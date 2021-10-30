@@ -1,8 +1,6 @@
 <div
   *ngIf="{
-    loadingVisit: loadingVisit$ | async,
     currentPatient: currentPatient$ | async,
-    activeVisit: activeVisit$ | async,
     vitalSignObservations: vitalSignObservations$ | async,
     hasConsultationStarted: hasConsultationStarted$ | async,
     startingConsultation: startingConsultation$ | async,
@@ -17,7 +15,8 @@
     formEntities: consultationForms$ | async,
     loadingForms: loadingForms$ | async,
     ordersUpdates: ordersUpdates$ | async,
-    currentLocation: currentLocation$ | async
+    currentLocation: currentLocation$ | async,
+    forms: forms$ | async
   } as dashboardParams"
 >
   <div
@@ -30,37 +29,10 @@
       !dashboardParams?.loadingForms
     "
   >
-    <div class="sidebar-container bg-white mat-elevation-z1">
-      <app-patient-sidebar
-        *ngIf="dashboardParams?.activeVisit"
-        [currentPatient]="dashboardParams?.currentPatient"
-        [hasPendingPaymentsForCurrentVisitType]="
-          dashboardParams?.hasPatientHavePendingPaymentForTheCurrentVisitType
-        "
-        [isEmergency]="dashboardParams?.activeVisit?.isEmergency"
-        [hasDeathStatus]="dashboardParams?.activeVisitDeathStatus"
-        [waitingToBeAdmitted]="
-          dashboardParams?.activeVisit?.waitingToBeAdmitted
-        "
-        [isAdmitted]="dashboardParams?.activeVisit?.isAdmitted"
-        [hasConsultationStarted]="dashboardParams?.hasConsultationStarted"
-      ></app-patient-sidebar>
-    </div>
-    <div
-      class="
-        patient-dashboard-container
-        sidebar-content-container
-        mat-elevation-z1
-      "
-    >
+    <div class="patient-dashboard-container mat-elevation-z1">
       <app-new-patient-profile
         [currentPatient]="dashboardParams?.currentPatient"
       ></app-new-patient-profile>
-      <mat-progress-bar
-        *ngIf="dashboardParams?.loadingVisit"
-        mode="indeterminate"
-      ></mat-progress-bar>
-
       <div>
         <div
           class="
@@ -87,15 +59,14 @@
           <div class="d-flex justify-content-end">
             <a
               class="text-danger mr-2"
-              *ngIf="dashboardParams?.activeVisit?.waitingToBeAdmitted"
+              *ngIf="activeVisit?.waitingToBeAdmitted"
             >
               Waiting to be given a bed
             </a>
             <a
               class="mr-2"
               *ngIf="
-                !dashboardParams?.activeVisit?.waitingToBeAdmitted &&
-                dashboardParams?.activeVisit?.isAdmitted
+                !activeVisit?.waitingToBeAdmitted && activeVisit?.isAdmitted
               "
             >
               <img
@@ -126,13 +97,13 @@
               <button
                 mat-menu-item
                 [disabled]="
-                  dashboardParams?.activeVisit?.isAdmitted ||
-                  dashboardParams?.activeVisit?.waitingToBeAdmitted ||
-                  dashboardParams?.activeVisitDeathStatus ||
+                  activeVisit?.isAdmitted ||
+                  activeVisit?.waitingToBeAdmitted ||
+                  activeVisitDeathStatus ||
                   dashboardParams?.startingConsultation ||
-                  (!dashboardParams?.activeVisit?.isEmergency &&
+                  (!activeVisit?.isEmergency &&
                     dashboardParams?.hasPatientHavePendingPaymentForTheCurrentVisitType) ||
-                  dashboardParams?.activeVisitDeathStatus
+                  activeVisitDeathStatus
                 "
                 (click)="
                   onOpenAdmitPopup(
@@ -140,7 +111,7 @@
                     'd2c7532c-fb01-11e2-8ff2-fd54ab5fdb2a',
                     'Admission Location',
                     dashboardParams?.currentPatient,
-                    dashboardParams?.activeVisit,
+                    activeVisit,
                     dashboardParams?.currentLocation
                   )
                 "
@@ -155,7 +126,7 @@
                     'a007bbfe-fbe5-11e2-8ff2-fd54ab5fdb2a',
                     'Treatment Room',
                     dashboardParams?.currentPatient,
-                    dashboardParams?.activeVisit,
+                    activeVisit,
                     dashboardParams?.currentLocation
                   )
                 "
@@ -166,32 +137,50 @@
                 mat-menu-item
                 [disabled]="
                   dashboardParams?.startingConsultation ||
-                  (!dashboardParams?.activeVisit?.isEmergency &&
+                  (!activeVisit?.isEmergency &&
                     dashboardParams?.hasPatientHavePendingPaymentForTheCurrentVisitType) ||
-                  dashboardParams?.activeVisitDeathStatus
+                  activeVisitDeathStatus
+                "
+                (click)="
+                  onOpenPopup(
+                    $event,
+                    'iCARE703-FORM-4df6-a364-abc9b1f48193',
+                    'Refer-to Location',
+                    dashboardParams?.currentPatient,
+                    activeVisit,
+                    dashboardParams?.currentLocation
+                  )
                 "
               >
                 Refer
               </button>
               <button
                 mat-menu-item
-                [disabled]="dashboardParams?.activeVisitDeathStatus"
+                [disabled]="activeVisitDeathStatus"
+                (click)="
+                  onOpenPopup(
+                    $event,
+                    '73d36615-9a4a-46a4-8134-2dca15acacc1',
+                    null,
+                    dashboardParams?.currentPatient,
+                    activeVisit,
+                    dashboardParams?.currentLocation
+                  )
+                "
               >
                 Mark Patient Deceased
               </button>
             </mat-menu>
-            <button
+            <!-- <button
               mat-flat-button
               color="primary"
               [disabled]="
                 dashboardParams?.startingConsultation ||
-                (!dashboardParams?.activeVisit?.isEmergency &&
+                (!activeVisit?.isEmergency &&
                   dashboardParams?.hasPatientHavePendingPaymentForTheCurrentVisitType) ||
-                dashboardParams?.activeVisitDeathStatus
+                activeVisitDeathStatus
               "
-              (click)="
-                onStartConsultation($event, dashboardParams?.activeVisit)
-              "
+              (click)="onStartConsultation($event, activeVisit)"
             >
               <mat-spinner
                 color="primary"
@@ -204,7 +193,7 @@
                   ? "Continue Consultation"
                   : "Consult Patient"
               }}
-            </button>
+            </button> -->
 
             <span
               class="ml-2 text-left"
@@ -223,7 +212,7 @@
           *ngIf="
             !dashboardParams?.startingConsultation &&
             !(
-              !dashboardParams?.activeVisit?.isEmergency &&
+              !activeVisit?.isEmergency &&
               dashboardParams?.hasPatientHavePendingPaymentForTheCurrentVisitType
             )
           "
@@ -232,7 +221,27 @@
             <div class="p-3">
               <div class="row">
                 <div class="col-lg-6 col-md-6 col-sm-12 col-sx-12">
-                  <mat-accordion>
+                  <app-clinical-notes
+                    *ngIf="
+                      !dashboardParams.loadingForms &&
+                      dashboardParams.currentPatient &&
+                      dashboardParams?.forms &&
+                      dashboardParams?.forms?.length > 0
+                    "
+                    [clinicalObservations]="
+                      dashboardParams?.observationsGroupedByConcept
+                    "
+                    [patient]="dashboardParams?.currentPatient"
+                    [location]="dashboardParams?.currentLocation"
+                    [visit]="activeVisit"
+                    [savingObservations]="params?.savingObservations"
+                    [forms]="dashboardParams?.forms"
+                    (saveObservations)="
+                      onSaveObservations($event, params?.currentPatient)
+                    "
+                  >
+                  </app-clinical-notes>
+                  <!-- <mat-accordion>
                     <mat-expansion-panel
                       class="mb-2 border p-0"
                       [expanded]="true"
@@ -243,7 +252,7 @@
 
                       <app-patient-vitals-summary></app-patient-vitals-summary>
                     </mat-expansion-panel>
-                  </mat-accordion>
+                  </mat-accordion> -->
                 </div>
 
                 <div class="col-lg-6 col-md-6 col-sm-12 col-sx-12">
@@ -262,8 +271,6 @@
                       ></app-patient-diagnoses-summary>
                     </mat-expansion-panel>
                   </mat-accordion>
-                </div>
-                <div class="col-lg-6 col-md-6 col-sm-12 col-sx-12">
                   <mat-accordion>
                     <mat-expansion-panel
                       class="mb-2 border p-0"
@@ -273,23 +280,19 @@
                         <mat-panel-title>Laboratory Tests </mat-panel-title>
                       </mat-expansion-panel-header>
                       <app-patient-lab-results-summary
-                        *ngIf="dashboardParams?.activeVisit"
+                        *ngIf="activeVisit"
                         [observations]="
                           dashboardParams?.observationsGroupedByConcept
                         "
-                        [patientVisit]="dashboardParams?.activeVisit"
+                        [patientVisit]="activeVisit"
                       ></app-patient-lab-results-summary>
                       <mat-progress-bar
-                        *ngIf="
-                          dashboardParams?.loadingVisit ||
-                          !dashboardParams?.activeVisit
-                        "
+                        *ngIf="dashboardParams?.loadingVisit || !activeVisit"
                         mode="indeterminate"
                       ></mat-progress-bar>
                     </mat-expansion-panel>
                   </mat-accordion>
-                </div>
-                <div class="col-lg-6 col-md-6 col-sm-12 col-sx-12">
+
                   <mat-accordion>
                     <mat-expansion-panel
                       class="mb-2 border p-0"
@@ -303,8 +306,7 @@
                       ></app-patient-diagnoses-summary>
                     </mat-expansion-panel>
                   </mat-accordion>
-                </div>
-                <div class="col-lg-6 col-md-6 col-sm-12 col-sx-12">
+
                   <mat-accordion>
                     <mat-expansion-panel
                       class="mb-2 border p-0"
@@ -314,8 +316,8 @@
                         <mat-panel-title>Medication </mat-panel-title>
                       </mat-expansion-panel-header>
                       <app-patient-medication-summary
-                        *ngIf="dashboardParams?.activeVisit"
-                        [patientVisit]="dashboardParams?.activeVisit"
+                        *ngIf="activeVisit"
+                        [patientVisit]="activeVisit"
                       ></app-patient-medication-summary>
                     </mat-expansion-panel>
                   </mat-accordion>
@@ -402,11 +404,11 @@
         </mat-tab-group>
         <div
           *ngIf="
-            (!dashboardParams?.activeVisit?.isEnsured &&
+            (!activeVisit?.isEnsured &&
               !dashboardParams?.loadingVisit &&
-                dashboardParams?.activeVisit &&
-                dashboardParams?.startingConsultation) ||
-            (!dashboardParams?.activeVisit?.isEmergency &&
+              activeVisit &&
+              dashboardParams?.startingConsultation) ||
+            (!activeVisit?.isEmergency &&
               dashboardParams?.hasPatientHavePendingPaymentForTheCurrentVisitType)
           "
           class="alert alert-danger p-3 ml-2 mr-2"

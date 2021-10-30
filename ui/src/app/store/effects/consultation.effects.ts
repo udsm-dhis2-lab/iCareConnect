@@ -1,7 +1,7 @@
-import { Injectable } from '@angular/core';
-import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { select, Store } from '@ngrx/store';
-import { of } from 'rxjs';
+import { Injectable } from "@angular/core";
+import { Actions, createEffect, ofType } from "@ngrx/effects";
+import { select, Store } from "@ngrx/store";
+import { of } from "rxjs";
 import {
   catchError,
   concatMap,
@@ -9,24 +9,24 @@ import {
   switchMap,
   tap,
   withLatestFrom,
-} from 'rxjs/operators';
-import { Location } from 'src/app/core/models';
-import { EncounterType } from 'src/app/shared/models/encounter-type.model';
-import { ICARE_CONFIG } from 'src/app/shared/resources/config';
-import { Patient } from 'src/app/shared/resources/patient/models/patient.model';
-import { VisitObject } from 'src/app/shared/resources/visits/models/visit-object.model';
-import { ConsultationService } from 'src/app/shared/services';
+} from "rxjs/operators";
+import { Location } from "src/app/core/models";
+import { EncounterType } from "src/app/shared/models/encounter-type.model";
+import { ICARE_CONFIG } from "src/app/shared/resources/config";
+import { Patient } from "src/app/shared/resources/patient/models/patient.model";
+import { VisitObject } from "src/app/shared/resources/visits/models/visit-object.model";
+import { ConsultationService } from "src/app/shared/services";
 import {
   Notification,
   NotificationService,
-} from 'src/app/shared/services/notification.service';
-import { go } from 'src/app/store/actions';
-import { AppState } from 'src/app/store/reducers';
-import { getCurrentLocation } from 'src/app/store/selectors';
-import { getCurrentPatient } from 'src/app/store/selectors/current-patient.selectors';
-import { getProviderDetails } from 'src/app/store/selectors/current-user.selectors';
-import { getEncounterTypeByUuid } from 'src/app/store/selectors/encounter-type.selectors';
-import { getActiveVisit } from 'src/app/store/selectors/visit.selectors';
+} from "src/app/shared/services/notification.service";
+import { go } from "src/app/store/actions";
+import { AppState } from "src/app/store/reducers";
+import { getCurrentLocation } from "src/app/store/selectors";
+import { getCurrentPatient } from "src/app/store/selectors/current-patient.selectors";
+import { getProviderDetails } from "src/app/store/selectors/current-user.selectors";
+import { getEncounterTypeByUuid } from "src/app/store/selectors/encounter-type.selectors";
+import { getActiveVisit } from "src/app/store/selectors/visit.selectors";
 import {
   checkIfConsultationIsStarted,
   createDiagnosticEncounter,
@@ -34,8 +34,8 @@ import {
   startConsultation,
   startConsultationError,
   upsertConsultation,
-} from '../actions/consultation.actions';
-import { getConsultationActiveVisit } from '../selectors/consultation.selectors';
+} from "../actions/consultation.actions";
+import { getConsultationActiveVisit } from "../selectors/consultation.selectors";
 
 @Injectable()
 export class ConsultationEffects {
@@ -67,7 +67,7 @@ export class ConsultationEffects {
           encounterType,
         ]: [any, any, Patient, Location, VisitObject, EncounterType]) => {
           const localStorageConsultation = JSON.parse(
-            localStorage.getItem('patientConsultation')
+            localStorage.getItem("patientConsultation")
           );
 
           const patientConsultation =
@@ -84,7 +84,6 @@ export class ConsultationEffects {
                       encounterUuid: localStorageConsultation.encounterUuid,
                     },
                   }),
-                  go({ path: [`/clinic/consultation/${currentPatient.id}`] }),
                 ];
               })
             );
@@ -92,8 +91,8 @@ export class ConsultationEffects {
 
           this.notificationService.show(
             new Notification({
-              message: 'Starting patient consultation...',
-              type: 'LOADING',
+              message: "Starting patient consultation...",
+              type: "LOADING",
             })
           );
 
@@ -106,14 +105,14 @@ export class ConsultationEffects {
             encounterProviders: [
               {
                 provider: provider?.uuid,
-                encounterRole: '240b26f9-dd88-4172-823d-4a8bfeb7841f',
+                encounterRole: "240b26f9-dd88-4172-823d-4a8bfeb7841f",
               },
             ],
           };
           return this.consultationService.start(patientConsultationData).pipe(
             switchMap((consultation) => {
               localStorage.setItem(
-                'patientConsultation',
+                "patientConsultation",
                 JSON.stringify({
                   ...consultation,
                   patientUuid: currentPatient?.id,
@@ -121,8 +120,8 @@ export class ConsultationEffects {
               );
               this.notificationService.show(
                 new Notification({
-                  message: 'Patient consultation started!',
-                  type: 'SUCCESS',
+                  message: "Patient consultation started!",
+                  type: "SUCCESS",
                 })
               );
               return [
@@ -133,8 +132,8 @@ export class ConsultationEffects {
             catchError((error) => {
               this.notificationService.show(
                 new Notification({
-                  message: 'Problem starting consultation',
-                  type: 'ERROR',
+                  message: "Problem starting consultation",
+                  type: "ERROR",
                 })
               );
 
@@ -166,7 +165,7 @@ export class ConsultationEffects {
           const patientConsultationData = {
             visit: visit?.uuid,
             patient: currentPatient?.id,
-            encounterType: '4d015850-5ab0-4fea-9568-9c2fe8ea2608',
+            encounterType: "4d015850-5ab0-4fea-9568-9c2fe8ea2608",
             location: location?.uuid,
             // TODO: Find best way to get encounter provider details and soft coding encounter type
             encounterProviders: [
@@ -179,7 +178,7 @@ export class ConsultationEffects {
           return this.consultationService.start(patientConsultationData).pipe(
             map((consultation) => {
               localStorage.setItem(
-                'patientConsultation',
+                "patientConsultation",
                 JSON.stringify({
                   ...consultation,
                   patientUuid: currentPatient?.id,
@@ -204,12 +203,12 @@ export class ConsultationEffects {
         ),
         tap(([{}, consultationVisit]: [any, VisitObject]) => {
           const consultationDetailsLocalOnLocalStorage =
-            JSON.parse(localStorage.getItem('patientConsultation')) || {};
+            JSON.parse(localStorage.getItem("patientConsultation")) || {};
           if (
             consultationDetailsLocalOnLocalStorage &&
-            !consultationDetailsLocalOnLocalStorage['encounterUuid']
+            !consultationDetailsLocalOnLocalStorage["encounterUuid"]
           ) {
-            this.store.dispatch(go({ path: ['/clinic'] }));
+            this.store.dispatch(go({ path: ["/clinic"] }));
           }
         })
       ),
@@ -221,7 +220,7 @@ export class ConsultationEffects {
       this.actions$.pipe(
         ofType(finishConsultation),
         tap(() => {
-          localStorage.removeItem('patientConsultation');
+          localStorage.removeItem("patientConsultation");
         })
       ),
     { dispatch: false }

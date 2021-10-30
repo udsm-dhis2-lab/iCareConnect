@@ -6,7 +6,9 @@
     privilegesConfigs: privilegesConfigs$ | async,
     currentUser: currentUser$ | async,
     userPrivileges: userPrivileges$ | async,
-    rolesLoadingState: rolesLoadingState$ | async
+    rolesLoadingState: rolesLoadingState$ | async,
+    loadingVisit: loadingVisit$ | async,
+    activeVisit: activeVisit$ | async
   } as params"
 >
   <app-shared-patient-dashboard
@@ -14,10 +16,13 @@
       params?.currentUser &&
       !params?.rolesLoadingState &&
       params?.privilegesConfigs &&
-      params?.userPrivileges
+      params?.userPrivileges &&
+      params?.activeVisit &&
+      !params?.loadingVisit
     "
     [formPrivilegesConfigs]="params?.privilegesConfigs"
     [currentUser]="params?.currentUser"
+    [activeVisit]="params?.activeVisit"
     [userPrivileges]="params?.userPrivileges"
   ></app-shared-patient-dashboard>
 
@@ -26,7 +31,8 @@
     *ngIf="
       params?.formPrivilegesConfigsLoadingState ||
       !params?.userPrivileges ||
-      params?.rolesLoadingState
+      params?.rolesLoadingState ||
+      params?.loadingVisit
     "
   ></mat-progress-bar>
 </div>
