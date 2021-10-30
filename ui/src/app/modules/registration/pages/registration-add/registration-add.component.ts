@@ -1,42 +1,49 @@
-import { Component, OnInit } from '@angular/core';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { Router } from '@angular/router';
-import { Store } from '@ngrx/store';
-import { getDateDifferenceYearsMonthsDays } from 'src/app/shared/helpers/date.helpers';
+import { Component, Input, OnInit } from "@angular/core";
+import { MatSnackBar } from "@angular/material/snack-bar";
+import { Router } from "@angular/router";
+import { Store } from "@ngrx/store";
+import { getDateDifferenceYearsMonthsDays } from "src/app/shared/helpers/date.helpers";
 import {
   addCurrentPatient,
   go,
   loadCurrentPatient,
-} from 'src/app/store/actions';
-import { getCurrentLocation } from 'src/app/store/selectors';
-import { RegistrationService } from '../../services/registration.services';
-import { VisitsService } from 'src/app/shared/resources/visits/services';
-import { Patient } from 'src/app/shared/resources/patient/models/patient.model';
-import { from, Observable, zip } from 'rxjs';
-import { LocationService } from 'src/app/core/services';
-import { tail, filter } from 'lodash';
-import { getCurrentPatient } from 'src/app/store/selectors/current-patient.selectors';
-import { StartVisitModelComponent } from '../../components/start-visit-model/start-visit-model.component';
-import { VisitStatusConfirmationModelComponent } from '../../components/visit-status-confirmation-model/visit-status-confirmation-model.component';
-import { MatDialog } from '@angular/material/dialog';
-import { SystemSettingsService } from 'src/app/core/services/system-settings.service';
+} from "src/app/store/actions";
+import { getCurrentLocation } from "src/app/store/selectors";
+import { RegistrationService } from "../../services/registration.services";
+import { VisitsService } from "src/app/shared/resources/visits/services";
+import { Patient } from "src/app/shared/resources/patient/models/patient.model";
+import { from, Observable, zip } from "rxjs";
+import { LocationService } from "src/app/core/services";
+import { tail, filter } from "lodash";
+import { getCurrentPatient } from "src/app/store/selectors/current-patient.selectors";
+import { StartVisitModelComponent } from "../../components/start-visit-model/start-visit-model.component";
+import { VisitStatusConfirmationModelComponent } from "../../components/visit-status-confirmation-model/visit-status-confirmation-model.component";
+import { MatDialog } from "@angular/material/dialog";
+import { SystemSettingsService } from "src/app/core/services/system-settings.service";
+import {
+  Notification,
+  NotificationService,
+} from "src/app/shared/services/notification.service";
 
 @Component({
-  selector: 'app-registration-add',
-  templateUrl: './registration-add.component.html',
-  styleUrls: ['./registration-add.component.scss'],
+  selector: "app-registration-add",
+  templateUrl: "./registration-add.component.html",
+  styleUrls: ["./registration-add.component.scss"],
 })
 export class RegistrationAddComponent implements OnInit {
+  @Input() patientInformation: any;
+  @Input() editMode: boolean;
+
   showOtherIdentifcation: boolean;
   showOtherBirthDetails: boolean;
   showMoreContactDetails: boolean;
   maxDateForDateOfBirth: Date = new Date();
 
-  newPatientOptions: string[] = ['Yes', 'No'];
+  newPatientOptions: string[] = ["Yes", "No"];
 
   registrationConfigurations$: Observable<any>;
   validatedTexts: any = {};
-  errorMessage: string = '';
+  errorMessage: string = "";
   updateCurrentMRNSystemSettingsResponse$: Observable<any>;
   currentMRN: number;
   currentMRNUuid: string;
@@ -47,6 +54,7 @@ export class RegistrationAddComponent implements OnInit {
     private registrationService: RegistrationService,
     private store: Store,
     private visitService: VisitsService,
+    private notificationService: NotificationService,
     private locationService: LocationService,
     private dialog: MatDialog,
     private systemSettingsService: SystemSettingsService
@@ -181,57 +189,156 @@ export class RegistrationAddComponent implements OnInit {
     ).subscribe(
       (results) => {
         if (results) {
-          this.systemSettingsService
-            .getSystemSettingsDetailsByKey('iCare.registration.currentMRN')
-            .subscribe((MRNResponse) => {
-              if (MRNResponse) {
-                this.currentMRNUuid = MRNResponse?.uuid;
-                const patientIdentifierTypes = results[0];
-                const facilityCode = results[1];
-                const autoFilledIdentifier = results[2];
-                this.patientIdentifierTypes = filter(
-                  patientIdentifierTypes.map((identifierType) => {
-                    const now = new Date();
-                    this.currentMRN = Number(MRNResponse?.value) + 1;
+          if (this.editMode) {
+            const patientIdentifierTypes = results[0];
+            const facilityCode = results[1];
+            const autoFilledIdentifier = results[2];
+            this.patientIdentifierTypes = filter(
+              patientIdentifierTypes.map((identifierType) => {
+                // TODO: Need to find best way to autofill identifier through regex
+                const isAutoFilled = identifierType.id === autoFilledIdentifier;
 
-                    // TODO: Need to find best way to autofill identifier through regex
-                    const isAutoFilled =
-                      identifierType.id === autoFilledIdentifier;
-                    if (isAutoFilled) {
-                      this.patient[identifierType.id] = `${facilityCode}/${
-                        this.currentMRN
-                      }/${now.getFullYear().toString().substring(2)}`;
-                    } else {
-                      this.patient[identifierType.id] = null;
-                    }
-                    setTimeout(() => {
-                      // UPDATE system settings
-                      this.updateCurrentMRNSystemSettingsResponse$ =
-                        this.systemSettingsService.updateSystemSettings({
-                          uuid: this.currentMRNUuid,
-                          value: this.currentMRN.toString(),
-                        });
-                    }, 50);
+                if (isAutoFilled) {
+                  if (this.patientInformation?.MRN) {
+                    this.patient[identifierType.id] =
+                      this.patientInformation?.MRN;
+                  } else {
+                    const identifierObject =
+                      this.patientInformation?.patient?.identifiers?.filter(
+                        (identifier) => {
+                          return (
+                            identifier?.identifierType?.uuid ==
+                            identifierType?.id
+                          );
+                        }
+                      );
 
-                    return { ...identifierType, disabled: isAutoFilled };
-                  }),
-                  (idType) => {
-                    ///// console.log("idtype :: ",idType)
-                    return (
-                      idType?.id != '8d79403a-c2cc-11de-8d13-0010c6dffd0f' &&
-                      idType?.id != 'a5d38e09-efcb-4d91-a526-50ce1ba5011a' &&
-                      idType?.id != '05a29f94-c0ed-11e2-94be-8c13b969e334' &&
-                      idType?.id != '8d793bee-c2cc-11de-8d13-0010c6dffd0f'
-                    );
+                    this.patient[identifierType.id] =
+                      identifierObject?.length > 0
+                        ? identifierObject[0]?.identifier
+                        : null;
+                    this.patient["MRN"] =
+                      identifierObject?.length > 0
+                        ? identifierObject[0]?.identifier
+                        : null;
                   }
-                );
+                } else {
+                  this.patient[identifierType.id] = null;
+                }
 
-                this.otherPatientIdentifierTypes = tail(
-                  this.patientIdentifierTypes
+                return { ...identifierType, disabled: isAutoFilled };
+              }),
+              (idType) => {
+                return (
+                  idType?.id != "8d79403a-c2cc-11de-8d13-0010c6dffd0f" &&
+                  idType?.id != "a5d38e09-efcb-4d91-a526-50ce1ba5011a" &&
+                  idType?.id != "05a29f94-c0ed-11e2-94be-8c13b969e334" &&
+                  idType?.id != "8d793bee-c2cc-11de-8d13-0010c6dffd0f"
                 );
-                this.loadingForm = false;
               }
-            });
+            );
+
+            this.otherPatientIdentifierTypes = tail(
+              this.patientIdentifierTypes
+            );
+
+            this.patient = {
+              ...this.patient,
+              fname: this.patientInformation?.fname
+                ? this.patientInformation?.fname
+                : "",
+              mname: this.patientInformation?.mname,
+              lname: this.patientInformation?.lname
+                ? this.patientInformation?.lname
+                : "",
+              age: {
+                years: this.patientInformation?.patientFull?.person?.age,
+                months: null,
+                days: null,
+              },
+              dob: this.patientInformation?.patientFull?.person?.birthdate?.split(
+                "T"
+              )[0],
+              birthplace: this.patientInformation?.birthplace,
+              gender: this.patientInformation?.patientFull?.person?.gender,
+              phone: this.patientInformation?.phone,
+              cityVillage: this.patientInformation?.cityVillage,
+              village: this.patientInformation?.street,
+              district: this.patientInformation?.district,
+              region: this.patientInformation?.region,
+              council: this.patientInformation?.council,
+              referredFrom: null,
+              tribe: this.patientInformation?.tribe,
+              maritalStatus: this.patientInformation?.maritalStatus,
+              occupation: this.patientInformation?.occupation,
+              education: this.patientInformation?.education,
+              nationalId: null,
+              nationalIdType: null,
+              kinFname: this.patientInformation?.kinFname,
+              kinLName: this.patientInformation?.kinLName,
+              kinRelationship: this.patientInformation?.kinRelationship,
+              kinPhone: this.patientInformation?.kinPhone,
+              areaLeader: this.patientInformation?.areaLeader,
+              areaLeaderNumber: this.patientInformation?.areaLeaderNumber,
+              religion: this?.patientInformation?.religion,
+              newPatient: this.patientInformation?.isNew,
+              RelationshipType: this.patientInformation?.relationshipType,
+              Id: this.patientInformation?.relatedPersonId,
+            };
+
+            this.loadingForm = false;
+          } else {
+            this.systemSettingsService
+              .getSystemSettingsDetailsByKey("iCare.registration.currentMRN")
+              .subscribe((MRNResponse) => {
+                if (MRNResponse) {
+                  this.currentMRNUuid = MRNResponse?.uuid;
+                  const patientIdentifierTypes = results[0];
+                  const facilityCode = results[1];
+                  const autoFilledIdentifier = results[2];
+                  this.patientIdentifierTypes = filter(
+                    patientIdentifierTypes.map((identifierType) => {
+                      const now = new Date();
+                      this.currentMRN = Number(MRNResponse?.value) + 1;
+
+                      // TODO: Need to find best way to autofill identifier through regex
+                      const isAutoFilled =
+                        identifierType.id === autoFilledIdentifier;
+                      if (isAutoFilled) {
+                        this.patient[identifierType.id] = `${facilityCode}/${
+                          this.currentMRN
+                        }/${now.getFullYear().toString().substring(2)}`;
+                      } else {
+                        this.patient[identifierType.id] = null;
+                      }
+                      setTimeout(() => {
+                        // UPDATE system settings
+                        this.updateCurrentMRNSystemSettingsResponse$ =
+                          this.systemSettingsService.updateSystemSettings({
+                            uuid: this.currentMRNUuid,
+                            value: this.currentMRN.toString(),
+                          });
+                      }, 50);
+
+                      return { ...identifierType, disabled: isAutoFilled };
+                    }),
+                    (idType) => {
+                      return (
+                        idType?.id != "8d79403a-c2cc-11de-8d13-0010c6dffd0f" &&
+                        idType?.id != "a5d38e09-efcb-4d91-a526-50ce1ba5011a" &&
+                        idType?.id != "05a29f94-c0ed-11e2-94be-8c13b969e334" &&
+                        idType?.id != "8d793bee-c2cc-11de-8d13-0010c6dffd0f"
+                      );
+                    }
+                  );
+
+                  this.otherPatientIdentifierTypes = tail(
+                    this.patientIdentifierTypes
+                  );
+                  this.loadingForm = false;
+                }
+              });
+          }
         }
       },
       (error) => {
@@ -257,7 +364,7 @@ export class RegistrationAddComponent implements OnInit {
     this.ShowFieldsError = false;
 
     if (this.mandatoryFieldsMissing) {
-      this.openSnackBar('Warning: Some mandatory fields are missing', null);
+      this.openSnackBar("Warning: Some mandatory fields are missing", null);
       this.ShowFieldsError = true;
     } else {
       if (currentLocation) {
@@ -279,11 +386,11 @@ export class RegistrationAddComponent implements OnInit {
             //TODO: fix address
             addresses: [
               {
-                stateProvince: this.patient['district'],
-                cityVillage: this.patient['village'],
-                countyDistrict: this.patient['ward'],
-                address1: this.patient['region'],
-                postalCode: '',
+                stateProvince: this.patient["district"],
+                cityVillage: this.patient["village"],
+                countyDistrict: this.patient["ward"],
+                address1: this.patient["region"],
+                postalCode: "",
               },
             ],
             attributes: (this.personAttributeTypes || [])
@@ -299,7 +406,7 @@ export class RegistrationAddComponent implements OnInit {
             .map((personIdentifierType) => {
               if (
                 personIdentifierType.id ==
-                '26742868-a38c-4e6a-ac1d-ae283c414c2e'
+                "26742868-a38c-4e6a-ac1d-ae283c414c2e"
               ) {
                 return {
                   identifier: this.patient[personIdentifierType.id],
@@ -319,64 +426,97 @@ export class RegistrationAddComponent implements OnInit {
             .filter((patientIdentifier) => patientIdentifier?.identifier),
         };
 
-        this.registrationService.createPatient(patientPayload).subscribe(
-          (patientResponse) => {
-            this.errorAddingPatient = false;
-            let patient = new Patient(patientResponse);
-            //// console.log('patient created ::', {patient: {...patientResponse} as any}patientResponse);
+        //TODO: add check for edit mode to see if can create or edit mode
+        if (this.editMode) {
+          this.registrationService
+            .updatePatient(patientPayload, this.patientInformation?.id)
+            .subscribe(
+              (updatePatientResponse) => {
+                this.notificationService.show(
+                  new Notification({
+                    message: "Patient details updated succesfully",
+                    type: "SUCCESS",
+                  })
+                );
 
-            //patient added succesfully
+                this.store.dispatch(go({ path: ['/registration/home'] }));
+              },
+              (errorUpdatingPatient) => {
+                this.errorAddingPatient = true;
+                this.patientAdded = false;
+                this.addingPatient = false;
+                this.errorMessage = errorUpdatingPatient?.error?.error
+                  ? errorUpdatingPatient?.error?.error?.message +
+                    `: ${(
+                      errorUpdatingPatient?.error?.error?.globalErrors.map(
+                        (globalError) => globalError?.message
+                      ) || []
+                    ).join(" and ")}`
+                  : "Error editing patient/client";
 
-            this.store.dispatch(
-              loadCurrentPatient({
-                uuid: patientResponse['uuid'],
-                isRegistrationPage: true,
-              })
+                this.openSnackBar("Error editin patient", null);
+              }
             );
+        } else {
+          this.registrationService.createPatient(patientPayload).subscribe(
+            (patientResponse) => {
+              this.errorAddingPatient = false;
+              let patient = new Patient(patientResponse);
+              //// console.log('patient created ::', {patient: {...patientResponse} as any}patientResponse);
 
-            setTimeout(() => {
-              this.patientAdded = true;
-              this.addingPatient = false;
+              //patient added succesfully
 
-              // this.store.dispatch(addCurrentPatient({patient}))
-              this.dialog
-                .open(StartVisitModelComponent, {
-                  width: '85%',
-                  data: { patient: patientResponse },
+              this.store.dispatch(
+                loadCurrentPatient({
+                  uuid: patientResponse["uuid"],
+                  isRegistrationPage: true,
                 })
-                .afterClosed()
-                .subscribe((visitDetails) => {
-                  if (visitDetails) {
-                    this.dialog.open(VisitStatusConfirmationModelComponent, {
-                      width: '30%',
-                      height: '100px',
-                    });
-                  }
-                });
+              );
 
-              // this.store.dispatch(go({ path: ['/registration/visit'] }));
-            }, 500);
-          },
-          (patientError) => {
-            this.errorAddingPatient = true;
-            this.patientAdded = false;
-            this.addingPatient = false;
-            this.errorMessage = patientError?.error?.error
-              ? patientError?.error?.error?.message +
-                `: ${(
-                  patientError?.error?.error?.globalErrors.map(
-                    (globalError) => globalError?.message
-                  ) || []
-                ).join(' and ')}`
-              : 'Error adding patient/client';
+              setTimeout(() => {
+                this.patientAdded = true;
+                this.addingPatient = false;
 
-            this.openSnackBar('Error creating patient', null);
-          }
-        );
+                // this.store.dispatch(addCurrentPatient({patient}))
+                this.dialog
+                  .open(StartVisitModelComponent, {
+                    width: "85%",
+                    data: { patient: patientResponse },
+                  })
+                  .afterClosed()
+                  .subscribe((visitDetails) => {
+                    if (visitDetails) {
+                      this.dialog.open(VisitStatusConfirmationModelComponent, {
+                        width: "30%",
+                        height: "100px",
+                      });
+                    }
+                  });
+
+                // this.store.dispatch(go({ path: ['/registration/visit'] }));
+              }, 500);
+            },
+            (patientError) => {
+              this.errorAddingPatient = true;
+              this.patientAdded = false;
+              this.addingPatient = false;
+              this.errorMessage = patientError?.error?.error
+                ? patientError?.error?.error?.message +
+                  `: ${(
+                    patientError?.error?.error?.globalErrors.map(
+                      (globalError) => globalError?.message
+                    ) || []
+                  ).join(" and ")}`
+                : "Error adding patient/client";
+
+              this.openSnackBar("Error creating patient", null);
+            }
+          );
+        }
       } else {
         //current location not set
 
-        this.openSnackBar('Error: location is not set', null);
+        this.openSnackBar("Error: location is not set", null);
       }
     }
   }
@@ -384,8 +524,8 @@ export class RegistrationAddComponent implements OnInit {
   openSnackBar(message: string, action: string) {
     this._snackBar.open(message, action, {
       duration: 3000,
-      horizontalPosition: 'center',
-      verticalPosition: 'top',
+      horizontalPosition: "center",
+      verticalPosition: "top",
     });
   }
 
@@ -452,6 +592,6 @@ export class RegistrationAddComponent implements OnInit {
 
   validateNamesInputs(value, key) {
     var regex = /^[a-zA-Z ]{2,30}$/;
-    this.validatedTexts[key] = regex.test(value) ? 'valid' : 'invalid';
+    this.validatedTexts[key] = regex.test(value) ? "valid" : "invalid";
   }
 }

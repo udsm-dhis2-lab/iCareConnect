@@ -191,11 +191,12 @@ public class ICareController {
 	public Map<String, Object> getPendingVisit(@RequestParam(defaultValue = "100") Integer limit,
 											   @RequestParam(defaultValue = "0") Integer startIndex,
 											   @RequestParam String orderTypeUuid,
+											   @RequestParam(required = false) String q,
 											   @RequestParam(required = false) String locationUuid,
 											   @RequestParam(required = false) OrderStatus.OrderStatusCode orderStatusCode,
 											   @RequestParam(required = false) Order.FulfillerStatus fulfillerStatus) {
 
-		List<Visit> visits = iCareService.getVisitsByOrderType(orderTypeUuid, locationUuid, orderStatusCode, fulfillerStatus,limit, startIndex);
+		List<Visit> visits = iCareService.getVisitsByOrderType(q, orderTypeUuid, locationUuid, orderStatusCode, fulfillerStatus,limit, startIndex);
 
 		List<Map<String, Object>> responseSamplesObject = new ArrayList<Map<String, Object>>();
 		for (Visit visit : visits) {

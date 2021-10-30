@@ -1,14 +1,16 @@
-import { Injectable } from '@angular/core';
+import { Injectable } from "@angular/core";
 import {
   ActivatedRoute,
   CanActivate,
   CanDeactivate,
   Router,
-} from '@angular/router';
-import { AuthService } from '../services/auth.service';
+} from "@angular/router";
+import { Observable, of } from "rxjs";
+import { first, map } from "rxjs/operators";
+import { AuthService } from "../services/auth.service";
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: "root",
 })
 export class AuthGuard implements CanActivate {
   constructor(
@@ -17,12 +19,16 @@ export class AuthGuard implements CanActivate {
     private route: ActivatedRoute
   ) {}
 
-  canActivate(): boolean {
-    if (!this.auth.isAuthenticated()) {
-      this.router.navigate(['login']);
-      return false;
-    }
-
-    return true;
+  canActivate(): Observable<boolean> {
+    return this.auth.session().pipe(
+      first(),
+      map((session) => {
+        const localSession = sessionStorage.getItem("JSESSIONID");
+        if (!session.authenticated || !localSession) {
+          this.router.navigate(["/login"]);
+        }
+        return session.authenticated;
+      })
+    );
   }
 }
