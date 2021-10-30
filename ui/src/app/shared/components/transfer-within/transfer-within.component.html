@@ -9,7 +9,9 @@
     transferLoadingState: transferLoadingState$ | async,
     transferStatus: transferStatus$ | async,
     currentVisitServiceAttributeDetails:
-      currentVisitServiceAttributeDetails$ | async
+      currentVisitServiceAttributeDetails$ | async,
+    currentVisitServiceBillingAttributeDetails:
+      currentVisitServiceBillingAttributeDetails$ | async
   } as params"
 >
   <mat-progress-bar
@@ -69,7 +71,8 @@
           params?.provider,
           params?.visit,
           obs,
-          params?.currentVisitServiceAttributeDetails
+          params?.currentVisitServiceAttributeDetails,
+          params?.currentVisitServiceBillingAttributeDetails
         )
       "
     >

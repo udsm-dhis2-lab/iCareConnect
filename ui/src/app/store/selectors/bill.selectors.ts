@@ -1,13 +1,14 @@
-import { createFeatureSelector, createSelector } from '@ngrx/store';
-import { BillObject } from 'src/app/modules/billing/models/bill-object.model';
-import { billAdapter, BillState } from '../states/bill.state';
-import { getBillItemsGroupedByBill } from './bill-item.selector';
+import { createFeatureSelector, createSelector } from "@ngrx/store";
+import { BillObject } from "src/app/modules/billing/models/bill-object.model";
+import { billAdapter, BillState } from "../states/bill.state";
+import { getBillItemsGroupedByBill } from "./bill-item.selector";
 import {
   getActiveVisit,
   getCurrentVisitServiceAttributeDetails,
-} from './visit.selectors';
+  getCurrentVisitServiceBillingAttributeDetails,
+} from "./visit.selectors";
 
-const getBillState = createFeatureSelector<BillState>('bill');
+const getBillState = createFeatureSelector<BillState>("bill");
 
 export const { selectAll: getAllBills, selectEntities: getBillEntities } =
   billAdapter.getSelectors(getBillState);
@@ -38,7 +39,7 @@ export const getPatientPendingBillStatus = createSelector(
 
 export const getActiveVisitPendingVisitServiceBillStatus = createSelector(
   getAllBills,
-  getCurrentVisitServiceAttributeDetails,
+  getCurrentVisitServiceBillingAttributeDetails,
   getActiveVisit,
   (bills, visitServiceAttributeDetails: any, activeVisit: any) => {
     if (activeVisit?.isEnsured) {
@@ -50,7 +51,7 @@ export const getActiveVisitPendingVisitServiceBillStatus = createSelector(
         activeVisit.attributes.filter(
           (attribute) =>
             attribute?.visitAttributeDetails?.attributeType?.display ===
-            'Insurance ID'
+            "Insurance ID"
         ) || []
       )?.length > 0
     ) {
@@ -61,7 +62,7 @@ export const getActiveVisitPendingVisitServiceBillStatus = createSelector(
         activeVisit.attributes.filter(
           (attribute) =>
             attribute?.visitAttributeDetails?.attributeType?.display ===
-            'Insurance ID'
+            "Insurance ID"
         ) || []
       )?.length === 0 &&
       bills &&
@@ -90,15 +91,16 @@ export const getActiveVisitPendingVisitServiceBillStatus = createSelector(
               return formattedBill;
             }
           }) || [];
+      console.log("billedServiceDetails", billedServiceDetails);
       return billedServiceDetails.length > 0;
-    } else if (bills && bills?.length === 0) {
+    } else if (activeVisit && bills && bills?.length === 0) {
       return false;
     } else if (
+      activeVisit &&
       !activeVisit?.isEnsured &&
-      (bills.filter((bill) => bill?.visitUuid === activeVisit) || []).length ===
-        0
+      (bills.filter((bill) => bill?.visitUuid === activeVisit?.uuid) || [])
+        .length === 0
     ) {
-      // console.log('activeVisit', activeVisit);
       return false;
     } else {
       return true;

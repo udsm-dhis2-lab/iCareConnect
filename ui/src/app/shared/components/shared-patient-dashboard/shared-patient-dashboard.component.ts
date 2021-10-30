@@ -27,6 +27,7 @@ import {
 import { getCurrentPatient } from "src/app/store/selectors/current-patient.selectors";
 import { getEncounterLoadedStatus } from "src/app/store/selectors/encounter-type.selectors";
 import {
+  getCustomOpenMRSFormsByIds,
   getFormEntitiesByNames,
   getFormsLoadingState,
 } from "src/app/store/selectors/form.selectors";
@@ -53,6 +54,14 @@ import { PatientVisitHistoryModalComponent } from "../patient-visit-history-moda
 import { MatDialog } from "@angular/material/dialog";
 import { OrdersService } from "../../resources/order/services/orders.service";
 import { TransferWithinComponent } from "../transfer-within/transfer-within.component";
+import { AdmissionFormComponent } from "../admission-form/admission-form.component";
+import { CaptureFormDataModalComponent } from "../capture-form-data-modal/capture-form-data-modal.component";
+import {
+  getCurrentUserPrivileges,
+  getProviderDetails,
+} from "src/app/store/selectors/current-user.selectors";
+import { ObsCreate, ProviderGetFull } from "../../resources/openmrs";
+import { saveObservations } from "src/app/store/actions/observation.actions";
 
 @Component({
   selector: "app-shared-patient-dashboard",
@@ -63,6 +72,7 @@ export class SharedPatientDashboardComponent implements OnInit {
   @Input() formPrivilegesConfigs: any;
   @Input() currentUser: any;
   @Input() userPrivileges: any;
+  @Input() activeVisit: any;
   currentPatient$: Observable<Patient>;
   vitalSignObservations$: Observable<any>;
   loadingVisit$: Observable<boolean>;
@@ -83,6 +93,11 @@ export class SharedPatientDashboardComponent implements OnInit {
   applicableForms: any[] = [];
   ordersUpdates$: Observable<any>;
   currentLocation$: Observable<Location>;
+  provider$: Observable<ProviderGetFull>;
+  menus: any[];
+  privileges$: Observable<any>;
+  forms$: Observable<any>;
+
   constructor(
     private store: Store<AppState>,
     private dialog: MatDialog,
@@ -90,6 +105,7 @@ export class SharedPatientDashboardComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.onStartConsultation(this.activeVisit);
     this.applicableForms = getApplicableForms(
       ICARE_CONFIG,
       this.currentUser,
@@ -106,6 +122,9 @@ export class SharedPatientDashboardComponent implements OnInit {
         ),
       })
     );
+
+    this.privileges$ = this.store.select(getCurrentUserPrivileges);
+    this.provider$ = this.store.select(getProviderDetails);
     this.store.dispatch(
       loadForms({ formConfigs: ICARE_CONFIG?.consultation?.forms })
     );
@@ -116,10 +135,6 @@ export class SharedPatientDashboardComponent implements OnInit {
     );
 
     this.diagnoses$ = this.store.select(getAllDiagnoses);
-
-    this.loadingVisit$ = this.store.pipe(select(getVisitLoadingState));
-    this.activeVisit$ = this.store.pipe(select(getActiveVisit));
-
     this.billLoadingState$ = this.store.pipe(select(getLoadingBillStatus));
     this.patientHasPendingBills$ = this.store.pipe(
       select(getPatientPendingBillStatus)
@@ -156,11 +171,22 @@ export class SharedPatientDashboardComponent implements OnInit {
       select(getFormEntitiesByNames(CONSULTATION_FORM_CONFIGS))
     );
 
+    this.forms$ = this.store.select(getCustomOpenMRSFormsByIds, {
+      formUUids: map(this.applicableForms, (form) => {
+        return form?.id;
+      }),
+    });
+
     this.currentLocation$ = this.store.select(getCurrentLocation);
   }
 
-  onStartConsultation(e, visit: VisitObject): void {
-    e.stopPropagation();
+  onSaveObservations(observations: ObsCreate[], patient): void {
+    this.store.dispatch(
+      saveObservations({ observations, patientId: patient?.patient?.uuid })
+    );
+  }
+
+  onStartConsultation(visit: VisitObject): void {
     this.store.dispatch(startConsultation());
     if (!visit.consultationStarted) {
       const orders = [
@@ -190,7 +216,58 @@ export class SharedPatientDashboardComponent implements OnInit {
     });
   }
 
-  onOpenMore(
+  onOpenPopup(
+    event: Event,
+    formUuid,
+    locationType,
+    currentPatient,
+    visit,
+    currentLocation,
+    privileges,
+    provider
+  ): void {
+    event.stopPropagation();
+    this.dialog.open(CaptureFormDataModalComponent, {
+      width: "60%",
+      data: {
+        patient: currentPatient,
+        form: { formUuid },
+        privileges,
+        provider,
+        visit,
+        locationType,
+        currentLocation,
+      },
+      disableClose: false,
+    });
+  }
+
+  onOpenAdmitPopup(
+    event: Event,
+    formUuid,
+    locationType,
+    currentPatient,
+    visit,
+    currentLocation
+  ): void {
+    event.stopPropagation();
+    this.dialog.open(AdmissionFormComponent, {
+      height: "230px",
+      width: "45%",
+      data: {
+        patient: currentPatient,
+        form: { formUuid },
+        currentLocation,
+        locationType,
+        visit,
+        path: "/clinic/patient-list",
+      },
+      disableClose: false,
+      panelClass: "custom-dialog-container",
+    });
+  }
+
+  onOpenTransferWithinPopup(
     event: Event,
     formUuid,
     locationType,

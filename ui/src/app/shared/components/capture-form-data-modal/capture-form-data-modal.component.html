@@ -11,21 +11,27 @@
     *ngIf="!params?.form || !params?.observations"
     mode="indeterminate"
   ></mat-progress-bar>
-  <ng-container *ngIf="params?.form && params?.observations">
-    <h2 mat-dialog-title>
-      {{ params?.form?.name }}
-    </h2>
-    <mat-dialog-content>
+  <ng-container>
+    <mat-toolbar color="primary">
+      <span>{{ params?.form?.name }}</span>
+      <span class="toolbar-spacer"></span>
+      <button mat-icon-button mat-dialog-close matTooltip="close">
+        <mat-icon>close</mat-icon>
+      </button>
+    </mat-toolbar>
+    <mat-dialog-content *ngIf="params?.form && params?.observations">
       <app-capture-form-data
         [form]="params?.form"
         [observations]="params?.observations"
         (formDataUpdate)="onFormUpdate($event, params?.form)"
       ></app-capture-form-data>
     </mat-dialog-content>
-    <!-- <div class="content">
-      
-    </div> -->
+    <mat-progress-bar
+      *ngIf="!params?.form || !params?.observations"
+      mode="indeterminate"
+    ></mat-progress-bar>
     <mat-dialog-actions align="end">
+      <button mat-stroked-button (click)="onClose($event)">Cancel</button>
       <button
         mat-flat-button
         color="primary"
@@ -39,20 +45,6 @@
         ></mat-spinner>
         {{ savingObservations ? "Saving ..." : "Save" }}
       </button>
-      <button mat-stroked-button (click)="onClose($event)">Cancel</button>
     </mat-dialog-actions>
-    <!-- <div class="btns">
-      <button mat-stroked-button class="mr-2">
-        <mat-spinner
-          color="primary"
-          [diameter]="20"
-          style="display: inline-block !important; margin-right: 4px"
-        ></mat-spinner>
-        Confirm
-      </button>
-      <button mat-stroked-button class="mr-2" (click)="onClose($event)">
-        Cancel
-      </button>
-    </div> -->
   </ng-container>
 </ng-container>
