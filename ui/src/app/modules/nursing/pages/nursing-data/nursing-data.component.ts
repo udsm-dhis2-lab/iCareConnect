@@ -125,7 +125,12 @@ export class NursingDataComponent implements OnInit {
     this.store.dispatch(clearBills());
   }
 
-  admitPatient(event: Event, currentPatient, visit): void {
+  admitPatient(
+    event: Event,
+    currentPatient,
+    visit,
+    sendToObservation: Boolean
+  ): void {
     event.stopPropagation();
 
     this.dialog.open(AdmissionFormComponent, {
@@ -138,6 +143,7 @@ export class NursingDataComponent implements OnInit {
         },
         visit,
         path: "/nursing",
+        sendToObservation,
       },
       disableClose: false,
       panelClass: "custom-dialog-container",
