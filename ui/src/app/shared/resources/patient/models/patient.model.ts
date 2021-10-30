@@ -1,10 +1,10 @@
-import * as _ from 'lodash';
-import * as moment from 'moment';
-import { PatientGetFull } from '../../openmrs';
+import * as _ from "lodash";
+import * as moment from "moment";
+import { PatientGetFull } from "../../openmrs";
 
 enum GenderType {
-  M = 'Male',
-  F = 'Female',
+  M = "Male",
+  F = "Female",
 }
 export class Patient {
   // TODO: Need to find best way to type incoming patient
@@ -25,7 +25,7 @@ export class Patient {
   get MRN(): string {
     return (_.filter(this.patient?.identifiers || []),
     (id) => {
-      return id?.identifierType?.display == 'MRN';
+      return id?.identifierType?.display == "MRN";
     })[0]?.identifier;
   }
 
@@ -46,7 +46,7 @@ export class Patient {
   }
 
   get birthplace(): any {
-    return this.getAttributeByTypeName('birthplace');
+    return this.getAttributeByTypeName("birthplace");
   }
 
   get age(): string {
@@ -62,74 +62,74 @@ export class Patient {
   }
 
   get kinLName(): any {
-    return this.getAttributeByTypeName('kinLName');
+    return this.getAttributeByTypeName("kinLName");
   }
 
   get kinFname(): any {
-    return this.getAttributeByTypeName('kinFname');
+    return this.getAttributeByTypeName("kinFname");
   }
 
   get kinPhone(): any {
-    return this.getAttributeByTypeName('kinPhone');
+    return this.getAttributeByTypeName("kinPhone");
   }
 
   get kinRelationship(): any {
-    return this.getAttributeByTypeName('kinRelationship');
+    return this.getAttributeByTypeName("kinRelationship");
   }
 
   get phone(): any {
-    return this.getAttributeByTypeName('phone');
+    return this.getAttributeByTypeName("phone");
   }
 
   get isNew(): any {
-    return this.getAttributeByTypeName('newPatient');
+    return this.getAttributeByTypeName("newPatient");
   }
 
   get relationshipType(): any {
-    return this.getAttributeByTypeName('RelationshipType');
+    return this.getAttributeByTypeName("RelationshipType");
   }
 
   get relatedPersonId(): any {
-    return this.getAttributeByTypeName('Id');
+    return this.getAttributeByTypeName("Id");
   }
 
   get fileNo(): any {
-    return this.getAttributeByTypeName('fileNo');
+    return this.getAttributeByTypeName("fileNo");
   }
 
   get tribe(): any {
-    return this.getAttributeByTypeName('tribe');
+    return this.getAttributeByTypeName("tribe");
   }
 
   get maritalStatus(): any {
-    return this.getAttributeByTypeName('maritalStatus');
+    return this.getAttributeByTypeName("maritalStatus");
   }
 
   get religion(): any {
-    return this.getAttributeByTypeName('religion');
+    return this.getAttributeByTypeName("religion");
   }
 
   get areaLeaderNumber(): any {
-    return this.getAttributeByTypeName('areaLeaderNumber');
+    return this.getAttributeByTypeName("areaLeaderNumber");
   }
 
   get areaLeader(): any {
-    return this.getAttributeByTypeName('areaLeader');
+    return this.getAttributeByTypeName("areaLeader");
   }
 
   get education(): any {
-    return this.getAttributeByTypeName('education');
+    return this.getAttributeByTypeName("education");
   }
 
   get occupation(): any {
-    return this.getAttributeByTypeName('occupation');
+    return this.getAttributeByTypeName("occupation");
   }
   get mname(): any {
-    return this.getAttributeByTypeName('mname');
+    return this.getAttributeByTypeName("mname");
   }
 
   get gothomisMRN(): any {
-    return this.getAttributeByTypeName('GoTHOMIS');
+    return this.getAttributeByTypeName("GoTHOMIS");
   }
 
   get noneMandatoryIdentity(): any {
@@ -137,13 +137,13 @@ export class Patient {
   }
 
   get phoneNumber(): string {
-    let phoneNumber = '';
+    let phoneNumber = "";
     const attributes = this.patient?.attributes || [];
     if (attributes.length > 0) {
       const numbersObjectArray = _.filter(attributes, (attribute) => {
         return attribute.attributeType &&
           attribute.attributeType.name &&
-          attribute.attributeType.name === 'Telephone Number'
+          attribute.attributeType.name === "Telephone Number"
           ? true
           : false;
       });
@@ -178,15 +178,16 @@ export class Patient {
     let attributeObject = _.filter(
       this.patient?.person?.attributes,
       (attribute) => {
-        return attribute?.display.toLowerCase().indexOf(name.toLowerCase()) ===
-          0
+        return attribute?.attributeType?.display
+          .toLowerCase()
+          .indexOf(name.toLowerCase()) === 0
           ? true
           : false;
       }
     )[0];
 
-    return attributeObject && attributeObject?.display.split('= ')?.length > 1
-      ? attributeObject?.display.split('= ')[1]
-      : '';
+    return attributeObject && attributeObject?.display.split("= ")?.length > 1
+      ? attributeObject?.display.split("= ")[1]
+      : "";
   }
 }
