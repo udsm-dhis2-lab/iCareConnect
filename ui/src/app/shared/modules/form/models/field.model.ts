@@ -1,4 +1,4 @@
-import { DropdownOption } from './dropdown-option.model';
+import { DropdownOption } from "./dropdown-option.model";
 
 export class Field<T> {
   value: T;
@@ -46,19 +46,22 @@ export class Field<T> {
     } = {}
   ) {
     this.value = options.value;
-    this.key = options.key || '';
-    this.id = options.id || '';
-    this.label = options.label || '';
+    this.key = options.key || "";
+    this.id = options.id || "";
+    this.label = options.label || "";
     this.required = !!options.required;
     this.order = options.order === undefined ? 1 : options.order;
-    this.controlType = options.controlType || '';
-    this.type = options.type || '';
+    this.controlType = options.controlType || "";
+    this.type = options.type || "";
     this.options = options.options || [];
     this.disabled = options.disabled || false;
     this.placeholder = options.placeholder;
     this.min = options.min;
     this.max = options.max;
     this.hidden = options.hidden || false;
-    this.units = options.units || '';
+    this.units = options.units || "";
+    (this.shouldHaveLiveSearchForDropDownFields =
+      options.shouldHaveLiveSearchForDropDownFields),
+      (this.otherType = options.otherType);
   }
 }
