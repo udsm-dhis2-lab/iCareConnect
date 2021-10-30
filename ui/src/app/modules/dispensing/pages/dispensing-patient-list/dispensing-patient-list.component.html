@@ -19,12 +19,13 @@
     </div> -->
     <div>
       <mat-tab-group>
-        <mat-tab label="All">
+        <mat-tab label="To dispense">
           <div class="p-2">
             <app-patient-list
               [isTabularList]="true"
               [itemsPerPage]="25"
               [orderType]="'iCARESTS-PRES-1111-1111-525400e4297f'"
+              [orderStatusCode]="'EMPTY'"
               (selectPatient)="onSelectPatient($event)"
             ></app-patient-list>
           </div>
