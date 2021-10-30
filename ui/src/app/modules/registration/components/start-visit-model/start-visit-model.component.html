@@ -62,7 +62,8 @@
       treatmentLocations: treatmentLocations$ | async,
       visitTypes: visitTypes$ | async,
       servicesConfigs: servicesConfigs$ | async,
-      allowOnlineVerification: allowOnlineVerification$ | async
+      allowOnlineVerification: allowOnlineVerification$ | async,
+      currentPatientVisit: currentPatientVisit$ | async
     } as params"
   >
     <mat-tab-group
@@ -112,10 +113,11 @@
       </mat-tab>
       <mat-tab>
         <ng-template mat-tab-label>
-          <span>Update Doctor's Room </span>
+          <span>Update Consultation Room </span>
         </ng-template>
         <div class="p-2" *ngIf="selectedTab.value === 3">
           <app-update-doctors-room
+            [currentVisit]="params?.currentPatientVisit"
             [patient]="patient"
             [treatmentLocations]="params?.treatmentLocations"
           ></app-update-doctors-room>
