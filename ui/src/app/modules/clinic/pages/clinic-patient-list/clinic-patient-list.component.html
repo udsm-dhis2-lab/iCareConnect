@@ -37,6 +37,7 @@
             <app-patient-list
               [isTabularList]="true"
               [itemsPerPage]="25"
+              [currentLocation]="(currentLocation$ | async)?.id"
               [orderType]="'iCARESTS-ADMS-1111-1111-525400e4297f'"
               (selectPatient)="onSelectPatient($event)"
             ></app-patient-list>
@@ -47,6 +48,7 @@
             <app-patient-list
               [isTabularList]="true"
               [itemsPerPage]="25"
+              [currentLocation]="(currentLocation$ | async)?.id"
               [orderType]="'iCARESTS-ADMS-1111-1111-525400e4297f'"
               [orderStatus]="'RECEIVED'"
               [currentLocation]="(currentLocation$ | async)?.id"

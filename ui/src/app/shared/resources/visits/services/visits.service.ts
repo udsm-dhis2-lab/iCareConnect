@@ -1,21 +1,21 @@
-import { flatten } from '@angular/compiler';
-import { Injectable } from '@angular/core';
-import { DomSanitizer } from '@angular/platform-browser';
-import { isArray, omit } from 'lodash';
-import { from, Observable, of, zip } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
-import { BillingService } from 'src/app/modules/billing/services/billing.service';
-import { PaymentService } from 'src/app/modules/billing/services/payment.service';
-import { OpenmrsHttpClientService } from 'src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service';
-import { ICARE_CONFIG } from '../../config';
-import { Api } from '../../openmrs';
-import { DrugOrder } from '../../order/models';
-import { DrugOrdersService } from '../../order/services';
-import { getDrugOrdersFromCurrentVisitEncounters } from '../helpers';
-import { Visit } from '../models/visit.model';
+import { flatten } from "@angular/compiler";
+import { Injectable } from "@angular/core";
+import { DomSanitizer } from "@angular/platform-browser";
+import { isArray, omit } from "lodash";
+import { from, Observable, of, zip } from "rxjs";
+import { catchError, map } from "rxjs/operators";
+import { BillingService } from "src/app/modules/billing/services/billing.service";
+import { PaymentService } from "src/app/modules/billing/services/payment.service";
+import { OpenmrsHttpClientService } from "src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service";
+import { ICARE_CONFIG } from "../../config";
+import { Api } from "../../openmrs";
+import { DrugOrder } from "../../order/models";
+import { DrugOrdersService } from "../../order/services";
+import { getDrugOrdersFromCurrentVisitEncounters } from "../helpers";
+import { Visit } from "../models/visit.model";
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: "root",
 })
 export class VisitsService {
   constructor(
@@ -28,7 +28,7 @@ export class VisitsService {
   ) {}
 
   createVisit(visitPayload): Observable<any> {
-    let url = 'visit';
+    let url = "visit";
     return this.httpClient.post(url, visitPayload).pipe(
       map((response) => {
         return response;
@@ -63,11 +63,11 @@ export class VisitsService {
                       attribute &&
                       attribute.display &&
                       attribute.display ===
-                        '00000101IIIIIIIIIIIIIIIIIIIIIIIIIIII'
+                        "00000101IIIIIIIIIIIIIIIIIIIIIIIIIIII"
                   ) || []
                 ).length > 0
-                  ? 'Insurance'
-                  : 'Cash',
+                  ? "Insurance"
+                  : "Cash",
             };
             return new Visit(formattedResult);
           });
@@ -90,13 +90,13 @@ export class VisitsService {
     if (orderType) {
       const orderStatusParameter = orderStatus
         ? `&fulfillerStatus=${orderStatus}`
-        : '';
+        : "";
       const orderStatusCodeParameter = orderStatusCode
         ? `&orderStatusCode=${orderStatusCode}`
-        : '';
+        : "";
       return this.httpClient
         .get(
-          `icare/visit?orderTypeUuid=${orderType}${orderStatusParameter}${orderStatusCodeParameter}&startIndex=${startIndex}&limit=${limit}`
+          `icare/visit?locationUuid=${location}&orderTypeUuid=${orderType}${orderStatusParameter}${orderStatusCodeParameter}&startIndex=${startIndex}&limit=${limit}`
         )
         .pipe(
           map((visitResponse) => {
@@ -112,11 +112,11 @@ export class VisitsService {
                         attribute &&
                         attribute.display &&
                         attribute.display ===
-                          '00000101IIIIIIIIIIIIIIIIIIIIIIIIIIII'
+                          "00000101IIIIIIIIIIIIIIIIIIIIIIIIIIII"
                     ) || []
                   ).length > 0
-                    ? 'Insurance'
-                    : 'Cash',
+                    ? "Insurance"
+                    : "Cash",
               };
               return new Visit(formattedResult);
             });
@@ -130,7 +130,7 @@ export class VisitsService {
             includeInactive:
               includeInactive === undefined ? false : includeInactive,
             location: locationUuid,
-            v: 'custom:(uuid,visitType,startDatetime,encounters:(uuid,diagnoses,encounterDatetime,encounterType,location,obs,orders),stopDatetime,attributes:(uuid,display),location:(uuid,display,tags,parentLocation:(uuid,display)),patient:(uuid,display,identifiers,person,voided)',
+            v: "custom:(uuid,visitType,startDatetime,encounters:(uuid,diagnoses,encounterDatetime,encounterType,location,obs,orders),stopDatetime,attributes:(uuid,display),location:(uuid,display,tags,parentLocation:(uuid,display)),patient:(uuid,display,identifiers,person,voided)",
             q: queryParam,
             limit: limit ? limit : 100,
             startIndex: startIndex ? startIndex : 0,
@@ -154,16 +154,16 @@ export class VisitsService {
                       (attribute) =>
                         attribute &&
                         attribute.display &&
-                        attribute.display?.indexOf('Insurance ID') > -1
+                        attribute.display?.indexOf("Insurance ID") > -1
                     ) || []
                   ).length > 0
-                    ? 'Insurance'
-                    : 'Cash',
+                    ? "Insurance"
+                    : "Cash",
               };
               return new Visit(formattedResult);
             })
             .filter((visit) =>
-              !onlyInsurance ? visit : visit.paymentType === 'Insurance'
+              !onlyInsurance ? visit : visit.paymentType === "Insurance"
             ) || []
         );
       })
@@ -232,8 +232,8 @@ export class VisitsService {
     shouldIncludeEncounter?: boolean
   ): Observable<any> {
     const encounters = shouldIncludeEncounter
-      ? 'encounters:(display,diagnoses,obs,orders,encounterDatetime,encounterType,location),'
-      : '';
+      ? "encounters:(display,diagnoses,obs,orders,encounterDatetime,encounterType,location),"
+      : "";
     return from(
       this.api.visit.getAllVisits({
         includeInactive: true,
@@ -258,16 +258,16 @@ export class VisitsService {
             // TODO: Find a way to set attributes to display on configurations
             const attributesToDisplay = [
               {
-                name: 'Insurance Id',
-                uuid: 'INSURANCEIDIIIIIIIIIIIIIIIIIIIIATYPE',
+                name: "Insurance Id",
+                uuid: "INSURANCEIDIIIIIIIIIIIIIIIIIIIIATYPE",
               },
               {
-                name: 'Authorization No.',
-                uuid: 'INSURANCEAUTHNOIIIIIIIIIIIIIIIIATYPE',
+                name: "Authorization No.",
+                uuid: "INSURANCEAUTHNOIIIIIIIIIIIIIIIIATYPE",
               },
               {
-                name: 'VOTE NO. or Company',
-                uuid: '370e6cf0-539f-46f1-87a2-43446d8b17b0',
+                name: "VOTE NO. or Company",
+                uuid: "370e6cf0-539f-46f1-87a2-43446d8b17b0",
               },
             ];
             return {
@@ -421,8 +421,8 @@ export class VisitsService {
         },
       ],
     };
-    encounterData = omit(encounterData, 'provider');
-    encounterData = omit(encounterData, 'visitLocation');
+    encounterData = omit(encounterData, "provider");
+    encounterData = omit(encounterData, "visitLocation");
     return from(this.api.encounter.createEncounter(encounterData));
   }
   // this.store.dispatch(updateVisit({ details: visitDetails, visitUuid }));
@@ -436,7 +436,7 @@ export class VisitsService {
         },
       ],
     };
-    encounterData = omit(encounterData, 'provider');
+    encounterData = omit(encounterData, "provider");
     return from(this.api.encounter.createEncounter(encounterData));
   }
 
@@ -450,7 +450,7 @@ export class VisitsService {
         },
       ],
     };
-    encounterData = omit(encounterData, 'provider');
+    encounterData = omit(encounterData, "provider");
     return from(this.api.encounter.createEncounter(encounterData));
   }
 
@@ -478,7 +478,7 @@ export class VisitsService {
   getVisitsTypes(): Observable<any> {
     return from(
       this.api.visittype.getAllVisitTypes({
-        v: 'custom:(uuid,name,display)',
+        v: "custom:(uuid,name,display)",
       } as any)
     ).pipe(
       map((response) => {
