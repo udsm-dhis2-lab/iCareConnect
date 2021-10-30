@@ -1,15 +1,15 @@
-import { Component, Inject, OnInit } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { Dropdown } from 'src/app/shared/modules/form/models/dropdown.model';
-import { Field } from 'src/app/shared/modules/form/models/field.model';
-import { FormValue } from 'src/app/shared/modules/form/models/form-value.model';
-import { Textbox } from 'src/app/shared/modules/form/models/text-box.model';
-import { RequisitionInput } from 'src/app/shared/resources/store/models/requisition-input.model';
+import { Component, Inject, OnInit } from "@angular/core";
+import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
+import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
+import { Field } from "src/app/shared/modules/form/models/field.model";
+import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
+import { Textbox } from "src/app/shared/modules/form/models/text-box.model";
+import { RequisitionInput } from "src/app/shared/resources/store/models/requisition-input.model";
 
 @Component({
-  selector: 'app-requisition-form',
-  templateUrl: './requisition-form.component.html',
-  styleUrls: ['./requisition-form.component.scss'],
+  selector: "app-requisition-form",
+  templateUrl: "./requisition-form.component.html",
+  styleUrls: ["./requisition-form.component.scss"],
 })
 export class RequisitionFormComponent implements OnInit {
   requisitionFields: Field<string>[];
@@ -22,20 +22,18 @@ export class RequisitionFormComponent implements OnInit {
   ngOnInit() {
     this.requisitionFields = [
       new Dropdown({
-        id: 'requisition_item',
-        key: 'requisitionItem',
-        label: 'Item',
+        id: "requisition_item",
+        key: "requisitionItem",
+        label: "Item",
         required: true,
-        options: (this.data?.items || []).map((item) => ({
-          key: item.id,
-          value: item.id,
-          label: item.display,
-        })),
+        options: [],
+        shouldHaveLiveSearchForDropDownFields: true,
+        otherType: "billableItem",
       }),
       new Dropdown({
-        id: 'target_store',
-        key: 'targetStore',
-        label: 'Target Store',
+        id: "target_store",
+        key: "targetStore",
+        label: "Target Store",
         required: true,
         options: (this.data?.stores || []).map((store) => ({
           key: store.id,
@@ -44,13 +42,15 @@ export class RequisitionFormComponent implements OnInit {
         })),
       }),
       new Textbox({
-        id: 'quantity',
-        key: 'quantity',
-        label: 'Quantity',
+        id: "quantity",
+        key: "quantity",
+        label: "Quantity",
         required: true,
-        type: 'number',
+        type: "number",
       }),
     ];
+
+    console.log(this.requisitionFields);
   }
 
   onCancel(e: Event): void {
