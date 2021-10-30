@@ -15,19 +15,19 @@
   <div *ngIf="
       params?.patientVisits &&
       params?.patientVisits?.length > 0 &&
-      params?.forms&&!location
+      params?.forms
     ">
     <app-patient-visits-history [patientVisits]="params?.patientVisits" [shouldShowPatientClinicalSummary]="true"
-      [forms]="params?.forms"></app-patient-visits-history>
+      [location]="location" [forms]="params?.forms"></app-patient-visits-history>
   </div>
 
-  <div *ngIf="
+  <!-- <div *ngIf="
         params?.patientVisits &&
         params?.patientVisits?.length > 0 &&
         params?.forms&&location
       ">
     <app-patient-vitals-summary></app-patient-vitals-summary>
-  </div>
+  </div> -->
 
   <div class="alert alert-warning" role="alert" *ngIf="params?.patientVisits && params?.patientVisits?.length === 0">
     There is no history for this patient, this is the first visit </div>

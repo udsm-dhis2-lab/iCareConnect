@@ -1,15 +1,16 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { Visit } from '../../resources/visits/models/visit.model';
+import { Component, Input, OnInit } from "@angular/core";
+import { Visit } from "../../resources/visits/models/visit.model";
 
 @Component({
-  selector: 'app-patient-visits-history',
-  templateUrl: './patient-visits-history.component.html',
-  styleUrls: ['./patient-visits-history.component.scss'],
+  selector: "app-patient-visits-history",
+  templateUrl: "./patient-visits-history.component.html",
+  styleUrls: ["./patient-visits-history.component.scss"],
 })
 export class PatientVisitsHistoryComponent implements OnInit {
   @Input() patientVisits: Visit[];
   @Input() shouldShowPatientClinicalSummary: boolean;
   @Input() forms: any[];
+  @Input() location: Boolean;
   currentPatientVisit: Visit;
   constructor() {}
 
