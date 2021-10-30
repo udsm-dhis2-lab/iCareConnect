@@ -1,156 +1,156 @@
-import { NgModule } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
-import { LandingComponent, LoginComponent } from './containers';
-import { ModulesComponent } from './containers/modules/modules.component';
-import { AuthGuard } from './guards/auth-guard.guard';
+import { NgModule } from "@angular/core";
+import { Routes, RouterModule } from "@angular/router";
+import { LandingComponent, LoginComponent } from "./containers";
+import { ModulesComponent } from "./containers/modules/modules.component";
+import { AuthGuard } from "./guards/auth-guard.guard";
 
 const routes: Routes = [
   {
-    path: '',
+    path: "",
     component: LandingComponent,
     canActivate: [AuthGuard],
     children: [
       {
-        path: '',
+        path: "",
         component: ModulesComponent,
       },
       {
-        path: 'nursing',
+        path: "nursing",
         loadChildren: () =>
-          import('../modules/nursing/nursing.module').then(
+          import("../modules/nursing/nursing.module").then(
             (m) => m.NursingModule
           ),
         canActivate: [AuthGuard],
       },
       {
-        path: 'counselor',
+        path: "counselor",
         loadChildren: () =>
-          import('../modules/nursing/nursing.module').then(
+          import("../modules/nursing/nursing.module").then(
             (m) => m.NursingModule
           ),
         canActivate: [AuthGuard],
       },
       {
-        path: 'vertical-programs',
+        path: "vertical-programs",
         loadChildren: () =>
-          import('../modules/vertical-programs/vertical-program.module').then(
+          import("../modules/vertical-programs/vertical-program.module").then(
             (m) => m.VerticalProgramsModule
           ),
         canActivate: [AuthGuard],
       },
       {
-        path: 'clinic',
+        path: "clinic",
         loadChildren: () =>
-          import('../modules/clinic/clinic.module').then((m) => m.ClinicModule),
+          import("../modules/clinic/clinic.module").then((m) => m.ClinicModule),
         canActivate: [AuthGuard],
       },
       {
-        path: 'diagnostic',
+        path: "diagnostic",
         loadChildren: () =>
-          import('../modules/clinic/clinic.module').then((m) => m.ClinicModule),
+          import("../modules/clinic/clinic.module").then((m) => m.ClinicModule),
         canActivate: [AuthGuard],
       },
       {
-        path: 'laboratory',
+        path: "laboratory",
         loadChildren: () =>
-          import('../modules/laboratory/laboratory.module').then(
+          import("../modules/laboratory/laboratory.module").then(
             (m) => m.LaboratoryModule
           ),
         canActivate: [AuthGuard],
       },
       {
-        path: 'dispensing',
+        path: "dispensing",
         loadChildren: () =>
-          import('../modules/dispensing/dispensing.module').then(
+          import("../modules/dispensing/dispensing.module").then(
             (m) => m.DispensingModule
           ),
         canActivate: [AuthGuard],
       },
       {
-        path: 'store',
+        path: "store",
         loadChildren: () =>
-          import('../modules/store/store.module').then((m) => m.StoreModule),
+          import("../modules/store/store.module").then((m) => m.StoreModule),
         canActivate: [AuthGuard],
       },
       {
-        path: 'registration',
+        path: "registration",
         loadChildren: () =>
-          import('../modules/registration/registration.module').then(
+          import("../modules/registration/registration.module").then(
             (m) => m.RegistrationModule
           ),
         canActivate: [AuthGuard],
       },
       {
-        path: 'billing',
+        path: "billing",
         loadChildren: () =>
-          import('../modules/billing/billing.module').then(
+          import("../modules/billing/billing.module").then(
             (m) => m.BillingModule
           ),
         canActivate: [AuthGuard],
       },
       {
-        path: 'e-claim',
+        path: "e-claim",
         loadChildren: () =>
-          import('../modules/e-claim/e-claim.module').then(
+          import("../modules/e-claim/e-claim.module").then(
             (m) => m.EClaimModule
           ),
         canActivate: [AuthGuard],
       },
       {
-        path: 'reports',
+        path: "reports",
         loadChildren: () =>
-          import('../modules/reports/report.module').then(
+          import("../modules/reports/report.module").then(
             (m) => m.ReportModule
           ),
         canActivate: [AuthGuard],
       },
       {
-        path: 'social-worker',
+        path: "social-worker",
         loadChildren: () =>
-          import('../modules/social-worker/social-worker.module').then(
+          import("../modules/social-worker/social-worker.module").then(
             (m) => m.SocialWorkerModule
           ),
         canActivate: [AuthGuard],
       },
       {
-        path: 'maintenance',
+        path: "maintenance",
         loadChildren: () =>
-          import('../modules/maintenance/maintenance.module').then(
+          import("../modules/maintenance/maintenance.module").then(
             (m) => m.MaintenanceModule
           ),
       },
       {
-        path: 'inpatient',
+        path: "inpatient",
         loadChildren: () =>
-          import('../modules/inpatient/inpatient.module').then(
+          import("../modules/inpatient/inpatient.module").then(
             (m) => m.InpatientModule
           ),
       },
       {
-        path: 'theatre',
+        path: "theatre",
         loadChildren: () =>
-          import('../modules/theatre/theatre.module').then(
+          import("../modules/theatre/theatre.module").then(
             (m) => m.TheatreModule
           ),
       },
       {
-        path: 'mortuary',
+        path: "mortuary",
         loadChildren: () =>
-          import('../modules/mortuary/mortuary.module').then(
+          import("../modules/mortuary/mortuary.module").then(
             (m) => m.MortuaryModule
           ),
       },
       {
-        path: 'radiology',
+        path: "radiology",
         loadChildren: () =>
-          import('../modules/theatre/theatre.module').then(
+          import("../modules/theatre/theatre.module").then(
             (m) => m.TheatreModule
           ),
       },
     ],
   },
   {
-    path: 'login',
+    path: "login",
     component: LoginComponent,
   },
 ];
@@ -159,7 +159,7 @@ const routes: Routes = [
   imports: [
     RouterModule.forRoot(routes, {
       useHash: true,
-      relativeLinkResolution: 'legacy',
+      relativeLinkResolution: "legacy",
     }),
   ],
   exports: [RouterModule],
