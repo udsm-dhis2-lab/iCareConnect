@@ -94,9 +94,10 @@ export class VisitsService {
       const orderStatusCodeParameter = orderStatusCode
         ? `&orderStatusCode=${orderStatusCode}`
         : "";
+      const locationParameter = location ? `locationUuid=${location}&` : "";
       return this.httpClient
         .get(
-          `icare/visit?locationUuid=${location}&orderTypeUuid=${orderType}${orderStatusParameter}${orderStatusCodeParameter}&startIndex=${startIndex}&limit=${limit}`
+          `icare/visit?${locationParameter}orderTypeUuid=${orderType}${orderStatusParameter}${orderStatusCodeParameter}&startIndex=${startIndex}&limit=${limit}`
         )
         .pipe(
           map((visitResponse) => {
