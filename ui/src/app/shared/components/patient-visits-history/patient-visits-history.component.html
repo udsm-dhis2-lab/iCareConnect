@@ -1,15 +1,10 @@
-<mat-accordion *ngIf="patientVisits && currentPatientVisit">
-  <mat-expansion-panel
-    *ngFor="let patientVisit of patientVisits; let count = index"
-    [expanded]="
-      patientVisit?.visit?.uuid === currentPatientVisit?.visit?.uuid
+<mat-accordion *ngIf="patientVisits && currentPatientVisit && !location">
+  <mat-expansion-panel *ngFor="let patientVisit of patientVisits; let count = index" [expanded]="
+      patientVisit?.visit?.uuid                                             === currentPatientVisit?.visit?.uuid
         ? true
         : false
-    "
-  >
-    <mat-expansion-panel-header
-      (click)="setCurrentPatientVisit($event, patientVisit)"
-    >
+    ">
+    <mat-expansion-panel-header (click)="setCurrentPatientVisit($event, patientVisit)">
       <mat-panel-title>
         <span>
           {{ patientVisit?.visit?.startDatetime | date }}
@@ -17,55 +12,42 @@
       </mat-panel-title>
       <mat-panel-description>
         {{
-          patientVisit?.visit?.visitType?.display +
-            "-" +
-            patientVisit?.visit?.visitType?.description
+        patientVisit?.visit?.visitType?.display +
+        "-" +
+        patientVisit?.visit?.visitType?.description
         }}
       </mat-panel-description>
     </mat-expansion-panel-header>
     <div class="top-history-banner text-left">
-      <div
-        *ngIf="currentPatientVisit?.visit?.uuid === patientVisit?.visit?.uuid"
-      >
+      <div *ngIf="currentPatientVisit?.visit?.uuid                          === patientVisit?.visit?.uuid">
         Location: <b>{{ currentPatientVisit?.visit?.location?.display }}</b>
         <div class="row" *ngIf="shouldShowPatientClinicalSummary">
           <div class="col-md-7">
             <h3 class="font-weight-bold">Provisional Diagnosis</h3>
             <div class="w-100 mb-3 mt-1">
-              <app-patient-diagnoses-summary
-                [patientVisit]="currentPatientVisit"
-                [isConfirmedDiagnosis]="false"
-              ></app-patient-diagnoses-summary>
+              <app-patient-diagnoses-summary [patientVisit]="currentPatientVisit" [isConfirmedDiagnosis]="false">
+              </app-patient-diagnoses-summary>
             </div>
             <h3 class="font-weight-bold">Laboratory Tests</h3>
             <div class="w-100 mb-3 mt-1">
-              <app-patient-lab-results-summary
-                [labConceptsTree]="null"
-                [observations]="null"
-                [patientVisit]="currentPatientVisit"
-              ></app-patient-lab-results-summary>
+              <app-patient-lab-results-summary [labConceptsTree]="null" [observations]="null"
+                [patientVisit]="currentPatientVisit"></app-patient-lab-results-summary>
             </div>
             <h3 class="font-weight-bold">Confirmed Diagnosis</h3>
             <div class="w-100 mb-3 mt-1">
-              <app-patient-diagnoses-summary
-                [patientVisit]="currentPatientVisit"
-                [isConfirmedDiagnosis]="true"
-              ></app-patient-diagnoses-summary>
+              <app-patient-diagnoses-summary [patientVisit]="currentPatientVisit" [isConfirmedDiagnosis]="true">
+              </app-patient-diagnoses-summary>
             </div>
             <h3 class="font-weight-bold">Medication</h3>
             <div class="w-100 mb-3 mt-1">
-              <app-patient-medication-summary
-                [patientVisit]="currentPatientVisit"
-              ></app-patient-medication-summary>
+              <app-patient-medication-summary [patientVisit]="currentPatientVisit"></app-patient-medication-summary>
             </div>
           </div>
           <div class="col-md-5">
             <h3 class="font-weight-bold">Clinical Summary</h3>
             <div class="w-100 mt-1">
-              <app-patient-clinical-notes-summary
-                [patientVisit]="currentPatientVisit"
-                [forms]="forms"
-              ></app-patient-clinical-notes-summary>
+              <app-patient-clinical-notes-summary [patientVisit]="currentPatientVisit" [forms]="forms">
+              </app-patient-clinical-notes-summary>
             </div>
           </div>
         </div>
@@ -73,9 +55,9 @@
     </div>
   </mat-expansion-panel>
 </mat-accordion>
-<div
-  class="text-center p-4 text-warning"
-  *ngIf="patientVisits && !currentPatientVisit"
->
+<div *ngIf="patientVisits && currentPatientVisit && location">
+  <app-patient-vitals-summary [patientVisit]="currentPatientVisit"></app-patient-vitals-summary>
+</div>
+<div class="text-center p-4 text-warning" *ngIf="patientVisits && !currentPatientVisit">
   No Previous History
 </div>
