@@ -18,6 +18,7 @@ import {
 import {
   getActiveVisit,
   getCurrentVisitServiceAttributeDetails,
+  getCurrentVisitServiceBillingAttributeDetails,
 } from "src/app/store/selectors/visit.selectors";
 import { OpenMRSForm } from "../../modules/form/models/custom-openmrs-form.model";
 import { FormValue } from "../../modules/form/models/form-value.model";
@@ -50,6 +51,7 @@ export class TransferWithinComponent implements OnInit {
   // TODO: Transfer logic for creating bill if insurance does not support more than one consultation to use configurations fromglobal properties
   shouldNotCreateBill: boolean = false;
   currentVisitServiceAttributeDetails$: Observable<any>;
+  currentVisitServiceBillingAttributeDetails$: Observable<any>;
 
   constructor(
     private store: Store<AppState>,
@@ -85,55 +87,65 @@ export class TransferWithinComponent implements OnInit {
     this.currentVisitServiceAttributeDetails$ = this.store.select(
       getCurrentVisitServiceAttributeDetails
     );
+    this.currentVisitServiceBillingAttributeDetails$ = this.store.select(
+      getCurrentVisitServiceBillingAttributeDetails
+    );
   }
 
-  onSaveForm(e, provider, visit, obs, currentVisitServiceAttributeDetails) {
+  onSaveForm(
+    e: Event,
+    provider,
+    visit,
+    obs,
+    currentVisitServiceAttributeDetails,
+    currentVisitServiceBillingAttributeDetails
+  ): void {
     e.stopPropagation();
     this.shouldNotCreateBill =
-      (
-        visit.attributes.filter(
-          (attribute) =>
-            attribute?.visitAttributeDetails?.attributeType?.display.toLowerCase() ===
-              "paymentcategory" &&
-            attribute?.visitAttributeDetails?.value ===
-              "00000101IIIIIIIIIIIIIIIIIIIIIIIIIIII"
-        ) || []
-      )?.length > 0 &&
-      (
-        visit.attributes.filter(
-          (attribute) =>
-            attribute?.visitAttributeDetails?.attributeType?.display.toLowerCase() ===
-              "paymentscheme" &&
-            (attribute?.visitAttributeDetails?.value ===
-              "274f186c-a9c0-4f37-a3c8-5b18f61353b3" ||
-              attribute?.visitAttributeDetails?.value ===
-                "f8c42c7f-f570-4278-bf72-e5e97c9ed321" ||
-              attribute?.visitAttributeDetails?.value ===
-                "29238e76-5cbe-476a-914d-7fdb9842b3d6")
-        ) || []
-      )?.length > 0;
+      currentVisitServiceBillingAttributeDetails?.visitAttributeDetails
+        ?.value === this.transferTo?.billingConcept
+        ? true
+        : (
+            visit.attributes.filter(
+              (attribute) =>
+                attribute?.visitAttributeDetails?.attributeType?.display.toLowerCase() ===
+                  "paymentcategory" &&
+                attribute?.visitAttributeDetails?.value ===
+                  "00000101IIIIIIIIIIIIIIIIIIIIIIIIIIII"
+            ) || []
+          )?.length > 0 &&
+          (
+            visit.attributes.filter(
+              (attribute) =>
+                attribute?.visitAttributeDetails?.attributeType?.display.toLowerCase() ===
+                  "paymentscheme" &&
+                (attribute?.visitAttributeDetails?.value ===
+                  "274f186c-a9c0-4f37-a3c8-5b18f61353b3" ||
+                  attribute?.visitAttributeDetails?.value ===
+                    "f8c42c7f-f570-4278-bf72-e5e97c9ed321" ||
+                  attribute?.visitAttributeDetails?.value ===
+                    "29238e76-5cbe-476a-914d-7fdb9842b3d6")
+            ) || []
+          )?.length > 0;
     const data = {
       patient: this.patient["uuid"],
       visitLocation: this.transferTo?.uuid,
       location: this.currentLocation?.uuid,
       form: this.formUuid,
       obs: obs,
-      orders:
-        this.shouldNotCreateBill || this.visit.isS
-          ? []
-          : [
-              {
-                concept: this.transferTo?.billingConcept,
-                type: "order",
-                action: "NEW",
-                careSetting: !this.visit?.isAdmitted
-                  ? "OUTPATIENT"
-                  : "INPATIENT",
-                orderer: provider?.uuid,
-                urgency: "ROUTINE",
-                orderType: "BIL00000IIIIIIIIIIIIIIIIIIIIIIIOTYPE",
-              },
-            ],
+      orders: this.shouldNotCreateBill
+        ? []
+        : [
+            {
+              concept: this.transferTo?.billingConcept,
+              type: "order",
+              action: "NEW",
+              careSetting: !this.visit?.isAdmitted ? "OUTPATIENT" : "INPATIENT",
+              orderer: provider?.uuid,
+              urgency: "ROUTINE",
+              orderType: "BIL00000IIIIIIIIIIIIIIIIIIIIIIIOTYPE",
+            },
+          ],
       visit: visit?.uuid,
       provider: provider?.uuid,
     };
