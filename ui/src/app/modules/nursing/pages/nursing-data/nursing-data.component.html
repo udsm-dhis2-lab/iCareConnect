@@ -37,7 +37,7 @@
               params?.forms &&
               !params?.billLoadingState
             " class="float-right ml-2" [disabled]="
-              params?.doesPatientHasPendingPaymentForTheCurrentVisitType
+              params?.doesPatientHasPendingPaymentForTheCurrentVisitType || params?.visit?.isAdmitted
             " color="primary" mat-stroked-button (click)="admitPatient($event, params?.patient, params?.visit)">
             Admit
           </button>
