@@ -16,7 +16,8 @@
     observationsGroupedByConcept: observationsGroupedByConcept$ | async,
     formEntities: consultationForms$ | async,
     loadingForms: loadingForms$ | async,
-    ordersUpdates: ordersUpdates$ | async
+    ordersUpdates: ordersUpdates$ | async,
+    currentLocation: currentLocation$ | async
   } as dashboardParams"
 >
   <div
@@ -114,6 +115,33 @@
             >
               History
             </button>
+            <button
+              class="mr-2"
+              mat-stroked-button
+              [matMenuTriggerFor]="moreMenuItems"
+            >
+              More
+            </button>
+            <mat-menu #moreMenuItems="matMenu">
+              <button mat-menu-item>Admitted</button>
+              <button
+                mat-menu-item
+                (click)="
+                  onOpenMore(
+                    $event,
+                    'a007bbfe-fbe5-11e2-8ff2-fd54ab5fdb2a',
+                    'Treatment Room',
+                    dashboardParams?.currentPatient,
+                    dashboardParams?.activeVisit,
+                    dashboardParams?.currentLocation
+                  )
+                "
+              >
+                Transfer within
+              </button>
+              <button mat-menu-item>Refer</button>
+              <button mat-menu-item>Mark Patient Deceased</button>
+            </mat-menu>
             <button
               mat-flat-button
               color="primary"

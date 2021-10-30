@@ -1,32 +1,33 @@
-import { Component, Inject, OnInit } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs';
-import { loadCustomOpenMRSForm, transferPatient } from 'src/app/store/actions';
-import { AppState } from 'src/app/store/reducers';
-import { getLocations, getLocationsByTagName } from 'src/app/store/selectors';
+import { Component, Inject, OnInit } from "@angular/core";
+import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
+import { Store } from "@ngrx/store";
+import { Observable } from "rxjs";
+import { Location } from "src/app/core/models";
+import { loadCustomOpenMRSForm, transferPatient } from "src/app/store/actions";
+import { AppState } from "src/app/store/reducers";
+import { getLocations, getLocationsByTagName } from "src/app/store/selectors";
 import {
   getTransferLoadingState,
   getTransferStatusOfCurrentPatient,
-} from 'src/app/store/selectors/current-patient.selectors';
-import { getProviderDetails } from 'src/app/store/selectors/current-user.selectors';
+} from "src/app/store/selectors/current-patient.selectors";
+import { getProviderDetails } from "src/app/store/selectors/current-user.selectors";
 import {
   getCustomOpenMRSFormById,
   getFormsLoadingState,
-} from 'src/app/store/selectors/form.selectors';
+} from "src/app/store/selectors/form.selectors";
 import {
   getActiveVisit,
   getCurrentVisitServiceAttributeDetails,
-} from 'src/app/store/selectors/visit.selectors';
-import { OpenMRSForm } from '../../modules/form/models/custom-openmrs-form.model';
-import { FormValue } from '../../modules/form/models/form-value.model';
-import { Patient } from '../../resources/patient/models/patient.model';
-import { Visit } from '../../resources/visits/models/visit.model';
+} from "src/app/store/selectors/visit.selectors";
+import { OpenMRSForm } from "../../modules/form/models/custom-openmrs-form.model";
+import { FormValue } from "../../modules/form/models/form-value.model";
+import { Patient } from "../../resources/patient/models/patient.model";
+import { Visit } from "../../resources/visits/models/visit.model";
 
 @Component({
-  selector: 'app-transfer-within',
-  templateUrl: './transfer-within.component.html',
-  styleUrls: ['./transfer-within.component.scss'],
+  selector: "app-transfer-within",
+  templateUrl: "./transfer-within.component.html",
+  styleUrls: ["./transfer-within.component.scss"],
 })
 export class TransferWithinComponent implements OnInit {
   patient: Patient;
@@ -44,6 +45,7 @@ export class TransferWithinComponent implements OnInit {
   isFormValid: boolean = false;
   obs: any[] = [];
   visit: any;
+  currentLocation: Location;
 
   // TODO: Transfer logic for creating bill if insurance does not support more than one consultation to use configurations fromglobal properties
   shouldNotCreateBill: boolean = false;
@@ -55,7 +57,8 @@ export class TransferWithinComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) data
   ) {
     this.patient = data?.patient?.patient;
-    this.locationType = data?.form?.locationType;
+    this.locationType = data?.locationType;
+    this.currentLocation = data?.currentLocation;
     this.path = data?.path;
     this.visit = data?.visit;
 
@@ -91,27 +94,28 @@ export class TransferWithinComponent implements OnInit {
         visit.attributes.filter(
           (attribute) =>
             attribute?.visitAttributeDetails?.attributeType?.display.toLowerCase() ===
-              'paymentcategory' &&
+              "paymentcategory" &&
             attribute?.visitAttributeDetails?.value ===
-              '00000101IIIIIIIIIIIIIIIIIIIIIIIIIIII'
+              "00000101IIIIIIIIIIIIIIIIIIIIIIIIIIII"
         ) || []
       )?.length > 0 &&
       (
         visit.attributes.filter(
           (attribute) =>
             attribute?.visitAttributeDetails?.attributeType?.display.toLowerCase() ===
-              'paymentscheme' &&
+              "paymentscheme" &&
             (attribute?.visitAttributeDetails?.value ===
-              '274f186c-a9c0-4f37-a3c8-5b18f61353b3' ||
+              "274f186c-a9c0-4f37-a3c8-5b18f61353b3" ||
               attribute?.visitAttributeDetails?.value ===
-                'f8c42c7f-f570-4278-bf72-e5e97c9ed321' ||
+                "f8c42c7f-f570-4278-bf72-e5e97c9ed321" ||
               attribute?.visitAttributeDetails?.value ===
-                '29238e76-5cbe-476a-914d-7fdb9842b3d6')
+                "29238e76-5cbe-476a-914d-7fdb9842b3d6")
         ) || []
       )?.length > 0;
     const data = {
-      patient: this.patient['uuid'],
-      location: this.transferTo?.uuid,
+      patient: this.patient["uuid"],
+      visitLocation: this.transferTo?.uuid,
+      location: this.currentLocation?.uuid,
       form: this.formUuid,
       obs: obs,
       orders:
@@ -120,14 +124,14 @@ export class TransferWithinComponent implements OnInit {
           : [
               {
                 concept: this.transferTo?.billingConcept,
-                type: 'order',
-                action: 'NEW',
+                type: "order",
+                action: "NEW",
                 careSetting: !this.visit?.isAdmitted
-                  ? 'OUTPATIENT'
-                  : 'INPATIENT',
+                  ? "OUTPATIENT"
+                  : "INPATIENT",
                 orderer: provider?.uuid,
-                urgency: 'ROUTINE',
-                orderType: 'BIL00000IIIIIIIIIIIIIIIIIIIIIIIOTYPE',
+                urgency: "ROUTINE",
+                orderType: "BIL00000IIIIIIIIIIIIIIIIIIIIIIIOTYPE",
               },
             ],
       visit: visit?.uuid,

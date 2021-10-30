@@ -1,15 +1,15 @@
-import { Injectable } from '@angular/core';
-import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { Store } from '@ngrx/store';
-import { of } from 'rxjs';
-import { catchError, map, switchMap } from 'rxjs/operators';
-import { Patient } from 'src/app/shared/resources/patient/models/patient.model';
-import { PatientService } from 'src/app/shared/resources/patient/services/patients.service';
-import { VisitsService } from 'src/app/shared/resources/visits/services';
+import { Injectable } from "@angular/core";
+import { Actions, createEffect, ofType } from "@ngrx/effects";
+import { Store } from "@ngrx/store";
+import { of } from "rxjs";
+import { catchError, map, switchMap } from "rxjs/operators";
+import { Patient } from "src/app/shared/resources/patient/models/patient.model";
+import { PatientService } from "src/app/shared/resources/patient/services/patients.service";
+import { VisitsService } from "src/app/shared/resources/visits/services";
 import {
   NotificationService,
   Notification,
-} from 'src/app/shared/services/notification.service';
+} from "src/app/shared/services/notification.service";
 import {
   addCurrentPatient,
   admitPatient,
@@ -20,9 +20,9 @@ import {
   setAsAdmitted,
   setAsTransferred,
   transferPatient,
-} from '../actions';
-import { loadActiveVisit, updateVisit } from '../actions/visit.actions';
-import { AppState } from '../reducers';
+} from "../actions";
+import { loadActiveVisit, updateVisit } from "../actions/visit.actions";
+import { AppState } from "../reducers";
 
 @Injectable()
 export class PatientEffects {
@@ -59,8 +59,8 @@ export class PatientEffects {
       switchMap((action) => {
         this.notificationService.show(
           new Notification({
-            message: 'Admitting a patient',
-            type: 'LOADING',
+            message: "Admitting a patient",
+            type: "LOADING",
           })
         );
         const visitUuid = action.admissionDetails?.visit;
@@ -73,8 +73,8 @@ export class PatientEffects {
           switchMap((admissionResponse) => {
             this.notificationService.show(
               new Notification({
-                message: 'Successfully admitted a patient',
-                type: 'SUCCESS',
+                message: "Successfully admitted a patient",
+                type: "SUCCESS",
               })
             );
             if (action?.path) {
@@ -99,8 +99,8 @@ export class PatientEffects {
           catchError((error) => {
             this.notificationService.show(
               new Notification({
-                message: 'Failed to admit',
-                type: 'ERROR',
+                message: "Failed to admit",
+                type: "ERROR",
               })
             );
             return of(failedToAdmitt({ error }));
@@ -116,15 +116,15 @@ export class PatientEffects {
       switchMap((action) => {
         this.notificationService.show(
           new Notification({
-            message: 'Transfering a patient',
-            type: 'LOADING',
+            message: "Transfering a patient",
+            type: "LOADING",
           })
         );
         const visitUuid = action.transferDetails?.visit;
         const visitDetails = {
-          location: action?.currentVisitLocation
-            ? action?.currentVisitLocation
-            : action.transferDetails?.location,
+          location: action?.transferDetails
+            ? action.transferDetails?.visitLocation
+            : action?.currentVisitLocation,
           attributes: action?.visitAttributes,
         };
         this.store.dispatch(updateVisit({ details: visitDetails, visitUuid }));
@@ -132,8 +132,8 @@ export class PatientEffects {
           switchMap((response) => {
             this.notificationService.show(
               new Notification({
-                message: 'Successfully transferred a patient',
-                type: 'SUCCESS',
+                message: "Successfully transferred a patient",
+                type: "SUCCESS",
               })
             );
             return [

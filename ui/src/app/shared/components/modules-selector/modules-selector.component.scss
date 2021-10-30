@@ -16,6 +16,8 @@
   margin-top: -5px;
   font-family: Roboto, "Helvetica Neue", sans-serif;
   color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 .selected-module {
@@ -40,4 +42,6 @@
   height: 1px;
   cursor: pointer;
   background-color: rgb(241, 241, 241);
+  white-space: nowrap;
+  overflow: hidden;
 }

@@ -1,8 +1,8 @@
-import { createSelector } from '@ngrx/store';
-import { AppState, getRootState } from '../reducers';
-import { visitAdapter, VisitState } from '../states';
+import { createSelector } from "@ngrx/store";
+import { AppState, getRootState } from "../reducers";
+import { visitAdapter, VisitState } from "../states";
 
-import { mapValues, keyBy } from 'lodash';
+import { mapValues, keyBy } from "lodash";
 
 const getVisitState = createSelector(
   getRootState,
@@ -52,7 +52,7 @@ export const getActiveVisitAuthorizationNumberAttribute = createSelector(
       ? (visitEntities[visitUuid].attributes.filter(
           (attribute) =>
             attribute?.visitAttributeDetails?.attributeType?.uuid ===
-            'INSURANCEAUTHNOIIIIIIIIIIIIIIIIATYPE'
+            "INSURANCEAUTHNOIIIIIIIIIIIIIIIIATYPE"
         ) || [])[0]
       : null
 );
@@ -62,8 +62,8 @@ export const getAllAdmittedPatientVisits = createSelector(
   (state: VisitState) => {
     return state.admittedPatientsVisitLocations &&
       state.admittedPatientsVisitLocations?.length > 0
-      ? mapValues(keyBy(state.admittedPatientsVisitLocations, 'id'))
-      : { data: 'NO' };
+      ? mapValues(keyBy(state.admittedPatientsVisitLocations, "id"))
+      : { data: "NO" };
   }
 );
 
@@ -76,11 +76,12 @@ export const getCurrentVisitServiceAttributeDetails = createSelector(
   getActiveVisit,
   getVisitEntities,
   (activeVisit, visitEntities) => {
+    // TODO: Remove hard coded uuid for visit attribute type uuid (service) uuid
     if (activeVisit && visitEntities) {
       return (visitEntities[activeVisit?.id]?.attributes.filter(
         (visitAttribute: any) =>
-          visitAttribute.visitAttributeDetails?.attributeType?.display ===
-          'Service'
+          visitAttribute.visitAttributeDetails?.attributeType?.uuid ===
+          "66f3825d-1915-4278-8e5d-b045de8a5db9"
       ) || [])[0];
     } else {
       return null;
