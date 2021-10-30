@@ -1,0 +1,65 @@
+<div
+  *ngIf="{
+    datesParameters: datesParameters$ | async,
+    visitReferences: visitReferences$ | async,
+    visitsLoadedState: visitsLoadedState$ | async,
+    sampleTypesLoadedState: sampleTypesLoadedState$ | async,
+    sampleTypes: sampleTypes$ | async,
+    labSamplesDepartments: labSamplesDepartments$ | async,
+    labSamplesContainers: labSamplesContainers$ | async,
+    configs: configs$ | async,
+    codedSampleRejectionReasons: codedSampleRejectionReasons$ | async
+  } as params"
+>
+
+  <!-- TODO JESSE - return conditions visitsLoadedState && sampleTypesLoadedState
+  <div
+    *ngIf="
+      params?.datesParameters &&
+      params?.visitsLoadedState &&
+      params?.sampleTypesLoadedState &&
+      params?.labSamplesDepartments?.length > 0 &&
+      params?.labSamplesContainers &&
+      params?.configs &&
+      params?.codedSampleRejectionReasons
+    "
+  > -->
+  <div
+    *ngIf="
+      params?.datesParameters &&
+      params?.labSamplesDepartments?.length > 0 &&
+      params?.labSamplesContainers &&
+      params?.configs &&
+      params?.codedSampleRejectionReasons
+    "
+  >
+
+    <app-sample-acceptance-dashboard
+      [datesParameters]="params?.datesParameters"
+      [patients]="params?.visitReferences"
+      [labSamplesDepartments]="params?.labSamplesDepartments"
+      [sampleTypes]="params?.sampleTypes"
+      [labSamplesContainers]="params?.labSamplesContainers"
+      [configs]="params?.configs"
+      [codedSampleRejectionReasons]="params?.codedSampleRejectionReasons"
+    ></app-sample-acceptance-dashboard>
+
+    <!-- herhe -->
+  </div>
+
+  <!-- {{
+    params | json
+  }} -->
+
+  <mat-progress-bar
+    *ngIf="
+      !params?.datesParameters ||
+      !params?.sampleTypesLoadedState ||
+      params?.labSamplesDepartments?.length == 0 ||
+      !params?.labSamplesContainers ||
+      !params?.configs ||
+      !params?.codedSampleRejectionReasons
+    "
+    mode="indeterminate"
+  ></mat-progress-bar>
+</div>

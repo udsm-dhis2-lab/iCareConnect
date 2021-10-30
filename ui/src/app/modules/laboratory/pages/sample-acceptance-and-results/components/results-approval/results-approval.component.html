@@ -1,0 +1,423 @@
+<div *ngIf="!ready">
+  <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+</div>
+<div *ngIf="ready">
+  <mat-card>
+    <mat-tab-group mat-align-tabs="start">
+      <mat-tab label="Waiting First SignOff" (click)="changeTab(0)">
+        <div *ngIf="selected.value == 0">
+          <div class="d-flex">
+            <mat-form-field class="w-50">
+              <mat-label>Search</mat-label>
+              <mat-icon matPrefix>search</mat-icon
+              ><input  autocomplete="off" matInput [(ngModel)]="searchingText" />
+            </mat-form-field>
+          </div>
+
+          <mat-accordion>
+            <mat-expansion-panel
+              [expanded]="currentSample.identifier == sample.identifier"
+              *ngFor="
+                let sample of samples | filterSamples: searchingText;
+                let count = index
+              "
+              (click)="setPanel(sample)"
+            >
+              <mat-expansion-panel-header>
+                <mat-panel-title>
+                  {{ sample.identifier }} - {{ sample.sampleName }}
+                </mat-panel-title>
+                <mat-panel-description>
+                  <!-- Currently I am {{ panelOpenState ? "open" : "closed" }} -->
+                </mat-panel-description>
+              </mat-expansion-panel-header>
+              <table
+                class="table table-bordered"
+                *ngIf="currentSample.identifier == sample.identifier"
+              >
+                <thead>
+                  <tr>
+                    <th style="width: 15%">Order</th>
+                    <th>Results</th>
+                    <th style="width: 30%">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let item of sample.items">
+                    <th>
+                      {{ item.display }}
+                    </th>
+                    <th>
+                      <div class="w-50" style="float: left;text-align: center;">
+                        <span
+                          *ngIf="
+                            savedData[
+                              currentSample.identifier + '-' + item.display
+                            ]
+                          "
+                          style="text-align: center; font-weight: 600"
+                        >
+                          {{
+                            values[
+                              currentSample.identifier + "-" + item.display
+                            ]
+                          }}
+                        </span>
+                      </div>
+                    </th>
+                    <td>
+                      <button
+                        [disabled]="
+                          !values &&
+                          !values[
+                            currentSample.identifier + '-' + item.display
+                          ] &&
+                          savedData[
+                            currentSample.identifier + '-' + item.display
+                          ]
+                        "
+                        mat-button
+                      >
+                        Accept
+                      </button>
+                      <span>{{
+                        savingMessage[
+                          currentSample.identifier + "-" + item.display
+                        ]
+                      }}</span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </mat-expansion-panel>
+          </mat-accordion>
+        </div>
+      </mat-tab>
+      <mat-tab label="Waiting Second SignOff" (click)="changeTab(1)">
+        <div *ngIf="selected.value == 1">
+          <div class="d-flex">
+            <mat-form-field class="w-50">
+              <mat-label>Search</mat-label>
+              <mat-icon matPrefix>search</mat-icon
+              ><input  autocomplete="off" matInput [(ngModel)]="searchingText" />
+            </mat-form-field>
+          </div>
+
+          <mat-accordion>
+            <mat-expansion-panel
+              [expanded]="currentSample.identifier == sample.identifier"
+              *ngFor="
+                let sample of samplesWithCompleteFirstSignOff
+                  | filterSamples: searchingText;
+                let count = index
+              "
+              (click)="setPanel(sample)"
+            >
+              <mat-expansion-panel-header>
+                <mat-panel-title>
+                  {{ sample.identifier }} - {{ sample.sampleName }}
+                </mat-panel-title>
+                <mat-panel-description>
+                  <!-- Currently I am {{ panelOpenState ? "open" : "closed" }} -->
+                </mat-panel-description>
+              </mat-expansion-panel-header>
+              <table
+                class="table table-bordered"
+                *ngIf="currentSample.identifier == sample.identifier"
+              >
+                <thead>
+                  <tr>
+                    <th style="width: 15%">Order</th>
+                    <th>Results</th>
+                    <th style="width: 30%">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let item of sample.items">
+                    <th>
+                      {{ item.display }}
+                    </th>
+                    <th>
+                      <div class="w-50" style="float: left;text-align: center;">
+                        <span
+                          *ngIf="
+                            savedData[
+                              currentSample.identifier + '-' + item.display
+                            ]
+                          "
+                          style="text-align: center; font-weight: 600"
+                        >
+                          {{
+                            values[
+                              currentSample.identifier + "-" + item.display
+                            ]
+                          }}
+                        </span>
+                      </div>
+                    </th>
+                    <td>
+                      <button
+                        [disabled]="
+                          !values &&
+                          !values[
+                            currentSample.identifier + '-' + item.display
+                          ] &&
+                          savedData[
+                            currentSample.identifier + '-' + item.display
+                          ]
+                        "
+                        mat-button
+                      >
+                        Accept
+                      </button>
+                      <button
+                        [disabled]="
+                          !values &&
+                          !values[
+                            currentSample.identifier + '-' + item.display
+                          ] &&
+                          savedData[
+                            currentSample.identifier + '-' + item.display
+                          ]
+                        "
+                        mat-button
+                      >
+                        Accept
+                      </button>
+                      <span>{{
+                        savingMessage[
+                          currentSample.identifier + "-" + item.display
+                        ]
+                      }}</span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </mat-expansion-panel>
+          </mat-accordion>
+        </div>
+      </mat-tab>
+      <mat-tab label="Completed Samples" (click)="changeTab(2)">
+        <div *ngIf="selected.value == 2">
+          <div class="d-flex">
+            <mat-form-field class="w-50">
+              <mat-label>Search</mat-label>
+              <mat-icon matPrefix>search</mat-icon
+              ><input  autocomplete="off" matInput [(ngModel)]="searchingText" />
+            </mat-form-field>
+          </div>
+
+          <mat-accordion>
+            <mat-expansion-panel
+              [expanded]="currentSample.identifier == sample.identifier"
+              *ngFor="
+                let sample of samplesWithCompleteSecondSignOff
+                  | filterSamples: searchingText;
+                let count = index
+              "
+              (click)="setPanel(sample)"
+            >
+              <mat-expansion-panel-header>
+                <mat-panel-title>
+                  {{ sample.identifier }} - {{ sample.sampleName }}
+                </mat-panel-title>
+                <mat-panel-description>
+                  <!-- Currently I am {{ panelOpenState ? "open" : "closed" }} -->
+                </mat-panel-description>
+              </mat-expansion-panel-header>
+              <table
+                class="table table-bordered"
+                *ngIf="currentSample.identifier == sample.identifier"
+              >
+                <thead>
+                  <tr>
+                    <th style="width: 15%">Order</th>
+                    <th>Results</th>
+                    <th style="width: 30%">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let item of sample.items">
+                    <th>
+                      {{ item.display }}
+                    </th>
+                    <th>
+                      <div class="w-50" style="float: left;text-align: center;">
+                        <span
+                          *ngIf="
+                            savedData[
+                              currentSample.identifier + '-' + item.display
+                            ]
+                          "
+                          style="text-align: center; font-weight: 600"
+                        >
+                          {{
+                            values[
+                              currentSample.identifier + "-" + item.display
+                            ]
+                          }}
+                        </span>
+                      </div>
+                      (<span style="font-weight: 400"
+                        >Min:
+                        <b style="margin-left: 10px">{{
+                          item.concept.lowNormal
+                        }}</b></span
+                      >
+                      -
+                      <span style="margin-left: 20px;font-weight: 400"
+                        >Max:
+                        <b style="margin-left: 10px">{{
+                          item.concept.hiNormal
+                        }}</b></span
+                      >)
+                    </th>
+                    <td>
+                      <button
+                        [disabled]="
+                          !values &&
+                          !values[
+                            currentSample.identifier + '-' + item.display
+                          ] &&
+                          savedData[
+                            currentSample.identifier + '-' + item.display
+                          ]
+                        "
+                        mat-button
+                      >
+                        Accept
+                      </button>
+                      <button
+                        [disabled]="
+                          !values &&
+                          !values[
+                            currentSample.identifier + '-' + item.display
+                          ] &&
+                          savedData[
+                            currentSample.identifier + '-' + item.display
+                          ]
+                        "
+                        mat-button
+                      >
+                        Accept
+                      </button>
+                      <span>{{
+                        savingMessage[
+                          currentSample.identifier + "-" + item.display
+                        ]
+                      }}</span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </mat-expansion-panel>
+          </mat-accordion>
+        </div>
+      </mat-tab>
+      <mat-tab label="Rejected Results" (click)="changeTab(3)">
+        <div *ngIf="selected.value == 3">
+          <div class="d-flex">
+            <mat-form-field class="w-50">
+              <mat-label>Search</mat-label>
+              <mat-icon matPrefix>search</mat-icon
+              ><input  autocomplete="off" matInput [(ngModel)]="searchingText" />
+            </mat-form-field>
+          </div>
+
+          <mat-accordion>
+            <mat-expansion-panel
+              [expanded]="currentSample.identifier == sample.identifier"
+              *ngFor="
+                let sample of samplesWithRejectedResults
+                  | filterSamples: searchingText;
+                let count = index
+              "
+              (click)="setPanel(sample)"
+            >
+              <mat-expansion-panel-header>
+                <mat-panel-title>
+                  {{ sample.identifier }} - {{ sample.sampleName }}
+                </mat-panel-title>
+                <mat-panel-description>
+                  <!-- Currently I am {{ panelOpenState ? "open" : "closed" }} -->
+                </mat-panel-description>
+              </mat-expansion-panel-header>
+              <table
+                class="table table-bordered"
+                *ngIf="currentSample.identifier == sample.identifier"
+              >
+                <thead>
+                  <tr>
+                    <th style="width: 15%">Order</th>
+                    <th>Results</th>
+                    <th style="width: 30%">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let item of sample.items">
+                    <th>
+                      {{ item.display }}
+                    </th>
+                    <th>
+                      <div class="w-50" style="float: left;text-align: center;">
+                        <span
+                          *ngIf="
+                            savedData[
+                              currentSample.identifier + '-' + item.display
+                            ]
+                          "
+                          style="text-align: center; font-weight: 600"
+                        >
+                          {{
+                            values[
+                              currentSample.identifier + "-" + item.display
+                            ]
+                          }}
+                        </span>
+                      </div>
+                    </th>
+                    <td>
+                      <button
+                        [disabled]="
+                          !values &&
+                          !values[
+                            currentSample.identifier + '-' + item.display
+                          ] &&
+                          savedData[
+                            currentSample.identifier + '-' + item.display
+                          ]
+                        "
+                        mat-button
+                      >
+                        Accept
+                      </button>
+                      <button
+                        [disabled]="
+                          !values &&
+                          !values[
+                            currentSample.identifier + '-' + item.display
+                          ] &&
+                          savedData[
+                            currentSample.identifier + '-' + item.display
+                          ]
+                        "
+                        mat-button
+                      >
+                        Accept
+                      </button>
+                      <span>{{
+                        savingMessage[
+                          currentSample.identifier + "-" + item.display
+                        ]
+                      }}</span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </mat-expansion-panel>
+          </mat-accordion>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  </mat-card>
+</div>

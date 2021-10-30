@@ -1,0 +1,342 @@
+<div
+  *ngIf="{
+    loadingVisit: loadingVisit$ | async,
+    currentPatient: currentPatient$ | async,
+    activeVisit: activeVisit$ | async,
+    vitalSignObservations: vitalSignObservations$ | async,
+    hasConsultationStarted: hasConsultationStarted$ | async,
+    startingConsultation: startingConsultation$ | async,
+    diagnoses: diagnoses$ | async,
+    encounterTypeLoaded: encounterTypeLoaded$ | async,
+    billLoadingState: billLoadingState$ | async,
+    loadingPaymentStatus: loadingPaymentStatus$ | async,
+    hasPatientHavePendingPaymentForTheCurrentVisitType:
+      hasPatientHavePendingPaymentForTheCurrentVisitType$ | async,
+    activeVisitDeathStatus: activeVisitDeathStatus$ | async,
+    observationsGroupedByConcept: observationsGroupedByConcept$ | async,
+    formEntities: consultationForms$ | async,
+    loadingForms: loadingForms$ | async,
+    ordersUpdates: ordersUpdates$ | async
+  } as dashboardParams"
+>
+  <div
+    class="w-100"
+    *ngIf="
+      !dashboardParams?.loadingPaymentStatus &&
+      dashboardParams?.encounterTypeLoaded &&
+      !dashboardParams?.billLoadingState &&
+      dashboardParams?.currentPatient &&
+      !dashboardParams?.loadingForms
+    "
+  >
+    <div class="sidebar-container bg-white mat-elevation-z1">
+      <app-patient-sidebar
+        *ngIf="dashboardParams?.activeVisit"
+        [currentPatient]="dashboardParams?.currentPatient"
+        [hasPendingPaymentsForCurrentVisitType]="
+          dashboardParams?.hasPatientHavePendingPaymentForTheCurrentVisitType
+        "
+        [isEmergency]="dashboardParams?.activeVisit?.isEmergency"
+        [hasDeathStatus]="dashboardParams?.activeVisitDeathStatus"
+        [waitingToBeAdmitted]="
+          dashboardParams?.activeVisit?.waitingToBeAdmitted
+        "
+        [isAdmitted]="dashboardParams?.activeVisit?.isAdmitted"
+        [hasConsultationStarted]="dashboardParams?.hasConsultationStarted"
+      ></app-patient-sidebar>
+    </div>
+    <div
+      class="
+        patient-dashboard-container
+        sidebar-content-container
+        mat-elevation-z1
+      "
+    >
+      <app-new-patient-profile
+        [currentPatient]="dashboardParams?.currentPatient"
+      ></app-new-patient-profile>
+      <mat-progress-bar
+        *ngIf="dashboardParams?.loadingVisit"
+        mode="indeterminate"
+      ></mat-progress-bar>
+
+      <div>
+        <div
+          class="
+            d-flex
+            justify-content-between
+            align-items-center
+            pt-2
+            pl-3
+            pr-3
+          "
+        >
+          <button
+            class="float-left"
+            mat-stroked-button
+            (click)="clearBills($event)"
+            [routerLink]="'/clinic/patient-list'"
+            matTooltip="Back to List"
+          >
+            <mat-icon>arrow_back</mat-icon>
+            Back to Client List
+          </button>
+
+          <h2 class="text-left ml-2">Patient Dashboard</h2>
+          <div class="d-flex justify-content-end">
+            <a
+              class="text-danger mr-2"
+              *ngIf="dashboardParams?.activeVisit?.waitingToBeAdmitted"
+            >
+              Waiting to be given a bed
+            </a>
+            <a
+              class="mr-2"
+              *ngIf="
+                !dashboardParams?.activeVisit?.waitingToBeAdmitted &&
+                dashboardParams?.activeVisit?.isAdmitted
+              "
+            >
+              <img
+                height="20"
+                src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAoCAYAAACM/rhtAAAABmJLR0QA/wD/AP+gvaeTAAAEqUlEQVRYhc2YW2hURxjH/9/MnL3lVovGS28ENa0iFKq1m2wi0j4UQ4wxmrZUKAg2rU9FCn1YrF1aRREsBS20kZbeESnFJESNCD4kGyMGSxG8Uo3QSzReqnGze/bMpQ9bN4m71Wxy1uT/eGbmm9+Zb/4f5zvAFBe5GWz1lo4vlJIbYAgewXf+/PGr4YnGZG6AAUBTU6+lldxQGQzypS8t4Y5Wm9yI6xrghTmDHCDDBYclBGAg3IjrGmC+NOUBx52GYUOAAwCSQyAifW/cGCPqwu1meAWp8RhnXC5uauq1rs64Gq8IBjkXfExr7GQSJ0/2Jlq21vhz2UusjnSUMm2+k1pXM8YvKK3faN264vx4wPMhwbT5aebMWcueevpJ69rAwPN9l6+0AHjuQYuam5c4DR91fNnd0/NOOsUAGJEOVVUyrTWi0eOj1hCRZIJ9misg1YcPJitCQYuxlF+i0e6kTjrTW3euGswl0PLIMV+JEx+sqqoUWmt0d/fIlm01Vq5A94tpQNyDAwACKR7w5XRP8qkpX2ZcAyz/q0gBhpRUcKQECNKNuBl1kDPywqjzb35y5FzclgcU6MBYXD3SOAQy4zFENlFduF1XV4fS9fDXkyf02pfnMr/HwulLN+xTFwckDHpjtt7ctm1Flxub5qKMFGsDMEZYWDYNr78yz7v97WBBfXXZsmIf63gt0vHD8sgx36QCOkqbOzFneAInVCyaRR+ufzFQNqdoTSmS0cZN+x+ZyzPuoFJGXekflAC8I5/7vQIb6xf5vj10dsGZPvM9gLVrNh/ZI7Wz0UzQbETM4Zz9qbT5UUq5q31H7a302Kpwu6qqDqU3iEaP234v1zveDWY9JUcqRL7ujd2NJ2qN5keDlUu54BP79NNaIxYbQv/f/fbA9esJLeXKlu21nUCWN6fUNbx28Y/bWYNZgqOm4pmAR3giBoZNFA4AGGMoKirE/PJ53gULF5QwwQ+vDLe9kBUQAJIJ+VlL56WYMSbbMBY/O4Ok0kGXWxoAwLTHSjCvfL5fcOuXxsb9PCsgt8y+a7fs31q7+pxs4z4PR9nsYtt1uv9UOn06+QP+x+3yQAMzlHlKEkLfScj6ztP9v3/VfjY+GM/knPtEUUG+AAFgzuzZRZbwvvW/7ju0vWYgYZKLz1y+uXfL3hP2NwfPxc5d+Qd2UgEASqcVcPcTPKzikmIoLYMPvOFtkZVDAN5rCB/ecerC9fVn+m6uSzpmfmHASggCM4RAvgC9Hg+MRokgw9I51lpDae1HUl+tC7enJ0sowABxO3V6t+/aqe+8PB4hYwzGaDHqBIkIAGH3pqqHBkg4Eh983pMvPgAGAI0uM0QEIgOls5eXUcsfPmVCMgYgGJNhEkY0NkDkNcOpHShrX0x4f3d0zGE6O8c+N1cRwATuq4OVoYq8bZirurqiamr3JIamdtNkSJPAiBxna7gfpRgjHQpVpg+NDGWahIhcabhzVWPkWKEjEzcAeEY+nzIpHkrELKSqV1oGIHavlwXgaj+bq7SPKRjDtE79wZNSgoiU4Fw0d/f0NMGAE5FknO2aDMBDkZo7DZEj+7qjx9cZgBFIcYvvmQyWnPQvCULmfbqY+pMAAAAASUVORK5CYII="
+              />
+            </a>
+            <button
+              mat-stroked-button
+              (click)="
+                viewPatientHistory(
+                  $event,
+                  dashboardParams?.currentPatient?.patient?.uuid
+                )
+              "
+              class="mr-2 float-right"
+            >
+              History
+            </button>
+            <button
+              mat-flat-button
+              color="primary"
+              [disabled]="
+                dashboardParams?.startingConsultation ||
+                (!dashboardParams?.activeVisit?.isEmergency &&
+                  dashboardParams?.hasPatientHavePendingPaymentForTheCurrentVisitType) ||
+                dashboardParams?.activeVisitDeathStatus
+              "
+              (click)="
+                onStartConsultation($event, dashboardParams?.activeVisit)
+              "
+            >
+              <mat-spinner
+                color="primary"
+                *ngIf="dashboardParams?.startingConsultation"
+                [diameter]="20"
+                style="display: inline-block !important; margin-right: 4px"
+              ></mat-spinner>
+              {{
+                dashboardParams?.hasConsultationStarted
+                  ? "Continue Consultation"
+                  : "Consult Patient"
+              }}
+            </button>
+
+            <span
+              class="ml-2 text-left"
+              *ngIf="dashboardParams?.currentPatient"
+            >
+              <app-is-first-visit
+                [patient]="dashboardParams?.currentPatient?.patient?.uuid"
+              ></app-is-first-visit>
+            </span>
+          </div>
+        </div>
+        <!-- dashboard menu -->
+        <mat-tab-group mat-align-tabs="start" dynamicHeight="true">
+          <mat-tab label="General">
+            <div class="p-3">
+              <div class="row">
+                <div class="col-lg-6 col-md-6 col-sm-12 col-sx-12">
+                  <mat-accordion>
+                    <mat-expansion-panel
+                      class="mb-2 border p-0"
+                      [expanded]="true"
+                    >
+                      <mat-expansion-panel-header>
+                        <mat-panel-title> Vitals </mat-panel-title>
+                      </mat-expansion-panel-header>
+
+                      <app-patient-vitals-summary></app-patient-vitals-summary>
+                    </mat-expansion-panel>
+                  </mat-accordion>
+                </div>
+
+                <div class="col-lg-6 col-md-6 col-sm-12 col-sx-12">
+                  <mat-accordion>
+                    <mat-expansion-panel
+                      class="mb-2 border p-0"
+                      [expanded]="true"
+                    >
+                      <mat-expansion-panel-header>
+                        <mat-panel-title
+                          >Provisional Diagnoses
+                        </mat-panel-title>
+                      </mat-expansion-panel-header>
+                      <app-patient-diagnoses-summary
+                        [isConfirmedDiagnosis]="false"
+                      ></app-patient-diagnoses-summary>
+                    </mat-expansion-panel>
+                  </mat-accordion>
+                </div>
+                <div class="col-lg-6 col-md-6 col-sm-12 col-sx-12">
+                  <mat-accordion>
+                    <mat-expansion-panel
+                      class="mb-2 border p-0"
+                      [expanded]="true"
+                    >
+                      <mat-expansion-panel-header>
+                        <mat-panel-title>Laboratory Tests </mat-panel-title>
+                      </mat-expansion-panel-header>
+                      <app-patient-lab-results-summary
+                        *ngIf="dashboardParams?.activeVisit"
+                        [observations]="
+                          dashboardParams?.observationsGroupedByConcept
+                        "
+                        [patientVisit]="dashboardParams?.activeVisit"
+                      ></app-patient-lab-results-summary>
+                      <mat-progress-bar
+                        *ngIf="
+                          dashboardParams?.loadingVisit ||
+                          !dashboardParams?.activeVisit
+                        "
+                        mode="indeterminate"
+                      ></mat-progress-bar>
+                    </mat-expansion-panel>
+                  </mat-accordion>
+                </div>
+                <div class="col-lg-6 col-md-6 col-sm-12 col-sx-12">
+                  <mat-accordion>
+                    <mat-expansion-panel
+                      class="mb-2 border p-0"
+                      [expanded]="true"
+                    >
+                      <mat-expansion-panel-header>
+                        <mat-panel-title>Confirmed Diagnoses </mat-panel-title>
+                      </mat-expansion-panel-header>
+                      <app-patient-diagnoses-summary
+                        [isConfirmedDiagnosis]="true"
+                      ></app-patient-diagnoses-summary>
+                    </mat-expansion-panel>
+                  </mat-accordion>
+                </div>
+                <div class="col-lg-6 col-md-6 col-sm-12 col-sx-12">
+                  <mat-accordion>
+                    <mat-expansion-panel
+                      class="mb-2 border p-0"
+                      [expanded]="true"
+                    >
+                      <mat-expansion-panel-header>
+                        <mat-panel-title>Medication </mat-panel-title>
+                      </mat-expansion-panel-header>
+                      <app-patient-medication-summary
+                        *ngIf="dashboardParams?.activeVisit"
+                        [patientVisit]="dashboardParams?.activeVisit"
+                      ></app-patient-medication-summary>
+                    </mat-expansion-panel>
+                  </mat-accordion>
+                </div>
+              </div>
+            </div>
+          </mat-tab>
+          <!-- <mat-tab label="Trends">
+            <div class="p-3">
+              <div class="row">
+                <div class="col-lg-4 col-md-4 col-sm-12 col-sx-12 mb-3">
+                  <h3 class="border-bottom border-secondary mb-2">BP</h3>
+                  <mat-card> no data </mat-card>
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-12 col-sx-12 mb-3">
+                  <h3 class="border-bottom border-secondary mb-2">
+                    Diabetes/Blood Sugar
+                  </h3>
+                  <mat-card> no data </mat-card>
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-12 col-sx-12 mb-3">
+                  <h3 class="border-bottom border-secondary mb-2">
+                    Temperature
+                  </h3>
+                  <mat-card> no data </mat-card>
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-12 col-sx-12 mb-3">
+                  <h3 class="border-bottom border-secondary mb-2">
+                    Growth Chart
+                  </h3>
+                  <mat-card> no data </mat-card>
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-12 col-sx-12 mb-3">
+                  <h3 class="border-bottom border-secondary mb-2">
+                    Weight/BMI
+                  </h3>
+                  <mat-card> no data </mat-card>
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-12 col-sx-12 mb-3">
+                  <h3 class="border-bottom border-secondary mb-2">Pulse</h3>
+                  <mat-card> no data </mat-card>
+                </div>
+              </div>
+            </div>
+          </mat-tab>
+          <mat-tab label="Summary">
+            <div class="p-3">
+              <div class="row">
+                <div class="col-lg-4 col-md-4 col-sm-12 col-sx-12 mb-3">
+                  <h3 class="border-bottom border-secondary mb-2">
+                    Problem History
+                  </h3>
+                  <mat-card> no data </mat-card>
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-12 col-sx-12 mb-3">
+                  <h3 class="border-bottom border-secondary mb-2">
+                    Medication
+                  </h3>
+                  <mat-card> no data </mat-card>
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-12 col-sx-12 mb-3">
+                  <h3 class="border-bottom border-secondary mb-2">
+                    Bacteriology Results
+                  </h3>
+                  <mat-card> no data </mat-card>
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-12 col-sx-12 mb-3">
+                  <h3 class="border-bottom border-secondary mb-2">
+                    Chronic Treatment Chart
+                  </h3>
+                  <mat-card> no data </mat-card>
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-12 col-sx-12 mb-3">
+                  <h3 class="border-bottom border-secondary mb-2">Radiology</h3>
+                  <mat-card> no data </mat-card>
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-12 col-sx-12 mb-3">
+                  <h3 class="border-bottom border-secondary mb-2">Pulse</h3>
+                  <mat-card> no data </mat-card>
+                </div>
+              </div>
+            </div>
+          </mat-tab> -->
+        </mat-tab-group>
+        <!-- end of dashboard menu -->
+      </div>
+    </div>
+  </div>
+  <mat-progress-bar
+    *ngIf="
+      dashboardParams?.loadingPaymentStatus ||
+      !dashboardParams?.encounterTypeLoaded ||
+      dashboardParams?.billLoadingState ||
+      !dashboardParams?.currentPatient ||
+      dashboardParams?.loadingForms
+    "
+    mode="indeterminate"
+  >
+  </mat-progress-bar>
+</div>

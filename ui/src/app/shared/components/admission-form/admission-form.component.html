@@ -1,0 +1,91 @@
+<div
+  class="admission-container"
+  *ngIf="{
+    formLoadingState: formLoadingState$ | async,
+    form: form$ | async,
+    locations: admissionLocations$ | async,
+    provider: provider$ | async,
+    visit: currentVisit$ | async,
+    admittingLoadingState: admittingLoadingState$ | async,
+    admissionStatus: admissionStatus$ | async,
+    currentLocation: currentLocation$ | async,
+    orderTypes: orderTypes$ | async
+  } as params"
+>
+  <mat-progress-bar
+    *ngIf="params?.formLoadingState || !params?.orderTypes"
+    mode="indeterminate"
+  ></mat-progress-bar>
+  <div *ngIf="params?.form" style="padding: 0px">
+    <div class="h5 p-3">Admit {{ patient?.display }}</div>
+    <hr style="margin: 0 !important" />
+    <div class="form" *ngIf="!params?.admissionStatus">
+      <!-- <mat-form-field class="w-100" appearance="legacy">
+        <mat-label>Admission date</mat-label>
+        <input
+          matInput
+          [matDatepicker]="picker"
+          name="admissionDate"
+          id="admissionDate"
+          required
+          [min]="minDate"
+          [max]="maxDate"
+          [(ngModel)]="admissionDate"
+        />
+        <mat-datepicker-toggle
+          matSuffix
+          [for]="picker"
+          id="input-date-picker"
+        ></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+      </mat-form-field> -->
+      <mat-form-field
+        class="w-100"
+        appearance="legacy"
+        style="border: solid 1px #adadad; border-radius: 6px"
+      >
+        <mat-label>Admit to:</mat-label>
+        <mat-select [(ngModel)]="admitTo" required>
+          <mat-option *ngFor="let option of params?.locations" [value]="option">
+            {{ option?.display }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+    <div *ngIf="params?.admissionStatus">
+      <h3 style="text-align: center" color="primary">Admitted!</h3>
+    </div>
+
+    <div class="btns">
+      <button
+        mat-stroked-button
+        [disabled]="!admitTo || params?.admissionStatus"
+        class="mr-2 admit-btn"
+        (click)="
+          onSaveForm(
+            $event,
+            params?.provider,
+            params?.visit,
+            params?.currentLocation,
+            params?.orderTypes
+          )
+        "
+      >
+        <mat-spinner
+          color="primary"
+          *ngIf="params?.admittingLoadingState"
+          [diameter]="20"
+          style="display: inline-block !important; margin-right: 4px"
+        ></mat-spinner>
+        Confirm
+      </button>
+      <button
+        mat-stroked-button
+        class="mr-2 cancel-btn"
+        (click)="onClose($event)"
+      >
+        Cancel
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,17 @@
+<div class="maintenance-container">
+  <div class="sidebar-container maintenance-sidebar mat-elevation-z1">
+    <mat-nav-list>
+      <mat-list-item [routerLink]="['']">
+        <mat-icon mat-list-icon>arrow_back</mat-icon>
+        <div mat-line>Home</div>
+      </mat-list-item>
+      <div mat-subheader>Maintenance</div>
+      <mat-list-item *ngFor="let page of pages">
+        <a matLine [routerLink]="[page.id]">{{ page.name }}</a>
+      </mat-list-item>
+    </mat-nav-list>
+  </div>
+  <div class="sidebar-content-container">
+    <router-outlet></router-outlet>
+  </div>
+</div>

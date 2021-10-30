@@ -1,0 +1,2138 @@
+<div
+  style="padding: 0 !important"
+  *ngIf="{
+    providerDetails: providerDetails$ | async,
+    currentSample: currentSample$ | async,
+    testOrders: testOrders$ | async,
+    savingLabResultsState: savingLabResultsState$ | async,
+    savingLabResultsStatusState: savingLabResultsStatusState$ | async
+  } as params"
+>
+  <mat-toolbar class="modal-header"
+    >Results entry and approval - {{ params?.currentSample?.id }}
+    <span *ngIf="params?.currentSample?.containerDetails?.display">
+      - {{ params?.currentSample?.containerDetails?.display }}
+    </span></mat-toolbar
+  >
+
+  <div style="padding: 10px">
+    Patient: {{ params?.currentSample?.patient?.givenName }}
+    {{ params?.currentSample?.patient?.midllename }}
+    {{ params?.currentSample?.patient?.familyName }} | Gender:
+    <b>{{ params?.currentSample?.patient?.gender }}</b> | Age:
+    <b>{{ params?.currentSample?.patient?.age }}</b>
+  </div>
+
+  <mat-progress-bar
+    mode="indeterminate"
+    *ngIf="loadingTestTimeSettings"
+  ></mat-progress-bar>
+  <div style="padding: 10px" *ngIf="!loadingTestTimeSettings">
+    <mat-tab-group>
+      <mat-tab label="Results">
+        <div
+          style="margin-top: 15px; overflow: auto"
+          [ngStyle]="{ 'max-height': maxHeight }"
+        >
+          <table class="table table-bordered">
+            <thead class="table-header">
+              <tr>
+                <th style="width: 15%">Test Order</th>
+                <th style="width: 5%">Container</th>
+                <th style="width: 5%">Label</th>
+                <th style="width: 15%">Ordered By</th>
+                <th colspan="2">Results</th>
+                <th style="width: 5%">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <ng-container *ngFor="let item of params?.testOrders">
+                <ng-container
+                  *ngIf="item?.order?.concept?.setMembers?.length == 0"
+                >
+                  <tr>
+                    <td>{{ item?.order?.concept?.name }}</td>
+                    <td>
+                      <span
+                        *ngIf="
+                          item?.testAllocations?.length > 0 &&
+                          item?.testAllocations[0]?.container?.display
+                        "
+                      >
+                        {{ item?.testAllocations[0]?.container?.display }}
+                      </span>
+
+                      <span
+                        *ngIf="
+                          item?.testAllocations?.length > 0 &&
+                          !item?.testAllocations[0]?.container?.display
+                        "
+                      >
+                        N/A
+                      </span>
+                    </td>
+                    <td>
+                      {{ item?.order?.orderNumber }}
+                    </td>
+                    <td>
+                      {{ item?.order?.orderer?.name }}
+                    </td>
+                    <td colspan="2">
+                      <div
+                        class="w-100 text-danger"
+                        *ngIf="
+                          item?.testAllocations?.length > 0 &&
+                          item?.testAllocations[0]?.rejected &&
+                          item?.testAllocations[0]?.results[
+                            item?.testAllocations[0]?.results?.length - 1
+                          ]?.dateCreated <
+                            item?.testAllocations[0]?.rejectionStatus?.timestamp
+                        "
+                      >
+                        Value
+
+                        <b>
+                          <span
+                            class="w-50"
+                            *ngIf="
+                              item?.order?.concept.answers &&
+                              item?.order?.concept.answers.length > 0
+                            "
+                          >
+                            {{
+                              item?.order?.concept?.keyedAnswers[
+                                item?.testAllocations[0]?.results[
+                                  item?.testAllocations[0]?.results?.length - 1
+                                ]?.value
+                              ]?.display
+                            }}
+                          </span>
+                          <span
+                            *ngIf="
+                              item?.order?.concept.answers &&
+                              item?.order?.concept.answers.length == 0
+                            "
+                          >
+                            {{
+                              item?.testAllocations[0]?.results?.length > 0
+                                ? item?.testAllocations[0]?.results[
+                                    item?.testAllocations[0]?.results?.length -
+                                      1
+                                  ]?.value
+                                : null
+                            }}
+                          </span>
+                        </b>
+
+                        was rejected by
+                        {{
+                          item?.testAllocations[0]?.rejectionStatus?.user
+                            ?.display
+                        }}
+                        <br />
+                        <span>
+                          Reason:
+                          {{
+                            item?.testAllocations[0]?.rejectionStatus?.remarks
+                          }}
+                        </span>
+                      </div>
+                      <mat-tab-group>
+                        <mat-tab label="Current">
+                          <div class="p-3">
+                            <mat-form-field
+                              class="w-100"
+                              *ngIf="
+                                !notInRangeIsSet[item?.order?.concept?.uuid] &&
+                                !item?.order?.concept.numeric &&
+                                item?.order?.concept.answers &&
+                                item?.order?.concept.answers.length == 0
+                              "
+                            >
+                              <mat-label
+                                >Value for
+                                {{ item?.order?.concept?.display }}</mat-label
+                              >
+                              <textarea
+                                (keyup)="
+                                  setEnteredValue(item, $event.target.value)
+                                "
+                                class="text-left"
+                                matInput
+                                [value]="
+                                  item?.testAllocations[0]?.results?.length > 0
+                                    ? item?.testAllocations[0]?.results[
+                                        item?.testAllocations[0]?.results
+                                          ?.length - 1
+                                      ]?.value
+                                    : null
+                                "
+                                [disabled]="
+                                  item?.testAllocations?.length > 0 &&
+                                  item?.testAllocations[0]?.firstSignOff
+                                "
+                                required
+                                id="{{ item?.order?.concept?.display }}"
+                              ></textarea>
+                            </mat-form-field>
+                            <!-- For concept with answers -->
+                            <mat-form-field
+                              class="w-50"
+                              *ngIf="
+                                !notInRangeIsSet[item?.order?.concept?.uuid] &&
+                                item?.order?.concept.answers &&
+                                item?.order?.concept.answers.length > 0
+                              "
+                            >
+                              <mat-label>Select</mat-label>
+                              <mat-select
+                                [disabled]="
+                                  item?.testAllocations?.length > 0 &&
+                                  item?.testAllocations[0]?.firstSignOff
+                                "
+                                required
+                                [value]="
+                                  item?.testAllocations?.length > 0 &&
+                                  item?.testAllocations[0]?.results?.length > 0
+                                    ? item?.testAllocations[0]?.results[
+                                        item?.testAllocations[0]?.results
+                                          ?.length - 1
+                                      ]?.value
+                                    : null
+                                "
+                                (selectionChange)="setValue($event.value, item)"
+                              >
+                                <mat-option>None</mat-option>
+                                <mat-option
+                                  *ngFor="
+                                    let option of item?.order?.concept?.answers
+                                  "
+                                  [value]="option.uuid"
+                                >
+                                  {{ option.display }}
+                                </mat-option>
+                              </mat-select>
+                            </mat-form-field>
+                            <mat-form-field
+                              class="w-50"
+                              *ngIf="
+                                !notInRangeIsSet[item?.order?.concept?.uuid] &&
+                                item?.order?.concept.numeric &&
+                                item?.order?.concept.lowNormal &&
+                                item?.order?.concept.hiNormal
+                              "
+                            >
+                              <mat-label
+                                >Select value for
+                                {{ item?.order?.concept?.display }}</mat-label
+                              >
+                              <mat-select
+                                [disabled]="
+                                  item?.testAllocations[0]?.firstSignOff
+                                "
+                                required
+                                [value]="
+                                  item?.testAllocations?.length > 0 &&
+                                  item?.testAllocations[0]?.results?.length > 0
+                                    ? item?.testAllocations[0]?.results[
+                                        item?.testAllocations[0]?.results
+                                          ?.length - 1
+                                      ]?.value
+                                    : null
+                                "
+                                (selectionChange)="setValue($event.value, item)"
+                              >
+                                <mat-option>None</mat-option>
+                                <mat-option
+                                  *ngFor="
+                                    let option of item?.order?.concept
+                                      ?.selectionOptions
+                                  "
+                                  [value]="option"
+                                  >{{ option }}
+                                </mat-option>
+                              </mat-select>
+                            </mat-form-field>
+
+                            <mat-form-field
+                              class="w-50"
+                              *ngIf="
+                                notInRangeIsSet[item?.order?.concept?.uuid]
+                              "
+                            >
+                              <mat-label
+                                >Value for {{ item?.order?.concept?.name }}
+                              </mat-label>
+                              <input
+                                *ngIf="!item?.order?.concept.numeric"
+                                matInput
+                                [type]="'text'"
+                                class="text-left"
+                                [value]="
+                                  item?.testAllocations?.length > 0 &&
+                                  item?.testAllocations[0]?.results?.length > 0
+                                    ? item?.testAllocations[0]?.results[
+                                        item?.testAllocations[0]?.results
+                                          ?.length - 1
+                                      ]?.value
+                                    : null
+                                "
+                                [disabled]="
+                                  item?.testAllocations[0]?.firstSignOff
+                                "
+                                [(ngModel)]="values[item?.order?.concept?.uuid]"
+                              />
+
+                              <input
+                                *ngIf="item?.order?.concept.numeric"
+                                type="number"
+                                (keyup)="
+                                  setEnteredValue(item, $event.target.value)
+                                "
+                                [value]="
+                                  item?.testAllocations[0]?.results?.length > 0
+                                    ? item?.testAllocations[0]?.results[
+                                        item?.testAllocations[0]?.results
+                                          ?.length - 1
+                                      ]?.value
+                                    : null
+                                "
+                                style="text-align: center"
+                                [disabled]="
+                                  item?.testAllocations[0]?.firstSignOff
+                                "
+                                matInput
+                                required
+                                id="{{ item?.order?.concept?.display }}"
+                              />
+                              <button
+                                mat-button
+                                *ngIf="values[item?.order?.concept?.uuid]"
+                                matSuffix
+                                mat-icon-button
+                                aria-label="Clear"
+                                (click)="
+                                  values[item?.order?.concept?.uuid] = ''
+                                "
+                              >
+                                <mat-icon>close</mat-icon>
+                              </button>
+                              <button
+                                *ngIf="
+                                  notInRangeIsSet[item?.order?.concept?.uuid]
+                                "
+                                [disabled]="
+                                  item?.testAllocations[0]?.firstSignOff
+                                "
+                                style="font-size: 0.6rem; margin-left: 5px"
+                                mat-button
+                                matSuffix
+                                mat-icon-button
+                                aria-label="Feed"
+                                (click)="onToggleFreeEntry($event, item)"
+                              >
+                                Go to range
+                              </button>
+                            </mat-form-field>
+
+                            <mat-form-field
+                              class="w-50"
+                              *ngIf="
+                                !notInRangeIsSet[item?.order?.concept?.uuid] &&
+                                item?.order?.concept.numeric &&
+                                (!item?.order?.concept.lowNormal ||
+                                  !item?.order?.concept.hiNormal)
+                              "
+                            >
+                              <mat-label
+                                >Value for
+                                {{ item?.order?.concept?.display }}</mat-label
+                              >
+                              <input
+                                type="number"
+                                [(ngModel)]="values[item?.order?.concept?.uuid]"
+                                (keyup)="
+                                  setEnteredValue(item, $event.target.value)
+                                "
+                                [value]="
+                                  item?.testAllocations?.length > 0 &&
+                                  item?.testAllocations[0]?.results?.length > 0
+                                    ? item?.testAllocations[0]?.results[
+                                        item?.testAllocations[0]?.results
+                                          ?.length - 1
+                                      ]?.valueNumeric
+                                    : null
+                                "
+                                style="text-align: center"
+                                [disabled]="
+                                  item?.testAllocations?.length > 0 &&
+                                  item?.testAllocations[0]?.firstSignOff
+                                "
+                                matInput
+                                required
+                                id="{{ item?.order?.concept.display }}"
+                              />
+                            </mat-form-field>
+                            <button
+                              *ngIf="
+                                !notInRangeIsSet[item?.order?.concept?.uuid] &&
+                                item?.order?.concept.numeric &&
+                                item?.order?.concept.lowNormal &&
+                                item?.order?.concept.hiNormal
+                              "
+                              [disabled]="
+                                item?.testAllocations[0]?.firstSignOff
+                              "
+                              style="font-size: 0.6rem; margin-left: 5px"
+                              mat-button
+                              matSuffix
+                              mat-icon-button
+                              aria-label="Feed"
+                              (click)="onToggleFreeEntry($event, item)"
+                            >
+                              Not in range?
+                            </button>
+
+                            <span
+                              *ngIf="item?.order?.concept.units"
+                              style="margin-right: 10px; margin-left: 40px"
+                            >
+                              Units: <b>{{ item?.order?.concept?.units }}</b>
+                            </span>
+
+                            <span
+                              *ngIf="
+                                item?.order?.concept.numeric &&
+                                item?.order?.concept.lowNormal &&
+                                item?.order?.concept.hiNormal
+                              "
+                            >
+                              <br />
+                              (<span style="font-weight: 400"
+                                >Min:
+                                <b style="margin-left: 20px">{{
+                                  item?.order?.concept.lowNormal
+                                }}</b></span
+                              >
+                              -
+                              <span style="margin-left: 30px; font-weight: 400"
+                                >Max:
+                                <b style="margin-left: 10px">{{
+                                  item?.order?.concept.hiNormal
+                                }}</b></span
+                              >)
+                            </span>
+
+                            <div class="w-100">
+                              <mat-checkbox
+                                [checked]="
+                                  item?.testAllocations[0]?.results?.length > 0
+                                    ? item?.testAllocations[0]?.results[
+                                        item?.testAllocations[0]?.results
+                                          ?.length - 1
+                                      ]?.abnormal
+                                    : false ||
+                                      values[
+                                        item?.order?.concept?.uuid + '-abnormal'
+                                      ]
+                                "
+                                (change)="
+                                  onSetAbnormal(
+                                    $event,
+                                    item?.order?.concept?.uuid + '-abnormal'
+                                  )
+                                "
+                              >
+                                Abnormal
+                              </mat-checkbox>
+                            </div>
+
+                            <mat-form-field
+                              [style.fontSize]="'15px'"
+                              style="margin-top: 5px"
+                              class="w-100"
+                            >
+                              <mat-label>Remarks</mat-label>
+                              <textarea
+                                [disabled]="
+                                  (item?.testAllocations?.length > 0 &&
+                                    item?.testAllocations[0]?.firstSignOff) ||
+                                  item?.secondSignOff
+                                "
+                                (keyup)="
+                                  setCommentValue($event.target.value, item)
+                                "
+                                [value]="
+                                  item?.testAllocations?.length > 0 &&
+                                  item?.testAllocations[0]?.results?.length >
+                                    0 &&
+                                  item?.testAllocations[0]
+                                    ?.resultsCommentsStatuses[0]?.remarks ==
+                                    'RESULTS'
+                                    ? null
+                                    : item?.testAllocations?.length > 0 &&
+                                      item?.testAllocations[0]?.results
+                                        ?.length > 0
+                                    ? item?.testAllocations[0]
+                                        ?.resultsCommentsStatuses[0]?.remarks
+                                    : null
+                                "
+                                matInput
+                                cdkTextareaAutosize
+                                #autosize="cdkTextareaAutosize"
+                                cdkAutosizeMinRows="1"
+                                cdkAutosizeMaxRows="2"
+                              ></textarea>
+                            </mat-form-field>
+
+                            <span
+                              *ngIf="
+                                labConfigs?.attachmentConcepts[
+                                  item?.order?.concept?.uuid
+                                ]
+                              "
+                              style="float: right; cursor: pointer"
+                              (click)="
+                                onToggleAttachment(
+                                  $event,
+                                  item?.order?.concept?.uuid
+                                )
+                              "
+                            >
+                              <mat-icon>attach_file</mat-icon></span
+                            >
+                            <div *ngIf="attach[item?.order?.concept?.uuid]">
+                              <app-upload-file
+                                [patientUuid]="
+                                  params?.currentSample?.patient?.uuid
+                                "
+                                [conceptUuid]="
+                                  labConfigs?.attachmentConcepts[
+                                    item?.order?.concept?.uuid
+                                  ]
+                                "
+                                [encounterUuid]="item?.order?.encounterUuid"
+                                (fileInfo)="
+                                  onGetFileInfo(
+                                    $event,
+                                    item,
+                                    null,
+                                    params?.providerDetails,
+                                    labConfigs?.attachmentConcepts[
+                                      item?.order?.concept?.uuid
+                                    ]
+                                  )
+                                "
+                              ></app-upload-file>
+                            </div>
+                          </div>
+                        </mat-tab>
+                        <mat-tab label="Backlog">
+                          <div class="p-3">
+                            <table class="table table-bordered">
+                              <thead class="table-header">
+                                <th>Value</th>
+                                <th>Remarks</th>
+                                <th>Date Time</th>
+                                <th>Completed By</th>
+                              </thead>
+                              <tbody>
+                                <ng-container
+                                  *ngIf="
+                                    item?.testAllocations?.length > 0 &&
+                                    item?.testAllocations[0]?.results?.length >
+                                      1
+                                  "
+                                >
+                                  <ng-container
+                                    *ngFor="
+                                      let result of item?.testAllocations[0]
+                                        ?.results;
+                                      let i = index
+                                    "
+                                  >
+                                    <tr
+                                      *ngIf="
+                                        i <
+                                        item?.testAllocations[0]?.results
+                                          ?.length -
+                                          1
+                                      "
+                                    >
+                                      <td>
+                                        <mat-form-field
+                                          class="w-100"
+                                          *ngIf="
+                                            item?.order?.concept.answers &&
+                                            item?.order?.concept.answers
+                                              .length > 0
+                                          "
+                                        >
+                                          <mat-select
+                                            [disabled]="true"
+                                            required
+                                            [value]="result?.value"
+                                            (selectionChange)="
+                                              setValue($event.value, item)
+                                            "
+                                          >
+                                            <mat-option
+                                              *ngFor="
+                                                let option of item?.order
+                                                  ?.concept?.answers
+                                              "
+                                              [value]="option.uuid"
+                                            >
+                                              {{ option.display }}
+                                            </mat-option>
+                                          </mat-select>
+                                        </mat-form-field>
+                                        <div
+                                          *ngIf="
+                                            item?.order?.concept.answers &&
+                                            item?.order?.concept.answers
+                                              .length == 0
+                                          "
+                                        >
+                                          {{ result?.value }}
+                                        </div>
+                                      </td>
+                                      <td>
+                                        {{
+                                          item?.testAllocations[0]
+                                            ?.resultsCommentsStatuses[0]
+                                            ?.remarks == "RESULTS"
+                                            ? null
+                                            : item?.testAllocations[0]
+                                                ?.resultsCommentsStatuses[0]
+                                                ?.remarks
+                                        }}
+                                      </td>
+                                      <td>
+                                        {{
+                                          item?.testAllocations[0]
+                                            ?.resultsCommentsStatuses[0]
+                                            ?.timestamp | date: "medium"
+                                        }}
+                                      </td>
+                                      <td>
+                                        {{ result?.resultsFedBy?.name }}
+                                      </td>
+                                    </tr>
+                                  </ng-container>
+                                </ng-container>
+                                <ng-container
+                                  *ngIf="
+                                    item?.testAllocations[0]?.results?.length <=
+                                    1
+                                  "
+                                >
+                                  <tr>
+                                    <td
+                                      colspan="4"
+                                      class="text-center text-danger"
+                                    >
+                                      No backlog data for this test
+                                      <br />
+                                      <!-- {{ params?.currentSample | json }} -->
+                                    </td>
+                                  </tr>
+                                </ng-container>
+                              </tbody>
+                            </table>
+                          </div>
+                        </mat-tab>
+                      </mat-tab-group>
+                    </td>
+                    <td>
+                      <button
+                        [disabled]="
+                          !item?.testAllocations[0] ||
+                          (!values[item?.order?.concept?.uuid] &&
+                            !values[item?.order?.concept?.uuid + '-comment']) ||
+                          item?.testAllocations[0]?.firstSignOff
+                        "
+                        (click)="
+                          onSave(
+                            $event,
+                            item,
+                            params?.testOrders,
+                            params?.currentSample,
+                            item?.testAllocations[0]
+                          )
+                        "
+                        mat-stroked-button
+                        class="ml-2"
+                      >
+                        <mat-spinner
+                          *ngIf="
+                            params?.savingLabResultsState &&
+                            savingMessage[item?.order?.concept?.uuid]
+                          "
+                          color="primary"
+                          [diameter]="20"
+                          style="
+                            display: inline-block !important;
+                            margin-right: 4px;
+                          "
+                        >
+                        </mat-spinner>
+                        {{
+                          item?.testAllocations?.length == 0 ||
+                          (item?.testAllocations[0]?.results &&
+                            item?.testAllocations[0]?.results?.length == 0)
+                            ? "Save"
+                            : "Edit"
+                        }}
+                      </button>
+                      <span
+                        *ngIf="!item?.testAllocations[0]"
+                        class="text-warning"
+                      >
+                        Code: <b>LABCODE 001</b> - Miss test allocation, contact
+                        IT
+                      </span>
+                    </td>
+                  </tr>
+                </ng-container>
+                <ng-container
+                  *ngIf="item?.order?.concept?.setMembers?.length > 0"
+                >
+                  <!-- {{ item?.concept?.setMembers | json }} -->
+
+                  <!-- {{ item | json}} -->
+                  <tr
+                    *ngFor="
+                      let parameter of item?.order?.concept?.setMembers;
+                      let count = index
+                    "
+                  >
+                    <td
+                      *ngIf="count == 0"
+                      [attr.rowspan]="
+                        item?.order?.concept?.setMembers?.length + 1
+                      "
+                    >
+                      {{ item?.order?.concept?.display }}
+                    </td>
+                    <td
+                      *ngIf="count == 0"
+                      [attr.rowspan]="item?.order?.concept?.setMembers?.length"
+                    >
+                      <span
+                        *ngIf="
+                          item?.allocationsPairedBySetMember[parameter?.uuid]
+                            ?.container?.display
+                        "
+                      >
+                        {{
+                          item?.allocationsPairedBySetMember[parameter?.uuid]
+                            ?.container?.display
+                        }}
+                      </span>
+
+                      <span
+                        *ngIf="
+                          !item?.allocationsPairedBySetMember[parameter?.uuid]
+                            ?.container?.display
+                        "
+                      >
+                        N/A
+                      </span>
+                    </td>
+                    <td
+                      *ngIf="count == 0"
+                      [attr.rowspan]="item?.order?.concept?.setMembers?.length"
+                    >
+                      {{ item?.order?.orderNumber }}
+                    </td>
+                    <td
+                      *ngIf="count == 0"
+                      [attr.rowspan]="item?.order?.concept?.setMembers?.length"
+                    >
+                      {{ item?.order?.orderer?.name }}
+                    </td>
+                    <td style="width: 20px">
+                      {{ parameter?.display }}
+                      <!-- - {{ parameter | json }} -->
+                    </td>
+                    <td>
+                      <!-- {{item | json}} -->
+                      <mat-tab-group>
+                        <mat-tab label="Current">
+                          <div class="p-3">
+                            <mat-form-field
+                              class="w-75"
+                              *ngIf="
+                                !notInRangeIsSet[parameter?.uuid] &&
+                                !parameter?.numeric &&
+                                parameter?.answers &&
+                                parameter?.answers.length == 0
+                              "
+                            >
+                              <mat-label
+                                >Value for {{ parameter?.display }}
+                              </mat-label>
+                              <textarea
+                                (keyup)="
+                                  setEnteredParameterValue(
+                                    parameter,
+                                    $event.target.value
+                                  )
+                                "
+                                class="text-left"
+                                matInput
+                                [value]="
+                                  item?.allocationsPairedBySetMember[
+                                    parameter?.uuid
+                                  ]?.results?.length > 0
+                                    ? item?.allocationsPairedBySetMember[
+                                        parameter?.uuid
+                                      ]?.results[
+                                        item?.allocationsPairedBySetMember[
+                                          parameter?.uuid
+                                        ]?.results?.length - 1
+                                      ]?.value
+                                    : null
+                                "
+                                [disabled]="
+                                  item?.allocationsPairedBySetMember[
+                                    parameter?.uuid
+                                  ]?.firstSignOff
+                                "
+                                required
+                                id="{{ parameter?.display }}"
+                              ></textarea>
+                            </mat-form-field>
+                            <mat-form-field
+                              class="w-75"
+                              *ngIf="
+                                !notInRangeIsSet[item?.order?.concept?.uuid] &&
+                                parameter?.answers &&
+                                parameter?.answers.length > 0
+                              "
+                            >
+                              <mat-label
+                                >Select {{ parameter?.display }}</mat-label
+                              >
+                              <mat-select
+                                [disabled]="
+                                  item?.allocationsPairedBySetMember[
+                                    parameter?.uuid
+                                  ]?.firstSignOff
+                                "
+                                required
+                                [value]="
+                                  item?.allocationsPairedBySetMember[
+                                    parameter?.uuid
+                                  ]?.results?.length > 0
+                                    ? item?.allocationsPairedBySetMember[
+                                        parameter?.uuid
+                                      ]?.results[
+                                        item?.allocationsPairedBySetMember[
+                                          parameter?.uuid
+                                        ]?.results?.length - 1
+                                      ]?.value
+                                    : null
+                                "
+                                (selectionChange)="
+                                  setParameterValue($event.value, parameter)
+                                "
+                              >
+                                <mat-option>None</mat-option>
+                                <mat-option
+                                  *ngFor="let option of parameter?.answers"
+                                  [value]="option.uuid"
+                                >
+                                  {{ option.display }}
+                                </mat-option>
+                              </mat-select>
+                            </mat-form-field>
+
+                            <mat-form-field
+                              class="w-50"
+                              *ngIf="
+                                !notInRangeIsSet[parameter?.uuid] &&
+                                parameter?.numeric &&
+                                parameter?.lowNormal &&
+                                parameter?.hiNormal
+                              "
+                            >
+                              <mat-label
+                                >Select value for
+                                {{ parameter?.display }}</mat-label
+                              >
+                              <!-- {{parameter | json}} -->
+                              <mat-select
+                                [disabled]="
+                                  item?.allocationsPairedBySetMember[
+                                    parameter?.uuid
+                                  ]?.firstSignOff
+                                "
+                                required
+                                [value]="
+                                  item?.allocationsPairedBySetMember[
+                                    parameter?.uuid
+                                  ]?.results?.length > 0
+                                    ? item?.allocationsPairedBySetMember[
+                                        parameter?.uuid
+                                      ]?.results[
+                                        item?.allocationsPairedBySetMember[
+                                          parameter?.uuid
+                                        ]?.results?.length - 1
+                                      ]?.value
+                                    : null
+                                "
+                                (selectionChange)="
+                                  setParameterValue($event.value, parameter)
+                                "
+                              >
+                                <mat-option>None</mat-option>
+                                <mat-option
+                                  *ngFor="
+                                    let option of parameter?.selectionOptions
+                                  "
+                                  [value]="option"
+                                  >{{ option }}
+                                </mat-option>
+                              </mat-select>
+                            </mat-form-field>
+
+                            <button
+                              *ngIf="
+                                !notInRangeIsSet[parameter?.uuid] &&
+                                parameter?.numeric &&
+                                parameter?.lowNormal &&
+                                parameter?.hiNormal
+                              "
+                              style="font-size: 0.6rem; margin-left: 5px"
+                              mat-button
+                              matSuffix
+                              mat-icon-button
+                              aria-label="Feed"
+                              (click)="
+                                onToggleFreeEntryForParameter($event, parameter)
+                              "
+                            >
+                              Not in range?
+                            </button>
+
+                            <mat-form-field
+                              class="w-50"
+                              *ngIf="notInRangeIsSet[parameter?.uuid]"
+                            >
+                              <mat-label
+                                >Value for {{ parameter?.display }}
+                              </mat-label>
+                              <input
+                                *ngIf="!parameter?.numeric"
+                                matInput
+                                autocomplete="off" 
+                                [type]="'text'"
+                                class="text-left"
+                                [value]="
+                                  item?.allocationsPairedBySetMember[
+                                    parameter?.uuid
+                                  ]?.results?.length > 0
+                                    ? item?.allocationsPairedBySetMember[
+                                        parameter?.uuid
+                                      ]?.results[
+                                        item?.allocationsPairedBySetMember[
+                                          parameter?.uuid
+                                        ]?.results?.length - 1
+                                      ]?.value
+                                    : null
+                                "
+                                [disabled]="
+                                  item?.allocationsPairedBySetMember[
+                                    parameter?.uuid
+                                  ]?.firstSignOff
+                                "
+                                (keyup.enter)="
+                                  setEnteredParameterValue(
+                                    parameter,
+                                    $event.target.value
+                                  )
+                                "
+                              />
+
+                              <input
+                                *ngIf="parameter?.numeric"
+                                type="number"
+                                (change)="
+                                  setEnteredParameterValue(
+                                    parameter,
+                                    $event.target.value
+                                  )
+                                "
+                                [value]="
+                                  item?.allocationsPairedBySetMember[
+                                    parameter?.uuid
+                                  ]?.results?.length > 0
+                                    ? item?.allocationsPairedBySetMember[
+                                        parameter?.uuid
+                                      ]?.results[
+                                        item?.allocationsPairedBySetMember[
+                                          parameter?.uuid
+                                        ]?.results?.length - 1
+                                      ]?.valueNumeric
+                                    : null
+                                "
+                                style="text-align: center"
+                                [disabled]="
+                                  item?.allocationsPairedBySetMember[
+                                    parameter?.uuid
+                                  ]?.firstSignOff
+                                "
+                                matInput
+                                required
+                                id="{{ parameter?.display }}"
+                              />
+                              <button
+                                mat-button
+                                *ngIf="values[parameter?.uuid]"
+                                matSuffix
+                                mat-icon-button
+                                aria-label="Clear"
+                                (click)="values[parameter?.uuid] = ''"
+                              >
+                                <mat-icon>close</mat-icon>
+                              </button>
+                              <button
+                                *ngIf="notInRangeIsSet[parameter?.uuid]"
+                                style="font-size: 0.6rem; margin-left: 5px"
+                                mat-button
+                                matSuffix
+                                mat-icon-button
+                                aria-label="Feed"
+                                (click)="
+                                  onToggleFreeEntryForParameter(
+                                    $event,
+                                    parameter
+                                  )
+                                "
+                              >
+                                Go to range
+                              </button>
+                            </mat-form-field>
+
+                            <mat-form-field
+                              class="w-50"
+                              *ngIf="
+                                !notInRangeIsSet[parameter?.uuid] &&
+                                parameter?.numeric &&
+                                (!parameter.lowNormal || !parameter.hiNormal)
+                              "
+                            >
+                              <mat-label>
+                                here for 1 :: {{ parameter?.display }} Value for
+                                {{ parameter?.display }}</mat-label
+                              >
+
+                              <input
+                                type="number"
+                                (change)="
+                                  setEnteredParameterValue(
+                                    parameter,
+                                    $event.target.value
+                                  )
+                                "
+                                [value]="
+                                  item?.allocationsPairedBySetMember[
+                                    parameter?.uuid
+                                  ]?.results?.length > 0
+                                    ? item?.allocationsPairedBySetMember[
+                                        parameter?.uuid
+                                      ]?.results[
+                                        item?.allocationsPairedBySetMember[
+                                          parameter?.uuid
+                                        ]?.results?.length - 1
+                                      ]?.valueNumeric
+                                    : null
+                                "
+                                style="text-align: center"
+                                [disabled]="
+                                  item?.allocationsPairedBySetMember[
+                                    parameter?.uuid
+                                  ]?.firstSignOff
+                                "
+                                matInput
+                                required
+                                id="{{ parameter?.display }}"
+                              />
+                            </mat-form-field>
+
+                            <span
+                              *ngIf="parameter?.units"
+                              style="margin-right: 10px; margin-left: 20px"
+                            >
+                              Units: <b>{{ parameter?.units }}</b>
+                            </span>
+
+                            <span
+                              *ngIf="
+                                parameter?.numeric &&
+                                parameter?.lowNormal &&
+                                parameter?.hiNormal
+                              "
+                            >
+                              <br />
+                              (<span style="font-weight: 400"
+                                >Min:
+                                <b style="margin-left: 10px">{{
+                                  parameter?.lowNormal
+                                }}</b></span
+                              >
+                              -
+                              <span style="margin-left: 20px; font-weight: 400"
+                                >Max:
+                                <b style="margin-left: 10px">{{
+                                  parameter?.hiNormal
+                                }}</b></span
+                              >)
+                            </span>
+
+                            <div class="w-100">
+                              <mat-checkbox
+                                [checked]="
+                                  values[parameter?.uuid + '-abnormal']
+                                "
+                                (change)="
+                                  onSetAbnormal(
+                                    $event,
+                                    parameter?.uuid + '-abnormal'
+                                  )
+                                "
+                              >
+                                Abnormal
+                              </mat-checkbox>
+                            </div>
+
+                            <mat-form-field
+                              [style.fontSize]="'15px'"
+                              style="margin-top: 5px"
+                              class="w-100"
+                            >
+                              <mat-label>Remarks</mat-label>
+                              <textarea
+                                [disabled]=""
+                                (keyup)="
+                                  setCommentValueForParameters(
+                                    $event.target.value,
+                                    parameter
+                                  )
+                                "
+                                [value]=""
+                                matInput
+                                cdkTextareaAutosize
+                                #autosize="cdkTextareaAutosize"
+                                cdkAutosizeMinRows="1"
+                                cdkAutosizeMaxRows="2"
+                              ></textarea>
+                            </mat-form-field>
+                          </div>
+                        </mat-tab>
+                        <mat-tab label="Backlog">
+                          <div class="p-3">
+                            <table class="table table-bordered">
+                              <thead class="table-header">
+                                <th>Value</th>
+                                <th>Remarks</th>
+                                <th>Date Time</th>
+                                <th>Completed By</th>
+                              </thead>
+                              <tbody>
+                                <ng-container
+                                  *ngIf="
+                                    item?.allocationsPairedBySetMember[
+                                      parameter?.uuid
+                                    ]?.results?.length > 1
+                                  "
+                                >
+                                  <ng-container
+                                    *ngFor="
+                                      let result of item
+                                        ?.allocationsPairedBySetMember[
+                                        parameter?.uuid
+                                      ]?.results;
+                                      let i = index
+                                    "
+                                  >
+                                    <tr
+                                      *ngIf="
+                                        i <
+                                        item?.allocationsPairedBySetMember[
+                                          parameter?.uuid
+                                        ]?.results?.length -
+                                          1
+                                      "
+                                    >
+                                      <td>
+                                        <mat-form-field
+                                          class="w-100"
+                                          *ngIf="
+                                            parameter?.answers &&
+                                            parameter?.answers.length > 0
+                                          "
+                                        >
+                                          <mat-select
+                                            [disabled]="true"
+                                            required
+                                            [value]="result?.value"
+                                            (selectionChange)="
+                                              setValue($event.value, item)
+                                            "
+                                          >
+                                            <mat-option
+                                              *ngFor="
+                                                let option of parameter?.answers
+                                              "
+                                              [value]="option.uuid"
+                                            >
+                                              {{ option.display }}
+                                            </mat-option>
+                                          </mat-select>
+                                        </mat-form-field>
+                                        <div
+                                          *ngIf="
+                                            parameter?.answers &&
+                                            parameter?.answers.length == 0
+                                          "
+                                        >
+                                          {{ result?.value }}
+                                        </div>
+                                      </td>
+                                      <td>
+                                        {{
+                                          item?.allocationsPairedBySetMember[
+                                            parameter?.uuid
+                                          ]?.resultsCommentsStatuses[i]
+                                            ?.remarks == "RESULTS"
+                                            ? null
+                                            : item
+                                                ?.allocationsPairedBySetMember[
+                                                parameter?.uuid
+                                              ]?.resultsCommentsStatuses[i]
+                                                ?.remarks
+                                        }}
+                                      </td>
+                                      <td>
+                                        {{
+                                          item?.allocationsPairedBySetMember[
+                                            parameter?.uuid
+                                          ]?.resultsCommentsStatuses[i]
+                                            ?.timestamp | date: "medium"
+                                        }}
+                                      </td>
+                                      <td>
+                                        {{ result?.resultsFedBy?.name }}
+                                      </td>
+                                    </tr>
+                                  </ng-container>
+                                </ng-container>
+                                <ng-container
+                                  *ngIf="
+                                    item?.allocationsPairedBySetMember[
+                                      parameter?.uuid
+                                    ]?.results?.length <= 1
+                                  "
+                                >
+                                  <tr>
+                                    <td
+                                      colspan="4"
+                                      class="text-center text-danger"
+                                    >
+                                      No backlog data for this test
+                                    </td>
+                                  </tr>
+                                </ng-container>
+                              </tbody>
+                            </table>
+                          </div>
+                        </mat-tab>
+                      </mat-tab-group>
+                    </td>
+                    <td>
+                      <button
+                        [disabled]="
+                          !item?.allocationsPairedBySetMember[
+                            parameter?.uuid
+                          ] ||
+                          (!values[parameter?.uuid] &&
+                            !values[parameter?.uuid + '-comment']) ||
+                          item?.allocationsPairedBySetMember[parameter?.uuid]
+                            ?.firstSignOff
+                        "
+                        (click)="
+                          onSaveParameterValue(
+                            $event,
+                            item,
+                            parameter,
+                            params?.currentSample,
+                            item?.allocationsPairedBySetMember[parameter?.uuid]
+                          )
+                        "
+                        mat-stroked-button
+                        class="ml-2"
+                      >
+                        <mat-spinner
+                          *ngIf="
+                            params?.savingLabResultsState &&
+                            savingMessage[parameter?.uuid]
+                          "
+                          color="primary"
+                          [diameter]="20"
+                          style="
+                            display: inline-block !important;
+                            margin-right: 4px;
+                          "
+                        >
+                        </mat-spinner>
+                        {{
+                          item?.allocationsPairedBySetMember[parameter?.uuid] &&
+                          item?.allocationsPairedBySetMember[parameter?.uuid]
+                            ?.results?.length > 0
+                            ? "Edit"
+                            : "Save"
+                        }}
+                      </button>
+
+                      <!-- {{item?.allocationsPairedBySetMember | json}} -->
+
+                      <span
+                        *ngIf="
+                          !item?.allocationsPairedBySetMember[parameter?.uuid]
+                        "
+                        class="text-warning"
+                      >
+                        Code: <b>LABCODE 001</b> - Miss test allocation, contact
+                        IT
+                      </span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td colspan="6">
+                      <span
+                        *ngIf="
+                          labConfigs?.attachmentConcepts[
+                            item?.order?.concept?.uuid
+                          ]
+                        "
+                        style="float: right; cursor: pointer"
+                        (click)="
+                          onToggleAttachment($event, item?.order?.concept?.uuid)
+                        "
+                      >
+                        <mat-icon>attach_file</mat-icon></span
+                      >
+                      <div *ngIf="attach[item?.order?.concept?.uuid]">
+                        <app-upload-file
+                          [patientUuid]="params?.currentSample?.patient?.uuid"
+                          [conceptUuid]="
+                            labConfigs?.attachmentConcepts[
+                              item?.order?.concept?.uuid
+                            ]
+                          "
+                          [encounterUuid]="item?.order?.encounterUuid"
+                          (fileInfo)="
+                            onGetFileInfo(
+                              $event,
+                              item,
+                              null,
+                              params?.providerDetails,
+                              labConfigs?.attachmentConcepts[
+                                item?.order?.concept?.uuid
+                              ]
+                            )
+                          "
+                        ></app-upload-file>
+                      </div>
+                    </td>
+                  </tr>
+                </ng-container>
+              </ng-container>
+            </tbody>
+          </table>
+
+          <div class="clinical-history-summary">
+            <a (click)="showClinicalNotes($event)" class="clinical-notes-btn">
+              Diagnosis & Clinical notes summary
+              <i
+                *ngIf="!showClinicalNotesSummary"
+                class="fa fa-chevron-down"
+                style="margin-left: 5px"
+              ></i>
+              <i
+                *ngIf="showClinicalNotesSummary"
+                class="fa fa-chevron-up"
+                style="margin-left: 5px"
+              ></i>
+            </a>
+            <div *ngIf="showClinicalNotesSummary" class="clinical-summary">
+              <app-clinical-notes-summary
+                [patientUuid]="params?.currentSample?.patient?.uuid"
+                [labConfigs]="labConfigs"
+              >
+              </app-clinical-notes-summary>
+            </div>
+          </div>
+        </div>
+      </mat-tab>
+      <mat-tab label="Approval">
+        <div
+          style="margin-top: 15px; overflow: auto"
+          [ngStyle]="{ 'max-height': maxHeight }"
+        >
+          <table class="table table-bordered">
+            <thead class="table-header">
+              <tr>
+                <th style="width: 15%">Test Order</th>
+                <th style="width: 10%">Ordered By</th>
+                <th colspan="2">Results</th>
+                <th style="width: 10%">Completed By</th>
+                <th colspan="2" style="width: 18%">First Sign Off</th>
+                <th colspan="2" style="width: 18%">Second Sign Off</th>
+              </tr>
+            </thead>
+            <tbody>
+              <ng-container *ngFor="let item of params?.testOrders">
+                <ng-container
+                  *ngIf="item?.order?.concept?.setMembers?.length == 0"
+                >
+                  <tr
+                    *ngIf="
+                      item?.testAllocations?.length > 0 &&
+                      item?.testAllocations[0]?.results &&
+                      item?.testAllocations[0]?.results?.length > 0
+                    "
+                  >
+                    <td>{{ item?.order?.concept?.display }}</td>
+                    <td>
+                      {{ item?.order?.orderer?.name }}
+                    </td>
+                    <td colspan="2">
+                      <mat-tab-group>
+                        <mat-tab label="Current.">
+                          <div class="p-3">
+                            <mat-form-field
+                              class="w-100"
+                              *ngIf="
+                                item?.order?.concept?.answers &&
+                                item?.order?.concept?.answers?.length > 0
+                              "
+                            >
+                              <mat-select
+                                [disabled]="true"
+                                required
+                                [value]="
+                                  item?.testAllocations[0]?.results[
+                                    item?.testAllocations[0]?.results?.length -
+                                      1
+                                  ]?.value
+                                "
+                                (selectionChange)="setValue($event.value, item)"
+                              >
+                                <mat-option
+                                  *ngFor="
+                                    let option of item?.order?.concept?.answers
+                                  "
+                                  [value]="option.uuid"
+                                >
+                                  {{ option.display }}
+                                </mat-option>
+                              </mat-select>
+                            </mat-form-field>
+                            <div
+                              *ngIf="
+                                item?.order?.concept.answers &&
+                                item?.order?.concept.answers.length === 0
+                              "
+                            >
+                              <span>
+                                {{
+                                  item?.testAllocations[0]?.results[
+                                    item?.testAllocations[0]?.results?.length -
+                                      1
+                                  ]?.value
+                                }}
+                              </span>
+                              <span
+                                *ngIf="item?.order?.concept.units"
+                                style="margin-right: 10px"
+                              >
+                                Units: <b>{{ item?.order?.concept?.units }}</b>
+                              </span>
+
+                              <span
+                                *ngIf="
+                                  item?.order?.concept.numeric &&
+                                  item?.order?.concept.lowNormal &&
+                                  item?.order?.concept.hiNormal
+                                "
+                              >
+                                (<span style="font-weight: 400"
+                                  >Min:
+                                  <b style="margin-left: 10px">{{
+                                    item?.order?.concept?.lowNormal
+                                  }}</b></span
+                                >
+                                -
+                                <span
+                                  style="margin-left: 20px; font-weight: 400"
+                                  >Max:
+                                  <b style="margin-left: 10px">{{
+                                    item?.order?.concept.hiNormal
+                                  }}</b></span
+                                >)
+                              </span>
+                            </div>
+                          </div>
+                        </mat-tab>
+                        <mat-tab label="Backlog">
+                          <div class="p-3">
+                            <div>
+                              <table class="table table-bordered">
+                                <thead class="table-header">
+                                  <th>Value</th>
+                                  <th>Remarks</th>
+                                  <th>Date Time</th>
+                                  <th>Completed By</th>
+                                </thead>
+                                <tbody>
+                                  <ng-container
+                                    *ngIf="
+                                      item?.testAllocations[0]?.results
+                                        ?.length > 1
+                                    "
+                                  >
+                                    <ng-container
+                                      *ngFor="
+                                        let result of item?.testAllocations[0]
+                                          ?.results;
+                                        let i = index
+                                      "
+                                    >
+                                      <tr
+                                        *ngIf="
+                                          i <
+                                          item?.testAllocations[0]?.results
+                                            ?.length -
+                                            1
+                                        "
+                                      >
+                                        <td>
+                                          <mat-form-field
+                                            class="w-100"
+                                            *ngIf="
+                                              item?.order?.concept?.answers &&
+                                              item?.order?.concept?.answers
+                                                .length > 0
+                                            "
+                                          >
+                                            <mat-select
+                                              [disabled]="true"
+                                              required
+                                              [value]="result?.value"
+                                              (selectionChange)="
+                                                setValue($event.value, item)
+                                              "
+                                            >
+                                              <mat-option
+                                                *ngFor="
+                                                  let option of item?.order
+                                                    ?.concept?.answers
+                                                "
+                                                [value]="option.uuid"
+                                              >
+                                                {{ option.display }}
+                                              </mat-option>
+                                            </mat-select>
+                                          </mat-form-field>
+                                          <div
+                                            *ngIf="
+                                              item?.order?.concept.answers &&
+                                              item?.order?.concept.answers
+                                                .length == 0
+                                            "
+                                          >
+                                            {{ result?.value }}
+                                          </div>
+                                        </td>
+                                        <td>
+                                          {{
+                                            item?.testAllocations[0]
+                                              ?.resultsCommentsStatuses[i]
+                                              ?.remarks == "RESULTS"
+                                              ? null
+                                              : item?.testAllocations[0]
+                                                  ?.resultsCommentsStatuses[i]
+                                                  ?.remarks
+                                          }}
+                                        </td>
+                                        <td>
+                                          {{
+                                            item?.testAllocations[0]
+                                              ?.resultsCommentsStatuses[i]
+                                              ?.timestamp | date: "medium"
+                                          }}
+                                        </td>
+                                        <td>
+                                          {{ result?.resultsFedBy?.name }}
+                                        </td>
+                                      </tr>
+                                    </ng-container>
+                                  </ng-container>
+                                  <ng-container
+                                    *ngIf="
+                                      item?.testAllocations[0]?.results
+                                        ?.length <= 1
+                                    "
+                                  >
+                                    <tr>
+                                      <td
+                                        colspan="4"
+                                        class="text-center text-danger"
+                                      >
+                                        No backlog data for this test
+                                      </td>
+                                    </tr>
+                                  </ng-container>
+                                </tbody>
+                              </table>
+                            </div>
+                          </div>
+                        </mat-tab>
+                      </mat-tab-group>
+                    </td>
+                    <td>
+                      {{
+                        item?.testAllocations[0]?.results[
+                          item?.testAllocations[0]?.results?.length - 1
+                        ]?.resultsFedBy?.name
+                      }}
+                    </td>
+                    <td colspan="2">
+                      <!-- TODO: reject first approval -->
+                      <button
+                        [disabled]="
+                          item?.testAllocations[0]?.firstSignOff ||
+                          item?.testAllocations[0]?.rejectionStatus ||
+                          item?.testAllocations[0]?.rejected
+                        "
+                        mat-stroked-button
+                        (click)="
+                          rejectResults(
+                            $event,
+                            item,
+                            params?.currentSample,
+                            item?.testAllocations[0]
+                          )
+                        "
+                      >
+                        Reject
+                      </button>
+                      <button
+                        [ngClass]="{
+                          'text-success': item?.testAllocations[0]?.firstSignOff
+                        }"
+                        [disabled]="
+                          item?.testAllocations[0]?.firstSignOff ||
+                          item?.testAllocations[0]?.results?.length == 0 ||
+                          item?.testAllocations[0]?.rejected
+                        "
+                        mat-stroked-button
+                        (click)="
+                          onSaveSignOff(
+                            $event,
+                            item,
+                            'first',
+                            params?.currentSample,
+                            item?.testAllocations[0]
+                          )
+                        "
+                        class="float-right"
+                      >
+                        <mat-spinner
+                          *ngIf="
+                            params?.savingLabResultsStatusState &&
+                            savingMessage[item?.order?.concept?.uuid + '-first']
+                          "
+                          color="primary"
+                          [diameter]="20"
+                          style="
+                            display: inline-block !important;
+                            margin-right: 4px;
+                          "
+                        >
+                        </mat-spinner>
+                        Approve<span
+                          *ngIf="item?.testAllocations[0]?.firstSignOff"
+                          >d</span
+                        >
+                      </button>
+                    </td>
+                    <td colspan="2">
+                      <!-- TODO: reject first approval -->
+                      <button
+                        [disabled]="
+                          !item?.testAllocations[0]?.firstSignOff ||
+                          item?.testAllocations[0]?.secondSignOff
+                        "
+                        mat-stroked-button
+                        (click)="
+                          rejectFirstApproval(
+                            $event,
+                            item,
+                            params?.currentSample,
+                            item?.testAllocations[0]
+                          )
+                        "
+                      >
+                        Reject
+                      </button>
+                      <button
+                        [ngClass]="{
+                          'text-success':
+                            item?.testAllocations[0]?.secondSignOff
+                        }"
+                        [disabled]="
+                          item?.testAllocations[0]?.secondSignOff ||
+                          !item?.testAllocations[0]?.firstSignOff ||
+                          item?.testAllocations[0]?.rejected
+                        "
+                        mat-stroked-button
+                        (click)="
+                          onSaveSignOff(
+                            $event,
+                            item,
+                            'second',
+                            params?.currentSample,
+                            item?.testAllocations[0]
+                          )
+                        "
+                        class="float-right"
+                      >
+                        <mat-spinner
+                          *ngIf="
+                            params?.savingLabResultsStatusState &&
+                            savingMessage[item?.concept?.uuid + '-second']
+                          "
+                          color="primary"
+                          [diameter]="20"
+                          style="
+                            display: inline-block !important;
+                            margin-right: 4px;
+                          "
+                        >
+                        </mat-spinner>
+                        Approve<span
+                          *ngIf="item?.testAllocations[0]?.secondSignOff"
+                          >d</span
+                        >
+                      </button>
+                    </td>
+                  </tr>
+                </ng-container>
+                <ng-container
+                  *ngIf="item?.order?.concept?.setMembers?.length > 0"
+                >
+                  <ng-container
+                    *ngFor="
+                      let parameter of item?.order?.concept?.setMembers;
+                      let count = index
+                    "
+                  >
+                    <tr
+                      *ngIf="
+                        item?.testAllocations?.length > 0 &&
+                        item?.allocationsPairedBySetMember[parameter?.uuid]
+                          ?.results &&
+                        item?.allocationsPairedBySetMember[parameter?.uuid]
+                          ?.results?.length > 0
+                      "
+                    >
+                      <td>
+                        {{ item?.order?.concept?.display }}
+                      </td>
+                      <td>
+                        {{ item?.order?.orderer?.name }}
+                      </td>
+                      <td>{{ parameter?.display }}</td>
+                      <td>
+                        <mat-tab-group>
+                          <mat-tab label="Current.">
+                            <div class="p-3">
+                              <mat-form-field
+                                class="w-100"
+                                *ngIf="
+                                  parameter?.answers &&
+                                  parameter?.answers.length > 0
+                                "
+                              >
+                                <mat-select
+                                  [disabled]="true"
+                                  required
+                                  [value]="
+                                    item?.allocationsPairedBySetMember[
+                                      parameter?.uuid
+                                    ]?.results[
+                                      item?.allocationsPairedBySetMember[
+                                        parameter?.uuid
+                                      ]?.results?.length - 1
+                                    ]?.value
+                                  "
+                                  (selectionChange)="
+                                    setValue($event.value, item)
+                                  "
+                                >
+                                  <mat-option
+                                    *ngFor="let option of parameter?.answers"
+                                    [value]="option.uuid"
+                                  >
+                                    {{ option.display }}
+                                  </mat-option>
+                                </mat-select>
+                              </mat-form-field>
+                              <div
+                                *ngIf="
+                                  parameter?.answers &&
+                                  parameter?.answers.length === 0
+                                "
+                              >
+                                <span>
+                                  {{
+                                    item?.allocationsPairedBySetMember[
+                                      parameter?.uuid
+                                    ]?.results[
+                                      item?.allocationsPairedBySetMember[
+                                        parameter?.uuid
+                                      ]?.results?.length - 1
+                                    ]?.value
+                                  }}
+                                </span>
+                                <span
+                                  *ngIf="parameter?.units"
+                                  style="margin-right: 10px"
+                                >
+                                  Units: <b>{{ parameter?.units }}</b>
+                                </span>
+
+                                <span
+                                  *ngIf="
+                                    parameter?.numeric &&
+                                    parameter?.lowNormal &&
+                                    parameter?.hiNormal
+                                  "
+                                >
+                                  (<span style="font-weight: 400"
+                                    >Min:
+                                    <b style="margin-left: 10px">{{
+                                      parameter?.lowNormal
+                                    }}</b></span
+                                  >
+                                  -
+                                  <span
+                                    style="margin-left: 20px; font-weight: 400"
+                                    >Max:
+                                    <b style="margin-left: 10px">{{
+                                      parameter?.hiNormal
+                                    }}</b></span
+                                  >)
+                                </span>
+                              </div>
+                            </div>
+                          </mat-tab>
+                          <mat-tab label="Backlog">
+                            <div class="p-3">
+                              <div>
+                                <table class="table table-bordered">
+                                  <thead class="table-header">
+                                    <th>Value</th>
+                                    <th>Remarks</th>
+                                    <th>Date Time</th>
+                                    <th>Completed By</th>
+                                  </thead>
+                                  <tbody>
+                                    <ng-container
+                                      *ngIf="
+                                        item?.allocationsPairedBySetMember[
+                                          parameter?.uuid
+                                        ]?.results?.length > 1
+                                      "
+                                    >
+                                      <ng-container
+                                        *ngFor="
+                                          let result of item?.testAllocations[
+                                            count
+                                          ]?.results;
+                                          let i = index
+                                        "
+                                      >
+                                        <tr
+                                          *ngIf="
+                                            i <
+                                            item?.allocationsPairedBySetMember[
+                                              parameter?.uuid
+                                            ]?.results?.length -
+                                              1
+                                          "
+                                        >
+                                          <td>
+                                            {{ result?.value }}
+                                          </td>
+                                          <td>
+                                            {{
+                                              item
+                                                ?.allocationsPairedBySetMember[
+                                                parameter?.uuid
+                                              ]?.resultsCommentsStatuses[i]
+                                                ?.remarks == "RESULTS"
+                                                ? null
+                                                : item
+                                                    ?.allocationsPairedBySetMember[
+                                                    parameter?.uuid
+                                                  ]?.resultsCommentsStatuses[i]
+                                                    ?.remarks
+                                            }}
+                                          </td>
+                                          <td>
+                                            {{
+                                              item
+                                                ?.allocationsPairedBySetMember[
+                                                parameter?.uuid
+                                              ]?.resultsCommentsStatuses[i]
+                                                ?.timestamp | date: "medium"
+                                            }}
+                                          </td>
+                                          <td>
+                                            {{ result?.resultsFedBy?.name }}
+                                          </td>
+                                        </tr>
+                                      </ng-container>
+                                    </ng-container>
+                                    <ng-container
+                                      *ngIf="
+                                        item?.allocationsPairedBySetMember[
+                                          parameter?.uuid
+                                        ]?.results?.length <= 1
+                                      "
+                                    >
+                                      <tr>
+                                        <td
+                                          colspan="4"
+                                          class="text-center text-danger"
+                                        >
+                                          No backlog data for this test
+                                        </td>
+                                      </tr>
+                                    </ng-container>
+                                  </tbody>
+                                </table>
+                              </div>
+                            </div>
+                          </mat-tab>
+                        </mat-tab-group>
+                      </td>
+                      <td>
+                        {{
+                          item?.allocationsPairedBySetMember[parameter?.uuid]
+                            ?.results[
+                            item?.allocationsPairedBySetMember[parameter?.uuid]
+                              ?.results?.length - 1
+                          ]?.resultsFedBy?.name
+                        }}
+                      </td>
+                      <td colspan="2">
+                        <button
+                          [disabled]="
+                            item?.allocationsPairedBySetMember[parameter?.uuid]
+                              ?.firstSignOff ||
+                            item?.allocationsPairedBySetMember[parameter?.uuid]
+                              ?.results[
+                              item?.allocationsPairedBySetMember[
+                                parameter?.uuid
+                              ]?.results?.length - 1
+                            ]?.dateCreated >
+                              item?.allocationsPairedBySetMember[
+                                parameter?.uuid
+                              ]?.rejectionStatus?.timestamp ||
+                            item?.allocationsPairedBySetMember[parameter?.uuid]
+                              ?.rejected
+                          "
+                          mat-stroked-button
+                          (click)="
+                            rejectResults(
+                              $event,
+                              item,
+                              params?.currentSample,
+                              item?.allocationsPairedBySetMember[
+                                parameter?.uuid
+                              ]
+                            )
+                          "
+                        >
+                          Reject
+                        </button>
+                        <button
+                          [ngClass]="{
+                            'text-success':
+                              item?.allocationsPairedBySetMember[
+                                parameter?.uuid
+                              ]?.firstSignOff
+                          }"
+                          [disabled]="
+                            item?.allocationsPairedBySetMember[parameter?.uuid]
+                              ?.firstSignOff ||
+                            item?.allocationsPairedBySetMember[parameter?.uuid]
+                              ?.results?.length == 0 ||
+                            item?.allocationsPairedBySetMember[parameter?.uuid]
+                              ?.rejected
+                          "
+                          mat-button
+                          (click)="
+                            onSaveSignOffForParameter(
+                              $event,
+                              item,
+                              parameter,
+                              'first',
+                              params?.currentSample,
+                              item?.allocationsPairedBySetMember[
+                                parameter?.uuid
+                              ]
+                            )
+                          "
+                          class="float-right"
+                        >
+                          <mat-spinner
+                            *ngIf="
+                              params?.savingLabResultsStatusState &&
+                              savingMessage[parameter?.uuid + '-first']
+                            "
+                            color="primary"
+                            [diameter]="20"
+                            style="
+                              display: inline-block !important;
+                              margin-right: 4px;
+                            "
+                          >
+                          </mat-spinner>
+                          Approve<span
+                            *ngIf="
+                              item?.allocationsPairedBySetMember[
+                                parameter?.uuid
+                              ]?.firstSignOff
+                            "
+                            >d</span
+                          >
+                        </button>
+                      </td>
+                      <td colspan="2">
+                        <!-- TODO: reject first approval -->
+                        <button
+                          [disabled]="
+                            item?.allocationsPairedBySetMember[parameter?.uuid]
+                              ?.secondSignOff ||
+                            !item?.allocationsPairedBySetMember[parameter?.uuid]
+                              ?.firstSignOff
+                          "
+                          mat-stroked-button
+                          (click)="
+                            rejectFirstApproval(
+                              $event,
+                              item,
+                              params?.currentSample,
+                              item?.allocationsPairedBySetMember[
+                                parameter?.uuid
+                              ]
+                            )
+                          "
+                        >
+                          Reject
+                        </button>
+                        <button
+                          [ngClass]="{
+                            'text-success':
+                              item?.allocationsPairedBySetMember[
+                                parameter?.uuid
+                              ]?.secondSignOff
+                          }"
+                          [disabled]="
+                            item?.allocationsPairedBySetMember[parameter?.uuid]
+                              ?.secondSignOff ||
+                            !item?.allocationsPairedBySetMember[parameter?.uuid]
+                              ?.firstSignOff
+                          "
+                          mat-stroked-button
+                          (click)="
+                            onSaveSignOffForParameter(
+                              $event,
+                              item,
+                              parameter,
+                              'second',
+                              params?.currentSample,
+                              item?.allocationsPairedBySetMember[
+                                parameter?.uuid
+                              ]
+                            )
+                          "
+                          class="float-right"
+                        >
+                          <mat-spinner
+                            *ngIf="
+                              params?.savingLabResultsStatusState &&
+                              savingMessage[parameter?.uuid + '-second']
+                            "
+                            color="primary"
+                            [diameter]="20"
+                            style="
+                              display: inline-block !important;
+                              margin-right: 4px;
+                            "
+                          >
+                          </mat-spinner>
+                          Approve<span
+                            *ngIf="
+                              item?.allocationsPairedBySetMember[
+                                parameter?.uuid
+                              ]?.secondSignOff
+                            "
+                            >d</span
+                          >
+                        </button>
+                      </td>
+                    </tr>
+                  </ng-container>
+                </ng-container>
+              </ng-container>
+            </tbody>
+          </table>
+        </div>
+        <div class="clinical-history-summary">
+          <a (click)="showClinicalNotes($event)" class="clinical-notes-btn">
+            Diagnosis & Clinical notes summary
+            <i
+              *ngIf="!showClinicalNotesSummary"
+              class="fa fa-chevron-down"
+              style="margin-left: 5px"
+            ></i>
+            <i
+              *ngIf="showClinicalNotesSummary"
+              class="fa fa-chevron-up"
+              style="margin-left: 5px"
+            ></i>
+          </a>
+          <div *ngIf="showClinicalNotesSummary" class="clinical-summary">
+            <app-clinical-notes-summary
+              [patientUuid]="params?.currentSample?.patient?.uuid"
+              [labConfigs]="labConfigs"
+            >
+            </app-clinical-notes-summary>
+          </div>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+    <button mat-stroked-button (click)="onClose($event)" style="float: right">
+      Close
+    </button>
+  </div>
+</div>

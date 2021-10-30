@@ -1,0 +1,42 @@
+<div
+  class="patient-search-container"
+  *ngIf="{ patients: patients$ | async } as params"
+>
+  <div
+    class="patient-search-input-block p-2  {{
+      showList ? 'patient-content-available' : 'border'
+    }}"
+  >
+    <div class="patient-search-input">
+      <mat-icon matPrefix class="text-muted">search</mat-icon>
+      <input
+        class="ml-2 w-100"
+        id="input-search-patient"
+        autocomplete="off"
+        type="text"
+        placeholder="Search Patient"
+        matInput
+        (keyup)="onSearchPatients($event)"
+      />
+      <mat-spinner *ngIf="searching" [diameter]="17"></mat-spinner>
+    </div>
+
+    <ng-container *ngIf="params?.patients?.length > 0">
+      <div id="patient-search-list" *ngIf="showList">
+        <mat-option
+          *ngFor="let patient of params?.patients"
+          [value]="patient.name"
+          (click)="onSelectPatient($event, patient)"
+        >
+          {{
+            patient.name +
+              "  |  " +
+              patient.identifier +
+              "  |  " +
+              patient.gender
+          }}
+        </mat-option>
+      </div>
+    </ng-container>
+  </div>
+</div>

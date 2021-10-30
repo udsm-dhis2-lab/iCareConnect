@@ -1,0 +1,768 @@
+<div class="container my-3">
+  <div id="results-to-print" style="color: gray">
+    <mat-accordion>
+      <mat-expansion-panel
+        [expanded]="
+          samplesGroupedByDepartment.departmentName ==
+          currentDepartmentSamples.departmentName
+        "
+        *ngFor="
+          let samplesGroupedByDepartment of patientDetailsAndSamples?.departments;
+          let count = index
+        "
+        (click)="setPanel($event, samplesGroupedByDepartment)"
+      >
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            {{ samplesGroupedByDepartment.departmentName }}
+          </mat-panel-title>
+          <mat-panel-description>
+            <!-- Currently I am {{ panelOpenState ? "open" : "closed" }} -->
+          </mat-panel-description>
+        </mat-expansion-panel-header>
+        <div
+          style="font-size: 0.7rem !important"
+          *ngIf="samplesGroupedByDepartment?.departmentName"
+          id="{{ samplesGroupedByDepartment?.departmentName }}"
+        >
+          <div class="row">
+            <div class="col-2" style="display: inline-block; width: 16.67%">
+              <img src="assets/images/tanzania-logo.png" height="90" />
+            </div>
+            <div class="col-8" style="display: inline-block; width: 66.67%">
+              <h4 style="text-align: center">
+                <b
+                  >United Republic of Tanzania. <br />
+                  Ministry of Health, Community Development, Gender, Elderly and
+                  Children.
+                  <br />
+                  <span *ngIf="labConfigs?.facilityDetails">
+                    {{ labConfigs?.facilityDetails?.name }}<br />
+                  </span>
+                  <small>
+                    <span
+                      *ngIf="
+                        labConfigs?.facilityDetails &&
+                        labConfigs?.facilityDetails?.addressBox
+                      "
+                    >
+                      P.O BOX: {{ labConfigs?.facilityDetails?.addressBox }}
+                    </span>
+                    <span
+                      *ngIf="
+                        labConfigs?.facilityDetails &&
+                        labConfigs?.facilityDetails?.addressTel
+                      "
+                    >
+                      TEL: {{ labConfigs?.facilityDetails?.addressTel }}
+                    </span> </small
+                  ><br />
+                  <small>
+                    <span
+                      *ngIf="
+                        labConfigs?.facilityDetails &&
+                        labConfigs?.facilityDetails?.addressLocaton
+                      "
+                    >
+                      {{ labConfigs?.facilityDetails?.addressLocaton }}
+                    </span>
+                  </small>
+                </b>
+              </h4>
+            </div>
+            <div class="col-12">
+              <div
+                class="h5 text-center report-name"
+                style="
+                  text-align: center;
+                  border-bottom: solid 1px #222;
+                  border-top: solid 1px #222;
+                  padding: 10px 4px;
+                "
+              >
+                {{ samplesGroupedByDepartment?.departmentName }} Report
+              </div>
+              <div>
+                <!-- {{samplesGroupedByDepartment["samples"][0]?.orders[0] | json}} -->
+
+                <table style="width: 100%">
+                  <tr>
+                    <td>
+                      <b> MRN </b>
+                    </td>
+                    <td>{{ patientDetailsAndSamples?.mrn }}</td>
+                    <td>
+                      <b> Ordering Doctor </b>
+                    </td>
+                    <td>
+                      {{
+                        samplesGroupedByDepartment["samples"][0]["orders"][0]
+                          ?.order?.orderer?.name
+                      }}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <b> Patient Name </b>
+                    </td>
+                    <td>
+                      {{ patientDetailsAndSamples?.patient?.givenName }}
+                      {{ patientDetailsAndSamples?.patient?.middleName }}
+                      {{ patientDetailsAndSamples?.patient?.familyName }}
+                    </td>
+                    <td><b>Sample IDS</b></td>
+                    <td>
+                      <span
+                        *ngFor="
+                          let sample of samplesGroupedByDepartment['samples']
+                        "
+                      >
+                        {{ sample?.label }},
+                      </span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <b> Age (dob)/ Gender </b>
+                    </td>
+                    <td>
+                      {{ patientDetailsAndSamples?.patient?.age }}
+                      yrs ({{ patientDetailsAndSamples?.patient?.dob | date }})
+                      /
+                      {{ patientDetailsAndSamples?.patient?.gender }}
+                    </td>
+
+                    <td>
+                      <b> Sample Collected By </b>
+                    </td>
+                    <td>
+                      {{
+                        samplesGroupedByDepartment?.samples[0]?.collectedBy
+                          ?.name
+                      }}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <b> Location/Source </b>
+                    </td>
+                    <td>
+                      {{
+                        samplesGroupedByDepartment["samples"][0]?.orders[0]
+                          ?.order?.location?.name
+                      }}
+                    </td>
+                    <td><b>Sample Collected At</b></td>
+                    <td>
+                      {{
+                        samplesGroupedByDepartment?.samples[0]?.created
+                          | date: "medium"
+                      }}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <b> Phone </b>
+                    </td>
+                    <td>{{ phoneNumber }}</td>
+                    <td><b>Sample Accepted At/Arrival Date</b></td>
+                    <td>
+                      {{
+                        samplesGroupedByDepartment?.samples[0]?.acceptedAt
+                          | date: "medium"
+                      }}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td></td>
+                    <td></td>
+                    <td>
+                      <b> Sample Accepted By </b>
+                    </td>
+                    <td>
+                      {{
+                        samplesGroupedByDepartment?.samples[0]?.acceptedBy?.user
+                          ?.name
+                      }}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td></td>
+                    <td></td>
+                    <td>
+                      <b>Results Fed By</b>
+                    </td>
+                    <td>
+                      {{
+                        samplesGroupedByDepartment?.samples[0]?.orders[0]
+                          ?.testAllocations[0]?.results[
+                          samplesGroupedByDepartment?.samples[0]?.orders[0]
+                            ?.testAllocations[0]?.results?.length - 1
+                        ]?.resultsFedBy?.name
+                      }}
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td></td>
+                    <td></td>
+                    <td>
+                      <b>Results Fed At</b>
+                    </td>
+                    <td>
+                      {{
+                        samplesGroupedByDepartment?.samples[0]?.orders[0]
+                          ?.testAllocations[0]?.resultsCommentsStatuses[
+                          samplesGroupedByDepartment?.samples[0]?.orders[0]
+                            ?.testAllocations[0]?.results?.length - 1
+                        ]?.timestamp | date: "medium"
+                      }}
+                    </td>
+                  </tr>
+                </table>
+                <div
+                  style="border-bottom: solid 1px #222; padding: 8px 0"
+                ></div>
+
+                <table class="table" style="width: 100%">
+                  <thead>
+                    <tr>
+                      <td colspan="1">Sample</td>
+                      <td colspan="4">Tests</td>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr
+                      *ngFor="let sample of samplesGroupedByDepartment?.samples"
+                      style="
+                        border-top: 1px solid gray;
+                        border-bottom: 1px solid gray;
+                      "
+                    >
+                      <td colspan="1">{{ sample?.specimen?.specimenName }}</td>
+                      <td colspan="4">
+                        <div class="my-2 mx-2">
+                          <table
+                            class="table"
+                            style="
+                              width: 100%;
+                              border-top: 1px solid gray;
+                              margin-top: 5px;
+                              margin-bottom: 10px;
+                            "
+                          >
+                            <tr>
+                              <td>Test #</td>
+                              <td>Test</td>
+                              <td>Results</td>
+                              <td>SI Units</td>
+                              <td>LL</td>
+                              <td>UL</td>
+                              <td>Remarks</td>
+                              <td>Order date & Time</td>
+                            </tr>
+
+                            <tr *ngFor="let order of sample?.orders">
+                              <td>{{ order?.order?.orderNumber }}</td>
+                              <td>{{ order?.order?.concept?.display }}</td>
+                              <td>
+                                <p
+                                  *ngIf="
+                                    order?.order?.concept?.setMembers?.length ==
+                                    0
+                                  "
+                                >
+                                  <span
+                                    *ngIf="
+                                      order?.testAllocations[0]
+                                        ?.secondSignOff &&
+                                      order?.order?.concept?.lowNormal &&
+                                      order?.order?.concept?.setMembers
+                                        ?.length == 0 &&
+                                      order?.order?.concept?.lowNormal >
+                                        order?.testAllocations[0]?.results[
+                                          order?.testAllocations[0]?.results
+                                            ?.length - 1
+                                        ]?.valueNumeric
+                                    "
+                                    ><img
+                                      src="assets/images/arrowdownred.png"
+                                      height="8px"
+                                  /></span>
+                                  <span
+                                    *ngIf="
+                                      order?.testAllocations[0]
+                                        ?.secondSignOff &&
+                                      order?.order?.concept?.setMembers
+                                        ?.length == 0 &&
+                                      order?.order?.concept?.hiNormal &&
+                                      order?.testAllocations[0]?.results[
+                                        order?.testAllocations[0]?.results
+                                          ?.length - 1
+                                      ]?.valueNumeric > order?.concept?.hiNormal
+                                    "
+                                    ><img
+                                      src="assets/images/arrowupred.png"
+                                      height="8px"
+                                  /></span>
+
+                                  <span
+                                    *ngIf="
+                                      order?.order?.concept?.setMembers
+                                        ?.length == 0 &&
+                                      order?.testAllocations[0]?.results[0]
+                                        ?.value
+                                    "
+                                  >
+                                    {{
+                                      order?.order?.concept?.answers?.length ==
+                                      0
+                                        ? order?.testAllocations[0]?.results[
+                                            order?.testAllocations[0]?.results
+                                              ?.length - 1
+                                          ]?.value
+                                        : order?.order?.concept?.keyedAnswers[
+                                            order?.testAllocations[0]?.results[
+                                              order?.testAllocations[0]?.results
+                                                ?.length - 1
+                                            ]?.value
+                                          ]?.display
+                                    }}
+                                  </span>
+                                  <span
+                                    class="text-warning"
+                                    *ngIf="
+                                      !order?.testAllocations[0]?.results[0]
+                                        ?.value
+                                    "
+                                  >
+                                    Processing ..
+                                  </span>
+                                </p>
+
+                                <p
+                                  *ngIf="
+                                    order?.order?.concept?.setMembers?.length >
+                                    0
+                                  "
+                                >
+                                  <span
+                                    *ngFor="
+                                      let parameter of order?.order?.concept
+                                        ?.setMembers;
+                                      let count = index
+                                    "
+                                  >
+                                    <span> {{ parameter?.display }} :</span>
+                                    <span>
+                                      <!-- 
+                                      {{order?.testAllocations[count]
+                                        ?.results[
+                                        order?.testAllocations[count]
+                                          ?.results?.length - 1
+                                      ] | json}} -->
+                                      <!-- l: {{parameter?.uuid}} -->
+                                      <b>
+                                        <span
+                                          *ngIf="parameter?.answers?.length > 0"
+                                        >
+                                          <!-- 1 -  -->
+                                          {{
+                                            getParameterConceptName(
+                                              parameter,
+                                              order?.testAllocations
+                                            )
+                                          }}
+                                        </span>
+                                        <span
+                                          *ngIf="
+                                            parameter?.answers?.length == 0
+                                          "
+                                        >
+                                          <!-- 2-  -->
+                                          {{
+                                            getResults(
+                                              parameter,
+                                              order?.testAllocations
+                                            )
+                                          }}
+                                        </span>
+
+                                        <!-- {{ parameter | json }} -->
+                                        <!-- {{
+                                          order?.testAllocations[count]
+                                            ?.results &&
+                                          order?.testAllocations[count]?.results
+                                            ?.length > 0 &&
+                                          parameter?.answers?.length == 0
+                                            ? order?.testAllocations[count]
+                                                ?.results[
+                                                order?.testAllocations[count]
+                                                  ?.results?.length - 1
+                                              ]?.value
+                                            : parameter?.answers?.length != 0
+                                            ? getParameterConceptName(
+                                                parameter?.answers,
+                                                order?.testAllocations[count]
+                                                  ?.results[
+                                                  order?.testAllocations[count]
+                                                    ?.results?.length - 1
+                                                ]?.value
+                                              )
+                                            : null
+                                        }}
+                                        {{ parameter?.units }} -->
+                                        <!-- {{ parameter | json }} -->
+                                      </b>
+                                    </span>
+                                    <span
+                                      *ngIf="
+                                        order?.testAllocations[count]
+                                          ?.secondSignOff &&
+                                        order?.order?.concept?.setMembers[count]
+                                          ?.lowNormal &&
+                                        order?.order?.concept?.setMembers[count]
+                                          ?.lowNormal >
+                                          order?.testAllocations[count]
+                                            ?.results[
+                                            order?.testAllocations[count]
+                                              ?.results?.length - 1
+                                          ]?.valueNumeric
+                                      "
+                                      ><img
+                                        src="assets/images/arrowdownred.png"
+                                        height="8px"
+                                    /></span>
+                                    <span
+                                      *ngIf="
+                                        order?.testAllocations[count]
+                                          ?.secondSignOff &&
+                                        order?.order?.concept?.setMembers[count]
+                                          ?.hiNormal &&
+                                        order?.testAllocations[count]?.results[
+                                          order?.testAllocations[count]?.results
+                                            ?.length - 1
+                                        ]?.valueNumeric >
+                                          order?.order?.concept?.setMembers[
+                                            count
+                                          ]?.hiNormal
+                                      "
+                                      ><img
+                                        src="assets/images/arrowupred.png"
+                                        height="8px"
+                                    /></span>
+                                    <br />
+                                  </span>
+                                </p>
+                              </td>
+                              <td>
+                                <p
+                                  *ngIf="
+                                    order?.order?.concept?.setMembers?.length ==
+                                    0
+                                  "
+                                >
+                                  <span *ngIf="order?.order?.concept?.units">
+                                    {{ order?.order?.concept?.units }}
+                                  </span>
+                                  <span
+                                    style="font-size: 0.7rem"
+                                    *ngIf="!order?.order?.concept?.units"
+                                  >
+                                    N/A
+                                  </span>
+                                </p>
+                                <p
+                                  *ngIf="
+                                    order?.order?.concept?.setMembers?.length >
+                                    0
+                                  "
+                                >
+                                  <span
+                                    *ngFor="
+                                      let allocation of order?.testAllocations;
+                                      let count = index
+                                    "
+                                  >
+                                    <span
+                                      *ngIf="
+                                        order?.order?.concept?.setMembers[count]
+                                          ?.units
+                                      "
+                                    >
+                                      {{ order?.order?.concept?.units }}
+                                    </span>
+                                    <span
+                                      style="font-size: 0.7rem"
+                                      *ngIf="
+                                        !order?.order?.concept?.setMembers[
+                                          count
+                                        ]?.units
+                                      "
+                                    >
+                                      N/A
+                                    </span>
+                                    <br />
+                                  </span>
+                                </p>
+                              </td>
+
+                              <td>
+                                <p
+                                  *ngIf="
+                                    order?.order?.concept?.setMembers?.length ==
+                                    0
+                                  "
+                                >
+                                  <span *ngIf="order?.order?.concept?.numeric">
+                                    {{ order?.order?.concept?.lowNormal }}
+                                  </span>
+                                  <span
+                                    style="font-size: 0.7rem"
+                                    *ngIf="!order?.order?.concept?.numeric"
+                                  >
+                                    N/A
+                                  </span>
+                                </p>
+                                <p
+                                  *ngIf="
+                                    order?.order?.concept?.setMembers?.length >
+                                    0
+                                  "
+                                >
+                                  <span
+                                    *ngFor="
+                                      let allocation of order?.testAllocations;
+                                      let count = index
+                                    "
+                                  >
+                                    <span
+                                      *ngIf="
+                                        order?.order?.concept?.setMembers[count]
+                                          ?.numeric
+                                      "
+                                    >
+                                      {{
+                                        order?.order?.concept?.setMembers[count]
+                                          ?.display
+                                      }}
+                                      :
+                                      {{
+                                        order?.order?.concept?.setMembers[count]
+                                          ?.lowNormal
+                                      }}
+                                    </span>
+                                    <span
+                                      style="font-size: 0.7rem"
+                                      *ngIf="
+                                        !order?.order?.concept?.setMembers[
+                                          count
+                                        ]?.numeric
+                                      "
+                                    >
+                                      N/A
+                                    </span>
+                                    <br />
+                                  </span>
+                                </p>
+                              </td>
+                              <td>
+                                <p
+                                  *ngIf="
+                                    order?.order?.concept?.setMembers?.length ==
+                                    0
+                                  "
+                                >
+                                  <span *ngIf="order?.order?.concept?.numeric">
+                                    {{ order?.order?.concept?.hiNormal }}
+                                  </span>
+                                  <span
+                                    style="font-size: 0.7rem"
+                                    *ngIf="!order?.order?.concept?.numeric"
+                                  >
+                                    N/A
+                                  </span>
+                                </p>
+                                <p
+                                  *ngIf="
+                                    order?.order?.concept?.setMembers?.length >
+                                    0
+                                  "
+                                >
+                                  <span
+                                    *ngFor="
+                                      let allocation of order?.testAllocations;
+                                      let count = index
+                                    "
+                                  >
+                                    <span>
+                                      {{
+                                        order?.order?.concept?.setMembers[count]
+                                          ?.display
+                                      }}
+                                    </span>
+                                    <span
+                                      *ngIf="
+                                        order?.order?.concept?.setMembers[count]
+                                          ?.numeric
+                                      "
+                                    >
+                                      {{
+                                        order?.order?.concept?.setMembers[count]
+                                          ?.hiNormal
+                                      }}
+                                    </span>
+                                    <span
+                                      style="font-size: 0.7rem"
+                                      *ngIf="
+                                        !order?.order?.concept?.setMembers[
+                                          count
+                                        ]?.numeric
+                                      "
+                                    >
+                                      N/A
+                                    </span>
+                                    <br />
+                                  </span>
+                                </p>
+                              </td>
+                              <td>
+                                <p
+                                  *ngIf="
+                                    order?.order?.concept?.setMembers?.length ==
+                                    0
+                                  "
+                                >
+                                  {{
+                                    order?.testAllocations[0]
+                                      ?.resultsCommentsStatuses[0]?.remarks !==
+                                    "NO DESCRPTION"
+                                      ? order?.testAllocations[0]
+                                          ?.resultsCommentsStatuses[0]?.remarks
+                                      : null
+                                  }}
+                                </p>
+                                <p
+                                  *ngIf="
+                                    order?.order?.concept?.setMembers?.length >
+                                    0
+                                  "
+                                >
+                                  <span
+                                    *ngFor="
+                                      let allocation of order?.order
+                                        ?.testAllocations;
+                                      let count = index
+                                    "
+                                  >
+                                    {{
+                                      order?.order?.concept?.setMembers[count]
+                                        ?.display
+                                    }}
+                                    :
+                                    {{
+                                      order?.order?.testAllocations[count]
+                                        ?.resultsCommentsStatuses[0]
+                                        ?.remarks !==
+                                      "NO DESCRPTION FOR PARAMETER"
+                                        ? order?.order?.allocations[count]
+                                            ?.resultsCommentsStatuses[0]
+                                            ?.remarks
+                                        : null
+                                    }}
+
+                                    <br />
+                                  </span>
+                                </p>
+                              </td>
+                              <td>
+                                {{ order?.order?.orderDate | date: "medium" }}
+                              </td>
+                            </tr>
+                          </table>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <div style="padding: 15px 0">
+                  <span>KEY</span>
+                  <table>
+                    <tr>
+                      <td>
+                        <img
+                          src="assets/images/arrowupred.png"
+                          height="12px"
+                        />above normal range
+                      </td>
+                      <td>
+                        &nbsp;
+                        <img
+                          src="assets/images/arrowdownred.png"
+                          height="12px"
+                        />below normal range
+                      </td>
+                      <td></td>
+                    </tr>
+                  </table>
+                </div>
+                <div
+                  style="text-align: left; padding: 6px 0"
+                  class="providers-details"
+                >
+                  <span>
+                    <b>Approved By :</b>
+                    {{
+                      samplesGroupedByDepartment?.samples[0]?.orders[0]
+                        ?.testAllocations[0]?.statuses?.length > 2
+                        ? samplesGroupedByDepartment?.samples[0]?.orders[0]
+                            ?.testAllocations[0]?.statuses[0]?.user?.display
+                        : null
+                    }},
+                    <b> Approved At : </b>
+                    {{
+                      samplesGroupedByDepartment?.samples[0]?.orders[0]
+                        ?.testAllocations[0]?.statuses?.length > 2
+                        ? (samplesGroupedByDepartment?.samples[0]?.orders[0]
+                            ?.testAllocations[0]?.statuses[0]?.timestamp
+                          | date: "medium")
+                        : null
+                    }}
+                  </span>
+                </div>
+                <div
+                  style="text-align: left; padding: 6px 0"
+                  class="providers-details"
+                >
+                  <span>
+                    <b>Printed By :</b>{{ user?.display }}, <b>Printed At :</b>
+                    {{ currentDateTime }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-expansion-panel>
+    </mat-accordion>
+  </div>
+
+  <div style="margin-top: 15px">
+    <button
+      mat-stroked-button
+      color="primary"
+      (click)="onPrint($event, currentDepartmentSamples)"
+    >
+      print
+    </button>
+    <button
+      mat-stroked-button
+      color="primary"
+      style="float: right"
+      (click)="onClose($event)"
+    >
+      Done
+    </button>
+  </div>
+</div>

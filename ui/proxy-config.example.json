@@ -1,0 +1,8 @@
+{
+  "/": {
+    "target": "http://localhost:8080",
+    "secure": "false",
+    "auth": "admin:Admin123",
+    "changeOrigin": "true"
+  }
+}

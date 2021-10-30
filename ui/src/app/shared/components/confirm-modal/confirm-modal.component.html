@@ -1,0 +1,39 @@
+<ng-container
+  *ngIf="{
+    admittingState: admittingState$ | async,
+    admissionStatus: admissionStatus$ | async
+  } as params"
+>
+  <mat-toolbar color="primary">
+    <span>{{ details && details?.occupied ? "Status" : message }}</span>
+    <span class="toolbar-spacer"></span>
+    <button mat-icon-button mat-dialog-close matTooltip="close">
+      <mat-icon>close</mat-icon>
+    </button>
+  </mat-toolbar>
+  <mat-dialog-content class="mat-typography">
+    <div class="text-center p-3">
+      <p *ngIf="params?.admissionStatus" class="text-center">
+        Successfully admitted <b>{{ currentPatient?.name }}</b>
+      </p>
+      <p *ngIf="details?.occupied">
+        Already occupied by {{ details?.visit?.patient?.display }}
+      </p>
+      <mat-progress-bar
+        *ngIf="params?.admittingState"
+        mode="indeterminate"
+      ></mat-progress-bar>
+    </div>
+  </mat-dialog-content>
+  <mat-dialog-actions align="end" class="m-0 p-3">
+    <button mat-stroked-button (click)="onClose($event)">Cancel</button>
+    <button
+      [disabled]="details?.occupied"
+      class="ml-2 confirm-btn"
+      mat-stroked-button
+      (click)="onConfirm($event, dataObject, orderType)"
+    >
+      Confirm
+    </button>
+  </mat-dialog-actions>
+</ng-container>

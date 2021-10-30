@@ -1,0 +1,32 @@
+<div style="width: 100%" id="dialog-bill-receipt">
+  <mat-toolbar color="primary">Bill Payment Receipt</mat-toolbar>
+  <div class="p-3">
+    <div>
+      <table class="table">
+        <tr>
+          <td>#</td>
+          <td>item</td>
+          <td>discount</td>
+          <td>paid amount</td>
+        </tr>
+        <tr *ngFor="let item of data?.billItems; let itemIndex = index">
+          <td>{{ itemIndex + 1 }}</td>
+          <td>{{ item?.billItem?.item?.concept?.name }}</td>
+          <td>{{ item?.billItem?.discount }}</td>
+          <td>{{ item?.billItem.price }}</td>
+        </tr>
+      </table>
+    </div>
+    <div style="text-align: right">
+      <button mat-stroked-button (click)="onCancel($event)">Cancel</button>
+      <button
+        class="ml-4 bg-success text-white"
+        mat-flat-button
+        color="primary"
+        (click)="onPrint($event)"
+      >
+        Print Receipt
+      </button>
+    </div>
+  </div>
+</div>

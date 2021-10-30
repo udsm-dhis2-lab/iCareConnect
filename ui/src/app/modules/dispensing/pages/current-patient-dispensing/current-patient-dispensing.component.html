@@ -1,0 +1,53 @@
+<div
+  style="padding: 0 10px"
+  *ngIf="{
+    response: response$ | async,
+    currentPatient: currentPatient$ | async,
+    patientVisit: patientVisit$ | async,
+    currentLocation: currentLocation$ | async,
+    currentVisitLoadedState: currentVisitLoadedState$ | async,
+    currentVisitLoadingState: currentVisitLoadingState$ | async
+  } as params"
+>
+  <button mat-button color="light" (click)="onBack($event)">
+    <mat-icon class="mr-2">arrow_back</mat-icon>
+    <mat-label>Back To list</mat-label>
+  </button>
+
+  <mat-progress-bar
+    class="mt-4"
+    *ngIf="
+      loading || !params?.currentPatient || params?.currentVisitLoadingState
+    "
+    mode="indeterminate"
+  ></mat-progress-bar>
+  <div class="row mt-2">
+    <div class="col-12">
+      <app-new-patient-profile
+        *ngIf="params?.currentPatient && params?.currentVisitLoadedState"
+        [currentPatient]="params?.currentPatient"
+      ></app-new-patient-profile>
+    </div>
+
+    <div class="col-12" *ngIf="params.patientVisit as patientVisit">
+      <p
+        class="text-left text-danger"
+        *ngIf="params?.response && params?.response?.message"
+      >
+        {{ params?.response?.message }}
+      </p>
+      <div class="border" *ngIf="params?.currentVisitLoadedState">
+        <app-patient-drug-order-list
+          [visit]="patientVisit"
+          [loading]="loading"
+          [loadingError]="loadingError"
+          [actionOptions]="dispensingActionOptions"
+          [currentLocation]="params.currentLocation"
+          (orderSelectAction)="
+            onSelectAction($event, patientVisit, params.currentLocation)
+          "
+        ></app-patient-drug-order-list>
+      </div>
+    </div>
+  </div>
+</div>

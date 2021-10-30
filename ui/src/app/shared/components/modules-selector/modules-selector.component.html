@@ -1,0 +1,28 @@
+<div>
+  <div class="w-100" style="overflow-x: auto; overflow-y: hidden">
+    <ul class="d-flex justify-content-left menu-items">
+      <li
+        class="menu-item text-center"
+        [ngClass]="{ 'selected-module': currentModule?.id === module?.id }"
+        (click)="onSelectModuleLocation($event, module)"
+        *ngFor="let module of modulesReferences"
+      >
+        {{ module?.app?.name }}
+      </li>
+    </ul>
+  </div>
+  <div class="sub-menu-items">
+    <div class="d-flex justify-content-left p-1">
+      <div
+        (click)="onSetLocation($event, userLocation)"
+        class="mat-chip-resemblance mr-1"
+        [ngClass]="{
+          'selected-user-location': currentLocation?.uuid == userLocation?.id
+        }"
+        *ngFor="let userLocation of userLocationsForTheCurrentModule"
+      >
+        {{ userLocation?.name }}
+      </div>
+    </div>
+  </div>
+</div>

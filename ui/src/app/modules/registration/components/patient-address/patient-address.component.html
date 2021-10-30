@@ -1,0 +1,11 @@
+<div *ngIf="personDetails$ | async as personDetails">
+  <p class="person-address" *ngIf="personDetails">
+    <span>
+      Address:
+      <b *ngIf="personDetails?.preferredAddress?.cityVillage">
+        {{ personDetails?.preferredAddress?.cityVillage }}
+      </b>
+      <span *ngIf="!personDetails?.preferredAddress?.cityVillage"> - </span>
+    </span>
+  </p>
+</div>

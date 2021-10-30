@@ -1,0 +1,40 @@
+<div style="padding: 0 !important">
+  <mat-toolbar class="modal-header">Reason for rejecting</mat-toolbar>
+  <div class="p-3">
+    <mat-form-field
+      [style.fontSize]="'15px'"
+      style="margin-top: 5px"
+      class="w-100"
+    >
+      <mat-label>Reason</mat-label>
+      <textarea
+        [disabled]=""
+        (keyup)="setReasonValue($event.target.value)"
+        [value]="reason"
+        matInput
+        cdkTextareaAutosize
+        #autosize="cdkTextareaAutosize"
+        cdkAutosizeMinRows="2"
+        cdkAutosizeMaxRows="4"
+      ></textarea>
+    </mat-form-field>
+    <div>
+      <button
+        mat-stroked-button
+        (click)="onSave($event)"
+        [disabled]="!reason || reason?.length < 2"
+        class="float-left"
+      >
+        Save
+      </button>
+      <button
+        mat-stroked-button
+        (click)="onClose($event)"
+        [disabled]="(reason && reason?.length >= 2) || reason !== ''"
+        class="float-right"
+      >
+        Cancel
+      </button>
+    </div>
+  </div>
+</div>

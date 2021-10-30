@@ -1,0 +1,113 @@
+<ng-container *ngIf="currentPatient$ | async as currentPatient">
+  <mat-progress-bar
+    mode="indeterminate"
+    *ngIf="loading || !currentPatient"
+  ></mat-progress-bar>
+  <div *ngIf="patientBillingDetails$ | async as patientBillingDetails" class="">
+    <ng-container>
+      <div class="row mt-3">
+        <div class="col-md-12 col-sm-12" *ngIf="currentPatient">
+          <app-new-patient-profile
+            [currentPatient]="currentPatient"
+          ></app-new-patient-profile>
+        </div>
+        <div class="col-md-12 col-sm-12 back-to-client-list">
+          <button
+            class="float-left"
+            mat-stroked-button
+            [routerLink]="'/billing'"
+            matTooltip="Go to Home page"
+          >
+            <mat-icon>arrow_back</mat-icon>
+            Back to Client List
+          </button>
+        </div>
+        <div class="col-md-12 col-sm-12" *ngIf="currentPatient">
+          <div class="border">
+            <mat-tab-group>
+              <mat-tab>
+                <ng-template mat-tab-label>
+                  <span
+                    [matBadge]="patientBillingDetails.bills?.length"
+                    matBadgePosition="after"
+                    matBadgeOverlap="false"
+                    [matBadgeHidden]="patientBillingDetails.bills?.length === 0"
+                    >Quotations</span
+                  >
+                </ng-template>
+
+                <div
+                  *ngIf="patientBillingDetails?.bills?.length == 0"
+                  class="py-4"
+                  style="text-align: center"
+                >
+                  No pending bills
+                </div>
+                <app-quotations
+                  *ngIf="patientBillingDetails.bills.length > 0"
+                  [bills]="patientBillingDetails?.bills"
+                  (confirmPayment)="onConfirmBillPayment($event)"
+                  (billPaymentSuccess)="onPaymentSuccess()"
+                ></app-quotations>
+              </mat-tab>
+              <mat-tab>
+                <ng-template mat-tab-label>
+                  <span
+                    class="mr-2"
+                    [matBadge]="patientBillingDetails.pendingPayments?.length"
+                    matBadgePosition="after"
+                    matBadgeOverlap="false"
+                    [matBadgeHidden]="
+                      patientBillingDetails.pendingPayments?.length === 0
+                    "
+                    >Pending Payments (Covered by Insurance)
+                  </span>
+                </ng-template>
+
+                <div
+                  *ngIf="patientBillingDetails?.pendingPayments?.length == 0"
+                  class="py-4"
+                  style="text-align: center"
+                >
+                  No pending payments
+                </div>
+
+                <app-quotations
+                  [bills]="patientBillingDetails?.pendingPayments"
+                  [disableControls]="true"
+                  (confirmPayment)="onConfirmBillPayment($event)"
+                >
+                </app-quotations>
+              </mat-tab>
+              <mat-tab>
+                <ng-template mat-tab-label>
+                  <span
+                    [matBadge]="patientBillingDetails.paymentItemCount"
+                    matBadgePosition="after"
+                    matBadgeOverlap="false"
+                    [matBadgeHidden]="
+                      patientBillingDetails.payments?.length === 0
+                    "
+                    >Payments
+                  </span>
+                </ng-template>
+
+                <div
+                  *ngIf="patientBillingDetails?.payments?.length == 0"
+                  class="py-4"
+                  style="text-align: center"
+                >
+                  No completed payments
+                </div>
+                <app-payments
+                  *ngIf="patientBillingDetails?.payments.length > 0"
+                  [payments]="patientBillingDetails?.payments"
+                ></app-payments>
+              </mat-tab>
+            </mat-tab-group>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+</ng-container>

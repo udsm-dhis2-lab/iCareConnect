@@ -1,0 +1,15 @@
+<div>
+  <mat-progress-bar
+    *ngIf="loadingVisit$ | async"
+    mode="indeterminate"
+  ></mat-progress-bar>
+  <div class="centered-container-patient-list">
+    <div>
+      <div class="text-muted h6 mb-4 text-center">Search for a patient</div>
+      <app-patient-list
+        (selectPatient)="onSelectPatient()"
+        [isTabularList]="isPatientListTabular"
+      ></app-patient-list>
+    </div>
+  </div>
+</div>

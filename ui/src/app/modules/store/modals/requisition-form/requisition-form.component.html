@@ -1,0 +1,23 @@
+<div>
+  <mat-toolbar color="primary">Requisition Form</mat-toolbar>
+  <div class="p-3">
+    <div class="requisition-form">
+      <app-form
+        [fields]="requisitionFields"
+        (formUpdate)="onUpdateForm($event)"
+      ></app-form>
+    </div>
+    <div class="d-flex justify-content-end">
+      <button mat-stroked-button (click)="onCancel($event)">Cancel</button>
+      <button
+        class="ml-2"
+        color="primary"
+        mat-flat-button
+        [disabled]="!requisitionFormValue?.isValid"
+        (click)="onRequest($event)"
+      >
+        Request
+      </button>
+    </div>
+  </div>
+</div>

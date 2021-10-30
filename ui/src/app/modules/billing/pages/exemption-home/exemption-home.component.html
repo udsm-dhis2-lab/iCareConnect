@@ -1,0 +1,21 @@
+<div>
+  <div class="border">
+    <mat-toolbar>
+      <button mat-icon-button [routerLink]="''" matTooltip="Go to Home page">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <span class="ml-2">Exemption</span>
+    </mat-toolbar>
+    <!-- patient list -->
+    <div class="mat-elevation-z1">
+      <app-table
+        [columns]="billingColumns"
+        [loading]="loadingVisits"
+        [loadingDataError]="loadingVisitsError"
+        [tableConfig]="tableConfig"
+        [data$]="visitsWithBiling$"
+        (selectRow)="onSelectVisit($event)"
+      ></app-table>
+    </div>
+  </div>
+</div>

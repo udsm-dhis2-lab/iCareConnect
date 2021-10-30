@@ -1,0 +1,28 @@
+<div class="settings">
+  <mat-tab-group
+    [selectedIndex]="selectedTab.value"
+    (selectedTabChange)="onChangeRoute($event)"
+    (selectedIndexChange)="selectedTab.setValue($event)"
+  >
+    <mat-tab
+      label="Stall tests"
+      (click)="changeRoute($event, 0, '/settings/tests-control')"
+    >
+      <div class="p-1"></div>
+    </mat-tab>
+    <mat-tab
+      label="Tests Settings"
+      (click)="changeRoute($event, 1, '/settings/tests-settings')"
+    >
+      <div class="p-1"></div>
+    </mat-tab>
+    <!-- <mat-tab
+      label="Lab Configurations"
+      (click)="changeRoute($event, 2, '/settings/lab-configurations')"
+    >
+      <div class="p-1"></div>
+    </mat-tab> -->
+  </mat-tab-group>
+
+  <router-outlet></router-outlet>
+</div>

@@ -1,0 +1,93 @@
+<div
+  *ngIf="{
+    settingCurrentLocationStatus: settingCurrentLocationStatus$ | async
+  } as params"
+>
+  <div
+    *ngIf="!params?.settingCurrentLocationStatus"
+    class="pt-2 store-container"
+  >
+    <!-- store sidebar -->
+    <div class="store-sidebar">
+      <mat-card class="p-0 border">
+        <h3 class="pl-3 pt-3 pr-3">
+          Store: {{ (currentStore$ | async)?.name }}
+        </h3>
+        <mat-nav-list>
+          <mat-list-item
+            *ngFor="let storePage of storePages"
+            routerLink="{{ storePage.url }}"
+            routerLinkActive="store-active"
+          >
+            <a matLine>{{ storePage.name }}</a>
+          </mat-list-item>
+        </mat-nav-list>
+      </mat-card>
+    </div>
+    <!-- end of store sidebar -->
+
+    <!-- store-content -->
+    <div class="store-content">
+      <!-- stock summary -->
+      <div class="row" *ngIf="!(stockMetrics$ | async)">
+        <div class="col p-2">
+          <mat-card class="border p-2">
+            <p>Loading Metrics . . .</p>
+            <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+          </mat-card>
+        </div>
+      </div>
+
+      <div class="row" *ngIf="stockMetrics$ | async as metrics">
+        <div class="col mb-2">
+          <mat-card class="border p-2">
+            <mat-card-subtitle class="mb-1" style="font-size: 12px">
+              Nearly Stocked Out
+            </mat-card-subtitle>
+            <mat-card-title style="font-size: 17px">{{
+              metrics?.nearlyStockedOut
+            }}</mat-card-title>
+          </mat-card>
+        </div>
+        <div class="col mb-2">
+          <mat-card class="border p-2">
+            <mat-card-subtitle class="mb-1" style="font-size: 12px">
+              Stocked Out
+            </mat-card-subtitle>
+            <mat-card-title style="font-size: 17px">{{
+              metrics?.stockedOut
+            }}</mat-card-title>
+          </mat-card>
+        </div>
+        <div class="col mb-2">
+          <mat-card class="border p-2">
+            <mat-card-subtitle class="mb-1" style="font-size: 12px">
+              Expired
+            </mat-card-subtitle>
+            <mat-card-title style="font-size: 17px">{{
+              metrics?.expired
+            }}</mat-card-title>
+          </mat-card>
+        </div>
+        <div class="col mb-2">
+          <mat-card class="border p-2">
+            <mat-card-subtitle class="mb-1" style="font-size: 12px">
+              Nearly Expired
+            </mat-card-subtitle>
+            <mat-card-title style="font-size: 17px">{{
+              metrics?.nearlyExpired
+            }}</mat-card-title>
+          </mat-card>
+        </div>
+      </div>
+      <!-- end of stock summary -->
+      <router-outlet></router-outlet>
+    </div>
+    <!-- end of store content -->
+  </div>
+
+  <mat-progress-bar
+    *ngIf="params?.settingCurrentLocationStatus"
+    mode="indeterminate"
+  ></mat-progress-bar>
+</div>

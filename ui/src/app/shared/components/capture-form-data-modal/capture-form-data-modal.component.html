@@ -1,0 +1,58 @@
+<ng-container
+  *ngIf="{
+    form: form$ | async,
+    provider: provider$ | async,
+    visit: currentVisit$ | async,
+    savingObservations: savingObservations$ | async,
+    observations: observations$ | async
+  } as params"
+>
+  <mat-progress-bar
+    *ngIf="!params?.form || !params?.observations"
+    mode="indeterminate"
+  ></mat-progress-bar>
+  <ng-container *ngIf="params?.form && params?.observations">
+    <h2 mat-dialog-title>
+      {{ params?.form?.name }}
+    </h2>
+    <mat-dialog-content>
+      <app-capture-form-data
+        [form]="params?.form"
+        [observations]="params?.observations"
+        (formDataUpdate)="onFormUpdate($event, params?.form)"
+      ></app-capture-form-data>
+    </mat-dialog-content>
+    <!-- <div class="content">
+      
+    </div> -->
+    <mat-dialog-actions align="end">
+      <button
+        mat-flat-button
+        color="primary"
+        (click)="saveCurrentFormData($event)"
+      >
+        <mat-spinner
+          color="primary"
+          *ngIf="params?.savingObservations"
+          [diameter]="20"
+          style="display: inline-block !important; margin-right: 4px"
+        ></mat-spinner>
+        {{ savingObservations ? "Saving ..." : "Save" }}
+      </button>
+      <button mat-stroked-button (click)="onClose($event)">Cancel</button>
+    </mat-dialog-actions>
+    <!-- <div class="btns">
+      <button mat-stroked-button class="mr-2">
+        <mat-spinner
+          color="primary"
+          [diameter]="20"
+          style="display: inline-block !important; margin-right: 4px"
+        ></mat-spinner>
+        Confirm
+      </button>
+      <button mat-stroked-button class="mr-2" (click)="onClose($event)">
+        Cancel
+      </button>
+    </div> -->
+  </ng-container>
+</ng-container>

@@ -1,0 +1,43 @@
+.menu-items {
+  list-style-type: none;
+  padding: 5px 5px 2px 0;
+  margin-bottom: -1px;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+.sub-menu-items {
+  background-color: #fff !important;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+.menu-item {
+  padding: 4px 12px;
+  cursor: pointer;
+  margin-top: -5px;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  color: #fff;
+}
+
+.selected-module {
+  color: #000;
+  background-color: #fff;
+  font-weight: 500;
+}
+
+.selected-user-location {
+  background-color: #2a8fd1 !important;
+  color: #fff !important;
+}
+
+.mat-chip-resemblance {
+  transition: box-shadow 280ms cubic-bezier(0.4, 0, 0.2, 1);
+  display: inline-flex;
+  padding: 5px 12px;
+  border-radius: 12px;
+  align-items: center;
+  cursor: default;
+  min-height: 26px;
+  height: 1px;
+  cursor: pointer;
+  background-color: rgb(241, 241, 241);
+}

@@ -1,0 +1,46 @@
+<div
+  class="visit-container"
+  *ngIf="{
+    currentPatient: currentPatient$ | async,
+    bills: bills$ | async,
+    patientsBillsLoadedState: patientsBillsLoadedState$ | async
+  } as params"
+>
+  <mat-progress-bar
+    *ngIf="!params?.currentPatient"
+    mode="indeterminate"
+  ></mat-progress-bar>
+  <div class="row" *ngIf="params?.currentPatient && params?.bills">
+    <div class="col-md-12">
+      <app-new-patient-profile
+        [currentPatient]="params?.currentPatient"
+      ></app-new-patient-profile>
+    </div>
+
+    <div class="col-md-12 col-sm-12 back-to-client-list">
+      <button
+        class="float-left"
+        mat-stroked-button
+        [routerLink]="'/billing/exemption'"
+        matTooltip="Go to Home page"
+      >
+        <mat-icon>arrow_back</mat-icon>
+        Back to Client List
+      </button>
+    </div>
+    <div class="col-md-12">
+      <mat-progress-bar
+        *ngIf="!params?.patientsBillsLoadedState"
+        mode="indeterminate"
+      ></mat-progress-bar>
+      <mat-card *ngIf="params?.patientsBillsLoadedState">
+        <app-exemption-list
+          [bills]="params?.bills"
+          [currentPatient]="params?.currentPatient"
+          (discountBill)="onDiscountBill($event)"
+        >
+        </app-exemption-list>
+      </mat-card>
+    </div>
+  </div>
+</div>

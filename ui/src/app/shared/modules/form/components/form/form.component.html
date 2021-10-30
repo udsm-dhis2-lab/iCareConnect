@@ -1,0 +1,54 @@
+<form [formGroup]="form" class="row p-1">
+  <div
+    *ngFor="let field of fields"
+    class="{{ isFormHorizontal ? 'col' : 'col-12' }} {{
+      field.hidden ? 'hidden-field' : ''
+    }}"
+  >
+    <div class="row">
+      <div class="col-12">
+        <app-field
+          [field]="field"
+          [form]="form"
+          [value]="values[field?.key]"
+          [isReport]="isReport"
+          [fieldClass]="fieldClass"
+          [isCheckBoxButton]="shouldRenderAsCheckBoxesButton"
+          [shouldDisable]="shouldDisable"
+          (fieldUpdate)="onFieldUpdate($event)"
+        ></app-field>
+      </div>
+      <!-- TODO: Might need to show full (col-12) in case it is not number-->
+      <div
+        class="{{ field?.type == 'number' ? 'col-12 units-and-ranges' : '' }}"
+        *ngIf="field?.type == 'number' && (field.min || field.max)"
+      >
+        <div class="d-flex flex-row">
+          <div class="p-2 text-left w-100">
+            <span *ngIf="field?.min"><span>(</span>{{ field?.min }}</span
+            ><span *ngIf="field?.min">-</span>
+            <span *ngIf="field?.max">{{ field?.max }} <span>)</span></span>
+          </div>
+          <div class="p-2 w-100">
+            <span> {{ field?.units }}</span>
+          </div>
+          <div class="p-2 w-100">
+            <span
+              class="text-warning text-left for-warning"
+              *ngIf="
+                (values[field?.key] &&
+                  field?.min &&
+                  values[field?.key] < field?.min) ||
+                (values[field?.key] &&
+                  field?.max &&
+                  values[field?.key] > field?.max)
+              "
+            >
+              Abnormal
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>

@@ -1,0 +1,49 @@
+<div>
+  <mat-progress-bar
+    mode="indeterminate"
+    *ngIf="loadingReport"
+  ></mat-progress-bar>
+  <div *ngIf="!loadingReport && reportData && reportHeaders?.length > 0">
+    <div class="d-flex float-left w-100">
+      <mat-form-field class="w-50" style="font-size: 0.9rem">
+        <mat-label>Search</mat-label>
+        <mat-icon matPrefix>search</mat-icon
+        ><input
+          type="text"
+          placeholder="Search"
+          matInput
+          autocomplete="off" 
+          [(ngModel)]="searchingText"
+        />
+      </mat-form-field>
+    </div>
+    <table class="table table-bordered" id="export-table">
+      <thead style="background-color: #222; color: #fff; font-weight: 600">
+        <tr>
+          <th *ngFor="let header of reportHeaders">
+            {{ header }}
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let dataRow of reportData | searchingItem: searchingText">
+          <td *ngFor="let header of reportHeaders">
+            {{ dataRow[header] }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div
+    *ngIf="
+      !loadingReport &&
+      reportData &&
+      reportHeaders &&
+      reportHeaders?.length == 0
+    "
+  >
+    <p class="text-center text-warning">
+      <b>No data</b>
+    </p>
+  </div>
+</div>

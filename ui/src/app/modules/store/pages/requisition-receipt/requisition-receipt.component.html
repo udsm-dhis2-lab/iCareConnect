@@ -1,0 +1,60 @@
+<div
+  class="requisition-container"
+  *ngIf="{
+    requisitions: requisitions$ | async,
+    stores: stores$ | async,
+    currentStore: currentStore$ | async,
+    stockableItems: stockableItems$ | async,
+    loadingRequisitions: loadingRequisitions$ | async
+  } as params"
+>
+  <mat-card class="border">
+    <div class="d-flex justify-content-between">
+      <mat-form-field class="w-25">
+        <input  autocomplete="off" type="text" matInput placeholder="Search" />
+      </mat-form-field>
+      <!-- <button
+        (click)="onNewRequest($event, params)"
+        mat-flat-button
+        color="primary"
+        style="height: 40px"
+      >
+        New Request
+      </button> -->
+    </div>
+
+    <table class="table">
+      <tr>
+        <td>#</td>
+        <td>Item</td>
+        <td>Quantity Requested</td>
+        <td>Quantity Received</td>
+        <td>Received From</td>
+      </tr>
+
+      <tr *ngIf="params.loadingRequisitions">
+        <td colspan="6">
+          <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+        </td>
+      </tr>
+
+      <tr
+        *ngIf="!params.loadingRequisitions && params.requisitions.length === 0"
+      >
+        <td colspan="6">
+          <div class="w-100 d-flex justify-content-center">No data</div>
+        </td>
+      </tr>
+
+      <tr
+        *ngFor="let request of params?.requisitions; let requestIndex = index"
+      >
+        <td>{{ requestIndex + 1 }}</td>
+        <td>{{ request?.name }}</td>
+        <td>{{ request?.quantityRequested }}</td>
+        <td>{{ request?.quantityIssued || "-" }}</td>
+        <td>{{ request?.targetStore?.name }}</td>
+      </tr>
+    </table>
+  </mat-card>
+</div>

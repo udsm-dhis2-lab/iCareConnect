@@ -1,0 +1,208 @@
+<div
+  *ngIf="{
+    allSamples: allSamples$ | async,
+    samplesLoadedState: samplesLoadedState$ | async,
+    privileges: privileges$ | async,
+    labConfigs: labConfigs$ | async,
+    codedSampleRejectionReasons: codedSampleRejectionReasons$ | async
+  } as sampleParams"
+>
+  <mat-progress-bar
+    *ngIf="
+      !sampleParams?.samplesLoadedState ||
+      !sampleParams?.labConfigs ||
+      !sampleParams?.allSamples
+    "
+    mode="indeterminate"
+  ></mat-progress-bar>
+
+  <div
+    *ngIf="
+      sampleParams?.samplesLoadedState &&
+      sampleParams?.allSamples &&
+      sampleParams?.labConfigs
+    "
+  >
+    <div class="sample-dashboard-summary">
+      <app-samples-summary-dashboard></app-samples-summary-dashboard>
+    </div>
+    <div class="filtering-div">
+      <mat-form-field class="w-50">
+        <mat-label>Search</mat-label>
+        <mat-icon matPrefix>search</mat-icon
+        ><input
+          matInput
+          (keyup)="onSearch($event)"
+          [(ngModel)]="searchingText"
+        />
+      </mat-form-field>
+
+      <table style="border: none; margin-left: 15px" class="w-20 float-right">
+        <tr style="height: 30px">
+          <td style="width: 40px; border: solid 1px #eee"></td>
+          <td>
+            <div style="margin-left: 3px; margin-right: 20px">
+              No results filled
+            </div>
+          </td>
+          <td
+            style="background-color: #ec864acf; width: 40px; margin-left: 20px"
+          ></td>
+          <td>
+            <div style="margin-left: 3px; margin-right: 20px">Has results</div>
+          </td>
+          <td
+            style="width: 40px; background-color: #f5f171f7; margin-left: 20x"
+          ></td>
+          <td>
+            <div style="margin-left: 3px; margin-right: 20px">
+              Waiting second approval
+            </div>
+          </td>
+          <td
+            style="background-color: #d04747ab; width: 40px; margin-left: 20px"
+          ></td>
+          <td><div style="margin-left: 3px">Has rejected results</div></td>
+          <td
+            style="background-color: #6fd67bcf; width: 40px; margin-left: 20px"
+          ></td>
+          <td><div style="margin-left: 3px">Completed</div></td>
+        </tr>
+      </table>
+
+      <mat-form-field appearance="fill" class="w-30 ml-2 float-right">
+        <mat-label>Select Department</mat-label>
+        <mat-select [(value)]="selectedDepartment">
+          <mat-option (click)="setDepartment('')">All Departments</mat-option>
+          <mat-option
+            *ngFor="let dept of labSamplesDepartments"
+            [value]="dept.display"
+            (click)="setDepartment(dept.display)"
+          >
+            {{ dept.display }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+    <div class="p-1">
+      <table class="table table-bordered">
+        <thead class="table-header">
+          <tr>
+            <th rowspan="2">SN</th>
+            <th rowspan="2">Department</th>
+            <th rowspan="2">Sample / Specimen</th>
+            <th rowspan="2">Sample ID</th>
+            <th rowspan="2">MRN</th>
+            <th rowspan="2">Patient Names</th>
+            <th colspan="2" class="text-center">Test details</th>
+            <th rowspan="2">Collected By</th>
+            <th rowspan="2">Collected At</th>
+            <th rowspan="2">Priority</th>
+            <th rowspan="2">Status</th>
+          </tr>
+          <tr>
+            <th>Test</th>
+            <th>Ordered By</th>
+          </tr>
+        </thead>
+        <tbody>
+          <ng-container *ngIf="sampleParams?.allSamples?.length > 0">
+            <ng-container
+              *ngFor="let sample of sampleParams?.allSamples; let count = index"
+            >
+              <tr
+                [ngStyle]="{
+                  'background-color':
+                    sample?.atLestOneOrderWithRejectedResults &&
+                    !sample?.completed
+                      ? '#d04747ab'
+                      : order?.testAllocations[0]?.firstSignOff &&
+                        !sample?.completed
+                      ? '#f5f171f7'
+                      : sample?.atLeastOneHasResults && !sample?.completed
+                      ? '#ec864acf'
+                      : sample?.completed
+                      ? '#6fd67bcf'
+                      : ''
+                }"
+                [ngClass]="{ 'row-alternated': count % 2 !== 0 }"
+                *ngFor="let order of sample?.orders; let orderCount = index"
+              >
+                <td
+                  *ngIf="orderCount == 0"
+                  [attr.rowspan]="sample?.orders?.length"
+                >
+                  {{ count + 1 }}
+                </td>
+                <td
+                  *ngIf="orderCount == 0"
+                  [attr.rowspan]="sample?.orders?.length"
+                >
+                  {{ sample?.department?.departmentName }}
+                </td>
+                <td
+                  *ngIf="orderCount == 0"
+                  [attr.rowspan]="sample?.orders?.length"
+                >
+                  {{ sample?.specimen?.name }}
+                </td>
+                <td
+                  *ngIf="orderCount == 0"
+                  [attr.rowspan]="sample?.orders?.length"
+                >
+                  {{ sample?.label }}
+                </td>
+                <td
+                  *ngIf="orderCount == 0"
+                  [attr.rowspan]="sample?.orders?.length"
+                >
+                  {{ sample?.patient?.identifiers[0]?.id }}
+                </td>
+                <td
+                  *ngIf="orderCount == 0"
+                  [attr.rowspan]="sample?.orders?.length"
+                >
+                  {{ sample?.patient?.givenName }}
+                  {{ sample?.patient?.middleName }}
+                  {{ sample?.patient?.familyName }}
+                </td>
+                <td>{{ order?.order?.concept?.display }}</td>
+                <td>{{ order?.order?.orderer?.name }}</td>
+                <td
+                  *ngIf="orderCount == 0"
+                  [attr.rowspan]="sample?.orders?.length"
+                >
+                  {{ sample?.collectedBy?.display }}
+                </td>
+                <td
+                  *ngIf="orderCount == 0"
+                  [attr.rowspan]="sample?.orders?.length"
+                >
+                  {{ sample?.created | date: "medium" }}
+                </td>
+                <td
+                  *ngIf="orderCount == 0"
+                  [attr.rowspan]="sample?.orders?.length"
+                >
+                  {{ sample?.priorityHigh ? "High" : "Normal" }}
+                </td>
+                <td
+                  *ngIf="orderCount == 0"
+                  [attr.rowspan]="sample?.orders?.length"
+                >
+                  <span *ngIf="sample?.accepted"> Accepted </span>
+                  <span *ngIf="sample?.rejected"> Rejected </span>
+                </td>
+              </tr>
+            </ng-container>
+          </ng-container>
+          <ng-container *ngIf="sampleParams?.allSamples?.length == 0">
+            <tr>
+              <td colspan="10" class="text-danger text-center">No samples</td>
+            </tr>
+          </ng-container>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

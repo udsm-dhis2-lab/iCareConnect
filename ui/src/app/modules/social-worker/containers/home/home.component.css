@@ -1,0 +1,22 @@
+.login-page {
+  background-color: #f5f5f5d4;
+  height: 100vh;
+}
+
+.page-description {
+  text-align: center;
+  padding: 10px;
+}
+
+mat-card {
+  max-width: 400px;
+  margin: 2em auto;
+  text-align: center;
+}
+mat-form-field {
+  display: block;
+}
+
+.authentication-progress {
+  margin-top: 15px;
+}

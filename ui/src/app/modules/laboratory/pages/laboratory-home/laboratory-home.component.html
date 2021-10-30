@@ -1,0 +1,49 @@
+<div class="laboratory-home-container">
+  <div class="row">
+    <div class="laboratory-header col-12">
+      <mat-chip-list class="w-100" cdkDropListOrientation="horizontal">
+        <mat-chip
+          class="w-20"
+          routerLinkActive="active-route"
+          [routerLink]="'sample-collection-home'"
+        >
+          Sample collection
+        </mat-chip>
+        <mat-chip
+          class="w-20"
+          routerLinkActive="active-route"
+          [routerLink]="'sample-acceptance-and-results'"
+        >
+          Sample acceptance
+        </mat-chip>
+        <mat-chip
+          class="w-20"
+          routerLinkActive="active-route"
+          [routerLink]="'tests-allocation-and-results'"
+        >
+          Tests allocation, Worklist & Results
+        </mat-chip>
+        <mat-chip
+          class="w-20"
+          routerLinkActive="active-route"
+          [routerLink]="'sample-tracking'"
+        >
+          Sample Tracking
+        </mat-chip>
+        <mat-chip
+          class="w-20"
+          routerLinkActive="active-route"
+          [routerLink]="'tests-management'"
+        >
+          Tests management
+        </mat-chip>
+      </mat-chip-list>
+    </div>
+    <div
+      class="laboratory-home-content col-12"
+      style="background-color: red; margin-top: 50vh !important"
+    >
+      <router-outlet></router-outlet>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,102 @@
+<div
+  *ngIf="{
+    settingCurrentLocationStatus: settingCurrentLocationStatus$ | async
+  } as params"
+>
+  <mat-toolbar>
+    <button
+      mat-icon-button
+      (click)="onBack($event)"
+      matTooltip="Go to Home page"
+    >
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <span class="ml-2">Patients</span>
+  </mat-toolbar>
+  <div *ngIf="!params?.settingCurrentLocationStatus">
+    <div class="w-100 text-center">
+      <!-- <div class="text-muted h6 mb-4">Search for a patient</div> -->
+      <!-- patient list -->
+      <mat-tab-group
+        (selectedTabChange)="changeTab(selectedTab.value)"
+        [selectedIndex]="selectedTab.value"
+        (selectedIndexChange)="selectedTab.setValue($event)"
+      >
+        <mat-tab label="All Active Patients">
+          <div class="p-2" *ngIf="selectedTab.value === 0">
+            <app-patient-list
+              [isTabularList]="true"
+              [itemsPerPage]="25"
+              [currentLocation]="(currentLocation$ | async)?.id"
+              (selectPatient)="onSelectPatient($event)"
+            ></app-patient-list>
+          </div>
+        </mat-tab>
+        <mat-tab label="Patients Awaiting Consultation">
+          <div class="p-2" *ngIf="selectedTab.value === 1">
+            <app-patient-list
+              [isTabularList]="true"
+              [itemsPerPage]="25"
+              [orderType]="'iCARESTS-ADMS-1111-1111-525400e4297f'"
+              (selectPatient)="onSelectPatient($event)"
+            ></app-patient-list>
+          </div>
+        </mat-tab>
+        <mat-tab label="Attended Patients">
+          <div class="p-2" *ngIf="selectedTab.value === 2">
+            <app-patient-list
+              [isTabularList]="true"
+              [itemsPerPage]="25"
+              [orderType]="'iCARESTS-ADMS-1111-1111-525400e4297f'"
+              [orderStatus]="'RECEIVED'"
+              [currentLocation]="(currentLocation$ | async)?.id"
+              (selectPatient)="onSelectPatient($event)"
+            ></app-patient-list>
+          </div>
+        </mat-tab>
+
+        <!-- <mat-tab label="Patient With Lab Orders Not Received at LAB">
+          <div class="p-2" *ngIf="selectedTab.value === 3">
+            <app-patient-list
+              [currentLocation]="(currentLocation$ | async)?.id"
+              [isTabularList]="true"
+              [itemsPerPage]="25"
+              [orderType]="'52a447d3-a64a-11e3-9aeb-50e549534c5e'"
+              (selectPatient)="onSelectPatient($event)"
+            ></app-patient-list>
+          </div>
+        </mat-tab> -->
+        <mat-tab label="Patient With Lab Orders Received at LAB">
+          <div class="p-2" *ngIf="selectedTab.value === 3">
+            <app-patient-list
+              [currentLocation]="(currentLocation$ | async)?.id"
+              [shouldShowParentLocation]="true"
+              [orderType]="'52a447d3-a64a-11e3-9aeb-50e549534c5e'"
+              [orderStatus]="'RECEIVED'"
+              [isTabularList]="true"
+              [itemsPerPage]="25"
+              (selectPatient)="onSelectPatient($event)"
+            ></app-patient-list>
+          </div>
+        </mat-tab>
+
+        <mat-tab label="Admitted Patients">
+          <!-- TODO: Remove hardcoded location Id -->
+          <div class="p-2" *ngIf="selectedTab.value === 4">
+            <app-patient-list
+              [shouldShowParentLocation]="true"
+              [currentLocation]="[
+                'b1a8b05e-3542-4037-bbd3-998ee9c40574',
+                '81c1b0e9-b222-478c-b35e-cac3f9f6394b'
+              ]"
+              [isTabularList]="true"
+              [itemsPerPage]="25"
+              [orderType]="'iCARE901-ADMS-11e8-b450-525400e4297f'"
+              (selectPatient)="onSelectPatient($event)"
+            ></app-patient-list>
+          </div>
+        </mat-tab>
+      </mat-tab-group>
+    </div>
+  </div>
+</div>

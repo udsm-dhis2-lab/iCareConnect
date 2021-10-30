@@ -1,0 +1,84 @@
+<div class="ordered-items-container">
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>{{ orderTypeName }}</th>
+        <th>Order Date & Time</th>
+        <th>Ordered By</th>
+        <th>Source</th>
+        <th>Payment Status</th>
+        <th>Status</th>
+        <th style="width: 20%">Comments</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <ng-container *ngIf="orderedItems?.length > 0">
+        <ng-container *ngFor="let orderedItem of orderedItems">
+          <tr [ngClass]="{ 'text-danger': !orderedItem?.paid }">
+            <td>
+              {{ orderedItem?.order?.display }}
+            </td>
+            <td>
+              {{ orderedItem?.order?.dateActivated | date: "medium" }}
+            </td>
+            <td>
+              {{ orderedItem?.order?.orderer?.display }}
+            </td>
+            <td>
+              {{ orderedItem?.order?.location?.display }}
+            </td>
+            <td>{{ orderedItem?.paid ? "PAID" : "NOT PAID" }}</td>
+            <td>
+              <section>
+                <mat-checkbox
+                  [checked]="
+                    orderedItem?.value && orderedItem?.value === 'True'
+                  "
+                  [disabled]="
+                    !orderedItem?.paid ||
+                    (orderedItem?.value && orderedItem?.value === 'True')
+                  "
+                  (change)="onCheck($event)"
+                  >Yes</mat-checkbox
+                >
+              </section>
+            </td>
+            <td>
+              <mat-form-field class="w-100" *ngIf="!orderedItem?.remarks">
+                <mat-label>Remarks</mat-label>
+                <textarea
+                  [disabled]="!orderedItem?.paid"
+                  [(ngModel)]="comments"
+                  matInput
+                ></textarea>
+              </mat-form-field>
+              <p>
+                {{ orderedItem?.remarks }}
+              </p>
+            </td>
+            <td>
+              <button
+                [disabled]="
+                  !orderedItem?.paid ||
+                  (orderedItem?.value && orderedItem?.value === 'True')
+                "
+                mat-button
+                (click)="saveObservationForThisOrder($event, orderedItem)"
+              >
+                Save
+              </button>
+            </td>
+          </tr>
+        </ng-container>
+      </ng-container>
+      <ng-container *ngIf="orderedItems?.length === 0">
+        <tr>
+          <td colspan="8" class="text-center text-warning">
+            NO ordered {{ orderTypeName }}
+          </td>
+        </tr>
+      </ng-container>
+    </tbody>
+  </table>
+</div>

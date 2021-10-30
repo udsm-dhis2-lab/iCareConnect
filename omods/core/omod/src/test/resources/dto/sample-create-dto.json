@@ -1,0 +1,14 @@
+{
+ "visit": {
+   "uuid": "2386395c-2b07-4abd-8fd7-a748c957554d"
+ },
+  "concept": {
+    "uuid": "a8102d6d-c528-477a-80bd-acc38ebc6252"
+  },
+  "label": "Create Sample Test",
+  "orders": [
+    {
+      "uuid": "6746395c-1117-4abd-8fd7-a748c9575abcd"
+    }
+  ]
+}

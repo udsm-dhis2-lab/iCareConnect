@@ -1,0 +1,29 @@
+<div *ngIf="!forSetMember">
+  <b>
+    {{
+      labTest?.result && keyedResults
+        ? keyedResults[labTest?.order?.concept?.uuid]?.display
+        : "No result"
+    }}
+  </b>
+  <span style="font-size: x-small">
+    <em *ngIf="labTest?.result"
+      >(Fed at:
+      {{
+        labTest?.result?.observationDatetime
+          ? (labTest?.result?.observationDatetime | date: "medium")
+          : null
+      }})
+    </em></span
+  >
+</div>
+<div *ngIf="forSetMember">
+  <b>
+    {{
+      observationsKeyedByConcept &&
+      observationsKeyedByConcept[concept?.uuid]?.latest
+        ? observationsKeyedByConcept[concept?.uuid]?.latest?.value
+        : "No result"
+    }}
+  </b>
+</div>

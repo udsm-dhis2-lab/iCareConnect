@@ -1,0 +1,11 @@
+<div *ngIf="previousVisitDetails$ | async as previousVisitDetails">
+  <app-patient-medication-summary
+    *ngIf="previousVisitDetails"
+    [patientVisit]="previousVisitDetails[0]"
+  ></app-patient-medication-summary>
+
+  <mat-progress-bar
+    *ngIf="!previousVisitDetails"
+    mode="indeterminate"
+  ></mat-progress-bar>
+</div>

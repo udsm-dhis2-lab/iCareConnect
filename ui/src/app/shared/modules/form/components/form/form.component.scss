@@ -1,0 +1,17 @@
+.form-horizontal {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+.hidden-field {
+  display: none;
+}
+
+.units-and-ranges span {
+  margin-left: 1%;
+  font-weight: 600;
+}
+
+.for-warning {
+  margin-left: 8px;
+}

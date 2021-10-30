@@ -1,0 +1,66 @@
+<div
+  *ngIf="{
+    diagnoses: diagnoses$ | async,
+    loadingVisit: loadingVisit$ | async
+  } as params"
+>
+  <div
+    class="text-left"
+    *ngIf="
+      (params?.diagnoses | filterDiagnoses: isConfirmedDiagnosis)?.length ===
+        0 && !params?.loadingVisit
+    "
+  >
+    No data
+  </div>
+  <mat-progress-bar
+    *ngIf="params?.loadingVisit"
+    mode="indeterminate"
+  ></mat-progress-bar>
+  <table
+    class="table"
+    *ngIf="
+      (params?.diagnoses | filterDiagnoses: isConfirmedDiagnosis)?.length > 0
+    "
+  >
+    <thead>
+      <tr>
+        <th style="width: 15px">SN</th>
+        <th>Diagnosis</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr
+        [ngClass]="{ 'text-danger': diagnosisInfo?.voided }"
+        *ngFor="
+          let diagnosisInfo of params?.diagnoses
+            | filterDiagnoses: isConfirmedDiagnosis;
+          let count = index
+        "
+      >
+        <td>
+          {{ count + 1 }}
+        </td>
+        <td>
+          <p *ngIf="diagnosisInfo?.voided">
+            <s>
+              {{
+                diagnosisInfo?.diagnosis?.display
+                  ? diagnosisInfo?.diagnosis?.display
+                  : diagnosisInfo?.diagnosis?.coded?.display
+              }}
+            </s>
+          </p>
+          <p *ngIf="!diagnosisInfo?.voided">
+            {{
+              diagnosisInfo?.diagnosis?.display
+                ? diagnosisInfo?.diagnosis?.display
+                : diagnosisInfo?.diagnosis?.coded?.display
+            }}
+          </p>
+          <!-- {{ diagnosisInfo | json }} -->
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

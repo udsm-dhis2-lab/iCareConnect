@@ -1,0 +1,46 @@
+<div class="rejection-reason row">
+  <mat-toolbar class="modal-header">Reason for rejecting a sample</mat-toolbar>
+  <div class="reason-contents col-12">
+    <div class="reason">
+
+      <mat-form-field class="w-100">
+        <mat-label>Select Reason for Rejection</mat-label>
+        <mat-select required
+          [(ngModel)]="reason">
+          <mat-option *ngFor="let option of codedSampleRejectionReasons" [value]="option.uuid">
+            {{ option.display }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+      <!-- <mat-form-field [style.fontSize]="'15px'" class="w-100">
+        <mat-label>Reason for rejection</mat-label>
+        <textarea
+          matInput
+          cdkTextareaAutosize
+          #autosize="cdkTextareaAutosize"
+          cdkAutosizeMinRows="1"
+          cdkAutosizeMaxRows="2"
+        ></textarea>
+      </mat-form-field> -->
+    </div>
+    <div>
+      <button
+        style="float: right"
+        [disabled]="reason == '' || reason?.length < 4"
+        mat-stroked-button
+        (click)="saveReason($event)"
+        class="mr-2 save-rejection-btn"
+      >
+        Save
+      </button>
+      <button
+        style="float: right"
+        mat-stroked-button
+        (click)="onCancel($event)"
+        class="mr-2 save-rejection-btn"
+      >
+        Cancel
+      </button>
+    </div>
+  </div>
+</div>

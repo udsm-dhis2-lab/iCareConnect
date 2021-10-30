@@ -1,0 +1,41 @@
+.example-spacer {
+  flex: 1 1 auto;
+}
+.menu-container {
+  position: fixed;
+  right: 0;
+  left: 0;
+  top: 0;
+  z-index: 1000;
+  height: 40px;
+}
+
+.menu-link {
+  cursor: pointer;
+  text-decoration: none;
+  color: #ffffff;
+}
+
+.menu-profile-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 50px;
+  width: 50px;
+  border-radius: 50%;
+  color: #ffffff;
+  font-size: 17px;
+}
+
+button {
+  outline: none !important;
+}
+
+button:hover {
+  outline: none !important;
+}
+
+#location-icon,
+#location-name {
+  color: #ffffff !important;
+}

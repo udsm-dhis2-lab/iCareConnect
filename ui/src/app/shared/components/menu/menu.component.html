@@ -1,0 +1,108 @@
+<div
+  style="z-index: 1000"
+  class="menu-container"
+  *ngIf="{
+    locationsForCurrentUser: locationsForCurrentUser$ | async
+  } as params"
+>
+  <div
+    class="
+      w-100
+      d-flex
+      justify-content-between
+      align-items-center
+      p-1
+      icare__bg-primary
+    "
+  >
+    <div>
+      <div class="d-flex align-items-center position-relative">
+        <a mat-button (click)="onRouteHome($event)" class="menu-link">iCARE</a>
+      </div>
+      <span class="example-spacer"></span>
+    </div>
+
+    <div>
+      <button
+        mat-button
+        id="location-btn"
+        class="mr-2"
+        (click)="onOpenLocation($event)"
+      >
+        <mat-icon id="location-icon">location_on</mat-icon>
+        <span
+          id="location-name"
+          class="ml-1"
+          *ngIf="!(currentLocation$ | async)"
+        >
+          Select Location
+        </span>
+        <span
+          id="location-name"
+          class="ml-1"
+          *ngIf="currentLocation$ | async as currentLocation"
+        >
+          {{ currentLocation.name }}
+        </span>
+      </button>
+
+      <ng-container *ngIf="currentUser$ | async as currentUser">
+        <button
+          id="btn-account"
+          mat-icon-button
+          class="menu-link border"
+          aria-label="Example icon-button with menu icon"
+          [matMenuTriggerFor]="menu"
+        >
+          {{ currentUser?.person?.display | abbreviate }}
+        </button>
+        <mat-menu id="menu-account" #menu="matMenu">
+          <div class="text-muted text-center">
+            <div class="w-100 d-flex justify-content-center mb-2">
+              <div class="menu-profile-icon icare__bg-primary">
+                {{ currentUser?.person?.display | abbreviate }}
+              </div>
+            </div>
+            <small class="mt-1">{{ currentUser?.person?.display }}</small>
+          </div>
+          <button
+            class="mt-2 text-center"
+            id="btn-logout"
+            mat-menu-item
+            (click)="oncChangePassword()"
+          >
+            Change Password
+          </button>
+          <button
+            class="mt-2 text-center"
+            id="btn-logout"
+            mat-menu-item
+            (click)="onLogOut()"
+          >
+            Logout
+          </button>
+        </mat-menu>
+      </ng-container>
+    </div>
+  </div>
+  <div
+    class="w-100"
+    style="
+      position: fixed;
+      z-index: 1000;
+      margin-top: -5px;
+      background-color: #2a8fd1;
+    "
+    *ngIf="{ userLocations: locationsForCurrentUser$ | async } as params"
+  >
+    <!-- {{ locationsForCurrentUser$ | async | json }} -->
+    <mat-progress-bar
+      *ngIf="!params?.userLocations"
+      mode="indeterminate"
+    ></mat-progress-bar>
+    <app-modules-selector
+      *ngIf="params?.userLocations && params?.userLocations?.length > 0"
+      [locations]="params?.userLocations"
+    ></app-modules-selector>
+  </div>
+</div>

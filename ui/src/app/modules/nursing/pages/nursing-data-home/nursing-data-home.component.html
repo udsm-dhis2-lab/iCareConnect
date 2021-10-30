@@ -1,0 +1,33 @@
+<div
+  *ngIf="{
+    formPrivilegesConfigsLoadingState:
+      formPrivilegesConfigsLoadingState$ | async,
+    privilegesConfigs: privilegesConfigs$ | async,
+    currentUser: currentUser$ | async,
+    allUserRoles: allUserRoles$ | async,
+    userPrivileges: userPrivileges$ | async
+  } as params"
+>
+  <app-nursing-data
+    *ngIf="
+      params?.currentUser &&
+      params?.privilegesConfigs &&
+      params?.allUserRoles &&
+      params?.allUserRoles?.length > 0 &&
+      params?.userPrivileges
+    "
+    [formPrivilegesConfigs]="params?.privilegesConfigs"
+    [currentUser]="params?.currentUser"
+    [userPrivileges]="params?.userPrivileges"
+  ></app-nursing-data>
+
+  <mat-progress-bar
+    mode="indeterminate"
+    *ngIf="
+      params?.formPrivilegesConfigsLoadingState ||
+      !params?.allUserRoles ||
+      (params?.allUserRoles && params?.allUserRoles?.length === 0) ||
+      !params?.userPrivileges
+    "
+  ></mat-progress-bar>
+</div>

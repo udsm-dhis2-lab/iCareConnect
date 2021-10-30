@@ -1,0 +1,34 @@
+<div *ngIf="{ drugOrders: drugOrders$ | async } as drugParams">
+  <table class="table" *ngIf="drugParams?.drugOrders">
+    <thead>
+      <tr>
+        <th>SN</th>
+        <th>Drug Details</th>
+        <th>Prescribed By</th>
+        <th>Order Date</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let drugOrder of drugParams?.drugOrders; let count = index">
+        <td>{{ count + 1 }}</td>
+        <td>{{ drugOrder?.drug?.display }}</td>
+        <td>
+          {{ drugOrder?.orderer?.display }}
+        </td>
+        <td>
+          {{ drugOrder?.dateActivated | date: "medium" }}
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <mat-progress-bar
+    *ngIf="!drugParams?.drugOrders"
+    mode="indeterminate"
+  ></mat-progress-bar>
+  <div
+    class="w-100"
+    *ngIf="drugParams?.drugOrders && drugParams?.drugOrders?.length === 0"
+  >
+    <p class="text-center text-warning">No Prescription done.</p>
+  </div>
+</div>

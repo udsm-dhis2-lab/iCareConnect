@@ -1,0 +1,157 @@
+<div class="laboratory-home-container">
+  <ng-container
+    *ngIf="{
+      sampleTypes: sampleTypes$ | async,
+      specimenSources: specimenSources$ | async,
+      privileges: privileges$ | async,
+      userRoles: userRoles$ | async
+    } as params"
+  >
+    <div
+      class="row"
+      *ngIf="
+        params?.sampleTypes?.length == 0 ||
+        !params?.privileges ||
+        !params?.userRoles ||
+        (params?.userRoles && params?.userRoles.length == 0)
+      "
+    >
+      <div class="col-12 text-center mt-5 mb-2">
+        <p>Loading Lab Settings</p>
+      </div>
+      <div class="col-12">
+        <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+      </div>
+    </div>
+
+    <div
+      class="row"
+      *ngIf="
+        params?.sampleTypes?.length > 0 &&
+        params?.privileges &&
+        params?.userRoles &&
+        params?.userRoles.length > 0
+      "
+    >
+      <div class="laboratory-header col-12">
+        <mat-chip-list class="w-100" cdkDropListOrientation="horizontal">
+          <mat-chip
+            class="w-20"
+            *ngIf="
+              params?.privileges && params?.privileges['Laboratory Orders']
+            "
+            (click)="disableDate($event)"
+            routerLinkActive="active-route"
+            [routerLink]="'lab-investigation-home'"
+          >
+            Diagnostic Orders/Services
+          </mat-chip>
+          <mat-chip
+            class="w-20"
+            *ngIf="
+              params?.privileges && params?.privileges['Sample Collection']
+            "
+            routerLinkActive="active-route"
+            [routerLink]="'sample-collection-home'"
+          >
+            Sample collection
+          </mat-chip>
+          <mat-chip
+            class="w-20"
+            routerLinkActive="active-route"
+            [routerLink]="'sample-acceptance-and-results'"
+            *ngIf="
+              params?.privileges &&
+              params?.privileges['Sample Acceptance and Results']
+            "
+          >
+            Sample Acceptance & Results
+          </mat-chip>
+          <mat-chip
+            class="w-20"
+            routerLinkActive="active-route"
+            [routerLink]="'sample-tracking'"
+            *ngIf="params?.privileges && params?.privileges['Sample Tracking']"
+          >
+            Sample Tracking
+          </mat-chip>
+          <mat-chip
+            class="w-20"
+            routerLinkActive="active-route"
+            [routerLink]="'settings'"
+            *ngIf="params?.privileges && params?.privileges['Tests Settings']"
+          >
+            Tests settings
+          </mat-chip>
+          <mat-chip
+            class="w-20"
+            routerLinkActive="active-route"
+            [routerLink]="'reports'"
+            *ngIf="
+              params?.privileges && params?.privileges['Laboratory Reports']
+            "
+          >
+            Reports
+          </mat-chip>
+        </mat-chip-list>
+      </div>
+    </div>
+
+    <div
+      class="row"
+      style="margin-top: 70px"
+      *ngIf="params?.sampleTypes?.length > 0"
+    >
+      <div class="col-12 no-print" *ngIf="showDate">
+        <!-- <mat-form-field appearance="fill">
+        <mat-label>Choose a date</mat-label>
+        <input
+          matInput
+          [(ngModel)]="selectedDay"
+          [ngModelOptions]="{ standalone: true }"
+          (dateInput)="onDateChange()"
+          [max]="today"
+          [matDatepicker]="picker"
+        />
+        <mat-datepicker-toggle
+          matSuffix
+          [for]="picker"
+        ></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+      </mat-form-field> -->
+
+        <!-- {{ parameters?.startDate }} - {{ parameters?.endDate }} -->
+        <mat-form-field appearance="fill" floatLabel="always">
+          <mat-label>Enter a date range</mat-label>
+          <mat-date-range-input [rangePicker]="visitDatePicker">
+            <input
+              matStartDate
+              placeholder="Start date"
+              autocomplete="off"
+              [(ngModel)]="startDate"
+              (dateInput)="onDateChange()"
+            />
+            <input
+              matEndDate
+              placeholder="End date"
+              autocomplete="off"
+              [(ngModel)]="endDate"
+              (dateInput)="onDateChange(true)"
+            />
+          </mat-date-range-input>
+          <mat-datepicker-toggle
+            matSuffix
+            [for]="visitDatePicker"
+          ></mat-datepicker-toggle>
+          <mat-date-range-picker #visitDatePicker></mat-date-range-picker>
+        </mat-form-field>
+      </div>
+      <!-- <div class="col-10">
+      <router-outlet></router-outlet>
+    </div> -->
+      <div class="laboratory-home-content col-12">
+        <router-outlet></router-outlet>
+      </div>
+    </div>
+  </ng-container>
+</div>

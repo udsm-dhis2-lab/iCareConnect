@@ -1,0 +1,98 @@
+<div
+  class="issuing-container"
+  *ngIf="{
+    issuingList: issuingList$ | async,
+    loadingIssuingList: loadingIssuingList$ | async
+  } as params"
+>
+  <mat-card>
+    <div class="d-flex justify-content-between">
+      <mat-form-field class="w-25">
+        <input  autocomplete="off" type="text" matInput placeholder="Search" />
+      </mat-form-field>
+    </div>
+
+    <table class="table">
+      <tr>
+        <td>#</td>
+        <td>Item</td>
+        <td>Quantity Requested</td>
+        <td>Quantity Issued</td>
+        <td>Requesting Store</td>
+        <td>Status</td>
+        <!-- <td>Requester's Status</td> -->
+        <td>Requested Date</td>
+        <td>Actions</td>
+      </tr>
+
+      <tr *ngIf="params.loadingIssuingList">
+        <td colspan="8">
+          <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+        </td>
+      </tr>
+
+      <tr
+        *ngIf="!params.loadingIssuingList && params.issuingList?.length === 0"
+      >
+        <td colspan="8">
+          <div class="w-100 d-flex justify-content-center">No data</div>
+        </td>
+      </tr>
+
+      <tr *ngFor="let issue of params?.issuingList; let issueIndex = index">
+        <td>{{ issueIndex + 1 }}</td>
+        <td>{{ issue?.name }}</td>
+        <td>{{ issue?.quantityRequested }}</td>
+        <td>{{ issue?.quantityIssued }}</td>
+        <td>{{ issue?.requestingLocation?.name }}</td>
+        <td>
+          <span class="text-warning">{{ issue?.status }}</span>
+        </td>
+        <!-- <td>
+          <div class="text-warning">Waiting</div>
+        </td> -->
+        <td>04 Sept 2020</td>
+        <td>
+          <button
+            mat-flat-button
+            color="primary"
+            [disabled]="
+              issue?.crudOperationStatus?.status === 'ISSUING' ||
+              issue?.status === 'ISSUED'
+            "
+            (click)="onIssue($event, issue)"
+          >
+            <mat-spinner
+              color="primary"
+              *ngIf="issue?.crudOperationStatus?.status === 'ISSUING'"
+              [diameter]="20"
+              style="display: inline-block !important; margin-right: 4px"
+            ></mat-spinner>
+            Issue
+          </button>
+          <button
+            mat-flat-button
+            class="ml-2"
+            color="warn"
+            [disabled]="
+              issue?.crudOperationStatus?.status === 'REJECTING' ||
+              issue?.status === 'ISSUED'
+            "
+            (click)="onReject($event, issue)"
+          >
+            <mat-spinner
+              color="primary"
+              *ngIf="
+                issue?.crudOperationStatus?.status === 'REJECTING' ||
+                issue?.status === 'REJECTED'
+              "
+              [diameter]="20"
+              style="display: inline-block !important; margin-right: 4px"
+            ></mat-spinner>
+            Reject
+          </button>
+        </td>
+      </tr>
+    </table>
+  </mat-card>
+</div>
