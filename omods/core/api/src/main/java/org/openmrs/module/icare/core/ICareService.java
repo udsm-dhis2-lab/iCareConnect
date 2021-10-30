@@ -93,7 +93,7 @@ public interface ICareService extends OpenmrsService {
 	
 	Prescription savePrescription(Prescription order);
 	
-	List<Visit> getVisitsByOrderType(String orderTypeUuid, String locationUuid,
+	List<Visit> getVisitsByOrderType(String search, String orderTypeUuid, String locationUuid,
 	        OrderStatus.OrderStatusCode prescriptionStatus, Order.FulfillerStatus fulfillerStatus, Integer limit,
 	        Integer startIndex);
 	

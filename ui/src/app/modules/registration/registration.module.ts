@@ -10,6 +10,7 @@ import { RegistrationRoutingModule } from './registration-routing.module';
 import { PatientEditComponent } from './pages/patient-edit/patient-edit.component';
 import { RegistrationEditComponent } from './components/registration-edit/registration-edit.component';
 import { entryRegComponents, regComponents } from './components';
+import { LocationsChipsComponent } from './components/locations-chips/locations-chips.component';
 
 @NgModule({
   declarations: [
@@ -21,6 +22,7 @@ import { entryRegComponents, regComponents } from './components';
     PatientEditComponent,
     RegistrationEditComponent,
     ...regComponents,
+    LocationsChipsComponent,
   ],
   entryComponents: [...entryRegComponents],
   imports: [CommonModule, RegistrationRoutingModule, SharedModule],

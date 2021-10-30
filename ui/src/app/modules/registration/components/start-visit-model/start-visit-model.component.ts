@@ -1,21 +1,21 @@
-import { Component, Inject, OnInit } from '@angular/core';
-import { FormControl } from '@angular/forms';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
-import { SystemSettingsService } from 'src/app/core/services/system-settings.service';
-import { Patient } from 'src/app/shared/resources/patient/models/patient.model';
-import { VisitsService } from 'src/app/shared/resources/visits/services';
-import { go, loadCurrentPatient } from 'src/app/store/actions';
-import { AppState } from 'src/app/store/reducers';
-import { getAllTreatmentLocations } from 'src/app/store/selectors';
-import { getVisitLoadedState } from 'src/app/store/selectors/visit.selectors';
+import { Component, Inject, OnInit } from "@angular/core";
+import { FormControl } from "@angular/forms";
+import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
+import { Store } from "@ngrx/store";
+import { Observable } from "rxjs";
+import { tap } from "rxjs/operators";
+import { SystemSettingsService } from "src/app/core/services/system-settings.service";
+import { Patient } from "src/app/shared/resources/patient/models/patient.model";
+import { VisitsService } from "src/app/shared/resources/visits/services";
+import { go, loadCurrentPatient } from "src/app/store/actions";
+import { AppState } from "src/app/store/reducers";
+import { getAllTreatmentLocations } from "src/app/store/selectors";
+import { getActiveVisit, getVisitLoadedState } from "src/app/store/selectors/visit.selectors";
 
 @Component({
-  selector: 'app-start-visit-model',
-  templateUrl: './start-visit-model.component.html',
-  styleUrls: ['./start-visit-model.component.scss'],
+  selector: "app-start-visit-model",
+  templateUrl: "./start-visit-model.component.html",
+  styleUrls: ["./start-visit-model.component.scss"],
 })
 export class StartVisitModelComponent implements OnInit {
   treatmentLocations$: Observable<any[]>;
@@ -29,6 +29,7 @@ export class StartVisitModelComponent implements OnInit {
   allowOnlineVerification$: Observable<boolean>;
   patientVisitsCount$: Observable<number>;
   currentVisitLoadedState$: Observable<boolean>;
+  currentPatientVisit$: Observable<any>;
 
   constructor(
     private store: Store<AppState>,
@@ -47,9 +48,10 @@ export class StartVisitModelComponent implements OnInit {
       this.systemSettingsService.getiCareServicesConfigurations();
     this.allowOnlineVerification$ =
       this.systemSettingsService.getSystemSettingsByKey(
-        'icare.billing.insurance.nhif.allowOnlineVerification'
+        "icare.billing.insurance.nhif.allowOnlineVerification"
       );
     this.currentVisitLoadedState$ = this.store.select(getVisitLoadedState);
+    this.currentPatientVisit$ = this.store.select(getActiveVisit);
   }
 
   onVisitUpdate(visitDetails) {
@@ -58,7 +60,7 @@ export class StartVisitModelComponent implements OnInit {
 
   onCancelVisitChanges(visitDetails) {
     this.dialogRef.close({ visitDetails, close: true });
-    this.store.dispatch(go({ path: ['/registration/home'] }));
+    this.store.dispatch(go({ path: ["/registration/home"] }));
   }
 
   changeTab(index) {

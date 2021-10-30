@@ -7,7 +7,7 @@
       updateCurrentMRNSystemSettingsResponse$ | async
   } as params"
 >
-  <h2>Register New Patient</h2>
+  <h2>{{ editMode ? "Edit Patient" : "Register New Patient" }}</h2>
 
   <mat-progress-bar
     *ngIf="loadingForm || !params?.registrationConfigurations"
@@ -652,7 +652,7 @@
             [diameter]="20"
             style="display: inline-block !important; margin-right: 4px"
           ></mat-spinner>
-          Save Registration
+          {{ editMode ? "Edit Patient" : "Save Registration" }}
         </button>
         <button
           style="height: 45px"

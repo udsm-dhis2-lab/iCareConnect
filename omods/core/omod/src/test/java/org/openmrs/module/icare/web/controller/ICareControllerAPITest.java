@@ -62,6 +62,14 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		results = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
 		maps = (List) results.get("results");
 		assertThat("Should return a 3 items", maps.size(), is(1));
+
+		newGetRequest = newGetRequest("icare/item", new Parameter("q", "opd servi"));
+		handle = handle(newGetRequest);
+		String res = handle.getContentAsString();
+		System.out.println(res);
+		results = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
+		maps = (List) results.get("results");
+		assertThat("Should return a 3 items", maps.size(), is(1));
 	}
 	
 	@Test
@@ -121,19 +129,60 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 	}
 	
 	@Test
-	@Ignore("Already testing using advice")
+	//@Ignore("Already testing using advice")
 	public void testVisitCreation() throws Exception {
 		
 		//Given
-		Map<String, Object> result = getResourceDTOMap("visit-create-dto");
-		
+		//Map<String, Object> result = getResourceDTOMap("visit-create-dto");
+		Map<String, Object> result = getResourceDTOMap("lab-order-create-dto");
+		PatientService patientService = Context.getService(PatientService.class);
+		Patient patient = patientService.getPatientByUuid((String) result.get("patient"));
+		Visit visit = this.getVisit(patient);
+		visit = Context.getVisitService().getVisitByUuid(visit.getUuid());
+		for(Encounter encounter:visit.getEncounters()){
+			System.out.println(encounter);
+			for(Order order:encounter.getOrders()){
+				System.out.println("orderTypeUuid:" + order.getOrderType().getUuid());
+			}
+		}
 		//When
-		MockHttpServletRequest newGetRequest = newPostRequest("icare/visit", result);
+		MockHttpServletRequest newGetRequest = newGetRequest("icare/visit", new Parameter("orderTypeUuid","2msir5eb-5345-11e8-9922-40b034c3cfee"));
 		
 		//Then
 		MockHttpServletResponse handle = handle(newGetRequest);
-		Visit visit = (new ObjectMapper()).readValue(handle.getContentAsString(), Visit.class);
-		assertThat("Should return a visit", visit != null);
+		String visitData = handle.getContentAsString();
+		Map visitMap = (new ObjectMapper()).readValue(visitData, Map.class);
+		List<Map> visitDetails = (List<Map>) visitMap.get("results");
+		assertThat("Should return a visit", visitDetails.size() ==1);
+
+		newGetRequest = newGetRequest("icare/visit",
+				new Parameter("orderTypeUuid","2msir5eb-5345-11e8-9922-40b034c3cfee"),
+				new Parameter("q","hsdfhe"));
+
+		//Then
+		handle = handle(newGetRequest);
+		visitData = handle.getContentAsString();
+		visitMap = (new ObjectMapper()).readValue(visitData, Map.class);
+		visitDetails = (List<Map>) visitMap.get("results");
+		assertThat("Should return a visit", visitDetails.size() ==0);
+
+		newGetRequest = newGetRequest("icare/visit",
+				new Parameter("orderTypeUuid","2msir5eb-5345-11e8-9922-40b034c3cfee"),
+				new Parameter("q","hermione"));
+		handle = handle(newGetRequest);
+		visitData = handle.getContentAsString();
+		visitMap = (new ObjectMapper()).readValue(visitData, Map.class);
+		visitDetails = (List<Map>) visitMap.get("results");
+		assertThat("Should return a visit", visitDetails.size() ==1);
+
+		newGetRequest = newGetRequest("icare/visit",
+				new Parameter("orderTypeUuid","2msir5eb-5345-11e8-9922-40b034c3cfee"),
+				new Parameter("q","hermione jean"));
+		handle = handle(newGetRequest);
+		visitData = handle.getContentAsString();
+		visitMap = (new ObjectMapper()).readValue(visitData, Map.class);
+		visitDetails = (List<Map>) visitMap.get("results");
+		assertThat("Should return a visit", visitDetails.size() ==1);
 	}
 	
 	@Test
