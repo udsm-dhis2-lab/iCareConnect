@@ -89,6 +89,23 @@ export const getCurrentVisitServiceAttributeDetails = createSelector(
   }
 );
 
+export const getCurrentVisitServiceBillingAttributeDetails = createSelector(
+  getActiveVisit,
+  getVisitEntities,
+  (activeVisit, visitEntities) => {
+    // TODO: Remove hard coded uuid for visit attribute type uuid (service billing concept) uuid
+    if (activeVisit && visitEntities) {
+      return (visitEntities[activeVisit?.id]?.attributes.filter(
+        (visitAttribute: any) =>
+          visitAttribute.visitAttributeDetails?.attributeType?.uuid ===
+          "SERVICE0IIIIIIIIIIIIIIIIIIIIIIIATYPE"
+      ) || [])[0];
+    } else {
+      return null;
+    }
+  }
+);
+
 export const getPatientVisitsForAdmissionAddedState = createSelector(
   getVisitState,
   (visit: VisitState) => visit?.patientAdmittedVisitsAdded

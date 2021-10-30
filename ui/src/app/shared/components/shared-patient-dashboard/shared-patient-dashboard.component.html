@@ -123,11 +123,34 @@
               More
             </button>
             <mat-menu #moreMenuItems="matMenu">
-              <button mat-menu-item>Admitted</button>
+              <button
+                mat-menu-item
+                [disabled]="
+                  dashboardParams?.activeVisit?.isAdmitted ||
+                  dashboardParams?.activeVisit?.waitingToBeAdmitted ||
+                  dashboardParams?.activeVisitDeathStatus ||
+                  dashboardParams?.startingConsultation ||
+                  (!dashboardParams?.activeVisit?.isEmergency &&
+                    dashboardParams?.hasPatientHavePendingPaymentForTheCurrentVisitType) ||
+                  dashboardParams?.activeVisitDeathStatus
+                "
+                (click)="
+                  onOpenAdmitPopup(
+                    $event,
+                    'd2c7532c-fb01-11e2-8ff2-fd54ab5fdb2a',
+                    'Admission Location',
+                    dashboardParams?.currentPatient,
+                    dashboardParams?.activeVisit,
+                    dashboardParams?.currentLocation
+                  )
+                "
+              >
+                Admit
+              </button>
               <button
                 mat-menu-item
                 (click)="
-                  onOpenMore(
+                  onOpenTransferWithinPopup(
                     $event,
                     'a007bbfe-fbe5-11e2-8ff2-fd54ab5fdb2a',
                     'Treatment Room',
@@ -139,8 +162,23 @@
               >
                 Transfer within
               </button>
-              <button mat-menu-item>Refer</button>
-              <button mat-menu-item>Mark Patient Deceased</button>
+              <button
+                mat-menu-item
+                [disabled]="
+                  dashboardParams?.startingConsultation ||
+                  (!dashboardParams?.activeVisit?.isEmergency &&
+                    dashboardParams?.hasPatientHavePendingPaymentForTheCurrentVisitType) ||
+                  dashboardParams?.activeVisitDeathStatus
+                "
+              >
+                Refer
+              </button>
+              <button
+                mat-menu-item
+                [disabled]="dashboardParams?.activeVisitDeathStatus"
+              >
+                Mark Patient Deceased
+              </button>
             </mat-menu>
             <button
               mat-flat-button
@@ -178,8 +216,18 @@
             </span>
           </div>
         </div>
-        <!-- dashboard menu -->
-        <mat-tab-group mat-align-tabs="start" dynamicHeight="true">
+        <!-- Patient clinic content -->
+        <mat-tab-group
+          mat-align-tabs="start"
+          dynamicHeight="true"
+          *ngIf="
+            !dashboardParams?.startingConsultation &&
+            !(
+              !dashboardParams?.activeVisit?.isEmergency &&
+              dashboardParams?.hasPatientHavePendingPaymentForTheCurrentVisitType
+            )
+          "
+        >
           <mat-tab label="General">
             <div class="p-3">
               <div class="row">
@@ -352,7 +400,21 @@
             </div>
           </mat-tab> -->
         </mat-tab-group>
-        <!-- end of dashboard menu -->
+        <div
+          *ngIf="
+            (!dashboardParams?.activeVisit?.isEnsured &&
+              !dashboardParams?.loadingVisit &&
+                dashboardParams?.activeVisit &&
+                dashboardParams?.startingConsultation) ||
+            (!dashboardParams?.activeVisit?.isEmergency &&
+              dashboardParams?.hasPatientHavePendingPaymentForTheCurrentVisitType)
+          "
+          class="alert alert-danger p-3 ml-2 mr-2"
+          role="alert"
+        >
+          Consultation Fee not paid
+        </div>
+        <!-- end of Patient clinic content -->
       </div>
     </div>
   </div>

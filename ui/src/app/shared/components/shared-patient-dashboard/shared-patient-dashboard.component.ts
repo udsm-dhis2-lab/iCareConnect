@@ -53,6 +53,7 @@ import { PatientVisitHistoryModalComponent } from "../patient-visit-history-moda
 import { MatDialog } from "@angular/material/dialog";
 import { OrdersService } from "../../resources/order/services/orders.service";
 import { TransferWithinComponent } from "../transfer-within/transfer-within.component";
+import { AdmissionFormComponent } from "../admission-form/admission-form.component";
 
 @Component({
   selector: "app-shared-patient-dashboard",
@@ -190,7 +191,32 @@ export class SharedPatientDashboardComponent implements OnInit {
     });
   }
 
-  onOpenMore(
+  onOpenAdmitPopup(
+    event: Event,
+    formUuid,
+    locationType,
+    currentPatient,
+    visit,
+    currentLocation
+  ): void {
+    event.stopPropagation();
+    this.dialog.open(AdmissionFormComponent, {
+      height: "230px",
+      width: "45%",
+      data: {
+        patient: currentPatient,
+        form: { formUuid },
+        currentLocation,
+        locationType,
+        visit,
+        path: "/clinic/patient-list",
+      },
+      disableClose: false,
+      panelClass: "custom-dialog-container",
+    });
+  }
+
+  onOpenTransferWithinPopup(
     event: Event,
     formUuid,
     locationType,
