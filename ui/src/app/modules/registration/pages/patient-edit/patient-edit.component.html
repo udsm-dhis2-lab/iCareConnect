@@ -1,5 +1,6 @@
 <div *ngIf="patientDetails$ | async as patientDetails">
-  <app-registration-edit
-    [patientDetails]="patientDetails"
-  ></app-registration-edit>
+  <app-registration-add
+    [patientInformation]="patientDetails"
+    [editMode]="true"
+  ></app-registration-add>
 </div>
