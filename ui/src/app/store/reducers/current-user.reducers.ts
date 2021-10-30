@@ -1,4 +1,4 @@
-import { createReducer, on } from '@ngrx/store';
+import { createReducer, on } from "@ngrx/store";
 import {
   addAuthenticatedUser,
   authenticateUser,
@@ -13,17 +13,25 @@ import {
   loadRolesDetails,
   addLoadedRolesDetails,
   setCurrentPageReloadStatus,
-} from '../actions';
-import { CurrentUserState, initialCurrentUserState } from '../states';
+  setUserAthenticatingStatus,
+} from "../actions";
+import { CurrentUserState, initialCurrentUserState } from "../states";
 import {
   errorBaseState,
   loadedBaseState,
   loadingBaseState,
-} from '../states/base.state';
+} from "../states/base.state";
 
 const reducer = createReducer(
   initialCurrentUserState,
   on(authenticateUser, (state) => ({
+    ...state,
+    ...loadingBaseState,
+    loggingIn: true,
+    sessionDetails: null,
+    response: null,
+  })),
+  on(setUserAthenticatingStatus, (state) => ({
     ...state,
     ...loadingBaseState,
     loggingIn: true,
