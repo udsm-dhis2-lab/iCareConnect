@@ -266,9 +266,18 @@
                           >Provisional Diagnoses
                         </mat-panel-title>
                       </mat-expansion-panel-header>
-                      <app-patient-diagnoses-summary
-                        [isConfirmedDiagnosis]="false"
-                      ></app-patient-diagnoses-summary>
+                      <div
+                        *ngIf="dashboardParams?.formEntities['Visit Diagnoses']"
+                      >
+                        <app-patient-diagnoses-summary
+                          [isConfirmedDiagnosis]="false"
+                          [forConsultation]="true"
+                          [diagnosisFormDetails]="
+                            dashboardParams?.formEntities['Visit Diagnoses']
+                          "
+                          [patientVisit]="activeVisit"
+                        ></app-patient-diagnoses-summary>
+                      </div>
                     </mat-expansion-panel>
                   </mat-accordion>
                   <mat-accordion>
@@ -301,9 +310,24 @@
                       <mat-expansion-panel-header>
                         <mat-panel-title>Confirmed Diagnoses </mat-panel-title>
                       </mat-expansion-panel-header>
-                      <app-patient-diagnoses-summary
-                        [isConfirmedDiagnosis]="true"
-                      ></app-patient-diagnoses-summary>
+                      <div
+                        *ngIf="dashboardParams?.formEntities['Visit Diagnoses']"
+                      >
+                        <app-patient-diagnoses-summary
+                          [isConfirmedDiagnosis]="true"
+                          [forConsultation]="true"
+                          [patientVisit]="activeVisit"
+                          [diagnosisFormDetails]="
+                            dashboardParams?.formEntities['Visit Diagnoses']
+                          "
+                        ></app-patient-diagnoses-summary>
+                      </div>
+                      <mat-progress-bar
+                        *ngIf="
+                          !dashboardParams?.formEntities['Visit Diagnoses']
+                        "
+                        mode="indeterminate"
+                      ></mat-progress-bar>
                     </mat-expansion-panel>
                   </mat-accordion>
 

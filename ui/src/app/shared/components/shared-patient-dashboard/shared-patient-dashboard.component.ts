@@ -46,6 +46,7 @@ import { getLoadingPaymentStatus } from "src/app/store/selectors/payment.selecto
 import { getApplicableForms } from "../../helpers/identify-applicable-forms.helper";
 const CONSULTATION_FORM_CONFIGS: FormConfig[] = [
   { name: "All orderables", formLevel: 5 },
+  { name: "Visit Diagnoses", formLevel: 2 },
 ];
 
 import { filter, map } from "lodash";
