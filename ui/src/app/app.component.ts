@@ -1,5 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
+import { ActivatedRoute } from "@angular/router";
 import { select, Store } from "@ngrx/store";
 import { Observable, timer } from "rxjs";
 import { LoginDialogComponent } from "./core/dialogs/login-dialog/login-dialog.component";
@@ -21,7 +22,8 @@ export class AppComponent implements OnInit {
   constructor(
     private store: Store<AppState>,
     private dialog: MatDialog,
-    private auth: AuthService
+    private auth: AuthService,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
@@ -32,7 +34,11 @@ export class AppComponent implements OnInit {
   monitorSession() {
     timer(2000, 10000).subscribe(() => {
       this.auth.session().subscribe((session) => {
-        if (!session?.authenticated && !this.isDialogOpen) {
+        if (
+          !session?.authenticated &&
+          !this.isDialogOpen &&
+          !window.location.href.includes("login")
+        ) {
           this.isDialogOpen = true;
           const dialog = this.dialog.open(LoginDialogComponent, {
             width: "25%",
