@@ -24,10 +24,10 @@ export class AuthGuard implements CanActivate {
       first(),
       map((session) => {
         const localSession = sessionStorage.getItem("JSESSIONID");
-        if (!session.authenticated || !localSession) {
+        if (!session?.authenticated || !localSession) {
           this.router.navigate(["/login"]);
         }
-        return session.authenticated;
+        return session?.authenticated;
       })
     );
   }
