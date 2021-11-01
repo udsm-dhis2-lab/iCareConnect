@@ -1,11 +1,11 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from "@angular/core";
 
-import { flatten } from 'lodash';
+import { flatten } from "lodash";
 
 @Component({
-  selector: 'app-procedures-history-summary',
-  templateUrl: './procedures-history-summary.component.html',
-  styleUrls: ['./procedures-history-summary.component.scss'],
+  selector: "app-procedures-history-summary",
+  templateUrl: "./procedures-history-summary.component.html",
+  styleUrls: ["./procedures-history-summary.component.scss"],
 })
 export class ProceduresHistorySummaryComponent implements OnInit {
   @Input() patientVisits: any[];

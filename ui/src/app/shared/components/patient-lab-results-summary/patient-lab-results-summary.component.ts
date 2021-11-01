@@ -1,34 +1,50 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { filter, each, keyBy, uniqBy } from 'lodash';
-import { Observable, of, zip } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
-import { OpenmrsHttpClientService } from '../../modules/openmrs-http-client/services/openmrs-http-client.service';
-import { Visit } from '../../resources/visits/models/visit.model';
+import { Component, Input, OnInit } from "@angular/core";
+import { FormControl } from "@angular/forms";
+import { Store } from "@ngrx/store";
+import { filter, each, keyBy, uniqBy } from "lodash";
+import { Observable, of, zip } from "rxjs";
+import { catchError, map } from "rxjs/operators";
+import { loadOrderTypes } from "src/app/store/actions";
+import { AppState } from "src/app/store/reducers";
+import { getAllOrderTypes } from "src/app/store/selectors";
+import { getProviderDetails } from "src/app/store/selectors/current-user.selectors";
+import { OpenmrsHttpClientService } from "../../modules/openmrs-http-client/services/openmrs-http-client.service";
+import { Visit } from "../../resources/visits/models/visit.model";
 
 @Component({
-  selector: 'app-patient-lab-results-summary',
-  templateUrl: './patient-lab-results-summary.component.html',
-  styleUrls: ['./patient-lab-results-summary.component.scss'],
+  selector: "app-patient-lab-results-summary",
+  templateUrl: "./patient-lab-results-summary.component.html",
+  styleUrls: ["./patient-lab-results-summary.component.scss"],
 })
 export class PatientLabResultsSummaryComponent implements OnInit {
   @Input() labConceptsTree: any;
   @Input() observations: any;
   @Input() patientVisit: Visit;
+  @Input() investigationAndProceduresFormsDetails: any;
   labOrdersResultsInformation: any[] = [];
   codedResultsData$: Observable<any>;
   keyedResults: any = {};
   testSetMembersDetails$: Observable<any>;
-  constructor(private openMRSHttpClient: OpenmrsHttpClientService) {}
+  @Input() forConsultation: boolean;
+  orderTypes$: Observable<any>;
+  provider$: Observable<any>;
+  constructor(
+    private openMRSHttpClient: OpenmrsHttpClientService,
+    private store: Store<AppState>
+  ) {}
 
   filteredLabTestsResults: Array<any>;
   labResultsObject: any = [];
 
   ngOnInit(): void {
+    this.store.dispatch(loadOrderTypes());
+    this.orderTypes$ = this.store.select(getAllOrderTypes);
+    this.provider$ = this.store.select(getProviderDetails);
     if (!this.patientVisit) {
       const labDeptConceptArray = filter(
         this.labConceptsTree?.setMembers,
         (setMember) => {
-          return setMember?.name === 'Lab departments' ? true : false;
+          return setMember?.name === "Lab departments" ? true : false;
         }
       );
 
@@ -40,10 +56,10 @@ export class PatientLabResultsSummaryComponent implements OnInit {
           each(departmentConcept?.setMembers, (testConcept) => {
             let test: any = {};
             if (testConcept?.setMembers?.length > 0) {
-              test['name'] = testConcept?.name;
-              test['value'] = null;
-              test['parameters'] = [];
-              test['concept'] = testConcept;
+              test["name"] = testConcept?.name;
+              test["value"] = null;
+              test["parameters"] = [];
+              test["concept"] = testConcept;
 
               each(testConcept?.setMembers, (parameter) => {
                 test?.parameters?.push({
@@ -57,12 +73,12 @@ export class PatientLabResultsSummaryComponent implements OnInit {
 
               this.labResultsObject.push(test);
             } else {
-              test['name'] = testConcept?.name;
-              test['value'] = this.observations[testConcept?.uuid]
+              test["name"] = testConcept?.name;
+              test["value"] = this.observations[testConcept?.uuid]
                 ? this.observations[testConcept?.uuid]?.latest
                 : null;
-              test['parameters'] = null;
-              test['concept'] = testConcept;
+              test["parameters"] = null;
+              test["concept"] = testConcept;
 
               this.labResultsObject.push(test);
             }
@@ -80,7 +96,7 @@ export class PatientLabResultsSummaryComponent implements OnInit {
         ? this.patientVisit.labOrders.map((labOrder: any) => {
             testsConcepts = uniqBy(
               [...testsConcepts, labOrder?.order?.concept],
-              'uuid'
+              "uuid"
             );
             // TODO: For multiple orders for the same test consider using encounter and dates
             const observation: any =
@@ -113,7 +129,7 @@ export class PatientLabResultsSummaryComponent implements OnInit {
 
       this.codedResultsData$.subscribe((data) => {
         if (data) {
-          this.keyedResults = keyBy(data, 'test');
+          this.keyedResults = keyBy(data, "test");
         }
       });
     }
@@ -149,10 +165,10 @@ export class PatientLabResultsSummaryComponent implements OnInit {
           .pipe(
             map((response) => {
               const shortNameDetails = (response.names.filter(
-                (name) => name.conceptNameType === 'SHORT'
+                (name) => name.conceptNameType === "SHORT"
               ) || [])[0];
               const fullSpecifiedNameDetails = (response.names.filter(
-                (name) => name.conceptNameType === 'FULLY_SPECIFIED'
+                (name) => name.conceptNameType === "FULLY_SPECIFIED"
               ) || [])[0];
               return {
                 coded: true,

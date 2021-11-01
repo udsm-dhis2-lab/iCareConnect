@@ -44,7 +44,7 @@
             {{ count + 1 }}
           </td>
           <td>
-            <p *ngIf="diagnosisInfo?.voided">
+            <span *ngIf="diagnosisInfo?.voided">
               <s>
                 {{
                   diagnosisInfo?.diagnosis?.display
@@ -52,14 +52,14 @@
                     : diagnosisInfo?.diagnosis?.coded?.display
                 }}
               </s>
-            </p>
-            <p *ngIf="!diagnosisInfo?.voided">
+            </span>
+            <span *ngIf="!diagnosisInfo?.voided">
               {{
                 diagnosisInfo?.diagnosis?.display
                   ? diagnosisInfo?.diagnosis?.display
                   : diagnosisInfo?.diagnosis?.coded?.display
               }}
-            </p>
+            </span>
           </td>
         </tr>
       </tbody>
@@ -94,7 +94,7 @@
               {{ count + 1 }}
             </td>
             <td>
-              <p *ngIf="diagnosisInfo?.voided">
+              <span *ngIf="diagnosisInfo?.voided">
                 <s>
                   {{
                     diagnosisInfo?.diagnosis?.display
@@ -102,14 +102,14 @@
                       : diagnosisInfo?.diagnosis?.coded?.display
                   }}
                 </s>
-              </p>
-              <p *ngIf="!diagnosisInfo?.voided">
+              </span>
+              <span *ngIf="!diagnosisInfo?.voided">
                 {{
                   diagnosisInfo?.diagnosis?.display
                     ? diagnosisInfo?.diagnosis?.display
                     : diagnosisInfo?.diagnosis?.coded?.display
                 }}
-              </p>
+              </span>
             </td>
             <td>
               {{ diagnosisInfo?.rank === 0 ? "Primary" : "Secondary" }}
