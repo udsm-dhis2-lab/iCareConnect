@@ -11,12 +11,12 @@ export class ReportsService {
   constructor(private httpClient: HttpClient) {}
 
   getReport(reportParams) {
-    console.log(
+    /*console.log(
       'SERVICE IMEITWA :: @@ ',
       `reportingrest/${reportParams?.reportGroup}/${
         reportParams?.reportId
       }?${reportParams?.params?.join('&')}`
-    );
+    );*/
 
     return this.httpClient
       .get(
