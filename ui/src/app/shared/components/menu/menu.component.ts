@@ -1,32 +1,32 @@
-import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
-import { select, Store } from '@ngrx/store';
-import { Observable } from 'rxjs';
-import { Location } from 'src/app/core/models';
-import { authenticateUser, logoutUser } from 'src/app/store/actions';
-import { AppState } from 'src/app/store/reducers';
+import { Component, OnInit } from "@angular/core";
+import { Router } from "@angular/router";
+import { select, Store } from "@ngrx/store";
+import { Observable } from "rxjs";
+import { Location } from "src/app/core/models";
+import { authenticateUser, logoutUser } from "src/app/store/actions";
+import { AppState } from "src/app/store/reducers";
 import {
   getChildLocationsOfTheFirstLevelParentLocation,
   getCurrentLocation,
-} from 'src/app/store/selectors';
+} from "src/app/store/selectors";
 import {
   getCurrentUserDetails,
   getUserAssignedLocations,
-} from 'src/app/store/selectors/current-user.selectors';
-import { UserGet } from 'src/app/shared/resources/openmrs';
-import { MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { LocationSelectModalComponent } from 'src/app/shared/components/location-select-modal/location-select-modal.component';
-import { showSearchPatientOnMenu } from 'src/app/store/selectors/ui.selectors';
-import { ChangePasswordComponent } from '../change-password/change-password.component';
+} from "src/app/store/selectors/current-user.selectors";
+import { UserGet } from "src/app/shared/resources/openmrs";
+import { MatDialog, MatDialogRef } from "@angular/material/dialog";
+import { LocationSelectModalComponent } from "src/app/shared/components/location-select-modal/location-select-modal.component";
+import { showSearchPatientOnMenu } from "src/app/store/selectors/ui.selectors";
+import { ChangePasswordComponent } from "../change-password/change-password.component";
 
 @Component({
-  selector: 'app-menu',
-  templateUrl: './menu.component.html',
-  styleUrls: ['./menu.component.scss'],
+  selector: "app-menu",
+  templateUrl: "./menu.component.html",
+  styleUrls: ["./menu.component.scss"],
 })
 export class MenuComponent implements OnInit {
   matDialogRef: MatDialogRef<ChangePasswordComponent>;
-  name: string = '';
+  name: string = "";
   currentUser$: Observable<UserGet>;
   locationsForCurrentUser$: Observable<Location[]>;
   currentLocation$: Observable<Location>;
@@ -49,7 +49,7 @@ export class MenuComponent implements OnInit {
 
   onRouteHome(e: Event): void {
     e.stopPropagation();
-    this.router.navigate(['']);
+    this.router.navigate([""]);
   }
 
   onLogOut(): void {
@@ -64,14 +64,14 @@ export class MenuComponent implements OnInit {
       e.stopPropagation();
     }
     this.dialog.open(LocationSelectModalComponent, {
-      width: '20%',
+      width: "20%",
       disableClose: true,
-      panelClass: 'custom-dialog-container',
+      panelClass: "custom-dialog-container",
     });
   }
   oncChangePassword() {
     this.matDialogRef = this.dialog.open(ChangePasswordComponent, {
-      width: '25%',
+      width: "25%",
       disableClose: true,
     });
   }
