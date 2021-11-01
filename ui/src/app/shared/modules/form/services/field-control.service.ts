@@ -1,9 +1,9 @@
-import { Injectable } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { Field } from '../models/field.model';
-import { FieldsData } from '../models/fields-data.model';
+import { Injectable } from "@angular/core";
+import { FormControl, FormGroup, Validators } from "@angular/forms";
+import { Field } from "../models/field.model";
+import { FieldsData } from "../models/fields-data.model";
 
-@Injectable({ providedIn: 'root' })
+@Injectable({ providedIn: "root" })
 export class FieldControlService {
   constructor() {}
 
@@ -11,18 +11,20 @@ export class FieldControlService {
     const group: any = {};
     fields.forEach((field) => {
       const fieldData = fieldsData ? fieldsData[field.id]?.latest : null;
-      group[field.key] = field.required
-        ? new FormControl(
-            {
-              value: fieldData?.value || field.value || '',
+      if (field?.key) {
+        group[field.key] = field.required
+          ? new FormControl(
+              {
+                value: fieldData?.value || field.value || "",
+                disabled: field?.disabled,
+              },
+              Validators.required
+            )
+          : new FormControl({
+              value: fieldData?.value || field.value || "",
               disabled: field?.disabled,
-            },
-            Validators.required
-          )
-        : new FormControl({
-            value: fieldData?.value || field.value || '',
-            disabled: field?.disabled,
-          });
+            });
+      }
     });
 
     return new FormGroup(group);
