@@ -281,18 +281,32 @@
                     class="mb-2 border p-0"
                     [expanded]="true"
                   >
-                    <mat-expansion-panel-header>
-                      <mat-panel-title>Laboratory Tests </mat-panel-title>
-                    </mat-expansion-panel-header>
-                    <app-patient-lab-results-summary
-                      *ngIf="activeVisit"
+                    <!-- <mat-expansion-panel-header>
+                      <mat-panel-title
+                        >Investigation / Procedures
+                      </mat-panel-title>
+                    </mat-expansion-panel-header> -->
+                    <app-patient-investigations-and-procedures
+                      *ngIf="
+                        activeVisit &&
+                        dashboardParams?.formEntities['All orderables']
+                      "
                       [observations]="
                         dashboardParams?.observationsGroupedByConcept
                       "
+                      [investigationAndProceduresFormsDetails]="
+                        dashboardParams?.formEntities['All orderables']
+                      "
                       [patientVisit]="activeVisit"
-                    ></app-patient-lab-results-summary>
+                      [forConsultation]="true"
+                    ></app-patient-investigations-and-procedures>
+
                     <mat-progress-bar
-                      *ngIf="dashboardParams?.loadingVisit || !activeVisit"
+                      *ngIf="
+                        dashboardParams?.loadingVisit ||
+                        !activeVisit ||
+                        !dashboardParams?.formEntities['All orderables']
+                      "
                       mode="indeterminate"
                     ></mat-progress-bar>
                   </mat-expansion-panel>
