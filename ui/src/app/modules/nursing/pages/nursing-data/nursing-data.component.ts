@@ -1,52 +1,46 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { select, Store } from '@ngrx/store';
-import { Observable } from 'rxjs';
-import { ProviderGetFull } from 'src/app/shared/resources/openmrs';
-import { Patient } from 'src/app/shared/resources/patient/models/patient.model';
-import { Visit } from 'src/app/shared/resources/visits/models/visit.model';
-import { AppState } from 'src/app/store/reducers';
-import { getCurrentLocation } from 'src/app/store/selectors';
-import { getCurrentPatient } from 'src/app/store/selectors/current-patient.selectors';
-import {
-  getCurrentUserPrivileges,
-  getProviderDetails,
-} from 'src/app/store/selectors/current-user.selectors';
-import {
-  getActiveVisit,
-  getActiveVisitDeathStatus,
-  getVisitLoadedState,
-} from 'src/app/store/selectors/visit.selectors';
-import { OpenMRSForm } from 'src/app/shared/modules/form/models/custom-openmrs-form.model';
-import { go, loadCustomOpenMRSForms } from 'src/app/store/actions';
-import { getCustomOpenMRSFormsByIds } from 'src/app/store/selectors/form.selectors';
-import { take } from 'rxjs/operators';
-import {
-  getGroupedObservationByConcept,
-  getSavingObservationStatus,
-} from 'src/app/store/selectors/observation.selectors';
-import {
-  saveObservations,
-  saveObservationsUsingEncounter,
-} from 'src/app/store/actions/observation.actions';
-import { ICARE_CONFIG } from 'src/app/shared/resources/config';
-
-import { map, filter } from 'lodash';
-import { getApplicableForms } from 'src/app/shared/helpers/identify-applicable-forms.helper';
-import { FormControl } from '@angular/forms';
+import { Component, Input, OnInit } from "@angular/core";
+import { FormControl } from "@angular/forms";
+import { MatDialog } from "@angular/material/dialog";
+import { select, Store } from "@ngrx/store";
+import { map } from "lodash";
+import { Observable } from "rxjs";
+import { AdmissionFormComponent } from "src/app/shared/components/admission-form/admission-form.component";
+import { PatientVisitHistoryModalComponent } from "src/app/shared/components/patient-visit-history-modal/patient-visit-history-modal.component";
+import { getApplicableForms } from "src/app/shared/helpers/identify-applicable-forms.helper";
+import { OpenMRSForm } from "src/app/shared/modules/form/models/custom-openmrs-form.model";
+import { ICARE_CONFIG } from "src/app/shared/resources/config";
+import { ProviderGetFull } from "src/app/shared/resources/openmrs";
+import { Patient } from "src/app/shared/resources/patient/models/patient.model";
+import { Visit } from "src/app/shared/resources/visits/models/visit.model";
+import { loadCustomOpenMRSForms } from "src/app/store/actions";
+import { clearBills } from "src/app/store/actions/bill.actions";
+import { saveObservationsUsingEncounter } from "src/app/store/actions/observation.actions";
+import { AppState } from "src/app/store/reducers";
+import { getCurrentLocation } from "src/app/store/selectors";
 import {
   getActiveVisitPendingVisitServiceBillStatus,
   getAllBills,
   getLoadingBillStatus,
-} from 'src/app/store/selectors/bill.selectors';
-import { clearBills } from 'src/app/store/actions/bill.actions';
-import { MatDialog } from '@angular/material/dialog';
-import { AdmissionFormComponent } from 'src/app/shared/components/admission-form/admission-form.component';
-import { PatientVisitHistoryModalComponent } from 'src/app/shared/components/patient-visit-history-modal/patient-visit-history-modal.component';
+} from "src/app/store/selectors/bill.selectors";
+import { getCurrentPatient } from "src/app/store/selectors/current-patient.selectors";
+import {
+  getCurrentUserPrivileges,
+  getProviderDetails,
+} from "src/app/store/selectors/current-user.selectors";
+import { getCustomOpenMRSFormsByIds } from "src/app/store/selectors/form.selectors";
+import {
+  getGroupedObservationByConcept,
+  getSavingObservationStatus,
+} from "src/app/store/selectors/observation.selectors";
+import {
+  getActiveVisit,
+  getActiveVisitDeathStatus,
+} from "src/app/store/selectors/visit.selectors";
 
 @Component({
-  selector: 'app-nursing-data',
-  templateUrl: './nursing-data.component.html',
-  styleUrls: ['./nursing-data.component.scss'],
+  selector: "app-nursing-data",
+  templateUrl: "./nursing-data.component.html",
+  styleUrls: ["./nursing-data.component.scss"],
 })
 export class NursingDataComponent implements OnInit {
   @Input() formPrivilegesConfigs: any;
@@ -131,31 +125,41 @@ export class NursingDataComponent implements OnInit {
     this.store.dispatch(clearBills());
   }
 
-  admitPatient(event: Event, currentPatient, visit): void {
+  admitPatient(
+    event: Event,
+    currentPatient,
+    visit,
+    sendToObservation: Boolean
+  ): void {
     event.stopPropagation();
 
     this.dialog.open(AdmissionFormComponent, {
-      height: '230px',
-      width: '45%',
+      height: "230px",
+      width: "45%",
       data: {
         patient: currentPatient,
         form: {
-          formUuid: 'd2c7532c-fb01-11e2-8ff2-fd54ab5fdb2a',
+          formUuid: "d2c7532c-fb01-11e2-8ff2-fd54ab5fdb2a",
         },
         visit,
-        path: '/nursing',
+        path: "/nursing",
+        sendToObservation,
       },
       disableClose: false,
-      panelClass: 'custom-dialog-container',
+      panelClass: "custom-dialog-container",
     });
   }
 
-  viewPatientHistory(event: Event, patientUuid) {
+  viewPatientHistory(
+    event: Event,
+    patientUuid: any,
+    params: { location: any }
+  ) {
     event.stopPropagation();
     this.dialog.open(PatientVisitHistoryModalComponent, {
-      width: '85%',
-      minHeight: '75vh',
-      data: { patientUuid, vitals: true },
+      minWidth: "40%",
+      minHeight: "auto",
+      data: { patientUuid, vitals: true, location: params?.location },
     });
   }
 }
