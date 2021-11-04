@@ -1,10 +1,10 @@
-import { createSelector } from '@ngrx/store';
-import { getRootState, AppState } from '../reducers';
-import { DHIS2ReportsAdapter, DHIS2ReportsState } from '../states';
+import { createSelector } from "@ngrx/store";
+import { getRootState, AppState } from "../reducers";
+import { DHIS2ReportsAdapter, DHIS2ReportsState } from "../states";
 
-import { filter, uniqBy } from 'lodash';
-import { addComparisonBetweenCurrentDataAndDataSent } from 'src/app/shared/helpers/format-report.helper';
-import { getMonthYearRepresentation } from 'src/app/shared/helpers/format-date.helper';
+import { filter, uniqBy } from "lodash";
+import { addComparisonBetweenCurrentDataAndDataSent } from "src/app/shared/helpers/format-report.helper";
+import { getMonthYearRepresentation } from "src/app/shared/helpers/format-date.helper";
 
 const getDHIS2ReportsState = createSelector(
   getRootState,
@@ -44,11 +44,13 @@ export const getDHIS2LoadedReportsById = createSelector(
   getAllReports,
   getAllReportLogs,
   (reports, reportLogs, props) => {
-    return (filter(reports, { id: props?.id + '-' + props?.periodId }) || [])
+    // console.log("what is here :: ", props?.id + "-" + props?.periodId);
+
+    return (filter(reports, { id: props?.id + "-" + props?.periodId }) || [])
       ?.length > 0
       ? addComparisonBetweenCurrentDataAndDataSent(
           {
-            ...(filter(reports, { id: props?.id + '-' + props?.periodId }) ||
+            ...(filter(reports, { id: props?.id + "-" + props?.periodId }) ||
               [])[0],
             logs: reportLogs[props?.id],
           },
@@ -105,7 +107,7 @@ export const getCurrentLoadedReport = createSelector(
   (period, reports, props) => {
     if (period) {
       return (filter(reports, {
-        id: 'dhis2.sqlGet.' + props?.id + '-' + period?.id,
+        id: "dhis2.sqlGet." + props?.id + "-" + period?.id,
       }) || [])[0];
     } else {
       return null;
@@ -121,7 +123,7 @@ export const getCurrentReportLogs = createSelector(
 export const getCountOfCurrentReportSubmittedToDHIS2 = createSelector(
   getDHIS2ReportsState,
   (state: DHIS2ReportsState) =>
-    (uniqBy(state.currentReportHistoryDetails, 'period') || [])?.length
+    (uniqBy(state.currentReportHistoryDetails, "period") || [])?.length
 );
 
 export const getCurrentReportsSubmittedHistory = createSelector(
@@ -135,7 +137,7 @@ export const getCurrentReportsSubmittedHistory = createSelector(
         payload: JSON.parse(log?.payload),
         response_dhis: JSON.parse(log?.response_dhis),
         user: {
-          display: log?.user?.display.split(' (')[0],
+          display: log?.user?.display.split(" (")[0],
         },
       };
     })
