@@ -62,7 +62,7 @@ export class ReportPeriodFilterComponent implements OnInit, OnChanges {
     } else if (this.reportConfigs?.reportingFrequency === "Daily") {
       this.selectedPeriod.emit(this.formatDate(this.selectedDay));
     } else if (this.reportConfigs?.reportingFrequency === "Range") {
-      console.log("For range picker");
+      // console.log("For range picker");
       // console.log("this.onDateChange()", this.onDateChange());
       // this.selectedPeriod.emit(this.onDateChange());
     }

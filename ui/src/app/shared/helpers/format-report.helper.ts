@@ -164,7 +164,7 @@ function formatReportDataKeys(keys) {
 }
 
 function formatResponseData(dataRows, elements) {
-  console.log(
+  /*console.log(
     'formatted rows :: ',
     _.map(dataRows, (row) => {
       const keys = Object.keys(row);
@@ -184,7 +184,7 @@ function formatResponseData(dataRows, elements) {
       });
       return formattedRow;
     })
-  );
+  ); */
   return _.map(dataRows, (row) => {
     const keys = Object.keys(row);
     let formattedRow = {};

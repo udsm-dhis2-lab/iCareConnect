@@ -5,24 +5,24 @@ import {
   OnChanges,
   OnInit,
   Output,
-} from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
-import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs';
-import { loadReport } from 'src/app/store/actions';
-import { AppState } from 'src/app/store/reducers';
+} from "@angular/core";
+import { MatDialog } from "@angular/material/dialog";
+import { Store } from "@ngrx/store";
+import { Observable } from "rxjs";
+import { loadReport } from "src/app/store/actions";
+import { AppState } from "src/app/store/reducers";
 import {
   getDHIS2LoadedReportsById,
   getDhis2ReportLoadingError,
   getDhis2ReportLoadingState,
   getDHIS2ReportsLoadedState,
-} from 'src/app/store/selectors/dhis2-reports.selectors';
-import { DataHistoryModalComponent } from '../data-history-modal/data-history-modal.component';
+} from "src/app/store/selectors/dhis2-reports.selectors";
+import { DataHistoryModalComponent } from "../data-history-modal/data-history-modal.component";
 
 @Component({
-  selector: 'app-report',
-  templateUrl: './report.component.html',
-  styleUrls: ['./report.component.scss'],
+  selector: "app-report",
+  templateUrl: "./report.component.html",
+  styleUrls: ["./report.component.scss"],
 })
 export class ReportComponent implements OnInit, OnChanges {
   @Input() period: any;
@@ -64,6 +64,8 @@ export class ReportComponent implements OnInit, OnChanges {
     this.reportErrorState$ = this.store.select(getDhis2ReportLoadingError);
     this.reportLoadingState$ = this.store.select(getDhis2ReportLoadingState);
 
+    // console.log("period into the select :: ", this.period?.id);
+
     this.report$ = this.store.select(getDHIS2LoadedReportsById, {
       id: this.reportConfigs?.id,
       periodId: this.period?.id,
@@ -82,10 +84,10 @@ export class ReportComponent implements OnInit, OnChanges {
         dataChangesDetails: dataChangesDetails,
         elementHeader: elementHeader,
       },
-      minHeight: '180px',
-      maxHeight: '220px',
-      width: '400px',
-      panelClass: 'custom-dialog-container',
+      minHeight: "180px",
+      maxHeight: "220px",
+      width: "400px",
+      panelClass: "custom-dialog-container",
       disableClose: false,
     });
   }

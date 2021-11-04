@@ -1,18 +1,18 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { select, Store } from '@ngrx/store';
-import { forkJoin, Observable, zip } from 'rxjs';
-import { AppState } from 'src/app/store/reducers';
+import { Component, Input, OnInit } from "@angular/core";
+import { select, Store } from "@ngrx/store";
+import { forkJoin, Observable, zip } from "rxjs";
+import { AppState } from "src/app/store/reducers";
 import {
   getCountOfCurrentReportSubmittedToDHIS2,
   getDHIS2ReportsConfigsById,
   getDHIS2ReportsLoadedState,
   getParentLocationTree,
-} from 'src/app/store/selectors';
-import { ReportGroup } from '../../models/report-group.model';
-import { Report } from '../../models/report.model';
-import { ReportParamsService } from '../../services/report-params.service';
-import { ReportService } from '../../services/report.service';
-import * as _ from 'lodash';
+} from "src/app/store/selectors";
+import { ReportGroup } from "../../models/report-group.model";
+import { Report } from "../../models/report.model";
+import { ReportParamsService } from "../../services/report-params.service";
+import { ReportService } from "../../services/report.service";
+import * as _ from "lodash";
 import {
   clearSendingDataStatus,
   loadAllLocations,
@@ -20,17 +20,17 @@ import {
   loadReport,
   loadReportLogs,
   setCurrentPeriod,
-} from 'src/app/store/actions';
-import { SendToDhis2ModalComponent } from '../../components/send-to-dhis2-modal/send-to-dhis2-modal.component';
-import { SendingStatusModalComponent } from '../../components/sending-status-modal/sending-status-modal.component';
-import { take } from 'rxjs/operators';
-import { MatDialog } from '@angular/material/dialog';
-import { ExportDataService } from 'src/app/core/services/export-data.service';
+} from "src/app/store/actions";
+import { SendToDhis2ModalComponent } from "../../components/send-to-dhis2-modal/send-to-dhis2-modal.component";
+import { SendingStatusModalComponent } from "../../components/sending-status-modal/sending-status-modal.component";
+import { take } from "rxjs/operators";
+import { MatDialog } from "@angular/material/dialog";
+import { ExportDataService } from "src/app/core/services/export-data.service";
 
 @Component({
-  selector: 'app-reports-generator',
-  templateUrl: './reports-generator.component.html',
-  styleUrls: ['./reports-generator.component.scss'],
+  selector: "app-reports-generator",
+  templateUrl: "./reports-generator.component.html",
+  styleUrls: ["./reports-generator.component.scss"],
 })
 export class ReportsGeneratorComponent implements OnInit {
   @Input() reportsAccessConfigurations: any;
@@ -43,7 +43,7 @@ export class ReportsGeneratorComponent implements OnInit {
   reportLoaded$: Observable<boolean>;
   loadingReportGroup: boolean;
   locations$: Observable<any>;
-  searchText: string = '';
+  searchText: string = "";
   dhisReport: boolean;
   reportCategories: any[];
   currentReportGroup: ReportGroup;
@@ -107,7 +107,7 @@ export class ReportsGeneratorComponent implements OnInit {
     let extraParamsArray =
       this.reportsExtraParams?.results?.length > 0
         ? _.filter(this.reportsExtraParams?.results, (res) => {
-            return res?.property == 'dhis.reportsConfigs' ? true : false;
+            return res?.property == "dhis.reportsConfigs" ? true : false;
           })
         : [];
     this.reportsExtraParams =
@@ -115,7 +115,7 @@ export class ReportsGeneratorComponent implements OnInit {
         ? JSON.parse(extraParamsArray[0]?.value)
         : [];
 
-    this.keyedReportsExtraParameters = _.keyBy(this.reportsExtraParams, 'id');
+    this.keyedReportsExtraParameters = _.keyBy(this.reportsExtraParams, "id");
 
     _.each(this.reportGroups, (reportGroup) => {
       this.reports = _.concat(
@@ -130,11 +130,11 @@ export class ReportsGeneratorComponent implements OnInit {
       );
     });
 
-    console.log('reports', this.reports);
+    // console.log("reports", this.reports);
 
     this.store.dispatch(loadDHIS2ReportsConfigs());
     // this.store.dispatch(loadAllLocations());
-    this.currentVisualization = 'TABLE';
+    this.currentVisualization = "TABLE";
     this.loadingReportGroup = true;
 
     this.reportLoaded$ = this.store.select(getDHIS2ReportsLoadedState);
@@ -208,30 +208,30 @@ export class ReportsGeneratorComponent implements OnInit {
       getCountOfCurrentReportSubmittedToDHIS2
     );
 
-    console.log('report :: ', report);
+    // console.log("report :: ", report);
     this.currentReport = report;
 
     let ageParams = _.filter(report?.otherParameters, (param) => {
-      return param?.id == 'maxAge' ||
-        param?.id == 'minAge' ||
-        param?.id == 'age'
+      return param?.id == "maxAge" ||
+        param?.id == "minAge" ||
+        param?.id == "age"
         ? true
         : false;
     });
 
-    this.currentReport['otherParameters'] = _.filter(
+    this.currentReport["otherParameters"] = _.filter(
       this.currentReport?.otherParameters,
       (param) => {
-        return param?.id == 'maxAge' ||
-          param?.id == 'minAge' ||
-          param?.id == 'age'
+        return param?.id == "maxAge" ||
+          param?.id == "minAge" ||
+          param?.id == "age"
           ? false
           : true;
       }
     );
 
     if (ageParams?.length > 0) {
-      this.currentReport['ageParameters'] = ageParams;
+      this.currentReport["ageParameters"] = ageParams;
     }
 
     const matchedReportWithParametersConfigs =
@@ -273,10 +273,10 @@ export class ReportsGeneratorComponent implements OnInit {
           period: this.period,
           report: currentReport,
         },
-        minHeight: '180px',
-        maxHeight: '200px',
-        width: '400px',
-        panelClass: 'custom-dialog-container',
+        minHeight: "180px",
+        maxHeight: "200px",
+        width: "400px",
+        panelClass: "custom-dialog-container",
         disableClose: false,
       })
       .afterClosed()
@@ -291,10 +291,10 @@ export class ReportsGeneratorComponent implements OnInit {
                 period: this.period,
                 report: currentReport,
               },
-              minHeight: '310px',
-              maxHeight: '310px',
-              width: '380px',
-              panelClass: 'custom-dialog-container',
+              minHeight: "310px",
+              maxHeight: "310px",
+              width: "380px",
+              panelClass: "custom-dialog-container",
               disableClose: false,
             })
             .afterClosed()
@@ -315,6 +315,8 @@ export class ReportsGeneratorComponent implements OnInit {
       //   this.renderDhisReport = true;
       // }, 100);
 
+      this.showReportArea = false;
+
       const params =
         this.period?.startDate && this.period?.endDate
           ? {
@@ -331,7 +333,7 @@ export class ReportsGeneratorComponent implements OnInit {
               ],
             }
           : {
-              reportName: 'dhis2.sqlGet.' + reportConfigs?.id,
+              reportName: "dhis2.sqlGet." + reportConfigs?.id,
               date: period?.date,
               periodId: period?.id ? period?.id : period.periodId,
               configs: reportConfigs,
@@ -340,6 +342,10 @@ export class ReportsGeneratorComponent implements OnInit {
       // console.log('params before the dispatch : ', params);
 
       this.store.dispatch(loadReport({ params }));
+
+      setTimeout(() => {
+        this.showReportArea = true;
+      }, 200);
     } else {
       this.loadingReport = true;
       this.reportData = null;
@@ -384,7 +390,7 @@ export class ReportsGeneratorComponent implements OnInit {
         //console.log(res);
       },
       (error) => {
-        console.log('error :: ', error);
+        // console.log("error :: ", error);
       }
     );
   }
@@ -405,7 +411,7 @@ export class ReportsGeneratorComponent implements OnInit {
       if (
         _.filter(dataSet?.metadata?.columns, (metadataColumn) => {
           return (
-            metadataColumn?.name && metadataColumn?.name.startsWith('DXConcept')
+            metadataColumn?.name && metadataColumn?.name.startsWith("DXConcept")
           );
         })?.length > 0
       ) {
