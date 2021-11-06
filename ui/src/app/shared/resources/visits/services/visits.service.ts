@@ -1,7 +1,7 @@
 import { flatten } from "@angular/compiler";
 import { Injectable } from "@angular/core";
 import { DomSanitizer } from "@angular/platform-browser";
-import { isArray, omit } from "lodash";
+import { isArray, omit, orderBy } from "lodash";
 import { from, Observable, of, zip } from "rxjs";
 import { catchError, map } from "rxjs/operators";
 import { BillingService } from "src/app/modules/billing/services/billing.service";
@@ -313,9 +313,13 @@ export class VisitsService {
           .map((visitResult: any) => new Visit(visitResult, null, null))
           .filter((visit) => visit);
         return includeInactive && omitCurrentVisit
-          ? visits.filter(
-              (visitDetails) => visitDetails?.visit?.stopDatetime
-            ) || []
+          ? orderBy(
+              visits.filter(
+                (visitDetails) => visitDetails?.visit?.stopDatetime
+              ) || [],
+              ["startDatetime"],
+              ["desc"]
+            )
           : includeInactive && !omitCurrentVisit
           ? visits
           : visits[0];

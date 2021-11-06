@@ -18,7 +18,7 @@ export class PatientVisitHistoryModalComponent implements OnInit {
   visits: any[];
   patientVisits$: Observable<any>;
   patientUuid: string;
-  location: Boolean;
+  shouldShowVitalsOnly: Boolean;
   omitCurrent: boolean = true;
   forms$: Observable<any[]>;
   constructor(
@@ -28,11 +28,12 @@ export class PatientVisitHistoryModalComponent implements OnInit {
     private store: Store<AppState>
   ) {
     this.patientUuid = data?.patientUuid;
-    this.location =
-      data?.location?.tags &&
-      data?.location?.tags.find(({ name }) => name === "Triage Location")
-        ? true
-        : false;
+    this.shouldShowVitalsOnly = data?.shouldShowVitalsOnly
+      ? data?.shouldShowVitalsOnly
+      : data?.location?.tags &&
+        data?.location?.tags.find(({ name }) => name === "Triage Location")
+      ? true
+      : false;
   }
 
   ngOnInit(): void {

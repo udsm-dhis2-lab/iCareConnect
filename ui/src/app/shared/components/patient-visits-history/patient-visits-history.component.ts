@@ -1,4 +1,5 @@
 import { Component, Input, OnInit } from "@angular/core";
+import { getVitalsFromVisitDetails } from "src/app/core";
 import { Visit } from "../../resources/visits/models/visit.model";
 
 @Component({
@@ -10,11 +11,16 @@ export class PatientVisitsHistoryComponent implements OnInit {
   @Input() patientVisits: Visit[];
   @Input() shouldShowPatientClinicalSummary: boolean;
   @Input() forms: any[];
-  @Input() location: Boolean;
+  @Input() shouldShowVitalsOnly: Boolean;
   currentPatientVisit: Visit;
+  vitalsForm: any;
   constructor() {}
 
   ngOnInit(): void {
+    // TODO: Put form uuid on configurations
+    this.vitalsForm = (this.forms.filter(
+      (form) => form?.name?.toLowerCase().indexOf("vitals") === 0
+    ) || [])[0];
     this.currentPatientVisit =
       this.patientVisits?.length > 0 ? this.patientVisits[0] : null;
   }

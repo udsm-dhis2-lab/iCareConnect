@@ -1,36 +1,36 @@
-import { Component, Input, OnInit, Provider } from '@angular/core';
-import { FormControl } from '@angular/forms';
-import { MatDialog } from '@angular/material/dialog';
-import { select, Store } from '@ngrx/store';
-import { map } from 'lodash';
-import { Observable } from 'rxjs';
-import { CreatePatientBedOrderModalComponent } from 'src/app/shared/components/create-patient-bed-order-modal/create-patient-bed-order-modal.component';
-import { DischargePatientModalComponent } from 'src/app/shared/components/discharge-patient-modal/discharge-patient-modal.component';
-import { TransferPatientOutsideComponent } from 'src/app/shared/components/transfer-patient-outside/transfer-patient-outside.component';
-import { TransferWithinComponent } from 'src/app/shared/components/transfer-within/transfer-within.component';
-import { getApplicableForms } from 'src/app/shared/helpers/identify-applicable-forms.helper';
-import { ICARE_CONFIG } from 'src/app/shared/resources/config';
-import { Patient } from 'src/app/shared/resources/patient/models/patient.model';
-import { Visit } from 'src/app/shared/resources/visits/models/visit.model';
-import { loadCustomOpenMRSForms } from 'src/app/store/actions';
-import { clearBills } from 'src/app/store/actions/bill.actions';
-import { saveObservationsUsingEncounter } from 'src/app/store/actions/observation.actions';
-import { AppState } from 'src/app/store/reducers';
-import { getCustomOpenMRSFormsByIds } from 'src/app/store/selectors/form.selectors';
+import { Component, Input, OnInit, Provider } from "@angular/core";
+import { FormControl } from "@angular/forms";
+import { MatDialog } from "@angular/material/dialog";
+import { select, Store } from "@ngrx/store";
+import { map } from "lodash";
+import { Observable } from "rxjs";
+import { CreatePatientBedOrderModalComponent } from "src/app/shared/components/create-patient-bed-order-modal/create-patient-bed-order-modal.component";
+import { DischargePatientModalComponent } from "src/app/shared/components/discharge-patient-modal/discharge-patient-modal.component";
+import { TransferPatientOutsideComponent } from "src/app/shared/components/transfer-patient-outside/transfer-patient-outside.component";
+import { TransferWithinComponent } from "src/app/shared/components/transfer-within/transfer-within.component";
+import { getApplicableForms } from "src/app/shared/helpers/identify-applicable-forms.helper";
+import { ICARE_CONFIG } from "src/app/shared/resources/config";
+import { Patient } from "src/app/shared/resources/patient/models/patient.model";
+import { Visit } from "src/app/shared/resources/visits/models/visit.model";
+import { loadCustomOpenMRSForms } from "src/app/store/actions";
+import { clearBills } from "src/app/store/actions/bill.actions";
+import { saveObservationsUsingEncounter } from "src/app/store/actions/observation.actions";
+import { AppState } from "src/app/store/reducers";
+import { getCustomOpenMRSFormsByIds } from "src/app/store/selectors/form.selectors";
 import {
   getGroupedObservationByConcept,
   getSavingObservationStatus,
-} from 'src/app/store/selectors/observation.selectors';
+} from "src/app/store/selectors/observation.selectors";
 import {
   addBillStatusOnBedOrders,
   getCountOfUnPaidBedOrders,
-} from '../../helpers/sanitize-bed-orders.helper';
-import { AssignBedToPatientComponent } from '../assign-bed-to-patient/assign-bed-to-patient.component';
+} from "../../helpers/sanitize-bed-orders.helper";
+import { AssignBedToPatientComponent } from "../assign-bed-to-patient/assign-bed-to-patient.component";
 
 @Component({
-  selector: 'app-inpatient',
-  templateUrl: './inpatient.component.html',
-  styleUrls: ['./inpatient.component.scss'],
+  selector: "app-inpatient",
+  templateUrl: "./inpatient.component.html",
+  styleUrls: ["./inpatient.component.scss"],
 })
 export class InpatientComponent implements OnInit {
   @Input() activeVisit: Visit;
@@ -63,7 +63,7 @@ export class InpatientComponent implements OnInit {
       this.activeVisit.otherOrders?.length > 0
         ? this.activeVisit.otherOrders.filter(
             (otherOrder) =>
-              otherOrder?.order?.orderType?.name.toLowerCase() === 'bed order'
+              otherOrder?.order?.orderType?.name.toLowerCase() === "bed order"
           ) || []
         : [];
     this.bedOrdersWithBillStatus = addBillStatusOnBedOrders(
@@ -89,7 +89,7 @@ export class InpatientComponent implements OnInit {
     const locationFormsAttributes =
       this.bedsByLocationDetails.attributes.filter(
         (attribute) =>
-          attribute?.attributeType?.display.toLowerCase() === 'forms'
+          attribute?.attributeType?.display.toLowerCase() === "forms"
       ) || [];
     const formsAssignedToCurrentLocation =
       locationFormsAttributes?.length > 0
@@ -131,8 +131,8 @@ export class InpatientComponent implements OnInit {
   onAdmit(e, location, patient, provider, visit, bedOrdersWithBillStatus) {
     e.stopPropagation();
     this.dialog.open(AssignBedToPatientComponent, {
-      width: '70%',
-      height: '570px',
+      width: "70%",
+      height: "570px",
       data: {
         location,
         patient,
@@ -141,7 +141,7 @@ export class InpatientComponent implements OnInit {
         bedOrdersWithBillStatus,
       },
       disableClose: true,
-      panelClass: 'custom-dialog-container',
+      panelClass: "custom-dialog-container",
     });
   }
 
@@ -174,36 +174,37 @@ export class InpatientComponent implements OnInit {
   transferPatient(event: Event, visit): void {
     event.stopPropagation();
     this.dialog.open(TransferWithinComponent, {
-      height: '250px',
-      width: '40%',
+      height: "250px",
+      width: "40%",
       data: {
         patient: this.currentPatient,
-        form: { form: { formUuid: null }, locationType: 'Bed Location' },
+        form: { form: { formUuid: null } },
         visit,
-        path: '/inpatient',
+        locationType: "Bed Location",
+        path: "/inpatient",
       },
       disableClose: false,
-      panelClass: 'custom-dialog-container',
+      panelClass: "custom-dialog-container",
     });
   }
 
   transferPatientOutSide(event: Event, visit): void {
     event.stopPropagation();
     this.dialog.open(TransferPatientOutsideComponent, {
-      minHeight: '250px',
-      width: '70%',
+      minHeight: "250px",
+      width: "70%",
       data: {
         patient: this.currentPatient,
         form: {
-          formUuid: 'iCARE703-FORM-4df6-a364-abc9b1f48193',
-          locationType: 'Refer-to Location',
+          formUuid: "iCARE703-FORM-4df6-a364-abc9b1f48193",
+          locationType: "Refer-to Location",
         },
         visit,
-        path: '/inpatient/dashboard/' + this.currentPatient['patient']['uuid'],
-        params: { patient: this.currentPatient['patient']['uuid'] },
+        path: "/inpatient/dashboard/" + this.currentPatient["patient"]["uuid"],
+        params: { patient: this.currentPatient["patient"]["uuid"] },
       },
       disableClose: false,
-      panelClass: 'custom-dialog-container',
+      panelClass: "custom-dialog-container",
     });
   }
 
@@ -216,7 +217,7 @@ export class InpatientComponent implements OnInit {
   ) {
     event.stopPropagation();
     this.dialog.open(DischargePatientModalComponent, {
-      width: '30%',
+      width: "30%",
       data: {
         ...visit,
         provider,
@@ -230,7 +231,7 @@ export class InpatientComponent implements OnInit {
     event.stopPropagation();
     this.dialog
       .open(CreatePatientBedOrderModalComponent, {
-        width: '30%',
+        width: "30%",
         data: {
           ...visit,
           provider,
