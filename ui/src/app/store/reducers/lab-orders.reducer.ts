@@ -1,5 +1,5 @@
-import { createReducer, on } from '@ngrx/store';
-import { initialLabOrdersState, labOrderAdapter } from '../states';
+import { createReducer, on } from "@ngrx/store";
+import { initialLabOrdersState, labOrderAdapter } from "../states";
 import {
   createLabOrder,
   upsertLabOrder,
@@ -17,7 +17,10 @@ import {
   addSampleContainers,
   addTestContainers,
   clearLoadedLabOrders,
-} from '../actions';
+  deleteLabOrder,
+  voidLabOrder,
+  upsertLabOrders,
+} from "../actions";
 
 const reducer = createReducer(
   initialLabOrdersState,
@@ -72,6 +75,14 @@ const reducer = createReducer(
       creatingLabOrderFails: false,
     })
   ),
+  on(upsertLabOrders, (state, { labOrders }) =>
+    labOrderAdapter.upsertMany(labOrders, {
+      ...state,
+      creatingLabOrderSuccess: true,
+      creatingLabOrder: false,
+      creatingLabOrderFails: false,
+    })
+  ),
   on(clearLoadedLabOrders, (state) =>
     labOrderAdapter.removeAll({
       ...state,
@@ -104,7 +115,20 @@ const reducer = createReducer(
     ...state,
     failedOrders: [],
   })),
-  on(clearLabOrders, (state) => labOrderAdapter.removeAll({ ...state }))
+  on(clearLabOrders, (state) => labOrderAdapter.removeAll({ ...state })),
+  on(deleteLabOrder, (state) => ({
+    ...state,
+    voidingOrder: true,
+    voidedOrder: false,
+  })),
+  on(voidLabOrder, (state, { uuid }) => {
+    const matchedOrder = { ...state.entities[uuid], voided: true };
+    return labOrderAdapter.upsertOne(matchedOrder, {
+      ...state,
+      voidingOrder: false,
+      voidedOrder: true,
+    });
+  })
 );
 
 export function labOrderReducer(state, action) {

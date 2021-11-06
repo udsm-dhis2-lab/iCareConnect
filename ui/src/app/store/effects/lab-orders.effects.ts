@@ -1,6 +1,6 @@
-import { Injectable } from '@angular/core';
-import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { InvestigationProcedureService } from 'src/app/shared/resources/investigation-procedure/services/investigation-procedure.service';
+import { Injectable } from "@angular/core";
+import { Actions, createEffect, ofType } from "@ngrx/effects";
+import { InvestigationProcedureService } from "src/app/shared/resources/investigation-procedure/services/investigation-procedure.service";
 import {
   addCollectedLabOrders,
   addLabDepartments,
@@ -11,23 +11,27 @@ import {
   createLabOrder,
   createLabOrders,
   creatingLabOrdersFail,
+  deleteLabOrder,
   loadingLabOrderInformationFails,
   loadLabOrders,
   loadLabOrdersMetaDataDependencies,
   removeLabOrder,
   upsertLabOrder,
+  upsertLabOrders,
+  voidLabOrder,
   voidOrder,
-} from '../actions';
-import { switchMap, map, catchError } from 'rxjs/operators';
-import { of } from 'rxjs';
+} from "../actions";
+import { switchMap, map, catchError } from "rxjs/operators";
+import { of } from "rxjs";
 
-import * as _ from 'lodash';
+import * as _ from "lodash";
 import {
   Notification,
   NotificationService,
-} from 'src/app/shared/services/notification.service';
-import { loadActiveVisit } from '../actions/visit.actions';
-import { VisitsService } from 'src/app/shared/services/visits.service';
+} from "src/app/shared/services/notification.service";
+import { loadActiveVisit } from "../actions/visit.actions";
+import { VisitsService } from "src/app/shared/services/visits.service";
+import { OrdersService } from "src/app/shared/resources/order/services/orders.service";
 
 @Injectable()
 export class LabOrdersEffects {
@@ -35,7 +39,8 @@ export class LabOrdersEffects {
     private actions$: Actions,
     private notificationService: NotificationService,
     private investigationProcedureService: InvestigationProcedureService,
-    private visitService: VisitsService
+    private visitService: VisitsService,
+    private ordersService: OrdersService
   ) {}
 
   labOrderCreateUsingEncounter$ = createEffect(() =>
@@ -44,40 +49,41 @@ export class LabOrdersEffects {
       switchMap((action) => {
         this.notificationService.show(
           new Notification({
-            message: 'Saving orders',
-            type: 'LOADING',
+            message: "Saving orders",
+            type: "LOADING",
           })
         );
         const data = {
           uuid: action.orders[0]?.encounter,
           orders: action.orders.map((order) => {
-            const formattedOrder = _.omit(order, 'encounter');
+            const formattedOrder = _.omit(order, "encounter");
             return formattedOrder;
           }),
         };
         return this.investigationProcedureService
           .saveOrdersUsingEncounter(data, action.orders[0]?.encounter)
           .pipe(
-            switchMap((labOrderResponse: any) => {
+            switchMap((labOrdersResponse: any) => {
               this.notificationService.show(
                 new Notification({
-                  message: 'Saved successfully',
-                  type: 'SUCCESS',
+                  message: "Saved successfully",
+                  type: "SUCCESS",
                 })
               );
+
+              const newLabOrders = action.orders;
               return [
-                upsertLabOrder({
-                  labOrder: { ...labOrderResponse, id: labOrderResponse?.uuid },
+                upsertLabOrders({
+                  labOrders: newLabOrders,
                 }),
-                loadActiveVisit({ patientId: action.patientId }),
               ];
             }),
             catchError((error) => {
-              if (error && error.hasOwnProperty('error')) {
+              if (error && error.hasOwnProperty("error")) {
                 this.notificationService.show(
                   new Notification({
-                    message: 'Failed',
-                    type: 'ERROR',
+                    message: "Failed",
+                    type: "ERROR",
                   })
                 );
               }
@@ -104,7 +110,7 @@ export class LabOrdersEffects {
             switchMap((response) => {
               const groupByPatientsLabOrders = _.groupBy(
                 response[0],
-                'identifier'
+                "identifier"
               );
               const testContainers = keyLevelTwoConceptSetMembers(
                 response[1]?.setMembers
@@ -115,9 +121,9 @@ export class LabOrdersEffects {
                 _.map(sample?.orders, (order) => {
                   collectedLabOrdersFormatted[
                     sample?.visit?.uuid +
-                      '-' +
+                      "-" +
                       order?.order?.concept?.uuid +
-                      '-' +
+                      "-" +
                       order?.order?.uuid
                   ] = {
                     orderUuid: order?.order?.uuid,
@@ -134,7 +140,7 @@ export class LabOrdersEffects {
                       : new Date(sample?.created).getTime(),
                     unFormattedSampleCollectionDate: sample?.created,
                     priorityHigh:
-                      (_.filter(sample?.statuses, { status: 'HIGH' }) || [])
+                      (_.filter(sample?.statuses, { status: "HIGH" }) || [])
                         ?.length > 0
                         ? true
                         : false,
@@ -154,7 +160,7 @@ export class LabOrdersEffects {
                             testAllocation?.statuses?.length > 0 &&
                             (
                               _.filter(testAllocation?.statuses, {
-                                status: 'APPROVED',
+                                status: "APPROVED",
                               }) || []
                             )?.length > 0
                               ? true
@@ -164,7 +170,7 @@ export class LabOrdersEffects {
                             testAllocation?.statuses?.length > 0 &&
                             (
                               _.filter(testAllocation?.statuses, {
-                                status: 'APPROVED',
+                                status: "APPROVED",
                               }) || []
                             )?.length > 1
                               ? true
@@ -174,7 +180,7 @@ export class LabOrdersEffects {
                             testAllocation?.statuses?.length > 0 &&
                             (
                               _.filter(testAllocation?.statuses, {
-                                status: 'APPROVED',
+                                status: "APPROVED",
                               }) || []
                             )?.length > 1
                               ? true
@@ -188,7 +194,7 @@ export class LabOrdersEffects {
                     reCollect:
                       (
                         _.filter(sample?.statuses, (status) => {
-                          if (status?.status == 'RECOLLECT') {
+                          if (status?.status == "RECOLLECT") {
                             return status;
                           }
                         }) || []
@@ -197,15 +203,15 @@ export class LabOrdersEffects {
                         : false,
                     sampleIdentifier: sample?.label,
                     collectedBy: {
-                      name: sample?.creator?.display.split('(')[0],
+                      name: sample?.creator?.display.split("(")[0],
                       uuid: sample?.creator?.uuid,
                     },
                     acceptedBy:
                       (
                         _.filter(sample?.statuses, (status) => {
                           if (
-                            status?.status == 'ACCEPTED' ||
-                            status?.status == 'RECEIVED'
+                            status?.status == "ACCEPTED" ||
+                            status?.status == "RECEIVED"
                           ) {
                             return status;
                           }
@@ -214,7 +220,7 @@ export class LabOrdersEffects {
                         ? {
                             name:
                               sample?.statuses?.length > 0
-                                ? sample?.statuses[0]?.user?.name.split('(')[0]
+                                ? sample?.statuses[0]?.user?.name.split("(")[0]
                                 : null,
                             uuid:
                               sample?.statuses?.length > 0
@@ -226,8 +232,8 @@ export class LabOrdersEffects {
                       (
                         _.filter(sample?.statuses, (status) => {
                           if (
-                            status?.status == 'ACCEPTED' ||
-                            status?.status == 'RECEIVED'
+                            status?.status == "ACCEPTED" ||
+                            status?.status == "RECEIVED"
                           ) {
                             return status;
                           }
@@ -235,8 +241,8 @@ export class LabOrdersEffects {
                       )?.length > 0
                         ? (_.filter(sample?.statuses, (status) => {
                             if (
-                              status?.status == 'ACCEPTED' ||
-                              status?.status == 'RECEIVED'
+                              status?.status == "ACCEPTED" ||
+                              status?.status == "RECEIVED"
                             ) {
                               return status;
                             }
@@ -246,13 +252,13 @@ export class LabOrdersEffects {
                     rejectedAt:
                       (
                         _.filter(sample?.statuses, (status) => {
-                          if (status?.status == 'REJECTED') {
+                          if (status?.status == "REJECTED") {
                             return status;
                           }
                         }) || []
                       )?.length > 0
                         ? (_.filter(sample?.statuses, (status) => {
-                            if (status?.status == 'REJECTED') {
+                            if (status?.status == "REJECTED") {
                               return status;
                             }
                           }) || [])[0]?.timestamp
@@ -260,13 +266,13 @@ export class LabOrdersEffects {
                     rejectionReason:
                       (
                         _.filter(sample?.statuses, (status) => {
-                          if (status?.status == 'REJECTED') {
+                          if (status?.status == "REJECTED") {
                             return status;
                           }
                         }) || []
                       )?.length > 0
                         ? _.filter(sample?.statuses, (status) => {
-                            if (status?.status == 'REJECTED') {
+                            if (status?.status == "REJECTED") {
                               // console.log('status', status);
                               return status;
                             }
@@ -275,7 +281,7 @@ export class LabOrdersEffects {
                     rejectedBy:
                       (
                         _.filter(sample?.statuses, (status) => {
-                          if (status?.status == 'REJECTED') {
+                          if (status?.status == "REJECTED") {
                             return status;
                           }
                         }) || []
@@ -283,7 +289,7 @@ export class LabOrdersEffects {
                         ? {
                             name:
                               sample?.statuses?.length > 0
-                                ? sample?.statuses[0]?.user?.name.split('(')[0]
+                                ? sample?.statuses[0]?.user?.name.split("(")[0]
                                 : null,
                             uuid:
                               sample?.statuses?.length > 0
@@ -296,8 +302,8 @@ export class LabOrdersEffects {
                       (
                         _.filter(sample?.statuses, (status) => {
                           if (
-                            status?.status == 'ACCEPTED' ||
-                            status?.status == 'RECEIVED'
+                            status?.status == "ACCEPTED" ||
+                            status?.status == "RECEIVED"
                           ) {
                             return status;
                           }
@@ -308,7 +314,7 @@ export class LabOrdersEffects {
                     sampleRejected:
                       (
                         _.filter(sample?.statuses, (status) => {
-                          if (status?.status == 'REJECTED') {
+                          if (status?.status == "REJECTED") {
                             // console.log('sample', sample);
                             // console.log(status?.status);
                             return status;
@@ -321,7 +327,7 @@ export class LabOrdersEffects {
                 });
               });
 
-              const codedSampleRejectionReasons = response[3]['answers'];
+              const codedSampleRejectionReasons = response[3]["answers"];
 
               const labDepartments = response[4]?.setMembers;
               // console.log('labDepartments', labDepartments);
@@ -345,7 +351,7 @@ export class LabOrdersEffects {
               ];
             }),
             catchError((error) => {
-              console.log('the error :: ', error);
+              console.log("the error :: ", error);
 
               return of(loadingLabOrderInformationFails({ error }));
             })
@@ -360,8 +366,8 @@ export class LabOrdersEffects {
       switchMap((action) => {
         this.notificationService.show(
           new Notification({
-            message: 'Deleting order',
-            type: 'LOADING',
+            message: "Deleting order",
+            type: "LOADING",
           })
         );
         return this.investigationProcedureService
@@ -370,13 +376,27 @@ export class LabOrdersEffects {
             map((response) => {
               this.notificationService.show(
                 new Notification({
-                  message: 'Deleted successfully',
-                  type: 'SUCCESS',
+                  message: "Deleted successfully",
+                  type: "SUCCESS",
                 })
               );
               return removeLabOrder({ orderUuid: action.order?.previousOrder });
             })
           );
+      })
+    )
+  );
+
+  deleteLabOrder$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(deleteLabOrder),
+      switchMap((action) => {
+        return this.ordersService.deleteOrder(action.uuid).pipe(
+          map((response) => {
+            console.log(response);
+            return voidLabOrder({ uuid: action.uuid });
+          })
+        );
       })
     )
   );
@@ -390,7 +410,7 @@ export class LabOrdersEffects {
             const testContainers = keyLevelTwoConceptSetMembers(
               responses[0]?.setMembers
             );
-            const codedSampleRejectionReasons = responses[1]['answers'];
+            const codedSampleRejectionReasons = responses[1]["answers"];
             const labDepartments = responses[2]?.setMembers;
             return [
               addTestContainers({ testContainers }),
@@ -432,8 +452,8 @@ function formatResults(results) {
       ...result,
       resultsFedBy: {
         name: result?.creator?.display
-          ? result?.creator?.display.split('(')[0]
-          : '',
+          ? result?.creator?.display.split("(")[0]
+          : "",
         uuid: result?.creator?.uuid,
       },
     };
@@ -442,7 +462,7 @@ function formatResults(results) {
 
 function getResultsCommentsStatuses(statuses) {
   return _.filter(statuses, (status) => {
-    if (status?.status != 'APPROVED' && status?.status != 'REJECTED') {
+    if (status?.status != "APPROVED" && status?.status != "REJECTED") {
       return status;
     }
   });

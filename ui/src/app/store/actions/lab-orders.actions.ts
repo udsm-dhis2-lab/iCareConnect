@@ -18,6 +18,11 @@ export const upsertLabOrder = createAction(
   props<{ labOrder: any }>()
 );
 
+export const upsertLabOrders = createAction(
+  "[Lab order] upsert lab orders",
+  props<{ labOrders: any[] }>()
+);
+
 export const addLabOrders = createAction(
   "[Lab order] add lab orders",
   props<{ labOrders: LabOrder[] }>()
@@ -100,5 +105,15 @@ export const addTestContainers = createAction(
 );
 
 export const clearLoadedLabOrders = createAction(
-  "[Orders] clear loaded orders"
+  "[Orders] clear loaded Lab orders"
+);
+
+export const deleteLabOrder = createAction(
+  "[Lab Orders] delete lab order",
+  props<{ uuid: string }>()
+);
+
+export const voidLabOrder = createAction(
+  "[Lab Orders] void lab order",
+  props<{ uuid: string }>()
 );
