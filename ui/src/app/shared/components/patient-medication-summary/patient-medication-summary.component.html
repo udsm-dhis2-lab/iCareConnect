@@ -1,5 +1,13 @@
-<div *ngIf="{ drugOrders: drugOrders$ | async } as drugParams">
-  <table class="table" *ngIf="drugParams?.drugOrders">
+<div
+  *ngIf="{
+    drugOrders: drugOrders$ | async,
+    patientVisitData: patientVisitData$ | async
+  } as drugParams"
+>
+  <table
+    class="table"
+    *ngIf="drugParams?.patientVisitData?.drugOrders && !forConsultation"
+  >
     <thead>
       <tr>
         <th>SN</th>
@@ -9,7 +17,12 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let drugOrder of drugParams?.drugOrders; let count = index">
+      <tr
+        *ngFor="
+          let drugOrder of drugParams?.patientVisitData?.drugOrders;
+          let count = index
+        "
+      >
         <td>{{ count + 1 }}</td>
         <td>{{ drugOrder?.drug?.display }}</td>
         <td>
@@ -21,13 +34,63 @@
       </tr>
     </tbody>
   </table>
+  <table
+    class="table table-bordered"
+    *ngIf="drugParams?.patientVisitData?.drugOrders && forConsultation"
+  >
+    <thead>
+      <tr>
+        <th style="width: 10px">SN</th>
+        <th>Drug</th>
+        <th>Instructions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <ng-container>
+        <tr
+          *ngFor="
+            let drugOrder of drugParams?.patientVisitData?.drugOrders;
+            let count = index
+          "
+        >
+          <td>
+            {{ count + 1 }}
+          </td>
+          <td>
+            {{ drugOrder?.drugOrder?.display }}
+          </td>
+          <td>
+            {{ drugOrder?.drugOrder.instructions }}
+          </td>
+        </tr>
+      </ng-container>
+      <ng-container>
+        <tr>
+          <td colspan="3">
+            <button
+              mat-flat-button
+              class="float-right"
+              color="primary"
+              (click)="onAddOrder($event)"
+            >
+              <mat-icon>add</mat-icon>
+              <span class="ml-2">Add Prescription</span>
+            </button>
+          </td>
+        </tr>
+      </ng-container>
+    </tbody>
+  </table>
   <mat-progress-bar
-    *ngIf="!drugParams?.drugOrders"
+    *ngIf="!drugParams?.patientVisitData?.drugOrders"
     mode="indeterminate"
   ></mat-progress-bar>
   <div
     class="w-100"
-    *ngIf="drugParams?.drugOrders && drugParams?.drugOrders?.length === 0"
+    *ngIf="
+      drugParams?.patientVisitData?.drugOrders &&
+      drugParams?.patientVisitData?.drugOrders?.length === 0
+    "
   >
     <p class="text-center text-warning">No Prescription done.</p>
   </div>
