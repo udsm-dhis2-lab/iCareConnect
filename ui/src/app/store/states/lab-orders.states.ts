@@ -1,6 +1,6 @@
-import { EntityState, EntityAdapter, createEntityAdapter } from '@ngrx/entity';
-import { LabOrder } from 'src/app/shared/resources/visits/models/lab-order.model';
-import { BaseState, initialBaseState } from './base.state';
+import { EntityState, EntityAdapter, createEntityAdapter } from "@ngrx/entity";
+import { LabOrder } from "src/app/shared/resources/visits/models/lab-order.model";
+import { BaseState, initialBaseState } from "./base.state";
 
 export interface LabOrdersState extends EntityState<any>, BaseState {
   creatingLabOrder: boolean;
@@ -16,6 +16,7 @@ export interface LabOrdersState extends EntityState<any>, BaseState {
   labOrdersWithFirstSignOff: any;
   labOrdersWithSecondSignOff: any;
   voidingOrder: boolean;
+  voidedOrder: boolean;
   testContainers: any;
   sampleContainers: any;
   codedSampleRejectionReasons: any[];
@@ -39,6 +40,7 @@ export const initialLabOrdersState = labOrderAdapter.getInitialState({
   labOrdersWithFirstSignOff: {},
   labOrdersWithSecondSignOff: {},
   voidingOrder: false,
+  voidedOrder: false,
   sampleContainers: null,
   testContainers: null,
   codedSampleRejectionReasons: null,

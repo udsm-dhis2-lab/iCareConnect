@@ -32,6 +32,7 @@ import {
   getFormsLoadingState,
 } from "src/app/store/selectors/form.selectors";
 import {
+  getCountOfVitalsFilled,
   getGroupedObservationByConcept,
   getVitalSignObservations,
 } from "src/app/store/selectors/observation.selectors";
@@ -46,6 +47,7 @@ import { getLoadingPaymentStatus } from "src/app/store/selectors/payment.selecto
 import { getApplicableForms } from "../../helpers/identify-applicable-forms.helper";
 const CONSULTATION_FORM_CONFIGS: FormConfig[] = [
   { name: "All orderables", formLevel: 5 },
+  { name: "Visit Diagnoses", formLevel: 2 },
 ];
 
 import { filter, map } from "lodash";
@@ -97,6 +99,7 @@ export class SharedPatientDashboardComponent implements OnInit {
   menus: any[];
   privileges$: Observable<any>;
   forms$: Observable<any>;
+  countOfVitalsElementsFilled$: Observable<number>;
 
   constructor(
     private store: Store<AppState>,
@@ -132,6 +135,10 @@ export class SharedPatientDashboardComponent implements OnInit {
 
     this.vitalSignObservations$ = this.store.pipe(
       select(getVitalSignObservations)
+    );
+
+    this.countOfVitalsElementsFilled$ = this.store.select(
+      getCountOfVitalsFilled
     );
 
     this.diagnoses$ = this.store.select(getAllDiagnoses);

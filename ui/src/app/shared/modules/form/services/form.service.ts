@@ -1,15 +1,15 @@
-import { Injectable } from '@angular/core';
-import { from, Observable, zip } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { Api, FormGet } from 'src/app/shared/resources/openmrs';
-import { OpenmrsHttpClientService } from '../../openmrs-http-client/services/openmrs-http-client.service';
-import { getFormQueryFields } from '../helpers/get-form-query-field.helper';
-import { getSanitizedFormObject } from '../helpers/get-sanitized-form-object.helper';
-import { FormConfig } from '../models/form-config.model';
-import { ICAREForm } from '../models/form.model';
-import { orderBy, uniqBy, omit, keyBy, groupBy } from 'lodash';
+import { Injectable } from "@angular/core";
+import { from, Observable, of, zip } from "rxjs";
+import { map } from "rxjs/operators";
+import { Api, FormGet } from "src/app/shared/resources/openmrs";
+import { OpenmrsHttpClientService } from "../../openmrs-http-client/services/openmrs-http-client.service";
+import { getFormQueryFields } from "../helpers/get-form-query-field.helper";
+import { getSanitizedFormObject } from "../helpers/get-sanitized-form-object.helper";
+import { FormConfig } from "../models/form-config.model";
+import { ICAREForm } from "../models/form.model";
+import { orderBy, uniqBy, omit, keyBy, groupBy } from "lodash";
 
-@Injectable({ providedIn: 'root' })
+@Injectable({ providedIn: "root" })
 export class FormService {
   constructor(private api: Api, private httpClient: OpenmrsHttpClientService) {}
 
@@ -36,7 +36,12 @@ export class FormService {
     return getSanitizedFormObject(formConcept);
   }
 
-  searchItem(parameters, otherType?, filteringItems?): Observable<any[]> {
+  searchItem(
+    parameters,
+    otherType?,
+    filteringItems?,
+    field?
+  ): Observable<any[]> {
     if (!otherType) {
       return from(this.api.concept.getAllConcepts(parameters)).pipe(
         map((response) => {
@@ -46,16 +51,22 @@ export class FormService {
                 result.conceptClass?.display.toLowerCase() ===
                 parameters?.class.toLowerCase()
             ) || [],
-            ['display'],
-            ['asc']
+            ["display"],
+            ["asc"]
           );
         })
       );
-    } else if (otherType === 'billableItem') {
+    } else if (otherType === "searchFromOptions") {
+      return of(
+        field?.options.filter(
+          (option) => option?.name.toLowerCase().indexOf(parameters?.q) > -1
+        )
+      );
+    } else if (otherType === "billableItem") {
       return this.httpClient
         .get(
           `icare/item?limit=${parameters?.limit}&startIndex=0${
-            '&q=' + parameters?.q
+            "&q=" + parameters?.q
           }`
         )
         .pipe(
@@ -72,41 +83,41 @@ export class FormService {
                     };
                   })
                   .filter((item) => item?.stockable),
-                'display'
+                "display"
               ),
-              ['display'],
-              ['asc']
+              ["display"],
+              ["asc"]
             );
           })
         );
-    } else if (otherType === 'Drug') {
-      const formattedParamters = omit(parameters, 'class', 'v');
+    } else if (otherType === "Drug") {
+      const formattedParamters = omit(parameters, "class", "v");
       // console.log('filteringItems', filteringItems);
       const keyedDispensingLocations = keyBy(
         filteringItems?.applicable,
-        'uuid'
+        "uuid"
       );
       const dispensableStock = keyBy(
         filteringItems.items.filter(
           (item) => keyedDispensingLocations[item?.location?.uuid]
         ) || [],
-        'name'
+        "name"
       );
       return from(
-        this.api.drug.getAllDrugs({ ...formattedParamters, v: 'full' })
+        this.api.drug.getAllDrugs({ ...formattedParamters, v: "full" })
       ).pipe(
         map((response) => {
           const formattedData = response?.results.map((result: any) => {
             const shouldFeedQuantity =
-              dispensableStock[result?.display]?.display.indexOf(':') > -1
-                ? ':true'
-                : ':false';
+              dispensableStock[result?.display]?.display.indexOf(":") > -1
+                ? ":true"
+                : ":false";
             return {
               ...result,
               isDrug: true,
               shouldFeedQuantity,
               formattedKey:
-                result?.uuid + ':' + result?.concept?.uuid + shouldFeedQuantity,
+                result?.uuid + ":" + result?.concept?.uuid + shouldFeedQuantity,
               name: dispensableStock[result?.display]
                 ? dispensableStock[result?.display]?.display
                 : result?.display,
@@ -129,8 +140,8 @@ export class FormService {
      * TODO:Dynamicall construct the fields
      */
     const fields =
-      '?v=custom:(uuid,display,name,encounterType,formFields:(uuid,display,fieldNumber,required,retired,fieldPart,maxOccurs,pageNumber,minOccurs,field:(uuid,display,concept:(uuid,display,conceptClass,datatype,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,numeric,descriptions,allowDecimal,displayPrecision,setMembers:(uuid,display,conceptClass,datatype,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,numeric,descriptions,allowDecimal,displayPrecision,answers,setMembers:(uuid,display,conceptClass,datatype,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,numeric,descriptions,allowDecimal,displayPrecision,answers)),answers:(uuid,display,conceptClass,datatype,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,numeric,descriptions,allowDecimal,displayPrecision,answers)))))';
-    return this.httpClient.get('form/' + uuid + fields);
+      "?v=custom:(uuid,display,name,encounterType,formFields:(uuid,display,fieldNumber,required,retired,fieldPart,maxOccurs,pageNumber,minOccurs,field:(uuid,display,concept:(uuid,display,conceptClass,datatype,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,numeric,descriptions,allowDecimal,displayPrecision,setMembers:(uuid,display,conceptClass,datatype,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,numeric,descriptions,allowDecimal,displayPrecision,answers,setMembers:(uuid,display,conceptClass,datatype,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,numeric,descriptions,allowDecimal,displayPrecision,answers)),answers:(uuid,display,conceptClass,datatype,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,numeric,descriptions,allowDecimal,displayPrecision,answers)))))";
+    return this.httpClient.get("form/" + uuid + fields);
   }
 
   getCustomeOpenMRSForms(uuids): Observable<any> {
