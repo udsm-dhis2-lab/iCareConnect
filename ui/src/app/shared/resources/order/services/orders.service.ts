@@ -1,10 +1,10 @@
-import { Injectable } from '@angular/core';
-import { Observable, of, zip } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
-import { OpenmrsHttpClientService } from '../../../modules/openmrs-http-client/services/openmrs-http-client.service';
+import { Injectable } from "@angular/core";
+import { Observable, of, zip } from "rxjs";
+import { catchError, map } from "rxjs/operators";
+import { OpenmrsHttpClientService } from "../../../modules/openmrs-http-client/services/openmrs-http-client.service";
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: "root",
 })
 export class OrdersService {
   constructor(private openMRSHttpClient: OpenmrsHttpClientService) {}
@@ -41,7 +41,7 @@ export class OrdersService {
               paid: !orderDetails?.invoiceItem
                 ? true
                 : orderDetails?.invoiceItem?.invoice?.paymentMode?.display.toLowerCase() ===
-                    'insurance' &&
+                    "insurance" &&
                   orderDetails?.invoiceItem?.invoice?.visit?.uuid == visit
                 ? true
                 : orderDetails?.invoiceItem?.invoice?.payments?.length > 0 &&
@@ -52,5 +52,9 @@ export class OrdersService {
           });
         })
       );
+  }
+
+  deleteOrder(uuid): Observable<any> {
+    return this.openMRSHttpClient.delete(`order/${uuid}`);
   }
 }

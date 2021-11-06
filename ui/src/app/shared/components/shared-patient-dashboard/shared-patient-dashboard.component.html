@@ -16,7 +16,8 @@
     loadingForms: loadingForms$ | async,
     ordersUpdates: ordersUpdates$ | async,
     currentLocation: currentLocation$ | async,
-    forms: forms$ | async
+    forms: forms$ | async,
+    countOfVitalsElementsFilled: countOfVitalsElementsFilled$ | async
   } as dashboardParams"
 >
   <div
@@ -55,8 +56,31 @@
             Back to Client List
           </button>
 
-          <h2 class="text-left ml-2">Patient Dashboard</h2>
+          <!-- <h2 class="text-left ml-2">Patient Dashboard</h2> -->
           <div class="d-flex justify-content-end">
+            <button
+              class="mr-2"
+              [ngStyle]="{
+                'background-color':
+                  dashboardParams?.countOfVitalsElementsFilled === 0
+                    ? '#F00'
+                    : 'transparent',
+                color:
+                  dashboardParams?.countOfVitalsElementsFilled === 0
+                    ? '#FFF'
+                    : '#222'
+              }"
+              mat-stroked-button
+              [matMenuTriggerFor]="forVitals"
+            >
+              Vitals
+            </button>
+            <mat-menu #forVitals="matMenu">
+              <div>
+                <app-patient-vitals-summary></app-patient-vitals-summary>
+              </div>
+            </mat-menu>
+
             <a
               class="text-danger mr-2"
               *ngIf="activeVisit?.waitingToBeAdmitted"
@@ -206,9 +230,7 @@
           </div>
         </div>
         <!-- Patient clinic content -->
-        <mat-tab-group
-          mat-align-tabs="start"
-          dynamicHeight="true"
+        <div
           *ngIf="
             !dashboardParams?.startingConsultation &&
             !(
@@ -217,114 +239,135 @@
             )
           "
         >
-          <mat-tab label="General">
-            <div class="p-3">
-              <div class="row">
-                <div class="col-lg-6 col-md-6 col-sm-12 col-sx-12">
-                  <app-clinical-notes
-                    *ngIf="
-                      !dashboardParams.loadingForms &&
-                      dashboardParams.currentPatient &&
-                      dashboardParams?.forms &&
-                      dashboardParams?.forms?.length > 0
-                    "
-                    [clinicalObservations]="
-                      dashboardParams?.observationsGroupedByConcept
-                    "
-                    [patient]="dashboardParams?.currentPatient"
-                    [location]="dashboardParams?.currentLocation"
-                    [visit]="activeVisit"
-                    [savingObservations]="params?.savingObservations"
-                    [forms]="dashboardParams?.forms"
-                    (saveObservations)="
-                      onSaveObservations($event, params?.currentPatient)
-                    "
+          <div class="p-2">
+            <div class="row">
+              <div class="col-lg-6 col-md-6 col-sm-12 col-sx-12">
+                <app-clinical-notes
+                  *ngIf="
+                    !dashboardParams.loadingForms &&
+                    dashboardParams.currentPatient &&
+                    dashboardParams?.forms &&
+                    dashboardParams?.forms?.length > 0
+                  "
+                  [clinicalObservations]="
+                    dashboardParams?.observationsGroupedByConcept
+                  "
+                  [patient]="dashboardParams?.currentPatient"
+                  [location]="dashboardParams?.currentLocation"
+                  [visit]="activeVisit"
+                  [savingObservations]="params?.savingObservations"
+                  [forms]="dashboardParams?.forms"
+                  (saveObservations)="
+                    onSaveObservations($event, params?.currentPatient)
+                  "
+                >
+                </app-clinical-notes>
+              </div>
+
+              <div class="col-lg-6 col-md-6 col-sm-12 col-sx-12">
+                <mat-accordion>
+                  <mat-expansion-panel
+                    class="mb-2 border p-0"
+                    [expanded]="true"
                   >
-                  </app-clinical-notes>
-                  <!-- <mat-accordion>
-                    <mat-expansion-panel
-                      class="mb-2 border p-0"
-                      [expanded]="true"
+                    <mat-expansion-panel-header>
+                      <mat-panel-title>Provisional Diagnoses </mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <div
+                      *ngIf="dashboardParams?.formEntities['Visit Diagnoses']"
                     >
-                      <mat-expansion-panel-header>
-                        <mat-panel-title> Vitals </mat-panel-title>
-                      </mat-expansion-panel-header>
-
-                      <app-patient-vitals-summary></app-patient-vitals-summary>
-                    </mat-expansion-panel>
-                  </mat-accordion> -->
-                </div>
-
-                <div class="col-lg-6 col-md-6 col-sm-12 col-sx-12">
-                  <mat-accordion>
-                    <mat-expansion-panel
-                      class="mb-2 border p-0"
-                      [expanded]="true"
-                    >
-                      <mat-expansion-panel-header>
-                        <mat-panel-title
-                          >Provisional Diagnoses
-                        </mat-panel-title>
-                      </mat-expansion-panel-header>
                       <app-patient-diagnoses-summary
                         [isConfirmedDiagnosis]="false"
-                      ></app-patient-diagnoses-summary>
-                    </mat-expansion-panel>
-                  </mat-accordion>
-                  <mat-accordion>
-                    <mat-expansion-panel
-                      class="mb-2 border p-0"
-                      [expanded]="true"
-                    >
-                      <mat-expansion-panel-header>
-                        <mat-panel-title>Laboratory Tests </mat-panel-title>
-                      </mat-expansion-panel-header>
-                      <app-patient-lab-results-summary
-                        *ngIf="activeVisit"
-                        [observations]="
-                          dashboardParams?.observationsGroupedByConcept
+                        [forConsultation]="true"
+                        [diagnosisFormDetails]="
+                          dashboardParams?.formEntities['Visit Diagnoses']
                         "
                         [patientVisit]="activeVisit"
-                      ></app-patient-lab-results-summary>
-                      <mat-progress-bar
-                        *ngIf="dashboardParams?.loadingVisit || !activeVisit"
-                        mode="indeterminate"
-                      ></mat-progress-bar>
-                    </mat-expansion-panel>
-                  </mat-accordion>
+                      ></app-patient-diagnoses-summary>
+                    </div>
+                  </mat-expansion-panel>
+                </mat-accordion>
+                <mat-accordion>
+                  <mat-expansion-panel
+                    class="mb-2 border p-0"
+                    [expanded]="true"
+                  >
+                    <!-- <mat-expansion-panel-header>
+                      <mat-panel-title
+                        >Investigation / Procedures
+                      </mat-panel-title>
+                    </mat-expansion-panel-header> -->
+                    <app-patient-investigations-and-procedures
+                      *ngIf="
+                        activeVisit &&
+                        dashboardParams?.formEntities['All orderables']
+                      "
+                      [observations]="
+                        dashboardParams?.observationsGroupedByConcept
+                      "
+                      [investigationAndProceduresFormsDetails]="
+                        dashboardParams?.formEntities['All orderables']
+                      "
+                      [patientVisit]="activeVisit"
+                      [forConsultation]="true"
+                    ></app-patient-investigations-and-procedures>
 
-                  <mat-accordion>
-                    <mat-expansion-panel
-                      class="mb-2 border p-0"
-                      [expanded]="true"
+                    <mat-progress-bar
+                      *ngIf="
+                        dashboardParams?.loadingVisit ||
+                        !activeVisit ||
+                        !dashboardParams?.formEntities['All orderables']
+                      "
+                      mode="indeterminate"
+                    ></mat-progress-bar>
+                  </mat-expansion-panel>
+                </mat-accordion>
+
+                <mat-accordion>
+                  <mat-expansion-panel
+                    class="mb-2 border p-0"
+                    [expanded]="true"
+                  >
+                    <mat-expansion-panel-header>
+                      <mat-panel-title>Confirmed Diagnoses </mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <div
+                      *ngIf="dashboardParams?.formEntities['Visit Diagnoses']"
                     >
-                      <mat-expansion-panel-header>
-                        <mat-panel-title>Confirmed Diagnoses </mat-panel-title>
-                      </mat-expansion-panel-header>
                       <app-patient-diagnoses-summary
                         [isConfirmedDiagnosis]="true"
-                      ></app-patient-diagnoses-summary>
-                    </mat-expansion-panel>
-                  </mat-accordion>
-
-                  <mat-accordion>
-                    <mat-expansion-panel
-                      class="mb-2 border p-0"
-                      [expanded]="true"
-                    >
-                      <mat-expansion-panel-header>
-                        <mat-panel-title>Medication </mat-panel-title>
-                      </mat-expansion-panel-header>
-                      <app-patient-medication-summary
-                        *ngIf="activeVisit"
+                        [forConsultation]="true"
                         [patientVisit]="activeVisit"
-                      ></app-patient-medication-summary>
-                    </mat-expansion-panel>
-                  </mat-accordion>
-                </div>
+                        [diagnosisFormDetails]="
+                          dashboardParams?.formEntities['Visit Diagnoses']
+                        "
+                      ></app-patient-diagnoses-summary>
+                    </div>
+                    <mat-progress-bar
+                      *ngIf="!dashboardParams?.formEntities['Visit Diagnoses']"
+                      mode="indeterminate"
+                    ></mat-progress-bar>
+                  </mat-expansion-panel>
+                </mat-accordion>
+
+                <mat-accordion>
+                  <mat-expansion-panel
+                    class="mb-2 border p-0"
+                    [expanded]="true"
+                  >
+                    <mat-expansion-panel-header>
+                      <mat-panel-title>Medication </mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <app-patient-medication-summary
+                      *ngIf="activeVisit"
+                      [patientVisit]="activeVisit"
+                      [forConsultation]="true"
+                    ></app-patient-medication-summary>
+                  </mat-expansion-panel>
+                </mat-accordion>
               </div>
             </div>
-          </mat-tab>
+          </div>
           <!-- <mat-tab label="Trends">
             <div class="p-3">
               <div class="row">
@@ -401,34 +444,35 @@
               </div>
             </div>
           </mat-tab> -->
-        </mat-tab-group>
-        <div
-          *ngIf="
-            (!activeVisit?.isEnsured &&
-              !dashboardParams?.loadingVisit &&
-              activeVisit &&
-              dashboardParams?.startingConsultation) ||
-            (!activeVisit?.isEmergency &&
-              dashboardParams?.hasPatientHavePendingPaymentForTheCurrentVisitType)
-          "
-          class="alert alert-danger p-3 ml-2 mr-2"
-          role="alert"
-        >
-          Consultation Fee not paid
+          <!-- </mat-tab-group> -->
+          <div
+            *ngIf="
+              (!activeVisit?.isEnsured &&
+                !dashboardParams?.loadingVisit &&
+                activeVisit &&
+                dashboardParams?.startingConsultation) ||
+              (!activeVisit?.isEmergency &&
+                dashboardParams?.hasPatientHavePendingPaymentForTheCurrentVisitType)
+            "
+            class="alert alert-danger p-3 ml-2 mr-2"
+            role="alert"
+          >
+            Consultation Fee not paid
+          </div>
+          <!-- end of Patient clinic content -->
         </div>
-        <!-- end of Patient clinic content -->
       </div>
     </div>
+    <mat-progress-bar
+      *ngIf="
+        dashboardParams?.loadingPaymentStatus ||
+        !dashboardParams?.encounterTypeLoaded ||
+        dashboardParams?.billLoadingState ||
+        !dashboardParams?.currentPatient ||
+        dashboardParams?.loadingForms
+      "
+      mode="indeterminate"
+    >
+    </mat-progress-bar>
   </div>
-  <mat-progress-bar
-    *ngIf="
-      dashboardParams?.loadingPaymentStatus ||
-      !dashboardParams?.encounterTypeLoaded ||
-      dashboardParams?.billLoadingState ||
-      !dashboardParams?.currentPatient ||
-      dashboardParams?.loadingForms
-    "
-    mode="indeterminate"
-  >
-  </mat-progress-bar>
 </div>

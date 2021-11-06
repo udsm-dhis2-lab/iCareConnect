@@ -1,0 +1,33 @@
+<div>
+  <mat-tab-group
+    [selectedIndex]="selectedTab.value"
+    (selectedIndexChange)="selectedTab.setValue($event)"
+  >
+    <mat-tab label="Laboratory">
+      <div class="mat-tab-container" *ngIf="selectedTab.value == 0">
+        <app-patient-lab-results-summary
+          [observations]="observations"
+          [patientVisit]="patientVisit"
+          [forConsultation]="forConsultation"
+          [investigationAndProceduresFormsDetails]="
+            investigationAndProceduresFormsDetails
+          "
+        ></app-patient-lab-results-summary>
+      </div>
+    </mat-tab>
+    <mat-tab label="Procedures">
+      <div class="mat-tab-container" *ngIf="selectedTab.value == 1">
+        <app-patient-procedures-summary
+          [patientVisit]="patientVisit"
+          [forConsultation]="forConsultation"
+        ></app-patient-procedures-summary></div
+    ></mat-tab>
+    <mat-tab label="Radiology">
+      <div class="mat-tab-container" *ngIf="selectedTab.value == 2">
+        <app-patient-radiology-summary
+          [patientVisit]="patientVisit"
+          [forConsultation]="forConsultation"
+        ></app-patient-radiology-summary></div
+    ></mat-tab>
+  </mat-tab-group>
+</div>

@@ -9,3 +9,7 @@ button {
 .patient-dashboard-container {
   padding-bottom: 5px;
 }
+
+::ng-deep .mat-expansion-panel-header.mat-expanded {
+  height: 44px !important;
+}

@@ -60,7 +60,7 @@ export class LabOrder {
       isBed:
         (
           this.order?.location?.tags.filter(
-            (tag) => tag?.display === 'Bed Location'
+            (tag) => tag?.display === "Bed Location"
           ) || []
         )?.length > 0,
     };
@@ -78,7 +78,7 @@ export class LabOrder {
     return (
       this.order.encounter?.obs.filter(
         (observation) =>
-          observation?.display?.split(':')[0] === this.order?.display
+          observation?.display?.split(":")[0] === this.order?.display
       ) || []
     ).legth > 0
       ? true
@@ -91,6 +91,10 @@ export class LabOrder {
 
   get fulfillerStatus(): string {
     return this.order?.fulfillerStatus;
+  }
+
+  get voided(): boolean {
+    return this.order?.voided;
   }
 
   toJson(): any {
@@ -113,6 +117,7 @@ export class LabOrder {
       careSetting: this.careSetting,
       accessionNumber: this.accessionNumber,
       fulfillerStatus: this.fulfillerStatus,
+      voided: this.voided,
     };
   }
 }

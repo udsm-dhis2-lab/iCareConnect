@@ -92,9 +92,9 @@
       <mat-option
         *ngFor="let option of members$ | async"
         (click)="getSelectedItemFromOption($event, option, field?.key)"
-        [value]="option?.display"
+        [value]="option?.display ? option?.display : option?.name"
       >
-        {{ option?.display }}
+        {{ option?.display ? option?.display : option?.name }}
       </mat-option>
     </mat-autocomplete>
   </mat-form-field>

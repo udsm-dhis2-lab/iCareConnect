@@ -124,10 +124,7 @@ export class ConsultationEffects {
                   type: "SUCCESS",
                 })
               );
-              return [
-                upsertConsultation({ consultation }),
-                go({ path: [`/clinic/consultation/${currentPatient.id}`] }),
-              ];
+              return [upsertConsultation({ consultation })];
             }),
             catchError((error) => {
               this.notificationService.show(

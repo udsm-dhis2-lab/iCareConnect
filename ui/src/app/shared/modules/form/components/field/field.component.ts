@@ -1,13 +1,13 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { FormGroup } from '@angular/forms';
-import { Observable, of } from 'rxjs';
-import { Field } from '../../models/field.model';
-import { FormService } from '../../services';
+import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import { FormGroup } from "@angular/forms";
+import { Observable, of } from "rxjs";
+import { Field } from "../../models/field.model";
+import { FormService } from "../../services";
 
 @Component({
-  selector: 'app-field',
-  templateUrl: './field.component.html',
-  styleUrls: ['./field.component.scss'],
+  selector: "app-field",
+  templateUrl: "./field.component.html",
+  styleUrls: ["./field.component.scss"],
 })
 export class FieldComponent {
   @Input() field: Field<string>;
@@ -17,7 +17,7 @@ export class FieldComponent {
   @Input() isCheckBoxButton: boolean;
   @Input() fieldClass: string;
   @Input() shouldDisable: boolean;
-  members$: Observable<any[]> = of([{ id: 'searching', display: 'Search' }]);
+  members$: Observable<any[]> = of([{ id: "searching", display: "Search" }]);
 
   constructor(private formService: FormService) {}
 
@@ -29,11 +29,11 @@ export class FieldComponent {
   }
 
   get isDate(): boolean {
-    return this.field.controlType === 'date';
+    return this.field.controlType === "date";
   }
 
   get isBoolean(): boolean {
-    return this.field.controlType === 'boolean';
+    return this.field.controlType === "boolean";
   }
 
   get isCommonField(): boolean {
@@ -52,7 +52,7 @@ export class FieldComponent {
     const matchedOption = (this.field.options.filter(
       (option) => option?.key === this.value
     ) || [])[0];
-    return matchedOption ? matchedOption?.value : '';
+    return matchedOption ? matchedOption?.value : "";
   }
 
   searchConcept(event: any): void {
@@ -62,12 +62,13 @@ export class FieldComponent {
       q: searchingText,
       limit: 50,
       class: this.field?.conceptClass,
-      v: 'custom:(uuid,display,datatype,conceptClass,mappings)',
+      v: "custom:(uuid,display,datatype,conceptClass,mappings)",
     };
     this.members$ = this.formService.searchItem(
       parameters,
       this.field?.otherType,
-      this.field?.filteringItems
+      this.field?.filteringItems,
+      this.field
     );
   }
 
