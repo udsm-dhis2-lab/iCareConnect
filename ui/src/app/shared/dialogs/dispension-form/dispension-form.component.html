@@ -7,8 +7,9 @@
   </div>
 </div>
 <mat-toolbar color="primary">
-  <span
-    >Drug Order - {{ data?.patient?.identifier }} - {{ data?.patient?.age }} -
+  <span>Drug Order </span
+  ><span *ngIf="data?.patient">
+    - {{ data?.patient?.identifier }} - {{ data?.patient?.age }} -
     {{ data?.patient?.gender }}</span
   >
   <span class="toolbar-spacer"></span>
@@ -84,7 +85,7 @@
                 <mat-panel-title> Previous Prescription </mat-panel-title>
               </mat-expansion-panel-header>
               <app-patient-previous-prescriptions
-                [patient]="data?.patient"
+                [patientUuid]="data?.patientUuid"
               ></app-patient-previous-prescriptions>
             </mat-expansion-panel>
             <mat-expansion-panel class="mb-2 border p-0" [expanded]="false">
