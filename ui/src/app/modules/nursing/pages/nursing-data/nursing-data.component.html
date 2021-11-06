@@ -72,6 +72,14 @@
             color="primary"
             mat-stroked-button
             (click)="admitPatient($event, params?.patient, params?.visit, true)"
+            *ngIf="
+              params?.provider &&
+              params?.location &&
+              params?.visit &&
+              params?.patient &&
+              params?.forms &&
+              !params?.billLoadingState
+            "
           >
             Send to Observation
           </button>
