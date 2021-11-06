@@ -16,7 +16,8 @@
     loadingForms: loadingForms$ | async,
     ordersUpdates: ordersUpdates$ | async,
     currentLocation: currentLocation$ | async,
-    forms: forms$ | async
+    forms: forms$ | async,
+    countOfVitalsElementsFilled: countOfVitalsElementsFilled$ | async
   } as dashboardParams"
 >
   <div
@@ -59,6 +60,16 @@
           <div class="d-flex justify-content-end">
             <button
               class="mr-2"
+              [ngStyle]="{
+                'background-color':
+                  dashboardParams?.countOfVitalsElementsFilled === 0
+                    ? '#F00'
+                    : 'transparent',
+                color:
+                  dashboardParams?.countOfVitalsElementsFilled === 0
+                    ? '#FFF'
+                    : '#222'
+              }"
               mat-stroked-button
               [matMenuTriggerFor]="forVitals"
             >
