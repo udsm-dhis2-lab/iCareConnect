@@ -32,6 +32,7 @@ import {
   getFormsLoadingState,
 } from "src/app/store/selectors/form.selectors";
 import {
+  getCountOfVitalsFilled,
   getGroupedObservationByConcept,
   getVitalSignObservations,
 } from "src/app/store/selectors/observation.selectors";
@@ -98,6 +99,7 @@ export class SharedPatientDashboardComponent implements OnInit {
   menus: any[];
   privileges$: Observable<any>;
   forms$: Observable<any>;
+  countOfVitalsElementsFilled$: Observable<number>;
 
   constructor(
     private store: Store<AppState>,
@@ -133,6 +135,10 @@ export class SharedPatientDashboardComponent implements OnInit {
 
     this.vitalSignObservations$ = this.store.pipe(
       select(getVitalSignObservations)
+    );
+
+    this.countOfVitalsElementsFilled$ = this.store.select(
+      getCountOfVitalsFilled
     );
 
     this.diagnoses$ = this.store.select(getAllDiagnoses);
