@@ -1,8 +1,8 @@
-import { createSelector } from '@ngrx/store';
-import { getRootState, AppState } from '../reducers';
-import { labOrderAdapter, LabOrdersState } from '../states';
+import { createSelector } from "@ngrx/store";
+import { getRootState, AppState } from "../reducers";
+import { labOrderAdapter, LabOrdersState } from "../states";
 
-import * as _ from 'lodash';
+import * as _ from "lodash";
 
 const getLabOrdersState = createSelector(
   getRootState,
@@ -16,7 +16,9 @@ export const {
 
 export const getAllNewLabOrders = createSelector(
   getAllLabOrders,
-  (labOrders: any) => labOrders.filter((labOrder) => labOrder?.action === 'NEW')
+  (labOrders: any) => {
+    return labOrders.filter((labOrder) => labOrder?.action === "NEW");
+  }
 );
 
 export const getCreatingLabOrderState = createSelector(
