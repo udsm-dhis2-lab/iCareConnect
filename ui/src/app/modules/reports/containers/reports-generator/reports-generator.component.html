@@ -271,7 +271,7 @@
           dhisR? - {{ dhisReport }} <br />
           loaded dhis report - {{ reportConfigs?.reportLoaded }} -->
 
-          <div *ngIf="period && reportConfigs?.dhisConfigs">
+          <div *ngIf="period && reportConfigs?.dhisConfigs && showReportArea">
             <app-report
               [period]="period"
               [reportConfigs]="reportConfigs?.dhisConfigs"
