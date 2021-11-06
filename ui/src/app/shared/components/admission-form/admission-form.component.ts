@@ -110,7 +110,7 @@ export class AdmissionFormComponent implements OnInit {
       encounterType: ICARE_CONFIG.admission.encounterTypeUuid,
     };
     // Create bill (order) if not insured
-    if (!visit?.insured && this.admitTo?.billingConcept) {
+    if (!visit?.isEnsured && this.admitTo?.billingConcept) {
       const orderType = (orderTypes.filter(
         (orderType) => orderType?.display.toLowerCase() === "bed order"
       ) || [])[0];
