@@ -16,6 +16,7 @@
       <app-patient-list
         [itemsPerPage]="50"
         [defaultFilter]="'Cash'"
+        [isTabularList]="true"
         (selectPatient)="onSelectPatient($event)"
       ></app-patient-list>
     </div>
