@@ -23,10 +23,16 @@ export class PatientVitalsSummaryComponent implements OnInit {
   constructor(private store: Store<AppState>) {}
 
   ngOnInit(): void {
-    const observations = this.patientVisit?.observations;
-    const vitalsData = getVitalsFromVisitDetails(this.vitalsForm, observations);
+    const observations = !this.patientVisit
+      ? null
+      : this.patientVisit?.observations;
+    const vitalsData = !this.patientVisit
+      ? null
+      : getVitalsFromVisitDetails(this.vitalsForm, observations);
 
-    this.vitalSignObservations$ = of(vitalsData);
+    this.vitalSignObservations$ = !this.patientVisit
+      ? this.store.select(getVitalSignObservations)
+      : of(vitalsData);
     this.observationsGroupedByConcept$ = this.store.select(
       getGroupedObservationByConcept
     );
