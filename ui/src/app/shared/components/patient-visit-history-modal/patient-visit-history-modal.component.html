@@ -7,18 +7,30 @@
   </button>
 </mat-toolbar>
 
-<mat-dialog-content class="mat-typography" *ngIf="{
+<mat-dialog-content
+  class="mat-typography"
+  *ngIf="{
     forms: forms$ | async,
     patientVisits: patientVisits$ | async
-  } as params">
-  <mat-progress-bar *ngIf="!params?.patientVisits || !params?.forms" mode="indeterminate"></mat-progress-bar>
-  <div *ngIf="
+  } as params"
+>
+  <mat-progress-bar
+    *ngIf="!params?.patientVisits || !params?.forms"
+    mode="indeterminate"
+  ></mat-progress-bar>
+  <div
+    *ngIf="
       params?.patientVisits &&
       params?.patientVisits?.length > 0 &&
       params?.forms
-    ">
-    <app-patient-visits-history [patientVisits]="params?.patientVisits" [shouldShowPatientClinicalSummary]="true"
-      [location]="location" [forms]="params?.forms"></app-patient-visits-history>
+    "
+  >
+    <app-patient-visits-history
+      [patientVisits]="params?.patientVisits"
+      [shouldShowPatientClinicalSummary]="true"
+      [shouldShowVitalsOnly]="shouldShowVitalsOnly"
+      [forms]="params?.forms"
+    ></app-patient-visits-history>
   </div>
 
   <!-- <div *ngIf="
@@ -29,7 +41,11 @@
     <app-patient-vitals-summary></app-patient-vitals-summary>
   </div> -->
 
-  <div class="alert alert-warning" role="alert" *ngIf="params?.patientVisits && params?.patientVisits?.length === 0">
-    There is no history for this patient, this is the first visit </div>
-
+  <div
+    class="alert alert-warning"
+    role="alert"
+    *ngIf="params?.patientVisits && params?.patientVisits?.length === 0"
+  >
+    There is no history for this patient, this is the first visit
+  </div>
 </mat-dialog-content>
