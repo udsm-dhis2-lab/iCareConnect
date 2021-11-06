@@ -84,9 +84,6 @@ export class AdmissionFormComponent implements OnInit {
     this.admissionStatus$ = this.store.select(
       getAdmissionStatusOfCurrentPatient
     );
-    this.store.select(getCurrentLocation).subscribe((location) => {
-      console.log("LOCATION", location);
-    });
     this.provider$ = this.store.select(getProviderDetails);
     this.admissionLocations$ = this.store.select(getLocationsByTagName, {
       tagName: "Admission Location",
