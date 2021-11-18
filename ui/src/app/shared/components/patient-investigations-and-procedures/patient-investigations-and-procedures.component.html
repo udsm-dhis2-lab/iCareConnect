@@ -31,6 +31,9 @@
       <div class="mat-tab-container" *ngIf="selectedTab.value == 2">
         <app-patient-radiology-summary
           [patientVisit]="patientVisit"
+          [investigationAndProceduresFormsDetails]="
+            investigationAndProceduresFormsDetails
+          "
           [forConsultation]="forConsultation"
           [provider]="provider"
           [orderTypes]="orderTypes"

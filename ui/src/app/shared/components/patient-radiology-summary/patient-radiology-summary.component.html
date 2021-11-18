@@ -1,28 +1,80 @@
-<div>
+<div
+  *ngIf="{
+    orders: orders$ | async
+  } as params"
+>
   <table class="table table-bordered">
     <thead>
       <tr>
         <th style="width: 10px">SN</th>
-        <th></th>
-        <th></th>
-        <th></th>
+        <th>Radiology order</th>
+        <th>Date & Time</th>
+        <th style="width: 60px"></th>
       </tr>
     </thead>
     <tbody>
-      <ng-container>
+      <ng-container
+        *ngIf="params?.orders && params?.orders?.length > 0 && !addingOrder"
+      >
+        <tr *ngFor="let order of params?.orders; let count = index">
+          <td>
+            {{ count + 1 }}
+          </td>
+          <td>
+            {{ order?.display }}
+          </td>
+          <td>
+            {{ order?.dateActivated | date: "medium" }}
+          </td>
+          <td></td>
+        </tr>
+      </ng-container>
+      <ng-container *ngIf="!params?.orders || addingProcedure">
         <tr>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
+          <td colspan="100%">
+            <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+          </td>
+        </tr>
+      </ng-container>
+      <ng-container
+        *ngIf="params?.orders && params?.orders.length === 0 && !addingOrder"
+      >
+        <tr>
+          <td colspan="100%">
+            <div class="alert alert-warning" role="alert">
+              NO Radiology service ordered
+            </div>
+          </td>
+        </tr>
+      </ng-container>
+      <ng-container *ngIf="hasError">
+        <tr>
+          <td colspan="100%">
+            <div class="alert alert-danger" role="alert">
+              {{ error }}
+            </div>
+          </td>
         </tr>
       </ng-container>
       <ng-container *ngIf="forConsultation">
         <tr>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
+          <td colspan="3">
+            <app-form
+              [fields]="formFields"
+              [isFormHorizontal]="true"
+              (formUpdate)="onFormUpdate($event)"
+            >
+            </app-form>
+          </td>
+          <td>
+            <button
+              mat-stroked-button
+              [disabled]="!isFormValid || addingOrder"
+              (click)="onSave($event)"
+            >
+              Add
+            </button>
+          </td>
         </tr>
       </ng-container>
     </tbody>
