@@ -20,13 +20,14 @@
 }
 
 .other-demographic-details {
-  font-size: 1.1rem;
+  font-size: 1rem;
   padding: 5px 0px !important;
 }
 
-// .other-demographic-details div {
-//   padding: 5px 10px 5px 0px;
-// }
+.other-demographic-details .p-items {
+  padding: 3px 0;
+}
+
 .container {
   display: flex;
   flex-direction: column;

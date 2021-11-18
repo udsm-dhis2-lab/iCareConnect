@@ -13,7 +13,9 @@
           {{ patientDetails?.person?.middleName }}
         </span>
         <span class="mr-2 age-and-gender-details"
-          >({{ patientDetails?.person?.gender === "M" ? "Male" : "Female" }}
+          >(<b>{{
+            patientDetails?.person?.gender === "M" ? "Male" : "Female"
+          }}</b>
           |
           {{ patientDetails?.person?.age }} Yrs |
           {{ patientDetails?.person?.birthdate | date }}
@@ -30,10 +32,10 @@
         "
       >
         <div class="col-md-3 col-sm-6 col-sx-6">
-          <div class="item-left">
+          <div class="item-left p-items">
             MRN: <span class="text-muted"> {{ patientDetails?.mrn }}</span>
           </div>
-          <div class="item-left">
+          <div class="item-left p-items">
             <span> Phone: </span>
             <span class="text-muted">
               {{
@@ -52,8 +54,7 @@
               }}
             </span>
           </div>
-          <div class="item-left"></div>
-          <div class="item-left">
+          <div class="item-left p-items">
             Payment type:
             <span class="text-muted">
               {{ (activeVisit$ | async)?.isEnsured ? "INSURANCE" : "CASH" }}
