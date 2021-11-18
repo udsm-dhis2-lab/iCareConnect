@@ -238,7 +238,13 @@
             </div>
           </td>
           <td>
-            <button mat-stroked-button (click)="onAddTest($event)">Add</button>
+            <button
+              mat-stroked-button
+              [disabled]="!isFormValid"
+              (click)="onAddTest($event)"
+            >
+              Add
+            </button>
           </td>
         </tr>
       </ng-container>

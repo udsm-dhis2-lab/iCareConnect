@@ -1,28 +1,77 @@
-<div>
+<div
+  *ngIf="{
+    procedures: procedures$ | async
+  } as params"
+>
   <table class="table table-bordered">
     <thead>
       <tr>
         <th style="width: 10px">SN</th>
-        <th></th>
-        <th></th>
-        <th></th>
+        <th>Procedure</th>
+        <th>Date & Time</th>
+        <th style="width: 60px"></th>
       </tr>
     </thead>
     <tbody>
-      <ng-container>
+      <ng-container
+        *ngIf="
+          params?.procedures &&
+          params?.procedures?.length > 0 &&
+          !addingProcedure
+        "
+      >
+        <tr *ngFor="let procedure of params?.procedures; let count = index">
+          <td>
+            {{ count + 1 }}
+          </td>
+          <td>
+            {{ procedure?.display }}
+          </td>
+          <td>
+            {{ procedure?.dateActivated | date: "medium" }}
+          </td>
+          <td></td>
+        </tr>
+      </ng-container>
+      <ng-container *ngIf="!params?.procedures || addingProcedure">
         <tr>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
+          <td colspan="100%">
+            <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+          </td>
+        </tr>
+      </ng-container>
+      <ng-container
+        *ngIf="
+          params?.procedures &&
+          params?.procedures.length === 0 &&
+          !addingProcedure
+        "
+      >
+        <tr>
+          <td colspan="100%">
+            <p class="text-left">NO Procedure ordered</p>
+          </td>
         </tr>
       </ng-container>
       <ng-container *ngIf="forConsultation">
         <tr>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
+          <td colspan="3">
+            <app-form
+              [fields]="formFields"
+              [isFormHorizontal]="true"
+              (formUpdate)="onFormUpdate($event)"
+            >
+            </app-form>
+          </td>
+          <td>
+            <button
+              mat-stroked-button
+              [disabled]="!isFormValid || addingProcedure"
+              (click)="onSave($event)"
+            >
+              Add
+            </button>
+          </td>
         </tr>
       </ng-container>
     </tbody>

@@ -17,7 +17,9 @@
     ordersUpdates: ordersUpdates$ | async,
     currentLocation: currentLocation$ | async,
     forms: forms$ | async,
-    countOfVitalsElementsFilled: countOfVitalsElementsFilled$ | async
+    countOfVitalsElementsFilled: countOfVitalsElementsFilled$ | async,
+    orderTypes: orderTypes$ | async,
+    provider: provider$ | async
   } as dashboardParams"
 >
   <div
@@ -310,13 +312,17 @@
                       "
                       [patientVisit]="activeVisit"
                       [forConsultation]="true"
+                      [provider]="dashboardParams?.provider"
+                      [orderTypes]="dashboardParams?.orderTypes"
                     ></app-patient-investigations-and-procedures>
 
                     <mat-progress-bar
                       *ngIf="
                         dashboardParams?.loadingVisit ||
                         !activeVisit ||
-                        !dashboardParams?.formEntities['All orderables']
+                        !dashboardParams?.formEntities['All orderables'] ||
+                        !dashboardParams?.provider ||
+                        !dashboardParams?.orderTypes
                       "
                       mode="indeterminate"
                     ></mat-progress-bar>

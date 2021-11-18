@@ -19,7 +19,12 @@
       <div class="mat-tab-container" *ngIf="selectedTab.value == 1">
         <app-patient-procedures-summary
           [patientVisit]="patientVisit"
+          [investigationAndProceduresFormsDetails]="
+            investigationAndProceduresFormsDetails
+          "
           [forConsultation]="forConsultation"
+          [provider]="provider"
+          [orderTypes]="orderTypes"
         ></app-patient-procedures-summary></div
     ></mat-tab>
     <mat-tab label="Radiology">
@@ -27,6 +32,8 @@
         <app-patient-radiology-summary
           [patientVisit]="patientVisit"
           [forConsultation]="forConsultation"
+          [provider]="provider"
+          [orderTypes]="orderTypes"
         ></app-patient-radiology-summary></div
     ></mat-tab>
   </mat-tab-group>

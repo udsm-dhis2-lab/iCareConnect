@@ -10,11 +10,13 @@ import {
   go,
   loadCustomOpenMRSForms,
   loadForms,
+  loadOrderTypes,
   startConsultation,
 } from "src/app/store/actions";
 import { AppState } from "src/app/store/reducers";
 import {
   getAllDiagnoses,
+  getAllOrderTypes,
   getConsultationInProgressStatus,
   getCurrentLocation,
   getStartingConsultationLoadingStatus,
@@ -99,6 +101,7 @@ export class SharedPatientDashboardComponent implements OnInit {
   menus: any[];
   privileges$: Observable<any>;
   forms$: Observable<any>;
+  orderTypes$: Observable<any>;
   countOfVitalsElementsFilled$: Observable<number>;
 
   constructor(
@@ -109,6 +112,8 @@ export class SharedPatientDashboardComponent implements OnInit {
 
   ngOnInit(): void {
     this.onStartConsultation(this.activeVisit);
+    this.store.dispatch(loadOrderTypes());
+    this.orderTypes$ = this.store.select(getAllOrderTypes);
     this.applicableForms = getApplicableForms(
       ICARE_CONFIG,
       this.currentUser,

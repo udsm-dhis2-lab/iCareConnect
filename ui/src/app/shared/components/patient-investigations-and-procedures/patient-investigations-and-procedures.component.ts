@@ -12,6 +12,8 @@ export class PatientInvestigationsAndProceduresComponent implements OnInit {
   @Input() patientVisit: Visit;
   @Input() forConsultation: boolean;
   @Input() investigationAndProceduresFormsDetails: any;
+  @Input() orderTypes: any;
+  @Input() provider: any;
   selectedTab = new FormControl(0);
   constructor() {}
 

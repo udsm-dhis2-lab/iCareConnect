@@ -2,6 +2,7 @@ import { Injectable } from "@angular/core";
 import { Observable, of, zip } from "rxjs";
 import { catchError, map } from "rxjs/operators";
 import { OpenmrsHttpClientService } from "../../../modules/openmrs-http-client/services/openmrs-http-client.service";
+import { omit } from "lodash";
 
 @Injectable({
   providedIn: "root",
@@ -56,5 +57,17 @@ export class OrdersService {
 
   deleteOrder(uuid): Observable<any> {
     return this.openMRSHttpClient.delete(`order/${uuid}`);
+  }
+
+  createOrdersViaEncounter(orders): Observable<any> {
+    const encounterUuid = orders[0]?.encounter;
+    const data = {
+      uuid: orders[0]?.encounter,
+      orders: orders.map((order) => {
+        const formattedOrder = omit(order, "encounter");
+        return formattedOrder;
+      }),
+    };
+    return this.openMRSHttpClient.post(`encounter/${encounterUuid}`, data);
   }
 }
