@@ -1,4 +1,4 @@
-FROM openmrs/openmrs-reference-application-distro:demo
+FROM udsmdhis2/icare-openmrs:1.0.0
 COPY ./docker/glowroot /glowroot
 COPY ./docker/setenv.sh bin/
 COPY ./docker/admin.json /glowroot/
