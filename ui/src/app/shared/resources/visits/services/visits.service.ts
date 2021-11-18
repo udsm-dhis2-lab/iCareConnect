@@ -11,7 +11,10 @@ import { ICARE_CONFIG } from "../../config";
 import { Api } from "../../openmrs";
 import { DrugOrder } from "../../order/models";
 import { DrugOrdersService } from "../../order/services";
-import { getDrugOrdersFromCurrentVisitEncounters } from "../helpers";
+import {
+  getDrugOrdersFromCurrentVisitEncounters,
+  getProceduresFromCurrentVisitEncounters,
+} from "../helpers";
 import { Visit } from "../models/visit.model";
 
 @Injectable({
@@ -412,6 +415,18 @@ export class VisitsService {
     } as any);
     const visit = (visitDetails?.results || [])[0];
     return getDrugOrdersFromCurrentVisitEncounters(visit);
+  }
+
+  getActiveVisitProcedures(uuid: string, fields): Observable<any> {
+    return from(
+      this.api.visit.getVisit(uuid, {
+        v: fields,
+      })
+    ).pipe(
+      map((response) => {
+        return getProceduresFromCurrentVisitEncounters(response);
+      })
+    );
   }
 
   /**TODO: Move to admission shared service */

@@ -9,6 +9,8 @@ import { Visit } from "../../resources/visits/models/visit.model";
 export class PatientRadiologySummaryComponent implements OnInit {
   @Input() patientVisit: Visit;
   @Input() forConsultation: boolean;
+  @Input() provider: any;
+  @Input() orderTypes: any[];
   constructor() {}
 
   ngOnInit(): void {}

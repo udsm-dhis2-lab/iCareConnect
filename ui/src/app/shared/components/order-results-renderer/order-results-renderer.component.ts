@@ -37,6 +37,8 @@ export class OrderResultsRendererComponent implements OnInit {
   formValuesData: any;
   commonLabTestsFields: any[] = [];
   voidingLabOrderState$: Observable<boolean>;
+
+  isFormValid: boolean = false;
   constructor(private store: Store<AppState>) {}
 
   ngOnInit(): void {
@@ -85,6 +87,7 @@ export class OrderResultsRendererComponent implements OnInit {
 
   onFormUpdate(formValues: FormValue): void {
     this.formValuesData = formValues.getValues();
+    this.isFormValid = formValues.isValid;
   }
 
   onAddTest(event: Event): void {
