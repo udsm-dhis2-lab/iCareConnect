@@ -1,6 +1,6 @@
 import * as _ from "lodash";
 
-export function getProceduresFromCurrentVisitEncounters(visit) {
+export function getOrdersFromCurrentVisitEncounters(visit, type) {
   if (!visit) {
     return null;
   }
@@ -11,7 +11,8 @@ export function getProceduresFromCurrentVisitEncounters(visit) {
       ..._.map(
         encounter.orders.filter(
           (order) =>
-            order?.orderType?.display.toLowerCase() === "procedure order"
+            order?.orderType?.display.toLowerCase() ===
+            (type == "procedure" ? "procedure order" : "radiology order")
         ) || [],
         (order) => {
           return {

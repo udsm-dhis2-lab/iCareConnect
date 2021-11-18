@@ -25,7 +25,8 @@ export class PatientProceduresSummaryComponent implements OnInit {
     "custom:(uuid,encounters:(uuid,location:(uuid,display),encounterType,display,encounterProviders,encounterDatetime,voided,obs,orders:(uuid,display,orderer,orderType,dateActivated,orderNumber,concept,display)))";
   creatingProceduresResponse$: Observable<any>;
   addingProcedure: boolean = false;
-  addedProcedure: boolean = false;
+  hasError: boolean = false;
+  error: string;
   formDetails: FormValue;
   constructor(
     private ordersService: OrdersService,
@@ -128,10 +129,16 @@ export class PatientProceduresSummaryComponent implements OnInit {
     this.creatingProceduresResponse$.subscribe((response) => {
       if (response) {
         this.addingProcedure = false;
-        this.procedures$ = this.visitService.getActiveVisitProcedures(
-          this.patientVisit.uuid,
-          this.fields
-        );
+        if (!response?.message) {
+          this.procedures$ = this.visitService.getActiveVisitProcedures(
+            this.patientVisit.uuid,
+            this.fields
+          );
+          this.hasError = false;
+        } else {
+          this.hasError = true;
+          this.error = response?.message;
+        }
       }
     });
   }

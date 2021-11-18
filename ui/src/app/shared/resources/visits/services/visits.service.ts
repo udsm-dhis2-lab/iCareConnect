@@ -13,7 +13,7 @@ import { DrugOrder } from "../../order/models";
 import { DrugOrdersService } from "../../order/services";
 import {
   getDrugOrdersFromCurrentVisitEncounters,
-  getProceduresFromCurrentVisitEncounters,
+  getOrdersFromCurrentVisitEncounters,
 } from "../helpers";
 import { Visit } from "../models/visit.model";
 
@@ -424,7 +424,19 @@ export class VisitsService {
       })
     ).pipe(
       map((response) => {
-        return getProceduresFromCurrentVisitEncounters(response);
+        return getOrdersFromCurrentVisitEncounters(response, "procedure");
+      })
+    );
+  }
+
+  getActiveVisitRadiologyOrders(uuid: string, fields): Observable<any> {
+    return from(
+      this.api.visit.getVisit(uuid, {
+        v: fields,
+      })
+    ).pipe(
+      map((response) => {
+        return getOrdersFromCurrentVisitEncounters(response, "radiology");
       })
     );
   }

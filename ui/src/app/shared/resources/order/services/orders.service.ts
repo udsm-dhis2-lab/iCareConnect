@@ -68,6 +68,13 @@ export class OrdersService {
         return formattedOrder;
       }),
     };
-    return this.openMRSHttpClient.post(`encounter/${encounterUuid}`, data);
+    return this.openMRSHttpClient.post(`encounter/${encounterUuid}`, data).pipe(
+      map((response) => {
+        return response;
+      }),
+      catchError((errorResponse) => {
+        return of(errorResponse?.error);
+      })
+    );
   }
 }
