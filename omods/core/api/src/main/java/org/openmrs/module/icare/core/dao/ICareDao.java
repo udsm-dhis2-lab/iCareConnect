@@ -214,18 +214,15 @@ public class ICareDao extends BaseDAO<Item> {
 	        OrderStatus.OrderStatusCode orderStatusCode, Order.FulfillerStatus fulfillerStatus, Integer limit,
 	        Integer startIndex) {
 		DbSession session = this.getSession();
-		String queryStr = "SELECT distinct v FROM Visit v"
-				+ " INNER JOIN v.patient p"
-				+ " INNER JOIN p.names pname"
-				+ " INNER JOIN v.encounters e"
-				+ " INNER JOIN e.orders o"
-		        + " INNER JOIN o.orderType ot" + " WHERE ot.uuid=:orderTypeUuid " + " AND v.stopDatetime IS NULL ";
+		String queryStr = "SELECT distinct v FROM Visit v" + " INNER JOIN v.patient p" + " INNER JOIN p.names pname"
+		        + " INNER JOIN v.encounters e" + " INNER JOIN e.orders o" + " INNER JOIN o.orderType ot"
+		        + " WHERE ot.uuid=:orderTypeUuid " + " AND v.stopDatetime IS NULL ";
 		if (fulfillerStatus != null) {
 			queryStr += " AND o.fulfillerStatus=:fulfillerStatus";
 		} else {
 			queryStr += " AND o.fulfillerStatus IS NULL";
 		}
-
+		
 		if (search != null) {
 			queryStr += " AND lower(concat(pname.givenName,pname.middleName,pname.familyName)) LIKE lower(:search)";
 		}
@@ -250,7 +247,7 @@ public class ICareDao extends BaseDAO<Item> {
 			query.setParameter("locationUuid", locationUuid);
 		}
 		if (search != null) {
-			query.setParameter("search", "%" + search.replace(" ","%") + "%");
+			query.setParameter("search", "%" + search.replace(" ", "%") + "%");
 		}
 		if (orderStatusCode != null) {
 			if (orderStatusCode == OrderStatus.OrderStatusCode.EMPTY) {
