@@ -1,10 +1,10 @@
-import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
-import { OpenmrsHttpClientService } from 'src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service';
+import { Injectable } from "@angular/core";
+import { Observable, of } from "rxjs";
+import { catchError, map } from "rxjs/operators";
+import { OpenmrsHttpClientService } from "src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service";
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: "root",
 })
 export class SystemSettingsService {
   constructor(private httpClient: OpenmrsHttpClientService) {}
@@ -15,7 +15,8 @@ export class SystemSettingsService {
       .pipe(
         map((response) => {
           return JSON.parse(response?.results[0]?.value);
-        })
+        }),
+        catchError((error) => of(error))
       );
   }
 
@@ -24,8 +25,9 @@ export class SystemSettingsService {
       map((response) => {
         return response?.results && response?.results[0]
           ? JSON.parse(response?.results[0]?.value)
-          : '';
-      })
+          : "";
+      }),
+      catchError((error) => of(error))
     );
   }
 
@@ -34,12 +36,14 @@ export class SystemSettingsService {
       map((response) => {
         return {
           uuid: response?.results[0]?.uuid,
+          key,
           value:
             response?.results && response?.results[0]
               ? JSON.parse(response?.results[0]?.value)
-              : '',
+              : "",
         };
-      })
+      }),
+      catchError((error) => of(error))
     );
   }
 
