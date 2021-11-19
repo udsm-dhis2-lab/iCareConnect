@@ -8,6 +8,7 @@ import { AdmissionFormComponent } from "src/app/shared/components/admission-form
 import { PatientVisitHistoryModalComponent } from "src/app/shared/components/patient-visit-history-modal/patient-visit-history-modal.component";
 import { getApplicableForms } from "src/app/shared/helpers/identify-applicable-forms.helper";
 import { OpenMRSForm } from "src/app/shared/modules/form/models/custom-openmrs-form.model";
+import { ConceptsService } from "src/app/shared/resources/concepts/services/concepts.service";
 import { ICARE_CONFIG } from "src/app/shared/resources/config";
 import { ProviderGetFull } from "src/app/shared/resources/openmrs";
 import { Patient } from "src/app/shared/resources/patient/models/patient.model";
@@ -46,6 +47,7 @@ export class NursingDataComponent implements OnInit {
   @Input() formPrivilegesConfigs: any;
   @Input() currentUser: any;
   @Input() userPrivileges: any;
+  @Input() nursingConfigurations: any;
   provider$: Observable<ProviderGetFull>;
   visit$: Observable<Visit>;
   currentLocation$: Observable<Location>;
@@ -64,11 +66,20 @@ export class NursingDataComponent implements OnInit {
   billLoadingState$: Observable<boolean>;
   currentBills$: Observable<any[]>;
   activeVisitLoadedState$: Observable<boolean>;
+  conceptsWithDepartmentsDetails$: Observable<any>;
 
-  constructor(private store: Store<AppState>, private dialog: MatDialog) {}
+  constructor(
+    private store: Store<AppState>,
+    private dialog: MatDialog,
+    private conceptsService: ConceptsService
+  ) {}
 
   ngOnInit(): void {
     this.privileges$ = this.store.select(getCurrentUserPrivileges);
+    this.conceptsWithDepartmentsDetails$ =
+      this.conceptsService.getConceptsDepartmentDetails(
+        this.nursingConfigurations?.departmentsReference?.id
+      );
     this.applicableForms = getApplicableForms(
       ICARE_CONFIG,
       this.currentUser,

@@ -5,7 +5,8 @@
     privilegesConfigs: privilegesConfigs$ | async,
     currentUser: currentUser$ | async,
     allUserRoles: allUserRoles$ | async,
-    userPrivileges: userPrivileges$ | async
+    userPrivileges: userPrivileges$ | async,
+    nursingConfigurations: nursingConfigurations$ | async
   } as params"
 >
   <app-nursing-data
@@ -14,12 +15,26 @@
       params?.privilegesConfigs &&
       params?.allUserRoles &&
       params?.allUserRoles?.length > 0 &&
-      params?.userPrivileges
+      params?.userPrivileges &&
+      params?.nursingConfigurations &&
+      params?.nursingConfigurations['value'] !== ''
     "
     [formPrivilegesConfigs]="params?.privilegesConfigs"
     [currentUser]="params?.currentUser"
     [userPrivileges]="params?.userPrivileges"
+    [nursingConfigurations]="params?.nursingConfigurations['value']"
   ></app-nursing-data>
+  <div
+    class="alert alert-danger p-1"
+    *ngIf="
+      params?.nursingConfigurations &&
+      params?.nursingConfigurations['value'] === ''
+    "
+    role="alert"
+  >
+    Missing Nursing module configurations, key:
+    {{ params?.nursingConfigurations["key"] }}
+  </div>
 
   <mat-progress-bar
     mode="indeterminate"
@@ -27,7 +42,8 @@
       params?.formPrivilegesConfigsLoadingState ||
       !params?.allUserRoles ||
       (params?.allUserRoles && params?.allUserRoles?.length === 0) ||
-      !params?.userPrivileges
+      !params?.userPrivileges ||
+      !params?.nursingConfigurations
     "
   ></mat-progress-bar>
 </div>
