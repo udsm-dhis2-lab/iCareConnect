@@ -1,20 +1,20 @@
-import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
-import { MatPaginator } from '@angular/material/paginator';
-import { MatTableDataSource } from '@angular/material/table';
-import { ActivatedRoute, Router } from '@angular/router';
-import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs';
-import { AppState } from 'src/app/store/reducers';
-import { getCurrentUserDetails } from 'src/app/store/selectors/current-user.selectors';
-import { CaptureSignatureComponent } from '../../../components/capture-signature/capture-signature.component';
-import { UserCreateModel } from '../../../models/user.model';
-import { UserService } from '../../../services/users.service';
+import { AfterViewInit, Component, OnInit, ViewChild } from "@angular/core";
+import { MatDialog } from "@angular/material/dialog";
+import { MatPaginator } from "@angular/material/paginator";
+import { MatTableDataSource } from "@angular/material/table";
+import { ActivatedRoute, Router } from "@angular/router";
+import { Store } from "@ngrx/store";
+import { Observable } from "rxjs";
+import { AppState } from "src/app/store/reducers";
+import { getCurrentUserDetails } from "src/app/store/selectors/current-user.selectors";
+import { CaptureSignatureComponent } from "../../../components/capture-signature/capture-signature.component";
+import { UserCreateModel } from "../../../models/user.model";
+import { UserService } from "../../../services/users.service";
 
 @Component({
-  selector: 'app-user-management',
-  templateUrl: './user-management.component.html',
-  styleUrls: ['./user-management.component.scss'],
+  selector: "app-user-management",
+  templateUrl: "./user-management.component.html",
+  styleUrls: ["./user-management.component.scss"],
 })
 export class UserManagementComponent implements OnInit, AfterViewInit {
   itemSearchTerm: string;
@@ -22,12 +22,12 @@ export class UserManagementComponent implements OnInit, AfterViewInit {
   currentUser$: Observable<any>;
   loading: boolean = true;
   displayedColumns: string[] = [
-    'index',
-    'display',
-    'fullName',
-    'username',
-    'systemId',
-    'actions',
+    "index",
+    "display",
+    "fullName",
+    "username",
+    "systemId",
+    "actions",
   ];
   dataSource: MatTableDataSource<UserCreateModel>;
   @ViewChild(MatPaginator) paginator: MatPaginator;
@@ -45,7 +45,7 @@ export class UserManagementComponent implements OnInit, AfterViewInit {
     this.currentUser$ = this.store.select(getCurrentUserDetails);
     this.service.getUsers().subscribe((users) => {
       this.dataSource = new MatTableDataSource<UserCreateModel>(
-        users['results']
+        users["results"]
       );
       this.dataSource.paginator = this.paginator;
       this.loading = false;
@@ -58,9 +58,10 @@ export class UserManagementComponent implements OnInit, AfterViewInit {
   }
   public data = {};
   getRecord(row: UserCreateModel) {
+    console.log(row);
     this.data = row;
-    localStorage.setItem('selectedUser', JSON.stringify(row));
-    this.router.navigate(['edit-user'], {
+    localStorage.setItem("selectedUser", JSON.stringify(row));
+    this.router.navigate(["edit-user"], {
       state: this.data,
       relativeTo: this.route,
       queryParams: { id: row.uuid },
@@ -77,7 +78,7 @@ export class UserManagementComponent implements OnInit, AfterViewInit {
   onCaptureSignature(event: Event): void {
     event.stopPropagation();
     this.dialog.open(CaptureSignatureComponent, {
-      width: '40%',
+      width: "40%",
     });
   }
 }
