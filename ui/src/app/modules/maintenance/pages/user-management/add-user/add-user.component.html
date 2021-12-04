@@ -132,11 +132,11 @@
           <mat-hint *ngIf="!passwordInput.value">Enter your password</mat-hint>
           <mat-icon matSuffix (click)="hide = !hide">{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
         </mat-form-field>
-        <span *ngIf="!passwordStrong &&passwordFocusOut" class="mt-0 text-danger"><b>Password too weak.</b> A strong
+        <!-- <span *ngIf="!passwordStrong &&passwordFocusOut" class="mt-0 text-danger"><b>Password too weak.</b> A strong
           password
           should
           have at least one number, one lowercase, one uppercase letter, and at least six characters that are
-          letters</span>
+          letters</span> -->
 
         <mat-form-field appearance="fill" autocomplete="off" *ngIf="hide" style="margin-top: 14px;">
           <mat-label>
@@ -288,7 +288,7 @@
       </ng-container>
 
       <button mat-flat-button color="primary" style="height: 40px; width: 100px" (click)="saveData()"
-        [disabled]="!userForm.valid||saving || !passwordMatch">
+        [disabled]="!userForm.valid||saving">
         <ng-container *ngIf="saving">
           <span class="ml-2">Saving</span>
           <mat-icon [ngClass]="{ 'fa-spin': saving }">cached</mat-icon>
