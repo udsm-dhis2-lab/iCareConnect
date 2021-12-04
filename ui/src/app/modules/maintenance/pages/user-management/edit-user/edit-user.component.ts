@@ -95,9 +95,7 @@ export class EditUserComponent implements OnInit {
                   this.selectedUser = user;
                   this.selectedUser.person = person;
                 const locations = user.userProperties.locations.split("'").join('"')
-                  console.log(locations)
                   for (const location of JSON.parse(locations)) {
-                     console.log("UUID", location);
                     this.service
                       .getLocationByUuid({ uuid: location })
                       .subscribe((response) => {
