@@ -1,16 +1,20 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { Location } from 'src/app/core/models';
-import { getObservationsFromForm } from 'src/app/modules/clinic/helpers/get-observations-from-form.helper';
-import { FormValue } from 'src/app/shared/modules/form/models/form-value.model';
-import { ICAREForm } from 'src/app/shared/modules/form/models/form.model';
-import { ObservationObject } from 'src/app/shared/resources/observation/models/obsevation-object.model';
-import { Patient } from 'src/app/shared/resources/patient/models/patient.model';
-import { VisitObject } from 'src/app/shared/resources/visits/models/visit-object.model';
+import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import { Store } from "@ngrx/store";
+import { Observable } from "rxjs";
+import { Location } from "src/app/core/models";
+import { getObservationsFromForm } from "src/app/modules/clinic/helpers/get-observations-from-form.helper";
+import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
+import { ICAREForm } from "src/app/shared/modules/form/models/form.model";
+import { ObservationObject } from "src/app/shared/resources/observation/models/obsevation-object.model";
+import { Patient } from "src/app/shared/resources/patient/models/patient.model";
+import { VisitObject } from "src/app/shared/resources/visits/models/visit-object.model";
+import { AppState } from "src/app/store/reducers";
+import { getSavingObservationStatus } from "src/app/store/selectors/observation.selectors";
 
 @Component({
-  selector: 'app-clinical-notes',
-  templateUrl: './clinical-notes.component.html',
-  styleUrls: ['./clinical-notes.component.scss'],
+  selector: "app-clinical-notes",
+  templateUrl: "./clinical-notes.component.html",
+  styleUrls: ["./clinical-notes.component.scss"],
 })
 export class ClinicalNotesComponent implements OnInit {
   @Input() clinicalForm: ICAREForm;
@@ -20,20 +24,23 @@ export class ClinicalNotesComponent implements OnInit {
   @Input() visit: VisitObject;
   @Input() encounterUuid: string;
   @Input() savingObservations: boolean;
+  savingObservations$: Observable<boolean>;
 
   clinicalForms: ICAREForm[];
   currentForm: ICAREForm;
   currentCustomForm: any;
   formData: any;
+  searchingText: string;
   @Output() saveObservations = new EventEmitter();
   @Input() forms: any[];
-  constructor() {}
+  constructor(private store: Store<AppState>) {}
 
   ngOnInit(): void {
     this.clinicalForms = this.clinicalForm?.setMembers || [];
     this.formData = {};
     this.currentForm = this.clinicalForms[0];
     this.currentCustomForm = this.forms[0];
+    this.savingObservations$ = this.store.select(getSavingObservationStatus);
   }
 
   onSetClinicalForm(e, form) {
@@ -63,8 +70,8 @@ export class ClinicalNotesComponent implements OnInit {
         this.location?.id,
         this.visit?.encounterUuid
           ? this.visit?.encounterUuid
-          : JSON.parse(localStorage.getItem('patientConsultation'))[
-              'encounterUuid'
+          : JSON.parse(localStorage.getItem("patientConsultation"))[
+              "encounterUuid"
             ]
       )
     );

@@ -1,7 +1,6 @@
-import { flatten } from "@angular/compiler";
 import { Injectable } from "@angular/core";
 import { DomSanitizer } from "@angular/platform-browser";
-import { isArray, omit, orderBy } from "lodash";
+import { isArray, omit, orderBy, flatten, groupBy, keyBy } from "lodash";
 import { from, Observable, of, zip } from "rxjs";
 import { catchError, map } from "rxjs/operators";
 import { BillingService } from "src/app/modules/billing/services/billing.service";
@@ -35,6 +34,40 @@ export class VisitsService {
     return this.httpClient.post(url, visitPayload).pipe(
       map((response) => {
         return response;
+      })
+    );
+  }
+
+  getVisitObservationsByVisitUuid(parameters): Observable<any> {
+    return from(
+      this.api.visit.getVisit(parameters?.uuid, parameters?.query)
+    ).pipe(
+      map((response) => {
+        let formattedObs = [];
+        response.encounters.map((encounter: any) => {
+          formattedObs = [
+            ...formattedObs,
+            ...encounter?.obs.map((observation) => {
+              return {
+                ...observation,
+                conceptUuid: observation?.concept?.uuid,
+              };
+            }),
+          ];
+        });
+        const groupedObsByConcept = groupBy(formattedObs, "conceptUuid");
+        const obs = Object.keys(groupedObsByConcept).map((key) => {
+          return {
+            uuid: key,
+            history: groupedObsByConcept[key],
+            latest: orderBy(
+              groupedObsByConcept[key],
+              ["observationDatetime"],
+              ["desc"]
+            )[0],
+          };
+        });
+        return keyBy(obs, "uuid");
       })
     );
   }
