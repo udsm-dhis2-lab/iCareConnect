@@ -2,6 +2,7 @@
   <div class="col-md-3 clinical-form-list">
     <mat-form-field class="w-100">
       <input
+        [(ngModel)]="searchingText"
         autocomplete="off"
         type="text"
         matInput
@@ -10,7 +11,7 @@
     </mat-form-field>
     <mat-nav-list>
       <mat-list-item
-        *ngFor="let clinicalForm of forms"
+        *ngFor="let clinicalForm of forms | searchItem: searchingText"
         (click)="onSetClinicalForm($event, clinicalForm)"
         class="clinical-form {{
           currentCustomForm?.id === clinicalForm?.id ? 'active-form' : ''
