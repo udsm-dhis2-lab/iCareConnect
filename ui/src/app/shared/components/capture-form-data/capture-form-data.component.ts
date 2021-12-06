@@ -1,22 +1,47 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { FormValue } from '../../modules/form/models/form-value.model';
+import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import { Observable } from "rxjs";
+import { FormValue } from "../../modules/form/models/form-value.model";
+import { Patient } from "../../resources/patient/models/patient.model";
+import { Visit } from "../../resources/visits/models/visit.model";
+import { VisitsService } from "../../resources/visits/services";
+import { PatientService } from "../../services/patient.service";
 
 @Component({
-  selector: 'app-capture-form-data',
-  templateUrl: './capture-form-data.component.html',
-  styleUrls: ['./capture-form-data.component.scss'],
+  selector: "app-capture-form-data",
+  templateUrl: "./capture-form-data.component.html",
+  styleUrls: ["./capture-form-data.component.scss"],
 })
 export class CaptureFormDataComponent implements OnInit {
   @Input() form: any;
   @Input() observations: any;
   @Input() isReport: boolean;
+  @Input() visit: Visit;
+  @Input() patient: Patient;
+  observations$: Observable<any>;
 
   @Output() formDataUpdate = new EventEmitter<FormValue>();
 
   legendControl: any = {};
-  constructor() {}
+  constructor(
+    private patientService: PatientService,
+    private visitService: VisitsService
+  ) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.observations$ = this.visitService.getVisitObservationsByVisitUuid({
+      uuid: this.visit?.uuid,
+      query: {
+        v: "custom:(encounters:(uuid,obs))",
+      },
+    });
+    // this.patientService
+    //   .getAllPatientsObses({
+    //     patient: this.patient?.id,
+    //     v: "full",
+    //     visit: this.visit?.uuid,
+    //   })
+    //   .subscribe((response) => console.log("RESPONSE", response));
+  }
 
   onFormUpdate(data) {
     this.formDataUpdate.emit(data);

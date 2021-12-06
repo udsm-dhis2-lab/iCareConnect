@@ -1,23 +1,25 @@
-import { Injectable } from '@angular/core';
+import { Injectable } from "@angular/core";
 
-import * as _ from 'lodash';
-import { HttpClient } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
-import { BASE_URL } from '../constants/constants.constants';
-import { OpenmrsHttpClientService } from '../modules/openmrs-http-client/services/openmrs-http-client.service';
-import { catchError, map } from 'rxjs/operators';
+import * as _ from "lodash";
+import { HttpClient } from "@angular/common/http";
+import { from, Observable, of } from "rxjs";
+import { BASE_URL } from "../constants/constants.constants";
+import { OpenmrsHttpClientService } from "../modules/openmrs-http-client/services/openmrs-http-client.service";
+import { catchError, map } from "rxjs/operators";
+import { Api } from "../resources/openmrs";
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: "root",
 })
 export class PatientService {
   constructor(
     private httpClient: HttpClient,
-    private openMRSHttpClient: OpenmrsHttpClientService
+    private openMRSHttpClient: OpenmrsHttpClientService,
+    private API: Api
   ) {}
 
   getPatientsDetails(id): Observable<any> {
-    return this.httpClient.get(BASE_URL + 'patient/' + id + '?v=full');
+    return this.httpClient.get(BASE_URL + "patient/" + id + "?v=full");
   }
 
   getPatientPhone(patientUuid) {
@@ -27,9 +29,19 @@ export class PatientService {
       )
       .pipe(
         map((response) => {
-          return response?.rows.map((row) => row?.value).join(', ') || [];
+          return response?.rows.map((row) => row?.value).join(", ") || [];
         }),
         catchError((error) => of(error))
       );
+  }
+
+  getPatientObservations(parameters): Observable<any> {
+    return this.openMRSHttpClient.get(
+      `obs?patient=${parameters?.patientUuid}&v=custom:(encounter:(visit,location:(uuid,display),obs:(uuid,display,obsDatetime,concept:(display),groupMembers:(uuid,display,concept,value,groupMembers:(uuid,concept:(display),value)))))&concept=${parameters?.conceptUuid}`
+    );
+  }
+
+  getAllPatientsObses(parameters): Observable<any> {
+    return from(this.API.obs.getAllObses(parameters));
   }
 }
