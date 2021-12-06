@@ -77,6 +77,7 @@ export class SharedPatientDashboardComponent implements OnInit {
   @Input() currentUser: any;
   @Input() userPrivileges: any;
   @Input() activeVisit: any;
+  @Input() iCareGeneralConfigurations: any;
   currentPatient$: Observable<Patient>;
   vitalSignObservations$: Observable<any>;
   loadingVisit$: Observable<boolean>;

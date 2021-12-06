@@ -14,14 +14,13 @@ import {
 } from "src/app/store/selectors/current-user.selectors";
 import { select, Store } from "@ngrx/store";
 import { ActivatedRoute } from "@angular/router";
-import { loadActiveVisit } from "src/app/store/actions/visit.actions";
 import { loadCurrentPatient, loadRolesDetails } from "src/app/store/actions";
-import { loadPatientBills } from "src/app/store/actions/bill.actions";
 import {
   getActiveVisit,
   getVisitLoadingState,
 } from "src/app/store/selectors/visit.selectors";
 import { VisitObject } from "src/app/shared/resources/visits/models/visit-object.model";
+import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 
 @Component({
   selector: "app-patient-dashboard",
@@ -36,9 +35,18 @@ export class PatientDashboardComponent implements OnInit {
   rolesLoadingState$: Observable<boolean>;
   loadingVisit$: Observable<boolean>;
   activeVisit$: Observable<VisitObject>;
-  constructor(private store: Store<AppState>, private route: ActivatedRoute) {}
+  iCareGeneralConfigurations$: Observable<any>;
+  constructor(
+    private store: Store<AppState>,
+    private route: ActivatedRoute,
+    private systemSettingsService: SystemSettingsService
+  ) {}
 
   ngOnInit(): void {
+    this.iCareGeneralConfigurations$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        "iCare.GeneralMetadata.Configurations"
+      );
     const patientId = this.route.snapshot.params["patientID"];
     this.store.dispatch(loadFormPrivilegesConfigs());
     this.store.dispatch(loadRolesDetails());
