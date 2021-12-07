@@ -318,4 +318,12 @@ public class VisitWrapper {
 		visitMap.put("location", locationMap);
 		return visitMap;
 	}
+
+    public enum OrderBy {
+		VISIT, ENCOUNTER, ORDER, OBSERVATION;
+	}
+
+	public enum OrderByDirection {
+		ASC, DESC;
+	}
 }
