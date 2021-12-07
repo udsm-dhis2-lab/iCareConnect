@@ -2,6 +2,7 @@
   <table class="table table-bordered">
     <thead>
       <tr>
+        <th>Department</th>
         <th>{{ orderTypeName }}</th>
         <th>Order Date & Time</th>
         <th>Ordered By</th>
@@ -16,6 +17,13 @@
       <ng-container *ngIf="orderedItems?.length > 0">
         <ng-container *ngFor="let orderedItem of orderedItems">
           <tr [ngClass]="{ 'text-danger': !orderedItem?.paid }">
+            <td>
+              {{
+                departmentsDetailsKeyedBySetmembers[
+                  orderedItem?.order?.concept?.uuid
+                ]?.department?.display
+              }}
+            </td>
             <td>
               {{ orderedItem?.order?.display }}
             </td>
@@ -39,7 +47,7 @@
                     !orderedItem?.paid ||
                     (orderedItem?.value && orderedItem?.value === 'True')
                   "
-                  (change)="onCheck($event)"
+                  (change)="onCheck($event, orderedItem)"
                   >Yes</mat-checkbox
                 >
               </section>
@@ -49,7 +57,7 @@
                 <mat-label>Remarks</mat-label>
                 <textarea
                   [disabled]="!orderedItem?.paid"
-                  [(ngModel)]="comments"
+                  [(ngModel)]="comments[orderedItem?.order?.concept?.uuid]"
                   matInput
                 ></textarea>
               </mat-form-field>
@@ -61,7 +69,8 @@
               <button
                 [disabled]="
                   !orderedItem?.paid ||
-                  (orderedItem?.value && orderedItem?.value === 'True')
+                  (orderedItem?.value && orderedItem?.value === 'True') ||
+                  !status[orderedItem?.order?.concept?.uuid]
                 "
                 mat-button
                 (click)="saveObservationForThisOrder($event, orderedItem)"
@@ -74,7 +83,7 @@
       </ng-container>
       <ng-container *ngIf="orderedItems?.length === 0">
         <tr>
-          <td colspan="8" class="text-center text-warning">
+          <td colspan="9" class="text-center text-warning">
             NO ordered {{ orderTypeName }}
           </td>
         </tr>

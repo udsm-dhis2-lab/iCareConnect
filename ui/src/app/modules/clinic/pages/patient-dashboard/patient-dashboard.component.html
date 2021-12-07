@@ -8,7 +8,8 @@
     userPrivileges: userPrivileges$ | async,
     rolesLoadingState: rolesLoadingState$ | async,
     loadingVisit: loadingVisit$ | async,
-    activeVisit: activeVisit$ | async
+    activeVisit: activeVisit$ | async,
+    iCareGeneralConfigurations: iCareGeneralConfigurations$ | async
   } as params"
 >
   <app-shared-patient-dashboard
@@ -18,14 +19,23 @@
       params?.privilegesConfigs &&
       params?.userPrivileges &&
       params?.activeVisit &&
-      !params?.loadingVisit
+      !params?.loadingVisit &&
+      params?.iCareGeneralConfigurations &&
+      params?.iCareGeneralConfigurations !== ''
     "
     [formPrivilegesConfigs]="params?.privilegesConfigs"
     [currentUser]="params?.currentUser"
     [activeVisit]="params?.activeVisit"
     [userPrivileges]="params?.userPrivileges"
+    [iCareGeneralConfigurations]="params?.iCareGeneralConfigurations"
   ></app-shared-patient-dashboard>
-
+  <div
+    class="alert alert-danger"
+    role="alert"
+    *ngIf="params?.iCareGeneralConfigurations === ''"
+  >
+    Missing General iCare Metadata Configurations, Contact IT
+  </div>
   <mat-progress-bar
     mode="indeterminate"
     *ngIf="

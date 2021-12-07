@@ -11,7 +11,8 @@
     doesPatientHasPendingPaymentForTheCurrentVisitType:
       doesPatientHasPendingPaymentForTheCurrentVisitType$ | async,
     billLoadingState: billLoadingState$ | async,
-    currentBills: currentBills$ | async
+    currentBills: currentBills$ | async,
+    conceptsWithDepartmentsDetails: conceptsWithDepartmentsDetails$ | async
   } as params"
 >
   <app-new-patient-profile
@@ -177,6 +178,9 @@
               [patient]="params?.patient"
               [visit]="params?.visit"
               [encounters]="params?.visit.encounters"
+              [conceptsWithDepartmentsDetails]="
+                params?.conceptsWithDepartmentsDetails
+              "
             ></app-attend-ordered-items>
           </div>
         </mat-tab>

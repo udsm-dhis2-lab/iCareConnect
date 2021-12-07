@@ -171,102 +171,29 @@ export class AddUserComponent implements OnInit {
       username: data.username,
       password: data.password,
       roles: this.selectedRoles,
+      person
     };
-    this.service.createPerson({ person }).subscribe(
-      (response) => {
-        user['person'] = response;
-        if (response) {
-          if (this.value) {
-            this.providerAttributes.attributes.find(
-              ({ attributeType }) =>
-                attributeType === '79fa49fc-d584-4b74-9dcd-eb265372ade1'
-            ).value = data.MCTNumber;
-            this.providerAttributes.attributes.find(
-              ({ attributeType }) =>
-                attributeType === '685a0d80-25e5-4ed4-8a03-974a1d161bf3'
-            ).value = data.phoneNumber;
-            this.providerAttributes.attributes.find(
-              ({ attributeType }) =>
-                attributeType === '9c4420fa-5a22-4249-978c-da6e0f24880b'
-            ).value = data.qualification;
-            const provider = {
-              identifier: user.username,
-              attributes: this.providerAttributes.attributes,
-              person: response.uuid,
-            };
-            this.service.createProvider({ provider }).subscribe(
-              (response) => {
-                if (user) {
-                  this._snackBar.open(
-                    `User ${response.display} created successfully`,
-                    'OK',
-                    {
-                      horizontalPosition: 'center',
-                      verticalPosition: 'bottom',
-                      duration: 10000,
-                      panelClass: ['snack-color'],
-                    }
-                  );
-                  window.location.href = '#/maintenance/users/';
-                  this.saving = false;
-                }
-              },
-              (error: { error: any }) => {
-                const uuid = response.uuid;
-                this.service.deletePerson({ uuid }).subscribe();
-                this._snackBar.open(
-                  `An error ocurred. Please try again. Hint: ${error.error.error.message}`,
-                  'CLOSE',
-                  {
-                    horizontalPosition: 'center',
-                    verticalPosition: 'bottom',
-                    duration: 10000,
-                    panelClass: ['snack-color-error'],
-                  }
-                );
-                this.saving = false;
-              }
-            );
-          } else {
-            this.service.createUser({ user }).subscribe(
-              (user) => {
-                if (user) {
-                  this._snackBar.open(
-                    `User ${response.display} created successfully`,
-                    'OK',
-                    {
-                      horizontalPosition: 'center',
-                      verticalPosition: 'bottom',
-                      duration: 10000,
-                      panelClass: ['snack-color'],
-                    }
-                  );
-                  window.location.href = '#/maintenance/users/';
-                  this.saving = false;
-                }
-              },
-              (error: { error: any }) => {
-                const uuid = response.uuid;
-                this.service.deletePerson({ uuid }).subscribe();
-                this._snackBar.open(
-                  `An error ocurred. Please try again. Hint: ${error.error.error.message}`,
-                  'CLOSE',
-                  {
-                    horizontalPosition: 'center',
-                    verticalPosition: 'bottom',
-                    duration: 10000,
-                    panelClass: ['snack-color-error'],
-                  }
-                );
-                this.saving = false;
-              }
-            );
-          }
+    this.service.createUser({ user }).subscribe(
+      (user) => {
+        if (user) {
+          this._snackBar.open(
+            `User ${person.display} created successfully`,
+            'OK',
+            {
+              horizontalPosition: 'center',
+              verticalPosition: 'bottom',
+              duration: 10000,
+              panelClass: ['snack-color'],
+            }
+          );
+          window.location.href = '#/maintenance/users/';
+          this.saving = false;
         }
       },
       (error: { error: any }) => {
+        console.log(error)
         this._snackBar.open(
-          `An error ocurred. Please try again. Hint: ${error.error.error.message}`,
+          `An error ocurred. Please try again. Hint: ${error.error?.error?.message || error.error.message}`,
           'CLOSE',
           {
             horizontalPosition: 'center',

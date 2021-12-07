@@ -27,6 +27,7 @@ export class PatientLabResultsSummaryComponent implements OnInit {
   @Input() observations: any;
   @Input() patientVisit: Visit;
   @Input() investigationAndProceduresFormsDetails: any;
+  @Input() iCareGeneralConfigurations: any;
   labOrdersResultsInformation: any[] = [];
   codedResultsData$: Observable<any>;
   keyedResults: any = {};
