@@ -9,6 +9,7 @@
  */
 package org.openmrs.module.icare.core.impl;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.openmrs.*;
 import org.openmrs.api.*;
 import org.openmrs.api.context.Context;
@@ -22,12 +23,18 @@ import org.openmrs.module.icare.billing.services.insurance.ClaimResult;
 import org.openmrs.module.icare.billing.services.insurance.InsuranceService;
 import org.openmrs.module.icare.core.ICareService;
 import org.openmrs.module.icare.core.Item;
+import org.openmrs.module.icare.core.Message;
 import org.openmrs.module.icare.core.dao.ICareDao;
 import org.openmrs.module.icare.core.utils.VisitWrapper;
 import org.openmrs.module.icare.store.models.OrderStatus;
 import org.openmrs.validator.ValidateUtil;
 
 import javax.naming.ConfigurationException;
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.SocketTimeoutException;
+import java.net.URL;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -190,7 +197,6 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	@Override
 	public Prescription savePrescription(Prescription prescription) {
 		if (prescription.getUuid() != null) {
-			System.out.println("What");
 			Prescription existingPrescription = (Prescription) Context.getOrderService().getOrderByUuid(
 			    prescription.getUuid());
 			if (existingPrescription != null) {
@@ -203,7 +209,6 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 					}
 				}
 				existingPrescription.updatePrescription(prescription);
-				System.out.println("Yey");
 				
 				dao.updatePrescription(prescription);
 				prescription = existingPrescription;
@@ -232,7 +237,60 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	        Order.FulfillerStatus fulfillerStatus, Integer limit, Integer startIndex) {
 		return this.dao.getOrdersByVisitAndOrderType(visitUuid, orderTypeUuid, fulfillerStatus, limit, startIndex);
 	}
-	
+
+	@Override
+	public Message sendMessage(Message message) throws Exception {
+		String messagePhoneNumber = Context.getAdministrationService().getGlobalProperty(ICareConfig.MESSAGE_PHONE_NUMBER);
+		if (messagePhoneNumber == null) {
+			throw new Exception("Message Phone Number is not configured. Please check "
+					+ ICareConfig.MESSAGE_PHONE_NUMBER + ".");
+		}
+		message.setPhoneNumber(messagePhoneNumber);
+		String urlString = "https://us-central1-maximal-journey-328212.cloudfunctions.net/messaging";
+		URL url = new URL(urlString);
+		HttpURLConnection con = (HttpURLConnection) url.openConnection();
+		//con.setReadTimeout(15000);
+		//con.setConnectTimeout(15000);
+		con.setRequestMethod("POST");
+		//String bearer = String.format("Bearer %1s", authToken.getAccessToken());
+		//con.addRequestProperty("Authorization", bearer);
+		con.addRequestProperty("Content-Type", "application/json");
+		con.setDoInput(true);
+		con.setDoOutput(true);
+
+		OutputStream os = con.getOutputStream();
+		BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+		String json = new ObjectMapper().writeValueAsString(message.toMap());
+		writer.write(json);
+
+		writer.flush();
+		writer.close();
+		os.close();
+		try {
+			BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+			String inputLine;
+			StringBuffer content = new StringBuffer();
+			while ((inputLine = in.readLine()) != null) {
+				content.append(inputLine);
+			}
+			in.close();
+			return message;
+		}
+		catch (SocketTimeoutException e) {
+			throw e;
+		}
+		catch (Exception e) {
+			BufferedReader in = new BufferedReader(new InputStreamReader(con.getErrorStream()));
+			String inputLine;
+			StringBuffer content = new StringBuffer();
+			while ((inputLine = in.readLine()) != null) {
+				content.append(inputLine);
+			}
+			in.close();
+			throw e;
+		}
+	}
+
 	@Override
 	public Item getItemByConceptUuid(String uuid) {
 		return dao.getItemByConceptUuid(uuid);

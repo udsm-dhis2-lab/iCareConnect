@@ -5,20 +5,21 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.openmrs.*;
+import org.openmrs.api.AdministrationService;
 import org.openmrs.api.EncounterService;
 import org.openmrs.api.PatientService;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.icare.ICareConfig;
 import org.openmrs.module.icare.billing.models.InvoiceItem;
-import org.openmrs.module.icare.billing.models.Prescription;
 import org.openmrs.module.icare.billing.services.BillingService;
 import org.openmrs.module.icare.web.controller.core.BaseResourceControllerTest;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -37,6 +38,7 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 	
 	@Test
 	public void testCreatingItem() throws Exception {
+
 		String dto = this.readFile("dto/item-create-dto.json");
 		Map<String, Object> item = (new ObjectMapper()).readValue(dto, Map.class);
 		
@@ -126,6 +128,24 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		Map<String, Object> results = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
 		List<Map<String, Object>> maps = (List) results.get("results");
 		assertThat("Should return a 3 item Prices", maps.size(), is(3));
+	}
+
+	@Test
+	public void testSendMessage() throws Exception {
+		AdministrationService adminService = Context.getService(AdministrationService.class);
+		adminService.setGlobalProperty(ICareConfig.MESSAGE_PHONE_NUMBER, "0718026490");
+		String dto = this.readFile("dto/send-message-single-dto.json");
+		Map<String, Object> item = (new ObjectMapper()).readValue(dto, Map.class);
+		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+		item.put("dateTime",dateFormat.format(new Date()));
+		item.put("id",UUID.randomUUID());
+		System.out.println(item.get("dateTime"));
+
+		MockHttpServletRequest newPostRequest = newPostRequest("icare/message", item);
+		MockHttpServletResponse handle = handle(newPostRequest);
+
+		Map<String, Object> map = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
+
 	}
 	
 	@Test

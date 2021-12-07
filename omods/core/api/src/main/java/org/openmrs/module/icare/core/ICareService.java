@@ -27,6 +27,8 @@ import org.openmrs.module.icare.store.models.OrderStatus;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.naming.ConfigurationException;
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.List;
 
 /**
@@ -100,4 +102,6 @@ public interface ICareService extends OpenmrsService {
 	
 	List<Order> getOrdersByVisitAndOrderType(String visitUuid, String orderTypeUuid, Order.FulfillerStatus fulfillerStatus,
 	        Integer limit, Integer startIndex);
+
+	Message sendMessage(Message message) throws MalformedURLException, IOException, Exception;
 }
