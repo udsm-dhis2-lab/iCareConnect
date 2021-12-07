@@ -76,3 +76,11 @@ ui/cypress/reports/*
 
 */backup/
 docker-compose.yml
+
+
+# Messaging support
+messaging/functions/node_modules/
+messaging/firestore-debug.log
+messaging/firebase-debug.log
+messaging/database-debug.log
+messaging/ui-debug.log
