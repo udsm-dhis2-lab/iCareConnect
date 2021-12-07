@@ -3,10 +3,10 @@
   "description": "iCare Messaging Cloud Functions for Firebase",
   "scripts": {
     "lint": "eslint .",
-    "serve": "firebase emulators:start --only functions maximal-journey-328212",
+    "serve": "firebase emulators:start --only functions --project maximal-journey-328212",
     "shell": "firebase functions:shell",
     "start": "npm run shell",
-    "deploy": "firebase deploy --only functions maximal-journey-328212",
+    "deploy": "firebase deploy --only functions --project maximal-journey-328212",
     "logs": "firebase functions:log"
   },
   "engines": {
