@@ -76,4 +76,6 @@ public class ICareConfig {
 	public static final String STOCK_ENABLE = "icare.stock.enable";
 	
 	public static final String STOCK_LOCATIONS = "icare.stock.locations";
+
+    public static final String MESSAGE_PHONE_NUMBER = "icare.notification.message.phoneNumber";
 }

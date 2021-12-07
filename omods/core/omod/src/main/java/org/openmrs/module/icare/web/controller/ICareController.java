@@ -21,6 +21,7 @@ import org.openmrs.module.icare.billing.services.insurance.Claim;
 import org.openmrs.module.icare.billing.services.insurance.ClaimResult;
 import org.openmrs.module.icare.core.ICareService;
 import org.openmrs.module.icare.core.Item;
+import org.openmrs.module.icare.core.Message;
 import org.openmrs.module.icare.core.utils.VisitWrapper;
 import org.openmrs.module.icare.store.models.OrderStatus;
 import org.openmrs.module.webservices.rest.web.RestConstants;
@@ -144,6 +145,15 @@ public class ICareController {
 		//Order newOrder = billingService.createLabOrder(order);
 		//return newOrder;
 		return null;
+	}
+
+	@RequestMapping(value = "message", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public Map<String, Object> sendMessage(@RequestBody Map<String, Object> messageObject) throws Exception {
+
+		Message message = Message.fromMap(messageObject);
+		message = iCareService.sendMessage(message);
+		return message.toMap();
 	}
 	
 	@RequestMapping(value = "prescription", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)

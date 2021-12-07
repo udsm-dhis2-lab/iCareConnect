@@ -393,19 +393,13 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 				TransactionUtil.deductStock(stockableItem);
 				totalQuantity -= quantityToDeduct;
 			}
-			/*Stock stock = stockList.get(0);
-			StockableItem stockableItem = new StockableItem();
-			stockableItem.setBatch(stock.getBatch());
-			stockableItem.setExpiryDate(stock.getExpiryDate());
-			stockableItem.setItem(item);
-			stockableItem.setLocation(Context.getLocationService().getLocationByUuid(locationUuid));
-			stockableItem.setQuantity(savedOrder.getQuantity());
-			TransactionUtil.deductStock(stockableItem);*/
 		}
 		OrderStatus orderStatus = new OrderStatus();
 		orderStatus.setOrder(savedOrder);
 		orderStatus.setStatus(OrderStatus.OrderStatusCode.DISPENSED);
 		orderStatus.setRemarks(remarks);
+
+
 		return this.stockDAO.saveOrderStatus(orderStatus);
 	}
 	
