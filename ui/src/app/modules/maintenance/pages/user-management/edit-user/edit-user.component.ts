@@ -1,30 +1,30 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from "@angular/core";
 import {
   FormBuilder,
   FormControl,
   FormGroup,
   Validators,
-} from '@angular/forms';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { MatTable, MatTableDataSource } from '@angular/material/table';
-import { Router } from '@angular/router';
-import * as moment from 'moment';
-import { LocationGetFull, RoleCreate } from 'src/app/shared/resources/openmrs';
+} from "@angular/forms";
+import { MatSnackBar } from "@angular/material/snack-bar";
+import { MatTable, MatTableDataSource } from "@angular/material/table";
+import { Router } from "@angular/router";
+import * as moment from "moment";
+import { LocationGetFull, RoleCreate } from "src/app/shared/resources/openmrs";
 import {
   GlobalEventHandlersEvent,
   PersonCreateModel,
   UserCreateModel,
-} from '../../../models/user.model';
-import { UserService } from '../../../services/users.service';
+} from "../../../models/user.model";
+import { UserService } from "../../../services/users.service";
 
 @Component({
-  selector: 'app-edit-user',
-  templateUrl: './edit-user.component.html',
-  styleUrls: ['./edit-user.component.scss'],
+  selector: "app-edit-user",
+  templateUrl: "./edit-user.component.html",
+  styleUrls: ["./edit-user.component.scss"],
 })
 export class EditUserComponent implements OnInit {
-  @ViewChild('table', { static: false }) table: MatTable<any>;
-  @ViewChild('filter', { static: false }) filter: ElementRef;
+  @ViewChild("table", { static: false }) table: MatTable<any>;
+  @ViewChild("filter", { static: false }) filter: ElementRef;
   userForm: FormGroup;
   loading: boolean = true;
   selectedUserId: any;
@@ -39,25 +39,25 @@ export class EditUserComponent implements OnInit {
   selectedRolesDatasource: MatTableDataSource<RoleCreate>;
   moveToAvailable: any[] = [];
   moveToSelected: any[] = [];
-  displayedColumns: string[] = ['display'];
+  displayedColumns: string[] = ["display"];
   clickedRows: any[] = [];
   clickedAvailable: any[] = [];
-  searchText: string = '';
+  searchText: string = "";
   genderClicked: boolean = false;
   today: Date = new Date();
   saving: boolean = false;
   birthdate: Date | string;
   checked: Boolean;
   genderValues = [
-    { code: 'F', value: 'Female' },
-    { code: 'U', value: 'Unknown' },
-    { code: 'M', value: 'Male' },
+    { code: "F", value: "Female" },
+    { code: "U", value: "Unknown" },
+    { code: "M", value: "Male" },
   ];
 
   gender: { F: string; M: string; U: string } = {
-    F: 'Femaile',
-    M: 'Male',
-    U: 'Unknown',
+    F: "Femaile",
+    M: "Male",
+    U: "Unknown",
   };
   currentDataAvailable: RoleCreate[];
   selectedLocations: any[] = [];
@@ -76,7 +76,7 @@ export class EditUserComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.selectedUserId = this.router['currentUrlTree'].queryParams;
+    this.selectedUserId = this.router["currentUrlTree"].queryParams;
     if (this.selectedUserId) {
       this.service.getUserById(this.selectedUserId.id).subscribe((user) => {
         if (user && user && user.person && user.person.uuid) {
@@ -94,27 +94,22 @@ export class EditUserComponent implements OnInit {
                   this.roles = roles.results;
                   this.selectedUser = user;
                   this.selectedUser.person = person;
-                  if (
-                    user.userProperties.locations &&
-                    !Array.isArray(user.userProperties.locations)
-                  ) {
-                    const locations = JSON.parse(user.userProperties.locations);
-                    for (const uuid of locations) {
-                      this.service
-                        .getLocationByUuid({ uuid })
-                        .subscribe((response) => {
-                          this.selectedLocations = [
-                            ...this.selectedLocations,
-                            response,
-                          ];
-                        });
-                    }
+                const locations = user.userProperties.locations.split("'").join('"')
+                  for (const location of JSON.parse(locations)) {
+                    this.service
+                      .getLocationByUuid({ uuid: location })
+                      .subscribe((response) => {
+                        this.selectedLocations = [
+                          ...this.selectedLocations,
+                          response,
+                        ];
+                      });
                   }
 
                   this.birthdate =
                     person && person.birthdate
                       ? new Date(person.birthdate)
-                      : '';
+                      : "";
                   this.selectedRoles = user.roles;
                   this.roles = roles.results.filter(
                     (selectedrole: RoleCreate) =>
@@ -142,15 +137,15 @@ export class EditUserComponent implements OnInit {
   generateForm() {
     return this.fb.group({
       username: new FormControl({
-        value: this.selectedUser ? this.selectedUser.username : '',
+        value: this.selectedUser ? this.selectedUser.username : "",
         disabled: true,
       }),
       systemid: new FormControl({
-        value: this.selectedUser ? this.selectedUser.systemId : '',
+        value: this.selectedUser ? this.selectedUser.systemId : "",
         disabled: true,
       }),
       password: new FormControl(
-        this.selectedUser ? this.selectedUser.password : '',
+        this.selectedUser ? this.selectedUser.password : "",
         Validators.minLength(2)
       ),
       gender: new FormControl(
@@ -159,21 +154,21 @@ export class EditUserComponent implements OnInit {
         this.selectedUser.person.gender &&
         this.selectedUser.person.gender
           ? this.gender[this.selectedUser.person.gender]
-          : ''
+          : ""
       ),
       middleName: new FormControl(
         this.selectedUser &&
         this.selectedUser.person &&
         this.selectedUser.person.preferredName
           ? this.selectedUser.person.preferredName.middleName
-          : ''
+          : ""
       ),
       firstName: new FormControl(
         this.selectedUser &&
         this.selectedUser.person &&
         this.selectedUser.person.preferredName
           ? this.selectedUser.person.preferredName.givenName
-          : '',
+          : "",
         Validators.required
       ),
       surname: new FormControl(
@@ -181,80 +176,80 @@ export class EditUserComponent implements OnInit {
         this.selectedUser.person &&
         this.selectedUser.person.preferredName
           ? this.selectedUser.person.preferredName.familyName
-          : '',
+          : "",
         Validators.required
       ),
       birthdate: new FormControl(
         this.selectedUser && this.selectedUser.person
           ? this.selectedUser.person.birthdate
-          : '',
+          : "",
         Validators.required
       ),
-      confirmpassword: new FormControl('', Validators.minLength(2)),
+      confirmpassword: new FormControl("", Validators.minLength(2)),
 
       addressDisplay: new FormControl(
         this.selectedUser.person.preferredAddress
           ? this.selectedUser.person.preferredAddress.display
-          : '',
+          : "",
         Validators.required
       ),
       country: new FormControl(
         this.selectedUser.person.preferredAddress
           ? this.selectedUser.person.preferredAddress.country
-          : '',
+          : "",
         Validators.required
       ),
       district: new FormControl(
         this.selectedUser.person.preferredAddress
           ? this.selectedUser.person.preferredAddress.cityVillage
-          : '',
+          : "",
         Validators.required
       ),
       city: new FormControl(
         this.selectedUser.person.preferredAddress
           ? this.selectedUser.person.preferredAddress.stateProvince
-          : '',
+          : "",
         Validators.required
       ),
       postalCode: new FormControl(
         this.selectedUser.person.preferredAddress
           ? this.selectedUser.person.preferredAddress.postalCode
-          : ''
+          : ""
       ),
       addressDisplay2: new FormControl(
         this.selectedUser.person.preferredAddress
           ? this.selectedUser.person.preferredAddress.address2
-          : ''
+          : ""
       ),
-      MCTNumber: new FormControl(''),
-      phoneNumber: new FormControl(''),
-      qualification: new FormControl(''),
+      MCTNumber: new FormControl(""),
+      phoneNumber: new FormControl(""),
+      qualification: new FormControl(""),
     });
   }
 
   get passwordInput() {
-    return this.userForm.get('password');
+    return this.userForm.get("password");
   }
   get check() {
-    return this.userForm.get('checked');
+    return this.userForm.get("checked");
   }
   get confirmpassword() {
-    return this.userForm.get('confirmpassword');
+    return this.userForm.get("confirmpassword");
   }
 
   get fullName() {
     return (
-      (this.userForm.get('firstName') && this.userForm.get('firstName').value
-        ? this.userForm.get('firstName').value
-        : '') +
-      ' ' +
-      (this.userForm.get('middleName') && this.userForm.get('middleName').value
-        ? this.userForm.get('middleName').value
-        : '') +
-      ' ' +
-      (this.userForm.get('surname') && this.userForm.get('surname').value
-        ? this.userForm.get('surname').value
-        : '')
+      (this.userForm.get("firstName") && this.userForm.get("firstName").value
+        ? this.userForm.get("firstName").value
+        : "") +
+      " " +
+      (this.userForm.get("middleName") && this.userForm.get("middleName").value
+        ? this.userForm.get("middleName").value
+        : "") +
+      " " +
+      (this.userForm.get("surname") && this.userForm.get("surname").value
+        ? this.userForm.get("surname").value
+        : "")
     );
   }
 
@@ -282,7 +277,7 @@ export class EditUserComponent implements OnInit {
     role: RoleCreate,
     action: string
   ) {
-    if (action === 'selected') {
+    if (action === "selected") {
       this.moveToSelected = [];
       this.getSelected({ e, role });
     } else {
@@ -295,7 +290,7 @@ export class EditUserComponent implements OnInit {
     role: RoleCreate,
     action: string
   ) {
-    if (action === 'selected') {
+    if (action === "selected") {
       if (!e.metaKey && !e.crtlKey && !e.shiftKey) {
         this.clickedRows = [];
         this.moveToAvailable = [];
@@ -344,8 +339,8 @@ export class EditUserComponent implements OnInit {
   selectedRow(role: RoleCreate) {
     const clicked = this.clickedRows.find(({ uuid }) => role.uuid === uuid);
     return clicked
-      ? { background: '#2a8fd1', color: 'white' }
-      : { background: '', color: 'black' };
+      ? { background: "#2a8fd1", color: "white" }
+      : { background: "", color: "black" };
   }
 
   selectedRowAvailable(role: RoleCreate) {
@@ -353,8 +348,8 @@ export class EditUserComponent implements OnInit {
       ({ uuid }) => role.uuid === uuid
     );
     return clicked
-      ? { background: '#2a8fd1', color: 'white !important' }
-      : { background: '', color: 'black' };
+      ? { background: "#2a8fd1", color: "white !important" }
+      : { background: "", color: "black" };
   }
 
   getSelected({ e, role }) {
@@ -426,7 +421,7 @@ export class EditUserComponent implements OnInit {
     delete this.selectedUser.privileges;
     delete this.selectedUser.allRoles;
     const data = this.userForm.value;
-    const years = moment().diff(data.birthdate, 'years', false);
+    const years = moment().diff(data.birthdate, "years", false);
     let person = {
       uuid: this.selectedUser.person.uuid,
       names: [
@@ -446,7 +441,7 @@ export class EditUserComponent implements OnInit {
         this.selectedUser.person.preferredAddress &&
         this.selectedUser.person.preferredAddress.uuid
           ? this.selectedUser.person.preferredAddress.uuid
-          : '',
+          : "",
       preferred: true,
       address1: data.addressDisplay,
       address2: data.addressDisplay2,
@@ -462,8 +457,8 @@ export class EditUserComponent implements OnInit {
     };
     Object.keys(this.selectedUser.person).forEach((key) => {
       if (data[key]) {
-        if (key === 'birthdate') {
-          person[key] = new Date(data[key]).toISOString().split('T')[0];
+        if (key === "birthdate") {
+          person[key] = new Date(data[key]).toISOString().split("T")[0];
         } else {
           person[key] = data[key];
         }
@@ -471,8 +466,8 @@ export class EditUserComponent implements OnInit {
         person[key] = this.selectedUser.person[key];
       }
     });
-    person['age'] = years.toString();
-    person['preferredAddress'] = prefferedLocation;
+    person["age"] = years.toString();
+    person["preferredAddress"] = prefferedLocation;
     const editedUser: UserCreateModel = {
       ...this.selectedUser,
       person,
@@ -504,26 +499,26 @@ export class EditUserComponent implements OnInit {
                 (response) => {
                   this._snackBar.open(
                     `${response.display} updated successfully`,
-                    'OK',
+                    "OK",
                     {
-                      horizontalPosition: 'center',
-                      verticalPosition: 'bottom',
+                      horizontalPosition: "center",
+                      verticalPosition: "bottom",
                       duration: 10000,
-                      panelClass: ['snack-color'],
+                      panelClass: ["snack-color"],
                     }
                   );
-                  this.router.navigate(['users']);
+                  this.router.navigate(["users"]);
                   this.saving = false;
                 },
                 (error: { error: any }) => {
                   this._snackBar.open(
                     `An error ocurred. Please try again. Hint: ${error.error.error.message}`,
-                    'CLOSE',
+                    "CLOSE",
                     {
-                      horizontalPosition: 'center',
-                      verticalPosition: 'bottom',
+                      horizontalPosition: "center",
+                      verticalPosition: "bottom",
                       duration: 10000,
-                      panelClass: ['snack-color-error'],
+                      panelClass: ["snack-color-error"],
                     }
                   );
                   this.saving = false;
@@ -531,11 +526,11 @@ export class EditUserComponent implements OnInit {
               );
           },
           (error: { error: any }) => {
-            this._snackBar.open(`${error.error.error.message}`, 'CLOSE', {
-              horizontalPosition: 'center',
-              verticalPosition: 'bottom',
+            this._snackBar.open(`${error.error.error.message}`, "CLOSE", {
+              horizontalPosition: "center",
+              verticalPosition: "bottom",
               duration: 10000,
-              panelClass: ['snack-color-error'],
+              panelClass: ["snack-color-error"],
             });
             this.saving = false;
           }
@@ -551,26 +546,26 @@ export class EditUserComponent implements OnInit {
         .subscribe((response) => {
           this._snackBar.open(
             `User ${response.display} updated successfully`,
-            'CLOSE',
+            "CLOSE",
             {
-              horizontalPosition: 'center',
-              verticalPosition: 'bottom',
+              horizontalPosition: "center",
+              verticalPosition: "bottom",
               duration: 20000,
-              panelClass: ['snack-color'],
+              panelClass: ["snack-color"],
             }
           );
-          window.location.href = '#/maintenance/users/';
+          window.location.href = "#/maintenance/users/";
           this.saving = false;
         }),
         (error: { error: any }) => {
           this._snackBar.open(
             `An error ocurred. Please try again. Hint: ${error.error.error.message}`,
-            'CLOSE',
+            "CLOSE",
             {
-              horizontalPosition: 'center',
-              verticalPosition: 'bottom',
+              horizontalPosition: "center",
+              verticalPosition: "bottom",
               duration: 20000,
-              panelClass: ['snack-color-error'],
+              panelClass: ["snack-color-error"],
             }
           );
           this.saving = false;
@@ -578,13 +573,11 @@ export class EditUserComponent implements OnInit {
     }
   }
   lastSelectedSegmentRow = 1;
-  ShiftKeyDown(event, lastRow) {
+  ShiftKeyDown(event: { shiftKey: any }, lastRow: number) {
     if (event.shiftKey) {
       let obj = Object.assign([], this.roles).filter((val, i) => {
         return i > this.lastSelectedSegmentRow && i < lastRow;
       });
-
-      // obj.forEach((e) => this.selection.select(e));
     }
     this.lastSelectedSegmentRow = lastRow;
   }
@@ -608,7 +601,7 @@ export class EditUserComponent implements OnInit {
     this.initialization = false;
     e.stopPropagation();
     const filterValue = (event.target as HTMLInputElement).value;
-    if (filterValue === '') {
+    if (filterValue === "") {
       this.searching = false;
     } else {
       this.service.searchLocation(filterValue).subscribe((res) => {
@@ -635,7 +628,7 @@ export class EditUserComponent implements OnInit {
   confirmStrongPassword(e: GlobalEventHandlersEvent) {
     this.passwordFocusOut = true;
     e.stopPropagation();
-    if (this.passwordInput.value && this.passwordInput.value !== '') {
+    if (this.passwordInput.value && this.passwordInput.value !== "") {
       const strongPassword = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])\w{6,}$/;
       const test = strongPassword.test(this.passwordInput.value);
       this.passwordFocusOut = true;
@@ -655,23 +648,29 @@ export class EditUserComponent implements OnInit {
   }
   providerAccount(value: boolean) {
     this.value = value;
-    console.log('VALUE', value);
   }
   providerAttributes = {
     attributes: [
       {
-        attributeType: '79fa49fc-d584-4b74-9dcd-eb265372ade1',
-        value: '',
+        attributeType: "79fa49fc-d584-4b74-9dcd-eb265372ade1",
+        value: "",
       },
       {
-        attributeType: '685a0d80-25e5-4ed4-8a03-974a1d161bf3',
-        value: '',
+        attributeType: "685a0d80-25e5-4ed4-8a03-974a1d161bf3",
+        value: "",
       },
       {
-        attributeType: '9c4420fa-5a22-4249-978c-da6e0f24880b',
-        value: '',
+        attributeType: "9c4420fa-5a22-4249-978c-da6e0f24880b",
+        value: "",
       },
     ],
     retired: false,
   };
+  parseJSON(json: string) {
+    try {
+      return JSON.parse(json);
+    } catch (e) {
+      return false;
+    }
+  }
 }

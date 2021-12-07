@@ -26,6 +26,9 @@ export class OrderResultsRendererComponent implements OnInit {
   @Input() visit: Visit;
   @Input() orderTypes: any[];
   @Input() provider: any;
+  @Input() iCareGeneralConfigurations: any;
+  @Input() commonLabTestsConceptReference: string =
+    "26172ff2-c058-44a9-8b09-980b24f6e973";
   showCommonLabTests: boolean = false;
   creatingLabOrderState$: Observable<boolean>;
 
@@ -180,8 +183,8 @@ export class OrderResultsRendererComponent implements OnInit {
   ): void {
     event.stopPropagation();
     this.showCommonLabTests = !this.showCommonLabTests;
-    // TODO: Softcode the uid
-    const commonLabTestsSetId = "26172ff2-c058-44a9-8b09-980b24f6e973";
+    const commonLabTestsSetId =
+      this.iCareGeneralConfigurations?.commonLabTest?.id;
     const labDepartment =
       (investigationAndProceduresFormsDetails?.setMembers.filter(
         (department) => department?.name.toLowerCase().indexOf("lab") > -1

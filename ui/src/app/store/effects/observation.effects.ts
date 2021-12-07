@@ -1,29 +1,29 @@
-import { Injectable } from '@angular/core';
-import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { Store } from '@ngrx/store';
-import { of } from 'rxjs';
+import { Injectable } from "@angular/core";
+import { Actions, createEffect, ofType } from "@ngrx/effects";
+import { Store } from "@ngrx/store";
+import { of } from "rxjs";
 import {
   catchError,
   concatMap,
   map,
   switchMap,
   withLatestFrom,
-} from 'rxjs/operators';
-import { Observation } from 'src/app/shared/resources/observation/models/observation.model';
-import { ObservationService } from 'src/app/shared/resources/observation/services';
+} from "rxjs/operators";
+import { Observation } from "src/app/shared/resources/observation/models/observation.model";
+import { ObservationService } from "src/app/shared/resources/observation/services";
 import {
   clearObservations,
   saveObservations,
   saveObservationsFail,
   saveObservationsUsingEncounter,
   upsertObservations,
-} from '../actions/observation.actions';
-import { AppState } from '../reducers';
+} from "../actions/observation.actions";
+import { AppState } from "../reducers";
 import {
   NotificationService,
   Notification,
-} from 'src/app/shared/services/notification.service';
-import { loadActiveVisit } from '../actions/visit.actions';
+} from "src/app/shared/services/notification.service";
+import { loadActiveVisit } from "../actions/visit.actions";
 
 @Injectable()
 export class ObservationEffects {
@@ -34,8 +34,8 @@ export class ObservationEffects {
       switchMap(({ observations, patientId }) => {
         this.notificationService.show(
           new Notification({
-            message: 'Saving Observations...',
-            type: 'LOADING',
+            message: "Saving Observations...",
+            type: "LOADING",
           })
         );
         const observationsDetails = {
@@ -49,22 +49,21 @@ export class ObservationEffects {
             switchMap((observationResults: any) => {
               this.notificationService.show(
                 new Notification({
-                  message: 'Observations successfully saved!',
-                  type: 'SUCCESS',
+                  message: "Observations successfully saved!",
+                  type: "SUCCESS",
                 })
               );
               return [
                 upsertObservations({
                   observations: observationResults?.obs,
                 }),
-                loadActiveVisit({ patientId }),
               ];
             }),
             catchError((error) => {
               this.notificationService.show(
                 new Notification({
-                  message: 'Error saving observations!',
-                  type: 'ERROR',
+                  message: "Error saving observations!",
+                  type: "ERROR",
                 })
               );
 
@@ -82,8 +81,8 @@ export class ObservationEffects {
       switchMap(({ data, patientId }) => {
         this.notificationService.show(
           new Notification({
-            message: 'Saving Observations...',
-            type: 'LOADING',
+            message: "Saving Observations...",
+            type: "LOADING",
           })
         );
 
@@ -91,8 +90,8 @@ export class ObservationEffects {
           switchMap((observationResults: any) => {
             this.notificationService.show(
               new Notification({
-                message: 'Observations successfully saved!',
-                type: 'SUCCESS',
+                message: "Observations successfully saved!",
+                type: "SUCCESS",
               })
             );
             return [
@@ -105,8 +104,8 @@ export class ObservationEffects {
           catchError((error) => {
             this.notificationService.show(
               new Notification({
-                message: 'Error saving observations!',
-                type: 'ERROR',
+                message: "Error saving observations!",
+                type: "ERROR",
               })
             );
 
