@@ -222,9 +222,9 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	@Override
 	public List<Visit> getVisitsByOrderType(String search, String orderTypeUuid, String locationUuid,
 	        OrderStatus.OrderStatusCode prescriptionStatus, Order.FulfillerStatus fulfillerStatus, Integer limit,
-	        Integer startIndex) {
+	        Integer startIndex, VisitWrapper.OrderBy orderBy, VisitWrapper.OrderByDirection orderByDirection) {
 		return this.dao.getVisitsByOrderType(search, orderTypeUuid, locationUuid, prescriptionStatus, fulfillerStatus,
-		    limit, startIndex);
+		    limit, startIndex, orderBy, orderByDirection);
 	}
 	
 	@Override

@@ -20,6 +20,7 @@ import org.openmrs.api.db.hibernate.DbSession;
 import org.openmrs.module.icare.billing.models.ItemPrice;
 import org.openmrs.module.icare.billing.models.Prescription;
 import org.openmrs.module.icare.core.Item;
+import org.openmrs.module.icare.core.utils.VisitWrapper;
 import org.openmrs.module.icare.store.models.OrderStatus;
 
 import javax.persistence.EntityManager;
@@ -211,8 +212,8 @@ public class ICareDao extends BaseDAO<Item> {
 	}
 	
 	public List<Visit> getVisitsByOrderType(String search, String orderTypeUuid, String locationUuid,
-	        OrderStatus.OrderStatusCode orderStatusCode, Order.FulfillerStatus fulfillerStatus, Integer limit,
-	        Integer startIndex) {
+											OrderStatus.OrderStatusCode orderStatusCode, Order.FulfillerStatus fulfillerStatus, Integer limit,
+											Integer startIndex, VisitWrapper.OrderBy orderBy, VisitWrapper.OrderByDirection orderByDirection) {
 		DbSession session = this.getSession();
 		String queryStr = "SELECT distinct v FROM Visit v" + " INNER JOIN v.patient p" + " INNER JOIN p.names pname"
 		        + " INNER JOIN v.encounters e" + " INNER JOIN e.orders o" + " INNER JOIN o.orderType ot"
@@ -235,9 +236,24 @@ public class ICareDao extends BaseDAO<Item> {
 			}
 		}
 		if (locationUuid != null) {
-			queryStr += " AND v.location.uuid=:locationUuid";
+			queryStr += " AND v.location.uuid=:locationUuid ";
 		}
-		
+
+		if(orderBy == VisitWrapper.OrderBy.VISIT){
+			queryStr += " ORDER BY v.startDatetime ";
+		} else if(orderBy == VisitWrapper.OrderBy.ENCOUNTER){
+			queryStr += " ORDER BY e.encounterDatetime ";
+		} else if(orderBy == VisitWrapper.OrderBy.ORDER){
+			queryStr += " ORDER BY o.dateActivated ";
+		} else if(orderBy == VisitWrapper.OrderBy.OBSERVATION){
+			queryStr += " ORDER BY e.dateChanged ";
+		}
+
+		if(orderByDirection == VisitWrapper.OrderByDirection.ASC){
+			queryStr += " ASC ";
+		} else if(orderByDirection == VisitWrapper.OrderByDirection.DESC){
+			queryStr += " DESC ";
+		}
 		Query query = session.createQuery(queryStr);
 		query.setParameter("orderTypeUuid", orderTypeUuid);
 		if (fulfillerStatus != null) {

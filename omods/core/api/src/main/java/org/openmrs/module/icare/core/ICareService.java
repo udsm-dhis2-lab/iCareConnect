@@ -22,6 +22,7 @@ import org.openmrs.module.icare.billing.models.ItemPrice;
 import org.openmrs.module.icare.billing.models.Prescription;
 import org.openmrs.module.icare.billing.services.insurance.Claim;
 import org.openmrs.module.icare.billing.services.insurance.ClaimResult;
+import org.openmrs.module.icare.core.utils.VisitWrapper;
 import org.openmrs.module.icare.store.models.OrderStatus;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -95,7 +96,7 @@ public interface ICareService extends OpenmrsService {
 	
 	List<Visit> getVisitsByOrderType(String search, String orderTypeUuid, String locationUuid,
 	        OrderStatus.OrderStatusCode prescriptionStatus, Order.FulfillerStatus fulfillerStatus, Integer limit,
-	        Integer startIndex);
+	        Integer startIndex, VisitWrapper.OrderBy orderBy, VisitWrapper.OrderByDirection orderByDirection);
 	
 	List<Order> getOrdersByVisitAndOrderType(String visitUuid, String orderTypeUuid, Order.FulfillerStatus fulfillerStatus,
 	        Integer limit, Integer startIndex);
