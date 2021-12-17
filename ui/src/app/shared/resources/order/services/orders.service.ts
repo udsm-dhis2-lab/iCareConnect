@@ -1,14 +1,18 @@
 import { Injectable } from "@angular/core";
-import { Observable, of, zip } from "rxjs";
+import { from, Observable, of, zip } from "rxjs";
 import { catchError, map } from "rxjs/operators";
 import { OpenmrsHttpClientService } from "../../../modules/openmrs-http-client/services/openmrs-http-client.service";
 import { omit } from "lodash";
+import { Api } from "../../openmrs";
 
 @Injectable({
   providedIn: "root",
 })
 export class OrdersService {
-  constructor(private openMRSHttpClient: OpenmrsHttpClientService) {}
+  constructor(
+    private openMRSHttpClient: OpenmrsHttpClientService,
+    private API: Api
+  ) {}
 
   updateOrdersViaEncounter(ordersToUpdate): Observable<any> {
     return zip(
@@ -75,6 +79,15 @@ export class OrdersService {
       catchError((errorResponse) => {
         return of(errorResponse?.error);
       })
+    );
+  }
+
+  getOrdersFrequencies() {
+    return from(
+      this.API.orderfrequency.getAllOrderFrequencies({ v: "full" })
+    ).pipe(
+      map((response) => response?.results),
+      catchError((error) => of(error))
     );
   }
 }
