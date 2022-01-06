@@ -1,7 +1,6 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, Input, OnInit, Output, EventEmitter } from "@angular/core";
 import { Observable, of } from "rxjs";
-import { formatDateToYYMMDD } from "../../helpers/format-date.helper";
-import { ConceptsService } from "../../resources/concepts/services/concepts.service";
+import { constructMessagesForDrugs } from "src/app/core";
 import { OrdersService } from "../../resources/order/services/orders.service";
 
 @Component({
@@ -12,6 +11,7 @@ import { OrdersService } from "../../resources/order/services/orders.service";
 export class MessageConstructorComponent implements OnInit {
   @Input() data: any;
   @Input() durationUnitsConceptUuid: string;
+  @Output() constructedMessages: EventEmitter<any> = new EventEmitter<any>()
   selectedDateTime: any;
   numberOfDays: number;
   selectedFrequency: any;
@@ -21,15 +21,10 @@ export class MessageConstructorComponent implements OnInit {
   allFrequencies: any[];
   messages: any[];
   constructor(
-    private conceptService: ConceptsService,
     private orderService: OrdersService
   ) {}
 
   ngOnInit(): void {
-    // this.durationUnits$ = this.conceptService.getConceptDetailsByUuid(
-    //   this.durationUnitsConceptUuid,
-    //   "custom:(uuid,name,setMembers,answers)"
-    // );
     this.orderFrequencies$ = this.orderService.getOrdersFrequencies();
     this.orderFrequencies$.subscribe((response) => {
       if (response) {
@@ -50,73 +45,49 @@ export class MessageConstructorComponent implements OnInit {
   getSelectedItemFromOption(event: Event, selectedItem, itemType): void {
     event.stopPropagation();
     this.selectedFrequency = selectedItem;
-    this.messages = this.constructMessages(
+    this.messages = constructMessagesForDrugs(
+      this.data,
       this.numberOfDays,
       this.selectedFrequency,
       this.doseInfo,
       this.selectedDateTime
     );
+    this.constructedMessages.emit(this.messages)
   }
 
   onModelChange(event, key, selectedDateTime): void {
     this.selectedDateTime = selectedDateTime;
-    this.messages = this.constructMessages(
+    this.messages = constructMessagesForDrugs(
+      this.data,
       this.numberOfDays,
       this.selectedFrequency,
       this.doseInfo,
       this.selectedDateTime
     );
+    this.constructedMessages.emit(this.messages)
   }
 
   getNumberOfDays(event: Event, days): void {
     this.numberOfDays = days;
-    this.messages = this.constructMessages(
+    this.messages = constructMessagesForDrugs(
+      this.data,
       this.numberOfDays,
       this.selectedFrequency,
       this.doseInfo,
       this.selectedDateTime
     );
+    this.constructedMessages.emit(this.messages)
   }
 
   getDoseInfo(event: Event, doseInfo): void {
     this.doseInfo = doseInfo;
-    this.messages = this.constructMessages(
+    this.messages = constructMessagesForDrugs(
+      this.data,
       this.numberOfDays,
       this.selectedFrequency,
       this.doseInfo,
       this.selectedDateTime
     );
-  }
-
-  constructMessages(days, frequency, dosePerIntake, startingDateTime): any {
-    let messages = [];
-    if (days && frequency && dosePerIntake && startingDateTime) {
-      for (
-        let count = 0;
-        count < Number(days) * Number(frequency?.frequencyPerDay);
-        count++
-      ) {
-        const hours = count * Number(24 / Number(frequency?.frequencyPerDay));
-        const currentDate = this.addHoursToTheDate(startingDateTime, hours);
-        messages = [
-          ...messages,
-          {
-            message:
-              "Haloo, unakumbushwa kutumia " +
-              dosePerIntake +
-              " cha " +
-              this.data?.drug +
-              " saa " +
-              currentDate.toTimeString().substring(0, 5),
-            dateTime: this.addHoursToTheDate(startingDateTime, hours),
-          },
-        ];
-      }
-    }
-    return messages;
-  }
-
-  addHoursToTheDate(date: Date, hours: number): Date {
-    return new Date(new Date(date).setHours(date.getHours() + hours));
+    this.constructedMessages.emit(this.messages)
   }
 }

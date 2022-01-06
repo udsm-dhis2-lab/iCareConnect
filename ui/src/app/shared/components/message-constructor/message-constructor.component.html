@@ -18,7 +18,7 @@
     </mat-form-field>
 
     <mat-form-field class="w-50 ml-2" appearance="fill">
-      <mat-label>Duration</mat-label>
+      <mat-label>Frequency</mat-label>
       <input
         type="text"
         placeholder="Search"
@@ -95,6 +95,24 @@
     </mat-form-field>
   </div>
   <div class="messages-constructed">
-    {{ messages | json }}
+    <mat-accordion *ngIf="messages && messages.length > 0">
+      <mat-expansion-panel [opened]="false">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            Messages for a client
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <div class="messages-container">
+          <p *ngFor="let message of messages; let count = index" class="constructed-message">
+            <span>
+              {{count + 1}}.
+            </span>
+            <span>
+              {{message?.message}}
+            </span>
+          </p>
+        </div>
+      </mat-expansion-panel>
+    </mat-accordion>
   </div>
 </div>

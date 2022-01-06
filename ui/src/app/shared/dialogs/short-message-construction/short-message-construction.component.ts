@@ -10,6 +10,7 @@ import { SystemSettingsService } from "src/app/core/services/system-settings.ser
 })
 export class ShortMessageConstructionComponent implements OnInit {
   durationUnitsConceptUuid$: Observable<any>;
+  messages: any;
   constructor(
     private dialogRef: MatDialogRef<ShortMessageConstructionComponent>,
     @Inject(MAT_DIALOG_DATA) public data,
@@ -21,5 +22,14 @@ export class ShortMessageConstructionComponent implements OnInit {
       this.systemSettingsService.getSystemSettingsByKey(
         "order.durationUnitsConceptUuid"
       );
+  }
+
+  onGetConstructedMessages(messages: any): void {
+    this.messages =messages;
+  }
+
+  onSaveMessages(event: Event, messages: any):void {
+    event.stopPropagation();
+    console.log(messages)
   }
 }

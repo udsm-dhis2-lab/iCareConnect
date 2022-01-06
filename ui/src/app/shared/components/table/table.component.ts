@@ -102,9 +102,8 @@ export class TableComponent implements OnInit {
 
   onOpenMessageConstruction(event: Event, drugOrder): void {
     event.stopPropagation();
-    console.log("drugOrder", drugOrder);
     this.dialog.open(ShortMessageConstructionComponent, {
-      width: "50%",
+      width: "60%",
       data: {
         headerDetails: "Construct messages",
         data: {
