@@ -1,6 +1,7 @@
 import { Component, Inject, OnInit } from "@angular/core";
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { Observable } from "rxjs";
+import { SmsService } from "src/app/core/services/sms.service";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 
 @Component({
@@ -11,10 +12,12 @@ import { SystemSettingsService } from "src/app/core/services/system-settings.ser
 export class ShortMessageConstructionComponent implements OnInit {
   durationUnitsConceptUuid$: Observable<any>;
   messages: any;
+  uploadMessagesResponse$: Observable<any>;
   constructor(
     private dialogRef: MatDialogRef<ShortMessageConstructionComponent>,
     @Inject(MAT_DIALOG_DATA) public data,
-    private systemSettingsService: SystemSettingsService
+    private systemSettingsService: SystemSettingsService,
+    private smsService: SmsService
   ) {}
 
   ngOnInit(): void {
@@ -30,6 +33,6 @@ export class ShortMessageConstructionComponent implements OnInit {
 
   onSaveMessages(event: Event, messages: any):void {
     event.stopPropagation();
-    console.log(messages)
+    this.uploadMessagesResponse$ = this.smsService.uploadMessages(messages);
   }
 }

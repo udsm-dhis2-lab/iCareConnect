@@ -4,6 +4,7 @@
     location: currentLocation$ | async,
     visit: visit$ | async,
     provider: provider$ | async,
+    orderTypes: orderTypes$ | async,
     observations: observations$ | async,
     savingObservations: savingObservations$ | async,
     forms: forms$ | async,
@@ -177,10 +178,13 @@
               [orderTypeName]="'Procedure'"
               [patient]="params?.patient"
               [visit]="params?.visit"
+              [orderTypes]="params?.orderTypes"
+              [provider]="params?.provider"
               [encounters]="params?.visit.encounters"
               [conceptsWithDepartmentsDetails]="
                 params?.conceptsWithDepartmentsDetails
               "
+              [nursingConfigurations]="nursingConfigurations"
             ></app-attend-ordered-items>
           </div>
         </mat-tab>

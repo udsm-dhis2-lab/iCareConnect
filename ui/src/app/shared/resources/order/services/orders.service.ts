@@ -63,6 +63,10 @@ export class OrdersService {
     return this.openMRSHttpClient.delete(`order/${uuid}`);
   }
 
+  createOrdersViaCreatingEncounter(encounter): Observable<any> {
+    return this.openMRSHttpClient.post(`encounter`, encounter).pipe(map(response => response),catchError(error => of(error)))
+  }
+
   createOrdersViaEncounter(orders): Observable<any> {
     const encounterUuid = orders[0]?.encounter;
     const data = {

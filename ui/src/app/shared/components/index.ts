@@ -54,6 +54,8 @@ import { PatientInvestigationsAndProceduresComponent } from "./patient-investiga
 import { PatientProceduresSummaryComponent } from "./patient-procedures-summary/patient-procedures-summary.component";
 import { PatientRadiologySummaryComponent } from "./patient-radiology-summary/patient-radiology-summary.component";
 import { MessageConstructorComponent } from "./message-constructor/message-constructor.component";
+import { AddProcedureComponent } from "./add-procedure/add-procedure.component";
+import { AddProcedureFormComponent } from "./add-procedure-form/add-procedure-form.component";
 
 export const components: any[] = [
   PatientSearchComponent,
@@ -112,6 +114,8 @@ export const components: any[] = [
   PatientProceduresSummaryComponent,
   PatientRadiologySummaryComponent,
   MessageConstructorComponent,
+  AddProcedureComponent,
+  AddProcedureFormComponent
 ];
 
 export const sharedEntryComponents: any[] = [
