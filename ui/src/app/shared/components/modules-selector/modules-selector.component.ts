@@ -110,6 +110,7 @@ export class ModulesSelectorComponent implements OnInit {
                   : ''),
             ]
           : navigationDetails?.path,
+          query: {queryParams: navigationDetails['queryParams']} 
       })
     );
     this.locationStatusControl();
@@ -138,7 +139,7 @@ export class ModulesSelectorComponent implements OnInit {
             (this.currentModule?.app?.considerLocationRoute
               ? '/' + this.currentLocation?.uuid
               : ''),
-        ],
+        ]
       })
     );
     this.locationStatusControl();

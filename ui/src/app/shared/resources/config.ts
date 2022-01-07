@@ -238,4 +238,6 @@ export const ICARE_CONFIG = {
       name: 'Death registry',
     },
   },
+  "iCare.GeneralMetadata.Configurations": '{"commonLabTest":{"id":"26172ff2-c058-44a9-8b09-980b24f6e973","name":"Common Lab Tests"}}',
+  "icare.nursing.configurations": '{"departmentsReference":{"id":"a85c274d-3aa9-4071-b7ac-6f75b7833bf4","name":"Procedures","display":"Procedures"}}'
 };
