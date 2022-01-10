@@ -104,4 +104,6 @@ public interface ICareService extends OpenmrsService {
 	        Integer limit, Integer startIndex);
 
 	Message sendMessage(Message message) throws MalformedURLException, IOException, Exception;
+
+	List<Message> sendMessages(List<Message> messages) throws MalformedURLException, IOException, Exception;
 }

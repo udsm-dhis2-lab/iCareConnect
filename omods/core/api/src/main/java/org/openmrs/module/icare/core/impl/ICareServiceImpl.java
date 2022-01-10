@@ -292,6 +292,14 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	}
 
 	@Override
+	public List<Message> sendMessages(List<Message> messages) throws MalformedURLException, IOException, Exception {
+		for(Message message:messages){
+			this.sendMessage(message);
+		}
+		return messages;
+	}
+
+	@Override
 	public Item getItemByConceptUuid(String uuid) {
 		return dao.getItemByConceptUuid(uuid);
 	}

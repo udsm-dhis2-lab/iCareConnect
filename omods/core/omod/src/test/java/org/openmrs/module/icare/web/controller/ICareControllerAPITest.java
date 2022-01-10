@@ -147,6 +147,26 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		Map<String, Object> map = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
 
 	}
+
+	@Test
+	public void testSendMessages() throws Exception {
+		AdministrationService adminService = Context.getService(AdministrationService.class);
+		adminService.setGlobalProperty(ICareConfig.MESSAGE_PHONE_NUMBER, "0718026490");
+		String dto = this.readFile("dto/send-message-double-dto.json");
+		List<Map<String, Object>> items = (new ObjectMapper()).readValue(dto, List.class);
+		for(Map item:items){
+			DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+			item.put("dateTime",dateFormat.format(new Date()));
+			item.put("id",UUID.randomUUID());
+			System.out.println(item.get("dateTime"));
+		}
+
+		MockHttpServletRequest newPostRequest = newPostRequest("icare/messages", items);
+		MockHttpServletResponse handle = handle(newPostRequest);
+
+		List<Map<String, Object>> map = (new ObjectMapper()).readValue(handle.getContentAsString(), List.class);
+
+	}
 	
 	@Test
 	//@Ignore("Already testing using advice")
