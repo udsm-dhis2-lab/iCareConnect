@@ -155,6 +155,25 @@ public class ICareController {
 		message = iCareService.sendMessage(message);
 		return message.toMap();
 	}
+
+	@RequestMapping(value = "messages", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public List<Map<String, Object>> sendMessages(@RequestBody List<Map<String, Object>> messageList) throws Exception {
+
+		List<Message> messages = new ArrayList<>();
+
+		for(Map<String, Object> messageObject: messageList){
+			Message message = Message.fromMap(messageObject);
+			messages.add(message);
+		}
+		messages = iCareService.sendMessages(messages);
+		messageList = new ArrayList<>();
+
+		for(Message message: iCareService.sendMessages(messages)){
+			messageList.add(message.toMap());
+		}
+		return messageList;
+	}
 	
 	@RequestMapping(value = "prescription", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
