@@ -5,6 +5,7 @@ export function constructMessagesForDrugs(
   dosePerIntake,
   startingDateTime
 ): any {
+  console.log("data", data);
   let messages = [];
   if (days && frequency && dosePerIntake && startingDateTime) {
     for (
@@ -25,7 +26,8 @@ export function constructMessagesForDrugs(
             " saa " +
             currentDate.toTimeString().substring(0, 5),
           dateTime: addHoursToTheDate(startingDateTime, hours),
-          phoneNumber: data?.patientPhoneAttribute,
+          status: "WAITING",
+          phoneNumber: data?.generalMetadataConfigurations?.facilityPhoneNumber,
           recipient: data?.patientPhoneAttribute,
         },
       ];
