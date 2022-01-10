@@ -70,7 +70,14 @@
             </td>
             <td>
               <button
-                (click)="onOpenMessageConstruction($event, drugOrder)"
+                (click)="
+                  onOpenMessageConstruction(
+                    $event,
+                    drugOrder,
+                    currentPatient,
+                    generalMetadataConfigurations
+                  )
+                "
                 mat-stroked-button
               >
                 SMS

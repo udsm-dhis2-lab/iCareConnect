@@ -20,6 +20,7 @@ import { Visit } from "../../resources/visits/models/visit.model";
 import { DrugOrdersService } from "../../resources/order/services";
 import { MatDialog } from "@angular/material/dialog";
 import { ShortMessageConstructionComponent } from "../../dialogs";
+import { Patient } from "../../resources/patient/models/patient.model";
 
 @Component({
   selector: "app-table",
@@ -37,6 +38,8 @@ export class TableComponent implements OnInit {
   @Input() patientDrugOrdersStatuses: any[];
   @Input() visit: Visit;
   @Input() drugOrders: any;
+  @Input() currentPatient: any;
+  @Input() generalMetadataConfigurations: any;
   keyedDrugOrderStatuses: any = {};
 
   displayedColumns: string[];
@@ -100,12 +103,12 @@ export class TableComponent implements OnInit {
     });
   }
 
-  onOpenMessageConstruction(event: Event, drugOrder): void {
+  onOpenMessageConstruction(event: Event, drugOrder: any, currentPatient: Patient, generalMetadataConfigurations: any): void {
     event.stopPropagation();
     this.dialog.open(ShortMessageConstructionComponent, {
       width: "60%",
       data: {
-        headerDetails: "Construct messages",
+        headerDetails: "Client messages",
         data: {
           referenceInstructions:
             drugOrder?.drug?.display +
@@ -115,6 +118,8 @@ export class TableComponent implements OnInit {
             drugOrder?.quantity +
             ")",
           drug: drugOrder?.drug?.display,
+          patient: currentPatient,
+          generalMetadataConfigurations
         },
       },
     });
