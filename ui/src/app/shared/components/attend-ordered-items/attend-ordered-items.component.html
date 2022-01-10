@@ -72,7 +72,7 @@
                 <mat-label>Remarks</mat-label>
                 <textarea
                   [disabled]="!orderedItem?.paid"
-                  [(ngModel)]="comments[orderedItem?.order?.concept?.uuid]"
+                  [(ngModel)]="comments[orderedItem?.concept?.uuid]"
                   matInput
                 ></textarea>
               </mat-form-field>

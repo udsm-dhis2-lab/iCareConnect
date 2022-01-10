@@ -27,6 +27,8 @@ export class PatientDrugOrderListComponent implements OnInit {
   @Input() encounterUuid: string;
   @Input() actionOptions: TableActionOption[];
   @Input() canAddPrescription: boolean;
+  @Input() currentPatient: any;
+  @Input() generalMetadataConfigurations: any;
   visitLoadingState$: Observable<boolean>;
 
   drugOrderColumns: TableColumn[];

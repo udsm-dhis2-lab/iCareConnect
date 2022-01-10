@@ -11,7 +11,8 @@ import { OrdersService } from "../../resources/order/services/orders.service";
 export class MessageConstructorComponent implements OnInit {
   @Input() data: any;
   @Input() durationUnitsConceptUuid: string;
-  @Output() constructedMessages: EventEmitter<any> = new EventEmitter<any>()
+  @Input() patientPhoneAttribute: string;
+  @Output() constructedMessages: EventEmitter<any> = new EventEmitter<any>();
   selectedDateTime: any;
   numberOfDays: number;
   selectedFrequency: any;
@@ -20,11 +21,13 @@ export class MessageConstructorComponent implements OnInit {
   orderFrequencies$: Observable<any>;
   allFrequencies: any[];
   messages: any[];
-  constructor(
-    private orderService: OrdersService
-  ) {}
+  constructor(private orderService: OrdersService) {}
 
   ngOnInit(): void {
+    this.data = {
+      ...this.data,
+      patientPhoneAttribute: this.patientPhoneAttribute,
+    };
     this.orderFrequencies$ = this.orderService.getOrdersFrequencies();
     this.orderFrequencies$.subscribe((response) => {
       if (response) {
@@ -52,7 +55,7 @@ export class MessageConstructorComponent implements OnInit {
       this.doseInfo,
       this.selectedDateTime
     );
-    this.constructedMessages.emit(this.messages)
+    this.constructedMessages.emit(this.messages);
   }
 
   onModelChange(event, key, selectedDateTime): void {
@@ -64,7 +67,7 @@ export class MessageConstructorComponent implements OnInit {
       this.doseInfo,
       this.selectedDateTime
     );
-    this.constructedMessages.emit(this.messages)
+    this.constructedMessages.emit(this.messages);
   }
 
   getNumberOfDays(event: Event, days): void {
@@ -76,7 +79,7 @@ export class MessageConstructorComponent implements OnInit {
       this.doseInfo,
       this.selectedDateTime
     );
-    this.constructedMessages.emit(this.messages)
+    this.constructedMessages.emit(this.messages);
   }
 
   getDoseInfo(event: Event, doseInfo): void {
@@ -88,6 +91,6 @@ export class MessageConstructorComponent implements OnInit {
       this.doseInfo,
       this.selectedDateTime
     );
-    this.constructedMessages.emit(this.messages)
+    this.constructedMessages.emit(this.messages);
   }
 }
