@@ -1,5 +1,6 @@
 ---
 sidebar_position: 1
+title: Login
 ---
 
 # Create a Page

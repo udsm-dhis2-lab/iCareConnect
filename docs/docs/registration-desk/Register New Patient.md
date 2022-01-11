@@ -1,5 +1,6 @@
 ---
 sidebar_position: 2
+title: Register New Patient
 ---
 
 # Create a Document
