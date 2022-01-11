@@ -17,8 +17,11 @@ function HomepageHeader() {
           <Link
             className="button button--secondary button--lg"
             to="/docs/iCare">
-            We care for you :: Enjoy a digitized health world ⏱️
+            We care for you :: Enjoy a digitized health world 
           </Link>
+          <div>
+            
+          </div>
         </div>
       </div>
     </header>
