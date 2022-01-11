@@ -1,5 +1,6 @@
 ---
 sidebar_position: 3
+title: Book Service
 ---
 
 # Create a Blog Post
