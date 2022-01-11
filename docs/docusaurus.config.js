@@ -53,15 +53,15 @@ const config = {
             type: 'doc',
             docId: 'iCare',
             position: 'left',
-            label: 'Documentations',
+            label: 'Documentation',
           },
           // This will be enabled when a full content of about us is already prepared and well designed
-          // {to: '/blog', label: 'About Us', position: 'left'},
-          // {
-          //   href: 'icare.dhis2udsm.org/#/',
-          //   label: 'GitHub',
-          //   position: 'right',
-          // },
+          {to: '/blog', label: 'About Us', position: 'left'},
+          {
+            href: 'icare.dhis2udsm.org/#/',
+            label: 'GitHub',
+            position: 'right',
+          },
         ],
       },
       footer: {
