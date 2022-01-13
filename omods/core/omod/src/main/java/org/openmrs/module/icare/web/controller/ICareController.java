@@ -77,6 +77,14 @@ public class ICareController {
 		Item newItem = iCareService.saveItem(item);
 		return newItem.toMap();
 	}
+
+	@RequestMapping(value = "itemByConcept/{conceptUuid}", method = RequestMethod.GET)
+	@ResponseBody
+	public Map<String, Object> onGetItemByConcept(@PathVariable("conceptUuid") String conceptUuid) {
+
+		Item newItem = iCareService.getItemByConceptUuid(conceptUuid);
+		return newItem.toMap();
+	}
 	
 	public Item onPostItem(Item item) {
 		return iCareService.saveItem(item);
