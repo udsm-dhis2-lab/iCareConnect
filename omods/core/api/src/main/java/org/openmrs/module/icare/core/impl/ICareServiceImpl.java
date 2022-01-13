@@ -303,6 +303,11 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	public Item getItemByConceptUuid(String uuid) {
 		return dao.getItemByConceptUuid(uuid);
 	}
+
+	@Override
+	public Item getItemByDrugConceptUuid(String uuid) {
+		return dao.getItemByDrugConceptUuid(uuid);
+	}
 	
 	@Override
 	public void stopVisits() throws APIException {

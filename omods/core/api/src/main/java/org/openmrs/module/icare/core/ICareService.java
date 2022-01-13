@@ -78,8 +78,10 @@ public interface ICareService extends OpenmrsService {
 	List<Item> getItems();
 	
 	Item getItemByConceptUuid(String uuid);
-	
-	@Transactional
+
+    Item getItemByDrugConceptUuid(String uuid);
+
+    @Transactional
 	void stopVisits() throws APIException;
 	
 	long getVisitSerialNumber(Visit visit);
