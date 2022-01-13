@@ -167,11 +167,28 @@ public class ICareDao extends BaseDAO<Item> {
 	public Item getItemByConceptUuid(String uuid) {
 		DbSession session = getSession();
 		
-		String queryStr = "SELECT a FROM Item a WHERE a.concept.uuid= :uuid OR a.drug.concept.uuid= :uuid";
+		//String queryStr = "SELECT a FROM Item a WHERE a.concept.uuid= :uuid OR a.drug.concept.uuid= :uuid";
+		String queryStr = "SELECT a FROM Item a WHERE a.concept.uuid=:uuid";
 		Query query = session.createQuery(queryStr);
 		query.setParameter("uuid", uuid);
 		List<Item> items = query.list();
 		
+		if (items.size() > 0) {
+			return items.get(0);
+		} else {
+			return null;
+		}
+	}
+
+	public Item getItemByDrugConceptUuid(String uuid) {
+		DbSession session = getSession();
+
+		//String queryStr = "SELECT a FROM Item a WHERE a.concept.uuid= :uuid OR a.drug.concept.uuid= :uuid";
+		String queryStr = "SELECT a FROM Item a WHERE a.drug.concept.uuid=:uuid";
+		Query query = session.createQuery(queryStr);
+		query.setParameter("uuid", uuid);
+		List<Item> items = query.list();
+
 		if (items.size() > 0) {
 			return items.get(0);
 		} else {

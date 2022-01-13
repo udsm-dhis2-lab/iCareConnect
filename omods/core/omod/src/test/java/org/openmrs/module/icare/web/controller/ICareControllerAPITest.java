@@ -12,6 +12,8 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.icare.ICareConfig;
 import org.openmrs.module.icare.billing.models.InvoiceItem;
 import org.openmrs.module.icare.billing.services.BillingService;
+import org.openmrs.module.icare.core.ICareService;
+import org.openmrs.module.icare.core.Item;
 import org.openmrs.module.icare.web.controller.core.BaseResourceControllerTest;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -58,7 +60,7 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		results = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
 		maps = (List) results.get("results");
 		assertThat("Should return a 3 items", maps.size(), is(3));
-		
+
 		newGetRequest = newGetRequest("icare/item", new Parameter("q", "asp"));
 		handle = handle(newGetRequest);
 		results = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
@@ -80,7 +82,7 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		Map<String, Object> item = (new ObjectMapper()).readValue(dto, Map.class);
 		MockHttpServletRequest newPostRequest = newPostRequest("icare/item", item);
 		MockHttpServletResponse handle = handle(newPostRequest);
-		
+
 		Map<String, Object> map = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
 		assertThat("Should have item uuid", map.get("uuid") != null, is(true));
 		MockHttpServletRequest newGetRequest = newGetRequest("icare/item");
@@ -100,6 +102,18 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 			}
 		}
 		assertThat("Drug was found in test", found, is(true));
+
+		System.out.println(Context.getConceptService().getDrugByUuid("3cfcf118-931c-46f7-8ff6-7b876f0d4202").getConcept().getUuid());
+		System.out.println(Context.getService(ICareService.class).getItems());
+		for(Item i: Context.getService(ICareService.class).getItems()){
+			if(i.getDrug() != null){
+				System.out.println("Found Drug Concept:" + i.getDrug().getConcept().getUuid());
+			}
+		}
+		newGetRequest = newGetRequest("icare/itemByDrugConcept/15f83cd6-64e9-4e06-a5f9-364d3b14a43d");
+		handle = handle(newGetRequest);
+		contentString = handle.getContentAsString();
+		System.out.println(contentString);
 	}
 	
 	@Test
