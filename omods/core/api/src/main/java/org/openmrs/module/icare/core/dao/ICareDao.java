@@ -14,6 +14,7 @@ import org.apache.commons.logging.LogFactory;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
+import org.openmrs.Drug;
 import org.openmrs.Order;
 import org.openmrs.Visit;
 import org.openmrs.api.db.hibernate.DbSession;
@@ -166,7 +167,7 @@ public class ICareDao extends BaseDAO<Item> {
 	public Item getItemByConceptUuid(String uuid) {
 		DbSession session = getSession();
 		
-		String queryStr = "SELECT a FROM Item a WHERE a.concept.uuid= :uuid";
+		String queryStr = "SELECT a FROM Item a WHERE a.concept.uuid= :uuid OR a.drug.concept.uuid= :uuid";
 		Query query = session.createQuery(queryStr);
 		query.setParameter("uuid", uuid);
 		List<Item> items = query.list();
