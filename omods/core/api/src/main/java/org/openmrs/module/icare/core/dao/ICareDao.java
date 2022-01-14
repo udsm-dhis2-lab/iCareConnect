@@ -129,7 +129,7 @@ public class ICareDao extends BaseDAO<Item> {
 		if (search != null) {
 			queryStr = "SELECT ip FROM Item ip " + "LEFT JOIN ip.concept as c " + "LEFT JOIN c.names cn "
 			        + "LEFT JOIN ip.drug as d " + "LEFT JOIN d.concept as c1 " + "LEFT JOIN c1.names cn1 "
-			        + "WHERE lower(cn.name) like :search OR lower(cn1.name) like :search";
+			        + "WHERE lower(cn.name) like :search OR lower(cn1.name) like :search OR lower(d.name) like :search";
 		}
 		Query query = session.createQuery(queryStr);
 		query.setFirstResult(startIndex);
