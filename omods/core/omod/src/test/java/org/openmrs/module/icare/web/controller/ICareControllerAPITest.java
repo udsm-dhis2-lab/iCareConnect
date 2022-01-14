@@ -110,7 +110,7 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 				System.out.println("Found Drug Concept:" + i.getDrug().getConcept().getUuid());
 			}
 		}
-		newGetRequest = newGetRequest("icare/itemByDrugConcept/15f83cd6-64e9-4e06-a5f9-364d3b14a43d");
+		newGetRequest = newGetRequest("icare/itemByConcept/15f83cd6-64e9-4e06-a5f9-364d3b14a43d");
 		handle = handle(newGetRequest);
 		contentString = handle.getContentAsString();
 		System.out.println(contentString);
