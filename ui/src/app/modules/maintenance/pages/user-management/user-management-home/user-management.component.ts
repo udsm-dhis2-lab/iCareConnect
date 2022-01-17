@@ -58,7 +58,6 @@ export class UserManagementComponent implements OnInit, AfterViewInit {
   }
   public data = {};
   getRecord(row: UserCreateModel) {
-    console.log(row);
     this.data = row;
     localStorage.setItem("selectedUser", JSON.stringify(row));
     this.router.navigate(["edit-user"], {

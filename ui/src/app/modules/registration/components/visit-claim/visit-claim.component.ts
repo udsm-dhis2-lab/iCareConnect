@@ -6,20 +6,20 @@ import {
   Inject,
   OnInit,
   ViewChild,
-} from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { Observable } from 'rxjs';
-import { VisitsService } from 'src/app/shared/resources/visits/services';
+} from "@angular/core";
+import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
+import { Observable } from "rxjs";
+import { VisitsService } from "src/app/shared/resources/visits/services";
 
 @Component({
-  selector: 'app-visit-claim',
-  templateUrl: './visit-claim.component.html',
-  styleUrls: ['./visit-claim.component.scss'],
+  selector: "app-visit-claim",
+  templateUrl: "./visit-claim.component.html",
+  styleUrls: ["./visit-claim.component.scss"],
 })
 export class VisitClaimComponent implements OnInit, AfterViewInit {
   // TODO: Soft code signature visit attribute
   clientSignatureVisitAttribute: string =
-    '8baac28c-0129-4ecc-9a45-b287a8ca7674';
+    "8baac28c-0129-4ecc-9a45-b287a8ca7674";
   visitUuid: string;
   visitClaim$: Observable<any>;
   clientSignature: string;
@@ -29,7 +29,7 @@ export class VisitClaimComponent implements OnInit, AfterViewInit {
   alreadySigned: boolean = false;
   signatureImg: string;
 
-  @ViewChild('sigPad') sigPad: ElementRef;
+  @ViewChild("sigPad") sigPad: ElementRef;
   isDrawing = false;
   sigPadElement;
   context;
@@ -59,8 +59,8 @@ export class VisitClaimComponent implements OnInit, AfterViewInit {
   ngAfterViewInit(): void {
     if (!this.signatureImg) {
       this.sigPadElement = this.sigPad.nativeElement;
-      this.context = this.sigPadElement.getContext('2d');
-      this.context.strokeStyle = '#3742fa';
+      this.context = this.sigPadElement.getContext("2d");
+      this.context.strokeStyle = "#3742fa";
     }
   }
 
@@ -69,33 +69,7 @@ export class VisitClaimComponent implements OnInit, AfterViewInit {
     this.dialogRef.close();
   }
 
-  onSave(event, allVisitDetails) {
-    event.stopPropagation();
-    this.updatingVisit = true;
-    const clientSignatureVisitAttribute = {
-      attributeType: this.clientSignatureVisitAttribute,
-      value: this.clientSignature,
-    };
-    const visitDetails = {
-      uuid: allVisitDetails?.uuid,
-      location: allVisitDetails?.location?.uuid,
-      attributes: [clientSignatureVisitAttribute],
-      visitType: allVisitDetails?.visitType?.uuid,
-    };
-    this.visitUpdateResponse$ = this.visitService.updateVisit(
-      allVisitDetails?.uuid,
-      visitDetails
-    );
-
-    this.visitUpdateResponse$.subscribe((response) => {
-      if (response) {
-        this.updatingVisit = false;
-        this.alreadySigned = true;
-      }
-    });
-  }
-
-  @HostListener('document:mouseup', ['$event'])
+  @HostListener("document:mouseup", ["$event"])
   onMouseUp(e) {
     this.isDrawing = false;
   }
@@ -133,7 +107,7 @@ export class VisitClaimComponent implements OnInit, AfterViewInit {
 
   savePad(event: Event, allVisitDetails) {
     event.stopPropagation();
-    this.signatureImg = this.sigPadElement.toDataURL('image/png');
+    this.signatureImg = this.sigPadElement.toDataURL("image/png");
     this.updatingVisit = true;
     const clientSignatureVisitAttribute = {
       attributeType: this.clientSignatureVisitAttribute,
