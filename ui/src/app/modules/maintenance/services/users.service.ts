@@ -1,17 +1,17 @@
-import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
-import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
-import { OpenmrsHttpClientService } from 'src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service';
-import { PersonCreateModel, UserCreateModel } from '../models/user.model';
+import { Injectable } from "@angular/core";
+import { Observable, of } from "rxjs";
+import { debounceTime, distinctUntilChanged, switchMap } from "rxjs/operators";
+import { OpenmrsHttpClientService } from "src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service";
+import { PersonCreateModel, UserCreateModel } from "../models/user.model";
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: "root",
 })
 export class UserService {
   constructor(private httpClient: OpenmrsHttpClientService) {}
 
   getUsers(): Observable<any[]> {
-    const url = 'user?startIndex=0&limit=100&v=full';
+    const url = "user?startIndex=0&limit=10&v=full";
     return this.httpClient.get(url);
   }
   getUserById(id: string): Observable<UserCreateModel> {
@@ -36,7 +36,7 @@ export class UserService {
     return this.httpClient.get(url);
   }
   getRoles() {
-    const url = 'role?startIndex=0&limit=100';
+    const url = "role?startIndex=0&limit=100";
     return this.httpClient.get(url);
   }
   updateUser({ data, uuid }): Observable<any> {
@@ -80,11 +80,11 @@ export class UserService {
   }
   getLoginLocations(): Observable<any> {
     return this.httpClient.get(
-      'location?limit=100&tag=Login+Location&v=custom:(display,uuid,tags,description,parentLocation,childLocations,attributes:(attributeType,uuid,value,display))'
+      "location?limit=100&tag=Login+Location&v=custom:(display,uuid,tags,description,parentLocation,childLocations,attributes:(attributeType,uuid,value,display))"
     );
   }
   createProvider({ provider }): Observable<any> {
-    const url = 'provider';
+    const url = "provider";
     return this.httpClient.post(url, provider);
   }
 }

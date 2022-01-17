@@ -10,7 +10,7 @@ export class SmsService {
   constructor(private httpClientService: OpenmrsHttpClientService) {}
 
   uploadMessages(data): Observable<any> {
-    return this.httpClientService.post("icare/message", data).pipe(
+    return this.httpClientService.post("icare/messages", data).pipe(
       map((response) => response),
       catchError((error) => of(error))
     );
