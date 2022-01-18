@@ -14,7 +14,10 @@
   </button>
 </mat-toolbar>
 
-<div class="signature-container">
+<div
+  class="signature-container w-100"
+  *ngIf="{ providerDetails: providerDetails$ | async } as params"
+>
   <canvas
     *ngIf="!alreadySigned"
     #sigPad
@@ -24,7 +27,7 @@
     (mousemove)="onMouseMove($event)"
   ></canvas>
   <!-- <img
-          *ngIf="alreadySigned && params?.visitClaim?.claimFile"
+          *ngIf="alreadySigned"
           height="130"
           [src]="signatureImg"
         /> -->
@@ -46,6 +49,7 @@
       *ngIf="!alreadySigned"
       class="action-btns"
       color="primary"
+      (click)="onSave($event, null)"
     >
       Save
     </button>

@@ -7,6 +7,8 @@ import {
   ViewChild,
 } from "@angular/core";
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
+import { Observable } from "rxjs";
+import { CurrentUserService } from "src/app/core/services";
 
 @Component({
   selector: "app-capture-signature",
@@ -21,12 +23,22 @@ export class CaptureSignatureComponent implements OnInit {
   signatureImg: string;
   @ViewChild("sigPad") sigPad: ElementRef;
   updatingUser: boolean = false;
+  data: any;
+  providerDetails$: Observable<any>;
   constructor(
     private dialogRef: MatDialogRef<CaptureSignatureComponent>,
-    @Inject(MAT_DIALOG_DATA) data
-  ) {}
+    @Inject(MAT_DIALOG_DATA) data,
+    private currentUserService: CurrentUserService
+  ) {
+    this.data = data;
+    console.log("this.data", this.data);
+  }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.providerDetails$ = this.currentUserService.getProviderByUserDetails(
+      this.data?.userUuid
+    );
+  }
 
   ngAfterViewInit(): void {
     if (!this.signatureImg) {
@@ -75,5 +87,15 @@ export class CaptureSignatureComponent implements OnInit {
       this.sigPadElement.height
     );
     this.context.beginPath();
+  }
+
+  onSave(event: Event, providerDetails: any): void {
+    event.stopPropagation();
+    this.signatureImg = this.sigPadElement.toDataURL("image/png");
+    this.updatingUser = true;
+    const providerSignatureAttribute = {
+      attributeType: "",
+      value: this.signatureImg,
+    };
   }
 }

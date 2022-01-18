@@ -74,10 +74,14 @@ export class UserManagementComponent implements OnInit, AfterViewInit {
     this.dataSource.filter = filterValue.trim().toLowerCase();
   }
 
-  onCaptureSignature(event: Event): void {
+  onCaptureSignature(event: Event, currentUser: any): void {
     event.stopPropagation();
     this.dialog.open(CaptureSignatureComponent, {
       width: "40%",
+      data: {
+        ...currentUser,
+        userUuid: currentUser?.uuid,
+      },
     });
   }
 }
