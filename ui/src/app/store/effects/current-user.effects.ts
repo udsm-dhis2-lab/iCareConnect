@@ -1,14 +1,14 @@
-import { Injectable } from '@angular/core';
-import { Actions, createEffect, ofType, OnInitEffects } from '@ngrx/effects';
-import { Action, Store } from '@ngrx/store';
-import { from } from 'rxjs';
-import { tap, withLatestFrom, map, switchMap, mergeMap } from 'rxjs/operators';
+import { Injectable } from "@angular/core";
+import { Actions, createEffect, ofType, OnInitEffects } from "@ngrx/effects";
+import { Action, Store } from "@ngrx/store";
+import { from } from "rxjs";
+import { tap, withLatestFrom, map, switchMap, mergeMap } from "rxjs/operators";
 import {
   CurrentUserDetailsService,
   formatCurrentUserDetails,
-} from 'src/app/core';
-import { AuthService } from 'src/app/core/services/auth.service';
-import { Api } from '../../shared/resources/openmrs';
+} from "src/app/core";
+import { AuthService } from "src/app/core/services/auth.service";
+import { Api } from "../../shared/resources/openmrs";
 import {
   addLoadedUserDetails,
   initiateCurrentUserLoad,
@@ -21,9 +21,9 @@ import {
   loadRolesDetails,
   addLoadedRolesDetails,
   setCurrentUserCurrentLocation,
-} from '../actions';
-import { AppState } from '../reducers';
-import { getCurrentUserDetails } from '../selectors/current-user.selectors';
+} from "../actions";
+import { AppState } from "../reducers";
+import { getCurrentUserDetails } from "../selectors/current-user.selectors";
 
 @Injectable()
 export class CurrentUserEffects implements OnInitEffects {
@@ -32,13 +32,13 @@ export class CurrentUserEffects implements OnInitEffects {
       this.actions$.pipe(
         ofType(initiateCurrentUserLoad),
         tap(() => {
-          const uuid = localStorage.getItem('userUuid');
+          const uuid = localStorage.getItem("userUuid");
           if (this.authService.isAuthenticated() && uuid) {
             this.store.dispatch(loadCurrentUserDetails({ uuid }));
             this.store.dispatch(loadProviderDetails({ userUuid: uuid }));
             this.store.dispatch(
               setCurrentUserCurrentLocation({
-                location: JSON.parse(localStorage.getItem('currentLocation')),
+                location: JSON.parse(localStorage.getItem("currentLocation")),
               })
             );
           }
@@ -67,7 +67,7 @@ export class CurrentUserEffects implements OnInitEffects {
         ofType(loadCurrentUserDetails),
         withLatestFrom(this.store.select(getCurrentUserDetails)),
         tap(([{ uuid }, user]: [any, any]) => {
-          if (!user && uuid !== '') {
+          if (!user && uuid !== "") {
             this.currentUserService.get(uuid).subscribe((userDetails) => {
               this.store.dispatch(
                 addLoadedUserDetails({
@@ -96,8 +96,7 @@ export class CurrentUserEffects implements OnInitEffects {
       mergeMap((action) =>
         this.currentUserService.getProviderByUserDetails(action.userUuid).pipe(
           map((providerDetails) => {
-            const providerData = (providerDetails?.results || [])[0];
-            return addLoadedProviderDetails({ provider: providerData });
+            return addLoadedProviderDetails({ provider: providerDetails });
           })
         )
       )
@@ -120,10 +119,10 @@ export class CurrentUserEffects implements OnInitEffects {
                 user: { uuid: response?.user?.uuid },
               };
               sessionStorage.setItem(
-                'sessionInfo',
+                "sessionInfo",
                 JSON.stringify(sessionData)
               );
-              localStorage.setItem('userUuid', response?.user?.uuid);
+              localStorage.setItem("userUuid", response?.user?.uuid);
             }
             return addLoadedCurrentUser({ currentUser: response?.user });
           })

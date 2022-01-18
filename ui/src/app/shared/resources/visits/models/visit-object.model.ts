@@ -1,5 +1,5 @@
-import { DiagnosisObject } from '../../diagnosis/models/diagnosis-object.model';
-import { VisitAttribute } from './visit-attribute.model';
+import { DiagnosisObject } from "../../diagnosis/models/diagnosis-object.model";
+import { VisitAttribute } from "./visit-attribute.model";
 
 export interface VisitObject {
   id: string;
@@ -28,4 +28,5 @@ export interface VisitObject {
   patientProfileAttributes?: any;
   consultationStarted?: boolean;
   consultationStatusOrder?: any;
+  hasProvisonalDiagnosis?: boolean;
 }

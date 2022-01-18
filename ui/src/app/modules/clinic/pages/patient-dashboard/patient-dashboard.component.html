@@ -9,7 +9,9 @@
     rolesLoadingState: rolesLoadingState$ | async,
     loadingVisit: loadingVisit$ | async,
     activeVisit: activeVisit$ | async,
-    iCareGeneralConfigurations: iCareGeneralConfigurations$ | async
+    provider: provider$ | async,
+    iCareGeneralConfigurations: iCareGeneralConfigurations$ | async,
+    iCareClinicConfigurations: iCareClinicConfigurations$ | async
   } as params"
 >
   <app-shared-patient-dashboard
@@ -20,29 +22,43 @@
       params?.userPrivileges &&
       params?.activeVisit &&
       !params?.loadingVisit &&
+      params?.provider &&
       params?.iCareGeneralConfigurations &&
-      params?.iCareGeneralConfigurations !== ''
+      params?.iCareGeneralConfigurations !== '' &&
+      params?.iCareClinicConfigurations &&
+      params?.iCareClinicConfigurations !== ''
     "
     [formPrivilegesConfigs]="params?.privilegesConfigs"
     [currentUser]="params?.currentUser"
     [activeVisit]="params?.activeVisit"
     [userPrivileges]="params?.userPrivileges"
     [iCareGeneralConfigurations]="params?.iCareGeneralConfigurations"
+    [clinicConfigurations]="params?.iCareClinicConfigurations"
   ></app-shared-patient-dashboard>
   <div
-    class="alert alert-danger"
+    class="alert alert-danger mt-2"
     role="alert"
     *ngIf="params?.iCareGeneralConfigurations === ''"
   >
     Missing General iCare Metadata Configurations, Contact IT
   </div>
+
+  <div
+    class="alert alert-danger mt-2"
+    role="alert"
+    *ngIf="params?.iCareClinicConfigurations === ''"
+  >
+    Missing Clinic module Configurations, Contact IT
+  </div>
+
   <mat-progress-bar
     mode="indeterminate"
     *ngIf="
       params?.formPrivilegesConfigsLoadingState ||
       !params?.userPrivileges ||
       params?.rolesLoadingState ||
-      params?.loadingVisit
+      params?.loadingVisit ||
+      !params?.provider
     "
   ></mat-progress-bar>
 </div>
