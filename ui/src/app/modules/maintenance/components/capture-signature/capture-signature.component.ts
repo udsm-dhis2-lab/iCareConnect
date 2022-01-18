@@ -32,7 +32,6 @@ export class CaptureSignatureComponent implements OnInit {
     private currentUserService: CurrentUserService
   ) {
     this.data = data;
-    console.log("this.data", this.data);
   }
 
   ngOnInit(): void {
