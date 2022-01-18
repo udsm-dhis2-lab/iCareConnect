@@ -15,18 +15,22 @@
 </mat-toolbar>
 
 <div
-  class="signature-container w-100"
+  class="signature-container w-100 p-2"
   *ngIf="{ providerDetails: providerDetails$ | async } as params"
 >
   <canvas
     #sigPad
     width="{{
-      params?.providerDetails && !params?.providerDetails?.signature
+      params?.providerDetails &&
+      params?.providerDetails?.uuid &&
+      !params?.providerDetails?.signature
         ? '500'
         : '0'
     }}"
     height="{{
-      params?.providerDetails && !params?.providerDetails?.signature
+      params?.providerDetails &&
+      params?.providerDetails?.uuid &&
+      !params?.providerDetails?.signature
         ? '130'
         : '0'
     }}"
@@ -38,6 +42,14 @@
     height="130"
     [src]="params?.providerDetails?.signature"
   />
+
+  <div
+    class="alert alert-danger"
+    role="alert"
+    *ngIf="params?.providerDetails && !params?.providerDetails?.uuid"
+  >
+    This user is not a provider!
+  </div>
 
   <mat-progress-bar
     *ngIf="!params?.providerDetails"
