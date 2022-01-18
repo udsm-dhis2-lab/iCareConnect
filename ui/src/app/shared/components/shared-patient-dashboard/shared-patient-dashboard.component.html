@@ -197,29 +197,6 @@
                 Mark Patient Deceased
               </button>
             </mat-menu>
-            <!-- <button
-              mat-flat-button
-              color="primary"
-              [disabled]="
-                dashboardParams?.startingConsultation ||
-                (!activeVisit?.isEmergency &&
-                  dashboardParams?.hasPatientHavePendingPaymentForTheCurrentVisitType) ||
-                activeVisitDeathStatus
-              "
-              (click)="onStartConsultation($event, activeVisit)"
-            >
-              <mat-spinner
-                color="primary"
-                *ngIf="dashboardParams?.startingConsultation"
-                [diameter]="20"
-                style="display: inline-block !important; margin-right: 4px"
-              ></mat-spinner>
-              {{
-                dashboardParams?.hasConsultationStarted
-                  ? "Continue Consultation"
-                  : "Consult Patient"
-              }}
-            </button> -->
 
             <span
               class="ml-2 text-left"
@@ -314,6 +291,7 @@
                       [provider]="dashboardParams?.provider"
                       [orderTypes]="dashboardParams?.orderTypes"
                       [iCareGeneralConfigurations]="iCareGeneralConfigurations"
+                      [clinicConfigurations]="clinicConfigurations"
                     ></app-patient-investigations-and-procedures>
 
                     <mat-progress-bar
