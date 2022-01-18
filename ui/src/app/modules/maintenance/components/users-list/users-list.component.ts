@@ -40,13 +40,10 @@ export class UsersListComponent implements OnInit {
   }
 
   getRecord(event: Event, user: any): void {
-    event.stopPropagation();
     this.edit.emit(user);
   }
 
   onCaptureSignature(event: Event, currentUser: any, user: any): void {
-    event.stopPropagation();
-    console.log("user", user);
     this.dialog.open(CaptureSignatureComponent, {
       width: "40%",
       data: {
