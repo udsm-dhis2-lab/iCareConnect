@@ -25,6 +25,7 @@ export class CaptureSignatureComponent implements OnInit {
   updatingUser: boolean = false;
   data: any;
   providerDetails$: Observable<any>;
+  providerAttributeDetails$: Observable<any>;
   constructor(
     private dialogRef: MatDialogRef<CaptureSignatureComponent>,
     @Inject(MAT_DIALOG_DATA) data,
@@ -69,6 +70,7 @@ export class CaptureSignatureComponent implements OnInit {
       const coords = this.relativeCoords(e);
       this.context.lineTo(coords.x, coords.y);
       this.context.stroke();
+      this.signatureImg = this.sigPadElement.toDataURL("image/png");
     }
   }
 
@@ -87,15 +89,28 @@ export class CaptureSignatureComponent implements OnInit {
       this.sigPadElement.height
     );
     this.context.beginPath();
+    this.signatureImg = null;
   }
 
   onSave(event: Event, providerDetails: any): void {
     event.stopPropagation();
-    this.signatureImg = this.sigPadElement.toDataURL("image/png");
     this.updatingUser = true;
     const providerSignatureAttribute = {
-      attributeType: "",
+      attributeType: "ecc4e84e-823c-4a1e-94dc-c349b9c64cca",
       value: this.signatureImg,
     };
+
+    this.providerAttributeDetails$ =
+      this.currentUserService.createProviderAttribute(
+        providerDetails?.uuid,
+        providerSignatureAttribute
+      );
+
+    this.providerAttributeDetails$.subscribe((response) => {
+      if (response) {
+        // TODO: Add support to check the handled error from service
+        this.updatingUser = false;
+      }
+    });
   }
 }

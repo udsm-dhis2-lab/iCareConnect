@@ -19,23 +19,40 @@
   *ngIf="{ providerDetails: providerDetails$ | async } as params"
 >
   <canvas
-    *ngIf="!alreadySigned"
     #sigPad
-    width="1200"
-    height="130"
+    width="{{
+      params?.providerDetails && !params?.providerDetails?.signature
+        ? '500'
+        : '0'
+    }}"
+    height="{{
+      params?.providerDetails && !params?.providerDetails?.signature
+        ? '130'
+        : '0'
+    }}"
     (mousedown)="onMouseDown($event)"
     (mousemove)="onMouseMove($event)"
   ></canvas>
-  <!-- <img
-          *ngIf="alreadySigned"
-          height="130"
-          [src]="signatureImg"
-        /> -->
+  <img
+    *ngIf="params?.providerDetails && params?.providerDetails?.signature"
+    height="130"
+    [src]="params?.providerDetails?.signature"
+  />
 
-  <div class="w-100 d-flex justify-content-right">
+  <mat-progress-bar
+    *ngIf="!params?.providerDetails"
+    mode="indeterminate"
+  ></mat-progress-bar>
+
+  <div class="w-100 d-flex justify-content-end mb-2">
     <button
       mat-stroked-button
-      *ngIf="!alreadySigned"
+      [disabled]="
+        (params?.providerDetails &&
+          !params?.providerDetails?.signature &&
+          !signatureImg) ||
+        !params?.providerDetails
+      "
       style="bottom: 0; z-index: 1401"
       class="mr-2 action-btns"
       color="primary"
@@ -47,9 +64,15 @@
       mat-stroked-button
       style="bottom: 0; z-index: 1401"
       *ngIf="!alreadySigned"
+      [disabled]="
+        !params?.providerDetails ||
+        (params?.providerDetails &&
+          !params?.providerDetails?.signature &&
+          !signatureImg)
+      "
       class="action-btns"
       color="primary"
-      (click)="onSave($event, null)"
+      (click)="onSave($event, params?.providerDetails)"
     >
       Save
     </button>

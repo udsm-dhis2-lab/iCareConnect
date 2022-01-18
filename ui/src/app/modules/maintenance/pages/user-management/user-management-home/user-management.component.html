@@ -1,5 +1,5 @@
 <mat-card>
-  <div class="d-flex justify-content-between mb-2">
+  <div class="w-100 d-flex justify-content-between mb-2">
     <div class="h4 font-weight-normal">User Management</div>
     <button
       mat-flat-button
@@ -18,11 +18,13 @@
     </button>
   </div>
 
-  <!-- loading section -->
-  <mat-progress-bar *ngIf="loading" mode="indeterminate"></mat-progress-bar>
-  <!-- end of loading section -->
-
-  <div class="mat-elevation-z8">
+  <div
+    class="w-100"
+    *ngIf="{
+      users: users$ | async,
+      currentUser: currentUser$ | async
+    } as params"
+  >
     <mat-form-field
       appearance="fill"
       style="margin-bottom: 0px; margin-left: 1px"
@@ -38,75 +40,18 @@
       />
       <mat-icon matSuffix>search</mat-icon>
     </mat-form-field>
-    <table mat-table [dataSource]="dataSource">
-      <ng-container matColumnDef="index">
-        <th mat-header-cell *matHeaderCellDef>No.</th>
-        <td mat-cell *matCellDef="let user; let i = index">{{ i + 1 }}</td>
-      </ng-container>
+    <app-users-list
+      *ngIf="params?.users"
+      [users]="params?.users?.results"
+      [currentUser]="params?.currentUser"
+      (edit)="getRecord($event)"
+    ></app-users-list>
 
-      <ng-container matColumnDef="fullName">
-        <th mat-header-cell *matHeaderCellDef>Full Name</th>
-        <td mat-cell *matCellDef="let user">{{ user.person?.display }}</td>
-      </ng-container>
-
-      <ng-container matColumnDef="display">
-        <th mat-header-cell *matHeaderCellDef>Name</th>
-        <td mat-cell *matCellDef="let user">{{ user.display }}</td>
-      </ng-container>
-
-      <ng-container matColumnDef="username">
-        <th mat-header-cell *matHeaderCellDef>Username</th>
-        <td mat-cell *matCellDef="let user">{{ user.username }}</td>
-      </ng-container>
-
-      <ng-container matColumnDef="systemId">
-        <th mat-header-cell *matHeaderCellDef>System ID</th>
-        <td mat-cell *matCellDef="let user">{{ user.systemId }}</td>
-      </ng-container>
-      <ng-container
-        matColumnDef="actions"
-        *ngIf="currentUser$ | async as currentUser"
-      >
-        <th mat-header-cell *matHeaderCellDef></th>
-        <td mat-cell *matCellDef="let user; let i = index">
-          <button mat-icon-button [matMenuTriggerFor]="menu">
-            <mat-icon>more_vert</mat-icon>
-          </button>
-          <mat-menu #menu="matMenu">
-            <button mat-menu-item (click)="getRecord(user)">
-              <mat-icon>edit</mat-icon>
-              <span>Edit</span>
-            </button>
-            <button
-              mat-menu-item
-              (click)="onCaptureSignature($event, currentUser)"
-            >
-              <mat-icon>
-                <img src="assets/icons/signature_30.png" />
-              </mat-icon>
-              <span>Capture Signature</span>
-            </button>
-            <!-- <button mat-menu-item (click)="onOpenDetails($event)">
-              <mat-icon>details</mat-icon>
-              <span>Details</span>
-            </button>
-            <button mat-menu-item (click)="onDeleteChild($event)">
-              <mat-icon>delete</mat-icon>
-              <span>Delete</span>
-            </button> -->
-          </mat-menu>
-        </td>
-      </ng-container>
-
-      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-    </table>
-
-    <mat-paginator
-      [pageSizeOptions]="[10, 20, 40, 60, 80, 100]"
-      showFirstLastButtons
-      aria-label="Select Number of Users Per Page"
-    >
-    </mat-paginator>
+    <!-- loading section -->
+    <mat-progress-bar
+      *ngIf="!params?.users"
+      mode="indeterminate"
+    ></mat-progress-bar>
+    <!-- end of loading section -->
   </div>
 </mat-card>

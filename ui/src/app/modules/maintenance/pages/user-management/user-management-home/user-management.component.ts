@@ -30,7 +30,9 @@ export class UserManagementComponent implements OnInit, AfterViewInit {
     "actions",
   ];
   dataSource: MatTableDataSource<UserCreateModel>;
+  users$: Observable<any>;
   @ViewChild(MatPaginator) paginator: MatPaginator;
+  public data = {};
 
   constructor(
     private store: Store<AppState>,
@@ -43,21 +45,16 @@ export class UserManagementComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     // TODO: current user to be used for privilages control
     this.currentUser$ = this.store.select(getCurrentUserDetails);
-    this.service.getUsers().subscribe((users) => {
-      this.dataSource = new MatTableDataSource<UserCreateModel>(
-        users["results"]
-      );
-      this.dataSource.paginator = this.paginator;
-      this.loading = false;
-    });
+    this.users$ = this.service.getUsers({ q: "" });
   }
+
   ngAfterViewInit() {
     if (this.dataSource) {
       this.dataSource.paginator = this.paginator;
     }
   }
-  public data = {};
-  getRecord(row: UserCreateModel) {
+
+  getRecord(row: UserCreateModel): void {
     this.data = row;
     localStorage.setItem("selectedUser", JSON.stringify(row));
     this.router.navigate(["edit-user"], {
@@ -66,22 +63,16 @@ export class UserManagementComponent implements OnInit, AfterViewInit {
       queryParams: { id: row.uuid },
     });
   }
-  onEditChild(e) {}
-  onDelete(e) {}
-  onOpenDetails(e) {}
-  applyFilter(event: Event) {
-    const filterValue = (event.target as HTMLInputElement).value;
-    this.dataSource.filter = filterValue.trim().toLowerCase();
-  }
 
-  onCaptureSignature(event: Event, currentUser: any): void {
+  onEditChild(e) {}
+
+  onDelete(e) {}
+
+  onOpenDetails(e) {}
+
+  applyFilter(event: Event): void {
     event.stopPropagation();
-    this.dialog.open(CaptureSignatureComponent, {
-      width: "40%",
-      data: {
-        ...currentUser,
-        userUuid: currentUser?.uuid,
-      },
-    });
+    const filterValue = (event.target as HTMLInputElement).value;
+    this.users$ = this.service.getUsers({ q: filterValue });
   }
 }
