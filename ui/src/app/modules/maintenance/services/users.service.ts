@@ -10,8 +10,8 @@ import { PersonCreateModel, UserCreateModel } from "../models/user.model";
 export class UserService {
   constructor(private httpClient: OpenmrsHttpClientService) {}
 
-  getUsers(): Observable<any[]> {
-    const url = "user?startIndex=0&limit=10&v=full";
+  getUsers(params): Observable<any[]> {
+    const url = `user?startIndex=0&limit=10&v=full&q=${params?.q}`;
     return this.httpClient.get(url);
   }
   getUserById(id: string): Observable<UserCreateModel> {
