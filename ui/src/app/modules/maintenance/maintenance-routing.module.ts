@@ -1,5 +1,5 @@
-import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
+import { NgModule } from "@angular/core";
+import { RouterModule, Routes } from "@angular/router";
 import {
   AddUserComponent,
   UserManagementComponent,
@@ -7,36 +7,37 @@ import {
   LocationManagementComponent,
   EditUserComponent,
   PriceListHomeComponent,
-} from './pages';
+} from "./pages";
 
+// TODO: Improve routing, at least include child routing
 const routes: Routes = [
   {
-    path: '',
+    path: "",
     component: MaintenanceHomeComponent,
     children: [
       // TODO: Need to find best starting page for maintenance
       {
-        path: '',
-        redirectTo: 'price-list',
+        path: "",
+        redirectTo: "price-list",
       },
       {
-        path: 'price-list',
+        path: "price-list",
         component: PriceListHomeComponent,
       },
       {
-        path: 'users',
+        path: "users",
         component: UserManagementComponent,
       },
       {
-        path: 'location',
+        path: "location",
         component: LocationManagementComponent,
       },
       {
-        path: 'users/add-user',
+        path: "users/add-user",
         component: AddUserComponent,
       },
       {
-        path: 'users/edit-user',
+        path: "users/edit-user",
         component: EditUserComponent,
       },
     ],

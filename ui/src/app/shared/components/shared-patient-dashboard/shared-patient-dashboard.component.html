@@ -445,6 +445,16 @@
           </div>
           <!-- end of Patient clinic content -->
         </div>
+        <div
+          class="alert alert-danger mt-4 ml-2 mr-2"
+          *ngIf="
+            !activeVisit?.isEmergency &&
+            dashboardParams?.hasPatientHavePendingPaymentForTheCurrentVisitType
+          "
+          role="alert"
+        >
+          Not paid for Consultation Service
+        </div>
       </div>
     </div>
     <mat-progress-bar
