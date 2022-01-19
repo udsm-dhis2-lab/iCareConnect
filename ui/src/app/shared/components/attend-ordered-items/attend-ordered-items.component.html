@@ -1,4 +1,9 @@
-<div class="ordered-items-container">
+<div
+  class="ordered-items-container"
+  *ngIf="{
+    orderedProcedures: orderedProcedures$ | async
+  } as params"
+>
   <table class="table table-bordered">
     <thead>
       <tr>
@@ -8,33 +13,43 @@
         <th>Ordered By</th>
         <th>Source</th>
         <th>Payment Status</th>
-        <th>Status</th>
+        <th>Attend</th>
         <th style="width: 20%">Comments</th>
         <th></th>
       </tr>
     </thead>
     <tbody>
-      <ng-container *ngIf="orderedItems?.length > 0">
-        <ng-container *ngFor="let orderedItem of orderedItems">
+      <ng-container *ngIf="!params?.orderedProcedures">
+        <tr>
+          <td colspan="100%">
+            <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+          </td>
+        </tr>
+      </ng-container>
+      <ng-container
+        *ngIf="
+          params?.orderedProcedures && params?.orderedProcedures?.length > 0
+        "
+      >
+        <ng-container *ngFor="let orderedItem of params?.orderedProcedures">
           <tr [ngClass]="{ 'text-danger': !orderedItem?.paid }">
             <td>
               {{
-                departmentsDetailsKeyedBySetmembers[
-                  orderedItem?.order?.concept?.uuid
-                ]?.department?.display
+                departmentsDetailsKeyedBySetmembers[orderedItem?.concept?.uuid]
+                  ?.department?.display
               }}
             </td>
             <td>
-              {{ orderedItem?.order?.display }}
+              {{ orderedItem?.display }}
             </td>
             <td>
-              {{ orderedItem?.order?.dateActivated | date: "medium" }}
+              {{ orderedItem?.dateActivated | date: "medium" }}
             </td>
             <td>
-              {{ orderedItem?.order?.orderer?.display }}
+              {{ orderedItem?.orderer?.display }}
             </td>
             <td>
-              {{ orderedItem?.order?.location?.display }}
+              {{ orderedItem?.location?.display }}
             </td>
             <td>{{ orderedItem?.paid ? "PAID" : "NOT PAID" }}</td>
             <td>
@@ -57,7 +72,7 @@
                 <mat-label>Remarks</mat-label>
                 <textarea
                   [disabled]="!orderedItem?.paid"
-                  [(ngModel)]="comments[orderedItem?.order?.concept?.uuid]"
+                  [(ngModel)]="comments[orderedItem?.concept?.uuid]"
                   matInput
                 ></textarea>
               </mat-form-field>
@@ -70,7 +85,7 @@
                 [disabled]="
                   !orderedItem?.paid ||
                   (orderedItem?.value && orderedItem?.value === 'True') ||
-                  !status[orderedItem?.order?.concept?.uuid]
+                  !status[orderedItem?.concept?.uuid]
                 "
                 mat-button
                 (click)="saveObservationForThisOrder($event, orderedItem)"
@@ -81,10 +96,42 @@
           </tr>
         </ng-container>
       </ng-container>
-      <ng-container *ngIf="orderedItems?.length === 0">
+      <ng-container
+        *ngIf="
+          params?.orderedProcedures && params?.orderedProcedures?.length === 0
+        "
+      >
         <tr>
           <td colspan="9" class="text-center text-warning">
             NO ordered {{ orderTypeName }}
+          </td>
+        </tr>
+      </ng-container>
+      <ng-container>
+        <tr>
+          <td colspan="100%">
+            <a (click)="addNew($event)" class="float-right">Add</a>
+          </td>
+        </tr>
+        <tr *ngIf="shouldAddNew">
+          <td colspan="8">
+            <app-add-procedure
+              [nursingConfigurations]="nursingConfigurations"
+              (isFormValid)="onGetFormValidity($event)"
+              (procedures)="onGetDefinedProcedures($event)"
+            ></app-add-procedure>
+
+            {{ params?.creatingOrderResponse | json }}
+          </td>
+          <td>
+            <button
+              (click)="onSave($event, proceduresSelected)"
+              class="float-right"
+              mat-stroked-button
+              [disabled]="!isFormValid"
+            >
+              Save
+            </button>
           </td>
         </tr>
       </ng-container>

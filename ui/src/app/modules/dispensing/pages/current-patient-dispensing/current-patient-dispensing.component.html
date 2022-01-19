@@ -6,7 +6,8 @@
     patientVisit: patientVisit$ | async,
     currentLocation: currentLocation$ | async,
     currentVisitLoadedState: currentVisitLoadedState$ | async,
-    currentVisitLoadingState: currentVisitLoadingState$ | async
+    currentVisitLoadingState: currentVisitLoadingState$ | async,
+    generalMetadataConfigurations: generalMetadataConfigurations$ | async
   } as params"
 >
   <button mat-button color="light" (click)="onBack($event)">
@@ -29,7 +30,21 @@
       ></app-new-patient-profile>
     </div>
 
-    <div class="col-12" *ngIf="params.patientVisit as patientVisit">
+    <div
+      class="alert alert-danger w-100 mt-2"
+      role="alert"
+      *ngIf="params?.generalMetadataConfigurations === ''"
+    >
+      Missing General iCare Metadata Configurations, Contact IT
+    </div>
+
+    <div
+      class="col-12"
+      *ngIf="
+        params?.generalMetadataConfigurations &&
+        params?.generalMetadataConfigurations !== ''
+      "
+    >
       <p
         class="text-left text-danger"
         *ngIf="params?.response && params?.response?.message"
@@ -38,13 +53,17 @@
       </p>
       <div class="border" *ngIf="params?.currentVisitLoadedState">
         <app-patient-drug-order-list
-          [visit]="patientVisit"
+          [visit]="params?.patientVisit"
           [loading]="loading"
           [loadingError]="loadingError"
           [actionOptions]="dispensingActionOptions"
           [currentLocation]="params.currentLocation"
+          [currentPatient]="params?.currentPatient"
+          [generalMetadataConfigurations]="
+            params?.generalMetadataConfigurations
+          "
           (orderSelectAction)="
-            onSelectAction($event, patientVisit, params.currentLocation)
+            onSelectAction($event, params?.patientVisit, params.currentLocation)
           "
         ></app-patient-drug-order-list>
       </div>

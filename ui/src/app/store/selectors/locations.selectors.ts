@@ -1,13 +1,13 @@
-import { createSelector, props } from '@ngrx/store';
-import { getRootState, AppState } from '../reducers';
-import { locationsAdapter, LocationsState } from '../states';
-import * as _ from 'lodash';
-import { Location } from 'src/app/core/models';
+import { createSelector, props } from "@ngrx/store";
+import { getRootState, AppState } from "../reducers";
+import { locationsAdapter, LocationsState } from "../states";
+import * as _ from "lodash";
+import { Location } from "src/app/core/models";
 import {
   getBedsFromAdmissionLocation,
   getBedsUnderCurrentLocation,
   getCabinentsUnderCurrentLocation,
-} from 'src/app/modules/inpatient/resources/helpers/admission.helper';
+} from "src/app/modules/inpatient/resources/helpers/admission.helper";
 
 const getLocationsState = createSelector(
   getRootState,
@@ -41,7 +41,7 @@ export const getStoreLocations = createSelector(
   getLocations,
   (locations: Location[]) => {
     return _.filter(locations, (location) => {
-      if ((_.filter(location?.tags, { display: 'Store' }) || [])?.length > 0) {
+      if ((_.filter(location?.tags, { display: "Store" }) || [])?.length > 0) {
         return location;
       }
     });
@@ -51,10 +51,26 @@ export const getStoreLocations = createSelector(
 export const getParentLocation = createSelector(
   getLocations,
   (locations: Location[]) => {
-    return _.filter(locations, { parentLocation: null }) &&
-      _.filter(locations, { parentLocation: null }).length > 0
-      ? _.filter(locations, { parentLocation: null })[0]
-      : null;
+    const allParentLocations =
+      _.filter(locations, { parentLocation: null }) || [];
+    const mainLocation =
+      allParentLocations && allParentLocations.length > 1
+        ? (allParentLocations.filter(
+            (location) =>
+              (
+                location?.tags.filter(
+                  (tag) => tag?.display.toLowerCase() === "main location"
+                ) || []
+              ).length > 0
+          ) || [])[0]
+        : allParentLocations && allParentLocations?.length == 1
+        ? allParentLocations[0]
+        : {
+            name: "iCare EMR & Hospital System",
+            description: "University of Dar es Salaam",
+            id: "iCare-udsm",
+          };
+    return mainLocation;
   }
 );
 
@@ -76,7 +92,7 @@ export const getChildLocationsOfTheFirstLevelParentLocation = createSelector(
         location.parentLocation &&
         (
           location.tags.filter(
-            (tag) => tag?.display.toLowerCase() === 'login location'
+            (tag) => tag?.display.toLowerCase() === "login location"
           ) || []
         )?.length > 0
       ) {
@@ -92,15 +108,15 @@ export const getCurrentLocation = createSelector(
       state.currentUserCurrentLocation &&
       state.currentUserCurrentLocation?.attributes
         ? state.currentUserCurrentLocation.attributes.filter(
-            (attribute) => attribute?.attributeType?.display === 'Forms'
+            (attribute) => attribute?.attributeType?.display === "Forms"
           ) || []
         : [];
-    const localStoredLocation = localStorage.getItem('currentLocation');
+    const localStoredLocation = localStorage.getItem("currentLocation");
     const location = state.currentUserCurrentLocation
       ? state.currentUserCurrentLocation
       : localStoredLocation &&
-        localStoredLocation !== 'undefined' &&
-        localStoredLocation !== ''
+        localStoredLocation !== "undefined" &&
+        localStoredLocation !== ""
       ? JSON.parse(localStoredLocation)
       : null;
     return {
@@ -110,7 +126,7 @@ export const getCurrentLocation = createSelector(
         ? location &&
           (
             location.tags.filter(
-              (tag) => tag?.display === 'Minor Procedure Location'
+              (tag) => tag?.display === "Minor Procedure Location"
             ) || []
           )?.length > 0
         : false,
@@ -136,7 +152,7 @@ export const getIfCurrentLocationIsMainStore = createSelector(
     state.currentUserCurrentLocation?.tags &&
     (
       state.currentUserCurrentLocation.tags.filter(
-        (tag) => tag?.display.toLowerCase() === 'main store'
+        (tag) => tag?.display.toLowerCase() === "main store"
       ) || []
     )?.length > 0
 );
@@ -146,14 +162,14 @@ export const getAllTreatmentLocations = createSelector(
   (locations: Location[]) => {
     return _.filter(locations, (location) => {
       if (
-        (_.filter(location?.tags, { display: 'Treatment Room' }) || [])
+        (_.filter(location?.tags, { display: "Treatment Room" }) || [])
           ?.length > 0
       ) {
         const matchedBillingConceptConfigurations =
           (location?.attributes.filter(
             (attribute) =>
               attribute?.attributeType?.display.toLowerCase() ===
-              'billing concept'
+              "billing concept"
           ) || [])[0];
         return {
           ...location,
@@ -246,7 +262,7 @@ function getChildLocationMembers(childLocations, locations) {
       currentLocation.attributes?.length > 0
         ? (currentLocation.attributes.filter(
             (attribute) =>
-              attribute?.attributeType?.display === 'Patients per bed'
+              attribute?.attributeType?.display === "Patients per bed"
           ) || [])[0]
         : null;
     return {
@@ -260,7 +276,7 @@ function getChildLocationMembers(childLocations, locations) {
         currentLocation?.tags &&
         (
           currentLocation.tags.filter(
-            (tag) => tag?.display === 'Bed Location'
+            (tag) => tag?.display === "Bed Location"
           ) || []
         )?.length > 0,
       patientsPerBed: patientPerBedAttribute
@@ -286,7 +302,7 @@ export const getAllLocationsUnderWardAsFlatArray = createSelector(
       currentLocation.attributes?.length > 0
         ? (currentLocation.attributes.filter(
             (attribute) =>
-              attribute?.attributeType?.display === 'Patients per bed'
+              attribute?.attributeType?.display === "Patients per bed"
           ) || [])[0]
         : null;
 
@@ -301,7 +317,7 @@ export const getAllLocationsUnderWardAsFlatArray = createSelector(
         currentLocation?.tags &&
         (
           currentLocation.tags.filter(
-            (tag) => tag?.display === 'Bed Location'
+            (tag) => tag?.display === "Bed Location"
           ) || []
         )?.length > 0,
       patientsPerBed: patientPerBedAttribute
@@ -319,7 +335,7 @@ function flattenList(list) {
   return _.flatten(
     list.map((item) => {
       return [
-        _.omit(item, 'childMembers'),
+        _.omit(item, "childMembers"),
         ...(item.childMembers ? flattenList(item.childMembers || []) : []),
       ];
     })
@@ -357,7 +373,7 @@ export const getAllBedsUnderCurrentWard = createSelector(
         currentLocation?.tags &&
         (
           currentLocation.tags.filter(
-            (tag) => tag?.display === 'Bed Location'
+            (tag) => tag?.display === "Bed Location"
           ) || []
         )?.length > 0,
     };

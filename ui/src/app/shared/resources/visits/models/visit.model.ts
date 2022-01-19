@@ -1,22 +1,22 @@
-import { VisitType } from './visit-type.model';
-import { flatten, groupBy, keys } from 'lodash';
-import { LabOrder } from './lab-order.model';
-import { Observation } from '../../observation/models/observation.model';
-import { VisitObject } from './visit-object.model';
-import { Diagnosis } from '../../diagnosis/models/diagnosis.model';
-import { VisitAttribute } from './visit-attribute.model';
-import { Patient } from '../../patient/models/patient.model';
-import { RadiologyOrder } from './radiology-order.model';
-import { ProcedureOrder } from './procedure-order.model';
-import { filter } from 'lodash';
-import { DrugOrder } from 'src/app/shared/resources/order/models/drug-order.model';
-import * as moment from 'moment';
-import { ICARE_CONFIG } from '../../config';
-import { Observable, of } from 'rxjs';
-import { MatTableDataSource } from '@angular/material/table';
-import { Bill } from 'src/app/modules/billing/models/bill.model';
-import { Payment } from 'src/app/modules/billing/models/payment.model';
-import { OtherOrder } from './other-orders.model';
+import { VisitType } from "./visit-type.model";
+import { flatten, groupBy, keys } from "lodash";
+import { LabOrder } from "./lab-order.model";
+import { Observation } from "../../observation/models/observation.model";
+import { VisitObject } from "./visit-object.model";
+import { Diagnosis } from "../../diagnosis/models/diagnosis.model";
+import { VisitAttribute } from "./visit-attribute.model";
+import { Patient } from "../../patient/models/patient.model";
+import { RadiologyOrder } from "./radiology-order.model";
+import { ProcedureOrder } from "./procedure-order.model";
+import { filter } from "lodash";
+import { DrugOrder } from "src/app/shared/resources/order/models/drug-order.model";
+import * as moment from "moment";
+import { ICARE_CONFIG } from "../../config";
+import { Observable, of } from "rxjs";
+import { MatTableDataSource } from "@angular/material/table";
+import { Bill } from "src/app/modules/billing/models/bill.model";
+import { Payment } from "src/app/modules/billing/models/payment.model";
+import { OtherOrder } from "./other-orders.model";
 
 export class Visit {
   // TODO: Need to find best way to type incoming patient
@@ -34,7 +34,7 @@ export class Visit {
     let emergencyAttributeArray = filter(
       this.visit?.attributes || [],
       (attribute) => {
-        return attribute?.attributeType?.display == 'EmergencyVisit';
+        return attribute?.attributeType?.display == "EmergencyVisit";
       }
     );
 
@@ -50,11 +50,11 @@ export class Visit {
   }
 
   get visitStartTime(): string {
-    return moment(this.visit.startDatetime).format('MMMM Do YYYY, h:mm:ss a');
+    return moment(this.visit.startDatetime).format("MMMM Do YYYY, h:mm:ss a");
   }
 
   get visitStopTime(): string {
-    return moment(this.visit.stopDatetime).format('MMMM Do YYYY, h:mm:ss a');
+    return moment(this.visit.stopDatetime).format("MMMM Do YYYY, h:mm:ss a");
   }
 
   get patient(): Patient {
@@ -111,16 +111,16 @@ export class Visit {
     /**
      * TODO: Remove this hard coded filter
      */
-    return this.location?.tags.some((tag) => tag?.name === 'Bed Location');
+    return this.location?.tags.some((tag) => tag?.name === "Bed Location");
   }
 
   get waitingToBeAdmitted(): boolean {
     return (
-      !this.location?.tags.some((tag) => tag?.name === 'Bed Location') &&
+      !this.location?.tags.some((tag) => tag?.name === "Bed Location") &&
       (
         this.visit.encounters.filter(
           (encounter) =>
-            encounter?.encounterType?.display.toLowerCase() === 'admission'
+            encounter?.encounterType?.display.toLowerCase() === "admission"
         ) || []
       ).length > 0
     );
@@ -136,12 +136,12 @@ export class Visit {
     return this.attributes.filter(
       (attribute) =>
         attribute.attributeType.uuid ===
-          'PSCHEME0IIIIIIIIIIIIIIIIIIIIIIIATYPE' ||
+          "PSCHEME0IIIIIIIIIIIIIIIIIIIIIIIATYPE" ||
         attribute.attributeType.uuid ===
-          'INSURANCEAUTHNOIIIIIIIIIIIIIIIIATYPE' ||
+          "INSURANCEAUTHNOIIIIIIIIIIIIIIIIATYPE" ||
         attribute.attributeType.uuid ===
-          'INSURANCEIDIIIIIIIIIIIIIIIIIIIIATYPE' ||
-        attribute.attributeType.uuid === 'INSURANCEIIIIIIIIIIIIIIIIIIIIIIATYPE'
+          "INSURANCEIDIIIIIIIIIIIIIIIIIIIIATYPE" ||
+        attribute.attributeType.uuid === "INSURANCEIIIIIIIIIIIIIIIIIIIIIIATYPE"
     );
   }
 
@@ -153,9 +153,9 @@ export class Visit {
             (attribute?.attributeType &&
               attribute?.attributeType?.uuid &&
               attribute?.attributeType?.uuid ===
-                'INSURANCEIDIIIIIIIIIIIIIIIIIIIIATYPE') ||
+                "INSURANCEIDIIIIIIIIIIIIIIIIIIIIATYPE") ||
             (attribute.display &&
-              attribute.display.indexOf('Insurance ID') > -1)
+              attribute.display.indexOf("Insurance ID") > -1)
           ) {
             return attribute;
           }
@@ -170,7 +170,7 @@ export class Visit {
     )
       .filter(
         (order) =>
-          order?.orderType?.uuid === 'BIL00000IIIIIIIIIIIIIIIIIIIIIIIOTYPE'
+          order?.orderType?.uuid === "BIL00000IIIIIIIIIIIIIIIIIIIIIIIOTYPE"
       )
       .map((order) => new DrugOrder(order, this.bills, this.payments));
   }
@@ -181,13 +181,13 @@ export class Visit {
     )
       .filter(
         (order) =>
-          order && order.orderType?.display.toLowerCase() === 'prescription'
+          order && order.orderType?.display.toLowerCase() === "prescription"
       )
       .map((order) => new DrugOrder(order, this.bills, this.payments));
   }
 
   get dispensingDrugOrders(): DrugOrder[] {
-    const groupedOrders = groupBy(this.drugOrders, 'concept.uuid');
+    const groupedOrders = groupBy(this.drugOrders, "concept.uuid");
     return keys(groupedOrders)
       .map((conceptUuid) => {
         const groupedDrugOrders = groupedOrders[conceptUuid] || [];
@@ -237,7 +237,7 @@ export class Visit {
       .filter(
         (order) =>
           order &&
-          order.type === 'testorder' &&
+          order.type === "testorder" &&
           !order?.dateStopped &&
           !order?.previousOrder
       )
@@ -251,7 +251,7 @@ export class Visit {
       .filter(
         (order) =>
           order &&
-          order?.orderType?.name.toLowerCase() === 'radiology order' &&
+          order?.orderType?.name.toLowerCase() === "radiology order" &&
           !order?.dateStopped &&
           !order?.previousOrder
       )
@@ -269,7 +269,7 @@ export class Visit {
       .filter(
         (order) =>
           order &&
-          order?.orderType?.name.toLowerCase() === 'procedure order' &&
+          order?.orderType?.name.toLowerCase() === "procedure order" &&
           !order?.dateStopped &&
           !order?.previousOrder
       )
@@ -287,9 +287,9 @@ export class Visit {
       .filter(
         (order) =>
           order &&
-          order?.orderType?.name.toLowerCase() !== 'procedure order' &&
-          order?.orderType?.name.toLowerCase() !== 'radiology order' &&
-          order.type !== 'testorder' &&
+          order?.orderType?.name.toLowerCase() !== "procedure order" &&
+          order?.orderType?.name.toLowerCase() !== "radiology order" &&
+          order.type !== "testorder" &&
           !order?.dateStopped &&
           !order?.previousOrder
       )
@@ -342,7 +342,7 @@ export class Visit {
     return (
       (
         (this.encounters || []).filter(
-          (encounter) => encounter?.encounterType?.display === 'referto'
+          (encounter) => encounter?.encounterType?.display === "referto"
         ) || []
       )?.length > 0
     );
@@ -351,7 +351,7 @@ export class Visit {
   get transferToEncounterDetails(): any {
     // TODO: Find a better way to softcode encounter type
     return ((this.encounters || []).filter(
-      (encounter) => encounter?.encounterType?.display === 'referto'
+      (encounter) => encounter?.encounterType?.display === "referto"
     ) || [])[0];
   }
 
@@ -366,7 +366,7 @@ export class Visit {
                 (order) =>
                   order?.accessionNumber &&
                   order?.orderType?.uuid ===
-                    'iCARESTS-ADMS-1111-1111-525400e4297f'
+                    "iCARESTS-ADMS-1111-1111-525400e4297f"
               ) || []
             ).length > 0
         ) || []
@@ -380,16 +380,27 @@ export class Visit {
         (
           encounter?.orders.filter(
             (order) =>
-              order?.orderType?.uuid === 'iCARESTS-ADMS-1111-1111-525400e4297f'
+              order?.orderType?.uuid === "iCARESTS-ADMS-1111-1111-525400e4297f"
           ) || []
         ).length > 0
     ) || [])[0];
     return encounter
       ? (encounter?.orders.filter(
           (order) =>
-            order?.orderType?.uuid === 'iCARESTS-ADMS-1111-1111-525400e4297f'
+            order?.orderType?.uuid === "iCARESTS-ADMS-1111-1111-525400e4297f"
         ) || [])[0]
       : null;
+  }
+
+  get hasProvisonalDiagnosis(): boolean {
+    const diagnoses = this.diagnoses;
+    return diagnoses.length > 0
+      ? (
+          diagnoses.filter(
+            (diagnosis) => diagnosis["diagnosisDetails"]["certainty"]
+          ) || []
+        )?.length > 0
+      : false;
   }
 
   toJson(): VisitObject {
@@ -418,6 +429,7 @@ export class Visit {
       patientProfileAttributes: this.patientProfileAttributes,
       consultationStarted: this.consultationStarted,
       consultationStatusOrder: this.consultationStatusOrder,
+      hasProvisonalDiagnosis: this.hasProvisonalDiagnosis,
     };
   }
 
@@ -432,7 +444,7 @@ export class Visit {
       openmrsApi.visit
         .getAllVisits({
           includeInactive: false,
-          v: 'custom:(uuid,visitType,startDatetime,stopDatetime,encounters:(orders),attributes:(uuid,display),location:(uuid,display,tags,parentLocation:(uuid,display)),patient:(uuid,display,identifiers,person,voided)',
+          v: "custom:(uuid,visitType,startDatetime,stopDatetime,encounters:(orders),attributes:(uuid,display),location:(uuid,display,tags,parentLocation:(uuid,display)),patient:(uuid,display,identifiers,person,voided)",
         } as any)
         .then((visitResponse: any) => {
           const visits = (visitResponse.results || [])
@@ -454,7 +466,7 @@ export class Visit {
       openmrsApi.visit
         .getAllVisits({
           includeInactive: false,
-          v: 'custom:(uuid,visitType,startDatetime,stopDatetime,encounters:(orders),attributes:(uuid,display),location:(uuid,display,tags,parentLocation:(uuid,display)),patient:(uuid,display,identifiers,person,voided)',
+          v: "custom:(uuid,visitType,startDatetime,stopDatetime,encounters:(orders),attributes:(uuid,display),location:(uuid,display,tags,parentLocation:(uuid,display)),patient:(uuid,display,identifiers,person,voided)",
         } as any)
         .then((visitResponse: any) => {
           const visits = (visitResponse.results || [])

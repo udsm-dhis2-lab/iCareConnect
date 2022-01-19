@@ -10,6 +10,7 @@ import {
 import {
   getCurrentUserDetails,
   getCurrentUserPrivileges,
+  getProviderDetails,
   getRolesLoadingState,
 } from "src/app/store/selectors/current-user.selectors";
 import { select, Store } from "@ngrx/store";
@@ -36,6 +37,8 @@ export class PatientDashboardComponent implements OnInit {
   loadingVisit$: Observable<boolean>;
   activeVisit$: Observable<VisitObject>;
   iCareGeneralConfigurations$: Observable<any>;
+  iCareClinicConfigurations$: Observable<any>;
+  provider$: Observable<any>;
   constructor(
     private store: Store<AppState>,
     private route: ActivatedRoute,
@@ -46,6 +49,10 @@ export class PatientDashboardComponent implements OnInit {
     this.iCareGeneralConfigurations$ =
       this.systemSettingsService.getSystemSettingsByKey(
         "iCare.GeneralMetadata.Configurations"
+      );
+    this.iCareClinicConfigurations$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        "icare.clinic.configurations"
       );
     const patientId = this.route.snapshot.params["patientID"];
     this.store.dispatch(loadFormPrivilegesConfigs());
@@ -61,5 +68,6 @@ export class PatientDashboardComponent implements OnInit {
     this.rolesLoadingState$ = this.store.select(getRolesLoadingState);
     this.loadingVisit$ = this.store.pipe(select(getVisitLoadingState));
     this.activeVisit$ = this.store.pipe(select(getActiveVisit));
+    this.provider$ = this.store.select(getProviderDetails);
   }
 }

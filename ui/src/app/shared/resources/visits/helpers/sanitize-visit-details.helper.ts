@@ -1,6 +1,6 @@
 import * as _ from "lodash";
 
-export function getOrdersFromCurrentVisitEncounters(visit, type) {
+export function getOrdersFromCurrentVisitEncounters(visit, type, bills?: any[], isEnsured?: boolean) {
   if (!visit) {
     return null;
   }
@@ -15,6 +15,30 @@ export function getOrdersFromCurrentVisitEncounters(visit, type) {
             (type == "procedure" ? "procedure order" : "radiology order")
         ) || [],
         (order) => {
+          const paid = bills ?
+          bills?.length === 0 || isEnsured
+            ? true
+            : (
+                bills.filter(
+                  (bill) =>
+                    (
+                      bill?.items.filter(
+                        (billItem) =>
+                          billItem?.billItem?.item?.concept?.uuid ===
+                          order?.concept?.uuid
+                      ) || []
+                    )?.length > 0
+                ) || []
+              )?.length > 0
+            ? false
+            : true: false;
+
+            const observation = encounter
+            ? (encounter?.obs.filter(
+                (observation) =>
+                  observation?.concept?.uuid === order?.concept?.uuid
+              ) || [])[0]
+            : null;
           return {
             orderNumber: order?.orderNumber,
             uuid: order?.uuid,
@@ -29,6 +53,10 @@ export function getOrdersFromCurrentVisitEncounters(visit, type) {
               uuid: order?.orderer?.uuid,
               display: order?.orderer?.display,
             },
+            value: observation ? observation?.value?.display : null,
+            remarks: observation ? observation?.comment : null,
+            obsDatetime: observation ? observation?.obsDatetime : null,
+            paid,
             orderReason: order?.orderReason,
             orderType: order?.orderType.display,
             display: order?.display,

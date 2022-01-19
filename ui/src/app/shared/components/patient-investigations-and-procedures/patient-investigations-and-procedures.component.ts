@@ -15,10 +15,22 @@ export class PatientInvestigationsAndProceduresComponent implements OnInit {
   @Input() orderTypes: any;
   @Input() provider: any;
   @Input() iCareGeneralConfigurations: any;
+  @Input() clinicConfigurations: any;
   selectedTab = new FormControl(0);
+
+  shouldShowLabSection: boolean = false;
   constructor() {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.shouldShowLabSection = !this.clinicConfigurations?.provisionalDiagnosis
+      ?.shouldAffectImmediateSections
+      ? (
+          this.clinicConfigurations?.provisionalDiagnosis?.immdicateSectionsAffected.filter(
+            (section) => section?.laboratory
+          ) || []
+        ).length > 0
+      : true;
+  }
 
   changeTab(val): void {
     this.selectedTab.setValue(val);

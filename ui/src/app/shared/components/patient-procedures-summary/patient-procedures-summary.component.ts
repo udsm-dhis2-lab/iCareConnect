@@ -5,6 +5,7 @@ import { keyBy, flatten, orderBy, uniqBy } from "lodash";
 import { OrdersService } from "../../resources/order/services/orders.service";
 import { Observable } from "rxjs";
 import { VisitsService } from "../../resources/visits/services";
+import { getProcedures } from "src/app/core/helpers/get-setmembers-from-departments.helper";
 
 @Component({
   selector: "app-patient-procedures-summary",
@@ -49,7 +50,7 @@ export class PatientProceduresSummaryComponent implements OnInit {
         options:
           this.investigationAndProceduresFormsDetails &&
           this.investigationAndProceduresFormsDetails?.setMembers
-            ? this.getProcedures(
+            ? getProcedures(
                 this.investigationAndProceduresFormsDetails?.setMembers
               )
             : [],
@@ -72,26 +73,6 @@ export class PatientProceduresSummaryComponent implements OnInit {
     this.formValuesData = formValues.getValues();
     this.formDetails = formValues;
     this.isFormValid = formValues.isValid;
-  }
-
-  getProcedures(departments): any {
-    const procedureDepartment = (departments.filter(
-      (department) => department?.name?.toLowerCase().indexOf("procedure") === 0
-    ) || [])[0];
-    return !procedureDepartment
-      ? []
-      : uniqBy(
-          orderBy(
-            flatten(
-              procedureDepartment?.setMembers.map((setMember) => {
-                return setMember?.setMembers;
-              })
-            ),
-            ["name"],
-            ["asc"]
-          ),
-          "uuid"
-        );
   }
 
   onSave(event: Event): void {

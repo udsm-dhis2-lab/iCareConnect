@@ -8,16 +8,17 @@ import { AdmissionFormComponent } from "src/app/shared/components/admission-form
 import { PatientVisitHistoryModalComponent } from "src/app/shared/components/patient-visit-history-modal/patient-visit-history-modal.component";
 import { getApplicableForms } from "src/app/shared/helpers/identify-applicable-forms.helper";
 import { OpenMRSForm } from "src/app/shared/modules/form/models/custom-openmrs-form.model";
+import { FormConfig } from "src/app/shared/modules/form/models/form-config.model";
 import { ConceptsService } from "src/app/shared/resources/concepts/services/concepts.service";
 import { ICARE_CONFIG } from "src/app/shared/resources/config";
 import { ProviderGetFull } from "src/app/shared/resources/openmrs";
 import { Patient } from "src/app/shared/resources/patient/models/patient.model";
 import { Visit } from "src/app/shared/resources/visits/models/visit.model";
-import { loadCustomOpenMRSForms } from "src/app/store/actions";
+import { loadCustomOpenMRSForms, loadOrderTypes } from "src/app/store/actions";
 import { clearBills } from "src/app/store/actions/bill.actions";
 import { saveObservationsUsingEncounter } from "src/app/store/actions/observation.actions";
 import { AppState } from "src/app/store/reducers";
-import { getCurrentLocation } from "src/app/store/selectors";
+import { getAllOrderTypes, getCurrentLocation } from "src/app/store/selectors";
 import {
   getActiveVisitPendingVisitServiceBillStatus,
   getAllBills,
@@ -28,7 +29,7 @@ import {
   getCurrentUserPrivileges,
   getProviderDetails,
 } from "src/app/store/selectors/current-user.selectors";
-import { getCustomOpenMRSFormsByIds } from "src/app/store/selectors/form.selectors";
+import { getCustomOpenMRSFormsByIds, getFormEntitiesByNames } from "src/app/store/selectors/form.selectors";
 import {
   getGroupedObservationByConcept,
   getSavingObservationStatus,
@@ -67,6 +68,7 @@ export class NursingDataComponent implements OnInit {
   currentBills$: Observable<any[]>;
   activeVisitLoadedState$: Observable<boolean>;
   conceptsWithDepartmentsDetails$: Observable<any>;
+  orderTypes$: Observable<any[]>;
 
   constructor(
     private store: Store<AppState>,
@@ -75,6 +77,8 @@ export class NursingDataComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.store.dispatch(loadOrderTypes());
+    this.orderTypes$ = this.store.select(getAllOrderTypes);
     this.privileges$ = this.store.select(getCurrentUserPrivileges);
     this.conceptsWithDepartmentsDetails$ =
       this.conceptsService.getConceptsDepartmentDetails(
@@ -93,7 +97,6 @@ export class NursingDataComponent implements OnInit {
         }),
       })
     );
-
     this.forms$ = this.store.select(getCustomOpenMRSFormsByIds, {
       formUUids: map(this.applicableForms, (form) => {
         return form?.id;
