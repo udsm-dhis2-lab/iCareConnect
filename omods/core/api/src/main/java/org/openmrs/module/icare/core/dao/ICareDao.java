@@ -14,6 +14,7 @@ import org.apache.commons.logging.LogFactory;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
+import org.openmrs.Drug;
 import org.openmrs.Order;
 import org.openmrs.Visit;
 import org.openmrs.api.db.hibernate.DbSession;
@@ -128,7 +129,7 @@ public class ICareDao extends BaseDAO<Item> {
 		if (search != null) {
 			queryStr = "SELECT ip FROM Item ip " + "LEFT JOIN ip.concept as c " + "LEFT JOIN c.names cn "
 			        + "LEFT JOIN ip.drug as d " + "LEFT JOIN d.concept as c1 " + "LEFT JOIN c1.names cn1 "
-			        + "WHERE lower(cn.name) like :search OR lower(cn1.name) like :search";
+			        + "WHERE lower(cn.name) like :search OR lower(cn1.name) like :search OR lower(d.name) like :search";
 		}
 		Query query = session.createQuery(queryStr);
 		query.setFirstResult(startIndex);
@@ -166,11 +167,30 @@ public class ICareDao extends BaseDAO<Item> {
 	public Item getItemByConceptUuid(String uuid) {
 		DbSession session = getSession();
 		
-		String queryStr = "SELECT a FROM Item a WHERE a.concept.uuid= :uuid";
+		String queryStr = "SELECT i FROM Item i " + "LEFT JOIN i.concept as c "
+				+ "LEFT JOIN i.drug as d " + "LEFT JOIN d.concept as c1 " +
+				" WHERE c.uuid= :uuid OR c1.uuid= :uuid";
+		//String queryStr = "SELECT a FROM Item a WHERE a.concept.uuid=:uuid";
 		Query query = session.createQuery(queryStr);
 		query.setParameter("uuid", uuid);
 		List<Item> items = query.list();
 		
+		if (items.size() > 0) {
+			return items.get(0);
+		} else {
+			return null;
+		}
+	}
+
+	public Item getItemByDrugConceptUuid(String uuid) {
+		DbSession session = getSession();
+
+		//String queryStr = "SELECT a FROM Item a WHERE a.concept.uuid= :uuid OR a.drug.concept.uuid= :uuid";
+		String queryStr = "SELECT a FROM Item a WHERE a.drug.concept.uuid=:uuid";
+		Query query = session.createQuery(queryStr);
+		query.setParameter("uuid", uuid);
+		List<Item> items = query.list();
+
 		if (items.size() > 0) {
 			return items.get(0);
 		} else {

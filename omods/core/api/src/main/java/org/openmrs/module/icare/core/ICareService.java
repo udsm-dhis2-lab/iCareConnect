@@ -78,8 +78,10 @@ public interface ICareService extends OpenmrsService {
 	List<Item> getItems();
 	
 	Item getItemByConceptUuid(String uuid);
-	
-	@Transactional
+
+    Item getItemByDrugConceptUuid(String uuid);
+
+    @Transactional
 	void stopVisits() throws APIException;
 	
 	long getVisitSerialNumber(Visit visit);
@@ -104,4 +106,6 @@ public interface ICareService extends OpenmrsService {
 	        Integer limit, Integer startIndex);
 
 	Message sendMessage(Message message) throws MalformedURLException, IOException, Exception;
+
+	List<Message> sendMessages(List<Message> messages) throws MalformedURLException, IOException, Exception;
 }
