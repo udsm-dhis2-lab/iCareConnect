@@ -16,7 +16,10 @@
 
 <div
   class="signature-container w-100 p-2"
-  *ngIf="{ providerDetails: providerDetails$ | async } as params"
+  *ngIf="{
+    providerDetails: providerDetails$ | async,
+    providerAttributes: providerAttributes$ | async
+  } as params"
 >
   <canvas
     #sigPad
@@ -51,12 +54,38 @@
     This user is not a provider!
   </div>
 
+  <mat-accordion
+    *ngIf="params?.providerDetails && !params?.providerDetails?.uuid"
+  >
+    <mat-expansion-panel>
+      <mat-expansion-panel-header>
+        <mat-panel-title> Provider details form </mat-panel-title>
+        <mat-panel-description>
+          <!-- This is a summary of the content -->
+        </mat-panel-description>
+      </mat-expansion-panel-header>
+      <app-provider-attributes-form
+        *ngIf="params?.providerAttributes"
+        [providerAttributes]="params?.providerAttributes"
+        (formFieldValues)="onGetAttributesFormValues($event)"
+        (isFormValid)="onGetFormValidity($event)"
+      ></app-provider-attributes-form>
+      <mat-progress-bar
+        *ngIf="!params?.providerAttributes"
+        mode="indeterminate"
+      ></mat-progress-bar>
+    </mat-expansion-panel>
+  </mat-accordion>
+
   <mat-progress-bar
     *ngIf="!params?.providerDetails"
     mode="indeterminate"
   ></mat-progress-bar>
 
-  <div class="w-100 d-flex justify-content-end mb-2">
+  <div
+    class="w-100 d-flex justify-content-end mb-2"
+    *ngIf="params?.providerDetails"
+  >
     <button
       mat-stroked-button
       [disabled]="
@@ -80,11 +109,21 @@
         !params?.providerDetails ||
         (params?.providerDetails &&
           !params?.providerDetails?.signature &&
-          !signatureImg)
+          !signatureImg &&
+          !isProviderAttributeFormValid) ||
+        (!(params?.providerDetails && !params?.providerDetails?.uuid) &&
+          !isProviderAttributeFormValid)
       "
       class="action-btns"
       color="primary"
-      (click)="onSave($event, params?.providerDetails)"
+      (click)="
+        onSave(
+          $event,
+          params?.providerDetails,
+          providerFormValues,
+          !(params?.providerDetails && !params?.providerDetails?.uuid)
+        )
+      "
     >
       Save
     </button>
