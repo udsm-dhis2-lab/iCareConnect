@@ -5,6 +5,7 @@ import { catchError, map } from "rxjs/operators";
 import { BASE_URL } from "src/app/shared/constants/constants.constants";
 import { OpenmrsHttpClientService } from "src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service";
 import { Api } from "src/app/shared/resources/openmrs";
+import { ProviderAttributeModel } from "src/app/modules/maintenance/models/provider-attribute.model";
 
 @Injectable({
   providedIn: "root",
@@ -49,7 +50,7 @@ export class CurrentUserService {
     return this.httpClient.get("session");
   }
 
-  createProviderAttribute(parentUuid, data): Observable<any> {
+  createProviderAttribute(parentUuid: string, data: any): Observable<any> {
     return from(
       this.api.provider.createProviderAttribute(parentUuid, data)
     ).pipe(
@@ -80,6 +81,20 @@ export class CurrentUserService {
     ).pipe(
       map((response: any) => {
         return flatten(response);
+      })
+    );
+  }
+
+  getProviderAttributes(): Observable<ProviderAttributeModel[]> {
+    return this.httpClient.get("providerattributetype").pipe(
+      map((response) => {
+        const attributes = response?.results;
+        return attributes.map((attribute) => {
+          return {
+            uuid: attribute?.uuid,
+            name: attribute?.display,
+          };
+        });
       })
     );
   }

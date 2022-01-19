@@ -9,6 +9,8 @@ import {
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { Observable } from "rxjs";
 import { CurrentUserService } from "src/app/core/services";
+import { ProviderAttributeModel } from "../../models/provider-attribute.model";
+import { UserService } from "../../services/users.service";
 
 @Component({
   selector: "app-capture-signature",
@@ -26,15 +28,24 @@ export class CaptureSignatureComponent implements OnInit {
   data: any;
   providerDetails$: Observable<any>;
   providerAttributeDetails$: Observable<any>;
+  providerAttributes$: Observable<ProviderAttributeModel[]>;
+  isProviderAttributeFormValid: boolean = false;
+  providerFormValues: any[];
   constructor(
     private dialogRef: MatDialogRef<CaptureSignatureComponent>,
     @Inject(MAT_DIALOG_DATA) data,
-    private currentUserService: CurrentUserService
+    private currentUserService: CurrentUserService,
+    private userService: UserService
   ) {
     this.data = data;
   }
 
   ngOnInit(): void {
+    this.getProviderDetails();
+    this.providerAttributes$ = this.currentUserService.getProviderAttributes();
+  }
+
+  getProviderDetails(): void {
     this.providerDetails$ = this.currentUserService.getProviderByUserDetails(
       this.data?.userUuid
     );
@@ -91,25 +102,61 @@ export class CaptureSignatureComponent implements OnInit {
     this.signatureImg = null;
   }
 
-  onSave(event: Event, providerDetails: any): void {
+  onSave(
+    event: Event,
+    providerDetails: any,
+    providerFormValues: any,
+    isSignature: boolean
+  ): void {
     event.stopPropagation();
     this.updatingUser = true;
-    const providerSignatureAttribute = {
-      attributeType: "ecc4e84e-823c-4a1e-94dc-c349b9c64cca",
-      value: this.signatureImg,
-    };
+    if (isSignature) {
+      const providerSignatureAttribute = {
+        attributeType: "ecc4e84e-823c-4a1e-94dc-c349b9c64cca",
+        value: this.signatureImg,
+      };
 
-    this.providerAttributeDetails$ =
-      this.currentUserService.createProviderAttribute(
-        providerDetails?.uuid,
-        providerSignatureAttribute
-      );
+      this.providerAttributeDetails$ =
+        this.currentUserService.createProviderAttribute(
+          providerDetails?.uuid,
+          providerSignatureAttribute
+        );
 
-    this.providerAttributeDetails$.subscribe((response) => {
-      if (response) {
-        // TODO: Add support to check the handled error from service
-        this.updatingUser = false;
-      }
-    });
+      this.providerAttributeDetails$.subscribe((response) => {
+        if (response) {
+          // TODO: Add support to check the handled error from service
+          this.updatingUser = false;
+          this.getProviderDetails();
+        }
+      });
+    } else {
+      const provider = {
+        identifier: this.data.user?.username,
+        person: this.data?.user?.person?.uuid,
+        attributes: Object.keys(providerFormValues).map((key) => {
+          return {
+            attributeType: key,
+            value: providerFormValues[key]?.value,
+          };
+        }),
+      };
+
+      this.userService
+        .createProvider({ provider: provider })
+        .subscribe((response) => {
+          if (response) {
+            this.updatingUser = false;
+            this.getProviderDetails();
+          }
+        });
+    }
+  }
+
+  onGetAttributesFormValues(formValues: any): void {
+    this.providerFormValues = formValues;
+  }
+
+  onGetFormValidity(isValid: boolean): void {
+    this.isProviderAttributeFormValid = isValid;
   }
 }

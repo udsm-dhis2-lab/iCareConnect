@@ -49,6 +49,7 @@ export class UsersListComponent implements OnInit {
       data: {
         ...currentUser,
         userUuid: user?.uuid,
+        user,
       },
     });
   }
