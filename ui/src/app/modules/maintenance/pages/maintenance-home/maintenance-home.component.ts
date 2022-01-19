@@ -16,6 +16,7 @@ export class MaintenanceHomeComponent implements OnInit {
     this.pages = [
       { id: "price-list", name: "Price List" },
       { id: "users", name: "User Management" },
+      { id: "drug", name: "Drug Management" },
       { id: "location", name: "Location Management" },
     ];
   }
