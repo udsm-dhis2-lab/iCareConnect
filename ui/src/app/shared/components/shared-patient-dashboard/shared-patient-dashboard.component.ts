@@ -56,7 +56,6 @@ import { filter, map } from "lodash";
 import { clearBills } from "src/app/store/actions/bill.actions";
 import { PatientVisitHistoryModalComponent } from "../patient-visit-history-modal/patient-visit-history-modal.component";
 import { MatDialog } from "@angular/material/dialog";
-import { OrdersService } from "../../resources/order/services/orders.service";
 import { TransferWithinComponent } from "../transfer-within/transfer-within.component";
 import { AdmissionFormComponent } from "../admission-form/admission-form.component";
 import { CaptureFormDataModalComponent } from "../capture-form-data-modal/capture-form-data-modal.component";
@@ -106,11 +105,7 @@ export class SharedPatientDashboardComponent implements OnInit {
   orderTypes$: Observable<any>;
   countOfVitalsElementsFilled$: Observable<number>;
 
-  constructor(
-    private store: Store<AppState>,
-    private dialog: MatDialog,
-    private ordersService: OrdersService
-  ) {}
+  constructor(private store: Store<AppState>, private dialog: MatDialog) {}
 
   ngOnInit(): void {
     this.onStartConsultation(this.activeVisit);
@@ -202,17 +197,6 @@ export class SharedPatientDashboardComponent implements OnInit {
 
   onStartConsultation(visit: VisitObject): void {
     this.store.dispatch(startConsultation());
-    if (!visit.consultationStarted) {
-      const orders = [
-        {
-          uuid: visit.consultationStatusOrder?.uuid,
-          accessionNumber: visit.consultationStatusOrder?.orderNumber,
-          fulfillerStatus: "RECEIVED",
-          encounter: visit.consultationStatusOrder?.encounter?.uuid,
-        },
-      ];
-      this.ordersUpdates$ = this.ordersService.updateOrdersViaEncounter(orders);
-    }
   }
 
   clearBills(event: Event) {
