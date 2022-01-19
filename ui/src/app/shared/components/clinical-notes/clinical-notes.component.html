@@ -1,6 +1,9 @@
 <div
   class="row mt-2"
-  *ngIf="{ savingObservations: savingObservations$ | async } as params"
+  *ngIf="{
+    savingObservations: savingObservations$ | async,
+    ordersUpdates: ordersUpdates$ | async
+  } as params"
 >
   <div class="col-md-3 clinical-form-list">
     <mat-form-field class="w-100">
@@ -43,7 +46,7 @@
     <div class="d-flex justify-content-end">
       <button
         mat-flat-button
-        (click)="onConfirm($event)"
+        (click)="onConfirm($event, visit)"
         color="primary"
         [disabled]="params?.savingObservations"
       >

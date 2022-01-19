@@ -24,7 +24,10 @@ export class SystemSettingsService {
     return this.httpClient.get(`systemsetting?q=${key}&v=full`).pipe(
       map((response) => {
         return response?.results && response?.results[0]
-          ? JSON.parse(response?.results[0]?.value)
+          ? response?.results[0]?.value.indexOf("{") > -1 ||
+            response?.results[0]?.value.indexOf("[") > -1
+            ? JSON.parse(response?.results[0]?.value)
+            : response?.results[0]?.value
           : "";
       }),
       catchError((error) => of(error))
@@ -39,7 +42,10 @@ export class SystemSettingsService {
           key,
           value:
             response?.results && response?.results[0]
-              ? JSON.parse(response?.results[0]?.value)
+              ? response?.results[0]?.value.indexOf("{") > -1 ||
+                response?.results[0]?.value.indexOf("[") > -1
+                ? JSON.parse(response?.results[0]?.value)
+                : response?.results[0]?.value
               : "",
         };
       }),

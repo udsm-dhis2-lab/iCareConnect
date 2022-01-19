@@ -207,32 +207,7 @@ export class ReportsGeneratorComponent implements OnInit {
     this.countOfReportsSent$ = this.store.select(
       getCountOfCurrentReportSubmittedToDHIS2
     );
-
-    // console.log("report :: ", report);
     this.currentReport = report;
-
-    let ageParams = _.filter(report?.otherParameters, (param) => {
-      return param?.id == "maxAge" ||
-        param?.id == "minAge" ||
-        param?.id == "age"
-        ? true
-        : false;
-    });
-
-    this.currentReport["otherParameters"] = _.filter(
-      this.currentReport?.otherParameters,
-      (param) => {
-        return param?.id == "maxAge" ||
-          param?.id == "minAge" ||
-          param?.id == "age"
-          ? false
-          : true;
-      }
-    );
-
-    if (ageParams?.length > 0) {
-      this.currentReport["ageParameters"] = ageParams;
-    }
 
     const matchedReportWithParametersConfigs =
       (this.reportsParametersConfigurations.filter(
@@ -240,7 +215,7 @@ export class ReportsGeneratorComponent implements OnInit {
       ) || [])[0];
     this.selectedReportParameters = matchedReportWithParametersConfigs
       ? matchedReportWithParametersConfigs?.parameters
-      : null;
+      : report?.parameters;
 
     this.reportData = null;
     this.reportError = null;

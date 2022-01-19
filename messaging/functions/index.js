@@ -35,7 +35,7 @@ exports.envaya = functions.https.onRequest(async (req, res) => {
   switch (req.method) {
     case "POST": {
       // await sendMessages(req, res);
-      const reqPhoneNumber = req.body.phoneNumber;
+      const reqPhoneNumber = req.body.phone_number;
       if (reqPhoneNumber) {
         if (req.body.action === "outgoing") {
           const messagesSnap = await admin
@@ -97,7 +97,7 @@ exports.envaya = functions.https.onRequest(async (req, res) => {
         await res.status(400).send({
           error: {
             code: 400,
-            message: "Missing phoneNumber parameter",
+            message: "Missing phone_number parameter",
           },
         });
       }

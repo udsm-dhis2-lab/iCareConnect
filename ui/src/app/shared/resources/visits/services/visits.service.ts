@@ -450,15 +450,16 @@ export class VisitsService {
     return getDrugOrdersFromCurrentVisitEncounters(visit);
   }
 
-  getActiveVisitProcedures(uuid: string, fields): Observable<any> {
+  getActiveVisitProcedures(uuid: string, fields: any, bills?:any, isEnsured?: boolean): Observable<any> {
     return from(
       this.api.visit.getVisit(uuid, {
         v: fields,
       })
     ).pipe(
       map((response) => {
-        return getOrdersFromCurrentVisitEncounters(response, "procedure");
-      })
+        return getOrdersFromCurrentVisitEncounters(response, "procedure", bills, isEnsured);
+      }),
+      catchError(error => of(error))
     );
   }
 

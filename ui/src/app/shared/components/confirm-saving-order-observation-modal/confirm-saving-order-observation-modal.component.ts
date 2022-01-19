@@ -26,7 +26,7 @@ export class ConfirmSavingOrderObservationModalComponent implements OnInit {
         (
           encounter.orders.filter(
             (order) =>
-              order?.orderNumber === this.dialogData?.order?.orderNumber
+              order?.orderNumber === this.dialogData?.orderNumber
           ) || []
         )?.length > 0
     ) || [])[0];
@@ -39,7 +39,7 @@ export class ConfirmSavingOrderObservationModalComponent implements OnInit {
       uuid: this.matchedEncounter?.uuid,
       obs: [
         {
-          concept: data?.order?.concept?.uuid,
+          concept: data?.concept?.uuid,
           value: data?.value,
           comment: data?.comments,
         },

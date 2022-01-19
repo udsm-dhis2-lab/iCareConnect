@@ -29,6 +29,7 @@ import {
   getVisitLoadedState,
   getVisitLoadingState,
 } from 'src/app/store/selectors/visit.selectors';
+import { SystemSettingsService } from 'src/app/core/services/system-settings.service';
 
 @Component({
   selector: 'app-current-patient-dispensing',
@@ -47,9 +48,10 @@ export class CurrentPatientDispensingComponent implements OnInit {
   currentPatient$: Observable<Patient>;
   currentVisitLoadingState$: Observable<boolean>;
   currentVisitLoadedState$: Observable<boolean>;
+  generalMetadataConfigurations$: Observable<any>;
   constructor(
     private route: ActivatedRoute,
-    private router: Router,
+    private systemSettingsService: SystemSettingsService,
     private dialog: MatDialog,
     private visitService: VisitsService,
     private store: Store<AppState>,
@@ -64,6 +66,7 @@ export class CurrentPatientDispensingComponent implements OnInit {
     this.currentVisitLoadedState$ = this.store.select(getVisitLoadedState);
     this.currentLocation$ = this.store.pipe(select(getCurrentLocation));
     this.currentPatient$ = this.store.select(getCurrentPatient);
+    this.generalMetadataConfigurations$ = this.systemSettingsService.getSystemSettingsByKey('iCare.GeneralMetadata.Configurations')
 
     this.dispensingActionOptions = [
       {

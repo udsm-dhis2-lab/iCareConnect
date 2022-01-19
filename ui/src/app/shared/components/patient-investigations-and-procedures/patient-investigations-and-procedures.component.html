@@ -6,6 +6,14 @@
     <mat-tab label="Laboratory">
       <div class="mat-tab-container" *ngIf="selectedTab.value == 0">
         <app-patient-lab-results-summary
+          *ngIf="
+            !clinicConfigurations?.provisionalDiagnosis
+              ?.shouldAffectImmediateSections ||
+            (clinicConfigurations?.provisionalDiagnosis
+              ?.shouldAffectImmediateSections &&
+              patientVisit?.hasProvisonalDiagnosis) ||
+            shouldShowLabSection
+          "
           [observations]="observations"
           [patientVisit]="patientVisit"
           [forConsultation]="forConsultation"
@@ -14,6 +22,18 @@
           "
           [iCareGeneralConfigurations]="iCareGeneralConfigurations"
         ></app-patient-lab-results-summary>
+        <div
+          class="alert alert-warning"
+          role="alert"
+          *ngIf="
+            (clinicConfigurations?.provisionalDiagnosis
+              ?.shouldAffectImmediateSections &&
+              !patientVisit?.hasProvisonalDiagnosis) ||
+            !shouldShowLabSection
+          "
+        >
+          Provisional diagnosis should be provided first
+        </div>
       </div>
     </mat-tab>
     <mat-tab label="Procedures">
