@@ -23,6 +23,7 @@
           <div class="h5 mb-3">{{ currentCustomForm?.name }}</div>
           <app-capture-form-data
             [form]="currentCustomForm"
+            [visit]="visit"
             [observations]="observations"
             (formDataUpdate)="onFormUpdate($event)"
           ></app-capture-form-data>

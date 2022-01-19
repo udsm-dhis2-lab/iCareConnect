@@ -1,13 +1,13 @@
-import { Injectable } from '@angular/core';
-import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { of } from 'rxjs';
-import { catchError, switchMap } from 'rxjs/operators';
-import { formatCurrentUserDetails } from 'src/app/core/helpers/current-user.helper';
+import { Injectable } from "@angular/core";
+import { Actions, createEffect, ofType } from "@ngrx/effects";
+import { of } from "rxjs";
+import { catchError, switchMap } from "rxjs/operators";
+import { formatCurrentUserDetails } from "src/app/core/helpers/current-user.helper";
 import {
   Notification,
   NotificationService,
-} from 'src/app/shared/services/notification.service';
-import { AuthService } from '../../core/services/auth.service';
+} from "src/app/shared/services/notification.service";
+import { AuthService } from "../../core/services/auth.service";
 import {
   addAuthenticatedUser,
   addSessionStatus,
@@ -22,7 +22,8 @@ import {
   addLoadedUserDetails,
   loadRolesDetails,
   clearLocations,
-} from '../actions';
+} from "../actions";
+import { initiateEncounterType } from "../actions/encounter-type.actions";
 
 @Injectable()
 export class AuthEffects {
@@ -41,14 +42,14 @@ export class AuthEffects {
               userLocations,
             }) => {
               if (authenticated) {
-                sessionStorage.setItem('JSESSIONID', loginResponse?.sessionId);
-                localStorage.setItem('credentialsToken', credentialsToken);
-                localStorage.setItem('userUuid', user.uuid);
+                sessionStorage.setItem("JSESSIONID", loginResponse?.sessionId);
+                localStorage.setItem("credentialsToken", credentialsToken);
+                localStorage.setItem("userUuid", user.uuid);
               }
 
               return authenticated
                 ? [
-                    go({ path: [''] }),
+                    go({ path: [""] }),
                     setUserLocations({ userLocations }),
                     loadProviderDetails({ userUuid }),
                     addLoadedUserDetails({
@@ -56,12 +57,13 @@ export class AuthEffects {
                     }),
                     loadRolesDetails(),
                     loadAllLocations(),
+                    initiateEncounterType(),
                   ]
                 : [
                     authenticateUserFail({
                       error: {
                         status: 403,
-                        message: 'incorrect username or password',
+                        message: "incorrect username or password",
                       },
                     }),
                   ];
@@ -81,16 +83,16 @@ export class AuthEffects {
       ofType(logoutUser),
       switchMap(() => {
         this.notificationService.show(
-          new Notification({ message: 'Logging out', type: 'LOADING' })
+          new Notification({ message: "Logging out", type: "LOADING" })
         );
         document.cookie = `JSESSIONID= ;expires=${new Date()}`;
-        localStorage.removeItem('credentialsToken');
-        localStorage.removeItem('currentLocation');
-        localStorage.removeItem('navigationDetails');
+        localStorage.removeItem("credentialsToken");
+        localStorage.removeItem("currentLocation");
+        localStorage.removeItem("navigationDetails");
         return this.authService.logout().pipe(
           switchMap(() => [
             clearLocations(),
-            go({ path: ['/login'] }),
+            go({ path: ["/login"] }),
             addSessionStatus({ authenticated: false }),
           ]),
           catchError((error) => of(logoutUserFail({ error })))
