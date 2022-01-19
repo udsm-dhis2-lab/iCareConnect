@@ -10,6 +10,7 @@ import { Patient } from "src/app/shared/resources/patient/models/patient.model";
 import { VisitObject } from "src/app/shared/resources/visits/models/visit-object.model";
 import { AppState } from "src/app/store/reducers";
 import { getSavingObservationStatus } from "src/app/store/selectors/observation.selectors";
+import { OrdersService } from "../../resources/order/services/orders.service";
 
 @Component({
   selector: "app-clinical-notes",
@@ -25,6 +26,7 @@ export class ClinicalNotesComponent implements OnInit {
   @Input() encounterUuid: string;
   @Input() savingObservations: boolean;
   savingObservations$: Observable<boolean>;
+  ordersUpdates$: Observable<any>;
 
   clinicalForms: ICAREForm[];
   currentForm: ICAREForm;
@@ -33,7 +35,10 @@ export class ClinicalNotesComponent implements OnInit {
   searchingText: string;
   @Output() saveObservations = new EventEmitter();
   @Input() forms: any[];
-  constructor(private store: Store<AppState>) {}
+  constructor(
+    private store: Store<AppState>,
+    private ordersService: OrdersService
+  ) {}
 
   ngOnInit(): void {
     this.clinicalForms = this.clinicalForm?.setMembers || [];
@@ -61,8 +66,19 @@ export class ClinicalNotesComponent implements OnInit {
     };
   }
 
-  onConfirm(e): void {
+  onConfirm(e: Event, visit: any): void {
     e.stopPropagation();
+    if (!visit.consultationStarted) {
+      const orders = [
+        {
+          uuid: visit.consultationStatusOrder?.uuid,
+          accessionNumber: visit.consultationStatusOrder?.orderNumber,
+          fulfillerStatus: "RECEIVED",
+          encounter: visit.consultationStatusOrder?.encounter?.uuid,
+        },
+      ];
+      this.ordersUpdates$ = this.ordersService.updateOrdersViaEncounter(orders);
+    }
     this.saveObservations.emit(
       getObservationsFromForm(
         this.formData[this.currentCustomForm?.id],
