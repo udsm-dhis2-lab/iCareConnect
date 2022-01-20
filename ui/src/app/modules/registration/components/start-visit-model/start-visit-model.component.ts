@@ -10,7 +10,10 @@ import { VisitsService } from "src/app/shared/resources/visits/services";
 import { go, loadCurrentPatient } from "src/app/store/actions";
 import { AppState } from "src/app/store/reducers";
 import { getAllTreatmentLocations } from "src/app/store/selectors";
-import { getActiveVisit, getVisitLoadedState } from "src/app/store/selectors/visit.selectors";
+import {
+  getActiveVisit,
+  getVisitLoadedState,
+} from "src/app/store/selectors/visit.selectors";
 
 @Component({
   selector: "app-start-visit-model",
@@ -54,16 +57,20 @@ export class StartVisitModelComponent implements OnInit {
     this.currentPatientVisit$ = this.store.select(getActiveVisit);
   }
 
-  onVisitUpdate(visitDetails) {
+  onVisitUpdate(visitDetails: any): void {
     this.dialogRef.close(visitDetails);
   }
 
-  onCancelVisitChanges(visitDetails) {
+  onCancelVisitChanges(visitDetails: any): void {
     this.dialogRef.close({ visitDetails, close: true });
     this.store.dispatch(go({ path: ["/registration/home"] }));
   }
 
-  changeTab(index) {
+  onCloseDialog(close: boolean, currentPatientVisit: any): void {
+    this.dialogRef.close({ visitDetails: currentPatientVisit, close });
+  }
+
+  changeTab(index): void {
     this.selectedTab.setValue(index);
   }
 

@@ -72,7 +72,9 @@
       </mat-chip-list> -->
     </div>
     <div class="d-flex justify-content-end">
+      <button mat-stroked-button (click)="onCancel($event)">Cancel</button>
       <button
+        class="ml-2"
         [disabled]="!currentRoom"
         mat-stroked-button
         color="primary"

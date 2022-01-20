@@ -1,26 +1,26 @@
-import { Injectable } from '@angular/core';
-import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { select, Store } from '@ngrx/store';
-import { of } from 'rxjs';
+import { Injectable } from "@angular/core";
+import { Actions, createEffect, ofType } from "@ngrx/effects";
+import { select, Store } from "@ngrx/store";
+import { of } from "rxjs";
 import {
   catchError,
   concatMap,
   map,
   switchMap,
   withLatestFrom,
-} from 'rxjs/operators';
+} from "rxjs/operators";
 import {
   clearSamples,
   clearSamplesToCollect,
-} from 'src/app/modules/laboratory/store/actions';
-import { ICARE_CONFIG } from 'src/app/shared/resources/config';
-import { VisitObject } from 'src/app/shared/resources/visits/models/visit-object.model';
-import { Visit } from 'src/app/shared/resources/visits/models/visit.model';
-import { VisitsService } from 'src/app/shared/resources/visits/services';
+} from "src/app/modules/laboratory/store/actions";
+import { ICARE_CONFIG } from "src/app/shared/resources/config";
+import { VisitObject } from "src/app/shared/resources/visits/models/visit-object.model";
+import { Visit } from "src/app/shared/resources/visits/models/visit.model";
+import { VisitsService } from "src/app/shared/resources/visits/services";
 import {
   Notification,
   NotificationService,
-} from 'src/app/shared/services/notification.service';
+} from "src/app/shared/services/notification.service";
 import {
   addLabOrders,
   addLoadedRadiologyOrders,
@@ -31,13 +31,13 @@ import {
   clearRadiologyOrders,
   go,
   loadDrugOrders,
-} from '../actions';
-import { clearBills, loadPatientBills } from '../actions/bill.actions';
-import { clearDiagnosis, upsertDiagnoses } from '../actions/diagnosis.actions';
+} from "../actions";
+import { clearBills, loadPatientBills } from "../actions/bill.actions";
+import { clearDiagnosis, upsertDiagnoses } from "../actions/diagnosis.actions";
 import {
   clearObservations,
   upsertObservations,
-} from '../actions/observation.actions';
+} from "../actions/observation.actions";
 import {
   activeVisitNotFound,
   clearVisits,
@@ -48,11 +48,11 @@ import {
   updateVisit,
   upsertVisit,
   upsertVisitDeathCheck,
-} from '../actions/visit.actions';
-import { AppState } from '../reducers';
-import { getCurrentLocation } from '../selectors';
-import { getCurrentPatient } from '../selectors/current-patient.selectors';
-import { getProviderDetails } from '../selectors/current-user.selectors';
+} from "../actions/visit.actions";
+import { AppState } from "../reducers";
+import { getCurrentLocation } from "../selectors";
+import { getCurrentPatient } from "../selectors/current-patient.selectors";
+import { getProviderDetails } from "../selectors/current-user.selectors";
 
 @Injectable()
 export class VisitEffects {
@@ -70,8 +70,8 @@ export class VisitEffects {
       switchMap(([{ visit, isEmergency }, currentPatient, currentLocation]) => {
         this.notificationService.show(
           new Notification({
-            message: 'Starting patient visit...',
-            type: 'LOADING',
+            message: "Starting patient visit...",
+            type: "LOADING",
           })
         );
         return this.visitService
@@ -83,8 +83,8 @@ export class VisitEffects {
             switchMap(() => {
               this.notificationService.show(
                 new Notification({
-                  message: 'Patient visit successfully started',
-                  type: 'SUCCESS',
+                  message: "Patient visit successfully started",
+                  type: "SUCCESS",
                 })
               );
               return [
@@ -98,8 +98,8 @@ export class VisitEffects {
             catchError((error) => {
               this.notificationService.show(
                 new Notification({
-                  message: 'Error starting patient visit',
-                  type: 'ERROR',
+                  message: "Error starting patient visit",
+                  type: "ERROR",
                 })
               );
               return of(loadVisitFail({ error }));
@@ -118,7 +118,7 @@ export class VisitEffects {
           any,
           any
         ]) => {
-          this.store.dispatch(clearVisits());
+          // this.store.dispatch(clearVisits());
           this.store.dispatch(clearDrugOrdersStore());
           this.store.dispatch(clearObservations());
           this.store.dispatch(clearDiagnosis());
@@ -140,7 +140,7 @@ export class VisitEffects {
                   ? {
                       patient: patientId,
                       location: JSON.parse(
-                        localStorage.getItem('currentLocation')
+                        localStorage.getItem("currentLocation")
                       )?.uuid,
                       visitLocation: visitResponse?.location?.uuid,
                       form: null,
@@ -212,8 +212,8 @@ export class VisitEffects {
               catchError((error) => {
                 this.notificationService.show(
                   new Notification({
-                    message: 'Failed to load current visit',
-                    type: 'ERROR',
+                    message: "Failed to load current visit",
+                    type: "ERROR",
                     autoClose: false,
                   })
                 );
@@ -254,16 +254,16 @@ export class VisitEffects {
       switchMap(([{ details, visitUuid }, currentPatient]) => {
         this.notificationService.show(
           new Notification({
-            message: 'Updating patient visit...',
-            type: 'LOADING',
+            message: "Updating patient visit...",
+            type: "LOADING",
           })
         );
         return this.visitService.updateVisit(visitUuid, details).pipe(
           switchMap(() => {
             this.notificationService.show(
               new Notification({
-                message: 'Patient visit successfully updated',
-                type: 'SUCCESS',
+                message: "Patient visit successfully updated",
+                type: "SUCCESS",
               })
             );
             return [
@@ -274,8 +274,8 @@ export class VisitEffects {
           catchError((error) => {
             this.notificationService.show(
               new Notification({
-                message: 'Error updating patient visit',
-                type: 'ERROR',
+                message: "Error updating patient visit",
+                type: "ERROR",
               })
             );
             return of(loadVisitFail({ error }));

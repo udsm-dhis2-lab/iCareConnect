@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { Store } from "@ngrx/store";
 import { Observable } from "rxjs";
 import { VisitsService } from "src/app/shared/resources/visits/services";
@@ -15,6 +15,7 @@ export class UpdateDoctorsRoomComponent implements OnInit {
   @Input() patient: any;
   @Input() treatmentLocations: any[];
   @Input() currentVisit: any;
+  @Output() closeDialog: EventEmitter<boolean> = new EventEmitter<boolean>();
   currentRoom: any;
   searchTerm: string = "";
   updating: boolean = false;
@@ -53,6 +54,11 @@ export class UpdateDoctorsRoomComponent implements OnInit {
     this.searchTerm = (event.target as HTMLInputElement).value;
   }
 
+  onCancel(event: Event): void {
+    event.stopPropagation();
+    this.closeDialog.emit(true);
+  }
+
   update(event: Event, visit): void {
     event.stopPropagation();
     const visitPayload = {
@@ -70,7 +76,7 @@ export class UpdateDoctorsRoomComponent implements OnInit {
           this.updating = false;
           this.updated = true;
           this.store.dispatch(
-            loadActiveVisit({ patientId: this.patient?.patient?.uuid })
+            loadActiveVisit({ patientId: this.currentVisit?.patientUuid })
           );
         }
       },
@@ -82,7 +88,7 @@ export class UpdateDoctorsRoomComponent implements OnInit {
         this.error = error;
         this.errorUpdatingConsultationRoom = true;
         this.store.dispatch(
-          loadActiveVisit({ patientId: this.patient?.patient?.uuid })
+          loadActiveVisit({ patientId: this.currentVisit?.patientUuid })
         );
       }
     );
