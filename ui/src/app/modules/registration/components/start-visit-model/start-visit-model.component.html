@@ -120,6 +120,7 @@
             [currentVisit]="params?.currentPatientVisit"
             [patient]="patient"
             [treatmentLocations]="params?.treatmentLocations"
+            (closeDialog)="onCloseDialog($event, params?.currentPatientVisit)"
           ></app-update-doctors-room>
         </div>
       </mat-tab>

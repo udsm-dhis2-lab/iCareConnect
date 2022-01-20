@@ -29,14 +29,14 @@ export class PatientEffects {
   loadCurrentPatient$ = createEffect(() =>
     this.actions$.pipe(
       ofType(loadCurrentPatient),
-      switchMap(({ uuid, isRegistrationPage }) =>
-        this.patientService.getPatient(uuid).pipe(
+      switchMap(({ uuid, isRegistrationPage }) => {
+        return this.patientService.getPatient(uuid).pipe(
           map((patient: Patient) =>
             addCurrentPatient({ patient, isRegistrationPage })
           ),
           catchError((error) => of(loadCurrentPatientFail({ error })))
-        )
-      )
+        );
+      })
     )
   );
 

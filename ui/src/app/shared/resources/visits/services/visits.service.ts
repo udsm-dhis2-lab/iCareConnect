@@ -75,7 +75,12 @@ export class VisitsService {
   updateVisitExisting(visitPayload): Observable<any> {
     let url = `visit/${visitPayload?.uuid}`;
 
-    return this.httpClient.post(url, visitPayload);
+    return this.httpClient.post(url, visitPayload).pipe(
+      map((response) => {
+        return response;
+      }),
+      catchError((e) => of(e))
+    );
   }
 
   getLabVisits(
@@ -450,16 +455,26 @@ export class VisitsService {
     return getDrugOrdersFromCurrentVisitEncounters(visit);
   }
 
-  getActiveVisitProcedures(uuid: string, fields: any, bills?:any, isEnsured?: boolean): Observable<any> {
+  getActiveVisitProcedures(
+    uuid: string,
+    fields: any,
+    bills?: any,
+    isEnsured?: boolean
+  ): Observable<any> {
     return from(
       this.api.visit.getVisit(uuid, {
         v: fields,
       })
     ).pipe(
       map((response) => {
-        return getOrdersFromCurrentVisitEncounters(response, "procedure", bills, isEnsured);
+        return getOrdersFromCurrentVisitEncounters(
+          response,
+          "procedure",
+          bills,
+          isEnsured
+        );
       }),
-      catchError(error => of(error))
+      catchError((error) => of(error))
     );
   }
 
