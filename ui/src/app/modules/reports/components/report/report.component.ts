@@ -35,37 +35,9 @@ export class ReportComponent implements OnInit, OnChanges {
   constructor(private store: Store<AppState>, private dialog: MatDialog) {}
 
   ngOnInit(): void {
-    // const params =
-    //   this.period?.startDate && this.period?.endDate
-    //     ? {
-    //         startDate: this.period?.startDate,
-    //         endDate: this.period?.endDate,
-    //         reportId: this.reportConfigs?.id,
-    //         reportGroup: this.reportConfigs?.reportGroup,
-    //         reportName: this.reportConfigs?.name,
-    //         periodId: this.period?.id ? this.period?.id : this.period.periodId,
-    //         configs: this.reportConfigs,
-    //         params: [
-    //           `startDate=${this.period?.startDate}`,
-    //           `endDate=${this.period?.endDate}`,
-    //         ],
-    //       }
-    //     : {
-    //         reportName: 'dhis2.sqlGet.' + this.reportConfigs?.id,
-    //         date: this.period?.date,
-    //         periodId: this.period?.id ? this.period?.id : this.period.periodId,
-    //         configs: this.reportConfigs,
-    //       };
-
-    // console.log('params before the dispatch : ', params);
-
-    // this.store.dispatch(loadReport({ params }));
     this.reportLoadedState$ = this.store.select(getDHIS2ReportsLoadedState);
     this.reportErrorState$ = this.store.select(getDhis2ReportLoadingError);
     this.reportLoadingState$ = this.store.select(getDhis2ReportLoadingState);
-
-    // console.log("period into the select :: ", this.period?.id);
-
     this.report$ = this.store.select(getDHIS2LoadedReportsById, {
       id: this.reportConfigs?.id,
       periodId: this.period?.id,
@@ -78,7 +50,6 @@ export class ReportComponent implements OnInit, OnChanges {
 
   onOpenChangesModal(e, dataChangesDetails, elementHeader) {
     e.stopPropagation();
-    // console.log("dataChangesDetails", dataChangesDetails);
     this.dialog.open(DataHistoryModalComponent, {
       data: {
         dataChangesDetails: dataChangesDetails,

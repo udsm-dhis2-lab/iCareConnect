@@ -126,6 +126,12 @@ export const getCountOfCurrentReportSubmittedToDHIS2 = createSelector(
     (uniqBy(state.currentReportHistoryDetails, "period") || [])?.length
 );
 
+export const getAllReportsOfCurrentReportSentToDHIS2 = createSelector(
+  getDHIS2ReportsState,
+  (state: DHIS2ReportsState) =>
+    uniqBy(state.currentReportHistoryDetails, "period") || []
+);
+
 export const getCurrentReportsSubmittedHistory = createSelector(
   getDHIS2ReportsState,
   (state: DHIS2ReportsState) =>
