@@ -40,7 +40,7 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 	
 	@Test
 	public void testCreatingItem() throws Exception {
-
+		
 		String dto = this.readFile("dto/item-create-dto.json");
 		Map<String, Object> item = (new ObjectMapper()).readValue(dto, Map.class);
 		
@@ -60,7 +60,7 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		results = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
 		maps = (List) results.get("results");
 		assertThat("Should return a 3 items", maps.size(), is(3));
-
+		
 		newGetRequest = newGetRequest("icare/item", new Parameter("q", "asp"));
 		handle = handle(newGetRequest);
 		results = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
@@ -82,7 +82,7 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		Map<String, Object> item = (new ObjectMapper()).readValue(dto, Map.class);
 		MockHttpServletRequest newPostRequest = newPostRequest("icare/item", item);
 		MockHttpServletResponse handle = handle(newPostRequest);
-
+		
 		Map<String, Object> map = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
 		assertThat("Should have item uuid", map.get("uuid") != null, is(true));
 		MockHttpServletRequest newGetRequest = newGetRequest("icare/item");
@@ -102,11 +102,12 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 			}
 		}
 		assertThat("Drug was found in test", found, is(true));
-
-		System.out.println(Context.getConceptService().getDrugByUuid("3cfcf118-931c-46f7-8ff6-7b876f0d4202").getConcept().getUuid());
+		
+		System.out.println(Context.getConceptService().getDrugByUuid("3cfcf118-931c-46f7-8ff6-7b876f0d4202").getConcept()
+		        .getUuid());
 		System.out.println(Context.getService(ICareService.class).getItems());
-		for(Item i: Context.getService(ICareService.class).getItems()){
-			if(i.getDrug() != null){
+		for (Item i : Context.getService(ICareService.class).getItems()) {
+			if (i.getDrug() != null) {
 				System.out.println("Found Drug Concept:" + i.getDrug().getConcept().getUuid());
 			}
 		}
@@ -143,7 +144,7 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		List<Map<String, Object>> maps = (List) results.get("results");
 		assertThat("Should return a 3 item Prices", maps.size(), is(3));
 	}
-
+	
 	@Test
 	public void testSendMessage() throws Exception {
 		AdministrationService adminService = Context.getService(AdministrationService.class);
@@ -151,35 +152,35 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		String dto = this.readFile("dto/send-message-single-dto.json");
 		Map<String, Object> item = (new ObjectMapper()).readValue(dto, Map.class);
 		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-		item.put("dateTime",dateFormat.format(new Date()));
-		item.put("id",UUID.randomUUID());
+		item.put("dateTime", dateFormat.format(new Date()));
+		item.put("id", UUID.randomUUID());
 		System.out.println(item.get("dateTime"));
-
+		
 		MockHttpServletRequest newPostRequest = newPostRequest("icare/message", item);
 		MockHttpServletResponse handle = handle(newPostRequest);
-
+		
 		Map<String, Object> map = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
-
+		
 	}
-
+	
 	@Test
 	public void testSendMessages() throws Exception {
 		AdministrationService adminService = Context.getService(AdministrationService.class);
 		adminService.setGlobalProperty(ICareConfig.MESSAGE_PHONE_NUMBER, "0718026490");
 		String dto = this.readFile("dto/send-message-double-dto.json");
 		List<Map<String, Object>> items = (new ObjectMapper()).readValue(dto, List.class);
-		for(Map item:items){
+		for (Map item : items) {
 			DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-			item.put("dateTime",dateFormat.format(new Date()));
-			item.put("id",UUID.randomUUID());
+			item.put("dateTime", dateFormat.format(new Date()));
+			item.put("id", UUID.randomUUID());
 			System.out.println(item.get("dateTime"));
 		}
-
+		
 		MockHttpServletRequest newPostRequest = newPostRequest("icare/messages", items);
 		MockHttpServletResponse handle = handle(newPostRequest);
-
+		
 		List<Map<String, Object>> map = (new ObjectMapper()).readValue(handle.getContentAsString(), List.class);
-
+		
 	}
 	
 	@Test

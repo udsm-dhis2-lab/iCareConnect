@@ -237,13 +237,13 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	        Order.FulfillerStatus fulfillerStatus, Integer limit, Integer startIndex) {
 		return this.dao.getOrdersByVisitAndOrderType(visitUuid, orderTypeUuid, fulfillerStatus, limit, startIndex);
 	}
-
+	
 	@Override
 	public Message sendMessage(Message message) throws Exception {
 		String messagePhoneNumber = Context.getAdministrationService().getGlobalProperty(ICareConfig.MESSAGE_PHONE_NUMBER);
 		if (messagePhoneNumber == null) {
-			throw new Exception("Message Phone Number is not configured. Please check "
-					+ ICareConfig.MESSAGE_PHONE_NUMBER + ".");
+			throw new Exception("Message Phone Number is not configured. Please check " + ICareConfig.MESSAGE_PHONE_NUMBER
+			        + ".");
 		}
 		message.setPhoneNumber(messagePhoneNumber);
 		String urlString = "https://us-central1-maximal-journey-328212.cloudfunctions.net/messaging";
@@ -257,12 +257,12 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		con.addRequestProperty("Content-Type", "application/json");
 		con.setDoInput(true);
 		con.setDoOutput(true);
-
+		
 		OutputStream os = con.getOutputStream();
 		BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
 		String json = new ObjectMapper().writeValueAsString(message.toMap());
 		writer.write(json);
-
+		
 		writer.flush();
 		writer.close();
 		os.close();
@@ -290,20 +290,20 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 			throw e;
 		}
 	}
-
+	
 	@Override
 	public List<Message> sendMessages(List<Message> messages) throws MalformedURLException, IOException, Exception {
-		for(Message message:messages){
+		for (Message message : messages) {
 			this.sendMessage(message);
 		}
 		return messages;
 	}
-
+	
 	@Override
 	public Item getItemByConceptUuid(String uuid) {
 		return dao.getItemByConceptUuid(uuid);
 	}
-
+	
 	@Override
 	public Item getItemByDrugConceptUuid(String uuid) {
 		return dao.getItemByDrugConceptUuid(uuid);
