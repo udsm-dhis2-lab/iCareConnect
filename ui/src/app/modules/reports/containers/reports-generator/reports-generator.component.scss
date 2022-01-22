@@ -81,3 +81,14 @@
   border-bottom: solid 1px #eee;
   padding: 4px;
 }
+
+.reports-sent-status-btn {
+  border: none !important;
+  background-color: #fff;
+  outline: none !important;
+  padding: 8px 8px;
+}
+
+.reports-sent-status-btn:hover {
+  outline: none !important;
+}

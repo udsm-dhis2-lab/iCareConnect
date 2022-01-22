@@ -1,11 +1,13 @@
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { BASE_URL } from '../constants/constants.constants';
+import { HttpClient } from "@angular/common/http";
+import { Injectable } from "@angular/core";
+import { uniqBy, orderBy } from "lodash";
+import { Observable, of } from "rxjs";
+import { catchError, map } from "rxjs/operators";
+import { BASE_URL } from "../constants/constants.constants";
+import { getReportPeriodObjectFromPeriodId } from "../helpers/format-dates-types.helper";
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: "root",
 })
 export class ReportsService {
   constructor(private httpClient: HttpClient) {}
@@ -22,54 +24,78 @@ export class ReportsService {
       .get(
         `${BASE_URL}reportingrest/${reportParams.reportGroup}/${
           reportParams.reportId
-        }?${reportParams.params.join('&')}`
+        }?${reportParams.params.join("&")}`
       )
       .pipe(
         map((response) => {
-          return reportParams.reportGroup === 'dataSet'
+          return reportParams.reportGroup === "dataSet"
             ? { dataSets: [response] }
             : response;
-        })
+        }),
+        catchError((e) => of(e))
       );
   }
 
   getReportsConfigs(): Observable<any> {
-    return this.httpClient.get(
-      BASE_URL +
-        'bahmnicore/sql/globalproperty?property=bahmni.DHIS2Reports.configurations'
-    );
+    return this.httpClient
+      .get(
+        BASE_URL +
+          "bahmnicore/sql/globalproperty?property=bahmni.DHIS2Reports.configurations"
+      )
+      .pipe(
+        map((response) => response),
+        catchError((e) => of(e))
+      );
   }
 
   getExtraParams() {
-    return this.httpClient.get(
-      BASE_URL + 'systemsetting?q=dhis.reportsConfigs&v=full'
-    );
+    return this.httpClient
+      .get(BASE_URL + "systemsetting?q=dhis.reportsConfigs&v=full")
+      .pipe(
+        map((response) => response),
+        catchError((e) => of(e))
+      );
   }
 
-  //   getDHISReportsConfigs(){
-  //     return this.httpClient.get(
-  //         BASE_URL +
-  //           "systemsetting?q="
-  //       );
-  //   }
-
-  getReportLogsByReportId(reportId): Observable<any> {
-    return this.httpClient.get(BASE_URL + `dhis2/logs?report=${reportId}`);
+  getReportLogsByReportId(reportId: string): Observable<any> {
+    return this.httpClient.get(BASE_URL + `dhis2/logs?report=${reportId}`).pipe(
+      map((response: any[]) => {
+        return orderBy(
+          uniqBy(response, "period")?.map((report) => {
+            return {
+              ...report,
+              payload: JSON.parse(report?.payload),
+              response_dhis: JSON.parse(report?.response_dhis),
+              periodDefn: getReportPeriodObjectFromPeriodId(report?.period),
+            };
+          }),
+          ["period"],
+          ["desc"]
+        );
+      }),
+      catchError((e) => of(e))
+    );
   }
 
   getReportLogs(reportId, periodId): Observable<any> {
-    return this.httpClient.get(
-      BASE_URL + `dhis2/logs?report=${reportId}&period=${periodId}`
-    );
+    return this.httpClient
+      .get(BASE_URL + `dhis2/logs?report=${reportId}&period=${periodId}`)
+      .pipe(
+        map((response) => response),
+        catchError((e) => of(e))
+      );
   }
 
   getReportLogsByPeriodId(periodId): Observable<any> {
-    return this.httpClient.get(BASE_URL + `dhis2/logs?period=${periodId}`);
+    return this.httpClient.get(BASE_URL + `dhis2/logs?period=${periodId}`).pipe(
+      map((response) => response),
+      catchError((e) => of(e))
+    );
   }
 
   sendEventData(data, reportConfigs, eventDate, mrn): Observable<any> {
     return this.httpClient
-      .post(BASE_URL + 'dhis2/event', {
+      .post(BASE_URL + "dhis2/event", {
         identifier: mrn,
         eventProgram: reportConfigs?.program,
         eventDate: eventDate,
@@ -81,17 +107,18 @@ export class ReportsService {
             return response;
           } else {
             return {
-              status: 'MISSING_API',
-              description: 'API is missing',
+              status: "MISSING_API",
+              description: "API is missing",
             };
           }
-        })
+        }),
+        catchError((e) => of(e))
       );
   }
 
   sendDataToDHIS2(data, report, period): Observable<any> {
     return this.httpClient
-      .post(BASE_URL + 'dhis2/dataset', {
+      .post(BASE_URL + "dhis2/dataset", {
         report_id: report?.id,
         period: period,
         report_name: report?.name,
@@ -103,49 +130,12 @@ export class ReportsService {
             return response;
           } else {
             return {
-              status: 'MISSING_API',
-              description: 'API is missing',
+              status: "MISSING_API",
+              description: "API is missing",
             };
           }
-        })
+        }),
+        catchError((e) => of(e))
       );
-    // const response = {
-    //   responseType: "ImportSummary",
-    //   status: "SUCCESS",
-    //   importOptions: {
-    //     idSchemes: {},
-    //     dryRun: false,
-    //     async: false,
-    //     importStrategy: "CREATE_AND_UPDATE",
-    //     mergeMode: "REPLACE",
-    //     reportMode: "FULL",
-    //     skipExistingCheck: false,
-    //     sharing: false,
-    //     skipNotifications: false,
-    //     skipAudit: false,
-    //     datasetAllowsPeriods: false,
-    //     strictPeriods: false,
-    //     strictDataElements: false,
-    //     strictCategoryOptionCombos: false,
-    //     strictAttributeOptionCombos: false,
-    //     strictOrganisationUnits: false,
-    //     requireCategoryOptionCombo: false,
-    //     requireAttributeOptionCombo: false,
-    //     skipPatternValidation: false,
-    //     ignoreEmptyCollection: false,
-    //     force: false,
-    //     firstRowIsHeader: true,
-    //     skipLastUpdated: false,
-    //   },
-    //   description: "Import process completed successfully",
-    //   importCount: {
-    //     imported: 0,
-    //     updated: 12,
-    //     ignored: 0,
-    //     deleted: 0,
-    //   },
-    //   dataSetComplete: "2021-05-12",
-    // };
-    // return of(response);
   }
 }
