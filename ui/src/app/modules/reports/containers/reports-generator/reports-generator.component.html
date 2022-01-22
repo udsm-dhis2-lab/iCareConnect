@@ -1,4 +1,11 @@
-<div style="padding: 5px">
+<div
+  style="padding: 5px"
+  *ngIf="{
+    dhisConfigs: reportConfigs$ | async,
+    countOfReportsSent: countOfReportsSent$ | async,
+    reportLoaded: reportLoaded$ | async
+  } as reportConfigs"
+>
   <div class="row">
     <div
       class="side-menu-panel"
@@ -58,9 +65,9 @@
           </div>
         </mat-expansion-panel>
 
-        <!-- {{ selectedReportParameters | json }} -->
-
-        <ng-container *ngIf="selectedReportParameters">
+        <ng-container
+          *ngIf="selectedReportParameters && !reportConfigs?.dhisConfigs"
+        >
           <mat-expansion-panel
             *ngFor="let parameter of selectedReportParameters"
             class="border mt-1"
@@ -94,14 +101,7 @@
         </mat-expansion-panel>
       </mat-accordion>
     </div>
-
-    <ng-container
-      *ngIf="{
-        dhisConfigs: reportConfigs$ | async,
-        countOfReportsSent: countOfReportsSent$ | async,
-        reportLoaded: reportLoaded$ | async
-      } as reportConfigs"
-    >
+    <ng-container>
       <div
         [ngClass]="{
           'col-md-9 col-sm-12 col-sx-12': !showFullReportRenderingArea,
@@ -140,11 +140,25 @@
               Get Report
             </button>
             <span *ngIf="reportConfigs && reportConfigs?.dhisConfigs">
-              Count of reports sent:
-              {{ reportConfigs?.countOfReportsSent || "0" }}
-
-              &nbsp;
               <button
+                class="ml-2 reports-sent-status-btn"
+                [disabled]="
+                  reportConfigs?.countOfReportsSent &&
+                  reportConfigs?.countOfReportsSent === 0
+                "
+                (click)="getDHIS2ReportsSent($event)"
+              >
+                Count of reports sent:
+                <span *ngIf="reportConfigs?.countOfReportsSent">
+                  {{ reportConfigs?.countOfReportsSent }}
+                </span>
+                <mat-progress-bar
+                  *ngIf="!reportConfigs?.countOfReportsSent"
+                  mode="indeterminate"
+                ></mat-progress-bar>
+              </button>
+              <button
+                class="ml-2"
                 [disabled]="
                   !currentReport || !currentReport?.name || !showReportArea
                 "
