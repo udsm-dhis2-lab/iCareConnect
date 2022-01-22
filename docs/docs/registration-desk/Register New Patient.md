@@ -21,63 +21,65 @@ To register a new patient
 - The form loaded will contain several fields in which they aim to collect details about the patient to be registered, these fields are into groups / sections 
 
 1 INDENTIFICATION
+
    This contain a MRN field (Medical Registration Number) which is auto generated but configurable to identify the identity of the facility
    this field is called `MRN`
-
+  ![img alt](/img/new_patient3.png)
     
    Also there is an option to add other identification in which a patient have these includes
+
+  ![img alt](/img/new_patient4.png)
+
     - Driving License 
     - Employee ID
     - National ID 
     - Passport Number
     - Voting Registration ID
   
+   ![img alt](/img/new_patient5.png)
 
+2 NAMES
 
+   This contains three fields for filling First Name, Middle name and Last Name
+   both first name and last name are mandatory to attend 
 
-- **previous/next navigation**
-- **versioning**
+  ![img alt](/img/new_patient6.png)
 
-## Create your first Doc
+3 GENDER
+  
+    Here will have to specify the gender of a patient whether is Male or Female
+    
+  ![img alt](/img/new_patient7.png)
 
-Create a markdown file at `docs/hello.md`:
+4 BIRTH INFORMATION & TRIBE
+  
+  This section consist of four fields in which initialy only two fields (Age and Date of Birth).Date of birth is a mandatory field.ere you have to specify the date birth of a patient which will calculate the Age of a patient in years and it is the same when specifying Age in years then it will calculate Date of Birth.
 
-```md title="docs/hello.md"
-# Hello
+  ![img alt](/img/new_patient8.png)
 
-This is my **first Docusaurus document**!
-```
+  ALso when click the More birth details text button it will display the other two fields (Place of birth and Tribe)
 
-A new document is now available at `http://localhost:3000/docs/hello`.
+  ![img alt](/img/new_patient9.png)
 
-## Configure the Sidebar
+ 5 CONTACT DETAILS
 
-Docusaurus automatically **creates a sidebar** from the `docs` folder.
+    Under this section will have to provide mobile number of a patient  which is mandatory and other residential information which are 
+    - Street/Village
+    - Counsil/District
+    - Ward
+    - Region
+  ![img alt](/img/new_patient10.png) 
 
-Add metadatas to customize the sidebar label and position:
+6 ADDITIONAL PATIENT INFORMATION
 
-```md title="docs/hello.md" {1-4}
----
-sidebar_label: 'Hi!'
-sidebar_position: 3
----
+   This section contains other details of patient  including Occupation, Religion,Education Details,Names of Area/Neghbour,Marital Status and  Phone Number of Area leader/leader
 
-# Hello
+  ![img alt](/img/new_patient11.png)
 
-This is my **first Docusaurus document**!
-```
+7 NEXT OF KIN
+  
+  This section involves details of the one relates to the patient it include (Names, Contact number and Relation Type)
 
-It is also possible to create your sidebar explicitly in `sidebars.js`:
+  ![img alt](/img/new_patient12.png)
 
-```diff title="sidebars.js"
-module.exports = {
-  tutorialSidebar: [
-    {
-      type: 'category',
-      label: 'Tutorial',
--     items: [...],
-+     items: ['hello'],
-    },
-  ],
-};
-```
+When all the information are filled accordingly then you can save the patient details  by clicking
