@@ -1,28 +1,26 @@
 <div>
-  <div class="w-100" style="overflow-x: auto; overflow-y: hidden">
-    <ul class="d-flex justify-content-left menu-items">
-      <li
-        class="menu-item text-center"
+  <div class="w-100 menu-items-container">
+    <div class="menu-items">
+      <div
+        class="menu-item"
         [ngClass]="{ 'selected-module': currentModule?.id === module?.id }"
         (click)="onSelectModuleLocation($event, module)"
         *ngFor="let module of modulesReferences"
       >
-        {{ module?.app?.name }}
-      </li>
-    </ul>
-  </div>
-  <div class="sub-menu-items">
-    <div class="d-flex justify-content-left p-1">
-      <div
-        (click)="onSetLocation($event, userLocation)"
-        class="mat-chip-resemblance mr-1"
-        [ngClass]="{
-          'selected-user-location': currentLocation?.uuid == userLocation?.id
-        }"
-        *ngFor="let userLocation of userLocationsForTheCurrentModule"
-      >
-        {{ userLocation?.name }}
+        <div>
+          <img src="{{ module?.app.image }}" style="height: 20px" />
+          <p class="mt-2 menu-label">{{ module?.app.name }}</p>
+        </div>
       </div>
     </div>
   </div>
+  <mat-chip-list class="sub-menu-items mat-elevation-z1">
+    <mat-chip
+      (click)="onSetLocation($event, userLocation)"
+      *ngFor="let userLocation of userLocationsForTheCurrentModule"
+      color="primary"
+      [selected]="currentLocation?.uuid == userLocation?.id"
+      >{{ userLocation?.name }}</mat-chip
+    >
+  </mat-chip-list>
 </div>

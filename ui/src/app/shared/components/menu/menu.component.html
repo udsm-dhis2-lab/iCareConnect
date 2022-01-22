@@ -50,8 +50,8 @@
         <button
           id="btn-account"
           mat-icon-button
-          class="menu-link border"
-          aria-label="Example icon-button with menu icon"
+          class="menu-link profile-btn mr-2"
+          aria-label="Profile icon"
           [matMenuTriggerFor]="menu"
         >
           {{ currentUser?.person?.display | abbreviate }}
@@ -86,13 +86,7 @@
     </div>
   </div>
   <div
-    class="w-100"
-    style="
-      position: fixed;
-      z-index: 1000;
-      margin-top: -5px;
-      background-color: #2a8fd1;
-    "
+    class="w-100 module-selector-container"
     *ngIf="{ userLocations: locationsForCurrentUser$ | async } as params"
   >
     <!-- {{ locationsForCurrentUser$ | async | json }} -->
