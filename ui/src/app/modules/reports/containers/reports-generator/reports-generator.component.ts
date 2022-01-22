@@ -19,6 +19,7 @@ import {
   loadDHIS2ReportsConfigs,
   loadReport,
   loadReportLogs,
+  loadReportLogsByReportId,
   setCurrentPeriod,
 } from "src/app/store/actions";
 import { SendToDhis2ModalComponent } from "../../components/send-to-dhis2-modal/send-to-dhis2-modal.component";
@@ -26,6 +27,7 @@ import { SendingStatusModalComponent } from "../../components/sending-status-mod
 import { take } from "rxjs/operators";
 import { MatDialog } from "@angular/material/dialog";
 import { ExportDataService } from "src/app/core/services/export-data.service";
+import { Dhis2ReportsSentSummaryComponent } from "../../components/dhis2-reports-sent-summary/dhis2-reports-sent-summary.component";
 
 @Component({
   selector: "app-reports-generator",
@@ -165,6 +167,7 @@ export class ReportsGeneratorComponent implements OnInit {
 
   setReportCategory(reportCategory) {
     this.selectedReportGroup = reportCategory;
+    this.selectedReportParameters = null;
     this.reportFromSelectedGroup = _.map(
       _.filter(this.reports, (report) => {
         return report?.name
@@ -197,7 +200,7 @@ export class ReportsGeneratorComponent implements OnInit {
 
   onSelectReport(e, report) {
     e.stopPropagation();
-
+    this.store.dispatch(loadReportLogsByReportId({ reportId: report?.id }));
     // this.store.dispatch(clearReportSelections());
 
     this.reportConfigs$ = this.store.select(getDHIS2ReportsConfigsById, {
@@ -235,7 +238,14 @@ export class ReportsGeneratorComponent implements OnInit {
     };
   }
 
-  onSendToDHIS2(e, reportConfigs, currentReport) {
+  getDHIS2ReportsSent(event: Event): void {
+    event.stopPropagation();
+    this.dialog.open(Dhis2ReportsSentSummaryComponent, {
+      width: "70%",
+    });
+  }
+
+  onSendToDHIS2(e, reportConfigs, currentReport): void {
     if (e) {
       e.stopPropagation();
     }

@@ -1,11 +1,11 @@
-import { Injectable } from '@angular/core';
-import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { Store } from '@ngrx/store';
-import { of } from 'rxjs';
-import { catchError, map, switchMap } from 'rxjs/operators';
-import { ReportParamsService } from 'src/app/modules/reports/services/report-params.service';
-import { formatReportResponse } from 'src/app/shared/helpers/format-report.helper';
-import { ReportsService } from 'src/app/shared/services/reports.service';
+import { Injectable } from "@angular/core";
+import { Actions, createEffect, ofType } from "@ngrx/effects";
+import { Store } from "@ngrx/store";
+import { of } from "rxjs";
+import { catchError, map, switchMap } from "rxjs/operators";
+import { ReportParamsService } from "src/app/modules/reports/services/report-params.service";
+import { formatReportResponse } from "src/app/shared/helpers/format-report.helper";
+import { ReportsService } from "src/app/shared/services/reports.service";
 import {
   addLoadedReportLogs,
   addLoadedReportLogsHistory,
@@ -25,9 +25,9 @@ import {
   sendingDataFails,
   sendingEventsDataFails,
   updateSendingEventDataStatus,
-} from '../actions';
-import { AppState } from '../reducers';
-import * as _ from 'lodash';
+} from "../actions";
+import { AppState } from "../reducers";
+import * as _ from "lodash";
 
 @Injectable()
 export class DHIS2ReportsEffects {
@@ -38,7 +38,7 @@ export class DHIS2ReportsEffects {
         return this.reportsService.getExtraParams().pipe(
           map((response: any) => {
             let arrayOfRepConfigs = _.filter(response?.results, (res) => {
-              return res?.property == 'dhis.reportsConfigs' ? true : false;
+              return res?.property == "dhis.reportsConfigs" ? true : false;
             });
 
             let RepConfigsJson =
@@ -66,14 +66,11 @@ export class DHIS2ReportsEffects {
         return this.reportsService.getReport(action.params).pipe(
           switchMap((response: any) => {
             const configs = action.params.configs;
-
-            
-
             return [
               clearSendingDataStatus(),
               addLoadedReportsData({
                 report: {
-                  id: configs.id + '-' + action?.params?.periodId,
+                  id: configs.id + "-" + action?.params?.periodId,
                   ...formatReportResponse(
                     response?.dataSets?.length > 0
                       ? response?.dataSets[0]?.rows
