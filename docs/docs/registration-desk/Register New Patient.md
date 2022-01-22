@@ -3,11 +3,38 @@ sidebar_position: 2
 title: Register New Patient
 ---
 
-# Create a Document
+# Registering a New Patient
 
-Documents are **groups of pages** connected through:
+After a sussessful login :
 
-- a **sidebar**
+Within a facility there are patients who came to the facility for the first time to get service
+
+To register a new patient 
+- You first click the `Registration` application as shown in the figure below
+     
+     ![img alt](/img/new_patient1.png)
+
+- After clicking the registration application it will redidirect to another page in which to register a new patient you click a **`Register New Patient`**  button which will open a form for capturing details of the patient
+
+     ![img alt](/img/new_patient2.png)
+
+- The form loaded will contain several fields in which they aim to collect details about the patient to be registered, these fields are into groups / sections 
+
+1 INDENTIFICATION
+   This contain a MRN field (Medical Registration Number) which is auto generated but configurable to identify the identity of the facility
+   this field is called `MRN`
+
+    
+   Also there is an option to add other identification in which a patient have these includes
+    - Driving License 
+    - Employee ID
+    - National ID 
+    - Passport Number
+    - Voting Registration ID
+  
+
+
+
 - **previous/next navigation**
 - **versioning**
 
