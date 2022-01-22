@@ -1,29 +1,50 @@
 .menu-items {
-  list-style-type: none;
-  padding: 5px 5px 2px 0;
-  margin-bottom: -1px;
-  font-family: Roboto, "Helvetica Neue", sans-serif;
+  background-color: #42abed;
+  display: flex;
+  padding: 0 10px 7px 10px;
+}
+
+.menu-item-container {
+  overflow-x: auto;
+  overflow-y: hidden;
 }
 
 .sub-menu-items {
-  background-color: #fff !important;
-  font-family: Roboto, "Helvetica Neue", sans-serif;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  background-color: #fff;
+  padding: 7px 15px 7px 15px;
+}
+
+.mat-standard-chip {
+  height: auto !important;
+  font-size: 12px;
+  font-weight: normal;
 }
 
 .menu-item {
-  padding: 4px 12px;
   cursor: pointer;
-  margin-top: -5px;
-  font-family: Roboto, "Helvetica Neue", sans-serif;
   color: #fff;
-  white-space: nowrap;
-  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  flex-wrap: wrap;
+  height: 75px;
+  width: 120px !important;
+  padding: 10px 7px 7px 7px;
+  margin: -1px 2px 2px 2px;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+
+  .menu-label {
+    font-size: 11px;
+  }
 }
 
 .selected-module {
-  color: #000;
-  background-color: #fff;
-  font-weight: 500;
+  background-color: #2a8fd1;
 }
 
 .selected-user-location {
