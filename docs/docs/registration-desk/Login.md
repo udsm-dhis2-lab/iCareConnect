@@ -11,4 +11,4 @@ As a registration clerk there are several activities that you will attend these 
 - Registering of patient
 - Assigning registered patients for services
 
-<iframe width="853" height="480" src="https://www.youtube.com/embed/s4vxzRiYrGQ" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+     <iframe width="1280" height="720" src="https://www.youtube.com/embed/mAs0AEdqmBg" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
