@@ -83,3 +83,5 @@ To register a new patient
   ![img alt](/img/new_patient12.png)
 
 When all the information are filled accordingly then you can save the patient details  by clicking
+
+  ![img alt](/img/new_patient14.png)
