@@ -6,7 +6,7 @@ const FeatureList = [
 
   {
     title: 'Focus on What Matters',
-    Svg: require('../../static/img/undraw_docusaurus_tree.svg').default,
+    Svg: require('../../static/img/homecare.svg').default,
     description: (
       <>
       <p><strong>iCare</strong>  let you focus on the <code>HEALTH</code> of your <code>Patients</code></p> 

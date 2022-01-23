@@ -1,9 +1,11 @@
 ---
-sidebar_position: 1
-title: Introduction
+slug: welcome
+title: Welcome
+# authors: [slorber, yangshun]
+tags: [udsm, hello, icare]
 ---
 
-# iCare EMR & Hospital Services System
+## iCare EMR & Hospital Services System
 
 :::info
 
@@ -33,3 +35,8 @@ iCare so far is being tested in one hospital and one specialized clinic. The fol
 * Automated Monthly emails for selected reports
 * Provider Registration
 * Mortually module
+
+
+
+
+
