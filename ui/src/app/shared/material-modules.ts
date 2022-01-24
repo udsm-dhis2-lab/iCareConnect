@@ -38,6 +38,7 @@ import {
   NgxMatDatetimePickerModule,
   NgxMatNativeDateModule,
 } from "@angular-material-components/datetime-picker";
+import { MatSidenavModule } from "@angular/material/sidenav";
 
 export const materialModules = [
   MatMenuModule,
@@ -79,4 +80,5 @@ export const materialModules = [
   DragDropModule,
   NgxMatDatetimePickerModule,
   NgxMatNativeDateModule,
+  MatSidenavModule,
 ];

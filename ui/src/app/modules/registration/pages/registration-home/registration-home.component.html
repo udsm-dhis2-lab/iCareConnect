@@ -1,49 +1,64 @@
 <div>
-  <div class="mt-4">
-    <div class="border">
-      <mat-toolbar>
-        <button
-          mat-icon-button
-          (click)="onBack($event)"
-          matTooltip="Go to Home page"
-        >
-          <mat-icon>arrow_back</mat-icon>
-        </button>
-        <span class="ml-2">Visits</span>
-        <button
-          mat-button
-          class="ml-2"
-          id="registration-search-patient"
-          (click)="onSearchPatient($event)"
-        >
-          <mat-icon class="mr-2">search</mat-icon>
-          <span>Search from all Patient</span>
-        </button>
+  <div>
+    <div class="mt-4">
+      <div class="border">
+        <mat-toolbar>
+          <button
+            mat-icon-button
+            (click)="onBack($event)"
+            matTooltip="Go to Home page"
+          >
+            <mat-icon>arrow_back</mat-icon>
+          </button>
+          <span class="ml-2">Visits</span>
+          <button
+            mat-button
+            class="ml-2"
+            id="registration-search-patient"
+            (click)="onSearchPatient($event)"
+          >
+            <mat-icon class="mr-2">search</mat-icon>
+            <span>Search from all Patient</span>
+          </button>
 
-        <span class="toolbar-spacer"></span>
-        <button
-          mat-flat-button
-          color="primary"
-          [routerLink]="['/registration/add']"
-        >
-          <mat-icon inline>person_add</mat-icon>
-          <span class="ml-2">Register New Patient</span>
-        </button>
-      </mat-toolbar>
+          <span class="toolbar-spacer"></span>
 
-      <div class="centered-container-patient-list">
-        <app-patient-list
-          *ngIf="!loadingData"
-          [itemsPerPage]="15"
-          [isRegistrationPage]="true"
-          [isTabularList]="true"
-          (selectPatient)="onSelectPatient($event)"
-        ></app-patient-list>
+          <button
+            mat-flat-button
+            color="primary"
+            [routerLink]="['/registration/add']"
+          >
+            <mat-icon inline>person_add</mat-icon>
+            <span class="ml-2">Register New Patient</span>
+          </button>
+          <a class="ml-2 help" (click)="toggleIcareHelp($event)">
+            <span>
+              <img height="20" src="assets/icons/help_icon-48.png" />
+            </span>
+            <!-- <span> Help </span> -->
+          </a>
+        </mat-toolbar>
 
-        <mat-progress-bar
-          mode="indeterminate"
-          *ngIf="loadingData"
-        ></mat-progress-bar>
+        <div class="centered-container-patient-list">
+          <icare-help
+            (cancel)="onInfoClose($event)"
+            [isInfoOpen]="isInfoOpen"
+            [documentURL]="documentURL"
+            [appName]="'Registration'"
+          ></icare-help>
+          <app-patient-list
+            *ngIf="!loadingData"
+            [itemsPerPage]="15"
+            [isRegistrationPage]="true"
+            [isTabularList]="true"
+            (selectPatient)="onSelectPatient($event)"
+          ></app-patient-list>
+
+          <mat-progress-bar
+            mode="indeterminate"
+            *ngIf="loadingData"
+          ></mat-progress-bar>
+        </div>
       </div>
     </div>
   </div>
