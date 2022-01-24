@@ -4,11 +4,11 @@
 const lightCodeTheme = require('prism-react-renderer/themes/github');
 const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 
-/** @type {import('@docusaurus/types').Config} */
+// /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: 'iCare',
   // tagline: 'We Care',
-  url: 'https://icare.dhis2udsm.org/#/',
+  url: 'http://icare.dhis2.udsm.ac.tz/',
   baseUrl: '/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
@@ -58,7 +58,7 @@ const config = {
           // This will be enabled when a full content of about us is already prepared and well designed
           {to: '/blog', label: 'About Us', position: 'left'},
           {
-            href: 'icare.dhis2udsm.org/#/',
+            href: 'http://icare.dhis2.udsm.ac.tz/',
             label: 'GitHub',
             position: 'right',
           },
