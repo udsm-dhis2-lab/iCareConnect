@@ -10,10 +10,27 @@
   height: 40px;
 }
 
+#location-name {
+  font-weight: normal;
+  font-size: 13px;
+}
+
 .menu-link {
   cursor: pointer;
   text-decoration: none;
   color: #ffffff;
+}
+
+.profile-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 35px;
+  width: 35px;
+  border-radius: 50%;
+  color: #ffffff;
+  font-size: 13px;
+  background-color: #0f77bc;
 }
 
 .menu-profile-icon {
@@ -38,4 +55,9 @@ button:hover {
 #location-icon,
 #location-name {
   color: #ffffff !important;
+}
+
+.module-selector-container {
+  position: fixed;
+  z-index: 1000;
 }

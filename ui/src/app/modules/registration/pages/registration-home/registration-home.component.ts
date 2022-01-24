@@ -29,6 +29,10 @@ export class RegistrationHomeComponent implements OnInit {
   loadedData: boolean = false;
   loadingDataError: string;
   registrationTableConfig: TableConfig;
+  isInfoOpen: boolean = false;
+  isExpanded: boolean = true;
+  isDark: boolean = false;
+  documentURL: string;
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
@@ -37,7 +41,9 @@ export class RegistrationHomeComponent implements OnInit {
     private store: Store<AppState>,
     private visitService: VisitsService,
     private dialog: MatDialog
-  ) {}
+  ) {
+    this.documentURL = "http://icare.dhis2.udsm.ac.tz/docs/";
+  }
 
   get displayedColumns(): string[] {
     return this.visitColumns.map((visitColumn) => visitColumn.id);
@@ -174,5 +180,30 @@ export class RegistrationHomeComponent implements OnInit {
   onBack(e: Event) {
     e.stopPropagation();
     this.store.dispatch(go({ path: ["/"] }));
+  }
+
+  toggleIcareHelp(event: Event): void {
+    event.stopPropagation();
+    this.isInfoOpen = !this.isInfoOpen;
+  }
+
+  onOpenInfo(): void {
+    this.isInfoOpen = true;
+  }
+
+  onInfoClose(e): void {
+    this.isInfoOpen = e;
+  }
+
+  toggleLogMonitor() {
+    this.isExpanded = !this.isExpanded;
+  }
+
+  toggleTheme() {
+    this.isDark = !this.isDark;
+  }
+
+  onOpenConsole() {
+    this.isExpanded = !this.isExpanded;
   }
 }
