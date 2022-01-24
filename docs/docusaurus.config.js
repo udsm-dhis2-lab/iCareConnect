@@ -8,8 +8,8 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 const config = {
   title: 'iCare',
   // tagline: 'We Care',
-  url: 'https://icare.dhis2udsm.org/#/',
-  baseUrl: '/',
+  url: 'http://icare.dhis2udsm.org/#/',
+  baseUrl: '/docs/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
   favicon: 'img/favicon.ico',
