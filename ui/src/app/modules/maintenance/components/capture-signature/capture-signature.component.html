@@ -81,7 +81,6 @@
     *ngIf="!params?.providerDetails"
     mode="indeterminate"
   ></mat-progress-bar>
-
   <div
     class="w-100 d-flex justify-content-end mb-2"
     *ngIf="params?.providerDetails"
@@ -111,7 +110,8 @@
           !params?.providerDetails?.signature &&
           !signatureImg &&
           !isProviderAttributeFormValid) ||
-        (!(params?.providerDetails && !params?.providerDetails?.uuid) &&
+        (params?.providerDetails &&
+          !params?.providerDetails?.uuid &&
           !isProviderAttributeFormValid)
       "
       class="action-btns"
