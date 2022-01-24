@@ -56,6 +56,7 @@ import { PatientRadiologySummaryComponent } from "./patient-radiology-summary/pa
 import { MessageConstructorComponent } from "./message-constructor/message-constructor.component";
 import { AddProcedureComponent } from "./add-procedure/add-procedure.component";
 import { AddProcedureFormComponent } from "./add-procedure-form/add-procedure-form.component";
+import { IcareHelpComponent } from "./icare-help/icare-help.component";
 
 export const components: any[] = [
   PatientSearchComponent,
@@ -115,7 +116,8 @@ export const components: any[] = [
   PatientRadiologySummaryComponent,
   MessageConstructorComponent,
   AddProcedureComponent,
-  AddProcedureFormComponent
+  AddProcedureFormComponent,
+  IcareHelpComponent,
 ];
 
 export const sharedEntryComponents: any[] = [
