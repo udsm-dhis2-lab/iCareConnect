@@ -1,6 +1,6 @@
-import { Action, createReducer, on } from '@ngrx/store';
-import { StockBatch } from 'src/app/shared/resources/store/models/stock-batch.model';
-import { Stock } from 'src/app/shared/resources/store/models/stock.model';
+import { Action, createReducer, on } from "@ngrx/store";
+import { StockBatch } from "src/app/shared/resources/store/models/stock-batch.model";
+import { Stock } from "src/app/shared/resources/store/models/stock.model";
 import {
   clearStockData,
   loadStocks,
@@ -9,15 +9,16 @@ import {
   saveStockLedgerFail,
   saveStockLedgerSuccess,
   setCurrentStock,
+  updateCurrentStockItem,
   upsertStockBatch,
   upsertStocks,
-} from '../actions/stock.actions';
-import { initialStockState, stockAdapter, StockState } from '../states';
+} from "../actions/stock.actions";
+import { initialStockState, stockAdapter, StockState } from "../states";
 import {
   errorBaseState,
   loadedBaseState,
   loadingBaseState,
-} from '../states/base.state';
+} from "../states/base.state";
 
 const reducer = createReducer(
   initialStockState,
@@ -41,9 +42,11 @@ const reducer = createReducer(
     }
 
     const newStockBatches = StockBatch.mergeStockBatches(
-      availableStock.batches,
+      availableStock.batches || [],
       [stockBatch]
     );
+
+    console.log("newStockBatches", newStockBatches);
 
     return stockAdapter.upsertOne(new Stock(newStockBatches).toJson(), {
       ...state,
@@ -63,6 +66,9 @@ const reducer = createReducer(
         availableCurrentStockId !== currentStockId ? currentStockId : undefined,
     };
   }),
+  on(updateCurrentStockItem, (state, currentStockItem) => ({
+    ...state,
+  })),
   on(clearStockData, (state) =>
     stockAdapter.removeAll({ ...state, currentStockId: null })
   )
