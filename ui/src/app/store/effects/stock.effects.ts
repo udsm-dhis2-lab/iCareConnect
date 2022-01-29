@@ -1,19 +1,19 @@
-import { Injectable } from '@angular/core';
-import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { select, Store } from '@ngrx/store';
-import { of } from 'rxjs';
+import { Injectable } from "@angular/core";
+import { Actions, createEffect, ofType } from "@ngrx/effects";
+import { select, Store } from "@ngrx/store";
+import { of } from "rxjs";
 import {
   catchError,
   concatMap,
   map,
   switchMap,
   withLatestFrom,
-} from 'rxjs/operators';
-import { StockService } from 'src/app/shared/resources/store/services/stock.service';
+} from "rxjs/operators";
+import { StockService } from "src/app/shared/resources/store/services/stock.service";
 import {
   Notification,
   NotificationService,
-} from 'src/app/shared/services/notification.service';
+} from "src/app/shared/services/notification.service";
 import {
   loadStocks,
   loadStocksFail,
@@ -21,9 +21,11 @@ import {
   upsertStocks,
   saveStockLedgerFail,
   upsertStockBatch,
-} from '../actions/stock.actions';
-import { AppState } from '../reducers';
-import { getCurrentLocation } from '../selectors';
+  loadCurrentStock,
+  updateCurrentStockItem,
+} from "../actions/stock.actions";
+import { AppState } from "../reducers";
+import { getCurrentLocation } from "../selectors";
 
 @Injectable()
 export class StockEffects {
@@ -48,19 +50,34 @@ export class StockEffects {
     )
   );
 
+  loadCurrentStockStatus$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(loadCurrentStock),
+      switchMap(({ currentStockItemId }) => {
+        return this.stockService
+          .getAvailableStockOfAnItem(currentStockItemId)
+          .pipe(
+            map((response: any) => {
+              return updateCurrentStockItem({ currentStockItem: response });
+            })
+          );
+      })
+    )
+  );
+
   saveStockLedger$ = createEffect(() =>
     this.actions$.pipe(
       ofType(saveStockLedger),
       switchMap(({ ledgerInput }) => {
         this.notificationService.show(
-          new Notification({ message: 'Saving Ledger...', type: 'LOADING' })
+          new Notification({ message: "Saving Ledger...", type: "LOADING" })
         );
         return this.stockService.saveStockLedger(ledgerInput).pipe(
-          map((stockBatch) => {
+          map((stockBatch: any) => {
             this.notificationService.show(
               new Notification({
-                message: 'Ledger Saved Succefully',
-                type: 'SUCCESS',
+                message: "Ledger Saved Succefully",
+                type: "SUCCESS",
               })
             );
             return upsertStockBatch({ stockBatch });
@@ -68,8 +85,8 @@ export class StockEffects {
           catchError((error) => {
             this.notificationService.show(
               new Notification({
-                message: 'Problem saving stock ledger',
-                type: 'ERROR',
+                message: "Problem saving stock ledger",
+                type: "ERROR",
               })
             );
             return of(saveStockLedgerFail({ error }));

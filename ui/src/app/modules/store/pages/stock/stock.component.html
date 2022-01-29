@@ -121,13 +121,18 @@
             </table>
           </div>
           <div class="col-7" *ngIf="params?.currentStock">
+            <mat-progress-bar
+              *ngIf="!params?.currentStock"
+              mode="indeterminate"
+            ></mat-progress-bar>
             <app-stock-batch-list
+              *ngIf="params?.currentStock"
               [stock]="params?.currentStock"
               [ledgerTypes]="params?.ledgerTypes"
               [currentStore]="params?.currentStore"
               [saving]="params?.savingLedger"
               (closeBatchList)="onToggleCurrentStock($event)"
-              (saveLedger)="onSaveLedger($event)"
+              (saveLedger)="onSaveLedger($event, params?.currentStock)"
             >
             </app-stock-batch-list>
           </div>
