@@ -1,4 +1,4 @@
-import * as moment from 'moment';
+import * as moment from "moment";
 export class StockBatch {
   constructor(private stockDetails: any) {}
 
@@ -19,7 +19,7 @@ export class StockBatch {
   }
 
   get quantity(): number {
-    return parseInt(this.stockDetails?.quantity || '0', 10);
+    return parseInt(this.stockDetails?.quantity || "0", 10);
   }
 
   get expiryDate(): string {
@@ -61,7 +61,9 @@ export class StockBatch {
 
   static mergeStockBatches(oldBatches, newBatches): StockBatch[] {
     let mergedBatches = [...oldBatches];
-
+    if (oldBatches?.length === 0) {
+      return newBatches;
+    }
     (newBatches || []).forEach((batch: StockBatch) => {
       const oldBatch = (mergedBatches || []).find(
         (batchItem) => batchItem.itemUuid === batch.itemUuid

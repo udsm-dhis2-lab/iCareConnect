@@ -1,13 +1,13 @@
-import { Injectable } from '@angular/core';
-import { Observable, throwError, zip } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { OpenmrsHttpClientService } from 'src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service';
-import { LedgerInput } from '../models/ledger-input.model';
-import { StockBatch } from '../models/stock-batch.model';
-import { Stock, StockObject } from '../models/stock.model';
+import { Injectable } from "@angular/core";
+import { Observable, of, throwError, zip } from "rxjs";
+import { catchError, map } from "rxjs/operators";
+import { OpenmrsHttpClientService } from "src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service";
+import { LedgerInput } from "../models/ledger-input.model";
+import { StockBatch } from "../models/stock-batch.model";
+import { Stock, StockObject } from "../models/stock.model";
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: "root",
 })
 export class StockService {
   constructor(private httpClient: OpenmrsHttpClientService) {}
@@ -20,11 +20,18 @@ export class StockService {
   }
 
   getAvailableStocks(locationUuid?: string): Observable<StockObject[]> {
-    return this._getStocks('store/stock', locationUuid);
+    return this._getStocks("store/stock", locationUuid);
+  }
+
+  getAvailableStockOfAnItem(itemUuid): Observable<any> {
+    return this.httpClient.get(`store/item/${itemUuid}/stock`).pipe(
+      map((response) => response),
+      catchError((e) => of(e))
+    );
   }
 
   getStockOuts(locationUuid?: string): Observable<StockObject[]> {
-    return this._getStocks('store/stockout', locationUuid);
+    return this._getStocks("store/stockout", locationUuid);
   }
 
   saveStockLedger(ledgerInput: LedgerInput): Observable<StockBatch> {
@@ -32,12 +39,12 @@ export class StockService {
 
     if (!storeLedger) {
       return throwError({
-        message: 'Incorrect parameters supplied',
+        message: "Incorrect parameters supplied",
       });
     }
 
     return this.httpClient
-      .post('store/ledger', storeLedger)
+      .post("store/ledger", storeLedger)
       .pipe(map((response) => new StockBatch(response)));
   }
 
