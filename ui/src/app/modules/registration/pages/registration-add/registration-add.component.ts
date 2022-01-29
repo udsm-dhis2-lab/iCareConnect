@@ -3,19 +3,14 @@ import { MatSnackBar } from "@angular/material/snack-bar";
 import { Router } from "@angular/router";
 import { Store } from "@ngrx/store";
 import { getDateDifferenceYearsMonthsDays } from "src/app/shared/helpers/date.helpers";
-import {
-  addCurrentPatient,
-  go,
-  loadCurrentPatient,
-} from "src/app/store/actions";
+import { go, loadCurrentPatient } from "src/app/store/actions";
 import { getCurrentLocation } from "src/app/store/selectors";
 import { RegistrationService } from "../../services/registration.services";
 import { VisitsService } from "src/app/shared/resources/visits/services";
 import { Patient } from "src/app/shared/resources/patient/models/patient.model";
-import { from, Observable, zip } from "rxjs";
+import { Observable, zip } from "rxjs";
 import { LocationService } from "src/app/core/services";
 import { tail, filter } from "lodash";
-import { getCurrentPatient } from "src/app/store/selectors/current-patient.selectors";
 import { StartVisitModelComponent } from "../../components/start-visit-model/start-visit-model.component";
 import { VisitStatusConfirmationModelComponent } from "../../components/visit-status-confirmation-model/visit-status-confirmation-model.component";
 import { MatDialog } from "@angular/material/dialog";
@@ -24,6 +19,7 @@ import {
   Notification,
   NotificationService,
 } from "src/app/shared/services/notification.service";
+import { IdentifiersService } from "src/app/core/services/identifiers.service";
 
 @Component({
   selector: "app-registration-add",
@@ -41,7 +37,7 @@ export class RegistrationAddComponent implements OnInit {
 
   newPatientOptions: string[] = ["Yes", "No"];
 
-  registrationConfigurations$: Observable<any>;
+  @Input() registrationConfigurations: any;
   validatedTexts: any = {};
   errorMessage: string = "";
   updateCurrentMRNSystemSettingsResponse$: Observable<any>;
@@ -57,7 +53,8 @@ export class RegistrationAddComponent implements OnInit {
     private notificationService: NotificationService,
     private locationService: LocationService,
     private dialog: MatDialog,
-    private systemSettingsService: SystemSettingsService
+    private systemSettingsService: SystemSettingsService,
+    private identifierService: IdentifiersService
   ) {}
 
   get mandatoryFieldsMissing(): boolean {
@@ -179,9 +176,6 @@ export class RegistrationAddComponent implements OnInit {
     this.currentLocation$ = this.store.select(getCurrentLocation);
     this.loadingForm = true;
 
-    this.registrationConfigurations$ =
-      this.registrationService.getRegistrationConfigurations();
-
     zip(
       this.registrationService.getPatientIdentifierTypes(),
       this.locationService.getFacilityCode(),
@@ -288,38 +282,26 @@ export class RegistrationAddComponent implements OnInit {
 
             this.loadingForm = false;
           } else {
-            this.systemSettingsService
-              .getSystemSettingsDetailsByKey("iCare.registration.currentMRN")
-              .subscribe((MRNResponse) => {
-                if (MRNResponse) {
-                  this.currentMRNUuid = MRNResponse?.uuid;
+            this.identifierService
+              .generateIds({
+                generateIdentifiers: true,
+                sourceUuid: this.registrationConfigurations?.sourceUuid,
+                numberToGenerate: 1,
+              })
+              .subscribe((identifiersResponse) => {
+                if (identifiersResponse) {
                   const patientIdentifierTypes = results[0];
-                  const facilityCode = results[1];
                   const autoFilledIdentifier = results[2];
                   this.patientIdentifierTypes = filter(
                     patientIdentifierTypes.map((identifierType) => {
-                      const now = new Date();
-                      this.currentMRN = Number(MRNResponse?.value) + 1;
-
-                      // TODO: Need to find best way to autofill identifier through regex
+                      this.currentMRN = identifiersResponse[0];
                       const isAutoFilled =
                         identifierType.id === autoFilledIdentifier;
                       if (isAutoFilled) {
-                        this.patient[identifierType.id] = `${facilityCode}/${
-                          this.currentMRN
-                        }/${now.getFullYear().toString().substring(2)}`;
+                        this.patient[identifierType.id] = this.currentMRN;
                       } else {
                         this.patient[identifierType.id] = null;
                       }
-                      setTimeout(() => {
-                        // UPDATE system settings
-                        this.updateCurrentMRNSystemSettingsResponse$ =
-                          this.systemSettingsService.updateSystemSettings({
-                            uuid: this.currentMRNUuid,
-                            value: this.currentMRN.toString(),
-                          });
-                      }, 50);
-
                       return { ...identifierType, disabled: isAutoFilled };
                     }),
                     (idType) => {
@@ -439,7 +421,7 @@ export class RegistrationAddComponent implements OnInit {
                   })
                 );
 
-                this.store.dispatch(go({ path: ['/registration/home'] }));
+                this.store.dispatch(go({ path: ["/registration/home"] }));
               },
               (errorUpdatingPatient) => {
                 this.errorAddingPatient = true;

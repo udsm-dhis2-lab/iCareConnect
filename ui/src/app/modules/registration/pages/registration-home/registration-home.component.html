@@ -26,7 +26,7 @@
           <button
             mat-flat-button
             color="primary"
-            [routerLink]="['/registration/add']"
+            (click)="goToAddNewClientPage($event, '/registration/add')"
           >
             <mat-icon inline>person_add</mat-icon>
             <span class="ml-2">Register New Patient</span>

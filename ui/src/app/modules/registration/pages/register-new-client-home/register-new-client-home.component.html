@@ -1,0 +1,29 @@
+<div
+  *ngIf="{
+    registrationConfigurations: registrationConfigurations$ | async
+  } as params"
+>
+  <app-registration-add
+    *ngIf="
+      params?.registrationConfigurations &&
+      params?.registrationConfigurations['sourceUuid']
+    "
+    [registrationConfigurations]="params?.registrationConfigurations"
+  ></app-registration-add>
+
+  <div
+    class="alert alert-danger mt-2 ml-2 mr-2"
+    *ngIf="
+      params?.registrationConfigurations &&
+      !params?.registrationConfigurations['sourceUuid']
+    "
+    role="alert"
+  >
+    Ensure source reference for generating MRN is configured. Contact IT
+  </div>
+
+  <mat-progress-bar
+    *ngIf="!params?.registrationConfigurations"
+    mode="indeterminate"
+  ></mat-progress-bar>
+</div>
