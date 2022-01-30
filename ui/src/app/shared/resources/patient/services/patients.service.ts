@@ -1,17 +1,18 @@
-import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { Injectable } from "@angular/core";
+import { Observable, of } from "rxjs";
 import {
+  catchError,
   debounceTime,
   distinctUntilChanged,
   map,
   switchMap,
   tap,
-} from 'rxjs/operators';
-import { OpenmrsHttpClientService } from '../../../modules/openmrs-http-client/services/openmrs-http-client.service';
-import { Patient } from '../models/patient.model';
+} from "rxjs/operators";
+import { OpenmrsHttpClientService } from "../../../modules/openmrs-http-client/services/openmrs-http-client.service";
+import { Patient } from "../models/patient.model";
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: "root",
 })
 export class PatientService {
   constructor(private httpClient: OpenmrsHttpClientService) {}
@@ -32,13 +33,12 @@ export class PatientService {
 
   searchPatients(searchTerm): Observable<Patient[]> {
     const url = `patient?identifier=${searchTerm}&v=full&limit=10`;
-    return this.httpClient
-      .get(url)
-      .pipe(
-        map((res: any) =>
-          (res?.results || []).map((patient) => new Patient(patient))
-        )
-      );
+    return this.httpClient.get(url).pipe(
+      map((res: any) =>
+        (res?.results || []).map((patient) => new Patient(patient))
+      ),
+      catchError((e) => of(e))
+    );
   }
 
   getPersonDetails(personUuid): Observable<any> {

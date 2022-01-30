@@ -1,37 +1,38 @@
-import { Component, OnInit } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
-import { select, Store } from '@ngrx/store';
-import { Observable, pipe } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { OpenmrsHttpClientService } from 'src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service';
-import { LedgerInput } from 'src/app/shared/resources/store/models/ledger-input.model';
-import { LedgerTypeObject } from 'src/app/shared/resources/store/models/ledger-type.model';
-import { StockObject } from 'src/app/shared/resources/store/models/stock.model';
+import { Component, OnInit } from "@angular/core";
+import { MatDialog } from "@angular/material/dialog";
+import { select, Store } from "@ngrx/store";
+import { Observable, of, pipe } from "rxjs";
+import { map } from "rxjs/operators";
+import { OpenmrsHttpClientService } from "src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service";
+import { LedgerInput } from "src/app/shared/resources/store/models/ledger-input.model";
+import { LedgerTypeObject } from "src/app/shared/resources/store/models/ledger-type.model";
+import { StockObject } from "src/app/shared/resources/store/models/stock.model";
+import { StockService } from "src/app/shared/resources/store/services/stock.service";
 import {
   clearStockData,
   loadStocks,
   saveStockLedger,
   setCurrentStock,
-} from 'src/app/store/actions/stock.actions';
-import { AppState } from 'src/app/store/reducers';
+} from "src/app/store/actions/stock.actions";
+import { AppState } from "src/app/store/reducers";
 import {
   getCurrentLocation,
   getIfCurrentLocationIsMainStore,
-} from 'src/app/store/selectors';
-import { getAllLedgerTypes } from 'src/app/store/selectors/ledger-type.selectors';
+} from "src/app/store/selectors";
+import { getAllLedgerTypes } from "src/app/store/selectors/ledger-type.selectors";
 import {
   getAllStocks,
   getCurrentStock,
   getLedgerSavingStatus,
   getStockLoadedState,
   getStockLoadingState,
-} from 'src/app/store/selectors/stock.selectors';
-import { AddNewStockReceivedComponent } from '../../modals/add-new-stock-received/add-new-stock-received.component';
+} from "src/app/store/selectors/stock.selectors";
+import { AddNewStockReceivedComponent } from "../../modals/add-new-stock-received/add-new-stock-received.component";
 
 @Component({
-  selector: 'app-stock',
-  templateUrl: './stock.component.html',
-  styleUrls: ['./stock.component.scss'],
+  selector: "app-stock",
+  templateUrl: "./stock.component.html",
+  styleUrls: ["./stock.component.scss"],
 })
 export class StockComponent implements OnInit {
   stocks$: Observable<StockObject[]>;
@@ -42,12 +43,13 @@ export class StockComponent implements OnInit {
   savingLedger$: Observable<boolean>;
   isCurrentLocationMainStore$: Observable<boolean>;
   billableItems$: Observable<any[]>;
-  searchTerm: string = '';
+  searchTerm: string = "";
   stockLoadedState$: Observable<boolean>;
   constructor(
     private store: Store<AppState>,
     private dialog: MatDialog,
-    private httpClient: OpenmrsHttpClientService
+    private httpClient: OpenmrsHttpClientService,
+    private stockService: StockService
   ) {}
 
   ngOnInit() {
@@ -63,29 +65,27 @@ export class StockComponent implements OnInit {
     this.isCurrentLocationMainStore$ = this.store.pipe(
       select(getIfCurrentLocationIsMainStore)
     );
-
-    // this.billableItems$ = this.httpClient
-    //   .get('icare/item?limit=20&startIndex=0')
-    //   .pipe(
-    //     map((response) => {
-    //       return response.results.filter((item) => item?.stockable);
-    //     })
-    //   );
   }
 
   onToggleCurrentStock(stock: StockObject): void {
     this.store.dispatch(setCurrentStock({ currentStockId: stock.id }));
   }
 
-  onSaveLedger(ledgerInput: LedgerInput) {
+  onSaveLedger(ledgerInput: LedgerInput, currentStock: any): void {
     this.store.dispatch(saveStockLedger({ ledgerInput }));
+    // TODO: Remove timeout thing
+
+    this.currentStock$ = of(null);
+    setTimeout(() => {
+      this.currentStock$ = this.store.pipe(select(getCurrentStock));
+    }, 200);
   }
 
   onAddNewStockRecevied(event, ledgerTypes, currentStore, billableItems) {
     event.stopPropagation();
     this.dialog
       .open(AddNewStockReceivedComponent, {
-        width: '700px',
+        width: "700px",
         data: {
           ledgerTypes,
           currentStore,
@@ -99,7 +99,7 @@ export class StockComponent implements OnInit {
           this.stocks$ = this.store.pipe(select(getAllStocks));
           this.loadingStocks$ = this.store.pipe(select(getStockLoadingState));
           this.billableItems$ = this.httpClient
-            .get('icare/item?limit=20&startIndex=0')
+            .get("icare/item?limit=20&startIndex=0")
             .pipe(
               map((response) => {
                 return response?.results.filter((item) => item?.stockable);
