@@ -53,12 +53,12 @@ public class ICareController {
 	/** Logger for this class and subclasses */
 	protected final Log log = LogFactory.getLog(getClass());
 
-	@RequestMapping(value = "idgen", method = RequestMethod.GET)
+	@RequestMapping(value = "idgen", method = RequestMethod.POST)
 	@ResponseBody
-	public Map<String, Object> onGenerateId(@RequestParam(required = false) String q, @RequestParam(defaultValue = "100") Integer limit, @RequestParam(defaultValue = "0") Integer startIndex) {
+	public Map<String, Object> onGenerateId() {
 		Map<String, Object> results = new HashMap<>();
-		String id = iCareService.generatePatientId();
-		results.put("id",id);
+		List<String> ids = iCareService.generatePatientIds();
+		results.put("identifiers",ids);
 		return results;
 	}
 	/**
