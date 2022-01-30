@@ -26,6 +26,7 @@ import org.openmrs.module.icare.core.Item;
 import org.openmrs.module.icare.core.Message;
 import org.openmrs.module.icare.core.dao.ICareDao;
 import org.openmrs.module.icare.core.utils.VisitWrapper;
+import org.openmrs.module.icare.report.dhis2.DHIS2Config;
 import org.openmrs.module.icare.store.models.OrderStatus;
 import org.openmrs.validator.ValidateUtil;
 
@@ -35,9 +36,13 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ICareServiceImpl extends BaseOpenmrsService implements ICareService {
 	
@@ -298,7 +303,38 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		}
 		return messages;
 	}
-	
+
+	@Override
+	public String generatePatientId() {
+		AdministrationService adminService = Context.getService(AdministrationService.class);
+		String idFormat = adminService.getGlobalProperty(ICareConfig.PATIENT_ID_FORMAT);
+
+		if(idFormat.contains("GP{" + DHIS2Config.facilityCode + "}")){
+			System.out.println("Replacing:");
+			String facilityCode = adminService.getGlobalProperty(DHIS2Config.facilityCode);
+			idFormat = idFormat.replace("GP{" + DHIS2Config.facilityCode + "}", facilityCode);
+		}
+
+		if(idFormat.contains("D{YYYYMMDD}")){
+			SimpleDateFormat formatter = new SimpleDateFormat("YYYYMMDD", Locale.ENGLISH);
+			idFormat = idFormat.replace("D{YYYYMMDD}", formatter.format(new Date()));
+		}
+		if(idFormat.contains("D{YYYYMM}")){
+			SimpleDateFormat formatter = new SimpleDateFormat("YYYYMMDD", Locale.ENGLISH);
+			idFormat = idFormat.replace("D{YYYYMM}", formatter.format(new Date()));
+		}
+		if(idFormat.contains("COUNTDAILY{PATIENT}")){
+			idFormat = idFormat.replace("COUNTDAILY{PATIENT}", "" + String.format("%02d", dao.countDailyPatients() + 1));
+		}
+		if(idFormat.contains("COUNTMONTHLY{PATIENT}")){
+			idFormat = idFormat.replace("COUNTMONTHLY{PATIENT}", "" + String.format("%03d", dao.countMonthlyPatients() + 1));
+		}
+		if(idFormat.contains("COUNTYEARLY{PATIENT}")){
+			idFormat = idFormat.replace("COUNTYEARLY{PATIENT}", "" + String.format("%04d", dao.countYearlyPatients() + 1));
+		}
+		return idFormat;
+	}
+
 	@Override
 	public Item getItemByConceptUuid(String uuid) {
 		return dao.getItemByConceptUuid(uuid);
