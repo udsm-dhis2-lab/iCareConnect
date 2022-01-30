@@ -1,6 +1,5 @@
 ---
-sidebar_position: 3
-title : Triage
+sidebar_position: 2
 ---
 
 # Translate your site
