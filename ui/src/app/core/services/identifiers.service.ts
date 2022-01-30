@@ -10,7 +10,7 @@ export class IdentifiersService {
   constructor(private httpClient: OpenmrsHttpClientService) {}
 
   generateIds(payload: any): Observable<any> {
-    return this.httpClient.post("idgen/identifiersource", payload).pipe(
+    return this.httpClient.post("icare/idgen", payload).pipe(
       map((response: any) => response?.identifiers),
       catchError((error) => of(error))
     );
