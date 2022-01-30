@@ -324,13 +324,13 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 			idFormat = idFormat.replace("D{YYYYMM}", formatter.format(new Date()));
 		}
 		if(idFormat.contains("COUNTDAILY{PATIENT}")){
-			idFormat = idFormat.replace("COUNTDAILY{PATIENT}", "" + String.format("%02d", dao.countDailyPatients() + 1));
+			idFormat = idFormat.replace("COUNTDAILY{PATIENT}", "" + String.format("%03d", dao.countDailyPatients() + 1));
 		}
 		if(idFormat.contains("COUNTMONTHLY{PATIENT}")){
-			idFormat = idFormat.replace("COUNTMONTHLY{PATIENT}", "" + String.format("%03d", dao.countMonthlyPatients() + 1));
+			idFormat = idFormat.replace("COUNTMONTHLY{PATIENT}", "" + String.format("%04d", dao.countMonthlyPatients() + 1));
 		}
 		if(idFormat.contains("COUNTYEARLY{PATIENT}")){
-			idFormat = idFormat.replace("COUNTYEARLY{PATIENT}", "" + String.format("%04d", dao.countYearlyPatients() + 1));
+			idFormat = idFormat.replace("COUNTYEARLY{PATIENT}", "" + String.format("%05d", dao.countYearlyPatients() + 1));
 		}
 		return idFormat;
 	}
