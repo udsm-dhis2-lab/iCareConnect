@@ -14,6 +14,7 @@ import org.openmrs.module.icare.billing.models.InvoiceItem;
 import org.openmrs.module.icare.billing.services.BillingService;
 import org.openmrs.module.icare.core.ICareService;
 import org.openmrs.module.icare.core.Item;
+import org.openmrs.module.icare.report.dhis2.DHIS2Config;
 import org.openmrs.module.icare.web.controller.core.BaseResourceControllerTest;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -37,7 +38,20 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		executeDataSet("billing-data.xml");
 		this.startUp();
 	}
-	
+
+	@Test
+	public void testIdGeneration() throws Exception {
+
+		AdministrationService adminService = Context.getService(AdministrationService.class);
+		adminService.setGlobalProperty(ICareConfig.PATIENT_ID_FORMAT, "GP{" + DHIS2Config.facilityCode + "}/D{YYYYMMDD}/COUNTDAILY{PATIENT}3");
+		adminService.setGlobalProperty(DHIS2Config.facilityCode, "987398345-6");
+		MockHttpServletRequest newGetRequest = newGetRequest("icare/idgen");
+		MockHttpServletResponse handle = handle(newGetRequest);
+		System.out.println("Results:" + handle.getContentAsString());
+		//Map<String, Object> results = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
+		//List<Map<String, Object>> maps = (List) results.get("results");
+		//assertThat("Should return a 7 items", maps.size(), is(7));
+	}
 	@Test
 	public void testCreatingItem() throws Exception {
 		
