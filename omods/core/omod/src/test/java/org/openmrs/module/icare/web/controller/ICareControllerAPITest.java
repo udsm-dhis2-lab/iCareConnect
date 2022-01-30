@@ -42,15 +42,25 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 	@Test
 	public void testIdGeneration() throws Exception {
 
+		String dto = this.readFile("dto/core/id-generator.json");
+		Map<String, Object> idDtop = (new ObjectMapper()).readValue(dto, Map.class);
 		AdministrationService adminService = Context.getService(AdministrationService.class);
-		adminService.setGlobalProperty(ICareConfig.PATIENT_ID_FORMAT, "GP{" + DHIS2Config.facilityCode + "}/D{YYYYMMDD}/COUNTDAILY{PATIENT}");
 		adminService.setGlobalProperty(DHIS2Config.facilityCode, "987398345-6");
-		MockHttpServletRequest newGetRequest = newGetRequest("icare/idgen");
+
+		adminService.setGlobalProperty(ICareConfig.PATIENT_ID_FORMAT, "GP{" + DHIS2Config.facilityCode + "}/D{YYYYMMDD}/COUNT");
+		MockHttpServletRequest newGetRequest = newPostRequest("icare/idgen",idDtop);
 		MockHttpServletResponse handle = handle(newGetRequest);
-		System.out.println("Results:" + handle.getContentAsString());
-		//Map<String, Object> results = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
-		//List<Map<String, Object>> maps = (List) results.get("results");
-		//assertThat("Should return a 7 items", maps.size(), is(7));
+		System.out.println("Date Wise:" + handle.getContentAsString());
+
+		adminService.setGlobalProperty(ICareConfig.PATIENT_ID_FORMAT, "GP{" + DHIS2Config.facilityCode + "}/D{YYYYMM}/COUNT");
+		newGetRequest = newPostRequest("icare/idgen",idDtop);
+		handle = handle(newGetRequest);
+		System.out.println("Monthly ID:" + handle.getContentAsString());
+
+		adminService.setGlobalProperty(ICareConfig.PATIENT_ID_FORMAT, "GP{" + DHIS2Config.facilityCode + "}/D{YYYY}/COUNT");
+		newGetRequest = newPostRequest("icare/idgen",idDtop);
+		handle = handle(newGetRequest);
+		System.out.println("Yearly ID:" + handle.getContentAsString());
 	}
 	@Test
 	public void testCreatingItem() throws Exception {

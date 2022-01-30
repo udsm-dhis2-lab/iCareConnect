@@ -319,20 +319,27 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		if(idFormat.contains("D{YYYYMMDD}")){
 			SimpleDateFormat formatter = new SimpleDateFormat("YYYYMMDD", Locale.ENGLISH);
 			idFormat = idFormat.replace("D{YYYYMMDD}", formatter.format(new Date()));
+			idFormat = idFormat.replace("COUNT", "" + String.format("%03d", dao.countDailyPatients() + 1));
 		}
 		if(idFormat.contains("D{YYYYMM}")){
-			SimpleDateFormat formatter = new SimpleDateFormat("YYYYMMDD", Locale.ENGLISH);
+			SimpleDateFormat formatter = new SimpleDateFormat("YYYYMM", Locale.ENGLISH);
 			idFormat = idFormat.replace("D{YYYYMM}", formatter.format(new Date()));
+			idFormat = idFormat.replace("COUNT", "" + String.format("%04d", dao.countMonthlyPatients() + 1));
 		}
-		if(idFormat.contains("COUNTDAILY{PATIENT}")){
-			idFormat = idFormat.replace("COUNTDAILY{PATIENT}", "" + String.format("%03d", dao.countDailyPatients() + 1));
+		if(idFormat.contains("D{YYYY}")){
+			SimpleDateFormat formatter = new SimpleDateFormat("YYYY", Locale.ENGLISH);
+			idFormat = idFormat.replace("D{YYYY}", formatter.format(new Date()));
+			idFormat = idFormat.replace("COUNT", "" + String.format("%05d", dao.countYearlyPatients() + 1));
 		}
-		if(idFormat.contains("COUNTMONTHLY{PATIENT}")){
-			idFormat = idFormat.replace("COUNTMONTHLY{PATIENT}", "" + String.format("%04d", dao.countMonthlyPatients() + 1));
-		}
-		if(idFormat.contains("COUNTYEARLY{PATIENT}")){
-			idFormat = idFormat.replace("COUNTYEARLY{PATIENT}", "" + String.format("%05d", dao.countYearlyPatients() + 1));
-		}
+//		if(idFormat.contains("COUNTDAILY{PATIENT}")){
+//			idFormat = idFormat.replace("COUNTDAILY{PATIENT}", "" + String.format("%03d", dao.countDailyPatients() + 1));
+//		}
+//		if(idFormat.contains("COUNTMONTHLY{PATIENT}")){
+//			idFormat = idFormat.replace("COUNTMONTHLY{PATIENT}", "" + String.format("%04d", dao.countMonthlyPatients() + 1));
+//		}
+//		if(idFormat.contains("COUNTYEARLY{PATIENT}")){
+//			idFormat = idFormat.replace("COUNTYEARLY{PATIENT}", "" + String.format("%05d", dao.countYearlyPatients() + 1));
+//		}
 		List<String> identifiers = new ArrayList<>();
 		identifiers.add(idFormat);
 		return identifiers;
