@@ -57,8 +57,8 @@ public class ICareController {
 	@ResponseBody
 	public Map<String, Object> onGenerateId(@RequestParam(required = false) String q, @RequestParam(defaultValue = "100") Integer limit, @RequestParam(defaultValue = "0") Integer startIndex) {
 		Map<String, Object> results = new HashMap<>();
-		String id = iCareService.generatePatientId();
-		results.put("id",id);
+		List<String> ids = iCareService.generatePatientIds();
+		results.put("identifiers",ids);
 		return results;
 	}
 	/**
