@@ -66,8 +66,9 @@ export const getParentLocation = createSelector(
         : allParentLocations && allParentLocations?.length == 1
         ? allParentLocations[0]
         : {
-            name: "iCare EMR & Hospital System",
-            description: "University of Dar es Salaam",
+            name: "Integrated Care EMR & Hospital System",
+            description:
+              "Comprehensive Electronic Medical Recording System for Secondary and Primary Health Care Facilities",
             id: "iCare-udsm",
           };
     return mainLocation;

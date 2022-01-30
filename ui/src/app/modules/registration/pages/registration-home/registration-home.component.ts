@@ -67,6 +67,11 @@ export class RegistrationHomeComponent implements OnInit {
     });
   }
 
+  goToAddNewClientPage(event: Event, path: string): void {
+    event.stopPropagation();
+    this.store.dispatch(go({ path: [path] }));
+  }
+
   getAllActiveVisits() {
     this.loadedData = false;
     this.visitService.getAllVisits().subscribe(

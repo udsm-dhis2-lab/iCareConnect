@@ -1,42 +1,43 @@
-import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
-import { RegistrationPatientComponent } from './components/registration-patient/registration-patient.component';
-import { RegistrationSearchComponent } from './components/registration-search/registration-search.component';
-import { PatientEditComponent } from './pages/patient-edit/patient-edit.component';
-import { RegistrationAddComponent } from './pages/registration-add/registration-add.component';
-import { RegistrationHomeComponent } from './pages/registration-home/registration-home.component';
-import { VisitComponent } from './pages/visit/visit.component';
+import { NgModule } from "@angular/core";
+import { RouterModule, Routes } from "@angular/router";
+import { RegistrationPatientComponent } from "./components/registration-patient/registration-patient.component";
+import { RegistrationSearchComponent } from "./components/registration-search/registration-search.component";
+import { PatientEditComponent } from "./pages/patient-edit/patient-edit.component";
+import { RegisterNewClientHomeComponent } from "./pages/register-new-client-home/register-new-client-home.component";
+import { RegistrationAddComponent } from "./pages/registration-add/registration-add.component";
+import { RegistrationHomeComponent } from "./pages/registration-home/registration-home.component";
+import { VisitComponent } from "./pages/visit/visit.component";
 
 const routes: Routes = [
   {
-    path: '',
-    pathMatch: 'full',
-    redirectTo: 'home',
+    path: "",
+    pathMatch: "full",
+    redirectTo: "home",
   },
   {
-    path: '',
+    path: "",
     component: RegistrationHomeComponent,
     children: [
       {
-        path: 'home',
+        path: "home",
         component: RegistrationSearchComponent,
       },
       {
-        path: 'patient',
+        path: "patient",
         component: RegistrationPatientComponent,
       },
     ],
   },
   {
-    path: 'visit',
+    path: "visit",
     component: VisitComponent,
   },
   {
-    path: 'add',
-    component: RegistrationAddComponent,
+    path: "add",
+    component: RegisterNewClientHomeComponent,
   },
   {
-    path: 'edit/:patientId',
+    path: "edit/:patientId",
     component: PatientEditComponent,
   },
 ];
