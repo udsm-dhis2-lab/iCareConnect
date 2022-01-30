@@ -162,18 +162,24 @@ export const getAllTreatmentLocations = createSelector(
   getLocations,
   (locations: Location[]) => {
     return _.filter(locations, (location) => {
+      // Remove voided attributes
+      const formattedLocation = {
+        ...location,
+        attributes:
+          location?.attributes.filter((attribute) => !attribute?.voided) || [],
+      };
       if (
-        (_.filter(location?.tags, { display: "Treatment Room" }) || [])
+        (_.filter(formattedLocation?.tags, { display: "Treatment Room" }) || [])
           ?.length > 0
       ) {
         const matchedBillingConceptConfigurations =
-          (location?.attributes.filter(
+          (formattedLocation?.attributes.filter(
             (attribute) =>
               attribute?.attributeType?.display.toLowerCase() ===
               "billing concept"
           ) || [])[0];
         return {
-          ...location,
+          ...formattedLocation,
           billingConcept: matchedBillingConceptConfigurations
             ? matchedBillingConceptConfigurations?.value
             : null,
