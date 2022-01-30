@@ -398,8 +398,7 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 		orderStatus.setOrder(savedOrder);
 		orderStatus.setStatus(OrderStatus.OrderStatusCode.DISPENSED);
 		orderStatus.setRemarks(remarks);
-
-
+		
 		return this.stockDAO.saveOrderStatus(orderStatus);
 	}
 	

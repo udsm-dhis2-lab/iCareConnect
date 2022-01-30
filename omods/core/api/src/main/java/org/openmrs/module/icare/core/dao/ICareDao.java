@@ -167,9 +167,8 @@ public class ICareDao extends BaseDAO<Item> {
 	public Item getItemByConceptUuid(String uuid) {
 		DbSession session = getSession();
 		
-		String queryStr = "SELECT i FROM Item i " + "LEFT JOIN i.concept as c "
-				+ "LEFT JOIN i.drug as d " + "LEFT JOIN d.concept as c1 " +
-				" WHERE c.uuid= :uuid OR c1.uuid= :uuid";
+		String queryStr = "SELECT i FROM Item i " + "LEFT JOIN i.concept as c " + "LEFT JOIN i.drug as d "
+		        + "LEFT JOIN d.concept as c1 " + " WHERE c.uuid= :uuid OR c1.uuid= :uuid";
 		//String queryStr = "SELECT a FROM Item a WHERE a.concept.uuid=:uuid";
 		Query query = session.createQuery(queryStr);
 		query.setParameter("uuid", uuid);
@@ -181,16 +180,16 @@ public class ICareDao extends BaseDAO<Item> {
 			return null;
 		}
 	}
-
+	
 	public Item getItemByDrugConceptUuid(String uuid) {
 		DbSession session = getSession();
-
+		
 		//String queryStr = "SELECT a FROM Item a WHERE a.concept.uuid= :uuid OR a.drug.concept.uuid= :uuid";
 		String queryStr = "SELECT a FROM Item a WHERE a.drug.concept.uuid=:uuid";
 		Query query = session.createQuery(queryStr);
 		query.setParameter("uuid", uuid);
 		List<Item> items = query.list();
-
+		
 		if (items.size() > 0) {
 			return items.get(0);
 		} else {
@@ -232,8 +231,8 @@ public class ICareDao extends BaseDAO<Item> {
 	}
 	
 	public List<Visit> getVisitsByOrderType(String search, String orderTypeUuid, String locationUuid,
-											OrderStatus.OrderStatusCode orderStatusCode, Order.FulfillerStatus fulfillerStatus, Integer limit,
-											Integer startIndex, VisitWrapper.OrderBy orderBy, VisitWrapper.OrderByDirection orderByDirection) {
+	        OrderStatus.OrderStatusCode orderStatusCode, Order.FulfillerStatus fulfillerStatus, Integer limit,
+	        Integer startIndex, VisitWrapper.OrderBy orderBy, VisitWrapper.OrderByDirection orderByDirection) {
 		DbSession session = this.getSession();
 		String queryStr = "SELECT distinct v FROM Visit v" + " INNER JOIN v.patient p" + " INNER JOIN p.names pname"
 		        + " INNER JOIN v.encounters e" + " INNER JOIN e.orders o" + " INNER JOIN o.orderType ot"
@@ -258,20 +257,20 @@ public class ICareDao extends BaseDAO<Item> {
 		if (locationUuid != null) {
 			queryStr += " AND v.location.uuid=:locationUuid ";
 		}
-
-		if(orderBy == VisitWrapper.OrderBy.VISIT){
+		
+		if (orderBy == VisitWrapper.OrderBy.VISIT) {
 			queryStr += " ORDER BY v.startDatetime ";
-		} else if(orderBy == VisitWrapper.OrderBy.ENCOUNTER){
+		} else if (orderBy == VisitWrapper.OrderBy.ENCOUNTER) {
 			queryStr += " ORDER BY e.encounterDatetime ";
-		} else if(orderBy == VisitWrapper.OrderBy.ORDER){
+		} else if (orderBy == VisitWrapper.OrderBy.ORDER) {
 			queryStr += " ORDER BY o.dateActivated ";
-		} else if(orderBy == VisitWrapper.OrderBy.OBSERVATION){
+		} else if (orderBy == VisitWrapper.OrderBy.OBSERVATION) {
 			queryStr += " ORDER BY e.dateChanged ";
 		}
-
-		if(orderByDirection == VisitWrapper.OrderByDirection.ASC){
+		
+		if (orderByDirection == VisitWrapper.OrderByDirection.ASC) {
 			queryStr += " ASC ";
-		} else if(orderByDirection == VisitWrapper.OrderByDirection.DESC){
+		} else if (orderByDirection == VisitWrapper.OrderByDirection.DESC) {
 			queryStr += " DESC ";
 		}
 		Query query = session.createQuery(queryStr);
@@ -320,5 +319,33 @@ public class ICareDao extends BaseDAO<Item> {
 		query.setFirstResult(startIndex);
 		query.setMaxResults(limit);
 		return query.list();
+	}
+
+    public long countDailyPatients() {
+		DbSession session = getSession();
+		String queryStr = "SELECT COUNT(patient) FROM Patient patient WHERE YEAR(patient.personDateCreated) = :year AND MONTH(patient.personDateCreated) = :month AND DAY(patient.personDateCreated) = :day";
+		Query query = session.createQuery(queryStr);
+		Calendar calendar = Calendar.getInstance();
+		query.setParameter("year", calendar.get(Calendar.YEAR));
+		query.setParameter("day", calendar.get(Calendar.DATE));
+		query.setParameter("month", calendar.get(Calendar.MONTH) + 1);
+		return (long) query.list().get(0);
+    }
+	public long countMonthlyPatients() {
+		DbSession session = getSession();
+		String queryStr = "SELECT COUNT(patient) FROM Patient patient WHERE YEAR(patient.personDateCreated) = :year AND MONTH(patient.personDateCreated) = :month";
+		Query query = session.createQuery(queryStr);
+		Calendar calendar = Calendar.getInstance();
+		query.setParameter("year", calendar.get(Calendar.YEAR));
+		query.setParameter("month", calendar.get(Calendar.MONTH) + 1);
+		return (long) query.list().get(0);
+	}
+	public long countYearlyPatients() {
+		DbSession session = getSession();
+		String queryStr = "SELECT COUNT(patient) FROM Patient patient WHERE YEAR(patient.personDateCreated) = :year";
+		Query query = session.createQuery(queryStr);
+		Calendar calendar = Calendar.getInstance();
+		query.setParameter("year", calendar.get(Calendar.YEAR));
+		return (long) query.list().get(0);
 	}
 }

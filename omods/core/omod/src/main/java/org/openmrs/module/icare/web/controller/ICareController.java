@@ -52,7 +52,15 @@ public class ICareController {
 	
 	/** Logger for this class and subclasses */
 	protected final Log log = LogFactory.getLog(getClass());
-	
+
+	@RequestMapping(value = "idgen", method = RequestMethod.GET)
+	@ResponseBody
+	public Map<String, Object> onGenerateId(@RequestParam(required = false) String q, @RequestParam(defaultValue = "100") Integer limit, @RequestParam(defaultValue = "0") Integer startIndex) {
+		Map<String, Object> results = new HashMap<>();
+		String id = iCareService.generatePatientId();
+		results.put("id",id);
+		return results;
+	}
 	/**
 	 * Initially called after the getUsers method to get the landing form name
 	 * 
@@ -77,19 +85,19 @@ public class ICareController {
 		Item newItem = iCareService.saveItem(item);
 		return newItem.toMap();
 	}
-
+	
 	@RequestMapping(value = "itemByConcept/{conceptUuid}", method = RequestMethod.GET)
 	@ResponseBody
 	public Map<String, Object> onGetItemByConcept(@PathVariable("conceptUuid") String conceptUuid) {
-
+		
 		Item newItem = iCareService.getItemByConceptUuid(conceptUuid);
 		return newItem.toMap();
 	}
-
+	
 	@RequestMapping(value = "itemByDrugConcept/{conceptUuid}", method = RequestMethod.GET)
 	@ResponseBody
 	public Map<String, Object> onGetItemByDrugConcept(@PathVariable("conceptUuid") String conceptUuid) {
-
+		
 		Item newItem = iCareService.getItemByDrugConceptUuid(conceptUuid);
 		return newItem.toMap();
 	}
@@ -162,16 +170,16 @@ public class ICareController {
 		//return newOrder;
 		return null;
 	}
-
+	
 	@RequestMapping(value = "message", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public Map<String, Object> sendMessage(@RequestBody Map<String, Object> messageObject) throws Exception {
-
+		
 		Message message = Message.fromMap(messageObject);
 		message = iCareService.sendMessage(message);
 		return message.toMap();
 	}
-
+	
 	@RequestMapping(value = "messages", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public List<Map<String, Object>> sendMessages(@RequestBody List<Map<String, Object>> messageList) throws Exception {

@@ -70,12 +70,14 @@ public class ICareConfig {
 	public static final String PROVIDER_PHONENUMBER_ATTRIBUTE = "icare.attribute.provider.phoneNumber";
 	
 	public static final String PATIENT_OCCUPATION_ATTRIBUTE = "icare.attribute.patient.occupation";
+
+	public static final String PATIENT_ID_FORMAT = "icare.patient.id.format";
 	
 	public static final String REGISTRATION_ENCOUNTER_ROLE = "icare.encounterRole.registration";
 	
 	public static final String STOCK_ENABLE = "icare.stock.enable";
 	
 	public static final String STOCK_LOCATIONS = "icare.stock.locations";
-
-    public static final String MESSAGE_PHONE_NUMBER = "icare.notification.message.phoneNumber";
+	
+	public static final String MESSAGE_PHONE_NUMBER = "icare.notification.message.phoneNumber";
 }
