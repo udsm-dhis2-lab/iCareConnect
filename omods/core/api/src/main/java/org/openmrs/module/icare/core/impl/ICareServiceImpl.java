@@ -37,6 +37,7 @@ import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -305,7 +306,7 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	}
 
 	@Override
-	public String generatePatientId() {
+	public List<String> generatePatientIds() {
 		AdministrationService adminService = Context.getService(AdministrationService.class);
 		String idFormat = adminService.getGlobalProperty(ICareConfig.PATIENT_ID_FORMAT);
 
@@ -332,7 +333,9 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		if(idFormat.contains("COUNTYEARLY{PATIENT}")){
 			idFormat = idFormat.replace("COUNTYEARLY{PATIENT}", "" + String.format("%05d", dao.countYearlyPatients() + 1));
 		}
-		return idFormat;
+		List<String> identifiers = new ArrayList<>();
+		identifiers.add(idFormat);
+		return identifiers;
 	}
 
 	@Override
