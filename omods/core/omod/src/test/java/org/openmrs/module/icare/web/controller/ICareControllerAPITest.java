@@ -43,7 +43,7 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 	public void testIdGeneration() throws Exception {
 
 		AdministrationService adminService = Context.getService(AdministrationService.class);
-		adminService.setGlobalProperty(ICareConfig.PATIENT_ID_FORMAT, "GP{" + DHIS2Config.facilityCode + "}/D{YYYYMMDD}/COUNTDAILY{PATIENT}3");
+		adminService.setGlobalProperty(ICareConfig.PATIENT_ID_FORMAT, "GP{" + DHIS2Config.facilityCode + "}/D{YYYYMMDD}/COUNTDAILY{PATIENT}");
 		adminService.setGlobalProperty(DHIS2Config.facilityCode, "987398345-6");
 		MockHttpServletRequest newGetRequest = newGetRequest("icare/idgen");
 		MockHttpServletResponse handle = handle(newGetRequest);
