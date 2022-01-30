@@ -1,7 +1,7 @@
-import { Pipe, PipeTransform } from '@angular/core';
+import { Pipe, PipeTransform } from "@angular/core";
 
 @Pipe({
-  name: 'filterLocationByService',
+  name: "filterLocationByService",
 })
 export class FilterLocationByServicePipe implements PipeTransform {
   transform(locations: any[], service: any): any {
@@ -14,7 +14,8 @@ export class FilterLocationByServicePipe implements PipeTransform {
           (
             location.attributes.filter(
               (attribute) =>
-                attribute?.attributeType?.display.toLowerCase() == 'services'
+                attribute?.attributeType?.display.toLowerCase() ===
+                  "services" && !attribute?.voided
             ) || []
           )?.length > 0
       ) || [];
@@ -25,7 +26,7 @@ export class FilterLocationByServicePipe implements PipeTransform {
               location.attributes.filter(
                 (attribute) =>
                   attribute?.attributeType?.display.toLowerCase() ==
-                    'services' && attribute?.value === service.uuid
+                    "services" && attribute?.value === service.uuid
               ) || []
             )?.length > 0
         )
