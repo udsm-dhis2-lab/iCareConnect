@@ -109,5 +109,5 @@ public interface ICareService extends OpenmrsService {
 	
 	List<Message> sendMessages(List<Message> messages) throws MalformedURLException, IOException, Exception;
 
-    String generatePatientId();
+	List<String> generatePatientIds();
 }
