@@ -2,28 +2,22 @@
   id="page-patient-registration"
   *ngIf="{
     currentLocation: currentLocation$ | async,
-    registrationConfigurations: registrationConfigurations$ | async,
     updateCurrentMRNSystemSettingsResponse:
       updateCurrentMRNSystemSettingsResponse$ | async
   } as params"
 >
   <h2>{{ editMode ? "Edit Patient" : "Register New Patient" }}</h2>
 
-  <mat-progress-bar
-    *ngIf="loadingForm || !params?.registrationConfigurations"
-    mode="indeterminate"
-  ></mat-progress-bar>
+  <mat-progress-bar *ngIf="loadingForm" mode="indeterminate"></mat-progress-bar>
 
-  <!-- {{ params?.registrationConfigurations | json }} -->
+  <!-- {{ registrationConfigurations | json }} -->
   <div class="alert alert-danger" *ngIf="loadingFormError">
     Problem Opening registration form
   </div>
 
   <div
     class="registration-form"
-    *ngIf="
-      !loadingForm && !loadingFormError && params?.registrationConfigurations
-    "
+    *ngIf="!loadingForm && !loadingFormError && registrationConfigurations"
   >
     <div class="row">
       <div class="col-8">
@@ -393,7 +387,7 @@
                 <mat-select>
                   <mat-option
                     *ngFor="
-                      let occupation of params?.registrationConfigurations[
+                      let occupation of registrationConfigurations[
                         'employmentStatuses'
                       ]
                     "
@@ -409,7 +403,7 @@
                 <mat-select>
                   <mat-option
                     *ngFor="
-                      let education of params?.registrationConfigurations[
+                      let education of registrationConfigurations[
                         'educationLevel'
                       ]
                     "
@@ -426,7 +420,7 @@
                 <mat-select>
                   <mat-option
                     *ngFor="
-                      let maritalStatus of params?.registrationConfigurations[
+                      let maritalStatus of registrationConfigurations[
                         'maritalStatuses'
                       ]
                     "
@@ -567,8 +561,7 @@
                 <mat-select>
                   <mat-option
                     *ngFor="
-                      let relationshipType of params?.registrationConfigurations
-                        .relationshipTypeOptions
+                      let relationshipType of registrationConfigurations.relationshipTypeOptions
                     "
                     [value]="relationshipType"
                     (click)="setRelationshipType(relationshipType)"
@@ -590,7 +583,7 @@
               <mat-select>
                 <mat-option
                   *ngFor="
-                    let relationshipType of params?.registrationConfigurations
+                    let relationshipType of registrationConfigurations
                       .relationshipTypeOptions
                   "
                   [value]="relationshipType"

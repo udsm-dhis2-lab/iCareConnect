@@ -57,6 +57,7 @@ import { MessageConstructorComponent } from "./message-constructor/message-const
 import { AddProcedureComponent } from "./add-procedure/add-procedure.component";
 import { AddProcedureFormComponent } from "./add-procedure-form/add-procedure-form.component";
 import { IcareHelpComponent } from "./icare-help/icare-help.component";
+import { PatientPersonAttributesComponent } from "./patient-person-attributes/patient-person-attributes.component";
 
 export const components: any[] = [
   PatientSearchComponent,
@@ -118,6 +119,7 @@ export const components: any[] = [
   AddProcedureComponent,
   AddProcedureFormComponent,
   IcareHelpComponent,
+  PatientPersonAttributesComponent,
 ];
 
 export const sharedEntryComponents: any[] = [
