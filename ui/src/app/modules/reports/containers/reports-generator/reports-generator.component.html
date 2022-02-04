@@ -224,7 +224,11 @@
               <div
                 class="ml-3 d-flex justify-content-right"
                 style="font-size: 1rem"
-                *ngIf="currentReport && currentReport?.parameters"
+                *ngIf="
+                  currentReport &&
+                  currentReport?.parameters &&
+                  reportSelectionParams
+                "
               >
                 <div
                   class="ml-2"
