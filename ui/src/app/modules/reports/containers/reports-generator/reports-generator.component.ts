@@ -93,7 +93,7 @@ export class ReportsGeneratorComponent implements OnInit {
           this.reportsAccessConfigurations.filter(
             (acessConfig) => acessConfig?.id === category?.id
           ) || [];
-        return {
+        const formattedReportCategory = {
           ...category,
           currentUserCanAccess:
             (
@@ -103,6 +103,7 @@ export class ReportsGeneratorComponent implements OnInit {
               ) || []
             )?.length > 0,
         };
+        return formattedReportCategory;
       })
       .filter((reportCategory) => reportCategory?.currentUserCanAccess);
 
@@ -168,6 +169,8 @@ export class ReportsGeneratorComponent implements OnInit {
   setReportCategory(reportCategory) {
     this.selectedReportGroup = reportCategory;
     this.selectedReportParameters = null;
+    this.reportSelectionParams = null;
+    this.showReportArea = false;
     this.reportFromSelectedGroup = _.map(
       _.filter(this.reports, (report) => {
         return report?.name
