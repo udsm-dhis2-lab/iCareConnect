@@ -91,7 +91,6 @@ export const getActiveVisitPendingVisitServiceBillStatus = createSelector(
               return formattedBill;
             }
           }) || [];
-      console.log("billedServiceDetails", billedServiceDetails);
       return billedServiceDetails.length > 0;
     } else if (activeVisit && bills && bills?.length === 0) {
       return false;

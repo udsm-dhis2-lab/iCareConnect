@@ -166,11 +166,21 @@
           label="Procedures"
         >
           <mat-progress-bar
-            *ngIf="!params?.provider || !params?.location || !params?.visit"
+            *ngIf="
+              !params?.provider ||
+              !params?.location ||
+              !params?.visit ||
+              !params?.currentBills
+            "
             mode="indeterminate"
           >
           </mat-progress-bar>
-          <div class="p-2" *ngIf="params?.visit && selectedTab.value === 0">
+          <div
+            class="p-2"
+            *ngIf="
+              params?.visit && selectedTab.value === 0 && params?.currentBills
+            "
+          >
             <!-- {{ params?.visit | json }} -->
             <app-attend-ordered-items
               [orderedItems]="params?.visit?.procedureOrders"

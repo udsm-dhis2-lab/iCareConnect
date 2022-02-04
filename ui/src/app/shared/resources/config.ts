@@ -241,7 +241,7 @@ export const ICARE_CONFIG = {
   "iCare.GeneralMetadata.Configurations":
     '{"commonLabTest":{"id":"26172ff2-c058-44a9-8b09-980b24f6e973","uuid":"26172ff2-c058-44a9-8b09-980b24f6e973","name":"Common Lab Tests"},"phoneAttribute":{"uuid":"aeb3a16c-f5b6-4848-aa51-d7e3146886d6","name":"phone"},"facilityPhoneNumber":"0766460759","paymentTypes":[{"uuid":"00000100IIIIIIIIIIIIIIIIIIIIIIIIIIII","display":"Cash","code":"CASH","direct":true,"shouldDisplay":true},{"uuid":"00000100IIIIIIIIIIIIIIIIIIIIIIIIIIII","display":"GePG","code":"GePG","shouldDisplay":false}]}',
   "icare.nursing.configurations":
-    '{"departmentsReference":{"id":"a85c274d-3aa9-4071-b7ac-6f75b7833bf4","name":"Procedures","display":"Procedures"}}',
+    '{"departmentsReference":{"id":"a85c274d-3aa9-4071-b7ac-6f75b7833bf4","name":"Procedures","display":"Procedures"},"encounterType":{"uuid":"a85c274d-3aa9-4071-b7ac-6f75b7833bf4","id":"a85c274d-3aa9-4071-b7ac-6f75b7833bf4","name":"Procedure orders"},"orderTypes":{"procedureOrder":"4ae7f8eb-0bd5-11e8-b450-525400e4297f"},"encounterRole":{"uuid":"240b26f9-dd88-4172-823d-4a8bfeb7841f"}}',
   "icare.clinic.configurations":
     '{"provisionalDiagnosis":{"shouldAffectImmediateSections":true,"immdicateSectionsAffected":[{"laboratory":"true"},{"procedures":"true"},{"radiologyService":"true"},{"confirmedDiagnosis":"true"},{"medication":"true"}]},"laboratory":{"shouldAffectImmediateSections":true,"immdicateSectionsAffected":[{"confirmedDiagnosis":"true"},{"medication":"true"}]}}',
 };

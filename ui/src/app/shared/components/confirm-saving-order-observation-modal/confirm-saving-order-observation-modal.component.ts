@@ -1,11 +1,11 @@
-import { Component, Inject, OnInit } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { OpenmrsHttpClientService } from '../../modules/openmrs-http-client/services/openmrs-http-client.service';
+import { Component, Inject, OnInit } from "@angular/core";
+import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
+import { OpenmrsHttpClientService } from "../../modules/openmrs-http-client/services/openmrs-http-client.service";
 
 @Component({
-  selector: 'app-confirm-saving-order-observation-modal',
-  templateUrl: './confirm-saving-order-observation-modal.component.html',
-  styleUrls: ['./confirm-saving-order-observation-modal.component.scss'],
+  selector: "app-confirm-saving-order-observation-modal",
+  templateUrl: "./confirm-saving-order-observation-modal.component.html",
+  styleUrls: ["./confirm-saving-order-observation-modal.component.scss"],
 })
 export class ConfirmSavingOrderObservationModalComponent implements OnInit {
   dialogData: any;
@@ -25,14 +25,13 @@ export class ConfirmSavingOrderObservationModalComponent implements OnInit {
         encounter?.orders?.length > 0 &&
         (
           encounter.orders.filter(
-            (order) =>
-              order?.orderNumber === this.dialogData?.orderNumber
+            (order) => order?.orderNumber === this.dialogData?.orderNumber
           ) || []
         )?.length > 0
     ) || [])[0];
   }
 
-  onConfirm(event: Event, data): void {
+  onConfirm(event: Event, data: any): void {
     event.stopPropagation();
     this.savingData = true;
     const encounterData = {
@@ -42,6 +41,7 @@ export class ConfirmSavingOrderObservationModalComponent implements OnInit {
           concept: data?.concept?.uuid,
           value: data?.value,
           comment: data?.comments,
+          order: data?.uuid,
         },
       ],
     };
