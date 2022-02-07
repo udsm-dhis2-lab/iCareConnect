@@ -1,36 +1,36 @@
-import { ThrowStmt } from '@angular/compiler';
-import { Component, OnInit } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
-import { select, Store } from '@ngrx/store';
-import { Observable } from 'rxjs';
-import { RequisitionInput } from 'src/app/shared/resources/store/models/requisition-input.model';
-import { RequisitionObject } from 'src/app/shared/resources/store/models/requisition.model';
+import { ThrowStmt } from "@angular/compiler";
+import { Component, OnInit } from "@angular/core";
+import { MatDialog } from "@angular/material/dialog";
+import { select, Store } from "@ngrx/store";
+import { Observable } from "rxjs";
+import { RequisitionInput } from "src/app/shared/resources/store/models/requisition-input.model";
+import { RequisitionObject } from "src/app/shared/resources/store/models/requisition.model";
 import {
   cancelRequisition,
   createRequest,
   loadRequisitions,
   receiveRequisition,
   rejectRequisition,
-} from 'src/app/store/actions/requisition.actions';
-import { AppState } from 'src/app/store/reducers';
+} from "src/app/store/actions/requisition.actions";
+import { AppState } from "src/app/store/reducers";
 import {
   getCurrentLocation,
   getLocations,
   getStoreLocations,
-} from 'src/app/store/selectors';
-import { getAllStockableItems } from 'src/app/store/selectors/pricing-item.selectors';
+} from "src/app/store/selectors";
+import { getAllStockableItems } from "src/app/store/selectors/pricing-item.selectors";
 import {
   getActiveRequisitions,
   getAllRequisitions,
   getRequisitionLoadingState,
-} from 'src/app/store/selectors/requisition.selectors';
-import { RequestCancelComponent } from '../../modals/request-cancel/request-cancel.component';
-import { RequisitionFormComponent } from '../../modals/requisition-form/requisition-form.component';
+} from "src/app/store/selectors/requisition.selectors";
+import { RequestCancelComponent } from "../../modals/request-cancel/request-cancel.component";
+import { RequisitionFormComponent } from "../../modals/requisition-form/requisition-form.component";
 
 @Component({
-  selector: 'app-requisition',
-  templateUrl: './requisition.component.html',
-  styleUrls: ['./requisition.component.scss'],
+  selector: "app-requisition",
+  templateUrl: "./requisition.component.html",
+  styleUrls: ["./requisition.component.scss"],
 })
 export class RequisitionComponent implements OnInit {
   requisitions$: Observable<RequisitionObject[]>;
@@ -38,7 +38,9 @@ export class RequisitionComponent implements OnInit {
   stores$: Observable<any>;
   stockableItems$: Observable<any>;
   currentStore$: Observable<any>;
-  constructor(private store: Store<AppState>, private dialog: MatDialog) {}
+  constructor(private store: Store<AppState>, private dialog: MatDialog) {
+    this.store.dispatch(loadRequisitions());
+  }
 
   ngOnInit() {
     this.requisitions$ = this.store.pipe(select(getActiveRequisitions));
@@ -56,8 +58,8 @@ export class RequisitionComponent implements OnInit {
     if (params) {
       const { currentStore, stockableItems, stores } = params;
       const dialog = this.dialog.open(RequisitionFormComponent, {
-        width: '30%',
-        panelClass: 'custom-dialog-container',
+        width: "30%",
+        panelClass: "custom-dialog-container",
         data: {
           currentStore,
           items: stockableItems,
@@ -81,9 +83,9 @@ export class RequisitionComponent implements OnInit {
     e.stopPropagation();
 
     const dialogToConfirmRejection = this.dialog.open(RequestCancelComponent, {
-      width: '25%',
-      panelClass: 'custom-dialog-container',
-      data: 'request',
+      width: "25%",
+      panelClass: "custom-dialog-container",
+      data: "request",
     });
 
     dialogToConfirmRejection.afterClosed().subscribe((result) => {
@@ -107,7 +109,7 @@ export class RequisitionComponent implements OnInit {
     if (requisition) {
       const { id, issueUuid } = requisition;
       // TODO Add support to capture rejection reasons
-      const rejectionReason = '';
+      const rejectionReason = "";
       this.store.dispatch(
         rejectRequisition({ id, issueUuid, rejectionReason })
       );
