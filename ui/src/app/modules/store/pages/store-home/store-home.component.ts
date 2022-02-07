@@ -1,25 +1,25 @@
-import { Component, OnInit } from '@angular/core';
-import { select, Store } from '@ngrx/store';
-import { Observable } from 'rxjs';
-import { clearStockMetrics, loadStockMetrics } from 'src/app/store/actions';
-import { loadIssuings } from 'src/app/store/actions/issuing.actions';
-import { loadLedgerTypes } from 'src/app/store/actions/ledger-type.actions';
-import { loadRequisitions } from 'src/app/store/actions/requisition.actions';
+import { Component, OnInit } from "@angular/core";
+import { select, Store } from "@ngrx/store";
+import { Observable } from "rxjs";
+import { clearStockMetrics, go, loadStockMetrics } from "src/app/store/actions";
+import { loadIssuings } from "src/app/store/actions/issuing.actions";
+import { loadLedgerTypes } from "src/app/store/actions/ledger-type.actions";
+import { loadRequisitions } from "src/app/store/actions/requisition.actions";
 import {
   clearStockData,
   loadStocks,
-} from 'src/app/store/actions/stock.actions';
-import { AppState } from 'src/app/store/reducers';
+} from "src/app/store/actions/stock.actions";
+import { AppState } from "src/app/store/reducers";
 import {
   getCurrentLocation,
   getMetrics,
   getSettingCurrentLocationStatus,
-} from 'src/app/store/selectors';
+} from "src/app/store/selectors";
 
 @Component({
-  selector: 'app-store-home',
-  templateUrl: './store-home.component.html',
-  styleUrls: ['./store-home.component.scss'],
+  selector: "app-store-home",
+  templateUrl: "./store-home.component.html",
+  styleUrls: ["./store-home.component.scss"],
 })
 export class StoreHomeComponent implements OnInit {
   storePages: any[];
@@ -42,24 +42,24 @@ export class StoreHomeComponent implements OnInit {
     this.currentStore$ = this.store.pipe(select(getCurrentLocation));
     this.storePages = [
       {
-        id: 'stock',
-        name: 'Stock',
-        url: 'stock',
+        id: "stock",
+        name: "Stock",
+        url: "stock",
       },
       {
-        id: 'requisition',
-        name: 'Requests',
-        url: 'requisition',
+        id: "requisition",
+        name: "Requests",
+        url: "requisition",
       },
       {
-        id: 'received',
-        name: 'Received',
-        url: 'receipt',
+        id: "received",
+        name: "Received",
+        url: "receipt",
       },
       {
-        id: 'issuing',
-        name: 'Issuing',
-        url: 'issuing',
+        id: "issuing",
+        name: "Issuing",
+        url: "issuing",
       },
       // {
       //   id: 'translation',
@@ -69,5 +69,10 @@ export class StoreHomeComponent implements OnInit {
     ];
 
     this.stockMetrics$ = this.store.select(getMetrics);
+  }
+
+  onChangeRoute(event: Event, url: string): void {
+    event.stopPropagation();
+    this.store.dispatch(go({ path: ["/store/" + url] }));
   }
 }

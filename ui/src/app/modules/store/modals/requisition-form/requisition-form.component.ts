@@ -49,8 +49,6 @@ export class RequisitionFormComponent implements OnInit {
         type: "number",
       }),
     ];
-
-    console.log(this.requisitionFields);
   }
 
   onCancel(e: Event): void {
