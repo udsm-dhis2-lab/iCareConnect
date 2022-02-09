@@ -1,24 +1,25 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Component, OnInit } from "@angular/core";
+import { ActivatedRoute } from "@angular/router";
 
-import { Observable, of, zip } from 'rxjs';
-import { catchError, map, tap } from 'rxjs/operators';
-import { Patient } from 'src/app/shared/resources/patient/models/patient.model';
-import { PatientService } from 'src/app/shared/resources/patient/services/patients.service';
-import { Visit } from 'src/app/shared/resources/visits/models/visit.model';
-import { VisitsService } from 'src/app/shared/resources/visits/services';
-import { BillObject } from '../../models/bill-object.model';
-import { BillPayment } from '../../models/bill-payment.model';
-import { Bill } from '../../models/bill.model';
-import { PaymentInput } from '../../models/payment-input.model';
-import { Payment } from '../../models/payment.model';
-import { BillingService } from '../../services/billing.service';
-import { PaymentService } from '../../services/payment.service';
+import { Observable, of, zip } from "rxjs";
+import { catchError, map, tap } from "rxjs/operators";
+import { Patient } from "src/app/shared/resources/patient/models/patient.model";
+import { PatientService } from "src/app/shared/resources/patient/services/patients.service";
+import { Visit } from "src/app/shared/resources/visits/models/visit.model";
+import { VisitsService } from "src/app/shared/resources/visits/services";
+import { ConfigsService } from "src/app/shared/services/configs.service";
+import { BillObject } from "../../models/bill-object.model";
+import { BillPayment } from "../../models/bill-payment.model";
+import { Bill } from "../../models/bill.model";
+import { PaymentInput } from "../../models/payment-input.model";
+import { Payment } from "../../models/payment.model";
+import { BillingService } from "../../services/billing.service";
+import { PaymentService } from "../../services/payment.service";
 
 @Component({
-  selector: 'app-current-patient-billing',
-  templateUrl: './current-patient-billing.component.html',
-  styleUrls: ['./current-patient-billing.component.scss'],
+  selector: "app-current-patient-billing",
+  templateUrl: "./current-patient-billing.component.html",
+  styleUrls: ["./current-patient-billing.component.scss"],
 })
 export class CurrentPatientBillingComponent implements OnInit {
   loading: boolean;
@@ -26,6 +27,8 @@ export class CurrentPatientBillingComponent implements OnInit {
   patientVisit$: Observable<Visit>;
   currentLocation$: Observable<any>;
   patientId: string;
+  facilityDetails$: Observable<any>;
+  facilityLogo$: Observable<any>;
   patientBillingDetails$: Observable<{
     visit: Visit;
     bills: Bill[];
@@ -39,7 +42,8 @@ export class CurrentPatientBillingComponent implements OnInit {
     private visitService: VisitsService,
     private billingService: BillingService,
     private paymentService: PaymentService,
-    private patientService: PatientService
+    private patientService: PatientService,
+    private configService: ConfigsService
   ) {}
 
   ngOnInit() {
@@ -47,6 +51,9 @@ export class CurrentPatientBillingComponent implements OnInit {
     this._getPatientDetails();
 
     this.currentPatient$ = this.patientService.getPatient(this.patientId);
+
+    this.facilityDetails$ = this.configService.getFacilityDetails();
+    this.facilityLogo$ = this.configService.getLogo();
   }
 
   private _getPatientDetails() {

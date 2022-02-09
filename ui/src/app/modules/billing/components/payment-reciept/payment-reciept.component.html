@@ -1,19 +1,35 @@
-<div style="width: 100%" id="dialog-bill-receipt">
+<div style="width: 100%">
   <mat-toolbar color="primary">Bill Payment Receipt</mat-toolbar>
   <div class="p-3">
-    <div>
+    <div id="dialog-bill-receipt">
+      <div style="text-align: center" *ngIf="facilityLogoBase64">
+        <img src="{{ facilityLogoBase64 }}" width="60" />
+      </div>
       <table class="table">
         <tr>
-          <td>#</td>
-          <td>item</td>
-          <td>discount</td>
-          <td>paid amount</td>
+          <td colspan="3" style="text-align: center">
+            <h3>{{ facilityDetailsJson?.name }}</h3>
+            <h5>{{ facilityDetailsJson?.address }}</h5>
+            <h5>{{ facilityDetailsJson?.phone }}</h5>
+          </td>
+        </tr>
+        <tr>
+          <!-- <td>#</td> -->
+          <td colspan="2">Item(s)</td>
+          <!-- <td>discount</td> -->
+          <td>Amount</td>
         </tr>
         <tr *ngFor="let item of data?.billItems; let itemIndex = index">
-          <td>{{ itemIndex + 1 }}</td>
-          <td>{{ item?.billItem?.item?.concept?.name }}</td>
-          <td>{{ item?.billItem?.discount }}</td>
+          <!-- <td>{{ itemIndex + 1 }}</td> -->
+          <td colspan="2">{{ item?.billItem?.item?.concept?.name }}</td>
+          <!-- <td>{{ item?.billItem?.discount }}</td> -->
           <td>{{ item?.billItem.price }}</td>
+        </tr>
+        <tr style="background-color: black; color: white">
+          <td colspan="2"><b>Total Amount</b></td>
+          <td>
+            <b> {{ totalBill }} </b>
+          </td>
         </tr>
       </table>
     </div>
