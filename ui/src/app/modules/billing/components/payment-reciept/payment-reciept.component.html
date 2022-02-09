@@ -2,10 +2,21 @@
   <mat-toolbar color="primary">Bill Payment Receipt</mat-toolbar>
   <div class="p-3">
     <div id="dialog-bill-receipt">
-      <div style="text-align: center" *ngIf="facilityLogoBase64">
+      <div
+        style="text-align: center; margin-left: 0px !important"
+        *ngIf="facilityLogoBase64"
+      >
         <img src="{{ facilityLogoBase64 }}" width="60" />
       </div>
-      <table class="table">
+      <table
+        class="table"
+        style="
+          margin-left: 0px !important;
+          width: 100% !important;
+          font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial,
+            sans-serif !important;
+        "
+      >
         <tr>
           <td colspan="3" style="text-align: center">
             <h3>{{ facilityDetailsJson?.name }}</h3>
@@ -13,13 +24,31 @@
             <h5>{{ facilityDetailsJson?.phone }}</h5>
           </td>
         </tr>
-        <tr>
-          <!-- <td>#</td> -->
-          <td colspan="2">Item(s)</td>
-          <!-- <td>discount</td> -->
-          <td>Amount</td>
+        <tr style="text-align: left; font-size: 0.7em">
+          <td>Patient</td>
+          <td colspan="2" style="color: black">
+            <b>{{ data?.currentPatient?.name }}</b>
+          </td>
         </tr>
-        <tr *ngFor="let item of data?.billItems; let itemIndex = index">
+        <tr style="text-align: left; font-size: 0.7em">
+          <td>MRN</td>
+          <td colspan="2" style="color: black">
+            <b>
+              {{
+                data?.currentPatient?.MRN ||
+                  data?.currentPatient?.patient?.identifiers[0]?.identifier
+              }}
+            </b>
+          </td>
+        </tr>
+
+        <tr style="font-size: 0.7em">
+          <!-- <td>#</td> -->
+          <td colspan="2"><b>Item(s)</b></td>
+          <!-- <td>discount</td> -->
+          <td><b>Amount</b></td>
+        </tr>
+        <tr *ngFor="let item of data?.billItems; let itemIndex = index" style="font-size: 0.7em">
           <!-- <td>{{ itemIndex + 1 }}</td> -->
           <td colspan="2">{{ item?.billItem?.item?.concept?.name }}</td>
           <!-- <td>{{ item?.billItem?.discount }}</td> -->
