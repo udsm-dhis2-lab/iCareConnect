@@ -1,19 +1,19 @@
-import { SelectionModel } from '@angular/cdk/collections';
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
-import { MatTableDataSource } from '@angular/material/table';
-import { PaymentTypeInterface } from 'src/app/shared/models/payment-type.model';
-import { BillItem } from '../../models/bill-item.model';
-import { BillObject } from '../../models/bill-object.model';
-import { Bill } from '../../models/bill.model';
-import { PaymentInput } from '../../models/payment-input.model';
-import { BillConfirmationComponent } from '../bill-confirmation/bill-confirmation.component';
-import { PaymentReceiptComponent } from '../payment-reciept/payment-reciept.component';
+import { SelectionModel } from "@angular/cdk/collections";
+import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import { MatDialog } from "@angular/material/dialog";
+import { MatTableDataSource } from "@angular/material/table";
+import { PaymentTypeInterface } from "src/app/shared/models/payment-type.model";
+import { BillItem } from "../../models/bill-item.model";
+import { BillObject } from "../../models/bill-object.model";
+import { Bill } from "../../models/bill.model";
+import { PaymentInput } from "../../models/payment-input.model";
+import { BillConfirmationComponent } from "../bill-confirmation/bill-confirmation.component";
+import { PaymentReceiptComponent } from "../payment-reciept/payment-reciept.component";
 
 @Component({
-  selector: 'app-quotation-item',
-  templateUrl: './quotation-item.component.html',
-  styleUrls: ['./quotation-item.component.scss'],
+  selector: "app-quotation-item",
+  templateUrl: "./quotation-item.component.html",
+  styleUrls: ["./quotation-item.component.scss"],
 })
 export class QuotationItemComponent implements OnInit {
   @Input() bill: Bill;
@@ -22,6 +22,9 @@ export class QuotationItemComponent implements OnInit {
   @Input() paymentTypes: any[];
   @Input() currentUser: any;
   @Input() expanded: boolean;
+  @Input() currentPatient: any;
+  @Input() facilityDetails: any;
+  @Input() logo: any;
 
   dataSource: MatTableDataSource<any>;
   selection = new SelectionModel<any>(true, []);
@@ -76,29 +79,29 @@ export class QuotationItemComponent implements OnInit {
     this.dataSource = new MatTableDataSource(this.billItems);
 
     this.columns = [
-      { id: 'index', label: '#', isIndexColumn: true },
-      { id: 'name', label: 'Description', width: '50%' },
-      { id: 'quantity', label: 'Quantity' },
-      { id: 'price', label: 'Unit Price', isCurrency: true },
-      { id: 'discount', label: 'Discount', isCurrency: true },
-      { id: 'amount', label: 'Amount', isCurrency: true },
+      { id: "index", label: "#", isIndexColumn: true },
+      { id: "name", label: "Description", width: "50%" },
+      { id: "quantity", label: "Quantity" },
+      { id: "price", label: "Unit Price", isCurrency: true },
+      { id: "discount", label: "Discount", isCurrency: true },
+      { id: "amount", label: "Amount", isCurrency: true },
     ];
     this.displayedColumns = [
       ...this.columns.map((column) => column.id),
-      'select',
+      "select",
     ];
     // TODO: Remove hardcoding for payment type
     this.paymentTypes = [
       {
-        uuid: '00000100IIIIIIIIIIIIIIIIIIIIIIIIIIII',
-        display: 'Cash',
-        code: 'CASH',
+        uuid: "00000100IIIIIIIIIIIIIIIIIIIIIIIIIIII",
+        display: "Cash",
+        code: "CASH",
         direct: true,
       },
       {
-        uuid: '00000100IIIIIIIIIIIIIIIIIIIIIIIIIIII',
-        display: 'GePG',
-        code: 'GePG',
+        uuid: "00000100IIIIIIIIIIIIIIIIIIIIIIIIIIII",
+        display: "GePG",
+        code: "GePG",
       },
     ];
 
@@ -125,7 +128,7 @@ export class QuotationItemComponent implements OnInit {
     // const paymentType: any = this.selectedPaymentType;
     e.stopPropagation();
     const dialog = this.dialog.open(BillConfirmationComponent, {
-      width: '600px',
+      width: "600px",
       disableClose: true,
       data: {
         billItems: this.selection?.selected,
@@ -134,6 +137,7 @@ export class QuotationItemComponent implements OnInit {
         totalPayableBill: this.totalPayableBill,
         paymentType: this.selectedPaymentType,
         currentUser: this.currentUser,
+        currentPatient: this.currentPatient,
       },
     });
 
@@ -141,7 +145,7 @@ export class QuotationItemComponent implements OnInit {
       this.paymentSuccess.emit();
       if (paymentResponse) {
         this.dialog.open(PaymentReceiptComponent, {
-          width: '500px',
+          width: "500px",
           data: {
             ...paymentResponse,
             billItems: this.selection?.selected,
@@ -150,6 +154,9 @@ export class QuotationItemComponent implements OnInit {
             totalPayableBill: this.totalPayableBill,
             paymentType: this.selectedPaymentType,
             currentUser: this.currentUser,
+            currentPatient: this.currentPatient,
+            logo: this.logo,
+            facilityDetails: this.facilityDetails,
           },
         });
       }

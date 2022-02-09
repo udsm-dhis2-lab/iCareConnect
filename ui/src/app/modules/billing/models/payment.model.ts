@@ -28,6 +28,7 @@ export class Payment {
       ? 'PENDING'
       : 'PAID';
   }
+  
 
   get items(): any[] {
     return (this.paymentDetails?.items || []).map(
