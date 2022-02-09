@@ -320,8 +320,8 @@ public class ICareDao extends BaseDAO<Item> {
 		query.setMaxResults(limit);
 		return query.list();
 	}
-
-    public long countDailyPatients() {
+	
+	public long countDailyPatients() {
 		DbSession session = getSession();
 		String queryStr = "SELECT COUNT(patient) FROM Patient patient WHERE YEAR(patient.personDateCreated) = :year AND MONTH(patient.personDateCreated) = :month AND DAY(patient.personDateCreated) = :day";
 		Query query = session.createQuery(queryStr);
@@ -330,7 +330,8 @@ public class ICareDao extends BaseDAO<Item> {
 		query.setParameter("day", calendar.get(Calendar.DATE));
 		query.setParameter("month", calendar.get(Calendar.MONTH) + 1);
 		return (long) query.list().get(0);
-    }
+	}
+	
 	public long countMonthlyPatients() {
 		DbSession session = getSession();
 		String queryStr = "SELECT COUNT(patient) FROM Patient patient WHERE YEAR(patient.personDateCreated) = :year AND MONTH(patient.personDateCreated) = :month";
@@ -340,6 +341,7 @@ public class ICareDao extends BaseDAO<Item> {
 		query.setParameter("month", calendar.get(Calendar.MONTH) + 1);
 		return (long) query.list().get(0);
 	}
+	
 	public long countYearlyPatients() {
 		DbSession session = getSession();
 		String queryStr = "SELECT COUNT(patient) FROM Patient patient WHERE YEAR(patient.personDateCreated) = :year";

@@ -49,6 +49,7 @@
     "moment": "^2.29.1",
     "ngrx-store-freeze": "^0.2.4",
     "ngx-barcode": "^0.3.0",
+    "ngx-print": "^1.2.1",
     "num-words": "^1.2.2",
     "quick-pivot": "^2.7.0",
     "rxjs": "~6.6.0",
