@@ -42,7 +42,7 @@ export class PaymentsComponent implements OnInit {
       this.totalBill = this.totalBill + payment?.amount;
     });
 
-    // console.log("payments : ",this.payments)
+    console.log("payments : ",this.payments)
     // console.log(this.currentPatient);
 
     this.dataSource = new MatTableDataSource(this.paymentItems);
