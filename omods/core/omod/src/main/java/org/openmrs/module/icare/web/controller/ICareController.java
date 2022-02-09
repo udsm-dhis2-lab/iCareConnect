@@ -52,7 +52,7 @@ public class ICareController {
 	
 	/** Logger for this class and subclasses */
 	protected final Log log = LogFactory.getLog(getClass());
-
+	
 	@RequestMapping(value = "idgen", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> onGenerateId() {
@@ -61,6 +61,7 @@ public class ICareController {
 		results.put("identifiers",ids);
 		return results;
 	}
+	
 	/**
 	 * Initially called after the getUsers method to get the landing form name
 	 * 
