@@ -345,7 +345,7 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 				ObsService observationService = Context.getObsService();
 				
 				Encounter encounter = testAllocation.getSampleOrder().getOrder().getEncounter();
-
+				
 				Order order = testAllocation.getSampleOrder().getOrder();
 				
 				Concept concept = Context.getConceptService().getConceptByUuid(allocationResults.getConcept().getUuid());
