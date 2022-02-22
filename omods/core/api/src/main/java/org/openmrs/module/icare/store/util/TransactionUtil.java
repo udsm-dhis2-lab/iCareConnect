@@ -12,38 +12,38 @@ import java.util.List;
 import java.util.Map;
 
 public class TransactionUtil {
-
-    public static void addStock(Stockable stockable) {
-        Transaction transaction = new Transaction();
-        transaction.setItem(stockable.getItem());
-        transaction.setLocation(stockable.getLocation());
-        transaction.setBatchNo(stockable.getBatchNo());
-        transaction.setExpireDate(stockable.getExpiryDate());
-
-        StoreService storeService = Context.getService(StoreService.class);
-        Stock stock = storeService.getStockByItemBatchLocation(stockable.getItem(), stockable.getBatchNo(),
-                stockable.getExpiryDate(), stockable.getLocation());
-
-        if (stock == null) {
-            transaction.setPreviousQuantity(0.0);
-            stock = new Stock();
-            stock.setQuantity(0.0);
-            stock.setBatch(stockable.getBatchNo());
-            stock.setExpiryDate(stockable.getExpiryDate());
-            stock.setItem(stockable.getItem());
-            stock.setLocation(stockable.getLocation());
-        } else {
-            transaction.setPreviousQuantity(stock.getQuantity());
-        }
-        Double newQuantity = stockable.getQuantity() + stock.getQuantity();
-        transaction.setCurrentQuantity(newQuantity);
-        stock.setQuantity(newQuantity);
-
-        storeService.saveStock(stock);
-        storeService.saveTransaction(transaction);
-    }
-
-    public static void deductStock(Stockable stockable) throws StockOutException {
+	
+	public static void addStock(Stockable stockable) {
+		Transaction transaction = new Transaction();
+		transaction.setItem(stockable.getItem());
+		transaction.setLocation(stockable.getLocation());
+		transaction.setBatchNo(stockable.getBatchNo());
+		transaction.setExpireDate(stockable.getExpiryDate());
+		
+		StoreService storeService = Context.getService(StoreService.class);
+		Stock stock = storeService.getStockByItemBatchLocation(stockable.getItem(), stockable.getBatchNo(),
+		    stockable.getExpiryDate(), stockable.getLocation());
+		
+		if (stock == null) {
+			transaction.setPreviousQuantity(0.0);
+			stock = new Stock();
+			stock.setQuantity(0.0);
+			stock.setBatch(stockable.getBatchNo());
+			stock.setExpiryDate(stockable.getExpiryDate());
+			stock.setItem(stockable.getItem());
+			stock.setLocation(stockable.getLocation());
+		} else {
+			transaction.setPreviousQuantity(stock.getQuantity());
+		}
+		Double newQuantity = stockable.getQuantity() + stock.getQuantity();
+		transaction.setCurrentQuantity(newQuantity);
+		stock.setQuantity(newQuantity);
+		
+		storeService.saveStock(stock);
+		storeService.saveTransaction(transaction);
+	}
+	
+	public static void deductStock(Stockable stockable) throws StockOutException {
 
         Transaction transaction = new Transaction();
         transaction.setItem(stockable.getItem());
@@ -185,12 +185,12 @@ public class TransactionUtil {
 //        storeService.saveStock(stock);
 //        storeService.saveTransaction(transaction);
     }
-
-    public static void operateOnStock(String operation, Stockable stockable) throws StockOutException {
-        if (operation.equals("+")) {
-            TransactionUtil.addStock(stockable);
-        } else if (operation.equals("-")) {
-            TransactionUtil.deductStock(stockable);
-        }
-    }
+	
+	public static void operateOnStock(String operation, Stockable stockable) throws StockOutException {
+		if (operation.equals("+")) {
+			TransactionUtil.addStock(stockable);
+		} else if (operation.equals("-")) {
+			TransactionUtil.deductStock(stockable);
+		}
+	}
 }
