@@ -21,6 +21,10 @@
     >
       <a
         mat-list-item
+        [ngClass]="{
+          'selected-department':
+            department?.uuid === currentMenuDepartment?.uuid
+        }"
         (click)="navigateToThis($event, page?.id, department)"
         *ngFor="let department of params?.currentMenuDepartments"
       >

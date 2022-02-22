@@ -14,6 +14,7 @@ import { ItemPriceService } from "../../services/item-price.service";
 export class MaintenanceSideMenuComponent implements OnInit {
   @Input() pages: any[];
   @Input() currentMenuDepartments: any[];
+  currentMenuDepartment: any;
   currentMenu: any;
   @ViewChild("sidenav") sidenav: MatSidenav;
   isExpanded = true;
@@ -28,6 +29,7 @@ export class MaintenanceSideMenuComponent implements OnInit {
 
   ngOnInit(): void {
     this.currentMenu = this.pages[0];
+    this.currentMenuDepartment = this.currentMenuDepartments[0];
     this.currentMenuDepartments$ = of(this.currentMenuDepartments);
     console.log("currentMenuDepartments", this.currentMenuDepartments);
     this.store.dispatch(
@@ -72,6 +74,7 @@ export class MaintenanceSideMenuComponent implements OnInit {
   }
 
   navigateToThis(event: Event, id: string, department: any): void {
+    this.currentMenuDepartment = department;
     event.stopPropagation();
     // console.log(department);
     // console.log(id);
