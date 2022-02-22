@@ -1,46 +1,47 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
-import { MatSelectChange } from '@angular/material/select';
-import { select, Store } from '@ngrx/store';
-import { find } from 'lodash';
-import { Observable } from 'rxjs';
-import { PaymentScheme } from 'src/app/shared/models/payment-scheme.model';
-import { PaymentTypeInterface } from 'src/app/shared/models/payment-type.model';
-import { Field } from 'src/app/shared/modules/form/models/field.model';
-import { FormValue } from 'src/app/shared/modules/form/models/form-value.model';
-import { setCurrentPaymentType } from 'src/app/store/actions/payment-type.actions';
-import { AppState } from 'src/app/store/reducers';
+import { Component, Input, OnInit } from "@angular/core";
+import { MatDialog } from "@angular/material/dialog";
+import { MatSelectChange } from "@angular/material/select";
+import { select, Store } from "@ngrx/store";
+import { find } from "lodash";
+import { Observable } from "rxjs";
+import { PaymentScheme } from "src/app/shared/models/payment-scheme.model";
+import { PaymentTypeInterface } from "src/app/shared/models/payment-type.model";
+import { Field } from "src/app/shared/modules/form/models/field.model";
+import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
+import { setCurrentPaymentType } from "src/app/store/actions/payment-type.actions";
+import { AppState } from "src/app/store/reducers";
 import {
   clearPricingItems,
   initiatePricingItems,
   loadPricingItems,
   saveItemPrice,
   upsertPricingItem,
-} from '../../../../store/actions/pricing-item.actions';
-import { getItemPriceEntities } from '../../../../store/selectors/item-price.selectors';
+} from "../../../../store/actions/pricing-item.actions";
+import { getItemPriceEntities } from "../../../../store/selectors/item-price.selectors";
 import {
   getAllPaymentTypes,
   getCurrentPaymentType,
   getPaymentSchemes,
   getPaymentTypeLoadingState,
-} from '../../../../store/selectors/payment-type.selectors';
+} from "../../../../store/selectors/payment-type.selectors";
 import {
   getAllPricingItems,
   getPricingItemLoadingState,
-} from '../../../../store/selectors/pricing-item.selectors';
-import { ManageItemPriceComponent } from '../../modals';
-import { ItemPriceInterface } from '../../models/item-price.model';
-import { PricingItemInterface } from '../../models/pricing-item.model';
-import { PricingService } from '../../services';
-import { ItemPriceService } from '../../services/item-price.service';
+} from "../../../../store/selectors/pricing-item.selectors";
+import { ManageItemPriceComponent } from "../../modals";
+import { ItemPriceInterface } from "../../models/item-price.model";
+import { PricingItemInterface } from "../../models/pricing-item.model";
+import { PricingService } from "../../services";
+import { ItemPriceService } from "../../services/item-price.service";
 
 @Component({
-  selector: 'app-price-list',
-  templateUrl: './price-list.component.html',
-  styleUrls: ['./price-list.component.scss'],
+  selector: "app-price-list",
+  templateUrl: "./price-list.component.html",
+  styleUrls: ["./price-list.component.scss"],
 })
 export class PriceListComponent implements OnInit {
   @Input() paymentTypes: PaymentTypeInterface[];
+  @Input() departmentId: string;
   priceList: any[];
   priceList$: Observable<any[]>;
 
@@ -75,7 +76,12 @@ export class PriceListComponent implements OnInit {
   ngOnInit() {
     this.store.dispatch(
       initiatePricingItems({
-        filterInfo: { limit: 25, startIndex: 0, searchTerm: null },
+        filterInfo: {
+          limit: 25,
+          startIndex: 0,
+          searchTerm: null,
+          conceptSet: this.departmentId,
+        },
       })
     );
 
@@ -110,8 +116,8 @@ export class PriceListComponent implements OnInit {
   onCreate(e, pricingItems: PricingItemInterface[]): void {
     e.stopPropagation();
     const dialog = this.dialog.open(ManageItemPriceComponent, {
-      width: '50%',
-      panelClass: 'custom-dialog-container',
+      width: "50%",
+      panelClass: "custom-dialog-container",
       data: { pricingItems },
     });
 
@@ -121,11 +127,11 @@ export class PriceListComponent implements OnInit {
         const { priceItemInput, concept, drug } = results;
 
         const availableItem =
-          find(pricingItems, ['drug', drug?.uuid]) ||
-          find(pricingItems, ['concept', concept?.uuid]);
+          find(pricingItems, ["drug", drug?.uuid]) ||
+          find(pricingItems, ["concept", concept?.uuid]);
 
         if (false) {
-          console.warn('ITEM ALREADY EXIST');
+          console.warn("ITEM ALREADY EXIST");
         } else {
           this.addingPricingItem = true;
           // TODO: Find best way to avoid subscription and handle update of table with new item
@@ -191,10 +197,10 @@ export class PriceListComponent implements OnInit {
     }
   }
 
-  getAnotherList(event: Event, type): void {
+  getAnotherList(event: Event, type: string, departmentId?: string): void {
     event.stopPropagation();
     this.currentPage =
-      type === 'next' ? this.currentPage + 1 : this.currentPage - 1;
+      type === "next" ? this.currentPage + 1 : this.currentPage - 1;
     this.store.dispatch(clearPricingItems());
     this.store.dispatch(
       loadPricingItems({
@@ -202,17 +208,18 @@ export class PriceListComponent implements OnInit {
           limit: 25,
           startIndex: this.currentPage,
           searchTerm: this.itemSearchTerm,
+          conceptSet: departmentId,
         },
       })
     );
   }
 
-  onSearch(e: any) {
+  onSearch(e: any, departmentId: string) {
     e.stopPropagation();
     this.itemSearchTerm = e?.target?.value;
     if (
       (this.itemSearchTerm && this.itemSearchTerm.length >= 3) ||
-      this.itemSearchTerm === ''
+      this.itemSearchTerm === ""
     ) {
       this.store.dispatch(clearPricingItems());
       this.store.dispatch(
@@ -220,7 +227,8 @@ export class PriceListComponent implements OnInit {
           filterInfo: {
             limit: 25,
             startIndex: this.currentPage,
-            searchTerm: this.itemSearchTerm !== '' ? this.itemSearchTerm : null,
+            searchTerm: this.itemSearchTerm !== "" ? this.itemSearchTerm : null,
+            conceptSet: departmentId,
           },
         })
       );

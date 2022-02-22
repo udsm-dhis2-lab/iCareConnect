@@ -43,7 +43,12 @@
               <mat-label>{{
                 itemSearchTerm ? "Item" : "Search item"
               }}</mat-label>
-              <input  autocomplete="off" type="text" matInput (keyup)="onSearch($event)" />
+              <input
+                autocomplete="off"
+                type="text"
+                matInput
+                (keyup)="onSearch($event, departmentId)"
+              />
             </mat-form-field>
           </th>
           <th

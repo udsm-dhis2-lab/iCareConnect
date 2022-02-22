@@ -5,3 +5,18 @@
   border-radius: 0;
   background: #fff;
 }
+
+.example-container {
+  border: 1px solid rgba(0, 0, 0, 0.5);
+}
+.page-sidenav-content {
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+}
+.maintenance-sidenav {
+  user-select: none;
+}
+.full-width {
+  width: 100%;
+}

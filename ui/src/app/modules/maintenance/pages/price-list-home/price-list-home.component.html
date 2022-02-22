@@ -5,6 +5,7 @@
   ></mat-progress-bar>
   <app-price-list-container
     [paymentCategories]="params?.paymentCategories?.setMembers"
+    [departmentId]="departmentId"
     *ngIf="params?.paymentCategories"
   ></app-price-list-container>
 </div>
