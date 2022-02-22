@@ -43,17 +43,17 @@ import java.util.Map;
 @Controller
 @RequestMapping(value = "/rest/" + RestConstants.VERSION_1 + "/icare")
 public class ICareController {
-
-    @Autowired
-    ICareService iCareService;
-
-    @Autowired
-    BillingService billingService;
-
-    /** Logger for this class and subclasses */
-    protected final Log log = LogFactory.getLog(getClass());
-
-    @RequestMapping(value = "idgen", method = RequestMethod.POST)
+	
+	@Autowired
+	ICareService iCareService;
+	
+	@Autowired
+	BillingService billingService;
+	
+	/** Logger for this class and subclasses */
+	protected final Log log = LogFactory.getLog(getClass());
+	
+	@RequestMapping(value = "idgen", method = RequestMethod.POST)
     @ResponseBody
     public Map<String, Object> onGenerateId() {
         Map<String, Object> results = new HashMap<>();
@@ -61,13 +61,13 @@ public class ICareController {
         results.put("identifiers", ids);
         return results;
     }
-
-    /**
-     * Initially called after the getUsers method to get the landing form name
-     *
-     * @return String form view name
-     */
-    @RequestMapping(value = "item", method = RequestMethod.GET)
+	
+	/**
+	 * Initially called after the getUsers method to get the landing form name
+	 * 
+	 * @return String form view name
+	 */
+	@RequestMapping(value = "item", method = RequestMethod.GET)
     @ResponseBody
     public Map<String, Object> onGetItem(@RequestParam(required = false) String q, @RequestParam(defaultValue = "100") Integer limit, @RequestParam(defaultValue = "0") Integer startIndex, @RequestParam(required = false) String department) {
         List<Map<String, Object>> items = new ArrayList<Map<String, Object>>();
@@ -78,36 +78,36 @@ public class ICareController {
         results.put("results", items);
         return results;
     }
-
-    @RequestMapping(value = "item", method = RequestMethod.POST)
-    @ResponseBody
-    public Map<String, Object> onPostItemJSON(@RequestBody Item item) {
-
-        Item newItem = iCareService.saveItem(item);
-        return newItem.toMap();
-    }
-
-    @RequestMapping(value = "itemByConcept/{conceptUuid}", method = RequestMethod.GET)
-    @ResponseBody
-    public Map<String, Object> onGetItemByConcept(@PathVariable("conceptUuid") String conceptUuid) {
-
-        Item newItem = iCareService.getItemByConceptUuid(conceptUuid);
-        return newItem.toMap();
-    }
-
-    @RequestMapping(value = "itemByDrugConcept/{conceptUuid}", method = RequestMethod.GET)
-    @ResponseBody
-    public Map<String, Object> onGetItemByDrugConcept(@PathVariable("conceptUuid") String conceptUuid) {
-
-        Item newItem = iCareService.getItemByDrugConceptUuid(conceptUuid);
-        return newItem.toMap();
-    }
-
-    public Item onPostItem(Item item) {
-        return iCareService.saveItem(item);
-    }
-
-    @RequestMapping(value = "itemprice", method = RequestMethod.GET)
+	
+	@RequestMapping(value = "item", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> onPostItemJSON(@RequestBody Item item) {
+		
+		Item newItem = iCareService.saveItem(item);
+		return newItem.toMap();
+	}
+	
+	@RequestMapping(value = "itemByConcept/{conceptUuid}", method = RequestMethod.GET)
+	@ResponseBody
+	public Map<String, Object> onGetItemByConcept(@PathVariable("conceptUuid") String conceptUuid) {
+		
+		Item newItem = iCareService.getItemByConceptUuid(conceptUuid);
+		return newItem.toMap();
+	}
+	
+	@RequestMapping(value = "itemByDrugConcept/{conceptUuid}", method = RequestMethod.GET)
+	@ResponseBody
+	public Map<String, Object> onGetItemByDrugConcept(@PathVariable("conceptUuid") String conceptUuid) {
+		
+		Item newItem = iCareService.getItemByDrugConceptUuid(conceptUuid);
+		return newItem.toMap();
+	}
+	
+	public Item onPostItem(Item item) {
+		return iCareService.saveItem(item);
+	}
+	
+	@RequestMapping(value = "itemprice", method = RequestMethod.GET)
     @ResponseBody
     public Map<String, Object> onGet(@RequestParam(defaultValue = "100") Integer limit, @RequestParam(defaultValue = "0") Integer startIndex, @RequestParam(required = false) String paymentType) {
         List<Map<String, Object>> items = new ArrayList<Map<String, Object>>();
@@ -118,70 +118,70 @@ public class ICareController {
         results.put("results", items);
         return results;
     }
-
-    @RequestMapping(value = "itemprice", method = RequestMethod.POST)
-    @ResponseBody
-    public Map<String, Object> onPostItemPrice(@RequestBody ItemPrice itemPrice) {
-        ItemPrice newItemPrice = iCareService.saveItemPrice(itemPrice);
-        return newItemPrice.toMap();
-    }
-
-    /**
-     * This class returns the form backing object. This can be a string, a boolean, or a normal java
-     * pojo. The bean name defined in the ModelAttribute annotation and the type can be just defined
-     * by the return type of this method
-     */
-    @RequestMapping(method = RequestMethod.POST)
-    @ResponseBody
-    protected List<User> getUsers() throws Exception {
-
-        // this object will be made available to the jsp page under the variable name
-        // that is defined in the @ModuleAttribute tag
-        return new ArrayList<User>();
-    }
-
-    @RequestMapping(value = "laborder", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
-    public Order onPostLabOrderCreation(@RequestBody Map<String, Object> orderObject) throws Exception {
-        PatientService patientService = Context.getService(PatientService.class);
-        Patient patient = patientService.getPatientByUuid((String) orderObject.get("patient"));
-
-        TestOrder order = new TestOrder();
-        order.setAction(Order.Action.valueOf((String) orderObject.get("action")));
-        order.setUrgency(Order.Urgency.valueOf((String) orderObject.get("urgency")));
-        order.setPatient(patient);
-
-        ProviderService providerService = Context.getProviderService();
-        Provider provider = providerService.getProviderByUuid((String) orderObject.get("orderer"));
-        order.setOrderer(provider);
-
-        Concept concept = new Concept();
-        concept.setUuid((String) orderObject.get("concept"));
-        order.setConcept(Context.getConceptService().getConceptByUuid((String) orderObject.get("concept")));
-
-        OrderService orderService = Context.getOrderService();
-        order.setCareSetting(orderService.getCareSetting(1));
-
-        Encounter encounter = new Encounter();
-        encounter.setUuid((String) orderObject.get("encounter"));
-        encounter.setPatient(patient);
-        order.setEncounter(Context.getEncounterService().getEncounterByUuid((String) orderObject.get("encounter")));
-
-        //Order newOrder = billingService.createLabOrder(order);
-        //return newOrder;
-        return null;
-    }
-
-    @RequestMapping(value = "message", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
-    public Map<String, Object> sendMessage(@RequestBody Map<String, Object> messageObject) throws Exception {
-
-        Message message = Message.fromMap(messageObject);
-        message = iCareService.sendMessage(message);
-        return message.toMap();
-    }
-
-    @RequestMapping(value = "messages", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	
+	@RequestMapping(value = "itemprice", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> onPostItemPrice(@RequestBody ItemPrice itemPrice) {
+		ItemPrice newItemPrice = iCareService.saveItemPrice(itemPrice);
+		return newItemPrice.toMap();
+	}
+	
+	/**
+	 * This class returns the form backing object. This can be a string, a boolean, or a normal java
+	 * pojo. The bean name defined in the ModelAttribute annotation and the type can be just defined
+	 * by the return type of this method
+	 */
+	@RequestMapping(method = RequestMethod.POST)
+	@ResponseBody
+	protected List<User> getUsers() throws Exception {
+		
+		// this object will be made available to the jsp page under the variable name
+		// that is defined in the @ModuleAttribute tag
+		return new ArrayList<User>();
+	}
+	
+	@RequestMapping(value = "laborder", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public Order onPostLabOrderCreation(@RequestBody Map<String, Object> orderObject) throws Exception {
+		PatientService patientService = Context.getService(PatientService.class);
+		Patient patient = patientService.getPatientByUuid((String) orderObject.get("patient"));
+		
+		TestOrder order = new TestOrder();
+		order.setAction(Order.Action.valueOf((String) orderObject.get("action")));
+		order.setUrgency(Order.Urgency.valueOf((String) orderObject.get("urgency")));
+		order.setPatient(patient);
+		
+		ProviderService providerService = Context.getProviderService();
+		Provider provider = providerService.getProviderByUuid((String) orderObject.get("orderer"));
+		order.setOrderer(provider);
+		
+		Concept concept = new Concept();
+		concept.setUuid((String) orderObject.get("concept"));
+		order.setConcept(Context.getConceptService().getConceptByUuid((String) orderObject.get("concept")));
+		
+		OrderService orderService = Context.getOrderService();
+		order.setCareSetting(orderService.getCareSetting(1));
+		
+		Encounter encounter = new Encounter();
+		encounter.setUuid((String) orderObject.get("encounter"));
+		encounter.setPatient(patient);
+		order.setEncounter(Context.getEncounterService().getEncounterByUuid((String) orderObject.get("encounter")));
+		
+		//Order newOrder = billingService.createLabOrder(order);
+		//return newOrder;
+		return null;
+	}
+	
+	@RequestMapping(value = "message", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public Map<String, Object> sendMessage(@RequestBody Map<String, Object> messageObject) throws Exception {
+		
+		Message message = Message.fromMap(messageObject);
+		message = iCareService.sendMessage(message);
+		return message.toMap();
+	}
+	
+	@RequestMapping(value = "messages", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public List<Map<String, Object>> sendMessages(@RequestBody List<Map<String, Object>> messageList) throws Exception {
 
@@ -199,48 +199,48 @@ public class ICareController {
         }
         return messageList;
     }
-
-    @RequestMapping(value = "prescription", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
-    public Map<String, Object> onPostDrugOrderCreation(@RequestBody Map<String, Object> orderObject) throws Exception {
-        Prescription prescription = Prescription.fromMap(orderObject);
-
-        ConceptService conceptService = Context.getConceptService();
-        OrderService orderService = Context.getOrderService();
-        PatientService patientService = Context.getPatientService();
-
-        prescription.setDoseUnits(conceptService.getConceptByUuid(prescription.getDoseUnits().getUuid()));
-        prescription.setDurationUnits(conceptService.getConceptByUuid(prescription.getDurationUnits().getUuid()));
-        prescription.setRoute(conceptService.getConceptByUuid(prescription.getRoute().getUuid()));
-        prescription.setFrequency(orderService.getOrderFrequencyByUuid(prescription.getFrequency().getUuid()));
-        prescription.setQuantityUnits(conceptService.getConceptByUuid(prescription.getQuantityUnits().getUuid()));
-        //order.setNumRefills((Integer) orderObject.get("numRefills"));
-
-        prescription.setDrug(conceptService.getDrugByUuid(prescription.getDrug().getUuid()));
-        prescription.setPatient(patientService.getPatientByUuid(prescription.getPatient().getUuid()));
-        //order.setId(33009);
-
-        ProviderService providerService = Context.getProviderService();
-        Provider provider = providerService.getProviderByUuid(prescription.getOrderer().getUuid());
-        prescription.setOrderer(provider);
-
-        //Concept concept = new Concept();
-        //concept.setUuid((String) orderObject.get("concept"));
-        prescription.setConcept(conceptService.getConceptByUuid(prescription.getConcept().getUuid()));
-        prescription.setCareSetting(orderService.getCareSetting(1));
-
-        prescription.setEncounter(Context.getEncounterService().getEncounterByUuid(prescription.getEncounter().getUuid()));
-
-        OrderType orderType = Context.getOrderService().getOrderTypeByName("Prescription");
-        if (orderType == null) {
-            throw new ConfigurationException("Prescription Order Type is not configured.");
-        }
-        prescription.setOrderType(orderType);
-        prescription = iCareService.savePrescription(prescription);
-        return prescription.toMap();
-    }
-
-    @RequestMapping(value = "visit", method = RequestMethod.GET)
+	
+	@RequestMapping(value = "prescription", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public Map<String, Object> onPostDrugOrderCreation(@RequestBody Map<String, Object> orderObject) throws Exception {
+		Prescription prescription = Prescription.fromMap(orderObject);
+		
+		ConceptService conceptService = Context.getConceptService();
+		OrderService orderService = Context.getOrderService();
+		PatientService patientService = Context.getPatientService();
+		
+		prescription.setDoseUnits(conceptService.getConceptByUuid(prescription.getDoseUnits().getUuid()));
+		prescription.setDurationUnits(conceptService.getConceptByUuid(prescription.getDurationUnits().getUuid()));
+		prescription.setRoute(conceptService.getConceptByUuid(prescription.getRoute().getUuid()));
+		prescription.setFrequency(orderService.getOrderFrequencyByUuid(prescription.getFrequency().getUuid()));
+		prescription.setQuantityUnits(conceptService.getConceptByUuid(prescription.getQuantityUnits().getUuid()));
+		//order.setNumRefills((Integer) orderObject.get("numRefills"));
+		
+		prescription.setDrug(conceptService.getDrugByUuid(prescription.getDrug().getUuid()));
+		prescription.setPatient(patientService.getPatientByUuid(prescription.getPatient().getUuid()));
+		//order.setId(33009);
+		
+		ProviderService providerService = Context.getProviderService();
+		Provider provider = providerService.getProviderByUuid(prescription.getOrderer().getUuid());
+		prescription.setOrderer(provider);
+		
+		//Concept concept = new Concept();
+		//concept.setUuid((String) orderObject.get("concept"));
+		prescription.setConcept(conceptService.getConceptByUuid(prescription.getConcept().getUuid()));
+		prescription.setCareSetting(orderService.getCareSetting(1));
+		
+		prescription.setEncounter(Context.getEncounterService().getEncounterByUuid(prescription.getEncounter().getUuid()));
+		
+		OrderType orderType = Context.getOrderService().getOrderTypeByName("Prescription");
+		if (orderType == null) {
+			throw new ConfigurationException("Prescription Order Type is not configured.");
+		}
+		prescription.setOrderType(orderType);
+		prescription = iCareService.savePrescription(prescription);
+		return prescription.toMap();
+	}
+	
+	@RequestMapping(value = "visit", method = RequestMethod.GET)
     @ResponseBody
     public Map<String, Object> getPendingVisit(@RequestParam(defaultValue = "100") Integer limit,
                                                @RequestParam(defaultValue = "0") Integer startIndex,
@@ -267,8 +267,8 @@ public class ICareController {
         retults.put("results", responseSamplesObject);
         return retults;
     }
-
-    @RequestMapping(value = "order", method = RequestMethod.GET)
+	
+	@RequestMapping(value = "order", method = RequestMethod.GET)
     @ResponseBody
     public Map<String, Object> getOrdersByVisit(@RequestParam(defaultValue = "100") Integer limit,
                                                 @RequestParam(defaultValue = "0") Integer startIndex,
@@ -291,18 +291,18 @@ public class ICareController {
         retults.put("results", responseSamplesObject);
         return retults;
     }
-
-    @RequestMapping(value = "visit/{visitUuid}/claimForm", method = RequestMethod.GET)
-    @ResponseBody
-    public Map<String, Object> getClaim(@PathVariable("visitUuid") String visitUuid) throws Exception {
-        Claim claim = iCareService.getClaimByVisitUuid(visitUuid);
-        return claim.toMap();
-    }
-
-    @RequestMapping(value = "visit/{visitUuid}/claim", method = RequestMethod.GET)
-    @ResponseBody
-    public ClaimResult claim(@PathVariable("visitUuid") String visitUuid) throws Exception {
-        ClaimResult claim = iCareService.claimByVisitUuid(visitUuid);
-        return claim;
-    }
+	
+	@RequestMapping(value = "visit/{visitUuid}/claimForm", method = RequestMethod.GET)
+	@ResponseBody
+	public Map<String, Object> getClaim(@PathVariable("visitUuid") String visitUuid) throws Exception {
+		Claim claim = iCareService.getClaimByVisitUuid(visitUuid);
+		return claim.toMap();
+	}
+	
+	@RequestMapping(value = "visit/{visitUuid}/claim", method = RequestMethod.GET)
+	@ResponseBody
+	public ClaimResult claim(@PathVariable("visitUuid") String visitUuid) throws Exception {
+		ClaimResult claim = iCareService.claimByVisitUuid(visitUuid);
+		return claim;
+	}
 }
