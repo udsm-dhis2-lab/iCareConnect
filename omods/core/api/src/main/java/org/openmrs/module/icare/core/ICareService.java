@@ -94,7 +94,7 @@ public interface ICareService extends OpenmrsService {
 	
 	ItemPrice getItemPriceByDrugId(Integer serviceConceptId, Integer paymentSchemeConceptId, Integer paymentTypeConceptId);
 	
-	List<Item> getItems(String search, Integer limit, Integer startIndex);
+	List<Item> getItems(String search, Integer limit, Integer startIndex, String department);
 	
 	Prescription savePrescription(Prescription order);
 	
