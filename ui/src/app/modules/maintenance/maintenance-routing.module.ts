@@ -25,6 +25,10 @@ const routes: Routes = [
         component: PriceListHomeComponent,
       },
       {
+        path: "price-list/:department",
+        component: PriceListHomeComponent,
+      },
+      {
         path: "users",
         component: UserManagementComponent,
       },
