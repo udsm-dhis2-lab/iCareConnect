@@ -28,6 +28,8 @@ public interface StoreService extends OpenmrsService {
 	public Ledger saveLedger(Ledger ledger) throws StockOutException;
 	
 	Stock getStockByItemBatchLocation(Item item, String batchNo, Date expiryDate, Location location);
+
+	List<Stock> getStockByItemLocation(Item item, Location location);
 	
 	public Requisition saveRequest(Requisition requisition);
 	

@@ -94,7 +94,7 @@ public interface ICareService extends OpenmrsService {
 	
 	ItemPrice getItemPriceByDrugId(Integer serviceConceptId, Integer paymentSchemeConceptId, Integer paymentTypeConceptId);
 	
-	List<Item> getItems(String search, Integer limit, Integer startIndex);
+	List<Item> getItems(String search, Integer limit, Integer startIndex, String department);
 	
 	Prescription savePrescription(Prescription order);
 	
@@ -108,6 +108,6 @@ public interface ICareService extends OpenmrsService {
 	Message sendMessage(Message message) throws MalformedURLException, IOException, Exception;
 	
 	List<Message> sendMessages(List<Message> messages) throws MalformedURLException, IOException, Exception;
-
+	
 	List<String> generatePatientIds();
 }

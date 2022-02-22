@@ -53,6 +53,7 @@
     <concept concept_id="1002" retired="false" datatype_id="2" class_id="1" is_set="false" creator="1"
              date_created="2016-01-01 00:00:57.0" version="" uuid="e721ec30-5344-11e8-ie7c-40b6etw379ee" />
 
+
     <!-- Payment Type Concepts -->
     <concept concept_id="1003" retired="false" datatype_id="2" class_id="1" is_set="false" creator="1"
              date_created="2016-01-01 00:00:57.0" version="" uuid="e7jnec30-5344-11e8-ie7c-40b6etw3cfee" />
@@ -60,6 +61,18 @@
              date_created="2016-01-01 00:00:57.0" version="" uuid="e721ec30-mfy4-11e8-ie7c-40b6etw379ee" />
     <concept concept_id="1005" retired="false" datatype_id="2" class_id="1" is_set="false" creator="1"
              date_created="2016-01-01 00:00:57.0" version="" uuid="e721ec30-mfy4-11e8-ie7c-40b69mdy79ee" />
+
+    <!-- dept concepts -->
+
+    <concept concept_id="5000" retired="false" datatype_id="2" class_id="1" is_set="false" creator="1"
+             date_created="2016-01-01 00:00:57.0" version="" uuid="z8211c30-5e44-11e8-ie7c-50b6etwQqQee" />
+
+    <!-- reception dept set members -->
+    <concept_set concept_set_id="1" concept_id="1005" uuid="c0011c30-1f43-11d8-ie7c-50b6etwQqQee" concept_set="5000" creator="1" date_created="2020-12-27 00:00:00" ></concept_set>
+
+<!--    <concept_set concept_set_id="2" concept_id="" uuid="q9911c30-6q44-12e8-ie7c-50b6etwQqQee" concept_set="5000" creator="1" date_created="2020-12-27 00:00:00" ></concept_set>-->
+
+<!--    <concept_set concept_set_id="2" concept_id="" uuid="p4111c30-4t44-11e7-ie7c-50b6etwQqQee" concept_set="5000" creator="1" date_created="2020-12-27 00:00:00" ></concept_set>-->
 
     <concept_description concept_description_id="500" concept_id="500"
                          description="GeneXpert is a type of bacteriology test for Tuberculosis." locale="en_GB" creator="1" date_created="2014-08-12 00:00:00.0"
@@ -103,6 +116,10 @@
                   date_created="2017-05-12 00:00:00.0" concept_name_type="FULLY_SPECIFIED" locale_preferred="1" voided="false"
                   uuid="a457ac00-5345-nso8-9c7c-4ybs34kksdee" />
 
+    <!-- reception dept concept name -->
+    <concept_name concept_name_id="1006" concept_id="5000" name="Reception" locale="en_GB" creator="1"
+                  date_created="2017-05-12 00:00:00.0" concept_name_type="FULLY_SPECIFIED" locale_preferred="1" voided="false"
+                  uuid="b657ac00-5345-nso8-9c7c-4ybs34kksxfe" />
 
     <!-- Patient-Persons -->
     <person person_id="1000" gender="M" birthdate="1980-07-31" birthdate_estimated="0" dead="0" creator="1"
@@ -163,4 +180,5 @@
 
     <item item_id="123" unit="Data" uuid="8o00d43570-8y37-11f3-1234-08002007777" concept_id="1003" date_created="2020-12-27 00:00:00" voided="false" creator="1" stockable="true"/>
     <!--<st_device_type device_type_id="22" uuid="2msir5eb-5345-11e8-9c7c-40b034c3cfee" name="lab_device_"/>-->
+
 </dataset>
