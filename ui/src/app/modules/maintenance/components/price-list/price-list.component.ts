@@ -214,7 +214,7 @@ export class PriceListComponent implements OnInit {
     );
   }
 
-  onSearch(e: any) {
+  onSearch(e: any, departmentId: string) {
     e.stopPropagation();
     this.itemSearchTerm = e?.target?.value;
     if (
@@ -228,6 +228,7 @@ export class PriceListComponent implements OnInit {
             limit: 25,
             startIndex: this.currentPage,
             searchTerm: this.itemSearchTerm !== "" ? this.itemSearchTerm : null,
+            conceptSet: departmentId,
           },
         })
       );
