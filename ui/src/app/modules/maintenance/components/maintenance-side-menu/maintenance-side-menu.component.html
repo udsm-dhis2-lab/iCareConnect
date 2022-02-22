@@ -2,7 +2,7 @@
   *ngIf="{ currentMenuDepartments: currentMenuDepartments$ | async } as params"
 >
   <mat-nav-list *ngFor="let page of pages">
-    <mat-list-item (click)="setCurrentMenu($event, page)">
+    <mat-list-item (click)="navigateToThis($event, page.id, null)">
       <span class="full-width" *ngIf="isExpanded || isShowing">{{
         page.name
       }}</span>
