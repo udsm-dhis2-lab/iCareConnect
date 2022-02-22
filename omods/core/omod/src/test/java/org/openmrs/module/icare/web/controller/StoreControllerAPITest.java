@@ -232,7 +232,7 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		//When post an issue
 		MockHttpServletRequest newPostRequest = newPostRequest("store/issue", issue);
 		MockHttpServletResponse handle = handle(newPostRequest);
-
+		
 		System.out.println("the output");
 		System.out.println(handle.getContentAsString());
 		
@@ -252,68 +252,70 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		        .toString(), is("store A"));
 		
 	}
-
+	
 	@Test
 	public void testIssueingMoreThanAvailableStock() throws Exception {
 		//Given request
 		Map<String, Object> requisitionMap = createRequisition();
-
+		
 		String dto = this.readFile("dto/store/issue-create-30.json");
 		Map<String, Object> issue = (new ObjectMapper()).readValue(dto, Map.class);
-
+		
 		Map<String, Object> requsition = new HashMap<String, Object>();
 		requsition.put("uuid", requisitionMap.get("uuid").toString());
-
+		
 		issue.put("requisition", requsition);
-
+		
 		//When post an issue
 		MockHttpServletRequest newPostRequest = newPostRequest("store/issue", issue);
-
+		
 		MockHttpServletResponse handle;
 		String response;
 		//The request should throw an exception
 		try {
 			handle = handle(newPostRequest);
 			response = handle.getContentAsString();
-		}catch (Exception e){
+		}
+		catch (Exception e) {
 			System.out.println(e.getMessage());
 			response = e.getMessage();
 		}
 		assertThat("The request threw a Negative stock exception", response, is("Negative Stock is not allowed"));
-
-
+		
 	}
-
+	
 	@Test
 	public void testIssueingFromSeveralBatches() throws Exception {
-
+		
 		//Given request
 		Map<String, Object> requisitionMap = createRequisition();
-
+		
 		String dto = this.readFile("dto/store/issue-create-15.json");
 		Map<String, Object> issue = (new ObjectMapper()).readValue(dto, Map.class);
-
+		
 		Map<String, Object> requsition = new HashMap<String, Object>();
 		requsition.put("uuid", requisitionMap.get("uuid").toString());
-
+		
 		issue.put("requisition", requsition);
-
+		
 		//When post an issue
 		MockHttpServletRequest newPostRequest = newPostRequest("store/issue", issue);
-
-		MockHttpServletResponse handle = handle(newPostRequest);;
-
+		
+		MockHttpServletResponse handle = handle(newPostRequest);
+		;
+		
 		// get stock from the same location for the same item
 		MockHttpServletRequest getStockRequest = newGetRequest("store/stock");
-		getStockRequest.addParameter("locationUuid", (String)((Map<String, Object> )issue.get("issueingLocation")).get("uuid"));
+		getStockRequest.addParameter("locationUuid",
+		    (String) ((Map<String, Object>) issue.get("issueingLocation")).get("uuid"));
 		MockHttpServletResponse handleGetStock = handle(getStockRequest);
-
+		
 		System.out.println(handleGetStock.getContentAsString());
 	}
-
+	
 	@Test
-	public void testIssueingFromOneOutOfManyAvailableBatches(){
-
+	public void testIssueingFromOneOutOfManyAvailableBatches() {
+		
 	}
 	
 	@Test
