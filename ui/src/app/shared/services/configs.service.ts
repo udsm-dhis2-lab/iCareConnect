@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 import { BASE_URL } from '../constants/constants.constants';
 import { OpenmrsHttpClientService } from '../modules/openmrs-http-client/services/openmrs-http-client.service';
 
@@ -19,5 +20,13 @@ export class ConfigsService {
   changePassword({ data }): Observable<any> {
     const url = 'password';
     return this.httpClient.post(url, data);
+  }
+
+  getLogo(): Observable<any> {
+    return this.httpClient.get('systemsetting?q=icare.facility.logo&v=full');
+  }
+
+  getFacilityDetails(): Observable<any> {
+    return this.httpClient.get('systemsetting?q=icare.facility.details&v=full');
   }
 }

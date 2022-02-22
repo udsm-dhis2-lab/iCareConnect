@@ -196,8 +196,8 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	}
 	
 	@Override
-	public List<Item> getItems(String search, Integer limit, Integer startIndex) {
-		return dao.getItems(search, limit, startIndex);
+	public List<Item> getItems(String search, Integer limit, Integer startIndex, String department) {
+		return dao.getItems(search, limit, startIndex, department);
 	}
 	
 	@Override
@@ -304,7 +304,7 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		}
 		return messages;
 	}
-
+	
 	@Override
 	public List<String> generatePatientIds() {
 		AdministrationService adminService = Context.getService(AdministrationService.class);
@@ -344,7 +344,7 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		identifiers.add(idFormat);
 		return identifiers;
 	}
-
+	
 	@Override
 	public Item getItemByConceptUuid(String uuid) {
 		return dao.getItemByConceptUuid(uuid);
