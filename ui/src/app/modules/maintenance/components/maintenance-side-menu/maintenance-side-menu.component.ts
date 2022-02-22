@@ -13,6 +13,7 @@ import { ItemPriceService } from "../../services/item-price.service";
 })
 export class MaintenanceSideMenuComponent implements OnInit {
   @Input() pages: any[];
+  @Input() currentMenuDepartments: any[];
   currentMenu: any;
   @ViewChild("sidenav") sidenav: MatSidenav;
   isExpanded = true;
@@ -27,11 +28,22 @@ export class MaintenanceSideMenuComponent implements OnInit {
 
   ngOnInit(): void {
     this.currentMenu = this.pages[0];
-    this.getDepartmentsForTheCurrentMenu(this.currentMenu);
+    this.currentMenuDepartments$ = of(this.currentMenuDepartments);
+    console.log("currentMenuDepartments", this.currentMenuDepartments);
+    this.store.dispatch(
+      go({
+        path: [
+          "maintenance/" +
+            this.pages[0]?.id +
+            "/" +
+            this.currentMenuDepartments[0]?.uuid,
+        ],
+      })
+    );
   }
 
   getDepartmentsForTheCurrentMenu(currentMenu: any): void {
-    if (currentMenu?.searchCode) {
+    if (currentMenu && currentMenu?.searchCode) {
       this.currentMenuDepartments$ =
         this.itemPriceService.getDepartmentsByMappingSearchQuery(
           currentMenu?.searchCode
@@ -55,8 +67,8 @@ export class MaintenanceSideMenuComponent implements OnInit {
 
   setCurrentMenu(event: Event, menu: any): void {
     event.stopPropagation();
-    console.log(menu);
     this.currentMenu = this.currentMenu?.id === menu?.id ? null : menu;
+    this.getDepartmentsForTheCurrentMenu(this.currentMenu);
   }
 
   navigateToThis(event: Event, id: string, department: any): void {

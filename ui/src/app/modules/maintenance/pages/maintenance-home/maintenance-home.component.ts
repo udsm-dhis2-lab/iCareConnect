@@ -1,8 +1,9 @@
 import { Component, OnInit, ViewChild } from "@angular/core";
-import { MatSidenav } from "@angular/material/sidenav";
 import { Store } from "@ngrx/store";
+import { Observable, of } from "rxjs";
 import { go } from "src/app/store/actions";
 import { AppState } from "src/app/store/reducers";
+import { ItemPriceService } from "../../services/item-price.service";
 
 @Component({
   selector: "app-maintenance-home",
@@ -11,13 +12,11 @@ import { AppState } from "src/app/store/reducers";
 })
 export class MaintenanceHomeComponent implements OnInit {
   pages: any[];
-  currentMenu: any;
-  @ViewChild("sidenav") sidenav: MatSidenav;
-  isExpanded = true;
-  showSubmenu: boolean = false;
-  isShowing = false;
-  showSubSubMenu: boolean = false;
-  constructor(private store: Store<AppState>) {}
+  currentMenuDepartments$: Observable<any[]>;
+  constructor(
+    private store: Store<AppState>,
+    private itemPriceService: ItemPriceService
+  ) {}
 
   ngOnInit(): void {
     this.pages = [
@@ -31,6 +30,19 @@ export class MaintenanceHomeComponent implements OnInit {
       { id: "drug", name: "Drug Management" },
       { id: "location", name: "Location Management" },
     ];
+
+    this.getDepartmentsForTheCurrentMenu(this.pages[0]);
+  }
+
+  getDepartmentsForTheCurrentMenu(currentMenu: any): void {
+    if (currentMenu && currentMenu?.searchCode) {
+      this.currentMenuDepartments$ =
+        this.itemPriceService.getDepartmentsByMappingSearchQuery(
+          currentMenu?.searchCode
+        );
+    } else {
+      this.currentMenuDepartments$ = of(null);
+    }
   }
 
   setRoute(event: Event, id: string): void {

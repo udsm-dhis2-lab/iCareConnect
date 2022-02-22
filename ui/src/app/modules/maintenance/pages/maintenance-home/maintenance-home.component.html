@@ -4,15 +4,30 @@
   </button>
   <h1 class="example-app-name">Nested Menus</h1>
 </mat-toolbar> -->
-<mat-sidenav-container class="example-container" autosize>
-  <mat-sidenav #sidenav class="maintenance-sidenav" mode="side" opened="true">
-    <app-maintenance-side-menu [pages]="pages"></app-maintenance-side-menu>
-  </mat-sidenav>
+<div
+  *ngIf="{ currentMenuDepartments: currentMenuDepartments$ | async } as params"
+>
+  <mat-progress-bar
+    *ngIf="!params?.currentMenuDepartments"
+    mode="indeterminate"
+  ></mat-progress-bar>
+  <mat-sidenav-container
+    class="example-container"
+    autosize
+    *ngIf="params?.currentMenuDepartments"
+  >
+    <mat-sidenav #sidenav class="maintenance-sidenav" mode="side" opened="true">
+      <app-maintenance-side-menu
+        [pages]="pages"
+        [currentMenuDepartments]="params?.currentMenuDepartments"
+      ></app-maintenance-side-menu>
+    </mat-sidenav>
 
-  <div class="page-sidenav-content">
-    <router-outlet></router-outlet>
-  </div>
-</mat-sidenav-container>
+    <div class="page-sidenav-content">
+      <router-outlet></router-outlet>
+    </div>
+  </mat-sidenav-container>
+</div>
 
 <!-- <div class="maintenance-container">
   <div class="sidebar-container maintenance-sidebar mat-elevation-z1">
