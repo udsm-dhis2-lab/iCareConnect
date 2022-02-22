@@ -31,7 +31,6 @@ export class MaintenanceSideMenuComponent implements OnInit {
     this.currentMenu = this.pages[0];
     this.currentMenuDepartment = this.currentMenuDepartments[0];
     this.currentMenuDepartments$ = of(this.currentMenuDepartments);
-    console.log("currentMenuDepartments", this.currentMenuDepartments);
     this.store.dispatch(
       go({
         path: [
@@ -76,11 +75,11 @@ export class MaintenanceSideMenuComponent implements OnInit {
   navigateToThis(event: Event, id: string, department: any): void {
     this.currentMenuDepartment = department;
     event.stopPropagation();
-    // console.log(department);
-    // console.log(id);
+    const currentPath =
+      "/maintenance/" + id + (department ? "/" + department?.uuid : "");
     this.store.dispatch(
       go({
-        path: ["maintenance/" + id + "/" + department?.uuid],
+        path: [currentPath],
       })
     );
   }
