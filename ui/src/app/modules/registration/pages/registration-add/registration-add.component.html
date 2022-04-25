@@ -256,6 +256,25 @@
                 ></mat-datepicker-toggle>
                 <mat-datepicker #picker></mat-datepicker>
               </mat-form-field>
+              <!-- <mat-form-field appearance="fill" class="w-100">
+                <input
+                  matInput
+                  [matDatepicker]="picker"
+                  [(ngModel)]="patient['dob']"
+                  (dateInput)="dateSet()"
+                  name="dob"
+                  [max]="maxDateForDateOfBirth"
+                  placeholder="Select Date of birth"
+                  [disabled]="addingPatient && !patientAdded"
+                  id="dob"
+                  required
+                />
+                <mat-datepicker-toggle
+                  matSuffix
+                  [for]="picker"
+                ></mat-datepicker-toggle>
+                <mat-datepicker touchUi="true" #picker></mat-datepicker>
+              </mat-form-field> -->
             </div>
 
             <div *ngIf="!emergencyRegistration">
