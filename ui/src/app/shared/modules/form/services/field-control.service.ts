@@ -26,7 +26,7 @@ export class FieldControlService {
                 field?.controlType === "phoneNumber"
                   ? Validators.maxLength(10)
                   : null,
-              ]
+              ].filter((validator) => validator)
             )
           : new FormControl({
               value: fieldData?.value || field.value || "",
