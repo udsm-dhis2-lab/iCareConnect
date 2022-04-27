@@ -27,18 +27,10 @@ import {
 } from "@angular/material/core";
 
 import { MomentDateAdapter } from "@angular/material-moment-adapter";
-
-export const MY_FORMATS = {
-  parse: {
-    dateInput: "LL",
-  },
-  display: {
-    dateInput: "DD-MM-YYYY",
-    monthYearLabel: "YYYY",
-    dateA11yLabel: "LL",
-    monthYearA11yLabel: "YYYY",
-  },
-};
+import { DATE_FORMATS_DD_MM_YYYY } from "src/app/core/constants/date-formats.constants";
+import { Textbox } from "src/app/shared/modules/form/models/text-box.model";
+import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
+import { PhoneNumber } from "src/app/shared/modules/form/models/phone-number.model";
 
 @Component({
   selector: "app-registration-add",
@@ -54,7 +46,7 @@ export const MY_FORMATS = {
       deps: [MAT_DATE_LOCALE],
     },
 
-    { provide: MAT_DATE_FORMATS, useValue: MY_FORMATS },
+    { provide: MAT_DATE_FORMATS, useValue: DATE_FORMATS_DD_MM_YYYY },
   ],
 })
 export class RegistrationAddComponent implements OnInit {
@@ -150,6 +142,22 @@ export class RegistrationAddComponent implements OnInit {
     Id: null,
   };
   mrnIsEditable: boolean = false;
+  primaryPhoneNumberFormField: any = new PhoneNumber({
+    id: "primaryMobileNumber",
+    key: "primaryMobileNumber",
+    label: "Mobile number",
+    required: true,
+    type: "number",
+    min: 0,
+    placeholder: "Mobile number",
+    category: "phoneNumber",
+  });
+  isPhoneNumberCorrect: boolean = false;
+
+  onPrimaryMobileNumberFormUpdate(formValueObject: FormValue): void {
+    this.patient["phone"] =
+      formValueObject.getValues()?.primaryMobileNumber?.value;
+  }
 
   setRelationshipType(relationshipType) {
     this.patient.RelationshipType = relationshipType;
@@ -369,6 +377,16 @@ export class RegistrationAddComponent implements OnInit {
         });
       });
   }
+
+  // validatePhoneNumber(event): void {
+  //   console.log(event);
+  //   console.log(this.patient["phone"]);
+  //   const phoneNumber = this.patient["phone"];
+  //   console.log(phoneNumber.match(/^[0]*[(]{0}[6-7]{1}[3-9]{3,8}/g));
+  //   this.isPhoneNumberCorrect =
+  //     phoneNumber?.length === 10 &&
+  //     phoneNumber.match(/^[0]*[(]{0}[6-7]{1}[3-9]{3,8}/g);
+  // }
 
   savePatient(e: Event, params) {
     e.stopPropagation();

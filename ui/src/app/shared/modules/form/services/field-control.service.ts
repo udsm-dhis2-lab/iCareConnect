@@ -18,7 +18,15 @@ export class FieldControlService {
                 value: fieldData?.value || field.value || "",
                 disabled: field?.disabled,
               },
-              Validators.required
+              [
+                Validators.required,
+                field?.controlType === "phoneNumber"
+                  ? Validators.minLength(10)
+                  : null,
+                field?.controlType === "phoneNumber"
+                  ? Validators.maxLength(10)
+                  : null,
+              ]
             )
           : new FormControl({
               value: fieldData?.value || field.value || "",
