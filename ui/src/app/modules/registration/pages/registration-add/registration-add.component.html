@@ -14,7 +14,6 @@
   <div class="alert alert-danger" *ngIf="loadingFormError">
     Problem Opening registration form
   </div>
-
   <div
     class="registration-form"
     *ngIf="!loadingForm && !loadingFormError && registrationConfigurations"
@@ -22,6 +21,7 @@
     <div class="row">
       <div class="col-8">
         <mat-checkbox
+          *ngIf="!editMode"
           color="primary"
           class="mb-3"
           (change)="setRegistrationMode($event.checked)"

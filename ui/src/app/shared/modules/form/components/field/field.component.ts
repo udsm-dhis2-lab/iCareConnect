@@ -25,7 +25,6 @@ export class FieldComponent {
     new EventEmitter<FormGroup>();
 
   get isValid(): boolean {
-    // console.log(this.form.controls[this.field.id]);
     return this.form?.controls[this.field.id]?.valid;
   }
 
@@ -41,13 +40,10 @@ export class FieldComponent {
       : !this.form?.controls[this.field.id]?.valid
       ? `${this.field?.label} is required`
       : "";
-    console.log(message);
-    console.log(this.form.controls[this.field.id]?.errors);
     return message;
   }
 
   get hasMinimunLengthIssue(): boolean {
-    console.log(this.form.controls[this.field.id]?.errors);
     return this.form.controls[this.field.id]?.errors?.minlength;
   }
 
