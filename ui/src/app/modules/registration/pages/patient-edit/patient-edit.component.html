@@ -1,6 +1,18 @@
-<div *ngIf="patientDetails$ | async as patientDetails">
+<div
+  *ngIf="{
+    patientDetails: patientDetails$ | async,
+    registrationConfigurations: registrationConfigurations$ | async
+  } as params"
+>
   <app-registration-add
-    [patientInformation]="patientDetails"
+    *ngIf="params?.patientDetails && params?.registrationConfigurations"
+    [patientInformation]="params?.patientDetails"
+    [registrationConfigurations]="params?.registrationConfigurations"
     [editMode]="true"
   ></app-registration-add>
+
+  <mat-progress-bar
+    *ngIf="!params?.patientDetails || !params?.registrationConfigurations"
+    mode="indeterminate"
+  ></mat-progress-bar>
 </div>
