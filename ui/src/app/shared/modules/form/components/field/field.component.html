@@ -9,7 +9,7 @@
     appearance="fill"
     class="w-100 no-padding"
   >
-    <mat-label [attr.for]="field?.key">{{ field?.label }}</mat-label>
+    <mat-label [attr.for]="field?.key">{{ field?.label }} </mat-label>
 
     <!-- phone number -->
     <input
@@ -86,7 +86,9 @@
     ></textarea>
     <!-- end of text area field -->
 
-    <mat-error *ngIf="!isValid">{{ field?.label }} is required</mat-error>
+    <mat-error *ngIf="issueWithTheDataField">
+      {{ issueWithTheDataField }}
+    </mat-error>
   </mat-form-field>
 </div>
 <div
