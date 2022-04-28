@@ -13,7 +13,7 @@ const config = {
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
   favicon: 'img/favicon.ico',
-  organizationName: 'UDSM-DHIS2', // Usually your GitHub org/user name.
+  organizationName: 'UDSM-DHIS2-LAB', // Usually your GitHub org/user name.
   projectName: 'iCARE', // Usually your repo name.
 
   presets: [
