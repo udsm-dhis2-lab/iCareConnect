@@ -59,14 +59,15 @@ export class FormService {
     } else if (otherType === "searchFromOptions") {
       return of(
         field?.options.filter(
-          (option) => option?.name.toLowerCase().indexOf(parameters?.q) > -1
+          (option) =>
+            option?.name.toLowerCase().indexOf(parameters?.q.toLowerCase()) > -1
         )
       );
     } else if (otherType === "billableItem") {
       return this.httpClient
         .get(
           `icare/item?limit=${parameters?.limit}&startIndex=0${
-            "&q=" + parameters?.q
+            "&q=" + parameters?.q.toLowerCase()
           }`
         )
         .pipe(

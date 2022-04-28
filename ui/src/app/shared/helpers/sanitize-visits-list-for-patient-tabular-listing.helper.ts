@@ -17,29 +17,32 @@ export function sanitizePatientsVisitsForTabularPatientListing(
         itemsPerPage && currentPage
           ? itemsPerPage * currentPage + index + 1
           : index + 1,
-      names: visitDetails?.visit?.patient?.person?.display,
+      names: visitDetails?.visit?.patient?.person?.display.toUpperCase(),
       mrn:
         (
           visitDetails?.visit?.patient?.identifiers?.filter(
             (identifier) =>
-              identifier?.identifierType?.display.toLowerCase() === 'mrn'
+              identifier?.identifierType?.display.toLowerCase() === "mrn"
           ) || []
         )?.length > 0
           ? (visitDetails?.visit?.patient?.identifiers?.filter(
               (identifier) =>
-                identifier?.identifierType?.display.toLowerCase() === 'mrn'
+                identifier?.identifierType?.display.toLowerCase() === "mrn"
             ) || [])[0]?.identifier
-          : '',
+          : "",
       location:
         shouldShowParentLocation &&
         visitDetails?.visit?.location?.parentLocation
           ? visitDetails?.visit?.location?.parentLocation?.display +
-            ' / ' +
+            " / " +
             visitDetails?.visit?.location?.display
           : visitDetails?.visit?.location?.display,
       gender: visitDetails?.visit?.patient?.person?.gender,
       age: visitDetails?.visit?.patient?.person?.age,
-      birthdate: visitDetails?.visit?.patient?.person?.birthdate,
+      birthdate: visitDetails?.visit?.patient?.person?.birthdate.substring(
+        0,
+        10
+      ),
       data: visitDetails,
       paymentType: visitDetails?.visit?.paymentType,
       visitType: visitDetails?.visit?.visitType?.name,
