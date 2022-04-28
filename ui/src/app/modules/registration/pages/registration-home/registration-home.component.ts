@@ -118,18 +118,11 @@ export class RegistrationHomeComponent implements OnInit {
             .afterClosed()
             .subscribe((visitDetails) => {
               if (visitDetails) {
-                this.dialog
-                  .open(VisitStatusConfirmationModelComponent, {
-                    width: "30%",
-                    minHeight: "190px",
-                  })
-                  .afterClosed()
-                  .subscribe(() => {
-                    this.loadingData = true;
-                    setTimeout(() => {
-                      this.loadingData = false;
-                    }, 100);
-                  });
+                // TODO: Review the logics
+                this.loadingData = true;
+                setTimeout(() => {
+                  this.loadingData = false;
+                }, 100);
               } else {
                 this.loadingData = true;
                 setTimeout(() => {
@@ -161,18 +154,23 @@ export class RegistrationHomeComponent implements OnInit {
       .afterClosed()
       .subscribe((visitDetails) => {
         if (visitDetails && !visitDetails?.close) {
-          this.dialog
-            .open(VisitStatusConfirmationModelComponent, {
-              width: "30%",
-              height: "190px",
-            })
-            .afterClosed()
-            .subscribe(() => {
-              this.loadingData = true;
-              setTimeout(() => {
-                this.loadingData = false;
-              }, 100);
-            });
+          // TODO: Review the logics here
+          this.loadingData = true;
+          setTimeout(() => {
+            this.loadingData = false;
+          }, 100);
+          // this.dialog
+          //   .open(VisitStatusConfirmationModelComponent, {
+          //     width: "30%",
+          //     height: "190px",
+          //   })
+          //   .afterClosed()
+          //   .subscribe(() => {
+          //     this.loadingData = true;
+          //     setTimeout(() => {
+          //       this.loadingData = false;
+          //     }, 100);
+          //   });
         } else {
           this.loadingData = true;
           setTimeout(() => {
