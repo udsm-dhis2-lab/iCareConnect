@@ -127,7 +127,9 @@
             </p>
             <p class="patient-gender-and-age">
               {{ visit?.visit?.patient?.person?.gender }} |
-              {{ visit?.visit?.patient?.person?.age }} yrs
+              {{ visit?.visit?.patient?.person?.age }} yrs ({{
+                visit?.visit?.patient?.person?.birthdate
+              }})
             </p>
           </div>
         </div>
