@@ -413,7 +413,9 @@ export class RegistrationAddComponent implements OnInit {
               },
             ],
             gender: this.patient.gender,
-            birthdate: this.patient.dob,
+            birthdate: new Date(
+              this.patient.dob.setDate(this.patient.dob.getDate() + 1)
+            ),
             //TODO: fix address
             addresses: [
               {
@@ -517,10 +519,10 @@ export class RegistrationAddComponent implements OnInit {
                   .afterClosed()
                   .subscribe((visitDetails) => {
                     if (visitDetails) {
-                      this.dialog.open(VisitStatusConfirmationModelComponent, {
-                        width: "30%",
-                        height: "100px",
-                      });
+                      // this.dialog.open(VisitStatusConfirmationModelComponent, {
+                      //   width: "30%",
+                      //   height: "100px",
+                      // });
                     }
                   });
 
