@@ -1,14 +1,14 @@
-import { Action, createReducer, on } from '@ngrx/store';
+import { Action, createReducer, on } from "@ngrx/store";
 import {
   loadEncounterTypes,
   upsertEncounterTypes,
-} from '../actions/encounter-type.actions';
-import { loadedBaseState, loadingBaseState } from '../states/base.state';
+} from "../actions/encounter-type.actions";
+import { loadedBaseState, loadingBaseState } from "../states/base.state";
 import {
   encounterTypeAdapter,
   EncounterTypeState,
   initialEncounterTypeState,
-} from '../states/encounter-type.state';
+} from "../states/encounter-type.state";
 
 const reducer = createReducer(
   initialEncounterTypeState,
