@@ -1,4 +1,4 @@
-<mat-card class="mat-elevation-z0 border">
+<mat-card class="mat-elevation-z5 border">
   <div *ngIf="stock">
     <div>
       <div class="d-flex justify-content-between">
@@ -31,6 +31,7 @@
         <td>#</td>
         <td>Batch No</td>
         <td>Quantity</td>
+        <td>Buying Price</td>
         <td>Expiry Date</td>
         <td><span class="float-right">Actions</span></td>
       </tr>
@@ -43,6 +44,7 @@
         <td>{{ batchIndex + 1 }}</td>
         <td>{{ stockBatch?.batchNo }}</td>
         <td>{{ stockBatch?.quantity }}</td>
+        <td> - </td>
         <td>
           {{ stockBatch?.expiryDate | date }}
           <span class="text-muted">({{ stockBatch?.remainingDays }})</span>
