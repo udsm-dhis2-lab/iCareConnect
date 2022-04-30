@@ -32,10 +32,13 @@
     "
   >
     <div class="patient-dashboard-container mat-elevation-z1">
-      <app-new-patient-profile
+      <div class="patient-profile-sticky">
+        <app-new-patient-profile
         [currentPatient]="dashboardParams?.currentPatient"
-      ></app-new-patient-profile>
-      <div>
+        ></app-new-patient-profile>
+      </div>
+      
+      <div class="w-100 patient-other-details-padding">
         <div
           class="
             d-flex
