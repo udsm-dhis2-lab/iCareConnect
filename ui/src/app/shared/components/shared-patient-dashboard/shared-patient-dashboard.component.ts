@@ -27,7 +27,10 @@ import {
   getPatientPendingBillStatus,
 } from "src/app/store/selectors/bill.selectors";
 import { getCurrentPatient } from "src/app/store/selectors/current-patient.selectors";
-import { getEncounterLoadedStatus } from "src/app/store/selectors/encounter-type.selectors";
+import {
+  getAllEncounterTypes,
+  getEncounterLoadedStatus,
+} from "src/app/store/selectors/encounter-type.selectors";
 import {
   getCustomOpenMRSFormsByIds,
   getFormEntitiesByNames,
@@ -83,7 +86,7 @@ export class SharedPatientDashboardComponent implements OnInit {
   vitalSignObservations$: Observable<any>;
   loadingVisit$: Observable<boolean>;
   loadingForms$: Observable<boolean>;
-  encounterTypeLoaded$: Observable<boolean>;
+  encounterTypes$: Observable<any>;
   activeVisit$: Observable<VisitObject>;
   patientHasPendingBills$: Observable<boolean>;
   hasConsultationStarted$: Observable<boolean>;
@@ -106,7 +109,9 @@ export class SharedPatientDashboardComponent implements OnInit {
   orderTypes$: Observable<any>;
   countOfVitalsElementsFilled$: Observable<number>;
 
-  constructor(private store: Store<AppState>, private dialog: MatDialog) {}
+  constructor(private store: Store<AppState>, private dialog: MatDialog) {
+    this.store.dispatch(loadEncounterTypes());
+  }
 
   ngOnInit(): void {
     this.onStartConsultation(this.activeVisit);
@@ -128,7 +133,6 @@ export class SharedPatientDashboardComponent implements OnInit {
         ),
       })
     );
-    this.store.dispatch(loadEncounterTypes());
 
     this.privileges$ = this.store.select(getCurrentUserPrivileges);
     this.provider$ = this.store.select(getProviderDetails);
@@ -160,9 +164,7 @@ export class SharedPatientDashboardComponent implements OnInit {
     );
 
     this.loadingForms$ = this.store.pipe(select(getFormsLoadingState));
-    this.encounterTypeLoaded$ = this.store.pipe(
-      select(getEncounterLoadedStatus)
-    );
+    this.encounterTypes$ = this.store.pipe(select(getAllEncounterTypes));
 
     this.hasConsultationStarted$ = this.store.pipe(
       select(getConsultationInProgressStatus)
