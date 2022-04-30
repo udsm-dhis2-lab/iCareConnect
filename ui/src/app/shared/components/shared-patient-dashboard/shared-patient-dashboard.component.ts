@@ -65,6 +65,7 @@ import {
 } from "src/app/store/selectors/current-user.selectors";
 import { ObsCreate, ProviderGetFull } from "../../resources/openmrs";
 import { saveObservations } from "src/app/store/actions/observation.actions";
+import { loadEncounterTypes } from "src/app/store/actions/encounter-type.actions";
 
 @Component({
   selector: "app-shared-patient-dashboard",
@@ -127,6 +128,7 @@ export class SharedPatientDashboardComponent implements OnInit {
         ),
       })
     );
+    this.store.dispatch(loadEncounterTypes());
 
     this.privileges$ = this.store.select(getCurrentUserPrivileges);
     this.provider$ = this.store.select(getProviderDetails);
@@ -250,7 +252,7 @@ export class SharedPatientDashboardComponent implements OnInit {
   ): void {
     event.stopPropagation();
     this.dialog.open(AdmissionFormComponent, {
-      height: "230px",
+      maxHeight: "230px",
       width: "45%",
       data: {
         patient: currentPatient,
