@@ -21,6 +21,7 @@
     provider: provider$ | async
   } as dashboardParams"
 >
+  {{ dashboardParams?.encounterTypeLoaded }}
   <div
     class="w-100"
     *ngIf="
@@ -28,7 +29,7 @@
       dashboardParams?.encounterTypeLoaded &&
       !dashboardParams?.billLoadingState &&
       dashboardParams?.currentPatient &&
-      !dashboardParams?.loadingForms
+      dashboardParams?.forms
     "
   >
     <div class="patient-dashboard-container mat-elevation-z1">
