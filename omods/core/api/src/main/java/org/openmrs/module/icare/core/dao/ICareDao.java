@@ -124,7 +124,7 @@ public class ICareDao extends BaseDAO<Item> {
 		return query.list();
 	}
 	
-	public List<Item> getItems(String search, Integer limit, Integer startIndex, String department) {
+	public List<Item> getItems(String search, Integer limit, Integer startIndex, String department, Item.Type type) {
 		DbSession session = getSession();
 		String queryStr;
 		
@@ -133,6 +133,9 @@ public class ICareDao extends BaseDAO<Item> {
 			        + "((SELECT cs.concept FROM ConceptSet cs WHERE cs.conceptSet = (SELECT c FROM Concept c WHERE c.uuid = :department)))";
 		} else {
 			queryStr = "SELECT ip FROM Item ip";
+		}
+		if(queryStr != null && type == Item.Type.DRUG){
+			queryStr += " WHERE ip.drug IS NOT NULL";
 		}
 		
 		if (search != null) {
@@ -151,7 +154,9 @@ public class ICareDao extends BaseDAO<Item> {
 				        + "LEFT JOIN ip.drug as d " + "LEFT JOIN d.concept as c1 " + "LEFT JOIN c1.names cn1 "
 				        + "WHERE lower(cn.name) like :search OR lower(cn1.name) like :search OR lower(d.name) like :search";
 			}
-			
+			if(type == Item.Type.DRUG){
+				queryStr += " AND ip.drug IS NOT NULL";
+			}
 		}
 		Query query = session.createQuery(queryStr);
 		query.setFirstResult(startIndex);

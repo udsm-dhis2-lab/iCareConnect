@@ -47,7 +47,10 @@ public class Item extends BaseOpenmrsData {
 	
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "id.item")
 	private List<ItemPrice> prices = new ArrayList<ItemPrice>(0);
-	
+
+	public enum Type {
+		DRUG
+	}
 	public String getUnit() {
 		return unit;
 	}
