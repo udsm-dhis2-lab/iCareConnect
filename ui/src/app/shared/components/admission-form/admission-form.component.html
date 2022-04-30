@@ -24,6 +24,14 @@
     <hr style="margin: 0 !important" />
     <div class="form" *ngIf="!params?.admissionStatus">
       <mat-form-field
+        *ngIf="
+          (sendToObservation &&
+            params?.observationLocations &&
+            params?.observationLocations.length > 0) ||
+          (!sendToObservation &&
+            params?.locations &&
+            params?.locations.length > 0)
+        "
         class="w-100"
         appearance="legacy"
         style="border: solid 1px #adadad; border-radius: 6px"
@@ -44,6 +52,29 @@
           </mat-option>
         </mat-select>
       </mat-form-field>
+      <div
+        class="alert alert-warning"
+        role="alert"
+        *ngIf="
+          params?.observationLocations &&
+          params?.observationLocations.length === 0 &&
+          sendToObservation
+        "
+      >
+        Missing Ward or Bed, contact IT
+      </div>
+
+      <div
+        class="alert alert-warning"
+        role="alert"
+        *ngIf="
+          !sendToObservation &&
+          params?.locations &&
+          params?.locations.length === 0
+        "
+      >
+        Missing Ward or Bed
+      </div>
     </div>
     <div *ngIf="params?.admissionStatus">
       <h3 style="text-align: center" color="primary">
@@ -53,7 +84,7 @@
       </h3>
     </div>
 
-    <div class="w-100 d-flex btns">
+    <div class="w-100 d-flex justify-content-end btns">
       <button
         mat-stroked-button
         [disabled]="!admitTo || params?.admissionStatus"
