@@ -23,3 +23,27 @@
 .mat-form-field-underline {
   display: none !important;
 }
+
+::ng-deep .mat-option {
+  word-wrap: break-word;
+  white-space: pre-line;
+  border-bottom: 1px solid rgba(0,0,0,.125);
+  text-overflow: ellipsis;
+  display: block;
+  line-height: 30px;
+  padding: 0 16px;
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+  text-align: left;
+  text-decoration: none;
+  max-width: 100%;
+  position: relative;
+  cursor: pointer;
+  outline: none;
+  display: flex;
+  flex-direction: row;
+  max-width: 100%;
+  box-sizing: border-box;
+  align-items: center;
+  -webkit-tap-highlight-color: transparent;
+}
