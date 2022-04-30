@@ -3,7 +3,7 @@
  * v. 2.0. If a copy of the MPL was not distributed with this file, You can
  * obtain one at http://mozilla.org/MPL/2.0/. OpenMRS is also distributed under
  * the terms of the Healthcare Disclaimer located at http://openmrs.org/license.
- *
+ * <p>
  * Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS
  * graphic logo is a trademark of OpenMRS Inc.
  */
@@ -14,6 +14,7 @@ import org.apache.commons.logging.LogFactory;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
+import org.openmrs.ConceptSet;
 import org.openmrs.Drug;
 import org.openmrs.Order;
 import org.openmrs.Visit;
@@ -123,13 +124,34 @@ public class ICareDao extends BaseDAO<Item> {
 		return query.list();
 	}
 	
-	public List<Item> getItems(String search, Integer limit, Integer startIndex) {
+	public List<Item> getItems(String search, Integer limit, Integer startIndex, String department) {
 		DbSession session = getSession();
-		String queryStr = "SELECT ip FROM Item ip";
+		String queryStr;
+		
+		if (department != null) {
+			queryStr = "SELECT ip FROM Item ip WHERE ip.concept IN "
+			        + "((SELECT cs.concept FROM ConceptSet cs WHERE cs.conceptSet = (SELECT c FROM Concept c WHERE c.uuid = :department)))";
+		} else {
+			queryStr = "SELECT ip FROM Item ip";
+		}
+		
 		if (search != null) {
-			queryStr = "SELECT ip FROM Item ip " + "LEFT JOIN ip.concept as c " + "LEFT JOIN c.names cn "
-			        + "LEFT JOIN ip.drug as d " + "LEFT JOIN d.concept as c1 " + "LEFT JOIN c1.names cn1 "
-			        + "WHERE lower(cn.name) like :search OR lower(cn1.name) like :search OR lower(d.name) like :search";
+			
+			if (department != null) {
+				queryStr = "SELECT ip FROM Item ip "
+				        + "LEFT JOIN ip.concept as c "
+				        + "LEFT JOIN c.names cn "
+				        + "LEFT JOIN ip.drug as d "
+				        + "LEFT JOIN d.concept as c1 "
+				        + "LEFT JOIN c1.names cn1 "
+				        + "WHERE (lower(cn.name) like :search OR lower(cn1.name) like :search OR lower(d.name) like :search) "
+				        + "AND ip.concept IN ((SELECT cs.concept FROM ConceptSet cs WHERE cs.conceptSet = (SELECT c FROM Concept c WHERE c.uuid = :department)))";
+			} else {
+				queryStr = "SELECT ip FROM Item ip " + "LEFT JOIN ip.concept as c " + "LEFT JOIN c.names cn "
+				        + "LEFT JOIN ip.drug as d " + "LEFT JOIN d.concept as c1 " + "LEFT JOIN c1.names cn1 "
+				        + "WHERE lower(cn.name) like :search OR lower(cn1.name) like :search OR lower(d.name) like :search";
+			}
+			
 		}
 		Query query = session.createQuery(queryStr);
 		query.setFirstResult(startIndex);
@@ -137,6 +159,11 @@ public class ICareDao extends BaseDAO<Item> {
 		if (search != null) {
 			query.setParameter("search", "%" + search + "%");
 		}
+		
+		if (department != null) {
+			query.setParameter("department", department);
+		}
+		
 		return query.list();
 	}
 	
@@ -320,8 +347,8 @@ public class ICareDao extends BaseDAO<Item> {
 		query.setMaxResults(limit);
 		return query.list();
 	}
-
-    public long countDailyPatients() {
+	
+	public long countDailyPatients() {
 		DbSession session = getSession();
 		String queryStr = "SELECT COUNT(patient) FROM Patient patient WHERE YEAR(patient.personDateCreated) = :year AND MONTH(patient.personDateCreated) = :month AND DAY(patient.personDateCreated) = :day";
 		Query query = session.createQuery(queryStr);
@@ -330,7 +357,8 @@ public class ICareDao extends BaseDAO<Item> {
 		query.setParameter("day", calendar.get(Calendar.DATE));
 		query.setParameter("month", calendar.get(Calendar.MONTH) + 1);
 		return (long) query.list().get(0);
-    }
+	}
+	
 	public long countMonthlyPatients() {
 		DbSession session = getSession();
 		String queryStr = "SELECT COUNT(patient) FROM Patient patient WHERE YEAR(patient.personDateCreated) = :year AND MONTH(patient.personDateCreated) = :month";
@@ -340,6 +368,7 @@ public class ICareDao extends BaseDAO<Item> {
 		query.setParameter("month", calendar.get(Calendar.MONTH) + 1);
 		return (long) query.list().get(0);
 	}
+	
 	public long countYearlyPatients() {
 		DbSession session = getSession();
 		String queryStr = "SELECT COUNT(patient) FROM Patient patient WHERE YEAR(patient.personDateCreated) = :year";

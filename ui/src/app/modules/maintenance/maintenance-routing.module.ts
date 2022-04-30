@@ -16,12 +16,16 @@ const routes: Routes = [
     component: MaintenanceHomeComponent,
     children: [
       // TODO: Need to find best starting page for maintenance
-      {
-        path: "",
-        redirectTo: "price-list",
-      },
+      // {
+      //   path: "",
+      //   redirectTo: "price-list",
+      // },
       {
         path: "price-list",
+        component: PriceListHomeComponent,
+      },
+      {
+        path: "price-list/:department",
         component: PriceListHomeComponent,
       },
       {

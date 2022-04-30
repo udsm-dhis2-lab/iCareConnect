@@ -1,37 +1,37 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { Router } from '@angular/router';
-import { select, Store } from '@ngrx/store';
-import * as _ from 'lodash';
-import { Observable, of } from 'rxjs';
-import { patientObj } from 'src/app/shared/models/patient';
-import { Patient } from 'src/app/shared/resources/patient/models/patient.model';
-import { VisitObject } from 'src/app/shared/resources/visits/models/visit-object.model';
-import { go, loadConceptByUuid } from 'src/app/store/actions';
-import { startVisit, updateVisit } from 'src/app/store/actions/visit.actions';
-import { AppState } from 'src/app/store/reducers';
+import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import { MatDialog } from "@angular/material/dialog";
+import { MatSnackBar } from "@angular/material/snack-bar";
+import { Router } from "@angular/router";
+import { select, Store } from "@ngrx/store";
+import * as _ from "lodash";
+import { Observable, of } from "rxjs";
+import { patientObj } from "src/app/shared/models/patient";
+import { Patient } from "src/app/shared/resources/patient/models/patient.model";
+import { VisitObject } from "src/app/shared/resources/visits/models/visit-object.model";
+import { go, loadConceptByUuid } from "src/app/store/actions";
+import { startVisit, updateVisit } from "src/app/store/actions/visit.actions";
+import { AppState } from "src/app/store/reducers";
 import {
   getConceptById,
   getLocations,
   getLocationsByTagName,
-} from 'src/app/store/selectors';
-import { getCurrentPatient } from 'src/app/store/selectors/current-patient.selectors';
+} from "src/app/store/selectors";
+import { getCurrentPatient } from "src/app/store/selectors/current-patient.selectors";
 import {
   getActiveVisit,
   getActiveVisitUuid,
   getVisitError,
   getVisitErrorState,
   getVisitLoadingState,
-} from 'src/app/store/selectors/visit.selectors';
-import { SelectRoomComponent } from '../../components/select-room/select-room.component';
-import { VisitClaimComponent } from '../../components/visit-claim/visit-claim.component';
-import { RegistrationService } from '../../services/registration.services';
+} from "src/app/store/selectors/visit.selectors";
+import { SelectRoomComponent } from "../../components/select-room/select-room.component";
+import { VisitClaimComponent } from "../../components/visit-claim/visit-claim.component";
+import { RegistrationService } from "../../services/registration.services";
 
 @Component({
-  selector: 'app-visit',
-  templateUrl: './visit.component.html',
-  styleUrls: ['./visit.component.scss'],
+  selector: "app-visit",
+  templateUrl: "./visit.component.html",
+  styleUrls: ["./visit.component.scss"],
 })
 export class VisitComponent implements OnInit {
   params: any;
@@ -103,34 +103,34 @@ export class VisitComponent implements OnInit {
   toggleAuthorizationNumberInputActive(event) {
     if (event.checked) {
       this.authorizationNumberAvailable = false;
-      this.visitDetails['InsuranceAuthNo'] = 'NOT_AUTHORIZED';
+      this.visitDetails["InsuranceAuthNo"] = "NOT_AUTHORIZED";
     } else {
       this.authorizationNumberAvailable = true;
-      this.visitDetails['InsuranceAuthNo'] = null;
+      this.visitDetails["InsuranceAuthNo"] = null;
     }
   }
 
   onSelectRoom(event: Event, room: any) {
     event.stopPropagation();
     if (room?.billingConcept) {
-      this.visitDetails['visitRoom'] = room?.uuid;
+      this.visitDetails["visitRoom"] = room?.uuid;
       this.missingBillingConceptError = null;
-      this.visitDetails['visitService'] = this.visitDetails?.service?.uuid;
-      this.visitDetails['Room'] = room;
-      this.visitDetails['RoomName'] = room?.name;
+      this.visitDetails["visitService"] = this.visitDetails?.service?.uuid;
+      this.visitDetails["Room"] = room;
+      this.visitDetails["RoomName"] = room?.name;
       this.currentRoom = room?.id;
       // Take the billable concept to be a service attribute value
-      this.visitDetails['service'] = {
+      this.visitDetails["service"] = {
         ...this.visitDetails?.service,
         value: room?.billingConcept,
         uuid: room?.billingConcept,
       };
     } else {
-      this.missingBillingConceptError = 'No price item set';
-      this.visitDetails['Cash'] = null;
-      this.visitDetails['InsuranceID'] = null;
-      this.visitDetails['Insurance'] = null;
-      this.visitDetails['InsuranceAuthNo'] = null;
+      this.missingBillingConceptError = "No price item set";
+      this.visitDetails["Cash"] = null;
+      this.visitDetails["InsuranceID"] = null;
+      this.visitDetails["Insurance"] = null;
+      this.visitDetails["InsuranceAuthNo"] = null;
     }
   }
 
@@ -155,7 +155,7 @@ export class VisitComponent implements OnInit {
         loadConceptByUuid({
           uuid: serviceConcept?.uuid,
           fields:
-            'custom:(uuid,name,display,setMembers:(uuid,name,names,display))',
+            "custom:(uuid,name,display,setMembers:(uuid,name,names,display))",
         })
       );
       this.servicesConcepts$ = this.store.select(getConceptById, {
@@ -186,7 +186,7 @@ export class VisitComponent implements OnInit {
       this.visitsHierarchy2,
       (visitHierarchy) =>
         this.isEmergencyVisit && !this.currentVisitType
-          ? visitHierarchy?.display.toLowerCase().indexOf('ipd') > -1
+          ? visitHierarchy?.display.toLowerCase().indexOf("ipd") > -1
           : !this.isEmergencyVisit && this.currentVisitType
           ? visitHierarchy?.display == this.currentVisitType?.display ||
             visitHierarchy?.name == this.currentVisitType?.name ||
@@ -196,20 +196,20 @@ export class VisitComponent implements OnInit {
   }
 
   getReferralNumber(refNumber) {
-    this.visitDetails['referralNo'] = refNumber;
+    this.visitDetails["referralNo"] = refNumber;
   }
 
   setVisitMode(value: boolean, attribute?: string, type?) {
-    if (type === 'emergency') {
+    if (type === "emergency") {
       this.isEmergencyVisit = value;
     }
 
-    if (type === 'referral') {
+    if (type === "referral") {
       this.isReferralVisit = value;
     }
-    this.visitDetails['insuranceVisitType'] =
-      type === 'referral' ? '1' : type === 'emergency' ? '2' : '1';
-    this.visitDetails['emergency'] = this.isEmergencyVisit
+    this.visitDetails["insuranceVisitType"] =
+      type === "referral" ? "1" : type === "emergency" ? "2" : "1";
+    this.visitDetails["emergency"] = this.isEmergencyVisit
       ? {
           value: this.isEmergencyVisit,
           attributeUuid: this.visitDetails?.emergency?.attributeUuid
@@ -226,7 +226,7 @@ export class VisitComponent implements OnInit {
       this.currentServicesHierarchy = _.filter(
         this.visitsHierarchy2,
         (visitHierarchy) =>
-          visitHierarchy?.display.toLowerCase().indexOf('ipd') > -1
+          visitHierarchy?.display.toLowerCase().indexOf("ipd") > -1
       );
     } else {
       this.currentServicesHierarchy = _.filter(
@@ -244,18 +244,18 @@ export class VisitComponent implements OnInit {
       loadConceptByUuid({
         uuid: value?.uuid,
         fields:
-          'custom:(uuid,name,display,setMembers:(uuid,name,names,display))',
+          "custom:(uuid,name,display,setMembers:(uuid,name,names,display))",
       })
     );
-    this.visitDetails['Insurance'] = value;
+    this.visitDetails["Insurance"] = value;
     this.insuranceSchemes$ = this.store.select(getConceptById, {
       id: value?.uuid,
     });
   }
 
   setPaymentOptions(key, value) {
-    if (key == 'Payment' && value?.display == 'Insurance') {
-      this.visitDetails['Cash'] = null;
+    if (key == "Payment" && value?.display == "Insurance") {
+      this.visitDetails["Cash"] = null;
 
       this.visitDetails[key] = this.visitDetails[key]?.attributeUuid
         ? {
@@ -265,11 +265,11 @@ export class VisitComponent implements OnInit {
         : value;
 
       this.currentPaymentCategory = this.visitDetails[key];
-    } else if (key == 'Payment' && value?.display == 'Cash') {
-      this.visitDetails['InsuranceID'] = null;
-      this.visitDetails['Insurance'] = null;
-      this.visitDetails['InsuranceAuthNo'] = null;
-      this.visitDetails['voteNumber'] = null;
+    } else if (key == "Payment" && value?.display == "Cash") {
+      this.visitDetails["InsuranceID"] = null;
+      this.visitDetails["Insurance"] = null;
+      this.visitDetails["InsuranceAuthNo"] = null;
+      this.visitDetails["voteNumber"] = null;
 
       this.visitDetails[key] = this.visitDetails[key]?.attributeUuid
         ? {
@@ -279,24 +279,24 @@ export class VisitComponent implements OnInit {
         : value;
 
       this.currentPaymentCategory = this.visitDetails[key];
-    } else if (key == 'Cash') {
+    } else if (key == "Cash") {
       this.visitDetails[key] = value;
 
-      this.visitDetails['Insurance'] = null;
-      this.visitDetails['InsuranceID'] = null;
-      this.visitDetails['InsuranceAuthNo'] = null;
-    } else if (key == 'Insurance') {
+      this.visitDetails["Insurance"] = null;
+      this.visitDetails["InsuranceID"] = null;
+      this.visitDetails["InsuranceAuthNo"] = null;
+    } else if (key == "Insurance") {
       this.visitDetails[key] = value;
 
-      this.visitDetails['Cash'] = null;
+      this.visitDetails["Cash"] = null;
     }
 
     //console.log('the visit details :: ', this.visitDetails);
   }
 
   setInsuranceScheme(scheme) {
-    this.visitDetails['insuranceScheme'] = scheme;
-    this.visitDetails['PaymentScheme'] = scheme?.display;
+    this.visitDetails["insuranceScheme"] = scheme;
+    this.visitDetails["PaymentScheme"] = scheme?.display;
   }
 
   getConceptValue(uuid) {
@@ -306,21 +306,21 @@ export class VisitComponent implements OnInit {
 
     //console.log("the cat :: ", paymentCategory)
 
-    return paymentCategory?.length > 0 ? paymentCategory[0]?.display : '';
+    return paymentCategory?.length > 0 ? paymentCategory[0]?.display : "";
   }
 
   setService(service) {
-    if (this.visitDetails['service']?.attributeUuid) {
-      this.visitDetails['service'] = {
-        attributeUuid: this.visitDetails['service']?.attributeUuid,
+    if (this.visitDetails["service"]?.attributeUuid) {
+      this.visitDetails["service"] = {
+        attributeUuid: this.visitDetails["service"]?.attributeUuid,
         ...service,
       };
       this.currentVisitService = {
-        attributeUuid: this.visitDetails['service']?.attributeUuid,
+        attributeUuid: this.visitDetails["service"]?.attributeUuid,
         ...service,
       };
     } else {
-      this.visitDetails['service'] = service;
+      this.visitDetails["service"] = service;
       this.currentVisitService = service;
     }
   }
@@ -348,19 +348,19 @@ export class VisitComponent implements OnInit {
     this.activeVisitUuid$ = this.store.pipe(select(getActiveVisitUuid));
     this.locations$ = this.store.pipe(select(getLocations));
     this.referralLocations$ = this.store.select(getLocationsByTagName, {
-      tagName: 'Refer-from Location',
+      tagName: "Refer-from Location",
     });
 
     this.admissionLocations$ = this.store.select(getLocationsByTagName, {
-      tagName: 'Admission Location',
+      tagName: "Admission Location",
     });
 
     this.registrationService
       .getServicesConceptHierarchy()
       .subscribe((response) => {
         this.visitsHierarchy2 =
-          response['results'] && response['results'].length > 0
-            ? response['results'][0]['setMembers']
+          response["results"] && response["results"].length > 0
+            ? response["results"][0]["setMembers"]
             : [];
       });
 
@@ -368,28 +368,28 @@ export class VisitComponent implements OnInit {
       this.registrationService.getPaymentOptionsHierarchy();
     this.paymentsCategories$.subscribe((response) => {
       this.paymentsCategories =
-        response['results'] && response['results'].length > 0
-          ? response['results'][0]['setMembers']
+        response["results"] && response["results"].length > 0
+          ? response["results"][0]["setMembers"]
           : [];
     });
   }
 
   openDialog(locations) {
     const dialogRef = this.dialog.open(SelectRoomComponent, {
-      width: '40%',
+      width: "40%",
       data: { locations, currentRoom: this.visitDetails?.Room },
     });
 
     dialogRef.afterClosed().subscribe((dialogData) => {
       if (dialogData) {
         this.visitDetails.Room = dialogData?.room;
-        this.visitDetails['RoomName'] = dialogData?.room?.name;
+        this.visitDetails["RoomName"] = dialogData?.room?.name;
       }
     });
   }
 
   setReferral(referral) {
-    if (referral == 'none') {
+    if (referral == "none") {
       this.referralHospital = null;
     } else {
       if (this.referralHospital?.attributeUuid) {
@@ -408,7 +408,7 @@ export class VisitComponent implements OnInit {
     if (this.visitPayloadViable) {
       let visitAttributes = [];
       visitAttributes.push({
-        attributeType: 'PSCHEME0IIIIIIIIIIIIIIIIIIIIIIIATYPE',
+        attributeType: "PSCHEME0IIIIIIIIIIIIIIIIIIIIIIIATYPE",
         value:
           this.visitDetails?.Cash && this.visitDetails?.Cash?.uuid
             ? this.visitDetails?.Cash?.uuid
@@ -419,36 +419,36 @@ export class VisitComponent implements OnInit {
 
       if (this.referralHospital) {
         visitAttributes.push({
-          attributeType: '47da17a9-a910-4382-8149-736de57dab18',
+          attributeType: "47da17a9-a910-4382-8149-736de57dab18",
           value: this.referralHospital?.uuid,
         });
       }
 
       if (this.visitDetails?.emergency?.value) {
         visitAttributes.push({
-          attributeType: 'f0cfcd18-5fd1-4c1b-9447-dc0e56be66d4',
+          attributeType: "f0cfcd18-5fd1-4c1b-9447-dc0e56be66d4",
           value: this.visitDetails?.emergency?.value,
         });
       } else {
         visitAttributes.push({
-          attributeType: 'f0cfcd18-5fd1-4c1b-9447-dc0e56be66d4',
+          attributeType: "f0cfcd18-5fd1-4c1b-9447-dc0e56be66d4",
           value: false,
         });
       }
 
       if (this.visitDetails?.Insurance?.uuid) {
         visitAttributes.push({
-          attributeType: 'INSURANCEIIIIIIIIIIIIIIIIIIIIIIATYPE',
+          attributeType: "INSURANCEIIIIIIIIIIIIIIIIIIIIIIATYPE",
           value: this.visitDetails?.Insurance?.uuid || null,
         });
 
         visitAttributes.push({
-          attributeType: 'INSURANCEIDIIIIIIIIIIIIIIIIIIIIATYPE',
+          attributeType: "INSURANCEIDIIIIIIIIIIIIIIIIIIIIATYPE",
           value: this.visitDetails?.InsuranceID || null,
         });
 
         visitAttributes.push({
-          attributeType: 'INSURANCEAUTHNOIIIIIIIIIIIIIIIIATYPE',
+          attributeType: "INSURANCEAUTHNOIIIIIIIIIIIIIIIIATYPE",
           value: this.visitDetails?.InsuranceAuthNo || null,
         });
       }
@@ -460,31 +460,31 @@ export class VisitComponent implements OnInit {
         attributes: [
           ...visitAttributes,
           {
-            attributeType: 'PTYPE000IIIIIIIIIIIIIIIIIIIIIIIATYPE',
+            attributeType: "PTYPE000IIIIIIIIIIIIIIIIIIIIIIIATYPE",
             value: this.visitDetails?.Payment?.uuid,
           },
           {
-            attributeType: 'SERVICE0IIIIIIIIIIIIIIIIIIIIIIIATYPE',
+            attributeType: "SERVICE0IIIIIIIIIIIIIIIIIIIIIIIATYPE",
             value: this.visitDetails?.service?.uuid,
           },
           {
-            attributeType: 'ebc0a258-44a1-409f-908c-652338c411e8',
+            attributeType: "ebc0a258-44a1-409f-908c-652338c411e8",
             value: this.visitDetails?.insuranceVisitType,
           },
           {
-            attributeType: '1ada2d4f-e6b7-4a5d-a2d0-d6d58e96ac7a',
+            attributeType: "1ada2d4f-e6b7-4a5d-a2d0-d6d58e96ac7a",
             value: this.visitDetails?.referralNo,
           },
           {
-            attributeType: '66f3825d-1915-4278-8e5d-b045de8a5db9',
+            attributeType: "66f3825d-1915-4278-8e5d-b045de8a5db9",
             value: this.visitDetails?.visitService,
           },
           {
-            attributeType: '6eb602fc-ae4a-473c-9cfb-f11a60eeb9ac',
+            attributeType: "6eb602fc-ae4a-473c-9cfb-f11a60eeb9ac",
             value: this.visitDetails?.visitRoom,
           },
           {
-            attributeType: '370e6cf0-539f-46f1-87a2-43446d8b17b0',
+            attributeType: "370e6cf0-539f-46f1-87a2-43446d8b17b0",
             value: this.visitDetails?.voteNumber,
           },
         ],
@@ -499,15 +499,15 @@ export class VisitComponent implements OnInit {
         startVisit({ visit: visitPayload, isEmergency: this.isEmergencyVisit })
       );
     } else {
-      this.openSnackBar('Error: location is not set', null);
+      this.openSnackBar("Error: location is not set", null);
     }
   }
 
   openSnackBar(message: string, action: string) {
     this._snackBar.open(message, action, {
       duration: 3000,
-      horizontalPosition: 'center',
-      verticalPosition: 'top',
+      horizontalPosition: "center",
+      verticalPosition: "top",
     });
   }
 
@@ -535,12 +535,12 @@ export class VisitComponent implements OnInit {
 
     const referredHospitalUuidAndValue =
       this.getAttributeValueAndUuidFromVisitAttribute(
-        'ReferredFrom',
+        "ReferredFrom",
         visitDetails
       );
     const insuranceVisitTypeUuidAndValue =
       this.getAttributeValueAndUuidFromVisitAttribute(
-        'NHIF Visit type',
+        "NHIF Visit type",
         visitDetails
       );
 
@@ -548,17 +548,17 @@ export class VisitComponent implements OnInit {
       insuranceVisitTypeUuidAndValue &&
       insuranceVisitTypeUuidAndValue?.value
     ) {
-      this.visitDetails['insuranceVisitType'] = true;
+      this.visitDetails["insuranceVisitType"] = true;
       this.isReferralVisit = true;
     }
 
     const referralNumberUuidAndValue =
       this.getAttributeValueAndUuidFromVisitAttribute(
-        'NHIF Referral Number',
+        "NHIF Referral Number",
         visitDetails
       );
 
-    this.visitDetails['referralNo'] =
+    this.visitDetails["referralNo"] =
       referralNumberUuidAndValue && referralNumberUuidAndValue?.value
         ? referralNumberUuidAndValue?.value
         : null;
@@ -573,7 +573,7 @@ export class VisitComponent implements OnInit {
     this.setReferral(this.referralHospital);
 
     const visitServiceUuidAndValue =
-      this.getAttributeValueAndUuidFromVisitAttribute('Service', visitDetails);
+      this.getAttributeValueAndUuidFromVisitAttribute("Service", visitDetails);
 
     const servicesArray = _.filter(
       this.currentServicesHierarchy?.length > 0
@@ -591,7 +591,7 @@ export class VisitComponent implements OnInit {
 
     const paymentCategoryUuidAndValue =
       this.getAttributeValueAndUuidFromVisitAttribute(
-        'PaymentCategory',
+        "PaymentCategory",
         visitDetails
       );
 
@@ -613,24 +613,24 @@ export class VisitComponent implements OnInit {
         : null;
 
     this.visitDetails.Room = visitDetails?.location;
-    this.visitDetails['RoomName'] =
+    this.visitDetails["RoomName"] =
       visitDetails?.location?.name || visitDetails?.location?.display;
     if (this.visitDetails && this.visitDetails?.Room) {
       this.currentRoom = this.visitDetails?.Room?.uuid;
     }
 
     if (
-      paymentCategoryConcept?.name == 'Insurance' ||
-      paymentCategoryConcept?.display == 'Insurance'
+      paymentCategoryConcept?.name == "Insurance" ||
+      paymentCategoryConcept?.display == "Insurance"
     ) {
       this.disableEditingPayments = true;
     }
 
-    this.setPaymentOptions('Payment', paymentCategoryConcept);
+    this.setPaymentOptions("Payment", paymentCategoryConcept);
 
     const paymentSchemeUuidAndValue =
       this.getAttributeValueAndUuidFromVisitAttribute(
-        'PaymentScheme',
+        "PaymentScheme",
         visitDetails
       );
 
@@ -645,28 +645,28 @@ export class VisitComponent implements OnInit {
 
     //TODO: fix changing payments to not add more attributes
 
-    if (this.visitDetails?.Payment?.display == 'Insurance') {
+    if (this.visitDetails?.Payment?.display == "Insurance") {
       let insuranceConcept =
         paymentSchemesConceptsArray?.length > 0
           ? paymentSchemesConceptsArray[0]
           : null;
-      this.setPaymentOptions('Insurance', insuranceConcept);
+      this.setPaymentOptions("Insurance", insuranceConcept);
     }
 
-    if (this.visitDetails?.Payment?.display == 'Cash') {
+    if (this.visitDetails?.Payment?.display == "Cash") {
       //console.log("i should ve gotten here")
       let cashConcept =
         paymentSchemesConceptsArray?.length > 0
           ? paymentSchemesConceptsArray[0]
           : null;
-      this.setPaymentOptions('Cash', {
+      this.setPaymentOptions("Cash", {
         ...cashConcept,
         attributeUuid: paymentSchemeUuidAndValue?.uuid,
       });
     }
 
     const emergencyState = this.getAttributeValueAndUuidFromVisitAttribute(
-      'EmergencyVisit',
+      "EmergencyVisit",
       visitDetails
     );
 
@@ -699,7 +699,7 @@ export class VisitComponent implements OnInit {
       let visitAttributes = [];
       visitAttributes.push({
         uuid: this.visitDetails?.Cash?.attributeUuid || null,
-        attributeType: 'PSCHEME0IIIIIIIIIIIIIIIIIIIIIIIATYPE',
+        attributeType: "PSCHEME0IIIIIIIIIIIIIIIIIIIIIIIATYPE",
         value:
           this.visitDetails?.Cash && this.visitDetails?.Cash?.uuid
             ? this.visitDetails?.Cash?.uuid
@@ -710,17 +710,17 @@ export class VisitComponent implements OnInit {
 
       if (this.visitDetails?.Insurance?.uuid) {
         visitAttributes.push({
-          attributeType: 'INSURANCEIIIIIIIIIIIIIIIIIIIIIIATYPE',
+          attributeType: "INSURANCEIIIIIIIIIIIIIIIIIIIIIIATYPE",
           value: this.visitDetails?.Insurance?.uuid || null,
         });
 
         visitAttributes.push({
-          attributeType: 'INSURANCEIDIIIIIIIIIIIIIIIIIIIIATYPE',
+          attributeType: "INSURANCEIDIIIIIIIIIIIIIIIIIIIIATYPE",
           value: this.visitDetails?.InsuranceID || null,
         });
 
         visitAttributes.push({
-          attributeType: 'INSURANCEAUTHNOIIIIIIIIIIIIIIIIATYPE',
+          attributeType: "INSURANCEAUTHNOIIIIIIIIIIIIIIIIATYPE",
           value: this.visitDetails?.InsuranceAuthNo || null,
         });
       }
@@ -729,14 +729,14 @@ export class VisitComponent implements OnInit {
         visitAttributes.push({
           uuid: this.visitDetails?.emergency?.attributeUuid,
           value: this.visitDetails?.emergency?.value,
-          attributeType: 'f0cfcd18-5fd1-4c1b-9447-dc0e56be66d4',
+          attributeType: "f0cfcd18-5fd1-4c1b-9447-dc0e56be66d4",
         });
       }
 
       if (this.referralHospital != null) {
         visitAttributes.push({
           uuid: this.referralHospital?.attributeUuid,
-          attributeType: '47da17a9-a910-4382-8149-736de57dab18',
+          attributeType: "47da17a9-a910-4382-8149-736de57dab18",
           value: this.referralHospital.uuid,
         });
       }
@@ -749,32 +749,32 @@ export class VisitComponent implements OnInit {
           ...visitAttributes,
           {
             uuid: this.visitDetails?.Payment?.attributeUuid,
-            attributeType: 'PTYPE000IIIIIIIIIIIIIIIIIIIIIIIATYPE',
+            attributeType: "PTYPE000IIIIIIIIIIIIIIIIIIIIIIIATYPE",
             value: this.visitDetails?.Payment?.uuid,
           },
           {
             uuid: this.visitDetails?.service?.attributeUuid,
-            attributeType: 'SERVICE0IIIIIIIIIIIIIIIIIIIIIIIATYPE',
+            attributeType: "SERVICE0IIIIIIIIIIIIIIIIIIIIIIIATYPE",
             value: this.visitDetails?.service?.uuid,
           },
           {
-            attributeType: 'ebc0a258-44a1-409f-908c-652338c411e8',
+            attributeType: "ebc0a258-44a1-409f-908c-652338c411e8",
             value: this.visitDetails?.insuranceVisitType,
           },
           {
-            attributeType: '1ada2d4f-e6b7-4a5d-a2d0-d6d58e96ac7a',
+            attributeType: "1ada2d4f-e6b7-4a5d-a2d0-d6d58e96ac7a",
             value: this.visitDetails?.referralNo,
           },
           {
-            attributeType: '66f3825d-1915-4278-8e5d-b045de8a5db9',
+            attributeType: "66f3825d-1915-4278-8e5d-b045de8a5db9",
             value: this.visitDetails?.visitService,
           },
           {
-            attributeType: '6eb602fc-ae4a-473c-9cfb-f11a60eeb9ac',
+            attributeType: "6eb602fc-ae4a-473c-9cfb-f11a60eeb9ac",
             value: this.visitDetails?.visitRoom,
           },
           {
-            attributeType: '370e6cf0-539f-46f1-87a2-43446d8b17b0',
+            attributeType: "370e6cf0-539f-46f1-87a2-43446d8b17b0",
             value: this.visitDetails?.voteNumber,
           },
         ],
@@ -790,7 +790,7 @@ export class VisitComponent implements OnInit {
       );
       this.visitUpdate.emit(visitPayload);
     } else {
-      this.openSnackBar('Error: location is not set', null);
+      this.openSnackBar("Error: location is not set", null);
     }
   }
 
@@ -799,8 +799,8 @@ export class VisitComponent implements OnInit {
     this.visitUpdate.emit(null);
     const dialogRef = this.dialog
       .open(VisitClaimComponent, {
-        width: '80%',
-        maxHeight: '90vh',
+        width: "80%",
+        maxHeight: "90vh",
         data: visitDetails,
       })
       .afterClosed()
@@ -814,13 +814,13 @@ export class VisitComponent implements OnInit {
     return !this.isEmergencyVisit
       ? this.visitTypes.filter(
           (visitType) =>
-            visitType?.id !== '8d74026d-e345-41d9-b5d1-aea721fc4ccd' &&
-            visitType?.name.toLowerCase().indexOf('ipd') === -1
+            visitType?.id !== "8d74026d-e345-41d9-b5d1-aea721fc4ccd" &&
+            visitType?.name.toLowerCase().indexOf("ipd") === -1
         ) || []
       : this.visitTypes.filter(
           (visitType) =>
-            visitType?.id === '8d74026d-e345-41d9-b5d1-aea721fc4ccd' ||
-            visitType?.name.toLowerCase().indexOf('ipd') > -1
+            visitType?.id === "8d74026d-e345-41d9-b5d1-aea721fc4ccd" ||
+            visitType?.name.toLowerCase().indexOf("ipd") > -1
         ) || [];
   }
 

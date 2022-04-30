@@ -21,6 +21,7 @@ export class Field<T> {
   otherType?: string;
   shouldHaveLiveSearchForDropDownFields?: boolean;
   filteringItems?: any[];
+  category?: string;
 
   constructor(
     options: {
@@ -43,6 +44,7 @@ export class Field<T> {
       otherType?: string;
       shouldHaveLiveSearchForDropDownFields?: boolean;
       filteringItems?: any[];
+      category?: string;
     } = {}
   ) {
     this.value = options.value;
@@ -60,8 +62,9 @@ export class Field<T> {
     this.max = options.max;
     this.hidden = options.hidden || false;
     this.units = options.units || "";
-    (this.shouldHaveLiveSearchForDropDownFields =
-      options.shouldHaveLiveSearchForDropDownFields),
-      (this.otherType = options.otherType);
+    this.shouldHaveLiveSearchForDropDownFields =
+      options.shouldHaveLiveSearchForDropDownFields;
+    this.otherType = options.otherType;
+    this.category = options?.category;
   }
 }

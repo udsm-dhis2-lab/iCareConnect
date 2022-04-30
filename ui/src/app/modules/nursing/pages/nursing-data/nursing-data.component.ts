@@ -15,7 +15,10 @@ import { ProviderGetFull } from "src/app/shared/resources/openmrs";
 import { Patient } from "src/app/shared/resources/patient/models/patient.model";
 import { Visit } from "src/app/shared/resources/visits/models/visit.model";
 import { loadCustomOpenMRSForms, loadOrderTypes } from "src/app/store/actions";
-import { clearBills } from "src/app/store/actions/bill.actions";
+import {
+  clearBills,
+  loadPatientBills,
+} from "src/app/store/actions/bill.actions";
 import { saveObservationsUsingEncounter } from "src/app/store/actions/observation.actions";
 import { AppState } from "src/app/store/reducers";
 import { getAllOrderTypes, getCurrentLocation } from "src/app/store/selectors";
@@ -29,7 +32,10 @@ import {
   getCurrentUserPrivileges,
   getProviderDetails,
 } from "src/app/store/selectors/current-user.selectors";
-import { getCustomOpenMRSFormsByIds, getFormEntitiesByNames } from "src/app/store/selectors/form.selectors";
+import {
+  getCustomOpenMRSFormsByIds,
+  getFormEntitiesByNames,
+} from "src/app/store/selectors/form.selectors";
 import {
   getGroupedObservationByConcept,
   getSavingObservationStatus,
@@ -49,6 +55,7 @@ export class NursingDataComponent implements OnInit {
   @Input() currentUser: any;
   @Input() userPrivileges: any;
   @Input() nursingConfigurations: any;
+  @Input() patient: any;
   provider$: Observable<ProviderGetFull>;
   visit$: Observable<Visit>;
   currentLocation$: Observable<Location>;

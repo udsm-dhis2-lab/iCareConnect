@@ -38,30 +38,33 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		executeDataSet("billing-data.xml");
 		this.startUp();
 	}
-
+	
 	@Test
 	public void testIdGeneration() throws Exception {
-
+		
 		String dto = this.readFile("dto/core/id-generator.json");
 		Map<String, Object> idDtop = (new ObjectMapper()).readValue(dto, Map.class);
 		AdministrationService adminService = Context.getService(AdministrationService.class);
 		adminService.setGlobalProperty(DHIS2Config.facilityCode, "987398345-6");
-
-		adminService.setGlobalProperty(ICareConfig.PATIENT_ID_FORMAT, "GP{" + DHIS2Config.facilityCode + "}/D{YYYYMMDD}/COUNT");
-		MockHttpServletRequest newGetRequest = newPostRequest("icare/idgen",idDtop);
+		
+		adminService.setGlobalProperty(ICareConfig.PATIENT_ID_FORMAT, "GP{" + DHIS2Config.facilityCode
+		        + "}/D{YYYYMMDD}/COUNT");
+		MockHttpServletRequest newGetRequest = newPostRequest("icare/idgen", idDtop);
 		MockHttpServletResponse handle = handle(newGetRequest);
 		System.out.println("Date Wise:" + handle.getContentAsString());
-
-		adminService.setGlobalProperty(ICareConfig.PATIENT_ID_FORMAT, "GP{" + DHIS2Config.facilityCode + "}/D{YYYYMM}/COUNT");
-		newGetRequest = newPostRequest("icare/idgen",idDtop);
+		
+		adminService
+		        .setGlobalProperty(ICareConfig.PATIENT_ID_FORMAT, "GP{" + DHIS2Config.facilityCode + "}/D{YYYYMM}/COUNT");
+		newGetRequest = newPostRequest("icare/idgen", idDtop);
 		handle = handle(newGetRequest);
 		System.out.println("Monthly ID:" + handle.getContentAsString());
-
+		
 		adminService.setGlobalProperty(ICareConfig.PATIENT_ID_FORMAT, "GP{" + DHIS2Config.facilityCode + "}/D{YYYY}/COUNT");
-		newGetRequest = newPostRequest("icare/idgen",idDtop);
+		newGetRequest = newPostRequest("icare/idgen", idDtop);
 		handle = handle(newGetRequest);
 		System.out.println("Yearly ID:" + handle.getContentAsString());
 	}
+	
 	@Test
 	public void testCreatingItem() throws Exception {
 		
@@ -386,5 +389,17 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		
 		orderResult = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
 		assertThat("Should return a visit", ((List) orderResult.get("results")).size() == 1);
+	}
+	
+	@Test
+	public void testGettingItemsByDepartment() throws Exception {
+		
+		MockHttpServletRequest newGetRequest = newGetRequest("icare/item", new Parameter("department",
+		        "z8211c30-5e44-11e8-ie7c-50b6etwQqQee"));
+		MockHttpServletResponse handle = handle(newGetRequest);
+		Map<String, Object> results = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
+		List<Map<String, Object>> maps = (List) results.get("results");
+		assertThat("Should return 1 item", maps.size(), is(1));
+		
 	}
 }

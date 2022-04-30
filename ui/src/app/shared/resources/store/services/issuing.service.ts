@@ -1,17 +1,17 @@
-import { Injectable } from '@angular/core';
-import { Observable, of, throwError } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { OpenmrsHttpClientService } from 'src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service';
+import { Injectable } from "@angular/core";
+import { Observable, of, throwError } from "rxjs";
+import { catchError, map } from "rxjs/operators";
+import { OpenmrsHttpClientService } from "src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service";
 import {
   IssueInput,
   IssueStatusInput,
   Issuing,
   IssuingObject,
-} from '../models/issuing.model';
-import { Requisition, RequisitionStatus } from '../models/requisition.model';
+} from "../models/issuing.model";
+import { Requisition, RequisitionStatus } from "../models/requisition.model";
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: "root",
 })
 export class IssuingService {
   constructor(private httpClient: OpenmrsHttpClientService) {}
@@ -30,15 +30,18 @@ export class IssuingService {
 
   issueRequest(issueInput: IssueInput): Observable<any> {
     if (!issueInput) {
-      return throwError({ message: 'You have provided incorrect parameters' });
+      return throwError({ message: "You have provided incorrect parameters" });
     }
     const issueObject = Issuing.createIssue(issueInput);
 
-    return this.httpClient.post('store/issue', issueObject);
+    return this.httpClient.post("store/issue", issueObject).pipe(
+      map((response) => response),
+      catchError((error) => of(error))
+    );
   }
 
   saveIssueStatus(issueStatusInput: IssueStatusInput): Observable<any> {
     const issueStatus = Issuing.createIssueStatusObject(issueStatusInput);
-    return this.httpClient.post('store/issuestatus', issueStatus);
+    return this.httpClient.post("store/issuestatus", issueStatus);
   }
 }

@@ -1,45 +1,49 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
-import { BillItemObject } from '../../models/bill-item-object.model';
-import { BillItem } from '../../models/bill-item.model';
-import { BillObject } from '../../models/bill-object.model';
-import { BillConfirmationComponent } from '../bill-confirmation/bill-confirmation.component';
-import { keys } from 'lodash';
-import { PaymentInput } from '../../models/payment-input.model';
-import { PaymentTypeInterface } from 'src/app/shared/models/payment-type.model';
-import { MatTableDataSource } from '@angular/material/table';
+import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import { MatDialog } from "@angular/material/dialog";
+import { BillItemObject } from "../../models/bill-item-object.model";
+import { BillItem } from "../../models/bill-item.model";
+import { BillObject } from "../../models/bill-object.model";
+import { BillConfirmationComponent } from "../bill-confirmation/bill-confirmation.component";
+import { keys } from "lodash";
+import { PaymentInput } from "../../models/payment-input.model";
+import { PaymentTypeInterface } from "src/app/shared/models/payment-type.model";
+import { MatTableDataSource } from "@angular/material/table";
 import {
   trigger,
   state,
   style,
   transition,
   animate,
-} from '@angular/animations';
-import { SelectionModel } from '@angular/cdk/collections';
+} from "@angular/animations";
+import { SelectionModel } from "@angular/cdk/collections";
 
 @Component({
-  selector: 'app-quotations',
-  templateUrl: './quotations.component.html',
-  styleUrls: ['./quotations.component.scss'],
+  selector: "app-quotations",
+  templateUrl: "./quotations.component.html",
+  styleUrls: ["./quotations.component.scss"],
   animations: [
-    trigger('detailExpand', [
+    trigger("detailExpand", [
       state(
-        'collapsed',
-        style({ height: '0px', minHeight: '0', visibility: 'hidden' })
+        "collapsed",
+        style({ height: "0px", minHeight: "0", visibility: "hidden" })
       ),
-      state('expanded', style({ height: '*', visibility: 'visible' })),
+      state("expanded", style({ height: "*", visibility: "visible" })),
       transition(
-        'expanded <=> collapsed',
-        animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')
+        "expanded <=> collapsed",
+        animate("225ms cubic-bezier(0.4, 0.0, 0.2, 1)")
       ),
     ]),
   ],
 })
 export class QuotationsComponent implements OnInit {
+  @Input() patientBillingDetails: any;
   @Input() bills: BillObject[];
   @Input() confirmingPayment: boolean;
   @Input() disableControls: boolean;
   @Input() currentUser: any;
+  @Input() currentPatient: any;
+  @Input() logo: any;
+  @Input() facilityDetails: any;
   displayedColumns: any[];
   columns: any[];
   dataSource: MatTableDataSource<any>;
@@ -59,14 +63,19 @@ export class QuotationsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.columns = [{ id: 'orderNumber', label: 'Order Number' }];
-    this.displayedColumns = ['orderNumber', 'select'];
+
+    // console.log("************************")
+    // console.log(this.patientBillingDetails);
+    // console.log(this.bills)
+
+    this.columns = [{ id: "orderNumber", label: "Order Number" }];
+    this.displayedColumns = ["orderNumber", "select"];
     this.dataSource = new MatTableDataSource([
       {
-        orderNumber: '#3424',
+        orderNumber: "#3424",
       },
       {
-        orderNumber: '#3444',
+        orderNumber: "#3444",
       },
     ]);
   }

@@ -9,7 +9,24 @@
     appearance="fill"
     class="w-100 no-padding"
   >
-    <mat-label [attr.for]="field?.key">{{ field?.label }}</mat-label>
+    <mat-label [attr.for]="field?.key">{{ field?.label }} </mat-label>
+
+    <!-- phone number -->
+    <input
+      *ngSwitchCase="'phoneNumber'"
+      [formControlName]="field?.key"
+      [id]="field?.key"
+      [min]="field?.type === 'number' ? 0 : null"
+      [max]="field?.max"
+      [disabled]="shouldDisable || field?.disabled"
+      [placeholder]="field?.placeholder"
+      class="{{ fieldClass || 'field-input' }}"
+      [type]="field?.type"
+      [required]="field?.required"
+      matInput
+      (keyup)="onFieldUpdate()"
+    />
+    <!-- end of phone number -->
 
     <!-- textbox -->
     <input
@@ -22,6 +39,7 @@
       [placeholder]="field?.placeholder"
       class="{{ fieldClass || 'field-input' }}"
       [type]="field?.type"
+      [required]="field?.required"
       matInput
       (keyup)="onFieldUpdate()"
     />
@@ -34,6 +52,7 @@
       [placeholder]="field?.placeholder"
       class="{{ fieldClass || 'field-input' }}"
       [formControlName]="field?.key"
+      [required]="field?.required"
       (selectionChange)="onFieldUpdate()"
     >
       <mat-option *ngFor="let option of field?.options" [value]="option?.key">{{
@@ -52,6 +71,7 @@
       }"
       *ngSwitchCase="'textarea'"
       matInput
+      [required]="field?.required"
       [rows]="
         field?.rows
           ? field?.rows
@@ -66,7 +86,9 @@
     ></textarea>
     <!-- end of text area field -->
 
-    <mat-error *ngIf="!isValid">{{ field?.label }} is required</mat-error>
+    <mat-error *ngIf="issueWithTheDataField">
+      {{ issueWithTheDataField }}
+    </mat-error>
   </mat-form-field>
 </div>
 <div
@@ -84,6 +106,7 @@
       type="text"
       placeholder="Search {{ field?.label }}"
       aria-label="{{ field?.label }}"
+      [required]="field?.required"
       matInput
       (keyup)="searchConcept($event)"
       [matAutocomplete]="auto"
@@ -107,6 +130,7 @@
     [formControlName]="field?.key"
     [checked]="field?.value"
     (change)="onFieldUpdate()"
+    [required]="field?.required"
     [disabled]="shouldDisable"
     [title]="shouldDisable ? 'No price set for this item' : 'Can be ordered'"
   >
@@ -119,6 +143,7 @@
     <mat-checkbox
       [hidden]="field?.hidden"
       [id]="field?.id"
+      [required]="field?.required"
       [formControlName]="field?.key"
       [checked]="field?.value"
       (change)="onFieldUpdate()"
@@ -139,6 +164,7 @@
     <input
       matInput
       [id]="field?.key"
+      [required]="field?.required"
       [matDatepicker]="fieldId"
       [placeholder]="field?.placeholder"
       [formControlName]="field?.key"

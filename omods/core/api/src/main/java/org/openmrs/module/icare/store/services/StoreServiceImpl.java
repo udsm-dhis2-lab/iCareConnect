@@ -146,7 +146,12 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 	
 	@Override
 	public Stock getStockByItemBatchLocation(Item item, String batchNo, Date expiryDate, Location location) {
-		return this.stockDAO.getStockByItemBatchLocation(item.getUuid(), batchNo, expiryDate, location.getUuid());
+		return this.stockDAO.getStockByItemBatchExpDateLocation(item.getUuid(), batchNo, expiryDate, location.getUuid());
+	}
+	
+	@Override
+	public List<Stock> getStockByItemLocation(Item item, Location location) {
+		return this.stockDAO.getStockByItemLocation(item.getUuid(), location.getUuid());
 	}
 	
 	@Override

@@ -28,6 +28,29 @@ export class FieldComponent {
     return this.form?.controls[this.field.id]?.valid;
   }
 
+  get issueWithTheDataField(): string {
+    const message = this.form?.controls[this.field.id]?.valid
+      ? null
+      : !this.form?.controls[this.field.id]?.valid &&
+        this.form.controls[this.field.id]?.errors?.minlength
+      ? `${this.field?.label} has not reached required number of characters`
+      : !this.form?.controls[this.field.id]?.valid &&
+        this.form.controls[this.field.id]?.errors?.maxlength
+      ? `${this.field?.label} has exceeded required number of characters`
+      : !this.form?.controls[this.field.id]?.valid
+      ? `${this.field?.label} is required`
+      : "";
+    return message;
+  }
+
+  get hasMinimunLengthIssue(): boolean {
+    return this.form.controls[this.field.id]?.errors?.minlength;
+  }
+
+  get hasMaximumLengthIssue(): boolean {
+    return this.form.controls[this.field.id]?.errors?.maxlength;
+  }
+
   get isDate(): boolean {
     return this.field.controlType === "date";
   }

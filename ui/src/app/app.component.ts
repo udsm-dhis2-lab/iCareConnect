@@ -15,7 +15,7 @@ import { getIfNonLoginRoute } from "./store/selectors";
   styleUrls: ["./app.component.scss"],
 })
 export class AppComponent implements OnInit {
-  title = "afyacare-ui";
+  title = "iCare";
 
   isNonLoginRoute$: Observable<boolean>;
   isDialogOpen: boolean;

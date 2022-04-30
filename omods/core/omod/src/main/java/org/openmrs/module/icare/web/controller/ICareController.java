@@ -3,7 +3,7 @@
  * v. 2.0. If a copy of the MPL was not distributed with this file, You can
  * obtain one at http://mozilla.org/MPL/2.0/. OpenMRS is also distributed under
  * the terms of the Healthcare Disclaimer located at http://openmrs.org/license.
- *
+ * <p>
  * Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS
  * graphic logo is a trademark of OpenMRS Inc.
  */
@@ -52,31 +52,32 @@ public class ICareController {
 	
 	/** Logger for this class and subclasses */
 	protected final Log log = LogFactory.getLog(getClass());
-
+	
 	@RequestMapping(value = "idgen", method = RequestMethod.POST)
-	@ResponseBody
-	public Map<String, Object> onGenerateId() {
-		Map<String, Object> results = new HashMap<>();
-		List<String> ids = iCareService.generatePatientIds();
-		results.put("identifiers",ids);
-		return results;
-	}
+    @ResponseBody
+    public Map<String, Object> onGenerateId() {
+        Map<String, Object> results = new HashMap<>();
+        List<String> ids = iCareService.generatePatientIds();
+        results.put("identifiers", ids);
+        return results;
+    }
+	
 	/**
 	 * Initially called after the getUsers method to get the landing form name
 	 * 
 	 * @return String form view name
 	 */
 	@RequestMapping(value = "item", method = RequestMethod.GET)
-	@ResponseBody
-	public Map<String, Object> onGetItem(@RequestParam(required = false) String q, @RequestParam(defaultValue = "100") Integer limit, @RequestParam(defaultValue = "0") Integer startIndex) {
-		List<Map<String, Object>> items = new ArrayList<Map<String, Object>>();
-		for (Item item : iCareService.getItems(q, limit, startIndex)) {
-			items.add(item.toMap());
-		}
-		Map<String, Object> results = new HashMap<>();
-		results.put("results",items);
-		return results;
-	}
+    @ResponseBody
+    public Map<String, Object> onGetItem(@RequestParam(required = false) String q, @RequestParam(defaultValue = "100") Integer limit, @RequestParam(defaultValue = "0") Integer startIndex, @RequestParam(required = false) String department) {
+        List<Map<String, Object>> items = new ArrayList<Map<String, Object>>();
+        for (Item item : iCareService.getItems(q, limit, startIndex, department)) {
+            items.add(item.toMap());
+        }
+        Map<String, Object> results = new HashMap<>();
+        results.put("results", items);
+        return results;
+    }
 	
 	@RequestMapping(value = "item", method = RequestMethod.POST)
 	@ResponseBody
@@ -107,16 +108,16 @@ public class ICareController {
 	}
 	
 	@RequestMapping(value = "itemprice", method = RequestMethod.GET)
-	@ResponseBody
-	public Map<String, Object> onGet(@RequestParam(defaultValue = "100") Integer limit, @RequestParam(defaultValue = "0") Integer startIndex, @RequestParam(required = false) String paymentType) {
-		List<Map<String, Object>> items = new ArrayList<Map<String, Object>>();
-		for (ItemPrice item : iCareService.getItemPrices(paymentType,limit, startIndex)) {
-			items.add(item.toMap());
-		}
-		Map<String, Object> results = new HashMap<>();
-		results.put("results",items);
-		return results;
-	}
+    @ResponseBody
+    public Map<String, Object> onGet(@RequestParam(defaultValue = "100") Integer limit, @RequestParam(defaultValue = "0") Integer startIndex, @RequestParam(required = false) String paymentType) {
+        List<Map<String, Object>> items = new ArrayList<Map<String, Object>>();
+        for (ItemPrice item : iCareService.getItemPrices(paymentType, limit, startIndex)) {
+            items.add(item.toMap());
+        }
+        Map<String, Object> results = new HashMap<>();
+        results.put("results", items);
+        return results;
+    }
 	
 	@RequestMapping(value = "itemprice", method = RequestMethod.POST)
 	@ResponseBody
@@ -181,23 +182,23 @@ public class ICareController {
 	}
 	
 	@RequestMapping(value = "messages", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
-	@ResponseBody
-	public List<Map<String, Object>> sendMessages(@RequestBody List<Map<String, Object>> messageList) throws Exception {
+    @ResponseBody
+    public List<Map<String, Object>> sendMessages(@RequestBody List<Map<String, Object>> messageList) throws Exception {
 
-		List<Message> messages = new ArrayList<>();
+        List<Message> messages = new ArrayList<>();
 
-		for(Map<String, Object> messageObject: messageList){
-			Message message = Message.fromMap(messageObject);
-			messages.add(message);
-		}
-		messages = iCareService.sendMessages(messages);
-		messageList = new ArrayList<>();
+        for (Map<String, Object> messageObject : messageList) {
+            Message message = Message.fromMap(messageObject);
+            messages.add(message);
+        }
+        messages = iCareService.sendMessages(messages);
+        messageList = new ArrayList<>();
 
-		for(Message message: iCareService.sendMessages(messages)){
-			messageList.add(message.toMap());
-		}
-		return messageList;
-	}
+        for (Message message : iCareService.sendMessages(messages)) {
+            messageList.add(message.toMap());
+        }
+        return messageList;
+    }
 	
 	@RequestMapping(value = "prescription", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
@@ -240,56 +241,56 @@ public class ICareController {
 	}
 	
 	@RequestMapping(value = "visit", method = RequestMethod.GET)
-	@ResponseBody
-	public Map<String, Object> getPendingVisit(@RequestParam(defaultValue = "100") Integer limit,
-											   @RequestParam(defaultValue = "0") Integer startIndex,
-											   @RequestParam String orderTypeUuid,
-											   @RequestParam(required = false) String q,
-											   @RequestParam(required = false) String locationUuid,
-											   @RequestParam(required = false) OrderStatus.OrderStatusCode orderStatusCode,
-											   @RequestParam(defaultValue = "VISIT") VisitWrapper.OrderBy orderBy,
-											   @RequestParam(defaultValue = "DESC") VisitWrapper.OrderByDirection orderByDirection,
-											   @RequestParam(required = false) Order.FulfillerStatus fulfillerStatus) {
+    @ResponseBody
+    public Map<String, Object> getPendingVisit(@RequestParam(defaultValue = "100") Integer limit,
+                                               @RequestParam(defaultValue = "0") Integer startIndex,
+                                               @RequestParam String orderTypeUuid,
+                                               @RequestParam(required = false) String q,
+                                               @RequestParam(required = false) String locationUuid,
+                                               @RequestParam(required = false) OrderStatus.OrderStatusCode orderStatusCode,
+                                               @RequestParam(defaultValue = "VISIT") VisitWrapper.OrderBy orderBy,
+                                               @RequestParam(defaultValue = "DESC") VisitWrapper.OrderByDirection orderByDirection,
+                                               @RequestParam(required = false) Order.FulfillerStatus fulfillerStatus) {
 
-		List<Visit> visits = iCareService.getVisitsByOrderType(q, orderTypeUuid, locationUuid, orderStatusCode, fulfillerStatus,limit, startIndex, orderBy, orderByDirection);
+        List<Visit> visits = iCareService.getVisitsByOrderType(q, orderTypeUuid, locationUuid, orderStatusCode, fulfillerStatus, limit, startIndex, orderBy, orderByDirection);
 
-		List<Map<String, Object>> responseSamplesObject = new ArrayList<Map<String, Object>>();
-		for (Visit visit : visits) {
+        List<Map<String, Object>> responseSamplesObject = new ArrayList<Map<String, Object>>();
+        for (Visit visit : visits) {
 
-			Map<String, Object> sampleObject = (new VisitWrapper(visit)).toMap();
+            Map<String, Object> sampleObject = (new VisitWrapper(visit)).toMap();
 
-			//add the sample after creating its object
-			responseSamplesObject.add(sampleObject);
+            //add the sample after creating its object
+            responseSamplesObject.add(sampleObject);
 
-		}
-		Map<String,Object> retults = new HashMap<>();
-		retults.put("results", responseSamplesObject);
-		return retults;
-	}
+        }
+        Map<String, Object> retults = new HashMap<>();
+        retults.put("results", responseSamplesObject);
+        return retults;
+    }
 	
 	@RequestMapping(value = "order", method = RequestMethod.GET)
-	@ResponseBody
-	public Map<String, Object> getOrdersByVisit(@RequestParam(defaultValue = "100") Integer limit,
-											   @RequestParam(defaultValue = "0") Integer startIndex,
-											   @RequestParam String orderTypeUuid,
-												@RequestParam String visitUuid,
-											   @RequestParam(required = false) Order.FulfillerStatus fulfillerStatus) {
+    @ResponseBody
+    public Map<String, Object> getOrdersByVisit(@RequestParam(defaultValue = "100") Integer limit,
+                                                @RequestParam(defaultValue = "0") Integer startIndex,
+                                                @RequestParam String orderTypeUuid,
+                                                @RequestParam String visitUuid,
+                                                @RequestParam(required = false) Order.FulfillerStatus fulfillerStatus) {
 
-		List<Order> orders = iCareService.getOrdersByVisitAndOrderType(visitUuid, orderTypeUuid, fulfillerStatus,limit, startIndex);
+        List<Order> orders = iCareService.getOrdersByVisitAndOrderType(visitUuid, orderTypeUuid, fulfillerStatus, limit, startIndex);
 
-		List<Map<String, Object>> responseSamplesObject = new ArrayList<Map<String, Object>>();
-		for (Order order : orders) {
+        List<Map<String, Object>> responseSamplesObject = new ArrayList<Map<String, Object>>();
+        for (Order order : orders) {
 
-			if(order instanceof Prescription){
-				Map<String, Object> sampleObject = ((Prescription)order).toMap();
-				responseSamplesObject.add(sampleObject);
-			}
+            if (order instanceof Prescription) {
+                Map<String, Object> sampleObject = ((Prescription) order).toMap();
+                responseSamplesObject.add(sampleObject);
+            }
 
-		}
-		Map<String,Object> retults = new HashMap<>();
-		retults.put("results", responseSamplesObject);
-		return retults;
-	}
+        }
+        Map<String, Object> retults = new HashMap<>();
+        retults.put("results", responseSamplesObject);
+        return retults;
+    }
 	
 	@RequestMapping(value = "visit/{visitUuid}/claimForm", method = RequestMethod.GET)
 	@ResponseBody
