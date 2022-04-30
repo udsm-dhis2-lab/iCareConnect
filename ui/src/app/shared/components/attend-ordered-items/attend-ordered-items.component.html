@@ -9,6 +9,7 @@
       <tr>
         <th>Department</th>
         <th>{{ orderTypeName }}</th>
+        <th>Instructions</th>
         <th>Order Date & Time</th>
         <th>Ordered By</th>
         <th>Source</th>
@@ -41,6 +42,9 @@
             </td>
             <td>
               {{ orderedItem?.display }}
+            </td>
+            <td>
+              {{ orderedItem?.instructions }}
             </td>
             <td>
               {{ orderedItem?.dateActivated | date: "medium" }}
@@ -102,7 +106,7 @@
         "
       >
         <tr>
-          <td colspan="9" class="text-center text-warning">
+          <td colspan="100%" class="text-center text-warning">
             NO ordered {{ orderTypeName }}
           </td>
         </tr>
@@ -114,7 +118,7 @@
           </td>
         </tr>
         <tr *ngIf="shouldAddNew">
-          <td colspan="8">
+          <td colspan="9">
             <app-add-procedure
               [nursingConfigurations]="nursingConfigurations"
               (isFormValid)="onGetFormValidity($event)"

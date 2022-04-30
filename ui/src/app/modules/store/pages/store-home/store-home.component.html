@@ -16,7 +16,7 @@
         <mat-nav-list>
           <mat-list-item
             *ngFor="let storePage of storePages"
-            routerLink="{{ storePage.url }}"
+            (click)="onChangeRoute($event, storePage.url)"
             routerLinkActive="store-active"
           >
             <a matLine>{{ storePage.name }}</a>

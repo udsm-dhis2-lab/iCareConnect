@@ -1,14 +1,23 @@
-<ng-container *ngIf="currentPatient$ | async as currentPatient">
+<ng-container
+  *ngIf="{
+    currentPatient: currentPatient$ | async,
+    logo: facilityLogo$ | async,
+    facilityDetails: facilityDetails$ | async
+  } as params"
+>
+  <!-- {{ params?.facilityDetails }} -->
+  <!-- | -->
+  <!-- {{ params?.logo | json}} -->
   <mat-progress-bar
     mode="indeterminate"
-    *ngIf="loading || !currentPatient"
+    *ngIf="loading || !params?.currentPatient"
   ></mat-progress-bar>
   <div *ngIf="patientBillingDetails$ | async as patientBillingDetails" class="">
     <ng-container>
       <div class="row mt-3">
-        <div class="col-md-12 col-sm-12" *ngIf="currentPatient">
+        <div class="col-md-12 col-sm-12" *ngIf="params?.currentPatient">
           <app-new-patient-profile
-            [currentPatient]="currentPatient"
+            [currentPatient]="params?.currentPatient"
           ></app-new-patient-profile>
         </div>
         <div class="col-md-12 col-sm-12 back-to-client-list">
@@ -22,7 +31,7 @@
             Back to Client List
           </button>
         </div>
-        <div class="col-md-12 col-sm-12" *ngIf="currentPatient">
+        <div class="col-md-12 col-sm-12" *ngIf="params?.currentPatient">
           <div class="border">
             <mat-tab-group>
               <mat-tab>
@@ -44,8 +53,17 @@
                   No pending bills
                 </div>
                 <app-quotations
-                  *ngIf="patientBillingDetails.bills.length > 0"
+                  *ngIf="
+                    patientBillingDetails.bills.length > 0 &&
+                    params?.currentPatient &&
+                    params?.logo &&
+                    params?.facilityDetails
+                  "
+                  [patientBillingDetails] = "patientBillingDetails"
                   [bills]="patientBillingDetails?.bills"
+                  [currentPatient]="params?.currentPatient"
+                  [facilityDetails]="params?.facilityDetails"
+                  [logo]="params?.logo"
                   (confirmPayment)="onConfirmBillPayment($event)"
                   (billPaymentSuccess)="onPaymentSuccess()"
                 ></app-quotations>
@@ -100,8 +118,16 @@
                   No completed payments
                 </div>
                 <app-payments
-                  *ngIf="patientBillingDetails?.payments.length > 0"
+                  *ngIf="
+                    patientBillingDetails?.payments.length > 0 &&
+                    params?.currentPatient !== undefined &&
+                    params?.logo &&
+                    params?.facilityDetails
+                  "
                   [payments]="patientBillingDetails?.payments"
+                  [currentPatient]="params?.currentPatient"
+                  [facilityDetails]="params?.facilityDetails"
+                  [logo]="params?.logo"
                 ></app-payments>
               </mat-tab>
             </mat-tab-group>

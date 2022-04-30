@@ -228,6 +228,7 @@ public class StoreController {
 			if (issueItemObject.get("quantity") instanceof Double) {
 				issueItem.setQuantity((Double) issueItemObject.get("quantity"));
 			}
+			
 			issueItem.setIssue(issue);
 			
 			issueItems.add(issueItem);

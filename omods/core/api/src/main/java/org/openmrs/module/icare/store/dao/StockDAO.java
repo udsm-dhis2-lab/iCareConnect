@@ -16,8 +16,8 @@ import java.util.*;
 /**
  * Home object for domain model class StStock.
  * 
- * @see org.openmrs.module.icare.store.models.Stock
  * @author Hibernate Tools
+ * @see org.openmrs.module.icare.store.models.Stock
  */
 public class StockDAO extends BaseDAO<Stock> {
 	
@@ -78,13 +78,13 @@ public class StockDAO extends BaseDAO<Stock> {
 		query.setParameter("itemUuid", itemUuid);
 		query.setParameter("locationUuids", locations);*/
 
-		List<Stock> stockList = new ArrayList<>();
+        List<Stock> stockList = new ArrayList<>();
 
-		for(String location: locationUuids){
-			stockList.addAll(getStockByItemAndLocation(itemUuid, location));
-		}
-		return stockList;
-	}
+        for (String location : locationUuids) {
+            stockList.addAll(getStockByItemAndLocation(itemUuid, location));
+        }
+        return stockList;
+    }
 	
 	public List<Stock> getStockByDrugAndLocation(String drugUuid, String locationUuid) {
 		DbSession session = this.getSession();
@@ -100,20 +100,69 @@ public class StockDAO extends BaseDAO<Stock> {
 		return query.list();
 	}
 	
-	public Stock getStockByItemBatchLocation(String itemUuid, String batch, Date expireDate, String locationUuid) {
+	public List<Stock> getStockByItemLocation(String itemUuid, String locationUuid) {
+		
 		DbSession session = this.getSession();
+		Date expireDate = new Date();
+		System.out.println("dates expiry");
+		System.out.println(expireDate);
+		
 		String queryStr = "SELECT st \n" + "FROM Stock st \n"
 		        + "WHERE st.item = (SELECT it FROM Item it WHERE it.uuid = :itemUuid) "
 		        + "AND st.location = (SELECT l FROM Location l WHERE l.uuid = :locationUuid)\n"
-		        + "AND st.item.stockable = true AND st.batch = :batch " + "AND st.expiryDate = :expireDate";
+		        + "AND st.item.stockable = true AND st.expiryDate >= :expireDate";
 		
 		Query query = session.createQuery(queryStr);
 		query.setParameter("itemUuid", itemUuid);
 		query.setParameter("locationUuid", locationUuid);
-		query.setParameter("batch", batch);
 		query.setParameter("expireDate", expireDate);
 		
-		return (Stock) query.uniqueResult();
+		return (List<Stock>) query.list();
+		
+	}
+	
+	public Stock getStockByItemBatchExpDateLocation(String itemUuid, String batch, Date expireDate, String locationUuid) {
+		DbSession session = this.getSession();
+		
+		if (batch == null && expireDate == null) {
+			
+			expireDate = new Date();
+			System.out.println("dates expiry");
+			System.out.println(expireDate);
+			
+			String queryStr = "SELECT st \n" + "FROM Stock st \n"
+			        + "WHERE st.item = (SELECT it FROM Item it WHERE it.uuid = :itemUuid) "
+			        + "AND st.location = (SELECT l FROM Location l WHERE l.uuid = :locationUuid)\n"
+			        + "AND st.item.stockable = true AND st.expiryDate <= :expireDate";
+			
+			Query query = session.createQuery(queryStr);
+			query.setParameter("itemUuid", itemUuid);
+			query.setParameter("locationUuid", locationUuid);
+			query.setParameter("expireDate", expireDate);
+			
+			System.out.println(query.getQueryString());
+			
+			return (Stock) query.uniqueResult();
+			
+		} else {
+			
+			String queryStr = "SELECT st \n" + "FROM Stock st \n"
+			        + "WHERE st.item = (SELECT it FROM Item it WHERE it.uuid = :itemUuid) "
+			        + "AND st.location = (SELECT l FROM Location l WHERE l.uuid = :locationUuid)\n"
+			        + "AND st.item.stockable = true AND st.batch = :batch " + "AND st.expiryDate = :expireDate";
+			
+			Query query = session.createQuery(queryStr);
+			query.setParameter("itemUuid", itemUuid);
+			query.setParameter("locationUuid", locationUuid);
+			query.setParameter("batch", batch);
+			query.setParameter("expireDate", expireDate);
+			
+			System.out.println(query.getQueryString());
+			
+			return (Stock) query.uniqueResult();
+			
+		}
+		
 	}
 	
 	public List<Stock> getStockByLocation(String locationUuid) {

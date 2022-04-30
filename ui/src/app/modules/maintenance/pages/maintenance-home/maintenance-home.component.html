@@ -1,4 +1,35 @@
-<div class="maintenance-container">
+<!-- <mat-toolbar color="primary" class="example-toolbar">
+  <button mat-icon-button (click)="isExpanded = !isExpanded">
+    <mat-icon>menu</mat-icon>
+  </button>
+  <h1 class="example-app-name">Nested Menus</h1>
+</mat-toolbar> -->
+<div
+  *ngIf="{ currentMenuDepartments: currentMenuDepartments$ | async } as params"
+>
+  <mat-progress-bar
+    *ngIf="!params?.currentMenuDepartments"
+    mode="indeterminate"
+  ></mat-progress-bar>
+  <mat-sidenav-container
+    class="page-container"
+    autosize
+    *ngIf="params?.currentMenuDepartments"
+  >
+    <mat-sidenav #sidenav class="maintenance-sidenav" mode="side" opened="true">
+      <app-maintenance-side-menu
+        [pages]="pages"
+        [currentMenuDepartments]="params?.currentMenuDepartments"
+      ></app-maintenance-side-menu>
+    </mat-sidenav>
+
+    <div class="page-sidenav-content">
+      <router-outlet></router-outlet>
+    </div>
+  </mat-sidenav-container>
+</div>
+
+<!-- <div class="maintenance-container">
   <div class="sidebar-container maintenance-sidebar mat-elevation-z1">
     <mat-nav-list>
       <mat-list-item [routerLink]="['']">
@@ -14,4 +45,4 @@
   <div class="sidebar-content-container">
     <router-outlet></router-outlet>
   </div>
-</div>
+</div> -->

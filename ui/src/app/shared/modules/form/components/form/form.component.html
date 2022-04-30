@@ -25,10 +25,10 @@
           *ngIf="field?.type == 'number' && (field.min || field.max)"
         >
           <div class="d-flex flex-row">
-            <div class="p-2 text-left w-100">
-              <span *ngIf="field?.min"><span>(</span>{{ field?.min }}</span
-              ><span *ngIf="field?.min">-</span>
-              <span *ngIf="field?.max">{{ field?.max }} <span>)</span></span>
+            <div class="p-1 text-left w-100" *ngIf="field?.max">
+              <span><span>(</span>{{ field?.min || 0 }}</span
+              ><span>-</span>
+              <span>{{ field?.max }} <span>)</span></span>
             </div>
             <div class="p-2 w-100">
               <span> {{ field?.units }}</span>

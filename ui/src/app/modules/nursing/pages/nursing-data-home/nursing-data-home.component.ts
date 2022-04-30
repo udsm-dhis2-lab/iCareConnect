@@ -49,6 +49,12 @@ export class NursingDataHomeComponent implements OnInit {
         "icare.nursing.configurations"
       );
     const patientId = this.route.snapshot.queryParams["patient"];
+    this.store.dispatch(
+      loadPatientBills({
+        patientUuid: patientId,
+        isRegistrationPage: true,
+      })
+    );
     this.store.dispatch(loadActiveVisit({ patientId }));
     this.store.dispatch(loadCurrentPatient({ uuid: patientId }));
     this.store.dispatch(loadPatientBills({ patientUuid: patientId }));

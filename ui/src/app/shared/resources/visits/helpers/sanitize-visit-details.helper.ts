@@ -1,40 +1,49 @@
 import * as _ from "lodash";
 
-export function getOrdersFromCurrentVisitEncounters(visit, type, bills?: any[], isEnsured?: boolean) {
+export function getOrdersFromCurrentVisitEncounters(
+  visit,
+  type,
+  bills?: any[],
+  isEnsured?: boolean
+) {
   if (!visit) {
     return null;
   }
   let procedures = [];
-  _.each(visit.encounters, (encounter) => {
+  _.each(visit?.encounters, (encounter) => {
     procedures = [
       ...procedures,
       ..._.map(
-        encounter.orders.filter(
+        encounter?.orders?.filter(
           (order) =>
-            order?.orderType?.display.toLowerCase() ===
+            order?.orderType?.display?.toLowerCase() ===
             (type == "procedure" ? "procedure order" : "radiology order")
         ) || [],
         (order) => {
-          const paid = bills ?
-          bills?.length === 0 || isEnsured
-            ? true
-            : (
-                bills.filter(
-                  (bill) =>
-                    (
-                      bill?.items.filter(
-                        (billItem) =>
-                          billItem?.billItem?.item?.concept?.uuid ===
-                          order?.concept?.uuid
-                      ) || []
-                    )?.length > 0
-                ) || []
-              )?.length > 0
-            ? false
-            : true: false;
+          const paid =
+            !isEnsured && bills && bills?.length === 0
+              ? false
+              : isEnsured && bills && bills?.length === 0
+              ? true
+              : bills && bills?.length === 0
+              ? true
+              : (
+                  bills.filter(
+                    (bill) =>
+                      (
+                        bill?.items.filter(
+                          (billItem) =>
+                            billItem?.billItem?.item?.concept?.uuid ===
+                            order?.concept?.uuid
+                        ) || []
+                      )?.length > 0
+                  ) || []
+                )?.length > 0
+              ? false
+              : true;
 
-            const observation = encounter
-            ? (encounter?.obs.filter(
+          const observation = encounter
+            ? (encounter?.obs?.filter(
                 (observation) =>
                   observation?.concept?.uuid === order?.concept?.uuid
               ) || [])[0]

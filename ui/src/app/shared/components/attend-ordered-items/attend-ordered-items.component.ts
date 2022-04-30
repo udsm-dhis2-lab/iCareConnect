@@ -29,7 +29,7 @@ export class AttendOrderedItemsComponent implements OnInit {
   @Input() investigationAndProceduresFormsDetails: any;
   @Input() nursingConfigurations: any;
   @Input() provider: any;
-  @Input() orderTypes: any[]
+  @Input() orderTypes: any[];
   status: any = {};
   comments: any = {};
   shouldAddNew: boolean = false;
@@ -40,8 +40,13 @@ export class AttendOrderedItemsComponent implements OnInit {
   creatingOrderResponse$: Observable<any>;
   orderedProcedures$: Observable<any>;
   fields: string =
-    "custom:(uuid,encounters:(uuid,location:(uuid,display),encounterType,display,encounterProviders,encounterDatetime,voided,obs,orders:(uuid,display,orderer,orderType,dateActivated,orderNumber,concept,display)))";
-  constructor(private dialog: MatDialog, private visitService: VisitsService, private store: Store<AppState>, private ordersService: OrdersService) {}
+    "custom:(uuid,encounters:(uuid,location:(uuid,display),encounterType,display,encounterProviders,encounterDatetime,voided,obs,orders:(uuid,display,instructions,orderer,orderType,dateActivated,orderNumber,concept,display)))";
+  constructor(
+    private dialog: MatDialog,
+    private visitService: VisitsService,
+    private store: Store<AppState>,
+    private ordersService: OrdersService
+  ) {}
 
   ngOnInit(): void {
     this.departmentsDetailsKeyedBySetmembers = keyBy(
@@ -94,7 +99,7 @@ export class AttendOrderedItemsComponent implements OnInit {
     this.status[orderedItem?.concept?.uuid] = event.checked;
   }
 
-  saveObservationForThisOrder(event: Event, orderedItem): void {
+  saveObservationForThisOrder(event: Event, orderedItem: any): void {
     event.stopPropagation();
     this.dialog
       .open(ConfirmSavingOrderObservationModalComponent, {
@@ -130,40 +135,37 @@ export class AttendOrderedItemsComponent implements OnInit {
 
   onSave(event: Event, proceduresValues: any): void {
     event.stopPropagation();
-    const procedure =
-      {
-        concept: proceduresValues["procedure"]?.value,
-        orderType: this.nursingConfigurations?.orderTypes?.procedureOrder,
-        action: "NEW",
-        orderer: this.provider?.uuid,
-        patient: this.visit?.patientUuid,
-        careSetting: !this.visit?.isAdmitted
-          ? "OUTPATIENT"
-          : "INPATIENT",
-        urgency: "ROUTINE",
-        instructions: proceduresValues["remarks"]?.value,
-        type: "order",
-      }
+    const procedure = {
+      concept: proceduresValues["procedure"]?.value,
+      orderType: this.nursingConfigurations?.orderTypes?.procedureOrder,
+      action: "NEW",
+      orderer: this.provider?.uuid,
+      patient: this.visit?.patientUuid,
+      careSetting: !this.visit?.isAdmitted ? "OUTPATIENT" : "INPATIENT",
+      urgency: "ROUTINE",
+      instructions: proceduresValues["remarks"]?.value,
+      type: "order",
+    };
 
-      const orders = uniqBy([procedure],'concept')
+    const orders = uniqBy([procedure], "concept");
+    const encounter = {
+      visit: this.visit?.uuid,
+      location: JSON.parse(localStorage.getItem("currentLocation"))["uuid"],
+      patient: this.visit?.patientUuid,
+      encounterType: this.nursingConfigurations?.encounterType?.uuid,
+      orders: orders,
+      encounterProviders: [
+        {
+          provider: this.provider?.uuid,
+          encounterRole: this.nursingConfigurations?.encounterRole?.uuid,
+        },
+      ],
+    };
 
-      const encounter = {
-        visit: this.visit?.uuid,
-        location: JSON.parse(localStorage.getItem('currentLocation'))['uuid'],
-        patient: this.visit?.patientUuid,
-        encounterType: this.nursingConfigurations?.encounterType?.uuid,
-        orders: orders,
-        encounterProviders: [
-          {
-            provider: this.provider?.uuid,
-            encounterRole: this.nursingConfigurations?.encounterRole?.uuid,
-          },
-        ],
-      }
-
-    this.orderedProcedures$ = of(null)
-    this.creatingOrderResponse$ = this.ordersService.createOrdersViaCreatingEncounter(encounter);
-    this.creatingOrderResponse$.subscribe(response => {
+    this.orderedProcedures$ = of(null);
+    this.creatingOrderResponse$ =
+      this.ordersService.createOrdersViaCreatingEncounter(encounter);
+    this.creatingOrderResponse$.subscribe((response) => {
       if (response) {
         this.orderedProcedures$ = this.visitService.getActiveVisitProcedures(
           this.visit.uuid,
@@ -172,6 +174,6 @@ export class AttendOrderedItemsComponent implements OnInit {
           this.visit?.isEnsured
         );
       }
-    })
+    });
   }
 }
