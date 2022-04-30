@@ -105,7 +105,6 @@ export class FieldComponent {
 
   getStockStatus(option) {
     const optionName = option?.display ? option?.display : option?.name
-    console.log(option)
     return optionName.includes('Available, Location') ? true : false
   }
 }
