@@ -69,9 +69,9 @@ public class ICareController {
 	 */
 	@RequestMapping(value = "item", method = RequestMethod.GET)
     @ResponseBody
-    public Map<String, Object> onGetItem(@RequestParam(required = false) String q, @RequestParam(defaultValue = "100") Integer limit, @RequestParam(defaultValue = "0") Integer startIndex, @RequestParam(required = false) String department) {
+    public Map<String, Object> onGetItem(@RequestParam(required = false) String q, @RequestParam(defaultValue = "100") Integer limit, @RequestParam(defaultValue = "0") Integer startIndex, @RequestParam(required = false) String department, @RequestParam(required = false) Item.Type type) {
         List<Map<String, Object>> items = new ArrayList<Map<String, Object>>();
-        for (Item item : iCareService.getItems(q, limit, startIndex, department)) {
+        for (Item item : iCareService.getItems(q, limit, startIndex, department, type)) {
             items.add(item.toMap());
         }
         Map<String, Object> results = new HashMap<>();
