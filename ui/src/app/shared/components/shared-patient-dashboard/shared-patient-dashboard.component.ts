@@ -250,7 +250,7 @@ export class SharedPatientDashboardComponent implements OnInit {
   ): void {
     event.stopPropagation();
     this.dialog.open(AdmissionFormComponent, {
-      height: "230px",
+      maxHeight: "230px",
       width: "45%",
       data: {
         patient: currentPatient,
