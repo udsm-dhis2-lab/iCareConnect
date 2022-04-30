@@ -24,6 +24,7 @@
       [type]="field?.type"
       [required]="field?.required"
       matInput
+      autocomplete="off"
       (keyup)="onFieldUpdate()"
     />
     <!-- end of phone number -->
@@ -41,6 +42,7 @@
       [type]="field?.type"
       [required]="field?.required"
       matInput
+      autocomplete="off"
       (keyup)="onFieldUpdate()"
     />
     <!-- end of textbox -->
@@ -105,10 +107,11 @@
     <mat-label>{{ field?.label }}</mat-label>
     <input
       type="text"
-      placeholder="Search xx {{ field?.label }}"
+      placeholder="Search {{ field?.label }}"
       aria-label="{{ field?.label }}"
       [required]="field?.required"
       matInput
+      autocomplete="off"
       (keyup)="searchConcept($event)"
       [matAutocomplete]="auto"
     />
@@ -118,7 +121,12 @@
         (click)="getSelectedItemFromOption($event, option, field?.key)"
         [value]="option?.display ? option?.display : option?.name"
       >
-        {{ option?.display ? option?.display : option?.name }}
+      <span class="badge badge-success" 
+      [ngClass]="{'badge-success': getStockStatus(option), 'badge-danger': !getStockStatus(option) }" 
+      *ngIf="field?.otherType === 'Drug' && !(option?.display === 'Search' || option?.name === 'Search')">
+      {{ getStockStatus(option) ? 'In-stock' : 'Out-stock' }}
+      </span>
+      {{ option?.display ? option?.display : option?.name }}
       </mat-option>
     </mat-autocomplete>
   </mat-form-field>
@@ -164,6 +172,7 @@
     <mat-label [attr.for]="field?.key">{{ field?.label }}</mat-label>
     <input
       matInput
+      autocomplete="off"
       [id]="field?.key"
       [required]="field?.required"
       [matDatepicker]="fieldId"
