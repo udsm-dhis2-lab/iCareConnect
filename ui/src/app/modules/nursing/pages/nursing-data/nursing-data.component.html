@@ -71,6 +71,10 @@
           <!-- TODO! ADD TRANFER TO OBSERVATION FUNCTIONALITY -->
           <button
             class="float-right ml-2"
+            [disabled]="
+              params?.doesPatientHasPendingPaymentForTheCurrentVisitType ||
+              params?.visit?.isAdmitted
+            "
             color="primary"
             mat-stroked-button
             (click)="admitPatient($event, params?.patient, params?.visit, true)"
