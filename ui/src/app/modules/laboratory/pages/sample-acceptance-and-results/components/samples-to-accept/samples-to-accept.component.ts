@@ -1,31 +1,31 @@
-import { Component, OnInit, Input } from '@angular/core';
-import * as _ from 'lodash';
-import { FormControl } from '@angular/forms';
-import { RejectionReasonComponent } from '../rejection-reason/rejection-reason.component';
-import { MatDialog } from '@angular/material/dialog';
-import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs';
-import { ResultsFeedingModalComponent } from '../results-feeding-modal/results-feeding-modal.component';
-import { SampleTrackingModalComponent } from '../sample-tracking-modal/sample-tracking-modal.component';
-import { PrintResultsModalComponent } from '../print-results-modal/print-results-modal.component';
-import { take } from 'rxjs/operators';
-import { AppState } from 'src/app/store/reducers';
+import { Component, OnInit, Input } from "@angular/core";
+import * as _ from "lodash";
+import { FormControl } from "@angular/forms";
+import { RejectionReasonComponent } from "../rejection-reason/rejection-reason.component";
+import { MatDialog } from "@angular/material/dialog";
+import { Store } from "@ngrx/store";
+import { Observable } from "rxjs";
+import { ResultsFeedingModalComponent } from "../results-feeding-modal/results-feeding-modal.component";
+import { SampleTrackingModalComponent } from "../sample-tracking-modal/sample-tracking-modal.component";
+import { PrintResultsModalComponent } from "../print-results-modal/print-results-modal.component";
+import { take } from "rxjs/operators";
+import { AppState } from "src/app/store/reducers";
 import {
   getCurrentUserInfo,
   getProviderDetails,
-} from 'src/app/store/selectors/current-user.selectors';
-import { groupLabOrdersBySpecimenSources } from 'src/app/shared/helpers/sample-types.helper';
+} from "src/app/store/selectors/current-user.selectors";
+import { groupLabOrdersBySpecimenSources } from "src/app/shared/helpers/sample-types.helper";
 import {
   loadActiveVisitsForSampleManagement,
   reloadPatientsLabOrders,
   setLoadedSamples,
   setSampleStatus,
-} from 'src/app/store/actions';
+} from "src/app/store/actions";
 import {
   formatSamplesToFeedResults,
   getPatientsCollectedSamples,
-} from 'src/app/shared/helpers/patient.helper';
-import { EncountersService } from 'src/app/shared/services/encounters.service';
+} from "src/app/shared/helpers/patient.helper";
+import { EncountersService } from "src/app/shared/services/encounters.service";
 import {
   getAllFullCompletedLabSamples,
   getAllLabSamplesWaitingAcceptance,
@@ -34,12 +34,12 @@ import {
   getSamplesLoadedState,
   getSettingLabSampleStatusState,
   getWorkListFromLabSamples,
-} from 'src/app/store/selectors';
+} from "src/app/store/selectors";
 
 @Component({
-  selector: 'app-samples-to-accept',
-  templateUrl: './samples-to-accept.component.html',
-  styleUrls: ['./samples-to-accept.component.scss'],
+  selector: "app-samples-to-accept",
+  templateUrl: "./samples-to-accept.component.html",
+  styleUrls: ["./samples-to-accept.component.scss"],
 })
 export class SamplesToAcceptComponent implements OnInit {
   @Input() visits: any;
@@ -65,7 +65,7 @@ export class SamplesToAcceptComponent implements OnInit {
   authenticatedUser$: Observable<any>;
   showClinicalNotesSummary: boolean = false;
   samples: any[];
-  searchingText: string = '';
+  searchingText: string = "";
   savingChanges: boolean = false;
   savingMessage: any = {};
 
@@ -115,13 +115,13 @@ export class SamplesToAcceptComponent implements OnInit {
     this.userUuid = this.currentUser?.uuid;
     if (
       this.privileges &&
-      !this.privileges['Sample Collection'] &&
-      !this.privileges['Sample Tracking'] &&
-      !this.privileges['Laboratory Reports'] &&
-      !this.privileges['Sample Acceptance and Results'] &&
-      !this.privileges['Tests Settings']
+      !this.privileges["Sample Collection"] &&
+      !this.privileges["Sample Tracking"] &&
+      !this.privileges["Laboratory Reports"] &&
+      !this.privileges["Sample Acceptance and Results"] &&
+      !this.privileges["Tests Settings"]
     ) {
-      window.location.replace('../../../bahmni/home/index.html#/dashboard');
+      window.location.replace("../../../bahmni/home/index.html#/dashboard");
     }
 
     this.providerDetails$ = this.store.select(getProviderDetails);
@@ -187,11 +187,11 @@ export class SamplesToAcceptComponent implements OnInit {
     });
 
     this.samplesGroupedBymRNo = _.map(
-      Object.keys(_.groupBy(this.samplesToAcceptOrReject, 'mrNo')),
+      Object.keys(_.groupBy(this.samplesToAcceptOrReject, "mrNo")),
       (key) => {
         return {
           mrNo: key,
-          samples: _.groupBy(this.samplesToAcceptOrReject, 'mrNo')[key],
+          samples: _.groupBy(this.samplesToAcceptOrReject, "mrNo")[key],
         };
       }
     );
@@ -213,7 +213,7 @@ export class SamplesToAcceptComponent implements OnInit {
       secondSignOff: false,
     });
 
-    this.samplesGroupedBymRNo = _.groupBy(this.samplesByMRN, 'mrNo');
+    this.samplesGroupedBymRNo = _.groupBy(this.samplesByMRN, "mrNo");
 
     this.patientMRNS = Object.keys(this.samplesGroupedBymRNo);
 
@@ -263,7 +263,7 @@ export class SamplesToAcceptComponent implements OnInit {
   }
 
   onOpenNewTab(e) {
-    this.searchingText = '';
+    this.searchingText = "";
     this.selectedDepartment = null;
     this.labSamplesWaitingToFeedResults$ = this.store.select(
       getLabSamplesWaitingToFeedResults,
@@ -296,17 +296,12 @@ export class SamplesToAcceptComponent implements OnInit {
         maxHeight:
           sample?.orders?.length == 1 &&
           sample?.orders[0]?.concept?.setMembers?.length == 0
-            ? '400px'
-            : '620px',
+            ? "610px"
+            : "900px",
       },
-      width: '100%',
-      height:
-        sample?.orders?.length == 1 &&
-        sample?.orders[0]?.concept?.setMembers?.length == 0
-          ? '610px'
-          : '900px',
+      width: "100%",
       disableClose: false,
-      panelClass: 'custom-dialog-container',
+      panelClass: "custom-dialog-container",
     });
 
     this.store.dispatch(
@@ -323,8 +318,8 @@ export class SamplesToAcceptComponent implements OnInit {
 
     this.dialog.open(PrintResultsModalComponent, {
       data: { samples: this.samplesGroupedBymRNo[key] },
-      width: '60%',
-      height: '610px',
+      width: "60%",
+      height: "610px",
       disableClose: false,
     });
 
@@ -344,11 +339,11 @@ export class SamplesToAcceptComponent implements OnInit {
   setViewItems(e, sample) {
     e.stopPropagation();
     this.dialog.open(SampleTrackingModalComponent, {
-      width: '60%',
-      height: '400px',
+      width: "60%",
+      height: "400px",
       disableClose: false,
       data: sample,
-      panelClass: 'custom-dialog-container',
+      panelClass: "custom-dialog-container",
     });
     this.store.dispatch(
       reloadPatientsLabOrders({
@@ -361,20 +356,20 @@ export class SamplesToAcceptComponent implements OnInit {
 
   unSetSampleToView(sample, addedKey) {
     this.samplesReadyForAction[
-      sample.sampleUniquIdentification + '-' + addedKey
+      sample.sampleUniquIdentification + "-" + addedKey
     ] = false;
   }
 
   setEnteredValue(item, val) {
     this.values[
-      this.currentSample.sampleUniquIdentification + '-' + item.display
+      this.currentSample.sampleUniquIdentification + "-" + item.display
     ] = val;
   }
 
   accept(e, sample, providerDetails) {
     e.stopPropagation();
 
-    this.savingMessage[sample?.id + '-accept'] = true;
+    this.savingMessage[sample?.id + "-accept"] = true;
 
     const data = {
       sample: {
@@ -383,8 +378,8 @@ export class SamplesToAcceptComponent implements OnInit {
       user: {
         uuid: this.userUuid,
       },
-      remarks: 'accepted',
-      status: 'ACCEPTED',
+      remarks: "accepted",
+      status: "ACCEPTED",
     };
 
     this.store.dispatch(
@@ -413,20 +408,20 @@ export class SamplesToAcceptComponent implements OnInit {
     e.stopPropagation();
     this.dialog
       .open(RejectionReasonComponent, {
-        width: '40%',
-        height: '250px',
+        width: "40%",
+        height: "250px",
         disableClose: false,
         data: {
           sample: sample,
           codedSampleRejectionReasons: this.codedSampleRejectionReasons,
         },
-        panelClass: 'custom-dialog-container',
+        panelClass: "custom-dialog-container",
       })
       .afterClosed()
       .pipe(take(1))
       .subscribe((reason) => {
         if (reason) {
-          this.savingMessage[sample?.id + '-reject'] = true;
+          this.savingMessage[sample?.id + "-reject"] = true;
 
           const data = {
             sample: {
@@ -436,7 +431,7 @@ export class SamplesToAcceptComponent implements OnInit {
               uuid: this.userUuid,
             },
             remarks: reason?.reasonUuid,
-            status: 'REJECTED',
+            status: "REJECTED",
           };
           this.store.dispatch(
             setSampleStatus({
@@ -465,7 +460,7 @@ export class SamplesToAcceptComponent implements OnInit {
 
   setValue(val, item) {
     this.values[
-      this.currentSample.sampleUniquIdentification + '-' + item.display
+      this.currentSample.sampleUniquIdentification + "-" + item.display
     ] = val;
   }
 

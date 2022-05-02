@@ -5,7 +5,7 @@
     hasConsultationStarted: hasConsultationStarted$ | async,
     startingConsultation: startingConsultation$ | async,
     diagnoses: diagnoses$ | async,
-    encounterTypeLoaded: encounterTypeLoaded$ | async,
+    encounterTypes: encounterTypes$ | async,
     billLoadingState: billLoadingState$ | async,
     loadingPaymentStatus: loadingPaymentStatus$ | async,
     hasPatientHavePendingPaymentForTheCurrentVisitType:
@@ -25,17 +25,20 @@
     class="w-100"
     *ngIf="
       !dashboardParams?.loadingPaymentStatus &&
-      dashboardParams?.encounterTypeLoaded &&
+      dashboardParams?.encounterTypes &&
       !dashboardParams?.billLoadingState &&
       dashboardParams?.currentPatient &&
-      !dashboardParams?.loadingForms
+      dashboardParams?.forms
     "
   >
     <div class="patient-dashboard-container mat-elevation-z1">
-      <app-new-patient-profile
+      <div class="patient-profile-sticky">
+        <app-new-patient-profile
         [currentPatient]="dashboardParams?.currentPatient"
-      ></app-new-patient-profile>
-      <div>
+        ></app-new-patient-profile>
+      </div>
+      
+      <div class="w-100 patient-other-details-padding">
         <div
           class="
             d-flex
@@ -456,16 +459,16 @@
         </div>
       </div>
     </div>
-    <mat-progress-bar
-      *ngIf="
-        dashboardParams?.loadingPaymentStatus ||
-        !dashboardParams?.encounterTypeLoaded ||
-        dashboardParams?.billLoadingState ||
-        !dashboardParams?.currentPatient ||
-        dashboardParams?.loadingForms
-      "
-      mode="indeterminate"
-    >
-    </mat-progress-bar>
   </div>
+  <mat-progress-bar
+    *ngIf="
+      dashboardParams?.loadingPaymentStatus ||
+      !dashboardParams?.encounterTypes ||
+      dashboardParams?.billLoadingState ||
+      !dashboardParams?.currentPatient ||
+      dashboardParams?.loadingForms
+    "
+    mode="indeterminate"
+  >
+  </mat-progress-bar>
 </div>

@@ -1,7 +1,9 @@
 import { Component, Inject, OnInit } from "@angular/core";
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
+import { MatSnackBar } from "@angular/material/snack-bar";
 import { Store } from "@ngrx/store";
 import { Observable } from "rxjs";
+import { LocationService } from "src/app/core/services";
 import {
   admitPatient,
   loadCustomOpenMRSForm,
@@ -56,7 +58,9 @@ export class AdmissionFormComponent implements OnInit {
   constructor(
     private store: Store<AppState>,
     private dialogRef: MatDialogRef<AdmissionFormComponent>,
-    @Inject(MAT_DIALOG_DATA) data
+    @Inject(MAT_DIALOG_DATA) data,
+    private _snackBar: MatSnackBar,
+    private locationService: LocationService
   ) {
     this.store.dispatch(loadOrderTypes());
     this.patient = data?.patient?.patient;
@@ -89,9 +93,9 @@ export class AdmissionFormComponent implements OnInit {
       tagName: "Admission Location",
     });
 
-    this.observationLocations$ = this.store.select(getLocationsByTagName, {
-      tagName: "Observation Location",
-    });
+    this.observationLocations$ = this.locationService.getLocationsByTagName(
+      "Observation+Location"
+    );
 
     this.currentVisit$ = this.store.select(getActiveVisit);
     this.admittingLoadingState$ = this.store.select(getAdmittingLoadingState);
@@ -130,6 +134,18 @@ export class AdmissionFormComponent implements OnInit {
     this.store.dispatch(
       admitPatient({ admissionDetails: data, path: this.path })
     );
+
+    this.store
+      .select(getAdmissionStatusOfCurrentPatient)
+      .subscribe((admissionResponse) => {
+        if (admissionResponse) {
+          this._snackBar.open("Successfully sent!");
+          setTimeout(() => {
+            this._snackBar.dismiss();
+            this.dialogRef.close();
+          }, 600);
+        }
+      });
   }
 
   onClose(e) {

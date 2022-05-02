@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { OpenmrsHttpClientService } from "src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service";
-import { Observable } from "rxjs";
-import { map } from "rxjs/operators";
+import { Observable, of } from "rxjs";
+import { catchError, map } from "rxjs/operators";
 import { head } from "lodash";
 
 @Injectable({
@@ -28,8 +28,14 @@ export class LocationService {
     return this.httpClient.get("location?v=full&limit=100&tag=Login+Location");
   }
 
+
   getLocationsByTagName(tagName): Observable<any[]> {
-    return this.httpClient.get("location?tag=" + tagName + "&v=full&limit=100");
+    return this.httpClient
+      .get("location?tag=" + tagName + "&v=full&limit=100")
+      .pipe(
+        map((response) => response?.results || []),
+        catchError((error) => of(error))
+      );
   }
 
   getFacilityCode(): Observable<any> {

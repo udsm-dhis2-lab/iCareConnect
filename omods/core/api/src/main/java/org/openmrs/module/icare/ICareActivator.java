@@ -11,6 +11,7 @@ package org.openmrs.module.icare;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openmrs.api.context.Context;
 import org.openmrs.module.BaseModuleActivator;
 
 /**
@@ -24,7 +25,9 @@ public class ICareActivator extends BaseModuleActivator {
 	 * @see #started()
 	 */
 	public void started() {
+
 		log.info("ICareLog Started ICare");
+		Context.updateSearchIndexAsync();
 	}
 	
 	/**
