@@ -5,33 +5,33 @@ import {
   OnChanges,
   Output,
   EventEmitter,
-} from '@angular/core';
-import { select, Store } from '@ngrx/store';
-import { AppState } from 'src/app/store/reducers';
-import { loadSamplesByVisit } from '../../store/actions';
-import { Observable } from 'rxjs';
+} from "@angular/core";
+import { select, Store } from "@ngrx/store";
+import { AppState } from "src/app/store/reducers";
+import { loadSamplesByVisit } from "../../store/actions";
+import { Observable } from "rxjs";
 import {
   getLabSamplesLoadingState,
   getSamplesToCollect,
-} from '../../store/selectors/samples.selectors';
+} from "../../store/selectors/samples.selectors";
 
-import * as _ from 'lodash';
-import { Patient } from 'src/app/shared/resources/patient/models/patient.model';
-import { VisitObject } from 'src/app/shared/resources/visits/models/visit-object.model';
-import { ConceptCreateFull } from 'src/app/shared/resources/openmrs';
-import { SampleObject } from '../../resources/models';
-import { getPatientPendingBillStatus } from 'src/app/store/selectors/bill.selectors';
-import { collectSample } from 'src/app/store/actions';
-import { SamplesService } from 'src/app/shared/services/samples.service';
-import { BarCodeModalComponent } from '../../pages/sample-acceptance-and-results/components/bar-code-modal/bar-code-modal.component';
-import { formatDateToYYMMDD } from 'src/app/shared/helpers/format-date.helper';
-import { MatDialog } from '@angular/material/dialog';
-import { LabOrdersService } from '../../resources/services/lab-orders.service';
+import * as _ from "lodash";
+import { Patient } from "src/app/shared/resources/patient/models/patient.model";
+import { VisitObject } from "src/app/shared/resources/visits/models/visit-object.model";
+import { ConceptCreateFull } from "src/app/shared/resources/openmrs";
+import { SampleObject } from "../../resources/models";
+import { getPatientPendingBillStatus } from "src/app/store/selectors/bill.selectors";
+import { collectSample } from "src/app/store/actions";
+import { SamplesService } from "src/app/shared/services/samples.service";
+import { BarCodeModalComponent } from "../../pages/sample-acceptance-and-results/components/bar-code-modal/bar-code-modal.component";
+import { formatDateToYYMMDD } from "src/app/shared/helpers/format-date.helper";
+import { MatDialog } from "@angular/material/dialog";
+import { LabOrdersService } from "../../resources/services/lab-orders.service";
 
 @Component({
-  selector: 'app-samples-to-collect',
-  templateUrl: './samples-to-collect.component.html',
-  styleUrls: ['./samples-to-collect.component.scss'],
+  selector: "app-samples-to-collect",
+  templateUrl: "./samples-to-collect.component.html",
+  styleUrls: ["./samples-to-collect.component.scss"],
 })
 export class SamplesToCollectComponent implements OnInit, OnChanges {
   @Input() specimenSources: ConceptCreateFull;
@@ -55,6 +55,7 @@ export class SamplesToCollectComponent implements OnInit, OnChanges {
   paidItems = {};
   thereIsUnSavedSample: boolean = false;
   @Output() isSaveCollectedSample = new EventEmitter<boolean>();
+  updateLabOrderResponse$: Observable<any>;
   constructor(
     private store: Store<AppState>,
     private sampleService: SamplesService,
@@ -124,17 +125,17 @@ export class SamplesToCollectComponent implements OnInit, OnChanges {
 
     // JESSE TODO get uiser uid and sample uid
     const priorityData =
-      this.samplePriority['sampleuid'] &&
-      this.samplePriority['sampleuid'] == 'HIGH'
+      this.samplePriority["sampleuid"] &&
+      this.samplePriority["sampleuid"] == "HIGH"
         ? {
             sample: {
               uuid: null,
             },
             user: {
-              uuid: 'userUuid',
+              uuid: "userUuid",
             },
-            remarks: 'high priority',
-            status: 'HIGH',
+            remarks: "high priority",
+            status: "HIGH",
           }
         : null;
 
@@ -148,13 +149,12 @@ export class SamplesToCollectComponent implements OnInit, OnChanges {
       return {
         uuid: order?.uuid,
         accessionNumber: order?.orderNumber,
-        fulfillerStatus: 'RECEIVED',
+        fulfillerStatus: "RECEIVED",
         encounter: order?.encounterUuid,
       };
     });
-    this.labOrdersService
-      .updateLabOrders(orders)
-      .subscribe((response) => console.log('order updated'));
+    this.updateLabOrderResponse$ =
+      this.labOrdersService.updateLabOrders(orders);
     // console.log('sample scheduledDate', orders);
     // console.log('details', details);
 
@@ -182,9 +182,9 @@ export class SamplesToCollectComponent implements OnInit, OnChanges {
 
     //JESSE TODO set priority
     if (e.checked) {
-      this.samplePriority['id'] = 'HIGH';
+      this.samplePriority["id"] = "HIGH";
     } else {
-      this.samplePriority['id'] = '';
+      this.samplePriority["id"] = "";
     }
   }
 
@@ -194,26 +194,26 @@ export class SamplesToCollectComponent implements OnInit, OnChanges {
       if (label) {
         // console.log('labels', label);
         const labelSection =
-          label['label'] < 10
-            ? `00${label['label']}`
-            : label['label'] < 100
-            ? `0${label['label']}`
-            : `${label['label']}`;
+          label["label"] < 10
+            ? `00${label["label"]}`
+            : label["label"] < 100
+            ? `0${label["label"]}`
+            : `${label["label"]}`;
 
         this.thereIsUnSavedSample = true;
 
         // console.log('labelSection', labelSection);
         let now = new Date();
         const identifier =
-          'MGH/' +
-          formatDateToYYMMDD(now).toString().split('-').join('').substring(2) +
-          '/' +
+          "MGH/" +
+          formatDateToYYMMDD(now).toString().split("-").join("").substring(2) +
+          "/" +
           labelSection;
         const currentSampleIdElement = document.getElementById(
           sample?.specimenSourceUuid + count
         );
         // this.sampleIdentification[sample?.id] = identifier;
-        currentSampleIdElement.setAttribute('value', identifier);
+        currentSampleIdElement.setAttribute("value", identifier);
         // if (
         //   (this.labConfigs?.barCode && this.labConfigs?.barCode?.use) ||
         //   !this.labConfigs?.barCode
@@ -221,14 +221,14 @@ export class SamplesToCollectComponent implements OnInit, OnChanges {
         setTimeout(() => {
           this.saveAsSample(sample, count, patient);
           this.dialog.open(BarCodeModalComponent, {
-            height: '200px',
-            width: '15%',
+            height: "200px",
+            width: "15%",
             data: {
               identifier: identifier,
               sample: sample,
             },
             disableClose: false,
-            panelClass: 'custom-dialog-container',
+            panelClass: "custom-dialog-container",
           });
         }, 400);
       }

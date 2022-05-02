@@ -196,8 +196,8 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	}
 	
 	@Override
-	public List<Item> getItems(String search, Integer limit, Integer startIndex, String department) {
-		return dao.getItems(search, limit, startIndex, department);
+	public List<Item> getItems(String search, Integer limit, Integer startIndex, String department, Item.Type type) {
+		return dao.getItems(search, limit, startIndex, department, type);
 	}
 	
 	@Override

@@ -1,14 +1,14 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
-import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs';
-import { take } from 'rxjs/operators';
+import { Component, Input, OnInit } from "@angular/core";
+import { MatDialog } from "@angular/material/dialog";
+import { Store } from "@ngrx/store";
+import { Observable } from "rxjs";
+import { take } from "rxjs/operators";
 import {
   setSampleStatus,
   loadLabSamplesByCollectionDates,
   acceptSample,
-} from 'src/app/store/actions';
-import { AppState } from 'src/app/store/reducers';
+} from "src/app/store/actions";
+import { AppState } from "src/app/store/reducers";
 import {
   getAcceptedFormattedLabSamples,
   getCompletedLabSamples,
@@ -20,17 +20,17 @@ import {
   getPatientsWithCompletedLabSamples,
   getSettingLabSampleStatusState,
   getWorkList,
-} from 'src/app/store/selectors';
-import { getProviderDetails } from 'src/app/store/selectors/current-user.selectors';
+} from "src/app/store/selectors";
+import { getProviderDetails } from "src/app/store/selectors/current-user.selectors";
 
-import { PrintResultsModalComponent } from '../print-results-modal/print-results-modal.component';
-import { RejectionReasonComponent } from '../rejection-reason/rejection-reason.component';
-import { ResultsFeedingModalComponent } from '../results-feeding-modal/results-feeding-modal.component';
+import { PrintResultsModalComponent } from "../print-results-modal/print-results-modal.component";
+import { RejectionReasonComponent } from "../rejection-reason/rejection-reason.component";
+import { ResultsFeedingModalComponent } from "../results-feeding-modal/results-feeding-modal.component";
 
 @Component({
-  selector: 'app-sample-acceptance',
-  templateUrl: './sample-acceptance.component.html',
-  styleUrls: ['./sample-acceptance.component.scss'],
+  selector: "app-sample-acceptance",
+  templateUrl: "./sample-acceptance.component.html",
+  styleUrls: ["./sample-acceptance.component.scss"],
 })
 export class SampleAcceptanceComponent implements OnInit {
   @Input() codedSampleRejectionReasons: any;
@@ -53,27 +53,27 @@ export class SampleAcceptanceComponent implements OnInit {
   savingMessage: any = {};
   settingLabSampleStatus$: Observable<any>;
   userUuid;
-  searchingText: string = '';
+  searchingText: string = "";
   labDepartments$: Observable<any>;
-  selectedDepartment: string = '';
+  selectedDepartment: string = "";
   constructor(private store: Store<AppState>, private dialog: MatDialog) {}
 
   ngOnInit(): void {
     this.userUuid = this.currentUser?.uuid;
     this.labDepartments$ = this.store.select(getLabDepartments);
     this.samplesAccepted$ = this.store.select(getAcceptedFormattedLabSamples, {
-      department: '',
+      department: "",
       searchingText: this.searchingText,
     });
     this.samplesToAccept$ = this.store.select(getFormattedLabSamplesToAccept, {
-      department: '',
+      department: "",
       searchingText: this.searchingText,
     });
 
     this.samplesToFeedResults$ = this.store.select(
       getFormattedLabSamplesToFeedResults,
       {
-        department: '',
+        department: "",
         searchingText: this.searchingText,
       }
     );
@@ -84,18 +84,18 @@ export class SampleAcceptanceComponent implements OnInit {
       getSettingLabSampleStatusState
     );
     this.allSamples$ = this.store.select(getFormattedLabSamplesForTracking, {
-      department: '',
+      department: "",
       searchingText: this.searchingText,
     });
 
     this.worklist$ = this.store.select(getWorkList, {
       userUuid: this.userUuid,
-      department: '',
+      department: "",
       searchingText: this.searchingText,
     });
 
     this.completedSamples$ = this.store.select(getCompletedLabSamples, {
-      department: '',
+      department: "",
       searchingText: this.searchingText,
     });
 
@@ -116,7 +116,7 @@ export class SampleAcceptanceComponent implements OnInit {
   accept(e, sample, providerDetails) {
     e.stopPropagation();
 
-    this.savingMessage[sample?.id + '-accept'] = true;
+    this.savingMessage[sample?.id + "-accept"] = true;
 
     const data = {
       sample: {
@@ -125,8 +125,8 @@ export class SampleAcceptanceComponent implements OnInit {
       user: {
         uuid: this.userUuid,
       },
-      remarks: 'accepted',
-      status: 'ACCEPTED',
+      remarks: "accepted",
+      status: "ACCEPTED",
     };
 
     this.store.dispatch(
@@ -151,20 +151,20 @@ export class SampleAcceptanceComponent implements OnInit {
     e.stopPropagation();
     this.dialog
       .open(RejectionReasonComponent, {
-        width: '40%',
-        height: '250px',
+        width: "40%",
+        height: "250px",
         disableClose: false,
         data: {
           sample: sample,
           codedSampleRejectionReasons: this.codedSampleRejectionReasons,
         },
-        panelClass: 'custom-dialog-container',
+        panelClass: "custom-dialog-container",
       })
       .afterClosed()
       .pipe(take(1))
       .subscribe((reason) => {
         if (reason) {
-          this.savingMessage[sample?.id + '-reject'] = true;
+          this.savingMessage[sample?.id + "-reject"] = true;
 
           const data = {
             sample: {
@@ -174,7 +174,7 @@ export class SampleAcceptanceComponent implements OnInit {
               uuid: this.userUuid,
             },
             remarks: reason?.reasonUuid,
-            status: 'REJECTED',
+            status: "REJECTED",
           };
           this.store.dispatch(
             setSampleStatus({
@@ -312,8 +312,8 @@ export class SampleAcceptanceComponent implements OnInit {
         })
       );
     }
-    this.searchingText = '';
-    this.selectedDepartment = '';
+    this.searchingText = "";
+    this.selectedDepartment = "";
     this.allSamples$ = this.store.select(getFormattedLabSamplesForTracking, {
       department: this.selectedDepartment,
       searchingText: this.searchingText,
@@ -370,17 +370,12 @@ export class SampleAcceptanceComponent implements OnInit {
         maxHeight:
           sample?.orders?.length == 1 &&
           sample?.orders[0]?.order?.concept?.setMembers?.length == 0
-            ? '400px'
-            : '520px',
+            ? "510px"
+            : "720px",
       },
-      width: '100%',
-      height:
-        sample?.orders?.length == 1 &&
-        sample?.orders[0]?.order?.concept?.setMembers?.length == 0
-          ? '510px'
-          : '720px',
+      width: "100%",
       disableClose: false,
-      panelClass: 'custom-dialog-container',
+      panelClass: "custom-dialog-container",
     });
   }
 
@@ -392,8 +387,8 @@ export class SampleAcceptanceComponent implements OnInit {
         labConfigs: this.labConfigs,
         user: providerDetails,
       },
-      width: '60%',
-      height: '750px',
+      width: "60%",
+      height: "750px",
       disableClose: false,
     });
   }
@@ -401,7 +396,7 @@ export class SampleAcceptanceComponent implements OnInit {
   onMarkRecollection(e, sample, providerDetails) {
     e.stopPropagation();
 
-    this.savingMessage[sample?.id + '-re-collect'] = true;
+    this.savingMessage[sample?.id + "-re-collect"] = true;
 
     const data = {
       sample: {
@@ -410,8 +405,8 @@ export class SampleAcceptanceComponent implements OnInit {
       user: {
         uuid: this.userUuid,
       },
-      remarks: 're-collect',
-      status: 'RECOLLECT',
+      remarks: "re-collect",
+      status: "RECOLLECT",
     };
 
     this.store.dispatch(

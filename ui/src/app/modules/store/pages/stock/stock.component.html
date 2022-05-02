@@ -58,12 +58,12 @@
         <div class="row">
           <!-- class="col-{{ params?.currentStock ? '5' : '12' }}" -->
           <div
-            class="overflow-x-auto"
-            [ngClass]="{
-              'col-5': params?.currentStock,
-              'col-12': !params?.currentStock
-            }"
+            class="overflow-x-auto col-sm-12"
           >
+          <!-- [ngClass]="{
+            'col-5': params?.currentStock,
+            'col-12': !params?.currentStock
+          }" -->
             <table class="table border-bottom table-fit">
               <tr>
                 <td style="max-width: 8%; word-wrap: initial">#</td>
@@ -100,6 +100,7 @@
                     let stock of params?.stocks | filterBy: searchTerm:'name';
                     let stockIndex = index
                   "
+                  [ngClass]="{'selectedStock': params?.currentStock?.id === stock.id }"
                 >
                   <td>{{ stockIndex + 1 }}</td>
                   <td style="word-wrap: break-word">{{ stock?.name }}</td>
@@ -121,7 +122,7 @@
               </ng-container>
             </table>
           </div>
-          <div class="col-7" *ngIf="params?.currentStock">
+          <div class="overflowing-stock-list" *ngIf="params?.currentStock">
             <mat-progress-bar
               *ngIf="!params?.currentStock"
               mode="indeterminate"

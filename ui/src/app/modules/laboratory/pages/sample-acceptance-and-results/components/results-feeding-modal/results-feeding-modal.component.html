@@ -927,7 +927,7 @@
                               <input
                                 *ngIf="!parameter?.numeric"
                                 matInput
-                                autocomplete="off" 
+                                autocomplete="off"
                                 [type]="'text'"
                                 class="text-left"
                                 [value]="
@@ -2131,8 +2131,8 @@
         </div>
       </mat-tab>
     </mat-tab-group>
-    <button mat-stroked-button (click)="onClose($event)" style="float: right">
-      Close
-    </button>
+    <div class="w-100 d-flex justify-content-end mb-2 mt-2">
+      <button mat-stroked-button (click)="onClose($event)">Close</button>
+    </div>
   </div>
 </div>
