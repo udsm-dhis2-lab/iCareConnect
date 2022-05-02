@@ -1,33 +1,22 @@
 <div
-  class="row mt-2"
+  class="row w-100 mx-0 mt-2"
   *ngIf="{
     savingObservations: savingObservations$ | async,
     ordersUpdates: ordersUpdates$ | async
   } as params"
 >
-  <div class="col-md-3 clinical-form-list">
-    <mat-form-field class="w-100">
-      <input
-        [(ngModel)]="searchingText"
-        autocomplete="off"
-        type="text"
-        matInput
-        placeholder="Search forms"
-      />
+  <div class="w-100 d-flex justify-content-start">
+    <mat-form-field appearance="fill" class="w-100">
+      <mat-label>{{currentCustomFormName ? currentCustomFormName : 'Select forms'}}</mat-label>
+      <mat-select [(value)]="currentCustomFormName">
+        <mat-option *ngFor="let clinicalForm of forms | searchItem: searchingText"
+        (click)="onSetClinicalForm($event, clinicalForm)">
+        {{ clinicalForm?.name }}
+        </mat-option>
+      </mat-select>
     </mat-form-field>
-    <mat-nav-list>
-      <mat-list-item
-        *ngFor="let clinicalForm of forms | searchItem: searchingText"
-        (click)="onSetClinicalForm($event, clinicalForm)"
-        class="clinical-form {{
-          currentCustomForm?.id === clinicalForm?.id ? 'active-form' : ''
-        }}"
-      >
-        <a matLine>{{ clinicalForm?.name }}</a>
-      </mat-list-item>
-    </mat-nav-list>
   </div>
-  <div class="col-md-9 mt-1 current-clinical-form">
+  <div class="col-sm mt-1 current-clinical-form">
     <div class="h5 mb-3">{{ currentCustomForm?.name }}</div>
     <mat-progress-bar
       *ngIf="params?.savingObservations"
