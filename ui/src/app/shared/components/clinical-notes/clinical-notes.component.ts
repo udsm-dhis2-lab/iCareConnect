@@ -54,7 +54,6 @@ export class ClinicalNotesComponent implements OnInit {
     e.stopPropagation()
     this.currentCustomForm = form
     this.currentCustomFormName = form?.name
-    console.log(this.currentCustomForm)
   }
 
   onSetForm(e, form: ICAREForm): void {
