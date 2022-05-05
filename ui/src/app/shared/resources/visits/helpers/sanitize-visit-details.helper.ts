@@ -16,31 +16,32 @@ export function getOrdersFromCurrentVisitEncounters(
       ..._.map(
         encounter?.orders?.filter(
           (order) =>
-            order?.orderType?.display?.toLowerCase() ===
-            (type == "procedure" ? "procedure order" : "radiology order")
+            order?.orderType?.display?.toLowerCase() === "procedure order" ||
+            order?.orderType?.display?.toLowerCase() === "radiology order"
         ) || [],
         (order) => {
-          const paid =
-            !isEnsured && bills && bills?.length === 0
-              ? false
-              : isEnsured && bills && bills?.length === 0
-              ? true
-              : bills && bills?.length === 0
-              ? true
-              : (
-                  bills.filter(
-                    (bill) =>
-                      (
-                        bill?.items.filter(
-                          (billItem) =>
-                            billItem?.billItem?.item?.concept?.uuid ===
-                            order?.concept?.uuid
-                        ) || []
-                      )?.length > 0
-                  ) || []
-                )?.length > 0
-              ? false
-              : true;
+          const paid = !bills
+            ? true
+            : !isEnsured && bills && bills?.length === 0
+            ? false
+            : isEnsured && bills && bills?.length === 0
+            ? true
+            : bills && bills?.length === 0
+            ? true
+            : (
+                bills.filter(
+                  (bill) =>
+                    (
+                      bill?.items.filter(
+                        (billItem) =>
+                          billItem?.billItem?.item?.concept?.uuid ===
+                          order?.concept?.uuid
+                      ) || []
+                    )?.length > 0
+                ) || []
+              )?.length > 0
+            ? false
+            : true;
 
           const observation = encounter
             ? (encounter?.obs?.filter(
@@ -48,6 +49,7 @@ export function getOrdersFromCurrentVisitEncounters(
                   observation?.concept?.uuid === order?.concept?.uuid
               ) || [])[0]
             : null;
+          console;
           return {
             orderNumber: order?.orderNumber,
             uuid: order?.uuid,
