@@ -20,7 +20,11 @@ export function getOrdersFromCurrentVisitEncounters(
             order?.orderType?.display?.toLowerCase() === "radiology order"
         ) || [],
         (order) => {
-          const paid = !bills
+          const paid = !isEnsured
+            ? false
+            : isEnsured
+            ? true
+            : !bills
             ? true
             : !isEnsured && bills && bills?.length === 0
             ? false
