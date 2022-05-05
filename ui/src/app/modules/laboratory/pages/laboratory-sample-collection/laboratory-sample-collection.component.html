@@ -59,7 +59,16 @@
           <div class="col-12">
             <mat-card>
               <mat-tab-group>
-                <mat-tab label="Samples to collect">
+                <mat-tab>
+                  <ng-template mat-tab-label>
+                    <span
+                      matBadge="{{ countOfSamplesToCollect }}"
+                      matBadgeColor="accent"
+                      matBadgeOverlap="false"
+                    >
+                      Samples to collect
+                    </span>
+                  </ng-template>
                   <div class="mat-tab-container">
                     <div
                       *ngIf="
@@ -80,6 +89,7 @@
                         [payments]="params?.payments"
                         [labDepartments]="params?.labDepartments"
                         (isSaveCollectedSample)="onSaveSampleCollection($event)"
+                        (samplesToCollect)="onGetSamplesToCollect($event)"
                       >
                       </app-samples-to-collect>
                     </div>
@@ -96,7 +106,16 @@
                   </div>
                 </mat-tab>
 
-                <mat-tab label="Collected samples" class="collected-samples">
+                <mat-tab class="collected-samples">
+                  <ng-template mat-tab-label>
+                    <span
+                      matBadge="{{ (samplesCollected$ | async)?.length }}"
+                      matBadgeColor="accent"
+                      matBadgeOverlap="false"
+                    >
+                      Collected samples
+                    </span>
+                  </ng-template>
                   <div class="mat-tab-container">
                     <table class="table table-bordered table-stripped">
                       <thead>

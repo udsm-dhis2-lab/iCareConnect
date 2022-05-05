@@ -1,32 +1,32 @@
-import { Component, OnInit } from '@angular/core';
-import { Observable, of } from 'rxjs';
-import { Patient } from 'src/app/shared/resources/patient/models/patient.model';
-import { select, Store } from '@ngrx/store';
-import { AppState } from 'src/app/store/reducers';
-import { getCurrentPatient } from 'src/app/store/selectors/current-patient.selectors';
-import { LabOrder } from 'src/app/shared/resources/visits/models/lab-order.model';
-import { getAllLabOrders } from 'src/app/store/selectors';
+import { Component, OnInit } from "@angular/core";
+import { Observable, of } from "rxjs";
+import { Patient } from "src/app/shared/resources/patient/models/patient.model";
+import { select, Store } from "@ngrx/store";
+import { AppState } from "src/app/store/reducers";
+import { getCurrentPatient } from "src/app/store/selectors/current-patient.selectors";
+import { LabOrder } from "src/app/shared/resources/visits/models/lab-order.model";
+import { getAllLabOrders } from "src/app/store/selectors";
 import {
   getVisitLoadingState,
   getVisitLoadedState,
   getActiveVisit,
-} from 'src/app/store/selectors/visit.selectors';
-import { SampleObject } from '../../resources/models';
-import { getAllLabSamples } from '../../store/selectors/samples.selectors';
-import { VisitObject } from 'src/app/shared/resources/visits/models/visit-object.model';
-import { getSpecimenSources } from '../../store/selectors/specimen-sources-and-tests-management.selectors';
-import { take } from 'rxjs/operators';
-import { go, loadCurrentPatient } from 'src/app/store/actions';
-import { getAllPayments } from 'src/app/store/selectors/payment.selector';
-import { loadPatientPayments } from 'src/app/store/actions/payment.actions';
-import { SampleTypesService } from 'src/app/shared/services/sample-types.service';
-import { ActivatedRoute } from '@angular/router';
-import { loadActiveVisit } from 'src/app/store/actions/visit.actions';
+} from "src/app/store/selectors/visit.selectors";
+import { SampleObject } from "../../resources/models";
+import { getAllLabSamples } from "../../store/selectors/samples.selectors";
+import { VisitObject } from "src/app/shared/resources/visits/models/visit-object.model";
+import { getSpecimenSources } from "../../store/selectors/specimen-sources-and-tests-management.selectors";
+import { take } from "rxjs/operators";
+import { go, loadCurrentPatient } from "src/app/store/actions";
+import { getAllPayments } from "src/app/store/selectors/payment.selector";
+import { loadPatientPayments } from "src/app/store/actions/payment.actions";
+import { SampleTypesService } from "src/app/shared/services/sample-types.service";
+import { ActivatedRoute } from "@angular/router";
+import { loadActiveVisit } from "src/app/store/actions/visit.actions";
 
 @Component({
-  selector: 'app-laboratory-sample-collection',
-  templateUrl: './laboratory-sample-collection.component.html',
-  styleUrls: ['./laboratory-sample-collection.component.scss'],
+  selector: "app-laboratory-sample-collection",
+  templateUrl: "./laboratory-sample-collection.component.html",
+  styleUrls: ["./laboratory-sample-collection.component.scss"],
 })
 export class LaboratorySampleCollectionComponent implements OnInit {
   patient$: Observable<Patient>;
@@ -42,6 +42,7 @@ export class LaboratorySampleCollectionComponent implements OnInit {
   patientId: string;
   visitId: string;
   containers$: Observable<any>;
+  countOfSamplesToCollect: number = 0;
   constructor(
     private store: Store<AppState>,
     private sampleTypesService: SampleTypesService,
@@ -49,8 +50,8 @@ export class LaboratorySampleCollectionComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.patientId = this.route.snapshot.params['patientId'];
-    this.visitId = this.route.snapshot.params['visitId'];
+    this.patientId = this.route.snapshot.params["patientId"];
+    this.visitId = this.route.snapshot.params["visitId"];
     this.store.dispatch(loadCurrentPatient({ uuid: this.patientId }));
 
     this.store.dispatch(loadActiveVisit({ patientId: this.patientId }));
@@ -59,7 +60,7 @@ export class LaboratorySampleCollectionComponent implements OnInit {
 
     this.labOrders$ = this.store.select(getAllLabOrders);
     this.specimenSources$ = this.store.select(getSpecimenSources, {
-      name: 'Specimen sources',
+      name: "Specimen sources",
     });
     this.labDepartments$ = this.sampleTypesService.getLabDepartments();
     // TODO: Find a better way to deal with sample containers
@@ -80,7 +81,7 @@ export class LaboratorySampleCollectionComponent implements OnInit {
 
     this.labOrders$ = this.store.select(getAllLabOrders);
     this.specimenSources$ = this.store.select(getSpecimenSources, {
-      name: 'Specimen sources',
+      name: "Specimen sources",
     });
     this.labDepartments$ = this.sampleTypesService.getLabDepartments();
 
@@ -92,5 +93,9 @@ export class LaboratorySampleCollectionComponent implements OnInit {
       ); /**TODO: Filter samples collection for this patient */
     this.activeVisit$ = this.store.select(getActiveVisit);
     this.payments$ = this.store.select(getAllPayments);
+  }
+
+  onGetSamplesToCollect(count: number): void {
+    this.countOfSamplesToCollect = count;
   }
 }

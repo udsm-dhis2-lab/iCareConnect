@@ -27,6 +27,7 @@ import { BarCodeModalComponent } from "../../pages/sample-acceptance-and-results
 import { formatDateToYYMMDD } from "src/app/shared/helpers/format-date.helper";
 import { MatDialog } from "@angular/material/dialog";
 import { LabOrdersService } from "../../resources/services/lab-orders.service";
+import { take } from "rxjs/operators";
 
 @Component({
   selector: "app-samples-to-collect",
@@ -54,7 +55,9 @@ export class SamplesToCollectComponent implements OnInit, OnChanges {
   patientHasPendingBills$: Observable<boolean>;
   paidItems = {};
   thereIsUnSavedSample: boolean = false;
-  @Output() isSaveCollectedSample = new EventEmitter<boolean>();
+  @Output() isSaveCollectedSample: EventEmitter<boolean> =
+    new EventEmitter<boolean>();
+  @Output() samplesToCollect: EventEmitter<number> = new EventEmitter<number>();
   updateLabOrderResponse$: Observable<any>;
   constructor(
     private store: Store<AppState>,
@@ -90,7 +93,11 @@ export class SamplesToCollectComponent implements OnInit, OnChanges {
       })
     );
     this.samplesToCollect$ = this.store.select(getSamplesToCollect);
-    // this.samplesToCollect$.subscribe((data) => console.log(data));
+    this.samplesToCollect$.pipe(take(1)).subscribe((data) => {
+      if (data) {
+        this.samplesToCollect.emit(data?.length);
+      }
+    });
     this.labSamplesLoadingState$ = this.store.select(getLabSamplesLoadingState);
   }
 
