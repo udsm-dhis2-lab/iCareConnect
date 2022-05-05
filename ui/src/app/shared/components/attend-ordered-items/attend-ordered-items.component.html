@@ -113,8 +113,14 @@
       </ng-container>
       <ng-container>
         <tr>
-          <td colspan="100%">
-            <a (click)="addNew($event)" class="float-right">Add</a>
+          <td colspan="100% d-flex justify-content-end">
+            <button
+              mat-stroked-button
+              (click)="addNew($event)"
+              class="float-right"
+            >
+              Add
+            </button>
           </td>
         </tr>
         <tr *ngIf="shouldAddNew">
