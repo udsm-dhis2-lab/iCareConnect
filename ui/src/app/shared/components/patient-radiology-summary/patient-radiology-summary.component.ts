@@ -129,15 +129,16 @@ export class PatientRadiologySummaryComponent implements OnInit {
     this.creatingOrdersResponse$.subscribe((response) => {
       if (response) {
         this.addingOrder = false;
-        if (!response?.message) {
+        if (!response?.error) {
           this.orders$ = this.visitService.getActiveVisitRadiologyOrders(
             this.patientVisit.uuid,
             this.fields
           );
           this.hasError = false;
         } else {
+          console.log("response", response);
           this.hasError = true;
-          this.error = response?.message;
+          this.error = response?.error?.message;
         }
       }
     });

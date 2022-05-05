@@ -1,6 +1,7 @@
 <div
   *ngIf="{
-    orders: orders$ | async
+    orders: orders$ | async,
+    creatingOrdersResponse: creatingOrdersResponse$ | async
   } as params"
 >
   <table class="table table-bordered">
@@ -37,7 +38,12 @@
         </tr>
       </ng-container>
       <ng-container
-        *ngIf="params?.orders && params?.orders.length === 0 && !addingOrder"
+        *ngIf="
+          params?.orders &&
+          params?.orders.length === 0 &&
+          !addingOrder &&
+          !hasError
+        "
       >
         <tr>
           <td colspan="100%">

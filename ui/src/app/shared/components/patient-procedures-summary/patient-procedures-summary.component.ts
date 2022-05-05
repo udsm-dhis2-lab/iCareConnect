@@ -110,7 +110,7 @@ export class PatientProceduresSummaryComponent implements OnInit {
     this.creatingProceduresResponse$.subscribe((response) => {
       if (response) {
         this.addingProcedure = false;
-        if (!response?.message) {
+        if (!response?.error) {
           this.procedures$ = this.visitService.getActiveVisitProcedures(
             this.patientVisit.uuid,
             this.fields
@@ -118,7 +118,7 @@ export class PatientProceduresSummaryComponent implements OnInit {
           this.hasError = false;
         } else {
           this.hasError = true;
-          this.error = response?.message;
+          this.error = response?.error?.message;
         }
       }
     });
