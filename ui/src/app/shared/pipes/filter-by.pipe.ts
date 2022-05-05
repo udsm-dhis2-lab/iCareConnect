@@ -1,8 +1,8 @@
-import { Pipe, PipeTransform } from '@angular/core';
-import { filter } from 'lodash';
+import { Pipe, PipeTransform } from "@angular/core";
+import { filter } from "lodash";
 
 @Pipe({
-  name: 'filterBy',
+  name: "filterBy",
 })
 export class FilterByPipe implements PipeTransform {
   transform(
@@ -12,10 +12,10 @@ export class FilterByPipe implements PipeTransform {
     currentLocation?: any,
     service?: string
   ): any[] {
-    if (service && service === 'LABS') {
+    if (service && service === "LABS") {
       return arrOfItems;
     }
-    if (service && service === 'LABSCOMPLETED') {
+    if (service && service === "LABSCOMPLETED") {
       return (
         arrOfItems.filter(
           (item) =>
@@ -34,9 +34,9 @@ export class FilterByPipe implements PipeTransform {
 
     searchText = searchText?.toLowerCase();
     return arrOfItems.filter((item: any) => {
-      if (typeof item === 'string') {
+      if (typeof item === "string") {
         return item?.toLowerCase()?.includes(searchText);
-      } else if (typeof item === 'number') {
+      } else if (typeof item === "number") {
         return item?.toString()?.toLowerCase()?.includes(searchText);
       } else if (key && currentLocation) {
         return (

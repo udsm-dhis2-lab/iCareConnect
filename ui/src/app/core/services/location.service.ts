@@ -24,6 +24,11 @@ export class LocationService {
     return this.httpClient.get("location?v=full&limit=100");
   }
 
+  getAllLocationsByLoginLocationTag() {
+    return this.httpClient.get("location?v=full&limit=100&tag=Login+Location");
+  }
+
+
   getLocationsByTagName(tagName): Observable<any[]> {
     return this.httpClient
       .get("location?tag=" + tagName + "&v=full&limit=100")

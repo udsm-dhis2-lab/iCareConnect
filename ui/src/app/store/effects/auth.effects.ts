@@ -47,6 +47,9 @@ export class AuthEffects {
                 localStorage.setItem("userUuid", user.uuid);
               }
 
+              console.log(authenticated ? 2 : 5);
+              console.log("slk.ciosahnc.sah");
+              console.log(authenticatedUser);
               return authenticated
                 ? [
                     go({ path: [""] }),
@@ -56,6 +59,7 @@ export class AuthEffects {
                       userDetails: formatCurrentUserDetails(authenticatedUser),
                     }),
                     loadRolesDetails(),
+                    addSessionStatus({authenticated}),
                     loadAllLocations(),
                     initiateEncounterType(),
                   ]

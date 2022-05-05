@@ -79,10 +79,14 @@ export class LoginFormComponent implements OnInit {
             })
           );
           this.store.dispatch(loadRolesDetails());
+
+          console.log("1")
+
           this.store.dispatch(loadAllLocations());
 
           this.closeLogin.emit();
         } else {
+          console.log("x1")
           authenticateUserFail({
             error: {
               status: 403,
