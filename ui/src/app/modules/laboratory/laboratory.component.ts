@@ -21,6 +21,7 @@ import {
   clearLoadedLabOrders,
   loadRolesDetails,
   loadOrderTypes,
+  go,
 } from "src/app/store/actions";
 import { loadSpecimenSources } from "./store/actions/specimen-sources-and-tests-management.actions";
 import { getAllSampleTypes } from "src/app/store/selectors";
@@ -70,23 +71,58 @@ export class LaboratoryComponent implements OnInit {
         if (currentRoute?.url?.includes("/sample-acceptance-and-results")) {
           this.enableDate(this.datesRangeDifference);
           this.currentSubModule = "acceptance";
+          this.store.dispatch(
+            go({
+              path: ["/laboratory/sample-acceptance-and-results"],
+            })
+          );
         } else if (currentRoute?.url?.includes("/sample-tracking")) {
           this.enableDate(this.datesRangeDifference);
           this.currentSubModule = "tracking";
+          this.store.dispatch(
+            go({
+              path: ["/laboratory/sample-tracking"],
+            })
+          );
         } else if (currentRoute?.url?.includes("/lab-investigation-home")) {
           this.disableDate();
           this.currentSubModule = "order-tests";
+          this.store.dispatch(
+            go({
+              path: ["/laboratory/lab-investigation-home"],
+            })
+          );
         } else if (currentRoute?.url?.includes("/reports")) {
           this.disableDate();
           this.currentSubModule = "reports";
+          this.store.dispatch(
+            go({
+              path: ["/laboratory/reports"],
+            })
+          );
         } else if (currentRoute?.url?.includes("/settings")) {
           this.disableDate();
           this.currentSubModule = "settings";
-        } else if (currentRoute?.url?.includes("/sample-collection")) {
+          this.store.dispatch(
+            go({
+              path: ["/laboratory/settings"],
+            })
+          );
+        } else if (currentRoute?.url?.includes("/sample-collection-home")) {
           this.currentSubModule = "collection";
           this.disableDate();
+          this.store.dispatch(
+            go({
+              path: ["/laboratory/sample-collection-home"],
+            })
+          );
         } else if (currentRoute?.url === "/laboratory") {
           this.router.navigate(["laboratory"]);
+          this.store.dispatch(
+            go({
+              path: ["/laboratory"],
+            })
+          );
         }
       }
     });
