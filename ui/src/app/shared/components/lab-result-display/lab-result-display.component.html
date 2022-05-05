@@ -1,8 +1,10 @@
 <div *ngIf="!forSetMember">
   <b>
     {{
-      labTest?.result && keyedResults
-        ? keyedResults[labTest?.order?.concept?.uuid]?.display
+      labTest?.result && !keyedResults[labTest?.result?.concept?.uuid]
+        ? labTest?.result?.value
+        : keyedResults[labTest?.result?.concept?.uuid]
+        ? keyedResults[labTest?.result?.concept?.uuid]?.display
         : "No result"
     }}
   </b>
