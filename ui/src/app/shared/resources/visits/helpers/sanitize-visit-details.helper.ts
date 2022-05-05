@@ -9,10 +9,10 @@ export function getOrdersFromCurrentVisitEncounters(
   if (!visit) {
     return null;
   }
-  let procedures = [];
+  let orders = [];
   _.each(visit?.encounters, (encounter) => {
-    procedures = [
-      ...procedures,
+    orders = [
+      ...orders,
       ..._.map(
         encounter?.orders?.filter(
           (order) =>
@@ -78,7 +78,12 @@ export function getOrdersFromCurrentVisitEncounters(
       ),
     ];
   });
-  return procedures;
+  return (
+    orders.filter(
+      (order) =>
+        order?.orderType?.toLowerCase()?.indexOf(type.toLowerCase()) > -1
+    ) || []
+  );
 }
 
 export function getDrugOrdersFromCurrentVisitEncounters(visit) {

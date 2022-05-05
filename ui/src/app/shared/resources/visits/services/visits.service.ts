@@ -478,7 +478,7 @@ export class VisitsService {
     );
   }
 
-  getActiveVisitRadiologyOrders(uuid: string, fields): Observable<any> {
+  getActiveVisitRadiologyOrders(uuid: string, fields: any): Observable<any> {
     return from(
       this.api.visit.getVisit(uuid, {
         v: fields,
