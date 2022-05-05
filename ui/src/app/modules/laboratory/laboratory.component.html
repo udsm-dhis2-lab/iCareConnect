@@ -103,26 +103,8 @@
       *ngIf="params?.sampleTypes?.length > 0"
     >
       <div class="col-12 no-print" *ngIf="showDate">
-        <!-- <mat-form-field appearance="fill">
-        <mat-label>Choose a date</mat-label>
-        <input
-          matInput
-          [(ngModel)]="selectedDay"
-          [ngModelOptions]="{ standalone: true }"
-          (dateInput)="onDateChange()"
-          [max]="today"
-          [matDatepicker]="picker"
-        />
-        <mat-datepicker-toggle
-          matSuffix
-          [for]="picker"
-        ></mat-datepicker-toggle>
-        <mat-datepicker #picker></mat-datepicker>
-      </mat-form-field> -->
-
-        <!-- {{ parameters?.startDate }} - {{ parameters?.endDate }} -->
         <mat-form-field appearance="fill" floatLabel="always">
-          <mat-label>Enter a date range</mat-label>
+          <mat-label>Select a date range</mat-label>
           <mat-date-range-input [rangePicker]="visitDatePicker">
             <input
               matStartDate
@@ -146,9 +128,6 @@
           <mat-date-range-picker #visitDatePicker></mat-date-range-picker>
         </mat-form-field>
       </div>
-      <!-- <div class="col-10">
-      <router-outlet></router-outlet>
-    </div> -->
       <div class="laboratory-home-content col-12">
         <router-outlet></router-outlet>
       </div>
