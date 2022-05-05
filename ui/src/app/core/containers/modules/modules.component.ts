@@ -44,8 +44,6 @@ export class ModulesComponent implements OnInit {
     this.searchModules();
 
     this.currentLocation$.subscribe((resp) => {
-      console.log(resp);
-
       let assignedApps = this.apps.filter((item: any) => {
         return (
           (

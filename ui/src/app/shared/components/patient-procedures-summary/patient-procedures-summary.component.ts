@@ -80,6 +80,7 @@ export class PatientProceduresSummaryComponent implements OnInit {
     let procedures = [];
     this.formDetails.clear();
     this.addingProcedure = true;
+    console.log(this.formValuesData);
     if (this.formValuesData["procedure"]) {
       procedures = [
         ...procedures,
