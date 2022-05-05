@@ -26,6 +26,11 @@ export const getAuthenticationLoadingState = createSelector(
   (state: CurrentUserState) => state.loggingIn
 );
 
+export const getAuthenticationState = createSelector(
+  getCurrentUserState,
+  (state: CurrentUserState) => state.authenticated
+);
+
 export const getCurrentUserDetails = createSelector(
   getCurrentUserState,
   (state: CurrentUserState) => {

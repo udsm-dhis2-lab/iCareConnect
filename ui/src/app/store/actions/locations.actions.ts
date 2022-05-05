@@ -3,6 +3,8 @@ import { Location } from 'src/app/core/models';
 
 export const loadAllLocations = createAction('[LOCATIONS] load all locations');
 
+export const loadAllLocationsByLoginTag = createAction('[LOCATIONS] load all locations');
+
 export const loadLoginLocations = createAction(
   '[LOCATIONS] load login locations'
 );
