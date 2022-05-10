@@ -1,28 +1,26 @@
-import { Component, OnInit } from '@angular/core';
-import { FormControl } from '@angular/forms';
-import { Store } from '@ngrx/store';
-import { AppState } from 'src/app/store/reducers';
-import { SampleObject } from '../../resources/models';
-import { Observable } from 'rxjs';
-import {
-  getAllLabSamples,
-  getLabSamplesGroupedBymrNoAndFilteredByStatus,
-} from '../../store/selectors/samples.selectors';
+import { Component, OnInit } from "@angular/core";
+import { FormControl } from "@angular/forms";
+import { Store } from "@ngrx/store";
+import { AppState } from "src/app/store/reducers";
+import { Observable } from "rxjs";
 import {
   ConceptCreateFull,
   ProviderGet,
   UserGetFull,
-} from 'src/app/shared/resources/openmrs';
+} from "src/app/shared/resources/openmrs";
 import {
   getCurrentUserDetails,
   getProviderDetails,
-} from 'src/app/store/selectors/current-user.selectors';
-import { getSpecimenSources } from '../../store/selectors/specimen-sources-and-tests-management.selectors';
+} from "src/app/store/selectors/current-user.selectors";
+import { SampleObject } from "src/app/modules/laboratory/resources/models";
+import { getSpecimenSources } from "src/app/modules/laboratory/store/selectors/specimen-sources-and-tests-management.selectors";
+import { getAllLabSamples } from "src/app/store/selectors";
+import { getLabSamplesGroupedBymrNoAndFilteredByStatus } from "src/app/modules/laboratory/store/selectors/samples.selectors";
 
 @Component({
-  selector: 'app-collected-lab-samples',
-  templateUrl: './collected-lab-samples.component.html',
-  styleUrls: ['./collected-lab-samples.component.scss'],
+  selector: "app-collected-lab-samples",
+  templateUrl: "./collected-lab-samples.component.html",
+  styleUrls: ["./collected-lab-samples.component.scss"],
 })
 export class CollectedLabSamplesComponent implements OnInit {
   selectedTab = new FormControl(0);
@@ -39,17 +37,17 @@ export class CollectedLabSamplesComponent implements OnInit {
 
   ngOnInit(): void {
     this.specimenSources$ = this.store.select(getSpecimenSources, {
-      name: 'Specimen sources',
+      name: "Specimen sources",
     });
     this.collectedSamples$ = this.store.select(getAllLabSamples);
     this.acceptedSamplesGroupedBymrNo$ = this.store.select(
       getLabSamplesGroupedBymrNoAndFilteredByStatus,
-      { status: 'ACCEPTED' }
+      { status: "ACCEPTED" }
     );
 
     this.rejectedSamplesGroupedBymrNo$ = this.store.select(
       getLabSamplesGroupedBymrNoAndFilteredByStatus,
-      { status: 'REJECTED' }
+      { status: "REJECTED" }
     );
     this.provider$ = this.store.select(getProviderDetails);
     this.currentUser$ = this.store.select(getCurrentUserDetails);

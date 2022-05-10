@@ -1,65 +1,59 @@
-import { NgModule } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
-import { LaboratoryHomeComponent } from './pages/laboratory-home/laboratory-home.component';
-import { LaboratorySampleCollectionComponent } from './pages/laboratory-sample-collection/laboratory-sample-collection.component';
-import { CollectedLabSamplesComponent } from './pages/collected-lab-samples/collected-lab-samples.component';
-import { LabSamplesAllocationComponent } from './pages/lab-samples-allocation/lab-samples-allocation.component';
-import { LabTestsManagementComponent } from './pages/lab-tests-management/lab-tests-management.component';
-import { SampleTrackingDashboardComponent } from './pages/sample-tracking-dashboard/sample-tracking-dashboard.component';
-import { SampleCollectionHomeComponent } from './pages/sample-collection-home/sample-collection-home.component';
-import { LaboratoryComponent } from './laboratory.component';
-import { NoLabAccessComponent } from './pages/no-lab-access/no-lab-access.component';
+import { NgModule } from "@angular/core";
+import { Routes, RouterModule } from "@angular/router";
+import { LaboratorySampleCollectionComponent } from "./modules/sample-collection/pages/laboratory-sample-collection/laboratory-sample-collection.component";
+import { SampleCollectionHomeComponent } from "./modules/sample-collection/pages/sample-collection-home/sample-collection-home.component";
+import { LaboratoryComponent } from "./laboratory.component";
+import { NoLabAccessComponent } from "./pages/no-lab-access/no-lab-access.component";
 
 const routes: Routes = [
   {
-    path: '',
+    path: "",
     component: LaboratoryComponent,
     children: [
       {
-        path: 'no-lab-access',
+        path: "no-lab-access",
         component: NoLabAccessComponent,
       },
       {
-        path: 'sample-collection-home',
-        component: SampleCollectionHomeComponent,
+        path: "sample-collection",
+        loadChildren: () =>
+          import("./modules/sample-collection/sample-collection.module").then(
+            (m) => m.SampleCollectionModule
+          ),
       },
       {
-        path: 'sample-collection-home/collection/:patientId/:visitId',
-        component: LaboratorySampleCollectionComponent,
-      },
-      {
-        path: 'lab-investigation-home',
+        path: "lab-investigation-home",
         loadChildren: () =>
           import(
-            './pages/laboratory-investigation/laboratory-investigation.module'
+            "./modules/laboratory-investigation/laboratory-investigation.module"
           ).then((m) => m.LaboratoryInvestigationModule),
       },
       {
-        path: 'sample-tracking',
+        path: "sample-tracking",
         loadChildren: () =>
-          import('./pages/sample-tracking/sample-tracking.module').then(
+          import("./modules/sample-tracking/sample-tracking.module").then(
             (m) => m.SampleTrackingModule
           ),
       },
       {
-        path: 'settings',
+        path: "settings",
         loadChildren: () =>
-          import('./pages/settings/settings.module').then(
+          import("./modules/settings/settings.module").then(
             (m) => m.SettingsModule
           ),
       },
       {
-        path: 'reports',
+        path: "reports",
         loadChildren: () =>
-          import('./pages/lab-reports/reports.module').then(
+          import("./modules/lab-reports/reports.module").then(
             (m) => m.ReportsModule
           ),
       },
       {
-        path: 'sample-acceptance-and-results',
+        path: "sample-acceptance-and-results",
         loadChildren: () =>
           import(
-            './pages/sample-acceptance-and-results/sample-acceptance-and-results.module'
+            "./modules/sample-acceptance-and-results/sample-acceptance-and-results.module"
           ).then((m) => m.SampleAcceptanceAndResultsModule),
       },
     ],

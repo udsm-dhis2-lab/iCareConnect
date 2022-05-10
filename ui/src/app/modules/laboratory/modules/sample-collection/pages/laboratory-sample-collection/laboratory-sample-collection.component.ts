@@ -11,10 +11,10 @@ import {
   getVisitLoadedState,
   getActiveVisit,
 } from "src/app/store/selectors/visit.selectors";
-import { SampleObject } from "../../resources/models";
-import { getAllLabSamples } from "../../store/selectors/samples.selectors";
+import { SampleObject } from "../../../../resources/models";
+import { getAllLabSamples } from "../../../../store/selectors/samples.selectors";
 import { VisitObject } from "src/app/shared/resources/visits/models/visit-object.model";
-import { getSpecimenSources } from "../../store/selectors/specimen-sources-and-tests-management.selectors";
+import { getSpecimenSources } from "../../../../store/selectors/specimen-sources-and-tests-management.selectors";
 import { take } from "rxjs/operators";
 import { go, loadCurrentPatient } from "src/app/store/actions";
 import { getAllPayments } from "src/app/store/selectors/payment.selector";
