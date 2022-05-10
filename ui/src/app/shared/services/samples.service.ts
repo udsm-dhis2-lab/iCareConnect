@@ -1,13 +1,13 @@
-import { Injectable } from '@angular/core';
+import { Injectable } from "@angular/core";
 
-import * as _ from 'lodash';
-import { HttpClient } from '@angular/common/http';
-import { from, Observable, of, zip } from 'rxjs';
-import { BASE_URL } from '../constants/constants.constants';
-import { catchError, delay, map } from 'rxjs/operators';
+import * as _ from "lodash";
+import { HttpClient } from "@angular/common/http";
+import { from, Observable, of, zip } from "rxjs";
+import { BASE_URL } from "../constants/constants.constants";
+import { catchError, delay, map } from "rxjs/operators";
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: "root",
 })
 export class SamplesService {
   constructor(private httpClient: HttpClient) {}
@@ -15,15 +15,20 @@ export class SamplesService {
   getLabSamplesByCollectionDates(dates): Observable<any> {
     return this.httpClient.get(
       BASE_URL +
-        'lab/samples?startDate=' +
+        "lab/samples?startDate=" +
         dates?.startDate +
-        '&endDate=' +
+        "&endDate=" +
         dates?.endDate
     );
   }
 
-  getSampleLabel() {
-    return this.httpClient.get(`${BASE_URL}lab/samplelable`);
+  getSampleLabel(): Observable<string> {
+    return this.httpClient.get(`${BASE_URL}lab/samplelable`).pipe(
+      map((response: { label: number }) => {
+        return response?.label;
+      }),
+      catchError((error) => of(error))
+    );
   }
 
   getTestTimeSettings(conceptUuid: string) {
@@ -37,16 +42,18 @@ export class SamplesService {
   }
 
   collectSample(data): Observable<any> {
-    return this.httpClient.post(BASE_URL + 'lab/sample', data);
+    return this.httpClient.post(BASE_URL + "lab/sample", data);
   }
 
   getCollectedSamples(): Observable<any> {
-    return this.httpClient.get(BASE_URL + 'lab/samples');
+    return this.httpClient.get(
+      BASE_URL + "lab/samples?startDate=2022-05-05&endDate=2022-05-10"
+    );
   }
 
   setSampleStatus(data): Observable<any> {
     if (data) {
-      return this.httpClient.post(BASE_URL + 'lab/samplestatus', data);
+      return this.httpClient.post(BASE_URL + "lab/samplestatus", data);
     } else {
       return from([null]);
     }
@@ -57,7 +64,7 @@ export class SamplesService {
     allocations: any[];
   }): Observable<any> {
     return this.httpClient.post(
-      BASE_URL + 'lab/sampleaccept',
+      BASE_URL + "lab/sampleaccept",
       statusWithAllocations
     );
   }
@@ -78,7 +85,7 @@ export class SamplesService {
             container: {
               uuid: order?.containerDetails
                 ? order?.containerDetails?.uuid
-                : configs['otherContainer']?.uuid,
+                : configs["otherContainer"]?.uuid,
             },
             sample: {
               uuid: order?.sample?.uuid,
@@ -101,7 +108,7 @@ export class SamplesService {
               container: {
                 uuid: order?.containerDetails
                   ? order?.containerDetails?.uuid
-                  : configs['otherContainer']?.uuid,
+                  : configs["otherContainer"]?.uuid,
               },
               sample: {
                 uuid: order?.sample?.uuid,
@@ -118,7 +125,7 @@ export class SamplesService {
 
     return zip(
       ...allocations.map((data, index) => {
-        return this.httpClient.post(BASE_URL + 'lab/allocation', data).pipe(
+        return this.httpClient.post(BASE_URL + "lab/allocation", data).pipe(
           map((response: any) => {
             return {
               ...newOrdersForReference[index],
@@ -141,12 +148,12 @@ export class SamplesService {
   // }
 
   saveLabResult(result): Observable<any> {
-    return this.httpClient.post(BASE_URL + 'lab/results', result);
+    return this.httpClient.post(BASE_URL + "lab/results", result);
   }
 
   saveLabResultStatus(resultStatus): Observable<any> {
     return this.httpClient.post(
-      BASE_URL + 'lab/allocationstatus',
+      BASE_URL + "lab/allocationstatus",
       resultStatus
     );
   }
@@ -155,9 +162,9 @@ export class SamplesService {
     return await this.httpClient
       .get(
         BASE_URL +
-          'visit/' +
+          "visit/" +
           id +
-          '?v=custom:(uuid,display,encounters:(uuid,display,obs,orders,patient,location,encounterType),patient,location,visitType)'
+          "?v=custom:(uuid,display,encounters:(uuid,display,obs,orders,patient,location,encounterType),patient,location,visitType)"
       )
       .pipe(delay(1000))
       .toPromise();
@@ -168,7 +175,7 @@ export class SamplesService {
       this.httpClient
         .get(
           BASE_URL +
-            'billing/quotation/read/dates/indexed?endDate=2020-09-26&endIndex=10&isAscending=false&startDate=2020-09-18&startIndex=1'
+            "billing/quotation/read/dates/indexed?endDate=2020-09-26&endIndex=10&isAscending=false&startDate=2020-09-18&startIndex=1"
         )
         .subscribe(
           (patientsBillingInfos: any) => {
@@ -177,7 +184,7 @@ export class SamplesService {
               let allVisitsData = [];
               _.each(patientsBillingInfos, (billingInfo) => {
                 idsLoaded[billingInfo.visit.uuid]
-                  ? ''
+                  ? ""
                   : this.getData(billingInfo.visit.uuid).then((data) => {
                       allVisitsData = [...allVisitsData, data];
                       observer.next(allVisitsData);
@@ -196,7 +203,7 @@ export class SamplesService {
 
   getTodaysSampleLabels(): Observable<any> {
     return this.httpClient
-      .get(BASE_URL + 'bahmnicore/sql?q=laboratory.sqlGet.todaysSampleLabels')
+      .get(BASE_URL + "bahmnicore/sql?q=laboratory.sqlGet.todaysSampleLabels")
       .pipe(
         map((response) => {
           return response;

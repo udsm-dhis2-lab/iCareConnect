@@ -15,6 +15,13 @@ const routes: Routes = [
         component: NoLabAccessComponent,
       },
       {
+        path: "sample-registration",
+        loadChildren: () =>
+          import(
+            "./modules/sample-registration/sample-registration.module"
+          ).then((m) => m.SampleRegistrationModule),
+      },
+      {
         path: "sample-collection",
         loadChildren: () =>
           import("./modules/sample-collection/sample-collection.module").then(

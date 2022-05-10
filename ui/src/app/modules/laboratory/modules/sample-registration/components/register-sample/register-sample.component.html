@@ -1,0 +1,42 @@
+<div class="sample-registration">
+  <!-- <section class="registration-category">
+    <mat-checkbox [checked]="registrationCategory === 'single'"
+      >Single</mat-checkbox
+    >
+    <mat-checkbox>Batch</mat-checkbox>
+  </section> -->
+
+  <mat-radio-group class="registration-category">
+    <mat-radio-button
+      (change)="getSelection($event)"
+      class="registration-category-btn"
+      [value]="'single'"
+      [checked]="registrationCategory === 'single'"
+      color="primary"
+    >
+      Single
+    </mat-radio-button>
+    <mat-radio-button
+      (change)="getSelection($event)"
+      class="registration-category-btn ml-2"
+      [value]="'batch'"
+      [checked]="registrationCategory === 'batch'"
+      color="primary"
+    >
+      Batch
+    </mat-radio-button>
+  </mat-radio-group>
+
+  <div
+    class="single-sample-registration"
+    *ngIf="registrationCategory === 'single'"
+  >
+    <app-single-registration></app-single-registration>
+  </div>
+  <div
+    class="batch-sample-registration"
+    *ngIf="registrationCategory === 'batch'"
+  >
+    <app-batch-registration></app-batch-registration>
+  </div>
+</div>
