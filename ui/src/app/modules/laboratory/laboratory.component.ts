@@ -46,7 +46,7 @@ export class LaboratoryComponent implements OnInit {
   selectedDay: Date = new Date();
   today: Date = new Date();
   url$: Observable<any>;
-  showDate: Boolean = true;
+  showDate: Boolean = false;
   startDate: any;
   endDate: any;
   datesRangeDifference: number = 5;
@@ -55,6 +55,7 @@ export class LaboratoryComponent implements OnInit {
   sampleTypes$: Observable<any>;
   specimenSources$: Observable<any>;
   userRoles$: Observable<any>;
+  currentRoutePath: string = "";
 
   constructor(
     private store: Store<AppState>,
@@ -168,10 +169,36 @@ export class LaboratoryComponent implements OnInit {
     this.store.dispatch(loadSampleTypes());
 
     this.sampleTypes$ = this.store.select(getAllSampleTypes);
+    const navigationDetails = JSON.parse(
+      localStorage.getItem("navigationDetails")
+    );
+    this.currentRoutePath =
+      navigationDetails && navigationDetails?.path[0]
+        ? navigationDetails?.path[0]?.replace("/laboratory/", "")
+        : "";
   }
 
   disableDate() {
     this.showDate = false;
+  }
+
+  changeRoute(
+    event: Event,
+    routePath: string,
+    showDate: boolean,
+    dateRange?: number
+  ) {
+    event.stopPropagation();
+    this.currentRoutePath = routePath;
+    this.showDate = showDate;
+    if (this.showDate) {
+      this.enableDate(this.datesRangeDifference);
+    }
+    this.store.dispatch(
+      go({
+        path: ["/laboratory/" + routePath],
+      })
+    );
   }
 
   enableDate(dateRange) {
