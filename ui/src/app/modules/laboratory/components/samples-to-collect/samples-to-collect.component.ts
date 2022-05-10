@@ -23,7 +23,7 @@ import { SampleObject } from "../../resources/models";
 import { getPatientPendingBillStatus } from "src/app/store/selectors/bill.selectors";
 import { collectSample } from "src/app/store/actions";
 import { SamplesService } from "src/app/shared/services/samples.service";
-import { BarCodeModalComponent } from "../../pages/sample-acceptance-and-results/components/bar-code-modal/bar-code-modal.component";
+import { BarCodeModalComponent } from "../../modules/sample-acceptance-and-results/components/bar-code-modal/bar-code-modal.component";
 import { formatDateToYYMMDD } from "src/app/shared/helpers/format-date.helper";
 import { MatDialog } from "@angular/material/dialog";
 import { LabOrdersService } from "../../resources/services/lab-orders.service";

@@ -1,41 +1,41 @@
-import { HttpClient } from '@angular/common/http';
-import { Component, Input, OnInit } from '@angular/core';
-import { MatButtonToggleChange } from '@angular/material/button-toggle';
-import { MatDialog } from '@angular/material/dialog';
-import { Store } from '@ngrx/store';
-import * as _ from 'lodash';
-import * as Highcharts from 'highcharts';
-import * as moment from 'moment';
-import { Observable } from 'rxjs';
-import { AppState } from 'src/app/store/reducers';
-import { getProviderDetails } from 'src/app/store/selectors/current-user.selectors';
-import { PrintResultsModalComponent } from '../../../sample-acceptance-and-results/components/print-results-modal/print-results-modal.component';
-import { SamplesService } from 'src/app/shared/services/samples.service';
+import { HttpClient } from "@angular/common/http";
+import { Component, Input, OnInit } from "@angular/core";
+import { MatButtonToggleChange } from "@angular/material/button-toggle";
+import { MatDialog } from "@angular/material/dialog";
+import { Store } from "@ngrx/store";
+import * as _ from "lodash";
+import * as Highcharts from "highcharts";
+import * as moment from "moment";
+import { Observable } from "rxjs";
+import { AppState } from "src/app/store/reducers";
+import { getProviderDetails } from "src/app/store/selectors/current-user.selectors";
+import { PrintResultsModalComponent } from "../../../sample-acceptance-and-results/components/print-results-modal/print-results-modal.component";
+import { SamplesService } from "src/app/shared/services/samples.service";
 import {
   getAllSampleTypes,
   getCodedSampleRejectionReassons,
   getLabDepartments,
   getLabTestsContainers,
-} from 'src/app/store/selectors';
-import { formatDateToYYMMDD } from 'src/app/shared/helpers/format-date.helper';
-import { BASE_URL } from 'src/app/shared/constants/constants.constants';
+} from "src/app/store/selectors";
+import { formatDateToYYMMDD } from "src/app/shared/helpers/format-date.helper";
+import { BASE_URL } from "src/app/shared/constants/constants.constants";
 import {
   formatDataReportResponse,
   formatReportResponse,
-} from 'src/app/shared/helpers/format-report.helper';
+} from "src/app/shared/helpers/format-report.helper";
 import {
   keyDepartmentsByTestOrder,
   keySampleTypesByTestOrder,
-} from 'src/app/shared/helpers/sample-types.helper';
-import { generateSelectionOptions } from 'src/app/shared/helpers/patient.helper';
-import { ExportService } from 'src/app/shared/services/export.service';
-import { LabReportsService } from 'src/app/modules/laboratory/resources/services/reports.service';
+} from "src/app/shared/helpers/sample-types.helper";
+import { generateSelectionOptions } from "src/app/shared/helpers/patient.helper";
+import { ExportService } from "src/app/shared/services/export.service";
+import { LabReportsService } from "src/app/modules/laboratory/resources/services/reports.service";
 // import { Agent } from 'http';
 
 @Component({
-  selector: 'app-lab-reports',
-  templateUrl: './lab-reports.component.html',
-  styleUrls: ['./lab-reports.component.scss'],
+  selector: "app-lab-reports",
+  templateUrl: "./lab-reports.component.html",
+  styleUrls: ["./lab-reports.component.scss"],
 })
 export class LabReportsComponent implements OnInit {
   @Input() configuredReports: any[];
@@ -55,88 +55,88 @@ export class LabReportsComponent implements OnInit {
   groupedByDeptDataObject: any = {};
   reports = [
     {
-      id: 'Malaria',
-      name: 'Malaria Lab Tests Report',
-      description: 'Malaria Lab Tests Report',
-      key: 'abfe1977-4094-4a09-beec-9d8555706fb1',
+      id: "Malaria",
+      name: "Malaria Lab Tests Report",
+      description: "Malaria Lab Tests Report",
+      key: "abfe1977-4094-4a09-beec-9d8555706fb1",
       hardCoded: true,
       showSearching: false,
     },
     {
-      id: 'TAT',
-      name: 'Turn Around Time',
-      description: 'Turn Around Time',
+      id: "TAT",
+      name: "Turn Around Time",
+      description: "Turn Around Time",
       hardCoded: true,
       showSearching: true,
-      key: 'e1204397-f359-4688-a863-a64de758c2a3',
+      key: "e1204397-f359-4688-a863-a64de758c2a3",
     },
     {
-      id: 'tests',
-      name: 'Tests Status',
-      description: 'Number of Tests by Status',
+      id: "tests",
+      name: "Tests Status",
+      description: "Number of Tests by Status",
       members: [
         {
-          id: 'tests-by-departments',
-          name: 'Tests by departments',
-          description: 'Tests by departments',
-          parent: 'tests',
+          id: "tests-by-departments",
+          name: "Tests by departments",
+          description: "Tests by departments",
+          parent: "tests",
           hardCoded: true,
           showSearching: false,
         },
         {
-          id: 'tests-by-specimen-sources',
-          name: 'Tests Performed by sample types',
-          description: 'Tests Performed by sample types',
-          parent: 'tests',
+          id: "tests-by-specimen-sources",
+          name: "Tests Performed by sample types",
+          description: "Tests Performed by sample types",
+          parent: "tests",
           hardCoded: true,
           showSearching: false,
         },
         {
-          id: 'grouped-tests-performed',
-          name: 'Grouped Tests performed',
-          description: 'Grouped Tests performed',
-          parent: 'tests',
+          id: "grouped-tests-performed",
+          name: "Grouped Tests performed",
+          description: "Grouped Tests performed",
+          parent: "tests",
           hardCoded: true,
           showSearching: false,
         },
       ],
     },
     {
-      id: 'tests-analysis',
-      name: 'Tests Analysis',
-      description: 'Tests Analysis',
+      id: "tests-analysis",
+      name: "Tests Analysis",
+      description: "Tests Analysis",
       members: [
         {
-          id: 'tests-analysis-report',
-          name: 'Tests Analysis Report',
-          description: 'Tests Analysis Report',
-          parent: 'tests-analysis',
+          id: "tests-analysis-report",
+          name: "Tests Analysis Report",
+          description: "Tests Analysis Report",
+          parent: "tests-analysis",
           hardCoded: true,
           showSearching: true,
         },
       ],
     },
     {
-      id: 'samples',
-      name: 'Samples',
-      description: 'Number of Samples by Status',
-      key: '02342279-8304-43d2-ba90-defaf4cbc4a5',
+      id: "samples",
+      name: "Samples",
+      description: "Number of Samples by Status",
+      key: "02342279-8304-43d2-ba90-defaf4cbc4a5",
       hardCoded: true,
       showSearching: false,
     },
     {
-      id: 'SamplesRejected',
-      name: 'Samples Rejection Detail Report',
-      description: 'List of samples rejected by sample collection date',
-      key: '8070e3ca-f723-427c-be28-5020a3c84e74',
+      id: "SamplesRejected",
+      name: "Samples Rejection Detail Report",
+      description: "List of samples rejected by sample collection date",
+      key: "8070e3ca-f723-427c-be28-5020a3c84e74",
       hardCoded: true,
       showSearching: false,
     },
     {
-      id: 'PatientsAttended',
-      name: 'List of Patients Attended',
-      description: 'List of patients who attended lab for collection',
-      key: '1f05441b-2b2f-493a-80eb-e0428f886070',
+      id: "PatientsAttended",
+      name: "List of Patients Attended",
+      description: "List of patients who attended lab for collection",
+      key: "1f05441b-2b2f-493a-80eb-e0428f886070",
       hardCoded: true,
       showSearching: true,
     },
@@ -154,7 +154,7 @@ export class LabReportsComponent implements OnInit {
   dateChanged: boolean = false;
 
   resultsLoader: any = {};
-  searchingText: string = '';
+  searchingText: string = "";
   constructor(
     private httpClient: HttpClient,
     private exportService: ExportService,
@@ -188,7 +188,7 @@ export class LabReportsComponent implements OnInit {
 
   dateRangeSelect() {
     if (this.startDate && this.endDate) {
-      this.onSelectPeriod(null, 'custom-range');
+      this.onSelectPeriod(null, "custom-range");
     }
   }
 
@@ -217,115 +217,115 @@ export class LabReportsComponent implements OnInit {
     // };
 
     // this.selectionDates = selectionDates;
-    let categoryName = '';
+    let categoryName = "";
     this.dateChanged = false;
 
     let categories = [];
 
     switch (this.period) {
-      case 'ThisMonth': {
+      case "ThisMonth": {
         let currentDate = moment(formatDateToYYMMDD(new Date()));
         this.selectionDates = {
           startDate: currentDate
-            .startOf('month')
+            .startOf("month")
             .format()
-            .split('T')
-            .join(' ')
-            .split('+')[0],
+            .split("T")
+            .join(" ")
+            .split("+")[0],
           endDate: currentDate
-            .endOf('month')
+            .endOf("month")
             .format()
-            .split('T')
-            .join(' ')
-            .split('+')[0],
+            .split("T")
+            .join(" ")
+            .split("+")[0],
         };
         this.dateChanged = true;
         break;
       }
 
-      case 'ThisWeek': {
+      case "ThisWeek": {
         const today = formatDateToYYMMDD(new Date());
         let formattedDate = moment(
           formatDateToYYMMDD(
             new Date(
-              Number(today.split('-')[0]),
-              Number(today.split('-')[1]) - 1,
-              Number(today.split('-')[2]) + 1
+              Number(today.split("-")[0]),
+              Number(today.split("-")[1]) - 1,
+              Number(today.split("-")[2]) + 1
             )
           )
         );
         this.selectionDates = {
           startDate: formattedDate
-            .startOf('week')
+            .startOf("week")
             .format()
-            .split('T')
-            .join(' ')
-            .split('+')[0],
+            .split("T")
+            .join(" ")
+            .split("+")[0],
           endDate: formattedDate
-            .endOf('week')
+            .endOf("week")
             .format()
-            .split('T')
-            .join(' ')
-            .split('+')[0],
+            .split("T")
+            .join(" ")
+            .split("+")[0],
         };
         this.dateChanged = true;
         break;
       }
 
-      case 'custom-range': {
+      case "custom-range": {
         this.selectionDates = {
           startDate: moment(formatDateToYYMMDD(this.startDate))
-            .startOf('day')
+            .startOf("day")
             .format()
-            .split('T')
-            .join(' ')
-            .split('+')[0],
+            .split("T")
+            .join(" ")
+            .split("+")[0],
           endDate: moment(formatDateToYYMMDD(this.endDate))
-            .endOf('day')
+            .endOf("day")
             .format()
-            .split('T')
-            .join(' ')
-            .split('+')[0],
+            .split("T")
+            .join(" ")
+            .split("+")[0],
         };
         this.dateChanged = true;
         break;
       }
 
-      case 'ThisYear': {
+      case "ThisYear": {
         let currentDate = moment(formatDateToYYMMDD(new Date()));
         this.selectionDates = {
           startDate: currentDate
-            .startOf('year')
+            .startOf("year")
             .format()
-            .split('T')
-            .join(' ')
-            .split('+')[0],
+            .split("T")
+            .join(" ")
+            .split("+")[0],
           endDate: currentDate
-            .endOf('year')
+            .endOf("year")
             .format()
-            .split('T')
-            .join(' ')
-            .split('+')[0],
+            .split("T")
+            .join(" ")
+            .split("+")[0],
         };
         this.dateChanged = true;
         break;
       }
 
-      case 'ToDay': {
+      case "ToDay": {
         let currentDate = moment(formatDateToYYMMDD(new Date()));
         this.selectionDates = {
           startDate: currentDate
-            .startOf('day')
+            .startOf("day")
             .format()
-            .split('T')
-            .join(' ')
-            .split('+')[0],
+            .split("T")
+            .join(" ")
+            .split("+")[0],
           endDate: currentDate
-            .endOf('day')
+            .endOf("day")
             .format()
-            .split('T')
-            .join(' ')
-            .split('+')[0],
+            .split("T")
+            .join(" ")
+            .split("+")[0],
         };
         this.dateChanged = true;
         break;
@@ -335,7 +335,7 @@ export class LabReportsComponent implements OnInit {
     this.loadingReport = true;
     // TODO: Find a better way to handle this
     // console.log('selectionDates', selectionDates);
-    if (this.currentReport.id == 'TAT') {
+    if (this.currentReport.id == "TAT") {
       this.reportService
         .runDataSet(this.currentReport?.key, this.selectionDates)
         .subscribe((data: any) => {
@@ -360,7 +360,7 @@ export class LabReportsComponent implements OnInit {
           });
           this.loadingReport = false;
         });
-    } else if (this.currentReport.id == 'samples') {
+    } else if (this.currentReport.id == "samples") {
       this.reportData = {};
       // laboratory.sqlGet.laboratory_samples_by_specimen_sources
       this.reportService
@@ -384,10 +384,10 @@ export class LabReportsComponent implements OnInit {
 
           _.map(data, (reportRow: any) => {
             if (
-              reportRow?.status != 'REJECTED' &&
-              reportRow?.status != 'RECOLLECT' &&
-              reportRow?.status != 'ACCEPTED' &&
-              reportRow?.status != 'HIGH'
+              reportRow?.status != "REJECTED" &&
+              reportRow?.status != "RECOLLECT" &&
+              reportRow?.status != "ACCEPTED" &&
+              reportRow?.status != "HIGH"
             ) {
               reportGroups.collected += Number(reportRow?.count);
               this.specimenSources = [...this.specimenSources, reportRow?.name];
@@ -397,22 +397,22 @@ export class LabReportsComponent implements OnInit {
           this.specimenSources = _.uniq(this.specimenSources);
 
           reportGroups.accepted = (
-            _.filter(data, { status: 'ACCEPTED' }) || []
+            _.filter(data, { status: "ACCEPTED" }) || []
           )?.length;
           reportGroups.rejected = (
-            _.filter(data, { status: 'REJECTED' }) || []
+            _.filter(data, { status: "REJECTED" }) || []
           )?.length;
           reportGroups.recollected = (
-            _.filter(data, { status: 'RECOLLECT' }) || []
+            _.filter(data, { status: "RECOLLECT" }) || []
           )?.length;
 
           let samplesCollected = [];
           _.map(data, (reportRow: any) => {
             if (
-              reportRow?.status != 'REJECTED' &&
-              reportRow?.status != 'RECOLLECT' &&
-              reportRow?.status != 'ACCEPTED' &&
-              reportRow?.status != 'HIGH'
+              reportRow?.status != "REJECTED" &&
+              reportRow?.status != "RECOLLECT" &&
+              reportRow?.status != "ACCEPTED" &&
+              reportRow?.status != "HIGH"
             ) {
               samplesCollected = [...samplesCollected, reportRow];
             }
@@ -420,31 +420,31 @@ export class LabReportsComponent implements OnInit {
 
           reportDataBySpecimenSources.collected = _.groupBy(
             samplesCollected,
-            'name'
+            "name"
           );
 
           reportDataBySpecimenSources.accepted = _.groupBy(
-            _.filter(data, { status: 'ACCEPTED' }) || [],
-            'name'
+            _.filter(data, { status: "ACCEPTED" }) || [],
+            "name"
           );
 
           reportDataBySpecimenSources.rejected = _.groupBy(
-            _.filter(data, { status: 'REJECTED' }) || [],
-            'name'
+            _.filter(data, { status: "REJECTED" }) || [],
+            "name"
           );
 
           reportDataBySpecimenSources.recollected = _.groupBy(
-            _.filter(data, { status: 'RECOLLECT' }) || [],
-            'name'
+            _.filter(data, { status: "RECOLLECT" }) || [],
+            "name"
           );
 
-          this.reportData['status'] = reportGroups;
-          this.reportData['bySpecimenSouces'] = reportDataBySpecimenSources;
+          this.reportData["status"] = reportGroups;
+          this.reportData["bySpecimenSouces"] = reportDataBySpecimenSources;
           this.loadingReport = false;
         });
     } else if (
-      this.currentReport.id == 'tests' ||
-      this.currentReport?.parent == 'tests'
+      this.currentReport.id == "tests" ||
+      this.currentReport?.parent == "tests"
     ) {
       // laboratory.sqlGet.laboratory_tests_by_specimen
 
@@ -453,10 +453,10 @@ export class LabReportsComponent implements OnInit {
       this.specimenSources = [];
 
       this.reportService
-        .runDataSet('545911ec-1dc3-4ac2-97bb-fb436158902a', this.selectionDates)
+        .runDataSet("545911ec-1dc3-4ac2-97bb-fb436158902a", this.selectionDates)
         .subscribe((data: any) => {
           data = _.filter(data, (row: any) => {
-            return row?.dep_nm == '' ? false : true;
+            return row?.dep_nm == "" ? false : true;
           });
 
           let departments = _.map(data, (row: any) => {
@@ -467,9 +467,9 @@ export class LabReportsComponent implements OnInit {
 
           this.groupedByDeptDataObject = {};
 
-          this.Totals['all'] = 0;
-          this.Totals['completed'] = 0;
-          this.Totals['progress'] = 0;
+          this.Totals["all"] = 0;
+          this.Totals["completed"] = 0;
+          this.Totals["progress"] = 0;
 
           _.each(this.departments, (department) => {
             let departmentData = _.filter(data, (row: any) => {
@@ -488,22 +488,22 @@ export class LabReportsComponent implements OnInit {
             this.groupedByDeptDataObject[department] = {
               all: departmentData.length,
               completed: _.filter(departmentData, (data: any) => {
-                return typeof data?.order_with_result_id == 'number';
+                return typeof data?.order_with_result_id == "number";
               }).length,
               progress: _.filter(departmentData, (data: any) => {
-                return typeof data?.order_with_result_id == 'string';
+                return typeof data?.order_with_result_id == "string";
               }).length,
             };
 
-            this.Totals['all'] += departmentData.length;
-            this.Totals['completed'] += _.filter(
+            this.Totals["all"] += departmentData.length;
+            this.Totals["completed"] += _.filter(
               departmentData,
               (data: any) => {
-                return typeof data?.order_with_result_id == 'number';
+                return typeof data?.order_with_result_id == "number";
               }
             ).length;
-            this.Totals['progress'] += _.filter(departmentData, (data: any) => {
-              return typeof data?.order_with_result_id == 'string';
+            this.Totals["progress"] += _.filter(departmentData, (data: any) => {
+              return typeof data?.order_with_result_id == "string";
             }).length;
           });
 
@@ -520,12 +520,12 @@ export class LabReportsComponent implements OnInit {
 
           testsData.performed = (
             _.filter(data, (testData) => {
-              if (testData['order_with_result_id']) {
+              if (testData["order_with_result_id"]) {
                 performed = [
                   ...performed,
                   {
                     ...testData,
-                    testSpecimen: testData?.specimen + '-' + testData?.test,
+                    testSpecimen: testData?.specimen + "-" + testData?.test,
                   },
                 ];
                 return testData;
@@ -534,7 +534,7 @@ export class LabReportsComponent implements OnInit {
                   ...testsInProcessing,
                   {
                     ...testData,
-                    testSpecimen: testData?.specimen + '-' + testData?.test,
+                    testSpecimen: testData?.specimen + "-" + testData?.test,
                   },
                 ];
               }
@@ -547,7 +547,7 @@ export class LabReportsComponent implements OnInit {
                 ...this.specimenSources,
                 testData.specimen,
               ];
-              if (testData['order_id']) {
+              if (testData["order_id"]) {
                 return testData;
               }
             }) || []
@@ -566,14 +566,14 @@ export class LabReportsComponent implements OnInit {
           };
 
           this.specimenSources = _.uniq(this.specimenSources);
-          const groupedBySpecimen = _.groupBy(data, 'specimen');
+          const groupedBySpecimen = _.groupBy(data, "specimen");
           _.map(Object.keys(groupedBySpecimen), (key) => {
             let keyedData = {};
             keyedData[key] = groupedBySpecimen[key];
             groupedTestsBySpecimen.ordered[key] = groupedBySpecimen[key];
             groupedTestsBySpecimen.performed[key] =
               _.filter(groupedBySpecimen[key], (testData) => {
-                if (testData['order_with_result_id']) {
+                if (testData["order_with_result_id"]) {
                   return testData;
                 }
               }) || [];
@@ -581,41 +581,40 @@ export class LabReportsComponent implements OnInit {
 
           _.map(Object.keys(groupedBySpecimen), (key) => {
             let keyedData = {};
-            keyedData[key] = _.uniqBy(groupedBySpecimen[key], 'test');
+            keyedData[key] = _.uniqBy(groupedBySpecimen[key], "test");
             groupedByTestsAndSpecimen.ordered[key] = _.uniqBy(
               groupedBySpecimen[key],
-              'test'
+              "test"
             );
             groupedByTestsAndSpecimen.performed[key] =
               _.filter(groupedBySpecimen[key], (testData) => {
-                if (testData['order_with_result_id']) {
+                if (testData["order_with_result_id"]) {
                   return testData;
                 }
               }) || [];
           });
 
           // console.log('groupedTests', groupedTestsBySpecimen);
-          this.reportData['status'] = testsData;
-          this.reportData['bySpecimenSouces'] = groupedTestsBySpecimen;
-          this.reportData[
-            'groupedByTestsAndSpecimen'
-          ] = groupedByTestsAndSpecimen;
+          this.reportData["status"] = testsData;
+          this.reportData["bySpecimenSouces"] = groupedTestsBySpecimen;
+          this.reportData["groupedByTestsAndSpecimen"] =
+            groupedByTestsAndSpecimen;
 
           // console.log(groupedTests);
 
-          this.reportData['performedKeyValuePair'] = _.groupBy(
+          this.reportData["performedKeyValuePair"] = _.groupBy(
             performed,
-            'testSpecimen'
+            "testSpecimen"
           );
-          this.reportData['processingKeyValuePair'] = _.groupBy(
+          this.reportData["processingKeyValuePair"] = _.groupBy(
             testsInProcessing,
-            'testSpecimen'
+            "testSpecimen"
           );
           this.loadingReport = false;
 
           // console.log('the data ::', this.reportData);
         });
-    } else if (this.currentReport?.id == 'SamplesRejected') {
+    } else if (this.currentReport?.id == "SamplesRejected") {
       this.reportData = null;
       // laboratory.sqlGet.laboratory_samples_by_specimen_sources
       this.reportService
@@ -625,7 +624,7 @@ export class LabReportsComponent implements OnInit {
 
           this.loadingReport = false;
         });
-    } else if (this.currentReport?.id == 'Malaria') {
+    } else if (this.currentReport?.id == "Malaria") {
       this.reportData = null;
       // laboratory.sqlGet.laboratory_samples_by_specimen_sources
       this.reportService
@@ -635,8 +634,8 @@ export class LabReportsComponent implements OnInit {
           this.loadingReport = false;
         });
     } else if (
-      this.currentReport?.id == 'tests-analysis' ||
-      this.currentReport?.parent == 'tests-analysis'
+      this.currentReport?.id == "tests-analysis" ||
+      this.currentReport?.parent == "tests-analysis"
     ) {
       //
       this.reportData = null;
@@ -649,7 +648,7 @@ export class LabReportsComponent implements OnInit {
                 test: data?.test,
                 dep_nm: data?.dep_nm,
                 count: _.filter(response, (resp: any) => {
-                  return resp?.order_with_result_id != '' &&
+                  return resp?.order_with_result_id != "" &&
                     resp?.dep_nm == data?.dep_nm &&
                     resp?.test == data?.test
                     ? true
@@ -667,7 +666,7 @@ export class LabReportsComponent implements OnInit {
 
           this.loadingReport = false;
         });
-    } else if (this.currentReport?.id == 'PatientsAttended') {
+    } else if (this.currentReport?.id == "PatientsAttended") {
       this.reportData = null;
       this.reportService
         .runDataSet(this.currentReport?.key, this.selectionDates)
@@ -692,7 +691,7 @@ export class LabReportsComponent implements OnInit {
     labConfigs
   ) {
     this.resultsLoader[visit] = { loading: true, error: false };
-    this.resultsLoader['disableRestOfRows'] = true;
+    this.resultsLoader["disableRestOfRows"] = true;
     e.stopPropagation();
 
     // console.log(visit, providerDetails, labConfigs);
@@ -724,7 +723,7 @@ export class LabReportsComponent implements OnInit {
       // console.log('processed samples :: ', patientsSamples);
 
       this.resultsLoader[visit] = { loading: false, error: false };
-      this.resultsLoader['disableRestOfRows'] = false;
+      this.resultsLoader["disableRestOfRows"] = false;
 
       this.dialog.open(PrintResultsModalComponent, {
         data: {
@@ -732,8 +731,8 @@ export class LabReportsComponent implements OnInit {
           labConfigs: labConfigs,
           user: providerDetails,
         },
-        width: '60%',
-        height: '750px',
+        width: "60%",
+        height: "750px",
         disableClose: false,
       });
     });
@@ -747,8 +746,8 @@ export class LabReportsComponent implements OnInit {
     containers: any,
     configs
   ) {
-    let searchingText = '';
-    let department = '';
+    let searchingText = "";
+    let department = "";
 
     const keyedDepartments = keyDepartmentsByTestOrder(departments);
 
@@ -769,62 +768,62 @@ export class LabReportsComponent implements OnInit {
         collected: true,
         reasonForRejection:
           sample?.statuses?.length > 0 &&
-          _.orderBy(sample?.statuses, ['timestamp'], ['desc'])[0]?.status ==
-            'REJECTED'
+          _.orderBy(sample?.statuses, ["timestamp"], ["desc"])[0]?.status ==
+            "REJECTED"
             ? (codedSampleRejectionReasons.filter(
                 (reason) =>
                   reason.uuid ===
-                  _.orderBy(sample?.statuses, ['timestamp'], ['desc'])[0]
+                  _.orderBy(sample?.statuses, ["timestamp"], ["desc"])[0]
                     ?.remarks
               ) || [])[0]
             : sample?.statuses?.length > 0 &&
-              _.orderBy(sample?.statuses, ['timestamp'], ['desc'])[0]?.status ==
-                'RECOLLECT'
+              _.orderBy(sample?.statuses, ["timestamp"], ["desc"])[0]?.status ==
+                "RECOLLECT"
             ? (codedSampleRejectionReasons.filter(
                 (reason) =>
                   reason.uuid ===
-                  _.orderBy(sample?.statuses, ['timestamp'], ['desc'])[1]
+                  _.orderBy(sample?.statuses, ["timestamp"], ["desc"])[1]
                     ?.remarks
               ) || [])[0]
             : null,
         markedForRecollection:
           sample?.statuses?.length > 0 &&
-          _.orderBy(sample?.statuses, ['timestamp'], ['desc'])[0]?.status ==
-            'RECOLLECT'
+          _.orderBy(sample?.statuses, ["timestamp"], ["desc"])[0]?.status ==
+            "RECOLLECT"
             ? true
             : false,
         rejected:
           sample?.statuses?.length > 0 &&
-          _.orderBy(sample?.statuses, ['timestamp'], ['desc'])[0]?.status ==
-            'REJECTED'
+          _.orderBy(sample?.statuses, ["timestamp"], ["desc"])[0]?.status ==
+            "REJECTED"
             ? true
             : false,
         rejectedBy:
           sample?.statuses?.length > 0 &&
-          _.orderBy(sample?.statuses, ['timestamp'], ['desc'])[0]?.status ==
-            'REJECTED'
-            ? _.orderBy(sample?.statuses, ['timestamp'], ['desc'])[0]?.user
+          _.orderBy(sample?.statuses, ["timestamp"], ["desc"])[0]?.status ==
+            "REJECTED"
+            ? _.orderBy(sample?.statuses, ["timestamp"], ["desc"])[0]?.user
             : null,
         departmentName:
           keyedDepartments[sample?.orders[0]?.order?.concept?.uuid]
             ?.departmentName,
         collectedBy: {
-          display: sample?.creator?.display?.split(' (')[0],
-          name: sample?.creator?.display?.split(' (')[0],
+          display: sample?.creator?.display?.split(" (")[0],
+          name: sample?.creator?.display?.split(" (")[0],
           uid: sample?.creator?.uuid,
         },
         accepted:
-          (_.filter(sample?.statuses, { status: 'ACCEPTED' }) || [])?.length > 0
+          (_.filter(sample?.statuses, { status: "ACCEPTED" }) || [])?.length > 0
             ? true
             : false,
         acceptedBy: this.formatUserChangedStatus(
           (_.filter(sample?.statuses, {
-            status: 'ACCEPTED',
+            status: "ACCEPTED",
           }) || [])[0]
         ),
         acceptedAt: (_.filter(sample?.statuses, {
-          status: 'ACCEPTED',
-        }) || [])[0]['timestamp'],
+          status: "ACCEPTED",
+        }) || [])[0]["timestamp"],
         orders: _.map(sample?.orders, (order) => {
           return {
             ...order,
@@ -864,7 +863,7 @@ export class LabReportsComponent implements OnInit {
                       ),
                 keyedAnswers: _.keyBy(
                   keyedSpecimenSources[order?.order?.concept?.uuid]?.answers,
-                  'uuid'
+                  "uuid"
                 ),
               },
             },
@@ -872,18 +871,18 @@ export class LabReportsComponent implements OnInit {
             secondSignOff: false,
             collected: true,
             collectedBy: {
-              display: sample?.creator?.display?.split(' (')[0],
-              name: sample?.creator?.display?.split(' (')[0],
+              display: sample?.creator?.display?.split(" (")[0],
+              name: sample?.creator?.display?.split(" (")[0],
               uid: sample?.creator?.uuid,
             },
             accepted:
-              (_.filter(sample?.statuses, { status: 'ACCEPTED' }) || [])
+              (_.filter(sample?.statuses, { status: "ACCEPTED" }) || [])
                 ?.length > 0
                 ? true
                 : false,
             acceptedBy: this.formatUserChangedStatus(
               (_.filter(sample?.statuses, {
-                status: 'ACCEPTED',
+                status: "ACCEPTED",
               }) || [])[0]
             ),
             containerDetails: containers[order?.order?.concept?.uuid]
@@ -894,32 +893,32 @@ export class LabReportsComponent implements OnInit {
                 ...allocation,
                 firstSignOff:
                   allocation?.statuses?.length > 0 &&
-                  _.orderBy(allocation?.statuses, ['timestamp'], ['desc'])[0]
-                    ?.status == 'APPROVED'
+                  _.orderBy(allocation?.statuses, ["timestamp"], ["desc"])[0]
+                    ?.status == "APPROVED"
                     ? true
                     : false,
                 secondSignOff:
                   allocation?.statuses?.length > 0 &&
-                  _.orderBy(allocation?.statuses, ['timestamp'], ['desc'])[0]
-                    ?.status == 'APPROVED' &&
-                  _.orderBy(allocation?.statuses, ['timestamp'], ['desc'])[1]
-                    ?.status == 'APPROVED'
+                  _.orderBy(allocation?.statuses, ["timestamp"], ["desc"])[0]
+                    ?.status == "APPROVED" &&
+                  _.orderBy(allocation?.statuses, ["timestamp"], ["desc"])[1]
+                    ?.status == "APPROVED"
                     ? true
                     : false,
                 rejected:
                   allocation?.statuses?.length > 0 &&
-                  _.orderBy(allocation?.statuses, ['timestamp'], ['desc'])[0]
-                    ?.status == 'REJECTED'
+                  _.orderBy(allocation?.statuses, ["timestamp"], ["desc"])[0]
+                    ?.status == "REJECTED"
                     ? true
                     : false,
                 rejectionStatus:
                   allocation?.statuses?.length > 0 &&
-                  _.orderBy(allocation?.statuses, ['timestamp'], ['desc'])[0]
-                    ?.status == 'REJECTED'
+                  _.orderBy(allocation?.statuses, ["timestamp"], ["desc"])[0]
+                    ?.status == "REJECTED"
                     ? _.orderBy(
                         allocation?.statuses,
-                        ['timestamp'],
-                        ['desc']
+                        ["timestamp"],
+                        ["desc"]
                       )[0]
                     : null,
                 results: this.formatResults(allocation?.results),
@@ -934,11 +933,11 @@ export class LabReportsComponent implements OnInit {
         }),
         searchingText: this.createSearchingText(sample),
         priorityHigh:
-          (_.filter(sample?.statuses, { status: 'HIGH' }) || [])?.length > 0
+          (_.filter(sample?.statuses, { status: "HIGH" }) || [])?.length > 0
             ? true
             : false,
         priorityOrderNumber:
-          (_.filter(sample?.statuses, { status: 'HIGH' }) || [])?.length > 0
+          (_.filter(sample?.statuses, { status: "HIGH" }) || [])?.length > 0
             ? 0
             : 1,
         configs: configs,
@@ -957,8 +956,8 @@ export class LabReportsComponent implements OnInit {
               return sample;
             }
           }),
-          ['dateCreated', 'priorityOrderNumber'],
-          ['asc', 'asc']
+          ["dateCreated", "priorityOrderNumber"],
+          ["asc", "asc"]
         ),
         (sample) => {
           if (
@@ -974,12 +973,12 @@ export class LabReportsComponent implements OnInit {
         }
       ) || [];
 
-    const groupedByMRN = _.groupBy(filteredCompletedSamples, 'mrn');
+    const groupedByMRN = _.groupBy(filteredCompletedSamples, "mrn");
 
     let whats = _.map(Object.keys(groupedByMRN), (key) => {
       const samplesKeyedByDepartments = _.groupBy(
         groupedByMRN[key],
-        'departmentName'
+        "departmentName"
       );
 
       return {
@@ -1017,8 +1016,8 @@ export class LabReportsComponent implements OnInit {
       return {
         ...statusDetails,
         user: {
-          display: statusDetails?.user?.name?.split(' (')[0],
-          name: statusDetails?.user?.name?.split(' (')[0],
+          display: statusDetails?.user?.name?.split(" (")[0],
+          name: statusDetails?.user?.name?.split(" (")[0],
           uuid: statusDetails?.user?.uuid,
         },
       };
@@ -1028,20 +1027,20 @@ export class LabReportsComponent implements OnInit {
   createSearchingText(sample) {
     return (
       sample?.label +
-      '-' +
+      "-" +
       sample?.patient?.givenName +
       sample?.patient?.middleName +
       sample?.patient?.familyName +
       sample?.patient?.identifiers[0]?.id +
       _.map(sample?.orders, (order) => {
         return order?.order?.concept?.display;
-      }).join('-')
+      }).join("-")
     );
   }
 
   getResultsCommentsStatuses(statuses) {
     return _.filter(statuses, (status) => {
-      if (status?.status != 'APPROVED' && status?.status != 'REJECTED') {
+      if (status?.status != "APPROVED" && status?.status != "REJECTED") {
         return status;
       }
     });
@@ -1060,27 +1059,27 @@ export class LabReportsComponent implements OnInit {
           ...result,
           resultsFedBy: {
             name: result?.creator?.display
-              ? result?.creator?.display.split('(')[0]
-              : '',
+              ? result?.creator?.display.split("(")[0]
+              : "",
             uuid: result?.creator?.uuid,
           },
         };
       }),
-      ['dateCreated'],
-      ['asc']
+      ["dateCreated"],
+      ["asc"]
     );
   }
 
   drawChart(categories: any, categoryName: string, data) {
     setTimeout(() => {
       this.chart = Highcharts.chart(
-        'container' as any,
+        "container" as any,
         {
           chart: {
-            type: 'column',
+            type: "column",
           },
           title: {
-            text: 'Turn Around time',
+            text: "Turn Around time",
           },
 
           xAxis: {
@@ -1090,7 +1089,7 @@ export class LabReportsComponent implements OnInit {
           yAxis: {
             min: 0,
             title: {
-              text: 'Minutes (min)',
+              text: "Minutes (min)",
             },
           },
           tooltip: {
@@ -1099,7 +1098,7 @@ export class LabReportsComponent implements OnInit {
             pointFormat:
               '<tr><td style="color:{series.color};padding:0"></td>' +
               '<td style="padding:0"><b>{point.y:.1f} min</b></td></tr>',
-            footerFormat: '</table>',
+            footerFormat: "</table>",
             shared: true,
             useHTML: true,
           },
@@ -1146,13 +1145,13 @@ export class LabReportsComponent implements OnInit {
 
   onDownloadCSV(e) {
     e.stopPropagation();
-    const table = document.getElementById('export-table');
+    const table = document.getElementById("export-table");
     this.exportService.exportCSV(this.currentReport?.description, table);
   }
 
   onDownloadXLS(e) {
     e.stopPropagation();
-    const table = document.getElementById('export-table');
+    const table = document.getElementById("export-table");
     this.exportService.exportXLS(this.currentReport?.description, table);
   }
 
@@ -1160,8 +1159,8 @@ export class LabReportsComponent implements OnInit {
     let filteredData = [];
     _.each(allData, (data: any) => {
       if (
-        formatDateToYYMMDD(new Date(data['Date'])) >= dates?.startDate &&
-        formatDateToYYMMDD(new Date(data['Date'])) <= dates?.endDate
+        formatDateToYYMMDD(new Date(data["Date"])) >= dates?.startDate &&
+        formatDateToYYMMDD(new Date(data["Date"])) <= dates?.endDate
       ) {
         filteredData = [...filteredData, data];
       }
