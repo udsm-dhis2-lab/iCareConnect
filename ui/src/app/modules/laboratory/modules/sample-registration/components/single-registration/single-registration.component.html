@@ -1,14 +1,13 @@
 <div
   class="single-registration"
   *ngIf="{
-    labSamples: labSamples$ | async,
     labSampleLabel: labSampleLabel$ | async,
     testsUnderDepartment: testsUnderDepartment$ | async
   } as params"
 >
-  <div class="row" *ngIf="params?.labSamples">
-    <div class="col-lg-4 col-md-4 col-sx-12 col-sm-12">
-      <div class="h5 text-left">New sample</div>
+  <div class="row" *ngIf="params?.labSampleLabel">
+    <div class="col-lg-6 col-md-6 col-sx-12 col-sm-12">
+      <div class="h6 text-left">New sample</div>
       <div class="for-sample-label">
         <app-sample-label [label]="params?.labSampleLabel"></app-sample-label>
       </div>
@@ -26,37 +25,13 @@
         </div>
       </div>
     </div>
-    <div class="col-lg-4 col-md-4 col-sx-12 col-sm-12">
-      <div class="h5">Who?</div>
-    </div>
-    <div class="col-lg-4 col-md-4 col-sx-12 col-sm-12">
-      <table class="table">
-        <thead>
-          <tr>
-            <th style="width: 20px">SN</th>
-            <th>Sample ID</th>
-            <th>Date</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let sample of params?.labSamples; let count = index">
-            <td>
-              {{ count + 1 }}
-            </td>
-            <td>
-              {{ sample?.label }}
-            </td>
-            <td>
-              {{ sample?.created | date }}
-            </td>
-          </tr>
-        </tbody>
-      </table>
+    <div class="col-lg-6 col-md-6 col-sx-12 col-sm-12">
+      <div class="h6">Who?</div>
     </div>
   </div>
 
   <mat-progress-bar
-    *ngIf="!params?.labSamples || !params?.labSampleLabel"
+    *ngIf="!params?.labSampleLabel"
     mode="indeterminate"
   ></mat-progress-bar>
 </div>
