@@ -2,14 +2,28 @@
   class="single-registration"
   *ngIf="{
     labSamples: labSamples$ | async,
-    labSampleLabel: labSampleLabel$ | async
+    labSampleLabel: labSampleLabel$ | async,
+    testsUnderDepartment: testsUnderDepartment$ | async
   } as params"
 >
   <div class="row" *ngIf="params?.labSamples">
     <div class="col-lg-4 col-md-4 col-sx-12 col-sm-12">
       <div class="h5 text-left">New sample</div>
-      <div>
+      <div class="for-sample-label">
         <app-sample-label [label]="params?.labSampleLabel"></app-sample-label>
+      </div>
+      <div>
+        <app-form
+          [fields]="[departmentField]"
+          (formUpdate)="onFormUpdate($event, 'department')"
+        ></app-form>
+        <div *ngIf="params?.testsUnderDepartment">
+          <app-lb-option-selector
+            [options]="params?.testsUnderDepartment"
+            [id]="formData['department']?.value"
+            [label]="'Test'"
+          ></app-lb-option-selector>
+        </div>
       </div>
     </div>
     <div class="col-lg-4 col-md-4 col-sx-12 col-sm-12">
