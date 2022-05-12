@@ -47,21 +47,28 @@ export class ModulesSelectorComponent implements OnInit {
           location: this.currentLocation,
         };
       });
-      console.log(modules);
-      this.currentModule = orderBy(modules, ["order"], ["asc"])[0];
+      this.currentModule = modules[0];
       this.modulesReferences = uniqBy(
         flatten(
           this.locations.map((location) => {
             return location?.modules.map((module) => {
+              const matchedModules =
+                ICARE_APPS.filter((app) => app?.id === module?.id) || [];
               return {
                 ...module,
-                app: (ICARE_APPS.filter((app) => app?.id === module?.id) ||
-                  [])[0],
+                app: matchedModules[0],
+                order: matchedModules[0]?.order,
               };
             });
           })
         ),
         "id"
+      );
+
+      this.modulesReferences = orderBy(
+        this.modulesReferences,
+        ["order"],
+        ["asc"]
       );
     } else {
       this.modulesReferences = uniqBy(
@@ -79,12 +86,18 @@ export class ModulesSelectorComponent implements OnInit {
         ),
         "id"
       );
+      this.modulesReferences = orderBy(
+        this.modulesReferences,
+        ["order"],
+        ["asc"]
+      );
       this.currentModule = this.modulesReferences[0];
       this.currentLocation = {
         ...this.modulesReferences[0]["location"],
         id: this.modulesReferences[0]["location"]?.uuid,
       };
     }
+
     this.userLocationsForTheCurrentModule =
       this.locations.filter(
         (location) =>
@@ -103,14 +116,15 @@ export class ModulesSelectorComponent implements OnInit {
     );
     this.store.dispatch(
       go({
-        path: !navigationDetails
-          ? [
-              this.currentModule?.app?.path +
-                (this.currentModule?.app?.considerLocationRoute
-                  ? "/" + this.currentLocation?.uuid
-                  : ""),
-            ]
-          : navigationDetails?.path,
+        path:
+          !navigationDetails || !navigationDetails?.path[0]
+            ? [
+                this.currentModule?.app?.path +
+                  (this.currentModule?.app?.considerLocationRoute
+                    ? "/" + this.currentLocation?.uuid
+                    : ""),
+              ]
+            : navigationDetails?.path,
         query: { queryParams: navigationDetails["queryParams"] },
       })
     );
