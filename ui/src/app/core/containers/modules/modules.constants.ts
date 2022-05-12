@@ -15,7 +15,7 @@ export const ICARE_APPS: ICAREApp[] = [
     name: "Home",
     modules: [{ path: "/", hidePatientSearch: true }],
     hidden: true,
-    order: 1,
+    order: 0,
   },
   {
     name: "Registration",
@@ -23,7 +23,7 @@ export const ICARE_APPS: ICAREApp[] = [
     icon: "person_add",
     image: "assets/material/register.png",
     path: "/registration",
-    order: 2,
+    order: 1,
     modules: [
       {
         path: "/registration/home",
@@ -126,7 +126,7 @@ export const ICARE_APPS: ICAREApp[] = [
     image: "assets/material/store.png",
     icon: "store",
     path: "./store",
-    order: 2,
+    order: 12,
   },
   {
     name: "IPD/Observation",
