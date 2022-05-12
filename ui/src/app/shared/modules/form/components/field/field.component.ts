@@ -17,7 +17,7 @@ export class FieldComponent {
   @Input() isCheckBoxButton: boolean;
   @Input() fieldClass: string;
   @Input() shouldDisable: boolean;
-  members$: Observable<any[]> = of([{ id: "searching", display: "Search" }]);
+  members$: Observable<any[]> = of([]);
 
   constructor(private formService: FormService) {}
 
