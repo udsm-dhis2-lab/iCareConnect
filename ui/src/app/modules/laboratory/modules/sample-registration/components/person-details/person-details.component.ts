@@ -1,6 +1,8 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, EventEmitter, OnInit, Output } from "@angular/core";
+import { RegistrationService } from "src/app/modules/registration/services/registration.services";
 import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
+import { PhoneNumber } from "src/app/shared/modules/form/models/phone-number.model";
 import { Textbox } from "src/app/shared/modules/form/models/text-box.model";
 
 @Component({
@@ -9,15 +11,51 @@ import { Textbox } from "src/app/shared/modules/form/models/text-box.model";
   styleUrls: ["./person-details.component.scss"],
 })
 export class PersonDetailsComponent implements OnInit {
+  patientIdentifierTypes: any[];
+  @Output() personDetails: EventEmitter<any> = new EventEmitter<any>();
+  personDetailsData: any = {};
   personFields: any[];
-  constructor() {}
+  identifiersFields: any[];
+  primaryIdentifierField: any;
+  showOtherIdentifiers: boolean = false;
+  constructor(private registrationService: RegistrationService) {}
 
   ngOnInit(): void {
+    this.registrationService
+      .getPatientIdentifierTypes()
+      .subscribe((response) => {
+        if (response) {
+          const primaryIdentifier = (response?.filter(
+            (identifier) => identifier?.required
+          ) || [])[0];
+          this.primaryIdentifierField = primaryIdentifier
+            ? new Textbox({
+                id: primaryIdentifier?.id,
+                key: primaryIdentifier?.id,
+                label: primaryIdentifier?.name,
+                required: true,
+              })
+            : null;
+
+          const otherIdentifiers =
+            response?.filter((identifier) => !identifier?.required) || [];
+
+          this.identifiersFields = otherIdentifiers.map((identifier) => {
+            return new Textbox({
+              id: identifier?.id,
+              key: identifier?.id,
+              label: identifier?.name,
+              required: identifier?.required,
+            });
+          });
+        }
+      });
     this.personFields = [
       new Textbox({
         id: "firstName",
         key: "firstName",
         label: "First name",
+        required: true,
         type: "text",
       }),
       new Textbox({
@@ -30,12 +68,14 @@ export class PersonDetailsComponent implements OnInit {
         id: "lastName",
         key: "lastName",
         label: "Last name",
+        required: true,
         type: "text",
       }),
       new Dropdown({
         id: "gender",
         key: "gender",
         label: "Gender",
+        required: true,
         type: "text",
         options: [
           {
@@ -51,10 +91,45 @@ export class PersonDetailsComponent implements OnInit {
         ],
         shouldHaveLiveSearchForDropDownFields: false,
       }),
+      new PhoneNumber({
+        id: "mobileNumber",
+        key: "mobileNumber",
+        label: "Mobile number",
+        required: true,
+        type: "number",
+        min: 0,
+        placeholder: "Mobile number",
+        category: "phoneNumber",
+      }),
     ];
   }
 
   onFormUpdate(formValues: FormValue): void {
-    console.log(formValues.getValues());
+    const values = formValues.getValues();
+    Object.keys(values).forEach((key) => {
+      this.personDetailsData[key] = values[key]?.value;
+    });
+    this.personDetails.emit(this.personDetailsData);
+  }
+
+  onUpdatePrimaryIdentifierForm(formValues: FormValue): void {
+    const values = formValues.getValues();
+    Object.keys(values).forEach((key) => {
+      this.personDetailsData[key] = values[key]?.value;
+    });
+    this.personDetails.emit(this.personDetailsData);
+  }
+
+  onUpdateIdentifierForm(formValues: FormValue): void {
+    const values = formValues.getValues();
+    Object.keys(values).forEach((key) => {
+      this.personDetailsData[key] = values[key]?.value;
+    });
+    this.personDetails.emit(this.personDetailsData);
+  }
+
+  toggleIdentifiers(event: Event): void {
+    event.stopPropagation();
+    this.showOtherIdentifiers = !this.showOtherIdentifiers;
   }
 }

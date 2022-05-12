@@ -27,7 +27,14 @@
     </div>
     <div class="col-lg-6 col-md-6 col-sx-12 col-sm-12">
       <div class="h6">Who?</div>
-      <app-person-details></app-person-details>
+      <app-person-details
+        (personDetails)="onGetPersonDetails($event)"
+      ></app-person-details>
+    </div>
+    <div class="col-12 d-flex justify-content-end mt-2">
+      <button mat-stroked-button color="primary" (click)="onSave($event)">
+        Save
+      </button>
     </div>
   </div>
 

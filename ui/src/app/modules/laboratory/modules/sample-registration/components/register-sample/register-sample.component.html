@@ -1,7 +1,9 @@
 <div
   class="sample-registration"
   *ngIf="{
-    labSamples: labSamples$ | async
+    labSamples: labSamples$ | async,
+    mrnGeneratorSourceUuid: mrnGeneratorSourceUuid$ | async,
+    preferredPersonIdentifier: preferredPersonIdentifier$ | async
   } as params"
 >
   <!-- <section class="registration-category">
@@ -38,7 +40,20 @@
         class="single-sample-registration"
         *ngIf="registrationCategory === 'single'"
       >
-        <app-single-registration></app-single-registration>
+        <mat-progress-bar
+          *ngIf="
+            !params?.mrnGeneratorSourceUuid ||
+            !params?.preferredPersonIdentifier
+          "
+          mode="indeterminate"
+        ></mat-progress-bar>
+        <app-single-registration
+          *ngIf="
+            params?.mrnGeneratorSourceUuid && params?.preferredPersonIdentifier
+          "
+          [mrnGeneratorSourceUuid]="params?.mrnGeneratorSourceUuid"
+          [preferredPersonIdentifier]="params?.preferredPersonIdentifier"
+        ></app-single-registration>
       </div>
       <div
         class="batch-sample-registration"
