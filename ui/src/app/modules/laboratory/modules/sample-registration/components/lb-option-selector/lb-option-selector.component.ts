@@ -24,7 +24,6 @@ export class LbOptionSelectorComponent implements OnInit {
         name: option?.display,
       };
     });
-    console.log(formattedOptions);
     this.formField = new Dropdown({
       id: this.id,
       key: this.id,

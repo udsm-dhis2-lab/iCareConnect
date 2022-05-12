@@ -1,4 +1,9 @@
-<div class="sample-registration">
+<div
+  class="sample-registration"
+  *ngIf="{
+    labSamples: labSamples$ | async
+  } as params"
+>
   <!-- <section class="registration-category">
     <mat-checkbox [checked]="registrationCategory === 'single'"
       >Single</mat-checkbox
@@ -27,16 +32,48 @@
     </mat-radio-button>
   </mat-radio-group>
 
-  <div
-    class="single-sample-registration"
-    *ngIf="registrationCategory === 'single'"
-  >
-    <app-single-registration></app-single-registration>
-  </div>
-  <div
-    class="batch-sample-registration"
-    *ngIf="registrationCategory === 'batch'"
-  >
-    <app-batch-registration></app-batch-registration>
+  <div class="row">
+    <div class="col-lg-8 col-md-8 col-sm-12 col-sx-12">
+      <div
+        class="single-sample-registration"
+        *ngIf="registrationCategory === 'single'"
+      >
+        <app-single-registration></app-single-registration>
+      </div>
+      <div
+        class="batch-sample-registration"
+        *ngIf="registrationCategory === 'batch'"
+      >
+        <app-batch-registration></app-batch-registration>
+      </div>
+    </div>
+    <div class="col-lg-4 col-md-4 col-sm-12 col-sx-12">
+      <table class="table" *ngIf="params?.labSamples">
+        <thead>
+          <tr>
+            <th style="width: 20px">SN</th>
+            <th>Sample ID</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let sample of params?.labSamples; let count = index">
+            <td>
+              {{ count + 1 }}
+            </td>
+            <td>
+              {{ sample?.label }}
+            </td>
+            <td>
+              {{ sample?.created | date }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <mat-progress-bar
+        *ngIf="!params?.labSamples"
+        mode="indeterminate"
+      ></mat-progress-bar>
+    </div>
   </div>
 </div>

@@ -12,7 +12,6 @@ import { SamplesService } from "src/app/shared/services/samples.service";
   styleUrls: ["./single-registration.component.scss"],
 })
 export class SingleRegistrationComponent implements OnInit {
-  labSamples$: Observable<LabSampleModel[]>;
   labSampleLabel$: Observable<string>;
 
   departmentField: any = {};
@@ -24,7 +23,6 @@ export class SingleRegistrationComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.labSamples$ = this.samplesService.getCollectedSamples();
     this.labSampleLabel$ = this.samplesService.getSampleLabel();
 
     this.departmentField = new Dropdown({
