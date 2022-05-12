@@ -20,7 +20,7 @@
         <div *ngIf="params?.testsUnderDepartment">
           <app-lb-option-selector
             [options]="params?.testsUnderDepartment"
-            [id]="formData['department']?.value"
+            [id]="'tests'"
             [label]="'Test'"
           ></app-lb-option-selector>
         </div>

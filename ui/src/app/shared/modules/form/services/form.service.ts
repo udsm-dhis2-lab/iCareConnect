@@ -60,7 +60,10 @@ export class FormService {
       return of(
         field?.options.filter(
           (option) =>
-            option?.name.toLowerCase().indexOf(parameters?.q.toLowerCase()) > -1
+            option?.name.toLowerCase().indexOf(parameters?.q.toLowerCase()) >
+              -1 ||
+            option?.label.toLowerCase().indexOf(parameters?.q.toLowerCase()) >
+              -1
         )
       );
     } else if (otherType === "billableItem") {
