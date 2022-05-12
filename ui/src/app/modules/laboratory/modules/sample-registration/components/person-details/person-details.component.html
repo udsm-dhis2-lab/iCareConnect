@@ -1,6 +1,25 @@
 <div>
   <app-form
     [fields]="personFields"
+    [isFormHorizontal]="true"
     (formUpdate)="onFormUpdate($event)"
+  ></app-form>
+
+  <div class="row primary-identifier">
+    <div class="col-10">
+      <app-form
+        [fields]="[primaryIdentifierField]"
+        (formUpdate)="onUpdatePrimaryIdentifierForm($event)"
+      ></app-form>
+    </div>
+    <div class="col-2">
+      <a class="show-more-toggle" (click)="toggleIdentifiers($event)">More</a>
+    </div>
+  </div>
+
+  <app-form
+    *ngIf="showOtherIdentifiers"
+    [fields]="identifiersFields"
+    (formUpdate)="onUpdateIdentifierForm($event)"
   ></app-form>
 </div>
