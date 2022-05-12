@@ -116,17 +116,26 @@
       [matAutocomplete]="auto"
     />
     <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
+      <mat-option aria-disabled="true" value=""> --Search-- </mat-option>
       <mat-option
         *ngFor="let option of members$ | async"
         (click)="getSelectedItemFromOption($event, option, field?.key)"
         [value]="option?.display ? option?.display : option?.name"
       >
-      <span class="badge badge-success" 
-      [ngClass]="{'badge-success': getStockStatus(option), 'badge-danger': !getStockStatus(option) }" 
-      *ngIf="field?.otherType === 'Drug' && !(option?.display === 'Search' || option?.name === 'Search')">
-      {{ getStockStatus(option) ? 'In-stock' : 'Out-stock' }}
-      </span>
-      {{ option?.display ? option?.display : option?.name }}
+        <span
+          class="badge badge-success"
+          [ngClass]="{
+            'badge-success': getStockStatus(option),
+            'badge-danger': !getStockStatus(option)
+          }"
+          *ngIf="
+            field?.otherType === 'Drug' &&
+            !(option?.display === 'Search' || option?.name === 'Search')
+          "
+        >
+          {{ getStockStatus(option) ? "In-stock" : "Out-stock" }}
+        </span>
+        {{ option?.display ? option?.display : option?.name }}
       </mat-option>
     </mat-autocomplete>
   </mat-form-field>
