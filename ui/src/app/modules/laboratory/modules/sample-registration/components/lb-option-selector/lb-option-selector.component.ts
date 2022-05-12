@@ -21,14 +21,17 @@ export class LbOptionSelectorComponent implements OnInit {
         value: option?.display,
         label: option?.display,
         id: option?.uuid,
+        name: option?.display,
       };
     });
+    console.log(formattedOptions);
     this.formField = new Dropdown({
       id: this.id,
       key: this.id,
       label: this.label,
       options: formattedOptions,
-      shouldHaveLiveSearchForDropDownFields: false,
+      shouldHaveLiveSearchForDropDownFields: true,
+      otherType: "searchFromOptions",
     });
   }
 

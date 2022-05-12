@@ -20,9 +20,7 @@ export class LabTestsService {
       )
       .pipe(
         map((response) => {
-          return response?.results?.length > 0
-            ? response?.results?.setMembers
-            : [];
+          return response?.setMembers;
         }),
         catchError((error) => of(error))
       );
