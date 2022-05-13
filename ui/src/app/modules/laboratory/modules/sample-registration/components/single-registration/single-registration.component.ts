@@ -34,6 +34,7 @@ export class SingleRegistrationComponent implements OnInit {
   personDetailsData: any;
   savingData: boolean = false;
   savingDataResponse: any = null;
+  currentSampleLabel: string;
   constructor(
     private samplesService: SamplesService,
     private labTestsService: LabTestsService,
@@ -66,6 +67,10 @@ export class SingleRegistrationComponent implements OnInit {
         this.formData["department"]?.value
       );
     }
+  }
+
+  onGetSampleLabel(sampleLabel: string): void {
+    this.currentSampleLabel = sampleLabel;
   }
 
   onGetSelectedOptionDetails(details): void {
@@ -234,6 +239,31 @@ export class SingleRegistrationComponent implements OnInit {
                               if (!encounterResponse?.error) {
                                 this.savingData = true;
                                 // Create sample
+                                const sample = {
+                                  visit: {
+                                    uuid: visitResponse?.uuid,
+                                  },
+                                  label: this.currentSampleLabel,
+                                  concept: {
+                                    uuid: this.formData["department"]?.value,
+                                  },
+                                  orders: encounterResponse?.orders.map(
+                                    (order) => {
+                                      return {
+                                        uuid: order?.uuid,
+                                      };
+                                    }
+                                  ),
+                                };
+
+                                this.samplesService
+                                  .createLabSample(sample)
+                                  .subscribe((sampleResponse) => {
+                                    this.savingDataResponse = sampleResponse;
+                                    if (sampleResponse) {
+                                      this.savingData = false;
+                                    }
+                                  });
                               } else {
                                 this.savingData = false;
                               }
