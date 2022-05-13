@@ -5,6 +5,7 @@ import { HttpClient } from "@angular/common/http";
 import { from, Observable, of, zip } from "rxjs";
 import { BASE_URL } from "../constants/constants.constants";
 import { catchError, delay, map } from "rxjs/operators";
+import { SampleObject } from "src/app/modules/laboratory/resources/models";
 
 @Injectable({
   providedIn: "root",
@@ -29,6 +30,16 @@ export class SamplesService {
       }),
       catchError((error) => of(error))
     );
+  }
+
+  createLabSample(sample: any): Observable<SampleObject> {
+    return this.httpClient.post("lab/sample", sample).pipe(
+      map((response) => {
+        return response;
+      }),
+      catchError((error) => of(error))
+    );
+    // return of(sample);
   }
 
   getTestTimeSettings(conceptUuid: string) {
