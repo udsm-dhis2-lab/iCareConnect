@@ -4,11 +4,13 @@ import { Location } from "src/app/core/models";
 import { LocationService } from "src/app/core/services";
 import { IdentifiersService } from "src/app/core/services/identifiers.service";
 import { LabSampleModel } from "src/app/modules/laboratory/resources/models";
+import { LabOrdersService } from "src/app/modules/laboratory/resources/services/lab-orders.service";
 import { LabTestsService } from "src/app/modules/laboratory/resources/services/lab-tests.service";
 import { RegistrationService } from "src/app/modules/registration/services/registration.services";
 import { formatDateToYYMMDD } from "src/app/shared/helpers/format-date.helper";
 import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
+import { ICARE_CONFIG } from "src/app/shared/resources/config";
 import { VisitsService } from "src/app/shared/resources/visits/services";
 import { SamplesService } from "src/app/shared/services/samples.service";
 
@@ -21,6 +23,7 @@ export class SingleRegistrationComponent implements OnInit {
   labSampleLabel$: Observable<string>;
   @Input() mrnGeneratorSourceUuid: string;
   @Input() preferredPersonIdentifier: string;
+  @Input() provider: any;
 
   departmentField: any = {};
   formData: any = {};
@@ -37,7 +40,8 @@ export class SingleRegistrationComponent implements OnInit {
     private locationService: LocationService,
     private registrationService: RegistrationService,
     private identifierService: IdentifiersService,
-    private visitsService: VisitsService
+    private visitsService: VisitsService,
+    private labOrdersService: LabOrdersService
   ) {
     this.currentLocation = JSON.parse(localStorage.getItem("currentLocation"));
   }
@@ -140,9 +144,9 @@ export class SingleRegistrationComponent implements OnInit {
               this.savingData = true;
               this.registrationService
                 .createPatient(this.patientPayload)
-                .subscribe((response) => {
-                  this.savingDataResponse = response;
-                  if (!response?.error) {
+                .subscribe((patientResponse) => {
+                  this.savingDataResponse = patientResponse;
+                  if (!patientResponse?.error) {
                     // TODO: SOftcode visit type
                     const visitObject = {
                       patient: this.savingDataResponse?.uuid,
@@ -175,11 +179,62 @@ export class SingleRegistrationComponent implements OnInit {
 
                     this.visitsService
                       .createVisit(visitObject)
-                      .subscribe((response) => {
-                        if (response) {
-                          console.log(response);
+                      .subscribe((visitResponse) => {
+                        this.savingDataResponse = visitResponse;
+                        if (!visitResponse?.error) {
+                          const orders = Object.keys(this.formData)
+                            .map((key) => {
+                              if (
+                                key?.toLocaleLowerCase().indexOf("test") > -1
+                              ) {
+                                return {
+                                  concept: this.formData[key]?.value,
+                                  orderType:
+                                    "52a447d3-a64a-11e3-9aeb-50e549534c5e", // TODO: Find a way to soft code this
+                                  action: "NEW",
+                                  orderer: this.provider?.uuid,
+                                  patient: patientResponse?.uuid,
+                                  careSetting: "OUTPATIENT",
+                                  urgency: "ROUTINE", // TODO: Change to reflect users input
+                                  instructions: "",
+                                  type: "order",
+                                };
+                              }
+                            })
+                            .filter((order) => order);
+                          this.savingData = true;
+                          const encounterObject = {
+                            visit: visitResponse?.uuid,
+                            patient: patientResponse?.uuid,
+                            encounterType:
+                              "9b46d3fe-1c3e-4836-a760-f38d286b578b",
+                            location: this.currentLocation?.uuid,
+                            orders,
+                            encounterProviders: [
+                              {
+                                provider: this.provider?.uuid,
+                                encounterRole: ICARE_CONFIG.encounterRole,
+                              },
+                            ],
+                          };
+
+                          // Create encounter with orders
+                          this.labOrdersService
+                            .createLabOrdersViaEncounter(encounterObject)
+                            .subscribe((encounterResponse) => {
+                              this.savingDataResponse = encounterResponse;
+                              console.log(
+                                "encounter response",
+                                this.savingDataResponse
+                              );
+                              if (!encounterResponse?.error) {
+                                this.savingData = true;
+                              } else {
+                                this.savingData = false;
+                              }
+                            });
+                        } else {
                           this.savingData = false;
-                          this.savingDataResponse = response;
                         }
                       });
                   } else {
