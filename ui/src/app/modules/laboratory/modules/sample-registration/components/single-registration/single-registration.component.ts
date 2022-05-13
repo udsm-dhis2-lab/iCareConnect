@@ -262,6 +262,9 @@ export class SingleRegistrationComponent implements OnInit {
                                     this.savingDataResponse = sampleResponse;
                                     if (sampleResponse) {
                                       this.savingData = false;
+
+                                      this.labSampleLabel$ =
+                                        this.samplesService.getSampleLabel();
                                     }
                                   });
                               } else {
