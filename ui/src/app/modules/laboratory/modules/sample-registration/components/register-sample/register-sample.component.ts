@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, Input, OnInit } from "@angular/core";
 import { MatRadioChange } from "@angular/material/radio";
 import { Observable } from "rxjs";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
@@ -11,6 +11,7 @@ import { SamplesService } from "src/app/shared/services/samples.service";
   styleUrls: ["./register-sample.component.scss"],
 })
 export class RegisterSampleComponent implements OnInit {
+  @Input() provider: any;
   registrationCategory: string = "single";
 
   labSamples$: Observable<LabSampleModel[]>;

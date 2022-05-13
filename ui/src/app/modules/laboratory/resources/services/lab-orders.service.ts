@@ -1,11 +1,11 @@
-import { Injectable } from '@angular/core';
-import { from, Observable, of, zip } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
-import { OpenmrsHttpClientService } from 'src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service';
-import { Api } from 'src/app/shared/resources/openmrs';
+import { Injectable } from "@angular/core";
+import { from, Observable, of, zip } from "rxjs";
+import { catchError, map } from "rxjs/operators";
+import { OpenmrsHttpClientService } from "src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service";
+import { Api } from "src/app/shared/resources/openmrs";
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: "root",
 })
 export class LabOrdersService {
   constructor(
@@ -31,6 +31,15 @@ export class LabOrdersService {
             catchError((error) => of(error))
           )
       )
+    );
+  }
+
+  createLabOrdersViaEncounter(encounterData: any): Observable<any> {
+    return from(this.api.encounter.createEncounter(encounterData)).pipe(
+      map((response) => {
+        return response;
+      }),
+      catchError((error) => of(error))
     );
   }
 }
