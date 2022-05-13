@@ -81,15 +81,24 @@ export class PersonDetailsComponent implements OnInit {
           {
             key: "Male",
             label: "Male",
-            value: "Male",
+            value: "M",
           },
           {
             key: "Female",
             label: "Female",
-            value: "Female",
+            value: "F",
           },
         ],
         shouldHaveLiveSearchForDropDownFields: false,
+      }),
+      new Textbox({
+        id: "age",
+        key: "age",
+        label: "Age",
+        required: false,
+        type: "number",
+        min: 0,
+        max: 150,
       }),
       new PhoneNumber({
         id: "mobileNumber",
@@ -100,6 +109,13 @@ export class PersonDetailsComponent implements OnInit {
         min: 0,
         placeholder: "Mobile number",
         category: "phoneNumber",
+      }),
+      new Textbox({
+        id: "address",
+        key: "address",
+        label: "Address",
+        required: true,
+        type: "text",
       }),
     ];
   }
