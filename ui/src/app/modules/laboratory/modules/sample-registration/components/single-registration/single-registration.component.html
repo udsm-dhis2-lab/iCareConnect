@@ -24,6 +24,7 @@
             [options]="params?.testsUnderDepartment"
             [id]="'tests'"
             [label]="'Test'"
+            (selectedOptionDetails)="onGetSelectedOptionDetails($event)"
           ></app-lb-option-selector>
         </div>
       </div>

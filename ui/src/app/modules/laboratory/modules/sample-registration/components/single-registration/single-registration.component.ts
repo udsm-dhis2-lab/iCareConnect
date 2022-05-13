@@ -68,6 +68,10 @@ export class SingleRegistrationComponent implements OnInit {
     }
   }
 
+  onGetSelectedOptionDetails(details): void {
+    this.formData = { ...this.formData, ...details };
+  }
+
   onGetPersonDetails(personDetails: any): void {
     this.personDetailsData = personDetails;
   }
@@ -182,10 +186,14 @@ export class SingleRegistrationComponent implements OnInit {
                       .subscribe((visitResponse) => {
                         this.savingDataResponse = visitResponse;
                         if (!visitResponse?.error) {
+                          console.log(this.formData);
+                          console.log(Object.keys(this.formData));
                           const orders = Object.keys(this.formData)
                             .map((key) => {
                               if (
-                                key?.toLocaleLowerCase().indexOf("test") > -1
+                                key
+                                  ?.toLocaleLowerCase()
+                                  .indexOf("department") === -1
                               ) {
                                 return {
                                   concept: this.formData[key]?.value,
@@ -197,7 +205,7 @@ export class SingleRegistrationComponent implements OnInit {
                                   careSetting: "OUTPATIENT",
                                   urgency: "ROUTINE", // TODO: Change to reflect users input
                                   instructions: "",
-                                  type: "order",
+                                  type: "testorder",
                                 };
                               }
                             })
@@ -223,12 +231,9 @@ export class SingleRegistrationComponent implements OnInit {
                             .createLabOrdersViaEncounter(encounterObject)
                             .subscribe((encounterResponse) => {
                               this.savingDataResponse = encounterResponse;
-                              console.log(
-                                "encounter response",
-                                this.savingDataResponse
-                              );
                               if (!encounterResponse?.error) {
                                 this.savingData = true;
+                                // Create sample
                               } else {
                                 this.savingData = false;
                               }

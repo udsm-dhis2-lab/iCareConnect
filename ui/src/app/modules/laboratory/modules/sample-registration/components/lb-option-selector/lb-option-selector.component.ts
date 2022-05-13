@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
 
@@ -11,6 +11,8 @@ export class LbOptionSelectorComponent implements OnInit {
   @Input() options: { uuid: string; display: string; name?: any }[];
   @Input() id: string;
   @Input() label: string;
+
+  @Output() selectedOptionDetails: EventEmitter<any> = new EventEmitter<any>();
   formField: any;
   constructor() {}
 
@@ -35,6 +37,6 @@ export class LbOptionSelectorComponent implements OnInit {
   }
 
   onFormUpdate(formValues: FormValue): void {
-    console.log("from options selector", formValues.getValues());
+    this.selectedOptionDetails.emit(formValues.getValues());
   }
 }
