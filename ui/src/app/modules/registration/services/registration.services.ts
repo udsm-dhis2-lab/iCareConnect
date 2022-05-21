@@ -1,25 +1,30 @@
-import { Injectable } from '@angular/core';
-import { catchError, map } from 'rxjs/operators';
-import { OpenmrsHttpClientService } from 'src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service';
-import { ICARE_CONFIG } from 'src/app/shared/resources/config';
-import { Api } from 'src/app/shared/resources/openmrs';
-import { head } from 'lodash';
+import { Injectable } from "@angular/core";
+import { catchError, map } from "rxjs/operators";
+import { OpenmrsHttpClientService } from "src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service";
+import { ICARE_CONFIG } from "src/app/shared/resources/config";
+import { Api } from "src/app/shared/resources/openmrs";
+import { head } from "lodash";
+import { of } from "rxjs";
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: "root",
 })
 export class RegistrationService {
   constructor(private httpClient: OpenmrsHttpClientService) {}
   createPerson(personPayload) {
-    let url = 'person';
+    let url = "person";
 
     return this.httpClient.post(url, personPayload);
   }
 
   createPatient(patientPayload) {
-    let url = 'patient';
-
-    return this.httpClient.post(url, patientPayload);
+    let url = "patient";
+    return this.httpClient.post(url, patientPayload).pipe(
+      map((response) => {
+        return response;
+      }),
+      catchError((error) => of(error))
+    );
   }
 
   updatePatient(patientPayload, uuid) {
@@ -29,7 +34,7 @@ export class RegistrationService {
   }
 
   getPatientIdentifierTypes() {
-    return this.httpClient.get('patientidentifiertype?v=full').pipe(
+    return this.httpClient.get("patientidentifiertype?v=full").pipe(
       map((res) => {
         return (res.results || [])
           .map((patientIdenfierType: any) => {
@@ -54,7 +59,7 @@ export class RegistrationService {
   }
 
   getPersonAttributeTypes() {
-    return this.httpClient.get('personattributetype?v=full').pipe(
+    return this.httpClient.get("personattributetype?v=full").pipe(
       map((res) => {
         return (res.results || [])
           .map((personAttributeType: any) => {
@@ -77,7 +82,7 @@ export class RegistrationService {
 
   getAutoFilledPatientIdentifierType() {
     return this.httpClient
-      .get('systemsetting?q=patient.autoFilledPatientIdentifierType&v=full')
+      .get("systemsetting?q=patient.autoFilledPatientIdentifierType&v=full")
       .pipe(
         map((res: any) => {
           return head((res?.results || []).map((payload) => payload?.value));
@@ -86,7 +91,7 @@ export class RegistrationService {
   }
 
   getVisitTypes() {
-    let url = 'visittype?v=custom:(display,name,uuid)';
+    let url = "visittype?v=custom:(display,name,uuid)";
 
     return this.httpClient.get(url).pipe(
       map((res) => {
@@ -121,7 +126,7 @@ export class RegistrationService {
 
   getRegistrationConfigurations() {
     return this.httpClient
-      .get('systemsetting?q=iCare.registrationConfigurations&v=full')
+      .get("systemsetting?q=iCare.registrationConfigurations&v=full")
       .pipe(
         map((response) => {
           return JSON.parse(response?.results[0]?.value);

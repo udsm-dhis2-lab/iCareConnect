@@ -13,6 +13,20 @@ export interface SampleObject {
   comments?: string;
 }
 
+export interface LabSampleModel {
+  uuid: string;
+  visit: any;
+  created: number;
+  dateCreated: number;
+  dateTimeCreated: number;
+  creator: any;
+  label: string;
+  orders: any[];
+  patient: any;
+  statuses: any[];
+  voided: boolean;
+}
+
 export interface SampleIdentifier {
   specimenSourceUuid: string;
   sampleIdentifier: string;

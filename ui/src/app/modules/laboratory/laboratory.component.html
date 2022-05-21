@@ -40,9 +40,24 @@
             *ngIf="
               params?.privileges && params?.privileges['Laboratory Orders']
             "
-            (click)="disableDate($event)"
+            (click)="changeRoute($event, 'sample-registration', false)"
             routerLinkActive="active-route"
-            [routerLink]="'lab-investigation-home'"
+            [ngClass]="{
+              'active-route': currentRoutePath === 'sample-registration'
+            }"
+          >
+            Sample Registration
+          </mat-chip>
+          <mat-chip
+            class="w-20"
+            *ngIf="
+              params?.privileges && params?.privileges['Laboratory Orders']
+            "
+            (click)="changeRoute($event, 'lab-investigation-home', true)"
+            routerLinkActive="active-route"
+            [ngClass]="{
+              'active-route': currentRoutePath === 'lab-investigation-home'
+            }"
           >
             Diagnostic Orders/Services
           </mat-chip>
@@ -51,15 +66,22 @@
             *ngIf="
               params?.privileges && params?.privileges['Sample Collection']
             "
+            (click)="changeRoute($event, 'sample-collection', true)"
             routerLinkActive="active-route"
-            [routerLink]="'sample-collection-home'"
+            [ngClass]="{
+              'active-route': currentRoutePath === 'sample-collection'
+            }"
           >
             Sample collection
           </mat-chip>
           <mat-chip
             class="w-20"
             routerLinkActive="active-route"
-            [routerLink]="'sample-acceptance-and-results'"
+            (click)="changeRoute($event, 'sample-acceptance-and-results', true)"
+            [ngClass]="{
+              'active-route':
+                currentRoutePath === 'sample-acceptance-and-results'
+            }"
             *ngIf="
               params?.privileges &&
               params?.privileges['Sample Acceptance and Results']
@@ -70,7 +92,10 @@
           <mat-chip
             class="w-20"
             routerLinkActive="active-route"
-            [routerLink]="'sample-tracking'"
+            (click)="changeRoute($event, 'sample-tracking', true)"
+            [ngClass]="{
+              'active-route': currentRoutePath === 'sample-tracking'
+            }"
             *ngIf="params?.privileges && params?.privileges['Sample Tracking']"
           >
             Sample Tracking
@@ -78,7 +103,10 @@
           <mat-chip
             class="w-20"
             routerLinkActive="active-route"
-            [routerLink]="'settings'"
+            (click)="changeRoute($event, 'settings', true)"
+            [ngClass]="{
+              'active-route': currentRoutePath === 'settings'
+            }"
             *ngIf="params?.privileges && params?.privileges['Tests Settings']"
           >
             Tests settings
@@ -86,7 +114,10 @@
           <mat-chip
             class="w-20"
             routerLinkActive="active-route"
-            [routerLink]="'reports'"
+            (click)="changeRoute($event, 'reports', false)"
+            [ngClass]="{
+              'active-route': currentRoutePath === 'reports'
+            }"
             *ngIf="
               params?.privileges && params?.privileges['Laboratory Reports']
             "

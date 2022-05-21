@@ -34,7 +34,8 @@ export class VisitsService {
     return this.httpClient.post(url, visitPayload).pipe(
       map((response) => {
         return response;
-      })
+      }),
+      catchError((error) => of(error))
     );
   }
 

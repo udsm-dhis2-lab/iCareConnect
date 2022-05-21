@@ -1,0 +1,8 @@
+<div class="sample-registration-page" *ngIf="provider$ | async as provider">
+  <div></div>
+  <div *ngIf="provider">
+    <app-register-sample [provider]="provider"></app-register-sample>
+  </div>
+
+  <mat-progress-bar *ngIf="!provider" mode="indeterminate"></mat-progress-bar>
+</div>

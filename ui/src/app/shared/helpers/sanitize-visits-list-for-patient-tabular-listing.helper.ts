@@ -17,17 +17,17 @@ export function sanitizePatientsVisitsForTabularPatientListing(
         itemsPerPage && currentPage
           ? itemsPerPage * currentPage + index + 1
           : index + 1,
-      names: visitDetails?.visit?.patient?.person?.display.toUpperCase(),
+      names: visitDetails?.visit?.patient?.person?.display?.toUpperCase(),
       mrn:
         (
           visitDetails?.visit?.patient?.identifiers?.filter(
             (identifier) =>
-              identifier?.identifierType?.display.toLowerCase() === "mrn"
+              identifier?.identifierType?.display?.toLowerCase() === "mrn"
           ) || []
         )?.length > 0
           ? (visitDetails?.visit?.patient?.identifiers?.filter(
               (identifier) =>
-                identifier?.identifierType?.display.toLowerCase() === "mrn"
+                identifier?.identifierType?.display?.toLowerCase() === "mrn"
             ) || [])[0]?.identifier
           : "",
       location:
@@ -39,7 +39,7 @@ export function sanitizePatientsVisitsForTabularPatientListing(
           : visitDetails?.visit?.location?.display,
       gender: visitDetails?.visit?.patient?.person?.gender,
       age: visitDetails?.visit?.patient?.person?.age,
-      birthdate: visitDetails?.visit?.patient?.person?.birthdate.substring(
+      birthdate: visitDetails?.visit?.patient?.person?.birthdate?.substring(
         0,
         10
       ),
@@ -50,6 +50,6 @@ export function sanitizePatientsVisitsForTabularPatientListing(
     };
   });
   return paymentTypeSelected
-    ? data.filter((row) => row.paymentType === paymentTypeSelected)
+    ? data?.filter((row) => row.paymentType === paymentTypeSelected)
     : data;
 }
