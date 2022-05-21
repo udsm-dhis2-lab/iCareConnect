@@ -126,7 +126,9 @@ public class PatientWrapper {
 		personMap.put("uuid", patient.getPerson().getUuid());
 		personMap.put("void", patient.getPerson().getVoided());
 		personMap.put("age", patient.getPerson().getAge());
-		personMap.put("birthdate", dateFormat.format(patient.getPerson().getBirthdate()));
+		if(patient.getPerson().getBirthdate() != null){
+			personMap.put("birthdate", dateFormat.format(patient.getPerson().getBirthdate()));
+		}
 		personMap.put("display", patient.getPerson().getPersonName().getFullName());
 		personMap.put("gender", patient.getPerson().getGender());
 		personMap.put("birthdateEstimated", patient.getPerson().getBirthdateEstimated());
