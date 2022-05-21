@@ -1,21 +1,21 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { Location } from 'src/app/core/models';
+import { Component, Input, OnInit } from "@angular/core";
+import { Location } from "src/app/core/models";
 
-import { flatten, uniqBy } from 'lodash';
-import { Store } from '@ngrx/store';
-import { AppState } from 'src/app/store/reducers';
+import { flatten, uniqBy, orderBy } from "lodash";
+import { Store } from "@ngrx/store";
+import { AppState } from "src/app/store/reducers";
 import {
   go,
   loadActiveVisits,
   setCurrentUserCurrentLocation,
   updateCurrentLocationStatus,
-} from 'src/app/store/actions';
-import { ICARE_APPS } from 'src/app/core/containers/modules/modules.constants';
+} from "src/app/store/actions";
+import { ICARE_APPS } from "src/app/core/containers/modules/modules.constants";
 
 @Component({
-  selector: 'app-modules-selector',
-  templateUrl: './modules-selector.component.html',
-  styleUrls: ['./modules-selector.component.scss'],
+  selector: "app-modules-selector",
+  templateUrl: "./modules-selector.component.html",
+  styleUrls: ["./modules-selector.component.scss"],
 })
 export class ModulesSelectorComponent implements OnInit {
   @Input() locations: Location[];
@@ -27,16 +27,15 @@ export class ModulesSelectorComponent implements OnInit {
 
   ngOnInit(): void {
     const storedLocation =
-      localStorage.getItem('currentLocation') != 'undefined'
-        ? JSON.parse(localStorage.getItem('currentLocation'))
+      localStorage.getItem("currentLocation") != "undefined"
+        ? JSON.parse(localStorage.getItem("currentLocation"))
         : null;
     if (storedLocation) {
       this.currentLocation = { ...storedLocation, id: storedLocation?.uuid };
-
       const modules = (
         storedLocation.attributes.filter(
           (attribute) =>
-            attribute?.attributeType?.display?.toLowerCase() === 'modules' &&
+            attribute?.attributeType?.display?.toLowerCase() === "modules" &&
             !attribute?.voided
         ) || []
       ).map((locationAttribute) => {
@@ -53,15 +52,23 @@ export class ModulesSelectorComponent implements OnInit {
         flatten(
           this.locations.map((location) => {
             return location?.modules.map((module) => {
+              const matchedModules =
+                ICARE_APPS.filter((app) => app?.id === module?.id) || [];
               return {
                 ...module,
-                app: (ICARE_APPS.filter((app) => app?.id === module?.id) ||
-                  [])[0],
+                app: matchedModules[0],
+                order: matchedModules[0]?.order,
               };
             });
           })
         ),
-        'id'
+        "id"
+      );
+
+      this.modulesReferences = orderBy(
+        this.modulesReferences,
+        ["order"],
+        ["asc"]
       );
     } else {
       this.modulesReferences = uniqBy(
@@ -70,20 +77,27 @@ export class ModulesSelectorComponent implements OnInit {
             return location?.modules.map((module) => {
               return {
                 ...module,
-                app: (ICARE_APPS.filter((app) => app?.id === module?.id) ||
-                  [])[0],
+                app: (orderBy(ICARE_APPS, ["order"], ["asc"]).filter(
+                  (app) => app?.id === module?.id
+                ) || [])[0],
               };
             });
           })
         ),
-        'id'
+        "id"
+      );
+      this.modulesReferences = orderBy(
+        this.modulesReferences,
+        ["order"],
+        ["asc"]
       );
       this.currentModule = this.modulesReferences[0];
       this.currentLocation = {
-        ...this.modulesReferences[0]['location'],
-        id: this.modulesReferences[0]['location']?.uuid,
+        ...this.modulesReferences[0]["location"],
+        id: this.modulesReferences[0]["location"]?.uuid,
       };
     }
+
     this.userLocationsForTheCurrentModule =
       this.locations.filter(
         (location) =>
@@ -98,19 +112,20 @@ export class ModulesSelectorComponent implements OnInit {
     );
     // Get the navigation details from localstorage
     const navigationDetails = JSON.parse(
-      localStorage.getItem('navigationDetails')
+      localStorage.getItem("navigationDetails")
     );
     this.store.dispatch(
       go({
-        path: !navigationDetails
-          ? [
-              this.currentModule?.app?.path +
-                (this.currentModule?.app?.considerLocationRoute
-                  ? '/' + this.currentLocation?.uuid
-                  : ''),
-            ]
-          : navigationDetails?.path,
-          query: {queryParams: navigationDetails['queryParams']} 
+        path:
+          !navigationDetails || !navigationDetails?.path[0]
+            ? [
+                this.currentModule?.app?.path +
+                  (this.currentModule?.app?.considerLocationRoute
+                    ? "/" + this.currentLocation?.uuid
+                    : ""),
+              ]
+            : navigationDetails?.path,
+        query: { queryParams: navigationDetails["queryParams"] },
       })
     );
     this.locationStatusControl();
@@ -137,9 +152,9 @@ export class ModulesSelectorComponent implements OnInit {
         path: [
           this.currentModule?.app?.path +
             (this.currentModule?.app?.considerLocationRoute
-              ? '/' + this.currentLocation?.uuid
-              : ''),
-        ]
+              ? "/" + this.currentLocation?.uuid
+              : ""),
+        ],
       })
     );
     this.locationStatusControl();
@@ -154,8 +169,8 @@ export class ModulesSelectorComponent implements OnInit {
     const path =
       this.currentModule?.app?.path +
       (this.currentModule?.app?.considerLocationRoute
-        ? '/' + this.currentLocation?.uuid
-        : '');
+        ? "/" + this.currentLocation?.uuid
+        : "");
     this.store.dispatch(
       go({
         path: [path],

@@ -66,5 +66,6 @@ export class Field<T> {
       options.shouldHaveLiveSearchForDropDownFields;
     this.otherType = options.otherType;
     this.category = options?.category;
+    this.conceptClass = options?.conceptClass;
   }
 }

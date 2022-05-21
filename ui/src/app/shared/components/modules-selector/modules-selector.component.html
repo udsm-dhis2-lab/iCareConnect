@@ -14,13 +14,15 @@
       </div>
     </div>
   </div>
-  <mat-chip-list class="sub-menu-items mat-elevation-z1">
-    <mat-chip
-      (click)="onSetLocation($event, userLocation)"
-      *ngFor="let userLocation of userLocationsForTheCurrentModule"
-      color="primary"
-      [selected]="currentLocation?.uuid == userLocation?.id"
-      >{{ userLocation?.name }}</mat-chip
-    >
-  </mat-chip-list>
+  <div>
+    <mat-chip-list class="sub-menu-items mat-elevation-z1">
+      <mat-chip
+        (click)="onSetLocation($event, userLocation)"
+        *ngFor="let userLocation of userLocationsForTheCurrentModule"
+        color="primary"
+        [selected]="currentLocation?.uuid == userLocation?.id"
+        >{{ userLocation?.name }}</mat-chip
+      >
+    </mat-chip-list>
+  </div>
 </div>
