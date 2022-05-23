@@ -39,6 +39,7 @@ export class SingleRegistrationComponent implements OnInit {
   savingData: boolean = false;
   savingDataResponse: any = null;
   currentSampleLabel: string;
+  selectedLab: any;
   constructor(
     private samplesService: SamplesService,
     private labTestsService: LabTestsService,
@@ -100,7 +101,7 @@ export class SingleRegistrationComponent implements OnInit {
       options: labsAvailable.map((location) => {
         return {
           key: location?.uuid,
-          value: location?.display,
+          value: location?.uuid,
           label: location?.display,
           name: location?.display,
         };
@@ -120,14 +121,16 @@ export class SingleRegistrationComponent implements OnInit {
 
   onFormUpdateForTest(formValues: FormValue): void {
     console.log(formValues.getValues());
+    // TODO: Add support to autoselect department
   }
 
   onFormUpdateForAgency(formValues: FormValue): void {
-    console.log(formValues.getValues());
+    this.formData = { ...this.formData, ...formValues.getValues() };
+    console.log(this.formData);
   }
 
   onFormUpdateForLab(formValues: FormValue): void {
-    console.log(formValues.getValues());
+    this.formData = { ...this.formData, ...formValues.getValues() };
   }
 
   onGetSampleLabel(sampleLabel: string): void {
@@ -143,7 +146,7 @@ export class SingleRegistrationComponent implements OnInit {
   }
 
   onGetClinicalDataValues(clinicalData): void {
-    console.log(clinicalData);
+    this.formData = { ...this.formData, ...clinicalData };
   }
 
   onSave(event: Event): void {
@@ -229,7 +232,9 @@ export class SingleRegistrationComponent implements OnInit {
                     const visitObject = {
                       patient: this.savingDataResponse?.uuid,
                       visitType: "54e8ffdc-dea0-4ef0-852f-c23e06d16066",
-                      location: this.currentLocation?.uuid,
+                      location: this.formData["lab"]?.value
+                        ? this.formData["lab"]?.value
+                        : this.currentLocation?.uuid,
                       indication: "Sample Registration",
                       attributes: [
                         {
@@ -328,10 +333,36 @@ export class SingleRegistrationComponent implements OnInit {
                                   .subscribe((sampleResponse) => {
                                     this.savingDataResponse = sampleResponse;
                                     if (sampleResponse) {
-                                      this.savingData = false;
+                                      this.savingData = this.formData["agency"]
+                                        ?.value
+                                        ? true
+                                        : false;
 
                                       this.labSampleLabel$ =
                                         this.samplesService.getSampleLabel();
+                                      if (this.formData["agency"]?.value) {
+                                        const sampleStatus = {
+                                          sample: {
+                                            uuid: sampleResponse?.uuid,
+                                          },
+                                          user: {
+                                            uuid: this.provider?.uuid,
+                                          },
+                                          remarks:
+                                            this.formData["agency"]?.value,
+                                          status:
+                                            this.formData["agency"]?.value,
+                                        };
+                                        this.samplesService
+                                          .setSampleStatus(sampleStatus)
+                                          .subscribe((sampleStatusResponse) => {
+                                            this.savingDataResponse =
+                                              sampleStatusResponse;
+                                            if (sampleStatusResponse) {
+                                              this.savingData = false;
+                                            }
+                                          });
+                                      }
                                     }
                                   });
                               } else {

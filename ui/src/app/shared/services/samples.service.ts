@@ -64,7 +64,10 @@ export class SamplesService {
 
   setSampleStatus(data): Observable<any> {
     if (data) {
-      return this.httpClient.post(BASE_URL + "lab/samplestatus", data);
+      return this.httpClient.post(BASE_URL + "lab/samplestatus", data).pipe(
+        map((response) => response),
+        catchError((error) => of(error))
+      );
     } else {
       return from([null]);
     }
