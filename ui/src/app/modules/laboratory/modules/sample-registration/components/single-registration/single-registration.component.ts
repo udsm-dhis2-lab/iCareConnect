@@ -24,8 +24,12 @@ export class SingleRegistrationComponent implements OnInit {
   @Input() mrnGeneratorSourceUuid: string;
   @Input() preferredPersonIdentifier: string;
   @Input() provider: any;
+  @Input() agencyConceptConfigs: any;
 
   departmentField: any = {};
+  testsFormField: any = {};
+  agencyFormField: any = {};
+  labFormField: any = {};
   formData: any = {};
   testsUnderDepartment$: Observable<any[]>;
 
@@ -35,6 +39,7 @@ export class SingleRegistrationComponent implements OnInit {
   savingData: boolean = false;
   savingDataResponse: any = null;
   currentSampleLabel: string;
+  selectedLab: any;
   constructor(
     private samplesService: SamplesService,
     private labTestsService: LabTestsService,
@@ -58,6 +63,51 @@ export class SingleRegistrationComponent implements OnInit {
       conceptClass: "Lab Department",
       shouldHaveLiveSearchForDropDownFields: true,
     });
+
+    this.testsFormField = new Dropdown({
+      id: "test1",
+      key: "test1",
+      label: "Test",
+      options: [],
+      conceptClass: "Test",
+      shouldHaveLiveSearchForDropDownFields: true,
+    });
+
+    this.agencyFormField = new Dropdown({
+      id: "agency",
+      key: "agency",
+      label: "Agency/Priority",
+      options: this.agencyConceptConfigs?.setMembers.map((member) => {
+        return {
+          key: member?.uuid,
+          value: member?.display,
+          label: member?.display,
+          name: member?.display,
+        };
+      }),
+      shouldHaveLiveSearchForDropDownFields: false,
+    });
+
+    const currentLocation = JSON.parse(localStorage.getItem("currentLocation"));
+    const labsAvailable =
+      currentLocation && currentLocation?.childLocations
+        ? currentLocation?.childLocations
+        : [];
+
+    this.labFormField = new Dropdown({
+      id: "lab",
+      key: "lab",
+      label: "Receiving Lab",
+      options: labsAvailable.map((location) => {
+        return {
+          key: location?.uuid,
+          value: location?.uuid,
+          label: location?.display,
+          name: location?.display,
+        };
+      }),
+      shouldHaveLiveSearchForDropDownFields: false,
+    });
   }
 
   onFormUpdate(formValues: FormValue, itemKey?: string): void {
@@ -67,6 +117,20 @@ export class SingleRegistrationComponent implements OnInit {
         this.formData["department"]?.value
       );
     }
+  }
+
+  onFormUpdateForTest(formValues: FormValue): void {
+    console.log(formValues.getValues());
+    // TODO: Add support to autoselect department
+  }
+
+  onFormUpdateForAgency(formValues: FormValue): void {
+    this.formData = { ...this.formData, ...formValues.getValues() };
+    console.log(this.formData);
+  }
+
+  onFormUpdateForLab(formValues: FormValue): void {
+    this.formData = { ...this.formData, ...formValues.getValues() };
   }
 
   onGetSampleLabel(sampleLabel: string): void {
@@ -79,6 +143,10 @@ export class SingleRegistrationComponent implements OnInit {
 
   onGetPersonDetails(personDetails: any): void {
     this.personDetailsData = personDetails;
+  }
+
+  onGetClinicalDataValues(clinicalData): void {
+    this.formData = { ...this.formData, ...clinicalData };
   }
 
   onSave(event: Event): void {
@@ -110,12 +178,17 @@ export class SingleRegistrationComponent implements OnInit {
                     {
                       givenName: this.personDetailsData?.firstName,
                       familyName: this.personDetailsData?.lastName,
+                      familyName2: this.personDetailsData?.middleName,
                     },
                   ],
                   gender: this.personDetailsData?.gender,
                   age: this.personDetailsData?.age,
-                  birthdate: null,
-                  birthdateEstimated: true,
+                  birthdate: this.personDetailsData?.dob
+                    ? this.personDetailsData?.dob
+                    : null,
+                  birthdateEstimated: this.personDetailsData?.dob
+                    ? false
+                    : true,
                   addresses: [
                     {
                       address1: this.personDetailsData?.address,
@@ -160,7 +233,9 @@ export class SingleRegistrationComponent implements OnInit {
                     const visitObject = {
                       patient: this.savingDataResponse?.uuid,
                       visitType: "54e8ffdc-dea0-4ef0-852f-c23e06d16066",
-                      location: this.currentLocation?.uuid,
+                      location: this.formData["lab"]?.value
+                        ? this.formData["lab"]?.value
+                        : this.currentLocation?.uuid,
                       indication: "Sample Registration",
                       attributes: [
                         {
@@ -191,8 +266,6 @@ export class SingleRegistrationComponent implements OnInit {
                       .subscribe((visitResponse) => {
                         this.savingDataResponse = visitResponse;
                         if (!visitResponse?.error) {
-                          console.log(this.formData);
-                          console.log(Object.keys(this.formData));
                           const orders = Object.keys(this.formData)
                             .map((key) => {
                               if (
@@ -261,10 +334,36 @@ export class SingleRegistrationComponent implements OnInit {
                                   .subscribe((sampleResponse) => {
                                     this.savingDataResponse = sampleResponse;
                                     if (sampleResponse) {
-                                      this.savingData = false;
+                                      this.savingData = this.formData["agency"]
+                                        ?.value
+                                        ? true
+                                        : false;
 
                                       this.labSampleLabel$ =
                                         this.samplesService.getSampleLabel();
+                                      if (this.formData["agency"]?.value) {
+                                        const sampleStatus = {
+                                          sample: {
+                                            uuid: sampleResponse?.uuid,
+                                          },
+                                          user: {
+                                            uuid: this.provider?.uuid,
+                                          },
+                                          remarks:
+                                            this.formData["agency"]?.value,
+                                          status:
+                                            this.formData["agency"]?.value,
+                                        };
+                                        this.samplesService
+                                          .setSampleStatus(sampleStatus)
+                                          .subscribe((sampleStatusResponse) => {
+                                            this.savingDataResponse =
+                                              sampleStatusResponse;
+                                            if (sampleStatusResponse) {
+                                              this.savingData = false;
+                                            }
+                                          });
+                                      }
                                     }
                                   });
                               } else {

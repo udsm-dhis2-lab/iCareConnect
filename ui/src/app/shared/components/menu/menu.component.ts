@@ -49,7 +49,7 @@ export class MenuComponent implements OnInit {
     private store: Store<AppState>,
     private authService: AuthService
   ) {
-    this.store.dispatch(loadAllLocations());
+    // this.store.dispatch(loadAllLocations());
   }
 
   ngOnInit(): void {

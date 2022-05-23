@@ -54,7 +54,7 @@ export class PatientRadiologySummaryComponent implements OnInit {
               )
             : [],
         conceptClass: "radiology",
-        otherType: "searchFromOptions",
+        searchControlType: "searchFromOptions",
         shouldHaveLiveSearchForDropDownFields: true,
       },
       {

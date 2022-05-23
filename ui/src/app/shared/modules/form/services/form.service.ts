@@ -38,11 +38,11 @@ export class FormService {
 
   searchItem(
     parameters,
-    otherType?,
+    searchControlType?,
     filteringItems?,
     field?
   ): Observable<any[]> {
-    if (!otherType) {
+    if (!searchControlType) {
       return from(this.api.concept.getAllConcepts(parameters)).pipe(
         map((response) => {
           return orderBy(
@@ -56,7 +56,13 @@ export class FormService {
           );
         })
       );
-    } else if (otherType === "searchFromOptions") {
+    } else if (searchControlType === "user") {
+      return from(this.api.person.getAllPersons({ q: parameters?.q })).pipe(
+        map((response) => {
+          return response?.results;
+        })
+      );
+    } else if (searchControlType === "searchFromOptions") {
       return of(
         field?.options.filter(
           (option) =>
@@ -66,7 +72,7 @@ export class FormService {
               -1
         )
       );
-    } else if (otherType === "billableItem") {
+    } else if (searchControlType === "billableItem") {
       return this.httpClient
         .get(
           `icare/item?limit=${parameters?.limit}&startIndex=0${
@@ -94,7 +100,7 @@ export class FormService {
             );
           })
         );
-    } else if (otherType === "Drug") {
+    } else if (searchControlType === "Drug") {
       const formattedParamters = omit(parameters, "class", "v");
       // console.log('filteringItems', filteringItems);
       const keyedDispensingLocations = keyBy(

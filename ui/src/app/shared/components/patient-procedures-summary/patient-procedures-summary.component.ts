@@ -55,7 +55,7 @@ export class PatientProceduresSummaryComponent implements OnInit {
               )
             : [],
         conceptClass: "procedure",
-        otherType: "searchFromOptions",
+        searchControlType: "searchFromOptions",
         shouldHaveLiveSearchForDropDownFields: true,
       },
       {

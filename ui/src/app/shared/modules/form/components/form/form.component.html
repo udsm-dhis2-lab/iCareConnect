@@ -7,7 +7,13 @@
       }}"
     >
       <div class="row">
-        <div class="col-12">
+        <div
+          class="{{
+            field?.type !== 'number' || (!field.min && !field.max)
+              ? 'col-12'
+              : 'col-8'
+          }}"
+        >
           <app-field
             [field]="field"
             [form]="form"
@@ -21,19 +27,23 @@
         </div>
         <!-- TODO: Might need to show full (col-12) in case it is not number-->
         <div
-          class="{{ field?.type == 'number' ? 'col-12 units-and-ranges' : '' }}"
+          class="{{
+            field?.type === 'number' && field.min && field.max
+              ? 'col-2 units-and-ranges'
+              : ''
+          }}"
           *ngIf="field?.type == 'number' && (field.min || field.max)"
         >
-          <div class="d-flex flex-row">
-            <div class="p-1 text-left w-100" *ngIf="field?.max">
+          <div class="d-flex flex-column">
+            <div class="text-left w-100" *ngIf="field?.max">
               <span><span>(</span>{{ field?.min || 0 }}</span
               ><span>-</span>
               <span>{{ field?.max }} <span>)</span></span>
             </div>
-            <div class="p-2 w-100">
+            <div class="w-100">
               <span> {{ field?.units }}</span>
             </div>
-            <div class="p-2 w-100">
+            <div class="w-100">
               <span
                 class="text-warning text-left for-warning"
                 *ngIf="

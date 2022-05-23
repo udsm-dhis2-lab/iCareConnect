@@ -1,8 +1,20 @@
-<div class="sample-registration-page" *ngIf="provider$ | async as provider">
+<div
+  class="sample-registration-page"
+  *ngIf="{
+    provider: provider$ | async,
+    LISConfigurations: LISConfigurations$ | async
+  } as params"
+>
   <div></div>
-  <div *ngIf="provider">
-    <app-register-sample [provider]="provider"></app-register-sample>
+  <div *ngIf="params?.provider && params?.LISConfigurations">
+    <app-register-sample
+      [provider]="params?.provider"
+      [LISConfigurations]="params?.LISConfigurations"
+    ></app-register-sample>
   </div>
 
-  <mat-progress-bar *ngIf="!provider" mode="indeterminate"></mat-progress-bar>
+  <mat-progress-bar
+    *ngIf="!params?.provider || !params?.LISConfigurations"
+    mode="indeterminate"
+  ></mat-progress-bar>
 </div>

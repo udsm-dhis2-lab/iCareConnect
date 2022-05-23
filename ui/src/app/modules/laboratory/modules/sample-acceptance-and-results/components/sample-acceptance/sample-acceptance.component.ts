@@ -41,6 +41,7 @@ export class SampleAcceptanceComponent implements OnInit {
   @Input() labSamplesDepartments: any;
   @Input() labSamplesContainers: any;
   @Input() currentUser: any;
+  @Input() LISConfigurations: any;
   samplesAccepted$: Observable<any[]>;
   samplesToAccept$: Observable<any[]>;
   allSamples$: Observable<any[]>;

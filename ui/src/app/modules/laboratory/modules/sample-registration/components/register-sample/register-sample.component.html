@@ -3,7 +3,8 @@
   *ngIf="{
     labSamples: labSamples$ | async,
     mrnGeneratorSourceUuid: mrnGeneratorSourceUuid$ | async,
-    preferredPersonIdentifier: preferredPersonIdentifier$ | async
+    preferredPersonIdentifier: preferredPersonIdentifier$ | async,
+    agencyConceptConfigs: agencyConceptConfigs$ | async
   } as params"
 >
   <!-- <section class="registration-category">
@@ -54,6 +55,7 @@
           [mrnGeneratorSourceUuid]="params?.mrnGeneratorSourceUuid"
           [preferredPersonIdentifier]="params?.preferredPersonIdentifier"
           [provider]="provider"
+          [agencyConceptConfigs]="params?.agencyConceptConfigs"
         ></app-single-registration>
       </div>
       <div

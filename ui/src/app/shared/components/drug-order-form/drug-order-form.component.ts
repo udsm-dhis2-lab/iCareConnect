@@ -5,68 +5,68 @@ import {
   OnInit,
   Output,
   ViewChildren,
-} from '@angular/core'
-import { Dropdown } from '../../modules/form/models/dropdown.model'
-import { FormValue } from '../../modules/form/models/form-value.model'
-import { ProviderGet } from '../../resources/openmrs'
+} from "@angular/core";
+import { Dropdown } from "../../modules/form/models/dropdown.model";
+import { FormValue } from "../../modules/form/models/form-value.model";
+import { ProviderGet } from "../../resources/openmrs";
 
-import { find, uniq } from 'lodash'
-import { Patient } from 'src/app/modules/registration/components/registration-search/registration-search.component'
-import { DrugOrderObject } from '../../resources/order/models'
-import { FormComponent } from '../../modules/form/components/form/form.component'
+import { find, uniq } from "lodash";
+import { Patient } from "src/app/modules/registration/components/registration-search/registration-search.component";
+import { DrugOrderObject } from "../../resources/order/models";
+import { FormComponent } from "../../modules/form/components/form/form.component";
 
 @Component({
-  selector: 'app-drug-order-form',
-  templateUrl: './drug-order-form.component.html',
-  styleUrls: ['./drug-order-form.component.scss'],
+  selector: "app-drug-order-form",
+  templateUrl: "./drug-order-form.component.html",
+  styleUrls: ["./drug-order-form.component.scss"],
 })
 export class DrugOrderFormComponent implements OnInit {
-  @ViewChildren(FormComponent) formComponents: FormComponent[]
-  @Input() drugOrder: DrugOrderObject
-  @Input() fromDispensing: boolean
-  @Input() showAddButton: boolean
-  @Input() hideActionButtons: boolean
-  @Input() encounterUuid: string
-  @Input() provider: ProviderGet
-  @Input() drugOrderFormsMetadata: any
-  drugFormField: Dropdown
-  @Input() patient: Patient
-  @Input() isFromDoctor: boolean
-  @Input() dispensingLocations: any
-  loadingMetadata: boolean
-  loadingMetadataError: string
-  countOfDispensingFormFieldsWithValues: number = 0
-  keysWithData: string[] = []
-  @Output() drugQuantity = new EventEmitter<number>()
-  @Output() drugOrdered = new EventEmitter<any>()
-  @Output() cancelForm = new EventEmitter<any>()
-  @Output() formUpdate = new EventEmitter<any>()
-  drugOrderDetails: any = {}
-  isTheOrderFromDoctor: boolean = false
-  quantityField: any
-  shouldFeedQuantity: boolean = false
-  isDrugSet: boolean = false
-  showOtherDetails: boolean = false
+  @ViewChildren(FormComponent) formComponents: FormComponent[];
+  @Input() drugOrder: DrugOrderObject;
+  @Input() fromDispensing: boolean;
+  @Input() showAddButton: boolean;
+  @Input() hideActionButtons: boolean;
+  @Input() encounterUuid: string;
+  @Input() provider: ProviderGet;
+  @Input() drugOrderFormsMetadata: any;
+  drugFormField: Dropdown;
+  @Input() patient: Patient;
+  @Input() isFromDoctor: boolean;
+  @Input() dispensingLocations: any;
+  loadingMetadata: boolean;
+  loadingMetadataError: string;
+  countOfDispensingFormFieldsWithValues: number = 0;
+  keysWithData: string[] = [];
+  @Output() drugQuantity = new EventEmitter<number>();
+  @Output() drugOrdered = new EventEmitter<any>();
+  @Output() cancelForm = new EventEmitter<any>();
+  @Output() formUpdate = new EventEmitter<any>();
+  drugOrderDetails: any = {};
+  isTheOrderFromDoctor: boolean = false;
+  quantityField: any;
+  shouldFeedQuantity: boolean = false;
+  isDrugSet: boolean = false;
+  showOtherDetails: boolean = false;
   constructor() {}
 
   ngOnInit(): void {
     this.drugFormField = {
       ...this.drugOrderFormsMetadata?.drugFormField,
-      conceptClass: 'Drug',
+      conceptClass: "Drug",
       shouldHaveLiveSearchForDropDownFields: true,
-      otherType: 'Drug',
+      searchControlType: "Drug",
       filteringItems: {
         items: this.drugOrderFormsMetadata?.stockedDrugs,
         applicable: this.dispensingLocations,
       },
-    }
-    this.quantityField = this.drugOrderFormsMetadata?.quantityField
+    };
+    this.quantityField = this.drugOrderFormsMetadata?.quantityField;
   }
 
   onFormUpdate(formName: string, formValue: FormValue): void {
-    let data = formValue.getValues()
-    this.isDrugSet = data['drug'] ? true : this.isDrugSet
-    if (this.isDrugSet && data['drug']) {
+    let data = formValue.getValues();
+    this.isDrugSet = data["drug"] ? true : this.isDrugSet;
+    if (this.isDrugSet && data["drug"]) {
     }
     // this.shouldFeedQuantity =
     //   data['drug'] && data['drug'].value.split(':')[2] === 'true'
@@ -74,33 +74,33 @@ export class DrugOrderFormComponent implements OnInit {
     //     : data['drug'] && data['drug'].value.split(':')[2] === 'false'
     //     ? false
     //     : this.shouldFeedQuantity
-    this.shouldFeedQuantity = true
+    this.shouldFeedQuantity = true;
     if (!this.shouldFeedQuantity) {
-      this.quantityField = null
+      this.quantityField = null;
       setTimeout(() => {
         this.quantityField = {
           ...this.drugOrderFormsMetadata?.quantityField,
           // disabled: true,
           // value: '0',
-        }
-      }, 100)
-      this.drugQuantity.emit(0)
-      data['quantity'] = {
-        id: 'quantity',
+        };
+      }, 100);
+      this.drugQuantity.emit(0);
+      data["quantity"] = {
+        id: "quantity",
         options: [],
-        value: '0',
-      }
-      this.keysWithData = [...this.keysWithData, 'quantity']
+        value: "0",
+      };
+      this.keysWithData = [...this.keysWithData, "quantity"];
     } else {
       this.keysWithData =
-        this.keysWithData.filter((key) => key !== 'quantity') || []
-      if (data?.quantity?.value != '' && Number(data?.quantity?.value) === 0) {
-        this.quantityField = null
+        this.keysWithData.filter((key) => key !== "quantity") || [];
+      if (data?.quantity?.value != "" && Number(data?.quantity?.value) === 0) {
+        this.quantityField = null;
         setTimeout(() => {
           this.quantityField = {
             ...this.drugOrderFormsMetadata?.quantityField,
-          }
-        }, 100)
+          };
+        }, 100);
       }
     }
     this.keysWithData = uniq(
@@ -108,20 +108,20 @@ export class DrugOrderFormComponent implements OnInit {
         ...this.keysWithData,
         ...(Object.keys(data).filter((key) => data[key]?.value) || []),
       ].filter((key) => key)
-    )
-    this.countOfDispensingFormFieldsWithValues = this.keysWithData.length
+    );
+    this.countOfDispensingFormFieldsWithValues = this.keysWithData.length;
     if (data.quantity && data.quantity.value) {
-      this.drugQuantity.emit(Number(data.quantity.value))
+      this.drugQuantity.emit(Number(data.quantity.value));
     }
     Object.keys(data).forEach((key: string) => {
-      if (data[key].value !== '') {
-        if (key === 'drug') {
+      if (data[key].value !== "") {
+        if (key === "drug") {
           const stockedDrug = find(this.drugOrderFormsMetadata.stockedDrugs, [
-            'drugUuid',
+            "drugUuid",
             data[key].value,
-          ])
+          ]);
 
-          this.drugOrderDetails['location'] = stockedDrug?.location
+          this.drugOrderDetails["location"] = stockedDrug?.location;
         }
 
         this.drugOrderDetails[key] =
@@ -129,9 +129,9 @@ export class DrugOrderFormComponent implements OnInit {
             ? {
                 uuid: data[key].value,
               }
-            : data[key].value
+            : data[key].value;
       }
-    })
+    });
 
     this.formUpdate.emit({
       formName,
@@ -143,11 +143,11 @@ export class DrugOrderFormComponent implements OnInit {
       orderType: this.drugOrderFormsMetadata?.orderType,
       countOfDispensingFormFieldsWithValues:
         this.countOfDispensingFormFieldsWithValues,
-    })
+    });
   }
 
   toggleOtherDetails(event: Event): void {
-    event.stopPropagation()
-    this.showOtherDetails = !this.showOtherDetails
+    event.stopPropagation();
+    this.showOtherDetails = !this.showOtherDetails;
   }
 }

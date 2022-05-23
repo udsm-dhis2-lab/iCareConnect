@@ -28,7 +28,7 @@ export class RequisitionFormComponent implements OnInit {
         required: true,
         options: [],
         shouldHaveLiveSearchForDropDownFields: true,
-        otherType: "billableItem",
+        searchControlType: "billableItem",
       }),
       new Dropdown({
         id: "target_store",
