@@ -8,7 +8,8 @@
     labSamplesDepartments: labSamplesDepartments$ | async,
     labSamplesContainers: labSamplesContainers$ | async,
     configs: configs$ | async,
-    codedSampleRejectionReasons: codedSampleRejectionReasons$ | async
+    codedSampleRejectionReasons: codedSampleRejectionReasons$ | async,
+    LISConfigurations: LISConfigurations$ | async
   } as params"
 >
   <div
@@ -18,7 +19,8 @@
       params?.labSamplesDepartments?.length > 0 &&
       params?.configs &&
       params?.labSamplesContainers &&
-      params?.codedSampleRejectionReasons
+      params?.codedSampleRejectionReasons &&
+      params?.LISConfigurations
     "
   >
     <app-sample-tracking-dashboard
@@ -28,6 +30,7 @@
       [sampleTypes]="params?.sampleTypes"
       [labSamplesContainers]="params?.labSamplesContainers"
       [configs]="params?.configs"
+      [LISConfigurations]="params?.LISConfigurations"
       [codedSampleRejectionReasons]="params?.codedSampleRejectionReasons"
     ></app-sample-tracking-dashboard>
   </div>
@@ -39,7 +42,8 @@
       params?.labSamplesDepartments?.length == 0 ||
       !params?.configs ||
       !params?.labSamplesContainers ||
-      !params?.codedSampleRejectionReasons
+      !params?.codedSampleRejectionReasons ||
+      !params?.LISConfigurations
     "
     mode="indeterminate"
   ></mat-progress-bar>
