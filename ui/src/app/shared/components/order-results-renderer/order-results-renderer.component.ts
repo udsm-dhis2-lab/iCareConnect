@@ -62,7 +62,7 @@ export class OrderResultsRendererComponent implements OnInit {
           this.investigationAndProceduresFormsDetails?.setMembers
         ),
         conceptClass: "test",
-        otherType: "searchFromOptions",
+        searchControlType: "searchFromOptions",
         shouldHaveLiveSearchForDropDownFields: true,
       },
       {

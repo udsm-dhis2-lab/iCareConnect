@@ -18,7 +18,7 @@ export class Field<T> {
   units: string;
   rows?: number;
   conceptClass?: any;
-  otherType?: string;
+  searchControlType?: string;
   shouldHaveLiveSearchForDropDownFields?: boolean;
   filteringItems?: any[];
   category?: string;
@@ -41,7 +41,7 @@ export class Field<T> {
       hidden?: boolean;
       units?: string;
       conceptClass?: any;
-      otherType?: string;
+      searchControlType?: string;
       shouldHaveLiveSearchForDropDownFields?: boolean;
       filteringItems?: any[];
       category?: string;
@@ -64,7 +64,7 @@ export class Field<T> {
     this.units = options.units || "";
     this.shouldHaveLiveSearchForDropDownFields =
       options.shouldHaveLiveSearchForDropDownFields;
-    this.otherType = options.otherType;
+    this.searchControlType = options.searchControlType;
     this.category = options?.category;
     this.conceptClass = options?.conceptClass;
   }

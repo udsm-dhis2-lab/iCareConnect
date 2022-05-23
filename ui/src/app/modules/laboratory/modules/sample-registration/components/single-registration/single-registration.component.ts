@@ -178,6 +178,7 @@ export class SingleRegistrationComponent implements OnInit {
                     {
                       givenName: this.personDetailsData?.firstName,
                       familyName: this.personDetailsData?.lastName,
+                      familyName2: this.personDetailsData?.middleName,
                     },
                   ],
                   gender: this.personDetailsData?.gender,

@@ -1,18 +1,17 @@
-import { Component, Input, OnInit, Output,EventEmitter } from '@angular/core';
-import { FormValue } from '../../modules/form/models/form-value.model';
+import { Component, Input, OnInit, Output, EventEmitter } from "@angular/core";
+import { FormValue } from "../../modules/form/models/form-value.model";
 
 @Component({
-  selector: 'app-add-procedure-form',
-  templateUrl: './add-procedure-form.component.html',
-  styleUrls: ['./add-procedure-form.component.scss']
+  selector: "app-add-procedure-form",
+  templateUrl: "./add-procedure-form.component.html",
+  styleUrls: ["./add-procedure-form.component.scss"],
 })
 export class AddProcedureFormComponent implements OnInit {
-
   @Input() proceduresDetails: any;
   formFields: any = [];
-  @Output() procedures: EventEmitter<any> = new EventEmitter<any>()
-  @Output() isFormValid: EventEmitter<boolean> = new EventEmitter<boolean>()
-  constructor() { }
+  @Output() procedures: EventEmitter<any> = new EventEmitter<any>();
+  @Output() isFormValid: EventEmitter<boolean> = new EventEmitter<boolean>();
+  constructor() {}
 
   ngOnInit(): void {
     this.formFields = [
@@ -23,16 +22,16 @@ export class AddProcedureFormComponent implements OnInit {
         name: "Procedure",
         controlType: "dropdown",
         type: "text",
-        options: this.proceduresDetails.map(procedure => {
+        options: this.proceduresDetails.map((procedure) => {
           return {
             ...procedure,
             key: procedure?.display,
             name: procedure?.display,
-          }
+          };
         }),
         required: true,
         conceptClass: "procedure",
-        otherType: "searchFromOptions",
+        searchControlType: "searchFromOptions",
         shouldHaveLiveSearchForDropDownFields: true,
       },
       {
@@ -47,8 +46,7 @@ export class AddProcedureFormComponent implements OnInit {
   }
 
   onFormUpdate(formValues: FormValue): void {
-    this.procedures.emit(formValues.getValues())
-    this.isFormValid.emit(formValues.isValid)
+    this.procedures.emit(formValues.getValues());
+    this.isFormValid.emit(formValues.isValid);
   }
-
 }

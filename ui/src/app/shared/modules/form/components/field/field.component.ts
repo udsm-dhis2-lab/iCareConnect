@@ -105,7 +105,7 @@ export class FieldComponent {
     };
     this.members$ = this.formService.searchItem(
       parameters,
-      this.field?.otherType,
+      this.field?.searchControlType,
       this.field?.filteringItems,
       this.field
     );

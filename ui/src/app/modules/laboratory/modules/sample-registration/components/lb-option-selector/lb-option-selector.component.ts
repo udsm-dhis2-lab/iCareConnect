@@ -32,7 +32,7 @@ export class LbOptionSelectorComponent implements OnInit {
       label: this.label,
       options: formattedOptions,
       shouldHaveLiveSearchForDropDownFields: true,
-      otherType: "searchFromOptions",
+      searchControlType: "searchFromOptions",
     });
   }
 
