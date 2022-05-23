@@ -57,9 +57,11 @@
       [required]="field?.required"
       (selectionChange)="onFieldUpdate()"
     >
-      <mat-option *ngFor="let option of field?.options" [value]="option?.key">{{
-        option.label
-      }}</mat-option>
+      <mat-option
+        *ngFor="let option of field?.options"
+        [value]="option?.value"
+        >{{ option.label }}</mat-option
+      >
     </mat-select>
     <!-- end of dropdown -->
     <!-- TODO: Remove hardcoded ID -->

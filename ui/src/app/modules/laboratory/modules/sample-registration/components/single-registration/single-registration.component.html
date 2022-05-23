@@ -9,34 +9,68 @@
     <div class="col-12" *ngIf="savingData">
       <mat-progress-bar mode="indeterminate"></mat-progress-bar>
     </div>
-    <div class="col-lg-6 col-md-6 col-sx-12 col-sm-12">
-      <div class="h6 text-left">New sample</div>
+    <div class="col-lg-6 col-md-6 col-sx-12 col-sm-12 mt-2">
+      <div class="h6 text-left">Specimen Details</div>
       <div class="for-sample-label">
-        <app-sample-label
-          [label]="params?.labSampleLabel"
-          (sampleLabel)="onGetSampleLabel($event)"
-        ></app-sample-label>
+        <fieldset>
+          <legend>Identification</legend>
+          <app-sample-label
+            [label]="params?.labSampleLabel"
+            (sampleLabel)="onGetSampleLabel($event)"
+          ></app-sample-label>
+        </fieldset>
       </div>
       <div>
-        <app-form
-          [fields]="[departmentField]"
-          (formUpdate)="onFormUpdate($event, 'department')"
-        ></app-form>
-        <div *ngIf="params?.testsUnderDepartment">
-          <app-lb-option-selector
-            [options]="params?.testsUnderDepartment"
-            [id]="'tests'"
-            [label]="'Test'"
-            (selectedOptionDetails)="onGetSelectedOptionDetails($event)"
-          ></app-lb-option-selector>
-        </div>
+        <fieldset>
+          <legend>Tests</legend>
+          <app-form
+            [fields]="[departmentField]"
+            (formUpdate)="onFormUpdate($event, 'department')"
+          ></app-form>
+          <div>
+            <app-lb-option-selector
+              *ngIf="params?.testsUnderDepartment"
+              [options]="params?.testsUnderDepartment"
+              [id]="'tests'"
+              [label]="'Test'"
+              (selectedOptionDetails)="onGetSelectedOptionDetails($event)"
+            ></app-lb-option-selector>
+            <app-form
+              *ngIf="!params?.testsUnderDepartment"
+              [fields]="[testsFormField]"
+              (formUpdate)="onFormUpdateForTest($event)"
+            ></app-form>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Other</legend>
+          <app-form
+            [fields]="[agencyFormField]"
+            (formUpdate)="onFormUpdateForAgency($event)"
+          ></app-form>
+
+          <app-form
+            [fields]="[labFormField]"
+            (formUpdate)="onFormUpdateForLab($event)"
+          ></app-form>
+        </fieldset>
       </div>
     </div>
     <div class="col-lg-6 col-md-6 col-sx-12 col-sm-12">
-      <div class="h6">Who?</div>
-      <app-person-details
-        (personDetails)="onGetPersonDetails($event)"
-      ></app-person-details>
+      <div class="h6">Patient</div>
+      <fieldset>
+        <legend>Demographic</legend>
+        <app-person-details
+          (personDetails)="onGetPersonDetails($event)"
+        ></app-person-details>
+      </fieldset>
+      <fieldset class="mt-2 mb-2">
+        <legend>Clinical Data</legend>
+        <app-clinical-data
+          (clinicalDataValues)="onGetClinicalDataValues($event)"
+        ></app-clinical-data>
+      </fieldset>
     </div>
     <div class="col-12" *ngIf="savingDataResponse?.error">
       <div *ngIf="savingDataResponse?.error?.error">
@@ -63,7 +97,7 @@
         </div>
       </div>
     </div>
-    <div class="col-12 d-flex justify-content-end mt-2">
+    <div class="col-12 d-flex justify-content-end mt-2 mb-2">
       <button mat-stroked-button color="primary" (click)="onSave($event)">
         Save
       </button>

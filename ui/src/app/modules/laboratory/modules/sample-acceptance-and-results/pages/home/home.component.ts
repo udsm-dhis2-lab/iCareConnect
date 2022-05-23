@@ -1,13 +1,25 @@
-import { Component, OnInit } from '@angular/core';
-import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs';
-import { AppState } from 'src/app/store/reducers';
-import { getAllPatientsVisitsReferences, getAllSampleTypes, getCodedSampleRejectionReassons, getLabConfigurations, getLabDepartments, getLabTestsContainers, getSampleTypesLoadedState, getVisitsLoadedState, getVisitsParameters } from 'src/app/store/selectors';
+import { Component, OnInit } from "@angular/core";
+import { Store } from "@ngrx/store";
+import { Observable } from "rxjs";
+import { loadLISConfigurations } from "src/app/modules/laboratory/store/actions";
+import { getLISConfigurations } from "src/app/modules/laboratory/store/selectors";
+import { AppState } from "src/app/store/reducers";
+import {
+  getAllPatientsVisitsReferences,
+  getAllSampleTypes,
+  getCodedSampleRejectionReassons,
+  getLabConfigurations,
+  getLabDepartments,
+  getLabTestsContainers,
+  getSampleTypesLoadedState,
+  getVisitsLoadedState,
+  getVisitsParameters,
+} from "src/app/store/selectors";
 
 @Component({
-  selector: 'app-home',
-  templateUrl: './home.component.html',
-  styleUrls: ['./home.component.scss'],
+  selector: "app-home",
+  templateUrl: "./home.component.html",
+  styleUrls: ["./home.component.scss"],
 })
 export class HomeComponent implements OnInit {
   datesParameters$: Observable<any>;
@@ -18,8 +30,11 @@ export class HomeComponent implements OnInit {
   sampleTypesLoadedState$: Observable<any>;
   sampleTypes$: Observable<any>;
   configs$: Observable<any>;
+  LISConfigurations$: Observable<any>;
   codedSampleRejectionReasons$: Observable<any[]>;
-  constructor(private store: Store<AppState>) {}
+  constructor(private store: Store<AppState>) {
+    this.store.dispatch(loadLISConfigurations());
+  }
 
   ngOnInit(): void {
     this.datesParameters$ = this.store.select(getVisitsParameters);
@@ -34,5 +49,7 @@ export class HomeComponent implements OnInit {
     this.codedSampleRejectionReasons$ = this.store.select(
       getCodedSampleRejectionReassons
     );
+
+    this.LISConfigurations$ = this.store.select(getLISConfigurations);
   }
 }

@@ -1,4 +1,28 @@
 <div>
+  <mat-radio-group class="registration-category">
+    <mat-radio-button
+      (change)="getSelection($event)"
+      class="person-details-btn"
+      [value]="'new'"
+      [checked]="personDetailsCategory === 'new'"
+      color="primary"
+    >
+      New
+    </mat-radio-button>
+    <mat-radio-button
+      (change)="getSelection($event)"
+      class="person-details-btn ml-2"
+      [value]="'existing'"
+      [checked]="personDetailsCategory === 'existing'"
+      color="primary"
+    >
+      Existing
+    </mat-radio-button>
+  </mat-radio-group>
+  <app-registered-patient-details
+    *ngIf="personDetailsCategory === 'existing'"
+    (personDetails)="onGetPersonDetails($event)"
+  ></app-registered-patient-details>
   <app-form
     [fields]="personFields"
     [isFormHorizontal]="true"

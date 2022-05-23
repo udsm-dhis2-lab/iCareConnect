@@ -1,17 +1,18 @@
-import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
-import { OpenmrsHttpClientService } from 'src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service';
-import { Api } from 'src/app/shared/resources/openmrs';
-import { SampleObject, SampleIdentifier } from '../models';
+import { Injectable } from "@angular/core";
+import { Observable, of } from "rxjs";
+import { OpenmrsHttpClientService } from "src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service";
+import { Api } from "src/app/shared/resources/openmrs";
+import { SampleObject, SampleIdentifier } from "../models";
 
-import * as _ from 'lodash';
+import * as _ from "lodash";
 import {
   createKeyValuePairForAllLabDepartments,
   groupTestsBySpecimenSource,
-} from 'src/app/shared/resources/concepts/helpers';
+} from "src/app/shared/resources/concepts/helpers";
+import { catchError, map } from "rxjs/operators";
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: "root",
 })
 export class SamplesService {
   constructor(
@@ -34,7 +35,7 @@ export class SamplesService {
       },
       orders: ordersUuid,
     };
-    return this.httpClientService.post('lab/sample', data);
+    return this.httpClientService.post("lab/sample", data);
     // return of(sample);
   }
 
@@ -43,9 +44,9 @@ export class SamplesService {
       of(new Date().getTime().toString()).subscribe((response) => {
         // create Identifier
         const identifier =
-          'UDSM' +
-          new Date().toISOString().split('T')[0] +
-          '/' +
+          "UDSM" +
+          new Date().toISOString().split("T")[0] +
+          "/" +
           response.substring(10);
         observer.next({
           specimenSourceUuid: specimenType.specimenSourceUuid,
@@ -68,7 +69,7 @@ export class SamplesService {
   ): Observable<any> {
     return new Observable((observer) => {
       this.httpClientService
-        .get('lab/sample?visit=' + visitUuid)
+        .get("lab/sample?visit=" + visitUuid)
         .subscribe((samples) => {
           let allSamples = [];
 
@@ -93,7 +94,7 @@ export class SamplesService {
               keyedDepartmentsByTestOrder[
                 sample?.orders[0]?.order?.concept?.uuid
               ]?.department?.id +
-              '_' +
+              "_" +
               sample?.concept?.uuid;
             if (
               (
@@ -131,13 +132,13 @@ export class SamplesService {
           let samplesNotMatchingToCollectedOnes = [];
 
           _.each(
-            _.uniqBy(samplesMerged, 'departmentSpecimentSource'),
+            _.uniqBy(samplesMerged, "departmentSpecimentSource"),
             (sample) => {
               const departmentAndSourceId =
                 keyedDepartmentsByTestOrder[
                   sample?.orders[0]?.order?.concept?.uuid
                 ]?.department?.id +
-                '_' +
+                "_" +
                 sample?.concept?.uuid;
               const matchedSamples = _.filter(samplesToCollect, {
                 departmentSpecimentSource: departmentAndSourceId,
@@ -198,7 +199,7 @@ export class SamplesService {
                     ];
                   }
                 });
-                return _.uniqBy(ordersNotSampled, 'uuid');
+                return _.uniqBy(ordersNotSampled, "uuid");
               }
             }
           );
@@ -230,7 +231,7 @@ export class SamplesService {
                             keyedDepartmentsByTestOrder[
                               sample?.orders[0]?.order?.concept?.uuid
                             ]?.department?.id +
-                            '_' +
+                            "_" +
                             sample?.concept?.uuid,
                           mrNo: getmRN(sample?.patient),
                           patient: sample?.patient,
@@ -249,7 +250,7 @@ export class SamplesService {
                           }),
                           isAdmitted,
                           collected: true,
-                          priority: sample.priority ? 'HIGH' : 'None',
+                          priority: sample.priority ? "HIGH" : "None",
                           allocation: sample?.testsAllocation,
                           status:
                             sample?.statuses && sample?.statuses?.length > 0
@@ -282,11 +283,11 @@ export class SamplesService {
               );
 
           function getRejectOrAcceptStatus(statusesInfo) {
-            let status = '';
+            let status = "";
             _.each(statusesInfo, (statusInfo) => {
               if (
-                statusInfo?.status.toUpperCase() == 'ACCEPTED' ||
-                statusInfo?.status.toUpperCase() == 'REJECTED'
+                statusInfo?.status.toUpperCase() == "ACCEPTED" ||
+                statusInfo?.status.toUpperCase() == "REJECTED"
               ) {
                 status = statusInfo?.status.toUpperCase();
               }
@@ -298,8 +299,8 @@ export class SamplesService {
             let user = null;
             _.each(statusesInfo, (statusInfo) => {
               if (
-                statusInfo?.status.toUpperCase() == 'ACCEPTED' ||
-                statusInfo?.status.toUpperCase() == 'REJECTED'
+                statusInfo?.status.toUpperCase() == "ACCEPTED" ||
+                statusInfo?.status.toUpperCase() == "REJECTED"
               ) {
                 user = statusInfo?.user;
               }
@@ -311,8 +312,8 @@ export class SamplesService {
             let comments = null;
             _.each(statusesInfo, (statusInfo) => {
               if (
-                statusInfo?.status.toUpperCase() == 'ACCEPTED' ||
-                statusInfo?.status.toUpperCase() == 'REJECTED'
+                statusInfo?.status.toUpperCase() == "ACCEPTED" ||
+                statusInfo?.status.toUpperCase() == "REJECTED"
               ) {
                 comments = statusInfo?.remarks;
               }
@@ -321,11 +322,11 @@ export class SamplesService {
           }
 
           function getmRN(patient) {
-            let mrNo = '';
+            let mrNo = "";
             _.map(patient?.identifiers, (identifier) => {
-              if (identifier?.name == 'MRN' || identifier?.display == 'MRN') {
+              if (identifier?.name == "MRN" || identifier?.display == "MRN") {
                 mrNo = identifier?.id;
-              } else if (identifier?.display.indexOf('MRN') > -1) {
+              } else if (identifier?.display.indexOf("MRN") > -1) {
                 mrNo = identifier?.identifier;
               }
             });
@@ -336,7 +337,7 @@ export class SamplesService {
   }
 
   getAllSamples(): Observable<any> {
-    return this.httpClientService.get('lab/samples');
+    return this.httpClientService.get("lab/samples");
   }
 
   setSampleStatus(statusDetails, sampleUuid): Observable<any> {
@@ -345,13 +346,20 @@ export class SamplesService {
         uuid: sampleUuid,
       },
       user: {
-        uuid: localStorage.getItem('userUuid'),
+        uuid: localStorage.getItem("userUuid"),
       },
-      remarks: statusDetails.comments ? statusDetails.comments : '',
+      remarks: statusDetails.comments ? statusDetails.comments : "",
       status: statusDetails?.status,
     };
 
-    return this.httpClientService.post('lab/samplestatus', data);
+    return this.httpClientService.post("lab/samplestatus", data);
+  }
+
+  saveSampleStatus(data: any): Observable<any> {
+    return this.httpClientService.post("lab/samplestatus", data).pipe(
+      map((response) => response),
+      catchError((error) => of(error))
+    );
   }
 
   setAllocation(orderAllocated, sample): Observable<any> {
@@ -368,22 +376,22 @@ export class SamplesService {
         uuid: orderAllocated?.technician?.id,
       },
     };
-    return this.httpClientService.post('lab/assign', data);
+    return this.httpClientService.post("lab/assign", data);
   }
 
   setSignOffs(sigOffDetails): Observable<any> {
     // console.log('sigOffDetails', sigOffDetails);
-    return this.httpClientService.post('lab/allocationstatus', sigOffDetails);
+    return this.httpClientService.post("lab/allocationstatus", sigOffDetails);
   }
 
   setContainerForLabTest(containerDetails): Observable<any> {
     return this.httpClientService.post(
-      'lab/allocation',
+      "lab/allocation",
       containerDetails?.allocation
     );
   }
 
   saveResultsForLabTest(resultsDetails): Observable<any> {
-    return this.httpClientService.post('lab/results', resultsDetails);
+    return this.httpClientService.post("lab/results", resultsDetails);
   }
 }
