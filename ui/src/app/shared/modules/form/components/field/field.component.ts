@@ -1,6 +1,13 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { FormGroup } from "@angular/forms";
+import { MomentDateAdapter } from "@angular/material-moment-adapter";
+import {
+  DateAdapter,
+  MAT_DATE_FORMATS,
+  MAT_DATE_LOCALE,
+} from "@angular/material/core";
 import { Observable, of } from "rxjs";
+import { DATE_FORMATS_DD_MM_YYYY } from "src/app/core/constants/date-formats.constants";
 import { Field } from "../../models/field.model";
 import { FormService } from "../../services";
 
@@ -8,6 +15,15 @@ import { FormService } from "../../services";
   selector: "app-field",
   templateUrl: "./field.component.html",
   styleUrls: ["./field.component.scss"],
+  providers: [
+    {
+      provide: DateAdapter,
+      useClass: MomentDateAdapter,
+      deps: [MAT_DATE_LOCALE],
+    },
+
+    { provide: MAT_DATE_FORMATS, useValue: DATE_FORMATS_DD_MM_YYYY },
+  ],
 })
 export class FieldComponent {
   @Input() field: Field<string>;

@@ -24,6 +24,7 @@ export class SingleRegistrationComponent implements OnInit {
   @Input() mrnGeneratorSourceUuid: string;
   @Input() preferredPersonIdentifier: string;
   @Input() provider: any;
+  @Input() agencyConceptConfigs: any;
 
   departmentField: any = {};
   testsFormField: any = {};
@@ -74,20 +75,14 @@ export class SingleRegistrationComponent implements OnInit {
       id: "agency",
       key: "agency",
       label: "Agency",
-      options: [
-        {
-          key: "routine",
-          value: "Routine",
-          label: "Routine",
-          name: "Routine",
-        },
-        {
-          key: "urgent",
-          value: "Urgent",
-          label: "Urgent",
-          name: "Urgent",
-        },
-      ],
+      options: this.agencyConceptConfigs?.setMembers.map((member) => {
+        return {
+          key: member?.uuid,
+          value: member?.display,
+          label: member?.display,
+          name: member?.display,
+        };
+      }),
       conceptClass: "Agency",
       shouldHaveLiveSearchForDropDownFields: false,
     });
@@ -155,8 +150,12 @@ export class SingleRegistrationComponent implements OnInit {
                   ],
                   gender: this.personDetailsData?.gender,
                   age: this.personDetailsData?.age,
-                  birthdate: null,
-                  birthdateEstimated: true,
+                  birthdate: this.personDetailsData?.dob
+                    ? this.personDetailsData?.dob
+                    : null,
+                  birthdateEstimated: this.personDetailsData?.dob
+                    ? false
+                    : true,
                   addresses: [
                     {
                       address1: this.personDetailsData?.address,
