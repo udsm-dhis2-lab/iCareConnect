@@ -182,6 +182,19 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		    "There is atleast 1 sample for the visit from lab-data.xml with visit id = 2386395c-2b07-4abd-8fd7-a748c957554d",
 		    handleGet.getContentAsString().contains("2386395c-2b07-4abd-8fd7-a748c957554d"));
 	}
+
+	@Test
+	public void testGettingSamples() throws Exception {
+
+		MockHttpServletRequest newGetRequest = newGetRequest("lab/samples");
+
+		MockHttpServletResponse handleGet = handle(newGetRequest);
+
+		System.out.println(handleGet.getContentAsString());
+		assertThat(
+				"There is atleast 1 sample for the visit from lab-data.xml with visit id = 2386395c-2b07-4abd-8fd7-a748c957554d",
+				handleGet.getContentAsString().contains("2386395c-2b07-4abd-8fd7-a748c957554d"));
+	}
 	
 	@Test
 	public void testUpdatingSampleOrder() throws Exception {

@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.map.annotate.JsonDeserialize;
 import org.openmrs.*;
+import org.openmrs.module.icare.core.JSONConverter;
 import org.openmrs.module.icare.core.utils.ChildIdOnlyDeserializer;
 import org.openmrs.module.icare.core.utils.ChildIdOnlySerializer;
 
@@ -21,7 +22,7 @@ import static javax.persistence.GenerationType.IDENTITY;
  */
 @Entity
 @Table(name = "lb_sample")
-public class Sample extends BaseOpenmrsData implements java.io.Serializable {
+public class Sample extends BaseOpenmrsData implements java.io.Serializable, JSONConverter {
 	
 	@Id
 	@GeneratedValue(strategy = IDENTITY)
