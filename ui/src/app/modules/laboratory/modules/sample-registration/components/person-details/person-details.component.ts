@@ -1,8 +1,10 @@
 import { Component, EventEmitter, OnInit, Output } from "@angular/core";
 import { RegistrationService } from "src/app/modules/registration/services/registration.services";
+import { DateField } from "src/app/shared/modules/form/models/date-field.model";
 import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
 import { PhoneNumber } from "src/app/shared/modules/form/models/phone-number.model";
+import { TextArea } from "src/app/shared/modules/form/models/text-area.model";
 import { Textbox } from "src/app/shared/modules/form/models/text-box.model";
 
 @Component({
@@ -100,6 +102,13 @@ export class PersonDetailsComponent implements OnInit {
         min: 0,
         max: 150,
       }),
+      new DateField({
+        id: "dob",
+        key: "dob",
+        label: "Date of birth",
+        required: false,
+        type: "date",
+      }),
       new PhoneNumber({
         id: "mobileNumber",
         key: "mobileNumber",
@@ -111,6 +120,15 @@ export class PersonDetailsComponent implements OnInit {
         category: "phoneNumber",
       }),
       new Textbox({
+        id: "email",
+        key: "email",
+        label: "Email",
+        required: false,
+        type: "text",
+        placeholder: "Email",
+        category: "email",
+      }),
+      new TextArea({
         id: "address",
         key: "address",
         label: "Address",

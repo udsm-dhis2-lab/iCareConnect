@@ -56,6 +56,15 @@ export class LaboratoryComponent implements OnInit {
   specimenSources$: Observable<any>;
   userRoles$: Observable<any>;
   currentRoutePath: string = "";
+  /**
+   *
+   * @param store
+   * @param router
+   * @param route
+   * Important keys
+   * 1. iCare.LIS: The value is this is true or false
+   * 2. iCare.Laboratory.agencyConceptUuid
+   */
 
   constructor(
     private store: Store<AppState>,
