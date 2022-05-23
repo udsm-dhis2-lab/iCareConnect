@@ -92,8 +92,8 @@
             <th rowspan="2">Department</th>
             <th rowspan="2">Sample / Specimen</th>
             <th rowspan="2">Sample ID</th>
-            <th rowspan="2">MRN</th>
-            <th rowspan="2">Patient Names</th>
+            <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">MRN</th>
+            <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">Patient Names</th>
             <th colspan="2" class="text-center">Test details</th>
             <th rowspan="2">Collected By</th>
             <th rowspan="2">Collected At</th>
@@ -153,13 +153,13 @@
                   {{ sample?.label }}
                 </td>
                 <td
-                  *ngIf="orderCount == 0"
+                  *ngIf="orderCount == 0 && !LISConfigurations?.isLIS"
                   [attr.rowspan]="sample?.orders?.length"
                 >
                   {{ sample?.patient?.identifiers[0]?.id }}
                 </td>
                 <td
-                  *ngIf="orderCount == 0"
+                  *ngIf="orderCount == 0 && !LISConfigurations?.isLIS"
                   [attr.rowspan]="sample?.orders?.length"
                 >
                   {{ sample?.patient?.givenName }}

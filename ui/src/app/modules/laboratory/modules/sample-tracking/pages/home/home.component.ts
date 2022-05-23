@@ -1,14 +1,28 @@
-import { Component, OnInit } from '@angular/core';
-import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs';
-import { AppState } from 'src/app/store/reducers';
-import { getAllSampleTypes, getCodedSampleRejectionReassons, getLabConfigurations, getLabDepartments, getLabTestsContainers, getSampleTypesLoadedState } from 'src/app/store/selectors';
-import { getAllPatientsVisitsReferences, getVisitsLoadedState, getVisitsParameters } from 'src/app/store/selectors/visits.selectors';
+import { Component, OnInit } from "@angular/core";
+import { Store } from "@ngrx/store";
+import { Observable } from "rxjs";
+import { LISConfigurationsModel } from "src/app/modules/laboratory/resources/models/lis-configurations.model";
+import { loadLISConfigurations } from "src/app/modules/laboratory/store/actions";
+import { getLISConfigurations } from "src/app/modules/laboratory/store/selectors";
+import { AppState } from "src/app/store/reducers";
+import {
+  getAllSampleTypes,
+  getCodedSampleRejectionReassons,
+  getLabConfigurations,
+  getLabDepartments,
+  getLabTestsContainers,
+  getSampleTypesLoadedState,
+} from "src/app/store/selectors";
+import {
+  getAllPatientsVisitsReferences,
+  getVisitsLoadedState,
+  getVisitsParameters,
+} from "src/app/store/selectors/visits.selectors";
 
 @Component({
-  selector: 'app-home',
-  templateUrl: './home.component.html',
-  styleUrls: ['./home.component.scss'],
+  selector: "app-home",
+  templateUrl: "./home.component.html",
+  styleUrls: ["./home.component.scss"],
 })
 export class HomeComponent implements OnInit {
   datesParameters$: Observable<any>;
@@ -20,7 +34,11 @@ export class HomeComponent implements OnInit {
   sampleTypes$: Observable<any>;
   configs$: Observable<any>;
   codedSampleRejectionReasons$: Observable<any>;
-  constructor(private store: Store<AppState>) {}
+
+  LISConfigurations$: Observable<LISConfigurationsModel>;
+  constructor(private store: Store<AppState>) {
+    this.store.dispatch(loadLISConfigurations());
+  }
 
   ngOnInit(): void {
     this.datesParameters$ = this.store.select(getVisitsParameters);
@@ -34,5 +52,7 @@ export class HomeComponent implements OnInit {
     this.codedSampleRejectionReasons$ = this.store.select(
       getCodedSampleRejectionReassons
     );
+
+    this.LISConfigurations$ = this.store.select(getLISConfigurations);
   }
 }
