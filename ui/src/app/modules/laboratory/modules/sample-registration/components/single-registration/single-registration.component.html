@@ -12,51 +12,65 @@
     <div class="col-lg-6 col-md-6 col-sx-12 col-sm-12 mt-2">
       <div class="h6 text-left">Specimen Details</div>
       <div class="for-sample-label">
-        <app-sample-label
-          [label]="params?.labSampleLabel"
-          (sampleLabel)="onGetSampleLabel($event)"
-        ></app-sample-label>
+        <fieldset>
+          <legend>Identification</legend>
+          <app-sample-label
+            [label]="params?.labSampleLabel"
+            (sampleLabel)="onGetSampleLabel($event)"
+          ></app-sample-label>
+        </fieldset>
       </div>
       <div>
-        <app-form
-          [fields]="[departmentField]"
-          (formUpdate)="onFormUpdate($event, 'department')"
-        ></app-form>
-        <div>
-          <app-lb-option-selector
-            *ngIf="params?.testsUnderDepartment"
-            [options]="params?.testsUnderDepartment"
-            [id]="'tests'"
-            [label]="'Test'"
-            (selectedOptionDetails)="onGetSelectedOptionDetails($event)"
-          ></app-lb-option-selector>
+        <fieldset>
+          <legend>Tests</legend>
           <app-form
-            *ngIf="!params?.testsUnderDepartment"
-            [fields]="[testsFormField]"
-            (formUpdate)="onFormUpdateForTest($event)"
+            [fields]="[departmentField]"
+            (formUpdate)="onFormUpdate($event, 'department')"
           ></app-form>
-        </div>
+          <div>
+            <app-lb-option-selector
+              *ngIf="params?.testsUnderDepartment"
+              [options]="params?.testsUnderDepartment"
+              [id]="'tests'"
+              [label]="'Test'"
+              (selectedOptionDetails)="onGetSelectedOptionDetails($event)"
+            ></app-lb-option-selector>
+            <app-form
+              *ngIf="!params?.testsUnderDepartment"
+              [fields]="[testsFormField]"
+              (formUpdate)="onFormUpdateForTest($event)"
+            ></app-form>
+          </div>
+        </fieldset>
 
-        <app-form
-          [fields]="[agencyFormField]"
-          (formUpdate)="onFormUpdateForAgency($event)"
-        ></app-form>
+        <fieldset>
+          <legend>Other</legend>
+          <app-form
+            [fields]="[agencyFormField]"
+            (formUpdate)="onFormUpdateForAgency($event)"
+          ></app-form>
 
-        <app-form
-          [fields]="[labFormField]"
-          (formUpdate)="onFormUpdateForLab($event)"
-        ></app-form>
+          <app-form
+            [fields]="[labFormField]"
+            (formUpdate)="onFormUpdateForLab($event)"
+          ></app-form>
+        </fieldset>
       </div>
     </div>
     <div class="col-lg-6 col-md-6 col-sx-12 col-sm-12">
       <div class="h6">Patient</div>
-      <app-person-details
-        (personDetails)="onGetPersonDetails($event)"
-      ></app-person-details>
-      <div class="h6 mt-2">Clinical Data</div>
-      <app-clinical-data
-        (clinicalDataValues)="onGetClinicalDataValues($event)"
-      ></app-clinical-data>
+      <fieldset>
+        <legend>Demographic</legend>
+        <app-person-details
+          (personDetails)="onGetPersonDetails($event)"
+        ></app-person-details>
+      </fieldset>
+      <fieldset class="mt-2 mb-2">
+        <legend>Clinical Data</legend>
+        <app-clinical-data
+          (clinicalDataValues)="onGetClinicalDataValues($event)"
+        ></app-clinical-data>
+      </fieldset>
     </div>
     <div class="col-12" *ngIf="savingDataResponse?.error">
       <div *ngIf="savingDataResponse?.error?.error">
