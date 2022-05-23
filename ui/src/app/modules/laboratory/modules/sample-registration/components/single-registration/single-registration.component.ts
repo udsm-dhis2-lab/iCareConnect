@@ -26,6 +26,8 @@ export class SingleRegistrationComponent implements OnInit {
   @Input() provider: any;
 
   departmentField: any = {};
+  testsFormField: any = {};
+  agencyFormField: any = {};
   formData: any = {};
   testsUnderDepartment$: Observable<any[]>;
 
@@ -58,6 +60,37 @@ export class SingleRegistrationComponent implements OnInit {
       conceptClass: "Lab Department",
       shouldHaveLiveSearchForDropDownFields: true,
     });
+
+    this.testsFormField = new Dropdown({
+      id: "test1",
+      key: "test1",
+      label: "Test",
+      options: [],
+      conceptClass: "Test",
+      shouldHaveLiveSearchForDropDownFields: true,
+    });
+
+    this.agencyFormField = new Dropdown({
+      id: "agency",
+      key: "agency",
+      label: "Agency",
+      options: [
+        {
+          key: "routine",
+          value: "Routine",
+          label: "Routine",
+          name: "Routine",
+        },
+        {
+          key: "urgent",
+          value: "Urgent",
+          label: "Urgent",
+          name: "Urgent",
+        },
+      ],
+      conceptClass: "Agency",
+      shouldHaveLiveSearchForDropDownFields: false,
+    });
   }
 
   onFormUpdate(formValues: FormValue, itemKey?: string): void {
@@ -67,6 +100,14 @@ export class SingleRegistrationComponent implements OnInit {
         this.formData["department"]?.value
       );
     }
+  }
+
+  onFormUpdateForTest(formValues: FormValue): void {
+    console.log(formValues.getValues());
+  }
+
+  onFormUpdateForAgency(formValues: FormValue): void {
+    console.log(formValues.getValues());
   }
 
   onGetSampleLabel(sampleLabel: string): void {
@@ -191,8 +232,6 @@ export class SingleRegistrationComponent implements OnInit {
                       .subscribe((visitResponse) => {
                         this.savingDataResponse = visitResponse;
                         if (!visitResponse?.error) {
-                          console.log(this.formData);
-                          console.log(Object.keys(this.formData));
                           const orders = Object.keys(this.formData)
                             .map((key) => {
                               if (
