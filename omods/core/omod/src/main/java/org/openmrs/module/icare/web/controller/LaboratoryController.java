@@ -5,6 +5,8 @@ import org.openmrs.User;
 import org.openmrs.Visit;
 import org.openmrs.api.*;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.icare.core.ListResult;
+import org.openmrs.module.icare.core.Pager;
 import org.openmrs.module.icare.core.utils.VisitWrapper;
 import org.openmrs.module.icare.laboratory.models.*;
 import org.openmrs.module.icare.laboratory.services.LaboratoryService;
@@ -171,10 +173,29 @@ public class LaboratoryController {
 	
 	@RequestMapping(value = "samples", method = RequestMethod.GET)
 	@ResponseBody
-	public List<Map<String, Object>> getAllSamples(@RequestParam(value = "startDate", required = false) String startDate,
-	        @RequestParam(value = "endDate", required = false) String endDate) throws ParseException {
-		
-		List<Sample> samples;
+	public Map<String, Object> getAllSamples(@RequestParam(value = "startDate", required = false) String startDate,
+	        @RequestParam(value = "endDate", required = false) String endDate,
+											 @RequestParam(defaultValue = "true", value = "paging", required = false) boolean paging,
+											 @RequestParam(defaultValue = "50", value = "pageSize", required = false) Integer pageSize,
+											 @RequestParam(defaultValue = "1", value = "page", required = false) Integer page) throws ParseException {
+
+		Date start = null;
+		Date end = null;
+		if (startDate != null && endDate != null) {
+
+			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+
+			start = formatter.parse(startDate);
+			end = formatter.parse(endDate);
+
+		}
+		Pager pager = new Pager();
+		pager.setAllowed(paging);
+		pager.setPageSize(pageSize);
+		pager.setPage(page);
+		ListResult<Sample> sampleResults = laboratoryService.getSamples(start,end,pager,null);
+		return sampleResults.toMap();
+		/*List<Sample> samples;
 		
 		if (startDate != null && endDate != null) {
 			
@@ -198,7 +219,7 @@ public class LaboratoryController {
 			responseSamplesObject.add(sampleObject);
 		}
 		
-		return responseSamplesObject;
+		return responseSamplesObject;*/
 	}
 	
 	@RequestMapping(value = "sampleaccept", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)

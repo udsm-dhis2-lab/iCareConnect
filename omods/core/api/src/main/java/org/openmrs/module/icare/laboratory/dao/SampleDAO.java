@@ -5,6 +5,8 @@ package org.openmrs.module.icare.laboratory.dao;
 import org.hibernate.Query;
 import org.openmrs.Visit;
 import org.openmrs.api.db.hibernate.DbSession;
+import org.openmrs.module.icare.core.ListResult;
+import org.openmrs.module.icare.core.Pager;
 import org.openmrs.module.icare.core.dao.BaseDAO;
 import org.openmrs.module.icare.laboratory.models.Sample;
 import org.springframework.stereotype.Repository;
@@ -58,5 +60,37 @@ public class SampleDAO extends BaseDAO<Sample> {
 		query.setMaxResults(limit);
 		
 		return query.list();
+	}
+
+	public ListResult<Sample> getSamples(Date startDate, Date endDate, Pager pager, String location) {
+
+		DbSession session = this.getSession();
+		String queryStr = "SELECT sp \n" + "FROM Sample sp \n";
+
+		if(startDate != null && endDate != null){
+			if(!queryStr.contains("WHERE")){
+				queryStr += " WHERE ";
+			}
+			queryStr += " cast(sp.dateTime as date) BETWEEN :startDate AND :endDate \n"
+					+ "OR cast(sp.dateCreated as date) BETWEEN :startDate AND :endDate";
+		}
+
+		Query query = session.createQuery(queryStr);
+		if(startDate != null && endDate != null){
+			query.setParameter("startDate", startDate);
+			query.setParameter("endDate", endDate);
+		}
+		if(pager.isAllowed()){
+			pager.setPageCount(query.list().size());
+			query.setFirstResult((pager.getPage()-1) * pager.getPageSize());
+			query.setMaxResults(pager.getPageSize());
+		}
+		ListResult<Sample> listResults = new ListResult();
+
+		listResults.setPager(pager);
+		listResults.setResults(query.list());
+
+		//
+		return listResults;
 	}
 }

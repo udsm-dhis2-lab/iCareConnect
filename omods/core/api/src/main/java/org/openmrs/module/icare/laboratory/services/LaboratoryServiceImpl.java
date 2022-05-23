@@ -6,6 +6,8 @@ import org.openmrs.*;
 import org.openmrs.api.ObsService;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.impl.BaseOpenmrsService;
+import org.openmrs.module.icare.core.ListResult;
+import org.openmrs.module.icare.core.Pager;
 import org.openmrs.module.icare.laboratory.dao.*;
 import org.openmrs.module.icare.laboratory.models.*;
 
@@ -91,7 +93,12 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	public List<Sample> getAllSamples() {
 		return IteratorUtils.toList(this.sampleDAO.findAll().iterator());
 	}
-	
+
+	@Override
+	public ListResult<Sample> getSamples(Date startDate, Date endDate, Pager pager, String location) {
+		return this.sampleDAO.getSamples(startDate, endDate, pager, location);
+	}
+
 	@Override
 	public List<Sample> getSampleByDates(Date startDate, Date endDate) {
 		return this.sampleDAO.getSamplesByDates(startDate, endDate);

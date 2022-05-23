@@ -2,6 +2,8 @@ package org.openmrs.module.icare.laboratory.services;
 
 import org.openmrs.Visit;
 import org.openmrs.api.OpenmrsService;
+import org.openmrs.module.icare.core.ListResult;
+import org.openmrs.module.icare.core.Pager;
 import org.openmrs.module.icare.laboratory.models.*;
 
 import javax.transaction.Transactional;
@@ -17,6 +19,8 @@ public interface LaboratoryService extends OpenmrsService {
 	List<Sample> getSamplesByVisit(String id);
 	
 	List<Sample> getAllSamples();
+
+	ListResult<Sample> getSamples(Date startDate, Date endDate, Pager pager, String location);
 	
 	List<Sample> getSampleByDates(Date startDate, Date endDate);
 	
