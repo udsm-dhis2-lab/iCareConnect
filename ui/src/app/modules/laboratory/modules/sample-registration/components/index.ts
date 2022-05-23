@@ -1,4 +1,5 @@
 import { BatchRegistrationComponent } from "./batch-registration/batch-registration.component";
+import { ClinicalDataComponent } from "./clinical-data/clinical-data.component";
 import { LbOptionSelectorComponent } from "./lb-option-selector/lb-option-selector.component";
 import { PersonDetailsComponent } from "./person-details/person-details.component";
 import { RegisterSampleComponent } from "./register-sample/register-sample.component";
@@ -12,4 +13,5 @@ export const sampleRegistrationComponents: any[] = [
   SampleLabelComponent,
   LbOptionSelectorComponent,
   PersonDetailsComponent,
+  ClinicalDataComponent,
 ];

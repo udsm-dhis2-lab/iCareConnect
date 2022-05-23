@@ -29,6 +29,7 @@ export class SingleRegistrationComponent implements OnInit {
   departmentField: any = {};
   testsFormField: any = {};
   agencyFormField: any = {};
+  labFormField: any = {};
   formData: any = {};
   testsUnderDepartment$: Observable<any[]>;
 
@@ -74,7 +75,7 @@ export class SingleRegistrationComponent implements OnInit {
     this.agencyFormField = new Dropdown({
       id: "agency",
       key: "agency",
-      label: "Agency",
+      label: "Agency/Priority",
       options: this.agencyConceptConfigs?.setMembers.map((member) => {
         return {
           key: member?.uuid,
@@ -83,7 +84,27 @@ export class SingleRegistrationComponent implements OnInit {
           name: member?.display,
         };
       }),
-      conceptClass: "Agency",
+      shouldHaveLiveSearchForDropDownFields: false,
+    });
+
+    const currentLocation = JSON.parse(localStorage.getItem("currentLocation"));
+    const labsAvailable =
+      currentLocation && currentLocation?.childLocations
+        ? currentLocation?.childLocations
+        : [];
+
+    this.labFormField = new Dropdown({
+      id: "lab",
+      key: "lab",
+      label: "Receiving Lab",
+      options: labsAvailable.map((location) => {
+        return {
+          key: location?.uuid,
+          value: location?.display,
+          label: location?.display,
+          name: location?.display,
+        };
+      }),
       shouldHaveLiveSearchForDropDownFields: false,
     });
   }
@@ -105,6 +126,10 @@ export class SingleRegistrationComponent implements OnInit {
     console.log(formValues.getValues());
   }
 
+  onFormUpdateForLab(formValues: FormValue): void {
+    console.log(formValues.getValues());
+  }
+
   onGetSampleLabel(sampleLabel: string): void {
     this.currentSampleLabel = sampleLabel;
   }
@@ -115,6 +140,10 @@ export class SingleRegistrationComponent implements OnInit {
 
   onGetPersonDetails(personDetails: any): void {
     this.personDetailsData = personDetails;
+  }
+
+  onGetClinicalDataValues(clinicalData): void {
+    console.log(clinicalData);
   }
 
   onSave(event: Event): void {
