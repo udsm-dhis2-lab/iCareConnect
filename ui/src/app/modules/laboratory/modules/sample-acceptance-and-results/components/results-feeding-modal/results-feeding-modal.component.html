@@ -1371,11 +1371,12 @@
               ></i>
             </a>
             <div *ngIf="showClinicalNotesSummary" class="clinical-summary">
-              <app-clinical-notes-summary
+              <app-lab-clinical-notes-summary
+                [visitUuid]="params?.currentSample?.visit?.uuid"
                 [patientUuid]="params?.currentSample?.patient?.uuid"
                 [labConfigs]="labConfigs"
               >
-              </app-clinical-notes-summary>
+              </app-lab-clinical-notes-summary>
             </div>
           </div>
         </div>
@@ -2124,11 +2125,12 @@
             ></i>
           </a>
           <div *ngIf="showClinicalNotesSummary" class="clinical-summary">
-            <app-clinical-notes-summary
+            <app-lab-clinical-notes-summary
+              [visitUuid]="params?.currentSample?.visit?.uuid"
               [patientUuid]="params?.currentSample?.patient?.uuid"
               [labConfigs]="labConfigs"
             >
-            </app-clinical-notes-summary>
+            </app-lab-clinical-notes-summary>
           </div>
         </div>
       </mat-tab>
