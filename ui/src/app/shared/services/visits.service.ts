@@ -1,13 +1,13 @@
-import { Injectable } from '@angular/core';
+import { Injectable } from "@angular/core";
 
-import * as _ from 'lodash';
-import { HttpClient } from '@angular/common/http';
-import { forkJoin, from, Observable, zip } from 'rxjs';
-import { BASE_URL } from '../constants/constants.constants';
-import { concatMap, map, mergeMap } from 'rxjs/operators';
+import * as _ from "lodash";
+import { HttpClient } from "@angular/common/http";
+import { forkJoin, from, Observable, of, zip } from "rxjs";
+import { BASE_URL } from "../constants/constants.constants";
+import { catchError, concatMap, map, mergeMap } from "rxjs/operators";
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: "root",
 })
 export class VisitsService {
   constructor(private httpClient: HttpClient) {}
@@ -18,9 +18,9 @@ export class VisitsService {
         return from(
           this.httpClient.get(
             BASE_URL +
-              'visit/' +
+              "visit/" +
               uuid +
-              '?v=custom:(uuid,startDatetime,display,patient,encounters:(uuid,location:(uuid,display),encounterType,display,patient,visit,encounterProviders,encounterDatetime,voided,obs,orders:(uuid,display,orderer,dateActivated,orderNumber,concept:(uuid,display,conceptClass,datatype,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,numeric,descriptions,allowDecimal,displayPrecision,answers,setMembers:(uuid,display),answers:(uuid,display)),display)),voided,attributes,visitType)'
+              "?v=custom:(uuid,startDatetime,display,patient,encounters:(uuid,location:(uuid,display),encounterType,display,patient,visit,encounterProviders,encounterDatetime,voided,obs,orders:(uuid,display,orderer,dateActivated,orderNumber,concept:(uuid,display,conceptClass,datatype,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,numeric,descriptions,allowDecimal,displayPrecision,answers,setMembers:(uuid,display),answers:(uuid,display)),display)),voided,attributes,visitType)"
           )
         );
       })
@@ -30,9 +30,9 @@ export class VisitsService {
       mergeMap((uuid) =>
         this.httpClient.get(
           BASE_URL +
-            'visit/' +
+            "visit/" +
             uuid +
-            '?v=custom:(uuid,startDatetime,display,patient,encounters:(uuid,location:(uuid,display),encounterType,display,patient,visit,encounterProviders,encounterDatetime,voided,obs,orders:(uuid,display,orderer,dateActivated,orderNumber,concept:(uuid,display,conceptClass,datatype,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,numeric,descriptions,allowDecimal,displayPrecision,answers,setMembers:(uuid,display),answers:(uuid,display)),display)),voided,attributes,visitType)'
+            "?v=custom:(uuid,startDatetime,display,patient,encounters:(uuid,location:(uuid,display),encounterType,display,patient,visit,encounterProviders,encounterDatetime,voided,obs,orders:(uuid,display,orderer,dateActivated,orderNumber,concept:(uuid,display,conceptClass,datatype,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,numeric,descriptions,allowDecimal,displayPrecision,answers,setMembers:(uuid,display),answers:(uuid,display)),display)),voided,attributes,visitType)"
         )
       )
     );
@@ -49,44 +49,44 @@ export class VisitsService {
     // console.log(new Date(endDate))
     return this.httpClient.get(
       BASE_URL +
-        'bahmnicore/sql?q=laboratory.sqlGet.patientsWithLabOrdersByCollectionStatus&visitStartDate=' +
+        "bahmnicore/sql?q=laboratory.sqlGet.patientsWithLabOrdersByCollectionStatus&visitStartDate=" +
         startDate +
-        '&visitEndDate=' +
+        "&visitEndDate=" +
         endDate +
-        'T23:59:59'
+        "T23:59:59"
     );
   }
 
   getLabOrdersDetailsByVisitsDates(startDate, endDate): Observable<any> {
     return this.httpClient.get(
       BASE_URL +
-        'bahmnicore/sql?q=laboratory.sqlGet.labOrdersDetailsByVisitsDates&visitStartDate=' +
+        "bahmnicore/sql?q=laboratory.sqlGet.labOrdersDetailsByVisitsDates&visitStartDate=" +
         startDate +
-        '&visitEndDate=' +
+        "&visitEndDate=" +
         endDate +
-        'T23:59:59'
+        "T23:59:59"
     );
   }
 
   getLabOrdersPaymentDetails(startDate, endDate): Observable<any> {
     return this.httpClient.get(
       BASE_URL +
-        'bahmnicore/sql?q=laboratory.sqlGet.labOrdersPaymentDetails&visitStartDate=' +
+        "bahmnicore/sql?q=laboratory.sqlGet.labOrdersPaymentDetails&visitStartDate=" +
         startDate +
-        '&visitEndDate=' +
+        "&visitEndDate=" +
         endDate +
-        'T23:59:59'
+        "T23:59:59"
     );
   }
 
   getPatientsEncounteredForLabService(startDate, endDate): Observable<any> {
     return this.httpClient.get(
       BASE_URL +
-        'bahmnicore/sql?q=laboratory.sqlGet.patientsEncounteredForLabServices&visitStartDate=' +
+        "bahmnicore/sql?q=laboratory.sqlGet.patientsEncounteredForLabServices&visitStartDate=" +
         startDate +
-        '&visitEndDate=' +
+        "&visitEndDate=" +
         endDate +
-        'T23:59:59'
+        "T23:59:59"
     );
   }
 
@@ -94,49 +94,49 @@ export class VisitsService {
     return forkJoin(
       this.httpClient.get(
         BASE_URL +
-          'bahmnicore/sql?q=laboratory.sqlGet.patientsEncounteredForLabServices&visitStartDate=' +
+          "bahmnicore/sql?q=laboratory.sqlGet.patientsEncounteredForLabServices&visitStartDate=" +
           startDate +
-          '&visitEndDate=' +
+          "&visitEndDate=" +
           endDate +
-          'T23:59:59'
+          "T23:59:59"
       ),
       this.httpClient.get(
         BASE_URL +
-          'bahmnicore/sql?q=laboratory.sqlGet.labOrdersPaymentDetails&visitStartDate=' +
+          "bahmnicore/sql?q=laboratory.sqlGet.labOrdersPaymentDetails&visitStartDate=" +
           startDate +
-          '&visitEndDate=' +
+          "&visitEndDate=" +
           endDate +
-          'T23:59:59'
+          "T23:59:59"
       ),
       this.httpClient.get(
         BASE_URL +
-          'bahmnicore/sql?q=laboratory.sqlGet.labOrdersDetailsByVisitsDates&visitStartDate=' +
+          "bahmnicore/sql?q=laboratory.sqlGet.labOrdersDetailsByVisitsDates&visitStartDate=" +
           startDate +
-          '&visitEndDate=' +
+          "&visitEndDate=" +
           endDate +
-          'T23:59:59'
+          "T23:59:59"
       ),
       this.httpClient.get(
         BASE_URL +
-          'bahmnicore/sql?q=laboratory.sqlGet.labOrdersSampleDetailsByVisitsDates&visitStartDate=' +
+          "bahmnicore/sql?q=laboratory.sqlGet.labOrdersSampleDetailsByVisitsDates&visitStartDate=" +
           startDate +
-          '&visitEndDate=' +
+          "&visitEndDate=" +
           endDate +
-          'T23:59:59'
+          "T23:59:59"
       )
     );
   }
 
   getEmppty(): Observable<any> {
-    return from(['empty']);
+    return from(["empty"]);
   }
 
   saveObservation(data): Observable<any> {
-    return this.httpClient.post(BASE_URL + 'obs', data);
+    return this.httpClient.post(BASE_URL + "obs", data);
   }
 
   updateObservation(data): Observable<any> {
-    return this.httpClient.post(BASE_URL + 'obs/' + data['uuid'], data);
+    return this.httpClient.post(BASE_URL + "obs/" + data["uuid"], data);
   }
 
   getPatientsVisitsNotes(patientUuid, conceptUuid) {
@@ -151,21 +151,21 @@ export class VisitsService {
     return forkJoin(
       this.httpClient.get(
         BASE_URL +
-          'concept/' +
-          configs['testContainers'] +
-          '?v=custom:(uuid,display,setMembers:(uuid,display,setMembers:(uuid,display)))'
+          "concept/" +
+          configs["testContainers"] +
+          "?v=custom:(uuid,display,setMembers:(uuid,display,setMembers:(uuid,display)))"
       ),
       this.httpClient.get(
         BASE_URL +
-          'concept/' +
-          configs['sampleRejectionReasonsCoded'] +
-          '?v=custom:(uuid,display,answers:(uuid,display))'
+          "concept/" +
+          configs["sampleRejectionReasonsCoded"] +
+          "?v=custom:(uuid,display,answers:(uuid,display))"
       ),
       this.httpClient.get(
         BASE_URL +
-          'concept/' +
-          configs['labDepartments'] +
-          '?v=custom:(uuid,display,setMembers:(uuid,display,setMembers:(uuid,display)))'
+          "concept/" +
+          configs["labDepartments"] +
+          "?v=custom:(uuid,display,setMembers:(uuid,display,setMembers:(uuid,display)))"
       )
     );
   }
@@ -179,30 +179,33 @@ export class VisitsService {
     return forkJoin(
       this.httpClient.get(
         BASE_URL +
-          'bahmnicore/sql?q=laboratory.sqlGet.patient_lab_orders_by_visit_start_date&visitStartDate=' +
+          "bahmnicore/sql?q=laboratory.sqlGet.patient_lab_orders_by_visit_start_date&visitStartDate=" +
           visitStartDate +
-          '&visitEndDate=' +
+          "&visitEndDate=" +
           endDate +
-          'T23:59:59'
+          "T23:59:59"
       ),
       this.httpClient.get(
         BASE_URL +
-          'concept/' +
-          configs['testContainers'] +
-          '?v=custom:(uuid,display,setMembers:(uuid,display,setMembers:(uuid,display)))'
+          "concept/" +
+          configs["testContainers"] +
+          "?v=custom:(uuid,display,setMembers:(uuid,display,setMembers:(uuid,display)))"
       ),
-      this.httpClient.get(BASE_URL + 'lab/samples'),
-      this.httpClient.get(
-        BASE_URL +
-          'concept/' +
-          configs['sampleRejectionReasonsCoded'] +
-          '?v=custom:(uuid,display,answers:(uuid,display))'
+      this.httpClient.get(BASE_URL + "lab/samples").pipe(
+        map((response: any) => response?.results),
+        catchError((error) => of(error))
       ),
       this.httpClient.get(
         BASE_URL +
-          'concept/' +
-          configs['labDepartments'] +
-          '?v=custom:(uuid,display,setMembers:(uuid,display,setMembers:(uuid,display)))'
+          "concept/" +
+          configs["sampleRejectionReasonsCoded"] +
+          "?v=custom:(uuid,display,answers:(uuid,display))"
+      ),
+      this.httpClient.get(
+        BASE_URL +
+          "concept/" +
+          configs["labDepartments"] +
+          "?v=custom:(uuid,display,setMembers:(uuid,display,setMembers:(uuid,display)))"
       )
     );
   }
@@ -216,32 +219,35 @@ export class VisitsService {
     return forkJoin(
       this.httpClient.get(
         BASE_URL +
-          'bahmnicore/sql?q=laboratory.sqlGet.patient_lab_orders_by_visit_start_date&visitStartDate=' +
+          "bahmnicore/sql?q=laboratory.sqlGet.patient_lab_orders_by_visit_start_date&visitStartDate=" +
           visitStartDate +
-          '&visitEndDate=' +
+          "&visitEndDate=" +
           endDate +
-          'T23:59:59'
+          "T23:59:59"
       ),
       this.httpClient.get(
         BASE_URL +
-          'bahmnicore/sql?q=laboratory.sqlGet.patients_with_lab_orders&visitStartDate=' +
+          "bahmnicore/sql?q=laboratory.sqlGet.patients_with_lab_orders&visitStartDate=" +
           visitStartDate +
-          '&visitEndDate=' +
+          "&visitEndDate=" +
           endDate +
-          'T23:59:59'
+          "T23:59:59"
       ),
-      this.httpClient.get(BASE_URL + 'lab/samples')
+      this.httpClient.get(BASE_URL + "lab/samples").pipe(
+        map((response: any) => response?.results),
+        catchError((error) => of(error))
+      )
     );
   }
 
   getPatientOrdersByPatientId(startDate, endDate, patientId): Observable<any> {
     return this.httpClient.get(
       BASE_URL +
-        'bahmnicore/sql?q=laboratory.sqlGet.patientLabOrders&startDate=' +
+        "bahmnicore/sql?q=laboratory.sqlGet.patientLabOrders&startDate=" +
         startDate +
-        '&endDate=' +
+        "&endDate=" +
         endDate +
-        'T23:59:59&patientId=' +
+        "T23:59:59&patientId=" +
         patientId
     );
   }
@@ -250,18 +256,18 @@ export class VisitsService {
 export function formatDateToYYMMDD(dateValue) {
   return (
     dateValue.getFullYear() +
-    '-' +
-    formatMonthOrDate(dateValue.getMonth() + 1, 'm') +
-    '-' +
-    formatMonthOrDate(dateValue.getDate(), 'd')
+    "-" +
+    formatMonthOrDate(dateValue.getMonth() + 1, "m") +
+    "-" +
+    formatMonthOrDate(dateValue.getDate(), "d")
   );
 }
 
 function formatMonthOrDate(value, type) {
-  if (type == 'm' && value.toString().length == 1) {
-    return '0' + value;
-  } else if (type == 'd' && value.toString().length == 1) {
-    return '0' + value;
+  if (type == "m" && value.toString().length == 1) {
+    return "0" + value;
+  } else if (type == "d" && value.toString().length == 1) {
+    return "0" + value;
   } else {
     return value;
   }

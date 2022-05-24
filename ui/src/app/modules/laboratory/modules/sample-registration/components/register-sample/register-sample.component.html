@@ -72,12 +72,23 @@
             <th style="width: 20px">SN</th>
             <th>Sample ID</th>
             <th>Date</th>
+            <th>Registra</th>
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let sample of params?.labSamples; let count = index">
+          <tr
+            *ngFor="
+              let sample of params?.labSamples?.results;
+              let count = index
+            "
+          >
             <td>
-              {{ count + 1 }}
+              {{
+                count +
+                  1 +
+                  (params?.labSamples?.pager?.page - 1) *
+                    params?.labSamples?.pager?.pageSize
+              }}
             </td>
             <td>
               {{ sample?.label }}
@@ -85,13 +96,36 @@
             <td>
               {{ sample?.created | date }}
             </td>
+            <td>
+              {{ sample?.creator?.display }}
+            </td>
           </tr>
         </tbody>
       </table>
+
       <mat-progress-bar
         *ngIf="!params?.labSamples"
         mode="indeterminate"
       ></mat-progress-bar>
+      <div class="w-100 mt-2 d-flex justify-content-end mb-2">
+        <button
+          [disabled]="
+            params?.labSamples?.pager?.page === 1 || !params?.labSamples
+          "
+          mat-stroked-button
+          (click)="getSamples($event, 'prev', params?.labSamples?.pager)"
+        >
+          Prev
+        </button>
+        <button
+          [disabled]="!params?.labSamples"
+          mat-stroked-button
+          (click)="getSamples($event, 'next', params?.labSamples?.pager)"
+          class="ml-2"
+        >
+          Next
+        </button>
+      </div>
     </div>
   </div>
 </div>

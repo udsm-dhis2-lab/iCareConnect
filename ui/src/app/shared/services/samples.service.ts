@@ -14,13 +14,18 @@ export class SamplesService {
   constructor(private httpClient: HttpClient) {}
 
   getLabSamplesByCollectionDates(dates): Observable<any> {
-    return this.httpClient.get(
-      BASE_URL +
-        "lab/samples?startDate=" +
-        dates?.startDate +
-        "&endDate=" +
-        dates?.endDate
-    );
+    return this.httpClient
+      .get(
+        BASE_URL +
+          "lab/samples?startDate=" +
+          dates?.startDate +
+          "&endDate=" +
+          dates?.endDate
+      )
+      .pipe(
+        map((response: any) => response?.results || []),
+        catchError((error) => of(error))
+      );
   }
 
   getSampleLabel(): Observable<string> {
@@ -33,7 +38,7 @@ export class SamplesService {
   }
 
   createLabSample(sample: any): Observable<SampleObject> {
-    return this.httpClient.post("lab/sample", sample).pipe(
+    return this.httpClient.post(BASE_URL + "lab/sample", sample).pipe(
       map((response) => {
         return response;
       }),
@@ -49,17 +54,35 @@ export class SamplesService {
   }
 
   getSampleByVisit(visit) {
-    return this.httpClient.get(BASE_URL + `lab/sample?visit=${visit}`);
+    return this.httpClient.get(BASE_URL + `lab/sample?visit=${visit}`).pipe(
+      map((response: any) => response?.results),
+      catchError((error) => of(error))
+    );
   }
 
   collectSample(data): Observable<any> {
     return this.httpClient.post(BASE_URL + "lab/sample", data);
   }
 
-  getCollectedSamples(): Observable<any> {
-    return this.httpClient.get(
-      BASE_URL + "lab/samples?startDate=2022-05-05&endDate=2022-05-10"
-    );
+  getCollectedSamplesByPaginationDetails(
+    paginationParameters: { page: number; pageSize: number },
+    dates?: { startDate: string; endDate: string }
+  ): Observable<{ pager: any; results: any[] }> {
+    return this.httpClient
+      .get(
+        BASE_URL +
+          `lab/samples?page=${paginationParameters?.page}&pageSize=${
+            paginationParameters?.pageSize
+          }${
+            dates
+              ? "&startDate=" + dates?.startDate + "&endDate=" + dates?.endDate
+              : ""
+          }`
+      )
+      .pipe(
+        map((response: any) => response),
+        catchError((error) => of(error))
+      );
   }
 
   setSampleStatus(data): Observable<any> {
