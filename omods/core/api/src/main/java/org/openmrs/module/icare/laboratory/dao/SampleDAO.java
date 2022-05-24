@@ -62,7 +62,7 @@ public class SampleDAO extends BaseDAO<Sample> {
 		return query.list();
 	}
 
-	public ListResult<Sample> getSamples(Date startDate, Date endDate, Pager pager, String location) {
+	public ListResult<Sample> getSamples(Date startDate, Date endDate, Pager pager, String locationUuid) {
 
 		DbSession session = this.getSession();
 		String queryStr = "SELECT sp \n" + "FROM Sample sp \n";
@@ -75,13 +75,24 @@ public class SampleDAO extends BaseDAO<Sample> {
 					+ "OR cast(sp.dateCreated as date) BETWEEN :startDate AND :endDate";
 		}
 
+		if(locationUuid != null){
+			if(!queryStr.contains("WHERE")){
+				queryStr += " WHERE ";
+			}
+			queryStr += " sp.visit.location = (SELECT l FROM Location l WHERE l.uuid = :locationUuid)";
+		}
+		queryStr += " ORDER BY sp.dateCreated ";
 		Query query = session.createQuery(queryStr);
 		if(startDate != null && endDate != null){
 			query.setParameter("startDate", startDate);
 			query.setParameter("endDate", endDate);
 		}
+		if(locationUuid != null){
+			query.setParameter("locationUuid", locationUuid);
+		}
 		if(pager.isAllowed()){
-			pager.setPageCount(query.list().size());
+			pager.setTotal(query.list().size());
+			//pager.setPageCount(pager.getT);
 			query.setFirstResult((pager.getPage()-1) * pager.getPageSize());
 			query.setMaxResults(pager.getPageSize());
 		}
