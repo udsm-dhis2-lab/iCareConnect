@@ -4,7 +4,7 @@ import { OpenmrsHttpClientService } from "src/app/shared/modules/openmrs-http-cl
 import { ICARE_CONFIG } from "src/app/shared/resources/config";
 import { Api } from "src/app/shared/resources/openmrs";
 import { head } from "lodash";
-import { of } from "rxjs";
+import { Observable, of } from "rxjs";
 
 @Injectable({
   providedIn: "root",
@@ -17,9 +17,13 @@ export class RegistrationService {
     return this.httpClient.post(url, personPayload);
   }
 
-  createPatient(patientPayload) {
+  createPatient(patientPayload: any, patientUuid?: string): Observable<any> {
     let url = "patient";
-    return this.httpClient.post(url, patientPayload).pipe(
+    return (
+      !patientUuid
+        ? this.httpClient.post(url, patientPayload)
+        : this.updatePatient(patientPayload, patientUuid)
+    ).pipe(
       map((response) => {
         return response;
       }),
@@ -29,8 +33,10 @@ export class RegistrationService {
 
   updatePatient(patientPayload, uuid) {
     let url = `patient/${uuid}?v=full`;
-
-    return this.httpClient.post(url, patientPayload);
+    return this.httpClient.post(url, patientPayload).pipe(
+      map((response) => response),
+      catchError((error) => of(error))
+    );
   }
 
   getPatientIdentifierTypes() {

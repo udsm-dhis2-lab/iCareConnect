@@ -4,7 +4,8 @@
       sampleTypes: sampleTypes$ | async,
       specimenSources: specimenSources$ | async,
       privileges: privileges$ | async,
-      userRoles: userRoles$ | async
+      userRoles: userRoles$ | async,
+      LISConfigurations: LISConfigurations$ | async
     } as params"
   >
     <div
@@ -13,7 +14,8 @@
         params?.sampleTypes?.length == 0 ||
         !params?.privileges ||
         !params?.userRoles ||
-        (params?.userRoles && params?.userRoles.length == 0)
+        (params?.userRoles && params?.userRoles.length == 0) ||
+        !params?.LISConfigurations
       "
     >
       <div class="col-12 text-center mt-5 mb-2">
@@ -30,15 +32,18 @@
         params?.sampleTypes?.length > 0 &&
         params?.privileges &&
         params?.userRoles &&
-        params?.userRoles.length > 0
+        params?.userRoles.length > 0 &&
+        params?.LISConfigurations
       "
     >
-      <div class="laboratory-header col-12">
+      <div class="laboratory-header col-12 mat-elevation-z1">
         <mat-chip-list class="w-100" cdkDropListOrientation="horizontal">
           <mat-chip
             class="w-20"
             *ngIf="
-              params?.privileges && params?.privileges['Laboratory Orders']
+              params?.privileges &&
+              params?.privileges['Laboratory Orders'] &&
+              params?.LISConfigurations?.isLIS
             "
             (click)="changeRoute($event, 'sample-registration', false)"
             routerLinkActive="active-route"
@@ -51,7 +56,9 @@
           <mat-chip
             class="w-20"
             *ngIf="
-              params?.privileges && params?.privileges['Laboratory Orders']
+              params?.privileges &&
+              params?.privileges['Laboratory Orders'] &&
+              !params?.LISConfigurations?.isLIS
             "
             (click)="changeRoute($event, 'lab-investigation-home', true)"
             routerLinkActive="active-route"
@@ -64,7 +71,9 @@
           <mat-chip
             class="w-20"
             *ngIf="
-              params?.privileges && params?.privileges['Sample Collection']
+              params?.privileges &&
+              params?.privileges['Sample Collection'] &&
+              !params?.LISConfigurations?.isLIS
             "
             (click)="changeRoute($event, 'sample-collection', true)"
             routerLinkActive="active-route"

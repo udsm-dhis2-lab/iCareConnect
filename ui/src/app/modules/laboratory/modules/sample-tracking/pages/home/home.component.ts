@@ -36,9 +36,7 @@ export class HomeComponent implements OnInit {
   codedSampleRejectionReasons$: Observable<any>;
 
   LISConfigurations$: Observable<LISConfigurationsModel>;
-  constructor(private store: Store<AppState>) {
-    this.store.dispatch(loadLISConfigurations());
-  }
+  constructor(private store: Store<AppState>) {}
 
   ngOnInit(): void {
     this.datesParameters$ = this.store.select(getVisitsParameters);
