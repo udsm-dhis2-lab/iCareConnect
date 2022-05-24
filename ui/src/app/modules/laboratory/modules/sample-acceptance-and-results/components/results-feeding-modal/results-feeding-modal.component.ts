@@ -1,34 +1,35 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, OnInit } from "@angular/core";
 import {
   MatDialog,
   MatDialogRef,
   MAT_DIALOG_DATA,
-} from '@angular/material/dialog';
-import { Store } from '@ngrx/store';
-import { forkJoin, Observable, zip } from 'rxjs';
-import * as _ from 'lodash';
-import { take } from 'rxjs/operators';
-import { RejectAnswerModalComponent } from '../reject-answer-modal/reject-answer-modal.component';
-import { AppState } from 'src/app/store/reducers';
-import { getProviderDetails } from 'src/app/store/selectors/current-user.selectors';
-import { SamplesService } from 'src/app/shared/services/samples.service';
+} from "@angular/material/dialog";
+import { Store } from "@ngrx/store";
+import { forkJoin, Observable, zip } from "rxjs";
+import * as _ from "lodash";
+import { take } from "rxjs/operators";
+import { RejectAnswerModalComponent } from "../reject-answer-modal/reject-answer-modal.component";
+import { AppState } from "src/app/store/reducers";
+import { getProviderDetails } from "src/app/store/selectors/current-user.selectors";
+import { SamplesService } from "src/app/shared/services/samples.service";
 import {
   loadPatientNotes,
   saveLabTestResults,
   saveLabTestResultsStatus,
-} from 'src/app/store/actions';
+} from "src/app/store/actions";
 import {
   getFormattedLabSampleBySampleIdentifier,
   getFormattedLabSampleOrdersBySampleIdentifier,
   getSavingLabTestResultsState,
   getSavingLabTestResultsStatusState,
-} from 'src/app/store/selectors';
-import { DataService } from 'src/app/shared/services/data.service';
+} from "src/app/store/selectors";
+import { DataService } from "src/app/shared/services/data.service";
+import { LISConfigurationsModel } from "src/app/modules/laboratory/resources/models/lis-configurations.model";
 
 @Component({
-  selector: 'app-results-feeding-modal',
-  templateUrl: './results-feeding-modal.component.html',
-  styleUrls: ['./results-feeding-modal.component.scss'],
+  selector: "app-results-feeding-modal",
+  templateUrl: "./results-feeding-modal.component.html",
+  styleUrls: ["./results-feeding-modal.component.scss"],
 })
 export class ResultsFeedingModalComponent implements OnInit {
   testOrders$: Observable<any>;
@@ -60,6 +61,7 @@ export class ResultsFeedingModalComponent implements OnInit {
   testTimeSettings: any;
 
   attach: any = {};
+  LISConfigurations: LISConfigurationsModel;
 
   constructor(
     private dialog: MatDialog,
@@ -73,10 +75,11 @@ export class ResultsFeedingModalComponent implements OnInit {
     this.labConfigs = data?.labConfigs;
     this.maxHeight = data?.maxHeight;
     this.userUuid = data?.currentUser?.uuid;
+    this.LISConfigurations = data?.LISConfigurations;
     this.store.dispatch(
       loadPatientNotes({
         patientUuid: this.sample?.patient?.uuid,
-        conceptUuid: this.labConfigs['patientHistoryConceptUuid'],
+        conceptUuid: this.labConfigs["patientHistoryConceptUuid"],
       })
     );
   }
@@ -181,10 +184,10 @@ export class ResultsFeedingModalComponent implements OnInit {
   }
 
   setCommentValue(val, item) {
-    this.values[item?.order?.concept?.uuid + '-comment'] = val;
+    this.values[item?.order?.concept?.uuid + "-comment"] = val;
   }
   setCommentValueForParameters(val, item) {
-    this.values[item?.uuid + '-comment'] = val;
+    this.values[item?.uuid + "-comment"] = val;
   }
 
   showClinicalNotes(e) {
@@ -221,7 +224,7 @@ export class ResultsFeedingModalComponent implements OnInit {
     ]
       ? !this.notInRangeIsSet[item?.order?.concept?.uuid]
       : true;
-    this.values[item?.order?.concept?.uuid + '-abnormal'] =
+    this.values[item?.order?.concept?.uuid + "-abnormal"] =
       this.notInRangeIsSet[item?.order?.concept?.uuid];
   }
 
@@ -230,12 +233,12 @@ export class ResultsFeedingModalComponent implements OnInit {
     this.notInRangeIsSet[item?.uuid] = this.notInRangeIsSet[item?.uuid]
       ? !this.notInRangeIsSet[item?.uuid]
       : true;
-    this.values[item?.uuid + '-abnormal'] = this.notInRangeIsSet[item?.uuid];
+    this.values[item?.uuid + "-abnormal"] = this.notInRangeIsSet[item?.uuid];
   }
 
   getTimeConfigs(uuid) {
     let configs = _.filter(this.testTimeSettings, (setting) => {
-      return setting.length > 0 && setting[0]['concept']['uuid'] == uuid
+      return setting.length > 0 && setting[0]["concept"]["uuid"] == uuid
         ? true
         : false;
     });
@@ -269,8 +272,8 @@ export class ResultsFeedingModalComponent implements OnInit {
               uuid: this.values[item?.order?.concept?.uuid],
             }
           : null,
-      abnormal: this.values[item?.order?.concept?.uuid + '-abnormal']
-        ? this.values[item?.order?.concept?.uuid + '-abnormal']
+      abnormal: this.values[item?.order?.concept?.uuid + "-abnormal"]
+        ? this.values[item?.order?.concept?.uuid + "-abnormal"]
         : false,
       additionalReqTimeLimit: this.getTimeConfigs(item?.order?.concept?.uuid)
         ?.additionalReqTimeLimit,
@@ -284,12 +287,12 @@ export class ResultsFeedingModalComponent implements OnInit {
     // );
 
     const resultsComments = {
-      status: this.values[item?.order?.concept?.uuid + '-comment']
-        ? 'ANSWER DESCRIPTION'
-        : 'COMMENT',
-      remarks: this.values[item?.order?.concept?.uuid + '-comment']
-        ? this.values[item?.order?.concept?.uuid + '-comment']
-        : 'NO DESCRPTION',
+      status: this.values[item?.order?.concept?.uuid + "-comment"]
+        ? "ANSWER DESCRIPTION"
+        : "COMMENT",
+      remarks: this.values[item?.order?.concept?.uuid + "-comment"]
+        ? this.values[item?.order?.concept?.uuid + "-comment"]
+        : "NO DESCRPTION",
       user: {
         uuid: this.userUuid,
       },
@@ -351,8 +354,8 @@ export class ResultsFeedingModalComponent implements OnInit {
               uuid: this.values[parameter?.uuid],
             }
           : null,
-      abnormal: this.values[parameter?.uuid + '-abnormal']
-        ? this.values[parameter?.uuid + '-abnormal']
+      abnormal: this.values[parameter?.uuid + "-abnormal"]
+        ? this.values[parameter?.uuid + "-abnormal"]
         : false,
       additionalReqTimeLimit: this.getTimeConfigs(item?.order?.concept?.uuid)
         ?.additionalReqTimeLimit,
@@ -361,12 +364,12 @@ export class ResultsFeedingModalComponent implements OnInit {
     };
 
     const resultsComments = {
-      status: this.values[item?.uuid + '-comment']
-        ? 'ANSWER DESCRIPTION'
-        : 'COMMENT',
-      remarks: this.values[item?.uuid + '-comment']
-        ? this.values[item?.uuid + '-comment']
-        : 'NO DESCRPTION FOR PARAMETER',
+      status: this.values[item?.uuid + "-comment"]
+        ? "ANSWER DESCRIPTION"
+        : "COMMENT",
+      remarks: this.values[item?.uuid + "-comment"]
+        ? this.values[item?.uuid + "-comment"]
+        : "NO DESCRPTION FOR PARAMETER",
       user: {
         uuid: this.userUuid,
       },
@@ -435,18 +438,18 @@ export class ResultsFeedingModalComponent implements OnInit {
         conceptName: order?.concept?.name,
       };
     });
-    return _.uniqBy(formattedOrders, 'conceptName');
+    return _.uniqBy(formattedOrders, "conceptName");
   }
 
   onSaveSignOff(e, item, signOff, currentSample, allocation) {
     e.stopPropagation();
-    this.savingMessage[item?.concept?.uuid + '-first'] =
-      signOff == 'second' ? false : true;
-    this.savingMessage[item?.order?.concept?.uuid + '-' + signOff] = true;
+    this.savingMessage[item?.concept?.uuid + "-first"] =
+      signOff == "second" ? false : true;
+    this.savingMessage[item?.order?.concept?.uuid + "-" + signOff] = true;
 
     const approvalStatus = {
-      status: 'APPROVED',
-      remarks: signOff == 'first' ? 'APPROVED' : 'SECOND_APPROVAL',
+      status: "APPROVED",
+      remarks: signOff == "first" ? "APPROVED" : "SECOND_APPROVAL",
       user: {
         uuid: this.userUuid,
       },
@@ -469,7 +472,7 @@ export class ResultsFeedingModalComponent implements OnInit {
 
     this.savingLabResultsStatusState$.pipe(take(1)).subscribe((state) => {
       if (state) {
-        this.savingMessage[item?.concept?.uuid + '-' + signOff] = null;
+        this.savingMessage[item?.concept?.uuid + "-" + signOff] = null;
       }
     });
   }
@@ -484,12 +487,12 @@ export class ResultsFeedingModalComponent implements OnInit {
   ) {
     e.stopPropagation();
 
-    this.savingMessage[parameter?.uuid + '-first'] =
-      signOff == 'second' ? false : true;
-    this.savingMessage[parameter?.uuid + '-' + signOff] = true;
+    this.savingMessage[parameter?.uuid + "-first"] =
+      signOff == "second" ? false : true;
+    this.savingMessage[parameter?.uuid + "-" + signOff] = true;
     const approvalStatus = {
-      status: 'APPROVED',
-      remarks: signOff == 'first' ? 'APPROVED' : 'SECOND_APPROVAL',
+      status: "APPROVED",
+      remarks: signOff == "first" ? "APPROVED" : "SECOND_APPROVAL",
       user: {
         uuid: this.userUuid,
       },
@@ -511,7 +514,7 @@ export class ResultsFeedingModalComponent implements OnInit {
     );
     this.savingLabResultsStatusState$.pipe(take(1)).subscribe((state) => {
       if (state) {
-        this.savingMessage[parameter?.uuid + '-' + signOff] = null;
+        this.savingMessage[parameter?.uuid + "-" + signOff] = null;
       }
     });
   }
@@ -521,16 +524,16 @@ export class ResultsFeedingModalComponent implements OnInit {
     this.dialog
       .open(RejectAnswerModalComponent, {
         data: null,
-        width: '50%',
-        height: '220px',
+        width: "50%",
+        height: "220px",
         disableClose: false,
-        panelClass: 'custom-dialog-container',
+        panelClass: "custom-dialog-container",
       })
       .afterClosed()
       .subscribe((feedback) => {
         if (feedback && feedback.length > 1) {
           const rejectStatus = {
-            status: 'REJECTED',
+            status: "REJECTED",
             remarks: feedback,
             user: {
               uuid: this.userUuid,
@@ -555,16 +558,16 @@ export class ResultsFeedingModalComponent implements OnInit {
     this.dialog
       .open(RejectAnswerModalComponent, {
         data: null,
-        width: '50%',
-        height: '220px',
+        width: "50%",
+        height: "220px",
         disableClose: false,
-        panelClass: 'custom-dialog-container',
+        panelClass: "custom-dialog-container",
       })
       .afterClosed()
       .subscribe((feedback) => {
         if (feedback && feedback.length > 1) {
           const rejectStatus = {
-            status: 'REJECTED',
+            status: "REJECTED",
             remarks: feedback,
             user: {
               uuid: this.userUuid,
