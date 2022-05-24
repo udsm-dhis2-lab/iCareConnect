@@ -1,6 +1,6 @@
-import { Injectable } from '@angular/core';
-import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { SamplesService } from '../../resources/services/samples.service';
+import { Injectable } from "@angular/core";
+import { Actions, createEffect, ofType } from "@ngrx/effects";
+import { SamplesService } from "../../resources/services/samples.service";
 import {
   createSample,
   upsertSample,
@@ -17,9 +17,9 @@ import {
   loadSamplesByVisit,
   loadAllLabSamples,
   upsertSamplesToCollect,
-} from '../actions';
-import { switchMap, map, catchError, withLatestFrom } from 'rxjs/operators';
-import { of } from 'rxjs';
+} from "../actions";
+import { switchMap, map, catchError, withLatestFrom } from "rxjs/operators";
+import { of } from "rxjs";
 import {
   addSampleStatusToSample,
   addResultToOrderInTheSample,
@@ -27,21 +27,21 @@ import {
   setContaincerToTestInTheSample,
   addTestAllocationDetailsToSample,
   mergeSampleCreationResponseAndGroupOrders,
-} from '../../resources/helpers';
-import { select, Store } from '@ngrx/store';
-import { AppState } from 'src/app/store/reducers';
-import { getSpecimenSources } from '../selectors/specimen-sources-and-tests-management.selectors';
+} from "../../resources/helpers";
+import { select, Store } from "@ngrx/store";
+import { AppState } from "src/app/store/reducers";
+import { getSpecimenSources } from "../selectors/specimen-sources-and-tests-management.selectors";
 
-import * as _ from 'lodash';
+import * as _ from "lodash";
 import {
   Notification,
   NotificationService,
-} from 'src/app/shared/services/notification.service';
+} from "src/app/shared/services/notification.service";
 import {
   keyDepartmentsByTestOrder,
   keySampleTypesByTestOrder,
-} from 'src/app/shared/helpers/sample-types.helper';
-import { calculateAgeUsingBirthDate } from 'src/app/core/helpers/calculate_age.helper';
+} from "src/app/shared/helpers/sample-types.helper";
+import { calculateAgeUsingBirthDate } from "src/app/core/helpers/calculate_age.helper";
 
 @Injectable()
 export class SamplesEffects {
@@ -58,16 +58,16 @@ export class SamplesEffects {
       switchMap((action) => {
         this.notificationService.show(
           new Notification({
-            message: 'Creating sample with id ' + action?.sample?.id,
-            type: 'LOADING',
+            message: "Creating sample with id " + action?.sample?.id,
+            type: "LOADING",
           })
         );
         return this.sampleService.createSample(action.sample).pipe(
           map((sampleCreateResponse) => {
             this.notificationService.show(
               new Notification({
-                message: 'Successfully created sample',
-                type: 'SUCCESS',
+                message: "Successfully created sample",
+                type: "SUCCESS",
               })
             );
             return upsertSample({
@@ -80,8 +80,8 @@ export class SamplesEffects {
           catchError((error) => {
             this.notificationService.show(
               new Notification({
-                message: 'Failed to create sample',
-                type: 'ERROR',
+                message: "Failed to create sample",
+                type: "ERROR",
               })
             );
             return of(creatingSampleFails({ error }));
@@ -96,14 +96,14 @@ export class SamplesEffects {
       ofType(loadAllLabSamples),
       withLatestFrom(
         this.store.pipe(
-          select(getSpecimenSources, { name: 'Specimen sources' })
+          select(getSpecimenSources, { name: "Specimen sources" })
         )
       ),
       switchMap(([{}, specimenSources]) => {
         this.notificationService.show(
           new Notification({
-            message: 'Loading samples',
-            type: 'LOADING',
+            message: "Loading samples",
+            type: "LOADING",
           })
         );
         return this.sampleService.getAllSamples().pipe(
@@ -131,7 +131,7 @@ export class SamplesEffects {
                     testAllocations: order?.testAllocations,
                   };
                 }),
-                priority: sample.priority ? 'HIGH' : 'None',
+                priority: sample.priority ? "Urgent" : "Routine",
                 allocation: sample?.testsAllocation,
                 status:
                   sample?.statuses && sample?.statuses?.length > 0
@@ -150,11 +150,11 @@ export class SamplesEffects {
             });
 
             function getRejectOrAcceptStatus(statusesInfo) {
-              let status = '';
+              let status = "";
               _.each(statusesInfo, (statusInfo) => {
                 if (
-                  statusInfo?.status.toUpperCase() == 'ACCEPTED' ||
-                  statusInfo?.status.toUpperCase() == 'REJECTED'
+                  statusInfo?.status.toUpperCase() == "ACCEPTED" ||
+                  statusInfo?.status.toUpperCase() == "REJECTED"
                 ) {
                   status = statusInfo?.status.toUpperCase();
                 }
@@ -166,8 +166,8 @@ export class SamplesEffects {
               let user = null;
               _.each(statusesInfo, (statusInfo) => {
                 if (
-                  statusInfo?.status.toUpperCase() == 'ACCEPTED' ||
-                  statusInfo?.status.toUpperCase() == 'REJECTED'
+                  statusInfo?.status.toUpperCase() == "ACCEPTED" ||
+                  statusInfo?.status.toUpperCase() == "REJECTED"
                 ) {
                   user = statusInfo?.user;
                 }
@@ -179,8 +179,8 @@ export class SamplesEffects {
               let comments = null;
               _.each(statusesInfo, (statusInfo) => {
                 if (
-                  statusInfo?.status.toUpperCase() == 'ACCEPTED' ||
-                  statusInfo?.status.toUpperCase() == 'REJECTED'
+                  statusInfo?.status.toUpperCase() == "ACCEPTED" ||
+                  statusInfo?.status.toUpperCase() == "REJECTED"
                 ) {
                   comments = statusInfo?.remarks;
                 }
@@ -189,9 +189,9 @@ export class SamplesEffects {
             }
 
             function getmRN(patient) {
-              let mrNo = '';
+              let mrNo = "";
               _.map(patient?.identifiers, (identifier) => {
-                if (identifier?.name == 'MRN') {
+                if (identifier?.name == "MRN") {
                   mrNo = identifier?.id;
                 }
               });
@@ -203,8 +203,8 @@ export class SamplesEffects {
             }
             this.notificationService.show(
               new Notification({
-                message: 'Successfully loaded samples',
-                type: 'SUCCESS',
+                message: "Successfully loaded samples",
+                type: "SUCCESS",
               })
             );
             return upsertSamples({ samples: formattedSamples });
@@ -221,8 +221,8 @@ export class SamplesEffects {
       switchMap((action) => {
         this.notificationService.show(
           new Notification({
-            message: 'Requesting Sample ID',
-            type: 'LOADING',
+            message: "Requesting Sample ID",
+            type: "LOADING",
           })
         );
         return this.sampleService
@@ -232,8 +232,8 @@ export class SamplesEffects {
               // console.log('SAMPLE IDENTIFIERS :: ', sampleIdentifier);
               this.notificationService.show(
                 new Notification({
-                  message: 'Successfully loaded sample ID',
-                  type: 'SUCCESS',
+                  message: "Successfully loaded sample ID",
+                  type: "SUCCESS",
                 })
               );
               return upsertSampleIdentifierDetails({ sampleIdentifier });
@@ -249,8 +249,8 @@ export class SamplesEffects {
       switchMap((action) => {
         this.notificationService.show(
           new Notification({
-            message: 'Loading orders and samples',
-            type: 'LOADING',
+            message: "Loading orders and samples",
+            type: "LOADING",
           })
         );
         return this.sampleService
@@ -268,7 +268,7 @@ export class SamplesEffects {
               let samplesToCollect = [];
               // TODO: Add a way to handle emergency visit and IPD through configurations
               _.map(allSamples, (sample) => {
-                if (sample.hasOwnProperty('id')) {
+                if (sample.hasOwnProperty("id")) {
                   samples = [...samples, sample];
                 } else {
                   let formattedOrders = [];
@@ -285,7 +285,7 @@ export class SamplesEffects {
                       },
                     ];
                   });
-                  sample['orders'] = formattedOrders;
+                  sample["orders"] = formattedOrders;
                   samplesToCollect = [
                     ...samplesToCollect,
                     {
@@ -315,8 +315,8 @@ export class SamplesEffects {
                 ) || [];
               this.notificationService.show(
                 new Notification({
-                  message: 'Successfully loaded lab orders',
-                  type: 'SUCCESS',
+                  message: "Successfully loaded lab orders",
+                  type: "SUCCESS",
                 })
               );
               return [
@@ -338,8 +338,8 @@ export class SamplesEffects {
         this.notificationService.show(
           new Notification({
             message:
-              'Saving sample ' + action.sampleStatusDetails?.status + ' status',
-            type: 'LOADING',
+              "Saving sample " + action.sampleStatusDetails?.status + " status",
+            type: "LOADING",
           })
         );
         return this.sampleService
@@ -352,8 +352,8 @@ export class SamplesEffects {
               );
               this.notificationService.show(
                 new Notification({
-                  message: 'Successfully saved status',
-                  type: 'SUCCESS',
+                  message: "Successfully saved status",
+                  type: "SUCCESS",
                 })
               );
               return updateSampleOnStore({
@@ -374,8 +374,8 @@ export class SamplesEffects {
       switchMap((action) => {
         this.notificationService.show(
           new Notification({
-            message: 'Saving assign to technician',
-            type: 'LOADING',
+            message: "Saving assign to technician",
+            type: "LOADING",
           })
         );
         return this.sampleService
@@ -388,8 +388,8 @@ export class SamplesEffects {
               );
               this.notificationService.show(
                 new Notification({
-                  message: 'Successfully saved',
-                  type: 'SUCCESS',
+                  message: "Successfully saved",
+                  type: "SUCCESS",
                 })
               );
               return updateSampleOnStore({
@@ -410,8 +410,8 @@ export class SamplesEffects {
       switchMap((action) => {
         this.notificationService.show(
           new Notification({
-            message: 'Saving results',
-            type: 'LOADING',
+            message: "Saving results",
+            type: "LOADING",
           })
         );
         return this.sampleService
@@ -424,8 +424,8 @@ export class SamplesEffects {
               );
               this.notificationService.show(
                 new Notification({
-                  message: 'Successfully saved result',
-                  type: 'SUCCESS',
+                  message: "Successfully saved result",
+                  type: "SUCCESS",
                 })
               );
               return updateSampleOnStore({
@@ -446,8 +446,8 @@ export class SamplesEffects {
       switchMap((action) => {
         this.notificationService.show(
           new Notification({
-            message: 'Saving approval',
-            type: 'LOADING',
+            message: "Saving approval",
+            type: "LOADING",
           })
         );
         return this.sampleService.setSignOffs(action.signOffDetails).pipe(
@@ -460,8 +460,8 @@ export class SamplesEffects {
 
             this.notificationService.show(
               new Notification({
-                message: 'Successfully saved approval',
-                type: 'SUCCESS',
+                message: "Successfully saved approval",
+                type: "SUCCESS",
               })
             );
             return updateSampleOnStore({
@@ -482,8 +482,8 @@ export class SamplesEffects {
       switchMap((action) => {
         this.notificationService.show(
           new Notification({
-            message: 'Saving container allocation',
-            type: 'LOADING',
+            message: "Saving container allocation",
+            type: "LOADING",
           })
         );
         return this.sampleService
@@ -497,8 +497,8 @@ export class SamplesEffects {
               );
               this.notificationService.show(
                 new Notification({
-                  message: 'Successfully saved container allocation',
-                  type: 'SUCCESS',
+                  message: "Successfully saved container allocation",
+                  type: "SUCCESS",
                 })
               );
               return updateSampleOnStore({

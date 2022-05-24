@@ -1,10 +1,10 @@
-import * as _ from 'lodash';
+import * as _ from "lodash";
 
 import {
   getVisitsByEncounterTypeWhereThereAreOrders,
   getPatientsByVisits,
   getEncountersForConsultation,
-} from './visits.helper';
+} from "./visits.helper";
 
 export function formatPatientDetails(patient) {
   return {
@@ -22,14 +22,14 @@ export function formatPatientDetails(patient) {
     middleName: patient?.person?.preferredName?.middleName,
     lastName: patient?.person?.preferredName?.familyName,
     voided: patient.person.preferredName.voided,
-    mrNo: patient.person.display.split(' - ')[0],
+    mrNo: patient.person.display.split(" - ")[0],
     searchingText:
       patient.person?.preferredName?.givenName +
-      '-' +
+      "-" +
       patient?.person?.preferredName?.familyName +
-      '-' +
+      "-" +
       patient?.person?.preferredName?.middleName +
-      '-' +
+      "-" +
       patient?.person?.display +
       patient?.person?.age +
       patient?.person?.gender,
@@ -40,7 +40,7 @@ export function formatPatientDetails(patient) {
 function getPatientVisits(id, visits) {
   return getVisitsByEncounterTypeWhereThereAreOrders(
     visits,
-    'Consultation'
+    "Consultation"
   ).filter((visit) => {
     if (visit?.patientUuid == id) {
       return visit;
@@ -57,7 +57,7 @@ function mergeEncountersOrdersByVisitsDetails(visits) {
       {
         orders: getOrdersSpecificToEncounterType(
           visit.encounters,
-          'Consultation'
+          "Consultation"
         ),
         obs: getObservations(visit.encounters),
         visitUuid: visit?.uuid,
@@ -75,16 +75,15 @@ function getOrdersSpecificToEncounterType(encounters, encounterType) {
 
   _.each(encounters, (encounterForAcceptReject) => {
     if (
-      encounterForAcceptReject.encounterType.display == 'ACCEPT_REJECT_RESULTS'
+      encounterForAcceptReject.encounterType.display == "ACCEPT_REJECT_RESULTS"
     ) {
       _.map(encounterForAcceptReject.obs, (observation) => {
-        acceptRejectObsKeyValuePairs[
-          observation?.concept?.display
-        ] = acceptRejectObsKeyValuePairs[observation?.concept?.display]
-          ? Number(
-              acceptRejectObsKeyValuePairs[observation?.concept?.display]
-            ) + Number(observation?.value)
-          : Number(observation?.value);
+        acceptRejectObsKeyValuePairs[observation?.concept?.display] =
+          acceptRejectObsKeyValuePairs[observation?.concept?.display]
+            ? Number(
+                acceptRejectObsKeyValuePairs[observation?.concept?.display]
+              ) + Number(observation?.value)
+            : Number(observation?.value);
       });
     }
   });
@@ -104,10 +103,10 @@ function getOrdersSpecificToEncounterType(encounters, encounterType) {
               status:
                 acceptRejectObsKeyValuePairs[order?.display] &&
                 acceptRejectObsKeyValuePairs[order?.display] == 1
-                  ? 'First Sign Off'
+                  ? "First Sign Off"
                   : acceptRejectObsKeyValuePairs[order?.display] &&
                     acceptRejectObsKeyValuePairs[order?.display] > 1
-                  ? 'Second Sign Off'
+                  ? "Second Sign Off"
                   : null,
             },
             orderNumber: order?.orderNumber,
@@ -123,18 +122,18 @@ function getSampleCollectionStatus(encounters, order) {
   let sampleCollectionData = {};
   _.each(encounters, (encounter) => {
     // console.log('collection', encounter);
-    if (encounter.encounterType.display == 'LAB_SAMPLE') {
+    if (encounter.encounterType.display == "LAB_SAMPLE") {
       _.each(
         _.orderBy(
           formatObs(encounter.obs),
-          ['conceptName', 'value'],
-          ['asc', 'desc']
+          ["conceptName", "value"],
+          ["asc", "desc"]
         ),
         (obs) => {
-          if (obs.display.split(':')[0] == order.display) {
-            sampleCollectionData['status'] =
-              obs.value >= 1 ? 'Collected' : 'Rejected';
-            sampleCollectionData['encounterUuid'] = encounter.uuid;
+          if (obs.display.split(":")[0] == order.display) {
+            sampleCollectionData["status"] =
+              obs.value >= 1 ? "Collected" : "Rejected";
+            sampleCollectionData["encounterUuid"] = encounter.uuid;
           }
         }
       );
@@ -149,10 +148,10 @@ function formatObs(obs) {
       uuid: observation.uuid,
       display: observation.display,
       value:
-        observation.display.split('|').length > 1
-          ? observation.display.split('|')[3]
-          : parseInt(observation.display.split(': ')[1]),
-      conceptName: observation.display.split(': ')[0],
+        observation.display.split("|").length > 1
+          ? observation.display.split("|")[3]
+          : parseInt(observation.display.split(": ")[1]),
+      conceptName: observation.display.split(": ")[0],
     };
   });
 }
@@ -174,13 +173,14 @@ function setPriorityStatus(obs, visitUuid, sampleUuid) {
   let hiPriority = false;
   _.each(obs, (observation) => {
     if (
-      observation.display.indexOf('Sample priority') > -1 &&
+      observation.display.indexOf("Sample priority") > -1 &&
       observation.display.indexOf(visitUuid) > -1 &&
       observation.display.indexOf(sampleUuid) > -1
     ) {
       hiPriority =
-        observation.display.split('|')[3] &&
-        observation.display.split('|')[3] == 'HIGH'
+        observation.display.split("|")[3] &&
+        (observation.display.split("|")[3] == "Urgent" ||
+          observation.display.split("|")[3] == "HIGH")
           ? true
           : false;
     }
@@ -189,15 +189,15 @@ function setPriorityStatus(obs, visitUuid, sampleUuid) {
 }
 
 function getSampleUniqueIdentifier(obs, visitUuid, sampleId) {
-  let identifier = '';
+  let identifier = "";
   _.each(obs, (observation) => {
     if (
-      observation?.display.indexOf('Sample identifier') > -1 &&
+      observation?.display.indexOf("Sample identifier") > -1 &&
       observation?.display.indexOf(visitUuid) > -1 &&
       observation?.display.indexOf(sampleId) > -1
     ) {
       identifier =
-        identifier == '' ? observation.display.split('|')[3] : identifier;
+        identifier == "" ? observation.display.split("|")[3] : identifier;
     }
   });
   // console.log('identifier', identifier);
@@ -220,7 +220,7 @@ export function groupAllActiveVisitsLabOrdersBySampleTypes(
     if (
       getPatientVisits(
         uuid,
-        getVisitsByEncounterTypeWhereThereAreOrders(visits, 'Consultation')
+        getVisitsByEncounterTypeWhereThereAreOrders(visits, "Consultation")
       )?.length > 0
     )
       patientVisitsDetails = [
@@ -228,14 +228,14 @@ export function groupAllActiveVisitsLabOrdersBySampleTypes(
         ...mergeEncountersOrdersByVisitsDetails(
           getPatientVisits(
             uuid,
-            getVisitsByEncounterTypeWhereThereAreOrders(visits, 'Consultation')
+            getVisitsByEncounterTypeWhereThereAreOrders(visits, "Consultation")
           )
         ),
       ];
   });
   const filteredVisits = _.filter(visits, (visit) => {
     const encounters = _.filter(visit?.encounters, (encounter) => {
-      if (encounter.encounterType.display == 'LAB_SAMPLE') {
+      if (encounter.encounterType.display == "LAB_SAMPLE") {
         return visit;
       }
     });
@@ -245,24 +245,24 @@ export function groupAllActiveVisitsLabOrdersBySampleTypes(
   });
   const sampledOrders = getSampledOrdersInformationByVisits(
     filteredVisits,
-    'LAB_SAMPLE',
+    "LAB_SAMPLE",
     sampleTypes
   );
   const labOrders = getLabOrdersInformationByVisits(
     filteredVisits,
-    'Consultation',
+    "Consultation",
     sampleTypes
   );
 
   const ordersWithIntermediateResults = getIntermediateResults(
     filteredVisits,
-    'UN_APPROVED_LAB_RESULTS',
+    "UN_APPROVED_LAB_RESULTS",
     sampleTypes
   );
 
   const ordersOnAcceptOrReject = getOrdersOnAcceptOrRejectCondition(
     filteredVisits,
-    'ACCEPT_REJECT_RESULTS',
+    "ACCEPT_REJECT_RESULTS",
     sampleTypes
   );
 
@@ -273,7 +273,7 @@ export function groupAllActiveVisitsLabOrdersBySampleTypes(
       ordersWithIntermediateResults,
       ordersOnAcceptOrReject
     ),
-    'visitUuid'
+    "visitUuid"
   );
 
   // console.log('formattedSampledOrders', formattedSampledOrders);
@@ -340,8 +340,8 @@ export function groupAllActiveVisitsLabOrdersBySampleTypes(
       patient: mergedOrders?.length > 0 ? mergedOrders[0]?.patient : null,
       mrNo:
         mergedOrders?.length > 0
-          ? mergedOrders[0]?.patient?.identifiers[0]?.display.split('= ')[1]
-          : '',
+          ? mergedOrders[0]?.patient?.identifiers[0]?.display.split("= ")[1]
+          : "",
       allHaveResults: areAllHaveResults(mergedOrders),
       fullCompleted:
         areAllHaveResults(mergedOrders) && areAllApproved(mergedOrders)
@@ -349,15 +349,15 @@ export function groupAllActiveVisitsLabOrdersBySampleTypes(
           : false,
       patientNames:
         mergedOrders?.length > 0
-          ? mergedOrders[0]?.patient?.display.split(' - ')[1]
-          : '',
+          ? mergedOrders[0]?.patient?.display.split(" - ")[1]
+          : "",
       searchingText:
         (mergedOrders?.length > 0
-          ? mergedOrders[0]?.patient?.display.split(' - ')[1]
-          : '') +
+          ? mergedOrders[0]?.patient?.display.split(" - ")[1]
+          : "") +
         (mergedOrders?.length > 0
-          ? mergedOrders[0]?.patient?.identifiers[0]?.display.split('= ')[1]
-          : '') +
+          ? mergedOrders[0]?.patient?.identifiers[0]?.display.split("= ")[1]
+          : "") +
         filteredSample?.sampleUniquIdentification +
         filteredSample?.sampleName,
 
@@ -370,7 +370,7 @@ export function groupAllActiveVisitsLabOrdersBySampleTypes(
       acceptRejectProviders: getAcceptanceRejectionProviders(mergedOrders),
       rejectionReason: getRejectionReason(
         visits,
-        'LAB_SAMPLE',
+        "LAB_SAMPLE",
         filteredSample.sampleUniquIdentification,
         filteredSample?.visitUuid
       ),
@@ -386,7 +386,7 @@ function getAcceptanceRejectionProviders(orders) {
       providers = [...providers, ...order?.acceptRejectProviders];
     }
   });
-  return _.uniqBy(providers, 'uuid');
+  return _.uniqBy(providers, "uuid");
 }
 
 function getResultsProviders(orders) {
@@ -396,7 +396,7 @@ function getResultsProviders(orders) {
       providers = [...providers, ...order?.resultsProviders];
     }
   });
-  return _.uniqBy(providers, 'uuid');
+  return _.uniqBy(providers, "uuid");
 }
 
 function getOrderProviders(orders) {
@@ -406,7 +406,7 @@ function getOrderProviders(orders) {
       providers = [...providers, ...order?.orderProviders];
     }
   });
-  return _.uniqBy(providers, 'uuid');
+  return _.uniqBy(providers, "uuid");
 }
 
 function getSampleCollectionProviders(orders) {
@@ -416,7 +416,7 @@ function getSampleCollectionProviders(orders) {
       providers = [...providers, ...order?.sampleCollectionProviders];
     }
   });
-  return _.uniqBy(providers, 'uuid');
+  return _.uniqBy(providers, "uuid");
 }
 
 function areAllHaveResults(items) {
@@ -492,9 +492,9 @@ function mergeOrdersDetails(orders, ordersWithStatus, sample) {
             acceptRejectProviders: orderWithStatus?.acceptRejectProviders,
             searchingText:
               order?.display +
-              '-' +
+              "-" +
               order?.orderNumber +
-              '-' +
+              "-" +
               orderWithStatus?.sampleTypeName,
             location: orderWithStatus?.location,
           },
@@ -517,7 +517,7 @@ function setStatusOnOrders(
   const matchedObs =
     _.filter(visit?.obs, (observation) => {
       if (
-        observation?.concept?.display == 'Sample identifier' &&
+        observation?.concept?.display == "Sample identifier" &&
         observation?.value?.indexOf(sampleTypeId) > -1
       ) {
         return observation;
@@ -525,7 +525,7 @@ function setStatusOnOrders(
     }) || [];
   // console.log('matchedObs', matchedObs);
   // console.log('sampleTypeId', sampleTypeId);
-  const id = matchedObs?.length > 0 ? matchedObs[0].value.split('|')[3] : null;
+  const id = matchedObs?.length > 0 ? matchedObs[0].value.split("|")[3] : null;
   return _.filter(
     _.map(visit?.orders, (order) => {
       const matchedConcept = (_.filter(setMembers, {
@@ -538,16 +538,16 @@ function setStatusOnOrders(
           concept: matchedConcept,
           status:
             labOrdersBillingInfo &&
-            labOrdersBillingInfo[visit?.uuid + '-' + matchedConcept?.uuid]
-              ? 'Paid'
-              : 'Not paid',
+            labOrdersBillingInfo[visit?.uuid + "-" + matchedConcept?.uuid]
+              ? "Paid"
+              : "Not paid",
           searchingText:
             order?.display +
-            '-' +
+            "-" +
             order?.concept?.display +
             (visit?.patient && visit?.patient?.identifiers
-              ? visit?.patient?.identifiers[0]?.display.split('= ')[1]
-              : '') +
+              ? visit?.patient?.identifiers[0]?.display.split("= ")[1]
+              : "") +
             order?.orderNumber,
           location: order?.location,
           sampleTypeName: sampleTypeName,
@@ -565,7 +565,7 @@ function formatVisitDetails(visit) {
   const sampleCollectionAndAcceptanceEncounters = _.filter(
     visit?.encounters,
     (encounter) => {
-      if (encounter.encounterType.display == 'LAB_SAMPLE') {
+      if (encounter.encounterType.display == "LAB_SAMPLE") {
         return visit;
       }
     }
@@ -574,9 +574,8 @@ function formatVisitDetails(visit) {
   let collectedItems = {};
   _.map(sampleCollectionAndAcceptanceEncounters, (encounter) => {
     _.map(encounter?.obs, (observation) => {
-      collectedItems[
-        visit?.uuid + '-' + observation?.concept?.display
-      ] = observation;
+      collectedItems[visit?.uuid + "-" + observation?.concept?.display] =
+        observation;
     });
   });
 
@@ -585,9 +584,8 @@ function formatVisitDetails(visit) {
   _.map(sampleCollectionAndAcceptanceEncounters, (encounter) => {
     _.map(encounter?.obs, (observation) => {
       if (observation?.value == 2) {
-        acceptedItems[
-          visit?.uuid + '-' + observation?.concept?.display
-        ] = observation;
+        acceptedItems[visit?.uuid + "-" + observation?.concept?.display] =
+          observation;
       }
     });
   });
@@ -599,9 +597,8 @@ function formatVisitDetails(visit) {
     _.map(encounter?.obs, (observation) => {
       obs = [...obs, observation];
       if (observation?.value == 0) {
-        rejectedItems[
-          visit?.uuid + '-' + observation?.concept?.display
-        ] = observation;
+        rejectedItems[visit?.uuid + "-" + observation?.concept?.display] =
+          observation;
       }
     });
   });
@@ -633,34 +630,34 @@ function formatVisitDetails(visit) {
                 )
               : [],
           sampleCollection: {
-            status: collectedItems[visit?.uuid + '-' + order?.display]
-              ? 'Collected'
+            status: collectedItems[visit?.uuid + "-" + order?.display]
+              ? "Collected"
               : null,
-            obs: collectedItems[visit?.uuid + '-' + order?.display]
-              ? collectedItems[visit?.uuid + '-' + order?.display]
+            obs: collectedItems[visit?.uuid + "-" + order?.display]
+              ? collectedItems[visit?.uuid + "-" + order?.display]
               : null,
             sampleCollectionEncounterUuid: collectedItems[
-              visit?.uuid + '-' + order?.display
+              visit?.uuid + "-" + order?.display
             ]
-              ? collectedItems[visit?.uuid + '-' + order?.display]?.encounter
+              ? collectedItems[visit?.uuid + "-" + order?.display]?.encounter
                   ?.uuid
               : null,
             encounter: encounter,
           },
-          collected: collectedItems[visit?.uuid + '-' + order?.display]
+          collected: collectedItems[visit?.uuid + "-" + order?.display]
             ? true
             : false,
-          accepted: acceptedItems[visit?.uuid + '-' + order?.display]
+          accepted: acceptedItems[visit?.uuid + "-" + order?.display]
             ? true
             : false,
-          acceptObsUuid: acceptedItems[visit?.uuid + '-' + order?.display]
-            ? acceptedItems[visit?.uuid + '-' + order?.display]?.uuid
+          acceptObsUuid: acceptedItems[visit?.uuid + "-" + order?.display]
+            ? acceptedItems[visit?.uuid + "-" + order?.display]?.uuid
             : null,
-          rejected: rejectedItems[visit?.uuid + '-' + order?.display]
+          rejected: rejectedItems[visit?.uuid + "-" + order?.display]
             ? true
             : false,
-          rejectObsUuid: rejectedItems[visit?.uuid + '-' + order?.display]
-            ? rejectedItems[visit?.uuid + '-' + order?.display]?.uuid
+          rejectObsUuid: rejectedItems[visit?.uuid + "-" + order?.display]
+            ? rejectedItems[visit?.uuid + "-" + order?.display]?.uuid
             : null,
         },
       ];
@@ -699,7 +696,7 @@ export function groupLabOrdersBySampleType(
     const id =
       ordersWithStatus?.length > 0
         ? (_.filter(ordersWithStatus, (order) => {
-            if (order?.sampleCollection?.status == 'Collected') {
+            if (order?.sampleCollection?.status == "Collected") {
               return order;
             }
           }) || [])[0]?.sampleUniquIdentification
@@ -721,32 +718,32 @@ export function groupLabOrdersBySampleType(
           return order;
         }
       }),
-      orders: _.filter(ordersWithStatus, { status: 'Paid' }),
-      items: _.filter(ordersWithStatus, { status: 'Paid' }),
+      orders: _.filter(ordersWithStatus, { status: "Paid" }),
+      items: _.filter(ordersWithStatus, { status: "Paid" }),
       atLeastOneOrderPaid:
-        (_.filter(ordersWithStatus, { status: 'Paid' }) || [])?.length > 0
+        (_.filter(ordersWithStatus, { status: "Paid" }) || [])?.length > 0
           ? true
           : false,
       allOrdersPaid:
-        (_.filter(ordersWithStatus, { status: 'Paid' }) || [])?.length ==
+        (_.filter(ordersWithStatus, { status: "Paid" }) || [])?.length ==
         visit?.orders?.length
           ? true
           : false,
       atLeastOneOrderBilled: _.filter(ordersWithStatus, {
-        status: 'Paid',
+        status: "Paid",
         sampleTypeName: sampleType?.display,
       }),
       sampleUniquIdentification: id,
       id: id,
       countOfOrdersBilled: (
         _.filter(ordersWithStatus, {
-          status: 'Paid',
+          status: "Paid",
           sampleTypeName: sampleType?.display,
         }) || []
       )?.length,
       countOfOrdersPaid: (
         _.filter(ordersWithStatus, {
-          status: 'Paid',
+          status: "Paid",
           sampleTypeName: sampleType?.display,
         }) || []
       )?.length,
@@ -776,12 +773,12 @@ export function groupLabOrdersBySampleType(
       patient: visit?.patient,
       mrNo:
         visit?.patient && visit?.patient?.identifiers
-          ? visit?.patient?.identifiers[0]?.display.split('= ')[1]
-          : '',
+          ? visit?.patient?.identifiers[0]?.display.split("= ")[1]
+          : "",
       searchingText:
         (visit?.patient && visit?.patient?.identifiers
-          ? visit?.patient?.identifiers[0]?.display.split('= ')[1]
-          : '') + sampleType?.display,
+          ? visit?.patient?.identifiers[0]?.display.split("= ")[1]
+          : "") + sampleType?.display,
     };
     // console.log(groupedOrders);
     // return groupedOrders;
@@ -795,8 +792,8 @@ export function groupLabOrdersBySampleType(
           return filteredSampleType;
         }
       }),
-      ['name'],
-      ['asc']
+      ["name"],
+      ["asc"]
     );
   } else {
     return _.orderBy(
@@ -811,8 +808,8 @@ export function groupLabOrdersBySampleType(
         }),
         (sample) => sample
       ),
-      ['name'],
-      ['asc']
+      ["name"],
+      ["asc"]
     );
   }
 }
@@ -821,9 +818,9 @@ export function formatSamplesToFeedResults(samples) {
   return _.map(samples, (sample) => {
     return {
       id: sample.sampleUniquIdentification,
-      name: sample.sampleName + '-' + sample.sampleUniquIdentification,
-      mrNo: sample.patient.display.split(' - ')[0],
-      patientNames: sample.patient.display.split(' - ')[1],
+      name: sample.sampleName + "-" + sample.sampleUniquIdentification,
+      mrNo: sample.patient.display.split(" - ")[0],
+      patientNames: sample.patient.display.split(" - ")[1],
       ...sample,
     };
   });
@@ -831,7 +828,7 @@ export function formatSamplesToFeedResults(samples) {
 
 export function getSamplesToCollect(visits, sampleTypes) {
   let samplesToCollect = [];
-  _.each(_.uniqBy(visits, 'uuid'), (visit) => {
+  _.each(_.uniqBy(visits, "uuid"), (visit) => {
     _.each(sampleTypes, (sampleType) => {
       let groupedOrders = {
         visitUuid: visit.id,
@@ -843,7 +840,7 @@ export function getSamplesToCollect(visits, sampleTypes) {
       };
 
       _.each(
-        getOrdersFromEncounters(visit.encounters, 'Consultation'),
+        getOrdersFromEncounters(visit.encounters, "Consultation"),
         (order) => {
           const filteredConcept = _.filter(sampleType.setMembers, {
             name: order.display,
@@ -865,8 +862,8 @@ export function getSamplesToCollect(visits, sampleTypes) {
         return sampleToCollect;
       }
     }),
-    ['name'],
-    ['asc']
+    ["name"],
+    ["asc"]
   );
 }
 
@@ -895,25 +892,25 @@ export function getPatientsCollectedSamples(
   // console.log('getPatientsCollectedSamples', visits);
   const sampledOrders = getSampledOrdersInformationByVisits(
     visits,
-    'LAB_SAMPLE',
+    "LAB_SAMPLE",
     sampleTypes
   );
   const labOrders = getLabOrdersInformationByVisits(
     visits,
-    'Consultation',
+    "Consultation",
     sampleTypes
   );
   // console.log("gotten lab orders :: ", labOrders);
 
   const ordersWithIntermediateResults = getIntermediateResults(
     visits,
-    'UN_APPROVED_LAB_RESULTS',
+    "UN_APPROVED_LAB_RESULTS",
     sampleTypes
   );
 
   const ordersOnAcceptOrReject = getOrdersOnAcceptOrRejectCondition(
     visits,
-    'ACCEPT_REJECT_RESULTS',
+    "ACCEPT_REJECT_RESULTS",
     sampleTypes
   );
 
@@ -930,7 +927,7 @@ export function getPatientsCollectedSamples(
       ordersWithIntermediateResults,
       ordersOnAcceptOrReject
     ),
-    'visitUuid'
+    "visitUuid"
   );
 
   let samplesCollected = [];
@@ -941,7 +938,7 @@ export function getPatientsCollectedSamples(
       ordersWithIntermediateResults,
       ordersOnAcceptOrReject
     ))*/
-    const samples = _.groupBy(formattedSampledOrders[key], 'sampleTypeName');
+    const samples = _.groupBy(formattedSampledOrders[key], "sampleTypeName");
     // console.log("SAMPLES", samples)
     samplesCollected = [
       ...samplesCollected,
@@ -963,27 +960,27 @@ export function getPatientsCollectedSamples(
           sampleUniquIdentification:
             samples[sampleKey][0].sampleUniquIdentification,
           patient: samples[sampleKey][0].patient,
-          patientNames: samples[sampleKey][0]?.patient?.display.split(' -')[1],
-          mrNoForSorting: samples[sampleKey][0]?.patient?.display.split('-')[2],
-          mrNo: samples[sampleKey][0].patient.display.split(' - ')[0],
-          accepted: checkStatusOfOrders(samples[sampleKey], 'accepted'),
-          rejected: checkStatusOfOrders(samples[sampleKey], 'rejected'),
+          patientNames: samples[sampleKey][0]?.patient?.display.split(" -")[1],
+          mrNoForSorting: samples[sampleKey][0]?.patient?.display.split("-")[2],
+          mrNo: samples[sampleKey][0].patient.display.split(" - ")[0],
+          accepted: checkStatusOfOrders(samples[sampleKey], "accepted"),
+          rejected: checkStatusOfOrders(samples[sampleKey], "rejected"),
           rejectionReason: getRejectionReason(
             visits,
-            'LAB_SAMPLE',
+            "LAB_SAMPLE",
             samples[sampleKey][0].sampleUniquIdentification,
             key
           ),
-          collected: checkStatusOfOrders(samples[sampleKey], 'collected'),
-          acceptedName: checkStatusOfOrders(samples[sampleKey], 'accepted')
-            ? 'accepted'
-            : '',
-          rejectedName: checkStatusOfOrders(samples[sampleKey], 'rejected')
-            ? 'rejected'
-            : '',
-          collectedName: checkStatusOfOrders(samples[sampleKey], 'collected')
-            ? 'collected'
-            : '',
+          collected: checkStatusOfOrders(samples[sampleKey], "collected"),
+          acceptedName: checkStatusOfOrders(samples[sampleKey], "accepted")
+            ? "accepted"
+            : "",
+          rejectedName: checkStatusOfOrders(samples[sampleKey], "rejected")
+            ? "rejected"
+            : "",
+          collectedName: checkStatusOfOrders(samples[sampleKey], "collected")
+            ? "collected"
+            : "",
           allHaveResults:
             checkIfAllHaveResults(
               allItems,
@@ -993,10 +990,10 @@ export function getPatientsCollectedSamples(
               : false,
           atLeastOneHasResult:
             itemsWithResults && itemsWithResults.length > 0 ? true : false,
-          items: _.orderBy(allItems, ['display'], ['asc']),
+          items: _.orderBy(allItems, ["display"], ["asc"]),
           hiPriority: getPriorityStatus(allItems),
           priority: getPriorityStatus(allItems) ? 1 : 0,
-          priorityName: getPriorityStatus(allItems) ? 'HIGH' : 'None',
+          priorityName: getPriorityStatus(allItems) ? "HIGH" : "None",
           firstSignOff:
             getItemsWithFirstSignOff(allItems) &&
             getItemsWithFirstSignOff(allItems).length == allItems.length
@@ -1021,12 +1018,12 @@ export function getPatientsCollectedSamples(
 
   return _.orderBy(
     _.filter(samplesCollected, (sampleCollected) => {
-      if (sampleCollected.sampleUniquIdentification != '') {
+      if (sampleCollected.sampleUniquIdentification != "") {
         return sampleCollected;
       }
     }),
-    ['priority'],
-    ['desc']
+    ["priority"],
+    ["desc"]
   );
 }
 
@@ -1041,17 +1038,17 @@ function checkIfAllHaveResults(items, sampleId) {
 }
 
 function getRejectionReason(visits, encounterType, sampleID, visitUuid) {
-  let reason = '';
+  let reason = "";
   _.each(
     (_.filter(visits, { id: visitUuid }) || [])[0]?.encounters,
     (encounter) => {
       if (encounter?.encounterType?.name == encounterType) {
         _.each(encounter?.obs, (observation) => {
           if (
-            observation.concept?.display == 'Reason for rejecting sample' &&
+            observation.concept?.display == "Reason for rejecting sample" &&
             observation?.value.indexOf(sampleID) > -1
           ) {
-            reason = observation?.value.split(' : ')[1];
+            reason = observation?.value.split(" : ")[1];
           }
         });
       }
@@ -1116,19 +1113,19 @@ function getItemsWithResults(items) {
 
 function checkStatusOfOrders(items, key) {
   if (
-    key == 'accepted' &&
+    key == "accepted" &&
     _.filter(items, { accepted: true }) &&
     _.filter(items, { accepted: true }).length > 0
   ) {
     return true;
   } else if (
-    key == 'rejected' &&
+    key == "rejected" &&
     _.filter(items, { rejected: true }) &&
     _.filter(items, { rejected: true }).length > 0
   ) {
     return true;
   } else if (
-    key == 'collected' &&
+    key == "collected" &&
     _.filter(items, { collected: true }) &&
     _.filter(items, { collected: true }).length > 0
   ) {
@@ -1158,53 +1155,53 @@ function addLabOrdersEncounterUuidToSampledOrders(
           ...sampledOrders[key],
           result:
             ordersWithIntermediateResults[key] &&
-            ordersWithIntermediateResults[key]['value'] &&
-            ordersWithIntermediateResults[key]['value'] != ''
-              ? ordersWithIntermediateResults[key]['value']
+            ordersWithIntermediateResults[key]["value"] &&
+            ordersWithIntermediateResults[key]["value"] != ""
+              ? ordersWithIntermediateResults[key]["value"]
               : null,
           remarks:
             ordersWithIntermediateResults[key] &&
-            ordersWithIntermediateResults[key]['comment'] &&
-            ordersWithIntermediateResults[key]['comment'] != ''
-              ? ordersWithIntermediateResults[key]['comment']
+            ordersWithIntermediateResults[key]["comment"] &&
+            ordersWithIntermediateResults[key]["comment"] != ""
+              ? ordersWithIntermediateResults[key]["comment"]
               : null,
           obsUuid:
             ordersWithIntermediateResults[key] &&
-            ordersWithIntermediateResults[key]['uuid'] &&
-            ordersWithIntermediateResults[key]['uuid'] != ''
-              ? ordersWithIntermediateResults[key]['uuid']
+            ordersWithIntermediateResults[key]["uuid"] &&
+            ordersWithIntermediateResults[key]["uuid"] != ""
+              ? ordersWithIntermediateResults[key]["uuid"]
               : null,
           intermediateEncounterUuid:
             ordersWithIntermediateResults[key] &&
-            ordersWithIntermediateResults[key]['encounterUuid']
-              ? ordersWithIntermediateResults[key]['encounterUuid']
+            ordersWithIntermediateResults[key]["encounterUuid"]
+              ? ordersWithIntermediateResults[key]["encounterUuid"]
               : null,
           firstSignOff:
             ordersOnAcceptOrReject[key] &&
-            ordersOnAcceptOrReject[key]['value'] &&
-            parseInt(ordersOnAcceptOrReject[key]['value']) >= 1
+            ordersOnAcceptOrReject[key]["value"] &&
+            parseInt(ordersOnAcceptOrReject[key]["value"]) >= 1
               ? true
               : false,
           secondSignOff:
             ordersOnAcceptOrReject[key] &&
-            ordersOnAcceptOrReject[key]['value'] &&
-            parseInt(ordersOnAcceptOrReject[key]['value']) > 1
+            ordersOnAcceptOrReject[key]["value"] &&
+            parseInt(ordersOnAcceptOrReject[key]["value"]) > 1
               ? true
               : false,
           rejectedResults:
             ordersOnAcceptOrReject[key] &&
-            ordersOnAcceptOrReject[key]['value'] &&
-            parseInt(ordersOnAcceptOrReject[key]['value']) == 0
+            ordersOnAcceptOrReject[key]["value"] &&
+            parseInt(ordersOnAcceptOrReject[key]["value"]) == 0
               ? true
               : false,
           labOrderEncounterUuid: labOrders[key]
-            ? labOrders[key]['encounterUuid']
+            ? labOrders[key]["encounterUuid"]
             : null,
           allValues:
             ordersWithIntermediateResults[key] &&
-            ordersWithIntermediateResults[key]['allValues'] &&
-            ordersWithIntermediateResults[key]['allValues'] != ''
-              ? ordersWithIntermediateResults[key]['allValues']
+            ordersWithIntermediateResults[key]["allValues"] &&
+            ordersWithIntermediateResults[key]["allValues"] != ""
+              ? ordersWithIntermediateResults[key]["allValues"]
               : null,
           location: labOrders[key]?.encounter?.location,
           sampleCollectionProviders:
@@ -1235,8 +1232,8 @@ function getLabOrdersInformationByVisits(visits, encounterType, sampleTypes) {
         _.each(encounter.orders, (order) => {
           const key =
             visit.id && order.display
-              ? visit.id + '-' + order.display
-              : visit?.uuid + '-' + order?.concept?.display;
+              ? visit.id + "-" + order.display
+              : visit?.uuid + "-" + order?.concept?.display;
           ordersByVisit[key] = {
             ...order,
             visitUuid: visit.id,
@@ -1265,15 +1262,15 @@ function getOrdersOnAcceptOrRejectCondition(
     _.each(visit.encounters, (encounter) => {
       if (encounter.encounterType.display == encounterType) {
         _.each(encounter.obs, (obs) => {
-          const conceptName = obs.display.split(':')[0];
-          const value = parseInt(obs.display.split(': ')[1]);
+          const conceptName = obs.display.split(":")[0];
+          const value = parseInt(obs.display.split(": ")[1]);
 
           obsData[conceptName] = !obsData[conceptName]
             ? value
             : obsData[conceptName] && obsData[conceptName] < value
             ? value
             : obsData[conceptName];
-          ordersByVisit[visit?.uuid + '-' + conceptName] = {
+          ordersByVisit[visit?.uuid + "-" + conceptName] = {
             ...obs,
             value: obsData[conceptName],
             visitUuid: visit.id ? visit?.id : visit?.uuid,
@@ -1301,12 +1298,12 @@ function getIntermediateResults(visits, encounterType, sampleTypes) {
 
         _.each(encounter.obs, (obs) => {
           const key = visit.id
-            ? visit.id + '-' + obs?.concept?.display
-            : visit?.uuid + '-' + obs?.concept?.display;
+            ? visit.id + "-" + obs?.concept?.display
+            : visit?.uuid + "-" + obs?.concept?.display;
           !ordersByVisit[key]
             ? (ordersByVisit[key] = {
                 ...obs,
-                value: obs.display.split(': ')[1],
+                value: obs.display.split(": ")[1],
                 visitUuid: visit.id ? visit?.id : visit?.uuid,
                 encounterUuid: encounter.uuid,
                 patient: visit.patient,
@@ -1318,14 +1315,14 @@ function getIntermediateResults(visits, encounterType, sampleTypes) {
             : (ordersByVisit[key] = {
                 ...ordersByVisit[key],
                 allValues:
-                  key?.split(obs?.concept?.display)[1] == ''
+                  key?.split(obs?.concept?.display)[1] == ""
                     ? _.orderBy(
-                        ...ordersByVisit[key]['allValues'],
+                        ...ordersByVisit[key]["allValues"],
                         obs,
-                        ['dateActivated', 'obsDatetime'],
-                        ['desc', 'desc']
+                        ["dateActivated", "obsDatetime"],
+                        ["desc", "desc"]
                       )
-                    : ordersByVisit[key]['allValues'],
+                    : ordersByVisit[key]["allValues"],
               });
         });
       }
@@ -1375,7 +1372,7 @@ function getSampledOrdersInformationByVisits(
                     return item.display == order.display;
                   })
                 )[0].name
-              : '';
+              : "";
           const sampleTypeUuid =
             sampleTypes.filter((sampleType) =>
               sampleType.setMembers.some((item) => {
@@ -1401,15 +1398,15 @@ function getSampledOrdersInformationByVisits(
                     return item.display == order.display;
                   })
                 )[0].uuid
-              : '';
+              : "";
           if (concept) {
             const key =
               visit.id && order.display
-                ? visit.id + '-' + order.display
-                : visit?.uuid + '-' + concept?.display;
+                ? visit.id + "-" + order.display
+                : visit?.uuid + "-" + concept?.display;
 
             ordersByVisit[key] =
-              ordersByVisit[key] && ordersByVisit[key]['visitUuid']
+              ordersByVisit[key] && ordersByVisit[key]["visitUuid"]
                 ? ordersByVisit[key]
                 : {
                     ...order,
@@ -1469,7 +1466,7 @@ function getSampledOrdersInformationByVisits(
                     concept: concept,
                     searchingText:
                       concept?.display +
-                      '-' +
+                      "-" +
                       getSampleUniqueIdentifier(
                         encounter.obs,
                         visit.id,
@@ -1560,8 +1557,8 @@ export function formatPatientNotes(notes, patientUuid, conceptUuid) {
                       return {
                         display: valueMember?.concept?.display,
                         value:
-                          typeof valueMember.value == 'string' ||
-                          typeof valueMember.value == 'number'
+                          typeof valueMember.value == "string" ||
+                          typeof valueMember.value == "number"
                             ? valueMember.value
                             : valueMember.value?.display,
                       };
