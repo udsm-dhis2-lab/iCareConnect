@@ -70,7 +70,8 @@ export class SamplesService {
     return new Observable((observer) => {
       this.httpClientService
         .get("lab/sample?visit=" + visitUuid)
-        .subscribe((samples) => {
+        .subscribe((samplesResponse) => {
+          const samples = samplesResponse?.results;
           let allSamples = [];
 
           const keyedDepartmentsByTestOrder =

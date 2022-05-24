@@ -269,9 +269,7 @@ export class SingleRegistrationComponent implements OnInit {
                           const orders = Object.keys(this.formData)
                             .map((key) => {
                               if (
-                                key
-                                  ?.toLocaleLowerCase()
-                                  .indexOf("department") === -1
+                                key?.toLocaleLowerCase().indexOf("test") > -1
                               ) {
                                 return {
                                   concept: this.formData[key]?.value,
