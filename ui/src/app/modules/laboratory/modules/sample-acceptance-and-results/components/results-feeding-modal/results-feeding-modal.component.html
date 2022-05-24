@@ -16,11 +16,13 @@
   >
 
   <div style="padding: 10px">
-    Patient: {{ params?.currentSample?.patient?.givenName }}
-    {{ params?.currentSample?.patient?.midllename }}
-    {{ params?.currentSample?.patient?.familyName }} | Gender:
-    <b>{{ params?.currentSample?.patient?.gender }}</b> | Age:
-    <b>{{ params?.currentSample?.patient?.age }}</b>
+    <span *ngIf="!LISConfigurations?.isLIS"
+      >Patient:
+      {{ params?.currentSample?.patient?.givenName }}
+      {{ params?.currentSample?.patient?.midllename }}
+      {{ params?.currentSample?.patient?.familyName }} | </span
+    >Gender: <b>{{ params?.currentSample?.patient?.gender }}</b> | Age:
+    <b>{{ params?.currentSample?.patient?.age }} Yrs</b>
   </div>
 
   <mat-progress-bar
