@@ -22,6 +22,8 @@ export class PersonDetailsComponent implements OnInit {
   identifiersFields: any[];
   primaryIdentifierField: any;
   showOtherIdentifiers: boolean = false;
+  patientUuid: string;
+  identifierTypes: any[] = [];
   constructor(private registrationService: RegistrationService) {}
 
   ngOnInit(): void {
@@ -29,115 +31,49 @@ export class PersonDetailsComponent implements OnInit {
       .getPatientIdentifierTypes()
       .subscribe((response) => {
         if (response) {
-          const primaryIdentifier = (response?.filter(
-            (identifier) => identifier?.required
-          ) || [])[0];
-          this.primaryIdentifierField = primaryIdentifier
-            ? new Textbox({
-                id: primaryIdentifier?.id,
-                key: primaryIdentifier?.id,
-                label: primaryIdentifier?.name,
-                required: true,
-              })
-            : null;
-
-          const otherIdentifiers =
-            response?.filter((identifier) => !identifier?.required) || [];
-
-          this.identifiersFields = otherIdentifiers.map((identifier) => {
-            return new Textbox({
-              id: identifier?.id,
-              key: identifier?.id,
-              label: identifier?.name,
-              required: identifier?.required,
-            });
-          });
+          this.identifierTypes = response;
+          this.setIdentifierFields(this.identifierTypes);
         }
       });
-    this.personFields = [
-      new Textbox({
-        id: "firstName",
-        key: "firstName",
-        label: "First name",
-        required: true,
-        type: "text",
-      }),
-      new Textbox({
-        id: "middleName",
-        key: "middleName",
-        label: "Middle name",
-        type: "text",
-      }),
-      new Textbox({
-        id: "lastName",
-        key: "lastName",
-        label: "Last name",
-        required: true,
-        type: "text",
-      }),
-      new Dropdown({
-        id: "gender",
-        key: "gender",
-        label: "Gender",
-        required: true,
-        type: "text",
-        options: [
-          {
-            key: "Male",
-            label: "Male",
-            value: "M",
-          },
-          {
-            key: "Female",
-            label: "Female",
-            value: "F",
-          },
-        ],
-        shouldHaveLiveSearchForDropDownFields: false,
-      }),
-      new Textbox({
-        id: "age",
-        key: "age",
-        label: "Age",
-        required: false,
-        type: "number",
-        min: 0,
-        max: 150,
-      }),
-      new DateField({
-        id: "dob",
-        key: "dob",
-        label: "Date of birth",
-        required: false,
-        type: "date",
-      }),
-      new PhoneNumber({
-        id: "mobileNumber",
-        key: "mobileNumber",
-        label: "Mobile number",
-        required: true,
-        type: "number",
-        min: 0,
-        placeholder: "Mobile number",
-        category: "phoneNumber",
-      }),
-      new Textbox({
-        id: "email",
-        key: "email",
-        label: "Email",
-        required: false,
-        type: "text",
-        placeholder: "Email",
-        category: "email",
-      }),
-      new TextArea({
-        id: "address",
-        key: "address",
-        label: "Address",
-        required: true,
-        type: "text",
-      }),
-    ];
+    this.setPersonDetails();
+  }
+
+  setIdentifierFields(identifierTypes: any[], personDetails?: any): void {
+    const primaryIdentifier = (identifierTypes?.filter(
+      (identifier) => identifier?.required
+    ) || [])[0];
+    this.primaryIdentifierField = primaryIdentifier
+      ? new Textbox({
+          id: primaryIdentifier?.id,
+          key: primaryIdentifier?.id,
+          label: primaryIdentifier?.name,
+          value: personDetails
+            ? (personDetails?.identifiers.filter(
+                (identifier) =>
+                  identifier?.identifierType?.uuid === primaryIdentifier?.id
+              ) || [])[0]?.identifier
+            : null,
+          required: true,
+        })
+      : null;
+
+    const otherIdentifiers =
+      identifierTypes?.filter((identifier) => !identifier?.required) || [];
+
+    this.identifiersFields = otherIdentifiers.map((identifier) => {
+      return new Textbox({
+        id: identifier?.id,
+        key: identifier?.id,
+        label: identifier?.name,
+        value: personDetails
+          ? (personDetails?.identifiers.filter(
+              (identifier) =>
+                identifier?.identifierType?.uuid === primaryIdentifier?.id
+            ) || [])[0]?.identifier
+          : null,
+        required: identifier?.required,
+      });
+    });
   }
 
   onFormUpdate(formValues: FormValue): void {
@@ -145,7 +81,11 @@ export class PersonDetailsComponent implements OnInit {
     Object.keys(values).forEach((key) => {
       this.personDetailsData[key] = values[key]?.value;
     });
-    this.personDetails.emit(this.personDetailsData);
+    this.personDetails.emit({
+      ...this.personDetailsData,
+      isNewPatient: this.personDetailsCategory === "new",
+      patientUuid: this.patientUuid,
+    });
   }
 
   onUpdatePrimaryIdentifierForm(formValues: FormValue): void {
@@ -153,7 +93,11 @@ export class PersonDetailsComponent implements OnInit {
     Object.keys(values).forEach((key) => {
       this.personDetailsData[key] = values[key]?.value;
     });
-    this.personDetails.emit(this.personDetailsData);
+    this.personDetails.emit({
+      ...this.personDetailsData,
+      isNewPatient: this.personDetailsCategory === "new",
+      patientUuid: this.patientUuid,
+    });
   }
 
   onUpdateIdentifierForm(formValues: FormValue): void {
@@ -161,7 +105,11 @@ export class PersonDetailsComponent implements OnInit {
     Object.keys(values).forEach((key) => {
       this.personDetailsData[key] = values[key]?.value;
     });
-    this.personDetails.emit(this.personDetailsData);
+    this.personDetails.emit({
+      ...this.personDetailsData,
+      isNewPatient: this.personDetailsCategory === "new",
+      patientUuid: this.patientUuid,
+    });
   }
 
   toggleIdentifiers(event: Event): void {
@@ -170,6 +118,7 @@ export class PersonDetailsComponent implements OnInit {
   }
 
   setPersonDetails(personDetails?: any): void {
+    this.patientUuid = personDetails?.uuid;
     this.personFields = [
       new Textbox({
         id: "firstName",
@@ -265,6 +214,14 @@ export class PersonDetailsComponent implements OnInit {
         type: "text",
       }),
     ];
+    if (personDetails) {
+      this.setIdentifierFields(this.identifierTypes, personDetails);
+      this.personDetails.emit({
+        ...this.personDetailsData,
+        isNewPatient: this.personDetailsCategory === "new",
+        patientUuid: this.patientUuid,
+      });
+    }
   }
 
   onGetPersonDetails(personDetails: any): void {
@@ -273,6 +230,12 @@ export class PersonDetailsComponent implements OnInit {
 
   getSelection(event: MatRadioChange): void {
     this.personDetailsCategory = event?.value;
+
+    this.personDetails.emit({
+      ...this.personDetailsData,
+      isNewPatient: this.personDetailsCategory === "new",
+      patientUuid: this.patientUuid,
+    });
     if (this.personDetailsCategory === "new") {
       this.setPersonDetails();
     }

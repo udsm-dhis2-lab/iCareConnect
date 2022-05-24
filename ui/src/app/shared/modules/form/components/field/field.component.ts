@@ -40,6 +40,11 @@ export class FieldComponent {
   @Output() fieldUpdate: EventEmitter<FormGroup> =
     new EventEmitter<FormGroup>();
 
+  ngAfterViewInit() {
+    // console.log("form", this.form);
+    this.fieldUpdate.emit(this.form);
+  }
+
   get isValid(): boolean {
     return this.form?.controls[this.field.id]?.valid;
   }

@@ -25,6 +25,9 @@ import {
 } from "src/app/store/actions";
 import { loadSpecimenSources } from "./store/actions/specimen-sources-and-tests-management.actions";
 import { getAllSampleTypes } from "src/app/store/selectors";
+import { loadLISConfigurations } from "./store/actions";
+import { LISConfigurationsModel } from "./resources/models/lis-configurations.model";
+import { getLISConfigurations } from "./store/selectors";
 
 @Component({
   selector: "lab-root",
@@ -66,6 +69,7 @@ export class LaboratoryComponent implements OnInit {
    * 2. iCare.Laboratory.agencyConceptUuid
    */
 
+  LISConfigurations$: Observable<LISConfigurationsModel>;
   constructor(
     private store: Store<AppState>,
     private router: Router,
@@ -73,6 +77,9 @@ export class LaboratoryComponent implements OnInit {
   ) {
     this.store.dispatch(loadRolesDetails());
     this.store.dispatch(loadOrderTypes());
+    this.store.dispatch(loadLISConfigurations());
+
+    this.LISConfigurations$ = this.store.select(getLISConfigurations);
     router.events.subscribe((currentRoute) => {
       // console.log('this :: ', currentRoute instanceof NavigationEnd);
       if (currentRoute instanceof NavigationEnd) {
