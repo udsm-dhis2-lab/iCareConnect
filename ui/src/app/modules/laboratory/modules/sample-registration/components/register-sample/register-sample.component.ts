@@ -20,7 +20,7 @@ export class RegisterSampleComponent implements OnInit {
   @Input() LISConfigurations: LISConfigurationsModel;
   registrationCategory: string = "single";
 
-  labSamples$: Observable<LabSampleModel[]>;
+  labSamples$: Observable<{ pager: any; results: LabSampleModel[] }>;
   mrnGeneratorSourceUuid$: Observable<string>;
   preferredPersonIdentifier$: Observable<string>;
 
@@ -32,7 +32,13 @@ export class RegisterSampleComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.labSamples$ = this.samplesService.getCollectedSamples();
+    const paginationParameters = {
+      page: 1,
+      pageSize: 10,
+    };
+
+    this.loadSamplesByPaginationDetails(paginationParameters);
+
     this.mrnGeneratorSourceUuid$ =
       this.systemSettingsService.getSystemSettingsByKey(
         "iCare.generateMRN.source"
@@ -55,5 +61,20 @@ export class RegisterSampleComponent implements OnInit {
 
   getSelection(event: MatRadioChange): void {
     this.registrationCategory = event?.value;
+  }
+
+  getSamples(event: Event, action: string, pager: any): void {
+    event.stopPropagation();
+    this.loadSamplesByPaginationDetails({
+      page: action === "next" ? pager?.page + 1 : pager?.page - 1,
+      pageSize: 10,
+    });
+  }
+
+  loadSamplesByPaginationDetails(paginationParameters): void {
+    this.labSamples$ =
+      this.samplesService.getCollectedSamplesByPaginationDetails(
+        paginationParameters
+      );
   }
 }

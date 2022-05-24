@@ -1,5 +1,5 @@
-import { Injectable } from '@angular/core';
-import { Actions, createEffect, ofType } from '@ngrx/effects';
+import { Injectable } from "@angular/core";
+import { Actions, createEffect, ofType } from "@ngrx/effects";
 import {
   loadPatientsDetails,
   addLoadedPatientsDetails,
@@ -8,14 +8,14 @@ import {
   addCollectedSample,
   setLabSampleStatus,
   updatePatientLabSample,
-} from '../actions';
-import { switchMap, map, catchError } from 'rxjs/operators';
-import { of } from 'rxjs';
+} from "../actions";
+import { switchMap, map, catchError } from "rxjs/operators";
+import { of } from "rxjs";
 
-import * as _ from 'lodash';
-import { PatientService } from 'src/app/shared/services/patient.service';
-import { SamplesService } from 'src/app/shared/services/samples.service';
-import { formatPatientDetails } from 'src/app/shared/helpers/patient.helper';
+import * as _ from "lodash";
+import { PatientService } from "src/app/shared/services/patient.service";
+import { SamplesService } from "src/app/shared/services/samples.service";
+import { formatPatientDetails } from "src/app/shared/helpers/patient.helper";
 
 @Injectable()
 export class PatientsEffects {
@@ -63,14 +63,15 @@ export class PatientsEffects {
 
             const statusDetails =
               action?.priorityDetails?.status &&
-              action?.priorityDetails?.status == 'HIGH'
+              (action?.priorityDetails?.status == "HIGH" ||
+                action?.priorityDetails?.status == "Urgent")
                 ? {
                     sample: {
                       uuid: sampleResponse?.uuid,
                     },
                     user: action?.priorityDetails?.user,
-                    remarks: 'high priority',
-                    status: 'HIGH',
+                    remarks: "high priority",
+                    status: "Urgent",
                   }
                 : null;
             // console.log(formattedSample);

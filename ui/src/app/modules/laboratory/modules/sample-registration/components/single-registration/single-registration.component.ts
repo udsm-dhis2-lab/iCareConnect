@@ -269,9 +269,7 @@ export class SingleRegistrationComponent implements OnInit {
                           const orders = Object.keys(this.formData)
                             .map((key) => {
                               if (
-                                key
-                                  ?.toLocaleLowerCase()
-                                  .indexOf("department") === -1
+                                key?.toLocaleLowerCase().indexOf("test") > -1
                               ) {
                                 return {
                                   concept: this.formData[key]?.value,
@@ -347,7 +345,9 @@ export class SingleRegistrationComponent implements OnInit {
                                             uuid: sampleResponse?.uuid,
                                           },
                                           user: {
-                                            uuid: this.provider?.uuid,
+                                            uuid: localStorage.getItem(
+                                              "userUuid"
+                                            ),
                                           },
                                           remarks:
                                             this.formData["agency"]?.value,
