@@ -1,19 +1,23 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import * as _ from 'lodash';
-import { FormControl } from '@angular/forms';
-import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs';
-import { MatDialog } from '@angular/material/dialog';
-import { BarCodeModalComponent } from '../bar-code-modal/bar-code-modal.component';
-import { AppState } from 'src/app/store/reducers';
-import { getCollectingLabSampleState, getPatientCollectedLabSamples, getPatientsSamplesToCollect } from 'src/app/store/selectors';
-import { collectSample } from 'src/app/store/actions';
-import { formatDateToYYMMDD } from 'src/app/shared/helpers/format-date.helper';
+import { Component, OnInit, Input, Output, EventEmitter } from "@angular/core";
+import * as _ from "lodash";
+import { FormControl } from "@angular/forms";
+import { Store } from "@ngrx/store";
+import { Observable } from "rxjs";
+import { MatDialog } from "@angular/material/dialog";
+import { BarCodeModalComponent } from "../bar-code-modal/bar-code-modal.component";
+import { AppState } from "src/app/store/reducers";
+import {
+  getCollectingLabSampleState,
+  getPatientCollectedLabSamples,
+  getPatientsSamplesToCollect,
+} from "src/app/store/selectors";
+import { collectSample } from "src/app/store/actions";
+import { formatDateToYYMMDD } from "src/app/shared/helpers/format-date.helper";
 
 @Component({
-  selector: 'app-patient-orders',
-  templateUrl: './patient-orders.component.html',
-  styleUrls: ['./patient-orders.component.scss'],
+  selector: "app-patient-orders",
+  templateUrl: "./patient-orders.component.html",
+  styleUrls: ["./patient-orders.component.scss"],
 })
 export class PatientOrdersComponent implements OnInit {
   @Input() patient: any;
@@ -33,12 +37,12 @@ export class PatientOrdersComponent implements OnInit {
   sampleIdentification: any = {};
   samplePriority: any = {};
   priorityConcept = {
-    uuid: '',
-    name: '',
+    uuid: "",
+    name: "",
   };
   sampleIdentifierConcept = {
-    uuid: '',
-    name: '',
+    uuid: "",
+    name: "",
   };
   savedData: any = {};
   samplesCollected: any[];
@@ -57,11 +61,10 @@ export class PatientOrdersComponent implements OnInit {
   collectingLabSampleState$: Observable<boolean>;
 
   /** TODO: Check how to handle this in a best way */
-  userUuid = JSON.parse(sessionStorage.getItem('sessionInfo'))['user']['uuid'];
+  userUuid = JSON.parse(sessionStorage.getItem("sessionInfo"))["user"]["uuid"];
   constructor(private store: Store<AppState>, private dialog: MatDialog) {}
 
   ngOnInit(): void {
-
     // console.log("nimeitwa :: ")
 
     // this.store.dispatch(
@@ -76,10 +79,10 @@ export class PatientOrdersComponent implements OnInit {
     // );
 
     this.sampleIdentificationKeyWord =
-      this.labConfigs?.concepts['sampleIdentifier'] &&
-      this.labConfigs?.concepts['sampleIdentifier']['keyWord']
-        ? this.labConfigs.concepts['sampleIdentifier']['keyWord']
-        : 'LAB';
+      this.labConfigs?.concepts["sampleIdentifier"] &&
+      this.labConfigs?.concepts["sampleIdentifier"]["keyWord"]
+        ? this.labConfigs.concepts["sampleIdentifier"]["keyWord"]
+        : "LAB";
     // console.log('labConfigs at patient orders', this.labConfigs);
     this.priorityConcept = this.labConfigs?.concepts?.samplePriority;
     this.sampleIdentifierConcept = this.labConfigs?.concepts?.sampleIdentifier;
@@ -137,7 +140,7 @@ export class PatientOrdersComponent implements OnInit {
     };
     const priorityData =
       this.samplePriority[sampleSelected?.id] &&
-      this.samplePriority[sampleSelected?.id] == 'HIGH'
+      this.samplePriority[sampleSelected?.id] == "HIGH"
         ? {
             sample: {
               uuid: null,
@@ -145,8 +148,8 @@ export class PatientOrdersComponent implements OnInit {
             user: {
               uuid: this.userUuid,
             },
-            remarks: 'high priority',
-            status: 'HIGH',
+            remarks: "high priority",
+            status: "Urgent",
           }
         : null;
 
@@ -162,9 +165,9 @@ export class PatientOrdersComponent implements OnInit {
           sampleCollectionDate: new Date().getTime(),
           searchingText:
             this.sampleIdentification[sampleSelected.id] +
-            '-' +
+            "-" +
             sampleSelected?.departmentName +
-            '-' +
+            "-" +
             sampleSelected?.name,
         },
         priorityDetails: priorityData,
@@ -173,24 +176,24 @@ export class PatientOrdersComponent implements OnInit {
   }
 
   setProviders(providers) {
-    let provider_names = '';
+    let provider_names = "";
     _.map(providers, (provider) => {
-      provider_names += provider?.name + ' ';
+      provider_names += provider?.name + " ";
     });
   }
 
   setPriority(id, e) {
     if (e.checked) {
-      this.samplePriority[id] = 'HIGH';
+      this.samplePriority[id] = "HIGH";
     } else {
-      this.samplePriority[id] = '';
+      this.samplePriority[id] = "";
     }
   }
 
   formatObs(obs) {
     return _.map(obs, (observation) => {
       return {
-        person: JSON.parse(localStorage.getItem('provider'))['providerUuid'],
+        person: JSON.parse(localStorage.getItem("provider"))["providerUuid"],
         concept: observation.concept.uuid,
         obsDatetime: observation.obsDatetime,
         value: observation.value,
@@ -206,7 +209,7 @@ export class PatientOrdersComponent implements OnInit {
     let conceptsTaken = {};
     _.each(orders, (order) => {
       conceptsTaken[order.concept.uuid]
-        ? ''
+        ? ""
         : (formattedOrders = [
             ...formattedOrders,
             {
@@ -229,23 +232,23 @@ export class PatientOrdersComponent implements OnInit {
     let now = new Date();
     const identifier =
       this.sampleIdentificationKeyWord +
-      formatDateToYYMMDD(now).toString().split('-').join('').substring(2) +
-      '/' +
+      formatDateToYYMMDD(now).toString().split("-").join("").substring(2) +
+      "/" +
       now.getTime().toString().substring(10, 13);
     const currentSampleIdElement = document.getElementById(id);
     this.sampleIdentification[id] = identifier;
-    currentSampleIdElement.setAttribute('value', identifier);
+    currentSampleIdElement.setAttribute("value", identifier);
     if (
       (this.labConfigs?.barCode && this.labConfigs?.barCode?.use) ||
       !this.labConfigs?.barCode
     )
       setTimeout(() => {
         this.dialog.open(BarCodeModalComponent, {
-          height: '300px',
-          width: '15%',
+          height: "300px",
+          width: "15%",
           data: identifier,
           disableClose: false,
-          panelClass: 'custom-dialog-container',
+          panelClass: "custom-dialog-container",
         });
       }, 800);
   }
@@ -255,7 +258,7 @@ export class PatientOrdersComponent implements OnInit {
     this.previousCollectedSample[id] = sampleIdentification;
     const currentSampleIdElement = document.getElementById(id);
     this.sampleIdentification[id] = sampleIdentification;
-    currentSampleIdElement.setAttribute('value', sampleIdentification);
+    currentSampleIdElement.setAttribute("value", sampleIdentification);
   }
 
   changeTab(val) {

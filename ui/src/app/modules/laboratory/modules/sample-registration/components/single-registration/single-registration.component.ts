@@ -345,7 +345,9 @@ export class SingleRegistrationComponent implements OnInit {
                                             uuid: sampleResponse?.uuid,
                                           },
                                           user: {
-                                            uuid: this.provider?.uuid,
+                                            uuid: localStorage.getItem(
+                                              "userUuid"
+                                            ),
                                           },
                                           remarks:
                                             this.formData["agency"]?.value,

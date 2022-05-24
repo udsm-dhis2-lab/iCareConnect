@@ -1,4 +1,4 @@
-import * as _ from 'lodash';
+import * as _ from "lodash";
 
 export function getAllLabTestsForCurrentUser(samples, currentUser) {
   let formattedOrders = [];
@@ -8,7 +8,7 @@ export function getAllLabTestsForCurrentUser(samples, currentUser) {
      */
     if (
       sample?.user?.uuid == currentUser?.uuid &&
-      sample?.status == 'ACCEPTED'
+      sample?.status == "ACCEPTED"
     ) {
       _.each(sample?.orders, (order) => {
         // The order should be assigned to a person
@@ -31,7 +31,7 @@ export function getAllLabTestsForCurrentUser(samples, currentUser) {
           ];
         }
       });
-    } else if (sample?.status == 'ACCEPTED') {
+    } else if (sample?.status == "ACCEPTED") {
       _.each(sample?.orders, (order) => {
         if (order?.technician?.uuid == currentUser?.uuid) {
           formattedOrders = [
@@ -70,7 +70,7 @@ export function formatLabSamples(samples, status?) {
             mrNo: sample?.mrNo,
             patient: sample?.patient,
             orders: sample?.orders,
-            priority: sample?.priority ? 'HIGH' : 'None',
+            priority: sample?.priority ? "HIGH" : "None",
             allocation: sample?.allocation,
             status: sample?.status,
             comments: sample?.comments,
@@ -88,7 +88,7 @@ export function formatLabSamples(samples, status?) {
           mrNo: sample?.mrNo,
           patient: sample?.patient,
           orders: sample?.orders,
-          priority: sample.priority ? 'HIGH' : 'None',
+          priority: sample.priority ? "Urgent" : "Routine",
           allocation: sample?.allocation,
           status: sample?.status,
           comments: sample?.comments,
@@ -107,7 +107,7 @@ export function getSamplesWithTestsHavingSpecificSignOff(samples, signOff) {
       mrNo: sample?.mrNo,
       patient: sample?.patient,
       orders: getOrdersWithSpecificSignOff(sample?.orders, signOff),
-      priority: sample?.priority ? 'HIGH' : 'None',
+      priority: sample?.priority ? "Urgent" : "Routine",
       allocation: sample?.allocation,
       status: sample?.status,
       comments: sample?.comments,
@@ -140,8 +140,8 @@ export function getSamplesWithNoStatus(samples) {
 function getmrNo(identifiers) {
   const matchedIdentifier = (_.filter(identifiers, (identifier) => {
     if (
-      identifier?.identifierType?.name == 'MRN' ||
-      identifier?.identifierType?.display == 'MRN'
+      identifier?.identifierType?.name == "MRN" ||
+      identifier?.identifierType?.display == "MRN"
     ) {
       return identifier;
     }
@@ -149,23 +149,23 @@ function getmrNo(identifiers) {
   if (matchedIdentifier) {
     return matchedIdentifier?.id;
   } else {
-    return '';
+    return "";
   }
 }
 
 export function getLabSamplesWithNoStatus(samples) {
   return _.filter(samples, (sample) => {
-    if (!sample.hasOwnProperty('status') || !sample?.status) {
+    if (!sample.hasOwnProperty("status") || !sample?.status) {
       return sample;
     }
   });
 }
 
 export function groupSamplesBymRNo(samples) {
-  return _.map(Object.keys(_.groupBy(samples, 'mrNo')), (key) => {
+  return _.map(Object.keys(_.groupBy(samples, "mrNo")), (key) => {
     return {
       mrNo: key,
-      samples: _.groupBy(samples, 'mrNo')[key],
+      samples: _.groupBy(samples, "mrNo")[key],
     };
   });
 }
@@ -217,18 +217,28 @@ export function addTestAllocationDetailsToSample(sample, allocationResponse) {
   };
 }
 
-export function setSignOffToTestInTheSample(sample, signOffDetails, allocationUuid) {
-  let orders = []
+export function setSignOffToTestInTheSample(
+  sample,
+  signOffDetails,
+  allocationUuid
+) {
+  let orders = [];
   _.map(sample.orders, (order) => {
     if (order?.testAllocations[0]?.uuid == allocationUuid) {
       let testAllocation = order?.testAllocations[0];
-      testAllocation = { ...testAllocation, statuses: [...testAllocation?.statuses, signOffDetails] };
-      orders = [...orders, {
-        ...order,
-        testAllocations: [testAllocation],
-      }]
+      testAllocation = {
+        ...testAllocation,
+        statuses: [...testAllocation?.statuses, signOffDetails],
+      };
+      orders = [
+        ...orders,
+        {
+          ...order,
+          testAllocations: [testAllocation],
+        },
+      ];
     } else {
-      orders = [...orders, order]
+      orders = [...orders, order];
     }
   });
   return {

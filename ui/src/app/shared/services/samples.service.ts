@@ -38,7 +38,7 @@ export class SamplesService {
   }
 
   createLabSample(sample: any): Observable<SampleObject> {
-    return this.httpClient.post("lab/sample", sample).pipe(
+    return this.httpClient.post(BASE_URL + "lab/sample", sample).pipe(
       map((response) => {
         return response;
       }),
@@ -64,11 +64,23 @@ export class SamplesService {
     return this.httpClient.post(BASE_URL + "lab/sample", data);
   }
 
-  getCollectedSamples(): Observable<any> {
+  getCollectedSamplesByPaginationDetails(
+    paginationParameters: { page: number; pageSize: number },
+    dates?: { startDate: string; endDate: string }
+  ): Observable<{ pager: any; results: any[] }> {
     return this.httpClient
-      .get(BASE_URL + "lab/samples?startDate=2022-05-05&endDate=2022-05-10")
+      .get(
+        BASE_URL +
+          `lab/samples?page=${paginationParameters?.page}&pageSize=${
+            paginationParameters?.pageSize
+          }${
+            dates
+              ? "&startDate=" + dates?.startDate + "&endDate=" + dates?.endDate
+              : ""
+          }`
+      )
       .pipe(
-        map((response: any) => response?.results),
+        map((response: any) => response),
         catchError((error) => of(error))
       );
   }
