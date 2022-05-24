@@ -1,4 +1,5 @@
 import { Component, Input, OnInit } from "@angular/core";
+import { MatDialog } from "@angular/material/dialog";
 import { Observable, zip } from "rxjs";
 import { Location } from "src/app/core/models";
 import { LocationService } from "src/app/core/services";
@@ -11,8 +12,10 @@ import { formatDateToYYMMDD } from "src/app/shared/helpers/format-date.helper";
 import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
 import { ICARE_CONFIG } from "src/app/shared/resources/config";
+import { DiagnosisService } from "src/app/shared/resources/diagnosis/services";
 import { VisitsService } from "src/app/shared/resources/visits/services";
 import { SamplesService } from "src/app/shared/services/samples.service";
+import { BarCodeModalComponent } from "../../../sample-acceptance-and-results/components/bar-code-modal/bar-code-modal.component";
 
 @Component({
   selector: "app-single-registration",
@@ -47,7 +50,9 @@ export class SingleRegistrationComponent implements OnInit {
     private registrationService: RegistrationService,
     private identifierService: IdentifiersService,
     private visitsService: VisitsService,
-    private labOrdersService: LabOrdersService
+    private labOrdersService: LabOrdersService,
+    private diagnosisService: DiagnosisService,
+    private dialog: MatDialog
   ) {
     this.currentLocation = JSON.parse(localStorage.getItem("currentLocation"));
   }
@@ -126,7 +131,6 @@ export class SingleRegistrationComponent implements OnInit {
 
   onFormUpdateForAgency(formValues: FormValue): void {
     this.formData = { ...this.formData, ...formValues.getValues() };
-    console.log(this.formData);
   }
 
   onFormUpdateForLab(formValues: FormValue): void {
@@ -225,7 +229,10 @@ export class SingleRegistrationComponent implements OnInit {
               };
               this.savingData = true;
               this.registrationService
-                .createPatient(this.patientPayload)
+                .createPatient(
+                  this.patientPayload,
+                  this.personDetailsData["patientUuid"]
+                )
                 .subscribe((patientResponse) => {
                   this.savingDataResponse = patientResponse;
                   if (!patientResponse?.error) {
@@ -326,7 +333,7 @@ export class SingleRegistrationComponent implements OnInit {
                                     }
                                   ),
                                 };
-
+                                // Create sample
                                 this.samplesService
                                   .createLabSample(sample)
                                   .subscribe((sampleResponse) => {
@@ -339,6 +346,16 @@ export class SingleRegistrationComponent implements OnInit {
 
                                       this.labSampleLabel$ =
                                         this.samplesService.getSampleLabel();
+                                      this.dialog.open(BarCodeModalComponent, {
+                                        height: "200px",
+                                        width: "15%",
+                                        data: {
+                                          identifier: this.currentSampleLabel,
+                                          sample: sample,
+                                        },
+                                        disableClose: false,
+                                        panelClass: "custom-dialog-container",
+                                      });
                                       if (this.formData["agency"]?.value) {
                                         const sampleStatus = {
                                           sample: {
@@ -366,6 +383,34 @@ export class SingleRegistrationComponent implements OnInit {
                                       }
                                     }
                                   });
+
+                                // Set diagnosis if any
+
+                                if (
+                                  encounterResponse?.uuid &&
+                                  this.formData["icd10"]
+                                ) {
+                                  const diagnosisData = {
+                                    diagnosis: {
+                                      coded: this.formData["icd10"]?.value,
+                                      nonCoded: null,
+                                      specificName: null,
+                                    },
+                                    rank: 0,
+                                    condition: null,
+                                    certainty: "PROVISIONAL",
+                                    patient: patientResponse?.uuid,
+                                    encounter: encounterResponse?.uuid,
+                                  };
+
+                                  this.diagnosisService
+                                    .addDiagnosis(diagnosisData)
+                                    .subscribe((diagnosisResponse) => {
+                                      if (diagnosisResponse) {
+                                        this.savingData = false;
+                                      }
+                                    });
+                                }
                               } else {
                                 this.savingData = false;
                               }

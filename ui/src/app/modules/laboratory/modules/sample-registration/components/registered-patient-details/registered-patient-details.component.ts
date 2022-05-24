@@ -26,12 +26,10 @@ export class RegisteredPatientDetailsComponent implements OnInit {
 
   onFormUpdate(formValues: FormValue): void {
     const personUuid = formValues.getValues()["patient"]?.value;
-    this.personService
-      .getPersonDetailsByUuid(personUuid)
-      .subscribe((response) => {
-        if (response) {
-          this.personDetails.emit(response);
-        }
-      });
+    this.personService.getPatientByUuid(personUuid).subscribe((response) => {
+      if (response) {
+        this.personDetails.emit(response);
+      }
+    });
   }
 }

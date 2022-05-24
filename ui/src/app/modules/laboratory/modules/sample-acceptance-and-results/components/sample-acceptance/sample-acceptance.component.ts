@@ -368,6 +368,7 @@ export class SampleAcceptanceComponent implements OnInit {
         sample: sample,
         currentUser: this.currentUser,
         labConfigs: this.labConfigs,
+        LISConfigurations: this.LISConfigurations,
         maxHeight:
           sample?.orders?.length == 1 &&
           sample?.orders[0]?.order?.concept?.setMembers?.length == 0
