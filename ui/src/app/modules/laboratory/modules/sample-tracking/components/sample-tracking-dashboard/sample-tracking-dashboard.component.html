@@ -184,7 +184,7 @@
                   *ngIf="orderCount == 0"
                   [attr.rowspan]="sample?.orders?.length"
                 >
-                  {{ sample?.priorityHigh ? "High" : "Normal" }}
+                  {{ sample?.priorityHigh ? "Urgent" : "Routine" }}
                 </td>
                 <td
                   *ngIf="orderCount == 0"

@@ -15,9 +15,7 @@ import { getProviderDetails } from "src/app/store/selectors/current-user.selecto
 export class SampleRegistrationHomeComponent implements OnInit {
   provider$: Observable<any>;
   LISConfigurations$: Observable<LISConfigurationsModel>;
-  constructor(private store: Store<AppState>) {
-    this.store.dispatch(loadLISConfigurations());
-  }
+  constructor(private store: Store<AppState>) {}
 
   ngOnInit(): void {
     this.provider$ = this.store.select(getProviderDetails);
