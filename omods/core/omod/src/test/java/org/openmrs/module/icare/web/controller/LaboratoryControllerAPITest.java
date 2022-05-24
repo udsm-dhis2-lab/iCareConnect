@@ -186,14 +186,45 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 	@Test
 	public void testGettingSamples() throws Exception {
 
-		MockHttpServletRequest newGetRequest = newGetRequest("lab/samples");
+		MockHttpServletRequest newGetRequest = newGetRequest("lab/samples", new Parameter("page",
+				"2"), new Parameter("pageSize",
+				"2"));
 
+		//System.out.println(Context.getVisitService().getVisitByUuid("2386395c-2b07-4abd-8fd7-a748c957554d").getLocation().getUuid());
 		MockHttpServletResponse handleGet = handle(newGetRequest);
 
-		System.out.println(handleGet.getContentAsString());
+		//System.out.println(Context.getVisitService().getVisitByUuid("2386395c-2b07-4abd-8fd7-a748c957554d").getLocation().getUuid());
+		Map<String, Object> sampleResults = (new ObjectMapper()).readValue(handleGet.getContentAsString(),
+				Map.class);
+
+		Map<String,Object> pagerObject = (Map<String, Object>) sampleResults.get("pager");
+		assertThat("Page Count is 2", (Integer)pagerObject.get("pageCount") == 2, is(true));
+		assertThat("Total is 3", (Integer)pagerObject.get("total") == 3, is(true));
+		assertThat("Page Size is 2", (Integer)pagerObject.get("pageSize") == 2, is(true));
+		assertThat("Page is 2", (Integer)pagerObject.get("page") == 2, is(true));
+		assertThat("List count is 1", ((List)sampleResults.get("results")).size() == 1, is(true));
 		assertThat(
 				"There is atleast 1 sample for the visit from lab-data.xml with visit id = 2386395c-2b07-4abd-8fd7-a748c957554d",
 				handleGet.getContentAsString().contains("2386395c-2b07-4abd-8fd7-a748c957554d"));
+
+		newGetRequest = newGetRequest("lab/samples", new Parameter("location",
+				"58c57d25-8d39-41ab-8422-108a0c277d98"));
+
+		//System.out.println(Context.getVisitService().getVisitByUuid("2386395c-2b07-4abd-8fd7-a748c957554d").getLocation().getUuid());
+		handleGet = handle(newGetRequest);
+
+		System.out.println(handleGet.getContentAsString());
+		//System.out.println(Context.getVisitService().getVisitByUuid("2386395c-2b07-4abd-8fd7-a748c957554d").getLocation().getUuid());
+		sampleResults = (new ObjectMapper()).readValue(handleGet.getContentAsString(),
+				Map.class);
+
+		pagerObject = (Map<String, Object>) sampleResults.get("pager");
+		System.out.println((Integer)pagerObject.get("pageCount"));
+		assertThat("Page Count is 2", (Integer)pagerObject.get("pageCount") == 0, is(true));
+		assertThat("Total is 3", (Integer)pagerObject.get("total") == 0, is(true));
+		assertThat("Page Size is 2", (Integer)pagerObject.get("pageSize") == 50, is(true));
+		assertThat("Page is 2", (Integer)pagerObject.get("page") == 1, is(true));
+		assertThat("List count is 1", ((List)sampleResults.get("results")).size() == 0, is(true));
 	}
 	
 	@Test

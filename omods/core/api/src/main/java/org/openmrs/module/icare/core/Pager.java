@@ -23,7 +23,7 @@ public class Pager implements JSONConverter{
     }
 
     public int getPageCount() {
-        return pageCount;
+        return (int) Math.ceil((double)total/pageSize);
     }
 
     public void setPageCount(int pageCount) {
@@ -54,7 +54,7 @@ public class Pager implements JSONConverter{
     public Map<String, Object> toMap() {
         Map<String, Object> result = new HashMap<String, Object>();
         result.put("page", this.page);
-        result.put("pageCount", this.pageCount);
+        result.put("pageCount", this.getPageCount());
         result.put("total", this.total);
         result.put("pageSize", this.pageSize);
         return result;
