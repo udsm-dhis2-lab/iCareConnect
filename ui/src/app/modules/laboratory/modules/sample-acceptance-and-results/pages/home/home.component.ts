@@ -1,8 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import { Store } from "@ngrx/store";
 import { Observable } from "rxjs";
-import { loadLISConfigurations } from "src/app/modules/laboratory/store/actions";
-import { getLISConfigurations } from "src/app/modules/laboratory/store/selectors";
 import { AppState } from "src/app/store/reducers";
 import {
   getAllPatientsVisitsReferences,
@@ -15,6 +13,7 @@ import {
   getVisitsLoadedState,
   getVisitsParameters,
 } from "src/app/store/selectors";
+import { getLISConfigurations } from "src/app/store/selectors/lis-configurations.selectors";
 
 @Component({
   selector: "app-home",

@@ -58,6 +58,7 @@ export class ModulesComponent implements OnInit {
       });
 
       if (assignedApps.length > 0 && assignedApps[0].path) {
+        // NB: Navigation has to be moved to module selector
         this.navigateToApp(assignedApps[0].path);
       }
     });
@@ -92,8 +93,6 @@ export class ModulesComponent implements OnInit {
 
   searchModules(event?: Event): void {
     if (event) {
-      console.log(event.target);
-
       event.stopPropagation();
       this.searchTerm = (event.target as HTMLInputElement).value;
     } else {

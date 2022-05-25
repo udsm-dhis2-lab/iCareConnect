@@ -1,1 +1,1 @@
-export * from "./lis-configurations.selectors";
+export * from "./samples.selectors";

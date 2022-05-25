@@ -1,20 +1,15 @@
-import { NgModule } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
-import { ReportsDashboardComponent } from './pages/reports-dashboard/reports-dashboard.component';
-import { ReportsHomeComponent } from './reports-home/reports-home.component';
+import { NgModule } from "@angular/core";
+import { Routes, RouterModule } from "@angular/router";
+import { ReportsDashboardComponent } from "./pages/reports-dashboard/reports-dashboard.component";
+import { ReportsHomeComponent } from "./reports-home/reports-home.component";
 
 const routes: Routes = [
   {
-    path: '',
-    pathMatch: 'full',
-    redirectTo: 'dashboard',
-  },
-  {
-    path: '',
+    path: "",
     component: ReportsHomeComponent,
     children: [
       {
-        path: 'dashboard',
+        path: "",
         component: ReportsDashboardComponent,
       },
     ],
