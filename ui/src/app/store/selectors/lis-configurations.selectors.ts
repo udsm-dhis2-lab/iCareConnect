@@ -3,10 +3,13 @@ import {
   createSelector,
   MemoizedSelector,
 } from "@ngrx/store";
+import { AppState, getRootState } from "../reducers";
 import { LISConfigsState } from "../states/lis-configurations.states";
 
-const getLISConfigsState: MemoizedSelector<Object, LISConfigsState> =
-  createFeatureSelector<LISConfigsState>("lisConfigs");
+const getLISConfigsState = createSelector(
+  getRootState,
+  (state: AppState) => state.lisConfigs
+);
 
 export const getLISConfigurationsLoadedState = createSelector(
   getLISConfigsState,

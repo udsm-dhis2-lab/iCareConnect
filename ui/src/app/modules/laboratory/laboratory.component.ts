@@ -22,12 +22,12 @@ import {
   loadRolesDetails,
   loadOrderTypes,
   go,
+  loadLISConfigurations,
 } from "src/app/store/actions";
 import { loadSpecimenSources } from "./store/actions/specimen-sources-and-tests-management.actions";
 import { getAllSampleTypes } from "src/app/store/selectors";
-import { loadLISConfigurations } from "./store/actions";
 import { LISConfigurationsModel } from "./resources/models/lis-configurations.model";
-import { getLISConfigurations } from "./store/selectors";
+import { getLISConfigurations } from "src/app/store/selectors/lis-configurations.selectors";
 
 @Component({
   selector: "lab-root",
@@ -212,7 +212,9 @@ export class LaboratoryComponent implements OnInit {
     }
     this.store.dispatch(
       go({
-        path: ["/laboratory/" + routePath],
+        path: [
+          (routePath !== "tests-control" ? "/laboratory/" : "/") + routePath,
+        ],
       })
     );
   }
