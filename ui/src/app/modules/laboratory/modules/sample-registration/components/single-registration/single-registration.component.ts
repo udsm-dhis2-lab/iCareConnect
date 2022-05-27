@@ -212,7 +212,7 @@ export class SingleRegistrationComponent implements OnInit {
                         identifier:
                           this.personDetailsData[personIdentifierType.id],
                         identifierType: personIdentifierType.id,
-                        location: this.currentLocation.uuid,
+                        location: this.currentLocation?.uuid,
                         preferred: true,
                       };
                     } else {
@@ -220,7 +220,7 @@ export class SingleRegistrationComponent implements OnInit {
                         identifier:
                           this.personDetailsData[personIdentifierType.id],
                         identifierType: personIdentifierType.id,
-                        location: this.currentLocation.uuid,
+                        location: this.currentLocation?.uuid,
                         preferred: false,
                       };
                     }
@@ -240,9 +240,7 @@ export class SingleRegistrationComponent implements OnInit {
                     const visitObject = {
                       patient: this.savingDataResponse?.uuid,
                       visitType: "54e8ffdc-dea0-4ef0-852f-c23e06d16066",
-                      location: this.formData["lab"]?.value
-                        ? this.formData["lab"]?.value
-                        : this.currentLocation?.uuid,
+                      location: this.currentLocation?.uuid,
                       indication: "Sample Registration",
                       attributes: [
                         {
