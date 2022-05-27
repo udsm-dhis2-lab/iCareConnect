@@ -47,12 +47,13 @@ export class PersonDetailsComponent implements OnInit {
           id: primaryIdentifier?.id,
           key: primaryIdentifier?.id,
           label: primaryIdentifier?.name,
-          value: personDetails
-            ? (personDetails?.identifiers.filter(
-                (identifier) =>
-                  identifier?.identifierType?.uuid === primaryIdentifier?.id
-              ) || [])[0]?.identifier
-            : null,
+          value:
+            personDetails && personDetails?.identifiers?.length > 0
+              ? (personDetails?.identifiers?.filter(
+                  (identifier) =>
+                    identifier?.identifierType?.uuid === primaryIdentifier?.id
+                ) || [])[0]?.identifier
+              : null,
           required: true,
         })
       : null;

@@ -99,20 +99,20 @@ export class SingleRegistrationComponent implements OnInit {
         ? currentLocation?.childLocations
         : [];
 
-    this.labFormField = new Dropdown({
-      id: "lab",
-      key: "lab",
-      label: "Receiving Lab",
-      options: labsAvailable.map((location) => {
-        return {
-          key: location?.uuid,
-          value: location?.uuid,
-          label: location?.display,
-          name: location?.display,
-        };
-      }),
-      shouldHaveLiveSearchForDropDownFields: false,
-    });
+    // this.labFormField = new Dropdown({
+    //   id: "lab",
+    //   key: "lab",
+    //   label: "Receiving Lab",
+    //   options: labsAvailable.map((location) => {
+    //     return {
+    //       key: location?.uuid,
+    //       value: location?.uuid,
+    //       label: location?.display,
+    //       name: location?.display,
+    //     };
+    //   }),
+    //   shouldHaveLiveSearchForDropDownFields: false,
+    // });
   }
 
   onFormUpdate(formValues: FormValue, itemKey?: string): void {
