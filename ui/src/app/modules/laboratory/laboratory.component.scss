@@ -8,10 +8,11 @@
   align-items: center;
   left: 0;
   right: 0;
-  position: fixed;
+  // position: fixed;
   z-index: 200;
   background-color: #FFF;
   padding: 10px 5px;
+  margin-top: 170px;
 }
 
 .active-route {

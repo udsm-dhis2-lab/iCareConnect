@@ -182,6 +182,15 @@ export class LaboratoryComponent implements OnInit {
     this.privileges$ = this.store.select(getCurrentUserPrivileges);
 
     this.currentUser$ = this.store.select(getCurrentUserInfo);
+
+    // Set current location if not set
+    // if (!JSON.parse(localStorage.getItem("currentLocation"))) {
+    //   this.currentUser$.subscribe((response) => {
+    //     if (response) {
+    //       console.log(response);
+    //     }
+    //   });
+    // }
     this.store.dispatch(loadSampleTypes());
 
     this.sampleTypes$ = this.store.select(getAllSampleTypes);
