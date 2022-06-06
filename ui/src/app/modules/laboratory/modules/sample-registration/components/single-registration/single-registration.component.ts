@@ -125,7 +125,7 @@ export class SingleRegistrationComponent implements OnInit {
   }
 
   onFormUpdateForTest(formValues: FormValue): void {
-    console.log(formValues.getValues());
+    // console.log(formValues.getValues());
     // TODO: Add support to autoselect department
   }
 

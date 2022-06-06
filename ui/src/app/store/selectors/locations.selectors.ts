@@ -106,7 +106,13 @@ export const getChildLocationsOfTheFirstLevelParentLocation = createSelector(
           ) || []
         )?.length > 0
       ) {
-        return location;
+        return {
+          ...location,
+          attributes:
+            location?.attributes && location?.attributes?.length > 0
+              ? location?.attributes.filter((attribute) => !attribute?.voided)
+              : [],
+        };
       }
     })
 );

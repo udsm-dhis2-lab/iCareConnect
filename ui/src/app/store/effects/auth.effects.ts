@@ -49,7 +49,9 @@ export class AuthEffects {
               return authenticated
                 ? [
                     go({ path: [""] }),
-                    setUserLocations({ userLocations }),
+                    setUserLocations({
+                      userLocations: userLocations,
+                    }),
                     loadProviderDetails({ userUuid }),
                     addLoadedUserDetails({
                       userDetails: formatCurrentUserDetails(authenticatedUser),

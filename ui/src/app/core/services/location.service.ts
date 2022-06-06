@@ -11,29 +11,102 @@ export class LocationService {
   constructor(private httpClient: OpenmrsHttpClientService) {}
 
   getLoginLocations(): Observable<any> {
-    return this.httpClient.get(
-      "location?limit=100&tag=Login+Location&v=custom:(display,uuid,tags,description,parentLocation,childLocations,attributes:(attributeType,uuid,value,display))"
-    );
+    return this.httpClient
+      .get(
+        "location?limit=100&tag=Login+Location&v=custom:(display,uuid,tags,description,parentLocation,childLocations,attributes:(attributeType,uuid,value,display,voided))"
+      )
+      .pipe(
+        map((response) => {
+          return {
+            results: response?.results.map((result) => {
+              return {
+                ...result,
+                attributes:
+                  result?.attributes && result?.attributes?.length > 0
+                    ? result?.attributes.filter(
+                        (attribute) => !attribute?.voided
+                      )
+                    : [],
+              };
+            }),
+          };
+        }),
+        catchError((error) => of(error))
+      );
   }
 
   getLocationById(uuid): Observable<any> {
-    return this.httpClient.get("location/" + uuid + "?v=full");
+    return this.httpClient.get("location/" + uuid + "?v=full").pipe(
+      map((response) => {
+        return {
+          ...response,
+          attributes:
+            response?.attributes && response?.attributes?.length > 0
+              ? response?.attributes.filter((attribute) => !attribute?.voided)
+              : [],
+        };
+      }),
+      catchError((error) => of(error))
+    );
   }
 
   getAllLocations() {
-    return this.httpClient.get("location?v=full&limit=100");
+    return this.httpClient.get("location?v=full&limit=100").pipe(
+      map((response) => {
+        return {
+          results: response?.results.map((result) => {
+            return {
+              ...result,
+              attributes:
+                result?.attributes && result?.attributes?.length > 0
+                  ? result?.attributes.filter((attribute) => !attribute?.voided)
+                  : [],
+            };
+          }),
+        };
+      }),
+      catchError((error) => of(error))
+    );
   }
 
   getAllLocationsByLoginLocationTag() {
-    return this.httpClient.get("location?v=full&limit=100&tag=Login+Location");
+    return this.httpClient
+      .get("location?v=full&limit=100&tag=Login+Location")
+      .pipe(
+        map((response) => {
+          return {
+            results: response?.results.map((result) => {
+              return {
+                ...result,
+                attributes:
+                  result?.attributes && result?.attributes?.length > 0
+                    ? result?.attributes.filter(
+                        (attribute) => !attribute?.voided
+                      )
+                    : [],
+              };
+            }),
+          };
+        }),
+        catchError((error) => of(error))
+      );
   }
-
 
   getLocationsByTagName(tagName): Observable<any[]> {
     return this.httpClient
       .get("location?tag=" + tagName + "&v=full&limit=100")
       .pipe(
-        map((response) => response?.results || []),
+        map((response) => {
+          return response?.results.map((result) => {
+            return {
+              ...result,
+              attributes:
+                result?.attributes && result?.attributes?.length > 0
+                  ? result?.attributes.filter((attribute) => !attribute?.voided)
+                  : [],
+            };
+          });
+        }),
         catchError((error) => of(error))
       );
   }

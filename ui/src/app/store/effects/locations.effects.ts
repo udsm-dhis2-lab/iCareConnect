@@ -137,6 +137,7 @@ export class LocationsEffects implements OnInitEffects {
             })
           );
         } else {
+          this.store.dispatch(go({ path: ["/login"] }));
           return of(null);
         }
       })

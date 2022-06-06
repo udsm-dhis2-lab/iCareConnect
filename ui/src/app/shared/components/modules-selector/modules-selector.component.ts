@@ -114,17 +114,7 @@ export class ModulesSelectorComponent implements OnInit {
     const navigationDetails = JSON.parse(
       localStorage.getItem("navigationDetails")
     );
-    console.log("HERE", this.currentModule);
 
-    console.log(
-      this.currentModule?.app?.path +
-        (this.currentModule?.app?.path === "/laboratory"
-          ? "/sample-registration"
-          : "") +
-        (this.currentModule?.app?.considerLocationRoute
-          ? "/" + this.currentLocation?.uuid
-          : "")
-    );
     this.store.dispatch(
       go({
         path:

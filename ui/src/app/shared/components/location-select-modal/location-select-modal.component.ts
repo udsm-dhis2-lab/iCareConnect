@@ -1,17 +1,17 @@
-import { Component, OnInit } from '@angular/core';
-import { MatDialogRef } from '@angular/material/dialog';
-import { select, Store } from '@ngrx/store';
-import { Observable } from 'rxjs';
-import { Location } from 'src/app/core/models';
-import { go, setCurrentUserCurrentLocation } from 'src/app/store/actions';
-import { AppState } from 'src/app/store/reducers';
-import { getLocationLoadingStatus } from 'src/app/store/selectors';
-import { getUserAssignedLocations } from 'src/app/store/selectors/current-user.selectors';
+import { Component, OnInit } from "@angular/core";
+import { MatDialogRef } from "@angular/material/dialog";
+import { select, Store } from "@ngrx/store";
+import { Observable } from "rxjs";
+import { Location } from "src/app/core/models";
+import { go, setCurrentUserCurrentLocation } from "src/app/store/actions";
+import { AppState } from "src/app/store/reducers";
+import { getLocationLoadingStatus } from "src/app/store/selectors";
+import { getUserAssignedLocations } from "src/app/store/selectors/current-user.selectors";
 
 @Component({
-  selector: 'app-location-select-modal',
-  templateUrl: './location-select-modal.component.html',
-  styleUrls: ['./location-select-modal.component.scss'],
+  selector: "app-location-select-modal",
+  templateUrl: "./location-select-modal.component.html",
+  styleUrls: ["./location-select-modal.component.scss"],
 })
 export class LocationSelectModalComponent implements OnInit {
   constructor(
@@ -23,7 +23,7 @@ export class LocationSelectModalComponent implements OnInit {
   locationSet = false;
   locations$: Observable<Location[]>;
   loadingLocations$: Observable<boolean>;
-  searchingText = '';
+  searchingText = "";
 
   ngOnInit(): void {
     this.locations$ = this.store.select(getUserAssignedLocations);
@@ -38,7 +38,7 @@ export class LocationSelectModalComponent implements OnInit {
 
   setLocation(location): void {
     this.store.dispatch(setCurrentUserCurrentLocation({ location }));
-    this.store.dispatch(go({ path: [''] }));
+    this.store.dispatch(go({ path: [""] }));
     this.closeDialog();
   }
 

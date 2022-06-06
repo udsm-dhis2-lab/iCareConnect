@@ -23,7 +23,7 @@ export class LandingComponent implements OnInit {
 
     this.LISConfigurations$ = this.store.select(getLISConfigurations);
     this.LISConfigurations$.subscribe((response) => {
-      if (response) {
+      if (response && response?.isLIS) {
         this.store.dispatch(go({ path: ["/laboratory/sample-registration"] }));
       }
     });
