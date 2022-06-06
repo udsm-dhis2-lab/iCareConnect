@@ -70,8 +70,9 @@ export class LoginFormComponent implements OnInit {
           sessionStorage.setItem("JSESSIONID", loginResponse?.sessionId);
           localStorage.setItem("credentialsToken", credentialsToken);
           localStorage.setItem("userUuid", user.uuid);
-
-          this.store.dispatch(setUserLocations({ userLocations }));
+          this.store.dispatch(
+            setUserLocations({ userLocations: userLocations })
+          );
           this.store.dispatch(loadProviderDetails({ userUuid }));
           this.store.dispatch(
             addLoadedUserDetails({

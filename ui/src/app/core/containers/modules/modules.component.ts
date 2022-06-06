@@ -86,8 +86,13 @@ export class ModulesComponent implements OnInit {
             formattedParam[param.split("=")[0]] = param.split("=")[1];
           })
         : (formattedParam = null);
-      go({ path: [basePath], extras: { queryParams: formattedParam } });
-      this.router.navigate([basePath]);
+
+      /**
+       * Navigation has been moved to module selector
+       */
+      // this.store.dispatch(
+      //   go({ path: [basePath], extras: { queryParams: formattedParam } })
+      // );
     }
   }
 

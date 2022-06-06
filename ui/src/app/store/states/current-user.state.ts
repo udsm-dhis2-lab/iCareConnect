@@ -1,5 +1,5 @@
-import { BaseState, initialBaseState } from './base.state';
-import { UserGet, ProviderGet } from 'src/app/shared/resources/openmrs';
+import { BaseState, initialBaseState } from "./base.state";
+import { UserGet, ProviderGet } from "src/app/shared/resources/openmrs";
 
 export interface CurrentUserState extends BaseState {
   currentUser: UserGet;

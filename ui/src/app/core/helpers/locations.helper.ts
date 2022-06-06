@@ -1,12 +1,13 @@
-import * as _ from 'lodash';
-import { Location } from '../models';
+import * as _ from "lodash";
+import { Location } from "../models";
 
-let locationPath = '';
+let locationPath = "";
 
 export function formatLocationsPayLoad(locations): Location[] {
   return _.map(locations, (location) => {
     if (!location.retired) {
-      locationPath = '';
+      locationPath = "";
+      const modules = getLocationModules(location);
       return {
         id: location?.uuid,
         uuid: location?.uuid,
@@ -27,23 +28,23 @@ export function formatLocationsPayLoad(locations): Location[] {
         path: _.reverse(
           (
             location?.uuid +
-            '/' +
+            "/" +
             (location?.parentLocation &&
-            location?.parentLocation.hasOwnProperty('uuid')
+            location?.parentLocation.hasOwnProperty("uuid")
               ? getPathForTheLocation(location?.parentLocation)
-              : '')
-          ).split('/')
+              : "")
+          ).split("/")
         )
-          .join('/')
+          .join("/")
           .substring(1),
         billingConcept:
           location?.attributes.length > 0
             ? (location?.attributes?.filter(
                 (attribute) =>
-                  attribute?.attributeType?.display === 'Billing concept'
+                  attribute?.attributeType?.display === "Billing concept"
               ) || [])[0]?.value
             : null,
-        modules: getLocationModules(location),
+        modules: modules,
       };
     }
   });
@@ -53,7 +54,8 @@ function getLocationModules(location) {
   const locationModuleAttributes =
     location.attributes.filter(
       (attribute) =>
-        attribute?.attributeType?.display.toLowerCase() === 'modules' &&
+        !attribute?.voided &&
+        attribute?.attributeType?.display.toLowerCase() === "modules" &&
         !attribute?.voided
     ) || [];
   return locationModuleAttributes?.length > 0
@@ -72,7 +74,7 @@ function checkIfTheChildAreBeds(childLocations) {
    * TODO: this has to be softcodes using global configs
    */
   return childLocations && childLocations?.length > 0
-    ? childLocations[0]?.tags.some((tag) => tag?.display === 'Bed Location')
+    ? childLocations[0]?.tags.some((tag) => tag?.display === "Bed Location")
     : false;
 }
 
@@ -82,7 +84,7 @@ function checkIfTheChildAreCabinets(childLocations) {
    */
   return childLocations && childLocations?.length > 0
     ? childLocations[0]?.tags.some(
-        (tag) => tag?.display === 'Mortuary Location'
+        (tag) => tag?.display === "Mortuary Location"
       )
     : false;
 }
@@ -98,9 +100,9 @@ function getCabinets(childLocations) {
 function getPathForTheLocation(location) {
   locationPath +=
     location?.uuid +
-    '/' +
-    (location?.parentLocation && location?.parentLocation.hasOwnProperty('uuid')
+    "/" +
+    (location?.parentLocation && location?.parentLocation.hasOwnProperty("uuid")
       ? getPathForTheLocation(location?.parentLocation)
-      : '');
+      : "");
   return locationPath;
 }
