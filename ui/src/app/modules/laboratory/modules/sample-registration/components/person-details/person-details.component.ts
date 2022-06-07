@@ -1,6 +1,13 @@
-import { Component, EventEmitter, OnInit, Output } from "@angular/core";
+import {
+  Component,
+  EventEmitter,
+  OnInit,
+  Output,
+  ViewChild,
+} from "@angular/core";
 import { MatRadioChange } from "@angular/material/radio";
 import { RegistrationService } from "src/app/modules/registration/services/registration.services";
+import { FormComponent } from "src/app/shared/modules/form/components/form/form.component";
 import { DateField } from "src/app/shared/modules/form/models/date-field.model";
 import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
@@ -24,6 +31,9 @@ export class PersonDetailsComponent implements OnInit {
   showOtherIdentifiers: boolean = false;
   patientUuid: string;
   identifierTypes: any[] = [];
+
+  @ViewChild(FormComponent, { static: false })
+  formComponent: FormComponent;
   constructor(private registrationService: RegistrationService) {}
 
   ngOnInit(): void {
@@ -82,6 +92,23 @@ export class PersonDetailsComponent implements OnInit {
     Object.keys(values).forEach((key) => {
       this.personDetailsData[key] = values[key]?.value;
     });
+    console.log(values);
+    if (values["age"]?.value) {
+      this.personDetailsData["dob"] = new Date(
+        new Date().getFullYear() - Number(values["age"]?.value),
+        6,
+        1
+      );
+      // console.log(this.personDetailsData["dob"]);
+      this.formComponent.patchFormValueValue({
+        dob: this.personDetailsData["dob"],
+      });
+    } else if (values["dob"]?.value) {
+      console.log(values);
+      console.log(values["dob"]);
+      console.log(values["dob"]?.value);
+    }
+
     this.personDetails.emit({
       ...this.personDetailsData,
       isNewPatient: this.personDetailsCategory === "new",
@@ -121,6 +148,14 @@ export class PersonDetailsComponent implements OnInit {
   setPersonDetails(personDetails?: any): void {
     this.patientUuid = personDetails?.uuid;
     this.personFields = [
+      new Dropdown({
+        id: "sourceLocation",
+        key: "sourceLocation",
+        label: "Source/Received From",
+        options: [],
+        searchControlType: "location",
+        shouldHaveLiveSearchForDropDownFields: true,
+      }),
       new Textbox({
         id: "firstName",
         key: "firstName",

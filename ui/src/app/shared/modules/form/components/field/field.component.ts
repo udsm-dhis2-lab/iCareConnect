@@ -92,6 +92,11 @@ export class FieldComponent {
     this.fieldUpdate.emit(this.form);
   }
 
+  updateFieldOnDemand(objectToUpdate): void {
+    this.form.patchValue(objectToUpdate);
+    this.fieldUpdate.emit(this.form);
+  }
+
   get getOptionValue(): any {
     const matchedOption = (this.field.options.filter(
       (option) => option?.key === this.value
@@ -99,14 +104,17 @@ export class FieldComponent {
     return matchedOption ? matchedOption?.value : "";
   }
 
-  searchConcept(event: any): void {
+  searchItem(event: any, field?: any): void {
     event.stopPropagation();
     const searchingText = event.target.value;
     const parameters = {
       q: searchingText,
       limit: 50,
       class: this.field?.conceptClass,
-      v: "custom:(uuid,display,datatype,conceptClass,mappings)",
+      v:
+        field?.searchControlType === "location"
+          ? "custom:(uuid,display)"
+          : "custom:(uuid,display,datatype,conceptClass,mappings)",
     };
     this.members$ = this.formService.searchItem(
       parameters,

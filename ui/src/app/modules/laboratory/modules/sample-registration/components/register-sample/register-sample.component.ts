@@ -71,7 +71,7 @@ export class RegisterSampleComponent implements OnInit {
     });
   }
 
-  loadSamplesByPaginationDetails(paginationParameters): void {
+  loadSamplesByPaginationDetails(paginationParameters: any): void {
     this.labSamples$ =
       this.samplesService.getCollectedSamplesByPaginationDetails(
         paginationParameters

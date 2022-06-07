@@ -23,11 +23,6 @@
     *ngIf="personDetailsCategory === 'existing'"
     (personDetails)="onGetPersonDetails($event)"
   ></app-registered-patient-details>
-  <app-form
-    [fields]="personFields"
-    [isFormHorizontal]="true"
-    (formUpdate)="onFormUpdate($event)"
-  ></app-form>
 
   <div class="row primary-identifier">
     <div class="col-10">
@@ -37,7 +32,9 @@
       ></app-form>
     </div>
     <div class="col-2">
-      <a class="show-more-toggle" (click)="toggleIdentifiers($event)">More</a>
+      <a class="show-more-toggle" (click)="toggleIdentifiers($event)">{{
+        showOtherIdentifiers ? "Less" : "More"
+      }}</a>
     </div>
   </div>
 
@@ -45,5 +42,10 @@
     *ngIf="showOtherIdentifiers"
     [fields]="identifiersFields"
     (formUpdate)="onUpdateIdentifierForm($event)"
+  ></app-form>
+  <app-form
+    [fields]="personFields"
+    [isFormHorizontal]="true"
+    (formUpdate)="onFormUpdate($event)"
   ></app-form>
 </div>

@@ -9,15 +9,33 @@
     <div class="col-12" *ngIf="savingData">
       <mat-progress-bar mode="indeterminate"></mat-progress-bar>
     </div>
+
+    <div class="col-lg-6 col-md-6 col-sx-12 col-sm-12">
+      <fieldset>
+        <legend>Patient Details</legend>
+        <app-person-details
+          (personDetails)="onGetPersonDetails($event)"
+        ></app-person-details>
+      </fieldset>
+      <fieldset class="mt-2 mb-2">
+        <legend>Clinical Data</legend>
+        <app-clinical-data
+          (clinicalDataValues)="onGetClinicalDataValues($event)"
+        ></app-clinical-data>
+      </fieldset>
+    </div>
     <div class="col-lg-6 col-md-6 col-sx-12 col-sm-12 mt-2">
-      <div class="h6 text-left">Specimen Details</div>
       <div class="for-sample-label">
         <fieldset>
-          <legend>Identification</legend>
+          <legend>Specimen Details</legend>
           <app-sample-label
             [label]="params?.labSampleLabel"
             (sampleLabel)="onGetSampleLabel($event)"
           ></app-sample-label>
+          <app-form
+            [fields]="specimenDetailsFields"
+            (formUpdate)="onFormUpdate($event)"
+          ></app-form>
         </fieldset>
       </div>
       <div>
@@ -51,21 +69,6 @@
           ></app-form>
         </fieldset>
       </div>
-    </div>
-    <div class="col-lg-6 col-md-6 col-sx-12 col-sm-12">
-      <div class="h6">Patient</div>
-      <fieldset>
-        <legend>Demographic</legend>
-        <app-person-details
-          (personDetails)="onGetPersonDetails($event)"
-        ></app-person-details>
-      </fieldset>
-      <fieldset class="mt-2 mb-2">
-        <legend>Clinical Data</legend>
-        <app-clinical-data
-          (clinicalDataValues)="onGetClinicalDataValues($event)"
-        ></app-clinical-data>
-      </fieldset>
     </div>
     <div class="col-12" *ngIf="savingDataResponse?.error">
       <div *ngIf="savingDataResponse?.error?.error">

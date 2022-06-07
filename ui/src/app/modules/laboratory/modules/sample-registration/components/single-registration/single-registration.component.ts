@@ -9,6 +9,7 @@ import { LabOrdersService } from "src/app/modules/laboratory/resources/services/
 import { LabTestsService } from "src/app/modules/laboratory/resources/services/lab-tests.service";
 import { RegistrationService } from "src/app/modules/registration/services/registration.services";
 import { formatDateToYYMMDD } from "src/app/shared/helpers/format-date.helper";
+import { DateField } from "src/app/shared/modules/form/models/date-field.model";
 import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
 import { ICARE_CONFIG } from "src/app/shared/resources/config";
@@ -30,6 +31,7 @@ export class SingleRegistrationComponent implements OnInit {
   @Input() agencyConceptConfigs: any;
 
   departmentField: any = {};
+  specimenDetailsFields: any = {};
   testsFormField: any = {};
   agencyFormField: any = {};
   labFormField: any = {};
@@ -77,6 +79,63 @@ export class SingleRegistrationComponent implements OnInit {
       conceptClass: "Test",
       shouldHaveLiveSearchForDropDownFields: true,
     });
+
+    this.specimenDetailsFields = [
+      new Dropdown({
+        id: "specimen",
+        key: "specimen",
+        label: "Specimen",
+        options: [],
+        conceptClass: "Specimen",
+        searchControlType: "concept",
+        shouldHaveLiveSearchForDropDownFields: true,
+      }),
+      new Dropdown({
+        id: "condition",
+        key: "condition",
+        label: "Condition",
+        options: [],
+        searchControlType: "concept",
+        shouldHaveLiveSearchForDropDownFields: true,
+      }),
+      new Dropdown({
+        id: "agency",
+        key: "agency",
+        label: "Agency/Priority",
+        options: this.agencyConceptConfigs?.setMembers.map((member) => {
+          return {
+            key: member?.uuid,
+            value: member?.display,
+            label: member?.display,
+            name: member?.display,
+          };
+        }),
+        shouldHaveLiveSearchForDropDownFields: false,
+      }),
+      new Dropdown({
+        id: "receivinglab",
+        key: "receivinglab",
+        label: "Receiving Lab",
+        options: [],
+        searchControlType: "concept",
+        conceptClass: "Lab Department",
+        shouldHaveLiveSearchForDropDownFields: true,
+      }),
+      new DateField({
+        id: "receivedon",
+        key: "receivedon",
+        label: "Received On",
+      }),
+      new Dropdown({
+        id: "department",
+        key: "department",
+        label: "Department",
+        options: [],
+        searchControlType: "concept",
+        conceptClass: "Lab Department",
+        shouldHaveLiveSearchForDropDownFields: true,
+      }),
+    ];
 
     this.agencyFormField = new Dropdown({
       id: "agency",

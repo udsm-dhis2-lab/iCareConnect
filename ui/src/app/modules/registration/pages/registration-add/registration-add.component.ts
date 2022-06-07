@@ -201,14 +201,11 @@ export class RegistrationAddComponent implements OnInit {
 
   calculateDateOfBirth() {
     let currentDate = new Date();
-
     this.patient.dob = new Date(
       currentDate.getFullYear() - this.patient?.age?.years,
       6,
       1
     );
-
-    //// console.log(this.patient?.dob)
   }
 
   ngOnInit(): void {
