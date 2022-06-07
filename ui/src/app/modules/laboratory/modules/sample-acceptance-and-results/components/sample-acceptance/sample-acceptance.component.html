@@ -53,15 +53,21 @@
                 Patient Names
               </th>
               <th colspan="2" class="text-center">Test details</th>
-              <th rowspan="2">Collected By</th>
-              <th rowspan="2">Collected At</th>
+              <th rowspan="2">
+                {{ !LISConfigurations?.isLIS ? "Collected By" : "Received By" }}
+              </th>
+              <th rowspan="2">
+                {{ !LISConfigurations?.isLIS ? "Collected On" : "Received On" }}
+              </th>
               <th rowspan="2">Priority</th>
               <th rowspan="2">Action</th>
             </tr>
             <tr>
               <th>Test</th>
               <!-- <th>Container</th> -->
-              <th>Ordered By</th>
+              <th>
+                {{ !LISConfigurations?.isLIS ? "Collected By" : "Received By" }}
+              </th>
               <!-- <th>Date Ordered</th>
               <th>Source</th> -->
             </tr>
@@ -245,8 +251,12 @@
                 Patient Names
               </th>
               <th colspan="2" class="text-center">Test details</th>
-              <th rowspan="2">Collected By</th>
-              <th rowspan="2">Collected At</th>
+              <th rowspan="2">
+                {{ !LISConfigurations?.isLIS ? "Collected By" : "Received By" }}
+              </th>
+              <th rowspan="2">
+                {{ !LISConfigurations?.isLIS ? "Collected On" : "Received On" }}
+              </th>
               <th rowspan="2">Priority</th>
               <th rowspan="2">Status</th>
             </tr>
@@ -425,8 +435,12 @@
                 Patient Names
               </th>
               <th colspan="2" class="text-center">Test details</th>
-              <th rowspan="2">Collected By</th>
-              <th rowspan="2">Collected At</th>
+              <th rowspan="2">
+                {{ !LISConfigurations?.isLIS ? "Collected By" : "Received By" }}
+              </th>
+              <th rowspan="2">
+                {{ !LISConfigurations?.isLIS ? "Collected On" : "Received On" }}
+              </th>
               <th rowspan="2">Priority</th>
               <th rowspan="2">Action</th>
             </tr>
@@ -647,8 +661,12 @@
                 Patient Names
               </th>
               <th colspan="2" class="text-center">Test details</th>
-              <th rowspan="2">Collected By</th>
-              <th rowspan="2">Collected At</th>
+              <th rowspan="2">
+                {{ !LISConfigurations?.isLIS ? "Collected By" : "Received By" }}
+              </th>
+              <th rowspan="2">
+                {{ !LISConfigurations?.isLIS ? "Collected On" : "Received On" }}
+              </th>
               <th rowspan="2">Priority</th>
               <th rowspan="2">Action</th>
             </tr>
@@ -814,8 +832,13 @@
                 Patient Names
               </th>
               <th colspan="2" class="text-center">Test details</th>
-              <th rowspan="2">Collected By</th>
-              <th rowspan="2">Collected At</th>
+
+              <th rowspan="2">
+                {{ !LISConfigurations?.isLIS ? "Collected By" : "Received By" }}
+              </th>
+              <th rowspan="2">
+                {{ !LISConfigurations?.isLIS ? "Collected On" : "Received On" }}
+              </th>
               <th rowspan="2">Priority</th>
               <th rowspan="2">Action</th>
             </tr>
@@ -976,8 +999,13 @@
                 Patient Names
               </th>
               <th colspan="2" class="text-center">Test details</th>
-              <th rowspan="2">Collected By</th>
-              <th rowspan="2">Collected At</th>
+
+              <th rowspan="2">
+                {{ !LISConfigurations?.isLIS ? "Collected By" : "Received By" }}
+              </th>
+              <th rowspan="2">
+                {{ !LISConfigurations?.isLIS ? "Collected On" : "Received On" }}
+              </th>
               <th rowspan="2">Priority</th>
               <th rowspan="2">Reason For Rejection</th>
               <th rowspan="2">Action</th>

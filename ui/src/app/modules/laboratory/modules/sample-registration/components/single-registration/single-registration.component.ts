@@ -12,6 +12,7 @@ import { formatDateToYYMMDD } from "src/app/shared/helpers/format-date.helper";
 import { DateField } from "src/app/shared/modules/form/models/date-field.model";
 import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
+import { Textbox } from "src/app/shared/modules/form/models/text-box.model";
 import { ICARE_CONFIG } from "src/app/shared/resources/config";
 import { DiagnosisService } from "src/app/shared/resources/diagnosis/services";
 import { VisitsService } from "src/app/shared/resources/visits/services";
@@ -29,9 +30,10 @@ export class SingleRegistrationComponent implements OnInit {
   @Input() preferredPersonIdentifier: string;
   @Input() provider: any;
   @Input() agencyConceptConfigs: any;
+  @Input() referFromFacilityVisitAttribute: string;
 
   departmentField: any = {};
-  specimenDetailsFields: any = {};
+  specimenDetailsFields: any;
   testsFormField: any = {};
   agencyFormField: any = {};
   labFormField: any = {};
@@ -45,6 +47,8 @@ export class SingleRegistrationComponent implements OnInit {
   savingDataResponse: any = null;
   currentSampleLabel: string;
   selectedLab: any;
+
+  referringDoctorFields: any[];
   constructor(
     private samplesService: SamplesService,
     private labTestsService: LabTestsService,
@@ -61,16 +65,29 @@ export class SingleRegistrationComponent implements OnInit {
 
   ngOnInit(): void {
     this.labSampleLabel$ = this.samplesService.getSampleLabel();
-
-    this.departmentField = new Dropdown({
-      id: "department",
-      key: "department",
-      label: "Select department",
-      options: [],
-      conceptClass: "Lab Department",
-      shouldHaveLiveSearchForDropDownFields: true,
-    });
-
+    this.referringDoctorFields = [
+      new Textbox({
+        id: "doctor",
+        key: "doctor",
+        label: `Doctor's Names`,
+        type: "text",
+      }),
+      new Textbox({
+        id: "phone",
+        key: "phone",
+        label: `Phone`,
+        type: "number",
+        min: 0,
+        category: "phoneNumber",
+      }),
+      new Textbox({
+        id: "doctorEmail",
+        key: "doctorEmail",
+        label: `Email`,
+        type: "email",
+        category: "email",
+      }),
+    ];
     this.testsFormField = new Dropdown({
       id: "test1",
       key: "test1",
@@ -176,7 +193,7 @@ export class SingleRegistrationComponent implements OnInit {
 
   onFormUpdate(formValues: FormValue, itemKey?: string): void {
     this.formData = { ...this.formData, ...formValues.getValues() };
-    if (itemKey === "department") {
+    if (itemKey && itemKey === "department") {
       this.testsUnderDepartment$ = this.labTestsService.getLabTestsByDepartment(
         this.formData["department"]?.value
       );
@@ -184,8 +201,7 @@ export class SingleRegistrationComponent implements OnInit {
   }
 
   onFormUpdateForTest(formValues: FormValue): void {
-    // console.log(formValues.getValues());
-    // TODO: Add support to autoselect department
+    this.formData = { ...this.formData, ...formValues.getValues() };
   }
 
   onFormUpdateForAgency(formValues: FormValue): void {
@@ -210,6 +226,12 @@ export class SingleRegistrationComponent implements OnInit {
 
   onGetClinicalDataValues(clinicalData): void {
     this.formData = { ...this.formData, ...clinicalData };
+  }
+
+  onSaveNow(event: Event): void {
+    event.stopPropagation();
+    console.log("personDetailsData", this.personDetailsData);
+    console.log(this.formData);
   }
 
   onSave(event: Event): void {
@@ -268,8 +290,9 @@ export class SingleRegistrationComponent implements OnInit {
                       personIdentifierType.id === this.preferredPersonIdentifier
                     ) {
                       return {
-                        identifier:
-                          this.personDetailsData[personIdentifierType.id],
+                        identifier: this.personDetailsData["mrn"]
+                          ? this.personDetailsData["mrn"]
+                          : this.personDetailsData[personIdentifierType.id],
                         identifierType: personIdentifierType.id,
                         location: this.currentLocation?.uuid,
                         preferred: true,
@@ -296,33 +319,47 @@ export class SingleRegistrationComponent implements OnInit {
                   this.savingDataResponse = patientResponse;
                   if (!patientResponse?.error) {
                     // TODO: SOftcode visit type
+                    let visAttributes = [
+                      {
+                        attributeType: "PSCHEME0IIIIIIIIIIIIIIIIIIIIIIIATYPE",
+                        value: "00000102IIIIIIIIIIIIIIIIIIIIIIIIIIII",
+                      },
+                      {
+                        attributeType: "PTYPE000IIIIIIIIIIIIIIIIIIIIIIIATYPE",
+                        value: "00000100IIIIIIIIIIIIIIIIIIIIIIIIIIII",
+                      },
+                      {
+                        attributeType: "SERVICE0IIIIIIIIIIIIIIIIIIIIIIIATYPE",
+                        value: "30fe16ed-7514-4e93-a021-50024fe82bdd",
+                      },
+                      {
+                        attributeType: "66f3825d-1915-4278-8e5d-b045de8a5db9",
+                        value: "d1063120-26f0-4fbb-9e7d-f74c429de306",
+                      },
+                      {
+                        attributeType: "6eb602fc-ae4a-473c-9cfb-f11a60eeb9ac",
+                        value: "b72ed04a-2c4b-4835-9cd2-ed0e841f4b58",
+                      },
+                    ];
+                    (
+                      Object.keys(this.personDetailsData).filter(
+                        (key) => key.indexOf("attribute-") === 0
+                      ) || []
+                    ).forEach((key) => {
+                      visAttributes = [
+                        ...visAttributes,
+                        {
+                          attributeType: key.split("attribute-")[1],
+                          value: this.personDetailsData[key],
+                        },
+                      ];
+                    });
                     const visitObject = {
                       patient: this.savingDataResponse?.uuid,
                       visitType: "54e8ffdc-dea0-4ef0-852f-c23e06d16066",
                       location: this.currentLocation?.uuid,
                       indication: "Sample Registration",
-                      attributes: [
-                        {
-                          attributeType: "PSCHEME0IIIIIIIIIIIIIIIIIIIIIIIATYPE",
-                          value: "00000102IIIIIIIIIIIIIIIIIIIIIIIIIIII",
-                        },
-                        {
-                          attributeType: "PTYPE000IIIIIIIIIIIIIIIIIIIIIIIATYPE",
-                          value: "00000100IIIIIIIIIIIIIIIIIIIIIIIIIIII",
-                        },
-                        {
-                          attributeType: "SERVICE0IIIIIIIIIIIIIIIIIIIIIIIATYPE",
-                          value: "30fe16ed-7514-4e93-a021-50024fe82bdd",
-                        },
-                        {
-                          attributeType: "66f3825d-1915-4278-8e5d-b045de8a5db9",
-                          value: "d1063120-26f0-4fbb-9e7d-f74c429de306",
-                        },
-                        {
-                          attributeType: "6eb602fc-ae4a-473c-9cfb-f11a60eeb9ac",
-                          value: "b72ed04a-2c4b-4835-9cd2-ed0e841f4b58",
-                        },
-                      ],
+                      attributes: visAttributes,
                     };
 
                     this.visitsService
@@ -380,7 +417,7 @@ export class SingleRegistrationComponent implements OnInit {
                                   },
                                   label: this.currentSampleLabel,
                                   concept: {
-                                    uuid: this.formData["department"]?.value,
+                                    uuid: this.formData["specimen"]?.value,
                                   },
                                   orders: encounterResponse?.orders.map(
                                     (order) => {

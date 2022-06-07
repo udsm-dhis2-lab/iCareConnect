@@ -1,12 +1,16 @@
 import {
   Component,
   EventEmitter,
+  Input,
   OnInit,
   Output,
+  QueryList,
   ViewChild,
+  ViewChildren,
 } from "@angular/core";
 import { MatRadioChange } from "@angular/material/radio";
 import { RegistrationService } from "src/app/modules/registration/services/registration.services";
+import { FieldComponent } from "src/app/shared/modules/form/components/field/field.component";
 import { FormComponent } from "src/app/shared/modules/form/components/form/form.component";
 import { DateField } from "src/app/shared/modules/form/models/date-field.model";
 import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
@@ -14,6 +18,8 @@ import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
 import { PhoneNumber } from "src/app/shared/modules/form/models/phone-number.model";
 import { TextArea } from "src/app/shared/modules/form/models/text-area.model";
 import { Textbox } from "src/app/shared/modules/form/models/text-box.model";
+import * as moment from "moment";
+import { MatDatepickerInputEvent } from "@angular/material/datepicker";
 
 @Component({
   selector: "app-person-details",
@@ -21,19 +27,28 @@ import { Textbox } from "src/app/shared/modules/form/models/text-box.model";
   styleUrls: ["./person-details.component.scss"],
 })
 export class PersonDetailsComponent implements OnInit {
+  @Input() referFromFacilityVisitAttribute: string;
   patientIdentifierTypes: any[];
   @Output() personDetails: EventEmitter<any> = new EventEmitter<any>();
   personDetailsCategory: string = "new";
   personDetailsData: any = {};
   personFields: any[];
+  personAgeField: any[];
+  personDOBField: any[];
+  personFieldsGroupThree: any[];
   identifiersFields: any[];
   primaryIdentifierField: any;
   showOtherIdentifiers: boolean = false;
   patientUuid: string;
   identifierTypes: any[] = [];
+  age: number = 0;
 
   @ViewChild(FormComponent, { static: false })
   formComponent: FormComponent;
+
+  @ViewChildren("fieldItem")
+  fieldItems: QueryList<FieldComponent>;
+
   constructor(private registrationService: RegistrationService) {}
 
   ngOnInit(): void {
@@ -87,26 +102,74 @@ export class PersonDetailsComponent implements OnInit {
     });
   }
 
+  // onFormUpdateForAge(formValues: FormValue): void {
+  //   const values = formValues.getValues();
+  //   Object.keys(values).forEach((key) => {
+  //     this.personDetailsData[key] = values[key]?.value;
+  //   });
+
+  //   if (values["age"]?.value) {
+  //     this.personDetailsData["age"] = new Date(
+  //       new Date().getFullYear() - Number(values["age"]?.value),
+  //       6,
+  //       1
+  //     );
+  //     this.personDOBField = [
+  //       new DateField({
+  //         id: "dob",
+  //         key: "dob",
+  //         label: "Date of birth",
+  //         required: false,
+  //         value: this.personDetailsData ? this.personDetailsData?.dob : null,
+  //         type: "date",
+  //       }),
+  //     ];
+  //   }
+  // }
+
+  getAge(event: any): void {
+    event.stopPropagation();
+    console.log(event.target.value);
+    this.personDetailsData["age"] = event.target.value;
+    this.personDetailsData["dob"] = new Date(
+      new Date().getFullYear() - Number(this.personDetailsData["age"]),
+      6,
+      1
+    );
+    this.personDOBField = [
+      new DateField({
+        id: "dob",
+        key: "dob",
+        label: "Date of birth",
+        required: false,
+        value: this.personDetailsData ? this.personDetailsData?.dob : null,
+        type: "date",
+      }),
+    ];
+  }
+
   onFormUpdate(formValues: FormValue): void {
     const values = formValues.getValues();
     Object.keys(values).forEach((key) => {
       this.personDetailsData[key] = values[key]?.value;
     });
-    console.log(values);
-    if (values["age"]?.value) {
-      this.personDetailsData["dob"] = new Date(
-        new Date().getFullYear() - Number(values["age"]?.value),
-        6,
-        1
-      );
-      // console.log(this.personDetailsData["dob"]);
-      this.formComponent.patchFormValueValue({
-        dob: this.personDetailsData["dob"],
-      });
-    } else if (values["dob"]?.value) {
-      console.log(values);
-      console.log(values["dob"]);
-      console.log(values["dob"]?.value);
+    if (values["dob"]?.value) {
+      const dob = moment(new Date(values["dob"]?.value));
+      const today = moment(new Date());
+      this.age = today.diff(dob, "years");
+      this.personDetailsData["age"] = this.age.toString();
+      this.personAgeField = [
+        new Textbox({
+          id: "age",
+          key: "age",
+          label: "Age",
+          required: false,
+          value: this.personDetailsData ? this.personDetailsData?.age : null,
+          type: "number",
+          min: 0,
+          max: 150,
+        }),
+      ];
     }
 
     this.personDetails.emit({
@@ -149,8 +212,8 @@ export class PersonDetailsComponent implements OnInit {
     this.patientUuid = personDetails?.uuid;
     this.personFields = [
       new Dropdown({
-        id: "sourceLocation",
-        key: "sourceLocation",
+        id: "attribute-" + this.referFromFacilityVisitAttribute,
+        key: "attribute-" + this.referFromFacilityVisitAttribute,
         label: "Source/Received From",
         options: [],
         searchControlType: "location",
@@ -200,6 +263,8 @@ export class PersonDetailsComponent implements OnInit {
         ],
         shouldHaveLiveSearchForDropDownFields: false,
       }),
+    ];
+    this.personAgeField = [
       new Textbox({
         id: "age",
         key: "age",
@@ -210,6 +275,8 @@ export class PersonDetailsComponent implements OnInit {
         min: 0,
         max: 150,
       }),
+    ];
+    this.personDOBField = [
       new DateField({
         id: "dob",
         key: "dob",
@@ -220,6 +287,8 @@ export class PersonDetailsComponent implements OnInit {
           : null,
         type: "date",
       }),
+    ];
+    this.personFieldsGroupThree = [
       new PhoneNumber({
         id: "mobileNumber",
         key: "mobileNumber",

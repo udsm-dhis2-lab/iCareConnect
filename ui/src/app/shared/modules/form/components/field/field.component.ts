@@ -93,7 +93,11 @@ export class FieldComponent {
   }
 
   updateFieldOnDemand(objectToUpdate): void {
+    console.log(objectToUpdate);
+    console.log(this.form);
     this.form.patchValue(objectToUpdate);
+    const theKey = Object.keys(objectToUpdate);
+    this.form.setValue({ dob: new Date() });
     this.fieldUpdate.emit(this.form);
   }
 
