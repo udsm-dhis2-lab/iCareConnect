@@ -114,7 +114,7 @@
       [required]="field?.required"
       matInput
       autocomplete="off"
-      (keyup)="searchConcept($event)"
+      (keyup)="searchItem($event, field)"
       [matAutocomplete]="auto"
     />
     <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">

@@ -27,6 +27,6 @@ export class SampleLabelComponent implements OnInit {
   }
 
   onFormUpdate(formValues: FormValue): void {
-    console.log(formValues.getValues());
+    // console.log(formValues.getValues());
   }
 }

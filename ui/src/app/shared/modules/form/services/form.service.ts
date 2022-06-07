@@ -42,7 +42,7 @@ export class FormService {
     filteringItems?,
     field?
   ): Observable<any[]> {
-    if (!searchControlType) {
+    if (!searchControlType || searchControlType === "concept") {
       return from(this.api.concept.getAllConcepts(parameters)).pipe(
         map((response) => {
           return orderBy(
@@ -58,6 +58,17 @@ export class FormService {
       );
     } else if (searchControlType === "user") {
       return from(this.api.person.getAllPersons({ q: parameters?.q })).pipe(
+        map((response) => {
+          return response?.results;
+        })
+      );
+    } else if (searchControlType === "location") {
+      return from(
+        this.api.location.getAllLocations({
+          q: parameters?.q,
+          v: parameters?.v,
+        })
+      ).pipe(
         map((response) => {
           return response?.results;
         })
