@@ -10,21 +10,16 @@
       <mat-progress-bar mode="indeterminate"></mat-progress-bar>
     </div>
 
-    <div class="col-lg-6 col-md-6 col-sx-12 col-sm-12">
+    <div class="col-lg-4 col-md-4 col-sx-12 col-sm-12 mt-2">
       <fieldset>
         <legend>Patient Details</legend>
         <app-person-details
+          [referFromFacilityVisitAttribute]="referFromFacilityVisitAttribute"
           (personDetails)="onGetPersonDetails($event)"
         ></app-person-details>
       </fieldset>
-      <fieldset class="mt-2 mb-2">
-        <legend>Clinical Data</legend>
-        <app-clinical-data
-          (clinicalDataValues)="onGetClinicalDataValues($event)"
-        ></app-clinical-data>
-      </fieldset>
     </div>
-    <div class="col-lg-6 col-md-6 col-sx-12 col-sm-12 mt-2">
+    <div class="col-lg-4 col-md-4 col-sx-12 col-sm-12 mt-2">
       <div class="for-sample-label">
         <fieldset>
           <legend>Specimen Details</legend>
@@ -38,34 +33,40 @@
           ></app-form>
         </fieldset>
       </div>
-      <div>
+      <div class="tests">
         <fieldset>
           <legend>Tests</legend>
-          <app-form
-            [fields]="[departmentField]"
-            (formUpdate)="onFormUpdate($event, 'department')"
-          ></app-form>
-          <div>
-            <app-lb-option-selector
+          <!-- <app-lb-option-selector
               *ngIf="params?.testsUnderDepartment"
               [options]="params?.testsUnderDepartment"
               [id]="'tests'"
               [label]="'Test'"
               (selectedOptionDetails)="onGetSelectedOptionDetails($event)"
-            ></app-lb-option-selector>
-            <app-form
-              *ngIf="!params?.testsUnderDepartment"
-              [fields]="[testsFormField]"
-              (formUpdate)="onFormUpdateForTest($event)"
-            ></app-form>
-          </div>
-        </fieldset>
-
-        <fieldset>
-          <legend>Other</legend>
+            ></app-lb-option-selector> -->
           <app-form
-            [fields]="[agencyFormField]"
-            (formUpdate)="onFormUpdateForAgency($event)"
+            [fields]="[testsFormField]"
+            (formUpdate)="onFormUpdateForTest($event)"
+          ></app-form>
+        </fieldset>
+      </div>
+    </div>
+    <div class="col-lg-4 col-md-4 col-sx-12 col-sm-12 mt-2">
+      <div class="clinical-data">
+        <fieldset>
+          <legend>Clinical Data</legend>
+          <app-clinical-data
+            (clinicalDataValues)="onGetClinicalDataValues($event)"
+          ></app-clinical-data>
+        </fieldset>
+      </div>
+
+      <div class="referring-doctor-field">
+        <fieldset>
+          <legend>Referring Doctor</legend>
+          <app-form
+            [isFormHorizontal]="true"
+            [fields]="referringDoctorFields"
+            (formUpdate)="onFormUpdate($event)"
           ></app-form>
         </fieldset>
       </div>

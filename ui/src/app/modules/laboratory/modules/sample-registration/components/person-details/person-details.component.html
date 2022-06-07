@@ -48,4 +48,48 @@
     [isFormHorizontal]="true"
     (formUpdate)="onFormUpdate($event)"
   ></app-form>
+
+  <div class="row">
+    <div class="col-8">
+      <mat-form-field
+        class="w-100 no-padding"
+        style="margin-left: 6px"
+        appearance="fill"
+      >
+        <mat-label>Age</mat-label>
+        <input
+          matInput
+          type="number"
+          (change)="getAge($event)"
+          required
+          min="0"
+          max="150"
+          [value]="age"
+          placeholder="Age"
+          autocomplete="off"
+        />
+      </mat-form-field>
+    </div>
+    <div class="col-4">
+      <span style="font-size: 0.8rem">
+        {{
+          personDetailsData["dob"]
+            ? (personDetailsData["dob"] | date: "medium")
+            : ""
+        }}
+      </span>
+    </div>
+  </div>
+
+  <app-form
+    [fields]="personDOBField"
+    [isFormHorizontal]="true"
+    (formUpdate)="onFormUpdate($event)"
+  ></app-form>
+
+  <app-form
+    [fields]="personFieldsGroupThree"
+    [isFormHorizontal]="true"
+    (formUpdate)="onFormUpdate($event)"
+  ></app-form>
 </div>

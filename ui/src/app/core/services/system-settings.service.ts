@@ -34,6 +34,23 @@ export class SystemSettingsService {
     );
   }
 
+  getSystemSettingsMatchingAKey(key: string): Observable<any> {
+    // lis.attributes.referringDoctor
+    return this.httpClient.get(`systemsetting?q=${key}&v=full`).pipe(
+      map((response) => {
+        return response?.results && response?.results?.length > 0
+          ? response?.results.map((result) => {
+              return result?.value.indexOf("{") > -1 ||
+                result?.value.indexOf("[") > -1
+                ? JSON.parse(result?.value)
+                : result?.value;
+            })
+          : [];
+      }),
+      catchError((error) => of(error))
+    );
+  }
+
   getSystemSettingsDetailsByKey(key: string): Observable<any> {
     return this.httpClient.get(`systemsetting?q=${key}&v=full`).pipe(
       map((response) => {

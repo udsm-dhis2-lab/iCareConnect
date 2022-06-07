@@ -1,6 +1,8 @@
 import { Component, EventEmitter, OnInit, Output } from "@angular/core";
 import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
+import { TextArea } from "src/app/shared/modules/form/models/text-area.model";
+import { Textbox } from "src/app/shared/modules/form/models/text-box.model";
 
 @Component({
   selector: "app-clinical-data",
@@ -21,6 +23,18 @@ export class ClinicalDataComponent implements OnInit {
         options: [],
         conceptClass: "Diagnosis",
         shouldHaveLiveSearchForDropDownFields: true,
+      }),
+      new TextArea({
+        id: "notes",
+        key: "notes",
+        label: "Notes",
+        type: "text",
+      }),
+      new Textbox({
+        id: "diagnosis",
+        key: "diagnosis",
+        label: "Diagnosis - Clinical",
+        type: "text",
       }),
     ];
   }

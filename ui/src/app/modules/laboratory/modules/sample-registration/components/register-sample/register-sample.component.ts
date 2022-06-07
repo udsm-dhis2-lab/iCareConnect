@@ -25,6 +25,9 @@ export class RegisterSampleComponent implements OnInit {
   preferredPersonIdentifier$: Observable<string>;
 
   agencyConceptConfigs$: Observable<any>;
+  referFromFacilityVisitAttribute$: Observable<string>;
+
+  referringDoctorAttributes$: Observable<any>;
   constructor(
     private samplesService: SamplesService,
     private systemSettingsService: SystemSettingsService,
@@ -46,6 +49,14 @@ export class RegisterSampleComponent implements OnInit {
     this.preferredPersonIdentifier$ =
       this.systemSettingsService.getSystemSettingsByKey(
         "iCare.preferredPersonIdentifier"
+      );
+    this.referFromFacilityVisitAttribute$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        "lis.attribute.referFromFacility"
+      );
+    this.referringDoctorAttributes$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        "lis.attribute.referFromFacility"
       );
     this.store.dispatch(
       loadConceptByUuid({
