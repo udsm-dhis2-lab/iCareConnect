@@ -55,8 +55,8 @@ export class RegisterSampleComponent implements OnInit {
         "lis.attribute.referFromFacility"
       );
     this.referringDoctorAttributes$ =
-      this.systemSettingsService.getSystemSettingsByKey(
-        "lis.attribute.referFromFacility"
+      this.systemSettingsService.getSystemSettingsMatchingAKey(
+        "lis.attributes.referringDoctor"
       );
     this.store.dispatch(
       loadConceptByUuid({

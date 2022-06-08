@@ -2,6 +2,8 @@ import { Injectable } from "@angular/core";
 import { Observable, of } from "rxjs";
 import { catchError, map } from "rxjs/operators";
 import { OpenmrsHttpClientService } from "src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service";
+import { SystemSettingsWithKeyDetails } from "../models/system-settings.model";
+import { capitalize } from "lodash";
 
 @Injectable({
   providedIn: "root",
@@ -34,7 +36,9 @@ export class SystemSettingsService {
     );
   }
 
-  getSystemSettingsMatchingAKey(key: string): Observable<any> {
+  getSystemSettingsMatchingAKey(
+    key: string
+  ): Observable<SystemSettingsWithKeyDetails[]> {
     // lis.attributes.referringDoctor
     return this.httpClient.get(`systemsetting?q=${key}&v=full`).pipe(
       map((response) => {
@@ -42,8 +46,22 @@ export class SystemSettingsService {
           ? response?.results.map((result) => {
               return result?.value.indexOf("{") > -1 ||
                 result?.value.indexOf("[") > -1
-                ? JSON.parse(result?.value)
-                : result?.value;
+                ? {
+                    name: result?.property
+                      .split(".")
+                      [result?.property.split(".").length - 1]?.toUpperCase(),
+                    property: result?.property,
+                    value: result?.value,
+                  }
+                : {
+                    name: capitalize(
+                      result?.property.split(".")[
+                        result?.property.split(".").length - 1
+                      ]
+                    ),
+                    property: result?.property,
+                    value: result?.value,
+                  };
             })
           : [];
       }),
