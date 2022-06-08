@@ -45,7 +45,7 @@
           <thead class="table-header">
             <tr>
               <th rowspan="2">SN</th>
-              <th rowspan="2">Department</th>
+              <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">Department</th>
               <th rowspan="2">Sample / Specimen</th>
               <th rowspan="2">Sample ID</th>
               <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">MRN</th>
@@ -91,7 +91,7 @@
                     {{ count + 1 }}
                   </td>
                   <td
-                    *ngIf="orderCount == 0"
+                    *ngIf="orderCount == 0 && !LISConfigurations?.isLIS"
                     [attr.rowspan]="sample?.orders?.length"
                   >
                     {{ sample?.department?.departmentName }}
@@ -243,7 +243,7 @@
           <thead class="table-header">
             <tr>
               <th rowspan="2">SN</th>
-              <th rowspan="2">Department</th>
+              <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">Department</th>
               <th rowspan="2">Sample / Specimen</th>
               <th rowspan="2">Sample ID</th>
               <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">MRN</th>
@@ -283,7 +283,7 @@
                     {{ count + 1 }}
                   </td>
                   <td
-                    *ngIf="orderCount == 0"
+                    *ngIf="orderCount == 0 && !LISConfigurations?.isLIS"
                     [attr.rowspan]="sample?.orders?.length"
                   >
                     {{ sample?.department?.departmentName }}
@@ -427,7 +427,7 @@
           <thead class="table-header">
             <tr>
               <th rowspan="2">SN</th>
-              <th rowspan="2">Department</th>
+              <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">Department</th>
               <th rowspan="2">Sample / Specimen</th>
               <th rowspan="2">Sample ID</th>
               <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">MRN</th>
@@ -484,7 +484,7 @@
                     {{ count + 1 }}
                   </td>
                   <td
-                    *ngIf="orderCount == 0"
+                    *ngIf="orderCount == 0 && !LISConfigurations?.isLIS"
                     [attr.rowspan]="sample?.orders?.length"
                   >
                     {{ sample?.department?.departmentName }}
@@ -653,7 +653,7 @@
           <thead class="table-header">
             <tr>
               <th rowspan="2">SN</th>
-              <th rowspan="2">Department</th>
+              <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">Department</th>
               <th rowspan="2">Sample / Specimen</th>
               <th rowspan="2">Sample ID</th>
               <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">MRN</th>
@@ -710,7 +710,7 @@
                     {{ count + 1 }}
                   </td>
                   <td
-                    *ngIf="orderCount == 0"
+                    *ngIf="orderCount == 0 && !LISConfigurations?.isLIS"
                     [attr.rowspan]="sample?.orders?.length"
                   >
                     {{ sample?.department?.departmentName }}
@@ -824,7 +824,7 @@
           <thead class="table-header">
             <tr>
               <th rowspan="2">SN</th>
-              <th rowspan="2">Department</th>
+              <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">Department</th>
               <th rowspan="2">Sample / Specimen</th>
               <th rowspan="2">Sample ID</th>
               <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">MRN</th>
@@ -870,7 +870,7 @@
                     {{ count + 1 }}
                   </td>
                   <td
-                    *ngIf="orderCount == 0"
+                    *ngIf="orderCount == 0 && !LISConfigurations?.isLIS"
                     [attr.rowspan]="sample?.orders?.length"
                   >
                     {{ sample?.department?.departmentName }}
@@ -991,7 +991,7 @@
           <thead class="table-header">
             <tr>
               <th rowspan="2">SN</th>
-              <th rowspan="2">Department</th>
+              <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">Department</th>
               <th rowspan="2">Sample / Specimen</th>
               <th rowspan="2">Sample ID</th>
               <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">MRN</th>
@@ -1038,7 +1038,7 @@
                     {{ count + 1 }}
                   </td>
                   <td
-                    *ngIf="orderCount == 0"
+                    *ngIf="orderCount == 0 && !LISConfigurations?.isLIS"
                     [attr.rowspan]="sample?.orders?.length"
                   >
                     {{ sample?.department?.departmentName }}

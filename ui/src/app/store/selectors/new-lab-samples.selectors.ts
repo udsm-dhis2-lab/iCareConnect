@@ -1,8 +1,8 @@
-import { createSelector } from '@ngrx/store';
-import { getRootState, AppState } from '../reducers';
-import { newLabSamplesAdapter, NewLabSamplesState } from '../states';
+import { createSelector } from "@ngrx/store";
+import { getRootState, AppState } from "../reducers";
+import { newLabSamplesAdapter, NewLabSamplesState } from "../states";
 
-import * as _ from 'lodash';
+import * as _ from "lodash";
 
 const getSamplesState = createSelector(
   getRootState,
@@ -23,14 +23,15 @@ export const getFormattedLabSamplesForTracking = createSelector(
   getAllFormattedLabSamples,
   (samples, props) => {
     return _.map(
-      _.filter(_.orderBy(samples, ['dateCreated'], ['desc']), (sample) => {
+      _.filter(_.orderBy(samples, ["dateCreated"], ["desc"]), (sample) => {
         if (
-          sample?.searchingText
+          (sample?.searchingText
             ?.toLowerCase()
             .indexOf(props?.searchingText.toLowerCase()) > -1 &&
-          sample?.department?.departmentName
-            .toLowerCase()
-            .indexOf(props?.department?.toLowerCase()) > -1
+            sample?.department?.departmentName
+              .toLowerCase()
+              .indexOf(props?.department?.toLowerCase()) > -1) ||
+          !sample?.department
         ) {
           return sample;
         }
@@ -60,16 +61,17 @@ export const getAcceptedFormattedLabSamples = createSelector(
   getAllFormattedLabSamples,
   (samples, props) => {
     return (
-      _.filter(_.orderBy(samples, ['dateCreated'], ['desc']), (sample) => {
+      _.filter(_.orderBy(samples, ["dateCreated"], ["desc"]), (sample) => {
         if (
           sample?.accepted &&
           !sample?.markedForRecollection &&
-          sample?.searchingText
+          ((sample?.searchingText
             ?.toLowerCase()
             .indexOf(props?.searchingText.toLowerCase()) > -1 &&
-          sample?.department?.departmentName
-            .toLowerCase()
-            .indexOf(props?.department?.toLowerCase()) > -1
+            sample?.department?.departmentName
+              .toLowerCase()
+              .indexOf(props?.department?.toLowerCase()) > -1) ||
+            !sample?.department)
         ) {
           return sample;
         }
@@ -89,17 +91,18 @@ export const getFormattedLabSamplesToAccept = createSelector(
             rejected: false,
             markedForRecollection: false,
           }),
-          ['priorityOrderNumber', 'dateCreated'],
-          ['asc', 'desc']
+          ["priorityOrderNumber", "dateCreated"],
+          ["asc", "desc"]
         ),
         (sample) => {
           if (
-            sample?.searchingText
+            (sample?.searchingText
               ?.toLowerCase()
               .indexOf(props?.searchingText.toLowerCase()) > -1 &&
-            sample?.department?.departmentName
-              .toLowerCase()
-              .indexOf(props?.department?.toLowerCase()) > -1
+              sample?.department?.departmentName
+                .toLowerCase()
+                .indexOf(props?.department?.toLowerCase()) > -1) ||
+            !sample?.department
           ) {
             return sample;
           }
@@ -127,24 +130,25 @@ export const getFormattedRejectedLabSamples = createSelector(
                 ...sample,
                 keyForCheckingRecollection:
                   sample?.mrn +
-                  '-' +
+                  "-" +
                   sample?.departmentName +
-                  '-' +
+                  "-" +
                   sample?.specimen?.specimenName,
               };
             }
           ),
-          ['priorityOrderNumber', 'dateCreated'],
-          ['asc', 'desc']
+          ["priorityOrderNumber", "dateCreated"],
+          ["asc", "desc"]
         ),
         (sample) => {
           if (
-            sample?.searchingText
+            (sample?.searchingText
               ?.toLowerCase()
               .indexOf(props?.searchingText.toLowerCase()) > -1 &&
-            sample?.department?.departmentName
-              .toLowerCase()
-              .indexOf(props?.department?.toLowerCase()) > -1
+              sample?.department?.departmentName
+                .toLowerCase()
+                .indexOf(props?.department?.toLowerCase()) > -1) ||
+            !sample?.department
           ) {
             return sample;
           }
@@ -158,9 +162,9 @@ export const getFormattedRejectedLabSamples = createSelector(
             ...sample,
             keyForCheckingRecollection:
               sample?.mrn +
-              '-' +
+              "-" +
               sample?.departmentName +
-              '-' +
+              "-" +
               sample?.specimen?.name,
           };
         }),
@@ -218,17 +222,18 @@ export const getFormattedLabSamplesToFeedResults = createSelector(
       _.filter(
         _.orderBy(
           unCompletedSamples,
-          ['priorityOrderNumber', 'dateCreated'],
-          ['asc', 'desc']
+          ["priorityOrderNumber", "dateCreated"],
+          ["asc", "desc"]
         ),
         (sample) => {
           if (
-            sample?.searchingText
+            (sample?.searchingText
               ?.toLowerCase()
               .indexOf(props?.searchingText.toLowerCase()) > -1 &&
-            sample?.department?.departmentName
-              .toLowerCase()
-              .indexOf(props?.department?.toLowerCase()) > -1
+              sample?.department?.departmentName
+                .toLowerCase()
+                .indexOf(props?.department?.toLowerCase()) > -1) ||
+            !sample?.department
           ) {
             return sample;
           }
@@ -254,17 +259,18 @@ export const getCompletedLabSamples = createSelector(
       _.filter(
         _.orderBy(
           completedSamples,
-          ['dateCreated', 'priorityOrderNumber'],
-          ['asc', 'asc']
+          ["dateCreated", "priorityOrderNumber"],
+          ["asc", "asc"]
         ),
         (sample) => {
           if (
-            sample?.searchingText
+            (sample?.searchingText
               ?.toLowerCase()
               .indexOf(props?.searchingText.toLowerCase()) > -1 &&
-            sample?.department?.departmentName
-              .toLowerCase()
-              .indexOf(props?.department?.toLowerCase()) > -1
+              sample?.department?.departmentName
+                .toLowerCase()
+                .indexOf(props?.department?.toLowerCase()) > -1) ||
+            !sample?.department
           ) {
             return sample;
           }
@@ -291,17 +297,18 @@ export const getPatientsWithCompletedLabSamples = createSelector(
               return sample;
             }
           }),
-          ['dateCreated', 'priorityOrderNumber'],
-          ['asc', 'asc']
+          ["dateCreated", "priorityOrderNumber"],
+          ["asc", "asc"]
         ),
         (sample) => {
           if (
-            sample?.searchingText
+            (sample?.searchingText
               ?.toLowerCase()
               .indexOf(props?.searchingText.toLowerCase()) > -1 &&
-            sample?.department?.departmentName
-              .toLowerCase()
-              .indexOf(props?.department?.toLowerCase()) > -1
+              sample?.department?.departmentName
+                .toLowerCase()
+                .indexOf(props?.department?.toLowerCase()) > -1) ||
+            !sample?.department
           ) {
             return sample;
           }
@@ -310,14 +317,14 @@ export const getPatientsWithCompletedLabSamples = createSelector(
 
     // console.log('filtered completed samples :: ', filteredCompletedSamples);
 
-    const groupedByMRN = _.groupBy(filteredCompletedSamples, 'mrn');
+    const groupedByMRN = _.groupBy(filteredCompletedSamples, "mrn");
 
     // console.log('grouped by mrn samples :: ', groupedByMRN);
 
     return _.map(Object.keys(groupedByMRN), (key) => {
       const samplesKeyedByDepartments = _.groupBy(
         groupedByMRN[key],
-        'departmentName'
+        "departmentName"
       );
       return {
         mrn: key,
@@ -382,17 +389,18 @@ export const getWorkList = createSelector(
               return sample;
             }
           }) || [],
-          ['dateCreated'],
-          ['desc']
+          ["dateCreated"],
+          ["desc"]
         ),
         (sample) => {
           if (
-            sample?.searchingText
+            (sample?.searchingText
               ?.toLowerCase()
               .indexOf(props?.searchingText.toLowerCase()) > -1 &&
-            sample?.department?.departmentName
-              .toLowerCase()
-              .indexOf(props?.department?.toLowerCase()) > -1
+              sample?.department?.departmentName
+                .toLowerCase()
+                .indexOf(props?.department?.toLowerCase()) > -1) ||
+            !sample?.department
           ) {
             return sample;
           }
@@ -448,9 +456,9 @@ function getOrdersWithRejectedResults(orders) {
         order?.testAllocations?.length > 0 &&
         _.orderBy(
           order?.testAllocations[0]?.statuses,
-          ['timestamp'],
-          ['desc']
-        )[0]?.status == 'REJECTED'
+          ["timestamp"],
+          ["desc"]
+        )[0]?.status == "REJECTED"
       ) {
         return order;
       }
@@ -475,17 +483,18 @@ export const getPatientWithSampleDetails = createSelector(
               return sample;
             }
           }),
-          ['dateCreated', 'priorityOrderNumber'],
-          ['asc', 'asc']
+          ["dateCreated", "priorityOrderNumber"],
+          ["asc", "asc"]
         ),
         (sample) => {
           if (
-            sample?.searchingText
+            (sample?.searchingText
               ?.toLowerCase()
               .indexOf(props?.searchingText.toLowerCase()) > -1 &&
-            sample?.department?.departmentName
-              .toLowerCase()
-              .indexOf(props?.department?.toLowerCase()) > -1
+              sample?.department?.departmentName
+                .toLowerCase()
+                .indexOf(props?.department?.toLowerCase()) > -1) ||
+            !sample?.department
           ) {
             return sample;
           }
@@ -501,12 +510,12 @@ export const getPatientWithSampleDetails = createSelector(
       }
     );
 
-    const groupedByMRN = _.groupBy(filteredCompletedSamplesForPatient, 'mrn');
+    const groupedByMRN = _.groupBy(filteredCompletedSamplesForPatient, "mrn");
 
     let whats = _.map(Object.keys(groupedByMRN), (key) => {
       const samplesKeyedByDepartments = _.groupBy(
         groupedByMRN[key],
-        'departmentName'
+        "departmentName"
       );
 
       return {

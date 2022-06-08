@@ -65,9 +65,6 @@ export class LabSamplesEffects {
               const keyedDepartments = keyDepartmentsByTestOrder(
                 action.departments
               );
-
-              // console.log('sample types :: ', action?.sampleTypes);
-
               const keyedSpecimenSources = keySampleTypesByTestOrder(
                 action.sampleTypes
               );
@@ -311,6 +308,7 @@ export class LabSamplesEffects {
                   configs: action?.configs,
                 };
               });
+              console.log(samples);
               return addFormattedLabSamples({ samples });
             })
           );
