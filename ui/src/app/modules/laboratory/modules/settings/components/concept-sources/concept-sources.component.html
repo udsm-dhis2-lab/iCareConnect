@@ -1,4 +1,4 @@
-<div>
+<div *ngIf="{ conceptSources: conceptSources$ | async } as params">
   <div class="loading-overlay" *ngIf="saving">
     <div class="text-center">
       <div>Saving data</div>
@@ -12,7 +12,7 @@
       <mat-radio-button
         (change)="getSelection($event)"
         class="category-btn"
-        [value]="'single'"
+        [value]="'List'"
         [checked]="category === 'List'"
         color="primary"
       >
@@ -38,7 +38,41 @@
           <button mat-stroked-button (click)="onSave($event)">Save</button>
         </div>
       </div>
-      <div class="for-list" *ngIf="category === 'List'"></div>
+      <div class="for-list" *ngIf="category === 'List'">
+        <div
+          *ngIf="params?.conceptSources"
+          style="max-height: 300px; overflow: auto"
+        >
+          <table class="table">
+            <thead>
+              <tr>
+                <th>SN</th>
+                <th>Code source</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                *ngFor="
+                  let conceptSource of params?.conceptSources;
+                  let count = index
+                "
+              >
+                <td>
+                  {{ count + 1 }}
+                </td>
+                <td>
+                  {{ conceptSource?.display }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <mat-progress-bar
+          *ngIf="!params?.conceptSources"
+          mode="indeterminate"
+        ></mat-progress-bar>
+      </div>
     </div>
   </div>
 </div>

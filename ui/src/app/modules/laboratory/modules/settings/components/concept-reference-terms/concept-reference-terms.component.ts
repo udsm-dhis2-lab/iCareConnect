@@ -26,6 +26,8 @@ export class ConceptReferenceTermsComponent implements OnInit {
   saving: boolean = false;
   referenceTerm: ConceptreferencetermCreate;
   category: string = "List";
+  pageSize: number = 10;
+  page: number = 1;
   constructor(
     private conceptSourceService: ConceptSourcesService,
     private referenceTermService: ReferenceTermsService
@@ -33,8 +35,36 @@ export class ConceptReferenceTermsComponent implements OnInit {
 
   ngOnInit(): void {
     this.conceptSources$ = this.conceptSourceService.getConceptSources();
-    this.conceptRerenceTerms$ = this.referenceTermService.getReferenceTerms();
+    this.getReferenceTermsList();
     this.createConceptReferenceFields();
+  }
+
+  getReferenceTermsList(): void {
+    this.conceptRerenceTerms$ = this.referenceTermService.getReferenceTerms({
+      page: this.page,
+      pageSize: this.pageSize,
+      searchingText: null,
+    });
+  }
+
+  searchReferenceTerm(event: KeyboardEvent): void {
+    this.page = 1;
+    const searchingText = (event.target as HTMLInputElement).value;
+    this.conceptRerenceTerms$ = this.referenceTermService.getReferenceTerms({
+      page: this.page,
+      pageSize: this.pageSize,
+      searchingText,
+    });
+  }
+
+  getReferenceTerms(event: Event, action: string): void {
+    event.stopPropagation();
+    this.page = action === "prev" ? this.page - 1 : this.page + 1;
+    this.conceptRerenceTerms$ = this.referenceTermService.getReferenceTerms({
+      page: this.page,
+      pageSize: this.pageSize,
+      searchingText: null,
+    });
   }
 
   createConceptReferenceFields(data?: any): void {
@@ -99,6 +129,7 @@ export class ConceptReferenceTermsComponent implements OnInit {
         if (response) {
           this.saving = false;
           setTimeout(() => {
+            this.category = "List";
             this.createConceptReferenceFields();
           }, 200);
         }
@@ -107,5 +138,8 @@ export class ConceptReferenceTermsComponent implements OnInit {
 
   getSelection(event: MatRadioChange): void {
     this.category = event?.value;
+    if (this.category === "List") {
+      this.getReferenceTermsList();
+    }
   }
 }

@@ -12,7 +12,7 @@
       <mat-radio-button
         (change)="getSelection($event)"
         class="category-btn"
-        [value]="'single'"
+        [value]="'List'"
         [checked]="category === 'List'"
         color="primary"
       >
@@ -38,7 +38,66 @@
           <button mat-stroked-button (click)="onSave($event)">Save</button>
         </div>
       </div>
-      <div class="for-list" *ngIf="category === 'List'"></div>
+      <div class="for-list" *ngIf="category === 'List'">
+        <div class="d-flex float-left w-100">
+          <mat-form-field class="w-75" style="font-size: 0.9rem">
+            <mat-label>Search</mat-label>
+            <mat-icon matPrefix>search</mat-icon
+            ><input
+              type="text"
+              placeholder="Search"
+              matInput
+              autocomplete="off"
+              (keyup)="searchReferenceTerm($event)"
+            />
+          </mat-form-field>
+        </div>
+        <div *ngIf="params?.conceptRerenceTerms">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>SN</th>
+                <th>Code</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                *ngFor="
+                  let parameter of params?.conceptRerenceTerms;
+                  let count = index
+                "
+              >
+                <td>{{ count + 1 + (page - 1) * pageSize }}</td>
+                <td>
+                  {{ parameter?.display }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="w-100 d-flex justify-content-end">
+            <button
+              [disabled]="page <= 1"
+              mat-button
+              (click)="getReferenceTerms($event, 'prev')"
+            >
+              Prev
+            </button>
+            <button
+              [disabled]="params?.conceptRerenceTerms?.length <= pageSize"
+              mat-button
+              (click)="getReferenceTerms($event, 'next')"
+              class="ml-2"
+            >
+              Next
+            </button>
+          </div>
+        </div>
+
+        <mat-progress-bar
+          *ngIf="!params?.conceptRerenceTerms"
+          mode="indeterminate"
+        ></mat-progress-bar>
+      </div>
     </div>
   </div>
 </div>

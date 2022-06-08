@@ -204,6 +204,12 @@ export class ParametersComponent implements OnInit {
     const mappings = [{ conceptReferenceTerm, conceptMapType }];
     this.concept = {
       names: names,
+      descriptions: [
+        {
+          description: this.formData["description"]?.value,
+          locale: "en",
+        },
+      ],
       datatype: this.formData["datatype"]?.value,
       // Softcode concept class
       set: false,

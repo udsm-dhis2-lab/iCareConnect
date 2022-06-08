@@ -8,6 +8,7 @@ import { LabOrdersManagementComponent } from "./lab-orders-management/lab-orders
 import { ParametersListComponent } from "./parameters-list/parameters-list.component";
 import { ParametersComponent } from "./parameters/parameters.component";
 import { SampleTypesListComponent } from "./sample-types-list/sample-types-list.component";
+import { TestMethodsComponent } from "./test-methods/test-methods.component";
 
 export const components: any[] = [
   LabOrdersManagementComponent,
@@ -20,4 +21,5 @@ export const components: any[] = [
   ConceptReferenceTermsComponent,
   ConceptSourcesComponent,
   CodedAnswersComponent,
+  TestMethodsComponent,
 ];

@@ -80,7 +80,29 @@ export class ConceptsService {
   }
 
   getConceptsByParameters(parameters: any): Observable<ConceptGetFull[]> {
-    return from(this.api.concept.getAllConcepts(parameters)).pipe(
+    let query = {};
+    if (parameters?.searchingText) {
+      query["q"] = parameters?.searchingText;
+    }
+    if (parameters?.pageSize) {
+      query["limit"] = parameters?.pageSize;
+    }
+
+    if (parameters?.page && parameters?.pageSize) {
+      query["startIndex"] = (parameters?.page - 1) * parameters?.pageSize + 1;
+    }
+    return from(this.api.concept.getAllConcepts(query)).pipe(
+      map((response) => response?.results),
+      catchError((error) => {
+        return of(error);
+      })
+    );
+  }
+
+  getConceptsAsCodedAnswers(): Observable<ConceptGetFull[]> {
+    return from(
+      this.api.concept.getAllConcepts({ q: "LIS_CODED_ANSWERS" })
+    ).pipe(
       map((response) => response?.results),
       catchError((error) => {
         return of(error);
