@@ -1,5 +1,10 @@
 import { Injectable } from "@angular/core";
-import { Api } from "../../openmrs";
+import {
+  Api,
+  ConceptCreate,
+  ConceptCreateFull,
+  ConceptGetFull,
+} from "../../openmrs";
 import { Observable, from, of } from "rxjs";
 import { OpenmrsHttpClientService } from "src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service";
 import { catchError, map } from "rxjs/operators";
@@ -54,5 +59,32 @@ export class ConceptsService {
           return of(error);
         })
       );
+  }
+
+  createConcept(data: any): Observable<ConceptCreateFull> {
+    return from(this.api.concept.createConcept(data)).pipe(
+      map((response) => response),
+      catchError((error) => {
+        return of(error);
+      })
+    );
+  }
+
+  updateConcept(uuid: string, data: any): Observable<ConceptCreateFull> {
+    return from(this.api.concept.updateConcept(uuid, data)).pipe(
+      map((response) => response),
+      catchError((error) => {
+        return of(error);
+      })
+    );
+  }
+
+  getConceptsByParameters(parameters: any): Observable<ConceptGetFull[]> {
+    return from(this.api.concept.getAllConcepts(parameters)).pipe(
+      map((response) => response?.results),
+      catchError((error) => {
+        return of(error);
+      })
+    );
   }
 }

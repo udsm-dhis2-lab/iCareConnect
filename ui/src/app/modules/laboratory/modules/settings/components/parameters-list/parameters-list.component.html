@@ -1,0 +1,43 @@
+<div *ngIf="{ parameters: parameters$ | async } as params">
+  <div style="max-height: 300px; overflow: auto">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>SN</th>
+          <th>Parameter</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          [ngClass]="{
+            'selected-parameter': currentParameter?.uuid === parameter?.uuid
+          }"
+          *ngFor="let parameter of params?.parameters; let count = index"
+        >
+          <td>
+            {{ count + 1 }}
+          </td>
+          <td>
+            {{ parameter?.display }}
+          </td>
+          <td>
+            <button mat-icon-button [matMenuTriggerFor]="menu">
+              <mat-icon>more_vert</mat-icon>
+            </button>
+            <mat-menu #menu="matMenu">
+              <button mat-menu-item (click)="onEdit($event, parameter)">
+                <mat-icon>edit</mat-icon>
+                <span>Edit</span>
+              </button>
+            </mat-menu>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <mat-progress-bar
+    *ngIf="!params?.parameters"
+    mode="indeterminate"
+  ></mat-progress-bar>
+</div>
