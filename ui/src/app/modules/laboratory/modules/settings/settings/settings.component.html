@@ -4,17 +4,19 @@
     (selectedTabChange)="onChangeRoute($event)"
     (selectedIndexChange)="selectedTab.setValue($event)"
   >
-    <mat-tab label="Profiles">
-      <div class="p-1" *ngIf="selectedTab.value === 0"></div>
-    </mat-tab>
     <mat-tab label="Parameters">
-      <div class="p-1">
+      <div class="p-3">
         <app-parameters-dashboard></app-parameters-dashboard>
       </div>
     </mat-tab>
     <mat-tab label="Test methods">
-      <div class="p-1">
+      <div class="p-3">
         <app-test-methods-dashboard></app-test-methods-dashboard>
+      </div>
+    </mat-tab>
+    <mat-tab label="Profiles && Access Control">
+      <div class="p-3">
+        <app-profiles-and-access-control></app-profiles-and-access-control>
       </div>
     </mat-tab>
   </mat-tab-group>
