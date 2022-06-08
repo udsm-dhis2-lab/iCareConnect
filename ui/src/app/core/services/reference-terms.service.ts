@@ -24,9 +24,17 @@ export class ReferenceTermsService {
     );
   }
 
-  getReferenceTerms(): Observable<ConceptreferencetermGet[]> {
+  getReferenceTerms(parameters: {
+    page: number;
+    pageSize: number;
+    searchingText?: string;
+  }): Observable<ConceptreferencetermGet[]> {
     return from(
-      this.api.conceptreferenceterm.getAllConceptReferenceTerms()
+      this.api.conceptreferenceterm.getAllConceptReferenceTerms({
+        q: parameters?.searchingText,
+        limit: parameters?.pageSize,
+        startIndex: (parameters?.page - 1) * parameters?.pageSize + 1,
+      })
     ).pipe(
       map((response) => response?.results),
       catchError((error) => of(error))

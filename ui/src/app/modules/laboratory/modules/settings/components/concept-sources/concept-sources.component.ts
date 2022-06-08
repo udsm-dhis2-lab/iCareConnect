@@ -1,9 +1,13 @@
 import { Component, OnInit } from "@angular/core";
 import { MatRadioChange } from "@angular/material/radio";
+import { Observable } from "rxjs";
 import { ConceptSourcesService } from "src/app/core/services/concept-sources.service";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
 import { Textbox } from "src/app/shared/modules/form/models/text-box.model";
-import { ConceptsourceCreate } from "src/app/shared/resources/openmrs";
+import {
+  ConceptsourceCreate,
+  ConceptsourceGet,
+} from "src/app/shared/resources/openmrs";
 
 @Component({
   selector: "app-concept-sources",
@@ -16,10 +20,12 @@ export class ConceptSourcesComponent implements OnInit {
   conceptSource: ConceptsourceCreate;
   saving: boolean = false;
   category: string = "List";
+  conceptSources$: Observable<ConceptsourceGet[]>;
   constructor(private conceptSourceService: ConceptSourcesService) {}
 
   ngOnInit(): void {
     this.createConceptSourcesFields();
+    this.conceptSources$ = this.conceptSourceService.getConceptSources();
   }
 
   createConceptSourcesFields(data?: any): void {
@@ -58,6 +64,9 @@ export class ConceptSourcesComponent implements OnInit {
           this.saving = false;
           setTimeout(() => {
             this.createConceptSourcesFields();
+            this.category = "List";
+            this.conceptSources$ =
+              this.conceptSourceService.getConceptSources();
           }, 200);
         }
       });
