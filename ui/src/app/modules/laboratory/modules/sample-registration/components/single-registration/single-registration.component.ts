@@ -417,7 +417,7 @@ export class SingleRegistrationComponent implements OnInit {
                                   },
                                   label: this.currentSampleLabel,
                                   concept: {
-                                    uuid: this.formData["receivinglab"]?.value,
+                                    uuid: this.formData["specimen"]?.value,
                                   },
                                   orders: encounterResponse?.orders.map(
                                     (order) => {
