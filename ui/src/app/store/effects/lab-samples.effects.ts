@@ -308,7 +308,6 @@ export class LabSamplesEffects {
                   configs: action?.configs,
                 };
               });
-              console.log(samples);
               return addFormattedLabSamples({ samples });
             })
           );
