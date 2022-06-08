@@ -5,7 +5,8 @@
     mrnGeneratorSourceUuid: mrnGeneratorSourceUuid$ | async,
     preferredPersonIdentifier: preferredPersonIdentifier$ | async,
     agencyConceptConfigs: agencyConceptConfigs$ | async,
-    referFromFacilityVisitAttribute: referFromFacilityVisitAttribute$ | async
+    referFromFacilityVisitAttribute: referFromFacilityVisitAttribute$ | async,
+    referringDoctorAttributes: referringDoctorAttributes$ | async
   } as params"
 >
   <!-- <section class="registration-category">
@@ -45,13 +46,18 @@
         <mat-progress-bar
           *ngIf="
             !params?.mrnGeneratorSourceUuid ||
-            !params?.preferredPersonIdentifier
+            !params?.preferredPersonIdentifier ||
+            !params?.referringDoctorAttributes ||
+            !params?.referFromFacilityVisitAttribute
           "
           mode="indeterminate"
         ></mat-progress-bar>
         <app-single-registration
           *ngIf="
-            params?.mrnGeneratorSourceUuid && params?.preferredPersonIdentifier
+            params?.mrnGeneratorSourceUuid &&
+            params?.preferredPersonIdentifier &&
+            params?.referringDoctorAttributes &&
+            params?.referFromFacilityVisitAttribute
           "
           [mrnGeneratorSourceUuid]="params?.mrnGeneratorSourceUuid"
           [preferredPersonIdentifier]="params?.preferredPersonIdentifier"
@@ -60,6 +66,7 @@
           [referFromFacilityVisitAttribute]="
             params?.referFromFacilityVisitAttribute
           "
+          [referringDoctorAttributes]="params?.referringDoctorAttributes"
         ></app-single-registration>
       </div>
       <div

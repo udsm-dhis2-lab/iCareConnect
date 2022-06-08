@@ -2,6 +2,7 @@ import { Component, Input, OnInit } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { Observable, zip } from "rxjs";
 import { Location } from "src/app/core/models";
+import { SystemSettingsWithKeyDetails } from "src/app/core/models/system-settings.model";
 import { LocationService } from "src/app/core/services";
 import { IdentifiersService } from "src/app/core/services/identifiers.service";
 import { LabSampleModel } from "src/app/modules/laboratory/resources/models";
@@ -31,6 +32,7 @@ export class SingleRegistrationComponent implements OnInit {
   @Input() provider: any;
   @Input() agencyConceptConfigs: any;
   @Input() referFromFacilityVisitAttribute: string;
+  @Input() referringDoctorAttributes: SystemSettingsWithKeyDetails[];
 
   departmentField: any = {};
   specimenDetailsFields: any;
@@ -65,29 +67,16 @@ export class SingleRegistrationComponent implements OnInit {
 
   ngOnInit(): void {
     this.labSampleLabel$ = this.samplesService.getSampleLabel();
-    this.referringDoctorFields = [
-      new Textbox({
-        id: "doctor",
-        key: "doctor",
-        label: `Doctor's Names`,
-        type: "text",
-      }),
-      new Textbox({
-        id: "phone",
-        key: "phone",
-        label: `Phone`,
-        type: "number",
-        min: 0,
-        category: "phoneNumber",
-      }),
-      new Textbox({
-        id: "doctorEmail",
-        key: "doctorEmail",
-        label: `Email`,
-        type: "email",
-        category: "email",
-      }),
-    ];
+    this.referringDoctorFields = this.referringDoctorAttributes.map(
+      (attribute) => {
+        return new Textbox({
+          id: "attribute-" + attribute?.value,
+          key: "attribute-" + attribute?.value,
+          label: attribute?.name,
+          type: "text",
+        });
+      }
+    );
     this.testsFormField = new Dropdown({
       id: "test1",
       key: "test1",
@@ -143,15 +132,15 @@ export class SingleRegistrationComponent implements OnInit {
         key: "receivedon",
         label: "Received On",
       }),
-      new Dropdown({
-        id: "department",
-        key: "department",
-        label: "Department",
-        options: [],
-        searchControlType: "concept",
-        conceptClass: "Lab Department",
-        shouldHaveLiveSearchForDropDownFields: true,
-      }),
+      // new Dropdown({
+      //   id: "department",
+      //   key: "department",
+      //   label: "Department",
+      //   options: [],
+      //   searchControlType: "concept",
+      //   conceptClass: "Lab Department",
+      //   shouldHaveLiveSearchForDropDownFields: true,
+      // }),
     ];
 
     this.agencyFormField = new Dropdown({
@@ -226,12 +215,6 @@ export class SingleRegistrationComponent implements OnInit {
 
   onGetClinicalDataValues(clinicalData): void {
     this.formData = { ...this.formData, ...clinicalData };
-  }
-
-  onSaveNow(event: Event): void {
-    event.stopPropagation();
-    console.log("personDetailsData", this.personDetailsData);
-    console.log(this.formData);
   }
 
   onSave(event: Event): void {
@@ -341,16 +324,33 @@ export class SingleRegistrationComponent implements OnInit {
                         value: "b72ed04a-2c4b-4835-9cd2-ed0e841f4b58",
                       },
                     ];
-                    (
+
+                    const personDataAttributeKeys =
                       Object.keys(this.personDetailsData).filter(
                         (key) => key.indexOf("attribute-") === 0
-                      ) || []
-                    ).forEach((key) => {
+                      ) || [];
+
+                    const formDataAttributeKeys =
+                      Object.keys(this.formData).filter(
+                        (key) => key.indexOf("attribute-") === 0
+                      ) || [];
+
+                    personDataAttributeKeys.forEach((key) => {
                       visAttributes = [
                         ...visAttributes,
                         {
                           attributeType: key.split("attribute-")[1],
                           value: this.personDetailsData[key],
+                        },
+                      ];
+                    });
+
+                    formDataAttributeKeys.forEach((key) => {
+                      visAttributes = [
+                        ...visAttributes,
+                        {
+                          attributeType: key.split("attribute-")[1],
+                          value: this.formData[key]?.value,
                         },
                       ];
                     });
@@ -417,7 +417,7 @@ export class SingleRegistrationComponent implements OnInit {
                                   },
                                   label: this.currentSampleLabel,
                                   concept: {
-                                    uuid: this.formData["specimen"]?.value,
+                                    uuid: this.formData["receivinglab"]?.value,
                                   },
                                   orders: encounterResponse?.orders.map(
                                     (order) => {
@@ -487,7 +487,8 @@ export class SingleRegistrationComponent implements OnInit {
                                   const diagnosisData = {
                                     diagnosis: {
                                       coded: this.formData["icd10"]?.value,
-                                      nonCoded: null,
+                                      nonCoded:
+                                        this.formData["diagnosis"]?.value,
                                       specificName: null,
                                     },
                                     rank: 0,
