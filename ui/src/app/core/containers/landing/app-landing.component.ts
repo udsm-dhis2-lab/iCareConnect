@@ -21,10 +21,24 @@ export class LandingComponent implements OnInit {
     this.store.dispatch(loadLISConfigurations());
     this.locationsForCurrentUser$ = this.store.select(getUserAssignedLocations);
 
+    // Get the navigation details from localstorage
+    const navigationDetails = JSON.parse(
+      localStorage.getItem("navigationDetails")
+    );
+
+    const isNavigationDetailsAvailable =
+      !navigationDetails || !navigationDetails?.path[0] ? false : true;
+
     this.LISConfigurations$ = this.store.select(getLISConfigurations);
     this.LISConfigurations$.subscribe((response) => {
       if (response && response?.isLIS) {
-        this.store.dispatch(go({ path: ["/laboratory/sample-registration"] }));
+        this.store.dispatch(
+          go({
+            path: isNavigationDetailsAvailable
+              ? navigationDetails?.path
+              : ["/laboratory/sample-registration"],
+          })
+        );
       }
     });
   }

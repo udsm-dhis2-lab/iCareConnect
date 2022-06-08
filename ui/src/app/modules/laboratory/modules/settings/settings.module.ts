@@ -15,6 +15,9 @@ import { TestFemaleRangeComponent } from './components/test-female-range/test-fe
 import { TimeSettingsListComponent } from './components/time-settings-list/time-settings-list.component';
 import { TestMaleRangeListComponent } from './components/test-male-range-list/test-male-range-list.component';
 import { TestFemaleRangeListComponent } from './components/test-female-range-list/test-female-range-list.component';
+import { TestMethodsDashboardComponent } from './containers/test-methods-dashboard/test-methods-dashboard.component';
+import { SpecimenSourcesDashboardComponent } from './containers/specimen-sources-dashboard/specimen-sources-dashboard.component';
+import { ParametersDashboardComponent } from './containers/parameters-dashboard/parameters-dashboard.component';
 
 @NgModule({
   declarations: [
@@ -31,6 +34,9 @@ import { TestFemaleRangeListComponent } from './components/test-female-range-lis
     TimeSettingsListComponent,
     TestMaleRangeListComponent,
     TestFemaleRangeListComponent,
+    TestMethodsDashboardComponent,
+    SpecimenSourcesDashboardComponent,
+    ParametersDashboardComponent,
   ],
   imports: [CommonModule, SettingsRoutingModule, SharedModule],
 })

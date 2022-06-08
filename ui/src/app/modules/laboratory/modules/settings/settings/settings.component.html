@@ -4,24 +4,19 @@
     (selectedTabChange)="onChangeRoute($event)"
     (selectedIndexChange)="selectedTab.setValue($event)"
   >
-    <mat-tab
-      label="Stall tests"
-      (click)="changeRoute($event, 0, '/settings/tests-control')"
-    >
-      <div class="p-1"></div>
+    <mat-tab label="Profiles">
+      <div class="p-1" *ngIf="selectedTab.value === 0"></div>
     </mat-tab>
-    <mat-tab
-      label="Tests Settings"
-      (click)="changeRoute($event, 1, '/settings/tests-settings')"
-    >
-      <div class="p-1"></div>
+    <mat-tab label="Parameters">
+      <div class="p-1">
+        <app-parameters-dashboard></app-parameters-dashboard>
+      </div>
     </mat-tab>
-    <!-- <mat-tab
-      label="Lab Configurations"
-      (click)="changeRoute($event, 2, '/settings/lab-configurations')"
-    >
-      <div class="p-1"></div>
-    </mat-tab> -->
+    <mat-tab label="Test methods">
+      <div class="p-1">
+        <app-test-methods-dashboard></app-test-methods-dashboard>
+      </div>
+    </mat-tab>
   </mat-tab-group>
 
   <router-outlet></router-outlet>

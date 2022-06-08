@@ -115,20 +115,21 @@ export class ModulesSelectorComponent implements OnInit {
       localStorage.getItem("navigationDetails")
     );
 
+    const isNavigationDetailsAvailable =
+      !navigationDetails || !navigationDetails?.path[0] ? false : true;
     this.store.dispatch(
       go({
-        path:
-          !navigationDetails || !navigationDetails?.path[0]
-            ? [
-                this.currentModule?.app?.path +
-                  (this.currentModule?.app?.path === "/laboratory"
-                    ? "/sample-registration"
-                    : "") +
-                  (this.currentModule?.app?.considerLocationRoute
-                    ? "/" + this.currentLocation?.uuid
-                    : ""),
-              ]
-            : navigationDetails?.path,
+        path: !isNavigationDetailsAvailable
+          ? [
+              this.currentModule?.app?.path +
+                (this.currentModule?.app?.path === "/laboratory"
+                  ? "/sample-registration"
+                  : "") +
+                (this.currentModule?.app?.considerLocationRoute
+                  ? "/" + this.currentLocation?.uuid
+                  : ""),
+            ]
+          : navigationDetails?.path,
         query: { queryParams: navigationDetails["queryParams"] },
       })
     );
