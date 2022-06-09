@@ -36,7 +36,9 @@ export class ReferenceTermsService {
         startIndex: (parameters?.page - 1) * parameters?.pageSize + 1,
       })
     ).pipe(
-      map((response) => response?.results),
+      map((response) => {
+        return response?.results;
+      }),
       catchError((error) => of(error))
     );
   }

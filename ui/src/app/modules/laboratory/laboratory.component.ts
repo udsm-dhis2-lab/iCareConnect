@@ -77,7 +77,7 @@ export class LaboratoryComponent implements OnInit {
   ) {
     this.store.dispatch(loadRolesDetails());
     this.store.dispatch(loadOrderTypes());
-    this.store.dispatch(loadLISConfigurations());
+    // this.store.dispatch(loadLISConfigurations());
 
     this.LISConfigurations$ = this.store.select(getLISConfigurations);
     router.events.subscribe((currentRoute) => {

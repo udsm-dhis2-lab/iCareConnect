@@ -8,6 +8,7 @@
     </div>
   </div>
   <div *ngIf="!saving">
+    <!-- {{ params?.conceptRerenceTerms | json }} -->
     <mat-radio-group class="category">
       <mat-radio-button
         (change)="getSelection($event)"
@@ -53,27 +54,29 @@
           </mat-form-field>
         </div>
         <div *ngIf="params?.conceptRerenceTerms">
-          <table class="table">
-            <thead>
-              <tr>
-                <th>SN</th>
-                <th>Code</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr
-                *ngFor="
-                  let parameter of params?.conceptRerenceTerms;
-                  let count = index
-                "
-              >
-                <td>{{ count + 1 + (page - 1) * pageSize }}</td>
-                <td>
-                  {{ parameter?.display }}
-                </td>
-              </tr>
-            </tbody>
-          </table>
+          <div>
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>SN</th>
+                  <th>Code</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  *ngFor="
+                    let parameter of params?.conceptRerenceTerms;
+                    let count = index
+                  "
+                >
+                  <td>{{ count + 1 + (page - 1) * pageSize }}</td>
+                  <td>
+                    {{ parameter?.display }}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
           <div class="w-100 d-flex justify-content-end">
             <button
               [disabled]="page <= 1"
@@ -83,7 +86,7 @@
               Prev
             </button>
             <button
-              [disabled]="params?.conceptRerenceTerms?.length <= pageSize"
+              [disabled]="params?.conceptRerenceTerms?.length < pageSize"
               mat-button
               (click)="getReferenceTerms($event, 'next')"
               class="ml-2"

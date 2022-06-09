@@ -15,7 +15,9 @@ export class LISConfigurationsService {
     return zip(
       this.httpClient.get(`systemsetting?q=iCare.LIS&v=full`).pipe(
         map((response) => {
-          return response ? response?.results[0]?.value : null;
+          return response && response?.results[0]?.value === "true"
+            ? true
+            : false;
         }),
         catchError((error) => of(error))
       ),
