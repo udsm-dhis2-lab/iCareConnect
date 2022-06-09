@@ -19,9 +19,10 @@ import { ICARE_APPS } from "src/app/core/containers/modules/modules.constants";
 })
 export class ModulesSelectorComponent implements OnInit {
   @Input() locations: Location[];
+  @Input() lisConfigurations: any;
   modulesReferences: string[];
   currentModule: any;
-  currentLocation: Location;
+  currentLocation: any;
   userLocationsForTheCurrentModule: Location[];
   constructor(private store: Store<AppState>) {}
 
@@ -31,7 +32,13 @@ export class ModulesSelectorComponent implements OnInit {
         ? JSON.parse(localStorage.getItem("currentLocation"))
         : null;
     if (storedLocation) {
-      this.currentLocation = { ...storedLocation, id: storedLocation?.uuid };
+      this.currentLocation = {
+        ...storedLocation,
+        id: storedLocation?.uuid,
+        ...this.locations.filter(
+          (loc) => loc?.uuid === storedLocation?.uuid || []
+        )[0],
+      };
       const modules = (
         storedLocation.attributes.filter(
           (attribute) =>
@@ -47,51 +54,58 @@ export class ModulesSelectorComponent implements OnInit {
           location: this.currentLocation,
         };
       });
-      this.currentModule = modules[0];
-      this.modulesReferences = uniqBy(
-        flatten(
-          this.locations.map((location) => {
-            return location?.modules.map((module) => {
-              const matchedModules =
-                ICARE_APPS.filter((app) => app?.id === module?.id) || [];
-              return {
-                ...module,
-                app: matchedModules[0],
-                order: matchedModules[0]?.order,
-              };
-            });
-          })
-        ),
-        "id"
-      );
-
+      this.currentModule = {
+        ...this.currentLocation?.modules[0],
+        ...(modules.filter(
+          (module) => module?.id === this.currentLocation?.modules[0]?.id
+        ) || [])[0],
+      };
       this.modulesReferences = orderBy(
-        this.modulesReferences,
+        uniqBy(
+          flatten(
+            this.locations.map((location) => {
+              return location?.modules.map((module) => {
+                const matchedModules =
+                  ICARE_APPS.filter((app) => app?.id === module?.id) || [];
+                return {
+                  ...module,
+                  app: matchedModules[0],
+                  order: matchedModules[0]?.order,
+                };
+              });
+            })
+          ),
+          "id"
+        ),
         ["order"],
         ["asc"]
       );
     } else {
-      this.modulesReferences = uniqBy(
-        flatten(
-          this.locations.map((location) => {
-            return location?.modules.map((module) => {
-              return {
-                ...module,
-                app: (orderBy(ICARE_APPS, ["order"], ["asc"]).filter(
-                  (app) => app?.id === module?.id
-                ) || [])[0],
-              };
-            });
-          })
-        ),
-        "id"
-      );
       this.modulesReferences = orderBy(
-        this.modulesReferences,
+        uniqBy(
+          flatten(
+            this.locations.map((location) => {
+              return location?.modules.map((module) => {
+                return {
+                  ...module,
+                  app: (orderBy(ICARE_APPS, ["order"], ["asc"]).filter(
+                    (app) => app?.id === module?.id
+                  ) || [])[0],
+                };
+              });
+            })
+          ),
+          "id"
+        ),
         ["order"],
         ["asc"]
       );
-      this.currentModule = this.modulesReferences[0];
+      console.log("modulesReferences", this.modulesReferences);
+      this.currentModule = this.lisConfigurations?.isLIS
+        ? (this.modulesReferences?.filter(
+            (module: any) => module?.id === "laboratory"
+          ) || [])[0]
+        : this.modulesReferences[0];
       this.currentLocation = {
         ...this.modulesReferences[0]["location"],
         id: this.modulesReferences[0]["location"]?.uuid,
@@ -114,9 +128,14 @@ export class ModulesSelectorComponent implements OnInit {
     const navigationDetails = JSON.parse(
       localStorage.getItem("navigationDetails")
     );
-
     const isNavigationDetailsAvailable =
-      !navigationDetails || !navigationDetails?.path[0] ? false : true;
+      !navigationDetails ||
+      (navigationDetails &&
+        navigationDetails?.path &&
+        !navigationDetails?.path[0])
+        ? false
+        : true;
+
     this.store.dispatch(
       go({
         path: !isNavigationDetailsAvailable
@@ -129,7 +148,11 @@ export class ModulesSelectorComponent implements OnInit {
                   ? "/" + this.currentLocation?.uuid
                   : ""),
             ]
-          : navigationDetails?.path,
+          : [
+              this.currentModule?.app
+                ? this.currentModule?.app?.path
+                : this.currentModule?.id,
+            ],
         query: { queryParams: navigationDetails["queryParams"] },
       })
     );
@@ -148,18 +171,25 @@ export class ModulesSelectorComponent implements OnInit {
             ) || []
           ).length > 0
       ) || [];
-    this.currentLocation = module?.location;
+    this.currentLocation = this.userLocationsForTheCurrentModule[0];
+    localStorage.setItem("currentLocation", this.currentModule?.location);
+    this.currentLocation = {
+      ...module?.location,
+      id: module?.location?.uuid,
+      app: this.currentModule?.app,
+    };
     this.store.dispatch(
       setCurrentUserCurrentLocation({ location: this.currentLocation })
     );
+    const url =
+      this.currentModule?.app?.path +
+      (this.currentModule?.app?.considerLocationRoute
+        ? "/" + this.currentLocation?.uuid
+        : "");
+    console.log("URL", url);
     this.store.dispatch(
       go({
-        path: [
-          this.currentModule?.app?.path +
-            (this.currentModule?.app?.considerLocationRoute
-              ? "/" + this.currentLocation?.uuid
-              : ""),
-        ],
+        path: [url],
       })
     );
     this.locationStatusControl();

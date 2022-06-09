@@ -30,6 +30,7 @@ import { ChangePasswordComponent } from "../change-password/change-password.comp
 import { AuthService } from "src/app/core/services/auth.service";
 import { formatCurrentUserDetails } from "src/app/core/helpers";
 import { initiateEncounterType } from "src/app/store/actions/encounter-type.actions";
+import { getLISConfigurations } from "src/app/store/selectors/lis-configurations.selectors";
 
 @Component({
   selector: "app-menu",
@@ -43,6 +44,7 @@ export class MenuComponent implements OnInit {
   locationsForCurrentUser$: Observable<Location[]>;
   currentLocation$: Observable<Location>;
   showPatientSearch$: Observable<boolean>;
+  lisConfigurations$: Observable<any>;
   constructor(
     private router: Router,
     public dialog: MatDialog,
@@ -56,6 +58,7 @@ export class MenuComponent implements OnInit {
     // if (!JSON.parse(localStorage.getItem('currentLocation'))) {
     //   this.onOpenLocation(null);
     // }
+    this.lisConfigurations$ = this.store.select(getLISConfigurations);
 
     this.authService.getSession().subscribe((sessionResponse) => {
       this.store.dispatch(

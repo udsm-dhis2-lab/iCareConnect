@@ -1,6 +1,7 @@
 <div>
-  <div class="w-100 menu-items-container">
+  <div class="w-100 menu-items-container" *ngIf="!lisConfigurations?.isLIS">
     <div class="menu-items">
+      <!-- {{ currentModule | json }} -->
       <div
         class="menu-item"
         [ngClass]="{ 'selected-module': currentModule?.id === module?.id }"

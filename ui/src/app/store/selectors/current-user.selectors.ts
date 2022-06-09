@@ -1,10 +1,10 @@
-import { CurrentUserState } from '../states';
-import { createSelector } from '@ngrx/store';
-import { getRootState, AppState } from '../reducers';
-import { getChildLocationsOfTheFirstLevelParentLocation } from './locations.selectors';
-import { sanitizeUserLocations } from 'src/app/shared/helpers/sanitize-user-locations.helper';
+import { CurrentUserState } from "../states";
+import { createSelector } from "@ngrx/store";
+import { getRootState, AppState } from "../reducers";
+import { getChildLocationsOfTheFirstLevelParentLocation } from "./locations.selectors";
+import { sanitizeUserLocations } from "src/app/shared/helpers/sanitize-user-locations.helper";
 
-import { keyBy, flatten, indexOf } from 'lodash';
+import { keyBy, flatten, indexOf } from "lodash";
 
 const getCurrentUserState = createSelector(
   getRootState,
@@ -73,8 +73,8 @@ export const getCurrentUserPrivileges = createSelector(
       : null;
     return matchedPrivileges
       ? {
-          ...(keyBy(matchedPrivileges, 'uuid') || {}),
-          ...(keyBy(matchedPrivileges, 'name') || {}),
+          ...(keyBy(matchedPrivileges, "uuid") || {}),
+          ...(keyBy(matchedPrivileges, "name") || {}),
         }
       : matchedPrivileges;
   }

@@ -5,28 +5,28 @@ import {
   OnChanges,
   OnInit,
   Output,
-} from '@angular/core';
-import { Store } from '@ngrx/store';
-import { Observable, of } from 'rxjs';
-import { take, tap } from 'rxjs/operators';
-import { AppState } from 'src/app/store/reducers';
-import { Patient } from '../../resources/patient/models/patient.model';
-import { Visit } from '../../resources/visits/models/visit.model';
-import { VisitsService } from '../../resources/visits/services';
+} from "@angular/core";
+import { Store } from "@ngrx/store";
+import { Observable, of } from "rxjs";
+import { take, tap } from "rxjs/operators";
+import { AppState } from "src/app/store/reducers";
+import { Patient } from "../../resources/patient/models/patient.model";
+import { Visit } from "../../resources/visits/models/visit.model";
+import { VisitsService } from "../../resources/visits/services";
 
-import { map, uniq } from 'lodash';
-import { upsertAdmittedPatientLocation } from 'src/app/store/actions/visit.actions';
-import { ActivatedRoute, Router } from '@angular/router';
-import { clearBills } from 'src/app/store/actions/bill.actions';
-import { clearBillItems } from 'src/app/store/actions/bill-item.actions';
-import { PatientListDialogComponent } from '../../dialogs';
-import { MatDialog } from '@angular/material/dialog';
-import { go } from 'src/app/store/actions';
+import { map, uniq } from "lodash";
+import { upsertAdmittedPatientLocation } from "src/app/store/actions/visit.actions";
+import { ActivatedRoute, Router } from "@angular/router";
+import { clearBills } from "src/app/store/actions/bill.actions";
+import { clearBillItems } from "src/app/store/actions/bill-item.actions";
+import { PatientListDialogComponent } from "../../dialogs";
+import { MatDialog } from "@angular/material/dialog";
+import { go } from "src/app/store/actions";
 
 @Component({
-  selector: 'app-patient-list',
-  templateUrl: './patient-list.component.html',
-  styleUrls: ['./patient-list.component.scss'],
+  selector: "app-patient-list",
+  templateUrl: "./patient-list.component.html",
+  styleUrls: ["./patient-list.component.scss"],
 })
 export class PatientListComponent implements OnInit, OnChanges {
   @Input() currentLocation: any;
@@ -71,16 +71,16 @@ export class PatientListComponent implements OnInit, OnChanges {
     this.visits$.pipe(take(1)).subscribe((visits) => {
       map(visits, (visit) => {
         if (
-          visit['visit']?.location?.tags.some(
-            (tag) => tag?.name === 'Bed Location'
+          visit["visit"]?.location?.tags.some(
+            (tag) => tag?.name === "Bed Location"
           )
         ) {
           this.store.dispatch(
             upsertAdmittedPatientLocation({
               locationVisitDetails: {
-                id: visit['visit']?.location?.uuid,
-                locationId: visit['visit']?.location?.uuid,
-                ...visit['visit'],
+                id: visit["visit"]?.location?.uuid,
+                locationId: visit["visit"]?.location?.uuid,
+                ...visit["visit"],
               },
             })
           );
@@ -99,8 +99,8 @@ export class PatientListComponent implements OnInit, OnChanges {
     this.loadingPatients = true;
     this.visits$ = visits
       ? of(visits)
-      : this.service && this.service === 'LABS'
-      ? this.visitService.getLabVisits('', 0, this.itemsPerPage).pipe(
+      : this.service && this.service === "LABS"
+      ? this.visitService.getLabVisits("", 0, this.itemsPerPage).pipe(
           tap(() => {
             this.loadingPatients = false;
           })
@@ -135,11 +135,11 @@ export class PatientListComponent implements OnInit, OnChanges {
   onLoadNewList(details): void {
     this.loadingPatients = true;
     this.page =
-      details?.type === 'next' ? Number(this.page) + 1 : Number(this.page) - 1;
+      details?.type === "next" ? Number(this.page) + 1 : Number(this.page) - 1;
 
     this.visits$ =
-      this.service && this.service === 'LABS'
-        ? this.visitService.getLabVisits('', this.page, this.itemsPerPage).pipe(
+      this.service && this.service === "LABS"
+        ? this.visitService.getLabVisits("", this.page, this.itemsPerPage).pipe(
             tap(() => {
               this.loadingPatients = false;
             })
@@ -153,7 +153,7 @@ export class PatientListComponent implements OnInit, OnChanges {
               details.visit?.pager
                 ? (details.visit?.pager.filter(
                     (pageLink) => pageLink?.rel === details?.type
-                  ) || [])[0]?.uri?.split('&startIndex=')[1]
+                  ) || [])[0]?.uri?.split("&startIndex=")[1]
                 : 0,
               this.itemsPerPage
             )
@@ -204,9 +204,9 @@ export class PatientListComponent implements OnInit, OnChanges {
   }
 
   togglePatientTypeList(type) {
-    const currentUrl = this.router.url.split('?')[0];
-    const params = this.router.url.split('?')[1];
-    this.isTabularList = type === 'tabular' ? true : false;
+    const currentUrl = this.router.url.split("?")[0];
+    const params = this.router.url.split("?")[1];
+    this.isTabularList = type === "tabular" ? true : false;
     this.store.dispatch(
       go({ path: [currentUrl], query: { queryParams: { list: type } } })
     );
@@ -214,7 +214,7 @@ export class PatientListComponent implements OnInit, OnChanges {
 
   getPaymentTypeSelected(event: Event, paymentType) {
     event.stopPropagation();
-    this.paymentTypeSelected = '';
+    this.paymentTypeSelected = "";
     setTimeout(() => {
       this.paymentTypeSelected = paymentType;
     }, 100);
@@ -223,13 +223,13 @@ export class PatientListComponent implements OnInit, OnChanges {
   onSearchAllPatient(event: Event) {
     event.stopPropagation();
     const patientListDialog = this.dialog.open(PatientListDialogComponent, {
-      width: '800px',
+      width: "800px",
     });
 
     patientListDialog
       .afterClosed()
       .subscribe((response: { action: string; patient: Patient }) => {
-        if (response?.action === 'PATIENT_SELECT') {
+        if (response?.action === "PATIENT_SELECT") {
           this.store.dispatch(clearBills());
           this.store.dispatch(clearBillItems());
           this.selectPatient.emit(response?.patient);

@@ -2,7 +2,8 @@
   style="z-index: 1000"
   class="menu-container"
   *ngIf="{
-    locationsForCurrentUser: locationsForCurrentUser$ | async
+    locationsForCurrentUser: locationsForCurrentUser$ | async,
+    lisConfigurations: lisConfigurations$ | async
   } as params"
 >
   <div
@@ -86,18 +87,20 @@
       </ng-container>
     </div>
   </div>
-  <div
-    class="w-100 module-selector-container"
-    *ngIf="{ userLocations: locationsForCurrentUser$ | async } as params"
-  >
+  <div class="w-100 module-selector-container">
     <!-- {{ locationsForCurrentUser$ | async | json }} -->
     <mat-progress-bar
-      *ngIf="!params?.userLocations"
+      *ngIf="!params?.locationsForCurrentUser || !params?.lisConfigurations"
       mode="indeterminate"
     ></mat-progress-bar>
     <app-modules-selector
-      *ngIf="params?.userLocations && params?.userLocations?.length > 0"
-      [locations]="params?.userLocations"
+      *ngIf="
+        params?.locationsForCurrentUser &&
+        params?.locationsForCurrentUser?.length > 0 &&
+        params?.lisConfigurations
+      "
+      [locations]="params?.locationsForCurrentUser"
+      [lisConfigurations]="params?.lisConfigurations"
     ></app-modules-selector>
   </div>
 </div>
