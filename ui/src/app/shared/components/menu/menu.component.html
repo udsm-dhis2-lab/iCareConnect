@@ -47,6 +47,7 @@
       </button>
 
       <ng-container *ngIf="currentUser$ | async as currentUser">
+        <!-- {{ currentUser | json }} -->
         <button
           id="btn-account"
           mat-icon-button

@@ -107,6 +107,9 @@ export class CodedAnswersComponent implements OnInit {
 
     this.conceptService.createConcept(this.answer).subscribe((response) => {
       if (response) {
+        this.category = "List";
+
+        this.codedAnswers$ = this.conceptService.getConceptsAsCodedAnswers();
         this.saving = false;
       }
     });

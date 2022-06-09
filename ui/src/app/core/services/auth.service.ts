@@ -120,6 +120,9 @@ export class AuthService {
   }
 
   getSession() {
-    return this.httpClient.get("session");
+    return this.httpClient.get("session").pipe(
+      map((response) => response),
+      catchError((error) => of(error))
+    );
   }
 }
