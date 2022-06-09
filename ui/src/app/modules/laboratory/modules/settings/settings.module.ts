@@ -4,9 +4,7 @@ import { SharedModule } from "src/app/shared/shared.module";
 import { SettingsComponent } from "./settings/settings.component";
 import { SettingsRoutingModule } from "./settings-routing.module";
 import { HomeComponent } from "./pages/home/home.component";
-import { TestsControlComponent } from "./pages/tests-control/tests-control.component";
-import { LabConfigurationsComponent } from "./pages/lab-configurations/lab-configurations.component";
-import { TestSettingsComponent } from "./pages/test-settings/test-settings.component";
+import { TestSettingsComponent } from "./components/test-settings/test-settings.component";
 import { components } from "./components";
 import { TestSelectorComponent } from "./components/test-selector/test-selector.component";
 import { TestTimeComponent } from "./components/test-time/test-time.component";
@@ -18,14 +16,13 @@ import { TestFemaleRangeListComponent } from "./components/test-female-range-lis
 import { TestMethodsDashboardComponent } from "./containers/test-methods-dashboard/test-methods-dashboard.component";
 import { SpecimenSourcesDashboardComponent } from "./containers/specimen-sources-dashboard/specimen-sources-dashboard.component";
 import { ParametersDashboardComponent } from "./containers/parameters-dashboard/parameters-dashboard.component";
-import { ProfilesAndAccessControlComponent } from './containers/profiles-and-access-control/profiles-and-access-control.component';
+import { ProfilesAndAccessControlComponent } from "./containers/profiles-and-access-control/profiles-and-access-control.component";
+import { ExtendedParametersSettingsComponent } from './containers/extended-parameters-settings/extended-parameters-settings.component';
 
 @NgModule({
   declarations: [
     SettingsComponent,
     HomeComponent,
-    TestsControlComponent,
-    LabConfigurationsComponent,
     TestSettingsComponent,
     ...components,
     TestSelectorComponent,
@@ -39,6 +36,7 @@ import { ProfilesAndAccessControlComponent } from './containers/profiles-and-acc
     SpecimenSourcesDashboardComponent,
     ParametersDashboardComponent,
     ProfilesAndAccessControlComponent,
+    ExtendedParametersSettingsComponent,
   ],
   imports: [CommonModule, SettingsRoutingModule, SharedModule],
 })
