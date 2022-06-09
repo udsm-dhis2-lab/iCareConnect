@@ -36,8 +36,20 @@
         params?.LISConfigurations
       "
     >
-      <div class="laboratory-header col-12 mat-elevation-z1">
-        <mat-chip-list class="w-100" cdkDropListOrientation="horizontal">
+      <div
+        [ngClass]="{
+          'col-2': params?.LISConfigurations?.isLIS,
+          'col-12': !params?.LISConfigurations?.isLIS
+        }"
+        class="laboratory-header mat-elevation-z1"
+      >
+        <mat-chip-list
+          class="w-100"
+          cdkDropListOrientation="{{
+            !params?.LISConfigurations?.isLIS ? 'horizontal' : ''
+          }}"
+          [ngClass]="{ 'full-width-chip': params?.LISConfigurations?.isLIS }"
+        >
           <mat-chip
             class="w-20"
             *ngIf="
@@ -135,42 +147,53 @@
           </mat-chip>
         </mat-chip-list>
       </div>
+      <div
+        [ngClass]="{
+          'col-10': params?.LISConfigurations?.isLIS,
+          'col-12': !params?.LISConfigurations?.isLIS
+        }"
+      >
+        <div
+          class="w-100 no-print"
+          *ngIf="showDate && params?.sampleTypes?.length > 0"
+        >
+          <mat-form-field appearance="fill" floatLabel="always">
+            <mat-label>Select a date range</mat-label>
+            <mat-date-range-input [rangePicker]="visitDatePicker">
+              <input
+                matStartDate
+                placeholder="Start date"
+                autocomplete="off"
+                [(ngModel)]="startDate"
+                (dateInput)="onDateChange()"
+              />
+              <input
+                matEndDate
+                placeholder="End date"
+                autocomplete="off"
+                [(ngModel)]="endDate"
+                (dateInput)="onDateChange(true)"
+              />
+            </mat-date-range-input>
+            <mat-datepicker-toggle
+              matSuffix
+              [for]="visitDatePicker"
+            ></mat-datepicker-toggle>
+            <mat-date-range-picker #visitDatePicker></mat-date-range-picker>
+          </mat-form-field>
+        </div>
+        <div class="laboratory-home-content w-100">
+          <router-outlet></router-outlet>
+        </div>
+      </div>
     </div>
 
-    <div
+    <!-- <div
       class="row"
       style="margin-top: 20px"
       *ngIf="params?.sampleTypes?.length > 0"
     >
-      <div class="col-12 no-print" *ngIf="showDate">
-        <mat-form-field appearance="fill" floatLabel="always">
-          <mat-label>Select a date range</mat-label>
-          <mat-date-range-input [rangePicker]="visitDatePicker">
-            <input
-              matStartDate
-              placeholder="Start date"
-              autocomplete="off"
-              [(ngModel)]="startDate"
-              (dateInput)="onDateChange()"
-            />
-            <input
-              matEndDate
-              placeholder="End date"
-              autocomplete="off"
-              [(ngModel)]="endDate"
-              (dateInput)="onDateChange(true)"
-            />
-          </mat-date-range-input>
-          <mat-datepicker-toggle
-            matSuffix
-            [for]="visitDatePicker"
-          ></mat-datepicker-toggle>
-          <mat-date-range-picker #visitDatePicker></mat-date-range-picker>
-        </mat-form-field>
-      </div>
-      <div class="laboratory-home-content col-12">
-        <router-outlet></router-outlet>
-      </div>
-    </div>
+      
+    </div> -->
   </ng-container>
 </div>
