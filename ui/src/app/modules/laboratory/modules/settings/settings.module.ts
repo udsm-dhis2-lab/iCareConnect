@@ -17,7 +17,8 @@ import { TestMethodsDashboardComponent } from "./containers/test-methods-dashboa
 import { SpecimenSourcesDashboardComponent } from "./containers/specimen-sources-dashboard/specimen-sources-dashboard.component";
 import { ParametersDashboardComponent } from "./containers/parameters-dashboard/parameters-dashboard.component";
 import { ProfilesAndAccessControlComponent } from "./containers/profiles-and-access-control/profiles-and-access-control.component";
-import { ExtendedParametersSettingsComponent } from './containers/extended-parameters-settings/extended-parameters-settings.component';
+import { ExtendedParametersSettingsComponent } from "./containers/extended-parameters-settings/extended-parameters-settings.component";
+import { settingsContainers } from "./containers";
 
 @NgModule({
   declarations: [
@@ -25,6 +26,7 @@ import { ExtendedParametersSettingsComponent } from './containers/extended-param
     HomeComponent,
     TestSettingsComponent,
     ...components,
+    ...settingsContainers,
     TestSelectorComponent,
     TestTimeComponent,
     TestMaleRangeComponent,

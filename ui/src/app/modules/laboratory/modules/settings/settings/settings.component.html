@@ -4,14 +4,24 @@
     (selectedTabChange)="onChangeRoute($event)"
     (selectedIndexChange)="selectedTab.setValue($event)"
   >
-    <mat-tab label="Parameters">
+    <mat-tab label="Tests Parameters Management">
       <div class="p-3">
         <app-parameters-dashboard></app-parameters-dashboard>
       </div>
     </mat-tab>
-    <mat-tab label="Test methods">
+    <mat-tab label="Test methods & Specimen Sources">
       <div class="p-3">
         <app-test-methods-dashboard></app-test-methods-dashboard>
+      </div>
+    </mat-tab>
+    <mat-tab label="Test Orders">
+      <div class="p-3">
+        <app-test-orders-management></app-test-orders-management>
+      </div>
+    </mat-tab>
+    <mat-tab label="Labs & Sections Management">
+      <div class="p-3">
+        <app-labs-and-sections-management></app-labs-and-sections-management>
       </div>
     </mat-tab>
     <mat-tab label="Profiles && Access Control">
@@ -19,7 +29,7 @@
         <app-profiles-and-access-control></app-profiles-and-access-control>
       </div>
     </mat-tab>
-    <mat-tab label="Extended parameters settings">
+    <mat-tab label="Extended Test Settings">
       <div class="p-3">
         <app-extended-parameters-settings></app-extended-parameters-settings>
       </div>
