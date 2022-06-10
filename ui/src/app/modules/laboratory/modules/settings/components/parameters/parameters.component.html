@@ -8,91 +8,93 @@
     </div>
   </div>
   <div class="row" *ngIf="!saving">
-    <div
-      class="col-lg-5 col-md-5 col-sx-12 col-sm-12 mb-4 border-right-separater"
-    >
-      <div class="h4 text-left">New Parameter</div>
-      <hr />
-      <div class="row">
-        <div class="col-lg-6 col-md-6 col-sx-12 col-sm-12">
-          <app-form
-            [fields]="basicParametersFields"
-            (formUpdate)="onFormUpdate($event)"
-          ></app-form>
-        </div>
-        <div class="col-lg-6 col-md-6 col-sx-12 col-sm-12">
-          <app-form
-            *ngIf="
-              formData['datatype']?.value ===
-              '8d4a4488-c2cc-11de-8d13-0010c6dffd0f'
-            "
-            [fields]="[displayPrecisionField]"
-            (formUpdate)="onFormUpdate($event)"
-          ></app-form>
-          <app-form
-            [fields]="[unitsField]"
-            (formUpdate)="onFormUpdate($event)"
-          ></app-form>
-          <fieldset>
-            <legend>Codes</legend>
-            <div>
-              <app-form
-                [fields]="[codesMappingsSourceField]"
-                (formUpdate)="onFormUpdateForSource($event)"
-              ></app-form>
-              <app-form
-                [fields]="[codeField]"
-                (formUpdate)="onFormUpdate($event)"
-              ></app-form>
-            </div>
-          </fieldset>
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="col-12 d-flex justify-content-end mt-2">
-          <button mat-stroked-button (click)="onSave($event, parameterUuid)">
-            Save
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <div
-      class="col-lg-3 col-md-3 col-sx-12 col-sm-12 mb-4 border-right-separater"
-    >
-      <app-parameters-list
-        (selectedParameter)="onGetSelectedParameter($event)"
-      ></app-parameters-list>
-    </div>
-    <div class="col-lg-4 col-md-4 col-sx-12 col-sm-12 mb-4">
+    <div class="col-12">
       <mat-tab-group>
-        <mat-tab label="Parameters Codes References">
+        <mat-tab label="Parameters">
           <ng-template matTabContent>
             <div class="p-3">
-              <app-concept-reference-terms></app-concept-reference-terms>
-            </div>
-          </ng-template>
-        </mat-tab>
-        <mat-tab label="Parameters Coding Sources">
-          <ng-template matTabContent>
-            <div class="p-3">
-              <app-concept-sources></app-concept-sources>
+              <div class="row">
+                <div
+                  class="
+                    col-lg-6 col-md-6 col-sx-12 col-sm-12
+                    mb-4
+                    border-right-separater
+                  "
+                >
+                  <div class="h4 text-left">New Parameter</div>
+                  <hr />
+                  <div class="row">
+                    <div class="col-lg-6 col-md-6 col-sx-12 col-sm-12">
+                      <app-form
+                        [fields]="basicParametersFields"
+                        (formUpdate)="onFormUpdate($event)"
+                      ></app-form>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sx-12 col-sm-12">
+                      <app-form
+                        *ngIf="
+                          formData['datatype']?.value ===
+                          '8d4a4488-c2cc-11de-8d13-0010c6dffd0f'
+                        "
+                        [fields]="[displayPrecisionField]"
+                        (formUpdate)="onFormUpdate($event)"
+                      ></app-form>
+                      <app-form
+                        [fields]="[unitsField]"
+                        (formUpdate)="onFormUpdate($event)"
+                      ></app-form>
+                      <fieldset>
+                        <legend>Codes</legend>
+                        <div>
+                          <app-form
+                            [fields]="[codesMappingsSourceField]"
+                            (formUpdate)="onFormUpdateForSource($event)"
+                          ></app-form>
+                          <app-form
+                            [fields]="[codeField]"
+                            (formUpdate)="onFormUpdate($event)"
+                          ></app-form>
+                        </div>
+                      </fieldset>
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-12 d-flex justify-content-end mt-2">
+                      <button
+                        mat-stroked-button
+                        (click)="onSave($event, parameterUuid)"
+                      >
+                        Save
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div
+                  class="
+                    col-lg-6 col-md-6 col-sx-12 col-sm-12
+                    mb-4
+                    border-right-separater
+                  "
+                >
+                  <app-parameters-list
+                    (selectedParameter)="onGetSelectedParameter($event)"
+                  ></app-parameters-list>
+                </div>
+              </div>
             </div>
           </ng-template>
         </mat-tab>
 
-        <mat-tab label="Coded Answers">
+        <mat-tab label="Other Parameters Configurations">
           <ng-template matTabContent>
             <div class="p-3">
-              <app-coded-answers></app-coded-answers>
-            </div>
-          </ng-template>
-        </mat-tab>
-        <mat-tab label="Coded References Types">
-          <ng-template matTabContent>
-            <div class="p-3">
-              <app-concept-map-types></app-concept-map-types>
+              <div class="row">
+                <div class="col-lg-12 col-md-12 col-sx-12 col-sm-12 mb-4">
+                  <app-other-parameters-configs></app-other-parameters-configs>
+                </div>
+              </div>
             </div>
           </ng-template>
         </mat-tab>
