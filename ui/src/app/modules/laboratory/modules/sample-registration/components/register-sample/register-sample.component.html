@@ -9,40 +9,9 @@
     referringDoctorAttributes: referringDoctorAttributes$ | async
   } as params"
 >
-  <!-- <section class="registration-category">
-    <mat-checkbox [checked]="registrationCategory === 'single'"
-      >Single</mat-checkbox
-    >
-    <mat-checkbox>Batch</mat-checkbox>
-  </section> -->
-
-  <mat-radio-group class="registration-category">
-    <mat-radio-button
-      (change)="getSelection($event)"
-      class="registration-category-btn"
-      [value]="'single'"
-      [checked]="registrationCategory === 'single'"
-      color="primary"
-    >
-      Single
-    </mat-radio-button>
-    <mat-radio-button
-      (change)="getSelection($event)"
-      class="registration-category-btn ml-2"
-      [value]="'batch'"
-      [checked]="registrationCategory === 'batch'"
-      color="primary"
-    >
-      Batch
-    </mat-radio-button>
-  </mat-radio-group>
-
   <div class="row">
     <div class="col-lg-12 col-md-12 col-sm-12 col-sx-12">
-      <div
-        class="single-sample-registration"
-        *ngIf="registrationCategory === 'single'"
-      >
+      <div class="single-sample-registration">
         <mat-progress-bar
           *ngIf="
             !params?.mrnGeneratorSourceUuid ||
@@ -69,74 +38,9 @@
           [referringDoctorAttributes]="params?.referringDoctorAttributes"
         ></app-single-registration>
       </div>
-      <div
-        class="batch-sample-registration"
-        *ngIf="registrationCategory === 'batch'"
-      >
+      <!-- <div class="batch-sample-registration">
         <app-batch-registration></app-batch-registration>
-      </div>
+      </div> -->
     </div>
-    <!-- <div class="col-lg-4 col-md-4 col-sm-12 col-sx-12">
-      <table class="table" *ngIf="params?.labSamples">
-        <thead>
-          <tr>
-            <th style="width: 20px">SN</th>
-            <th>Sample ID</th>
-            <th>Date</th>
-            <th>Registra</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr
-            *ngFor="
-              let sample of params?.labSamples?.results;
-              let count = index
-            "
-          >
-            <td>
-              {{
-                count +
-                  1 +
-                  (params?.labSamples?.pager?.page - 1) *
-                    params?.labSamples?.pager?.pageSize
-              }}
-            </td>
-            <td>
-              {{ sample?.label }}
-            </td>
-            <td>
-              {{ sample?.created | date }}
-            </td>
-            <td>
-              {{ sample?.creator?.display }}
-            </td>
-          </tr>
-        </tbody>
-      </table>
-
-      <mat-progress-bar
-        *ngIf="!params?.labSamples"
-        mode="indeterminate"
-      ></mat-progress-bar>
-      <div class="w-100 mt-2 d-flex justify-content-end mb-2">
-        <button
-          [disabled]="
-            params?.labSamples?.pager?.page === 1 || !params?.labSamples
-          "
-          mat-stroked-button
-          (click)="getSamples($event, 'prev', params?.labSamples?.pager)"
-        >
-          Prev
-        </button>
-        <button
-          [disabled]="!params?.labSamples"
-          mat-stroked-button
-          (click)="getSamples($event, 'next', params?.labSamples?.pager)"
-          class="ml-2"
-        >
-          Next
-        </button>
-      </div>
-    </div> -->
   </div>
 </div>

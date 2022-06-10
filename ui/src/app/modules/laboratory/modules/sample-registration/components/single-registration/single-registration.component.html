@@ -6,71 +6,124 @@
   } as params"
 >
   <div class="row" *ngIf="params?.labSampleLabel">
+    <div class="col-12">
+      <mat-radio-group class="registration-category">
+        <mat-radio-button
+          (change)="getSelection($event)"
+          class="registration-category-btn"
+          [value]="'Clinical'"
+          [checked]="registrationCategory === 'Clinical'"
+          color="primary"
+        >
+          Clinical
+        </mat-radio-button>
+        <mat-radio-button
+          (change)="getSelection($event)"
+          class="registration-category-btn ml-2"
+          [value]="'Non-Clinical'"
+          [checked]="registrationCategory === 'Non-Clinical'"
+          color="primary"
+        >
+          Non-Clinical
+        </mat-radio-button>
+      </mat-radio-group>
+    </div>
     <div class="col-12" *ngIf="savingData">
       <mat-progress-bar mode="indeterminate"></mat-progress-bar>
     </div>
 
-    <div class="col-lg-4 col-md-4 col-sx-12 col-sm-12 mt-2">
+    <div class="col-12" *ngIf="registrationCategory === 'Clinical'">
       <fieldset>
-        <legend>Patient Details</legend>
+        <legend
+          (click)="togglePatientDetailsFieldSet($event)"
+          class="d-flex justify-content-center"
+        >
+          <span> Patient Details </span>
+          <span>
+            <mat-icon *ngIf="!patientFieldSetClosed"
+              >keyboard_arrow_down</mat-icon
+            >
+            <mat-icon *ngIf="patientFieldSetClosed">keyboard_arrow_up</mat-icon>
+          </span>
+        </legend>
         <app-person-details
+          *ngIf="!patientFieldSetClosed"
           [referFromFacilityVisitAttribute]="referFromFacilityVisitAttribute"
           (personDetails)="onGetPersonDetails($event)"
         ></app-person-details>
       </fieldset>
     </div>
-    <div class="col-lg-4 col-md-4 col-sx-12 col-sm-12 mt-2">
-      <div class="for-sample-label">
-        <fieldset>
-          <legend>Specimen Details</legend>
-          <app-sample-label
-            [label]="params?.labSampleLabel"
-            (sampleLabel)="onGetSampleLabel($event)"
-          ></app-sample-label>
-          <app-form
-            [fields]="specimenDetailsFields"
-            (formUpdate)="onFormUpdate($event)"
-          ></app-form>
-        </fieldset>
-      </div>
-      <div class="tests">
-        <fieldset>
-          <legend>Tests</legend>
-          <!-- <app-lb-option-selector
-              *ngIf="params?.testsUnderDepartment"
-              [options]="params?.testsUnderDepartment"
-              [id]="'tests'"
-              [label]="'Test'"
-              (selectedOptionDetails)="onGetSelectedOptionDetails($event)"
-            ></app-lb-option-selector> -->
-          <app-form
-            [fields]="[testsFormField]"
-            (formUpdate)="onFormUpdateForTest($event)"
-          ></app-form>
-        </fieldset>
-      </div>
-    </div>
-    <div class="col-lg-4 col-md-4 col-sx-12 col-sm-12 mt-2">
-      <div class="clinical-data">
-        <fieldset>
-          <legend>Clinical Data</legend>
-          <app-clinical-data
-            (clinicalDataValues)="onGetClinicalDataValues($event)"
-          ></app-clinical-data>
-        </fieldset>
-      </div>
+    <div class="col-12">
+      <mat-stepper #stepper>
+        <mat-step errorMessage="Some fields not fed.">
+          <ng-template matStepLabel>Specimen Details</ng-template>
+          <div class="row">
+            <div class="col-lg-12 col-md-12 col-sx-12 col-sm-12">
+              <div class="for-specimen-details">
+                <fieldset>
+                  <legend>Specimen Details</legend>
+                  <app-sample-label
+                    [label]="params?.labSampleLabel"
+                    (sampleLabel)="onGetSampleLabel($event)"
+                  ></app-sample-label>
+                  <app-form
+                    [fields]="specimenDetailsFields"
+                    [isFormHorizontal]="true"
+                    (formUpdate)="onFormUpdate($event)"
+                  ></app-form>
+                </fieldset>
+              </div>
+            </div>
+          </div>
+        </mat-step>
 
-      <div class="referring-doctor-field">
-        <fieldset>
-          <legend>Referring Doctor</legend>
-          <app-form
-            [isFormHorizontal]="true"
-            [fields]="referringDoctorFields"
-            (formUpdate)="onFormUpdate($event)"
-          ></app-form>
-        </fieldset>
-      </div>
+        <mat-step
+          errorMessage="Some fields not fed."
+          *ngIf="registrationCategory === 'Clinical'"
+        >
+          <ng-template matStepLabel>Clinical Data</ng-template>
+          <div>
+            <div class="clinical-data">
+              <fieldset>
+                <legend>Clinical Data</legend>
+                <app-clinical-data
+                  (clinicalDataValues)="onGetClinicalDataValues($event)"
+                ></app-clinical-data>
+              </fieldset>
+            </div>
+          </div>
+        </mat-step>
+
+        <mat-step
+          errorMessage="Some fields not fed."
+          *ngIf="registrationCategory === 'Clinical'"
+        >
+          <ng-template matStepLabel>Referring Doctor</ng-template>
+          <div>
+            <div class="referring-doctor-field">
+              <fieldset>
+                <legend>Referring Doctor</legend>
+                <app-form
+                  [isFormHorizontal]="true"
+                  [fields]="referringDoctorFields"
+                  (formUpdate)="onFormUpdate($event)"
+                ></app-form>
+              </fieldset>
+            </div>
+          </div>
+        </mat-step>
+
+        <mat-step errorMessage="Some fields not fed.">
+          <ng-template matStepLabel>Tests</ng-template>
+          <div>
+            <app-multiple-tests-selection
+              (testsData)="onFormUpdateForTest($event)"
+            ></app-multiple-tests-selection>
+          </div>
+        </mat-step>
+      </mat-stepper>
     </div>
+
     <div class="col-12" *ngIf="savingDataResponse?.error">
       <div *ngIf="savingDataResponse?.error?.error">
         <div

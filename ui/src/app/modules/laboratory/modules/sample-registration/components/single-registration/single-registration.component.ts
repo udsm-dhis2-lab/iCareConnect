@@ -1,6 +1,8 @@
 import { Component, Input, OnInit } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
+import { MatRadioChange } from "@angular/material/radio";
 import { Observable, zip } from "rxjs";
+import { NON_CLINICAL_PERSON_DATA } from "src/app/core/constants/non-clinical-person.constant";
 import { Location } from "src/app/core/models";
 import { SystemSettingsWithKeyDetails } from "src/app/core/models/system-settings.model";
 import { LocationService } from "src/app/core/services";
@@ -51,6 +53,10 @@ export class SingleRegistrationComponent implements OnInit {
   selectedLab: any;
 
   referringDoctorFields: any[];
+
+  patientFieldSetClosed: boolean = true;
+
+  registrationCategory: string = "Clinical";
   constructor(
     private samplesService: SamplesService,
     private labTestsService: LabTestsService,
@@ -77,14 +83,6 @@ export class SingleRegistrationComponent implements OnInit {
         });
       }
     );
-    this.testsFormField = new Dropdown({
-      id: "test1",
-      key: "test1",
-      label: "Test",
-      options: [],
-      conceptClass: "Test",
-      shouldHaveLiveSearchForDropDownFields: true,
-    });
 
     this.specimenDetailsFields = [
       new Dropdown({
@@ -118,15 +116,15 @@ export class SingleRegistrationComponent implements OnInit {
         }),
         shouldHaveLiveSearchForDropDownFields: false,
       }),
-      new Dropdown({
-        id: "receivinglab",
-        key: "receivinglab",
-        label: "Receiving Lab",
-        options: [],
-        searchControlType: "concept",
-        conceptClass: "Lab Department",
-        shouldHaveLiveSearchForDropDownFields: true,
-      }),
+      // new Dropdown({
+      //   id: "receivinglab",
+      //   key: "receivinglab",
+      //   label: "Receiving Lab",
+      //   options: [],
+      //   searchControlType: "concept",
+      //   conceptClass: "Lab Department",
+      //   shouldHaveLiveSearchForDropDownFields: true,
+      // }),
       new DateField({
         id: "receivedon",
         key: "receivedon",
@@ -180,6 +178,15 @@ export class SingleRegistrationComponent implements OnInit {
     // });
   }
 
+  togglePatientDetailsFieldSet(event: Event): void {
+    event.stopPropagation();
+    this.patientFieldSetClosed = !this.patientFieldSetClosed;
+  }
+
+  getSelection(event: MatRadioChange): void {
+    this.registrationCategory = event?.value;
+  }
+
   onFormUpdate(formValues: FormValue, itemKey?: string): void {
     this.formData = { ...this.formData, ...formValues.getValues() };
     if (itemKey && itemKey === "department") {
@@ -189,8 +196,8 @@ export class SingleRegistrationComponent implements OnInit {
     }
   }
 
-  onFormUpdateForTest(formValues: FormValue): void {
-    this.formData = { ...this.formData, ...formValues.getValues() };
+  onFormUpdateForTest(testValues: any): void {
+    this.formData = { ...this.formData, ...testValues };
   }
 
   onFormUpdateForAgency(formValues: FormValue): void {
@@ -210,7 +217,10 @@ export class SingleRegistrationComponent implements OnInit {
   }
 
   onGetPersonDetails(personDetails: any): void {
-    this.personDetailsData = personDetails;
+    this.personDetailsData =
+      this.registrationCategory === "Clinical"
+        ? personDetails
+        : NON_CLINICAL_PERSON_DATA;
   }
 
   onGetClinicalDataValues(clinicalData): void {
@@ -219,6 +229,11 @@ export class SingleRegistrationComponent implements OnInit {
 
   onSave(event: Event): void {
     event.stopPropagation();
+
+    this.personDetailsData =
+      this.registrationCategory === "Clinical"
+        ? this.personDetailsData
+        : NON_CLINICAL_PERSON_DATA;
     zip(
       this.registrationService.getPatientIdentifierTypes(),
       this.locationService.getFacilityCode(),
@@ -267,36 +282,51 @@ export class SingleRegistrationComponent implements OnInit {
                   ],
                   attributes: [],
                 },
-                identifiers: (patientIdentifierTypes || [])
-                  .map((personIdentifierType) => {
-                    if (
-                      personIdentifierType.id === this.preferredPersonIdentifier
-                    ) {
-                      return {
-                        identifier: this.personDetailsData["mrn"]
-                          ? this.personDetailsData["mrn"]
-                          : this.personDetailsData[personIdentifierType.id],
-                        identifierType: personIdentifierType.id,
-                        location: this.currentLocation?.uuid,
-                        preferred: true,
-                      };
-                    } else {
-                      return {
-                        identifier:
-                          this.personDetailsData[personIdentifierType.id],
-                        identifierType: personIdentifierType.id,
-                        location: this.currentLocation?.uuid,
-                        preferred: false,
-                      };
-                    }
-                  })
-                  .filter((patientIdentifier) => patientIdentifier?.identifier),
+                identifiers:
+                  this.registrationCategory === "Clinical"
+                    ? (patientIdentifierTypes || [])
+                        .map((personIdentifierType) => {
+                          if (
+                            personIdentifierType.id ===
+                            this.preferredPersonIdentifier
+                          ) {
+                            return {
+                              identifier: this.personDetailsData["mrn"]
+                                ? this.personDetailsData["mrn"]
+                                : this.personDetailsData[
+                                    personIdentifierType.id
+                                  ],
+                              identifierType: personIdentifierType.id,
+                              location: this.currentLocation?.uuid,
+                              preferred: true,
+                            };
+                          } else {
+                            return {
+                              identifier:
+                                this.personDetailsData[personIdentifierType.id],
+                              identifierType: personIdentifierType.id,
+                              location: this.currentLocation?.uuid,
+                              preferred: false,
+                            };
+                          }
+                        })
+                        .filter(
+                          (patientIdentifier) => patientIdentifier?.identifier
+                        )
+                    : [
+                        {
+                          identifier: this.currentSampleLabel,
+                          identifierType: this.preferredPersonIdentifier,
+                          location: this.currentLocation?.uuid,
+                          preferred: true,
+                        },
+                      ],
               };
               this.savingData = true;
               this.registrationService
                 .createPatient(
                   this.patientPayload,
-                  this.personDetailsData["patientUuid"]
+                  this.personDetailsData?.patientUuid
                 )
                 .subscribe((patientResponse) => {
                   this.savingDataResponse = patientResponse;
@@ -325,35 +355,37 @@ export class SingleRegistrationComponent implements OnInit {
                       },
                     ];
 
-                    const personDataAttributeKeys =
-                      Object.keys(this.personDetailsData).filter(
-                        (key) => key.indexOf("attribute-") === 0
-                      ) || [];
+                    if (this.registrationCategory === "Clinical") {
+                      const personDataAttributeKeys =
+                        Object.keys(this.personDetailsData).filter(
+                          (key) => key.indexOf("attribute-") === 0
+                        ) || [];
 
-                    const formDataAttributeKeys =
-                      Object.keys(this.formData).filter(
-                        (key) => key.indexOf("attribute-") === 0
-                      ) || [];
+                      const formDataAttributeKeys =
+                        Object.keys(this.formData).filter(
+                          (key) => key.indexOf("attribute-") === 0
+                        ) || [];
 
-                    personDataAttributeKeys.forEach((key) => {
-                      visAttributes = [
-                        ...visAttributes,
-                        {
-                          attributeType: key.split("attribute-")[1],
-                          value: this.personDetailsData[key],
-                        },
-                      ];
-                    });
+                      personDataAttributeKeys.forEach((key) => {
+                        visAttributes = [
+                          ...visAttributes,
+                          {
+                            attributeType: key.split("attribute-")[1],
+                            value: this.personDetailsData[key],
+                          },
+                        ];
+                      });
 
-                    formDataAttributeKeys.forEach((key) => {
-                      visAttributes = [
-                        ...visAttributes,
-                        {
-                          attributeType: key.split("attribute-")[1],
-                          value: this.formData[key]?.value,
-                        },
-                      ];
-                    });
+                      formDataAttributeKeys.forEach((key) => {
+                        visAttributes = [
+                          ...visAttributes,
+                          {
+                            attributeType: key.split("attribute-")[1],
+                            value: this.formData[key]?.value,
+                          },
+                        ];
+                      });
+                    }
                     const visitObject = {
                       patient: this.savingDataResponse?.uuid,
                       visitType: "54e8ffdc-dea0-4ef0-852f-c23e06d16066",
