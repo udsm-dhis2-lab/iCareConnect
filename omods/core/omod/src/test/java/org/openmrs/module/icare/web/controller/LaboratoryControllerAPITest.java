@@ -142,6 +142,9 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		boolean sampleFound = false;
 		for (Map sample : sampleWithStatus) {
 			if (sample.get("uuid").equals("d365e560-zz77-11e3-1111-08002007777")) {
+
+				System.out.println(((List<Map>) sample.get("statuses")).get(0));
+
 				sampleFound = true;
 				assertThat("list of statuses is greater than 0", ((List<Map>) sample.get("statuses")).size(), is(1));
 				Map<String, Object> status = ((List<Map>) sample.get("statuses")).get(0);
