@@ -42,11 +42,10 @@ export class FieldComponent {
 
   ngAfterViewInit() {
     if (this.field?.searchTerm) {
-      console.log(this.field);
       this.members$ = this.formService.searchItem(
         {
           q: this.field?.searchTerm,
-          limit: 10,
+          limit: 50,
           class: this.field?.conceptClass,
           v:
             this.field?.searchControlType === "concept"
