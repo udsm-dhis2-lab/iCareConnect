@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
-import { Observable } from "rxjs";
+import { Observable, of } from "rxjs";
 import { ConceptsService } from "src/app/shared/resources/concepts/services/concepts.service";
 import { ConceptGetFull } from "src/app/shared/resources/openmrs";
 import { uniqBy } from "lodash";
@@ -12,6 +12,7 @@ import { uniqBy } from "lodash";
 export class ConceptSetMembersComponent implements OnInit {
   @Input() setMembersSearchTerm: string;
   @Input() selectedSetMembersItems: any[];
+  @Input() setMembersListFromTestMethod: ConceptGetFull[];
   selectedItems: ConceptGetFull[] = [];
   conceptsList$: Observable<ConceptGetFull[]>;
   @Output() selectedSetMembers: EventEmitter<ConceptGetFull[]> =
@@ -19,9 +20,9 @@ export class ConceptSetMembersComponent implements OnInit {
   constructor(private conceptService: ConceptsService) {}
 
   ngOnInit(): void {
-    this.conceptsList$ = this.conceptService.getConceptsBySearchTerm(
-      this.setMembersSearchTerm
-    );
+    this.conceptsList$ = !this.setMembersListFromTestMethod
+      ? this.conceptService.getConceptsBySearchTerm(this.setMembersSearchTerm)
+      : of(this.setMembersListFromTestMethod);
   }
 
   onGetSelectedSetMembers(selectedSetMembers: ConceptGetFull[]): void {

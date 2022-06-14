@@ -1,4 +1,9 @@
-<div class="row">
+<div
+  class="row"
+  *ngIf="{
+    selectedTestMethodDetails: selectedTestMethodDetails$ | async
+  } as params"
+>
   <div class="col-lg-7 col-md-7 col-sx-12 col-sm-12">
     <div class="h4">New</div>
     <hr />
@@ -15,10 +20,33 @@
         [fields]="basicConceptFields"
         (formUpdate)="onFormUpdate($event)"
       ></app-form>
+      <div *ngIf="searchTermForTestMethod">
+        <app-form
+          [fields]="[testMethodField]"
+          (formUpdate)="onFormUpdateTestMethod($event)"
+        ></app-form>
+      </div>
+
+      <mat-progress-bar
+        *ngIf="
+          searchTermForTestMethod &&
+          testMethodSelected &&
+          !params?.selectedTestMethodDetails
+        "
+        mode="indeterminate"
+      ></mat-progress-bar>
       <app-concept-set-members
-        *ngIf="isSet && !editingSet"
+        *ngIf="
+          (isSet && !editingSet && !searchTermForTestMethod) ||
+          (searchTermForTestMethod &&
+            testMethodSelected &&
+            params?.selectedTestMethodDetails)
+        "
         [setMembersSearchTerm]="setMembersSearchTerm"
         [selectedSetMembersItems]="selectedSetMembers"
+        [setMembersListFromTestMethod]="
+          params?.selectedTestMethodDetails?.setMembers
+        "
         (selectedSetMembers)="onGetSelectedSetMembers($event)"
       ></app-concept-set-members>
     </div>
@@ -27,7 +55,12 @@
       <button
         class="ml-2"
         mat-stroked-button
-        [disabled]="!isFormValid"
+        [disabled]="
+          (!isFormValid && !searchTermForTestMethod) ||
+          (!isFormValid &&
+            searchTermForTestMethod &&
+            selectedSetMembers?.length === 0)
+        "
         (click)="onSave($event)"
         color="primary"
       >
