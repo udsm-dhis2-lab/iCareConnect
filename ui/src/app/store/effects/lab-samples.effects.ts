@@ -133,6 +133,11 @@ export class LabSamplesEffects {
                     name: sample?.creator?.display?.split(" (")[0],
                     uid: sample?.creator?.uuid,
                   },
+                  registeredBy: {
+                    display: sample?.creator?.display?.split(" (")[0],
+                    name: sample?.creator?.display?.split(" (")[0],
+                    uid: sample?.creator?.uuid,
+                  },
                   accepted:
                     (_.filter(sample?.statuses, { status: "ACCEPTED" }) || [])
                       ?.length > 0
@@ -285,6 +290,15 @@ export class LabSamplesEffects {
                     };
                   }),
                   searchingText: createSearchingText(sample),
+                  priorityStatus: (sample?.statuses?.filter(
+                    (status) => status?.remarks === "PRIORITY"
+                  ) || [])[0],
+                  receivedOnStatus: (sample?.statuses?.filter(
+                    (status) => status?.remarks === "RECEIVED_ON"
+                  ) || [])[0],
+                  receivedByStatus: (sample?.statuses?.filter(
+                    (status) => status?.remarks === "RECEIVED_BY"
+                  ) || [])[0],
                   priorityHigh:
                     (
                       sample?.statuses.filter(
