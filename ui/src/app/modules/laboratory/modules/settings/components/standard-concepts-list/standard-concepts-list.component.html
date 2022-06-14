@@ -24,8 +24,14 @@
           <ng-container *ngIf="saving">
             <mat-progress-bar mode="indeterminate"></mat-progress-bar>
           </ng-container>
-          <ng-container>
-            <tr *ngFor="let concept of params?.conceptsList; let count = index">
+          <ng-container
+            *ngFor="let concept of params?.conceptsList; let count = index"
+          >
+            <tr
+              [ngClass]="{
+                'selected-concept': concept?.uuid === selectedConceptUuid
+              }"
+            >
               <td>
                 {{ count + 1 }}
               </td>

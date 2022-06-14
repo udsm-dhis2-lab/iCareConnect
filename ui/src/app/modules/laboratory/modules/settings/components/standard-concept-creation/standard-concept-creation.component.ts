@@ -1,4 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import { Observable } from "rxjs";
+import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
 import { TextArea } from "src/app/shared/modules/form/models/text-area.model";
 import { Textbox } from "src/app/shared/modules/form/models/text-box.model";
@@ -14,6 +16,7 @@ export class StandardConceptCreationComponent implements OnInit {
   @Input() conceptClass: string;
   @Input() standardSearchTerm: string;
   @Input() setMembersSearchTerm: string;
+  @Input() searchTermForTestMethod: string;
   @Input() dataType: string;
   @Input() isSet: boolean;
   basicConceptFields: any[];
@@ -27,10 +30,31 @@ export class StandardConceptCreationComponent implements OnInit {
   conceptUuid: string;
 
   selectedSetMembers: ConceptGetFull[] = [];
+
+  testMethodField: any;
+  testMethodSelected: boolean = false;
+  selectedTestMethodDetails$: Observable<ConceptGetFull[]>;
   constructor(private conceptService: ConceptsService) {}
 
   ngOnInit(): void {
     this.createBasicConceptFields();
+    if (this.searchTermForTestMethod) {
+      this.createTestMethodField();
+    }
+  }
+
+  createTestMethodField(): void {
+    this.testMethodField = new Dropdown({
+      id: "testmethod",
+      key: "testmethod",
+      label: "Test method",
+      searchTerm: "TEST_METHODS",
+      required: true,
+      options: [],
+      conceptClass: "Test",
+      searchControlType: "concept",
+      shouldHaveLiveSearchForDropDownFields: true,
+    });
   }
 
   createBasicConceptFields(data?: any): void {
@@ -68,8 +92,33 @@ export class StandardConceptCreationComponent implements OnInit {
     this.isFormValid = formValues.isValid;
   }
 
+  onFormUpdateTestMethod(formValues: FormValue): void {
+    this.formData = { ...this.formData, ...formValues.getValues() };
+    const methodUuid = this.formData["testmethod"]?.value;
+    if (methodUuid) {
+      this.testMethodSelected = true;
+      this.formData["testmethod"]?.value;
+      this.selectedTestMethodDetails$ =
+        this.conceptService.getConceptDetailsByUuid(
+          methodUuid,
+          "custom:(uuid,display,setMembers:(uuid,display))"
+        );
+    }
+  }
+
   onGetSelectedSetMembers(selectedSetMembers: ConceptGetFull[]): void {
     this.selectedSetMembers = selectedSetMembers;
+  }
+
+  onCancel(event: Event): void {
+    event.stopPropagation();
+    this.createBasicConceptFields();
+    this.editingSet = true;
+    setTimeout(() => {
+      this.editingSet = false;
+      this.conceptUuid = null;
+      this.selectedSetMembers = [];
+    }, 200);
   }
 
   onConceptEdit(concept: ConceptGetFull): void {
@@ -144,6 +193,7 @@ export class StandardConceptCreationComponent implements OnInit {
         this.saving = false;
         this.conceptUuid = null;
         this.conceptCreated.emit(true);
+        this.selectedSetMembers = [];
         this.createBasicConceptFields();
       }
     });
