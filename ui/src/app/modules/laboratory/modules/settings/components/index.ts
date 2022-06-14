@@ -1,6 +1,8 @@
 import { CodedAnswersComponent } from "./coded-answers/coded-answers.component";
 import { ConceptMapTypesComponent } from "./concept-map-types/concept-map-types.component";
 import { ConceptReferenceTermsComponent } from "./concept-reference-terms/concept-reference-terms.component";
+import { ConceptSetMembersSelectionComponent } from "./concept-set-members-selection/concept-set-members-selection.component";
+import { ConceptSetMembersComponent } from "./concept-set-members/concept-set-members.component";
 import { ConceptSourcesComponent } from "./concept-sources/concept-sources.component";
 import { ConfigsComponent } from "./configs/configs.component";
 import { LabConfigurationsComponent } from "./lab-configurations/lab-configurations.component";
@@ -32,4 +34,6 @@ export const components: any[] = [
   OtherParametersConfigsComponent,
   StandardConceptCreationComponent,
   StandardConceptsListComponent,
+  ConceptSetMembersComponent,
+  ConceptSetMembersSelectionComponent,
 ];
