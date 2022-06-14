@@ -44,6 +44,7 @@ export class FormComponent implements OnInit, OnChanges {
 
   ngOnChanges(): void {
     this.shouldDisable = this.isReport ? true : this.shouldDisable;
+    console.log(this.fields);
     this.form = this.fieldControlService.toFormGroup(
       this.fields,
       this.fieldsData

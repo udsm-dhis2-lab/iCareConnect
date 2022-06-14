@@ -103,7 +103,9 @@ export class SingleRegistrationComponent implements OnInit {
         key: "condition",
         label: "Condition",
         options: [],
+        conceptClass: "condition",
         searchControlType: "concept",
+        searchTerm: "SAMPLE_CONDITIONS",
         shouldHaveLiveSearchForDropDownFields: true,
       }),
       new Dropdown({
