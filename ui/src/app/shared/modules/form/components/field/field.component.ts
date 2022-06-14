@@ -72,6 +72,10 @@ export class FieldComponent {
     return this.form.controls[this.field.id]?.errors?.maxlength;
   }
 
+  get isDateTime(): boolean {
+    return this.field.controlType === "date-time";
+  }
+
   get isDate(): boolean {
     return this.field.controlType === "date";
   }
@@ -116,9 +120,9 @@ export class FieldComponent {
       limit: 50,
       class: this.field?.conceptClass,
       v:
-        field?.searchControlType === "location"
-          ? "custom:(uuid,display)"
-          : "custom:(uuid,display,datatype,conceptClass,mappings)",
+        field?.searchControlType === "concept"
+          ? "custom:(uuid,display,datatype,conceptClass,mappings)"
+          : "custom:(uuid,display)",
     };
     this.members$ = this.formService.searchItem(
       parameters,

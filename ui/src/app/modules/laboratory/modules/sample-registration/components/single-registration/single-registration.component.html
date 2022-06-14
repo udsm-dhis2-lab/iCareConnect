@@ -71,6 +71,28 @@
                     [isFormHorizontal]="true"
                     (formUpdate)="onFormUpdate($event)"
                   ></app-form>
+                  <div class="row">
+                    <div class="col-4">
+                      <app-form
+                        [fields]="[receivedByField]"
+                        (formUpdate)="onFormUpdate($event)"
+                      ></app-form>
+                    </div>
+                    <div class="col-4">
+                      <app-form
+                        [fields]="[receivedOnField]"
+                        (formUpdate)="onFormUpdate($event)"
+                      ></app-form>
+                    </div>
+                    <div class="col-4">
+                      <input
+                        (change)="getSelectedReceivedOnTime($event)"
+                        class="time-input-field"
+                        placeholder="Received At"
+                        type="time"
+                      />
+                    </div>
+                  </div>
                 </fieldset>
               </div>
             </div>

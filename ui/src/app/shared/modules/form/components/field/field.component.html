@@ -172,6 +172,30 @@
   </section>
 </div>
 
+<div [formGroup]="form" *ngIf="isDateTime && !isReport">
+  <mat-form-field
+    [hidden]="field?.hidden"
+    [ngSwitch]="field?.controlType"
+    appearance="fill"
+    class="w-100"
+  >
+    <mat-label [attr.for]="field?.key">{{ field?.label }}</mat-label>
+    <input
+      matInput
+      autocomplete="off"
+      [id]="field?.key"
+      [required]="field?.required"
+      [ngxMatDatetimePicker]="fieldId"
+      [placeholder]="field?.placeholder"
+      [formControlName]="field?.key"
+      (dateChange)="onFieldUpdate()"
+    />
+    <mat-datepicker-toggle matSuffix [for]="fieldId"></mat-datepicker-toggle>
+    <ngx-mat-datetime-picker #fieldId> </ngx-mat-datetime-picker>
+    <mat-error *ngIf="!isValid">{{ field?.label }} is required</mat-error>
+  </mat-form-field>
+</div>
+
 <div [formGroup]="form" *ngIf="isDate && !isReport">
   <!-- date field -->
   <mat-form-field
@@ -195,7 +219,7 @@
     <mat-datepicker #fieldId></mat-datepicker>
     <mat-error *ngIf="!isValid">{{ field?.label }} is required</mat-error>
   </mat-form-field>
-  <!-- end of data field -->
+  <!-- end of date field -->
 </div>
 
 <div [formGroup]="form" *ngIf="isCommonField && !isReport"></div>
