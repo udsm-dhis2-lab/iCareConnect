@@ -93,6 +93,7 @@ export class SingleRegistrationComponent implements OnInit {
         id: "specimen",
         key: "specimen",
         label: "Specimen",
+        searchTerm: "SPECIMEN_SOURCE",
         options: [],
         conceptClass: "Specimen",
         searchControlType: "concept",

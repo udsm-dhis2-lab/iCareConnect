@@ -17,7 +17,16 @@ export class ConceptsService {
   constructor(private api: Api, private httpClient: OpenmrsHttpClientService) {}
 
   getConceptDetails(name: string, fields: string): Observable<any> {
-    return from(this.api.concept.getAllConcepts({ name: name, v: fields }));
+    return from(
+      this.api.concept.getAllConcepts({ name: name, v: fields })
+    ).pipe(
+      map((response) => {
+        return response;
+      }),
+      catchError((error) => {
+        return of(error);
+      })
+    );
   }
 
   getConceptDetailsByUuid(uuid: string, fields: string): Observable<any> {
