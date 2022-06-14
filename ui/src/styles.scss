@@ -258,3 +258,12 @@ mat-dialog-container {
 .lis-contents {
   margin-top: 100px;
 }
+
+.time-input-field {
+  margin-top: 6px;
+  border-radius: 4px 4px !important;
+  border: solid 1px rgba(0, 0, 0, 0.18);
+  padding: 0.8em !important;
+  background-color: #fff;
+  animation: cdk-text-field-autofill-end 0s 1ms;
+}
