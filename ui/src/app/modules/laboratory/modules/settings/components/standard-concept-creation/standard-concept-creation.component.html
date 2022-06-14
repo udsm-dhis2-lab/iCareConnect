@@ -1,0 +1,25 @@
+<div class="row">
+  <div class="col-lg-6 col-md-6 col-sx-12 col-sm-12">
+    <div class="h4">New</div>
+    <hr />
+    <app-form
+      [fields]="basicConceptFields"
+      (formUpdate)="onFormUpdate($event)"
+    ></app-form>
+    <div class="w-100 d-flex justify-content-end">
+      <button
+        mat-stroked-button
+        [disabled]="!isFormValid"
+        (click)="onSave($event)"
+      >
+        Save
+      </button>
+    </div>
+  </div>
+  <div class="col-lg-6 col-md-6 col-sx-12 col-sm-12">
+    <app-standard-concepts-list
+      *ngIf="!saving"
+      [standardSearchTerm]="standardSearchTerm"
+    ></app-standard-concepts-list>
+  </div>
+</div>

@@ -10,6 +10,8 @@ import { OtherParametersConfigsComponent } from "./other-parameters-configs/othe
 import { ParametersListComponent } from "./parameters-list/parameters-list.component";
 import { ParametersComponent } from "./parameters/parameters.component";
 import { SampleTypesListComponent } from "./sample-types-list/sample-types-list.component";
+import { StandardConceptCreationComponent } from "./standard-concept-creation/standard-concept-creation.component";
+import { StandardConceptsListComponent } from "./standard-concepts-list/standard-concepts-list.component";
 import { TestMethodsComponent } from "./test-methods/test-methods.component";
 import { TestsControlComponent } from "./tests-control/tests-control.component";
 
@@ -28,4 +30,6 @@ export const components: any[] = [
   TestsControlComponent,
   LabConfigurationsComponent,
   OtherParametersConfigsComponent,
+  StandardConceptCreationComponent,
+  StandardConceptsListComponent,
 ];

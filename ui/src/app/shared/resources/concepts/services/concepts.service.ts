@@ -109,4 +109,22 @@ export class ConceptsService {
       })
     );
   }
+
+  getConceptsBySearchTerm(searchTerm: string): Observable<ConceptGetFull[]> {
+    return from(this.api.concept.getAllConcepts({ q: searchTerm })).pipe(
+      map((response) => response?.results),
+      catchError((error) => {
+        return of(error);
+      })
+    );
+  }
+
+  deleteConcept(id: string): Observable<ConceptGetFull[]> {
+    return from(this.api.concept.deleteConcept(id)).pipe(
+      map((response) => response),
+      catchError((error) => {
+        return of(error);
+      })
+    );
+  }
 }
