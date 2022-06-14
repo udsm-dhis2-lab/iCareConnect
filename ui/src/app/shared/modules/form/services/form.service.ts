@@ -48,8 +48,9 @@ export class FormService {
           return orderBy(
             response.results.filter(
               (result: any) =>
+                parameters?.class &&
                 result.conceptClass?.display.toLowerCase() ===
-                parameters?.class.toLowerCase()
+                  parameters?.class.toLowerCase()
             ) || [],
             ["display"],
             ["asc"]

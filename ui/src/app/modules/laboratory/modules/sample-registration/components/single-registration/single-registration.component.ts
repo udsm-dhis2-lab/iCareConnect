@@ -103,22 +103,20 @@ export class SingleRegistrationComponent implements OnInit {
         key: "condition",
         label: "Condition",
         options: [],
+        conceptClass: "condition",
         searchControlType: "concept",
+        searchTerm: "SAMPLE_CONDITIONS",
         shouldHaveLiveSearchForDropDownFields: true,
       }),
       new Dropdown({
         id: "agency",
         key: "agency",
         label: "Agency/Priority",
-        options: this.agencyConceptConfigs?.setMembers.map((member) => {
-          return {
-            key: member?.uuid,
-            value: member?.display,
-            label: member?.display,
-            name: member?.display,
-          };
-        }),
-        shouldHaveLiveSearchForDropDownFields: false,
+        options: [],
+        conceptClass: "priority",
+        searchControlType: "concept",
+        searchTerm: "SAMPLE_PRIORITIES",
+        shouldHaveLiveSearchForDropDownFields: true,
       }),
       // new Dropdown({
       //   id: "receivinglab",
@@ -553,6 +551,27 @@ export class SingleRegistrationComponent implements OnInit {
                                           receivedOnStatus,
                                         ];
                                       }
+
+                                      if (this.formData["condition"]?.value) {
+                                        const receivedOnStatus = {
+                                          sample: {
+                                            uuid: sampleResponse?.uuid,
+                                          },
+                                          user: {
+                                            uuid: localStorage.getItem(
+                                              "userUuid"
+                                            ),
+                                          },
+                                          remarks:
+                                            this.formData["condition"]?.value,
+                                          status: "CONDITION",
+                                        };
+                                        statuses = [
+                                          ...statuses,
+                                          receivedOnStatus,
+                                        ];
+                                      }
+
                                       const receivedByStatus = {
                                         sample: {
                                           uuid: sampleResponse?.uuid,

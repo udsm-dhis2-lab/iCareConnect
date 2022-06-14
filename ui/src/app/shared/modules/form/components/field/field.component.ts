@@ -41,7 +41,22 @@ export class FieldComponent {
     new EventEmitter<FormGroup>();
 
   ngAfterViewInit() {
-    // console.log("form", this.form);
+    if (this.field?.searchTerm) {
+      this.members$ = this.formService.searchItem(
+        {
+          q: this.field?.searchTerm,
+          limit: 50,
+          class: this.field?.conceptClass,
+          v:
+            this.field?.searchControlType === "concept"
+              ? "custom:(uuid,display,datatype,conceptClass,mappings)"
+              : "custom:(uuid,display)",
+        },
+        this.field?.searchControlType,
+        this.field?.filteringItems,
+        this.field
+      );
+    }
     this.fieldUpdate.emit(this.form);
   }
 
@@ -97,8 +112,6 @@ export class FieldComponent {
   }
 
   updateFieldOnDemand(objectToUpdate): void {
-    console.log(objectToUpdate);
-    console.log(this.form);
     this.form.patchValue(objectToUpdate);
     const theKey = Object.keys(objectToUpdate);
     this.form.setValue({ dob: new Date() });

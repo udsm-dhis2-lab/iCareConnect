@@ -1,0 +1,26 @@
+<div class="other-labs-configurations">
+  <mat-tab-group>
+    <mat-tab label="Sample Priorities">
+      <ng-template matTabContent>
+        <div class="p-3">
+          <app-standard-concept-creation
+            [conceptClass]="'Priority'"
+            [standardSearchTerm]="'SAMPLE_PRIORITIES'"
+            (conceptCreated)="getConceptCreated($event)"
+          ></app-standard-concept-creation>
+        </div>
+      </ng-template>
+    </mat-tab>
+    <mat-tab label="Sample Conditions">
+      <ng-template matTabContent>
+        <div class="p-3">
+          <app-standard-concept-creation
+            [conceptClass]="'Condition'"
+            [standardSearchTerm]="'SAMPLE_CONDITIONS'"
+            (conceptCreated)="getConceptCreated($event)"
+          ></app-standard-concept-creation>
+        </div>
+      </ng-template>
+    </mat-tab>
+  </mat-tab-group>
+</div>
