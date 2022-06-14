@@ -551,6 +551,27 @@ export class SingleRegistrationComponent implements OnInit {
                                           receivedOnStatus,
                                         ];
                                       }
+
+                                      if (this.formData["condition"]?.value) {
+                                        const receivedOnStatus = {
+                                          sample: {
+                                            uuid: sampleResponse?.uuid,
+                                          },
+                                          user: {
+                                            uuid: localStorage.getItem(
+                                              "userUuid"
+                                            ),
+                                          },
+                                          remarks:
+                                            this.formData["condition"]?.value,
+                                          status: "CONDITION",
+                                        };
+                                        statuses = [
+                                          ...statuses,
+                                          receivedOnStatus,
+                                        ];
+                                      }
+
                                       const receivedByStatus = {
                                         sample: {
                                           uuid: sampleResponse?.uuid,
