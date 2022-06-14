@@ -111,7 +111,12 @@ export class ConceptsService {
   }
 
   getConceptsBySearchTerm(searchTerm: string): Observable<ConceptGetFull[]> {
-    return from(this.api.concept.getAllConcepts({ q: searchTerm })).pipe(
+    return from(
+      this.api.concept.getAllConcepts({
+        q: searchTerm,
+        v: "custom:(uuid,display,names,descriptions)",
+      })
+    ).pipe(
       map((response) => response?.results),
       catchError((error) => {
         return of(error);

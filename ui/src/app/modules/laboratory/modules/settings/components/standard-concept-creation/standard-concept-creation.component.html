@@ -20,6 +20,7 @@
     <app-standard-concepts-list
       *ngIf="!saving"
       [standardSearchTerm]="standardSearchTerm"
+      (conceptToEdit)="onConceptEdit($event)"
     ></app-standard-concepts-list>
   </div>
 </div>
