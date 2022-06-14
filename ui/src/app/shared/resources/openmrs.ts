@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable } from "@angular/core";
 
 /* tslint:disable */
 /* eslint-disable */
@@ -14,7 +14,7 @@ import { Injectable } from '@angular/core';
 
 export interface PersonCreate {
   names: PersonNameCreate[];
-  gender: 'M' | 'F';
+  gender: "M" | "F";
   age?: number;
   birthdate?: string;
   birthdateEstimated?: boolean;
@@ -28,7 +28,7 @@ export interface PersonCreate {
 
 export interface PersonCreateFull {
   names: PersonNameCreate[];
-  gender: 'M' | 'F';
+  gender: "M" | "F";
   age?: number;
   birthdate?: string;
   birthdateEstimated?: boolean;
@@ -44,7 +44,7 @@ export interface PersonGet {
   links?: { rel?: string; uri?: string }[];
   uuid?: string;
   display?: string;
-  gender?: 'M' | 'F';
+  gender?: "M" | "F";
   age?: number;
   birthdate?: string;
   birthdateEstimated?: boolean;
@@ -67,7 +67,7 @@ export interface PersonGetFull {
   links?: { rel?: string; uri?: string }[];
   uuid?: string;
   display?: string;
-  gender?: 'M' | 'F';
+  gender?: "M" | "F";
   age?: number;
   birthdate?: string;
   birthdateEstimated?: boolean;
@@ -88,7 +88,7 @@ export interface PersonUpdate {
   causeOfDeath: string;
   deathDate?: string;
   age?: number;
-  gender?: 'M' | 'F';
+  gender?: "M" | "F";
   birthdate?: string;
   birthdateEstimated?: boolean;
   preferredName?: string;
@@ -930,7 +930,7 @@ export interface PatientdiagnosesGet {
   uuid?: string;
   diagnosis?: string;
   condition?: string;
-  certainty?: 'PROVISIONAL' | 'CONFIRMED';
+  certainty?: "PROVISIONAL" | "CONFIRMED";
   rank?: number;
   patient?: PatientGetRef;
   voided?: boolean;
@@ -946,7 +946,7 @@ export interface PatientdiagnosesGetFull {
   uuid?: string;
   diagnosis?: string;
   condition?: string;
-  certainty?: 'PROVISIONAL' | 'CONFIRMED';
+  certainty?: "PROVISIONAL" | "CONFIRMED";
   rank?: number;
   patient?: PatientGetRef;
   voided?: boolean;
@@ -956,7 +956,7 @@ export interface PatientdiagnosesUpdate {
   diagnosis?: string;
   condition?: string;
   encounter?: string;
-  certainty?: 'PROVISIONAL' | 'CONFIRMED';
+  certainty?: "PROVISIONAL" | "CONFIRMED";
   rank?: number;
   voided?: boolean;
 }
@@ -1454,7 +1454,7 @@ export interface CaresettingGet {
   links?: { rel?: string; uri?: string }[];
   uuid?: string;
   display?: string;
-  careSettingType?: 'OUTPATIENT' | 'INPATIENT';
+  careSettingType?: "OUTPATIENT" | "INPATIENT";
 }
 
 export interface CaresettingGetRef {
@@ -1471,7 +1471,7 @@ export interface CaresettingGetFull {
   name?: string;
   description?: string;
   retired?: boolean;
-  careSettingType?: 'OUTPATIENT' | 'INPATIENT';
+  careSettingType?: "OUTPATIENT" | "INPATIENT";
 }
 
 export interface TaskdefinitionGet {
@@ -1581,24 +1581,24 @@ export interface TaskactionCreate {
   tasks?: string[];
   allTasks?: boolean;
   action:
-    | 'SCHEDULETASK'
-    | 'SHUTDOWNTASK'
-    | 'RESCHEDULETASK'
-    | 'RESCHEDULEALLTASKS'
-    | 'DELETE'
-    | 'RUNTASK';
+    | "SCHEDULETASK"
+    | "SHUTDOWNTASK"
+    | "RESCHEDULETASK"
+    | "RESCHEDULEALLTASKS"
+    | "DELETE"
+    | "RUNTASK";
 }
 
 export interface TaskactionCreateFull {
   tasks?: string[];
   allTasks?: boolean;
   action:
-    | 'SCHEDULETASK'
-    | 'SHUTDOWNTASK'
-    | 'RESCHEDULETASK'
-    | 'RESCHEDULEALLTASKS'
-    | 'DELETE'
-    | 'RUNTASK';
+    | "SCHEDULETASK"
+    | "SHUTDOWNTASK"
+    | "RESCHEDULETASK"
+    | "RESCHEDULEALLTASKS"
+    | "DELETE"
+    | "RUNTASK";
 }
 
 export interface TaskactionGet {
@@ -1617,14 +1617,14 @@ export interface TaskactionGetFull {
 export interface ModuleactionCreate {
   modules?: string[];
   allModules?: boolean;
-  action: 'START' | 'STOP' | 'RESTART' | 'UNLOAD' | 'INSTALL';
+  action: "START" | "STOP" | "RESTART" | "UNLOAD" | "INSTALL";
   installUri?: string;
 }
 
 export interface ModuleactionCreateFull {
   modules?: string[];
   allModules?: boolean;
-  action: 'START' | 'STOP' | 'RESTART' | 'UNLOAD' | 'INSTALL';
+  action: "START" | "STOP" | "RESTART" | "UNLOAD" | "INSTALL";
   installUri?: string;
 }
 
@@ -1920,7 +1920,7 @@ export interface OrdersetGet {
   links?: { rel?: string; uri?: string }[];
   uuid?: string;
   display?: string;
-  operator?: 'ALL' | 'ONE' | 'ANY';
+  operator?: "ALL" | "ONE" | "ANY";
   orderSetMembers?: OrdersetOrdersetmemberGetRef[];
 }
 
@@ -1938,22 +1938,22 @@ export interface OrdersetGetFull {
   name?: string;
   description?: string;
   retired?: boolean;
-  operator?: 'ALL' | 'ONE' | 'ANY';
+  operator?: "ALL" | "ONE" | "ANY";
   orderSetMembers?: OrdersetOrdersetmemberGet[];
 }
 
 export interface OrdersetCreate {
-  operator?: 'ALL' | 'ONE' | 'ANY';
+  operator?: "ALL" | "ONE" | "ANY";
   orderSetMembers?: OrdersetOrdersetmemberCreate[];
 }
 
 export interface OrdersetCreateFull {
-  operator?: 'ALL' | 'ONE' | 'ANY';
+  operator?: "ALL" | "ONE" | "ANY";
   orderSetMembers?: OrdersetOrdersetmemberCreate[];
 }
 
 export interface OrdersetUpdate {
-  operator?: 'ALL' | 'ONE' | 'ANY';
+  operator?: "ALL" | "ONE" | "ANY";
   orderSetMembers?: OrdersetOrdersetmemberCreate[];
 }
 
@@ -2300,7 +2300,7 @@ export type FieldtypeUpdate = any;
 export interface OrderCreate {
   encounter?: string;
   orderType: string;
-  action?: 'NEW' | 'REVISE' | 'DISCONTINUE' | 'RENEW';
+  action?: "NEW" | "REVISE" | "DISCONTINUE" | "RENEW";
   accessionNumber?: string;
   dateActivated?: string;
   scheduledDate?: string;
@@ -2311,18 +2311,18 @@ export interface OrderCreate {
   autoExpireDate?: string;
   orderer?: string;
   previousOrder?: string;
-  urgency?: 'ROUTINE' | 'STAT' | 'ON_SCHEDULED_DATE';
+  urgency?: "ROUTINE" | "STAT" | "ON_SCHEDULED_DATE";
   orderReason?: string;
   orderReasonNonCoded?: string;
   instructions?: string;
-  fulfillerStatus?: 'RECEIVED' | 'IN_PROGRESS' | 'EXCEPTION'| 'COMPLETED'
+  fulfillerStatus?: "RECEIVED" | "IN_PROGRESS" | "EXCEPTION" | "COMPLETED";
   commentToFulfiller?: string;
 }
 
 export interface OrderCreateFull {
   encounter?: EncounterCreate;
   orderType: string;
-  action?: 'NEW' | 'REVISE' | 'DISCONTINUE' | 'RENEW';
+  action?: "NEW" | "REVISE" | "DISCONTINUE" | "RENEW";
   accessionNumber?: string;
   dateActivated?: string;
   scheduledDate?: string;
@@ -2333,7 +2333,7 @@ export interface OrderCreateFull {
   autoExpireDate?: string;
   orderer?: UserCreate;
   previousOrder?: OrderCreate;
-  urgency?: 'ROUTINE' | 'STAT' | 'ON_SCHEDULED_DATE';
+  urgency?: "ROUTINE" | "STAT" | "ON_SCHEDULED_DATE";
   orderReason?: ConceptCreate;
   orderReasonNonCoded?: string;
   instructions?: string;
@@ -2394,7 +2394,7 @@ export interface PatientidentifiertypeGet {
   required?: boolean;
   checkDigit?: boolean;
   validator?: string;
-  locationBehavior?: 'REQUIRED' | 'NOT_USED';
+  locationBehavior?: "REQUIRED" | "NOT_USED";
   uniquenessBehavior?: string;
 }
 
@@ -2417,7 +2417,7 @@ export interface PatientidentifiertypeGetFull {
   required?: boolean;
   checkDigit?: boolean;
   validator?: string;
-  locationBehavior?: 'REQUIRED' | 'NOT_USED';
+  locationBehavior?: "REQUIRED" | "NOT_USED";
   uniquenessBehavior?: string;
 }
 
@@ -2429,7 +2429,7 @@ export interface PatientidentifiertypeCreate {
   required?: boolean;
   checkDigit?: boolean;
   validator?: string;
-  locationBehavior?: 'REQUIRED' | 'NOT_USED';
+  locationBehavior?: "REQUIRED" | "NOT_USED";
   uniquenessBehavior?: string;
 }
 
@@ -2441,7 +2441,7 @@ export interface PatientidentifiertypeCreateFull {
   required?: boolean;
   checkDigit?: boolean;
   validator?: string;
-  locationBehavior?: 'REQUIRED' | 'NOT_USED';
+  locationBehavior?: "REQUIRED" | "NOT_USED";
   uniquenessBehavior?: string;
 }
 
@@ -2453,7 +2453,7 @@ export interface PatientidentifiertypeUpdate {
   required?: boolean;
   checkDigit?: boolean;
   validator?: string;
-  locationBehavior?: 'REQUIRED' | 'NOT_USED';
+  locationBehavior?: "REQUIRED" | "NOT_USED";
   uniquenessBehavior?: string;
 }
 
@@ -2523,25 +2523,25 @@ export interface ObsCreate {
   valueModifier?: string;
   formFieldPath?: string;
   formFieldNamespace?: string;
-  status?: 'PRELIMINARY' | 'FINAL' | 'AMENDED';
+  status?: "PRELIMINARY" | "FINAL" | "AMENDED";
   interpretation?:
-    | 'NORMAL'
-    | 'ABNORMAL'
-    | 'CRITICALLY_ABNORMAL'
-    | 'NEGATIVE'
-    | 'POSITIVE'
-    | 'CRITICALLY_LOW'
-    | 'LOW'
-    | 'HIGH'
-    | 'CRITICALLY_HIGH'
-    | 'VERY_SUSCEPTIBLE'
-    | 'SUSCEPTIBLE'
-    | 'INTERMEDIATE'
-    | 'RESISTANT'
-    | 'SIGNIFICANT_CHANGE_DOWN'
-    | 'SIGNIFICANT_CHANGE_UP'
-    | 'OFF_SCALE_LOW'
-    | 'OFF_SCALE_HIGH';
+    | "NORMAL"
+    | "ABNORMAL"
+    | "CRITICALLY_ABNORMAL"
+    | "NEGATIVE"
+    | "POSITIVE"
+    | "CRITICALLY_LOW"
+    | "LOW"
+    | "HIGH"
+    | "CRITICALLY_HIGH"
+    | "VERY_SUSCEPTIBLE"
+    | "SUSCEPTIBLE"
+    | "INTERMEDIATE"
+    | "RESISTANT"
+    | "SIGNIFICANT_CHANGE_DOWN"
+    | "SIGNIFICANT_CHANGE_UP"
+    | "OFF_SCALE_LOW"
+    | "OFF_SCALE_HIGH";
 }
 
 export interface ObsCreateFull {
@@ -2560,25 +2560,25 @@ export interface ObsCreateFull {
   valueModifier?: string;
   formFieldPath?: string;
   formFieldNamespace?: string;
-  status?: 'PRELIMINARY' | 'FINAL' | 'AMENDED';
+  status?: "PRELIMINARY" | "FINAL" | "AMENDED";
   interpretation?:
-    | 'NORMAL'
-    | 'ABNORMAL'
-    | 'CRITICALLY_ABNORMAL'
-    | 'NEGATIVE'
-    | 'POSITIVE'
-    | 'CRITICALLY_LOW'
-    | 'LOW'
-    | 'HIGH'
-    | 'CRITICALLY_HIGH'
-    | 'VERY_SUSCEPTIBLE'
-    | 'SUSCEPTIBLE'
-    | 'INTERMEDIATE'
-    | 'RESISTANT'
-    | 'SIGNIFICANT_CHANGE_DOWN'
-    | 'SIGNIFICANT_CHANGE_UP'
-    | 'OFF_SCALE_LOW'
-    | 'OFF_SCALE_HIGH';
+    | "NORMAL"
+    | "ABNORMAL"
+    | "CRITICALLY_ABNORMAL"
+    | "NEGATIVE"
+    | "POSITIVE"
+    | "CRITICALLY_LOW"
+    | "LOW"
+    | "HIGH"
+    | "CRITICALLY_HIGH"
+    | "VERY_SUSCEPTIBLE"
+    | "SUSCEPTIBLE"
+    | "INTERMEDIATE"
+    | "RESISTANT"
+    | "SIGNIFICANT_CHANGE_DOWN"
+    | "SIGNIFICANT_CHANGE_UP"
+    | "OFF_SCALE_LOW"
+    | "OFF_SCALE_HIGH";
 }
 
 export interface ObsGet {
@@ -2601,50 +2601,50 @@ export interface ObsGet {
   encounter?: EncounterGetRef;
   formFieldPath?: string;
   formFieldNamespace?: string;
-  status?: 'PRELIMINARY' | 'FINAL' | 'AMENDED';
+  status?: "PRELIMINARY" | "FINAL" | "AMENDED";
   interpretation?:
-    | 'NORMAL'
-    | 'ABNORMAL'
-    | 'CRITICALLY_ABNORMAL'
-    | 'NEGATIVE'
-    | 'POSITIVE'
-    | 'CRITICALLY_LOW'
-    | 'LOW'
-    | 'HIGH'
-    | 'CRITICALLY_HIGH'
-    | 'VERY_SUSCEPTIBLE'
-    | 'SUSCEPTIBLE'
-    | 'INTERMEDIATE'
-    | 'RESISTANT'
-    | 'SIGNIFICANT_CHANGE_DOWN'
-    | 'SIGNIFICANT_CHANGE_UP'
-    | 'OFF_SCALE_LOW'
-    | 'OFF_SCALE_HIGH';
+    | "NORMAL"
+    | "ABNORMAL"
+    | "CRITICALLY_ABNORMAL"
+    | "NEGATIVE"
+    | "POSITIVE"
+    | "CRITICALLY_LOW"
+    | "LOW"
+    | "HIGH"
+    | "CRITICALLY_HIGH"
+    | "VERY_SUSCEPTIBLE"
+    | "SUSCEPTIBLE"
+    | "INTERMEDIATE"
+    | "RESISTANT"
+    | "SIGNIFICANT_CHANGE_DOWN"
+    | "SIGNIFICANT_CHANGE_UP"
+    | "OFF_SCALE_LOW"
+    | "OFF_SCALE_HIGH";
 }
 
 export interface ObsGetRef {
   links?: { rel?: string; uri?: string }[];
   formFieldPath?: string;
   formFieldNamespace?: string;
-  status?: 'PRELIMINARY' | 'FINAL' | 'AMENDED';
+  status?: "PRELIMINARY" | "FINAL" | "AMENDED";
   interpretation?:
-    | 'NORMAL'
-    | 'ABNORMAL'
-    | 'CRITICALLY_ABNORMAL'
-    | 'NEGATIVE'
-    | 'POSITIVE'
-    | 'CRITICALLY_LOW'
-    | 'LOW'
-    | 'HIGH'
-    | 'CRITICALLY_HIGH'
-    | 'VERY_SUSCEPTIBLE'
-    | 'SUSCEPTIBLE'
-    | 'INTERMEDIATE'
-    | 'RESISTANT'
-    | 'SIGNIFICANT_CHANGE_DOWN'
-    | 'SIGNIFICANT_CHANGE_UP'
-    | 'OFF_SCALE_LOW'
-    | 'OFF_SCALE_HIGH';
+    | "NORMAL"
+    | "ABNORMAL"
+    | "CRITICALLY_ABNORMAL"
+    | "NEGATIVE"
+    | "POSITIVE"
+    | "CRITICALLY_LOW"
+    | "LOW"
+    | "HIGH"
+    | "CRITICALLY_HIGH"
+    | "VERY_SUSCEPTIBLE"
+    | "SUSCEPTIBLE"
+    | "INTERMEDIATE"
+    | "RESISTANT"
+    | "SIGNIFICANT_CHANGE_DOWN"
+    | "SIGNIFICANT_CHANGE_UP"
+    | "OFF_SCALE_LOW"
+    | "OFF_SCALE_HIGH";
 }
 
 export interface ObsGetFull {
@@ -2668,25 +2668,25 @@ export interface ObsGetFull {
   encounter?: EncounterGet;
   formFieldPath?: string;
   formFieldNamespace?: string;
-  status?: 'PRELIMINARY' | 'FINAL' | 'AMENDED';
+  status?: "PRELIMINARY" | "FINAL" | "AMENDED";
   interpretation?:
-    | 'NORMAL'
-    | 'ABNORMAL'
-    | 'CRITICALLY_ABNORMAL'
-    | 'NEGATIVE'
-    | 'POSITIVE'
-    | 'CRITICALLY_LOW'
-    | 'LOW'
-    | 'HIGH'
-    | 'CRITICALLY_HIGH'
-    | 'VERY_SUSCEPTIBLE'
-    | 'SUSCEPTIBLE'
-    | 'INTERMEDIATE'
-    | 'RESISTANT'
-    | 'SIGNIFICANT_CHANGE_DOWN'
-    | 'SIGNIFICANT_CHANGE_UP'
-    | 'OFF_SCALE_LOW'
-    | 'OFF_SCALE_HIGH';
+    | "NORMAL"
+    | "ABNORMAL"
+    | "CRITICALLY_ABNORMAL"
+    | "NEGATIVE"
+    | "POSITIVE"
+    | "CRITICALLY_LOW"
+    | "LOW"
+    | "HIGH"
+    | "CRITICALLY_HIGH"
+    | "VERY_SUSCEPTIBLE"
+    | "SUSCEPTIBLE"
+    | "INTERMEDIATE"
+    | "RESISTANT"
+    | "SIGNIFICANT_CHANGE_DOWN"
+    | "SIGNIFICANT_CHANGE_UP"
+    | "OFF_SCALE_LOW"
+    | "OFF_SCALE_HIGH";
 }
 
 export type ObsUpdate = any;
@@ -3280,6 +3280,7 @@ export interface ConceptGetFull {
   links?: { rel?: string; uri?: string }[];
   uuid?: string;
   display?: string;
+  setMembers?: any;
 }
 
 export interface ConceptCreate {
@@ -3987,7 +3988,7 @@ export interface ConceptNameGet {
   name?: string;
   locale?: string;
   localePreferred?: boolean;
-  conceptNameType?: 'FULLY_SPECIFIED' | 'SHORT' | 'INDEX_TERM';
+  conceptNameType?: "FULLY_SPECIFIED" | "SHORT" | "INDEX_TERM";
 }
 
 export interface ConceptNameGetRef {
@@ -4004,21 +4005,21 @@ export interface ConceptNameGetFull {
   name?: string;
   locale?: string;
   localePreferred?: boolean;
-  conceptNameType?: 'FULLY_SPECIFIED' | 'SHORT' | 'INDEX_TERM';
+  conceptNameType?: "FULLY_SPECIFIED" | "SHORT" | "INDEX_TERM";
 }
 
 export interface ConceptNameCreate {
   name: string;
   locale: string;
   localePreferred?: boolean;
-  conceptNameType?: 'FULLY_SPECIFIED' | 'SHORT' | 'INDEX_TERM';
+  conceptNameType?: "FULLY_SPECIFIED" | "SHORT" | "INDEX_TERM";
 }
 
 export interface ConceptNameCreateFull {
   name: string;
   locale: string;
   localePreferred?: boolean;
-  conceptNameType?: 'FULLY_SPECIFIED' | 'SHORT' | 'INDEX_TERM';
+  conceptNameType?: "FULLY_SPECIFIED" | "SHORT" | "INDEX_TERM";
 }
 
 export interface ConceptNameUpdate {
@@ -4375,12 +4376,12 @@ export interface DrugIngredientUpdate {
 
 export interface OrderFulfillerdetailsCreate {
   fulfillerComment?: string;
-  fulfillerStatus?: 'RECEIVED' | 'IN_PROGRESS' | 'EXCEPTION' | 'COMPLETED';
+  fulfillerStatus?: "RECEIVED" | "IN_PROGRESS" | "EXCEPTION" | "COMPLETED";
 }
 
 export interface OrderFulfillerdetailsCreateFull {
   fulfillerComment?: string;
-  fulfillerStatus?: 'RECEIVED' | 'IN_PROGRESS' | 'EXCEPTION' | 'COMPLETED';
+  fulfillerStatus?: "RECEIVED" | "IN_PROGRESS" | "EXCEPTION" | "COMPLETED";
 }
 
 export interface FetchAll {
@@ -4391,7 +4392,7 @@ export interface FetchAll {
   }[];
 }
 
-export type RequestParams = Omit<RequestInit, 'body' | 'method'> & {
+export type RequestParams = Omit<RequestInit, "body" | "method"> & {
   secure?: boolean;
 };
 
@@ -4408,18 +4409,18 @@ enum BodyType {
 }
 
 class HttpClient<SecurityDataType> {
-  public baseUrl: string = '../../../openmrs/ws/rest/v1';
+  public baseUrl: string = "../../../openmrs/ws/rest/v1";
   private securityData: SecurityDataType = null as any;
-  private securityWorker: ApiConfig<SecurityDataType>['securityWorker'] =
+  private securityWorker: ApiConfig<SecurityDataType>["securityWorker"] =
     (() => {}) as any;
 
   private baseApiParams: RequestParams = {
-    credentials: 'same-origin',
+    credentials: "same-origin",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
-    redirect: 'follow',
-    referrerPolicy: 'no-referrer',
+    redirect: "follow",
+    referrerPolicy: "no-referrer",
   };
 
   constructor({
@@ -4439,9 +4440,9 @@ class HttpClient<SecurityDataType> {
   private addQueryParam(query: RequestQueryParamsType, key: string) {
     return (
       encodeURIComponent(key) +
-      '=' +
+      "=" +
       encodeURIComponent(
-        Array.isArray(query[key]) ? query[key].join(',') : query[key]
+        Array.isArray(query[key]) ? query[key].join(",") : query[key]
       )
     );
   }
@@ -4449,17 +4450,17 @@ class HttpClient<SecurityDataType> {
   protected addQueryParams(rawQuery?: RequestQueryParamsType): string {
     const query = rawQuery || {};
     const keys = Object.keys(query).filter(
-      (key) => 'undefined' !== typeof query[key]
+      (key) => "undefined" !== typeof query[key]
     );
     return keys.length
       ? `?${keys
           .map((key) =>
-            typeof query[key] === 'object' && !Array.isArray(query[key])
+            typeof query[key] === "object" && !Array.isArray(query[key])
               ? this.addQueryParams(query[key] as object).substring(1)
               : this.addQueryParam(query, key)
           )
-          .join('&')}`
-      : '';
+          .join("&")}`
+      : "";
   }
 
   private bodyFormatters: Record<BodyType, (input: any) => any> = {
@@ -4520,7 +4521,7 @@ class HttpClient<SecurityDataType> {
  * OpenMRS RESTful API documentation generated by Swagger
  */
 @Injectable({
-  providedIn: 'root',
+  providedIn: "root",
 })
 export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
   person = {
@@ -4535,14 +4536,14 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
         q: string;
       },
       params?: RequestParams
     ) =>
       this.request<FetchAll, any>(
         `/person${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -4553,7 +4554,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      * @request POST:/person
      */
     createPerson: (resource: PersonCreate, params?: RequestParams) =>
-      this.request<any, any>(`/person`, 'POST', params, resource),
+      this.request<any, any>(`/person`, "POST", params, resource),
 
     /**
      * @tags person
@@ -4563,12 +4564,12 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      */
     getPerson: (
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<PersonGet, any>(
         `/person/${uuid}${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -4582,7 +4583,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       uuid: string,
       resource: PersonUpdate,
       params?: RequestParams
-    ) => this.request<any, any>(`/person/${uuid}`, 'POST', params, resource),
+    ) => this.request<any, any>(`/person/${uuid}`, "POST", params, resource),
 
     /**
      * @tags person
@@ -4598,7 +4599,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/person/${uuid}${this.addQueryParams(query)}`,
-        'DELETE',
+        "DELETE",
         params
       ),
 
@@ -4613,13 +4614,13 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query?: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
       },
       params?: RequestParams
     ) =>
       this.request<{ results?: PersonAttributeGet[] }, any>(
         `/person/${parentUuid}/attribute${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -4636,7 +4637,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/person/${parentUuid}/attribute`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -4650,12 +4651,12 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     getPersonAttribute: (
       parentUuid: string,
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<PersonAttributeGet, any>(
         `/person/${parentUuid}/attribute/${uuid}${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -4673,7 +4674,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/person/${parentUuid}/attribute/${uuid}`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -4693,7 +4694,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/person/${parentUuid}/attribute/${uuid}${this.addQueryParams(query)}`,
-        'DELETE',
+        "DELETE",
         params
       ),
 
@@ -4708,13 +4709,13 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query?: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
       },
       params?: RequestParams
     ) =>
       this.request<{ results?: PersonAddressGet[] }, any>(
         `/person/${parentUuid}/address${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -4731,7 +4732,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/person/${parentUuid}/address`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -4745,12 +4746,12 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     getPersonAddress: (
       parentUuid: string,
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<PersonAddressGet, any>(
         `/person/${parentUuid}/address/${uuid}${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -4768,7 +4769,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/person/${parentUuid}/address/${uuid}`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -4788,7 +4789,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/person/${parentUuid}/address/${uuid}${this.addQueryParams(query)}`,
-        'DELETE',
+        "DELETE",
         params
       ),
 
@@ -4803,13 +4804,13 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query?: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
       },
       params?: RequestParams
     ) =>
       this.request<{ results?: PersonNameGet[] }, any>(
         `/person/${parentUuid}/name${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -4826,7 +4827,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/person/${parentUuid}/name`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -4840,12 +4841,12 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     getPersonName: (
       parentUuid: string,
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<PersonNameGet, any>(
         `/person/${parentUuid}/name/${uuid}${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -4863,7 +4864,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/person/${parentUuid}/name/${uuid}`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -4883,7 +4884,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/person/${parentUuid}/name/${uuid}${this.addQueryParams(query)}`,
-        'DELETE',
+        "DELETE",
         params
       ),
   };
@@ -4899,14 +4900,14 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query?: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
         q?: string;
       },
       params?: RequestParams
     ) =>
       this.request<FetchAll, any>(
         `/personattributetype${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -4920,7 +4921,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       resource: PersonattributetypeCreate,
       params?: RequestParams
     ) =>
-      this.request<any, any>(`/personattributetype`, 'POST', params, resource),
+      this.request<any, any>(`/personattributetype`, "POST", params, resource),
 
     /**
      * @tags personattributetype
@@ -4930,12 +4931,12 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      */
     getPersonAttributeType: (
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<PersonattributetypeGet, any>(
         `/personattributetype/${uuid}${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -4952,7 +4953,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/personattributetype/${uuid}`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -4971,7 +4972,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/personattributetype/${uuid}${this.addQueryParams(query)}`,
-        'DELETE',
+        "DELETE",
         params
       ),
   };
@@ -4987,14 +4988,14 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
         q: string;
       },
       params?: RequestParams
     ) =>
       this.request<FetchAll, any>(
         `/ordergroup${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -5005,7 +5006,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      * @request POST:/ordergroup
      */
     createOrderGroup: (resource: OrdergroupCreate, params?: RequestParams) =>
-      this.request<any, any>(`/ordergroup`, 'POST', params, resource),
+      this.request<any, any>(`/ordergroup`, "POST", params, resource),
 
     /**
      * @tags ordergroup
@@ -5015,12 +5016,12 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      */
     getOrderGroup: (
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<OrdergroupGet, any>(
         `/ordergroup/${uuid}${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -5035,7 +5036,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       resource: OrdergroupUpdate,
       params?: RequestParams
     ) =>
-      this.request<any, any>(`/ordergroup/${uuid}`, 'POST', params, resource),
+      this.request<any, any>(`/ordergroup/${uuid}`, "POST", params, resource),
 
     /**
      * @tags ordergroup
@@ -5051,7 +5052,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/ordergroup/${uuid}${this.addQueryParams(query)}`,
-        'DELETE',
+        "DELETE",
         params
       ),
   };
@@ -5067,7 +5068,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query?: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
         q?: string;
         user?: string;
       },
@@ -5075,7 +5076,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<FetchAll, any>(
         `/provider${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -5086,7 +5087,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      * @request POST:/provider
      */
     createProvider: (resource: ProviderCreate, params?: RequestParams) =>
-      this.request<any, any>(`/provider`, 'POST', params, resource),
+      this.request<any, any>(`/provider`, "POST", params, resource),
 
     /**
      * @tags provider
@@ -5096,12 +5097,12 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      */
     getProvider: (
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<ProviderGet, any>(
         `/provider/${uuid}${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -5115,7 +5116,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       uuid: string,
       resource: ProviderUpdate,
       params?: RequestParams
-    ) => this.request<any, any>(`/provider/${uuid}`, 'POST', params, resource),
+    ) => this.request<any, any>(`/provider/${uuid}`, "POST", params, resource),
 
     /**
      * @tags provider
@@ -5131,7 +5132,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/provider/${uuid}${this.addQueryParams(query)}`,
-        'DELETE',
+        "DELETE",
         params
       ),
 
@@ -5146,13 +5147,13 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query?: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
       },
       params?: RequestParams
     ) =>
       this.request<{ results?: ProviderAttributeGet[] }, any>(
         `/provider/${parentUuid}/attribute${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -5169,7 +5170,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/provider/${parentUuid}/attribute`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -5183,14 +5184,14 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     getProviderAttribute: (
       parentUuid: string,
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<ProviderAttributeGet, any>(
         `/provider/${parentUuid}/attribute/${uuid}${this.addQueryParams(
           query
         )}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -5208,7 +5209,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/provider/${parentUuid}/attribute/${uuid}`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -5230,7 +5231,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
         `/provider/${parentUuid}/attribute/${uuid}${this.addQueryParams(
           query
         )}`,
-        'DELETE',
+        "DELETE",
         params
       ),
   };
@@ -5246,14 +5247,14 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
         q: string;
       },
       params?: RequestParams
     ) =>
       this.request<FetchAll, any>(
         `/condition${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -5264,7 +5265,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      * @request POST:/condition
      */
     createCondition: (resource: ConditionCreate, params?: RequestParams) =>
-      this.request<any, any>(`/condition`, 'POST', params, resource),
+      this.request<any, any>(`/condition`, "POST", params, resource),
 
     /**
      * @tags condition
@@ -5274,12 +5275,12 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      */
     getCondition: (
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<ConditionGet, any>(
         `/condition/${uuid}${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -5293,7 +5294,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       uuid: string,
       resource: ConditionUpdate,
       params?: RequestParams
-    ) => this.request<any, any>(`/condition/${uuid}`, 'POST', params, resource),
+    ) => this.request<any, any>(`/condition/${uuid}`, "POST", params, resource),
 
     /**
      * @tags condition
@@ -5309,7 +5310,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/condition/${uuid}${this.addQueryParams(query)}`,
-        'DELETE',
+        "DELETE",
         params
       ),
   };
@@ -5325,14 +5326,14 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
         q: string;
       },
       params?: RequestParams
     ) =>
       this.request<FetchAll, any>(
         `/hl7source${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -5343,7 +5344,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      * @request POST:/hl7source
      */
     createHl7Source: (resource: Hl7SourceCreate, params?: RequestParams) =>
-      this.request<any, any>(`/hl7source`, 'POST', params, resource),
+      this.request<any, any>(`/hl7source`, "POST", params, resource),
 
     /**
      * @tags hl7source
@@ -5353,12 +5354,12 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      */
     getHl7Source: (
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<Hl7SourceGet, any>(
         `/hl7source/${uuid}${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -5372,7 +5373,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       uuid: string,
       resource: Hl7SourceUpdate,
       params?: RequestParams
-    ) => this.request<any, any>(`/hl7source/${uuid}`, 'POST', params, resource),
+    ) => this.request<any, any>(`/hl7source/${uuid}`, "POST", params, resource),
 
     /**
      * @tags hl7source
@@ -5388,7 +5389,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/hl7source/${uuid}${this.addQueryParams(query)}`,
-        'DELETE',
+        "DELETE",
         params
       ),
   };
@@ -5404,14 +5405,14 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query?: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
         q?: string;
       },
       params?: RequestParams
     ) =>
       this.request<FetchAll, any>(
         `/appointmentscheduling/appointmentblock${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -5427,7 +5428,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/appointmentscheduling/appointmentblock`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -5440,14 +5441,14 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      */
     getAppointmentBlock: (
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<AppointmentschedulingAppointmentblockGet, any>(
         `/appointmentscheduling/appointmentblock/${uuid}${this.addQueryParams(
           query
         )}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -5464,7 +5465,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/appointmentscheduling/appointmentblock/${uuid}`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -5485,7 +5486,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
         `/appointmentscheduling/appointmentblock/${uuid}${this.addQueryParams(
           query
         )}`,
-        'DELETE',
+        "DELETE",
         params
       ),
 
@@ -5500,14 +5501,14 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query?: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
         q?: string;
       },
       params?: RequestParams
     ) =>
       this.request<FetchAll, any>(
         `/appointmentscheduling/timeslot${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -5523,7 +5524,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/appointmentscheduling/timeslot`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -5536,12 +5537,12 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      */
     getTimeSlot: (
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<AppointmentschedulingTimeslotGet, any>(
         `/appointmentscheduling/timeslot/${uuid}${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -5558,7 +5559,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/appointmentscheduling/timeslot/${uuid}`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -5577,7 +5578,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/appointmentscheduling/timeslot/${uuid}${this.addQueryParams(query)}`,
-        'DELETE',
+        "DELETE",
         params
       ),
 
@@ -5592,7 +5593,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query?: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
         q?: string;
       },
       params?: RequestParams
@@ -5601,7 +5602,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
         `/appointmentscheduling/appointmentstatushistory${this.addQueryParams(
           query
         )}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -5617,7 +5618,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/appointmentscheduling/appointmentstatushistory`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -5630,14 +5631,14 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      */
     getAppointmentStatusHistory: (
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<AppointmentschedulingAppointmentstatushistoryGet, any>(
         `/appointmentscheduling/appointmentstatushistory/${uuid}${this.addQueryParams(
           query
         )}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -5657,7 +5658,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
         `/appointmentscheduling/appointmentstatushistory/${uuid}${this.addQueryParams(
           query
         )}`,
-        'DELETE',
+        "DELETE",
         params
       ),
 
@@ -5672,7 +5673,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query?: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
         q?: string;
       },
       params?: RequestParams
@@ -5681,7 +5682,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
         `/appointmentscheduling/appointmentrequest${this.addQueryParams(
           query
         )}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -5697,7 +5698,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/appointmentscheduling/appointmentrequest`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -5710,14 +5711,14 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      */
     getAppointmentRequest: (
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<AppointmentschedulingAppointmentrequestGet, any>(
         `/appointmentscheduling/appointmentrequest/${uuid}${this.addQueryParams(
           query
         )}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -5734,7 +5735,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/appointmentscheduling/appointmentrequest/${uuid}`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -5755,7 +5756,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
         `/appointmentscheduling/appointmentrequest/${uuid}${this.addQueryParams(
           query
         )}`,
-        'DELETE',
+        "DELETE",
         params
       ),
 
@@ -5770,14 +5771,14 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query?: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
         q?: string;
       },
       params?: RequestParams
     ) =>
       this.request<FetchAll, any>(
         `/appointmentscheduling/providerschedule${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -5793,7 +5794,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/appointmentscheduling/providerschedule`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -5806,14 +5807,14 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      */
     getProviderSchedule: (
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<AppointmentschedulingProviderscheduleGet, any>(
         `/appointmentscheduling/providerschedule/${uuid}${this.addQueryParams(
           query
         )}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -5830,7 +5831,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/appointmentscheduling/providerschedule/${uuid}`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -5851,7 +5852,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
         `/appointmentscheduling/providerschedule/${uuid}${this.addQueryParams(
           query
         )}`,
-        'DELETE',
+        "DELETE",
         params
       ),
 
@@ -5866,7 +5867,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query?: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
         q?: string;
         fromDate?: string;
         appointmentType?: string;
@@ -5879,7 +5880,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<FetchAll, any>(
         `/appointmentscheduling/appointment${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -5895,7 +5896,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/appointmentscheduling/appointment`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -5908,14 +5909,14 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      */
     getAppointment: (
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<AppointmentschedulingAppointmentGet, any>(
         `/appointmentscheduling/appointment/${uuid}${this.addQueryParams(
           query
         )}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -5932,7 +5933,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/appointmentscheduling/appointment/${uuid}`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -5953,7 +5954,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
         `/appointmentscheduling/appointment/${uuid}${this.addQueryParams(
           query
         )}`,
-        'DELETE',
+        "DELETE",
         params
       ),
 
@@ -5968,14 +5969,14 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query?: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
         q?: string;
       },
       params?: RequestParams
     ) =>
       this.request<FetchAll, any>(
         `/appointmentscheduling/appointmenttype${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -5991,7 +5992,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/appointmentscheduling/appointmenttype`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -6004,14 +6005,14 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      */
     getAppointmentType: (
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<AppointmentschedulingAppointmenttypeGet, any>(
         `/appointmentscheduling/appointmenttype/${uuid}${this.addQueryParams(
           query
         )}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -6028,7 +6029,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/appointmentscheduling/appointmenttype/${uuid}`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -6049,7 +6050,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
         `/appointmentscheduling/appointmenttype/${uuid}${this.addQueryParams(
           query
         )}`,
-        'DELETE',
+        "DELETE",
         params
       ),
   };
@@ -6065,14 +6066,14 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query?: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
         q?: string;
       },
       params?: RequestParams
     ) =>
       this.request<FetchAll, any>(
         `/visittype${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -6083,7 +6084,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      * @request POST:/visittype
      */
     createVisitType: (resource: VisittypeCreate, params?: RequestParams) =>
-      this.request<any, any>(`/visittype`, 'POST', params, resource),
+      this.request<any, any>(`/visittype`, "POST", params, resource),
 
     /**
      * @tags visittype
@@ -6093,12 +6094,12 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      */
     getVisitType: (
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<VisittypeGet, any>(
         `/visittype/${uuid}${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -6112,7 +6113,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       uuid: string,
       resource: VisittypeUpdate,
       params?: RequestParams
-    ) => this.request<any, any>(`/visittype/${uuid}`, 'POST', params, resource),
+    ) => this.request<any, any>(`/visittype/${uuid}`, "POST", params, resource),
 
     /**
      * @tags visittype
@@ -6128,7 +6129,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/visittype/${uuid}${this.addQueryParams(query)}`,
-        'DELETE',
+        "DELETE",
         params
       ),
   };
@@ -6144,14 +6145,14 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query?: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
         q?: string;
       },
       params?: RequestParams
     ) =>
       this.request<FetchAll, any>(
         `/conceptdatatype${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -6163,12 +6164,12 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      */
     getConceptDatatype: (
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<ConceptdatatypeGet, any>(
         `/conceptdatatype/${uuid}${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -6186,7 +6187,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/conceptdatatype/${uuid}${this.addQueryParams(query)}`,
-        'DELETE',
+        "DELETE",
         params
       ),
   };
@@ -6202,14 +6203,14 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
         q: string;
       },
       params?: RequestParams
     ) =>
       this.request<FetchAll, any>(
         `/programenrollment${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -6222,7 +6223,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     createProgramEnrollment: (
       resource: ProgramenrollmentCreate,
       params?: RequestParams
-    ) => this.request<any, any>(`/programenrollment`, 'POST', params, resource),
+    ) => this.request<any, any>(`/programenrollment`, "POST", params, resource),
 
     /**
      * @tags programenrollment
@@ -6232,12 +6233,12 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      */
     getProgramEnrollment: (
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<ProgramenrollmentGet, any>(
         `/programenrollment/${uuid}${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -6254,7 +6255,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/programenrollment/${uuid}`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -6273,7 +6274,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/programenrollment/${uuid}${this.addQueryParams(query)}`,
-        'DELETE',
+        "DELETE",
         params
       ),
 
@@ -6290,7 +6291,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/programenrollment/${parentUuid}/state`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -6304,14 +6305,14 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     getPatientState: (
       parentUuid: string,
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<ProgramenrollmentStateGet, any>(
         `/programenrollment/${parentUuid}/state/${uuid}${this.addQueryParams(
           query
         )}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -6329,7 +6330,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/programenrollment/${parentUuid}/state/${uuid}`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -6351,7 +6352,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
         `/programenrollment/${parentUuid}/state/${uuid}${this.addQueryParams(
           query
         )}`,
-        'DELETE',
+        "DELETE",
         params
       ),
 
@@ -6366,7 +6367,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query?: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
       },
       params?: RequestParams
     ) =>
@@ -6374,7 +6375,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
         `/programenrollment/${parentUuid}/attribute${this.addQueryParams(
           query
         )}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -6391,7 +6392,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/programenrollment/${parentUuid}/attribute`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -6405,14 +6406,14 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     getPatientProgramAttribute: (
       parentUuid: string,
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<ProgramenrollmentAttributeGet, any>(
         `/programenrollment/${parentUuid}/attribute/${uuid}${this.addQueryParams(
           query
         )}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -6430,7 +6431,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/programenrollment/${parentUuid}/attribute/${uuid}`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -6452,7 +6453,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
         `/programenrollment/${parentUuid}/attribute/${uuid}${this.addQueryParams(
           query
         )}`,
-        'DELETE',
+        "DELETE",
         params
       ),
   };
@@ -6468,7 +6469,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query?: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
         q?: string;
         obsConcept?: string;
         obsValues?: string;
@@ -6482,7 +6483,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<FetchAll, any>(
         `/encounter${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -6493,7 +6494,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      * @request POST:/encounter
      */
     createEncounter: (resource: EncounterCreate, params?: RequestParams) =>
-      this.request<any, any>(`/encounter`, 'POST', params, resource),
+      this.request<any, any>(`/encounter`, "POST", params, resource),
 
     /**
      * @tags encounter
@@ -6503,12 +6504,12 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      */
     getEncounter: (
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<EncounterGet, any>(
         `/encounter/${uuid}${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -6522,7 +6523,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       uuid: string,
       resource: EncounterUpdate,
       params?: RequestParams
-    ) => this.request<any, any>(`/encounter/${uuid}`, 'POST', params, resource),
+    ) => this.request<any, any>(`/encounter/${uuid}`, "POST", params, resource),
 
     /**
      * @tags encounter
@@ -6538,7 +6539,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/encounter/${uuid}${this.addQueryParams(query)}`,
-        'DELETE',
+        "DELETE",
         params
       ),
 
@@ -6553,7 +6554,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query?: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
       },
       params?: RequestParams
     ) =>
@@ -6561,7 +6562,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
         `/encounter/${parentUuid}/encounterprovider${this.addQueryParams(
           query
         )}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -6578,7 +6579,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/encounter/${parentUuid}/encounterprovider`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -6592,14 +6593,14 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     getEncounterProvider: (
       parentUuid: string,
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<EncounterEncounterproviderGet, any>(
         `/encounter/${parentUuid}/encounterprovider/${uuid}${this.addQueryParams(
           query
         )}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -6617,7 +6618,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/encounter/${parentUuid}/encounterprovider/${uuid}`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -6639,7 +6640,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
         `/encounter/${parentUuid}/encounterprovider/${uuid}${this.addQueryParams(
           query
         )}`,
-        'DELETE',
+        "DELETE",
         params
       ),
   };
@@ -6655,7 +6656,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query?: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
         q?: string;
         matchSimilar?: string;
         country?: string;
@@ -6678,7 +6679,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<FetchAll, any>(
         `/patient${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -6689,7 +6690,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      * @request POST:/patient
      */
     createPatient: (resource: PatientCreate, params?: RequestParams) =>
-      this.request<any, any>(`/patient`, 'POST', params, resource),
+      this.request<any, any>(`/patient`, "POST", params, resource),
 
     /**
      * @tags patient
@@ -6699,12 +6700,12 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      */
     getPatient: (
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<PatientGet, any>(
         `/patient/${uuid}${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -6718,7 +6719,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       uuid: string,
       resource: PatientUpdate,
       params?: RequestParams
-    ) => this.request<any, any>(`/patient/${uuid}`, 'POST', params, resource),
+    ) => this.request<any, any>(`/patient/${uuid}`, "POST", params, resource),
 
     /**
      * @tags patient
@@ -6734,7 +6735,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/patient/${uuid}${this.addQueryParams(query)}`,
-        'DELETE',
+        "DELETE",
         params
       ),
 
@@ -6749,13 +6750,13 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query?: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
       },
       params?: RequestParams
     ) =>
       this.request<{ results?: PatientIdentifierGet[] }, any>(
         `/patient/${parentUuid}/identifier${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -6772,7 +6773,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/patient/${parentUuid}/identifier`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -6786,14 +6787,14 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     getPatientIdentifier: (
       parentUuid: string,
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<PatientIdentifierGet, any>(
         `/patient/${parentUuid}/identifier/${uuid}${this.addQueryParams(
           query
         )}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -6811,7 +6812,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/patient/${parentUuid}/identifier/${uuid}`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -6833,7 +6834,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
         `/patient/${parentUuid}/identifier/${uuid}${this.addQueryParams(
           query
         )}`,
-        'DELETE',
+        "DELETE",
         params
       ),
 
@@ -6850,7 +6851,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/patient/${parentUuid}/allergy`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -6864,12 +6865,12 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     getPatientAllergy: (
       parentUuid: string,
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<PatientAllergyGet, any>(
         `/patient/${parentUuid}/allergy/${uuid}${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -6887,7 +6888,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/patient/${parentUuid}/allergy/${uuid}`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -6907,7 +6908,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/patient/${parentUuid}/allergy/${uuid}${this.addQueryParams(query)}`,
-        'DELETE',
+        "DELETE",
         params
       ),
   };
@@ -6923,14 +6924,14 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query?: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
         q?: string;
       },
       params?: RequestParams
     ) =>
       this.request<FetchAll, any>(
         `/relationshiptype${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -6943,7 +6944,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     createRelationShipType: (
       resource: RelationshiptypeCreate,
       params?: RequestParams
-    ) => this.request<any, any>(`/relationshiptype`, 'POST', params, resource),
+    ) => this.request<any, any>(`/relationshiptype`, "POST", params, resource),
 
     /**
      * @tags relationshiptype
@@ -6953,12 +6954,12 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      */
     getRelationShipType: (
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<RelationshiptypeGet, any>(
         `/relationshiptype/${uuid}${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -6975,7 +6976,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/relationshiptype/${uuid}`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -6994,7 +6995,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/relationshiptype/${uuid}${this.addQueryParams(query)}`,
-        'DELETE',
+        "DELETE",
         params
       ),
   };
@@ -7010,14 +7011,14 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
         q: string;
       },
       params?: RequestParams
     ) =>
       this.request<FetchAll, any>(
         `/reportingrest/cohort${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -7031,7 +7032,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       resource: RelationshiptypeUpdate,
       params?: RequestParams
     ) =>
-      this.request<any, any>(`/reportingrest/cohort`, 'POST', params, resource),
+      this.request<any, any>(`/reportingrest/cohort`, "POST", params, resource),
 
     /**
      * @tags reportingrest/cohort
@@ -7041,12 +7042,12 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      */
     getEvaluatedCohort: (
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<ReportingrestCohortGet, any>(
         `/reportingrest/cohort/${uuid}${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -7064,7 +7065,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/reportingrest/cohort/${uuid}${this.addQueryParams(query)}`,
-        'DELETE',
+        "DELETE",
         params
       ),
 
@@ -7079,14 +7080,14 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
         q: string;
       },
       params?: RequestParams
     ) =>
       this.request<FetchAll, any>(
         `/reportingrest/dataSet${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -7102,7 +7103,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/reportingrest/dataSet`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -7115,12 +7116,12 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      */
     getEvaluatedDataSet: (
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<ReportingrestDataSetGet, any>(
         `/reportingrest/dataSet/${uuid}${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -7138,7 +7139,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/reportingrest/dataSet/${uuid}${this.addQueryParams(query)}`,
-        'DELETE',
+        "DELETE",
         params
       ),
 
@@ -7153,14 +7154,14 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query?: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
         q?: string;
       },
       params?: RequestParams
     ) =>
       this.request<FetchAll, any>(
         `/reportingrest/reportDefinition${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -7176,7 +7177,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/reportingrest/reportDefinition`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -7189,12 +7190,12 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      */
     getReportDefinition: (
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<ReportingrestReportDefinitionGet, any>(
         `/reportingrest/reportDefinition/${uuid}${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -7211,7 +7212,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/reportingrest/reportDefinition/${uuid}`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -7230,7 +7231,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/reportingrest/reportDefinition/${uuid}${this.addQueryParams(query)}`,
-        'DELETE',
+        "DELETE",
         params
       ),
 
@@ -7245,14 +7246,14 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
         q: string;
       },
       params?: RequestParams
     ) =>
       this.request<FetchAll, any>(
         `/reportingrest/reportRequest${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -7268,7 +7269,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/reportingrest/reportRequest`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -7281,12 +7282,12 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      */
     getReportRequest: (
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<ReportingrestReportRequestGet, any>(
         `/reportingrest/reportRequest/${uuid}${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -7303,7 +7304,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/reportingrest/reportRequest/${uuid}`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -7322,7 +7323,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/reportingrest/reportRequest/${uuid}${this.addQueryParams(query)}`,
-        'DELETE',
+        "DELETE",
         params
       ),
 
@@ -7337,14 +7338,14 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query?: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
         q?: string;
       },
       params?: RequestParams
     ) =>
       this.request<FetchAll, any>(
         `/reportingrest/dataSetDefinition${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -7360,7 +7361,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/reportingrest/dataSetDefinition`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -7373,12 +7374,12 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      */
     getDataSetDefinition: (
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<ReportingrestDataSetDefinitionGet, any>(
         `/reportingrest/dataSetDefinition/${uuid}${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -7395,7 +7396,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/reportingrest/dataSetDefinition/${uuid}`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -7414,7 +7415,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/reportingrest/dataSetDefinition/${uuid}${this.addQueryParams(query)}`,
-        'DELETE',
+        "DELETE",
         params
       ),
 
@@ -7429,14 +7430,14 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
         q: string;
       },
       params?: RequestParams
     ) =>
       this.request<FetchAll, any>(
         `/reportingrest/reportdata${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -7452,7 +7453,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/reportingrest/reportdata`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -7465,12 +7466,12 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      */
     getEvaluatedReportDefinition: (
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<ReportingrestReportdataGet, any>(
         `/reportingrest/reportdata/${uuid}${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -7488,7 +7489,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/reportingrest/reportdata/${uuid}${this.addQueryParams(query)}`,
-        'DELETE',
+        "DELETE",
         params
       ),
 
@@ -7503,14 +7504,14 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query?: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
         q?: string;
       },
       params?: RequestParams
     ) =>
       this.request<FetchAll, any>(
         `/reportingrest/cohortDefinition${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -7526,7 +7527,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/reportingrest/cohortDefinition`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -7539,12 +7540,12 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      */
     getCohortDefinition: (
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<ReportingrestCohortDefinitionGet, any>(
         `/reportingrest/cohortDefinition/${uuid}${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -7561,7 +7562,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/reportingrest/cohortDefinition/${uuid}`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -7580,7 +7581,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/reportingrest/cohortDefinition/${uuid}${this.addQueryParams(query)}`,
-        'DELETE',
+        "DELETE",
         params
       ),
   };
@@ -7597,14 +7598,14 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
         limit?: number;
         startIndex?: number;
         includeInactive?: boolean;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
         q?: string;
       },
       params?: RequestParams
     ) =>
       this.request<FetchAll, any>(
         `/visit${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -7615,7 +7616,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      * @request POST:/visit
      */
     createVisit: (resource: VisitCreate, params?: RequestParams) =>
-      this.request<any, any>(`/visit`, 'POST', params, resource),
+      this.request<any, any>(`/visit`, "POST", params, resource),
 
     /**
      * @tags visit
@@ -7625,12 +7626,12 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      */
     getVisit: (
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<VisitGet, any>(
         `/visit/${uuid}${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -7644,7 +7645,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       uuid: string,
       resource: VisitUpdate,
       params?: RequestParams
-    ) => this.request<any, any>(`/visit/${uuid}`, 'POST', params, resource),
+    ) => this.request<any, any>(`/visit/${uuid}`, "POST", params, resource),
 
     /**
      * @tags visit
@@ -7660,7 +7661,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/visit/${uuid}${this.addQueryParams(query)}`,
-        'DELETE',
+        "DELETE",
         params
       ),
 
@@ -7675,13 +7676,13 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query?: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
       },
       params?: RequestParams
     ) =>
       this.request<{ results?: VisitAttributeGet[] }, any>(
         `/visit/${parentUuid}/attribute${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -7698,7 +7699,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/visit/${parentUuid}/attribute`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -7712,12 +7713,12 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     getVisitAttribute: (
       parentUuid: string,
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<VisitAttributeGet, any>(
         `/visit/${parentUuid}/attribute/${uuid}${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -7735,7 +7736,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/visit/${parentUuid}/attribute/${uuid}`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -7755,7 +7756,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/visit/${parentUuid}/attribute/${uuid}${this.addQueryParams(query)}`,
-        'DELETE',
+        "DELETE",
         params
       ),
   };
@@ -7771,7 +7772,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query?: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
         q?: string;
         tag?: string;
       },
@@ -7779,7 +7780,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<FetchAll, any>(
         `/location${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -7790,7 +7791,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      * @request POST:/location
      */
     createLocation: (resource: LocationCreate, params?: RequestParams) =>
-      this.request<any, any>(`/location`, 'POST', params, resource),
+      this.request<any, any>(`/location`, "POST", params, resource),
 
     /**
      * @tags location
@@ -7800,12 +7801,12 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      */
     getLocation: (
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<LocationGet, any>(
         `/location/${uuid}${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -7819,7 +7820,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       uuid: string,
       resource: LocationUpdate,
       params?: RequestParams
-    ) => this.request<any, any>(`/location/${uuid}`, 'POST', params, resource),
+    ) => this.request<any, any>(`/location/${uuid}`, "POST", params, resource),
 
     /**
      * @tags location
@@ -7835,7 +7836,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/location/${uuid}${this.addQueryParams(query)}`,
-        'DELETE',
+        "DELETE",
         params
       ),
 
@@ -7851,14 +7852,14 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query?: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
         q?: string;
       },
       params?: RequestParams
     ) =>
       this.request<{ results?: LocationAttributeGet[] }, any>(
         `/location/${parentUuid}/attribute${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -7875,7 +7876,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/location/${parentUuid}/attribute`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -7889,14 +7890,14 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     getLocationAttribute: (
       parentUuid: string,
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<LocationAttributeGet, any>(
         `/location/${parentUuid}/attribute/${uuid}${this.addQueryParams(
           query
         )}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -7914,7 +7915,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/location/${parentUuid}/attribute/${uuid}`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -7936,7 +7937,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
         `/location/${parentUuid}/attribute/${uuid}${this.addQueryParams(
           query
         )}`,
-        'DELETE',
+        "DELETE",
         params
       ),
   };
@@ -7952,14 +7953,14 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
         q: string;
       },
       params?: RequestParams
     ) =>
       this.request<FetchAll, any>(
         `/patientdiagnoses${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -7972,7 +7973,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     createDiagnosis: (
       resource: PatientdiagnosesCreate,
       params?: RequestParams
-    ) => this.request<any, any>(`/patientdiagnoses`, 'POST', params, resource),
+    ) => this.request<any, any>(`/patientdiagnoses`, "POST", params, resource),
 
     /**
      * @tags patientdiagnoses
@@ -7982,12 +7983,12 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      */
     getDiagnosis: (
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<PatientdiagnosesGet, any>(
         `/patientdiagnoses/${uuid}${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -8004,7 +8005,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/patientdiagnoses/${uuid}`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -8023,7 +8024,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/patientdiagnoses/${uuid}${this.addQueryParams(query)}`,
-        'DELETE',
+        "DELETE",
         params
       ),
   };
@@ -8039,7 +8040,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query?: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
         q?: string;
         username?: string;
       },
@@ -8047,7 +8048,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<FetchAll, any>(
         `/user${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -8058,7 +8059,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      * @request POST:/user
      */
     createUser: (resource: UserCreate, params?: RequestParams) =>
-      this.request<any, any>(`/user`, 'POST', params, resource),
+      this.request<any, any>(`/user`, "POST", params, resource),
 
     /**
      * @tags user
@@ -8068,12 +8069,12 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      */
     getUser: (
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<UserGet, any>(
         `/user/${uuid}${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -8084,7 +8085,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      * @request POST:/user/{uuid}
      */
     updateUser: (uuid: string, resource: UserUpdate, params?: RequestParams) =>
-      this.request<any, any>(`/user/${uuid}`, 'POST', params, resource),
+      this.request<any, any>(`/user/${uuid}`, "POST", params, resource),
 
     /**
      * @tags user
@@ -8100,7 +8101,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/user/${uuid}${this.addQueryParams(query)}`,
-        'DELETE',
+        "DELETE",
         params
       ),
   };
@@ -8116,14 +8117,14 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query?: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
         q?: string;
       },
       params?: RequestParams
     ) =>
       this.request<FetchAll, any>(
         `/providerattributetype${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -8139,7 +8140,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/providerattributetype`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -8152,12 +8153,12 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      */
     getProviderAttributeType: (
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<ProviderattributetypeGet, any>(
         `/providerattributetype/${uuid}${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -8174,7 +8175,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/providerattributetype/${uuid}`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -8193,7 +8194,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/providerattributetype/${uuid}${this.addQueryParams(query)}`,
-        'DELETE',
+        "DELETE",
         params
       ),
   };
@@ -8209,14 +8210,14 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query?: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
         q?: string;
       },
       params?: RequestParams
     ) =>
       this.request<FetchAll, any>(
         `/conceptmaptype${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -8229,7 +8230,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     createConceptMapType: (
       resource: ConceptmaptypeCreate,
       params?: RequestParams
-    ) => this.request<any, any>(`/conceptmaptype`, 'POST', params, resource),
+    ) => this.request<any, any>(`/conceptmaptype`, "POST", params, resource),
 
     /**
      * @tags conceptmaptype
@@ -8239,12 +8240,12 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      */
     getConceptMapType: (
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<ConceptmaptypeGet, any>(
         `/conceptmaptype/${uuid}${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -8261,7 +8262,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/conceptmaptype/${uuid}`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -8280,7 +8281,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/conceptmaptype/${uuid}${this.addQueryParams(query)}`,
-        'DELETE',
+        "DELETE",
         params
       ),
   };
@@ -8296,14 +8297,14 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
         q: string;
       },
       params?: RequestParams
     ) =>
       this.request<FetchAll, any>(
         `/patientprofile${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -8316,7 +8317,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     createPatientProfile: (
       resource: RelationshiptypeUpdate,
       params?: RequestParams
-    ) => this.request<any, any>(`/patientprofile`, 'POST', params, resource),
+    ) => this.request<any, any>(`/patientprofile`, "POST", params, resource),
 
     /**
      * @tags patientprofile
@@ -8331,7 +8332,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/patientprofile/${uuid}`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -8348,7 +8349,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query?: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
         q?: string;
         codeOrName?: string;
         searchType?: string;
@@ -8358,7 +8359,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<FetchAll, any>(
         `/conceptreferenceterm${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -8372,7 +8373,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       resource: ConceptreferencetermCreate,
       params?: RequestParams
     ) =>
-      this.request<any, any>(`/conceptreferenceterm`, 'POST', params, resource),
+      this.request<any, any>(`/conceptreferenceterm`, "POST", params, resource),
 
     /**
      * @tags conceptreferenceterm
@@ -8382,12 +8383,12 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      */
     getConceptReferenceTerm: (
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<ConceptreferencetermGet, any>(
         `/conceptreferenceterm/${uuid}${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -8404,7 +8405,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/conceptreferenceterm/${uuid}`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -8423,7 +8424,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/conceptreferenceterm/${uuid}${this.addQueryParams(query)}`,
-        'DELETE',
+        "DELETE",
         params
       ),
   };
@@ -8439,14 +8440,14 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query?: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
         q?: string;
       },
       params?: RequestParams
     ) =>
       this.request<FetchAll, any>(
         `/encountertype${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -8459,7 +8460,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     createEncounterType: (
       resource: EncountertypeCreate,
       params?: RequestParams
-    ) => this.request<any, any>(`/encountertype`, 'POST', params, resource),
+    ) => this.request<any, any>(`/encountertype`, "POST", params, resource),
 
     /**
      * @tags encountertype
@@ -8469,12 +8470,12 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      */
     getEncounterType: (
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<EncountertypeGet, any>(
         `/encountertype/${uuid}${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -8491,7 +8492,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/encountertype/${uuid}`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -8510,7 +8511,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/encountertype/${uuid}${this.addQueryParams(query)}`,
-        'DELETE',
+        "DELETE",
         params
       ),
   };
@@ -8526,14 +8527,14 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query?: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
         q?: string;
       },
       params?: RequestParams
     ) =>
       this.request<FetchAll, any>(
         `/cohort${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -8544,7 +8545,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      * @request POST:/cohort
      */
     createCohort: (resource: CohortCreate, params?: RequestParams) =>
-      this.request<any, any>(`/cohort`, 'POST', params, resource),
+      this.request<any, any>(`/cohort`, "POST", params, resource),
 
     /**
      * @tags cohort
@@ -8554,12 +8555,12 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      */
     getCohort: (
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<CohortGet, any>(
         `/cohort/${uuid}${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -8573,7 +8574,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       uuid: string,
       resource: CohortUpdate,
       params?: RequestParams
-    ) => this.request<any, any>(`/cohort/${uuid}`, 'POST', params, resource),
+    ) => this.request<any, any>(`/cohort/${uuid}`, "POST", params, resource),
 
     /**
      * @tags cohort
@@ -8589,7 +8590,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/cohort/${uuid}${this.addQueryParams(query)}`,
-        'DELETE',
+        "DELETE",
         params
       ),
 
@@ -8604,13 +8605,13 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query?: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
       },
       params?: RequestParams
     ) =>
       this.request<{ results?: CohortMembershipGet[] }, any>(
         `/cohort/${parentUuid}/membership${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -8627,7 +8628,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/cohort/${parentUuid}/membership`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -8641,12 +8642,12 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     getCohortMembership: (
       parentUuid: string,
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<CohortMembershipGet, any>(
         `/cohort/${parentUuid}/membership/${uuid}${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -8664,7 +8665,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/cohort/${parentUuid}/membership/${uuid}`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -8684,7 +8685,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/cohort/${parentUuid}/membership/${uuid}${this.addQueryParams(query)}`,
-        'DELETE',
+        "DELETE",
         params
       ),
   };
@@ -8700,14 +8701,14 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query?: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
         q?: string;
       },
       params?: RequestParams
     ) =>
       this.request<FetchAll, any>(
         `/encounterrole${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -8720,7 +8721,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     createEncounterRole: (
       resource: EncounterroleCreate,
       params?: RequestParams
-    ) => this.request<any, any>(`/encounterrole`, 'POST', params, resource),
+    ) => this.request<any, any>(`/encounterrole`, "POST", params, resource),
 
     /**
      * @tags encounterrole
@@ -8730,12 +8731,12 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      */
     getEncounterRole: (
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<EncounterroleGet, any>(
         `/encounterrole/${uuid}${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -8752,7 +8753,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/encounterrole/${uuid}`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -8771,7 +8772,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/encounterrole/${uuid}${this.addQueryParams(query)}`,
-        'DELETE',
+        "DELETE",
         params
       ),
   };
@@ -8787,14 +8788,14 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query?: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
         q?: string;
       },
       params?: RequestParams
     ) =>
       this.request<FetchAll, any>(
         `/field${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -8805,7 +8806,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      * @request POST:/field
      */
     createField: (resource: FieldCreate, params?: RequestParams) =>
-      this.request<any, any>(`/field`, 'POST', params, resource),
+      this.request<any, any>(`/field`, "POST", params, resource),
 
     /**
      * @tags field
@@ -8815,12 +8816,12 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      */
     getField: (
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<FieldGet, any>(
         `/field/${uuid}${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -8834,7 +8835,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       uuid: string,
       resource: FieldUpdate,
       params?: RequestParams
-    ) => this.request<any, any>(`/field/${uuid}`, 'POST', params, resource),
+    ) => this.request<any, any>(`/field/${uuid}`, "POST", params, resource),
 
     /**
      * @tags field
@@ -8850,7 +8851,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/field/${uuid}${this.addQueryParams(query)}`,
-        'DELETE',
+        "DELETE",
         params
       ),
 
@@ -8865,13 +8866,13 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query?: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
       },
       params?: RequestParams
     ) =>
       this.request<{ results?: FieldAnswerGet[] }, any>(
         `/field/${parentUuid}/answer${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -8888,7 +8889,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/field/${parentUuid}/answer`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -8902,12 +8903,12 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     getFieldAnswer: (
       parentUuid: string,
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<FieldAnswerGet, any>(
         `/field/${parentUuid}/answer/${uuid}${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -8925,7 +8926,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/field/${parentUuid}/answer/${uuid}`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -8945,7 +8946,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/field/${parentUuid}/answer/${uuid}${this.addQueryParams(query)}`,
-        'DELETE',
+        "DELETE",
         params
       ),
   };
@@ -8961,14 +8962,14 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query?: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
         q?: string;
       },
       params?: RequestParams
     ) =>
       this.request<FetchAll, any>(
         `/conceptclass${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -8981,7 +8982,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     createConceptClass: (
       resource: ConceptclassCreate,
       params?: RequestParams
-    ) => this.request<any, any>(`/conceptclass`, 'POST', params, resource),
+    ) => this.request<any, any>(`/conceptclass`, "POST", params, resource),
 
     /**
      * @tags conceptclass
@@ -8991,12 +8992,12 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      */
     getConceptClass: (
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<ConceptclassGet, any>(
         `/conceptclass/${uuid}${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -9011,7 +9012,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       resource: ConceptclassUpdate,
       params?: RequestParams
     ) =>
-      this.request<any, any>(`/conceptclass/${uuid}`, 'POST', params, resource),
+      this.request<any, any>(`/conceptclass/${uuid}`, "POST", params, resource),
 
     /**
      * @tags conceptclass
@@ -9027,7 +9028,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/conceptclass/${uuid}${this.addQueryParams(query)}`,
-        'DELETE',
+        "DELETE",
         params
       ),
   };
@@ -9043,14 +9044,14 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query?: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
         q?: string;
       },
       params?: RequestParams
     ) =>
       this.request<FetchAll, any>(
         `/caresetting${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -9062,12 +9063,12 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      */
     getCareSetting: (
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<CaresettingGet, any>(
         `/caresetting/${uuid}${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -9085,7 +9086,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/caresetting/${uuid}${this.addQueryParams(query)}`,
-        'DELETE',
+        "DELETE",
         params
       ),
   };
@@ -9101,14 +9102,14 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query?: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
         q?: string;
       },
       params?: RequestParams
     ) =>
       this.request<FetchAll, any>(
         `/taskdefinition${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -9121,7 +9122,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     createTaskDefinition: (
       resource: TaskdefinitionCreate,
       params?: RequestParams
-    ) => this.request<any, any>(`/taskdefinition`, 'POST', params, resource),
+    ) => this.request<any, any>(`/taskdefinition`, "POST", params, resource),
 
     /**
      * @tags taskdefinition
@@ -9131,12 +9132,12 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      */
     getTaskDefinition: (
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<TaskdefinitionGet, any>(
         `/taskdefinition/${uuid}${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -9153,7 +9154,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/taskdefinition/${uuid}`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -9172,7 +9173,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/taskdefinition/${uuid}${this.addQueryParams(query)}`,
-        'DELETE',
+        "DELETE",
         params
       ),
   };
@@ -9187,13 +9188,13 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query?: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
       },
       params?: RequestParams
     ) =>
       this.request<FetchAll, any>(
         `/apptemplate${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -9205,12 +9206,12 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      */
     getAppTemplate: (
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<ApptemplateGet, any>(
         `/apptemplate/${uuid}${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
   };
@@ -9225,13 +9226,13 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query?: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
       },
       params?: RequestParams
     ) =>
       this.request<FetchAll, any>(
         `/serverlog${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -9243,12 +9244,12 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      */
     getServerLog: (
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<ServerlogGet, any>(
         `/serverlog/${uuid}${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
   };
@@ -9260,7 +9261,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      * @request POST:/taskaction
      */
     createTaskAction: (resource: TaskactionCreate, params?: RequestParams) =>
-      this.request<any, any>(`/taskaction`, 'POST', params, resource),
+      this.request<any, any>(`/taskaction`, "POST", params, resource),
 
     /**
      * @tags taskaction
@@ -9270,12 +9271,12 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      */
     getTaskAction: (
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<TaskactionGet, any>(
         `/taskaction/${uuid}${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
   };
@@ -9289,7 +9290,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     createModuleAction: (
       resource: ModuleactionCreate,
       params?: RequestParams
-    ) => this.request<any, any>(`/moduleaction`, 'POST', params, resource),
+    ) => this.request<any, any>(`/moduleaction`, "POST", params, resource),
   };
   personimage = {
     /**
@@ -9303,14 +9304,14 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
         q: string;
       },
       params?: RequestParams
     ) =>
       this.request<FetchAll, any>(
         `/personimage${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -9323,7 +9324,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     createPersonImage: (
       resource: RelationshiptypeUpdate,
       params?: RequestParams
-    ) => this.request<any, any>(`/personimage`, 'POST', params, resource),
+    ) => this.request<any, any>(`/personimage`, "POST", params, resource),
 
     /**
      * @tags personimage
@@ -9333,12 +9334,12 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      */
     getPersonImage: (
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<PersonimageGet, any>(
         `/personimage/${uuid}${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -9353,7 +9354,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       resource: RelationshiptypeUpdate,
       params?: RequestParams
     ) =>
-      this.request<any, any>(`/personimage/${uuid}`, 'POST', params, resource),
+      this.request<any, any>(`/personimage/${uuid}`, "POST", params, resource),
 
     /**
      * @tags personimage
@@ -9369,7 +9370,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/personimage/${uuid}${this.addQueryParams(query)}`,
-        'DELETE',
+        "DELETE",
         params
       ),
   };
@@ -9385,14 +9386,14 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query?: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
         q?: string;
       },
       params?: RequestParams
     ) =>
       this.request<FetchAll, any>(
         `/form${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -9403,7 +9404,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      * @request POST:/form
      */
     createForm: (resource: FormCreate, params?: RequestParams) =>
-      this.request<any, any>(`/form`, 'POST', params, resource),
+      this.request<any, any>(`/form`, "POST", params, resource),
 
     /**
      * @tags form
@@ -9413,12 +9414,12 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      */
     getForm: (
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<FormGet, any>(
         `/form/${uuid}${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -9429,7 +9430,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      * @request POST:/form/{uuid}
      */
     updateForm: (uuid: string, resource: FormUpdate, params?: RequestParams) =>
-      this.request<any, any>(`/form/${uuid}`, 'POST', params, resource),
+      this.request<any, any>(`/form/${uuid}`, "POST", params, resource),
 
     /**
      * @tags form
@@ -9445,7 +9446,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/form/${uuid}${this.addQueryParams(query)}`,
-        'DELETE',
+        "DELETE",
         params
       ),
 
@@ -9460,13 +9461,13 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query?: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
       },
       params?: RequestParams
     ) =>
       this.request<{ results?: FormResourceGet[] }, any>(
         `/form/${parentUuid}/resource${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -9483,7 +9484,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/form/${parentUuid}/resource`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -9497,12 +9498,12 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     getFormResource: (
       parentUuid: string,
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<FormResourceGet, any>(
         `/form/${parentUuid}/resource/${uuid}${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -9520,7 +9521,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/form/${parentUuid}/resource/${uuid}`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -9540,7 +9541,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/form/${parentUuid}/resource/${uuid}${this.addQueryParams(query)}`,
-        'DELETE',
+        "DELETE",
         params
       ),
 
@@ -9555,13 +9556,13 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query?: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
       },
       params?: RequestParams
     ) =>
       this.request<{ results?: FormFormfieldGet[] }, any>(
         `/form/${parentUuid}/formfield${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -9578,7 +9579,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/form/${parentUuid}/formfield`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -9592,12 +9593,12 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     getFormField: (
       parentUuid: string,
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<FormFormfieldGet, any>(
         `/form/${parentUuid}/formfield/${uuid}${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -9615,7 +9616,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/form/${parentUuid}/formfield/${uuid}`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -9635,7 +9636,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/form/${parentUuid}/formfield/${uuid}${this.addQueryParams(query)}`,
-        'DELETE',
+        "DELETE",
         params
       ),
   };
@@ -9651,14 +9652,14 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query?: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
         q?: string;
       },
       params?: RequestParams
     ) =>
       this.request<FetchAll, any>(
         `/orderfrequency${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -9671,7 +9672,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     createOrderFrequency: (
       resource: OrderfrequencyCreate,
       params?: RequestParams
-    ) => this.request<any, any>(`/orderfrequency`, 'POST', params, resource),
+    ) => this.request<any, any>(`/orderfrequency`, "POST", params, resource),
 
     /**
      * @tags orderfrequency
@@ -9681,12 +9682,12 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      */
     getOrderFrequency: (
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<OrderfrequencyGet, any>(
         `/orderfrequency/${uuid}${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -9703,7 +9704,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/orderfrequency/${uuid}`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -9722,7 +9723,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/orderfrequency/${uuid}${this.addQueryParams(query)}`,
-        'DELETE',
+        "DELETE",
         params
       ),
   };
@@ -9738,14 +9739,14 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query?: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
         q?: string;
       },
       params?: RequestParams
     ) =>
       this.request<FetchAll, any>(
         `/visitattributetype${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -9759,7 +9760,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       resource: VisitattributetypeCreate,
       params?: RequestParams
     ) =>
-      this.request<any, any>(`/visitattributetype`, 'POST', params, resource),
+      this.request<any, any>(`/visitattributetype`, "POST", params, resource),
 
     /**
      * @tags visitattributetype
@@ -9769,12 +9770,12 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      */
     getVisitAttributeType: (
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<VisitattributetypeGet, any>(
         `/visitattributetype/${uuid}${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -9791,7 +9792,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/visitattributetype/${uuid}`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -9810,7 +9811,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/visitattributetype/${uuid}${this.addQueryParams(query)}`,
-        'DELETE',
+        "DELETE",
         params
       ),
   };
@@ -9825,13 +9826,13 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query?: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
       },
       params?: RequestParams
     ) =>
       this.request<FetchAll, any>(
         `/module${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -9843,12 +9844,12 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      */
     getModule: (
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<ModuleGet, any>(
         `/module/${uuid}${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
   };
@@ -9864,14 +9865,14 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query?: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
         q?: string;
       },
       params?: RequestParams
     ) =>
       this.request<FetchAll, any>(
         `/locationtag${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -9882,7 +9883,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      * @request POST:/locationtag
      */
     createLocationTag: (resource: LocationtagCreate, params?: RequestParams) =>
-      this.request<any, any>(`/locationtag`, 'POST', params, resource),
+      this.request<any, any>(`/locationtag`, "POST", params, resource),
 
     /**
      * @tags locationtag
@@ -9892,12 +9893,12 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      */
     getLocationTag: (
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<LocationtagGet, any>(
         `/locationtag/${uuid}${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -9912,7 +9913,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       resource: LocationtagUpdate,
       params?: RequestParams
     ) =>
-      this.request<any, any>(`/locationtag/${uuid}`, 'POST', params, resource),
+      this.request<any, any>(`/locationtag/${uuid}`, "POST", params, resource),
 
     /**
      * @tags locationtag
@@ -9928,7 +9929,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/locationtag/${uuid}${this.addQueryParams(query)}`,
-        'DELETE',
+        "DELETE",
         params
       ),
   };
@@ -9944,14 +9945,14 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query?: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
         q?: string;
       },
       params?: RequestParams
     ) =>
       this.request<FetchAll, any>(
         `/orderset${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -9962,7 +9963,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      * @request POST:/orderset
      */
     createOrderSet: (resource: OrdersetCreate, params?: RequestParams) =>
-      this.request<any, any>(`/orderset`, 'POST', params, resource),
+      this.request<any, any>(`/orderset`, "POST", params, resource),
 
     /**
      * @tags orderset
@@ -9972,12 +9973,12 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      */
     getOrderSet: (
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<OrdersetGet, any>(
         `/orderset/${uuid}${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -9991,7 +9992,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       uuid: string,
       resource: OrdersetUpdate,
       params?: RequestParams
-    ) => this.request<any, any>(`/orderset/${uuid}`, 'POST', params, resource),
+    ) => this.request<any, any>(`/orderset/${uuid}`, "POST", params, resource),
 
     /**
      * @tags orderset
@@ -10007,7 +10008,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/orderset/${uuid}${this.addQueryParams(query)}`,
-        'DELETE',
+        "DELETE",
         params
       ),
 
@@ -10022,13 +10023,13 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query?: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
       },
       params?: RequestParams
     ) =>
       this.request<{ results?: OrdersetOrdersetmemberGet[] }, any>(
         `/orderset/${parentUuid}/ordersetmember${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -10045,7 +10046,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/orderset/${parentUuid}/ordersetmember`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -10059,14 +10060,14 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     getOrderSetMember: (
       parentUuid: string,
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<OrdersetOrdersetmemberGet, any>(
         `/orderset/${parentUuid}/ordersetmember/${uuid}${this.addQueryParams(
           query
         )}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -10084,7 +10085,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/orderset/${parentUuid}/ordersetmember/${uuid}`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -10106,7 +10107,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
         `/orderset/${parentUuid}/ordersetmember/${uuid}${this.addQueryParams(
           query
         )}`,
-        'DELETE',
+        "DELETE",
         params
       ),
   };
@@ -10122,14 +10123,14 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
         q: string;
       },
       params?: RequestParams
     ) =>
       this.request<FetchAll, any>(
         `/orderable${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
   };
@@ -10145,14 +10146,14 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
         q: string;
       },
       params?: RequestParams
     ) =>
       this.request<FetchAll, any>(
         `/hl7${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -10163,7 +10164,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      * @request POST:/hl7
      */
     createHl7Message: (resource: Hl7Create, params?: RequestParams) =>
-      this.request<any, any>(`/hl7`, 'POST', params, resource),
+      this.request<any, any>(`/hl7`, "POST", params, resource),
   };
   drug = {
     /**
@@ -10177,7 +10178,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query?: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
         q?: string;
         code?: string;
         preferredMapTypes?: string;
@@ -10189,7 +10190,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<FetchAll, any>(
         `/drug${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -10200,7 +10201,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      * @request POST:/drug
      */
     createDrug: (resource: DrugCreate, params?: RequestParams) =>
-      this.request<any, any>(`/drug`, 'POST', params, resource),
+      this.request<any, any>(`/drug`, "POST", params, resource),
 
     /**
      * @tags drug
@@ -10210,12 +10211,12 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      */
     getDrug: (
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<DrugGet, any>(
         `/drug/${uuid}${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -10226,7 +10227,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      * @request POST:/drug/{uuid}
      */
     updateDrug: (uuid: string, resource: DrugUpdate, params?: RequestParams) =>
-      this.request<any, any>(`/drug/${uuid}`, 'POST', params, resource),
+      this.request<any, any>(`/drug/${uuid}`, "POST", params, resource),
 
     /**
      * @tags drug
@@ -10242,7 +10243,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/drug/${uuid}${this.addQueryParams(query)}`,
-        'DELETE',
+        "DELETE",
         params
       ),
 
@@ -10257,13 +10258,13 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query?: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
       },
       params?: RequestParams
     ) =>
       this.request<{ results?: DrugIngredientGet[] }, any>(
         `/drug/${parentUuid}/ingredient${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -10280,7 +10281,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/drug/${parentUuid}/ingredient`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -10294,12 +10295,12 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     getDrugIngredient: (
       parentUuid: string,
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<DrugIngredientGet, any>(
         `/drug/${parentUuid}/ingredient/${uuid}${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -10317,7 +10318,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/drug/${parentUuid}/ingredient/${uuid}`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -10337,7 +10338,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/drug/${parentUuid}/ingredient/${uuid}${this.addQueryParams(query)}`,
-        'DELETE',
+        "DELETE",
         params
       ),
   };
@@ -10353,14 +10354,14 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query?: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
         q?: string;
       },
       params?: RequestParams
     ) =>
       this.request<FetchAll, any>(
         `/program${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -10371,7 +10372,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      * @request POST:/program
      */
     createProgram: (resource: ProgramCreate, params?: RequestParams) =>
-      this.request<any, any>(`/program`, 'POST', params, resource),
+      this.request<any, any>(`/program`, "POST", params, resource),
 
     /**
      * @tags program
@@ -10381,12 +10382,12 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      */
     getProgram: (
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<ProgramGet, any>(
         `/program/${uuid}${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -10400,7 +10401,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       uuid: string,
       resource: ProgramUpdate,
       params?: RequestParams
-    ) => this.request<any, any>(`/program/${uuid}`, 'POST', params, resource),
+    ) => this.request<any, any>(`/program/${uuid}`, "POST", params, resource),
 
     /**
      * @tags program
@@ -10416,7 +10417,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/program/${uuid}${this.addQueryParams(query)}`,
-        'DELETE',
+        "DELETE",
         params
       ),
   };
@@ -10432,14 +10433,14 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
         q: string;
       },
       params?: RequestParams
     ) =>
       this.request<FetchAll, any>(
         `/drugreferencemap${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -10452,7 +10453,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     createDrugReferenceMap: (
       resource: DrugreferencemapCreate,
       params?: RequestParams
-    ) => this.request<any, any>(`/drugreferencemap`, 'POST', params, resource),
+    ) => this.request<any, any>(`/drugreferencemap`, "POST", params, resource),
 
     /**
      * @tags drugreferencemap
@@ -10462,12 +10463,12 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      */
     getDrugReferenceMap: (
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<DrugreferencemapGet, any>(
         `/drugreferencemap/${uuid}${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -10484,7 +10485,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/drugreferencemap/${uuid}`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -10503,7 +10504,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/drugreferencemap/${uuid}${this.addQueryParams(query)}`,
-        'DELETE',
+        "DELETE",
         params
       ),
   };
@@ -10519,14 +10520,14 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query?: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
         q?: string;
       },
       params?: RequestParams
     ) =>
       this.request<FetchAll, any>(
         `/conceptsource${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -10539,7 +10540,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     createConceptSource: (
       resource: ConceptsourceCreate,
       params?: RequestParams
-    ) => this.request<any, any>(`/conceptsource`, 'POST', params, resource),
+    ) => this.request<any, any>(`/conceptsource`, "POST", params, resource),
 
     /**
      * @tags conceptsource
@@ -10549,12 +10550,12 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      */
     getConceptSource: (
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<ConceptsourceGet, any>(
         `/conceptsource/${uuid}${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -10571,7 +10572,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/conceptsource/${uuid}`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -10590,7 +10591,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/conceptsource/${uuid}${this.addQueryParams(query)}`,
-        'DELETE',
+        "DELETE",
         params
       ),
   };
@@ -10606,14 +10607,14 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query?: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
         q?: string;
       },
       params?: RequestParams
     ) =>
       this.request<FetchAll, any>(
         `/ordertype${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -10624,7 +10625,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      * @request POST:/ordertype
      */
     createOrderType: (resource: OrdertypeCreate, params?: RequestParams) =>
-      this.request<any, any>(`/ordertype`, 'POST', params, resource),
+      this.request<any, any>(`/ordertype`, "POST", params, resource),
 
     /**
      * @tags ordertype
@@ -10634,12 +10635,12 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      */
     getOrderType: (
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<OrdertypeGet, any>(
         `/ordertype/${uuid}${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -10653,7 +10654,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       uuid: string,
       resource: OrdertypeUpdate,
       params?: RequestParams
-    ) => this.request<any, any>(`/ordertype/${uuid}`, 'POST', params, resource),
+    ) => this.request<any, any>(`/ordertype/${uuid}`, "POST", params, resource),
 
     /**
      * @tags ordertype
@@ -10669,7 +10670,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/ordertype/${uuid}${this.addQueryParams(query)}`,
-        'DELETE',
+        "DELETE",
         params
       ),
   };
@@ -10685,14 +10686,14 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query?: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
         q?: string;
       },
       params?: RequestParams
     ) =>
       this.request<FetchAll, any>(
         `/conceptstopword${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -10705,7 +10706,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     createConceptStopword: (
       resource: ConceptstopwordCreate,
       params?: RequestParams
-    ) => this.request<any, any>(`/conceptstopword`, 'POST', params, resource),
+    ) => this.request<any, any>(`/conceptstopword`, "POST", params, resource),
 
     /**
      * @tags conceptstopword
@@ -10715,12 +10716,12 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      */
     getConceptStopword: (
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<ConceptstopwordGet, any>(
         `/conceptstopword/${uuid}${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -10737,7 +10738,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/conceptstopword/${uuid}`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -10756,7 +10757,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/conceptstopword/${uuid}${this.addQueryParams(query)}`,
-        'DELETE',
+        "DELETE",
         params
       ),
   };
@@ -10772,14 +10773,14 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query?: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
         q?: string;
       },
       params?: RequestParams
     ) =>
       this.request<FetchAll, any>(
         `/fieldtype${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -10790,7 +10791,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      * @request POST:/fieldtype
      */
     createFieldType: (resource: FieldtypeCreate, params?: RequestParams) =>
-      this.request<any, any>(`/fieldtype`, 'POST', params, resource),
+      this.request<any, any>(`/fieldtype`, "POST", params, resource),
 
     /**
      * @tags fieldtype
@@ -10800,12 +10801,12 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      */
     getFieldType: (
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<FieldtypeGet, any>(
         `/fieldtype/${uuid}${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -10819,7 +10820,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       uuid: string,
       resource: FieldtypeUpdate,
       params?: RequestParams
-    ) => this.request<any, any>(`/fieldtype/${uuid}`, 'POST', params, resource),
+    ) => this.request<any, any>(`/fieldtype/${uuid}`, "POST", params, resource),
 
     /**
      * @tags fieldtype
@@ -10835,7 +10836,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/fieldtype/${uuid}${this.addQueryParams(query)}`,
-        'DELETE',
+        "DELETE",
         params
       ),
   };
@@ -10851,7 +10852,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query?: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
         q?: string;
         t?: string;
         isStopped?: string;
@@ -10875,7 +10876,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<FetchAll, any>(
         `/order${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -10886,7 +10887,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      * @request POST:/order
      */
     createOrder: (resource: OrderCreate, params?: RequestParams) =>
-      this.request<any, any>(`/order`, 'POST', params, resource),
+      this.request<any, any>(`/order`, "POST", params, resource),
 
     /**
      * @tags order
@@ -10896,12 +10897,12 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      */
     getOrder: (
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<OrderGet, any>(
         `/order/${uuid}${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -10919,7 +10920,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/order/${uuid}${this.addQueryParams(query)}`,
-        'DELETE',
+        "DELETE",
         params
       ),
 
@@ -10936,7 +10937,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/order/${parentUuid}/fulfillerdetails`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -10953,14 +10954,14 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query?: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
         q?: string;
       },
       params?: RequestParams
     ) =>
       this.request<FetchAll, any>(
         `/patientidentifiertype${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -10976,7 +10977,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/patientidentifiertype`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -10989,12 +10990,12 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      */
     getPatientIdentifierType: (
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<PatientidentifiertypeGet, any>(
         `/patientidentifiertype/${uuid}${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -11011,7 +11012,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/patientidentifiertype/${uuid}`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -11030,7 +11031,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/patientidentifiertype/${uuid}${this.addQueryParams(query)}`,
-        'DELETE',
+        "DELETE",
         params
       ),
   };
@@ -11046,14 +11047,14 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
         q: string;
       },
       params?: RequestParams
     ) =>
       this.request<FetchAll, any>(
         `/attachment${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -11066,7 +11067,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     createAttachment: (
       resource: RelationshiptypeUpdate,
       params?: RequestParams
-    ) => this.request<any, any>(`/attachment`, 'POST', params, resource),
+    ) => this.request<any, any>(`/attachment`, "POST", params, resource),
 
     /**
      * @tags attachment
@@ -11076,12 +11077,12 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      */
     getAttachment: (
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<AttachmentGet, any>(
         `/attachment/${uuid}${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -11096,7 +11097,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       resource: RelationshiptypeUpdate,
       params?: RequestParams
     ) =>
-      this.request<any, any>(`/attachment/${uuid}`, 'POST', params, resource),
+      this.request<any, any>(`/attachment/${uuid}`, "POST", params, resource),
 
     /**
      * @tags attachment
@@ -11112,7 +11113,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/attachment/${uuid}${this.addQueryParams(query)}`,
-        'DELETE',
+        "DELETE",
         params
       ),
   };
@@ -11128,7 +11129,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query?: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
         q?: string;
         concepts?: string;
         patient?: string;
@@ -11141,7 +11142,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<FetchAll, any>(
         `/obs${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -11152,7 +11153,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      * @request POST:/obs
      */
     createObs: (resource: ObsCreate, params?: RequestParams) =>
-      this.request<any, any>(`/obs`, 'POST', params, resource),
+      this.request<any, any>(`/obs`, "POST", params, resource),
 
     /**
      * @tags obs
@@ -11162,12 +11163,12 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      */
     getObs: (
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<ObsGet, any>(
         `/obs/${uuid}${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -11178,7 +11179,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      * @request POST:/obs/{uuid}
      */
     updateObs: (uuid: string, resource: ObsUpdate, params?: RequestParams) =>
-      this.request<any, any>(`/obs/${uuid}`, 'POST', params, resource),
+      this.request<any, any>(`/obs/${uuid}`, "POST", params, resource),
 
     /**
      * @tags obs
@@ -11194,7 +11195,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/obs/${uuid}${this.addQueryParams(query)}`,
-        'DELETE',
+        "DELETE",
         params
       ),
   };
@@ -11210,14 +11211,14 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query?: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
         q?: string;
       },
       params?: RequestParams
     ) =>
       this.request<FetchAll, any>(
         `/conceptattributetype${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -11231,7 +11232,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       resource: ConceptattributetypeCreate,
       params?: RequestParams
     ) =>
-      this.request<any, any>(`/conceptattributetype`, 'POST', params, resource),
+      this.request<any, any>(`/conceptattributetype`, "POST", params, resource),
 
     /**
      * @tags conceptattributetype
@@ -11241,12 +11242,12 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      */
     getConceptAttributeType: (
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<ConceptattributetypeGet, any>(
         `/conceptattributetype/${uuid}${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -11263,7 +11264,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/conceptattributetype/${uuid}`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -11282,7 +11283,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/conceptattributetype/${uuid}${this.addQueryParams(query)}`,
-        'DELETE',
+        "DELETE",
         params
       ),
   };
@@ -11298,14 +11299,14 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query?: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
         q?: string;
       },
       params?: RequestParams
     ) =>
       this.request<FetchAll, any>(
         `/programattributetype${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -11319,7 +11320,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       resource: ProgramattributetypeCreate,
       params?: RequestParams
     ) =>
-      this.request<any, any>(`/programattributetype`, 'POST', params, resource),
+      this.request<any, any>(`/programattributetype`, "POST", params, resource),
 
     /**
      * @tags programattributetype
@@ -11329,12 +11330,12 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      */
     getProgramAttributeType: (
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<ProgramattributetypeGet, any>(
         `/programattributetype/${uuid}${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -11351,7 +11352,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/programattributetype/${uuid}`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -11370,7 +11371,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/programattributetype/${uuid}${this.addQueryParams(query)}`,
-        'DELETE',
+        "DELETE",
         params
       ),
   };
@@ -11386,14 +11387,14 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query?: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
         q?: string;
       },
       params?: RequestParams
     ) =>
       this.request<FetchAll, any>(
         `/customdatatype${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -11405,12 +11406,12 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      */
     getCustomDatatype: (
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<CustomdatatypeGet, any>(
         `/customdatatype/${uuid}${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -11428,7 +11429,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/customdatatype/${uuid}${this.addQueryParams(query)}`,
-        'DELETE',
+        "DELETE",
         params
       ),
 
@@ -11443,13 +11444,13 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query?: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
       },
       params?: RequestParams
     ) =>
       this.request<{ results?: CustomdatatypeHandlersGet[] }, any>(
         `/customdatatype/${parentUuid}/handlers${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
   };
@@ -11465,14 +11466,14 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query?: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
         q?: string;
       },
       params?: RequestParams
     ) =>
       this.request<FetchAll, any>(
         `/locationattributetype${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -11488,7 +11489,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/locationattributetype`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -11501,12 +11502,12 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      */
     getLocationAttributeType: (
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<LocationattributetypeGet, any>(
         `/locationattributetype/${uuid}${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -11523,7 +11524,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/locationattributetype/${uuid}`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -11542,7 +11543,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/locationattributetype/${uuid}${this.addQueryParams(query)}`,
-        'DELETE',
+        "DELETE",
         params
       ),
   };
@@ -11558,14 +11559,14 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query?: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
         q?: string;
       },
       params?: RequestParams
     ) =>
       this.request<FetchAll, any>(
         `/privilege${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -11576,7 +11577,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      * @request POST:/privilege
      */
     createPrivilege: (resource: PrivilegeCreate, params?: RequestParams) =>
-      this.request<any, any>(`/privilege`, 'POST', params, resource),
+      this.request<any, any>(`/privilege`, "POST", params, resource),
 
     /**
      * @tags privilege
@@ -11586,12 +11587,12 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      */
     getPrivilege: (
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<PrivilegeGet, any>(
         `/privilege/${uuid}${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -11605,7 +11606,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       uuid: string,
       resource: PrivilegeUpdate,
       params?: RequestParams
-    ) => this.request<any, any>(`/privilege/${uuid}`, 'POST', params, resource),
+    ) => this.request<any, any>(`/privilege/${uuid}`, "POST", params, resource),
 
     /**
      * @tags privilege
@@ -11621,7 +11622,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/privilege/${uuid}${this.addQueryParams(query)}`,
-        'DELETE',
+        "DELETE",
         params
       ),
   };
@@ -11637,7 +11638,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query?: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
         q?: string;
         personB?: string;
         personA?: string;
@@ -11649,7 +11650,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<FetchAll, any>(
         `/relationship${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -11662,7 +11663,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     createRelationship: (
       resource: RelationshipCreate,
       params?: RequestParams
-    ) => this.request<any, any>(`/relationship`, 'POST', params, resource),
+    ) => this.request<any, any>(`/relationship`, "POST", params, resource),
 
     /**
      * @tags relationship
@@ -11672,12 +11673,12 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      */
     getRelationship: (
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<RelationshipGet, any>(
         `/relationship/${uuid}${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -11692,7 +11693,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       resource: RelationshipUpdate,
       params?: RequestParams
     ) =>
-      this.request<any, any>(`/relationship/${uuid}`, 'POST', params, resource),
+      this.request<any, any>(`/relationship/${uuid}`, "POST", params, resource),
 
     /**
      * @tags relationship
@@ -11708,7 +11709,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/relationship/${uuid}${this.addQueryParams(query)}`,
-        'DELETE',
+        "DELETE",
         params
       ),
   };
@@ -11724,14 +11725,14 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
         q: string;
       },
       params?: RequestParams
     ) =>
       this.request<FetchAll, any>(
         `/workflow${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -11742,7 +11743,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      * @request POST:/workflow
      */
     createProgramWorkflow: (resource: WorkflowCreate, params?: RequestParams) =>
-      this.request<any, any>(`/workflow`, 'POST', params, resource),
+      this.request<any, any>(`/workflow`, "POST", params, resource),
 
     /**
      * @tags workflow
@@ -11752,12 +11753,12 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      */
     getProgramWorkflow: (
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<WorkflowGet, any>(
         `/workflow/${uuid}${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -11771,7 +11772,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       uuid: string,
       resource: WorkflowUpdate,
       params?: RequestParams
-    ) => this.request<any, any>(`/workflow/${uuid}`, 'POST', params, resource),
+    ) => this.request<any, any>(`/workflow/${uuid}`, "POST", params, resource),
 
     /**
      * @tags workflow
@@ -11787,7 +11788,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/workflow/${uuid}${this.addQueryParams(query)}`,
-        'DELETE',
+        "DELETE",
         params
       ),
 
@@ -11802,13 +11803,13 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query?: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
       },
       params?: RequestParams
     ) =>
       this.request<{ results?: WorkflowStateGet[] }, any>(
         `/workflow/${parentUuid}/state${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -11825,7 +11826,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/workflow/${parentUuid}/state`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -11839,12 +11840,12 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     getProgramWorkflowState: (
       parentUuid: string,
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<WorkflowStateGet, any>(
         `/workflow/${parentUuid}/state/${uuid}${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -11863,7 +11864,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/workflow/${parentUuid}/state/${uuid}${this.addQueryParams(query)}`,
-        'DELETE',
+        "DELETE",
         params
       ),
   };
@@ -11879,7 +11880,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query?: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
         q?: string;
         maps?: string;
         termB?: string;
@@ -11891,7 +11892,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<FetchAll, any>(
         `/conceptreferencetermmap${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -11907,7 +11908,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/conceptreferencetermmap`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -11920,12 +11921,12 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      */
     getConceptReferenceTermMap: (
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<ConceptreferencetermmapGet, any>(
         `/conceptreferencetermmap/${uuid}${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -11942,7 +11943,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/conceptreferencetermmap/${uuid}`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -11961,7 +11962,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/conceptreferencetermmap/${uuid}${this.addQueryParams(query)}`,
-        'DELETE',
+        "DELETE",
         params
       ),
   };
@@ -11977,14 +11978,14 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query?: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
         q?: string;
       },
       params?: RequestParams
     ) =>
       this.request<FetchAll, any>(
         `/systemsetting${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -11997,7 +11998,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     createSystemSetting: (
       resource: SystemsettingCreate,
       params?: RequestParams
-    ) => this.request<any, any>(`/systemsetting`, 'POST', params, resource),
+    ) => this.request<any, any>(`/systemsetting`, "POST", params, resource),
 
     /**
      * @tags systemsetting
@@ -12007,12 +12008,12 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      */
     getSystemSetting: (
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<SystemsettingGet, any>(
         `/systemsetting/${uuid}${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -12029,7 +12030,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/systemsetting/${uuid}`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -12048,7 +12049,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/systemsetting/${uuid}${this.addQueryParams(query)}`,
-        'DELETE',
+        "DELETE",
         params
       ),
   };
@@ -12064,14 +12065,14 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
         q: string;
       },
       params?: RequestParams
     ) =>
       this.request<FetchAll, any>(
         `/extension${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -12083,12 +12084,12 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      */
     getExtension: (
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<ExtensionGet, any>(
         `/extension/${uuid}${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
   };
@@ -12103,13 +12104,13 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query?: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
       },
       params?: RequestParams
     ) =>
       this.request<FetchAll, any>(
         `/app${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -12121,12 +12122,12 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      */
     getApp: (
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<AppGet, any>(
         `/app/${uuid}${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
   };
@@ -12142,14 +12143,14 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query?: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
         q?: string;
       },
       params?: RequestParams
     ) =>
       this.request<FetchAll, any>(
         `/role${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -12160,7 +12161,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      * @request POST:/role
      */
     createRole: (resource: RoleCreate, params?: RequestParams) =>
-      this.request<any, any>(`/role`, 'POST', params, resource),
+      this.request<any, any>(`/role`, "POST", params, resource),
 
     /**
      * @tags role
@@ -12170,12 +12171,12 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      */
     getRole: (
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<RoleGet, any>(
         `/role/${uuid}${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -12186,7 +12187,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      * @request POST:/role/{uuid}
      */
     updateRole: (uuid: string, resource: RoleUpdate, params?: RequestParams) =>
-      this.request<any, any>(`/role/${uuid}`, 'POST', params, resource),
+      this.request<any, any>(`/role/${uuid}`, "POST", params, resource),
 
     /**
      * @tags role
@@ -12202,7 +12203,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/role/${uuid}${this.addQueryParams(query)}`,
-        'DELETE',
+        "DELETE",
         params
       ),
   };
@@ -12218,7 +12219,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query?: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom' | string;
+        v?: "ref" | "default" | "full" | "custom" | string;
         q?: string;
         code?: string;
         searchType?: string;
@@ -12231,7 +12232,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<FetchAll, any>(
         `/concept${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -12242,7 +12243,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      * @request POST:/concept
      */
     createConcept: (resource: ConceptCreate, params?: RequestParams) =>
-      this.request<any, any>(`/concept`, 'POST', params, resource),
+      this.request<any, any>(`/concept`, "POST", params, resource),
 
     /**
      * @tags concept
@@ -12252,12 +12253,12 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      */
     getConcept: (
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<ConceptGet, any>(
         `/concept/${uuid}${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -12271,7 +12272,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       uuid: string,
       resource: ConceptUpdate,
       params?: RequestParams
-    ) => this.request<any, any>(`/concept/${uuid}`, 'POST', params, resource),
+    ) => this.request<any, any>(`/concept/${uuid}`, "POST", params, resource),
 
     /**
      * @tags concept
@@ -12287,7 +12288,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/concept/${uuid}${this.addQueryParams(query)}`,
-        'DELETE',
+        "DELETE",
         params
       ),
 
@@ -12302,13 +12303,13 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query?: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
       },
       params?: RequestParams
     ) =>
       this.request<{ results?: ConceptDescriptionGet[] }, any>(
         `/concept/${parentUuid}/description${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -12325,7 +12326,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/concept/${parentUuid}/description`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -12339,14 +12340,14 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     getConceptDescription: (
       parentUuid: string,
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<ConceptDescriptionGet, any>(
         `/concept/${parentUuid}/description/${uuid}${this.addQueryParams(
           query
         )}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -12364,7 +12365,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/concept/${parentUuid}/description/${uuid}`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -12386,7 +12387,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
         `/concept/${parentUuid}/description/${uuid}${this.addQueryParams(
           query
         )}`,
-        'DELETE',
+        "DELETE",
         params
       ),
 
@@ -12401,13 +12402,13 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query?: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
       },
       params?: RequestParams
     ) =>
       this.request<{ results?: ConceptAttributeGet[] }, any>(
         `/concept/${parentUuid}/attribute${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -12424,7 +12425,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/concept/${parentUuid}/attribute`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -12438,12 +12439,12 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     getConceptAttribute: (
       parentUuid: string,
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<ConceptAttributeGet, any>(
         `/concept/${parentUuid}/attribute/${uuid}${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -12461,7 +12462,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/concept/${parentUuid}/attribute/${uuid}`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -12481,7 +12482,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/concept/${parentUuid}/attribute/${uuid}${this.addQueryParams(query)}`,
-        'DELETE',
+        "DELETE",
         params
       ),
 
@@ -12496,13 +12497,13 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query?: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
       },
       params?: RequestParams
     ) =>
       this.request<{ results?: ConceptNameGet[] }, any>(
         `/concept/${parentUuid}/name${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -12519,7 +12520,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/concept/${parentUuid}/name`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -12533,12 +12534,12 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     getConceptName: (
       parentUuid: string,
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<ConceptNameGet, any>(
         `/concept/${parentUuid}/name/${uuid}${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -12556,7 +12557,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/concept/${parentUuid}/name/${uuid}`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -12576,7 +12577,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/concept/${parentUuid}/name/${uuid}${this.addQueryParams(query)}`,
-        'DELETE',
+        "DELETE",
         params
       ),
 
@@ -12591,13 +12592,13 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query?: {
         limit?: number;
         startIndex?: number;
-        v?: 'ref' | 'default' | 'full' | 'custom';
+        v?: "ref" | "default" | "full" | "custom";
       },
       params?: RequestParams
     ) =>
       this.request<{ results?: ConceptMappingGet[] }, any>(
         `/concept/${parentUuid}/mapping${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -12614,7 +12615,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/concept/${parentUuid}/mapping`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -12628,12 +12629,12 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     getConceptMap: (
       parentUuid: string,
       uuid: string,
-      query?: { v?: 'ref' | 'default' | 'full' | 'custom' },
+      query?: { v?: "ref" | "default" | "full" | "custom" },
       params?: RequestParams
     ) =>
       this.request<ConceptMappingGet, any>(
         `/concept/${parentUuid}/mapping/${uuid}${this.addQueryParams(query)}`,
-        'GET',
+        "GET",
         params
       ),
 
@@ -12651,7 +12652,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/concept/${parentUuid}/mapping/${uuid}`,
-        'POST',
+        "POST",
         params,
         resource
       ),
@@ -12671,7 +12672,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
     ) =>
       this.request<any, any>(
         `/concept/${parentUuid}/mapping/${uuid}${this.addQueryParams(query)}`,
-        'DELETE',
+        "DELETE",
         params
       ),
   };

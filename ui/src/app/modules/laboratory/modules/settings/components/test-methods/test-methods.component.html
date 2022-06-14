@@ -1,1 +1,29 @@
-<p>test-methods works!</p>
+<div class="test-methods-and-specimen-sources">
+  <mat-tab-group>
+    <mat-tab label="Test methods">
+      <ng-template matTabContent>
+        <div class="p-3">
+          <app-standard-concept-creation
+            [conceptClass]="'Test'"
+            [dataType]="'8d4a4c94-c2cc-11de-8d13-0010c6dffd0f'"
+            [isSet]="true"
+            [standardSearchTerm]="'TEST_METHODS'"
+            [setMembersSearchTerm]="'LIS_TEST_PARAMETER'"
+          ></app-standard-concept-creation>
+        </div>
+      </ng-template>
+    </mat-tab>
+    <mat-tab label="Specimen Sources">
+      <ng-template matTabContent>
+        <div class="p-3">
+          <app-standard-concept-creation
+            [conceptClass]="'LAB Department'"
+            [dataType]="'8d4a4c94-c2cc-11de-8d13-0010c6dffd0f'"
+            [isSet]="true"
+            [standardSearchTerm]="'SPECIMEN_SOURCE'"
+          ></app-standard-concept-creation>
+        </div>
+      </ng-template>
+    </mat-tab>
+  </mat-tab-group>
+</div>

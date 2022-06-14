@@ -1,7 +1,9 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
+import { TextArea } from "src/app/shared/modules/form/models/text-area.model";
 import { Textbox } from "src/app/shared/modules/form/models/text-box.model";
 import { ConceptsService } from "src/app/shared/resources/concepts/services/concepts.service";
+import { ConceptGetFull } from "src/app/shared/resources/openmrs";
 
 @Component({
   selector: "app-standard-concept-creation",
@@ -11,6 +13,9 @@ import { ConceptsService } from "src/app/shared/resources/concepts/services/conc
 export class StandardConceptCreationComponent implements OnInit {
   @Input() conceptClass: string;
   @Input() standardSearchTerm: string;
+  @Input() setMembersSearchTerm: string;
+  @Input() dataType: string;
+  @Input() isSet: boolean;
   basicConceptFields: any[];
   formData: any = {};
   isFormValid: boolean = false;
@@ -18,6 +23,10 @@ export class StandardConceptCreationComponent implements OnInit {
   @Output() conceptCreated: EventEmitter<boolean> = new EventEmitter<boolean>();
 
   saving: boolean = false;
+  editingSet: boolean = false;
+  conceptUuid: string;
+
+  selectedSetMembers: ConceptGetFull[] = [];
   constructor(private conceptService: ConceptsService) {}
 
   ngOnInit(): void {
@@ -25,23 +34,30 @@ export class StandardConceptCreationComponent implements OnInit {
   }
 
   createBasicConceptFields(data?: any): void {
+    const shortNameDetails = (data?.names.filter(
+      (name) => name?.conceptNameType === "SHORT"
+    ) || [])[0];
+    // Add support to support multiple languages
+    const descriptionsDetails = data?.descriptions[0];
     this.basicConceptFields = [
       new Textbox({
         id: "name",
         key: "name",
         label: "Name",
-        value: data && data?.name ? data?.name?.name : null,
+        value: data && data?.display ? data?.display : null,
         required: true,
       }),
       new Textbox({
         id: "shortName",
         key: "shortName",
         label: "Short name",
+        value: shortNameDetails ? shortNameDetails?.name : null,
         required: true,
       }),
-      new Textbox({
+      new TextArea({
         id: "description",
         key: "description",
+        value: descriptionsDetails ? descriptionsDetails?.description : null,
         label: "Description",
       }),
     ];
@@ -50,6 +66,20 @@ export class StandardConceptCreationComponent implements OnInit {
   onFormUpdate(formValues: FormValue): void {
     this.formData = { ...this.formData, ...formValues.getValues() };
     this.isFormValid = formValues.isValid;
+  }
+
+  onGetSelectedSetMembers(selectedSetMembers: ConceptGetFull[]): void {
+    this.selectedSetMembers = selectedSetMembers;
+  }
+
+  onConceptEdit(concept: ConceptGetFull): void {
+    this.conceptUuid = concept?.uuid;
+    this.createBasicConceptFields(concept);
+    this.editingSet = true;
+    setTimeout(() => {
+      this.editingSet = false;
+      this.selectedSetMembers = concept?.setMembers;
+    }, 200);
   }
 
   onSave(event: Event): void {
@@ -95,15 +125,24 @@ export class StandardConceptCreationComponent implements OnInit {
           locale: "en",
         },
       ],
-      datatype: "8d4a4c94-c2cc-11de-8d13-0010c6dffd0f",
+      datatype: this.dataType
+        ? this.dataType
+        : "8d4a4c94-c2cc-11de-8d13-0010c6dffd0f",
       // Softcode concept class
-      set: false,
-      setMembers: [],
+      set: this.isSet ? this.isSet : false,
+      setMembers:
+        this.selectedSetMembers?.length > 0
+          ? this.selectedSetMembers.map((member) => member?.uuid)
+          : [],
       conceptClass: this.conceptClass,
     };
-    this.conceptService.createConcept(concept).subscribe((response) => {
+    (!this.conceptUuid
+      ? this.conceptService.createConcept(concept)
+      : this.conceptService.updateConcept(this.conceptUuid, concept)
+    ).subscribe((response) => {
       if (response) {
         this.saving = false;
+        this.conceptUuid = null;
         this.conceptCreated.emit(true);
         this.createBasicConceptFields();
       }
