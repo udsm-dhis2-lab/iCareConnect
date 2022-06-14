@@ -23,12 +23,15 @@
       ></app-concept-set-members>
     </div>
     <div class="w-100 d-flex justify-content-end mt-2">
+      <button mat-stroked-button (click)="onCancel($event)">Cancel</button>
       <button
+        class="ml-2"
         mat-stroked-button
         [disabled]="!isFormValid"
         (click)="onSave($event)"
+        color="primary"
       >
-        Save
+        {{ !conceptUuid ? "Save" : "Update" }}
       </button>
     </div>
   </div>
@@ -36,6 +39,7 @@
     <app-standard-concepts-list
       *ngIf="!saving"
       [standardSearchTerm]="standardSearchTerm"
+      [selectedConceptUuid]="conceptUuid"
       (conceptToEdit)="onConceptEdit($event)"
     ></app-standard-concepts-list>
   </div>

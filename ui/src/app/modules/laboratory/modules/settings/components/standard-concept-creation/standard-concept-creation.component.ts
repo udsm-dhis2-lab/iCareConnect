@@ -72,6 +72,17 @@ export class StandardConceptCreationComponent implements OnInit {
     this.selectedSetMembers = selectedSetMembers;
   }
 
+  onCancel(event: Event): void {
+    event.stopPropagation();
+    this.createBasicConceptFields();
+    this.editingSet = true;
+    setTimeout(() => {
+      this.editingSet = false;
+      this.conceptUuid = null;
+      this.selectedSetMembers = [];
+    }, 200);
+  }
+
   onConceptEdit(concept: ConceptGetFull): void {
     this.conceptUuid = concept?.uuid;
     this.createBasicConceptFields(concept);
