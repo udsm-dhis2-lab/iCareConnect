@@ -85,6 +85,21 @@ export class SamplesService {
       );
   }
 
+  setMultipleSampleStatuses(statuses: any[]): Observable<any> {
+    if (statuses) {
+      return zip(
+        ...statuses.map((status) => {
+          return this.httpClient.post(BASE_URL + "lab/samplestatus", status);
+        })
+      ).pipe(
+        map((response) => response),
+        catchError((error) => of(error))
+      );
+    } else {
+      return from([null]);
+    }
+  }
+
   setSampleStatus(data): Observable<any> {
     if (data) {
       return this.httpClient.post(BASE_URL + "lab/samplestatus", data).pipe(

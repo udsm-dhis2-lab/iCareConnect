@@ -19,7 +19,7 @@ export class RegisteredPatientDetailsComponent implements OnInit {
       id: "patient",
       label: "Search existing patient",
       options: [],
-      searchControlType: "user",
+      searchControlType: "person",
       shouldHaveLiveSearchForDropDownFields: true,
     });
   }

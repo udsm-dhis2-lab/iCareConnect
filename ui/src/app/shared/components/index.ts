@@ -58,6 +58,7 @@ import { AddProcedureComponent } from "./add-procedure/add-procedure.component";
 import { AddProcedureFormComponent } from "./add-procedure-form/add-procedure-form.component";
 import { IcareHelpComponent } from "./icare-help/icare-help.component";
 import { PatientPersonAttributesComponent } from "./patient-person-attributes/patient-person-attributes.component";
+import { LoaderComponent } from "./loader/loader.component";
 
 export const components: any[] = [
   PatientSearchComponent,
@@ -120,6 +121,7 @@ export const components: any[] = [
   AddProcedureFormComponent,
   IcareHelpComponent,
   PatientPersonAttributesComponent,
+  LoaderComponent,
 ];
 
 export const sharedEntryComponents: any[] = [

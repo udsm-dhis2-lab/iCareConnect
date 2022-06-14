@@ -150,7 +150,10 @@ export class ModulesSelectorComponent implements OnInit {
             ]
           : [
               this.currentModule?.app
-                ? this.currentModule?.app?.path
+                ? this.currentModule?.app?.path +
+                  (this.currentModule?.app?.path === "/laboratory"
+                    ? "/sample-registration"
+                    : "")
                 : this.currentModule?.id,
             ],
         query: { queryParams: navigationDetails["queryParams"] },

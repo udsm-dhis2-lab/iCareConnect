@@ -1,6 +1,7 @@
 import { Component, Input, OnInit } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { MatRadioChange } from "@angular/material/radio";
+import * as moment from "moment";
 import { Observable, zip } from "rxjs";
 import { NON_CLINICAL_PERSON_DATA } from "src/app/core/constants/non-clinical-person.constant";
 import { Location } from "src/app/core/models";
@@ -57,6 +58,9 @@ export class SingleRegistrationComponent implements OnInit {
   patientFieldSetClosed: boolean = true;
 
   registrationCategory: string = "Clinical";
+
+  receivedOnField: any;
+  receivedByField: any;
   constructor(
     private samplesService: SamplesService,
     private labTestsService: LabTestsService,
@@ -125,11 +129,11 @@ export class SingleRegistrationComponent implements OnInit {
       //   conceptClass: "Lab Department",
       //   shouldHaveLiveSearchForDropDownFields: true,
       // }),
-      new DateField({
-        id: "receivedon",
-        key: "receivedon",
-        label: "Received On",
-      }),
+      // new DateField({
+      //   id: "receivedOn",
+      //   key: "receivedOn",
+      //   label: "Received On",
+      // }),
       // new Dropdown({
       //   id: "department",
       //   key: "department",
@@ -140,6 +144,21 @@ export class SingleRegistrationComponent implements OnInit {
       //   shouldHaveLiveSearchForDropDownFields: true,
       // }),
     ];
+
+    this.receivedOnField = new DateField({
+      id: "receivedOn",
+      key: "receivedOn",
+      label: "Received On",
+    });
+
+    this.receivedByField = new Dropdown({
+      id: "receivedBy",
+      key: "receivedBy",
+      label: "Received By",
+      options: [],
+      shouldHaveLiveSearchForDropDownFields: true,
+      searchControlType: "user",
+    });
 
     this.agencyFormField = new Dropdown({
       id: "agency",
@@ -185,6 +204,17 @@ export class SingleRegistrationComponent implements OnInit {
 
   getSelection(event: MatRadioChange): void {
     this.registrationCategory = event?.value;
+  }
+
+  getSelectedReceivedOnTime(event: Event): void {
+    this.formData = {
+      ...this.formData,
+      receivedAt: {
+        value: (event.target as any)?.value,
+        id: "receivedAt",
+        key: "receivedAt",
+      },
+    };
   }
 
   onFormUpdate(formValues: FormValue, itemKey?: string): void {
@@ -482,8 +512,9 @@ export class SingleRegistrationComponent implements OnInit {
                                         disableClose: false,
                                         panelClass: "custom-dialog-container",
                                       });
+                                      let statuses = [];
                                       if (this.formData["agency"]?.value) {
-                                        const sampleStatus = {
+                                        const agencyStatus = {
                                           sample: {
                                             uuid: sampleResponse?.uuid,
                                           },
@@ -492,13 +523,62 @@ export class SingleRegistrationComponent implements OnInit {
                                               "userUuid"
                                             ),
                                           },
-                                          remarks:
-                                            this.formData["agency"]?.value,
+                                          remarks: "PRIORITY",
                                           status:
                                             this.formData["agency"]?.value,
                                         };
+                                        statuses = [...statuses, agencyStatus];
+                                      }
+
+                                      if (this.formData["receivedOn"]?.value) {
+                                        const receivedOnStatus = {
+                                          sample: {
+                                            uuid: sampleResponse?.uuid,
+                                          },
+                                          user: {
+                                            uuid: localStorage.getItem(
+                                              "userUuid"
+                                            ),
+                                          },
+                                          remarks: "RECEIVED_ON",
+                                          status: "RECEIVED_ON",
+                                          timestamp: `${moment(
+                                            this.formData["receivedOn"]?.value
+                                          ).format("YYYY-MM-DD")} ${
+                                            this.formData["receivedAt"]?.value
+                                          }:00.001`,
+                                        };
+                                        statuses = [
+                                          ...statuses,
+                                          receivedOnStatus,
+                                        ];
+                                      }
+                                      const receivedByStatus = {
+                                        sample: {
+                                          uuid: sampleResponse?.uuid,
+                                        },
+                                        user: {
+                                          uuid: this.formData["receivedBy"]
+                                            ?.value
+                                            ? this.formData["receivedBy"]?.value
+                                            : localStorage.getItem("userUuid"),
+                                        },
+                                        remarks: "RECEIVED_BY",
+                                        status: "RECEIVED_BY",
+                                        timestamp: `${moment(
+                                          this.formData["receivedOn"]?.value
+                                        ).format("YYYY-MM-DD")} ${
+                                          this.formData["receivedAt"]?.value
+                                        }:00.001`,
+                                      };
+                                      statuses = [
+                                        ...statuses,
+                                        receivedByStatus,
+                                      ];
+
+                                      if (statuses?.length > 0) {
                                         this.samplesService
-                                          .setSampleStatus(sampleStatus)
+                                          .setMultipleSampleStatuses(statuses)
                                           .subscribe((sampleStatusResponse) => {
                                             this.savingDataResponse =
                                               sampleStatusResponse;

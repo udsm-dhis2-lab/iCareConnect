@@ -20,6 +20,7 @@ export class MultipleTestsSelectionComponent implements OnInit {
       label: "Test",
       options: [],
       conceptClass: "Test",
+      searchControlType: "concept",
       shouldHaveLiveSearchForDropDownFields: true,
     });
   }
