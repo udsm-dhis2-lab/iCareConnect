@@ -10,6 +10,7 @@ import { ConceptGetFull } from "src/app/shared/resources/openmrs";
 })
 export class StandardConceptsListComponent implements OnInit {
   @Input() standardSearchTerm: string;
+  @Input() selectedConceptUuid: string;
   conceptsList$: Observable<ConceptGetFull[]>;
   saving: boolean = false;
 
