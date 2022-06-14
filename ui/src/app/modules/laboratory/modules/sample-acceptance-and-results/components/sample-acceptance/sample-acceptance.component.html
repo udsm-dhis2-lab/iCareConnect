@@ -41,6 +41,7 @@
         </mat-form-field>
       </div>
       <div class="p-1">
+        <!-- {{ sampleParams?.samplesToAccept | json }} -->
         <table class="table table-bordered">
           <thead class="table-header">
             <tr>
@@ -53,11 +54,17 @@
                 Patient Names
               </th>
               <th colspan="2" class="text-center">Test details</th>
+              <th rowspan="2" *ngIf="LISConfigurations?.isLIS">Received By</th>
+              <th rowspan="2" *ngIf="LISConfigurations?.isLIS">Received On</th>
               <th rowspan="2">
-                {{ !LISConfigurations?.isLIS ? "Collected By" : "Received By" }}
+                {{
+                  !LISConfigurations?.isLIS ? "Collected By" : "Registered By"
+                }}
               </th>
               <th rowspan="2">
-                {{ !LISConfigurations?.isLIS ? "Collected On" : "Received On" }}
+                {{
+                  !LISConfigurations?.isLIS ? "Collected On" : "Registered On"
+                }}
               </th>
               <th rowspan="2">Priority</th>
               <th rowspan="2">Action</th>
@@ -66,7 +73,7 @@
               <th>Test</th>
               <!-- <th>Container</th> -->
               <th>
-                {{ !LISConfigurations?.isLIS ? "Collected By" : "Received By" }}
+                {{ !LISConfigurations?.isLIS ? "Collected By" : "ID" }}
               </th>
               <!-- <th>Date Ordered</th>
               <th>Source</th> -->
@@ -124,10 +131,32 @@
                   </td>
                   <td>{{ order?.order?.concept?.display }}</td>
                   <!-- <td></td> -->
-                  <td>{{ order?.order?.orderer?.name }}</td>
+                  <td>
+                    {{
+                      !LISConfigurations?.isLIS
+                        ? order?.order?.orderer?.name
+                        : order?.order?.orderNumber
+                    }}
+                  </td>
                   <!-- <td>{{ order?.order?.orderDate | date: "medium" }}</td>
                   <td>{{ order?.order?.location?.name }}</td> -->
                   <!-- <td>{{order?.p_sub_category}} - {{order?.p_sub_category}}</td> -->
+                  <td
+                    *ngIf="orderCount == 0 && LISConfigurations?.isLIS"
+                    [attr.rowspan]="sample?.orders?.length"
+                  >
+                    {{ sample?.receivedByStatus?.user?.name }}
+                  </td>
+                  <td
+                    *ngIf="orderCount == 0 && LISConfigurations?.isLIS"
+                    [attr.rowspan]="sample?.orders?.length"
+                  >
+                    {{
+                      sample?.receivedOnStatus?.timestamp
+                        ? (sample?.receivedOnStatus?.timestamp | date: "medium")
+                        : ""
+                    }}
+                  </td>
                   <td
                     *ngIf="orderCount == 0"
                     [attr.rowspan]="sample?.orders?.length"
@@ -144,7 +173,13 @@
                     *ngIf="orderCount == 0"
                     [attr.rowspan]="sample?.orders?.length"
                   >
-                    {{ sample?.priorityHigh ? "Urgent" : "Routine" }}
+                    {{
+                      !LISConfigurations?.isLIS
+                        ? sample?.priorityHigh
+                          ? "Urgent"
+                          : "Routine"
+                        : sample?.priorityStatus?.status
+                    }}
                   </td>
                   <td
                     *ngIf="orderCount == 0"

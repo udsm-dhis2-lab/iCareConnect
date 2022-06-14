@@ -523,8 +523,7 @@ export class SingleRegistrationComponent implements OnInit {
                                               "userUuid"
                                             ),
                                           },
-                                          remarks:
-                                            this.formData["agency"]?.value,
+                                          remarks: "PRIORITY",
                                           status:
                                             this.formData["agency"]?.value,
                                         };
@@ -554,30 +553,28 @@ export class SingleRegistrationComponent implements OnInit {
                                           receivedOnStatus,
                                         ];
                                       }
-
-                                      if (this.formData["receivedBy"]?.value) {
-                                        const receivedByStatus = {
-                                          sample: {
-                                            uuid: sampleResponse?.uuid,
-                                          },
-                                          user: {
-                                            uuid: this.formData["receivedBy"]
-                                              ?.value,
-                                          },
-                                          remarks: "RECEIVED_BY",
-                                          status: "RECEIVED_BY",
-                                          timestamp: `${moment(
-                                            this.formData["receivedOn"]?.value
-                                          ).format("YYYY-MM-DD")} ${
-                                            this.formData["receivedAt"]?.value
-                                          }:00.001`,
-                                        };
-                                        statuses = [
-                                          ...statuses,
-                                          receivedByStatus,
-                                        ];
-                                      }
-                                      console.log(statuses);
+                                      const receivedByStatus = {
+                                        sample: {
+                                          uuid: sampleResponse?.uuid,
+                                        },
+                                        user: {
+                                          uuid: this.formData["receivedBy"]
+                                            ?.value
+                                            ? this.formData["receivedBy"]?.value
+                                            : localStorage.getItem("userUuid"),
+                                        },
+                                        remarks: "RECEIVED_BY",
+                                        status: "RECEIVED_BY",
+                                        timestamp: `${moment(
+                                          this.formData["receivedOn"]?.value
+                                        ).format("YYYY-MM-DD")} ${
+                                          this.formData["receivedAt"]?.value
+                                        }:00.001`,
+                                      };
+                                      statuses = [
+                                        ...statuses,
+                                        receivedByStatus,
+                                      ];
 
                                       if (statuses?.length > 0) {
                                         this.samplesService
