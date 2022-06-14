@@ -1,12 +1,28 @@
 <div class="row">
-  <div class="col-lg-6 col-md-6 col-sx-12 col-sm-12">
+  <div class="col-lg-7 col-md-7 col-sx-12 col-sm-12">
     <div class="h4">New</div>
     <hr />
-    <app-form
-      [fields]="basicConceptFields"
-      (formUpdate)="onFormUpdate($event)"
-    ></app-form>
-    <div class="w-100 d-flex justify-content-end">
+    <div class="loading-overlay" *ngIf="saving">
+      <div class="text-center">
+        <div>Saving data</div>
+        <div class="mt-3 d-flex justify-content-center w-100">
+          <mat-spinner diameter="50" strokeWidth="2"></mat-spinner>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="!saving">
+      <app-form
+        [fields]="basicConceptFields"
+        (formUpdate)="onFormUpdate($event)"
+      ></app-form>
+      <app-concept-set-members
+        *ngIf="isSet && !editingSet"
+        [setMembersSearchTerm]="setMembersSearchTerm"
+        [selectedSetMembersItems]="selectedSetMembers"
+        (selectedSetMembers)="onGetSelectedSetMembers($event)"
+      ></app-concept-set-members>
+    </div>
+    <div class="w-100 d-flex justify-content-end mt-2">
       <button
         mat-stroked-button
         [disabled]="!isFormValid"
@@ -16,7 +32,7 @@
       </button>
     </div>
   </div>
-  <div class="col-lg-6 col-md-6 col-sx-12 col-sm-12">
+  <div class="col-lg-5 col-md-5 col-sx-12 col-sm-12">
     <app-standard-concepts-list
       *ngIf="!saving"
       [standardSearchTerm]="standardSearchTerm"

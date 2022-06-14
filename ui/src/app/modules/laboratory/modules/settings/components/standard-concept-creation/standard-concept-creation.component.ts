@@ -13,6 +13,9 @@ import { ConceptGetFull } from "src/app/shared/resources/openmrs";
 export class StandardConceptCreationComponent implements OnInit {
   @Input() conceptClass: string;
   @Input() standardSearchTerm: string;
+  @Input() setMembersSearchTerm: string;
+  @Input() dataType: string;
+  @Input() isSet: boolean;
   basicConceptFields: any[];
   formData: any = {};
   isFormValid: boolean = false;
@@ -20,7 +23,10 @@ export class StandardConceptCreationComponent implements OnInit {
   @Output() conceptCreated: EventEmitter<boolean> = new EventEmitter<boolean>();
 
   saving: boolean = false;
+  editingSet: boolean = false;
   conceptUuid: string;
+
+  selectedSetMembers: ConceptGetFull[] = [];
   constructor(private conceptService: ConceptsService) {}
 
   ngOnInit(): void {
@@ -62,9 +68,18 @@ export class StandardConceptCreationComponent implements OnInit {
     this.isFormValid = formValues.isValid;
   }
 
+  onGetSelectedSetMembers(selectedSetMembers: ConceptGetFull[]): void {
+    this.selectedSetMembers = selectedSetMembers;
+  }
+
   onConceptEdit(concept: ConceptGetFull): void {
     this.conceptUuid = concept?.uuid;
     this.createBasicConceptFields(concept);
+    this.editingSet = true;
+    setTimeout(() => {
+      this.editingSet = false;
+      this.selectedSetMembers = concept?.setMembers;
+    }, 200);
   }
 
   onSave(event: Event): void {
@@ -110,10 +125,15 @@ export class StandardConceptCreationComponent implements OnInit {
           locale: "en",
         },
       ],
-      datatype: "8d4a4c94-c2cc-11de-8d13-0010c6dffd0f",
+      datatype: this.dataType
+        ? this.dataType
+        : "8d4a4c94-c2cc-11de-8d13-0010c6dffd0f",
       // Softcode concept class
-      set: false,
-      setMembers: [],
+      set: this.isSet ? this.isSet : false,
+      setMembers:
+        this.selectedSetMembers?.length > 0
+          ? this.selectedSetMembers.map((member) => member?.uuid)
+          : [],
       conceptClass: this.conceptClass,
     };
     (!this.conceptUuid
