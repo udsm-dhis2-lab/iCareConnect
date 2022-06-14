@@ -1,6 +1,18 @@
-<div>
-  <app-form
+<div *ngIf="{ conceptsList: conceptsList$ | async } as params">
+  <!-- <app-form
     [fields]="[testsFormField]"
     (formUpdate)="onFormUpdate($event)"
-  ></app-form>
+  ></app-form> -->
+
+  <app-multiple-concepts-selection
+    *ngIf="params?.conceptsList"
+    [concepts]="params?.conceptsList"
+    [selectedSetMembersItems]="selectedSetMembersItems"
+    (selectedSetMembers)="onGetSelectedMembers($event)"
+  ></app-multiple-concepts-selection>
+
+  <mat-progress-bar
+    *ngIf="!params?.conceptsList"
+    mode="indeterminate"
+  ></mat-progress-bar>
 </div>
