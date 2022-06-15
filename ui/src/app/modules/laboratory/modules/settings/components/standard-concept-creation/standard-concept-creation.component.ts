@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
-import { Observable } from "rxjs";
+import { Observable, zip } from "rxjs";
 import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
 import { TextArea } from "src/app/shared/modules/form/models/text-area.model";
@@ -200,16 +200,52 @@ export class StandardConceptCreationComponent implements OnInit {
         if (!this.conceptUuid && this.standardSearchTerm === "TEST_ORDERS") {
           const billableItem = {
             concept: { uuid: response?.uuid },
+            unit: "default",
           };
           this.billableItemService
             .createBillableItem(billableItem)
             .subscribe((billableItemResponse) => {
               if (billableItemResponse) {
-                this.saving = false;
-                this.conceptUuid = null;
-                this.conceptCreated.emit(true);
-                this.selectedSetMembers = [];
-                this.createBasicConceptFields();
+                // Create prices
+                const prices = [
+                  {
+                    item: {
+                      uuid: billableItemResponse?.uuid,
+                    },
+                    paymentScheme: {
+                      uuid: "00000102IIIIIIIIIIIIIIIIIIIIIIIIIIII",
+                    },
+                    paymentType: {
+                      uuid: "00000100IIIIIIIIIIIIIIIIIIIIIIIIIIII",
+                    },
+                    price: "0",
+                  },
+                  {
+                    item: {
+                      uuid: billableItemResponse?.uuid,
+                    },
+                    paymentScheme: {
+                      uuid: "5f53b4e2-da03-4139-b32c-ad6edb699943",
+                    },
+                    paymentType: {
+                      uuid: "00000100IIIIIIIIIIIIIIIIIIIIIIIIIIII",
+                    },
+                    price: "0",
+                  },
+                ];
+                zip(
+                  ...prices.map((priceObject) => {
+                    return this.billableItemService.createPrice(priceObject);
+                  })
+                ).subscribe((priceResponses) => {
+                  if (priceResponses) {
+                    this.saving = false;
+                    this.conceptUuid = null;
+                    this.conceptCreated.emit(true);
+                    this.selectedSetMembers = [];
+                    this.createBasicConceptFields();
+                  }
+                });
               }
             });
         } else {
