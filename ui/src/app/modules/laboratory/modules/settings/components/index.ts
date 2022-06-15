@@ -8,6 +8,7 @@ import { ConfigsComponent } from "./configs/configs.component";
 import { LabConfigurationsComponent } from "./lab-configurations/lab-configurations.component";
 import { LabOrdersManagementDashboardComponent } from "./lab-orders-management-dashboard/lab-orders-management-dashboard.component";
 import { LabOrdersManagementComponent } from "./lab-orders-management/lab-orders-management.component";
+import { LabsSectionManagementComponent } from "./labs-section-management/labs-section-management.component";
 import { OtherParametersConfigsComponent } from "./other-parameters-configs/other-parameters-configs.component";
 import { ParametersListComponent } from "./parameters-list/parameters-list.component";
 import { ParametersComponent } from "./parameters/parameters.component";
@@ -36,4 +37,5 @@ export const components: any[] = [
   StandardConceptsListComponent,
   ConceptSetMembersComponent,
   ConceptSetMembersSelectionComponent,
+  LabsSectionManagementComponent,
 ];

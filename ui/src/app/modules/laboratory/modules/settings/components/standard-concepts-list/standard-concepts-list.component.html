@@ -25,12 +25,13 @@
             <mat-progress-bar mode="indeterminate"></mat-progress-bar>
           </ng-container>
           <ng-container
-            *ngFor="let concept of params?.conceptsList; let count = index"
+            *ngIf="params?.conceptsList && params?.conceptsList?.length > 0"
           >
             <tr
               [ngClass]="{
                 'selected-concept': concept?.uuid === selectedConceptUuid
               }"
+              *ngFor="let concept of params?.conceptsList; let count = index"
             >
               <td>
                 {{ count + 1 }}
@@ -52,6 +53,15 @@
                     <span>Delete</span>
                   </button>
                 </mat-menu>
+              </td>
+            </tr>
+          </ng-container>
+          <ng-container
+            *ngIf="params?.conceptsList && params?.conceptsList?.length === 0"
+          >
+            <tr>
+              <td colspan="100%">
+                <div class="alert alert-warning" role="alert">Missing List</div>
               </td>
             </tr>
           </ng-container>
