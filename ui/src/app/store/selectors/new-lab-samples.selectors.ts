@@ -3,6 +3,7 @@ import { getRootState, AppState } from "../reducers";
 import { newLabSamplesAdapter, NewLabSamplesState } from "../states";
 
 import * as _ from "lodash";
+import { getLISConfigurations } from "./lis-configurations.selectors";
 
 const getSamplesState = createSelector(
   getRootState,
@@ -25,13 +26,12 @@ export const getFormattedLabSamplesForTracking = createSelector(
     return _.map(
       _.filter(_.orderBy(samples, ["dateCreated"], ["desc"]), (sample) => {
         if (
-          (sample?.searchingText
+          sample?.searchingText
             ?.toLowerCase()
             .indexOf(props?.searchingText.toLowerCase()) > -1 &&
-            sample?.department?.departmentName
-              .toLowerCase()
-              .indexOf(props?.department?.toLowerCase()) > -1) ||
-          !sample?.department
+          sample?.department?.departmentName
+            .toLowerCase()
+            .indexOf(props?.department?.toLowerCase()) > -1
         ) {
           return sample;
         }
@@ -65,13 +65,12 @@ export const getAcceptedFormattedLabSamples = createSelector(
         if (
           sample?.accepted &&
           !sample?.markedForRecollection &&
-          ((sample?.searchingText
+          sample?.searchingText
             ?.toLowerCase()
             .indexOf(props?.searchingText.toLowerCase()) > -1 &&
-            sample?.department?.departmentName
-              .toLowerCase()
-              .indexOf(props?.department?.toLowerCase()) > -1) ||
-            !sample?.department)
+          sample?.department?.departmentName
+            .toLowerCase()
+            .indexOf(props?.department?.toLowerCase()) > -1
         ) {
           return sample;
         }
@@ -96,13 +95,12 @@ export const getFormattedLabSamplesToAccept = createSelector(
         ),
         (sample) => {
           if (
-            (sample?.searchingText
+            sample?.searchingText
               ?.toLowerCase()
               .indexOf(props?.searchingText.toLowerCase()) > -1 &&
-              sample?.department?.departmentName
-                .toLowerCase()
-                .indexOf(props?.department?.toLowerCase()) > -1) ||
-            !sample?.department
+            sample?.department?.departmentName
+              .toLowerCase()
+              .indexOf(props?.department?.toLowerCase()) > -1
           ) {
             return sample;
           }
@@ -142,13 +140,12 @@ export const getFormattedRejectedLabSamples = createSelector(
         ),
         (sample) => {
           if (
-            (sample?.searchingText
+            sample?.searchingText
               ?.toLowerCase()
               .indexOf(props?.searchingText.toLowerCase()) > -1 &&
-              sample?.department?.departmentName
-                .toLowerCase()
-                .indexOf(props?.department?.toLowerCase()) > -1) ||
-            !sample?.department
+            sample?.department?.departmentName
+              .toLowerCase()
+              .indexOf(props?.department?.toLowerCase()) > -1
           ) {
             return sample;
           }
@@ -227,13 +224,12 @@ export const getFormattedLabSamplesToFeedResults = createSelector(
         ),
         (sample) => {
           if (
-            (sample?.searchingText
+            sample?.searchingText
               ?.toLowerCase()
               .indexOf(props?.searchingText.toLowerCase()) > -1 &&
-              sample?.department?.departmentName
-                .toLowerCase()
-                .indexOf(props?.department?.toLowerCase()) > -1) ||
-            !sample?.department
+            sample?.department?.departmentName
+              .toLowerCase()
+              .indexOf(props?.department?.toLowerCase()) > -1
           ) {
             return sample;
           }
@@ -245,9 +241,13 @@ export const getFormattedLabSamplesToFeedResults = createSelector(
 
 export const getCompletedLabSamples = createSelector(
   getAllFormattedLabSamples,
-  (samples, props) => {
+  getLISConfigurations,
+  (samples, lisConfigs, props) => {
     const completedSamples = _.filter(samples, (sample) => {
-      const completedOrders = getCompletedOrders(sample?.orders);
+      const completedOrders = getCompletedOrders(
+        sample?.orders,
+        lisConfigs?.isLIS
+      );
       if (
         sample?.accepted &&
         completedOrders?.length == sample?.orders?.length
@@ -264,13 +264,12 @@ export const getCompletedLabSamples = createSelector(
         ),
         (sample) => {
           if (
-            (sample?.searchingText
+            sample?.searchingText
               ?.toLowerCase()
               .indexOf(props?.searchingText.toLowerCase()) > -1 &&
-              sample?.department?.departmentName
-                .toLowerCase()
-                .indexOf(props?.department?.toLowerCase()) > -1) ||
-            !sample?.department
+            sample?.department?.departmentName
+              .toLowerCase()
+              .indexOf(props?.department?.toLowerCase()) > -1
           ) {
             return sample;
           }
@@ -302,13 +301,12 @@ export const getPatientsWithCompletedLabSamples = createSelector(
         ),
         (sample) => {
           if (
-            (sample?.searchingText
+            sample?.searchingText
               ?.toLowerCase()
               .indexOf(props?.searchingText.toLowerCase()) > -1 &&
-              sample?.department?.departmentName
-                .toLowerCase()
-                .indexOf(props?.department?.toLowerCase()) > -1) ||
-            !sample?.department
+            sample?.department?.departmentName
+              .toLowerCase()
+              .indexOf(props?.department?.toLowerCase()) > -1
           ) {
             return sample;
           }
@@ -394,13 +392,12 @@ export const getWorkList = createSelector(
         ),
         (sample) => {
           if (
-            (sample?.searchingText
+            sample?.searchingText
               ?.toLowerCase()
               .indexOf(props?.searchingText.toLowerCase()) > -1 &&
-              sample?.department?.departmentName
-                .toLowerCase()
-                .indexOf(props?.department?.toLowerCase()) > -1) ||
-            !sample?.department
+            sample?.department?.departmentName
+              .toLowerCase()
+              .indexOf(props?.department?.toLowerCase()) > -1
           ) {
             return sample;
           }
@@ -410,12 +407,14 @@ export const getWorkList = createSelector(
   }
 );
 
-function getCompletedOrders(orders) {
+function getCompletedOrders(orders, isLIS?: boolean) {
   return (
     _.filter(orders, (order) => {
       if (
-        order?.testAllocations?.length > 0 &&
-        order?.testAllocations[0]?.secondSignOff
+        (!isLIS &&
+          order?.testAllocations?.length > 0 &&
+          order?.testAllocations[0]?.secondSignOff) ||
+        (isLIS && order?.testAllocations[0]?.results?.length > 0)
       ) {
         return order;
       }
@@ -488,13 +487,12 @@ export const getPatientWithSampleDetails = createSelector(
         ),
         (sample) => {
           if (
-            (sample?.searchingText
+            sample?.searchingText
               ?.toLowerCase()
               .indexOf(props?.searchingText.toLowerCase()) > -1 &&
-              sample?.department?.departmentName
-                .toLowerCase()
-                .indexOf(props?.department?.toLowerCase()) > -1) ||
-            !sample?.department
+            sample?.department?.departmentName
+              .toLowerCase()
+              .indexOf(props?.department?.toLowerCase()) > -1
           ) {
             return sample;
           }
