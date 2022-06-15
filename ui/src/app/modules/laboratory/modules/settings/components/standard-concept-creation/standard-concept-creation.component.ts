@@ -4,6 +4,7 @@ import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
 import { TextArea } from "src/app/shared/modules/form/models/text-area.model";
 import { Textbox } from "src/app/shared/modules/form/models/text-box.model";
+import { BillableItemsService } from "src/app/shared/resources/billable-items/services/billable-items.service";
 import { ConceptsService } from "src/app/shared/resources/concepts/services/concepts.service";
 import { ConceptGetFull } from "src/app/shared/resources/openmrs";
 
@@ -36,7 +37,10 @@ export class StandardConceptCreationComponent implements OnInit {
   testMethodField: any;
   testMethodSelected: boolean = false;
   selectedTestMethodDetails$: Observable<ConceptGetFull[]>;
-  constructor(private conceptService: ConceptsService) {}
+  constructor(
+    private conceptService: ConceptsService,
+    private billableItemService: BillableItemsService
+  ) {}
 
   ngOnInit(): void {
     this.createBasicConceptFields();
@@ -190,13 +194,31 @@ export class StandardConceptCreationComponent implements OnInit {
     (!this.conceptUuid
       ? this.conceptService.createConcept(concept)
       : this.conceptService.updateConcept(this.conceptUuid, concept)
-    ).subscribe((response) => {
+    ).subscribe((response: any) => {
       if (response) {
-        this.saving = false;
-        this.conceptUuid = null;
-        this.conceptCreated.emit(true);
-        this.selectedSetMembers = [];
-        this.createBasicConceptFields();
+        // If it is test order create as a billable item
+        if (!this.conceptUuid && this.standardSearchTerm === "TEST_ORDERS") {
+          const billableItem = {
+            concept: { uuid: response?.uuid },
+          };
+          this.billableItemService
+            .createBillableItem(billableItem)
+            .subscribe((billableItemResponse) => {
+              if (billableItemResponse) {
+                this.saving = false;
+                this.conceptUuid = null;
+                this.conceptCreated.emit(true);
+                this.selectedSetMembers = [];
+                this.createBasicConceptFields();
+              }
+            });
+        } else {
+          this.saving = false;
+          this.conceptUuid = null;
+          this.conceptCreated.emit(true);
+          this.selectedSetMembers = [];
+          this.createBasicConceptFields();
+        }
       }
     });
   }
