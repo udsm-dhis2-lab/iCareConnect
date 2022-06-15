@@ -5,39 +5,53 @@
     (selectedIndexChange)="selectedTab.setValue($event)"
   >
     <mat-tab label="Tests Parameters Management">
-      <div class="p-3">
-        <app-parameters-dashboard></app-parameters-dashboard>
-      </div>
+      <ng-template matTabContent>
+        <div class="p-3">
+          <app-parameters-dashboard></app-parameters-dashboard>
+        </div>
+      </ng-template>
     </mat-tab>
     <mat-tab label="Test methods & Specimen Sources">
-      <div class="p-3">
-        <app-test-methods-dashboard></app-test-methods-dashboard>
-      </div>
+      <ng-template matTabContent>
+        <div class="p-3">
+          <app-test-methods-dashboard></app-test-methods-dashboard>
+        </div>
+      </ng-template>
     </mat-tab>
     <mat-tab label="Test Orders">
-      <div class="p-3">
-        <app-test-orders-management></app-test-orders-management>
-      </div>
+      <ng-template matTabContent>
+        <div class="p-3">
+          <app-test-orders-management></app-test-orders-management>
+        </div>
+      </ng-template>
     </mat-tab>
     <mat-tab label="Labs & Sections Management">
-      <div class="p-3">
-        <app-labs-and-sections-management></app-labs-and-sections-management>
-      </div>
+      <ng-template matTabContent>
+        <div class="p-3">
+          <app-labs-and-sections-management></app-labs-and-sections-management>
+        </div>
+      </ng-template>
     </mat-tab>
     <mat-tab label="Profiles && Access Control">
-      <div class="p-3">
-        <app-profiles-and-access-control></app-profiles-and-access-control>
-      </div>
+      <ng-template matTabContent>
+        <div class="p-3">
+          <app-profiles-and-access-control></app-profiles-and-access-control>
+        </div>
+      </ng-template>
     </mat-tab>
     <mat-tab label="Extended Test Settings">
-      <div class="p-3">
-        <app-extended-parameters-settings></app-extended-parameters-settings>
-      </div>
+      <ng-template matTabContent>
+        <div class="p-3">
+          <app-extended-parameters-settings></app-extended-parameters-settings>
+        </div>
+      </ng-template>
     </mat-tab>
     <mat-tab label="Other">
-      <div class="p-3">
-        <app-other-lab-configurations></app-other-lab-configurations>
-      </div>
+      <ng-template matTabContent>
+        <div class="p-3">
+          <app-other-lab-configurations></app-other-lab-configurations>
+        </div>
+      </ng-template>
     </mat-tab>
   </mat-tab-group>
 </div>

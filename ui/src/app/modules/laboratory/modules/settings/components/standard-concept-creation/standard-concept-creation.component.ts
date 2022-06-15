@@ -19,6 +19,8 @@ export class StandardConceptCreationComponent implements OnInit {
   @Input() searchTermForTestMethod: string;
   @Input() dataType: string;
   @Input() isSet: boolean;
+  @Input() itemTypeName: string;
+  @Input() setMembersHeaderName: string;
   basicConceptFields: any[];
   formData: any = {};
   isFormValid: boolean = false;
