@@ -64,7 +64,7 @@ export class SingleRegistrationComponent implements OnInit {
 
   referringDoctorFields: any[];
 
-  patientFieldSetClosed: boolean = true;
+  patientFieldSetClosed: boolean = false;
 
   registrationCategory: string = "Clinical";
 
