@@ -39,7 +39,7 @@
           <table class="table table-bordered">
             <thead class="table-header">
               <tr>
-                <th style="width: 15%">Test Order</th>
+                <th style="width: 15%">Test Parameter</th>
                 <th style="width: 5%">Container</th>
                 <th style="width: 5%">Label</th>
                 <th style="width: 15%">Ordered By</th>
@@ -53,7 +53,13 @@
                   *ngIf="item?.order?.concept?.setMembers?.length == 0"
                 >
                   <tr>
-                    <td>{{ item?.order?.concept?.name }}</td>
+                    <td>
+                      {{
+                        item?.order?.concept?.name
+                          ? item?.order?.concept?.name
+                          : item?.order?.concept?.display
+                      }}
+                    </td>
                     <td>
                       <span
                         *ngIf="
@@ -1381,7 +1387,7 @@
           </div>
         </div>
       </mat-tab>
-      <mat-tab label="Approval">
+      <mat-tab label="Approval" *ngIf="!LISConfigurations?.isLIS">
         <div
           style="margin-top: 15px; overflow: auto"
           [ngStyle]="{ 'max-height': maxHeight }"
