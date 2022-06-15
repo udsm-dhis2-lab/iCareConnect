@@ -5,7 +5,7 @@
   } as params"
 >
   <div class="col-lg-7 col-md-7 col-sx-12 col-sm-12">
-    <div class="h4">New</div>
+    <div class="h5">New {{ itemTypeName }}</div>
     <hr />
     <div class="loading-overlay" *ngIf="saving">
       <div class="text-center">
@@ -35,20 +35,26 @@
         "
         mode="indeterminate"
       ></mat-progress-bar>
-      <app-concept-set-members
+      <div
         *ngIf="
           (isSet && !editingSet && !searchTermForTestMethod) ||
           (searchTermForTestMethod &&
             testMethodSelected &&
             params?.selectedTestMethodDetails)
         "
-        [setMembersSearchTerm]="setMembersSearchTerm"
-        [selectedSetMembersItems]="selectedSetMembers"
-        [setMembersListFromTestMethod]="
-          params?.selectedTestMethodDetails?.setMembers
-        "
-        (selectedSetMembers)="onGetSelectedSetMembers($event)"
-      ></app-concept-set-members>
+      >
+        <div class="h5">
+          {{ setMembersHeaderName }}
+        </div>
+        <app-concept-set-members
+          [setMembersSearchTerm]="setMembersSearchTerm"
+          [selectedSetMembersItems]="selectedSetMembers"
+          [setMembersListFromTestMethod]="
+            params?.selectedTestMethodDetails?.setMembers
+          "
+          (selectedSetMembers)="onGetSelectedSetMembers($event)"
+        ></app-concept-set-members>
+      </div>
     </div>
     <div class="w-100 d-flex justify-content-end mt-2">
       <button mat-stroked-button (click)="onCancel($event)">Cancel</button>
@@ -69,6 +75,7 @@
     </div>
   </div>
   <div class="col-lg-5 col-md-5 col-sx-12 col-sm-12">
+    <div class="h5">{{ itemTypeName }}s</div>
     <app-standard-concepts-list
       *ngIf="!saving"
       [standardSearchTerm]="standardSearchTerm"

@@ -1,5 +1,5 @@
-import * as _ from 'lodash';
-import { generateSelectionOptions } from './patient.helper';
+import * as _ from "lodash";
+import { generateSelectionOptions } from "./patient.helper";
 
 export function formatSampleTypes(samples) {
   const formattedSampleType = _.map(samples, (sample) => {
@@ -33,19 +33,19 @@ export function formatSetMembers(SetMembers, SampleType, configs) {
 
 function getSetMemberState(test, configs) {
   // console.log('configs: ndani', configs);
-  if (test && test['mappings']) {
-    let testAvailability = _.filter(test['mappings'], (mapping) => {
-      return mapping['display'].includes('Lab Test Availability:');
+  if (test && test["mappings"]) {
+    let testAvailability = _.filter(test["mappings"], (mapping) => {
+      return mapping["display"].includes("Lab Test Availability:");
     });
 
     if (testAvailability.length > 0) {
-      if (testAvailability[0].conceptReferenceTerm.code == 'yes') {
-        return 'active';
-      } else if (testAvailability[0].conceptReferenceTerm.code == 'no') {
-        return 'stalled';
+      if (testAvailability[0].conceptReferenceTerm.code == "yes") {
+        return "active";
+      } else if (testAvailability[0].conceptReferenceTerm.code == "no") {
+        return "stalled";
       }
     } else {
-      return 'nostate';
+      return "nostate";
     }
   }
 }
@@ -94,8 +94,8 @@ export function getAllSampleTypesWithTheOrdersAsMember(sampleTypes, orders) {
         return sampleTypesMatched;
       }
     }),
-    ['name'],
-    ['asc']
+    ["name"],
+    ["asc"]
   );
 }
 
@@ -120,7 +120,7 @@ export function flagOrdersIfReadyPutIntoSampleTypes(
       return {
         addedToSample: true,
         ...orders[key],
-        sampleEncounterUuid: ordersInSamples[key]['encounterUuid'],
+        sampleEncounterUuid: ordersInSamples[key]["encounterUuid"],
       };
     } else {
       return {
@@ -138,16 +138,16 @@ export function createOrdersObject(encounters) {
     _.each(encounter.orders, (order) => {
       orders[
         order.display +
-          '-' +
+          "-" +
           encounter.patient.uuid +
-          '-' +
+          "-" +
           encounter.visit.uuid
       ] = {
         id:
           order.display +
-          '-' +
+          "-" +
           encounter.patient.uuid +
-          '-' +
+          "-" +
           encounter.visit.uuid,
         encounterUuid: encounter.uuid,
         ...order,
@@ -185,6 +185,7 @@ export function keyDepartmentsByTestOrder(items) {
       keyedTests[test?.uuid] = {
         departmentName: item?.display,
         departmentUuid: item?.uuid,
+        ...item,
       };
     });
   });
@@ -263,54 +264,54 @@ export function groupLabOrdersBySpecimenSources(
       _.map(labOrder?.groupedOrders, (order) => {
         const departmentAndSpecimenSource =
           departmentsKeyedByTestOrder[order?.concept_uuid]?.departmentName +
-          '-' +
+          "-" +
           keyedTests[order?.concept_uuid]?.specimenName;
         return {
           ...order,
           visit_concept_order:
             order?.visit_uuid +
-            '-' +
+            "-" +
             order?.concept_uuid +
-            '-' +
+            "-" +
             order?.order_uuid,
           containerDetails: testsContainers[order?.concept_uuid]
             ? testsContainers[order?.concept_uuid]
-            : labConfigs['otherContainer'],
+            : labConfigs["otherContainer"],
           allocations: collectedLabOrders[
             order?.visit_uuid +
-              '-' +
+              "-" +
               order?.concept_uuid +
-              '-' +
+              "-" +
               order?.order_uuid
           ]
             ? collectedLabOrders[
                 order?.visit_uuid +
-                  '-' +
+                  "-" +
                   order?.concept_uuid +
-                  '-' +
+                  "-" +
                   order?.order_uuid
               ]?.allocations
             : [],
           orderer: collectedLabOrders[
             order?.visit_uuid +
-              '-' +
+              "-" +
               order?.concept_uuid +
-              '-' +
+              "-" +
               order?.order_uuid
           ]
             ? collectedLabOrders[
                 order?.visit_uuid +
-                  '-' +
+                  "-" +
                   order?.concept_uuid +
-                  '-' +
+                  "-" +
                   order?.order_uuid
               ]?.orderer
             : { name: order?.orderer_names },
           collected: collectedLabOrders[
             order?.visit_uuid +
-              '-' +
+              "-" +
               order?.concept_uuid +
-              '-' +
+              "-" +
               order?.order_uuid
           ]
             ? true
@@ -318,32 +319,32 @@ export function groupLabOrdersBySpecimenSources(
           accepted:
             collectedLabOrders[
               order?.visit_uuid +
-                '-' +
+                "-" +
                 order?.concept_uuid +
-                '-' +
+                "-" +
                 order?.order_uuid
             ] &&
             collectedLabOrders[
               order?.visit_uuid +
-                '-' +
+                "-" +
                 order?.concept_uuid +
-                '-' +
+                "-" +
                 order?.order_uuid
             ]?.sampleAccepted
               ? true
               : false,
           acceptedBy: collectedLabOrders[
             order?.visit_uuid +
-              '-' +
+              "-" +
               order?.concept_uuid +
-              '-' +
+              "-" +
               order?.order_uuid
           ]
             ? collectedLabOrders[
                 order?.visit_uuid +
-                  '-' +
+                  "-" +
                   order?.concept_uuid +
-                  '-' +
+                  "-" +
                   order?.order_uuid
               ]?.acceptedBy
             : null,
@@ -351,29 +352,29 @@ export function groupLabOrdersBySpecimenSources(
           reCollect:
             collectedLabOrders[
               order?.visit_uuid +
-                '-' +
+                "-" +
                 order?.concept_uuid +
-                '-' +
+                "-" +
                 order?.order_uuid
             ] &&
-            collectedLabOrders[order?.visit_uuid + '-' + order?.concept_uuid] +
-              '-' +
+            collectedLabOrders[order?.visit_uuid + "-" + order?.concept_uuid] +
+              "-" +
               order?.order_uuid?.reCollect
               ? true
               : false,
           rejected:
             collectedLabOrders[
               order?.visit_uuid +
-                '-' +
+                "-" +
                 order?.concept_uuid +
-                '-' +
+                "-" +
                 order?.order_uuid
             ] &&
             collectedLabOrders[
               order?.visit_uuid +
-                '-' +
+                "-" +
                 order?.concept_uuid +
-                '-' +
+                "-" +
                 order?.order_uuid
             ]?.sampleRejected
               ? true
@@ -381,34 +382,34 @@ export function groupLabOrdersBySpecimenSources(
           rejectionReason:
             collectedLabOrders[
               order?.visit_uuid +
-                '-' +
+                "-" +
                 order?.concept_uuid +
-                '-' +
+                "-" +
                 order?.order_uuid
             ] &&
-            collectedLabOrders[order?.visit_uuid + '-' + order?.concept_uuid] +
-              '-' +
+            collectedLabOrders[order?.visit_uuid + "-" + order?.concept_uuid] +
+              "-" +
               order?.order_uuid?.sampleRejected
               ? collectedLabOrders[
                   order?.visit_uuid +
-                    '-' +
+                    "-" +
                     order?.concept_uuid +
-                    '-' +
+                    "-" +
                     order?.order_uuid
                 ]?.rejectionReason
-              : 'false',
+              : "false",
           rejectedBy: collectedLabOrders[
             order?.visit_uuid +
-              '-' +
+              "-" +
               order?.concept_uuid +
-              '-' +
+              "-" +
               order?.order_uuid
           ]
             ? collectedLabOrders[
                 order?.visit_uuid +
-                  '-' +
+                  "-" +
                   order?.concept_uuid +
-                  '-' +
+                  "-" +
                   order?.order_uuid
               ]?.rejectedBy
             : null,
@@ -431,136 +432,136 @@ export function groupLabOrdersBySpecimenSources(
           specimenUuid: keyedTests[order?.concept_uuid]?.specimenUuid,
           patient: collectedLabOrders[
             order?.visit_uuid +
-              '-' +
+              "-" +
               order?.concept_uuid +
-              '-' +
+              "-" +
               order?.order_uuid
           ]
             ? collectedLabOrders[
                 order?.visit_uuid +
-                  '-' +
+                  "-" +
                   order?.concept_uuid +
-                  '-' +
+                  "-" +
                   order?.order_uuid
               ]?.patient
             : null,
           collectedBy: collectedLabOrders[
             order?.visit_uuid +
-              '-' +
+              "-" +
               order?.concept_uuid +
-              '-' +
+              "-" +
               order?.order_uuid
           ]
             ? collectedLabOrders[
                 order?.visit_uuid +
-                  '-' +
+                  "-" +
                   order?.concept_uuid +
-                  '-' +
+                  "-" +
                   order?.order_uuid
               ]?.collectedBy
             : null,
           rejectedAt: collectedLabOrders[
             order?.visit_uuid +
-              '-' +
+              "-" +
               order?.concept_uuid +
-              '-' +
+              "-" +
               order?.order_uuid
           ]
             ? collectedLabOrders[
                 order?.visit_uuid +
-                  '-' +
+                  "-" +
                   order?.concept_uuid +
-                  '-' +
+                  "-" +
                   order?.order_uuid
               ]?.rejectedAt
             : null,
           acceptedAt: collectedLabOrders[
             order?.visit_uuid +
-              '-' +
+              "-" +
               order?.concept_uuid +
-              '-' +
+              "-" +
               order?.order_uuid
           ]
             ? collectedLabOrders[
                 order?.visit_uuid +
-                  '-' +
+                  "-" +
                   order?.concept_uuid +
-                  '-' +
+                  "-" +
                   order?.order_uuid
               ]?.acceptedAt
             : null,
           sampleUuid: collectedLabOrders[
             order?.visit_uuid +
-              '-' +
+              "-" +
               order?.concept_uuid +
-              '-' +
+              "-" +
               order?.order_uuid
           ]
             ? collectedLabOrders[
                 order?.visit_uuid +
-                  '-' +
+                  "-" +
                   order?.concept_uuid +
-                  '-' +
+                  "-" +
                   order?.order_uuid
               ]?.sampleUuid
             : null,
           sampleIdentifier: collectedLabOrders[
             order?.visit_uuid +
-              '-' +
+              "-" +
               order?.concept_uuid +
-              '-' +
+              "-" +
               order?.order_uuid
           ]
             ? collectedLabOrders[
                 order?.visit_uuid +
-                  '-' +
+                  "-" +
                   order?.concept_uuid +
-                  '-' +
+                  "-" +
                   order?.order_uuid
               ]?.sampleIdentifier
             : null,
           priorityHigh: collectedLabOrders[
             order?.visit_uuid +
-              '-' +
+              "-" +
               order?.concept_uuid +
-              '-' +
+              "-" +
               order?.order_uuid
           ]
             ? collectedLabOrders[
                 order?.visit_uuid +
-                  '-' +
+                  "-" +
                   order?.concept_uuid +
-                  '-' +
+                  "-" +
                   order?.order_uuid
               ]?.priorityHigh
             : null,
           sampleCollectionDate: collectedLabOrders[
             order?.visit_uuid +
-              '-' +
+              "-" +
               order?.concept_uuid +
-              '-' +
+              "-" +
               order?.order_uuid
           ]
             ? collectedLabOrders[
                 order?.visit_uuid +
-                  '-' +
+                  "-" +
                   order?.concept_uuid +
-                  '-' +
+                  "-" +
                   order?.order_uuid
               ]?.sampleCollectionDate
             : null,
           unFormattedSampleCollectionDate: collectedLabOrders[
             order?.visit_uuid +
-              '-' +
+              "-" +
               order?.concept_uuid +
-              '-' +
+              "-" +
               order?.order_uuid
           ]
             ? collectedLabOrders[
                 order?.visit_uuid +
-                  '-' +
+                  "-" +
                   order?.concept_uuid +
-                  '-' +
+                  "-" +
                   order?.order_uuid
               ]?.unFormattedSampleCollectionDate
             : null,
@@ -569,11 +570,11 @@ export function groupLabOrdersBySpecimenSources(
           orderUuid: order?.order_uuid,
         };
       }),
-      'visit_concept_order'
+      "visit_concept_order"
     );
     const groupedBySpecimen = _.groupBy(
       formattedOrders,
-      'departmentAndSpecimenSource'
+      "departmentAndSpecimenSource"
     );
 
     let recreatedSamples = [];
@@ -581,7 +582,7 @@ export function groupLabOrdersBySpecimenSources(
       mrNo: labOrder?.id,
       groupedOrders: _.filter(
         _.map(Object.keys(groupedBySpecimen), (key) => {
-          if (key && key != 'undefined') {
+          if (key && key != "undefined") {
             const collectedSamples =
               _.filter(groupedBySpecimen[key], {
                 collected: true,
@@ -591,11 +592,11 @@ export function groupLabOrdersBySpecimenSources(
             const expectedSample = {
               id:
                 groupedBySpecimen[key][0]?.departmentName +
-                '-' +
+                "-" +
                 key +
-                '-' +
+                "-" +
                 groupedBySpecimen[key][0]?.visit_uuid +
-                '-',
+                "-",
               name: key,
               departmentName: groupedBySpecimen[key][0]?.departmentName,
               mrNo: labOrder?.id,
@@ -642,10 +643,10 @@ export function groupLabOrdersBySpecimenSources(
               orders: groupedBySpecimen[key],
               rejectionReason:
                 codedSampleRejectionReasons &&
-                _.groupBy(codedSampleRejectionReasons, 'uuid')[
+                _.groupBy(codedSampleRejectionReasons, "uuid")[
                   groupedBySpecimen[key][0]?.rejectionReason
                 ]
-                  ? (_.groupBy(codedSampleRejectionReasons, 'uuid')[
+                  ? (_.groupBy(codedSampleRejectionReasons, "uuid")[
                       groupedBySpecimen[key][0]?.rejectionReason
                     ] || [])[0]?.display
                   : groupedBySpecimen[key][0]?.rejectionReason,
@@ -669,12 +670,12 @@ export function groupLabOrdersBySpecimenSources(
 
             const groupedOrdersByCollection = _.groupBy(
               expectedSample?.orders,
-              'sampleIdentifier'
+              "sampleIdentifier"
             );
 
             const orderGroupedKeys = Object.keys(groupedOrdersByCollection);
             _.map(orderGroupedKeys, (key) => {
-              if (key && key != 'null') {
+              if (key && key != "null") {
                 recreatedSamples = [
                   ...recreatedSamples,
                   {
@@ -839,11 +840,11 @@ export function groupLabOrdersBySpecimenSources(
 
     // const mySamples = {}
     mySamples = _.map(
-      Object.keys(_.groupBy(_.uniqBy(allSamples, 'id'), 'mrNo')),
+      Object.keys(_.groupBy(_.uniqBy(allSamples, "id"), "mrNo")),
       (key) => {
         return {
           mrNo: key,
-          groupedOrders: _.groupBy(_.uniqBy(allSamples, 'id'), 'mrNo')[key],
+          groupedOrders: _.groupBy(_.uniqBy(allSamples, "id"), "mrNo")[key],
         };
       }
     );

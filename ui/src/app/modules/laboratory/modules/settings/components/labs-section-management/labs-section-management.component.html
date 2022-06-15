@@ -1,0 +1,24 @@
+<div>
+  <mat-tab-group>
+    <mat-tab label="Lab Sections">
+      <ng-template matTabContent>
+        <div class="p-3">
+          <app-standard-concept-creation
+            [conceptClass]="'LAB Department'"
+            [dataType]="'8d4a4c94-c2cc-11de-8d13-0010c6dffd0f'"
+            [isSet]="true"
+            [itemTypeName]="'Lab Section'"
+            [setMembersHeaderName]="'Test orders'"
+            [standardSearchTerm]="'LAB_DEPARTMENT'"
+            [setMembersSearchTerm]="'TEST_ORDERS'"
+          ></app-standard-concept-creation>
+        </div>
+      </ng-template>
+    </mat-tab>
+    <mat-tab label="Laboratories">
+      <ng-template matTabContent>
+        <div class="p-3"></div>
+      </ng-template>
+    </mat-tab>
+  </mat-tab-group>
+</div>
