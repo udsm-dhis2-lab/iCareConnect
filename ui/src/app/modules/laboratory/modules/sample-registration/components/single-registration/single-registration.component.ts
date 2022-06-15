@@ -4,6 +4,7 @@ import { MatRadioChange } from "@angular/material/radio";
 import * as moment from "moment";
 import { Observable, zip } from "rxjs";
 import { NON_CLINICAL_PERSON_DATA } from "src/app/core/constants/non-clinical-person.constant";
+import { formulateSamplesByDepartments } from "src/app/core/helpers/create-samples-as-per-departments.helper";
 import { Location } from "src/app/core/models";
 import { SystemSettingsWithKeyDetails } from "src/app/core/models/system-settings.model";
 import { LocationService } from "src/app/core/services";
@@ -19,6 +20,7 @@ import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
 import { Textbox } from "src/app/shared/modules/form/models/text-box.model";
 import { ICARE_CONFIG } from "src/app/shared/resources/config";
 import { DiagnosisService } from "src/app/shared/resources/diagnosis/services";
+import { ConceptGetFull } from "src/app/shared/resources/openmrs";
 import { VisitsService } from "src/app/shared/resources/visits/services";
 import { SamplesService } from "src/app/shared/services/samples.service";
 import { BarCodeModalComponent } from "../../../sample-acceptance-and-results/components/bar-code-modal/bar-code-modal.component";
@@ -36,6 +38,7 @@ export class SingleRegistrationComponent implements OnInit {
   @Input() agencyConceptConfigs: any;
   @Input() referFromFacilityVisitAttribute: string;
   @Input() referringDoctorAttributes: SystemSettingsWithKeyDetails[];
+  @Input() labSections: ConceptGetFull[];
 
   departmentField: any = {};
   specimenDetailsFields: any;
@@ -428,11 +431,18 @@ export class SingleRegistrationComponent implements OnInit {
                       .subscribe((visitResponse) => {
                         this.savingDataResponse = visitResponse;
                         if (!visitResponse?.error) {
+                          let testOrders = [];
                           const orders = Object.keys(this.formData)
                             .map((key) => {
                               if (
                                 key?.toLocaleLowerCase().indexOf("test") > -1
                               ) {
+                                testOrders = [
+                                  ...testOrders,
+                                  {
+                                    ...this.formData[key],
+                                  },
+                                ];
                                 return {
                                   concept: this.formData[key]?.value,
                                   orderType:
@@ -463,6 +473,13 @@ export class SingleRegistrationComponent implements OnInit {
                               },
                             ],
                           };
+
+                          console.log("TEST ORDERS", testOrders);
+                          const samplesExpected = formulateSamplesByDepartments(
+                            this.labSections,
+                            testOrders
+                          );
+                          console.log(samplesExpected);
 
                           // Create encounter with orders
                           this.labOrdersService

@@ -5,6 +5,7 @@ import { Observable } from "rxjs";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { LabSampleModel } from "src/app/modules/laboratory/resources/models";
 import { LISConfigurationsModel } from "src/app/modules/laboratory/resources/models/lis-configurations.model";
+import { ConceptGetFull } from "src/app/shared/resources/openmrs";
 import { SamplesService } from "src/app/shared/services/samples.service";
 import { loadConceptByUuid } from "src/app/store/actions";
 import { AppState } from "src/app/store/reducers";
@@ -18,6 +19,7 @@ import { getConceptById } from "src/app/store/selectors";
 export class RegisterSampleComponent implements OnInit {
   @Input() provider: any;
   @Input() LISConfigurations: LISConfigurationsModel;
+  @Input() labSections: ConceptGetFull[];
   registrationCategory: string = "single";
 
   labSamples$: Observable<{ pager: any; results: LabSampleModel[] }>;
