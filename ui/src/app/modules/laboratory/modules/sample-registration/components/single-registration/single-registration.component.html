@@ -5,7 +5,12 @@
     testsUnderDepartment: testsUnderDepartment$ | async
   } as params"
 >
-  <div class="row" *ngIf="params?.labSampleLabel">
+  <div class="row">
+    <div *ngIf="errorMessage" class="col-12 mt-2 p-3">
+      <div class="alert alert-danger" role="alert">
+        {{ errorMessage }}
+      </div>
+    </div>
     <div class="col-12">
       <mat-radio-group class="registration-category">
         <mat-radio-button
@@ -62,10 +67,10 @@
               <div class="for-specimen-details">
                 <fieldset>
                   <legend>Specimen Details</legend>
-                  <app-sample-label
+                  <!-- <app-sample-label
                     [label]="params?.labSampleLabel"
                     (sampleLabel)="onGetSampleLabel($event)"
-                  ></app-sample-label>
+                  ></app-sample-label> -->
                   <app-form
                     [fields]="specimenDetailsFields"
                     [isFormHorizontal]="true"
@@ -178,8 +183,8 @@
     </div>
   </div>
 
-  <mat-progress-bar
+  <!-- <mat-progress-bar
     *ngIf="!params?.labSampleLabel"
     mode="indeterminate"
-  ></mat-progress-bar>
+  ></mat-progress-bar> -->
 </div>
