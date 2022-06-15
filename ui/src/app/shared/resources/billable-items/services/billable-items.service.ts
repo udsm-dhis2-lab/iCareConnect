@@ -17,6 +17,13 @@ export class BillableItemsService {
     );
   }
 
+  createPrice(payload: any): Observable<any> {
+    return this.httpClientService.post("icare/itemprice", payload).pipe(
+      map((response: any) => response),
+      catchError((error) => of(error))
+    );
+  }
+
   getItemsWithPrices(): Observable<any[]> {
     return this.httpClientService.get("icare/itemprice").pipe(
       map((response) => {
