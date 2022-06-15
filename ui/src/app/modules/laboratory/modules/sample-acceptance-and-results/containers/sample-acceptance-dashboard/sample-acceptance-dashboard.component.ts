@@ -2,7 +2,10 @@ import { Component, Input, OnInit } from "@angular/core";
 import { Observable } from "rxjs";
 import { Store } from "@ngrx/store";
 import { AppState } from "src/app/store/reducers";
-import { loadLabSamplesByCollectionDates } from "src/app/store/actions";
+import {
+  addLabDepartments,
+  loadLabSamplesByCollectionDates,
+} from "src/app/store/actions";
 import {
   getCodedSampleRejectionReassons,
   getFormattedLabSamplesLoadedState,
@@ -36,6 +39,9 @@ export class SampleAcceptanceDashboardComponent implements OnInit {
   ngOnInit(): void {
     this.currentUser$ = this.store.select(getCurrentUserDetails);
     // console.log("Acceptance", this.datesParameters, this.labSamplesDepartments);
+    this.store.dispatch(
+      addLabDepartments({ labDepartments: this.labSamplesDepartments })
+    );
     this.store.dispatch(
       loadLabSamplesByCollectionDates({
         datesParameters: this.datesParameters,
