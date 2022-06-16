@@ -4,6 +4,35 @@
     (formUpdate)="onFormUpdate($event)"
   ></app-form> -->
 
+  <div class="tests-control">
+    <mat-radio-group class="test-selection-category">
+      <mat-radio-button
+        [title]="
+          !setMembersFromSpecimen
+            ? 'Specimen not selected'
+            : 'Click to get test orders under selected specimen'
+        "
+        (change)="getSelection($event)"
+        class="test-selection-category-btn"
+        [disabled]="!setMembersFromSpecimen"
+        [value]="'by-specimen'"
+        [checked]="testSelectionCategory === 'by-specimen'"
+        color="primary"
+      >
+        By selected Specimen
+      </mat-radio-button>
+      <mat-radio-button
+        (change)="getSelection($event)"
+        class="test-selection-category-btn ml-2"
+        [value]="'All'"
+        [checked]="testSelectionCategory === 'All'"
+        color="primary"
+      >
+        All
+      </mat-radio-button>
+    </mat-radio-group>
+  </div>
+
   <app-multiple-concepts-selection
     *ngIf="params?.conceptsList"
     [concepts]="params?.conceptsList"
