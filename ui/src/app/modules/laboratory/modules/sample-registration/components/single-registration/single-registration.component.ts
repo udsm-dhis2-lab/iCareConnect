@@ -78,6 +78,8 @@ export class SingleRegistrationComponent implements OnInit {
 
   sampleLabelsUsedDetails: any[] = [];
 
+  isRegistrationReady: boolean = true;
+
   constructor(
     private samplesService: SamplesService,
     private labTestsService: LabTestsService,
@@ -572,16 +574,11 @@ export class SingleRegistrationComponent implements OnInit {
                                               .createLabSample(sample)
                                               .subscribe((sampleResponse) => {
                                                 this.sampleLabelsUsedDetails = [
-                                                  ...{
-                                                    ...this
-                                                      .sampleLabelsUsedDetails,
-                                                    items:
-                                                      this
-                                                        .groupedTestOrdersByDepartments[
-                                                        index
-                                                      ],
+                                                  ...this
+                                                    .sampleLabelsUsedDetails,
+                                                  {
+                                                    ...sample,
                                                   },
-                                                  sampleResponse,
                                                 ];
                                                 this.savingDataResponse =
                                                   sampleResponse;
@@ -590,25 +587,6 @@ export class SingleRegistrationComponent implements OnInit {
                                                     .formData["agency"]?.value
                                                     ? true
                                                     : false;
-                                                  this.dialog.open(
-                                                    BarCodeModalComponent,
-                                                    {
-                                                      height: "200px",
-                                                      width: "15%",
-                                                      data: {
-                                                        identifier:
-                                                          this
-                                                            .currentSampleLabel,
-                                                        sample: sample,
-                                                        sampleLabelsUsedDetails:
-                                                          this
-                                                            .sampleLabelsUsedDetails,
-                                                      },
-                                                      disableClose: false,
-                                                      panelClass:
-                                                        "custom-dialog-container",
-                                                    }
-                                                  );
                                                   let statuses = [];
                                                   if (
                                                     this.formData["agency"]
@@ -736,6 +714,41 @@ export class SingleRegistrationComponent implements OnInit {
                                                           if (
                                                             sampleStatusResponse
                                                           ) {
+                                                            this.dialog
+                                                              .open(
+                                                                BarCodeModalComponent,
+                                                                {
+                                                                  height:
+                                                                    "200px",
+                                                                  width: "15%",
+                                                                  data: {
+                                                                    identifier:
+                                                                      this
+                                                                        .currentSampleLabel,
+                                                                    sample:
+                                                                      sample,
+                                                                    sampleLabelsUsedDetails:
+                                                                      this
+                                                                        .sampleLabelsUsedDetails,
+                                                                  },
+                                                                  disableClose:
+                                                                    false,
+                                                                  panelClass:
+                                                                    "custom-dialog-container",
+                                                                }
+                                                              )
+                                                              .afterClosed()
+                                                              .subscribe(() => {
+                                                                this.isRegistrationReady =
+                                                                  false;
+                                                                setTimeout(
+                                                                  () => {
+                                                                    this.isRegistrationReady =
+                                                                      true;
+                                                                  },
+                                                                  200
+                                                                );
+                                                              });
                                                             this.savingData =
                                                               false;
                                                           }

@@ -1,8 +1,12 @@
 import { Component, Input, OnInit } from "@angular/core";
+import { MatDialog } from "@angular/material/dialog";
 import { Store } from "@ngrx/store";
 import { Observable } from "rxjs";
 import { LISConfigurationsModel } from "src/app/modules/laboratory/resources/models/lis-configurations.model";
-import { loadLabSamplesByCollectionDates } from "src/app/store/actions";
+import {
+  addLabDepartments,
+  loadLabSamplesByCollectionDates,
+} from "src/app/store/actions";
 import { AppState } from "src/app/store/reducers";
 import {
   getCodedSampleRejectionReassons,
@@ -11,6 +15,7 @@ import {
   getLabConfigurations,
 } from "src/app/store/selectors";
 import { getCurrentUserPrivileges } from "src/app/store/selectors/current-user.selectors";
+import { BarCodeModalComponent } from "../../../sample-acceptance-and-results/components/bar-code-modal/bar-code-modal.component";
 
 @Component({
   selector: "app-sample-tracking-dashboard",
@@ -33,9 +38,12 @@ export class SampleTrackingDashboardComponent implements OnInit {
   searchingText: string = "";
   allSamples$: Observable<any[]>;
   selectedDepartment: string = "";
-  constructor(private store: Store<AppState>) {}
+  constructor(private store: Store<AppState>, private dialog: MatDialog) {}
 
   ngOnInit(): void {
+    this.store.dispatch(
+      addLabDepartments({ labDepartments: this.labSamplesDepartments })
+    );
     this.store.dispatch(
       loadLabSamplesByCollectionDates({
         datesParameters: this.datesParameters,
@@ -81,5 +89,26 @@ export class SampleTrackingDashboardComponent implements OnInit {
         searchingText: this.searchingText,
       });
     }
+  }
+
+  onPrintBarCodes(event: Event, sample: any): void {
+    event.stopPropagation();
+    const sampleDetails = {
+      label: sample?.label,
+      orders: sample?.orders.map((order) => {
+        return {
+          ...order?.order?.concept,
+        };
+      }),
+    };
+    this.dialog.open(BarCodeModalComponent, {
+      height: "200px",
+      width: "15%",
+      data: {
+        sampleLabelsUsedDetails: [sampleDetails],
+      },
+      disableClose: false,
+      panelClass: "custom-dialog-container",
+    });
   }
 }
