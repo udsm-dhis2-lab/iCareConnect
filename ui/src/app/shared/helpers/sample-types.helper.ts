@@ -186,6 +186,9 @@ export function keyDepartmentsByTestOrder(items) {
         departmentName: item?.display,
         departmentUuid: item?.uuid,
         ...item,
+        keyedConcept: (item?.setMembers.filter(
+          (member) => member?.uuid === test?.uuid
+        ) || [])[0],
       };
     });
   });

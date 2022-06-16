@@ -8,6 +8,7 @@ import { Textbox } from "src/app/shared/modules/form/models/text-box.model";
 import { BillableItemsService } from "src/app/shared/resources/billable-items/services/billable-items.service";
 import { ConceptsService } from "src/app/shared/resources/concepts/services/concepts.service";
 import {
+  ConceptdatatypeGet,
   ConceptGetFull,
   ConceptsourceGet,
 } from "src/app/shared/resources/openmrs";
@@ -26,7 +27,12 @@ export class StandardConceptCreationComponent implements OnInit {
   @Input() isSet: boolean;
   @Input() itemTypeName: string;
   @Input() setMembersHeaderName: string;
+  @Input() conceptDataTypes: ConceptdatatypeGet[];
+  @Input() inheritProperties: boolean;
   basicConceptFields: any[];
+  dataTypeField: any;
+  unitsField: any;
+  displayPrecisionField: any;
   formData: any = {};
   isFormValid: boolean = false;
 
@@ -57,6 +63,16 @@ export class StandardConceptCreationComponent implements OnInit {
       this.createTestMethodField();
     }
 
+    if (!this.dataType && this.conceptDataTypes) {
+      this.createDataTypeField();
+      this.createDisplayPrecisionField();
+      this.createUnitField();
+    }
+
+    if (this.inheritProperties) {
+      this.createUnitField();
+    }
+
     this.conceptSources$ = this.conceptSourceService.getConceptSources();
   }
 
@@ -71,6 +87,42 @@ export class StandardConceptCreationComponent implements OnInit {
       conceptClass: "Test",
       searchControlType: "concept",
       shouldHaveLiveSearchForDropDownFields: true,
+    });
+  }
+
+  createDataTypeField(data?: any): void {
+    this.dataTypeField = new Dropdown({
+      id: "datatype",
+      key: "datatype",
+      label: "Data type",
+      required: true,
+      value: data ? data?.datatype?.uuid : null,
+      options: this.conceptDataTypes.map((conceptDataType) => {
+        return {
+          key: conceptDataType?.uuid,
+          value: conceptDataType?.uuid,
+          label: conceptDataType?.display,
+          name: conceptDataType?.display,
+        };
+      }),
+    });
+  }
+
+  createDisplayPrecisionField() {
+    this.displayPrecisionField = new Textbox({
+      id: "precision",
+      key: "precision",
+      label: "Display precision",
+      type: "number",
+    });
+  }
+
+  createUnitField(): void {
+    this.unitsField = new Textbox({
+      id: "units",
+      key: "units",
+      label: "Units",
+      type: "text",
     });
   }
 
@@ -109,6 +161,10 @@ export class StandardConceptCreationComponent implements OnInit {
     this.isFormValid = formValues.isValid;
   }
 
+  onFormUpdateForDataType(formValues: FormValue): void {
+    this.formData = { ...this.formData, ...formValues.getValues() };
+  }
+
   onFormUpdateTestMethod(formValues: FormValue): void {
     this.formData = { ...this.formData, ...formValues.getValues() };
     const methodUuid = this.formData["testmethod"]?.value;
@@ -116,10 +172,20 @@ export class StandardConceptCreationComponent implements OnInit {
       this.testMethodSelected = true;
       this.formData["testmethod"]?.value;
       this.selectedTestMethodDetails$ =
-        this.conceptService.getConceptDetailsByUuid(
-          methodUuid,
-          "custom:(uuid,display,setMembers:(uuid,display))"
-        );
+        this.conceptService.getConceptDetailsByUuid(methodUuid, "full");
+
+      this.selectedTestMethodDetails$.subscribe((response: any) => {
+        if (response) {
+          let newFormData = {};
+          newFormData["datatype"] = {
+            value: (this.conceptDataTypes?.filter(
+              (dataType) => dataType?.display === response?.datatype?.display
+            ) || [])[0]?.uuid,
+          };
+          this.formData = { ...this.formData, ...newFormData };
+          this.createDisplayPrecisionField();
+        }
+      });
     }
   }
 
@@ -152,7 +218,7 @@ export class StandardConceptCreationComponent implements OnInit {
     this.selectedCodes = selectedCodes;
   }
 
-  onSave(event: Event): void {
+  onSave(event: Event, selectedTestMethodDetails?: any): void {
     event.stopPropagation();
 
     let names = [
@@ -213,6 +279,8 @@ export class StandardConceptCreationComponent implements OnInit {
       ],
       datatype: this.dataType
         ? this.dataType
+        : this.formData["datatype"]?.value
+        ? this.formData["datatype"]?.value
         : "8d4a4c94-c2cc-11de-8d13-0010c6dffd0f",
       // Softcode concept class
       set: this.isSet ? this.isSet : false,
@@ -221,6 +289,15 @@ export class StandardConceptCreationComponent implements OnInit {
           ? this.selectedSetMembers.map((member) => member?.uuid)
           : [],
       conceptClass: this.conceptClass,
+      units: this.formData["units"]?.value
+        ? this.formData["units"]?.value
+        : null,
+      displayPrecision:
+        this.formData["datatype"]?.value ===
+          "8d4a4488-c2cc-11de-8d13-0010c6dffd0f" &&
+        this.formData["precision"]?.value
+          ? this.formData["precision"]?.value
+          : null,
       mappings,
     };
     (!this.conceptUuid

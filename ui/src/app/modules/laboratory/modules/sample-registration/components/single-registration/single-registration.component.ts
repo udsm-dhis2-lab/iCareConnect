@@ -3,7 +3,6 @@ import { MatDialog } from "@angular/material/dialog";
 import { MatRadioChange } from "@angular/material/radio";
 import * as moment from "moment";
 import { Observable, zip } from "rxjs";
-import { map } from "rxjs/operators";
 import { NON_CLINICAL_PERSON_DATA } from "src/app/core/constants/non-clinical-person.constant";
 import {
   determineIfAtLeastOneTestHasNoDepartment,
@@ -29,7 +28,8 @@ import { VisitsService } from "src/app/shared/resources/visits/services";
 import { SamplesService } from "src/app/shared/services/samples.service";
 import { BarCodeModalComponent } from "../../../sample-acceptance-and-results/components/bar-code-modal/bar-code-modal.component";
 
-import { uniqBy } from "lodash";
+import { uniqBy, keyBy } from "lodash";
+import { OrdersService } from "src/app/shared/resources/order/services/orders.service";
 
 @Component({
   selector: "app-single-registration",
@@ -78,6 +78,8 @@ export class SingleRegistrationComponent implements OnInit {
 
   sampleLabelsUsedDetails: any[] = [];
 
+  isRegistrationReady: boolean = true;
+
   constructor(
     private samplesService: SamplesService,
     private labTestsService: LabTestsService,
@@ -87,7 +89,8 @@ export class SingleRegistrationComponent implements OnInit {
     private visitsService: VisitsService,
     private labOrdersService: LabOrdersService,
     private diagnosisService: DiagnosisService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private orderService: OrdersService
   ) {
     this.currentLocation = JSON.parse(localStorage.getItem("currentLocation"));
   }
@@ -540,210 +543,322 @@ export class SingleRegistrationComponent implements OnInit {
                                   (encounterResponse, index) => {
                                     if (!encounterResponse?.error) {
                                       this.savingData = true;
-                                      this.samplesService
-                                        .getSampleLabel()
-                                        .subscribe((sampleLabelResponse) => {
-                                          if (sampleLabelResponse) {
-                                            // Create sample
-                                            const sampleLabel =
-                                              "LIS/TZ/" + sampleLabelResponse;
-                                            const sample = {
-                                              visit: {
-                                                uuid: visitResponse?.uuid,
+                                      // Get orders details for allocations
+                                      const orderUuids =
+                                        encounterResponse?.orders.map(
+                                          (order) => {
+                                            return order?.uuid;
+                                          }
+                                        );
+                                      this.orderService
+                                        .getOrdersByUuids(orderUuids)
+                                        .subscribe((ordersResponse) => {
+                                          if (ordersResponse) {
+                                            const configs = {
+                                              otherContainer: {
+                                                id: "eb21ff23-a627-4a62-8bd0-efdc1db2ebb5",
+                                                uuid: "eb21ff23-a627-4a62-8bd0-efdc1db2ebb5",
                                               },
-                                              label: sampleLabel,
-                                              concept: {
-                                                uuid: this
-                                                  .groupedTestOrdersByDepartments[
-                                                  index
-                                                ][0]?.departmentUuid,
-                                              },
-                                              orders:
-                                                encounterResponse?.orders.map(
-                                                  (order) => {
-                                                    return {
-                                                      uuid: order?.uuid,
-                                                    };
-                                                  }
-                                                ),
                                             };
-                                            // Create sample
+
+                                            const keyedOrders = keyBy(
+                                              ordersResponse,
+                                              "uuid"
+                                            );
+
                                             this.samplesService
-                                              .createLabSample(sample)
-                                              .subscribe((sampleResponse) => {
-                                                this.sampleLabelsUsedDetails = [
-                                                  ...{
-                                                    ...this
-                                                      .sampleLabelsUsedDetails,
-                                                    items:
-                                                      this
-                                                        .groupedTestOrdersByDepartments[
-                                                        index
-                                                      ],
-                                                  },
-                                                  sampleResponse,
-                                                ];
-                                                this.savingDataResponse =
-                                                  sampleResponse;
-                                                if (sampleResponse) {
-                                                  this.savingData = this
-                                                    .formData["agency"]?.value
-                                                    ? true
-                                                    : false;
-                                                  this.dialog.open(
-                                                    BarCodeModalComponent,
-                                                    {
-                                                      height: "200px",
-                                                      width: "15%",
-                                                      data: {
-                                                        identifier:
-                                                          this
-                                                            .currentSampleLabel,
-                                                        sample: sample,
-                                                        sampleLabelsUsedDetails:
-                                                          this
-                                                            .sampleLabelsUsedDetails,
+                                              .getSampleLabel()
+                                              .subscribe(
+                                                (sampleLabelResponse) => {
+                                                  if (sampleLabelResponse) {
+                                                    // Create sample
+                                                    const sampleLabel =
+                                                      "LIS/TZ/" +
+                                                      new Date().getFullYear() +
+                                                      "/" +
+                                                      (new Date().getMonth() +
+                                                        1) +
+                                                      "/" +
+                                                      new Date().getDate() +
+                                                      "/" +
+                                                      sampleLabelResponse;
+                                                    const sample = {
+                                                      visit: {
+                                                        uuid: visitResponse?.uuid,
                                                       },
-                                                      disableClose: false,
-                                                      panelClass:
-                                                        "custom-dialog-container",
-                                                    }
-                                                  );
-                                                  let statuses = [];
-                                                  if (
-                                                    this.formData["agency"]
-                                                      ?.value
-                                                  ) {
-                                                    const agencyStatus = {
-                                                      sample: {
-                                                        uuid: sampleResponse?.uuid,
+                                                      label: sampleLabel,
+                                                      concept: {
+                                                        uuid: this
+                                                          .groupedTestOrdersByDepartments[
+                                                          index
+                                                        ][0]?.departmentUuid,
                                                       },
-                                                      user: {
-                                                        uuid: localStorage.getItem(
-                                                          "userUuid"
+                                                      orders:
+                                                        encounterResponse?.orders.map(
+                                                          (order) => {
+                                                            return {
+                                                              uuid: order?.uuid,
+                                                            };
+                                                          }
                                                         ),
-                                                      },
-                                                      remarks:
-                                                        this.formData["agency"]
-                                                          ?.value,
-                                                      status: "PRIORITY",
                                                     };
-                                                    statuses = [
-                                                      ...statuses,
-                                                      agencyStatus,
-                                                    ];
-                                                  }
-
-                                                  if (
-                                                    this.formData["receivedOn"]
-                                                      ?.value
-                                                  ) {
-                                                    const receivedOnStatus = {
-                                                      sample: {
-                                                        uuid: sampleResponse?.uuid,
-                                                      },
-                                                      user: {
-                                                        uuid: localStorage.getItem(
-                                                          "userUuid"
-                                                        ),
-                                                      },
-                                                      remarks: "RECEIVED_ON",
-                                                      status: "RECEIVED_ON",
-                                                      timestamp: `${moment(
-                                                        this.formData[
-                                                          "receivedOn"
-                                                        ]?.value
-                                                      ).format("YYYY-MM-DD")} ${
-                                                        this.formData[
-                                                          "receivedAt"
-                                                        ]?.value
-                                                      }:00.001`,
-                                                    };
-                                                    statuses = [
-                                                      ...statuses,
-                                                      receivedOnStatus,
-                                                    ];
-                                                  }
-
-                                                  if (
-                                                    this.formData["condition"]
-                                                      ?.value
-                                                  ) {
-                                                    const receivedOnStatus = {
-                                                      sample: {
-                                                        uuid: sampleResponse?.uuid,
-                                                      },
-                                                      user: {
-                                                        uuid: localStorage.getItem(
-                                                          "userUuid"
-                                                        ),
-                                                      },
-                                                      remarks:
-                                                        this.formData[
-                                                          "condition"
-                                                        ]?.value,
-                                                      status: "CONDITION",
-                                                    };
-                                                    statuses = [
-                                                      ...statuses,
-                                                      receivedOnStatus,
-                                                    ];
-                                                  }
-
-                                                  const receivedByStatus = {
-                                                    sample: {
-                                                      uuid: sampleResponse?.uuid,
-                                                    },
-                                                    user: {
-                                                      uuid: this.formData[
-                                                        "receivedBy"
-                                                      ]?.value
-                                                        ? this.formData[
-                                                            "receivedBy"
-                                                          ]?.value
-                                                        : localStorage.getItem(
-                                                            "userUuid"
-                                                          ),
-                                                    },
-                                                    remarks: "RECEIVED_BY",
-                                                    status: "RECEIVED_BY",
-                                                    timestamp: `${moment(
-                                                      this.formData[
-                                                        "receivedOn"
-                                                      ]?.value
-                                                    ).format("YYYY-MM-DD")} ${
-                                                      this.formData[
-                                                        "receivedAt"
-                                                      ]?.value
-                                                    }:00.001`,
-                                                  };
-                                                  statuses = [
-                                                    ...statuses,
-                                                    receivedByStatus,
-                                                  ];
-
-                                                  if (statuses?.length > 0) {
+                                                    // Create sample
                                                     this.samplesService
-                                                      .setMultipleSampleStatuses(
-                                                        statuses
-                                                      )
+                                                      .createLabSample(sample)
                                                       .subscribe(
-                                                        (
-                                                          sampleStatusResponse
-                                                        ) => {
+                                                        (sampleResponse) => {
                                                           this.savingDataResponse =
-                                                            sampleStatusResponse;
-                                                          if (
-                                                            sampleStatusResponse
-                                                          ) {
+                                                            sampleResponse;
+                                                          this.sampleLabelsUsedDetails =
+                                                            [
+                                                              ...this
+                                                                .sampleLabelsUsedDetails,
+                                                              {
+                                                                ...sample,
+                                                              },
+                                                            ];
+
+                                                          // Create sample allocations
+
+                                                          if (sampleResponse) {
+                                                            let ordersWithConceptsDetails =
+                                                              [];
+
+                                                            sampleResponse.orders.forEach(
+                                                              (order) => {
+                                                                ordersWithConceptsDetails =
+                                                                  [
+                                                                    ...ordersWithConceptsDetails,
+                                                                    {
+                                                                      sample:
+                                                                        sampleResponse,
+                                                                      order: {
+                                                                        sample:
+                                                                          sampleResponse,
+                                                                        ...keyedOrders[
+                                                                          order
+                                                                            ?.uuid
+                                                                        ],
+                                                                      },
+                                                                    },
+                                                                  ];
+                                                              }
+                                                            );
+
                                                             this.savingData =
-                                                              false;
+                                                              this.formData[
+                                                                "agency"
+                                                              ]?.value
+                                                                ? true
+                                                                : false;
+                                                            let statuses = [];
+                                                            if (
+                                                              this.formData[
+                                                                "agency"
+                                                              ]?.value
+                                                            ) {
+                                                              const agencyStatus =
+                                                                {
+                                                                  sample: {
+                                                                    uuid: sampleResponse?.uuid,
+                                                                  },
+                                                                  user: {
+                                                                    uuid: localStorage.getItem(
+                                                                      "userUuid"
+                                                                    ),
+                                                                  },
+                                                                  remarks:
+                                                                    this
+                                                                      .formData[
+                                                                      "agency"
+                                                                    ]?.value,
+                                                                  status:
+                                                                    "PRIORITY",
+                                                                };
+                                                              statuses = [
+                                                                ...statuses,
+                                                                agencyStatus,
+                                                              ];
+                                                            }
+
+                                                            if (
+                                                              this.formData[
+                                                                "receivedOn"
+                                                              ]?.value
+                                                            ) {
+                                                              const receivedOnStatus =
+                                                                {
+                                                                  sample: {
+                                                                    uuid: sampleResponse?.uuid,
+                                                                  },
+                                                                  user: {
+                                                                    uuid: localStorage.getItem(
+                                                                      "userUuid"
+                                                                    ),
+                                                                  },
+                                                                  remarks:
+                                                                    "RECEIVED_ON",
+                                                                  status:
+                                                                    "RECEIVED_ON",
+                                                                  timestamp: `${moment(
+                                                                    this
+                                                                      .formData[
+                                                                      "receivedOn"
+                                                                    ]?.value
+                                                                  ).format(
+                                                                    "YYYY-MM-DD"
+                                                                  )} ${
+                                                                    this
+                                                                      .formData[
+                                                                      "receivedAt"
+                                                                    ]?.value
+                                                                  }:00.001`,
+                                                                };
+                                                              statuses = [
+                                                                ...statuses,
+                                                                receivedOnStatus,
+                                                              ];
+                                                            }
+
+                                                            if (
+                                                              this.formData[
+                                                                "condition"
+                                                              ]?.value
+                                                            ) {
+                                                              const receivedOnStatus =
+                                                                {
+                                                                  sample: {
+                                                                    uuid: sampleResponse?.uuid,
+                                                                  },
+                                                                  user: {
+                                                                    uuid: localStorage.getItem(
+                                                                      "userUuid"
+                                                                    ),
+                                                                  },
+                                                                  remarks:
+                                                                    this
+                                                                      .formData[
+                                                                      "condition"
+                                                                    ]?.value,
+                                                                  status:
+                                                                    "CONDITION",
+                                                                };
+                                                              statuses = [
+                                                                ...statuses,
+                                                                receivedOnStatus,
+                                                              ];
+                                                            }
+
+                                                            const receivedByStatus =
+                                                              {
+                                                                sample: {
+                                                                  uuid: sampleResponse?.uuid,
+                                                                },
+                                                                user: {
+                                                                  uuid: this
+                                                                    .formData[
+                                                                    "receivedBy"
+                                                                  ]?.value
+                                                                    ? this
+                                                                        .formData[
+                                                                        "receivedBy"
+                                                                      ]?.value
+                                                                    : localStorage.getItem(
+                                                                        "userUuid"
+                                                                      ),
+                                                                },
+                                                                remarks:
+                                                                  "RECEIVED_BY",
+                                                                status:
+                                                                  "RECEIVED_BY",
+                                                                timestamp: `${moment(
+                                                                  this.formData[
+                                                                    "receivedOn"
+                                                                  ]?.value
+                                                                ).format(
+                                                                  "YYYY-MM-DD"
+                                                                )} ${
+                                                                  this.formData[
+                                                                    "receivedAt"
+                                                                  ]?.value
+                                                                }:00.001`,
+                                                              };
+                                                            statuses = [
+                                                              ...statuses,
+                                                              receivedByStatus,
+                                                            ];
+
+                                                            if (
+                                                              statuses?.length >
+                                                              0
+                                                            ) {
+                                                              zip(
+                                                                this.samplesService.saveTestContainerAllocation(
+                                                                  ordersWithConceptsDetails,
+                                                                  configs
+                                                                ),
+                                                                this.samplesService.setMultipleSampleStatuses(
+                                                                  statuses
+                                                                )
+                                                              ).subscribe(
+                                                                (
+                                                                  sampleStatusResponse
+                                                                ) => {
+                                                                  this.savingDataResponse =
+                                                                    sampleStatusResponse;
+                                                                  if (
+                                                                    sampleStatusResponse
+                                                                  ) {
+                                                                    this.dialog
+                                                                      .open(
+                                                                        BarCodeModalComponent,
+                                                                        {
+                                                                          height:
+                                                                            "200px",
+                                                                          width:
+                                                                            "15%",
+                                                                          data: {
+                                                                            identifier:
+                                                                              this
+                                                                                .currentSampleLabel,
+                                                                            sample:
+                                                                              sample,
+                                                                            sampleLabelsUsedDetails:
+                                                                              this
+                                                                                .sampleLabelsUsedDetails,
+                                                                          },
+                                                                          disableClose:
+                                                                            false,
+                                                                          panelClass:
+                                                                            "custom-dialog-container",
+                                                                        }
+                                                                      )
+                                                                      .afterClosed()
+                                                                      .subscribe(
+                                                                        () => {
+                                                                          this.isRegistrationReady =
+                                                                            false;
+                                                                          setTimeout(
+                                                                            () => {
+                                                                              this.isRegistrationReady =
+                                                                                true;
+                                                                            },
+                                                                            200
+                                                                          );
+                                                                        }
+                                                                      );
+                                                                    this.savingData =
+                                                                      false;
+                                                                  }
+                                                                }
+                                                              );
+                                                            }
                                                           }
                                                         }
                                                       );
                                                   }
                                                 }
-                                              });
+                                              );
                                           }
                                         });
 
