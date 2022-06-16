@@ -1,0 +1,19 @@
+<div *ngIf="codedOptions$ | async as codedOptions">
+  <app-form
+    [fields]="[codesMappingsSourceField]"
+    (formUpdate)="onFormUpdateForSource($event)"
+  ></app-form>
+  <div>
+    <app-multiple-concepts-selection
+      *ngIf="codedOptions && codedOptions?.length > 0"
+      [concepts]="codedOptions"
+      [selectedSetMembersItems]="selectedCodes"
+      (selectedSetMembers)="onGetSelectedMembers($event)"
+    ></app-multiple-concepts-selection>
+
+    <mat-progress-bar
+      *ngIf="!codedOptions"
+      mode="indeterminate"
+    ></mat-progress-bar>
+  </div>
+</div>

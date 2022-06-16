@@ -1,4 +1,5 @@
 import { CodedAnswersComponent } from "./coded-answers/coded-answers.component";
+import { CodesSelectionComponent } from "./codes-selection/codes-selection.component";
 import { ConceptMapTypesComponent } from "./concept-map-types/concept-map-types.component";
 import { ConceptReferenceTermsComponent } from "./concept-reference-terms/concept-reference-terms.component";
 import { ConceptSetMembersSelectionComponent } from "./concept-set-members-selection/concept-set-members-selection.component";
@@ -38,4 +39,5 @@ export const components: any[] = [
   ConceptSetMembersComponent,
   ConceptSetMembersSelectionComponent,
   LabsSectionManagementComponent,
+  CodesSelectionComponent,
 ];
