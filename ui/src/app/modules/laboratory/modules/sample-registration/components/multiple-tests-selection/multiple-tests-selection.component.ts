@@ -21,7 +21,9 @@ export class MultipleTestsSelectionComponent implements OnInit {
   @Output() testsData: EventEmitter<any> = new EventEmitter<any>();
   selectedSetMembersItems: ConceptGetFull[] = [];
   testSelectionCategory: string;
-  constructor(private conceptService: ConceptsService) {
+  constructor(private conceptService: ConceptsService) {}
+
+  ngOnInit(): void {
     if (
       this.setMembersFromSpecimen &&
       this.setMembersFromSpecimen?.length > 0
@@ -30,9 +32,7 @@ export class MultipleTestsSelectionComponent implements OnInit {
     } else {
       this.testSelectionCategory = "All";
     }
-  }
 
-  ngOnInit(): void {
     this.conceptsList$ = !this.setMembersFromSpecimen
       ? this.conceptService.getConceptsBySearchTerm("TEST_ORDERS")
       : of(this.setMembersFromSpecimen);
