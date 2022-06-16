@@ -22,6 +22,7 @@
           [fields]="basicConceptFields"
           (formUpdate)="onFormUpdate($event)"
         ></app-form>
+
         <div *ngIf="searchTermForTestMethod">
           <app-form
             [fields]="[testMethodField]"
@@ -59,6 +60,38 @@
         </div>
       </div>
       <div class="col-lg-6 col-md-6 col-sx-12 col-sm-12">
+        <div
+          *ngIf="
+            !dataType &&
+            conceptDataTypes &&
+            conceptDataTypes?.length > 0 &&
+            !inheritProperties
+          "
+        >
+          <app-form
+            [fields]="[dataTypeField]"
+            (formUpdate)="onFormUpdateForDataType($event)"
+          ></app-form>
+        </div>
+        <div
+          *ngIf="
+            inheritProperties ||
+            (!dataType && conceptDataTypes && conceptDataTypes?.length > 0)
+          "
+        >
+          <app-form
+            *ngIf="
+              formData['datatype']?.value ==
+              '8d4a4488-c2cc-11de-8d13-0010c6dffd0f'
+            "
+            [fields]="[displayPrecisionField]"
+            (formUpdate)="onFormUpdate($event)"
+          ></app-form>
+          <app-form
+            [fields]="[unitsField]"
+            (formUpdate)="onFormUpdate($event)"
+          ></app-form>
+        </div>
         <fieldset>
           <legend>{{ itemTypeName }} Codes</legend>
           <div *ngIf="params?.conceptSources">
@@ -86,7 +119,7 @@
             searchTermForTestMethod &&
             selectedSetMembers?.length === 0)
         "
-        (click)="onSave($event)"
+        (click)="onSave($event, selectedTestMethodDetails)"
         color="primary"
       >
         {{ !conceptUuid ? "Save" : "Update" }}
