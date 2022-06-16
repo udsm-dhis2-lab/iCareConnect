@@ -1,12 +1,16 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { Observable, zip } from "rxjs";
+import { ConceptSourcesService } from "src/app/core/services/concept-sources.service";
 import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
 import { TextArea } from "src/app/shared/modules/form/models/text-area.model";
 import { Textbox } from "src/app/shared/modules/form/models/text-box.model";
 import { BillableItemsService } from "src/app/shared/resources/billable-items/services/billable-items.service";
 import { ConceptsService } from "src/app/shared/resources/concepts/services/concepts.service";
-import { ConceptGetFull } from "src/app/shared/resources/openmrs";
+import {
+  ConceptGetFull,
+  ConceptsourceGet,
+} from "src/app/shared/resources/openmrs";
 
 @Component({
   selector: "app-standard-concept-creation",
@@ -37,9 +41,14 @@ export class StandardConceptCreationComponent implements OnInit {
   testMethodField: any;
   testMethodSelected: boolean = false;
   selectedTestMethodDetails$: Observable<ConceptGetFull[]>;
+
+  conceptSources$: Observable<ConceptsourceGet[]>;
+
+  selectedCodes: any[];
   constructor(
     private conceptService: ConceptsService,
-    private billableItemService: BillableItemsService
+    private billableItemService: BillableItemsService,
+    private conceptSourceService: ConceptSourcesService
   ) {}
 
   ngOnInit(): void {
@@ -47,6 +56,8 @@ export class StandardConceptCreationComponent implements OnInit {
     if (this.searchTermForTestMethod) {
       this.createTestMethodField();
     }
+
+    this.conceptSources$ = this.conceptSourceService.getConceptSources();
   }
 
   createTestMethodField(): void {
@@ -137,6 +148,10 @@ export class StandardConceptCreationComponent implements OnInit {
     }, 200);
   }
 
+  onGetSelectedCodes(selectedCodes: any): void {
+    this.selectedCodes = selectedCodes;
+  }
+
   onSave(event: Event): void {
     event.stopPropagation();
 
@@ -144,7 +159,7 @@ export class StandardConceptCreationComponent implements OnInit {
       {
         name: this.standardSearchTerm,
         locale: "en",
-        localePreferred: false,
+        localePreferred: true,
         conceptNameType: "INDEX_TERM",
       },
     ];
@@ -158,6 +173,7 @@ export class StandardConceptCreationComponent implements OnInit {
         conceptNameType: "FULLY_SPECIFIED",
       },
     ];
+
     names = [
       ...names,
       {
@@ -168,10 +184,25 @@ export class StandardConceptCreationComponent implements OnInit {
       },
     ];
 
-    // const conceptReferenceTerm = this.formData["code"]?.value;
+    let mappings = [];
+    const conceptMapType = "35543629-7d8c-11e1-909d-c80aa9edcf4e";
+    if (this.selectedCodes?.length > 0) {
+      // Add codes as search terms and mappings
+      this.selectedCodes.forEach((selectedCode) => {
+        names = [
+          ...names,
+          {
+            name: selectedCode?.display?.split(" (")[1]?.split(")")[0],
+            locale: "en",
+            localePreferred: false,
+            conceptNameType: "INDEX_TERM",
+          },
+        ];
+        const conceptReferenceTerm = selectedCode?.value;
+        mappings = [...mappings, { conceptReferenceTerm, conceptMapType }];
+      });
+    }
 
-    // const conceptMapType = "35543629-7d8c-11e1-909d-c80aa9edcf4e";
-    // const mappings = [{ conceptReferenceTerm, conceptMapType }];
     const concept = {
       names: names,
       descriptions: [
@@ -190,6 +221,7 @@ export class StandardConceptCreationComponent implements OnInit {
           ? this.selectedSetMembers.map((member) => member?.uuid)
           : [],
       conceptClass: this.conceptClass,
+      mappings,
     };
     (!this.conceptUuid
       ? this.conceptService.createConcept(concept)
