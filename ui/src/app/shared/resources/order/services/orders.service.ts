@@ -15,6 +15,21 @@ export class OrdersService {
     private API: Api
   ) {}
 
+  getOrdersByUuids(orderUuids: any): Observable<any[]> {
+    return zip(
+      ...orderUuids.map((orderUuid) => {
+        return this.openMRSHttpClient.get(
+          `order/${orderUuid}?v=custom:(uuid,orderNumber,concept:(uuid,display,setMembers:(uuid,display)))`
+        );
+      })
+    ).pipe(
+      map((response) => {
+        console.log("Orders Response", response);
+        return response;
+      })
+    );
+  }
+
   updateOrdersViaEncounter(ordersToUpdate): Observable<any> {
     return zip(
       ...ordersToUpdate.map((order) =>

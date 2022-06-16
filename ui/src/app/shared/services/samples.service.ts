@@ -195,10 +195,6 @@ export class SamplesService {
     );
   }
 
-  // createAllocation(allocation): Observable<any> {
-
-  // }
-
   saveLabResult(result): Observable<any> {
     return this.httpClient.post(BASE_URL + "lab/results", result);
   }
