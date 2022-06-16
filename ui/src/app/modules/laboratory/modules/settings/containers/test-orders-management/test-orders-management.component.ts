@@ -1,15 +1,18 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit } from "@angular/core";
+import { Observable } from "rxjs";
+import { DataTypesService } from "src/app/core/services/datatypes.service";
+import { ConceptdatatypeGet } from "src/app/shared/resources/openmrs";
 
 @Component({
-  selector: 'app-test-orders-management',
-  templateUrl: './test-orders-management.component.html',
-  styleUrls: ['./test-orders-management.component.scss']
+  selector: "app-test-orders-management",
+  templateUrl: "./test-orders-management.component.html",
+  styleUrls: ["./test-orders-management.component.scss"],
 })
 export class TestOrdersManagementComponent implements OnInit {
-
-  constructor() { }
+  conceptDataTypes$: Observable<ConceptdatatypeGet[]>;
+  constructor(private dataTypesService: DataTypesService) {}
 
   ngOnInit(): void {
+    this.conceptDataTypes$ = this.dataTypesService.getDataTypes();
   }
-
 }

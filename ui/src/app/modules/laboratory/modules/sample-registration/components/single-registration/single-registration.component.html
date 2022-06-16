@@ -5,7 +5,7 @@
     testsUnderSpecimen: testsUnderSpecimen$ | async
   } as params"
 >
-  <div class="row">
+  <div class="row" *ngIf="isRegistrationReady">
     <div *ngIf="errorMessage" class="col-12 mt-2 p-3">
       <div class="alert alert-danger" role="alert">
         {{ errorMessage }}

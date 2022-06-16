@@ -123,7 +123,7 @@ export class ConceptsService {
     return from(
       this.api.concept.getAllConcepts({
         q: searchTerm,
-        v: "custom:(uuid,display,names,descriptions,setMembers:(uuid,display))",
+        v: "custom:(uuid,display,names,descriptions,setMembers:(uuid,display,setMembers:(uuid,display,answers:(uuid,display))))",
       })
     ).pipe(
       map((response) => response?.results),

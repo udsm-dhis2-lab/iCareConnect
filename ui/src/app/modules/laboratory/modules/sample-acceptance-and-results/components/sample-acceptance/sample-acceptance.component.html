@@ -27,9 +27,14 @@
         </mat-form-field>
 
         <mat-form-field appearance="fill" class="w-30 ml-2 float-right">
-          <mat-label>Select Department</mat-label>
+          <mat-label
+            >Select
+            {{
+              !LISConfigurations?.isLIS ? "Department" : "Section"
+            }}</mat-label
+          >
           <mat-select [(value)]="selectedDepartment">
-            <mat-option (click)="setDepartment('')">All Departments</mat-option>
+            <mat-option (click)="setDepartment('')">All</mat-option>
             <mat-option
               *ngFor="let dept of sampleParams?.labDepartments"
               [value]="dept.display"
@@ -264,9 +269,14 @@
         </mat-form-field>
 
         <mat-form-field appearance="fill" class="w-30 ml-2 float-right">
-          <mat-label>Select Department</mat-label>
+          <mat-label
+            >Select
+            {{
+              !LISConfigurations?.isLIS ? "Department" : "Section"
+            }}</mat-label
+          >
           <mat-select [(value)]="selectedDepartment">
-            <mat-option (click)="setDepartment('')">All Departments</mat-option>
+            <mat-option (click)="setDepartment('')">All</mat-option>
             <mat-option
               *ngFor="let dept of sampleParams?.labDepartments"
               [value]="dept.display"
@@ -490,9 +500,14 @@
         </table>
 
         <mat-form-field appearance="fill" class="w-30 ml-2 float-right">
-          <mat-label>Select Department</mat-label>
+          <mat-label
+            >Select
+            {{
+              !LISConfigurations?.isLIS ? "Department" : "Section"
+            }}</mat-label
+          >
           <mat-select [(value)]="selectedDepartment">
-            <mat-option (click)="setDepartment('')">All Departments</mat-option>
+            <mat-option (click)="setDepartment('')">All</mat-option>
             <mat-option
               *ngFor="let dept of sampleParams?.labDepartments"
               [value]="dept.display"
@@ -754,9 +769,14 @@
         </table>
 
         <mat-form-field appearance="fill" class="w-30 ml-2 float-right">
-          <mat-label>Select Department</mat-label>
+          <mat-label
+            >Select
+            {{
+              !LISConfigurations?.isLIS ? "Department" : "Section"
+            }}</mat-label
+          >
           <mat-select [(value)]="selectedDepartment">
-            <mat-option (click)="setDepartment('')">All Departments</mat-option>
+            <mat-option (click)="setDepartment('')">All</mat-option>
             <mat-option
               *ngFor="let dept of sampleParams?.labDepartments"
               [value]="dept.display"
@@ -957,9 +977,14 @@
         </mat-form-field>
 
         <mat-form-field appearance="fill" class="w-30 ml-2 float-right">
-          <mat-label>Select Department</mat-label>
+          <mat-label
+            >Select
+            {{
+              !LISConfigurations?.isLIS ? "Department" : "Section"
+            }}</mat-label
+          >
           <mat-select [(value)]="selectedDepartment">
-            <mat-option (click)="setDepartment('')">All Departments</mat-option>
+            <mat-option (click)="setDepartment('')">All</mat-option>
             <mat-option
               *ngFor="let dept of sampleParams?.labDepartments"
               [value]="dept.display"
@@ -1125,9 +1150,14 @@
         </mat-form-field>
 
         <mat-form-field appearance="fill" class="w-30 ml-2 float-right">
-          <mat-label>Select Department</mat-label>
+          <mat-label
+            >Select
+            {{
+              !LISConfigurations?.isLIS ? "Department" : "Section"
+            }}</mat-label
+          >
           <mat-select [(value)]="selectedDepartment">
-            <mat-option (click)="setDepartment('')">All Departments</mat-option>
+            <mat-option (click)="setDepartment('')">All</mat-option>
             <mat-option
               *ngFor="let dept of sampleParams?.labDepartments"
               [value]="dept.display"
@@ -1335,9 +1365,14 @@
         </mat-form-field>
 
         <mat-form-field appearance="fill" class="w-30 ml-2 float-right">
-          <mat-label>Select Department</mat-label>
+          <mat-label
+            >Select
+            {{
+              !LISConfigurations?.isLIS ? "Department" : "Section"
+            }}</mat-label
+          >
           <mat-select [(value)]="selectedDepartment">
-            <mat-option (click)="setDepartment('')">All Departments</mat-option>
+            <mat-option (click)="setDepartment('')">All</mat-option>
             <mat-option
               *ngFor="let dept of sampleParams?.labDepartments"
               [value]="dept.display"
