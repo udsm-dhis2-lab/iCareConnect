@@ -2,7 +2,7 @@
   class="single-registration"
   *ngIf="{
     labSampleLabel: labSampleLabel$ | async,
-    testsUnderDepartment: testsUnderDepartment$ | async
+    testsUnderSpecimen: testsUnderSpecimen$ | async
   } as params"
 >
   <div class="row">
@@ -74,7 +74,7 @@
                   <app-form
                     [fields]="specimenDetailsFields"
                     [isFormHorizontal]="true"
-                    (formUpdate)="onFormUpdate($event)"
+                    (formUpdate)="onFormUpdate($event, 'specimenDetails')"
                   ></app-form>
                   <div class="row">
                     <div class="col-4">
@@ -142,11 +142,21 @@
 
         <mat-step errorMessage="Some fields not fed.">
           <ng-template matStepLabel>Tests</ng-template>
-          <div>
+          <div
+            *ngIf="
+              (selectedSpecimenUuid && params?.testsUnderSpecimen) ||
+              !selectedSpecimenUuid
+            "
+          >
             <app-multiple-tests-selection
+              [setMembersFromSpecimen]="params?.testsUnderSpecimen"
               (testsData)="onFormUpdateForTest($event)"
             ></app-multiple-tests-selection>
           </div>
+          <mat-progress-bar
+            *ngIf="selectedSpecimenUuid && !params?.testsUnderSpecimen"
+            mode="indeterminate"
+          ></mat-progress-bar>
         </mat-step>
       </mat-stepper>
     </div>
