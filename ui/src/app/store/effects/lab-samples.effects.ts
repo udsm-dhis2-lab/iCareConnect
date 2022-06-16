@@ -45,6 +45,7 @@ import {
   markSampleCollected,
   removeCollectedSampleFromSamplesToCollect,
 } from "src/app/modules/laboratory/store/actions";
+import { getLISConfigurations } from "../selectors/lis-configurations.selectors";
 
 @Injectable()
 export class LabSamplesEffects {
@@ -57,7 +58,8 @@ export class LabSamplesEffects {
   labSamples$ = createEffect(() =>
     this.actions$.pipe(
       ofType(loadLabSamplesByCollectionDates),
-      switchMap((action) => {
+      withLatestFrom(this.store.select(getLISConfigurations)),
+      switchMap(([action, lisConfigs]: [any, any]) => {
         return this.sampleService
           .getLabSamplesByCollectionDates(action.datesParameters)
           .pipe(
@@ -176,13 +178,12 @@ export class LabSamplesEffects {
                                 )
                               : [],
                           setMembers:
-                            keyedSpecimenSources[order?.order?.concept?.uuid]
-                              ?.setMembers?.length == 0
+                            keyedDepartments[order?.order?.concept?.uuid]
+                              ?.keyedConcept?.setMembers?.length == 0
                               ? []
                               : _.map(
-                                  keyedSpecimenSources[
-                                    order?.order?.concept?.uuid
-                                  ]?.setMembers,
+                                  keyedDepartments[order?.order?.concept?.uuid]
+                                    ?.keyedConcept?.setMembers,
                                   (member) => {
                                     return {
                                       ...member,

@@ -345,8 +345,6 @@ export const getFormattedLabSampleOrdersBySampleIdentifier = createSelector(
       id: props?.sampleIdentifier,
     }) || [])[0]?.orders;
 
-    // console.log('check hii log : ', orderedItemsMatched);
-
     return orderedItemsMatched.map((item) => {
       if (item?.order?.concept?.setMembers?.length > 0) {
         let allocations = {};
