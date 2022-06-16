@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnInit, Output } from "@angular/core";
+import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { Observable, of } from "rxjs";
 import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
@@ -6,6 +6,7 @@ import { ConceptsService } from "src/app/shared/resources/concepts/services/conc
 import { ConceptGetFull } from "src/app/shared/resources/openmrs";
 
 import { keyBy } from "lodash";
+import { MatRadioChange } from "@angular/material/radio";
 
 @Component({
   selector: "app-multiple-tests-selection",
@@ -13,13 +14,23 @@ import { keyBy } from "lodash";
   styleUrls: ["./multiple-tests-selection.component.scss"],
 })
 export class MultipleTestsSelectionComponent implements OnInit {
+  @Input() setMembersFromSpecimen: ConceptGetFull[];
   testsFormField: any;
   testsFormData: any = {};
-  setMembersFromSpecimen: ConceptGetFull[];
   conceptsList$: Observable<ConceptGetFull[]>;
   @Output() testsData: EventEmitter<any> = new EventEmitter<any>();
   selectedSetMembersItems: ConceptGetFull[] = [];
-  constructor(private conceptService: ConceptsService) {}
+  testSelectionCategory: string;
+  constructor(private conceptService: ConceptsService) {
+    if (
+      this.setMembersFromSpecimen &&
+      this.setMembersFromSpecimen?.length > 0
+    ) {
+      this.testSelectionCategory = "by-specimen";
+    } else {
+      this.testSelectionCategory = "All";
+    }
+  }
 
   ngOnInit(): void {
     this.conceptsList$ = !this.setMembersFromSpecimen
@@ -56,5 +67,13 @@ export class MultipleTestsSelectionComponent implements OnInit {
       "id"
     );
     this.testsData.emit(this.testsFormData);
+  }
+
+  getSelection(event: MatRadioChange): void {
+    this.testSelectionCategory = event?.value;
+    this.conceptsList$ =
+      this.testSelectionCategory === "All"
+        ? this.conceptService.getConceptsBySearchTerm("TEST_ORDERS")
+        : of(this.setMembersFromSpecimen);
   }
 }

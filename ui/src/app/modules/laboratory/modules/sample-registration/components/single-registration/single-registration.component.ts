@@ -52,7 +52,8 @@ export class SingleRegistrationComponent implements OnInit {
   agencyFormField: any = {};
   labFormField: any = {};
   formData: any = {};
-  testsUnderDepartment$: Observable<any[]>;
+  testsUnderSpecimen$: Observable<any[]>;
+  selectedSpecimenUuid: string;
 
   currentLocation: Location;
   patientPayload: any;
@@ -234,10 +235,16 @@ export class SingleRegistrationComponent implements OnInit {
 
   onFormUpdate(formValues: FormValue, itemKey?: string): void {
     this.formData = { ...this.formData, ...formValues.getValues() };
-    if (itemKey && itemKey === "department") {
-      this.testsUnderDepartment$ = this.labTestsService.getLabTestsByDepartment(
-        this.formData["department"]?.value
-      );
+    if (
+      itemKey &&
+      itemKey === "specimenDetails" &&
+      this.selectedSpecimenUuid !== this.formData["specimen"]?.value
+    ) {
+      this.selectedSpecimenUuid = this.formData["specimen"]?.value;
+      this.testsUnderSpecimen$ =
+        this.labTestsService.getSetMembersByConceptUuid(
+          this.selectedSpecimenUuid
+        );
     }
   }
 
