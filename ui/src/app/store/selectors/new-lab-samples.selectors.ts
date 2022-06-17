@@ -281,14 +281,18 @@ export const getCompletedLabSamples = createSelector(
 
 export const getPatientsWithCompletedLabSamples = createSelector(
   getAllFormattedLabSamples,
-  (samples, props) => {
+  getLISConfigurations,
+  (samples, lisConfigs, props) => {
     // console.log('SAMP ', samples);
 
     const filteredCompletedSamples =
       _.filter(
         _.orderBy(
           _.filter(samples, (sample) => {
-            const completedOrders = getCompletedOrders(sample?.orders);
+            const completedOrders = getCompletedOrders(
+              sample?.orders,
+              lisConfigs?.isLIS
+            );
             if (
               sample?.accepted &&
               completedOrders?.length == sample?.orders?.length

@@ -712,22 +712,43 @@
                   class="providers-details"
                 >
                   <span>
-                    <b>Approved By :</b>
+                    <b
+                      >{{
+                        !LISConfigurations?.isLIS
+                          ? "Approved By"
+                          : "Authorized By"
+                      }}
+                      :</b
+                    >
                     {{
-                      samplesGroupedByDepartment?.samples[0]?.orders[0]
-                        ?.testAllocations[0]?.statuses?.length > 2
+                      !LISConfigurations?.isLIS
                         ? samplesGroupedByDepartment?.samples[0]?.orders[0]
-                            ?.testAllocations[0]?.statuses[0]?.user?.display
-                        : null
+                            ?.testAllocations[0]?.statuses?.length > 2
+                          ? samplesGroupedByDepartment?.samples[0]?.orders[0]
+                              ?.testAllocations[0]?.statuses[0]?.user?.display
+                          : null
+                        : samplesGroupedByDepartment?.samples[0]?.orders[0]
+                            ?.testAllocations[0]?.authorizationInfo?.user
+                            ?.display
                     }},
-                    <b> Approved At : </b>
+                    <b>
+                      {{
+                        !LISConfigurations?.isLIS
+                          ? "Approved By"
+                          : "Authorized At"
+                      }}:
+                    </b>
                     {{
-                      samplesGroupedByDepartment?.samples[0]?.orders[0]
-                        ?.testAllocations[0]?.statuses?.length > 2
-                        ? (samplesGroupedByDepartment?.samples[0]?.orders[0]
-                            ?.testAllocations[0]?.statuses[0]?.timestamp
+                      !LISConfigurations?.isLIS
+                        ? samplesGroupedByDepartment?.samples[0]?.orders[0]
+                            ?.testAllocations[0]?.statuses?.length > 2
+                          ? (samplesGroupedByDepartment?.samples[0]?.orders[0]
+                              ?.testAllocations[0]?.statuses[0]?.timestamp
+                            | date: "medium")
+                          : null
+                        : (samplesGroupedByDepartment?.samples[0]?.orders[0]
+                            ?.testAllocations[0]?.authorizationInfo?.timestamp
                           | date: "medium")
-                        : null
                     }}
                   </span>
                 </div>
@@ -748,21 +769,17 @@
     </mat-accordion>
   </div>
 
-  <div style="margin-top: 15px">
+  <div class="w-100 mt-2 d-flex justify-content-end">
+    <button mat-stroked-button color="primary" (click)="onClose($event)">
+      Cancel
+    </button>
     <button
+      class="ml-2"
       mat-stroked-button
       color="primary"
       (click)="onPrint($event, currentDepartmentSamples)"
     >
       print
-    </button>
-    <button
-      mat-stroked-button
-      color="primary"
-      style="float: right"
-      (click)="onClose($event)"
-    >
-      Done
     </button>
   </div>
 </div>
