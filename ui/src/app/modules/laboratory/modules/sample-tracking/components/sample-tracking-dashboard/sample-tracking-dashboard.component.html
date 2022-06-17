@@ -51,12 +51,22 @@
           <td>
             <div style="margin-left: 3px; margin-right: 20px">Has results</div>
           </td>
+
           <td
-            style="width: 40px; background-color: #f5f171f7; margin-left: 20x"
+            style="width: 40px; margin-left: 20x"
+            [ngStyle]="{
+              'background-color': !LISConfigurations?.isLIS
+                ? '#f5f171f7'
+                : '#0080009e'
+            }"
           ></td>
           <td>
             <div style="margin-left: 3px; margin-right: 20px">
-              Waiting second approval
+              {{
+                !LISConfigurations?.isLIS
+                  ? "Waiting second approval"
+                  : "Authorized"
+              }}
             </div>
           </td>
           <td
@@ -64,9 +74,12 @@
           ></td>
           <td><div style="margin-left: 3px">Has rejected results</div></td>
           <td
+            *ngIf="!LISConfigurations?.isLIS"
             style="background-color: #6fd67bcf; width: 40px; margin-left: 20px"
           ></td>
-          <td><div style="margin-left: 3px">Completed</div></td>
+          <td *ngIf="!LISConfigurations?.isLIS">
+            <div style="margin-left: 3px">Completed</div>
+          </td>
         </tr>
       </table>
 
@@ -131,8 +144,11 @@
                     !sample?.completed
                       ? '#d04747ab'
                       : order?.testAllocations[0]?.firstSignOff &&
-                        !sample?.completed
+                        !LISConfigurations?.isLIS
                       ? '#f5f171f7'
+                      : order?.testAllocations[0]?.firstSignOff &&
+                        LISConfigurations?.isLIS
+                      ? '#0080009e'
                       : sample?.atLeastOneHasResults && !sample?.completed
                       ? '#ec864acf'
                       : sample?.completed

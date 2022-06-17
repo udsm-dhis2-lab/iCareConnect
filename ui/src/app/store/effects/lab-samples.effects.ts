@@ -154,6 +154,12 @@ export class LabSamplesEffects {
                     status: "ACCEPTED",
                   }) || [])[0]?.timestamp,
                   orders: _.map(sample?.orders, (order) => {
+                    const allocationStatuses = _.flatten(
+                      order.testAllocations.map((allocation) => {
+                        return allocation?.statuses;
+                      })
+                    );
+
                     return {
                       ...order,
                       order: {
@@ -229,11 +235,21 @@ export class LabSamplesEffects {
                       ]
                         ? action.containers[order?.order?.concept?.uuid]
                         : null,
+                      allocationStatuses: allocationStatuses,
                       testAllocations: _.map(
                         order?.testAllocations,
                         (allocation) => {
+                          const authorizationStatus = _.orderBy(
+                            allocation?.statuses,
+                            ["timestamp"],
+                            ["desc"]
+                          )[0];
                           return {
                             ...allocation,
+                            authorizationInfo:
+                              authorizationStatus?.status === "APPROVED"
+                                ? authorizationStatus
+                                : null,
                             firstSignOff:
                               allocation?.statuses?.length > 0 &&
                               _.orderBy(

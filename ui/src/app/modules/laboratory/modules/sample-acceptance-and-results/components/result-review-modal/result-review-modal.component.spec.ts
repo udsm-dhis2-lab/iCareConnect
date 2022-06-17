@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ResultsApprovalComponent } from './results-approval.component';
+import { ResultReviewModalComponent } from './result-review-modal.component';
 
-describe('ResultsApprovalComponent', () => {
-  let component: ResultsApprovalComponent;
-  let fixture: ComponentFixture<ResultsApprovalComponent>;
+describe('ResultReviewModalComponent', () => {
+  let component: ResultReviewModalComponent;
+  let fixture: ComponentFixture<ResultReviewModalComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ResultsApprovalComponent ]
+      declarations: [ ResultReviewModalComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ResultsApprovalComponent);
+    fixture = TestBed.createComponent(ResultReviewModalComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

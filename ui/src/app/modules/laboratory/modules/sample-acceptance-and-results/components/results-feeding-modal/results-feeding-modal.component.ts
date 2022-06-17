@@ -63,6 +63,8 @@ export class ResultsFeedingModalComponent implements OnInit {
   attach: any = {};
   LISConfigurations: LISConfigurationsModel;
 
+  dialogData: any;
+
   constructor(
     private dialog: MatDialog,
     private dialogRef: MatDialogRef<ResultsFeedingModalComponent>,
@@ -71,6 +73,7 @@ export class ResultsFeedingModalComponent implements OnInit {
     private dataService: DataService,
     private sampleService: SamplesService
   ) {
+    this.dialogData = data;
     this.sample = data?.sample;
     this.labConfigs = data?.labConfigs;
     this.maxHeight = data?.maxHeight;

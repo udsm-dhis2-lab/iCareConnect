@@ -9,7 +9,8 @@
   } as params"
 >
   <mat-toolbar class="modal-header"
-    >Results entry and approval - {{ params?.currentSample?.id }}
+    >{{ dialogData?.actionType === "Entry" ? "Results entry" : "Review" }} -
+    {{ params?.currentSample?.id }}
     <span *ngIf="params?.currentSample?.containerDetails?.display">
       - {{ params?.currentSample?.containerDetails?.display }}
     </span></mat-toolbar
@@ -31,7 +32,7 @@
   ></mat-progress-bar>
   <div style="padding: 10px" *ngIf="!loadingTestTimeSettings">
     <mat-tab-group>
-      <mat-tab label="Results">
+      <mat-tab label="Results" *ngIf="dialogData?.actionType === 'Entry'">
         <div
           style="margin-top: 15px; overflow: auto"
           [ngStyle]="{ 'max-height': maxHeight }"
@@ -1387,7 +1388,10 @@
           </div>
         </div>
       </mat-tab>
-      <mat-tab label="Approval" *ngIf="!LISConfigurations?.isLIS">
+      <mat-tab
+        label="{{ !LISConfigurations?.isLIS ? 'Approval' : 'Authorization' }}"
+        *ngIf="!LISConfigurations?.isLIS || dialogData?.actionType !== 'Entry'"
+      >
         <div
           style="margin-top: 15px; overflow: auto"
           [ngStyle]="{ 'max-height': maxHeight }"
@@ -1398,9 +1402,24 @@
                 <th style="width: 15%">Test Order</th>
                 <th style="width: 10%">Ordered By</th>
                 <th colspan="2">Results</th>
-                <th style="width: 10%">Completed By</th>
-                <th colspan="2" style="width: 18%">First Sign Off</th>
-                <th colspan="2" style="width: 18%">Second Sign Off</th>
+                <th style="width: 10%">
+                  {{ !LISConfigurations?.isLIS ? "Completed By" : "Fed By" }}
+                </th>
+                <th
+                  colspan="2"
+                  style="width: 18%"
+                  *ngIf="!LISConfigurations?.isLIS"
+                >
+                  First Sign Off
+                </th>
+                <th
+                  colspan="2"
+                  style="width: 18%"
+                  *ngIf="!LISConfigurations?.isLIS"
+                >
+                  Second Sign Off
+                </th>
+                <th *ngIf="LISConfigurations?.isLIS">Action</th>
               </tr>
             </thead>
             <tbody>
@@ -1620,7 +1639,7 @@
                         ]?.resultsFedBy?.name
                       }}
                     </td>
-                    <td colspan="2">
+                    <td colspan="2" *ngIf="!LISConfigurations?.isLIS">
                       <!-- TODO: reject first approval -->
                       <button
                         [disabled]="
@@ -1680,7 +1699,7 @@
                         >
                       </button>
                     </td>
-                    <td colspan="2">
+                    <td colspan="2" *ngIf="!LISConfigurations?.isLIS">
                       <!-- TODO: reject first approval -->
                       <button
                         [disabled]="
@@ -1739,6 +1758,59 @@
                           >d</span
                         >
                       </button>
+                    </td>
+                    <td *ngIf="LISConfigurations?.isLIS">
+                      <div class="w-100 d-flex justify-content-end">
+                        <button
+                          [disabled]="!item?.testAllocations[0]?.firstSignOff"
+                          mat-stroked-button
+                          (click)="
+                            rejectFirstApproval(
+                              $event,
+                              item,
+                              params?.currentSample,
+                              item?.testAllocations[0]
+                            )
+                          "
+                        >
+                          Reject
+                        </button>
+                        <button
+                          [ngClass]="{
+                            'text-success':
+                              item?.testAllocations[0]?.firstSignOff
+                          }"
+                          [disabled]="
+                            !item?.testAllocations[0]?.firstSignOff ||
+                            item?.testAllocations[0]?.rejected
+                          "
+                          class="ml-2"
+                          mat-stroked-button
+                          (click)="
+                            onSaveSignOff(
+                              $event,
+                              item,
+                              'first',
+                              params?.currentSample,
+                              item?.testAllocations[0]
+                            )
+                          "
+                        >
+                          <mat-spinner
+                            *ngIf="
+                              params?.savingLabResultsStatusState &&
+                              savingMessage[item?.concept?.uuid + '-second']
+                            "
+                            color="primary"
+                            [diameter]="20"
+                          >
+                          </mat-spinner>
+                          Authorize<span
+                            *ngIf="item?.testAllocations[0]?.firstSignOff"
+                            >d</span
+                          >
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 </ng-container>
@@ -1951,7 +2023,7 @@
                           ]?.resultsFedBy?.name
                         }}
                       </td>
-                      <td colspan="2">
+                      <td colspan="2" *ngIf="!LISConfigurations?.isLIS">
                         <button
                           [disabled]="
                             item?.allocationsPairedBySetMember[parameter?.uuid]
@@ -2035,7 +2107,7 @@
                           >
                         </button>
                       </td>
-                      <td colspan="2">
+                      <td colspan="2" *ngIf="!LISConfigurations?.isLIS">
                         <!-- TODO: reject first approval -->
                         <button
                           [disabled]="
@@ -2108,6 +2180,75 @@
                             >d</span
                           >
                         </button>
+                      </td>
+                      <td *ngIf="LISConfigurations?.isLIS">
+                        <div class="w-100 d-flex justify-content-end">
+                          <button
+                            [disabled]="
+                              item?.allocationsPairedBySetMember[
+                                parameter?.uuid
+                              ]?.firstSignOff
+                            "
+                            mat-stroked-button
+                            (click)="
+                              rejectResults(
+                                $event,
+                                item,
+                                params?.currentSample,
+                                item?.allocationsPairedBySetMember[
+                                  parameter?.uuid
+                                ]
+                              )
+                            "
+                          >
+                            Reject
+                          </button>
+                          <button
+                            class="ml-2"
+                            [ngClass]="{
+                              'text-success':
+                                item?.allocationsPairedBySetMember[
+                                  parameter?.uuid
+                                ]?.firstSignOff
+                            }"
+                            [disabled]="
+                              item?.allocationsPairedBySetMember[
+                                parameter?.uuid
+                              ]?.firstSignOff
+                            "
+                            mat-stroked-button
+                            (click)="
+                              onSaveSignOffForParameter(
+                                $event,
+                                item,
+                                parameter,
+                                'first',
+                                params?.currentSample,
+                                item?.allocationsPairedBySetMember[
+                                  parameter?.uuid
+                                ]
+                              )
+                            "
+                          >
+                            <mat-spinner
+                              *ngIf="
+                                params?.savingLabResultsStatusState &&
+                                savingMessage[parameter?.uuid + '-first']
+                              "
+                              color="primary"
+                              [diameter]="20"
+                            >
+                            </mat-spinner>
+                            Authorize<span
+                              *ngIf="
+                                item?.allocationsPairedBySetMember[
+                                  parameter?.uuid
+                                ]?.firstSignOff
+                              "
+                              >d</span
+                            >
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   </ng-container>

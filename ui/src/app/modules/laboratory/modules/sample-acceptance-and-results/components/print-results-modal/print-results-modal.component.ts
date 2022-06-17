@@ -1,15 +1,15 @@
-import { Component, Inject, Input, OnInit } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { isThisSecond } from 'date-fns';
+import { Component, Inject, Input, OnInit } from "@angular/core";
+import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
+import { isThisSecond } from "date-fns";
 
-import * as _ from 'lodash';
-import { sample } from 'rxjs/operators';
-import { PatientService } from 'src/app/shared/services/patient.service';
+import * as _ from "lodash";
+import { sample } from "rxjs/operators";
+import { PatientService } from "src/app/shared/services/patient.service";
 
 @Component({
-  selector: 'app-print-results-modal',
-  templateUrl: './print-results-modal.component.html',
-  styleUrls: ['./print-results-modal.component.scss'],
+  selector: "app-print-results-modal",
+  templateUrl: "./print-results-modal.component.html",
+  styleUrls: ["./print-results-modal.component.scss"],
 })
 export class PrintResultsModalComponent implements OnInit {
   samples: any;
@@ -21,14 +21,14 @@ export class PrintResultsModalComponent implements OnInit {
   loadingPatientPhone: boolean;
   errorLoadingPhone: boolean;
   phoneNumber: string;
-
+  LISConfigurations: any;
   constructor(
     private patientService: PatientService,
     private dialogRef: MatDialogRef<PrintResultsModalComponent>,
     @Inject(MAT_DIALOG_DATA) data
   ) {
     this.patientDetailsAndSamples = data?.patientDetailsAndSamples;
-
+    this.LISConfigurations = data?.LISConfigurations;
     this.loadingPatientPhone = true;
     this.errorLoadingPhone = false;
 
@@ -78,11 +78,11 @@ export class PrintResultsModalComponent implements OnInit {
     var contents = document.getElementById(
       samplesGroupedByDepartment?.departmentName
     ).innerHTML;
-    const iframe: any = document.createElement('iframe');
-    iframe.name = 'frame3';
-    iframe.style.position = 'absolute';
-    iframe.style.width = '100%';
-    iframe.style.top = '-1000000px';
+    const iframe: any = document.createElement("iframe");
+    iframe.name = "frame3";
+    iframe.style.position = "absolute";
+    iframe.style.width = "100%";
+    iframe.style.top = "-1000000px";
     document.body.appendChild(iframe);
     var frameDoc = iframe.contentWindow
       ? iframe.contentWindow
@@ -91,15 +91,15 @@ export class PrintResultsModalComponent implements OnInit {
       : iframe.contentDocument;
     frameDoc.document.open();
     frameDoc.document.write(
-      '<html><head> <style>button {display:none;}</style>'
+      "<html><head> <style>button {display:none;}</style>"
     );
-    frameDoc.document.write('</head><body>');
+    frameDoc.document.write("</head><body>");
     frameDoc.document.write(contents);
-    frameDoc.document.write('</body></html>');
+    frameDoc.document.write("</body></html>");
     frameDoc.document.close();
     setTimeout(function () {
-      window.frames['frame3'].focus();
-      window.frames['frame3'].print();
+      window.frames["frame3"].focus();
+      window.frames["frame3"].print();
       document.body.removeChild(iframe);
     }, 500);
 
@@ -130,7 +130,7 @@ export class PrintResultsModalComponent implements OnInit {
 
     // console.log("answer :: ",concept)
 
-    return concept?.length > 0 ? concept[0]['display'] : '';
+    return concept?.length > 0 ? concept[0]["display"] : "";
   }
 
   getResults(concept, allocations) {
@@ -139,7 +139,7 @@ export class PrintResultsModalComponent implements OnInit {
     });
 
     return allocation?.length > 0
-      ? allocation[0]?.results[allocation[0]?.results?.length - 1]['value']
-      : '';
+      ? allocation[0]?.results[allocation[0]?.results?.length - 1]["value"]
+      : "";
   }
 }

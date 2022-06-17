@@ -25,6 +25,7 @@ import { getProviderDetails } from "src/app/store/selectors/current-user.selecto
 
 import { PrintResultsModalComponent } from "../print-results-modal/print-results-modal.component";
 import { RejectionReasonComponent } from "../rejection-reason/rejection-reason.component";
+import { ResultReviewModalComponent } from "../result-review-modal/result-review-modal.component";
 import { ResultsFeedingModalComponent } from "../results-feeding-modal/results-feeding-modal.component";
 
 @Component({
@@ -363,11 +364,35 @@ export class SampleAcceptanceComponent implements OnInit {
 
   onResultsReview(event: Event, sample, providerDetails): void {
     event.stopPropagation();
-    console.log(sample);
-    console.log(providerDetails);
+    this.dialog.open(ResultReviewModalComponent, {
+      data: {
+        sample: sample,
+        currentUser: this.currentUser,
+        labConfigs: this.labConfigs,
+        LISConfigurations: this.LISConfigurations,
+        maxHeight:
+          sample?.orders?.length == 1 &&
+          sample?.orders[0]?.order?.concept?.setMembers?.length == 0
+            ? "480px"
+            : "620px",
+      },
+      maxHeight:
+        sample?.orders?.length == 1 &&
+        sample?.orders[0]?.concept?.setMembers?.length == 0
+          ? "610px"
+          : "860px",
+      width: "100%",
+      disableClose: false,
+      panelClass: "custom-dialog-container",
+    });
   }
 
-  onResultsEntry(e, sample, providerDetails) {
+  onResultsEntryAndReview(
+    e,
+    sample,
+    providerDetails,
+    actionType: string
+  ): void {
     e.stopPropagation();
     this.dialog.open(ResultsFeedingModalComponent, {
       data: {
@@ -375,6 +400,7 @@ export class SampleAcceptanceComponent implements OnInit {
         currentUser: this.currentUser,
         labConfigs: this.labConfigs,
         LISConfigurations: this.LISConfigurations,
+        actionType,
         maxHeight:
           sample?.orders?.length == 1 &&
           sample?.orders[0]?.order?.concept?.setMembers?.length == 0
@@ -398,6 +424,7 @@ export class SampleAcceptanceComponent implements OnInit {
       data: {
         patientDetailsAndSamples: patientDetailsAndSamples,
         labConfigs: this.labConfigs,
+        LISConfigurations: this.LISConfigurations,
         user: providerDetails,
       },
       width: "60%",
