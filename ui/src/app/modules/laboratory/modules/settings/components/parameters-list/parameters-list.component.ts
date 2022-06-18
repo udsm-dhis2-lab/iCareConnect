@@ -51,4 +51,17 @@ export class ParametersListComponent implements OnInit {
     this.currentParameter = concept;
     this.selectedParameter.emit(this.currentParameter);
   }
+
+  onDelete(event: Event, concept: ConceptGetFull): void {
+    this.conceptService.deleteConcept(concept?.uuid).subscribe((response) => {
+      if (response) {
+        this.page = 1;
+        this.parameters$ = this.conceptService.getConceptsByParameters({
+          searchingText: "LIS_TEST_PARAMETER",
+          pageSize: this.pageSize,
+          page: this.page,
+        });
+      }
+    });
+  }
 }
