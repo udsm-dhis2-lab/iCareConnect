@@ -14,6 +14,8 @@ import {
   ConceptsourceGet,
 } from "src/app/shared/resources/openmrs";
 
+import { omit } from "lodash";
+
 @Component({
   selector: "app-parameters",
   templateUrl: "./parameters.component.html",
@@ -226,6 +228,14 @@ export class ParametersComponent implements OnInit {
           : null,
       mappings,
     };
+
+    if (!this.formData["precision"]?.value) {
+      this.concept = omit(this.concept, "displayPrecision");
+    }
+
+    if (!this.formData["units"]?.value) {
+      this.concept = omit(this.concept, "units");
+    }
 
     (!uuid
       ? this.conceptService.createConcept(this.concept)

@@ -40,6 +40,10 @@
                         (formUpdate)="onFormUpdate($event)"
                       ></app-form>
                       <app-form
+                        *ngIf="
+                          formData['datatype']?.value ===
+                          '8d4a4488-c2cc-11de-8d13-0010c6dffd0f'
+                        "
                         [fields]="[unitsField]"
                         (formUpdate)="onFormUpdate($event)"
                       ></app-form>
