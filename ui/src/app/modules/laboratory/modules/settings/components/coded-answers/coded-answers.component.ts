@@ -21,11 +21,29 @@ export class CodedAnswersComponent implements OnInit {
   answer: any;
   category: string = "List";
   codedAnswers$: Observable<ConceptGetFull[]>;
+  pageSize: number = 10;
+  page: number = 1;
+  isFormValid: boolean = false;
+  hasError: boolean = false;
+  error: string;
   constructor(private conceptService: ConceptsService) {}
 
   ngOnInit(): void {
     this.createCodedAnswersFields();
-    this.codedAnswers$ = this.conceptService.getConceptsAsCodedAnswers();
+    this.codedAnswers$ = this.conceptService.getConceptsAsCodedAnswers({
+      searchingText: "LIS_CODED_ANSWERS",
+      pageSize: this.pageSize,
+      page: this.page,
+    });
+  }
+
+  getList(event: Event, actionType: string): void {
+    this.page = actionType == "next" ? this.page + 1 : this.page - 1;
+    this.codedAnswers$ = this.conceptService.getConceptsAsCodedAnswers({
+      searchingText: "LIS_CODED_ANSWERS",
+      pageSize: this.pageSize,
+      page: this.page,
+    });
   }
 
   createCodedAnswersFields(data?: any): void {
@@ -59,6 +77,7 @@ export class CodedAnswersComponent implements OnInit {
 
   onFormUpdate(formValue: FormValue): void {
     const values = formValue.getValues();
+    this.isFormValid = formValue.isValid;
     this.formData = { ...this.formData, ...values };
   }
 
@@ -105,17 +124,45 @@ export class CodedAnswersComponent implements OnInit {
       conceptClass: "Coded answer",
     };
 
-    this.conceptService.createConcept(this.answer).subscribe((response) => {
-      if (response) {
-        this.category = "List";
-
-        this.codedAnswers$ = this.conceptService.getConceptsAsCodedAnswers();
-        this.saving = false;
-      }
-    });
+    this.conceptService
+      .createConcept(this.answer)
+      .subscribe((response: any) => {
+        if (response && !response?.error) {
+          this.category = "List";
+          this.page = 1;
+          this.codedAnswers$ = this.conceptService.getConceptsAsCodedAnswers({
+            searchingText: "LIS_CODED_ANSWERS",
+            pageSize: this.pageSize,
+            page: this.page,
+          });
+          this.saving = false;
+        } else {
+          this.saving = false;
+          this.hasError = true;
+          this.error =
+            response?.error?.message + " Please contact system administrator";
+        }
+      });
   }
 
   getSelection(event: MatRadioChange): void {
     this.category = event?.value;
+  }
+
+  onEdit(event: Event, codedAnswer: any): void {
+    console.log("codedAnswer", codedAnswer);
+  }
+
+  onDelete(event: Event, concept: any): void {
+    this.conceptService.deleteConcept(concept?.uuid).subscribe((response) => {
+      if (response) {
+        this.page = 1;
+        this.codedAnswers$ = this.conceptService.getConceptsByParameters({
+          searchingText: "LIS_CODED_ANSWERS",
+          pageSize: this.pageSize,
+          page: this.page,
+        });
+      }
+    });
   }
 }

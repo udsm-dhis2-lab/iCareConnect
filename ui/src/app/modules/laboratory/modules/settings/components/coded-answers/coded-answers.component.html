@@ -29,40 +29,98 @@
       </mat-radio-button>
     </mat-radio-group>
     <div *ngIf="category === 'New'">
-      <app-form
-        [fields]="codedAnswersFields"
-        (formUpdate)="onFormUpdate($event)"
-      ></app-form>
+      <div class="alert alert-danger" *ngIf="hasError" role="alert">
+        {{ error }}
+      </div>
+      <div *ngIf="!hasError">
+        <app-form
+          [fields]="codedAnswersFields"
+          (formUpdate)="onFormUpdate($event)"
+        ></app-form>
 
-      <div class="w-100 d-flex justify-content-end mt-2">
-        <button mat-stroked-button (click)="onSave($event)">Save</button>
+        <div class="w-100 d-flex justify-content-end mt-2">
+          <button
+            mat-stroked-button
+            [disabled]="!isFormValid"
+            (click)="onSave($event)"
+          >
+            Save
+          </button>
+        </div>
       </div>
     </div>
     <div *ngIf="category === 'List'">
       <div *ngIf="params?.codedAnswers">
-        <table class="table">
+        <table class="table table-striped">
           <thead>
             <tr>
               <th>SN</th>
               <th>Answer</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
-            <tr
-              *ngFor="
-                let codedAnswer of params?.codedAnswers;
-                let count = index
-              "
-            >
-              <td>{{ count + 1 }}</td>
-              <td>
-                {{ codedAnswer?.display }}
-              </td>
-            </tr>
+            <ng-container *ngIf="params?.codedAnswers?.length > 0">
+              <tr
+                *ngFor="
+                  let codedAnswer of params?.codedAnswers;
+                  let count = index
+                "
+              >
+                <td>{{ count + 1 }}</td>
+                <td>
+                  {{ codedAnswer?.display }}
+                </td>
+                <td>
+                  <button mat-icon-button [matMenuTriggerFor]="menu">
+                    <mat-icon>more_vert</mat-icon>
+                  </button>
+                  <mat-menu #menu="matMenu">
+                    <button mat-menu-item (click)="onEdit($event, codedAnswer)">
+                      <mat-icon>edit</mat-icon>
+                      <span>Edit</span>
+                    </button>
+                    <button
+                      mat-menu-item
+                      (click)="onDelete($event, codedAnswer)"
+                    >
+                      <mat-icon>delete</mat-icon>
+                      <span>Delete</span>
+                    </button>
+                  </mat-menu>
+                </td>
+              </tr>
+            </ng-container>
+            <ng-container *ngIf="params?.codedAnswers?.length === 0">
+              <tr>
+                <td colspan="100%">
+                  <div class="alert alert-warning" role="alert">No items</div>
+                </td>
+              </tr>
+            </ng-container>
           </tbody>
         </table>
       </div>
 
+      <div class="w-100 d-flex justify-content-end">
+        <button
+          [disabled]="page <= 1"
+          mat-button
+          (click)="getList($event, 'prev')"
+        >
+          Prev
+        </button>
+        <button
+          [disabled]="
+            params?.codedAnswers && params?.codedAnswers?.length < pageSize
+          "
+          mat-button
+          (click)="getList($event, 'next')"
+          class="ml-2"
+        >
+          Next
+        </button>
+      </div>
       <mat-progress-bar
         *ngIf="!params?.codedAnswers"
         mode="indeterminate"
