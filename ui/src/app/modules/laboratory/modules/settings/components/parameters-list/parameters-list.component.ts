@@ -19,6 +19,8 @@ export class ParametersListComponent implements OnInit {
   ngOnInit(): void {
     this.parameters$ = this.conceptService.getConceptsByParameters({
       searchingText: "LIS_TEST_PARAMETER",
+      pageSize: this.pageSize,
+      page: this.page,
     });
   }
 
@@ -35,11 +37,13 @@ export class ParametersListComponent implements OnInit {
   searchConcept(event: KeyboardEvent): void {
     this.page = 1;
     const searchingText = (event.target as HTMLInputElement).value;
-    this.parameters$ = this.conceptService.getConceptsByParameters({
-      searchingText,
-      pageSize: this.pageSize,
-      page: this.page,
-    });
+    if (searchingText) {
+      this.parameters$ = this.conceptService.getConceptsByParameters({
+        searchingText,
+        pageSize: this.pageSize,
+        page: this.page,
+      });
+    }
   }
 
   onEdit(event: Event, concept: ConceptGetFull): void {

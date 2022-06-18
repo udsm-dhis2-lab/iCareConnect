@@ -1,18 +1,20 @@
 <div *ngIf="{ parameters: parameters$ | async } as params">
   <div>
-    <!-- <div class="d-flex float-left w-100">
-      <mat-form-field class="w-75" style="font-size: 0.9rem">
+    <div class="d-flex justify-content-between w-100">
+      <mat-form-field class="w-50" apperance="fill" style="font-size: 0.9rem">
         <mat-label>Search</mat-label>
         <mat-icon matPrefix>search</mat-icon
         ><input
           type="text"
           placeholder="Search"
+          class="search-input"
           matInput
           autocomplete="off"
           (keyup)="searchConcept($event)"
         />
       </mat-form-field>
-    </div> -->
+      <div class="w-50"></div>
+    </div>
     <!-- {{ params?.parameters | json }} -->
     <div style="max-height: 500px; overflow: auto">
       <table *ngIf="params?.parameters" class="table">
@@ -51,7 +53,7 @@
         </tbody>
       </table>
     </div>
-    <!-- <div class="w-100 d-flex justify-content-end">
+    <div class="w-100 d-flex justify-content-end">
       <button
         [disabled]="page <= 1"
         mat-button
@@ -69,7 +71,7 @@
       >
         Next
       </button>
-    </div> -->
+    </div>
   </div>
   <mat-progress-bar
     *ngIf="!params?.parameters"
