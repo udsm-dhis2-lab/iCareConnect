@@ -1,3 +1,4 @@
+import { AddNewUserComponent } from "./add-new-user/add-new-user.component";
 import { CodedAnswersComponent } from "./coded-answers/coded-answers.component";
 import { CodesSelectionComponent } from "./codes-selection/codes-selection.component";
 import { ConceptMapTypesComponent } from "./concept-map-types/concept-map-types.component";
@@ -18,6 +19,8 @@ import { StandardConceptCreationComponent } from "./standard-concept-creation/st
 import { StandardConceptsListComponent } from "./standard-concepts-list/standard-concepts-list.component";
 import { TestMethodsComponent } from "./test-methods/test-methods.component";
 import { TestsControlComponent } from "./tests-control/tests-control.component";
+import { UserManagementDashboardComponent } from "./user-management-dashboard/user-management-dashboard.component";
+import { UsersListComponent } from "./users-list/users-list.component";
 
 export const components: any[] = [
   LabOrdersManagementComponent,
@@ -40,4 +43,9 @@ export const components: any[] = [
   ConceptSetMembersSelectionComponent,
   LabsSectionManagementComponent,
   CodesSelectionComponent,
+  UserManagementDashboardComponent,
+  UsersListComponent,
+  AddNewUserComponent,
 ];
+
+export const entrySettingComponents: any[] = [AddNewUserComponent];

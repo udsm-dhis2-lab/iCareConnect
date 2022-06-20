@@ -1,0 +1,35 @@
+<div class="w-100 d-flex justify-content-between">
+  <div class="custom-selection">
+    <div class="h5 text-center multiple-selection-header">Available</div>
+    <div class="d-flex justify-content-between w-100 ml-1 mr-1">
+      <mat-form-field class="w-100" style="font-size: 0.9rem">
+        <mat-label>Search</mat-label>
+        <mat-icon matPrefix>search</mat-icon
+        ><input
+          type="text"
+          placeholder="Search"
+          matInput
+          autocomplete="off"
+          (keyup)="searchItem($event)"
+        />
+      </mat-form-field>
+    </div>
+    <ul class="concept-list">
+      <li (click)="getSelectedItem($event, item)" *ngFor="let item of items">
+        {{ item?.display }}
+      </li>
+    </ul>
+  </div>
+  <div style="width: 10%"></div>
+  <div class="custom-selection">
+    <div class="h5 text-center multiple-selection-header">Selected</div>
+    <ul class="concept-list">
+      <li
+        (click)="removeSelectedItem($event, item)"
+        *ngFor="let item of selectedItems"
+      >
+        {{ item?.display }}
+      </li>
+    </ul>
+  </div>
+</div>

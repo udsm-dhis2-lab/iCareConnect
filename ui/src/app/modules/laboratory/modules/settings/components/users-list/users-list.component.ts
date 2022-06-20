@@ -9,8 +9,7 @@ import {
 import { MatDialog } from "@angular/material/dialog";
 import { MatPaginator } from "@angular/material/paginator";
 import { MatTableDataSource } from "@angular/material/table";
-import { UserCreateModel } from "../../models/user.model";
-import { CaptureSignatureComponent } from "../../../../shared/components/capture-signature/capture-signature.component";
+import { CaptureSignatureComponent } from "src/app/shared/components/capture-signature/capture-signature.component";
 
 @Component({
   selector: "app-users-list",
@@ -26,7 +25,7 @@ export class UsersListComponent implements OnInit {
     "systemId",
     "actions",
   ];
-  dataSource: MatTableDataSource<UserCreateModel>;
+  dataSource: MatTableDataSource<any>;
   @ViewChild(MatPaginator) paginator: MatPaginator;
   public data = {};
   @Output() edit: EventEmitter<any> = new EventEmitter<any>();
@@ -35,7 +34,7 @@ export class UsersListComponent implements OnInit {
   constructor(private dialog: MatDialog) {}
 
   ngOnInit(): void {
-    this.dataSource = new MatTableDataSource<UserCreateModel>(this.users);
+    this.dataSource = new MatTableDataSource<any>(this.users);
     this.dataSource.paginator = this.paginator;
   }
 

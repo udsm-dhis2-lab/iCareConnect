@@ -5,7 +5,7 @@ import { SettingsComponent } from "./settings/settings.component";
 import { SettingsRoutingModule } from "./settings-routing.module";
 import { HomeComponent } from "./pages/home/home.component";
 import { TestSettingsComponent } from "./components/test-settings/test-settings.component";
-import { components } from "./components";
+import { components, entrySettingComponents } from "./components";
 import { TestSelectorComponent } from "./components/test-selector/test-selector.component";
 import { TestTimeComponent } from "./components/test-time/test-time.component";
 import { TestMaleRangeComponent } from "./components/test-male-range/test-male-range.component";
@@ -41,5 +41,6 @@ import { settingsContainers } from "./containers";
     ExtendedParametersSettingsComponent,
   ],
   imports: [CommonModule, SettingsRoutingModule, SharedModule],
+  entryComponents: [...entrySettingComponents],
 })
 export class SettingsModule {}
