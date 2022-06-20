@@ -576,6 +576,17 @@ export class SingleRegistrationComponent implements OnInit {
                                       };
                                     }
                                   );
+
+                                  let obs = [];
+                                  if (this.formData["notes"]?.value) {
+                                    obs = [
+                                      {
+                                        concept:
+                                          "3a010ff3-6361-4141-9f4e-dd863016db5a",
+                                        value: this.formData["notes"]?.value,
+                                      },
+                                    ];
+                                  }
                                   const encounterObject = {
                                     visit: visitResponse?.uuid,
                                     patient: patientResponse?.uuid,
@@ -583,6 +594,7 @@ export class SingleRegistrationComponent implements OnInit {
                                       "9b46d3fe-1c3e-4836-a760-f38d286b578b",
                                     location: this.currentLocation?.uuid,
                                     orders,
+                                    obs,
                                     encounterProviders: [
                                       {
                                         provider: this.provider?.uuid,
