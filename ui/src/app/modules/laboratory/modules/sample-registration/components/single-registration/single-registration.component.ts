@@ -30,6 +30,7 @@ import { BarCodeModalComponent } from "../../../sample-acceptance-and-results/co
 
 import { uniqBy, keyBy } from "lodash";
 import { OrdersService } from "src/app/shared/resources/order/services/orders.service";
+import { SampleRegistrationFinalizationComponent } from "../sample-registration-finalization/sample-registration-finalization.component";
 
 @Component({
   selector: "app-single-registration",
@@ -995,24 +996,26 @@ export class SingleRegistrationComponent implements OnInit {
                                                                   if (
                                                                     sampleStatusResponse
                                                                   ) {
+                                                                    const data =
+                                                                      {
+                                                                        identifier:
+                                                                          this
+                                                                            .currentSampleLabel,
+                                                                        sample:
+                                                                          sampleResponse,
+                                                                        sampleLabelsUsedDetails:
+                                                                          this
+                                                                            .sampleLabelsUsedDetails,
+                                                                      };
                                                                     this.dialog
                                                                       .open(
-                                                                        BarCodeModalComponent,
+                                                                        SampleRegistrationFinalizationComponent,
                                                                         {
                                                                           height:
                                                                             "200px",
                                                                           width:
-                                                                            "15%",
-                                                                          data: {
-                                                                            identifier:
-                                                                              this
-                                                                                .currentSampleLabel,
-                                                                            sample:
-                                                                              sample,
-                                                                            sampleLabelsUsedDetails:
-                                                                              this
-                                                                                .sampleLabelsUsedDetails,
-                                                                          },
+                                                                            "30%",
+                                                                          data,
                                                                           disableClose:
                                                                             false,
                                                                           panelClass:
@@ -1022,6 +1025,9 @@ export class SingleRegistrationComponent implements OnInit {
                                                                       .afterClosed()
                                                                       .subscribe(
                                                                         () => {
+                                                                          this.openBarCodeDialog(
+                                                                            data
+                                                                          );
                                                                           this.isRegistrationReady =
                                                                             false;
                                                                           setTimeout(
@@ -1103,5 +1109,15 @@ export class SingleRegistrationComponent implements OnInit {
         }
       });
     }
+  }
+
+  openBarCodeDialog(data): void {
+    this.dialog.open(BarCodeModalComponent, {
+      height: "200px",
+      width: "15%",
+      data,
+      disableClose: false,
+      panelClass: "custom-dialog-container",
+    });
   }
 }
