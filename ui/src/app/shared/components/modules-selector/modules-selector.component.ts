@@ -100,7 +100,6 @@ export class ModulesSelectorComponent implements OnInit {
         ["order"],
         ["asc"]
       );
-      console.log("modulesReferences", this.modulesReferences);
       this.currentModule = this.lisConfigurations?.isLIS
         ? (this.modulesReferences?.filter(
             (module: any) => module?.id === "laboratory"

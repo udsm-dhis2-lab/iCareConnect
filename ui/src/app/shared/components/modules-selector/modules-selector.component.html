@@ -16,7 +16,10 @@
     </div>
   </div>
   <div>
-    <mat-chip-list class="sub-menu-items mat-elevation-z1">
+    <mat-chip-list
+      class="sub-menu-items mat-elevation-z1"
+      *ngIf="!lisConfigurations?.isLIS"
+    >
       <mat-chip
         (click)="onSetLocation($event, userLocation)"
         *ngFor="let userLocation of userLocationsForTheCurrentModule"
