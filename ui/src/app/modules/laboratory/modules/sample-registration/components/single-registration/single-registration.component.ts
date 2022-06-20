@@ -80,6 +80,12 @@ export class SingleRegistrationComponent implements OnInit {
 
   isRegistrationReady: boolean = true;
 
+  sampleCollectedByField: any;
+  sampleColectionDateField: any;
+
+  broughtOnField: any;
+  broughtByField: any;
+
   constructor(
     private samplesService: SamplesService,
     private labTestsService: LabTestsService,
@@ -213,7 +219,38 @@ export class SingleRegistrationComponent implements OnInit {
     //     };
     //   }),
     //   shouldHaveLiveSearchForDropDownFields: false,
-    // });
+    // });getSelectedRCollectedOnTime
+
+    this.createSampleCollectionDetailsFields();
+    this.createSampleBroughtByDetailsFields();
+  }
+
+  createSampleCollectionDetailsFields(data?: any): void {
+    this.sampleColectionDateField = new DateField({
+      id: "collectedOn",
+      key: "collectedOn",
+      label: "Collected On",
+    });
+
+    this.sampleCollectedByField = new Textbox({
+      id: "collectedBy",
+      key: "collectedBy",
+      label: "Collected By",
+    });
+  }
+
+  createSampleBroughtByDetailsFields(data?: any): void {
+    this.broughtOnField = new DateField({
+      id: "broughtOn",
+      key: "broughtOn",
+      label: "Brought One",
+    });
+
+    this.broughtByField = new Textbox({
+      id: "broughtBy",
+      key: "broughtBy",
+      label: "Brought By",
+    });
   }
 
   togglePatientDetailsFieldSet(event: Event): void {
@@ -232,6 +269,28 @@ export class SingleRegistrationComponent implements OnInit {
         value: (event.target as any)?.value,
         id: "receivedAt",
         key: "receivedAt",
+      },
+    };
+  }
+
+  getSelectedRCollectedOnTime(event: Event): void {
+    this.formData = {
+      ...this.formData,
+      collectedAt: {
+        value: (event.target as any)?.value,
+        id: "collectedAt",
+        key: "collectedAt",
+      },
+    };
+  }
+
+  getSelectedBroughtOnTime(event: Event): void {
+    this.formData = {
+      ...this.formData,
+      broughtAt: {
+        value: (event.target as any)?.value,
+        id: "broughtAt",
+        key: "broughtAt",
       },
     };
   }
@@ -787,6 +846,121 @@ export class SingleRegistrationComponent implements OnInit {
                                                               ...statuses,
                                                               receivedByStatus,
                                                             ];
+
+                                                            if (
+                                                              this.formData[
+                                                                "collectedBy"
+                                                              ]?.value ||
+                                                              this.formData[
+                                                                "collectedOn"
+                                                              ]?.value
+                                                            ) {
+                                                              const collectedByStatus =
+                                                                {
+                                                                  sample: {
+                                                                    uuid: sampleResponse?.uuid,
+                                                                  },
+                                                                  user: {
+                                                                    uuid: localStorage.getItem(
+                                                                      "userUuid"
+                                                                    ),
+                                                                  },
+                                                                  remarks:
+                                                                    this
+                                                                      .formData[
+                                                                      "collectedBy"
+                                                                    ]?.value ||
+                                                                    "NO COLLECTOR SPECIFIED",
+                                                                  status:
+                                                                    "COLLECTED_BY",
+                                                                  timestamp:
+                                                                    (this
+                                                                      .formData[
+                                                                      "collectedOn"
+                                                                    ]?.value
+                                                                      ? `${moment(
+                                                                          this
+                                                                            .formData[
+                                                                            "collectedOn"
+                                                                          ]
+                                                                            ?.value
+                                                                        ).format(
+                                                                          "YYYY-MM-DD"
+                                                                        )}`
+                                                                      : formatDateToYYMMDD(
+                                                                          new Date()
+                                                                        )
+                                                                    ).toString() +
+                                                                    " " +
+                                                                    (this
+                                                                      .formData[
+                                                                      "collectedAt"
+                                                                    ]?.value
+                                                                      ? `${this.formData["collectedAt"]?.value}:00.001`
+                                                                      : "00:00:00:001"),
+                                                                };
+                                                              statuses = [
+                                                                ...statuses,
+                                                                collectedByStatus,
+                                                              ];
+                                                            }
+
+                                                            if (
+                                                              this.formData[
+                                                                "broughtBy"
+                                                              ]?.value ||
+                                                              this.formData[
+                                                                "broughtOn"
+                                                              ]?.value
+                                                            ) {
+                                                              const broughtdByStatus =
+                                                                {
+                                                                  sample: {
+                                                                    uuid: sampleResponse?.uuid,
+                                                                  },
+                                                                  user: {
+                                                                    uuid: localStorage.getItem(
+                                                                      "userUuid"
+                                                                    ),
+                                                                  },
+                                                                  remarks:
+                                                                    this
+                                                                      .formData[
+                                                                      "broughtBy"
+                                                                    ]?.value ||
+                                                                    "NO PERSON SPECIFIED",
+                                                                  status:
+                                                                    "BROUGHT_BY",
+                                                                  timestamp:
+                                                                    (this
+                                                                      .formData[
+                                                                      "broughtOn"
+                                                                    ]?.value
+                                                                      ? `${moment(
+                                                                          this
+                                                                            .formData[
+                                                                            "broughtOn"
+                                                                          ]
+                                                                            ?.value
+                                                                        ).format(
+                                                                          "YYYY-MM-DD"
+                                                                        )}`
+                                                                      : formatDateToYYMMDD(
+                                                                          new Date()
+                                                                        )) +
+                                                                    " " +
+                                                                    (this
+                                                                      .formData[
+                                                                      "broughtAt"
+                                                                    ]?.value
+                                                                      ? `${this.formData["broughtAt"]?.value}:00.001`
+                                                                      : "00:00:00:001"),
+                                                                };
+                                                              statuses = [
+                                                                ...statuses,
+                                                                broughtdByStatus,
+                                                              ];
+                                                            }
 
                                                             if (
                                                               statuses?.length >

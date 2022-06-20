@@ -61,12 +61,12 @@
     <div class="col-12">
       <mat-stepper #stepper>
         <mat-step errorMessage="Some fields not fed.">
-          <ng-template matStepLabel>Specimen Details</ng-template>
+          <ng-template matStepLabel>Sample Information</ng-template>
           <div class="row">
             <div class="col-lg-12 col-md-12 col-sx-12 col-sm-12">
               <div class="for-specimen-details">
                 <fieldset>
-                  <legend>Specimen Details</legend>
+                  <legend>Sample Information</legend>
                   <!-- <app-sample-label
                     [label]="params?.labSampleLabel"
                     (sampleLabel)="onGetSampleLabel($event)"
@@ -76,6 +76,29 @@
                     [isFormHorizontal]="true"
                     (formUpdate)="onFormUpdate($event, 'specimenDetails')"
                   ></app-form>
+
+                  <div class="row">
+                    <div class="col-4">
+                      <app-form
+                        [fields]="[sampleCollectedByField]"
+                        (formUpdate)="onFormUpdate($event)"
+                      ></app-form>
+                    </div>
+                    <div class="col-4">
+                      <app-form
+                        [fields]="[sampleColectionDateField]"
+                        (formUpdate)="onFormUpdate($event)"
+                      ></app-form>
+                    </div>
+                    <div class="col-4">
+                      <input
+                        (change)="getSelectedRCollectedOnTime($event)"
+                        class="time-input-field"
+                        placeholder="Collected At"
+                        type="time"
+                      />
+                    </div>
+                  </div>
                   <div class="row">
                     <div class="col-4">
                       <app-form
@@ -135,6 +158,40 @@
                   [fields]="referringDoctorFields"
                   (formUpdate)="onFormUpdate($event)"
                 ></app-form>
+              </fieldset>
+            </div>
+          </div>
+        </mat-step>
+
+        <mat-step errorMessage="Some fields not fed.">
+          <ng-template matStepLabel>Brought By</ng-template>
+          <div>
+            <div class="brought-by-field">
+              <fieldset>
+                <legend>Referring Doctor</legend>
+
+                <div class="row">
+                  <div class="col-4">
+                    <app-form
+                      [fields]="[broughtByField]"
+                      (formUpdate)="onFormUpdate($event)"
+                    ></app-form>
+                  </div>
+                  <div class="col-4">
+                    <app-form
+                      [fields]="[broughtOnField]"
+                      (formUpdate)="onFormUpdate($event)"
+                    ></app-form>
+                  </div>
+                  <div class="col-4">
+                    <input
+                      (change)="getSelectedBroughtOnTime($event)"
+                      class="time-input-field"
+                      placeholder="Brought At"
+                      type="time"
+                    />
+                  </div>
+                </div>
               </fieldset>
             </div>
           </div>
