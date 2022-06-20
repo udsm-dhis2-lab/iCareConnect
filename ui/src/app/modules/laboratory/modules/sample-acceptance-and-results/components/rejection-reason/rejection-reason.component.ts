@@ -1,16 +1,20 @@
-import { Component, Inject, OnInit } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { Component, Inject, OnInit } from "@angular/core";
+import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 
-import * as _ from 'lodash';
+import * as _ from "lodash";
+import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
+import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
 
 @Component({
-  selector: 'app-rejection-reason',
-  templateUrl: './rejection-reason.component.html',
-  styleUrls: ['./rejection-reason.component.scss'],
+  selector: "app-rejection-reason",
+  templateUrl: "./rejection-reason.component.html",
+  styleUrls: ["./rejection-reason.component.scss"],
 })
 export class RejectionReasonComponent implements OnInit {
-  reason: string = '';
   codedSampleRejectionReasons: any[];
+  rejectionReasonField: any;
+  rejectionReason: string;
+  isFormValid: boolean = false;
   constructor(
     private dialogRef: MatDialogRef<RejectionReasonComponent>,
     @Inject(MAT_DIALOG_DATA) data
@@ -18,15 +22,30 @@ export class RejectionReasonComponent implements OnInit {
     this.codedSampleRejectionReasons = data?.codedSampleRejectionReasons;
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.rejectionReasonField = new Dropdown({
+      id: "rejectionReason",
+      key: "rejectionReason",
+      label: "Reason for Rejection",
+      searchTerm: "SAMPLE_REJECTION_REASONS",
+      required: true,
+      options: [],
+      conceptClass: "Misc",
+      searchControlType: "concept",
+      shouldHaveLiveSearchForDropDownFields: true,
+    });
+  }
+
+  onFormUpdate(formValue: FormValue): void {
+    this.rejectionReason = formValue.getValues()["rejectionReason"]?.value;
+    this.isFormValid = formValue.isValid;
+  }
 
   saveReason(e) {
     e.stopPropagation();
     this.dialogRef.close({
-      reasonText: (_.filter(this.codedSampleRejectionReasons, {
-        uuid: this.reason,
-      }) || [])[0]?.display,
-      reasonUuid: this.reason,
+      reasonText: "",
+      reasonUuid: this.rejectionReason,
     });
   }
 

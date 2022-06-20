@@ -154,7 +154,6 @@ export class SampleAcceptanceComponent implements OnInit {
     this.dialog
       .open(RejectionReasonComponent, {
         width: "40%",
-        height: "250px",
         disableClose: false,
         data: {
           sample: sample,
