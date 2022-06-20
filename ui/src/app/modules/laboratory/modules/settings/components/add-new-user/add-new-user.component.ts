@@ -55,14 +55,12 @@ export class AddNewUserComponent implements OnInit {
   shouldCreateProvider: boolean = false;
   genderValues = [
     { code: "F", value: "Female" },
-    { code: "U", value: "Unknown" },
     { code: "M", value: "Male" },
   ];
 
-  gender: { Female: string; Male: string; Unknown: string } = {
+  gender: { Female: string; Male: string } = {
     Female: "F",
     Male: "M",
-    Unknown: "U",
   };
   currentDataAvailable: RoleCreate[];
   passwordFocusOut: Boolean = false;
@@ -222,7 +220,9 @@ export class AddNewUserComponent implements OnInit {
                         panelClass: ["snack-color"],
                       }
                     );
-                    window.location.href = "#/maintenance/users/";
+                    setTimeout(() => {
+                      this.dialogRef.close();
+                    }, 200);
                     this.saving = false;
                   }
                 })
