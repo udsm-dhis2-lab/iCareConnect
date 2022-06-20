@@ -1,0 +1,24 @@
+<div class="sample-registration-confirmation p-3">
+  <div class="h5">Sample Rejection</div>
+  <div class="rejection-reasons">
+    <app-form
+      [fields]="[rejectionReasonField]"
+      (formUpdate)="onFormUpdate($event)"
+    >
+    </app-form>
+  </div>
+  <div class="w-100 d-flex justify-content-end mt-2">
+    <button mat-stroked-button (click)="onFinalize($event, 'continue')">
+      Continue
+    </button>
+    <button
+      mat-stroked-button
+      color="primary"
+      [disabled]="!isFormValid"
+      (click)="onFinalize($event, 'reject')"
+      class="ml-2"
+    >
+      Reject & Continue
+    </button>
+  </div>
+</div>
