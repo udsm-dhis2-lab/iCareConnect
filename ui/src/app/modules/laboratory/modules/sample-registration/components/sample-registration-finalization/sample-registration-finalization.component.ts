@@ -35,6 +35,7 @@ export class SampleRegistrationFinalizationComponent implements OnInit {
       key: "rejectionReason",
       label: "Reason for Rejection",
       searchTerm: "SAMPLE_REJECTION_REASONS",
+      required: true,
       options: [],
       conceptClass: "Misc",
       searchControlType: "concept",

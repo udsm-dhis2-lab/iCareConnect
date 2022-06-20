@@ -1379,10 +1379,7 @@
       </div>
     </mat-tab>
 
-    <mat-tab
-      label="Rejected Samples/ Marked for Re-collection"
-      *ngIf="!LISConfigurations?.isLIS"
-    >
+    <mat-tab label="Rejected Samples">
       <div class="filter-and-legend">
         <mat-form-field class="w-50">
           <mat-label>Search</mat-label>
@@ -1427,20 +1424,28 @@
               </th>
               <th colspan="2" class="text-center">Test details</th>
 
+              <th rowspan="2" *ngIf="LISConfigurations?.isLIS">Received By</th>
+              <th rowspan="2" *ngIf="LISConfigurations?.isLIS">Received On</th>
               <th rowspan="2">
-                {{ !LISConfigurations?.isLIS ? "Collected By" : "Received By" }}
+                {{
+                  !LISConfigurations?.isLIS ? "Collected By" : "Registered By"
+                }}
               </th>
               <th rowspan="2">
-                {{ !LISConfigurations?.isLIS ? "Collected On" : "Received On" }}
+                {{
+                  !LISConfigurations?.isLIS ? "Collected On" : "Registered On"
+                }}
               </th>
               <th rowspan="2">Priority</th>
               <th rowspan="2">Reason For Rejection</th>
-              <th rowspan="2">Action</th>
+              <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">Action</th>
             </tr>
             <tr>
               <th>Test Order</th>
               <!-- <th>Container</th> -->
-              <th>Ordered By</th>
+              <th>
+                {{ !LISConfigurations?.isLIS ? "Collected By" : "ID" }}
+              </th>
               <!-- <th>Source</th>
               <th>Date Ordered</th> -->
               <!-- <th>Payment</th> -->
@@ -1465,13 +1470,13 @@
                     {{ count + 1 }}
                   </td>
                   <td
-                    *ngIf="orderCount == 0 && !LISConfigurations?.isLIS"
+                    *ngIf="orderCount == 0"
                     [attr.rowspan]="sample?.orders?.length"
                   >
                     {{ sample?.department?.departmentName }}
                   </td>
                   <td
-                    *ngIf="orderCount == 0"
+                    *ngIf="orderCount == 0 && !LISConfigurations?.isLIS"
                     [attr.rowspan]="sample?.orders?.length"
                   >
                     {{ sample?.specimen?.specimenName }}
@@ -1499,11 +1504,33 @@
                   </td>
                   <td>{{ order?.order?.concept?.display }}</td>
                   <!-- <td></td> -->
-                  <td>{{ order?.order?.orderer?.name }}</td>
+                  <td>
+                    {{
+                      !LISConfigurations?.isLIS
+                        ? order?.order?.orderer?.name
+                        : order?.order?.orderNumber
+                    }}
+                  </td>
 
                   <!-- <td>{{ order?.order?.location?.name }}</td>
                   <td>{{ order?.order?.orderDate | date: "medium" }}</td> -->
                   <!-- <td>{{order?.p_sub_category}} - {{order?.p_sub_category}}</td> -->
+                  <td
+                    *ngIf="orderCount == 0 && LISConfigurations?.isLIS"
+                    [attr.rowspan]="sample?.orders?.length"
+                  >
+                    {{ sample?.receivedByStatus?.user?.name }}
+                  </td>
+                  <td
+                    *ngIf="orderCount == 0 && LISConfigurations?.isLIS"
+                    [attr.rowspan]="sample?.orders?.length"
+                  >
+                    {{
+                      sample?.receivedOnStatus?.timestamp
+                        ? (sample?.receivedOnStatus?.timestamp | date: "medium")
+                        : ""
+                    }}
+                  </td>
                   <td
                     *ngIf="orderCount == 0"
                     [attr.rowspan]="sample?.orders?.length"
@@ -1520,13 +1547,21 @@
                     *ngIf="orderCount == 0"
                     [attr.rowspan]="sample?.orders?.length"
                   >
-                    {{ sample?.priorityHigh ? "Urgent" : "Routine" }}
+                    {{
+                      !LISConfigurations?.isLIS
+                        ? sample?.priorityHigh
+                          ? "Urgent"
+                          : "Routine"
+                        : sample?.priorityStatus?.status
+                        ? sample?.priorityStatus?.status
+                        : "Routine"
+                    }}
                   </td>
                   <td>
                     {{ sample?.reasonForRejection?.display }}
                   </td>
                   <td
-                    *ngIf="orderCount == 0"
+                    *ngIf="orderCount == 0 && !LISConfigurations?.isLIS"
                     [attr.rowspan]="sample?.orders?.length"
                   >
                     <button
