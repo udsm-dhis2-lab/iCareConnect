@@ -29,6 +29,17 @@
                         [fields]="basicParametersFields"
                         (formUpdate)="onFormUpdate($event)"
                       ></app-form>
+                      <div
+                        *ngIf="
+                          formData['datatype']?.value ===
+                          '8d4a48b6-c2cc-11de-8d13-0010c6dffd0f'
+                        "
+                      >
+                        <app-coded-answers-selection
+                          [selectedItems]="selectedAnswers"
+                          (selectedAnswers)="onGetSelectedAnswers($event)"
+                        ></app-coded-answers-selection>
+                      </div>
                     </div>
                     <div class="col-lg-6 col-md-6 col-sx-12 col-sm-12">
                       <app-form
@@ -69,7 +80,7 @@
                         mat-stroked-button
                         (click)="onSave($event, parameterUuid)"
                       >
-                        Save
+                        {{ !parameterUuid ? "Save" : "Update" }}
                       </button>
                     </div>
                   </div>
