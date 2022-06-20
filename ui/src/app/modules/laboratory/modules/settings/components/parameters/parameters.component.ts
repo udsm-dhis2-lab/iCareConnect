@@ -35,6 +35,8 @@ export class ParametersComponent implements OnInit {
   saving: boolean = false;
   codedOptions: any[];
   parameterUuid: string;
+
+  selectedAnswers: any[] = [];
   constructor(
     private conceptService: ConceptsService,
     private conceptReferenceService: ReferenceTermsService
@@ -53,6 +55,10 @@ export class ParametersComponent implements OnInit {
     if (values["datatype"]?.value) {
       this.createPrecisionField();
     }
+  }
+
+  onGetSelectedAnswers(selectedAnswers: any[]): void {
+    this.selectedAnswers = selectedAnswers;
   }
 
   onFormUpdateForSource(formValue: FormValue): void {
@@ -92,6 +98,7 @@ export class ParametersComponent implements OnInit {
   }
 
   createBasicParametersFields(data?: any): void {
+    const descriptionsDetails = data?.descriptions[0];
     const shortName =
       data && data?.names
         ? (data?.names.filter((name) => name?.conceptNameType === "SHORT") ||
@@ -116,6 +123,7 @@ export class ParametersComponent implements OnInit {
         id: "description",
         key: "description",
         label: "Description",
+        value: descriptionsDetails ? descriptionsDetails?.description : null,
       }),
       new Dropdown({
         id: "datatype",
@@ -201,6 +209,13 @@ export class ParametersComponent implements OnInit {
     }
 
     const conceptReferenceTerm = this.formData["code"]?.value;
+    let answers = [];
+
+    if (this.selectedAnswers?.length > 0) {
+      answers = this.selectedAnswers.map((answer) => {
+        return answer?.uuid;
+      });
+    }
 
     const conceptMapType = "35543629-7d8c-11e1-909d-c80aa9edcf4e";
     const mappings = [{ conceptReferenceTerm, conceptMapType }];
@@ -216,6 +231,7 @@ export class ParametersComponent implements OnInit {
       // Softcode concept class
       set: false,
       setMembers: [],
+      answers,
       conceptClass: "Test",
       units: this.formData["units"]?.value
         ? this.formData["units"]?.value
@@ -231,6 +247,10 @@ export class ParametersComponent implements OnInit {
 
     if (!this.formData["precision"]?.value) {
       this.concept = omit(this.concept, "displayPrecision");
+    }
+
+    if (this.selectedAnswers?.length === 0) {
+      this.concept = omit(this.concept, "answers");
     }
 
     if (!this.formData["units"]?.value) {
@@ -259,6 +279,7 @@ export class ParametersComponent implements OnInit {
           this.createUnitField();
           this.createCodesMappingSourceField();
           this.createCodeField([]);
+          this.selectedAnswers = response?.answers;
         }
       });
   }

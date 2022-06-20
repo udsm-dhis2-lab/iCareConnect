@@ -1,4 +1,5 @@
 import { AddNewUserComponent } from "./add-new-user/add-new-user.component";
+import { CodedAnswersSelectionComponent } from "./coded-answers-selection/coded-answers-selection.component";
 import { CodedAnswersComponent } from "./coded-answers/coded-answers.component";
 import { CodesSelectionComponent } from "./codes-selection/codes-selection.component";
 import { ConceptMapTypesComponent } from "./concept-map-types/concept-map-types.component";
@@ -46,6 +47,7 @@ export const components: any[] = [
   UserManagementDashboardComponent,
   UsersListComponent,
   AddNewUserComponent,
+  CodedAnswersSelectionComponent,
 ];
 
 export const entrySettingComponents: any[] = [AddNewUserComponent];
