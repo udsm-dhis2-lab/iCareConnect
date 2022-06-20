@@ -9,7 +9,7 @@
       providerDetails: providerDetails$ | async
     } as params"
   >
-    <div class="col-md-3 no-print">
+    <div class="col-md-2 col-sx-12 col-sm-12 no-print">
       <div class="h3 p-3 text-muted" style="border-bottom: solid 1px #eee">
         Reports list
       </div>
@@ -90,50 +90,56 @@
         </li>
       </ul>
     </div>
-    <div class="col-md-9 report">
-      <div style="padding: 5px 0" class="no-print">
-        <mat-button-toggle-group
-          name="fontStyle"
-          (change)="onSelectPeriod($event)"
-        >
-          <mat-button-toggle value="ToDay">Today</mat-button-toggle>
+    <div class="col-md-10 col-sx-12 col-sm-12 report">
+      <div class="w-100 d-flex justify-content-left no-print">
+        <div style="width: auto">
+          <mat-button-toggle-group
+            name="fontStyle"
+            (change)="onSelectPeriod($event)"
+          >
+            <mat-button-toggle value="ToDay">Today</mat-button-toggle>
 
-          <mat-button-toggle value="ThisWeek">This Week</mat-button-toggle>
-          <!-- <mat-button-toggle value="LastSevenDays"
+            <mat-button-toggle value="ThisWeek">This Week</mat-button-toggle>
+            <!-- <mat-button-toggle value="LastSevenDays"
             >Last 7 days</mat-button-toggle
           > -->
-          <mat-button-toggle value="ThisMonth">This Month</mat-button-toggle>
-          <mat-button-toggle value="ThisYear">This year</mat-button-toggle>
-        </mat-button-toggle-group>
+            <mat-button-toggle value="ThisMonth">This Month</mat-button-toggle>
+            <mat-button-toggle value="ThisYear">This year</mat-button-toggle>
+          </mat-button-toggle-group>
+        </div>
 
-        <mat-form-field appearance="fill" floatLabel="always">
-          <mat-label>Enter a date range</mat-label>
-          <mat-date-range-input [rangePicker]="picker">
-            <input
-              matStartDate
-              placeholder="Start date"
-              [(ngModel)]="startDate"
-              (dateInput)="dateRangeSelect()"
-            />
-            <input
-              matEndDate
-              placeholder="End date"
-              [(ngModel)]="endDate"
-              (dateInput)="dateRangeSelect()"
-            />
-          </mat-date-range-input>
-          <mat-datepicker-toggle
-            matSuffix
-            [for]="picker"
-          ></mat-datepicker-toggle>
-          <mat-date-range-picker #picker></mat-date-range-picker>
-        </mat-form-field>
-
-        <!-- {{startDate}}- {{endDate}} -->
-
+        <div class="w-25">
+          <mat-form-field
+            appearance="fill"
+            class="ml-2 mt-1"
+            floatLabel="always"
+          >
+            <mat-label>Enter a date range</mat-label>
+            <mat-date-range-input [rangePicker]="picker">
+              <input
+                matStartDate
+                placeholder="Start date"
+                [(ngModel)]="startDate"
+                (dateInput)="dateRangeSelect()"
+              />
+              <input
+                matEndDate
+                placeholder="End date"
+                [(ngModel)]="endDate"
+                (dateInput)="dateRangeSelect()"
+              />
+            </mat-date-range-input>
+            <mat-datepicker-toggle
+              matSuffix
+              [for]="picker"
+            ></mat-datepicker-toggle>
+            <mat-date-range-picker #picker></mat-date-range-picker>
+          </mat-form-field>
+        </div>
+      </div>
+      <div class="w-100 d-flex justify-content-end mt-1 mb-2">
         <button
           (click)="onDownloadCSV($event)"
-          class="mr-2 float-right"
           mat-stroked-button
           color="primary"
         >
@@ -141,7 +147,7 @@
         </button>
         <button
           (click)="onPrint($event)"
-          class="mr-2 float-right"
+          class="ml-2"
           mat-stroked-button
           color="primary"
         >
@@ -175,8 +181,7 @@
                   <h4 style="text-align: center">
                     <b
                       >United Republic of Tanzania. <br />
-                      Ministry of Health, Community Development, Gender, Elderly
-                      and Children.
+                      Ministry of Health.
                       <br />
                       <span *ngIf="labConfigs?.facilityDetails">
                         {{ labConfigs?.facilityDetails?.name }}<br />
@@ -783,8 +788,7 @@
               <h4 style="text-align: center">
                 <b
                   >United Republic of Tanzania. <br />
-                  Ministry of Health, Community Development, Gender, Elderly and
-                  Children.
+                  Ministry of Health.
                   <br />
                   <span *ngIf="labConfigs?.facilityDetails">
                     {{ labConfigs?.facilityDetails?.name }}<br />
