@@ -9,8 +9,7 @@ import {
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { Observable } from "rxjs";
 import { CurrentUserService } from "src/app/core/services";
-import { ProviderAttributeModel } from "../../models/provider-attribute.model";
-import { UserService } from "../../services/users.service";
+import { SystemUsersService } from "src/app/core/services/system-users.service";
 
 @Component({
   selector: "app-capture-signature",
@@ -28,14 +27,14 @@ export class CaptureSignatureComponent implements OnInit {
   data: any;
   providerDetails$: Observable<any>;
   providerAttributeDetails$: Observable<any>;
-  providerAttributes$: Observable<ProviderAttributeModel[]>;
+  providerAttributes$: Observable<any[]>;
   isProviderAttributeFormValid: boolean = false;
   providerFormValues: any[];
   constructor(
     private dialogRef: MatDialogRef<CaptureSignatureComponent>,
     @Inject(MAT_DIALOG_DATA) data,
     private currentUserService: CurrentUserService,
-    private userService: UserService
+    private userService: SystemUsersService
   ) {
     this.data = data;
   }

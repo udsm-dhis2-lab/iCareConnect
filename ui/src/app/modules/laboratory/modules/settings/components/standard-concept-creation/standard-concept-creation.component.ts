@@ -258,7 +258,7 @@ export class StandardConceptCreationComponent implements OnInit {
         names = [
           ...names,
           {
-            name: selectedCode?.display?.split(" (")[1]?.split(")")[0],
+            name: selectedCode?.display?.split(" (")[0],
             locale: "en",
             localePreferred: false,
             conceptNameType: "INDEX_TERM",

@@ -60,6 +60,8 @@ import { IcareHelpComponent } from "./icare-help/icare-help.component";
 import { PatientPersonAttributesComponent } from "./patient-person-attributes/patient-person-attributes.component";
 import { LoaderComponent } from "./loader/loader.component";
 import { MultipleConceptsSelectionComponent } from "./multiple-concepts-selection/multiple-concepts-selection.component";
+import { CaptureSignatureComponent } from "./capture-signature/capture-signature.component";
+import { MultipleItemsSelectionComponent } from "./multiple-items-selection/multiple-items-selection.component";
 
 export const components: any[] = [
   PatientSearchComponent,
@@ -124,6 +126,8 @@ export const components: any[] = [
   PatientPersonAttributesComponent,
   LoaderComponent,
   MultipleConceptsSelectionComponent,
+  CaptureSignatureComponent,
+  MultipleItemsSelectionComponent,
 ];
 
 export const sharedEntryComponents: any[] = [
@@ -138,6 +142,7 @@ export const sharedEntryComponents: any[] = [
   CreatePatientBedOrderModalComponent,
   AddDiagnosisModalComponent,
   DeleteDiagnosisModalComponent,
+  CaptureSignatureComponent,
 ];
 
 export * from "./patient-vitals-summary/patient-vitals-summary.component";
