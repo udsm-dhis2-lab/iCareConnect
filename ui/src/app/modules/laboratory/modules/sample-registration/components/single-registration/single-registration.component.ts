@@ -244,7 +244,7 @@ export class SingleRegistrationComponent implements OnInit {
     this.broughtOnField = new DateField({
       id: "broughtOn",
       key: "broughtOn",
-      label: "Brought One",
+      label: "Brought On",
     });
 
     this.broughtByField = new Textbox({
