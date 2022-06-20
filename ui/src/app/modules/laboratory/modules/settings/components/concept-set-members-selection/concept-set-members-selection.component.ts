@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { ConceptGetFull } from "src/app/shared/resources/openmrs";
 import { uniqBy, orderBy } from "lodash";
+import { ConceptsService } from "src/app/shared/resources/concepts/services/concepts.service";
 
 @Component({
   selector: "app-concept-set-members-selection",
@@ -13,7 +14,7 @@ export class ConceptSetMembersSelectionComponent implements OnInit {
   selectedItems: ConceptGetFull[] = [];
   @Output() selectedSetMembers: EventEmitter<ConceptGetFull[]> =
     new EventEmitter<ConceptGetFull[]>();
-  constructor() {}
+  constructor(private conceptService: ConceptsService) {}
 
   ngOnInit(): void {
     this.selectedItems = this.selectedSetMembersItems;
@@ -51,7 +52,20 @@ export class ConceptSetMembersSelectionComponent implements OnInit {
     this.selectedSetMembers.emit(this.selectedItems);
   }
 
-  searchConcept(event): void {
-    console.log(event);
+  searchConcept(event: KeyboardEvent): void {
+    const searchingText = (event.target as HTMLInputElement).value;
+    if (searchingText && searchingText?.length > 2) {
+      this.conceptService
+        .getConceptsByParameters({
+          searchingText: searchingText,
+          page: 1,
+          pageSize: 10,
+        })
+        .subscribe((response) => {
+          this.concepts = response;
+        });
+    } else {
+      this.concepts = this.concepts;
+    }
   }
 }
