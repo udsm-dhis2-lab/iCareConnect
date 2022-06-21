@@ -6,11 +6,6 @@
   } as params"
 >
   <div class="row" *ngIf="isRegistrationReady">
-    <div *ngIf="errorMessage" class="col-12 mt-2 p-3">
-      <div class="alert alert-danger" role="alert">
-        {{ errorMessage }}
-      </div>
-    </div>
     <div class="col-12">
       <mat-radio-group class="registration-category">
         <mat-radio-button
@@ -32,9 +27,6 @@
           Non-Clinical
         </mat-radio-button>
       </mat-radio-group>
-    </div>
-    <div class="col-12" *ngIf="savingData">
-      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
     </div>
 
     <div class="col-12" *ngIf="registrationCategory === 'Clinical'">
@@ -168,7 +160,7 @@
           <div>
             <div class="brought-by-field">
               <fieldset>
-                <legend>Referring Doctor</legend>
+                <legend>Who brought sample</legend>
 
                 <div class="row">
                   <div class="col-4">
@@ -242,6 +234,15 @@
           {{ activeAttribute?.message }}
         </div>
       </div>
+    </div>
+    <div *ngIf="errorMessage" class="col-12 mt-2 p-3">
+      <div class="alert alert-danger" role="alert">
+        {{ errorMessage }}
+      </div>
+    </div>
+
+    <div class="col-12" *ngIf="savingData">
+      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
     </div>
     <div class="col-12 d-flex justify-content-end mt-2 mb-2">
       <button mat-stroked-button color="primary" (click)="onSave($event)">
