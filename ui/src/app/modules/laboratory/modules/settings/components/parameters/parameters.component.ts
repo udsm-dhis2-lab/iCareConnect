@@ -15,6 +15,7 @@ import {
 } from "src/app/shared/resources/openmrs";
 
 import { omit } from "lodash";
+import { any } from "cypress/types/bluebird";
 
 @Component({
   selector: "app-parameters",
@@ -37,6 +38,12 @@ export class ParametersComponent implements OnInit {
   parameterUuid: string;
 
   selectedAnswers: any[] = [];
+
+  lowNormalField: any;
+
+  highNormalField: any;
+
+  conceptBeingEdited: any;
   constructor(
     private conceptService: ConceptsService,
     private conceptReferenceService: ReferenceTermsService
@@ -53,12 +60,31 @@ export class ParametersComponent implements OnInit {
     const values = formValue.getValues();
     this.formData = { ...this.formData, ...values };
     if (values["datatype"]?.value) {
-      this.createPrecisionField();
+      this.createPrecisionField(this.conceptBeingEdited);
+      this.createLowAndHighNormalFields(this.conceptBeingEdited);
     }
   }
 
   onGetSelectedAnswers(selectedAnswers: any[]): void {
     this.selectedAnswers = selectedAnswers;
+  }
+
+  createLowAndHighNormalFields(data?: any): void {
+    this.lowNormalField = new Textbox({
+      id: "lowNormal",
+      key: "lowNormal",
+      label: "Low Normal",
+      controlType: "Number",
+      value: data?.lowNormal,
+    });
+
+    this.highNormalField = new Textbox({
+      id: "hiNormal",
+      key: "hiNormal",
+      label: "High Normal",
+      controlType: "Number",
+      value: data?.hiNormal,
+    });
   }
 
   onFormUpdateForSource(formValue: FormValue): void {
@@ -142,8 +168,8 @@ export class ParametersComponent implements OnInit {
       }),
     ];
   }
-  createPrecisionField(): void {
-    this.displayPrecisionField = createDisplayPrecisionField();
+  createPrecisionField(data?: any): void {
+    this.displayPrecisionField = createDisplayPrecisionField(data);
   }
 
   createCodesMappingSourceField(data?: any): void {
@@ -232,6 +258,12 @@ export class ParametersComponent implements OnInit {
       set: false,
       setMembers: [],
       answers,
+      lowNormal: this.formData["lowNormal"]?.value
+        ? this.formData["lowNormal"]?.value
+        : null,
+      hiNormal: this.formData["hiNormal"]?.value
+        ? this.formData["hiNormal"]?.value
+        : null,
       conceptClass: "Test",
       units: this.formData["units"]?.value
         ? this.formData["units"]?.value
@@ -245,17 +277,27 @@ export class ParametersComponent implements OnInit {
       mappings,
     };
 
-    if (!this.formData["precision"]?.value) {
-      this.concept = omit(this.concept, "displayPrecision");
+    const keys = Object.keys(this.concept);
+
+    if (this.concept) {
+      keys.forEach((key) => {
+        if (!this.concept[key]) {
+          this.concept = omit(this.concept, key);
+        }
+      });
     }
 
-    if (this.selectedAnswers?.length === 0) {
-      this.concept = omit(this.concept, "answers");
-    }
+    // if (!this.formData["precision"]?.value) {
+    //   this.concept = omit(this.concept, "displayPrecision");
+    // }
 
-    if (!this.formData["units"]?.value) {
-      this.concept = omit(this.concept, "units");
-    }
+    // if (this.selectedAnswers?.length === 0) {
+    //   this.concept = omit(this.concept, "answers");
+    // }
+
+    // if (!this.formData["units"]?.value) {
+    //   this.concept = omit(this.concept, "units");
+    // }
 
     (!uuid
       ? this.conceptService.createConcept(this.concept)
@@ -263,6 +305,7 @@ export class ParametersComponent implements OnInit {
     ).subscribe((response) => {
       if (response) {
         this.parameterUuid = null;
+        this.conceptBeingEdited = null;
         this.saving = false;
         this.resetFields();
       }
@@ -275,11 +318,13 @@ export class ParametersComponent implements OnInit {
       .getConceptDetailsByUuid(this.parameterUuid, "full")
       .subscribe((response) => {
         if (response) {
+          this.conceptBeingEdited = response;
           this.createBasicParametersFields(response);
           this.createUnitField();
           this.createCodesMappingSourceField();
           this.createCodeField([]);
           this.selectedAnswers = response?.answers;
+          this.createLowAndHighNormalFields(response);
         }
       });
   }

@@ -28,6 +28,7 @@ import { loadSpecimenSources } from "./store/actions/specimen-sources-and-tests-
 import { getAllSampleTypes } from "src/app/store/selectors";
 import { LISConfigurationsModel } from "./resources/models/lis-configurations.model";
 import { getLISConfigurations } from "src/app/store/selectors/lis-configurations.selectors";
+import { Title } from "@angular/platform-browser";
 
 @Component({
   selector: "lab-root",
@@ -73,7 +74,8 @@ export class LaboratoryComponent implements OnInit {
   constructor(
     private store: Store<AppState>,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private titleService: Title
   ) {
     this.store.dispatch(loadRolesDetails());
     this.store.dispatch(loadOrderTypes());
@@ -146,6 +148,7 @@ export class LaboratoryComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.titleService.setTitle("NPHL IS");
     this.url$ = this.route.url.pipe(map((segments) => segments.join("")));
     this.userRoles$ = this.store.select(getAllUSerRoles);
     // this.store.dispatch(loadSessionDetails());
