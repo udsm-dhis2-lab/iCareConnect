@@ -228,7 +228,8 @@
                                 !notInRangeIsSet[item?.order?.concept?.uuid] &&
                                 item?.order?.concept.numeric &&
                                 item?.order?.concept.lowNormal &&
-                                item?.order?.concept.hiNormal
+                                item?.order?.concept.hiNormal &&
+                                !LISConfigurations?.isLIS
                               "
                             >
                               <mat-label
@@ -266,7 +267,8 @@
                             <mat-form-field
                               class="w-50"
                               *ngIf="
-                                notInRangeIsSet[item?.order?.concept?.uuid]
+                                notInRangeIsSet[item?.order?.concept?.uuid] ||
+                                LISConfigurations?.isLIS
                               "
                             >
                               <mat-label
@@ -328,7 +330,8 @@
                               </button>
                               <button
                                 *ngIf="
-                                  notInRangeIsSet[item?.order?.concept?.uuid]
+                                  notInRangeIsSet[item?.order?.concept?.uuid] &&
+                                  !LISConfigurations?.isLIS
                                 "
                                 [disabled]="
                                   item?.testAllocations[0]?.firstSignOff
@@ -387,7 +390,8 @@
                                 !notInRangeIsSet[item?.order?.concept?.uuid] &&
                                 item?.order?.concept.numeric &&
                                 item?.order?.concept.lowNormal &&
-                                item?.order?.concept.hiNormal
+                                item?.order?.concept.hiNormal &&
+                                !LISConfigurations?.isLIS
                               "
                               [disabled]="
                                 item?.testAllocations[0]?.firstSignOff
@@ -775,12 +779,14 @@
                               *ngIf="
                                 !notInRangeIsSet[parameter?.uuid] &&
                                 !parameter?.numeric &&
+                                parameter?.datatype?.display !== 'Numeric' &&
                                 parameter?.answers &&
-                                parameter?.answers.length == 0
+                                parameter?.answers.length == 0 &&
+                                !LISConfigurations?.isLIS
                               "
                             >
                               <mat-label
-                                >Value for {{ parameter?.display }}
+                                >Value for {{ parameter?.display }} - NANA
                               </mat-label>
                               <textarea
                                 (keyup)="
@@ -862,9 +868,11 @@
                               class="w-50"
                               *ngIf="
                                 !notInRangeIsSet[parameter?.uuid] &&
-                                parameter?.numeric &&
+                                (parameter?.numeric ||
+                                  parameter?.datatype?.display === 'Numeric') &&
                                 parameter?.lowNormal &&
-                                parameter?.hiNormal
+                                parameter?.hiNormal &&
+                                !LISConfigurations?.isLIS
                               "
                             >
                               <mat-label
@@ -910,9 +918,11 @@
                             <button
                               *ngIf="
                                 !notInRangeIsSet[parameter?.uuid] &&
-                                parameter?.numeric &&
+                                (parameter?.numeric ||
+                                  parameter?.datatype?.display === 'Numeric') &&
                                 parameter?.lowNormal &&
-                                parameter?.hiNormal
+                                parameter?.hiNormal &&
+                                !LISConfigurations?.isLIS
                               "
                               style="font-size: 0.6rem; margin-left: 5px"
                               mat-button
@@ -925,16 +935,21 @@
                             >
                               Not in range?
                             </button>
-
                             <mat-form-field
                               class="w-50"
-                              *ngIf="notInRangeIsSet[parameter?.uuid]"
+                              *ngIf="
+                                notInRangeIsSet[parameter?.uuid] &&
+                                !LISConfigurations?.isLIS
+                              "
                             >
                               <mat-label
-                                >Value for {{ parameter?.display }}
+                                >Enter value for {{ parameter?.display }}
                               </mat-label>
                               <input
-                                *ngIf="!parameter?.numeric"
+                                *ngIf="
+                                  !parameter?.numeric &&
+                                  parameter?.datatype?.display !== 'Numeric'
+                                "
                                 matInput
                                 autocomplete="off"
                                 [type]="'text'"
@@ -966,7 +981,10 @@
                               />
 
                               <input
-                                *ngIf="parameter?.numeric"
+                                *ngIf="
+                                  parameter?.numeric ||
+                                  parameter?.datatype?.display === 'Numeric'
+                                "
                                 type="number"
                                 (change)="
                                   setEnteredParameterValue(
@@ -1008,7 +1026,10 @@
                                 <mat-icon>close</mat-icon>
                               </button>
                               <button
-                                *ngIf="notInRangeIsSet[parameter?.uuid]"
+                                *ngIf="
+                                  notInRangeIsSet[parameter?.uuid] &&
+                                  !LISConfigurations?.isLIS
+                                "
                                 style="font-size: 0.6rem; margin-left: 5px"
                                 mat-button
                                 matSuffix
@@ -1024,12 +1045,102 @@
                                 Go to range
                               </button>
                             </mat-form-field>
-
                             <mat-form-field
                               class="w-50"
+                              *ngIf="LISConfigurations?.isLIS"
+                            >
+                              <mat-label
+                                >Enter value for {{ parameter?.display }}
+                              </mat-label>
+                              <input
+                                *ngIf="
+                                  !parameter?.numeric &&
+                                  parameter?.datatype?.display !== 'Numeric'
+                                "
+                                matInput
+                                autocomplete="off"
+                                [type]="'text'"
+                                class="text-left"
+                                [value]="
+                                  item?.allocationsPairedBySetMember[
+                                    parameter?.uuid
+                                  ]?.results?.length > 0
+                                    ? item?.allocationsPairedBySetMember[
+                                        parameter?.uuid
+                                      ]?.results[
+                                        item?.allocationsPairedBySetMember[
+                                          parameter?.uuid
+                                        ]?.results?.length - 1
+                                      ]?.value
+                                    : null
+                                "
+                                [disabled]="
+                                  item?.allocationsPairedBySetMember[
+                                    parameter?.uuid
+                                  ]?.firstSignOff
+                                "
+                                (keyup.enter)="
+                                  setEnteredParameterValue(
+                                    parameter,
+                                    $event.target.value
+                                  )
+                                "
+                              />
+
+                              <input
+                                *ngIf="
+                                  parameter?.numeric ||
+                                  parameter?.datatype?.display === 'Numeric'
+                                "
+                                type="number"
+                                (change)="
+                                  setEnteredParameterValue(
+                                    parameter,
+                                    $event.target.value
+                                  )
+                                "
+                                [value]="
+                                  item?.allocationsPairedBySetMember[
+                                    parameter?.uuid
+                                  ]?.results?.length > 0
+                                    ? item?.allocationsPairedBySetMember[
+                                        parameter?.uuid
+                                      ]?.results[
+                                        item?.allocationsPairedBySetMember[
+                                          parameter?.uuid
+                                        ]?.results?.length - 1
+                                      ]?.valueNumeric
+                                    : null
+                                "
+                                style="text-align: center"
+                                [disabled]="
+                                  item?.allocationsPairedBySetMember[
+                                    parameter?.uuid
+                                  ]?.firstSignOff
+                                "
+                                matInput
+                                required
+                                id="{{ parameter?.display }}"
+                              />
+                              <button
+                                mat-button
+                                *ngIf="values[parameter?.uuid]"
+                                matSuffix
+                                mat-icon-button
+                                aria-label="Clear"
+                                (click)="values[parameter?.uuid] = ''"
+                              >
+                                <mat-icon>close</mat-icon>
+                              </button>
+                            </mat-form-field>
+
+                            <!-- <mat-form-field
+                              class="w-50"
                               *ngIf="
-                                !notInRangeIsSet[parameter?.uuid] &&
-                                parameter?.numeric &&
+                                (!notInRangeIsSet[parameter?.uuid] ||
+                                  LISConfigurations?.isLIS) &&
+                                (parameter?.numeric ||
+                                  parameter?.datatype?.display === 'Numeric') &&
                                 (!parameter.lowNormal || !parameter.hiNormal)
                               "
                             >
@@ -1069,7 +1180,7 @@
                                 required
                                 id="{{ parameter?.display }}"
                               />
-                            </mat-form-field>
+                            </mat-form-field> -->
 
                             <span
                               *ngIf="parameter?.units"
@@ -1080,7 +1191,8 @@
 
                             <span
                               *ngIf="
-                                parameter?.numeric &&
+                                (parameter?.numeric ||
+                                  parameter?.datatype?.display === 'Numeric') &&
                                 parameter?.lowNormal &&
                                 parameter?.hiNormal
                               "
