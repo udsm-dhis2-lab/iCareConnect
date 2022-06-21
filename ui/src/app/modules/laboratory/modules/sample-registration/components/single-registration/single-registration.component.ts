@@ -378,6 +378,28 @@ export class SingleRegistrationComponent implements OnInit {
       this.labSections,
       this.testOrders
     );
+
+    // Identify referring doctor fields entered values
+    let attributeMissingOnDoctorsAttributes;
+    const doctorsAttributesWithValues =
+      this.referringDoctorAttributes.filter(
+        (attribute) => this.formData["attribute-" + attribute?.value]?.value
+      ) || [];
+    if (
+      doctorsAttributesWithValues?.length !=
+      this.referringDoctorAttributes?.length
+    ) {
+      attributeMissingOnDoctorsAttributes = true;
+      this.referringDoctorAttributes.forEach((attribute) => {
+        if (!this.formData["attribute-" + attribute?.value]?.value) {
+          this.formData["attribute-" + attribute?.value] = {
+            id: "attribute-" + attribute?.value,
+            value: "NONE",
+          };
+        }
+      });
+    }
+
     this.personDetailsData =
       this.registrationCategory === "Clinical"
         ? this.personDetailsData
