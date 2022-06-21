@@ -2,45 +2,17 @@
   class="test-methods-and-specimen-sources"
   *ngIf="{ conceptDataTypes: conceptDataTypes$ | async } as params"
 >
-  <mat-tab-group>
-    <mat-tab label="Test methods">
-      <ng-template matTabContent>
-        <div class="p-3">
-          <app-standard-concept-creation
-            *ngIf="params?.conceptDataTypes"
-            [conceptClass]="'Test'"
-            [isSet]="true"
-            [conceptDataTypes]="params?.conceptDataTypes"
-            [standardSearchTerm]="'TEST_METHODS'"
-            [setMembersSearchTerm]="'LIS_TEST_PARAMETER'"
-          ></app-standard-concept-creation>
+  <app-standard-concept-creation
+    *ngIf="params?.conceptDataTypes"
+    [conceptClass]="'Test'"
+    [isSet]="true"
+    [conceptDataTypes]="params?.conceptDataTypes"
+    [standardSearchTerm]="'TEST_METHODS'"
+    [setMembersSearchTerm]="'LIS_TEST_PARAMETER'"
+  ></app-standard-concept-creation>
 
-          <mat-progress-bar
-            *ngIf="!params?.conceptDataTypes"
-            mode="indeterminate"
-          ></mat-progress-bar>
-        </div>
-      </ng-template>
-    </mat-tab>
-    <mat-tab label="Specimen Sources">
-      <ng-template matTabContent>
-        <div class="p-3">
-          <app-standard-concept-creation
-            *ngIf="params?.conceptDataTypes"
-            [conceptClass]="'Specimen'"
-            [dataType]="'8d4a4c94-c2cc-11de-8d13-0010c6dffd0f'"
-            [isSet]="true"
-            [conceptDataTypes]="params?.conceptDataTypes"
-            [standardSearchTerm]="'SPECIMEN_SOURCE'"
-            [setMembersSearchTerm]="'TEST_METHODS'"
-          ></app-standard-concept-creation>
-
-          <mat-progress-bar
-            *ngIf="!params?.conceptDataTypes"
-            mode="indeterminate"
-          ></mat-progress-bar>
-        </div>
-      </ng-template>
-    </mat-tab>
-  </mat-tab-group>
+  <mat-progress-bar
+    *ngIf="!params?.conceptDataTypes"
+    mode="indeterminate"
+  ></mat-progress-bar>
 </div>

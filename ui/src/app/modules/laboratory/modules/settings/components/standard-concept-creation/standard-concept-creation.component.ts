@@ -13,6 +13,8 @@ import {
   ConceptsourceGet,
 } from "src/app/shared/resources/openmrs";
 
+import { omit } from "lodash";
+
 @Component({
   selector: "app-standard-concept-creation",
   templateUrl: "./standard-concept-creation.component.html",
@@ -269,7 +271,7 @@ export class StandardConceptCreationComponent implements OnInit {
       });
     }
 
-    const concept = {
+    let concept = {
       names: names,
       descriptions: [
         {
@@ -300,6 +302,16 @@ export class StandardConceptCreationComponent implements OnInit {
           : null,
       mappings,
     };
+
+    const keys: any[] = Object.keys(concept);
+    if (concept) {
+      keys.forEach((key) => {
+        if (!concept[key]) {
+          concept = omit(concept, key);
+        }
+      });
+    }
+
     (!this.conceptUuid
       ? this.conceptService.createConcept(concept)
       : this.conceptService.updateConcept(this.conceptUuid, concept)
