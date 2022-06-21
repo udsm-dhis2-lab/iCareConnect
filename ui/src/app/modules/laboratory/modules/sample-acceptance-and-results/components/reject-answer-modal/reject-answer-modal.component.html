@@ -1,4 +1,4 @@
-<div style="padding: 0 !important">
+<div>
   <mat-toolbar class="modal-header">Reason for rejecting</mat-toolbar>
   <div class="p-3">
     <mat-form-field
@@ -18,22 +18,22 @@
         cdkAutosizeMaxRows="4"
       ></textarea>
     </mat-form-field>
-    <div>
-      <button
-        mat-stroked-button
-        (click)="onSave($event)"
-        [disabled]="!reason || reason?.length < 2"
-        class="float-left"
-      >
-        Save
-      </button>
+    <div class="d-flex justify-content-end mt-2">
       <button
         mat-stroked-button
         (click)="onClose($event)"
         [disabled]="(reason && reason?.length >= 2) || reason !== ''"
-        class="float-right"
       >
         Cancel
+      </button>
+      <button
+        color="primary"
+        mat-stroked-button
+        class="ml-2"
+        (click)="onSave($event)"
+        [disabled]="!reason || reason?.length < 2"
+      >
+        Save
       </button>
     </div>
   </div>
