@@ -4,12 +4,13 @@
     (formUpdate)="onFormUpdateForSource($event)"
   ></app-form>
   <div>
-    <app-multiple-concepts-selection
+    <app-multiple-items-selection
       *ngIf="codedOptions && codedOptions?.length > 0"
-      [concepts]="codedOptions"
-      [selectedSetMembersItems]="selectedCodes"
-      (selectedSetMembers)="onGetSelectedMembers($event)"
-    ></app-multiple-concepts-selection>
+      [items]="codedOptions"
+      [itemType]="'concept'"
+      [selectedItems]="selectedCodes"
+      (getSelectedItems)="onGetSelectedMembers($event)"
+    ></app-multiple-items-selection>
 
     <mat-progress-bar
       *ngIf="!codedOptions"
