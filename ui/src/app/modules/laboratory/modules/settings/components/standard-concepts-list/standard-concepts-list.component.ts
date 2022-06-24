@@ -14,14 +14,19 @@ export class StandardConceptsListComponent implements OnInit {
   conceptsList$: Observable<ConceptGetFull[]>;
   saving: boolean = false;
 
+  page: number = 1;
+  pageSize: number = 10;
+
   @Output() conceptToEdit: EventEmitter<ConceptGetFull> =
     new EventEmitter<ConceptGetFull>();
   constructor(private conceptService: ConceptsService) {}
 
   ngOnInit(): void {
-    this.conceptsList$ = this.conceptService.getConceptsBySearchTerm(
-      this.standardSearchTerm
-    );
+    this.conceptsList$ = this.conceptService.getConceptsByParameters({
+      searchingText: this.standardSearchTerm,
+      pageSize: this.pageSize,
+      page: this.page,
+    });
   }
 
   onEdit(event: Event, concept: ConceptGetFull): void {
@@ -37,6 +42,28 @@ export class StandardConceptsListComponent implements OnInit {
           this.standardSearchTerm
         );
       }
+    });
+  }
+
+  searchConcept(event: KeyboardEvent): void {
+    this.page = 1;
+    const searchingText = (event.target as HTMLInputElement).value;
+    if (searchingText) {
+      this.conceptsList$ = this.conceptService.getConceptsByParameters({
+        searchingText,
+        pageSize: this.pageSize,
+        page: this.page,
+      });
+    }
+  }
+
+  getConceptList(event: Event, action: string): void {
+    event.stopPropagation();
+    this.page = action === "prev" ? this.page - 1 : this.page + 1;
+    this.conceptsList$ = this.conceptService.getConceptsByParameters({
+      searchingText: this.standardSearchTerm,
+      pageSize: this.pageSize,
+      page: this.page,
     });
   }
 }
