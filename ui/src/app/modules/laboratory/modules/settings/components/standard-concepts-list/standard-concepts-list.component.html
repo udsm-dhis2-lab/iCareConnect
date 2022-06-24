@@ -11,6 +11,20 @@
     </div>
   </div>
   <div class="w-100" *ngIf="!saving">
+    <div class="w-100">
+      <mat-form-field class="w-100" apperance="fill" style="font-size: 0.9rem">
+        <mat-label>Search</mat-label>
+        <mat-icon matPrefix>search</mat-icon
+        ><input
+          type="text"
+          placeholder="Search"
+          class="search-input"
+          matInput
+          autocomplete="off"
+          (keyup)="searchConcept($event)"
+        />
+      </mat-form-field>
+    </div>
     <div *ngIf="params?.conceptsList" style="height: 400px; overflow: auto">
       <table class="table">
         <thead>
@@ -67,6 +81,26 @@
           </ng-container>
         </tbody>
       </table>
+    </div>
+
+    <div class="w-100 d-flex justify-content-end">
+      <button
+        [disabled]="page <= 1"
+        mat-button
+        (click)="getConceptList($event, 'prev')"
+      >
+        Prev
+      </button>
+      <button
+        [disabled]="
+          params?.conceptsList && params?.conceptsList?.length < pageSize
+        "
+        mat-button
+        (click)="getConceptList($event, 'next')"
+        class="ml-2"
+      >
+        Next
+      </button>
     </div>
   </div>
 
