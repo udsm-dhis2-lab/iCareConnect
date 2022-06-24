@@ -60,6 +60,7 @@ export class StandardConceptCreationComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    console.log("itemTypeName", this.itemTypeName);
     this.createBasicConceptFields();
     if (this.searchTermForTestMethod) {
       this.createTestMethodField();
@@ -139,7 +140,11 @@ export class StandardConceptCreationComponent implements OnInit {
         id: "name",
         key: "name",
         label: "Name",
-        value: data && data?.display ? data?.display : null,
+        value:
+          data && data?.display
+            ? (this.standardSearchTerm = "TEST_ORDERS" ? "TO: " : "") +
+              data?.display
+            : null,
         required: true,
       }),
       new Textbox({
@@ -178,14 +183,7 @@ export class StandardConceptCreationComponent implements OnInit {
 
       this.selectedTestMethodDetails$.subscribe((response: any) => {
         if (response) {
-          let newFormData = {};
-          newFormData["datatype"] = {
-            value: (this.conceptDataTypes?.filter(
-              (dataType) => dataType?.display === response?.datatype?.display
-            ) || [])[0]?.uuid,
-          };
-          this.formData = { ...this.formData, ...newFormData };
-          this.createDisplayPrecisionField();
+          this.createBasicConceptFields(response);
         }
       });
     }
