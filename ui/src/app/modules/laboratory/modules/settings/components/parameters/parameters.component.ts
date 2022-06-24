@@ -244,7 +244,9 @@ export class ParametersComponent implements OnInit {
     }
 
     const conceptMapType = "35543629-7d8c-11e1-909d-c80aa9edcf4e";
-    const mappings = [{ conceptReferenceTerm, conceptMapType }];
+    const mappings = conceptReferenceTerm
+      ? [{ conceptReferenceTerm, conceptMapType }]
+      : [];
     this.concept = {
       names: names,
       descriptions: [
@@ -257,7 +259,7 @@ export class ParametersComponent implements OnInit {
       // Softcode concept class
       set: false,
       setMembers: [],
-      answers,
+      answers: uuid ? [] : answers,
       lowNormal: this.formData["lowNormal"]?.value
         ? this.formData["lowNormal"]?.value
         : null,
@@ -304,10 +306,28 @@ export class ParametersComponent implements OnInit {
       : this.conceptService.updateConcept(uuid, this.concept)
     ).subscribe((response) => {
       if (response) {
-        this.parameterUuid = null;
-        this.conceptBeingEdited = null;
-        this.saving = false;
-        this.resetFields();
+        // Repeat update with answers (if any) added: Current openmrs does not support to update concept answers by adding new on the existing ones
+        if (uuid && answers?.length > 0) {
+          this.concept = {
+            ...this.concept,
+            answers,
+          };
+          this.conceptService
+            .updateConcept(uuid, this.concept)
+            .subscribe((updateResponse) => {
+              if (updateResponse) {
+                this.parameterUuid = null;
+                this.conceptBeingEdited = null;
+                this.saving = false;
+                this.resetFields();
+              }
+            });
+        } else {
+          this.parameterUuid = null;
+          this.conceptBeingEdited = null;
+          this.saving = false;
+          this.resetFields();
+        }
       }
     });
   }

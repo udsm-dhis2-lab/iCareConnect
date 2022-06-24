@@ -21,11 +21,6 @@
     </div>
     <div *ngIf="!saving" class="row">
       <div class="col-lg-6 col-md-6 col-sx-12 col-sm-12">
-        <app-form
-          [fields]="basicConceptFields"
-          (formUpdate)="onFormUpdate($event)"
-        ></app-form>
-
         <div *ngIf="searchTermForTestMethod">
           <app-form
             [fields]="[testMethodField]"
@@ -41,6 +36,12 @@
           "
           mode="indeterminate"
         ></mat-progress-bar>
+        <div class="w-100">
+          <app-form
+            [fields]="basicConceptFields"
+            (formUpdate)="onFormUpdate($event)"
+          ></app-form>
+        </div>
         <div
           *ngIf="
             (isSet && !editingSet && !searchTermForTestMethod) ||
@@ -63,7 +64,7 @@
         </div>
       </div>
       <div class="col-lg-6 col-md-6 col-sx-12 col-sm-12">
-        <div
+        <!-- <div
           *ngIf="
             !dataType &&
             conceptDataTypes &&
@@ -98,7 +99,7 @@
             [fields]="[unitsField]"
             (formUpdate)="onFormUpdate($event)"
           ></app-form>
-        </div>
+        </div> -->
         <fieldset>
           <legend>{{ itemTypeName }} Codes</legend>
           <div *ngIf="params?.conceptSources">
