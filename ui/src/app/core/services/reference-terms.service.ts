@@ -25,16 +25,29 @@ export class ReferenceTermsService {
   }
 
   getReferenceTerms(parameters: {
-    page: number;
-    pageSize: number;
+    page?: number;
+    pageSize?: number;
     searchingText?: string;
+    source?: string;
   }): Observable<ConceptreferencetermGet[]> {
+    let query = {};
+    if (parameters?.searchingText) {
+      query["q"] = parameters?.searchingText;
+    }
+
+    if (parameters?.page && parameters?.pageSize) {
+      query["startIndex"] = (parameters?.page - 1) * parameters?.pageSize + 1;
+    }
+
+    if (parameters?.pageSize) {
+      query["limit"] = parameters?.pageSize;
+    }
+
+    if (parameters?.source) {
+      query["source"] = parameters?.source;
+    }
     return from(
-      this.api.conceptreferenceterm.getAllConceptReferenceTerms({
-        q: parameters?.searchingText,
-        limit: parameters?.pageSize,
-        startIndex: (parameters?.page - 1) * parameters?.pageSize + 1,
-      })
+      this.api.conceptreferenceterm.getAllConceptReferenceTerms(query)
     ).pipe(
       map((response) => {
         return response?.results;
