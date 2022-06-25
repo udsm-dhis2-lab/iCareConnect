@@ -6,16 +6,12 @@ import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
 import { Textbox } from "src/app/shared/modules/form/models/text-box.model";
 import { ConceptsService } from "src/app/shared/resources/concepts/services/concepts.service";
 import {
-  ConceptCreate,
-  ConceptCreateFull,
   ConceptdatatypeGet,
   ConceptGetFull,
-  ConceptNameCreate,
   ConceptsourceGet,
 } from "src/app/shared/resources/openmrs";
 
 import { omit } from "lodash";
-import { any } from "cypress/types/bluebird";
 
 @Component({
   selector: "app-parameters",
@@ -100,17 +96,20 @@ export class ParametersComponent implements OnInit {
             name: referenceTerm?.display,
           };
         });
-        this.createCodeField(this.codedOptions);
+        this.createCodeField(this.codedOptions, null, values["source"]?.value);
       });
   }
 
-  createCodeField(options?: any[], data?: any): void {
+  createCodeField(options?: any[], data?: any, source?: string): void {
     this.codeField = new Dropdown({
       id: "code",
       key: "code",
       label: "Code",
+      source: source,
+      searchControlType: "conceptreferenceterm",
       value: data ? data?.mappings[0]?.conceptReferenceTerm?.uuid : null,
       options,
+      shouldHaveLiveSearchForDropDownFields: true,
     });
   }
 

@@ -100,8 +100,17 @@ export class ConceptsService {
     if (parameters?.page && parameters?.pageSize) {
       query["startIndex"] = (parameters?.page - 1) * parameters?.pageSize + 1;
     }
+
+    if (parameters?.class) {
+      query["class"] = parameters?.class;
+    }
+    if (parameters?.code) {
+      query["code"] = parameters?.code;
+    }
     return from(this.api.concept.getAllConcepts(query)).pipe(
-      map((response) => response?.results),
+      map((response) => {
+        return response?.results;
+      }),
       catchError((error) => {
         return of(error);
       })
