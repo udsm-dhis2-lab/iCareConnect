@@ -16,11 +16,7 @@ export class CodedAnswersSelectionComponent implements OnInit {
   >();
   constructor(private conceptService: ConceptsService) {}
 
-  ngOnInit(): void {
-    this.codedAnswers$ = this.conceptService.getConceptsAsCodedAnswers({
-      searchingText: "LIS_CODED_ANSWERS",
-    });
-  }
+  ngOnInit(): void {}
 
   onGetSelectedAnswers(answers: ConceptGet[]): void {
     this.selectedAnswers.emit(answers);
