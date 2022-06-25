@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { from, Observable, of, zip } from "rxjs";
-import { map } from "rxjs/operators";
+import { catchError, map } from "rxjs/operators";
 import { Api, FormGet } from "src/app/shared/resources/openmrs";
 import { OpenmrsHttpClientService } from "../../openmrs-http-client/services/openmrs-http-client.service";
 import { getFormQueryFields } from "../helpers/get-form-query-field.helper";
@@ -118,6 +118,29 @@ export class FormService {
             );
           })
         );
+    } else if (searchControlType === "conceptreferenceterm") {
+      let query = {};
+      if (parameters?.source) {
+        query["source"] = parameters?.source;
+      }
+
+      if (parameters?.q) {
+        query["q"] = parameters?.q;
+      }
+
+      return from(
+        this.api.conceptreferenceterm.getAllConceptReferenceTerms(query)
+      ).pipe(
+        map((response) =>
+          response?.results.map((result) => {
+            return {
+              ...result,
+              display: result?.display.split(": ")[1],
+            };
+          })
+        ),
+        catchError((error) => of(error))
+      );
     } else if (searchControlType === "Drug") {
       const formattedParamters = omit(parameters, "class", "v");
       // console.log('filteringItems', filteringItems);

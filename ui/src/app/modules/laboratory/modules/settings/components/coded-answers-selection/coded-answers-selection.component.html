@@ -1,13 +1,9 @@
-<div *ngIf="codedAnswers$ | async as codedAnswers">
-  <div *ngIf="codedAnswers">
-    <app-multiple-items-selection
-      [items]="codedAnswers"
-      [selectedItems]="selectedItems"
-      (getSelectedItems)="onGetSelectedAnswers($event)"
-    ></app-multiple-items-selection>
-  </div>
-  <mat-progress-bar
-    *ngIf="!codedAnswers"
-    mode="indeterminate"
-  ></mat-progress-bar>
+<div>
+  <app-multiple-items-selection
+    [items]="[]"
+    [itemType]="'concept'"
+    [standardSearchTerm]="'LIS_CODED_ANSWERS'"
+    [selectedItems]="selectedItems"
+    (getSelectedItems)="onGetSelectedAnswers($event)"
+  ></app-multiple-items-selection>
 </div>

@@ -60,7 +60,6 @@ export class StandardConceptCreationComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    console.log("itemTypeName", this.itemTypeName);
     this.createBasicConceptFields();
     if (this.searchTermForTestMethod) {
       this.createTestMethodField();
