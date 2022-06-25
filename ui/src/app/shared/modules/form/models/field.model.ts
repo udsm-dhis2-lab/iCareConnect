@@ -23,6 +23,7 @@ export class Field<T> {
   filteringItems?: any[];
   category?: string;
   searchTerm?: string;
+  source?: string;
 
   constructor(
     options: {
@@ -47,6 +48,7 @@ export class Field<T> {
       filteringItems?: any[];
       category?: string;
       searchTerm?: string;
+      source?: string;
     } = {}
   ) {
     this.value = options.value;
@@ -70,5 +72,6 @@ export class Field<T> {
     this.category = options?.category;
     this.conceptClass = options?.conceptClass;
     this.searchTerm = options?.searchTerm;
+    this.source = options?.source;
   }
 }

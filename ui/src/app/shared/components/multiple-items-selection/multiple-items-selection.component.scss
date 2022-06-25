@@ -1,7 +1,7 @@
-.concept-list {
-    height: 320px;
-    overflow: auto;
-}
+// .concept-list {
+//     height: 320px;
+//     overflow: auto;
+// }
 
 .custom-selection {
     width: 45%;
@@ -24,4 +24,8 @@ ul li:hover {
     background-color: #EEE;
     padding: 6px;
     margin: -16px -4px 4px;
+}
+
+.item-in-list {
+    border-bottom: solid 1px #eee;
 }
