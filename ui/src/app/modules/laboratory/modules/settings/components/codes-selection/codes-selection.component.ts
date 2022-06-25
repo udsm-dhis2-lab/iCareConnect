@@ -17,6 +17,7 @@ export class CodesSelectionComponent implements OnInit {
   codedOptions$: Observable<any[]> = of([]);
 
   selectedCodes: any[] = [];
+  selectedCodingSource: string;
   @Output() selectedCodesItems: EventEmitter<any[]> = new EventEmitter<any[]>();
   constructor(private conceptReferenceService: ReferenceTermsService) {}
 
@@ -49,6 +50,7 @@ export class CodesSelectionComponent implements OnInit {
     const values = formValue.getValues();
     this.formData = { ...this.formData, ...values };
     this.codedOptions$ = of([]);
+    this.selectedCodingSource = values["source"]?.value;
     if (values["source"]?.value)
       this.conceptReferenceService
         .getReferenceTermsBySource(values["source"]?.value)

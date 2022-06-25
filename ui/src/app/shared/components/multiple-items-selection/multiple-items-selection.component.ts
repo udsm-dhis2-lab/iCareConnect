@@ -1,6 +1,8 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { uniqBy, orderBy } from "lodash";
 import { Observable, of } from "rxjs";
+import { debounceTime, distinctUntilChanged, switchMap } from "rxjs/operators";
+import { ReferenceTermsService } from "src/app/core/services/reference-terms.service";
 import { ConceptsService } from "../../resources/concepts/services/concepts.service";
 
 @Component({
@@ -13,20 +15,32 @@ export class MultipleItemsSelectionComponent implements OnInit {
   @Input() selectedItems: any[];
   @Input() itemType: string;
   @Input() standardSearchTerm: string;
+  @Input() source: string;
   currentSelectedItems: any[] = [];
   @Output() getSelectedItems: EventEmitter<any[]> = new EventEmitter<any[]>();
   items$: Observable<any[]>;
   page: number = 1;
   pageSize: number = 10;
-  constructor(private conceptService: ConceptsService) {}
+  constructor(
+    private conceptService: ConceptsService,
+    private conceptReferenceService: ReferenceTermsService
+  ) {}
 
   ngOnInit(): void {
     this.currentSelectedItems = this.selectedItems;
-    if (this.itemType && this.standardSearchTerm) {
+    if (
+      this.itemType &&
+      this.itemType === "concept" &&
+      this.standardSearchTerm
+    ) {
       this.items$ = this.conceptService.getConceptsByParameters({
         searchingText: this.standardSearchTerm,
         page: this.page,
         pageSize: this.pageSize,
+      });
+    } else if (this.itemType === "conceptReferenceTerm") {
+      this.items$ = this.conceptReferenceService.getReferenceTerms({
+        source: this.source,
       });
     } else {
       this.items$ = of(
@@ -73,12 +87,32 @@ export class MultipleItemsSelectionComponent implements OnInit {
   searchItem(event: KeyboardEvent): void {
     this.page = 1;
     const searchingText = (event.target as HTMLInputElement).value;
+
     if (searchingText && this.itemType === "concept") {
-      this.items$ = this.conceptService.getConceptsByParameters({
-        searchingText,
-        pageSize: this.pageSize,
-        page: this.page,
-      });
+      this.items$ = of(searchingText).pipe(
+        debounceTime(1000),
+        distinctUntilChanged(),
+        switchMap((term) =>
+          this.conceptService.getConceptsByParameters({
+            searchingText: term,
+            pageSize: 100,
+            page: this.page,
+          })
+        )
+      );
+    } else if (searchingText && this.itemType === "conceptReferenceTerm") {
+      this.items$ = of(searchingText).pipe(
+        debounceTime(1000),
+        distinctUntilChanged(),
+        switchMap((term) =>
+          this.conceptReferenceService.getReferenceTerms({
+            searchingText: term,
+            pageSize: 100,
+            page: this.page,
+            source: this.source,
+          })
+        )
+      );
     }
   }
 

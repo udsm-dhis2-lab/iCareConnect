@@ -1,10 +1,18 @@
 <div *ngIf="{ conceptsList: conceptsList$ | async } as params">
-  <app-concept-set-members-selection
+  <!-- <app-concept-set-members-selection
     *ngIf="params?.conceptsList"
     [concepts]="params?.conceptsList"
     [selectedSetMembersItems]="selectedSetMembersItems"
     (selectedSetMembers)="onGetSelectedSetMembers($event)"
-  ></app-concept-set-members-selection>
+  ></app-concept-set-members-selection> -->
+
+  <app-multiple-items-selection
+    [items]="[]"
+    [itemType]="'concept'"
+    [standardSearchTerm]="setMembersSearchTerm"
+    [selectedItems]="selectedSetMembersItems"
+    (getSelectedItems)="onGetSelectedSetMembers($event)"
+  ></app-multiple-items-selection>
 
   <mat-progress-bar
     *ngIf="!params?.conceptsList"

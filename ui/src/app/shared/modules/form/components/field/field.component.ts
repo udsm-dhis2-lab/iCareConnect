@@ -41,12 +41,13 @@ export class FieldComponent {
     new EventEmitter<FormGroup>();
 
   ngAfterViewInit() {
-    if (this.field?.searchTerm) {
+    if (this.field?.searchTerm || this.field?.source) {
       this.members$ = this.formService.searchItem(
         {
           q: this.field?.searchTerm,
           limit: 50,
           class: this.field?.conceptClass,
+          source: this.field?.source,
           v:
             this.field?.searchControlType === "concept"
               ? "custom:(uuid,display,datatype,conceptClass,mappings)"
@@ -132,6 +133,7 @@ export class FieldComponent {
       q: searchingText,
       limit: 50,
       class: this.field?.conceptClass,
+      source: this.field?.source,
       v:
         field?.searchControlType === "concept"
           ? "custom:(uuid,display,datatype,conceptClass,mappings)"

@@ -30,7 +30,10 @@
         mode="indeterminate"
       ></mat-progress-bar>
 
-      <div class="w-100 d-flex justify-content-end">
+      <div
+        class="w-100 d-flex justify-content-end"
+        *ngIf="itemType === 'concept'"
+      >
         <button
           [disabled]="page <= 1"
           mat-button
