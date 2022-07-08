@@ -1,7 +1,8 @@
-import { state } from '@angular/animations';
-import { Action, createReducer, on } from '@ngrx/store';
+import { state } from "@angular/animations";
+import { Action, createReducer, on } from "@ngrx/store";
 import {
   activeVisitNotFound,
+  clearActiveVisit,
   clearVisits,
   holdVisitState,
   loadActiveVisit,
@@ -11,17 +12,17 @@ import {
   upsertAdmittedPatientLocation,
   upsertVisit,
   upsertVisitDeathCheck,
-} from '../actions/visit.actions';
+} from "../actions/visit.actions";
 import {
   errorBaseState,
   loadedBaseState,
   loadingBaseState,
-} from '../states/base.state';
+} from "../states/base.state";
 import {
   initialVisitState,
   visitAdapter,
   VisitState,
-} from '../states/visit.state';
+} from "../states/visit.state";
 
 const reducer = createReducer(
   initialVisitState,
@@ -36,6 +37,10 @@ const reducer = createReducer(
       activeVisitUuid,
     })
   ),
+  on(clearActiveVisit, (state) => ({
+    ...state,
+    activeVisitUuid: null,
+  })),
   on(loadVisitFail, (state, { error }) => ({
     ...state,
     ...errorBaseState,

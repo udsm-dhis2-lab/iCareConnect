@@ -1,11 +1,16 @@
-<div *ngIf="{ paymentCategories: paymentCategories$ | async } as params">
+<div
+  *ngIf="{
+    paymentCategories: paymentCategories$ | async,
+    routeParams: routeParams$ | async
+  } as params"
+>
   <mat-progress-bar
-    *ngIf="!params?.paymentCategories"
+    *ngIf="!params?.paymentCategories || !params?.routeParams"
     mode="indeterminate"
   ></mat-progress-bar>
   <app-price-list-container
     [paymentCategories]="params?.paymentCategories?.setMembers"
-    [departmentId]="departmentId"
-    *ngIf="params?.paymentCategories"
+    [departmentId]="params?.routeParams?.department"
+    *ngIf="params?.paymentCategories && params?.routeParams"
   ></app-price-list-container>
 </div>

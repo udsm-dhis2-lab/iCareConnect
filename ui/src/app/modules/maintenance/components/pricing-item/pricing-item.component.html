@@ -23,6 +23,14 @@
       (formUpdate)="onPriceUpdate($event)"
     >
     </app-form>
+    <app-form
+    class="w-100"
+    [fields]="[payableItemField]"
+    [fieldClass]="'item-price-input-' + pricingItem?.htmlDisplay"
+    (formUpdate)="onPayableUpdate($event)"
+  >
+  </app-form>
+    
     <button
       mat-stroked-button
       (click)="onToggleForm($event)"

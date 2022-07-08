@@ -5,7 +5,7 @@
   ></mat-progress-bar>
   <app-price-list
     [paymentTypes]="params?.paymentTypes"
-    [departmentId]="departmentId"
+    [departmentId]="currentDepartmentId"
     *ngIf="params?.paymentTypes && params?.paymentTypes.length > 0"
   ></app-price-list>
   <div

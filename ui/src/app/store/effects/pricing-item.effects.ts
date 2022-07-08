@@ -17,6 +17,7 @@ import { PricingService } from '../../modules/maintenance/services';
 import {
   addItemPrices,
   addPricingItems,
+  clearPricingItems,
   initiateLoadingPricingItem,
   initiatePricingItems,
   loadItemPrices,
@@ -43,12 +44,13 @@ export class PricingItemEffects {
           )
         ),
         tap(([action, initiated]: [any, boolean]) => {
-          if (!initiated) {
+          // if (!initiated) {
+            this.store.dispatch(clearPricingItems());
             this.store.dispatch(initiateLoadingPricingItem());
             this.store.dispatch(
               loadPricingItems({ filterInfo: action?.filterInfo })
             );
-          }
+          // }
         })
       ),
     { dispatch: false }
@@ -59,19 +61,21 @@ export class PricingItemEffects {
       switchMap((action) =>
         this.pricingService.getItems(action.filterInfo).pipe(
           map((pricingItems) =>
-            addPricingItems({
-              pricingItems: pricingItems.map((priceItem: any) => {
-                return {
-                  ...priceItem,
-                  prices: priceItem?.prices.map((price) => {
-                    return {
-                      ...price,
-                      paymentSchemeUuid: price?.paymentScheme?.uuid,
-                    };
-                  }),
-                };
-              }),
-            })
+            {
+              return addPricingItems({
+                pricingItems: pricingItems.map((priceItem: any) => {
+                  return {
+                    ...priceItem,
+                    prices: priceItem?.prices.map((price) => {
+                      return {
+                        ...price,
+                        paymentSchemeUuid: price?.paymentScheme?.uuid,
+                      };
+                    }),
+                  };
+                }),
+              })
+            }
           ),
           catchError((error) => of(loadPricingItemsFails({ error })))
         )
