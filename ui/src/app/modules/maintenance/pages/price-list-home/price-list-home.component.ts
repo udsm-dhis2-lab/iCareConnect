@@ -1,5 +1,5 @@
 import { Component, OnInit } from "@angular/core";
-import { ActivatedRoute } from "@angular/router";
+import { ActivatedRoute, Params } from "@angular/router";
 import { select, Store } from "@ngrx/store";
 import { Observable } from "rxjs";
 import { PaymentTypeInterface } from "src/app/shared/models/payment-type.model";
@@ -16,10 +16,13 @@ import { getAllPaymentTypes } from "src/app/store/selectors/payment-type.selecto
 export class PriceListHomeComponent implements OnInit {
   paymentCategories$: Observable<any>;
   departmentId: string;
+  routeParams$: Observable<Params>
   constructor(private store: Store<AppState>, private route: ActivatedRoute) {}
 
   ngOnInit(): void {
     this.departmentId = this.route.snapshot.params["department"];
+    this.routeParams$ = this.route.params;
+    console.log(this.departmentId)
     // TODO: Move the id to configurations
     this.store.dispatch(
       loadConceptByUuid({

@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, Input, OnChanges, OnInit, SimpleChanges } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { MatSelectChange } from "@angular/material/select";
 import { select, Store } from "@ngrx/store";
@@ -39,9 +39,10 @@ import { ItemPriceService } from "../../services/item-price.service";
   templateUrl: "./price-list.component.html",
   styleUrls: ["./price-list.component.scss"],
 })
-export class PriceListComponent implements OnInit {
+export class PriceListComponent implements OnInit,OnChanges {
   @Input() paymentTypes: PaymentTypeInterface[];
   @Input() departmentId: string;
+  currentDepartmentId: string;
   priceList: any[];
   priceList$: Observable<any[]>;
 
@@ -74,13 +75,26 @@ export class PriceListComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    this.currentDepartmentId = this.departmentId;
+    this.loadData();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (!changes?.departmentId?.firstChange) {
+      this.currentDepartmentId = changes?.departmentId?.currentValue
+      this.loadData();
+    }
+  }
+
+
+  loadData(): void {
     this.store.dispatch(
       initiatePricingItems({
         filterInfo: {
           limit: 25,
           startIndex: 0,
           searchTerm: null,
-          conceptSet: this.departmentId,
+          conceptSet: this.currentDepartmentId,
         },
       })
     );

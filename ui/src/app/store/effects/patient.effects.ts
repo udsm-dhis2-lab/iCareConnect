@@ -21,7 +21,11 @@ import {
   setAsTransferred,
   transferPatient,
 } from "../actions";
-import { loadActiveVisit, updateVisit } from "../actions/visit.actions";
+import {
+  clearActiveVisit,
+  loadActiveVisit,
+  updateVisit,
+} from "../actions/visit.actions";
 import { AppState } from "../reducers";
 
 @Injectable()
@@ -31,9 +35,12 @@ export class PatientEffects {
       ofType(loadCurrentPatient),
       switchMap(({ uuid, isRegistrationPage }) => {
         return this.patientService.getPatient(uuid).pipe(
-          map((patient: Patient) =>
-            addCurrentPatient({ patient, isRegistrationPage })
-          ),
+          switchMap((patient: Patient) => {
+            return [
+              addCurrentPatient({ patient, isRegistrationPage }),
+              clearActiveVisit(),
+            ];
+          }),
           catchError((error) => of(loadCurrentPatientFail({ error })))
         );
       })

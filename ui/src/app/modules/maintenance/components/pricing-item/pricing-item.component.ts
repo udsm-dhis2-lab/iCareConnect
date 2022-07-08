@@ -21,6 +21,8 @@ export class PricingItemComponent implements OnInit {
   formValue: FormValue;
   fieldId: string;
   pricingItemField: Field<string>;
+  payableItemField: Field<string>;
+  priceObject: any = {}
 
   @Output() saveItemPrice = new EventEmitter<any>();
   constructor() {}
@@ -36,6 +38,17 @@ export class PricingItemComponent implements OnInit {
       : '';
   }
 
+  get itemPayableValue(): number | string {
+    return this.pricingItem
+      ? (this.pricingItem.prices.filter(
+          (priceInfo) =>
+            priceInfo?.paymentScheme?.uuid ===
+              this.paymentScheme?.concept?.uuid &&
+            priceInfo?.paymentType?.uuid === this.paymentScheme?.paymentTypeUuid
+        ) || [])[0]?.payable
+      : '';
+  }
+
   ngOnInit() {
     this.fieldId = `${this.paymentScheme?.uuid}_${this.pricingItem?.uuid}`;
 
@@ -43,7 +56,15 @@ export class PricingItemComponent implements OnInit {
       id: this.fieldId,
       label: `Price`,
       key: this.fieldId,
+      required: true,
       value: this.itemValue?.toString(),
+    });
+
+    this.payableItemField = new Textbox({
+      id: this.fieldId +"-payable",
+      label: `Payable`,
+      key: this.fieldId +"-payable",
+      value: this.itemPayableValue?.toString(),
     });
   }
 
@@ -54,7 +75,8 @@ export class PricingItemComponent implements OnInit {
 
   onSaveItemPrice(e) {
     e.stopPropagation();
-    const priceObject = (this.formValue.getValues() || {})[this.fieldId];
+    // const priceObject = (this.formValue.getValues() || {})[this.fieldId];
+    console.log("HERE")
     this.showForm = false;
     this.saveItemPrice.emit({
       item: {
@@ -62,11 +84,17 @@ export class PricingItemComponent implements OnInit {
       },
       paymentType: { uuid: this.paymentScheme?.paymentTypeUuid },
       paymentScheme: { uuid: this.paymentScheme?.concept?.uuid },
-      price: priceObject?.value,
+      price: this.priceObject[this.fieldId]?.value,
+      payable: this.priceObject[this.fieldId+"-payable"]?.value,
     });
   }
 
   onPriceUpdate(formValue: FormValue) {
     this.formValue = formValue;
+    this.priceObject = {...this.priceObject, ...formValue.getValues()}
+  }
+
+  onPayableUpdate(formValue: FormValue): void {
+    this.priceObject = {...this.priceObject, ...formValue.getValues()}
   }
 }

@@ -489,6 +489,7 @@ export class VisitComponent implements OnInit {
           },
         ],
       };
+      
       visitPayload = {
         ...visitPayload,
         attributes:
