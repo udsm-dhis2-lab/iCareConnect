@@ -185,7 +185,6 @@ export class ModulesSelectorComponent implements OnInit {
       (this.currentModule?.app?.considerLocationRoute
         ? "/" + this.currentLocation?.uuid
         : "");
-    console.log("URL", url);
     this.store.dispatch(
       go({
         path: [url],

@@ -93,6 +93,7 @@ export class VisitEffects {
                   isEmergency: isEmergency,
                 }),
                 loadPatientBills({ patientUuid: currentPatient?.id }),
+                go({path: ['/registration/home']})
               ];
             }),
             catchError((error) => {
