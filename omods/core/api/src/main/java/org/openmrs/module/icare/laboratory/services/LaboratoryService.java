@@ -19,7 +19,7 @@ public interface LaboratoryService extends OpenmrsService {
 	List<Sample> getSamplesByVisit(String id);
 	
 	List<Sample> getAllSamples();
-
+	
 	ListResult<Sample> getSamples(Date startDate, Date endDate, Pager pager, String location);
 	
 	List<Sample> getSampleByDates(Date startDate, Date endDate);

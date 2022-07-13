@@ -89,7 +89,13 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		}
 		assertThat("Created sample is found:", found, is(true));
 	}
-	
+
+	@Test
+	public void testGettingConcep() throws Exception {
+		MockHttpServletRequest newGetRequest = newGetRequest("lab/sample", new Parameter("visit",
+				"2386395c-2b07-4abd-8fd7-a748c957554d"));
+	}
+
 	@Test
 	public void testUpdateSampleOrder() throws Exception {
 		//Given

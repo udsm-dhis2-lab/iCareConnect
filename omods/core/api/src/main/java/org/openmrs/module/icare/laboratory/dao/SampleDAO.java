@@ -61,46 +61,46 @@ public class SampleDAO extends BaseDAO<Sample> {
 		
 		return query.list();
 	}
-
+	
 	public ListResult<Sample> getSamples(Date startDate, Date endDate, Pager pager, String locationUuid) {
-
+		
 		DbSession session = this.getSession();
 		String queryStr = "SELECT sp \n" + "FROM Sample sp \n";
-
-		if(startDate != null && endDate != null){
-			if(!queryStr.contains("WHERE")){
+		
+		if (startDate != null && endDate != null) {
+			if (!queryStr.contains("WHERE")) {
 				queryStr += " WHERE ";
 			}
 			queryStr += " cast(sp.dateTime as date) BETWEEN :startDate AND :endDate \n"
-					+ "OR cast(sp.dateCreated as date) BETWEEN :startDate AND :endDate";
+			        + "OR cast(sp.dateCreated as date) BETWEEN :startDate AND :endDate";
 		}
-
-		if(locationUuid != null){
-			if(!queryStr.contains("WHERE")){
+		
+		if (locationUuid != null) {
+			if (!queryStr.contains("WHERE")) {
 				queryStr += " WHERE ";
 			}
 			queryStr += " sp.visit.location = (SELECT l FROM Location l WHERE l.uuid = :locationUuid)";
 		}
 		queryStr += " ORDER BY sp.dateCreated ";
 		Query query = session.createQuery(queryStr);
-		if(startDate != null && endDate != null){
+		if (startDate != null && endDate != null) {
 			query.setParameter("startDate", startDate);
 			query.setParameter("endDate", endDate);
 		}
-		if(locationUuid != null){
+		if (locationUuid != null) {
 			query.setParameter("locationUuid", locationUuid);
 		}
-		if(pager.isAllowed()){
+		if (pager.isAllowed()) {
 			pager.setTotal(query.list().size());
 			//pager.setPageCount(pager.getT);
-			query.setFirstResult((pager.getPage()-1) * pager.getPageSize());
+			query.setFirstResult((pager.getPage() - 1) * pager.getPageSize());
 			query.setMaxResults(pager.getPageSize());
 		}
 		ListResult<Sample> listResults = new ListResult();
-
+		
 		listResults.setPager(pager);
 		listResults.setResults(query.list());
-
+		
 		//
 		return listResults;
 	}

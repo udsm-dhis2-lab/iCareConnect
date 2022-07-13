@@ -25,7 +25,7 @@ public class ICareActivator extends BaseModuleActivator {
 	 * @see #started()
 	 */
 	public void started() {
-
+		
 		log.info("ICareLog Started ICare");
 		Context.updateSearchIndexAsync();
 	}

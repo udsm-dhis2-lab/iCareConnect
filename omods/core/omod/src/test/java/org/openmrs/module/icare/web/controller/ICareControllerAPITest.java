@@ -414,4 +414,12 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		assertThat("Should return 1 item", maps.size(), is(1));
 
 	}
+
+	@Test
+	public  void TestGetIcareConcepts() throws Exception {
+		MockHttpServletRequest newGetRequest = newGetRequest("icare/concept", new Parameter("searchingText", "test"),
+				new Parameter("conceptClass", "misc"));
+		MockHttpServletResponse handle = handle(newGetRequest);
+		System.out.println("TEST CONCEPT SEARCH SUCCESS");
+	}
 }
