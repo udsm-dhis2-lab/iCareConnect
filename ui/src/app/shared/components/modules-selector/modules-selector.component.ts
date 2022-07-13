@@ -27,20 +27,43 @@ export class ModulesSelectorComponent implements OnInit {
   constructor(private store: Store<AppState>) {}
 
   ngOnInit(): void {
+    const storedNavigationDetails =
+      localStorage.getItem("navigationDetails") != "undefined"
+        ? JSON.parse(localStorage.getItem("navigationDetails"))
+        : null;
+    let locationMatchingNavigationDetails = (this.locations.filter(
+      (location) =>
+        (
+          location?.modules.filter(
+            (module) =>
+              storedNavigationDetails?.path[0]?.indexOf(module?.id) > -1
+          ) || []
+        )?.length > 0
+    ) || [])[0];
+
+    localStorage.setItem(
+      "currentLocation",
+      JSON.stringify(locationMatchingNavigationDetails)
+    );
     const storedLocation =
       localStorage.getItem("currentLocation") != "undefined"
         ? JSON.parse(localStorage.getItem("currentLocation"))
         : null;
-    if (storedLocation) {
+    if (storedNavigationDetails) {
       this.currentLocation = {
-        ...storedLocation,
-        id: storedLocation?.uuid,
+        ...locationMatchingNavigationDetails,
+        id: locationMatchingNavigationDetails?.uuid,
         ...this.locations.filter(
           (loc) => loc?.uuid === storedLocation?.uuid || []
         )[0],
       };
+
+      this.store.dispatch(
+        setCurrentUserCurrentLocation({ location: this.currentLocation })
+      );
+
       const modules = (
-        storedLocation.attributes.filter(
+        this.currentLocation.attributes.filter(
           (attribute) =>
             attribute?.attributeType?.display?.toLowerCase() === "modules" &&
             !attribute?.voided
