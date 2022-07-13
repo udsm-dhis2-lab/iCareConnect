@@ -1,4 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import { Observable } from "rxjs";
+import { ConceptsService } from "src/app/shared/resources/concepts/services/concepts.service";
 
 @Component({
   selector: "app-locations-chips",
@@ -6,18 +8,19 @@ import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
   styleUrls: ["./locations-chips.component.scss"],
 })
 export class LocationsChipsComponent implements OnInit {
-  @Input() locations;
-  @Input() currentVisit;
+  @Input() locations: any[];
+  @Input() currentVisit: any;
   @Output() emitLocationSelection = new EventEmitter<any>();
   currentRoom: any;
 
   searchTerm: string = "";
 
-  constructor() {}
+  currentPatientService$: Observable<any>;
+
+  constructor(private conceptService: ConceptsService) {}
 
   ngOnInit(): void {
     this.currentRoom = this.currentVisit?.location;
-
     const visitServiceTypeObject = this.currentVisit?.attributes.filter(
       (visitAttribute) => {
         return (
@@ -32,20 +35,20 @@ export class LocationsChipsComponent implements OnInit {
         ? visitServiceTypeObject[0]?.visitAttributeDetails?.value
         : null;
 
+    this.currentPatientService$ = this.conceptService.getConceptDetailsByUuid(
+      visitTypeConcept,
+      "custom:(uuid,display)"
+    );
     this.locations = this.locations?.filter((location) => {
       return (
         location?.billingConcept == visitTypeConcept &&
         location?.uuid !== this.currentVisit?.location?.uuid
       );
     });
-
-    // console.log(this.locations);
-    // console.log(this.currentVisit);
   }
 
   onSelectRoom(event: Event, room): void {
     event.stopPropagation();
-    // console.log(room);
     this.currentRoom = room;
 
     this.emitLocationSelection.emit(this.currentRoom);
