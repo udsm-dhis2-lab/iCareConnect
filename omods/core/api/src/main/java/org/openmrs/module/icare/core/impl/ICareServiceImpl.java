@@ -22,6 +22,7 @@ import org.openmrs.module.icare.billing.services.insurance.Claim;
 import org.openmrs.module.icare.billing.services.insurance.ClaimResult;
 import org.openmrs.module.icare.billing.services.insurance.InsuranceService;
 import org.openmrs.module.icare.core.ICareService;
+import org.openmrs.module.icare.core.IcareConcept;
 import org.openmrs.module.icare.core.Item;
 import org.openmrs.module.icare.core.Message;
 import org.openmrs.module.icare.core.dao.ICareDao;
@@ -420,6 +421,11 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	@Override
 	public ItemPrice getItemPriceByDrugId(Integer drugId, Integer paymentSchemeConceptId, Integer paymentTypeConceptId) {
 		return dao.getItemPriceByDrugId(drugId, paymentSchemeConceptId, paymentTypeConceptId);
+	}
+	
+	@Override
+	public List<Concept> getIcareConcepts(String searchingText, String conceptClass, Integer limit, Integer startIndex) {
+		return dao.getConceptsBySearchParams(searchingText, conceptClass, limit, startIndex);
 	}
 	
 	Boolean patientIsAdmitted(Visit visit) {

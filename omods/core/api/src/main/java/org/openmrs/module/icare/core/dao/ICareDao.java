@@ -14,18 +14,17 @@ import org.apache.commons.logging.LogFactory;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
-import org.openmrs.ConceptSet;
-import org.openmrs.Drug;
-import org.openmrs.Order;
-import org.openmrs.Visit;
+import org.openmrs.*;
 import org.openmrs.api.db.hibernate.DbSession;
 import org.openmrs.module.icare.billing.models.ItemPrice;
 import org.openmrs.module.icare.billing.models.Prescription;
+import org.openmrs.module.icare.core.IcareConcept;
 import org.openmrs.module.icare.core.Item;
 import org.openmrs.module.icare.core.utils.VisitWrapper;
 import org.openmrs.module.icare.store.models.OrderStatus;
 
 import javax.persistence.EntityManager;
+import javax.persistence.criteria.CriteriaBuilder;
 import java.util.Calendar;
 import java.util.List;
 
@@ -134,7 +133,7 @@ public class ICareDao extends BaseDAO<Item> {
 		} else {
 			queryStr = "SELECT ip FROM Item ip";
 		}
-		if(queryStr != null && type == Item.Type.DRUG){
+		if (queryStr != null && type == Item.Type.DRUG) {
 			queryStr += " WHERE ip.drug IS NOT NULL";
 		}
 		
@@ -154,7 +153,7 @@ public class ICareDao extends BaseDAO<Item> {
 				        + "LEFT JOIN ip.drug as d " + "LEFT JOIN d.concept as c1 " + "LEFT JOIN c1.names cn1 "
 				        + "WHERE lower(cn.name) like :search OR lower(cn1.name) like :search OR lower(d.name) like :search";
 			}
-			if(type == Item.Type.DRUG){
+			if (type == Item.Type.DRUG) {
 				queryStr += " AND ip.drug IS NOT NULL";
 			}
 		}
@@ -381,5 +380,40 @@ public class ICareDao extends BaseDAO<Item> {
 		Calendar calendar = Calendar.getInstance();
 		query.setParameter("year", calendar.get(Calendar.YEAR));
 		return (long) query.list().get(0);
+	}
+	
+	public List<Concept> getConceptsBySearchParams(String searchingText, String conceptClass, Integer limit,
+	        Integer startIndex) {
+//		new Concept().getConceptClass().getName();
+//		new ConceptClass();
+		DbSession session = getSession();
+
+		String searchConceptQueryStr = "SELECT c FROM Concept c LEFT JOIN c.names cn LEFT JOIN c.conceptMappings mp";
+		if (searchingText != null && conceptClass != null) {
+			searchConceptQueryStr += " WHERE lower(cn.name) like :searchingText";
+		} else if (searchingText == null && conceptClass != null) {
+			searchConceptQueryStr += " WHERE lower(cc.name) =:conceptClass";
+		} else if (searchingText != null && conceptClass == null) {
+			searchConceptQueryStr += "";
+		} else {
+			searchConceptQueryStr += "";
+		}
+		Query sqlQuery = session.createQuery(searchConceptQueryStr);
+		sqlQuery.setFirstResult(startIndex);
+		sqlQuery.setMaxResults(limit);
+		if (searchingText != null) {
+			sqlQuery.setParameter("searchingText", "%" + searchingText + "%");
+		}
+
+		if (conceptClass != null) {
+//			sqlQuery.setParameter("conceptClass", "%" + conceptClass + "%");
+		}
+
+		System.out.println(searchConceptQueryStr);
+
+		List data = sqlQuery.list();
+		System.out.println("##################################################################");
+		System.out.println(data.size());
+		return data;
 	}
 }
