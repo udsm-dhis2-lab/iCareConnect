@@ -36,7 +36,7 @@ export class LocationSelectModalComponent implements OnInit {
     });
   }
 
-  setLocation(location): void {
+  setLocation(location: Location): void {
     this.store.dispatch(setCurrentUserCurrentLocation({ location }));
     this.store.dispatch(go({ path: [""] }));
     this.closeDialog();

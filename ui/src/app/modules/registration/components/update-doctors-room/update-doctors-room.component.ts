@@ -32,8 +32,6 @@ export class UpdateDoctorsRoomComponent implements OnInit {
 
   ngOnInit(): void {
     this.currentPatientVisit$ = this.store.select(getActiveVisit);
-
-    // console.log("locations :: ", this.treatmentLocations);
   }
 
   onSelectRoom(event: Event, room): void {
