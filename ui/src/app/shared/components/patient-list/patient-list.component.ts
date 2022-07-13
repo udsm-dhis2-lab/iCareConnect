@@ -15,7 +15,10 @@ import { Visit } from "../../resources/visits/models/visit.model";
 import { VisitsService } from "../../resources/visits/services";
 
 import { map, uniq } from "lodash";
-import { upsertAdmittedPatientLocation } from "src/app/store/actions/visit.actions";
+import {
+  clearActiveVisit,
+  upsertAdmittedPatientLocation,
+} from "src/app/store/actions/visit.actions";
 import { ActivatedRoute, Router } from "@angular/router";
 import { clearBills } from "src/app/store/actions/bill.actions";
 import { clearBillItems } from "src/app/store/actions/bill-item.actions";
@@ -91,6 +94,7 @@ export class PatientListComponent implements OnInit, OnChanges {
             })
           );
         }
+        this.store.dispatch(clearActiveVisit());
       });
     });
   }
@@ -200,6 +204,7 @@ export class PatientListComponent implements OnInit, OnChanges {
     }
     this.store.dispatch(clearBills());
     this.store.dispatch(clearBillItems());
+    this.store.dispatch(clearActiveVisit());
     this.selectPatient.emit({ ...visit?.patient, visitUuid: visit?.uuid });
   }
 
@@ -222,6 +227,8 @@ export class PatientListComponent implements OnInit, OnChanges {
 
   onSearchAllPatient(event: Event) {
     event.stopPropagation();
+
+    this.store.dispatch(clearActiveVisit());
     const patientListDialog = this.dialog.open(PatientListDialogComponent, {
       width: "800px",
     });
