@@ -42,7 +42,22 @@ export class FormService {
     filteringItems?,
     field?
   ): Observable<any[]> {
-    if (!searchControlType || searchControlType === "concept") {
+    if (parameters?.class === "Diagnosis") {
+      return from(this.api.concept.getAllConcepts(parameters)).pipe(
+        map((response) => {
+          return orderBy(
+            response.results.filter(
+              (result: any) =>
+                parameters?.class &&
+                result.conceptClass?.display.toLowerCase() ===
+                  parameters?.class.toLowerCase()
+            ) || [],
+            ["display"],
+            ["asc"]
+          );
+        })
+      );
+    } else if (!searchControlType || searchControlType === "concept") {
       return from(this.api.concept.getAllConcepts(parameters)).pipe(
         map((response) => {
           return orderBy(
@@ -143,7 +158,6 @@ export class FormService {
       );
     } else if (searchControlType === "Drug") {
       const formattedParamters = omit(parameters, "class", "v");
-      // console.log('filteringItems', filteringItems);
       const keyedDispensingLocations = keyBy(
         filteringItems?.applicable,
         "uuid"

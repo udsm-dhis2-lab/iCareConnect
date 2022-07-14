@@ -1,5 +1,5 @@
-import * as _ from 'lodash';
-import { DiagnosisObject } from '../models/diagnosis-object.model';
+import * as _ from "lodash";
+import { DiagnosisObject } from "../models/diagnosis-object.model";
 
 export function formatDiagnosisFormObject(formObject, data?: DiagnosisObject) {
   if (!formObject) {
@@ -7,11 +7,11 @@ export function formatDiagnosisFormObject(formObject, data?: DiagnosisObject) {
   }
 
   const referenceMapping = {
-    '1284AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'diagnosis',
-    '161602AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'diagnosis-non-coded',
-    '159946AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'rank',
-    '159394AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'certainty',
-    '162820AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'condition',
+    "1284AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA": "diagnosis",
+    "161602AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA": "diagnosis-non-coded",
+    "159946AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA": "rank",
+    "159394AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA": "certainty",
+    "162820AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA": "condition",
   };
   return {
     id: formObject?.uuid,
@@ -20,6 +20,7 @@ export function formatDiagnosisFormObject(formObject, data?: DiagnosisObject) {
     dataType: formObject?.dataType,
     formClass: formObject?.formClass,
     setMembers: formObject?.setMembers,
+    searchControlType: "concept",
     shouldHaveLiveSearchForOptions: true,
     formFields: formatFormFields(
       _.filter(formObject?.formFields, (formField) => {
@@ -39,9 +40,9 @@ function formatFormFields(fields, referenceMapping, data, setMembers) {
     return {
       ...field,
       shouldHaveLiveSearchForDropDownFields:
-        referenceMapping[field?.key] === 'diagnosis' ? true : false,
+        referenceMapping[field?.key] === "diagnosis" ? true : false,
       conceptClass:
-        referenceMapping[field?.key] === 'diagnosis' ? 'Diagnosis' : '',
+        referenceMapping[field?.key] === "diagnosis" ? "Diagnosis" : "",
       key: referenceMapping[field.key]
         ? referenceMapping[field.key]
         : field.key,
@@ -60,10 +61,10 @@ function formatFormFields(fields, referenceMapping, data, setMembers) {
 }
 
 function getValueAsPerField(fieldKey, key, data, setMembers) {
-  if (fieldKey == 'diagnosis') {
+  if (fieldKey == "diagnosis") {
     return data?.diagnosis?.uuid;
-  } else if (fieldKey == 'rank') {
-    const orderValue = data.rank == 0 ? 'Primary' : 'Secondary';
+  } else if (fieldKey == "rank") {
+    const orderValue = data.rank == 0 ? "Primary" : "Secondary";
     let options = [];
     _.map(setMembers, (setMember) => {
       if (setMember?.id === key) {
@@ -71,8 +72,8 @@ function getValueAsPerField(fieldKey, key, data, setMembers) {
       }
     });
     const matchedRank = (_.filter(options, { value: orderValue }) || [])[0];
-    return matchedRank ? matchedRank['key'] : null;
-  } else if (fieldKey == 'certainty') {
+    return matchedRank ? matchedRank["key"] : null;
+  } else if (fieldKey == "certainty") {
     let options = [];
     _.map(setMembers, (setMember) => {
       if (setMember?.id === key) {
@@ -84,7 +85,7 @@ function getValueAsPerField(fieldKey, key, data, setMembers) {
         option?.value.toLowerCase().indexOf(data?.certainty?.toLowerCase()) > -1
     ) || [])[0];
 
-    return matchedCertainty ? matchedCertainty['key'] : null;
+    return matchedCertainty ? matchedCertainty["key"] : null;
   }
   return null;
 }
