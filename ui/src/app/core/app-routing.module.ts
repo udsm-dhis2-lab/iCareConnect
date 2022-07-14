@@ -97,7 +97,7 @@ const routes: Routes = [
         canActivate: [AuthGuard],
       },
       {
-        path: "reports",
+        path: "interactive-reports",
         loadChildren: () =>
           import("../modules/reports/report.module").then(
             (m) => m.ReportModule

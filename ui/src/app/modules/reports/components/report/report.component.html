@@ -14,9 +14,9 @@
   <div class="row" *ngIf="params?.reportLoadedState">
     <div class="col-12">
       <!-- {{ params?.report | json }} -->
-      <div *ngIf="reportConfigs.isDataSet">
+      <div *ngIf="reportConfigs.isDataSet" style="width: 100%; overflow: auto">
         <table class="table table-bordered">
-          <thead>
+          <thead class="custom-table-header">
             <tr>
               <th
                 class="text-center"

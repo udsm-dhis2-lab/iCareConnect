@@ -140,6 +140,7 @@
               Get Report
             </button>
             <span *ngIf="reportConfigs && reportConfigs?.dhisConfigs">
+              <!-- {{ reportConfigs?.countOfReportsSent | json }} -->
               <button
                 class="ml-2 reports-sent-status-btn"
                 [disabled]="
@@ -204,9 +205,10 @@
             </button>
           </div>
           <div class="menu-and-report-sepatator w-100"></div>
-          <div class="mt-3">
+          <div class="w-100 mt-3">
             <div
               class="
+                w-100
                 report-dimensions-summary
                 h5
                 font-weight-normal
@@ -214,7 +216,7 @@
                 justify-content-left
               "
             >
-              <div>
+              <div class="w-100">
                 {{
                   currentReport && currentReport?.name
                     ? currentReport?.name
@@ -255,6 +257,14 @@
                 </div>
               </div>
             </div>
+          </div>
+
+          <div
+            class="w-100 text-center"
+            style="font-size: 1rem"
+            *ngIf="!currentReport"
+          >
+            <img src="assets/images/report-table.png" height="200" />
           </div>
 
           <div class="mt-3" *ngIf="loadingReport">
