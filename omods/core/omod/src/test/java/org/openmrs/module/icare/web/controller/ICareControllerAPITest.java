@@ -416,10 +416,30 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 	}
 
 	@Test
-	public  void TestGetIcareConcepts() throws Exception {
-		MockHttpServletRequest newGetRequest = newGetRequest("icare/concept", new Parameter("searchingText", "test"),
-				new Parameter("conceptClass", "misc"));
+	public  void testSearchConcepts() throws Exception {
+		MockHttpServletRequest newGetRequest = newGetRequest("icare/concept"
+				, new Parameter("searchingText", "count")
+				, new Parameter("conceptClass", "Test")
+		);
 		MockHttpServletResponse handle = handle(newGetRequest);
-		System.out.println("TEST CONCEPT SEARCH SUCCESS");
+		Map<String, Object> results = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
+		List<Map<String, Object>> maps = (List) results.get("results");
+		assertThat("Should return 1 item", maps.size(), is(1));
+
+		newGetRequest = newGetRequest("icare/concept"
+				, new Parameter("searchingText", "count")
+		);
+		handle = handle(newGetRequest);
+		results = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
+		maps = (List) results.get("results");
+		assertThat("Should return 1 item", maps.size(), is(1));
+
+		newGetRequest = newGetRequest("icare/concept"
+				, new Parameter("conceptClass", "Test")
+		);
+		handle = handle(newGetRequest);
+		results = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
+		maps = (List) results.get("results");
+		assertThat("Should return 1 item", maps.size(), is(15));
 	}
 }

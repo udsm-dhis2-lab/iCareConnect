@@ -388,15 +388,20 @@ public class ICareDao extends BaseDAO<Item> {
 //		new ConceptClass();
 		DbSession session = getSession();
 
-		String searchConceptQueryStr = "SELECT c FROM Concept c LEFT JOIN c.names cn LEFT JOIN c.conceptMappings mp";
-		if (searchingText != null && conceptClass != null) {
-			searchConceptQueryStr += " WHERE lower(cn.name) like :searchingText";
-		} else if (searchingText == null && conceptClass != null) {
-			searchConceptQueryStr += " WHERE lower(cc.name) =:conceptClass";
-		} else if (searchingText != null && conceptClass == null) {
-			searchConceptQueryStr += "";
-		} else {
-			searchConceptQueryStr += "";
+		//String searchConceptQueryStr = "SELECT c FROM Concept c LEFT JOIN c.names cn LEFT JOIN c.conceptMappings mp";
+		String searchConceptQueryStr = "SELECT c FROM Concept c INNER JOIN c.names cn INNER JOIN c.conceptClass cc";
+		String where = "WHERE";
+		if (searchingText != null) {
+			where += " lower(cn.name) like lower(:searchingText)";
+		}
+		if (conceptClass != null) {
+			if(!where.equals("WHERE")){
+				where += " AND ";
+			}
+			where += " lower(cc.name) like lower(:conceptClass)";
+		}
+		if(!where.equals("WHERE")){
+			searchConceptQueryStr += " " + where;
 		}
 		Query sqlQuery = session.createQuery(searchConceptQueryStr);
 		sqlQuery.setFirstResult(startIndex);
@@ -406,7 +411,7 @@ public class ICareDao extends BaseDAO<Item> {
 		}
 
 		if (conceptClass != null) {
-//			sqlQuery.setParameter("conceptClass", "%" + conceptClass + "%");
+			sqlQuery.setParameter("conceptClass", "%" + conceptClass + "%");
 		}
 
 		System.out.println(searchConceptQueryStr);
