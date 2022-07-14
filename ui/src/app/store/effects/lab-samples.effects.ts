@@ -350,7 +350,7 @@ export class LabSamplesEffects {
     this.actions$.pipe(
       ofType(loadLabSamplesByVisit),
       switchMap((action) => {
-        // console.log("dispatch details :: ",action)
+        console.log("dispatch details :: ", action);
         return this.sampleService.getSampleByVisit(action.visit).pipe(
           map((response) => {
             const keyedDepartments = keyDepartmentsByTestOrder(

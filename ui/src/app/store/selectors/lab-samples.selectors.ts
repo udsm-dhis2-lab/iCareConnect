@@ -1,9 +1,9 @@
-import { createSelector } from '@ngrx/store';
-import { AppState, getRootState } from '../reducers';
-import { labSamplesAdapter, LabSamplesState } from '../states';
+import { createSelector } from "@ngrx/store";
+import { AppState, getRootState } from "../reducers";
+import { labSamplesAdapter, LabSamplesState } from "../states";
 
-import * as _ from 'lodash';
-import { generateSelectionOptions } from 'src/app/shared/helpers/patient.helper';
+import * as _ from "lodash";
+import { generateSelectionOptions } from "src/app/shared/helpers/patient.helper";
 
 const getLabSamplesState = createSelector(
   getRootState,
@@ -122,7 +122,7 @@ export const getAllLabSamplesWaitingAcceptance = createSelector(
           .indexOf(props?.searchingText.toLowerCase()) > -1 &&
         sample?.departmentName
           ?.toLowerCase()
-          ?.indexOf(props?.department?.toLowerCase() || '') > -1
+          ?.indexOf(props?.department?.toLowerCase() || "") > -1
       ) {
         return sample;
       }
@@ -134,27 +134,27 @@ export const getAllLabSamplesWaitingAcceptance = createSelector(
             return {
               ...sample,
               orders: _.uniqBy(
-                _.filter(_.orderBy(sample?.orders, ['order_date'], ['asc']), {
+                _.filter(_.orderBy(sample?.orders, ["order_date"], ["asc"]), {
                   collected: true,
                 }),
-                'concept_uuid'
+                "concept_uuid"
               ),
               priority: sample?.priorityHigh ? 0 : 1,
             };
           }),
           (sample) => sample?.orders?.length > 0
         ),
-        ['priority'],
-        ['asc']
+        ["priority"],
+        ["asc"]
       ),
-      'mrNo'
+      "mrNo"
     );
     const formattedSamples = _.map(Object.keys(withFilteredOrders), (key) => {
       let countOfOrdersForGroupedSamples = 0;
 
       withFilteredOrders[key] = _.uniqBy(
         withFilteredOrders[key],
-        'sampleIdentifier'
+        "sampleIdentifier"
       );
 
       // console.log("before the map",withFilteredOrders[key])
@@ -188,7 +188,7 @@ export const getLabSamplesWaitingToFeedResults = createSelector(
           .indexOf(props?.searchingText.toLowerCase()) > -1 &&
         sample?.departmentName
           ?.toLowerCase()
-          ?.indexOf(props?.department?.toLowerCase() || '') > -1
+          ?.indexOf(props?.department?.toLowerCase() || "") > -1
       ) {
         return sample;
       }
@@ -210,10 +210,10 @@ export const getLabSamplesWaitingToFeedResults = createSelector(
                         return order;
                       }
                     }),
-                    ['order_date'],
-                    ['asc']
+                    ["order_date"],
+                    ["asc"]
                   ),
-                  'concept_uuid'
+                  "concept_uuid"
                 ),
                 (order) => {
                   if (order?.collected) {
@@ -256,14 +256,13 @@ export const getLabSamplesWaitingToFeedResults = createSelector(
         }),
         (sample) => sample?.orders?.length > 0
       ),
-      'mrNo'
+      "mrNo"
     );
 
-    console.log('withFilteredOrders', withFilteredOrders);
     const formattedSamples = _.map(Object.keys(withFilteredOrders), (key) => {
       withFilteredOrders[key] = _.uniqBy(
         withFilteredOrders[key],
-        'sampleIdentifier'
+        "sampleIdentifier"
       );
 
       let countOfOrdersForGroupedSamples = 0;
@@ -292,7 +291,7 @@ function getAllAlocationsWithResults(allocations) {
 function getAllocationsWithFirstSignOff(allocations) {
   return _.filter(allocations, (allocation) => {
     if (
-      (_.filter(allocation?.statuses, { status: 'APPROVED' }) || [])?.length > 0
+      (_.filter(allocation?.statuses, { status: "APPROVED" }) || [])?.length > 0
     ) {
       return allocation;
     }
@@ -302,7 +301,7 @@ function getAllocationsWithFirstSignOff(allocations) {
 function getAllocationsWithSecondSignOff(allocations) {
   return _.filter(allocations, (allocation) => {
     if (
-      (_.filter(allocation?.statuses, { status: 'APPROVED' }) || [])?.length > 1
+      (_.filter(allocation?.statuses, { status: "APPROVED" }) || [])?.length > 1
     ) {
       return allocation;
     }
@@ -330,7 +329,7 @@ export const getLabSamplesForShowingTrackingDetails = createSelector(
           .indexOf(props?.searchingText.toLowerCase()) > -1 &&
         sample?.departmentName
           ?.toLowerCase()
-          ?.indexOf(props?.department?.toLowerCase() || '') > -1
+          ?.indexOf(props?.department?.toLowerCase() || "") > -1
       ) {
         return sample;
       }
@@ -345,7 +344,7 @@ export const getLabSamplesForShowingTrackingDetails = createSelector(
         }),
         (sample) => sample?.orders?.length > 0
       ),
-      'mrNo'
+      "mrNo"
     );
     const formattedSamples = _.map(Object.keys(withFilteredOrders), (key) => {
       return {
@@ -370,13 +369,13 @@ export const getWorkListFromLabSamples = createSelector(
             acceptedByUuid: order?.acceptedBy?.uuid,
             searchingText:
               order?.concept?.display +
-              '-' +
+              "-" +
               order?.departmentName +
-              '-' +
+              "-" +
               order?.specimenName +
-              '-' +
+              "-" +
               order?.sampleIdentifier +
-              '-' +
+              "-" +
               order?.identifier,
           };
         }),
@@ -412,7 +411,7 @@ export const getSampledOrdersToTrackBySampleIndentifier = createSelector(
                           ...orderAllocationResult,
                           value:
                             groupedSampleOrder?.concept?.datatype?.display ==
-                            'Coded'
+                            "Coded"
                               ? _.filter(
                                   groupedSampleOrder?.concept?.answers,
                                   (answer) => {
@@ -421,7 +420,7 @@ export const getSampledOrdersToTrackBySampleIndentifier = createSelector(
                                       ? true
                                       : false;
                                   }
-                                )[0]['display']
+                                )[0]["display"]
                               : orderAllocationResult?.value,
                         };
                       }
@@ -459,7 +458,7 @@ export const getSampledOrdersBySampleIndentifier = createSelector(
     //   }
     // });
     // console.log('formattedOrders', formattedOrders);
-    return _.uniqBy(filteredOrders, 'concept_uuid');
+    return _.uniqBy(filteredOrders, "concept_uuid");
   }
 );
 
@@ -507,7 +506,7 @@ export const getAllFullCompletedLabSamples = createSelector(
             .indexOf(props?.searchingText.toLowerCase()) > -1 &&
           sample?.departmentName
             ?.toLowerCase()
-            ?.indexOf(props?.department?.toLowerCase() || '') > -1
+            ?.indexOf(props?.department?.toLowerCase() || "") > -1
         ) {
           return sample;
         }
@@ -519,7 +518,7 @@ export const getAllFullCompletedLabSamples = createSelector(
       _.map(sample?.orders, (order) => {
         if (
           (
-            _.filter(order?.allocations[0]?.statuses, { status: 'APPROVED' }) ||
+            _.filter(order?.allocations[0]?.statuses, { status: "APPROVED" }) ||
             []
           )?.length > 1
         ) {
@@ -535,7 +534,7 @@ export const getAllFullCompletedLabSamples = createSelector(
 export const getAllFullCompletedLabSamplesGroupedByMRN = createSelector(
   getAllLabSamples,
   (samples, props) => {
-    console.log('SELECTOR SAMPLES ::', samples);
+    console.log("SELECTOR SAMPLES ::", samples);
 
     const completedSamples =
       _.filter(samples, (sample) => {
@@ -548,7 +547,7 @@ export const getAllFullCompletedLabSamplesGroupedByMRN = createSelector(
             .indexOf(props?.searchingText.toLowerCase()) > -1 &&
           sample?.departmentName
             ?.toLowerCase()
-            ?.indexOf(props?.department?.toLowerCase() || '') > -1
+            ?.indexOf(props?.department?.toLowerCase() || "") > -1
         ) {
           return sample;
         }
@@ -560,7 +559,7 @@ export const getAllFullCompletedLabSamplesGroupedByMRN = createSelector(
       _.map(sample?.orders, (order) => {
         if (
           (
-            _.filter(order?.allocations[0]?.statuses, { status: 'APPROVED' }) ||
+            _.filter(order?.allocations[0]?.statuses, { status: "APPROVED" }) ||
             []
           )?.length > 1
         ) {
@@ -569,7 +568,7 @@ export const getAllFullCompletedLabSamplesGroupedByMRN = createSelector(
         }
       });
     });
-    const grouped = _.groupBy(fullCompletedSamples, 'mrNo');
+    const grouped = _.groupBy(fullCompletedSamples, "mrNo");
     return _.map(Object.keys(grouped), (mrNo) => {
       return {
         mrNo: mrNo,
@@ -580,7 +579,7 @@ export const getAllFullCompletedLabSamplesGroupedByMRN = createSelector(
   }
 );
 
-export const getPatientCollectedLabSamples = createSelector(
+export const getPatientCollectedLabSamplesDelete = createSelector(
   getAllLabSamples,
   (samples, props) => {
     const patientSamples =
@@ -596,7 +595,7 @@ export const getPatientCollectedLabSamples = createSelector(
           ...sample,
           orders: _.uniqBy(
             _.filter(sample?.orders, { collected: true }),
-            'concept_uuid'
+            "concept_uuid"
           ),
         };
       }),
@@ -605,10 +604,9 @@ export const getPatientCollectedLabSamples = createSelector(
   }
 );
 
-export const getPatientsSamplesToCollect = createSelector(
+export const getPatientsSamplesToCollectDelete = createSelector(
   getAllLabSamples,
   (samples, props) => {
-    // console.log(samples)
     const patientSamples = _.filter(samples, (sample) => {
       if (!sample?.collected && sample?.patient_uuid == props?.patient_uuid) {
         return sample;
@@ -645,12 +643,12 @@ export const getPatientsSamplesToCollect = createSelector(
             _.map(sample?.orders, (order) => {
               return {
                 ...order,
-                paymentType: order?.p_category + ' - ' + order?.p_sub_category,
+                paymentType: order?.p_category + " - " + order?.p_sub_category,
               };
             }),
             (order) => order
           ),
-          'concept_uuid'
+          "concept_uuid"
         ),
       };
     });
@@ -701,7 +699,7 @@ export const getCollectedLabSamplesKeyedByMRN = createSelector(
   getAllLabSamples,
   (samples) => {
     const collectedSamples = _.filter(samples, { collected: true });
-    return _.groupBy(collectedSamples, 'mrNo');
+    return _.groupBy(collectedSamples, "mrNo");
   }
 );
 
@@ -709,6 +707,6 @@ export const getCollectedLabSamplesKeyedBySampleIdentifier = createSelector(
   getAllLabSamples,
   (samples) => {
     const collectedSamples = _.filter(samples, { collected: true });
-    return _.groupBy(collectedSamples, 'sampleIdentifier');
+    return _.groupBy(collectedSamples, "sampleIdentifier");
   }
 );

@@ -20,6 +20,81 @@ export const {
   selectEntities: getAllFormattedLabSampleEntities,
 } = newLabSamplesAdapter.getSelectors(getSamplesState);
 
+export const getPatientsSamplesToCollect = createSelector(
+  getAllFormattedLabSamples,
+  (samples, props) => {
+    const patientSamples = _.filter(samples, (sample) => {
+      if (!sample?.collected && sample?.patient?.uuid == props?.patient_uuid) {
+        return sample;
+      }
+    });
+
+    // Extract tests not collected from collected samples
+    let samplesWithOrdersNotCollected = [];
+    _.map(
+      _.filter(samples, { collected: true, patient_uuid: props?.patient_uuid }),
+      (sample) => {
+        const ordersNotCollected = _.filter(sample?.orders, {
+          collected: false,
+        });
+        if (ordersNotCollected?.length > 0) {
+          samplesWithOrdersNotCollected = [
+            ...samplesWithOrdersNotCollected,
+            {
+              ...sample,
+              orders: ordersNotCollected,
+              reCollect: true,
+            },
+          ];
+        }
+      }
+    );
+    const formattedPatientSamples = _.map(patientSamples, (sample) => {
+      return {
+        ...sample,
+        orders: _.uniqBy(
+          _.filter(
+            _.map(sample?.orders, (order) => {
+              return {
+                ...order,
+                paymentType: order?.p_category + " - " + order?.p_sub_category,
+              };
+            }),
+            (order) => order
+          ),
+          "concept_uuid"
+        ),
+      };
+    });
+
+    return _.filter(
+      [...formattedPatientSamples, ...samplesWithOrdersNotCollected],
+      (sample) => {
+        if (sample?.orders?.length > 0) {
+          return sample;
+        }
+      }
+    );
+  }
+);
+
+export const getPatientCollectedLabSamples = createSelector(
+  getAllFormattedLabSamples,
+  (samples, props) => {
+    console.log(samples);
+    console.log(props);
+    const patientSamples =
+      (
+        _.filter(samples, {
+          collected: true,
+          rejected: false,
+        }) || []
+      ).filter((sample) => sample?.patient?.uuid === props?.patient_uuid) || [];
+    console.log("patientSamples", patientSamples);
+    return patientSamples;
+  }
+);
+
 export const getFormattedLabSamplesForTracking = createSelector(
   getAllFormattedLabSamples,
   (samples, props) => {

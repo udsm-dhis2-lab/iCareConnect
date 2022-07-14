@@ -10,7 +10,9 @@
     labOrders: labOrders$ | async,
     patient: patient$ | async,
     payments: payments$ | async,
-    containers: containers$ | async
+    containers: containers$ | async,
+    datesParameters: datesParameters$ | async,
+    visitReferences: visitReferences$ | async
   } as params"
 >
   <div
@@ -77,7 +79,8 @@
                         params?.specimenSources &&
                         params?.labOrders &&
                         params?.visit &&
-                        params?.labDepartments
+                        params?.labDepartments &&
+                        params?.datesParameters
                       "
                     >
                       <app-samples-to-collect
@@ -88,6 +91,8 @@
                         [containers]="params?.containers"
                         [payments]="params?.payments"
                         [labDepartments]="params?.labDepartments"
+                        [datesParameters]="params?.datesParameters"
+                        [patients]="params?.visitReferences"
                         (isSaveCollectedSample)="onSaveSampleCollection($event)"
                         (samplesToCollect)="onGetSamplesToCollect($event)"
                       >

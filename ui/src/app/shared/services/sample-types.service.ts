@@ -1,21 +1,21 @@
-import { Injectable } from '@angular/core';
+import { Injectable } from "@angular/core";
 
-import * as _ from 'lodash';
-import { HttpClient } from '@angular/common/http';
-import { Observable, pipe, from } from 'rxjs';
-import { BASE_URL } from '../constants/constants.constants';
-import { delay, mergeMap, map } from 'rxjs/operators';
-import { Store } from '@ngrx/store';
+import * as _ from "lodash";
+import { HttpClient } from "@angular/common/http";
+import { Observable, pipe, from } from "rxjs";
+import { BASE_URL } from "../constants/constants.constants";
+import { delay, mergeMap, map } from "rxjs/operators";
+import { Store } from "@ngrx/store";
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: "root",
 })
 export class SampleTypesService {
   constructor(private httpClient: HttpClient, private store: Store) {}
 
   getSampleTypeUuid() {
     return this.httpClient.get(
-      BASE_URL + 'systemsetting?q=iCare.laboratory.configurations&v=full'
+      BASE_URL + "systemsetting?q=iCare.laboratory.configurations&v=full"
     );
   }
 
@@ -23,7 +23,7 @@ export class SampleTypesService {
     return from(
       this.httpClient
         .get(
-          BASE_URL + 'systemsetting?q=iCare.laboratory.configurations&v=full'
+          BASE_URL + "systemsetting?q=iCare.laboratory.configurations&v=full"
         )
         .pipe(delay(1000))
         .toPromise()
@@ -39,7 +39,7 @@ export class SampleTypesService {
 
   getSampleTypes(): Observable<any> {
     return this.httpClient
-      .get(BASE_URL + 'systemsetting?q=iCare.laboratory.configurations&v=full')
+      .get(BASE_URL + "systemsetting?q=iCare.laboratory.configurations&v=full")
       .pipe(
         mergeMap((configs: any) => {
           let parsedConfigs = JSON.parse(configs?.results[0]?.value) || {};
@@ -47,34 +47,33 @@ export class SampleTypesService {
           return this.httpClient
             .get(
               BASE_URL +
-                'concept/' +
-                parsedConfigs['sampleTypes'].id +
-                '?v=custom:(uuid,display,name,setMembers:(uuid,display,setMembers:(uuid,display,datatype,mappings:(uuid,display,conceptReferenceTerm:(name,code)),hiNormal,lowNormal,units,numeric,answers,setMembers:(uuid,display,hiNormal,lowNormal,units,numeric,answers:(uuid,display)))))'
+                "concept/" +
+                parsedConfigs["sampleTypes"].id +
+                "?v=custom:(uuid,display,name,setMembers:(uuid,display,setMembers:(uuid,display,datatype,mappings:(uuid,display,conceptReferenceTerm:(name,code)),hiNormal,lowNormal,units,numeric,answers,setMembers:(uuid,display,hiNormal,lowNormal,units,numeric,answers:(uuid,display)))))"
             )
-            .pipe(map((sampleTypes) => sampleTypes['setMembers']));
+            .pipe(map((sampleTypes) => sampleTypes["setMembers"]));
         })
       );
   }
 
   getLabDepartments(): Observable<any> {
     return this.httpClient
-      .get(BASE_URL + 'systemsetting?q=iCare.laboratory.configurations&v=full')
+      .get(BASE_URL + "systemsetting?q=iCare.laboratory.configurations&v=full")
       .pipe(
         mergeMap((configs: any) => {
           let parsedConfigs = JSON.parse(configs?.results[0]?.value) || {};
-
           return this.httpClient
             .get(
               BASE_URL +
-                'concept/' +
-                parsedConfigs['labDepartments'] +
-                '?v=custom:(uuid,display,name,setMembers:(uuid,display,setMembers:(uuid,display,datatype,mappings:(uuid,display,conceptReferenceTerm:(name,code)),hiNormal,lowNormal,units,numeric,answers,setMembers:(uuid,display,hiNormal,lowNormal,units,numeric,answers:(uuid,display)))))'
+                "concept/" +
+                parsedConfigs["labDepartments"] +
+                "?v=custom:(uuid,display,name,setMembers:(uuid,display,setMembers:(uuid,display,datatype,mappings:(uuid,display,conceptReferenceTerm:(name,code)),hiNormal,lowNormal,units,numeric,answers,setMembers:(uuid,display,hiNormal,lowNormal,units,numeric,answers:(uuid,display)))))"
             )
             .pipe(
               map((departments: any) => {
                 const excludedDepartmentsKeyedById = _.keyBy(
                   parsedConfigs?.excludedDepartments,
-                  'id'
+                  "id"
                 );
                 return {
                   ...departments,
@@ -90,7 +89,7 @@ export class SampleTypesService {
 
   testSave(data) {
     this.httpClient
-      .post(BASE_URL + 'bahmnicore/bahmniencounter', data)
+      .post(BASE_URL + "bahmnicore/bahmniencounter", data)
       .subscribe((response) => {});
   }
 }
