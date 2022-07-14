@@ -135,9 +135,10 @@ export class FieldComponent {
       class: this.field?.conceptClass,
       source: this.field?.source,
       v:
-        field?.searchControlType === "concept"
+        field?.searchControlType === "concept" ||
+        field?.conceptClass === "Diagnosis"
           ? "custom:(uuid,display,datatype,conceptClass,mappings)"
-          : "custom:(uuid,display)",
+          : "custom:(uuid,display,conceptClass)",
     };
     this.members$ = this.formService.searchItem(
       parameters,
