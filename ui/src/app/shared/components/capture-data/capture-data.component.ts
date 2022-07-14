@@ -1,21 +1,21 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { select, Store } from '@ngrx/store';
-import { Observable } from 'rxjs';
-import { FormValue } from 'src/app/shared/modules/form/models/form-value.model';
-import { OpenmrsHttpClientService } from 'src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service';
-import { ICARE_CONFIG } from 'src/app/shared/resources/config';
-import { Patient } from 'src/app/shared/resources/patient/models/patient.model';
-import { VisitObject } from 'src/app/shared/resources/visits/models/visit-object.model';
-import { AppState } from 'src/app/store/reducers';
+import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import { select, Store } from "@ngrx/store";
+import { Observable } from "rxjs";
+import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
+import { OpenmrsHttpClientService } from "src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service";
+import { ICARE_CONFIG } from "src/app/shared/resources/config";
+import { Patient } from "src/app/shared/resources/patient/models/patient.model";
+import { VisitObject } from "src/app/shared/resources/visits/models/visit-object.model";
+import { AppState } from "src/app/store/reducers";
 
-import * as _ from 'lodash';
-import { getSavingObservationStatus } from 'src/app/store/selectors/observation.selectors';
-import { OpenMRSForm } from 'src/app/shared/modules/form/models/custom-openmrs-form.model';
+import * as _ from "lodash";
+import { getSavingObservationStatus } from "src/app/store/selectors/observation.selectors";
+import { OpenMRSForm } from "src/app/shared/modules/form/models/custom-openmrs-form.model";
 
 @Component({
-  selector: 'app-capture-data',
-  templateUrl: './capture-data.component.html',
-  styleUrls: ['./capture-data.component.scss'],
+  selector: "app-capture-data",
+  templateUrl: "./capture-data.component.html",
+  styleUrls: ["./capture-data.component.scss"],
 })
 export class CaptureDataComponent implements OnInit {
   currentForm: any;
@@ -79,15 +79,15 @@ export class CaptureDataComponent implements OnInit {
     this.isFormValid = this.currentFormState.isValid;
     const valueForObs = formValue.getValues();
     this.obsDetails[Object.keys(valueForObs)[0]] = {
-      person: this.patient['patient']?.uuid,
+      person: this.patient["patient"]?.uuid,
       obsDatetime: new Date().toISOString(),
       concept: Object.keys(valueForObs)[0],
-      location: this.location['uuid'],
+      location: this.location["uuid"],
       encounter: this.currentVitalsEncounterUuid,
       groupMembers: undefined,
       voided: false,
-      value: valueForObs[Object.keys(valueForObs)[0]]['value'],
-      status: 'PRELIMINARY',
+      value: valueForObs[Object.keys(valueForObs)[0]]["value"],
+      status: "PRELIMINARY",
     };
   }
 
@@ -97,8 +97,8 @@ export class CaptureDataComponent implements OnInit {
     const obs = _.map(Object.keys(this.obsDetails), (key) => {
       return this.obsDetails[key];
     });
-    this.encounterData.obs = obs;
-    // console.log('obs', obs);
+    this.encounterData.obs =
+      obs.filter((observation) => observation?.value != "") || [];
     this.saveObservations.emit(this.encounterData);
   }
 }
