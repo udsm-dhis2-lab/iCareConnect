@@ -69,7 +69,7 @@
             class="w-20"
             *ngIf="
               params?.privileges &&
-              params?.privileges['Laboratory Orders'] &&
+              params?.privileges['Laboratory Diagnostic Orders'] &&
               !params?.LISConfigurations?.isLIS
             "
             (click)="changeRoute($event, 'lab-investigation-home', true)"

@@ -21,13 +21,18 @@ import { VisitObject } from "src/app/shared/resources/visits/models/visit-object
 import { ConceptCreateFull } from "src/app/shared/resources/openmrs";
 import { SampleObject } from "../../resources/models";
 import { getPatientPendingBillStatus } from "src/app/store/selectors/bill.selectors";
-import { collectSample } from "src/app/store/actions";
+import {
+  collectSample,
+  loadLabSamplesByCollectionDates,
+  loadLabSamplesByVisit,
+} from "src/app/store/actions";
 import { SamplesService } from "src/app/shared/services/samples.service";
 import { BarCodeModalComponent } from "../../modules/sample-acceptance-and-results/components/bar-code-modal/bar-code-modal.component";
 import { formatDateToYYMMDD } from "src/app/shared/helpers/format-date.helper";
 import { MatDialog } from "@angular/material/dialog";
 import { LabOrdersService } from "../../resources/services/lab-orders.service";
 import { take } from "rxjs/operators";
+import { getPatientsSamplesToCollect } from "src/app/store/selectors";
 
 @Component({
   selector: "app-samples-to-collect",
@@ -43,6 +48,8 @@ export class SamplesToCollectComponent implements OnInit, OnChanges {
   @Input() payments: any[];
   @Input() labConfigs: any;
   @Input() containers: [];
+  @Input() patients: any[];
+  @Input() datesParameters: any;
   groupedTestOrders: any[];
   sampleIdentifiers$: Observable<any>;
   currentSamplesToCollect = {};
@@ -93,7 +100,11 @@ export class SamplesToCollectComponent implements OnInit, OnChanges {
       })
     );
     this.samplesToCollect$ = this.store.select(getSamplesToCollect);
-    this.samplesToCollect$.pipe(take(1)).subscribe((data) => {
+
+    // this.samplesToCollect$ = this.store.select(getPatientsSamplesToCollect, {
+    //   patient_uuid: this.patient.personUuid,
+    // });
+    this.samplesToCollect$.subscribe((data) => {
       if (data) {
         this.samplesToCollect.emit(data?.length);
       }
@@ -199,13 +210,12 @@ export class SamplesToCollectComponent implements OnInit, OnChanges {
     e.stopPropagation();
     this.sampleService.getSampleLabel().subscribe((label) => {
       if (label) {
-        // console.log('labels', label);
         const labelSection =
-          label["label"] < 10
-            ? `00${label["label"]}`
+          Number(label) < 10
+            ? `00${label}`
             : label["label"] < 100
-            ? `0${label["label"]}`
-            : `${label["label"]}`;
+            ? `0${label}`
+            : `${label}`;
 
         this.thereIsUnSavedSample = true;
 

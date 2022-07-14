@@ -5,7 +5,12 @@ import { select, Store } from "@ngrx/store";
 import { AppState } from "src/app/store/reducers";
 import { getCurrentPatient } from "src/app/store/selectors/current-patient.selectors";
 import { LabOrder } from "src/app/shared/resources/visits/models/lab-order.model";
-import { getAllLabOrders } from "src/app/store/selectors";
+import {
+  getAllLabOrders,
+  getAllPatientsVisitsReferences,
+  getPatientCollectedLabSamples,
+  getVisitsParameters,
+} from "src/app/store/selectors";
 import {
   getVisitLoadingState,
   getVisitLoadedState,
@@ -43,6 +48,8 @@ export class LaboratorySampleCollectionComponent implements OnInit {
   visitId: string;
   containers$: Observable<any>;
   countOfSamplesToCollect: number = 0;
+  datesParameters$: Observable<any>;
+  visitReferences$: Observable<any>;
   constructor(
     private store: Store<AppState>,
     private sampleTypesService: SampleTypesService,
@@ -66,17 +73,17 @@ export class LaboratorySampleCollectionComponent implements OnInit {
     // TODO: Find a better way to deal with sample containers
     this.containers$ = of([]);
 
+    this.datesParameters$ = this.store.select(getVisitsParameters);
+    this.visitReferences$ = this.store.select(getAllPatientsVisitsReferences);
+
     this.visitLoadedState$ = this.store.select(getVisitLoadedState);
     this.loadingVisit$ = this.store.select(getVisitLoadingState);
-    this.samplesCollected$ =
-      this.store.select(
-        getAllLabSamples
-      ); /**TODO: Filter samples collection for this patient */
+    this.samplesCollected$ = this.store.select(getAllLabSamples);
     this.activeVisit$ = this.store.select(getActiveVisit);
     this.payments$ = this.store.select(getAllPayments);
   }
 
-  onSaveSampleCollection(event) {
+  onSaveSampleCollection(event: Event): void {
     this.patient$ = this.store.select(getCurrentPatient);
 
     this.labOrders$ = this.store.select(getAllLabOrders);
@@ -87,15 +94,14 @@ export class LaboratorySampleCollectionComponent implements OnInit {
 
     this.visitLoadedState$ = this.store.select(getVisitLoadedState);
     this.loadingVisit$ = this.store.select(getVisitLoadingState);
-    this.samplesCollected$ =
-      this.store.select(
-        getAllLabSamples
-      ); /**TODO: Filter samples collection for this patient */
+    this.samplesCollected$ = this.store.select(getAllLabSamples);
+    /**TODO: Filter samples collection for this patient */
     this.activeVisit$ = this.store.select(getActiveVisit);
     this.payments$ = this.store.select(getAllPayments);
   }
 
   onGetSamplesToCollect(count: number): void {
+    console.log("countOfSamplesToCollect");
     this.countOfSamplesToCollect = count;
   }
 }

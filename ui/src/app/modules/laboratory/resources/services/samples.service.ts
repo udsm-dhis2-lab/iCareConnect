@@ -71,7 +71,7 @@ export class SamplesService {
       this.httpClientService
         .get("lab/sample?visit=" + visitUuid)
         .subscribe((samplesResponse) => {
-          const samples = samplesResponse?.results;
+          const samples = samplesResponse;
           let allSamples = [];
 
           const keyedDepartmentsByTestOrder =

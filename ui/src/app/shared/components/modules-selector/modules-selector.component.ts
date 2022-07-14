@@ -182,7 +182,6 @@ export class ModulesSelectorComponent implements OnInit {
   }
 
   onSelectModuleLocation(event: Event, module: any): void {
-    console.log("Module", module);
     event.stopPropagation();
     this.currentModule = module;
     this.userLocationsForTheCurrentModule =
@@ -194,10 +193,7 @@ export class ModulesSelectorComponent implements OnInit {
             ) || []
           ).length > 0
       ) || [];
-    console.log(
-      "userLocationsForTheCurrentModule",
-      this.userLocationsForTheCurrentModule
-    );
+
     this.currentLocation = this.userLocationsForTheCurrentModule[0];
     localStorage.setItem("currentLocation", this.currentModule?.location);
     this.currentLocation = {

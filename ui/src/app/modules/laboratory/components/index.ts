@@ -1,4 +1,3 @@
-import { SamplesToCollectComponent } from "./samples-to-collect/samples-to-collect.component";
 import { LabSamplesStatusesComponent } from "./lab-samples-statuses/lab-samples-statuses.component";
 import { LabSamplesForAcceptanceComponent } from "./lab-samples-for-acceptance/lab-samples-for-acceptance.component";
 import { TechnicianWorklistComponent } from "./technician-worklist/technician-worklist.component";
@@ -14,7 +13,6 @@ import { CaptureLabResultsComponent } from "./capture-lab-results/capture-lab-re
 import { CaptureLabResultsApprovalComponent } from "./capture-lab-results-approval/capture-lab-results-approval.component";
 
 export const labComponents: any[] = [
-  SamplesToCollectComponent,
   LabSamplesStatusesComponent,
   LabSamplesForAcceptanceComponent,
   TechnicianWorklistComponent,
