@@ -174,7 +174,7 @@ export const ICARE_APPS: ICAREApp[] = [
     id: "reports",
     image: "assets/material/report.png",
     icon: "bar_chart",
-    path: "/reports",
+    path: "/interactive-reports",
     order: 10,
   },
   {
