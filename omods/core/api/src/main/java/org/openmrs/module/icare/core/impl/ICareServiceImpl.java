@@ -42,8 +42,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class ICareServiceImpl extends BaseOpenmrsService implements ICareService {
 	
@@ -420,6 +418,11 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	@Override
 	public ItemPrice getItemPriceByDrugId(Integer drugId, Integer paymentSchemeConceptId, Integer paymentTypeConceptId) {
 		return dao.getItemPriceByDrugId(drugId, paymentSchemeConceptId, paymentTypeConceptId);
+	}
+	
+	@Override
+	public List<Concept> getConcepts(String q, String conceptClass, Integer limit, Integer startIndex) {
+		return dao.getConceptsBySearchParams(q, conceptClass, limit, startIndex);
 	}
 	
 	Boolean patientIsAdmitted(Visit visit) {

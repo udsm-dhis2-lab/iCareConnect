@@ -18,126 +18,126 @@ import java.util.Map;
 @Table(name = "lb_sample_status")
 public class SampleStatus { // implements java.io.Serializable {
 
-    @Id
-    @GeneratedValue()
-    @Column(name = "sample_status_id", unique = true, nullable = false)
-    private Integer id;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sample_id")
-    private Sample sample;
-
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
-
-    @Column(name = "remarks", length = 65535)
-    private String remarks;
-
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "timestamp", length = 19)
-    //@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-ddTHH:mm:ss.SSSZ")
-    private Date timestamp;
-
-    @Column(name = "status", length = 32)
-    private String status;
-
-    public String getRemarks() {
-        return this.remarks;
-    }
-
-    public void setRemarks(String remarks) {
-        this.remarks = remarks;
-    }
-
-    public String getStatus() {
-        return this.status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public Sample getSample() {
-        return sample;
-    }
-
-    public void setSample(Sample sample) {
-        this.sample = sample;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public Date getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(Date timestamp) {
-        this.timestamp = timestamp;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public static SampleStatus fromMap(Map<String, Object> map) throws ParseException {
-        SampleStatus sampleStatus = new SampleStatus();
-
-        Sample sample = new Sample();
-        sample.setUuid(((Map) map.get("sample")).get("uuid").toString());
-        sampleStatus.setSample(sample);
-
-        User user = new User();
-        user.setUuid(((Map) map.get("user")).get("uuid").toString());
-        sampleStatus.setUser(user);
-
-        sampleStatus.setStatus((map.get("status")).toString());
-        sampleStatus.setRemarks((map.get("remarks")).toString());
-
-        if (map.get("timestamp") == null) {
-
-            sampleStatus.setTimestamp(new Date());
-
-        } else {
-
-            String dateString = map.get("timestamp").toString();
-
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSS");
-            Date parsedDate = dateFormat.parse(dateString);
-            sampleStatus.setTimestamp(parsedDate);
-
-        }
-
-        return sampleStatus;
-
-    }
-
-    public Map<String, Object> toMap() {
-        Map<String, Object> statusObject = new HashMap<String, Object>();
-
-        statusObject.put("status", this.getStatus());
-        statusObject.put("timestamp", this.getTimestamp());
-        statusObject.put("remarks", this.getRemarks());
-
-        HashMap<String, Object> userObject = new HashMap<String, Object>();
-        if (this.getUser() != null) {
-            userObject.put("uuid", this.getUser().getUuid());
-            userObject.put("name", this.getUser().getDisplayString());
-
-            statusObject.put("user", userObject);
-
-        }
-
-        return statusObject;
-    }
+	@Id
+	@GeneratedValue()
+	@Column(name = "sample_status_id", unique = true, nullable = false)
+	private Integer id;
+	
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "sample_id")
+	private Sample sample;
+	
+	@ManyToOne
+	@JoinColumn(name = "user_id")
+	private User user;
+	
+	@Column(name = "remarks", length = 65535)
+	private String remarks;
+	
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "timestamp", length = 19)
+	//@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-ddTHH:mm:ss.SSSZ")
+	private Date timestamp;
+	
+	@Column(name = "status", length = 32)
+	private String status;
+	
+	public String getRemarks() {
+		return this.remarks;
+	}
+	
+	public void setRemarks(String remarks) {
+		this.remarks = remarks;
+	}
+	
+	public String getStatus() {
+		return this.status;
+	}
+	
+	public void setStatus(String status) {
+		this.status = status;
+	}
+	
+	public Sample getSample() {
+		return sample;
+	}
+	
+	public void setSample(Sample sample) {
+		this.sample = sample;
+	}
+	
+	public void setId(Integer id) {
+		this.id = id;
+	}
+	
+	public User getUser() {
+		return user;
+	}
+	
+	public void setUser(User user) {
+		this.user = user;
+	}
+	
+	public Date getTimestamp() {
+		return timestamp;
+	}
+	
+	public void setTimestamp(Date timestamp) {
+		this.timestamp = timestamp;
+	}
+	
+	public Integer getId() {
+		return id;
+	}
+	
+	public static SampleStatus fromMap(Map<String, Object> map) throws ParseException {
+		SampleStatus sampleStatus = new SampleStatus();
+		
+		Sample sample = new Sample();
+		sample.setUuid(((Map) map.get("sample")).get("uuid").toString());
+		sampleStatus.setSample(sample);
+		
+		User user = new User();
+		user.setUuid(((Map) map.get("user")).get("uuid").toString());
+		sampleStatus.setUser(user);
+		
+		sampleStatus.setStatus((map.get("status")).toString());
+		sampleStatus.setRemarks((map.get("remarks")).toString());
+		
+		if (map.get("timestamp") == null) {
+			
+			sampleStatus.setTimestamp(new Date());
+			
+		} else {
+			
+			String dateString = map.get("timestamp").toString();
+			
+			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSS");
+			Date parsedDate = dateFormat.parse(dateString);
+			sampleStatus.setTimestamp(parsedDate);
+			
+		}
+		
+		return sampleStatus;
+		
+	}
+	
+	public Map<String, Object> toMap() {
+		Map<String, Object> statusObject = new HashMap<String, Object>();
+		
+		statusObject.put("status", this.getStatus());
+		statusObject.put("timestamp", this.getTimestamp());
+		statusObject.put("remarks", this.getRemarks());
+		
+		HashMap<String, Object> userObject = new HashMap<String, Object>();
+		if (this.getUser() != null) {
+			userObject.put("uuid", this.getUser().getUuid());
+			userObject.put("name", this.getUser().getDisplayString());
+			
+			statusObject.put("user", userObject);
+			
+		}
+		
+		return statusObject;
+	}
 }
