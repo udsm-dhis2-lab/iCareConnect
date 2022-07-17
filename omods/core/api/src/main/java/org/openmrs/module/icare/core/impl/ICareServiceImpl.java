@@ -22,7 +22,6 @@ import org.openmrs.module.icare.billing.services.insurance.Claim;
 import org.openmrs.module.icare.billing.services.insurance.ClaimResult;
 import org.openmrs.module.icare.billing.services.insurance.InsuranceService;
 import org.openmrs.module.icare.core.ICareService;
-import org.openmrs.module.icare.core.IcareConcept;
 import org.openmrs.module.icare.core.Item;
 import org.openmrs.module.icare.core.Message;
 import org.openmrs.module.icare.core.dao.ICareDao;
@@ -43,8 +42,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class ICareServiceImpl extends BaseOpenmrsService implements ICareService {
 	
@@ -424,8 +421,8 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	}
 	
 	@Override
-	public List<Concept> getIcareConcepts(String searchingText, String conceptClass, Integer limit, Integer startIndex) {
-		return dao.getConceptsBySearchParams(searchingText, conceptClass, limit, startIndex);
+	public List<Concept> getConcepts(String q, String conceptClass, Integer limit, Integer startIndex) {
+		return dao.getConceptsBySearchParams(q, conceptClass, limit, startIndex);
 	}
 	
 	Boolean patientIsAdmitted(Visit visit) {

@@ -17,9 +17,7 @@ import org.openmrs.annotation.Authorized;
 import org.openmrs.api.APIException;
 import org.openmrs.api.OpenmrsService;
 import org.openmrs.module.icare.billing.ItemNotPayableException;
-import org.openmrs.module.icare.billing.VisitInvalidException;
 import org.openmrs.module.icare.billing.models.ItemPrice;
-import org.openmrs.module.icare.core.IcareConcept;
 import org.openmrs.module.icare.billing.models.Prescription;
 import org.openmrs.module.icare.billing.services.insurance.Claim;
 import org.openmrs.module.icare.billing.services.insurance.ClaimResult;
@@ -112,5 +110,5 @@ public interface ICareService extends OpenmrsService {
 	
 	List<String> generatePatientIds();
 	
-	List<Concept> getIcareConcepts(String searchingText, String conceptClass, Integer limit, Integer startIndex);
+	List<Concept> getConcepts(String q, String conceptClass, Integer limit, Integer startIndex);
 }

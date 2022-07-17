@@ -418,7 +418,7 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 	@Test
 	public  void testSearchConcepts() throws Exception {
 		MockHttpServletRequest newGetRequest = newGetRequest("icare/concept"
-				, new Parameter("searchingText", "count")
+				, new Parameter("q", "count")
 				, new Parameter("conceptClass", "Test")
 		);
 		MockHttpServletResponse handle = handle(newGetRequest);
@@ -427,7 +427,7 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		assertThat("Should return 1 item", maps.size(), is(1));
 
 		newGetRequest = newGetRequest("icare/concept"
-				, new Parameter("searchingText", "count")
+				, new Parameter("q", "count")
 		);
 		handle = handle(newGetRequest);
 		results = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
