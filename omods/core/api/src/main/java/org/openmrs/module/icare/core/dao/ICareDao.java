@@ -13,18 +13,14 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
-import org.hibernate.Session;
 import org.openmrs.*;
 import org.openmrs.api.db.hibernate.DbSession;
 import org.openmrs.module.icare.billing.models.ItemPrice;
 import org.openmrs.module.icare.billing.models.Prescription;
-import org.openmrs.module.icare.core.IcareConcept;
 import org.openmrs.module.icare.core.Item;
 import org.openmrs.module.icare.core.utils.VisitWrapper;
 import org.openmrs.module.icare.store.models.OrderStatus;
 
-import javax.persistence.EntityManager;
-import javax.persistence.criteria.CriteriaBuilder;
 import java.util.Calendar;
 import java.util.List;
 
@@ -381,9 +377,9 @@ public class ICareDao extends BaseDAO<Item> {
 		query.setParameter("year", calendar.get(Calendar.YEAR));
 		return (long) query.list().get(0);
 	}
-	
-	public List<Concept> getConceptsBySearchParams(String searchingText, String conceptClass, Integer limit,
-	        Integer startIndex) {
+
+	public List<Concept> getConceptsBySearchParams(String q, String conceptClass, Integer limit,
+												   Integer startIndex) {
 //		new Concept().getConceptClass().getName();
 //		new ConceptClass();
 		DbSession session = getSession();
@@ -391,8 +387,8 @@ public class ICareDao extends BaseDAO<Item> {
 		//String searchConceptQueryStr = "SELECT c FROM Concept c LEFT JOIN c.names cn LEFT JOIN c.conceptMappings mp";
 		String searchConceptQueryStr = "SELECT c FROM Concept c INNER JOIN c.names cn INNER JOIN c.conceptClass cc";
 		String where = "WHERE";
-		if (searchingText != null) {
-			where += " lower(cn.name) like lower(:searchingText)";
+		if (q != null) {
+			where += " lower(cn.name) like lower(:q)";
 		}
 		if (conceptClass != null) {
 			if(!where.equals("WHERE")){
@@ -406,19 +402,13 @@ public class ICareDao extends BaseDAO<Item> {
 		Query sqlQuery = session.createQuery(searchConceptQueryStr);
 		sqlQuery.setFirstResult(startIndex);
 		sqlQuery.setMaxResults(limit);
-		if (searchingText != null) {
-			sqlQuery.setParameter("searchingText", "%" + searchingText + "%");
+		if (q != null) {
+			sqlQuery.setParameter("q", "%" + q + "%");
 		}
 
 		if (conceptClass != null) {
 			sqlQuery.setParameter("conceptClass", "%" + conceptClass + "%");
 		}
-
-		System.out.println(searchConceptQueryStr);
-
-		List data = sqlQuery.list();
-		System.out.println("##################################################################");
-		System.out.println(data.size());
-		return data;
+		return sqlQuery.list();
 	}
 }

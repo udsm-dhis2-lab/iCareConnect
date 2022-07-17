@@ -21,7 +21,6 @@ import org.openmrs.module.icare.billing.services.insurance.Claim;
 import org.openmrs.module.icare.billing.services.insurance.ClaimResult;
 import org.openmrs.module.icare.core.ICareService;
 import org.openmrs.module.icare.core.Item;
-import org.openmrs.module.icare.core.IcareConcept;
 import org.openmrs.module.icare.core.Message;
 import org.openmrs.module.icare.core.utils.VisitWrapper;
 import org.openmrs.module.icare.store.models.OrderStatus;
@@ -310,9 +309,9 @@ public class ICareController {
 	// Search concepts
 	@RequestMapping(value = "concept", method = RequestMethod.GET)
     @ResponseBody
-    public Map<String, Object> getIcareConcepts(@RequestParam(value = "searchingText", required = false) String searchingText, @RequestParam(value = "conceptClass", required = false) String conceptClass, @RequestParam(defaultValue = "50") Integer limit, @RequestParam(defaultValue = "0") Integer startIndex) {
+    public Map<String, Object> getIcareConcepts(@RequestParam(value = "q", required = false) String q, @RequestParam(value = "conceptClass", required = false) String conceptClass, @RequestParam(defaultValue = "50") Integer limit, @RequestParam(defaultValue = "0") Integer startIndex) {
 		List<Map<String, Object>> conceptsList = new ArrayList<>();
-        for (Concept conceptItem: iCareService.getIcareConcepts(searchingText, conceptClass, limit, startIndex)) {
+        for (Concept conceptItem: iCareService.getConcepts(q, conceptClass, limit, startIndex)) {
 			Map<String, Object> conceptMap = new HashMap<String, Object>();
 			conceptMap.put("uuid", conceptItem.getUuid().toString());
 			conceptMap.put("display", conceptItem.getDisplayString());
