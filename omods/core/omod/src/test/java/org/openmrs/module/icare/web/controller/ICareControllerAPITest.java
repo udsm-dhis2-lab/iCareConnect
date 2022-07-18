@@ -402,16 +402,15 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		assertThat("Should return 1 item", maps.size(), is(1));
 		
 	}
-
+	
 	@Test
 	public void testGettingItemsByDrug() throws Exception {
-
-		MockHttpServletRequest newGetRequest = newGetRequest("icare/item", new Parameter("type",
-				"DRUG"));
+		
+		MockHttpServletRequest newGetRequest = newGetRequest("icare/item", new Parameter("type", "DRUG"));
 		MockHttpServletResponse handle = handle(newGetRequest);
 		Map<String, Object> results = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
 		List<Map<String, Object>> maps = (List) results.get("results");
 		assertThat("Should return 1 item", maps.size(), is(1));
-
+		
 	}
 }
