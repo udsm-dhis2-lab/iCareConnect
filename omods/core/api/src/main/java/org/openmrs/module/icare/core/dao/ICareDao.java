@@ -377,38 +377,37 @@ public class ICareDao extends BaseDAO<Item> {
 		query.setParameter("year", calendar.get(Calendar.YEAR));
 		return (long) query.list().get(0);
 	}
-
-	public List<Concept> getConceptsBySearchParams(String q, String conceptClass, Integer limit,
-												   Integer startIndex) {
-//		new Concept().getConceptClass().getName();
-//		new ConceptClass();
-		DbSession session = getSession();
-
-		//String searchConceptQueryStr = "SELECT c FROM Concept c LEFT JOIN c.names cn LEFT JOIN c.conceptMappings mp";
-		String searchConceptQueryStr = "SELECT c FROM Concept c INNER JOIN c.names cn INNER JOIN c.conceptClass cc";
-		String where = "WHERE";
-		if (q != null) {
-			where += " lower(cn.name) like lower(:q)";
-		}
-		if (conceptClass != null) {
-			if(!where.equals("WHERE")){
-				where += " AND ";
-			}
-			where += " lower(cc.name) like lower(:conceptClass)";
-		}
-		if(!where.equals("WHERE")){
-			searchConceptQueryStr += " " + where;
-		}
-		Query sqlQuery = session.createQuery(searchConceptQueryStr);
-		sqlQuery.setFirstResult(startIndex);
-		sqlQuery.setMaxResults(limit);
-		if (q != null) {
-			sqlQuery.setParameter("q", "%" + q + "%");
-		}
-
-		if (conceptClass != null) {
-			sqlQuery.setParameter("conceptClass", "%" + conceptClass + "%");
-		}
-		return sqlQuery.list();
-	}
+	
+	//	public List<Concept> getConceptsBySearchParams(String q, String conceptClass, Integer limit, Integer startIndex) {
+	//		//		new Concept().getConceptClass().getName();
+	//		//		new ConceptClass();
+	//		DbSession session = getSession();
+	//
+	//		//String searchConceptQueryStr = "SELECT c FROM Concept c LEFT JOIN c.names cn LEFT JOIN c.conceptMappings mp";
+	//		String searchConceptQueryStr = "SELECT c FROM Concept c INNER JOIN c.names cn INNER JOIN c.conceptClass cc";
+	//		String where = "WHERE";
+	//		if (q != null) {
+	//			where += " lower(cn.name) like lower(:q)";
+	//		}
+	//		if (conceptClass != null) {
+	//			if (!where.equals("WHERE")) {
+	//				where += " AND ";
+	//			}
+	//			where += " lower(cc.name) like lower(:conceptClass)";
+	//		}
+	//		if (!where.equals("WHERE")) {
+	//			searchConceptQueryStr += " " + where;
+	//		}
+	//		Query sqlQuery = session.createQuery(searchConceptQueryStr);
+	//		sqlQuery.setFirstResult(startIndex);
+	//		sqlQuery.setMaxResults(limit);
+	//		if (q != null) {
+	//			sqlQuery.setParameter("q", "%" + q + "%");
+	//		}
+	//
+	//		if (conceptClass != null) {
+	//			sqlQuery.setParameter("conceptClass", "%" + conceptClass + "%");
+	//		}
+	//		return sqlQuery.list();
+	//	}
 }
