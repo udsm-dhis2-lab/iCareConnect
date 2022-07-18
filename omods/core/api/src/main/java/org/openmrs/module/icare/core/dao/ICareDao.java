@@ -14,10 +14,7 @@ import org.apache.commons.logging.LogFactory;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
-import org.openmrs.ConceptSet;
-import org.openmrs.Drug;
-import org.openmrs.Order;
-import org.openmrs.Visit;
+import org.openmrs.*;
 import org.openmrs.api.db.hibernate.DbSession;
 import org.openmrs.module.icare.billing.models.ItemPrice;
 import org.openmrs.module.icare.billing.models.Prescription;
@@ -134,7 +131,7 @@ public class ICareDao extends BaseDAO<Item> {
 		} else {
 			queryStr = "SELECT ip FROM Item ip";
 		}
-		if(queryStr != null && type == Item.Type.DRUG){
+		if (queryStr != null && type == Item.Type.DRUG) {
 			queryStr += " WHERE ip.drug IS NOT NULL";
 		}
 		
@@ -154,7 +151,7 @@ public class ICareDao extends BaseDAO<Item> {
 				        + "LEFT JOIN ip.drug as d " + "LEFT JOIN d.concept as c1 " + "LEFT JOIN c1.names cn1 "
 				        + "WHERE lower(cn.name) like :search OR lower(cn1.name) like :search OR lower(d.name) like :search";
 			}
-			if(type == Item.Type.DRUG){
+			if (type == Item.Type.DRUG) {
 				queryStr += " AND ip.drug IS NOT NULL";
 			}
 		}
@@ -381,5 +378,34 @@ public class ICareDao extends BaseDAO<Item> {
 		Calendar calendar = Calendar.getInstance();
 		query.setParameter("year", calendar.get(Calendar.YEAR));
 		return (long) query.list().get(0);
+	}
+	
+	public List<Concept> getConceptsBySearchParams(String q, String conceptClass, Integer limit, Integer startIndex) {
+		DbSession session = getSession();
+		String searchConceptQueryStr = "SELECT c FROM Concept c INNER JOIN c.names cn INNER JOIN c.conceptClass cc";
+		String where = "WHERE";
+		if (q != null) {
+			where += " lower(cn.name) like lower(:q)";
+		}
+		if (conceptClass != null) {
+			if (!where.equals("WHERE")) {
+				where += " AND ";
+			}
+			where += " lower(cc.name) like lower(:conceptClass)";
+		}
+		if (!where.equals("WHERE")) {
+			searchConceptQueryStr += " " + where;
+		}
+		Query sqlQuery = session.createQuery(searchConceptQueryStr);
+		sqlQuery.setFirstResult(startIndex);
+		sqlQuery.setMaxResults(limit);
+		if (q != null) {
+			sqlQuery.setParameter("q", "%" + q + "%");
+		}
+		
+		if (conceptClass != null) {
+			sqlQuery.setParameter("conceptClass", "%" + conceptClass + "%");
+		}
+		return sqlQuery.list();
 	}
 }
