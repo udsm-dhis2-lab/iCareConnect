@@ -175,26 +175,26 @@ public class LaboratoryController {
 	@ResponseBody
 	public Map<String, Object> getAllSamples(@RequestParam(value = "startDate", required = false) String startDate,
 	        @RequestParam(value = "endDate", required = false) String endDate,
-											 @RequestParam(defaultValue = "true", value = "paging", required = false) boolean paging,
-											 @RequestParam(defaultValue = "50", value = "pageSize", required = false) Integer pageSize,
-											 @RequestParam(defaultValue = "1", value = "page", required = false) Integer page,
-											 @RequestParam(value="location", required = false) String locationUuid) throws ParseException {
-
+	        @RequestParam(defaultValue = "true", value = "paging", required = false) boolean paging,
+	        @RequestParam(defaultValue = "50", value = "pageSize", required = false) Integer pageSize,
+	        @RequestParam(defaultValue = "1", value = "page", required = false) Integer page,
+	        @RequestParam(value = "location", required = false) String locationUuid) throws ParseException {
+		
 		Date start = null;
 		Date end = null;
 		if (startDate != null && endDate != null) {
-
+			
 			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-
+			
 			start = formatter.parse(startDate);
 			end = formatter.parse(endDate);
-
+			
 		}
 		Pager pager = new Pager();
 		pager.setAllowed(paging);
 		pager.setPageSize(pageSize);
 		pager.setPage(page);
-		ListResult<Sample> sampleResults = laboratoryService.getSamples(start,end,pager,locationUuid);
+		ListResult<Sample> sampleResults = laboratoryService.getSamples(start, end, pager, locationUuid);
 		return sampleResults.toMap();
 		/*List<Sample> samples;
 		
