@@ -382,11 +382,7 @@ public class ICareDao extends BaseDAO<Item> {
 	}
 	
 	public List<Concept> getConceptsBySearchParams(String q, String conceptClass, Integer limit, Integer startIndex) {
-		//		new Concept().getConceptClass().getName();
-		//		new ConceptClass();
 		DbSession session = getSession();
-		
-		//String searchConceptQueryStr = "SELECT c FROM Concept c LEFT JOIN c.names cn LEFT JOIN c.conceptMappings mp";
 		String searchConceptQueryStr = "SELECT c FROM Concept c INNER JOIN c.names cn INNER JOIN c.conceptClass cc";
 		String where = "WHERE";
 		if (q != null) {
