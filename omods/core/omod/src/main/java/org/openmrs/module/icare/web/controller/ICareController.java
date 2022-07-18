@@ -305,12 +305,12 @@ public class ICareController {
 		ClaimResult claim = iCareService.claimByVisitUuid(visitUuid);
 		return claim;
 	}
-
+	
 	@RequestMapping(value = "concept", method = RequestMethod.GET)
-    @ResponseBody
-    public Map<String, Object> getIcareConcepts(@RequestParam(value = "q", required = false) String q, @RequestParam(value = "conceptClass", required = false) String conceptClass, @RequestParam(defaultValue = "50") Integer limit, @RequestParam(defaultValue = "0") Integer startIndex) {
+	@ResponseBody
+	public Map<String, Object> getIcareConcepts(@RequestParam(value = "q", required = false) String q, @RequestParam(value = "conceptClass", required = false) String conceptClass, @RequestParam(defaultValue = "50") Integer limit, @RequestParam(defaultValue = "0") Integer startIndex) {
 		List<Map<String, Object>> conceptsList = new ArrayList<>();
-	   for (Concept conceptItem: iCareService.getConcepts(q, conceptClass, limit, startIndex)) {
+		for (Concept conceptItem: iCareService.getConcepts(q, conceptClass, limit, startIndex)) {
 			Map<String, Object> conceptMap = new HashMap<String, Object>();
 			conceptMap.put("uuid", conceptItem.getUuid().toString());
 			conceptMap.put("display", conceptItem.getDisplayString());
@@ -326,10 +326,10 @@ public class ICareController {
 
 			conceptMap.put("mappings",  mappings );
 			conceptsList.add(conceptMap);
-	   }
-	   Map<String, Object> results = new HashMap<>();
-	   results.put("results", conceptsList);
+		}
+		Map<String, Object> results = new HashMap<>();
+		results.put("results", conceptsList);
 		System.out.println(results);
-	   return results;
-   }
+		return results;
+	}
 }
