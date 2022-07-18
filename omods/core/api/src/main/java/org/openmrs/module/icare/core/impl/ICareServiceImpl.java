@@ -422,10 +422,10 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		return dao.getItemPriceByDrugId(drugId, paymentSchemeConceptId, paymentTypeConceptId);
 	}
 	
-	//	@Override
-	//	public List<Concept> getConcepts(String q, String conceptClass, Integer limit, Integer startIndex) {
-	//		return dao.getConceptsBySearchParams(q, conceptClass, limit, startIndex);
-	//	}
+	@Override
+	public List<Concept> getConcepts(String q, String conceptClass, Integer limit, Integer startIndex) {
+		return dao.getConceptsBySearchParams(q, conceptClass, limit, startIndex);
+	}
 	
 	Boolean patientIsAdmitted(Visit visit) {
 		if (visit.getStopDatetime() == null) {

@@ -24,7 +24,7 @@ import org.openmrs.module.icare.billing.services.insurance.ClaimResult;
 import org.openmrs.module.icare.core.utils.VisitWrapper;
 import org.openmrs.module.icare.store.models.OrderStatus;
 import org.springframework.transaction.annotation.Transactional;
-
+import org.openmrs.module.icare.billing.VisitInvalidException;
 import javax.naming.ConfigurationException;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -110,5 +110,5 @@ public interface ICareService extends OpenmrsService {
 	
 	List<String> generatePatientIds();
 	
-	//	List<Concept> getConcepts(String q, String conceptClass, Integer limit, Integer startIndex);
+	List<Concept> getConcepts(String q, String conceptClass, Integer limit, Integer startIndex);
 }
