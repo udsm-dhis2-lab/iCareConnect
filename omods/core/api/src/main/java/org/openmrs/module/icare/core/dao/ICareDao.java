@@ -13,7 +13,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
-import org.openmrs.*;
+//import org.openmrs.*;
+import org.hibernate.Session;
+import org.openmrs.ConceptSet;
+import org.openmrs.Drug;
+import org.openmrs.Order;
+import org.openmrs.Visit;
 import org.openmrs.api.db.hibernate.DbSession;
 import org.openmrs.module.icare.billing.models.ItemPrice;
 import org.openmrs.module.icare.billing.models.Prescription;
@@ -21,6 +26,7 @@ import org.openmrs.module.icare.core.Item;
 import org.openmrs.module.icare.core.utils.VisitWrapper;
 import org.openmrs.module.icare.store.models.OrderStatus;
 
+import javax.persistence.EntityManager;
 import java.util.Calendar;
 import java.util.List;
 
