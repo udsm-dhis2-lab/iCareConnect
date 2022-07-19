@@ -423,8 +423,8 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	}
 	
 	@Override
-	public List<Concept> getConcepts(String q, String conceptClass, Integer limit, Integer startIndex) {
-		return dao.getConceptsBySearchParams(q, conceptClass, limit, startIndex);
+	public List<Concept> getConcepts(String q, String conceptClass, String searchTerm, Integer limit, Integer startIndex) {
+		return dao.getConceptsBySearchParams(q, conceptClass, searchTerm, limit, startIndex);
 	}
 	
 	Boolean patientIsAdmitted(Visit visit) {
