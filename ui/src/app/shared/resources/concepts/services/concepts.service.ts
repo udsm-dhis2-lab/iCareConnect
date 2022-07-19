@@ -3,9 +3,10 @@ import {
   Api,
   ConceptCreate,
   ConceptCreateFull,
+  ConceptGet,
   ConceptGetFull,
 } from "../../openmrs";
-import { Observable, from, of } from "rxjs";
+import { Observable, from, of, zip } from "rxjs";
 import { OpenmrsHttpClientService } from "src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service";
 import { catchError, map } from "rxjs/operators";
 import { flatten } from "lodash";
@@ -79,9 +80,70 @@ export class ConceptsService {
     );
   }
 
+  createConceptNames(
+    parentUuid,
+    conceptNames: any[]
+  ): Observable<ConceptCreateFull> {
+    return zip(
+      ...conceptNames.map((conceptNameData) =>
+        from(
+          this.api.concept.createConceptName(parentUuid, conceptNameData)
+        ).pipe(
+          map((response) => {
+            return response?.results;
+          }),
+          catchError((error) => of([]))
+        )
+      )
+    ).pipe(
+      map((response: any) => {
+        return flatten(response);
+      })
+    );
+  }
+
   updateConcept(uuid: string, data: any): Observable<ConceptCreateFull> {
     return from(this.api.concept.updateConcept(uuid, data)).pipe(
       map((response) => response),
+      catchError((error) => {
+        return of(error);
+      })
+    );
+  }
+
+  searchConcept(parameters: any): Observable<ConceptGet[]> {
+    let queryParams = "";
+    if (parameters?.q) {
+      queryParams = "q=" + parameters?.q;
+    }
+    if (parameters?.limit) {
+      queryParams +=
+        (queryParams?.length > 0 ? "&" : "") + "limit=" + parameters?.limit;
+    }
+
+    if (parameters?.startIndex) {
+      queryParams +=
+        (queryParams?.length > 0 ? "&" : "") +
+        "startIndex=" +
+        parameters?.startIndex;
+    }
+
+    if (parameters?.conceptClass) {
+      queryParams +=
+        (queryParams?.length > 0 ? "&" : "") +
+        "conceptClass=" +
+        parameters?.conceptClass;
+    }
+    if (parameters?.searchTerm) {
+      queryParams +=
+        (queryParams?.length > 0 ? "&" : "") +
+        "searchTerm=" +
+        parameters?.searchTerm;
+    }
+    return this.httpClient.get(`icare/concept?${queryParams}`).pipe(
+      map((response) => {
+        return response?.results;
+      }),
       catchError((error) => {
         return of(error);
       })

@@ -417,7 +417,7 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 	@Test
 	public void testSearchConcepts() throws Exception {
 		MockHttpServletRequest newGetRequest = newGetRequest("icare/concept", new Parameter("q", "opd"), new Parameter(
-		        "conceptClass", "Test"), new Parameter("searchTerm", "OPD"));
+		        "conceptClass", "Test"));
 		MockHttpServletResponse handle = handle(newGetRequest);
 		Map<String, Object> results = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
 		List<Map<String, Object>> maps = (List) results.get("results");
