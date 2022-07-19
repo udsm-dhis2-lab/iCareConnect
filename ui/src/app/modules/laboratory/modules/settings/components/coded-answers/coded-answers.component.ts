@@ -30,19 +30,23 @@ export class CodedAnswersComponent implements OnInit {
 
   ngOnInit(): void {
     this.createCodedAnswersFields();
-    this.codedAnswers$ = this.conceptService.getConceptsAsCodedAnswers({
-      searchingText: "LIS_CODED_ANSWERS",
-      pageSize: this.pageSize,
-      page: this.page,
+    this.codedAnswers$ = this.conceptService.searchConcept({
+      q: "LIS_CODED_ANSWERS",
+      limit: this.pageSize,
+      conceptClass: "Coded answer",
+      startIndex: (this.page - 1) * this.pageSize,
+      searchTerm: "LIS_CODED_ANSWERS",
     });
   }
 
   getList(event: Event, actionType: string): void {
     this.page = actionType == "next" ? this.page + 1 : this.page - 1;
-    this.codedAnswers$ = this.conceptService.getConceptsAsCodedAnswers({
-      searchingText: "LIS_CODED_ANSWERS",
-      pageSize: this.pageSize,
-      page: this.page,
+    this.codedAnswers$ = this.conceptService.searchConcept({
+      q: "LIS_CODED_ANSWERS",
+      limit: this.pageSize,
+      conceptClass: "Coded answer",
+      startIndex: (this.page - 1) * this.pageSize,
+      searchTerm: "LIS_CODED_ANSWERS",
     });
   }
 
@@ -85,7 +89,7 @@ export class CodedAnswersComponent implements OnInit {
     event.stopPropagation();
     // class:3f3e1f30-b6ef-43a3-bd36-3fd0d0a94eaf (Coded answers)
     // datatype: 8d4a4c94-c2cc-11de-8d13-0010c6dffd0f (NA)
-    let names = [
+    const searchTerms = [
       {
         name: "LIS_CODED_ANSWERS",
         locale: "en",
@@ -93,6 +97,7 @@ export class CodedAnswersComponent implements OnInit {
         conceptNameType: "INDEX_TERM",
       },
     ];
+    let names = [];
     this.saving = true;
     names = [
       ...names,
@@ -128,14 +133,21 @@ export class CodedAnswersComponent implements OnInit {
       .createConcept(this.answer)
       .subscribe((response: any) => {
         if (response && !response?.error) {
-          this.category = "List";
-          this.page = 1;
-          this.codedAnswers$ = this.conceptService.getConceptsAsCodedAnswers({
-            searchingText: "LIS_CODED_ANSWERS",
-            pageSize: this.pageSize,
-            page: this.page,
-          });
-          this.saving = false;
+          this.conceptService
+            .createConceptNames(response?.uuid, searchTerms)
+            .subscribe((conceptNameResponse) => {
+              if (conceptNameResponse) {
+                this.category = "List";
+                this.page = 1;
+                this.codedAnswers$ = this.conceptService.searchConcept({
+                  limit: this.pageSize,
+                  conceptClass: "Coded answer",
+                  startIndex: (this.page - 1) * this.pageSize,
+                  searchTerm: "LIS_CODED_ANSWERS",
+                });
+                this.saving = false;
+              }
+            });
         } else {
           this.saving = false;
           this.hasError = true;
@@ -157,10 +169,11 @@ export class CodedAnswersComponent implements OnInit {
     this.conceptService.deleteConcept(concept?.uuid).subscribe((response) => {
       if (response) {
         this.page = 1;
-        this.codedAnswers$ = this.conceptService.getConceptsByParameters({
-          searchingText: "LIS_CODED_ANSWERS",
-          pageSize: this.pageSize,
-          page: this.page,
+        this.codedAnswers$ = this.conceptService.searchConcept({
+          limit: this.pageSize,
+          conceptClass: "Coded answer",
+          startIndex: (this.page - 1) * this.pageSize,
+          searchTerm: "LIS_CODED_ANSWERS",
         });
       }
     });
