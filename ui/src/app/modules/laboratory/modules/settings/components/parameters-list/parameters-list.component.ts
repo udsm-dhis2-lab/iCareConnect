@@ -17,33 +17,35 @@ export class ParametersListComponent implements OnInit {
   constructor(private conceptService: ConceptsService) {}
 
   ngOnInit(): void {
-    this.parameters$ = this.conceptService.getConceptsByParameters({
-      searchingText: "LIS_TEST_PARAMETER",
-      pageSize: this.pageSize,
-      page: this.page,
+    this.parameters$ = this.conceptService.searchConcept({
+      limit: this.pageSize,
+      conceptClass: "Test",
+      startIndex: ((this.page - 1) * this.pageSize).toString(),
+      searchTerm: "LIS_TEST_PARAMETER",
     });
   }
 
   getTestParameters(event: Event, action: string): void {
     event.stopPropagation();
     this.page = action === "prev" ? this.page - 1 : this.page + 1;
-    this.parameters$ = this.conceptService.getConceptsByParameters({
-      searchingText: "LIS_TEST_PARAMETER",
-      pageSize: this.pageSize,
-      page: this.page,
+    this.parameters$ = this.conceptService.searchConcept({
+      conceptClass: "Test",
+      limit: this.pageSize,
+      startIndex: (this.page - 1) * this.pageSize,
+      searchTerm: "LIS_TEST_PARAMETER",
     });
   }
 
   searchConcept(event: KeyboardEvent): void {
     this.page = 1;
     const searchingText = (event.target as HTMLInputElement).value;
-    if (searchingText) {
-      this.parameters$ = this.conceptService.getConceptsByParameters({
-        searchingText,
-        pageSize: this.pageSize,
-        page: this.page,
-      });
-    }
+    this.parameters$ = this.conceptService.searchConcept({
+      q: searchingText,
+      conceptClass: "Test",
+      limit: this.pageSize,
+      startIndex: (this.page - 1) * this.pageSize,
+      searchTerm: "LIS_TEST_PARAMETER",
+    });
   }
 
   onEdit(event: Event, concept: ConceptGetFull): void {
@@ -56,10 +58,11 @@ export class ParametersListComponent implements OnInit {
     this.conceptService.deleteConcept(concept?.uuid).subscribe((response) => {
       if (response) {
         this.page = 1;
-        this.parameters$ = this.conceptService.getConceptsByParameters({
-          searchingText: "LIS_TEST_PARAMETER",
-          pageSize: this.pageSize,
-          page: this.page,
+        this.parameters$ = this.conceptService.searchConcept({
+          limit: this.pageSize,
+          conceptClass: "Test",
+          startIndex: (this.page - 1) * this.pageSize,
+          searchTerm: "LIS_TEST_PARAMETER",
         });
       }
     });
