@@ -433,6 +433,6 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		handle = handle(newGetRequest);
 		results = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
 		maps = (List) results.get("results");
-		assertThat("Should return 1 item", maps.size(), is(15));
+		assertThat("Should return 1 item", maps.size(), is(12));
 	}
 }

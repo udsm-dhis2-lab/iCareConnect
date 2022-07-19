@@ -50,7 +50,12 @@ export class ReferenceTermsService {
       this.api.conceptreferenceterm.getAllConceptReferenceTerms(query)
     ).pipe(
       map((response) => {
-        return response?.results;
+        return response?.results.map((result) => {
+          return {
+            ...result,
+            display: result?.display?.split(": ")[1],
+          };
+        });
       }),
       catchError((error) => of(error))
     );

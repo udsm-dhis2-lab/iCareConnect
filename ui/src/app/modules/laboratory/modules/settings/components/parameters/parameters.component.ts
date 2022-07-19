@@ -40,6 +40,14 @@ export class ParametersComponent implements OnInit {
   highNormalField: any;
 
   conceptBeingEdited: any;
+  savingMessage: string = null;
+  alertType: string = "";
+
+  selectedCodeItems: any[] = [];
+
+  selectedCodingSource: string;
+
+  isFormValid: boolean = false;
   constructor(
     private conceptService: ConceptsService,
     private conceptReferenceService: ReferenceTermsService
@@ -54,6 +62,7 @@ export class ParametersComponent implements OnInit {
 
   onFormUpdate(formValue: FormValue): void {
     const values = formValue.getValues();
+    this.isFormValid = formValue.isValid;
     this.formData = { ...this.formData, ...values };
     if (values["datatype"]?.value) {
       this.createPrecisionField(this.conceptBeingEdited);
@@ -85,6 +94,11 @@ export class ParametersComponent implements OnInit {
 
   onFormUpdateForSource(formValue: FormValue): void {
     const values = formValue.getValues();
+    this.selectedCodingSource = null;
+    setTimeout(() => {
+      this.selectedCodingSource = values["source"]?.value;
+    }, 100);
+
     this.conceptReferenceService
       .getReferenceTermsBySource(values["source"]?.value)
       .subscribe((response) => {
@@ -96,7 +110,7 @@ export class ParametersComponent implements OnInit {
             name: referenceTerm?.display,
           };
         });
-        this.createCodeField(this.codedOptions, null, values["source"]?.value);
+        // this.createCodeField(this.codedOptions, null, values["source"]?.value);
       });
   }
 
@@ -187,9 +201,15 @@ export class ParametersComponent implements OnInit {
     });
   }
 
+  onGetSelectedCodes(items: any): void {
+    this.selectedCodeItems = items;
+  }
+
   onSave(event: Event, uuid?: string): void {
     event.stopPropagation();
-    let names = [
+    const conceptName = this.formData["name"]?.value;
+    let names = [];
+    let searchIndexedTerms = [
       {
         name: "LIS_TEST_PARAMETER",
         locale: "en",
@@ -197,6 +217,18 @@ export class ParametersComponent implements OnInit {
         conceptNameType: "INDEX_TERM",
       },
     ];
+    searchIndexedTerms = [
+      ...searchIndexedTerms,
+      ...this.selectedCodeItems.map((item) => {
+        return {
+          name: item?.display.split(" (")[0],
+          locale: "en",
+          localePreferred: false,
+          conceptNameType: "INDEX_TERM",
+        };
+      }),
+    ];
+
     this.saving = true;
     names = [
       ...names,
@@ -217,23 +249,6 @@ export class ParametersComponent implements OnInit {
       },
     ];
 
-    // INDEX_TERM
-    const matchedOption = (this.codedOptions.filter(
-      (option) => option?.uuid === this.formData["shortName"]?.value
-    ) || [])[0];
-    if (matchedOption) {
-      names = [
-        ...names,
-        {
-          name: matchedOption?.name.split("(")[0],
-          locale: "en",
-          localePreferred: false,
-          conceptNameType: "INDEX_TERM",
-        },
-      ];
-    }
-
-    const conceptReferenceTerm = this.formData["code"]?.value;
     let answers = [];
 
     if (this.selectedAnswers?.length > 0) {
@@ -243,9 +258,14 @@ export class ParametersComponent implements OnInit {
     }
 
     const conceptMapType = "35543629-7d8c-11e1-909d-c80aa9edcf4e";
-    const mappings = conceptReferenceTerm
-      ? [{ conceptReferenceTerm, conceptMapType }]
-      : [];
+
+    let mappings = this.selectedCodeItems.map((item) => {
+      return {
+        conceptReferenceTerm: item?.uuid,
+        conceptMapType,
+      };
+    });
+
     this.concept = {
       names: names,
       descriptions: [
@@ -300,35 +320,72 @@ export class ParametersComponent implements OnInit {
     //   this.concept = omit(this.concept, "units");
     // }
 
-    (!uuid
-      ? this.conceptService.createConcept(this.concept)
-      : this.conceptService.updateConcept(uuid, this.concept)
-    ).subscribe((response) => {
-      if (response) {
-        // Repeat update with answers (if any) added: Current openmrs does not support to update concept answers by adding new on the existing ones
-        if (uuid && answers?.length > 0) {
-          this.concept = {
-            ...this.concept,
-            answers,
-          };
-          this.conceptService
-            .updateConcept(uuid, this.concept)
-            .subscribe((updateResponse) => {
-              if (updateResponse) {
-                this.parameterUuid = null;
-                this.conceptBeingEdited = null;
-                this.saving = false;
-                this.resetFields();
+    // Check if concept exist
+
+    this.conceptService
+      .searchConcept({ q: conceptName, conceptClass: "Test" })
+      .subscribe((response) => {
+        if (response) {
+          if (response?.length > 0 && !uuid) {
+            this.saving = false;
+            this.alertType = "danger";
+            this.savingMessage =
+              "Parameter with name " + conceptName + " exists";
+            setTimeout(() => {
+              this.savingMessage = null;
+            }, 4000);
+          } else {
+            (!uuid
+              ? this.conceptService.createConcept(this.concept)
+              : this.conceptService.updateConcept(uuid, this.concept)
+            ).subscribe((response: any) => {
+              if (response) {
+                // Repeat update with answers (if any) added: Current openmrs does not support to update concept answers by adding new on the existing ones
+                if (uuid && answers?.length > 0) {
+                  this.concept = {
+                    ...this.concept,
+                    answers,
+                  };
+                  this.conceptService
+                    .updateConcept(uuid, this.concept)
+                    .subscribe((updateResponse) => {
+                      if (updateResponse) {
+                        this.parameterUuid = null;
+                        this.conceptBeingEdited = null;
+                        this.savingMessage =
+                          "Successfully created " + conceptName;
+                        this.alertType = "success";
+                        setTimeout(() => {
+                          this.savingMessage = null;
+                        }, 4000);
+                        this.saving = false;
+                        this.resetFields();
+                      }
+                    });
+                } else {
+                  this.conceptService
+                    .createConceptNames(response?.uuid, searchIndexedTerms)
+                    .subscribe((conceptNameResponse) => {
+                      if (conceptNameResponse) {
+                        this.parameterUuid = null;
+                        this.conceptBeingEdited = null;
+                        this.saving = false;
+                        this.alertType = "success";
+                        this.savingMessage =
+                          "Successfully created " + conceptName;
+
+                        setTimeout(() => {
+                          this.savingMessage = null;
+                        }, 4000);
+                        this.resetFields();
+                      }
+                    });
+                }
               }
             });
-        } else {
-          this.parameterUuid = null;
-          this.conceptBeingEdited = null;
-          this.saving = false;
-          this.resetFields();
+          }
         }
-      }
-    });
+      });
   }
 
   onGetSelectedParameter(selectedParameter: ConceptGetFull): void {

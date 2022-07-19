@@ -308,9 +308,9 @@ public class ICareController {
 	
 	@RequestMapping(value = "concept", method = RequestMethod.GET)
 	@ResponseBody
-	public Map<String, Object> getIcareConcepts(@RequestParam(value = "q", required = false) String q, @RequestParam(value = "conceptClass", required = false) String conceptClass, @RequestParam(defaultValue = "50") Integer limit, @RequestParam(defaultValue = "0") Integer startIndex) {
+	public Map<String, Object> getIcareConcepts(@RequestParam(value = "q", required = false) String q, @RequestParam(value = "conceptClass", required = false) String conceptClass, @RequestParam(value = "searchTerm", required = false) String searchTerm, @RequestParam(defaultValue = "50") Integer limit, @RequestParam(defaultValue = "0") Integer startIndex) {
 		List<Map<String, Object>> conceptsList = new ArrayList<>();
-		for (Concept conceptItem: iCareService.getConcepts(q, conceptClass, limit, startIndex)) {
+		for (Concept conceptItem: iCareService.getConcepts(q, conceptClass, searchTerm, limit, startIndex)) {
 			Map<String, Object> conceptMap = new HashMap<String, Object>();
 			conceptMap.put("uuid", conceptItem.getUuid().toString());
 			conceptMap.put("display", conceptItem.getDisplayString());
