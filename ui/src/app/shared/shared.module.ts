@@ -12,6 +12,7 @@ import { FilterFormsByLocationPipe } from './pipes/filter-forms-by-location.pipe
 import { FilterServicesConceptPipe } from './pipes/filter-services-concept.pipe';
 import { FormatIsoStrDateForDisplayPipe } from './pipes/format-iso-str-date-for-display.pipe';
 import { FilterDiagnosesPipe } from './pipes/filter-diagnoses.pipe';
+import { FilterItemsBySelectionsPipe } from './pipes/filter-items-by-selections.pipe';
 @NgModule({
   imports: [CommonModule, ...materialModules, ...modules],
   exports: [
@@ -24,7 +25,7 @@ import { FilterDiagnosesPipe } from './pipes/filter-diagnoses.pipe';
     ...sharedDialogs,
   ],
   entryComponents: [...sharedEntryComponents, ...sharedDialogs],
-  declarations: [...components, ...sharedDialogs, ...sharedPipes, FilterFormsByServiceProvidedPipe, FilterFormsByLocationPipe, FilterServicesConceptPipe, FormatIsoStrDateForDisplayPipe, FilterDiagnosesPipe],
+  declarations: [...components, ...sharedDialogs, ...sharedPipes, FilterFormsByServiceProvidedPipe, FilterFormsByLocationPipe, FilterServicesConceptPipe, FormatIsoStrDateForDisplayPipe, FilterDiagnosesPipe, FilterItemsBySelectionsPipe],
   providers: [...sharedServices],
 })
 export class SharedModule {}

@@ -36,7 +36,7 @@ export class ReferenceTermsService {
     }
 
     if (parameters?.page && parameters?.pageSize) {
-      query["startIndex"] = (parameters?.page - 1) * parameters?.pageSize + 1;
+      query["startIndex"] = (parameters?.page - 1) * parameters?.pageSize;
     }
 
     if (parameters?.pageSize) {
