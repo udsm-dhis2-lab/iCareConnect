@@ -380,9 +380,13 @@ public class ICareDao extends BaseDAO<Item> {
 		return (long) query.list().get(0);
 	}
 	
-	public List<Concept> getConceptsBySearchParams(String q, String conceptClass, Integer limit, Integer startIndex) {
+	public List<Concept> getConceptsBySearchParams(String q, String conceptClass, String searchTerm, Integer limit,
+	        Integer startIndex) {
 		DbSession session = getSession();
-		String searchConceptQueryStr = "SELECT c FROM Concept c INNER JOIN c.names cn INNER JOIN c.conceptClass cc";
+		String searchConceptQueryStr = "SELECT DISTINCT c FROM Concept c INNER JOIN c.names cn INNER JOIN c.conceptClass cc LEFT JOIN c.names st";
+		if (searchTerm != null) {
+			searchConceptQueryStr += " ON st.conceptNameType= 'INDEX_TERM'";
+		}
 		String where = "WHERE";
 		if (q != null) {
 			where += " lower(cn.name) like lower(:q)";
@@ -393,6 +397,12 @@ public class ICareDao extends BaseDAO<Item> {
 			}
 			where += " lower(cc.name) like lower(:conceptClass)";
 		}
+		if (searchTerm != null) {
+			if (!where.equals("WHERE")) {
+				where += " AND ";
+			}
+			where += " lower(st.name) like lower(:searchTerm)";
+		}
 		if (!where.equals("WHERE")) {
 			searchConceptQueryStr += " " + where;
 		}
@@ -402,7 +412,9 @@ public class ICareDao extends BaseDAO<Item> {
 		if (q != null) {
 			sqlQuery.setParameter("q", "%" + q + "%");
 		}
-		
+		if (searchTerm != null) {
+			sqlQuery.setParameter("searchTerm", "%" + searchTerm + "%");
+		}
 		if (conceptClass != null) {
 			sqlQuery.setParameter("conceptClass", "%" + conceptClass + "%");
 		}

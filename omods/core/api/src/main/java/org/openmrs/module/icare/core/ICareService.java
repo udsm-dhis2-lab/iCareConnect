@@ -111,6 +111,6 @@ public interface ICareService extends OpenmrsService {
 	
 	List<String> generatePatientIds();
 	
-	List<Concept> getConcepts(String q, String conceptClass, Integer limit, Integer startIndex);
+	List<Concept> getConcepts(String q, String conceptClass, String searchTerm, Integer limit, Integer startIndex);
 	
 }
