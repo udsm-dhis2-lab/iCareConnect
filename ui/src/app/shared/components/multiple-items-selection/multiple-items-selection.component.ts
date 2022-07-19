@@ -41,6 +41,8 @@ export class MultipleItemsSelectionComponent implements OnInit {
     } else if (this.itemType === "conceptReferenceTerm") {
       this.items$ = this.conceptReferenceService.getReferenceTerms({
         source: this.source,
+        page: this.page,
+        pageSize: this.pageSize,
       });
     } else {
       this.items$ = of(
@@ -67,62 +69,62 @@ export class MultipleItemsSelectionComponent implements OnInit {
           ) || []
         )?.length === 0
     );
-    this.items = orderBy(this.items, ["display"], ["asc"]);
-    this.items$ = of(items);
     this.getSelectedItems.emit(this.currentSelectedItems);
   }
 
-  removeSelectedItem(event: Event, item: any, items: any[]): void {
+  removeSelectedItem(
+    event: Event,
+    item: any,
+    items: any[],
+    itemType: string
+  ): void {
     event.stopPropagation();
     this.currentSelectedItems = uniqBy(
       this.currentSelectedItems.filter(
         (selectedItem) => selectedItem?.uuid !== item?.uuid
       )
     );
-    this.items = orderBy([...this.items, item], ["display"], ["asc"]);
-    this.items$ = of(items);
     this.getSelectedItems.emit(this.currentSelectedItems);
   }
 
   searchItem(event: KeyboardEvent): void {
     this.page = 1;
     const searchingText = (event.target as HTMLInputElement).value;
+    this.loadItemsByParameters(searchingText, this.itemType);
+  }
 
-    if (searchingText && this.itemType === "concept") {
+  getItems(event: Event, actionType: string, itemType: string): void {
+    event.stopPropagation();
+    this.page = actionType === "prev" ? this.page - 1 : this.page + 1;
+    this.loadItemsByParameters("", itemType);
+  }
+
+  loadItemsByParameters(searchingText: string, itemType: string): void {
+    if (itemType === "concept") {
       this.items$ = of(searchingText).pipe(
         debounceTime(1000),
         distinctUntilChanged(),
         switchMap((term) =>
           this.conceptService.getConceptsByParameters({
             searchingText: term,
-            pageSize: 100,
+            pageSize: this.pageSize,
             page: this.page,
           })
         )
       );
-    } else if (searchingText && this.itemType === "conceptReferenceTerm") {
+    } else if (itemType === "conceptReferenceTerm") {
       this.items$ = of(searchingText).pipe(
         debounceTime(1000),
         distinctUntilChanged(),
         switchMap((term) =>
           this.conceptReferenceService.getReferenceTerms({
             searchingText: term,
-            pageSize: 100,
+            pageSize: this.pageSize,
             page: this.page,
             source: this.source,
           })
         )
       );
     }
-  }
-
-  getItems(event: Event, actionType: string, itemType: string): void {
-    event.stopPropagation();
-    this.page = actionType === "prev" ? this.page - 1 : this.page + 1;
-    this.items$ = this.conceptService.getConceptsByParameters({
-      searchingText: this.standardSearchTerm,
-      pageSize: this.pageSize,
-      page: this.page,
-    });
   }
 }
