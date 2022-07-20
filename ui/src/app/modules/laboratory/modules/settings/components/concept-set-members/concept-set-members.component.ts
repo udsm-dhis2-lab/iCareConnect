@@ -23,12 +23,14 @@ export class ConceptSetMembersComponent implements OnInit {
   constructor(private conceptService: ConceptsService) {}
 
   ngOnInit(): void {
-    this.conceptsList$ = this.conceptService
-      .getConceptDetailsByUuid(
-        this.testMethodUuid,
-        "custom:(uuid,display,setMembers:(uuid,display))"
-      )
-      .pipe(map((response) => response?.setMembers));
+    this.conceptsList$ = this.testMethodUuid
+      ? this.conceptService
+          .getConceptDetailsByUuid(
+            this.testMethodUuid,
+            "custom:(uuid,display,setMembers:(uuid,display))"
+          )
+          .pipe(map((response) => response?.setMembers))
+      : of([]);
   }
 
   onGetSelectedSetMembers(selectedSetMembers: ConceptGetFull[]): void {

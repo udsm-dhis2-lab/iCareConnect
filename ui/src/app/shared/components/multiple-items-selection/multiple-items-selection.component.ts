@@ -99,7 +99,7 @@ export class MultipleItemsSelectionComponent implements OnInit {
   getItems(event: Event, actionType: string, itemType: string): void {
     event.stopPropagation();
     this.page = actionType === "prev" ? this.page - 1 : this.page + 1;
-    this.loadItemsByParameters("", itemType);
+    this.loadItemsByParameters(this.standardSearchTerm, itemType);
   }
 
   loadItemsByParameters(searchingText: string, itemType: string): void {
