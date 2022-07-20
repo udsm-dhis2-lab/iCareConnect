@@ -329,7 +329,31 @@ public class ICareController {
 		}
 		Map<String, Object> results = new HashMap<>();
 		results.put("results", conceptsList);
-		System.out.println(results);
+		return results;
+	}
+	
+	@RequestMapping(value = "conceptreferenceterm", method = RequestMethod.GET)
+	@ResponseBody
+	public Map<String, Object> getIcareConceptReferenceTerms(@RequestParam(value = "q", required = false) String q,
+															 @RequestParam(value = "source", required = false) String source,
+															 @RequestParam(defaultValue = "50") Integer limit,
+															 @RequestParam(defaultValue = "0") Integer startIndex) {
+		List<Map<String, Object>> conceptReferenceTermsList = new ArrayList<>();
+		for (ConceptReferenceTerm conceptReferenceTerm: iCareService.getConceptReferenceTerms(q, source, limit, startIndex)) {
+			Map<String, Object> conceptReferenceTermMap = new HashMap<String, Object>();
+			conceptReferenceTermMap.put("uuid", conceptReferenceTerm.getUuid().toString());
+			conceptReferenceTermMap.put("display", conceptReferenceTerm.getName().toString());
+			conceptReferenceTermMap.put("code", conceptReferenceTerm.getCode());
+
+//			Source details
+			Map<String, Object> sourceDetails = new HashMap<String, Object>();
+			sourceDetails.put("uuid", conceptReferenceTerm.getConceptSource().getUuid().toString() );
+			sourceDetails.put("name", conceptReferenceTerm.getConceptSource().getName().toString() );
+			conceptReferenceTermMap.put("source", sourceDetails);
+			conceptReferenceTermsList.add(conceptReferenceTermMap);
+		}
+		Map<String, Object> results = new HashMap<>();
+		results.put("results", conceptReferenceTermsList);
 		return results;
 	}
 }

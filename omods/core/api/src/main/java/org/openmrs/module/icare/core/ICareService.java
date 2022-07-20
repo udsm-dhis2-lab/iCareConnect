@@ -9,14 +9,12 @@
  */
 package org.openmrs.module.icare.core;
 
-import org.openmrs.Concept;
-import org.openmrs.Drug;
-import org.openmrs.Order;
-import org.openmrs.Visit;
+import org.openmrs.*;
 import org.openmrs.annotation.Authorized;
 import org.openmrs.api.APIException;
 import org.openmrs.api.OpenmrsService;
 import org.openmrs.module.icare.billing.ItemNotPayableException;
+import org.openmrs.module.icare.billing.VisitInvalidException;
 import org.openmrs.module.icare.billing.models.ItemPrice;
 import org.openmrs.module.icare.billing.models.Prescription;
 import org.openmrs.module.icare.billing.services.insurance.Claim;
@@ -24,7 +22,7 @@ import org.openmrs.module.icare.billing.services.insurance.ClaimResult;
 import org.openmrs.module.icare.core.utils.VisitWrapper;
 import org.openmrs.module.icare.store.models.OrderStatus;
 import org.springframework.transaction.annotation.Transactional;
-import org.openmrs.module.icare.billing.VisitInvalidException;
+
 import javax.naming.ConfigurationException;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -111,5 +109,7 @@ public interface ICareService extends OpenmrsService {
 	List<String> generatePatientIds();
 	
 	List<Concept> getConcepts(String q, String conceptClass, String searchTerm, Integer limit, Integer startIndex);
+	
+	List<ConceptReferenceTerm> getConceptReferenceTerms(String q, String source, Integer limit, Integer startIndex);
 	
 }
