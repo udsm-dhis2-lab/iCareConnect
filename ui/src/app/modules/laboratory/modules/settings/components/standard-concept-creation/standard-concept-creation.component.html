@@ -6,7 +6,7 @@
   } as params"
 >
   <div
-    class="col-lg-7 col-md-7 col-sx-12 col-sm-12"
+    class="col-lg-9 col-md-9 col-sx-12 col-sm-12"
     style="border-right: solid 1px #eee"
   >
     <div class="h5">New {{ itemTypeName }}</div>
@@ -64,42 +64,6 @@
         </div>
       </div>
       <div class="col-lg-6 col-md-6 col-sx-12 col-sm-12">
-        <!-- <div
-          *ngIf="
-            !dataType &&
-            conceptDataTypes &&
-            conceptDataTypes?.length > 0 &&
-            !inheritProperties
-          "
-        >
-          <app-form
-            [fields]="[dataTypeField]"
-            (formUpdate)="onFormUpdateForDataType($event)"
-          ></app-form>
-        </div>
-        <div
-          *ngIf="
-            inheritProperties ||
-            (!dataType && conceptDataTypes && conceptDataTypes?.length > 0)
-          "
-        >
-          <app-form
-            *ngIf="
-              formData['datatype']?.value ==
-              '8d4a4488-c2cc-11de-8d13-0010c6dffd0f'
-            "
-            [fields]="[displayPrecisionField]"
-            (formUpdate)="onFormUpdate($event)"
-          ></app-form>
-          <app-form
-            *ngIf="
-              formData['datatype']?.value ==
-              '8d4a4488-c2cc-11de-8d13-0010c6dffd0f'
-            "
-            [fields]="[unitsField]"
-            (formUpdate)="onFormUpdate($event)"
-          ></app-form>
-        </div> -->
         <fieldset>
           <legend>{{ itemTypeName }} Codes</legend>
           <div *ngIf="params?.conceptSources">
@@ -114,6 +78,11 @@
             mode="indeterminate"
           ></mat-progress-bar>
         </fieldset>
+      </div>
+    </div>
+    <div class="w-100" *ngIf="savingMessage">
+      <div class="alert alert-{{ alertType }}" role="alert">
+        {{ savingMessage }}
       </div>
     </div>
     <div class="w-100 d-flex justify-content-end mt-2">
@@ -134,12 +103,13 @@
       </button>
     </div>
   </div>
-  <div class="col-lg-5 col-md-5 col-sx-12 col-sm-12">
+  <div class="col-lg-3 col-md-3 col-sx-12 col-sm-12">
     <div class="h5" *ngIf="itemTypeName">{{ itemTypeName }}s</div>
     <app-standard-concepts-list
       *ngIf="!saving"
       [standardSearchTerm]="standardSearchTerm"
       [selectedConceptUuid]="conceptUuid"
+      [conceptClass]="conceptClass"
       (conceptToEdit)="onConceptEdit($event)"
     ></app-standard-concepts-list>
   </div>

@@ -53,6 +53,10 @@ export class StandardConceptCreationComponent implements OnInit {
   conceptSources$: Observable<ConceptsourceGet[]>;
 
   selectedCodes: any[];
+
+  alertType: string = "";
+
+  savingMessage: string;
   constructor(
     private conceptService: ConceptsService,
     private billableItemService: BillableItemsService,
@@ -60,6 +64,7 @@ export class StandardConceptCreationComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    // console.log("conceptClass", this.conceptClass);
     this.createBasicConceptFields();
     if (this.searchTermForTestMethod) {
       this.createTestMethodField();
@@ -219,15 +224,28 @@ export class StandardConceptCreationComponent implements OnInit {
 
   onSave(event: Event, selectedTestMethodDetails?: any): void {
     event.stopPropagation();
-
-    let names = [
+    const conceptName = this.formData["name"]?.value;
+    let searchIndexedTerms = [
       {
         name: this.standardSearchTerm,
         locale: "en",
-        localePreferred: true,
+        localePreferred: false,
         conceptNameType: "INDEX_TERM",
       },
     ];
+    searchIndexedTerms = [
+      ...searchIndexedTerms,
+      ...this.selectedCodes.map((item) => {
+        return {
+          name: item?.display.split(" (")[0],
+          locale: "en",
+          localePreferred: false,
+          conceptNameType: "INDEX_TERM",
+        };
+      }),
+    ];
+
+    let names = [];
     this.saving = true;
     names = [
       ...names,
@@ -249,24 +267,14 @@ export class StandardConceptCreationComponent implements OnInit {
       },
     ];
 
-    let mappings = [];
     const conceptMapType = "35543629-7d8c-11e1-909d-c80aa9edcf4e";
-    if (this.selectedCodes?.length > 0) {
-      // Add codes as search terms and mappings
-      this.selectedCodes.forEach((selectedCode) => {
-        names = [
-          ...names,
-          {
-            name: selectedCode?.display?.split(" (")[0],
-            locale: "en",
-            localePreferred: false,
-            conceptNameType: "INDEX_TERM",
-          },
-        ];
-        const conceptReferenceTerm = selectedCode?.value;
-        mappings = [...mappings, { conceptReferenceTerm, conceptMapType }];
-      });
-    }
+
+    let mappings = this.selectedCodes.map((item) => {
+      return {
+        conceptReferenceTerm: item?.uuid,
+        conceptMapType,
+      };
+    });
 
     let concept = {
       names: names,
@@ -309,71 +317,109 @@ export class StandardConceptCreationComponent implements OnInit {
       });
     }
 
-    (!this.conceptUuid
-      ? this.conceptService.createConcept(concept)
-      : this.conceptService.updateConcept(this.conceptUuid, concept)
-    ).subscribe((response: any) => {
-      if (response) {
-        // If it is test order create as a billable item
-        if (!this.conceptUuid && this.standardSearchTerm === "TEST_ORDERS") {
-          const billableItem = {
-            concept: { uuid: response?.uuid },
-            unit: "default",
-          };
-          this.billableItemService
-            .createBillableItem(billableItem)
-            .subscribe((billableItemResponse) => {
-              if (billableItemResponse) {
-                // Create prices
-                const prices = [
-                  {
-                    item: {
-                      uuid: billableItemResponse?.uuid,
-                    },
-                    paymentScheme: {
-                      uuid: "00000102IIIIIIIIIIIIIIIIIIIIIIIIIIII",
-                    },
-                    paymentType: {
-                      uuid: "00000100IIIIIIIIIIIIIIIIIIIIIIIIIIII",
-                    },
-                    price: "0",
-                  },
-                  {
-                    item: {
-                      uuid: billableItemResponse?.uuid,
-                    },
-                    paymentScheme: {
-                      uuid: "5f53b4e2-da03-4139-b32c-ad6edb699943",
-                    },
-                    paymentType: {
-                      uuid: "00000100IIIIIIIIIIIIIIIIIIIIIIIIIIII",
-                    },
-                    price: "0",
-                  },
-                ];
-                zip(
-                  ...prices.map((priceObject) => {
-                    return this.billableItemService.createPrice(priceObject);
-                  })
-                ).subscribe((priceResponses) => {
-                  if (priceResponses) {
-                    this.saving = false;
-                    this.conceptUuid = null;
-                    this.conceptCreated.emit(true);
-                    this.selectedSetMembers = [];
-                    this.createBasicConceptFields();
-                  }
-                });
-              }
-            });
-        } else {
+    // Check if concept exists
+    this.conceptService
+      .searchConcept({ q: conceptName, conceptClass: this.conceptClass })
+      .subscribe((checkResponse) => {
+        if (checkResponse?.length > 0 && !this.conceptUuid) {
           this.saving = false;
-          this.conceptUuid = null;
-          this.conceptCreated.emit(true);
-          this.selectedSetMembers = [];
-          this.createBasicConceptFields();
+          this.alertType = "danger";
+          this.savingMessage = "Item with name " + conceptName + " exists";
+          setTimeout(() => {
+            this.savingMessage = null;
+          }, 4000);
+        } else {
+          (!this.conceptUuid
+            ? this.conceptService.createConcept(concept)
+            : this.conceptService.updateConcept(this.conceptUuid, concept)
+          ).subscribe((response: any) => {
+            if (response) {
+              // If it is test order create as a billable item
+              if (
+                !this.conceptUuid &&
+                this.standardSearchTerm === "TEST_ORDERS"
+              ) {
+                const billableItem = {
+                  concept: { uuid: response?.uuid },
+                  unit: "default",
+                };
+                this.billableItemService
+                  .createBillableItem(billableItem)
+                  .subscribe((billableItemResponse) => {
+                    if (billableItemResponse) {
+                      // Create prices
+                      const prices = [
+                        {
+                          item: {
+                            uuid: billableItemResponse?.uuid,
+                          },
+                          paymentScheme: {
+                            uuid: "00000102IIIIIIIIIIIIIIIIIIIIIIIIIIII",
+                          },
+                          paymentType: {
+                            uuid: "00000100IIIIIIIIIIIIIIIIIIIIIIIIIIII",
+                          },
+                          price: "0",
+                        },
+                        {
+                          item: {
+                            uuid: billableItemResponse?.uuid,
+                          },
+                          paymentScheme: {
+                            uuid: "5f53b4e2-da03-4139-b32c-ad6edb699943",
+                          },
+                          paymentType: {
+                            uuid: "00000100IIIIIIIIIIIIIIIIIIIIIIIIIIII",
+                          },
+                          price: "0",
+                        },
+                      ];
+                      zip(
+                        ...prices.map((priceObject) => {
+                          return this.billableItemService.createPrice(
+                            priceObject
+                          );
+                        })
+                      ).subscribe((priceResponses) => {
+                        if (priceResponses) {
+                          this.saving = false;
+                          this.conceptUuid = null;
+                          this.savingMessage =
+                            "Successfully created " + conceptName;
+                          this.alertType = "success";
+                          setTimeout(() => {
+                            this.savingMessage = null;
+                          }, 4000);
+                          this.conceptCreated.emit(true);
+                          this.selectedSetMembers = [];
+                          this.createBasicConceptFields();
+                        }
+                      });
+                    }
+                  });
+              } else {
+                this.conceptService
+                  .createConceptNames(response?.uuid, searchIndexedTerms)
+                  .subscribe((conceptNameResponse) => {
+                    if (conceptNameResponse) {
+                      this.saving = false;
+                      this.alertType = "success";
+                      this.savingMessage =
+                        "Successfully created " + conceptName;
+
+                      setTimeout(() => {
+                        this.savingMessage = null;
+                      }, 4000);
+                      this.conceptUuid = null;
+                      this.conceptCreated.emit(true);
+                      this.selectedSetMembers = [];
+                      this.createBasicConceptFields();
+                    }
+                  });
+              }
+            }
+          });
         }
-      }
-    });
+      });
   }
 }

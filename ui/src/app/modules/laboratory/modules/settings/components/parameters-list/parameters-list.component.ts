@@ -20,7 +20,7 @@ export class ParametersListComponent implements OnInit {
     this.parameters$ = this.conceptService.searchConcept({
       limit: this.pageSize,
       conceptClass: "Test",
-      startIndex: ((this.page - 1) * this.pageSize).toString(),
+      startIndex: (this.page - 1) * this.pageSize,
       searchTerm: "LIS_TEST_PARAMETER",
     });
   }
