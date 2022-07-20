@@ -33,11 +33,14 @@ export class MultipleItemsSelectionComponent implements OnInit {
       this.itemType === "concept" &&
       this.standardSearchTerm
     ) {
-      this.items$ = this.conceptService.getConceptsByParameters({
-        searchingText: this.standardSearchTerm,
-        page: this.page,
-        pageSize: this.pageSize,
-      });
+      this.items$ =
+        this.items?.length > 0
+          ? of(this.items)
+          : this.conceptService.getConceptsByParameters({
+              searchingText: this.standardSearchTerm,
+              page: this.page,
+              pageSize: this.pageSize,
+            });
     } else if (this.itemType === "conceptReferenceTerm") {
       this.items$ = this.conceptReferenceService.getReferenceTerms({
         source: this.source,

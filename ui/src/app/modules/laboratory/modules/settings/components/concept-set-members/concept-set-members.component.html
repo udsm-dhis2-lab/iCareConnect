@@ -5,9 +5,10 @@
     [selectedSetMembersItems]="selectedSetMembersItems"
     (selectedSetMembers)="onGetSelectedSetMembers($event)"
   ></app-concept-set-members-selection> -->
-
   <app-multiple-items-selection
-    [items]="[]"
+    *ngIf="params?.conceptsList"
+    [items]="params?.conceptsList"
+    [standardSearchTerm]="standardSearchTerm"
     [itemType]="'concept'"
     [standardSearchTerm]="setMembersSearchTerm"
     [selectedItems]="selectedSetMembersItems"

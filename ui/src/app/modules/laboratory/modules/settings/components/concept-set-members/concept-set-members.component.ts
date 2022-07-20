@@ -3,6 +3,7 @@ import { Observable, of } from "rxjs";
 import { ConceptsService } from "src/app/shared/resources/concepts/services/concepts.service";
 import { ConceptGetFull } from "src/app/shared/resources/openmrs";
 import { uniqBy } from "lodash";
+import { map } from "rxjs/operators";
 
 @Component({
   selector: "app-concept-set-members",
@@ -12,6 +13,8 @@ import { uniqBy } from "lodash";
 export class ConceptSetMembersComponent implements OnInit {
   @Input() setMembersSearchTerm: string;
   @Input() selectedSetMembersItems: any[];
+  @Input() standardSearchTerm: string;
+  @Input() testMethodUuid: string;
   @Input() setMembersListFromTestMethod: ConceptGetFull[];
   selectedItems: ConceptGetFull[] = [];
   conceptsList$: Observable<ConceptGetFull[]>;
@@ -20,9 +23,12 @@ export class ConceptSetMembersComponent implements OnInit {
   constructor(private conceptService: ConceptsService) {}
 
   ngOnInit(): void {
-    this.conceptsList$ = !this.setMembersListFromTestMethod
-      ? this.conceptService.getConceptsBySearchTerm(this.setMembersSearchTerm)
-      : of(this.setMembersListFromTestMethod);
+    this.conceptsList$ = this.conceptService
+      .getConceptDetailsByUuid(
+        this.testMethodUuid,
+        "custom:(uuid,display,setMembers:(uuid,display))"
+      )
+      .pipe(map((response) => response?.setMembers));
   }
 
   onGetSelectedSetMembers(selectedSetMembers: ConceptGetFull[]): void {

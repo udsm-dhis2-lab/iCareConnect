@@ -57,6 +57,8 @@ export class StandardConceptCreationComponent implements OnInit {
   alertType: string = "";
 
   savingMessage: string;
+
+  testMethodUuid: string;
   constructor(
     private conceptService: ConceptsService,
     private billableItemService: BillableItemsService,
@@ -64,7 +66,6 @@ export class StandardConceptCreationComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // console.log("conceptClass", this.conceptClass);
     this.createBasicConceptFields();
     if (this.searchTermForTestMethod) {
       this.createTestMethodField();
@@ -146,7 +147,7 @@ export class StandardConceptCreationComponent implements OnInit {
         label: "Name",
         value:
           data && data?.display
-            ? (this.standardSearchTerm = "TEST_ORDERS" ? "TO: " : "") +
+            ? (this.standardSearchTerm === "TEST_ORDERS" ? "TO: " : "") +
               data?.display
             : null,
         required: true,
@@ -179,6 +180,7 @@ export class StandardConceptCreationComponent implements OnInit {
   onFormUpdateTestMethod(formValues: FormValue): void {
     this.formData = { ...this.formData, ...formValues.getValues() };
     const methodUuid = this.formData["testmethod"]?.value;
+    this.testMethodUuid = methodUuid;
     if (methodUuid) {
       this.testMethodSelected = true;
       this.formData["testmethod"]?.value;
