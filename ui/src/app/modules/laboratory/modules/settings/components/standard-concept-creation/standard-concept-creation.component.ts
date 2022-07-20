@@ -384,17 +384,26 @@ export class StandardConceptCreationComponent implements OnInit {
                         })
                       ).subscribe((priceResponses) => {
                         if (priceResponses) {
-                          this.saving = false;
-                          this.conceptUuid = null;
-                          this.savingMessage =
-                            "Successfully created " + conceptName;
-                          this.alertType = "success";
-                          setTimeout(() => {
-                            this.savingMessage = null;
-                          }, 4000);
-                          this.conceptCreated.emit(true);
-                          this.selectedSetMembers = [];
-                          this.createBasicConceptFields();
+                          this.conceptService
+                            .createConceptNames(
+                              response?.uuid,
+                              searchIndexedTerms
+                            )
+                            .subscribe((conceptNameResponse) => {
+                              if (conceptNameResponse) {
+                                this.saving = false;
+                                this.conceptUuid = null;
+                                this.savingMessage =
+                                  "Successfully created " + conceptName;
+                                this.alertType = "success";
+                                setTimeout(() => {
+                                  this.savingMessage = null;
+                                }, 4000);
+                                this.conceptCreated.emit(true);
+                                this.selectedSetMembers = [];
+                                this.createBasicConceptFields();
+                              }
+                            });
                         }
                       });
                     }
