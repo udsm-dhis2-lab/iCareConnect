@@ -435,4 +435,21 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		maps = (List) results.get("results");
 		assertThat("Should return 1 item", maps.size(), is(12));
 	}
+	
+	@Test
+	public void testSearchConceptReferenceTerm() throws Exception {
+		MockHttpServletRequest newGetRequest = newGetRequest("icare/conceptreferenceterm", new Parameter("q", "cd4 term2"),
+		    new Parameter("source", "00001827-639f-4cb4-961f-1e025bf80000"));
+		MockHttpServletResponse handle = handle(newGetRequest);
+		Map<String, Object> results = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
+		List<Map<String, Object>> maps = (List) results.get("results");
+		assertThat("Should return 0 reference term", maps.size(), is(0));
+		
+		newGetRequest = newGetRequest("icare/conceptreferenceterm", new Parameter("q", ""));
+		handle = handle(newGetRequest);
+		results = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
+		maps = (List) results.get("results");
+		assertThat("Should return 11 reference terms", maps.size(), is(11));
+		
+	}
 }
