@@ -11,6 +11,7 @@ import { ConceptGetFull } from "src/app/shared/resources/openmrs";
 export class StandardConceptsListComponent implements OnInit {
   @Input() standardSearchTerm: string;
   @Input() selectedConceptUuid: string;
+  @Input() conceptClass: string;
   conceptsList$: Observable<ConceptGetFull[]>;
   saving: boolean = false;
 
@@ -22,10 +23,11 @@ export class StandardConceptsListComponent implements OnInit {
   constructor(private conceptService: ConceptsService) {}
 
   ngOnInit(): void {
-    this.conceptsList$ = this.conceptService.getConceptsByParameters({
-      searchingText: this.standardSearchTerm,
-      pageSize: this.pageSize,
-      page: this.page,
+    this.conceptsList$ = this.conceptService.searchConcept({
+      limit: this.pageSize,
+      conceptClass: this.conceptClass,
+      startIndex: (this.page - 1) * this.pageSize,
+      searchTerm: this.standardSearchTerm,
     });
   }
 

@@ -5,8 +5,6 @@ import { Pipe, PipeTransform } from "@angular/core";
 })
 export class FilterItemsBySelectionsPipe implements PipeTransform {
   transform(allItems: any[], selectedItems: any[]): any {
-    console.log("all", allItems);
-    console.log(selectedItems);
     if (selectedItems?.length === 0) {
       return allItems;
     }
