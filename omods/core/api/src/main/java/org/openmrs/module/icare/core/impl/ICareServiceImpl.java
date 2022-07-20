@@ -427,6 +427,11 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		return dao.getConceptsBySearchParams(q, conceptClass, searchTerm, limit, startIndex);
 	}
 	
+	@Override
+	public List<ConceptReferenceTerm> getConceptReferenceTerms(String q, String source, Integer limit, Integer startIndex) {
+		return dao.getConceptReferenceTermsBySearchParams(q, source, limit, startIndex);
+	}
+	
 	Boolean patientIsAdmitted(Visit visit) {
 		if (visit.getStopDatetime() == null) {
 			for (Encounter encounter : visit.getEncounters()) {

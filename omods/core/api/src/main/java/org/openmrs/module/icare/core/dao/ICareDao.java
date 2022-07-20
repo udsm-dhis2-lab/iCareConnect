@@ -13,7 +13,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
-//import org.openmrs.*;
 import org.hibernate.Session;
 import org.openmrs.*;
 import org.openmrs.api.db.hibernate.DbSession;
@@ -420,5 +419,39 @@ public class ICareDao extends BaseDAO<Item> {
 			sqlQuery.setParameter("conceptClass", "%" + conceptClass + "%");
 		}
 		return sqlQuery.list();
+	}
+	
+	public List<ConceptReferenceTerm> getConceptReferenceTermsBySearchParams(String q, String source, Integer limit,
+	        Integer startIndex) {
+		//				new ConceptReferenceTerm();
+		DbSession session = getSession();
+		String searchQueryStr = "SELECT DISTINCT crt FROM ConceptReferenceTerm crt INNER JOIN crt.conceptSource cs";
+		String where = "WHERE";
+		if (q != null) {
+			where += " (lower(crt.name) like lower(:q) OR lower(crt.code) like lower(:q))";
+		}
+		if (source != null) {
+			if (!where.equals("WHERE")) {
+				where += " AND ";
+			}
+			where += " cs.uuid like :source";
+		}
+		if (!where.equals("WHERE")) {
+			searchQueryStr += " " + where;
+		}
+		System.out.println(searchQueryStr);
+		Query sqlQuery = session.createQuery(searchQueryStr);
+		sqlQuery.setFirstResult(startIndex);
+		sqlQuery.setMaxResults(limit);
+		
+		if (q != null) {
+			sqlQuery.setParameter("q", "%" + q + "%");
+		}
+		if (source != null) {
+			sqlQuery.setParameter("source", "%" + source + "%");
+		}
+		List data = sqlQuery.list();
+		System.out.println(data);
+		return data;
 	}
 }
