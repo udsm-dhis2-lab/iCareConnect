@@ -91,12 +91,6 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 	}
 	
 	@Test
-	public void testGettingConcep() throws Exception {
-		MockHttpServletRequest newGetRequest = newGetRequest("lab/sample", new Parameter("visit",
-		        "2386395c-2b07-4abd-8fd7-a748c957554d"));
-	}
-	
-	@Test
 	public void testUpdateSampleOrder() throws Exception {
 		//Given
 		String dto = this.readFile("dto/sample-order-create-dto.json");
