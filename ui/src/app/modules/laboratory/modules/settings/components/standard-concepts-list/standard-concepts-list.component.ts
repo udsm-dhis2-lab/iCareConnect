@@ -51,10 +51,12 @@ export class StandardConceptsListComponent implements OnInit {
     this.page = 1;
     const searchingText = (event.target as HTMLInputElement).value;
     if (searchingText) {
-      this.conceptsList$ = this.conceptService.getConceptsByParameters({
-        searchingText,
-        pageSize: this.pageSize,
-        page: this.page,
+      this.conceptsList$ = this.conceptService.searchConcept({
+        q: searchingText,
+        limit: this.pageSize,
+        conceptClass: this.conceptClass,
+        startIndex: (this.page - 1) * this.pageSize,
+        searchTerm: this.standardSearchTerm,
       });
     }
   }
@@ -62,10 +64,11 @@ export class StandardConceptsListComponent implements OnInit {
   getConceptList(event: Event, action: string): void {
     event.stopPropagation();
     this.page = action === "prev" ? this.page - 1 : this.page + 1;
-    this.conceptsList$ = this.conceptService.getConceptsByParameters({
-      searchingText: this.standardSearchTerm,
-      pageSize: this.pageSize,
-      page: this.page,
+    this.conceptsList$ = this.conceptService.searchConcept({
+      limit: this.pageSize,
+      conceptClass: this.conceptClass,
+      startIndex: (this.page - 1) * this.pageSize,
+      searchTerm: this.standardSearchTerm,
     });
   }
 }
