@@ -308,20 +308,7 @@ export class ParametersComponent implements OnInit {
       });
     }
 
-    // if (!this.formData["precision"]?.value) {
-    //   this.concept = omit(this.concept, "displayPrecision");
-    // }
-
-    // if (this.selectedAnswers?.length === 0) {
-    //   this.concept = omit(this.concept, "answers");
-    // }
-
-    // if (!this.formData["units"]?.value) {
-    //   this.concept = omit(this.concept, "units");
-    // }
-
     // Check if concept exist
-
     this.conceptService
       .searchConcept({ q: conceptName, conceptClass: "Test" })
       .subscribe((response) => {
