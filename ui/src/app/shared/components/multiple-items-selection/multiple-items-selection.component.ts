@@ -42,11 +42,14 @@ export class MultipleItemsSelectionComponent implements OnInit {
               pageSize: this.pageSize,
             });
     } else if (this.itemType === "conceptReferenceTerm") {
-      this.items$ = this.conceptReferenceService.getReferenceTerms({
-        source: this.source,
-        page: this.page,
-        pageSize: this.pageSize,
-      });
+      this.items$ =
+        this.conceptReferenceService.getConceptReferenceTermsByParameters({
+          q: "",
+          source: this.source,
+          limit: this.pageSize,
+          startIndex: (this.page - 1) * this.pageSize,
+          searchTerm: this.standardSearchTerm,
+        });
     } else {
       this.items$ = of(
         this.items.filter(
@@ -120,11 +123,11 @@ export class MultipleItemsSelectionComponent implements OnInit {
         debounceTime(1000),
         distinctUntilChanged(),
         switchMap((term) =>
-          this.conceptReferenceService.getReferenceTerms({
-            searchingText: term,
-            pageSize: this.pageSize,
-            page: this.page,
+          this.conceptReferenceService.getConceptReferenceTermsByParameters({
+            q: term,
             source: this.source,
+            limit: this.pageSize,
+            startIndex: (this.page - 1) * this.pageSize,
           })
         )
       );

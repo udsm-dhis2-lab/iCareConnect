@@ -6,12 +6,13 @@ import {
   ConceptreferencetermCreate,
   ConceptreferencetermGet,
 } from "src/app/shared/resources/openmrs";
+import { OpenmrsHttpClientService } from "src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service";
 
 @Injectable({
   providedIn: "root",
 })
 export class ReferenceTermsService {
-  constructor(private api: Api) {}
+  constructor(private api: Api, private httpClient: OpenmrsHttpClientService) {}
 
   createReferenceTerm(
     data: ConceptreferencetermCreate
@@ -22,6 +23,39 @@ export class ReferenceTermsService {
       map((response) => response),
       catchError((error) => of(error))
     );
+  }
+  getConceptReferenceTermsByParameters(parameters: any): Observable<any> {
+    let queryParams = "";
+    if (parameters?.q) {
+      queryParams = "q=" + parameters?.q;
+    }
+    if (parameters?.limit) {
+      queryParams +=
+        (queryParams?.length > 0 ? "&" : "") + "limit=" + parameters?.limit;
+    }
+
+    if (parameters?.startIndex) {
+      queryParams +=
+        (queryParams?.length > 0 ? "&" : "") +
+        "startIndex=" +
+        parameters?.startIndex;
+    }
+
+    if (parameters?.source) {
+      queryParams +=
+        (queryParams?.length > 0 ? "&" : "") + "source=" + parameters?.source;
+    }
+
+    return this.httpClient
+      .get(`icare/conceptreferenceterm?${queryParams}`)
+      .pipe(
+        map((response) => {
+          return response?.results;
+        }),
+        catchError((error) => {
+          return of(error);
+        })
+      );
   }
 
   getReferenceTerms(parameters: {
