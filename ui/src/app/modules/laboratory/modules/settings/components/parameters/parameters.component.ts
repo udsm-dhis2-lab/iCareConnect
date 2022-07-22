@@ -190,6 +190,10 @@ export class ParametersComponent implements OnInit {
       id: "source",
       key: "source",
       label: "Coding source",
+      value:
+        data && data?.length > 0
+          ? data[0]?.conceptReferenceTerm?.conceptSource?.uuid
+          : null,
       options: this.conceptSources.map((source) => {
         return {
           key: source?.uuid,
@@ -378,13 +382,20 @@ export class ParametersComponent implements OnInit {
   onGetSelectedParameter(selectedParameter: ConceptGetFull): void {
     this.parameterUuid = selectedParameter?.uuid;
     this.conceptService
-      .getConceptDetailsByUuid(this.parameterUuid, "full")
+      .getConceptDetailsByUuid(
+        this.parameterUuid,
+        "custom:(uuid,display,datatype,set,retired,descriptions,name,names,setMembers:(uuid,display),conceptClass:(uuid,display),answers:(uuid,display),mappings:(conceptReferenceTerm:(uuid,display,conceptSource:(uuid,display))))"
+      )
       .subscribe((response) => {
         if (response) {
           this.conceptBeingEdited = response;
+          this.selectedCodeItems =
+            response?.mappings.map(
+              (mapping) => mapping?.conceptReferenceTerm
+            ) || [];
           this.createBasicParametersFields(response);
           this.createUnitField();
-          this.createCodesMappingSourceField();
+          this.createCodesMappingSourceField(response?.mappings);
           this.createCodeField([]);
           this.selectedAnswers = response?.answers;
           this.createLowAndHighNormalFields(response);

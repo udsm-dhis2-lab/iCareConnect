@@ -37,6 +37,9 @@ export class StandardConceptCreationComponent implements OnInit {
   displayPrecisionField: any;
   formData: any = {};
   isFormValid: boolean = false;
+  selectedCodingItems: any[] = [];
+  mappings: any[] = [];
+  readyToCollectCodes: boolean = false;
 
   @Output() conceptCreated: EventEmitter<boolean> = new EventEmitter<boolean>();
 
@@ -140,6 +143,7 @@ export class StandardConceptCreationComponent implements OnInit {
     ) || [])[0];
     // Add support to support multiple languages
     const descriptionsDetails = data?.descriptions[0];
+    this.readyToCollectCodes = true;
     this.basicConceptFields = [
       new Textbox({
         id: "name",
@@ -214,13 +218,23 @@ export class StandardConceptCreationComponent implements OnInit {
     this.conceptUuid = concept?.uuid;
     // First get concept details
     this.conceptService
-      .getConceptDetailsByUuid(concept?.uuid, "full")
+      .getConceptDetailsByUuid(
+        concept?.uuid,
+        "custom:(uuid,display,datatype,set,retired,descriptions,name,names,setMembers:(uuid,display),conceptClass:(uuid,display),answers:(uuid,display),mappings:(conceptReferenceTerm:(uuid,display,conceptSource:(uuid,display))))"
+      )
       .subscribe((response) => {
         if (response) {
           this.createBasicConceptFields(response);
           this.editingSet = true;
+          this.readyToCollectCodes = false;
+          this.selectedCodingItems =
+            response?.mappings.map(
+              (mapping) => mapping?.conceptReferenceTerm
+            ) || [];
+          this.mappings = response?.mappings;
           setTimeout(() => {
             this.editingSet = false;
+            this.readyToCollectCodes = true;
             this.selectedSetMembers = response?.setMembers;
           }, 200);
         }

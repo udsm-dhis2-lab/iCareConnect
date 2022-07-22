@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { from, Observable, of } from "rxjs";
+import { from, Observable, of, zip } from "rxjs";
 import { catchError, map } from "rxjs/operators";
 import {
   Api,
@@ -56,6 +56,27 @@ export class ReferenceTermsService {
           return of(error);
         })
       );
+  }
+
+  getConceptReferenceTermByUuids(
+    uuids: string[]
+  ): Observable<ConceptreferencetermGet[]> {
+    return uuids.length > 0
+      ? zip(
+          ...uuids.map((uuid) =>
+            from(
+              this.api.conceptreferenceterm.getConceptReferenceTerm(uuid)
+            ).pipe(
+              map((response) => {
+                return response;
+              }),
+              catchError((error) => {
+                return of(error);
+              })
+            )
+          )
+        )
+      : of([]);
   }
 
   getReferenceTerms(parameters: {
