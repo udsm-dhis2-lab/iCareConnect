@@ -27,7 +27,6 @@ export class MultipleItemsSelectionComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    console.log("standardSearchTerm", this.standardSearchTerm);
     this.currentSelectedItems = this.selectedItems;
     if (
       this.itemType &&
