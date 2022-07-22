@@ -16,6 +16,7 @@ export class MultipleItemsSelectionComponent implements OnInit {
   @Input() itemType: string;
   @Input() standardSearchTerm: string;
   @Input() source: string;
+  @Input() conceptClass: string;
   currentSelectedItems: any[] = [];
   @Output() getSelectedItems: EventEmitter<any[]> = new EventEmitter<any[]>();
   items$: Observable<any[]>;
@@ -36,10 +37,12 @@ export class MultipleItemsSelectionComponent implements OnInit {
       this.items$ =
         this.items?.length > 0
           ? of(this.items)
-          : this.conceptService.getConceptsByParameters({
-              searchingText: this.standardSearchTerm,
-              page: this.page,
-              pageSize: this.pageSize,
+          : this.conceptService.searchConcept({
+              q: this.standardSearchTerm,
+              conceptClass: this.conceptClass,
+              limit: this.pageSize,
+              startIndex: (this.page - 1) * this.pageSize,
+              searchTerm: this.standardSearchTerm,
             });
     } else if (this.itemType === "conceptReferenceTerm") {
       this.items$ =
@@ -111,10 +114,12 @@ export class MultipleItemsSelectionComponent implements OnInit {
         debounceTime(1000),
         distinctUntilChanged(),
         switchMap((term) =>
-          this.conceptService.getConceptsByParameters({
-            searchingText: term,
-            pageSize: this.pageSize,
-            page: this.page,
+          this.conceptService.searchConcept({
+            q: term,
+            conceptClass: this.conceptClass,
+            limit: this.pageSize,
+            startIndex: (this.page - 1) * this.pageSize,
+            searchTerm: this.standardSearchTerm,
           })
         )
       );
