@@ -12,17 +12,18 @@ import { ConceptsourceGet } from "src/app/shared/resources/openmrs";
 })
 export class CodesSelectionComponent implements OnInit {
   @Input() conceptSources: ConceptsourceGet[];
+  @Input() mappings: any[];
+  @Input() selectedCodes: any[];
   codesMappingsSourceField: any;
   formData: any = {};
   codedOptions$: Observable<any[]> = of([]);
 
-  selectedCodes: any[] = [];
   selectedCodingSource: string;
   @Output() selectedCodesItems: EventEmitter<any[]> = new EventEmitter<any[]>();
   constructor(private conceptReferenceService: ReferenceTermsService) {}
 
   ngOnInit(): void {
-    this.createCodesMappingSourceField();
+    this.createCodesMappingSourceField(this.mappings);
   }
 
   createCodesMappingSourceField(data?: any): void {
@@ -30,6 +31,10 @@ export class CodesSelectionComponent implements OnInit {
       id: "source",
       key: "source",
       label: "Coding source",
+      value:
+        data && data?.length > 0
+          ? data[0]?.conceptReferenceTerm?.conceptSource?.uuid
+          : null,
       options: this.conceptSources.map((source) => {
         return {
           key: source?.uuid,

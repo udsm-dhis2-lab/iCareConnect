@@ -68,9 +68,11 @@
       <div class="col-lg-6 col-md-6 col-sx-12 col-sm-12">
         <fieldset>
           <legend>{{ itemTypeName }} Codes</legend>
-          <div *ngIf="params?.conceptSources">
+          <div *ngIf="params?.conceptSources && readyToCollectCodes">
             <app-codes-selection
               [conceptSources]="params?.conceptSources"
+              [selectedCodes]="selectedCodingItems"
+              [mappings]="mappings"
               (selectedCodesItems)="onGetSelectedCodes($event)"
             ></app-codes-selection>
           </div>
