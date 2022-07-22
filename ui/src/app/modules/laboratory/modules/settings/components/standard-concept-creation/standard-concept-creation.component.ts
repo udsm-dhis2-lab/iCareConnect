@@ -212,12 +212,19 @@ export class StandardConceptCreationComponent implements OnInit {
 
   onConceptEdit(concept: ConceptGetFull): void {
     this.conceptUuid = concept?.uuid;
-    this.createBasicConceptFields(concept);
-    this.editingSet = true;
-    setTimeout(() => {
-      this.editingSet = false;
-      this.selectedSetMembers = concept?.setMembers;
-    }, 200);
+    // First get concept details
+    this.conceptService
+      .getConceptDetailsByUuid(concept?.uuid, "full")
+      .subscribe((response) => {
+        if (response) {
+          this.createBasicConceptFields(response);
+          this.editingSet = true;
+          setTimeout(() => {
+            this.editingSet = false;
+            this.selectedSetMembers = response?.setMembers;
+          }, 200);
+        }
+      });
   }
 
   onGetSelectedCodes(selectedCodes: any): void {
