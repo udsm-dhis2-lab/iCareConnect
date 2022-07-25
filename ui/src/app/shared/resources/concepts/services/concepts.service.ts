@@ -84,22 +84,24 @@ export class ConceptsService {
     parentUuid,
     conceptNames: any[]
   ): Observable<ConceptCreateFull> {
-    return zip(
-      ...conceptNames.map((conceptNameData) =>
-        from(
-          this.api.concept.createConceptName(parentUuid, conceptNameData)
+    return conceptNames?.length > 0
+      ? zip(
+          ...conceptNames.map((conceptNameData) =>
+            from(
+              this.api.concept.createConceptName(parentUuid, conceptNameData)
+            ).pipe(
+              map((response) => {
+                return response?.results;
+              }),
+              catchError((error) => of([]))
+            )
+          )
         ).pipe(
-          map((response) => {
-            return response?.results;
-          }),
-          catchError((error) => of([]))
+          map((response: any) => {
+            return flatten(response);
+          })
         )
-      )
-    ).pipe(
-      map((response: any) => {
-        return flatten(response);
-      })
-    );
+      : of([]);
   }
 
   updateConcept(uuid: string, data: any): Observable<ConceptCreateFull> {

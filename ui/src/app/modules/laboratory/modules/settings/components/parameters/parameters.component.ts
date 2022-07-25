@@ -11,7 +11,7 @@ import {
   ConceptsourceGet,
 } from "src/app/shared/resources/openmrs";
 
-import { omit } from "lodash";
+import { omit, uniqBy } from "lodash";
 
 @Component({
   selector: "app-parameters",
@@ -270,6 +270,28 @@ export class ParametersComponent implements OnInit {
       };
     });
 
+    if (this.conceptBeingEdited) {
+      mappings = [
+        ...mappings,
+        ...this.conceptBeingEdited?.mappings.map((mapping) => {
+          return {
+            conceptReferenceTerm: mapping?.conceptReferenceTerm?.uuid,
+            conceptMapType,
+          };
+        }),
+      ];
+      searchIndexedTerms = searchIndexedTerms.filter(
+        (searchIndexedTerm) =>
+          (
+            this.conceptBeingEdited?.names?.filter(
+              (savedName) =>
+                savedName?.name != searchIndexedTerm?.name &&
+                savedName?.conceptNameType == "INDEX_TERM"
+            ) || []
+          ).length === 0
+      );
+    }
+
     this.concept = {
       names: names,
       descriptions: [
@@ -299,7 +321,7 @@ export class ParametersComponent implements OnInit {
         this.formData["precision"]?.value
           ? this.formData["precision"]?.value
           : null,
-      mappings,
+      mappings: uniqBy(mappings, "conceptReferenceTerm"),
     };
 
     const keys = Object.keys(this.concept);
@@ -355,7 +377,10 @@ export class ParametersComponent implements OnInit {
                     });
                 } else {
                   this.conceptService
-                    .createConceptNames(response?.uuid, searchIndexedTerms)
+                    .createConceptNames(
+                      response?.uuid,
+                      uniqBy(searchIndexedTerms, "name")
+                    )
                     .subscribe((conceptNameResponse) => {
                       if (conceptNameResponse) {
                         this.parameterUuid = null;
@@ -393,6 +418,8 @@ export class ParametersComponent implements OnInit {
             response?.mappings.map(
               (mapping) => mapping?.conceptReferenceTerm
             ) || [];
+          this.selectedCodingSource =
+            response?.mappings[0]?.conceptReferenceTerm?.conceptSource;
           this.createBasicParametersFields(response);
           this.createUnitField();
           this.createCodesMappingSourceField(response?.mappings);
