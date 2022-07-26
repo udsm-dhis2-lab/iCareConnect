@@ -3281,6 +3281,14 @@ export interface ConceptGetFull {
   uuid?: string;
   display?: string;
   setMembers?: any;
+  answers?: any[];
+  mappings?: any[];
+  conceptClass?: any;
+  datatype?: any;
+  descriptions?: any[];
+  name?: any;
+  names?: any[];
+  set?: boolean;
 }
 
 export interface ConceptCreate {

@@ -13,7 +13,7 @@ import {
   ConceptsourceGet,
 } from "src/app/shared/resources/openmrs";
 
-import { omit } from "lodash";
+import { omit, uniqBy } from "lodash";
 
 @Component({
   selector: "app-standard-concept-creation",
@@ -62,6 +62,7 @@ export class StandardConceptCreationComponent implements OnInit {
   savingMessage: string;
 
   testMethodUuid: string;
+  conceptBeingEdited: ConceptGetFull;
   constructor(
     private conceptService: ConceptsService,
     private billableItemService: BillableItemsService,
@@ -299,6 +300,28 @@ export class StandardConceptCreationComponent implements OnInit {
       };
     });
 
+    if (this.conceptBeingEdited) {
+      mappings = [
+        ...mappings,
+        ...this.conceptBeingEdited?.mappings.map((mapping) => {
+          return {
+            conceptReferenceTerm: mapping?.conceptReferenceTerm?.uuid,
+            conceptMapType,
+          };
+        }),
+      ];
+      searchIndexedTerms = searchIndexedTerms.filter(
+        (searchIndexedTerm) =>
+          (
+            this.conceptBeingEdited?.names?.filter(
+              (savedName) =>
+                savedName?.name != searchIndexedTerm?.name &&
+                savedName?.conceptNameType == "INDEX_TERM"
+            ) || []
+          ).length === 0
+      );
+    }
+
     let concept = {
       names: names,
       descriptions: [
@@ -328,7 +351,7 @@ export class StandardConceptCreationComponent implements OnInit {
         this.formData["precision"]?.value
           ? this.formData["precision"]?.value
           : null,
-      mappings,
+      mappings: uniqBy(mappings, "conceptReferenceTerm"),
     };
 
     const keys: any[] = Object.keys(concept);
@@ -431,7 +454,10 @@ export class StandardConceptCreationComponent implements OnInit {
                   });
               } else {
                 this.conceptService
-                  .createConceptNames(response?.uuid, searchIndexedTerms)
+                  .createConceptNames(
+                    response?.uuid,
+                    uniqBy(searchIndexedTerms, "name")
+                  )
                   .subscribe((conceptNameResponse) => {
                     if (conceptNameResponse) {
                       this.saving = false;
