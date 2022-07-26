@@ -26,6 +26,10 @@ export class CodedAnswersComponent implements OnInit {
   isFormValid: boolean = false;
   hasError: boolean = false;
   error: string;
+
+  conceptBeingEdited: ConceptGetFull;
+
+  alertMessage: string;
   constructor(private conceptService: ConceptsService) {}
 
   ngOnInit(): void {
@@ -61,7 +65,7 @@ export class CodedAnswersComponent implements OnInit {
         id: "name",
         key: "name",
         label: "Name",
-        value: data && data?.name ? data?.name?.name : null,
+        value: data && data?.display ? data?.display : null,
         required: true,
       }),
       new Textbox({
@@ -108,6 +112,7 @@ export class CodedAnswersComponent implements OnInit {
         conceptNameType: "FULLY_SPECIFIED",
       },
     ];
+    const conceptName = this.formData["name"]?.value;
     names = [
       ...names,
       {
@@ -130,29 +135,46 @@ export class CodedAnswersComponent implements OnInit {
     };
 
     this.conceptService
-      .createConcept(this.answer)
-      .subscribe((response: any) => {
-        if (response && !response?.error) {
-          this.conceptService
-            .createConceptNames(response?.uuid, searchTerms)
-            .subscribe((conceptNameResponse) => {
-              if (conceptNameResponse) {
-                this.category = "List";
-                this.page = 1;
-                this.codedAnswers$ = this.conceptService.searchConcept({
-                  limit: this.pageSize,
-                  conceptClass: "Coded answer",
-                  startIndex: (this.page - 1) * this.pageSize,
-                  searchTerm: "LIS_CODED_ANSWERS",
-                });
-                this.saving = false;
-              }
-            });
-        } else {
+      .searchConcept({ q: conceptName, conceptClass: "Coded answer" })
+      .subscribe((response) => {
+        if (response?.length > 0 && !this.conceptBeingEdited) {
           this.saving = false;
-          this.hasError = true;
-          this.error =
-            response?.error?.message + " Please contact system administrator";
+          this.alertMessage = "Answer with name " + conceptName + " exists";
+          setTimeout(() => {
+            this.alertMessage = null;
+          }, 2000);
+        } else {
+          (!this.conceptBeingEdited
+            ? this.conceptService.createConcept(this.answer)
+            : this.conceptService.updateConcept(
+                this.conceptBeingEdited?.uuid,
+                this.answer
+              )
+          ).subscribe((response: any) => {
+            if (response && !response?.error) {
+              this.conceptService
+                .createConceptNames(response?.uuid, searchTerms)
+                .subscribe((conceptNameResponse) => {
+                  if (conceptNameResponse) {
+                    this.category = "List";
+                    this.page = 1;
+                    this.codedAnswers$ = this.conceptService.searchConcept({
+                      limit: this.pageSize,
+                      conceptClass: "Coded answer",
+                      startIndex: (this.page - 1) * this.pageSize,
+                      searchTerm: "LIS_CODED_ANSWERS",
+                    });
+                    this.saving = false;
+                  }
+                });
+            } else {
+              this.saving = false;
+              this.hasError = true;
+              this.error =
+                response?.error?.message +
+                " Please contact system administrator";
+            }
+          });
         }
       });
   }
@@ -162,7 +184,18 @@ export class CodedAnswersComponent implements OnInit {
   }
 
   onEdit(event: Event, codedAnswer: any): void {
-    console.log("codedAnswer", codedAnswer);
+    this.conceptService
+      .getConceptDetailsByUuid(
+        codedAnswer?.uuid,
+        "custom:(uuid,display,names,descriptions)"
+      )
+      .subscribe((response) => {
+        if (response) {
+          this.conceptBeingEdited = response;
+          this.category = "New";
+          this.createCodedAnswersFields(response);
+        }
+      });
   }
 
   onDelete(event: Event, concept: any): void {
@@ -176,6 +209,18 @@ export class CodedAnswersComponent implements OnInit {
           searchTerm: "LIS_CODED_ANSWERS",
         });
       }
+    });
+  }
+
+  searchConcept(event: KeyboardEvent): void {
+    this.page = 1;
+    const searchingText = (event.target as HTMLInputElement).value;
+    this.codedAnswers$ = this.conceptService.searchConcept({
+      q: searchingText,
+      conceptClass: "Coded answer",
+      limit: this.pageSize,
+      startIndex: (this.page - 1) * this.pageSize,
+      searchTerm: "LIS_CODED_ANSWERS",
     });
   }
 }
