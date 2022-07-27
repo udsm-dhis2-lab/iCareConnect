@@ -259,7 +259,7 @@ export class StandardConceptCreationComponent implements OnInit {
     ];
     searchIndexedTerms = [
       ...searchIndexedTerms,
-      ...this.selectedCodes.map((item) => {
+      ...(this.selectedCodes || []).map((item) => {
         return {
           name: item?.display.split(" (")[0],
           locale: "en",
@@ -293,12 +293,15 @@ export class StandardConceptCreationComponent implements OnInit {
 
     const conceptMapType = "35543629-7d8c-11e1-909d-c80aa9edcf4e";
 
-    let mappings = this.selectedCodes.map((item) => {
-      return {
-        conceptReferenceTerm: item?.uuid,
-        conceptMapType,
-      };
-    });
+    let mappings =
+      this.selectedCodes && this.selectedCodes.length > 0
+        ? this.selectedCodes.map((item) => {
+            return {
+              conceptReferenceTerm: item?.uuid,
+              conceptMapType,
+            };
+          })
+        : [];
 
     if (this.conceptBeingEdited) {
       mappings = [
