@@ -11,6 +11,7 @@ import org.openmrs.module.icare.core.dao.BaseDAO;
 import org.openmrs.module.icare.laboratory.models.Sample;
 import org.springframework.stereotype.Repository;
 
+import java.text.SimpleDateFormat; 
 import java.util.Date;
 import java.util.List;
 
@@ -104,4 +105,34 @@ public class SampleDAO extends BaseDAO<Sample> {
 		//
 		return listResults;
 	}
+
+
+	public List<Sample> getSamplesByPatientAndOrDates(String patientId, Date startDate, Date endDate){
+		DbSession session = this.getSession();
+
+		if(startDate != null || endDate != null){
+			String queryStr = "SELECT sp \n" + "FROM Sample sp \n"
+					+ "JOIN Visit v ON sp.visit= v.visit_id \n" 
+					+ "JOIN Patient p ON v.patient_id= p.patient_id \n"
+					+ "WHERE p.patient_id = (SELECT p FROM Patient p JOIN PatientIdentifier pi ON pi.patient_id = p.patient_id WHERE pi.uuid = :patientUuid)"
+					+ "AND (cast(sp.dateTime as date) BETWEEN :startDate AND :endDate \n"
+					+ "OR cast(sp.dateCreated as date) BETWEEN :startDate AND :endDate)";
+			
+			Query query = session.createQuery(queryStr);
+			query.setParameter("startDate", startDate);
+			query.setParameter("endDate", endDate);
+
+			return query.list();
+		}
+
+		String queryStr = "SELECT sp \n" + "FROM Sample sp \n"
+				+ "WHERE sp.Patient = (SELECT p FROM Patient p WHERE p.uuid = :patientUuid)";
+		
+		Query query = session.createQuery(queryStr);
+		query.setParameter("patientUuid", patientId);
+
+		return query.list();
+	}
+
+
 }

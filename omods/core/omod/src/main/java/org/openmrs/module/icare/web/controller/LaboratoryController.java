@@ -65,7 +65,7 @@ public class LaboratoryController {
 		retults.put("results", responseSamplesObject);
 		return retults;
 	}
-	
+
 	@RequestMapping(value = "sample", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public Map<String, Object> createNewSample(@RequestBody Map<String, Object> sample) throws IOException {
@@ -145,9 +145,40 @@ public class LaboratoryController {
 	
 	@RequestMapping(value = "sample", method = RequestMethod.GET)
 	@ResponseBody
-	public List<Map<String, Object>> getSamplesByVisit(@RequestParam("visit") String visitId) {
+	public List<Map<String, Object>> getSamplesByVisit(
+		@RequestParam(value = "visit", required = false) String visitId,
+		@RequestParam(value = "patientId", required = false) String patientId,
+		@RequestParam(value = "startDate", required = false) String startDate,
+		@RequestParam(value = "endDate", required = false) String endDate
+		)		
+		{
 		
-		List<Sample> samples = laboratoryService.getSamplesByVisit(visitId);
+		List<Sample> samples = new ArrayList<Sample>();
+
+		if(visitId != null && visitId != "" && visitId.length() > 0){
+
+			samples = laboratoryService.getSamplesByVisit(visitId);
+		}
+
+		if(patientId != null && patientId.length() > 0){
+			
+			Date sampleCreatedStartDate = null;
+			Date sampleCreatedEndDate = null;
+			
+			if (startDate != null && endDate != null && startDate.length() > 0  && endDate.length() > 0) {
+			
+				SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+				try {
+					sampleCreatedStartDate = formatter.parse(startDate);
+					sampleCreatedEndDate = formatter.parse(endDate);
+				}
+				catch( Exception e ) {
+
+				}
+			}
+
+			samples = laboratoryService.getSamplesByPatientAndOrDates(patientId, sampleCreatedStartDate, sampleCreatedEndDate);
+		}
 		
 		List<Map<String, Object>> responseSamplesObject = new ArrayList<Map<String, Object>>();
 		for (Sample sample : samples) {
