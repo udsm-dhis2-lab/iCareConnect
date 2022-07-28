@@ -81,7 +81,7 @@ export class FormService {
     } else if (searchControlType === "user") {
       return from(this.api.user.getAllUsers({ q: parameters?.q })).pipe(
         map((response) => {
-          return response?.results;
+          return response?.results || [];
         })
       );
     } else if (searchControlType === "location") {
@@ -92,7 +92,7 @@ export class FormService {
         })
       ).pipe(
         map((response) => {
-          return response?.results;
+          return response?.results || [];
         })
       );
     } else if (searchControlType === "searchFromOptions") {
