@@ -92,7 +92,7 @@ export class PersonDetailsComponent implements OnInit {
         key: identifier?.id,
         label: identifier?.name,
         value: personDetails
-          ? (personDetails?.identifiers.filter(
+          ? (personDetails?.identifiers?.filter(
               (identifier) =>
                 identifier?.identifierType?.uuid === primaryIdentifier?.id
             ) || [])[0]?.identifier
