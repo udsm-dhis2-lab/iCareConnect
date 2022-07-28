@@ -49,7 +49,7 @@ public class LaboratoryServiceTest extends LaboratoryTestBase {
 		OrderService orderService = Context.getService(OrderService.class);
 		UserService userService = Context.getService(UserService.class);
 		
-		Visit visit = visitService.getVisitByUuid("2386395c-2b07-4abd-8fd7-a748c957554d");
+		Visit visit = visitService.getVisitByUuid("d9c1d8ac-2b8e-427f-804d-b858c52e6f11");
 		Order order = orderService.getOrderByUuid("6746395c-1117-4abd-8fd7-a748c9575abcd");
 		
 		Sample sample = new Sample();
@@ -71,13 +71,13 @@ public class LaboratoryServiceTest extends LaboratoryTestBase {
 		MatcherAssert.assertThat("Sample ID was created", createdSample.getId() == sample.getId());
 		
 		MatcherAssert.assertThat("Sample List is greater than 0",
-		    laboratoryService.getSamplesByVisit("2386395c-2b07-4abd-8fd7-a748c957554d").size() > 0);
+		    laboratoryService.getSamplesByVisit("d9c1d8ac-2b8e-427f-804d-b858c52e6f11").size() > 0);
 		
 		//test get methods
 		
 		//allocate test
 		
-		sampleOrder.setSample(laboratoryService.getSamplesByVisit("2386395c-2b07-4abd-8fd7-a748c957554d").get(0));
+		sampleOrder.setSample(laboratoryService.getSamplesByVisit("d9c1d8ac-2b8e-427f-804d-b858c52e6f11").get(0));
 		
 		TestAllocation allocation = new TestAllocation();
 		allocation.setLabel("allocation1");
