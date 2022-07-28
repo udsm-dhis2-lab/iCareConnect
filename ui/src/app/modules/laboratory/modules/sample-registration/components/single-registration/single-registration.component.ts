@@ -569,7 +569,10 @@ export class SingleRegistrationComponent implements OnInit {
                         visitType: "54e8ffdc-dea0-4ef0-852f-c23e06d16066",
                         location: this.currentLocation?.uuid,
                         indication: "Sample Registration",
-                        attributes: visAttributes,
+                        attributes:
+                          visAttributes.filter(
+                            (attribute) => attribute?.value
+                          ) || [],
                       };
 
                       this.visitsService
