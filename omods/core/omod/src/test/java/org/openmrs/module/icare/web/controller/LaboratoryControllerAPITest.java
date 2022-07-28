@@ -4,7 +4,6 @@ import org.apache.commons.collections.IteratorUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
-import org.openmrs.Concept;
 import org.openmrs.Encounter;
 import org.openmrs.Obs;
 import org.openmrs.api.context.Context;
@@ -37,7 +36,7 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 	@Test
 	public void testConversion() {
 		SimpleObject sample = new SimpleObject();
-		sample.add("visit", (new SimpleObject().add("uuid", "2386395c-2b07-4abd-8fd7-a748c957554d")));
+		sample.add("visit", (new SimpleObject().add("uuid", "d9c1d8ac-2b8e-427f-804d-b858c52e6f11")));
 		sample.add("label", "Test Label X");
 		sample.add("concept", (new SimpleObject().add("uuid", "a8102d6d-c528-477a-80bd-acc38ebc6252")));
 		sample.add("technician", (new SimpleObject().add("uuid", "1a61a0b5-d271-4b00-a803-5cef8b06ba8f")));
@@ -69,7 +68,7 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		
 		//Then
 		//TODO put test for the results that should be returned to the client
-		newGetRequest = newGetRequest("lab/sample", new Parameter("visit", "2386395c-2b07-4abd-8fd7-a748c957554d"));
+		newGetRequest = newGetRequest("lab/sample", new Parameter("visit", "d9c1d8ac-2b8e-427f-804d-b858c52e6f11"));
 		MockHttpServletResponse handleGet = handle(newGetRequest);
 		List<Map<String, Object>> createdsample = (new ObjectMapper()).readValue(handleGet.getContentAsString(), List.class);
 		
@@ -103,7 +102,7 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		
 		//Then
 		MockHttpServletRequest newGetRequest = newGetRequest("lab/sample", new Parameter("visit",
-		        "2386395c-2b07-4abd-8fd7-a748c957554d"));
+		        "d9c1d8ac-2b8e-427f-804d-b858c52e6f11"));
 		MockHttpServletResponse handleGet = handle(newGetRequest);
 		List<Map<String, Object>> createdsample = (new ObjectMapper()).readValue(handleGet.getContentAsString(), List.class);
 		boolean found = false;
@@ -133,7 +132,7 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		MockHttpServletResponse handle = handle(newPostRequest);
 		
 		MockHttpServletRequest newGetRequest = newGetRequest("lab/sample", new Parameter("visit",
-		        "2386395c-2b07-4abd-8fd7-a748c957554d"));
+		        "d9c1d8ac-2b8e-427f-804d-b858c52e6f11"));
 		
 		MockHttpServletResponse handleGet = handle(newGetRequest);
 		
@@ -176,14 +175,21 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 	@Test
 	public void testGettingSampleByVisitUuid() throws Exception {
 		
-		MockHttpServletRequest newGetRequest = newGetRequest("lab/sample", new Parameter("visit",
-		        "2386395c-2b07-4abd-8fd7-a748c957554d"));
-		
+		MockHttpServletRequest newGetRequest = newGetRequest("lab/sample", new Parameter("patientId",
+		        "6a24f4e5-dc26-47f9-a624-c968c6b26d28"));
 		MockHttpServletResponse handleGet = handle(newGetRequest);
-		
+
+		System.out.println(handleGet.getContentAsString());
 		assertThat(
-		    "There is atleast 1 sample for the visit from lab-data.xml with visit id = 2386395c-2b07-4abd-8fd7-a748c957554d",
-		    handleGet.getContentAsString().contains("2386395c-2b07-4abd-8fd7-a748c957554d"));
+		    "There is atleast 1 sample for the visit from lab-data.xml with patient uuid = 6a24f4e5-dc26-47f9-a624-c968c6b26d28",
+		    handleGet.getContentAsString().contains("6a24f4e5-dc26-47f9-a624-c968c6b26d28"));
+
+//		newGetRequest = newGetRequest("lab/sample", new Parameter("patientId",
+//				"d9c1d8ac-2b8e-427f-804d-b858c52e6f11"));
+//		handleGet = handle(newGetRequest);
+//		assertThat(
+//				"There is atleast 1 sample for the visit from lab-data.xml with visit id = d9c1d8ac-2b8e-427f-804d-b858c52e6f11",
+//				handleGet.getContentAsString().contains("d9c1d8ac-2b8e-427f-804d-b858c52e6f11"));
 	}
 	
 	@Test
@@ -192,10 +198,10 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		MockHttpServletRequest newGetRequest = newGetRequest("lab/samples", new Parameter("page", "2"), new Parameter(
 		        "pageSize", "2"));
 		
-		//System.out.println(Context.getVisitService().getVisitByUuid("2386395c-2b07-4abd-8fd7-a748c957554d").getLocation().getUuid());
+		//System.out.println(Context.getVisitService().getVisitByUuid("d9c1d8ac-2b8e-427f-804d-b858c52e6f11").getLocation().getUuid());
 		MockHttpServletResponse handleGet = handle(newGetRequest);
 		
-		//System.out.println(Context.getVisitService().getVisitByUuid("2386395c-2b07-4abd-8fd7-a748c957554d").getLocation().getUuid());
+		//System.out.println(Context.getVisitService().getVisitByUuid("d9c1d8ac-2b8e-427f-804d-b858c52e6f11").getLocation().getUuid());
 		Map<String, Object> sampleResults = (new ObjectMapper()).readValue(handleGet.getContentAsString(), Map.class);
 		
 		Map<String, Object> pagerObject = (Map<String, Object>) sampleResults.get("pager");
@@ -205,16 +211,16 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		assertThat("Page is 2", (Integer) pagerObject.get("page") == 2, is(true));
 		assertThat("List count is 1", ((List) sampleResults.get("results")).size() == 1, is(true));
 		assertThat(
-		    "There is atleast 1 sample for the visit from lab-data.xml with visit id = 2386395c-2b07-4abd-8fd7-a748c957554d",
-		    handleGet.getContentAsString().contains("2386395c-2b07-4abd-8fd7-a748c957554d"));
+		    "There is atleast 1 sample for the visit from lab-data.xml with visit id = d9c1d8ac-2b8e-427f-804d-b858c52e6f11",
+		    handleGet.getContentAsString().contains("d9c1d8ac-2b8e-427f-804d-b858c52e6f11"));
 		
 		newGetRequest = newGetRequest("lab/samples", new Parameter("location", "58c57d25-8d39-41ab-8422-108a0c277d98"));
 		
-		//System.out.println(Context.getVisitService().getVisitByUuid("2386395c-2b07-4abd-8fd7-a748c957554d").getLocation().getUuid());
+		//System.out.println(Context.getVisitService().getVisitByUuid("d9c1d8ac-2b8e-427f-804d-b858c52e6f11").getLocation().getUuid());
 		handleGet = handle(newGetRequest);
 		
 		System.out.println(handleGet.getContentAsString());
-		//System.out.println(Context.getVisitService().getVisitByUuid("2386395c-2b07-4abd-8fd7-a748c957554d").getLocation().getUuid());
+		//System.out.println(Context.getVisitService().getVisitByUuid("d9c1d8ac-2b8e-427f-804d-b858c52e6f11").getLocation().getUuid());
 		sampleResults = (new ObjectMapper()).readValue(handleGet.getContentAsString(), Map.class);
 		
 		pagerObject = (Map<String, Object>) sampleResults.get("pager");
@@ -307,7 +313,7 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		    is(((Map) testAllocationStatus.get("user")).get("uuid")));
 		
 		MockHttpServletRequest newGetRequest = newGetRequest("lab/sample", new Parameter("visit",
-		        "2386395c-2b07-4abd-8fd7-a748c957554d"));
+		        "d9c1d8ac-2b8e-427f-804d-b858c52e6f11"));
 		
 		MockHttpServletResponse handleGet = handle(newGetRequest);
 		

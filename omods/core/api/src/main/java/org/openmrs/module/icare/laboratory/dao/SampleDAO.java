@@ -3,6 +3,8 @@ package org.openmrs.module.icare.laboratory.dao;
 // Generated Oct 7, 2020 12:49:21 PM by Hibernate Tools 5.2.10.Final
 
 import org.hibernate.Query;
+import org.openmrs.Patient;
+import org.openmrs.Person;
 import org.openmrs.Visit;
 import org.openmrs.api.db.hibernate.DbSession;
 import org.openmrs.module.icare.core.ListResult;
@@ -109,28 +111,34 @@ public class SampleDAO extends BaseDAO<Sample> {
 
 	public List<Sample> getSamplesByPatientAndOrDates(String patientId, Date startDate, Date endDate){
 		DbSession session = this.getSession();
-
-		if(startDate != null || endDate != null){
-			String queryStr = "SELECT sp \n" + "FROM Sample sp \n"
-					+ "JOIN Visit v ON sp.visit= v.visit_id \n" 
-					+ "JOIN Patient p ON v.patient_id= p.patient_id \n"
-					+ "WHERE p.patient_id = (SELECT p FROM Patient p JOIN PatientIdentifier pi ON pi.patient_id = p.patient_id WHERE pi.uuid = :patientUuid)"
-					+ "AND (cast(sp.dateTime as date) BETWEEN :startDate AND :endDate \n"
-					+ "OR cast(sp.dateCreated as date) BETWEEN :startDate AND :endDate)";
-			
-			Query query = session.createQuery(queryStr);
-			query.setParameter("startDate", startDate);
-			query.setParameter("endDate", endDate);
-
-			return query.list();
+		String queryStr = "SELECT ls FROM Sample ls LEFT JOIN ls.visit v LEFT JOIN v.patient pnt WHERE pnt.uuid=:patientUuid";
+		if(startDate != null && endDate == null){
+//			Get Patient_id using the the UUID
+			String patient_id = "";
+//			String queryStr = "SELECT sp \n" + "FROM Sample sp \n"
+//					+ "LEFT JOIN Visit v ON sp.visit= v.visit_id \n"
+//					+ "LEFT JOIN Person p ON v.patient_id= p.patient_id \n"
+//					+ "WHERE p.patient_id = (SELECT p FROM Patient p JOIN PatientIdentifier pi ON pi.patient_id = p.patient_id WHERE pi.uuid = :patientUuid)"
+//					+ "AND (cast(sp.dateTime as date) BETWEEN :startDate AND :endDate \n"
+//					+ "OR cast(sp.dateCreated as date) BETWEEN :startDate AND :endDate)";
+			queryStr += " AND ls.dateCreated >= :startDate";
 		}
 
-		String queryStr = "SELECT sp \n" + "FROM Sample sp \n"
-				+ "WHERE sp.Patient = (SELECT p FROM Patient p WHERE p.uuid = :patientUuid)";
+		if (startDate != null && endDate != null) {
+			queryStr += " AND ls.dateCreated >= :startDate AND ls.dateCreated <= :endDate";
+		}
 		
 		Query query = session.createQuery(queryStr);
 		query.setParameter("patientUuid", patientId);
+		if (startDate != null) {
+			query.setParameter("startDate", startDate);
+		}
+		if (endDate != null) {
+			query.setParameter("endDate", endDate);
+		}
 
+		List data = query.list();
+		System.out.println(data);
 		return query.list();
 	}
 
