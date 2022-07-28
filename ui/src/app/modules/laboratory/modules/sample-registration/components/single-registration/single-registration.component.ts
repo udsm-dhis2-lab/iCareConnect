@@ -28,7 +28,7 @@ import { VisitsService } from "src/app/shared/resources/visits/services";
 import { SamplesService } from "src/app/shared/services/samples.service";
 import { BarCodeModalComponent } from "../../../sample-acceptance-and-results/components/bar-code-modal/bar-code-modal.component";
 
-import { uniqBy, keyBy } from "lodash";
+import { uniqBy, keyBy, omit } from "lodash";
 import { OrdersService } from "src/app/shared/resources/order/services/orders.service";
 import { SampleRegistrationFinalizationComponent } from "../sample-registration-finalization/sample-registration-finalization.component";
 
@@ -312,6 +312,11 @@ export class SingleRegistrationComponent implements OnInit {
   }
 
   onFormUpdateForTest(testValues: any): void {
+    Object.keys(this.formData).forEach((key) => {
+      if (!testValues[key]) {
+        this.formData = omit(this.formData, key);
+      }
+    });
     this.formData = { ...this.formData, ...testValues };
     Object.keys(this.formData).forEach((key) => {
       if (key.indexOf("test") === 0) {
@@ -334,11 +339,6 @@ export class SingleRegistrationComponent implements OnInit {
     const allTestHaveDepartment = determineIfAtLeastOneTestHasNoDepartment(
       this.labSections,
       this.testOrders
-    );
-    console.log("allTestHaveDepartment", allTestHaveDepartment);
-    console.log(
-      "groupedTestOrdersByDepartments",
-      this.groupedTestOrdersByDepartments
     );
 
     if (this.testOrders?.length === 0) {
@@ -383,7 +383,6 @@ export class SingleRegistrationComponent implements OnInit {
 
   onSave(event: Event): void {
     event.stopPropagation();
-    console.log("labSections", this.labSections);
     // Identify if tests ordered are well configured
     const allTestHaveDepartment = determineIfAtLeastOneTestHasNoDepartment(
       this.labSections,
