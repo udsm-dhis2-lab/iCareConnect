@@ -331,6 +331,16 @@ export class SingleRegistrationComponent implements OnInit {
       this.testOrders
     );
 
+    const allTestHaveDepartment = determineIfAtLeastOneTestHasNoDepartment(
+      this.labSections,
+      this.testOrders
+    );
+    console.log("allTestHaveDepartment", allTestHaveDepartment);
+    console.log(
+      "groupedTestOrdersByDepartments",
+      this.groupedTestOrdersByDepartments
+    );
+
     if (this.testOrders?.length === 0) {
       this.errorMessage = "No test has been selected";
     } else {
@@ -373,6 +383,7 @@ export class SingleRegistrationComponent implements OnInit {
 
   onSave(event: Event): void {
     event.stopPropagation();
+    console.log("labSections", this.labSections);
     // Identify if tests ordered are well configured
     const allTestHaveDepartment = determineIfAtLeastOneTestHasNoDepartment(
       this.labSections,
