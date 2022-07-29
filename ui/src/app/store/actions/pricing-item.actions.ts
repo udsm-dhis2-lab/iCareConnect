@@ -72,4 +72,6 @@ export const saveItemPriceFail = createAction(
   props<{ error: any }>()
 );
 
-export const clearPricingItems = createAction("[PricingItem]");
+export const clearPricingItems = createAction(
+  "[PricingItem] Clear Pricing Items"
+);
