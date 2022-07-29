@@ -1,9 +1,9 @@
-import { Action, createReducer, on } from '@ngrx/store';
+import { Action, createReducer, on } from "@ngrx/store";
 import {
   errorBaseState,
   loadedBaseState,
   loadingBaseState,
-} from 'src/app/store/states/base.state';
+} from "src/app/store/states/base.state";
 import {
   addPricingItems,
   clearPricingItems,
@@ -13,14 +13,14 @@ import {
   loadPricingItemsFails,
   upsertItemPrice,
   upsertPricingItem,
-} from '../actions/pricing-item.actions';
+} from "../actions/pricing-item.actions";
 import {
   initialPricingItemState,
   pricingItemAdapter,
   PricingItemState,
-} from '../states/pricing-item.state';
+} from "../states/pricing-item.state";
 
-import { keyBy, unionBy } from 'lodash';
+import { keyBy, unionBy } from "lodash";
 
 const reducer = createReducer(
   initialPricingItemState,
@@ -47,7 +47,7 @@ const reducer = createReducer(
           schemeId: price?.paymentScheme?.uuid,
         };
       }),
-      'schemeId'
+      "schemeId"
     );
     const pricingItem = {
       id: itemPrice?.id,
@@ -57,7 +57,7 @@ const reducer = createReducer(
         : unionBy(
             itemPrice,
             state.entities[itemPrice?.id]?.prices,
-            'paymentSchemeUuid'
+            "paymentSchemeUuid"
           ),
     };
     return pricingItemAdapter.upsertOne(pricingItem, state);
