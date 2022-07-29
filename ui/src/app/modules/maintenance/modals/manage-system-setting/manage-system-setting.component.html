@@ -1,6 +1,6 @@
 <div class="w-100 manage-system-setting p-3">
   <div class="h3 text-center">
-    {{ dialogData?.property }}
+    {{ dialogData?.property ? dialogData?.property : dialogData?.key }}
   </div>
   <div class="loading-overlay" *ngIf="savingData">
     <div class="text-center">
@@ -10,11 +10,14 @@
       </div>
     </div>
   </div>
-  <div class="entry-form p-1">
+  <div class="entry-form p-1" *ngIf="!message">
     <app-form [fields]="formFields" (formUpdate)="onFormUpdate($event)">
     </app-form>
   </div>
-  <div class="p-1 mt-2 mb-2 d-flex justify-content-end">
+  <div class="alert alert-success p-3" role="alert" *ngIf="message">
+    {{ message }}
+  </div>
+  <div class="p-1 mt-2 mb-2 d-flex justify-content-end" *ngIf="!message">
     <button mat-stroked-button (click)="onCancel($event)">Cancel</button>
     <button
       [disabled]="!isFormValid"

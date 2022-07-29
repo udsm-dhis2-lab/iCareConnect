@@ -9,10 +9,19 @@
   <!-- {{ systemSettings | json }} -->
   <div *ngIf="systemSettings">
     <div class="card" style="overflow: auto">
-      <table class="table table-striped">
+      <table class="mt-2 table table-striped">
+        <thead>
+          <tr>
+            <th>SN</th>
+            <th>Key</th>
+            <th>Value</th>
+            <th>Description</th>
+            <th>Action</th>
+          </tr>
+        </thead>
         <tbody>
           <tr *ngFor="let systemSetting of systemSettings; let count = index">
-            <td>{{ count + 1 }}.</td>
+            <td>{{ count + 1 + (page - 1) * pageSize }}.</td>
             <td>
               {{ systemSetting?.property }}
             </td>
@@ -27,6 +36,7 @@
             <td>
               {{ systemSetting?.description }}
             </td>
+            <td></td>
           </tr>
         </tbody>
       </table>
