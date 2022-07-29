@@ -16,12 +16,14 @@
   transform: scaleY(1);
 }
 
-.selected-department {
-  background-color: #2a8fd1;
-  color: #fff;
+.selected-department,
+.selected-department:hover {
+  background-color: #cbcccc82 !important;
+  color: #0c0c0c !important;
 }
 
-.selected-department:hover {
-  background-color: #2a8fd1 !important;
+.selected-menu-item,
+.selected-menu-item:hover {
+  background-color: #42abed !important;
   color: #fff !important;
 }

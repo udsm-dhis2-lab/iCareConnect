@@ -1,0 +1,61 @@
+<div
+  class="system-settings-list-container"
+  *ngIf="systemSettings$ | async as systemSettings"
+>
+  <mat-progress-bar
+    *ngIf="!systemSettings"
+    mode="indeterminate"
+  ></mat-progress-bar>
+  <!-- {{ systemSettings | json }} -->
+  <div *ngIf="systemSettings">
+    <div class="card" style="overflow: auto">
+      <table class="table table-striped">
+        <tbody>
+          <tr *ngFor="let systemSetting of systemSettings; let count = index">
+            <td>{{ count + 1 }}.</td>
+            <td>
+              {{ systemSetting?.property }}
+            </td>
+            <td>
+              <div
+                (click)="openModal($event, systemSetting)"
+                class="system-setting-value"
+              >
+                {{ systemSetting?.value }}
+              </div>
+            </td>
+            <td>
+              {{ systemSetting?.description }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="d-flex justify-content-end">
+        <button
+          class="add-button"
+          (click)="openModal($event, systemSettings[0], true)"
+        >
+          New
+        </button>
+      </div>
+    </div>
+
+    <div class="mt-2 d-flex justify-content-end">
+      <button
+        mat-stroked-button
+        (click)="getItems($event, 'prev')"
+        [disabled]="page <= 1"
+      >
+        Prev
+      </button>
+      <button
+        mat-stroked-button
+        (click)="getItems($event, 'next')"
+        class="ml-2"
+        [disabled]="systemSettings?.length < pageSize"
+      >
+        Next
+      </button>
+    </div>
+  </div>
+</div>

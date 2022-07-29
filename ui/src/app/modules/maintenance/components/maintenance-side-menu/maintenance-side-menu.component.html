@@ -1,8 +1,15 @@
 <div
-  *ngIf="{ currentMenuDepartments: currentMenuDepartments$ | async } as params"
+  *ngIf="{
+    currentMenuDepartments: currentMenuDepartments$ | async
+  } as params"
 >
   <mat-nav-list *ngFor="let page of pages">
-    <mat-list-item (click)="navigateToThis($event, page.id, null)">
+    <mat-list-item
+      (click)="navigateToThis($event, page.id, null)"
+      [ngClass]="{
+        'selected-menu-item': currentMenu?.id === page?.id
+      }"
+    >
       <span class="full-width" *ngIf="isExpanded || isShowing">{{
         page.name
       }}</span>
@@ -17,7 +24,11 @@
     <div
       class="submenu"
       [ngClass]="{ expanded: page?.id === currentMenu?.id }"
-      *ngIf="page?.id === currentMenu?.id && params?.currentMenuDepartments"
+      *ngIf="
+        page?.id === currentMenu?.id &&
+        params?.currentMenuDepartments &&
+        currentMenu?.children?.length > 0
+      "
     >
       <a
         mat-list-item

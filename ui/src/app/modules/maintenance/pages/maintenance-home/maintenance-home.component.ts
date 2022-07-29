@@ -1,4 +1,5 @@
 import { Component, OnInit, ViewChild } from "@angular/core";
+import { ActivatedRoute, Params } from "@angular/router";
 import { Store } from "@ngrx/store";
 import { Observable, of } from "rxjs";
 import { go } from "src/app/store/actions";
@@ -13,12 +14,15 @@ import { ItemPriceService } from "../../services/item-price.service";
 export class MaintenanceHomeComponent implements OnInit {
   pages: any[];
   currentMenuDepartments$: Observable<any[]>;
+  routeParams$: Observable<Params>;
   constructor(
     private store: Store<AppState>,
-    private itemPriceService: ItemPriceService
+    private itemPriceService: ItemPriceService,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
+    this.routeParams$ = this.route.params;
     this.pages = [
       {
         id: "price-list",
@@ -29,6 +33,7 @@ export class MaintenanceHomeComponent implements OnInit {
       { id: "users", name: "User Management" },
       { id: "drug", name: "Drug Management" },
       { id: "location", name: "Location Management" },
+      { id: "system-settings", name: "System Settings" },
     ];
 
     this.getDepartmentsForTheCurrentMenu(this.pages[0]);
@@ -44,6 +49,8 @@ export class MaintenanceHomeComponent implements OnInit {
       this.currentMenuDepartments$ = of(null);
     }
   }
+
+  getSelectedMenuItem(menuItem): void {}
 
   setRoute(event: Event, id: string): void {
     event.stopPropagation();

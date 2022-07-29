@@ -1,4 +1,11 @@
-import { Component, Input, OnInit, ViewChild } from "@angular/core";
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+  ViewChild,
+} from "@angular/core";
 import { MatSidenav } from "@angular/material/sidenav";
 import { Store } from "@ngrx/store";
 import { Observable, of } from "rxjs";
@@ -22,6 +29,8 @@ export class MaintenanceSideMenuComponent implements OnInit {
   isShowing = false;
   showSubSubMenu: boolean = false;
   currentMenuDepartments$: Observable<any[]>;
+
+  @Output() selectedMenuItem: EventEmitter<any> = new EventEmitter<any>();
   constructor(
     private itemPriceService: ItemPriceService,
     private store: Store<AppState>
@@ -29,6 +38,7 @@ export class MaintenanceSideMenuComponent implements OnInit {
 
   ngOnInit(): void {
     this.currentMenu = this.pages[0];
+    this.selectedMenuItem.emit(this.currentMenu);
     this.currentMenuDepartment = this.currentMenuDepartments[0];
     this.currentMenuDepartments$ = of(this.currentMenuDepartments);
     this.store.dispatch(
@@ -74,9 +84,16 @@ export class MaintenanceSideMenuComponent implements OnInit {
 
   navigateToThis(event: Event, id: string, department: any): void {
     this.currentMenuDepartment = department;
+    if (!department) {
+      this.currentMenu = (this.pages?.filter((page) => page?.id === id) ||
+        [])[0];
+      this.selectedMenuItem.emit(this.currentMenu);
+    }
     event.stopPropagation();
     const currentPath =
-      "/maintenance/" + id + (department ? "/" + department?.uuid : "");
+      "/maintenance/" +
+      id +
+      (department && department?.uuid ? "/" + department?.uuid : "");
     this.store.dispatch(
       go({
         path: [currentPath],
