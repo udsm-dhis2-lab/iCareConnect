@@ -20,6 +20,10 @@ export class SystemSettingsListComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.getSystemSettings();
+  }
+
+  getSystemSettings(): void {
     this.systemSettings$ =
       this.systemSettingsService.getSystemSettingsMatchingAKey(this.key, {
         startIndex: (this.page - 1) * this.pageSize,
@@ -29,13 +33,21 @@ export class SystemSettingsListComponent implements OnInit {
 
   openModal(event: Event, data: any, isNew?: boolean): void {
     event.stopPropagation();
-    this.dialog.open(ManageSystemSettingComponent, {
-      width: "40%",
-      data: {
-        ...(isNew ? data : {}),
-        isNew: isNew,
-      },
-    });
+    this.dialog
+      .open(ManageSystemSettingComponent, {
+        width: "40%",
+        data: {
+          ...(!isNew ? data : {}),
+          key: this.key,
+          isNew: isNew,
+        },
+      })
+      .afterClosed()
+      .subscribe((response) => {
+        if (response) {
+          this.getSystemSettings();
+        }
+      });
   }
 
   getItems(event: Event, action: string): void {

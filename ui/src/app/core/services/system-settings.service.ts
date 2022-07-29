@@ -101,12 +101,14 @@ export class SystemSettingsService {
   }
 
   updateSystemSettings(data): Observable<any> {
-    return this.httpClient.post(`systemsetting/${data?.uuid}`, data).pipe(
-      map((response) => {
-        return response;
-      }),
-      catchError((error) => of(error))
-    );
+    return this.httpClient
+      .post(`systemsetting/${data?.uuid ? data?.uuid : ""}`, data)
+      .pipe(
+        map((response) => {
+          return response;
+        }),
+        catchError((error) => of(error))
+      );
   }
 
   getiCareServicesConfigurations(): Observable<any[]> {

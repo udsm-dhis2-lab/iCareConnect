@@ -12,11 +12,12 @@ import { Textbox } from "src/app/shared/modules/form/models/text-box.model";
 })
 export class ManageSystemSettingComponent implements OnInit {
   dialogData: any;
-  formFields: any[];
+  formFields: any[] = [];
   isFormValid: boolean;
 
   data: any;
   savingData: boolean = false;
+  message: string = "";
   constructor(
     private dialogRef: MatDialogRef<ManageSystemSettingComponent>,
     @Inject(MAT_DIALOG_DATA) data,
@@ -28,23 +29,39 @@ export class ManageSystemSettingComponent implements OnInit {
   ngOnInit(): void {
     this.data = {
       value: "",
+      property: "",
       description: "",
       uuid: this.dialogData?.uuid,
     };
+    if (this.dialogData?.isNew) {
+      this.formFields = [
+        new Textbox({
+          id: "metakeyname",
+          key: "metakeyname",
+          required: true,
+          placeholder: "Key",
+          label: "Key",
+        }),
+      ];
+    }
     this.formFields = [
+      ...this.formFields,
       new Textbox({
         id: "value",
         key: "value",
         required: true,
         value: this.dialogData?.value ? this.dialogData?.value : null,
+        placeholder: "Value",
+        label: "Value",
       }),
       new TextArea({
         id: "description",
         key: "description",
-        required: true,
         value: this.dialogData?.description
           ? this.dialogData?.description
           : null,
+        placeholder: "Description",
+        label: "Description",
       }),
     ];
   }
@@ -52,6 +69,12 @@ export class ManageSystemSettingComponent implements OnInit {
   onFormUpdate(formValues: FormValue): void {
     this.data.value = formValues.getValues()["value"]?.value;
     this.data.description = formValues.getValues()["description"]?.value;
+    if (this.dialogData?.isNew) {
+      this.data.property =
+        this.dialogData?.key +
+        "." +
+        formValues.getValues()["metakeyname"]?.value;
+    }
     this.isFormValid = formValues.isValid;
   }
 
@@ -62,12 +85,17 @@ export class ManageSystemSettingComponent implements OnInit {
 
   onSave(event: Event): void {
     this.savingData = true;
+    this.message = "Saving data";
     event.stopPropagation();
     this.systemSettingsService
       .updateSystemSettings(this.data)
       .subscribe((response) => {
         if (response) {
+          this.message = "Successfully updated";
           this.savingData = false;
+          setTimeout(() => {
+            this.dialogRef.close(true);
+          }, 2000);
         }
       });
   }
