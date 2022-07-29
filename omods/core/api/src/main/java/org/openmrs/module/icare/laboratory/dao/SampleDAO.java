@@ -109,36 +109,73 @@ public class SampleDAO extends BaseDAO<Sample> {
 	}
 
 
-	public List<Sample> getSamplesByPatientAndOrDates(String patientId, Date startDate, Date endDate){
+	public List<Sample> getSamplesByVisitOrPatientAndOrDates(String visitId, String patient, Date startDate, Date endDate){
+
 		DbSession session = this.getSession();
-		String queryStr = "SELECT ls FROM Sample ls LEFT JOIN ls.visit v LEFT JOIN v.patient pnt WHERE pnt.uuid=:patientUuid";
-		if(startDate != null && endDate == null){
-//			Get Patient_id using the the UUID
-			String patient_id = "";
-//			String queryStr = "SELECT sp \n" + "FROM Sample sp \n"
-//					+ "LEFT JOIN Visit v ON sp.visit= v.visit_id \n"
-//					+ "LEFT JOIN Person p ON v.patient_id= p.patient_id \n"
-//					+ "WHERE p.patient_id = (SELECT p FROM Patient p JOIN PatientIdentifier pi ON pi.patient_id = p.patient_id WHERE pi.uuid = :patientUuid)"
-//					+ "AND (cast(sp.dateTime as date) BETWEEN :startDate AND :endDate \n"
-//					+ "OR cast(sp.dateCreated as date) BETWEEN :startDate AND :endDate)";
-			queryStr += " AND ls.dateCreated >= :startDate";
+
+		// General search query
+		String queryStr = "SELECT sp FROM Sample sp";
+
+		//If visit is provided, use visit instead
+		if(visitId != null && visitId.length() > 0){
+			queryStr = "SELECT sp \n" + "FROM Sample sp \n"
+					+ "WHERE sp.visit = (SELECT v FROM Visit v WHERE v.uuid = :visitUuid)";
 		}
 
-		if (startDate != null && endDate != null) {
-			queryStr += " AND ls.dateCreated >= :startDate AND ls.dateCreated <= :endDate";
+		//if no visit is provided but patient is provided
+		if((visitId == null || visitId.equals("")) && patient != null){
+			queryStr += " LEFT JOIN sp.visit v LEFT JOIN v.patient pnt WHERE pnt.uuid=:patientUuid";
 		}
-		
+
+		// if visit / patient is provided
+		if( visitId != null || patient != null ){
+			//if start date only is provided
+			if(startDate != null && endDate == null){
+				queryStr += " AND sp.dateCreated >= :startDate";
+			}
+
+			//if both dates are provided
+			if (startDate != null && endDate != null) {
+				queryStr += " AND sp.dateCreated >= :startDate AND sp.dateCreated <= :endDate";
+			}
+		}
+
+		// Append with dates if provided but no patient/visit number
+
+		if((visitId == null || visitId.equals(""))){
+			if (patient == null || patient.equals("")){
+				//if start date only is provided
+				if(startDate != null && endDate == null){
+					queryStr += " WHERE sp.dateCreated >= :startDate";
+				}
+				//if both dates are provided
+				if (startDate != null && endDate != null) {
+					queryStr += " WHERE sp.dateCreated >= :startDate AND sp.dateCreated <= :endDate";
+				}
+			}
+		}
+
+
+		//Construct a query object
 		Query query = session.createQuery(queryStr);
-		query.setParameter("patientUuid", patientId);
+
+		//Attach arguments accordingly
 		if (startDate != null) {
 			query.setParameter("startDate", startDate);
 		}
-		if (endDate != null) {
+		if (endDate != null && startDate != null) {
 			query.setParameter("endDate", endDate);
 		}
 
-		List data = query.list();
-		System.out.println(data);
+		if(visitId != null && visitId.length() > 0){
+			query.setParameter("visitUuid", visitId);
+		}
+
+		if((visitId == null || visitId.length() < 1) && patient != null){
+			query.setParameter("patientUuid", patient);
+		}
+
+
 		return query.list();
 	}
 

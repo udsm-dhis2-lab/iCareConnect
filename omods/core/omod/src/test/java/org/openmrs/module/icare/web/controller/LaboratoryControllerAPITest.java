@@ -173,23 +173,44 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 	}
 	
 	@Test
-	public void testGettingSampleByVisitUuid() throws Exception {
-		
-		MockHttpServletRequest newGetRequest = newGetRequest("lab/sample", new Parameter("patientId",
-		        "6a24f4e5-dc26-47f9-a624-c968c6b26d28"));
-		MockHttpServletResponse handleGet = handle(newGetRequest);
+	public void testGettingSampleByVisitOrPatientUuidAndOrDates() throws Exception {
 
-		System.out.println(handleGet.getContentAsString());
-		assertThat(
-		    "There is atleast 1 sample for the visit from lab-data.xml with patient uuid = 6a24f4e5-dc26-47f9-a624-c968c6b26d28",
-		    handleGet.getContentAsString().contains("6a24f4e5-dc26-47f9-a624-c968c6b26d28"));
+		MockHttpServletRequest newSampleGetByPatientRequest = newGetRequest("lab/sample");
 
-//		newGetRequest = newGetRequest("lab/sample", new Parameter("patientId",
-//				"d9c1d8ac-2b8e-427f-804d-b858c52e6f11"));
-//		handleGet = handle(newGetRequest);
-//		assertThat(
-//				"There is atleast 1 sample for the visit from lab-data.xml with visit id = d9c1d8ac-2b8e-427f-804d-b858c52e6f11",
-//				handleGet.getContentAsString().contains("d9c1d8ac-2b8e-427f-804d-b858c52e6f11"));
+		newSampleGetByPatientRequest.addParameter("patient", "660484f6-0d02-4e2a-8e0e-fd2f71906f81");
+		MockHttpServletResponse handleGet = handle(newSampleGetByPatientRequest);
+		System.out.println("Done testing with patient \n");
+		newSampleGetByPatientRequest.removeParameter("patient");
+
+		newSampleGetByPatientRequest.addParameter("visit","d9c1d8ac-2b8e-427f-804d-b858c52e6f11");
+//
+		handle(newSampleGetByPatientRequest);
+		System.out.println("Done testing with visit \n");
+		newSampleGetByPatientRequest.removeParameter("visit");
+//
+		newSampleGetByPatientRequest.addParameter("startDate","2022-01-01");
+//
+		handle(newSampleGetByPatientRequest);
+		System.out.println("Done testing with start date only \n");
+
+		newSampleGetByPatientRequest.addParameter("startDate","2022-01-01");
+		newSampleGetByPatientRequest.addParameter("endDate","2022-07-29");
+//
+		handle(newSampleGetByPatientRequest);
+		System.out.println("Done testing with start date and end date only \n");
+
+		newSampleGetByPatientRequest.addParameter("patient", "660484f6-0d02-4e2a-8e0e-fd2f71906f81");
+//
+		handle(newSampleGetByPatientRequest);
+		System.out.println("Done testing with start , end date and patient \n");
+		newSampleGetByPatientRequest.removeParameter("patient");
+
+
+		newSampleGetByPatientRequest.addParameter("visit","d9c1d8ac-2b8e-427f-804d-b858c52e6f11");
+//
+		handle(newSampleGetByPatientRequest);
+		System.out.println("Done testing with start , end date and visit \n");
+
 	}
 	
 	@Test
