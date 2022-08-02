@@ -64,6 +64,7 @@ import { CaptureSignatureComponent } from "./capture-signature/capture-signature
 import { MultipleItemsSelectionComponent } from "./multiple-items-selection/multiple-items-selection.component";
 import { SharedLocationSettingsComponent } from "./shared-location-settings/shared-location-settings.component";
 import { SharedLocationTypeSelectionComponent } from "./shared-location-type-selection/shared-location-type-selection.component";
+import { PatientListFiltersComponent } from "./patient-list-filters/patient-list-filters.component";
 
 export const components: any[] = [
   PatientSearchComponent,
@@ -132,6 +133,7 @@ export const components: any[] = [
   MultipleItemsSelectionComponent,
   SharedLocationSettingsComponent,
   SharedLocationTypeSelectionComponent,
+  PatientListFiltersComponent,
 ];
 
 export const sharedEntryComponents: any[] = [
