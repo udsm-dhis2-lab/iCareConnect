@@ -153,10 +153,7 @@
           'col-12': !params?.LISConfigurations?.isLIS
         }"
       >
-        <div
-          class="w-100 no-print"
-          *ngIf="showDate && params?.sampleTypes?.length > 0"
-        >
+        <div class="w-100 no-print" *ngIf="showDate">
           <mat-form-field appearance="fill" floatLabel="always">
             <mat-label>Select a date range</mat-label>
             <mat-date-range-input [rangePicker]="visitDatePicker">
