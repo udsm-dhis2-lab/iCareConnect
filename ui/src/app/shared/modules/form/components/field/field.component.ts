@@ -138,7 +138,7 @@ export class FieldComponent {
         field?.searchControlType === "concept" ||
         field?.conceptClass === "Diagnosis"
           ? "custom:(uuid,display,datatype,conceptClass,mappings)"
-          : "custom:(uuid,display,conceptClass)",
+          : "custom:(uuid,display)",
     };
     this.members$ = this.formService.searchItem(
       parameters,

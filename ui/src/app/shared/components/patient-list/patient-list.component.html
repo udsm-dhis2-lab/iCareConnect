@@ -1,4 +1,4 @@
-<div>
+<div *ngIf="{ filters: filters$ | async } as params">
   <div class="search-input-card p-2 border mb-3">
     <mat-icon matPrefix class="text-muted">search</mat-icon>
     <input
@@ -37,29 +37,11 @@
       class="w-100 patient-list-type-toggle-container d-flex"
     >
       <div class="w-75">
-        <mat-form-field class="float-left" appearance="fill">
-          <mat-label>Filter by Cash/Insurance</mat-label>
-          <mat-select [(ngModel)]="paymentTypeSelected">
-            <mat-option
-              (click)="getPaymentTypeSelected($event, null)"
-              [value]="null"
-            >
-              All
-            </mat-option>
-            <mat-option
-              (click)="getPaymentTypeSelected($event, 'Insurance')"
-              [value]="'Insurance'"
-            >
-              Insurance
-            </mat-option>
-            <mat-option
-              (click)="getPaymentTypeSelected($event, 'Cash')"
-              [value]="'Cash'"
-            >
-              Cash
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
+        <app-patient-list-filters
+          *ngIf="params?.filters"
+          [filterCategories]="params?.filters"
+        ></app-patient-list-filters>
+
         <!-- <button
           mat-button
           class="ml-2 float-left"

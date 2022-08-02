@@ -37,36 +37,47 @@ export class SystemSettingsService {
   }
 
   getSystemSettingsMatchingAKey(
-    key: string
+    key: string,
+    parameters?: { startIndex: number; limit: number }
   ): Observable<SystemSettingsWithKeyDetails[]> {
     // lis.attributes.referringDoctor
-    return this.httpClient.get(`systemsetting?q=${key}&v=full`).pipe(
-      map((response) => {
-        return response?.results && response?.results?.length > 0
-          ? response?.results.map((result) => {
-              return result?.value.indexOf("{") > -1 ||
-                result?.value.indexOf("[") > -1
-                ? {
-                    name: result?.property
-                      .split(".")
-                      [result?.property.split(".").length - 1]?.toUpperCase(),
-                    property: result?.property,
-                    value: result?.value,
-                  }
-                : {
-                    name: capitalize(
-                      result?.property.split(".")[
-                        result?.property.split(".").length - 1
-                      ]
-                    ),
-                    property: result?.property,
-                    value: result?.value,
-                  };
-            })
-          : [];
-      }),
-      catchError((error) => of(error))
-    );
+    return this.httpClient
+      .get(
+        `systemsetting?q=${key}&v=full${
+          parameters?.startIndex ? "&startIndex=" + parameters?.startIndex : ""
+        }${parameters?.limit ? "&limit=" + parameters?.limit : ""}`
+      )
+      .pipe(
+        map((response) => {
+          return response?.results && response?.results?.length > 0
+            ? response?.results.map((result) => {
+                return result?.value.indexOf("{") > -1 ||
+                  result?.value.indexOf("[") > -1
+                  ? {
+                      uuid: result?.uuid,
+                      name: result?.property
+                        .split(".")
+                        [result?.property.split(".").length - 1]?.toUpperCase(),
+                      property: result?.property,
+                      description: result?.description,
+                      value: result?.value,
+                    }
+                  : {
+                      uuid: result?.uuid,
+                      name: capitalize(
+                        result?.property.split(".")[
+                          result?.property.split(".").length - 1
+                        ]
+                      ),
+                      property: result?.property,
+                      description: result?.description,
+                      value: result?.value,
+                    };
+              })
+            : [];
+        }),
+        catchError((error) => of(error))
+      );
   }
 
   getSystemSettingsDetailsByKey(key: string): Observable<any> {
@@ -74,6 +85,7 @@ export class SystemSettingsService {
       map((response) => {
         return {
           uuid: response?.results[0]?.uuid,
+          description: response?.results[0]?.description,
           key,
           value:
             response?.results && response?.results[0]
@@ -89,12 +101,14 @@ export class SystemSettingsService {
   }
 
   updateSystemSettings(data): Observable<any> {
-    return this.httpClient.post(`systemsetting/${data?.uuid}`, data).pipe(
-      map((response) => {
-        return response;
-      }),
-      catchError((error) => of(error))
-    );
+    return this.httpClient
+      .post(`systemsetting/${data?.uuid ? data?.uuid : ""}`, data)
+      .pipe(
+        map((response) => {
+          return response;
+        }),
+        catchError((error) => of(error))
+      );
   }
 
   getiCareServicesConfigurations(): Observable<any[]> {

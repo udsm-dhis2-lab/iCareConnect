@@ -4,7 +4,7 @@
     (formUpdate)="onFormUpdate($event)"
   ></app-form> -->
 
-  <div class="tests-control">
+  <!-- <div class="tests-control">
     <mat-radio-group class="test-selection-category">
       <mat-radio-button
         [title]="
@@ -31,14 +31,21 @@
         All
       </mat-radio-button>
     </mat-radio-group>
-  </div>
+  </div> -->
 
-  <app-multiple-concepts-selection
+  <!-- <app-multiple-concepts-selection
     *ngIf="params?.conceptsList"
     [concepts]="params?.conceptsList"
     [selectedSetMembersItems]="selectedSetMembersItems"
     (selectedSetMembers)="onGetSelectedMembers($event)"
-  ></app-multiple-concepts-selection>
+  ></app-multiple-concepts-selection> -->
+  <app-multiple-items-selection
+    [items]="[]"
+    [itemType]="'concept'"
+    [standardSearchTerm]="'TEST_ORDERS'"
+    [selectedItems]="selectedSetMembersItems"
+    (getSelectedItems)="onGetSelectedMembers($event)"
+  ></app-multiple-items-selection>
 
   <mat-progress-bar
     *ngIf="!params?.conceptsList"

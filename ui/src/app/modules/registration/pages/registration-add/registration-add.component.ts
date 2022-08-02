@@ -31,6 +31,7 @@ import { DATE_FORMATS_DD_MM_YYYY } from "src/app/core/constants/date-formats.con
 import { Textbox } from "src/app/shared/modules/form/models/text-box.model";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
 import { PhoneNumber } from "src/app/shared/modules/form/models/phone-number.model";
+import { ConceptsService } from "src/app/shared/resources/concepts/services/concepts.service";
 
 @Component({
   selector: "app-registration-add",
@@ -67,6 +68,9 @@ export class RegistrationAddComponent implements OnInit {
   currentMRN: number;
   currentMRNUuid: string;
 
+  // New variables
+  genderOptions$: Observable<any[]>;
+
   constructor(
     private _snackBar: MatSnackBar,
     private router: Router,
@@ -77,7 +81,8 @@ export class RegistrationAddComponent implements OnInit {
     private locationService: LocationService,
     private dialog: MatDialog,
     private systemSettingsService: SystemSettingsService,
-    private identifierService: IdentifiersService
+    private identifierService: IdentifiersService,
+    private conceptService: ConceptsService
   ) {}
 
   get mandatoryFieldsMissing(): boolean {
@@ -210,6 +215,10 @@ export class RegistrationAddComponent implements OnInit {
 
   ngOnInit(): void {
     this.currentLocation$ = this.store.select(getCurrentLocation);
+    this.genderOptions$ = this.conceptService.getConceptDetailsByUuid(
+      "bad70d90-9bac-401a-8c49-a440f6a07bf5",
+      "custom:(uuid,display,names,answers:(uuid,display,names,mappings))"
+    );
     this.loadingForm = true;
 
     zip(

@@ -28,7 +28,7 @@ import { VisitsService } from "src/app/shared/resources/visits/services";
 import { SamplesService } from "src/app/shared/services/samples.service";
 import { BarCodeModalComponent } from "../../../sample-acceptance-and-results/components/bar-code-modal/bar-code-modal.component";
 
-import { uniqBy, keyBy } from "lodash";
+import { uniqBy, keyBy, omit } from "lodash";
 import { OrdersService } from "src/app/shared/resources/order/services/orders.service";
 import { SampleRegistrationFinalizationComponent } from "../sample-registration-finalization/sample-registration-finalization.component";
 
@@ -312,6 +312,11 @@ export class SingleRegistrationComponent implements OnInit {
   }
 
   onFormUpdateForTest(testValues: any): void {
+    Object.keys(this.formData).forEach((key) => {
+      if (!testValues[key]) {
+        this.formData = omit(this.formData, key);
+      }
+    });
     this.formData = { ...this.formData, ...testValues };
     Object.keys(this.formData).forEach((key) => {
       if (key.indexOf("test") === 0) {
@@ -327,6 +332,11 @@ export class SingleRegistrationComponent implements OnInit {
       }
     });
     this.groupedTestOrdersByDepartments = formulateSamplesByDepartments(
+      this.labSections,
+      this.testOrders
+    );
+
+    const allTestHaveDepartment = determineIfAtLeastOneTestHasNoDepartment(
       this.labSections,
       this.testOrders
     );
@@ -569,7 +579,10 @@ export class SingleRegistrationComponent implements OnInit {
                         visitType: "54e8ffdc-dea0-4ef0-852f-c23e06d16066",
                         location: this.currentLocation?.uuid,
                         indication: "Sample Registration",
-                        attributes: visAttributes,
+                        attributes:
+                          visAttributes.filter(
+                            (attribute) => attribute?.value
+                          ) || [],
                       };
 
                       this.visitsService

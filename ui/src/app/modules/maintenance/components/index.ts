@@ -2,6 +2,7 @@ import { MaintenanceSideMenuComponent } from "./maintenance-side-menu/maintenanc
 import { PriceListComponent } from "./price-list/price-list.component";
 import { PricingItemComponent } from "./pricing-item/pricing-item.component";
 import { ProviderAttributesFormComponent } from "./provider-attributes-form/provider-attributes-form.component";
+import { SystemSettingsListComponent } from "./system-settings-list/system-settings-list.component";
 import { UsersListComponent } from "./users-list/users-list.component";
 
 export const maintenanceComponents: any[] = [
@@ -10,4 +11,5 @@ export const maintenanceComponents: any[] = [
   UsersListComponent,
   ProviderAttributesFormComponent,
   MaintenanceSideMenuComponent,
+  SystemSettingsListComponent,
 ];

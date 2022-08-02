@@ -33,7 +33,23 @@ export class ConceptsService {
   getConceptDetailsByUuid(uuid: string, fields: string): Observable<any> {
     return this.httpClient.get("concept/" + uuid + "?v=" + fields).pipe(
       map((response) => {
-        return response;
+        return {
+          ...response,
+          answers:
+            response?.answers && response?.answers?.length > 0
+              ? response?.answers.map((answer) => {
+                  return {
+                    ...answer,
+                    code:
+                      answer?.names && answer?.names?.length > 0
+                        ? (answer?.names?.filter(
+                            (name) => name?.conceptNameType === "SHORT"
+                          ) || [])[0]?.name
+                        : "",
+                  };
+                })
+              : [],
+        };
       }),
       catchError((error) => {
         return of(error);
