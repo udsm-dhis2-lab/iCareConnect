@@ -1,14 +1,15 @@
 import { Injectable } from "@angular/core";
 import { OpenmrsHttpClientService } from "src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service";
-import { Observable, of } from "rxjs";
+import { from, Observable, of } from "rxjs";
 import { catchError, map } from "rxjs/operators";
 import { head } from "lodash";
+import { Api, LocationtagGetFull } from "src/app/shared/resources/openmrs";
 
 @Injectable({
   providedIn: "root",
 })
 export class LocationService {
-  constructor(private httpClient: OpenmrsHttpClientService) {}
+  constructor(private httpClient: OpenmrsHttpClientService, private api: Api) {}
 
   getLoginLocations(): Observable<any> {
     return this.httpClient
@@ -92,9 +93,24 @@ export class LocationService {
       );
   }
 
-  getLocationsByTagName(tagName): Observable<any[]> {
+  getLocationsByTagName(
+    tagName: string,
+    parameters?: { limit: number; startIndex: number }
+  ): Observable<any[]> {
+    let othersParameters = "";
+    if (parameters?.limit) {
+      othersParameters += `&limit=${parameters?.limit}`;
+    }
+    if (parameters?.startIndex) {
+      othersParameters += `&startIndex=${parameters?.startIndex}`;
+    }
     return this.httpClient
-      .get("location?tag=" + tagName + "&v=full&limit=100")
+      .get(
+        "location?tag=" +
+          tagName +
+          "&v=full" +
+          (othersParameters != "" ? othersParameters : "&limit=100")
+      )
       .pipe(
         map((response) => {
           return response?.results.map((result) => {
@@ -116,6 +132,13 @@ export class LocationService {
       map((res: any) => {
         return head((res?.results || []).map((payload) => payload?.value));
       })
+    );
+  }
+
+  getLocationTags(): Observable<LocationtagGetFull[]> {
+    return from(this.api.locationtag.getAllLocationTags()).pipe(
+      map((response) => response?.results),
+      catchError((error) => of(error))
     );
   }
 }

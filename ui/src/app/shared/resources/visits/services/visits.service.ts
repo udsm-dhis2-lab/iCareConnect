@@ -565,7 +565,8 @@ export class VisitsService {
     ).pipe(
       map((response) => {
         return response?.results;
-      })
+      }),
+      catchError((error) => of(error))
     );
   }
 }
