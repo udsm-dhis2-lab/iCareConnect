@@ -45,6 +45,7 @@ export class PatientListComponent implements OnInit, OnChanges {
   @Input() orderStatus: string;
   @Input() orderStatusCode: string;
   @Input() filterCategory: string;
+
   page: number = 0;
   visits$: Observable<Visit[]>;
   searchTerm: string;
@@ -67,6 +68,7 @@ export class PatientListComponent implements OnInit, OnChanges {
   ngOnChanges() {}
 
   ngOnInit() {
+
     this.filters$ = this.systemSettingsService.getSystemSettingsMatchingAKey(
       "iCare.filters." + (this.filterCategory ? this.filterCategory : "")
     );
@@ -225,7 +227,7 @@ export class PatientListComponent implements OnInit, OnChanges {
     );
   }
 
-  getPaymentTypeSelected(event: Event, paymentType) {
+  getPaymentTypeSelected(event: Event, paymentType: string) {
     event.stopPropagation();
     this.paymentTypeSelected = "";
     setTimeout(() => {
@@ -256,5 +258,9 @@ export class PatientListComponent implements OnInit, OnChanges {
           // );
         }
       });
+  }
+
+  filterPatientList(event: Event){
+    console.log("Filtering values : ",event);
   }
 }
