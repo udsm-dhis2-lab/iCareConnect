@@ -62,6 +62,8 @@ import { LoaderComponent } from "./loader/loader.component";
 import { MultipleConceptsSelectionComponent } from "./multiple-concepts-selection/multiple-concepts-selection.component";
 import { CaptureSignatureComponent } from "./capture-signature/capture-signature.component";
 import { MultipleItemsSelectionComponent } from "./multiple-items-selection/multiple-items-selection.component";
+import { SharedLocationSettingsComponent } from "./shared-location-settings/shared-location-settings.component";
+import { SharedLocationTypeSelectionComponent } from "./shared-location-type-selection/shared-location-type-selection.component";
 
 export const components: any[] = [
   PatientSearchComponent,
@@ -128,6 +130,8 @@ export const components: any[] = [
   MultipleConceptsSelectionComponent,
   CaptureSignatureComponent,
   MultipleItemsSelectionComponent,
+  SharedLocationSettingsComponent,
+  SharedLocationTypeSelectionComponent,
 ];
 
 export const sharedEntryComponents: any[] = [
