@@ -14,6 +14,9 @@ export class SystemSettingsListComponent implements OnInit {
   page: number = 1;
   pageSize: number = 10;
   @Input() key: string;
+  error: any;
+
+  saving: boolean = false;
   constructor(
     private systemSettingsService: SystemSettingsService,
     private dialog: MatDialog
@@ -58,5 +61,27 @@ export class SystemSettingsListComponent implements OnInit {
         startIndex: (this.page - 1) * this.pageSize,
         limit: this.pageSize,
       });
+  }
+
+  onDelete(event: Event, systemSettingUid: string): void {
+    event.stopPropagation();
+    this.saving = true;
+    this.systemSettingsService
+      .deleteSystemSettingByUuid(systemSettingUid)
+      .subscribe((response) => {
+        if (response && !response?.error) {
+          this.error = null;
+          this.saving = false;
+          this.getSystemSettings();
+        } else if (response && response?.error) {
+          this.saving = false;
+          this.error = response?.error;
+        }
+      });
+  }
+
+  onClose(event: Event): void {
+    event.stopPropagation();
+    this.error = null;
   }
 }
