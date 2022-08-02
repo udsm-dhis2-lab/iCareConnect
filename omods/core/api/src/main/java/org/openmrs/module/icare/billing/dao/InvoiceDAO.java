@@ -50,6 +50,7 @@ public class InvoiceDAO extends BaseDAO<Invoice> {
 	
 	public List<Invoice> findByPatientUuidAndPending(String patientUuid) {
 		DbSession session = this.getSession();
+		//TODO consider discount calculation
 		String queryStr = "SELECT invoice FROM Invoice invoice WHERE \n" + "invoice.visit.patient.uuid = :patientUuid \n"
 		        + "AND (SELECT SUM(item.price*item.quantity) FROM InvoiceItem item WHERE item.id.invoice = invoice) \n"
 		        + "> (SELECT CASE WHEN SUM(pi.amount) IS NULL THEN 0 ELSE SUM(pi.amount) END FROM " + "PaymentItem pi " +
