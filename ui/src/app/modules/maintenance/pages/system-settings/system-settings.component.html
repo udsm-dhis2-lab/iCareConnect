@@ -32,4 +32,11 @@
       <app-system-settings-list [key]="'dhis2'"></app-system-settings-list>
     </ng-template>
   </mat-tab>
+  <mat-tab label="Location Types">
+    <ng-template matTabContent>
+      <app-system-settings-list
+        [key]="'icare.location.types'"
+      ></app-system-settings-list>
+    </ng-template>
+  </mat-tab>
 </mat-tab-group>

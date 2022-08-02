@@ -25,6 +25,7 @@ import { clearBillItems } from "src/app/store/actions/bill-item.actions";
 import { PatientListDialogComponent } from "../../dialogs";
 import { MatDialog } from "@angular/material/dialog";
 import { go } from "src/app/store/actions";
+import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 
 @Component({
   selector: "app-patient-list",
@@ -43,6 +44,7 @@ export class PatientListComponent implements OnInit, OnChanges {
   @Input() orderType: string;
   @Input() orderStatus: string;
   @Input() orderStatusCode: string;
+  @Input() filterCategory: string;
   page: number = 0;
   visits$: Observable<Visit[]>;
   searchTerm: string;
@@ -50,18 +52,24 @@ export class PatientListComponent implements OnInit, OnChanges {
   locationsUuids: string[] = [];
   paymentTypeSelected: string;
 
+  filters$: Observable<any[]>;
+
   @Output() selectPatient = new EventEmitter<any>();
   constructor(
     private visitService: VisitsService,
     private store: Store<AppState>,
     private route: ActivatedRoute,
     private router: Router,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private systemSettingsService: SystemSettingsService
   ) {}
 
   ngOnChanges() {}
 
   ngOnInit() {
+    this.filters$ = this.systemSettingsService.getSystemSettingsMatchingAKey(
+      "iCare.filters." + (this.filterCategory ? this.filterCategory : "")
+    );
     if (this.defaultFilter) {
       this.paymentTypeSelected = this.defaultFilter;
     }

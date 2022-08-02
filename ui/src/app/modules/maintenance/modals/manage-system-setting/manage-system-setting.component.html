@@ -20,7 +20,7 @@
   <div class="p-1 mt-2 mb-2 d-flex justify-content-end" *ngIf="!message">
     <button mat-stroked-button (click)="onCancel($event)">Cancel</button>
     <button
-      [disabled]="!isFormValid"
+      [disabled]="!isFormValid && dataType != 'Boolean'"
       mat-stroked-button
       class="ml-2"
       color="primary"

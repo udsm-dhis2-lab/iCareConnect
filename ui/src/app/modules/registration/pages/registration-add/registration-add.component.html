@@ -3,7 +3,8 @@
   *ngIf="{
     currentLocation: currentLocation$ | async,
     updateCurrentMRNSystemSettingsResponse:
-      updateCurrentMRNSystemSettingsResponse$ | async
+      updateCurrentMRNSystemSettingsResponse$ | async,
+    genderOptions: genderOptions$ | async
   } as params"
 >
   <h2>{{ editMode ? "Edit Patient" : "Register New Patient" }}</h2>
@@ -207,8 +208,12 @@
                 placeholder="Select Gender"
                 [disabled]="addingPatient && !patientAdded"
               >
-                <mat-option value="M"> Male </mat-option>
-                <mat-option value="F"> Female </mat-option>
+                <mat-option
+                  [value]="option?.code ? option?.code : option?.display"
+                  *ngFor="let option of params?.genderOptions?.answers"
+                >
+                  {{ option?.display }}
+                </mat-option>
               </mat-select>
               <mat-error> Gender is a mandatory field </mat-error>
             </mat-form-field>
