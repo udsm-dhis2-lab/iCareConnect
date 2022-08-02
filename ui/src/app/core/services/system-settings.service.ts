@@ -1,15 +1,16 @@
 import { Injectable } from "@angular/core";
-import { Observable, of } from "rxjs";
+import { from, Observable, of } from "rxjs";
 import { catchError, map } from "rxjs/operators";
 import { OpenmrsHttpClientService } from "src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service";
 import { SystemSettingsWithKeyDetails } from "../models/system-settings.model";
 import { capitalize } from "lodash";
+import { Api } from "src/app/shared/resources/openmrs";
 
 @Injectable({
   providedIn: "root",
 })
 export class SystemSettingsService {
-  constructor(private httpClient: OpenmrsHttpClientService) {}
+  constructor(private httpClient: OpenmrsHttpClientService, private api: Api) {}
 
   getFormPrivilegesConfigs(): Observable<any> {
     return this.httpClient
@@ -32,6 +33,13 @@ export class SystemSettingsService {
             : response?.results[0]?.value
           : "";
       }),
+      catchError((error) => of(error))
+    );
+  }
+
+  deleteSystemSettingByUuid(uuid: string): Observable<any> {
+    return from(this.api.systemsetting.deleteSystemSetting(uuid)).pipe(
+      map((response) => response),
       catchError((error) => of(error))
     );
   }
