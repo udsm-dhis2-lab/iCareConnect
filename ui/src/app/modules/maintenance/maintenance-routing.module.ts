@@ -8,6 +8,7 @@ import {
   EditUserComponent,
   PriceListHomeComponent,
 } from "./pages";
+import { SystemSettingsComponent } from "./pages/system-settings/system-settings.component";
 
 // TODO: Improve routing, at least include child routing
 const routes: Routes = [
@@ -43,6 +44,10 @@ const routes: Routes = [
       {
         path: "users/edit-user",
         component: EditUserComponent,
+      },
+      {
+        path: "system-settings",
+        component: SystemSettingsComponent,
       },
     ],
   },

@@ -5,7 +5,10 @@
   <h1 class="example-app-name">Nested Menus</h1>
 </mat-toolbar> -->
 <div
-  *ngIf="{ currentMenuDepartments: currentMenuDepartments$ | async } as params"
+  *ngIf="{
+    currentMenuDepartments: currentMenuDepartments$ | async,
+    routeParams: routeParams$ | async
+  } as params"
 >
   <mat-progress-bar
     *ngIf="!params?.currentMenuDepartments"
@@ -20,6 +23,7 @@
       <app-maintenance-side-menu
         [pages]="pages"
         [currentMenuDepartments]="params?.currentMenuDepartments"
+        (selectedMenuItem)="getSelectedMenuItem($event)"
       ></app-maintenance-side-menu>
     </mat-sidenav>
 

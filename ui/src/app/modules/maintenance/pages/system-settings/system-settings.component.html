@@ -1,0 +1,42 @@
+<mat-tab-group>
+  <mat-tab label="Billing">
+    <ng-template matTabContent>
+      <app-system-settings-list
+        [key]="'icare.billing'"
+      ></app-system-settings-list>
+    </ng-template>
+  </mat-tab>
+  <mat-tab label="Integration">
+    <ng-template matTabContent>
+      <app-system-settings-list
+        [key]="'icare.integration'"
+      ></app-system-settings-list>
+    </ng-template>
+  </mat-tab>
+  <mat-tab label="Users">
+    <ng-template matTabContent>
+      <app-system-settings-list
+        [key]="'icare.person'"
+      ></app-system-settings-list>
+    </ng-template>
+  </mat-tab>
+  <mat-tab label="Registration">
+    <ng-template matTabContent>
+      <app-system-settings-list
+        [key]="'icare.registration'"
+      ></app-system-settings-list>
+    </ng-template>
+  </mat-tab>
+  <mat-tab label="DHIS2">
+    <ng-template matTabContent>
+      <app-system-settings-list [key]="'dhis2'"></app-system-settings-list>
+    </ng-template>
+  </mat-tab>
+  <mat-tab label="Location Types">
+    <ng-template matTabContent>
+      <app-system-settings-list
+        [key]="'icare.location.types'"
+      ></app-system-settings-list>
+    </ng-template>
+  </mat-tab>
+</mat-tab-group>

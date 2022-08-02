@@ -148,7 +148,22 @@ export class LaboratoryComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.titleService.setTitle("NPHL IS");
+    this.LISConfigurations$.subscribe((response) => {
+      if (response && response?.isLIS) {
+        this.titleService.setTitle("NPHL IS");
+      }
+    });
+    // evaluate condition for showing date
+    const currentPath = JSON.parse(localStorage.getItem("navigationDetails"))
+      ?.path[0];
+    if (
+      currentPath?.indexOf("sample-collection") == -1 &&
+      currentPath?.indexOf("settings") == -1 &&
+      currentPath?.indexOf("reports") == -1
+    ) {
+      this.showDate = true;
+    }
+
     this.url$ = this.route.url.pipe(map((segments) => segments.join("")));
     this.userRoles$ = this.store.select(getAllUSerRoles);
     // this.store.dispatch(loadSessionDetails());
