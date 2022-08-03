@@ -58,7 +58,10 @@
       </button>
     </div>
     <div class="d-flex justify-content-end" *ngIf="!errorMessage">
-      <button class="add-button" (click)="openModal($event, locationTag)">
+      <button
+        class="add-button"
+        (click)="openModal($event, locationTag, locations[0]?.parentLocation)"
+      >
         New
       </button>
     </div>

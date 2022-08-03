@@ -2,7 +2,11 @@ import { Component, Input, OnInit } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { Observable } from "rxjs";
 import { LocationService } from "src/app/core/services";
-import { LocationGetFull, LocationtagGetFull } from "../../resources/openmrs";
+import {
+  LocationGet,
+  LocationGetFull,
+  LocationtagGetFull,
+} from "../../resources/openmrs";
 import { ManageLocationModalComponent } from "../manage-location-modal/manage-location-modal.component";
 import { RetireMetadataReasonModalComponent } from "../retire-metadata-reason-modal/retire-metadata-reason-modal.component";
 
@@ -39,15 +43,21 @@ export class SharedLocationSettingsComponent implements OnInit {
     );
   }
 
-  openModal(event: Event, locationTag: any): void {
+  openModal(event: Event, locationTag: any, parentLocation: LocationGet): void {
     event.stopPropagation();
-    this.dialog.open(ManageLocationModalComponent, {
-      width: "50%",
-      data: {
-        locationTag,
-        locationTags: this.locationTags,
-      },
-    });
+    this.dialog
+      .open(ManageLocationModalComponent, {
+        width: "40%",
+        data: {
+          locationTag,
+          locationTags: this.locationTags,
+          parentLocation: parentLocation?.uuid,
+        },
+      })
+      .afterClosed()
+      .subscribe(() => {
+        this.getLocations();
+      });
   }
 
   getItems(event: Event, actionType: string): void {
@@ -64,6 +74,7 @@ export class SharedLocationSettingsComponent implements OnInit {
       .subscribe((response) => {
         if (response && !response?.error) {
           this.saving = false;
+          this.getLocations();
         } else {
           this.errorMessage = response?.error?.message;
           this.saving = false;
@@ -72,7 +83,6 @@ export class SharedLocationSettingsComponent implements OnInit {
   }
 
   onRetire(event: Event, location: LocationtagGetFull): void {
-    console.log(location);
     this.dialog
       .open(RetireMetadataReasonModalComponent, {
         width: "40%",
@@ -87,14 +97,7 @@ export class SharedLocationSettingsComponent implements OnInit {
           this.locationService
             .deleteLocation(location?.uuid, false)
             .subscribe((response) => {
-              console.log(response);
-              this.locationsByTag$ = this.locationService.getLocationsByTagName(
-                this.locationTag?.display,
-                {
-                  limit: this.pageSize,
-                  startIndex: (this.page - 1) * this.pageSize,
-                }
-              );
+              this.getLocations();
               return response;
             });
         }
