@@ -35,6 +35,8 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	
 	SampleLableDAO sampleLableDAO;
 	
+	TestOrderLocationDAO testOrderLocationDAO;
+	
 	public void setSampleDAO(SampleDAO sampleDAO) {
 		this.sampleDAO = sampleDAO;
 	}
@@ -521,6 +523,29 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 		
 		return testAllocationsStatuses.size();
 		
+	}
+	
+	@Override
+	public TestOrderLocation addTestOrderWithLocation(TestOrderLocation testOrderLocation) {
+
+		Concept concept = Context.getConceptService().getConceptByUuid(testOrderLocation.getConcept().getUuid());
+		Location location = Context.getLocationService().getLocationByUuid(testOrderLocation.getLocation().getUuid());
+		//User user = Context.getUserService().getUserByUuid(testOrderLocation.getUser().getUuid());
+		User user = Context.getAuthenticatedUser();
+		Date date = new Date();
+
+
+		testOrderLocation.setConcept(concept);
+		testOrderLocation.setLocation(location);
+		testOrderLocation.setUser(user);
+		testOrderLocation.setDateTime(date);
+
+
+		System.out.println(testOrderLocation.toMap());
+
+		testOrderLocationDAO.save(testOrderLocation);
+
+		return testOrderLocation;
 	}
 	
 }

@@ -544,4 +544,12 @@ public class LaboratoryController {
 		
 	}
 	
+	@RequestMapping(value = "testorderlocation", method = RequestMethod.POST)
+	@ResponseBody
+	public TestOrderLocation createTestOrderWithLocation(@RequestBody Map<String, Object> testOrderLocation) {
+
+		return laboratoryService.addTestOrderWithLocation(TestOrderLocation.fromMap(testOrderLocation));
+		
+	}
+	
 }

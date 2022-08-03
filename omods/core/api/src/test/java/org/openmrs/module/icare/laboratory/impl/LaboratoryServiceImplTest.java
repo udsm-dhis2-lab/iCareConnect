@@ -5,15 +5,18 @@ import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.openmrs.Concept;
+import org.openmrs.Location;
 import org.openmrs.User;
 import org.openmrs.api.UserService;
 import org.openmrs.module.icare.laboratory.LaboratoryTestBase;
 import org.openmrs.module.icare.laboratory.dao.SampleDAO;
 import org.openmrs.module.icare.laboratory.dao.SampleStatusDAO;
+import org.openmrs.module.icare.laboratory.dao.TestOrderLocationDAO;
 import org.openmrs.module.icare.laboratory.models.Sample;
+import org.openmrs.module.icare.laboratory.models.TestOrderLocation;
 import org.openmrs.module.icare.laboratory.models.SampleStatus;
 import org.openmrs.module.icare.laboratory.services.LaboratoryServiceImpl;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -22,6 +25,9 @@ public class LaboratoryServiceImplTest extends LaboratoryTestBase {
 	
 	@Mock
 	SampleDAO sampleDAO;
+	
+	@Mock
+	TestOrderLocationDAO testOrderLocationDAO;
 	
 	@Mock
 	SampleStatusDAO sampleStatusDAO;
@@ -81,7 +87,34 @@ public class LaboratoryServiceImplTest extends LaboratoryTestBase {
 		//assertThat("ID was created", createdSampleStatus.getId() == sampleStatus.getId());
 	}
 	
-	/*
+//	@Test
+//	//@DisplayName("Creating A TestOrderLocation")
+//	public void testingTestOrderLocation() {
+//
+//		//Given
+//		TestOrderLocation testOrderLocation = new TestOrderLocation();
+//		//testOrderLocation.setId(1);
+//
+//		Concept cnConcept = new Concept();
+//		cnConcept.setUuid("00000003IIIIIIIIIIIIIIIIIIIIIIIIIIII");
+//
+//		Location location = new Location();
+//		location.setUuid("4748646b-81b0-4d76-81e5-7957469d4ab5");
+//
+//		testOrderLocation.setConcept(cnConcept);
+//		testOrderLocation.setLocation(location);
+//
+//		//TestOrderLocation newTestOrderLocation = testOrderLocation;
+//
+//		//When
+//		TestOrderLocation createdTestOrderLocation = laboratoryService.addTestOrderWithLocation(testOrderLocation);
+//
+//		//Then
+//		verify(testOrderLocationDAO).save(testOrderLocation);
+//		assertThat("Test Order was created", location.getUuid() == createdTestOrderLocation.getLocation().getUuid());
+//	}
+	
+	/*testOrderLocationDAO
 	@Test
 	//@DisplayName("Allocating a tes")
 	public void testingAllocatingATest(){
