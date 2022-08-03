@@ -2,7 +2,7 @@ import { Component, OnInit } from "@angular/core";
 import { Observable } from "rxjs";
 import { Store } from "@ngrx/store";
 import { ActivatedRoute, NavigationEnd, Router } from "@angular/router";
-import { map, take } from "rxjs/operators";
+import { map } from "rxjs/operators";
 import { AppState } from "src/app/store/reducers";
 import {
   getAllUSerRoles,
@@ -14,15 +14,11 @@ import {
   loadLabConfigurations,
   setVisitsParameters,
   clearLoadedLabSamples,
-  loadActiveVisitsWithLabOrders,
-  loadCurrentUserDetails,
   loadSampleTypes,
-  loadSessionDetails,
   clearLoadedLabOrders,
   loadRolesDetails,
   loadOrderTypes,
   go,
-  loadLISConfigurations,
 } from "src/app/store/actions";
 import { loadSpecimenSources } from "./store/actions/specimen-sources-and-tests-management.actions";
 import { getAllSampleTypes } from "src/app/store/selectors";
@@ -50,7 +46,7 @@ export class LaboratoryComponent implements OnInit {
   selectedDay: Date = new Date();
   today: Date = new Date();
   url$: Observable<any>;
-  showDate: Boolean = false;
+  showDate: boolean = false;
   startDate: any;
   endDate: any;
   datesRangeDifference: number = 5;
@@ -88,7 +84,7 @@ export class LaboratoryComponent implements OnInit {
         // console.log(currentRoute);
 
         if (currentRoute?.url?.includes("/sample-acceptance-and-results")) {
-          this.enableDate(this.datesRangeDifference);
+          this.enableDate(this.datesRangeDifference, this.showDate);
           this.currentSubModule = "acceptance";
           this.store.dispatch(
             go({
@@ -96,7 +92,7 @@ export class LaboratoryComponent implements OnInit {
             })
           );
         } else if (currentRoute?.url?.includes("/sample-tracking")) {
-          this.enableDate(this.datesRangeDifference);
+          this.enableDate(this.datesRangeDifference, this.showDate);
           this.currentSubModule = "tracking";
           this.store.dispatch(
             go({
@@ -159,9 +155,12 @@ export class LaboratoryComponent implements OnInit {
     if (
       currentPath?.indexOf("sample-collection") == -1 &&
       currentPath?.indexOf("settings") == -1 &&
-      currentPath?.indexOf("reports") == -1
+      currentPath?.indexOf("reports") == -1 &&
+      currentPath?.indexOf("sample-registration") == -1
     ) {
       this.showDate = true;
+    } else {
+      this.showDate = false;
     }
 
     this.url$ = this.route.url.pipe(map((segments) => segments.join("")));
@@ -235,7 +234,7 @@ export class LaboratoryComponent implements OnInit {
     this.currentRoutePath = routePath;
     this.showDate = showDate;
     if (this.showDate) {
-      this.enableDate(this.datesRangeDifference);
+      this.enableDate(this.datesRangeDifference, showDate);
     }
     this.store.dispatch(
       go({
@@ -246,8 +245,8 @@ export class LaboratoryComponent implements OnInit {
     );
   }
 
-  enableDate(dateRange) {
-    this.showDate = true;
+  enableDate(dateRange: any, showDate: boolean): void {
+    this.showDate = showDate;
     let endDate =
       dateRange == 6
         ? formatDateToYYMMDD(new Date())

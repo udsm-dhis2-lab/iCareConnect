@@ -25,8 +25,6 @@ export function determineIfAtLeastOneTestHasNoDepartment(
   labSections: ConceptGetFull[],
   testOrders: any[]
 ): boolean {
-  console.log("labSections", labSections);
-  console.log("testOrders", testOrders);
   const keyedDepartmentsByTestOrders = keyDepartmentsByTestOrder(labSections);
   return (
     (
