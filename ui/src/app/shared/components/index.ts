@@ -67,6 +67,7 @@ import { SharedLocationTypeSelectionComponent } from "./shared-location-type-sel
 import { PatientListFiltersComponent } from "./patient-list-filters/patient-list-filters.component";
 import { SharedLocationSettingsHomeComponent } from "./shared-location-settings-home/shared-location-settings-home.component";
 import { ManageLocationModalComponent } from "./manage-location-modal/manage-location-modal.component";
+import { PrintButtonComponent } from "./print-button/print-button.component";
 
 export const components: any[] = [
   PatientSearchComponent,
@@ -138,6 +139,7 @@ export const components: any[] = [
   PatientListFiltersComponent,
   SharedLocationSettingsHomeComponent,
   ManageLocationModalComponent,
+  PrintButtonComponent,
 ];
 
 export const sharedEntryComponents: any[] = [
