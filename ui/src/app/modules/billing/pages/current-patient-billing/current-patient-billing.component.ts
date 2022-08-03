@@ -1,3 +1,4 @@
+import { keys } from 'lodash';
 import { Component, OnInit } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
 
@@ -95,5 +96,69 @@ export class CurrentPatientBillingComponent implements OnInit {
 
   onPaymentSuccess() {
     this._getPatientDetails();
+  }
+
+  onPrint(e: any): void {
+
+    let contents: any;
+
+    const frame1: any = document.createElement("iframe");
+    frame1.name = "frame3";
+    frame1.style.position = "absolute";
+    frame1.style.width = "100%";
+    frame1.style.top = "-1000000px";
+    document.body.appendChild(frame1);
+
+    var frameDoc = frame1.contentWindow
+      ? frame1.contentWindow
+      : frame1.contentDocument.document
+      ? frame1.contentDocument.document
+      : frame1.contentDocument;
+
+    frameDoc.document.open();
+    frameDoc.document.write("<html><head> <style> #table {font-family: Arial, Helvetica, sans-serif;border-collapse: collapse;width: 100%;} #table td, #table th {border: 1px solid #ddd;padding: 8px;} #table tr:nth-child(even){background-color: #f2f2f2;} #table th { padding-top: 12px; padding-bottom: 12px; text-align: left; background-color: #2a8fd1; color: white;}</style>");
+    frameDoc.document.write("</head><body>");
+    
+    //For paid items
+    if(e.Payments){
+      frameDoc.document.write("<table><thead><tr><th>")
+
+      console.log("Payment: ", e)
+      contents = e.Payments[0]
+
+      frameDoc.document.write("</th></tr></thead></table>");
+    }
+    
+    //For bills
+    if(e.Bill){
+      frameDoc.document.write("<table id='table'><thead><tr>");
+      frameDoc.document.write("<th>Item Name</th>");
+      frameDoc.document.write("<th>Quantity</th>");
+      frameDoc.document.write("<th>Unit Price</th>");
+      frameDoc.document.write("<th>Discount</th>");
+      frameDoc.document.write("<th>Amount</th>");
+      frameDoc.document.write("</tr></thead><tbody>");
+      
+      e.Bill.forEach(bill => {
+        bill.items.forEach(record => {
+          frameDoc.document.write(`<tr><td>${record.name}</td>`);
+          frameDoc.document.write(`<td>${record.quantity}</td>`);
+          frameDoc.document.write(`<td>${record.price}</td>`);
+          frameDoc.document.write(`<td>${record.discount}</td>`);
+          frameDoc.document.write(`<td>${record.amount}</td></tr>`);
+        });
+      }); 
+
+    }
+      
+    frameDoc.document.write("</tbody></table>");
+      
+    frameDoc.document.write("</body></html>");
+    frameDoc.document.close();
+    setTimeout(function () {
+      window.frames["frame3"].focus();
+      window.frames["frame3"].print();
+      document.body.removeChild(frame1);
+    }, 500);
   }
 }

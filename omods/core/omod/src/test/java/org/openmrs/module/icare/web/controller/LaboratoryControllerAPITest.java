@@ -183,31 +183,30 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		newSampleGetByPatientRequest.removeParameter("patient");
 
 		newSampleGetByPatientRequest.addParameter("visit","d9c1d8ac-2b8e-427f-804d-b858c52e6f11");
-//
+
 		handle(newSampleGetByPatientRequest);
 		System.out.println("Done testing with visit \n");
 		newSampleGetByPatientRequest.removeParameter("visit");
-//
+		
 		newSampleGetByPatientRequest.addParameter("startDate","2022-01-01");
-//
+		
 		handle(newSampleGetByPatientRequest);
 		System.out.println("Done testing with start date only \n");
 
-		newSampleGetByPatientRequest.addParameter("startDate","2022-01-01");
 		newSampleGetByPatientRequest.addParameter("endDate","2022-07-29");
-//
+
 		handle(newSampleGetByPatientRequest);
 		System.out.println("Done testing with start date and end date only \n");
 
 		newSampleGetByPatientRequest.addParameter("patient", "660484f6-0d02-4e2a-8e0e-fd2f71906f81");
-//
+
 		handle(newSampleGetByPatientRequest);
 		System.out.println("Done testing with start , end date and patient \n");
 		newSampleGetByPatientRequest.removeParameter("patient");
 
 
 		newSampleGetByPatientRequest.addParameter("visit","d9c1d8ac-2b8e-427f-804d-b858c52e6f11");
-//
+
 		handle(newSampleGetByPatientRequest);
 		System.out.println("Done testing with start , end date and visit \n");
 

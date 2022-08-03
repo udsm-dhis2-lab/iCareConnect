@@ -126,7 +126,9 @@ export class VisitsService {
     limit?: number,
     orderType?: string,
     orderStatus?: string,
-    orderStatusCode?: string
+    orderStatusCode?: string,
+    visitAttributeType?: string,
+    paymentType?: string,
   ): Observable<Visit[]> {
     const locationUuids: any = isArray(location) ? location : [location];
     if (orderType) {
@@ -166,6 +168,7 @@ export class VisitsService {
           })
         );
     }
+    
     return zip(
       ...locationUuids.map((locationUuid) => {
         return from(
