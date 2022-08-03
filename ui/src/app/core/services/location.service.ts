@@ -141,4 +141,22 @@ export class LocationService {
       catchError((error) => of(error))
     );
   }
+
+  deleteLocation(uuid: string, purge?: boolean): Observable<any> {
+    return from(this.api.location.deleteLocation(uuid, { purge })).pipe(
+      map((response) => {
+        return response;
+      }),
+      catchError((error) => of(error))
+    );
+  }
+
+  retireLocation(uuid: string, data: any): Observable<any> {
+    return from(this.api.location.updateLocation(uuid, data)).pipe(
+      map((response) => {
+        return response;
+      }),
+      catchError((error) => of(error))
+    );
+  }
 }
