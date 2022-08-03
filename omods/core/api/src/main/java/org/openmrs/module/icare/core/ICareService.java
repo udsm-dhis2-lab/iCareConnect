@@ -112,4 +112,6 @@ public interface ICareService extends OpenmrsService {
 	
 	List<ConceptReferenceTerm> getConceptReferenceTerms(String q, String source, Integer limit, Integer startIndex);
 	
+	List<ConceptSet> getConceptsSetsByConcept(String concept);
+	
 }
