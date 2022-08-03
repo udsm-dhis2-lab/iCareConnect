@@ -239,4 +239,36 @@ export class ConceptsService {
       })
     );
   }
+
+  getConceptSetsByConceptUuids(uuids: string[]): Observable<ConceptGetFull[]> {
+    return zip(
+      ...uuids.map((uuid) =>
+        this.httpClient.get(`icare/conceptsets?concept=${uuid}`).pipe(
+          map(
+            (response) =>
+              response?.results?.map((result) => {
+                return {
+                  ...result,
+                  concept: uuid,
+                  setMembers: [
+                    {
+                      uuid,
+                    },
+                  ],
+                };
+              }) || []
+          )
+        )
+      )
+    ).pipe(
+      map((data) => {
+        return flatten(data);
+      }),
+      catchError((error) => {
+        return of(error);
+      })
+    );
+  }
+
+  get;
 }
