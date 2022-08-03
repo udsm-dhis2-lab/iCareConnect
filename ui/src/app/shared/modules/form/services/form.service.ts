@@ -87,8 +87,9 @@ export class FormService {
     } else if (searchControlType === "location") {
       return from(
         this.api.location.getAllLocations({
-          q: parameters?.q,
+          q: parameters?.q ? parameters?.q : null,
           v: parameters?.v,
+          tag: !parameters?.q ? parameters?.tag : null,
         })
       ).pipe(
         map((response) => {
