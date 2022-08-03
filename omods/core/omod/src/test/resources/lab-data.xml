@@ -136,4 +136,7 @@
 
     <lb_test_allocation_status test_allocation_status_id="1" test_allocation_id="323" user_id="400" status="APPROVED" remarks="" timestamp="2020-10-14 13:56:44" />
 
+    <!-- Location -->
+    <location location_id ="602" uuid = "iCARE890-TEST-MOTR-9beb-d30dcfc0c66e" name = "My location" description = "Testing" date_created="2017-02-14 15:51:57.0" retired="false" />
+
 </dataset>

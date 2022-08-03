@@ -261,11 +261,29 @@ public class ICareDao extends BaseDAO<Item> {
 	
 	public List<Visit> getVisitsByOrderType(String search, String orderTypeUuid, String locationUuid,
 	        OrderStatus.OrderStatusCode orderStatusCode, Order.FulfillerStatus fulfillerStatus, Integer limit,
-	        Integer startIndex, VisitWrapper.OrderBy orderBy, VisitWrapper.OrderByDirection orderByDirection) {
+	        Integer startIndex, VisitWrapper.OrderBy orderBy, VisitWrapper.OrderByDirection orderByDirection,String attributeValueReference) {
+
+		Query query = null;
 		DbSession session = this.getSession();
-		String queryStr = "SELECT distinct v FROM Visit v" + " INNER JOIN v.patient p" + " INNER JOIN p.names pname"
-		        + " INNER JOIN v.encounters e" + " INNER JOIN e.orders o" + " INNER JOIN o.orderType ot"
-		        + " WHERE ot.uuid=:orderTypeUuid " + " AND v.stopDatetime IS NULL ";
+		String queryStr1 = "SELECT distinct v FROM Visit v" + " INNER JOIN v.patient p" + " INNER JOIN p.names pname";
+
+		if(attributeValueReference != null) {
+
+			queryStr1 += " WHERE v.id IN( SELECT va.visit FROM VisitAttribute va WHERE va.valueReference=:attributeValueReference)";
+			query = session.createQuery(queryStr1);
+
+			if (search != null) {
+				queryStr1 += " AND lower(concat(pname.givenName,pname.middleName,pname.familyName)) LIKE lower(:search)";
+				query = session.createQuery(queryStr1);
+				query.setParameter("search", "%" + search.replace(" ", "%") + "%");
+			}
+			query.setParameter("attributeValueReference", attributeValueReference);
+		}
+
+		if(orderTypeUuid != null){
+			String queryStr = queryStr1 + " INNER JOIN v.encounters e" + " INNER JOIN e.orders o" + " INNER JOIN o.orderType ot"
+					+ " WHERE ot.uuid=:orderTypeUuid " + " AND v.stopDatetime IS NULL ";
+
 		if (fulfillerStatus != null) {
 			queryStr += " AND o.fulfillerStatus=:fulfillerStatus";
 		} else {
@@ -302,7 +320,7 @@ public class ICareDao extends BaseDAO<Item> {
 		} else if (orderByDirection == VisitWrapper.OrderByDirection.DESC) {
 			queryStr += " DESC ";
 		}
-		Query query = session.createQuery(queryStr);
+		query = session.createQuery(queryStr);
 		query.setParameter("orderTypeUuid", orderTypeUuid);
 		if (fulfillerStatus != null) {
 			query.setParameter("fulfillerStatus", fulfillerStatus);
@@ -323,6 +341,9 @@ public class ICareDao extends BaseDAO<Item> {
 		//query.setParameter("fulfillerStatus", fulfillerStatus);
 		query.setFirstResult(startIndex);
 		query.setMaxResults(limit);
+
+		//return query.list();
+		}
 		return query.list();
 	}
 	

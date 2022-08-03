@@ -170,6 +170,20 @@
     <visit_attribute_type visit_attribute_type_id="104" name="Insurance ID" min_occurs="0" uuid="298b75eb-er45-12e8-9c7c-42b0yt63cfee" creator="1"
                           retired="false" date_created="2020-12-27 00:00:00" datatype="org.openmrs.customdatatype.datatype.FreeTextDatatype"/>
 
+    <!-- Visit Type-->
+    <visit_type visit_type_id="14" name="OPD"  uuid="298b75eb-er45-12e8-9c7c-42b0yt63cfepiA" creator="1" date_created="2020-12-27 00:00:00" retired="0" />
+
+    <!-- Visit -->
+    <visit visit_id="10" patient_id="1000" visit_type_id="14" uuid="298b75eb-er45-12e8-9c7c-42b0yt63cfepi" creator="1"
+           voided="0" date_created="2020-12-27 00:00:00" date_started="2020-12-27 00:00:00"/>
+
+    <!-- Visit Attributes -->
+    <visit_attribute visit_attribute_id="104" visit_id="10" attribute_type_id="104" value_reference="123" uuid="298b75eb-er45-12e8-9c7c-42b0yt63cfep" creator="1"
+                          voided="0" date_created="2020-12-27 00:00:00" />
+
+
+
+
     <encounter_type encounter_type_id="1" name="Registration"  creator="1"
                     retired="false" date_created="2020-12-27 00:00:00" uuid="2msir5eb-5345-11e8-9c7c-40b034c3cfee"/>
 
