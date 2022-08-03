@@ -93,9 +93,24 @@ export class LocationService {
       );
   }
 
-  getLocationsByTagName(tagName): Observable<any[]> {
+  getLocationsByTagName(
+    tagName: string,
+    parameters?: { limit: number; startIndex: number }
+  ): Observable<any[]> {
+    let othersParameters = "";
+    if (parameters?.limit) {
+      othersParameters += `&limit=${parameters?.limit}`;
+    }
+    if (parameters?.startIndex) {
+      othersParameters += `&startIndex=${parameters?.startIndex}`;
+    }
     return this.httpClient
-      .get("location?tag=" + tagName + "&v=full&limit=100")
+      .get(
+        "location?tag=" +
+          tagName +
+          "&v=full" +
+          (othersParameters != "" ? othersParameters : "&limit=100")
+      )
       .pipe(
         map((response) => {
           return response?.results.map((result) => {
@@ -122,7 +137,7 @@ export class LocationService {
 
   getLocationTags(): Observable<LocationtagGetFull[]> {
     return from(this.api.locationtag.getAllLocationTags()).pipe(
-      map((response) => response),
+      map((response) => response?.results),
       catchError((error) => of(error))
     );
   }
