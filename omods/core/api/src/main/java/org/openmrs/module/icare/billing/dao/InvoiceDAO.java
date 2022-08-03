@@ -60,6 +60,7 @@ public class InvoiceDAO extends BaseDAO<Invoice> {
 		Query query = session.createQuery(queryStr);
 		query.setParameter("patientUuid", patientUuid);
 		return query.list();
+
 	}
 	
 	public List<Invoice> findAllInvoiceByPatientUuid(String patientUuid) {

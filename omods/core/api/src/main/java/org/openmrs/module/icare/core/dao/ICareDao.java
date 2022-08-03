@@ -261,15 +261,21 @@ public class ICareDao extends BaseDAO<Item> {
 	
 	public List<Visit> getVisitsByOrderType(String search, String orderTypeUuid, String locationUuid,
 	        OrderStatus.OrderStatusCode orderStatusCode, Order.FulfillerStatus fulfillerStatus, Integer limit,
-	        Integer startIndex, VisitWrapper.OrderBy orderBy, VisitWrapper.OrderByDirection orderByDirection,String attributeValueReference) {
+	        Integer startIndex, VisitWrapper.OrderBy orderBy, VisitWrapper.OrderByDirection orderByDirection,String attributeValueReference,String paymentStatus) {
 
 		Query query = null;
 		DbSession session = this.getSession();
 		String queryStr1 = "SELECT distinct v FROM Visit v" + " INNER JOIN v.patient p" + " INNER JOIN p.names pname";
 
+		if(paymentStatus != null){
+			if (paymentStatus == "PAID"){
+				queryStr1 += " WHERE v.id IN ( SELECT invoice.visit FROM Invoice invoice AND (SELECT SUM(item.price*item.quantity) FROM InvoiceItem item WHERE item.id.invoice = invoice <= SELECT( (SELECT SUM(pi.amount) FROM PaymentItem pi WHERE pi.id.payment.invoice = invoice)+(SELECT SUM(di.amount) FROM DiscountItem di WHERE di.id.invoice = invoice)))";
+			}
+		}
+
 		if(attributeValueReference != null) {
 
-			queryStr1 += " WHERE v.id IN( SELECT va.visit FROM VisitAttribute va WHERE va.valueReference=:attributeValueReference)";
+
 			query = session.createQuery(queryStr1);
 
 			if (search != null) {
