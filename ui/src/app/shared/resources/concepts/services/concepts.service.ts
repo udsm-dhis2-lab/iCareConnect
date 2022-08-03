@@ -231,8 +231,8 @@ export class ConceptsService {
     );
   }
 
-  deleteConcept(id: string): Observable<ConceptGetFull[]> {
-    return from(this.api.concept.deleteConcept(id)).pipe(
+  deleteConcept(id: string, purge?: boolean): Observable<ConceptGetFull> {
+    return from(this.api.concept.deleteConcept(id, { purge: purge })).pipe(
       map((response) => response),
       catchError((error) => {
         return of(error);
