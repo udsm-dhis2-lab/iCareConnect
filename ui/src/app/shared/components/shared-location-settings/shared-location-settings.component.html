@@ -5,16 +5,17 @@
     class="mt-3 mb-3"
   ></mat-progress-bar>
   <div *ngIf="locations">
-    <table class="table table-striped">
+    <table class="table table-striped" *ngIf="!errorMessage">
       <thead>
         <th>SN</th>
         <th>Name</th>
         <th>Description</th>
+        <th></th>
       </thead>
       <tbody>
         <tr *ngFor="let location of locations; let count = index">
           <td>
-            {{ count + 1 }}
+            {{ count + 1 + (page - 1) * pageSize }}
           </td>
           <td>
             {{ location?.display }}
@@ -22,16 +23,49 @@
           <td>
             {{ location?.description }}
           </td>
-          <td></td>
+          <td>
+            <button mat-icon-button [matMenuTriggerFor]="menu">
+              <mat-icon>more_vert</mat-icon>
+            </button>
+            <mat-menu #menu="matMenu">
+              <button mat-menu-item>
+                <mat-icon>edit</mat-icon>
+                <span>Edit</span>
+              </button>
+              <button mat-menu-item (click)="onRetire($event, location)">
+                <mat-icon>remove</mat-icon>
+                <span>Retire / Stop</span>
+              </button>
+              <button mat-menu-item (click)="onDelete($event, location?.uuid)">
+                <mat-icon>delete</mat-icon>
+                <span>Delete</span>
+              </button>
+            </mat-menu>
+          </td>
         </tr>
       </tbody>
     </table>
-    <div class="d-flex justify-content-end">
-      <button class="add-button" (click)="openModal($event, locationTag)">
+    <div class="alert alert-danger" role="alert" *ngIf="errorMessage">
+      {{ errorMessage }}
+      <button
+        type="button"
+        class="close"
+        data-dismiss="alert"
+        aria-label="Close"
+        (click)="closeAlart($event)"
+      >
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="d-flex justify-content-end" *ngIf="!errorMessage">
+      <button
+        class="add-button"
+        (click)="openModal($event, locationTag, locations[0]?.parentLocation)"
+      >
         New
       </button>
     </div>
-    <div class="mt-2 d-flex justify-content-end">
+    <div class="mt-2 d-flex justify-content-end" *ngIf="!errorMessage">
       <button
         [disabled]="page <= 1"
         mat-stroked-button
