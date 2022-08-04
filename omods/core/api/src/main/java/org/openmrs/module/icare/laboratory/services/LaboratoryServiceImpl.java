@@ -522,5 +522,10 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 		return testAllocationsStatuses.size();
 		
 	}
+
+	@Override
+	public List<Sample> getSamplesByVisitOrPatientAndOrDates( String visitId ,String patient, Date startDate, Date endDate) {
+		return this.sampleDAO.getSamplesByVisitOrPatientAndOrDates(visitId, patient, startDate, endDate);
+	}
 	
 }

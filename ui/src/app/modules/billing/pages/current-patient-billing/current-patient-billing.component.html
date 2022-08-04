@@ -34,6 +34,9 @@
         <div class="col-md-12 col-sm-12" *ngIf="params?.currentPatient">
           <div class="border">
             <mat-tab-group>
+
+              <!-- Pending payments -->
+
               <mat-tab>
                 <ng-template mat-tab-label>
                   <span
@@ -52,22 +55,46 @@
                 >
                   No pending bills
                 </div>
-                <app-quotations
-                  *ngIf="
-                    patientBillingDetails.bills.length > 0 &&
-                    params?.currentPatient &&
-                    params?.logo &&
-                    params?.facilityDetails
-                  "
-                  [patientBillingDetails] = "patientBillingDetails"
-                  [bills]="patientBillingDetails?.bills"
-                  [currentPatient]="params?.currentPatient"
-                  [facilityDetails]="params?.facilityDetails"
-                  [logo]="params?.logo"
-                  (confirmPayment)="onConfirmBillPayment($event)"
-                  (billPaymentSuccess)="onPaymentSuccess()"
-                ></app-quotations>
+                <div>
+                  <app-quotations
+                    *ngIf="
+                      patientBillingDetails.bills.length > 0 &&
+                      params?.currentPatient &&
+                      params?.logo &&
+                      params?.facilityDetails
+                    "
+                    [patientBillingDetails] = "patientBillingDetails"
+                    [bills]="patientBillingDetails?.bills"
+                    [currentPatient]="params?.currentPatient"
+                    [facilityDetails]="params?.facilityDetails"
+                    [logo]="params?.logo"
+                    (confirmPayment)="onConfirmBillPayment($event)"
+                    (billPaymentSuccess)="onPaymentSuccess()"
+                    id="quotation"
+                  ></app-quotations>
+                </div>
+                <div class="row mt-3">
+                  <div class="col-12">
+                    <div *ngIf="patientBillingDetails.bills.length > 0">
+                      <!-- Make ElementToBePrinted as an object -->
+                      <div *ngIf="patientBillingDetails?.payments.length > 0 || patientBillingDetails.bills.length > 0 ">
+                        <app-print-button [iconName]="'print'" [toolTipText]="'Click to print bills and receipt in one document'"
+                          [showText]="'Print All'"
+                          [ElementToBePrinted]="{Payments: patientBillingDetails?.payments, Bill: patientBillingDetails.bills, CurrentPatient: params?.currentPatient, FacilityDetails: params?.facilityDetails, Logo: params?.logo}"
+                          [classesList]="['float-right', 'button']" (print)="onPrint($event)"></app-print-button>
+                      </div>
+                      <app-print-button [iconName]="'print'" [toolTipText]="'Click to print invoice'" [showText]="'Print Invoice'"
+                        [classesList]="['float-right', 'button', 'mr-5']"
+                        [ElementToBePrinted]="{Bill: patientBillingDetails.bills, CurrentPatient: params?.currentPatient, FacilityDetails: params?.facilityDetails, Logo: params?.logo}"
+                        [currentPatient]="params?.currentPatient" [facilityDetails]="params?.facilityDetails" [logo]="params?.logo"
+                        (print)="onPrint($event)"></app-print-button>
+                    </div>
+                    
+                  </div>
+                </div>
               </mat-tab>
+              
+              <!-- Pending Payments (Covered by Insurance) -->
               <mat-tab>
                 <ng-template mat-tab-label>
                   <span
@@ -89,14 +116,18 @@
                 >
                   No pending payments
                 </div>
-
-                <app-quotations
-                  [bills]="patientBillingDetails?.pendingPayments"
-                  [disableControls]="true"
-                  (confirmPayment)="onConfirmBillPayment($event)"
-                >
-                </app-quotations>
+                <div>
+                  <app-quotations
+                    [bills]="patientBillingDetails?.pendingPayments"
+                    [disableControls]="true"
+                    (confirmPayment)="onConfirmBillPayment($event)"
+                  >
+                  </app-quotations>
+                </div>
+                
               </mat-tab>
+
+              <!-- Payments made -->
               <mat-tab>
                 <ng-template mat-tab-label>
                   <span
@@ -117,22 +148,44 @@
                 >
                   No completed payments
                 </div>
-                <app-payments
-                  *ngIf="
-                    patientBillingDetails?.payments.length > 0 &&
-                    params?.currentPatient !== undefined &&
-                    params?.logo &&
-                    params?.facilityDetails
-                  "
-                  [payments]="patientBillingDetails?.payments"
-                  [currentPatient]="params?.currentPatient"
-                  [facilityDetails]="params?.facilityDetails"
-                  [logo]="params?.logo"
-                ></app-payments>
+                <div>
+                  <app-payments
+                    *ngIf="
+                      patientBillingDetails?.payments.length > 0 &&
+                      params?.currentPatient !== undefined &&
+                      params?.logo &&
+                      params?.facilityDetails
+                    "
+                    [payments]="patientBillingDetails?.payments"
+                    [currentPatient]="params?.currentPatient"
+                    [facilityDetails]="params?.facilityDetails"
+                    [logo]="params?.logo" id="payments"
+                  ></app-payments>
+                </div>
+
+                <div class="row mt-3">
+                  <div class="col-12">
+                    <!-- Make ElementToBePrinted as an object -->
+                    <div *ngIf="patientBillingDetails?.payments.length > 0 || patientBillingDetails.bills.length > 0 ">
+                      <app-print-button [iconName]="'print'" [toolTipText]="'Click to print bills and receipt in one document'"
+                        [showText]="'Print All'"
+                        [ElementToBePrinted]="{Payments: patientBillingDetails?.payments, Bill: patientBillingDetails.bills, CurrentPatient: params?.currentPatient, FacilityDetails: params?.facilityDetails, Logo: params?.logo}"
+                        [classesList]="['float-right', 'button']" (print)="onPrint($event)"></app-print-button>
+                    </div>
+
+                    <div *ngIf="patientBillingDetails?.payments.length > 0">
+                      <app-print-button [iconName]="'print'" [toolTipText]="'Click to print receipt'" [showText]="'Print Receipt'" [ElementToBePrinted]="{Payments: patientBillingDetails?.payments, CurrentPatient: params?.currentPatient, FacilityDetails: params?.facilityDetails, Logo: params?.logo}"
+                        [classesList]="['float-right', 'button', 'mr-5']" (print)="onPrint($event)"></app-print-button>
+                    </div>
+                    
+                  </div>
+                  
+                </div>
               </mat-tab>
             </mat-tab-group>
           </div>
         </div>
+
       </div>
     </ng-container>
   </div>

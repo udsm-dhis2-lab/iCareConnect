@@ -1,3 +1,5 @@
+import { Payment } from 'src/app/modules/billing/models/payment.model';
+import { keys } from 'lodash';
 import { Component, OnInit } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
 
@@ -12,9 +14,12 @@ import { BillObject } from "../../models/bill-object.model";
 import { BillPayment } from "../../models/bill-payment.model";
 import { Bill } from "../../models/bill.model";
 import { PaymentInput } from "../../models/payment-input.model";
-import { Payment } from "../../models/payment.model";
 import { BillingService } from "../../services/billing.service";
 import { PaymentService } from "../../services/payment.service";
+import { Store } from '@ngrx/store';
+import { AppState } from 'src/app/store/reducers';
+import { getParentLocation } from 'src/app/store/selectors';
+import { DomSanitizer } from '@angular/platform-browser';
 
 @Component({
   selector: "app-current-patient-billing",
@@ -29,6 +34,7 @@ export class CurrentPatientBillingComponent implements OnInit {
   patientId: string;
   facilityDetails$: Observable<any>;
   facilityLogo$: Observable<any>;
+  facility: any;
   patientBillingDetails$: Observable<{
     visit: Visit;
     bills: Bill[];
@@ -37,13 +43,16 @@ export class CurrentPatientBillingComponent implements OnInit {
     pendingPayments: BillPayment[];
   }>;
   currentPatient$: Observable<Patient>;
+  parentLocation$: Observable<any>;
+
   constructor(
     private route: ActivatedRoute,
     private visitService: VisitsService,
     private billingService: BillingService,
     private paymentService: PaymentService,
     private patientService: PatientService,
-    private configService: ConfigsService
+    private configService: ConfigsService,
+    private store: Store<AppState>
   ) {}
 
   ngOnInit() {
@@ -54,6 +63,12 @@ export class CurrentPatientBillingComponent implements OnInit {
 
     this.facilityDetails$ = this.configService.getFacilityDetails();
     this.facilityLogo$ = this.configService.getLogo();
+    this.facilityDetails$ = this.store.select(getParentLocation);
+    // this.parentLocation$.subscribe({
+    //   next: (location) => {
+    //     this.facility = location;
+    //   }
+    // });
   }
 
   private _getPatientDetails() {
@@ -95,5 +110,193 @@ export class CurrentPatientBillingComponent implements OnInit {
 
   onPaymentSuccess() {
     this._getPatientDetails();
+  }
+
+  onPrint(e: any): void {
+    let contents: string;
+
+    const frame1: any = document.createElement("iframe");
+    frame1.name = "frame3";
+    frame1.style.position = "absolute";
+    frame1.style.width = "100%";
+    frame1.style.top = "-1000000px";
+    document.body.appendChild(frame1);
+
+    var frameDoc = frame1.contentWindow
+      ? frame1.contentWindow
+      : frame1.contentDocument.document
+      ? frame1.contentDocument.document
+      : frame1.contentDocument;
+
+    frameDoc.document.open();
+
+    frameDoc.document.write(`
+      <html>
+        <head> 
+          <style> 
+              #top .logo img{
+                //float: left;
+                height: 100px;
+                width: 100px;
+                background-size: 100px 100px;
+              }
+              #table {
+                font-family: Arial, Helvetica, sans-serif;
+                border-collapse: collapse;
+                width: 100%;
+                background-color: #000;
+              } 
+              #table td, #table  th {
+                border: 1px solid #ddd;
+                padding: 5px;
+              } 
+              
+              #table tbody tr:nth-child(even){
+                background-color: #f2f2f2;
+              } 
+
+              #table thead tr th { 
+                padding-top: 12px; 
+                padding-bottom: 12px; 
+                text-align: left; 
+                // background-color: #2a8fd1; 
+                background-color: #000; 
+                color: #fff;
+              }
+              thead tr {
+                background: #000;
+                color: #fff;
+              } 
+          </style>
+        </head>
+        <body>`);
+        
+    console.log(e.FacilityDetails);
+
+    // Change image from base64 then replace some text with empty string to get an image
+    let image = e.FacilityDetails.attributes[0].display.replace("Logo: ", "");
+
+    frameDoc.document.write(`
+    
+      <center id="top">
+        <div class="logo">
+          <img src="${image}" alt="Facility's Logo"> 
+        </div>
+        
+
+        <div class="info">
+          <h2>${e.FacilityDetails.display}</h2>
+        </div>
+        <!--End Info-->
+      </center>
+      <!--End Document top-->
+      
+      
+      <div id="mid">
+        <div class="info">
+          <p> 
+              Patient Name : ${e.CurrentPatient.name}</br>
+          </p>
+        </div>
+      </div>`);
+
+    //For paid items
+    if (e.Payments) {
+      if (e.Payments.length > 0) {
+        frameDoc.document.write(`
+        <div>
+          <h3>Payments</h3>
+        </div>
+        <table id="table">
+          <thead>
+            <tr>
+              <th>Item Name</th>
+              <th>Amount</th>
+              <th>Paid through</th>
+              <th>Date paid</th>
+            </tr>
+          </thead>
+          <tbody>`);
+
+        e.Payments.forEach((payment) => {
+          payment.items.forEach((item) => {
+            let paymentDate = new Date(payment.created);
+            // Date to string
+            let date_paid = `${
+              paymentDate.getDate().toString().length > 1
+                ? paymentDate.getDate()
+                : "0" + paymentDate.getDate()
+            }-${
+              paymentDate.getMonth().toString().length > 1
+                ? paymentDate.getMonth()
+                : "0" + paymentDate.getMonth()
+            }-${paymentDate.getFullYear()}`;
+            contents = `
+                <tr>
+                  <td>${item.name}</td> 
+                  <td>${item.amount}</td> 
+                  <td>${payment.paymentType.name}</td> 
+                  <td>${date_paid}</td>
+                </tr>`;
+            frameDoc.document.write(contents);
+          });
+        });
+
+        frameDoc.document.write(`
+          </tbody>
+        </table>`);
+      }
+    }
+
+    //For bills
+    if (e.Bill) {
+      if (e.Bill.length > 0) {
+        frameDoc.document.write(`
+        <div>
+          <h3>Bills</h3>
+        </div>
+        <table id="table">
+          <thead>
+            <tr>
+              <th>Item Name</th>
+              <th>Quantity</th>
+              <th>Unit Price</th>
+              <th>Discount</th>
+              <th>Amount</th>
+            </tr>
+          </thead>
+        <tbody>`);
+
+        e.Bill.forEach((bill) => {
+          bill.items.forEach((record) => {
+            contents = `
+            <tr>
+              <td>${record.name}</td> 
+              <td>${record.quantity}</td> 
+              <td>${record.price}</td> 
+              <td>${record.discount}</td> 
+              <td>${record.amount}</td>
+            </tr>`;
+            frameDoc.document.write(contents);
+          });
+        });
+
+        frameDoc.document.write(`
+          </tbody>
+        </table>`);
+      }
+    }
+
+    frameDoc.document.write(`
+      </body>
+    </html>`);
+
+    frameDoc.document.close();
+
+    setTimeout(function () {
+      window.frames["frame3"].focus();
+      window.frames["frame3"].print();
+      document.body.removeChild(frame1);
+    }, 500);
   }
 }
