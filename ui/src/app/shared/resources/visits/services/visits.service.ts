@@ -249,17 +249,17 @@ export class VisitsService {
       map((response) => {
         return {
           claimFile: this.domSanitizer.bypassSecurityTrustHtml(`<embed
-    src="data:application/pdf;base64,${response?.claimFile}"
-    type="application/pdf"
-    width="100%"
-    height="550px"
-  />`),
+              src="data:application/pdf;base64,${response?.claimFile}"
+              type="application/pdf"
+              width="100%"
+              height="550px"
+            />`),
           patientFile: this.domSanitizer.bypassSecurityTrustHtml(`<embed
-     src="data:application/pdf;base64,${response?.patientFile}"
-     type="application/pdf"
-     width="100%"
-     height="550px"
-   />`),
+            src="data:application/pdf;base64,${response?.patientFile}"
+            type="application/pdf"
+            width="100%"
+            height="550px"
+          />`),
         };
       })
     );
