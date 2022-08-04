@@ -100,7 +100,7 @@ export class CurrentPatientBillingComponent implements OnInit {
 
   onPrint(e: any): void {
 
-    let contents: any;
+    let contents: string;
 
     const frame1: any = document.createElement("iframe");
     frame1.name = "frame3";
@@ -116,60 +116,70 @@ export class CurrentPatientBillingComponent implements OnInit {
       : frame1.contentDocument;
 
     frameDoc.document.open();
+
     frameDoc.document.write("<html><head> <style> #table {font-family: Arial, Helvetica, sans-serif;border-collapse: collapse;width: 100%;} #table tbody td, #table thead tr th {border: 1px solid #ddd;padding: 8px;} #table tbody tr:nth-child(even){background-color: #f2f2f2;} #table thead tr th { padding-top: 12px; padding-bottom: 12px; text-align: left; background-color: #2a8fd1; color: white;}</style>");
     frameDoc.document.write("</head><body>");
     
     //For paid items
     if(e.Payments){
-      frameDoc.document.write("<div'><h3>Payments</h3></div>");
-      frameDoc.document.write("<table id='table'><thead><tr>");
-      frameDoc.document.write("<th>Item Name</th>");
-      frameDoc.document.write("<th>Amount</th>");
-      frameDoc.document.write("<th>Paid through</th>");
-      frameDoc.document.write("<th>Date paid</th>");
-      frameDoc.document.write("</tr></thead><tbody>");
+      
+      if (e.Payments.length > 0){
+        frameDoc.document.write("<div'><h3>Payments</h3></div>");
+        frameDoc.document.write("<table id='table'><thead><tr>");
+        frameDoc.document.write("<th>Item Name</th>");
+        frameDoc.document.write("<th>Amount</th>");
+        frameDoc.document.write("<th>Paid through</th>");
+        frameDoc.document.write("<th>Date paid</th>");
+        frameDoc.document.write("</tr></thead><tbody>");
 
-      console.log("Payments: ", e)
-      e.Payments.forEach(payment => {
-          console.log("Payment: ", payment);
-          payment.items.forEach(item => {
+        e.Payments.forEach((payment) => {
+          payment.items.forEach((item) => {
             contents = `<tr><td>${item.name}</td> <td>${item.amount}</td> <td>${payment.paymentType.name}</td> <td>${payment.created}</td></tr>`;
             frameDoc.document.write(contents);
           });
         });
 
-      frameDoc.document.write("</tbody></table>");
+        frameDoc.document.write("</tbody></table>");
+      } 
+
     }
     
     //For bills
     if(e.Bill){
-      frameDoc.document.write("<div'><h3>Bills</h3></div>");
-      frameDoc.document.write("<table id='table'><thead><tr>");
-      frameDoc.document.write("<th>Item Name</th>");
-      frameDoc.document.write("<th>Quantity</th>");
-      frameDoc.document.write("<th>Unit Price</th>");
-      frameDoc.document.write("<th>Discount</th>");
-      frameDoc.document.write("<th>Amount</th>");
-      frameDoc.document.write("</tr></thead><tbody>");
-
       
-      e.Bill.forEach(bill => {
-        bill.items.forEach(record => {
-          contents = `<tr><td>${record.name}</td> <td>${record.quantity}</td> <td>${record.price}</td> <td>${record.discount}</td> <td>${record.amount}</td></tr>`;
-          frameDoc.document.write(contents);
-        });
-      }); 
+      if(e.Bill.length > 0){
+        frameDoc.document.write("<div'><h3>Bills</h3></div>");
+        frameDoc.document.write("<table id='table'><thead><tr>");
+        frameDoc.document.write("<th>Item Name</th>");
+        frameDoc.document.write("<th>Quantity</th>");
+        frameDoc.document.write("<th>Unit Price</th>");
+        frameDoc.document.write("<th>Discount</th>");
+        frameDoc.document.write("<th>Amount</th>");
+        frameDoc.document.write("</tr></thead><tbody>");
 
-      frameDoc.document.write("</tbody></table>");
+        e.Bill.forEach(bill => {
+          bill.items.forEach(record => {
+            contents = `<tr><td>${record.name}</td> <td>${record.quantity}</td> <td>${record.price}</td> <td>${record.discount}</td> <td>${record.amount}</td></tr>`;
+            frameDoc.document.write(contents);
+          });
+        }); 
+
+        frameDoc.document.write("</tbody></table>");
+      }
+
     }
       
-      
     frameDoc.document.write("</body></html>");
+    
     frameDoc.document.close();
-    setTimeout(function () {
-      window.frames["frame3"].focus();
-      window.frames["frame3"].print();
-      document.body.removeChild(frame1);
-    }, 500);
+    window.frames["frame3"].focus();
+    window.frames["frame3"].print();
+    document.body.removeChild(frame1);
+    
+    // setTimeout(function () {
+    //   window.frames["frame3"].focus();
+    //   window.frames["frame3"].print();
+    //   document.body.removeChild(frame1);
+    // }, 500);
   }
 }
