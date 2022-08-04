@@ -76,6 +76,7 @@
                 <div class="row mt-3">
                   <div class="col-12">
                     <div *ngIf="patientBillingDetails.bills.length > 0">
+                      <!-- Make ElementToBePrinted as an object -->
                       <app-print-button [iconName]="'print'" [toolTipText]="'Click to print invoice'" [showText]="'Print Invoice'" [classesList]="['float-right', 'button']" [ElementToBePrinted]="{Bill: patientBillingDetails.bills}" (print)="onPrint($event)"></app-print-button>
                     </div>
                   </div>
