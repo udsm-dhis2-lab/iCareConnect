@@ -39,4 +39,11 @@
       ></app-system-settings-list>
     </ng-template>
   </mat-tab>
+  <mat-tab label="Modules">
+    <ng-template matTabContent>
+      <app-system-settings-list
+        [key]="'icare.modules'"
+      ></app-system-settings-list>
+    </ng-template>
+  </mat-tab>
 </mat-tab-group>
