@@ -126,7 +126,9 @@ export class VisitsService {
     limit?: number,
     orderType?: string,
     orderStatus?: string,
-    orderStatusCode?: string
+    orderStatusCode?: string,
+    visitAttributeType?: string,
+    paymentType?: string,
   ): Observable<Visit[]> {
     const locationUuids: any = isArray(location) ? location : [location];
     if (orderType) {
@@ -166,6 +168,7 @@ export class VisitsService {
           })
         );
     }
+    
     return zip(
       ...locationUuids.map((locationUuid) => {
         return from(
@@ -246,17 +249,17 @@ export class VisitsService {
       map((response) => {
         return {
           claimFile: this.domSanitizer.bypassSecurityTrustHtml(`<embed
-    src="data:application/pdf;base64,${response?.claimFile}"
-    type="application/pdf"
-    width="100%"
-    height="550px"
-  />`),
+              src="data:application/pdf;base64,${response?.claimFile}"
+              type="application/pdf"
+              width="100%"
+              height="550px"
+            />`),
           patientFile: this.domSanitizer.bypassSecurityTrustHtml(`<embed
-     src="data:application/pdf;base64,${response?.patientFile}"
-     type="application/pdf"
-     width="100%"
-     height="550px"
-   />`),
+            src="data:application/pdf;base64,${response?.patientFile}"
+            type="application/pdf"
+            width="100%"
+            height="550px"
+          />`),
         };
       })
     );

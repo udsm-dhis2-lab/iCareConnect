@@ -3,6 +3,8 @@ package org.openmrs.module.icare.laboratory.dao;
 // Generated Oct 7, 2020 12:49:21 PM by Hibernate Tools 5.2.10.Final
 
 import org.hibernate.Query;
+import org.openmrs.Patient;
+import org.openmrs.Person;
 import org.openmrs.Visit;
 import org.openmrs.api.db.hibernate.DbSession;
 import org.openmrs.module.icare.core.ListResult;
@@ -11,6 +13,7 @@ import org.openmrs.module.icare.core.dao.BaseDAO;
 import org.openmrs.module.icare.laboratory.models.Sample;
 import org.springframework.stereotype.Repository;
 
+import java.text.SimpleDateFormat; 
 import java.util.Date;
 import java.util.List;
 
@@ -104,4 +107,77 @@ public class SampleDAO extends BaseDAO<Sample> {
 		//
 		return listResults;
 	}
+
+
+	public List<Sample> getSamplesByVisitOrPatientAndOrDates(String visitId, String patient, Date startDate, Date endDate){
+
+		DbSession session = this.getSession();
+
+		// General search query
+		String queryStr = "SELECT sp FROM Sample sp";
+
+		//If visit is provided, use visit instead
+		if(visitId != null && visitId.length() > 0){
+			queryStr = "SELECT sp \n" + "FROM Sample sp \n"
+					+ "WHERE sp.visit = (SELECT v FROM Visit v WHERE v.uuid = :visitUuid)";
+		}
+
+		//if no visit is provided but patient is provided
+		if((visitId == null || visitId.equals("")) && patient != null){
+			queryStr += " LEFT JOIN sp.visit v LEFT JOIN v.patient pnt WHERE pnt.uuid=:patientUuid";
+		}
+
+		// if visit / patient is provided
+		if( visitId != null || patient != null ){
+			//if start date only is provided
+			if(startDate != null && endDate == null){
+				queryStr += " AND sp.dateCreated >= :startDate";
+			}
+
+			//if both dates are provided
+			if (startDate != null && endDate != null) {
+				queryStr += " AND sp.dateCreated >= :startDate AND sp.dateCreated <= :endDate";
+			}
+		}
+
+		// Append with dates if provided but no patient/visit number
+
+		if((visitId == null || visitId.equals(""))){
+			if (patient == null || patient.equals("")){
+				//if start date only is provided
+				if(startDate != null && endDate == null){
+					queryStr += " WHERE sp.dateCreated >= :startDate";
+				}
+				//if both dates are provided
+				if (startDate != null && endDate != null) {
+					queryStr += " WHERE sp.dateCreated >= :startDate AND sp.dateCreated <= :endDate";
+				}
+			}
+		}
+
+
+		//Construct a query object
+		Query query = session.createQuery(queryStr);
+
+		//Attach arguments accordingly
+		if (startDate != null) {
+			query.setParameter("startDate", startDate);
+		}
+		if (endDate != null && startDate != null) {
+			query.setParameter("endDate", endDate);
+		}
+
+		if(visitId != null && visitId.length() > 0){
+			query.setParameter("visitUuid", visitId);
+		}
+
+		if((visitId == null || visitId.length() < 1) && patient != null){
+			query.setParameter("patientUuid", patient);
+		}
+
+
+		return query.list();
+	}
+
+
 }

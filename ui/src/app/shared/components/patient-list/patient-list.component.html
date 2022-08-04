@@ -40,6 +40,7 @@
         <app-patient-list-filters
           *ngIf="params?.filters"
           [filterCategories]="params?.filters"
+          (onFilterChanged)="filterPatientList($event)"
         ></app-patient-list-filters>
 
         <!-- <button
