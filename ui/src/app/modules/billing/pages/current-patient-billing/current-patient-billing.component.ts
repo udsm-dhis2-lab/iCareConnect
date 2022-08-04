@@ -16,6 +16,10 @@ import { Bill } from "../../models/bill.model";
 import { PaymentInput } from "../../models/payment-input.model";
 import { BillingService } from "../../services/billing.service";
 import { PaymentService } from "../../services/payment.service";
+import { Store } from '@ngrx/store';
+import { AppState } from 'src/app/store/reducers';
+import { getParentLocation } from 'src/app/store/selectors';
+import { DomSanitizer } from '@angular/platform-browser';
 
 @Component({
   selector: "app-current-patient-billing",
@@ -30,6 +34,7 @@ export class CurrentPatientBillingComponent implements OnInit {
   patientId: string;
   facilityDetails$: Observable<any>;
   facilityLogo$: Observable<any>;
+  facility: any;
   patientBillingDetails$: Observable<{
     visit: Visit;
     bills: Bill[];
@@ -38,13 +43,16 @@ export class CurrentPatientBillingComponent implements OnInit {
     pendingPayments: BillPayment[];
   }>;
   currentPatient$: Observable<Patient>;
+  parentLocation$: Observable<any>;
+
   constructor(
     private route: ActivatedRoute,
     private visitService: VisitsService,
     private billingService: BillingService,
     private paymentService: PaymentService,
     private patientService: PatientService,
-    private configService: ConfigsService
+    private configService: ConfigsService,
+    private store: Store<AppState>
   ) {}
 
   ngOnInit() {
@@ -55,6 +63,12 @@ export class CurrentPatientBillingComponent implements OnInit {
 
     this.facilityDetails$ = this.configService.getFacilityDetails();
     this.facilityLogo$ = this.configService.getLogo();
+    this.facilityDetails$ = this.store.select(getParentLocation);
+    // this.parentLocation$.subscribe({
+    //   next: (location) => {
+    //     this.facility = location;
+    //   }
+    // });
   }
 
   private _getPatientDetails() {
@@ -99,7 +113,6 @@ export class CurrentPatientBillingComponent implements OnInit {
   }
 
   onPrint(e: any): void {
-
     let contents: string;
 
     const frame1: any = document.createElement("iframe");
@@ -117,69 +130,173 @@ export class CurrentPatientBillingComponent implements OnInit {
 
     frameDoc.document.open();
 
-    frameDoc.document.write("<html><head> <style> #table {font-family: Arial, Helvetica, sans-serif;border-collapse: collapse;width: 100%;} #table tbody td, #table thead tr th {border: 1px solid #ddd;padding: 8px;} #table tbody tr:nth-child(even){background-color: #f2f2f2;} #table thead tr th { padding-top: 12px; padding-bottom: 12px; text-align: left; background-color: #2a8fd1; color: white;}</style>");
-    frameDoc.document.write("</head><body>");
+    frameDoc.document.write(`
+      <html>
+        <head> 
+          <style> 
+              #top .logo img{
+                //float: left;
+                height: 100px;
+                width: 100px;
+                background-size: 100px 100px;
+              }
+              #table {
+                font-family: Arial, Helvetica, sans-serif;
+                border-collapse: collapse;
+                width: 100%;
+                background-color: #000;
+              } 
+              #table td, #table  th {
+                border: 1px solid #ddd;
+                padding: 5px;
+              } 
+              
+              #table tbody tr:nth-child(even){
+                background-color: #f2f2f2;
+              } 
+
+              #table thead tr th { 
+                padding-top: 12px; 
+                padding-bottom: 12px; 
+                text-align: left; 
+                // background-color: #2a8fd1; 
+                background-color: #000; 
+                color: #fff;
+              }
+              thead tr {
+                background: #000;
+                color: #fff;
+              } 
+          </style>
+        </head>
+        <body>`);
+        
+    console.log(e.FacilityDetails);
+
+    // Change image from base64 then replace some text with empty string to get an image
+    let image = e.FacilityDetails.attributes[0].display.replace("Logo: ", "");
+
+    frameDoc.document.write(`
     
-    //For paid items
-    if(e.Payments){
+      <center id="top">
+        <div class="logo">
+          <img src="${image}" alt="Facility's Logo"> 
+        </div>
+        
+
+        <div class="info">
+          <h2>${e.FacilityDetails.display}</h2>
+        </div>
+        <!--End Info-->
+      </center>
+      <!--End Document top-->
       
-      if (e.Payments.length > 0){
-        frameDoc.document.write("<div'><h3>Payments</h3></div>");
-        frameDoc.document.write("<table id='table'><thead><tr>");
-        frameDoc.document.write("<th>Item Name</th>");
-        frameDoc.document.write("<th>Amount</th>");
-        frameDoc.document.write("<th>Paid through</th>");
-        frameDoc.document.write("<th>Date paid</th>");
-        frameDoc.document.write("</tr></thead><tbody>");
+      
+      <div id="mid">
+        <div class="info">
+          <p> 
+              Patient Name : ${e.CurrentPatient.name}</br>
+          </p>
+        </div>
+      </div>`);
+
+    //For paid items
+    if (e.Payments) {
+      if (e.Payments.length > 0) {
+        frameDoc.document.write(`
+        <div>
+          <h3>Payments</h3>
+        </div>
+        <table id="table">
+          <thead>
+            <tr>
+              <th>Item Name</th>
+              <th>Amount</th>
+              <th>Paid through</th>
+              <th>Date paid</th>
+            </tr>
+          </thead>
+          <tbody>`);
 
         e.Payments.forEach((payment) => {
           payment.items.forEach((item) => {
-            contents = `<tr><td>${item.name}</td> <td>${item.amount}</td> <td>${payment.paymentType.name}</td> <td>${payment.created}</td></tr>`;
+            let paymentDate = new Date(payment.created);
+            // Date to string
+            let date_paid = `${
+              paymentDate.getDate().toString().length > 1
+                ? paymentDate.getDate()
+                : "0" + paymentDate.getDate()
+            }-${
+              paymentDate.getMonth().toString().length > 1
+                ? paymentDate.getMonth()
+                : "0" + paymentDate.getMonth()
+            }-${paymentDate.getFullYear()}`;
+            contents = `
+                <tr>
+                  <td>${item.name}</td> 
+                  <td>${item.amount}</td> 
+                  <td>${payment.paymentType.name}</td> 
+                  <td>${date_paid}</td>
+                </tr>`;
             frameDoc.document.write(contents);
           });
         });
 
-        frameDoc.document.write("</tbody></table>");
-      } 
-
+        frameDoc.document.write(`
+          </tbody>
+        </table>`);
+      }
     }
-    
-    //For bills
-    if(e.Bill){
-      
-      if(e.Bill.length > 0){
-        frameDoc.document.write("<div'><h3>Bills</h3></div>");
-        frameDoc.document.write("<table id='table'><thead><tr>");
-        frameDoc.document.write("<th>Item Name</th>");
-        frameDoc.document.write("<th>Quantity</th>");
-        frameDoc.document.write("<th>Unit Price</th>");
-        frameDoc.document.write("<th>Discount</th>");
-        frameDoc.document.write("<th>Amount</th>");
-        frameDoc.document.write("</tr></thead><tbody>");
 
-        e.Bill.forEach(bill => {
-          bill.items.forEach(record => {
-            contents = `<tr><td>${record.name}</td> <td>${record.quantity}</td> <td>${record.price}</td> <td>${record.discount}</td> <td>${record.amount}</td></tr>`;
+    //For bills
+    if (e.Bill) {
+      if (e.Bill.length > 0) {
+        frameDoc.document.write(`
+        <div>
+          <h3>Bills</h3>
+        </div>
+        <table id="table">
+          <thead>
+            <tr>
+              <th>Item Name</th>
+              <th>Quantity</th>
+              <th>Unit Price</th>
+              <th>Discount</th>
+              <th>Amount</th>
+            </tr>
+          </thead>
+        <tbody>`);
+
+        e.Bill.forEach((bill) => {
+          bill.items.forEach((record) => {
+            contents = `
+            <tr>
+              <td>${record.name}</td> 
+              <td>${record.quantity}</td> 
+              <td>${record.price}</td> 
+              <td>${record.discount}</td> 
+              <td>${record.amount}</td>
+            </tr>`;
             frameDoc.document.write(contents);
           });
-        }); 
+        });
 
-        frameDoc.document.write("</tbody></table>");
+        frameDoc.document.write(`
+          </tbody>
+        </table>`);
       }
-
     }
-      
-    frameDoc.document.write("</body></html>");
-    
+
+    frameDoc.document.write(`
+      </body>
+    </html>`);
+
     frameDoc.document.close();
-    window.frames["frame3"].focus();
-    window.frames["frame3"].print();
-    document.body.removeChild(frame1);
-    
-    // setTimeout(function () {
-    //   window.frames["frame3"].focus();
-    //   window.frames["frame3"].print();
-    //   document.body.removeChild(frame1);
-    // }, 500);
+
+    setTimeout(function () {
+      window.frames["frame3"].focus();
+      window.frames["frame3"].print();
+      document.body.removeChild(frame1);
+    }, 500);
   }
 }

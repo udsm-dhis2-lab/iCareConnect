@@ -14,7 +14,7 @@ export class LocationService {
   getLoginLocations(): Observable<any> {
     return this.httpClient
       .get(
-        "location?limit=100&tag=Login+Location&v=custom:(display,uuid,tags,description,parentLocation,childLocations,attributes:(attributeType,uuid,value,display,voided))"
+        "location?limit=100&tag=Login+Location&v=custom:(display,country,postalCode,stateProvince,uuid,tags,description,parentLocation,childLocations,attributes:(attributeType,uuid,value,display,voided))"
       )
       .pipe(
         map((response) => {
