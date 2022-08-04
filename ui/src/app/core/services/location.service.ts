@@ -3,7 +3,12 @@ import { OpenmrsHttpClientService } from "src/app/shared/modules/openmrs-http-cl
 import { from, Observable, of } from "rxjs";
 import { catchError, map } from "rxjs/operators";
 import { head } from "lodash";
-import { Api, LocationtagGetFull } from "src/app/shared/resources/openmrs";
+import {
+  Api,
+  LocationCreate,
+  LocationCreateFull,
+  LocationtagGetFull,
+} from "src/app/shared/resources/openmrs";
 
 @Injectable({
   providedIn: "root",
@@ -135,9 +140,34 @@ export class LocationService {
     );
   }
 
+  createLocation(data: any): Observable<LocationCreate> {
+    return from(this.api.location.createLocation(data)).pipe(
+      map((response) => response?.results),
+      catchError((error) => of(error))
+    );
+  }
+
   getLocationTags(): Observable<LocationtagGetFull[]> {
     return from(this.api.locationtag.getAllLocationTags()).pipe(
       map((response) => response?.results),
+      catchError((error) => of(error))
+    );
+  }
+
+  deleteLocation(uuid: string, purge?: boolean): Observable<any> {
+    return from(this.api.location.deleteLocation(uuid, { purge })).pipe(
+      map((response) => {
+        return response;
+      }),
+      catchError((error) => of(error))
+    );
+  }
+
+  retireLocation(uuid: string, data: any): Observable<any> {
+    return from(this.api.location.updateLocation(uuid, data)).pipe(
+      map((response) => {
+        return response;
+      }),
       catchError((error) => of(error))
     );
   }

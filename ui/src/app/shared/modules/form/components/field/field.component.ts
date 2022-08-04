@@ -44,8 +44,12 @@ export class FieldComponent {
     if (this.field?.searchTerm || this.field?.source) {
       this.members$ = this.formService.searchItem(
         {
-          q: this.field?.searchTerm,
+          q:
+            this.field?.searchControlType !== "location"
+              ? this.field?.searchTerm
+              : "",
           limit: 50,
+          tag: this.field?.searchTerm,
           class: this.field?.conceptClass,
           source: this.field?.source,
           v:
@@ -132,6 +136,7 @@ export class FieldComponent {
     const parameters = {
       q: searchingText,
       limit: 50,
+      tag: field?.searchTerm,
       class: this.field?.conceptClass,
       source: this.field?.source,
       v:
