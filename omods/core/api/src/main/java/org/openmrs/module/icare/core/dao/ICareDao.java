@@ -9,6 +9,7 @@
  */
 package org.openmrs.module.icare.core.dao;
 
+import ca.uhn.hl7v2.model.v26.group.EHC_E01_INVOICE_PROCESSING;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Query;
@@ -267,15 +268,19 @@ public class ICareDao extends BaseDAO<Item> {
 		DbSession session = this.getSession();
 		String queryStr1 = "SELECT distinct v FROM Visit v" + " INNER JOIN v.patient p" + " INNER JOIN p.names pname";
 
-		if(paymentStatus != null){
-			if (paymentStatus == "PAID"){
-				queryStr1 += " WHERE v.id IN ( SELECT invoice.visit FROM Invoice invoice AND (SELECT SUM(item.price*item.quantity) FROM InvoiceItem item WHERE item.id.invoice = invoice <= SELECT( (SELECT SUM(pi.amount) FROM PaymentItem pi WHERE pi.id.payment.invoice = invoice)+(SELECT SUM(di.amount) FROM DiscountItem di WHERE di.id.invoice = invoice)))";
+		if(paymentStatus != null) {
+			if (paymentStatus == "PAID") {
+				queryStr1 += " WHERE v.id IN (SELECT invoice.visit FROM Invoice invoice" + " WHERE invoice.id IN(SELECT item.id.invoice FROM InvoiceItem item,PaymentItem pi,DiscountInvoiceItem di " + " WHERE item.id.invoice = pi.id.payment.invoice" + " AND pi.id.payment.invoice = di.id.invoice" + " GROUP BY " + " item.id.invoice" + " HAVING SUM(item.price*item.quantity) <= (SUM(pi.amount) + SUM(di.amount))))";
 			}
+
+			if (paymentStatus == "PENDING") {
+                queryStr1 += " WHERE v.id IN (SELECT invoice.visit FROM Invoice invoice" + " WHERE invoice.id IN(SELECT item.id.invoice FROM InvoiceItem item,PaymentItem pi,DiscountInvoiceItem di " + " WHERE item.id.invoice = pi.id.payment.invoice" + " AND pi.id.payment.invoice = di.id.invoice" + " GROUP BY " + " item.id.invoice" + " HAVING SUM(item.price*item.quantity) > (SUM(pi.amount) + SUM(di.amount))))";
+			}
+            query = session.createQuery(queryStr1);
 		}
 
 		if(attributeValueReference != null) {
-
-
+			queryStr1 += " WHERE v.id IN ( SELECT va.visit FROM VisitAttribute va WHERE va.valueReference=:attributeValueReference)";
 			query = session.createQuery(queryStr1);
 
 			if (search != null) {
