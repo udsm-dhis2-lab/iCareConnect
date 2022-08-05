@@ -130,7 +130,7 @@ export class PatientListComponent implements OnInit, OnChanges {
           .pipe(
             tap(() => {
               this.loadingPatients = false;
-            })
+            }),
           );
   }
 
@@ -231,9 +231,6 @@ export class PatientListComponent implements OnInit, OnChanges {
         event && event.paymentType && event.paymentType.display
           ? event.paymentType.display
           : "" ;
-      if(this.paymentTypeSelected === ""){
-        console.log("All is selected...");
-      }
     }, 100);
 
   }
