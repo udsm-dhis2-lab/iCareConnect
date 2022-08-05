@@ -64,11 +64,6 @@ export class CurrentPatientBillingComponent implements OnInit {
     this.facilityDetails$ = this.configService.getFacilityDetails();
     this.facilityLogo$ = this.configService.getLogo();
     this.facilityDetails$ = this.store.select(getParentLocation);
-    // this.parentLocation$.subscribe({
-    //   next: (location) => {
-    //     this.facility = location;
-    //   }
-    // });
   }
 
   private _getPatientDetails() {
@@ -170,8 +165,6 @@ export class CurrentPatientBillingComponent implements OnInit {
           </style>
         </head>
         <body>`);
-        
-    console.log(e.FacilityDetails);
 
     // Change image from base64 then replace some text with empty string to get an image
     let image = e.FacilityDetails.attributes[0].display.replace("Logo: ", "");
@@ -186,6 +179,8 @@ export class CurrentPatientBillingComponent implements OnInit {
 
         <div class="info">
           <h2>${e.FacilityDetails.display}</h2>
+          <h4>P.O Box ${e.FacilityDetails.postalCode} ${e.FacilityDetails.stateProvince}</h4>
+          <h4>${e.FacilityDetails.country}</h4>
         </div>
         <!--End Info-->
       </center>

@@ -1,6 +1,9 @@
 export interface Location {
   uuid: string;
   display?: string;
+  country?: string;
+  postalCode?: string;
+  stateProvince?: string;
   id?: string;
   name?: string;
   links: { rel?: string; uri?: string }[];

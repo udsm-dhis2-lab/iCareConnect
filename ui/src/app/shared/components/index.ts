@@ -141,6 +141,7 @@ export const components: any[] = [
   SharedLocationSettingsHomeComponent,
   ManageLocationModalComponent,
   PrintButtonComponent,
+  RetireMetadataReasonModalComponent,
 ];
 
 export const sharedEntryComponents: any[] = [
