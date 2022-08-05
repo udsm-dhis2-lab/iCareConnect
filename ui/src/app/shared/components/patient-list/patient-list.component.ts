@@ -45,6 +45,7 @@ export class PatientListComponent implements OnInit, OnChanges {
   @Input() orderStatus: string;
   @Input() orderStatusCode: string;
   @Input() filterCategory: string;
+
   page: number = 0;
   visits$: Observable<Visit[]>;
   searchTerm: string;
@@ -55,6 +56,8 @@ export class PatientListComponent implements OnInit, OnChanges {
   filters$: Observable<any[]>;
 
   @Output() selectPatient = new EventEmitter<any>();
+  visitAttributeType: any;
+  paymentType: any;
   constructor(
     private visitService: VisitsService,
     private store: Store<AppState>,
@@ -67,6 +70,7 @@ export class PatientListComponent implements OnInit, OnChanges {
   ngOnChanges() {}
 
   ngOnInit() {
+
     this.filters$ = this.systemSettingsService.getSystemSettingsMatchingAKey(
       "iCare.filters." + (this.filterCategory ? this.filterCategory : "")
     );
@@ -75,17 +79,14 @@ export class PatientListComponent implements OnInit, OnChanges {
     }
     this.itemsPerPage = this.itemsPerPage ? this.itemsPerPage : 10;
     this.getVisits(this.visits);
-
     /**
      * TODO: find the best place to put this
      */
     this.visits$.pipe(take(1)).subscribe((visits) => {
       map(visits, (visit) => {
-        if (
-          visit["visit"]?.location?.tags.some(
+        if ( visit["visit"]?.location?.tags.some(
             (tag) => tag?.name === "Bed Location"
-          )
-        ) {
+          )){
           this.store.dispatch(
             upsertAdmittedPatientLocation({
               locationVisitDetails: {
@@ -109,10 +110,7 @@ export class PatientListComponent implements OnInit, OnChanges {
 
   private getVisits(visits: Visit[]) {
     this.loadingPatients = true;
-    this.visits$ = visits
-      ? of(visits)
-      : this.service && this.service === "LABS"
-      ? this.visitService.getLabVisits("", 0, this.itemsPerPage).pipe(
+    this.visits$ = visits ? of(visits) : this.service && this.service === "LABS" ? this.visitService.getLabVisits("", 0, this.itemsPerPage).pipe(
           tap(() => {
             this.loadingPatients = false;
           })
@@ -225,12 +223,19 @@ export class PatientListComponent implements OnInit, OnChanges {
     );
   }
 
-  getPaymentTypeSelected(event: Event, paymentType) {
-    event.stopPropagation();
+  getPaymentTypeSelected(event: any) {
+    // event.stopPropagation();
     this.paymentTypeSelected = "";
     setTimeout(() => {
-      this.paymentTypeSelected = paymentType;
+      this.paymentTypeSelected =
+        event && event.paymentType && event.paymentType.display
+          ? event.paymentType.display
+          : "" ;
+      if(this.paymentTypeSelected === ""){
+        console.log("All is selected...");
+      }
     }, 100);
+
   }
 
   onSearchAllPatient(event: Event) {
@@ -256,5 +261,14 @@ export class PatientListComponent implements OnInit, OnChanges {
           // );
         }
       });
+  }
+
+  filterPatientList(event: any){
+    this.visitAttributeType = event.visitAttributeType.value;
+    this.paymentType = event.paymentType.uuid;
+
+    // console.log(
+    //   `filterValue: ${this.visitAttributeType}==>${this.paymentType}`
+    // );
   }
 }
