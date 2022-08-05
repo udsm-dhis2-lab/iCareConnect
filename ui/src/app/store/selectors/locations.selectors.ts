@@ -60,8 +60,10 @@ export const getStoreLocations = createSelector(
 export const getParentLocation = createSelector(
   getLocations,
   (locations: Location[]) => {
+
     const allParentLocations =
       _.filter(locations, { parentLocation: null }) || [];
+
     const mainLocation =
       allParentLocations && allParentLocations.length > 1
         ? (allParentLocations.filter(
