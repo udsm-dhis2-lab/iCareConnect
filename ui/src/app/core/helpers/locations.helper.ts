@@ -11,6 +11,9 @@ export function formatLocationsPayLoad(locations): Location[] {
       return {
         id: location?.uuid,
         uuid: location?.uuid,
+        country: location?.country,
+        stateProvince: location?.stateProvince,
+        postalCode: location?.postalCode,
         description: location?.description,
         name: location?.display,
         display: location?.display,

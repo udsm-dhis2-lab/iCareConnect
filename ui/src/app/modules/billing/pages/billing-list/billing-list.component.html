@@ -5,9 +5,9 @@
 >
   <div class="pt-4" *ngIf="!params?.settingCurrentLocationStatus">
     <mat-toolbar>
-      <button mat-icon-button [routerLink]="''" matTooltip="Go to Home page">
+      <!-- <button mat-icon-button [routerLink]="''" matTooltip="Go to Home page">
         <mat-icon>arrow_back</mat-icon>
-      </button>
+      </button> -->
       <span class="ml-2">Billing</span>
     </mat-toolbar>
     <!-- patient list -->
@@ -17,6 +17,7 @@
         [itemsPerPage]="50"
         [defaultFilter]="'Cash'"
         [isTabularList]="true"
+        [filterCategory]="'billing'"
         (selectPatient)="onSelectPatient($event)"
       ></app-patient-list>
     </div>

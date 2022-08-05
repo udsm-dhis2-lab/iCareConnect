@@ -18,9 +18,11 @@ export class PatientVisitsHistoryComponent implements OnInit {
 
   ngOnInit(): void {
     // TODO: Put form uuid on configurations
-    this.vitalsForm = (this.forms.filter(
-      (form) => form?.name?.toLowerCase().indexOf("vitals") === 0
-    ) || [])[0];
+    if(this.forms){
+      this.vitalsForm = (this.forms.filter(
+        (form) => form?.name?.toLowerCase().indexOf("vitals") === 0
+      ) || [])[0];
+    }
     this.currentPatientVisit =
       this.patientVisits?.length > 0 ? this.patientVisits[0] : null;
   }
