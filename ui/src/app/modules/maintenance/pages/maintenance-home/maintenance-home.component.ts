@@ -34,6 +34,7 @@ export class MaintenanceHomeComponent implements OnInit {
       { id: "drug", name: "Drug Management" },
       { id: "location", name: "Location Management" },
       { id: "system-settings", name: "System Settings" },
+      { id: "system-privileges-and-roles", name: "Privileges & Roles" },
     ];
 
     this.getDepartmentsForTheCurrentMenu(this.pages[0]);
