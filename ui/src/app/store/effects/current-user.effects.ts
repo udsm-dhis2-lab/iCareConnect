@@ -38,7 +38,9 @@ export class CurrentUserEffects implements OnInitEffects {
             this.store.dispatch(loadProviderDetails({ userUuid: uuid }));
             this.store.dispatch(
               setCurrentUserCurrentLocation({
-                location: JSON.parse(localStorage.getItem("currentLocation")),
+                location: localStorage.getItem("currentLocation")
+                  ? JSON.parse(localStorage.getItem("currentLocation"))
+                  : null,
               })
             );
           }
