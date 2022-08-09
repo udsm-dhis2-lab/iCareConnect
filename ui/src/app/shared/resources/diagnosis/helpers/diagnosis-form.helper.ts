@@ -82,7 +82,8 @@ function getValueAsPerField(fieldKey, key, data, setMembers) {
     });
     const matchedCertainty = (options.filter(
       (option) =>
-        option?.value.toLowerCase().indexOf(data?.certainty?.toLowerCase()) > -1
+        option?.value?.toLowerCase()?.indexOf(data?.certainty?.toLowerCase()) >
+        -1
     ) || [])[0];
 
     return matchedCertainty ? matchedCertainty["key"] : null;

@@ -83,6 +83,9 @@ public interface LaboratoryService extends OpenmrsService {
 	SampleLable updateSampleLable(SampleLable sampleLable, Integer previousLable);
 	
 	List<Visit> getSamplePendingVisits(Integer limit, Integer startIndex);
+	
+	TestOrderLocation addTestOrderWithLocation(TestOrderLocation testOrderLocation);
 
 	List<Sample> getSamplesByVisitOrPatientAndOrDates(String visitId,String patient, Date startDate, Date endDate);
+
 }

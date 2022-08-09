@@ -1,4 +1,4 @@
-import { DiagnosisObject } from './diagnosis-object.model';
+import { DiagnosisObject } from "./diagnosis-object.model";
 
 export class Diagnosis {
   constructor(private diagnosisDetails: any) {}
@@ -42,7 +42,7 @@ export class Diagnosis {
   }
 
   get isConfirmedDiagnosis(): boolean {
-    return this.diagnosisDetails.certainty.toLowerCase() === 'confirmed';
+    return this.diagnosisDetails?.certainty?.toLowerCase() === "confirmed";
   }
 
   toJson(): DiagnosisObject {
