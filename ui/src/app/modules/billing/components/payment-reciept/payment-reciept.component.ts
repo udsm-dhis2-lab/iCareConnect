@@ -99,10 +99,18 @@ export class PaymentReceiptComponent implements OnInit {
         <body>`);
 
      // Change image from base64 then replace some text with empty string to get an image
-     let image = this.facilityDetailsJson.attributes[0].display.replace(
-       "Logo: ",
-       ""
-     );
+    let image = "";
+
+    this.facilityDetailsJson.attributes.map((attribute) => {
+      let attributeTypeName =
+        attribute && attribute.attributeType
+          ? attribute?.attributeType?.name.toLowerCase()
+          : "";
+      if (attributeTypeName === "logo") {
+        image = attribute?.value;
+      }
+    });
+
 
      frameDoc.document.write(`
         
