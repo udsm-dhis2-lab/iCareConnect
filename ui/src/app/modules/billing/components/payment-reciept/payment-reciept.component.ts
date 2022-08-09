@@ -19,8 +19,8 @@ export class PaymentReceiptComponent implements OnInit {
 
   ngOnInit() {
     this.facilityDetailsJson =
-      this.data?.facilityDetails?.results?.length > 0
-        ? JSON.parse(this.data?.facilityDetails?.results[0]?.value)
+      this.data?.facilityDetails
+        ? this.data?.facilityDetails
         : null;
 
     this.facilityLogoBase64 =
@@ -54,18 +54,114 @@ export class PaymentReceiptComponent implements OnInit {
       ? frame1.contentDocument.document
       : frame1.contentDocument;
     frameDoc.document.open();
-    frameDoc.document.write(
-      "<html><head> <style>button {display:none;}</style>"
-    );
-    frameDoc.document.write("</head><body>");
-    frameDoc.document.write(contents);
-    frameDoc.document.write("</body></html>");
+    
+    console.log(this.facilityDetailsJson);
+
+     frameDoc.document.write(`
+      <html>
+        <head> 
+          <style> 
+              #top .logo img{
+                //float: left;
+                height: 100px;
+                width: 100px;
+                background-size: 100px 100px;
+              }
+              #table {
+                font-family: Arial, Helvetica, sans-serif;
+                border-collapse: collapse;
+                width: 100%;
+                background-color: #000;
+              } 
+              #table td, #table  th {
+                border: 1px solid #ddd;
+                padding: 5px;
+              } 
+              
+              #table tbody tr:nth-child(even){
+                background-color: #f2f2f2;
+              } 
+
+              #table thead tr th { 
+                padding-top: 12px; 
+                padding-bottom: 12px; 
+                text-align: left; 
+                // background-color: #2a8fd1; 
+                background-color: #000; 
+                color: #fff;
+              }
+              thead tr {
+                background: #000;
+                color: #fff;
+              } 
+          </style>
+        </head>
+        <body>`);
+
+     // Change image from base64 then replace some text with empty string to get an image
+     let image = this.facilityDetailsJson.attributes[0].display.replace(
+       "Logo: ",
+       ""
+     );
+
+     frameDoc.document.write(`
+        
+          <center id="top">
+            <div class="logo">
+              <img src="${image}" alt="Facility's Logo"> 
+            </div>
+            
+
+            <div class="info">
+              <h2>${this.facilityDetailsJson.display}</h2>
+              <h4>P.O Box ${this.facilityDetailsJson.postalCode} ${
+       this.facilityDetailsJson.stateProvince
+     }</h4>
+              <h4>${this.facilityDetailsJson.country}</h4>
+            </div>
+            <!--End Info-->
+          </center>
+          <!--End Document top-->
+          
+          
+          <div id="mid">
+            <div class="info">
+              <p> 
+                  Patient MRN : ${
+                    this.data?.currentPatient?.MRN ||
+                    this.data?.currentPatient?.patient?.identifiers[0]
+                      ?.identifier
+                  }</br>
+              </p>
+              <p> 
+                  Patient Name : ${this.data?.currentPatient?.name}</br>
+              </p>
+            </div>
+          </div>`);
+
+        frameDoc.document.write(contents);
+
+        frameDoc.document.write(`
+          </body>
+        </html>`);
+
+
+
     frameDoc.document.close();
     setTimeout(function () {
       window.frames["frame3"].focus();
       window.frames["frame3"].print();
       document.body.removeChild(frame1);
     }, 500);
+
+
+
+    // frameDoc.document.write(
+    //   "<html><head> <style>button {display:none;}</style>"
+    // );
+    // frameDoc.document.write("</head><body>");
+    // frameDoc.document.write(contents);
+    // frameDoc.document.write("</body></html>");
 
     //window.print();
   }
