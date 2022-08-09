@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { Observable, zip } from "rxjs";
 import { map } from "rxjs/operators";
 import { ConceptsService } from "../../resources/concepts/services/concepts.service";
@@ -13,6 +13,9 @@ export class PatientListFiltersComponent implements OnInit {
   @Input() filterCategories: any[];
   filterCategoriesOptions$: Observable<any>;
   paymentTypeSelected: any;
+
+  @Output() onFilterChanged = new EventEmitter<any>();
+
   constructor(private conceptService: ConceptsService) {}
 
   ngOnInit(): void {
@@ -29,4 +32,9 @@ export class PatientListFiltersComponent implements OnInit {
       })
     );
   }
+
+  getValue(){
+    this.onFilterChanged.emit(this.paymentTypeSelected);
+  }
+
 }

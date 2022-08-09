@@ -65,7 +65,7 @@ public class LaboratoryController {
 		retults.put("results", responseSamplesObject);
 		return retults;
 	}
-	
+
 	@RequestMapping(value = "sample", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public Map<String, Object> createNewSample(@RequestBody Map<String, Object> sample) throws IOException {
@@ -142,12 +142,37 @@ public class LaboratoryController {
 		
 		return response;
 	}
-	
+
+
 	@RequestMapping(value = "sample", method = RequestMethod.GET)
 	@ResponseBody
-	public List<Map<String, Object>> getSamplesByVisit(@RequestParam("visit") String visitId) {
-		
-		List<Sample> samples = laboratoryService.getSamplesByVisit(visitId);
+	public List<Map<String, Object>> getSamplesByVisit(
+		@RequestParam(value = "visit", required = false) String visitId,
+		@RequestParam(value = "patient", required = false) String patient,
+		@RequestParam(value = "startDate", required = false) String startDate,
+		@RequestParam(value = "endDate", required = false) String endDate
+		)		
+		{
+
+			
+		Date sampleCreatedStartDate = null;
+		Date sampleCreatedEndDate = null;
+
+		if ((startDate != null || endDate != null) && (startDate.length() > 0  || endDate.length() > 0)) {
+
+			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+			try {
+				sampleCreatedStartDate = formatter.parse(startDate);
+				if(endDate != null){
+					sampleCreatedEndDate = formatter.parse(endDate);
+				}
+			}
+			catch( Exception e ) {
+				System.out.println("Dates provided were not in correct format, please format in year-month-date e.g 1990-01-05");
+			}
+		}
+
+		List<Sample> samples = laboratoryService.getSamplesByVisitOrPatientAndOrDates(visitId , patient, sampleCreatedStartDate, sampleCreatedEndDate);
 		
 		List<Map<String, Object>> responseSamplesObject = new ArrayList<Map<String, Object>>();
 		for (Sample sample : samples) {

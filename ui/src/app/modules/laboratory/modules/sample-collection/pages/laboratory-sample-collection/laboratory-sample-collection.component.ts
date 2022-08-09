@@ -101,7 +101,6 @@ export class LaboratorySampleCollectionComponent implements OnInit {
   }
 
   onGetSamplesToCollect(count: number): void {
-    console.log("countOfSamplesToCollect");
     this.countOfSamplesToCollect = count;
   }
 }

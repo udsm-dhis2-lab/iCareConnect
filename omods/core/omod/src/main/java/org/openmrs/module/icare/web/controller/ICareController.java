@@ -359,4 +359,19 @@ public class ICareController {
 		results.put("results", conceptReferenceTermsList);
 		return results;
 	}
+	
+	@RequestMapping(value = "conceptsets", method = RequestMethod.GET)
+	@ResponseBody
+	public Map<String, Object> getConceptSetsByConcept(@RequestParam(value = "concept", required = false) String concept) {
+		List<Map<String, Object>> conceptSetsList = new ArrayList<>();
+		for (ConceptSet conceptSets: iCareService.getConceptsSetsByConcept(concept)) {
+			Map<String, Object> conceptSet = new HashMap<String, Object>();
+			conceptSet.put("uuid", conceptSets.getConceptSet().getUuid());
+			conceptSet.put("display", conceptSets.getConceptSet().getDisplayString());
+			conceptSetsList.add(conceptSet);
+		}
+		Map<String, Object> results = new HashMap<>();
+		results.put("results", conceptSetsList);
+		return results;
+	}
 }
