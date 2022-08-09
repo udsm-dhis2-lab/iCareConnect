@@ -168,6 +168,17 @@ export class RegistrationAddComponent implements OnInit {
     placeholder: "Eg: 0711111111",
     category: "phoneNumber",
   });
+
+  primaryPhoneNumberNextOfKinFormField: any = new PhoneNumber({
+    id: "primaryMobileNumber",
+    key: "primaryMobileNumber",
+    label: "Enter Contact Number",
+    required: false,
+    type: "number",
+    min: 0,
+    placeholder: "Eg: 0711111111",
+    category: "phoneNumber",
+  });
   isPhoneNumberCorrect: boolean = false;
 
   onPrimaryMobileNumberFormUpdate(formValueObject: FormValue): void {
@@ -177,6 +188,11 @@ export class RegistrationAddComponent implements OnInit {
 
   onPrimaryMobileNumberAreaLeaderFormUpdate(formValueObject: FormValue): void {
     this.patient["areaLeaderNumber"] =
+      formValueObject.getValues()?.primaryMobileNumber?.value;
+  }
+
+  onPrimaryMobileNumberNextOfKinFormUpdate(formValueObject: FormValue): void {
+    this.patient["kinPhone"] =
       formValueObject.getValues()?.primaryMobileNumber?.value;
   }
 
