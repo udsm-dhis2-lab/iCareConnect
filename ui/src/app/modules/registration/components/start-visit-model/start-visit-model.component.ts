@@ -24,6 +24,7 @@ export class StartVisitModelComponent implements OnInit {
   treatmentLocations$: Observable<any[]>;
   loadingPatientByLocation: boolean = true;
   patient: any;
+  patientPhone: any;
   selectedTab = new FormControl(0);
   omitCurrent: boolean = true;
   visitTypes$: Observable<any[]>;
@@ -42,6 +43,11 @@ export class StartVisitModelComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) data
   ) {
     this.patient = data?.patient;
+    this.patient.person.attributes.map((attribute) => {
+        if(attribute?.display.split(" = ")[0].toLowerCase() === "phone" ){
+          this.patientPhone =  attribute.display.split(' = ')[1];
+        }
+    })
   }
 
   ngOnInit(): void {
