@@ -3,8 +3,8 @@
     <div class="menu-items">
       <!-- {{ currentModule | json }} -->
       <div
-        class="menu-item"
-        [ngClass]="{ 'selected-module': currentModule?.id === module?.id }"
+      class="menu-item"
+      [ngClass]="{ 'selected-module': currentModule?.id === module?.id }"
         (click)="onSelectModuleLocation($event, module)"
         *ngFor="let module of modulesReferences"
       >

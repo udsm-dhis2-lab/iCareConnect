@@ -109,8 +109,12 @@ export class PatientListComponent implements OnInit, OnChanges {
   }
 
   private getVisits(visits: Visit[]) {
+    
     this.loadingPatients = true;
-    this.visits$ = visits ? of(visits) : this.service && this.service === "LABS" ? this.visitService.getLabVisits("", 0, this.itemsPerPage).pipe(
+    this.visits$ = visits
+      ? of(visits)
+      : this.service && this.service === "LABS"
+      ? this.visitService.getLabVisits("", 0, this.itemsPerPage).pipe(
           tap(() => {
             this.loadingPatients = false;
           })
@@ -125,7 +129,9 @@ export class PatientListComponent implements OnInit, OnChanges {
             this.itemsPerPage,
             this.orderType,
             this.orderStatus,
-            this.orderStatusCode
+            this.orderStatusCode,
+            "ENCOUNTER",
+            "ASC"
           )
           .pipe(
             tap(() => {
@@ -165,7 +171,12 @@ export class PatientListComponent implements OnInit, OnChanges {
                     (pageLink) => pageLink?.rel === details?.type
                   ) || [])[0]?.uri?.split("&startIndex=")[1]
                 : 0,
-              this.itemsPerPage
+              this.itemsPerPage,
+              null,
+              null,
+              null,
+              "ENCOUNTER",
+              "ASC"
             )
             .pipe(
               tap(() => {
@@ -185,7 +196,12 @@ export class PatientListComponent implements OnInit, OnChanges {
         false,
         this.searchTerm,
         0,
-        this.itemsPerPage
+        this.itemsPerPage,
+        null,
+        null,
+        null,
+        "ENCOUNTER",
+        "ASC"
       )
       .pipe(
         tap(() => {
@@ -231,9 +247,6 @@ export class PatientListComponent implements OnInit, OnChanges {
         event && event.paymentType && event.paymentType.display
           ? event.paymentType.display
           : "" ;
-      if(this.paymentTypeSelected === ""){
-        console.log("All is selected...");
-      }
     }, 100);
 
   }
