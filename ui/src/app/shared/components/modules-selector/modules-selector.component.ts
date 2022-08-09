@@ -45,6 +45,7 @@ export class ModulesSelectorComponent implements OnInit {
       "currentLocation",
       JSON.stringify(locationMatchingNavigationDetails)
     );
+
     const storedLocation =
       localStorage.getItem("currentLocation") != "undefined"
         ? JSON.parse(localStorage.getItem("currentLocation"))
@@ -77,12 +78,15 @@ export class ModulesSelectorComponent implements OnInit {
           location: this.currentLocation,
         };
       });
-      this.currentModule = {
-        ...this.currentLocation?.modules[0],
-        ...(modules.filter(
-          (module) => module?.id === this.currentLocation?.modules[0]?.id
-        ) || [])[0],
-      };
+      
+      //Hinglight the current location
+      // this.currentModule = {
+      //   ...this.currentLocation?.modules[0],
+      //   ...(modules.filter(
+      //     (module) => module?.id === this.currentLocation?.modules[0]?.id
+      //   ) || [])[0],
+      // };
+
       this.modulesReferences = orderBy(
         uniqBy(
           flatten(

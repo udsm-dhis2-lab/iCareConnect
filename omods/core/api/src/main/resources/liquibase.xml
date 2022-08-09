@@ -1374,6 +1374,9 @@
         </createIndex>
     </changeSet>
 
+
+
+
     <changeSet id="group_services_concept" author="jesse-justin" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <sqlCheck  expectedResult="0">select count(*) from concept_class where name = 'ConceptGroup'</sqlCheck>
@@ -2678,6 +2681,41 @@
 
     </changeSet>
 
+    <changeSet id="create_lb_test_order_location" author="dennis-kibahila" dbms="mysql">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="lb_test_order_location"/>
+            </not>
+        </preConditions>
+        <comment>Creating openmrs TestOrderLocation table</comment>
+        <createTable tableName="lb_test_order_location">
+            <column name="test_order_location_id" type="INTEGER"/>
+            <column name="concept_id" type="INTEGER"/>
+            <column name="location_id" type="INTEGER"/>
+             <column name="created_by" type="INTEGER"/>
+              <column name="created_on" type="DATETIME"/>
+        </createTable>
+        <addPrimaryKey columnNames="id" tableName="test_order_location"/>
+        <addForeignKeyConstraint
+                baseTableName="test_order_location"
+                baseColumnNames="concept_id"
+                constraintName="test_order_location_concept_id_fk"
+                referencedTableName="concept"
+                referencedColumnNames="concept_id"/>
+        <addForeignKeyConstraint
+                baseTableName="test_order_location"
+                baseColumnNames="location_id"
+                constraintName="test_order_location_location_id_fk"
+                referencedTableName="location"
+                referencedColumnNames="location_id"/>
+        <addForeignKeyConstraint
+                baseTableName="test_order_location"
+                baseColumnNames="created_by"
+                constraintName="test_order_location_created_by_fk"
+                referencedTableName="users"
+                referencedColumnNames="user_id"/>        
+
+    </changeSet>
 
     <changeSet id="add_concept_id_column_to_lb_test_allocation" author="jesse-justin" dbms="mysql">
         <preConditions onFail="MARK_RAN">

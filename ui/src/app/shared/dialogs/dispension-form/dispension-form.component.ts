@@ -142,7 +142,9 @@ export class DispensingFormComponent implements OnInit {
         : { uuid: order?.drug.split(":")[1] },
       action: order?.action || "NEW",
       urgency: "ROUTINE",
-      location: JSON.parse(localStorage.getItem("currentLocation"))["uuid"],
+      location: localStorage.getItem("currentLocation")
+        ? JSON.parse(localStorage.getItem("currentLocation"))["uuid"]
+        : null,
       providerUuid: this.drugOrderData?.provider?.uuid,
       encounterUuid: JSON.parse(localStorage.getItem("patientConsultation"))[
         "encounterUuid"
