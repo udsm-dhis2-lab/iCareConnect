@@ -97,13 +97,10 @@ export class FormService {
         })
       );
     } else if (searchControlType === "searchFromOptions") {
+
       return of(
         field?.options.filter(
-          (option) =>
-            option?.name.toLowerCase().indexOf(parameters?.q.toLowerCase()) >
-              -1 ||
-            option?.label.toLowerCase().indexOf(parameters?.q.toLowerCase()) >
-              -1
+          (option) => option?.name.toLowerCase().indexOf(parameters?.q.toLowerCase()) > -1 || option?.formField?.label.toLowerCase().indexOf(parameters?.q.toLowerCase()) > -1
         )
       );
     } else if (searchControlType === "billableItem") {
