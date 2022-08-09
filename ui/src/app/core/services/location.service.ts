@@ -19,7 +19,7 @@ export class LocationService {
   getLoginLocations(): Observable<any> {
     return this.httpClient
       .get(
-        "location?limit=100&tag=Login+Location&v=custom:(display,country,postalCode,stateProvince,uuid,tags,description,parentLocation,childLocations,attributes:(attributeType,uuid,value,display,voided))"
+        "location?limit=100&tag=Login+Location&v=custom:(display,country,postalCode,stateProvince,uuid,tags,description,parentLocation:(uuid,display),attributes:(attributeType,uuid,value,display,voided))"
       )
       .pipe(
         map((response) => {
@@ -57,27 +57,35 @@ export class LocationService {
   }
 
   getAllLocations() {
-    return this.httpClient.get("location?v=full&limit=100").pipe(
-      map((response) => {
-        return {
-          results: response?.results.map((result) => {
-            return {
-              ...result,
-              attributes:
-                result?.attributes && result?.attributes?.length > 0
-                  ? result?.attributes.filter((attribute) => !attribute?.voided)
-                  : [],
-            };
-          }),
-        };
-      }),
-      catchError((error) => of(error))
-    );
+    return this.httpClient
+      .get(
+        "location?v=custom:(uuid,display,parentLocation:(uuid,display),tags,description,attributes:(attributeType,uuid,value,voided))&limit=100"
+      )
+      .pipe(
+        map((response) => {
+          return {
+            results: response?.results.map((result) => {
+              return {
+                ...result,
+                attributes:
+                  result?.attributes && result?.attributes?.length > 0
+                    ? result?.attributes.filter(
+                        (attribute) => !attribute?.voided
+                      )
+                    : [],
+              };
+            }),
+          };
+        }),
+        catchError((error) => of(error))
+      );
   }
 
   getAllLocationsByLoginLocationTag() {
     return this.httpClient
-      .get("location?v=full&limit=100&tag=Login+Location")
+      .get(
+        "location?v=custom:(uuid,display,parentLocation:(uuid,display),tags,description,attributes:(attributeType,uuid,value,voided))&limit=100&tag=Login+Location"
+      )
       .pipe(
         map((response) => {
           return {
