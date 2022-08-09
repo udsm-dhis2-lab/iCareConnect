@@ -69,6 +69,12 @@ import { SharedLocationSettingsHomeComponent } from "./shared-location-settings-
 import { ManageLocationModalComponent } from "./manage-location-modal/manage-location-modal.component";
 import { PrintButtonComponent } from "./print-button/print-button.component";
 import { RetireMetadataReasonModalComponent } from "./retire-metadata-reason-modal/retire-metadata-reason-modal.component";
+import { ManagePrivilegesComponent } from "./manage-privileges/manage-privileges.component";
+import { ManageRolesComponent } from "./manage-roles/manage-roles.component";
+import { SharedPrivilegesAndRolesManagementComponent } from "./shared-privileges-and-roles-management/shared-privileges-and-roles-management.component";
+import { PrivilegesListComponent } from "./privileges-list/privileges-list.component";
+import { RolesListComponent } from "./roles-list/roles-list.component";
+import { SharedConfirmationDialogComponent } from "./shared-confirmation-dialog/shared-confirmation-dialog.component";
 
 export const components: any[] = [
   PatientSearchComponent,
@@ -142,6 +148,12 @@ export const components: any[] = [
   ManageLocationModalComponent,
   PrintButtonComponent,
   RetireMetadataReasonModalComponent,
+  ManagePrivilegesComponent,
+  ManageRolesComponent,
+  SharedPrivilegesAndRolesManagementComponent,
+  PrivilegesListComponent,
+  RolesListComponent,
+  SharedConfirmationDialogComponent,
 ];
 
 export const sharedEntryComponents: any[] = [
@@ -159,6 +171,9 @@ export const sharedEntryComponents: any[] = [
   CaptureSignatureComponent,
   ManageLocationModalComponent,
   RetireMetadataReasonModalComponent,
+  ManagePrivilegesComponent,
+  ManageRolesComponent,
+  SharedConfirmationDialogComponent,
 ];
 
 export * from "./patient-vitals-summary/patient-vitals-summary.component";

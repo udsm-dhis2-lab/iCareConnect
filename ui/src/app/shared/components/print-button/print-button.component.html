@@ -1,4 +1,5 @@
 <button class="{{classes}}" mat-stroked-button matTooltip="{{ toolTipText }}" (click)="onPrint()">
-    <mat-icon>{{iconName}}</mat-icon>
+    
+    <mat-icon *ngIf="iconName">{{iconName}}</mat-icon>
     {{ showText}}
 </button>

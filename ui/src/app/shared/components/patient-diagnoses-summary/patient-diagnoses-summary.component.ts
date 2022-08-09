@@ -40,10 +40,10 @@ export class PatientDiagnosesSummaryComponent implements OnInit {
   ngOnInit(): void {
     if (this.diagnosisFormDetails) {
       this.diagnosisForm = formatDiagnosisFormObject(this.diagnosisFormDetails);
-      this.diagnosisField = (this.diagnosisForm.formFields.filter(
+      this.diagnosisField = (this.diagnosisForm?.formFields.filter(
         (field) => field?.key === "diagnosis"
       ) || [])[0];
-      this.diagnosisRankField = (this.diagnosisForm.formFields.filter(
+      this.diagnosisRankField = (this.diagnosisForm?.formFields.filter(
         (field) => field?.key === "rank"
       ) || [])[0];
     }
@@ -79,10 +79,10 @@ export class PatientDiagnosesSummaryComponent implements OnInit {
 
       setTimeout(() => {
         this.diagnoses$ = this.store.select(getAllDiagnoses);
-        this.diagnosisField = (this.diagnosisForm.formFields.filter(
+        this.diagnosisField = (this.diagnosisForm?.formFields.filter(
           (field) => field?.key === "diagnosis"
         ) || [])[0];
-        this.diagnosisRankField = (this.diagnosisForm.formFields.filter(
+        this.diagnosisRankField = (this.diagnosisForm?.formFields.filter(
           (field) => field?.key === "rank"
         ) || [])[0];
       }, 200);

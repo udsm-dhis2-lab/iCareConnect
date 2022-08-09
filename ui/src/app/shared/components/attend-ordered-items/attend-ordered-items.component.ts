@@ -150,7 +150,9 @@ export class AttendOrderedItemsComponent implements OnInit {
     const orders = uniqBy([procedure], "concept");
     const encounter = {
       visit: this.visit?.uuid,
-      location: JSON.parse(localStorage.getItem("currentLocation"))["uuid"],
+      location: localStorage.getItem("currentLocation")
+        ? JSON.parse(localStorage.getItem("currentLocation"))["uuid"]
+        : null,
       patient: this.visit?.patientUuid,
       encounterType: this.nursingConfigurations?.encounterType?.uuid,
       orders: orders,

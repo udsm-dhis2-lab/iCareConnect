@@ -263,8 +263,56 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		visitMap = (new ObjectMapper()).readValue(visitData, Map.class);
 		visitDetails = (List<Map>) visitMap.get("results");
 		assertThat("Should return a visit", visitDetails.size() == 1);
+
 	}
-	
+
+	@Test
+	public void testGetVisitAttribute() throws Exception {
+
+		//Get visits by attribute value references
+		MockHttpServletRequest newGetRequest = newGetRequest("icare/visit", new Parameter("attributeValueReference","123"));
+		MockHttpServletResponse handle = handle(newGetRequest);
+		String visitData = handle.getContentAsString();
+		Map visitMap = (new ObjectMapper()).readValue(visitData, Map.class);
+		List<Map> visitDetails = (List<Map>) visitMap.get("results");
+		assertThat("Should return a visit", visitDetails.size() == 1);
+
+		//Get searched patient with visit attribute reference
+		newGetRequest = newGetRequest("icare/visit", new Parameter("attributeValueReference", "123"),
+				new Parameter("q", "Harry"));
+		handle = handle(newGetRequest);
+		visitData = handle.getContentAsString();
+		visitMap = (new ObjectMapper()).readValue(visitData, Map.class);
+		visitDetails = (List<Map>) visitMap.get("results");
+		assertThat("Should return a visit", visitDetails.size() == 1);
+
+	}
+
+	@Test
+	public void testGetPatientsByPaymentStatus() throws Exception{
+
+		//Get visits by Payment Status
+		//PAID
+		MockHttpServletRequest newGetRequest = newGetRequest("icare/visit", new Parameter("paymentStatus","PAID"));
+		MockHttpServletResponse handle = handle(newGetRequest);
+		String visitData = handle.getContentAsString();
+		Map visitMap = (new ObjectMapper()).readValue(visitData, Map.class);
+		List<Map> visitDetails = (List<Map>) visitMap.get("results");
+		System.out.println(visitDetails.size());
+		assertThat("Should return a visit", visitDetails.size() == 1);
+
+		//PENDING
+		// When testing for pending uncomment the below test and modify the records in billing-data.xml file
+//		 newGetRequest = newGetRequest("icare/visit", new Parameter("paymentStatus","PENDING"));
+//		 handle = handle(newGetRequest);
+//		 visitData = handle.getContentAsString();
+//		visitMap = (new ObjectMapper()).readValue(visitData, Map.class);
+//		 visitDetails = (List<Map>) visitMap.get("results");
+//		System.out.println(visitDetails.size());
+//		assertThat("Should return a visit", visitDetails.size() == 1);
+
+	}
+
 	@Test
 	@Ignore(value = "Changed to Advice")
 	public void testLabOrderCreation() throws Exception {
@@ -363,11 +411,13 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		Visit newVisit = this.getVisit(patient);
 		
 		MockHttpServletRequest newGetRequest = newGetRequest("icare/visit", new Parameter("orderTypeUuid",
-		        "2msir5eb-5345-11e8-9922-40b034c3cfee")
+		        "2msir5eb-5345-11e8-9922-40b034c3cfee"), new Parameter("OrderBy", "ENCOUNTER"), new Parameter("OrderByDirection", "ASC")
 		//, new Parameter("fulfillerStatus","COMPL")
 		);
 		MockHttpServletResponse handle = handle(newGetRequest);
-		
+
+		System.out.println(handle.getContentAsString());
+
 		Map<String, Object> orderResult = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
 		assertThat("Should return a visit", ((List) orderResult.get("results")).size() == 1);
 		//Then

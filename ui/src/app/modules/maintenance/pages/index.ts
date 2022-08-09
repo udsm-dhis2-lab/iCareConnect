@@ -5,6 +5,7 @@ import { EditUserComponent } from "./user-management/edit-user/edit-user.compone
 import { UserManagementComponent } from "./user-management/user-management-home/user-management.component";
 import { PriceListHomeComponent } from "./price-list-home/price-list-home.component";
 import { SystemSettingsComponent } from "./system-settings/system-settings.component";
+import { PrivilegesAndRolesComponent } from "./privileges-and-roles/privileges-and-roles.component";
 
 export const maintenancePages: any[] = [
   MaintenanceHomeComponent,
@@ -14,6 +15,7 @@ export const maintenancePages: any[] = [
   EditUserComponent,
   PriceListHomeComponent,
   SystemSettingsComponent,
+  PrivilegesAndRolesComponent,
 ];
 
 export {
