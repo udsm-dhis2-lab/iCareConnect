@@ -30,11 +30,13 @@
       <p class="demographic-details">
         {{
           patient?.display +
-            ", Gender: " +
+            " | Gender: " +
             patient?.person?.gender +
-            ", Age: " +
+            " | Age: " +
             patient?.person?.age +
-            " yrs"
+            " yrs" +
+            " | Contact:" +
+            patientPhone
         }}
       </p>
       <mat-progress-bar
@@ -42,14 +44,14 @@
         *ngIf="!params?.currentVisitLoadedState"
       ></mat-progress-bar>
       <div class="row" *ngIf="params?.currentVisitLoadedState">
-        <div class="col-md-4">
+        <!-- <div class="col-md-4">
           <div class="other-patient-details">
             <app-patient-person-attributes
               [attributes]="patient?.person?.attributes"
             ></app-patient-person-attributes>
           </div>
-        </div>
-        <div class="col-md-8">
+        </div> -->
+        <div class="col-md-12">
           <app-other-patient-details
             [patient]="patient"
           ></app-other-patient-details>
