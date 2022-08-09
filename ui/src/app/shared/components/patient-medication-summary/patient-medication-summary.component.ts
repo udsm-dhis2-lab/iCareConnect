@@ -44,7 +44,9 @@ export class PatientMedicationSummaryComponent implements OnInit {
         drugOrder: null,
         patientUuid: this.patientVisit?.patientUuid,
         visit: this.patientVisit,
-        location: JSON.parse(localStorage.getItem("currentLocation")),
+        location: localStorage.getItem("currentLocation")
+          ? JSON.parse(localStorage.getItem("currentLocation"))
+          : null,
         encounterUuid: JSON.parse(localStorage.getItem("patientConsultation"))[
           "encounterUuid"
         ],
