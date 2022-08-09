@@ -1,1 +1,12 @@
-<p>shared-location-type-selection works!</p>
+<div>
+  <mat-tab-group>
+    <mat-tab label="{{ header?.display }}" *ngFor="let header of headers">
+      <ng-template matTabContent>
+        <app-shared-location-settings
+          [locationTag]="header"
+          [locationTags]="locationTags"
+        ></app-shared-location-settings>
+      </ng-template>
+    </mat-tab>
+  </mat-tab-group>
+</div>

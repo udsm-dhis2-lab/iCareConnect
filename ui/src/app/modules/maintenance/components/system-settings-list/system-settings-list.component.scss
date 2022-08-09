@@ -2,6 +2,11 @@
   cursor: pointer;
 }
 
+button,
+button:hover {
+  outline: none !important;
+}
+
 .add-button {
   border: 10px;
   bottom: 0;

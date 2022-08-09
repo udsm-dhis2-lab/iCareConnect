@@ -65,6 +65,10 @@ import { MultipleItemsSelectionComponent } from "./multiple-items-selection/mult
 import { SharedLocationSettingsComponent } from "./shared-location-settings/shared-location-settings.component";
 import { SharedLocationTypeSelectionComponent } from "./shared-location-type-selection/shared-location-type-selection.component";
 import { PatientListFiltersComponent } from "./patient-list-filters/patient-list-filters.component";
+import { SharedLocationSettingsHomeComponent } from "./shared-location-settings-home/shared-location-settings-home.component";
+import { ManageLocationModalComponent } from "./manage-location-modal/manage-location-modal.component";
+import { PrintButtonComponent } from "./print-button/print-button.component";
+import { RetireMetadataReasonModalComponent } from "./retire-metadata-reason-modal/retire-metadata-reason-modal.component";
 
 export const components: any[] = [
   PatientSearchComponent,
@@ -134,6 +138,10 @@ export const components: any[] = [
   SharedLocationSettingsComponent,
   SharedLocationTypeSelectionComponent,
   PatientListFiltersComponent,
+  SharedLocationSettingsHomeComponent,
+  ManageLocationModalComponent,
+  PrintButtonComponent,
+  RetireMetadataReasonModalComponent,
 ];
 
 export const sharedEntryComponents: any[] = [
@@ -149,6 +157,8 @@ export const sharedEntryComponents: any[] = [
   AddDiagnosisModalComponent,
   DeleteDiagnosisModalComponent,
   CaptureSignatureComponent,
+  ManageLocationModalComponent,
+  RetireMetadataReasonModalComponent,
 ];
 
 export * from "./patient-vitals-summary/patient-vitals-summary.component";

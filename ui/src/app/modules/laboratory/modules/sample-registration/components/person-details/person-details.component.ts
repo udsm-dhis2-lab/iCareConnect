@@ -217,6 +217,7 @@ export class PersonDetailsComponent implements OnInit {
         label: "Source/Received From",
         options: [],
         searchControlType: "location",
+        searchTerm: "Health Facility",
         shouldHaveLiveSearchForDropDownFields: true,
       }),
       new Textbox({

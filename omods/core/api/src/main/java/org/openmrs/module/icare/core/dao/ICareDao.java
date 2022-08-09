@@ -471,7 +471,6 @@ public class ICareDao extends BaseDAO<Item> {
 		if (!where.equals("WHERE")) {
 			searchQueryStr += " " + where;
 		}
-		System.out.println(searchQueryStr);
 		Query sqlQuery = session.createQuery(searchQueryStr);
 		sqlQuery.setFirstResult(startIndex);
 		sqlQuery.setMaxResults(limit);
@@ -483,7 +482,17 @@ public class ICareDao extends BaseDAO<Item> {
 			sqlQuery.setParameter("source", "%" + source + "%");
 		}
 		List data = sqlQuery.list();
-		System.out.println(data);
 		return data;
+	}
+	
+	public List<ConceptSet> getConceptsSetsByConcept(String concept) {
+		DbSession session = getSession();
+		String searchConceptSetQueryStr = "SELECT DISTINCT cs FROM ConceptSet cs INNER JOIN cs.concept c WHERE c.uuid =:concept";
+		Query sqlQuery = session.createQuery(searchConceptSetQueryStr);
+		
+		if (concept != null) {
+			sqlQuery.setParameter("concept", concept);
+		}
+		return sqlQuery.list();
 	}
 }
