@@ -2930,7 +2930,8 @@ export interface PrivilegeGetFull {
 }
 
 export interface PrivilegeCreate {
-  name: string;
+  name?: string;
+  uuid?: string;
   description?: string;
 }
 
@@ -3231,11 +3232,11 @@ export interface RoleGetFull {
 
 export interface RoleCreate {
   name: string;
-  uuid: string;
+  uuid?: string;
   description?: string;
   privileges?: PrivilegeCreate[];
   inheritedRoles?: RoleCreate[];
-  display: string;
+  display?: string;
 }
 
 export interface RoleCreateFull {
