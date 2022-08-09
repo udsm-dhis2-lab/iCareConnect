@@ -542,7 +542,11 @@
                   [disabled]="addingPatient && !patientAdded"
                 />
               </mat-form-field>
-              <mat-form-field appearance="fill" class="w-100">
+
+              <app-form [fields]="[primaryPhoneNumberNextOfKinFormField]"
+                (formUpdate)="onPrimaryMobileNumberNextOfKinFormUpdate($event)"></app-form>
+
+              <!-- <mat-form-field appearance="fill" class="w-100">
                 <mat-label>Contact number</mat-label>
                 <input
                   matInput
@@ -551,7 +555,7 @@
                   name="kinPhone"
                   [disabled]="addingPatient && !patientAdded"
                 />
-              </mat-form-field>
+              </mat-form-field> -->
             </div>
 
             <div>
