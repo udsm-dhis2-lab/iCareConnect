@@ -127,10 +127,21 @@ export class VisitsService {
     orderType?: string,
     orderStatus?: string,
     orderStatusCode?: string,
-    visitAttributeType?: string,
-    paymentType?: string,
+    orderBy?: string,
+    orderDirection?: string,
   ): Observable<Visit[]> {
     const locationUuids: any = isArray(location) ? location : [location];
+
+    // Parameters for sorting
+    const orderByParameter = orderBy ? `&OrderBy=${orderBy}` : "";
+    const orderDirectionParameter = orderDirection
+      ? `&OrderByDirection=${orderDirection}`
+      : "";
+    const sortingParameters =
+      orderByParameter || orderDirectionParameter
+        ? orderByParameter + orderDirectionParameter
+        : "";
+
     if (orderType) {
       const orderStatusParameter = orderStatus
         ? `&fulfillerStatus=${orderStatus}`
@@ -139,9 +150,10 @@ export class VisitsService {
         ? `&orderStatusCode=${orderStatusCode}`
         : "";
       const locationParameter = location ? `locationUuid=${location}&` : "";
+
       return this.httpClient
         .get(
-          `icare/visit?${locationParameter}orderTypeUuid=${orderType}${orderStatusParameter}${orderStatusCodeParameter}&startIndex=${startIndex}&limit=${limit}`
+          `icare/visit?${locationParameter}orderTypeUuid=${orderType}${orderStatusParameter}${orderStatusCodeParameter}${sortingParameters}&startIndex=${startIndex}&limit=${limit}`
         )
         .pipe(
           map((visitResponse) => {
@@ -168,9 +180,10 @@ export class VisitsService {
           })
         );
     }
-    
+
     return zip(
       ...locationUuids.map((locationUuid) => {
+        
         return from(
           this.api.visit.getAllVisits({
             includeInactive:
@@ -180,8 +193,14 @@ export class VisitsService {
             q: queryParam,
             limit: limit ? limit : 100,
             startIndex: startIndex ? startIndex : 0,
+            orderBy: orderBy ? orderBy : null,
+            orderByDirection: orderDirection ? orderDirection : null 
           } as any)
-        ).pipe(map((result: any) => result));
+        ).pipe(
+          map((result: any) => {
+            return result;
+          })
+        );
       })
     ).pipe(
       map((visitResponse: any) => {
@@ -286,7 +305,7 @@ export class VisitsService {
         patient: patientUuid,
         v: `custom:(uuid,visitType,startDatetime,${encounters}attributes,stopDatetime,patient:(uuid,display,identifiers,person:(uuid,age,birthdate,gender,dead,preferredAddress:(cityVillage)),voided))`,
         limit: 2,
-        startIndex: 0,
+        startIndex: 0
       } as any)
     ).pipe(
       map((visitResponse) => {
@@ -342,6 +361,7 @@ export class VisitsService {
     includeInactive: boolean,
     omitCurrentVisit?: boolean
   ): Observable<any> {
+
     return zip(
       from(
         this.api.visit.getAllVisits({
@@ -412,6 +432,7 @@ export class VisitsService {
   ): Observable<any> {
     // TODO Load order separately to allow inclusion of more attributes
     // https://icare.dhis2udsm.org/openmrs/ws/rest/v1/order?patient=${patient}&v=full
+
     return zip(
       from(
         this.api.visit.getAllVisits({
@@ -428,6 +449,7 @@ export class VisitsService {
         : this.paymentService.getPatientPayments(patient)
     ).pipe(
       map((response: any[]) => {
+        
         const visitResponse = response[0];
         const patientBills = response[1];
         const patientPayments = response[2];
