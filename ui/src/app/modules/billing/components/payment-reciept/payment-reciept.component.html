@@ -2,22 +2,32 @@
   <mat-toolbar color="primary">Bill Payment Receipt</mat-toolbar>
   <div class="p-3">
     <div id="dialog-bill-receipt">
-      <div
+      <!-- <div
         style="text-align: center; margin-left: 0px !important"
         *ngIf="facilityLogoBase64"
       >
         <img src="{{ facilityLogoBase64 }}" width="60" />
-      </div>
+      </div> -->
       <table
-        class="table"
+        class="table table-bordered table-striped"
         style="
+                font-family: Arial, Helvetica, sans-serif;
+                border-collapse: collapse;
+                width: 100%;
+              "
+       
+      >
+        <!-- 
+          
+          table styles
+           style="
           margin-left: 0px !important;
           width: 100% !important;
           font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial,
             sans-serif !important;
         "
-      >
-        <tr>
+          
+          <tr>
           <td colspan="3" style="text-align: center">
             <h3>{{ facilityDetailsJson?.name }}</h3>
             <h5>{{ facilityDetailsJson?.address }}</h5>
@@ -40,9 +50,10 @@
               }}
             </b>
           </td>
-        </tr>
+        </tr> -->
 
-        <tr style="font-size: 0.7em">
+        <tr style="
+        font-size: 1.0em">
           <!-- <td>#</td> -->
           <td colspan="2"><b>Item(s)</b></td>
           <!-- <td>discount</td> -->
@@ -64,14 +75,12 @@
     </div>
     <div style="text-align: right">
       <button mat-stroked-button (click)="onCancel($event)">Cancel</button>
-      <button
-        class="ml-4 bg-success text-white"
-        mat-flat-button
-        color="primary"
-        (click)="onPrint($event)"
-      >
-        Print Receipt
-      </button>
+      
+        <app-print-button [toolTipText]="'Click to print receipt'"
+        [iconName]="'print'"
+          [showText]="'Print Receipt'"
+          [classesList]="['ml-4', 'bg-success', 'text-white']" (click)="onPrint($event)"></app-print-button>
+      
     </div>
   </div>
 </div>
