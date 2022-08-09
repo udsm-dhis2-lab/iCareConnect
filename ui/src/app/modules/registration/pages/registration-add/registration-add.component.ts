@@ -157,10 +157,26 @@ export class RegistrationAddComponent implements OnInit {
     placeholder: "Mobile number",
     category: "phoneNumber",
   });
+
+  primaryPhoneNumberAreaLeaderFormField: any = new PhoneNumber({
+    id: "primaryMobileNumber",
+    key: "primaryMobileNumber",
+    label: "Enter Number of Area leader/Neighbour",
+    required: false,
+    type: "number",
+    min: 0,
+    placeholder: "Eg: 0711111111",
+    category: "phoneNumber",
+  });
   isPhoneNumberCorrect: boolean = false;
 
   onPrimaryMobileNumberFormUpdate(formValueObject: FormValue): void {
     this.patient["phone"] =
+      formValueObject.getValues()?.primaryMobileNumber?.value;
+  }
+
+  onPrimaryMobileNumberAreaLeaderFormUpdate(formValueObject: FormValue): void {
+    this.patient["areaLeaderNumber"] =
       formValueObject.getValues()?.primaryMobileNumber?.value;
   }
 
