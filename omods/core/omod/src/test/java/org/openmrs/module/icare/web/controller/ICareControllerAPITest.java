@@ -405,13 +405,11 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 	public void testGettingVisits() throws Exception {
 		
 		//Given
-		
 		PatientService patientService = Context.getService(PatientService.class);
 		Patient patient = patientService.getPatientByUuid("1f6959e5-d15a-4025-bb48-340ee9e2c58d");
 		Visit newVisit = this.getVisit(patient);
 		
-		MockHttpServletRequest newGetRequest = newGetRequest("icare/visit", new Parameter("orderTypeUuid",
-		        "2msir5eb-5345-11e8-9922-40b034c3cfee"), new Parameter("OrderBy", "ENCOUNTER"), new Parameter("OrderByDirection", "ASC")
+		MockHttpServletRequest newGetRequest = newGetRequest("icare/visit", new Parameter("orderTypeUuid", "2msir5eb-5345-11e8-9922-40b034c3cfee"), new Parameter("OrderBy", "VISIT"), new Parameter("orderByDirection", "ASC")
 		//, new Parameter("fulfillerStatus","COMPL")
 		);
 		MockHttpServletResponse handle = handle(newGetRequest);
@@ -419,7 +417,7 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		System.out.println(handle.getContentAsString());
 
 		Map<String, Object> orderResult = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
-		assertThat("Should return a visit", ((List) orderResult.get("results")).size() == 1);
+		assertThat("Should return a visit", ((List) orderResult.get("results")).size() == 2);
 		//Then
 		
 		for (Visit visit : Context.getVisitService().getAllVisits()) {
@@ -438,7 +436,7 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		handle = handle(newGetRequest);
 		
 		orderResult = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
-		assertThat("Should return a visit", ((List) orderResult.get("results")).size() == 1);
+		assertThat("Should return a visit", ((List) orderResult.get("results")).size() > 0 );
 	}
 	
 	@Test
