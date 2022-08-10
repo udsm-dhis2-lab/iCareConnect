@@ -319,7 +319,7 @@ public class ICareDao extends BaseDAO<Item> {
 		if (orderBy == VisitWrapper.OrderBy.VISIT) {
 			queryStr += " ORDER BY v.startDatetime ";
 		} else if (orderBy == VisitWrapper.OrderBy.ENCOUNTER) {
-			queryStr += " ORDER BY e.encounterDatetime ";
+			queryStr += " ORDER BY e.encounterDatetime";
 		} else if (orderBy == VisitWrapper.OrderBy.ORDER) {
 			queryStr += " ORDER BY o.dateActivated ";
 		} else if (orderBy == VisitWrapper.OrderBy.OBSERVATION) {
