@@ -498,10 +498,14 @@ export class VisitComponent implements OnInit {
       };
       this.store.dispatch(
         startVisit({ visit: visitPayload, isEmergency: this.isEmergencyVisit })
-      );
+        );
+
+        //Close dialog after starting the visit successfully. 
+        this.dialog.closeAll();
     } else {
       this.openSnackBar("Error: location is not set", null);
     }
+
   }
 
   openSnackBar(message: string, action: string) {
