@@ -12,7 +12,7 @@ import { keyBy } from "lodash";
 export class PatientListFiltersComponent implements OnInit {
   @Input() filterCategories: any[];
   filterCategoriesOptions$: Observable<any>;
-  paymentTypeSelected: any;
+  filterParameters: any;
 
   @Output() onFilterChanged = new EventEmitter<any>();
 
@@ -35,7 +35,10 @@ export class PatientListFiltersComponent implements OnInit {
 
   getValue(event: any){
     // this.onFilterChanged.emit(this.paymentTypeSelected);
-    console.log(event)
+    
+    this.filterParameters += event.value.value ? event.value.value : "";  
+    
+    console.log(event.value);
   }
 
 }
