@@ -31,7 +31,17 @@ export class FieldControlService {
           : new FormControl({
               value: fieldData?.value || field.value || "",
               disabled: field?.disabled,
-            });
+            },
+
+            [
+              field?.controlType === "phoneNumber"
+                ? Validators.minLength(10)
+                : null,
+              field?.controlType === "phoneNumber"
+                ? Validators.maxLength(10)
+                : null,
+            ].filter((validator) => validator)
+            );
       }
     });
 

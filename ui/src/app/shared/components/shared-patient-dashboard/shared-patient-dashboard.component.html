@@ -34,10 +34,10 @@
     <div class="patient-dashboard-container mat-elevation-z1">
       <div class="patient-profile-sticky">
         <app-new-patient-profile
-        [currentPatient]="dashboardParams?.currentPatient"
+          [currentPatient]="dashboardParams?.currentPatient"
         ></app-new-patient-profile>
       </div>
-      
+
       <div class="w-100 patient-other-details-padding">
         <div
           class="
@@ -245,7 +245,9 @@
               </div>
 
               <div class="col-lg-6 col-md-6 col-sm-12 col-sx-12">
-                <mat-accordion>
+                <mat-accordion
+                  *ngIf="userPrivileges['CLINIC_ADD_PROVISIONAL_DIAGNOSIS']"
+                >
                   <mat-expansion-panel
                     class="mb-2 border p-0"
                     [expanded]="true"
@@ -269,6 +271,11 @@
                 </mat-accordion>
                 <mat-accordion>
                   <mat-expansion-panel
+                    *ngIf="
+                      userPrivileges['CLINIC_ADD_LABORATORY_INVESTIGATION'] ||
+                      userPrivileges['CLINIC_ADD_RADIOLOGY_INVESTIGATION'] ||
+                      userPrivileges['CLINIC_ADD_PROCEDURE_ORDER']
+                    "
                     class="mb-2 border p-0"
                     [expanded]="true"
                   >
@@ -309,7 +316,9 @@
                   </mat-expansion-panel>
                 </mat-accordion>
 
-                <mat-accordion>
+                <mat-accordion
+                  *ngIf="userPrivileges['CLINIC_ADD_CONFIRMED_DIAGNOSIS']"
+                >
                   <mat-expansion-panel
                     class="mb-2 border p-0"
                     [expanded]="true"
@@ -336,7 +345,9 @@
                   </mat-expansion-panel>
                 </mat-accordion>
 
-                <mat-accordion>
+                <mat-accordion
+                  *ngIf="userPrivileges['CLINIC_ADD_PRESCRIPTION']"
+                >
                   <mat-expansion-panel
                     class="mb-2 border p-0"
                     [expanded]="true"
