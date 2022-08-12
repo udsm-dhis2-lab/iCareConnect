@@ -54,8 +54,6 @@ export class PaymentReceiptComponent implements OnInit {
       ? frame1.contentDocument.document
       : frame1.contentDocument;
     frameDoc.document.open();
-    
-    console.log(this.facilityDetailsJson);
 
      frameDoc.document.write(`
       <html>
@@ -123,8 +121,8 @@ export class PaymentReceiptComponent implements OnInit {
             <div class="info">
               <h2>${this.facilityDetailsJson.display}</h2>
               <h4>P.O Box ${this.facilityDetailsJson.postalCode} ${
-       this.facilityDetailsJson.stateProvince
-     }</h4>
+                this.facilityDetailsJson.stateProvince
+              }</h4>
               <h4>${this.facilityDetailsJson.country}</h4>
             </div>
             <!--End Info-->

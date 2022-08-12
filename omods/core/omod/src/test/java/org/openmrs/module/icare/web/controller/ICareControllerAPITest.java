@@ -411,12 +411,10 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		Visit newVisit = this.getVisit(patient);
 		
 		MockHttpServletRequest newGetRequest = newGetRequest("icare/visit", new Parameter("orderTypeUuid",
-		        "2msir5eb-5345-11e8-9922-40b034c3cfee"), new Parameter("OrderBy", "ENCOUNTER"), new Parameter("OrderByDirection", "ASC")
+		        "2msir5eb-5345-11e8-9922-40b034c3cfee"), new Parameter("orderBy", "ENCOUNTER"), new Parameter("orderByDirection", "ASC")
 		//, new Parameter("fulfillerStatus","COMPL")
 		);
 		MockHttpServletResponse handle = handle(newGetRequest);
-
-		System.out.println(handle.getContentAsString());
 
 		Map<String, Object> orderResult = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
 		assertThat("Should return a visit", ((List) orderResult.get("results")).size() == 1);

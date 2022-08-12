@@ -11,7 +11,7 @@
         >Filter by
         {{ filterCategoriesOptions[filter?.value]?.display }}</mat-label
       >
-      <mat-select [(ngModel)]="paymentTypeSelected" (selectionChange)="getValue()">
+      <mat-select (selectionChange)="getValue($event)">
         <mat-option [value]="null"> All </mat-option>
         <mat-option
           *ngFor="

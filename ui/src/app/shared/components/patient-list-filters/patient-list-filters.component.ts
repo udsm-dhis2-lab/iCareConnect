@@ -33,8 +33,9 @@ export class PatientListFiltersComponent implements OnInit {
     );
   }
 
-  getValue(){
-    this.onFilterChanged.emit(this.paymentTypeSelected);
+  getValue(event: any){
+    // this.onFilterChanged.emit(this.paymentTypeSelected);
+    console.log(event)
   }
 
 }

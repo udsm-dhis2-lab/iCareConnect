@@ -135,7 +135,7 @@ export class VisitsService {
     // Parameters for sorting
     const orderByParameter = orderBy ? `&OrderBy=${orderBy}` : "";
     const orderDirectionParameter = orderDirection
-      ? `&OrderByDirection=${orderDirection}`
+      ? `&orderByDirection=${orderDirection}`
       : "";
     const sortingParameters =
       orderByParameter || orderDirectionParameter
