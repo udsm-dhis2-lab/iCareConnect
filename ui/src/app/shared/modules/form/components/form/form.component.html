@@ -9,9 +9,9 @@
       <div class="row">
         <div
           class="{{
-            field?.type !== 'number' || (!field.min && !field.max)
+            field?.type !== 'number' || (!field.min && !field.max && !field?.units)
               ? 'col-12'
-              : 'col-8'
+              : 'col-10'
           }}"
         >
           <app-field
@@ -26,13 +26,14 @@
           ></app-field>
         </div>
         <!-- TODO: Might need to show full (col-12) in case it is not number-->
+        
         <div
           class="{{
             field?.type === 'number' && field.min && field.max
               ? 'col-2 units-and-ranges'
               : ''
           }}"
-          *ngIf="field?.type == 'number' && (field.min || field.max)"
+          *ngIf="field?.type == 'number' && (field.min || field.max || field?.units)"
         >
           <div class="d-flex flex-column">
             <div class="text-left w-100" *ngIf="field?.max">
