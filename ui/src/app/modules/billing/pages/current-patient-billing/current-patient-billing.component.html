@@ -76,10 +76,10 @@
                 <div class="row mt-3">
                   <div class="col-12">
                     <!-- Make ElementToBePrinted as an object -->
-                    <div *ngIf="patientBillingDetails?.payments.length > 0 || patientBillingDetails.bills.length > 0 ">
+                    <div *ngIf="patientBillingDetails?.payments.length > 0 && patientBillingDetails.bills.length > 0">
                       <app-print-button [iconName]="'print'" [toolTipText]="'Click to print invoice and receipt in one document'"
                         [showText]="'Print All'"
-                        [ElementToBePrinted]="{Payments: patientBillingDetails?.payments, Bill: patientBillingDetails.bills, CurrentPatient: params?.currentPatient, FacilityDetails: params?.facilityDetails, Logo: params?.logo}"
+                        [ElementToBePrinted]="{Payments: patientBillingDetails?.payments, Bill: patientBillingDetails.bills, CurrentPatient: params?.currentPatient, FacilityDetails: params?.facilityDetails, Logo: params?.logo}" [
                         [classesList]="['float-right', 'button']" (print)="onPrint($event)"></app-print-button>
                     </div>
                     <div *ngIf="patientBillingDetails.bills.length > 0">
@@ -166,7 +166,7 @@
                 <div class="row mt-3">
                   <div class="col-12">
                     <!-- Make ElementToBePrinted as an object -->
-                    <div *ngIf="patientBillingDetails?.payments.length > 0 || patientBillingDetails.bills.length > 0 ">
+                    <div *ngIf="patientBillingDetails?.payments.length > 0 && patientBillingDetails.bills.length > 0 ">
                       <app-print-button [iconName]="'print'" [toolTipText]="'Click to print bills and receipt in one document'"
                         [showText]="'Print All'"
                         [ElementToBePrinted]="{Payments: patientBillingDetails?.payments, Bill: patientBillingDetails.bills, CurrentPatient: params?.currentPatient, FacilityDetails: params?.facilityDetails, Logo: params?.logo}"

@@ -74,12 +74,13 @@
       </table>
     </div>
     <div style="text-align: right">
-      <button mat-stroked-button (click)="onCancel($event)">Cancel</button>
+      <button mat-stroked-button [routerLink]="'/billing'" (click)="onCancel($event)">Cancel</button>
       
-        <app-print-button [toolTipText]="'Click to print receipt'"
+        <app-print-button [routerLink]="'/billing'" 
+        [toolTipText]="'Click to print receipt'"
         [iconName]="'print'"
-          [showText]="'Print Receipt'"
-          [classesList]="['ml-4', 'bg-success', 'text-white']" (click)="onPrint($event)"></app-print-button>
+        [showText]="'Print Receipt'"
+        [classesList]="['ml-4', 'bg-success', 'text-white']" (print)="onPrint($event)"></app-print-button>
       
     </div>
   </div>

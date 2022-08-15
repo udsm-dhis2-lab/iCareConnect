@@ -1,6 +1,10 @@
+import { Observable } from 'rxjs';
 import { Component, Inject, OnInit } from "@angular/core";
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { each } from "lodash";
+import { getCurrentUserDetails } from "src/app/store/selectors/current-user.selectors";
+import { Store } from '@ngrx/store';
+import { AppState } from 'src/app/store/reducers';
 
 @Component({
   selector: "app-payment-reciept",
@@ -11,22 +15,34 @@ export class PaymentReceiptComponent implements OnInit {
   totalBill: number = 0;
   facilityDetailsJson: any;
   facilityLogoBase64: string;
+  currentUser: any;
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: any,
-    private matDialogRef: MatDialogRef<PaymentReceiptComponent>
+    private matDialogRef: MatDialogRef<PaymentReceiptComponent>,
+    private store: Store<AppState>
   ) {}
 
   ngOnInit() {
-    this.facilityDetailsJson =
-      this.data?.facilityDetails
-        ? this.data?.facilityDetails
-        : null;
+    this.facilityDetailsJson = this.data?.facilityDetails
+      ? this.data?.facilityDetails
+      : null;
 
     this.facilityLogoBase64 =
       this.data?.logo?.results?.length > 0
         ? this.data?.logo?.results[0]?.value
         : null;
+
+    this.currentUser = this.store.select(getCurrentUserDetails).subscribe({
+        next: (currentUser) => {
+          return currentUser;
+        },
+
+        error: (error) => {
+          throw error;
+        }
+      }
+    );
 
     each(this.data?.billItems, (item) => {
       this.totalBill = this.totalBill + item?.amount;
@@ -39,7 +55,6 @@ export class PaymentReceiptComponent implements OnInit {
   }
 
   onPrint(e): void {
-    e.stopPropagation();
 
     var contents = document.getElementById("dialog-bill-receipt").innerHTML;
     const frame1: any = document.createElement("iframe");
@@ -55,10 +70,15 @@ export class PaymentReceiptComponent implements OnInit {
       : frame1.contentDocument;
     frameDoc.document.open();
 
-     frameDoc.document.write(`
+    frameDoc.document.write(`
       <html>
         <head> 
           <style> 
+              @page { size: auto;  margin: 0mm; }
+              
+              body {
+                padding: 30px;
+              }
               #top .logo img{
                 //float: left;
                 height: 100px;
@@ -91,12 +111,21 @@ export class PaymentReceiptComponent implements OnInit {
               thead tr {
                 background: #000;
                 color: #fff;
-              } 
+              }
+              .footer {
+                position: fixed;
+                bottom: 0;
+                display: flex;
+              }
+              .footer .userDetails {
+                float: right;
+                margin-right: 30vw;
+              }
           </style>
         </head>
         <body>`);
 
-     // Change image from base64 then replace some text with empty string to get an image
+    // Change image from base64 then replace some text with empty string to get an image
     let image = "";
 
     this.facilityDetailsJson.attributes.map((attribute) => {
@@ -109,8 +138,7 @@ export class PaymentReceiptComponent implements OnInit {
       }
     });
 
-
-     frameDoc.document.write(`
+    frameDoc.document.write(`
         
           <center id="top">
             <div class="logo">
@@ -121,8 +149,8 @@ export class PaymentReceiptComponent implements OnInit {
             <div class="info">
               <h2>${this.facilityDetailsJson.display}</h2>
               <h4>P.O Box ${this.facilityDetailsJson.postalCode} ${
-                this.facilityDetailsJson.stateProvince
-              }</h4>
+      this.facilityDetailsJson.stateProvince
+    }</h4>
               <h4>${this.facilityDetailsJson.country}</h4>
             </div>
             <!--End Info-->
@@ -145,13 +173,22 @@ export class PaymentReceiptComponent implements OnInit {
             </div>
           </div>`);
 
-        frameDoc.document.write(contents);
+    frameDoc.document.write(contents);
 
-        frameDoc.document.write(`
-          </body>
-        </html>`);
+    frameDoc.document.write(`
+        <div class="footer">
+        <div class="userDetails">
+          <p>Printed By: ${e.CurrentUser?.person?.display}</p>
+          <p>Signature : .........................................................</p>
+        </div>
 
+        <div class=""printDate>
+          <p>Printed on: ${e.PrintingDate}</p>
+        </div>
+      </div>
 
+        </body>
+      </html>`);
 
     frameDoc.document.close();
     setTimeout(function () {
@@ -160,15 +197,6 @@ export class PaymentReceiptComponent implements OnInit {
       document.body.removeChild(frame1);
     }, 500);
 
-
-
-    // frameDoc.document.write(
-    //   "<html><head> <style>button {display:none;}</style>"
-    // );
-    // frameDoc.document.write("</head><body>");
-    // frameDoc.document.write(contents);
-    // frameDoc.document.write("</body></html>");
-
-    //window.print();
+    this.matDialogRef.close();
   }
 }
