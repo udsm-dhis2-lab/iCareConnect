@@ -128,14 +128,14 @@ export class VisitsService {
     orderStatus?: string,
     orderStatusCode?: string,
     orderBy?: string,
-    orderDirection?: string,
+    orderByDirection?: string,
   ): Observable<Visit[]> {
     const locationUuids: any = isArray(location) ? location : [location];
 
     // Parameters for sorting
     const orderByParameter = orderBy ? `&OrderBy=${orderBy}` : "";
-    const orderDirectionParameter = orderDirection
-      ? `&orderByDirection=${orderDirection}`
+    const orderDirectionParameter = orderByDirection
+      ? `&orderByDirection=${orderByDirection}`
       : "";
     const sortingParameters =
       orderByParameter || orderDirectionParameter
@@ -150,10 +150,13 @@ export class VisitsService {
         ? `&orderStatusCode=${orderStatusCode}`
         : "";
       const locationParameter = location ? `locationUuid=${location}&` : "";
+      const orderTypeParameter = orderType
+        ? `&orderTypeUuid=${orderType}`
+        : "";
 
       return this.httpClient
         .get(
-          `icare/visit?${locationParameter}orderTypeUuid=${orderType}${orderStatusParameter}${orderStatusCodeParameter}${sortingParameters}&startIndex=${startIndex}&limit=${limit}`
+          `icare/visit?${locationParameter}${orderTypeParameter}${orderStatusParameter}${orderStatusCodeParameter}${sortingParameters}&startIndex=${startIndex}&limit=${limit}`
         )
         .pipe(
           map((visitResponse) => {
@@ -194,7 +197,7 @@ export class VisitsService {
             limit: limit ? limit : 100,
             startIndex: startIndex ? startIndex : 0,
             orderBy: orderBy ? orderBy : null,
-            orderByDirection: orderDirection ? orderDirection : null 
+            orderByDirection: orderByDirection ? orderByDirection : null 
           } as any)
         ).pipe(
           map((result: any) => {
