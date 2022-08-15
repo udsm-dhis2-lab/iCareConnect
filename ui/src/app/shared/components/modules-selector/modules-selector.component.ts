@@ -79,14 +79,13 @@ export class ModulesSelectorComponent implements OnInit {
         };
       });
       
-      console.log(this.currentLocation?.modules)
-      //Hinglight the current location
-      // this.currentModule = {
-      //   ...this.currentLocation?.modules[0],
-      //   ...(modules.filter(
-      //     (module) => module?.id === this.currentLocation?.modules[0]?.id
-      //   ) || [])[0],
-      // };
+      // Hinglight the current location
+      this.currentModule = {
+        ...this.currentLocation?.modules[0],
+        ...(modules.filter(
+          (module) => module?.id === this.currentLocation?.modules[0]?.id
+        ) || [])[0],
+      };
 
       this.modulesReferences = orderBy(
         uniqBy(

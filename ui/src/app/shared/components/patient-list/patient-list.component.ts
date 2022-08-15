@@ -45,6 +45,8 @@ export class PatientListComponent implements OnInit, OnChanges {
   @Input() orderStatus: string;
   @Input() orderStatusCode: string;
   @Input() filterCategory: string;
+  @Input() orderBy: string;
+  @Input() orderByDirection: string;
 
   page: number = 0;
   visits$: Observable<Visit[]>;
@@ -79,6 +81,7 @@ export class PatientListComponent implements OnInit, OnChanges {
     }
     this.itemsPerPage = this.itemsPerPage ? this.itemsPerPage : 10;
     this.getVisits(this.visits);
+
     /**
      * TODO: find the best place to put this
      */
@@ -109,11 +112,10 @@ export class PatientListComponent implements OnInit, OnChanges {
   }
 
   private getVisits(visits: Visit[]) {
-    
     this.loadingPatients = true;
     this.visits$ = visits
-      ? of(visits)
-      : this.service && this.service === "LABS"
+    ? of(visits)
+    : this.service && this.service === "LABS"
       ? this.visitService.getLabVisits("", 0, this.itemsPerPage).pipe(
           tap(() => {
             this.loadingPatients = false;
@@ -130,14 +132,15 @@ export class PatientListComponent implements OnInit, OnChanges {
             this.orderType,
             this.orderStatus,
             this.orderStatusCode,
-            "ENCOUNTER",
-            "ASC"
-          )
+            this.orderBy ? this.orderBy: "ENCOUNTER",
+            this.orderByDirection ? this.orderByDirection : "ASC"
+            )
           .pipe(
             tap(() => {
               this.loadingPatients = false;
             })
           );
+    
   }
 
   getAnotherList(event: Event, visit, type): void {

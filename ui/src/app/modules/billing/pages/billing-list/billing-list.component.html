@@ -14,10 +14,12 @@
 
     <div class="ml-2 mr-2">
       <app-patient-list
-        [itemsPerPage]="50"
+        [itemsPerPage]="10"
         [defaultFilter]="'Cash'"
         [isTabularList]="true"
         [filterCategory]="'billing'"
+        [orderBy]="'ENCOUNTER'"
+        [orderByDirection]="'ASC'"
         (selectPatient)="onSelectPatient($event)"
       ></app-patient-list>
     </div>
