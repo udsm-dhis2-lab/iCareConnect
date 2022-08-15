@@ -78,6 +78,7 @@ export class CaptureDataComponent implements OnInit {
     this.currentFormState = formValue;
     this.isFormValid = this.currentFormState.isValid;
     const valueForObs = formValue.getValues();
+
     this.obsDetails[Object.keys(valueForObs)[0]] = {
       person: this.patient["patient"]?.uuid,
       obsDatetime: new Date().toISOString(),
@@ -100,5 +101,6 @@ export class CaptureDataComponent implements OnInit {
     this.encounterData.obs =
       obs.filter((observation) => observation?.value != "") || [];
     this.saveObservations.emit(this.encounterData);
+    
   }
 }

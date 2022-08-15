@@ -42,7 +42,8 @@ export class ObservationEffects {
           obs: observations,
           encounterUuid: observations[0]?.encounter,
         };
-
+        
+        
         return this.observationService
           .saveObservationsViaEncounter(observationsDetails)
           .pipe(
@@ -65,8 +66,8 @@ export class ObservationEffects {
                   message: "Error saving observations!",
                   type: "ERROR",
                 })
-              );
-
+                );
+                
               return of(saveObservationsFail({ error }));
             })
           );
@@ -85,7 +86,7 @@ export class ObservationEffects {
             type: "LOADING",
           })
         );
-
+        
         return this.observationService.saveEncounterWithObsDetails(data).pipe(
           switchMap((observationResults: any) => {
             this.notificationService.show(
