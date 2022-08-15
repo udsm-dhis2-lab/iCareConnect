@@ -1,5 +1,5 @@
-import { Payment } from 'src/app/modules/billing/models/payment.model';
-import { keys } from 'lodash';
+import { Payment } from "src/app/modules/billing/models/payment.model";
+import { keys } from "lodash";
 import { Component, OnInit } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
 
@@ -16,10 +16,11 @@ import { Bill } from "../../models/bill.model";
 import { PaymentInput } from "../../models/payment-input.model";
 import { BillingService } from "../../services/billing.service";
 import { PaymentService } from "../../services/payment.service";
-import { Store } from '@ngrx/store';
-import { AppState } from 'src/app/store/reducers';
-import { getParentLocation } from 'src/app/store/selectors';
-import { DomSanitizer } from '@angular/platform-browser';
+import { Store } from "@ngrx/store";
+import { AppState } from "src/app/store/reducers";
+import { getParentLocation } from "src/app/store/selectors";
+import { DomSanitizer } from "@angular/platform-browser";
+import { getCurrentUserDetails } from "src/app/store/selectors/current-user.selectors";
 
 @Component({
   selector: "app-current-patient-billing",
@@ -44,6 +45,7 @@ export class CurrentPatientBillingComponent implements OnInit {
   }>;
   currentPatient$: Observable<Patient>;
   parentLocation$: Observable<any>;
+  currentUser$: Observable<any>;
 
   constructor(
     private route: ActivatedRoute,
@@ -129,6 +131,11 @@ export class CurrentPatientBillingComponent implements OnInit {
       <html>
         <head> 
           <style> 
+              @page { size: auto;  margin: 0mm; }
+              
+              body {
+                padding: 30px;
+              }
               #top .logo img{
                 //float: left;
                 height: 100px;
@@ -161,17 +168,29 @@ export class CurrentPatientBillingComponent implements OnInit {
               thead tr {
                 background: #000;
                 color: #fff;
-              } 
+              }
+              .footer {
+                position: fixed;
+                bottom: 0;
+                display: flex;
+              }
+              .footer .userDetails {
+                float: right;
+                margin-right: 30vw;
+              }
           </style>
         </head>
         <body>`);
 
     // Change image from base64 then replace some text with empty string to get an image
-    
-    let image = ""
+
+    let image = "";
 
     e.FacilityDetails.attributes.map((attribute) => {
-      let attributeTypeName = attribute && attribute.attributeType ?  attribute?.attributeType?.name.toLowerCase() : ""
+      let attributeTypeName =
+        attribute && attribute.attributeType
+          ? attribute?.attributeType?.name.toLowerCase()
+          : "";
       if (attributeTypeName === "logo") {
         image = attribute?.value;
       }
@@ -289,8 +308,20 @@ export class CurrentPatientBillingComponent implements OnInit {
         </table>`);
       }
     }
+    
 
     frameDoc.document.write(`
+      <div class="footer">
+        <div class="userDetails">
+          <p>Printed By: ${e.CurrentUser?.person?.display}</p>
+          <p>Signature : .........................................................</p>
+        </div>
+
+        <div class=""printDate>
+          <p>Printed on: ${e.PrintingDate}</p>
+        </div>
+      </div>
+
       </body>
     </html>`);
 

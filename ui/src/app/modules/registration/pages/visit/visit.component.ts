@@ -83,6 +83,7 @@ export class VisitComponent implements OnInit {
   @Input() treatmentLocations: any[];
   @Input() patientVisitsCount: number;
   @Output() editPatient = new EventEmitter<any>();
+  @Output() startVisitEvent = new EventEmitter<any>();
 
   searchTerm: string;
   currentRoom: any;
@@ -499,10 +500,13 @@ export class VisitComponent implements OnInit {
       this.store.dispatch(
         startVisit({ visit: visitPayload, isEmergency: this.isEmergencyVisit })
         );
+      
 
     } else {
       this.openSnackBar("Error: location is not set", null);
     }
+
+    this.startVisitEvent.emit();
 
   }
 

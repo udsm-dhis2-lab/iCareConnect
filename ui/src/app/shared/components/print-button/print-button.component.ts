@@ -1,4 +1,8 @@
 import { Component, EventEmitter, OnInit, Output, Input } from '@angular/core';
+import { Store } from '@ngrx/store';
+import { Observable } from 'rxjs';
+import { AppState } from 'src/app/store/reducers';
+import { getCurrentUserDetails } from 'src/app/store/selectors/current-user.selectors';
 
 @Component({
   selector: "app-print-button",
@@ -15,14 +19,49 @@ export class PrintButtonComponent implements OnInit {
   @Input() ElementToBePrinted: any;
 
   @Output() print = new EventEmitter();
+  currentUser:any
+  todaysDate: string;
 
-  constructor() {}
+  constructor(private store: Store<AppState>) {}
 
   ngOnInit(): void {
     this.classesList.forEach((className) => (this.classes += ` ${className}`));
+
+    this.store.select(getCurrentUserDetails).subscribe({
+      next: (currentUser) => {
+        this.currentUser = currentUser;
+      },
+
+      error: (error) => {
+        throw error;
+      },
+    });
+    //Construct printing date string
+    let today = new Date();
+    let year = today.getFullYear();
+    let month =
+      today.getMonth().toString().length > 1
+        ? today.getMonth()
+        : `0${today.getMonth()}`;
+    let day =
+      today.getDate().toString().length > 1
+        ? today.getDate()
+        : `0${today.getDate()}`;
+    this.todaysDate = `${day}/${month}/${year}`;
   }
 
   onPrint() {
-    this.print.emit(this.ElementToBePrinted)
+    
+    if(this.ElementToBePrinted) {
+      this.ElementToBePrinted['CurrentUser'] = this.currentUser
+      this.ElementToBePrinted['PrintingDate'] = this.todaysDate
+    } else {
+      this.ElementToBePrinted = {
+        CurrentUser: this.currentUser,
+        PrintingDate: this.todaysDate
+      }
+    }
+
+    this.print.emit(this.ElementToBePrinted);
   }
 }

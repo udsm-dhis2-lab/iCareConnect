@@ -86,4 +86,9 @@ export class StartVisitModelComponent implements OnInit {
       this.store.dispatch(go({ path: [path] }));
     }, 200);
   }
+
+  onStartVisit(){
+    this.dialogRef.close();
+    this.store.dispatch(go({ path: ["/registration/home"] }));
+  }
 }
