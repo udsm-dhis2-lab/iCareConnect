@@ -3,25 +3,30 @@
     [selectedIndex]="selectedTab.value"
     (selectedIndexChange)="selectedTab.setValue($event)"
   >
-    <mat-tab label="Laboratory">
-      <div class="mat-tab-container" *ngIf="selectedTab.value == 0">
-        <app-patient-lab-results-summary
-          *ngIf="
-            !clinicConfigurations?.provisionalDiagnosis
-              ?.shouldAffectImmediateSections ||
-            (clinicConfigurations?.provisionalDiagnosis
-              ?.shouldAffectImmediateSections &&
-              patientVisit?.hasProvisonalDiagnosis) ||
-            shouldShowLabSection
-          "
-          [observations]="observations"
-          [patientVisit]="patientVisit"
-          [forConsultation]="forConsultation"
-          [investigationAndProceduresFormsDetails]="
-            investigationAndProceduresFormsDetails
-          "
-          [iCareGeneralConfigurations]="iCareGeneralConfigurations"
-        ></app-patient-lab-results-summary>
+    <mat-tab
+      label="Laboratory"
+      *ngIf="userPrivileges['CLINIC_ADD_LABORATORY_INVESTIGATION']"
+    >
+      <div class="mat-tab-container">
+        <ng-template matTabContent>
+          <app-patient-lab-results-summary
+            *ngIf="
+              !clinicConfigurations?.provisionalDiagnosis
+                ?.shouldAffectImmediateSections ||
+              (clinicConfigurations?.provisionalDiagnosis
+                ?.shouldAffectImmediateSections &&
+                patientVisit?.hasProvisonalDiagnosis) ||
+              shouldShowLabSection
+            "
+            [observations]="observations"
+            [patientVisit]="patientVisit"
+            [forConsultation]="forConsultation"
+            [investigationAndProceduresFormsDetails]="
+              investigationAndProceduresFormsDetails
+            "
+            [iCareGeneralConfigurations]="iCareGeneralConfigurations"
+          ></app-patient-lab-results-summary>
+        </ng-template>
         <!-- TODO: Lofic to handle provisional diagnosis check -->
         <!-- <div
           class="alert alert-warning"
@@ -37,29 +42,39 @@
         </div> -->
       </div>
     </mat-tab>
-    <mat-tab label="Procedures">
-      <div class="mat-tab-container" *ngIf="selectedTab.value == 1">
-        <app-patient-procedures-summary
-          [patientVisit]="patientVisit"
-          [investigationAndProceduresFormsDetails]="
-            investigationAndProceduresFormsDetails
-          "
-          [forConsultation]="forConsultation"
-          [provider]="provider"
-          [orderTypes]="orderTypes"
-        ></app-patient-procedures-summary></div
+    <mat-tab
+      label="Procedures"
+      *ngIf="userPrivileges['CLINIC_ADD_PROCEDURE_ORDER']"
+    >
+      <div class="mat-tab-container">
+        <ng-template matTabContent>
+          <app-patient-procedures-summary
+            [patientVisit]="patientVisit"
+            [investigationAndProceduresFormsDetails]="
+              investigationAndProceduresFormsDetails
+            "
+            [forConsultation]="forConsultation"
+            [provider]="provider"
+            [orderTypes]="orderTypes"
+          ></app-patient-procedures-summary>
+        </ng-template></div
     ></mat-tab>
-    <mat-tab label="Radiology">
-      <div class="mat-tab-container" *ngIf="selectedTab.value == 2">
-        <app-patient-radiology-summary
-          [patientVisit]="patientVisit"
-          [investigationAndProceduresFormsDetails]="
-            investigationAndProceduresFormsDetails
-          "
-          [forConsultation]="forConsultation"
-          [provider]="provider"
-          [orderTypes]="orderTypes"
-        ></app-patient-radiology-summary></div
+    <mat-tab
+      label="Radiology"
+      *ngIf="userPrivileges['CLINIC_ADD_RADIOLOGY_INVESTIGATION']"
+    >
+      <div class="mat-tab-container">
+        <ng-template matTabContent>
+          <app-patient-radiology-summary
+            [patientVisit]="patientVisit"
+            [investigationAndProceduresFormsDetails]="
+              investigationAndProceduresFormsDetails
+            "
+            [forConsultation]="forConsultation"
+            [provider]="provider"
+            [orderTypes]="orderTypes"
+          ></app-patient-radiology-summary>
+        </ng-template></div
     ></mat-tab>
   </mat-tab-group>
 </div>

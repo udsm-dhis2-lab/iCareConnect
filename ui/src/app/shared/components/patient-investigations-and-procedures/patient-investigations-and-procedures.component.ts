@@ -16,6 +16,7 @@ export class PatientInvestigationsAndProceduresComponent implements OnInit {
   @Input() provider: any;
   @Input() iCareGeneralConfigurations: any;
   @Input() clinicConfigurations: any;
+  @Input() userPrivileges: any;
   selectedTab = new FormControl(0);
 
   shouldShowLabSection: boolean = false;
