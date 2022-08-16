@@ -11,6 +11,7 @@ import { FilterServicesConceptPipe } from "./filter-services-concept.pipe";
 import { FormatIsoStrDateForDisplayPipe } from "./format-iso-str-date-for-display.pipe";
 import { FilterDiagnosesPipe } from "./filter-diagnoses.pipe";
 import { UpdatePrivilegesWithSelectedAttributePipe } from "./update-privileges-with-selected-attribute.pipe";
+import { UpdateRolesWithSelectedAttributePipe } from "./update-roles-with-selected-attribute.pipe";
 
 export const sharedPipes: any[] = [
   FilterByPipe,
@@ -26,4 +27,5 @@ export const sharedPipes: any[] = [
   FormatIsoStrDateForDisplayPipe,
   FilterDiagnosesPipe,
   UpdatePrivilegesWithSelectedAttributePipe,
+  UpdateRolesWithSelectedAttributePipe,
 ];

@@ -1,7 +1,7 @@
 import { Component, OnInit } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { Observable } from "rxjs";
-import { PrivilegeGetFull } from "../../resources/openmrs";
+import { PrivilegeGetFull, RoleGet } from "../../resources/openmrs";
 import { PrivilegesAndRolesService } from "../../services/privileges-and-roles.service";
 import { ManageRolesComponent } from "../manage-roles/manage-roles.component";
 import { SharedConfirmationDialogComponent } from "../shared-confirmation-dialog/shared-confirmation-dialog.component";
@@ -60,6 +60,15 @@ export class RolesListComponent implements OnInit {
     this.q = (event.target as HTMLInputElement).value;
     this.q = this.q == "" ? null : this.q;
     this.getRolesList();
+  }
+
+  onEdit(event: Event, role: RoleGet): void {
+    this.dialog.open(ManageRolesComponent, {
+      width: "40%",
+      data: {
+        role: role,
+      },
+    });
   }
 
   onRetire(event: Event, privilege: PrivilegeGetFull): void {}

@@ -1,4 +1,7 @@
-<div class="p-3" *ngIf="{ privileges: privileges$ | async } as params">
+<div
+  class="p-3"
+  *ngIf="{ privileges: privileges$ | async, roles: roles$ | async } as params"
+>
   <div class="h3">Add new role</div>
   <div class="alert alert-danger" role="alert" *ngIf="message && !saving">
     {{ message }}
@@ -22,13 +25,47 @@
           (formUpdate)="onFormUpdate($event)"
         ></app-form>
       </div>
-      <div class="privileges-selection w-100 p-2">
+      <div class="roles-selection w-100 p-2">
+        <div class="h5">Inherited roles</div>
+        <section class="w-100 mt-1">
+          <mat-checkbox
+            class="mr-2 mb-2"
+            (change)="checkBoxSelectionChange($event, role?.uuid)"
+            [disabled]="role?.selected"
+            [checked]="role?.selected"
+            *ngFor="
+              let role of params?.roles
+                | updateRolesWithSelectedAttribute: selectedRoles
+            "
+            >{{ role?.display }}</mat-checkbox
+          >
+        </section>
+        <div class="d-flex justify-content-end">
+          <a
+            class="action-control-btn"
+            (click)="getRoleItems($event, 'prev')"
+            [disabled]="rolePage <= 1"
+            >Prev</a
+          >
+          <a
+            class="ml-2 action-control-btn"
+            (click)="getRoleItems($event, 'next')"
+            [disabled]="rolePageSize > params?.roles?.length"
+            >Next</a
+          >
+        </div>
+        <mat-progress-bar
+          class="mt-2"
+          *ngIf="!params?.roles"
+          mode="indeterminate"
+        ></mat-progress-bar>
+      </div>
+      <div class="privileges-selection w-100 p-2 mt-3">
         <div class="h5">Select privileges</div>
         <section class="w-100 mt-1">
           <mat-checkbox
             class="mr-2 mb-2"
             (change)="checkBoxSelectionChange($event, privilege?.uuid)"
-            [disabled]="privilege?.selected"
             [checked]="privilege?.selected"
             *ngFor="
               let privilege of params?.privileges
@@ -38,14 +75,17 @@
           >
         </section>
         <div class="d-flex justify-content-end">
-          <a (click)="getItems($event, 'prev')" [disabled]="privilegePage <= 1"
+          <a
+            class="action-control-btn"
+            (click)="getItems($event, 'prev')"
+            [disabled]="privilegePage <= 1"
             >Prev</a
           >
           <a
-            class="ml-2"
+            class="ml-2 action-control-btn"
             (click)="getItems($event, 'next')"
             [disabled]="privilegePageSize > params?.privileges?.length"
-            >Prev</a
+            >Nex</a
           >
         </div>
         <mat-progress-bar
