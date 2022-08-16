@@ -135,12 +135,27 @@ export class CurrentPatientBillingComponent implements OnInit {
               
               body {
                 padding: 30px;
+                margin: 0 auto;
+                width: 100mm;
               }
+
               #top .logo img{
                 //float: left;
                 height: 100px;
                 width: 100px;
                 background-size: 100px 100px;
+              }
+              .info h2 {
+                font-size: 1.3em;
+              }
+              h3 {
+                font-size: 1em;
+              }
+              h5 {
+                font-size: .7em;
+              }
+              p {
+                font-size: .7em;
               }
               #table {
                 font-family: Arial, Helvetica, sans-serif;
@@ -158,29 +173,26 @@ export class CurrentPatientBillingComponent implements OnInit {
               } 
 
               #table thead tr th { 
-                padding-top: 12px; 
-                padding-bottom: 12px; 
+                padding-top:6px; 
+                padding-bottom: 6px; 
                 text-align: left; 
-                // background-color: #2a8fd1; 
-                background-color: #000; 
-                color: #fff;
+                background-color: #cecece;
+                font-size: .7em;
               }
-              thead tr {
-                background: #000;
-                color: #fff;
+              tbody tr td {
+                font-size: .7em;
               }
               .footer {
-                position: fixed;
-                bottom: 0;
-                display: flex;
+                margin-top:50px
               }
-              .footer .userDetails {
-                float: right;
-                margin-right: 30vw;
+              .footer .userDetails .signature {
+                margin-top: 20px;
               }
           </style>
         </head>
-        <body>`);
+        <body> 
+         <div id="printOut">
+        `);
 
     // Change image from base64 then replace some text with empty string to get an image
 
@@ -196,6 +208,12 @@ export class CurrentPatientBillingComponent implements OnInit {
       }
     });
 
+    let patientMRN = e.CurrentPatient.MRN ||
+      e.CurrentPatient.patient?.identifiers[0]?.identifier.replace(
+        "MRN = ",
+        ""
+      );
+
     frameDoc.document.write(`
     
       <center id="top">
@@ -206,8 +224,8 @@ export class CurrentPatientBillingComponent implements OnInit {
 
         <div class="info">
           <h2>${e.FacilityDetails.display}</h2>
-          <h4>P.O Box ${e.FacilityDetails.postalCode} ${e.FacilityDetails.stateProvince}</h4>
-          <h4>${e.FacilityDetails.country}</h4>
+          <h3>P.O Box ${e.FacilityDetails.postalCode} ${e.FacilityDetails.stateProvince}</h3>
+          <h3>${e.FacilityDetails.country}</h3>
         </div>
         <!--End Info-->
       </center>
@@ -215,9 +233,12 @@ export class CurrentPatientBillingComponent implements OnInit {
       
       
       <div id="mid">
-        <div class="info">
+        <div class="patient-info">
           <p> 
               Patient Name : ${e.CurrentPatient.name}</br>
+          </p>
+          <p> 
+              MRN : ${patientMRN}</br>
           </p>
         </div>
       </div>`);
@@ -227,14 +248,13 @@ export class CurrentPatientBillingComponent implements OnInit {
       if (e.Payments.length > 0) {
         frameDoc.document.write(`
         <div>
-          <h3>Payments</h3>
+          <h5>Paid Items</h5>
         </div>
         <table id="table">
           <thead>
             <tr>
               <th>Item Name</th>
               <th>Amount</th>
-              <th>Paid through</th>
               <th>Date paid</th>
             </tr>
           </thead>
@@ -256,8 +276,7 @@ export class CurrentPatientBillingComponent implements OnInit {
             contents = `
                 <tr>
                   <td>${item.name}</td> 
-                  <td>${item.amount}</td> 
-                  <td>${payment.paymentType.name}</td> 
+                  <td>${item.amount}</td>  
                   <td>${date_paid}</td>
                 </tr>`;
             frameDoc.document.write(contents);
@@ -275,15 +294,13 @@ export class CurrentPatientBillingComponent implements OnInit {
       if (e.Bill.length > 0) {
         frameDoc.document.write(`
         <div>
-          <h3>Bills</h3>
+          <h5>Unpaid Items</h5>
         </div>
         <table id="table">
           <thead>
             <tr>
               <th>Item Name</th>
               <th>Quantity</th>
-              <th>Unit Price</th>
-              <th>Discount</th>
               <th>Amount</th>
             </tr>
           </thead>
@@ -295,8 +312,6 @@ export class CurrentPatientBillingComponent implements OnInit {
             <tr>
               <td>${record.name}</td> 
               <td>${record.quantity}</td> 
-              <td>${record.price}</td> 
-              <td>${record.discount}</td> 
               <td>${record.amount}</td>
             </tr>`;
             frameDoc.document.write(contents);
@@ -311,17 +326,17 @@ export class CurrentPatientBillingComponent implements OnInit {
     
 
     frameDoc.document.write(`
-      <div class="footer">
-        <div class="userDetails">
-          <p>Printed By: ${e.CurrentUser?.person?.display}</p>
-          <p>Signature : .........................................................</p>
-        </div>
+          <div class="footer">
+            <div class="userDetails">
+              <p class="name">Printed By: ${e.CurrentUser?.person?.display}</p>
+              <p class="signature">Signature : ..............................</p>
+            </div>
 
-        <div class=""printDate>
-          <p>Printed on: ${e.PrintingDate}</p>
+            <div class=""printDate>
+              <p>Printed on: ${e.PrintingDate}</p>
+            </div>
+          </div>
         </div>
-      </div>
-
       </body>
     </html>`);
 
