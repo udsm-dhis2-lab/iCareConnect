@@ -111,6 +111,8 @@ export class SharedPatientDashboardComponent implements OnInit {
 
   constructor(private store: Store<AppState>, private dialog: MatDialog) {
     this.store.dispatch(loadEncounterTypes());
+
+    console.log(this.userPrivileges);
   }
 
   ngOnInit(): void {
