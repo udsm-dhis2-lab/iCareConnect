@@ -47,7 +47,9 @@ export class PrintButtonComponent implements OnInit {
       today.getDate().toString().length > 1
         ? today.getDate()
         : `0${today.getDate()}`;
-    this.todaysDate = `${day}/${month}/${year}`;
+    let hour = today.getHours();
+    let minutes = today.getMinutes();
+    this.todaysDate = `${day}/${month}/${year} ${hour}:${minutes}`;
   }
 
   onPrint() {
