@@ -78,12 +78,27 @@ export class PaymentReceiptComponent implements OnInit {
               
               body {
                 padding: 30px;
+                margin: 0 auto;
+                width: 100mm;
               }
+
               #top .logo img{
                 //float: left;
                 height: 100px;
                 width: 100px;
                 background-size: 100px 100px;
+              }
+              .info h2 {
+                font-size: 1.3em;
+              }
+              h3 {
+                font-size: 1em;
+              }
+              h5 {
+                font-size: .7em;
+              }
+              p {
+                font-size: .7em;
               }
               #table {
                 font-family: Arial, Helvetica, sans-serif;
@@ -101,29 +116,28 @@ export class PaymentReceiptComponent implements OnInit {
               } 
 
               #table thead tr th { 
-                padding-top: 12px; 
-                padding-bottom: 12px; 
+                padding-top:6px; 
+                padding-bottom: 6px; 
                 text-align: left; 
-                // background-color: #2a8fd1; 
-                background-color: #000; 
-                color: #fff;
+                background-color: #cecece;
+                font-size: .7em;
               }
-              thead tr {
-                background: #000;
-                color: #fff;
+              tbody tr td {
+                font-size: .7em;
               }
               .footer {
                 position: fixed;
                 bottom: 0;
-                display: flex;
+                width: 100%;
               }
               .footer .userDetails {
-                float: right;
-                margin-right: 30vw;
+                margin-bottom: 10px;
               }
           </style>
         </head>
-        <body>`);
+        <body> 
+         <div id="printOut">
+        `);
 
     // Change image from base64 then replace some text with empty string to get an image
     let image = "";
@@ -138,57 +152,58 @@ export class PaymentReceiptComponent implements OnInit {
       }
     });
 
-    frameDoc.document.write(`
-        
-          <center id="top">
-            <div class="logo">
-              <img src="${image}" alt="Facility's Logo"> 
-            </div>
-            
+    let patientMRN =
+      e.CurrentPatient.MRN ||
+      e.CurrentPatient.patient?.identifiers[0]?.identifier.replace(
+        "MRN = ",
+        ""
+      );
 
-            <div class="info">
-              <h2>${this.facilityDetailsJson.display}</h2>
-              <h4>P.O Box ${this.facilityDetailsJson.postalCode} ${
-      this.facilityDetailsJson.stateProvince
-    }</h4>
-              <h4>${this.facilityDetailsJson.country}</h4>
-            </div>
-            <!--End Info-->
-          </center>
-          <!--End Document top-->
-          
-          
-          <div id="mid">
-            <div class="info">
-              <p> 
-                  Patient MRN : ${
-                    this.data?.currentPatient?.MRN ||
-                    this.data?.currentPatient?.patient?.identifiers[0]
-                      ?.identifier
-                  }</br>
-              </p>
-              <p> 
-                  Patient Name : ${this.data?.currentPatient?.name}</br>
-              </p>
-            </div>
-          </div>`);
+    frameDoc.document.write(`
+    
+      <center id="top">
+        <div class="logo">
+          <img src="${image}" alt="Facility's Logo"> 
+        </div>
+        
+
+        <div class="info">
+          <h2>${e.FacilityDetails.display}</h2>
+          <h3>P.O Box ${e.FacilityDetails.postalCode} ${e.FacilityDetails.stateProvince}</h3>
+          <h3>${e.FacilityDetails.country}</h3>
+        </div>
+        <!--End Info-->
+      </center>
+      <!--End Document top-->
+      
+      
+      <div id="mid">
+        <div class="patient-info">
+          <p> 
+              Patient Name : ${e.CurrentPatient.name}</br>
+          </p>
+          <p> 
+              MRN : ${patientMRN}</br>
+          </p>
+        </div>
+      </div>`);
 
     frameDoc.document.write(contents);
 
     frameDoc.document.write(`
-        <div class="footer">
-        <div class="userDetails">
-          <p>Printed By: ${e.CurrentUser?.person?.display}</p>
-          <p>Signature : .........................................................</p>
-        </div>
+          <div class="footer">
+            <div class="userDetails">
+              <p>Printed By: ${e.CurrentUser?.person?.display}</p>
+              <p>Signature : .........................................................</p>
+            </div>
 
-        <div class=""printDate>
-          <p>Printed on: ${e.PrintingDate}</p>
+            <div class=""printDate>
+              <p>Printed on: ${e.PrintingDate}</p>
+            </div>
+          </div>
         </div>
-      </div>
-
-        </body>
-      </html>`);
+      </body>
+    </html>`);
 
     frameDoc.document.close();
     setTimeout(function () {
