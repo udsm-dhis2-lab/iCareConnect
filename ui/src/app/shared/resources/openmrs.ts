@@ -3231,7 +3231,7 @@ export interface RoleGetFull {
 }
 
 export interface RoleCreate {
-  name: string;
+  name?: string;
   uuid?: string;
   description?: string;
   privileges?: PrivilegeCreate[];

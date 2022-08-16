@@ -78,7 +78,6 @@ export class PrivilegesListComponent implements OnInit {
           this.privilegeAndRolesService
             .deletePrivilege(privilege?.uuid)
             .subscribe((response) => {
-              console.log(response);
               this.getPrivilegesList();
             });
         }

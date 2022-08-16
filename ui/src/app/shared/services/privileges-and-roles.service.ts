@@ -54,8 +54,21 @@ export class PrivilegesAndRolesService {
     );
   }
 
-  addNewRole(role: RoleCreate): Observable<RoleCreateFull> {
-    return from(this.api.role.createRole(role)).pipe(
+  addNewOrUpdateRole(role: RoleCreate): Observable<RoleCreateFull> {
+    return (
+      role?.uuid
+        ? from(this.api.role.updateRole(role?.uuid, role))
+        : from(this.api.role.createRole(role))
+    ).pipe(
+      map((response) => {
+        return response;
+      }),
+      catchError((error) => of(error))
+    );
+  }
+
+  getRoleById(id: string): Observable<RoleGetFull> {
+    return from(this.api.role.getRole(id, { v: "full" })).pipe(
       map((response) => {
         return response;
       }),
