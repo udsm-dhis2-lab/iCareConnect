@@ -126,12 +126,10 @@ export class PaymentReceiptComponent implements OnInit {
                 font-size: .7em;
               }
               .footer {
-                position: fixed;
-                bottom: 0;
-                width: 100%;
+                margin-top:50px
               }
-              .footer .userDetails {
-                margin-bottom: 10px;
+              .footer .userDetails .signature {
+                margin-top: 20px;
               }
           </style>
         </head>
@@ -193,8 +191,8 @@ export class PaymentReceiptComponent implements OnInit {
     frameDoc.document.write(`
           <div class="footer">
             <div class="userDetails">
-              <p>Printed By: ${e.CurrentUser?.person?.display}</p>
-              <p>Signature : .........................................................</p>
+              <p class="name">Printed By: ${e.CurrentUser?.person?.display}</p>
+              <p class="signature">Signature : ..............................</p>
             </div>
 
             <div class=""printDate>
