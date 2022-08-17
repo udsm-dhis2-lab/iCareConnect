@@ -39,6 +39,7 @@ export class SharedLocationSettingsComponent implements OnInit {
       {
         limit: this.pageSize,
         startIndex: (this.page - 1) * this.pageSize,
+        v: "custom:(uuid,display,description,tags:(uuid,display))",
       }
     );
   }

@@ -108,7 +108,7 @@ export class LocationService {
 
   getLocationsByTagName(
     tagName: string,
-    parameters?: { limit: number; startIndex: number }
+    parameters?: { limit: number; startIndex: number; v: string }
   ): Observable<any[]> {
     let othersParameters = "";
     if (parameters?.limit) {
@@ -117,12 +117,14 @@ export class LocationService {
     if (parameters?.startIndex) {
       othersParameters += `&startIndex=${parameters?.startIndex}`;
     }
+    if (parameters?.v) {
+      othersParameters += `&v=${parameters?.v}`;
+    }
     return this.httpClient
       .get(
         "location?tag=" +
           tagName +
-          "&v=full" +
-          (othersParameters != "" ? othersParameters : "&limit=100")
+          (othersParameters != "" ? othersParameters : "&v=full&limit=100")
       )
       .pipe(
         map((response) => {
