@@ -46,4 +46,11 @@
       ></app-system-settings-list>
     </ng-template>
   </mat-tab>
+  <mat-tab label="Patient metadata">
+    <ng-template matTabContent>
+      <app-system-settings-list
+        [key]="'icare.patient'"
+      ></app-system-settings-list>
+    </ng-template>
+  </mat-tab>
 </mat-tab-group>
