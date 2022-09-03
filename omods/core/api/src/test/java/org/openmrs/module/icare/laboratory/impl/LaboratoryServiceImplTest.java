@@ -87,32 +87,32 @@ public class LaboratoryServiceImplTest extends LaboratoryTestBase {
 		//assertThat("ID was created", createdSampleStatus.getId() == sampleStatus.getId());
 	}
 	
-//	@Test
-//	//@DisplayName("Creating A TestOrderLocation")
-//	public void testingTestOrderLocation() {
-//
-//		//Given
-//		TestOrderLocation testOrderLocation = new TestOrderLocation();
-//		//testOrderLocation.setId(1);
-//
-//		Concept cnConcept = new Concept();
-//		cnConcept.setUuid("00000003IIIIIIIIIIIIIIIIIIIIIIIIIIII");
-//
-//		Location location = new Location();
-//		location.setUuid("4748646b-81b0-4d76-81e5-7957469d4ab5");
-//
-//		testOrderLocation.setConcept(cnConcept);
-//		testOrderLocation.setLocation(location);
-//
-//		//TestOrderLocation newTestOrderLocation = testOrderLocation;
-//
-//		//When
-//		TestOrderLocation createdTestOrderLocation = laboratoryService.addTestOrderWithLocation(testOrderLocation);
-//
-//		//Then
-//		verify(testOrderLocationDAO).save(testOrderLocation);
-//		assertThat("Test Order was created", location.getUuid() == createdTestOrderLocation.getLocation().getUuid());
-//	}
+	//	@Test
+	//	//@DisplayName("Creating A TestOrderLocation")
+	//	public void testingTestOrderLocation() {
+	//
+	//		//Given
+	//		TestOrderLocation testOrderLocation = new TestOrderLocation();
+	//		//testOrderLocation.setId(1);
+	//
+	//		Concept cnConcept = new Concept();
+	//		cnConcept.setUuid("00000003IIIIIIIIIIIIIIIIIIIIIIIIIIII");
+	//
+	//		Location location = new Location();
+	//		location.setUuid("4748646b-81b0-4d76-81e5-7957469d4ab5");
+	//
+	//		testOrderLocation.setConcept(cnConcept);
+	//		testOrderLocation.setLocation(location);
+	//
+	//		//TestOrderLocation newTestOrderLocation = testOrderLocation;
+	//
+	//		//When
+	//		TestOrderLocation createdTestOrderLocation = laboratoryService.addTestOrderWithLocation(testOrderLocation);
+	//
+	//		//Then
+	//		verify(testOrderLocationDAO).save(testOrderLocation);
+	//		assertThat("Test Order was created", location.getUuid() == createdTestOrderLocation.getLocation().getUuid());
+	//	}
 	
 	/*testOrderLocationDAO
 	@Test
