@@ -8,11 +8,11 @@ import { RegistrationService } from "../../services/registration.services";
   styleUrls: ["./register-new-client-home.component.scss"],
 })
 export class RegisterNewClientHomeComponent implements OnInit {
-  registrationConfigurations$: Observable<any>;
+  registrationMRNSourceReference$: Observable<any>;
   constructor(private registrationService: RegistrationService) {}
 
   ngOnInit(): void {
-    this.registrationConfigurations$ =
-      this.registrationService.getRegistrationConfigurations();
+    this.registrationMRNSourceReference$ =
+      this.registrationService.getRegistrationMRNSource();
   }
 }

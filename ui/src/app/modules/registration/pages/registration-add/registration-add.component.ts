@@ -61,7 +61,7 @@ export class RegistrationAddComponent implements OnInit {
 
   newPatientOptions: string[] = ["Yes", "No"];
 
-  @Input() registrationConfigurations: any;
+  @Input() registrationMRNSourceReference: any;
   validatedTexts: any = {};
   errorMessage: string = "";
   updateCurrentMRNSystemSettingsResponse$: Observable<any>;
@@ -362,7 +362,7 @@ export class RegistrationAddComponent implements OnInit {
             this.identifierService
               .generateIds({
                 generateIdentifiers: true,
-                sourceUuid: this.registrationConfigurations?.sourceUuid,
+                sourceUuid: this.registrationMRNSourceReference,
                 numberToGenerate: 1,
               })
               .subscribe((identifiersResponse) => {
