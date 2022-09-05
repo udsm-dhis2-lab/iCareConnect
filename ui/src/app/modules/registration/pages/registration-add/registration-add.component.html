@@ -11,14 +11,10 @@
 
   <mat-progress-bar *ngIf="loadingForm" mode="indeterminate"></mat-progress-bar>
 
-  <!-- {{ registrationConfigurations | json }} -->
   <div class="alert alert-danger" *ngIf="loadingFormError">
     Problem Opening registration form
   </div>
-  <div
-    class="registration-form"
-    *ngIf="!loadingForm && !loadingFormError && registrationConfigurations"
-  >
+  <div class="registration-form" *ngIf="!loadingForm && !loadingFormError">
     <div class="row">
       <div class="col-8">
         <mat-checkbox
@@ -404,11 +400,7 @@
                 <mat-label>Occupation</mat-label>
                 <mat-select>
                   <mat-option
-                    *ngFor="
-                      let occupation of registrationConfigurations[
-                        'employmentStatuses'
-                      ]
-                    "
+                    *ngFor="let occupation of []"
                     [value]="occupation"
                     (click)="setOccupation(occupation)"
                   >
@@ -420,11 +412,7 @@
                 <mat-label>Education Details</mat-label>
                 <mat-select>
                   <mat-option
-                    *ngFor="
-                      let education of registrationConfigurations[
-                        'educationLevel'
-                      ]
-                    "
+                    *ngFor="let education of []"
                     [value]="education"
                     (click)="setEducationDetails(education)"
                   >
@@ -437,11 +425,7 @@
                 <mat-label>Marital Status</mat-label>
                 <mat-select>
                   <mat-option
-                    *ngFor="
-                      let maritalStatus of registrationConfigurations[
-                        'maritalStatuses'
-                      ]
-                    "
+                    *ngFor="let maritalStatus of []"
                     [value]="maritalStatus"
                     (click)="setMaritalStatus(maritalStatus)"
                   >
@@ -478,8 +462,10 @@
                 />
               </mat-form-field>
 
-              <app-form [fields]="[primaryPhoneNumberAreaLeaderFormField]"
-               (formUpdate)="onPrimaryMobileNumberAreaLeaderFormUpdate($event)"></app-form>
+              <app-form
+                [fields]="[primaryPhoneNumberAreaLeaderFormField]"
+                (formUpdate)="onPrimaryMobileNumberAreaLeaderFormUpdate($event)"
+              ></app-form>
 
               <!-- <mat-form-field appearance="fill" class="w-100">
                 <mat-label>Phone Number of Area leader/Neighbour</mat-label>
@@ -543,8 +529,10 @@
                 />
               </mat-form-field>
 
-              <app-form [fields]="[primaryPhoneNumberNextOfKinFormField]"
-                (formUpdate)="onPrimaryMobileNumberNextOfKinFormUpdate($event)"></app-form>
+              <app-form
+                [fields]="[primaryPhoneNumberNextOfKinFormField]"
+                (formUpdate)="onPrimaryMobileNumberNextOfKinFormUpdate($event)"
+              ></app-form>
 
               <!-- <mat-form-field appearance="fill" class="w-100">
                 <mat-label>Contact number</mat-label>
@@ -585,9 +573,7 @@
                 <mat-label>Relationship Type</mat-label>
                 <mat-select>
                   <mat-option
-                    *ngFor="
-                      let relationshipType of registrationConfigurations.relationshipTypeOptions
-                    "
+                    *ngFor="let relationshipType of []"
                     [value]="relationshipType"
                     (click)="setRelationshipType(relationshipType)"
                   >
@@ -598,41 +584,6 @@
             </div>
           </div>
         </div>
-        <!-- <div class="row mt-4" *ngIf="!emergencyRegistration">
-          <div class="col-sm-3">
-            <label for="">Relationships</label>
-          </div>
-          <div class="col-sm-9 d-flex">
-            <mat-form-field appearance="fill" class="w-100">
-              <mat-label>Relationship Type</mat-label>
-              <mat-select>
-                <mat-option
-                  *ngFor="
-                    let relationshipType of registrationConfigurations
-                      .relationshipTypeOptions
-                  "
-                  [value]="relationshipType"
-                  (click)="setRelationshipType(relationshipType)"
-                >
-                  {{ relationshipType }}
-                </mat-option>
-              </mat-select>
-            </mat-form-field>
-
-            <mat-form-field appearance="fill" class="w-100 ml-3">
-              <mat-label>Name/ Id</mat-label>
-              <input
-                name="Id"
-                id="Id"
-                autocomplete="off"
-                matInput
-                placeholder="Enter Name or Id"
-                [(ngModel)]="patient['Id']"
-                [disabled]="addingPatient && !patientAdded"
-              />
-            </mat-form-field>
-          </div>
-        </div> -->
       </div>
       <div
         class="col-4 d-flex justify-content-end"
