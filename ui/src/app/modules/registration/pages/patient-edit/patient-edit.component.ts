@@ -36,6 +36,6 @@ export class PatientEditComponent implements OnInit {
         })
       );
     this.registrationConfigurations$ =
-      this.registrationService.getRegistrationConfigurations();
+      this.registrationService.getRegistrationMRNSource();
   }
 }
