@@ -16,42 +16,12 @@ export class BillingService {
 
   getPatientBills(
     patientUuid: string,
-    isRegistrationPage?: boolean
+    isRegistrationPage?: boolean,
+    status?: string
   ): Observable<Bill[]> {
+    status = status && status.length > 0 ? `&status=${status}` : ""
     return !isRegistrationPage
-      ? this.httpClient.get(`billing/invoice?patient=${patientUuid}`).pipe(
-          map((results) =>
-            (
-              results.map((result) => {
-                return {
-                  ...result,
-                  items: result.items.map((item) => {
-                    return {
-                      ...item,
-                      item: {
-                        ...item?.item,
-                        concept: item?.item?.concept
-                          ? item?.item?.concept
-                          : {
-                              name: item?.item?.name,
-                              uuid: item?.item?.uuid,
-                            },
-                      },
-                    };
-                  }),
-                };
-              }) || []
-            ).map((bill) => new Bill(bill))
-          )
-        )
-      : of([]);
-  }
-  getAllPatientBills(
-    patientUuid: string,
-    isRegistrationPage?: boolean
-  ): Observable<Bill[]> {
-    return !isRegistrationPage
-      ? this.httpClient.get(`billing/patient/allInvoices?patient=${patientUuid}`).pipe(
+      ? this.httpClient.get(`billing/invoice?patient=${patientUuid}${status}`).pipe(
           map((results) =>
             (
               results.map((result) => {

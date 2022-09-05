@@ -80,7 +80,7 @@ export class CurrentPatientBillingComponent implements OnInit {
     this.provider$ = this.store.select(getProviderDetails);
 
 
-    this.billingService.getAllPatientBills(this.patientId).subscribe({
+    this.billingService.getPatientBills(this.patientId, false, "all").subscribe({
       next: (bills) => {
         bills.forEach((bill) => {
           if(bill){

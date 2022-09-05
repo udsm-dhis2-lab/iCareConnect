@@ -70,7 +70,7 @@ export class ExemptionComponent implements OnInit, AfterContentInit {
   }
 
   ngAfterContentInit() {
-    this.billingService.getAllPatientBills(this.patientId).subscribe({
+    this.billingService.getPatientBills(this.patientId, false, "all").subscribe({
       next: (bills) => {
         bills.forEach((bill) => {
           if (bill) {
