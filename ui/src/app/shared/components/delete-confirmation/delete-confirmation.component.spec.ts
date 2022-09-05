@@ -6,7 +6,7 @@ import { DebugElement } from '@angular/core';
 import { DeleteConfirmationComponent } from './delete-confirmation.component';
 import { matDialogRefMock } from 'src/test-mocks/material.mocks';
 
-describe('ExemptionConfirmationComponent', () => {
+describe('DeleteConfirmationComponent', () => {
   let component: DeleteConfirmationComponent;
   let fixture: ComponentFixture<DeleteConfirmationComponent>;
 

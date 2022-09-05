@@ -5,7 +5,7 @@ import { DebugElement } from '@angular/core';
 
 import { ExemptionHistoryComponent } from "./exemption-history.component";
 
-describe('PendingPaymentsComponent', () => {
+describe('ExemptionHistoryComponent', () => {
   let component: ExemptionHistoryComponent;
   let fixture: ComponentFixture<ExemptionHistoryComponent>;
 
