@@ -8,15 +8,11 @@
       >
         <img src="{{ facilityLogoBase64 }}" width="60" />
       </div> -->
-      <table
-        class="table table-bordered table-striped"
-        style="
+      <table class="table table-bordered table-striped" style="
                 font-family: Arial, Helvetica, sans-serif;
                 border-collapse: collapse;
                 width: 100%;
-              "
-       
-      >
+              ">
         <!-- 
           
           table styles
@@ -63,7 +59,7 @@
           <!-- <td>{{ itemIndex + 1 }}</td> -->
           <td colspan="2">{{ item?.billItem?.item?.concept?.name }}</td>
           <!-- <td>{{ item?.billItem?.discount }}</td> -->
-          <td>{{ item?.billItem.price }}</td>
+          <td>{{ item?.billItem?.price }}</td>
         </tr>
         <tr style="background-color: black; color: white">
           <td colspan="2"><b>Total Amount</b></td>
@@ -75,13 +71,11 @@
     </div>
     <div style="text-align: right">
       <button mat-stroked-button [routerLink]="'/billing'" (click)="onCancel($event)">Cancel</button>
-      
-        <app-print-button [routerLink]="'/billing'" 
-        [toolTipText]="'Click to print receipt'"
-        [iconName]="'print'"
-        [showText]="'Print Receipt'"
-        [classesList]="['ml-4', 'bg-success', 'text-white']" (print)="onPrint($event)"></app-print-button>
-      
+
+      <app-print-button [routerLink]="'/billing'" [toolTipText]="'Click to print receipt'" [iconName]="'print'"
+        [showText]="'Print Receipt'" [classesList]="['ml-4', 'bg-success', 'text-white']" (print)="onPrint($event)">
+      </app-print-button>
+
     </div>
   </div>
 </div>

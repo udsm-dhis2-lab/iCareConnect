@@ -55,12 +55,12 @@ export class PatientDiagnosesSummaryComponent implements OnInit {
     this.formValuesData = { ...this.formValuesData, ...formValues.getValues() };
   }
 
-  addDiagnosis(e: Event): void {
+addDiagnosis(e: Event): void {
     e.stopPropagation();
     this.diagnosisField = null;
     this.diagnosisRankField = null;
     map(Object.keys(this.formValuesData), (key) => {
-      if (this.formValuesData[key] && this.formValuesData[key].value) {
+      if (this.formValuesData[key]) {
         if (key === "diagnosis") {
           this.diagnosesData[key] = {
             coded: this.formValuesData[key].value,
@@ -69,11 +69,9 @@ export class PatientDiagnosesSummaryComponent implements OnInit {
           };
         } else {
           const options = this.formValuesData[key]?.options || [];
-          const keyedOptions = keyBy(options, "key");
+          const keyedOptions = keyBy(options, "value");
           this.diagnosesData[key] =
-            keyedOptions[this.formValuesData[key].value]?.value === "Secondary"
-              ? 1
-              : 0;
+          keyedOptions[this.formValuesData[key].value]?.value === "Secondary" ? 1 : 0;
         }
       }
 
