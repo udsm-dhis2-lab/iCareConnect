@@ -46,6 +46,38 @@ export class BillingService {
         )
       : of([]);
   }
+  getAllPatientBills(
+    patientUuid: string,
+    isRegistrationPage?: boolean
+  ): Observable<Bill[]> {
+    return !isRegistrationPage
+      ? this.httpClient.get(`billing/patient/allInvoices?patient=${patientUuid}`).pipe(
+          map((results) =>
+            (
+              results.map((result) => {
+                return {
+                  ...result,
+                  items: result.items.map((item) => {
+                    return {
+                      ...item,
+                      item: {
+                        ...item?.item,
+                        concept: item?.item?.concept
+                          ? item?.item?.concept
+                          : {
+                              name: item?.item?.name,
+                              uuid: item?.item?.uuid,
+                            },
+                      },
+                    };
+                  }),
+                };
+              }) || []
+            ).map((bill) => new Bill(bill))
+          )
+        )
+      : of([]);
+  }
 
   payBill(bill: BillObject, paymentInput: PaymentInput): Observable<Payment> {
     const billPayment = Bill.createPayment(bill, paymentInput);

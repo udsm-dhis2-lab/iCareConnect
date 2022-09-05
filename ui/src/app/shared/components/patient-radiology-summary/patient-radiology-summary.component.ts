@@ -136,7 +136,7 @@ export class PatientRadiologySummaryComponent implements OnInit {
           );
           this.hasError = false;
         } else {
-          console.log("response", response);
+          console.log("==> response", response);
           this.hasError = true;
           this.error = response?.error?.message;
         }

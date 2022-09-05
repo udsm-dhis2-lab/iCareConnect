@@ -105,6 +105,10 @@ export class OrdersService {
     );
   }
 
+  async createOrder(order): Promise<any> {
+    return await this.API.order.createOrder(order);
+  }
+
   getOrdersFrequencies() {
     return from(
       this.API.orderfrequency.getAllOrderFrequencies({ v: "full" })

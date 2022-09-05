@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterContentInit } from "@angular/core";
+import { MatDialog } from "@angular/material/dialog";
 import { ActivatedRoute } from '@angular/router';
 import { select, Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
@@ -17,15 +18,18 @@ import {
   getAllPayments,
   getLoadingPaymentStatus,
 } from 'src/app/store/selectors/payment.selector';
+import { ExemptionDenialComponent } from "../../components/exemption-denial/exemption-denial.component";
 import { BillObject } from '../../models/bill-object.model';
+import { Bill } from "../../models/bill.model";
 import { PaymentObject } from '../../models/payment-object.model';
+import { BillingService } from '../../services/billing.service';
 
 @Component({
-  selector: 'app-exemption',
-  templateUrl: './exemption.component.html',
-  styleUrls: ['./exemption.component.scss'],
+  selector: "app-exemption",
+  templateUrl: "./exemption.component.html",
+  styleUrls: ["./exemption.component.scss"],
 })
-export class ExemptionComponent implements OnInit {
+export class ExemptionComponent implements OnInit, AfterContentInit {
   currentPatient$: Observable<Patient>;
   patientDetails: any;
   quoteToShow: boolean;
@@ -35,10 +39,16 @@ export class ExemptionComponent implements OnInit {
   payments$: Observable<PaymentObject[]>;
   patientId: string;
   patientsBillsLoadedState$: Observable<boolean>;
+  discountItemsCount: any;
+  discountItems: any[] = [];
+  bill: Bill;
+
   constructor(
     private store: Store<AppState>,
     private patientService: PatientService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private billingService: BillingService,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit() {
@@ -59,6 +69,22 @@ export class ExemptionComponent implements OnInit {
     );
   }
 
+  ngAfterContentInit() {
+    this.billingService.getAllPatientBills(this.patientId).subscribe({
+      next: (bills) => {
+        bills.forEach((bill) => {
+          if (bill) {
+            this.bill = bill;
+            bill.billDetails?.discountItems.forEach((discountItem) => {
+              this.discountItems = [...this.discountItems, discountItem];
+            });
+            this.discountItemsCount = this.discountItems.length;
+          }
+        });
+      },
+    });
+  }
+
   onDiscountBill(exemptionDetails): void {
     if (exemptionDetails) {
       const { bill, discountDetails, patient } = exemptionDetails;
@@ -68,5 +94,19 @@ export class ExemptionComponent implements OnInit {
 
   onSelectPatient(e) {
     e.stopPropagation();
+  }
+
+  exemptionDenial() {
+    const dialog = this.dialog.open(ExemptionDenialComponent, {
+      width: "25%",
+      panelClass: "custom-dialog-container",
+    });
+
+    dialog.afterClosed().subscribe((data) => {
+      if(data){
+        console.log("Denied Successfully!", data)
+         
+      }
+    });
   }
 }
