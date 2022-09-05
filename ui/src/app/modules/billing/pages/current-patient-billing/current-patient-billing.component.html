@@ -4,12 +4,22 @@
     facilityDetails: facilityDetails$ | async,
     currentLocation: currentLocation$ | async,
     provider: provider$ | async,
-    currentUser: currentUser$ | async
+    currentUser: currentUser$ | async,
+    exemptionEncounterType: exemptionEncounterType$ | async,
+    exemptionOrderType: exemptionOrderType$ | async
   } as params">
-  <!-- {{ params?.facilityDetails }} -->
-  <!-- | -->
-  <!-- {{ params?.logo | json}} -->
+
   <mat-progress-bar mode="indeterminate" *ngIf="loading || !params?.currentPatient"></mat-progress-bar>
+
+  <!-- Alerts -->
+    <div class="alert alert-danger mt-2" role="alert" *ngIf="!params?.exemptionOrderType[0]?.value">
+      Missing Icare Exemption Configurations. Please set "icare.billing.exemption.orderType" or Contact IT
+    </div>
+    <div class="alert alert-danger mt-2" role="alert" *ngIf="!params?.exemptionEncounterType[0]?.value">
+      Missing Icare Exemption Configurations. Please set "icare.billing.exemption.encounterType" or Contact IT
+    </div>
+  <!-- End Alerts -->
+
   <div *ngIf="patientBillingDetails$ | async as patientBillingDetails" class="">
     <ng-container>
       <div class="row mt-3">
@@ -67,6 +77,7 @@
                     </div>
                     <div *ngIf="patientBillingDetails.bills.length > 0">
                       <button class="float-left" mat-stroked-button
+                        [ngClass]="!params?.exemptionEncounterType[0]?.value || !params?.exemptionOrderType[0]?.value ? 'button-faint': 'button'"
                         matTooltip="Send patient to administration for exemption"
                         (click)="requestExemption(patientBillingDetails, params)">
                         Request Exemption

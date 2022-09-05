@@ -24,6 +24,10 @@ import { getCurrentUserDetails, getProviderDetails } from "src/app/store/selecto
 import { EncountersService } from "src/app/shared/services/encounters.service";
 import { OrdersService } from "src/app/shared/resources/order/services/orders.service";
 import { any } from "cypress/types/bluebird";
+import { ICARE_CONFIG } from "src/app/shared/resources/config";
+import { getEncounterTypeByName } from "src/app/store/selectors/encounter-type.selectors";
+import { SystemSettingsService } from "src/app/core/services/system-settings.service";
+import { MatTableDataSource } from "@angular/material/table";
 
 @Component({
   selector: "app-current-patient-billing",
@@ -54,6 +58,8 @@ export class CurrentPatientBillingComponent implements OnInit {
   discountItems: any[] = [];
   discountItemsCount: any;
   bill: Bill;
+  exemptionEncounterType$: Observable<any>;
+  exemptionOrderType$: Observable<any>;
   
   constructor(
     private route: ActivatedRoute,
@@ -64,6 +70,7 @@ export class CurrentPatientBillingComponent implements OnInit {
     private configService: ConfigsService,
     private encounterService: EncountersService,
     private ordersService: OrdersService,
+    private systemSettingsService: SystemSettingsService,
     private store: Store<AppState>
   ) {}
 
@@ -150,6 +157,32 @@ export class CurrentPatientBillingComponent implements OnInit {
         })
       }
     });
+
+    // Get exemption encounter Type
+    this.exemptionEncounterType$ = this.systemSettingsService
+      .getSystemSettingsMatchingAKey("icare.billing.exemption.encounterType")
+      .pipe(
+        tap((orderType) => {
+          return orderType[0];
+        }),
+        catchError((error) => {
+          console.log("Error occured while trying to get orderType: ", error);
+          return of(new MatTableDataSource([]));
+        })
+      );
+
+     //Get exemption order type
+    this.exemptionOrderType$ = this.systemSettingsService
+      .getSystemSettingsMatchingAKey("icare.billing.exemption.orderType")
+      .pipe(
+        tap((orderType) => {
+          return orderType[0];
+        }),
+        catchError((error) => {
+          console.log("Error occured while trying to get orderType: ", error);
+          return of(new MatTableDataSource([]));
+        })
+      );
   }
 
   private _getPatientDetails() {
@@ -204,13 +237,13 @@ export class CurrentPatientBillingComponent implements OnInit {
       visit: patientBillingDetails.visit?.uuid,
       encounterDatetime: currentDate.toISOString(),
       patient: params.currentPatient?.id,
-      encounterType: "51130033-46fe-4fe5-b407-32413fb9acfa",
+      encounterType: params?.exemptionEncounterType[0]?.value,
       location: params.currentLocation?.uuid,
-      // TODO: Find best way to get encounter provider details
       encounterProviders: [
         {
           provider: params.provider?.uuid,
-          encounterRole: "240b26f9-dd88-4172-823d-4a8bfeb7841f",
+          encounterRole: ICARE_CONFIG?.encounterRole?.uuid,
+          // encounterRole: "240b26f9-dd88-4172-823d-4a8bfeb7841f",
         },
       ],
     };
@@ -219,7 +252,7 @@ export class CurrentPatientBillingComponent implements OnInit {
     this.encounterService.createEncounter(exemptionEncounterStart).then((encounter) => {
       if (encounter){
         let order = {
-          orderType: "3b4a9d58-0224-474f-a0f0-7fac80897b07",
+          orderType: params?.exemptionOrderType[0]?.value,
           action: "NEW",
           urgency: "ROUTINE",
           encounter: encounter.uuid,
