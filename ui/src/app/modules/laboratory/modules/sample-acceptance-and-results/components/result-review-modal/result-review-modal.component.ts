@@ -1,5 +1,6 @@
 import { Component, Inject, OnInit } from "@angular/core";
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
+import * as moment from "moment";
 
 @Component({
   selector: "app-result-review-modal",
@@ -8,6 +9,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 })
 export class ResultReviewModalComponent implements OnInit {
   dialogData: any;
+  results: any[] = [];
   constructor(
     private dialogRef: MatDialogRef<ResultReviewModalComponent>,
     @Inject(MAT_DIALOG_DATA) data
@@ -16,7 +18,19 @@ export class ResultReviewModalComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log(this.dialogData);
+    this.dialogData?.sample.orders.forEach((order) => {
+      order?.testAllocations.forEach((testAllocation) => {
+        let resultObject = {
+          testName: testAllocation?.concept?.display,
+          results: testAllocation?.results
+        }
+
+        this.results = [
+          ...this.results,
+          resultObject
+        ]
+      })
+    })
   }
 
   onClose(event: Event): void {
