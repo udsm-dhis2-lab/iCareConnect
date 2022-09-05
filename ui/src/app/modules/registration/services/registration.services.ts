@@ -130,12 +130,12 @@ export class RegistrationService {
     );
   }
 
-  getRegistrationConfigurations() {
+  getRegistrationMRNSource() {
     return this.httpClient
-      .get("systemsetting?q=iCare.registrationConfigurations&v=full")
+      .get("systemsetting?q=icare.registration.mrnSource&v=full")
       .pipe(
         map((response) => {
-          return JSON.parse(response?.results[0]?.value);
+          return JSON.parse(response?.results[0]?.value) || "";
         }),
         catchError((error) => {
           return error;
