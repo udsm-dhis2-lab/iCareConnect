@@ -1,3 +1,4 @@
+import { ClassGetter } from "@angular/compiler/src/output/output_ast";
 import { Injectable } from "@angular/core";
 import { DomSanitizer } from "@angular/platform-browser";
 import { isArray, omit, orderBy, flatten, groupBy, keyBy } from "lodash";
@@ -129,7 +130,9 @@ export class VisitsService {
     orderStatusCode?: string,
     orderBy?: string,
     orderByDirection?: string,
+    filterBy?: string,
   ): Observable<Visit[]> {
+
     const locationUuids: any = isArray(location) ? location : [location];
 
     // Parameters for sorting
@@ -142,7 +145,7 @@ export class VisitsService {
         ? orderByParameter + orderDirectionParameter
         : "";
 
-    if (orderType) {
+    if (orderType || !orderType) {
       const orderStatusParameter = orderStatus
         ? `&fulfillerStatus=${orderStatus}`
         : "";
@@ -156,7 +159,7 @@ export class VisitsService {
 
       return this.httpClient
         .get(
-          `icare/visit?${locationParameter}${orderTypeParameter}${orderStatusParameter}${orderStatusCodeParameter}${sortingParameters}&startIndex=${startIndex}&limit=${limit}`
+          `icare/visit?${locationParameter}${orderTypeParameter}${orderStatusParameter}${orderStatusCodeParameter}${sortingParameters}${filterBy}&startIndex=${startIndex}&limit=${limit}`
         )
         .pipe(
           map((visitResponse) => {
@@ -195,9 +198,7 @@ export class VisitsService {
             v: "custom:(uuid,visitType,startDatetime,encounters:(uuid,diagnoses,encounterDatetime,encounterType,location,obs,orders),stopDatetime,attributes:(uuid,display),location:(uuid,display,tags,parentLocation:(uuid,display)),patient:(uuid,display,identifiers,person,voided)",
             q: queryParam,
             limit: limit ? limit : 100,
-            startIndex: startIndex ? startIndex : 0,
-            orderBy: orderBy ? orderBy : null,
-            orderByDirection: orderByDirection ? orderByDirection : null 
+            startIndex: startIndex ? startIndex : 0
           } as any)
         ).pipe(
           map((result: any) => {

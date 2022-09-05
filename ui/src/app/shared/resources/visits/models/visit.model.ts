@@ -21,7 +21,7 @@ import { OtherOrder } from "./other-orders.model";
 export class Visit {
   // TODO: Need to find best way to type incoming patient
   constructor(
-    private visit: any,
+    public visit: any,
     public bills?: Bill[],
     public payments?: Payment[]
   ) {}
@@ -479,5 +479,47 @@ export class Visit {
           observer.error(error);
         });
     });
+  }
+}
+
+export class VisitExt extends Visit {
+  // TODO: Need to find best way to type incoming patient
+  constructor(
+    public visit: any,
+    public bills?: Bill[],
+    public payments?: Payment[]
+  ) {
+    super(visit);
+  }
+
+  get uuid(): string {
+    return this.visit?.uuid;
+  }
+
+  get isEmergency(): boolean {
+    let emergencyAttributeArray = filter(
+      this.visit?.attributes || [],
+      (attribute) => {
+        return attribute?.attributeType?.display == "EmergencyVisit";
+      }
+    );
+
+    return emergencyAttributeArray?.length > 0 ? true : false;
+  }
+
+  get patient(): Patient {
+    return new Patient(this.visit?.visit?.patient);
+  }
+
+  get patientUuid(): string {
+    return this.visit.visit.patient.uuid;
+  }
+
+  get patientName(): string {
+    return this.visit?.patient?.name;
+  }
+
+  get patientGender(): string {
+    return this.patient?.gender;
   }
 }

@@ -30,10 +30,10 @@ export class BillConfirmationComponent implements OnInit {
     e.stopPropagation();
     this.savingPayment = true;
     this.billingService
-      .payBill(this.data.bill, {
-        confirmedItems: this.data.billItems,
-        items: this.data.items,
-        paymentType: this.data.paymentType,
+     .payBill(this.data?.bill, {
+        confirmedItems: this.data?.billItems,
+        items: this.data?.items,
+        paymentType: this.data?.paymentType,
         referenceNumber: '',
       })
       .subscribe(

@@ -73,7 +73,7 @@
     <ng-container class="w-100" *ngIf="!isTabularList">
       <ng-container
         *ngFor="
-          let visit of visits | filterBy: searchTerm:'patientName':null:service
+          let visit of visits$ | async  | filterBy: searchTerm:'patientName':null:service
         "
       >
         <div
