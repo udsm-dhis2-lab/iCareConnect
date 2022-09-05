@@ -89,12 +89,11 @@ public class TestOrderLocation {
 		Location location = new Location();
 		location.setUuid((String) ((Map<String, Object>) testOrderLocationMap.get("location")).get("uuid"));
 		testOrderLocation.setLocation(location);
-
+		
 		User user = new User();
 		location.setUuid((String) ((Map<String, Object>) testOrderLocationMap.get("user")).get("uuid"));
 		testOrderLocation.setUser(user);
-
-
+		
 		return testOrderLocation;
 	}
 	
@@ -105,7 +104,7 @@ public class TestOrderLocation {
 		HashMap<String, Object> conceptMap = new HashMap<String, Object>();
 		conceptMap.put("display", this.getConcept().getDisplayString());
 		conceptMap.put("uuid", this.getConcept().getUuid());
-//		conceptMap.put("name", this.getConcept().getName().getName());
+		//		conceptMap.put("name", this.getConcept().getName().getName());
 		testOrderLocationMap.put("concept", conceptMap);
 		
 		HashMap<String, Object> locationMap = new HashMap<String, Object>();

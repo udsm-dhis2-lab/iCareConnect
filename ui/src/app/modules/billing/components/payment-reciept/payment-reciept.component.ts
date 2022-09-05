@@ -151,8 +151,8 @@ export class PaymentReceiptComponent implements OnInit {
     });
 
     let patientMRN =
-      e.CurrentPatient.MRN ||
-      e.CurrentPatient.patient?.identifiers[0]?.identifier.replace(
+      e?.CurrentPatient?.MRN ||
+      e?.CurrentPatient?.patient?.identifiers[0]?.identifier.replace(
         "MRN = ",
         ""
       );
@@ -166,9 +166,9 @@ export class PaymentReceiptComponent implements OnInit {
         
 
         <div class="info">
-          <h2>${e.FacilityDetails.display}</h2>
-          <h3>P.O Box ${e.FacilityDetails.postalCode} ${e.FacilityDetails.stateProvince}</h3>
-          <h3>${e.FacilityDetails.country}</h3>
+          <h2>${e?.FacilityDetails?.display}</h2>
+          <h3>P.O Box ${e.FacilityDetails?.postalCode} ${e.FacilityDetails?.stateProvince}</h3>
+          <h3>${e?.FacilityDetails?.country}</h3>
         </div>
         <!--End Info-->
       </center>
@@ -178,7 +178,7 @@ export class PaymentReceiptComponent implements OnInit {
       <div id="mid">
         <div class="patient-info">
           <p> 
-              Patient Name : ${e.CurrentPatient.name}</br>
+              Patient Name : ${e.CurrentPatient?.name}</br>
           </p>
           <p> 
               MRN : ${patientMRN}</br>
@@ -196,7 +196,7 @@ export class PaymentReceiptComponent implements OnInit {
             </div>
 
             <div class=""printDate>
-              <p>Printed on: ${e.PrintingDate}</p>
+              <p>Printed on: ${e?.PrintingDate}</p>
             </div>
           </div>
         </div>
