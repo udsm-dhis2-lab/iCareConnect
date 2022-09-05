@@ -6,7 +6,7 @@ import { DebugElement } from '@angular/core';
 import { ExemptionDenialComponent } from './exemption-denial.component';
 import { matDialogRefMock } from 'src/test-mocks/material.mocks';
 
-describe('ExemptionConfirmationComponent', () => {
+describe('ExemptionDenialComponent', () => {
   let component: ExemptionDenialComponent;
   let fixture: ComponentFixture<ExemptionDenialComponent>;
 

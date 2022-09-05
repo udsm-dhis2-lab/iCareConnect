@@ -5,7 +5,7 @@ import { DebugElement } from '@angular/core';
 
 import { DiscountsComponent } from "./discounts.component";
 
-describe('PendingPaymentsComponent', () => {
+describe('DiscountsComponent', () => {
   let component: DiscountsComponent;
   let fixture: ComponentFixture<DiscountsComponent>;
 
