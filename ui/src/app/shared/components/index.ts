@@ -75,6 +75,7 @@ import { SharedPrivilegesAndRolesManagementComponent } from "./shared-privileges
 import { PrivilegesListComponent } from "./privileges-list/privileges-list.component";
 import { RolesListComponent } from "./roles-list/roles-list.component";
 import { SharedConfirmationDialogComponent } from "./shared-confirmation-dialog/shared-confirmation-dialog.component";
+import { DeleteConfirmationComponent } from "./delete-confirmation/delete-confirmation.component";
 
 export const components: any[] = [
   PatientSearchComponent,
@@ -154,6 +155,7 @@ export const components: any[] = [
   PrivilegesListComponent,
   RolesListComponent,
   SharedConfirmationDialogComponent,
+  DeleteConfirmationComponent
 ];
 
 export const sharedEntryComponents: any[] = [

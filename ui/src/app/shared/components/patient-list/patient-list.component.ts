@@ -50,6 +50,7 @@ export class PatientListComponent implements OnInit, OnChanges {
 
   page: number = 0;
   visits$: Observable<Visit[]>;
+  filteredVisits$: Observable<Visit[]>;
   searchTerm: string;
   loadingPatients: boolean;
   locationsUuids: string[] = [];
@@ -60,6 +61,7 @@ export class PatientListComponent implements OnInit, OnChanges {
   @Output() selectPatient = new EventEmitter<any>();
   visitAttributeType: any;
   paymentType: any;
+  filterBy: any;
   constructor(
     private visitService: VisitsService,
     private store: Store<AppState>,
@@ -81,6 +83,14 @@ export class PatientListComponent implements OnInit, OnChanges {
     }
     this.itemsPerPage = this.itemsPerPage ? this.itemsPerPage : 10;
     this.getVisits(this.visits);
+
+    this.visits$.subscribe({
+      next: (visits) => {
+        // console.log("Visits: ", visits)
+       this.visits = visits
+      },
+    });
+
 
     /**
      * TODO: find the best place to put this
@@ -133,7 +143,8 @@ export class PatientListComponent implements OnInit, OnChanges {
             this.orderStatus,
             this.orderStatusCode,
             this.orderBy ? this.orderBy: "ENCOUNTER",
-            this.orderByDirection ? this.orderByDirection : "ASC"
+            this.orderByDirection ? this.orderByDirection : "ASC",
+            this.filterBy ? this.filterBy: ""
             )
           .pipe(
             tap(() => {
@@ -153,8 +164,7 @@ export class PatientListComponent implements OnInit, OnChanges {
 
   onLoadNewList(details): void {
     this.loadingPatients = true;
-    this.page =
-      details?.type === "next" ? Number(this.page) + 1 : Number(this.page) - 1;
+    this.page = details?.type === "next" ? Number(this.page) + 1 : Number(this.page) - 1;
 
     this.visits$ =
       this.service && this.service === "LABS"
@@ -189,28 +199,28 @@ export class PatientListComponent implements OnInit, OnChanges {
   }
 
   onSearchPatient(e) {
-    e.stopPropagation();
+     e.stopPropagation();
     this.searchTerm = e?.target?.value;
-    this.loadingPatients = true;
-    this.visits$ = this.visitService
-      .getAllVisits(
-        this.currentLocation,
-        false,
-        false,
-        this.searchTerm,
-        0,
-        this.itemsPerPage,
-        null,
-        null,
-        null,
-        "ENCOUNTER",
-        "ASC"
-      )
-      .pipe(
-        tap(() => {
-          this.loadingPatients = false;
-        })
-      );
+    // this.loadingPatients = true;
+    // this.visits$ = this.visitService
+    //   .getAllVisits(
+    //     this.currentLocation,
+    //     false,
+    //     false,
+    //     this.searchTerm,
+    //     0,
+    //     this.itemsPerPage,
+    //     null,
+    //     null,
+    //     null,
+    //     "ENCOUNTER",
+    //     "ASC"
+    //   )
+    //   .pipe(
+    //     tap(() => {
+    //       this.loadingPatients = false;
+    //     })
+    //   );
   }
 
   getLocationUuids(location) {
@@ -280,11 +290,43 @@ export class PatientListComponent implements OnInit, OnChanges {
   }
 
   filterPatientList(event: any){
-    this.visitAttributeType = event.visitAttributeType.value;
-    this.paymentType = event.paymentType.uuid;
+    this.loadingPatients = true;
 
-    // console.log(
-    //   `filterValue: ${this.visitAttributeType}==>${this.paymentType}`
-    // );
+    this.filterBy = event && typeof event === 'string' ? event : "";
+
+    this.filteredVisits$ = this.visitService.getAllVisits(
+          this.currentLocation,
+          false,
+          false,
+          null,
+          0,
+          this.itemsPerPage,
+          this.orderType,
+          this.orderStatus,
+          this.orderStatusCode,
+          this.orderBy ? this.orderBy : "ENCOUNTER",
+          this.orderByDirection ? this.orderByDirection : "ASC",
+          this.filterBy
+        );
+
+    this.filteredVisits$.subscribe({
+      next: (visits) => {
+        this.loadingPatients = false;
+        if (visits.length > 0) {
+          return (this.visits = visits);
+        }
+        else {
+          this.visits$.subscribe({
+            next: (visits) => {
+              this.visits = visits;
+            },
+          });
+        }
+
+      },
+      error: (error) => {
+        this.loadingPatients = false;
+      },
+    });
   }
 }
