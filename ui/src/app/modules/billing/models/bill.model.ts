@@ -6,7 +6,7 @@ import { PaymentInput } from './payment-input.model';
 import * as _ from 'lodash';
 
 export class Bill {
-  constructor(private billDetails: any) {}
+  constructor(public billDetails: any) {}
 
   get id(): string {
     return this.billDetails?.uuid;

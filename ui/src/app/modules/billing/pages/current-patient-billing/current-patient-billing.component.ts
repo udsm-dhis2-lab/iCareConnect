@@ -16,11 +16,14 @@ import { Bill } from "../../models/bill.model";
 import { PaymentInput } from "../../models/payment-input.model";
 import { BillingService } from "../../services/billing.service";
 import { PaymentService } from "../../services/payment.service";
-import { Store } from "@ngrx/store";
+import { select, Store } from "@ngrx/store";
 import { AppState } from "src/app/store/reducers";
-import { getParentLocation } from "src/app/store/selectors";
+import { getCurrentLocation, getParentLocation } from "src/app/store/selectors";
 import { DomSanitizer } from "@angular/platform-browser";
-import { getCurrentUserDetails } from "src/app/store/selectors/current-user.selectors";
+import { getCurrentUserDetails, getProviderDetails } from "src/app/store/selectors/current-user.selectors";
+import { EncountersService } from "src/app/shared/services/encounters.service";
+import { OrdersService } from "src/app/shared/resources/order/services/orders.service";
+import { any } from "cypress/types/bluebird";
 
 @Component({
   selector: "app-current-patient-billing",
@@ -46,7 +49,12 @@ export class CurrentPatientBillingComponent implements OnInit {
   currentPatient$: Observable<Patient>;
   parentLocation$: Observable<any>;
   currentUser$: Observable<any>;
-
+  provider$: Observable<any>;
+  creatingOrdersResponse$: Observable<any>;
+  discountItems: any[] = [];
+  discountItemsCount: any;
+  bill: Bill;
+  
   constructor(
     private route: ActivatedRoute,
     private visitService: VisitsService,
@@ -54,6 +62,8 @@ export class CurrentPatientBillingComponent implements OnInit {
     private paymentService: PaymentService,
     private patientService: PatientService,
     private configService: ConfigsService,
+    private encounterService: EncountersService,
+    private ordersService: OrdersService,
     private store: Store<AppState>
   ) {}
 
@@ -62,10 +72,84 @@ export class CurrentPatientBillingComponent implements OnInit {
     this._getPatientDetails();
 
     this.currentPatient$ = this.patientService.getPatient(this.patientId);
-
+    this.currentUser$ = this.store.select(getCurrentUserDetails);
     this.facilityDetails$ = this.configService.getFacilityDetails();
     this.facilityLogo$ = this.configService.getLogo();
     this.facilityDetails$ = this.store.select(getParentLocation);
+    this.currentLocation$ = this.store.pipe(select(getCurrentLocation));
+    this.provider$ = this.store.select(getProviderDetails);
+
+
+    this.billingService.getAllPatientBills(this.patientId).subscribe({
+      next: (bills) => {
+        bills.forEach((bill) => {
+          if(bill){
+            this.bill = bill;
+            //Get discounted Items
+            
+            bill.billDetails.discountItems.forEach((discountItem) => {
+              let paidAmount: number = 0;
+              let paidItems: any[] = [];
+              let givenItems: any[] = []
+              
+              
+              //Get total amount that is already paid for an item
+              bill.billDetails.payments.forEach((payment) => {
+                payment.items.forEach((paymentItem) =>{
+                  if(discountItem.item.uuid === paymentItem.item.uuid){
+                    paidItems = [
+                      ...paidItems,
+                      paymentItem
+                    ];
+                  }
+                }) 
+              });
+              
+              //Get total amount of the item from the list of items the patient has
+              bill.billDetails.items.forEach((givenItem) => {
+                if(discountItem.item.uuid === givenItem.item.uuid){
+                  givenItems = [
+                    ...givenItems,
+                    givenItem
+                  ]
+                }
+              });
+              
+              //calculate total amount paid
+              paidItems.forEach((paymentItem) => {
+                paidAmount = paidAmount + parseInt(paymentItem.amount, 10);
+              });
+              
+              
+              // return givenItem with discounted amount if paid amount is less than item's price
+              if (paidAmount < givenItems[0].price){
+                givenItems[0] = {
+                  ...givenItems[0],
+                  price: discountItem.amount
+                }
+
+                //Filterout for items that were exempted twice
+                this.discountItems = this.discountItems.filter((discountItem) => {
+                    if(!(discountItem.item.uuid === givenItems[0].item.uuid)){
+                      return discountItem
+                    }
+                  }
+                )
+                
+                this.discountItems = [
+                  ...this.discountItems,
+                  givenItems[0]
+                ]
+                
+              }
+            });
+
+            this.discountItemsCount = this.discountItems.length
+            
+          }
+        })
+      }
+    });
   }
 
   private _getPatientDetails() {
@@ -74,22 +158,25 @@ export class CurrentPatientBillingComponent implements OnInit {
     this.patientBillingDetails$ = zip(
       this.visitService.getActiveVisit(this.patientId, false),
       this.billingService.getPatientBills(this.patientId),
-      this.paymentService.getPatientPayments(this.patientId)
+      this.paymentService.getPatientPayments(this.patientId),
     ).pipe(
       map((res) => {
         this.loading = false;
         const visit = res[0];
         const bills = res[1];
         const payments = res[2];
-
         return {
           visit,
-          bills: bills.filter((bill) => !bill.isInsurance),
+          bills: bills.filter((bill) => {
+            if(!bill.isInsurance && bill.items.length > 0){
+              return bill
+            }
+          }),
           payments,
           paymentItemCount: payments
             .map((payment) => payment?.items?.length || 0)
             .reduce((sum, count) => sum + count, 0),
-          pendingPayments: bills.filter((bill) => bill.isInsurance),
+          pendingPayments: bills.filter((bill) => bill.isInsurance)
         };
       }),
       catchError((error) => {
@@ -107,6 +194,54 @@ export class CurrentPatientBillingComponent implements OnInit {
 
   onPaymentSuccess() {
     this._getPatientDetails();
+  }
+
+  requestExemption(patientBillingDetails, params) {
+    
+    let currentDate = new Date();
+
+    let exemptionEncounterStart = {
+      visit: patientBillingDetails.visit?.uuid,
+      encounterDatetime: currentDate.toISOString(),
+      patient: params.currentPatient?.id,
+      encounterType: "51130033-46fe-4fe5-b407-32413fb9acfa",
+      location: params.currentLocation?.uuid,
+      // TODO: Find best way to get encounter provider details
+      encounterProviders: [
+        {
+          provider: params.provider?.uuid,
+          encounterRole: "240b26f9-dd88-4172-823d-4a8bfeb7841f",
+        },
+      ],
+    };
+    
+
+    this.encounterService.createEncounter(exemptionEncounterStart).then((encounter) => {
+      if (encounter){
+        let order = {
+          orderType: "3b4a9d58-0224-474f-a0f0-7fac80897b07",
+          action: "NEW",
+          urgency: "ROUTINE",
+          encounter: encounter.uuid,
+          careSetting: !patientBillingDetails.visit?.isAdmitted
+            ? "OUTPATIENT"
+            : "INPATIENT",
+          patient: params.currentPatient?.id,
+          concept: "be767d14-db83-40af-8de3-4a2f4e158712",
+          orderer: params.provider?.uuid,
+          type: "order"
+        };
+         
+        // send a request to create order
+        this.ordersService.createOrder(order).then((order) => {
+          if (order) {
+          } else {
+            console.log(" ==> Failed exemption to create order: ", order);
+          }
+        });
+      }
+      
+    });
   }
 
   onPrint(e: any): void {
@@ -208,8 +343,9 @@ export class CurrentPatientBillingComponent implements OnInit {
       }
     });
 
-    let patientMRN = e.CurrentPatient.MRN ||
-      e.CurrentPatient.patient?.identifiers[0]?.identifier.replace(
+    let patientMRN =
+      e.CurrentPatient?.MRN ||
+      e.CurrentPatient?.patient?.identifiers[0]?.identifier.replace(
         "MRN = ",
         ""
       );
@@ -323,7 +459,6 @@ export class CurrentPatientBillingComponent implements OnInit {
         </table>`);
       }
     }
-    
 
     frameDoc.document.write(`
           <div class="footer">
