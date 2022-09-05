@@ -135,7 +135,7 @@ export class RegistrationService {
       .get("systemsetting?q=icare.registration.mrnSource&v=full")
       .pipe(
         map((response) => {
-          return JSON.parse(response?.results[0]?.value) || "";
+          return response?.results[0]?.value;
         }),
         catchError((error) => {
           return error;
