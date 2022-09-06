@@ -483,7 +483,6 @@ export class Visit {
 }
 
 export class VisitExt extends Visit {
-  // TODO: Need to find best way to type incoming patient
   constructor(
     public visit: any,
     public bills?: Bill[],

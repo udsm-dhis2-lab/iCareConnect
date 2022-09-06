@@ -23,6 +23,12 @@ export class ExemptionListComponent implements OnInit {
 
   ngOnInit() {
     this.criteriaResults$ = this.billingService.discountCriteriaConcept();
+    this.bills = this.bills.filter((bill) => {
+      if(bill?.items && bill?.items.length > 0){
+        return bill
+      }
+    })
+
   }
 
   onConfirmExemption(exemptionDetails): void {

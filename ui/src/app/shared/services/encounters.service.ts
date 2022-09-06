@@ -3,9 +3,9 @@ import { Injectable } from '@angular/core';
 
 import * as _ from 'lodash';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { from, Observable, of } from 'rxjs';
 import { BASE_URL } from '../constants/constants.constants';
-import { delay } from 'rxjs/operators';
+import { catchError, delay, map } from 'rxjs/operators';
 import { Api } from '../resources/openmrs';
 
 @Injectable({
@@ -50,7 +50,19 @@ export class EncountersService {
     return data;
   }
 
-  async createEncounter(encounter): Promise<any> {
-    return await this.API.encounter.createEncounter(encounter);
+  createEncounter(encounter): Observable<any> {
+    return from(this.API.encounter.createEncounter(encounter)).pipe(
+      map((encounter) => {
+        return encounter
+      }),
+      catchError((err) => {
+        return of(err);
+      }));
+  }
+
+  updateEncounter(encounter): Observable<any> {
+    return from(this.API.encounter.updateEncounter(encounter.uuid, encounter)).pipe(
+      map((encounter) => {return encounter})
+    )
   }
 }
