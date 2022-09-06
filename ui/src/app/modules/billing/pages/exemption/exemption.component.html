@@ -1,7 +1,9 @@
 <div class="visit-container" *ngIf="{
     currentPatient: currentPatient$ | async,
     bills: bills$ | async,
-    patientsBillsLoadedState: patientsBillsLoadedState$ | async
+    patientsBillsLoadedState: patientsBillsLoadedState$ | async,
+    currentVisit: currentVisit$ | async,
+    exemptionEncounterType: exemptionEncounterType$ | async
   } as params">
   <mat-progress-bar *ngIf="!params?.currentPatient" mode="indeterminate"></mat-progress-bar>
   <div class="row" *ngIf="params?.currentPatient && params?.bills">
@@ -14,10 +16,15 @@
         <mat-icon>arrow_back</mat-icon>
         Back to Client List
       </button>
-      <button class="float-right bg-danger" mat-stroked-button [routerLink]="'/billing/exemption'"
-        matTooltip="Deny exemption for this patient" (click)="exemptionDenial()">
+      <button class="float-right bg-danger" mat-stroked-button
+        matTooltip="Deny exemption for this patient" (click)="exemptionDenial(params)">
         <mat-icon>pan_tool</mat-icon>
         Deny Exemption
+      </button>
+      <button class="float-right bg-success mr-5" mat-stroked-button
+        matTooltip="Exempt patient across the whole visit" (click)="exemptFull(params)">
+        <mat-icon>thumb_up_alt</mat-icon>
+        Full Exempt
       </button>
     </div>
     <div class="col-md-12">

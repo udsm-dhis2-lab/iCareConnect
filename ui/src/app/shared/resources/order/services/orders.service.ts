@@ -105,8 +105,11 @@ export class OrdersService {
     );
   }
 
-  async createOrder(order): Promise<any> {
-    return await this.API.order.createOrder(order);
+  createOrder(order): Observable<any> {
+    return from(this.API.order.createOrder(order)).pipe(
+      map((order) => order),
+      catchError((error) => of(error))
+    );
   }
 
   getOrdersFrequencies() {

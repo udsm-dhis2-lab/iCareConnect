@@ -246,16 +246,11 @@ export class CurrentPatientBillingComponent implements OnInit {
           // encounterRole: "240b26f9-dd88-4172-823d-4a8bfeb7841f",
         },
       ],
-    };
-    
-
-    this.encounterService.createEncounter(exemptionEncounterStart).then((encounter) => {
-      if (encounter){
-        let order = {
+      orders: [
+        {
           orderType: params?.exemptionOrderType[0]?.value,
           action: "NEW",
           urgency: "ROUTINE",
-          encounter: encounter.uuid,
           careSetting: !patientBillingDetails.visit?.isAdmitted
             ? "OUTPATIENT"
             : "INPATIENT",
@@ -263,17 +258,18 @@ export class CurrentPatientBillingComponent implements OnInit {
           concept: "be767d14-db83-40af-8de3-4a2f4e158712",
           orderer: params.provider?.uuid,
           type: "order"
-        };
-         
-        // send a request to create order
-        this.ordersService.createOrder(order).then((order) => {
-          if (order) {
-          } else {
-            console.log(" ==> Failed exemption to create order: ", order);
-          }
-        });
+        },
+      ]
+    };
+
+    
+    this.ordersService.createOrdersViaCreatingEncounter(exemptionEncounterStart).subscribe({
+      next: (encounter) => {
+        return encounter;
+      },
+      error: (err) => {
+        return err;
       }
-      
     });
   }
 

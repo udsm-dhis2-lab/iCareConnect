@@ -1,12 +1,20 @@
 import { Component, OnInit, AfterContentInit } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
+import { MatTableDataSource } from "@angular/material/table";
 import { ActivatedRoute } from '@angular/router';
 import { select, Store } from '@ngrx/store';
-import { Observable } from 'rxjs';
+import * as _ from "lodash";
+import { Observable, of } from 'rxjs';
+import { catchError, tap } from "rxjs/operators";
+import { SystemSettingsService } from "src/app/core/services/system-settings.service";
+import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
+import { Textbox } from "src/app/shared/modules/form/models/text-box.model";
+import { OrdersService } from "src/app/shared/resources/order/services/orders.service";
 import { Patient } from 'src/app/shared/resources/patient/models/patient.model';
 import { PatientService } from 'src/app/shared/resources/patient/services/patients.service';
-import { addCurrentPatient, loadCurrentPatient } from 'src/app/store/actions';
-import { discountBill } from 'src/app/store/actions/bill.actions';
+import { EncountersService } from "src/app/shared/services/encounters.service";
+import { loadCurrentPatient } from 'src/app/store/actions';
+import { discountBill } from "src/app/store/actions/bill.actions";
 import { AppState } from 'src/app/store/reducers';
 import {
   getLoadingBillStatus,
@@ -18,7 +26,10 @@ import {
   getAllPayments,
   getLoadingPaymentStatus,
 } from 'src/app/store/selectors/payment.selector';
+import { getActiveVisit } from "src/app/store/selectors/visit.selectors";
 import { ExemptionDenialComponent } from "../../components/exemption-denial/exemption-denial.component";
+import { ExemptionFullConfirmationComponent } from "../../components/exemption-full-confirmation/exemption-full-confirmation.component";
+import { BillItem } from "../../models/bill-item.model";
 import { BillObject } from '../../models/bill-object.model';
 import { Bill } from "../../models/bill.model";
 import { PaymentObject } from '../../models/payment-object.model';
@@ -42,13 +53,23 @@ export class ExemptionComponent implements OnInit, AfterContentInit {
   discountItemsCount: any;
   discountItems: any[] = [];
   bill: Bill;
+  billItems: BillItem[];
+  currentVisit$: Observable<any>;
+  criteriaResults$: Observable<any>;
+  criteria: any;
+  criteriaObject: any;
+  exemptionForm: any;
+  exemptionEncounterType$: any;
 
   constructor(
     private store: Store<AppState>,
     private patientService: PatientService,
     private route: ActivatedRoute,
     private billingService: BillingService,
-    private dialog: MatDialog
+    private systemSettingsService: SystemSettingsService,
+    private dialog: MatDialog,
+    private encounterService: EncountersService,
+    private ordersService: OrdersService,
   ) {}
 
   ngOnInit() {
@@ -62,11 +83,33 @@ export class ExemptionComponent implements OnInit, AfterContentInit {
     this.loadingBills$ = this.store.pipe(select(getLoadingBillStatus));
 
     this.payments$ = this.store.pipe(select(getAllPayments));
+    
+    this.currentVisit$ = this.store.select(getActiveVisit);
+
     this.loadingPayments$ = this.store.pipe(select(getLoadingPaymentStatus));
 
     this.patientsBillsLoadedState$ = this.store.select(
       getPatientBillLoadedStatus
     );
+    this.criteriaResults$ = this.billingService.discountCriteriaConcept();
+    
+    this.criteriaResults$.subscribe((criteria) => {
+      this.criteria = criteria.results[0]
+    });
+
+    // Get exemption encounter Type
+    this.exemptionEncounterType$ = this.systemSettingsService
+      .getSystemSettingsMatchingAKey("icare.billing.exemption.encounterType")
+      .pipe(
+        tap((orderType) => {
+          return orderType[0];
+        }),
+        catchError((error) => {
+          console.log("Error occured while trying to get orderType: ", error);
+          return of(new MatTableDataSource([]));
+        })
+      );
+
   }
 
   ngAfterContentInit() {
@@ -83,6 +126,8 @@ export class ExemptionComponent implements OnInit, AfterContentInit {
         });
       },
     });
+
+    
   }
 
   onDiscountBill(exemptionDetails): void {
@@ -96,7 +141,17 @@ export class ExemptionComponent implements OnInit, AfterContentInit {
     e.stopPropagation();
   }
 
-  exemptionDenial() {
+
+  getCurrentExemptionEncounter(encounters: any[], encounterType: any){
+    encounters.filter((encounter) => {
+      if(encounter?.encounterType?.uuid === encounterType?.value){
+        return encounter
+      }
+    });
+    return encounters[0];
+  }
+
+  exemptionDenial(params) {
     const dialog = this.dialog.open(ExemptionDenialComponent, {
       width: "25%",
       panelClass: "custom-dialog-container",
@@ -104,9 +159,105 @@ export class ExemptionComponent implements OnInit, AfterContentInit {
 
     dialog.afterClosed().subscribe((data) => {
       if(data){
-        console.log("Denied Successfully!", data)
-         
+        let exemptionEncounter = this.getCurrentExemptionEncounter(params?.currentVisit?.encounters, params?.exemptionEncounterType);
+        let reason = data.reason
+        let exemptionOrder = exemptionEncounter.orders[0];
+
+        exemptionEncounter = {
+          uuid: exemptionEncounter?.uuid,
+          void: 1,
+          voidReason: reason
+        }
+
+        exemptionOrder = {
+          uuid: exemptionOrder?.uuid,
+          fulfillerStatus: exemptionOrder?.fulfillerStatus,
+          encounter: exemptionOrder?.encounter
+        }
+
+        this.ordersService.updateOrdersViaEncounter([exemptionOrder]).subscribe({
+          next: (order) => {
+            console.log("==> Order updated successfully: ", order)
+          },
+          error: (error) => {
+            console.log("==> Failed to update order: ", error)
+          }
+        })
+
+        this.encounterService.updateEncounter(exemptionEncounter)
       }
     });
   }
+
+  exemptFull(params){
+    let exemptionEncounter = this.getCurrentExemptionEncounter(params?.currentVisit?.encounters, params?.exemptionEncounterType);
+    let exemptionOrder = exemptionEncounter.orders[0];
+
+    this.criteriaObject = {
+      id: this.criteria['display'],
+      key: this.criteria['display'],
+      label: this.criteria['display'],
+      options: _.map(this.criteria['answers'], (answer) => {
+        return {
+          key: answer['uuid'],
+          value: answer['uuid'],
+          label: answer['display'],
+        };
+      }),
+    };
+
+    this.exemptionForm = {
+      criteria: new Dropdown(this.criteriaObject),
+      remarks: new Textbox({
+        id: 'remarks',
+        key: 'remarks',
+        label: 'Remark',
+      }),
+    };
+
+    const dialog = this.dialog.open(ExemptionFullConfirmationComponent, {
+      width: "25%",
+      panelClass: "custom-dialog-container",
+      data: {
+        visit: params?.currentVisit, 
+        bills: params?.bills, 
+        exemptionMessage: {
+          heading: `Fully exempt ${params?.currentPatient?.patient?.person?.display}`, 
+          message: "This is to confirm that you are about to confirm exempting this person in fully including the above items. Click Confirm to process the exemption."
+        },
+        form: this.exemptionForm,
+        patient: params?.currentPatient
+      }
+    });
+
+    dialog.afterClosed().subscribe((data) => {
+      if(data?.confirmed){
+        //Update Encounter Order after Succesfully exempting this person
+        exemptionOrder = {
+          ...exemptionOrder,
+          fulfillerStatus: 'RECEIVED',
+          encounter: exemptionOrder?.encounter?.uuid,
+        };
+
+        exemptionOrder = {
+          uuid: exemptionOrder?.uuid,
+          fulfillerStatus: exemptionOrder?.fulfillerStatus,
+          encounter: exemptionOrder?.encounter
+        }
+        this.ordersService.updateOrdersViaEncounter([exemptionOrder]).subscribe({
+          next: (order) => {
+            console.log("==> Order updated successfully: ", order)
+          },
+          error: (error) => {
+            console.log("==> Failed to update order: ", error)
+          }
+        })
+
+        // Discount Creation
+        this.onDiscountBill(data?.exemptionDetails);
+      }
+
+    });
+  }
+
 }

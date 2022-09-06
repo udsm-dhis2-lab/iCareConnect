@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
 
 @Component({
-  selector: 'app-exemption-confirmation',
+  selector: 'app-exemption-denial',
   templateUrl: './exemption-denial.component.html',
   styleUrls: ['./exemption-denial.component.scss'],
 })

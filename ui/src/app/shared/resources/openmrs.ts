@@ -572,6 +572,8 @@ export interface EncounterUpdate {
   provider?: string;
   orders?: OrderCreate[];
   obs?: ObsCreate[];
+  void?: boolean;
+  voidReason?: string;
 }
 
 export interface AppointmentschedulingTimeslotGet {
