@@ -1,21 +1,18 @@
 <div
   *ngIf="{
-    registrationConfigurations: registrationConfigurations$ | async
+    registrationMRNSourceReference: registrationMRNSourceReference$ | async
   } as params"
 >
   <app-registration-add
-    *ngIf="
-      params?.registrationConfigurations &&
-      params?.registrationConfigurations['sourceUuid']
-    "
-    [registrationConfigurations]="params?.registrationConfigurations"
+    *ngIf="params?.registrationMRNSourceReference"
+    [registrationMRNSourceReference]="params?.registrationMRNSourceReference"
   ></app-registration-add>
 
   <div
     class="alert alert-danger mt-2 ml-2 mr-2"
     *ngIf="
-      params?.registrationConfigurations &&
-      !params?.registrationConfigurations['sourceUuid']
+      params?.registrationMRNSourceReference &&
+      params?.registrationMRNSourceReference == ''
     "
     role="alert"
   >
@@ -23,7 +20,7 @@
   </div>
 
   <mat-progress-bar
-    *ngIf="!params?.registrationConfigurations"
+    *ngIf="!params?.registrationMRNSourceReference"
     mode="indeterminate"
   ></mat-progress-bar>
 </div>
