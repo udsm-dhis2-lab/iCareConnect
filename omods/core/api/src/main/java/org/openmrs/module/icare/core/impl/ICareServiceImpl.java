@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.openmrs.*;
 import org.openmrs.api.*;
 import org.openmrs.api.context.Context;
+import org.openmrs.api.db.PatientDAO;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.icare.ICareConfig;
 import org.openmrs.module.icare.billing.ItemNotPayableException;
@@ -48,6 +49,8 @@ import java.util.regex.Pattern;
 public class ICareServiceImpl extends BaseOpenmrsService implements ICareService {
 	
 	ICareDao dao;
+	
+	PatientDAO patientDAO;
 	
 	UserService userService;
 	
@@ -234,7 +237,7 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	public List<Visit> getVisitsByOrderType(String search, String orderTypeUuid, String locationUuid,
 	        OrderStatus.OrderStatusCode prescriptionStatus, Order.FulfillerStatus fulfillerStatus, Integer limit,
 	        Integer startIndex, VisitWrapper.OrderBy orderBy, VisitWrapper.OrderByDirection orderByDirection,
-	        String attributeValueReference, String paymentStatus) {
+	        String attributeValueReference, VisitWrapper.PaymentStatus paymentStatus) {
 		return this.dao.getVisitsByOrderType(search, orderTypeUuid, locationUuid, prescriptionStatus, fulfillerStatus,
 		    limit, startIndex, orderBy, orderByDirection, attributeValueReference, paymentStatus);
 	}
@@ -436,6 +439,16 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	@Override
 	public List<ConceptSet> getConceptsSetsByConcept(String concept) {
 		return dao.getConceptsSetsByConcept(concept);
+	}
+	
+	@Override
+	public List<Patient> getPatients(String search, String patientUUID) {
+		return dao.getPatients(search, patientUUID);
+	}
+	
+	@Override
+	public Patient savePatient(Patient patient) {
+		return patientDAO.savePatient(patient);
 	}
 	
 	Boolean patientIsAdmitted(Visit visit) {

@@ -36,6 +36,9 @@ public class Discount extends BaseChangeableOpenmrsData {
 	@Column(name = "attachment_id")
 	private Integer attachmentId;
 	
+	@Column(name = "is_full_exempted")
+	private Boolean isFullExempted;
+	
 	@Column(name = "remarks")
 	private String remarks;
 	
@@ -103,11 +106,20 @@ public class Discount extends BaseChangeableOpenmrsData {
 		this.criteria = criteria;
 	}
 	
+	public boolean getIsFullExempted() {
+		return isFullExempted;
+	}
+	
+	public void setIsFullExempted(Boolean fullExempted) {
+		this.isFullExempted = fullExempted;
+	}
+	
 	public Map<String, Object> toMap() {
 		HashMap<String, Object> discountMap = new HashMap<String, Object>();
 		
 		discountMap.put("uuid", this.getUuid());
 		discountMap.put("remarks", this.getRemarks());
+		discountMap.put("isFullExempted", this.getIsFullExempted());
 		
 		HashMap<String, Object> criteria = new HashMap<String, Object>();
 		criteria.put("uuid", this.getCriteria().getUuid());
