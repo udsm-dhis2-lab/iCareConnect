@@ -6,6 +6,7 @@ import { Textbox } from "../../modules/form/models/text-box.model";
 
 import { omit } from "lodash";
 import { LocationService } from "src/app/core/services";
+import { Dropdown } from "../../modules/form/models/dropdown.model";
 
 @Component({
   selector: "app-manage-location-modal",
@@ -16,6 +17,7 @@ export class ManageLocationModalComponent implements OnInit {
   dialogData: any;
 
   locationFields: any[] = [];
+  serviceConceptsField: any;
   formValues: any = {};
   isFormValid: boolean;
 
@@ -48,6 +50,18 @@ export class ManageLocationModalComponent implements OnInit {
         required: true,
       }),
     ];
+
+    this.serviceConceptsField = new Dropdown({
+      id: "service",
+      key: "service",
+      options: [],
+      label: "Service",
+      conceptClass: "Service",
+      searchControlType: "concept",
+      value: null,
+      searchTerm: "ICARE_CONSULTATION_SERVICE",
+      shouldHaveLiveSearchForDropDownFields: true,
+    });
   }
 
   onCancel(event: Event): void {
@@ -89,5 +103,10 @@ export class ManageLocationModalComponent implements OnInit {
   onFormUpdate(formValues: FormValue): void {
     this.isFormValid = formValues.isValid;
     this.formValues = { ...this.formValues, ...formValues.getValues() };
+  }
+
+  onFormUpdateForServices(formValues: FormValue): void {
+    this.formValues = { ...this.formValues, ...formValues.getValues() };
+    console.log(this.formValues);
   }
 }
