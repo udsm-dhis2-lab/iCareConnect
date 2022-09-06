@@ -50,6 +50,7 @@ export class ConceptsService {
                   };
                 })
               : [],
+          setMembers: (response?.setMembers ? response?.setMembers : []),
         };
       }),
       catchError((error) => {
