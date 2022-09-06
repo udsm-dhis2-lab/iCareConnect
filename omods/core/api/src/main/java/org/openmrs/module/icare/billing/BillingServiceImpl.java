@@ -207,6 +207,21 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 				}
 			}
 			this.invoiceDAO.save(existingInvoice);
+
+			//Automatic discount creation for full exempted discounts
+			List<DiscountInvoiceItem> discountInvoiceItems = existingInvoice.getDiscountItems();
+			List<Boolean> isFullExemptedCheck = new ArrayList<>();
+			for (DiscountInvoiceItem discountItem: discountInvoiceItems) {
+				isFullExemptedCheck.add(discountItem.getDiscount().getIsFullExempted());
+			}
+			if(isFullExemptedCheck.contains(true)){
+				DiscountInvoiceItem discountInvoiceItem = new DiscountInvoiceItem();
+				discountInvoiceItem.setAmount(orderMetaData.getItemPrice().getPrice());
+				discountInvoiceItem.setDiscount(discountInvoiceItems.get(0).getDiscount());
+				discountInvoiceItem.setItem(orderMetaData.getItemPrice().getItem());
+				discountInvoiceItem.setInvoice(discountInvoiceItems.get(0).getInvoice());
+			}
+
 		}
 		return orderMetaData.getOrder();
 	}
