@@ -1,12 +1,12 @@
-import { Injectable } from '@angular/core';
-import { from, Observable, of, zip } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
-import { OpenmrsHttpClientService } from 'src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service';
-import { Api, ObsCreate, ObsUpdate } from '../../openmrs';
-import { Observation } from '../models/observation.model';
+import { Injectable } from "@angular/core";
+import { from, Observable, of, zip } from "rxjs";
+import { catchError, map } from "rxjs/operators";
+import { OpenmrsHttpClientService } from "src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service";
+import { Api, ObsCreate, ObsGetFull, ObsUpdate } from "../../openmrs";
+import { Observation } from "../models/observation.model";
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: "root",
 })
 export class ObservationService {
   constructor(private api: Api, private httpClient: OpenmrsHttpClientService) {}
@@ -35,12 +35,16 @@ export class ObservationService {
   }
 
   saveObservationsViaEncounter(details): Observable<any> {
-    return this.httpClient.post('encounter/' + details['encounterUuid'], {
-      obs: details['obs'],
+    return this.httpClient.post("encounter/" + details["encounterUuid"], {
+      obs: details["obs"],
     });
   }
 
   saveEncounterWithObsDetails(data): Observable<any> {
-    return this.httpClient.post('encounter', data);
+    return this.httpClient.post("encounter", data);
+  }
+
+  getObservationsByPatientUuid(patientUuid: string): Observable<ObsGetFull[]> {
+    return this.httpClient.get(`obs?patient=${patientUuid}`);
   }
 }

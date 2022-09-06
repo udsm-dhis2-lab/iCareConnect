@@ -436,7 +436,10 @@
                               >)
                             </span>
 
-                            <div class="w-100">
+                            <div
+                              class="w-100"
+                              *ngIf="parameter?.datatype?.display !== 'Complex'"
+                            >
                               <mat-checkbox
                                 [checked]="
                                   item?.testAllocations[0]?.results?.length > 0
@@ -774,19 +777,52 @@
                       <mat-tab-group>
                         <mat-tab label="Current">
                           <div class="p-3">
+                            <!-- {{ parameter?.datatype?.display }} -->
+                            <div
+                              *ngIf="parameter?.datatype?.display === 'Complex'"
+                            >
+                              <input
+                                type="file"
+                                style="
+                                  border: none;
+                                  background-color: transparent;
+                                "
+                                class="form-control"
+                                name="file"
+                                accept=".pdf, .doc, .xls, .xlsx, .zip"
+                                id="file-selector-{{ parameter?.uuid }}"
+                                (change)="fileSelection($event, parameter)"
+                              />
+                              <div
+                                *ngIf="obsKeyedByConcepts[parameter?.uuid]"
+                                class="text-right"
+                              >
+                                <a
+                                  [href]="
+                                    obsKeyedByConcepts[parameter?.uuid]?.uri
+                                  "
+                                  target="_blank"
+                                  ><img
+                                    src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABmJLR0QA/wD/AP+gvaeTAAABbklEQVRIibXUTygEUQDH8e/MDi1WbZQoHDZ/tkSxrfynxIE9yMUmJ83FwcEBZ1H+XBwUN26y5cBJ7YEtLtuWf4dVm9aiOMmBcpodB1H7b3bM7vyOM+/9Pu/15g2YHCH5gep1LOqfHvcJB7HY/4AJh6qnWq1rRXgKP6MoA8J+JJppnKinLC1Q34Yir9VgkQLqZIMj7wCA6mxHkVc1kZwAPUjOQAIiSqfJ7wwfcqYIvmhCZ152oBX9QHM37F5D/7hJQKML4gq09JkEPN6BzQ5vLyYBl2fw8Q6vDyYBRTawloBHhkKrCUCXB0J+iFzB7CbUOsE9BE0dIKR87X+R9C3DAiPTcHsOZZXgGgT3MHx9gijC3hIEDg0CpXbwzkNFNZRXwcUx7CxASw/0joFUAPc3Gadr3+TOUZBXoNgGy1MQDmZdT/JN1t7BzMbPgR5t6ypPF21gaw4sEgRPDJVnB0J+w8W/Mf1nl7oDlXWz0bzmG0ZVX0NFOd9TAAAAAElFTkSuQmCC"
+                                  />
+                                  Download
+                                </a>
+                              </div>
+                            </div>
                             <mat-form-field
                               class="w-75"
                               *ngIf="
                                 !notInRangeIsSet[parameter?.uuid] &&
                                 !parameter?.numeric &&
                                 parameter?.datatype?.display !== 'Numeric' &&
+                                parameter?.datatype?.display !== 'Complex' &&
                                 parameter?.answers &&
                                 parameter?.answers.length == 0 &&
                                 !LISConfigurations?.isLIS
                               "
                             >
                               <mat-label
-                                >Value for {{ parameter?.display }} - NANA
+                                >Value for {{ parameter?.display }}
                               </mat-label>
                               <textarea
                                 (keyup)="
@@ -1254,7 +1290,10 @@
                               >)
                             </span>
 
-                            <div class="w-100">
+                            <div
+                              class="w-100"
+                              *ngIf="parameter?.datatype?.display !== 'Complex'"
+                            >
                               <mat-checkbox
                                 [checked]="
                                   values[parameter?.uuid + '-abnormal']
@@ -1417,9 +1456,12 @@
                     <td>
                       <button
                         [disabled]="
-                          !item?.allocationsPairedBySetMember[
-                            parameter?.uuid
-                          ] ||
+                          (parameter?.datatype?.display !== 'Complex' &&
+                            !item?.allocationsPairedBySetMember[
+                              parameter?.uuid
+                            ]) ||
+                          (parameter?.datatype?.display === 'Complex' &&
+                            !file) ||
                           (!values[parameter?.uuid] &&
                             !values[parameter?.uuid + '-comment']) ||
                           item?.allocationsPairedBySetMember[parameter?.uuid]
@@ -1434,7 +1476,10 @@
                             item,
                             parameter,
                             params?.currentSample,
-                            item?.allocationsPairedBySetMember[parameter?.uuid]
+                            item?.allocationsPairedBySetMember[parameter?.uuid],
+                            parameter?.datatype?.display === 'Complex'
+                              ? 'file'
+                              : null
                           )
                         "
                         mat-stroked-button

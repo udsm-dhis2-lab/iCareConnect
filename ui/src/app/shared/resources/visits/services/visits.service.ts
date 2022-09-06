@@ -130,9 +130,8 @@ export class VisitsService {
     orderStatusCode?: string,
     orderBy?: string,
     orderByDirection?: string,
-    filterBy?: string,
+    filterBy?: string
   ): Observable<Visit[]> {
-
     const locationUuids: any = isArray(location) ? location : [location];
 
     // Parameters for sorting
@@ -153,9 +152,7 @@ export class VisitsService {
         ? `&orderStatusCode=${orderStatusCode}`
         : "";
       const locationParameter = location ? `locationUuid=${location}&` : "";
-      const orderTypeParameter = orderType
-        ? `&orderTypeUuid=${orderType}`
-        : "";
+      const orderTypeParameter = orderType ? `&orderTypeUuid=${orderType}` : "";
 
       return this.httpClient
         .get(
@@ -189,7 +186,6 @@ export class VisitsService {
 
     return zip(
       ...locationUuids.map((locationUuid) => {
-        
         return from(
           this.api.visit.getAllVisits({
             includeInactive:
@@ -198,7 +194,7 @@ export class VisitsService {
             v: "custom:(uuid,visitType,startDatetime,encounters:(uuid,diagnoses,encounterDatetime,encounterType,location,obs,orders),stopDatetime,attributes:(uuid,display),location:(uuid,display,tags,parentLocation:(uuid,display)),patient:(uuid,display,identifiers,person,voided)",
             q: queryParam,
             limit: limit ? limit : 100,
-            startIndex: startIndex ? startIndex : 0
+            startIndex: startIndex ? startIndex : 0,
           } as any)
         ).pipe(
           map((result: any) => {
@@ -296,12 +292,21 @@ export class VisitsService {
     return this.httpClient.post(`visit/${visitUuid}`, data);
   }
 
+  getVisitDetailsByVisitUuid(uuid: string, params?: any): Observable<any> {
+    return from(this.api.visit.getVisit(uuid, params)).pipe(
+      map((response) => {
+        return response;
+      }),
+      catchError((error) => of(error))
+    );
+  }
+
   getLastPatientVisit(
     patientUuid,
     shouldIncludeEncounter?: boolean
   ): Observable<any> {
     const encounters = shouldIncludeEncounter
-      ? "encounters:(display,diagnoses,obs,orders,encounterDatetime,encounterType,location),"
+      ? "encounters:(display,diagnoses,obs,orders,encounterDatetime,encounterType,location)"
       : "";
     return from(
       this.api.visit.getAllVisits({
@@ -309,7 +314,7 @@ export class VisitsService {
         patient: patientUuid,
         v: `custom:(uuid,visitType,startDatetime,${encounters}attributes,stopDatetime,patient:(uuid,display,identifiers,person:(uuid,age,birthdate,gender,dead,preferredAddress:(cityVillage)),voided))`,
         limit: 2,
-        startIndex: 0
+        startIndex: 0,
       } as any)
     ).pipe(
       map((visitResponse) => {
@@ -365,7 +370,6 @@ export class VisitsService {
     includeInactive: boolean,
     omitCurrentVisit?: boolean
   ): Observable<any> {
-
     return zip(
       from(
         this.api.visit.getAllVisits({
@@ -453,7 +457,6 @@ export class VisitsService {
         : this.paymentService.getPatientPayments(patient)
     ).pipe(
       map((response: any[]) => {
-        
         const visitResponse = response[0];
         const patientBills = response[1];
         const patientPayments = response[2];
