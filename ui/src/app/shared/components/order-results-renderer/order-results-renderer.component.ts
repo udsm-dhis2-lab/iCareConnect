@@ -1,4 +1,5 @@
 import { Component, Input, OnInit } from "@angular/core";
+import { MatDialog } from "@angular/material/dialog";
 import { Store } from "@ngrx/store";
 import { keyBy, flatten, orderBy, uniqBy } from "lodash";
 import { Observable } from "rxjs";
@@ -10,6 +11,7 @@ import {
 } from "src/app/store/selectors";
 import { FormValue } from "../../modules/form/models/form-value.model";
 import { Visit } from "../../resources/visits/models/visit.model";
+import { DeleteConfirmationComponent } from "../delete-confirmation/delete-confirmation.component";
 
 @Component({
   selector: "app-order-results-renderer",
@@ -42,7 +44,7 @@ export class OrderResultsRendererComponent implements OnInit {
   voidingLabOrderState$: Observable<boolean>;
 
   isFormValid: boolean = false;
-  constructor(private store: Store<AppState>) {}
+  constructor(private store: Store<AppState>, private dialog: MatDialog) {}
 
   ngOnInit(): void {
     this.testSetMembersKeyedByConceptUuid = keyBy(
@@ -195,5 +197,24 @@ export class OrderResultsRendererComponent implements OnInit {
           (member) => member?.id === commonLabTestsSetId
         ) || [])[0];
     this.commonLabTestsFields = commonLabTestsSet?.formFields;
+  }
+
+  onDeleteLabTest(e: any) {
+    const dialog = this.dialog.open(DeleteConfirmationComponent, {
+      width: "600px",
+      disableClose: true,
+      data: {
+        modalTitle: "Delete Lab Test",
+        modalMessage: `Are you sure you want to delete "${e?.concept?.display}" from the lab orders list?`,
+      },
+    });
+
+    dialog.afterClosed().subscribe((data) => {
+      if (data) {
+        this.store.dispatch(deleteLabOrder({ uuid: e?.uuid }));
+        console.log("==> Deleted Lab test: ", e);
+      }
+    });
+
   }
 }
