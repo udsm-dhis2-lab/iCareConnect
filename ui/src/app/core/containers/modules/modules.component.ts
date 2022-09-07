@@ -39,7 +39,7 @@ export class ModulesComponent implements OnInit {
   constructor(private store: Store<AppState>, private router: Router) {}
 
   ngOnInit() {
-    this.currentLocation$ = this.store.select(getCurrentLocation);
+    /*this.currentLocation$ = this.store.select(getCurrentLocation);
     this.store.dispatch(loadRolesDetails());
     this.searchModules();
 
@@ -61,7 +61,7 @@ export class ModulesComponent implements OnInit {
         // NB: Navigation has to be moved to module selector
         this.navigateToApp(assignedApps[0].path);
       }
-    });
+    });*/
   }
 
   navigateToApp(path): void {
