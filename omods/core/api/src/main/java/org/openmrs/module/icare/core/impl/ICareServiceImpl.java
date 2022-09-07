@@ -15,6 +15,7 @@ import org.openmrs.api.*;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.db.PatientDAO;
 import org.openmrs.api.impl.BaseOpenmrsService;
+import org.openmrs.logic.op.In;
 import org.openmrs.module.icare.ICareConfig;
 import org.openmrs.module.icare.billing.ItemNotPayableException;
 import org.openmrs.module.icare.billing.models.ItemPrice;
@@ -26,6 +27,7 @@ import org.openmrs.module.icare.core.ICareService;
 import org.openmrs.module.icare.core.Item;
 import org.openmrs.module.icare.core.Message;
 import org.openmrs.module.icare.core.dao.ICareDao;
+import org.openmrs.module.icare.core.utils.PatientWrapper;
 import org.openmrs.module.icare.core.utils.VisitWrapper;
 import org.openmrs.module.icare.report.dhis2.DHIS2Config;
 import org.openmrs.module.icare.store.models.OrderStatus;
@@ -442,8 +444,8 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	}
 	
 	@Override
-	public List<Patient> getPatients(String search, String patientUUID) {
-		return dao.getPatients(search, patientUUID);
+	public List<Patient> getPatients(String search, String patientUUID, PatientWrapper.VisitStatus visitStatus, Integer startIndex, Integer limit, PatientWrapper.OrderByDirection orderByDirection) {
+		return dao.getPatients(search, patientUUID,visitStatus, startIndex, limit, orderByDirection);
 	}
 	
 	@Override
