@@ -256,28 +256,24 @@ export class RegistrationAddComponent implements OnInit {
       "bad70d90-9bac-401a-8c49-a440f6a07bf5",
       "custom:(uuid,display,names,answers:(uuid,display,names,mappings))"
     );
-    this.religionInfo$= this.conceptService.getConceptDetailsByUuid(
+    this.religionInfo$ = this.conceptService.getConceptDetailsByUuid(
       "b2399b15-a38d-47f9-8e15-fc7e7c7dc1f3",
       "custom:(uuid,display,names,answers:(uuid,display,names),setMembers:(uuid,display,answers:(uuid,display,names)))"
-      
     );
-    this.occupationInfo$= this.conceptService.getConceptDetailsByUuid(
+    this.occupationInfo$ = this.conceptService.getConceptDetailsByUuid(
       "c3d16c94-4e03-4b19-9491-43d10f470981",
       "custom:(uuid,display,names,answers:(uuid,display,names),setMembers:(uuid,display,answers:(uuid,display,names)))"
-      
     );
-    this.educationInfo$= this.conceptService.getConceptDetailsByUuid(
+    this.educationInfo$ = this.conceptService.getConceptDetailsByUuid(
       "79d20b25-42aa-42a7-a48e-8cd9a96c6064",
       "custom:(uuid,display,names,answers:(uuid,display,names),setMembers:(uuid,display,answers:(uuid,display,names)))"
-      
     );
-    this.maritalstatusInfo$= this.conceptService.getConceptDetailsByUuid(
+    this.maritalstatusInfo$ = this.conceptService.getConceptDetailsByUuid(
       "f62b5605-1335-45e9-9574-9487e85b2820",
       "custom:(uuid,display,names,answers:(uuid,display,names),setMembers:(uuid,display,answers:(uuid,display,names)))"
-      
     );
     this.loadingForm = true;
-   
+
     zip(
       this.registrationService.getPatientIdentifierTypes(),
       this.locationService.getFacilityCode(),
@@ -691,5 +687,4 @@ export class RegistrationAddComponent implements OnInit {
     var regex = /^[a-zA-Z ]{2,30}$/;
     this.validatedTexts[key] = regex.test(value) ? "valid" : "invalid";
   }
-  
 }
