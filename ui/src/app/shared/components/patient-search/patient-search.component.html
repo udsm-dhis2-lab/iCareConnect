@@ -40,8 +40,6 @@
     </ng-container>
   </div>
 </div> -->
-
-
 <div class="mt-2" *ngIf="{ patients: patients$ | async } as params">
   <div class="patient-search-container">
     <div
@@ -58,9 +56,10 @@
           placeholder="Search Patient"
           matInput
           (keyup)="onSearchPatients($event)"
-          (focus)="onFocus($event)"
         />
-        <mat-spinner *ngIf="searching" [diameter]="17"></mat-spinner>
+        <div class="search-spinner">
+          <mat-spinner *ngIf="searching"  [diameter]="22"></mat-spinner>
+        </div>
       </div>
     </div>
   </div>
@@ -102,7 +101,7 @@
               (click)="onSelectPatient($event, row)"></tr>
         </table> 
       </div>
-      <div *ngIf="!(params?.patients.length > 0) &&  showList && !searching && focused" class="no-data mt-4">
+      <div *ngIf="params?.patients && !(params?.patients.length > 0) &&  showList && !searching && focused" class="no-data mt-4">
         <p>
           No Patient with this keyword. Please Register or search again!
         </p>
