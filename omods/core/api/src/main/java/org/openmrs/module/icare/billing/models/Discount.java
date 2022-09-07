@@ -3,6 +3,7 @@ package org.openmrs.module.icare.billing.models;
 // Generated Oct 7, 2020 12:48:40 PM by Hibernate Tools 5.2.10.Final
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import liquibase.database.structure.type.VarcharType;
 import org.codehaus.jackson.annotate.JsonSetter;
 import org.openmrs.BaseChangeableOpenmrsData;
 import org.openmrs.Concept;
@@ -34,7 +35,7 @@ public class Discount extends BaseChangeableOpenmrsData {
 	private Concept criteria;
 	
 	@Column(name = "attachment_id")
-	private Integer attachmentId;
+	private String attachmentId;
 	
 	@Column(name = "is_full_exempted")
 	private Boolean isFullExempted;
@@ -66,11 +67,11 @@ public class Discount extends BaseChangeableOpenmrsData {
 		this.id = id;
 	}
 	
-	public Integer getAttachmentId() {
+	public String getAttachmentId() {
 		return this.attachmentId;
 	}
 	
-	public void setAttachmentId(Integer attachmentId) {
+	public void setAttachmentId(String attachmentId) {
 		this.attachmentId = attachmentId;
 	}
 	
