@@ -16,6 +16,8 @@ import { AppState } from "src/app/store/reducers";
 import { getLocationsByTagName } from "src/app/store/selectors";
 import { Dropdown } from "../../modules/form/models/dropdown.model";
 import { Textbox } from "../../modules/form/models/text-box.model";
+import { ICARE_CONFIG } from "../../resources/config";
+import { OrdersService } from "../../resources/order/services/orders.service";
 
 @Component({
   selector: "app-general-dispension-form",
@@ -25,6 +27,10 @@ import { Textbox } from "../../modules/form/models/text-box.model";
 export class GeneralDispensingFormComponent implements OnInit {
   @Input() orderType: any;
   @Input() encounterType: any;
+  @Input() currentPatient: any;
+  @Input() currentVisit: any;
+  @Input() currentLocation: any;
+  @Input() provider: any;
   @Input() orderFrequencies: any[];
 
   drugOrder: DrugOrderObject;
@@ -44,6 +50,7 @@ export class GeneralDispensingFormComponent implements OnInit {
 
   constructor(
     private drugOrderService: DrugOrdersService,
+    private ordersService: OrdersService,
     private store: Store<AppState>,
   ) {}
 
@@ -90,8 +97,60 @@ export class GeneralDispensingFormComponent implements OnInit {
     this.isFormValid = formValues.isValid;
     this.formValues = { ...this.formValues, ...formValues.getValues() };
   }
+
   saveOrder(e: any){
+    console.log("==> Values: ", this.formValues);
+    let time = new Date().toISOString();
     
+    let encounterObject = {
+        patient: this.currentPatient?.uuid,
+        encounterType: this.encounterType?.value,
+        location: this.currentLocation?.uuid,
+        encounterProviders: [
+          {
+            provider: this.provider?.uuid,
+            encounterRole: ICARE_CONFIG?.encounterRole?.uuid
+          },
+        ],
+        orders: [
+          {
+            orderType: this.orderType?.value,
+            action: "NEW",
+            urgency: "ROUTINE",
+            careSetting: !this.currentVisit?.isAdmitted
+              ? "OUTPATIENT"
+              : "INPATIENT",
+            patient: this.currentPatient?.id,
+            concept: this.formValues['drug'].value,
+            orderer: this.provider?.uuid,
+            type: "order"
+          }
+        ],
+        obs: [
+          {
+            person: this.currentPatient?.uuid,
+            concept: this.formValues["frequency"].value,
+            obsDatetime: time,
+            value: this.formValues["frequency"].value,
+          },
+          {
+            person: this.currentPatient?.uuid,
+            concept: "4564644f-2099-4c91-ba26-3d44edef9591",
+            obsDatetime: time,
+            value: this.formValues["dose"].value
+          }
+        ], 
+        visit: this.currentVisit?.uuid,
+    }
+
+    this.ordersService.createOrdersViaCreatingEncounter(encounterObject).subscribe({
+      next: (encounter) => {
+        return encounter;
+      },
+      error: (err) => {
+        return err;
+      }
+    });
   }
 
 }

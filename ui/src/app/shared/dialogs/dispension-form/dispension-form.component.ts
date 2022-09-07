@@ -14,7 +14,10 @@ import { Patient } from "src/app/shared/resources/patient/models/patient.model";
 import { Visit } from "src/app/shared/resources/visits/models/visit.model";
 import { loadActiveVisit } from "src/app/store/actions/visit.actions";
 import { AppState } from "src/app/store/reducers";
-import { getLocationsByTagName } from "src/app/store/selectors";
+import { getCurrentLocation, getLocationsByTagName } from "src/app/store/selectors";
+import { getCurrentPatient } from "src/app/store/selectors/current-patient.selectors";
+import { getProviderDetails } from "src/app/store/selectors/current-user.selectors";
+import { getActiveVisit } from "src/app/store/selectors/visit.selectors";
 import { OrdersService } from "../../resources/order/services/orders.service";
 
 @Component({
@@ -37,6 +40,10 @@ export class DispensingFormComponent implements OnInit {
   generalPrescriptionEncounterType$: Observable<any>;
   useGeneralPrescription$: Observable<any>;
   orderFrequencies$: Observable<any>;
+  currentPatient$: Observable<Patient>;
+  currentLocation$: Observable<any>;
+  currentVisit$: Observable<any>;
+  provider$: Observable<import("/home/jonas/DHIS2Lab/icare/ui/src/app/shared/resources/openmrs").ProviderGet>;
 
   constructor(
     private drugOrderService: DrugOrdersService,
@@ -83,6 +90,10 @@ export class DispensingFormComponent implements OnInit {
     this.generalPrescriptionOrderType$ = this.systemSettingsService.getSystemSettingsMatchingAKey("iCare.clinic.prescription.orderType");
     this.useGeneralPrescription$ = this.systemSettingsService.getSystemSettingsMatchingAKey("iCare.clinic.useGeneralPrescription");
     this.orderFrequencies$ = this.orderService.getOrdersFrequencies();
+    this.currentPatient$ = this.store.pipe(select(getCurrentPatient));
+    this.currentLocation$ = this.store.pipe(select(getCurrentLocation));
+    this.currentVisit$ = this.store.pipe(select(getActiveVisit));
+    this.provider$ = this.store.select(getProviderDetails);
   }
 
   onCancel(): void {

@@ -2,7 +2,11 @@
   generalPrescriptionOrderType: generalPrescriptionOrderType$ | async,
   generalPrescriptionEncounterType: generalPrescriptionEncounterType$ | async,
   useGeneralPrescription: useGeneralPrescription$ | async,
-  orderFrequencies: orderFrequencies$ | async
+  orderFrequencies: orderFrequencies$ | async,
+  currentPatient: currentPatient$ | async,
+  currentVisit: currentVisit$ | async,
+  currentLocation: currentLocation$ | async,
+  provider: provider$ | async
 } as params">
   <div class="loading-overlay" *ngIf="savingOrder">
     <div class="text-center">
@@ -47,11 +51,15 @@
   <mat-dialog-content class="mat-typography">
     <div class="p-3">
       <div class="row">
-        <div class="col-7" *ngIf="params?.useGeneralPrescription[0].value==='true' && params?.orderFrequencies">
+        <div class="col-7" *ngIf="params?.useGeneralPrescription[0].value==='true' && params?.orderFrequencies && params?.currentPatient && params?.currentVisit && params?.currentLocation && params?.provider">
           <app-general-dispension-form 
           [encounterType]="params?.generalPrescriptionEncounterType[0]" 
           [orderFrequencies]="params?.orderFrequencies" 
           [orderType]="params?.generalPrescriptionOrderType[0]"
+          [currentPatient]="params?.currentPatient"
+          [currentVisit]="params?.currentVisit"
+          [currentLocation]="params?.currentLocation"
+          [provider]="params?.provider"
           ></app-general-dispension-form>
         </div>
         <div class="col-7" *ngIf="!params?.useGeneralPrescription[0].value || params?.useGeneralPrescription[0].value==='false'">
