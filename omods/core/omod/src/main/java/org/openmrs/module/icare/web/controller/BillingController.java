@@ -36,7 +36,7 @@ public class BillingController extends BaseController {
 	
 	@Autowired
 	BillingService billingService;
-
+	
 	ServletContext context;
 	
 	@RequestMapping(value = "invoice", method = RequestMethod.GET)
@@ -109,22 +109,23 @@ public class BillingController extends BaseController {
 	public Payment onPostConfirmPayment(Payment payment) throws Exception {
 		return billingService.confirmPayment(payment);
 	}
-
-	@RequestMapping(value = "discount", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	
+	@RequestMapping(value = "discount", method = RequestMethod.POST)
 	@ResponseBody
-	public Map<String, Object> onPostDiscountInvoiceMap(@RequestParam("document") MultipartFile file, @RequestParam("discount") Discount discount) throws Exception {
-
-
+	public Map<String, Object> onPostDiscountInvoiceMap(@RequestParam("document") MultipartFile file
+	//, @RequestParam("json") Discount discount
+	) throws Exception {
+		
 		//File upload implementation
-		Path Path_Directory = Paths.get("resorces/DocumentsUploads");
+		Path Path_Directory = Paths.get("/tmp/documents");
 		//Files.copy(file.getInputStream(), Paths.get(Path_Directory+ File.separator+file.getOriginalFilename()), StandardCopyOption.REPLACE_EXISTING);
 		Path filePath = Path_Directory.resolve(file.getName());
-		Files.copy(file.getInputStream(),filePath,StandardCopyOption.REPLACE_EXISTING);
+		Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 		String dateTime = DateTime.now().toString("yyyyMMddHHmmss");
-		String fileNameToSave =  dateTime.concat(file.getName());
-		discount.setAttachmentId(fileNameToSave);
-
-		Discount newDiscount = this.onPostDiscountInvoice(discount);
+		String fileNameToSave = dateTime.concat(file.getName());
+		//discount.setAttachmentId(fileNameToSave);
+		
+		Discount newDiscount = new Discount();//this.onPostDiscountInvoice(discount);
 		return newDiscount.toMap();
 	}
 	

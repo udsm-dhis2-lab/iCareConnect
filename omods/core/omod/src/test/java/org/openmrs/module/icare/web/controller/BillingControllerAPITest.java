@@ -30,6 +30,7 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.mock.web.MockMultipartHttpServletRequest;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -431,28 +432,31 @@ public class BillingControllerAPITest extends BaseResourceControllerTest {
 		List invoicePayment = (new ObjectMapper()).readValue(handler.getContentAsString(), List.class);
 		assertThat("Should still contain a invoice", invoicePayment.size(), is(1));*/
 	}
-
+	
 	@Test
 	public void shouldUploadFileForDiscount() throws Exception {
 		//Discount discount = new Discount();
-
+		
 		InputStream in = getClass().getClassLoader().getResourceAsStream("lab-data.xml");
 		System.out.println(in);
-
+		
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		//System.out.println(out);
 		IOUtils.copy(in, out);
-
-		String json ="{\"remarks\":\"Discountingwithfullexemption\",\"patient\":{\"uuid\":\"4aaad795-9fdb-4cdb-8ea2-ca250ad6b347\"},\"criteria\":{\"uuid\":\"28d3207a-79d1-4d09-83b0-bc873622ab66\"},\"items\":[{\"item\":{\"uuid\":\"6429edb2-d80e-4501-9627-c910ee6557d9\"},\"invoice\":{\"uuid\":\"01556d87-83c7-40dd-86ff-7bcf7fd3131a\"},\"amount\":100000}]}";
-
+		
+		String json = "{\"remarks\":\"Discountingwithfullexemption\",\"patient\":{\"uuid\":\"4aaad795-9fdb-4cdb-8ea2-ca250ad6b347\"},\"criteria\":{\"uuid\":\"28d3207a-79d1-4d09-83b0-bc873622ab66\"},\"items\":[{\"item\":{\"uuid\":\"6429edb2-d80e-4501-9627-c910ee6557d9\"},\"invoice\":{\"uuid\":\"01556d87-83c7-40dd-86ff-7bcf7fd3131a\"},\"amount\":100000}]}";
+		
 		MockMultipartHttpServletRequest request = newUploadRequest("icare/discount");
+		request.setMethod(RequestMethod.POST.name());
+		//request.setContentType("multipart/form-data");
+		//request.addHeader("Content-Type", "multipart/form-data");
 		request.addFile(new MockMultipartFile("document", "lab-data.xml", "application/xml", out.toByteArray()));
 		//request.addParameter("json", json);
-
+		
 		SimpleObject response = deserialize(handle(request));
-
+		
 		MockHttpServletResponse rawResponse = handle(newGetRequest("discount" + "/" + response.get("uuid") + "/value"));
-
+		
 		assertThat(out.toByteArray(), is(equalTo(rawResponse.getContentAsByteArray())));
 	}
 	
