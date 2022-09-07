@@ -144,7 +144,7 @@ export class VisitsService {
         ? orderByParameter + orderDirectionParameter
         : "";
 
-    if (orderType || !orderType) {
+    if (orderType) {
       const orderStatusParameter = orderStatus
         ? `&fulfillerStatus=${orderStatus}`
         : "";
