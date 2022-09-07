@@ -228,40 +228,36 @@ export class RegistrationAddComponent implements OnInit {
     };
   }
 
-  setOccupation(occupation) {
-    //console.log(occupation)
-    const key = Object.keys(occupation)[0]
-    this.patient.occupation = occupation[key]?.value;
-  }
+   getAdditionalInformationValues(formValues): void {
+    //console.log("formValues", formValues)
+    //console.log(this.registrationFormConfigsKeyedByProperty)
 
-  getAdditionalInformationValues(formValues): void {
-    console.log("formValues", formValues)
     this.patient.occupation =
       formValues[
         this.registrationFormConfigsKeyedByProperty["occupation"]?.value
-      ];
-    // this.patient.maritalStatus =
-    //   formValues[
-    //     this.registrationFormConfigsKeyedByProperty["maritalStatus"]?.value
-    //   ];
-    //   this.patient.religion =
-    //     formValues[
-    //       this.registrationFormConfigsKeyedByProperty["religion"]?.value
-    //     ];
+      ].value;
+    this.patient.maritalStatus =
+       formValues[
+         this.registrationFormConfigsKeyedByProperty["maritalStatus"]?.value
+       ].value;
+       this.patient.religion =
+         formValues[
+          this.registrationFormConfigsKeyedByProperty["religion"]?.value
+        ].value;
+        this.patient.education =formValues[this.registrationFormConfigsKeyedByProperty["education"]?.value
+        ].value;
+        this.patient['areaLeader'] = formValues[this.registrationFormConfigsKeyedByProperty["areaLeaderName"]?.value
+        ].value;
+        this.patient['areaLeaderNumber'] = formValues[this.registrationFormConfigsKeyedByProperty["areaLeaderNumber"]?.value
+        ].value;
   }
 
-  setMaritalStatus(status) {
-    console.log("marital status", status)
-    /* const key = Object.keys(status)[0]
-    this.patient.maritalStatus = status[key].value; */
-  }
-
-  setEducationDetails(education) {
+    //setEducationDetails(education) {
    // console.log(education)
    /* 
     const key = Object.keys(education)[0]
     this.patient.education = education[key].value; */
-  }
+  //}
 
   canEditMRN() {
     this.mrnIsEditable = !this.mrnIsEditable;
