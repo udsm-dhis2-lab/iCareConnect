@@ -168,4 +168,12 @@ public class PatientWrapper {
 	public CharSequence getEmail() {
 		return "";
 	}
+
+	public enum OrderByDirection {
+		ASC, DESC;
+	}
+
+	public enum VisitStatus {
+		ACTIVE, CLOSED;
+	}
 }
