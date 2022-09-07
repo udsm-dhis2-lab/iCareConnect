@@ -40,6 +40,8 @@ export class FieldComponent {
   @Output() fieldUpdate: EventEmitter<FormGroup> =
     new EventEmitter<FormGroup>();
 
+  @Output() fileFieldUpdate: EventEmitter<any> = new EventEmitter<any>();
+
   ngAfterViewInit() {
     if (this.field?.searchTerm || this.field?.source) {
       this.members$ = this.formService.searchItem(
@@ -114,6 +116,12 @@ export class FieldComponent {
 
   onFieldUpdate(): void {
     this.fieldUpdate.emit(this.form);
+  }
+
+  fileChangeEvent(event, field): void {
+    let objectToUpdate = {};
+    objectToUpdate[field?.key] = event.target.files[0];
+    this.fileFieldUpdate.emit(objectToUpdate);
   }
 
   updateFieldOnDemand(objectToUpdate): void {

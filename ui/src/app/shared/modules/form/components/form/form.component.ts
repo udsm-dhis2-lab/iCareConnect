@@ -32,6 +32,7 @@ export class FormComponent implements OnInit, OnChanges {
   @Input() isReport: boolean;
 
   @Output() formUpdate: EventEmitter<any> = new EventEmitter<any>();
+  @Output() fileFormUpdate: EventEmitter<any> = new EventEmitter<any>();
 
   values: any;
 
@@ -54,18 +55,20 @@ export class FormComponent implements OnInit, OnChanges {
 
   ngOnInit(): void {
     // Use coded dataType to restructure field options
-    if(this.dataType && typeof (this.dataType) === 'string' && this.dataType.toLowerCase() === 'coded') {
-      this.fields[0] =  {
+    if (
+      this.dataType &&
+      typeof this.dataType === "string" &&
+      this.dataType.toLowerCase() === "coded"
+    ) {
+      this.fields[0] = {
         ...this.fields[0],
-        options: (this.fields[0].options || []).map(
-            (option) => {
-            return {
-                ...option,
-                value: option?.key ? option?.key : option?.value,
-            };
-          }
-        )
-      }
+        options: (this.fields[0].options || []).map((option) => {
+          return {
+            ...option,
+            value: option?.key ? option?.key : option?.value,
+          };
+        }),
+      };
     }
   }
 
@@ -79,6 +82,11 @@ export class FormComponent implements OnInit, OnChanges {
 
       this.values = form.getRawValue();
     }
+  }
+
+  onFileFieldUpdate(fileData: File): void {
+    this.formUpdate.emit(new FormValue(this.form, this.fields, fileData));
+    this.values = fileData;
   }
 
   onClear(): void {
