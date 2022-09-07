@@ -537,13 +537,13 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 		Location location = Context.getLocationService().getLocationByUuid(testOrderLocation.getLocation().getUuid());
 		//User user = Context.getUserService().getUserByUuid(testOrderLocation.getUser().getUuid());
 		User user = Context.getAuthenticatedUser();
+		
 		Date date = new Date();
 		
 		testOrderLocation.setConcept(concept);
 		testOrderLocation.setLocation(location);
 		testOrderLocation.setUser(user);
 		testOrderLocation.setDateTime(date);
-		
 		System.out.println(testOrderLocation.toMap());
 		
 		testOrderLocationDAO.save(testOrderLocation);
