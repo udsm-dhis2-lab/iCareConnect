@@ -1,0 +1,22 @@
+
+  <div class="form">
+
+    <div>
+    <app-form [fields]="[drugConceptField]" (formUpdate)="onFormUpdate($event)"></app-form>
+    </div>
+    <div>
+      <app-form [fields]="[drugDoseField]" (formUpdate)="onFormUpdate($event)"></app-form>
+    </div>
+    <div>
+      <app-form [fields]="[frequencyField]" (formUpdate)="onFormUpdate($event)"></app-form>
+    </div>
+    <div class="float-right">
+        <button class="float-right" (click)="saveOrder($event)" mat-flat-button [color]="savingError ? 'warn' : 'primary'"
+          [disabled]="savingOrder">
+          <mat-icon *ngIf="savingError" class="mr-2">error</mat-icon>
+          <mat-spinner color="primary" *ngIf="savingOrder" [diameter]="17" class="order__spinner mr-2"></mat-spinner>
+          <span>{{ savingOrder ? "Saving..." : "Save" }}</span>
+        </button>
+    </div>
+  
+  </div>
