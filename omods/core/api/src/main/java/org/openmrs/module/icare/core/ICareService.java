@@ -19,6 +19,7 @@ import org.openmrs.module.icare.billing.models.ItemPrice;
 import org.openmrs.module.icare.billing.models.Prescription;
 import org.openmrs.module.icare.billing.services.insurance.Claim;
 import org.openmrs.module.icare.billing.services.insurance.ClaimResult;
+import org.openmrs.module.icare.core.utils.PatientWrapper;
 import org.openmrs.module.icare.core.utils.VisitWrapper;
 import org.openmrs.module.icare.store.models.OrderStatus;
 import org.springframework.transaction.annotation.Transactional;
@@ -115,7 +116,7 @@ public interface ICareService extends OpenmrsService {
 	
 	List<ConceptSet> getConceptsSetsByConcept(String concept);
 	
-	List<Patient> getPatients(String search, String patientUUID);
+	List<Patient> getPatients(String search, String patientUUID, PatientWrapper.VisitStatus visitStatus, Integer startIndex, Integer limit, PatientWrapper.OrderByDirection orderByDirection);
 	
 	Patient savePatient(Patient patient);
 	
