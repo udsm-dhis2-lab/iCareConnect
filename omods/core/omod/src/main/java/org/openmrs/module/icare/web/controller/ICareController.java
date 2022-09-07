@@ -22,6 +22,7 @@ import org.openmrs.module.icare.billing.services.insurance.ClaimResult;
 import org.openmrs.module.icare.core.ICareService;
 import org.openmrs.module.icare.core.Item;
 import org.openmrs.module.icare.core.Message;
+import org.openmrs.module.icare.core.utils.PatientWrapper;
 import org.openmrs.module.icare.core.utils.VisitWrapper;
 import org.openmrs.module.icare.store.models.OrderStatus;
 import org.openmrs.module.webservices.rest.web.RestConstants;
@@ -379,15 +380,11 @@ public class ICareController {
 		List<Patient> patients = iCareService.getPatients(search,patientUUID);
 
 		List<Map<String, Object>> responseSamplesObject = new ArrayList<Map<String, Object>>();
-		Map<String, Object> patientresult = new HashMap<String, Object>();
+		//Map<String, Object> patientresult = new HashMap<String, Object>();
 		for (Patient patient: patients){
-			patientresult.put("uuid", patient.getUuid());
-			patientresult.put("firstName",patient.getGivenName());
-			patientresult.put("lastName",patient.getFamilyName());
-			patientresult.put("identifier", patient.getIdentifiers());
-			patientresult.put("age",patient.getAge());
 
-			responseSamplesObject.add(patientresult);
+			responseSamplesObject.add((Map<String, Object>) new PatientWrapper(patient).toMap());
+
 		}
 		Map<String, Object> results = new HashMap<>();
 		results.put("results",responseSamplesObject);
