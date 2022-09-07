@@ -1,5 +1,6 @@
 package org.openmrs.module.icare.web.controller;
 
+import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -11,9 +12,13 @@ import org.openmrs.module.icare.billing.models.Discount;
 import org.openmrs.module.icare.billing.models.Invoice;
 import org.openmrs.module.icare.billing.models.Payment;
 import org.openmrs.module.icare.billing.services.BillingService;
+import org.springframework.mock.web.MockMultipartFile;
 
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.verify;
@@ -98,5 +103,21 @@ public class BillingControllerTest {
 		
 		//Then
 		verify(billingService).discountInvoice(discount);
+	}
+	
+	@Test
+	//@DisplayName("Creating an invoice")
+	public void testDiscountingInvoice2() throws Exception {
+		
+		InputStream in = getClass().getClassLoader().getResourceAsStream("lab-data.xml");
+		System.out.println(in);
+		
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		//System.out.println(out);
+		IOUtils.copy(in, out);
+		//When
+		Map<String, Object> discount2 = billingController.onPostDiscountInvoiceMap(new MockMultipartFile("document",
+		        "lab-data.xml", "application/xml", out.toByteArray()));
+		
 	}
 }

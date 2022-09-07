@@ -3054,7 +3054,7 @@
         </addColumn>
     </changeSet>
 
-    <changeSet id="update_column_name_and_dataType_for_attachment_column_to_bl_discount" author="dennis-kibahila" dbms="mysql">
+    <changeSet id="update_attachment_column_to_bl_discount" author="dennis-kibahila" dbms="mysql">
         <sql>
             ALTER TABLE bl_discount MODIFY COLUMN attachment_id VARCHAR(100)
         </sql>
