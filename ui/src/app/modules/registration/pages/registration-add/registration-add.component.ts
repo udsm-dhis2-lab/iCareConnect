@@ -10,7 +10,7 @@ import { VisitsService } from "src/app/shared/resources/visits/services";
 import { Patient } from "src/app/shared/resources/patient/models/patient.model";
 import { Observable, zip } from "rxjs";
 import { LocationService } from "src/app/core/services";
-import { tail, filter } from "lodash";
+import { tail, filter, keyBy } from "lodash";
 import { StartVisitModelComponent } from "../../components/start-visit-model/start-visit-model.component";
 import { VisitStatusConfirmationModelComponent } from "../../components/visit-status-confirmation-model/visit-status-confirmation-model.component";
 import { MatDialog } from "@angular/material/dialog";
@@ -32,6 +32,7 @@ import { Textbox } from "src/app/shared/modules/form/models/text-box.model";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
 import { PhoneNumber } from "src/app/shared/modules/form/models/phone-number.model";
 import { ConceptsService } from "src/app/shared/resources/concepts/services/concepts.service";
+import { ThisReceiver } from "@angular/compiler";
 
 @Component({
   selector: "app-registration-add",
@@ -52,7 +53,10 @@ import { ConceptsService } from "src/app/shared/resources/concepts/services/conc
 })
 export class RegistrationAddComponent implements OnInit {
   @Input() patientInformation: any;
+  @Input() registrationFormConfigs: any;
   @Input() editMode: boolean;
+
+  registrationFormConfigsKeyedByProperty: any = {};
 
   showOtherIdentifcation: boolean;
   showOtherBirthDetails: boolean;
@@ -230,6 +234,17 @@ export class RegistrationAddComponent implements OnInit {
     this.patient.occupation = occupation[key]?.value;
   }
 
+  testGeneric(formValues): void {
+    this.patient.occupation =
+      formValues[
+        this.registrationFormConfigsKeyedByProperty["occupation"]?.value
+      ];
+    this.patient.maritalStatus =
+      formValues[
+        this.registrationFormConfigsKeyedByProperty["maritalStatus"]?.value
+      ];
+  }
+
   setMaritalStatus(status) {
     console.log("marital status", status)
     /* const key = Object.keys(status)[0]
@@ -262,6 +277,10 @@ export class RegistrationAddComponent implements OnInit {
 
   ngOnInit(): void {
     this.currentLocation$ = this.store.select(getCurrentLocation);
+    this.registrationFormConfigsKeyedByProperty = keyBy(
+      this.registrationFormConfigs,
+      "referenceKeyPart"
+    );
 
     this.genderOptions$ = this.conceptService.getConceptDetailsByUuid(
       "bad70d90-9bac-401a-8c49-a440f6a07bf5",

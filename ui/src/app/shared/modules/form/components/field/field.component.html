@@ -29,6 +29,27 @@
     />
     <!-- end of phone number -->
 
+    <!-- File upload for default complex -->
+    <div *ngSwitchCase="'ComplexDefaultFile'">
+      <mat-toolbar>
+        <input matInput readonly [name]="field?.key" />
+        <!-- <button mat-flat-button color="primary">Browse</button> -->
+      </mat-toolbar>
+
+      <!-- Fetch selected filed on change -->
+      <input
+        type="file"
+        #UploadFileInput
+        [id]="field?.key"
+        [name]="field?.key"
+        [formControlName]="field?.key"
+        (change)="fileChangeEvent($event, field)"
+        multiple="multiple"
+        accept=".pdf"
+      />
+    </div>
+    <!-- End of File upload for default complex -->
+
     <!-- textbox -->
     <input
       *ngSwitchCase="'textbox'"
