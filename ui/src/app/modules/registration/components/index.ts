@@ -5,6 +5,7 @@ import { UpdateDoctorsRoomComponent } from './update-doctors-room/update-doctors
 import { VisitClaimComponent } from './visit-claim/visit-claim.component';
 import { VisitStatusConfirmationModelComponent } from './visit-status-confirmation-model/visit-status-confirmation-model.component';
 import { VisitsHistoryForPatientComponent } from './visits-history-for-patient/visits-history-for-patient.component';
+import { DynamicRegFormComponent } from './dynamic-reg-form/dynamic-reg-form.component';
 
 export const regComponents: any[] = [
   StartVisitModelComponent,
@@ -14,6 +15,7 @@ export const regComponents: any[] = [
   OtherPatientDetailsComponent,
   PatientAddressComponent,
   UpdateDoctorsRoomComponent,
+  DynamicRegFormComponent,
 ];
 export const entryRegComponents: any[] = [
   StartVisitModelComponent,
