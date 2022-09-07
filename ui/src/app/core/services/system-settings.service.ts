@@ -66,6 +66,10 @@ export class SystemSettingsService {
                       name: result?.property
                         .split(".")
                         [result?.property.split(".").length - 1]?.toUpperCase(),
+                      referenceKeyPart:
+                        result?.property.split(".")[
+                          result?.property.split(".").length - 1
+                        ],
                       property: result?.property,
                       description: result?.description,
                       value: result?.value,
@@ -77,6 +81,10 @@ export class SystemSettingsService {
                           result?.property.split(".").length - 1
                         ]
                       ),
+                      referenceKeyPart:
+                        result?.property.split(".")[
+                          result?.property.split(".").length - 1
+                        ],
                       property: result?.property,
                       description: result?.description,
                       value: result?.value,
