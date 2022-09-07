@@ -5,9 +5,9 @@ import {
   MAT_DIALOG_DATA,
 } from "@angular/material/dialog";
 import { Store } from "@ngrx/store";
-import { forkJoin, Observable, zip } from "rxjs";
+import { forkJoin, Observable, of, zip } from "rxjs";
 import * as _ from "lodash";
-import { take } from "rxjs/operators";
+import { map, take } from "rxjs/operators";
 import { RejectAnswerModalComponent } from "../reject-answer-modal/reject-answer-modal.component";
 import { AppState } from "src/app/store/reducers";
 import { getProviderDetails } from "src/app/store/selectors/current-user.selectors";
@@ -25,6 +25,10 @@ import {
 } from "src/app/store/selectors";
 import { DataService } from "src/app/shared/services/data.service";
 import { LISConfigurationsModel } from "src/app/modules/laboratory/resources/models/lis-configurations.model";
+import { HttpClient } from "@angular/common/http";
+import { ObsCreate } from "src/app/shared/resources/openmrs";
+import { VisitsService } from "src/app/shared/resources/visits/services";
+import { OpenmrsHttpClientService } from "src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service";
 
 @Component({
   selector: "app-results-feeding-modal",
@@ -66,14 +70,19 @@ export class ResultsFeedingModalComponent implements OnInit {
   dialogData: any;
 
   temporaryValues: any = {};
+  file: any;
 
+  ordersKeyedByConcepts: any = {};
+  obsKeyedByConcepts: any = {};
   constructor(
     private dialog: MatDialog,
     private dialogRef: MatDialogRef<ResultsFeedingModalComponent>,
     @Inject(MAT_DIALOG_DATA) data,
     private store: Store<AppState>,
     private dataService: DataService,
-    private sampleService: SamplesService
+    private sampleService: SamplesService,
+    private httpClient: HttpClient,
+    private visitService: VisitsService
   ) {
     this.dialogData = data;
     this.sample = data?.sample;
@@ -107,8 +116,6 @@ export class ResultsFeedingModalComponent implements OnInit {
       })
     ).subscribe(
       (response) => {
-        // console.log('response :: ', response);
-
         this.testTimeSettings = response;
         this.loadingTestTimeSettings = false;
       },
@@ -146,6 +153,34 @@ export class ResultsFeedingModalComponent implements OnInit {
                 ]?.abnormal == true
                   ? true
                   : false;
+            }
+
+            if (parameter?.datatype?.display === "Complex") {
+              // Find obs
+              this.visitService
+                .getVisitDetailsByVisitUuid(this.sample?.visit?.uuid, {
+                  v: "custom:(encounters:(uuid,display,obs,orders,encounterDatetime,encounterType,location))",
+                })
+                .subscribe((response) => {
+                  if (response && response?.encounters?.length > 0) {
+                    response?.encounters?.forEach((encounter, index) => {
+                      encounter?.obs?.forEach((obs) => {
+                        this.obsKeyedByConcepts[obs?.concept?.uuid] = {
+                          ...obs,
+                          uri:
+                            obs?.value?.links && obs?.value?.links?.uri
+                              ? obs?.value?.links?.uri?.replace("http", "https")
+                              : null,
+                        };
+                      });
+
+                      encounter?.orders?.forEach((order) => {
+                        this.ordersKeyedByConcepts[order?.concept?.uuid] =
+                          order;
+                      });
+                    });
+                  }
+                });
             }
           });
         }
@@ -370,81 +405,153 @@ export class ResultsFeedingModalComponent implements OnInit {
     );
   }
 
-  onSaveParameterValue(e, item, parameter, currentSample, allocation) {
+  onSaveParameterValue(
+    e,
+    item,
+    parameter,
+    currentSample,
+    allocation,
+    type?: string
+  ) {
     e.stopPropagation();
     this.savingMessage[parameter?.uuid] = true;
-    const resultObject = {
-      concept: {
-        uuid: parameter?.uuid,
-      },
-      testAllocation: {
-        uuid: allocation?.allocationUuid,
-      },
-      valueNumeric: parameter?.numeric ? this.values[parameter?.uuid] : null,
-      valueText:
-        !parameter?.numeric && parameter?.answers?.length == 0
-          ? this.values[parameter?.uuid]
-          : null,
+    if (!type || type !== "file") {
+      const resultObject = {
+        concept: {
+          uuid: parameter?.uuid,
+        },
+        testAllocation: {
+          uuid: allocation?.allocationUuid,
+        },
+        valueNumeric: parameter?.numeric ? this.values[parameter?.uuid] : null,
+        valueText:
+          !parameter?.numeric && parameter?.answers?.length == 0
+            ? this.values[parameter?.uuid]
+            : null,
 
-      valueCoded:
-        parameter.answers && parameter.answers.length > 0
-          ? {
-              uuid: this.values[parameter?.uuid],
+        valueCoded:
+          parameter.answers && parameter.answers.length > 0
+            ? {
+                uuid: this.values[parameter?.uuid],
+              }
+            : null,
+        abnormal: this.values[parameter?.uuid + "-abnormal"]
+          ? this.values[parameter?.uuid + "-abnormal"]
+          : false,
+        additionalReqTimeLimit: this.getTimeConfigs(item?.order?.concept?.uuid)
+          ?.additionalReqTimeLimit,
+        standardTAT: this.getTimeConfigs(item?.order?.concept?.uuid)
+          ?.standardTAT,
+        urgentTAT: this.getTimeConfigs(item?.order?.concept?.uuid)?.urgentTAT,
+      };
+
+      const resultsComments = {
+        status: this.values[item?.uuid + "-comment"]
+          ? "ANSWER DESCRIPTION"
+          : "COMMENT",
+        remarks: this.values[item?.uuid + "-comment"]
+          ? this.values[item?.uuid + "-comment"]
+          : "NO DESCRPTION FOR PARAMETER",
+        user: {
+          uuid: this.userUuid,
+        },
+        testAllocation: {
+          uuid: allocation.allocationUuid,
+        },
+      };
+
+      let formattedDataObject = {};
+      _.map(this.getAllKeysWithData(resultObject), (key) => {
+        formattedDataObject[key] = resultObject[key];
+      });
+      this.store.dispatch(
+        saveLabTestResults({
+          results: formattedDataObject,
+          comments: resultsComments,
+          sampleDetails: currentSample,
+          concept: item?.order?.concept,
+          allocation,
+        })
+      );
+
+      this.savingLabResultsState$ = this.store.select(
+        getSavingLabTestResultsState
+      );
+
+      this.savingLabResultsState$.pipe(take(1)).subscribe((state) => {
+        if (state) {
+          this.savingMessage[parameter?.uuid] = null;
+        }
+      });
+      this.testOrders$ = this.store.select(
+        getFormattedLabSampleOrdersBySampleIdentifier,
+        {
+          sampleIdentifier: this.sample?.id,
+        }
+      );
+    } else {
+      // Attachment
+      this.savingLabResultsState$ = of(false);
+      let data = new FormData();
+      const jsonData = {
+        concept: parameter?.uuid,
+        person: this.sample?.patient?.uuid,
+        encounter:
+          this.ordersKeyedByConcepts[item?.order?.concept?.uuid]?.encounter
+            ?.uuid,
+        obsDatetime: new Date(),
+        voided: false,
+        status: "PRELIMINARY",
+        comment: this.values[parameter?.uuid + "-comment"],
+      };
+      data.append("file", this.file);
+      data.append("json", JSON.stringify(jsonData));
+
+      // void first the existing observation
+      if (
+        this.obsKeyedByConcepts[parameter?.uuid] &&
+        this.obsKeyedByConcepts[parameter?.uuid]?.value
+      ) {
+        const existingObs = {
+          concept: parameter?.uuid,
+          person: this.sample?.patient?.uuid,
+          obsDatetime:
+            this.obsKeyedByConcepts[parameter?.uuid]?.encounter?.obsDatetime,
+          encounter: this.obsKeyedByConcepts[parameter?.uuid]?.encounter?.uuid,
+          status: "PRELIMINARY",
+          comment: this.obsKeyedByConcepts[parameter?.uuid]?.encounter?.comment,
+        };
+        this.httpClient
+          .post(
+            `../../../openmrs/ws/rest/v1/obs/${
+              this.obsKeyedByConcepts[parameter?.uuid]?.uuid
+            }`,
+            {
+              ...existingObs,
+              voided: true,
             }
-          : null,
-      abnormal: this.values[parameter?.uuid + "-abnormal"]
-        ? this.values[parameter?.uuid + "-abnormal"]
-        : false,
-      additionalReqTimeLimit: this.getTimeConfigs(item?.order?.concept?.uuid)
-        ?.additionalReqTimeLimit,
-      standardTAT: this.getTimeConfigs(item?.order?.concept?.uuid)?.standardTAT,
-      urgentTAT: this.getTimeConfigs(item?.order?.concept?.uuid)?.urgentTAT,
-    };
-
-    const resultsComments = {
-      status: this.values[item?.uuid + "-comment"]
-        ? "ANSWER DESCRIPTION"
-        : "COMMENT",
-      remarks: this.values[item?.uuid + "-comment"]
-        ? this.values[item?.uuid + "-comment"]
-        : "NO DESCRPTION FOR PARAMETER",
-      user: {
-        uuid: this.userUuid,
-      },
-      testAllocation: {
-        uuid: allocation.allocationUuid,
-      },
-    };
-
-    let formattedDataObject = {};
-    _.map(this.getAllKeysWithData(resultObject), (key) => {
-      formattedDataObject[key] = resultObject[key];
-    });
-    this.store.dispatch(
-      saveLabTestResults({
-        results: formattedDataObject,
-        comments: resultsComments,
-        sampleDetails: currentSample,
-        concept: item?.order?.concept,
-        allocation,
-      })
-    );
-
-    this.savingLabResultsState$ = this.store.select(
-      getSavingLabTestResultsState
-    );
-
-    this.savingLabResultsState$.pipe(take(1)).subscribe((state) => {
-      if (state) {
-        this.savingMessage[parameter?.uuid] = null;
+          )
+          .subscribe((response) => {
+            if (response) {
+              this.savingLabResultsState$ = of(false);
+            }
+          });
       }
-    });
-    this.testOrders$ = this.store.select(
-      getFormattedLabSampleOrdersBySampleIdentifier,
-      {
-        sampleIdentifier: this.sample?.id,
-      }
-    );
+      this.httpClient
+        .post(`../../../openmrs/ws/rest/v1/obs`, data)
+        .subscribe((response: any) => {
+          if (response) {
+            this.obsKeyedByConcepts[parameter?.uuid] = {
+              ...response,
+              uri: response?.value?.links
+                ? response?.value?.links?.uri?.replace("http", "https")
+                : null,
+            };
+
+            this.savingLabResultsState$ = of(false);
+          }
+        });
+    }
   }
 
   onGetFileInfo(data, item, parameter, provider, attachmentConceptUuid) {
@@ -624,5 +731,15 @@ export class ResultsFeedingModalComponent implements OnInit {
           );
         }
       });
+  }
+
+  fileSelection(event, parameter): void {
+    event.stopPropagation();
+    const fileInputElement: HTMLElement = document.getElementById(
+      "file-selector-" + parameter?.uuid
+    );
+    this.file = event.target.files[0];
+    this.values[parameter?.uuid] = this.file;
+    this.values[parameter?.uuid + "-comment"] = "Attachment";
   }
 }

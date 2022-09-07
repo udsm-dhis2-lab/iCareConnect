@@ -136,7 +136,8 @@ export class FieldComponent {
     const parameters = {
       q: searchingText,
       limit: 50,
-      tag: field?.searchTerm,
+      tag:
+        this.field?.searchControlType === "location" ? field?.searchTerm : null,
       class: this.field?.conceptClass,
       source: this.field?.source,
       v:
