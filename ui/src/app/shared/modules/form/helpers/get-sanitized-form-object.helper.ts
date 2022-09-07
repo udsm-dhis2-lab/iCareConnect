@@ -1,13 +1,14 @@
-import { ConceptGet } from 'src/app/shared/resources/openmrs';
-import { FormFieldType } from '../constants/form-field-type.constant';
-import { Boolean } from '../models/boolean.model';
-import { CheckBox } from '../models/check-box.model';
-import { Dropdown } from '../models/dropdown.model';
-import { Field } from '../models/field.model';
-import { ICAREForm } from '../models/form.model';
-import { TextArea } from '../models/text-area.model';
-import { Textbox } from '../models/text-box.model';
-import { getFormFieldOptions } from './get-form-field-options.helper';
+import { ConceptGet } from "src/app/shared/resources/openmrs";
+import { FormFieldType } from "../constants/form-field-type.constant";
+import { Boolean } from "../models/boolean.model";
+import { CheckBox } from "../models/check-box.model";
+import { ComplexDefaultFileField } from "../models/complex-file.model";
+import { Dropdown } from "../models/dropdown.model";
+import { Field } from "../models/field.model";
+import { ICAREForm } from "../models/form.model";
+import { TextArea } from "../models/text-area.model";
+import { Textbox } from "../models/text-box.model";
+import { getFormFieldOptions } from "./get-form-field-options.helper";
 
 export function getSanitizedFormObject(
   concept: ConceptGet,
@@ -34,8 +35,8 @@ export function getSanitizedFormObject(
     uuid,
     name: name?.name ? name?.name : display,
     dataType:
-      datatype?.display == 'N/A' && answers?.length > 0
-        ? 'Coded'
+      datatype?.display == "N/A" && answers?.length > 0
+        ? "Coded"
         : datatype?.display,
     formClass: conceptClass?.display,
     concept: concept,
@@ -82,7 +83,7 @@ function getFormField(formObject: ICAREForm): Field<string> {
       return new Textbox({
         key: formObject.uuid,
         label: formObject.name,
-        type: 'number',
+        type: "number",
         id: formObject.id,
         conceptClass: formObject?.concept?.conceptClass,
         min: formObject?.concept?.lowCritical
@@ -113,6 +114,16 @@ function getFormField(formObject: ICAREForm): Field<string> {
     }
     case FormFieldType.TEXT: {
       return new TextArea({
+        key: formObject.uuid,
+        label: formObject.name,
+        conceptClass: formObject?.concept?.conceptClass,
+        id: formObject.id,
+        options: formObject.options,
+      });
+    }
+
+    case FormFieldType.COMPLEX: {
+      return new ComplexDefaultFileField({
         key: formObject.uuid,
         label: formObject.name,
         conceptClass: formObject?.concept?.conceptClass,
