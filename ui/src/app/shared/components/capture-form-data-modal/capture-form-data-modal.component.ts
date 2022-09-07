@@ -95,6 +95,17 @@ export class CaptureFormDataModalComponent implements OnInit {
       this.currentLocation?.uuid,
       null
     );
+    const fileObs = Object.keys(this.formData)
+      .map((key) => {
+        if (this.formData[key]?.isFile) {
+          return {
+            concept: key,
+            person: this.patient?.uuid,
+            file: this.formData[key]?.value,
+          };
+        }
+      })
+      .filter((obs) => obs);
     this.encounterObject = {
       encounterDatetime: new Date(),
       visit: this.visit?.uuid,
@@ -102,6 +113,7 @@ export class CaptureFormDataModalComponent implements OnInit {
       encounterType: form?.encounterType?.uuid,
       location: this.currentLocation?.uuid,
       obs: this.currentObs,
+      fileObs: fileObs,
       orders: [],
       encounterProviders: [
         {
