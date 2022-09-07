@@ -28,6 +28,8 @@ import { ICARE_CONFIG } from "src/app/shared/resources/config";
 import { getEncounterTypeByName } from "src/app/store/selectors/encounter-type.selectors";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { MatTableDataSource } from "@angular/material/table";
+import { getIsPatientSentForExemption } from "src/app/store/selectors/visit.selectors";
+import { loadCurrentPatient } from "src/app/store/actions";
 
 @Component({
   selector: "app-current-patient-billing",
@@ -61,6 +63,7 @@ export class CurrentPatientBillingComponent implements OnInit {
   exemptionEncounterType$: Observable<any>;
   exemptionOrderType$: Observable<any>;
   exemptionConcept$: Observable<any>;
+  hasOpenExemptionRequest: boolean;
   
   constructor(
     private route: ActivatedRoute,
@@ -79,7 +82,9 @@ export class CurrentPatientBillingComponent implements OnInit {
     this.patientId = this.route?.snapshot?.params?.patientId;
     this._getPatientDetails();
 
+
     this.currentPatient$ = this.patientService.getPatient(this.patientId);
+    this.store.dispatch(loadCurrentPatient({uuid: this.patientId, isRegistrationPage: false}));
     this.currentUser$ = this.store.select(getCurrentUserDetails);
     this.facilityDetails$ = this.configService.getFacilityDetails();
     this.facilityLogo$ = this.configService.getLogo();
@@ -238,6 +243,10 @@ export class CurrentPatientBillingComponent implements OnInit {
 
   onPaymentSuccess() {
     this._getPatientDetails();
+  }
+
+  onCheckOpenExemptionRequest(orderTypeUuid: any): any {
+    this.store.select(getIsPatientSentForExemption(orderTypeUuid)).subscribe((value) => this.hasOpenExemptionRequest = value);
   }
 
   requestExemption(patientBillingDetails, params) {
