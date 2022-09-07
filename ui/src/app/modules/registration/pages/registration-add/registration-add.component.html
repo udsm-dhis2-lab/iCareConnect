@@ -466,7 +466,7 @@
               <app-dynamic-reg-form
               *ngIf="params?.additionalPatientInformation"
               [concepts]="params?.additionalPatientInformation.setMembers"
-              (selectedValue)="testGeneric($event)"
+              (selectedValue)="getAdditionalInformationValues($event)"
             >
             </app-dynamic-reg-form>
 
