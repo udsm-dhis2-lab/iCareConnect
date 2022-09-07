@@ -4,16 +4,19 @@ package org.openmrs.module.icare.web.controller;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;*/
 
+import org.apache.commons.io.IOUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.hamcrest.CoreMatchers;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.openmrs.ConceptComplex;
 import org.openmrs.Patient;
 import org.openmrs.Visit;
 import org.openmrs.api.PatientService;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.icare.billing.models.Discount;
 import org.openmrs.module.icare.billing.models.Invoice;
 import org.openmrs.module.icare.billing.models.InvoiceItem;
 import org.openmrs.module.icare.billing.models.Payment;
@@ -25,12 +28,17 @@ import org.openmrs.module.webservices.rest.SimpleObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.mock.web.MockMultipartHttpServletRequest;
 
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -422,6 +430,30 @@ public class BillingControllerAPITest extends BaseResourceControllerTest {
 		handler = handle(newGetRequest);
 		List invoicePayment = (new ObjectMapper()).readValue(handler.getContentAsString(), List.class);
 		assertThat("Should still contain a invoice", invoicePayment.size(), is(1));*/
+	}
+
+	@Test
+	public void shouldUploadFileForDiscount() throws Exception {
+		//Discount discount = new Discount();
+
+		InputStream in = getClass().getClassLoader().getResourceAsStream("lab-data.xml");
+		System.out.println(in);
+
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		//System.out.println(out);
+		IOUtils.copy(in, out);
+
+		String json ="{\"remarks\":\"Discountingwithfullexemption\",\"patient\":{\"uuid\":\"4aaad795-9fdb-4cdb-8ea2-ca250ad6b347\"},\"criteria\":{\"uuid\":\"28d3207a-79d1-4d09-83b0-bc873622ab66\"},\"items\":[{\"item\":{\"uuid\":\"6429edb2-d80e-4501-9627-c910ee6557d9\"},\"invoice\":{\"uuid\":\"01556d87-83c7-40dd-86ff-7bcf7fd3131a\"},\"amount\":100000}]}";
+
+		MockMultipartHttpServletRequest request = newUploadRequest("icare/discount");
+		request.addFile(new MockMultipartFile("document", "lab-data.xml", "application/xml", out.toByteArray()));
+		//request.addParameter("json", json);
+
+		SimpleObject response = deserialize(handle(request));
+
+		MockHttpServletResponse rawResponse = handle(newGetRequest("discount" + "/" + response.get("uuid") + "/value"));
+
+		assertThat(out.toByteArray(), is(equalTo(rawResponse.getContentAsByteArray())));
 	}
 	
 	@Override
