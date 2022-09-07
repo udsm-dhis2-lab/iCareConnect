@@ -18,12 +18,10 @@ import org.openmrs.module.icare.report.dhis2.DHIS2Config;
 import org.openmrs.module.icare.web.controller.core.BaseResourceControllerTest;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
-
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
-
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -293,7 +291,9 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		
 		//Get visits by Payment Status
 		//PAID
-		MockHttpServletRequest newGetRequest = newGetRequest("icare/visit", new Parameter("paymentStatus", "PAID"));
+		MockHttpServletRequest newGetRequest = newGetRequest("icare/visit", new Parameter("orderTypeUuid",
+		        "2msir5eb-5345-11e8-9922-40b034c3cfee"), new Parameter("OrderBy", "ENCOUNTER"), new Parameter(
+		        "orderByDirection", "ASC"), new Parameter("paymentStatus", "PAID"));
 		MockHttpServletResponse handle = handle(newGetRequest);
 		String visitData = handle.getContentAsString();
 		Map visitMap = (new ObjectMapper()).readValue(visitData, Map.class);
@@ -302,14 +302,14 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		assertThat("Should return a visit", visitDetails.size() == 1);
 		
 		//PENDING
-		// When testing for pending uncomment the below test and modify the records in billing-data.xml file
-		//		 newGetRequest = newGetRequest("icare/visit", new Parameter("paymentStatus","PENDING"));
-		//		 handle = handle(newGetRequest);
-		//		 visitData = handle.getContentAsString();
-		//		visitMap = (new ObjectMapper()).readValue(visitData, Map.class);
-		//		 visitDetails = (List<Map>) visitMap.get("results");
-		//		System.out.println(visitDetails.size());
-		//		assertThat("Should return a visit", visitDetails.size() == 1);
+		//		 When testing for pending will return 0 since there are no pending payments
+		newGetRequest = newGetRequest("icare/visit", new Parameter("paymentStatus", "PENDING"));
+		handle = handle(newGetRequest);
+		visitData = handle.getContentAsString();
+		visitMap = (new ObjectMapper()).readValue(visitData, Map.class);
+		visitDetails = (List<Map>) visitMap.get("results");
+		System.out.println(visitDetails.size());
+		assertThat("Should return a visit", visitDetails.size() == 0);
 		
 	}
 	
@@ -410,8 +410,7 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		Visit newVisit = this.getVisit(patient);
 		
 		MockHttpServletRequest newGetRequest = newGetRequest("icare/visit", new Parameter("orderTypeUuid",
-		        "2msir5eb-5345-11e8-9922-40b034c3cfee"), new Parameter("OrderBy", "VISIT"), new Parameter(
-		        "orderByDirection", "ASC")
+		        "2msir5eb-5345-11e8-9922-40b034c3cfee")
 		//7bc34d5bde5d829d31cc8c22a455896a97085951
 		//, new Parameter("fulfillerStatus","COMPL")
 		);
@@ -438,6 +437,7 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		
 		orderResult = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
 		assertThat("Should return a visit", ((List) orderResult.get("results")).size() > 0);
+		
 	}
 	
 	@Test
@@ -512,4 +512,26 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		System.out.println(maps);
 		assertThat("Should return 0 concept set", maps.size(), is(0));
 	}
+	
+	@Test
+	public void getPatient() throws Exception {
+		
+		MockHttpServletRequest newGetRequest = newGetRequest("icare/patient", new Parameter("search", "Hermione"));
+		MockHttpServletResponse handle = handle(newGetRequest);
+		String PatientData = handle.getContentAsString();
+		System.out.println("data: " + PatientData);
+		Map patientMap = (new ObjectMapper()).readValue(PatientData, Map.class);
+		List<Map> visitDetails = (List<Map>) patientMap.get("results");
+		assertThat("Should return a patient", visitDetails.size() == 1);
+		
+		newGetRequest = newGetRequest("icare/patient", new Parameter("patientUUID", "993c46d2-5007-45e8-9512-969300717761"));
+		handle = handle(newGetRequest);
+		String PatientData2 = handle.getContentAsString();
+		System.out.println("data: " + PatientData2);
+		Map patientMap2 = (new ObjectMapper()).readValue(PatientData2, Map.class);
+		List<Map> visitDetails2 = (List<Map>) patientMap2.get("results");
+		assertThat("Should return a patient", visitDetails2.size() == 1);
+		
+	}
+	
 }

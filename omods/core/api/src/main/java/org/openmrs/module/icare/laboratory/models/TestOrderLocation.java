@@ -30,7 +30,7 @@ public class TestOrderLocation {
 	private User user;
 	
 	public int getId() {
-		return id;
+		return this.id;
 	}
 	
 	public void setId(int id) {
@@ -38,7 +38,7 @@ public class TestOrderLocation {
 	}
 	
 	public Concept getConcept() {
-		return concept;
+		return this.concept;
 	}
 	
 	public void setConcept(Concept concept) {
@@ -50,7 +50,7 @@ public class TestOrderLocation {
 	}
 	
 	public Location getLocation() {
-		return location;
+		return this.location;
 	}
 	
 	public Date getDateTime() {
@@ -62,7 +62,7 @@ public class TestOrderLocation {
 	}
 	
 	public User getUser() {
-		return user;
+		return this.user;
 	}
 	
 	public void setUser(User user) {
@@ -110,14 +110,14 @@ public class TestOrderLocation {
 		HashMap<String, Object> locationMap = new HashMap<String, Object>();
 		locationMap.put("display", this.getLocation().getDisplayString());
 		locationMap.put("uuid", this.getLocation().getUuid());
-		conceptMap.put("name", this.getLocation().getName());
-		testOrderLocationMap.put("concept", locationMap);
+		locationMap.put("name", this.getLocation().getName());
+		testOrderLocationMap.put("location", locationMap);
 		
-		HashMap<String, Object> UserMap = new HashMap<String, Object>();
-		conceptMap.put("user_id", this.getUser().getUserId());
-		conceptMap.put("uuid", this.getUser().getUuid());
-		conceptMap.put("username", this.getUser().getName());
-		testOrderLocationMap.put("created_by", UserMap);
+		HashMap<String, Object> userMap = new HashMap<String, Object>();
+		userMap.put("user_id", this.getUser().getUserId());
+		userMap.put("uuid", this.getUser().getUuid());
+		userMap.put("username", this.getUser().getName());
+		testOrderLocationMap.put("created_by", userMap);
 		
 		testOrderLocationMap.put("created_on", this.getDateTime());
 		
