@@ -15,7 +15,6 @@ export class DynamicRegFormComponent implements OnInit {
   constructor() { }
 
   ngOnInit(): void {
-    console.log("concepts re", this.concepts)
     this.formFields = this.concepts.map(concept => {
        return new Dropdown({
          id: concept?.uuid,
