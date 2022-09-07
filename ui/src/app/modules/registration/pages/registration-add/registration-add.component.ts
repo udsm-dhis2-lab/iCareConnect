@@ -74,7 +74,7 @@ export class RegistrationAddComponent implements OnInit {
 
   // New variables
   genderOptions$: Observable<any[]>;
-  religionInfo$: Observable<any[]>;
+  additionalPatientInformation$: Observable<any[]>;
   occupationInfo$: Observable<any[]>;
   educationInfo$: Observable<any[]>;
   maritalstatusInfo$: Observable<any[]>;
@@ -228,28 +228,36 @@ export class RegistrationAddComponent implements OnInit {
     };
   }
 
-  setOccupation(occupation) {
-    this.patient.occupation = occupation;
-  }
+   getAdditionalInformationValues(formValues): void {
+    //console.log("formValues", formValues)
+    //console.log(this.registrationFormConfigsKeyedByProperty)
 
-  testGeneric(formValues): void {
     this.patient.occupation =
       formValues[
         this.registrationFormConfigsKeyedByProperty["occupation"]?.value
-      ];
+      ].value;
     this.patient.maritalStatus =
-      formValues[
-        this.registrationFormConfigsKeyedByProperty["maritalStatus"]?.value
-      ];
+       formValues[
+         this.registrationFormConfigsKeyedByProperty["maritalStatus"]?.value
+       ].value;
+       this.patient.religion =
+         formValues[
+          this.registrationFormConfigsKeyedByProperty["religion"]?.value
+        ].value;
+        this.patient.education =formValues[this.registrationFormConfigsKeyedByProperty["education"]?.value
+        ].value;
+        this.patient['areaLeader'] = formValues[this.registrationFormConfigsKeyedByProperty["areaLeaderName"]?.value
+        ].value;
+        this.patient['areaLeaderNumber'] = formValues[this.registrationFormConfigsKeyedByProperty["areaLeaderNumber"]?.value
+        ].value;
   }
 
-  setMaritalStatus(status) {
-    this.patient.maritalStatus = status;
-  }
-
-  setEducationDetails(education) {
-    this.patient.education = education;
-  }
+    //setEducationDetails(education) {
+   // console.log(education)
+   /* 
+    const key = Object.keys(education)[0]
+    this.patient.education = education[key].value; */
+  //}
 
   canEditMRN() {
     this.mrnIsEditable = !this.mrnIsEditable;
@@ -275,10 +283,10 @@ export class RegistrationAddComponent implements OnInit {
       "bad70d90-9bac-401a-8c49-a440f6a07bf5",
       "custom:(uuid,display,names,answers:(uuid,display,names,mappings))"
     );
-    this.religionInfo$ = this.conceptService.getConceptDetailsByUuid(
+    this.additionalPatientInformation$ = this.conceptService.getConceptDetailsByUuid(
       "b2399b15-a38d-47f9-8e15-fc7e7c7dc1f3",
       "custom:(uuid,display,names,answers:(uuid,display,names),setMembers:(uuid,display,answers:(uuid,display,names)))"
-    );
+    );/* 
     this.occupationInfo$ = this.conceptService.getConceptDetailsByUuid(
       "c3d16c94-4e03-4b19-9491-43d10f470981",
       "custom:(uuid,display,names,answers:(uuid,display,names),setMembers:(uuid,display,answers:(uuid,display,names)))"
@@ -290,7 +298,8 @@ export class RegistrationAddComponent implements OnInit {
     this.maritalstatusInfo$ = this.conceptService.getConceptDetailsByUuid(
       "f62b5605-1335-45e9-9574-9487e85b2820",
       "custom:(uuid,display,names,answers:(uuid,display,names),setMembers:(uuid,display,answers:(uuid,display,names)))"
-    );
+    ); */
+
     this.loadingForm = true;
 
     zip(
