@@ -7,23 +7,33 @@ import { AppState } from '../../../store/reducers';
 import { Patient } from '../../resources/patient/models/patient.model';
 import { PatientService } from '../../resources/patient/services/patients.service';
 
+
 @Component({
   selector: 'app-patient-search',
   templateUrl: './patient-search.component.html',
   styleUrls: ['./patient-search.component.scss'],
 })
 export class PatientSearchComponent implements OnInit {
+  @Output() selectPatient: EventEmitter<any> = new EventEmitter();
   patients$: Observable<any>;
   searching: boolean;
   showList: boolean;
-  @Output() selectPatient: EventEmitter<Patient> = new EventEmitter<Patient>();
+  nopatient: boolean=true;
+  displayedColumn: string[] = [
+    'id',
+    'name',
+    'gender',
+    'age',
+    'phone',
+  ];
+  focused: boolean;
 
   constructor(
     private patientService: PatientService,
     private store: Store<AppState>
   ) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void { }
 
   onSearchPatients(e): void {
     if (e) {
@@ -36,7 +46,15 @@ export class PatientSearchComponent implements OnInit {
           this.showList = true;
         })
       );
+      
     }
+  }
+
+  onFocus(e){
+      if(e){
+        this.focused=true;
+      }
+      else this.focused=false;
   }
 
   onSelectPatient(e, patient: Patient): void {
