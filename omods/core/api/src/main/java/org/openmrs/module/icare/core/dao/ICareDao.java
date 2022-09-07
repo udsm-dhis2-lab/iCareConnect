@@ -20,6 +20,7 @@ import org.openmrs.api.db.hibernate.DbSession;
 import org.openmrs.module.icare.billing.models.ItemPrice;
 import org.openmrs.module.icare.billing.models.Prescription;
 import org.openmrs.module.icare.core.Item;
+import org.openmrs.module.icare.core.utils.PatientWrapper;
 import org.openmrs.module.icare.core.utils.VisitWrapper;
 import org.openmrs.module.icare.store.models.OrderStatus;
 
@@ -524,17 +525,24 @@ public class ICareDao extends BaseDAO<Item> {
 		return sqlQuery.list();
 	}
 	
-	public List<Patient> getPatients(String search, String patientUUID) {
+	public List<Patient> getPatients(String search, String patientUUID, PatientWrapper.VisitStatus visitStatus , Integer startIndex, Integer limit, PatientWrapper.OrderByDirection orderByDirection) {
 		
 		DbSession session = this.getSession();
 		String queryStr = "SELECT p FROM Patient p INNER JOIN p.names pname WHERE p.voided = false ";
 		
 		if (search != null) {
-			queryStr += " AND lower(concat(pname.givenName,pname.middleName,pname.familyName)) LIKE lower(:search)";
+			queryStr += "AND lower(concat(pname.givenName,pname.middleName,pname.familyName)) LIKE lower(:search)";
 		}
 		if (patientUUID != null) {
 			queryStr += "AND p.uuid=:patientUUID";
 		}
+
+
+//		if (orderByDirection == PatientWrapper.OrderByDirection.ASC) {
+//			queryStr += " ASC";
+//		} else if (orderByDirection == PatientWrapper.OrderByDirection.DESC) {
+//			queryStr += " DESC";
+//		}
 		
 		Query query = session.createQuery(queryStr);
 		
@@ -545,6 +553,9 @@ public class ICareDao extends BaseDAO<Item> {
 		if (patientUUID != null) {
 			query.setParameter("patientUUID", patientUUID);
 		}
+
+		query.setFirstResult(startIndex);
+		query.setMaxResults(limit);
 		
 		return query.list();
 		
