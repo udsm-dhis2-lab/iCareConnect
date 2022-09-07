@@ -528,24 +528,21 @@ public class ICareDao extends BaseDAO<Item> {
 	public List<Patient> getPatients(String search, String patientUUID, PatientWrapper.VisitStatus visitStatus , Integer startIndex, Integer limit, PatientWrapper.OrderByDirection orderByDirection) {
 		
 		DbSession session = this.getSession();
-		String queryStr = "SELECT p FROM Patient p INNER JOIN p.names pname INNER JOIN visit v WHERE p.voided = false AND visit.patient == p ";
+		String queryStr = "SELECT p FROM Patient p INNER JOIN p.names pname WHERE p.voided = false ";
 		
 		if (search != null) {
-			queryStr += " AND lower(concat(pname.givenName,pname.middleName,pname.familyName)) LIKE lower(:search)";
+			queryStr += "AND lower(concat(pname.givenName,pname.middleName,pname.familyName)) LIKE lower(:search)";
 		}
 		if (patientUUID != null) {
 			queryStr += "AND p.uuid=:patientUUID";
 		}
 
-		if (visitStatus == PatientWrapper.VisitStatus.ACTIVE){
-			queryStr+="AND v.stopDatetime IS NULL";
-		}
 
-		if (orderByDirection == PatientWrapper.OrderByDirection.ASC) {
-			queryStr += " ASC ";
-		} else if (orderByDirection == PatientWrapper.OrderByDirection.DESC) {
-			queryStr += " DESC ";
-		}
+//		if (orderByDirection == PatientWrapper.OrderByDirection.ASC) {
+//			queryStr += " ASC";
+//		} else if (orderByDirection == PatientWrapper.OrderByDirection.DESC) {
+//			queryStr += " DESC";
+//		}
 		
 		Query query = session.createQuery(queryStr);
 		
