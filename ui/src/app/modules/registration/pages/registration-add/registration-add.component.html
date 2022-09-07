@@ -5,10 +5,7 @@
     updateCurrentMRNSystemSettingsResponse:
       updateCurrentMRNSystemSettingsResponse$ | async,
     genderOptions: genderOptions$ | async,
-    religionInfo: religionInfo$ | async,
-    occupationInfo: occupationInfo$ | async,
-    educationInfo: educationInfo$ | async,
-    maritalstatusInfo: maritalstatusInfo$ | async
+    additionalPatientInformation: additionalPatientInformation$ | async
   } as params"
 >
   <h2>{{ editMode ? "Edit Patient" : "Register New Patient" }}</h2>
@@ -399,8 +396,9 @@
             <label for="">Additional Patient Information</label>
           </div>
           <div class="col-sm-9 d-flex">
-            <div>
-              <!-- <mat-form-field appearance="fill" class="w-100">
+            
+        <!--<div>
+                 <mat-form-field appearance="fill" class="w-100">
                 <mat-label>Occupation</mat-label>
                 <mat-select>
                   <mat-option
@@ -438,10 +436,11 @@
                 </mat-select>
               </mat-form-field>
               -->
-              <div class="w-100">
+              <!-- <div class="w-100">
                 <app-dynamic-reg-form
                   *ngIf="params?.occupationInfo"
                   [concepts]="[params?.occupationInfo]"
+                  (selectedValue)="setOccupation($event)"
                 >
                 </app-dynamic-reg-form>
               </div>
@@ -449,6 +448,7 @@
                 <app-dynamic-reg-form
                   *ngIf="params?.educationInfo"
                   [concepts]="[params?.educationInfo]"
+                  (selectedValue)="setEducationDetails(event$)"
                 >
                 </app-dynamic-reg-form>
               </div>
@@ -456,12 +456,21 @@
                 <app-dynamic-reg-form
                   *ngIf="params?.maritalstatusInfo"
                   [concepts]="[params?.maritalstatusInfo]"
+                  (selectedValue)="setMaritalStatus(event$)"
                 >
                 </app-dynamic-reg-form>
               </div>
-            </div>
+            </div> -->
 
             <div class="ml-3">
+
+              <app-dynamic-reg-form
+              *ngIf="params?.additionalPatientInformation"
+              [concepts]="params?.additionalPatientInformation.setMembers"
+              (selectedValue)="setReligionDetails(event$)"
+            >
+            </app-dynamic-reg-form>
+
               <!-- <mat-form-field appearance="fill" class="w-100">
                 <mat-label>Religion</mat-label>
                 <input
@@ -475,15 +484,7 @@
                 />
               </mat-form-field> -->
 
-              <div class="w-100">
-                <app-dynamic-reg-form
-                  *ngIf="params?.religionInfo"
-                  [concepts]="params?.religionInfo.setMembers"
-                >
-                </app-dynamic-reg-form>
-              </div>
-
-              <mat-form-field appearance="fill" class="w-100">
+              <!-- <mat-form-field appearance="fill" class="w-100">
                 <mat-label>Names of Area leader/Neighbour</mat-label>
                 <input
                   name="areaLeader"
@@ -499,7 +500,7 @@
               <app-form
                 [fields]="[primaryPhoneNumberAreaLeaderFormField]"
                 (formUpdate)="onPrimaryMobileNumberAreaLeaderFormUpdate($event)"
-              ></app-form>
+              ></app-form> -->
 
               <!-- <mat-form-field appearance="fill" class="w-100">
                 <mat-label>Phone Number of Area leader/Neighbour</mat-label>
