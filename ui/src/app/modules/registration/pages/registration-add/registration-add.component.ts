@@ -234,7 +234,7 @@ export class RegistrationAddComponent implements OnInit {
     this.patient.occupation = occupation[key]?.value;
   }
 
-  testGeneric(formValues): void {
+  getAdditionalInformationValues(formValues): void {
     console.log("formValues", formValues)
     this.patient.occupation =
       formValues[
@@ -248,8 +248,6 @@ export class RegistrationAddComponent implements OnInit {
     //     formValues[
     //       this.registrationFormConfigsKeyedByProperty["religion"]?.value
     //     ];
-
-        console.log("--->",this.patient.occupation)
   }
 
   setMaritalStatus(status) {
@@ -263,10 +261,6 @@ export class RegistrationAddComponent implements OnInit {
    /* 
     const key = Object.keys(education)[0]
     this.patient.education = education[key].value; */
-  }
-
-  setReligionDetails(religion){
-    //console.log(religion);
   }
 
   canEditMRN() {
