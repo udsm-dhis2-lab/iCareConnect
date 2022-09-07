@@ -5,10 +5,10 @@
     updateCurrentMRNSystemSettingsResponse:
       updateCurrentMRNSystemSettingsResponse$ | async,
     genderOptions: genderOptions$ | async,
-    religionInfo : religionInfo$ | async,
-    occupationInfo : occupationInfo$ | async,
-    educationInfo : educationInfo$ | async,
-    maritastatusInfo : maritalstatusInfo$ | async
+    religionInfo: religionInfo$ | async,
+    occupationInfo: occupationInfo$ | async,
+    educationInfo: educationInfo$ | async,
+    maritalstatusInfo: maritalstatusInfo$ | async
   } as params"
 >
   <h2>{{ editMode ? "Edit Patient" : "Register New Patient" }}</h2>
@@ -438,27 +438,28 @@
                 </mat-select>
               </mat-form-field>
               -->
-              {{params?.maritalstatusInfo | json}}
-                <div class="w-100">
-                  <app-dynamic-reg-form *ngIf="params?.occupationInfo" 
+              <div class="w-100">
+                <app-dynamic-reg-form
+                  *ngIf="params?.occupationInfo"
                   [concepts]="[params?.occupationInfo]"
-                  >
-                  </app-dynamic-reg-form>
-                </div>
-                <div class="w-100">
-                  <app-dynamic-reg-form *ngIf="params?.educationInfo" 
+                >
+                </app-dynamic-reg-form>
+              </div>
+              <div class="w-100">
+                <app-dynamic-reg-form
+                  *ngIf="params?.educationInfo"
                   [concepts]="[params?.educationInfo]"
-                  >
-                  </app-dynamic-reg-form>
-                </div>
-                <div class="w-100">
-                  <app-dynamic-reg-form *ngIf="params?.maritalstatusInfo" 
+                >
+                </app-dynamic-reg-form>
+              </div>
+              <div class="w-100">
+                <app-dynamic-reg-form
+                  *ngIf="params?.maritalstatusInfo"
                   [concepts]="[params?.maritalstatusInfo]"
-                  >
-                  </app-dynamic-reg-form>
-                </div>
-                
-            </div> 
+                >
+                </app-dynamic-reg-form>
+              </div>
+            </div>
 
             <div class="ml-3">
               <!-- <mat-form-field appearance="fill" class="w-100">
@@ -473,10 +474,11 @@
                   [disabled]="addingPatient && !patientAdded"
                 />
               </mat-form-field> -->
-             
+
               <div class="w-100">
-                <app-dynamic-reg-form *ngIf="params?.religionInfo" 
-                [concepts]="params?.religionInfo.setMembers"
+                <app-dynamic-reg-form
+                  *ngIf="params?.religionInfo"
+                  [concepts]="params?.religionInfo.setMembers"
                 >
                 </app-dynamic-reg-form>
               </div>
