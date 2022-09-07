@@ -1,9 +1,11 @@
 .patient-search-container {
   position: relative;
+  display: flex;
+  flex-direction: column;
 }
 
 .patient-search-input-block {
-  position: absolute;
+  //position: absolute;
   width: 100%;
   border-radius: 25px;
   background-color: #ffffff;
@@ -15,6 +17,11 @@
   box-shadow: 1px 0px 3px 0px rgba(0, 0, 0, 0.15);
 }
 
+.no-data{
+  color: red;
+  font-size: 20px;
+  text-align: center;
+}
 .patient-search-input {
   display: flex;
   text-align: left;
@@ -45,4 +52,5 @@
     font-size: 14px;
     height: 35px;
   }
+
 }
