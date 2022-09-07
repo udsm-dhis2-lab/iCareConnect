@@ -98,7 +98,7 @@ public interface ICareService extends OpenmrsService {
 	List<Visit> getVisitsByOrderType(String search, String orderTypeUuid, String locationUuid,
 	        OrderStatus.OrderStatusCode prescriptionStatus, Order.FulfillerStatus fulfillerStatus, Integer limit,
 	        Integer startIndex, VisitWrapper.OrderBy orderBy, VisitWrapper.OrderByDirection orderByDirection,
-	        String attributeValueReference, String paymentStatus);
+	        String attributeValueReference, VisitWrapper.PaymentStatus paymentStatus);
 	
 	List<Order> getOrdersByVisitAndOrderType(String visitUuid, String orderTypeUuid, Order.FulfillerStatus fulfillerStatus,
 	        Integer limit, Integer startIndex);
@@ -114,5 +114,9 @@ public interface ICareService extends OpenmrsService {
 	List<ConceptReferenceTerm> getConceptReferenceTerms(String q, String source, Integer limit, Integer startIndex);
 	
 	List<ConceptSet> getConceptsSetsByConcept(String concept);
+	
+	List<Patient> getPatients(String search, String patientUUID);
+	
+	Patient savePatient(Patient patient);
 	
 }
