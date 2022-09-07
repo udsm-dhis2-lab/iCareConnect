@@ -147,6 +147,11 @@ const routes: Routes = [
             (m) => m.TheatreModule
           ),
       },
+      {
+        path: "dhis2",
+        loadChildren: () =>
+          import("../modules/dhis2/dhis2.module").then((m) => m.DHIS2Module),
+      },
     ],
   },
   {
