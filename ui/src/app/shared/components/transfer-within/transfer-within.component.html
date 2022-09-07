@@ -29,9 +29,9 @@
     style="padding: 0px"
   >
     <mat-toolbar color="primary">Transfer {{ patient?.display }}</mat-toolbar>
-    <div class="form" *ngIf="!params?.transferStatus">
+    <div class="form mt-3" *ngIf="!params?.transferStatus">
       <mat-form-field class="w-100 transfer-to-field">
-        <mat-label>Transfer to:</mat-label>
+        <mat-label>Transfer to: </mat-label>
         <mat-select [(ngModel)]="transferTo" required>
           <mat-option *ngFor="let option of params?.locations" [value]="option">
             {{ option?.display }}
@@ -56,7 +56,7 @@
       Transferred successfully
     </div>
   </div>
-  <mat-dialog-actions align="end">
+  <mat-dialog-actions align="end" class="mb-2">
     <button mat-stroked-button class="mr-2" (click)="onClose($event)">
       Close
     </button>
