@@ -116,7 +116,7 @@ public interface ICareService extends OpenmrsService {
 	
 	List<ConceptSet> getConceptsSetsByConcept(String concept);
 	
-	List<Patient> getPatients(String search, String patientUUID, PatientWrapper.VisitStatus visitStatus, Integer startIndex, Integer limit, PatientWrapper.OrderByDirection orderByDirection);
+	List<PatientWrapper> getPatients(String search, String patientUUID, PatientWrapper.VisitStatus visitStatus, Integer startIndex, Integer limit, PatientWrapper.OrderByDirection orderByDirection);
 	
 	Patient savePatient(Patient patient);
 	
