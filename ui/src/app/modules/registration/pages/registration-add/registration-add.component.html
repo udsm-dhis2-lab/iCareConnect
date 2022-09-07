@@ -461,13 +461,12 @@
                 </app-dynamic-reg-form>
               </div>
             </div> -->
-
+{{patient.occupation}}
             <div class="ml-3">
-
               <app-dynamic-reg-form
               *ngIf="params?.additionalPatientInformation"
               [concepts]="params?.additionalPatientInformation.setMembers"
-              (selectedValue)="setReligionDetails(event$)"
+              (selectedValue)="testGeneric($event)"
             >
             </app-dynamic-reg-form>
 

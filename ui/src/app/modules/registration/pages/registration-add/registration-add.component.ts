@@ -235,14 +235,21 @@ export class RegistrationAddComponent implements OnInit {
   }
 
   testGeneric(formValues): void {
+    console.log("formValues", formValues)
     this.patient.occupation =
       formValues[
         this.registrationFormConfigsKeyedByProperty["occupation"]?.value
       ];
-    this.patient.maritalStatus =
-      formValues[
-        this.registrationFormConfigsKeyedByProperty["maritalStatus"]?.value
-      ];
+    // this.patient.maritalStatus =
+    //   formValues[
+    //     this.registrationFormConfigsKeyedByProperty["maritalStatus"]?.value
+    //   ];
+    //   this.patient.religion =
+    //     formValues[
+    //       this.registrationFormConfigsKeyedByProperty["religion"]?.value
+    //     ];
+
+        console.log("--->",this.patient.occupation)
   }
 
   setMaritalStatus(status) {

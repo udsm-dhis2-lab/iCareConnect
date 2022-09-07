@@ -46,7 +46,7 @@ export class DynamicRegFormComponent implements OnInit {
   }
 
   onFormUpdate(formValue:FormValue): void {
-    console.log("this concepts--->",formValue.getValues())
+    //console.log("this concepts--->",formValue.getValues())
       this.selectedValue.emit(formValue.getValues());
 
     }
