@@ -3,7 +3,7 @@
     <div class="mt-4">
       <div class="border">
         <mat-toolbar>
-          <button
+        <!--   <button
             mat-icon-button
             (click)="onBack($event)"
             matTooltip="Go to Home page"
@@ -19,7 +19,7 @@
           >
             <mat-icon class="mr-2">search</mat-icon>
             <span>Search from all Patient</span>
-          </button>
+          </button> -->
 
           <span class="toolbar-spacer"></span>
 
@@ -46,14 +46,18 @@
             [documentURL]="documentURL"
             [appName]="'Registration'"
           ></icare-help>
-          <app-patient-list
+       <!--    <app-patient-list
             *ngIf="!loadingData"
             [itemsPerPage]="15"
             [isRegistrationPage]="true"
             [isTabularList]="true"
             (selectPatient)="onSelectPatient($event)"
-          ></app-patient-list>
+          ></app-patient-list> -->
 
+          <app-patient-search
+          (selectPatient)="onSelectPatient($event)"
+          ></app-patient-search>
+        
           <mat-progress-bar
             mode="indeterminate"
             *ngIf="loadingData"
