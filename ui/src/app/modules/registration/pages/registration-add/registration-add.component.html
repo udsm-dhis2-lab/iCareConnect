@@ -4,7 +4,11 @@
     currentLocation: currentLocation$ | async,
     updateCurrentMRNSystemSettingsResponse:
       updateCurrentMRNSystemSettingsResponse$ | async,
-    genderOptions: genderOptions$ | async
+    genderOptions: genderOptions$ | async,
+    religionInfo: religionInfo$ | async,
+    occupationInfo: occupationInfo$ | async,
+    educationInfo: educationInfo$ | async,
+    maritalstatusInfo: maritalstatusInfo$ | async
   } as params"
 >
   <h2>{{ editMode ? "Edit Patient" : "Register New Patient" }}</h2>
@@ -396,7 +400,7 @@
           </div>
           <div class="col-sm-9 d-flex">
             <div>
-              <mat-form-field appearance="fill" class="w-100">
+              <!-- <mat-form-field appearance="fill" class="w-100">
                 <mat-label>Occupation</mat-label>
                 <mat-select>
                   <mat-option
@@ -433,10 +437,32 @@
                   </mat-option>
                 </mat-select>
               </mat-form-field>
+              -->
+              <div class="w-100">
+                <app-dynamic-reg-form
+                  *ngIf="params?.occupationInfo"
+                  [concepts]="[params?.occupationInfo]"
+                >
+                </app-dynamic-reg-form>
+              </div>
+              <div class="w-100">
+                <app-dynamic-reg-form
+                  *ngIf="params?.educationInfo"
+                  [concepts]="[params?.educationInfo]"
+                >
+                </app-dynamic-reg-form>
+              </div>
+              <div class="w-100">
+                <app-dynamic-reg-form
+                  *ngIf="params?.maritalstatusInfo"
+                  [concepts]="[params?.maritalstatusInfo]"
+                >
+                </app-dynamic-reg-form>
+              </div>
             </div>
 
             <div class="ml-3">
-              <mat-form-field appearance="fill" class="w-100">
+              <!-- <mat-form-field appearance="fill" class="w-100">
                 <mat-label>Religion</mat-label>
                 <input
                   name="Religion"
@@ -447,7 +473,15 @@
                   [(ngModel)]="patient['religion']"
                   [disabled]="addingPatient && !patientAdded"
                 />
-              </mat-form-field>
+              </mat-form-field> -->
+
+              <div class="w-100">
+                <app-dynamic-reg-form
+                  *ngIf="params?.religionInfo"
+                  [concepts]="params?.religionInfo.setMembers"
+                >
+                </app-dynamic-reg-form>
+              </div>
 
               <mat-form-field appearance="fill" class="w-100">
                 <mat-label>Names of Area leader/Neighbour</mat-label>
