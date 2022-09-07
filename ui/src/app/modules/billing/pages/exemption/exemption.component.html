@@ -39,7 +39,7 @@
       <mat-progress-bar *ngIf="!params?.patientsBillsLoadedState" mode="indeterminate"></mat-progress-bar>
       <mat-card *ngIf="params?.patientsBillsLoadedState">
         <app-exemption-list [bills]="params?.bills" [currentPatient]="params?.currentPatient"
-          (discountBill)="onDiscountBill($event)">
+          (discountBill)="onDiscountBill($event, params)">
         </app-exemption-list>
       </mat-card>
     </div>

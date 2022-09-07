@@ -67,7 +67,7 @@ export class ExemptionFullConfirmationComponent implements OnInit {
     this.exemptionDetails = {
       ...this.exemptionDetails,
       ...formValue.getValues(),
-      isFullExempted: 1
+      isFullExempted: true
     };
 
   }

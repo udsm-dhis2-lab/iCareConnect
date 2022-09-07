@@ -60,7 +60,7 @@ export class EncountersService {
       }));
   }
 
-  updateEncounter(encounter): Observable<any> {
+updateEncounter(encounter): Observable<any> {
     return from(this.API.encounter.updateEncounter(encounter.uuid, encounter)).pipe(
       map((encounter) => {return encounter})
     )

@@ -130,10 +130,14 @@ export class ExemptionComponent implements OnInit, AfterContentInit {
     
   }
 
-  onDiscountBill(exemptionDetails): void {
+  onDiscountBill(exemptionDetails: any, params: any): void {
     if (exemptionDetails) {
       const { bill, discountDetails, patient } = exemptionDetails;
       this.store.dispatch(discountBill({ bill, discountDetails, patient }));
+    }
+
+    if(params){
+      this.updateOrderInExemptionEncounter(params?.currentVisit?.encounters, params?.exemptionEncounterType)
     }
   }
 
@@ -165,7 +169,7 @@ export class ExemptionComponent implements OnInit, AfterContentInit {
 
         exemptionEncounter = {
           uuid: exemptionEncounter?.uuid,
-          void: 1,
+          voided: true,
           voidReason: reason
         }
 
@@ -182,17 +186,24 @@ export class ExemptionComponent implements OnInit, AfterContentInit {
           error: (error) => {
             console.log("==> Failed to update order: ", error)
           }
+          
         })
-
-        this.encounterService.updateEncounter(exemptionEncounter)
-      }
+        //Update Encounter Order after Succesfully exempting this person
+      this.updateOrderInExemptionEncounter(params?.currentVisit?.encounters, params?.exemptionEncounterType)
+      this.encounterService.updateEncounter(exemptionEncounter).subscribe({
+        next: (encounter) => {
+          console.log("==> Successfully updated encounter: ", encounter);
+        },
+        error: (error) => {
+          console.log("==> Failed to update encounter: ", error);
+        }
+      })
+      
+    }
     });
   }
 
-  exemptFull(params){
-    let exemptionEncounter = this.getCurrentExemptionEncounter(params?.currentVisit?.encounters, params?.exemptionEncounterType);
-    let exemptionOrder = exemptionEncounter.orders[0];
-
+  exemptFull(params){ 
     this.criteriaObject = {
       id: this.criteria['display'],
       key: this.criteria['display'],
@@ -232,32 +243,36 @@ export class ExemptionComponent implements OnInit, AfterContentInit {
 
     dialog.afterClosed().subscribe((data) => {
       if(data?.confirmed){
-        //Update Encounter Order after Succesfully exempting this person
-        exemptionOrder = {
-          ...exemptionOrder,
-          fulfillerStatus: 'RECEIVED',
-          encounter: exemptionOrder?.encounter?.uuid,
-        };
-
-        exemptionOrder = {
-          uuid: exemptionOrder?.uuid,
-          fulfillerStatus: exemptionOrder?.fulfillerStatus,
-          encounter: exemptionOrder?.encounter
-        }
-        this.ordersService.updateOrdersViaEncounter([exemptionOrder]).subscribe({
-          next: (order) => {
-            console.log("==> Order updated successfully: ", order)
-          },
-          error: (error) => {
-            console.log("==> Failed to update order: ", error)
-          }
-        })
-
         // Discount Creation
-        this.onDiscountBill(data?.exemptionDetails);
+        this.onDiscountBill(data?.exemptionDetails, params);
       }
 
     });
+  }
+
+  updateOrderInExemptionEncounter(encounters: any[], exemptionEncounterType: any){
+    let exemptionEncounter = this.getCurrentExemptionEncounter(encounters, exemptionEncounterType);
+    let exemptionOrder = exemptionEncounter.orders[0];
+
+    exemptionOrder = {
+      ...exemptionOrder,
+      fulfillerStatus: 'RECEIVED',
+      encounter: exemptionOrder?.encounter?.uuid,
+    };
+
+    exemptionOrder = {
+      uuid: exemptionOrder?.uuid,
+      fulfillerStatus: exemptionOrder?.fulfillerStatus,
+      encounter: exemptionOrder?.encounter
+    }
+    this.ordersService.updateOrdersViaEncounter([exemptionOrder]).subscribe({
+      next: (order) => {
+        console.log("==> Order updated successfully: ", order)
+      },
+      error: (error) => {
+        console.log("==> Failed to update order: ", error)
+      }
+    })
   }
 
 }
