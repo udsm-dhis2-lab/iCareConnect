@@ -8,6 +8,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.openmrs.Concept;
 import org.openmrs.Patient;
+import org.openmrs.api.context.Context;
 import org.openmrs.module.icare.billing.models.Discount;
 import org.openmrs.module.icare.billing.models.Invoice;
 import org.openmrs.module.icare.billing.models.Payment;
@@ -109,15 +110,16 @@ public class BillingControllerTest {
 	//@DisplayName("Creating an invoice")
 	public void testDiscountingInvoice2() throws Exception {
 		
+		//Context.getAdministrationService().getSystemVariables().put("ATTACHMENT_DIRECTORY","/tmp/attachment");
 		InputStream in = getClass().getClassLoader().getResourceAsStream("lab-data.xml");
 		System.out.println(in);
 		
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		//System.out.println(out);
+		System.out.println(out);
 		IOUtils.copy(in, out);
 		//When
-		Map<String, Object> discount2 = billingController.onPostDiscountInvoiceMap(new MockMultipartFile("document",
-		        "lab-data.xml", "application/xml", out.toByteArray()));
+		String discount2 = billingController.onPostDiscountInvoiceMap(new MockMultipartFile("document", "form2B-A.html",
+		        "application/xml", out.toByteArray()));
 		
 	}
 }
