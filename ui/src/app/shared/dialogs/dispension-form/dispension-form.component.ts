@@ -2,6 +2,7 @@ import { Component, Inject, OnInit } from "@angular/core";
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { select, Store } from "@ngrx/store";
 import { Observable } from "rxjs";
+import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
 import { DrugOrderError } from "src/app/shared/resources/order/constants/drug-order-error.constant";
 import {
@@ -14,6 +15,7 @@ import { Visit } from "src/app/shared/resources/visits/models/visit.model";
 import { loadActiveVisit } from "src/app/store/actions/visit.actions";
 import { AppState } from "src/app/store/reducers";
 import { getLocationsByTagName } from "src/app/store/selectors";
+import { OrdersService } from "../../resources/order/services/orders.service";
 
 @Component({
   selector: "app-dispension-form",
@@ -31,10 +33,16 @@ export class DispensingFormComponent implements OnInit {
   savedOrder: DrugOrder;
   dispensingLocations$: Observable<any>;
   countOfDispensingFormFieldsWithValues: number = 0;
+  generalPrescriptionOrderType$: Observable<any>;
+  generalPrescriptionEncounterType$: Observable<any>;
+  useGeneralPrescription$: Observable<any>;
+  orderFrequencies$: Observable<any>;
 
   constructor(
     private drugOrderService: DrugOrdersService,
+    private orderService: OrdersService,
     private dialogRef: MatDialogRef<DispensingFormComponent>,
+    private systemSettingsService: SystemSettingsService,
     private store: Store<AppState>,
     @Inject(MAT_DIALOG_DATA)
     public data: {
@@ -70,6 +78,11 @@ export class DispensingFormComponent implements OnInit {
     this.dispensingLocations$ = this.store.pipe(
       select(getLocationsByTagName, { tagName: "Dispensing Unit" })
     );
+
+    this.generalPrescriptionEncounterType$ = this.systemSettingsService.getSystemSettingsMatchingAKey("iCare.clinic.prescription.encounterType");
+    this.generalPrescriptionOrderType$ = this.systemSettingsService.getSystemSettingsMatchingAKey("iCare.clinic.prescription.orderType");
+    this.useGeneralPrescription$ = this.systemSettingsService.getSystemSettingsMatchingAKey("iCare.clinic.useGeneralPrescription");
+    this.orderFrequencies$ = this.orderService.getOrdersFrequencies();
   }
 
   onCancel(): void {
