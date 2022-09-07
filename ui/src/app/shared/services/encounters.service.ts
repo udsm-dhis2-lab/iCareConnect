@@ -60,6 +60,13 @@ export class EncountersService {
       }));
   }
 
+voidEncounter(encounter): Observable<any> {
+    return from(this.OpenmrsHttpClientService.delete(`encounter/${encounter.uuid}`)).pipe(
+      map((encounter) => {return encounter})
+    )
+  }
+
+
 updateEncounter(encounter): Observable<any> {
     return from(this.API.encounter.updateEncounter(encounter.uuid, encounter)).pipe(
       map((encounter) => {return encounter})
