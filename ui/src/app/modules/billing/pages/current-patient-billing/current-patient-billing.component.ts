@@ -60,6 +60,7 @@ export class CurrentPatientBillingComponent implements OnInit {
   bill: Bill;
   exemptionEncounterType$: Observable<any>;
   exemptionOrderType$: Observable<any>;
+  exemptionConcept$: Observable<any>;
   
   constructor(
     private route: ActivatedRoute,
@@ -183,6 +184,16 @@ export class CurrentPatientBillingComponent implements OnInit {
           return of(new MatTableDataSource([]));
         })
       );
+
+    //Get exemption Concept
+    this.exemptionConcept$ = this.systemSettingsService.getSystemSettingsMatchingAKey("icare.billing.exemption.concept").pipe(
+        tap((exemptionConcept) => {
+          return exemptionConcept[0];
+        }),
+        catchError((error) => {
+          return of(new MatTableDataSource([error]));
+        })
+      )
   }
 
   private _getPatientDetails() {
@@ -254,8 +265,8 @@ export class CurrentPatientBillingComponent implements OnInit {
           careSetting: !patientBillingDetails.visit?.isAdmitted
             ? "OUTPATIENT"
             : "INPATIENT",
-          patient: params.currentPatient?.id,
-          concept: "be767d14-db83-40af-8de3-4a2f4e158712",
+          patient: params?.currentPatient?.id,
+          concept: params?.exemptionConcept[0].value,
           orderer: params.provider?.uuid,
           type: "order"
         },

@@ -1,7 +1,7 @@
 import { Component, OnInit, AfterContentInit } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { MatTableDataSource } from "@angular/material/table";
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { select, Store } from '@ngrx/store';
 import * as _ from "lodash";
 import { Observable, of } from 'rxjs';
@@ -13,7 +13,7 @@ import { OrdersService } from "src/app/shared/resources/order/services/orders.se
 import { Patient } from 'src/app/shared/resources/patient/models/patient.model';
 import { PatientService } from 'src/app/shared/resources/patient/services/patients.service';
 import { EncountersService } from "src/app/shared/services/encounters.service";
-import { loadCurrentPatient } from 'src/app/store/actions';
+import { go, loadCurrentPatient } from 'src/app/store/actions';
 import { discountBill } from "src/app/store/actions/bill.actions";
 import { AppState } from 'src/app/store/reducers';
 import {
@@ -60,11 +60,16 @@ export class ExemptionComponent implements OnInit, AfterContentInit {
   criteriaObject: any;
   exemptionForm: any;
   exemptionEncounterType$: any;
-
+  exemptionConcept$: Observable<any>;
+  bills: any;
+  billsCount: any;
+  showActionButtons: boolean;
+  
   constructor(
     private store: Store<AppState>,
     private patientService: PatientService,
     private route: ActivatedRoute,
+    private router: Router,
     private billingService: BillingService,
     private systemSettingsService: SystemSettingsService,
     private dialog: MatDialog,
@@ -97,6 +102,8 @@ export class ExemptionComponent implements OnInit, AfterContentInit {
       this.criteria = criteria.results[0]
     });
 
+
+
     // Get exemption encounter Type
     this.exemptionEncounterType$ = this.systemSettingsService
       .getSystemSettingsMatchingAKey("icare.billing.exemption.encounterType")
@@ -106,9 +113,18 @@ export class ExemptionComponent implements OnInit, AfterContentInit {
         }),
         catchError((error) => {
           console.log("Error occured while trying to get orderType: ", error);
-          return of(new MatTableDataSource([]));
+          return of(new MatTableDataSource([error]));
         })
       );
+    
+      this.exemptionConcept$ = this.systemSettingsService.getSystemSettingsMatchingAKey("icare.billing.exemption.concept").pipe(
+        tap((exemptionConcept) => {
+          return exemptionConcept[0];
+        }),
+        catchError((error) => {
+          return of(new MatTableDataSource([error]));
+        })
+      )
 
   }
 
@@ -130,7 +146,7 @@ export class ExemptionComponent implements OnInit, AfterContentInit {
     
   }
 
-  onDiscountBill(exemptionDetails: any, params: any): void {
+  onDiscountBill(exemptionDetails: any, params?: any): void {
     if (exemptionDetails) {
       const { bill, discountDetails, patient } = exemptionDetails;
       this.store.dispatch(discountBill({ bill, discountDetails, patient }));
@@ -145,16 +161,6 @@ export class ExemptionComponent implements OnInit, AfterContentInit {
     e.stopPropagation();
   }
 
-
-  getCurrentExemptionEncounter(encounters: any[], encounterType: any){
-    encounters.filter((encounter) => {
-      if(encounter?.encounterType?.uuid === encounterType?.value){
-        return encounter
-      }
-    });
-    return encounters[0];
-  }
-
   exemptionDenial(params) {
     const dialog = this.dialog.open(ExemptionDenialComponent, {
       width: "25%",
@@ -165,40 +171,12 @@ export class ExemptionComponent implements OnInit, AfterContentInit {
       if(data){
         let exemptionEncounter = this.getCurrentExemptionEncounter(params?.currentVisit?.encounters, params?.exemptionEncounterType);
         let reason = data.reason
-        let exemptionOrder = exemptionEncounter.orders[0];
 
-        exemptionEncounter = {
-          uuid: exemptionEncounter?.uuid,
-          voided: true,
-          voidReason: reason
-        }
-
-        exemptionOrder = {
-          uuid: exemptionOrder?.uuid,
-          fulfillerStatus: exemptionOrder?.fulfillerStatus,
-          encounter: exemptionOrder?.encounter
-        }
-
-        this.ordersService.updateOrdersViaEncounter([exemptionOrder]).subscribe({
-          next: (order) => {
-            console.log("==> Order updated successfully: ", order)
-          },
-          error: (error) => {
-            console.log("==> Failed to update order: ", error)
-          }
-          
-        })
-        //Update Encounter Order after Succesfully exempting this person
-      this.updateOrderInExemptionEncounter(params?.currentVisit?.encounters, params?.exemptionEncounterType)
-      this.encounterService.updateEncounter(exemptionEncounter).subscribe({
-        next: (encounter) => {
-          console.log("==> Successfully updated encounter: ", encounter);
-        },
-        error: (error) => {
-          console.log("==> Failed to update encounter: ", error);
-        }
-      })
-      
+        console.log("==> Denial Reason: ", reason);
+        
+      //Update Encounter Order after Succesfully exempting this person
+      this.updateOrderInExemptionEncounter(params?.currentVisit?.encounters, params?.exemptionEncounterType, reason, true)
+      this.router.navigateByUrl('/billing/exemption')
     }
     });
   }
@@ -234,7 +212,7 @@ export class ExemptionComponent implements OnInit, AfterContentInit {
         bills: params?.bills, 
         exemptionMessage: {
           heading: `Fully exempt ${params?.currentPatient?.patient?.person?.display}`, 
-          message: "This is to confirm that you are about to confirm exempting this person in fully including the above items. Click Confirm to process the exemption."
+          message: "This is to confirm that you are about to confirm exempting this person in fully including all of the above items. Click Confirm to process the exemption."
         },
         form: this.exemptionForm,
         patient: params?.currentPatient
@@ -245,12 +223,22 @@ export class ExemptionComponent implements OnInit, AfterContentInit {
       if(data?.confirmed){
         // Discount Creation
         this.onDiscountBill(data?.exemptionDetails, params);
+        this.router.navigateByUrl('/billing/exemption')
       }
-
     });
   }
 
-  updateOrderInExemptionEncounter(encounters: any[], exemptionEncounterType: any){
+
+  getCurrentExemptionEncounter(encounters: any[], encounterType: any){
+    encounters.filter((encounter) => {
+      if(encounter?.encounterType?.uuid === encounterType?.value){
+        return encounter
+      }
+    });
+    return encounters[0];
+  }
+
+  updateOrderInExemptionEncounter(encounters: any[], exemptionEncounterType: any, commentToFulfiller?: string, voidEncounter?: boolean){
     let exemptionEncounter = this.getCurrentExemptionEncounter(encounters, exemptionEncounterType);
     let exemptionOrder = exemptionEncounter.orders[0];
 
@@ -258,21 +246,40 @@ export class ExemptionComponent implements OnInit, AfterContentInit {
       ...exemptionOrder,
       fulfillerStatus: 'RECEIVED',
       encounter: exemptionOrder?.encounter?.uuid,
+      fulfillerComment: commentToFulfiller
     };
 
     exemptionOrder = {
       uuid: exemptionOrder?.uuid,
       fulfillerStatus: exemptionOrder?.fulfillerStatus,
-      encounter: exemptionOrder?.encounter
+      fulfillerComment: exemptionOrder?.fulfillerComment,
+      encounter: exemptionOrder?.encounter,
     }
     this.ordersService.updateOrdersViaEncounter([exemptionOrder]).subscribe({
       next: (order) => {
-        console.log("==> Order updated successfully: ", order)
+        return order;
       },
       error: (error) => {
-        console.log("==> Failed to update order: ", error)
+        return error;
       }
     })
+
+    //Update encounter to void if voidEncounter True
+    if (voidEncounter === true) {
+      this.encounterService.voidEncounter(exemptionEncounter).subscribe({
+          next: (encounter) => {
+            console.log("==> Successfully updated encounter: ", encounter);
+          },
+          error: (error) => {
+            console.log("==> Failed to update encounter: ", error);
+          }
+        })
+    }
+
+  }
+
+  onShowActionButtons(e: any){
+    this.showActionButtons = true;
   }
 
 }

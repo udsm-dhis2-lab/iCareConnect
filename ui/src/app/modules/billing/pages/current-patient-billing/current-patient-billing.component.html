@@ -6,7 +6,8 @@
     provider: provider$ | async,
     currentUser: currentUser$ | async,
     exemptionEncounterType: exemptionEncounterType$ | async,
-    exemptionOrderType: exemptionOrderType$ | async
+    exemptionOrderType: exemptionOrderType$ | async,
+    exemptionConcept: exemptionConcept$ | async
   } as params">
 
   <mat-progress-bar mode="indeterminate" *ngIf="loading || !params?.currentPatient"></mat-progress-bar>
@@ -17,6 +18,9 @@
     </div>
     <div class="alert alert-danger mt-2" role="alert" *ngIf="!params?.exemptionEncounterType[0]?.value">
       Missing Icare Exemption Configurations. Please set "icare.billing.exemption.encounterType" or Contact IT
+    </div>
+    <div class="alert alert-danger mt-2" role="alert" *ngIf="!params?.exemptionConcept[0]?.value">
+      Missing Icare Exemption Configurations. Please set "icare.billing.exemption.concept" or Contact IT
     </div>
   <!-- End Alerts -->
 

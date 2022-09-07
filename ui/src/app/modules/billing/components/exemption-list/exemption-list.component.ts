@@ -16,6 +16,7 @@ export class ExemptionListComponent implements OnInit {
 
   @Output() discountBill = new EventEmitter();
   @Output() updateBillDiscount = new EventEmitter();
+  @Output() showActionButtons = new EventEmitter();
 
   criteriaResults$: Observable<any>;
 
@@ -25,6 +26,7 @@ export class ExemptionListComponent implements OnInit {
     this.criteriaResults$ = this.billingService.discountCriteriaConcept();
     this.bills = this.bills.filter((bill) => {
       if(bill?.items && bill?.items.length > 0){
+        this.showActionButtons.emit();
         return bill
       }
     })
