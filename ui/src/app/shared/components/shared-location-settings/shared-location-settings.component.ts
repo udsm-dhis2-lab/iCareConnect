@@ -45,7 +45,7 @@ export class SharedLocationSettingsComponent implements OnInit {
   }
 
   openModal(event: Event, locationTag: any, parentLocation: LocationGet): void {
-    event.stopPropagation();
+    // event.stopPropagation();
     this.dialog
       .open(ManageLocationModalComponent, {
         width: "40%",
@@ -65,6 +65,29 @@ export class SharedLocationSettingsComponent implements OnInit {
     event.stopPropagation();
     this.page = actionType === "next" ? this.page + 1 : this.page - 1;
     this.getLocations();
+  }
+
+  onEdit(event: Event, location: LocationGet): void {
+    this.locationService
+      .getLocationById(location?.uuid)
+      .subscribe((response) => {
+        if (response) {
+          console.log(response);
+          this.dialog
+            .open(ManageLocationModalComponent, {
+              width: "40%",
+              data: {
+                edit: true,
+                location: response,
+                locationTags: this.locationTags,
+              },
+            })
+            .afterClosed()
+            .subscribe(() => {
+              this.getLocations();
+            });
+        }
+      });
   }
 
   onDelete(event: Event, locationUuid: string): void {
