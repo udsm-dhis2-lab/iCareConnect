@@ -5,11 +5,18 @@ import { OpenmrsHttpClientService } from "src/app/shared/modules/openmrs-http-cl
 import { Api, ObsCreate, ObsGetFull, ObsUpdate } from "../../openmrs";
 import { Observation } from "../models/observation.model";
 
+import { omit } from "lodash";
+import { HttpClient } from "@angular/common/http";
+
 @Injectable({
   providedIn: "root",
 })
 export class ObservationService {
-  constructor(private api: Api, private httpClient: OpenmrsHttpClientService) {}
+  constructor(
+    private api: Api,
+    private httpClient: OpenmrsHttpClientService,
+    private http: HttpClient
+  ) {}
 
   create(observation: ObsCreate): Observable<Observation> {
     return from(this.api.obs.createObs(observation)).pipe(
@@ -41,7 +48,27 @@ export class ObservationService {
   }
 
   saveEncounterWithObsDetails(data): Observable<any> {
-    return this.httpClient.post("encounter", data);
+    return this.httpClient.post("encounter", omit(data, "fileObs"));
+  }
+
+  saveObsDetailsForFiles(data): Observable<any> {
+    return zip(
+      ...data?.map((obsItem) => {
+        let formData = new FormData();
+        const jsonData = omit(obsItem, "file");
+        formData.append("json", JSON.stringify(jsonData));
+        formData.append("file", obsItem?.file);
+        // TODO: Find a way to save using the custom httpClientService module
+        return this.http
+          .post(` ../../../openmrs/ws/rest/v1/obs`, formData)
+          .pipe(
+            map((response) => {
+              console.log("FILEresponse", response);
+              return response;
+            })
+          );
+      })
+    ).pipe(map((response) => response));
   }
 
   getObservationsByPatientUuid(patientUuid: string): Observable<ObsGetFull[]> {

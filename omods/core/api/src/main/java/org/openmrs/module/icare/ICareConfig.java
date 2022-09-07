@@ -80,4 +80,8 @@ public class ICareConfig {
 	public static final String STOCK_LOCATIONS = "icare.stock.locations";
 	
 	public static final String MESSAGE_PHONE_NUMBER = "icare.notification.message.phoneNumber";
+	
+	public static final String EXEMPTION_REQUEST_ENCOUNTER_TYPE = "icare.encounters.exemption";
+	
+	public static final String EXEMPTION_REQUEST_ORDER_TYPE = "icare.orders.standard.exemption";
 }

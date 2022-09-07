@@ -50,7 +50,7 @@ public class InvoiceDAO extends BaseDAO<Invoice> {
 	
 	public List<Invoice> findByPatientUuidAndPending(String patientUuid) {
 		DbSession session = this.getSession();
-		//TODO consider discount calculation
+		//TODO consider discount calculation(done)
 		String queryStr = "SELECT invoice FROM Invoice invoice WHERE \n"
 		        + "invoice.visit.patient.uuid = :patientUuid \n"
 		        + "AND (SELECT SUM(item.price*item.quantity) FROM InvoiceItem item WHERE item.id.invoice = invoice) \n"

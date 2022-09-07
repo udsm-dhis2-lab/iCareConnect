@@ -208,18 +208,20 @@
 
     <item item_id="123" unit="Data" uuid="8o00d43570-8y37-11f3-1234-08002007777" concept_id="1003" date_created="2020-12-27 00:00:00" voided="false" creator="1" stockable="true"/>
     <!--<st_device_type device_type_id="22" uuid="2msir5eb-5345-11e8-9c7c-40b034c3cfee" name="lab_device_"/>-->
+    <item item_id="124" unit="Data" uuid="8o00d43570-8y37-11f3-1234-08002007779" concept_id="1003" date_created="2020-12-27 00:00:00" voided="false" creator="1" stockable="true"/>
 
     <!-- Invoice -->
     <bl_invoice invoice_id="11" visit_id="10" payment_mode_id="1003" uuid="298b75eb-er45-12e8-9c7cs" creator="1" voided="0" date_created="2020-12-27 00:00:00" />
     <!-- Invoice Item-->
     <bl_invoice_item order_id="301" invoice_id="11" item_id="123" quantity="1" price="100" />
+    <bl_invoice_item order_id="301" invoice_id="11" item_id="124" quantity="1" price="10" />
 
     <!--Payment-->
     <bl_payment payment_id="1" uuid="98b75eb-er45-12e8-9c7cs" invoice_id="11" reference_number="abc123" payment_type_id="500" received_by="abc" date_created="2020-12-27 00:00:00" voided="0" creator="1" />
-    <bl_payment_item order_id="301" item_id="123" amount="90" payment_id="1" />
+    <bl_payment_item order_id="301" item_id="123" amount="50" payment_id="1" />
 
     <!--Discount -->
     <bl_discount discount_id="1" uuid="8b75eb-er45-12e8" discount_criteria_id="500" patient_id="1000" creator="1" date_created="2020-12-27 00:00:00" voided="0" />
-    <bl_discount_invoice_item discount_id="1" invoice_id="11" item_id="123" amount="10" />
+    <bl_discount_invoice_item discount_id="1" invoice_id="11" item_id="123" amount="60" />
 
 </dataset>
