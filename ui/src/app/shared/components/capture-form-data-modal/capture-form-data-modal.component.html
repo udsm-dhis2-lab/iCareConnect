@@ -1,8 +1,6 @@
 <ng-container
   *ngIf="{
     form: form$ | async,
-    provider: provider$ | async,
-    visit: currentVisit$ | async,
     savingObservations: savingObservations$ | async,
     observations: observations$ | async
   } as params"
@@ -19,9 +17,13 @@
         <mat-icon>close</mat-icon>
       </button>
     </mat-toolbar>
-    <mat-dialog-content *ngIf="params?.form && params?.observations">
+    <mat-dialog-content
+      class="mt-2 ml-1 mr-1"
+      *ngIf="params?.form && params?.observations"
+    >
       <app-capture-form-data
         [form]="params?.form"
+        [visit]="visit"
         [observations]="params?.observations"
         (formDataUpdate)="onFormUpdate($event, params?.form)"
       ></app-capture-form-data>
@@ -30,7 +32,7 @@
       *ngIf="!params?.form || !params?.observations"
       mode="indeterminate"
     ></mat-progress-bar>
-    <mat-dialog-actions align="end">
+    <mat-dialog-actions align="end" class="mb-2 ml-2 mr-2">
       <button mat-stroked-button (click)="onClose($event)">Cancel</button>
       <button
         mat-flat-button
