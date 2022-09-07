@@ -140,6 +140,7 @@ export class VisitsService {
   }
 
   getPatientsVisitsNotes(patientUuid, conceptUuid) {
+    console.log("HEREEEEe");
     let url =
       BASE_URL +
       `obs?patient=${patientUuid}&v=custom:(encounter:(visit,location:(uuid,display),obs:(uuid,display,obsDatetime,concept:(display),groupMembers:(uuid,display,concept,value,groupMembers:(uuid,concept:(display),value)))))&concept=${conceptUuid}`;
