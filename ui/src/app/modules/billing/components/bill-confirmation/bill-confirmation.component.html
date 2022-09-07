@@ -72,7 +72,7 @@
   <button
     data-test="generate-control-number-button"
     [disabled]="generatingControlNumber"
-    *ngIf="data?.paymentType?.code === 'GePG'"
+    *ngIf="data?.paymentType?.code === 'GePG' && !controlNumber"
     mat-flat-button
     color="primary"
     (click)="onGenerateControlNumber($event)"
@@ -80,4 +80,9 @@
   >
     {{ generatingControlNumber ? "Generating..." : "Get Control number" }}
   </button>
+  
+  <app-print-button *ngIf="data?.paymentType?.code === 'GePG' && controlNumber" [iconName]="'print'" [toolTipText]="'Click to print control number'" [showText]="'Print Control Number'"
+    [classesList]="['float-right', 'button', 'mr-5']"
+    [ElementToBePrinted]="{ControlNumber: controlNumber, CurrentPatient: data?.currentPatient, FacilityDetails: facilityDetailsJson}"
+    (print)="onPrint($event)"></app-print-button>
 </mat-dialog-actions>
