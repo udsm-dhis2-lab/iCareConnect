@@ -3,6 +3,7 @@ package org.openmrs.module.icare.web.controller;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.joda.time.DateTime;
+import org.openmrs.api.context.Context;
 import org.openmrs.module.icare.billing.models.Discount;
 import org.openmrs.module.icare.billing.models.Invoice;
 import org.openmrs.module.icare.billing.models.Payment;
@@ -112,21 +113,26 @@ public class BillingController extends BaseController {
 	
 	@RequestMapping(value = "discount", method = RequestMethod.POST)
 	@ResponseBody
-	public Map<String, Object> onPostDiscountInvoiceMap(@RequestParam("document") MultipartFile file
-	//, @RequestParam("json") Discount discount
+	public String onPostDiscountInvoiceMap(@RequestParam(value = "document", required = false) MultipartFile file, @RequestParam("json") Discount discount
 	) throws Exception {
 		
 		//File upload implementation
-		Path Path_Directory = Paths.get("/tmp/documents");
-		//Files.copy(file.getInputStream(), Paths.get(Path_Directory+ File.separator+file.getOriginalFilename()), StandardCopyOption.REPLACE_EXISTING);
-		Path filePath = Path_Directory.resolve(file.getName());
-		Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+		//		Path Path_Directory = Paths.get("../resources/DocumentsUploads");
+		//		Path filePath = Path_Directory.resolve(file.getName());
+		//		Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+		//		String dateTime = DateTime.now().toString("yyyyMMddHHmmss");
+		//		String fileNameToSave = dateTime.concat(file.getName());
+		
+		String filePath = "/home/kiba/Documents/icare/omods/core/api/src/main/resources/DocumentsUploads/";
 		String dateTime = DateTime.now().toString("yyyyMMddHHmmss");
-		String fileNameToSave = dateTime.concat(file.getName());
+		String fileNameToSave = dateTime.concat(file.getOriginalFilename());
+		String path = filePath + fileNameToSave;
+		file.transferTo(new File(path));
+		
 		//discount.setAttachmentId(fileNameToSave);
 		
-		Discount newDiscount = new Discount();//this.onPostDiscountInvoice(discount);
-		return newDiscount.toMap();
+		this.onPostDiscountInvoice(discount);
+		return "uploaded";
 	}
 	
 	public Discount onPostDiscountInvoice(Discount discount) throws Exception {
