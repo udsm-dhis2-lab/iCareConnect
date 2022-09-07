@@ -531,6 +531,14 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		Map patientMap2 = (new ObjectMapper()).readValue(PatientData2, Map.class);
 		List<Map> visitDetails2 = (List<Map>) patientMap2.get("results");
 		assertThat("Should return a patient", visitDetails2.size() == 1);
+
+
+		newGetRequest = newGetRequest("icare/patient", new Parameter("limit", "1"),new Parameter("startIndex", "0"));
+		handle = handle(newGetRequest);
+		String PatientData3 = handle.getContentAsString();
+		Map patientMap3 = (new ObjectMapper()).readValue(PatientData3, Map.class);
+		List<Map> visitDetails3 = (List<Map>) patientMap3.get("results");
+		assertThat("Should return a patient", visitDetails3.size() == 1);
 		
 	}
 	
