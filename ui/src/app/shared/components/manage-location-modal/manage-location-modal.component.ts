@@ -37,6 +37,8 @@ export class ManageLocationModalComponent implements OnInit {
   ngOnInit(): void {
     this.selectedTags[this.dialogData?.locationTag?.uuid] =
       this.dialogData?.locationTag?.uuid;
+
+    // if (this.dialogData?.location?.)
     this.locationFields = [
       new Textbox({
         id: "displayName",
@@ -73,8 +75,8 @@ export class ManageLocationModalComponent implements OnInit {
             {
               key: serviceAttribute?.value,
               value: serviceAttribute?.value,
-              label: "",
-              name: "",
+              label: "Test",
+              name: "Test",
             },
           ]
         : [],
