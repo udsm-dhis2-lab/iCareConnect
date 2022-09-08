@@ -10,6 +10,7 @@ import {
   getLabOrderVoidingState,
 } from "src/app/store/selectors";
 import { FormValue } from "../../modules/form/models/form-value.model";
+import { InvestigationProcedureService } from "../../resources/investigation-procedure/services/investigation-procedure.service";
 import { Visit } from "../../resources/visits/models/visit.model";
 import { DeleteConfirmationComponent } from "../delete-confirmation/delete-confirmation.component";
 
@@ -44,7 +45,11 @@ export class OrderResultsRendererComponent implements OnInit {
   voidingLabOrderState$: Observable<boolean>;
 
   isFormValid: boolean = false;
-  constructor(private store: Store<AppState>, private dialog: MatDialog) {}
+  constructor(
+    private store: Store<AppState>, 
+    private dialog: MatDialog,
+    private investigationPrecedureService: InvestigationProcedureService
+  ) {}
 
   ngOnInit(): void {
     this.testSetMembersKeyedByConceptUuid = keyBy(
