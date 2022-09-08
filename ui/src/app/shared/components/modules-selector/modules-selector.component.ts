@@ -51,13 +51,15 @@ export class ModulesSelectorComponent implements OnInit {
         ? JSON.parse(localStorage.getItem("currentLocation"))
         : null;
     if (storedNavigationDetails) {
-      this.currentLocation = {
-        ...locationMatchingNavigationDetails,
-        id: locationMatchingNavigationDetails?.uuid,
-        ...this.locations.filter(
-          (loc) => loc?.uuid === storedLocation?.uuid || []
-        )[0],
-      };
+      this.currentLocation = !storedLocation
+        ? {
+            ...locationMatchingNavigationDetails,
+            id: locationMatchingNavigationDetails?.uuid,
+            ...this.locations.filter(
+              (loc) => loc?.uuid === storedLocation?.uuid || []
+            )[0],
+          }
+        : storedLocation;
 
       this.store.dispatch(
         setCurrentUserCurrentLocation({ location: this.currentLocation })
