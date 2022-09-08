@@ -46,18 +46,13 @@ export class PatientSearchComponent implements OnInit {
           this.showList = true;
         })
       );
-      
-    }
-  }
-
-  onFocus(e){
-      if(e){
+      if(e.target.value.length > 0) {
         this.focused=true;
       }
       else this.focused=false;
+    }
   }
-
-  onSelectPatient(e, patient: Patient): void {
+   onSelectPatient(e, patient: Patient): void {
     e.stopPropagation();
     this.showList = false;
     this.store.dispatch(addCurrentPatient({ patient }));
