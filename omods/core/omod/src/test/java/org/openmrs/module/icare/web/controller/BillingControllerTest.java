@@ -109,6 +109,24 @@ public class BillingControllerTest {
 	@Test
 	//@DisplayName("Creating an invoice")
 	public void testDiscountingInvoice2() throws Exception {
+
+		//Given
+		Discount discount = new Discount();
+
+		Concept criteria = new Concept();
+		discount.setCriteria(criteria);
+
+		Patient patient = new Patient();
+		patient.setPersonId(1);
+		discount.setPatient(patient);
+
+		when(billingService.discountInvoice(discount)).thenReturn(discount);
+
+		//When
+		Discount discount2 = billingController.onPostDiscountInvoice(discount);
+
+		//Then
+		verify(billingService).discountInvoice(discount);
 		
 		//Context.getAdministrationService().getSystemVariables().put("ATTACHMENT_DIRECTORY","/tmp/attachment");
 		InputStream in = getClass().getClassLoader().getResourceAsStream("lab-data.xml");
@@ -119,16 +137,16 @@ public class BillingControllerTest {
 		IOUtils.copy(in, out);
 		//When
 
-		Discount discount = new Discount();
-		Concept criteria = new Concept();
-		criteria.setUuid("123");
-		discount.setCriteria(criteria);
+//		Discount discount = new Discount();
+//		Concept criteria = new Concept();
+//		criteria.setUuid("123");
+//		discount.setCriteria(criteria);
+//
+//		Patient patient = new Patient();
+//		patient.setPersonId(1);
+//		discount.setPatient(patient);
 
-		Patient patient = new Patient();
-		patient.setPersonId(1);
-		discount.setPatient(patient);
-
-		Map<String, Object> discount2 = billingController.onPostDiscountInvoiceMap(new MockMultipartFile("document", "lab-data.xml",
+		Map<String, Object> discount4 = billingController.onPostDiscountInvoiceMap(new MockMultipartFile("document", "lab-data.xml",
 		        "application/xml", out.toByteArray()),discount);
 
 		
