@@ -232,10 +232,10 @@ export class RegistrationAddComponent implements OnInit {
     //console.log("formValues", formValues)
     //console.log(this.registrationFormConfigsKeyedByProperty)
 
-    this.patient.occupation =
+    /* this.patient.occupation =
       formValues[
         this.registrationFormConfigsKeyedByProperty["occupation"]?.value
-      ].value;
+      ].value; */
     this.patient.maritalStatus =
        formValues[
          this.registrationFormConfigsKeyedByProperty["maritalStatus"]?.value
