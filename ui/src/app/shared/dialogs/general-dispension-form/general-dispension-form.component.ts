@@ -126,6 +126,7 @@ export class GeneralDispensingFormComponent implements OnInit {
 
   
   saveOrder(e: any){
+    console.log("==> Form Values: ", this.formValues);
     
     let encounterObject = {
         patient: this.currentPatient?.id,
@@ -155,44 +156,42 @@ export class GeneralDispensingFormComponent implements OnInit {
           // {
           //   person: this.currentPatient?.id,
           //   concept: this.formValues["frequency"].value,
-          //   obsDatetime: new Date().toISOString(),
+          //   obsDatetime: new Date().toISOString().replace('Z', '+0000',
           //   value: this.formValues["frequency"].value,
           // },
           // {
           //   person: this.currentPatient?.id,
           //   concept: "4564644f-2099-4c91-ba26-3d44edef9591",
-          //   obsDatetime: new Date().toISOString(),
+          //   obsDatetime: new Date().toISOString().replace('Z', '+0000',
           //   value: this.formValues["dose"].value.toString()
           // },
           // {
           //   person: this.currentPatient?.id,
           //   concept: "a77fedfa-d9ff-4966-ae21-ecb39d750e76",
-          //   obsDatetime: new Date().toISOString(),
+          //   obsDatetime: new Date().toISOString().replace('Z', '+0000',
           //   value: this.formValues["duration"].value.toString(),
           // },
           // {
           //   person: this.currentPatient?.id,
           //   concept: this.formValues["durationUnit"].value,
-          //   obsDatetime: new Date().toISOString(),
+          //   obsDatetime: new Date().toISOString().replace('Z', '+0000',
           //   value: this.formValues["durationUnit"].value
           // },
           // {
           //   person: this.currentPatient?.id,
           //   concept: this.formValues["dosingUnit"].value,
-          //   obsDatetime: new Date().toISOString(),
+          //   obsDatetime: new Date().toISOString().replace('Z', '+0000',
           //   value: this.formValues["dosingUnit"].value
           // },
-          // {
-          //   person: this.currentPatient?.id,
-          //   concept: this.formValues["route"].value,
-          //   obsDatetime: new Date().toISOString(),
-          //   value: this.formValues["route"].value
-          // }
+          {
+            person: this.currentPatient?.id,
+            concept: this.formValues["route"].value,
+            obsDatetime: new Date().toISOString().replace('Z', '+0000'),
+            value: this.formValues["route"].value
+          }
         ], 
         visit: this.currentVisit?.uuid,
     }
-
-    console.log("==> encounter object: ", encounterObject);
 
     this.ordersService.createOrdersViaCreatingEncounter(encounterObject).subscribe({
       next: (encounter) => {
