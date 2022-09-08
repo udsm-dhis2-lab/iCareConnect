@@ -133,7 +133,7 @@ export class LocationService {
 
   getLocationsByTagName(
     tagName: string,
-    parameters?: { limit?: number; startIndex?: number; v?: string }
+    parameters?: { limit?: number; startIndex?: number; v?: string; q?: string }
   ): Observable<any[]> {
     let othersParameters = "";
     if (parameters?.limit) {
