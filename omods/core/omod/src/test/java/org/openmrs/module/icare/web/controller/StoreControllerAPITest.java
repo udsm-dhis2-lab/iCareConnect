@@ -136,7 +136,7 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		Map<String, Object> ledger = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
 		MockHttpServletRequest newGetRequest = newGetRequest("store/ledgers");
 		MockHttpServletResponse handleGet = handle(newGetRequest);
-
+		
 		List<Map<String, Object>> ledgers = (new ObjectMapper()).readValue(handleGet.getContentAsString(), List.class);
 		
 		assertThat("Listing of requests has one request:", ledgers.size(), is(1));
