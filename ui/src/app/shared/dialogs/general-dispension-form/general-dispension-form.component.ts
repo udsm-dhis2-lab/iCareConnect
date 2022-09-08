@@ -1,4 +1,11 @@
-import { Component, EventEmitter, Inject, Input, OnInit, Output } from "@angular/core";
+import {
+  Component,
+  EventEmitter,
+  Inject,
+  Input,
+  OnInit,
+  Output,
+} from "@angular/core";
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { select, Store } from "@ngrx/store";
 import { Observable } from "rxjs";
@@ -50,28 +57,26 @@ export class GeneralDispensingFormComponent implements OnInit {
   countOfDispensingFormFieldsWithValues: number = 0;
   isFormValid: boolean;
   savingError: boolean = false;
-  
+
   drugConceptField: Dropdown;
   drugDurationField: Textbox;
   frequencyField: Dropdown;
   drugDoseField: Textbox;
 
-  @Output() dosingUnitsSettingsEvent: EventEmitter<any> = new EventEmitter()
-  @Output() durationUnitsSettingsEvent: EventEmitter<any> = new EventEmitter()
-  @Output() drugRoutesSettingsEvent: EventEmitter<any> = new EventEmitter()
+  @Output() dosingUnitsSettingsEvent: EventEmitter<any> = new EventEmitter();
+  @Output() durationUnitsSettingsEvent: EventEmitter<any> = new EventEmitter();
+  @Output() drugRoutesSettingsEvent: EventEmitter<any> = new EventEmitter();
 
   constructor(
     private drugOrderService: DrugOrdersService,
     private ordersService: OrdersService,
-    private store: Store<AppState>,
-  ) {
-  }
-  
+    private store: Store<AppState>
+  ) {}
+
   ngOnInit() {
-    
-    this.dosingUnitsSettingsEvent.emit(this.dosingUnitsSettings[0].value);
-    this.durationUnitsSettingsEvent.emit(this.durationUnitsSettings[0].value);
-    this.drugRoutesSettingsEvent.emit(this.drugRoutesSettings[0].value);
+    this.dosingUnitsSettingsEvent.emit(this.dosingUnitsSettings);
+    this.durationUnitsSettingsEvent.emit(this.durationUnitsSettings);
+    this.drugRoutesSettingsEvent.emit(this.drugRoutesSettings);
 
     this.drugConceptField = new Dropdown({
       id: "drug",
@@ -84,23 +89,22 @@ export class GeneralDispensingFormComponent implements OnInit {
       searchTerm: "ICARE_GENERIC_DRUG",
       shouldHaveLiveSearchForDropDownFields: true,
     });
-    
+
     this.drugDoseField = new Textbox({
       id: "dose",
       key: "dose",
       label: "Dose",
       required: true,
-      type: "number"
-    })
-    
+      type: "number",
+    });
+
     this.drugDurationField = new Textbox({
       id: "duration",
       key: "duration",
       label: "Duration",
       required: true,
-      type: "number"
-    })
-    
+      type: "number",
+    });
 
     this.frequencyField = new Dropdown({
       id: "frequency",
@@ -108,15 +112,14 @@ export class GeneralDispensingFormComponent implements OnInit {
       label: "Select Frequency",
       conceptClass: "Frequency",
       value: null,
-      options: this.orderFrequencies?.map((frequency)=> {
+      options: this.orderFrequencies?.map((frequency) => {
         return {
-            key: frequency?.uuid,
-            value: frequency?.uuid,
-            label: frequency?.display,
-          }
-      })
+          key: frequency?.uuid,
+          value: frequency?.uuid,
+          label: frequency?.display,
+        };
+      }),
     });
-    
   }
 
   onFormUpdate(formValues: FormValue): void {
@@ -124,86 +127,77 @@ export class GeneralDispensingFormComponent implements OnInit {
     this.formValues = { ...this.formValues, ...formValues.getValues() };
   }
 
-  
-  saveOrder(e: any){
-    
+  saveOrder(e: any) {
     let encounterObject = {
-        patient: this.currentPatient?.id,
-        encounterType: this.encounterType?.value,
-        location: this.currentLocation?.uuid,
-        encounterProviders: [
-          {
-            provider: this.provider?.uuid,
-            encounterRole: ICARE_CONFIG?.encounterRole?.uuid
-          },
-        ],
-        orders: [
-          {
-            orderType: this.orderType?.value,
-            action: "NEW",
-            urgency: "ROUTINE",
-            careSetting: !this.currentVisit?.isAdmitted
-              ? "OUTPATIENT"
-              : "INPATIENT",
-            patient: this.currentPatient?.id,
-            concept: this.formValues['drug'].value,
-            orderer: this.provider?.uuid,
-            type: "order"
-          }
-        ],
-        obs: [
-          // {
-          //   person: this.currentPatient?.id,
-          //   concept: this.formValues["frequency"].value,
-          //   obsDatetime: new Date().toISOString(),
-          //   value: this.formValues["frequency"].value,
-          // },
-          // {
-          //   person: this.currentPatient?.id,
-          //   concept: "4564644f-2099-4c91-ba26-3d44edef9591",
-          //   obsDatetime: new Date().toISOString(),
-          //   value: this.formValues["dose"].value.toString()
-          // },
-          // {
-          //   person: this.currentPatient?.id,
-          //   concept: "a77fedfa-d9ff-4966-ae21-ecb39d750e76",
-          //   obsDatetime: new Date().toISOString(),
-          //   value: this.formValues["duration"].value.toString(),
-          // },
-          // {
-          //   person: this.currentPatient?.id,
-          //   concept: this.formValues["durationUnit"].value,
-          //   obsDatetime: new Date().toISOString(),
-          //   value: this.formValues["durationUnit"].value
-          // },
-          // {
-          //   person: this.currentPatient?.id,
-          //   concept: this.formValues["dosingUnit"].value,
-          //   obsDatetime: new Date().toISOString(),
-          //   value: this.formValues["dosingUnit"].value
-          // },
-          // {
-          //   person: this.currentPatient?.id,
-          //   concept: this.formValues["route"].value,
-          //   obsDatetime: new Date().toISOString(),
-          //   value: this.formValues["route"].value
-          // }
-        ], 
-        visit: this.currentVisit?.uuid,
-    }
+      patient: this.currentPatient?.id,
+      encounterType: this.encounterType,
+      location: this.currentLocation?.uuid,
+      encounterProviders: [
+        {
+          provider: this.provider?.uuid,
+          encounterRole: ICARE_CONFIG?.encounterRole?.uuid,
+        },
+      ],
+      orders: [
+        {
+          orderType: this.orderType,
+          action: "NEW",
+          urgency: "ROUTINE",
+          careSetting: !this.currentVisit?.isAdmitted
+            ? "OUTPATIENT"
+            : "INPATIENT",
+          patient: this.currentPatient?.id,
+          concept: this.formValues["drug"].value,
+          orderer: this.provider?.uuid,
+          type: "order",
+        },
+      ],
+      visit: this.currentVisit?.uuid,
+    };
+
+    const obs = [
+      {
+        person: this.currentPatient?.id,
+        concept: "2a39fb41-55ea-4641-bcdf-1dd1c32f1353",
+        obsDatetime: new Date(),
+        value: this.formValues["frequency"].value,
+      },
+      {
+        person: this.currentPatient?.id,
+        concept: "4564644f-2099-4c91-ba26-3d44edef9591",
+        obsDatetime: new Date(),
+        value: this.formValues["dose"].value.toString(),
+      },
+      {
+        person: this.currentPatient?.id,
+        concept: "a77fedfa-d9ff-4966-ae21-ecb39d750e76",
+        obsDatetime: new Date(),
+        value: this.formValues["duration"].value.toString(),
+      },
+      {
+        person: this.currentPatient?.id,
+        concept: this.durationUnitsSettings,
+        obsDatetime: new Date(),
+        value: this.formValues["durationUnit"].value,
+      },
+      {
+        person: this.currentPatient?.id,
+        concept: this.dosingUnitsSettings,
+        obsDatetime: new Date(),
+        value: this.formValues["dosingUnit"].value,
+      },
+      {
+        person: this.currentPatient?.id,
+        concept: this.drugRoutesSettings,
+        obsDatetime: new Date(),
+        value: this.formValues["route"].value,
+      },
+    ];
 
     console.log("==> encounter object: ", encounterObject);
 
-    this.ordersService.createOrdersViaCreatingEncounter(encounterObject).subscribe({
-      next: (encounter) => {
-        console.log("==> Successfully created: ", encounter)
-        return encounter;
-      },
-      error: (err) => {
-        console.log("==> Error creating encounter: ", err);
-        return err;
-      }
-    });
+    this.ordersService
+      .createStandardEncounter(encounterObject)
+      .subscribe((response) => console.log(response));
   }
-
 }

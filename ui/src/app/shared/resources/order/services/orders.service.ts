@@ -3,7 +3,7 @@ import { from, Observable, of, zip } from "rxjs";
 import { catchError, map } from "rxjs/operators";
 import { OpenmrsHttpClientService } from "../../../modules/openmrs-http-client/services/openmrs-http-client.service";
 import { omit } from "lodash";
-import { Api } from "../../openmrs";
+import { Api, EncounterCreate } from "../../openmrs";
 import { HttpErrorResponse } from "@angular/common/http";
 
 @Injectable({
@@ -81,6 +81,13 @@ export class OrdersService {
 
   createOrdersViaCreatingEncounter(encounter): Observable<any> {
     return this.openMRSHttpClient.post(`encounter`, encounter).pipe(
+      map((response) => response),
+      catchError((error) => of(error))
+    );
+  }
+
+  createStandardEncounter(encounter): Observable<EncounterCreate> {
+    return from(this.API.encounter.createEncounter(encounter)).pipe(
       map((response) => response),
       catchError((error) => of(error))
     );
