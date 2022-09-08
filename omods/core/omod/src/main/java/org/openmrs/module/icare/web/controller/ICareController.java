@@ -22,6 +22,7 @@ import org.openmrs.module.icare.billing.services.insurance.ClaimResult;
 import org.openmrs.module.icare.core.ICareService;
 import org.openmrs.module.icare.core.Item;
 import org.openmrs.module.icare.core.Message;
+import org.openmrs.module.icare.core.Summary;
 import org.openmrs.module.icare.core.utils.PatientWrapper;
 import org.openmrs.module.icare.core.utils.VisitWrapper;
 import org.openmrs.module.icare.store.models.OrderStatus;
@@ -59,6 +60,18 @@ public class ICareController {
         results.put("identifiers", ids);
         return results;
     }
+
+	/**
+	 * Initially called after the getUsers method to get the landing form name
+	 *
+	 * @return String form view name
+	 */
+	@RequestMapping(value = "summary", method = RequestMethod.GET)
+	@ResponseBody
+	public Map<String, Object> onGetSummary() {
+		Summary summary = iCareService.getSummary();
+		return summary.toMap();
+	}
 	
 	/**
 	 * Initially called after the getUsers method to get the landing form name
