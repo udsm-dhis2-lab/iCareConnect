@@ -183,7 +183,7 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		MockHttpServletResponse handleGet1 = handle(newGetRequest1);
 		
 		List<Map<String, Object>> stocks = (new ObjectMapper()).readValue(handleGet1.getContentAsString(), List.class);
-		assertThat("Only two stock items", stocks.size(), is(4));
+		assertThat("Only 6 stock items", stocks.size(), is(6));
 		assertThat("Only two stock items", stocks.get(3).get("quantity").toString(), is("70.0"));
 		
 	}
@@ -435,7 +435,7 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		
 		List<Map<String, Object>> stockList = (new ObjectMapper()).readValue(handleGet.getContentAsString(), List.class);
 		
-		assertThat("stock listing has one entry:", stockList.size(), is(3));
+		assertThat("stock listing has 5 entries:", stockList.size(), is(5));
 		
 		//assertThat("The stock quantity is 100", (stockList.get(0).get("quantity")).toString(), is("100.0"));
 		
@@ -451,7 +451,7 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		
 		List<Map<String, Object>> stockList = (new ObjectMapper()).readValue(handleGet.getContentAsString(), List.class);
 		
-		assertThat("stock listing has one entry:", stockList.size(), is(3));
+		assertThat("stock listing has 5 entries:", stockList.size(), is(5));
 		
 		//assertThat("The stock quantity is 100", (stockList.get(0).get("quantity")).toString(), is("100.0"));
 		
@@ -480,7 +480,7 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		
 		List<Map<String, Object>> stockList = (new ObjectMapper()).readValue(handleGet.getContentAsString(), List.class);
 		
-		assertThat("stock listing has one entry:", stockList.size(), is(2));
+		assertThat("stock listing has 4 entries:", stockList.size(), is(4));
 		
 		//assertThat("The stock quantity is 100", (stockList.get(0).get("quantity")).toString(), is("100.0"));
 		
@@ -494,7 +494,7 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		
 		List<Map<String, Object>> stockList = (new ObjectMapper()).readValue(handleGet.getContentAsString(), List.class);
 		
-		assertThat("stock listing has one entry:", stockList.size(), is(2));
+		assertThat("stock listing has 4 entries:", stockList.size(), is(4));
 		
 		boolean found = false;
 		
