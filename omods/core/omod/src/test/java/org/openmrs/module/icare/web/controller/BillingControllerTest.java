@@ -118,8 +118,19 @@ public class BillingControllerTest {
 		System.out.println(out);
 		IOUtils.copy(in, out);
 		//When
-		String discount2 = billingController.onPostDiscountInvoiceMap(new MockMultipartFile("document", "form2B-A.html",
-		        "application/xml", out.toByteArray()));
+
+		Discount discount = new Discount();
+		Concept criteria = new Concept();
+		criteria.setUuid("123");
+		discount.setCriteria(criteria);
+
+		Patient patient = new Patient();
+		patient.setPersonId(1);
+		discount.setPatient(patient);
+
+		Map<String, Object> discount2 = billingController.onPostDiscountInvoiceMap(new MockMultipartFile("document", "lab-data.xml",
+		        "application/xml", out.toByteArray()),discount);
+
 		
 	}
 }
