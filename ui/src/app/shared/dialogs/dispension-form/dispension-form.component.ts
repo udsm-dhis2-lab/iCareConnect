@@ -14,7 +14,10 @@ import { Patient } from "src/app/shared/resources/patient/models/patient.model";
 import { Visit } from "src/app/shared/resources/visits/models/visit.model";
 import { loadActiveVisit } from "src/app/store/actions/visit.actions";
 import { AppState } from "src/app/store/reducers";
-import { getCurrentLocation, getLocationsByTagName } from "src/app/store/selectors";
+import {
+  getCurrentLocation,
+  getLocationsByTagName,
+} from "src/app/store/selectors";
 import { getCurrentPatient } from "src/app/store/selectors/current-patient.selectors";
 import { getProviderDetails } from "src/app/store/selectors/current-user.selectors";
 import { getActiveVisit } from "src/app/store/selectors/visit.selectors";
@@ -44,7 +47,7 @@ export class DispensingFormComponent implements OnInit {
   currentPatient$: Observable<Patient>;
   currentLocation$: Observable<any>;
   currentVisit$: Observable<any>;
-  provider$: Observable<import("/home/jonas/DHIS2Lab/icare/ui/src/app/shared/resources/openmrs").ProviderGet>;
+  provider$: Observable<any>;
   dosingUnitsSettings$: Observable<any>;
   dosingUnits$: Observable<any>;
   durationUnitsSettings$: Observable<any>;
@@ -94,12 +97,30 @@ export class DispensingFormComponent implements OnInit {
       select(getLocationsByTagName, { tagName: "Dispensing Unit" })
     );
 
-    this.generalPrescriptionEncounterType$ = this.systemSettingsService.getSystemSettingsMatchingAKey("iCare.clinic.prescription.encounterType");
-    this.generalPrescriptionOrderType$ = this.systemSettingsService.getSystemSettingsMatchingAKey("iCare.clinic.prescription.orderType");
-    this.useGeneralPrescription$ = this.systemSettingsService.getSystemSettingsMatchingAKey("iCare.clinic.useGeneralPrescription");
-    this.dosingUnitsSettings$ = this.systemSettingsService.getSystemSettingsMatchingAKey("order.drugDosingUnitsConceptUuid");
-    this.durationUnitsSettings$ = this.systemSettingsService.getSystemSettingsMatchingAKey("order.durationUnitsConceptUuid");
-    this.drugRoutesSettings$ = this.systemSettingsService.getSystemSettingsMatchingAKey("order.drugRoutesConceptUuid");
+    this.generalPrescriptionEncounterType$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        "iCare.clinic.prescription.encounterType"
+      );
+    this.generalPrescriptionOrderType$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        "iCare.clinic.prescription.orderType"
+      );
+    this.useGeneralPrescription$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        "iCare.clinic.useGeneralPrescription"
+      );
+    this.dosingUnitsSettings$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        "order.drugDosingUnitsConceptUuid"
+      );
+    this.durationUnitsSettings$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        "order.durationUnitsConceptUuid"
+      );
+    this.drugRoutesSettings$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        "order.drugRoutesConceptUuid"
+      );
     this.orderFrequencies$ = this.orderService.getOrdersFrequencies();
     this.currentPatient$ = this.store.pipe(select(getCurrentPatient));
     this.currentLocation$ = this.store.pipe(select(getCurrentLocation));
@@ -227,48 +248,22 @@ export class DispensingFormComponent implements OnInit {
 
   getDosingUnits(conceptUuid: string) {
     this.dosingUnits$ = this.conceptsService.getConceptDetailsByUuid(
-      conceptUuid, 
-      `custom:(uuid,name,setMembers:(uuid,display,setMembers:(uuid,display,datatype,mappings:(uuid,display,conceptReferenceTerm:(name,code)))),conceptClass:(uuid,display))`
-    )
+      conceptUuid,
+      `custom:(uuid,name,conceptClass:(uuid,display),setMembers:(uuid,display),answers:(uuid,display)`
+    );
   }
-  
+
   getDurationUnits(conceptUuid: string) {
     this.durationUnits$ = this.conceptsService.getConceptDetailsByUuid(
-      conceptUuid, 
-      `custom:(uuid,name,setMembers:(uuid,display,setMembers:(uuid,display,datatype,mappings:(uuid,display,conceptReferenceTerm:(name,code)))),conceptClass:(uuid,display))`
-    )
+      conceptUuid,
+      `custom:(uuid,name,conceptClass:(uuid,display),setMembers:(uuid,display),answers:(uuid,display)`
+    );
   }
-  
+
   getDrugRoutes(conceptUuid: string) {
     this.drugRoutes$ = this.conceptsService.getConceptDetailsByUuid(
-      conceptUuid, 
-      `custom:(uuid,name,setMembers:(uuid,display,setMembers:(uuid,display,datatype,mappings:(uuid,display,conceptReferenceTerm:(name,code)))),conceptClass:(uuid,display))`
-    )
+      conceptUuid,
+      `custom:(uuid,name,conceptClass:(uuid,display),setMembers:(uuid,display),answers:(uuid,display)`
+    );
   }
 }
-
-// `custom:(
-//         uuid,
-//         name,
-//         setMembers:(
-//           uuid,
-//           display,
-//           setMembers:(
-//             uuid,
-//             display,
-//             datatype,
-//             mappings:(
-//               uuid,
-//               display,
-//               conceptReferenceTerm:(
-//                 name,
-//                 code
-//               )
-//             )
-//           )
-//         ),
-//         conceptClass:(
-//           uuid,
-//           display
-//         )
-//       )`

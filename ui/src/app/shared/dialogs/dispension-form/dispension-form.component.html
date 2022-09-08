@@ -1,47 +1,49 @@
-<ng-container *ngIf="{
-  generalPrescriptionOrderType: generalPrescriptionOrderType$ | async,
-  generalPrescriptionEncounterType: generalPrescriptionEncounterType$ | async,
-  useGeneralPrescription: useGeneralPrescription$ | async,
-  orderFrequencies: orderFrequencies$ | async,
-  currentPatient: currentPatient$ | async,
-  currentVisit: currentVisit$ | async,
-  currentLocation: currentLocation$ | async,
-  provider: provider$ | async,
-  dosingUnitsSettings: dosingUnitsSettings$ | async,
-  durationUnitsSettings: durationUnitsSettings$ | async,
-  drugRoutesSettings: drugRoutesSettings$ | async
-} as params">
+<ng-container
+  *ngIf="{
+    generalPrescriptionOrderType: generalPrescriptionOrderType$ | async,
+    generalPrescriptionEncounterType: generalPrescriptionEncounterType$ | async,
+    useGeneralPrescription: useGeneralPrescription$ | async,
+    orderFrequencies: orderFrequencies$ | async,
+    currentPatient: currentPatient$ | async,
+    currentVisit: currentVisit$ | async,
+    currentLocation: currentLocation$ | async,
+    provider: provider$ | async,
+    dosingUnitsSettings: dosingUnitsSettings$ | async,
+    durationUnitsSettings: durationUnitsSettings$ | async,
+    drugRoutesSettings: drugRoutesSettings$ | async
+  } as params"
+>
   <div class="loading-overlay" *ngIf="savingOrder">
     <div class="text-center">
       <div>Saving order details...</div>
       <div class="mt-3 d-flex justify-content-center w-100">
-      <mat-spinner diameter="50" strokeWidth="2"></mat-spinner>
+        <mat-spinner diameter="50" strokeWidth="2"></mat-spinner>
+      </div>
     </div>
   </div>
-</div>
-<mat-toolbar color="primary">
-  <span>Drug Order </span
+  <mat-toolbar color="primary">
+    <span>Drug Order </span
     ><span *ngIf="data?.patient">
       - {{ data?.patient?.identifier }} - {{ data?.patient?.age }} -
       {{ data?.patient?.gender }}</span
-      >
-  <span class="toolbar-spacer"></span>
-  <button mat-icon-button mat-dialog-close matTooltip="close">
-    <mat-icon>close</mat-icon>
-  </button>
-</mat-toolbar>
+    >
+    <span class="toolbar-spacer"></span>
+    <button mat-icon-button mat-dialog-close matTooltip="close">
+      <mat-icon>close</mat-icon>
+    </button>
+  </mat-toolbar>
 
-<div
-  class="alert alert-danger d-flex justify-content-between align-items-center"
-  *ngIf="savingError"
->
-<span>{{ savingError }}</span>
-<button mat-icon-button (click)="onClearError($event)">
-  <mat-icon>close</mat-icon>
-  </button>
-</div>
+  <div
+    class="alert alert-danger d-flex justify-content-between align-items-center"
+    *ngIf="savingError"
+  >
+    <span>{{ savingError }}</span>
+    <button mat-icon-button (click)="onClearError($event)">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
 
-<!-- <ng-container *ngIf="savingOrderSuccess">
+  <!-- <ng-container *ngIf="savingOrderSuccess">
   <mat-dialog-content class="mat-typography">
     <div class="text-center">
       <h3>Order was successfully placed</h3>
@@ -50,102 +52,116 @@
   </mat-dialog-content>
 </ng-container> -->
 
-<ng-container>
-  <mat-dialog-content class="mat-typography">
-    <div class="p-3">
-      <div class="row">
-        <div class="col-7" *ngIf="
-          params?.useGeneralPrescription[0].value==='true'">
-          <div *ngIf="params?.orderFrequencies && 
-                  params?.currentPatient && 
-                  params?.currentVisit && 
-                  params?.currentLocation && 
-                  params?.provider && 
-                  params?.dosingUnitsSettings &&
-                  params?.durationUnitsSettings &&
-                  params?.drugRoutesSettings">
-
-                  <app-general-dispension-form 
-                  (dosingUnitsSettingsEvent)="getDosingUnits($event)"
-                  (durationUnitsSettingsEvent)="getDurationUnits($event)"
-                  (drugRoutesSettingsEvent)="getDrugRoutes($event)"
-                  [encounterType]="params?.generalPrescriptionEncounterType[0]" 
-                  [orderFrequencies]="params?.orderFrequencies" 
-                  [orderType]="params?.generalPrescriptionOrderType[0]"
-                  [currentPatient]="params?.currentPatient"
-                  [currentVisit]="params?.currentVisit"
-                  [currentLocation]="params?.currentLocation"
-                  [provider]="params?.provider"
-                  [dosingUnitsSettings]="params?.dosingUnitsSettings"
-                  [durationUnitsSettings]="params?.durationUnitsSettings"
-                  [drugRoutesSettings]="params?.drugRoutesSettings"
-                  [dosingUnits$]="dosingUnits$"
-                  [durationUnits$]="durationUnits$"
-                  [drugRoutes$]="drugRoutes$"
-                  ></app-general-dispension-form>
+  <ng-container>
+    <mat-dialog-content class="mat-typography">
+      <div class="p-3">
+        <div class="row">
+          <div
+            class="col-7"
+            *ngIf="
+              params?.useGeneralPrescription &&
+              params?.useGeneralPrescription === 'true'
+            "
+          >
+            <div
+              *ngIf="
+                params?.orderFrequencies &&
+                params?.currentPatient &&
+                params?.currentVisit &&
+                params?.currentLocation &&
+                params?.provider &&
+                params?.dosingUnitsSettings &&
+                params?.durationUnitsSettings &&
+                params?.drugRoutesSettings
+              "
+            >
+              <app-general-dispension-form
+                (dosingUnitsSettingsEvent)="getDosingUnits($event)"
+                (durationUnitsSettingsEvent)="getDurationUnits($event)"
+                (drugRoutesSettingsEvent)="getDrugRoutes($event)"
+                [encounterType]="params?.generalPrescriptionEncounterType"
+                [orderFrequencies]="params?.orderFrequencies"
+                [orderType]="params?.generalPrescriptionOrderType"
+                [currentPatient]="params?.currentPatient"
+                [currentVisit]="params?.currentVisit"
+                [currentLocation]="params?.currentLocation"
+                [provider]="params?.provider"
+                [dosingUnitsSettings]="params?.dosingUnitsSettings"
+                [durationUnitsSettings]="params?.durationUnitsSettings"
+                [drugRoutesSettings]="params?.drugRoutesSettings"
+                [dosingUnits$]="dosingUnits$"
+                [durationUnits$]="durationUnits$"
+                [drugRoutes$]="drugRoutes$"
+              ></app-general-dispension-form>
+            </div>
           </div>
-        </div>
-        <div class="col-7" *ngIf="!params?.useGeneralPrescription[0].value || params?.useGeneralPrescription[0].value==='false'">
-          <div class="p-2" *ngIf="!savingOrder">
-            <app-drug-order
-            [drugOrder]="data?.drugOrder"
-            [patient]="data?.patient"
-            [locations]="dispensingLocations$ | async"
-            [fromDispensing]="true"
-              [showAddButton]="false"
-              [hideActionButtons]="true"
-              [encounterUuid]="data?.encounterUuid"
-              (drugQuantity)="onChangeDrugQuantity($event)"
-              (drugOrdered)="onOrderingDrug($event)"
-              (cancelForm)="onCancel()"
-              (formUpdate)="onFormUpdate($event)"
+          <div
+            class="col-7"
+            *ngIf="
+              !params?.useGeneralPrescription ||
+              params?.useGeneralPrescription === 'false'
+            "
+          >
+            <div class="p-2" *ngIf="!savingOrder">
+              <app-drug-order
+                [drugOrder]="data?.drugOrder"
+                [patient]="data?.patient"
+                [locations]="dispensingLocations$ | async"
+                [fromDispensing]="true"
+                [showAddButton]="false"
+                [hideActionButtons]="true"
+                [encounterUuid]="data?.encounterUuid"
+                (drugQuantity)="onChangeDrugQuantity($event)"
+                (drugOrdered)="onOrderingDrug($event)"
+                (cancelForm)="onCancel()"
+                (formUpdate)="onFormUpdate($event)"
               ></app-drug-order>
             </div>
             <div>
               <button
-              class="float-right"
-              (click)="onUpdateOrder($event)"
-              mat-flat-button
-              [color]="savingError ? 'warn' : 'primary'"
-              [disabled]="
-              savingOrder || countOfDispensingFormFieldsWithValues < 3
-              "
+                class="float-right"
+                (click)="onUpdateOrder($event)"
+                mat-flat-button
+                [color]="savingError ? 'warn' : 'primary'"
+                [disabled]="
+                  savingOrder || countOfDispensingFormFieldsWithValues < 3
+                "
               >
-              <mat-icon *ngIf="savingError" class="mr-2">error</mat-icon>
-              <mat-spinner
-                color="primary"
-                *ngIf="savingOrder"
-                [diameter]="17"
-                class="order__spinner mr-2"
-              ></mat-spinner>
-              <span>{{ savingOrder ? "Saving..." : "Save" }}</span>
-            </button>
+                <mat-icon *ngIf="savingError" class="mr-2">error</mat-icon>
+                <mat-spinner
+                  color="primary"
+                  *ngIf="savingOrder"
+                  [diameter]="17"
+                  class="order__spinner mr-2"
+                ></mat-spinner>
+                <span>{{ savingOrder ? "Saving..." : "Save" }}</span>
+              </button>
+            </div>
           </div>
-        </div>
-        <div class="col-5">
-          <mat-accordion>
-            <mat-expansion-panel class="mb-2 border p-0" [expanded]="true">
-              <mat-expansion-panel-header>
-                <mat-panel-title> Previous Prescription </mat-panel-title>
-              </mat-expansion-panel-header>
-              <app-patient-previous-prescriptions
-              [patientUuid]="data?.patientUuid"
-              ></app-patient-previous-prescriptions>
-            </mat-expansion-panel>
-            <mat-expansion-panel class="mb-2 border p-0" [expanded]="false">
-              <mat-expansion-panel-header>
-                <mat-panel-title> Diagnoses </mat-panel-title>
-              </mat-expansion-panel-header>
-              <h5>Confirmed Diagnoses</h5>
-              <app-patient-diagnoses-summary
-              [isConfirmedDiagnosis]="true"
-              ></app-patient-diagnoses-summary>
-              <h5 class="mt-2">Provisional Diagnoses</h5>
-              <app-patient-diagnoses-summary
-              [isConfirmedDiagnosis]="false"
-              ></app-patient-diagnoses-summary>
-            </mat-expansion-panel>
-            <!-- <mat-expansion-panel
+          <div class="col-5">
+            <mat-accordion>
+              <mat-expansion-panel class="mb-2 border p-0" [expanded]="true">
+                <mat-expansion-panel-header>
+                  <mat-panel-title> Previous Prescription </mat-panel-title>
+                </mat-expansion-panel-header>
+                <app-patient-previous-prescriptions
+                  [patientUuid]="data?.patientUuid"
+                ></app-patient-previous-prescriptions>
+              </mat-expansion-panel>
+              <mat-expansion-panel class="mb-2 border p-0" [expanded]="false">
+                <mat-expansion-panel-header>
+                  <mat-panel-title> Diagnoses </mat-panel-title>
+                </mat-expansion-panel-header>
+                <h5>Confirmed Diagnoses</h5>
+                <app-patient-diagnoses-summary
+                  [isConfirmedDiagnosis]="true"
+                ></app-patient-diagnoses-summary>
+                <h5 class="mt-2">Provisional Diagnoses</h5>
+                <app-patient-diagnoses-summary
+                  [isConfirmedDiagnosis]="false"
+                ></app-patient-diagnoses-summary>
+              </mat-expansion-panel>
+              <!-- <mat-expansion-panel
               class="mb-2 border p-0"
               [expanded]="true"
               >
@@ -159,17 +175,16 @@
                         [patientVisit]="dashboardParams?.activeVisit"
                       ></app-patient-lab-results-summary>
                     </mat-expansion-panel> -->
-                  </mat-accordion>
+            </mat-accordion>
+          </div>
         </div>
       </div>
-    </div>
-  </mat-dialog-content>
+    </mat-dialog-content>
 
-  <mat-dialog-actions align="end" class="m-0 p-3">
-    <button mat-stroked-button mat-dialog-close [disabled]="savingOrder">
-      Cancel
-    </button>
-  </mat-dialog-actions>
-</ng-container>
-
+    <mat-dialog-actions align="end" class="m-0 p-3">
+      <button mat-stroked-button mat-dialog-close [disabled]="savingOrder">
+        Cancel
+      </button>
+    </mat-dialog-actions>
+  </ng-container>
 </ng-container>

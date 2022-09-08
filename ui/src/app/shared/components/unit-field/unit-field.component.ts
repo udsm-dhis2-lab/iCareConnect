@@ -1,5 +1,5 @@
-import { Component, EventEmitter, OnInit, Output, Input } from '@angular/core';
-import { Dropdown } from '../../modules/form/models/dropdown.model';
+import { Component, EventEmitter, OnInit, Output, Input } from "@angular/core";
+import { Dropdown } from "../../modules/form/models/dropdown.model";
 
 @Component({
   selector: "app-unit-field",
@@ -7,54 +7,51 @@ import { Dropdown } from '../../modules/form/models/dropdown.model';
   styleUrls: ["./unit-field.component.scss"],
 })
 export class UnitFieldComponent implements OnInit {
-
   @Input() dosingUnits: any;
   @Input() durationUnits: any;
   @Input() drugRoutes: any;
 
-
   @Output() formUpdate = new EventEmitter();
   unitField: Dropdown;
-  
+
   constructor() {}
 
   ngOnInit(): void {
-
-    if(this.dosingUnits){
+    if (this.dosingUnits) {
       this.unitField = new Dropdown({
         id: "dosingUnit",
         key: "dosingUnit",
         label: `Select Dose Unit`,
         conceptClass: this.dosingUnits?.conceptClass?.display,
         value: null,
-        options: this.dosingUnits?.setMembers?.map((member) => {
+        options: this.dosingUnits?.answers?.map((answer) => {
           return {
-            key: member?.uuid,
-            value: member?.uuid,
-            label: member?.display
-          }
-        })
-      })
+            key: answer?.uuid,
+            value: answer?.uuid,
+            label: answer?.display,
+          };
+        }),
+      });
     }
 
-    if(this.durationUnits){
+    if (this.durationUnits) {
       this.unitField = new Dropdown({
         id: "durationUnit",
         key: "durationUnit",
         label: `Select Duration Unit`,
         conceptClass: this.durationUnits?.conceptClass?.display,
         value: null,
-        options: this.durationUnits?.setMembers?.map((member) => {
+        options: this.durationUnits?.answers?.map((answer) => {
           return {
-            key: member?.uuid,
-            value: member?.uuid,
-            label: member?.display
-          }
-        })
-      })
+            key: answer?.uuid,
+            value: answer?.uuid,
+            label: answer?.display,
+          };
+        }),
+      });
     }
-   
-    if(this.drugRoutes){
+
+    if (this.drugRoutes) {
       this.unitField = new Dropdown({
         id: "route",
         key: "route",
@@ -65,16 +62,14 @@ export class UnitFieldComponent implements OnInit {
           return {
             key: member?.uuid,
             value: member?.uuid,
-            label: member?.display
-          }
-        })
-      })
+            label: member?.display,
+          };
+        }),
+      });
     }
-    
   }
 
   onFormUpdate(e: any) {
     this.formUpdate.emit(e);
   }
-    
 }
