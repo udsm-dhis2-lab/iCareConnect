@@ -26,6 +26,7 @@ import org.openmrs.module.icare.billing.services.insurance.InsuranceService;
 import org.openmrs.module.icare.core.ICareService;
 import org.openmrs.module.icare.core.Item;
 import org.openmrs.module.icare.core.Message;
+import org.openmrs.module.icare.core.Summary;
 import org.openmrs.module.icare.core.dao.ICareDao;
 import org.openmrs.module.icare.core.utils.PatientWrapper;
 import org.openmrs.module.icare.core.utils.VisitWrapper;
@@ -303,7 +304,7 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 			throw e;
 		}*/
 	}
-
+	
 	public Message sendMessageRequest(Message message) throws Exception {
 		String urlString = "https://us-central1-maximal-journey-328212.cloudfunctions.net/messaging";
 		URL url = new URL(urlString);
@@ -316,12 +317,12 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		con.addRequestProperty("Content-Type", "application/json");
 		con.setDoInput(true);
 		con.setDoOutput(true);
-
+		
 		OutputStream os = con.getOutputStream();
 		BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
 		String json = new ObjectMapper().writeValueAsString(message.toMap());
 		writer.write(json);
-
+		
 		writer.flush();
 		writer.close();
 		os.close();
@@ -491,8 +492,9 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	}
 	
 	@Override
-	public List<PatientWrapper> getPatients(String search, String patientUUID, PatientWrapper.VisitStatus visitStatus, Integer startIndex, Integer limit, PatientWrapper.OrderByDirection orderByDirection) {
-		return dao.getPatients(search, patientUUID,visitStatus, startIndex, limit, orderByDirection);
+	public List<PatientWrapper> getPatients(String search, String patientUUID, PatientWrapper.VisitStatus visitStatus,
+	        Integer startIndex, Integer limit, PatientWrapper.OrderByDirection orderByDirection) {
+		return dao.getPatients(search, patientUUID, visitStatus, startIndex, limit, orderByDirection);
 	}
 	
 	@Override
@@ -511,5 +513,9 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 			}
 		}
 		return false;
+	}
+
+	public Summary getSummary() {
+		return dao.getSummary();
 	}
 }
