@@ -34,6 +34,11 @@ export class RegistrationHomeComponent implements OnInit {
   isDark: boolean = false;
   documentURL: string;
 
+  // New variables
+  roomNo: any = 10;
+  doctorName: string = "doctor Masembo";
+  totalActivePatients: number = 100;
+
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
 

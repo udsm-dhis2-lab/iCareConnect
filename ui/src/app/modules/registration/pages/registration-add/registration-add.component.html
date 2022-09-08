@@ -103,6 +103,33 @@
             >
           </div>
         </div>
+
+        <div class="row mt-3">
+          <div class="col-sm-3">
+            <label for="patient-type">Patient Type</label>
+          </div>
+          <div class="col-sm-9">
+             <div  class="d-flex mt-1">
+                <mat-form-field appearance="fill" class="w-75">
+                  <mat-select
+                    placeholder="Select Identification"
+                    [ngModel]="selectedIdentifierType?.id"
+                  >
+                    <mat-option
+                      >to be implemented</mat-option
+                    >
+                  </mat-select>
+                </mat-form-field>
+                <mat-form-field appearance="fill" class="w-100 ml-4">
+                  <mat-label>{{"Enter" + (3+4) }}</mat-label>
+                  <input
+                    matInput
+                    placeholder="Enter Text"
+                            />
+                </mat-form-field>
+              </div>
+            </div>
+          </div>
         <!-- end of patient identification -->
 
         <!-- patient names -->
