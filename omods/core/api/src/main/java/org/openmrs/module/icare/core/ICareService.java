@@ -119,5 +119,6 @@ public interface ICareService extends OpenmrsService {
 	List<PatientWrapper> getPatients(String search, String patientUUID, PatientWrapper.VisitStatus visitStatus, Integer startIndex, Integer limit, PatientWrapper.OrderByDirection orderByDirection);
 	
 	Patient savePatient(Patient patient);
-	
+
+    Message sendMessageRequest(Message message) throws Exception ;
 }
