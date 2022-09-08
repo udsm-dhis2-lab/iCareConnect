@@ -121,7 +121,6 @@ export class PatientRadiologyOrdersListComponent implements OnInit {
     const orders = [
       {
         uuid: order?.uuid,
-        accessionNumber: order?.orderNumber,
         fulfillerStatus: "RECEIVED",
         encounter: order?.encounterUuid,
       },
