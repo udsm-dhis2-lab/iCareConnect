@@ -54,7 +54,7 @@ export class PatientSearchComponent implements OnInit {
   }
    onSelectPatient(e, patient: Patient): void {
     e.stopPropagation();
-    this.showList = false;
+    //this.showList = false;
     this.store.dispatch(addCurrentPatient({ patient }));
     this.selectPatient.emit(patient);
   }
