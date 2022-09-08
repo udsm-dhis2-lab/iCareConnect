@@ -1,5 +1,8 @@
 import { HttpClient } from "@angular/common/http";
 import { Component, Input, OnInit } from "@angular/core";
+import { zip } from "rxjs";
+import { map } from "rxjs/operators";
+import { OrdersService } from "src/app/shared/resources/order/services/orders.service";
 import { VisitsService } from "src/app/shared/resources/visits/services";
 
 @Component({
@@ -22,7 +25,8 @@ export class PatientRadiologyOrdersListComponent implements OnInit {
   saving: boolean = false;
   constructor(
     private httpClient: HttpClient,
-    private visitService: VisitsService
+    private visitService: VisitsService,
+    private ordersService: OrdersService
   ) {}
 
   ngOnInit(): void {
@@ -43,9 +47,9 @@ export class PatientRadiologyOrdersListComponent implements OnInit {
               };
             });
 
-            encounter?.orders?.forEach((order) => {
-              this.obsKeyedByConcepts[order?.concept?.uuid] = order;
-            });
+            // encounter?.orders?.forEach((order) => {
+            //   this.obsKeyedByConcepts[order?.concept?.uuid] = order;
+            // });
           });
         }
       });
@@ -75,6 +79,7 @@ export class PatientRadiologyOrdersListComponent implements OnInit {
       obsDatetime: new Date(),
       voided: false,
       status: "PRELIMINARY",
+      order: order?.uuid,
       comment: this.values[order?.uuid + "-comment"],
     };
     data.append("file", this.file);
@@ -112,6 +117,22 @@ export class PatientRadiologyOrdersListComponent implements OnInit {
           }
         });
     }
+
+    const orders = [
+      {
+        uuid: order?.uuid,
+        accessionNumber: order?.orderNumber,
+        fulfillerStatus: "RECEIVED",
+        encounter: order?.encounterUuid,
+      },
+    ];
+
+    this.ordersService
+      .updateOrdersViaEncounter(orders)
+      .subscribe((response) => {
+        this.saving = false;
+      });
+
     this.httpClient
       .post(`../../../openmrs/ws/rest/v1/obs`, data)
       .subscribe((response: any) => {
@@ -122,8 +143,6 @@ export class PatientRadiologyOrdersListComponent implements OnInit {
               ? response?.value?.links?.uri?.replace("http", "https")
               : null,
           };
-
-          this.saving = false;
         }
       });
   }

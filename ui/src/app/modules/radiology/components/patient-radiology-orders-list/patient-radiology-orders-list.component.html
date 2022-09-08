@@ -15,6 +15,7 @@
           <th>Order ID</th>
           <th>Order</th>
           <th>Orderer</th>
+          <th>Instructions</th>
           <th>Upload</th>
           <th>Remarks</th>
           <td>Action</td>
@@ -33,6 +34,9 @@
           </td>
           <td>
             {{ order?.orderer?.display }}
+          </td>
+          <td>
+            {{ order?.instructions }}
           </td>
           <td>
             <div>
@@ -62,9 +66,14 @@
             </div>
           </td>
           <td>
+            <!-- {{ obsKeyedByConcepts | json }} -->
             <mat-form-field class="w-100">
               <mat-label>Remarks</mat-label>
-              <textarea matInput (keyup)="getRemarks($event, order)"></textarea>
+              <textarea
+                matInput
+                [value]="obsKeyedByConcepts[order?.concept?.uuid]?.comment"
+                (keyup)="getRemarks($event, order)"
+              ></textarea>
             </mat-form-field>
           </td>
           <td>
