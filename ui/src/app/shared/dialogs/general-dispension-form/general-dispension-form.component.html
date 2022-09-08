@@ -4,11 +4,27 @@
     <div>
     <app-form [fields]="[drugConceptField]" (formUpdate)="onFormUpdate($event)"></app-form>
     </div>
-    <div>
-      <app-form [fields]="[drugDoseField]" (formUpdate)="onFormUpdate($event)"></app-form>
+    <div class="row">
+      <div class="col-4">
+        <app-form [fields]="[drugDoseField]" (formUpdate)="onFormUpdate($event)"></app-form>
+      </div>
+      <div class="col-4" *ngIf="dosingUnits$ | async as dosingUnits">
+        <app-unit-field [dosingUnits]="dosingUnits" (formUpdate)="onFormUpdate($event)"></app-unit-field>
+      </div>
+      <div class="col-4">
+        <app-form [fields]="[frequencyField]" (formUpdate)="onFormUpdate($event)"></app-form>
+      </div>  
     </div>
-    <div>
-      <app-form [fields]="[frequencyField]" (formUpdate)="onFormUpdate($event)"></app-form>
+    <div class="row">
+      <div class="col-5">
+        <app-form [fields]="[drugDurationField]" (formUpdate)="onFormUpdate($event)"></app-form>
+      </div>
+      <div class="col-7" *ngIf="durationUnits$ | async as durationUnits">
+        <app-unit-field [durationUnits]="durationUnits" (formUpdate)="onFormUpdate($event)"></app-unit-field>
+      </div>
+    </div>
+    <div *ngIf="drugRoutes$ | async as drugRoutes">
+      <app-unit-field [drugRoutes]="drugRoutes" (formUpdate)="onFormUpdate($event)"></app-unit-field>
     </div>
     <div class="float-right">
         <button class="float-right" (click)="saveOrder($event)" mat-flat-button [color]="savingError ? 'warn' : 'primary'"
