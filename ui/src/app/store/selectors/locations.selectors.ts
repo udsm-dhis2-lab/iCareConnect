@@ -379,7 +379,8 @@ function getItems(location): string[] {
 
 export const getAllBedsUnderCurrentWard = createSelector(
   getLocations,
-  (locations: Location[], props) => {
+  getLocationEntities,
+  (locations: Location[], locationEntities, props) => {
     let currentLocation = (locations.filter(
       (location) => location?.uuid === props?.id
     ) || [])[0];
@@ -389,7 +390,13 @@ export const getAllBedsUnderCurrentWard = createSelector(
     const formattedLocation = {
       ...currentLocation,
       childMembers: getChildLocationMembers(
-        currentLocation?.childLocations,
+        (
+          currentLocation?.childLocations?.filter(
+            (location: any) => !location?.retired
+          ) || []
+        ).map((childLocation) => {
+          return locationEntities[childLocation?.uuid];
+        }),
         locations
       ),
       isBed:
@@ -401,8 +408,6 @@ export const getAllBedsUnderCurrentWard = createSelector(
           ) || []
         )?.length > 0,
     };
-
-    // console.log('formattedLocation', formattedLocation);
     return formattedLocation;
     // const beds = getBedsUnderCurrentLocation(locations, props?.id);
 

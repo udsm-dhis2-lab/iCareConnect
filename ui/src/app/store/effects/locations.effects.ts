@@ -119,22 +119,34 @@ export class LocationsEffects implements OnInitEffects {
               (formatLocationsPayLoad([locationResponse] || []) || [])?.length >
                 0
             ) {
-              return [
-                action?.isCurrentLocation
-                  ? setCurrentUserCurrentLocation({
-                      location: (formatLocationsPayLoad(
-                        [locationResponse] || []
-                      ) || [])[0],
-                    })
-                  : null,
-                upsertLocation({
-                  location: {
-                    ...locationResponse,
-                    ...(formatLocationsPayLoad([locationResponse] || []) ||
-                      [])[0],
-                  },
-                }),
-              ];
+              const location = {
+                ...locationResponse,
+                ...(formatLocationsPayLoad([locationResponse] || []) || [])[0],
+              };
+              if (action?.isCurrentLocation) {
+                return [
+                  setCurrentUserCurrentLocation({
+                    location,
+                  }),
+                  upsertLocation({
+                    location: {
+                      ...locationResponse,
+                      ...(formatLocationsPayLoad([locationResponse] || []) ||
+                        [])[0],
+                    },
+                  }),
+                ];
+              } else {
+                return [
+                  upsertLocation({
+                    location: {
+                      ...locationResponse,
+                      ...(formatLocationsPayLoad([locationResponse] || []) ||
+                        [])[0],
+                    },
+                  }),
+                ];
+              }
             }
           })
         );
@@ -142,7 +154,7 @@ export class LocationsEffects implements OnInitEffects {
     )
   );
 
-  loadLocations$ = createEffect(() =>
+  loadLocationsByIds$ = createEffect(() =>
     this.actions$.pipe(
       ofType(loadLocationByIds),
       switchMap((action) => {
@@ -188,10 +200,8 @@ export class LocationsEffects implements OnInitEffects {
       switchMap((action) => {
         return this.locationService.getLocationsByTagName(action.tagName).pipe(
           map((locationsResponse: any) => {
-            return addLoadedLocations({
-              locations: formatLocationsPayLoad(
-                locationsResponse?.results || []
-              ),
+            return upsertLocations({
+              locations: formatLocationsPayLoad(locationsResponse || []),
             });
           }),
           catchError((error) => {
