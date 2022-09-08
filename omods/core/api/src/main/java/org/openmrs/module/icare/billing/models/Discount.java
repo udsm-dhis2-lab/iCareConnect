@@ -37,7 +37,8 @@ public class Discount extends BaseChangeableOpenmrsData {
 	private Integer attachmentId;
 	
 	@Column(name = "is_full_exempted")
-	private Boolean isFullExempted;
+	@JsonProperty("exempted")
+	private Boolean exempted;
 	
 	@Column(name = "remarks")
 	private String remarks;
@@ -106,12 +107,12 @@ public class Discount extends BaseChangeableOpenmrsData {
 		this.criteria = criteria;
 	}
 	
-	public boolean getIsFullExempted() {
-		return isFullExempted;
+	public Boolean getExempted() {
+		return exempted;
 	}
 	
-	public void setIsFullExempted(Boolean fullExempted) {
-		this.isFullExempted = fullExempted;
+	public void setExempted(Boolean fullExempted) {
+		this.exempted = fullExempted;
 	}
 	
 	public Map<String, Object> toMap() {
@@ -119,13 +120,17 @@ public class Discount extends BaseChangeableOpenmrsData {
 		
 		discountMap.put("uuid", this.getUuid());
 		discountMap.put("remarks", this.getRemarks());
-		discountMap.put("isFullExempted", this.getIsFullExempted());
-		
+		if(this.exempted != null){
+			discountMap.put("isFullExempted", this.getExempted());
+		}
 		HashMap<String, Object> criteria = new HashMap<String, Object>();
 		criteria.put("uuid", this.getCriteria().getUuid());
 		discountMap.put("criteria", criteria);
-		
-		discountMap.put("attachmentId", this.getAttachmentId());
+
+		if(this.getAttachmentId() != null){
+			discountMap.put("attachmentId", this.getAttachmentId());
+		}
+
 		
 		HashMap<String, Object> patient = new HashMap<String, Object>();
 		patient.put("uuid", this.getPatient().getUuid());
