@@ -113,26 +113,24 @@ public class BillingController extends BaseController {
 	
 	@RequestMapping(value = "discount", method = RequestMethod.POST)
 	@ResponseBody
-	public String onPostDiscountInvoiceMap(@RequestParam(value = "document", required = false) MultipartFile file, @RequestParam("json") Discount discount
+	public Map<String, Object> onPostDiscountInvoiceMap(@RequestParam(value = "document", required = false) MultipartFile file, @RequestParam("json") Discount discount
 	) throws Exception {
 		
 		//File upload implementation
-		//		Path Path_Directory = Paths.get("../resources/DocumentsUploads");
-		//		Path filePath = Path_Directory.resolve(file.getName());
-		//		Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-		//		String dateTime = DateTime.now().toString("yyyyMMddHHmmss");
-		//		String fileNameToSave = dateTime.concat(file.getName());
-		
-		String filePath = "/home/kiba/Documents/icare/omods/core/api/src/main/resources/DocumentsUploads/";
+		String filePath = "/tmp/";
 		String dateTime = DateTime.now().toString("yyyyMMddHHmmss");
 		String fileNameToSave = dateTime.concat(file.getOriginalFilename());
 		String path = filePath + fileNameToSave;
 		file.transferTo(new File(path));
+
+		discount.setAttachmentId(path);
+
+		Discount newDiscount = this.onPostDiscountInvoice(discount);
+		System.out.println(discount.getCriteria().getUuid());
 		
-		//discount.setAttachmentId(fileNameToSave);
-		
-		this.onPostDiscountInvoice(discount);
-		return "uploaded";
+
+
+		return newDiscount.toMap();
 	}
 	
 	public Discount onPostDiscountInvoice(Discount discount) throws Exception {
