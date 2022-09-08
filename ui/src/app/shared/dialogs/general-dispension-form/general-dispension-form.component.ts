@@ -24,6 +24,7 @@ import { getLocationsByTagName } from "src/app/store/selectors";
 import { Dropdown } from "../../modules/form/models/dropdown.model";
 import { Textbox } from "../../modules/form/models/text-box.model";
 import { ICARE_CONFIG } from "../../resources/config";
+import { ObservationService } from "../../resources/observation/services/observation.service";
 import { OrdersService } from "../../resources/order/services/orders.service";
 
 @Component({
@@ -44,7 +45,10 @@ export class GeneralDispensingFormComponent implements OnInit {
   @Input() drugRoutesSettings: Observable<any>;
   @Input() dosingUnitsSettings: any;
   @Input() durationUnitsSettings: any;
-  @Input() orderFrequencies: any[];
+  @Input() generalPrescriptionDurationConcept: any;
+  @Input() generalPrescriptionDoseConcept: any;
+  @Input() generalPrescriptionFrequencyConcept: any;
+  @Input() dosingFrequencies$: Observable<any>;
 
   drugOrder: DrugOrderObject;
 
@@ -66,10 +70,12 @@ export class GeneralDispensingFormComponent implements OnInit {
   @Output() dosingUnitsSettingsEvent: EventEmitter<any> = new EventEmitter();
   @Output() durationUnitsSettingsEvent: EventEmitter<any> = new EventEmitter();
   @Output() drugRoutesSettingsEvent: EventEmitter<any> = new EventEmitter();
+  @Output() generalPrescriptionFrequencyConceptEvent: EventEmitter<any> = new EventEmitter();
 
   constructor(
     private drugOrderService: DrugOrdersService,
     private ordersService: OrdersService,
+    private observationService: ObservationService,
     private store: Store<AppState>
   ) {}
 
@@ -77,6 +83,7 @@ export class GeneralDispensingFormComponent implements OnInit {
     this.dosingUnitsSettingsEvent.emit(this.dosingUnitsSettings);
     this.durationUnitsSettingsEvent.emit(this.durationUnitsSettings);
     this.drugRoutesSettingsEvent.emit(this.drugRoutesSettings);
+    this.generalPrescriptionFrequencyConceptEvent.emit(this.generalPrescriptionFrequencyConcept);
 
     this.drugConceptField = new Dropdown({
       id: "drug",
@@ -104,21 +111,6 @@ export class GeneralDispensingFormComponent implements OnInit {
       label: "Duration",
       required: true,
       type: "number",
-    });
-
-    this.frequencyField = new Dropdown({
-      id: "frequency",
-      key: "frequency",
-      label: "Select Frequency",
-      conceptClass: "Frequency",
-      value: null,
-      options: this.orderFrequencies?.map((frequency) => {
-        return {
-          key: frequency?.uuid,
-          value: frequency?.uuid,
-          label: frequency?.display,
-        };
-      }),
     });
   }
 
@@ -158,19 +150,19 @@ export class GeneralDispensingFormComponent implements OnInit {
     const obs = [
       {
         person: this.currentPatient?.id,
-        concept: "2a39fb41-55ea-4641-bcdf-1dd1c32f1353",
+        concept: this.generalPrescriptionFrequencyConcept,
         obsDatetime: new Date(),
         value: this.formValues["frequency"].value,
       },
       {
         person: this.currentPatient?.id,
-        concept: "4564644f-2099-4c91-ba26-3d44edef9591",
+        concept: this.generalPrescriptionDoseConcept,
         obsDatetime: new Date(),
         value: this.formValues["dose"].value.toString(),
       },
       {
         person: this.currentPatient?.id,
-        concept: "a77fedfa-d9ff-4966-ae21-ecb39d750e76",
+        concept: this.generalPrescriptionDurationConcept,
         obsDatetime: new Date(),
         value: this.formValues["duration"].value.toString(),
       },
@@ -194,15 +186,22 @@ export class GeneralDispensingFormComponent implements OnInit {
       }
     ];
 
-    console.log("==> encounter object: ", encounterObject);
-
     this.ordersService
-      .createStandardEncounterWithObservations(encounterObject, obs)
+      .createOrdersViaCreatingEncounter(encounterObject)
       .subscribe((response) => {
-        response?.subscribe((response) => { 
-          console.log("==> ZIpped Response: ", response);
-          return response
-        })
+        if (response?.uuid) {
+          let data = {
+            encounterUuid: response?.uuid,
+            obs: obs.filter((observation) => {
+              if(observation.value && observation.value.length > 0){
+                return observation
+              }
+            }),
+          };
+          this.observationService
+            .saveObservationsViaEncounter(data)
+            .subscribe();
+        }
       });
   }
 }

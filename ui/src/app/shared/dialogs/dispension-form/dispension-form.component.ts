@@ -54,6 +54,10 @@ export class DispensingFormComponent implements OnInit {
   durationUnits$: Observable<any>;
   drugRoutes$: Observable<any>;
   drugRoutesSettings$: Observable<any>;
+  generalPrescriptionDurationConcept$: Observable<any>;
+  generalPrescriptionDoseConcept$: Observable<any>;
+  generalPrescriptionFrequencyConcept$: Observable<any>;
+  dosingFrequencies$: Observable<any>;
 
   constructor(
     private drugOrderService: DrugOrdersService,
@@ -121,7 +125,18 @@ export class DispensingFormComponent implements OnInit {
       this.systemSettingsService.getSystemSettingsByKey(
         "order.drugRoutesConceptUuid"
       );
-    this.orderFrequencies$ = this.orderService.getOrdersFrequencies();
+    this.generalPrescriptionDurationConcept$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        "iCare.clinic.prescription.duration"
+      );
+    this.generalPrescriptionDoseConcept$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        "iCare.clinic.prescription.dose"
+      );
+    this.generalPrescriptionFrequencyConcept$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        "iCare.clinic.prescription.frequency"
+      );
     this.currentPatient$ = this.store.pipe(select(getCurrentPatient));
     this.currentLocation$ = this.store.pipe(select(getCurrentLocation));
     this.currentVisit$ = this.store.pipe(select(getActiveVisit));
@@ -262,6 +277,13 @@ export class DispensingFormComponent implements OnInit {
 
   getDrugRoutes(conceptUuid: string) {
     this.drugRoutes$ = this.conceptsService.getConceptDetailsByUuid(
+      conceptUuid,
+      `custom:(uuid,name,conceptClass:(uuid,display),setMembers:(uuid,display),answers:(uuid,display)`
+    );
+  }
+  
+  getDosingFrequencies(conceptUuid: string) {
+    this.dosingFrequencies$ = this.conceptsService.getConceptDetailsByUuid(
       conceptUuid,
       `custom:(uuid,name,conceptClass:(uuid,display),setMembers:(uuid,display),answers:(uuid,display)`
     );
