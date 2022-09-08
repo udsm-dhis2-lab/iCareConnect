@@ -51,20 +51,22 @@ export class ModulesSelectorComponent implements OnInit {
         ? JSON.parse(localStorage.getItem("currentLocation"))
         : null;
     if (storedNavigationDetails) {
-      this.currentLocation = {
-        ...locationMatchingNavigationDetails,
-        id: locationMatchingNavigationDetails?.uuid,
-        ...this.locations.filter(
-          (loc) => loc?.uuid === storedLocation?.uuid || []
-        )[0],
-      };
+      this.currentLocation = !storedLocation
+        ? {
+            ...locationMatchingNavigationDetails,
+            id: locationMatchingNavigationDetails?.uuid,
+            ...this.locations.filter(
+              (loc) => loc?.uuid === storedLocation?.uuid || []
+            )[0],
+          }
+        : storedLocation;
 
       this.store.dispatch(
         setCurrentUserCurrentLocation({ location: this.currentLocation })
       );
 
       const modules = (
-        this.currentLocation.attributes.filter(
+        this.currentLocation.attributes?.filter(
           (attribute) =>
             attribute?.attributeType?.display?.toLowerCase() === "modules" &&
             !attribute?.voided
@@ -78,7 +80,7 @@ export class ModulesSelectorComponent implements OnInit {
           location: this.currentLocation,
         };
       });
-      
+
       // Hinglight the current location
       this.currentModule = {
         ...this.currentLocation?.modules[0],

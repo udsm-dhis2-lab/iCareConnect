@@ -9,6 +9,7 @@ export function formatLocationsPayLoad(locations): Location[] {
       locationPath = "";
       const modules = getLocationModules(location);
       return {
+        ...location,
         id: location?.uuid,
         uuid: location?.uuid,
         country: location?.country,
@@ -55,7 +56,7 @@ export function formatLocationsPayLoad(locations): Location[] {
 
 function getLocationModules(location) {
   const locationModuleAttributes =
-    location.attributes.filter(
+    location?.attributes?.filter(
       (attribute) =>
         !attribute?.voided &&
         attribute?.attributeType?.display.toLowerCase() === "modules" &&
@@ -77,7 +78,7 @@ function checkIfTheChildAreBeds(childLocations) {
    * TODO: this has to be softcodes using global configs
    */
   return childLocations && childLocations?.length > 0
-    ? childLocations[0]?.tags.some((tag) => tag?.display === "Bed Location")
+    ? childLocations[0]?.tags?.some((tag) => tag?.display === "Bed Location")
     : false;
 }
 
@@ -86,7 +87,7 @@ function checkIfTheChildAreCabinets(childLocations) {
    * TODO: this has to be softcodes using global configs
    */
   return childLocations && childLocations?.length > 0
-    ? childLocations[0]?.tags.some(
+    ? childLocations[0]?.tags?.some(
         (tag) => tag?.display === "Mortuary Location"
       )
     : false;
@@ -108,4 +109,8 @@ function getPathForTheLocation(location) {
       ? getPathForTheLocation(location?.parentLocation)
       : "");
   return locationPath;
+}
+
+export function getChildrenLocations(location) {
+  return location?.childLocations;
 }

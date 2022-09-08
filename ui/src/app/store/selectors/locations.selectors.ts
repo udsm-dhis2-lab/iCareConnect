@@ -60,7 +60,6 @@ export const getStoreLocations = createSelector(
 export const getParentLocation = createSelector(
   getLocations,
   (locations: Location[]) => {
-
     const allParentLocations =
       _.filter(locations, { parentLocation: null }) || [];
 
@@ -124,10 +123,12 @@ export const getCurrentLocation = createSelector(
     const formsAttributes =
       state.currentUserCurrentLocation &&
       state.currentUserCurrentLocation?.attributes
-        ? state.currentUserCurrentLocation.attributes.filter(
+        ? state.currentUserCurrentLocation.attributes?.filter(
             (attribute) => attribute?.attributeType?.display === "Forms"
           ) || []
         : [];
+
+    // console.log(state.currentUserCurrentLocation);
     const localStoredLocation = localStorage.getItem("currentLocation");
     const location = state.currentUserCurrentLocation
       ? state.currentUserCurrentLocation
@@ -275,15 +276,15 @@ function getChildLocationMembers(childLocations, locations) {
   if (childLocations?.length === 0) {
     return [];
   }
-  return childLocations.map((location) => {
+  return childLocations?.map((location) => {
     const currentLocation = (locations.filter(
       (loc) => loc.uuid === location.uuid
     ) || [])[0];
     const patientPerBedAttribute =
       currentLocation &&
-      currentLocation.attributes &&
-      currentLocation.attributes?.length > 0
-        ? (currentLocation.attributes.filter(
+      currentLocation?.attributes &&
+      currentLocation?.attributes?.length > 0
+        ? (currentLocation?.attributes.filter(
             (attribute) =>
               attribute?.attributeType?.display === "Patients per bed"
           ) || [])[0]
@@ -323,7 +324,7 @@ export const getAllLocationsUnderWardAsFlatArray = createSelector(
       currentLocation &&
       currentLocation.attributes &&
       currentLocation.attributes?.length > 0
-        ? (currentLocation.attributes.filter(
+        ? (currentLocation?.attributes?.filter(
             (attribute) =>
               attribute?.attributeType?.display === "Patients per bed"
           ) || [])[0]
@@ -378,7 +379,8 @@ function getItems(location): string[] {
 
 export const getAllBedsUnderCurrentWard = createSelector(
   getLocations,
-  (locations: Location[], props) => {
+  getLocationEntities,
+  (locations: Location[], locationEntities, props) => {
     let currentLocation = (locations.filter(
       (location) => location?.uuid === props?.id
     ) || [])[0];
@@ -388,7 +390,14 @@ export const getAllBedsUnderCurrentWard = createSelector(
     const formattedLocation = {
       ...currentLocation,
       childMembers: getChildLocationMembers(
-        currentLocation?.childLocations,
+        (
+          currentLocation?.childLocations?.filter(
+            (location: any) => !location?.retired
+          ) || []
+        ).map((childLocation) => {
+          // console.log("CHILD", locationEntities[childLocation?.uuid]);
+          return locationEntities[childLocation?.uuid];
+        }),
         locations
       ),
       isBed:
@@ -400,8 +409,6 @@ export const getAllBedsUnderCurrentWard = createSelector(
           ) || []
         )?.length > 0,
     };
-
-    // console.log('formattedLocation', formattedLocation);
     return formattedLocation;
     // const beds = getBedsUnderCurrentLocation(locations, props?.id);
 
