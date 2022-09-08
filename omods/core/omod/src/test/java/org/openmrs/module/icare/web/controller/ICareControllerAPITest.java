@@ -563,11 +563,11 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		MockHttpServletRequest newGetRequest = newGetRequest("icare/summary");
 		MockHttpServletResponse handle = handle(newGetRequest);
 		String summaryData = handle.getContentAsString();
-		System.out.println(summaryData);
 		Map summaryMap = (new ObjectMapper()).readValue(summaryData, Map.class);
-		List<Map> summaryDetails = (List<Map>) summaryMap.get("results");
-		//assertThat("Should return a visit", visitDetails.size() == 1);
 
+		assertThat("Has 8 patient", summaryMap.get("allPatients").equals(8));
+		assertThat("Has 8 activeVisits", summaryMap.get("activeVisits").equals(8));
+		assertThat("Has 1 location", ((List)summaryMap.get("locations")).size() == 1);
 
 	}
 
