@@ -11,8 +11,8 @@
       <div class="col-4" *ngIf="dosingUnits$ | async as dosingUnits">
         <app-unit-field [dosingUnits]="dosingUnits" (formUpdate)="onFormUpdate($event)"></app-unit-field>
       </div>
-      <div class="col-4">
-        <app-form [fields]="[frequencyField]" (formUpdate)="onFormUpdate($event)"></app-form>
+      <div class="col-4" *ngIf="dosingFrequencies$ | async as dosingFrequencies">
+        <app-unit-field [dosingFrequencies]="dosingFrequencies" (formUpdate)="onFormUpdate($event)"></app-unit-field>
       </div>  
     </div>
     <div class="row">

@@ -3,14 +3,16 @@
     generalPrescriptionOrderType: generalPrescriptionOrderType$ | async,
     generalPrescriptionEncounterType: generalPrescriptionEncounterType$ | async,
     useGeneralPrescription: useGeneralPrescription$ | async,
-    orderFrequencies: orderFrequencies$ | async,
     currentPatient: currentPatient$ | async,
     currentVisit: currentVisit$ | async,
     currentLocation: currentLocation$ | async,
     provider: provider$ | async,
     dosingUnitsSettings: dosingUnitsSettings$ | async,
     durationUnitsSettings: durationUnitsSettings$ | async,
-    drugRoutesSettings: drugRoutesSettings$ | async
+    drugRoutesSettings: drugRoutesSettings$ | async,
+    generalPrescriptionDurationConcept: generalPrescriptionDurationConcept$ | async,
+    generalPrescriptionDoseConcept: generalPrescriptionDoseConcept$ | async,
+    generalPrescriptionFrequencyConcept: generalPrescriptionFrequencyConcept$ | async
   } as params"
 >
   <div class="loading-overlay" *ngIf="savingOrder">
@@ -63,24 +65,24 @@
               params?.useGeneralPrescription === 'true'
             "
           >
-            <div
-              *ngIf="
-                params?.orderFrequencies &&
-                params?.currentPatient &&
-                params?.currentVisit &&
-                params?.currentLocation &&
-                params?.provider &&
-                params?.dosingUnitsSettings &&
-                params?.durationUnitsSettings &&
-                params?.drugRoutesSettings
-              "
+            <div *ngIf="
+                  params?.currentPatient &&
+                  params?.currentVisit &&
+                  params?.currentLocation &&
+                  params?.provider &&
+                  params?.dosingUnitsSettings &&
+                  params?.durationUnitsSettings &&
+                  params?.drugRoutesSettings &&
+                  params?.generalPrescriptionDurationConcept &&
+                  params?.generalPrescriptionDoseConcept && 
+                  params?.generalPrescriptionFrequencyConcept"
             >
               <app-general-dispension-form
                 (dosingUnitsSettingsEvent)="getDosingUnits($event)"
                 (durationUnitsSettingsEvent)="getDurationUnits($event)"
                 (drugRoutesSettingsEvent)="getDrugRoutes($event)"
+                (generalPrescriptionFrequencyConceptEvent)="getDosingFrequencies($event)"
                 [encounterType]="params?.generalPrescriptionEncounterType"
-                [orderFrequencies]="params?.orderFrequencies"
                 [orderType]="params?.generalPrescriptionOrderType"
                 [currentPatient]="params?.currentPatient"
                 [currentVisit]="params?.currentVisit"
@@ -92,6 +94,10 @@
                 [dosingUnits$]="dosingUnits$"
                 [durationUnits$]="durationUnits$"
                 [drugRoutes$]="drugRoutes$"
+                [dosingFrequencies$]="dosingFrequencies$"
+                [generalPrescriptionDurationConcept]="params?.generalPrescriptionDurationConcept"
+                [generalPrescriptionDoseConcept]="params?.generalPrescriptionDoseConcept"
+                [generalPrescriptionFrequencyConcept]="params?.generalPrescriptionFrequencyConcept"
               ></app-general-dispension-form>
             </div>
           </div>

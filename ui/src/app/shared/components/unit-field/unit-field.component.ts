@@ -10,14 +10,15 @@ export class UnitFieldComponent implements OnInit {
   @Input() dosingUnits: any;
   @Input() durationUnits: any;
   @Input() drugRoutes: any;
+  @Input() dosingFrequencies: any;
 
   @Output() formUpdate = new EventEmitter();
   unitField: Dropdown;
 
   constructor() {}
 
-  ngOnInit(): void {
-    if (this.dosingUnits) {
+  ngOnInit(): void{
+    if(this.dosingUnits) {
       this.unitField = new Dropdown({
         id: "dosingUnit",
         key: "dosingUnit",
@@ -34,7 +35,24 @@ export class UnitFieldComponent implements OnInit {
       });
     }
 
-    if (this.durationUnits) {
+    if(this.dosingFrequencies) {
+      this.unitField = new Dropdown({
+        id: "frequency",
+        key: "frequency",
+        label: `Select dosing frequency`,
+        conceptClass: this.dosingFrequencies?.conceptClass?.display,
+        value: null,
+        options: this.dosingFrequencies?.answers?.map((answer) => {
+          return {
+            key: answer?.uuid,
+            value: answer?.uuid,
+            label: answer?.display,
+          };
+        }),
+      });
+    }
+
+    if(this.durationUnits) {
       this.unitField = new Dropdown({
         id: "durationUnit",
         key: "durationUnit",
@@ -51,7 +69,7 @@ export class UnitFieldComponent implements OnInit {
       });
     }
 
-    if (this.drugRoutes) {
+    if(this.drugRoutes) {
       this.unitField = new Dropdown({
         id: "route",
         key: "route",
