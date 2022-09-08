@@ -283,36 +283,36 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 	
 	@Override
 	public Discount discountInvoice(Discount discount) throws Exception {
-//		Concept discountCriteria = Context.getConceptService().getConceptByUuid(discount.getCriteria().getUuid());
-//		if (discountCriteria == null) {
-//			throw new Exception("Discount Criteria with id '" + discount.getCriteria().getUuid() + "' does not exist.");
-//		}
-//		discount.setCriteria(discountCriteria);
-//		PatientService patientService = Context.getService(PatientService.class);
-//		Patient patient = patientService.getPatientByUuid(discount.getPatient().getUuid());
-//		if (patient == null) {
-//			throw new Exception("Patient with id '" + patient.getUuid() + "' does not exist.");
-//		}
-//		discount.setPatient(patient);
-//		List<DiscountInvoiceItem> newItems = new ArrayList<DiscountInvoiceItem>();
-//		for (DiscountInvoiceItem discountInvoiceItem : discount.getItems()) {
-//			Item item = dao.findByUuid(discountInvoiceItem.getItem().getUuid());
-//			if (item == null) {
-//				throw new Exception("Item with id '" + discountInvoiceItem.getItem().getUuid() + "' does not exist.");
-//			}
-//			Invoice invoice = invoiceDAO.findByUuid(discountInvoiceItem.getInvoice().getUuid());
-//			if (invoice == null) {
-//				throw new Exception("Invoice with id '" + discountInvoiceItem.getInvoice().getUuid() + "' does not exist.");
-//			}
-//
-//			DiscountInvoiceItem newItem = new DiscountInvoiceItem();
-//			newItem.setItem(item);
-//			newItem.setInvoice(invoice);
-//			newItem.setAmount(discountInvoiceItem.getAmount());
-//			newItem.setDiscount(discount);
-//			newItems.add(newItem);
-//		}
-//		discount.setItems(newItems);
+		Concept discountCriteria = Context.getConceptService().getConceptByUuid(discount.getCriteria().getUuid());
+		if (discountCriteria == null) {
+			throw new Exception("Discount Criteria with id '" + discount.getCriteria().getUuid() + "' does not exist.");
+		}
+		discount.setCriteria(discountCriteria);
+		PatientService patientService = Context.getService(PatientService.class);
+		Patient patient = patientService.getPatientByUuid(discount.getPatient().getUuid());
+		if (patient == null) {
+			throw new Exception("Patient with id '" + patient.getUuid() + "' does not exist.");
+		}
+		discount.setPatient(patient);
+		List<DiscountInvoiceItem> newItems = new ArrayList<DiscountInvoiceItem>();
+		for (DiscountInvoiceItem discountInvoiceItem : discount.getItems()) {
+			Item item = dao.findByUuid(discountInvoiceItem.getItem().getUuid());
+			if (item == null) {
+				throw new Exception("Item with id '" + discountInvoiceItem.getItem().getUuid() + "' does not exist.");
+			}
+			Invoice invoice = invoiceDAO.findByUuid(discountInvoiceItem.getInvoice().getUuid());
+			if (invoice == null) {
+				throw new Exception("Invoice with id '" + discountInvoiceItem.getInvoice().getUuid() + "' does not exist.");
+			}
+
+			DiscountInvoiceItem newItem = new DiscountInvoiceItem();
+			newItem.setItem(item);
+			newItem.setInvoice(invoice);
+			newItem.setAmount(discountInvoiceItem.getAmount());
+			newItem.setDiscount(discount);
+			newItems.add(newItem);
+		}
+		discount.setItems(newItems);
 		//discount.setCreator(Context.getAuthenticatedUser());
 		
 		return discountDAO.save(discount);
