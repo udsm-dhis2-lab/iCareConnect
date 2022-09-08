@@ -22,14 +22,16 @@ export class InpatientPatientListComponent implements OnInit {
   constructor(private store: Store<AppState>) {}
 
   ngOnInit(): void {
-    // this.store.dispatch(
-    //   loadLocationById({
-    //     locationUuid: JSON.parse(localStorage.getItem("currentLocation"))?.uuid,
-    //     isCurrentLocation: true,
-    //   })
-    // );
-
-    // this.store.dispatch(loadLocationsByTagName({ tagName: "Bed+Location" }));
+    this.store.dispatch(
+      loadLocationById({
+        locationUuid: JSON.parse(localStorage.getItem("currentLocation"))?.uuid,
+        isCurrentLocation: true,
+      })
+    );
+    this.store.dispatch(loadLocationsByTagName({ tagName: "Bed+Location" }));
+    this.store.dispatch(
+      loadLocationsByTagName({ tagName: "Admission+Location" })
+    );
     this.currentLocation$ = this.store.select(getCurrentLocation);
     this.settingCurrentLocationStatus$ = this.store.select(
       getSettingCurrentLocationStatus

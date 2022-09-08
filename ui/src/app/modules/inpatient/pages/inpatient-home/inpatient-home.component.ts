@@ -3,10 +3,10 @@ import { MatDialog } from "@angular/material/dialog";
 import { ActivatedRoute } from "@angular/router";
 import { select, Store } from "@ngrx/store";
 import { Observable } from "rxjs";
-import { take } from "rxjs/operators";
+import { take, takeLast } from "rxjs/operators";
 import { Location } from "src/app/core/models";
+import { LocationService } from "src/app/core/services";
 import { OccupiedLocationStatusModalComponent } from "src/app/shared/components/occupied-location-status-modal/occupied-location-status-modal.component";
-import { VisitObject } from "src/app/shared/resources/visits/models/visit-object.model";
 import {
   go,
   loadLocationById,
@@ -48,7 +48,8 @@ export class InpatientHomeComponent implements OnInit {
   constructor(
     private store: Store<AppState>,
     private dialog: MatDialog,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private locationService: LocationService
   ) {
     this.store.dispatch(loadRolesDetails());
   }
@@ -58,32 +59,32 @@ export class InpatientHomeComponent implements OnInit {
     this.settingCurrentLocationStatus$ = this.store.select(
       getSettingCurrentLocationStatus
     );
+
     /**
      * TODO: Check how to softcode the 'Bed Location' tag
      */
-    // if (this.location?.childLocations?.length > 0) {
-    //   const locationUuids = this.location?.childLocations?.map((location) => {
-    //     return location?.uuid;
+
+    // this.store
+    //   .select(getCurrentLocation)
+    //   .subscribe((response) => {
+    //     this.currentLocation = response;
+    //     // localStorage.setItem(
+    //     //   "currentLocation",
+    //     //   JSON.stringify(this.currentLocation)
+    //     // );
+    //     if (this.currentLocation?.childLocations?.length > 0) {
+    //       const locationUuids = (
+    //         this.location?.childLocations?.filter((loc: any) => !loc.retired) ||
+    //         []
+    //       ).map((location) => {
+    //         return location?.uuid;
+    //       });
+    //       this.store.dispatch(loadLocationByIds({ locationUuids }));
+    //     }
     //   });
-    //   this.store.dispatch(loadLocationByIds({ locationUuids }));
-    // }
-
-    this.store.select(getCurrentLocation).subscribe((response) => {
-      this.currentLocation = response;
-      // localStorage.setItem(
-      //   "currentLocation",
-      //   JSON.stringify(this.currentLocation)
-      // );
-    });
-
-    // this.currentLocation = this.location
-    //   ? this.location
-    //   : JSON.parse(localStorage.getItem("currentLocation"));
-    this.store.dispatch(
-      loadLocationById({ locationUuid: this.currentLocation?.uuid })
-    );
 
     // console.log("this.currentLocation?.uuid", this.currentLocation);
+    this.currentLocation = this.location;
     this.bedsUnderCurrentWard$ = this.store.select(getAllBedsUnderCurrentWard, {
       id: this.currentLocation?.uuid,
       tagName: "Bed Location",
