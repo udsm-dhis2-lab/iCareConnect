@@ -31,7 +31,7 @@ const routes: Routes = [
         component: PriceListHomeComponent,
       },
       {
-        path: "users",
+        path: "users-management",
         component: UserManagementComponent,
       },
       {
@@ -39,11 +39,11 @@ const routes: Routes = [
         component: LocationManagementComponent,
       },
       {
-        path: "users/add-user",
+        path: "users-management/add-user",
         component: AddUserComponent,
       },
       {
-        path: "users/edit-user",
+        path: "users-management/edit-user",
         component: EditUserComponent,
       },
       {
