@@ -18,6 +18,7 @@ import { getCurrentLocation, getLocationsByTagName } from "src/app/store/selecto
 import { getCurrentPatient } from "src/app/store/selectors/current-patient.selectors";
 import { getProviderDetails } from "src/app/store/selectors/current-user.selectors";
 import { getActiveVisit } from "src/app/store/selectors/visit.selectors";
+import { ConceptsService } from "../../resources/concepts/services/concepts.service";
 import { OrdersService } from "../../resources/order/services/orders.service";
 
 @Component({
@@ -44,12 +45,19 @@ export class DispensingFormComponent implements OnInit {
   currentLocation$: Observable<any>;
   currentVisit$: Observable<any>;
   provider$: Observable<import("/home/jonas/DHIS2Lab/icare/ui/src/app/shared/resources/openmrs").ProviderGet>;
+  dosingUnitsSettings$: Observable<any>;
+  dosingUnits$: Observable<any>;
+  durationUnitsSettings$: Observable<any>;
+  durationUnits$: Observable<any>;
+  drugRoutes$: Observable<any>;
+  drugRoutesSettings$: Observable<any>;
 
   constructor(
     private drugOrderService: DrugOrdersService,
     private orderService: OrdersService,
     private dialogRef: MatDialogRef<DispensingFormComponent>,
     private systemSettingsService: SystemSettingsService,
+    private conceptsService: ConceptsService,
     private store: Store<AppState>,
     @Inject(MAT_DIALOG_DATA)
     public data: {
@@ -89,6 +97,9 @@ export class DispensingFormComponent implements OnInit {
     this.generalPrescriptionEncounterType$ = this.systemSettingsService.getSystemSettingsMatchingAKey("iCare.clinic.prescription.encounterType");
     this.generalPrescriptionOrderType$ = this.systemSettingsService.getSystemSettingsMatchingAKey("iCare.clinic.prescription.orderType");
     this.useGeneralPrescription$ = this.systemSettingsService.getSystemSettingsMatchingAKey("iCare.clinic.useGeneralPrescription");
+    this.dosingUnitsSettings$ = this.systemSettingsService.getSystemSettingsMatchingAKey("order.drugDosingUnitsConceptUuid");
+    this.durationUnitsSettings$ = this.systemSettingsService.getSystemSettingsMatchingAKey("order.durationUnitsConceptUuid");
+    this.drugRoutesSettings$ = this.systemSettingsService.getSystemSettingsMatchingAKey("order.drugRoutesConceptUuid");
     this.orderFrequencies$ = this.orderService.getOrdersFrequencies();
     this.currentPatient$ = this.store.pipe(select(getCurrentPatient));
     this.currentLocation$ = this.store.pipe(select(getCurrentLocation));
@@ -213,4 +224,51 @@ export class DispensingFormComponent implements OnInit {
     e.stopPropagation();
     this.savingError = undefined;
   }
+
+  getDosingUnits(conceptUuid: string) {
+    this.dosingUnits$ = this.conceptsService.getConceptDetailsByUuid(
+      conceptUuid, 
+      `custom:(uuid,name,setMembers:(uuid,display,setMembers:(uuid,display,datatype,mappings:(uuid,display,conceptReferenceTerm:(name,code)))),conceptClass:(uuid,display))`
+    )
+  }
+  
+  getDurationUnits(conceptUuid: string) {
+    this.durationUnits$ = this.conceptsService.getConceptDetailsByUuid(
+      conceptUuid, 
+      `custom:(uuid,name,setMembers:(uuid,display,setMembers:(uuid,display,datatype,mappings:(uuid,display,conceptReferenceTerm:(name,code)))),conceptClass:(uuid,display))`
+    )
+  }
+  
+  getDrugRoutes(conceptUuid: string) {
+    this.drugRoutes$ = this.conceptsService.getConceptDetailsByUuid(
+      conceptUuid, 
+      `custom:(uuid,name,setMembers:(uuid,display,setMembers:(uuid,display,datatype,mappings:(uuid,display,conceptReferenceTerm:(name,code)))),conceptClass:(uuid,display))`
+    )
+  }
 }
+
+// `custom:(
+//         uuid,
+//         name,
+//         setMembers:(
+//           uuid,
+//           display,
+//           setMembers:(
+//             uuid,
+//             display,
+//             datatype,
+//             mappings:(
+//               uuid,
+//               display,
+//               conceptReferenceTerm:(
+//                 name,
+//                 code
+//               )
+//             )
+//           )
+//         ),
+//         conceptClass:(
+//           uuid,
+//           display
+//         )
+//       )`

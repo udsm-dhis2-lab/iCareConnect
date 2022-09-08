@@ -30,7 +30,7 @@ export class ConceptsService {
     );
   }
 
-  getConceptDetailsByUuid(uuid: string, fields: string): Observable<any> {
+  getConceptDetailsByUuid(uuid: string, fields?: string): Observable<any> {
     fields = fields && fields.length > 0 ? "?v=" + fields : "";
     return this.httpClient.get("concept/" + uuid + fields ).pipe(
       map((response) => {
