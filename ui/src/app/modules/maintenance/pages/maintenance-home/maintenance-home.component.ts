@@ -30,7 +30,7 @@ export class MaintenanceHomeComponent implements OnInit {
         searchCode: "PRICE_LIST",
         children: [{ id: "dept-1" }],
       },
-      { id: "users", name: "User Management" },
+      { id: "users-management", name: "User Management" },
       { id: "drug", name: "Drug Management" },
       { id: "location", name: "Location Management" },
       { id: "system-settings", name: "System Settings" },
