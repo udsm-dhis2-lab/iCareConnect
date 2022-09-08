@@ -1,0 +1,113 @@
+{
+  "uuid": "a000cb34-9ec1-4344-a1c8-f692232f6edd",
+  "display": "Registration",
+  "name": "Registration",
+  "description": null,
+  "published": false,
+  "rules": [
+    {
+      "field": "field-uuid",
+      "trigger": "ON_CHANGE",
+      "actions": [
+
+      ]
+    }
+  ],
+  "formFields": [
+    {
+      "uuid": "field-uuid",
+      "name": "Patient Type",
+      "description": "For capturing weight of a person",
+      "personAttribute": "d52cb407-290d-4e45-a4db-be115ac29b03",
+      "typeId": "d52cb407-290d-4e45-a4db-be115ac29b03",
+      "selectMultiple": false,
+      "fieldNumber": 4,
+      "fieldPart": "1",
+      "pageNumber": 1,
+      "minOccurs": null,
+      "maxOccurs": null,
+      "required": false,
+      "sortWeight": 650,
+      "retired": false,
+      "rules": [
+        {
+          "trigger": "ON_CHANGE",
+          "actions": [
+            {
+              "condition": "FIELD_VALUE=='Student'",
+              "action": "SHOW",
+              "field": "student-id-uuid"
+            },
+            {
+              "condition": "FIELD_VALUE=='Staff'",
+              "action": "SHOW",
+              "field": "staff-id-uuid"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "uuid": "field-uuid",
+      "name": "MRN",
+      "description": "For capturing weight of a person",
+      "identifier": "d52cb407-290d-4e45-a4db-be115ac29b03",
+      "selectMultiple": false,
+      "fieldNumber": 4,
+      "fieldPart": "1",
+      "pageNumber": 1,
+      "minOccurs": null,
+      "maxOccurs": null,
+      "required": false,
+      "sortWeight": 650,
+      "retired": false
+    },
+    {
+      "uuid": "student-id-uuid",
+      "name": "Student ID",
+      "description": "Identifier for MRN",
+      "identifier": "d52cb407-290d-4e45-a4db-be115ac29b03",
+      "selectMultiple": false,
+      "fieldNumber": 4,
+      "fieldPart": "1",
+      "pageNumber": 1,
+      "minOccurs": null,
+      "maxOccurs": null,
+      "required": false,
+      "sortWeight": 650,
+      "retired": false
+    },
+    {
+      "uuid": "field-uuid",
+      "name": "First Name",
+      "description": "Stores the first name",
+      "attribute": "firstName",
+      "selectMultiple": false,
+      "fieldNumber": 4,
+      "fieldPart": "1",
+      "pageNumber": 1,
+      "minOccurs": null,
+      "maxOccurs": null,
+      "required": false,
+      "sortWeight": 650,
+      "retired": false
+    },
+    {
+      "uuid": "d52cb407-290d-4e45-a4db-be115ac29b03",
+      "name": "First Name",
+      "description": "For capturing weight of a person",
+      "attribute": "",
+      "identifier": "",
+      "selectMultiple": false,
+      "fieldNumber": 4,
+      "fieldPart": "1",
+      "pageNumber": 1,
+      "minOccurs": null,
+      "maxOccurs": null,
+      "required": false,
+      "sortWeight": 650,
+      "retired": false
+    }
+  ],
+  "resources": []
+}
