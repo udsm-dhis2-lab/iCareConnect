@@ -133,7 +133,7 @@ export class LocationService {
 
   getLocationsByTagName(
     tagName: string,
-    parameters?: { limit: number; startIndex: number; v: string }
+    parameters?: { limit?: number; startIndex?: number; v?: string }
   ): Observable<any[]> {
     let othersParameters = "";
     if (parameters?.limit) {
@@ -153,9 +153,15 @@ export class LocationService {
       )
       .pipe(
         map((response) => {
-          return response?.results.map((result) => {
+          return (
+            response?.results?.filter((res: any) => !res?.retired) || []
+          ).map((result) => {
             return {
               ...result,
+              childLocations:
+                result?.childLocations?.filter(
+                  (childLoc: any) => !childLoc?.retired
+                ) || [],
               attributes:
                 result?.attributes && result?.attributes?.length > 0
                   ? result?.attributes.filter((attribute) => !attribute?.voided)

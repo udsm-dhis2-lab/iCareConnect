@@ -42,7 +42,7 @@ export const upsertLocation = createAction(
 );
 
 export const upsertLocations = createAction(
-  "[LOCATIONS] upsert locatiosn",
+  "[LOCATIONS] upsert loaded locations",
   props<{ locations: Location[] }>()
 );
 
