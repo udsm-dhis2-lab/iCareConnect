@@ -395,6 +395,7 @@ export const getAllBedsUnderCurrentWard = createSelector(
             (location: any) => !location?.retired
           ) || []
         ).map((childLocation) => {
+          // console.log("CHILD", locationEntities[childLocation?.uuid]);
           return locationEntities[childLocation?.uuid];
         }),
         locations

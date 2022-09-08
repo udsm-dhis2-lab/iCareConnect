@@ -64,6 +64,8 @@ export class InpatientHomeComponent implements OnInit {
      * TODO: Check how to softcode the 'Bed Location' tag
      */
 
+    //  this.store.dispatch(loadLocationsByTagName({ tagName: "Bed+Location" }));
+
     // this.store
     //   .select(getCurrentLocation)
     //   .subscribe((response) => {
