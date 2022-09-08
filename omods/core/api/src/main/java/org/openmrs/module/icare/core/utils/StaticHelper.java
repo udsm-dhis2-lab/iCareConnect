@@ -1,5 +1,7 @@
 package org.openmrs.module.icare.core.utils;
 
+import org.openmrs.api.context.Context;
+
 import java.util.Map;
 
 public class StaticHelper {
@@ -10,5 +12,9 @@ public class StaticHelper {
 		} else {
 			return (String) uuidOrObject;
 		}
+	}
+
+	public static String getFilepath(){
+		return Context.getAdministrationService().getSystemVariables().get("ATTACHMENT_DIRECTORY");
 	}
 }

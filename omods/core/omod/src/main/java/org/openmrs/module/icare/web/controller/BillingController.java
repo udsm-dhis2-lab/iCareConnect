@@ -110,14 +110,18 @@ public class BillingController extends BaseController {
 	public Payment onPostConfirmPayment(Payment payment) throws Exception {
 		return billingService.confirmPayment(payment);
 	}
-	
+
+	public String getFilepath(){
+		return "/tmp/attachments";
+	}
 	@RequestMapping(value = "discount", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> onPostDiscountInvoiceMap(@RequestParam(value = "document", required = false) MultipartFile file, @RequestParam("json") Discount discount
 	) throws Exception {
 		
 		//File upload implementation
-		String filePath = "/tmp/";
+		String filePath = getFilepath();
+		//String filePath = "/tmp/";
 		String dateTime = DateTime.now().toString("yyyyMMddHHmmss");
 		String fileNameToSave = dateTime.concat(file.getOriginalFilename());
 		String path = filePath + fileNameToSave;
