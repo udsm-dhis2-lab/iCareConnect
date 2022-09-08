@@ -19,11 +19,13 @@ import java.util.Map;
 public class PatientWrapper {
 	
 	Patient patient;
+	
 	Visit activeVisit;
 	
 	public PatientWrapper(Patient patient) {
 		this.patient = patient;
 	}
+	
 	public PatientWrapper(Patient patient, Visit activeVisit) {
 		this.patient = patient;
 		this.activeVisit = activeVisit;
@@ -142,7 +144,7 @@ public class PatientWrapper {
 		personMap.put("causeOfDeath", patient.getPerson().getCauseOfDeathNonCoded());
 
 		if(activeVisit != null){
-			personMap.put("activeVisit", (new VisitWrapper(activeVisit)).toMap());
+			patientMap.put("activeVisit", (new VisitWrapper(activeVisit)).toMap());
 		}
 		List<Map<String, Object>> attributesMap = new ArrayList<>();
 		for(PersonAttribute attribute:patient.getPerson().getAttributes()){
@@ -176,11 +178,11 @@ public class PatientWrapper {
 	public CharSequence getEmail() {
 		return "";
 	}
-
+	
 	public enum OrderByDirection {
 		ASC, DESC;
 	}
-
+	
 	public enum VisitStatus {
 		ACTIVE, CLOSED;
 	}

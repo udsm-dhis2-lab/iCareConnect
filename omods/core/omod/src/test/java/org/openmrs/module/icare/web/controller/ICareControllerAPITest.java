@@ -185,11 +185,11 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		item.put("dateTime", dateFormat.format(new Date()));
 		item.put("id", UUID.randomUUID());
 		System.out.println(item.get("dateTime"));
-
+		
 		ICareService iCareService = spy(Context.getService(ICareService.class));
 		//ICareServiceImpl iCareServiceImpl = mock(ICareServiceImpl.class);
 		when(iCareService.sendMessageRequest(new Message())).thenReturn(new Message());
-
+		
 		MockHttpServletRequest newPostRequest = newPostRequest("icare/message", item);
 		MockHttpServletResponse handle = handle(newPostRequest);
 		
@@ -245,7 +245,7 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		Map visitMap = (new ObjectMapper()).readValue(visitData, Map.class);
 		List<Map> visitDetails = (List<Map>) visitMap.get("results");
 		System.out.println("visitDetails.size():" + visitDetails.size());
-
+		
 		//TODO Check if it is actually what is expected
 		assertThat("Should return a visit", visitDetails.size() == 2);
 		
@@ -538,7 +538,7 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		Map patientMap = (new ObjectMapper()).readValue(PatientData, Map.class);
 		List<Map> visitDetails = (List<Map>) patientMap.get("results");
 		assertThat("Should return a patient", visitDetails.size() == 1);
-
+		
 		newGetRequest = newGetRequest("icare/patient", new Parameter("patientUUID", "993c46d2-5007-45e8-9512-969300717761"));
 		handle = handle(newGetRequest);
 		String PatientData2 = handle.getContentAsString();
@@ -546,9 +546,8 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		Map patientMap2 = (new ObjectMapper()).readValue(PatientData2, Map.class);
 		List<Map> visitDetails2 = (List<Map>) patientMap2.get("results");
 		assertThat("Should return a patient", visitDetails2.size() == 1);
-
-
-		newGetRequest = newGetRequest("icare/patient", new Parameter("limit", "1"),new Parameter("startIndex", "0"));
+		
+		newGetRequest = newGetRequest("icare/patient", new Parameter("limit", "1"), new Parameter("startIndex", "0"));
 		handle = handle(newGetRequest);
 		String PatientData3 = handle.getContentAsString();
 		Map patientMap3 = (new ObjectMapper()).readValue(PatientData3, Map.class);
@@ -556,5 +555,19 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		assertThat("Should return a patient", visitDetails3.size() == 1);
 		
 	}
-	
+
+	@Test
+	public void testSummary() throws Exception {
+
+		//Get visits by attribute value references
+		MockHttpServletRequest newGetRequest = newGetRequest("icare/summary");
+		MockHttpServletResponse handle = handle(newGetRequest);
+		String summaryData = handle.getContentAsString();
+		System.out.println(summaryData);
+		Map summaryMap = (new ObjectMapper()).readValue(summaryData, Map.class);
+		List<Map> summaryDetails = (List<Map>) summaryMap.get("results");
+		//assertThat("Should return a visit", visitDetails.size() == 1);
+
+
+	}
 }
