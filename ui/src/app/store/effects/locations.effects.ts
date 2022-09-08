@@ -33,6 +33,8 @@ import {
   upsertLocation,
   go,
   loadAllLocationsByLoginTag,
+  loadLocationByIds,
+  upsertLocations,
 } from "../actions";
 import { AppState } from "../reducers";
 import { getCurrentLocation, getUrl } from "../selectors";
@@ -111,11 +113,47 @@ export class LocationsEffects implements OnInitEffects {
       ofType(loadLocationById),
       switchMap((action) => {
         return this.locationService.getLocationById(action.locationUuid).pipe(
-          map((locationResponse) => {
-            return upsertLocation({
-              location: (formatLocationsPayLoad([locationResponse] || []) ||
-                [])[0],
-            });
+          switchMap((locationResponse) => {
+            if (
+              locationResponse &&
+              (formatLocationsPayLoad([locationResponse] || []) || [])?.length >
+                0
+            ) {
+              return [
+                action?.isCurrentLocation
+                  ? setCurrentUserCurrentLocation({
+                      location: (formatLocationsPayLoad(
+                        [locationResponse] || []
+                      ) || [])[0],
+                    })
+                  : null,
+                upsertLocation({
+                  location: {
+                    ...locationResponse,
+                    ...(formatLocationsPayLoad([locationResponse] || []) ||
+                      [])[0],
+                  },
+                }),
+              ];
+            }
+          })
+        );
+      })
+    )
+  );
+
+  loadLocations$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(loadLocationByIds),
+      switchMap((action) => {
+        return this.locationService.getLocationByIds(action.locationUuids).pipe(
+          switchMap((locationsResponse) => {
+            return [
+              upsertLocations({
+                locations:
+                  formatLocationsPayLoad(locationsResponse || []) || [],
+              }),
+            ];
           })
         );
       })

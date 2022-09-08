@@ -1,7 +1,10 @@
 import { Component, OnInit } from "@angular/core";
 import { Store } from "@ngrx/store";
 import { Observable } from "rxjs";
-import { loadLocationById } from "src/app/store/actions";
+import {
+  loadLocationById,
+  loadLocationsByTagName,
+} from "src/app/store/actions";
 import { AppState } from "src/app/store/reducers";
 import {
   getCurrentLocation,
@@ -19,11 +22,14 @@ export class InpatientPatientListComponent implements OnInit {
   constructor(private store: Store<AppState>) {}
 
   ngOnInit(): void {
-    this.store.dispatch(
-      loadLocationById({
-        locationUuid: JSON.parse(localStorage.getItem("currentLocation"))?.uuid,
-      })
-    );
+    // this.store.dispatch(
+    //   loadLocationById({
+    //     locationUuid: JSON.parse(localStorage.getItem("currentLocation"))?.uuid,
+    //     isCurrentLocation: true,
+    //   })
+    // );
+
+    // this.store.dispatch(loadLocationsByTagName({ tagName: "Bed+Location" }));
     this.currentLocation$ = this.store.select(getCurrentLocation);
     this.settingCurrentLocationStatus$ = this.store.select(
       getSettingCurrentLocationStatus

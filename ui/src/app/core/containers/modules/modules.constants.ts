@@ -191,4 +191,12 @@ export const ICARE_APPS: ICAREApp[] = [
       },
     ],
   },
+  {
+    name: "DHIS2",
+    id: "dhis2",
+    image: "assets/material/report.png",
+    icon: "",
+    path: "/dhis2",
+    order: 20,
+  },
 ];

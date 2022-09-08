@@ -8,8 +8,10 @@
     *ngIf="!params?.location || params?.settingCurrentLocationStatus"
     mode="indeterminate"
   ></mat-progress-bar>
+
+  <!-- {{ params?.location | json }} -->
   <app-inpatient-home
     *ngIf="params?.location && !params?.settingCurrentLocationStatus"
-    [location]="location"
+    [location]="params?.location"
   ></app-inpatient-home>
 </div>

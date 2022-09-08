@@ -375,15 +375,15 @@ public class ICareController {
 	
 	@RequestMapping(value ="patient", method = RequestMethod.GET)
 	@ResponseBody
-	public Map<String, Object> getPatient(@RequestParam(required = false) String search,@RequestParam(required = false) String patientUUID){
+	public Map<String, Object> getPatient(@RequestParam(required = false) String search,@RequestParam(required = false) String patientUUID,@RequestParam(required = false) PatientWrapper.VisitStatus visitStatus,@RequestParam(defaultValue = "100") Integer limit,
+										  @RequestParam(defaultValue = "0") Integer startIndex,@RequestParam(defaultValue = "DESC") PatientWrapper.OrderByDirection orderByDirection){
 
-		List<Patient> patients = iCareService.getPatients(search,patientUUID);
+		List<PatientWrapper> patients = iCareService.getPatients(search,patientUUID,visitStatus,startIndex,limit,orderByDirection);
 
 		List<Map<String, Object>> responseSamplesObject = new ArrayList<Map<String, Object>>();
-		//Map<String, Object> patientresult = new HashMap<String, Object>();
-		for (Patient patient: patients){
+		for (PatientWrapper patient: patients){
 
-			responseSamplesObject.add((Map<String, Object>) new PatientWrapper(patient).toMap());
+			responseSamplesObject.add((Map<String, Object>) patient.toMap());
 
 		}
 		Map<String, Object> results = new HashMap<>();

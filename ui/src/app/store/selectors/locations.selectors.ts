@@ -60,7 +60,6 @@ export const getStoreLocations = createSelector(
 export const getParentLocation = createSelector(
   getLocations,
   (locations: Location[]) => {
-
     const allParentLocations =
       _.filter(locations, { parentLocation: null }) || [];
 
@@ -124,10 +123,12 @@ export const getCurrentLocation = createSelector(
     const formsAttributes =
       state.currentUserCurrentLocation &&
       state.currentUserCurrentLocation?.attributes
-        ? state.currentUserCurrentLocation.attributes.filter(
+        ? state.currentUserCurrentLocation.attributes?.filter(
             (attribute) => attribute?.attributeType?.display === "Forms"
           ) || []
         : [];
+
+    // console.log(state.currentUserCurrentLocation);
     const localStoredLocation = localStorage.getItem("currentLocation");
     const location = state.currentUserCurrentLocation
       ? state.currentUserCurrentLocation
@@ -275,15 +276,15 @@ function getChildLocationMembers(childLocations, locations) {
   if (childLocations?.length === 0) {
     return [];
   }
-  return childLocations.map((location) => {
+  return childLocations?.map((location) => {
     const currentLocation = (locations.filter(
       (loc) => loc.uuid === location.uuid
     ) || [])[0];
     const patientPerBedAttribute =
       currentLocation &&
-      currentLocation.attributes &&
-      currentLocation.attributes?.length > 0
-        ? (currentLocation.attributes.filter(
+      currentLocation?.attributes &&
+      currentLocation?.attributes?.length > 0
+        ? (currentLocation?.attributes.filter(
             (attribute) =>
               attribute?.attributeType?.display === "Patients per bed"
           ) || [])[0]
@@ -323,7 +324,7 @@ export const getAllLocationsUnderWardAsFlatArray = createSelector(
       currentLocation &&
       currentLocation.attributes &&
       currentLocation.attributes?.length > 0
-        ? (currentLocation.attributes.filter(
+        ? (currentLocation?.attributes?.filter(
             (attribute) =>
               attribute?.attributeType?.display === "Patients per bed"
           ) || [])[0]
