@@ -198,16 +198,28 @@ export class LocationsEffects implements OnInitEffects {
     this.actions$.pipe(
       ofType(loadLocationsByTagName),
       switchMap((action) => {
-        return this.locationService.getLocationsByTagName(action.tagName).pipe(
-          map((locationsResponse: any) => {
-            return upsertLocations({
-              locations: formatLocationsPayLoad(locationsResponse || []),
-            });
-          }),
-          catchError((error) => {
-            return of(loadingLocationByTagNameFails({ error }));
+        return this.locationService
+          .getLocationsByTagName(action.tagName, {
+            limit: 100,
+            startIndex: 0,
+            v: "custom:(uuid,name,display,description,parentLocation:(uuid,name),tags,attributes,childLocations,retired)",
           })
-        );
+          .pipe(
+            switchMap((locationsResponse: any) => {
+              // console.log("locationsResponse", locationsResponse);
+              return [
+                addLoadedLocations({
+                  locations: formatLocationsPayLoad(locationsResponse || []),
+                }),
+                upsertLocations({
+                  locations: formatLocationsPayLoad(locationsResponse || []),
+                }),
+              ];
+            }),
+            catchError((error) => {
+              return of(loadingLocationByTagNameFails({ error }));
+            })
+          );
       })
     )
   );

@@ -28,6 +28,7 @@ export class InpatientPatientListComponent implements OnInit {
         isCurrentLocation: true,
       })
     );
+
     this.store.dispatch(loadLocationsByTagName({ tagName: "Bed+Location" }));
     this.store.dispatch(
       loadLocationsByTagName({ tagName: "Admission+Location" })
