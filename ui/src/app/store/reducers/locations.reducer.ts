@@ -1,5 +1,5 @@
-import { createReducer, on } from '@ngrx/store';
-import { initialLocationsState, locationsAdapter } from '../states';
+import { createReducer, on } from "@ngrx/store";
+import { initialLocationsState, locationsAdapter } from "../states";
 import {
   loadLocationsByTagName,
   loadingLocationsFails,
@@ -11,12 +11,13 @@ import {
   loadingLocationByTagNameFails,
   clearLocations,
   updateCurrentLocationStatus,
-} from '../actions';
+  upsertLocations,
+} from "../actions";
 import {
   loadingBaseState,
   loadedBaseState,
   errorBaseState,
-} from '../states/base.state';
+} from "../states/base.state";
 
 const reducer = createReducer(
   initialLocationsState,
@@ -48,6 +49,9 @@ const reducer = createReducer(
   })),
   on(upsertLocation, (state, { location }) =>
     locationsAdapter.upsertOne(location, { ...state })
+  ),
+  on(upsertLocations, (state, { locations }) =>
+    locationsAdapter.upsertMany(locations, { ...state })
   ),
   on(loadLocationsByTagName, (state) => ({
     ...state,

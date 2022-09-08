@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { OpenmrsHttpClientService } from "src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service";
-import { from, Observable, of } from "rxjs";
+import { from, Observable, of, zip } from "rxjs";
 import { catchError, map } from "rxjs/operators";
 import { head } from "lodash";
 import {
@@ -53,6 +53,31 @@ export class LocationService {
         };
       }),
       catchError((error) => of(error))
+    );
+  }
+
+  getLocationByIds(uuids): Observable<any> {
+    return zip(
+      ...uuids?.map((uuid) =>
+        this.httpClient.get("location/" + uuid + "?v=full").pipe(
+          map((response) => {
+            return {
+              ...response,
+              attributes:
+                response?.attributes && response?.attributes?.length > 0
+                  ? response?.attributes.filter(
+                      (attribute) => !attribute?.voided
+                    )
+                  : [],
+            };
+          })
+        )
+      )
+    ).pipe(
+      map((response) => {
+        console.log("ALL", response);
+        return response;
+      })
     );
   }
 

@@ -64,7 +64,7 @@ export class ModulesSelectorComponent implements OnInit {
       );
 
       const modules = (
-        this.currentLocation.attributes.filter(
+        this.currentLocation.attributes?.filter(
           (attribute) =>
             attribute?.attributeType?.display?.toLowerCase() === "modules" &&
             !attribute?.voided
@@ -78,7 +78,7 @@ export class ModulesSelectorComponent implements OnInit {
           location: this.currentLocation,
         };
       });
-      
+
       // Hinglight the current location
       this.currentModule = {
         ...this.currentLocation?.modules[0],
