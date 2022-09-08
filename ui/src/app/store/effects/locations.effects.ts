@@ -33,6 +33,9 @@ import {
   upsertLocation,
   go,
   loadAllLocationsByLoginTag,
+  loadLocationByIds,
+  upsertLocations,
+  updateCurrentLocationStatus,
 } from "../actions";
 import { AppState } from "../reducers";
 import { getCurrentLocation, getUrl } from "../selectors";
@@ -111,11 +114,61 @@ export class LocationsEffects implements OnInitEffects {
       ofType(loadLocationById),
       switchMap((action) => {
         return this.locationService.getLocationById(action.locationUuid).pipe(
-          map((locationResponse) => {
-            return upsertLocation({
-              location: (formatLocationsPayLoad([locationResponse] || []) ||
-                [])[0],
-            });
+          switchMap((locationResponse) => {
+            if (
+              locationResponse &&
+              (formatLocationsPayLoad([locationResponse] || []) || [])?.length >
+                0
+            ) {
+              const location = {
+                ...locationResponse,
+                ...(formatLocationsPayLoad([locationResponse] || []) || [])[0],
+              };
+              if (action?.isCurrentLocation) {
+                return [
+                  setCurrentUserCurrentLocation({
+                    location,
+                  }),
+                  upsertLocation({
+                    location: {
+                      ...locationResponse,
+                      ...(formatLocationsPayLoad([locationResponse] || []) ||
+                        [])[0],
+                    },
+                  }),
+                  updateCurrentLocationStatus({ settingLocation: false }),
+                ];
+              } else {
+                return [
+                  upsertLocation({
+                    location: {
+                      ...locationResponse,
+                      ...(formatLocationsPayLoad([locationResponse] || []) ||
+                        [])[0],
+                    },
+                  }),
+                ];
+              }
+            }
+          })
+        );
+      })
+    )
+  );
+
+  loadLocationsByIds$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(loadLocationByIds),
+      switchMap((action) => {
+        return this.locationService.getLocationByIds(action.locationUuids).pipe(
+          switchMap((locationsResponse) => {
+            return [
+              upsertLocations({
+                locations:
+                  formatLocationsPayLoad(locationsResponse || []) || [],
+              }),
+              updateCurrentLocationStatus({ settingLocation: false }),
+            ];
           })
         );
       })
@@ -148,18 +201,29 @@ export class LocationsEffects implements OnInitEffects {
     this.actions$.pipe(
       ofType(loadLocationsByTagName),
       switchMap((action) => {
-        return this.locationService.getLocationsByTagName(action.tagName).pipe(
-          map((locationsResponse: any) => {
-            return addLoadedLocations({
-              locations: formatLocationsPayLoad(
-                locationsResponse?.results || []
-              ),
-            });
-          }),
-          catchError((error) => {
-            return of(loadingLocationByTagNameFails({ error }));
+        return this.locationService
+          .getLocationsByTagName(action.tagName, {
+            limit: 100,
+            startIndex: 0,
+            v: "custom:(uuid,name,display,description,parentLocation:(uuid,name),tags,attributes,childLocations,retired)",
           })
-        );
+          .pipe(
+            switchMap((locationsResponse: any) => {
+              // console.log("locationsResponse", locationsResponse);
+              return [
+                addLoadedLocations({
+                  locations: formatLocationsPayLoad(locationsResponse || []),
+                }),
+                upsertLocations({
+                  locations: formatLocationsPayLoad(locationsResponse || []),
+                }),
+                updateCurrentLocationStatus({ settingLocation: false }),
+              ];
+            }),
+            catchError((error) => {
+              return of(loadingLocationByTagNameFails({ error }));
+            })
+          );
       })
     )
   );

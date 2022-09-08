@@ -22,6 +22,8 @@ import org.openmrs.module.icare.billing.services.insurance.ClaimResult;
 import org.openmrs.module.icare.core.ICareService;
 import org.openmrs.module.icare.core.Item;
 import org.openmrs.module.icare.core.Message;
+import org.openmrs.module.icare.core.Summary;
+import org.openmrs.module.icare.core.utils.PatientWrapper;
 import org.openmrs.module.icare.core.utils.VisitWrapper;
 import org.openmrs.module.icare.store.models.OrderStatus;
 import org.openmrs.module.webservices.rest.web.RestConstants;
@@ -58,6 +60,18 @@ public class ICareController {
         results.put("identifiers", ids);
         return results;
     }
+
+	/**
+	 * Initially called after the getUsers method to get the landing form name
+	 *
+	 * @return String form view name
+	 */
+	@RequestMapping(value = "summary", method = RequestMethod.GET)
+	@ResponseBody
+	public Map<String, Object> onGetSummary() {
+		Summary summary = iCareService.getSummary();
+		return summary.toMap();
+	}
 	
 	/**
 	 * Initially called after the getUsers method to get the landing form name
@@ -374,20 +388,16 @@ public class ICareController {
 	
 	@RequestMapping(value ="patient", method = RequestMethod.GET)
 	@ResponseBody
-	public Map<String, Object> getPatient(@RequestParam(required = false) String search,@RequestParam(required = false) String patientUUID){
+	public Map<String, Object> getPatient(@RequestParam(required = false) String search,@RequestParam(required = false) String patientUUID,@RequestParam(required = false) PatientWrapper.VisitStatus visitStatus,@RequestParam(defaultValue = "100") Integer limit,
+										  @RequestParam(defaultValue = "0") Integer startIndex,@RequestParam(defaultValue = "DESC") PatientWrapper.OrderByDirection orderByDirection){
 
-		List<Patient> patients = iCareService.getPatients(search,patientUUID);
+		List<PatientWrapper> patients = iCareService.getPatients(search,patientUUID,visitStatus,startIndex,limit,orderByDirection);
 
 		List<Map<String, Object>> responseSamplesObject = new ArrayList<Map<String, Object>>();
-		Map<String, Object> patientresult = new HashMap<String, Object>();
-		for (Patient patient: patients){
-			patientresult.put("uuid", patient.getUuid());
-			patientresult.put("firstName",patient.getGivenName());
-			patientresult.put("lastName",patient.getFamilyName());
-			patientresult.put("identifier", patient.getIdentifiers());
-			patientresult.put("age",patient.getAge());
+		for (PatientWrapper patient: patients){
 
-			responseSamplesObject.add(patientresult);
+			responseSamplesObject.add((Map<String, Object>) patient.toMap());
+
 		}
 		Map<String, Object> results = new HashMap<>();
 		results.put("results",responseSamplesObject);

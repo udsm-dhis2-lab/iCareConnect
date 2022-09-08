@@ -20,12 +20,13 @@ import org.openmrs.api.db.hibernate.DbSession;
 import org.openmrs.module.icare.billing.models.ItemPrice;
 import org.openmrs.module.icare.billing.models.Prescription;
 import org.openmrs.module.icare.core.Item;
+import org.openmrs.module.icare.core.Summary;
+import org.openmrs.module.icare.core.utils.PatientWrapper;
 import org.openmrs.module.icare.core.utils.VisitWrapper;
 import org.openmrs.module.icare.store.models.OrderStatus;
 
 import javax.persistence.EntityManager;
-import java.util.Calendar;
-import java.util.List;
+import java.util.*;
 
 public class ICareDao extends BaseDAO<Item> {
 	
@@ -524,17 +525,24 @@ public class ICareDao extends BaseDAO<Item> {
 		return sqlQuery.list();
 	}
 	
-	public List<Patient> getPatients(String search, String patientUUID) {
+	public List<PatientWrapper> getPatients(String search, String patientUUID, PatientWrapper.VisitStatus visitStatus,
+	        Integer startIndex, Integer limit, PatientWrapper.OrderByDirection orderByDirection) {
 		
 		DbSession session = this.getSession();
-		String queryStr = "SELECT p FROM Patient p INNER JOIN p.names pname WHERE p.voided = false ";
+		String queryStr = "SELECT p, v FROM Patient p,Visit v INNER JOIN p.names pname WHERE p = v.patient AND v.stopDatetime IS NULL AND p.voided = false ";
 		
 		if (search != null) {
-			queryStr += " AND lower(concat(pname.givenName,pname.middleName,pname.familyName)) LIKE lower(:search)";
+			queryStr += "AND lower(concat(pname.givenName,pname.middleName,pname.familyName)) LIKE lower(:search)";
 		}
 		if (patientUUID != null) {
 			queryStr += "AND p.uuid=:patientUUID";
 		}
+		
+		//		if (orderByDirection == PatientWrapper.OrderByDirection.ASC) {
+		//			queryStr += " ASC";
+		//		} else if (orderByDirection == PatientWrapper.OrderByDirection.DESC) {
+		//			queryStr += " DESC";
+		//		}
 		
 		Query query = session.createQuery(queryStr);
 		
@@ -546,7 +554,47 @@ public class ICareDao extends BaseDAO<Item> {
 			query.setParameter("patientUUID", patientUUID);
 		}
 		
-		return query.list();
+		query.setFirstResult(startIndex);
+		query.setMaxResults(limit);
+		
+		List<PatientWrapper> patientWrappers = new ArrayList<PatientWrapper>();
+		
+		for (Object[] patientData : (List<Object[]>) query.list()) {
+			Patient patient = (Patient) patientData[0];
+			Visit visit = (Visit) patientData[1];
+			patientWrappers.add(new PatientWrapper(patient, visit));
+		}
+		/*for(Patient patient:(List<Patient>)query.list()){
+			patientWrappers.add(new PatientWrapper(patient));
+		}*/
+		return patientWrappers;
 		
 	}
+
+    public Summary getSummary() {
+
+		Summary summary = new Summary();
+
+		DbSession session = getSession();
+		String queryStr = "SELECT COUNT(patient) FROM Patient patient";
+		Query query = session.createQuery(queryStr);
+		summary.setAllPatients((long) query.list().get(0));
+
+		queryStr = "SELECT COUNT(visit) FROM Visit visit WHERE visit.stopDatetime IS NULL";
+		query = session.createQuery(queryStr);
+		summary.setActiveVisits((long) query.list().get(0));
+
+		queryStr = "SELECT l,COUNT(v) FROM Location l, Visit v WHERE v.stopDatetime IS NULL AND v.location=l GROUP BY l";
+		query = session.createQuery(queryStr);
+		//summary.setActiveVisits((long) query.list().get(0));
+
+		Map<Location, Long> locationMap= new HashMap<>();
+		for (Object[] locationData : (List<Object[]>) query.list()) {
+			Location location = (Location) locationData[0];
+			Long count = (long) locationData[1];
+			locationMap.put(location,count);
+		}
+		summary.setLocations(locationMap);
+		return summary;
+    }
 }

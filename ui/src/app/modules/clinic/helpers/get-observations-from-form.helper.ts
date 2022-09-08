@@ -23,7 +23,7 @@ export function getObservationsFromForm(
           ? getObservationsFromForm(valueObject.memberEntities)
           : undefined,
         voided: false,
-        value: valueObject?.value,
+        value: !valueObject?.isFile ? valueObject?.value : null,
         status: "PRELIMINARY",
       };
     })

@@ -260,7 +260,7 @@
                   *ngIf="orderCount == 0"
                   [attr.rowspan]="sample?.orders?.length"
                 >
-                  <button mat-button (click)="onPrintBarCodes($event, sample)">
+                  <button mat-button class="colored-button " (click)="onPrintBarCodes($event, sample)">
                     Print Barcodes
                   </button>
                 </td>
