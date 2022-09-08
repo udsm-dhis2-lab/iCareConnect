@@ -563,10 +563,31 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		MockHttpServletRequest newGetRequest = newGetRequest("icare/summary");
 		MockHttpServletResponse handle = handle(newGetRequest);
 		String summaryData = handle.getContentAsString();
-		System.out.println(summaryData);
 		Map summaryMap = (new ObjectMapper()).readValue(summaryData, Map.class);
-		List<Map> summaryDetails = (List<Map>) summaryMap.get("results");
-		//assertThat("Should return a visit", visitDetails.size() == 1);
+
+		assertThat("Has 8 patient", summaryMap.get("allPatients").equals(8));
+		assertThat("Has 8 activeVisits", summaryMap.get("activeVisits").equals(8));
+		assertThat("Has 1 location", ((List)summaryMap.get("locations")).size() == 1);
+
+	}
+
+	@Test
+	public void testDrug() throws Exception {
+
+		//Get visits by attribute value references
+		Drug drug = Context.getConceptService().getAllDrugs().get(0);
+		//System.out.println(drug.getConcept().getUuid());
+
+		MockHttpServletRequest newGetRequest = newGetRequest("icare/drug",new Parameter("concept",drug.getConcept().getUuid()));
+		MockHttpServletResponse handle = handle(newGetRequest);
+		String drugData = handle.getContentAsString();
+		//System.out.println(drugData);
+		Map drugMap = (new ObjectMapper()).readValue(drugData, Map.class);
+		List<Map> drugDetails = (List<Map>) drugMap.get("results");
+		//drugDetails.get(0).
+		assertThat("Should have drug with display", drug.getDisplayName().equals(drugDetails.get(0).get("display")));
+		assertThat("Should have drug with name", drug.getName().equals(drugDetails.get(0).get("name")));
+		assertThat("Should have drug with same uuid", drug.getUuid().equals(drugDetails.get(0).get("uuid")));
 
 
 	}
