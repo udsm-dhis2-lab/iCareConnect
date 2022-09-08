@@ -13,10 +13,15 @@ import org.openmrs.module.icare.billing.models.Discount;
 import org.openmrs.module.icare.billing.models.Invoice;
 import org.openmrs.module.icare.billing.models.Payment;
 import org.openmrs.module.icare.billing.services.BillingService;
+import org.openmrs.module.icare.core.utils.StaticHelper;
 import org.springframework.mock.web.MockMultipartFile;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -129,6 +134,14 @@ public class BillingControllerTest {
 		verify(billingService).discountInvoice(discount);
 		
 		//Context.getAdministrationService().getSystemVariables().put("ATTACHMENT_DIRECTORY","/tmp/attachment");
+
+		//when(billingController.getFilepath()).thenReturn("/tmp/attachment");
+
+		Path path = Paths.get(billingController.getFilepath());
+		if (Files.notExists(path)){
+			Files.createDirectories(path);
+		}
+
 		InputStream in = getClass().getClassLoader().getResourceAsStream("lab-data.xml");
 		System.out.println(in);
 		
@@ -148,6 +161,8 @@ public class BillingControllerTest {
 
 		Map<String, Object> discount4 = billingController.onPostDiscountInvoiceMap(new MockMultipartFile("document", "lab-data.xml",
 		        "application/xml", out.toByteArray()),discount);
+
+		assertThat("Discount is present",discount4.size() != 0);
 
 		
 	}
