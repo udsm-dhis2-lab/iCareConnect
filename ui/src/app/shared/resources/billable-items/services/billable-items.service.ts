@@ -42,4 +42,10 @@ export class BillableItemsService {
       })
     );
   }
+
+  getControlNumber(): Observable<string>{
+    let number = new Date().getMilliseconds();
+    console.log(number)
+    return of(number.toString())
+  }
 }

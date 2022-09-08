@@ -20,8 +20,15 @@ public class PatientWrapper {
 	
 	Patient patient;
 	
+	Visit activeVisit;
+	
 	public PatientWrapper(Patient patient) {
 		this.patient = patient;
+	}
+	
+	public PatientWrapper(Patient patient, Visit activeVisit) {
+		this.patient = patient;
+		this.activeVisit = activeVisit;
 	}
 	
 	private String getAttribute(String attributeConfig) throws ConfigurationException {
@@ -136,6 +143,9 @@ public class PatientWrapper {
 		personMap.put("deathdateEstimated", patient.getPerson().getDeathdateEstimated());
 		personMap.put("causeOfDeath", patient.getPerson().getCauseOfDeathNonCoded());
 
+		if(activeVisit != null){
+			patientMap.put("activeVisit", (new VisitWrapper(activeVisit)).toMap());
+		}
 		List<Map<String, Object>> attributesMap = new ArrayList<>();
 		for(PersonAttribute attribute:patient.getPerson().getAttributes()){
 			Map<String, Object> attributeMap = new HashMap<>();
@@ -167,5 +177,13 @@ public class PatientWrapper {
 	
 	public CharSequence getEmail() {
 		return "";
+	}
+	
+	public enum OrderByDirection {
+		ASC, DESC;
+	}
+	
+	public enum VisitStatus {
+		ACTIVE, CLOSED;
 	}
 }
