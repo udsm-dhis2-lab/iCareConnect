@@ -206,12 +206,14 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 					existingInvoice.getInvoiceItems().add(invoiceItem);
 				}
 			}
-			this.invoiceDAO.save(existingInvoice);
+
 
 			//Automatic discount creation for full exempted discounts
+
 			List<DiscountInvoiceItem> discountInvoiceItems = existingInvoice.getDiscountItems();
-			//List<Boolean> isFullExemptedCheck = new ArrayList<>();
+
 			Boolean isFullExemptedCheck = false;
+
 			for (DiscountInvoiceItem discountItem: discountInvoiceItems) {
 				if(discountItem.getDiscount().getExempted()){
 					isFullExemptedCheck = true;
@@ -222,14 +224,29 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 				for(InvoiceItem invoiceItem:existingInvoice.getInvoiceItems()){
 
 					//Find the coresponding discount item
-					String itemUUID = invoiceItem.getItem().getUuid();
+					boolean found = false;
+					for (DiscountInvoiceItem discountItem: discountInvoiceItems) {
+						if(discountItem.getItem().getUuid().equals(invoiceItem.getItem().getUuid())){
+							found = true;
+							discountItem.setAmount(invoiceItem.getPrice() * invoiceItem.getQuantity());
+						}
+					}
+					if(!found){
+						DiscountInvoiceItem discountInvoiceItem = new DiscountInvoiceItem();
+						discountInvoiceItem.setAmount(invoiceItem.getPrice() * invoiceItem.getQuantity());
+						discountInvoiceItem.setDiscount(discountInvoiceItems.get(0).getDiscount());
+						discountInvoiceItem.setItem(invoiceItem.getItem());
+						discountInvoiceItem.setInvoice(invoiceItem.getInvoice());
+						discountInvoiceItems.add(discountInvoiceItem);
+					}
+					/*String itemUUID = invoiceItem.getItem().getUuid();
 
 					List<DiscountInvoiceItem> existingInvoiceDiscountItems = invoiceItem.getInvoice().getDiscountItems();
 					List<String> ExistingDiscountsitemUUIDs = new ArrayList<>();
 
-					for(DiscountInvoiceItem existingDiscountItems : existingInvoiceDiscountItems){
+					for(DiscountInvoiceItem existingDiscountItem : existingInvoiceDiscountItems){
 
-						ExistingDiscountsitemUUIDs.add(existingDiscountItems.getItem().getUuid());
+						ExistingDiscountsitemUUIDs.add(existingDiscountItem.getItem().getUuid());
 					}
 
 					if(ExistingDiscountsitemUUIDs.contains(itemUUID)){
@@ -247,7 +264,7 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 						discountInvoiceItems.add(discountInvoiceItem);
 
 
-					}
+					}*/
 
 					//If it exists update the discount item amount with the price times quantity
 
@@ -258,8 +275,7 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 
 			}
 
-
-
+			this.invoiceDAO.save(existingInvoice);
 		}
 		return orderMetaData.getOrder();
 	}
