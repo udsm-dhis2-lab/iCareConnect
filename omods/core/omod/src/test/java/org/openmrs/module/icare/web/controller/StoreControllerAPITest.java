@@ -7,6 +7,7 @@ import org.openmrs.api.AdministrationService;
 import org.openmrs.api.LocationService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.icare.ICareConfig;
+import org.openmrs.module.icare.billing.models.Invoice;
 import org.openmrs.module.icare.store.models.IssueStatus;
 import org.openmrs.module.icare.store.models.Requisition;
 import org.openmrs.module.icare.store.models.RequisitionStatus;
@@ -17,12 +18,14 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.Mockito.when;
 
 public class StoreControllerAPITest extends BaseResourceControllerTest {
 	
@@ -133,7 +136,7 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		Map<String, Object> ledger = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
 		MockHttpServletRequest newGetRequest = newGetRequest("store/ledgers");
 		MockHttpServletResponse handleGet = handle(newGetRequest);
-		
+
 		List<Map<String, Object>> ledgers = (new ObjectMapper()).readValue(handleGet.getContentAsString(), List.class);
 		
 		assertThat("Listing of requests has one request:", ledgers.size(), is(1));
@@ -183,8 +186,8 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		MockHttpServletResponse handleGet1 = handle(newGetRequest1);
 		
 		List<Map<String, Object>> stocks = (new ObjectMapper()).readValue(handleGet1.getContentAsString(), List.class);
-		assertThat("Only two stock items", stocks.size(), is(4));
-		assertThat("Only two stock items", stocks.get(3).get("quantity").toString(), is("70.0"));
+		assertThat("Only 6 stock items", stocks.size(), is(6));
+		assertThat("Only two stock items", stocks.get(3).get("quantity").toString(), is("10.0"));
 		
 	}
 	
@@ -435,7 +438,7 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		
 		List<Map<String, Object>> stockList = (new ObjectMapper()).readValue(handleGet.getContentAsString(), List.class);
 		
-		assertThat("stock listing has one entry:", stockList.size(), is(3));
+		assertThat("stock listing has 5 entries:", stockList.size(), is(5));
 		
 		//assertThat("The stock quantity is 100", (stockList.get(0).get("quantity")).toString(), is("100.0"));
 		
@@ -451,7 +454,7 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		
 		List<Map<String, Object>> stockList = (new ObjectMapper()).readValue(handleGet.getContentAsString(), List.class);
 		
-		assertThat("stock listing has one entry:", stockList.size(), is(3));
+		assertThat("stock listing has 5 entries:", stockList.size(), is(5));
 		
 		//assertThat("The stock quantity is 100", (stockList.get(0).get("quantity")).toString(), is("100.0"));
 		
@@ -480,7 +483,7 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		
 		List<Map<String, Object>> stockList = (new ObjectMapper()).readValue(handleGet.getContentAsString(), List.class);
 		
-		assertThat("stock listing has one entry:", stockList.size(), is(2));
+		assertThat("stock listing has 4 entries:", stockList.size(), is(4));
 		
 		//assertThat("The stock quantity is 100", (stockList.get(0).get("quantity")).toString(), is("100.0"));
 		
@@ -494,7 +497,7 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		
 		List<Map<String, Object>> stockList = (new ObjectMapper()).readValue(handleGet.getContentAsString(), List.class);
 		
-		assertThat("stock listing has one entry:", stockList.size(), is(2));
+		assertThat("stock listing has 4 entries:", stockList.size(), is(4));
 		
 		boolean found = false;
 		

@@ -50,9 +50,9 @@ const reducer = createReducer(
   on(upsertLocation, (state, { location }) =>
     locationsAdapter.upsertOne(location, { ...state })
   ),
-  on(upsertLocations, (state, { locations }) =>
-    locationsAdapter.upsertMany(locations, { ...state })
-  ),
+  on(upsertLocations, (state, { locations }) => {
+    return locationsAdapter.upsertMany(locations, { ...state });
+  }),
   on(loadLocationsByTagName, (state) => ({
     ...state,
     loadingByTagName: true,

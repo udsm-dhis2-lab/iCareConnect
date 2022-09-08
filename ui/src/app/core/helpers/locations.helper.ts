@@ -9,6 +9,7 @@ export function formatLocationsPayLoad(locations): Location[] {
       locationPath = "";
       const modules = getLocationModules(location);
       return {
+        ...location,
         id: location?.uuid,
         uuid: location?.uuid,
         country: location?.country,
