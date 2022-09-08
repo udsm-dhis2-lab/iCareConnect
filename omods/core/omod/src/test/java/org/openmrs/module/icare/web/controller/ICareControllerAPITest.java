@@ -78,7 +78,7 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		handle = handle(newGetRequest);
 		Map<String, Object> results = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
 		List<Map<String, Object>> maps = (List) results.get("results");
-		assertThat("Should return a 7 items", maps.size(), is(7));
+		assertThat("Should return a 8 items", maps.size(), is(8));
 		
 		newGetRequest = newGetRequest("icare/item", new Parameter("q", "opd"));
 		handle = handle(newGetRequest);
@@ -90,7 +90,7 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		handle = handle(newGetRequest);
 		results = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
 		maps = (List) results.get("results");
-		assertThat("Should return a 3 items", maps.size(), is(1));
+		assertThat("Should return a 2 items", maps.size(), is(2));
 		
 		newGetRequest = newGetRequest("icare/item", new Parameter("q", "opd servi"));
 		handle = handle(newGetRequest);
@@ -115,7 +115,7 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		String contentString = handle.getContentAsString();
 		Map<String, Object> results = (new ObjectMapper()).readValue(contentString, Map.class);
 		List<Map<String, Object>> maps = (List) results.get("results");
-		assertThat("Should return a 7 items", maps.size(), is(7));
+		assertThat("Should return a 8 items", maps.size(), is(8));
 		boolean found = false;
 		for (Map<String, Object> itemMap : maps) {
 			if (itemMap.get("unit").equals("DrugUnits")) {
@@ -234,6 +234,8 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		String visitData = handle.getContentAsString();
 		Map visitMap = (new ObjectMapper()).readValue(visitData, Map.class);
 		List<Map> visitDetails = (List<Map>) visitMap.get("results");
+		System.out.println("visitDetails.size():" + visitDetails.size());
+
 		assertThat("Should return a visit", visitDetails.size() == 1);
 		
 		newGetRequest = newGetRequest("icare/visit", new Parameter("orderTypeUuid", "2msir5eb-5345-11e8-9922-40b034c3cfee"),
@@ -341,6 +343,8 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 	public void testDrugOrderRevision() throws Exception {
 		
 		//Given
+		AdministrationService administrationService = Context.getAdministrationService();
+		administrationService.setGlobalProperty(ICareConfig.ALLOW_NEGATIVE_STOCK, "true");
 		OrderType orderType = new OrderType();
 		orderType.setJavaClassName("org.openmrs.module.icare.billing.models.Prescription");
 		orderType.setName("Prescription");
@@ -523,7 +527,7 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		Map patientMap = (new ObjectMapper()).readValue(PatientData, Map.class);
 		List<Map> visitDetails = (List<Map>) patientMap.get("results");
 		assertThat("Should return a patient", visitDetails.size() == 1);
-		
+
 		newGetRequest = newGetRequest("icare/patient", new Parameter("patientUUID", "993c46d2-5007-45e8-9512-969300717761"));
 		handle = handle(newGetRequest);
 		String PatientData2 = handle.getContentAsString();
