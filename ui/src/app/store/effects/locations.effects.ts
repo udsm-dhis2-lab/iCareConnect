@@ -35,6 +35,7 @@ import {
   loadAllLocationsByLoginTag,
   loadLocationByIds,
   upsertLocations,
+  updateCurrentLocationStatus,
 } from "../actions";
 import { AppState } from "../reducers";
 import { getCurrentLocation, getUrl } from "../selectors";
@@ -135,6 +136,7 @@ export class LocationsEffects implements OnInitEffects {
                         [])[0],
                     },
                   }),
+                  updateCurrentLocationStatus({ settingLocation: false }),
                 ];
               } else {
                 return [
@@ -165,6 +167,7 @@ export class LocationsEffects implements OnInitEffects {
                 locations:
                   formatLocationsPayLoad(locationsResponse || []) || [],
               }),
+              updateCurrentLocationStatus({ settingLocation: false }),
             ];
           })
         );
@@ -214,6 +217,7 @@ export class LocationsEffects implements OnInitEffects {
                 upsertLocations({
                   locations: formatLocationsPayLoad(locationsResponse || []),
                 }),
+                updateCurrentLocationStatus({ settingLocation: false }),
               ];
             }),
             catchError((error) => {

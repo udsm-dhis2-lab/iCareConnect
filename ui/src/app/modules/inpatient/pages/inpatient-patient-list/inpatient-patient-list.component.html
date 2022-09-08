@@ -9,7 +9,7 @@
     mode="indeterminate"
   ></mat-progress-bar>
 
-  <!-- {{ params?.location | json }} -->
+  <!-- {{ params?.settingCurrentLocationStatus | json }} -->
   <app-inpatient-home
     *ngIf="params?.location && !params?.settingCurrentLocationStatus"
     [location]="params?.location"
