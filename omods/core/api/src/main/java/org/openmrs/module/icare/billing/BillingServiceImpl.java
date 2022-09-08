@@ -304,7 +304,7 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 			if (invoice == null) {
 				throw new Exception("Invoice with id '" + discountInvoiceItem.getInvoice().getUuid() + "' does not exist.");
 			}
-			
+
 			DiscountInvoiceItem newItem = new DiscountInvoiceItem();
 			newItem.setItem(item);
 			newItem.setInvoice(invoice);
