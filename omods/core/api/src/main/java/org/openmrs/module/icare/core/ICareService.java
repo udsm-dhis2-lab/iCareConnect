@@ -124,4 +124,6 @@ public interface ICareService extends OpenmrsService {
 	Message sendMessageRequest(Message message) throws Exception;
 	
 	Summary getSummary();
+
+    List<Drug> getDrugs(String concept, Integer limit, Integer startIndex);
 }

@@ -84,9 +84,9 @@ export const ICARE_APPS: ICAREApp[] = [
     name: "Radiology",
     id: "radiology",
     image: "assets/material/radiology.png",
-    icon: "pregnant_woman",
+    icon: "",
     path: "/radiology",
-    order: 20,
+    order: 17,
   },
   {
     name: "VCT",

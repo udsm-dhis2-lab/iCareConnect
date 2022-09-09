@@ -141,10 +141,17 @@ const routes: Routes = [
           ),
       },
       {
-        path: "radiology",
+        path: "theatre",
         loadChildren: () =>
           import("../modules/theatre/theatre.module").then(
             (m) => m.TheatreModule
+          ),
+      },
+      {
+        path: "radiology",
+        loadChildren: () =>
+          import("../modules/radiology/radiology.module").then(
+            (m) => m.RadiologyModule
           ),
       },
       {
