@@ -103,6 +103,7 @@
             >
           </div>
         </div>
+
         <!-- end of patient identification -->
 
         <!-- patient names -->
@@ -396,8 +397,7 @@
             <label for="">Additional Patient Information</label>
           </div>
           <div class="col-sm-9 d-flex">
-            
-        <!--<div>
+            <!--<div>
                  <mat-form-field appearance="fill" class="w-100">
                 <mat-label>Occupation</mat-label>
                 <mat-select>
@@ -436,7 +436,7 @@
                 </mat-select>
               </mat-form-field>
               -->
-              <!-- <div class="w-100">
+            <!-- <div class="w-100">
                 <app-dynamic-reg-form
                   *ngIf="params?.occupationInfo"
                   [concepts]="[params?.occupationInfo]"
@@ -463,11 +463,11 @@
             </div> -->
             <div class="ml-3">
               <app-dynamic-reg-form
-              *ngIf="params?.additionalPatientInformation"
-              [concepts]="params?.additionalPatientInformation.setMembers"
-              (selectedValue)="getAdditionalInformationValues($event)"
-            >
-            </app-dynamic-reg-form>
+                *ngIf="params?.additionalPatientInformation"
+                [concepts]="params?.additionalPatientInformation.setMembers"
+                (selectedValue)="getAdditionalInformationValues($event)"
+              >
+              </app-dynamic-reg-form>
 
               <!-- <mat-form-field appearance="fill" class="w-100">
                 <mat-label>Religion</mat-label>
