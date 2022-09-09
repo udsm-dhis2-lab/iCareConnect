@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { uniqBy, orderBy } from "lodash";
 import { Observable, of } from "rxjs";
 import { debounceTime, distinctUntilChanged, switchMap } from "rxjs/operators";
+import { LocationService } from "src/app/core/services";
 import { ReferenceTermsService } from "src/app/core/services/reference-terms.service";
 import { ConceptsService } from "../../resources/concepts/services/concepts.service";
 
@@ -15,6 +16,7 @@ export class MultipleItemsSelectionComponent implements OnInit {
   @Input() selectedItems: any[];
   @Input() itemType: string;
   @Input() standardSearchTerm: string;
+  @Input() tag: string;
   @Input() source: string;
   @Input() conceptClass: string;
   currentSelectedItems: any[] = [];
@@ -24,7 +26,8 @@ export class MultipleItemsSelectionComponent implements OnInit {
   pageSize: number = 10;
   constructor(
     private conceptService: ConceptsService,
-    private conceptReferenceService: ReferenceTermsService
+    private conceptReferenceService: ReferenceTermsService,
+    private locationService: LocationService
   ) {}
 
   ngOnInit(): void {
@@ -131,6 +134,18 @@ export class MultipleItemsSelectionComponent implements OnInit {
           this.conceptReferenceService.getConceptReferenceTermsByParameters({
             q: term,
             source: this.source,
+            limit: this.pageSize,
+            startIndex: (this.page - 1) * this.pageSize,
+          })
+        )
+      );
+    } else if (itemType === "location") {
+      this.items$ = of(searchingText).pipe(
+        debounceTime(1000),
+        distinctUntilChanged(),
+        switchMap((term) =>
+          this.locationService.getLocationsByTagName(this.tag, {
+            q: term,
             limit: this.pageSize,
             startIndex: (this.page - 1) * this.pageSize,
           })

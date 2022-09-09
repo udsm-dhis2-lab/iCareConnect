@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { OpenmrsHttpClientService } from "src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service";
-import { from, Observable, of } from "rxjs";
+import { from, Observable, of, zip } from "rxjs";
 import { catchError, map } from "rxjs/operators";
 import { head } from "lodash";
 import {
@@ -56,6 +56,31 @@ export class LocationService {
     );
   }
 
+  getLocationByIds(uuids): Observable<any> {
+    return zip(
+      ...uuids?.map((uuid) =>
+        this.httpClient.get("location/" + uuid + "?v=full").pipe(
+          map((response) => {
+            return {
+              ...response,
+              attributes:
+                response?.attributes && response?.attributes?.length > 0
+                  ? response?.attributes.filter(
+                      (attribute) => !attribute?.voided
+                    )
+                  : [],
+            };
+          })
+        )
+      )
+    ).pipe(
+      map((response) => {
+        console.log("ALL", response);
+        return response;
+      })
+    );
+  }
+
   getAllLocations() {
     return this.httpClient
       .get(
@@ -108,7 +133,7 @@ export class LocationService {
 
   getLocationsByTagName(
     tagName: string,
-    parameters?: { limit: number; startIndex: number; v: string }
+    parameters?: { limit?: number; startIndex?: number; v?: string; q?: string }
   ): Observable<any[]> {
     let othersParameters = "";
     if (parameters?.limit) {
@@ -128,9 +153,15 @@ export class LocationService {
       )
       .pipe(
         map((response) => {
-          return response?.results.map((result) => {
+          return (
+            response?.results?.filter((res: any) => !res?.retired) || []
+          ).map((result) => {
             return {
               ...result,
+              childLocations:
+                result?.childLocations?.filter(
+                  (childLoc: any) => !childLoc?.retired
+                ) || [],
               attributes:
                 result?.attributes && result?.attributes?.length > 0
                   ? result?.attributes.filter((attribute) => !attribute?.voided)

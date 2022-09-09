@@ -1,11 +1,15 @@
 <div
   *ngIf="{
-    registrationMRNSourceReference: registrationMRNSourceReference$ | async
+    registrationMRNSourceReference: registrationMRNSourceReference$ | async,
+    registrationFormConfigs: registrationFormConfigs$ | async
   } as params"
 >
   <app-registration-add
-    *ngIf="params?.registrationMRNSourceReference"
+    *ngIf="
+      params?.registrationMRNSourceReference && params?.registrationFormConfigs
+    "
     [registrationMRNSourceReference]="params?.registrationMRNSourceReference"
+    [registrationFormConfigs]="params?.registrationFormConfigs"
   ></app-registration-add>
 
   <div
@@ -20,7 +24,10 @@
   </div>
 
   <mat-progress-bar
-    *ngIf="!params?.registrationMRNSourceReference"
+    *ngIf="
+      !params?.registrationMRNSourceReference ||
+      !params?.registrationFormConfigs
+    "
     mode="indeterminate"
   ></mat-progress-bar>
 </div>

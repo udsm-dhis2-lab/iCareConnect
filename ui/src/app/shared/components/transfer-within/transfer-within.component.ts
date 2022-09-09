@@ -3,7 +3,12 @@ import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { Store } from "@ngrx/store";
 import { Observable } from "rxjs";
 import { Location } from "src/app/core/models";
-import { loadCustomOpenMRSForm, transferPatient } from "src/app/store/actions";
+import { SystemSettingsService } from "src/app/core/services/system-settings.service";
+import {
+  go,
+  loadCustomOpenMRSForm,
+  transferPatient,
+} from "src/app/store/actions";
 import { AppState } from "src/app/store/reducers";
 import { getLocations, getLocationsByTagName } from "src/app/store/selectors";
 import {
@@ -53,10 +58,13 @@ export class TransferWithinComponent implements OnInit {
   currentVisitServiceAttributeDetails$: Observable<any>;
   currentVisitServiceBillingAttributeDetails$: Observable<any>;
 
+  locationServiceAttribute$: Observable<any>;
+
   constructor(
     private store: Store<AppState>,
     private dialogRef: MatDialogRef<TransferWithinComponent>,
-    @Inject(MAT_DIALOG_DATA) data
+    @Inject(MAT_DIALOG_DATA) data,
+    private systemSettingsService: SystemSettingsService
   ) {
     this.patient = data?.patient?.patient;
     this.locationType = data?.locationType;
@@ -73,6 +81,10 @@ export class TransferWithinComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.locationServiceAttribute$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        "iCare.clinic.location.serviceAttribute"
+      );
     this.formLoadingState$ = this.store.select(getFormsLoadingState);
     this.form$ = this.store.select(getCustomOpenMRSFormById, {
       id: this.formUuid,
@@ -92,41 +104,43 @@ export class TransferWithinComponent implements OnInit {
     );
   }
 
-  onSaveForm(
-    e: Event,
-    provider,
-    visit,
-    obs,
-    currentVisitServiceAttributeDetails,
-    currentVisitServiceBillingAttributeDetails
-  ): void {
+  onSaveForm(e: Event, provider, visit, obs, locationServiceAttribute): void {
     e.stopPropagation();
-    this.shouldNotCreateBill =
-      currentVisitServiceBillingAttributeDetails?.visitAttributeDetails
-        ?.value === this.transferTo?.billingConcept
-        ? true
-        : (
-            visit.attributes.filter(
-              (attribute) =>
-                attribute?.visitAttributeDetails?.attributeType?.display.toLowerCase() ===
-                  "paymentcategory" &&
+    const services = (
+      this.currentLocation?.attributes?.filter(
+        (attribute) =>
+          !attribute?.voided &&
+          attribute?.attributeType?.uuid === locationServiceAttribute
+      ) || []
+    )?.map((attr) => attr?.value);
+    (
+      services?.filter(
+        (service) => service === this.transferTo?.billingConcept
+      ) || []
+    )?.length > 0
+      ? true
+      : (
+          visit.attributes.filter(
+            (attribute) =>
+              attribute?.visitAttributeDetails?.attributeType?.display.toLowerCase() ===
+                "paymentcategory" &&
+              attribute?.visitAttributeDetails?.value ===
+                "00000101IIIIIIIIIIIIIIIIIIIIIIIIIIII"
+          ) || []
+        )?.length > 0 &&
+        (
+          visit.attributes.filter(
+            (attribute) =>
+              attribute?.visitAttributeDetails?.attributeType?.display.toLowerCase() ===
+                "paymentscheme" &&
+              (attribute?.visitAttributeDetails?.value ===
+                "274f186c-a9c0-4f37-a3c8-5b18f61353b3" ||
                 attribute?.visitAttributeDetails?.value ===
-                  "00000101IIIIIIIIIIIIIIIIIIIIIIIIIIII"
-            ) || []
-          )?.length > 0 &&
-          (
-            visit.attributes.filter(
-              (attribute) =>
-                attribute?.visitAttributeDetails?.attributeType?.display.toLowerCase() ===
-                  "paymentscheme" &&
-                (attribute?.visitAttributeDetails?.value ===
-                  "274f186c-a9c0-4f37-a3c8-5b18f61353b3" ||
-                  attribute?.visitAttributeDetails?.value ===
-                    "f8c42c7f-f570-4278-bf72-e5e97c9ed321" ||
-                  attribute?.visitAttributeDetails?.value ===
-                    "29238e76-5cbe-476a-914d-7fdb9842b3d6")
-            ) || []
-          )?.length > 0;
+                  "f8c42c7f-f570-4278-bf72-e5e97c9ed321" ||
+                attribute?.visitAttributeDetails?.value ===
+                  "29238e76-5cbe-476a-914d-7fdb9842b3d6")
+          ) || []
+        )?.length > 0;
     const data = {
       patient: this.patient["uuid"],
       visitLocation: this.transferTo?.uuid,
@@ -149,26 +163,32 @@ export class TransferWithinComponent implements OnInit {
       visit: visit?.uuid,
       provider: provider?.uuid,
     };
-    const visitAttributes =
-      this.shouldNotCreateBill || this.visit?.isAdmitted
-        ? []
-        : [
-            {
-              uuid: currentVisitServiceAttributeDetails?.visitAttributeDetails
-                ?.uuid,
-              attributeType:
-                currentVisitServiceAttributeDetails?.visitAttributeDetails
-                  ?.attributeType?.uuid,
-              value: this.transferTo?.billingConcept,
-            },
-          ];
+    // const visitAttributes =
+    //   this.shouldNotCreateBill || this.visit?.isAdmitted
+    //     ? []
+    //     : [
+    //         {
+    //           uuid: currentVisitServiceAttributeDetails?.visitAttributeDetails
+    //             ?.uuid,
+    //           attributeType:
+    //             currentVisitServiceAttributeDetails?.visitAttributeDetails
+    //               ?.attributeType?.uuid,
+    //           value: this.transferTo?.billingConcept,
+    //         },
+    //       ];
     this.store.dispatch(
       transferPatient({
         transferDetails: data,
         path: this.path,
-        visitAttributes: visitAttributes,
+        visitAttributes: [],
       })
     );
+
+    this.transferLoadingState$.subscribe((response) => {
+      if (response) {
+        this.store.dispatch(go({ path: ["/clinic/patient-list"] }));
+      }
+    });
   }
 
   onFormUpdate(formValues: FormValue): void {

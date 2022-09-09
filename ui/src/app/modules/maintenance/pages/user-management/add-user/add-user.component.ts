@@ -9,8 +9,13 @@ import { MatSnackBar } from "@angular/material/snack-bar";
 import { MatTable, MatTableDataSource } from "@angular/material/table";
 import { Router } from "@angular/router";
 import * as moment from "moment";
+import { LocationService } from "src/app/core/services";
 import { processDateFromMaterialInput } from "src/app/shared/helpers/utils.helpers";
-import { LocationGetFull, RoleCreate } from "src/app/shared/resources/openmrs";
+import {
+  LocationGet,
+  LocationGetFull,
+  RoleCreate,
+} from "src/app/shared/resources/openmrs";
 import {
   GlobalEventHandlersEvent,
   PersonCreateModel,
@@ -40,6 +45,9 @@ export class AddUserComponent implements OnInit {
   rolesLoading: boolean = true;
   touchtime: number = 0;
   selectedRolesDatasource: MatTableDataSource<RoleCreate>;
+
+  selectedLocationsDataSource: MatTableDataSource<LocationGet[]>;
+  locationsDataSource: MatTableDataSource<LocationGet[]>;
   moveToAvailable: any[] = [];
   moveToSelected: any[] = [];
   clickedAvailable: any[] = [];
@@ -57,7 +65,6 @@ export class AddUserComponent implements OnInit {
   shouldCreateProvider: boolean = false;
   genderValues = [
     { code: "F", value: "Female" },
-    { code: "U", value: "Unknown" },
     { code: "M", value: "Male" },
   ];
 
@@ -73,7 +80,8 @@ export class AddUserComponent implements OnInit {
     private fb: FormBuilder,
     private service: UserService,
     private router: Router,
-    private _snackBar: MatSnackBar
+    private _snackBar: MatSnackBar,
+    private locationService: LocationService
   ) {}
 
   ngOnInit() {
@@ -84,9 +92,20 @@ export class AddUserComponent implements OnInit {
       this.selectedRolesDatasource = new MatTableDataSource(this.selectedRoles);
       this.loading = false;
     });
-    this.service.getLoginLocations().subscribe((res) => {
-      this.locations = res.results;
-    });
+    this.locationService
+      .getLocationsByTagName("Login+Location", {
+        limit: 100,
+        startIndex: 0,
+        v: "custom:(uuid,display,name)",
+      })
+      .subscribe((res) => {
+        this.locations = res;
+
+        this.locationsDataSource = new MatTableDataSource(this.locations);
+        this.selectedLocationsDataSource = new MatTableDataSource(
+          this.selectedLocations
+        );
+      });
   }
 
   generateForm() {
@@ -131,7 +150,18 @@ export class AddUserComponent implements OnInit {
     this.selectedRolesDatasource.filter = filterValue.trim().toLowerCase();
   }
 
-  saveData() {
+  applyFilterLocations(event: Event) {
+    const filterValue = (event.target as HTMLInputElement).value;
+    this.locationsDataSource.filter = filterValue.trim().toLowerCase();
+    this.selectedLocationsDataSource.filter = filterValue.trim().toLowerCase();
+  }
+
+  onGetSelectedLocationItems(selected) {
+    console.log(selected);
+  }
+
+  saveData(event: Event): void {
+    event.stopPropagation();
     this.saving = true;
     const data = this.userForm.value;
     const years = moment().diff(data.birthdate, "years", false);
@@ -216,7 +246,7 @@ export class AddUserComponent implements OnInit {
                         panelClass: ["snack-color"],
                       }
                     );
-                    window.location.href = "#/maintenance/users/";
+                    window.location.href = "#/maintenance/users-management/";
                     this.saving = false;
                   }
                 })
@@ -230,12 +260,11 @@ export class AddUserComponent implements OnInit {
                   panelClass: ["snack-color"],
                 }
               );
-          window.location.href = "#/maintenance/users/";
+          window.location.href = "#/maintenance/users-management/";
           this.saving = false;
         }
       },
       (error: { error: any }) => {
-        console.log(error);
         this._snackBar.open(
           `An error ocurred. Please try again. Hint: ${
             error.error?.error?.message || error.error.message

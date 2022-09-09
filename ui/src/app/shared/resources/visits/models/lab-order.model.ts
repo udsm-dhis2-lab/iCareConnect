@@ -54,6 +54,10 @@ export class LabOrder {
     return this.order?.dateActivated.substring(11, 19);
   }
 
+  get dateActivated(): string {
+    return this.order?.dateActivated;
+  }
+
   get location(): any {
     return {
       ...this.order?.location,
@@ -97,6 +101,14 @@ export class LabOrder {
     return this.order?.voided;
   }
 
+  get orderInstructions(): string {
+    return this.order?.instructions;
+  }
+
+  get dateStopped(): string {
+    return this.order?.dateStopped;
+  }
+
   toJson(): any {
     return {
       id: this.uuid,
@@ -118,6 +130,9 @@ export class LabOrder {
       accessionNumber: this.accessionNumber,
       fulfillerStatus: this.fulfillerStatus,
       voided: this.voided,
+      dateActivated: this.dateActivated,
+      dateStopped: this.dateStopped,
+      orderInstructions: this.orderInstructions,
     };
   }
 }

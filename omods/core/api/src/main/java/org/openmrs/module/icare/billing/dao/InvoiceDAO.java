@@ -8,6 +8,7 @@ import org.openmrs.api.db.hibernate.DbSessionFactory;
 import org.openmrs.module.icare.billing.models.Invoice;
 import org.openmrs.module.icare.billing.models.InvoiceItem;
 import org.openmrs.module.icare.core.dao.BaseDAO;
+import org.openmrs.module.icare.billing.models.DiscountInvoiceItem;
 
 import java.util.List;
 
@@ -50,19 +51,15 @@ public class InvoiceDAO extends BaseDAO<Invoice> {
 	
 	public List<Invoice> findByPatientUuidAndPending(String patientUuid) {
 		DbSession session = this.getSession();
-		//TODO consider discount calculation
-		String queryStr = "SELECT invoice FROM Invoice invoice WHERE \n"
-		        + "invoice.visit.patient.uuid = :patientUuid \n"
+		String queryStr = "SELECT invoice FROM Invoice invoice WHERE \n" + "invoice.visit.patient.uuid = :patientUuid \n"
 		        + "AND (SELECT SUM(item.price*item.quantity) FROM InvoiceItem item WHERE item.id.invoice = invoice) \n"
-		        + "> (SELECT CASE WHEN (SUM(pi.amount) + SUM(di.amount)) IS NULL THEN 0 ELSE (SUM(pi.amount) + SUM(di.amount)) END FROM "
-		        + "PaymentItem pi, DiscountInvoiceItem di " +
+		        + "> ((SELECT CASE WHEN SUM(pi.amount) IS NULL THEN 0 ELSE SUM(pi.amount) END FROM " + "PaymentItem pi " +
 		        //"INNER JOIN PaymentItem pi ON(pi.id.payment=payment) " +
-		        "WHERE pi.id.payment.invoice = invoice AND di.id.invoice = invoice)";
+		        "WHERE pi.id.payment.invoice = invoice)+(SELECT CASE WHEN SUM(di.amount) IS NULL THEN 0 ELSE SUM(di.amount) END FROM "+"DiscountInvoiceItem di "+" WHERE di.id.invoice = invoice))";
 		//queryStr = "SELECT i FROM Invoice i WHERE i.patient.uuid = :patientUuid";
 		Query query = session.createQuery(queryStr);
 		query.setParameter("patientUuid", patientUuid);
 		return query.list();
-		
 	}
 	
 	public List<Invoice> findAllInvoiceByPatientUuid(String patientUuid) {

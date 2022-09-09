@@ -1,5 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import { Observable } from "rxjs";
+import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { RegistrationService } from "../../services/registration.services";
 
 @Component({
@@ -9,9 +10,17 @@ import { RegistrationService } from "../../services/registration.services";
 })
 export class RegisterNewClientHomeComponent implements OnInit {
   registrationMRNSourceReference$: Observable<any>;
-  constructor(private registrationService: RegistrationService) {}
+  registrationFormConfigs$: Observable<any>;
+  constructor(
+    private registrationService: RegistrationService,
+    private systemSettingsService: SystemSettingsService
+  ) {}
 
   ngOnInit(): void {
+    this.registrationFormConfigs$ =
+      this.systemSettingsService.getSystemSettingsMatchingAKey(
+        "icare.registration.form"
+      );
     this.registrationMRNSourceReference$ =
       this.registrationService.getRegistrationMRNSource();
   }

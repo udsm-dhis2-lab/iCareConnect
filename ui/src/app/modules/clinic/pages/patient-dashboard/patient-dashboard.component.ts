@@ -22,6 +22,8 @@ import {
 } from "src/app/store/selectors/visit.selectors";
 import { VisitObject } from "src/app/shared/resources/visits/models/visit-object.model";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
+import { LocationGet } from "src/app/shared/resources/openmrs";
+import { getCurrentLocation } from "src/app/store/selectors";
 
 @Component({
   selector: "app-patient-dashboard",
@@ -39,6 +41,7 @@ export class PatientDashboardComponent implements OnInit {
   iCareGeneralConfigurations$: Observable<any>;
   iCareClinicConfigurations$: Observable<any>;
   provider$: Observable<any>;
+  currentLocation$: Observable<LocationGet>;
   constructor(
     private store: Store<AppState>,
     private route: ActivatedRoute,
@@ -69,5 +72,6 @@ export class PatientDashboardComponent implements OnInit {
     this.loadingVisit$ = this.store.pipe(select(getVisitLoadingState));
     this.activeVisit$ = this.store.pipe(select(getActiveVisit));
     this.provider$ = this.store.select(getProviderDetails);
+    this.currentLocation$ = this.store.select(getCurrentLocation);
   }
 }

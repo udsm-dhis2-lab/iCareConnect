@@ -440,7 +440,6 @@ export class VisitsService {
   ): Observable<any> {
     // TODO Load order separately to allow inclusion of more attributes
     // https://icare.dhis2udsm.org/openmrs/ws/rest/v1/order?patient=${patient}&v=full
-
     return zip(
       from(
         this.api.visit.getAllVisits({

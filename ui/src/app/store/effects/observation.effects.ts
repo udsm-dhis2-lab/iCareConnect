@@ -15,6 +15,7 @@ import {
   clearObservations,
   saveObservations,
   saveObservationsFail,
+  saveObservationsForFiles,
   saveObservationsUsingEncounter,
   upsertObservations,
 } from "../actions/observation.actions";
@@ -42,8 +43,7 @@ export class ObservationEffects {
           obs: observations,
           encounterUuid: observations[0]?.encounter,
         };
-        
-        
+
         return this.observationService
           .saveObservationsViaEncounter(observationsDetails)
           .pipe(
@@ -66,8 +66,8 @@ export class ObservationEffects {
                   message: "Error saving observations!",
                   type: "ERROR",
                 })
-                );
-                
+              );
+
               return of(saveObservationsFail({ error }));
             })
           );
@@ -86,8 +86,62 @@ export class ObservationEffects {
             type: "LOADING",
           })
         );
-        
+
         return this.observationService.saveEncounterWithObsDetails(data).pipe(
+          switchMap((observationResults: any) => {
+            this.notificationService.show(
+              new Notification({
+                message: "Observations successfully saved!",
+                type: "SUCCESS",
+              })
+            );
+
+            console.log("observationResults", observationResults);
+            return [
+              data?.fileObs && data?.fileObs?.length > 0
+                ? saveObservationsForFiles({
+                    data: data?.fileObs,
+                    patientId,
+                    encounter: observationResults?.uuid,
+                  })
+                : null,
+              upsertObservations({
+                observations: observationResults?.obs,
+              }),
+              loadActiveVisit({ patientId }),
+            ];
+          }),
+          catchError((error) => {
+            this.notificationService.show(
+              new Notification({
+                message: "Error saving observations!",
+                type: "ERROR",
+              })
+            );
+
+            return of(saveObservationsFail({ error }));
+          })
+        );
+      })
+    )
+  );
+
+  saveObservationFiles$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(saveObservationsForFiles),
+      switchMap(({ data, patientId, encounter }) => {
+        const obsData = data?.map((obsDetails) => {
+          return {
+            ...obsDetails,
+            encounter: encounter,
+            obsDatetime: new Date(),
+            voided: false,
+            status: "PRELIMINARY",
+          };
+        });
+
+        console.log("obsData", obsData);
+        return this.observationService.saveObsDetailsForFiles(obsData).pipe(
           switchMap((observationResults: any) => {
             this.notificationService.show(
               new Notification({
