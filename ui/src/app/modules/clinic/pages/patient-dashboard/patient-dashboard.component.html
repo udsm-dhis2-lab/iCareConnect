@@ -11,7 +11,8 @@
     activeVisit: activeVisit$ | async,
     provider: provider$ | async,
     iCareGeneralConfigurations: iCareGeneralConfigurations$ | async,
-    iCareClinicConfigurations: iCareClinicConfigurations$ | async
+    iCareClinicConfigurations: iCareClinicConfigurations$ | async,
+    currentLocation: currentLocation$ | async
   } as params"
 >
   <app-shared-patient-dashboard
@@ -26,7 +27,8 @@
       params?.iCareGeneralConfigurations &&
       params?.iCareGeneralConfigurations !== '' &&
       params?.iCareClinicConfigurations &&
-      params?.iCareClinicConfigurations !== ''
+      params?.iCareClinicConfigurations !== '' &&
+      params?.currentLocation
     "
     [formPrivilegesConfigs]="params?.privilegesConfigs"
     [currentUser]="params?.currentUser"
@@ -34,6 +36,7 @@
     [userPrivileges]="params?.userPrivileges"
     [iCareGeneralConfigurations]="params?.iCareGeneralConfigurations"
     [clinicConfigurations]="params?.iCareClinicConfigurations"
+    [currentLocation]="params?.currentLocation"
   ></app-shared-patient-dashboard>
   <div
     class="alert alert-danger mt-2"
@@ -58,7 +61,8 @@
       !params?.userPrivileges ||
       params?.rolesLoadingState ||
       params?.loadingVisit ||
-      !params?.provider
+      !params?.provider ||
+      !params?.currentLocation
     "
   ></mat-progress-bar>
 </div>
