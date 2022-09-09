@@ -97,24 +97,23 @@
                 <ng-template mat-tab-label>
                   <span [matBadge]="discountItemsCount" matBadgePosition="after" matBadgeOverlap="false"
                     [matBadgeHidden]="
-                                    discountItemsCount === 0
+                                    discountItemsCount === 0 
                                   ">Loans / Debts
                   </span>
                 </ng-template>
 
-                <div *ngIf="discountItemsCount == 0" class="py-4" style="text-align: center">
+                <div *ngIf="discountItemsCount === 0" class="py-4" style="text-align: center">
                   No Items in debt
                 </div>
                 <div>
-
                   <app-discounts *ngIf="
                                     discountItemsCount > 0 &&
-                                    params?.currentPatient !== undefined &&
+                                    params?.currentPatient &&
                                     params?.logo &&
                                     params?.facilityDetails
                                     " [discountItems]="discountItems" [discountItemsCount]="discountItemsCount"
                     [currentPatient]="params?.currentPatient" [facilityDetails]="params?.facilityDetails"
-                    [logo]="params?.logo" [bill]="bill" (confirmPayment)="onConfirmBillPayment($event)"
+                    [logo]="params?.logo" [bill]="bill" (confirmPayment)="onConfirmBillPayment( event)"
                     (billPaymentSuccess)="onPaymentSuccess()" id="exemptions">
                   </app-discounts>
                 </div>
