@@ -1,4 +1,5 @@
 import {
+  AfterViewInit,
   Component,
   EventEmitter,
   Input,
@@ -24,11 +25,11 @@ import { uniq, keyBy } from 'lodash';
 import { getLocationsByTagName } from 'src/app/store/selectors';
 
 @Component({
-  selector: 'app-drug-order',
-  templateUrl: './drug-order.component.html',
-  styleUrls: ['./drug-order.component.scss'],
+  selector: "app-drug-order",
+  templateUrl: "./drug-order.component.html",
+  styleUrls: ["./drug-order.component.scss"],
 })
-export class DrugOrderComponent implements OnInit {
+export class DrugOrderComponent implements OnInit, AfterViewInit {
   @ViewChildren(FormComponent) formComponents: FormComponent[];
   @Input() drugOrder: DrugOrderObject;
   @Input() fromDispensing: boolean;
@@ -38,12 +39,14 @@ export class DrugOrderComponent implements OnInit {
   @Input() patient: Patient;
   @Input() isFromDoctor: boolean;
   @Input() locations: any[];
+  @Input() drugsToBeDispensed: any[];
 
   drugsConceptsField: any;
   @Output() drugOrdered = new EventEmitter<any>();
   @Output() drugQuantity = new EventEmitter<number>();
   @Output() cancelForm = new EventEmitter<any>();
   @Output() formUpdate = new EventEmitter<any>();
+  @Output() getDrugsByConceptUuid = new EventEmitter<any>();
   drugOrderDetails: any = {};
   isTheOrderFromDoctor: boolean = false;
 
@@ -60,13 +63,17 @@ export class DrugOrderComponent implements OnInit {
   constructor(
     private drugOrderService: DrugOrdersService,
     private store: Store<AppState>
-  ) {}
-
+  ) {
+  }
+  
   ngOnInit() {
+    this.getDrugsByConceptUuid.emit(this.drugOrder?.concept?.uuid);
+
+    
     this.isTheOrderFromDoctor =
       this.drugOrder && this.drugOrder.drugUuid ? false : true;
 
-    this.loadingMetadata = true;
+      this.loadingMetadata = true;
 
     this.drugOrderFormsMetadata$ = this.drugOrderService.getDrugOrderMetadata(
       this.drugOrder,
@@ -76,15 +83,15 @@ export class DrugOrderComponent implements OnInit {
 
     this.provider$ = this.store.pipe(select(getProviderDetails));
     this.dispensingLocations$ = this.store.select(getLocationsByTagName, {
-      tagName: 'Dispensing Unit',
+      tagName: "Dispensing Unit",
     });
     // zip(
-    //   this.drugOrderService.getDrugOrderMetadata(
-    //     this.drugOrder,
-    //     this.locations,
-    //     this.fromDispensing
-    //   ),
-    //   this.store.pipe(select(getProviderDetails)).pipe(take(1))
+      //   this.drugOrderService.getDrugOrderMetadata(
+        //     this.drugOrder,
+        //     this.locations,
+        //     this.fromDispensing
+        //   ),
+        //   this.store.pipe(select(getProviderDetails)).pipe(take(1))
     // ).subscribe(
     //   (res) => {
     //     console.log('res', res);
@@ -98,6 +105,10 @@ export class DrugOrderComponent implements OnInit {
     //     this.loadingMetadataError = error;
     //   }
     // );
+  }
+  
+  ngAfterViewInit(): void {
+    console.log("==> Drugs: ",this.drugsToBeDispensed)
   }
 
   onOrderingDrug(data): void {
@@ -120,10 +131,10 @@ export class DrugOrderComponent implements OnInit {
           patientUuid: this.patient?.id,
           encounterUuid: this.encounterUuid,
           orderType: this.drugOrderMetadata.orderType,
-          careSetting: 'OUTPATIENT',
+          careSetting: "OUTPATIENT",
           numRefills: 1,
         })
-      : '';
+      : "";
 
     this.formComponents.forEach((form) => {
       form.onClear();

@@ -54,7 +54,7 @@
       >
         {{ params?.response?.message }}
       </p>
-      <div class="border" *ngIf="params?.currentVisitLoadedState && !params?.useGenericPrescription">
+      <div class="border" *ngIf="params?.currentVisitLoadedState && params?.useGenericPrescription !== 'true'">
         <app-patient-drug-order-list
         [visit]="params?.patientVisit"
         [loading]="loading"
@@ -70,7 +70,7 @@
         "
         ></app-patient-drug-order-list>
       </div>
-      <div class="border" *ngIf="params?.currentVisitLoadedState && params?.useGenericPrescription">
+      <div class="border" *ngIf="params?.currentVisitLoadedState && params?.useGenericPrescription === 'true'">
         <app-patient-generic-drug-order-list
           [visit]="params?.patientVisit"
           [loading]="loading"

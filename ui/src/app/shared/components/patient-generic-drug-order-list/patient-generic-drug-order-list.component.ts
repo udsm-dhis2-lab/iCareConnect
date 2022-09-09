@@ -111,17 +111,12 @@ export class PatientGenericDrugOrderListComponent implements OnInit {
     );
   }
 
-  onSelectAction(data: any) {
-    this.orderSelectAction.emit(data);
-  }
-
-  onAddOrder(e: MouseEvent) {
-    e.stopPropagation();
+  onDispense(order: any) {
     const dialog = this.dialog.open(DispensingFormComponent, {
       width: "80%",
       disableClose: true,
       data: {
-        drugOrder: null,
+        drugOrder: order,
         patient: this.visit?.patient,
         visit: this.visit,
         location: this.currentLocation,

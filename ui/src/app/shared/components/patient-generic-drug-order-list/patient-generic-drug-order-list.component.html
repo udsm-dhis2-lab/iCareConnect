@@ -55,6 +55,7 @@
         <th>Prescribed By</th>
         <th>Date & Time</th>
         <th>Care setting</th>
+        <th></th>
       </tr>
     </thead>
     <tbody>
@@ -73,6 +74,11 @@
         </td>
         <td>
           {{ drugOrder?.careSetting?.display }}
+        </td>
+        <td>
+          <button class="btn" (click)="onDispense(drugOrder)">
+            Dispense
+          </button>
         </td>
       </tr>
     </tbody>
