@@ -2,6 +2,8 @@ package org.openmrs.module.icare.core.utils;
 
 import org.openmrs.*;
 import org.openmrs.api.AdministrationService;
+import org.openmrs.api.PatientService;
+import org.openmrs.api.PersonService;
 import org.openmrs.api.VisitService;
 import org.openmrs.api.context.Context;
 import org.openmrs.attribute.AttributeType;
@@ -19,11 +21,13 @@ import java.util.Map;
 public class PatientWrapper {
 	
 	Patient patient;
+	
 	Visit activeVisit;
 	
 	public PatientWrapper(Patient patient) {
 		this.patient = patient;
 	}
+	
 	public PatientWrapper(Patient patient, Visit activeVisit) {
 		this.patient = patient;
 		this.activeVisit = activeVisit;
@@ -32,17 +36,17 @@ public class PatientWrapper {
 	private String getAttribute(String attributeConfig) throws ConfigurationException {
 		String attributeValue = null;
 		AdministrationService adminService = Context.getService(AdministrationService.class);
-		String insuranceAttributeUuid = adminService.getGlobalProperty(attributeConfig);
-		if (insuranceAttributeUuid == null) {
+		String patientAttributeUuid = adminService.getGlobalProperty(attributeConfig);
+		if (patientAttributeUuid == null) {
 			throw new ConfigurationException("Attribute ID is configured. Please set '" + attributeConfig + "'");
 		}
-		VisitService visitService = Context.getService(VisitService.class);
-		List<VisitAttributeType> visitAttributeTypes = visitService.getAllVisitAttributeTypes();
+		PersonService patientService = Context.getService(PersonService.class);
+		List<PersonAttributeType> personAttributeTypes = patientService.getAllPersonAttributeTypes();
 		for (PersonAttribute attribute : this.patient.getAttributes()) {
 			PersonAttributeType attributeType = attribute.getAttributeType();
-			for (VisitAttributeType visitAttributeType : visitAttributeTypes) {
-				if (visitAttributeType.getUuid().equals(attributeType.getUuid())) {
-					if (visitAttributeType.getUuid().equals(insuranceAttributeUuid)) { //CASH OR Insurance
+			for (PersonAttributeType personAttributeType : personAttributeTypes) {
+				if (personAttributeType.getUuid().equals(attributeType.getUuid())) {
+					if (personAttributeType.getUuid().equals(patientAttributeUuid)) {
 						attributeValue = (String) attribute.getValue();
 					}
 				}
@@ -142,7 +146,7 @@ public class PatientWrapper {
 		personMap.put("causeOfDeath", patient.getPerson().getCauseOfDeathNonCoded());
 
 		if(activeVisit != null){
-			personMap.put("activeVisit", (new VisitWrapper(activeVisit)).toMap());
+			patientMap.put("activeVisit", (new VisitWrapper(activeVisit)).toMap());
 		}
 		List<Map<String, Object>> attributesMap = new ArrayList<>();
 		for(PersonAttribute attribute:patient.getPerson().getAttributes()){
@@ -176,11 +180,11 @@ public class PatientWrapper {
 	public CharSequence getEmail() {
 		return "";
 	}
-
+	
 	public enum OrderByDirection {
 		ASC, DESC;
 	}
-
+	
 	public enum VisitStatus {
 		ACTIVE, CLOSED;
 	}

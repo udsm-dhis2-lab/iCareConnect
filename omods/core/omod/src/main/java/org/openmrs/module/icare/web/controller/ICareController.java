@@ -22,6 +22,7 @@ import org.openmrs.module.icare.billing.services.insurance.ClaimResult;
 import org.openmrs.module.icare.core.ICareService;
 import org.openmrs.module.icare.core.Item;
 import org.openmrs.module.icare.core.Message;
+import org.openmrs.module.icare.core.Summary;
 import org.openmrs.module.icare.core.utils.PatientWrapper;
 import org.openmrs.module.icare.core.utils.VisitWrapper;
 import org.openmrs.module.icare.store.models.OrderStatus;
@@ -59,6 +60,18 @@ public class ICareController {
         results.put("identifiers", ids);
         return results;
     }
+	
+	/**
+	 * Initially called after the getUsers method to get the landing form name
+	 * 
+	 * @return String form view name
+	 */
+	@RequestMapping(value = "summary", method = RequestMethod.GET)
+	@ResponseBody
+	public Map<String, Object> onGetSummary() {
+		Summary summary = iCareService.getSummary();
+		return summary.toMap();
+	}
 	
 	/**
 	 * Initially called after the getUsers method to get the landing form name
@@ -372,7 +385,30 @@ public class ICareController {
 		results.put("results", conceptSetsList);
 		return results;
 	}
-	
+
+	@RequestMapping(value = "drug", method = RequestMethod.GET)
+	@ResponseBody
+	public Map<String, Object> getDrugs(@RequestParam(value = "concept", required = false) String concept, @RequestParam(defaultValue = "50") Integer limit, @RequestParam(defaultValue = "0") Integer startIndex) {
+		List<Map<String, Object>> drugsList = new ArrayList<>();
+		for (Drug drug: iCareService.getDrugs(concept, limit, startIndex)) {
+			Map<String, Object> drugMap = new HashMap<String, Object>();
+			drugMap.put("uuid", drug.getUuid());
+			drugMap.put("display", drug.getDisplayName());
+			drugMap.put("name", drug.getName());
+			drugMap.put("description", drug.getDescription());
+			drugMap.put("retired", drug.getRetired());
+
+			Map<String, Object> conceptMap = new HashMap<String, Object>();
+			conceptMap.put("uuid",drug.getConcept().getUuid());
+			conceptMap.put("display",drug.getConcept().getDisplayString());
+			drugMap.put("concept", conceptMap);
+			drugsList.add(drugMap);
+		}
+		Map<String, Object> results = new HashMap<>();
+		results.put("results", drugsList);
+		return results;
+	}
+
 	@RequestMapping(value ="patient", method = RequestMethod.GET)
 	@ResponseBody
 	public Map<String, Object> getPatient(@RequestParam(required = false) String search,@RequestParam(required = false) String patientUUID,@RequestParam(required = false) PatientWrapper.VisitStatus visitStatus,@RequestParam(defaultValue = "100") Integer limit,

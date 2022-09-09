@@ -3,13 +3,19 @@ import { MatDialog } from "@angular/material/dialog";
 import { Store } from "@ngrx/store";
 import { keyBy, flatten, orderBy, uniqBy } from "lodash";
 import { Observable } from "rxjs";
-import { createLabOrders, deleteLabOrder } from "src/app/store/actions";
+import {
+  createLabOrders,
+  deleteLabOrder,
+  voidOrder,
+} from "src/app/store/actions";
 import { AppState } from "src/app/store/reducers";
 import {
   getCreatingLabOrderState,
   getLabOrderVoidingState,
 } from "src/app/store/selectors";
 import { FormValue } from "../../modules/form/models/form-value.model";
+import { InvestigationProcedureService } from "../../resources/investigation-procedure/services/investigation-procedure.service";
+import { OrdersService } from "../../resources/order/services/orders.service";
 import { Visit } from "../../resources/visits/models/visit.model";
 import { DeleteConfirmationComponent } from "../delete-confirmation/delete-confirmation.component";
 
@@ -44,7 +50,12 @@ export class OrderResultsRendererComponent implements OnInit {
   voidingLabOrderState$: Observable<boolean>;
 
   isFormValid: boolean = false;
-  constructor(private store: Store<AppState>, private dialog: MatDialog) {}
+  constructor(
+    private store: Store<AppState>,
+    private dialog: MatDialog,
+    private investigationPrecedureService: InvestigationProcedureService,
+    private ordersService: OrdersService
+  ) {}
 
   ngOnInit(): void {
     this.testSetMembersKeyedByConceptUuid = keyBy(
@@ -211,10 +222,17 @@ export class OrderResultsRendererComponent implements OnInit {
 
     dialog.afterClosed().subscribe((data) => {
       if (data) {
-        this.store.dispatch(deleteLabOrder({ uuid: e?.uuid }));
+        // this.store.dispatch(voidOrder({ order: e }));
+        let order = {
+          uuid: e?.uuid,
+          action: "DISCONTINUE",
+          location: e?.location?.uuid,
+          dateStopped: new Date(),
+          encounter: e?.encounter?.uuid,
+        };
+        this.ordersService.updateOrdersViaEncounter([order]).subscribe();
         console.log("==> Deleted Lab test: ", e);
       }
     });
-
   }
 }
