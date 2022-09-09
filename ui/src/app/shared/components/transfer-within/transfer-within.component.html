@@ -8,10 +8,9 @@
     visit: currentVisit$ | async,
     transferLoadingState: transferLoadingState$ | async,
     transferStatus: transferStatus$ | async,
-    currentVisitServiceAttributeDetails:
-      currentVisitServiceAttributeDetails$ | async,
     currentVisitServiceBillingAttributeDetails:
-      currentVisitServiceBillingAttributeDetails$ | async
+      currentVisitServiceBillingAttributeDetails$ | async,
+    locationServiceAttribute: locationServiceAttribute$ | async
   } as params"
 >
   <mat-progress-bar
@@ -19,17 +18,18 @@
     mode="indeterminate"
   ></mat-progress-bar>
   <div
-    *ngIf="
-      ((params?.form &&
-        formUuid &&
-        params?.currentVisitServiceAttributeDetails) ||
-        !formUuid) &&
-      params?.locations
-    "
+    *ngIf="((params?.form && formUuid) || !formUuid) && params?.locations"
     style="padding: 0px"
   >
     <mat-toolbar color="primary">Transfer {{ patient?.display }}</mat-toolbar>
-    <div class="form mt-3" *ngIf="!params?.transferStatus">
+    <div
+      class="form mt-3"
+      *ngIf="
+        !params?.transferStatus &&
+        params?.locationServiceAttribute &&
+        params?.locationServiceAttribute !== 'none'
+      "
+    >
       <mat-form-field class="w-100 transfer-to-field">
         <mat-label>Transfer to: </mat-label>
         <mat-select [(ngModel)]="transferTo" required>
@@ -39,13 +39,26 @@
         </mat-select>
       </mat-form-field>
 
-      <div *ngIf="params?.form && params?.currentVisitServiceAttributeDetails">
+      <div *ngIf="params?.form && visit && visit?.uuid">
         <app-capture-form-data
           [form]="params?.form"
+          [visit]="visit"
+          [patient]="patient"
           [observations]="[]"
           (formDataUpdate)="onFormUpdate($event)"
         ></app-capture-form-data>
       </div>
+    </div>
+    <div
+      class="alert alert-warning"
+      role="alert"
+      *ngIf="
+        !params?.transferStatus &&
+        params?.locationServiceAttribute &&
+        params?.locationServiceAttribute == 'none'
+      "
+    >
+      Serives Location Attribute Value is missing
     </div>
 
     <div
@@ -64,15 +77,18 @@
       color="primary"
       class="mr-2"
       mat-stroked-button
-      [disabled]="!transferTo || params?.transferStatus"
+      [disabled]="
+        !transferTo ||
+        params?.transferStatus ||
+        !params?.locationServiceAttribute
+      "
       (click)="
         onSaveForm(
           $event,
           params?.provider,
           params?.visit,
           obs,
-          params?.currentVisitServiceAttributeDetails,
-          params?.currentVisitServiceBillingAttributeDetails
+          params?.locationServiceAttribute
         )
       "
     >
