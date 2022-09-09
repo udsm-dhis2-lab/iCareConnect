@@ -66,7 +66,11 @@ import {
   getCurrentUserPrivileges,
   getProviderDetails,
 } from "src/app/store/selectors/current-user.selectors";
-import { ObsCreate, ProviderGetFull } from "../../resources/openmrs";
+import {
+  LocationGet,
+  ObsCreate,
+  ProviderGetFull,
+} from "../../resources/openmrs";
 import { saveObservations } from "src/app/store/actions/observation.actions";
 import { loadEncounterTypes } from "src/app/store/actions/encounter-type.actions";
 
@@ -82,6 +86,7 @@ export class SharedPatientDashboardComponent implements OnInit {
   @Input() activeVisit: any;
   @Input() iCareGeneralConfigurations: any;
   @Input() clinicConfigurations: any;
+  @Input() currentLocation: LocationGet;
   currentPatient$: Observable<Patient>;
   vitalSignObservations$: Observable<any>;
   loadingVisit$: Observable<boolean>;
@@ -114,6 +119,7 @@ export class SharedPatientDashboardComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    console.log("current location", this.currentLocation);
     this.onStartConsultation(this.activeVisit);
     this.store.dispatch(loadOrderTypes());
     this.orderTypes$ = this.store.select(getAllOrderTypes);
@@ -125,12 +131,7 @@ export class SharedPatientDashboardComponent implements OnInit {
     );
     this.store.dispatch(
       loadCustomOpenMRSForms({
-        formUuids: filter(
-          map(this.applicableForms, (form) => {
-            return form?.id;
-          }),
-          (uuid) => uuid
-        ),
+        formUuids: this.currentLocation?.forms,
       })
     );
 
@@ -177,17 +178,15 @@ export class SharedPatientDashboardComponent implements OnInit {
 
     this.loadingPaymentStatus$ = this.store.select(getLoadingPaymentStatus);
 
-    this.store.dispatch(
-      loadForms({ formConfigs: ICARE_CONFIG?.consultation?.forms })
-    );
+    // this.store.dispatch(
+    //   loadForms({ formConfigs: ICARE_CONFIG?.consultation?.forms })
+    // );
     this.consultationForms$ = this.store.pipe(
       select(getFormEntitiesByNames(CONSULTATION_FORM_CONFIGS))
     );
 
     this.forms$ = this.store.select(getCustomOpenMRSFormsByIds, {
-      formUUids: map(this.applicableForms, (form) => {
-        return form?.id;
-      }),
+      formUUids: this.currentLocation?.forms,
     });
 
     this.currentLocation$ = this.store.select(getCurrentLocation);

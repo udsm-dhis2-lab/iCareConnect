@@ -3,6 +3,7 @@ package org.openmrs.module.icare.billing.models;
 // Generated Oct 7, 2020 12:48:40 PM by Hibernate Tools 5.2.10.Final
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import liquibase.database.structure.type.VarcharType;
 import org.codehaus.jackson.annotate.JsonSetter;
 import org.openmrs.BaseChangeableOpenmrsData;
 import org.openmrs.Concept;
@@ -34,10 +35,11 @@ public class Discount extends BaseChangeableOpenmrsData {
 	private Concept criteria;
 	
 	@Column(name = "attachment_id")
-	private Integer attachmentId;
+	private String attachmentId;
 	
 	@Column(name = "is_full_exempted")
-	private Boolean isFullExempted;
+	@JsonProperty("exempted")
+	private Boolean exempted;
 	
 	@Column(name = "remarks")
 	private String remarks;
@@ -66,11 +68,11 @@ public class Discount extends BaseChangeableOpenmrsData {
 		this.id = id;
 	}
 	
-	public Integer getAttachmentId() {
+	public String getAttachmentId() {
 		return this.attachmentId;
 	}
 	
-	public void setAttachmentId(Integer attachmentId) {
+	public void setAttachmentId(String attachmentId) {
 		this.attachmentId = attachmentId;
 	}
 	
@@ -105,14 +107,15 @@ public class Discount extends BaseChangeableOpenmrsData {
 	public void setCriteria(Concept criteria) {
 		this.criteria = criteria;
 	}
+	
 
-
-	public void setIsFullExempted(Boolean fullExempted) {
-		this.isFullExempted = fullExempted;
+	public Boolean getExempted() {
+		return exempted;
 	}
 	
-	public boolean getIsFullExempted() {
-		return this.isFullExempted;
+	public void setExempted(Boolean fullExempted) {
+		this.exempted = fullExempted;
+
 	}
 
 	
@@ -121,15 +124,21 @@ public class Discount extends BaseChangeableOpenmrsData {
 		
 		discountMap.put("uuid", this.getUuid());
 		discountMap.put("remarks", this.getRemarks());
-		if(this.isFullExempted != null){
-			discountMap.put("isFullExempted", this.getIsFullExempted());
+
+		if(this.exempted != null){
+			discountMap.put("isFullExempted", this.getExempted());
+
 		}
 		HashMap<String, Object> criteria = new HashMap<String, Object>();
 		criteria.put("uuid", this.getCriteria().getUuid());
 		discountMap.put("criteria", criteria);
+
+
 		if(this.getAttachmentId() != null){
-			//discountMap.put("attachmentId", this.getAttachmentId());
+			discountMap.put("attachmentId", this.getAttachmentId());
 		}
+
+
 		HashMap<String, Object> patient = new HashMap<String, Object>();
 		patient.put("uuid", this.getPatient().getUuid());
 		discountMap.put("patient", patient);

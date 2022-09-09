@@ -16,18 +16,8 @@
       <mat-icon>arrow_back</mat-icon>
     </button>
     <span class="ml-2">Visits</span>
-    <!-- <button
-      mat-button
-      class="ml-2"
-      id="nursing-search-patient"
-      (click)="onSearchPatient($event)"
-    >
-      <mat-icon class="mr-2">search</mat-icon>
-      <span>Search from all Patients</span>
-    </button> -->
   </mat-toolbar>
   <div *ngIf="!params?.settingCurrentLocationStatus">
-    <!-- <div class="text-muted h6 mb-4 text-center">Search for a patient</div> -->
     <app-patient-list
       (selectPatient)="onSelectPatient($event)"
       [isTabularList]="isPatientListTabular"

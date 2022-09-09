@@ -2,6 +2,7 @@ branch=$(git branch | grep \* | cut -d ' ' -f2)
 cd ui
 
 docker run -w="/app" -v "$(pwd)":/app udsmdhis2/icare-ui-compiler mv /node_modules .
+docker run -w="/app" -v "$(pwd)":/app udsmdhis2/icare-ui-compiler npm install
 docker run -w="/app" -v "$(pwd)":/app udsmdhis2/icare-ui-compiler npm run build:prod
 #cd ../docs
 #docker run -w="/app" -v "$(pwd)":/app node:16.14 npm install
