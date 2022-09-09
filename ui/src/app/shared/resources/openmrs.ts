@@ -810,6 +810,8 @@ export interface LocationGet {
   tags?: LocationtagGetRef[];
   parentLocation?: LocationGetRef;
   childLocations?: LocationGetRef[];
+  attributes?: any[];
+  forms?: any[];
 }
 
 export interface LocationGetRef {
