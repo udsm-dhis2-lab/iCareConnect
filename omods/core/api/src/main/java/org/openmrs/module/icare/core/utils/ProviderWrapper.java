@@ -1,10 +1,8 @@
 package org.openmrs.module.icare.core.utils;
 
-import org.openmrs.Provider;
-import org.openmrs.ProviderAttribute;
-import org.openmrs.VisitAttribute;
-import org.openmrs.VisitAttributeType;
+import org.openmrs.*;
 import org.openmrs.api.AdministrationService;
+import org.openmrs.api.ProviderService;
 import org.openmrs.api.VisitService;
 import org.openmrs.api.context.Context;
 import org.openmrs.attribute.AttributeType;
@@ -28,17 +26,17 @@ public class ProviderWrapper {
 	private String getAttribute(String attributeConfig) throws ConfigurationException {
 		String attributeValue = null;
 		AdministrationService adminService = Context.getService(AdministrationService.class);
-		String insuranceAttributeUuid = adminService.getGlobalProperty(attributeConfig);
-		if (insuranceAttributeUuid == null) {
+		String providerAttributeUuid = adminService.getGlobalProperty(attributeConfig);
+		if (providerAttributeUuid == null) {
 			throw new ConfigurationException("Attribute ID is configured. Please set '" + attributeConfig + "'");
 		}
-		VisitService visitService = Context.getService(VisitService.class);
-		List<VisitAttributeType> visitAttributeTypes = visitService.getAllVisitAttributeTypes();
+		ProviderService providerService = Context.getService(ProviderService.class);
+		List<ProviderAttributeType> providerAttributeTypes = providerService.getAllProviderAttributeTypes();
 		for (ProviderAttribute attribute : this.provider.getAttributes()) {
 			AttributeType attributeType = attribute.getAttributeType();
-			for (VisitAttributeType visitAttributeType : visitAttributeTypes) {
-				if (visitAttributeType.getUuid().equals(attributeType.getUuid())) {
-					if (visitAttributeType.getUuid().equals(insuranceAttributeUuid)) { //CASH OR Insurance
+			for (ProviderAttributeType providerAttributeType : providerAttributeTypes) {
+				if (providerAttributeType.getUuid().equals(attributeType.getUuid())) {
+					if (providerAttributeType.getUuid().equals(providerAttributeUuid)) { //CASH OR Insurance
 						attributeValue = (String) attribute.getValue();
 					}
 				}

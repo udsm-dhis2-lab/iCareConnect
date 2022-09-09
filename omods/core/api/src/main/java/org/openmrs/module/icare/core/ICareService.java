@@ -122,7 +122,7 @@ public interface ICareService extends OpenmrsService {
 	Patient savePatient(Patient patient);
 	
 	Message sendMessageRequest(Message message) throws Exception;
-
+	
 	Summary getSummary();
 
     List<Drug> getDrugs(String concept, Integer limit, Integer startIndex);

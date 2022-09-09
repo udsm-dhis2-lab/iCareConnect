@@ -4,16 +4,19 @@ package org.openmrs.module.icare.web.controller;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;*/
 
+import org.apache.commons.io.IOUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.hamcrest.CoreMatchers;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.openmrs.ConceptComplex;
 import org.openmrs.Patient;
 import org.openmrs.Visit;
 import org.openmrs.api.PatientService;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.icare.billing.models.Discount;
 import org.openmrs.module.icare.billing.models.Invoice;
 import org.openmrs.module.icare.billing.models.InvoiceItem;
 import org.openmrs.module.icare.billing.models.Payment;
@@ -25,12 +28,18 @@ import org.openmrs.module.webservices.rest.SimpleObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.mock.web.MockMultipartHttpServletRequest;
+import org.springframework.web.bind.annotation.RequestMethod;
 
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -183,83 +192,83 @@ public class BillingControllerAPITest extends BaseResourceControllerTest {
 		    CoreMatchers.<Object> is("OPD Service"));
 	}
 	
-	@Test
-	public void testCMakingDiscounts() throws Exception {
-		
-		//Given
-		PatientService patientService = Context.getService(PatientService.class);
-		Patient patient = patientService.getPatientByUuid("1f6959e5-d15a-4025-bb48-340ee9e2c58d");
-		createVisit(patient);
-		List<Invoice> invoices = billingService.getPendingInvoices(patient.getUuid());
-		Invoice invoice = invoices.get(0);
-		
-		String dto = this.readFile("dto/discount-create.json");
-		Map<String, Object> discount = (new ObjectMapper()).readValue(dto, Map.class);
-		
-		//When
-		((Map) ((Map) ((List) discount.get("items")).get(0)).get("invoice")).put("uuid", invoice.getUuid());
-		MockHttpServletRequest newGetRequest = newPostRequest("billing/discount", discount);
-		MockHttpServletResponse handle = handle(newGetRequest);
-		
-		//Then
-		Map<String, Object> newDiscount = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
-		assertThat("Should contain discount", newDiscount != null);
-		assertThat("Should contain Remarks", discount.get("remarks"), is(newDiscount.get("remarks")));
-		assertThat("Should contain Patient", discount.get("patient"), is(newDiscount.get("patient")));
-		assertThat("Should contain Criteria", discount.get("criteria"), is(newDiscount.get("criteria")));
-		assertThat("Should contain items", ((List) discount.get("items")).size(),
-		    is(((List) newDiscount.get("items")).size()));
-		
-		String amount = ((Map) ((List) discount.get("items")).get(0)).get("amount").toString();
-		assertThat("Should have item with amount", (Double.valueOf(amount)),
-		    is(((Map) ((List) newDiscount.get("items")).get(0)).get("amount")));
-		
-		//Test fetching discounts on the invoice
-		newGetRequest = newGetRequest("billing/invoice", new Parameter("patient", patient.getUuid()));
-		MockHttpServletResponse handle2 = handle(newGetRequest);
-		List invoiceMaps = (new ObjectMapper()).readValue(handle2.getContentAsString(), List.class);
-		Map<String, Object> invoiceMap = (Map<String, Object>) invoiceMaps.get(0);
-		assertThat("Should contain discount items", ((List) invoiceMap.get("discountItems")).size(), is(1));
-	}
+	//	@Test
+	//	public void testCMakingDiscounts() throws Exception {
+	//
+	//		//Given
+	//		PatientService patientService = Context.getService(PatientService.class);
+	//		Patient patient = patientService.getPatientByUuid("1f6959e5-d15a-4025-bb48-340ee9e2c58d");
+	//		createVisit(patient);
+	//		List<Invoice> invoices = billingService.getPendingInvoices(patient.getUuid());
+	//		Invoice invoice = invoices.get(0);
+	//
+	//		String dto = this.readFile("dto/discount-create.json");
+	//		Map<String, Object> discount = (new ObjectMapper()).readValue(dto, Map.class);
+	//
+	//		//When
+	//		((Map) ((Map) ((List) discount.get("items")).get(0)).get("invoice")).put("uuid", invoice.getUuid());
+	//		MockHttpServletRequest newGetRequest = newPostRequest("billing/discount", discount);
+	//		MockHttpServletResponse handle = handle(newGetRequest);
+	//
+	//		//Then
+	//		Map<String, Object> newDiscount = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
+	//		assertThat("Should contain discount", newDiscount != null);
+	//		assertThat("Should contain Remarks", discount.get("remarks"), is(newDiscount.get("remarks")));
+	//		assertThat("Should contain Patient", discount.get("patient"), is(newDiscount.get("patient")));
+	//		assertThat("Should contain Criteria", discount.get("criteria"), is(newDiscount.get("criteria")));
+	//		assertThat("Should contain items", ((List) discount.get("items")).size(),
+	//		    is(((List) newDiscount.get("items")).size()));
+	//
+	//		String amount = ((Map) ((List) discount.get("items")).get(0)).get("amount").toString();
+	//		assertThat("Should have item with amount", (Double.valueOf(amount)),
+	//		    is(((Map) ((List) newDiscount.get("items")).get(0)).get("amount")));
+	//
+	//		//Test fetching discounts on the invoice
+	//		newGetRequest = newGetRequest("billing/invoice", new Parameter("patient", patient.getUuid()));
+	//		MockHttpServletResponse handle2 = handle(newGetRequest);
+	//		List invoiceMaps = (new ObjectMapper()).readValue(handle2.getContentAsString(), List.class);
+	//		Map<String, Object> invoiceMap = (Map<String, Object>) invoiceMaps.get(0);
+	//		assertThat("Should contain discount items", ((List) invoiceMap.get("discountItems")).size(), is(1));
+	//	}
 	
-	@Test
-	public void testDMakingDiscountsDoubleAmount() throws Exception {
-		
-		//Given
-		PatientService patientService = Context.getService(PatientService.class);
-		Patient patient = patientService.getPatientByUuid("1f6959e5-d15a-4025-bb48-340ee9e2c58d");
-		createVisit(patient);
-		List<Invoice> invoices = billingService.getPendingInvoices(patient.getUuid());
-		Invoice invoice = invoices.get(0);
-		
-		String dto = this.readFile("dto/discount-create-double.json");
-		Map<String, Object> discount = (new ObjectMapper()).readValue(dto, Map.class);
-		
-		//When
-		((Map) ((Map) ((List) discount.get("items")).get(0)).get("invoice")).put("uuid", invoice.getUuid());
-		MockHttpServletRequest newGetRequest = newPostRequest("billing/discount", discount);
-		MockHttpServletResponse handle = handle(newGetRequest);
-		
-		//Then
-		Map<String, Object> newDiscount = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
-		assertThat("Should contain discount", newDiscount != null);
-		assertThat("Should contain Remarks", discount.get("remarks"), is(newDiscount.get("remarks")));
-		assertThat("Should contain Patient", discount.get("patient"), is(newDiscount.get("patient")));
-		assertThat("Should contain Criteria", discount.get("criteria"), is(newDiscount.get("criteria")));
-		assertThat("Should contain items", ((List) discount.get("items")).size(),
-		    is(((List) newDiscount.get("items")).size()));
-		
-		String amount = ((Map) ((List) discount.get("items")).get(0)).get("amount").toString();
-		assertThat("Should have item with amount", (Double.valueOf(amount)),
-		    is(((Map) ((List) newDiscount.get("items")).get(0)).get("amount")));
-		
-		//Test fetching discounts on the invoice
-		newGetRequest = newGetRequest("billing/invoice", new Parameter("patient", patient.getUuid()));
-		MockHttpServletResponse handle2 = handle(newGetRequest);
-		List invoiceMaps = (new ObjectMapper()).readValue(handle2.getContentAsString(), List.class);
-		Map<String, Object> invoiceMap = (Map<String, Object>) invoiceMaps.get(0);
-		assertThat("Should contain discount items", ((List) invoiceMap.get("discountItems")).size(), is(1));
-	}
+	//	@Test
+	//	public void testDMakingDiscountsDoubleAmount() throws Exception {
+	//
+	//		//Given
+	//		PatientService patientService = Context.getService(PatientService.class);
+	//		Patient patient = patientService.getPatientByUuid("1f6959e5-d15a-4025-bb48-340ee9e2c58d");
+	//		createVisit(patient);
+	//		List<Invoice> invoices = billingService.getPendingInvoices(patient.getUuid());
+	//		Invoice invoice = invoices.get(0);
+	//
+	//		String dto = this.readFile("dto/discount-create-double.json");
+	//		Map<String, Object> discount = (new ObjectMapper()).readValue(dto, Map.class);
+	//
+	//		//When
+	//		((Map) ((Map) ((List) discount.get("items")).get(0)).get("invoice")).put("uuid", invoice.getUuid());
+	//		MockHttpServletRequest newGetRequest = newPostRequest("billing/discount", discount);
+	//		MockHttpServletResponse handle = handle(newGetRequest);
+	//
+	//		//Then
+	//		Map<String, Object> newDiscount = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
+	//		assertThat("Should contain discount", newDiscount != null);
+	//		assertThat("Should contain Remarks", discount.get("remarks"), is(newDiscount.get("remarks")));
+	//		assertThat("Should contain Patient", discount.get("patient"), is(newDiscount.get("patient")));
+	//		assertThat("Should contain Criteria", discount.get("criteria"), is(newDiscount.get("criteria")));
+	//		assertThat("Should contain items", ((List) discount.get("items")).size(),
+	//		    is(((List) newDiscount.get("items")).size()));
+	//
+	//		String amount = ((Map) ((List) discount.get("items")).get(0)).get("amount").toString();
+	//		assertThat("Should have item with amount", (Double.valueOf(amount)),
+	//		    is(((Map) ((List) newDiscount.get("items")).get(0)).get("amount")));
+	//
+	//		//Test fetching discounts on the invoice
+	//		newGetRequest = newGetRequest("billing/invoice", new Parameter("patient", patient.getUuid()));
+	//		MockHttpServletResponse handle2 = handle(newGetRequest);
+	//		List invoiceMaps = (new ObjectMapper()).readValue(handle2.getContentAsString(), List.class);
+	//		Map<String, Object> invoiceMap = (Map<String, Object>) invoiceMaps.get(0);
+	//		assertThat("Should contain discount items", ((List) invoiceMap.get("discountItems")).size(), is(1));
+	//	}
 	
 	@Test
 	//@Ignore
@@ -423,6 +432,33 @@ public class BillingControllerAPITest extends BaseResourceControllerTest {
 		List invoicePayment = (new ObjectMapper()).readValue(handler.getContentAsString(), List.class);
 		assertThat("Should still contain a invoice", invoicePayment.size(), is(1));*/
 	}
+	
+	//	@Test
+	//	public void shouldUploadFileForDiscount() throws Exception {
+	//		//Discount discount = new Discount();
+	//
+	//		InputStream in = getClass().getClassLoader().getResourceAsStream("lab-data.xml");
+	//		System.out.println(in);
+	//
+	//		ByteArrayOutputStream out = new ByteArrayOutputStream();
+	//		//System.out.println(out);
+	//		IOUtils.copy(in, out);
+	//
+	//		String json = "{\"remarks\":\"Discountingwithfullexemption\",\"patient\":{\"uuid\":\"4aaad795-9fdb-4cdb-8ea2-ca250ad6b347\"},\"criteria\":{\"uuid\":\"28d3207a-79d1-4d09-83b0-bc873622ab66\"},\"items\":[{\"item\":{\"uuid\":\"6429edb2-d80e-4501-9627-c910ee6557d9\"},\"invoice\":{\"uuid\":\"01556d87-83c7-40dd-86ff-7bcf7fd3131a\"},\"amount\":100000}]}";
+	//
+	//		MockMultipartHttpServletRequest request = newUploadRequest("icare/discount");
+	//		request.setMethod(RequestMethod.POST.name());
+	//		//request.setContentType("multipart/form-data");
+	//		//request.addHeader("Content-Type", "multipart/form-data");
+	//		request.addFile(new MockMultipartFile("document", "lab-data.xml", "application/xml", out.toByteArray()));
+	//		//request.addParameter("json", json);
+	//
+	//		SimpleObject response = deserialize(handle(request));
+	//
+	//		MockHttpServletResponse rawResponse = handle(newGetRequest("discount" + "/" + response.get("uuid") + "/value"));
+	//
+	//		assertThat(out.toByteArray(), is(equalTo(rawResponse.getContentAsByteArray())));
+	//	}
 	
 	@Override
 	public String getURI() {
