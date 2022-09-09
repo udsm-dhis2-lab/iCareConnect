@@ -6,31 +6,65 @@
       </button>
       <span class="ml-2">Dispensing</span>
     </mat-toolbar>
-    <div>
-      <mat-tab-group>
-        <mat-tab label="To dispense">
-          <div class="p-2">
-            <app-patient-list
-              [isTabularList]="true"
-              [itemsPerPage]="25"
-              [orderType]="'iCARESTS-PRES-1111-1111-525400e4297f'"
-              [orderStatusCode]="'EMPTY'"
-              (selectPatient)="onSelectPatient($event)"
-            ></app-patient-list>
-          </div>
-        </mat-tab>
-        <mat-tab label="Already dispensed">
-          <div class="p-2">
-            <app-patient-list
-              [isTabularList]="true"
-              [itemsPerPage]="25"
-              [orderType]="'iCARESTS-PRES-1111-1111-525400e4297f'"
-              [orderStatusCode]="'DISPENSED'"
-              (selectPatient)="onSelectPatient($event)"
-            ></app-patient-list>
-          </div>
-        </mat-tab>
-      </mat-tab-group>
+    <div *ngIf="{
+      generalPrescriptionEncounterType: generalPrescriptionEncounterType$ | async,
+      generalPrescriptionOrderType: generalPrescriptionOrderType$ | async,
+      useGenericPrescription: useGenericPrescription$ | async
+    } as params">
+      <div *ngIf="params?.useGenericPrescription">
+        <mat-tab-group>
+          <mat-tab label="To dispense">
+            <div class="p-2">
+              <app-patient-list
+                [isTabularList]="true"
+                [itemsPerPage]="25"
+                [orderType]="params?.generalPrescriptionOrderType"
+                [orderStatusCode]="'EMPTY'"
+                (selectPatient)="onSelectPatient($event)"
+              ></app-patient-list>
+            </div>
+          </mat-tab>
+          <mat-tab label="Already dispensed">
+            <div class="p-2">
+              <app-patient-list
+                [isTabularList]="true"
+                [itemsPerPage]="25"
+                [orderType]="params?.generalPrescriptionOrderType"
+                [orderStatusCode]="'DISPENSED'"
+                (selectPatient)="onSelectPatient($event)"
+              ></app-patient-list>
+            </div>
+          </mat-tab>
+        </mat-tab-group>
+      </div>
+      
+      <div *ngIf="!params?.useGenericPrescription">
+        <mat-tab-group>
+          <mat-tab label="To dispense">
+            <div class="p-2">
+              <app-patient-list
+                [isTabularList]="true"
+                [itemsPerPage]="25"
+                [orderType]="'iCARESTS-PRES-1111-1111-525400e4297f'"
+                [orderStatusCode]="'EMPTY'"
+                (selectPatient)="onSelectPatient($event)"
+              ></app-patient-list>
+            </div>
+          </mat-tab>
+          <mat-tab label="Already dispensed">
+            <div class="p-2">
+              <app-patient-list
+                [isTabularList]="true"
+                [itemsPerPage]="25"
+                [orderType]="'iCARESTS-PRES-1111-1111-525400e4297f'"
+                [orderStatusCode]="'DISPENSED'"
+                (selectPatient)="onSelectPatient($event)"
+              ></app-patient-list>
+            </div>
+          </mat-tab>
+        </mat-tab-group>
+      </div>
+
     </div>
   </div>
 </div>
