@@ -22,7 +22,13 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let order of orders; let count = index">
+        <tr
+          *ngFor="let order of orders; let count = index"
+          [ngClass]="{
+            'attended-radiology-order':
+              obsKeyedByConcepts[order?.concept?.uuid]?.uri
+          }"
+        >
           <td>
             {{ count + 1 }}
           </td>
