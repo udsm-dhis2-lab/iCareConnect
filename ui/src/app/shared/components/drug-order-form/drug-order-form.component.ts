@@ -29,6 +29,7 @@ export class DrugOrderFormComponent implements OnInit {
   @Input() encounterUuid: string;
   @Input() provider: ProviderGet;
   @Input() drugOrderFormsMetadata: any;
+  @Input() drugs: any;
   drugFormField: Dropdown;
   @Input() patient: Patient;
   @Input() isFromDoctor: boolean;
@@ -50,16 +51,35 @@ export class DrugOrderFormComponent implements OnInit {
   constructor() {}
 
   ngOnInit(): void {
-    this.drugFormField = {
-      ...this.drugOrderFormsMetadata?.drugFormField,
-      conceptClass: "Drug",
-      shouldHaveLiveSearchForDropDownFields: true,
-      searchControlType: "Drug",
-      filteringItems: {
-        items: this.drugOrderFormsMetadata?.stockedDrugs,
-        applicable: this.dispensingLocations,
-      },
-    };
+    console.log("==> Drugs: ", this.drugs.results);
+    if(this.drugs?.results?.length > 0) {
+      this.drugFormField = new Dropdown({
+        id: "drug",
+        key: "drug",
+        label: `Select Drug`,
+        conceptClass: "Drug",
+        value: null,
+        options: this.drugs?.results?.map((drug) => {
+          return {
+            key: drug?.uuid,
+            value: drug?.uuid,
+            label: drug?.display,
+          };
+        }),
+      });
+    } 
+    else {
+      this.drugFormField = {
+        ...this.drugOrderFormsMetadata?.drugFormField,
+        conceptClass: "Drug",
+        shouldHaveLiveSearchForDropDownFields: true,
+        searchControlType: "Drug",
+        filteringItems: {
+          items: this.drugOrderFormsMetadata?.stockedDrugs,
+          applicable: this.dispensingLocations,
+        },
+      };
+    }
     this.quantityField = this.drugOrderFormsMetadata?.quantityField;
   }
 

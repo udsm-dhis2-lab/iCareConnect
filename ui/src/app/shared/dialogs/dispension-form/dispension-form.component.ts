@@ -22,6 +22,7 @@ import { getCurrentPatient } from "src/app/store/selectors/current-patient.selec
 import { getProviderDetails } from "src/app/store/selectors/current-user.selectors";
 import { getActiveVisit } from "src/app/store/selectors/visit.selectors";
 import { ConceptsService } from "../../resources/concepts/services/concepts.service";
+import { DrugsService } from "../../resources/drugs/services/drugs.service";
 import { OrdersService } from "../../resources/order/services/orders.service";
 
 @Component({
@@ -58,9 +59,11 @@ export class DispensingFormComponent implements OnInit {
   generalPrescriptionDoseConcept$: Observable<any>;
   generalPrescriptionFrequencyConcept$: Observable<any>;
   dosingFrequencies$: Observable<any>;
+  drugsToBeDispensed$: Observable<any>;
 
   constructor(
     private drugOrderService: DrugOrdersService,
+    private drugsService: DrugsService,
     private orderService: OrdersService,
     private dialogRef: MatDialogRef<DispensingFormComponent>,
     private systemSettingsService: SystemSettingsService,
@@ -287,5 +290,10 @@ export class DispensingFormComponent implements OnInit {
       conceptUuid,
       `custom:(uuid,name,conceptClass:(uuid,display),setMembers:(uuid,display),answers:(uuid,display)`
     );
+  }
+  
+  getDrugsByConceptUuid(conceptUuid: string) {
+    this.drugsToBeDispensed$ = this.drugsService.getDrugsUsingConceptUuid(
+      conceptUuid);
   }
 }
