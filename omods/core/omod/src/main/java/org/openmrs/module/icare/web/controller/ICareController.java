@@ -60,10 +60,10 @@ public class ICareController {
         results.put("identifiers", ids);
         return results;
     }
-
+	
 	/**
 	 * Initially called after the getUsers method to get the landing form name
-	 *
+	 * 
 	 * @return String form view name
 	 */
 	@RequestMapping(value = "summary", method = RequestMethod.GET)

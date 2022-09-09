@@ -555,10 +555,10 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		assertThat("Should return a patient", visitDetails3.size() == 1);
 		
 	}
-
+	
 	@Test
 	public void testSummary() throws Exception {
-
+		
 		//Get visits by attribute value references
 		MockHttpServletRequest newGetRequest = newGetRequest("icare/summary");
 		MockHttpServletResponse handle = handle(newGetRequest);
@@ -567,7 +567,6 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		Map summaryMap = (new ObjectMapper()).readValue(summaryData, Map.class);
 		List<Map> summaryDetails = (List<Map>) summaryMap.get("results");
 		//assertThat("Should return a visit", visitDetails.size() == 1);
-
-
+		
 	}
 }
