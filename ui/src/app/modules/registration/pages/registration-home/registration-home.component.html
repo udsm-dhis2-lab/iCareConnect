@@ -1,9 +1,9 @@
 <div>
-  <div>
+  <div *ngIf="patientSummary$ | async as patientSummary">
     <div class="mt-4">
       <div class="border">
         <mat-toolbar>
-        <!--   <button
+          <!--   <button
             mat-icon-button
             (click)="onBack($event)"
             matTooltip="Go to Home page"
@@ -20,6 +20,20 @@
             <mat-icon class="mr-2">search</mat-icon>
             <span>Search from all Patient</span>
           </button> -->
+
+          <span class="ml-2"
+            >Total Patients:
+            <span style="color: #42abed; font-weight: bold">{{
+              patientSummary?.allPatients
+            }}</span></span
+          >
+          &nbsp;&nbsp; | &nbsp;&nbsp;
+          <span class="ml-2"
+            >Active Visit:
+            <span style="color: #42abed; font-weight: bold">{{
+              patientSummary?.activeVisits
+            }}</span></span
+          >
 
           <span class="toolbar-spacer"></span>
 
@@ -46,7 +60,7 @@
             [documentURL]="documentURL"
             [appName]="'Registration'"
           ></icare-help>
-       <!--    <app-patient-list
+          <!--    <app-patient-list
             *ngIf="!loadingData"
             [itemsPerPage]="15"
             [isRegistrationPage]="true"
@@ -55,16 +69,22 @@
           ></app-patient-list> -->
 
           <app-patient-search
-          (selectPatient)="onSelectPatient($event)"
+            (selectPatient)="onSelectPatient($event)"
           ></app-patient-search>
 
-         <!--  <app-registration-summary-cards
-          [roomNo]="roomNo "
-          [doctorName]="doctorName"
-          [totalActivePatients]="totalActivePatients"
-          >
-          </app-registration-summary-cards> -->
-        
+          <div class="row mt-4 w-100">
+            <div
+              class="col-lg-3 col-md-3 col-sx-12 col-sm-12 ml-2 mt-2"
+              *ngFor="let location of patientSummary?.locations"
+            >
+              <app-registration-summary-cards
+                [roomNo]="location?.name"
+                [doctorName]="''"
+                [totalActivePatients]="location?.activeVisits"
+              >
+              </app-registration-summary-cards>
+            </div>
+          </div>
           <mat-progress-bar
             mode="indeterminate"
             *ngIf="loadingData"
