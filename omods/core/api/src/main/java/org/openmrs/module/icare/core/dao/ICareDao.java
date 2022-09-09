@@ -597,8 +597,8 @@ public class ICareDao extends BaseDAO<Item> {
 		summary.setLocations(locationMap);
 		return summary;
     }
-
-    public List<Drug> getDrugs(String concept, Integer limit, Integer startIndex) {
+	
+	public List<Drug> getDrugs(String concept, Integer limit, Integer startIndex) {
 		DbSession session = getSession();
 		String queryStr = "SELECT d FROM Drug d WHERE d.concept.uuid=:concept";
 		Query query = session.createQuery(queryStr);
@@ -606,5 +606,5 @@ public class ICareDao extends BaseDAO<Item> {
 		query.setMaxResults(limit);
 		query.setParameter("concept", concept);
 		return query.list();
-    }
+	}
 }
