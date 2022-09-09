@@ -31,24 +31,31 @@
       ></app-new-patient-profile>
     </div>
     <div class="patient-other-details-padding">
-      <div class="w-100 mt-2">
-        <button
-          class="float-left"
-          mat-stroked-button
-          [routerLink]="'/radiology'"
-          matTooltip="Back to List"
-        >
-          <mat-icon>arrow_back</mat-icon>
-          Back to Clients List
-        </button>
+      <div class="w-100 mt-4 d-flex justify-content-between">
+        <div class="w-50">
+          <button
+            class="float-left"
+            mat-stroked-button
+            [routerLink]="'/radiology'"
+            matTooltip="Back to List"
+          >
+            <mat-icon>arrow_back</mat-icon>
+            Back to Clients List
+          </button>
+        </div>
+        <div class="w-100">
+          <!-- Put scale here -->
+        </div>
       </div>
       <div
         class="alert alert-warning"
         role="alert"
         *ngIf="
+          params?.currentUser &&
           params?.userPrivileges &&
           params?.allUserRoles &&
           params?.orders &&
+          params?.activeVisitUuid &&
           params?.orders?.length === 0
         "
       >
