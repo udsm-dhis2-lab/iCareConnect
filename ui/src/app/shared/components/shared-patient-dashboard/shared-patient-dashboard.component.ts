@@ -113,7 +113,8 @@ export class SharedPatientDashboardComponent implements OnInit {
   forms$: Observable<any>;
   orderTypes$: Observable<any>;
   countOfVitalsElementsFilled$: Observable<number>;
-
+  selectedForm: any;
+  readyForClinicalNotes: boolean = true;
   constructor(private store: Store<AppState>, private dialog: MatDialog) {
     this.store.dispatch(loadEncounterTypes());
   }
@@ -190,6 +191,17 @@ export class SharedPatientDashboardComponent implements OnInit {
     });
 
     this.currentLocation$ = this.store.select(getCurrentLocation);
+  }
+
+  getSelectedForm(event: Event, form: any): void {
+    this.readyForClinicalNotes = false;
+    if (event) {
+      event.stopPropagation();
+    }
+    this.selectedForm = form;
+    setTimeout(() => {
+      this.readyForClinicalNotes = true;
+    }, 50);
   }
 
   onSaveObservations(observations: ObsCreate[], patient): void {
