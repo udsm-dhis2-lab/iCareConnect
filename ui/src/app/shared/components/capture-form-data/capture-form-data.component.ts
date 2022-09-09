@@ -34,13 +34,6 @@ export class CaptureFormDataComponent implements OnInit {
         v: "custom:(encounters:(uuid,obs))",
       },
     });
-    // this.patientService
-    //   .getAllPatientsObses({
-    //     patient: this.patient?.id,
-    //     v: "full",
-    //     visit: this.visit?.uuid,
-    //   })
-    //   .subscribe((response) => console.log("RESPONSE", response));
   }
 
   onFormUpdate(data) {

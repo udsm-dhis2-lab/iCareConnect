@@ -73,6 +73,7 @@ import {
 } from "../../resources/openmrs";
 import { saveObservations } from "src/app/store/actions/observation.actions";
 import { loadEncounterTypes } from "src/app/store/actions/encounter-type.actions";
+import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 
 @Component({
   selector: "app-shared-patient-dashboard",
@@ -113,13 +114,14 @@ export class SharedPatientDashboardComponent implements OnInit {
   forms$: Observable<any>;
   orderTypes$: Observable<any>;
   countOfVitalsElementsFilled$: Observable<number>;
-
+  selectedForm: any;
+  readyForClinicalNotes: boolean = true;
   constructor(private store: Store<AppState>, private dialog: MatDialog) {
     this.store.dispatch(loadEncounterTypes());
   }
 
   ngOnInit(): void {
-    console.log("current location", this.currentLocation);
+    // console.log(this.currentLocation);
     this.onStartConsultation(this.activeVisit);
     this.store.dispatch(loadOrderTypes());
     this.orderTypes$ = this.store.select(getAllOrderTypes);
@@ -190,6 +192,17 @@ export class SharedPatientDashboardComponent implements OnInit {
     });
 
     this.currentLocation$ = this.store.select(getCurrentLocation);
+  }
+
+  getSelectedForm(event: Event, form: any): void {
+    this.readyForClinicalNotes = false;
+    if (event) {
+      event.stopPropagation();
+    }
+    this.selectedForm = form;
+    setTimeout(() => {
+      this.readyForClinicalNotes = true;
+    }, 50);
   }
 
   onSaveObservations(observations: ObsCreate[], patient): void {
