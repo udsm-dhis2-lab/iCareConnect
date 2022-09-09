@@ -129,7 +129,6 @@ export class LabOrdersEffects {
       switchMap((action) => {
         return this.ordersService.deleteOrder(action.uuid).pipe(
           map((response) => {
-            console.log(response);
             return voidLabOrder({ uuid: action.uuid });
           })
         );

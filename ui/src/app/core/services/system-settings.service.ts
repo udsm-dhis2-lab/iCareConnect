@@ -31,7 +31,7 @@ export class SystemSettingsService {
             response?.results[0]?.value.indexOf("[") > -1
             ? JSON.parse(response?.results[0]?.value)
             : response?.results[0]?.value
-          : "";
+          : "none";
       }),
       catchError((error) => of(error))
     );
