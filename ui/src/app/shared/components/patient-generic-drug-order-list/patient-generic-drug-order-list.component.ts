@@ -14,6 +14,8 @@ import { DrugOrdersService } from "../../resources/order/services";
 import { OrdersService } from "../../resources/order/services/orders.service";
 import { Visit } from "../../resources/visits/models/visit.model";
 
+import { flatten, keyBy } from "lodash";
+
 @Component({
   selector: "app-patient-generic-drug-order-list",
   templateUrl: "./patient-generic-drug-order-list.component.html",
@@ -38,7 +40,7 @@ export class PatientGenericDrugOrderListComponent implements OnInit {
   isThereDiagnosisProvided$: Observable<boolean>;
   drugOrders$: Observable<any>;
   drugOrders: any[];
-  
+
   @Output() orderSelectAction = new EventEmitter<TableSelectAction>();
 
   constructor(
@@ -49,19 +51,32 @@ export class PatientGenericDrugOrderListComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    let orders = []
-    this.visit?.encounters?.forEach((encounter) => {
-      this.drugOrders = encounter?.orders.filter((order) => {
-        if(order.orderType?.uuid == this.genericPrescriptionOrderType){
-          orders = [
-            ...orders,
-            order
-          ]
-        }
-      });
-    })
-
-    this.drugOrders = orders;
+    this.drugOrders = flatten(
+      this.visit?.encounters
+        ?.map((encounter) => {
+          return (
+            encounter?.orders.filter(
+              (order) =>
+                order.orderType?.uuid == this.genericPrescriptionOrderType
+            ) || []
+          )?.map((genericDrugOrder) => {
+            return {
+              ...genericDrugOrder,
+              obs: keyBy(
+                encounter?.obs?.map((observation) => {
+                  return {
+                    ...observation,
+                    conceptKey: observation?.concept?.uuid,
+                    valueIsObject: observation?.value?.uuid ? true : false,
+                  };
+                }),
+                "conceptKey"
+              ),
+            };
+          });
+        })
+        ?.filter((order) => order)
+    );
 
     this.visitLoadingState$ = this.store.select(getVisitLoadingState);
     this.tableConfig = new TableConfig({ noDataLabel: "No prescription" });
