@@ -43,10 +43,6 @@ export class RegistrationHomeComponent implements OnInit {
   }>;
 
   //card variables
-  roomNumber: string[];
-  activeVisits: number[];
-  allactiveVisits: number;
-  allPatients: number;
   roomData: { name: string; activePatients: number }[];
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
@@ -85,7 +81,6 @@ export class RegistrationHomeComponent implements OnInit {
 
     //== This is how to use the selector from store selectors==
     //this.treatmentLocations$ = this.store.select(getAllTreatmentLocations);
-    this.patientSummary$ = this.patentService.getPatientSummary();
     /*  this.patientSummary$.subscribe((data) => {
       this.allPatients = data.allPatients;
       this.allactiveVisits = data.activeVisits;
@@ -100,6 +95,8 @@ export class RegistrationHomeComponent implements OnInit {
         });
       }
     }); */
+
+    this.patientSummary$ = this.patentService.getPatientSummary();
   }
 
   goToAddNewClientPage(event: Event, path: string): void {
