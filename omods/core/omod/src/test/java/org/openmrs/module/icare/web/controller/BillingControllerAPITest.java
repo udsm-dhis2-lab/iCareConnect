@@ -444,10 +444,13 @@ public class BillingControllerAPITest extends BaseResourceControllerTest {
 		Map<String, Object> discount = (new ObjectMapper()).readValue(dto, Map.class);
 		discount.put("exempted",true);
 
+
 		//When
 		((Map) ((Map) ((List) discount.get("items")).get(0)).get("invoice")).put("uuid", invoice.getUuid());
 		MockHttpServletRequest newGetRequest = newPostRequest("billing/discount", discount);
 		MockHttpServletResponse handle = handle(newGetRequest);
+
+		System.out.println(invoice.getInvoiceItems().size());
 
 		///Create a new bill
 		//Given
@@ -480,7 +483,9 @@ public class BillingControllerAPITest extends BaseResourceControllerTest {
 		Double discountPrice = invoice.getDiscountItems().get(1).getAmount();
 		Double totalPrice = invoice.getInvoiceItems().get(1).getPrice() * invoice.getInvoiceItems().get(1).getQuantity();
 
+
 		assertThat(totalPrice,equalTo(discountPrice));
+		assertThat("The discount items should be three i.e includes the registration invoice item", invoice.getDiscountItems().size()==3);
 
 
 	}
