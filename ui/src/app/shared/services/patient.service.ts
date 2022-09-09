@@ -44,4 +44,21 @@ export class PatientService {
   getAllPatientsObses(parameters): Observable<any> {
     return from(this.API.obs.getAllObses(parameters));
   }
+  getPatientSummary() {
+    return this.openMRSHttpClient.get("icare/summary").pipe(
+      map((response) => {
+        return {
+          ...response,
+          locations: response?.locations?.filter(
+            (location) =>
+              (
+                location?.tags?.filter(
+                  (tag) => tag?.name === "Treatment Room"
+                ) || []
+              )?.length > 0
+          ),
+        };
+      })
+    );
+  }
 }
