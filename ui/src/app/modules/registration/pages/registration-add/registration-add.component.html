@@ -104,32 +104,6 @@
           </div>
         </div>
 
-        <div class="row mt-3">
-          <div class="col-sm-3">
-            <label for="patient-type">Patient Type</label>
-          </div>
-          <div class="col-sm-9">
-             <div  class="d-flex mt-1">
-                <mat-form-field appearance="fill" class="w-75">
-                  <mat-select
-                    placeholder="Select Identification"
-                    [ngModel]="selectedIdentifierType?.id"
-                  >
-                    <mat-option
-                      >to be implemented</mat-option
-                    >
-                  </mat-select>
-                </mat-form-field>
-                <mat-form-field appearance="fill" class="w-100 ml-4">
-                  <mat-label>{{"Enter" + (3+4) }}</mat-label>
-                  <input
-                    matInput
-                    placeholder="Enter Text"
-                            />
-                </mat-form-field>
-              </div>
-            </div>
-          </div>
         <!-- end of patient identification -->
 
         <!-- patient names -->
@@ -423,8 +397,7 @@
             <label for="">Additional Patient Information</label>
           </div>
           <div class="col-sm-9 d-flex">
-            
-        <!--<div>
+            <!--<div>
                  <mat-form-field appearance="fill" class="w-100">
                 <mat-label>Occupation</mat-label>
                 <mat-select>
@@ -463,7 +436,7 @@
                 </mat-select>
               </mat-form-field>
               -->
-              <!-- <div class="w-100">
+            <!-- <div class="w-100">
                 <app-dynamic-reg-form
                   *ngIf="params?.occupationInfo"
                   [concepts]="[params?.occupationInfo]"
@@ -490,11 +463,11 @@
             </div> -->
             <div class="ml-3">
               <app-dynamic-reg-form
-              *ngIf="params?.additionalPatientInformation"
-              [concepts]="params?.additionalPatientInformation.setMembers"
-              (selectedValue)="getAdditionalInformationValues($event)"
-            >
-            </app-dynamic-reg-form>
+                *ngIf="params?.additionalPatientInformation"
+                [concepts]="params?.additionalPatientInformation.setMembers"
+                (selectedValue)="getAdditionalInformationValues($event)"
+              >
+              </app-dynamic-reg-form>
 
               <!-- <mat-form-field appearance="fill" class="w-100">
                 <mat-label>Religion</mat-label>
