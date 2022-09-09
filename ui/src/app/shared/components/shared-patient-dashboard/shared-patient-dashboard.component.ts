@@ -73,6 +73,7 @@ import {
 } from "../../resources/openmrs";
 import { saveObservations } from "src/app/store/actions/observation.actions";
 import { loadEncounterTypes } from "src/app/store/actions/encounter-type.actions";
+import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 
 @Component({
   selector: "app-shared-patient-dashboard",
@@ -120,7 +121,7 @@ export class SharedPatientDashboardComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log("current location", this.currentLocation);
+    // console.log(this.currentLocation);
     this.onStartConsultation(this.activeVisit);
     this.store.dispatch(loadOrderTypes());
     this.orderTypes$ = this.store.select(getAllOrderTypes);

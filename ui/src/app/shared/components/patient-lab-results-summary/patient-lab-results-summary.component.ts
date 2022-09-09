@@ -149,14 +149,11 @@ export class PatientLabResultsSummaryComponent implements OnInit {
                         this.keyedResults = keyBy(data, "test");
                       }
                     });
-                    const data = {
+                    return {
                       ...labOrder?.order,
                       voided: labOrder?.voided,
                       result: observation,
                     };
-
-                    console.log(data);
-                    return data;
                   }
                 );
               } else {
