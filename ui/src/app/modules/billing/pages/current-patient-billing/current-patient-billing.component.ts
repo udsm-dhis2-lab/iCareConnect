@@ -58,7 +58,7 @@ export class CurrentPatientBillingComponent implements OnInit {
   provider$: Observable<any>;
   creatingOrdersResponse$: Observable<any>;
   discountItems: any[] = [];
-  discountItemsCount: any;
+  discountItemsCount: any = 0;
   bill: Bill;
   exemptionEncounterType$: Observable<any>;
   exemptionOrderType$: Observable<any>;
@@ -157,7 +157,7 @@ export class CurrentPatientBillingComponent implements OnInit {
               }
             });
 
-            this.discountItemsCount = this.discountItems.length
+            this.discountItemsCount = this.discountItems.length > 0 ? this.discountItems.length : 0;
             
           }
         })

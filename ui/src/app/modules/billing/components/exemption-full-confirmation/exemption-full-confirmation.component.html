@@ -9,6 +9,10 @@
                 <div class="mt-3">
                     <app-form [fields]="[data?.form?.remarks]" (formUpdate)="onFormUpdate($event)"></app-form>
                 </div>
+                 <div>
+                    <label for="document">Upload file if any </label>
+                    <input  autocomplete="off" name="document" class="w-100" type="file" accept=".pdf .xls .doc .csv .png .jpg" />
+                </div>
             </div>
         </div>
 
