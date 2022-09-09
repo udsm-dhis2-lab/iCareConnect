@@ -514,7 +514,7 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		}
 		return false;
 	}
-
+	
 	public Summary getSummary() {
 		return dao.getSummary();
 	}
