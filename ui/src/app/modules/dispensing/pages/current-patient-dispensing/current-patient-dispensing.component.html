@@ -7,7 +7,10 @@
     currentLocation: currentLocation$ | async,
     currentVisitLoadedState: currentVisitLoadedState$ | async,
     currentVisitLoadingState: currentVisitLoadingState$ | async,
-    generalMetadataConfigurations: generalMetadataConfigurations$ | async
+    generalMetadataConfigurations: generalMetadataConfigurations$ | async,
+    genericPrescriptionOrderType: genericPrescriptionOrderType$ | async,
+    genericPrescriptionEncounterType: genericPrescriptionEncounterType$ | async,
+    useGenericPrescription: useGenericPrescription$ | async
   } as params"
 >
   <button mat-button color="light" (click)="onBack($event)">
@@ -51,21 +54,39 @@
       >
         {{ params?.response?.message }}
       </p>
-      <div class="border" *ngIf="params?.currentVisitLoadedState">
+      <div class="border" *ngIf="params?.currentVisitLoadedState && !params?.useGenericPrescription">
         <app-patient-drug-order-list
+        [visit]="params?.patientVisit"
+        [loading]="loading"
+        [loadingError]="loadingError"
+        [actionOptions]="dispensingActionOptions"
+        [currentLocation]="params.currentLocation"
+        [currentPatient]="params?.currentPatient"
+        [generalMetadataConfigurations]="
+        params?.generalMetadataConfigurations
+        "
+        (orderSelectAction)="
+        onSelectAction($event, params?.patientVisit, params.currentLocation)
+        "
+        ></app-patient-drug-order-list>
+      </div>
+      <div class="border" *ngIf="params?.currentVisitLoadedState && params?.useGenericPrescription">
+        <app-patient-generic-drug-order-list
           [visit]="params?.patientVisit"
           [loading]="loading"
           [loadingError]="loadingError"
           [actionOptions]="dispensingActionOptions"
           [currentLocation]="params.currentLocation"
           [currentPatient]="params?.currentPatient"
+          [genericPrescriptionOrderType]="params?.genericPrescriptionOrderType"
+          [genericPrescriptionEncounterType]="params?.genericPrescriptionEncounterType"
           [generalMetadataConfigurations]="
             params?.generalMetadataConfigurations
           "
           (orderSelectAction)="
             onSelectAction($event, params?.patientVisit, params.currentLocation)
           "
-        ></app-patient-drug-order-list>
+        ></app-patient-generic-drug-order-list>
       </div>
     </div>
   </div>
