@@ -46,7 +46,38 @@
     *ngIf="!actionOptions"
     [patientVisit]="visit"
   ></app-patient-medication-summary>
-  <app-table
+  <!-- {{ drugOrders | json }} -->
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>SN</th>
+        <th>Drug</th>
+        <th>Prescribed By</th>
+        <th>Date & Time</th>
+        <th>Care setting</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let drugOrder of drugOrders; let count = index">
+        <td>
+          {{ count + 1 }}
+        </td>
+        <td>
+          {{ drugOrder?.concept?.display }}
+        </td>
+        <td>
+          {{ drugOrder?.orderer?.display }}
+        </td>
+        <td>
+          {{ drugOrder?.dateActivated | date: "medium" }}
+        </td>
+        <td>
+          {{ drugOrder?.careSetting?.display }}
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <!-- <app-table
     *ngIf="!params?.visitLoadingState && actionOptions && drugOrders"
     [columns]="drugOrderColumns"
     [data$]="visit?.dispensingDrugOrderTableList$"
@@ -60,5 +91,5 @@
     [tableConfig]="tableConfig"
     [actionOptions]="actionOptions"
     (selectAction)="onSelectAction($event)"
-  ></app-table>
+  ></app-table> -->
 </div>
