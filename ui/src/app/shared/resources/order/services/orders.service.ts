@@ -51,6 +51,18 @@ export class OrdersService {
     );
   }
 
+  updateOrderStatus(order): Observable<any> {
+    return this.openMRSHttpClient.put(`order/${order?.uuid}`, order).pipe(
+      map((response) => {
+        return {
+          ...order,
+          ...response,
+        };
+      }),
+      catchError((error) => of(error))
+    );
+  }
+
   getOrdersByVisitAndOrderType({ visit, orderType }): Observable<any> {
     return this.openMRSHttpClient
       .get(`icare/order?visitUuid=${visit}&orderTypeUuid=${orderType}`)

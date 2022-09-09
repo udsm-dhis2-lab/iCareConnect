@@ -66,9 +66,14 @@ import {
   getCurrentUserPrivileges,
   getProviderDetails,
 } from "src/app/store/selectors/current-user.selectors";
-import { ObsCreate, ProviderGetFull } from "../../resources/openmrs";
+import {
+  LocationGet,
+  ObsCreate,
+  ProviderGetFull,
+} from "../../resources/openmrs";
 import { saveObservations } from "src/app/store/actions/observation.actions";
 import { loadEncounterTypes } from "src/app/store/actions/encounter-type.actions";
+import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 
 @Component({
   selector: "app-shared-patient-dashboard",
@@ -82,6 +87,7 @@ export class SharedPatientDashboardComponent implements OnInit {
   @Input() activeVisit: any;
   @Input() iCareGeneralConfigurations: any;
   @Input() clinicConfigurations: any;
+  @Input() currentLocation: LocationGet;
   currentPatient$: Observable<Patient>;
   vitalSignObservations$: Observable<any>;
   loadingVisit$: Observable<boolean>;
@@ -108,14 +114,14 @@ export class SharedPatientDashboardComponent implements OnInit {
   forms$: Observable<any>;
   orderTypes$: Observable<any>;
   countOfVitalsElementsFilled$: Observable<number>;
-
+  selectedForm: any;
+  readyForClinicalNotes: boolean = true;
   constructor(private store: Store<AppState>, private dialog: MatDialog) {
     this.store.dispatch(loadEncounterTypes());
-
-    console.log(this.userPrivileges);
   }
 
   ngOnInit(): void {
+    // console.log(this.currentLocation);
     this.onStartConsultation(this.activeVisit);
     this.store.dispatch(loadOrderTypes());
     this.orderTypes$ = this.store.select(getAllOrderTypes);
@@ -127,12 +133,7 @@ export class SharedPatientDashboardComponent implements OnInit {
     );
     this.store.dispatch(
       loadCustomOpenMRSForms({
-        formUuids: filter(
-          map(this.applicableForms, (form) => {
-            return form?.id;
-          }),
-          (uuid) => uuid
-        ),
+        formUuids: this.currentLocation?.forms,
       })
     );
 
@@ -179,20 +180,29 @@ export class SharedPatientDashboardComponent implements OnInit {
 
     this.loadingPaymentStatus$ = this.store.select(getLoadingPaymentStatus);
 
-    this.store.dispatch(
-      loadForms({ formConfigs: ICARE_CONFIG?.consultation?.forms })
-    );
+    // this.store.dispatch(
+    //   loadForms({ formConfigs: ICARE_CONFIG?.consultation?.forms })
+    // );
     this.consultationForms$ = this.store.pipe(
       select(getFormEntitiesByNames(CONSULTATION_FORM_CONFIGS))
     );
 
     this.forms$ = this.store.select(getCustomOpenMRSFormsByIds, {
-      formUUids: map(this.applicableForms, (form) => {
-        return form?.id;
-      }),
+      formUUids: this.currentLocation?.forms,
     });
 
     this.currentLocation$ = this.store.select(getCurrentLocation);
+  }
+
+  getSelectedForm(event: Event, form: any): void {
+    this.readyForClinicalNotes = false;
+    if (event) {
+      event.stopPropagation();
+    }
+    this.selectedForm = form;
+    setTimeout(() => {
+      this.readyForClinicalNotes = true;
+    }, 50);
   }
 
   onSaveObservations(observations: ObsCreate[], patient): void {

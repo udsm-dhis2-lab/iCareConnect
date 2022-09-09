@@ -22,6 +22,8 @@ import org.openmrs.module.icare.billing.services.insurance.ClaimResult;
 import org.openmrs.module.icare.core.ICareService;
 import org.openmrs.module.icare.core.Item;
 import org.openmrs.module.icare.core.Message;
+import org.openmrs.module.icare.core.Summary;
+import org.openmrs.module.icare.core.utils.PatientWrapper;
 import org.openmrs.module.icare.core.utils.VisitWrapper;
 import org.openmrs.module.icare.store.models.OrderStatus;
 import org.openmrs.module.webservices.rest.web.RestConstants;
@@ -31,10 +33,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.naming.ConfigurationException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * This class configured as controller using annotation and mapped with the URL of
@@ -61,6 +60,18 @@ public class ICareController {
         results.put("identifiers", ids);
         return results;
     }
+	
+	/**
+	 * Initially called after the getUsers method to get the landing form name
+	 * 
+	 * @return String form view name
+	 */
+	@RequestMapping(value = "summary", method = RequestMethod.GET)
+	@ResponseBody
+	public Map<String, Object> onGetSummary() {
+		Summary summary = iCareService.getSummary();
+		return summary.toMap();
+	}
 	
 	/**
 	 * Initially called after the getUsers method to get the landing form name
@@ -252,7 +263,7 @@ public class ICareController {
                                                @RequestParam(defaultValue = "DESC") VisitWrapper.OrderByDirection orderByDirection,
                                                @RequestParam(required = false) Order.FulfillerStatus fulfillerStatus,
 											   @RequestParam(required = false) String attributeValueReference,
-											   @RequestParam(required = false) String paymentStatus
+											   @RequestParam(required = false) VisitWrapper.PaymentStatus paymentStatus
 											   ) {
 
         List<Visit> visits = iCareService.getVisitsByOrderType(q, orderTypeUuid, locationUuid, orderStatusCode, fulfillerStatus, limit, startIndex, orderBy, orderByDirection, attributeValueReference, paymentStatus);
@@ -374,4 +385,71 @@ public class ICareController {
 		results.put("results", conceptSetsList);
 		return results;
 	}
+
+	@RequestMapping(value = "drug", method = RequestMethod.GET)
+	@ResponseBody
+	public Map<String, Object> getDrugs(@RequestParam(value = "concept", required = false) String concept, @RequestParam(defaultValue = "50") Integer limit, @RequestParam(defaultValue = "0") Integer startIndex) {
+		List<Map<String, Object>> drugsList = new ArrayList<>();
+		for (Drug drug: iCareService.getDrugs(concept, limit, startIndex)) {
+			Map<String, Object> drugMap = new HashMap<String, Object>();
+			drugMap.put("uuid", drug.getUuid());
+			drugMap.put("display", drug.getDisplayName());
+			drugMap.put("name", drug.getName());
+			drugMap.put("description", drug.getDescription());
+			drugMap.put("retired", drug.getRetired());
+
+			Map<String, Object> conceptMap = new HashMap<String, Object>();
+			conceptMap.put("uuid",drug.getConcept().getUuid());
+			conceptMap.put("display",drug.getConcept().getDisplayString());
+			drugMap.put("concept", conceptMap);
+			drugsList.add(drugMap);
+		}
+		Map<String, Object> results = new HashMap<>();
+		results.put("results", drugsList);
+		return results;
+	}
+
+	@RequestMapping(value ="patient", method = RequestMethod.GET)
+	@ResponseBody
+	public Map<String, Object> getPatient(@RequestParam(required = false) String search,@RequestParam(required = false) String patientUUID,@RequestParam(required = false) PatientWrapper.VisitStatus visitStatus,@RequestParam(defaultValue = "100") Integer limit,
+										  @RequestParam(defaultValue = "0") Integer startIndex,@RequestParam(defaultValue = "DESC") PatientWrapper.OrderByDirection orderByDirection){
+
+		List<PatientWrapper> patients = iCareService.getPatients(search,patientUUID,visitStatus,startIndex,limit,orderByDirection);
+
+		List<Map<String, Object>> responseSamplesObject = new ArrayList<Map<String, Object>>();
+		for (PatientWrapper patient: patients){
+
+			responseSamplesObject.add((Map<String, Object>) patient.toMap());
+
+		}
+		Map<String, Object> results = new HashMap<>();
+		results.put("results",responseSamplesObject);
+
+		return results;
+	}
+	
+	@RequestMapping(value = "patient", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public Map<String, Object> createPatient(@RequestBody Map<String, Object> patientObject) throws Exception {
+		
+		Patient patient = new Patient();
+		patient.setIdentifiers((Set<PatientIdentifier>) patientObject.get("identifiers"));
+		patient.setBirthdate((Date) patientObject.get("birthdate"));
+		patient.setAddresses((Set<PersonAddress>) patientObject.get("addresses"));
+		patient.setNames((Set<PersonName>) patientObject.get("names"));
+		patient.setDead((Boolean) patientObject.get("dead"));
+		patient.setGender((String) patientObject.get("gender"));
+		
+		patient = iCareService.savePatient(patient);
+		
+		Map<String, Object> patientcreated = new HashMap<String, Object>();
+		patientcreated.put("identifiers", patient.getIdentifiers());
+		patientcreated.put("names", patient.getNames());
+		patientcreated.put("addresses", patient.getAddresses());
+		patientcreated.put("gender", patient.getGender());
+		
+		return patientcreated;
+		
+	}
+	
 }

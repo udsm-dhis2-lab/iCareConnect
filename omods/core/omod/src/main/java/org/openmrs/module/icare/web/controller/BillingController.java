@@ -2,6 +2,8 @@ package org.openmrs.module.icare.web.controller;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.joda.time.DateTime;
+import org.openmrs.api.context.Context;
 import org.openmrs.module.icare.billing.models.Discount;
 import org.openmrs.module.icare.billing.models.Invoice;
 import org.openmrs.module.icare.billing.models.Payment;
@@ -12,7 +14,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.ServletContext;
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -29,11 +38,14 @@ public class BillingController extends BaseController {
 	@Autowired
 	BillingService billingService;
 	
+	ServletContext context;
+	
 	@RequestMapping(value = "invoice", method = RequestMethod.GET)
 	@ResponseBody
 	public List<Map<String, Object>> onGetPatientPendingBillsMap(
 	        @RequestParam(value = "patient", required = false) String patient,
-	        @RequestParam(value = "visit", required = false) String visit) {
+	        @RequestParam(value = "visit", required = false) String visit,
+	        @RequestParam(value = "status", required = false) String status) {
 		if (patient != null) {
 			List<Invoice> invoices = onGetPatientPendingBills(patient);
 			List<Map<String, Object>> invoiceMaps = new ArrayList<Map<String, Object>>();
@@ -48,9 +60,18 @@ public class BillingController extends BaseController {
 				invoiceMaps.add(invoice.toMap());
 			}
 			return invoiceMaps;
+		} else if (status == "all") {
+			List<Invoice> invoices = billingService.getPatientsInvoices(patient);
+			List<Map<String, Object>> invoiceMaps = new ArrayList<Map<String, Object>>();
+			for (Invoice invoice : invoices) {
+				invoiceMaps.add(invoice.toMap());
+			}
+			return invoiceMaps;
+			
 		} else {
 			return null;
 		}
+		
 	}
 	
 	public List<Invoice> onGetPatientPendingBills(@RequestParam("patient") String patient) {
@@ -90,14 +111,45 @@ public class BillingController extends BaseController {
 		return billingService.confirmPayment(payment);
 	}
 	
-	@RequestMapping(value = "discount", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	public String getFilepath() {
+		return "/tmp/attachments";
+	}
+	
+	@RequestMapping(value = "discount", method = RequestMethod.POST)
 	@ResponseBody
-	public Map<String, Object> onPostDiscountInvoiceMap(@RequestBody Discount discount) throws Exception {
+	public Map<String, Object> onPostDiscountInvoiceMap(
+	        @RequestParam(value = "document", required = false) MultipartFile file, @RequestParam("json") Discount discount)
+	        throws Exception {
+		
+		//File upload implementation
+		String filePath = getFilepath();
+		//String filePath = "/tmp/";
+		String dateTime = DateTime.now().toString("yyyyMMddHHmmss");
+		String fileNameToSave = dateTime.concat(file.getOriginalFilename());
+		String path = filePath + fileNameToSave;
+		file.transferTo(new File(path));
+		
+		discount.setAttachmentId(path);
+		
 		Discount newDiscount = this.onPostDiscountInvoice(discount);
+		System.out.println(discount.getCriteria().getUuid());
+		
 		return newDiscount.toMap();
 	}
 	
 	public Discount onPostDiscountInvoice(Discount discount) throws Exception {
 		return billingService.discountInvoice(discount);
+	}
+	
+	@RequestMapping(value = "patient/allInvoices", method = RequestMethod.GET)
+	@ResponseBody
+	public List<Map<String, Object>> onGetAllPatientInvoices(
+	        @RequestParam(value = "patient", required = false) String patient) {
+		List<Invoice> invoices = billingService.getPatientsInvoices(patient);
+		List<Map<String, Object>> invoiceMaps = new ArrayList<Map<String, Object>>();
+		for (Invoice invoice : invoices) {
+			invoiceMaps.add(invoice.toMap());
+		}
+		return invoiceMaps;
 	}
 }

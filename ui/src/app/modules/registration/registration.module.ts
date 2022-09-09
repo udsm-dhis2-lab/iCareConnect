@@ -11,6 +11,7 @@ import { PatientEditComponent } from './pages/patient-edit/patient-edit.componen
 import { RegistrationEditComponent } from './components/registration-edit/registration-edit.component';
 import { entryRegComponents, regComponents } from './components';
 import { LocationsChipsComponent } from './components/locations-chips/locations-chips.component';
+import { RegistrationSummaryCardsComponent } from './components/registration-summary-cards/registration-summary-cards/registration-summary-cards.component';
 
 @NgModule({
   declarations: [
@@ -23,6 +24,7 @@ import { LocationsChipsComponent } from './components/locations-chips/locations-
     RegistrationEditComponent,
     ...regComponents,
     LocationsChipsComponent,
+    RegistrationSummaryCardsComponent,
   ],
   entryComponents: [...entryRegComponents],
   imports: [CommonModule, RegistrationRoutingModule, SharedModule],

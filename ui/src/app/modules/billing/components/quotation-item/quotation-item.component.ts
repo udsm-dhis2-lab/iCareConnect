@@ -2,9 +2,8 @@ import { SelectionModel } from "@angular/cdk/collections";
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { MatTableDataSource } from "@angular/material/table";
-import { PaymentTypeInterface } from "src/app/shared/models/payment-type.model";
+import { BillableItemsService } from "src/app/shared/resources/billable-items/services/billable-items.service";
 import { BillItem } from "../../models/bill-item.model";
-import { BillObject } from "../../models/bill-object.model";
 import { Bill } from "../../models/bill.model";
 import { PaymentInput } from "../../models/payment-input.model";
 import { BillConfirmationComponent } from "../bill-confirmation/bill-confirmation.component";
@@ -36,7 +35,10 @@ export class QuotationItemComponent implements OnInit {
   @Output() confirmPayment = new EventEmitter<PaymentInput>();
   @Output() paymentSuccess = new EventEmitter<any>();
 
-  constructor(private dialog: MatDialog) {}
+  constructor(
+    private dialog: MatDialog,
+    private billableItemsService: BillableItemsService
+  ) {}
 
   get canDisableItemSelection(): boolean {
     return (this.billItems || []).some((item) => item.payable === 0);
@@ -180,5 +182,23 @@ export class QuotationItemComponent implements OnInit {
 
   onChangePaymentType(e) {
     console.log(e);
+  }
+
+  getControlNumber(e: any){
+   e.stopPropagation();
+    const dialog = this.dialog.open(BillConfirmationComponent, {
+      width: "600px",
+      disableClose: true,
+      data: {
+        billItems: this.selection?.selected,
+        items: this.billItems,
+        bill: this.bill,
+        totalPayableBill: this.totalPayableBill,
+        paymentType: this.selectedPaymentType,
+        currentUser: this.currentUser,
+        currentPatient: this.currentPatient,
+        facilityDetails: this.facilityDetails,
+      },
+    });
   }
 }
