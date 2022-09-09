@@ -570,8 +570,8 @@ public class ICareDao extends BaseDAO<Item> {
 		return patientWrappers;
 		
 	}
-
-    public Summary getSummary() {
+	
+	public Summary getSummary() {
 
 		Summary summary = new Summary();
 

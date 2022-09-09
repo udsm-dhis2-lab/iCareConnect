@@ -114,34 +114,34 @@ public class BillingControllerTest {
 	@Test
 	//@DisplayName("Creating an invoice")
 	public void testDiscountingInvoice2() throws Exception {
-
+		
 		//Given
 		Discount discount = new Discount();
-
+		
 		Concept criteria = new Concept();
 		discount.setCriteria(criteria);
-
+		
 		Patient patient = new Patient();
 		patient.setPersonId(1);
 		discount.setPatient(patient);
-
+		
 		when(billingService.discountInvoice(discount)).thenReturn(discount);
-
+		
 		//When
 		Discount discount2 = billingController.onPostDiscountInvoice(discount);
-
+		
 		//Then
 		verify(billingService).discountInvoice(discount);
 		
 		//Context.getAdministrationService().getSystemVariables().put("ATTACHMENT_DIRECTORY","/tmp/attachment");
-
+		
 		//when(billingController.getFilepath()).thenReturn("/tmp/attachment");
-
+		
 		Path path = Paths.get(billingController.getFilepath());
-		if (Files.notExists(path)){
+		if (Files.notExists(path)) {
 			Files.createDirectories(path);
 		}
-
+		
 		InputStream in = getClass().getClassLoader().getResourceAsStream("lab-data.xml");
 		System.out.println(in);
 		
@@ -149,21 +149,20 @@ public class BillingControllerTest {
 		System.out.println(out);
 		IOUtils.copy(in, out);
 		//When
-
-//		Discount discount = new Discount();
-//		Concept criteria = new Concept();
-//		criteria.setUuid("123");
-//		discount.setCriteria(criteria);
-//
-//		Patient patient = new Patient();
-//		patient.setPersonId(1);
-//		discount.setPatient(patient);
-
-		Map<String, Object> discount4 = billingController.onPostDiscountInvoiceMap(new MockMultipartFile("document", "lab-data.xml",
-		        "application/xml", out.toByteArray()),discount);
-
-		assertThat("Discount is present",discount4.size() != 0);
-
+		
+		//		Discount discount = new Discount();
+		//		Concept criteria = new Concept();
+		//		criteria.setUuid("123");
+		//		discount.setCriteria(criteria);
+		//
+		//		Patient patient = new Patient();
+		//		patient.setPersonId(1);
+		//		discount.setPatient(patient);
+		
+		Map<String, Object> discount4 = billingController.onPostDiscountInvoiceMap(new MockMultipartFile("document",
+		        "lab-data.xml", "application/xml", out.toByteArray()), discount);
+		
+		assertThat("Discount is present", discount4.size() != 0);
 		
 	}
 }

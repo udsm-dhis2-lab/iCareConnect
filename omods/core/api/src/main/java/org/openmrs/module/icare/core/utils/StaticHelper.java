@@ -13,8 +13,8 @@ public class StaticHelper {
 			return (String) uuidOrObject;
 		}
 	}
-
-	public static String getFilepath(){
+	
+	public static String getFilepath() {
 		return Context.getAdministrationService().getSystemVariables().get("ATTACHMENT_DIRECTORY");
 	}
 }
