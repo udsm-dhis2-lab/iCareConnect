@@ -49,6 +49,9 @@ export class CurrentPatientDispensingComponent implements OnInit {
   currentVisitLoadingState$: Observable<boolean>;
   currentVisitLoadedState$: Observable<boolean>;
   generalMetadataConfigurations$: Observable<any>;
+  genericPrescriptionEncounterType$: Observable<any>;
+  genericPrescriptionOrderType$: Observable<any>;
+  useGenericPrescription$: Observable<any>;
   constructor(
     private route: ActivatedRoute,
     private systemSettingsService: SystemSettingsService,
@@ -67,6 +70,18 @@ export class CurrentPatientDispensingComponent implements OnInit {
     this.currentLocation$ = this.store.pipe(select(getCurrentLocation));
     this.currentPatient$ = this.store.select(getCurrentPatient);
     this.generalMetadataConfigurations$ = this.systemSettingsService.getSystemSettingsByKey('iCare.GeneralMetadata.Configurations')
+    this.genericPrescriptionEncounterType$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        "iCare.clinic.prescription.encounterType"
+      );
+    this.genericPrescriptionOrderType$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        "iCare.clinic.prescription.orderType"
+      );
+    this.useGenericPrescription$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        "iCare.clinic.useGeneralPrescription"
+      );
 
     this.dispensingActionOptions = [
       {
@@ -84,6 +99,8 @@ export class CurrentPatientDispensingComponent implements OnInit {
     ];
 
     this.getPatientVisit();
+
+    
   }
 
   private getPatientVisit() {

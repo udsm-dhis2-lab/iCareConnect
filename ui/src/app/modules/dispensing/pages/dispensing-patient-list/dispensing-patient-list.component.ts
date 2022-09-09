@@ -34,18 +34,18 @@ export class DispensingPatientListComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-        this.generalPrescriptionEncounterType$ =
-          this.systemSettingsService.getSystemSettingsByKey(
-            "iCare.clinic.prescription.encounterType"
-          );
-        this.generalPrescriptionOrderType$ =
-          this.systemSettingsService.getSystemSettingsByKey(
-            "iCare.clinic.prescription.orderType"
-          );
-        this.useGenericPrescription$ =
-          this.systemSettingsService.getSystemSettingsByKey(
-            "iCare.clinic.useGeneralPrescription"
-          );
+    this.generalPrescriptionEncounterType$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        "iCare.clinic.prescription.encounterType"
+      );
+    this.generalPrescriptionOrderType$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        "iCare.clinic.prescription.orderType"
+      );
+    this.useGenericPrescription$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        "iCare.clinic.useGeneralPrescription"
+      );
   }
 
   onSelectVisit(visit: Visit) {
