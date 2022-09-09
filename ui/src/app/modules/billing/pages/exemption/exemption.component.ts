@@ -1,39 +1,39 @@
 import { Component, OnInit, AfterContentInit } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { MatTableDataSource } from "@angular/material/table";
-import { ActivatedRoute, Router } from '@angular/router';
-import { select, Store } from '@ngrx/store';
+import { ActivatedRoute, Router } from "@angular/router";
+import { select, Store } from "@ngrx/store";
 import * as _ from "lodash";
-import { Observable, of } from 'rxjs';
+import { Observable, of } from "rxjs";
 import { catchError, tap } from "rxjs/operators";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
 import { Textbox } from "src/app/shared/modules/form/models/text-box.model";
 import { OrdersService } from "src/app/shared/resources/order/services/orders.service";
-import { Patient } from 'src/app/shared/resources/patient/models/patient.model';
-import { PatientService } from 'src/app/shared/resources/patient/services/patients.service';
+import { Patient } from "src/app/shared/resources/patient/models/patient.model";
+import { PatientService } from "src/app/shared/resources/patient/services/patients.service";
 import { EncountersService } from "src/app/shared/services/encounters.service";
-import { go, loadCurrentPatient } from 'src/app/store/actions';
+import { go, loadCurrentPatient } from "src/app/store/actions";
 import { discountBill } from "src/app/store/actions/bill.actions";
-import { AppState } from 'src/app/store/reducers';
+import { AppState } from "src/app/store/reducers";
 import {
   getLoadingBillStatus,
   getPatientBillLoadedStatus,
   getPatientBills,
-} from 'src/app/store/selectors/bill.selectors';
-import { getCurrentPatient } from 'src/app/store/selectors/current-patient.selectors';
+} from "src/app/store/selectors/bill.selectors";
+import { getCurrentPatient } from "src/app/store/selectors/current-patient.selectors";
 import {
   getAllPayments,
   getLoadingPaymentStatus,
-} from 'src/app/store/selectors/payment.selector';
+} from "src/app/store/selectors/payment.selector";
 import { getActiveVisit } from "src/app/store/selectors/visit.selectors";
 import { ExemptionDenialComponent } from "../../components/exemption-denial/exemption-denial.component";
 import { ExemptionFullConfirmationComponent } from "../../components/exemption-full-confirmation/exemption-full-confirmation.component";
 import { BillItem } from "../../models/bill-item.model";
-import { BillObject } from '../../models/bill-object.model';
+import { BillObject } from "../../models/bill-object.model";
 import { Bill } from "../../models/bill.model";
-import { PaymentObject } from '../../models/payment-object.model';
-import { BillingService } from '../../services/billing.service';
+import { PaymentObject } from "../../models/payment-object.model";
+import { BillingService } from "../../services/billing.service";
 
 @Component({
   selector: "app-exemption",
@@ -64,7 +64,7 @@ export class ExemptionComponent implements OnInit, AfterContentInit {
   bills: any;
   billsCount: any;
   showActionButtons: boolean;
-  
+
   constructor(
     private store: Store<AppState>,
     private patientService: PatientService,
@@ -74,7 +74,7 @@ export class ExemptionComponent implements OnInit, AfterContentInit {
     private systemSettingsService: SystemSettingsService,
     private dialog: MatDialog,
     private encounterService: EncountersService,
-    private ordersService: OrdersService,
+    private ordersService: OrdersService
   ) {}
 
   ngOnInit() {
@@ -88,7 +88,7 @@ export class ExemptionComponent implements OnInit, AfterContentInit {
     this.loadingBills$ = this.store.pipe(select(getLoadingBillStatus));
 
     this.payments$ = this.store.pipe(select(getAllPayments));
-    
+
     this.currentVisit$ = this.store.select(getActiveVisit);
 
     this.loadingPayments$ = this.store.pipe(select(getLoadingPaymentStatus));
@@ -97,12 +97,10 @@ export class ExemptionComponent implements OnInit, AfterContentInit {
       getPatientBillLoadedStatus
     );
     this.criteriaResults$ = this.billingService.discountCriteriaConcept();
-    
+
     this.criteriaResults$.subscribe((criteria) => {
-      this.criteria = criteria.results[0]
+      this.criteria = criteria.results[0];
     });
-
-
 
     // Get exemption encounter Type
     this.exemptionEncounterType$ = this.systemSettingsService
@@ -116,34 +114,35 @@ export class ExemptionComponent implements OnInit, AfterContentInit {
           return of(new MatTableDataSource([error]));
         })
       );
-    
-      this.exemptionConcept$ = this.systemSettingsService.getSystemSettingsMatchingAKey("icare.billing.exemption.concept").pipe(
+
+    this.exemptionConcept$ = this.systemSettingsService
+      .getSystemSettingsMatchingAKey("icare.billing.exemption.concept")
+      .pipe(
         tap((exemptionConcept) => {
           return exemptionConcept[0];
         }),
         catchError((error) => {
           return of(new MatTableDataSource([error]));
         })
-      )
-
+      );
   }
 
   ngAfterContentInit() {
-    this.billingService.getPatientBills(this.patientId, false, "all").subscribe({
-      next: (bills) => {
-        bills.forEach((bill) => {
-          if (bill) {
-            this.bill = bill;
-            bill.billDetails?.discountItems.forEach((discountItem) => {
-              this.discountItems = [...this.discountItems, discountItem];
-            });
-            this.discountItemsCount = this.discountItems.length;
-          }
-        });
-      },
-    });
-
-    
+    this.billingService
+      .getPatientBills(this.patientId, false, "all")
+      .subscribe({
+        next: (bills) => {
+          bills.forEach((bill) => {
+            if (bill) {
+              this.bill = bill;
+              bill.billDetails?.discountItems.forEach((discountItem) => {
+                this.discountItems = [...this.discountItems, discountItem];
+              });
+              this.discountItemsCount = this.discountItems.length;
+            }
+          });
+        },
+      });
   }
 
   onDiscountBill(exemptionDetails: any, params?: any): void {
@@ -152,8 +151,11 @@ export class ExemptionComponent implements OnInit, AfterContentInit {
       this.store.dispatch(discountBill({ bill, discountDetails, patient }));
     }
 
-    if(params){
-      this.updateOrderInExemptionEncounter(params?.currentVisit?.encounters, params?.exemptionEncounterType)
+    if (params) {
+      this.updateOrderInExemptionEncounter(
+        params?.currentVisit?.encounters,
+        params?.exemptionEncounterType
+      );
     }
   }
 
@@ -168,29 +170,37 @@ export class ExemptionComponent implements OnInit, AfterContentInit {
     });
 
     dialog.afterClosed().subscribe((data) => {
-      if(data){
-        let exemptionEncounter = this.getCurrentExemptionEncounter(params?.currentVisit?.encounters, params?.exemptionEncounterType);
-        let reason = data.reason
+      if (data) {
+        let exemptionEncounter = this.getCurrentExemptionEncounter(
+          params?.currentVisit?.encounters,
+          params?.exemptionEncounterType
+        );
+        let reason = data.reason;
 
         console.log("==> Denial Reason: ", reason);
-        
-      //Update Encounter Order after Succesfully exempting this person
-      this.updateOrderInExemptionEncounter(params?.currentVisit?.encounters, params?.exemptionEncounterType, reason, true)
-      this.router.navigateByUrl('/billing/exemption')
-    }
+
+        //Update Encounter Order after Succesfully exempting this person
+        this.updateOrderInExemptionEncounter(
+          params?.currentVisit?.encounters,
+          params?.exemptionEncounterType,
+          reason,
+          true
+        );
+        this.router.navigateByUrl("/billing/exemption");
+      }
     });
   }
 
-  exemptFull(params){ 
+  exemptFull(params) {
     this.criteriaObject = {
-      id: this.criteria['display'],
-      key: this.criteria['display'],
-      label: this.criteria['display'],
-      options: _.map(this.criteria['answers'], (answer) => {
+      id: this.criteria["display"],
+      key: this.criteria["display"],
+      label: this.criteria["display"],
+      options: _.map(this.criteria["answers"], (answer) => {
         return {
-          key: answer['uuid'],
-          value: answer['uuid'],
-          label: answer['display'],
+          key: answer["uuid"],
+          value: answer["uuid"],
+          label: answer["display"],
         };
       }),
     };
@@ -198,9 +208,9 @@ export class ExemptionComponent implements OnInit, AfterContentInit {
     this.exemptionForm = {
       criteria: new Dropdown(this.criteriaObject),
       remarks: new Textbox({
-        id: 'remarks',
-        key: 'remarks',
-        label: 'Remark',
+        id: "remarks",
+        key: "remarks",
+        label: "Remark",
       }),
     };
 
@@ -208,45 +218,53 @@ export class ExemptionComponent implements OnInit, AfterContentInit {
       width: "25%",
       panelClass: "custom-dialog-container",
       data: {
-        visit: params?.currentVisit, 
-        bills: params?.bills, 
+        visit: params?.currentVisit,
+        bills: params?.bills,
         exemptionMessage: {
-          heading: `Fully exempt ${params?.currentPatient?.patient?.person?.display}`, 
-          message: "This is to confirm that you are about to confirm exempting this person in fully including all of the above items. Click Confirm to process the exemption."
+          heading: `Fully exempt ${params?.currentPatient?.patient?.person?.display}`,
+          message:
+            "This is to confirm that you are about to confirm exempting this person in fully including all of the above items. Click Confirm to process the exemption.",
         },
         form: this.exemptionForm,
-        patient: params?.currentPatient
-      }
+        patient: params?.currentPatient,
+      },
     });
 
     dialog.afterClosed().subscribe((data) => {
-      if(data?.confirmed){
+      if (data?.confirmed) {
         // Discount Creation
         this.onDiscountBill(data?.exemptionDetails, params);
-        this.router.navigateByUrl('/billing/exemption')
+        this.router.navigateByUrl("/billing/exemption");
       }
     });
   }
 
-
-  getCurrentExemptionEncounter(encounters: any[], encounterType: any){
+  getCurrentExemptionEncounter(encounters: any[], encounterType: any) {
     encounters.filter((encounter) => {
-      if(encounter?.encounterType?.uuid === encounterType?.value){
-        return encounter
+      if (encounter?.encounterType?.uuid === encounterType?.value) {
+        return encounter;
       }
     });
     return encounters[0];
   }
 
-  updateOrderInExemptionEncounter(encounters: any[], exemptionEncounterType: any, commentToFulfiller?: string, voidEncounter?: boolean){
-    let exemptionEncounter = this.getCurrentExemptionEncounter(encounters, exemptionEncounterType);
+  updateOrderInExemptionEncounter(
+    encounters: any[],
+    exemptionEncounterType: any,
+    commentToFulfiller?: string,
+    voidEncounter?: boolean
+  ) {
+    let exemptionEncounter = this.getCurrentExemptionEncounter(
+      encounters,
+      exemptionEncounterType
+    );
     let exemptionOrder = exemptionEncounter.orders[0];
 
     exemptionOrder = {
       ...exemptionOrder,
-      fulfillerStatus: 'RECEIVED',
+      fulfillerStatus: "RECEIVED",
       encounter: exemptionOrder?.encounter?.uuid,
-      fulfillerComment: commentToFulfiller
+      fulfillerComment: commentToFulfiller,
     };
 
     exemptionOrder = {
@@ -254,32 +272,30 @@ export class ExemptionComponent implements OnInit, AfterContentInit {
       fulfillerStatus: exemptionOrder?.fulfillerStatus,
       fulfillerComment: exemptionOrder?.fulfillerComment,
       encounter: exemptionOrder?.encounter,
-    }
-    this.ordersService.updateOrdersViaEncounter([exemptionOrder]).subscribe({
-      next: (order) => {
-        return order;
-      },
-      error: (error) => {
-        return error;
-      }
-    })
+    };
+    // this.ordersService.updateOrdersViaEncounter([exemptionOrder]).subscribe({
+    //   next: (order) => {
+    //     return order;
+    //   },
+    //   error: (error) => {
+    //     return error;
+    //   },
+    // });
 
     //Update encounter to void if voidEncounter True
     if (voidEncounter === true) {
       this.encounterService.voidEncounter(exemptionEncounter).subscribe({
-          next: (encounter) => {
-            console.log("==> Successfully updated encounter: ", encounter);
-          },
-          error: (error) => {
-            console.log("==> Failed to update encounter: ", error);
-          }
-        })
+        next: (encounter) => {
+          console.log("==> Successfully updated encounter: ", encounter);
+        },
+        error: (error) => {
+          console.log("==> Failed to update encounter: ", error);
+        },
+      });
     }
-
   }
 
-  onShowActionButtons(e: any){
+  onShowActionButtons(e: any) {
     this.showActionButtons = true;
   }
-
 }
