@@ -268,7 +268,7 @@ public class ICareDao extends BaseDAO<Item> {
 		
 		Query query = null;
 		DbSession session = this.getSession();
-		String queryStr = "SELECT distinct v FROM Visit v ,Invoice invoice" + " INNER JOIN v.patient p"
+		String queryStr = "SELECT distinct v FROM Visit v" + " INNER JOIN v.patient p"
 		        + " INNER JOIN p.names pname";
 		
 		if (orderTypeUuid != null) {
@@ -305,30 +305,30 @@ public class ICareDao extends BaseDAO<Item> {
 		
 		if (paymentStatus != null) {
 			if (paymentStatus == VisitWrapper.PaymentStatus.PAID) {
-				//				queryStr += " AND v.id IN (SELECT invoice.visit FROM Invoice invoice"
-				//				        + " WHERE invoice.id IN(SELECT item.id.invoice FROM InvoiceItem item,PaymentItem pi,DiscountInvoiceItem di "
-				//				        + " WHERE item.id.invoice = pi.id.payment.invoice" + " AND item.id.invoice = di.id.invoice"
-				//				        + " GROUP BY item.id.invoice"
-				//				        + " HAVING SUM(item.price*item.quantity) <= (SUM(pi.amount) + SUM(di.amount))))";
-				queryStr += " AND v.id = invoice.visit.id "
-				        + "AND (SELECT SUM(item.price*item.quantity) FROM InvoiceItem item WHERE item.id.invoice = invoice) \n"
-				        + "<= (SELECT CASE WHEN (SUM(pi.amount) + SUM(di.amount)) IS NULL THEN 0 ELSE (SUM(pi.amount) + SUM(di.amount)) END FROM "
-				        + "PaymentItem pi, DiscountInvoiceItem di "
-				        + "WHERE pi.id.payment.invoice = invoice AND di.id.invoice = invoice)";
+				queryStr += " AND v IN (SELECT invoice.visit FROM Invoice invoice WHERE " +
+						"(SELECT SUM(item.price*item.quantity) FROM InvoiceItem item WHERE item.id.invoice = invoice) <= (" +
+						"(SELECT CASE WHEN SUM(pi.amount) IS NULL THEN 0 ELSE SUM(pi.amount) END FROM PaymentItem pi " +
+						"WHERE pi.id.payment.invoice = invoice)+(SELECT CASE WHEN SUM(di.amount) IS NULL THEN 0 ELSE SUM(di.amount) END FROM DiscountInvoiceItem di WHERE di.id.invoice = invoice))" +
+						") ORDER BY v.startDatetime  ASC)";
+//				queryStr += " AND v.id = invoice.visit.id "
+//				        + "AND (SELECT SUM(item.price*item.quantity) FROM InvoiceItem item WHERE item.id.invoice = invoice) \n"
+//				        + "<= (SELECT CASE WHEN (SUM(pi.amount) + SUM(di.amount)) IS NULL THEN 0 ELSE (SUM(pi.amount) + SUM(di.amount)) END FROM "
+//				        + "PaymentItem pi, DiscountInvoiceItem di "
+//				        + "WHERE pi.id.payment.invoice = invoice AND di.id.invoice = invoice)";
 			}
 			
 			if (paymentStatus == VisitWrapper.PaymentStatus.PENDING) {
-				//				queryStr += " AND v.id IN (SELECT invoice.visit FROM Invoice invoice"
-				//				        + " WHERE invoice.id IN(SELECT item.id.invoice FROM InvoiceItem item,PaymentItem pi,DiscountInvoiceItem di "
-				//				        + " WHERE item.id.invoice = pi.id.payment.invoice"
-				//				        + " AND item.id.invoice = di.id.invoice"
-				//				        + " GROUP BY item.id.invoice HAVING SUM(item.price*item.quantity) > (SUM(pi.amount) + SUM(di.amount))))";
-				
-				queryStr += " AND v.id = invoice.visit.id "
-				        + "AND (SELECT SUM(item.price*item.quantity) FROM InvoiceItem item WHERE item.id.invoice = invoice) \n"
-				        + "> (SELECT CASE WHEN (SUM(pi.amount) + SUM(di.amount)) IS NULL THEN 0 ELSE (SUM(pi.amount) + SUM(di.amount)) END FROM "
-				        + "PaymentItem pi, DiscountInvoiceItem di "
-				        + "WHERE pi.id.payment.invoice = invoice AND di.id.invoice = invoice)";
+								queryStr += " AND v IN (SELECT invoice.visit FROM Invoice invoice WHERE " +
+										"(SELECT SUM(item.price*item.quantity) FROM InvoiceItem item WHERE item.id.invoice = invoice) > (" +
+										"(SELECT CASE WHEN SUM(pi.amount) IS NULL THEN 0 ELSE SUM(pi.amount) END FROM PaymentItem pi " +
+										"WHERE pi.id.payment.invoice = invoice)+(SELECT CASE WHEN SUM(di.amount) IS NULL THEN 0 ELSE SUM(di.amount) END FROM DiscountInvoiceItem di WHERE di.id.invoice = invoice))" +
+										") ORDER BY v.startDatetime  ASC)";
+
+//				queryStr += " AND v.id = invoice.visit.id "
+//				        + "AND (SELECT SUM(item.price*item.quantity) FROM InvoiceItem item WHERE item.id.invoice = invoice) \n"
+//				        + "> (SELECT CASE WHEN (SUM(pi.amount) + SUM(di.amount)) IS NULL THEN 0 ELSE (SUM(pi.amount) + SUM(di.amount)) END FROM "
+//				        + "PaymentItem pi, DiscountInvoiceItem di "
+//				        + "WHERE pi.id.payment.invoice = invoice AND di.id.invoice = invoice)";
 				
 			}
 		}
@@ -382,6 +382,7 @@ public class ICareDao extends BaseDAO<Item> {
 		
 		query.setFirstResult(startIndex);
 		query.setMaxResults(limit);
+		System.out.println(query);
 		return query.list();
 		
 	}
