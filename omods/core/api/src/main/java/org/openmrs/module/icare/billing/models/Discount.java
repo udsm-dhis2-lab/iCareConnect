@@ -7,6 +7,7 @@ import liquibase.database.structure.type.VarcharType;
 import org.codehaus.jackson.annotate.JsonSetter;
 import org.openmrs.BaseChangeableOpenmrsData;
 import org.openmrs.Concept;
+import org.openmrs.Obs;
 import org.openmrs.Patient;
 import org.openmrs.module.icare.core.Item;
 
@@ -30,9 +31,10 @@ public class Discount extends BaseChangeableOpenmrsData {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "discount_criteria_id", nullable = false)
 	private Concept criteria;
-	
-	@Column(name = "attachment_id")
-	private String attachmentId;
+
+	@JoinColumn(name = "attachment_id")
+	@OneToOne(fetch = FetchType.LAZY)
+	private Obs attachment;
 	
 	@Column(name = "is_full_exempted")
 	@JsonProperty("exempted")
@@ -56,51 +58,13 @@ public class Discount extends BaseChangeableOpenmrsData {
 	public Discount(@JsonProperty("patient") String patient) {
 		
 	}
-	
-	public static Discount fromMap(Set<Map.Entry<String, Object>> entrySet) {
-		Discount discount = new Discount();
-		Iterator<Map.Entry<String, Object>> itr = entrySet.iterator();
-		
-		// traversing over HashSet
-		System.out.println("Traversing over Set using Iterator");
-		while (itr.hasNext()) {
-			System.out.println(itr.next());
-			Map.Entry<String, Object> entry = itr.next();
-			if (entry.getKey().equals("attachmentId")) {
-				discount.setAttachmentId((String) entry.getValue());
-			} else if (entry.getKey().equals("criteria")) {
-				Concept concept = new Concept();
-				Map<String, Object> map = (Map<String, Object>) entry.getValue();
-				concept.setUuid((String) map.get("uuid"));
-				discount.setCriteria(concept);
-			} else if (entry.getKey().equals("exempted")) {
-				discount.setExempted((Boolean) entry.getValue());
-			} else if (entry.getKey().equals("remarks")) {
-				discount.setRemarks((String) entry.getValue());
-			} else if (entry.getKey().equals("patient")) {
-				Patient patient = new Patient();
-				Map<String, Object> map = (Map<String, Object>) entry.getValue();
-				patient.setUuid((String) map.get("uuid"));
-				discount.setPatient(patient);
-			}
-		}
-		return discount;
-	}
-	
+
 	public Integer getId() {
 		return this.id;
 	}
-	
+
 	public void setId(Integer id) {
 		this.id = id;
-	}
-	
-	public String getAttachmentId() {
-		return this.attachmentId;
-	}
-	
-	public void setAttachmentId(String attachmentId) {
-		this.attachmentId = attachmentId;
 	}
 	
 	public String getRemarks() {
@@ -158,8 +122,10 @@ public class Discount extends BaseChangeableOpenmrsData {
 		criteria.put("uuid", this.getCriteria().getUuid());
 		discountMap.put("criteria", criteria);
 		
-		if (this.getAttachmentId() != null) {
-			discountMap.put("attachmentId", this.getAttachmentId());
+		if (this.getAttachment() != null) {
+			HashMap<String, Object> attachment = new HashMap<String, Object>();
+			attachment.put("uuid", this.getAttachment().getUuid());
+			discountMap.put("attachment", attachment);
 		}
 		
 		HashMap<String, Object> patient = new HashMap<String, Object>();
@@ -206,6 +172,13 @@ public class Discount extends BaseChangeableOpenmrsData {
 		patient.setUuid((String) patientMap.get("uuid"));
 		this.setPatient(patient);
 	}
+
+	@JsonSetter("attachment")
+	public void setAttachment(Map<String, Object> attachmentMap) {
+		Obs obs = new Obs();
+		obs.setUuid((String) attachmentMap.get("uuid"));
+		this.setAttachment(obs);
+	}
 	
 	@JsonSetter("criteria")
 	public void setCriteria(Map<String, Object> criteriaMap) {
@@ -231,5 +204,13 @@ public class Discount extends BaseChangeableOpenmrsData {
 			newItems.add(i);
 		}
 		this.setItems(newItems);
+	}
+
+	public Obs getAttachment() {
+		return attachment;
+	}
+
+	public void setAttachment(Obs attachment) {
+		this.attachment = attachment;
 	}
 }

@@ -381,6 +381,14 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 			newItems.add(newItem);
 		}
 		discount.setItems(newItems);
+
+		if(discount.getAttachment() != null){
+			Obs obs = Context.getObsService().getObsByUuid(discount.getAttachment().getUuid());
+			if (obs == null) {
+				throw new Exception("Attachment with id '" + obs.getUuid() + "' does not exist.");
+			}
+			discount.setAttachment(obs);
+		}
 		//discount.setCreator(Context.getAuthenticatedUser());
 		
 		return discountDAO.save(discount);
