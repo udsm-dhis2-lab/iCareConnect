@@ -22,7 +22,7 @@ import { FormComponent } from "../../modules/form/components/form/form.component
 })
 export class DrugOrderFormComponent implements OnInit {
   @ViewChildren(FormComponent) formComponents: FormComponent[];
-  @Input() drugOrder: DrugOrderObject;
+  @Input() doctorPrescriptionDetails: any;
   @Input() fromDispensing: boolean;
   @Input() showAddButton: boolean;
   @Input() hideActionButtons: boolean;
@@ -52,7 +52,7 @@ export class DrugOrderFormComponent implements OnInit {
 
   ngOnInit(): void {
     console.log("==> Drugs: ", this.drugs.results);
-    if(this.drugs?.results?.length > 0) {
+    if (this.drugs?.results?.length > 0) {
       this.drugFormField = new Dropdown({
         id: "drug",
         key: "drug",
@@ -67,8 +67,7 @@ export class DrugOrderFormComponent implements OnInit {
           };
         }),
       });
-    } 
-    else {
+    } else {
       this.drugFormField = {
         ...this.drugOrderFormsMetadata?.drugFormField,
         conceptClass: "Drug",
@@ -156,7 +155,10 @@ export class DrugOrderFormComponent implements OnInit {
     this.formUpdate.emit({
       formName,
       formValue,
-      drugOrder: { ...this.drugOrder, ...this.drugOrderDetails },
+      drugOrder: {
+        ...this.doctorPrescriptionDetails,
+        ...this.drugOrderDetails,
+      },
       isTheOrderFromDoctor: this.isFromDoctor,
       patient: this.patient,
       provider: this.provider,

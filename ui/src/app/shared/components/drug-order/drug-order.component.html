@@ -8,7 +8,7 @@
 >
   <div *ngIf="!params?.drugOrderFormsMetadata || !params?.provider">
     <mat-progress-bar mode="indeterminate"></mat-progress-bar>
-  </div> 
+  </div>
   <app-drug-order-form
     *ngIf="params?.drugOrderFormsMetadata && params?.provider"
     [provider]="params?.provider"
@@ -19,6 +19,7 @@
     [drugs]="params?.drugs"
     (shouldFeedQuantity)="onCheckIfShouldFeedQuantity($event)"
     [dispensingLocations]="params?.dispensingLocations"
+    [doctorPrescriptionDetails]="drugOrder"
     (drugQuantity)="onChangeDrugQuantity($event)"
     (drugOrdered)="onOrderingDrug($event)"
     (cancelForm)="onCancel()"
