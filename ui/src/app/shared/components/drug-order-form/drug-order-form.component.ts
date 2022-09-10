@@ -51,7 +51,6 @@ export class DrugOrderFormComponent implements OnInit {
   constructor() {}
 
   ngOnInit(): void {
-    console.log("==> Drugs: ", this.drugs.results);
     if (this.drugs?.results?.length > 0) {
       this.drugFormField = new Dropdown({
         id: "drug",
