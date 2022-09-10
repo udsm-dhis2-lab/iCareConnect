@@ -71,9 +71,9 @@ export class ExemptionFullConfirmationComponent implements OnInit {
 
   fileSelection(event): void {
     event.stopPropagation();
-    // const fileInputElement: HTMLElement = document.getElementById(
-    //   "exemptionFile"
-    // );
+    const fileInputElement: HTMLElement = document.getElementById(
+      "exemptionFile"
+    );
     this.document = event.target.files[0];
   }
 

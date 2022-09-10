@@ -148,6 +148,7 @@ export class ExemptionComponent implements OnInit, AfterContentInit {
   onDiscountBill(exemptionDetails: any, params?: any): void {
     if (exemptionDetails) {
       const { bill, discountDetails, patient } = exemptionDetails;
+      console.log("==> Check file in object: ", exemptionDetails)
       this.store.dispatch(discountBill({ bill, discountDetails, patient }));
     }
 
