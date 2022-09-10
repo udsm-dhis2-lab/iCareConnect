@@ -262,27 +262,36 @@ public class ICareDao extends BaseDAO<Item> {
 	
 	public List<Visit> getVisitsByOrderType(String search, String orderTypeUuid, String locationUuid,
 	        OrderStatus.OrderStatusCode orderStatusCode, Order.FulfillerStatus fulfillerStatus, Integer limit,
-	        Integer startIndex, VisitWrapper.OrderBy orderBy, VisitWrapper.OrderByDirection orderByDirection,String attributeValueReference,String paymentStatus) {
-
+	        Integer startIndex, VisitWrapper.OrderBy orderBy, VisitWrapper.OrderByDirection orderByDirection,
+	        String attributeValueReference, String paymentStatus) {
+		
 		Query query = null;
 		DbSession session = this.getSession();
 		String queryStr1 = "SELECT distinct v FROM Visit v" + " INNER JOIN v.patient p" + " INNER JOIN p.names pname";
-
-		if(paymentStatus != null) {
+		
+		if (paymentStatus != null) {
 			if (paymentStatus == "PAID") {
-				queryStr1 += " WHERE v.id IN (SELECT invoice.visit FROM Invoice invoice" + " WHERE invoice.id IN(SELECT item.id.invoice FROM InvoiceItem item,PaymentItem pi,DiscountInvoiceItem di " + " WHERE item.id.invoice = pi.id.payment.invoice" + " AND pi.id.payment.invoice = di.id.invoice" + " GROUP BY " + " item.id.invoice" + " HAVING SUM(item.price*item.quantity) <= (SUM(pi.amount) + SUM(di.amount))))";
+				queryStr1 += " WHERE v.id IN (SELECT invoice.visit FROM Invoice invoice"
+				        + " WHERE invoice.id IN(SELECT item.id.invoice FROM InvoiceItem item,PaymentItem pi,DiscountInvoiceItem di "
+				        + " WHERE item.id.invoice = pi.id.payment.invoice" + " AND pi.id.payment.invoice = di.id.invoice"
+				        + " GROUP BY " + " item.id.invoice"
+				        + " HAVING SUM(item.price*item.quantity) <= (SUM(pi.amount) + SUM(di.amount))))";
 			}
-
+			
 			if (paymentStatus == "PENDING") {
-                queryStr1 += " WHERE v.id IN (SELECT invoice.visit FROM Invoice invoice" + " WHERE invoice.id IN(SELECT item.id.invoice FROM InvoiceItem item,PaymentItem pi,DiscountInvoiceItem di " + " WHERE item.id.invoice = pi.id.payment.invoice" + " AND pi.id.payment.invoice = di.id.invoice" + " GROUP BY " + " item.id.invoice" + " HAVING SUM(item.price*item.quantity) > (SUM(pi.amount) + SUM(di.amount))))";
+				queryStr1 += " WHERE v.id IN (SELECT invoice.visit FROM Invoice invoice"
+				        + " WHERE invoice.id IN(SELECT item.id.invoice FROM InvoiceItem item,PaymentItem pi,DiscountInvoiceItem di "
+				        + " WHERE item.id.invoice = pi.id.payment.invoice" + " AND pi.id.payment.invoice = di.id.invoice"
+				        + " GROUP BY " + " item.id.invoice"
+				        + " HAVING SUM(item.price*item.quantity) > (SUM(pi.amount) + SUM(di.amount))))";
 			}
-            query = session.createQuery(queryStr1);
+			query = session.createQuery(queryStr1);
 		}
-
-		if(attributeValueReference != null) {
+		
+		if (attributeValueReference != null) {
 			queryStr1 += " WHERE v.id IN ( SELECT va.visit FROM VisitAttribute va WHERE va.valueReference=:attributeValueReference)";
 			query = session.createQuery(queryStr1);
-
+			
 			if (search != null) {
 				queryStr1 += " AND lower(concat(pname.givenName,pname.middleName,pname.familyName)) LIKE lower(:search)";
 				query = session.createQuery(queryStr1);
@@ -290,70 +299,70 @@ public class ICareDao extends BaseDAO<Item> {
 			}
 			query.setParameter("attributeValueReference", attributeValueReference);
 		}
-
-		if(orderTypeUuid != null){
-			String queryStr = queryStr1 + " INNER JOIN v.encounters e" + " INNER JOIN e.orders o" + " INNER JOIN o.orderType ot"
-					+ " WHERE ot.uuid=:orderTypeUuid " + " AND v.stopDatetime IS NULL ";
-
-		if (fulfillerStatus != null) {
-			queryStr += " AND o.fulfillerStatus=:fulfillerStatus";
-		} else {
-			queryStr += " AND o.fulfillerStatus IS NULL";
-		}
 		
-		if (search != null) {
-			queryStr += " AND lower(concat(pname.givenName,pname.middleName,pname.familyName)) LIKE lower(:search)";
-		}
-		if (orderStatusCode != null) {
-			if (orderStatusCode == OrderStatus.OrderStatusCode.EMPTY) {
-				queryStr += " AND o NOT IN (SELECT o2 FROM OrderStatus os" + "	INNER JOIN os.order o2)";
+		if (orderTypeUuid != null) {
+			String queryStr = queryStr1 + " INNER JOIN v.encounters e" + " INNER JOIN e.orders o"
+			        + " INNER JOIN o.orderType ot" + " WHERE ot.uuid=:orderTypeUuid " + " AND v.stopDatetime IS NULL ";
+			
+			if (fulfillerStatus != null) {
+				queryStr += " AND o.fulfillerStatus=:fulfillerStatus";
 			} else {
-				queryStr += " AND o IN (SELECT o2 FROM OrderStatus os"
-				        + "	INNER JOIN os.order o2 WHERE os.status=:orderStatusCode)";
+				queryStr += " AND o.fulfillerStatus IS NULL";
 			}
-		}
-		if (locationUuid != null) {
-			queryStr += " AND v.location.uuid=:locationUuid ";
-		}
-		
-		if (orderBy == VisitWrapper.OrderBy.VISIT) {
-			queryStr += " ORDER BY v.startDatetime ";
-		} else if (orderBy == VisitWrapper.OrderBy.ENCOUNTER) {
-			queryStr += " ORDER BY e.encounterDatetime";
-		} else if (orderBy == VisitWrapper.OrderBy.ORDER) {
-			queryStr += " ORDER BY o.dateActivated ";
-		} else if (orderBy == VisitWrapper.OrderBy.OBSERVATION) {
-			queryStr += " ORDER BY e.dateChanged ";
-		}
-		
-		if (orderByDirection == VisitWrapper.OrderByDirection.ASC) {
-			queryStr += " ASC ";
-		} else if (orderByDirection == VisitWrapper.OrderByDirection.DESC) {
-			queryStr += " DESC ";
-		}
-		query = session.createQuery(queryStr);
-		query.setParameter("orderTypeUuid", orderTypeUuid);
-		if (fulfillerStatus != null) {
-			query.setParameter("fulfillerStatus", fulfillerStatus);
-		}
-		if (locationUuid != null) {
-			query.setParameter("locationUuid", locationUuid);
-		}
-		if (search != null) {
-			query.setParameter("search", "%" + search.replace(" ", "%") + "%");
-		}
-		if (orderStatusCode != null) {
-			if (orderStatusCode == OrderStatus.OrderStatusCode.EMPTY) {
-				
-			} else {
-				query.setParameter("orderStatusCode", orderStatusCode);
+			
+			if (search != null) {
+				queryStr += " AND lower(concat(pname.givenName,pname.middleName,pname.familyName)) LIKE lower(:search)";
 			}
-		}
-		//query.setParameter("fulfillerStatus", fulfillerStatus);
-		query.setFirstResult(startIndex);
-		query.setMaxResults(limit);
-
-		//return query.list();
+			if (orderStatusCode != null) {
+				if (orderStatusCode == OrderStatus.OrderStatusCode.EMPTY) {
+					queryStr += " AND o NOT IN (SELECT o2 FROM OrderStatus os" + "	INNER JOIN os.order o2)";
+				} else {
+					queryStr += " AND o IN (SELECT o2 FROM OrderStatus os"
+					        + "	INNER JOIN os.order o2 WHERE os.status=:orderStatusCode)";
+				}
+			}
+			if (locationUuid != null) {
+				queryStr += " AND v.location.uuid=:locationUuid ";
+			}
+			
+			if (orderBy == VisitWrapper.OrderBy.VISIT) {
+				queryStr += " ORDER BY v.startDatetime ";
+			} else if (orderBy == VisitWrapper.OrderBy.ENCOUNTER) {
+				queryStr += " ORDER BY e.encounterDatetime";
+			} else if (orderBy == VisitWrapper.OrderBy.ORDER) {
+				queryStr += " ORDER BY o.dateActivated ";
+			} else if (orderBy == VisitWrapper.OrderBy.OBSERVATION) {
+				queryStr += " ORDER BY e.dateChanged ";
+			}
+			
+			if (orderByDirection == VisitWrapper.OrderByDirection.ASC) {
+				queryStr += " ASC ";
+			} else if (orderByDirection == VisitWrapper.OrderByDirection.DESC) {
+				queryStr += " DESC ";
+			}
+			query = session.createQuery(queryStr);
+			query.setParameter("orderTypeUuid", orderTypeUuid);
+			if (fulfillerStatus != null) {
+				query.setParameter("fulfillerStatus", fulfillerStatus);
+			}
+			if (locationUuid != null) {
+				query.setParameter("locationUuid", locationUuid);
+			}
+			if (search != null) {
+				query.setParameter("search", "%" + search.replace(" ", "%") + "%");
+			}
+			if (orderStatusCode != null) {
+				if (orderStatusCode == OrderStatus.OrderStatusCode.EMPTY) {
+					
+				} else {
+					query.setParameter("orderStatusCode", orderStatusCode);
+				}
+			}
+			//query.setParameter("fulfillerStatus", fulfillerStatus);
+			query.setFirstResult(startIndex);
+			query.setMaxResults(limit);
+			
+			//return query.list();
 		}
 		return query.list();
 	}

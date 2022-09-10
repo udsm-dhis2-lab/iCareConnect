@@ -13,7 +13,7 @@ import org.openmrs.module.icare.core.dao.BaseDAO;
 import org.openmrs.module.icare.laboratory.models.Sample;
 import org.springframework.stereotype.Repository;
 
-import java.text.SimpleDateFormat; 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -107,45 +107,44 @@ public class SampleDAO extends BaseDAO<Sample> {
 		//
 		return listResults;
 	}
-
-
-	public List<Sample> getSamplesByVisitOrPatientAndOrDates(String visitId, String patient, Date startDate, Date endDate){
-
+	
+	public List<Sample> getSamplesByVisitOrPatientAndOrDates(String visitId, String patient, Date startDate, Date endDate) {
+		
 		DbSession session = this.getSession();
-
+		
 		// General search query
 		String queryStr = "SELECT sp FROM Sample sp";
-
+		
 		//If visit is provided, use visit instead
-		if(visitId != null && visitId.length() > 0){
+		if (visitId != null && visitId.length() > 0) {
 			queryStr = "SELECT sp \n" + "FROM Sample sp \n"
-					+ "WHERE sp.visit = (SELECT v FROM Visit v WHERE v.uuid = :visitUuid)";
+			        + "WHERE sp.visit = (SELECT v FROM Visit v WHERE v.uuid = :visitUuid)";
 		}
-
+		
 		//if no visit is provided but patient is provided
-		if((visitId == null || visitId.equals("")) && patient != null){
+		if ((visitId == null || visitId.equals("")) && patient != null) {
 			queryStr += " LEFT JOIN sp.visit v LEFT JOIN v.patient pnt WHERE pnt.uuid=:patientUuid";
 		}
-
+		
 		// if visit / patient is provided
-		if( visitId != null || patient != null ){
+		if (visitId != null || patient != null) {
 			//if start date only is provided
-			if(startDate != null && endDate == null){
+			if (startDate != null && endDate == null) {
 				queryStr += " AND sp.dateCreated >= :startDate";
 			}
-
+			
 			//if both dates are provided
 			if (startDate != null && endDate != null) {
 				queryStr += " AND sp.dateCreated >= :startDate AND sp.dateCreated <= :endDate";
 			}
 		}
-
+		
 		// Append with dates if provided but no patient/visit number
-
-		if((visitId == null || visitId.equals(""))){
-			if (patient == null || patient.equals("")){
+		
+		if ((visitId == null || visitId.equals(""))) {
+			if (patient == null || patient.equals("")) {
 				//if start date only is provided
-				if(startDate != null && endDate == null){
+				if (startDate != null && endDate == null) {
 					queryStr += " WHERE sp.dateCreated >= :startDate";
 				}
 				//if both dates are provided
@@ -154,11 +153,10 @@ public class SampleDAO extends BaseDAO<Sample> {
 				}
 			}
 		}
-
-
+		
 		//Construct a query object
 		Query query = session.createQuery(queryStr);
-
+		
 		//Attach arguments accordingly
 		if (startDate != null) {
 			query.setParameter("startDate", startDate);
@@ -166,18 +164,16 @@ public class SampleDAO extends BaseDAO<Sample> {
 		if (endDate != null && startDate != null) {
 			query.setParameter("endDate", endDate);
 		}
-
-		if(visitId != null && visitId.length() > 0){
+		
+		if (visitId != null && visitId.length() > 0) {
 			query.setParameter("visitUuid", visitId);
 		}
-
-		if((visitId == null || visitId.length() < 1) && patient != null){
+		
+		if ((visitId == null || visitId.length() < 1) && patient != null) {
 			query.setParameter("patientUuid", patient);
 		}
-
-
+		
 		return query.list();
 	}
-
-
+	
 }
