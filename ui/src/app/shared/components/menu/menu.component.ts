@@ -8,6 +8,7 @@ import {
   addSessionStatus,
   authenticateUser,
   loadAllLocations,
+  loadLocationByIds,
   loadProviderDetails,
   loadRolesDetails,
   logoutUser,
@@ -50,14 +51,9 @@ export class MenuComponent implements OnInit {
     public dialog: MatDialog,
     private store: Store<AppState>,
     private authService: AuthService
-  ) {
-    // this.store.dispatch(loadAllLocations());
-  }
+  ) {}
 
   ngOnInit(): void {
-    // if (!JSON.parse(localStorage.getItem('currentLocation'))) {
-    //   this.onOpenLocation(null);
-    // }
     this.lisConfigurations$ = this.store.select(getLISConfigurations);
 
     this.authService.getSession().subscribe((sessionResponse) => {
@@ -73,7 +69,19 @@ export class MenuComponent implements OnInit {
       this.store.dispatch(
         addSessionStatus({ authenticated: sessionResponse?.authenticated })
       );
-      this.store.dispatch(loadAllLocations());
+      this.store.dispatch(
+        loadLocationByIds({
+          locationUuids: JSON.parse(
+            localStorage
+              .getItem("userLocations")
+              .split("'")
+              .join('"')
+              .split(" ")
+              .join("")
+          ),
+        })
+      );
+
       this.store.dispatch(initiateEncounterType());
     });
 

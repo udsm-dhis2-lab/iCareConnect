@@ -16,10 +16,35 @@ import {
 export class LocationService {
   constructor(private httpClient: OpenmrsHttpClientService, private api: Api) {}
 
+  getMainLocation(): Observable<any> {
+    return this.httpClient
+      .get(
+        "location?limit=100&tag=Main+Location&v=custom:(display,country,postalCode,stateProvince,uuid,tags,description,parentLocation:(uuid,display),attributes:(attributeType,uuid,value,voided))"
+      )
+      .pipe(
+        map((response) => {
+          return {
+            results: response?.results.map((result) => {
+              return {
+                ...result,
+                attributes:
+                  result?.attributes && result?.attributes?.length > 0
+                    ? result?.attributes.filter(
+                        (attribute) => !attribute?.voided
+                      )
+                    : [],
+              };
+            }),
+          };
+        }),
+        catchError((error) => of(error))
+      );
+  }
+
   getLoginLocations(): Observable<any> {
     return this.httpClient
       .get(
-        "location?limit=100&tag=Login+Location&v=custom:(display,country,postalCode,stateProvince,uuid,tags,description,parentLocation:(uuid,display),attributes:(attributeType,uuid,value,display,voided))"
+        "location?limit=100&tag=Login+Location&v=custom:(display,country,postalCode,stateProvince,uuid,tags,description,parentLocation:(uuid,display),attributes:(attributeType,uuid,value,voided))"
       )
       .pipe(
         map((response) => {
@@ -75,8 +100,7 @@ export class LocationService {
       )
     ).pipe(
       map((response) => {
-        console.log("ALL", response);
-        return response;
+        return response.filter((location) => location);
       })
     );
   }
