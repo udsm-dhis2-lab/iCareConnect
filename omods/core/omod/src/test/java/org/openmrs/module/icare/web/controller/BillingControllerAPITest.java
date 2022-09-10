@@ -502,7 +502,7 @@ public class BillingControllerAPITest extends BaseResourceControllerTest {
 		        .getDiscountItems().size() == 3);
 		
 	}
-
+	
 	@Override
 	public String getURI() {
 		return "billing";

@@ -65,7 +65,9 @@ export class FormService {
               (result: any) =>
                 parameters?.class &&
                 result.conceptClass?.display.toLowerCase() ===
-                  parameters?.class.toLowerCase()
+                  (field?.isDiagnosis
+                    ? "diagnosis"
+                    : parameters?.class.toLowerCase())
             ) || [],
             ["display"],
             ["asc"]

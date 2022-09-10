@@ -2,6 +2,8 @@ import { Component, Inject, OnInit } from "@angular/core";
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { select, Store } from "@ngrx/store";
 import { Observable } from "rxjs";
+import { map } from "rxjs/operators";
+import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { getObservationsFromForm } from "src/app/modules/clinic/helpers/get-observations-from-form.helper";
 import { loadCustomOpenMRSForm } from "src/app/store/actions";
 import {
@@ -51,12 +53,18 @@ export class CaptureFormDataModalComponent implements OnInit {
   visit: any;
   currentLocationUuid: string;
   encounterObject: any;
+  deathRegistryFormUuid$: Observable<string>;
+  causesOfDeathConcepts: any[];
+  // Change logic to handle is valid (At least use form field required property)
+  isValid: boolean = false;
+
+  deathFormFields: any[];
   constructor(
     private store: Store<AppState>,
     @Inject(MAT_DIALOG_DATA) data,
     private dialogRef: MatDialogRef<CaptureFormDataModalComponent>,
     private observationService: ObservationService,
-    private service: OpenmrsHttpClientService
+    private systemSettingsService: SystemSettingsService
   ) {
     this.patient = data?.patient?.patient;
     this.formUuid = data?.form?.formUuid;
@@ -64,16 +72,35 @@ export class CaptureFormDataModalComponent implements OnInit {
     this.visit = data?.visit;
     this.provider = data?.provider;
     this.currentLocation = data?.currentLocation;
+    this.causesOfDeathConcepts = data?.causesOfDeathConcepts;
     this.store.dispatch(
-      loadCustomOpenMRSForm({ formUuid: data?.form?.formUuid })
+      loadCustomOpenMRSForm({
+        formUuid: data?.form?.formUuid,
+        causesOfDeathConcepts: this.causesOfDeathConcepts,
+      })
     );
   }
 
   ngOnInit(): void {
     this.formLoadingState$ = this.store.select(getFormsLoadingState);
+    this.deathRegistryFormUuid$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        "iCare.clinic.deathRegistry.formUuid"
+      );
     this.form$ = this.store.select(getCustomOpenMRSFormById, {
       id: this.formUuid,
     });
+    // this.deathRegistryFormUuid$.subscribe((responseFormUuid) => {
+    //   if (responseFormUuid) {
+    //     this.store
+    //       .select(getCustomOpenMRSFormById, {
+    //         id: this.formUuid,
+    //       })
+    //       .subscribe((formResponse) => {
+    //         console.log("formResponse", formResponse);
+    //       });
+    //   }
+    // });
 
     this.formData = {};
     this.savingObservations$ = this.store.pipe(
@@ -87,8 +114,13 @@ export class CaptureFormDataModalComponent implements OnInit {
     this.dialogRef.close();
   }
 
-  onFormUpdate(formValue: FormValue, form) {
+  onFormUpdate(formValue: FormValue, form): void {
     this.formData = { ...this.formData, ...formValue.getValues() };
+    this.isValid =
+      (
+        Object.keys(this.formData).filter((key) => this.formData[key]?.value) ||
+        []
+      )?.length > 0;
     this.currentObs = getObservationsFromForm(
       this.formData,
       this.patient?.person?.uuid,
@@ -126,13 +158,18 @@ export class CaptureFormDataModalComponent implements OnInit {
     // console.log('location', location);
   }
 
-  saveCurrentFormData(e) {
+  saveCurrentFormData(e: Event, deathRegistryFormUuid: string): void {
     e.stopPropagation();
+    console.log(this.encounterObject);
     this.store.dispatch(
       saveObservationsUsingEncounter({
         data: this.encounterObject,
         patientId: this.patient.uuid,
       })
     );
+
+    if (this.formUuid === deathRegistryFormUuid) {
+      // TODO: Mark as deceased
+    }
   }
 }

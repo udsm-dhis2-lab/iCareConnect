@@ -53,24 +53,7 @@ export class FormComponent implements OnInit, OnChanges {
     this.values = this.form.getRawValue();
   }
 
-  ngOnInit(): void {
-    // Use coded dataType to restructure field options
-    if (
-      this.dataType &&
-      typeof this.dataType === "string" &&
-      this.dataType.toLowerCase() === "coded"
-    ) {
-      this.fields[0] = {
-        ...this.fields[0],
-        options: (this.fields[0].options || []).map((option) => {
-          return {
-            ...option,
-            value: option?.key ? option?.key : option?.value,
-          };
-        }),
-      };
-    }
-  }
+  ngOnInit(): void {}
 
   onSubmit(): void {
     this.formUpdate.emit(this.form.getRawValue());

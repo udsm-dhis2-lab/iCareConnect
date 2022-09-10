@@ -157,6 +157,7 @@ export class CurrentPatientBillingComponent implements OnInit {
               }
             });
 
+            
             this.discountItemsCount = this.discountItems.length > 0 ? this.discountItems.length : 0;
             
           }
@@ -166,10 +167,10 @@ export class CurrentPatientBillingComponent implements OnInit {
 
     // Get exemption encounter Type
     this.exemptionEncounterType$ = this.systemSettingsService
-      .getSystemSettingsMatchingAKey("icare.billing.exemption.encounterType")
+      .getSystemSettingsByKey("icare.billing.exemption.encounterType")
       .pipe(
         tap((orderType) => {
-          return orderType[0];
+          return orderType;
         }),
         catchError((error) => {
           console.log("Error occured while trying to get orderType: ", error);
@@ -179,10 +180,10 @@ export class CurrentPatientBillingComponent implements OnInit {
 
      //Get exemption order type
     this.exemptionOrderType$ = this.systemSettingsService
-      .getSystemSettingsMatchingAKey("icare.billing.exemption.orderType")
+      .getSystemSettingsByKey("icare.billing.exemption.orderType")
       .pipe(
         tap((orderType) => {
-          return orderType[0];
+          return orderType;
         }),
         catchError((error) => {
           console.log("Error occured while trying to get orderType: ", error);
@@ -191,9 +192,9 @@ export class CurrentPatientBillingComponent implements OnInit {
       );
 
     //Get exemption Concept
-    this.exemptionConcept$ = this.systemSettingsService.getSystemSettingsMatchingAKey("icare.billing.exemption.concept").pipe(
+    this.exemptionConcept$ = this.systemSettingsService.getSystemSettingsByKey("icare.billing.exemption.concept").pipe(
         tap((exemptionConcept) => {
-          return exemptionConcept[0];
+          return exemptionConcept;
         }),
         catchError((error) => {
           return of(new MatTableDataSource([error]));
@@ -257,7 +258,7 @@ export class CurrentPatientBillingComponent implements OnInit {
       visit: patientBillingDetails.visit?.uuid,
       encounterDatetime: currentDate.toISOString(),
       patient: params.currentPatient?.id,
-      encounterType: params?.exemptionEncounterType[0]?.value,
+      encounterType: params?.exemptionEncounterType,
       location: params.currentLocation?.uuid,
       encounterProviders: [
         {
@@ -268,14 +269,14 @@ export class CurrentPatientBillingComponent implements OnInit {
       ],
       orders: [
         {
-          orderType: params?.exemptionOrderType[0]?.value,
+          orderType: params?.exemptionOrderType,
           action: "NEW",
           urgency: "ROUTINE",
           careSetting: !patientBillingDetails.visit?.isAdmitted
             ? "OUTPATIENT"
             : "INPATIENT",
           patient: params?.currentPatient?.id,
-          concept: params?.exemptionConcept[0].value,
+          concept: params?.exemptionConcept,
           orderer: params.provider?.uuid,
           type: "order"
         },
@@ -285,6 +286,7 @@ export class CurrentPatientBillingComponent implements OnInit {
     
     this.ordersService.createOrdersViaCreatingEncounter(exemptionEncounterStart).subscribe({
       next: (encounter) => {
+        this.hasOpenExemptionRequest = true;
         return encounter;
       },
       error: (err) => {

@@ -126,8 +126,7 @@ export const getIsPatientSentForExemption = (orderTypeUuid: string) => createSel
           return encounter;
         }
       })
-      // return encountersWithExemptionOrderActive.length > 0 ? true : false;
-      return false;
+      return encountersWithExemptionOrderActive.length > 0 ? true : false;
     } else {
       return false;
     }
