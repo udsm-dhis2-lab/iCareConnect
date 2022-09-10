@@ -51,7 +51,7 @@ export function formatLocationsPayLoad(locations): Location[] {
         modules: modules,
       };
     }
-  });
+  }).filter((loc) => loc);
 }
 
 function getLocationModules(location) {

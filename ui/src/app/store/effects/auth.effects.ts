@@ -22,6 +22,7 @@ import {
   addLoadedUserDetails,
   loadRolesDetails,
   clearLocations,
+  loadLocationByIds,
 } from "../actions";
 import { initiateEncounterType } from "../actions/encounter-type.actions";
 
@@ -58,7 +59,16 @@ export class AuthEffects {
                     }),
                     loadRolesDetails(),
                     addSessionStatus({ authenticated }),
-                    loadAllLocations(),
+                    loadLocationByIds({
+                      locationUuids: JSON.parse(
+                        localStorage
+                          .getItem("userLocations")
+                          .split(" ")
+                          .join("")
+                          .split("'")
+                          .join('"')
+                      ),
+                    }),
                     initiateEncounterType(),
                   ]
                 : [
