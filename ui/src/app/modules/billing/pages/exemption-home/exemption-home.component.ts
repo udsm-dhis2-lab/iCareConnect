@@ -16,6 +16,7 @@ import {
 import { VisitsService } from "../../../../shared/resources/visits/services";
 import { AppState } from "src/app/store/reducers";
 import { getCurrentLocation } from "src/app/store/selectors";
+import { loadCurrentPatient } from "src/app/store/actions";
 
 @Component({
   selector: "app-exemption-home",
@@ -153,6 +154,12 @@ export class ExemptionHomeComponent implements OnInit {
   }
 
   onSelectVisit(visit: Visit) {
+    this.store.dispatch(
+      loadCurrentPatient({
+        uuid: visit.patientUuid,
+        isRegistrationPage: false,
+      })
+    );
     this.router.navigate([`/billing/${visit.patientUuid}/exempt`]);
   }
 }

@@ -174,12 +174,10 @@ export class ExemptionComponent implements OnInit, AfterContentInit {
       this.store.dispatch(discountBill({ bill, discountDetails, patient }));
     }
 
-    if (params) {
-      this.updateOrderAndExemptionEncounter(
-        params?.currentVisit?.encounters,
-        params?.exemptionEncounterType
-      );
+    if(params){
+      this.updateOrderAndExemptionEncounter(params?.currentVisit?.encounters, params?.exemptionEncounterType)
     }
+    this.store.dispatch(go({ path: ["/billing/exemption"] }));
   }
 
   onSelectPatient(e) {
@@ -247,7 +245,7 @@ export class ExemptionComponent implements OnInit, AfterContentInit {
       if (data?.confirmed) {
         // Discount Creation
         this.onDiscountBill(data?.exemptionDetails, params);
-        this.router.navigateByUrl('/billing/exemption')
+        // this.router.navigateByUrl('/billing/exemption')
       }
     });
   }
