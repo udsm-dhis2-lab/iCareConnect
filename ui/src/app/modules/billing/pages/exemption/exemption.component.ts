@@ -247,7 +247,7 @@ export class ExemptionComponent implements OnInit, AfterContentInit {
       if (data?.confirmed) {
         // Discount Creation
         this.onDiscountBill(data?.exemptionDetails, params);
-        // this.router.navigateByUrl('/billing/exemption')
+        this.router.navigateByUrl('/billing/exemption')
       }
     });
   }
@@ -286,14 +286,14 @@ export class ExemptionComponent implements OnInit, AfterContentInit {
       fulfillerComment: exemptionOrder?.fulfillerComment,
       encounter: exemptionOrder?.encounter,
     }
-    // this.ordersService.updateOrdersViaEncounter([exemptionOrder]).subscribe({
-    //   next: (order) => {
-    //     return order;
-    //   },
-    //   error: (error) => {
-    //     return error;
-    //   }
-    // })
+    this.ordersService.updateOrdersViaEncounter([exemptionOrder]).subscribe({
+      next: (order) => {
+        return order;
+      },
+      error: (error) => {
+        return error;
+      }
+    })
 
     //Update encounter to void if voidEncounter True
     if (voidEncounter === true) {
