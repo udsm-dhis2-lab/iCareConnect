@@ -71,7 +71,7 @@ export class DispensingFormComponent implements OnInit {
     private store: Store<AppState>,
     @Inject(MAT_DIALOG_DATA)
     public data: {
-      drugOrder: DrugOrderObject;
+      drugOrder: any;
       patientUuid: string;
       patient: any;
       orderType: any;
@@ -222,11 +222,14 @@ export class DispensingFormComponent implements OnInit {
         ? JSON.parse(localStorage.getItem("currentLocation"))["uuid"]
         : null,
       providerUuid: this.drugOrderData?.provider?.uuid,
-      encounterUuid: JSON.parse(localStorage.getItem("patientConsultation"))[
-        "encounterUuid"
-      ],
+      encounterUuid: this.data?.fromDispensing
+        ? this.data?.drugOrder?.encounter?.uuid
+        : JSON.parse(localStorage.getItem("patientConsultation"))[
+            "encounterUuid"
+          ],
       patientUuid: order?.patientUuid || this.data?.patientUuid,
     };
+    // console.log("this.data?.drugOrder", this.data?.drugOrder);
     this.drugOrderService
       .saveDrugOrder(
         DrugOrder.getOrderForSaving(formattedOrder),
