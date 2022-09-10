@@ -70,7 +70,8 @@ export class GeneralDispensingFormComponent implements OnInit {
   @Output() dosingUnitsSettingsEvent: EventEmitter<any> = new EventEmitter();
   @Output() durationUnitsSettingsEvent: EventEmitter<any> = new EventEmitter();
   @Output() drugRoutesSettingsEvent: EventEmitter<any> = new EventEmitter();
-  @Output() generalPrescriptionFrequencyConceptEvent: EventEmitter<any> = new EventEmitter();
+  @Output() generalPrescriptionFrequencyConceptEvent: EventEmitter<any> =
+    new EventEmitter();
 
   constructor(
     private drugOrderService: DrugOrdersService,
@@ -83,7 +84,9 @@ export class GeneralDispensingFormComponent implements OnInit {
     this.dosingUnitsSettingsEvent.emit(this.dosingUnitsSettings);
     this.durationUnitsSettingsEvent.emit(this.durationUnitsSettings);
     this.drugRoutesSettingsEvent.emit(this.drugRoutesSettings);
-    this.generalPrescriptionFrequencyConceptEvent.emit(this.generalPrescriptionFrequencyConcept);
+    this.generalPrescriptionFrequencyConceptEvent.emit(
+      this.generalPrescriptionFrequencyConcept
+    );
 
     this.drugConceptField = new Dropdown({
       id: "drug",
@@ -120,6 +123,7 @@ export class GeneralDispensingFormComponent implements OnInit {
   }
 
   saveOrder(e: any) {
+    this.savingOrder = true;
     let encounterObject = {
       patient: this.currentPatient?.id,
       encounterType: this.encounterType,
@@ -183,7 +187,7 @@ export class GeneralDispensingFormComponent implements OnInit {
         concept: this.drugRoutesSettings,
         obsDatetime: new Date(),
         value: this.formValues["route"].value,
-      }
+      },
     ];
 
     this.ordersService
@@ -193,14 +197,18 @@ export class GeneralDispensingFormComponent implements OnInit {
           let data = {
             encounterUuid: response?.uuid,
             obs: obs.filter((observation) => {
-              if(observation.value && observation.value.length > 0){
-                return observation
+              if (observation.value && observation.value.length > 0) {
+                return observation;
               }
             }),
           };
           this.observationService
             .saveObservationsViaEncounter(data)
-            .subscribe();
+            .subscribe((res) => {
+              if (res) {
+                this.savingOrder = false;
+              }
+            });
         }
       });
   }
