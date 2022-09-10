@@ -382,7 +382,6 @@ public class ICareDao extends BaseDAO<Item> {
 		
 		query.setFirstResult(startIndex);
 		query.setMaxResults(limit);
-		
 		return query.list();
 		
 	}
