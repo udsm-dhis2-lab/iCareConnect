@@ -81,7 +81,9 @@ export class DispensingFormComponent implements OnInit {
       location: any;
       encounterUuid: string;
     }
-  ) {}
+  ) {
+    // console.log("data disp", data);
+  }
 
   get isValid(): boolean {
     return (
@@ -284,16 +286,16 @@ export class DispensingFormComponent implements OnInit {
       `custom:(uuid,name,conceptClass:(uuid,display),setMembers:(uuid,display),answers:(uuid,display)`
     );
   }
-  
+
   getDosingFrequencies(conceptUuid: string) {
     this.dosingFrequencies$ = this.conceptsService.getConceptDetailsByUuid(
       conceptUuid,
       `custom:(uuid,name,conceptClass:(uuid,display),setMembers:(uuid,display),answers:(uuid,display)`
     );
   }
-  
+
   getDrugsByConceptUuid(conceptUuid: string) {
-    this.drugsToBeDispensed$ = this.drugsService.getDrugsUsingConceptUuid(
-      conceptUuid);
+    this.drugsToBeDispensed$ =
+      this.drugsService.getDrugsUsingConceptUuid(conceptUuid);
   }
 }

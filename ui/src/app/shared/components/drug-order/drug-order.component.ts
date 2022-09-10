@@ -6,23 +6,23 @@ import {
   OnInit,
   Output,
   ViewChildren,
-} from '@angular/core';
-import { select, Store } from '@ngrx/store';
-import { find } from 'lodash';
-import { Observable, zip } from 'rxjs';
-import { take } from 'rxjs/operators';
-import { AppState } from 'src/app/store/reducers';
-import { getProviderDetails } from 'src/app/store/selectors/current-user.selectors';
-import { FormComponent } from '../../modules/form/components/form/form.component';
-import { Dropdown } from '../../modules/form/models/dropdown.model';
-import { FormValue } from '../../modules/form/models/form-value.model';
-import { ProviderGet } from '../../resources/openmrs';
-import { DrugOrderMetadata } from '../../resources/order/models/drug-order-metadata.model';
-import { DrugOrderObject } from '../../resources/order/models/drug-order.model';
-import { DrugOrdersService } from '../../resources/order/services';
-import { Patient } from '../../resources/patient/models/patient.model';
-import { uniq, keyBy } from 'lodash';
-import { getLocationsByTagName } from 'src/app/store/selectors';
+} from "@angular/core";
+import { select, Store } from "@ngrx/store";
+import { find } from "lodash";
+import { Observable, zip } from "rxjs";
+import { take } from "rxjs/operators";
+import { AppState } from "src/app/store/reducers";
+import { getProviderDetails } from "src/app/store/selectors/current-user.selectors";
+import { FormComponent } from "../../modules/form/components/form/form.component";
+import { Dropdown } from "../../modules/form/models/dropdown.model";
+import { FormValue } from "../../modules/form/models/form-value.model";
+import { ProviderGet } from "../../resources/openmrs";
+import { DrugOrderMetadata } from "../../resources/order/models/drug-order-metadata.model";
+import { DrugOrderObject } from "../../resources/order/models/drug-order.model";
+import { DrugOrdersService } from "../../resources/order/services";
+import { Patient } from "../../resources/patient/models/patient.model";
+import { uniq, keyBy } from "lodash";
+import { getLocationsByTagName } from "src/app/store/selectors";
 
 @Component({
   selector: "app-drug-order",
@@ -41,12 +41,20 @@ export class DrugOrderComponent implements OnInit, AfterViewInit {
   @Input() locations: any[];
   @Input() drugsToBeDispensed: any[];
 
+  @Input() dosingUnitsSettings: string;
+  @Input() durationUnitsSettings: string;
+  @Input() drugRoutesSettings: string;
+  @Input() generalPrescriptionDurationConcept: string;
+  @Input() generalPrescriptionDoseConcept: string;
+  @Input() generalPrescriptionFrequencyConcept: string;
+
   drugsConceptsField: any;
   @Output() drugOrdered = new EventEmitter<any>();
   @Output() drugQuantity = new EventEmitter<number>();
   @Output() cancelForm = new EventEmitter<any>();
   @Output() formUpdate = new EventEmitter<any>();
   @Output() getDrugsByConceptUuid = new EventEmitter<any>();
+
   drugOrderDetails: any = {};
   isTheOrderFromDoctor: boolean = false;
 
@@ -63,22 +71,33 @@ export class DrugOrderComponent implements OnInit, AfterViewInit {
   constructor(
     private drugOrderService: DrugOrdersService,
     private store: Store<AppState>
-  ) {
-  }
-  
+  ) {}
+
   ngOnInit() {
     this.getDrugsByConceptUuid.emit(this.drugOrder?.concept?.uuid);
+    console.log("dosingUnitsSettings", this.dosingUnitsSettings);
 
-    
     this.isTheOrderFromDoctor =
       this.drugOrder && this.drugOrder.drugUuid ? false : true;
 
-      this.loadingMetadata = true;
+    this.loadingMetadata = true;
 
     this.drugOrderFormsMetadata$ = this.drugOrderService.getDrugOrderMetadata(
       this.drugOrder,
       this.locations,
-      this.fromDispensing
+      this.fromDispensing,
+      this.drugOrder,
+      {
+        dosingUnitsSettings: this.dosingUnitsSettings,
+        durationUnitsSettings: this.durationUnitsSettings,
+        drugRoutesSettings: this.drugRoutesSettings,
+        generalPrescriptionDurationConcept:
+          this.generalPrescriptionDurationConcept,
+        generalPrescriptionDoseConcept: this.generalPrescriptionDoseConcept,
+        generalPrescriptionFrequencyConcept:
+          this.generalPrescriptionFrequencyConcept,
+        fromDispensing: this.fromDispensing,
+      }
     );
 
     this.provider$ = this.store.pipe(select(getProviderDetails));
@@ -86,12 +105,12 @@ export class DrugOrderComponent implements OnInit, AfterViewInit {
       tagName: "Dispensing Unit",
     });
     // zip(
-      //   this.drugOrderService.getDrugOrderMetadata(
-        //     this.drugOrder,
-        //     this.locations,
-        //     this.fromDispensing
-        //   ),
-        //   this.store.pipe(select(getProviderDetails)).pipe(take(1))
+    //   this.drugOrderService.getDrugOrderMetadata(
+    //     this.drugOrder,
+    //     this.locations,
+    //     this.fromDispensing
+    //   ),
+    //   this.store.pipe(select(getProviderDetails)).pipe(take(1))
     // ).subscribe(
     //   (res) => {
     //     console.log('res', res);
@@ -106,9 +125,9 @@ export class DrugOrderComponent implements OnInit, AfterViewInit {
     //   }
     // );
   }
-  
+
   ngAfterViewInit(): void {
-    console.log("==> Drugs: ",this.drugsToBeDispensed)
+    console.log("==> Drugs: ", this.drugsToBeDispensed);
   }
 
   onOrderingDrug(data): void {
