@@ -388,6 +388,7 @@
                     </mat-expansion-panel-header>
                     <app-patient-medication-summary
                       *ngIf="activeVisit"
+                      [fromDispensing]="false"
                       [patientVisit]="activeVisit"
                       [forConsultation]="true"
                     ></app-patient-medication-summary>

@@ -17,6 +17,7 @@ import { VisitsService } from "../../resources/visits/services";
 export class PatientMedicationSummaryComponent implements OnInit {
   @Input() patientVisit: Visit;
   @Input() forConsultation: boolean;
+  @Input() fromDispensing: boolean;
   drugOrders$: Observable<any[]>;
   patientVisitData$: Observable<any>;
   constructor(
@@ -50,7 +51,7 @@ export class PatientMedicationSummaryComponent implements OnInit {
         encounterUuid: JSON.parse(localStorage.getItem("patientConsultation"))[
           "encounterUuid"
         ],
-        fromDispensing: true,
+        fromDispensing: this.fromDispensing,
         showAddButton: false,
       },
     });
