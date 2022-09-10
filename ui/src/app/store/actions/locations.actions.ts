@@ -58,6 +58,8 @@ export const loadingLocationByTagNameFails = createAction(
 
 export const clearLocations = createAction("[LOCATIONS] clear locations");
 
+export const loadMainLocation = createAction("[LOCATIONS] load main location");
+
 export const updateCurrentLocationStatus = createAction(
   "[CURRENT LOCATION] update current location",
   props<{ settingLocation: boolean }>()

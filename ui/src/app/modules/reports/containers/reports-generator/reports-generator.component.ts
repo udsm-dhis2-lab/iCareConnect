@@ -136,7 +136,6 @@ export class ReportsGeneratorComponent implements OnInit {
     // console.log("reports", this.reports);
 
     this.store.dispatch(loadDHIS2ReportsConfigs());
-    // this.store.dispatch(loadAllLocations());
     this.currentVisualization = "TABLE";
     this.loadingReportGroup = true;
 
