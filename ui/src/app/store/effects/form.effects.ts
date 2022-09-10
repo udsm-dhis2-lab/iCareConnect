@@ -88,7 +88,8 @@ export class FormEffects {
                 _.map(formResponse?.formFields, (formField) => {
                   return getSanitizedFormObject(
                     formField?.field?.concept,
-                    formField
+                    formField,
+                    action?.causesOfDeathConcepts
                   );
                 }),
                 ["fieldNumber"],
@@ -129,7 +130,8 @@ export class FormEffects {
                       ...formattedFormFields,
                       getSanitizedFormObject(
                         formField?.field?.concept,
-                        formField
+                        formField,
+                        action.causesOfDeathConcepts
                       ),
                     ];
                   }

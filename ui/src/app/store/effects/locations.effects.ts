@@ -3,7 +3,7 @@ import { MatDialog } from "@angular/material/dialog";
 import { Actions, createEffect, ofType, OnInitEffects } from "@ngrx/effects";
 import { ROUTER_NAVIGATED } from "@ngrx/router-store";
 import { Action, select, Store } from "@ngrx/store";
-import { error } from "protractor";
+import { orderBy } from "lodash";
 import { of } from "rxjs";
 import {
   catchError,
@@ -36,9 +36,15 @@ import {
   loadLocationByIds,
   upsertLocations,
   updateCurrentLocationStatus,
+  loadMainLocation,
 } from "../actions";
 import { AppState } from "../reducers";
-import { getCurrentLocation, getUrl } from "../selectors";
+import {
+  getCurrentLocation,
+  getLocationEntities,
+  getLocations,
+  getUrl,
+} from "../selectors";
 import { getAuthenticationState } from "../selectors/current-user.selectors";
 
 @Injectable()
@@ -79,6 +85,24 @@ export class LocationsEffects implements OnInitEffects {
     { dispatch: false }
   );
 
+  minLocations$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(loadMainLocation),
+      switchMap(() => {
+        return this.locationService.getMainLocation().pipe(
+          map((locationsResults) => {
+            return addLoadedLocations({
+              locations: formatLocationsPayLoad(
+                locationsResults?.results || []
+              ),
+            });
+          }),
+          catchError((error) => of(loadingLocationsFails({ error })))
+        );
+      })
+    )
+  );
+
   locations$ = createEffect(() =>
     this.actions$.pipe(
       ofType(loadLoginLocations),
@@ -112,7 +136,9 @@ export class LocationsEffects implements OnInitEffects {
   loadLocation$ = createEffect(() =>
     this.actions$.pipe(
       ofType(loadLocationById),
-      switchMap((action) => {
+
+      withLatestFrom(this.store.select(getLocationEntities)),
+      switchMap(([action, entities]: [any, any]) => {
         return this.locationService.getLocationById(action.locationUuid).pipe(
           switchMap((locationResponse) => {
             if (
@@ -129,13 +155,25 @@ export class LocationsEffects implements OnInitEffects {
                   setCurrentUserCurrentLocation({
                     location,
                   }),
-                  upsertLocation({
-                    location: {
-                      ...locationResponse,
-                      ...(formatLocationsPayLoad([locationResponse] || []) ||
-                        [])[0],
-                    },
-                  }),
+                  entities[locationResponse?.uuid]
+                    ? upsertLocation({
+                        location: {
+                          ...locationResponse,
+                          ...(formatLocationsPayLoad(
+                            [locationResponse] || []
+                          ) || [])[0],
+                        },
+                      })
+                    : addLoadedLocations({
+                        locations: [
+                          {
+                            ...locationResponse,
+                            ...(formatLocationsPayLoad(
+                              [locationResponse] || []
+                            ) || [])[0],
+                          },
+                        ],
+                      }),
                   updateCurrentLocationStatus({ settingLocation: false }),
                 ];
               } else {
@@ -159,18 +197,37 @@ export class LocationsEffects implements OnInitEffects {
   loadLocationsByIds$ = createEffect(() =>
     this.actions$.pipe(
       ofType(loadLocationByIds),
-      switchMap((action) => {
-        return this.locationService.getLocationByIds(action.locationUuids).pipe(
-          switchMap((locationsResponse) => {
-            return [
-              upsertLocations({
-                locations:
-                  formatLocationsPayLoad(locationsResponse || []) || [],
-              }),
-              updateCurrentLocationStatus({ settingLocation: false }),
-            ];
-          })
-        );
+      withLatestFrom(this.store.select(getLocationEntities)),
+      switchMap(([action, locationsEntities]: [any, any]) => {
+        return this.locationService
+          .getLocationByIds(
+            action.locationUuids?.filter((uuid) => !locationsEntities[uuid])
+          )
+          .pipe(
+            switchMap((locationsResponse) => {
+              const formattedLocs = orderBy(
+                formatLocationsPayLoad(locationsResponse || [])?.filter(
+                  (location) => location || []
+                ),
+                ["display"],
+                ["asc"]
+              );
+              const storedCurrentLocation =
+                localStorage.getItem("currentLocation");
+              if (!storedCurrentLocation || storedCurrentLocation === "null") {
+                localStorage.setItem(
+                  "currentLocation",
+                  JSON.stringify(formattedLocs[0])
+                );
+              }
+              return [
+                addLoadedLocations({
+                  locations: formattedLocs || [],
+                }),
+                updateCurrentLocationStatus({ settingLocation: false }),
+              ];
+            })
+          );
       })
     )
   );
