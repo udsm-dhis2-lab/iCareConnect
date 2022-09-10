@@ -3,16 +3,6 @@
   "display": "Registration",
   "name": "Registration",
   "description": null,
-  "published": false,
-  "rules": [
-    {
-      "field": "field-uuid",
-      "trigger": "ON_CHANGE",
-      "actions": [
-
-      ]
-    }
-  ],
   "formFields": [
     {
       "uuid": "field-uuid",
@@ -32,16 +22,45 @@
       "rules": [
         {
           "trigger": "ON_CHANGE",
-          "actions": [
+          "conditions": [
             {
               "condition": "FIELD_VALUE=='Student'",
-              "action": "SHOW",
-              "field": "student-id-uuid"
+              "actions": [
+                {
+                  "action": "SHOW",
+                  "field": "student-id-uuid"
+                },
+                {
+                  "action": "HIDE",
+                  "field": "staff-id-uuid"
+                }
+              ]
             },
             {
               "condition": "FIELD_VALUE=='Staff'",
-              "action": "SHOW",
-              "field": "staff-id-uuid"
+              "actions": [
+                {
+                  "action": "SHOW",
+                  "field": "staff-id-uuid"
+                },
+                {
+                  "action": "HIDE",
+                  "field": "student-id-uuid"
+                }
+              ]
+            },
+            {
+              "condition": "FIELD_VALUE=='Other'",
+              "actions": [
+                {
+                  "action": "HIDE",
+                  "field": "student-id-uuid"
+                },
+                {
+                  "action": "HIDE",
+                  "field": "staff-id-uuid"
+                }
+              ]
             }
           ]
         }
@@ -58,7 +77,7 @@
       "pageNumber": 1,
       "minOccurs": null,
       "maxOccurs": null,
-      "required": false,
+      "required": true,
       "sortWeight": 650,
       "retired": false
     },
@@ -90,14 +109,13 @@
       "maxOccurs": null,
       "required": false,
       "sortWeight": 650,
-      "retired": false
+      "retired": true
     },
     {
       "uuid": "d52cb407-290d-4e45-a4db-be115ac29b03",
-      "name": "First Name",
+      "name": "Middle Name",
       "description": "For capturing weight of a person",
-      "attribute": "",
-      "identifier": "",
+      "attribute": "middleName",
       "selectMultiple": false,
       "fieldNumber": 4,
       "fieldPart": "1",
@@ -105,8 +123,36 @@
       "minOccurs": null,
       "maxOccurs": null,
       "required": false,
-      "sortWeight": 650,
-      "retired": false
+      "sortWeight": 650
+    },
+    {
+      "uuid": "d52cb407-290d-4e45-a4db-be115ac29b03",
+      "name": "Last Name",
+      "description": "For capturing weight of a person",
+      "attribute": "lastName",
+      "selectMultiple": false,
+      "fieldNumber": 4,
+      "fieldPart": "1",
+      "pageNumber": 1,
+      "minOccurs": null,
+      "maxOccurs": null,
+      "required": true,
+      "sortWeight": 650
+    },
+    {
+      "uuid": "d52cb407-290d-4e45-a4db-be115ac29b03",
+      "name": "Gender",
+      "description": "For capturing weight of a person",
+      "attribute": "gender",
+      "concept": "gender-concept-uuid",
+      "selectMultiple": false,
+      "fieldNumber": 4,
+      "fieldPart": "1",
+      "pageNumber": 1,
+      "minOccurs": null,
+      "maxOccurs": null,
+      "required": true,
+      "sortWeight": 650
     }
   ],
   "resources": []
