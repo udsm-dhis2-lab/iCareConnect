@@ -205,7 +205,9 @@
               </button>
               <button
                 mat-menu-item
-                [disabled]="activeVisitDeathStatus"
+                [disabled]="
+                  activeVisitDeathStatus || !dashboardParams?.provider
+                "
                 (click)="
                   onOpenPopup(
                     $event,
@@ -213,7 +215,9 @@
                     null,
                     dashboardParams?.currentPatient,
                     activeVisit,
-                    dashboardParams?.currentLocation
+                    dashboardParams?.currentLocation,
+                    null,
+                    dashboardParams?.provider
                   )
                 "
               >

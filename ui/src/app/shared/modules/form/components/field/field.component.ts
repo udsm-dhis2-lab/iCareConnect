@@ -162,7 +162,7 @@ export class FieldComponent {
     );
   }
 
-  getSelectedItemFromOption(event: Event, item, key): void {
+  getSelectedItemFromOption(event: Event, item, field): void {
     event.stopPropagation();
     const value = item?.isDrug
       ? item?.formattedKey
@@ -170,7 +170,7 @@ export class FieldComponent {
       ? item?.uuid
       : item?.id;
     let objectToUpdate = {};
-    objectToUpdate[key] = value;
+    objectToUpdate[field?.key] = value;
     this.form.patchValue(objectToUpdate);
     this.fieldUpdate.emit(this.form);
   }

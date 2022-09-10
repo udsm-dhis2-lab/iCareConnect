@@ -1,5 +1,5 @@
-import { DropdownOption } from '../models/dropdown-option.model';
-import * as _ from 'lodash';
+import { DropdownOption } from "../models/dropdown-option.model";
+import * as _ from "lodash";
 
 export function getFormFieldOptions(conceptAnswers: any[]): DropdownOption[] {
   return (conceptAnswers || [])
@@ -19,8 +19,9 @@ export function getFormFieldOptions(conceptAnswers: any[]): DropdownOption[] {
       // }
       return {
         key: uuid,
-        value: display,
+        value: uuid,
         label: display,
+        name: display,
       };
     })
     .filter((option) => option);
