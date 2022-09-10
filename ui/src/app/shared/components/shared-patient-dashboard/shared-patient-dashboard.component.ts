@@ -116,7 +116,11 @@ export class SharedPatientDashboardComponent implements OnInit {
   countOfVitalsElementsFilled$: Observable<number>;
   selectedForm: any;
   readyForClinicalNotes: boolean = true;
-  constructor(private store: Store<AppState>, private dialog: MatDialog) {
+  constructor(
+    private store: Store<AppState>,
+    private dialog: MatDialog,
+    private systemSettingsService: SystemSettingsService
+  ) {
     this.store.dispatch(loadEncounterTypes());
   }
 
@@ -241,19 +245,29 @@ export class SharedPatientDashboardComponent implements OnInit {
     provider
   ): void {
     event.stopPropagation();
-    this.dialog.open(CaptureFormDataModalComponent, {
-      width: "60%",
-      data: {
-        patient: currentPatient,
-        form: { formUuid },
-        privileges,
-        provider,
-        visit,
-        locationType,
-        currentLocation,
-      },
-      disableClose: false,
-    });
+    this.systemSettingsService
+      .getSystemSettingsMatchingAKey("iCare.clinic.deathRegistry.form.causes")
+      .subscribe((response) => {
+        const concepts = response?.map((response: any) => {
+          return response?.value;
+        });
+        if (response) {
+          this.dialog.open(CaptureFormDataModalComponent, {
+            width: "60%",
+            data: {
+              patient: currentPatient,
+              form: { formUuid },
+              privileges,
+              provider,
+              visit,
+              locationType,
+              currentLocation,
+              causesOfDeathConcepts: concepts,
+            },
+            disableClose: false,
+          });
+        }
+      });
   }
 
   onOpenAdmitPopup(
