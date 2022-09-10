@@ -37,6 +37,10 @@ export class AuthService {
   isAuthenticated(): any {
     return this.getSession().pipe(
       map((session) => {
+        localStorage.setItem(
+          "userLocations",
+          session?.user?.userProperties?.locations
+        );
         return session?.authenticated;
       }),
       catchError(() => of(false))
@@ -81,6 +85,10 @@ export class AuthService {
         this._session.next(loginResponse);
         return this.currentUserService.get(user?.uuid).pipe(
           map((userDetails) => {
+            localStorage.setItem(
+              "userLocations",
+              user?.userProperties?.locations
+            );
             const authDetails = {
               authenticatedUser: formatCurrentUserDetails(userDetails),
               authenticated: authenticated,

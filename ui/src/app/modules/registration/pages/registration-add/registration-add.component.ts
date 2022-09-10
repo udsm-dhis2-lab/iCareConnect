@@ -153,7 +153,6 @@ export class RegistrationAddComponent implements OnInit {
     newPatient: null,
     RelationshipType: null,
     Id: null,
-    patientType: null,
   };
   mrnIsEditable: boolean = false;
   primaryPhoneNumberFormField: any = new PhoneNumber({
@@ -510,7 +509,6 @@ export class RegistrationAddComponent implements OnInit {
               },
             ],
             gender: this.patient.gender,
-            patientType: this.patient.patientType,
             birthdate: new Date(
               this.patient.dob.setDate(this.patient.dob.getDate() + 1)
             ),
@@ -723,6 +721,7 @@ export class RegistrationAddComponent implements OnInit {
 
   getPatientType(value: string, occupationInfo) {
     this.patient["patientType"] = value;
+    // TODO: FInd logic to softcode this particular area
     if (value === "Student") {
       this.selectedIdentifierType = {
         name: "Student ID",

@@ -1,7 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { select, Store } from "@ngrx/store";
-import { connect } from "http2";
 import { Observable } from "rxjs";
 import { IssuingObject } from "src/app/shared/resources/store/models/issuing.model";
 import {
