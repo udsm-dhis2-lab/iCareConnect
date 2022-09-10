@@ -58,7 +58,7 @@
                       params?.currentPatient &&
                       params?.logo &&
                       params?.facilityDetails
-                    " [patientBillingDetails]="patientBillingDetails" [bills]="patientBillingDetails?.bills" [exemptionOrderType]="params?.exemptionOrderType[0]"
+                    " [patientBillingDetails]="patientBillingDetails" [bills]="patientBillingDetails?.bills" [exemptionOrderType]="params?.exemptionOrderType"
                     [currentPatient]="params?.currentPatient" [facilityDetails]="params?.facilityDetails"
                     [logo]="params?.logo" (confirmPayment)="onConfirmBillPayment($event)"
                     (billPaymentSuccess)="onPaymentSuccess()" (checkOpenExemptionRequest)="onCheckOpenExemptionRequest($event)" id="quotation"></app-quotations>

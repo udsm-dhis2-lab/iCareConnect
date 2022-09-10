@@ -66,9 +66,9 @@ export class BillingService {
 
   discountBill(discountDetails): Observable<any> {
     let discountData = omit(discountDetails, "attachmentDetails");
-    
+
     let formData = new FormData();
-    
+
     const file = discountDetails?.attachmentDetails?.file;
     const jsonData = {
       concept: discountDetails?.attachmentDetails?.concept,
@@ -89,13 +89,12 @@ export class BillingService {
           };
           const discountedBill = Bill.createDiscount(discountData);
           return this.http
-            .post("../../../openmrs/ws/rest/v1/icare/billing/discount", discountedBill)
+            .post("../../../openmrs/ws/rest/v1/billing/discount", discountedBill)
             .subscribe(() => {
                 return new Discount(discountedBill);
               })
         }
       }))
-    // return 
   }
 
   discountCriteriaConcept() {
