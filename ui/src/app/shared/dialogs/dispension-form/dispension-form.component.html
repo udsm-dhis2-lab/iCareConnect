@@ -145,6 +145,15 @@
                 [dosingUnitsSettings]="params?.dosingUnitsSettings"
                 [durationUnitsSettings]="params?.durationUnitsSettings"
                 [drugRoutesSettings]="params?.drugRoutesSettings"
+                [generalPrescriptionDurationConcept]="
+                  params?.generalPrescriptionDurationConcept
+                "
+                [generalPrescriptionDoseConcept]="
+                  params?.generalPrescriptionDoseConcept
+                "
+                [generalPrescriptionFrequencyConcept]="
+                  params?.generalPrescriptionFrequencyConcept
+                "
                 (drugQuantity)="onChangeDrugQuantity($event)"
                 (drugOrdered)="onOrderingDrug($event)"
                 (cancelForm)="onCancel()"
