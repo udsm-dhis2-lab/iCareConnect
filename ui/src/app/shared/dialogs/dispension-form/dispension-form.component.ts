@@ -259,6 +259,7 @@ export class DispensingFormComponent implements OnInit {
             (errorResponse?.error?.message || "")
               .replace("[", "")
               .replace("]", "");
+          this.dialogRef.close(true);
           this.savingOrderSuccess = false;
         }
       );
@@ -300,5 +301,9 @@ export class DispensingFormComponent implements OnInit {
   getDrugsByConceptUuid(conceptUuid: string) {
     this.drugsToBeDispensed$ =
       this.drugsService.getDrugsUsingConceptUuid(conceptUuid);
+  }
+
+  onCloseDialog(closeDialog: boolean): void {
+    this.dialogRef.close(closeDialog);
   }
 }

@@ -73,6 +73,9 @@ export class GeneralDispensingFormComponent implements OnInit {
   @Output() generalPrescriptionFrequencyConceptEvent: EventEmitter<any> =
     new EventEmitter();
 
+  @Output() showCloseDialog: EventEmitter<boolean> =
+    new EventEmitter<boolean>();
+
   constructor(
     private drugOrderService: DrugOrdersService,
     private ordersService: OrdersService,

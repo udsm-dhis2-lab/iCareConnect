@@ -8,7 +8,9 @@
     <div>
       <div class="h5">
         {{
-          actionOptions?.actionCode === CALCULATE_PRESCRIPTION
+          useGenericPrescription
+            ? "Doctor's Prescription"
+            : actionOptions?.actionCode === "CALCULATE_PRESCRIPTION"
             ? "Dispensing"
             : "Prescription"
         }}
@@ -59,28 +61,41 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let drugOrder of drugOrders; let count = index">
-        <td>
-          {{ count + 1 }}
-        </td>
-        <td>
-          {{ drugOrder?.concept?.display }}
-        </td>
-        <td>
-          {{ drugOrder?.orderer?.display }}
-        </td>
-        <td>
-          {{ drugOrder?.dateActivated | date: "medium" }}
-        </td>
-        <td>
-          {{ drugOrder?.careSetting?.display }}
-        </td>
-        <td>
-          <button class="btn" (click)="onDispense(drugOrder)">
-            Dispense
-          </button>
-        </td>
-      </tr>
+      <ng-container *ngFor="let drugOrder of drugOrders; let count = index">
+        <ng-container *ngIf="drugOrders && drugOrders?.length > 0">
+          <tr>
+            <td>
+              {{ count + 1 }}
+            </td>
+            <td>
+              {{ drugOrder?.concept?.display }}
+            </td>
+            <td>
+              {{ drugOrder?.orderer?.display }}
+            </td>
+            <td>
+              {{ drugOrder?.dateActivated | date: "medium" }}
+            </td>
+            <td>
+              {{ drugOrder?.careSetting?.display }}
+            </td>
+            <td>
+              <button class="btn" (click)="onDispense(drugOrder)">
+                Dispense
+              </button>
+            </td>
+          </tr>
+        </ng-container>
+        <ng-container *ngIf="drugOrders && drugOrders?.length === 0">
+          <tr>
+            <td colspan="100%">
+              <div class="alert alert-warning" role="alert">
+                No Prescription from Doctor's side
+              </div>
+            </td>
+          </tr>
+        </ng-container>
+      </ng-container>
     </tbody>
   </table>
   <!-- <app-table
