@@ -157,6 +157,7 @@ export class Bill {
     });
 
     return {
+      isFullExempted: discountDetails?.isFullExempted.value ? discountDetails?.isFullExempted.value : discountDetails?.isFullExempted,
       remarks: discountDetails?.remarks?.value,
       patient: {
         uuid: discountDetails?.patient,

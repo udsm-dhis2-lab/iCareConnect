@@ -11,7 +11,15 @@
                 </div>
                  <div>
                     <label for="document">Upload file if any </label>
-                    <input  autocomplete="off" name="document" class="w-100" type="file" accept=".pdf .xls .doc .csv .png .jpg" />
+                    <input
+                        type="file"
+                        style="border: none; background-color: transparent"
+                        class="form-control"
+                        name="file"
+                        accept=".pdf .doc .docx .xlsx .xls .csv"
+                        id="exemptionFile"
+                        (change)="fileSelection($event)"
+                    />
                 </div>
             </div>
         </div>
