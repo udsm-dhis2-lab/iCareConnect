@@ -148,11 +148,12 @@ export class ExemptionComponent implements OnInit, AfterContentInit {
   onDiscountBill(exemptionDetails: any, params?: any): void {
     if (exemptionDetails) {
       const { bill, discountDetails, patient } = exemptionDetails;
+      console.log("==> Check file in object: ", exemptionDetails)
       this.store.dispatch(discountBill({ bill, discountDetails, patient }));
     }
 
     if (params) {
-      this.updateOrderInExemptionEncounter(
+      this.updateOrderAndExemptionEncounter(
         params?.currentVisit?.encounters,
         params?.exemptionEncounterType
       );
@@ -170,24 +171,14 @@ export class ExemptionComponent implements OnInit, AfterContentInit {
     });
 
     dialog.afterClosed().subscribe((data) => {
-      if (data) {
-        let exemptionEncounter = this.getCurrentExemptionEncounter(
-          params?.currentVisit?.encounters,
-          params?.exemptionEncounterType
-        );
-        let reason = data.reason;
-
-        console.log("==> Denial Reason: ", reason);
-
-        //Update Encounter Order after Succesfully exempting this person
-        this.updateOrderInExemptionEncounter(
-          params?.currentVisit?.encounters,
-          params?.exemptionEncounterType,
-          reason,
-          true
-        );
-        this.router.navigateByUrl("/billing/exemption");
-      }
+      if(data){
+        let reason = data.reason
+        
+      //Update Encounter Order after Succesfully exempting this person
+      this.updateOrderAndExemptionEncounter(params?.currentVisit?.encounters, params?.exemptionEncounterType, reason, true)
+      // this.router.navigateByUrl('/billing/exemption')
+      this.store.dispatch(go({ path: ['/billing/exemption']}))
+    }
     });
   }
 
@@ -234,7 +225,7 @@ export class ExemptionComponent implements OnInit, AfterContentInit {
       if (data?.confirmed) {
         // Discount Creation
         this.onDiscountBill(data?.exemptionDetails, params);
-        this.router.navigateByUrl("/billing/exemption");
+        // this.router.navigateByUrl('/billing/exemption')
       }
     });
   }
@@ -248,7 +239,7 @@ export class ExemptionComponent implements OnInit, AfterContentInit {
     return encounters[0];
   }
 
-  updateOrderInExemptionEncounter(
+  updateOrderAndExemptionEncounter(
     encounters: any[],
     exemptionEncounterType: any,
     commentToFulfiller?: string,
@@ -272,15 +263,15 @@ export class ExemptionComponent implements OnInit, AfterContentInit {
       fulfillerStatus: exemptionOrder?.fulfillerStatus,
       fulfillerComment: exemptionOrder?.fulfillerComment,
       encounter: exemptionOrder?.encounter,
-    };
+    }
     // this.ordersService.updateOrdersViaEncounter([exemptionOrder]).subscribe({
     //   next: (order) => {
     //     return order;
     //   },
     //   error: (error) => {
     //     return error;
-    //   },
-    // });
+    //   }
+    // })
 
     //Update encounter to void if voidEncounter True
     if (voidEncounter === true) {
