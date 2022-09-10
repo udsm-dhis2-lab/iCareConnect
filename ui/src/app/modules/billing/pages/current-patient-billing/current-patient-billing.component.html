@@ -13,13 +13,13 @@
   <mat-progress-bar mode="indeterminate" *ngIf="loading || !params?.currentPatient"></mat-progress-bar>
 
   <!-- Alerts -->
-    <div class="alert alert-danger mt-2" role="alert" *ngIf="!params?.exemptionOrderType[0]?.value">
+    <div class="alert alert-danger mt-2" role="alert" *ngIf="!params?.exemptionOrderType">
       Missing Icare Exemption Configurations. Please set "icare.billing.exemption.orderType" or Contact IT
     </div>
-    <div class="alert alert-danger mt-2" role="alert" *ngIf="!params?.exemptionEncounterType[0]?.value">
+    <div class="alert alert-danger mt-2" role="alert" *ngIf="!params?.exemptionEncounterType">
       Missing Icare Exemption Configurations. Please set "icare.billing.exemption.encounterType" or Contact IT
     </div>
-    <div class="alert alert-danger mt-2" role="alert" *ngIf="!params?.exemptionConcept[0]?.value">
+    <div class="alert alert-danger mt-2" role="alert" *ngIf="!params?.exemptionConcept">
       Missing Icare Exemption Configurations. Please set "icare.billing.exemption.concept" or Contact IT
     </div>
   <!-- End Alerts -->
@@ -58,7 +58,7 @@
                       params?.currentPatient &&
                       params?.logo &&
                       params?.facilityDetails
-                    " [patientBillingDetails]="patientBillingDetails" [bills]="patientBillingDetails?.bills" [exemptionOrderType]="params?.exemptionOrderType[0]"
+                    " [patientBillingDetails]="patientBillingDetails" [bills]="patientBillingDetails?.bills" [exemptionOrderType]="params?.exemptionOrderType"
                     [currentPatient]="params?.currentPatient" [facilityDetails]="params?.facilityDetails"
                     [logo]="params?.logo" (confirmPayment)="onConfirmBillPayment($event)"
                     (billPaymentSuccess)="onPaymentSuccess()" (checkOpenExemptionRequest)="onCheckOpenExemptionRequest($event)" id="quotation"></app-quotations>
@@ -81,7 +81,7 @@
                     </div>
                     <div *ngIf="patientBillingDetails.bills.length > 0">
                       <button class="float-left" mat-stroked-button
-                        [ngClass]="!params?.exemptionEncounterType[0]?.value || !params?.exemptionOrderType[0]?.value || hasOpenExemptionRequest ? 'button-faint': 'button'"
+                        [ngClass]="!params?.exemptionEncounterType || !params?.exemptionOrderType || hasOpenExemptionRequest ? 'button-faint': 'button'"
                         matTooltip="Send patient to administration for exemption"
                         (click)="requestExemption(patientBillingDetails, params)">
                         Request Exemption

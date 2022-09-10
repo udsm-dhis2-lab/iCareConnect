@@ -2,11 +2,14 @@
   *ngIf="{
     form: form$ | async,
     savingObservations: savingObservations$ | async,
-    observations: observations$ | async
+    observations: observations$ | async,
+    deathRegistryFormUuid: deathRegistryFormUuid$ | async
   } as params"
 >
   <mat-progress-bar
-    *ngIf="!params?.form || !params?.observations"
+    *ngIf="
+      !params?.form || !params?.observations || !params?.deathRegistryFormUuid
+    "
     mode="indeterminate"
   ></mat-progress-bar>
   <ng-container>
@@ -17,36 +20,42 @@
         <mat-icon>close</mat-icon>
       </button>
     </mat-toolbar>
-    <mat-dialog-content
-      class="mt-2 ml-1 mr-1"
-      *ngIf="params?.form && params?.observations"
+    <div
+      *ngIf="
+        params?.form && params?.observations && params?.deathRegistryFormUuid
+      "
     >
-      <app-capture-form-data
-        [form]="params?.form"
-        [visit]="visit"
-        [observations]="params?.observations"
-        (formDataUpdate)="onFormUpdate($event, params?.form)"
-      ></app-capture-form-data>
-    </mat-dialog-content>
-    <mat-progress-bar
-      *ngIf="!params?.form || !params?.observations"
-      mode="indeterminate"
-    ></mat-progress-bar>
-    <mat-dialog-actions align="end" class="mb-2 ml-2 mr-2">
-      <button mat-stroked-button (click)="onClose($event)">Cancel</button>
-      <button
-        mat-flat-button
-        color="primary"
-        (click)="saveCurrentFormData($event)"
-      >
-        <mat-spinner
+      <mat-dialog-content class="mt-2 ml-1 mr-1">
+        <app-capture-form-data
+          [form]="params?.form"
+          [visit]="visit"
+          [observations]="params?.observations"
+          (formDataUpdate)="
+            onFormUpdate($event, params?.form, params?.deathRegistryFormUuid)
+          "
+        ></app-capture-form-data>
+      </mat-dialog-content>
+      <mat-progress-bar
+        *ngIf="!params?.form || !params?.observations"
+        mode="indeterminate"
+      ></mat-progress-bar>
+      <mat-dialog-actions align="end" class="mb-2 ml-2 mr-2">
+        <button mat-stroked-button (click)="onClose($event)">Cancel</button>
+        <button
+          mat-flat-button
+          [disabled]="!params?.deathRegistryFormUuid || !isValid"
           color="primary"
-          *ngIf="params?.savingObservations"
-          [diameter]="20"
-          style="display: inline-block !important; margin-right: 4px"
-        ></mat-spinner>
-        {{ savingObservations ? "Saving ..." : "Save" }}
-      </button>
-    </mat-dialog-actions>
+          (click)="saveCurrentFormData($event, params?.deathRegistryFormUuid)"
+        >
+          <mat-spinner
+            color="primary"
+            *ngIf="params?.savingObservations"
+            [diameter]="20"
+            style="display: inline-block !important; margin-right: 4px"
+          ></mat-spinner>
+          {{ savingObservations ? "Saving ..." : "Save" }}
+        </button>
+      </mat-dialog-actions>
+    </div>
   </ng-container>
 </ng-container>

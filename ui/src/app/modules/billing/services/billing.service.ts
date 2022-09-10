@@ -64,23 +64,37 @@ export class BillingService {
       .pipe(map(() => new Payment(billPayment)));
   }
 
-  discountBill(discountDetails): Observable<Discount> {
-    const discountedBill = Bill.createDiscount(omit(discountDetails, "file"));
-    const file = discountDetails?.file;
+  discountBill(discountDetails): Observable<any> {
+    let discountData = omit(discountDetails, "attachmentDetails");
+
     let formData = new FormData();
 
-    console.log("==> File: ", file)
+    const file = discountDetails?.attachmentDetails?.file;
+    const jsonData = {
+      concept: discountDetails?.attachmentDetails?.concept,
+      person: discountDetails?.patient,
+      obsDatetime: new Date(),
+    };
 
-    formData.append("json", JSON.stringify(discountedBill));
-    formData.append("document", file);
+    formData.append("json", JSON.stringify(jsonData));
+    formData.append("file", file);
 
-    return this.http
-      .post("../../../openmrs/ws/rest/v1/icare/billing/discount", formData)
-      .pipe(
-        map(() => {
-          return new Discount(discountedBill);
-        })
-      );
+    return of(this.http
+      .post(`../../../openmrs/ws/rest/v1/obs`, formData)
+      .subscribe((response: any) => {
+        if (response) {
+          discountData = {
+            ...discountData,
+            attachmentUuid: response?.uuid,
+          };
+          const discountedBill = Bill.createDiscount(discountData);
+          return this.http
+            .post("../../../openmrs/ws/rest/v1/billing/discount", discountedBill)
+            .subscribe(() => {
+                return new Discount(discountedBill);
+              })
+        }
+      }))
   }
 
   discountCriteriaConcept() {
