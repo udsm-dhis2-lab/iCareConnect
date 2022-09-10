@@ -295,7 +295,7 @@ public class ICareController {
         return retults;
     }
 	
-		@RequestMapping(value = "visit/{visitUuid}/claimForm", method = RequestMethod.GET)
+	@RequestMapping(value = "visit/{visitUuid}/claimForm", method = RequestMethod.GET)
 	@ResponseBody
 	public Map<String, Object> getClaim(@PathVariable("visitUuid") String visitUuid) throws Exception {
 		Claim claim = iCareService.getClaimByVisitUuid(visitUuid);
