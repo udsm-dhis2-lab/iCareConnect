@@ -64,6 +64,7 @@ export class ExemptionComponent implements OnInit, AfterContentInit {
   bills: any;
   billsCount: any;
   showActionButtons: boolean;
+  attachmentConcept: any;
 
   constructor(
     private store: Store<AppState>,
@@ -104,10 +105,10 @@ export class ExemptionComponent implements OnInit, AfterContentInit {
 
     // Get exemption encounter Type
     this.exemptionEncounterType$ = this.systemSettingsService
-      .getSystemSettingsMatchingAKey("icare.billing.exemption.encounterType")
+      .getSystemSettingsByKey("icare.billing.exemption.encounterType")
       .pipe(
         tap((orderType) => {
-          return orderType[0];
+          return orderType;
         }),
         catchError((error) => {
           console.log("Error occured while trying to get orderType: ", error);
@@ -116,15 +117,21 @@ export class ExemptionComponent implements OnInit, AfterContentInit {
       );
 
     this.exemptionConcept$ = this.systemSettingsService
-      .getSystemSettingsMatchingAKey("icare.billing.exemption.concept")
+      .getSystemSettingsByKey("icare.billing.exemption.concept")
       .pipe(
         tap((exemptionConcept) => {
-          return exemptionConcept[0];
+          return exemptionConcept;
         }),
         catchError((error) => {
           return of(new MatTableDataSource([error]));
         })
       );
+
+    this.systemSettingsService.getSystemSettingsByKey(
+      "icare.billing.exemption.attachmentConcept"
+    ).subscribe((value) => {
+      this.attachmentConcept = value;
+    });
   }
 
   ngAfterContentInit() {
@@ -147,8 +154,23 @@ export class ExemptionComponent implements OnInit, AfterContentInit {
 
   onDiscountBill(exemptionDetails: any, params?: any): void {
     if (exemptionDetails) {
-      const { bill, discountDetails, patient } = exemptionDetails;
-      console.log("==> Check file in object: ", exemptionDetails)
+      let exemptionObject = {
+        discountDetails: {
+          Criteria: exemptionDetails.Criteria,
+          isFullExempted: exemptionDetails.isFullExempted,
+          remarks: exemptionDetails.remarks,
+          items: exemptionDetails.items,
+          patient: exemptionDetails.patient,
+          attachmentDetails: {
+            file: exemptionDetails.file,
+            concept: this.attachmentConcept
+          }
+        },
+        patient: exemptionDetails.patient,
+        bill: exemptionDetails.bill
+      }
+
+      const { bill, discountDetails, patient } = exemptionObject;
       this.store.dispatch(discountBill({ bill, discountDetails, patient }));
     }
 

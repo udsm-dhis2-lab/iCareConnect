@@ -165,6 +165,9 @@ export class Bill {
       criteria: {
         uuid: discountDetails?.Criteria?.value,
       },
+      attachment: {
+        uuid: discountDetails?.attachmentUuid,
+      },
       items,
     };
   }

@@ -166,10 +166,10 @@ export class CurrentPatientBillingComponent implements OnInit {
 
     // Get exemption encounter Type
     this.exemptionEncounterType$ = this.systemSettingsService
-      .getSystemSettingsMatchingAKey("icare.billing.exemption.encounterType")
+      .getSystemSettingsByKey("icare.billing.exemption.encounterType")
       .pipe(
         tap((orderType) => {
-          return orderType[0];
+          return orderType;
         }),
         catchError((error) => {
           console.log("Error occured while trying to get orderType: ", error);
@@ -179,10 +179,10 @@ export class CurrentPatientBillingComponent implements OnInit {
 
      //Get exemption order type
     this.exemptionOrderType$ = this.systemSettingsService
-      .getSystemSettingsMatchingAKey("icare.billing.exemption.orderType")
+      .getSystemSettingsByKey("icare.billing.exemption.orderType")
       .pipe(
         tap((orderType) => {
-          return orderType[0];
+          return orderType;
         }),
         catchError((error) => {
           console.log("Error occured while trying to get orderType: ", error);
@@ -191,9 +191,9 @@ export class CurrentPatientBillingComponent implements OnInit {
       );
 
     //Get exemption Concept
-    this.exemptionConcept$ = this.systemSettingsService.getSystemSettingsMatchingAKey("icare.billing.exemption.concept").pipe(
+    this.exemptionConcept$ = this.systemSettingsService.getSystemSettingsByKey("icare.billing.exemption.concept").pipe(
         tap((exemptionConcept) => {
-          return exemptionConcept[0];
+          return exemptionConcept;
         }),
         catchError((error) => {
           return of(new MatTableDataSource([error]));
