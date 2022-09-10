@@ -7,7 +7,10 @@
     currentLocation: currentLocation$ | async,
     currentVisitLoadedState: currentVisitLoadedState$ | async,
     currentVisitLoadingState: currentVisitLoadingState$ | async,
-    generalMetadataConfigurations: generalMetadataConfigurations$ | async
+    generalMetadataConfigurations: generalMetadataConfigurations$ | async,
+    genericPrescriptionOrderType: genericPrescriptionOrderType$ | async,
+    genericPrescriptionEncounterType: genericPrescriptionEncounterType$ | async,
+    useGenericPrescription: useGenericPrescription$ | async
   } as params"
 >
   <button mat-button color="light" (click)="onBack($event)">
@@ -51,6 +54,36 @@
       >
         {{ params?.response?.message }}
       </p>
+      <div
+        class="border"
+        *ngIf="
+          params?.currentVisitLoadedState &&
+          params?.useGenericPrescription === 'true'
+        "
+      >
+        <app-patient-generic-drug-order-list
+          [visit]="params?.patientVisit"
+          [loading]="loading"
+          [loadingError]="loadingError"
+          [actionOptions]="dispensingActionOptions"
+          [currentLocation]="params.currentLocation"
+          [currentPatient]="params?.currentPatient"
+          [genericPrescriptionOrderType]="params?.genericPrescriptionOrderType"
+          [genericPrescriptionEncounterType]="
+            params?.genericPrescriptionEncounterType
+          "
+          [useGenericPrescription]="
+            params?.useGenericPrescription === 'true' ? true : false
+          "
+          [generalMetadataConfigurations]="
+            params?.generalMetadataConfigurations
+          "
+          (orderSelectAction)="
+            onSelectAction($event, params?.patientVisit, params.currentLocation)
+          "
+        ></app-patient-generic-drug-order-list>
+      </div>
+
       <div class="border" *ngIf="params?.currentVisitLoadedState">
         <app-patient-drug-order-list
           [visit]="params?.patientVisit"

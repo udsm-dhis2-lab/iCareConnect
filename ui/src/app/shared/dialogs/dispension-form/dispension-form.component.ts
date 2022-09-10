@@ -2,6 +2,7 @@ import { Component, Inject, OnInit } from "@angular/core";
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { select, Store } from "@ngrx/store";
 import { Observable } from "rxjs";
+import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
 import { DrugOrderError } from "src/app/shared/resources/order/constants/drug-order-error.constant";
 import {
@@ -13,7 +14,16 @@ import { Patient } from "src/app/shared/resources/patient/models/patient.model";
 import { Visit } from "src/app/shared/resources/visits/models/visit.model";
 import { loadActiveVisit } from "src/app/store/actions/visit.actions";
 import { AppState } from "src/app/store/reducers";
-import { getLocationsByTagName } from "src/app/store/selectors";
+import {
+  getCurrentLocation,
+  getLocationsByTagName,
+} from "src/app/store/selectors";
+import { getCurrentPatient } from "src/app/store/selectors/current-patient.selectors";
+import { getProviderDetails } from "src/app/store/selectors/current-user.selectors";
+import { getActiveVisit } from "src/app/store/selectors/visit.selectors";
+import { ConceptsService } from "../../resources/concepts/services/concepts.service";
+import { DrugsService } from "../../resources/drugs/services/drugs.service";
+import { OrdersService } from "../../resources/order/services/orders.service";
 
 @Component({
   selector: "app-dispension-form",
@@ -31,14 +41,37 @@ export class DispensingFormComponent implements OnInit {
   savedOrder: DrugOrder;
   dispensingLocations$: Observable<any>;
   countOfDispensingFormFieldsWithValues: number = 0;
+  generalPrescriptionOrderType$: Observable<any>;
+  generalPrescriptionEncounterType$: Observable<any>;
+  useGeneralPrescription$: Observable<any>;
+  orderFrequencies$: Observable<any>;
+  currentPatient$: Observable<Patient>;
+  currentLocation$: Observable<any>;
+  currentVisit$: Observable<any>;
+  provider$: Observable<any>;
+  dosingUnitsSettings$: Observable<any>;
+  dosingUnits$: Observable<any>;
+  durationUnitsSettings$: Observable<any>;
+  durationUnits$: Observable<any>;
+  drugRoutes$: Observable<any>;
+  drugRoutesSettings$: Observable<any>;
+  generalPrescriptionDurationConcept$: Observable<any>;
+  generalPrescriptionDoseConcept$: Observable<any>;
+  generalPrescriptionFrequencyConcept$: Observable<any>;
+  dosingFrequencies$: Observable<any>;
+  drugsToBeDispensed$: Observable<any>;
 
   constructor(
     private drugOrderService: DrugOrdersService,
+    private drugsService: DrugsService,
+    private orderService: OrdersService,
     private dialogRef: MatDialogRef<DispensingFormComponent>,
+    private systemSettingsService: SystemSettingsService,
+    private conceptsService: ConceptsService,
     private store: Store<AppState>,
     @Inject(MAT_DIALOG_DATA)
     public data: {
-      drugOrder: DrugOrderObject;
+      drugOrder: any;
       patientUuid: string;
       patient: any;
       orderType: any;
@@ -48,7 +81,9 @@ export class DispensingFormComponent implements OnInit {
       location: any;
       encounterUuid: string;
     }
-  ) {}
+  ) {
+    // console.log("data disp", data);
+  }
 
   get isValid(): boolean {
     return (
@@ -70,6 +105,47 @@ export class DispensingFormComponent implements OnInit {
     this.dispensingLocations$ = this.store.pipe(
       select(getLocationsByTagName, { tagName: "Dispensing Unit" })
     );
+
+    this.generalPrescriptionEncounterType$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        "iCare.clinic.prescription.encounterType"
+      );
+    this.generalPrescriptionOrderType$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        "iCare.clinic.prescription.orderType"
+      );
+    this.useGeneralPrescription$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        "iCare.clinic.useGeneralPrescription"
+      );
+    this.dosingUnitsSettings$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        "order.drugDosingUnitsConceptUuid"
+      );
+    this.durationUnitsSettings$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        "order.durationUnitsConceptUuid"
+      );
+    this.drugRoutesSettings$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        "order.drugRoutesConceptUuid"
+      );
+    this.generalPrescriptionDurationConcept$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        "iCare.clinic.prescription.duration"
+      );
+    this.generalPrescriptionDoseConcept$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        "iCare.clinic.prescription.dose"
+      );
+    this.generalPrescriptionFrequencyConcept$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        "iCare.clinic.prescription.frequency"
+      );
+    this.currentPatient$ = this.store.pipe(select(getCurrentPatient));
+    this.currentLocation$ = this.store.pipe(select(getCurrentLocation));
+    this.currentVisit$ = this.store.pipe(select(getActiveVisit));
+    this.provider$ = this.store.select(getProviderDetails);
   }
 
   onCancel(): void {
@@ -146,11 +222,14 @@ export class DispensingFormComponent implements OnInit {
         ? JSON.parse(localStorage.getItem("currentLocation"))["uuid"]
         : null,
       providerUuid: this.drugOrderData?.provider?.uuid,
-      encounterUuid: JSON.parse(localStorage.getItem("patientConsultation"))[
-        "encounterUuid"
-      ],
+      encounterUuid: this.data?.fromDispensing
+        ? this.data?.drugOrder?.encounter?.uuid
+        : JSON.parse(localStorage.getItem("patientConsultation"))[
+            "encounterUuid"
+          ],
       patientUuid: order?.patientUuid || this.data?.patientUuid,
     };
+    // console.log("this.data?.drugOrder", this.data?.drugOrder);
     this.drugOrderService
       .saveDrugOrder(
         DrugOrder.getOrderForSaving(formattedOrder),
@@ -180,6 +259,7 @@ export class DispensingFormComponent implements OnInit {
             (errorResponse?.error?.message || "")
               .replace("[", "")
               .replace("]", "");
+          this.dialogRef.close(true);
           this.savingOrderSuccess = false;
         }
       );
@@ -188,5 +268,42 @@ export class DispensingFormComponent implements OnInit {
   onClearError(e: MouseEvent) {
     e.stopPropagation();
     this.savingError = undefined;
+  }
+
+  getDosingUnits(conceptUuid: string) {
+    this.dosingUnits$ = this.conceptsService.getConceptDetailsByUuid(
+      conceptUuid,
+      `custom:(uuid,name,conceptClass:(uuid,display),setMembers:(uuid,display),answers:(uuid,display)`
+    );
+  }
+
+  getDurationUnits(conceptUuid: string) {
+    this.durationUnits$ = this.conceptsService.getConceptDetailsByUuid(
+      conceptUuid,
+      `custom:(uuid,name,conceptClass:(uuid,display),setMembers:(uuid,display),answers:(uuid,display)`
+    );
+  }
+
+  getDrugRoutes(conceptUuid: string) {
+    this.drugRoutes$ = this.conceptsService.getConceptDetailsByUuid(
+      conceptUuid,
+      `custom:(uuid,name,conceptClass:(uuid,display),setMembers:(uuid,display),answers:(uuid,display)`
+    );
+  }
+
+  getDosingFrequencies(conceptUuid: string) {
+    this.dosingFrequencies$ = this.conceptsService.getConceptDetailsByUuid(
+      conceptUuid,
+      `custom:(uuid,name,conceptClass:(uuid,display),setMembers:(uuid,display),answers:(uuid,display)`
+    );
+  }
+
+  getDrugsByConceptUuid(conceptUuid: string) {
+    this.drugsToBeDispensed$ =
+      this.drugsService.getDrugsUsingConceptUuid(conceptUuid);
+  }
+
+  onCloseDialog(closeDialog: boolean): void {
+    this.dialogRef.close(closeDialog);
   }
 }
