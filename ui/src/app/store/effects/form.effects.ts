@@ -88,7 +88,8 @@ export class FormEffects {
                 _.map(formResponse?.formFields, (formField) => {
                   return getSanitizedFormObject(
                     formField?.field?.concept,
-                    formField
+                    formField,
+                    action?.causesOfDeathConcepts
                   );
                 }),
                 ["fieldNumber"],
@@ -114,6 +115,7 @@ export class FormEffects {
       ofType(loadCustomOpenMRSForms),
       withLatestFrom(this.store.select(getFormsEntities)),
       switchMap(([action, formsEntities]: [any, any]) => {
+        console.log(action);
         const loadedFormsIds = Object.keys(formsEntities);
         const missingIds = _.difference(action.formUuids, loadedFormsIds) || [];
         if (missingIds.length > 0) {
@@ -129,7 +131,8 @@ export class FormEffects {
                       ...formattedFormFields,
                       getSanitizedFormObject(
                         formField?.field?.concept,
-                        formField
+                        formField,
+                        action.causesOfDeathConcepts
                       ),
                     ];
                   }

@@ -24,6 +24,7 @@ export class Field<T> {
   category?: string;
   searchTerm?: string;
   source?: string;
+  isDiagnosis?: boolean;
 
   constructor(
     options: {
@@ -46,6 +47,7 @@ export class Field<T> {
       searchControlType?: string;
       shouldHaveLiveSearchForDropDownFields?: boolean;
       filteringItems?: any[];
+      isDiagnosis?: boolean;
       category?: string;
       searchTerm?: string;
       source?: string;
@@ -73,5 +75,6 @@ export class Field<T> {
     this.conceptClass = options?.conceptClass;
     this.searchTerm = options?.searchTerm;
     this.source = options?.source;
+    this.isDiagnosis = options?.isDiagnosis;
   }
 }
