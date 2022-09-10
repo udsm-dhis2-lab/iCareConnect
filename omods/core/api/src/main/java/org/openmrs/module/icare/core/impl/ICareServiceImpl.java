@@ -518,7 +518,7 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	public Summary getSummary() {
 		return dao.getSummary();
 	}
-
+	
 	@Override
 	public List<Drug> getDrugs(String concept, Integer limit, Integer startIndex) {
 		return dao.getDrugs(concept, limit, startIndex);
