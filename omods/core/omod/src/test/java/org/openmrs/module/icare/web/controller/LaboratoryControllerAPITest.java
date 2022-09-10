@@ -30,9 +30,9 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 	
 	@Autowired
 	LaboratoryService laboratoryService;
-
+	
 	@Mock
-    TestOrderLocationDAO testOrderLocationDAO;
+	TestOrderLocationDAO testOrderLocationDAO;
 	
 	@Before
 	public void setUp() throws SQLException {
@@ -181,42 +181,41 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 	
 	@Test
 	public void testGettingSampleByVisitOrPatientUuidAndOrDates() throws Exception {
-
+		
 		MockHttpServletRequest newSampleGetByPatientRequest = newGetRequest("lab/sample");
-
+		
 		newSampleGetByPatientRequest.addParameter("patient", "660484f6-0d02-4e2a-8e0e-fd2f71906f81");
 		MockHttpServletResponse handleGet = handle(newSampleGetByPatientRequest);
 		System.out.println("Done testing with patient \n");
 		newSampleGetByPatientRequest.removeParameter("patient");
-
-		newSampleGetByPatientRequest.addParameter("visit","d9c1d8ac-2b8e-427f-804d-b858c52e6f11");
-
+		
+		newSampleGetByPatientRequest.addParameter("visit", "d9c1d8ac-2b8e-427f-804d-b858c52e6f11");
+		
 		handle(newSampleGetByPatientRequest);
 		System.out.println("Done testing with visit \n");
 		newSampleGetByPatientRequest.removeParameter("visit");
 		
-		newSampleGetByPatientRequest.addParameter("startDate","2022-01-01");
+		newSampleGetByPatientRequest.addParameter("startDate", "2022-01-01");
 		
 		handle(newSampleGetByPatientRequest);
 		System.out.println("Done testing with start date only \n");
-
-		newSampleGetByPatientRequest.addParameter("endDate","2022-07-29");
-
+		
+		newSampleGetByPatientRequest.addParameter("endDate", "2022-07-29");
+		
 		handle(newSampleGetByPatientRequest);
 		System.out.println("Done testing with start date and end date only \n");
-
+		
 		newSampleGetByPatientRequest.addParameter("patient", "660484f6-0d02-4e2a-8e0e-fd2f71906f81");
-
+		
 		handle(newSampleGetByPatientRequest);
 		System.out.println("Done testing with start , end date and patient \n");
 		newSampleGetByPatientRequest.removeParameter("patient");
-
-
-		newSampleGetByPatientRequest.addParameter("visit","d9c1d8ac-2b8e-427f-804d-b858c52e6f11");
-
+		
+		newSampleGetByPatientRequest.addParameter("visit", "d9c1d8ac-2b8e-427f-804d-b858c52e6f11");
+		
 		handle(newSampleGetByPatientRequest);
 		System.out.println("Done testing with start , end date and visit \n");
-
+		
 	}
 	
 	@Test
@@ -387,22 +386,22 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		assertThat("The observation value text should be positive", observations.get(0).getValueText(), is("positive"));
 		
 	}
-
+	
 	@Test
-	public void addTestOrderLocation() throws Exception{
+	public void addTestOrderLocation() throws Exception {
 		//Given
-//		String dto = this.readFile("dto/test-allocation-approve.json");
-
+		//		String dto = this.readFile("dto/test-allocation-approve.json");
+		
 		String dto = "{\"location\":{\"uuid\":\"iCARE890-TEST-MOTR-9beb-d30dcfc0c66e\"},\"concept\":{\"uuid\":\"a8102d6d-c528-477a-80bd-acc38ebc6252\"},\"user\":{\"uuid\":\"e4ef4d4d-5cf2-47ff-af6b-bb9abdabdd60\"}}";
-
+		
 		Map<String, Object> testOrderLocation = (new ObjectMapper()).readValue(dto, Map.class);
-
-		MockHttpServletRequest newPostRequest = newPostRequest("lab/testorderlocation",testOrderLocation);
-
+		
+		MockHttpServletRequest newPostRequest = newPostRequest("lab/testorderlocation", testOrderLocation);
+		
 		MockHttpServletResponse handle = handle(newPostRequest);
-
+		
 		//assertThat("test order inserted",);
-
+		
 	}
 	
 	@Override
