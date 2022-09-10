@@ -1,17 +1,27 @@
-import { Component, OnInit } from '@angular/core';
-import { MatTableDataSource } from '@angular/material/table';
-import { Router } from '@angular/router';
-import { Observable, of } from 'rxjs';
-import { catchError, tap } from 'rxjs/operators';
-import { TableColumn } from 'src/app/shared/models/table-column.model';
-import { TableConfig } from 'src/app/shared/models/table-config.model';
-import { Api } from 'src/app/shared/resources/openmrs';
-import { Visit } from 'src/app/shared/resources/visits/models/visit.model';
+import { Component, EventEmitter, OnInit, Output } from "@angular/core";
+import { MatTableDataSource } from "@angular/material/table";
+import { Router } from "@angular/router";
+import { select, Store } from "@ngrx/store";
+import { Observable, of } from "rxjs";
+import { catchError, tap } from "rxjs/operators";
+import { SystemSettingsService } from "src/app/core/services/system-settings.service";
+import { TableColumn } from "src/app/shared/models/table-column.model";
+import { TableConfig } from "src/app/shared/models/table-config.model";
+import { Api } from "src/app/shared/resources/openmrs";
+import {
+  Visit,
+  VisitExt,
+} from "src/app/shared/resources/visits/models/visit.model";
+
+import { VisitsService } from "../../../../shared/resources/visits/services";
+import { AppState } from "src/app/store/reducers";
+import { getCurrentLocation } from "src/app/store/selectors";
+import { loadCurrentPatient } from "src/app/store/actions";
 
 @Component({
-  selector: 'app-exemption-home',
-  templateUrl: './exemption-home.component.html',
-  styleUrls: ['./exemption-home.component.scss'],
+  selector: "app-exemption-home",
+  templateUrl: "./exemption-home.component.html",
+  styleUrls: ["./exemption-home.component.scss"],
 })
 export class ExemptionHomeComponent implements OnInit {
   visitsWithBiling$: Observable<MatTableDataSource<Visit>>;
@@ -19,34 +29,50 @@ export class ExemptionHomeComponent implements OnInit {
   loadingVisits: boolean;
   loadingVisitsError: string;
   tableConfig: TableConfig;
+  orderType$: Observable<any>;
+  currentLocation$: Observable<any>;
+  orderType: any;
+  orderByDirection: any;
+  orderBy: any;
+  filterBy: any;
+  currentLocation: any;
+  loadingPatients: boolean;
+  visits$: any;
+  visitsLength: number;
 
-  constructor(private api: Api, private router: Router) {}
+  constructor(
+    private api: Api,
+    private router: Router,
+    private visitService: VisitsService,
+    private systemSettingsService: SystemSettingsService,
+    private store: Store<AppState>
+  ) {}
 
   ngOnInit() {
     this.billingColumns = [
       {
-        id: 'index',
-        label: '#',
+        id: "index",
+        label: "#",
       },
       {
-        id: 'patientName',
-        label: 'Name',
+        id: "patientName",
+        label: "Name",
       },
       {
-        id: 'patientGender',
-        label: 'Gender',
+        id: "patientGender",
+        label: "Gender",
       },
       {
-        id: 'locationName',
-        label: 'Location',
+        id: "locationName",
+        label: "Location",
       },
       {
-        id: 'patientAge',
-        label: 'Age',
+        id: "patientAge",
+        label: "Age",
       },
     ];
     this.tableConfig = new TableConfig({
-      noDataLabel: 'No bills at the moment',
+      noDataLabel: "No bills at the moment",
     });
     this.loadingVisits = true;
     this.visitsWithBiling$ = Visit.getVisitWithBillingOrders(this.api).pipe(
@@ -59,9 +85,81 @@ export class ExemptionHomeComponent implements OnInit {
         return of(new MatTableDataSource([]));
       })
     );
+
+    this.currentLocation$ = this.store.pipe(select(getCurrentLocation));
+
+    //Get current location
+    this.currentLocation$.subscribe({
+      next: (currentLocation) => {
+        this.currentLocation = currentLocation;
+      },
+      error: (error) => {
+        console.log(
+          "Error occured while trying to get current location: ",
+          error
+        );
+      },
+    });
+
+    //Get order type
+    this.orderType$ = this.systemSettingsService
+      .getSystemSettingsMatchingAKey("icare.billing.exemption.orderType")
+      .pipe(
+        tap((orderType) => {
+          return orderType[0];
+        }),
+        catchError((error) => {
+          console.log("Error occured while trying to get orderType: ", error);
+          return of(new MatTableDataSource([]));
+        })
+      );
+
+    this.orderType$.subscribe({
+      next: (orderType) => {
+        this.orderType = orderType[0];
+
+        this.getVisits(this.orderType).subscribe({
+          next: (visits) => {
+            this.visits$ = of(
+              new MatTableDataSource(visits.map((visit) => new VisitExt(visit)))
+            );
+            this.visitsLength = visits.length;
+          },
+        });
+      },
+    });
+  }
+
+  getVisits(orderType) {
+    return this.visitService
+      .getAllVisits(
+        null,
+        false,
+        false,
+        null,
+        0,
+        10,
+        orderType?.value,
+        null,
+        null,
+        this.orderBy ? this.orderBy : "ENCOUNTER",
+        this.orderByDirection ? this.orderByDirection : "ASC",
+        this.filterBy ? this.filterBy : ""
+      )
+      .pipe(
+        tap(() => {
+          this.loadingVisits = false;
+        })
+      );
   }
 
   onSelectVisit(visit: Visit) {
+    this.store.dispatch(
+      loadCurrentPatient({
+        uuid: visit.patientUuid,
+        isRegistrationPage: false,
+      })
+    );
     this.router.navigate([`/billing/${visit.patientUuid}/exempt`]);
   }
 }
