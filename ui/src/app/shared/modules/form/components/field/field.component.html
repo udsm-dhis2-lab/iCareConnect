@@ -145,7 +145,7 @@
       <mat-option aria-disabled="true" value=""> --Search-- </mat-option>
       <mat-option
         *ngFor="let option of members$ | async"
-        (click)="getSelectedItemFromOption($event, option, field?.key)"
+        (click)="getSelectedItemFromOption($event, option, field)"
         [value]="option?.display ? option?.display : option?.name"
       >
         <span
