@@ -307,6 +307,7 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		MockHttpServletRequest newGetRequest = newGetRequest("icare/visit", new Parameter("orderTypeUuid",
 		        "2msir5eb-5345-11e8-9922-40b034c3cfee"), new Parameter("OrderBy", "ENCOUNTER"), new Parameter(
 		        "orderByDirection", "ASC"), new Parameter("paymentStatus", "PAID"));
+		
 		MockHttpServletResponse handle = handle(newGetRequest);
 		String visitData = handle.getContentAsString();
 		Map visitMap = (new ObjectMapper()).readValue(visitData, Map.class);
@@ -564,25 +565,25 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		MockHttpServletResponse handle = handle(newGetRequest);
 		String summaryData = handle.getContentAsString();
 		Map summaryMap = (new ObjectMapper()).readValue(summaryData, Map.class);
-
+		
 		List<Map> summaryDetails = (List<Map>) summaryMap.get("results");
 		//assertThat("Should return a visit", visitDetails.size() == 1);
-
-
+		
 		assertThat("Has 8 patient", summaryMap.get("allPatients").equals(8));
 		assertThat("Has 8 activeVisits", summaryMap.get("activeVisits").equals(8));
-		assertThat("Has 1 location", ((List)summaryMap.get("locations")).size() == 1);
-
+		assertThat("Has 1 location", ((List) summaryMap.get("locations")).size() == 1);
+		
 	}
-
+	
 	@Test
 	public void testDrug() throws Exception {
-
+		
 		//Get visits by attribute value references
 		Drug drug = Context.getConceptService().getAllDrugs().get(0);
 		//System.out.println(drug.getConcept().getUuid());
-
-		MockHttpServletRequest newGetRequest = newGetRequest("icare/drug",new Parameter("concept",drug.getConcept().getUuid()));
+		
+		MockHttpServletRequest newGetRequest = newGetRequest("icare/drug", new Parameter("concept", drug.getConcept()
+		        .getUuid()));
 		MockHttpServletResponse handle = handle(newGetRequest);
 		String drugData = handle.getContentAsString();
 		//System.out.println(drugData);
@@ -592,7 +593,6 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		assertThat("Should have drug with display", drug.getDisplayName().equals(drugDetails.get(0).get("display")));
 		assertThat("Should have drug with name", drug.getName().equals(drugDetails.get(0).get("name")));
 		assertThat("Should have drug with same uuid", drug.getUuid().equals(drugDetails.get(0).get("uuid")));
-
-
+		
 	}
 }

@@ -1,14 +1,15 @@
 package org.openmrs.module.icare.web.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.joda.time.DateTime;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.icare.billing.models.Discount;
 import org.openmrs.module.icare.billing.models.Invoice;
 import org.openmrs.module.icare.billing.models.Payment;
 import org.openmrs.module.icare.billing.services.BillingService;
 import org.openmrs.module.icare.billing.services.insurance.SyncResult;
+import org.openmrs.module.webservices.rest.SimpleObject;
 import org.openmrs.module.webservices.rest.web.RestConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -18,13 +19,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.ServletContext;
 import java.io.File;
+import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 //import com.google.gson.Gson;
 //import com.google.gson.GsonBuilder;
@@ -115,21 +116,94 @@ public class BillingController extends BaseController {
 		return "/tmp/attachments";
 	}
 	
-	@RequestMapping(value = "discount", method = RequestMethod.POST)
+	public class Payload implements Serializable {
+		
+		//private String name;
+		private String json;
+		
+		public String getJson() {
+			return json;
+		}
+		
+		public void setJson(String json) {
+			this.json = json;
+		}
+		
+		private MultipartFile document;
+		
+		public MultipartFile getDocument() {
+			return document;
+		}
+		
+		public void setDocument(MultipartFile document) {
+			this.document = document;
+		}
+		
+		public Payload() {
+			
+		}
+	}
+	
+	/*@RequestMapping(value = "discount", method = RequestMethod.POST, consumes = { MediaType.MULTIPART_FORM_DATA_VALUE }, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
-	public Map<String, Object> onPostDiscountInvoiceMap(
+	public Map<String, Object> onPostDiscountInvoiceFile(
 	        @RequestParam(value = "document", required = false) MultipartFile file, @RequestParam("json") Discount discount)
 	        throws Exception {
+		System.out.println("Returns the file:" + file.getOriginalFilename());
+		//File upload implementation
+		//		String filePath = getFilepath();
+		//		//String filePath = "/tmp/";
+		//		String dateTime = DateTime.now().toString("yyyyMMddHHmmss");
+		//		String fileNameToSave = dateTime.concat(file.getOriginalFilename());
+		//		String path = filePath + fileNameToSave;
+		//		file.transferTo(new File(path));
 		
+		//discount.setAttachmentId(path);
+		
+		Discount newDiscount = this.onPostDiscountInvoice(discount);
+		
+		return newDiscount.toMap();
+	}*/
+	@RequestMapping(value = "discount", method = RequestMethod.POST, consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
+	@ResponseBody
+	public Map<String, Object> onPostDiscountInvoiceMap2(
+	        @RequestParam(value = "document", required = false) MultipartFile file, @RequestParam("json") String discountStr)
+	//@RequestParam(value = "document", required = false) MultipartFile file, @RequestParam("json") String discountStr)
+	        throws Exception {
+		System.out.println(discountStr);
 		//File upload implementation
 		String filePath = getFilepath();
 		//String filePath = "/tmp/";
-		String dateTime = DateTime.now().toString("yyyyMMddHHmmss");
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss", Locale.ENGLISH);
+		String dateTime = formatter.format(new Date());
 		String fileNameToSave = dateTime.concat(file.getOriginalFilename());
 		String path = filePath + fileNameToSave;
 		file.transferTo(new File(path));
 		
-		discount.setAttachmentId(path);
+		Map<String, Object> result = new ObjectMapper().readValue(discountStr, HashMap.class);
+		Discount newDiscount = Discount.fromMap(result.entrySet()); //this.onPostDiscountInvoice(discount);
+		newDiscount.setAttachmentId(path);
+		newDiscount = this.onPostDiscountInvoice(newDiscount);
+		//System.out.println(discount.getCriteria().getUuid());
+		
+		return newDiscount.toMap();
+	}
+	
+	//@RequestMapping(value = "discount", method = RequestMethod.POST, consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
+	@ResponseBody
+	public Map<String, Object> onPostDiscountInvoiceMap(
+	        @RequestParam(value = "document", required = false) MultipartFile file, @RequestParam("json") Discount discount)
+	        throws Exception {
+		System.out.println();
+		//File upload implementation
+		String filePath = getFilepath();
+		//String filePath = "/tmp/";
+		/*String dateTime = DateTime.now().toString("yyyyMMddHHmmss");
+		String fileNameToSave = dateTime.concat(file.getOriginalFilename());
+		String path = filePath + fileNameToSave;
+		file.transferTo(new File(path));
+		
+		discount.setAttachmentId(path);*/
 		
 		Discount newDiscount = this.onPostDiscountInvoice(discount);
 		System.out.println(discount.getCriteria().getUuid());
