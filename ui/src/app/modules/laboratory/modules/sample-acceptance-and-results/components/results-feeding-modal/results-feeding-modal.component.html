@@ -778,6 +778,8 @@
                         <mat-tab label="Current">
                           <div class="p-3">
                             <!-- {{ parameter?.datatype?.display }} -->
+
+                            <!-- {{ parameter | json }} -->
                             <div
                               *ngIf="parameter?.datatype?.display === 'Complex'"
                             >
@@ -937,7 +939,6 @@
                                 >Select value for
                                 {{ parameter?.display }}</mat-label
                               >
-                              <!-- {{parameter | json}} -->
                               <mat-select
                                 [disabled]="
                                   item?.allocationsPairedBySetMember[
@@ -1103,6 +1104,49 @@
                                 Go to range
                               </button>
                             </mat-form-field>
+
+                            <mat-form-field
+                              class="w-50"
+                              *ngIf="
+                                parameter?.datatype?.display === 'Numeric' &&
+                                (!parameter?.lowNormal || !parameter?.hiNormal)
+                              "
+                            >
+                              <mat-label
+                                >Enter value for {{ parameter?.display }}
+                              </mat-label>
+                              <input
+                                matInput
+                                autocomplete="off"
+                                [type]="'number'"
+                                class="text-left"
+                                [value]="
+                                  item?.allocationsPairedBySetMember[
+                                    parameter?.uuid
+                                  ]?.results?.length > 0
+                                    ? item?.allocationsPairedBySetMember[
+                                        parameter?.uuid
+                                      ]?.results[
+                                        item?.allocationsPairedBySetMember[
+                                          parameter?.uuid
+                                        ]?.results?.length - 1
+                                      ]?.value
+                                    : null
+                                "
+                                [disabled]="
+                                  item?.allocationsPairedBySetMember[
+                                    parameter?.uuid
+                                  ]?.firstSignOff
+                                "
+                                (change)="
+                                  setEnteredParameterValue(
+                                    parameter,
+                                    $event.target.value
+                                  )
+                                "
+                              />
+                            </mat-form-field>
+
                             <div class="50 d-flex justify-content-left">
                               <mat-form-field
                                 class="w-25"

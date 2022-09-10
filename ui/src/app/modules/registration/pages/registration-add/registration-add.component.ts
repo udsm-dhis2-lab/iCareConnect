@@ -101,7 +101,7 @@ export class RegistrationAddComponent implements OnInit {
       ? false
       : true;
   }
-
+  disabledIDType: boolean = false;
   addingPatient: boolean = false;
   patientAdded: boolean = false;
   errorAddingPatient: boolean = false;
@@ -153,6 +153,7 @@ export class RegistrationAddComponent implements OnInit {
     newPatient: null,
     RelationshipType: null,
     Id: null,
+    patientType: null,
   };
   mrnIsEditable: boolean = false;
   primaryPhoneNumberFormField: any = new PhoneNumber({
@@ -228,33 +229,39 @@ export class RegistrationAddComponent implements OnInit {
     };
   }
 
-   getAdditionalInformationValues(formValues): void {
+  getAdditionalInformationValues(formValues): void {
     //console.log("formValues", formValues)
     //console.log(this.registrationFormConfigsKeyedByProperty)
 
-    this.patient.occupation =
+    /* this.patient.occupation =
       formValues[
         this.registrationFormConfigsKeyedByProperty["occupation"]?.value
-      ].value;
+      ].value; */
     this.patient.maritalStatus =
-       formValues[
-         this.registrationFormConfigsKeyedByProperty["maritalStatus"]?.value
-       ].value;
-       this.patient.religion =
-         formValues[
-          this.registrationFormConfigsKeyedByProperty["religion"]?.value
-        ].value;
-        this.patient.education =formValues[this.registrationFormConfigsKeyedByProperty["education"]?.value
-        ].value;
-        this.patient['areaLeader'] = formValues[this.registrationFormConfigsKeyedByProperty["areaLeaderName"]?.value
-        ].value;
-        this.patient['areaLeaderNumber'] = formValues[this.registrationFormConfigsKeyedByProperty["areaLeaderNumber"]?.value
-        ].value;
+      formValues[
+        this.registrationFormConfigsKeyedByProperty["maritalStatus"]?.value
+      ].value;
+    this.patient.religion =
+      formValues[
+        this.registrationFormConfigsKeyedByProperty["religion"]?.value
+      ].value;
+    this.patient.education =
+      formValues[
+        this.registrationFormConfigsKeyedByProperty["education"]?.value
+      ].value;
+    this.patient["areaLeader"] =
+      formValues[
+        this.registrationFormConfigsKeyedByProperty["areaLeaderName"]?.value
+      ].value;
+    this.patient["areaLeaderNumber"] =
+      formValues[
+        this.registrationFormConfigsKeyedByProperty["areaLeaderNumber"]?.value
+      ].value;
   }
 
-    //setEducationDetails(education) {
-   // console.log(education)
-   /* 
+  //setEducationDetails(education) {
+  // console.log(education)
+  /* 
     const key = Object.keys(education)[0]
     this.patient.education = education[key].value; */
   //}
@@ -283,14 +290,16 @@ export class RegistrationAddComponent implements OnInit {
       "bad70d90-9bac-401a-8c49-a440f6a07bf5",
       "custom:(uuid,display,names,answers:(uuid,display,names,mappings))"
     );
-    this.additionalPatientInformation$ = this.conceptService.getConceptDetailsByUuid(
-      "b2399b15-a38d-47f9-8e15-fc7e7c7dc1f3",
-      "custom:(uuid,display,names,answers:(uuid,display,names),setMembers:(uuid,display,answers:(uuid,display,names)))"
-    );/* 
+    this.additionalPatientInformation$ =
+      this.conceptService.getConceptDetailsByUuid(
+        "b2399b15-a38d-47f9-8e15-fc7e7c7dc1f3",
+        "custom:(uuid,display,names,answers:(uuid,display,names),setMembers:(uuid,display,answers:(uuid,display,names)))"
+      );
     this.occupationInfo$ = this.conceptService.getConceptDetailsByUuid(
       "c3d16c94-4e03-4b19-9491-43d10f470981",
       "custom:(uuid,display,names,answers:(uuid,display,names),setMembers:(uuid,display,answers:(uuid,display,names)))"
     );
+    /*
     this.educationInfo$ = this.conceptService.getConceptDetailsByUuid(
       "79d20b25-42aa-42a7-a48e-8cd9a96c6064",
       "custom:(uuid,display,names,answers:(uuid,display,names),setMembers:(uuid,display,answers:(uuid,display,names)))"
@@ -501,6 +510,7 @@ export class RegistrationAddComponent implements OnInit {
               },
             ],
             gender: this.patient.gender,
+            patientType: this.patient.patientType,
             birthdate: new Date(
               this.patient.dob.setDate(this.patient.dob.getDate() + 1)
             ),
@@ -709,6 +719,26 @@ export class RegistrationAddComponent implements OnInit {
     e.stopPropagation();
     this.selectedIdentifierType = identifier;
     this.patient[identifier.id] = null;
+  }
+
+  getPatientType(value: string, occupationInfo) {
+    this.patient["patientType"] = value;
+    if (value === "Student") {
+      this.selectedIdentifierType = {
+        name: "Student ID",
+        id: "9f6496ec-cf8e-4186-b8fc-aaf9e93b3406",
+      };
+      this.disabledIDType = true;
+    } else if (value === "Staff") {
+      this.selectedIdentifierType = {
+        id: "6e7203dd-0d6b-4c92-998d-fdc82a71a1b0",
+        name: "Staff ID",
+      };
+      this.disabledIDType = true;
+    } else {
+      this.disabledIDType = false;
+      this.selectedIdentifierType = null;
+    }
   }
 
   validateNamesInputs(value, key) {

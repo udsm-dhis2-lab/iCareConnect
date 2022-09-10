@@ -1,13 +1,13 @@
 branch=$(git branch | grep \* | cut -d ' ' -f2)
-cd ui
 
-docker run -w="/app" -v "$(pwd)":/app udsmdhis2/icare-ui-compiler mv /node_modules .
-docker run -w="/app" -v "$(pwd)":/app udsmdhis2/icare-ui-compiler npm install
-docker run -w="/app" -v "$(pwd)":/app udsmdhis2/icare-ui-compiler npm run build:prod
+
+docker run -w="/app" -v "$(pwd)/ui":/app udsmdhis2/icare-ui-compiler mv -r /node_modules .
+docker run -w="/app" -v "$(pwd)/ui":/app udsmdhis2/icare-ui-compiler npm install
+docker run -w="/app" -v "$(pwd)/ui":/app udsmdhis2/icare-ui-compiler npm run build:prod
 #cd ../docs
 #docker run -w="/app" -v "$(pwd)":/app node:16.14 npm install
 #docker run -w="/app" -v "$(pwd)":/app node:16.14 npm run build
-cd ..
+#cd ..
 #docker run --rm -v maven-repo:/root/.m2 -v $(pwd)/omods/core:/usr/src/omod -w /usr/src/omod maven:3.6.3-openjdk-11-slim mvn clean package -DskipTests
 docker run --rm -v $(pwd)/omods/core:/usr/src/omod -w /usr/src/omod udsmdhis2/icare-omod-compiler mvn clean package -DskipTests
 version=$(cat version)
