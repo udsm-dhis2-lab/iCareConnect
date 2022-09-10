@@ -385,7 +385,7 @@ public class ICareController {
 		results.put("results", conceptSetsList);
 		return results;
 	}
-
+	
 	@RequestMapping(value = "drug", method = RequestMethod.GET)
 	@ResponseBody
 	public Map<String, Object> getDrugs(@RequestParam(value = "concept", required = false) String concept, @RequestParam(defaultValue = "50") Integer limit, @RequestParam(defaultValue = "0") Integer startIndex) {
@@ -408,7 +408,7 @@ public class ICareController {
 		results.put("results", drugsList);
 		return results;
 	}
-
+	
 	@RequestMapping(value ="patient", method = RequestMethod.GET)
 	@ResponseBody
 	public Map<String, Object> getPatient(@RequestParam(required = false) String search,@RequestParam(required = false) String patientUUID,@RequestParam(required = false) PatientWrapper.VisitStatus visitStatus,@RequestParam(defaultValue = "100") Integer limit,
