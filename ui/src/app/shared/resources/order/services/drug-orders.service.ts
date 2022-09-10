@@ -380,7 +380,9 @@ export class DrugOrdersService {
           type: "number",
           value: !metadataConfigs?.fromDispensing
             ? drugOrder?.dose
-            : "GET DOSE CONCEPT AS A KEY",
+            : doctorPrescriptionDetails?.obs[
+                metadataConfigs?.generalPrescriptionDoseConcept
+              ]?.value,
         });
 
         const dosingUnitsField = new Dropdown({
@@ -423,7 +425,9 @@ export class DrugOrdersService {
           order: 4,
           required: true,
           key: "frequency",
-          value: drugOrder?.frequency,
+          value: !metadataConfigs.fromDispensing ? drugOrder?.frequency : doctorPrescriptionDetails?.obs[
+                metadataConfigs?.generalPrescriptionFrequencyConcept
+              ]?.value?.uuid,
         });
 
         const drugRoutesField = new Dropdown({
@@ -438,7 +442,11 @@ export class DrugOrdersService {
           required: true,
           key: "route",
           id: "route",
-          value: drugOrder?.route,
+          value: !metadataConfigs.fromDispensing
+            ? drugOrder?.route
+            : doctorPrescriptionDetails?.obs[
+                metadataConfigs?.drugRoutesSettings
+              ]?.value?.uuid,
         });
 
         const durationUnitsFormField = new Dropdown({
@@ -453,7 +461,11 @@ export class DrugOrdersService {
           required: true,
           key: "durationUnits",
           id: "durationUnits",
-          value: drugOrder?.durationUnits,
+          value: !metadataConfigs.fromDispensing
+            ? drugOrder?.durationUnits
+            : doctorPrescriptionDetails?.obs[
+                metadataConfigs?.durationUnitsSettings
+              ]?.value?.uuid,
         });
 
         const doseDurationField = new Textbox({
@@ -463,7 +475,11 @@ export class DrugOrdersService {
           order: 2,
           required: true,
           type: "text",
-          value: drugOrder?.duration,
+          value: !metadataConfigs.fromDispensing
+            ? drugOrder?.duration
+            : doctorPrescriptionDetails?.obs[
+                metadataConfigs?.generalPrescriptionDurationConcept
+              ]?.value,
         });
 
         const genericNameField = new Dropdown({
