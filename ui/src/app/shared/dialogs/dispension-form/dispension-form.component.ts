@@ -24,6 +24,7 @@ import { getActiveVisit } from "src/app/store/selectors/visit.selectors";
 import { ConceptsService } from "../../resources/concepts/services/concepts.service";
 import { DrugsService } from "../../resources/drugs/services/drugs.service";
 import { OrdersService } from "../../resources/order/services/orders.service";
+import { flatten, keyBy } from "lodash";
 
 @Component({
   selector: "app-dispension-form",
@@ -60,6 +61,8 @@ export class DispensingFormComponent implements OnInit {
   generalPrescriptionFrequencyConcept$: Observable<any>;
   dosingFrequencies$: Observable<any>;
   drugsToBeDispensed$: Observable<any>;
+  drugsDispensed: any;
+  genericPrescriptionOrderType: any;
 
   constructor(
     private drugOrderService: DrugOrdersService,
@@ -300,5 +303,33 @@ export class DispensingFormComponent implements OnInit {
   getDrugsByConceptUuid(conceptUuid: string) {
     this.drugsToBeDispensed$ =
       this.drugsService.getDrugsUsingConceptUuid(conceptUuid);
+  }
+
+  filterPrescribedOrdersFromVisit(visit, genericPrescriptionOrderType) {
+    this.drugsDispensed = flatten(
+      visit?.encounters
+        ?.map((encounter) => {
+          return (
+            encounter?.orders.filter(
+              (order) => order.orderType?.uuid == genericPrescriptionOrderType
+            ) || []
+          )?.map((genericDrugOrder) => {
+            return {
+              ...genericDrugOrder,
+              obs: keyBy(
+                encounter?.obs?.map((observation) => {
+                  return {
+                    ...observation,
+                    conceptKey: observation?.concept?.uuid,
+                    valueIsObject: observation?.value?.uuid ? true : false,
+                  };
+                }),
+                "conceptKey"
+              ),
+            };
+          });
+        })
+        ?.filter((order) => order)
+    );
   }
 }
