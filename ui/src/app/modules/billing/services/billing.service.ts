@@ -69,6 +69,8 @@ export class BillingService {
     const file = discountDetails?.file;
     let formData = new FormData();
 
+    console.log("==> File: ", file)
+
     formData.append("json", JSON.stringify(discountedBill));
     formData.append("document", file);
 
