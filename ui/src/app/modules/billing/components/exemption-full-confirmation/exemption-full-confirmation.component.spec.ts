@@ -3,22 +3,22 @@ import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { DebugElement } from '@angular/core';
 
-import { DeleteConfirmationComponent } from './delete-confirmation.component';
+import { ExemptionFullConfirmationComponent } from './exemption-full-confirmation.component';
 import { matDialogRefMock } from 'src/test-mocks/material.mocks';
 
-describe('ExemptionConfirmationComponent', () => {
-  let component: DeleteConfirmationComponent;
-  let fixture: ComponentFixture<DeleteConfirmationComponent>;
+describe('ExemptionFullConfirmationComponent', () => {
+  let component: ExemptionFullConfirmationComponent;
+  let fixture: ComponentFixture<ExemptionFullConfirmationComponent>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [DeleteConfirmationComponent],
+      declarations: [ExemptionFullConfirmationComponent],
       providers: [matDialogRefMock],
     }).compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(DeleteConfirmationComponent);
+    fixture = TestBed.createComponent(ExemptionFullConfirmationComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

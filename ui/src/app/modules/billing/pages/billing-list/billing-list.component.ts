@@ -8,6 +8,7 @@ import { TableColumn } from 'src/app/shared/models/table-column.model';
 import { TableConfig } from 'src/app/shared/models/table-config.model';
 import { Api } from 'src/app/shared/resources/openmrs';
 import { Visit } from 'src/app/shared/resources/visits/models/visit.model';
+import { loadCurrentPatient } from 'src/app/store/actions';
 import { AppState } from 'src/app/store/reducers';
 import { getSettingCurrentLocationStatus } from 'src/app/store/selectors';
 
@@ -73,6 +74,7 @@ export class BillingListComponent implements OnInit {
   }
 
   onSelectPatient(patient) {
+    this.store.dispatch(loadCurrentPatient({uuid: patient?.patient?.uuid, isRegistrationPage: false}))
     this.router.navigate([`/billing/${patient?.patient?.uuid}/bills`]);
   }
 }

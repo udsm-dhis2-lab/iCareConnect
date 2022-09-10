@@ -117,6 +117,13 @@ export class OrdersService {
     );
   }
 
+  createOrder(order): Observable<any> {
+    return from(this.API.order.createOrder(order)).pipe(
+      map((order) => order),
+      catchError((error) => of(error))
+    );
+  }
+
   getOrdersFrequencies() {
     return from(
       this.API.orderfrequency.getAllOrderFrequencies({ v: "full" })
