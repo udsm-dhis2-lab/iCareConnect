@@ -92,6 +92,7 @@
                 (dosingUnitsSettingsEvent)="getDosingUnits($event)"
                 (durationUnitsSettingsEvent)="getDurationUnits($event)"
                 (drugRoutesSettingsEvent)="getDrugRoutes($event)"
+                (currentVisitEvent)="filterPrescribedOrdersFromVisit($event, params?.generalPrescriptionOrderType)"
                 (generalPrescriptionFrequencyConceptEvent)="
                   getDosingFrequencies($event)
                 "
@@ -201,6 +202,33 @@
             </div>
           </div>
           <div class="col-5">
+             <mat-accordion>
+              <mat-expansion-panel class="mb-2 border p-0" [expanded]="true">
+                <mat-expansion-panel-header>
+                  <mat-panel-title> Current Prescriptions </mat-panel-title>
+                </mat-expansion-panel-header>
+                <div class="current-prescriptions">
+                  <table class="table table-bordered table-striped">
+                    <thead>
+                      <tr>
+                        <th>S/N</th>
+                        <th>Drug Name</th>
+                        <th>Description</th>
+                        <th>Date Ordered</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let order of drugsDispensed, let index = index">
+                        <td>{{ index + 1 }}</td>
+                        <td>{{ order?.display }}</td>
+                        <td> {{ order.careSetting.display }}</td>
+                        <td> {{ order.dateActivated | date:'short' }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </mat-expansion-panel>
+            </mat-accordion>
             <mat-accordion>
               <mat-expansion-panel class="mb-2 border p-0" [expanded]="true">
                 <mat-expansion-panel-header>
