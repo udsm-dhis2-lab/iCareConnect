@@ -22,13 +22,14 @@ import { FormComponent } from "../../modules/form/components/form/form.component
 })
 export class DrugOrderFormComponent implements OnInit {
   @ViewChildren(FormComponent) formComponents: FormComponent[];
-  @Input() drugOrder: DrugOrderObject;
+  @Input() doctorPrescriptionDetails: any;
   @Input() fromDispensing: boolean;
   @Input() showAddButton: boolean;
   @Input() hideActionButtons: boolean;
   @Input() encounterUuid: string;
   @Input() provider: ProviderGet;
   @Input() drugOrderFormsMetadata: any;
+  @Input() drugs: any;
   drugFormField: Dropdown;
   @Input() patient: Patient;
   @Input() isFromDoctor: boolean;
@@ -50,16 +51,33 @@ export class DrugOrderFormComponent implements OnInit {
   constructor() {}
 
   ngOnInit(): void {
-    this.drugFormField = {
-      ...this.drugOrderFormsMetadata?.drugFormField,
-      conceptClass: "Drug",
-      shouldHaveLiveSearchForDropDownFields: true,
-      searchControlType: "Drug",
-      filteringItems: {
-        items: this.drugOrderFormsMetadata?.stockedDrugs,
-        applicable: this.dispensingLocations,
-      },
-    };
+    if (this.drugs?.results?.length > 0) {
+      this.drugFormField = new Dropdown({
+        id: "drug",
+        key: "drug",
+        label: `Select Drug`,
+        conceptClass: "Drug",
+        value: null,
+        options: this.drugs?.results?.map((drug) => {
+          return {
+            key: drug?.uuid,
+            value: drug?.uuid,
+            label: drug?.display,
+          };
+        }),
+      });
+    } else {
+      this.drugFormField = {
+        ...this.drugOrderFormsMetadata?.drugFormField,
+        conceptClass: "Drug",
+        shouldHaveLiveSearchForDropDownFields: true,
+        searchControlType: "Drug",
+        filteringItems: {
+          items: this.drugOrderFormsMetadata?.stockedDrugs,
+          applicable: this.dispensingLocations,
+        },
+      };
+    }
     this.quantityField = this.drugOrderFormsMetadata?.quantityField;
   }
 
@@ -136,7 +154,10 @@ export class DrugOrderFormComponent implements OnInit {
     this.formUpdate.emit({
       formName,
       formValue,
-      drugOrder: { ...this.drugOrder, ...this.drugOrderDetails },
+      drugOrder: {
+        ...this.doctorPrescriptionDetails,
+        ...this.drugOrderDetails,
+      },
       isTheOrderFromDoctor: this.isFromDoctor,
       patient: this.patient,
       provider: this.provider,
