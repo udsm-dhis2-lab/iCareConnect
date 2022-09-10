@@ -220,8 +220,8 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 			}
 			if (isFullExemptedCheck) {
 				
-				for(InvoiceItem invoiceItem:existingInvoice.getInvoiceItems()){
-
+				for (InvoiceItem invoiceItem : existingInvoice.getInvoiceItems()) {
+					
 					//Find the coresponding discount item
 					boolean found = false;
 					for (DiscountInvoiceItem discountItem : discountInvoiceItems) {

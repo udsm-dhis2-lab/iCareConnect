@@ -8,6 +8,10 @@
   		    http://www.springframework.org/schema/context
   		    http://www.springframework.org/schema/context/spring-context-3.0.xsd">
 
+	<bean id="multipartResolver"
+		  class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<property name="maxUploadSize" value="10485760"/>
+	</bean>
 	<context:component-scan base-package="org.openmrs.module.icare.web.controller" />
 
 </beans>
