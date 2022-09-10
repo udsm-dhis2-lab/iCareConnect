@@ -1,6 +1,7 @@
 import { Component, Input, OnInit } from "@angular/core";
 import { FormControl } from "@angular/forms";
 import { Store } from "@ngrx/store";
+import { data } from "cypress/types/jquery";
 import { filter, each, keyBy, uniqBy } from "lodash";
 import { Observable, of, zip } from "rxjs";
 import { catchError, map } from "rxjs/operators";
@@ -113,7 +114,7 @@ export class PatientLabResultsSummaryComponent implements OnInit {
             .subscribe((visitResponse) => {
               if (visitResponse) {
                 this.loadedLabOrders = true;
-                this.labOrdersResultsInformation = visitResponse.labOrders.map(
+                this.labOrdersResultsInformation = visitResponse?.labOrders.map(
                   (labOrder: any) => {
                     testsConcepts = uniqBy(
                       [...testsConcepts, labOrder?.order?.concept],
@@ -150,6 +151,7 @@ export class PatientLabResultsSummaryComponent implements OnInit {
                     });
                     return {
                       ...labOrder?.order,
+                      voided: labOrder?.voided,
                       result: observation,
                     };
                   }
