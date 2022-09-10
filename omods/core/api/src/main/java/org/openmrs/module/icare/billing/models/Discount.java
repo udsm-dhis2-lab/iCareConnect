@@ -108,37 +108,33 @@ public class Discount extends BaseChangeableOpenmrsData {
 		this.criteria = criteria;
 	}
 	
-
 	public Boolean getExempted() {
 		return exempted;
 	}
 	
 	public void setExempted(Boolean fullExempted) {
 		this.exempted = fullExempted;
-
+		
 	}
-
 	
 	public Map<String, Object> toMap() {
 		HashMap<String, Object> discountMap = new HashMap<String, Object>();
 		
 		discountMap.put("uuid", this.getUuid());
 		discountMap.put("remarks", this.getRemarks());
-
-		if(this.exempted != null){
+		
+		if (this.exempted != null) {
 			discountMap.put("isFullExempted", this.getExempted());
-
+			
 		}
 		HashMap<String, Object> criteria = new HashMap<String, Object>();
 		criteria.put("uuid", this.getCriteria().getUuid());
 		discountMap.put("criteria", criteria);
-
-
-		if(this.getAttachmentId() != null){
+		
+		if (this.getAttachmentId() != null) {
 			discountMap.put("attachmentId", this.getAttachmentId());
 		}
-
-
+		
 		HashMap<String, Object> patient = new HashMap<String, Object>();
 		patient.put("uuid", this.getPatient().getUuid());
 		discountMap.put("patient", patient);

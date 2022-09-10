@@ -206,32 +206,31 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 					existingInvoice.getInvoiceItems().add(invoiceItem);
 				}
 			}
-
-
+			
 			//Automatic discount creation for full exempted discounts
-
+			
 			List<DiscountInvoiceItem> discountInvoiceItems = existingInvoice.getDiscountItems();
-
+			
 			Boolean isFullExemptedCheck = false;
-
-			for (DiscountInvoiceItem discountItem: discountInvoiceItems) {
-				if(discountItem.getDiscount().getExempted()){
+			
+			for (DiscountInvoiceItem discountItem : discountInvoiceItems) {
+				if (discountItem.getDiscount().getExempted()) {
 					isFullExemptedCheck = true;
 				}
 			}
-			if(isFullExemptedCheck){
-
+			if (isFullExemptedCheck) {
+				
 				for(InvoiceItem invoiceItem:existingInvoice.getInvoiceItems()){
 
 					//Find the coresponding discount item
 					boolean found = false;
-					for (DiscountInvoiceItem discountItem: discountInvoiceItems) {
-						if(discountItem.getItem().getUuid().equals(invoiceItem.getItem().getUuid())){
+					for (DiscountInvoiceItem discountItem : discountInvoiceItems) {
+						if (discountItem.getItem().getUuid().equals(invoiceItem.getItem().getUuid())) {
 							found = true;
 							discountItem.setAmount(invoiceItem.getPrice() * invoiceItem.getQuantity());
 						}
 					}
-					if(!found){
+					if (!found) {
 						DiscountInvoiceItem discountInvoiceItem = new DiscountInvoiceItem();
 						discountInvoiceItem.setAmount(invoiceItem.getPrice() * invoiceItem.getQuantity());
 						discountInvoiceItem.setDiscount(discountInvoiceItems.get(0).getDiscount());
@@ -265,16 +264,16 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 
 
 					}*/
-
+					
 					//If it exists update the discount item amount with the price times quantity
-
+					
 					//If it does not exist then create a discount invoice item and set the amount based on the price times the quantity
-
+					
 					//Save the discounts
 				}
-
+				
 			}
-
+			
 			this.invoiceDAO.save(existingInvoice);
 		}
 		return orderMetaData.getOrder();
