@@ -156,20 +156,21 @@ export class ExemptionComponent implements OnInit, AfterContentInit {
     if (exemptionDetails) {
       let exemptionObject = {
         discountDetails: {
-          Criteria: exemptionDetails.Criteria,
-          isFullExempted: exemptionDetails.isFullExempted,
-          remarks: exemptionDetails.remarks,
-          items: exemptionDetails.items,
-          patient: exemptionDetails.patient,
+          Criteria: exemptionDetails?.discountDetails?.Criteria,
+          isFullExempted: exemptionDetails?.discountDetails?.isFullExempted
+            ? exemptionDetails?.discountDetails?.isFullExempted
+            : false,
+          remarks: exemptionDetails?.discountDetails?.remarks,
+          items: exemptionDetails?.discountDetails?.items,
+          patient: exemptionDetails?.discountDetails?.patient,
           attachmentDetails: {
-            file: exemptionDetails.file,
-            concept: this.attachmentConcept
-          }
+            file: exemptionDetails?.discountDetails?.file,
+            concept: this.attachmentConcept,
+          },
         },
-        patient: exemptionDetails.patient,
-        bill: exemptionDetails.bill
-      }
-
+        patient: exemptionDetails?.discountDetails?.patient,
+        bill: exemptionDetails.bill,
+      };
       const { bill, discountDetails, patient } = exemptionObject;
       this.store.dispatch(discountBill({ bill, discountDetails, patient }));
     }
