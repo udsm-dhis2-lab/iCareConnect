@@ -49,6 +49,7 @@ export class RegistrationHomeComponent implements OnInit {
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
   treatmentLocations$: Observable<any>;
+  showCard: boolean;
 
   constructor(
     private store: Store<AppState>,
@@ -167,7 +168,9 @@ export class RegistrationHomeComponent implements OnInit {
         }
       });
   }
-
+  onDisplayList(showCard: boolean) {
+    this.showCard = showCard;
+  }
   onSelectPatient(patient: Patient, e?: Event): void {
     if (e) {
       e.stopPropagation();
