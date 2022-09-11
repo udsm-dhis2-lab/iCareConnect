@@ -201,7 +201,8 @@ export class LocationsEffects implements OnInitEffects {
       switchMap(([action, locationsEntities]: [any, any]) => {
         return this.locationService
           .getLocationByIds(
-            action.locationUuids?.filter((uuid) => !locationsEntities[uuid])
+            action.locationUuids?.filter((uuid) => !locationsEntities[uuid]),
+            action?.params
           )
           .pipe(
             switchMap((locationsResponse) => {
@@ -212,17 +213,21 @@ export class LocationsEffects implements OnInitEffects {
                 ["display"],
                 ["asc"]
               );
+              let currentUserCurrentLocation;
               const storedCurrentLocation =
                 localStorage.getItem("currentLocation");
               if (!storedCurrentLocation || storedCurrentLocation === "null") {
-                localStorage.setItem(
-                  "currentLocation",
-                  JSON.stringify(formattedLocs[0])
-                );
+                currentUserCurrentLocation = formattedLocs[0];
+              } else {
+                currentUserCurrentLocation = JSON.parse(storedCurrentLocation);
               }
+
               return [
                 addLoadedLocations({
                   locations: formattedLocs || [],
+                }),
+                setCurrentUserCurrentLocation({
+                  location: currentUserCurrentLocation,
                 }),
                 updateCurrentLocationStatus({ settingLocation: false }),
               ];
