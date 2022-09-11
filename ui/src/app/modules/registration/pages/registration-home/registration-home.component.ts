@@ -18,6 +18,7 @@ import { getAllTreatmentLocations } from "src/app/store/selectors";
 import { StartVisitModelComponent } from "../../components/start-visit-model/start-visit-model.component";
 import { VisitStatusConfirmationModelComponent } from "../../components/visit-status-confirmation-model/visit-status-confirmation-model.component";
 import { PatientService } from "src/app/shared/services/patient.service";
+import { clearActiveVisit } from "src/app/store/actions/visit.actions";
 
 @Component({
   selector: "app-registration-home",
@@ -64,6 +65,7 @@ export class RegistrationHomeComponent implements OnInit {
 
   ngOnInit() {
     this.loadingData = false;
+    this.store.dispatch(clearActiveVisit());
     this.visitColumns = [
       { id: "index", label: "#" },
       { id: "patientName", label: "Name" },
