@@ -104,6 +104,8 @@ export class CurrentPatientBillingComponent implements OnInit {
               let paidAmount: number = 0;
               let paidItems: any[] = [];
               let givenItems: any[] = []
+              let item: any;
+
               
               
               //Get total amount that is already paid for an item
@@ -117,6 +119,7 @@ export class CurrentPatientBillingComponent implements OnInit {
                   }
                 }) 
               });
+              
               
               //Get total amount of the item from the list of items the patient has
               bill.billDetails.items.forEach((givenItem) => {
@@ -134,6 +137,7 @@ export class CurrentPatientBillingComponent implements OnInit {
               });
               
               
+
               // return givenItem with discounted amount if paid amount is less than item's price
               if (paidAmount < givenItems[0].price){
                 givenItems[0] = {
