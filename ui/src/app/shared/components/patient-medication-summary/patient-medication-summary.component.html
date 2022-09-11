@@ -1,12 +1,15 @@
 <div
   *ngIf="{
     drugOrders: drugOrders$ | async,
-    patientVisitData: patientVisitData$ | async
+    patientVisitData: patientVisitData$ | async,
+    generalPrescriptionOrderType: generalPrescriptionOrderType$ | async,
+    useGeneralPrescription: useGeneralPrescription$ | async,
+    currentVisit: currentVisit$ | async  
   } as drugParams"
 >
   <table
     class="table"
-    *ngIf="drugParams?.patientVisitData?.drugOrders && !forConsultation"
+    *ngIf="(drugParams?.patientVisitData?.drugOrders && !forConsultation) && drugParams?.useGeneralPrescription !== 'true' "
   >
     <thead>
       <tr>
@@ -34,9 +37,35 @@
       </tr>
     </tbody>
   </table>
+  <div *ngIf="drugParams?.currentVisit && drugParams?.generalPrescriptionOrderType">
+    <table class="w-100 table table-bordered">
+      <tbody>
+        <tr class="p-4">
+          <app-current-prescriptions 
+              [visit]="drugParams?.currentVisit" 
+              [genericPrescriptionOrderType]="drugParams?.generalPrescriptionOrderType"
+              ></app-current-prescriptions>
+        </tr>
+        <tr>
+          <td colspan="3">
+            <button
+              mat-flat-button
+              class="float-right"
+              color="primary"
+              (click)="onAddOrder($event)"
+            >
+              <mat-icon>add</mat-icon>
+              <span class="ml-2">Add Prescription</span>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
   <table
     class="table table-bordered"
-    *ngIf="drugParams?.patientVisitData?.drugOrders && forConsultation"
+    *ngIf="(drugParams?.patientVisitData?.drugOrders && forConsultation) && drugParams?.useGeneralPrescription !== 'true'"
   >
     <thead>
       <tr>
@@ -81,6 +110,7 @@
       </ng-container>
     </tbody>
   </table>
+
   <mat-progress-bar
     *ngIf="!drugParams?.patientVisitData?.drugOrders"
     mode="indeterminate"

@@ -1,9 +1,11 @@
 import { Component, Input, OnInit } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
-import { Store } from "@ngrx/store";
+import { select, Store } from "@ngrx/store";
 import { Observable } from "rxjs";
+import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { AppState } from "src/app/store/reducers";
 import { getAllUniqueDrugOrders } from "src/app/store/selectors";
+import { getActiveVisit } from "src/app/store/selectors/visit.selectors";
 import { DispensingFormComponent } from "../../dialogs";
 import { OrdersService } from "../../resources/order/services/orders.service";
 import { Visit } from "../../resources/visits/models/visit.model";
@@ -20,14 +22,27 @@ export class PatientMedicationSummaryComponent implements OnInit {
   @Input() fromDispensing: boolean;
   drugOrders$: Observable<any[]>;
   patientVisitData$: Observable<any>;
+  generalPrescriptionOrderType$: Observable<any>;
+  useGeneralPrescription$: Observable<any>;
+  currentVisit$: Observable<unknown>;
   constructor(
     private store: Store<AppState>,
     private ordersService: OrdersService,
     private dialog: MatDialog,
-    private visitService: VisitsService
+    private visitService: VisitsService,
+    private systemSettingsService: SystemSettingsService
   ) {}
 
   ngOnInit(): void {
+    this.generalPrescriptionOrderType$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        "iCare.clinic.prescription.orderType"
+      );
+    this.useGeneralPrescription$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        "iCare.clinic.useGeneralPrescription"
+      );
+    this.currentVisit$ = this.store.pipe(select(getActiveVisit));
     this.patientVisitData$ = this.visitService.getActiveVisit(
       this.patientVisit?.patientUuid,
       false,

@@ -202,6 +202,15 @@
           </div>
           <div class="col-5">
             <mat-accordion>
+              <mat-expansion-panel *ngIf="params?.generalPrescriptionOrderType && params?.currentVisit && params?.useGeneralPrescription" class="mb-2 border p-0" [expanded]="true">
+                <mat-expansion-panel-header>
+                  <mat-panel-title> Current Prescriptions </mat-panel-title>
+                </mat-expansion-panel-header>
+                  <app-current-prescriptions 
+                    [visit]="params?.currentVisit" 
+                    [genericPrescriptionOrderType]="params?.generalPrescriptionOrderType"
+                    ></app-current-prescriptions>
+              </mat-expansion-panel>
               <mat-expansion-panel class="mb-2 border p-0" [expanded]="true">
                 <mat-expansion-panel-header>
                   <mat-panel-title> Previous Prescription </mat-panel-title>
