@@ -78,6 +78,7 @@ import { SharedConfirmationDialogComponent } from "./shared-confirmation-dialog/
 import { DeleteConfirmationComponent } from "./delete-confirmation/delete-confirmation.component";
 import { UnitFieldComponent } from "./unit-field/unit-field.component";
 import { PatientGenericDrugOrderListComponent } from "./patient-generic-drug-order-list/patient-generic-drug-order-list.component";
+import { CurrentPrescriptionComponent } from "./current-prescriptions/current-prescriptions.component";
 
 export const components: any[] = [
   PatientSearchComponent,
@@ -159,7 +160,8 @@ export const components: any[] = [
   SharedConfirmationDialogComponent,
   DeleteConfirmationComponent,
   UnitFieldComponent,
-  PatientGenericDrugOrderListComponent
+  PatientGenericDrugOrderListComponent,
+  CurrentPrescriptionComponent
 ];
 
 export const sharedEntryComponents: any[] = [

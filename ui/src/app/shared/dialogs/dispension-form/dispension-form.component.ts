@@ -61,7 +61,6 @@ export class DispensingFormComponent implements OnInit {
   generalPrescriptionFrequencyConcept$: Observable<any>;
   dosingFrequencies$: Observable<any>;
   drugsToBeDispensed$: Observable<any>;
-  drugsDispensed: any;
   genericPrescriptionOrderType: any;
 
   constructor(
@@ -262,6 +261,7 @@ export class DispensingFormComponent implements OnInit {
             (errorResponse?.error?.message || "")
               .replace("[", "")
               .replace("]", "");
+          this.dialogRef.close(true);
           this.savingOrderSuccess = false;
         }
       );
@@ -305,31 +305,7 @@ export class DispensingFormComponent implements OnInit {
       this.drugsService.getDrugsUsingConceptUuid(conceptUuid);
   }
 
-  filterPrescribedOrdersFromVisit(visit, genericPrescriptionOrderType) {
-    this.drugsDispensed = flatten(
-      visit?.encounters
-        ?.map((encounter) => {
-          return (
-            encounter?.orders.filter(
-              (order) => order.orderType?.uuid == genericPrescriptionOrderType
-            ) || []
-          )?.map((genericDrugOrder) => {
-            return {
-              ...genericDrugOrder,
-              obs: keyBy(
-                encounter?.obs?.map((observation) => {
-                  return {
-                    ...observation,
-                    conceptKey: observation?.concept?.uuid,
-                    valueIsObject: observation?.value?.uuid ? true : false,
-                  };
-                }),
-                "conceptKey"
-              ),
-            };
-          });
-        })
-        ?.filter((order) => order)
-    );
+  onCloseDialog(closeDialog: boolean): void {
+    this.dialogRef.close(closeDialog);
   }
 }
