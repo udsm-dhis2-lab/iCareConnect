@@ -75,7 +75,6 @@ export class DrugOrderComponent implements OnInit, AfterViewInit {
 
   ngOnInit() {
     this.getDrugsByConceptUuid.emit(this.drugOrder?.concept?.uuid);
-    console.log("dosingUnitsSettings", this.dosingUnitsSettings);
 
     this.isTheOrderFromDoctor =
       this.drugOrder && this.drugOrder.drugUuid ? false : true;
@@ -126,9 +125,7 @@ export class DrugOrderComponent implements OnInit, AfterViewInit {
     // );
   }
 
-  ngAfterViewInit(): void {
-    console.log("==> Drugs: ", this.drugsToBeDispensed);
-  }
+  ngAfterViewInit(): void {}
 
   onOrderingDrug(data): void {
     this.drugOrdered.emit(data);

@@ -70,8 +70,10 @@ export class GeneralDispensingFormComponent implements OnInit {
   @Output() dosingUnitsSettingsEvent: EventEmitter<any> = new EventEmitter();
   @Output() durationUnitsSettingsEvent: EventEmitter<any> = new EventEmitter();
   @Output() drugRoutesSettingsEvent: EventEmitter<any> = new EventEmitter();
-  @Output() currentVisitEvent: EventEmitter<any> = new EventEmitter();
   @Output() generalPrescriptionFrequencyConceptEvent: EventEmitter<any> = new EventEmitter();
+
+  @Output() showCloseDialog: EventEmitter<boolean> =
+    new EventEmitter<boolean>();
 
   constructor(
     private drugOrderService: DrugOrdersService,
@@ -81,11 +83,9 @@ export class GeneralDispensingFormComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    console.log("==> Visit: ", this.currentVisit);
     this.dosingUnitsSettingsEvent.emit(this.dosingUnitsSettings);
     this.durationUnitsSettingsEvent.emit(this.durationUnitsSettings);
     this.drugRoutesSettingsEvent.emit(this.drugRoutesSettings);
-    this.currentVisitEvent.emit(this.currentVisit);
     this.generalPrescriptionFrequencyConceptEvent.emit(
       this.generalPrescriptionFrequencyConcept
     );

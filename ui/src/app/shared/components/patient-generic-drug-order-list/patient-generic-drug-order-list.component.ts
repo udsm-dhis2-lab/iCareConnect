@@ -33,6 +33,7 @@ export class PatientGenericDrugOrderListComponent implements OnInit {
   @Input() generalMetadataConfigurations: any;
   @Input() genericPrescriptionOrderType: any;
   @Input() genericPrescriptionEncounterType: any;
+  @Input() useGenericPrescription: boolean;
   visitLoadingState$: Observable<boolean>;
 
   drugOrderColumns: TableColumn[];
@@ -41,19 +42,24 @@ export class PatientGenericDrugOrderListComponent implements OnInit {
   drugOrders$: Observable<any>;
   drugOrders: any[];
 
+  drugOrdersKeyedByEncounter: any = {};
+
   @Output() orderSelectAction = new EventEmitter<TableSelectAction>();
 
-  constructor(
-    private dialog: MatDialog,
-    private store: Store<AppState>,
-    private drugOrderService: DrugOrdersService,
-    private ordersService: OrdersService
-  ) {}
+  constructor(private dialog: MatDialog, private store: Store<AppState>) {}
 
   ngOnInit() {
     this.drugOrders = flatten(
       this.visit?.encounters
         ?.map((encounter) => {
+          encounter?.orders?.forEach((order) => {
+            if (
+              order?.orderType?.javaClassName ===
+              "org.openmrs.module.icare.billing.models.Prescription"
+            ) {
+              this.drugOrdersKeyedByEncounter[order?.encounter?.uuid] = order;
+            }
+          });
           return (
             encounter?.orders.filter(
               (order) =>
@@ -75,7 +81,11 @@ export class PatientGenericDrugOrderListComponent implements OnInit {
             };
           });
         })
-        ?.filter((order) => order)
+        ?.filter((order) => order) || []
+    );
+
+    this.drugOrders = this.drugOrders?.filter(
+      (order) => !this.drugOrdersKeyedByEncounter[order?.encounter?.uuid]
     );
 
     this.visitLoadingState$ = this.store.select(getVisitLoadingState);
