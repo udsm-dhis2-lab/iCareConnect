@@ -79,6 +79,7 @@ export class RegistrationAddComponent implements OnInit {
   occupationInfo$: Observable<any[]>;
   educationInfo$: Observable<any[]>;
   maritalstatusInfo$: Observable<any[]>;
+  relationTypeOptions$: Observable<any>;
 
   constructor(
     private _snackBar: MatSnackBar,
@@ -205,9 +206,10 @@ export class RegistrationAddComponent implements OnInit {
       formValueObject.getValues()?.primaryMobileNumber?.value;
   }
 
-  setRelationshipType(relationshipType) {
-    this.patient.RelationshipType = relationshipType;
-  }
+  /* setRelationshipType(relationshipType) {
+    this.patient.RelationshipType = relationshipType.target.value;
+    console.log(this.patient.RelationshipType);
+  } */
 
   setNewPatient(option) {
     this.patient.newPatient = option;
@@ -299,6 +301,10 @@ export class RegistrationAddComponent implements OnInit {
     this.occupationInfo$ = this.conceptService.getConceptDetailsByUuid(
       "c3d16c94-4e03-4b19-9491-43d10f470981",
       "custom:(uuid,display,names,answers:(uuid,display,names),setMembers:(uuid,display,answers:(uuid,display,names)))"
+    );
+    this.relationTypeOptions$ = this.conceptService.getConceptDetailsByUuid(
+      "a74b0803-0aae-43a7-84f9-2daa2cd19332",
+      "custom:(uuid,display,names,answers:(uuid,display,names,mappings))"
     );
     /*
     this.educationInfo$ = this.conceptService.getConceptDetailsByUuid(
