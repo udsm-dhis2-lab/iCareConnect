@@ -6,7 +6,8 @@
       updateCurrentMRNSystemSettingsResponse$ | async,
     genderOptions: genderOptions$ | async,
     additionalPatientInformation: additionalPatientInformation$ | async,
-    occupationInfo: occupationInfo$ | async
+    occupationInfo: occupationInfo$ | async,
+    relationTypeOptions: relationTypeOptions$ | async
   } as params"
 >
   <h2>{{ editMode ? "Edit Patient" : "Register New Patient" }}</h2>
@@ -654,13 +655,27 @@
 
               <mat-form-field appearance="fill" class="w-100 ml-2">
                 <mat-label>Relationship Type</mat-label>
-                <mat-select>
+                <!-- <mat-select>
                   <mat-option
                     *ngFor="let relationshipType of []"
                     [value]="relationshipType"
                     (click)="setRelationshipType(relationshipType)"
                   >
                     {{ relationshipType }}
+                  </mat-option>
+                </mat-select> -->
+                <mat-select
+                  id="relationshipType"
+                  name="relationshipType"
+                  placeholder="Select Relationship Type"
+                  [disabled]="addingPatient && !patientAdded"
+                  [(ngModel)]="patient['RelationshipType']"
+                >
+                  <mat-option
+                    [value]="option?.display"
+                    *ngFor="let option of params?.relationTypeOptions?.answers"
+                  >
+                    {{ option?.display }}
                   </mat-option>
                 </mat-select>
               </mat-form-field>

@@ -81,6 +81,9 @@ export class MenuComponent implements OnInit {
               .split(" ")
               .join("")
           ),
+          params: {
+            v: `custom:(display,uuid,tags:(uuid,display),parentLocation:(uuid,display),attributes,retired)`,
+          },
         })
       );
 
