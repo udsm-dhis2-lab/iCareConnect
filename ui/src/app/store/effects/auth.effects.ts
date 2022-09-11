@@ -68,6 +68,9 @@ export class AuthEffects {
                           .split("'")
                           .join('"')
                       ),
+                      params: {
+                        v: `custom:(display,uuid,tags:(uuid,display),parentLocation:(uuid,display),attributes,retired)`,
+                      },
                     }),
                     initiateEncounterType(),
                   ]
