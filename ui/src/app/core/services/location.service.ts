@@ -81,10 +81,23 @@ export class LocationService {
     );
   }
 
-  getLocationByIds(uuids): Observable<any> {
+  getLocationByIds(uuids, params?: any): Observable<any> {
+    let parameters = [];
+    if (params && params?.v) {
+      parameters = [...parameters, `v=${params?.v}`];
+    } else {
+      parameters = [...parameters, `v=full`];
+    }
+
+    if (params && params?.limit) {
+      parameters = [...parameters, `limit=${params?.limit}`];
+    }
+    if (params && params?.startIndex) {
+      parameters = [...parameters, `startIndex=${params?.startIndex}`];
+    }
     return zip(
       ...uuids?.map((uuid) =>
-        this.httpClient.get("location/" + uuid + "?v=full").pipe(
+        this.httpClient.get(`location/${uuid}?${parameters?.join(`&`)}`).pipe(
           map((response) => {
             return {
               ...response,

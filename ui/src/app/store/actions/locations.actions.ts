@@ -18,7 +18,7 @@ export const loadLocationById = createAction(
 
 export const loadLocationByIds = createAction(
   "[LOCATIONS] load location By Location IDS",
-  props<{ locationUuids: string[] }>()
+  props<{ locationUuids: string[]; params?: any }>()
 );
 
 export const addLoadedLocations = createAction(
