@@ -7,15 +7,14 @@
       <span class="ml-2">Exemption</span>
     </mat-toolbar>
     <!-- patient list -->
-    <div class="mat-elevation-z1">
-      <app-table
-        [columns]="billingColumns"
-        [loading]="loadingVisits"
-        [loadingDataError]="loadingVisitsError"
-        [tableConfig]="tableConfig"
-        [data$]="visitsWithBiling$"
-        (selectRow)="onSelectVisit($event)"
-      ></app-table>
+    <div class="mat-elevation-z1" *ngIf="visitsLength > 0">
+      <app-table [columns]="billingColumns" [loading]="loadingVisits" [loadingDataError]="loadingVisitsError"
+        [tableConfig]="tableConfig" [data$]="visits$" (selectRow)="onSelectVisit($event)"></app-table>
+    </div>
+    <div class="no-exemptions" *ngIf="visitsLength == 0">
+      <h4>
+        No Exemption Requests at the moment
+      </h4>
     </div>
   </div>
 </div>

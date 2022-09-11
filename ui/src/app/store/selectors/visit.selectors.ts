@@ -110,3 +110,25 @@ export const getPatientVisitsForAdmissionAddedState = createSelector(
   getVisitState,
   (visit: VisitState) => visit?.patientAdmittedVisitsAdded
 );
+
+export const getIsPatientSentForExemption = (orderTypeUuid: string) => createSelector(
+  getActiveVisit,
+  (activeVisit) => {
+    if (activeVisit) {
+      let encountersWithExemptionOrderActive = activeVisit.encounters.filter((encounter) => {
+        //TODO: to be worked on making sure fulfiller status is one of the order properties in an encounter orders list
+        let orders =  encounter.orders.filter((order) => {
+          if(order.orderType.uuid === orderTypeUuid){
+            return order
+          }
+        })
+        if(orders.length > 0){
+          return encounter;
+        }
+      })
+      return encountersWithExemptionOrderActive.length > 0 ? true : false;
+    } else {
+      return false;
+    }
+  }
+);

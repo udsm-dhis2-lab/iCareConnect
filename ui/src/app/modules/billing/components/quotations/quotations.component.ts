@@ -44,6 +44,7 @@ export class QuotationsComponent implements OnInit {
   @Input() currentPatient: any;
   @Input() logo: any;
   @Input() facilityDetails: any;
+  @Input() exemptionOrderType: any;
   displayedColumns: any[];
   columns: any[];
   dataSource: MatTableDataSource<any>;
@@ -56,6 +57,7 @@ export class QuotationsComponent implements OnInit {
     paymentInput: PaymentInput;
   }>();
   @Output() billPaymentSuccess = new EventEmitter<any>();
+  @Output() checkOpenExemptionRequest = new EventEmitter<any>();
   constructor() {}
 
   get isAllSelected() {
@@ -67,6 +69,9 @@ export class QuotationsComponent implements OnInit {
     // console.log("************************")
     // console.log(this.patientBillingDetails);
     // console.log(this.bills)
+    if(this.exemptionOrderType){
+      this.checkOpenExemptionRequest.emit(this.exemptionOrderType?.value)
+    }
 
     this.columns = [{ id: "orderNumber", label: "Order Number" }];
     this.displayedColumns = ["orderNumber", "select"];

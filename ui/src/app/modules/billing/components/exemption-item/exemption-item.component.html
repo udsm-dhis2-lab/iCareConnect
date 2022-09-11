@@ -6,7 +6,15 @@
       (formUpdate)="onFormUpdate($event)"
     ></app-form>
     <div>
-      <input  autocomplete="off" class="w-100" type="file" />
+      <input
+        type="file"
+        style="border: none; background-color: transparent"
+        class="form-control"
+        name="file"
+        accept=".pdf, .png, .jpg"
+        id="file-selector"
+        (change)="fileSelection($event)"
+      />
     </div>
     <div class="mt-3">
       <app-form
@@ -51,7 +59,7 @@
               id="input-exemption-discount-{{ itemIndex }}"
               [value]="item.discount"
               matInput
-              autocomplete="off" 
+              autocomplete="off"
               (change)="onDiscountUpdate($event, item)"
               [disabled]="item?.discounted"
             />
@@ -67,7 +75,13 @@
     <div class="d-flex justify-content-end mt-3">
       <mat-form-field>
         <mat-label>Discount</mat-label>
-        <input  autocomplete="off" type="text" matInput [value]="totalBillDiscount" disabled />
+        <input
+          autocomplete="off"
+          type="text"
+          matInput
+          [value]="totalBillDiscount"
+          disabled
+        />
       </mat-form-field>
 
       <mat-form-field class="ml-4">
@@ -76,7 +90,7 @@
           id="payable-summary"
           type="text"
           matInput
-          autocomplete="off" 
+          autocomplete="off"
           [value]="totalPayableBill"
           disabled
         />
