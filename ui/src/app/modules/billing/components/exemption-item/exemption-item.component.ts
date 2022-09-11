@@ -172,6 +172,11 @@ export class ExemptionItemComponent implements OnInit {
     const dialog = this.dialog.open(ExemptionConfirmationComponent, {
       width: "25%",
       panelClass: "custom-dialog-container",
+      data: {
+        modelTitle: "Exemption confirmation",
+        modelMessage:
+          "This is to confirm that you have exempted from the client",
+      },
     });
 
     dialog.afterClosed().subscribe((data) => {

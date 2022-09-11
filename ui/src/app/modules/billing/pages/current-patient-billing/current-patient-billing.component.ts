@@ -29,7 +29,9 @@ import { getEncounterTypeByName } from "src/app/store/selectors/encounter-type.s
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { MatTableDataSource } from "@angular/material/table";
 import { getIsPatientSentForExemption } from "src/app/store/selectors/visit.selectors";
-import { loadCurrentPatient } from "src/app/store/actions";
+import { go, loadCurrentPatient } from "src/app/store/actions";
+import { MatDialog } from "@angular/material/dialog";
+import { ExemptionConfirmationComponent } from "../../components/exemption-confirmation/exemption-confirmation.component";
 
 @Component({
   selector: "app-current-patient-billing",
@@ -64,7 +66,7 @@ export class CurrentPatientBillingComponent implements OnInit {
   exemptionOrderType$: Observable<any>;
   exemptionConcept$: Observable<any>;
   hasOpenExemptionRequest: boolean;
-  
+
   constructor(
     private route: ActivatedRoute,
     private visitService: VisitsService,
@@ -75,16 +77,18 @@ export class CurrentPatientBillingComponent implements OnInit {
     private encounterService: EncountersService,
     private ordersService: OrdersService,
     private systemSettingsService: SystemSettingsService,
-    private store: Store<AppState>
+    private store: Store<AppState>,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit() {
     this.patientId = this.route?.snapshot?.params?.patientId;
     this._getPatientDetails();
 
-
     this.currentPatient$ = this.patientService.getPatient(this.patientId);
-    this.store.dispatch(loadCurrentPatient({uuid: this.patientId, isRegistrationPage: false}));
+    this.store.dispatch(
+      loadCurrentPatient({ uuid: this.patientId, isRegistrationPage: false })
+    );
     this.currentUser$ = this.store.select(getCurrentUserDetails);
     this.facilityDetails$ = this.configService.getFacilityDetails();
     this.facilityLogo$ = this.configService.getLogo();
@@ -96,78 +100,65 @@ export class CurrentPatientBillingComponent implements OnInit {
     this.billingService.getPatientBills(this.patientId, false, "all").subscribe({
       next: (bills) => {
         bills.forEach((bill) => {
-          if(bill){
-            this.bill = bill;
-            //Get discounted Items
-            
-            bill.billDetails.discountItems.forEach((discountItem) => {
-              let paidAmount: number = 0;
-              let paidItems: any[] = [];
-              let givenItems: any[] = []
-              let item: any;
+            if (bill) {
+              this.bill = bill;
+              //Get discounted Items
 
-              
-              
-              //Get total amount that is already paid for an item
-              bill.billDetails.payments.forEach((payment) => {
-                payment.items.forEach((paymentItem) =>{
-                  if(discountItem.item.uuid === paymentItem.item.uuid){
-                    paidItems = [
-                      ...paidItems,
-                      paymentItem
-                    ];
-                  }
-                }) 
-              });
-              
-              
-              //Get total amount of the item from the list of items the patient has
-              bill.billDetails.items.forEach((givenItem) => {
-                if(discountItem.item.uuid === givenItem.item.uuid){
-                  givenItems = [
-                    ...givenItems,
-                    givenItem
-                  ]
-                }
-              });
-              
-              //calculate total amount paid
-              paidItems.forEach((paymentItem) => {
-                paidAmount = paidAmount + parseInt(paymentItem.amount, 10);
-              });
-              
-              
+              bill.billDetails.discountItems.forEach((discountItem) => {
+                let paidAmount: number = 0;
+                let paidItems: any[] = [];
+                let givenItems: any[] = [];
+                let item: any;
 
-              // return givenItem with discounted amount if paid amount is less than item's price
-              if (paidAmount < givenItems[0].price){
-                givenItems[0] = {
-                  ...givenItems[0],
-                  price: discountItem.amount
-                }
-
-                //Filterout for items that were exempted twice
-                this.discountItems = this.discountItems.filter((discountItem) => {
-                    if(!(discountItem.item.uuid === givenItems[0].item.uuid)){
-                      return discountItem
+                //Get total amount that is already paid for an item
+                bill.billDetails.payments.forEach((payment) => {
+                  payment.items.forEach((paymentItem) => {
+                    if (discountItem.item.uuid === paymentItem.item.uuid) {
+                      paidItems = [...paidItems, paymentItem];
                     }
-                  }
-                )
-                
-                this.discountItems = [
-                  ...this.discountItems,
-                  givenItems[0]
-                ]
-                
-              }
-            });
+                  });
+                });
 
-            
-            this.discountItemsCount = this.discountItems.length > 0 ? this.discountItems.length : 0;
-            
-          }
-        })
-      }
-    });
+                //Get total amount of the item from the list of items the patient has
+                bill.billDetails.items.forEach((givenItem) => {
+                  if (discountItem.item.uuid === givenItem.item.uuid) {
+                    givenItems = [...givenItems, givenItem];
+                  }
+                });
+
+                //calculate total amount paid
+                paidItems.forEach((paymentItem) => {
+                  paidAmount = paidAmount + parseInt(paymentItem.amount, 10);
+                });
+
+                // return givenItem with discounted amount if paid amount is less than item's price
+                if (paidAmount < givenItems[0].price) {
+                  givenItems[0] = {
+                    ...givenItems[0],
+                    price: discountItem.amount,
+                  };
+
+                  //Filterout for items that were exempted twice
+                  this.discountItems = this.discountItems.filter(
+                    (discountItem) => {
+                      if (
+                        !(discountItem.item.uuid === givenItems[0].item.uuid)
+                      ) {
+                        return discountItem;
+                      }
+                    }
+                  );
+
+                  this.discountItems = [...this.discountItems, givenItems[0]];
+                }
+              });
+
+              this.discountItemsCount =
+                this.discountItems.length > 0 ? this.discountItems.length : 0;
+            }
+          });
+        },
+      });
 
     // Get exemption encounter Type
     this.exemptionEncounterType$ = this.systemSettingsService
@@ -182,7 +173,7 @@ export class CurrentPatientBillingComponent implements OnInit {
         })
       );
 
-     //Get exemption order type
+    //Get exemption order type
     this.exemptionOrderType$ = this.systemSettingsService
       .getSystemSettingsByKey("icare.billing.exemption.orderType")
       .pipe(
@@ -196,14 +187,16 @@ export class CurrentPatientBillingComponent implements OnInit {
       );
 
     //Get exemption Concept
-    this.exemptionConcept$ = this.systemSettingsService.getSystemSettingsByKey("icare.billing.exemption.concept").pipe(
+    this.exemptionConcept$ = this.systemSettingsService
+      .getSystemSettingsByKey("icare.billing.exemption.concept")
+      .pipe(
         tap((exemptionConcept) => {
           return exemptionConcept;
         }),
         catchError((error) => {
           return of(new MatTableDataSource([error]));
         })
-      )
+      );
   }
 
   private _getPatientDetails() {
@@ -212,7 +205,7 @@ export class CurrentPatientBillingComponent implements OnInit {
     this.patientBillingDetails$ = zip(
       this.visitService.getActiveVisit(this.patientId, false),
       this.billingService.getPatientBills(this.patientId),
-      this.paymentService.getPatientPayments(this.patientId),
+      this.paymentService.getPatientPayments(this.patientId)
     ).pipe(
       map((res) => {
         this.loading = false;
@@ -222,15 +215,15 @@ export class CurrentPatientBillingComponent implements OnInit {
         return {
           visit,
           bills: bills.filter((bill) => {
-            if(!bill.isInsurance && bill.items.length > 0){
-              return bill
+            if (!bill.isInsurance && bill.items.length > 0) {
+              return bill;
             }
           }),
           payments,
           paymentItemCount: payments
             .map((payment) => payment?.items?.length || 0)
             .reduce((sum, count) => sum + count, 0),
-          pendingPayments: bills.filter((bill) => bill.isInsurance)
+          pendingPayments: bills.filter((bill) => bill.isInsurance),
         };
       }),
       catchError((error) => {
@@ -251,11 +244,12 @@ export class CurrentPatientBillingComponent implements OnInit {
   }
 
   onCheckOpenExemptionRequest(orderTypeUuid: any): any {
-    this.store.select(getIsPatientSentForExemption(orderTypeUuid)).subscribe((value) => this.hasOpenExemptionRequest = value);
+    this.store
+      .select(getIsPatientSentForExemption(orderTypeUuid))
+      .subscribe((value) => (this.hasOpenExemptionRequest = value));
   }
 
   requestExemption(patientBillingDetails, params) {
-    
     let currentDate = new Date();
 
     let exemptionEncounterStart = {
@@ -282,21 +276,38 @@ export class CurrentPatientBillingComponent implements OnInit {
           patient: params?.currentPatient?.id,
           concept: params?.exemptionConcept,
           orderer: params.provider?.uuid,
-          type: "order"
+          type: "order",
         },
-      ]
+      ],
     };
 
-    
-    this.ordersService.createOrdersViaCreatingEncounter(exemptionEncounterStart).subscribe({
-      next: (encounter) => {
-        this.hasOpenExemptionRequest = true;
-        return encounter;
+    const dialog = this.dialog.open(ExemptionConfirmationComponent, {
+      width: "25%",
+      panelClass: "custom-dialog-container",
+      data: {
+        modelTitle: "Request confirmation",
+        modelMessage:
+          "This is to confirm that you are requesting exemption  for this patient",
       },
-      error: (err) => {
-        return err;
+    });
+
+    dialog.afterClosed().subscribe((data) => {
+      if (data?.confirmed) {
+        this.ordersService
+          .createOrdersViaCreatingEncounter(exemptionEncounterStart)
+          .subscribe({
+            next: (encounter) => {
+              this.hasOpenExemptionRequest = true;
+              this.store.dispatch(go({path: ['/billing']}))
+              return encounter;
+            },
+            error: (err) => {
+              return err;
+            },
+          });
       }
     });
+
   }
 
   onPrint(e: any): void {

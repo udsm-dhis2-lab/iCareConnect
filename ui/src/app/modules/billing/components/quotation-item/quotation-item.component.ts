@@ -86,7 +86,7 @@ export class QuotationItemComponent implements OnInit {
       { id: "quantity", label: "Quantity" },
       { id: "price", label: "Unit Price", isCurrency: true },
       { id: "discount", label: "Discount", isCurrency: true },
-      { id: "amount", label: "Amount", isCurrency: true },
+      { id: "amount", label: "Payable Amount", isCurrency: true },
     ];
     this.displayedColumns = [
       ...this.columns.map((column) => column.id),

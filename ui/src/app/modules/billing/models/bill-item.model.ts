@@ -20,7 +20,7 @@ export class BillItem {
   }
 
   get amount(): number {
-    return this.quantity * this.price;
+    return (this.quantity * this.price) - this.discount;
   }
 
   get order(): any {
