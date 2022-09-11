@@ -33,6 +33,7 @@ import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
 import { PhoneNumber } from "src/app/shared/modules/form/models/phone-number.model";
 import { ConceptsService } from "src/app/shared/resources/concepts/services/concepts.service";
 import { ThisReceiver } from "@angular/compiler";
+import { clearActiveVisit } from "src/app/store/actions/visit.actions";
 
 @Component({
   selector: "app-registration-add",
@@ -284,6 +285,7 @@ export class RegistrationAddComponent implements OnInit {
       this.registrationFormConfigs,
       "referenceKeyPart"
     );
+    this.store.dispatch(clearActiveVisit());
 
     this.genderOptions$ = this.conceptService.getConceptDetailsByUuid(
       "bad70d90-9bac-401a-8c49-a440f6a07bf5",

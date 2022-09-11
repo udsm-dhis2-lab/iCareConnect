@@ -79,6 +79,7 @@ import { DeleteConfirmationComponent } from "./delete-confirmation/delete-confir
 import { UnitFieldComponent } from "./unit-field/unit-field.component";
 import { PatientGenericDrugOrderListComponent } from "./patient-generic-drug-order-list/patient-generic-drug-order-list.component";
 import { CurrentPrescriptionComponent } from "./current-prescriptions/current-prescriptions.component";
+import { IcareSupportGoogleFormComponent } from "./icare-support-google-form/icare-support-google-form.component";
 
 export const components: any[] = [
   PatientSearchComponent,
@@ -161,7 +162,8 @@ export const components: any[] = [
   DeleteConfirmationComponent,
   UnitFieldComponent,
   PatientGenericDrugOrderListComponent,
-  CurrentPrescriptionComponent
+  CurrentPrescriptionComponent,
+  IcareSupportGoogleFormComponent,
 ];
 
 export const sharedEntryComponents: any[] = [
