@@ -60,7 +60,12 @@
       </div>
 
       <!-- active visit section -->
-      <mat-card class="col-12" *ngIf="params?.activeVisit && !editMode">
+      <mat-card
+        class="col-12"
+        *ngIf="
+          params?.activeVisit && !params?.activeVisit?.stopDate && !editMode
+        "
+      >
         <h2>Patient already has active visit</h2>
         <div class="row mt-2">
           <div class="col-3">Service Departments</div>
@@ -152,7 +157,12 @@
       <div
         class="col-12 p-3 border"
         style="border-radius: 5px"
-        *ngIf="(!params?.activeVisit && !params?.loadingVisit) || editMode"
+        *ngIf="
+          (params?.activeVisit &&
+            params?.activeVisit?.stopDate &&
+            !params?.loadingVisit) ||
+          editMode
+        "
       >
         <!-- 
       {{
