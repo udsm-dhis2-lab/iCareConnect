@@ -14,6 +14,7 @@ import { PatientService } from "../../resources/patient/services/patients.servic
 })
 export class PatientSearchComponent implements OnInit {
   @Output() selectPatient: EventEmitter<any> = new EventEmitter();
+  @Output() displayList: EventEmitter<any> = new EventEmitter();
   patients$: Observable<any>;
   searching: boolean;
   showList: boolean;
@@ -41,7 +42,11 @@ export class PatientSearchComponent implements OnInit {
       );
       if (e.target.value.length > 0) {
         this.focused = true;
-      } else this.focused = false;
+      } else {
+        this.focused = false;
+      }
+
+      this.displayList.emit(this.focused);
     }
   }
   onSelectPatient(e, patient: Patient): void {

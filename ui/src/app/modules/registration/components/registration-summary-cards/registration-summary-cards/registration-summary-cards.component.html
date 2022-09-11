@@ -1,22 +1,13 @@
 <div class="summary-card w-100">
-  <mat-card class="summary-card">
+  <mat-card>
     <mat-card-title
-      style="padding-bottom: 0px; margin-bottom: 1px; font-size: 20px"
-      >{{ roomNo }}</mat-card-title
-    >
-    <span
-      style="
-        display: inline-block;
-        margin-left: 5px;
-        margin-right: 5px;
-        width: 100%;
-        border-bottom: 1px solid #eefffe;
-        top: 0%;
-      "
-    ></span>
-    <mat-card-subtitle class="ml-2">{{ doctorName }}</mat-card-subtitle>
+      style="padding-bottom: 0px; margin-bottom: 1px; font-size: 15px"
+      >{{ roomNo }}
+    </mat-card-title>
+
+    <!-- <mat-card-subtitle class="ml-2">{{ doctorName }}</mat-card-subtitle> -->
     <mat-card-content>
-      <p>Active patient: {{ totalActivePatients }}</p>
+      <p class="mt-2">Active patient: {{ totalActivePatients }}</p>
     </mat-card-content>
   </mat-card>
 </div>
