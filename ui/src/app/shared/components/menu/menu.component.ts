@@ -46,6 +46,8 @@ export class MenuComponent implements OnInit {
   currentLocation$: Observable<Location>;
   showPatientSearch$: Observable<boolean>;
   lisConfigurations$: Observable<any>;
+
+  isSupportOpened: boolean = false;
   constructor(
     private router: Router,
     public dialog: MatDialog,
@@ -118,10 +120,20 @@ export class MenuComponent implements OnInit {
       panelClass: "custom-dialog-container",
     });
   }
-  oncChangePassword() {
+  onChangePassword(event: Event): void {
+    // event.stopPropagation();
     this.matDialogRef = this.dialog.open(ChangePasswordComponent, {
       width: "25%",
       disableClose: true,
     });
+  }
+
+  onOpenSupportPage(event: Event): void {
+    // event.stopPropagation();
+    this.isSupportOpened = true;
+  }
+
+  onSupportClose(isOpened): void {
+    this.isSupportOpened = isOpened;
   }
 }
