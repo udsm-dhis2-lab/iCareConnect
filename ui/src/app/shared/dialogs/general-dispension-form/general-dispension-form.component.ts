@@ -70,8 +70,7 @@ export class GeneralDispensingFormComponent implements OnInit {
   @Output() dosingUnitsSettingsEvent: EventEmitter<any> = new EventEmitter();
   @Output() durationUnitsSettingsEvent: EventEmitter<any> = new EventEmitter();
   @Output() drugRoutesSettingsEvent: EventEmitter<any> = new EventEmitter();
-  @Output() generalPrescriptionFrequencyConceptEvent: EventEmitter<any> =
-    new EventEmitter();
+  @Output() generalPrescriptionFrequencyConceptEvent: EventEmitter<any> = new EventEmitter();
 
   @Output() showCloseDialog: EventEmitter<boolean> =
     new EventEmitter<boolean>();

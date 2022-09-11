@@ -24,6 +24,7 @@ import { getActiveVisit } from "src/app/store/selectors/visit.selectors";
 import { ConceptsService } from "../../resources/concepts/services/concepts.service";
 import { DrugsService } from "../../resources/drugs/services/drugs.service";
 import { OrdersService } from "../../resources/order/services/orders.service";
+import { flatten, keyBy } from "lodash";
 
 @Component({
   selector: "app-dispension-form",
@@ -60,6 +61,7 @@ export class DispensingFormComponent implements OnInit {
   generalPrescriptionFrequencyConcept$: Observable<any>;
   dosingFrequencies$: Observable<any>;
   drugsToBeDispensed$: Observable<any>;
+  genericPrescriptionOrderType: any;
 
   constructor(
     private drugOrderService: DrugOrdersService,
