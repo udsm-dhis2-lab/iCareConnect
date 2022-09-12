@@ -5,7 +5,7 @@
       (keyup)="onSearchPatient($event)" />
   </div>
   <mat-progress-bar *ngIf="loadingPatients" mode="indeterminate" class="mb-3"></mat-progress-bar>
-  <div class="patient-list d-flex" *ngIf="visits">
+  <div class="patient-list d-flex" *ngIf="visits$ | async as visits">
     <!-- {{ visits | json }} -->
     <div class="text-center w-100 mt-5" *ngIf="
         searchTerm &&
