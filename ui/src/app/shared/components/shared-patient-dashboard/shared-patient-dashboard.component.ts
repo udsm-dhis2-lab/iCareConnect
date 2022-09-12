@@ -74,6 +74,7 @@ import {
 import { saveObservations } from "src/app/store/actions/observation.actions";
 import { loadEncounterTypes } from "src/app/store/actions/encounter-type.actions";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
+import { OrdersService } from "../../resources/order/services/orders.service";
 
 @Component({
   selector: "app-shared-patient-dashboard",
@@ -116,10 +117,13 @@ export class SharedPatientDashboardComponent implements OnInit {
   countOfVitalsElementsFilled$: Observable<number>;
   selectedForm: any;
   readyForClinicalNotes: boolean = true;
+  consultationEncounterType$: Observable<any>;
+  consultationOrderType$: Observable<any>;
   constructor(
     private store: Store<AppState>,
     private dialog: MatDialog,
-    private systemSettingsService: SystemSettingsService
+    private systemSettingsService: SystemSettingsService,
+    private ordersService: OrdersService
   ) {
     this.store.dispatch(loadEncounterTypes());
   }
@@ -196,6 +200,14 @@ export class SharedPatientDashboardComponent implements OnInit {
     });
 
     this.currentLocation$ = this.store.select(getCurrentLocation);
+    this.consultationOrderType$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        "iCare.clinic.consultation.orderType"
+      );
+    this.consultationEncounterType$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        "iCare.clinic.consultation.encounterType"
+      );
   }
 
   getSelectedForm(event: Event, form: any): void {
@@ -320,5 +332,20 @@ export class SharedPatientDashboardComponent implements OnInit {
       disableClose: false,
       panelClass: "custom-dialog-container",
     });
+  }
+
+  onUpdateConsultationOrder() {
+    if (!this.activeVisit.consultationStarted) {
+      const orders = [
+        {
+          uuid: this.activeVisit.consultationStatusOrder?.uuid,
+          accessionNumber:
+            this.activeVisit.consultationStatusOrder?.orderNumber,
+          fulfillerStatus: "RECEIVED",
+          encounter: this.activeVisit.consultationStatusOrder?.encounter?.uuid,
+        },
+      ];
+      this.ordersUpdates$ = this.ordersService.updateOrdersViaEncounter(orders);
+    }
   }
 }

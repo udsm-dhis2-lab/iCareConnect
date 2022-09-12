@@ -18,9 +18,11 @@
     forms: forms$ | async,
     countOfVitalsElementsFilled: countOfVitalsElementsFilled$ | async,
     orderTypes: orderTypes$ | async,
-    provider: provider$ | async
+    provider: provider$ | async,
+    consultationEncounterType: consultationEncounterType$ | async,
+    consultationOrderType: consultationOrderType$ | async
   } as dashboardParams"
->
+  >
   <div
     class="w-100"
     *ngIf="
@@ -264,6 +266,10 @@
                   [visit]="activeVisit"
                   [forms]="dashboardParams?.forms"
                   [shouldUseOwnFormSelection]="false"
+                  [consultationOrderType]="dashboardParams?.consultationOrderType"
+                  [consultationEncounterType]="dashboardParams?.consultationEncounterType"
+                  [provider]="dashboardParams?.provider"
+                  (updateConsultationOrder)="onUpdateConsultationOrder()"
                   [selectedForm]="
                     selectedForm ? selectedForm : dashboardParams?.forms[0]
                   "
@@ -295,6 +301,7 @@
                           dashboardParams?.formEntities['Visit Diagnoses']
                         "
                         [patientVisit]="activeVisit"
+                        (updateConsultationOrder)="onUpdateConsultationOrder()"
                       ></app-patient-diagnoses-summary>
                     </div>
                   </mat-expansion-panel>
@@ -332,6 +339,8 @@
                       [iCareGeneralConfigurations]="iCareGeneralConfigurations"
                       [clinicConfigurations]="clinicConfigurations"
                       [userPrivileges]="userPrivileges"
+                      [fromConsultation]="true"
+                      (updateConsultationOrder)="onUpdateConsultationOrder()"
                     ></app-patient-investigations-and-procedures>
 
                     <mat-progress-bar
@@ -367,6 +376,7 @@
                         [diagnosisFormDetails]="
                           dashboardParams?.formEntities['Visit Diagnoses']
                         "
+                        (updateConsultationOrder)="onUpdateConsultationOrder()"
                       ></app-patient-diagnoses-summary>
                     </div>
                     <mat-progress-bar
@@ -391,6 +401,7 @@
                       [fromDispensing]="false"
                       [patientVisit]="activeVisit"
                       [forConsultation]="true"
+                      (updateConsultationOrder)="onUpdateConsultationOrder()"
                     ></app-patient-medication-summary>
                   </mat-expansion-panel>
                 </mat-accordion>

@@ -18,6 +18,7 @@ import { Patient } from "src/app/shared/resources/patient/models/patient.model";
 import { VisitObject } from "src/app/shared/resources/visits/models/visit-object.model";
 import { AppState } from "src/app/store/reducers";
 import { getSavingObservationStatus } from "src/app/store/selectors/observation.selectors";
+import { ICARE_CONFIG } from "../../resources/config";
 import { OrdersService } from "../../resources/order/services/orders.service";
 
 @Component({
@@ -35,6 +36,9 @@ export class ClinicalNotesComponent implements OnInit {
   @Input() savingObservations: boolean;
   @Input() selectedForm: any;
   @Input() shouldUseOwnFormSelection: boolean;
+  @Input() consultationOrderType: any;
+  @Input() consultationEncounterType: any;
+  @Input() provider: any;
   savingObservations$: Observable<boolean>;
   ordersUpdates$: Observable<any>;
 
@@ -47,6 +51,7 @@ export class ClinicalNotesComponent implements OnInit {
   @Output() saveObservations = new EventEmitter();
   @Input() forms: any[];
   @Output() currentSelectedFormForEmitting = new EventEmitter<any>();
+  @Output() updateConsultationOrder = new EventEmitter<any>();
   constructor(
     private store: Store<AppState>,
     private ordersService: OrdersService
@@ -86,17 +91,58 @@ export class ClinicalNotesComponent implements OnInit {
 
   onConfirm(e: Event, visit: any): void {
     e.stopPropagation();
-    if (!visit.consultationStarted) {
-      const orders = [
-        {
-          uuid: visit.consultationStatusOrder?.uuid,
-          accessionNumber: visit.consultationStatusOrder?.orderNumber,
-          fulfillerStatus: "RECEIVED",
-          encounter: visit.consultationStatusOrder?.encounter?.uuid,
-        },
-      ];
-      this.ordersUpdates$ = this.ordersService.updateOrdersViaEncounter(orders);
-    }
+    this.updateConsultationOrder.emit();
+    // if (!visit.consultationStarted) {
+    //   const orders = [
+    //     {
+    //       uuid: visit.consultationStatusOrder?.uuid,
+    //       accessionNumber: visit.consultationStatusOrder?.orderNumber,
+    //       fulfillerStatus: "RECEIVED",
+    //       encounter: visit.consultationStatusOrder?.encounter?.uuid,
+    //     },
+    //   ];
+    //   this.ordersUpdates$ = this.ordersService.updateOrdersViaEncounter(orders);
+
+      // const consultationEncounter = {
+      //   encounterDatetime: new Date(),
+      //   patient: this.patient.personUuid,
+      //   encounterType: this.consultationEncounterType,
+      //   location: this.location.uuid,
+      //   encounterProviders: [
+      //     {
+      //       provider: this.provider.uuid,
+      //       encounterRole: ICARE_CONFIG?.encounterRole?.uuid,
+      //     },
+      //   ],
+      //   visit: visit.uuid,
+      //   orders: [
+      //     {
+      //       orderType: this.consultationOrderType,
+      //       action: "NEW",
+      //       urgency: "ROUTINE",
+      //       careSetting: !visit?.isAdmitted
+      //         ? "OUTPATIENT"
+      //         : "INPATIENT",
+      //       patient: this.patient.personUuid,
+      //       concept: visit.consultationStatusOrder.concept.uuid,
+      //       orderer: this.provider?.uuid,
+      //       type: "order",
+      //       fulfillerStatus: "RECEIVED",
+      //     },
+      //   ],
+      // };
+
+      // this.ordersService
+      //   .createOrdersViaCreatingEncounter(consultationEncounter)
+      //   .subscribe({
+      //     next: (encounter) => {
+      //       if(!encounter?.error){
+      //         return encounter;
+      //       };
+      //       return encounter?.error;
+      //     }
+      //   });
+      // }
     this.saveObservations.emit(
       getObservationsFromForm(
         this.formData[this.currentCustomForm?.id],

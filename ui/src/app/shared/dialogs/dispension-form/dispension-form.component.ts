@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from "@angular/core";
+import { Component, EventEmitter, Inject, OnInit, Output } from "@angular/core";
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { select, Store } from "@ngrx/store";
 import { Observable } from "rxjs";
@@ -62,6 +62,7 @@ export class DispensingFormComponent implements OnInit {
   dosingFrequencies$: Observable<any>;
   drugsToBeDispensed$: Observable<any>;
   genericPrescriptionOrderType: any;
+  @Output() updateConsultationOrder = new EventEmitter();
 
   constructor(
     private drugOrderService: DrugOrdersService,
@@ -265,6 +266,8 @@ export class DispensingFormComponent implements OnInit {
           this.savingOrderSuccess = false;
         }
       );
+
+      this.onUpdateConsultationOrder();
   }
 
   onClearError(e: MouseEvent) {
@@ -308,4 +311,10 @@ export class DispensingFormComponent implements OnInit {
   onCloseDialog(closeDialog: boolean): void {
     this.dialogRef.close(closeDialog);
   }
+
+  onUpdateConsultationOrder(){
+    this.dialogRef.close({
+      updateConsultationOrder: true,
+    });
+  };
 }
