@@ -24,7 +24,7 @@ import { clearBills } from "src/app/store/actions/bill.actions";
 import { clearBillItems } from "src/app/store/actions/bill-item.actions";
 import { PatientListDialogComponent } from "../../dialogs";
 import { MatDialog } from "@angular/material/dialog";
-import { go } from "src/app/store/actions";
+import { addCurrentPatient, go } from "src/app/store/actions";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 
 @Component({
@@ -84,12 +84,12 @@ export class PatientListComponent implements OnInit, OnChanges {
     this.itemsPerPage = this.itemsPerPage ? this.itemsPerPage : 10;
     this.getVisits(this.visits);
 
-    this.visits$.subscribe({
-      next: (visits) => {
-        // console.log("Visits: ", visits)
-       this.visits = visits
-      },
-    });
+    // this.visits$.subscribe({
+    //   next: (visits) => {
+    //     // console.log("Visits: ", visits)
+    //    this.visits = visits
+    //   },
+    // });
 
 
     /**
@@ -279,12 +279,12 @@ export class PatientListComponent implements OnInit, OnChanges {
           this.store.dispatch(clearBills());
           this.store.dispatch(clearBillItems());
           this.selectPatient.emit(response?.patient);
-          // this.store.dispatch(
-          //   addCurrentPatient({
-          //     patient: response?.patient,
-          //     isRegistrationPage: this.isRegistrationPage,
-          //   })
-          // );
+          this.store.dispatch(
+            addCurrentPatient({
+              patient: response?.patient,
+              isRegistrationPage: this.isRegistrationPage,
+            })
+          );
         }
       });
   }
@@ -294,7 +294,7 @@ export class PatientListComponent implements OnInit, OnChanges {
 
     this.filterBy = event && typeof event === 'string' ? event : "";
 
-    this.filteredVisits$ = this.visitService.getAllVisits(
+    this.visits$ = this.visitService.getAllVisits(
           this.currentLocation,
           false,
           false,
@@ -309,24 +309,24 @@ export class PatientListComponent implements OnInit, OnChanges {
           this.filterBy
         );
 
-    this.filteredVisits$.subscribe({
-      next: (visits) => {
-        this.loadingPatients = false;
-        if (visits.length > 0) {
-          return (this.visits = visits);
-        }
-        else {
-          this.visits$.subscribe({
-            next: (visits) => {
-              this.visits = visits;
-            },
-          });
-        }
+    // this.filteredVisits$.subscribe({
+    //   next: (visits) => {
+    //     this.loadingPatients = false;
+    //     if (visits.length > 0) {
+    //       return (this.visits = visits);
+    //     }
+    //     else {
+    //       this.visits$.subscribe({
+    //         next: (visits) => {
+    //           this.visits = visits;
+    //         },
+    //       });
+    //     }
 
-      },
-      error: (error) => {
-        this.loadingPatients = false;
-      },
-    });
+    //   },
+    //   error: (error) => {
+    //     this.loadingPatients = false;
+    //   },
+    // });
   }
 }
