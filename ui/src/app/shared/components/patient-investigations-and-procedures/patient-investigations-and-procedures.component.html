@@ -25,6 +25,7 @@
               investigationAndProceduresFormsDetails
             "
             [iCareGeneralConfigurations]="iCareGeneralConfigurations"
+            (updateConsultationOrder)="onUpdateConsultationOrder()"
           ></app-patient-lab-results-summary>
         </ng-template>
         <!-- TODO: Lofic to handle provisional diagnosis check -->
@@ -56,24 +57,26 @@
             [forConsultation]="forConsultation"
             [provider]="provider"
             [orderTypes]="orderTypes"
-          ></app-patient-procedures-summary>
-        </ng-template></div
-    ></mat-tab>
-    <mat-tab
-      label="Radiology"
-      *ngIf="userPrivileges['CLINIC_ADD_RADIOLOGY_INVESTIGATION']"
-    >
-      <div class="mat-tab-container">
-        <ng-template matTabContent>
-          <app-patient-radiology-summary
-            [patientVisit]="patientVisit"
-            [investigationAndProceduresFormsDetails]="
+            (updateConsultationOrder)="onUpdateConsultationOrder()"
+            ></app-patient-procedures-summary>
+          </ng-template></div
+          ></mat-tab>
+          <mat-tab
+          label="Radiology"
+          *ngIf="userPrivileges['CLINIC_ADD_RADIOLOGY_INVESTIGATION']"
+          >
+          <div class="mat-tab-container">
+            <ng-template matTabContent>
+              <app-patient-radiology-summary
+              [patientVisit]="patientVisit"
+              [investigationAndProceduresFormsDetails]="
               investigationAndProceduresFormsDetails
-            "
-            [forConsultation]="forConsultation"
-            [provider]="provider"
-            [orderTypes]="orderTypes"
-          ></app-patient-radiology-summary>
+              "
+              [forConsultation]="forConsultation"
+              [provider]="provider"
+              [orderTypes]="orderTypes"
+              (updateConsultationOrder)="onUpdateConsultationOrder()"
+            ></app-patient-radiology-summary>
         </ng-template></div
     ></mat-tab>
   </mat-tab-group>
