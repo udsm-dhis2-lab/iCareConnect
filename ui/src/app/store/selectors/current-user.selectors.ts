@@ -4,6 +4,8 @@ import { getRootState, AppState } from "../reducers";
 import {
   getChildLocationsOfTheFirstLevelParentLocation,
   getLocations,
+  getModuleLocations,
+  getUserAssignedLocationsLoadedState,
 } from "./locations.selectors";
 import { sanitizeUserLocations } from "src/app/shared/helpers/sanitize-user-locations.helper";
 
@@ -49,8 +51,11 @@ export const getProviderDetails = createSelector(
 export const getUserAssignedLocations = createSelector(
   getCurrentUserState,
   getLocations,
-  (state: CurrentUserState, availableLoginLocations) => {
-    return sanitizeUserLocations(state.userLocations, availableLoginLocations);
+  getUserAssignedLocationsLoadedState,
+  (state: CurrentUserState, locations, userAssignedLocationsLoadedState) => {
+    return userAssignedLocationsLoadedState
+      ? sanitizeUserLocations(state.userLocations, locations)
+      : null;
   }
 );
 

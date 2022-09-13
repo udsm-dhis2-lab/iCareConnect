@@ -143,6 +143,7 @@
                 <mat-label>{{ selectedIdentifierType?.name }}</mat-label>
                 <input
                   matInput
+                  [pattern]="selectedIdentifierType?.format"
                   placeholder="Enter Text"
                   [required]="selectedIdentifierType?.required"
                   [disabled]="
@@ -154,7 +155,6 @@
             </div>
           </div>
         </div>
-
         <!-- end of patient identification -->
 
         <!-- patient names -->

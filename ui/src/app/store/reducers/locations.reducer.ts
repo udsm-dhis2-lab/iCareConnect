@@ -12,6 +12,8 @@ import {
   clearLocations,
   updateCurrentLocationStatus,
   upsertLocations,
+  loadLocationByIds,
+  setAllUserAssignedLocationsLoadedState,
 } from "../actions";
 import {
   loadingBaseState,
@@ -32,6 +34,7 @@ const reducer = createReducer(
       loadingByTagName: false,
       loadedByTagName: true,
       errorLoadingByTagName: null,
+      loadingLocationById: false,
     })
   ),
   on(loadingLocationsFails, (state, { error }) => ({
@@ -46,7 +49,14 @@ const reducer = createReducer(
   })),
   on(loadLocationById, (state) => ({
     ...state,
+    loadingLocationById: true,
   })),
+  on(loadLocationByIds, (state) => {
+    return {
+      ...state,
+      loadingLocationById: true,
+    };
+  }),
   on(upsertLocation, (state, { location }) =>
     locationsAdapter.upsertOne(location, { ...state })
   ),
@@ -71,7 +81,13 @@ const reducer = createReducer(
   on(updateCurrentLocationStatus, (state, { settingLocation }) => ({
     ...state,
     settingLocation,
-  }))
+  })),
+  on(setAllUserAssignedLocationsLoadedState, (state, { allLoadedState }) => {
+    return {
+      ...state,
+      allUserAssignedLocationsLoadedState: allLoadedState,
+    };
+  })
 );
 
 export function locationsReducer(state, action) {
