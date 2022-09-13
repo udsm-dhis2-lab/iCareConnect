@@ -18,7 +18,7 @@ export const loadLocationById = createAction(
 
 export const loadLocationByIds = createAction(
   "[LOCATIONS] load location By Location IDS",
-  props<{ locationUuids: string[]; params?: any }>()
+  props<{ locationUuids: string[]; params?: any; isUserLocations?: boolean }>()
 );
 
 export const addLoadedLocations = createAction(
@@ -49,6 +49,11 @@ export const upsertLocations = createAction(
 export const loadLocationsByTagName = createAction(
   "[LOCATIONS] load locations by tag name",
   props<{ tagName: string }>()
+);
+
+export const loadLocationsByTagNames = createAction(
+  "[LOCATIONS] load locations by tag names",
+  props<{ tagNames: string[] }>()
 );
 
 export const loadingLocationByTagNameFails = createAction(

@@ -38,6 +38,7 @@ import {
   updateCurrentLocationStatus,
   loadMainLocation,
   setAllUserAssignedLocationsLoadedState,
+  loadLocationsByTagNames,
 } from "../actions";
 import { AppState } from "../reducers";
 import {
@@ -233,10 +234,12 @@ export class LocationsEffects implements OnInitEffects {
                 setCurrentUserCurrentLocation({
                   location: currentUserCurrentLocation,
                 }),
-                setAllUserAssignedLocationsLoadedState({
-                  allLoadedState:
-                    locationsToLoad?.length === formattedLocs?.length,
-                }),
+                action?.isUserLocations
+                  ? setAllUserAssignedLocationsLoadedState({
+                      allLoadedState:
+                        locationsToLoad?.length === formattedLocs?.length,
+                    })
+                  : null,
                 updateCurrentLocationStatus({ settingLocation: false }),
               ];
             })
@@ -280,6 +283,36 @@ export class LocationsEffects implements OnInitEffects {
           .pipe(
             switchMap((locationsResponse: any) => {
               // console.log("locationsResponse", locationsResponse);
+              return [
+                addLoadedLocations({
+                  locations: formatLocationsPayLoad(locationsResponse || []),
+                }),
+                upsertLocations({
+                  locations: formatLocationsPayLoad(locationsResponse || []),
+                }),
+                updateCurrentLocationStatus({ settingLocation: false }),
+              ];
+            }),
+            catchError((error) => {
+              return of(loadingLocationByTagNameFails({ error }));
+            })
+          );
+      })
+    )
+  );
+
+  locationByTagNames$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(loadLocationsByTagNames),
+      switchMap((action) => {
+        return this.locationService
+          .getLocationsByTagNames(action.tagNames, {
+            limit: 100,
+            startIndex: 0,
+            v: "custom:(uuid,name,display,description,parentLocation:(uuid,name),tags,attributes,childLocations,retired)",
+          })
+          .pipe(
+            switchMap((locationsResponse: any) => {
               return [
                 addLoadedLocations({
                   locations: formatLocationsPayLoad(locationsResponse || []),
