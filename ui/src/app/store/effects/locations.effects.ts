@@ -37,6 +37,7 @@ import {
   upsertLocations,
   updateCurrentLocationStatus,
   loadMainLocation,
+  setAllUserAssignedLocationsLoadedState,
 } from "../actions";
 import { AppState } from "../reducers";
 import {
@@ -199,11 +200,11 @@ export class LocationsEffects implements OnInitEffects {
       ofType(loadLocationByIds),
       withLatestFrom(this.store.select(getLocationEntities)),
       switchMap(([action, locationsEntities]: [any, any]) => {
+        const locationsToLoad = action.locationUuids?.filter(
+          (uuid) => !locationsEntities[uuid]
+        );
         return this.locationService
-          .getLocationByIds(
-            action.locationUuids?.filter((uuid) => !locationsEntities[uuid]),
-            action?.params
-          )
+          .getLocationByIds(locationsToLoad, action?.params)
           .pipe(
             switchMap((locationsResponse) => {
               const formattedLocs = orderBy(
@@ -216,18 +217,25 @@ export class LocationsEffects implements OnInitEffects {
               let currentUserCurrentLocation;
               const storedCurrentLocation =
                 localStorage.getItem("currentLocation");
-              if (!storedCurrentLocation || storedCurrentLocation === "null") {
+              if (
+                !storedCurrentLocation ||
+                storedCurrentLocation === "null" ||
+                !JSON.parse(storedCurrentLocation)?.uuid
+              ) {
                 currentUserCurrentLocation = formattedLocs[0];
               } else {
                 currentUserCurrentLocation = JSON.parse(storedCurrentLocation);
               }
-
               return [
                 addLoadedLocations({
                   locations: formattedLocs || [],
                 }),
                 setCurrentUserCurrentLocation({
                   location: currentUserCurrentLocation,
+                }),
+                setAllUserAssignedLocationsLoadedState({
+                  allLoadedState:
+                    locationsToLoad?.length === formattedLocs?.length,
                 }),
                 updateCurrentLocationStatus({ settingLocation: false }),
               ];

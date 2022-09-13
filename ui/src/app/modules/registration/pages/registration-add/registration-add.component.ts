@@ -546,16 +546,16 @@ export class RegistrationAddComponent implements OnInit {
                 "26742868-a38c-4e6a-ac1d-ae283c414c2e"
               ) {
                 return {
-                  identifier: this.patient[personIdentifierType.id],
-                  identifierType: personIdentifierType.id,
-                  location: currentLocation.uuid,
+                  identifier: this.patient[personIdentifierType?.id],
+                  identifierType: personIdentifierType?.id,
+                  location: currentLocation?.uuid,
                   preferred: true,
                 };
               } else {
                 return {
-                  identifier: this.patient[personIdentifierType.id],
-                  identifierType: personIdentifierType.id,
-                  location: currentLocation.uuid,
+                  identifier: this.patient[personIdentifierType?.id],
+                  identifierType: personIdentifierType?.id,
+                  location: currentLocation?.uuid,
                   preferred: false,
                 };
               }
@@ -734,12 +734,14 @@ export class RegistrationAddComponent implements OnInit {
       this.selectedIdentifierType = {
         name: "Student ID",
         id: "9f6496ec-cf8e-4186-b8fc-aaf9e93b3406",
+        format: "\\d{4}-0\\d-\\d{5}",
       };
       this.disabledIDType = true;
     } else if (value === "Staff") {
       this.selectedIdentifierType = {
         id: "6e7203dd-0d6b-4c92-998d-fdc82a71a1b0",
         name: "Staff ID",
+        format: "\\d{5}",
       };
       this.disabledIDType = true;
     } else {

@@ -44,6 +44,10 @@ export class RegistrationService {
       map((res) => {
         return (res.results || [])
           .map((patientIdenfierType: any) => {
+            // In order to get empty results on the format key if the value is null
+            if (patientIdenfierType.format === null) {
+              patientIdenfierType.format = "";
+            }
             const { uuid, display, required, retired, description, format } =
               patientIdenfierType;
 
