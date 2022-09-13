@@ -335,7 +335,7 @@ export class SharedPatientDashboardComponent implements OnInit {
   }
 
   onUpdateConsultationOrder() {
-    if (!this.activeVisit.consultationStarted) {
+    if (!this.activeVisit.consultationStarted){
       const orders = [
         {
           uuid: this.activeVisit.consultationStatusOrder?.uuid,
@@ -345,7 +345,11 @@ export class SharedPatientDashboardComponent implements OnInit {
           encounter: this.activeVisit.consultationStatusOrder?.encounter?.uuid,
         },
       ];
-      this.ordersUpdates$ = this.ordersService.updateOrdersViaEncounter(orders);
+      this.ordersService.updateOrdersViaEncounter(orders).subscribe((order) => {
+        if(!order.error){
+          console.log("==> Order results: ", order)
+        }
+      });
     }
   }
 }
