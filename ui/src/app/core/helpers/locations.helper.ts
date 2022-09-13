@@ -42,7 +42,7 @@ export function formatLocationsPayLoad(locations): Location[] {
         .join("/")
         .substring(1),
       billingConcept:
-        location?.attributes.length > 0
+        location?.attributes?.length > 0
           ? (location?.attributes?.filter(
               (attribute) =>
                 attribute?.attributeType?.display === "Billing concept"
