@@ -50,7 +50,7 @@ import {
 import { getAuthenticationState } from "../selectors/current-user.selectors";
 
 @Injectable()
-export class LocationsEffects implements OnInitEffects {
+export class LocationsEffects {
   routerReady$ = createEffect(
     () =>
       this.actions$.pipe(
@@ -330,10 +330,6 @@ export class LocationsEffects implements OnInitEffects {
       })
     )
   );
-
-  ngrxOnInitEffects(): Action {
-    return loadLoginLocations();
-  }
 
   constructor(
     private actions$: Actions,

@@ -41,7 +41,9 @@
         <div *ngIf="!params?.settingCurrentLocationStatus">
           <div class="w-100 text-centered">
             <!-- TODO: Softcode the order uuid -->
+            <!-- {{ locationsIds$ | async | json }} -->
             <app-patient-list
+              [currentLocation]="params?.locationsIds"
               (selectPatient)="onSelectPatient($event)"
               [shouldShowParentLocation]="true"
               [isTabularList]="true"
