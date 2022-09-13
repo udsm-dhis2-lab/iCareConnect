@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, Input, OnInit, Output, EventEmitter } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { Store } from "@ngrx/store";
 import { keyBy, flatten, orderBy, uniqBy } from "lodash";
@@ -50,6 +50,7 @@ export class OrderResultsRendererComponent implements OnInit {
   voidingLabOrderState$: Observable<boolean>;
 
   isFormValid: boolean = false;
+  @Output() updateConsultationOrder = new EventEmitter();
   constructor(
     private store: Store<AppState>,
     private dialog: MatDialog,
@@ -164,6 +165,8 @@ export class OrderResultsRendererComponent implements OnInit {
         patientId: this.visit?.patientUuid,
       })
     );
+
+    this.updateConsultationOrder.emit();
   }
 
   onDelete(event: Event, labOrder): void {

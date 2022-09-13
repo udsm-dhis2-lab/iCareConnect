@@ -1,6 +1,8 @@
 <div
   *ngIf="{
-    settingCurrentLocationStatus: settingCurrentLocationStatus$ | async
+    settingCurrentLocationStatus: settingCurrentLocationStatus$ | async,
+    consultationEncounterType: consultationEncounterType$ | async,
+    consultationOrderType: consultationOrderType$ | async
   } as params"
 >
   <mat-toolbar>
@@ -38,7 +40,7 @@
               [isTabularList]="true"
               [itemsPerPage]="25"
               [currentLocation]="(currentLocation$ | async)?.id"
-              [orderType]="'iCARESTS-ADMS-1111-1111-525400e4297f'"
+              [orderType]="params?.consultationOrderType"
               (selectPatient)="onSelectPatient($event)"
             ></app-patient-list>
           </div>
@@ -49,7 +51,7 @@
               [isTabularList]="true"
               [itemsPerPage]="25"
               [currentLocation]="(currentLocation$ | async)?.id"
-              [orderType]="'iCARESTS-ADMS-1111-1111-525400e4297f'"
+              [orderType]="params?.consultationOrderType"
               [orderStatus]="'RECEIVED'"
               [currentLocation]="(currentLocation$ | async)?.id"
               (selectPatient)="onSelectPatient($event)"

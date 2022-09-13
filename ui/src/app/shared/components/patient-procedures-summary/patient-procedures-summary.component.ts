@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, Input, OnInit, Output, EventEmitter } from "@angular/core";
 import { FormValue } from "../../modules/form/models/form-value.model";
 import { Visit } from "../../resources/visits/models/visit.model";
 import { keyBy, flatten, orderBy, uniqBy } from "lodash";
@@ -29,6 +29,7 @@ export class PatientProceduresSummaryComponent implements OnInit {
   hasError: boolean = false;
   error: string;
   formDetails: FormValue;
+  @Output() updateConsultationOrder = new EventEmitter();
   constructor(
     private ordersService: OrdersService,
     private visitService: VisitsService
@@ -122,5 +123,7 @@ export class PatientProceduresSummaryComponent implements OnInit {
         }
       }
     });
+
+    this.updateConsultationOrder.emit();
   }
 }
