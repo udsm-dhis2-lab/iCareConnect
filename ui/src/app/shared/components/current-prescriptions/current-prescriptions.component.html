@@ -1,27 +1,29 @@
-<div class="current-prescriptions">
+<div [ngClass]="drugsPrescribed.length > 0 ? 'current-prescriptions' : ''">
     <table class="table table-bordered table-striped">
-        <thead>
-            <tr>
-            <th>S/N</th>
-            <th>Drug Name</th>
-            <th>Description</th>
-            <th>Date Ordered</th>
-        </tr>
-        </thead>
-        <tbody>
-            <ng-container *ngIf="drugsPrescribed.length > 0" >
+        <ng-container *ngIf="drugsPrescribed.length > 0">
+            <thead>
+                <tr>
+                <th>S/N</th>
+                <th>Drug Name</th>
+                <th>Description</th>
+                <th>Date Ordered</th>
+            </tr>
+            </thead>
+            <tbody>
                 <tr *ngFor="let drug of drugsPrescribed, let index = index">
                     <td>{{ index + 1 }}</td>
                     <td>{{ drug?.display }}</td>
                     <td> {{ drug.careSetting.display }}</td>
                     <td> {{ drug.dateActivated | date:'short' }}</td>
                 </tr>
-            </ng-container>
-            <ng-container *ngIf="drugsPrescribed.length === 0">
-                <tr>
+            </tbody>
+        </ng-container>
+        <ng-container *ngIf="drugsPrescribed.length === 0">
+            <tbody>
+                <tr class="text-center">
                     No Prescriptions Yet
                 </tr>
-            </ng-container>
-        </tbody>
+            </tbody>
+        </ng-container>
     </table>
 </div>
