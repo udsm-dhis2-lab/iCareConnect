@@ -546,16 +546,16 @@ export class RegistrationAddComponent implements OnInit {
                 "26742868-a38c-4e6a-ac1d-ae283c414c2e"
               ) {
                 return {
-                  identifier: this.patient[personIdentifierType.id],
-                  identifierType: personIdentifierType.id,
-                  location: currentLocation.uuid,
+                  identifier: this.patient[personIdentifierType?.id],
+                  identifierType: personIdentifierType?.id,
+                  location: currentLocation?.uuid,
                   preferred: true,
                 };
               } else {
                 return {
-                  identifier: this.patient[personIdentifierType.id],
-                  identifierType: personIdentifierType.id,
-                  location: currentLocation.uuid,
+                  identifier: this.patient[personIdentifierType?.id],
+                  identifierType: personIdentifierType?.id,
+                  location: currentLocation?.uuid,
                   preferred: false,
                 };
               }
