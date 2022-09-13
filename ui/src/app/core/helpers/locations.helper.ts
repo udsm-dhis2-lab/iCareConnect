@@ -5,52 +5,52 @@ let locationPath = "";
 
 export function formatLocationsPayLoad(locations): Location[] {
   return _.map(locations, (location) => {
-    if (!location.retired) {
-      locationPath = "";
-      const modules = getLocationModules(location);
-      return {
-        ...location,
-        id: location?.uuid,
-        uuid: location?.uuid,
-        country: location?.country,
-        stateProvince: location?.stateProvince,
-        postalCode: location?.postalCode,
-        description: location?.description,
-        name: location?.display,
-        display: location?.display,
-        childLocations: location?.childLocations,
-        parentLocation: location?.parentLocation,
-        links: location?.links,
-        attributes: location?.attributes,
-        tags: location?.tags,
-        areChildLocationsBeds: checkIfTheChildAreBeds(location?.childLocations),
-        areChildLocationsCabinets: checkIfTheChildAreCabinets(
-          location?.childLocations
-        ),
-        beds: getBeds(location?.childLocations),
-        cabinets: getCabinets(location?.childLocations),
-        path: _.reverse(
-          (
-            location?.uuid +
-            "/" +
-            (location?.parentLocation &&
-            location?.parentLocation.hasOwnProperty("uuid")
-              ? getPathForTheLocation(location?.parentLocation)
-              : "")
-          ).split("/")
-        )
-          .join("/")
-          .substring(1),
-        billingConcept:
-          location?.attributes.length > 0
-            ? (location?.attributes?.filter(
-                (attribute) =>
-                  attribute?.attributeType?.display === "Billing concept"
-              ) || [])[0]?.value
-            : null,
-        modules: modules,
-      };
-    }
+    // if (!location.retired) {
+    locationPath = "";
+    const modules = getLocationModules(location);
+    return {
+      ...location,
+      id: location?.uuid,
+      uuid: location?.uuid,
+      country: location?.country,
+      stateProvince: location?.stateProvince,
+      postalCode: location?.postalCode,
+      description: location?.description,
+      name: location?.display,
+      display: location?.display,
+      childLocations: location?.childLocations,
+      parentLocation: location?.parentLocation,
+      links: location?.links,
+      attributes: location?.attributes,
+      tags: location?.tags,
+      areChildLocationsBeds: checkIfTheChildAreBeds(location?.childLocations),
+      areChildLocationsCabinets: checkIfTheChildAreCabinets(
+        location?.childLocations
+      ),
+      beds: getBeds(location?.childLocations),
+      cabinets: getCabinets(location?.childLocations),
+      path: _.reverse(
+        (
+          location?.uuid +
+          "/" +
+          (location?.parentLocation &&
+          location?.parentLocation.hasOwnProperty("uuid")
+            ? getPathForTheLocation(location?.parentLocation)
+            : "")
+        ).split("/")
+      )
+        .join("/")
+        .substring(1),
+      billingConcept:
+        location?.attributes.length > 0
+          ? (location?.attributes?.filter(
+              (attribute) =>
+                attribute?.attributeType?.display === "Billing concept"
+            ) || [])[0]?.value
+          : null,
+      modules: modules,
+    };
+    // }
   }).filter((loc) => loc);
 }
 
