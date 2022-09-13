@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { select, Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
+import { SystemSettingsService } from 'src/app/core/services/system-settings.service';
 import { Patient } from 'src/app/shared/resources/patient/models/patient.model';
 import { go } from 'src/app/store/actions';
 import { AppState } from 'src/app/store/reducers';
@@ -19,13 +20,27 @@ export class ClinicPatientListComponent implements OnInit {
   currentLocation$: Observable<any>;
   selectedTab = new FormControl(0);
   settingCurrentLocationStatus$: Observable<boolean>;
-  constructor(private store: Store<AppState>) {}
+  consultationOrderType$: Observable<any>;
+  consultationEncounterType$: Observable<any>;
+  constructor(
+    private store: Store<AppState>,
+    private systemSettingsService: SystemSettingsService
+    ) {}
 
   ngOnInit() {
     this.currentLocation$ = this.store.pipe(select(getCurrentLocation));
     this.settingCurrentLocationStatus$ = this.store.select(
       getSettingCurrentLocationStatus
     );
+
+     this.consultationOrderType$ =
+       this.systemSettingsService.getSystemSettingsByKey(
+         "iCare.clinic.consultation.orderType"
+       );
+     this.consultationEncounterType$ =
+       this.systemSettingsService.getSystemSettingsByKey(
+         "iCare.clinic.consultation.encounterType"
+       );
   }
 
   onSelectPatient(patient: any) {
