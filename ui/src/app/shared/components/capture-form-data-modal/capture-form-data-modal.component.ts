@@ -13,8 +13,8 @@ import {
 } from "src/app/store/actions/observation.actions";
 import { loadActiveVisit } from "src/app/store/actions/visit.actions";
 import { AppState } from "src/app/store/reducers";
-import { getLocationsByTagName } from "src/app/store/selectors";
-import { getProviderDetails } from "src/app/store/selectors/current-user.selectors";
+import { getCurrentLocation, getLocationsByTagName, getParentLocation, getParentLocationTree } from "src/app/store/selectors";
+import { getCurrentUserDetails, getProviderDetails } from "src/app/store/selectors/current-user.selectors";
 import {
   getCustomOpenMRSFormById,
   getFormsLoadingState,
@@ -31,6 +31,7 @@ import { ICARE_CONFIG } from "../../resources/config";
 import { ObservationService } from "../../resources/observation/services";
 import { Patient } from "../../resources/patient/models/patient.model";
 import { Visit } from "../../resources/visits/models/visit.model";
+import { ConfigsService } from "../../services/configs.service";
 
 @Component({
   selector: "app-capture-form-data-modal",
@@ -59,12 +60,15 @@ export class CaptureFormDataModalComponent implements OnInit {
   isValid: boolean = false;
 
   deathFormFields: any[];
+  facilityDetails$: Observable<any>;
+  currentUser$: Observable<any>;
   constructor(
     private store: Store<AppState>,
-    @Inject(MAT_DIALOG_DATA) data,
+    @Inject(MAT_DIALOG_DATA) public data,
     private dialogRef: MatDialogRef<CaptureFormDataModalComponent>,
     private observationService: ObservationService,
-    private systemSettingsService: SystemSettingsService
+    private systemSettingsService: SystemSettingsService,
+    private configService: ConfigsService
   ) {
     this.patient = data?.patient?.patient;
     this.formUuid = data?.form?.formUuid;
@@ -107,6 +111,7 @@ export class CaptureFormDataModalComponent implements OnInit {
       select(getSavingObservationStatus)
     );
     this.observations$ = this.store.select(getGroupedObservationByConcept);
+    this.currentUser$ = this.store.select(getCurrentUserDetails);
   }
 
   onClose(e) {
@@ -171,5 +176,9 @@ export class CaptureFormDataModalComponent implements OnInit {
     if (this.formUuid === deathRegistryFormUuid) {
       // TODO: Mark as deceased
     }
+  }
+
+  onPrint(e: any) {
+    console.log("==> Referral form To be printed: ", e);
   }
 }
