@@ -71,6 +71,7 @@ export class AuthEffects {
                       params: {
                         v: `custom:(display,uuid,tags:(uuid,display),parentLocation:(uuid,display),attributes,retired)`,
                       },
+                      isUserLocations: true,
                     }),
                     initiateEncounterType(),
                   ]
