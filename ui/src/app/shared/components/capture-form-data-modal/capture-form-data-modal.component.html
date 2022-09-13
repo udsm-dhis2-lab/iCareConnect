@@ -41,6 +41,19 @@
       ></mat-progress-bar>
       <mat-dialog-actions align="end" class="mb-2 ml-2 mr-2">
         <button mat-stroked-button (click)="onClose($event)">Cancel</button>
+        <div *ngIf="data.fromClinic">
+          <app-print-button
+            [iconName]="'print'"
+            [toolTipText]="'Click to print refereal form'"
+            [showText]="'Print Referral Form'"
+            [classesList]="['float-right', 'button', 'mr-5']"
+            [ElementToBePrinted]="{
+              facilityDetails: data?.facilityDetails,
+              observationsGroupedByConcept: observations$ | async
+            }"
+            (print)="onPrint($event)"
+          ></app-print-button>
+        </div>
         <button
           mat-flat-button
           [disabled]="!params?.deathRegistryFormUuid || !isValid"

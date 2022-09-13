@@ -19,6 +19,7 @@ import {
   getAllOrderTypes,
   getConsultationInProgressStatus,
   getCurrentLocation,
+  getParentLocation,
   getStartingConsultationLoadingStatus,
 } from "src/app/store/selectors";
 import {
@@ -75,6 +76,7 @@ import { saveObservations } from "src/app/store/actions/observation.actions";
 import { loadEncounterTypes } from "src/app/store/actions/encounter-type.actions";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { OrdersService } from "../../resources/order/services/orders.service";
+import { ConfigsService } from "../../services/configs.service";
 
 @Component({
   selector: "app-shared-patient-dashboard",
@@ -119,13 +121,15 @@ export class SharedPatientDashboardComponent implements OnInit {
   readyForClinicalNotes: boolean = true;
   consultationEncounterType$: Observable<any>;
   consultationOrderType$: Observable<any>;
+  facilityDetails$: Observable<any>;
   constructor(
     private store: Store<AppState>,
     private dialog: MatDialog,
     private systemSettingsService: SystemSettingsService,
-    private ordersService: OrdersService
-  ) {
-    this.store.dispatch(loadEncounterTypes());
+    private ordersService: OrdersService,
+    private configService: ConfigsService,
+    ) {
+      this.store.dispatch(loadEncounterTypes());
   }
 
   ngOnInit(): void {
@@ -208,6 +212,8 @@ export class SharedPatientDashboardComponent implements OnInit {
       this.systemSettingsService.getSystemSettingsByKey(
         "iCare.clinic.consultation.encounterType"
       );
+    this.facilityDetails$ = this.configService.getFacilityDetails();
+    this.facilityDetails$ = this.store.select(getParentLocation);
   }
 
   getSelectedForm(event: Event, form: any): void {
@@ -254,8 +260,10 @@ export class SharedPatientDashboardComponent implements OnInit {
     visit,
     currentLocation,
     privileges,
-    provider
-  ): void {
+    provider,
+    facilityDetails
+  ): void {;
+    console.log("==> Facility Details: ", facilityDetails)
     event.stopPropagation();
     this.systemSettingsService
       .getSystemSettingsMatchingAKey("iCare.clinic.deathRegistry.form.causes")
@@ -275,6 +283,8 @@ export class SharedPatientDashboardComponent implements OnInit {
               locationType,
               currentLocation,
               causesOfDeathConcepts: concepts,
+              fromClinic: true,
+              facilityDetails: facilityDetails
             },
             disableClose: false,
           });

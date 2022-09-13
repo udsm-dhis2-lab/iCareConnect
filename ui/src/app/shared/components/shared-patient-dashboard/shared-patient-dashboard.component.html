@@ -20,7 +20,8 @@
     orderTypes: orderTypes$ | async,
     provider: provider$ | async,
     consultationEncounterType: consultationEncounterType$ | async,
-    consultationOrderType: consultationOrderType$ | async
+    consultationOrderType: consultationOrderType$ | async,
+    facilityDetails: facilityDetails$ | async
   } as dashboardParams"
   >
   <div
@@ -199,7 +200,8 @@
                     activeVisit,
                     dashboardParams?.currentLocation,
                     null,
-                    dashboardParams?.provider
+                    dashboardParams?.provider,
+                    dashboardParams?.facilityDetails
                   )
                 "
               >
