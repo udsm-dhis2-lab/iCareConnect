@@ -1,33 +1,33 @@
-import { Component, Inject, Input, OnInit } from '@angular/core';
+import { Component, Inject, Input, OnInit } from "@angular/core";
 import {
   MatDialog,
   MatDialogRef,
   MAT_DIALOG_DATA,
-} from '@angular/material/dialog';
-import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs';
-import { getBillingConceptFromLocation } from 'src/app/core/helpers/location-billing-concept.helper';
-import { Location } from 'src/app/core/models';
-import { ConfirmModalComponent } from 'src/app/shared/components/confirm-modal/confirm-modal.component';
-import { ICARE_CONFIG } from 'src/app/shared/resources/config';
-import { Patient } from 'src/app/shared/resources/patient/models/patient.model';
-import { Visit } from 'src/app/shared/resources/visits/models/visit.model';
-import { admitPatient } from 'src/app/store/actions';
-import { AppState } from 'src/app/store/reducers';
-import { getOrderTypesByName } from 'src/app/store/selectors';
+} from "@angular/material/dialog";
+import { Store } from "@ngrx/store";
+import { Observable } from "rxjs";
+import { getBillingConceptFromLocation } from "src/app/core/helpers/location-billing-concept.helper";
+import { Location } from "src/app/core/models";
+import { ConfirmModalComponent } from "src/app/shared/components/confirm-modal/confirm-modal.component";
+import { ICARE_CONFIG } from "src/app/shared/resources/config";
+import { Patient } from "src/app/shared/resources/patient/models/patient.model";
+import { Visit } from "src/app/shared/resources/visits/models/visit.model";
+import { admitPatient, loadLocationById } from "src/app/store/actions";
+import { AppState } from "src/app/store/reducers";
+import { getLocationById, getOrderTypesByName } from "src/app/store/selectors";
 import {
   getAdmissionStatusOfCurrentPatient,
   getAdmittingLoadingState,
-} from 'src/app/store/selectors/current-patient.selectors';
-import { getVisitLoadingState } from 'src/app/store/selectors/visit.selectors';
+} from "src/app/store/selectors/current-patient.selectors";
+import { getVisitLoadingState } from "src/app/store/selectors/visit.selectors";
 
 @Component({
-  selector: 'app-assign-bed-to-patient',
-  templateUrl: './assign-bed-to-patient.component.html',
-  styleUrls: ['./assign-bed-to-patient.component.scss'],
+  selector: "app-assign-bed-to-patient",
+  templateUrl: "./assign-bed-to-patient.component.html",
+  styleUrls: ["./assign-bed-to-patient.component.scss"],
 })
 export class AssignBedToPatientComponent implements OnInit {
-  currentLocation: Location;
+  currentLocationId: string;
   currentPatient: Patient;
   currentBedStatus: any;
   provider: any;
@@ -36,25 +36,32 @@ export class AssignBedToPatientComponent implements OnInit {
   /**
    * TODO: softcode admission form
    */
-  formUuid: string = 'd2c7532c-fb01-11e2-8ff2-fd54ab5fdb2a';
+  formUuid: string = "d2c7532c-fb01-11e2-8ff2-fd54ab5fdb2a";
   admittingState$: Observable<boolean>;
   admissionStatus$: Observable<boolean>;
   orderType$: Observable<any>;
   loadingVisit$: Observable<boolean>;
+  currentLocation$: Observable<any>;
   constructor(
     private dialogRef: MatDialogRef<AssignBedToPatientComponent>,
     @Inject(MAT_DIALOG_DATA) data,
     private store: Store<AppState>,
     private dialog: MatDialog
   ) {
-    this.currentLocation = data?.location;
+    this.currentLocationId = data?.location?.uuid;
     this.currentPatient = data?.patient;
     this.provider = data?.provider;
     this.visit = data?.visit;
     this.bedOrdersWithBillStatus = data?.bedOrdersWithBillStatus;
+    this.store.dispatch(
+      loadLocationById({ locationUuid: this.currentLocationId })
+    );
   }
 
   ngOnInit(): void {
+    this.currentLocation$ = this.store.select(getLocationById, {
+      id: this.currentLocationId,
+    });
     this.admittingState$ = this.store.select(getAdmittingLoadingState);
     this.admissionStatus$ = this.store.select(
       getAdmissionStatusOfCurrentPatient
@@ -62,7 +69,7 @@ export class AssignBedToPatientComponent implements OnInit {
     this.loadingVisit$ = this.store.select(getVisitLoadingState);
 
     this.orderType$ = this.store.select(getOrderTypesByName, {
-      name: 'Bed Order',
+      name: "Bed Order",
     });
   }
 
@@ -75,27 +82,35 @@ export class AssignBedToPatientComponent implements OnInit {
     this.currentBedStatus = bedStatus;
     const data = {
       patient: this.currentPatient?.id,
-      location: this.currentBedStatus?.id,
+      location: this.currentBedStatus?.uuid,
       billingConcept: getBillingConceptFromLocation(this.currentBedStatus),
       form: this.formUuid,
       visit: this.visit?.uuid,
       encounterType: ICARE_CONFIG.admission.encounterTypeUuid,
       provider: this.provider?.uuid,
     };
-    this.dialog.open(ConfirmModalComponent, {
-      data: {
-        message: 'Are sure',
-        is: true,
-        dataObject: data,
-        currentPatient: this.currentPatient,
-        locationDetails: this.currentBedStatus,
-        orderType,
-        details: this.currentBedStatus,
-      },
-      minWidth: '28%',
-      minHeight: '210px',
-      disableClose: false,
-    });
+    this.dialog
+      .open(ConfirmModalComponent, {
+        data: {
+          header: "Bed Confirmation",
+          message: "Are you sure to assign this bed to the name patient?",
+          is: true,
+          dataObject: data,
+          currentPatient: this.currentPatient,
+          locationDetails: this.currentBedStatus,
+          orderType,
+          details: this.currentBedStatus,
+        },
+        minWidth: "28%",
+        maxHeight: "210px",
+        disableClose: false,
+      })
+      .afterClosed()
+      .subscribe((response) => {
+        if (response) {
+          this.dialogRef.close();
+        }
+      });
     this.currentBedStatus = bedStatus;
   }
 

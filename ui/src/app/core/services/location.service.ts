@@ -67,18 +67,24 @@ export class LocationService {
   }
 
   getLocationById(uuid): Observable<any> {
-    return this.httpClient.get("location/" + uuid + "?v=full").pipe(
-      map((response) => {
-        return {
-          ...response,
-          attributes:
-            response?.attributes && response?.attributes?.length > 0
-              ? response?.attributes.filter((attribute) => !attribute?.voided)
-              : [],
-        };
-      }),
-      catchError((error) => of(error))
-    );
+    return this.httpClient
+      .get(
+        "location/" +
+          uuid +
+          "?v=custom:(display,uuid,tags,description,parentLocation:(uuid,display),childLocations:(display,uuid,tags,description,parentLocation:(uuid,display),childLocations,attributes:(attributeType,uuid,value,voided)),attributes:(attributeType,uuid,value,voided))"
+      )
+      .pipe(
+        map((response) => {
+          return {
+            ...response,
+            attributes:
+              response?.attributes && response?.attributes?.length > 0
+                ? response?.attributes.filter((attribute) => !attribute?.voided)
+                : [],
+          };
+        }),
+        catchError((error) => of(error))
+      );
   }
 
   getLocationByIds(uuids, params?: any): Observable<any> {

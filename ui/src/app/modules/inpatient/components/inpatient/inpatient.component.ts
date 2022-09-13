@@ -132,7 +132,7 @@ export class InpatientComponent implements OnInit {
     e.stopPropagation();
     this.dialog.open(AssignBedToPatientComponent, {
       width: "70%",
-      height: "570px",
+      maxHeight: "570px",
       data: {
         location,
         patient,
