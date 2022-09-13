@@ -9,6 +9,7 @@ import {
   authenticateUser,
   loadAllLocations,
   loadLocationByIds,
+  loadLocationsByTagName,
   loadProviderDetails,
   loadRolesDetails,
   logoutUser,
@@ -18,6 +19,8 @@ import { AppState } from "src/app/store/reducers";
 import {
   getChildLocationsOfTheFirstLevelParentLocation,
   getCurrentLocation,
+  getUserAssignedLocationsLoadedState,
+  loadingLocationsByIdState,
 } from "src/app/store/selectors";
 import {
   getCurrentUserDetails,
@@ -48,12 +51,18 @@ export class MenuComponent implements OnInit {
   lisConfigurations$: Observable<any>;
 
   isSupportOpened: boolean = false;
+  modulesLocations$: Observable<boolean>;
+
+  userLocationsUuids: string[];
+  userAssignedLocationsLoadedState$: Observable<boolean>;
   constructor(
     private router: Router,
     public dialog: MatDialog,
     private store: Store<AppState>,
     private authService: AuthService
-  ) {}
+  ) {
+    this.store.dispatch(loadLocationsByTagName({ tagName: "Module+Location" }));
+  }
 
   ngOnInit(): void {
     this.lisConfigurations$ = this.store.select(getLISConfigurations);
@@ -71,16 +80,17 @@ export class MenuComponent implements OnInit {
       this.store.dispatch(
         addSessionStatus({ authenticated: sessionResponse?.authenticated })
       );
+      this.userLocationsUuids = JSON.parse(
+        localStorage
+          .getItem("userLocations")
+          .split("'")
+          .join('"')
+          .split(" ")
+          .join("")
+      );
       this.store.dispatch(
         loadLocationByIds({
-          locationUuids: JSON.parse(
-            localStorage
-              .getItem("userLocations")
-              .split("'")
-              .join('"')
-              .split(" ")
-              .join("")
-          ),
+          locationUuids: this.userLocationsUuids,
           params: {
             v: `custom:(display,uuid,tags:(uuid,display),parentLocation:(uuid,display),attributes,retired)`,
           },
@@ -94,6 +104,9 @@ export class MenuComponent implements OnInit {
     this.locationsForCurrentUser$ = this.store.select(getUserAssignedLocations);
     this.currentLocation$ = this.store.pipe(select(getCurrentLocation));
     this.showPatientSearch$ = this.store.pipe(select(showSearchPatientOnMenu));
+    this.userAssignedLocationsLoadedState$ = this.store.select(
+      getUserAssignedLocationsLoadedState
+    );
 
     // this.authService.getSession().subscribe((sessionResponse) => {
     //   console.log("the sess response");

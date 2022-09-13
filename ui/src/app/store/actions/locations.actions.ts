@@ -64,3 +64,8 @@ export const updateCurrentLocationStatus = createAction(
   "[CURRENT LOCATION] update current location",
   props<{ settingLocation: boolean }>()
 );
+
+export const setAllUserAssignedLocationsLoadedState = createAction(
+  "[LOCATIONS] all user locations loaded state update",
+  props<{ allLoadedState: boolean }>()
+);
