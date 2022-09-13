@@ -30,7 +30,7 @@ export class LoginFormComponent implements OnInit {
   loginForm: FormGroup;
   authenticationLoading$: Observable<boolean>;
   loginErrorStatus$: Observable<boolean>;
-  parentLocation$: Observable<Location>;
+  parentLocation$: Observable<any>;
   hide: boolean = true;
 
   @Output() closeLogin = new EventEmitter();
