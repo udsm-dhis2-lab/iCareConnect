@@ -84,27 +84,14 @@ export const getModuleLocations = createSelector(
 export const getParentLocation = createSelector(
   getLocations,
   (locations: Location[]) => {
-    const allParentLocations =
-      _.filter(locations, { parentLocation: null, retired: false }) || [];
-
-    const mainLocation =
-      allParentLocations && allParentLocations.length > 1
-        ? (allParentLocations?.filter(
-            (location) =>
-              (
-                location?.tags?.filter(
-                  (tag) => tag?.display?.toLowerCase() === "main location"
-                ) || []
-              ).length > 0
-          ) || [])[0]
-        : allParentLocations && allParentLocations?.length == 1
-        ? allParentLocations[0]
-        : {
-            name: "",
-            description: "",
-            id: "iCare-udsm",
-          };
-    return mainLocation;
+    return (locations?.filter(
+      (location) =>
+        (
+          location?.tags?.filter(
+            (tag) => tag?.display?.toLowerCase() === "main location"
+          ) || []
+        ).length > 0
+    ) || [])[0];
   }
 );
 
@@ -415,7 +402,9 @@ export const getAllLocationsUnderWardAsFlatArray = createSelector(
     };
     return _.uniq([
       currentLocation?.uuid,
-      ...flattenList([formattedLocation]).map((item) => item.id),
+      ...flattenList([formattedLocation])
+        .map((item) => item.id)
+        ?.filter((uuid) => uuid),
     ]);
   }
 );
