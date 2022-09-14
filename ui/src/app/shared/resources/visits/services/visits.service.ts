@@ -133,7 +133,6 @@ export class VisitsService {
     filterBy?: string
   ): Observable<Visit[]> {
     const locationUuids: any = isArray(location) ? location : [location];
-    // console.log("locationUuids", locationUuids);
 
     // Parameters for sorting
     const orderByParameter = orderBy ? `&OrderBy=${orderBy}` : "";
@@ -154,9 +153,9 @@ export class VisitsService {
         : "";
       const orderTypeParameter = orderType ? `&orderTypeUuid=${orderType}` : "";
 
-      zip(
+      return zip(
         ...locationUuids.map((locationUuid) => {
-          const locationParameter = `locationUuid=${locationUuid}&`;
+          const locationParameter = `locationUuid=${locationUuid}`;
           return this.httpClient.get(
             `icare/visit?${locationParameter}${orderTypeParameter}${orderStatusParameter}${orderStatusCodeParameter}${sortingParameters}${filterBy}&startIndex=${startIndex}&limit=${limit}`
           );
