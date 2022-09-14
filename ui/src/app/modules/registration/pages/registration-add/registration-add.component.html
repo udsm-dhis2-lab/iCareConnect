@@ -29,7 +29,7 @@
         >
 
         <!-- patient identification -->
-        <div class="row mt-3">
+        <!-- <div class="row mt-3">
           <div class="col-sm-3">
             <label for="patient-identification">Identification</label>
           </div>
@@ -49,54 +49,10 @@
                   [(ngModel)]="patient[primaryIdentifier.id]"
                 />
               </mat-form-field>
-
               &nbsp;
-
-              <!-- <button mat-stroked-button (click)="canEditMRN()">
-                Edit MRN
-              </button> -->
-
-              <!--  <div *ngIf="showOtherIdentifcation" class="d-flex mt-1">
-                <mat-form-field appearance="fill" class="w-75">
-                  <mat-select
-                    placeholder="Select Identification"
-                    [ngModel]="selectedIdentifierType?.id"
-                  >
-                    <mat-option
-                      *ngFor="let identifier of otherPatientIdentifierTypes"
-                      (click)="onSelectOtherIdentifier($event, identifier)"
-                      [value]="identifier.id"
-                      >{{ identifier.name }}</mat-option
-                    >
-                  </mat-select>
-                </mat-form-field>
-                <mat-form-field appearance="fill" class="w-100 ml-4">
-                  <mat-label>{{ selectedIdentifierType?.name }}</mat-label>
-                  <input
-                    matInput
-                    placeholder="Enter Text"
-                    [required]="selectedIdentifierType?.required"
-                    [disabled]="
-                      !selectedIdentifierType || selectedIdentifierType.disabled
-                    "
-                    [(ngModel)]="patient[selectedIdentifierType?.id]"
-                  />
-                </mat-form-field>
-              </div> -->
-
-              <!-- <div *ngIf="showOtherIdentifcation && !emergencyRegistration">
-                <mat-form-field appearance="fill" class="w-100">
-                  <mat-label>Imported MRN issued by GoTHOMIS</mat-label>
-                  <input
-                    matInput
-                    placeholder="GoTHOMIS MRN"
-                    [(ngModel)]="patient['GoTHOMIS']"
-                  />
-                </mat-form-field>
-              </div> -->
             </div>
           </div>
-        </div>
+        </div> -->
         <div class="row mt-3">
           <div class="col-sm-3">
             <label for="pat`ient-type">Patient Type</label>
@@ -144,7 +100,7 @@
                 <input
                   matInput
                   [pattern]="selectedIdentifierType?.format"
-                  placeholder="Enter Text"
+                  [placeholder]="selectedIdFormat"
                   [required]="selectedIdentifierType?.required"
                   [disabled]="
                     !selectedIdentifierType || selectedIdentifierType.disabled

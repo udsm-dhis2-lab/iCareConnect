@@ -19,6 +19,45 @@ export class BillingService {
     private http: HttpClient
   ) {}
 
+
+  getAllPatientInvoices(
+    patientUuid: string,
+    isRegistrationPage?: boolean,
+    status?: string
+  ): Observable<Bill[]> {
+    status = status && status.length > 0 ? `&status=${status}` : "";
+    return !isRegistrationPage
+      ? this.httpClient
+          .get(`billing/patient/allInvoices?patient=${patientUuid}${status}`)
+          .pipe(
+            map((results) =>
+              (
+                results.map((result) => {
+                  return {
+                    ...result,
+                    items: result.items.map((item) => {
+                      return {
+                        ...item,
+                        item: {
+                          ...item?.item,
+                          concept: item?.item?.concept
+                            ? item?.item?.concept
+                            : {
+                                name: item?.item?.name,
+                                uuid: item?.item?.uuid,
+                              },
+                        },
+                      };
+                    }),
+                  };
+                }) || []
+              ).map((bill) => new Bill(bill))
+            )
+          )
+      : of([]);
+  }
+
+
   getPatientBills(
     patientUuid: string,
     isRegistrationPage?: boolean,
@@ -78,23 +117,40 @@ export class BillingService {
 
     formData.append("json", JSON.stringify(jsonData));
     formData.append("file", file);
-
-    return of(this.http
-      .post(`../../../openmrs/ws/rest/v1/obs`, formData)
-      .subscribe((response: any) => {
-        if (response) {
-          discountData = {
-            ...discountData,
-            attachmentUuid: response?.uuid,
-          };
-          const discountedBill = Bill.createDiscount(discountData);
-          return this.http
-            .post("../../../openmrs/ws/rest/v1/billing/discount", discountedBill)
-            .subscribe(() => {
-                return new Discount(discountedBill);
-              })
-        }
-      }))
+    if (!discountDetails?.attachmentDetails?.file) {
+      return this.http
+        .post(
+          "../../../openmrs/ws/rest/v1/billing/discount",
+          omit(Bill.createDiscount(discountData), "attachment")
+        )
+        .pipe(
+          map((response) => {
+            return new Discount(response);
+          })
+        );
+    } else {
+      return of(
+        this.http
+          .post(`../../../openmrs/ws/rest/v1/obs`, formData)
+          .subscribe((response: any) => {
+            if (response) {
+              discountData = {
+                ...discountData,
+                attachmentUuid: response?.uuid,
+              };
+              const discountedBill = Bill.createDiscount(discountData);
+              return this.http
+                .post(
+                  "../../../openmrs/ws/rest/v1/billing/discount",
+                  discountedBill
+                )
+                .subscribe(() => {
+                  return new Discount(discountedBill);
+                });
+            }
+          })
+      );
+    }
   }
 
   discountCriteriaConcept() {

@@ -92,6 +92,24 @@
           <span>Get Invoice</span>
         </button> -->
             </div>
+            <div class="mt-4" *ngIf="selectedPaymentType?.code === 'GePG'">
+                <button
+                mat-flat-button
+                color="primary"
+                class="mr-2 mb-1"
+                (click)="getControlNumber($event)"
+                >
+                Get Control Number
+                </button>
+                <!-- <button
+                mat-stroked-button
+                [disabled]="!canConfirmBill"
+                (click)="onGetInvoice($event)"
+                class="mb-1"
+                >
+                <span>Get Invoice</span>
+                </button> -->
+            </div>
         </div>
     </div>
 </mat-expansion-panel>

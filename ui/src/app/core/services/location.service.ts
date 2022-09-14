@@ -71,7 +71,7 @@ export class LocationService {
       .get(
         "location/" +
           uuid +
-          "?v=custom:(display,uuid,tags,description,parentLocation:(uuid,display),childLocations:(display,uuid,tags,description,parentLocation:(uuid,display),childLocations,attributes:(attributeType,uuid,value,voided)),attributes:(attributeType,uuid,value,voided))"
+          "?v=custom:(display,uuid,tags,description,retired,parentLocation:(uuid,display),childLocations:(display,uuid,tags,retired,description,parentLocation:(uuid,display),childLocations,attributes:(attributeType,uuid,value,voided)),attributes:(attributeType,uuid,value,voided))"
       )
       .pipe(
         map((response) => {
