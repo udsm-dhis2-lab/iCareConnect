@@ -20,7 +20,10 @@ import { select, Store } from "@ngrx/store";
 import { AppState } from "src/app/store/reducers";
 import { getCurrentLocation, getParentLocation } from "src/app/store/selectors";
 import { DomSanitizer } from "@angular/platform-browser";
-import { getCurrentUserDetails, getProviderDetails } from "src/app/store/selectors/current-user.selectors";
+import {
+  getCurrentUserDetails,
+  getProviderDetails,
+} from "src/app/store/selectors/current-user.selectors";
 import { EncountersService } from "src/app/shared/services/encounters.service";
 import { OrdersService } from "src/app/shared/resources/order/services/orders.service";
 import { any } from "cypress/types/bluebird";
@@ -66,6 +69,7 @@ export class CurrentPatientBillingComponent implements OnInit {
   exemptionOrderType$: Observable<any>;
   exemptionConcept$: Observable<any>;
   hasOpenExemptionRequest: boolean;
+  isBillCleared: boolean;
 
   constructor(
     private route: ActivatedRoute,
@@ -90,16 +94,16 @@ export class CurrentPatientBillingComponent implements OnInit {
       loadCurrentPatient({ uuid: this.patientId, isRegistrationPage: false })
     );
     this.currentUser$ = this.store.select(getCurrentUserDetails);
-    this.facilityDetails$ = this.configService.getFacilityDetails();
     this.facilityLogo$ = this.configService.getLogo();
     this.facilityDetails$ = this.store.select(getParentLocation);
     this.currentLocation$ = this.store.pipe(select(getCurrentLocation));
     this.provider$ = this.store.select(getProviderDetails);
 
-
-    this.billingService.getPatientBills(this.patientId, false, "all").subscribe({
-      next: (bills) => {
-        bills.forEach((bill) => {
+    this.billingService
+      .getAllPatientInvoices(this.patientId, false, "all")
+      .subscribe({
+        next: (bills) => {
+          bills.forEach((bill) => {
             if (bill) {
               this.bill = bill;
               //Get discounted Items
@@ -123,6 +127,7 @@ export class CurrentPatientBillingComponent implements OnInit {
                 bill.billDetails.items.forEach((givenItem) => {
                   if (discountItem.item.uuid === givenItem.item.uuid) {
                     givenItems = [...givenItems, givenItem];
+                    item = givenItem
                   }
                 });
 
@@ -130,6 +135,12 @@ export class CurrentPatientBillingComponent implements OnInit {
                 paidItems.forEach((paymentItem) => {
                   paidAmount = paidAmount + parseInt(paymentItem.amount, 10);
                 });
+
+                //Check if bill was cleared
+                let payableAmount = givenItems[0].price - discountItem.amount;
+                if (paidAmount >= payableAmount) {
+                  this.isBillCleared = true;
+                }
 
                 // return givenItem with discounted amount if paid amount is less than item's price
                 if (paidAmount < givenItems[0].price) {
@@ -298,7 +309,7 @@ export class CurrentPatientBillingComponent implements OnInit {
           .subscribe({
             next: (encounter) => {
               this.hasOpenExemptionRequest = true;
-              this.store.dispatch(go({path: ['/billing']}))
+              this.store.dispatch(go({ path: ["/billing"] }));
               return encounter;
             },
             error: (err) => {
@@ -307,7 +318,6 @@ export class CurrentPatientBillingComponent implements OnInit {
           });
       }
     });
-
   }
 
   onPrint(e: any): void {

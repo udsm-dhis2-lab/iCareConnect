@@ -115,12 +115,14 @@ export class Visit {
   }
 
   get waitingToBeAdmitted(): boolean {
+    // TODO: Softcode tag name and admission encounter type uuid
     return (
       !this.location?.tags.some((tag) => tag?.name === "Bed Location") &&
       (
         this.visit.encounters.filter(
           (encounter) =>
-            encounter?.encounterType?.display.toLowerCase() === "admission"
+            encounter?.encounterType?.uuid ===
+            "e22e39fd-7db2-45e7-80f1-60fa0d5a4378"
         ) || []
       ).length > 0
     );

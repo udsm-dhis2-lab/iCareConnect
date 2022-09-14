@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { Store } from "@ngrx/store";
 import { Observable } from "rxjs";
+import { getBillingConceptUuid } from "src/app/core";
 import { Location } from "src/app/core/models";
 import { VisitObject } from "src/app/shared/resources/visits/models/visit-object.model";
 import { loadLocationById } from "src/app/store/actions";
@@ -46,8 +47,12 @@ export class WardsListComponent implements OnInit {
 
   onGetStatus(e, bed, visitData, bedOrdersWithBillStatus): void {
     e.stopPropagation();
+    const billingConcept = getBillingConceptUuid(bed?.attributes);
     this.bedStatus.emit({
-      ...bed,
+      ...{
+        ...bed,
+        billingConcept: billingConcept,
+      },
       occupied: visitData ? true : false,
       visit: visitData,
       bedOrdersWithBillStatus,

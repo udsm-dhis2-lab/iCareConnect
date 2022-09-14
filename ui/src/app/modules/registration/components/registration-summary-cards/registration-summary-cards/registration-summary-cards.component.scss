@@ -11,8 +11,7 @@
   background-color: #fff;
   background-clip: border-box;
   border: 1px solid #e3e6f0;
-  border-radius: 0.35rem;
-  margin: 10px;
+  // border-radius: 0.35rem;
 }
 p {
   font-size: 20px;
@@ -24,4 +23,8 @@ p {
   margin-right: 5px;
   width: 100%;
   border-bottom: 1px solid #000405;
+}
+
+.location-details-card {
+  cursor: pointer;
 }
