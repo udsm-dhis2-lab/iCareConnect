@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { select, Store } from "@ngrx/store";
 import { Observable } from "rxjs";
@@ -25,6 +25,7 @@ export class PatientMedicationSummaryComponent implements OnInit {
   generalPrescriptionOrderType$: Observable<any>;
   useGeneralPrescription$: Observable<any>;
   currentVisit$: Observable<unknown>;
+  @Output() updateConsultationOrder = new EventEmitter();
   constructor(
     private store: Store<AppState>,
     private ordersService: OrdersService,
@@ -69,6 +70,12 @@ export class PatientMedicationSummaryComponent implements OnInit {
         fromDispensing: this.fromDispensing,
         showAddButton: false,
       },
+    });
+
+    dialog.afterClosed().subscribe((data) => {
+      if(data?.updateConsultationOrder){
+        this.updateConsultationOrder.emit();
+      }
     });
   }
 }

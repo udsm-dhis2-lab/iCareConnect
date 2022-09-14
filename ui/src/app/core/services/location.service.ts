@@ -2,7 +2,7 @@ import { Injectable } from "@angular/core";
 import { OpenmrsHttpClientService } from "src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service";
 import { from, Observable, of, zip } from "rxjs";
 import { catchError, map } from "rxjs/operators";
-import { head } from "lodash";
+import { head, flatten } from "lodash";
 import {
   Api,
   LocationCreate,
@@ -67,18 +67,24 @@ export class LocationService {
   }
 
   getLocationById(uuid): Observable<any> {
-    return this.httpClient.get("location/" + uuid + "?v=full").pipe(
-      map((response) => {
-        return {
-          ...response,
-          attributes:
-            response?.attributes && response?.attributes?.length > 0
-              ? response?.attributes.filter((attribute) => !attribute?.voided)
-              : [],
-        };
-      }),
-      catchError((error) => of(error))
-    );
+    return this.httpClient
+      .get(
+        "location/" +
+          uuid +
+          "?v=custom:(display,uuid,tags,description,parentLocation:(uuid,display),childLocations:(display,uuid,tags,description,parentLocation:(uuid,display),childLocations,attributes:(attributeType,uuid,value,voided)),attributes:(attributeType,uuid,value,voided))"
+      )
+      .pipe(
+        map((response) => {
+          return {
+            ...response,
+            attributes:
+              response?.attributes && response?.attributes?.length > 0
+                ? response?.attributes.filter((attribute) => !attribute?.voided)
+                : [],
+          };
+        }),
+        catchError((error) => of(error))
+      );
   }
 
   getLocationByIds(uuids, params?: any): Observable<any> {
@@ -208,6 +214,57 @@ export class LocationService {
         }),
         catchError((error) => of(error))
       );
+  }
+
+  getLocationsByTagNames(
+    tagNames: string[],
+    parameters?: { limit?: number; startIndex?: number; v?: string; q?: string }
+  ): Observable<any[]> {
+    let othersParameters = "";
+    if (parameters?.limit) {
+      othersParameters += `&limit=${parameters?.limit}`;
+    }
+    if (parameters?.startIndex) {
+      othersParameters += `&startIndex=${parameters?.startIndex}`;
+    }
+    if (parameters?.v) {
+      othersParameters += `&v=${parameters?.v}`;
+    }
+    return zip(
+      ...tagNames.map((tagName) =>
+        this.httpClient
+          .get(
+            "location?tag=" +
+              tagName +
+              (othersParameters != "" ? othersParameters : "&v=full&limit=100")
+          )
+          .pipe(
+            map((response) => {
+              return (
+                response?.results?.filter((res: any) => !res?.retired) || []
+              ).map((result) => {
+                return {
+                  ...result,
+                  childLocations:
+                    result?.childLocations?.filter(
+                      (childLoc: any) => !childLoc?.retired
+                    ) || [],
+                  attributes:
+                    result?.attributes && result?.attributes?.length > 0
+                      ? result?.attributes.filter(
+                          (attribute) => !attribute?.voided
+                        )
+                      : [],
+                };
+              });
+            })
+          )
+      )
+    ).pipe(
+      map((response) => {
+        return flatten(response);
+      })
+    );
   }
 
   getFacilityCode(): Observable<any> {

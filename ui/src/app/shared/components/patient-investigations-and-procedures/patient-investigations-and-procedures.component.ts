@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { FormControl } from "@angular/forms";
 import { Visit } from "../../resources/visits/models/visit.model";
 
@@ -17,9 +17,11 @@ export class PatientInvestigationsAndProceduresComponent implements OnInit {
   @Input() iCareGeneralConfigurations: any;
   @Input() clinicConfigurations: any;
   @Input() userPrivileges: any;
+  @Input() fromConsultation: any;
   selectedTab = new FormControl(0);
 
   shouldShowLabSection: boolean = false;
+  @Output() updateConsultationOrder = new EventEmitter();
   constructor() {}
 
   ngOnInit(): void {
@@ -35,5 +37,11 @@ export class PatientInvestigationsAndProceduresComponent implements OnInit {
 
   changeTab(val): void {
     this.selectedTab.setValue(val);
+  }
+
+  onUpdateConsultationOrder(){
+    if (this.fromConsultation) {
+      this.updateConsultationOrder.emit();
+    }
   }
 }

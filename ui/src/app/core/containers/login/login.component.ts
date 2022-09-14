@@ -5,7 +5,11 @@ import { Store } from "@ngrx/store";
 import { Observable } from "rxjs";
 import { Credentials } from "src/app/core";
 import { Location } from "src/app/core/models";
-import { authenticateUser, loadRolesDetails } from "src/app/store/actions";
+import {
+  authenticateUser,
+  loadLoginLocations,
+  loadRolesDetails,
+} from "src/app/store/actions";
 import { AppState } from "src/app/store/reducers";
 import { getParentLocation } from "src/app/store/selectors";
 import {
@@ -29,7 +33,9 @@ export class LoginComponent implements OnInit {
     private store: Store<AppState>,
     private formBuilder: FormBuilder,
     public dialog: MatDialog
-  ) {}
+  ) {
+    this.store.dispatch(loadLoginLocations());
+  }
 
   ngOnInit(): void {
     this.loginForm = this.formBuilder.group({
