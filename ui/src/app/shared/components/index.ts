@@ -80,6 +80,7 @@ import { UnitFieldComponent } from "./unit-field/unit-field.component";
 import { PatientGenericDrugOrderListComponent } from "./patient-generic-drug-order-list/patient-generic-drug-order-list.component";
 import { CurrentPrescriptionComponent } from "./current-prescriptions/current-prescriptions.component";
 import { IcareSupportGoogleFormComponent } from "./icare-support-google-form/icare-support-google-form.component";
+import { PatientsListByLocationComponent } from "./patients-list-by-location/patients-list-by-location.component";
 
 export const components: any[] = [
   PatientSearchComponent,
@@ -164,6 +165,7 @@ export const components: any[] = [
   PatientGenericDrugOrderListComponent,
   CurrentPrescriptionComponent,
   IcareSupportGoogleFormComponent,
+  PatientsListByLocationComponent,
 ];
 
 export const sharedEntryComponents: any[] = [
