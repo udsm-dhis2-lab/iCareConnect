@@ -1,12 +1,12 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { MatTableDataSource } from '@angular/material/table';
-import { Bill } from '../../models/bill.model';
-import { flatten } from 'lodash';
-import { PaymentReceiptComponent } from '../payment-reciept/payment-reciept.component';
-import { BillConfirmationComponent } from '../bill-confirmation/bill-confirmation.component';
-import { MatDialog } from '@angular/material/dialog';
-import { SelectionModel } from '@angular/cdk/collections';
-import { BillItem } from '../../models/bill-item.model';
+import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import { MatTableDataSource } from "@angular/material/table";
+import { Bill } from "../../models/bill.model";
+import { flatten } from "lodash";
+import { PaymentReceiptComponent } from "../payment-reciept/payment-reciept.component";
+import { BillConfirmationComponent } from "../bill-confirmation/bill-confirmation.component";
+import { MatDialog } from "@angular/material/dialog";
+import { SelectionModel } from "@angular/cdk/collections";
+import { BillItem } from "../../models/bill-item.model";
 
 @Component({
   selector: "app-discounts",
@@ -21,6 +21,7 @@ export class DiscountsComponent implements OnInit {
   @Input() facilityDetails: any;
   @Input() disableControls: boolean;
   @Input() bill: Bill;
+  @Input() bills: Bill[];
 
   @Output() confirmPayment = new EventEmitter<any>();
   @Output() paymentSuccess = new EventEmitter<any>();
@@ -136,22 +137,22 @@ export class DiscountsComponent implements OnInit {
       disableClose: true,
       data: {
         billItems: this.selection?.selected.map((item) => {
-          delete item["name"]
-          delete item["amount"]
-          
-          let billItem ={
-              ...item,
-              discounted: false,
-            }
-          let bill = item?.invoice?.uuid
+          delete item["name"];
+          delete item["amount"];
+
+          let billItem = {
+            ...item,
+            discounted: false,
+          };
+          let bill = item?.invoice?.uuid;
           return new BillItem(billItem, bill);
         }),
         items: this.discountItems.map((item) => {
-          let billItem =  {
-              ...item,
-              discounted: false
-            }
-          let bill = item?.invoice?.uuid
+          let billItem = {
+            ...item,
+            discounted: false,
+          };
+          let bill = item?.invoice?.uuid;
           return new BillItem(billItem, bill);
         }),
         bill: this.bill,
@@ -216,6 +217,5 @@ export class DiscountsComponent implements OnInit {
 
   onGetInvoice(e: MouseEvent) {}
 
-  onChangePaymentType(e) {
-  }
+  onChangePaymentType(e) {}
 }
