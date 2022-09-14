@@ -12,7 +12,7 @@ import { getApplicableForms } from "src/app/shared/helpers/identify-applicable-f
 import { ICARE_CONFIG } from "src/app/shared/resources/config";
 import { Patient } from "src/app/shared/resources/patient/models/patient.model";
 import { Visit } from "src/app/shared/resources/visits/models/visit.model";
-import { loadCustomOpenMRSForms } from "src/app/store/actions";
+import { go, loadCustomOpenMRSForms } from "src/app/store/actions";
 import { clearBills } from "src/app/store/actions/bill.actions";
 import { saveObservationsUsingEncounter } from "src/app/store/actions/observation.actions";
 import { AppState } from "src/app/store/reducers";
@@ -132,7 +132,7 @@ export class InpatientComponent implements OnInit {
     e.stopPropagation();
     this.dialog.open(AssignBedToPatientComponent, {
       width: "70%",
-      height: "570px",
+      maxHeight: "570px",
       data: {
         location,
         patient,
@@ -243,5 +243,10 @@ export class InpatientComponent implements OnInit {
       .subscribe(() => {
         window.location.reload();
       });
+  }
+
+  getBackToPatientsList(event: Event): void {
+    event.stopPropagation();
+    this.store.dispatch(go({ path: ["/inpatient"] }));
   }
 }

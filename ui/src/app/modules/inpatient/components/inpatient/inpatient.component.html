@@ -11,8 +11,7 @@
     <button
       class="float-left"
       mat-stroked-button
-      (click)="clearBills($event)"
-      [routerLink]="'/inpatient'"
+      (click)="getBackToPatientsList($event)"
       matTooltip="Back to List"
     >
       <mat-icon>arrow_back</mat-icon>
@@ -22,7 +21,7 @@
       [disabled]="activeVisit?.transferedOutSide"
       (click)="transferPatient($event, activeVisit)"
       *ngIf="activeVisit?.isAdmitted"
-      style="color: #fff !important"
+      style="color: #fff"
       mat-stroked-button
       class="ml-2 float-right"
     >
@@ -32,7 +31,7 @@
       [disabled]="activeVisit?.transferedOutSide"
       (click)="transferPatientOutSide($event, activeVisit)"
       *ngIf="activeVisit?.isAdmitted"
-      style="color: #fff !important"
+      style="color: #fff"
       mat-stroked-button
       class="ml-2 float-right"
     >
@@ -52,7 +51,7 @@
         )
       "
       *ngIf="activeVisit?.isAdmitted"
-      style="color: #fff !important"
+      style="color: #fff"
       mat-stroked-button
       class="ml-2 float-right"
     >
@@ -69,19 +68,17 @@
         )
       "
       *ngIf="activeVisit?.isAdmitted"
-      style="color: #fff !important"
+      style="color: #fff"
       mat-stroked-button
       class="ml-2 float-right"
     >
       Discharge
     </button>
     <button
-      *ngIf="!activeVisit?.isAdmitted && bedOrdersWithBillStatus?.length > 0"
       [disabled]="
-        activeVisit?.isAdmitted ||
-        (!activeVisit?.isAdmitted && countOfUnPaidBedOrders > 0)
+        !activeVisit?.waitingToBeAdmitted || countOfUnPaidBedOrders > 0
       "
-      style="color: #fff !important"
+      style="color: #fff"
       mat-stroked-button
       class="float-right"
       (click)="
@@ -95,7 +92,7 @@
         )
       "
     >
-      Admit patient
+      Assign Bed
     </button>
   </div>
   <div class="col-12" *ngIf="activeVisit?.transferedOutSide">

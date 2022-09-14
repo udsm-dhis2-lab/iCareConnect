@@ -11,6 +11,7 @@ import {
   updateCurrentLocationStatus,
 } from "src/app/store/actions";
 import { ICARE_APPS } from "src/app/core/containers/modules/modules.constants";
+import { getUserAssignedLocations } from "src/app/store/selectors/current-user.selectors";
 
 @Component({
   selector: "app-modules-selector",
@@ -22,7 +23,7 @@ export class ModulesSelectorComponent implements OnInit {
   @Input() lisConfigurations: any;
   modulesReferences: string[];
   currentModule: any;
-  currentLocation: any;
+  @Input() currentLocation: any;
   userLocationsForTheCurrentModule: Location[];
   constructor(private store: Store<AppState>) {}
 
@@ -41,30 +42,26 @@ export class ModulesSelectorComponent implements OnInit {
         )?.length > 0
     ) || [])[0];
 
-    localStorage.setItem(
-      "currentLocation",
-      JSON.stringify(locationMatchingNavigationDetails)
-    );
-
     const storedLocation =
-      localStorage.getItem("currentLocation") != "undefined"
-        ? JSON.parse(localStorage.getItem("currentLocation"))
-        : null;
+      localStorage.getItem("currentLocation") == "undefined" ||
+      !localStorage.getItem("currentLocation")
+        ? null
+        : JSON.parse(localStorage.getItem("currentLocation"));
     if (storedNavigationDetails) {
-      this.currentLocation = !storedLocation
-        ? {
-            ...locationMatchingNavigationDetails,
-            id: locationMatchingNavigationDetails?.uuid,
-            ...this.locations.filter(
-              (loc) => loc?.uuid === storedLocation?.uuid || []
-            )[0],
-          }
-        : storedLocation;
+      // this.currentLocation = !storedLocation
+      //   ? {
+      //       ...locationMatchingNavigationDetails,
+      //       id: locationMatchingNavigationDetails?.uuid,
+      //       ...this.locations.filter(
+      //         (loc) => loc?.uuid === storedLocation?.uuid || []
+      //       )[0],
+      //     }
+      //   : storedLocation;
+      // console.log("currentLocation CHeck", this.currentLocation);
 
       this.store.dispatch(
         setCurrentUserCurrentLocation({ location: this.currentLocation })
       );
-
       const modules = (
         this.currentLocation.attributes?.filter(
           (attribute) =>

@@ -74,6 +74,7 @@ export class GeneralDispensingFormComponent implements OnInit {
 
   @Output() showCloseDialog: EventEmitter<boolean> =
     new EventEmitter<boolean>();
+  @Output() updateConsultationOrder = new EventEmitter();
 
   constructor(
     private drugOrderService: DrugOrdersService,
@@ -213,5 +214,7 @@ export class GeneralDispensingFormComponent implements OnInit {
             });
         }
       });
+
+    this.updateConsultationOrder.emit();
   }
 }

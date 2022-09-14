@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { FormControl } from "@angular/forms";
 import { Store } from "@ngrx/store";
 import { data } from "cypress/types/jquery";
@@ -39,6 +39,7 @@ export class PatientLabResultsSummaryComponent implements OnInit {
   provider$: Observable<any>;
   loadedLabOrders: boolean = false;
   creatingLabOrdersState$: Observable<boolean>;
+  @Output() updateConsultationOrder = new EventEmitter();
   constructor(
     private openMRSHttpClient: OpenmrsHttpClientService,
     private store: Store<AppState>,
@@ -221,4 +222,8 @@ export class PatientLabResultsSummaryComponent implements OnInit {
       )
     );
   }
+
+  onUpdateConsultationOrder(){
+    this.updateConsultationOrder.emit();
+  };
 }
