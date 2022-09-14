@@ -16,4 +16,5 @@ export interface BillItemObject {
     display: string;
     uuid: string;
   };
+  calculatedPayableAmount?: number;
 }

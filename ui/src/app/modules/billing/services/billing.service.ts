@@ -78,23 +78,40 @@ export class BillingService {
 
     formData.append("json", JSON.stringify(jsonData));
     formData.append("file", file);
-
-    return of(this.http
-      .post(`../../../openmrs/ws/rest/v1/obs`, formData)
-      .subscribe((response: any) => {
-        if (response) {
-          discountData = {
-            ...discountData,
-            attachmentUuid: response?.uuid,
-          };
-          const discountedBill = Bill.createDiscount(discountData);
-          return this.http
-            .post("../../../openmrs/ws/rest/v1/billing/discount", discountedBill)
-            .subscribe(() => {
-                return new Discount(discountedBill);
-              })
-        }
-      }))
+    if (!discountDetails?.attachmentDetails?.file) {
+      return this.http
+        .post(
+          "../../../openmrs/ws/rest/v1/billing/discount",
+          omit(Bill.createDiscount(discountData), "attachment")
+        )
+        .pipe(
+          map((response) => {
+            return new Discount(response);
+          })
+        );
+    } else {
+      return of(
+        this.http
+          .post(`../../../openmrs/ws/rest/v1/obs`, formData)
+          .subscribe((response: any) => {
+            if (response) {
+              discountData = {
+                ...discountData,
+                attachmentUuid: response?.uuid,
+              };
+              const discountedBill = Bill.createDiscount(discountData);
+              return this.http
+                .post(
+                  "../../../openmrs/ws/rest/v1/billing/discount",
+                  discountedBill
+                )
+                .subscribe(() => {
+                  return new Discount(discountedBill);
+                });
+            }
+          })
+      );
+    }
   }
 
   discountCriteriaConcept() {
