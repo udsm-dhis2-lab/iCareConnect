@@ -37,6 +37,8 @@ import {
   upsertLocations,
   updateCurrentLocationStatus,
   loadMainLocation,
+  setAllUserAssignedLocationsLoadedState,
+  loadLocationsByTagNames,
 } from "../actions";
 import { AppState } from "../reducers";
 import {
@@ -48,7 +50,7 @@ import {
 import { getAuthenticationState } from "../selectors/current-user.selectors";
 
 @Injectable()
-export class LocationsEffects implements OnInitEffects {
+export class LocationsEffects {
   routerReady$ = createEffect(
     () =>
       this.actions$.pipe(
@@ -199,11 +201,11 @@ export class LocationsEffects implements OnInitEffects {
       ofType(loadLocationByIds),
       withLatestFrom(this.store.select(getLocationEntities)),
       switchMap(([action, locationsEntities]: [any, any]) => {
+        const locationsToLoad = action.locationUuids?.filter(
+          (uuid) => !locationsEntities[uuid]
+        );
         return this.locationService
-          .getLocationByIds(
-            action.locationUuids?.filter((uuid) => !locationsEntities[uuid]),
-            action?.params
-          )
+          .getLocationByIds(locationsToLoad, action?.params)
           .pipe(
             switchMap((locationsResponse) => {
               const formattedLocs = orderBy(
@@ -216,12 +218,15 @@ export class LocationsEffects implements OnInitEffects {
               let currentUserCurrentLocation;
               const storedCurrentLocation =
                 localStorage.getItem("currentLocation");
-              if (!storedCurrentLocation || storedCurrentLocation === "null") {
+              if (
+                !storedCurrentLocation ||
+                storedCurrentLocation === "null" ||
+                !JSON.parse(storedCurrentLocation)?.uuid
+              ) {
                 currentUserCurrentLocation = formattedLocs[0];
               } else {
                 currentUserCurrentLocation = JSON.parse(storedCurrentLocation);
               }
-
               return [
                 addLoadedLocations({
                   locations: formattedLocs || [],
@@ -229,6 +234,12 @@ export class LocationsEffects implements OnInitEffects {
                 setCurrentUserCurrentLocation({
                   location: currentUserCurrentLocation,
                 }),
+                action?.isUserLocations
+                  ? setAllUserAssignedLocationsLoadedState({
+                      allLoadedState:
+                        locationsToLoad?.length === formattedLocs?.length,
+                    })
+                  : null,
                 updateCurrentLocationStatus({ settingLocation: false }),
               ];
             })
@@ -290,9 +301,35 @@ export class LocationsEffects implements OnInitEffects {
     )
   );
 
-  ngrxOnInitEffects(): Action {
-    return loadLoginLocations();
-  }
+  locationByTagNames$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(loadLocationsByTagNames),
+      switchMap((action) => {
+        return this.locationService
+          .getLocationsByTagNames(action.tagNames, {
+            limit: 100,
+            startIndex: 0,
+            v: "custom:(uuid,name,display,description,parentLocation:(uuid,name),tags,attributes,childLocations,retired)",
+          })
+          .pipe(
+            switchMap((locationsResponse: any) => {
+              return [
+                addLoadedLocations({
+                  locations: formatLocationsPayLoad(locationsResponse || []),
+                }),
+                upsertLocations({
+                  locations: formatLocationsPayLoad(locationsResponse || []),
+                }),
+                updateCurrentLocationStatus({ settingLocation: false }),
+              ];
+            }),
+            catchError((error) => {
+              return of(loadingLocationByTagNameFails({ error }));
+            })
+          );
+      })
+    )
+  );
 
   constructor(
     private actions$: Actions,

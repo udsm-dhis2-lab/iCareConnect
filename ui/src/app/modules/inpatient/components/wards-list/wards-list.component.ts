@@ -28,14 +28,6 @@ export class WardsListComponent implements OnInit {
   constructor(private store: Store<AppState>) {}
 
   ngOnInit(): void {
-    // console.log("currentLocation:::", this.currentLocation);
-    // console.log("locationBedsDetails", this.locationBedsDetails);
-    // this.store.dispatch(
-    //   loadLocationById({
-    //     locationUuid: this.locationBedsDetails?.id,
-    //   })
-    // );
-    // console.log("this.locationBedsDetails?.id", this.locationBedsDetails?.id);
     this.wardsInfo$ = this.store.select(
       getBedsGroupedByTheCurrentLocationChildren,
       {

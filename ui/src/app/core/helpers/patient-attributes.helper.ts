@@ -3,7 +3,7 @@ export function identifyIfPatientHasPhoneAttribute(
   generalMetadataConfigurations
 ): string {
   return !patient?.person?.attributes ||
-    (patient?.person?.attributes && patient?.person?.attributes.length == 0)
+    (patient?.person?.attributes && patient?.person?.attributes?.length == 0)
     ? ""
     : (
         patient?.person?.attributes.filter(
