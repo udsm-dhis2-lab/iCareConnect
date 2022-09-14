@@ -42,14 +42,10 @@
 </div> -->
 <div class="mt-2" *ngIf="{ patients: patients$ | async } as params">
   <div class="patient-search-container">
-    <div
-      class="patient-search-input-block p-2  border"
-    
-    >
+    <div class="patient-search-input-block p-2 border">
       <div class="patient-search-input">
         <mat-icon matPrefix class="text-muted">search</mat-icon>
         <input
-          class="ml-2 " 
           id="input-search-patient"
           autocomplete="off"
           type="text"
@@ -58,56 +54,72 @@
           (keyup)="onSearchPatients($event)"
         />
         <div class="search-spinner">
-          <mat-spinner *ngIf="searching"  [diameter]="22"></mat-spinner>
+          <mat-spinner *ngIf="searching" [diameter]="22"></mat-spinner>
         </div>
       </div>
     </div>
   </div>
-    
-  <div *ngIf="params?.patients?.length > 0 && showList" class="mt-3" style="width: 80%;" >
-      <table mat-table [dataSource]="params?.patients " class="mat-elevation-z2 w-100">
-          <!-- No Column -->
-          <ng-container matColumnDef="id">
-            <th mat-header-cell *matHeaderCellDef>No</th>
-            <td mat-cell *matCellDef="let element; let i = index;"> {{i+1}} </td>
-          </ng-container>
 
-          <!-- Name Column -->
-          <ng-container matColumnDef="name">
-            <th mat-header-cell *matHeaderCellDef> Name </th>
-            <td mat-cell *matCellDef="let element"> {{element.name}} </td>
-          </ng-container>
-        
-          <!-- Gender Column -->
-          <ng-container matColumnDef="gender">
-            <th mat-header-cell *matHeaderCellDef>Gender</th>
-            <td mat-cell *matCellDef="let element"> {{element.gender}} </td>
-          </ng-container>
-        
-          <!-- Age Column -->
-          <ng-container matColumnDef="age">
-            <th mat-header-cell *matHeaderCellDef> Age </th>
-            <td mat-cell *matCellDef="let element"> {{element.age}}</td>
-          </ng-container>
-           <!-- Phone Column -->
-           <ng-container matColumnDef="phone">
-            <th mat-header-cell *matHeaderCellDef>Phone</th>
-            <td mat-cell *matCellDef="let element"> {{element.phone ? "0"+ element.phone : ''}} </td>
-          </ng-container>
-        
-          <tr mat-header-row *matHeaderRowDef="displayedColumn"></tr>
-          <tr mat-row *matRowDef="let row; columns: displayedColumn;"    
-              style="cursor: pointer"
-              (click)="onSelectPatient($event, row)"></tr>
-        </table> 
-      </div>
-      <div *ngIf="params?.patients && !(params?.patients.length > 0) &&  showList && !searching && focused" class="no-data mt-4">
-        <p>
-          No Patient with this keyword. Please Register or search again!
-        </p>
-      </div>
+  <div
+    *ngIf="params?.patients?.length > 0 && showList"
+    class="mt-3"
+    style="margin-left: 10%; width: 80%"
+  >
+    <table
+      mat-table
+      [dataSource]="params?.patients"
+      class="mat-elevation-z2 w-100"
+    >
+      <!-- No Column -->
+      <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef>No</th>
+        <td mat-cell *matCellDef="let element; let i = index">{{ i + 1 }}</td>
+      </ng-container>
+
+      <!-- Name Column -->
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef>Name</th>
+        <td mat-cell *matCellDef="let element">{{ element.name }}</td>
+      </ng-container>
+
+      <!-- Gender Column -->
+      <ng-container matColumnDef="gender">
+        <th mat-header-cell *matHeaderCellDef>Gender</th>
+        <td mat-cell *matCellDef="let element">{{ element.gender }}</td>
+      </ng-container>
+
+      <!-- Age Column -->
+      <ng-container matColumnDef="age">
+        <th mat-header-cell *matHeaderCellDef>Age</th>
+        <td mat-cell *matCellDef="let element">{{ element.age }}</td>
+      </ng-container>
+      <!-- Phone Column -->
+      <ng-container matColumnDef="phone">
+        <th mat-header-cell *matHeaderCellDef>Phone</th>
+        <td mat-cell *matCellDef="let element">
+          {{ element.phone ? "0" + element.phone : "" }}
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumn"></tr>
+      <tr
+        mat-row
+        *matRowDef="let row; columns: displayedColumn"
+        style="cursor: pointer"
+        (click)="onSelectPatient($event, row)"
+      ></tr>
+    </table>
+  </div>
+  <div
+    *ngIf="
+      params?.patients &&
+      !(params?.patients.length > 0) &&
+      showList &&
+      !searching &&
+      focused
+    "
+    class="no-data mt-4"
+  >
+    <p>No Patient with this keyword. Please Register or search again!</p>
+  </div>
 </div>
-
-
-    
-
