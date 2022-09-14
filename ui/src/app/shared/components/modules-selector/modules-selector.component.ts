@@ -139,12 +139,12 @@ export class ModulesSelectorComponent implements OnInit {
 
     this.userLocationsForTheCurrentModule =
       this.locations.filter(
-        (location) =>
+        (location: any) =>
           (
             location?.modules.filter(
               (module) => module?.id === this.currentModule?.id
             ) || []
-          ).length > 0
+          ).length > 0 && !location?.retired
       ) || [];
     this.store.dispatch(
       setCurrentUserCurrentLocation({ location: this.currentModule?.location })
@@ -189,12 +189,12 @@ export class ModulesSelectorComponent implements OnInit {
     this.currentModule = module;
     this.userLocationsForTheCurrentModule =
       this.locations.filter(
-        (location) =>
+        (location: any) =>
           (
             location?.modules.filter(
               (module) => module?.id === this.currentModule?.id
             ) || []
-          ).length > 0
+          ).length > 0 && !location?.retired
       ) || [];
 
     this.currentLocation = this.userLocationsForTheCurrentModule[0];
