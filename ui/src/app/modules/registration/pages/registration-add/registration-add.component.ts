@@ -80,6 +80,7 @@ export class RegistrationAddComponent implements OnInit {
   educationInfo$: Observable<any[]>;
   maritalstatusInfo$: Observable<any[]>;
   relationTypeOptions$: Observable<any>;
+  selectedIdFormat: string;
 
   constructor(
     private _snackBar: MatSnackBar,
@@ -731,6 +732,7 @@ export class RegistrationAddComponent implements OnInit {
     this.patient["patientType"] = value;
     // TODO: FInd logic to softcode this particular area
     if (value === "Student") {
+      this.selectedIdFormat = "Eg: 2014-04-02341";
       this.selectedIdentifierType = {
         name: "Student ID",
         id: "9f6496ec-cf8e-4186-b8fc-aaf9e93b3406",
@@ -738,6 +740,7 @@ export class RegistrationAddComponent implements OnInit {
       };
       this.disabledIDType = true;
     } else if (value === "Staff") {
+      this.selectedIdFormat = "Eg: 02342";
       this.selectedIdentifierType = {
         id: "6e7203dd-0d6b-4c92-998d-fdc82a71a1b0",
         name: "Staff ID",
@@ -745,6 +748,7 @@ export class RegistrationAddComponent implements OnInit {
       };
       this.disabledIDType = true;
     } else {
+      this.selectedIdFormat = "Enter ID";
       this.disabledIDType = false;
       this.selectedIdentifierType = null;
     }
