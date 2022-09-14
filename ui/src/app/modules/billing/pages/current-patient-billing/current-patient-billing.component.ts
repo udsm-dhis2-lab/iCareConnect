@@ -69,6 +69,7 @@ export class CurrentPatientBillingComponent implements OnInit {
   exemptionOrderType$: Observable<any>;
   exemptionConcept$: Observable<any>;
   hasOpenExemptionRequest: boolean;
+  isBillCleared: boolean;
 
   constructor(
     private route: ActivatedRoute,
@@ -126,6 +127,7 @@ export class CurrentPatientBillingComponent implements OnInit {
                 bill.billDetails.items.forEach((givenItem) => {
                   if (discountItem.item.uuid === givenItem.item.uuid) {
                     givenItems = [...givenItems, givenItem];
+                    item = givenItem
                   }
                 });
 
@@ -133,6 +135,12 @@ export class CurrentPatientBillingComponent implements OnInit {
                 paidItems.forEach((paymentItem) => {
                   paidAmount = paidAmount + parseInt(paymentItem.amount, 10);
                 });
+
+                //Check if bill was cleared
+                let payableAmount = givenItems[0].price - discountItem.amount;
+                if (paidAmount >= payableAmount) {
+                  this.isBillCleared = true;
+                }
 
                 // return givenItem with discounted amount if paid amount is less than item's price
                 if (paidAmount < givenItems[0].price) {
