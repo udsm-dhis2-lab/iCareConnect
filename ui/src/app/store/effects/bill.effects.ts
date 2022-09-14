@@ -144,7 +144,6 @@ export class BillEffects {
     this.actions$.pipe(
       ofType(discountBill),
       switchMap(({ discountDetails, bill }) => {
-        console.log(discountDetails);
         return this.billingService.discountBill(discountDetails).pipe(
           map((discount: Discount) => {
             const newBill = new Bill({

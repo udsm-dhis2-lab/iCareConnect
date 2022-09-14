@@ -197,7 +197,7 @@ export class ExemptionComponent implements OnInit, AfterContentInit {
         
       //Update Encounter Order after Succesfully exempting this person
       this.updateOrderAndExemptionEncounter(params?.currentVisit?.encounters, params?.exemptionEncounterType, reason, true)
-      // this.router.navigateByUrl('/billing/exemption')
+      
       this.store.dispatch(go({ path: ['/billing/exemption']}))
     }
     });
@@ -246,7 +246,6 @@ export class ExemptionComponent implements OnInit, AfterContentInit {
       if (data?.confirmed) {
         // Discount Creation
         this.onDiscountBill(data?.exemptionDetails, params);
-        // this.router.navigateByUrl('/billing/exemption')
       }
     });
   }
@@ -279,20 +278,22 @@ export class ExemptionComponent implements OnInit, AfterContentInit {
       fulfillerComment: commentToFulfiller,
     };
 
-    exemptionOrder = {
+    const exemptionOrderPayload = {
       uuid: exemptionOrder?.uuid,
       fulfillerStatus: exemptionOrder?.fulfillerStatus,
       fulfillerComment: exemptionOrder?.fulfillerComment,
       encounter: exemptionOrder?.encounter,
     }
-    this.ordersService.updateOrdersViaEncounter([exemptionOrder]).subscribe({
-      next: (order) => {
-        return order;
-      },
-      error: (error) => {
-        return error;
-      }
-    })
+    this.ordersService
+      .updateOrdersViaEncounter([exemptionOrderPayload])
+      .subscribe({
+        next: (order) => {
+          return order;
+        },
+        error: (error) => {
+          return error;
+        },
+      });
 
     //Update encounter to void if voidEncounter True
     if (voidEncounter === true) {
