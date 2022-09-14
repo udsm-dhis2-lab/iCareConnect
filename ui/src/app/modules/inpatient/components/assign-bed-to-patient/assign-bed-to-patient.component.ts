@@ -119,7 +119,7 @@ export class AssignBedToPatientComponent implements OnInit {
     this.currentBedStatus = null;
   }
 
-  onAdmit(e) {
+  onAdmit(e: Event): void {
     e.stopPropagation();
     const data = {
       encounterDatetime: new Date(),
@@ -129,6 +129,7 @@ export class AssignBedToPatientComponent implements OnInit {
       visit: this.visit?.uuid,
       provider: this.provider?.uuid,
     };
+    console.log("data", data);
     this.store.dispatch(admitPatient({ admissionDetails: data, path: null }));
   }
 }
