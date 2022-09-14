@@ -153,6 +153,7 @@
             >
               Get Report
             </button>
+            {{ reportSelectionParams | json }}
             <span *ngIf="reportConfigs && reportConfigs?.dhisConfigs">
               <!-- {{ reportConfigs?.countOfReportsSent | json }} -->
               <button
