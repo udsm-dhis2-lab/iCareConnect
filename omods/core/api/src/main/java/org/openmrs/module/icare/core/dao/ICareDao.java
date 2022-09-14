@@ -584,7 +584,7 @@ public class ICareDao extends BaseDAO<Item> {
 		query = session.createQuery(queryStr);
 		summary.setActiveVisits((long) query.list().get(0));
 
-		queryStr = "SELECT l,COUNT(v) FROM Location l, Visit v WHERE v.stopDatetime IS NULL AND v.location=l GROUP BY l";
+		queryStr = "SELECT l,COUNT(v) FROM Location l, Visit v WHERE v.stopDatetime IS NULL AND v.location=l AND l.retired=false GROUP BY l";
 		query = session.createQuery(queryStr);
 		//summary.setActiveVisits((long) query.list().get(0));
 
