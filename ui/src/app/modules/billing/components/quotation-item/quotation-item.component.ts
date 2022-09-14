@@ -86,7 +86,11 @@ export class QuotationItemComponent implements OnInit {
       { id: "quantity", label: "Quantity" },
       { id: "price", label: "Unit Price", isCurrency: true },
       { id: "discount", label: "Discount", isCurrency: true },
-      { id: "amount", label: "Payable Amount", isCurrency: true },
+      {
+        id: "calculatedPayableAmount",
+        label: "Payable Amount",
+        isCurrency: true,
+      },
     ];
     this.displayedColumns = [
       ...this.columns.map((column) => column.id),
@@ -184,8 +188,8 @@ export class QuotationItemComponent implements OnInit {
     console.log(e);
   }
 
-  getControlNumber(e: any){
-   e.stopPropagation();
+  getControlNumber(e: any) {
+    e.stopPropagation();
     const dialog = this.dialog.open(BillConfirmationComponent, {
       width: "600px",
       disableClose: true,
