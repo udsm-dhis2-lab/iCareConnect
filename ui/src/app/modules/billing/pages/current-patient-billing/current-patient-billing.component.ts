@@ -20,7 +20,10 @@ import { select, Store } from "@ngrx/store";
 import { AppState } from "src/app/store/reducers";
 import { getCurrentLocation, getParentLocation } from "src/app/store/selectors";
 import { DomSanitizer } from "@angular/platform-browser";
-import { getCurrentUserDetails, getProviderDetails } from "src/app/store/selectors/current-user.selectors";
+import {
+  getCurrentUserDetails,
+  getProviderDetails,
+} from "src/app/store/selectors/current-user.selectors";
 import { EncountersService } from "src/app/shared/services/encounters.service";
 import { OrdersService } from "src/app/shared/resources/order/services/orders.service";
 import { any } from "cypress/types/bluebird";
@@ -90,16 +93,16 @@ export class CurrentPatientBillingComponent implements OnInit {
       loadCurrentPatient({ uuid: this.patientId, isRegistrationPage: false })
     );
     this.currentUser$ = this.store.select(getCurrentUserDetails);
-    this.facilityDetails$ = this.configService.getFacilityDetails();
     this.facilityLogo$ = this.configService.getLogo();
     this.facilityDetails$ = this.store.select(getParentLocation);
     this.currentLocation$ = this.store.pipe(select(getCurrentLocation));
     this.provider$ = this.store.select(getProviderDetails);
 
-
-    this.billingService.getPatientBills(this.patientId, false, "all").subscribe({
-      next: (bills) => {
-        bills.forEach((bill) => {
+    this.billingService
+      .getPatientBills(this.patientId, false, "all")
+      .subscribe({
+        next: (bills) => {
+          bills.forEach((bill) => {
             if (bill) {
               this.bill = bill;
               //Get discounted Items
@@ -298,7 +301,7 @@ export class CurrentPatientBillingComponent implements OnInit {
           .subscribe({
             next: (encounter) => {
               this.hasOpenExemptionRequest = true;
-              this.store.dispatch(go({path: ['/billing']}))
+              this.store.dispatch(go({ path: ["/billing"] }));
               return encounter;
             },
             error: (err) => {
@@ -307,7 +310,6 @@ export class CurrentPatientBillingComponent implements OnInit {
           });
       }
     });
-
   }
 
   onPrint(e: any): void {

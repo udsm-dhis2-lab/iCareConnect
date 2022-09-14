@@ -8,7 +8,11 @@ import { TableColumn } from "src/app/shared/models/table-column.model";
 import { TableConfig } from "src/app/shared/models/table-config.model";
 import { Api } from "src/app/shared/resources/openmrs";
 import { Visit } from "src/app/shared/resources/visits/models/visit.model";
-import { go, loadCurrentPatient } from "src/app/store/actions";
+import {
+  go,
+  loadCurrentPatient,
+  loadLoginLocations,
+} from "src/app/store/actions";
 import { AppState } from "src/app/store/reducers";
 import { getSettingCurrentLocationStatus } from "src/app/store/selectors";
 
