@@ -144,7 +144,7 @@
                 <input
                   matInput
                   [pattern]="selectedIdentifierType?.format"
-                  placeholder="Enter Text"
+                  [placeholder]="selectedIdFormat"
                   [required]="selectedIdentifierType?.required"
                   [disabled]="
                     !selectedIdentifierType || selectedIdentifierType.disabled

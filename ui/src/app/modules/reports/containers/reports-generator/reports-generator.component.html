@@ -74,7 +74,16 @@
           >
             <mat-expansion-panel-header>
               <mat-panel-title>
-                {{ parameter?.label ? parameter?.label : parameter?.name }}
+                {{
+                  parameter?.label
+                    ? parameter?.label
+                    : parameter?.type == "DATE" &&
+                      parameter?.name == "startDate"
+                    ? "Start Date"
+                    : parameter?.name == "endDate"
+                    ? "End Date"
+                    : parameter?.name
+                }}
               </mat-panel-title>
             </mat-expansion-panel-header>
             <app-parameter-field
@@ -124,7 +133,12 @@
               />
             </button>
             <button
-              [disabled]="!currentReport || !currentReport?.name"
+              [disabled]="
+                !currentReport ||
+                !currentReport?.name ||
+                !reportSelectionParams?.startDate ||
+                !reportSelectionParams?.endDate
+              "
               class="ml-2"
               mat-flat-button
               color="primary"
@@ -237,7 +251,15 @@
                   *ngFor="let parameter of currentReport?.parameters"
                 >
                   <div *ngIf="reportSelectionParams[parameter?.id]">
-                    <b class="text-muted"> {{ parameter?.name }} </b>:
+                    <b class="text-muted">
+                      {{
+                        parameter?.name && parameter?.name == "startDate"
+                          ? "Start Date"
+                          : parameter?.name && parameter?.name == "endDate"
+                          ? "End Date"
+                          : parameter?.name
+                      }} </b
+                    >:
                     <span
                       style="font-size: smaller"
                       *ngIf="parameter?.type === 'DATE'"
