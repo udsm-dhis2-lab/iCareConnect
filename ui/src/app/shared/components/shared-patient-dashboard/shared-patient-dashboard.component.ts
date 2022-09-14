@@ -72,11 +72,12 @@ import {
   ObsCreate,
   ProviderGetFull,
 } from "../../resources/openmrs";
-import { saveObservations } from "src/app/store/actions/observation.actions";
+import { loadPreviousObservations, saveObservations } from "src/app/store/actions/observation.actions";
 import { loadEncounterTypes } from "src/app/store/actions/encounter-type.actions";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { OrdersService } from "../../resources/order/services/orders.service";
 import { ConfigsService } from "../../services/configs.service";
+import { UserService } from "src/app/modules/maintenance/services/users.service";
 
 @Component({
   selector: "app-shared-patient-dashboard",
@@ -122,14 +123,17 @@ export class SharedPatientDashboardComponent implements OnInit {
   consultationEncounterType$: Observable<any>;
   consultationOrderType$: Observable<any>;
   facilityDetails$: Observable<any>;
+  generalPrescriptionOrderType$: Observable<any>;
+  useGeneralPrescription$: Observable<any>;
   constructor(
     private store: Store<AppState>,
     private dialog: MatDialog,
     private systemSettingsService: SystemSettingsService,
     private ordersService: OrdersService,
     private configService: ConfigsService,
-    ) {
-      this.store.dispatch(loadEncounterTypes());
+    private userService: UserService
+  ) {
+    this.store.dispatch(loadEncounterTypes());
   }
 
   ngOnInit(): void {
@@ -212,8 +216,16 @@ export class SharedPatientDashboardComponent implements OnInit {
       this.systemSettingsService.getSystemSettingsByKey(
         "iCare.clinic.consultation.encounterType"
       );
+    this.generalPrescriptionOrderType$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        "iCare.clinic.prescription.orderType"
+      );
+    this.useGeneralPrescription$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        "iCare.clinic.useGeneralPrescription"
+      );
     this.facilityDetails$ = this.configService.getFacilityDetails();
-    this.facilityDetails$ = this.store.select(getParentLocation);
+    this.facilityDetails$ = this.userService.getLoginLocations();
   }
 
   getSelectedForm(event: Event, form: any): void {
@@ -261,9 +273,11 @@ export class SharedPatientDashboardComponent implements OnInit {
     currentLocation,
     privileges,
     provider,
-    facilityDetails
-  ): void {;
-    console.log("==> Facility Details: ", facilityDetails)
+    facilityDetails,
+    observations,
+    generalPrescriptionOrderType,
+    useGeneralPrescription
+  ): void {
     event.stopPropagation();
     this.systemSettingsService
       .getSystemSettingsMatchingAKey("iCare.clinic.deathRegistry.form.causes")
@@ -284,7 +298,9 @@ export class SharedPatientDashboardComponent implements OnInit {
               currentLocation,
               causesOfDeathConcepts: concepts,
               fromClinic: true,
-              facilityDetails: facilityDetails
+              facilityDetails: facilityDetails,
+              observations: observations,
+              generalPrescriptionOrderType: generalPrescriptionOrderType
             },
             disableClose: false,
           });
@@ -345,7 +361,7 @@ export class SharedPatientDashboardComponent implements OnInit {
   }
 
   onUpdateConsultationOrder() {
-    if (!this.activeVisit.consultationStarted){
+    if (!this.activeVisit.consultationStarted) {
       const orders = [
         {
           uuid: this.activeVisit.consultationStatusOrder?.uuid,
@@ -356,8 +372,8 @@ export class SharedPatientDashboardComponent implements OnInit {
         },
       ];
       this.ordersService.updateOrdersViaEncounter(orders).subscribe((order) => {
-        if(!order.error){
-          console.log("==> Order results: ", order)
+        if (!order.error) {
+          console.log("==> Order results: ", order);
         }
       });
     }

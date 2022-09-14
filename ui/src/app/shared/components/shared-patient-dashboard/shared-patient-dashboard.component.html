@@ -21,7 +21,9 @@
     provider: provider$ | async,
     consultationEncounterType: consultationEncounterType$ | async,
     consultationOrderType: consultationOrderType$ | async,
-    facilityDetails: facilityDetails$ | async
+    facilityDetails: facilityDetails$ | async,
+    useGeneralPrescription: useGeneralPrescription$ | async,
+    generalPrescriptionOrderType: generalPrescriptionOrderType$ | async
   } as dashboardParams"
   >
   <div
@@ -201,7 +203,10 @@
                     dashboardParams?.currentLocation,
                     null,
                     dashboardParams?.provider,
-                    dashboardParams?.facilityDetails
+                    dashboardParams?.facilityDetails.results,
+                    dashboardParams?.observationsGroupedByConcept,
+                    dashboardParams?.generalPrescriptionOrderType,
+                    dashboardParams?.useGeneralPrescription
                   )
                 "
               >

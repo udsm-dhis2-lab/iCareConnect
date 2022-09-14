@@ -3,9 +3,12 @@
     form: form$ | async,
     savingObservations: savingObservations$ | async,
     observations: observations$ | async,
-    deathRegistryFormUuid: deathRegistryFormUuid$ | async
+    deathRegistryFormUuid: deathRegistryFormUuid$ | async,
+    referralFormsConcepts: referralFormsConcepts$ | async,
+    diagnoses: diagnoses$ | async
   } as params"
 >
+==> {{ params?.diagnoses | json }}
   <mat-progress-bar
     *ngIf="
       !params?.form || !params?.observations || !params?.deathRegistryFormUuid
@@ -48,8 +51,10 @@
             [showText]="'Print Referral Form'"
             [classesList]="['float-right', 'button', 'mr-5']"
             [ElementToBePrinted]="{
-              facilityDetails: data?.facilityDetails,
-              observationsGroupedByConcept: observations$ | async
+              FacilityDetails: data?.facilityDetails[0],
+              CurrentPatient: data?.patient,
+              ObservationsGroupedByConcept: data?.observations,
+              ReferralFormsConcepts: params?.referralFormsConcepts
             }"
             (print)="onPrint($event)"
           ></app-print-button>
