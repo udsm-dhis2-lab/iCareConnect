@@ -535,6 +535,7 @@ export class VisitsService {
   /**TODO: Move to admission shared service */
 
   admitPatient(data): Observable<any> {
+    // console.log("data", data);
     let encounterData: any = {
       ...data,
       encounterProviders: [
@@ -546,7 +547,10 @@ export class VisitsService {
     };
     encounterData = omit(encounterData, "provider");
     encounterData = omit(encounterData, "visitLocation");
-    return from(this.api.encounter.createEncounter(encounterData));
+    return from(this.api.encounter.createEncounter(encounterData)).pipe(
+      map((response) => response),
+      catchError((err) => of(err))
+    );
   }
   // this.store.dispatch(updateVisit({ details: visitDetails, visitUuid }));
   dischargePatient(data): Observable<any> {
