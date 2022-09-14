@@ -11,6 +11,7 @@ import {
   go,
   loadCurrentPatient,
   loadLocationsByTagName,
+  loadLocationsByTagNames,
 } from "src/app/store/actions";
 import {
   clearActiveVisit,
@@ -56,9 +57,10 @@ export class StartVisitModelComponent implements OnInit {
         this.patientPhone = attribute?.display.split(" = ")[1];
       }
     });
-    this.store.dispatch(loadLocationsByTagName({ tagName: "Treatment+Room" }));
     this.store.dispatch(
-      loadLocationsByTagName({ tagName: "Admission+Location" })
+      loadLocationsByTagNames({
+        tagNames: ["Treatment+Room", "Admission+Location"],
+      })
     );
   }
 

@@ -1,7 +1,7 @@
-import { Component, EventEmitter, OnInit, Output, Input } from '@angular/core';
-import { Store } from '@ngrx/store';
-import { AppState } from 'src/app/store/reducers';
-import { flatten, keyBy } from 'lodash';
+import { Component, EventEmitter, OnInit, Output, Input } from "@angular/core";
+import { Store } from "@ngrx/store";
+import { AppState } from "src/app/store/reducers";
+import { flatten, keyBy } from "lodash";
 
 @Component({
   selector: "app-current-prescriptions",
@@ -17,7 +17,6 @@ export class CurrentPrescriptionComponent implements OnInit {
   constructor() {}
 
   ngOnInit(): void {
-    console.log("==> Visit: ", this.visit, "==> ", this.genericPrescriptionOrderType);
     this.drugsPrescribed = flatten(
       this.visit?.encounters
         ?.map((encounter) => {

@@ -74,7 +74,6 @@ export class PatientListComponent implements OnInit, OnChanges {
   ngOnChanges() {}
 
   ngOnInit() {
-
     this.filters$ = this.systemSettingsService.getSystemSettingsMatchingAKey(
       "iCare.filters." + (this.filterCategory ? this.filterCategory : "")
     );
@@ -91,15 +90,16 @@ export class PatientListComponent implements OnInit, OnChanges {
     //   },
     // });
 
-
     /**
      * TODO: find the best place to put this
      */
     this.visits$.pipe(take(1)).subscribe((visits) => {
       map(visits, (visit) => {
-        if ( visit["visit"]?.location?.tags.some(
+        if (
+          visit["visit"]?.location?.tags.some(
             (tag) => tag?.name === "Bed Location"
-          )){
+          )
+        ) {
           this.store.dispatch(
             upsertAdmittedPatientLocation({
               locationVisitDetails: {
@@ -124,8 +124,8 @@ export class PatientListComponent implements OnInit, OnChanges {
   private getVisits(visits: Visit[]) {
     this.loadingPatients = true;
     this.visits$ = visits
-    ? of(visits)
-    : this.service && this.service === "LABS"
+      ? of(visits)
+      : this.service && this.service === "LABS"
       ? this.visitService.getLabVisits("", 0, this.itemsPerPage).pipe(
           tap(() => {
             this.loadingPatients = false;
@@ -142,16 +142,15 @@ export class PatientListComponent implements OnInit, OnChanges {
             this.orderType,
             this.orderStatus,
             this.orderStatusCode,
-            this.orderBy ? this.orderBy: "ENCOUNTER",
+            this.orderBy ? this.orderBy : "ENCOUNTER",
             this.orderByDirection ? this.orderByDirection : "ASC",
-            this.filterBy ? this.filterBy: ""
-            )
+            this.filterBy ? this.filterBy : ""
+          )
           .pipe(
             tap(() => {
               this.loadingPatients = false;
             })
           );
-    
   }
 
   getAnotherList(event: Event, visit, type): void {
@@ -164,7 +163,8 @@ export class PatientListComponent implements OnInit, OnChanges {
 
   onLoadNewList(details): void {
     this.loadingPatients = true;
-    this.page = details?.type === "next" ? Number(this.page) + 1 : Number(this.page) - 1;
+    this.page =
+      details?.type === "next" ? Number(this.page) + 1 : Number(this.page) - 1;
 
     this.visits$ =
       this.service && this.service === "LABS"
@@ -199,7 +199,7 @@ export class PatientListComponent implements OnInit, OnChanges {
   }
 
   onSearchPatient(e) {
-     e.stopPropagation();
+    e.stopPropagation();
     this.searchTerm = e?.target?.value;
     // this.loadingPatients = true;
     // this.visits$ = this.visitService
@@ -259,9 +259,8 @@ export class PatientListComponent implements OnInit, OnChanges {
       this.paymentTypeSelected =
         event && event.paymentType && event.paymentType.display
           ? event.paymentType.display
-          : "" ;
+          : "";
     }, 100);
-
   }
 
   onSearchAllPatient(event: Event) {
@@ -289,25 +288,25 @@ export class PatientListComponent implements OnInit, OnChanges {
       });
   }
 
-  filterPatientList(event: any){
+  filterPatientList(event: any) {
     this.loadingPatients = true;
 
-    this.filterBy = event && typeof event === 'string' ? event : "";
+    this.filterBy = event && typeof event === "string" ? event : "";
 
     this.visits$ = this.visitService.getAllVisits(
-          this.currentLocation,
-          false,
-          false,
-          null,
-          0,
-          this.itemsPerPage,
-          this.orderType,
-          this.orderStatus,
-          this.orderStatusCode,
-          this.orderBy ? this.orderBy : "ENCOUNTER",
-          this.orderByDirection ? this.orderByDirection : "ASC",
-          this.filterBy
-        );
+      this.currentLocation,
+      false,
+      false,
+      null,
+      0,
+      this.itemsPerPage,
+      this.orderType,
+      this.orderStatus,
+      this.orderStatusCode,
+      this.orderBy ? this.orderBy : "ENCOUNTER",
+      this.orderByDirection ? this.orderByDirection : "ASC",
+      this.filterBy
+    );
 
     // this.filteredVisits$.subscribe({
     //   next: (visits) => {

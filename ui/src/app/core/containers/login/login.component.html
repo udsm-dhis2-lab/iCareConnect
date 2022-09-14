@@ -8,23 +8,23 @@
         <div *ngIf="(parentLocation$ | async)?.name">
           {{ (parentLocation$ | async)?.name }}
         </div>
-        <app-loader
+        <mat-progress-bar
           *ngIf="!(parentLocation$ | async) || !(parentLocation$ | async)?.name"
-          [height]="'40px'"
-        ></app-loader>
+          mode="indeterminate"
+        ></mat-progress-bar>
       </div>
       <div class="h5 font-weight-normal">
         <div *ngIf="(parentLocation$ | async)?.name">
           {{ (parentLocation$ | async)?.description }}
         </div>
-
-        <app-loader
+        <!-- 
+        <mat-progress-bar
           *ngIf="
             !(parentLocation$ | async) ||
             !(parentLocation$ | async)?.description
           "
-          [height]="'30px'"
-        ></app-loader>
+          mode="indeterminate"
+        ></mat-progress-bar> -->
       </div>
     </div>
     <div class="d-flex justify-content-center">

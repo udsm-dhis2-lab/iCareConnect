@@ -2,9 +2,11 @@
   *ngIf="{
     admissionStatus: admissionStatus$ | async,
     orderType: orderType$ | async,
-    loadingVisit: loadingVisit$ | async
+    loadingVisit: loadingVisit$ | async,
+    currentLocation: currentLocation$ | async
   } as admissionParams"
 >
+  <!-- {{ admissionParams?.currentLocation | json }} -->
   <mat-toolbar color="primary">
     <span>Admit {{ currentPatient?.name }}</span>
     <span class="toolbar-spacer"></span>
@@ -14,16 +16,26 @@
   </mat-toolbar>
 
   <mat-dialog-content class="mat-typography">
-    <div *ngIf="!admissionParams?.loadingVisit && admissionParams?.orderType">
+    <div
+      *ngIf="
+        !admissionParams?.loadingVisit &&
+        admissionParams?.orderType &&
+        admissionParams?.currentLocation
+      "
+    >
       <app-wards-list
-        [currentLocation]="currentLocation"
-        [locationBedsDetails]="currentLocation"
+        [currentLocation]="admissionParams?.currentLocation"
+        [locationBedsDetails]="admissionParams?.currentLocation"
         [bedOrdersWithBillStatus]="bedOrdersWithBillStatus"
         (bedStatus)="onGetBedStatus($event, admissionParams?.orderType)"
       ></app-wards-list>
     </div>
     <mat-progress-bar
-      *ngIf="admissionParams?.loadingVisit || !admissionParams?.orderType"
+      *ngIf="
+        admissionParams?.loadingVisit ||
+        !admissionParams?.orderType ||
+        !admissionParams?.currentLocation
+      "
       mode="indeterminate"
     ></mat-progress-bar>
   </mat-dialog-content>

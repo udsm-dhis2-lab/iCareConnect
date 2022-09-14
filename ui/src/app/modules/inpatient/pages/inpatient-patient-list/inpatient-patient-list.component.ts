@@ -4,6 +4,7 @@ import { Observable } from "rxjs";
 import {
   loadLocationById,
   loadLocationsByTagName,
+  loadLocationsByTagNames,
 } from "src/app/store/actions";
 import { AppState } from "src/app/store/reducers";
 import {
@@ -29,9 +30,14 @@ export class InpatientPatientListComponent implements OnInit {
       })
     );
 
-    this.store.dispatch(loadLocationsByTagName({ tagName: "Bed+Location" }));
+    // this.store.dispatch(loadLocationsByTagName({ tagName: "Bed+Location" }));
+    // this.store.dispatch(
+    //   loadLocationsByTagName({ tagName: "Admission+Location" })
+    // );
     this.store.dispatch(
-      loadLocationsByTagName({ tagName: "Admission+Location" })
+      loadLocationsByTagNames({
+        tagNames: ["Admission+Location", "Bed+Location"],
+      })
     );
     this.currentLocation$ = this.store.select(getCurrentLocation);
     this.settingCurrentLocationStatus$ = this.store.select(

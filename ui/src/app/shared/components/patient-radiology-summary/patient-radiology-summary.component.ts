@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { Observable } from "rxjs";
 import { FormValue } from "../../modules/form/models/form-value.model";
 import { OrdersService } from "../../resources/order/services/orders.service";
@@ -28,6 +28,7 @@ export class PatientRadiologySummaryComponent implements OnInit {
     "custom:(uuid,encounters:(uuid,location:(uuid,display),encounterType,display,encounterProviders,encounterDatetime,voided,obs,orders:(uuid,display,orderer,orderType,dateActivated,orderNumber,concept,display)))";
   creatingOrdersResponse$: Observable<any>;
   formDetails: FormValue;
+  @Output() updateConsultationOrder = new EventEmitter();
   constructor(
     private ordersService: OrdersService,
     private visitService: VisitsService
@@ -142,5 +143,6 @@ export class PatientRadiologySummaryComponent implements OnInit {
         }
       }
     });
+    this.updateConsultationOrder.emit();
   }
 }
