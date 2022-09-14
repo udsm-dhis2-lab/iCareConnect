@@ -76,7 +76,8 @@
     </button>
     <button
       [disabled]="
-        !activeVisit?.waitingToBeAdmitted || countOfUnPaidBedOrders > 0
+        (!activeVisit?.waitingToBeAdmitted && lastBedOrder) ||
+        (countOfUnPaidBedOrders > 0 && lastBedOrder)
       "
       style="color: #fff"
       mat-stroked-button
@@ -92,7 +93,7 @@
         )
       "
     >
-      Assign Bed
+      Assign Bed {{ lastBedOrder }}
     </button>
   </div>
   <div class="col-12" *ngIf="activeVisit?.transferedOutSide">
@@ -126,7 +127,8 @@
   <div
     class="col-md-12"
     *ngIf="
-      (countOfUnPaidBedOrders === 0 &&
+      (bedOrdersWithBillStatus?.length !== 0 &&
+        countOfUnPaidBedOrders === 0 &&
         !activeVisit?.isAdmitted &&
         !activeVisit?.transferedOutSide) ||
       (activeVisit?.isAdmitted && !activeVisit?.transferedOutSide)
@@ -135,7 +137,11 @@
     <div
       class="loading-overlay"
       style="align-items: baseline"
-      *ngIf="activeVisit?.isAdmitted && lastBedOrder?.dueDateAndTime < now"
+      *ngIf="
+        activeVisit?.isAdmitted &&
+        lastBedOrder &&
+        lastBedOrder?.dueDateAndTime < now
+      "
     >
       <div class="text-center">
         <div style="top: 100px">

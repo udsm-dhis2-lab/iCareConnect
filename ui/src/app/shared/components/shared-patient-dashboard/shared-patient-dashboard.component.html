@@ -22,7 +22,7 @@
     consultationEncounterType: consultationEncounterType$ | async,
     consultationOrderType: consultationOrderType$ | async
   } as dashboardParams"
-  >
+>
   <div
     class="w-100"
     *ngIf="
@@ -266,8 +266,12 @@
                   [visit]="activeVisit"
                   [forms]="dashboardParams?.forms"
                   [shouldUseOwnFormSelection]="false"
-                  [consultationOrderType]="dashboardParams?.consultationOrderType"
-                  [consultationEncounterType]="dashboardParams?.consultationEncounterType"
+                  [consultationOrderType]="
+                    dashboardParams?.consultationOrderType
+                  "
+                  [consultationEncounterType]="
+                    dashboardParams?.consultationEncounterType
+                  "
                   [provider]="dashboardParams?.provider"
                   (updateConsultationOrder)="onUpdateConsultationOrder()"
                   [selectedForm]="
@@ -278,6 +282,19 @@
                   "
                 >
                 </app-clinical-notes>
+                <div
+                  class="alert alert-warning"
+                  role="alert"
+                  *ngIf="
+                    readyForClinicalNotes &&
+                    !dashboardParams.loadingForms &&
+                    dashboardParams.currentPatient &&
+                    dashboardParams?.forms &&
+                    dashboardParams?.forms?.length === 0
+                  "
+                >
+                  NO Forms assigned for this Doctor's Room, Contact IT
+                </div>
               </div>
 
               <div class="col-lg-6 col-md-6 col-sm-12 col-sx-12">
