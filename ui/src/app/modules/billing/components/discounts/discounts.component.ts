@@ -7,6 +7,7 @@ import { BillConfirmationComponent } from "../bill-confirmation/bill-confirmatio
 import { MatDialog } from "@angular/material/dialog";
 import { SelectionModel } from "@angular/cdk/collections";
 import { BillItem } from "../../models/bill-item.model";
+import { ThisReceiver } from "@angular/compiler";
 
 @Component({
   selector: "app-discounts",
@@ -22,6 +23,7 @@ export class DiscountsComponent implements OnInit {
   @Input() disableControls: boolean;
   @Input() bill: Bill;
   @Input() bills: Bill[];
+  @Input() isBillCleared: boolean;
 
   @Output() confirmPayment = new EventEmitter<any>();
   @Output() paymentSuccess = new EventEmitter<any>();
@@ -85,15 +87,21 @@ export class DiscountsComponent implements OnInit {
     this.totalPaymentAmount = data.reduce((total, item) => {
       return (total = total + item.amount);
     }, 0);
+
     this.columns = [
       { id: "index", label: "#", isIndexColumn: true },
       { id: "name", label: "Description", width: "50%" },
       { id: "amount", label: "Amount", isCurrency: true },
     ];
-    this.displayedColumns = [
-      ...this.columns.map((column) => column.id),
-      "select",
-    ];
+
+    //Check if bill was cleared
+
+    this.displayedColumns = [];
+
+    this.displayedColumns =
+      this.isBillCleared && this.isBillCleared === true
+        ? [...this.columns.map((column) => column.id), "select"]
+        : [...this.columns.map((column) => column.id)];
 
     // T
 
@@ -218,4 +226,22 @@ export class DiscountsComponent implements OnInit {
   onGetInvoice(e: MouseEvent) {}
 
   onChangePaymentType(e) {}
+
+  getControlNumber(e: any) {
+    e.stopPropagation();
+    const dialog = this.dialog.open(BillConfirmationComponent, {
+      width: "600px",
+      disableClose: true,
+      data: {
+        billItems: this.selection?.selected,
+        items: this.discountItems,
+        bill: this.bill,
+        totalPayableBill: this.totalPayableBill,
+        paymentType: this.selectedPaymentType,
+        currentUser: this.currentUser,
+        currentPatient: this.currentPatient,
+        facilityDetails: this.facilityDetails,
+      },
+    });
+  }
 }

@@ -45,8 +45,10 @@ export class PaymentReceiptComponent implements OnInit {
     );
 
     each(this.data?.billItems, (item) => {
-      this.totalBill = this.totalBill + item?.amount;
+      this.totalBill = this.totalBill + item?.payable;
     });
+
+    console.log("==> Bill: ", this.data?.billItems)
   }
 
   onCancel(e): void {
