@@ -81,7 +81,14 @@ export class NursingDataComponent implements OnInit {
     private store: Store<AppState>,
     private dialog: MatDialog,
     private conceptsService: ConceptsService
-  ) {}
+  ) {
+    this.store.dispatch(
+      loadCustomOpenMRSForms({
+        formUuids:
+          JSON.parse(localStorage.getItem("currentLocation"))?.forms || [],
+      })
+    );
+  }
 
   ngOnInit(): void {
     this.store.dispatch(loadOrderTypes());
@@ -91,23 +98,9 @@ export class NursingDataComponent implements OnInit {
       this.conceptsService.getConceptsDepartmentDetails(
         this.nursingConfigurations?.departmentsReference?.id
       );
-    this.applicableForms = getApplicableForms(
-      ICARE_CONFIG,
-      this.currentUser,
-      this.formPrivilegesConfigs,
-      this.userPrivileges
-    );
-    this.store.dispatch(
-      loadCustomOpenMRSForms({
-        formUuids: map(this.applicableForms, (form) => {
-          return form?.id;
-        }),
-      })
-    );
     this.forms$ = this.store.select(getCustomOpenMRSFormsByIds, {
-      formUUids: map(this.applicableForms, (form) => {
-        return form?.id;
-      }),
+      formUUids:
+        JSON.parse(localStorage.getItem("currentLocation"))?.forms || [],
     });
     this.provider$ = this.store.select(getProviderDetails);
     this.visit$ = this.store.select(getActiveVisit);
