@@ -219,9 +219,16 @@ export class ReportsGeneratorComponent implements OnInit {
       (this.reportsParametersConfigurations.filter(
         (reportConfigs) => reportConfigs?.id === this.currentReport?.id
       ) || [])[0];
-    this.selectedReportParameters = matchedReportWithParametersConfigs
-      ? matchedReportWithParametersConfigs?.parameters
-      : report?.parameters;
+    this.selectedReportParameters = (
+      matchedReportWithParametersConfigs
+        ? matchedReportWithParametersConfigs?.parameters
+        : report?.parameters
+    ).map((param) => {
+      return {
+        ...param,
+        name: this.sanitizeParameter(param?.lable ? param.lable : param?.name),
+      };
+    });
 
     this.reportData = null;
     this.reportError = null;
@@ -427,5 +434,10 @@ export class ReportsGeneratorComponent implements OnInit {
     setTimeout(() => {
       this.isQuickPivotSet = !this.isQuickPivotSet;
     }, 100);
+  }
+
+  sanitizeParameter(text) {
+    const result = text.replace(/([A-Z])/g, " $1");
+    return result.charAt(0).toUpperCase() + result.slice(1);
   }
 }
