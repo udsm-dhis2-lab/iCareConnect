@@ -56,6 +56,7 @@ export class NursingDataComponent implements OnInit {
   @Input() userPrivileges: any;
   @Input() nursingConfigurations: any;
   @Input() patient: any;
+  @Input() currentLocation: any;
   provider$: Observable<ProviderGetFull>;
   visit$: Observable<Visit>;
   currentLocation$: Observable<Location>;
@@ -76,24 +77,21 @@ export class NursingDataComponent implements OnInit {
   activeVisitLoadedState$: Observable<boolean>;
   conceptsWithDepartmentsDetails$: Observable<any>;
   orderTypes$: Observable<any[]>;
-
+  locationFormsIds: string[] = [];
   constructor(
     private store: Store<AppState>,
     private dialog: MatDialog,
     private conceptsService: ConceptsService
-  ) {
-    this.store.dispatch(
-      loadCustomOpenMRSForms({
-        formUuids:
-          JSON.parse(localStorage.getItem("currentLocation"))?.forms || [],
-      })
-    );
-  }
+  ) {}
 
   ngOnInit(): void {
-    console.log(
-      "HERE",
-      JSON.parse(localStorage.getItem("currentLocation"))?.forms || []
+    this.locationFormsIds = this.currentLocation?.forms
+      ? this.currentLocation?.forms
+      : [];
+    this.store.dispatch(
+      loadCustomOpenMRSForms({
+        formUuids: this.locationFormsIds,
+      })
     );
     this.store.dispatch(loadOrderTypes());
     this.orderTypes$ = this.store.select(getAllOrderTypes);
@@ -103,8 +101,7 @@ export class NursingDataComponent implements OnInit {
         this.nursingConfigurations?.departmentsReference?.id
       );
     this.forms$ = this.store.select(getCustomOpenMRSFormsByIds, {
-      formUUids:
-        JSON.parse(localStorage.getItem("currentLocation"))?.forms || [],
+      formUUids: this.locationFormsIds,
     });
     this.provider$ = this.store.select(getProviderDetails);
     this.visit$ = this.store.select(getActiveVisit);
@@ -152,7 +149,7 @@ export class NursingDataComponent implements OnInit {
     event.stopPropagation();
 
     this.dialog.open(AdmissionFormComponent, {
-      height: "230px",
+      minHeight: "230px",
       width: "45%",
       data: {
         patient: currentPatient,
