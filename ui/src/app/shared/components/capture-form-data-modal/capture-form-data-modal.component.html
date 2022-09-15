@@ -3,7 +3,9 @@
     form: form$ | async,
     savingObservations: savingObservations$ | async,
     observations: observations$ | async,
-    deathRegistryFormUuid: deathRegistryFormUuid$ | async
+    deathRegistryFormUuid: deathRegistryFormUuid$ | async,
+    referralFormsConcepts: referralFormsConcepts$ | async,
+    diagnoses: diagnoses$ | async
   } as params"
 >
   <mat-progress-bar
@@ -41,6 +43,22 @@
       ></mat-progress-bar>
       <mat-dialog-actions align="end" class="mb-2 ml-2 mr-2">
         <button mat-stroked-button (click)="onClose($event)">Cancel</button>
+        <div *ngIf="data.fromClinic">
+          <app-print-button
+            [iconName]="'print'"
+            [toolTipText]="'Click to print refereal form'"
+            [showText]="'Print Referral Form'"
+            [classesList]="['float-right', 'button', 'mr-5']"
+            [ElementToBePrinted]="{
+              FacilityDetails: data?.facilityDetails[0],
+              CurrentPatient: data?.patient,
+              ObservationsGroupedByConcept: data?.observations,
+              ReferralFormsConcepts: params?.referralFormsConcepts,
+              Diagnoses: params?.diagnoses
+            }"
+            (print)="onPrint($event)"
+          ></app-print-button>
+        </div>
         <button
           mat-flat-button
           [disabled]="!params?.deathRegistryFormUuid || !isValid"
