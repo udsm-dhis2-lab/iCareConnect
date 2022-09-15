@@ -79,6 +79,19 @@ export class ModulesSelectorComponent implements OnInit {
       });
 
       // Hinglight the current location
+      // console.log(this.locations);
+      if (
+        !this.currentLocation?.modules ||
+        (this.currentLocation?.modules &&
+          this.currentLocation?.modules?.length == 0)
+      ) {
+        this.currentLocation = (this.locations?.filter(
+          (loc) => loc?.modules?.length > 0
+        ) || [])[0];
+        this.store.dispatch(
+          setCurrentUserCurrentLocation({ location: this.currentLocation })
+        );
+      }
       this.currentModule = {
         ...this.currentLocation?.modules[0],
         ...(modules.filter(

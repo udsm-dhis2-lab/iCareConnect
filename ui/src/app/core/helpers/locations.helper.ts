@@ -29,6 +29,11 @@ export function formatLocationsPayLoad(locations): Location[] {
       ),
       beds: getBeds(location?.childLocations),
       cabinets: getCabinets(location?.childLocations),
+      childMembers:
+        (location.childLocations?.filter((loc) => !loc?.retired) || [])
+          ?.length > 0
+          ? getChildLocationMembers(location?.childLocations, locations)
+          : [],
       path: _.reverse(
         (
           location?.uuid +
@@ -52,6 +57,70 @@ export function formatLocationsPayLoad(locations): Location[] {
     };
     // }
   }).filter((loc) => loc);
+}
+
+function getChildLocationMembers(childLocations, locations) {
+  return childLocations?.map((location) => {
+    const matchedLocations =
+      locations?.filter((loc) => loc?.uuid === location?.uuid) || [];
+
+    const currentLocation =
+      matchedLocations?.length > 0 ? matchedLocations[0] : location;
+    const patientPerBedAttribute =
+      currentLocation &&
+      currentLocation?.attributes &&
+      currentLocation?.attributes?.length > 0
+        ? (currentLocation?.attributes?.filter(
+            (attribute) =>
+              attribute?.attributeType?.display === "Patients per bed"
+          ) || [])[0]
+        : null;
+    return {
+      ...currentLocation,
+      childMembers:
+        (currentLocation?.childLocations?.filter((loc) => !loc?.retired) || [])
+          ?.length > 0
+          ? getChildLocationMembers(currentLocation?.childLocations, locations)
+          : [],
+      isBed:
+        currentLocation &&
+        currentLocation?.tags &&
+        (
+          currentLocation?.tags.filter(
+            (tag) => tag?.display === "Bed Location"
+          ) || []
+        )?.length > 0,
+      billingConcept: getBillingConceptUuid(currentLocation?.attributes),
+      patientsPerBed: patientPerBedAttribute
+        ? parseInt(patientPerBedAttribute?.value)
+        : 1,
+      path: _.reverse(
+        (
+          location?.uuid +
+          "/" +
+          (location?.parentLocation &&
+          location?.parentLocation.hasOwnProperty("uuid")
+            ? getPathForTheLocation(location?.parentLocation)
+            : "")
+        ).split("/")
+      )
+        .join("/")
+        .substring(1),
+    };
+  });
+}
+
+export function getBillingConceptUuid(attributes): void {
+  const billingConceptAttribute = (attributes?.filter(
+    (attribute) =>
+      attribute?.attributeType?.display?.toLowerCase() === "billing concept" ||
+      attribute?.display?.toLowerCase()?.indexOf("billing concept") > -1
+  ) || [])[0];
+  return attributes?.length > 0
+    ? billingConceptAttribute?.value
+      ? billingConceptAttribute?.value
+      : billingConceptAttribute?.display?.split(": ")[1]
+    : null;
 }
 
 function getLocationModules(location) {

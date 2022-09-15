@@ -10,6 +10,7 @@ import {
   loadAllLocations,
   loadLocationByIds,
   loadLocationsByTagName,
+  loadLoginLocations,
   loadProviderDetails,
   loadRolesDetails,
   logoutUser,
@@ -61,7 +62,7 @@ export class MenuComponent implements OnInit {
     private store: Store<AppState>,
     private authService: AuthService
   ) {
-    this.store.dispatch(loadLocationsByTagName({ tagName: "Module+Location" }));
+    this.store.dispatch(loadLoginLocations()); // This is also a main location
   }
 
   ngOnInit(): void {

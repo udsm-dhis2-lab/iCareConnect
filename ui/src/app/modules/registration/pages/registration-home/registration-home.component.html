@@ -73,13 +73,14 @@
             (displayList)="onDisplayList($event)"
           ></app-patient-search>
 
-          <div *ngIf="!showCard" class="row mt-4 w-100">
+          <div *ngIf="!showCard" class="row mt-4 w-100 mb-4">
             <div
-              class="col-lg-3 col-md-3 col-sx-12 col-sm-12 ml-2 mt-2"
+              class="col-lg-3 col-md-3 col-sx-12 col-sm-12 mt-2"
               *ngFor="let location of patientSummary?.locations"
             >
               <app-registration-summary-cards
                 [roomNo]="location?.name"
+                [location]="location"
                 [totalActivePatients]="location?.activeVisits"
               >
               </app-registration-summary-cards>
