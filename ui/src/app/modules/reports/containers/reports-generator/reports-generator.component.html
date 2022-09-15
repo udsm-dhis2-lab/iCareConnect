@@ -134,10 +134,7 @@
             </button>
             <button
               [disabled]="
-                !currentReport ||
-                !currentReport?.name ||
-                !reportSelectionParams?.startDate ||
-                !reportSelectionParams?.endDate
+                !currentReport || !currentReport?.name || disabledbuttons
               "
               class="ml-2"
               mat-flat-button

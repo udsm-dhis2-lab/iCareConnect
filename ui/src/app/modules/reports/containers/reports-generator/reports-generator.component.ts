@@ -78,6 +78,7 @@ export class ReportsGeneratorComponent implements OnInit {
     options?: any[];
   }[];
   keyedReportsExtraParameters: any = {};
+  disabledbutton: boolean;
   constructor(
     private reportParamsService: ReportParamsService,
     private reportService: ReportService,
@@ -238,6 +239,10 @@ export class ReportsGeneratorComponent implements OnInit {
       ...this.reportSelectionParams,
       ...paramValue,
     };
+    this.disabledbutton = paramValue.disabledGetReport;
+    console.log(this.disabledbutton);
+
+    // !(paramValue.length  > 0) ? this.disabledbutton = true : this.disabledbutton = false;
   }
 
   getDHIS2ReportsSent(event: Event): void {
