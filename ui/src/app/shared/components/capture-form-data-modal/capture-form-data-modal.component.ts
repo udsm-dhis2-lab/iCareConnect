@@ -202,10 +202,11 @@ export class CaptureFormDataModalComponent implements OnInit {
     let observations: any[] = [];
 
     e?.ReferralFormsConcepts?.forEach((concept) => {
-      let hasObervation = e?.ObservationsGroupedByConcept && e
-        ?.ObservationsGroupedByConcept[concept?.value]
-        ? true
-        : false;
+      let hasObervation =
+        e?.ObservationsGroupedByConcept &&
+        e?.ObservationsGroupedByConcept[concept?.value]
+          ? true
+          : false;
 
       if (hasObervation) {
         observations = [
@@ -219,7 +220,13 @@ export class CaptureFormDataModalComponent implements OnInit {
     console.log("==> Prescriptions: ", this.drugsPrescribed);
 
     // Available Clinical Notes
-    console.log("==> Prescriptions: ", this.drugsPrescribed);
+    console.log("==> Observations: ", observations);
+
+    //Available Diagnoses
+    console.log("==> Diagnoses: ", e?.Diagnoses);
+
+    // Orders in this visit
+    console.log("==> Visit: ", this.visit);
 
     const frame1: any = document.createElement("iframe");
     frame1.name = "frame3";
@@ -240,11 +247,11 @@ export class CaptureFormDataModalComponent implements OnInit {
       <html>
         <head>
           <style>
-            @page { size: auto;  margin: 5mm; }
+            @page { size: auto;  margin: 10mm; }
             .container {
               margin: 20px;
               align-items: center;
-              width: 100%;
+              width: 90%;
             }
             .row {
               display: flex;
@@ -296,6 +303,33 @@ export class CaptureFormDataModalComponent implements OnInit {
             .content {
               margin: 0 0 0 5vw;
             }
+
+            #table {
+                font-family: Arial, Helvetica, sans-serif;
+                border-collapse: collapse;
+                width: 80%;
+                background-color: #000;
+              } 
+              #table td, #table  th {
+                border-bottom: 1px solid #ddd;
+                padding: 5px;
+              } 
+              
+              #table tbody tr:nth-child(even){
+                background-color: #f2f2f2;
+              } 
+
+              #table thead tr th { 
+                padding-top:6px; 
+                padding-bottom: 6px; 
+                text-align: left; 
+                background-color: #cecece;
+                font-size: .7em;
+              }
+              tbody tr td {
+                font-size: .7em;
+              }
+
             .footer-content-1{
               margin: 0 0 0 5vw;
             }
@@ -325,12 +359,157 @@ export class CaptureFormDataModalComponent implements OnInit {
       }
     });
 
-    let patientMRN =
-      e.CurrentPatient?.MRN ||
-      e.CurrentPatient?.patient?.identifiers[0]?.identifier.replace(
-        "MRN = ",
-        ""
-      );
+    //Declare strings to carry HTML associated with them
+    let drugs: string = "";
+    let observation: string = "";
+    let provisionalDiagnoses: string = "";
+    let confirmedDiagnoses: string = "";
+    let labOrders: string = "";
+
+    // Counters related to each HTML generated
+    let drugsCounter = 1;
+    let obsCounter = 1;
+    let provisionalDiagnosesCounter = 1;
+    let confirmedDiagnosesCounter = 1;
+    let labOrdersCounter = 1;
+    let radiologyOrdersCounter = 1;
+    let proceduresOrdersCounter = 1;
+
+    //Loop over data to generate HTML table data
+    this.drugsPrescribed.forEach((drug) => {
+      drugs = drugs + `
+        <tr>
+          <td>${drugsCounter}</td>
+          <td>${drug?.order?.display}</td>
+        </tr>
+      `;
+      drugsCounter = drugsCounter + 1;
+    });
+    
+    observations.forEach((observation) => {
+      observation = observation + `
+        <tr>
+          <td>${obsCounter}</td>
+          <td>${observation?.latest?.value}</td>
+        </tr>
+      `;
+      obsCounter = obsCounter + 1;
+    });
+    
+    e?.Diagnoses.forEach((diagnosis) => {
+      if (diagnosis?.certainty === "PROVISIONAL") {
+        provisionalDiagnoses = provisionalDiagnoses +`
+          <tr>
+            <td>${provisionalDiagnosesCounter}</td>
+            <td>${diagnosis?.display}</td>
+          </tr>
+          `;
+          provisionalDiagnosesCounter = provisionalDiagnosesCounter + 1;
+      }
+    });
+    
+    e?.Diagnoses.forEach((diagnosis) => {
+      if (diagnosis?.certainty === "CONFIRMED") {
+        confirmedDiagnoses = confirmedDiagnoses + `
+          <tr>
+            <td>${confirmedDiagnosesCounter}</td>
+            <td>${diagnosis?.display}</td>
+          </tr>
+        `;
+        confirmedDiagnosesCounter = confirmedDiagnosesCounter + 1;
+      }
+    });
+
+    this.visit.labOrders.forEach((labOrder) => {
+      labOrders = labOrders + `
+        <tr>
+          <td>${labOrdersCounter}</td>
+          <td>${labOrder?.order?.display}</td>
+        </tr>
+      `;
+      labOrdersCounter = labOrdersCounter + 1;
+    });
+
+    
+    let drugsContent = `
+        <div>
+            <h5>Drugs Prescribed</h5>
+          </div>
+          <table id="table">
+            <thead>
+              <tr>
+                <th>S/N</th>
+                <th>Name</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${drugs}
+            </tbody>
+          </table>`;
+    
+    let clinicalNotesContent = `
+        <div>
+            <h5>Clinical Notes and Examination Findings</h5>
+          </div>
+          <table id="table">
+            <thead>
+              <tr>
+                <th>S/N</th>
+                <th>Name</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${observation}
+            </tbody>
+          </table>`;
+
+    let provisionalDiagnosesContent = `
+        <div>
+            <h5>Provisional Diagnoses</h5>
+          </div>
+          <table id="table">
+            <thead>
+              <tr>
+                <th>S/N</th>
+                <th>Name</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${provisionalDiagnoses}
+            </tbody>
+          </table>`;
+
+    let confirmedDiagnosesContent = `
+        <div>
+            <h5>Provisional Diagnoses</h5>
+          </div>
+          <table id="table">
+            <thead>
+              <tr>
+                <th>S/N</th>
+                <th>Name</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${confirmedDiagnoses}
+            </tbody>
+          </table>`;
+
+    let labOrdersContent = `
+        <div>
+            <h5>Provisional Diagnoses</h5>
+          </div>
+          <table id="table">
+            <thead>
+              <tr>
+                <th>S/N</th>
+                <th>Name</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${labOrders}
+            </tbody>
+          </table>`;
 
     frameDoc.document.write(`
         <div class="container">
@@ -344,7 +523,9 @@ export class CaptureFormDataModalComponent implements OnInit {
         </div>
         <div class="row details text-small">
           <div class="details-1">
-            <p>P.O Box ${e?.FacilityDetails?.postalCode}, ${e?.FacilityDetails?.stateProvince}</p>
+            <p>P.O Box ${e?.FacilityDetails?.postalCode}, ${
+              e?.FacilityDetails?.stateProvince
+            }</p>
             <p>Direct: ............................................</p>
             <p>Email: ...........................................</p>
           </div>
@@ -354,7 +535,9 @@ export class CaptureFormDataModalComponent implements OnInit {
               Surname: ${e?.CurrentPatient?.lname}
             </p>
             <p>
-              Other Names: ${e?.CurrentPatient?.fname} ${e?.CurrentPatient?.mname}
+              Other Names: ${e?.CurrentPatient?.fname} ${
+              e?.CurrentPatient?.mname
+            }
             </p>
             <p>
               Address:
@@ -382,42 +565,17 @@ export class CaptureFormDataModalComponent implements OnInit {
             </p>
             <p>
               <strong>Clinical Notes and Examination Findings</strong>
-              ....................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................
-              <p>
-                  .........................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................
-              </p>
-              <p>
-                  .........................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................
-              </p>
-              <p>
-                  .........................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................
-              </p>
+              ${clinicalNotesContent}
             </p>
             <p>
               <strong>Provisinal / Definitive diagnosis</strong>
-              ....................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................             
-              <p>
-                  .........................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................
-              </p>
-              <p>
-                  .........................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................
-              </p>
-              <p>
-                  .........................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................
-              </p>
+              ${provisionalDiagnosesContent} 
+              ${confirmedDiagnosesContent}
+              ${labOrdersContent}
             </p>
             <p>
               <strong>Treatment Given</strong>
-              ....................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................
-              <p>
-                  .........................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................
-              </p>
-              <p>
-                  .........................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................
-              </p>
-              <p>
-                  .........................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................
-              </p>
+              ${drugsContent}
             </p>
             <p>
               <strong>Reasons for referral</strong>

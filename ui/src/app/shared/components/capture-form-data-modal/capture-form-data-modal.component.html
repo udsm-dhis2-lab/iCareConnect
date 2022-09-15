@@ -8,7 +8,6 @@
     diagnoses: diagnoses$ | async
   } as params"
 >
-==> {{ params?.diagnoses | json }}
   <mat-progress-bar
     *ngIf="
       !params?.form || !params?.observations || !params?.deathRegistryFormUuid
@@ -54,7 +53,8 @@
               FacilityDetails: data?.facilityDetails[0],
               CurrentPatient: data?.patient,
               ObservationsGroupedByConcept: data?.observations,
-              ReferralFormsConcepts: params?.referralFormsConcepts
+              ReferralFormsConcepts: params?.referralFormsConcepts,
+              Diagnoses: params?.diagnoses
             }"
             (print)="onPrint($event)"
           ></app-print-button>
