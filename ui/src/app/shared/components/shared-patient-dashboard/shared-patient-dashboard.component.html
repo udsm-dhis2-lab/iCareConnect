@@ -84,6 +84,7 @@
           <div class="w-50 d-flex justify-content-end">
             <button
               class="mr-2"
+              (click)="onToggleVitalsSummary($event)"
               [ngStyle]="{
                 'background-color':
                   dashboardParams?.countOfVitalsElementsFilled === 0
@@ -95,15 +96,24 @@
                     : '#222'
               }"
               mat-stroked-button
-              [matMenuTriggerFor]="forVitals"
             >
               View Vitals
             </button>
-            <mat-menu #forVitals="matMenu">
-              <div>
+            <div
+              class="patient-vitals-mat-menu mat-elevation-z1"
+              *ngIf="showVitalsSummary"
+            >
+              <div class="p-2">
+                <button
+                  mat-icon-button
+                  class="float-right"
+                  (click)="onToggleVitalsSummary($event)"
+                >
+                  <mat-icon> close </mat-icon>
+                </button>
                 <app-patient-vitals-summary></app-patient-vitals-summary>
               </div>
-            </mat-menu>
+            </div>
 
             <span
               class="text-danger mr-2"
