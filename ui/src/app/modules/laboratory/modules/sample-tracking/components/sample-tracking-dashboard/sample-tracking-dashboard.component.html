@@ -140,6 +140,8 @@
               <tr
                 [ngStyle]="{
                   'background-color':
+                    sample?.completed
+                      ? '#6fd67bcf' :
                     sample?.atLestOneOrderWithRejectedResults &&
                     !sample?.completed
                       ? '#d04747ab'
@@ -151,8 +153,6 @@
                       ? '#0080009e'
                       : sample?.atLeastOneHasResults && !sample?.completed
                       ? '#ec864acf'
-                      : sample?.completed
-                      ? '#6fd67bcf'
                       : ''
                 }"
                 [ngClass]="{ 'row-alternated': count % 2 !== 0 }"
