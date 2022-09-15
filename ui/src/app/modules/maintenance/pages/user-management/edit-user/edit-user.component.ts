@@ -78,11 +78,14 @@ export class EditUserComponent implements OnInit {
 
   ngOnInit() {
     this.locationService
-      .getLocationsByTagName("Login+Location", {
-        limit: 100,
-        startIndex: 0,
-        v: "custom:(uuid,display,name)",
-      })
+      .getLocationsByTagNames(
+        ["Treatment+Room", "Admission+Location", "Module+Location"],
+        {
+          limit: 100,
+          startIndex: 0,
+          v: "custom:(uuid,display,name)",
+        }
+      )
       .subscribe((response) => {
         this.locations = response;
       });
