@@ -30,3 +30,13 @@ button {
   background-color: #2a8fd1 !important;
   color: #fff !important;
 }
+
+.patient-vitals-mat-menu {
+  position: fixed !important;
+  top: 130px;
+  right: 0 !important;
+  background-color: #fff !important;
+  width: 700px !important;
+  overflow: auto;
+  z-index: 1001;
+}

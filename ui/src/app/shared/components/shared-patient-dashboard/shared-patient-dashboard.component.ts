@@ -119,6 +119,8 @@ export class SharedPatientDashboardComponent implements OnInit {
   readyForClinicalNotes: boolean = true;
   consultationEncounterType$: Observable<any>;
   consultationOrderType$: Observable<any>;
+
+  showVitalsSummary: boolean = false;
   constructor(
     private store: Store<AppState>,
     private dialog: MatDialog,
@@ -208,6 +210,11 @@ export class SharedPatientDashboardComponent implements OnInit {
       this.systemSettingsService.getSystemSettingsByKey(
         "iCare.clinic.consultation.encounterType"
       );
+  }
+
+  onToggleVitalsSummary(event: Event): void {
+    event.stopPropagation();
+    this.showVitalsSummary = !this.showVitalsSummary;
   }
 
   getSelectedForm(event: Event, form: any): void {
@@ -335,7 +342,7 @@ export class SharedPatientDashboardComponent implements OnInit {
   }
 
   onUpdateConsultationOrder() {
-    if (!this.activeVisit.consultationStarted){
+    if (!this.activeVisit.consultationStarted) {
       const orders = [
         {
           uuid: this.activeVisit.consultationStatusOrder?.uuid,
@@ -346,8 +353,8 @@ export class SharedPatientDashboardComponent implements OnInit {
         },
       ];
       this.ordersService.updateOrdersViaEncounter(orders).subscribe((order) => {
-        if(!order.error){
-          console.log("==> Order results: ", order)
+        if (!order.error) {
+          console.log("==> Order results: ", order);
         }
       });
     }
