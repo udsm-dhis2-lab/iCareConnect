@@ -216,18 +216,6 @@ export class CaptureFormDataModalComponent implements OnInit {
       }
     });
 
-    // Available Prescriptions
-    console.log("==> Prescriptions: ", this.drugsPrescribed);
-
-    // Available Clinical Notes
-    console.log("==> Observations: ", observations);
-
-    //Available Diagnoses
-    console.log("==> Diagnoses: ", e?.Diagnoses);
-
-    // Orders in this visit
-    console.log("==> Visit: ", this.visit);
-
     const frame1: any = document.createElement("iframe");
     frame1.name = "frame3";
     frame1.style.position = "absolute";
