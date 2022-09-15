@@ -1,9 +1,9 @@
-import { BillItem } from './bill-item.model';
-import { BillObject } from './bill-object.model';
-import { BillPayment } from './bill-payment.model';
-import { keys, flatten, find } from 'lodash';
-import { PaymentInput } from './payment-input.model';
-import * as _ from 'lodash';
+import { BillItem } from "./bill-item.model";
+import { BillObject } from "./bill-object.model";
+import { BillPayment } from "./bill-payment.model";
+import { keys, flatten, find } from "lodash";
+import { PaymentInput } from "./payment-input.model";
+import * as _ from "lodash";
 
 export class Bill {
   constructor(public billDetails: any) {}
@@ -27,7 +27,7 @@ export class Bill {
     return this.discount && this.discount > 0 ? true : false;
   }
 
-  get status(): 'NEW' | 'PENDING' {
+  get status(): "NEW" | "PENDING" {
     return this.billDetails?.status;
   }
 
@@ -123,7 +123,7 @@ export class Bill {
   }
 
   get isInsurance(): boolean {
-    return this.paymentMode === 'Insurance';
+    return this.paymentMode === "Insurance";
   }
 
   public static create(input: any): Bill {
@@ -167,9 +167,11 @@ export class Bill {
       criteria: {
         uuid: discountDetails?.Criteria?.value,
       },
-      attachment: {
-        uuid: discountDetails?.attachmentUuid,
-      },
+      attachment: discountDetails?.attachmentUuid
+        ? {
+            uuid: discountDetails?.attachmentUuid,
+          }
+        : null,
       items,
     };
   }

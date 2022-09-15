@@ -93,11 +93,14 @@ export class AddUserComponent implements OnInit {
       this.loading = false;
     });
     this.locationService
-      .getLocationsByTagName("Login+Location", {
-        limit: 100,
-        startIndex: 0,
-        v: "custom:(uuid,display,name)",
-      })
+      .getLocationsByTagNames(
+        ["Treatment+Room", "Admission+Location", "Module+Location"],
+        {
+          limit: 100,
+          startIndex: 0,
+          v: "custom:(uuid,display,name)",
+        }
+      )
       .subscribe((res) => {
         this.locations = res;
 
