@@ -102,6 +102,8 @@ export const getVitalSignObservations = createSelector(
       };
     });
     //group items
+    // console.log("vitalsArray", vitalsArray);
+    // console.log("groupedObservations", groupedObservations);
     return {
       noChildren: vitalsArray?.filter(
         (vitailItem) => vitailItem?.children?.length === 0
@@ -123,6 +125,10 @@ function getSetMembers(setMembers, groupedObservations) {
       ...setMember,
       display: setMember?.concept?.display,
       value: observation ? observation?.latest?.value : null,
+      valueObject:
+        observation && observation?.latest?.valueObject
+          ? observation?.latest?.valueObject
+          : null,
       ...setMember?.formField,
       children: setMember?.formFields
         ? getSetMembers(
