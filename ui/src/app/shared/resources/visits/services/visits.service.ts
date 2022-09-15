@@ -175,6 +175,7 @@ export class VisitsService {
             locationUuids?.length > 0
               ? flatten(visitResponse.map((visitData) => visitData?.results))
               : visitResponse?.results;
+          // TODO: Softcode Insurance attribute value (Concept UUID) - 00000105IIIIIIIIIIIIIIIIIIIIIIIIIIII
           return (
             (flatten(results) || [])
               .map((visitResult: any) => {
@@ -189,8 +190,9 @@ export class VisitsService {
                       visitResult?.attributes.filter(
                         (attribute) =>
                           attribute &&
-                          attribute.display &&
-                          attribute.display?.indexOf("Insurance ID") > -1
+                          attribute?.display &&
+                          attribute?.display ===
+                            "00000105IIIIIIIIIIIIIIIIIIIIIIIIIIII"
                       ) || []
                     ).length > 0
                       ? "Insurance"
@@ -199,7 +201,7 @@ export class VisitsService {
                 return new Visit(formattedResult);
               })
               .filter((visit) =>
-                !onlyInsurance ? visit : visit.paymentType === "Insurance"
+                !onlyInsurance ? visit : visit?.paymentType === "Insurance"
               ) || []
           );
         })
