@@ -365,6 +365,8 @@ export class CaptureFormDataModalComponent implements OnInit {
     let provisionalDiagnoses: string = "";
     let confirmedDiagnoses: string = "";
     let labOrders: string = "";
+    let proceduresOrders: string = "";
+    let radiologyOrders: string = "";
 
     // Counters related to each HTML generated
     let drugsCounter = 1;
@@ -430,8 +432,33 @@ export class CaptureFormDataModalComponent implements OnInit {
       labOrdersCounter = labOrdersCounter + 1;
     });
 
+    this.visit.procedureOrders.forEach((procedureOrder) => {
+      proceduresOrders =
+        proceduresOrders +
+        `
+        <tr>
+          <td>${proceduresOrdersCounter}</td>
+          <td>${procedureOrder?.order?.display}</td>
+        </tr>
+      `;
+      proceduresOrdersCounter = proceduresOrdersCounter + 1;
+    });
+
+    this.visit.radiologyOrders.forEach((radiologyOrder) => {
+      radiologyOrders =
+        radiologyOrders +
+        `
+        <tr>
+          <td>${radiologyOrdersCounter}</td>
+          <td>${radiologyOrder?.order?.display}</td>
+        </tr>
+      `;
+      radiologyOrdersCounter = radiologyOrdersCounter + 1;
+    });
+
+    //Generate contents to be placed in HTML form to be generated
     
-    let drugsContent = `
+    drugs = drugs.length > 0 ? `
         <div>
             <h5>Drugs Prescribed</h5>
           </div>
@@ -445,9 +472,11 @@ export class CaptureFormDataModalComponent implements OnInit {
             <tbody>
               ${drugs}
             </tbody>
-          </table>`;
+          </table>` : drugs;
     
-    let clinicalNotesContent = `
+    observation =
+      observation.length > 0
+        ? `
         <div>
             <h5>Clinical Notes and Examination Findings</h5>
           </div>
@@ -461,9 +490,12 @@ export class CaptureFormDataModalComponent implements OnInit {
             <tbody>
               ${observation}
             </tbody>
-          </table>`;
+          </table>`
+        : observation;
 
-    let provisionalDiagnosesContent = `
+    provisionalDiagnoses =
+      provisionalDiagnoses.length > 0
+        ? `
         <div>
             <h5>Provisional Diagnoses</h5>
           </div>
@@ -477,11 +509,14 @@ export class CaptureFormDataModalComponent implements OnInit {
             <tbody>
               ${provisionalDiagnoses}
             </tbody>
-          </table>`;
+          </table>`
+        : provisionalDiagnoses;
 
-    let confirmedDiagnosesContent = `
+    confirmedDiagnoses =
+      confirmedDiagnoses.length > 0
+        ? `
         <div>
-            <h5>Provisional Diagnoses</h5>
+            <h5>Confirmed Diagnoses</h5>
           </div>
           <table id="table">
             <thead>
@@ -493,11 +528,14 @@ export class CaptureFormDataModalComponent implements OnInit {
             <tbody>
               ${confirmedDiagnoses}
             </tbody>
-          </table>`;
+          </table>`
+        : confirmedDiagnoses;
 
-    let labOrdersContent = `
+    labOrders =
+      labOrders.length > 0
+        ? `
         <div>
-            <h5>Provisional Diagnoses</h5>
+            <h5>Laboratory</h5>
           </div>
           <table id="table">
             <thead>
@@ -509,7 +547,44 @@ export class CaptureFormDataModalComponent implements OnInit {
             <tbody>
               ${labOrders}
             </tbody>
-          </table>`;
+          </table>`
+        : labOrders;
+    proceduresOrders =
+      proceduresOrders.length > 0
+        ? `
+        <div>
+            <h5>Procedures</h5>
+          </div>
+          <table id="table">
+            <thead>
+              <tr>
+                <th>S/N</th>
+                <th>Name</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${proceduresOrders}
+            </tbody>
+          </table>`
+        : proceduresOrders;
+    radiologyOrders =
+      radiologyOrders.length > 0
+        ? `
+        <div>
+            <h5>Radiology</h5>
+          </div>
+          <table id="table">
+            <thead>
+              <tr>
+                <th>S/N</th>
+                <th>Name</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${radiologyOrders}
+            </tbody>
+          </table>`
+        : radiologyOrders;
 
     frameDoc.document.write(`
         <div class="container">
@@ -565,17 +640,19 @@ export class CaptureFormDataModalComponent implements OnInit {
             </p>
             <p>
               <strong>Clinical Notes and Examination Findings</strong>
-              ${clinicalNotesContent}
+              ${observation}
             </p>
             <p>
               <strong>Provisinal / Definitive diagnosis</strong>
-              ${provisionalDiagnosesContent} 
-              ${confirmedDiagnosesContent}
-              ${labOrdersContent}
+              ${provisionalDiagnoses} 
+              ${confirmedDiagnoses}
+              ${labOrders}
+              ${radiologyOrders}
             </p>
             <p>
               <strong>Treatment Given</strong>
-              ${drugsContent}
+              ${drugs}
+              ${proceduresOrders}
             </p>
             <p>
               <strong>Reasons for referral</strong>
