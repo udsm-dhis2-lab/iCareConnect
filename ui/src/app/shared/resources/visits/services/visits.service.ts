@@ -132,8 +132,11 @@ export class VisitsService {
     orderByDirection?: string,
     filterBy?: string
   ): Observable<Visit[]> {
-    const locationUuids: any = isArray(location) ? location : [location];
-    // console.log("locationUuids", locationUuids);
+    const locationUuids: any = isArray(location)
+      ? location
+      : location
+      ? [location]
+      : [];
 
     // Parameters for sorting
     const orderByParameter = orderBy ? `&OrderBy=${orderBy}` : "";
@@ -153,24 +156,33 @@ export class VisitsService {
         ? `&orderStatusCode=${orderStatusCode}`
         : "";
       const orderTypeParameter = orderType ? `&orderTypeUuid=${orderType}` : "";
-
-      zip(
-        ...locationUuids.map((locationUuid) => {
-          const locationParameter = `locationUuid=${locationUuid}&`;
-          return this.httpClient.get(
-            `icare/visit?${locationParameter}${orderTypeParameter}${orderStatusParameter}${orderStatusCodeParameter}${sortingParameters}${filterBy}&startIndex=${startIndex}&limit=${limit}`
-          );
-        })
+      return (
+        locationUuids?.length > 0
+          ? zip(
+              ...locationUuids.map((locationUuid) => {
+                const locationParameter = `locationUuid=${locationUuid}`;
+                return this.httpClient.get(
+                  `icare/visit?${locationParameter}${orderTypeParameter}${orderStatusParameter}${orderStatusCodeParameter}${sortingParameters}${filterBy}&startIndex=${startIndex}&limit=${limit}`
+                );
+              })
+            )
+          : this.httpClient.get(
+              `icare/visit?${orderTypeParameter}${orderStatusParameter}${orderStatusCodeParameter}${sortingParameters}${filterBy}&startIndex=${startIndex}&limit=${limit}`
+            )
       ).pipe(
         map((visitResponse: any) => {
-          const results = flatten(
-            visitResponse.map((visitData) => visitData?.results)
-          );
+          const results =
+            locationUuids?.length > 0
+              ? flatten(visitResponse.map((visitData) => visitData?.results))
+              : visitResponse?.results;
           return (
             (flatten(results) || [])
               .map((visitResult: any) => {
                 const formattedResult = {
-                  pager: visitResponse[0].links,
+                  pager:
+                    locationUuids?.length > 0
+                      ? visitResponse[0].links
+                      : visitResponse?.links,
                   ...visitResult,
                   paymentType:
                     (
@@ -193,35 +205,55 @@ export class VisitsService {
         })
       );
     }
-
-    return zip(
-      ...locationUuids.map((locationUuid) => {
-        return from(
-          this.api.visit.getAllVisits({
-            includeInactive:
-              includeInactive === undefined ? false : includeInactive,
-            location: locationUuid,
-            v: "custom:(uuid,visitType,startDatetime,encounters:(uuid,diagnoses,encounterDatetime,encounterType,location,obs,orders),stopDatetime,attributes:(uuid,display),location:(uuid,display,tags,parentLocation:(uuid,display)),patient:(uuid,display,identifiers,person,voided)",
-            q: queryParam,
-            limit: limit ? limit : 100,
-            startIndex: startIndex ? startIndex : 0,
-          } as any)
-        ).pipe(
-          map((result: any) => {
-            return result;
-          })
-        );
-      })
+    return (
+      locationUuids?.length > 0
+        ? zip(
+            ...locationUuids.map((locationUuid) => {
+              return from(
+                this.api.visit.getAllVisits({
+                  includeInactive:
+                    includeInactive === undefined ? false : includeInactive,
+                  location: locationUuid,
+                  v: "custom:(uuid,visitType,startDatetime,encounters:(uuid,diagnoses,encounterDatetime,encounterType,location,obs,orders),stopDatetime,attributes:(uuid,display),location:(uuid,display,tags,parentLocation:(uuid,display)),patient:(uuid,display,identifiers,person,voided)",
+                  q: queryParam,
+                  limit: limit ? limit : 100,
+                  startIndex: startIndex ? startIndex : 0,
+                } as any)
+              ).pipe(
+                map((result: any) => {
+                  return result;
+                })
+              );
+            })
+          )
+        : from(
+            this.api.visit.getAllVisits({
+              includeInactive:
+                includeInactive === undefined ? false : includeInactive,
+              v: "custom:(uuid,visitType,startDatetime,encounters:(uuid,diagnoses,encounterDatetime,encounterType,location,obs,orders),stopDatetime,attributes:(uuid,display),location:(uuid,display,tags,parentLocation:(uuid,display)),patient:(uuid,display,identifiers,person,voided)",
+              q: queryParam,
+              limit: limit ? limit : 100,
+              startIndex: startIndex ? startIndex : 0,
+            } as any)
+          ).pipe(
+            map((result: any) => {
+              return result;
+            })
+          )
     ).pipe(
       map((visitResponse: any) => {
-        const results = flatten(
-          visitResponse.map((visitData) => visitData?.results)
-        );
+        const results =
+          locationUuids?.length > 0
+            ? flatten(visitResponse.map((visitData) => visitData?.results))
+            : visitResponse?.results;
         return (
           (flatten(results) || [])
             .map((visitResult: any) => {
               const formattedResult = {
-                pager: visitResponse[0].links,
+                pager:
+                  locationUuids?.length > 0
+                    ? visitResponse[0]?.links
+                    : visitResponse?.links,
                 ...visitResult,
                 paymentType:
                   (
@@ -244,6 +276,123 @@ export class VisitsService {
       })
     );
   }
+
+  // getAllVisits(
+  //   location?: string | string[],
+  //   includeInactive?: boolean,
+  //   onlyInsurance?: boolean,
+  //   queryParam?: string,
+  //   startIndex?: number,
+  //   limit?: number,
+  //   orderType?: string,
+  //   orderStatus?: string,
+  //   orderStatusCode?: string,
+  //   orderBy?: string,
+  //   orderByDirection?: string,
+  //   filterBy?: string
+  // ): Observable<Visit[]> {
+  //   const locationUuids: any = isArray(location) ? location : [location];
+
+  //   // Parameters for sorting
+  //   const orderByParameter = orderBy ? `&OrderBy=${orderBy}` : "";
+  //   const orderDirectionParameter = orderByDirection
+  //     ? `&orderByDirection=${orderByDirection}`
+  //     : "";
+  //   const sortingParameters =
+  //     orderByParameter || orderDirectionParameter
+  //       ? orderByParameter + orderDirectionParameter
+  //       : "";
+
+  //   if (orderType) {
+  //     const orderStatusParameter = orderStatus
+  //       ? `&fulfillerStatus=${orderStatus}`
+  //       : "";
+  //     const orderStatusCodeParameter = orderStatusCode
+  //       ? `&orderStatusCode=${orderStatusCode}`
+  //       : "";
+  //     const locationParameter = location ? `locationUuid=${location}&` : "";
+  //     const orderTypeParameter = orderType ? `&orderTypeUuid=${orderType}` : "";
+
+  //     return this.httpClient
+  //       .get(
+  //         `icare/visit?${locationParameter}${orderTypeParameter}${orderStatusParameter}${orderStatusCodeParameter}${sortingParameters}${filterBy}&startIndex=${startIndex}&limit=${limit}`
+  //       )
+  //       .pipe(
+  //         map((visitResponse) => {
+  //           const results = visitResponse?.results;
+  //           return (flatten(results) || []).map((visitResult: any) => {
+  //             const formattedResult = {
+  //               pager: null,
+  //               ...visitResult,
+  //               paymentType:
+  //                 (
+  //                   visitResult?.attributes.filter(
+  //                     (attribute) =>
+  //                       attribute &&
+  //                       attribute.display &&
+  //                       attribute.display ===
+  //                         "00000101IIIIIIIIIIIIIIIIIIIIIIIIIIII"
+  //                   ) || []
+  //                 ).length > 0
+  //                   ? "Insurance"
+  //                   : "Cash",
+  //             };
+  //             return new Visit(formattedResult);
+  //           });
+  //         })
+  //       );
+  //   }
+
+  //   return zip(
+  //     ...locationUuids.map((locationUuid) => {
+  //       return from(
+  //         this.api.visit.getAllVisits({
+  //           includeInactive:
+  //             includeInactive === undefined ? false : includeInactive,
+  //           location: locationUuid,
+  //           v: "custom:(uuid,visitType,startDatetime,encounters:(uuid,diagnoses,encounterDatetime,encounterType,location,obs,orders),stopDatetime,attributes:(uuid,display),location:(uuid,display,tags,parentLocation:(uuid,display)),patient:(uuid,display,identifiers,person,voided)",
+  //           q: queryParam,
+  //           limit: limit ? limit : 100,
+  //           startIndex: startIndex ? startIndex : 0,
+  //         } as any)
+  //       ).pipe(
+  //         map((result: any) => {
+  //           return result;
+  //         })
+  //       );
+  //     })
+  //   ).pipe(
+  //     map((visitResponse: any) => {
+  //       const results = flatten(
+  //         visitResponse.map((visitData) => visitData?.results)
+  //       );
+  //       return (
+  //         (flatten(results) || [])
+  //           .map((visitResult: any) => {
+  //             const formattedResult = {
+  //               pager: visitResponse[0].links,
+  //               ...visitResult,
+  //               paymentType:
+  //                 (
+  //                   visitResult?.attributes.filter(
+  //                     (attribute) =>
+  //                       attribute &&
+  //                       attribute.display &&
+  //                       attribute.display?.indexOf("Insurance ID") > -1
+  //                   ) || []
+  //                 ).length > 0
+  //                   ? "Insurance"
+  //                   : "Cash",
+  //             };
+  //             return new Visit(formattedResult);
+  //           })
+  //           .filter((visit) =>
+  //             !onlyInsurance ? visit : visit.paymentType === "Insurance"
+  //           ) || []
+  //       );
+  //     })
+  //   );
+  // }
 
   getPatientLoadByLocation(): Observable<{ [uuid: string]: number }> {
     return this.getAllVisits().pipe(

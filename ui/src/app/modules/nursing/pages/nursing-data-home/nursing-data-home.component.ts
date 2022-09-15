@@ -12,6 +12,7 @@ import { loadPatientBills } from "src/app/store/actions/bill.actions";
 import { loadFormPrivilegesConfigs } from "src/app/store/actions/form-privileges-configs.actions";
 import { loadActiveVisit } from "src/app/store/actions/visit.actions";
 import { AppState } from "src/app/store/reducers";
+import { getCurrentLocation } from "src/app/store/selectors";
 import {
   getAllUSerRoles,
   getCurrentUserDetails,
@@ -34,6 +35,7 @@ export class NursingDataHomeComponent implements OnInit {
   allUserRoles$: Observable<any[]>;
   userPrivileges$: Observable<any>;
   nursingConfigurations$: Observable<any>;
+  currentLocation$: Observable<any>;
   constructor(
     private store: Store<AppState>,
     private route: ActivatedRoute,
@@ -65,5 +67,6 @@ export class NursingDataHomeComponent implements OnInit {
       getFormPrivilegesConfigsLoadingState
     );
     this.currentUser$ = this.store.select(getCurrentUserDetails);
+    this.currentLocation$ = this.store.select(getCurrentLocation);
   }
 }
