@@ -129,13 +129,12 @@
           </div>
           <mat-progress-bar
             *ngIf="
-              (!params?.provider ||
-                !params?.location ||
-                !params?.visit ||
-                !params?.patient ||
-                !params?.forms ||
-                (params?.forms && params?.forms?.length == 0)) &&
-              applicableForms?.length > 0
+              !params?.provider ||
+              !params?.location ||
+              !params?.visit ||
+              !params?.patient ||
+              !params?.forms ||
+              (params?.forms && params?.forms?.length == 0)
             "
             mode="indeterminate"
           ></mat-progress-bar>
@@ -148,7 +147,6 @@
               params?.patient &&
               params?.forms &&
               params?.forms?.length > 0 &&
-              applicableForms?.length > 0 &&
               selectedTab.value === 0
             "
           >
