@@ -23,6 +23,7 @@ export class ParameterFieldComponent implements OnInit {
   selectedDateTime: any;
 
   @Output() parameterUpdate = new EventEmitter();
+  disabledGetReport: any;
   constructor() {}
 
   ngOnInit() {
@@ -50,10 +51,19 @@ export class ParameterFieldComponent implements OnInit {
         selectedDateTime ? new Date(selectedDateTime).getMinutes() : "59"
       }:59`;
     }
+    this.disabledGetReport = !(
+      e.target.value.length > 0 ||
+      e.value > 0 ||
+      e.checked ||
+      this.fieldValue.length > 0
+    )
+      ? "true"
+      : "false";
     this.parameterUpdate.emit({
       // [paramId]: getSanitizedParamValue(e.value || e.checked, this.field?.type),
       [paramId]:
         value || e?.target?.value || e?.value || e?.checked || this.fieldValue,
+      disabledGetReport: this.disabledGetReport,
     });
   }
 }
