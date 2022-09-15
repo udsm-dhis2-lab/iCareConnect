@@ -47,6 +47,7 @@
           </button>
           <button
             *ngIf="
+              userPrivileges['NURSING_VIEW_ADMISSION_BUTTON'] &&
               params?.provider &&
               params?.location &&
               params?.visit &&
@@ -79,6 +80,7 @@
             mat-stroked-button
             (click)="admitPatient($event, params?.patient, params?.visit, true)"
             *ngIf="
+              userPrivileges['NURSING_VIEW_SEND_TO_OBSERVATION_BUTTON'] &&
               params?.provider &&
               params?.location &&
               params?.visit &&
