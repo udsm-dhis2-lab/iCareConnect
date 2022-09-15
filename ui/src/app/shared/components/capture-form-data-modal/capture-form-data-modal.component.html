@@ -43,7 +43,7 @@
       ></mat-progress-bar>
       <mat-dialog-actions align="end" class="mb-2 ml-2 mr-2">
         <button mat-stroked-button (click)="onClose($event)">Cancel</button>
-        <div *ngIf="data.fromClinic">
+        <div *ngIf="data.fromClinic" class="ml-5">
           <app-print-button
             [iconName]="'print'"
             [toolTipText]="'Click to print refereal form'"
@@ -69,7 +69,7 @@
             color="primary"
             *ngIf="params?.savingObservations"
             [diameter]="20"
-            style="display: inline-block !important; margin-right: 4px"
+            style="display: inline-block !important;"
           ></mat-spinner>
           {{ savingObservations ? "Saving ..." : "Save" }}
         </button>
