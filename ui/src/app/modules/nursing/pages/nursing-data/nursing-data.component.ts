@@ -91,10 +91,10 @@ export class NursingDataComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // console.log(
-    //   "HERE",
-    //   JSON.parse(localStorage.getItem("currentLocation"))?.forms || []
-    // );
+    console.log(
+      "HERE",
+      JSON.parse(localStorage.getItem("currentLocation"))?.forms || []
+    );
     this.store.dispatch(loadOrderTypes());
     this.orderTypes$ = this.store.select(getAllOrderTypes);
     this.privileges$ = this.store.select(getCurrentUserPrivileges);
