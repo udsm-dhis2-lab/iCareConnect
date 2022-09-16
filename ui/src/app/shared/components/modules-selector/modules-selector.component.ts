@@ -179,7 +179,8 @@ export class ModulesSelectorComponent implements OnInit {
         path: !isNavigationDetailsAvailable
           ? [
               this.currentModule?.app?.path +
-                (this.currentModule?.app?.path === "/laboratory"
+                (this.currentModule?.app?.path === "/laboratory" &&
+                this.lisConfigurations?.isLIS
                   ? "/sample-registration"
                   : "") +
                 (this.currentModule?.app?.considerLocationRoute
