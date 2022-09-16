@@ -54,29 +54,30 @@
             [investigationAndProceduresFormsDetails]="
               investigationAndProceduresFormsDetails
             "
+            [userPrivileges]="userPrivileges"
             [forConsultation]="forConsultation"
             [provider]="provider"
             [orderTypes]="orderTypes"
             (updateConsultationOrder)="onUpdateConsultationOrder()"
-            ></app-patient-procedures-summary>
-          </ng-template></div
-          ></mat-tab>
-          <mat-tab
-          label="Radiology"
-          *ngIf="userPrivileges['CLINIC_ADD_RADIOLOGY_INVESTIGATION']"
-          >
-          <div class="mat-tab-container">
-            <ng-template matTabContent>
-              <app-patient-radiology-summary
-              [patientVisit]="patientVisit"
-              [investigationAndProceduresFormsDetails]="
+          ></app-patient-procedures-summary>
+        </ng-template></div
+    ></mat-tab>
+    <mat-tab
+      label="Radiology"
+      *ngIf="userPrivileges['CLINIC_ADD_RADIOLOGY_INVESTIGATION']"
+    >
+      <div class="mat-tab-container">
+        <ng-template matTabContent>
+          <app-patient-radiology-summary
+            [patientVisit]="patientVisit"
+            [investigationAndProceduresFormsDetails]="
               investigationAndProceduresFormsDetails
-              "
-              [forConsultation]="forConsultation"
-              [provider]="provider"
-              [orderTypes]="orderTypes"
-              (updateConsultationOrder)="onUpdateConsultationOrder()"
-            ></app-patient-radiology-summary>
+            "
+            [forConsultation]="forConsultation"
+            [provider]="provider"
+            [orderTypes]="orderTypes"
+            (updateConsultationOrder)="onUpdateConsultationOrder()"
+          ></app-patient-radiology-summary>
         </ng-template></div
     ></mat-tab>
   </mat-tab-group>

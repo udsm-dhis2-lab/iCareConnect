@@ -20,7 +20,10 @@
     orderTypes: orderTypes$ | async,
     provider: provider$ | async,
     consultationEncounterType: consultationEncounterType$ | async,
-    consultationOrderType: consultationOrderType$ | async
+    consultationOrderType: consultationOrderType$ | async,
+    facilityDetails: facilityDetails$ | async,
+    useGeneralPrescription: useGeneralPrescription$ | async,
+    generalPrescriptionOrderType: generalPrescriptionOrderType$ | async
   } as dashboardParams"
 >
   <div
@@ -82,6 +85,9 @@
 
           <!-- <h2 class="text-left ml-2">Patient Dashboard</h2> -->
           <div class="w-50 d-flex justify-content-end">
+            <div class="mr-2">
+              <app-bmi></app-bmi>
+            </div>
             <button
               class="mr-2"
               (click)="onToggleVitalsSummary($event)"
@@ -209,7 +215,11 @@
                     activeVisit,
                     dashboardParams?.currentLocation,
                     null,
-                    dashboardParams?.provider
+                    dashboardParams?.provider,
+                    dashboardParams?.facilityDetails.results,
+                    dashboardParams?.observationsGroupedByConcept,
+                    dashboardParams?.generalPrescriptionOrderType,
+                    dashboardParams?.useGeneralPrescription
                   )
                 "
               >

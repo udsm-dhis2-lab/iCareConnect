@@ -53,6 +53,14 @@
   >
     {{ parameter?.name }}
   </mat-checkbox>
+  <mat-form-field
+    appearance="fill"
+    class="w-100"
+    *ngIf="parameter?.type === ''"
+  >
+    <mat-label>{{ parameter?.label }}</mat-label>
+    <input matInput (change)="onParamChange($event, parameter?.id)" />
+  </mat-form-field>
 
   <!-- <mat-form-field
     appearance="outline"
