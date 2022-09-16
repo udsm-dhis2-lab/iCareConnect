@@ -35,7 +35,8 @@
           </div>
         </mat-tab> -->
         <mat-tab label="Awaiting Consultation">
-          <div class="p-2" *ngIf="selectedTab.value === 0">
+          <!-- <div class="p-2" *ngIf="selectedTab.value === 0"> -->
+          <ng-template matTabContent>
             <app-patient-list
               [isTabularList]="true"
               [itemsPerPage]="25"
@@ -43,10 +44,12 @@
               [orderType]="params?.consultationOrderType"
               (selectPatient)="onSelectPatient($event)"
             ></app-patient-list>
-          </div>
+          </ng-template>
+          <!-- </div> -->
         </mat-tab>
         <mat-tab label="Attended">
-          <div class="p-2" *ngIf="selectedTab.value === 1">
+          <!-- <div class="p-2" *ngIf="selectedTab.value === 1"> -->
+          <ng-template matTabContent>
             <app-patient-list
               [isTabularList]="true"
               [itemsPerPage]="25"
@@ -56,7 +59,8 @@
               [currentLocation]="(currentLocation$ | async)?.id"
               (selectPatient)="onSelectPatient($event)"
             ></app-patient-list>
-          </div>
+          </ng-template>
+          <!-- </div> -->
         </mat-tab>
 
         <!-- <mat-tab label="Patient With Lab Orders Not Received at LAB">
@@ -71,7 +75,9 @@
           </div>
         </mat-tab> -->
         <mat-tab label="With Laboratory Tests">
-          <div class="p-2" *ngIf="selectedTab.value === 2">
+          <!-- <div class="p-2" *ngIf="selectedTab.value === 2"> -->
+
+          <ng-template matTabContent>
             <app-patient-list
               [currentLocation]="(currentLocation$ | async)?.id"
               [shouldShowParentLocation]="true"
@@ -80,12 +86,15 @@
               [itemsPerPage]="10"
               (selectPatient)="onSelectPatient($event)"
             ></app-patient-list>
-          </div>
+          </ng-template>
+          <!-- </div> -->
         </mat-tab>
 
         <mat-tab label="Admitted Patients">
           <!-- TODO: Remove hardcoded location Id -->
-          <div class="p-2" *ngIf="selectedTab.value === 3">
+          <!-- <div class="p-2" *ngIf="selectedTab.value === 3"> -->
+
+          <ng-template matTabContent>
             <app-patient-list
               [shouldShowParentLocation]="true"
               [isTabularList]="true"
@@ -93,7 +102,8 @@
               [orderType]="'iCARE901-ADMS-11e8-b450-525400e4297f'"
               (selectPatient)="onSelectPatient($event)"
             ></app-patient-list>
-          </div>
+          </ng-template>
+          <!-- </div> -->
         </mat-tab>
       </mat-tab-group>
     </div>

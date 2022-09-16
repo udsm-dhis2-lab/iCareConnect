@@ -7,7 +7,7 @@
     observationsGroupedByConcept: observationsGroupedByConcept$ | async
   } as params"
 >
-  <div class="col-md-12 col-sm-12 back-to-client-list">
+  <!-- <div class="col-md-12 col-sm-12 back-to-client-list">
     <button
       class="float-left"
       mat-stroked-button
@@ -123,7 +123,7 @@
     <p class="text-danger text-center">
       No any admission order has been ordered
     </p>
-  </div>
+  </div> -->
   <div
     class="col-md-12"
     *ngIf="
@@ -150,6 +150,66 @@
       </div>
     </div>
     <div class="row">
+      <div class="col-12">
+        <div
+          style="padding: 0 4px"
+          *ngIf="{
+            currentUser: currentUser$ | async,
+            userPrivileges: userPrivileges$ | async,
+            loadingVisit: loadingVisit$ | async,
+            activeVisit: activeVisit$ | async,
+            iCareGeneralConfigurations: iCareGeneralConfigurations$ | async,
+            currentLocation: currentLocation$ | async
+          } as params"
+        >
+          <app-shared-patient-dashboard
+            *ngIf="
+              params?.currentUser &&
+              params?.userPrivileges &&
+              params?.activeVisit &&
+              !params?.loadingVisit &&
+              params?.iCareGeneralConfigurations &&
+              params?.iCareGeneralConfigurations !== '' &&
+              params?.currentLocation
+            "
+            [currentUser]="params?.currentUser"
+            [activeVisit]="params?.activeVisit"
+            [userPrivileges]="params?.userPrivileges"
+            [iCareGeneralConfigurations]="params?.iCareGeneralConfigurations"
+            [currentLocation]="params?.currentLocation"
+            [isInpatient]="true"
+          ></app-shared-patient-dashboard>
+          <div
+            class="alert alert-danger mt-2"
+            role="alert"
+            *ngIf="params?.iCareGeneralConfigurations === ''"
+          >
+            Missing General iCare Metadata Configurations, Please set
+            "iCare.GeneralMetadata.Configurations" or Contact IT
+          </div>
+
+          <div
+            class="alert alert-danger mt-2"
+            role="alert"
+            *ngIf="params?.iCareClinicConfigurations === ''"
+          >
+            Missing Icare Clinic Configurations. Please set
+            "icare.clinic.configurations" or Contact IT
+          </div>
+
+          <mat-progress-bar
+            mode="indeterminate"
+            *ngIf="
+              !params?.userPrivileges ||
+              params?.rolesLoadingState ||
+              params?.loadingVisit ||
+              !params?.currentLocation
+            "
+          ></mat-progress-bar>
+        </div>
+      </div>
+    </div>
+    <!-- <div class="row">
       <div class="col-9">
         <mat-progress-bar
           *ngIf="!currentBedOrder && bedOrdersWithBillStatus?.length > 0"
@@ -249,6 +309,6 @@
           </mat-expansion-panel>
         </mat-accordion>
       </div>
-    </div>
+    </div> -->
   </div>
 </div>

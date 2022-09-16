@@ -4,12 +4,16 @@
     patientVisitData: patientVisitData$ | async,
     generalPrescriptionOrderType: generalPrescriptionOrderType$ | async,
     useGeneralPrescription: useGeneralPrescription$ | async,
-    currentVisit: currentVisit$ | async  
+    currentVisit: currentVisit$ | async
   } as drugParams"
 >
   <table
     class="table"
-    *ngIf="(drugParams?.patientVisitData?.drugOrders && !forConsultation) && drugParams?.useGeneralPrescription !== 'true' "
+    *ngIf="
+      drugParams?.patientVisitData?.drugOrders &&
+      !forConsultation &&
+      drugParams?.useGeneralPrescription !== 'true'
+    "
   >
     <thead>
       <tr>
@@ -37,16 +41,20 @@
       </tr>
     </tbody>
   </table>
-  <div *ngIf="drugParams?.currentVisit && drugParams?.generalPrescriptionOrderType">
+  <div
+    *ngIf="drugParams?.currentVisit && drugParams?.generalPrescriptionOrderType"
+  >
     <table class="w-100 table table-bordered">
       <tbody>
         <tr class="p-4">
-          <app-current-prescriptions 
-              [visit]="drugParams?.currentVisit" 
-              [genericPrescriptionOrderType]="drugParams?.generalPrescriptionOrderType"
-              ></app-current-prescriptions>
+          <app-current-prescriptions
+            [visit]="drugParams?.currentVisit"
+            [genericPrescriptionOrderType]="
+              drugParams?.generalPrescriptionOrderType
+            "
+          ></app-current-prescriptions>
         </tr>
-        <tr>
+        <tr *ngIf="isInpatient">
           <td colspan="3">
             <button
               mat-flat-button
@@ -65,7 +73,11 @@
 
   <table
     class="table table-bordered"
-    *ngIf="(drugParams?.patientVisitData?.drugOrders && forConsultation) && drugParams?.useGeneralPrescription !== 'true'"
+    *ngIf="
+      drugParams?.patientVisitData?.drugOrders &&
+      forConsultation &&
+      drugParams?.useGeneralPrescription !== 'true'
+    "
   >
     <thead>
       <tr>
@@ -93,7 +105,7 @@
           </td>
         </tr>
       </ng-container>
-      <ng-container>
+      <ng-container *ngIf="isInpatient">
         <tr>
           <td colspan="3">
             <button

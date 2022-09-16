@@ -43,7 +43,6 @@
           [currentPatient]="dashboardParams?.currentPatient"
         ></app-new-patient-profile>
       </div>
-
       <div class="w-100 patient-other-details-padding">
         <div
           class="
@@ -268,10 +267,17 @@
           "
         >
           <div class="p-2">
+            isInpatient - {{ isInpatient }}
             <div class="row">
-              <div class="col-lg-6 col-md-6 col-sm-12 col-sx-12">
+              <div
+                [ngClass]="{
+                  'col-lg-6 col-md-6 col-sm-12 col-sx-12': !isInpatient,
+                  'col-lg-8 col-md-8 col-sm-12 col-sx-12': isInpatient
+                }"
+              >
                 <app-clinical-notes
                   *ngIf="
+                    !isInpatient &&
                     readyForClinicalNotes &&
                     !dashboardParams.loadingForms &&
                     dashboardParams.currentPatient &&
@@ -302,6 +308,7 @@
                   "
                 >
                 </app-clinical-notes>
+                <div>Observation Chart Component</div>
                 <div
                   class="alert alert-warning"
                   role="alert"
@@ -317,9 +324,35 @@
                 </div>
               </div>
 
-              <div class="col-lg-6 col-md-6 col-sm-12 col-sx-12">
+              <div
+                [ngClass]="{
+                  'col-lg-6 col-md-6 col-sm-12 col-sx-12': !isInpatient,
+                  'col-lg-4 col-md-4 col-sm-12 col-sx-12': isInpatient
+                }"
+              >
+                <mat-accordion *ngIf="isInpatient">
+                  <mat-expansion-panel
+                    class="mb-2 border p-0"
+                    [expanded]="isInpatient ? true : false"
+                  >
+                    <mat-expansion-panel-header>
+                      <mat-panel-title>Medication </mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <app-patient-medication-summary
+                      *ngIf="activeVisit"
+                      [fromDispensing]="false"
+                      [patientVisit]="activeVisit"
+                      [forConsultation]="true"
+                      [isInpatient]="isInpatient"
+                      (updateConsultationOrder)="onUpdateConsultationOrder()"
+                    ></app-patient-medication-summary>
+                  </mat-expansion-panel>
+                </mat-accordion>
                 <mat-accordion
-                  *ngIf="userPrivileges['CLINIC_ADD_PROVISIONAL_DIAGNOSIS']"
+                  *ngIf="
+                    userPrivileges['CLINIC_ADD_PROVISIONAL_DIAGNOSIS'] &&
+                    !isInpatient
+                  "
                 >
                   <mat-expansion-panel
                     class="mb-2 border p-0"
@@ -338,6 +371,7 @@
                           dashboardParams?.formEntities['Visit Diagnoses']
                         "
                         [patientVisit]="activeVisit"
+                        [isInpatient]="isInpatient"
                         (updateConsultationOrder)="onUpdateConsultationOrder()"
                       ></app-patient-diagnoses-summary>
                     </div>
@@ -377,6 +411,7 @@
                       [clinicConfigurations]="clinicConfigurations"
                       [userPrivileges]="userPrivileges"
                       [fromConsultation]="true"
+                      [isInpatient]="isInpatient"
                       (updateConsultationOrder)="onUpdateConsultationOrder()"
                     ></app-patient-investigations-and-procedures>
 
@@ -413,6 +448,7 @@
                         [diagnosisFormDetails]="
                           dashboardParams?.formEntities['Visit Diagnoses']
                         "
+                        [isInpatient]="isInpatient"
                         (updateConsultationOrder)="onUpdateConsultationOrder()"
                       ></app-patient-diagnoses-summary>
                     </div>
@@ -424,7 +460,9 @@
                 </mat-accordion>
 
                 <mat-accordion
-                  *ngIf="userPrivileges['CLINIC_ADD_PRESCRIPTION']"
+                  *ngIf="
+                    userPrivileges['CLINIC_ADD_PRESCRIPTION'] && !isInpatient
+                  "
                 >
                   <mat-expansion-panel
                     class="mb-2 border p-0"
@@ -438,6 +476,7 @@
                       [fromDispensing]="false"
                       [patientVisit]="activeVisit"
                       [forConsultation]="true"
+                      [isInpatient]="isInpatient"
                       (updateConsultationOrder)="onUpdateConsultationOrder()"
                     ></app-patient-medication-summary>
                   </mat-expansion-panel>
