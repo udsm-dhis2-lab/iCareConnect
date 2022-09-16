@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { Store } from "@ngrx/store";
 import { keyBy, uniqBy } from "lodash";
@@ -41,6 +41,7 @@ export class AttendOrderedItemsComponent implements OnInit {
   orderedProcedures$: Observable<any>;
   fields: string =
     "custom:(uuid,encounters:(uuid,location:(uuid,display),encounterType,display,encounterProviders,encounterDatetime,voided,obs,orders:(uuid,display,instructions,orderer,orderType,dateActivated,orderNumber,concept,display)))";
+  @Output() done: EventEmitter<boolean> = new EventEmitter<boolean>();
   constructor(
     private dialog: MatDialog,
     private visitService: VisitsService,
@@ -113,10 +114,13 @@ export class AttendOrderedItemsComponent implements OnInit {
         },
       })
       .afterClosed()
-      .subscribe(() => {
-        this.store.dispatch(
-          loadActiveVisit({ patientId: this.patient?.patient?.uuid })
-        );
+      .subscribe((changed) => {
+        if (changed) {
+          this.store.dispatch(
+            loadActiveVisit({ patientId: this.patient?.patient?.uuid })
+          );
+        }
+        this.done.emit(changed);
       });
   }
 
