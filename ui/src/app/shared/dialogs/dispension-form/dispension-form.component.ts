@@ -25,6 +25,7 @@ import { ConceptsService } from "../../resources/concepts/services/concepts.serv
 import { DrugsService } from "../../resources/drugs/services/drugs.service";
 import { OrdersService } from "../../resources/order/services/orders.service";
 import { flatten, keyBy } from "lodash";
+import { VisitsService } from "../../resources/visits/services";
 
 @Component({
   selector: "app-dispension-form",
@@ -64,6 +65,8 @@ export class DispensingFormComponent implements OnInit {
   genericPrescriptionOrderType: any;
   @Output() updateConsultationOrder = new EventEmitter();
 
+  intermediateVisit$: Observable<any>; // TODO: Change this to use current visit
+
   constructor(
     private drugOrderService: DrugOrdersService,
     private drugsService: DrugsService,
@@ -72,6 +75,7 @@ export class DispensingFormComponent implements OnInit {
     private systemSettingsService: SystemSettingsService,
     private conceptsService: ConceptsService,
     private store: Store<AppState>,
+    private visitService: VisitsService,
     @Inject(MAT_DIALOG_DATA)
     public data: {
       drugOrder: any;
@@ -104,6 +108,7 @@ export class DispensingFormComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.getVisitByUuid(this.data?.visit?.uuid);
     this.drugOrder = this.data?.drugOrder;
     this.dispensingLocations$ = this.store.pipe(
       select(getLocationsByTagName, { tagName: "Dispensing Unit" })
@@ -200,6 +205,19 @@ export class DispensingFormComponent implements OnInit {
     };
   }
 
+  onOrderSaved(saved, visit): void {
+    this.getVisitByUuid(visit?.uuid);
+  }
+
+  getVisitByUuid(uuid: string): void {
+    this.intermediateVisit$ = this.visitService.getVisitDetailsByVisitUuid(
+      uuid,
+      {
+        v: "custom:(uuid,display,patient,encounters:(uuid,display,obs,orders),attributes)",
+      }
+    );
+  }
+
   onUpdateOrder(e: Event) {
     e.stopPropagation();
     this.savingOrder = true;
@@ -267,7 +285,7 @@ export class DispensingFormComponent implements OnInit {
         }
       );
 
-      this.onUpdateConsultationOrder();
+    this.onUpdateConsultationOrder();
   }
 
   onClearError(e: MouseEvent) {
@@ -312,9 +330,10 @@ export class DispensingFormComponent implements OnInit {
     this.dialogRef.close(closeDialog);
   }
 
-  onUpdateConsultationOrder(){
-    this.dialogRef.close({
-      updateConsultationOrder: true,
-    });
-  };
+  onUpdateConsultationOrder() {
+    // this.dialogRef.close({
+    //   updateConsultationOrder: true,
+    // });
+    this.updateConsultationOrder.emit();
+  }
 }
