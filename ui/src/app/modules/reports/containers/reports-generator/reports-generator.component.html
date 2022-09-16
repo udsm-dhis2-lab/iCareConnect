@@ -82,7 +82,6 @@
               [parameter]="parameter"
               (parameterUpdate)="onSetParameterValue($event)"
             ></app-parameter-field>
-            {{ selectedReportParameters | json }}
           </mat-expansion-panel>
         </ng-container>
         <mat-expansion-panel
@@ -258,7 +257,6 @@
                     >
                       {{ reportSelectionParams[parameter?.id] }}
                     </span>
-                    {{ reportSelectionParams | json }}
                   </div>
                 </div>
               </div>
