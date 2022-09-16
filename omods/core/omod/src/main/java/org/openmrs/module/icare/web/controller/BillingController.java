@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
-
 @Controller
 @RequestMapping(value = "/rest/" + RestConstants.VERSION_1 + "/billing")
 public class BillingController extends BaseController {
@@ -36,9 +35,9 @@ public class BillingController extends BaseController {
 	        @RequestParam(value = "status", required = false) String status) {
 		if (patient != null) {
 			List<Invoice> invoices;
-			if(status == "all"){
+			if (status == "all") {
 				invoices = billingService.getPatientsInvoices(patient);
-			}else{
+			} else {
 				invoices = onGetPatientPendingBills(patient);
 			}
 			List<Map<String, Object>> invoiceMaps = new ArrayList<Map<String, Object>>();
@@ -95,7 +94,7 @@ public class BillingController extends BaseController {
 	public Payment onPostConfirmPayment(Payment payment) throws Exception {
 		return billingService.confirmPayment(payment);
 	}
-
+	
 	@RequestMapping(value = "discount", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public Map<String, Object> onPostDiscountInvoiceMap(@RequestBody Discount discount) throws Exception {
