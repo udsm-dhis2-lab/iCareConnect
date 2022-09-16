@@ -78,6 +78,7 @@ export class ReportsGeneratorComponent implements OnInit {
     options?: any[];
   }[];
   keyedReportsExtraParameters: any = {};
+  disabledbutton: boolean;
   constructor(
     private reportParamsService: ReportParamsService,
     private reportService: ReportService,
@@ -218,9 +219,16 @@ export class ReportsGeneratorComponent implements OnInit {
       (this.reportsParametersConfigurations.filter(
         (reportConfigs) => reportConfigs?.id === this.currentReport?.id
       ) || [])[0];
-    this.selectedReportParameters = matchedReportWithParametersConfigs
-      ? matchedReportWithParametersConfigs?.parameters
-      : report?.parameters;
+    this.selectedReportParameters = (
+      matchedReportWithParametersConfigs
+        ? matchedReportWithParametersConfigs?.parameters
+        : report?.parameters
+    ).map((param) => {
+      return {
+        ...param,
+        name: this.sanitizeParameter(param?.lable ? param.lable : param?.name),
+      };
+    });
 
     this.reportData = null;
     this.reportError = null;
@@ -238,6 +246,9 @@ export class ReportsGeneratorComponent implements OnInit {
       ...this.reportSelectionParams,
       ...paramValue,
     };
+    //this.disabledbutton = paramValue.disabledGetReport;
+
+    // !(paramValue.length  > 0) ? this.disabledbutton = true : this.disabledbutton = false;
   }
 
   getDHIS2ReportsSent(event: Event): void {
@@ -422,5 +433,10 @@ export class ReportsGeneratorComponent implements OnInit {
     setTimeout(() => {
       this.isQuickPivotSet = !this.isQuickPivotSet;
     }, 100);
+  }
+
+  sanitizeParameter(text) {
+    const result = text.replace(/([A-Z])/g, " $1");
+    return result.charAt(0).toUpperCase() + result.slice(1);
   }
 }

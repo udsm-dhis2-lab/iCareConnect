@@ -219,10 +219,8 @@ export class RegistrationAddComponent implements OnInit {
   dateSet() {
     // // console.log(this.patient?.dob);
 
-    let ageObject = getDateDifferenceYearsMonthsDays(
-      this.patient.dob,
-      new Date()
-    );
+    let birthdate = new Date(this.patient?.dob);
+    let ageObject = getDateDifferenceYearsMonthsDays(birthdate, new Date());
 
     this.patient.age = {
       ...this.patient.age,
@@ -502,7 +500,9 @@ export class RegistrationAddComponent implements OnInit {
             ],
             gender: this.patient.gender,
             birthdate: new Date(
-              this.patient.dob.setDate(this.patient.dob.getDate() + 1)
+              new Date(this.patient.dob).setDate(
+                new Date(this.patient.dob).getDate() + 1
+              )
             ),
             //TODO: fix address
             addresses: [

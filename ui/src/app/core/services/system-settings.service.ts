@@ -73,6 +73,17 @@ export class SystemSettingsService {
                       property: result?.property,
                       description: result?.description,
                       value: result?.value,
+                      order: Number(
+                        result?.property.split(".")[
+                          result?.property.split(".").length - 1
+                        ]
+                      )
+                        ? Number(
+                            result?.property.split(".")[
+                              result?.property.split(".").length - 1
+                            ]
+                          )
+                        : null,
                     }
                   : {
                       uuid: result?.uuid,
@@ -88,6 +99,17 @@ export class SystemSettingsService {
                       property: result?.property,
                       description: result?.description,
                       value: result?.value,
+                      order: Number(
+                        result?.property.split(".")[
+                          result?.property.split(".").length - 1
+                        ]
+                      )
+                        ? Number(
+                            result?.property.split(".")[
+                              result?.property.split(".").length - 1
+                            ]
+                          )
+                        : null,
                     };
               })
             : [];
