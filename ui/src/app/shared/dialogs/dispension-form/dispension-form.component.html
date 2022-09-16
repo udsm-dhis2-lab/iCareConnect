@@ -14,7 +14,8 @@
       generalPrescriptionDurationConcept$ | async,
     generalPrescriptionDoseConcept: generalPrescriptionDoseConcept$ | async,
     generalPrescriptionFrequencyConcept:
-      generalPrescriptionFrequencyConcept$ | async
+      generalPrescriptionFrequencyConcept$ | async,
+    intermediateVisit: intermediateVisit$ | async
   } as params"
 >
   <div class="loading-overlay" *ngIf="savingOrder">
@@ -118,6 +119,7 @@
                   params?.generalPrescriptionFrequencyConcept
                 "
                 (updateConsultationOrder)="onUpdateConsultationOrder()"
+                (orderSaved)="onOrderSaved($event, params?.currentVisit)"
               ></app-general-dispension-form>
             </div>
           </div>
@@ -203,14 +205,30 @@
           </div>
           <div class="col-5">
             <mat-accordion>
-              <mat-expansion-panel *ngIf="params?.generalPrescriptionOrderType && params?.currentVisit && params?.useGeneralPrescription" class="mb-2 border p-0" [expanded]="true">
+              <mat-expansion-panel
+                *ngIf="
+                  params?.generalPrescriptionOrderType &&
+                  params?.currentVisit &&
+                  params?.useGeneralPrescription
+                "
+                class="mb-2 border p-0"
+                [expanded]="true"
+              >
                 <mat-expansion-panel-header>
                   <mat-panel-title> Current Prescriptions </mat-panel-title>
                 </mat-expansion-panel-header>
-                  <app-current-prescriptions 
-                    [visit]="params?.currentVisit" 
-                    [genericPrescriptionOrderType]="params?.generalPrescriptionOrderType"
-                    ></app-current-prescriptions>
+                <!-- {{ params?.intermediateVisit | json }} -->
+                <app-current-prescriptions
+                  *ngIf="params?.intermediateVisit"
+                  [visit]="params?.intermediateVisit"
+                  [genericPrescriptionOrderType]="
+                    params?.generalPrescriptionOrderType
+                  "
+                ></app-current-prescriptions>
+                <mat-progress-bar
+                  *ngIf="!params?.intermediateVisit"
+                  mode="indeterminate"
+                ></mat-progress-bar>
               </mat-expansion-panel>
               <mat-expansion-panel class="mb-2 border p-0" [expanded]="true">
                 <mat-expansion-panel-header>
