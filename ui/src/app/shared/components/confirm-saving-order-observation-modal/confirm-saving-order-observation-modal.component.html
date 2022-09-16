@@ -22,8 +22,8 @@
   </div>
 </mat-dialog-content>
 
-<mat-dialog-actions align="end">
-  <button mat-button mat-dialog-close>Cancel</button>
+<mat-dialog-actions align="end" class="mb-2 mt-2 mr-2">
+  <button mat-button mat-dialog-close (click)="onClose($event)">Cancel</button>
   <button
     mat-flat-button
     color="primary"
