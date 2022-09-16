@@ -29,16 +29,19 @@ export class PatientLabResultsSummaryComponent implements OnInit {
   @Input() patientVisit: Visit;
   @Input() investigationAndProceduresFormsDetails: any;
   @Input() iCareGeneralConfigurations: any;
+  @Input() isInpatient: boolean;
+  @Input() forConsultation: boolean;
+
   labOrdersResultsInformation: any[] = [];
   codedResultsData$: Observable<any>;
   keyedResults: any = {};
   testSetMembersDetails$: Observable<any>;
-  @Input() forConsultation: boolean;
   labOrders$: Observable<any>;
   orderTypes$: Observable<any>;
   provider$: Observable<any>;
   loadedLabOrders: boolean = false;
   creatingLabOrdersState$: Observable<boolean>;
+  
   @Output() updateConsultationOrder = new EventEmitter();
   constructor(
     private openMRSHttpClient: OpenmrsHttpClientService,
@@ -223,7 +226,7 @@ export class PatientLabResultsSummaryComponent implements OnInit {
     );
   }
 
-  onUpdateConsultationOrder(){
+  onUpdateConsultationOrder() {
     this.updateConsultationOrder.emit();
-  };
+  }
 }
