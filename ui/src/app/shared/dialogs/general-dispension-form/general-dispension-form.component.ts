@@ -70,11 +70,13 @@ export class GeneralDispensingFormComponent implements OnInit {
   @Output() dosingUnitsSettingsEvent: EventEmitter<any> = new EventEmitter();
   @Output() durationUnitsSettingsEvent: EventEmitter<any> = new EventEmitter();
   @Output() drugRoutesSettingsEvent: EventEmitter<any> = new EventEmitter();
-  @Output() generalPrescriptionFrequencyConceptEvent: EventEmitter<any> = new EventEmitter();
+  @Output() generalPrescriptionFrequencyConceptEvent: EventEmitter<any> =
+    new EventEmitter();
 
   @Output() showCloseDialog: EventEmitter<boolean> =
     new EventEmitter<boolean>();
   @Output() updateConsultationOrder = new EventEmitter();
+  @Output() orderSaved: EventEmitter<boolean> = new EventEmitter<boolean>();
 
   constructor(
     private drugOrderService: DrugOrdersService,
@@ -210,6 +212,7 @@ export class GeneralDispensingFormComponent implements OnInit {
             .subscribe((res) => {
               if (res) {
                 this.savingOrder = false;
+                this.orderSaved.emit(true);
               }
             });
         }
