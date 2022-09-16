@@ -218,6 +218,7 @@ export class RegistrationAddComponent implements OnInit {
 
   dateSet() {
     // // console.log(this.patient?.dob);
+
     let birthdate = new Date(this.patient?.dob);
     let ageObject = getDateDifferenceYearsMonthsDays(birthdate, new Date());
 
@@ -422,45 +423,29 @@ export class RegistrationAddComponent implements OnInit {
 
             this.loadingForm = false;
           } else {
-            this.identifierService
-              .generateIds({
-                generateIdentifiers: true,
-                sourceUuid: this.registrationMRNSourceReference,
-                numberToGenerate: 1,
-              })
-              .subscribe((identifiersResponse) => {
-                if (identifiersResponse) {
-                  const patientIdentifierTypes = results[0];
-                  const autoFilledIdentifier = results[2];
-                  this.patientIdentifierTypes = filter(
-                    patientIdentifierTypes.map((identifierType) => {
-                      this.currentMRN = identifiersResponse[0];
-                      const isAutoFilled =
-                        identifierType.id === autoFilledIdentifier;
-                      if (isAutoFilled) {
-                        this.patient[identifierType.id] = this.currentMRN;
-                      } else {
-                        this.patient[identifierType.id] = null;
-                      }
-                      return { ...identifierType, disabled: isAutoFilled };
-                    }),
-                    (idType) => {
-                      return (
-                        idType?.id != "8d79403a-c2cc-11de-8d13-0010c6dffd0f" &&
-                        idType?.id != "a5d38e09-efcb-4d91-a526-50ce1ba5011a" &&
-                        idType?.id != "05a29f94-c0ed-11e2-94be-8c13b969e334" &&
-                        idType?.id != "8d793bee-c2cc-11de-8d13-0010c6dffd0f"
-                      );
-                    }
-                  );
+            // if (identifiersResponse) {
+            const patientIdentifierTypes = results[0];
+            const autoFilledIdentifier = results[2];
+            this.patientIdentifierTypes = filter(
+              patientIdentifierTypes.map((identifierType) => {
+                return { ...identifierType, disabled: false };
+              }),
+              (idType) => {
+                return (
+                  idType?.id != "8d79403a-c2cc-11de-8d13-0010c6dffd0f" &&
+                  idType?.id != "a5d38e09-efcb-4d91-a526-50ce1ba5011a" &&
+                  idType?.id != "05a29f94-c0ed-11e2-94be-8c13b969e334" &&
+                  idType?.id != "8d793bee-c2cc-11de-8d13-0010c6dffd0f"
+                );
+              }
+            );
 
-                  this.otherPatientIdentifierTypes = tail(
-                    this.patientIdentifierTypes
-                  );
-                  this.loadingForm = false;
-                }
-              });
+            this.otherPatientIdentifierTypes = tail(
+              this.patientIdentifierTypes
+            );
+            this.loadingForm = false;
           }
+          // }
         }
       },
       (error) => {
@@ -540,24 +525,12 @@ export class RegistrationAddComponent implements OnInit {
           },
           identifiers: (this.patientIdentifierTypes || [])
             .map((personIdentifierType) => {
-              if (
-                personIdentifierType.id ==
-                "26742868-a38c-4e6a-ac1d-ae283c414c2e"
-              ) {
-                return {
-                  identifier: this.patient[personIdentifierType?.id],
-                  identifierType: personIdentifierType?.id,
-                  location: currentLocation?.uuid,
-                  preferred: true,
-                };
-              } else {
-                return {
-                  identifier: this.patient[personIdentifierType?.id],
-                  identifierType: personIdentifierType?.id,
-                  location: currentLocation?.uuid,
-                  preferred: false,
-                };
-              }
+              return {
+                identifier: this.patient[personIdentifierType?.id],
+                identifierType: personIdentifierType?.id,
+                location: currentLocation?.uuid,
+                preferred: false,
+              };
             })
             .filter((patientIdentifier) => patientIdentifier?.identifier),
         };
@@ -594,60 +567,85 @@ export class RegistrationAddComponent implements OnInit {
               }
             );
         } else {
-          this.registrationService.createPatient(patientPayload).subscribe(
-            (patientResponse) => {
-              this.errorAddingPatient = false;
-              let patient = new Patient(patientResponse);
-              //// console.log('patient created ::', {patient: {...patientResponse} as any}patientResponse);
+          this.identifierService
+            .generateIds({
+              generateIdentifiers: true,
+              sourceUuid: this.registrationMRNSourceReference,
+              numberToGenerate: 1,
+            })
+            .subscribe((identifierResponse) => {
+              if (identifierResponse) {
+                this.currentMRN = identifierResponse[0];
+                patientPayload = {
+                  ...patientPayload,
+                  identifiers: [
+                    ...patientPayload?.identifiers,
+                    {
+                      identifier: this.currentMRN,
+                      identifierType: "26742868-a38c-4e6a-ac1d-ae283c414c2e",
+                      location: currentLocation?.uuid,
+                      preferred: false,
+                    },
+                  ],
+                };
+                this.registrationService
+                  .createPatient(patientPayload)
+                  .subscribe(
+                    (patientResponse) => {
+                      this.errorAddingPatient = false;
+                      let patient = new Patient(patientResponse);
+                      //// console.log('patient created ::', {patient: {...patientResponse} as any}patientResponse);
 
-              //patient added succesfully
+                      //patient added succesfully
 
-              this.store.dispatch(
-                loadCurrentPatient({
-                  uuid: patientResponse["uuid"],
-                  isRegistrationPage: true,
-                })
-              );
+                      this.store.dispatch(
+                        loadCurrentPatient({
+                          uuid: patientResponse["uuid"],
+                          isRegistrationPage: true,
+                        })
+                      );
 
-              setTimeout(() => {
-                this.patientAdded = true;
-                this.addingPatient = false;
+                      setTimeout(() => {
+                        this.patientAdded = true;
+                        this.addingPatient = false;
 
-                // this.store.dispatch(addCurrentPatient({patient}))
-                this.dialog
-                  .open(StartVisitModelComponent, {
-                    width: "85%",
-                    data: { patient: patientResponse },
-                  })
-                  .afterClosed()
-                  .subscribe((visitDetails) => {
-                    if (visitDetails) {
-                      // this.dialog.open(VisitStatusConfirmationModelComponent, {
-                      //   width: "30%",
-                      //   height: "100px",
-                      // });
+                        // this.store.dispatch(addCurrentPatient({patient}))
+                        this.dialog
+                          .open(StartVisitModelComponent, {
+                            width: "85%",
+                            data: { patient: patientResponse },
+                          })
+                          .afterClosed()
+                          .subscribe((visitDetails) => {
+                            if (visitDetails) {
+                              // this.dialog.open(VisitStatusConfirmationModelComponent, {
+                              //   width: "30%",
+                              //   height: "100px",
+                              // });
+                            }
+                          });
+
+                        // this.store.dispatch(go({ path: ['/registration/visit'] }));
+                      }, 500);
+                    },
+                    (patientError) => {
+                      this.errorAddingPatient = true;
+                      this.patientAdded = false;
+                      this.addingPatient = false;
+                      this.errorMessage = patientError?.error?.error
+                        ? patientError?.error?.error?.message +
+                          `: ${(
+                            patientError?.error?.error?.globalErrors.map(
+                              (globalError) => globalError?.message
+                            ) || []
+                          ).join(" and ")}`
+                        : "Error adding patient/client";
+
+                      this.openSnackBar("Error creating patient", null);
                     }
-                  });
-
-                // this.store.dispatch(go({ path: ['/registration/visit'] }));
-              }, 500);
-            },
-            (patientError) => {
-              this.errorAddingPatient = true;
-              this.patientAdded = false;
-              this.addingPatient = false;
-              this.errorMessage = patientError?.error?.error
-                ? patientError?.error?.error?.message +
-                  `: ${(
-                    patientError?.error?.error?.globalErrors.map(
-                      (globalError) => globalError?.message
-                    ) || []
-                  ).join(" and ")}`
-                : "Error adding patient/client";
-
-              this.openSnackBar("Error creating patient", null);
-            }
-          );
+                  );
+              }
+            });
         }
       } else {
         //current location not set

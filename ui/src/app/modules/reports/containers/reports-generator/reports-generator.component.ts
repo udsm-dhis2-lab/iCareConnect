@@ -246,8 +246,7 @@ export class ReportsGeneratorComponent implements OnInit {
       ...this.reportSelectionParams,
       ...paramValue,
     };
-    this.disabledbutton = paramValue.disabledGetReport;
-    console.log(this.disabledbutton);
+    //this.disabledbutton = paramValue.disabledGetReport;
 
     // !(paramValue.length  > 0) ? this.disabledbutton = true : this.disabledbutton = false;
   }
