@@ -7,7 +7,7 @@
   <table class="table table-bordered">
     <thead>
       <tr>
-        <th>Department</th>
+        <th *ngIf="conceptsWithDepartmentsDetails">Department</th>
         <th>{{ orderTypeName }}</th>
         <th>Instructions</th>
         <th>Order Date & Time</th>
@@ -34,7 +34,7 @@
       >
         <ng-container *ngFor="let orderedItem of params?.orderedProcedures">
           <tr [ngClass]="{ 'text-danger': !orderedItem?.paid }">
-            <td>
+            <td *ngIf="conceptsWithDepartmentsDetails">
               {{
                 departmentsDetailsKeyedBySetmembers[orderedItem?.concept?.uuid]
                   ?.department?.display
@@ -112,7 +112,7 @@
         </tr>
       </ng-container>
       <ng-container>
-        <tr>
+        <tr *ngIf="nursingConfigurations">
           <td colspan="100% d-flex justify-content-end">
             <button
               mat-stroked-button
