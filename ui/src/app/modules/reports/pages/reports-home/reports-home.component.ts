@@ -1,21 +1,21 @@
-import { Component, OnInit } from '@angular/core';
-import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs';
-import { SystemSettingsService } from 'src/app/core/services/system-settings.service';
-import { loadRolesDetails } from 'src/app/store/actions';
-import { AppState } from 'src/app/store/reducers';
+import { Component, OnInit } from "@angular/core";
+import { Store } from "@ngrx/store";
+import { Observable } from "rxjs";
+import { SystemSettingsService } from "src/app/core/services/system-settings.service";
+import { loadRolesDetails } from "src/app/store/actions";
+import { AppState } from "src/app/store/reducers";
 import {
   getCurrentUserPrivileges,
   getRolesLoadedState,
   getRolesLoadingState,
-} from 'src/app/store/selectors/current-user.selectors';
-import { ReportParamsService } from '../../services/report-params.service';
-import { ReportService } from '../../services/report.service';
+} from "src/app/store/selectors/current-user.selectors";
+import { ReportParamsService } from "../../services/report-params.service";
+import { ReportService } from "../../services/report.service";
 
 @Component({
-  selector: 'app-reports-home',
-  templateUrl: './reports-home.component.html',
-  styleUrls: ['./reports-home.component.scss'],
+  selector: "app-reports-home",
+  templateUrl: "./reports-home.component.html",
+  styleUrls: ["./reports-home.component.scss"],
 })
 export class ReportsHomeComponent implements OnInit {
   reportsAccessConfigurations$: Observable<any>;
@@ -38,16 +38,16 @@ export class ReportsHomeComponent implements OnInit {
     this.userPrivileges$ = this.store.select(getCurrentUserPrivileges);
     this.reportsAccessConfigurations$ =
       this.systemSettingsService.getSystemSettingsByKey(
-        'icare.Reports.Access.Configurations'
+        "icare.Reports.Access.Configurations"
       );
     this.reportsCategoriesConfigurations$ =
       this.systemSettingsService.getSystemSettingsByKey(
-        'icare.Reports.Categories.Configurations'
+        "icare.Reports.Categories.Configurations"
       );
 
     this.reportsParametersConfigurations$ =
       this.systemSettingsService.getSystemSettingsByKey(
-        'icare.Reports.Parameters.Configurations'
+        "icare.Reports.Parameters.Configurations"
       );
 
     this.reportsExtraParams$ = this.reportParamsService.getReportExtraParams();
