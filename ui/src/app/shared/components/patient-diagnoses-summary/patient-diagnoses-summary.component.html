@@ -116,6 +116,7 @@
             </td>
             <td>
               <button
+                *ngIf="!isInpatient"
                 mat-icon-button
                 [matMenuTriggerFor]="menu"
                 aria-label="Options"
@@ -139,7 +140,7 @@
             </td>
           </tr>
         </ng-container>
-        <ng-container>
+        <ng-container *ngIf="!isInpatient">
           <tr *ngIf="diagnosisField">
             <td colspan="2">
               <app-form
