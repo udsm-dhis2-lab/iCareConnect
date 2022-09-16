@@ -82,6 +82,7 @@ import { CurrentPrescriptionComponent } from "./current-prescriptions/current-pr
 import { IcareSupportGoogleFormComponent } from "./icare-support-google-form/icare-support-google-form.component";
 import { PatientsListByLocationComponent } from "./patients-list-by-location/patients-list-by-location.component";
 import { BmiComponent } from "./bmi/bmi.component";
+import { AttendProcedureOrderComponent } from "./attend-procedure-order/attend-procedure-order.component";
 
 export const components: any[] = [
   PatientSearchComponent,
@@ -167,7 +168,8 @@ export const components: any[] = [
   CurrentPrescriptionComponent,
   IcareSupportGoogleFormComponent,
   PatientsListByLocationComponent,
-  BmiComponent
+  BmiComponent,
+  AttendProcedureOrderComponent,
 ];
 
 export const sharedEntryComponents: any[] = [
@@ -188,6 +190,7 @@ export const sharedEntryComponents: any[] = [
   ManagePrivilegesComponent,
   ManageRolesComponent,
   SharedConfirmationDialogComponent,
+  AttendProcedureOrderComponent,
 ];
 
 export * from "./patient-vitals-summary/patient-vitals-summary.component";
