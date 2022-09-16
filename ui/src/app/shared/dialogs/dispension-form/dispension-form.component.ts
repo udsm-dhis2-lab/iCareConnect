@@ -267,7 +267,7 @@ export class DispensingFormComponent implements OnInit {
         }
       );
 
-      this.onUpdateConsultationOrder();
+    this.onUpdateConsultationOrder();
   }
 
   onClearError(e: MouseEvent) {
@@ -312,9 +312,10 @@ export class DispensingFormComponent implements OnInit {
     this.dialogRef.close(closeDialog);
   }
 
-  onUpdateConsultationOrder(){
-    this.dialogRef.close({
-      updateConsultationOrder: true,
-    });
-  };
+  onUpdateConsultationOrder() {
+    // this.dialogRef.close({
+    //   updateConsultationOrder: true,
+    // });
+    this.updateConsultationOrder.emit();
+  }
 }
