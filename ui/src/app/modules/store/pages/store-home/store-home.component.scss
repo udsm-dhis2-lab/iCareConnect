@@ -3,10 +3,20 @@
   width: 200px;
 }
 
-.store-active {
-  background-color: #e6e6e6;
+.store-active,
+.store-active:hover {
+  background-color: #42abed;
+  color: #fff;
+  font-weight: 600;
 }
 
 .store-content {
   margin-left: 215px;
+}
+
+.not-allowed-menu-item {
+  pointer-events: none !important;
+  cursor: not-allowed !important;
+  background-color: #cccccc;
+  color: #666666;
 }

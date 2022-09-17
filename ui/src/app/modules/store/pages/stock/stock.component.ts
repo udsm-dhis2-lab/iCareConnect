@@ -19,6 +19,7 @@ import {
   getCurrentLocation,
   getIfCurrentLocationIsMainStore,
 } from "src/app/store/selectors";
+import { getCurrentUserPrivileges } from "src/app/store/selectors/current-user.selectors";
 import { getAllLedgerTypes } from "src/app/store/selectors/ledger-type.selectors";
 import {
   getAllStocks,
@@ -45,6 +46,7 @@ export class StockComponent implements OnInit {
   billableItems$: Observable<any[]>;
   searchTerm: string = "";
   stockLoadedState$: Observable<boolean>;
+  userPrivileges$: Observable<any>;
   constructor(
     private store: Store<AppState>,
     private dialog: MatDialog,
@@ -65,6 +67,7 @@ export class StockComponent implements OnInit {
     this.isCurrentLocationMainStore$ = this.store.pipe(
       select(getIfCurrentLocationIsMainStore)
     );
+    this.userPrivileges$ = this.store.select(getCurrentUserPrivileges);
   }
 
   onToggleCurrentStock(stock: StockObject): void {

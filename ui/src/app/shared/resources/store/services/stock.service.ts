@@ -16,7 +16,11 @@ export class StockService {
     return zip(
       this.getAvailableStocks(locationUuid),
       this.getStockOuts(locationUuid)
-    ).pipe(map((results) => [...results[0], ...results[1]]));
+    ).pipe(
+      map((results) => {
+        return [...results[0], ...results[1]];
+      })
+    );
   }
 
   getAvailableStocks(locationUuid?: string): Observable<StockObject[]> {
