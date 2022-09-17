@@ -125,7 +125,9 @@
             </button>
             <button
               [disabled]="
-                !currentReport || !currentReport?.name || disabledbuttons
+                !currentReport ||
+                !currentReport?.name ||
+                !(selectedReportParameters?.length === count)
               "
               class="ml-2"
               mat-flat-button
