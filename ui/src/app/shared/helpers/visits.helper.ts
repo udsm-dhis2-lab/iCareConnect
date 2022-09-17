@@ -1,10 +1,10 @@
-import * as _ from 'lodash';
+import * as _ from "lodash";
 
 export function getEncountersForLabSample(details) {
   let encounters = [];
   _.map(details, (detail) => {
     _.map(detail.encounters, (encounter) => {
-      if (encounter.display && encounter.display.indexOf('LAB_SAMPLE') > -1) {
+      if (encounter.display && encounter.display.indexOf("LAB_SAMPLE") > -1) {
         encounters = [
           ...encounters,
           { patient: detail.patient, ...encounter, visitUuid: detail.uuid },
@@ -23,7 +23,7 @@ export function getEncountersForConsultation(details) {
       _.each(detail.encounters, (encounter) => {
         if (
           encounter.display &&
-          encounter.display.indexOf('Consultation') > -1
+          encounter.display.indexOf("Consultation") > -1
         ) {
           encounters = [
             ...encounters,
@@ -45,7 +45,7 @@ export function getPatientsEncounteredLab(data) {
       action: patient,
     };
   });
-  return _.uniqBy(info, 'id');
+  return _.uniqBy(info, "id");
 }
 
 export function formatVisitsDetails(visits) {
@@ -76,16 +76,16 @@ export function getVisitsByEncounterTypeWhereThereAreOrders(
       }
     });
   });
-  return _.uniqBy(filteredVisits, 'uuid');
+  return _.uniqBy(filteredVisits, "uuid");
 }
 
 export function getPatientsByVisits(visits) {
   let data = [];
   _.map(
     _.orderBy(
-      getVisitsByEncounterTypeWhereThereAreOrders(visits, 'Consultation'),
-      ['visitStartDatetime'],
-      ['desc']
+      getVisitsByEncounterTypeWhereThereAreOrders(visits, "Consultation"),
+      ["visitStartDatetime"],
+      ["desc"]
     ),
     (visit, index) => {
       // if (!visit.stopDatetime && !visit.voided) {
@@ -98,21 +98,50 @@ export function getPatientsByVisits(visits) {
           position: data.length + 1,
           ...visit,
           id: visit.id,
-          names: visit?.patient.display.split(' - ')[1],
-          patientId: visit?.patient.display.split(' - ')[0],
-          mrNo: visit?.patient.display.split(' - ')[0],
-          status: '',
+          names: visit?.patient.display.split(" - ")[1],
+          patientId: visit?.patient.display.split(" - ")[0],
+          mrNo: visit?.patient.display.split(" - ")[0],
+          status: "",
           orderDate: visit?.startDatetime.substring(0, 10),
-          remarks: '',
+          remarks: "",
           searchingText:
             visit?.patient?.display +
-            '-' +
+            "-" +
             visit?.patient?.person?.age +
-            '-' +
+            "-" +
             visit?.patient?.person?.gender,
         },
       ];
     }
   );
-  return _.orderBy(_.uniqBy(data, 'id'), ['startDatetime'], ['asc']);
+  return _.orderBy(_.uniqBy(data, "id"), ["startDatetime"], ["asc"]);
+}
+
+export function getFormattedEncountersByEncounterTypeFromVisit(
+  visit,
+  encounterTypeUuid
+) {
+  return _.orderBy(
+    (
+      visit?.encounters?.filter(
+        (encounter) => encounter?.encounterType?.uuid === encounterTypeUuid
+      ) || []
+    )?.map((encounter) => {
+      return {
+        ...encounter,
+        obsKeyedByConcept: _.keyBy(
+          encounter.obs?.map((observation) => {
+            return {
+              ...observation,
+              conceptKey: observation?.concept?.uuid,
+              valueIsObject: observation?.value?.uuid ? true : false,
+            };
+          }),
+          "conceptKey"
+        ),
+      };
+    }),
+    ["encounterDatetime"],
+    ["asc"]
+  );
 }

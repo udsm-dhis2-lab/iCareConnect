@@ -1,0 +1,69 @@
+<div class="observations-chart-table-container">
+  <table class="table table-bordered table-striped" *ngIf="selectedForm">
+    <thead>
+      <tr>
+        <th *ngFor="let formField of selectedForm?.formFields">
+          {{ formField?.name }}
+          <span class="ml-2" *ngIf="formField?.concept?.units"
+            >({{ formField?.concept?.units }})</span
+          >
+        </th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let encounter of obsChartEncountersData">
+        <td *ngFor="let formField of selectedForm?.formFields">
+          <!-- TODO: Add support to check if the value is valueObject -->
+          {{ encounter?.obsKeyedByConcept[formField?.concept?.uuid]?.value }}
+        </td>
+        <td></td>
+      </tr>
+      <tr>
+        <td *ngFor="let formField of selectedForm?.formFields">
+          <app-form
+            *ngIf="
+              formField &&
+              formField?.formField &&
+              formField?.setMembers &&
+              formField?.setMembers?.length === 0
+            "
+            [fields]="[formField?.formField]"
+            [isFormHorizontal]="false"
+            [isReport]="false"
+            [fieldsData]=""
+            (formUpdate)="onFormUpdate($event)"
+          ></app-form>
+          <div
+            *ngIf="
+              !formField?.formField &&
+              formField?.setMembers &&
+              formField?.setMembers?.length > 0
+            "
+          >
+            <td *ngIf="member?.formFields && member?.setMembers?.length == 0">
+              <app-form
+                [fields]="member?.formFields"
+                [isFormHorizontal]="true"
+                [fieldsData]="params?.observations"
+                [isReport]="isReport"
+                (formUpdate)="onFormUpdate($event)"
+              >
+              </app-form>
+            </td>
+          </div>
+        </td>
+        <td class="text-center">
+          <button
+            [disabled]="!atLeastOneFormFieldHasBeenFilled"
+            mat-stroked-button
+            color="primary"
+            (click)="onSave($event)"
+          >
+            Save
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
