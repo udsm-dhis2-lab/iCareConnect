@@ -66,14 +66,7 @@ export class AddNewStockReceivedComponent implements OnInit {
         conceptClass: null,
         required: true,
         disabled: false,
-        options: this.billableItems.map((item) => {
-          return {
-            id: item?.uuid,
-            key: item?.uuid,
-            label: item?.display,
-            value: null,
-          };
-        }),
+        options: [],
         value: "",
       },
       new Textbox({
