@@ -84,6 +84,7 @@ import { PatientsListByLocationComponent } from "./patients-list-by-location/pat
 import { AttendProcedureOrderComponent } from "./attend-procedure-order/attend-procedure-order.component";
 import { SharedBmiComponent } from "./shared-bmi/shared-bmi.component";
 import { PatientObservationsChartComponent } from "./patient-observations-chart/patient-observations-chart.component";
+import { ObservationChartTableComponent } from "./observation-chart-table/observation-chart-table.component";
 
 export const components: any[] = [
   PatientSearchComponent,
@@ -172,6 +173,7 @@ export const components: any[] = [
   AttendProcedureOrderComponent,
   SharedBmiComponent,
   PatientObservationsChartComponent,
+  ObservationChartTableComponent,
 ];
 
 export const sharedEntryComponents: any[] = [

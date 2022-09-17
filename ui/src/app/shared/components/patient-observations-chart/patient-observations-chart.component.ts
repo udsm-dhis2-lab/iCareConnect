@@ -37,19 +37,12 @@ export class PatientObservationsChartComponent implements OnInit {
   @Input() consultationOrderType: any;
   @Input() consultationEncounterType: any;
   @Input() provider: any;
-  formValuesData: any;
-  observations$: Observable<any>;
-  encounters: any[] = [];
-  obsChartEncounterType: any;
   obsChartEncounterType$: any;
-  encounters$: Observable<any>;
-  formData: any = {};
+  activeVisit$: Observable<any>;
   savingObs: boolean;
 
   constructor(
-    private ordersService: OrdersService,
     private visitService: VisitsService,
-    private store: Store<AppState>,
     private systemSettingsService: SystemSettingsService,
     private observationService: ObservationService
   ) {}
@@ -59,24 +52,15 @@ export class PatientObservationsChartComponent implements OnInit {
       this.systemSettingsService.getSystemSettingsByKey(
         "iCare.ipd.encounterType.observationChart"
       );
-    this.getObservations();
+
+    this.getActiveVisit();
   }
 
-  onFormUpdate(formValues: FormValue): void {
-    
-    this.formValuesData = formValues.getValues();
-    
-      this.formData = {
-        ...this.formData,
-        ...this.formValuesData
-      }
-
-  }
-
-  onSave(): void {
+  onSave(data: any): void {
+    this.savingObs = true;
     let encounterObject = {
       patient: this.patient?.id,
-      encounterType: this.obsChartEncounterType,
+      encounterType: data.obsChartEncounterType,
       location: this.location?.uuid,
       encounterProviders: [
         {
@@ -84,14 +68,8 @@ export class PatientObservationsChartComponent implements OnInit {
           encounterRole: ICARE_CONFIG?.encounterRole?.uuid,
         },
       ],
-      visit: this.visit?.uuid,
-      obs: getObservationsFromForm(
-      this.formData,
-        this.patient?.personUuid,
-        this.location?.id
-      ).map((ob) => {
-        return omit(ob, "status");
-      })
+      visit: data.visit?.uuid,
+      obs: data?.obs,
     };
 
     this.observationService
@@ -99,46 +77,15 @@ export class PatientObservationsChartComponent implements OnInit {
       .subscribe((res) => {
         if (res) {
           this.savingObs = false;
+          this.getActiveVisit();
         }
       });
-
-    //Load the saved observations
-    this.getObservations();
   }
 
-  getObservations() {
-    // const encounters =
-    //   "encounters:(display,diagnoses,obs,orders,encounterDatetime,encounterType,location)";
-    // let params = `custom:(uuid,visitType,startDatetime,${encounters}attributes,stopDatetime,patient:(uuid,display,identifiers,person:(uuid,age,birthdate,gender,dead,preferredAddress:(cityVillage)),voided))`;
-
-    zip(
-      this.obsChartEncounterType$,
-      this.visitService.getActiveVisit(this.patient?.id, false)
-    ).pipe(
-      map((res) => {
-        this.obsChartEncounterType = res[0];
-        this.visit = res[1];
-
-        return this.visit?.encounters?.filter(
-          (encounter) => {
-            if (encounter?.encounterType.uuid === this.obsChartEncounterType) {
-              return {
-                  ...encounter,
-                  obs: keyBy(
-                    encounter.obs?.map((observation) => {
-                      return {
-                        ...observation,
-                        conceptKey: observation?.concept?.uuid,
-                        valueIsObject: observation?.value?.uuid ? true : false,
-                      };
-                    }),
-                    "conceptKey"
-                  ),
-                }
-            }
-          }
-        );
-      })
-    ).subscribe(encounters => this.encounters = encounters);
+  getActiveVisit(): void {
+    this.activeVisit$ = this.visitService.getActiveVisit(
+      this.patient?.id,
+      false
+    );
   }
 }
