@@ -9,17 +9,21 @@
     currentStock: currentStock$ | async,
     isCurrentLocationMainStore: isCurrentLocationMainStore$ | async,
     billableItems: billableItems$ | async,
-    stockLoadedState: stockLoadedState$ | async
+    stockLoadedState: stockLoadedState$ | async,
+    userPrivileges: userPrivileges$ | async
   } as params"
 >
   <!-- stock content -->
   <div class="row">
     <div class="col-12">
       <mat-progress-bar
-        *ngIf="params?.loadingStocks"
+        *ngIf="params?.loadingStocks || !params?.userPrivileges"
         mode="indeterminate"
       ></mat-progress-bar>
-      <mat-card class="border" *ngIf="!params?.loadingStocks">
+      <mat-card
+        class="border"
+        *ngIf="!params?.loadingStocks && params?.userPrivileges"
+      >
         <div class="d-flex">
           <mat-form-field class="w-25">
             <input
@@ -37,7 +41,9 @@
             *ngIf="params?.isCurrentLocationMainStore"
           >
             <button
-              [disabled]="true"
+              [disabled]="
+                !params?.userPrivileges['STORE_ADD_NEW_STOCKABLE_ITEM']
+              "
               class="float-right"
               color="primary"
               mat-stroked-button
