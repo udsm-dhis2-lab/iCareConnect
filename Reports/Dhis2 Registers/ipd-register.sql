@@ -2,7 +2,7 @@ SET @row_number = 0;
 SELECT
  (@row_number:=@row_number + 1) AS NAMBA,
 CONCAT(pn.given_name,' ',pn.family_name) AS `JINA LA MGONJWA`,
-p.birthdate AS FAILINO,
+-- p.birthdate AS FAILINO,
 GROUP_CONCAT(DISTINCT CASE WHEN p.gender='M' THEN 'Me'  ELSE 'Ke' END) AS `JINSIA YA MGONJWA`,
 DATE_FORMAT(FROM_DAYS(DATEDIFF(v.date_started, p.birthdate)), '%Y') + 0 AS UMRI,
 pa.address1 AS `MAHALI ANAISHI`,
@@ -56,5 +56,7 @@ AND (result_encounter_type.encounter_type_id =1 OR result_encounter_type.encount
 
 -- ADDRESSING VISIT TYPE
 LEFT JOIN visit_type vt ON vt.visit_type_id=v.visit_type_id
-WHERE vt.name='IPD'
+
+WHERE vt.name='IPD' AND (v.date_started BETWEEN '2022-04-10' AND '2022-09-12')
 GROUP BY v.visit_id,CONCAT(pn.given_name,' ',pn.family_name),pa.address1
+ORDER BY v.date_started ASC

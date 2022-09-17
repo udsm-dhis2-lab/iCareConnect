@@ -16,6 +16,7 @@ import {
   getCodedSampleRejectionReassons,
   getLabDepartments,
   getLabTestsContainers,
+  getParentLocation,
 } from "src/app/store/selectors";
 import { formatDateToYYMMDD } from "src/app/shared/helpers/format-date.helper";
 import { BASE_URL } from "src/app/shared/constants/constants.constants";
@@ -68,6 +69,7 @@ export class LabReportsComponent implements OnInit {
 
   resultsLoader: any = {};
   searchingText: string = "";
+  facilityDetails$: any;
   constructor(
     private httpClient: HttpClient,
     private exportService: ExportService,
@@ -90,6 +92,7 @@ export class LabReportsComponent implements OnInit {
 
     this.currentReport = this.reports[0];
     this.reports = [...this.reports, ...this.configuredReports];
+    this.facilityDetails$ = this.store.select(getParentLocation);
   }
 
   onSetCurrentReport(e, report) {

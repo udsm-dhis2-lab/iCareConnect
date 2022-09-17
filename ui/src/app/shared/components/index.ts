@@ -81,8 +81,8 @@ import { PatientGenericDrugOrderListComponent } from "./patient-generic-drug-ord
 import { CurrentPrescriptionComponent } from "./current-prescriptions/current-prescriptions.component";
 import { IcareSupportGoogleFormComponent } from "./icare-support-google-form/icare-support-google-form.component";
 import { PatientsListByLocationComponent } from "./patients-list-by-location/patients-list-by-location.component";
-import { BmiComponent } from "./bmi/bmi.component";
 import { AttendProcedureOrderComponent } from "./attend-procedure-order/attend-procedure-order.component";
+import { SharedBmiComponent } from "./shared-bmi/shared-bmi.component";
 
 export const components: any[] = [
   PatientSearchComponent,
@@ -168,8 +168,8 @@ export const components: any[] = [
   CurrentPrescriptionComponent,
   IcareSupportGoogleFormComponent,
   PatientsListByLocationComponent,
-  BmiComponent,
   AttendProcedureOrderComponent,
+  SharedBmiComponent,
 ];
 
 export const sharedEntryComponents: any[] = [
