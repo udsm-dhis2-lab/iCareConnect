@@ -83,6 +83,7 @@ import { IcareSupportGoogleFormComponent } from "./icare-support-google-form/ica
 import { PatientsListByLocationComponent } from "./patients-list-by-location/patients-list-by-location.component";
 import { AttendProcedureOrderComponent } from "./attend-procedure-order/attend-procedure-order.component";
 import { SharedBmiComponent } from "./shared-bmi/shared-bmi.component";
+import { PatientObservationsChartComponent } from "./patient-observations-chart/patient-observations-chart.component";
 
 export const components: any[] = [
   PatientSearchComponent,
@@ -170,6 +171,7 @@ export const components: any[] = [
   PatientsListByLocationComponent,
   AttendProcedureOrderComponent,
   SharedBmiComponent,
+  PatientObservationsChartComponent,
 ];
 
 export const sharedEntryComponents: any[] = [
