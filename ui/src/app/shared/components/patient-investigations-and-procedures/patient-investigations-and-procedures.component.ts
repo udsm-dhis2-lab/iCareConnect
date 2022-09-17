@@ -17,7 +17,8 @@ export class PatientInvestigationsAndProceduresComponent implements OnInit {
   @Input() iCareGeneralConfigurations: any;
   @Input() clinicConfigurations: any;
   @Input() userPrivileges: any;
-  @Input() fromConsultation: any;
+  @Input() fromConsultation: boolean;
+  @Input() isInpatient: boolean;
   selectedTab = new FormControl(0);
 
   shouldShowLabSection: boolean = false;
@@ -39,7 +40,7 @@ export class PatientInvestigationsAndProceduresComponent implements OnInit {
     this.selectedTab.setValue(val);
   }
 
-  onUpdateConsultationOrder(){
+  onUpdateConsultationOrder() {
     if (this.fromConsultation) {
       this.updateConsultationOrder.emit();
     }
