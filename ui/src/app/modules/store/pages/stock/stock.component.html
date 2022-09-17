@@ -57,22 +57,22 @@
 
         <div class="row">
           <!-- class="col-{{ params?.currentStock ? '5' : '12' }}" -->
-          <div
-            class="overflow-x-auto col-sm-12"
-          >
-          <!-- [ngClass]="{
+          <div class="overflow-x-auto col-sm-12">
+            <!-- [ngClass]="{
             'col-5': params?.currentStock,
             'col-12': !params?.currentStock
           }" -->
             <table class="table border-bottom table-fit">
               <tr>
-                <td style="max-width: 8%; word-wrap: initial">#</td>
-                <td style="width: 63%; word-wrap: break-word">Item</td>
-                <td style="width: 10%">Quantity</td>
-                <td style="width: 10%"># of Batches</td>
-                <td style="width: 10%">
+                <th style="width: 8%; word-wrap: initial">#</th>
+                <th style="width: 40%; word-wrap: break-word">Item</th>
+                <th style="width: 10%">Available Quantity</th>
+                <th style="width: 10%">Expired Quantity</th>
+                <th style="width: 10%">Eligible Quantity</th>
+                <th style="width: 10%"># of Batches</th>
+                <th style="width: 10%">
                   <span class="float-right">Actions</span>
-                </td>
+                </th>
               </tr>
 
               <tr *ngIf="params.loadingStocks || !params?.stockLoadedState">
@@ -100,11 +100,19 @@
                     let stock of params?.stocks | filterBy: searchTerm:'name';
                     let stockIndex = index
                   "
-                  [ngClass]="{'selectedStock': params?.currentStock?.id === stock.id }"
+                  [ngClass]="{
+                    selectedStock: params?.currentStock?.id === stock.id
+                  }"
                 >
                   <td>{{ stockIndex + 1 }}</td>
                   <td style="word-wrap: break-word">{{ stock?.name }}</td>
                   <td>{{ stock?.quantity }}</td>
+                  <td>{{ stock?.quantity - stock?.eligibleQuantity }}</td>
+                  <td>
+                    <b>
+                      {{ stock?.eligibleQuantity }}
+                    </b>
+                  </td>
                   <td>{{ stock?.batches?.length }}</td>
                   <td>
                     <div class="float-right">
