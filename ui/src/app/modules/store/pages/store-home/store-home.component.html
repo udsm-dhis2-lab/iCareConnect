@@ -1,6 +1,7 @@
 <div
   *ngIf="{
-    settingCurrentLocationStatus: settingCurrentLocationStatus$ | async
+    settingCurrentLocationStatus: settingCurrentLocationStatus$ | async,
+    currentStore: currentStore$ | async
   } as params"
 >
   <div
@@ -11,16 +12,24 @@
     <div class="store-sidebar">
       <mat-card class="p-0 border">
         <h3 class="pl-3 pt-3 pr-3">
-          Store: {{ (currentStore$ | async)?.name }}
+          Store: {{ params?.currentStore?.name }}
+          {{ params?.currentStore?.isMainStore }}
         </h3>
         <mat-nav-list>
-          <mat-list-item
-            *ngFor="let storePage of storePages"
-            (click)="onChangeRoute($event, storePage.url)"
-            routerLinkActive="store-active"
-          >
-            <a matLine>{{ storePage.name }}</a>
-          </mat-list-item>
+          <ng-container *ngFor="let storePage of storePages">
+            <mat-list-item
+              [ngClass]="{
+                'not-allowed-menu-item':
+                  params?.currentStore?.isMainStore &&
+                  storePage?.id === 'requisition',
+                'store-active': storePage?.id === currentStorePage?.id
+              }"
+              (click)="onChangeRoute($event, storePage.url, storePage)"
+              routerLinkActive="store-active"
+            >
+              <a matLine>{{ storePage?.name }}</a>
+            </mat-list-item>
+          </ng-container>
         </mat-nav-list>
       </mat-card>
     </div>
