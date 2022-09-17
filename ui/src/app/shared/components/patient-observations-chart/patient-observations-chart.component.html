@@ -1,9 +1,6 @@
-<div class="row" *ngIf="{
-  encounters: encounters$ | async
-} as params">
-{{ params?.encounters | json}}
+<div class="row">
   <div class="col-12">
-    <table class="table" *ngIf="selectedForm">
+    <table class="table table-bordered table-striped" *ngIf="selectedForm">
       <thead>
         <tr>
           <th *ngFor="let formField of selectedForm?.formFields">{{ formField?.name }}</th>
@@ -11,7 +8,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let encounter of params?.encounters">
+        <tr *ngFor="let encounter of encounters">
           <td *ngFor="let ob of encounter.obs">{{ ob.value }}</td>
         </tr>
         <tr>
