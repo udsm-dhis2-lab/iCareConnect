@@ -65,7 +65,7 @@ public interface StoreService extends OpenmrsService {
 	
 	public List<Stock> getStockByItemAndLocation(String itemUuid, String locationUuid);
 	
-	public List<Stock> getStockByLocation(String locationUuid);
+	public List<Stock> getStockByLocation(String locationUuid,String search,Integer startIndex, Integer limit);
 	
 	public List<Item> getStockout();
 	

@@ -3,7 +3,9 @@ package org.openmrs.module.icare.store.dao;
 // Generated Oct 7, 2020 12:49:21 PM by Hibernate Tools 5.2.10.Final
 
 import org.hibernate.Query;
+import org.openmrs.Concept;
 import org.openmrs.Location;
+import org.openmrs.Visit;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.db.hibernate.DbSession;
 import org.openmrs.module.icare.core.Item;
@@ -165,14 +167,24 @@ public class StockDAO extends BaseDAO<Stock> {
 		
 	}
 	
-	public List<Stock> getStockByLocation(String locationUuid) {
+	public List<Stock> getStockByLocation(String locationUuid,String search,Integer startIndex,Integer limit) {
 		
 		DbSession session = this.getSession();
 		String queryStr = "SELECT st \n" + "FROM Stock st \n"
-		        + "WHERE st.location = (SELECT l FROM Location l WHERE l.uuid = :locationUuid)";
+		        + "WHERE st.location = (SELECT l FROM Location l WHERE l.uuid = :locationUuid) INNER JOIN st.items it INNER JOIN it.concept cn INNER JOIN cn.names cname";
+
+		if (search != null) {
+			queryStr += " AND lower(cname.name) LIKE lower(:search)";
+		}
+
 		
 		Query query = session.createQuery(queryStr);
+		if(search != null){
+			query.setParameter("search", "%" + search.replace(" ", "%") + "%");
+		}
 		query.setParameter("locationUuid", locationUuid);
+		query.setFirstResult(startIndex);
+		query.setMaxResults(limit);
 		
 		return query.list();
 		
