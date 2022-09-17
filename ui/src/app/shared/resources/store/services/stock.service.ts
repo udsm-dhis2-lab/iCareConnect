@@ -18,7 +18,6 @@ export class StockService {
       this.getStockOuts(locationUuid)
     ).pipe(
       map((results) => {
-        console.log(results);
         return [...results[0], ...results[1]];
       })
     );
