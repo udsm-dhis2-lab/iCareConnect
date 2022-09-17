@@ -1,18 +1,18 @@
-import { Component, Inject, OnInit } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { Field } from 'src/app/shared/modules/form/models/field.model';
-import { FormValue } from 'src/app/shared/modules/form/models/form-value.model';
-import { Textbox } from 'src/app/shared/modules/form/models/text-box.model';
+import { Component, Inject, OnInit } from "@angular/core";
+import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
+import { Field } from "src/app/shared/modules/form/models/field.model";
+import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
+import { Textbox } from "src/app/shared/modules/form/models/text-box.model";
 import {
   IssueInput,
   IssuingObject,
-} from 'src/app/shared/resources/store/models/issuing.model';
-import { RequisitionInput } from 'src/app/shared/resources/store/models/requisition-input.model';
+} from "src/app/shared/resources/store/models/issuing.model";
+import { RequisitionInput } from "src/app/shared/resources/store/models/requisition-input.model";
 
 @Component({
-  selector: 'app-issuing-form',
-  templateUrl: './issuing-form.component.html',
-  styleUrls: ['./issuing-form.component.scss'],
+  selector: "app-issuing-form",
+  templateUrl: "./issuing-form.component.html",
+  styleUrls: ["./issuing-form.component.scss"],
 })
 export class IssuingFormComponent implements OnInit {
   issuingFormValue: FormValue;
@@ -23,33 +23,34 @@ export class IssuingFormComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    // TODO: Get stock status of the item and use it to control how issuing should go on
     this.issueFormFields = [
       new Textbox({
-        id: 'item',
-        label: 'Item',
-        key: 'item',
+        id: "item",
+        label: "Item",
+        key: "item",
         disabled: true,
         value: this.data?.issue?.name,
       }),
       new Textbox({
-        id: 'requesting_store',
-        key: 'requestingStore',
-        label: 'Requesting Store',
+        id: "requesting_store",
+        key: "requestingStore",
+        label: "Requesting Store",
         disabled: true,
         value: this.data?.issue?.requestingLocation?.name,
       }),
       new Textbox({
-        id: 'requested_store',
-        key: 'requestedStore',
-        label: 'Requested Store',
+        id: "requested_store",
+        key: "requestedStore",
+        label: "Requested Store",
         disabled: true,
         value: this.data?.issue?.requestedLocation?.name,
       }),
       new Textbox({
-        id: 'quantity',
-        key: 'quantity',
+        id: "quantity",
+        key: "quantity",
         label: `Quantity max(${this.data?.issue?.quantityRequested})`,
-        type: 'number',
+        type: "number",
         min: 0,
         max: this.data?.issue?.quantityRequested,
       }),
