@@ -1,3 +1,59 @@
-<div>
-  <p> Patient Observations Chat Works!</p>
+<div class="row" *ngIf="{
+  encounters: encounters$ | async
+} as params">
+{{ params?.encounters | json}}
+  <div class="col-12">
+    <table class="table" *ngIf="selectedForm">
+      <thead>
+        <tr>
+          <th *ngFor="let formField of selectedForm?.formFields">{{ formField?.name }}</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let encounter of params?.encounters">
+          <td *ngFor="let ob of encounter.obs">{{ ob.value }}</td>
+        </tr>
+        <tr>
+          <td *ngFor="let formField of selectedForm?.formFields">
+           <app-form 
+            *ngIf="           
+            formField &&
+            formField?.formField &&
+            formField?.setMembers &&
+            formField?.setMembers?.length === 0"
+            [fields]="[formField?.formField]"
+            [isFormHorizontal]="false"
+            [isReport]="false"
+            [fieldsData]=""
+            (formUpdate)="onFormUpdate($event)"></app-form>
+          <div *ngIf="
+          !formField?.formField &&
+          formField?.setMembers &&
+          formField?.setMembers?.length > 0">
+          <td *ngIf="member?.formFields && member?.setMembers?.length == 0">
+            <app-form
+              [fields]="member?.formFields"
+              [isFormHorizontal]="true"
+              [fieldsData]="params?.observations"
+              [isReport]="isReport"
+              (formUpdate)="onFormUpdate($event)"
+            >
+            </app-form>
+          </td>
+
+          </div>
+          </td>
+          <td>
+            <button 
+              class="btn btn-outline-primary"
+              (click)="onSave(selectedForm?.formFields)"
+              >
+              Save
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </div>

@@ -307,7 +307,34 @@
                   "
                 >
                 </app-clinical-notes>
-                <div><app-patient-observations-chart></app-patient-observations-chart></div>
+                <app-patient-observations-chart 
+                *ngIf="isInpatient &&
+                    !dashboardParams.loadingForms &&
+                    dashboardParams.currentPatient &&
+                    dashboardParams?.forms &&
+                    dashboardParams?.forms?.length > 0
+                  "
+                  [clinicalObservations]="
+                    dashboardParams?.observationsGroupedByConcept
+                  "
+                  [patient]="dashboardParams?.currentPatient"
+                  [location]="dashboardParams?.currentLocation"
+                  [visit]="activeVisit"
+                  [forms]="dashboardParams?.forms"
+                  [shouldUseOwnFormSelection]="false"
+                  [consultationOrderType]="
+                    dashboardParams?.consultationOrderType
+                  "
+                  [consultationEncounterType]="
+                    dashboardParams?.consultationEncounterType
+                  "
+                  [provider]="dashboardParams?.provider"
+                  (updateConsultationOrder)="onUpdateConsultationOrder()"
+                  [selectedForm]="
+                    selectedForm ? selectedForm : dashboardParams?.forms[0]
+                  "
+                >
+                </app-patient-observations-chart>
                 <div
                   class="alert alert-warning"
                   role="alert"
