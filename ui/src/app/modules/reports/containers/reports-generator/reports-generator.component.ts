@@ -68,6 +68,7 @@ export class ReportsGeneratorComponent implements OnInit {
   hasError: boolean;
   showFullReportRenderingArea: boolean = false;
   isQuickPivotSet: boolean = false;
+  count: number = 1;
 
   selectedReportParameters: {
     order?: string;
@@ -78,7 +79,6 @@ export class ReportsGeneratorComponent implements OnInit {
     options?: any[];
   }[];
   keyedReportsExtraParameters: any = {};
-  disabledbutton: boolean;
   constructor(
     private reportParamsService: ReportParamsService,
     private reportService: ReportService,
@@ -246,9 +246,7 @@ export class ReportsGeneratorComponent implements OnInit {
       ...this.reportSelectionParams,
       ...paramValue,
     };
-    //this.disabledbutton = paramValue.disabledGetReport;
-
-    // !(paramValue.length  > 0) ? this.disabledbutton = true : this.disabledbutton = false;
+    this.count = Object.keys(this.reportSelectionParams).length;
   }
 
   getDHIS2ReportsSent(event: Event): void {

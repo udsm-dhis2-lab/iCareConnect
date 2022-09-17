@@ -33,7 +33,6 @@ const reducer = createReducer(
   ),
   on(upsertStockBatch, (state, { stockBatch }) => {
     const availableStock = state?.entities[stockBatch.itemUuid];
-
     if (!availableStock) {
       return stockAdapter.upsertOne(new Stock([stockBatch]), {
         ...state,

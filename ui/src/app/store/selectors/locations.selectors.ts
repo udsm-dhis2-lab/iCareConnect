@@ -179,6 +179,16 @@ export const getCurrentLocation = createSelector(
               return attribute?.value;
             })
           : [],
+      isMainStore:
+        location?.tags?.length > 0
+          ? (
+              location?.tags?.filter(
+                (tag) =>
+                  tag?.display?.toLowerCase() === "main store" ||
+                  tag?.display?.toLowerCase()?.indexOf("main store") > -1
+              ) || []
+            )?.length > 0
+          : false,
     };
   }
 );
