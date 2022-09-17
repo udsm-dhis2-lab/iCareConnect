@@ -99,7 +99,6 @@ export class PatientObservationsChartComponent implements OnInit {
       .subscribe((res) => {
         if (res) {
           this.savingObs = false;
-          console.log("==> Status of saving encounter: ", res)
         }
       });
 
@@ -108,11 +107,11 @@ export class PatientObservationsChartComponent implements OnInit {
   }
 
   getObservations() {
-    const encounters =
-      "encounters:(display,diagnoses,obs,orders,encounterDatetime,encounterType,location)";
-    let params = `custom:(uuid,visitType,startDatetime,${encounters}attributes,stopDatetime,patient:(uuid,display,identifiers,person:(uuid,age,birthdate,gender,dead,preferredAddress:(cityVillage)),voided))`;
+    // const encounters =
+    //   "encounters:(display,diagnoses,obs,orders,encounterDatetime,encounterType,location)";
+    // let params = `custom:(uuid,visitType,startDatetime,${encounters}attributes,stopDatetime,patient:(uuid,display,identifiers,person:(uuid,age,birthdate,gender,dead,preferredAddress:(cityVillage)),voided))`;
 
-    this.encounters$ = zip(
+    zip(
       this.obsChartEncounterType$,
       this.visitService.getActiveVisit(this.patient?.id, false)
     ).pipe(
@@ -120,12 +119,10 @@ export class PatientObservationsChartComponent implements OnInit {
         this.obsChartEncounterType = res[0];
         this.visit = res[1];
 
-        return this.encounters = this.visit?.encounters?.filter(
+        return this.visit?.encounters?.filter(
           (encounter) => {
             if (encounter?.encounterType.uuid === this.obsChartEncounterType) {
-              return this.encounters = [
-                ...this.encounters,
-                {
+              return {
                   ...encounter,
                   obs: keyBy(
                     encounter.obs?.map((observation) => {
@@ -137,12 +134,11 @@ export class PatientObservationsChartComponent implements OnInit {
                     }),
                     "conceptKey"
                   ),
-                },
-              ];
+                }
             }
           }
         );
       })
-    );
+    ).subscribe(encounters => this.encounters = encounters);
   }
 }
