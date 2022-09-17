@@ -44,7 +44,7 @@
         <td>{{ batchIndex + 1 }}</td>
         <td>{{ stockBatch?.batchNo }}</td>
         <td>{{ stockBatch?.quantity }}</td>
-        <td> - </td>
+        <td>-</td>
         <td>
           {{ stockBatch?.expiryDate | date }}
           <span class="text-muted">({{ stockBatch?.remainingDays }})</span>
@@ -59,6 +59,9 @@
               Add
             </button>
             <button
+              [disabled]="
+                stockBatch?.expiryDate < today || stockBatch?.quantity === 0
+              "
               mat-flat-button
               class="ml-2"
               color="warn"
