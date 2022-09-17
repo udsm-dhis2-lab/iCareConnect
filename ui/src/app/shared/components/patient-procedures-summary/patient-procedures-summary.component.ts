@@ -21,6 +21,7 @@ export class PatientProceduresSummaryComponent implements OnInit {
   @Input() patientVisit: Visit;
   @Input() investigationAndProceduresFormsDetails: any;
   @Input() forConsultation: boolean;
+  @Input() isInpatient: boolean;
   @Input() provider: any;
   @Input() orderTypes: any[];
   @Input() userPrivileges: any;

@@ -201,9 +201,12 @@ export class ModulesSelectorComponent implements OnInit {
             ) || []
           ).length > 0 && !location?.retired
       ) || [];
-
+    // console.log(
+    //   "userLocationsForTheCurrentModule",
+    //   this.userLocationsForTheCurrentModule
+    // );
     this.currentLocation = this.userLocationsForTheCurrentModule[0];
-    localStorage.setItem("currentLocation", this.currentModule?.location);
+    // localStorage.setItem("currentLocation", this.currentLocation);
     this.currentLocation = {
       ...module?.location,
       id: module?.location?.uuid,

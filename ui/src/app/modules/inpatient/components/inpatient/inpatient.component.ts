@@ -4,6 +4,7 @@ import { MatDialog } from "@angular/material/dialog";
 import { select, Store } from "@ngrx/store";
 import { map } from "lodash";
 import { Observable } from "rxjs";
+import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { CreatePatientBedOrderModalComponent } from "src/app/shared/components/create-patient-bed-order-modal/create-patient-bed-order-modal.component";
 import { DischargePatientModalComponent } from "src/app/shared/components/discharge-patient-modal/discharge-patient-modal.component";
 import { TransferPatientOutsideComponent } from "src/app/shared/components/transfer-patient-outside/transfer-patient-outside.component";
@@ -12,15 +13,28 @@ import { getApplicableForms } from "src/app/shared/helpers/identify-applicable-f
 import { ICARE_CONFIG } from "src/app/shared/resources/config";
 import { Patient } from "src/app/shared/resources/patient/models/patient.model";
 import { Visit } from "src/app/shared/resources/visits/models/visit.model";
-import { go, loadCustomOpenMRSForms } from "src/app/store/actions";
+import {
+  go,
+  loadCurrentPatient,
+  loadCustomOpenMRSForms,
+} from "src/app/store/actions";
 import { clearBills } from "src/app/store/actions/bill.actions";
 import { saveObservationsUsingEncounter } from "src/app/store/actions/observation.actions";
 import { AppState } from "src/app/store/reducers";
+import { getCurrentLocation } from "src/app/store/selectors";
+import {
+  getCurrentUserDetails,
+  getCurrentUserPrivileges,
+} from "src/app/store/selectors/current-user.selectors";
 import { getCustomOpenMRSFormsByIds } from "src/app/store/selectors/form.selectors";
 import {
   getGroupedObservationByConcept,
   getSavingObservationStatus,
 } from "src/app/store/selectors/observation.selectors";
+import {
+  getActiveVisit,
+  getVisitLoadingState,
+} from "src/app/store/selectors/visit.selectors";
 import {
   addBillStatusOnBedOrders,
   getCountOfUnPaidBedOrders,
@@ -54,7 +68,19 @@ export class InpatientComponent implements OnInit {
   lastBedOrder: any;
   observationsGroupedByConcept$: Observable<any>;
 
-  constructor(private store: Store<AppState>, private dialog: MatDialog) {}
+  // For shared patient dashboard
+  iCareGeneralConfigurations$: any;
+  currentUser$: Observable<any>;
+  userPrivileges$: Observable<any>;
+  loadingVisit$: Observable<any>;
+  activeVisit$: Observable<any>;
+  currentLocation$: Observable<any>;
+
+  constructor(
+    private store: Store<AppState>,
+    private dialog: MatDialog,
+    private systemSettingsService: SystemSettingsService
+  ) {}
 
   ngOnInit(): void {
     const bedOrders =
@@ -126,6 +152,17 @@ export class InpatientComponent implements OnInit {
     this.observationsGroupedByConcept$ = this.store.select(
       getGroupedObservationByConcept
     );
+
+    // New for shared consultation
+    this.iCareGeneralConfigurations$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        "iCare.GeneralMetadata.Configurations"
+      );
+    this.currentUser$ = this.store.select(getCurrentUserDetails);
+    this.userPrivileges$ = this.store.select(getCurrentUserPrivileges);
+    this.loadingVisit$ = this.store.pipe(select(getVisitLoadingState));
+    this.activeVisit$ = this.store.pipe(select(getActiveVisit));
+    this.currentLocation$ = this.store.select(getCurrentLocation);
   }
 
   onAdmit(e, location, patient, provider, visit, bedOrdersWithBillStatus) {

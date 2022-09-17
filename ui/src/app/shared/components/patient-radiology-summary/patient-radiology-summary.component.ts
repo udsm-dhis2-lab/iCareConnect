@@ -15,6 +15,7 @@ export class PatientRadiologySummaryComponent implements OnInit {
   @Input() patientVisit: Visit;
   @Input() investigationAndProceduresFormsDetails: any;
   @Input() forConsultation: boolean;
+  @Input() isInpatient: boolean;
   @Input() provider: any;
   @Input() orderTypes: any[];
   addingOrder: boolean = false;
