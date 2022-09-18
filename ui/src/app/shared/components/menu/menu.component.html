@@ -5,7 +5,8 @@
     locationsForCurrentUser: locationsForCurrentUser$ | async,
     lisConfigurations: lisConfigurations$ | async,
     currentLocation: currentLocation$ | async,
-    userAssignedLocationsLoadedState: userAssignedLocationsLoadedState$ | async
+    userAssignedLocationsLoadedState: userAssignedLocationsLoadedState$ | async,
+    googleFormLink: googleFormLink$ | async
   } as params"
 >
   <div
@@ -81,9 +82,15 @@
             class="mt-2 text-center"
             id="btn-logout"
             mat-menu-item
-            (click)="onOpenSupportPage($event)"
+            *ngIf="params?.googleFormLink"
           >
-            Support
+            <a
+              style="text-decoration: none"
+              [href]="params?.googleFormLink"
+              target="_blank"
+            >
+              Support
+            </a>
           </button>
           <button
             class="mt-2 text-center"
