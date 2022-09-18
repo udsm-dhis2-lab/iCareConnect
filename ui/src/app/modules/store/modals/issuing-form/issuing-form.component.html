@@ -1,9 +1,10 @@
 <div>
   <mat-toolbar color="primary">Issuing Form</mat-toolbar>
   <div class="p-3">
-    <h4>
+    <h3>
       Eligible: <b>{{ eligibleQuantity }}</b>
-    </h4>
+    </h3>
+    <hr />
     <div class="requisition-form">
       <app-form
         [fields]="issueFormFields"
