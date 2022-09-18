@@ -40,9 +40,21 @@ export class StockService {
       .pipe(
         map((response) => {
           const stockItem = new Stock(response).toJson();
+          const eligibleBatches = (stockItem?.batches || []).filter(
+            (batch) => batch.expiryDate > Date.now().toFixed(0)
+          );
+          let eligibleQuantity = 0;
+          if (eligibleBatches?.length === 0) {
+          } else {
+            eligibleQuantity = eligibleBatches.reduce(
+              (sum, stockBatch) => sum + stockBatch.quantity,
+              0
+            );
+          }
           const batchZero = stockItem?.batches[0];
           return {
             ...stockItem,
+            eligibleQuantity,
             batches: stockItem?.batches?.map((batch: any) => {
               const expiryDate = moment(new Date(batch.expiryDate));
               return {
