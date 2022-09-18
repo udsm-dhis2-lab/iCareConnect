@@ -366,12 +366,14 @@ public class StoreController {
 	
 	@RequestMapping(value = "stock", method = RequestMethod.GET)
 	@ResponseBody
-	public List<Map<String, Object>> listAllStockStatus(@RequestParam(required = false) String locationUuid) {
+	public List<Map<String, Object>> listAllStockStatus(@RequestParam(required = false) String locationUuid,
+	        @RequestParam(required = false) String q, @RequestParam(defaultValue = "100") Integer limit,
+	        @RequestParam(defaultValue = "0") Integer startIndex) {
 		
 		List<Stock> stocksStatus;
 		
 		if (locationUuid != null) {
-			stocksStatus = this.storeService.getStockByLocation(locationUuid);
+			stocksStatus = this.storeService.getStockByLocation(locationUuid, q, startIndex, limit);
 		} else {
 			stocksStatus = this.storeService.getAllStockStatusMetrics();
 		}
@@ -453,7 +455,8 @@ public class StoreController {
 	@RequestMapping(value = "stockout", method = RequestMethod.GET)
 	@ResponseBody
 	public List<Map<String, Object>> getItemsStockedOut(
-	        @RequestParam(required = false, value = "location") String locationUuid) {
+	        @RequestParam(required = false, value = "location") String locationUuid,
+	        @RequestParam(defaultValue = "100") Integer limit, @RequestParam(defaultValue = "0") Integer startIndex) {
 		List<Item> stockObjects = null;
 		if (locationUuid != null) {
 			stockObjects = storeService.getStockoutByLocation(locationUuid);
