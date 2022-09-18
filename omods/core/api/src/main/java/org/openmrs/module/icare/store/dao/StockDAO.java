@@ -273,7 +273,7 @@ public class StockDAO extends BaseDAO<Stock> {
 		query for out of stock
 		------------------------
 		------------------------- */
-		metricsMap.put("stockedOut", this.getStockedOutByLocation(locationUuid, null, null).size());
+		metricsMap.put("stockedOut", this.getStockedOutByLocation(locationUuid, 1000, 0).size());
 		
 		/* ------------------------
 		-----------------------
