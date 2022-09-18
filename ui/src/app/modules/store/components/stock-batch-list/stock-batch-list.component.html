@@ -7,8 +7,8 @@
             <mat-icon>arrow_backward</mat-icon>
           </button>
           <span class="ml-2 span-fit"
-            ><b> {{ stock.batches?.length }}</b> Batches of
-            <b>{{ stock?.name }}</b></span
+            ><b> {{ stock?.batches?.length }}</b> Batches of
+            <b>{{ stock?.name ? stock?.name : stock?.item?.display }}</b></span
           >
         </div>
         <button
@@ -44,9 +44,11 @@
             <div class="w-100 d-flex justify-content-center">No data</div>
           </td>
         </tr>
-        <tr *ngFor="let stockBatch of stock.batches; let batchIndex = index">
+        <tr *ngFor="let stockBatch of stock?.batches; let batchIndex = index">
           <td>{{ batchIndex + 1 }}</td>
-          <td>{{ stockBatch?.batchNo }}</td>
+          <td>
+            {{ stockBatch?.batchNo ? stockBatch?.batchNo : stockBatch?.batch }}
+          </td>
           <td>{{ stockBatch?.quantity }}</td>
           <td>-</td>
           <td>

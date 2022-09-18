@@ -1,11 +1,29 @@
 <div>
   <mat-toolbar color="primary">Issuing Form</mat-toolbar>
   <div class="p-3">
+    <h3>
+      Eligible: <b>{{ eligibleQuantity }}</b>
+    </h3>
+    <hr />
     <div class="requisition-form">
       <app-form
         [fields]="issueFormFields"
         (formUpdate)="onUpdateForm($event)"
       ></app-form>
+      <div
+        *ngIf="eligibleQuantity === 0"
+        class="alert alert-warning"
+        role="alert"
+      >
+        There is zero eligible stock for this item
+      </div>
+      <div
+        *ngIf="quantityToIssue > eligibleQuantity"
+        class="alert alert-warning"
+        role="alert"
+      >
+        You can not issue than eligible quantity
+      </div>
     </div>
     <div class="d-flex justify-content-end">
       <button mat-stroked-button (click)="onCancel($event)">Cancel</button>
@@ -13,7 +31,12 @@
         class="ml-2"
         color="primary"
         mat-flat-button
-        [disabled]="!issuingFormValue?.isValid"
+        [disabled]="
+          !issuingFormValue?.isValid ||
+          eligibleQuantity === 0 ||
+          quantityToIssue > eligibleQuantity ||
+          !isFormValid
+        "
         (click)="onIssue($event)"
       >
         Issue

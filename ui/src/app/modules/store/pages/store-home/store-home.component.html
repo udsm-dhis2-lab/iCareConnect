@@ -21,7 +21,8 @@
               [ngClass]="{
                 'not-allowed-menu-item':
                   params?.currentStore?.isMainStore &&
-                  storePage?.id === 'requisition',
+                  (storePage?.id === 'requisition' ||
+                    storePage?.id === 'received'),
                 'store-active': storePage?.id === currentStorePage?.id
               }"
               (click)="onChangeRoute($event, storePage.url, storePage)"

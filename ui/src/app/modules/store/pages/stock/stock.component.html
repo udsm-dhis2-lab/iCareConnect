@@ -17,50 +17,19 @@
   <div class="row">
     <div class="col-12">
       <mat-progress-bar
-        *ngIf="params?.loadingStocks || !params?.userPrivileges"
+        *ngIf="
+          !params?.currentStore ||
+          !params?.userPrivileges ||
+          !params?.ledgerTypes
+        "
         mode="indeterminate"
       ></mat-progress-bar>
       <mat-card
         class="border"
-        *ngIf="!params?.loadingStocks && params?.userPrivileges"
+        *ngIf="
+          params?.userPrivileges && params?.currentStore && params?.ledgerTypes
+        "
       >
-        <div class="d-flex">
-          <mat-form-field class="w-25">
-            <input
-              autocomplete="off"
-              type="text"
-              class="float-left"
-              matInput
-              [(ngModel)]="searchTerm"
-              placeholder="Search"
-            />
-          </mat-form-field>
-
-          <div
-            class="w-75 float-right"
-            *ngIf="params?.isCurrentLocationMainStore"
-          >
-            <button
-              [disabled]="
-                !params?.userPrivileges['STORE_ADD_NEW_STOCKABLE_ITEM']
-              "
-              class="float-right"
-              color="primary"
-              mat-stroked-button
-              (click)="
-                onAddNewStockRecevied(
-                  $event,
-                  params?.ledgerTypes,
-                  params?.currentStore,
-                  params?.billableItems
-                )
-              "
-            >
-              New Received Item
-            </button>
-          </div>
-        </div>
-
         <div class="row">
           <!-- class="col-{{ params?.currentStock ? '5' : '12' }}" -->
           <div class="overflow-x-auto col-sm-12">
@@ -68,7 +37,13 @@
             'col-5': params?.currentStock,
             'col-12': !params?.currentStock
           }" -->
-            <table class="table border-bottom table-fit">
+            <app-stock-status-list
+              [currentLocation]="params?.currentStore"
+              [isCurrentLocationMainStore]="params?.isCurrentLocationMainStore"
+              [userPrivileges]="params?.userPrivileges"
+              [ledgerTypes]="params?.ledgerTypes"
+            ></app-stock-status-list>
+            <!-- <table class="table border-bottom table-fit">
               <tr>
                 <th style="width: 8%; word-wrap: initial">#</th>
                 <th style="width: 40%; word-wrap: break-word">Item</th>
@@ -134,13 +109,9 @@
                   </td>
                 </tr>
               </ng-container>
-            </table>
+            </table> -->
           </div>
           <div class="overflowing-stock-list" *ngIf="params?.currentStock">
-            <mat-progress-bar
-              *ngIf="!params?.currentStock"
-              mode="indeterminate"
-            ></mat-progress-bar>
             <app-stock-batch-list
               *ngIf="params?.currentStock"
               [stock]="params?.currentStock"
