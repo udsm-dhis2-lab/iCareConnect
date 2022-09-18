@@ -1,15 +1,10 @@
 <div
   class="stock-container"
   *ngIf="{
-    loadingStocks: loadingStocks$ | async,
-    stocks: stocks$ | async,
     ledgerTypes: ledgerTypes$ | async,
     currentStore: currentStore$ | async,
-    savingLedger: savingLedger$ | async,
     currentStock: currentStock$ | async,
     isCurrentLocationMainStore: isCurrentLocationMainStore$ | async,
-    billableItems: billableItems$ | async,
-    stockLoadedState: stockLoadedState$ | async,
     userPrivileges: userPrivileges$ | async
   } as params"
 >
@@ -31,92 +26,25 @@
         "
       >
         <div class="row">
-          <!-- class="col-{{ params?.currentStock ? '5' : '12' }}" -->
           <div class="overflow-x-auto col-sm-12">
-            <!-- [ngClass]="{
-            'col-5': params?.currentStock,
-            'col-12': !params?.currentStock
-          }" -->
             <app-stock-status-list
               [currentLocation]="params?.currentStore"
               [isCurrentLocationMainStore]="params?.isCurrentLocationMainStore"
               [userPrivileges]="params?.userPrivileges"
               [ledgerTypes]="params?.ledgerTypes"
             ></app-stock-status-list>
-            <!-- <table class="table border-bottom table-fit">
-              <tr>
-                <th style="width: 8%; word-wrap: initial">#</th>
-                <th style="width: 40%; word-wrap: break-word">Item</th>
-                <th style="width: 10%">Available Quantity</th>
-                <th style="width: 10%">Expired Quantity</th>
-                <th style="width: 10%">Eligible Quantity</th>
-                <th style="width: 10%"># of Batches</th>
-                <th style="width: 10%">
-                  <span class="float-right">Actions</span>
-                </th>
-              </tr>
-
-              <tr *ngIf="params.loadingStocks || !params?.stockLoadedState">
-                <td colspan="100%">
-                  <mat-progress-bar mode="indeterminate"></mat-progress-bar>
-                </td>
-              </tr>
-
-              <tr
-                *ngIf="
-                  !params.loadingStocks &&
-                  params?.stockLoadedState &&
-                  params?.stocks &&
-                  params.stocks.length === 0
-                "
-              >
-                <td colspan="100%">
-                  <div class="w-100 d-flex justify-content-center">No data</div>
-                </td>
-              </tr>
-
-              <ng-container>
-                <tr
-                  *ngFor="
-                    let stock of params?.stocks | filterBy: searchTerm:'name';
-                    let stockIndex = index
-                  "
-                  [ngClass]="{
-                    selectedStock: params?.currentStock?.id === stock.id
-                  }"
-                >
-                  <td>{{ stockIndex + 1 }}</td>
-                  <td style="word-wrap: break-word">{{ stock?.name }}</td>
-                  <td>{{ stock?.quantity }}</td>
-                  <td>{{ stock?.quantity - stock?.eligibleQuantity }}</td>
-                  <td>
-                    <b>
-                      {{ stock?.eligibleQuantity }}
-                    </b>
-                  </td>
-                  <td>{{ stock?.batches?.length }}</td>
-                  <td>
-                    <div class="float-right">
-                      <button
-                        [disabled]="params?.currentStock?.id === stock.id"
-                        mat-flat-button
-                        color="primary"
-                        (click)="onToggleCurrentStock(stock)"
-                      >
-                        View/Add Batches
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              </ng-container>
-            </table> -->
           </div>
-          <div class="overflowing-stock-list" *ngIf="params?.currentStock">
+          <div class="overflowing-stock-list">
+            <mat-progress-bar
+              mode="indeterminate"
+              *ngIf="!params?.currentStock"
+            ></mat-progress-bar>
             <app-stock-batch-list
               *ngIf="params?.currentStock"
               [stock]="params?.currentStock"
               [ledgerTypes]="params?.ledgerTypes"
               [currentStore]="params?.currentStore"
+              [isCurrentLocationMainStore]="params?.isCurrentLocationMainStore"
               [saving]="params?.savingLedger"
               (closeBatchList)="onToggleCurrentStock($event)"
               (saveLedger)="onSaveLedger($event, params?.currentStock)"
