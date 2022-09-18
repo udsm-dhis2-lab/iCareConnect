@@ -1,15 +1,10 @@
 <div
   class="stock-container"
   *ngIf="{
-    loadingStocks: loadingStocks$ | async,
-    stocks: stocks$ | async,
     ledgerTypes: ledgerTypes$ | async,
     currentStore: currentStore$ | async,
-    savingLedger: savingLedger$ | async,
     currentStock: currentStock$ | async,
     isCurrentLocationMainStore: isCurrentLocationMainStore$ | async,
-    billableItems: billableItems$ | async,
-    stockLoadedState: stockLoadedState$ | async,
     userPrivileges: userPrivileges$ | async
   } as params"
 >
