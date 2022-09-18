@@ -82,9 +82,9 @@ public class BillingServiceTest extends BillingTestBase {
 			MatcherAssert.assertThat("Invoice quantity is 1", invoiceItem.getQuantity(), is(1.0));
 		}
 		MatcherAssert.assertThat("Two items have been found", countItems, is(2));
-
+		
 		invoices = billingService.getPatientsInvoices(visit.getPatient().getUuid());
-
+		
 		System.out.println("Invoices:" + invoices.size());
 		MatcherAssert.assertThat("One invoice is found by fetching all invoices ", invoices.size(), is(1));
 	}
