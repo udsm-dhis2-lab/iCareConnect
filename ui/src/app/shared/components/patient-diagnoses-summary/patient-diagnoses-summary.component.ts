@@ -28,6 +28,7 @@ export class PatientDiagnosesSummaryComponent implements OnInit {
   @Input() patientVisit: Visit;
   @Input() isConfirmedDiagnosis: boolean;
   @Input() forConsultation: boolean;
+  @Input() isInpatient: boolean;
   @Input() diagnosisFormDetails: any;
   diagnosisForm: any;
   diagnosisField: any;
@@ -35,7 +36,7 @@ export class PatientDiagnosesSummaryComponent implements OnInit {
   formValuesData: any = {};
   diagnosesData: any = {};
   savingDiagnosisState$: Observable<boolean>;
-  @Output() updateConsultationOrder = new EventEmitter()
+  @Output() updateConsultationOrder = new EventEmitter();
   constructor(private store: Store<AppState>, private dialog: MatDialog) {}
 
   ngOnInit(): void {
@@ -57,87 +58,89 @@ export class PatientDiagnosesSummaryComponent implements OnInit {
   }
 
   addDiagnosis(e: Event): void {
-      e.stopPropagation();
-      this.diagnosisField = null;
-      this.diagnosisRankField = null;
-      map(Object.keys(this.formValuesData), (key) => {
-        if (this.formValuesData[key]) {
-          if (key === "diagnosis") {
-            this.diagnosesData[key] = {
-              coded: this.formValuesData[key].value,
-              nonCoded: null,
-              specificName: null,
-            };
-          } else {
-            const options = this.formValuesData[key]?.options || [];
-            const keyedOptions = keyBy(options, "value");
-            this.diagnosesData[key] =
-            keyedOptions[this.formValuesData[key].value]?.value === "Secondary" ? 1 : 0;
-          }
+    e.stopPropagation();
+    this.diagnosisField = null;
+    this.diagnosisRankField = null;
+    map(Object.keys(this.formValuesData), (key) => {
+      if (this.formValuesData[key]) {
+        if (key === "diagnosis") {
+          this.diagnosesData[key] = {
+            coded: this.formValuesData[key].value,
+            nonCoded: null,
+            specificName: null,
+          };
+        } else {
+          const options = this.formValuesData[key]?.options || [];
+          const keyedOptions = keyBy(options, "value");
+          this.diagnosesData[key] =
+            keyedOptions[this.formValuesData[key].value]?.value === "Secondary"
+              ? 1
+              : 0;
         }
+      }
 
-        setTimeout(() => {
-          this.diagnoses$ = this.store.select(getAllDiagnoses);
-          this.diagnosisField = (this.diagnosisForm?.formFields.filter(
-            (field) => field?.key === "diagnosis"
-          ) || [])[0];
-          this.diagnosisRankField = (this.diagnosisForm?.formFields.filter(
-            (field) => field?.key === "rank"
-          ) || [])[0];
-        }, 200);
-      });
-      this.diagnosesData = {
-        ...this.diagnosesData,
-        condition: null,
-        certainty: this.isConfirmedDiagnosis ? "CONFIRMED" : "PROVISIONAL",
+      setTimeout(() => {
+        this.diagnoses$ = this.store.select(getAllDiagnoses);
+        this.diagnosisField = (this.diagnosisForm?.formFields.filter(
+          (field) => field?.key === "diagnosis"
+        ) || [])[0];
+        this.diagnosisRankField = (this.diagnosisForm?.formFields.filter(
+          (field) => field?.key === "rank"
+        ) || [])[0];
+      }, 200);
+    });
+    this.diagnosesData = {
+      ...this.diagnosesData,
+      condition: null,
+      certainty: this.isConfirmedDiagnosis ? "CONFIRMED" : "PROVISIONAL",
+      patient: this.patientVisit?.patientUuid,
+      encounter: JSON.parse(localStorage.getItem("patientConsultation"))[
+        "encounterUuid"
+      ],
+    };
+    this.savingDiagnosisState$ = this.store.select(getSavingDiagnosisState);
+    this.store.dispatch(
+      saveDiagnosis({
+        diagnosis: this.diagnosesData,
+        currentDiagnosisUuid: null,
+      })
+    );
+    this.updateConsultationOrder.emit();
+  }
+
+  onEdit(e: Event, diagnosisData, currentDiagnosisUuid) {
+    this.diagnosisForm = formatDiagnosisFormObject(
+      this.diagnosisFormDetails,
+      diagnosisData?.diagnosisDetails
+        ? diagnosisData?.diagnosisDetails
+        : diagnosisData
+    );
+    currentDiagnosisUuid = diagnosisData?.diagnosisDetails
+      ? diagnosisData?.diagnosisDetails?.uuid
+      : diagnosisData?.uuid;
+    // e.stopPropagation();
+    this.dialog.open(AddDiagnosisModalComponent, {
+      width: "75%",
+      data: {
         patient: this.patientVisit?.patientUuid,
-        encounter: JSON.parse(localStorage.getItem("patientConsultation"))[
-          "encounterUuid"
-        ],
-      };
-      this.savingDiagnosisState$ = this.store.select(getSavingDiagnosisState);
-      this.store.dispatch(
-        saveDiagnosis({
-          diagnosis: this.diagnosesData,
-          currentDiagnosisUuid: null,
-        })
-      );
-      this.updateConsultationOrder.emit()
-    }
+        diagnosisForm: this.diagnosisForm,
+        visit: null,
+        edit: true,
+        currentDiagnosisUuid: currentDiagnosisUuid,
+      },
+    });
+  }
 
-    onEdit(e: Event, diagnosisData, currentDiagnosisUuid) {
-      this.diagnosisForm = formatDiagnosisFormObject(
-        this.diagnosisFormDetails,
-        diagnosisData?.diagnosisDetails
+  onDelete(e: Event, diagnosisData) {
+    // e.stopPropagation();
+    this.dialog.open(DeleteDiagnosisModalComponent, {
+      width: "25%",
+      data: {
+        patient: this.patientVisit?.patientUuid,
+        diagnosis: diagnosisData?.diagnosisDetails
           ? diagnosisData?.diagnosisDetails
-          : diagnosisData
-      );
-      currentDiagnosisUuid = diagnosisData?.diagnosisDetails
-        ? diagnosisData?.diagnosisDetails?.uuid
-        : diagnosisData?.uuid;
-      // e.stopPropagation();
-      this.dialog.open(AddDiagnosisModalComponent, {
-        width: "75%",
-        data: {
-          patient: this.patientVisit?.patientUuid,
-          diagnosisForm: this.diagnosisForm,
-          visit: null,
-          edit: true,
-          currentDiagnosisUuid: currentDiagnosisUuid,
-        },
-      });
-    }
-
-    onDelete(e: Event, diagnosisData) {
-      // e.stopPropagation();
-      this.dialog.open(DeleteDiagnosisModalComponent, {
-        width: "25%",
-        data: {
-          patient: this.patientVisit?.patientUuid,
-          diagnosis: diagnosisData?.diagnosisDetails
-            ? diagnosisData?.diagnosisDetails
-            : diagnosisData,
-        },
-      });
-    }
+          : diagnosisData,
+      },
+    });
+  }
 }

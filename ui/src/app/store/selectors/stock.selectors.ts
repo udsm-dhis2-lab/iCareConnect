@@ -1,6 +1,6 @@
-import { createSelector } from '@ngrx/store';
-import { AppState, getRootState } from '../reducers';
-import { stockAdapter, StockState } from '../states';
+import { createSelector } from "@ngrx/store";
+import { AppState, getRootState } from "../reducers";
+import { stockAdapter, StockState } from "../states";
 
 const getStockState = createSelector(
   getRootState,
@@ -14,6 +14,11 @@ export const getStockLoadingState = createSelector(
   getStockState,
   (stockState: StockState) => stockState?.loading
 );
+
+export const getStockStateByItemUuid = (id: string) =>
+  createSelector(getStockEntities, (stockEntities: any) =>
+    stockEntities[id] ? stockEntities[id] : null
+  );
 
 export const getStockLoadedState = createSelector(
   getStockState,
