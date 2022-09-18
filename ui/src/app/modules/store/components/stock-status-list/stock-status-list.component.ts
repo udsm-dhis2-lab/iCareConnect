@@ -17,6 +17,7 @@ export class StockStatusListComponent implements OnInit {
   @Input() ledgerTypes: any[];
   @Input() userPrivileges: any;
   @Input() isCurrentLocationMainStore: boolean;
+  @Input() isStockOutPage: boolean;
   stocksList$: Observable<StockObject[]>;
   searchTerm: string;
   currentItemStock: StockObject;
@@ -55,10 +56,16 @@ export class StockStatusListComponent implements OnInit {
   }
 
   getStock(): void {
-    this.stocksList$ = this.stockService.getAvailableStocks(
-      this.currentLocation?.uuid,
-      { q: this.searchTerm }
-    );
+    if (!this.isStockOutPage) {
+      this.stocksList$ = this.stockService.getAvailableStocks(
+        this.currentLocation?.uuid,
+        { q: this.searchTerm }
+      );
+    } else {
+      this.stocksList$ = this.stockService.getStockOuts(
+        this.currentLocation?.uuid
+      );
+    }
   }
 
   onToggleCurrentStock(event: Event, stock: StockObject): void {
