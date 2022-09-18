@@ -459,7 +459,7 @@ public class StoreController {
 	        @RequestParam(defaultValue = "100") Integer limit, @RequestParam(defaultValue = "0") Integer startIndex) {
 		List<Item> stockObjects = null;
 		if (locationUuid != null) {
-			stockObjects = storeService.getStockoutByLocation(locationUuid, limit, startIndex);
+			stockObjects = storeService.getStockoutByLocation(locationUuid);
 		} else {
 			stockObjects = storeService.getStockout();
 		}
