@@ -366,13 +366,14 @@ public class StoreController {
 	
 	@RequestMapping(value = "stock", method = RequestMethod.GET)
 	@ResponseBody
-	public List<Map<String, Object>> listAllStockStatus(@RequestParam(required = false) String locationUuid,@RequestParam(required = false) String search,@RequestParam(defaultValue = "100") Integer limit,
-														@RequestParam(defaultValue = "0") Integer startIndex) {
+	public List<Map<String, Object>> listAllStockStatus(@RequestParam(required = false) String locationUuid,
+	        @RequestParam(required = false) String search, @RequestParam(defaultValue = "100") Integer limit,
+	        @RequestParam(defaultValue = "0") Integer startIndex) {
 		
 		List<Stock> stocksStatus;
 		
 		if (locationUuid != null) {
-			stocksStatus = this.storeService.getStockByLocation(locationUuid,search,startIndex,limit);
+			stocksStatus = this.storeService.getStockByLocation(locationUuid, search, startIndex, limit);
 		} else {
 			stocksStatus = this.storeService.getAllStockStatusMetrics();
 		}
