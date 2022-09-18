@@ -6,6 +6,14 @@ let locationPath = "";
 export function formatLocationsPayLoad(locations): Location[] {
   return _.map(locations, (location) => {
     // if (!location.retired) {
+    const mainStoreTag =
+      location?.tags?.length > 0
+        ? (location?.tags?.filter(
+            (tag) =>
+              tag?.display?.toLowerCase() === "main store" ||
+              tag?.display?.toLowerCase()?.indexOf("main store") > -1
+          ) || [])[0]
+        : null;
     locationPath = "";
     const modules = getLocationModules(location);
     return {
@@ -54,6 +62,7 @@ export function formatLocationsPayLoad(locations): Location[] {
             ) || [])[0]?.value
           : null,
       modules: modules,
+      isMainStore: mainStoreTag ? true : false,
     };
     // }
   }).filter((loc) => loc);

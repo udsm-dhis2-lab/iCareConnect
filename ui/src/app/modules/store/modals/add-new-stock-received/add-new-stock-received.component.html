@@ -25,7 +25,8 @@
   </div>
 </mat-dialog-content>
 
-<mat-dialog-actions class="d-flex justify-content-end">
+<mat-dialog-actions class="d-flex justify-content-end mr-2 mb-2 mt-2">
+  <button mat-stroked-button (click)="onClose($event)">Close</button>
   <button
     [disabled]="!isFormValid"
     mat-stroked-button
@@ -34,5 +35,4 @@
   >
     Save
   </button>
-  <button mat-stroked-button (click)="onClose($event)">Close</button>
 </mat-dialog-actions>

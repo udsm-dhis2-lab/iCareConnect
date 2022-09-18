@@ -37,7 +37,7 @@ export class IssuingComponent implements OnInit {
     e.stopPropagation();
 
     const dialog = this.dialog.open(IssuingFormComponent, {
-      width: "25%",
+      width: "30%",
       panelClass: "custom-dialog-container",
       data: { issue },
     });

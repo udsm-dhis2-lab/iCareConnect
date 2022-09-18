@@ -27,6 +27,7 @@ export class StoreHomeComponent implements OnInit {
   currentStore$: Observable<any>;
   stockMetrics$: Observable<any>;
   settingCurrentLocationStatus$: Observable<boolean>;
+  currentStorePage: any;
   constructor(private store: Store<AppState>) {
     this.store.dispatch(clearStockMetrics());
   }
@@ -67,12 +68,14 @@ export class StoreHomeComponent implements OnInit {
       //   url: 'transaction',
       // },
     ];
+    this.currentStorePage = this.storePages[0];
 
     this.stockMetrics$ = this.store.select(getMetrics);
   }
 
-  onChangeRoute(event: Event, url: string): void {
+  onChangeRoute(event: Event, url: string, page: any): void {
     event.stopPropagation();
+    this.currentStorePage = page;
     this.store.dispatch(go({ path: ["/store/" + url] }));
   }
 }
