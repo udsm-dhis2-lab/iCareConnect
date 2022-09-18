@@ -77,7 +77,7 @@ public interface StoreService extends OpenmrsService {
 	
 	public Issue getIssueByUuid(String issueUuid);
 	
-	List<Item> getStockoutByLocation(String locationUuid);
+	List<Item> getStockoutByLocation(String locationUuid, Integer limit, Integer startIndex);
 	
 	Stock saveStock(Stock stock);
 	

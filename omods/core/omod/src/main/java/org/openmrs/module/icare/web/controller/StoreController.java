@@ -455,10 +455,11 @@ public class StoreController {
 	@RequestMapping(value = "stockout", method = RequestMethod.GET)
 	@ResponseBody
 	public List<Map<String, Object>> getItemsStockedOut(
-	        @RequestParam(required = false, value = "location") String locationUuid) {
+	        @RequestParam(required = false, value = "location") String locationUuid,
+	        @RequestParam(defaultValue = "100") Integer limit, @RequestParam(defaultValue = "0") Integer startIndex) {
 		List<Item> stockObjects = null;
 		if (locationUuid != null) {
-			stockObjects = storeService.getStockoutByLocation(locationUuid);
+			stockObjects = storeService.getStockoutByLocation(locationUuid, limit, startIndex);
 		} else {
 			stockObjects = storeService.getStockout();
 		}
