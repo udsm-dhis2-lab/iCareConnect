@@ -11,7 +11,7 @@
   <mat-card class="border">
     <div class="d-flex justify-content-between">
       <mat-form-field class="w-25">
-        <input  autocomplete="off" type="text" matInput placeholder="Search" />
+        <input autocomplete="off" type="text" matInput placeholder="Search" />
       </mat-form-field>
       <!-- <button
         (click)="onNewRequest($event, params)"
@@ -29,6 +29,7 @@
         <td>Item</td>
         <td>Quantity Requested</td>
         <td>Quantity Received</td>
+        <td>Received Date</td>
         <td>Received From</td>
       </tr>
 
@@ -53,6 +54,7 @@
         <td>{{ request?.name }}</td>
         <td>{{ request?.quantityRequested }}</td>
         <td>{{ request?.quantityIssued || "-" }}</td>
+        <td>{{ request?.created?.substring(0, 10) }}</td>
         <td>{{ request?.targetStore?.name }}</td>
       </tr>
     </table>
