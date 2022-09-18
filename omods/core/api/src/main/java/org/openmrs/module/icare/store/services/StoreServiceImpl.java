@@ -540,8 +540,8 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 	}
 	
 	@Override
-	public List<Item> getStockoutByLocation(String locationUuid, Integer limit, Integer startIndex) {
-		return this.stockDAO.getStockedOutByLocation(locationUuid, limit, startIndex);
+	public List<Item> getStockoutByLocation(String locationUuid) {
+		return this.stockDAO.getStockedOutByLocation(locationUuid);
 	}
 	
 	@Override
