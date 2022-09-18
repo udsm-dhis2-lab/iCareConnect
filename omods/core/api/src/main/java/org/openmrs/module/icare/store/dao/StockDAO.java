@@ -206,7 +206,7 @@ public class StockDAO extends BaseDAO<Stock> {
 	}
 	
 	//TODO fix getting by location query
-	public List<Item> getStockedOutByLocation(String locationUuid) {
+	public List<Item> getStockedOutByLocation(String locationUuid, Integer limit, Integer startIndex) {
 		DbSession session = this.getSession();
 		//String queryStr = "SELECT item FROM Item item \n"
 		//        + "WHERE item.stockable = true AND item.uuid NOT IN(SELECT stock.item.uuid FROM Stock stock WHERE stock.location.uuid =:locationUuid)";
@@ -215,7 +215,11 @@ public class StockDAO extends BaseDAO<Stock> {
 		        + "WHERE item.stockable = true AND item NOT IN(SELECT stock.item FROM Stock stock WHERE stock.location.uuid =:locationUuid)";
 		
 		Query query = session.createQuery(queryStr);
+		query.setFirstResult(startIndex);
+		query.setMaxResults(limit);
+		
 		query.setParameter("locationUuid", locationUuid);
+		
 		return query.list();
 	}
 	
@@ -269,7 +273,7 @@ public class StockDAO extends BaseDAO<Stock> {
 		query for out of stock
 		------------------------
 		------------------------- */
-		metricsMap.put("stockedOut", this.getStockedOutByLocation(locationUuid).size());
+		metricsMap.put("stockedOut", this.getStockedOutByLocation(locationUuid, null, null).size());
 		
 		/* ------------------------
 		-----------------------
