@@ -257,7 +257,15 @@ export class SharedPatientDashboardComponent implements OnInit {
   clearBills(event: Event) {
     event.stopPropagation();
     this.store.dispatch(clearBills());
-    this.store.dispatch(go({ path: ["/clinic/patient-list"] }));
+    this.store.dispatch(
+      go({
+        path: [
+          !this.isInpatient
+            ? "/clinic/patient-list"
+            : "/inpatient/" + this.currentLocation?.uuid,
+        ],
+      })
+    );
   }
 
   viewPatientHistory(event: Event, patientUuid) {

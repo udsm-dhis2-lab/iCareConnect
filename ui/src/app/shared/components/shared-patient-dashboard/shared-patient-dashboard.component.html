@@ -59,7 +59,6 @@
               class="float-left mr-4"
               mat-stroked-button
               (click)="clearBills($event)"
-              [routerLink]="'/clinic/patient-list'"
               matTooltip="Back to List"
             >
               <mat-icon>arrow_back</mat-icon>
@@ -87,7 +86,8 @@
             <div class="mr-2">
               <app-shared-bmi></app-shared-bmi>
             </div>
-            <button *ngIf="!isInpatient"
+            <button
+              *ngIf="!isInpatient"
               class="mr-2"
               (click)="onToggleVitalsSummary($event)"
               [ngStyle]="{
@@ -137,7 +137,8 @@
                 src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAoCAYAAACM/rhtAAAABmJLR0QA/wD/AP+gvaeTAAAEqUlEQVRYhc2YW2hURxjH/9/MnL3lVovGS28ENa0iFKq1m2wi0j4UQ4wxmrZUKAg2rU9FCn1YrF1aRREsBS20kZbeESnFJESNCD4kGyMGSxG8Uo3QSzReqnGze/bMpQ9bN4m71Wxy1uT/eGbmm9+Zb/4f5zvAFBe5GWz1lo4vlJIbYAgewXf+/PGr4YnGZG6AAUBTU6+lldxQGQzypS8t4Y5Wm9yI6xrghTmDHCDDBYclBGAg3IjrGmC+NOUBx52GYUOAAwCSQyAifW/cGCPqwu1meAWp8RhnXC5uauq1rs64Gq8IBjkXfExr7GQSJ0/2Jlq21vhz2UusjnSUMm2+k1pXM8YvKK3faN264vx4wPMhwbT5aebMWcueevpJ69rAwPN9l6+0AHjuQYuam5c4DR91fNnd0/NOOsUAGJEOVVUyrTWi0eOj1hCRZIJ9misg1YcPJitCQYuxlF+i0e6kTjrTW3euGswl0PLIMV+JEx+sqqoUWmt0d/fIlm01Vq5A94tpQNyDAwACKR7w5XRP8qkpX2ZcAyz/q0gBhpRUcKQECNKNuBl1kDPywqjzb35y5FzclgcU6MBYXD3SOAQy4zFENlFduF1XV4fS9fDXkyf02pfnMr/HwulLN+xTFwckDHpjtt7ctm1Flxub5qKMFGsDMEZYWDYNr78yz7v97WBBfXXZsmIf63gt0vHD8sgx36QCOkqbOzFneAInVCyaRR+ufzFQNqdoTSmS0cZN+x+ZyzPuoFJGXekflAC8I5/7vQIb6xf5vj10dsGZPvM9gLVrNh/ZI7Wz0UzQbETM4Zz9qbT5UUq5q31H7a302Kpwu6qqDqU3iEaP234v1zveDWY9JUcqRL7ujd2NJ2qN5keDlUu54BP79NNaIxYbQv/f/fbA9esJLeXKlu21nUCWN6fUNbx28Y/bWYNZgqOm4pmAR3giBoZNFA4AGGMoKirE/PJ53gULF5QwwQ+vDLe9kBUQAJIJ+VlL56WYMSbbMBY/O4Ok0kGXWxoAwLTHSjCvfL5fcOuXxsb9PCsgt8y+a7fs31q7+pxs4z4PR9nsYtt1uv9UOn06+QP+x+3yQAMzlHlKEkLfScj6ztP9v3/VfjY+GM/knPtEUUG+AAFgzuzZRZbwvvW/7ju0vWYgYZKLz1y+uXfL3hP2NwfPxc5d+Qd2UgEASqcVcPcTPKzikmIoLYMPvOFtkZVDAN5rCB/ecerC9fVn+m6uSzpmfmHASggCM4RAvgC9Hg+MRokgw9I51lpDae1HUl+tC7enJ0sowABxO3V6t+/aqe+8PB4hYwzGaDHqBIkIAGH3pqqHBkg4Eh983pMvPgAGAI0uM0QEIgOls5eXUcsfPmVCMgYgGJNhEkY0NkDkNcOpHShrX0x4f3d0zGE6O8c+N1cRwATuq4OVoYq8bZirurqiamr3JIamdtNkSJPAiBxna7gfpRgjHQpVpg+NDGWahIhcabhzVWPkWKEjEzcAeEY+nzIpHkrELKSqV1oGIHavlwXgaj+bq7SPKRjDtE79wZNSgoiU4Fw0d/f0NMGAE5FknO2aDMBDkZo7DZEj+7qjx9cZgBFIcYvvmQyWnPQvCULmfbqY+pMAAAAASUVORK5CYII="
               />
             </span>
-            <button *ngIf="!isInpatient"
+            <button
+              *ngIf="!isInpatient"
               mat-stroked-button
               (click)="
                 viewPatientHistory(
@@ -149,7 +150,8 @@
             >
               History
             </button>
-            <button *ngIf="!isInpatient"
+            <button
+              *ngIf="!isInpatient"
               class="mr-2"
               mat-stroked-button
               [matMenuTriggerFor]="moreMenuItems"
@@ -307,8 +309,9 @@
                   "
                 >
                 </app-clinical-notes>
-                <app-patient-observations-chart 
-                *ngIf="isInpatient &&
+                <app-patient-observations-chart
+                  *ngIf="
+                    isInpatient &&
                     !dashboardParams.loadingForms &&
                     dashboardParams.currentPatient &&
                     dashboardParams?.forms &&
