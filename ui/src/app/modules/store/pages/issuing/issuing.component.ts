@@ -2,6 +2,7 @@ import { Component, OnInit } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { select, Store } from "@ngrx/store";
 import { Observable } from "rxjs";
+import { LocationGet } from "src/app/shared/resources/openmrs";
 import { IssuingObject } from "src/app/shared/resources/store/models/issuing.model";
 import {
   issueRequest,
@@ -9,6 +10,7 @@ import {
   rejectRequisition,
 } from "src/app/store/actions/issuing.actions";
 import { AppState } from "src/app/store/reducers";
+import { getCurrentLocation } from "src/app/store/selectors";
 import {
   getAllIssuings,
   getIssuingLoadingState,
@@ -24,6 +26,7 @@ import { RequestCancelComponent } from "../../modals/request-cancel/request-canc
 export class IssuingComponent implements OnInit {
   issuingList$: Observable<IssuingObject[]>;
   loadingIssuingList$: Observable<boolean>;
+  currentStore$: Observable<LocationGet>;
   constructor(private store: Store<AppState>, private dialog: MatDialog) {
     store.dispatch(loadIssuings());
   }
@@ -31,15 +34,16 @@ export class IssuingComponent implements OnInit {
   ngOnInit() {
     this.issuingList$ = this.store.pipe(select(getAllIssuings));
     this.loadingIssuingList$ = this.store.pipe(select(getIssuingLoadingState));
+    this.currentStore$ = this.store.select(getCurrentLocation);
   }
 
-  onIssue(e: Event, issue: IssuingObject): void {
+  onIssue(e: Event, issue: IssuingObject, currentStore: LocationGet): void {
     e.stopPropagation();
 
     const dialog = this.dialog.open(IssuingFormComponent, {
       width: "30%",
       panelClass: "custom-dialog-container",
-      data: { issue },
+      data: { issue, currentStore },
     });
 
     dialog.afterClosed().subscribe((result) => {

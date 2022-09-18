@@ -53,9 +53,9 @@ export class StockEffects {
   loadCurrentStockStatus$ = createEffect(() =>
     this.actions$.pipe(
       ofType(loadCurrentStock),
-      switchMap(({ currentStockItemId }) => {
+      switchMap(({ currentStockItemId, locationUuid }) => {
         return this.stockService
-          .getAvailableStockOfAnItem(currentStockItemId)
+          .getAvailableStockOfAnItem(currentStockItemId, locationUuid)
           .pipe(
             map((response: any) => {
               return updateCurrentStockItem({ currentStockItem: response });
