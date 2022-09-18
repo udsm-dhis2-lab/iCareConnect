@@ -18,32 +18,36 @@ export class CurrentUserService {
   }
 
   getProviderByUserDetails(userUuid: string): Observable<any> {
-    return this.httpClient.get(`provider?user=${userUuid}&v=full`).pipe(
-      map((response) =>
-        response?.results[0]
-          ? {
-              ...response?.results[0],
-              signature:
-                response?.results[0]?.attributes?.length > 0
-                  ? (
-                      response?.results[0]?.attributes.filter(
-                        (attribute) =>
-                          attribute?.attributeType?.uuid ===
-                          "ecc4e84e-823c-4a1e-94dc-c349b9c64cca"
-                      ) || []
-                    )?.length > 0
-                    ? (response?.results[0]?.attributes.filter(
-                        (attribute) =>
-                          attribute?.attributeType?.uuid ===
-                          "ecc4e84e-823c-4a1e-94dc-c349b9c64cca"
-                      ) || [])[0]?.value
-                    : null
-                  : null,
-            }
-          : {}
-      ),
-      catchError((error) => of(error))
-    );
+    return this.httpClient
+      .get(
+        `provider?user=${userUuid}&v=custom:(uuid,display,person:(uuid,display))`
+      )
+      .pipe(
+        map((response) =>
+          response?.results[0]
+            ? {
+                ...response?.results[0],
+                signature:
+                  response?.results[0]?.attributes?.length > 0
+                    ? (
+                        response?.results[0]?.attributes.filter(
+                          (attribute) =>
+                            attribute?.attributeType?.uuid ===
+                            "ecc4e84e-823c-4a1e-94dc-c349b9c64cca"
+                        ) || []
+                      )?.length > 0
+                      ? (response?.results[0]?.attributes.filter(
+                          (attribute) =>
+                            attribute?.attributeType?.uuid ===
+                            "ecc4e84e-823c-4a1e-94dc-c349b9c64cca"
+                        ) || [])[0]?.value
+                      : null
+                    : null,
+              }
+            : {}
+        ),
+        catchError((error) => of(error))
+      );
   }
 
   getSessionDetails(): Observable<any> {
