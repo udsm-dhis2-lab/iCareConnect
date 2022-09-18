@@ -31,7 +31,7 @@ public class Discount extends BaseChangeableOpenmrsData {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "discount_criteria_id", nullable = false)
 	private Concept criteria;
-
+	
 	@JoinColumn(name = "attachment_id")
 	@OneToOne(fetch = FetchType.LAZY)
 	private Obs attachment;
@@ -58,11 +58,11 @@ public class Discount extends BaseChangeableOpenmrsData {
 	public Discount(@JsonProperty("patient") String patient) {
 		
 	}
-
+	
 	public Integer getId() {
 		return this.id;
 	}
-
+	
 	public void setId(Integer id) {
 		this.id = id;
 	}
@@ -172,7 +172,7 @@ public class Discount extends BaseChangeableOpenmrsData {
 		patient.setUuid((String) patientMap.get("uuid"));
 		this.setPatient(patient);
 	}
-
+	
 	@JsonSetter("attachment")
 	public void setAttachment(Map<String, Object> attachmentMap) {
 		Obs obs = new Obs();
@@ -205,11 +205,11 @@ public class Discount extends BaseChangeableOpenmrsData {
 		}
 		this.setItems(newItems);
 	}
-
+	
 	public Obs getAttachment() {
 		return attachment;
 	}
-
+	
 	public void setAttachment(Obs attachment) {
 		this.attachment = attachment;
 	}
