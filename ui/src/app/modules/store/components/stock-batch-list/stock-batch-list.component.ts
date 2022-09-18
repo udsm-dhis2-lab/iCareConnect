@@ -1,9 +1,14 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
+import { select, Store } from "@ngrx/store";
+import { Observable } from "rxjs";
 import { LedgerInput } from "src/app/shared/resources/store/models/ledger-input.model";
 import { LedgerTypeObject } from "src/app/shared/resources/store/models/ledger-type.model";
 import { StockBatch } from "src/app/shared/resources/store/models/stock-batch.model";
 import { StockObject } from "src/app/shared/resources/store/models/stock.model";
+import { AppState } from "src/app/store/reducers";
+import { getIfCurrentLocationIsMainStore } from "src/app/store/selectors";
+import { getCurrentUserPrivileges } from "src/app/store/selectors/current-user.selectors";
 import { LedgerFormComponent } from "../../modals/ledger-form/ledger-form.component";
 
 @Component({
@@ -16,13 +21,19 @@ export class StockBatchListComponent implements OnInit {
   @Input() ledgerTypes: LedgerTypeObject[];
   @Input() currentStore: any;
   @Input() saving: boolean;
+  isCurrentLocationMainStore$: Observable<boolean>;
   @Output() closeBatchList = new EventEmitter<StockObject>();
   @Output() saveLedger = new EventEmitter<LedgerInput>();
+  userPrivileges$: Observable<any>;
 
   today: Date;
-  constructor(private dialog: MatDialog) {}
+  constructor(private dialog: MatDialog, private store: Store<AppState>) {}
 
   ngOnInit() {
+    this.userPrivileges$ = this.store.select(getCurrentUserPrivileges);
+    this.isCurrentLocationMainStore$ = this.store.pipe(
+      select(getIfCurrentLocationIsMainStore)
+    );
     this.today = new Date();
   }
 
