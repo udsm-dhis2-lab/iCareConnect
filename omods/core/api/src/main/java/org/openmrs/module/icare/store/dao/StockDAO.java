@@ -215,7 +215,11 @@ public class StockDAO extends BaseDAO<Stock> {
 		        + "WHERE item.stockable = true AND item NOT IN(SELECT stock.item FROM Stock stock WHERE stock.location.uuid =:locationUuid)";
 		
 		Query query = session.createQuery(queryStr);
+		//		query.setFirstResult(startIndex);
+		//		query.setMaxResults(limit);
+		
 		query.setParameter("locationUuid", locationUuid);
+		
 		return query.list();
 	}
 	
