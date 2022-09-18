@@ -30,6 +30,7 @@ export class OrderResultsRendererComponent implements OnInit {
   @Input() codedResultsData: any;
   @Input() observationsKeyedByConcept: any;
   @Input() forConsultation: boolean;
+  @Input() isInpatient: boolean;
   @Input() investigationAndProceduresFormsDetails: any;
   @Input() visit: Visit;
   @Input() orderTypes: any[];

@@ -173,9 +173,10 @@
             style="min-height: 400px; padding: 2%"
           >
             <div class="p-3 h3 text-center" *ngIf="reportData">
-              <div class="row">
+              <div class="row" *ngIf="facilityDetails$ | async as facility">
                 <div class="col-2" style="display: inline-block; width: 16.67%">
-                  <img src="assets/images/tanzania-logo.png" height="90" />
+                  <img src="assets/images/udsm-logo.webp" height="90" />
+                  <!-- <img src="assets/images/tanzania-logo.png" height="90" /> -->
                 </div>
                 <div class="col-8" style="display: inline-block; width: 66.67%">
                   <h4 style="text-align: center">
@@ -183,36 +184,53 @@
                       >United Republic of Tanzania. <br />
                       Ministry of Health.
                       <br />
-                      <span *ngIf="labConfigs?.facilityDetails">
+                     <!-- <span *ngIf="labConfigs?.facilityDetails">
                         {{ labConfigs?.facilityDetails?.name }}<br />
+                      </span> -->
+                      <span *ngIf="facility.display">
+                        {{ facility.display }}<br />
                       </span>
-                      <small>
+                     <small>
+                    <!-- <span
+                      *ngIf="
+                        labConfigs?.facilityDetails &&
+                        labConfigs?.facilityDetails?.addressBox
+                      ">P.O BOX: {{ labConfigs?.facilityDetails?.addressBox }}</span> -->
                         <span
                           *ngIf="
-                            labConfigs?.facilityDetails &&
-                            labConfigs?.facilityDetails?.addressBox
+                            facility &&
+                            facility.postalCode
                           "
                         >
-                          P.O BOX: {{ labConfigs?.facilityDetails?.addressBox }}
+                          P.O BOX: {{ facility.postalCode }}
                         </span>
-                        <span
+                        <!-- <span
                           *ngIf="
                             labConfigs?.facilityDetails &&
                             labConfigs?.facilityDetails?.addressTel
                           "
                         >
                           TEL: {{ labConfigs?.facilityDetails?.addressTel }}
-                        </span> </small
+                        </span>  -->
+                        </small
                       ><br />
                       <small>
                         <span
+                          *ngIf="
+                            facility &&
+                            facility.stateProvince
+                          "
+                        >
+                          {{ facility.stateProvince }}
+                        </span>
+                        <!-- <span
                           *ngIf="
                             labConfigs?.facilityDetails &&
                             labConfigs?.facilityDetails?.addressLocaton
                           "
                         >
                           {{ labConfigs?.facilityDetails?.addressLocaton }}
-                        </span>
+                        </span> -->
                       </small>
                     </b>
                   </h4>
@@ -780,51 +798,69 @@
           </div>
         </div>
         <div *ngIf="!currentReport?.hardCoded">
-          <div class="row">
-            <div class="col-2" style="display: inline-block; width: 16.67%">
-              <img src="assets/images/tanzania-logo.png" height="90" />
-            </div>
-            <div class="col-8" style="display: inline-block; width: 66.67%">
-              <h4 style="text-align: center">
-                <b
-                  >United Republic of Tanzania. <br />
-                  Ministry of Health.
-                  <br />
-                  <span *ngIf="labConfigs?.facilityDetails">
-                    {{ labConfigs?.facilityDetails?.name }}<br />
-                  </span>
-                  <small>
-                    <span
+          <div class="row" *ngIf="facilityDetails$ | async as facility">
+                <div class="col-2" style="display: inline-block; width: 16.67%">
+                  <img src="assets/images/udsm-logo.webp" height="90" />
+                  <!-- <img src="assets/images/tanzania-logo.png" height="90" /> -->
+                </div>
+                <div class="col-8" style="display: inline-block; width: 66.67%">
+                  <h4 style="text-align: center">
+                    <b
+                      >United Republic of Tanzania. <br />
+                      Ministry of Health.
+                      <br />
+                     <!-- <span *ngIf="labConfigs?.facilityDetails">
+                        {{ labConfigs?.facilityDetails?.name }}<br />
+                      </span> -->
+                      <span *ngIf="facility.display">
+                        {{ facility.display }}<br />
+                      </span>
+                     <small>
+                    <!-- <span
                       *ngIf="
                         labConfigs?.facilityDetails &&
                         labConfigs?.facilityDetails?.addressBox
-                      "
-                    >
-                      P.O BOX: {{ labConfigs?.facilityDetails?.addressBox }}
-                    </span>
-                    <span
-                      *ngIf="
-                        labConfigs?.facilityDetails &&
-                        labConfigs?.facilityDetails?.addressTel
-                      "
-                    >
-                      TEL: {{ labConfigs?.facilityDetails?.addressTel }}
-                    </span> </small
-                  ><br />
-                  <small>
-                    <span
-                      *ngIf="
-                        labConfigs?.facilityDetails &&
-                        labConfigs?.facilityDetails?.addressLocaton
-                      "
-                    >
-                      {{ labConfigs?.facilityDetails?.addressLocaton }}
-                    </span>
-                  </small>
-                </b>
-              </h4>
-            </div>
-          </div>
+                      ">P.O BOX: {{ labConfigs?.facilityDetails?.addressBox }}</span> -->
+                        <span
+                          *ngIf="
+                            facility &&
+                            facility.postalCode
+                          "
+                        >
+                          P.O BOX: {{ facility.postalCode }}
+                        </span>
+                        <!-- <span
+                          *ngIf="
+                            labConfigs?.facilityDetails &&
+                            labConfigs?.facilityDetails?.addressTel
+                          "
+                        >
+                          TEL: {{ labConfigs?.facilityDetails?.addressTel }}
+                        </span>  -->
+                        </small
+                      ><br />
+                      <small>
+                        <span
+                          *ngIf="
+                            facility &&
+                            facility.stateProvince
+                          "
+                        >
+                          {{ facility.stateProvince }}
+                        </span>
+                        <!-- <span
+                          *ngIf="
+                            labConfigs?.facilityDetails &&
+                            labConfigs?.facilityDetails?.addressLocaton
+                          "
+                        >
+                          {{ labConfigs?.facilityDetails?.addressLocaton }}
+                        </span> -->
+                      </small>
+                    </b>
+                  </h4>
+                </div>
+              </div>
           <div class="header text-center h3 p-3">
             {{ currentReport?.name }}
           </div>

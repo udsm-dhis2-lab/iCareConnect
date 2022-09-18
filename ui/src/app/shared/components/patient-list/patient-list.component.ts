@@ -199,28 +199,30 @@ export class PatientListComponent implements OnInit, OnChanges {
   }
 
   onSearchPatient(e) {
+    const orderType = "";
     e.stopPropagation();
     this.searchTerm = e?.target?.value;
-    // this.loadingPatients = true;
-    // this.visits$ = this.visitService
-    //   .getAllVisits(
-    //     this.currentLocation,
-    //     false,
-    //     false,
-    //     this.searchTerm,
-    //     0,
-    //     this.itemsPerPage,
-    //     null,
-    //     null,
-    //     null,
-    //     "ENCOUNTER",
-    //     "ASC"
-    //   )
-    //   .pipe(
-    //     tap(() => {
-    //       this.loadingPatients = false;
-    //     })
-    //   );
+    this.loadingPatients = true;
+    this.visits$ = this.visitService
+      .getAllVisits(
+        this.currentLocation,
+        false,
+        false,
+        this.searchTerm,
+        0,
+        this.itemsPerPage,
+        this.orderType,
+        this.orderStatus,
+        this.orderStatusCode,
+        this.orderBy ? this.orderBy : "ENCOUNTER",
+        this.orderByDirection ? this.orderByDirection : "ASC",
+        this.filterBy ? this.filterBy : ""
+      )
+      .pipe(
+        tap(() => {
+          this.loadingPatients = false;
+        })
+      );
   }
 
   getLocationUuids(location) {

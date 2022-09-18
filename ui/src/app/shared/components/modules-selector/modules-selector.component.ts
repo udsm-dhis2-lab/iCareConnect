@@ -48,20 +48,11 @@ export class ModulesSelectorComponent implements OnInit {
         ? null
         : JSON.parse(localStorage.getItem("currentLocation"));
     if (storedNavigationDetails) {
-      // this.currentLocation = !storedLocation
-      //   ? {
-      //       ...locationMatchingNavigationDetails,
-      //       id: locationMatchingNavigationDetails?.uuid,
-      //       ...this.locations.filter(
-      //         (loc) => loc?.uuid === storedLocation?.uuid || []
-      //       )[0],
-      //     }
-      //   : storedLocation;
-      // console.log("currentLocation CHeck", this.currentLocation);
+      this.currentLocation = locationMatchingNavigationDetails;
 
-      this.store.dispatch(
-        setCurrentUserCurrentLocation({ location: this.currentLocation })
-      );
+      // this.store.dispatch(
+      //   setCurrentUserCurrentLocation({ location: this.currentLocation })
+      // );
       const modules = (
         this.currentLocation.attributes?.filter(
           (attribute) =>
@@ -79,7 +70,7 @@ export class ModulesSelectorComponent implements OnInit {
       });
 
       // Hinglight the current location
-      // console.log(this.locations);
+      // console.log("modules", modules);
       if (
         !this.currentLocation?.modules ||
         (this.currentLocation?.modules &&
@@ -88,9 +79,9 @@ export class ModulesSelectorComponent implements OnInit {
         this.currentLocation = (this.locations?.filter(
           (loc) => loc?.modules?.length > 0
         ) || [])[0];
-        this.store.dispatch(
-          setCurrentUserCurrentLocation({ location: this.currentLocation })
-        );
+        // this.store.dispatch(
+        //   setCurrentUserCurrentLocation({ location: this.currentLocation })
+        // );
       }
       this.currentModule = {
         ...this.currentLocation?.modules[0],
@@ -160,7 +151,7 @@ export class ModulesSelectorComponent implements OnInit {
           ).length > 0 && !location?.retired
       ) || [];
     this.store.dispatch(
-      setCurrentUserCurrentLocation({ location: this.currentModule?.location })
+      setCurrentUserCurrentLocation({ location: this.currentLocation })
     );
     // Get the navigation details from localstorage
     const navigationDetails = JSON.parse(
@@ -210,9 +201,12 @@ export class ModulesSelectorComponent implements OnInit {
             ) || []
           ).length > 0 && !location?.retired
       ) || [];
-
+    // console.log(
+    //   "userLocationsForTheCurrentModule",
+    //   this.userLocationsForTheCurrentModule
+    // );
     this.currentLocation = this.userLocationsForTheCurrentModule[0];
-    localStorage.setItem("currentLocation", this.currentModule?.location);
+    // localStorage.setItem("currentLocation", this.currentLocation);
     this.currentLocation = {
       ...module?.location,
       id: module?.location?.uuid,

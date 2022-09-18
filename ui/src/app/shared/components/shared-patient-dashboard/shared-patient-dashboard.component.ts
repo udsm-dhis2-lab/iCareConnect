@@ -72,7 +72,10 @@ import {
   ObsCreate,
   ProviderGetFull,
 } from "../../resources/openmrs";
-import { loadPreviousObservations, saveObservations } from "src/app/store/actions/observation.actions";
+import {
+  loadPreviousObservations,
+  saveObservations,
+} from "src/app/store/actions/observation.actions";
 import { loadEncounterTypes } from "src/app/store/actions/encounter-type.actions";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { OrdersService } from "../../resources/order/services/orders.service";
@@ -92,6 +95,7 @@ export class SharedPatientDashboardComponent implements OnInit {
   @Input() iCareGeneralConfigurations: any;
   @Input() clinicConfigurations: any;
   @Input() currentLocation: LocationGet;
+  @Input() isInpatient: boolean;
   currentPatient$: Observable<Patient>;
   vitalSignObservations$: Observable<any>;
   loadingVisit$: Observable<boolean>;
@@ -143,12 +147,6 @@ export class SharedPatientDashboardComponent implements OnInit {
     this.onStartConsultation(this.activeVisit);
     this.store.dispatch(loadOrderTypes());
     this.orderTypes$ = this.store.select(getAllOrderTypes);
-    this.applicableForms = getApplicableForms(
-      ICARE_CONFIG,
-      this.currentUser,
-      this.formPrivilegesConfigs,
-      this.userPrivileges
-    );
     this.store.dispatch(
       loadCustomOpenMRSForms({
         formUuids: this.currentLocation?.forms,
@@ -307,7 +305,7 @@ export class SharedPatientDashboardComponent implements OnInit {
               fromClinic: true,
               facilityDetails: facilityDetails,
               observations: observations,
-              generalPrescriptionOrderType: generalPrescriptionOrderType
+              generalPrescriptionOrderType: generalPrescriptionOrderType,
             },
             disableClose: false,
           });

@@ -20,6 +20,7 @@ export class PatientMedicationSummaryComponent implements OnInit {
   @Input() patientVisit: Visit;
   @Input() forConsultation: boolean;
   @Input() fromDispensing: boolean;
+  @Input() isInpatient: boolean;
   drugOrders$: Observable<any[]>;
   patientVisitData$: Observable<any>;
   generalPrescriptionOrderType$: Observable<any>;
@@ -73,7 +74,7 @@ export class PatientMedicationSummaryComponent implements OnInit {
     });
 
     dialog.afterClosed().subscribe((data) => {
-      if(data?.updateConsultationOrder){
+      if (data?.updateConsultationOrder) {
         this.updateConsultationOrder.emit();
       }
     });
