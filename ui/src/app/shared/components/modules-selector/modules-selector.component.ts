@@ -32,29 +32,32 @@ export class ModulesSelectorComponent implements OnInit {
       localStorage.getItem("navigationDetails") != "undefined"
         ? JSON.parse(localStorage.getItem("navigationDetails"))
         : null;
-    let locationMatchingNavigationDetails = (this.locations.filter(
-      (location) =>
-        (
-          location?.modules.filter(
-            (module) =>
-              storedNavigationDetails?.path[0]?.indexOf(module?.id) > -1
-          ) || []
-        )?.length > 0
-    ) || [])[0];
+    let locationMatchingNavigationDetails =
+      storedNavigationDetails?.path[0] !== ""
+        ? (this.locations.filter(
+            (location) =>
+              (
+                location?.modules.filter(
+                  (module) =>
+                    storedNavigationDetails?.path[0]?.indexOf(module?.id) > -1
+                ) || []
+              )?.length > 0
+          ) || [])[0]
+        : null;
 
     const storedLocation =
       localStorage.getItem("currentLocation") == "undefined" ||
       !localStorage.getItem("currentLocation")
         ? null
         : JSON.parse(localStorage.getItem("currentLocation"));
-    if (storedNavigationDetails) {
+    if (storedNavigationDetails && locationMatchingNavigationDetails) {
       this.currentLocation = locationMatchingNavigationDetails;
 
       // this.store.dispatch(
       //   setCurrentUserCurrentLocation({ location: this.currentLocation })
       // );
       const modules = (
-        this.currentLocation.attributes?.filter(
+        this.currentLocation?.attributes?.filter(
           (attribute) =>
             attribute?.attributeType?.display?.toLowerCase() === "modules" &&
             !attribute?.voided

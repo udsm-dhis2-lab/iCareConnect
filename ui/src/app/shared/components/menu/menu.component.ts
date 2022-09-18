@@ -36,6 +36,7 @@ import { AuthService } from "src/app/core/services/auth.service";
 import { formatCurrentUserDetails } from "src/app/core/helpers";
 import { initiateEncounterType } from "src/app/store/actions/encounter-type.actions";
 import { getLISConfigurations } from "src/app/store/selectors/lis-configurations.selectors";
+import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 
 @Component({
   selector: "app-menu",
@@ -56,16 +57,21 @@ export class MenuComponent implements OnInit {
 
   userLocationsUuids: string[];
   userAssignedLocationsLoadedState$: Observable<boolean>;
+  googleFormLink$: Observable<string>;
   constructor(
     private router: Router,
     public dialog: MatDialog,
     private store: Store<AppState>,
-    private authService: AuthService
+    private authService: AuthService,
+    private systemSettingsService: SystemSettingsService
   ) {
     this.store.dispatch(loadLoginLocations()); // This is also a main location
   }
 
   ngOnInit(): void {
+    this.googleFormLink$ = this.systemSettingsService.getSystemSettingsByKey(
+      "iCare.general.systemSettings.support.googleFormLink"
+    );
     this.lisConfigurations$ = this.store.select(getLISConfigurations);
 
     this.authService.getSession().subscribe((sessionResponse) => {
