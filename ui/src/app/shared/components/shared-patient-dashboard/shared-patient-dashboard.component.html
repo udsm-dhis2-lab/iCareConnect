@@ -147,6 +147,14 @@
               Assign Bed
             </button>
             <button
+              (click)="onDischargePatient($event)"
+              *ngIf="activeVisit?.isAdmitted && isInpatient"
+              mat-stroked-button
+              class="mr-2 float-right"
+            >
+              Discharge
+            </button>
+            <button
               *ngIf="!isInpatient"
               mat-stroked-button
               (click)="

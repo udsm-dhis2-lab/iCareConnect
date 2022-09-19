@@ -188,6 +188,15 @@
                 bedOrdersWithBillStatus
               )
             "
+            (dichargePatient)="
+              dischargePatient(
+                $event,
+                activeVisit,
+                currentPatient,
+                provider,
+                lastBedOrder
+              )
+            "
           ></app-shared-patient-dashboard>
           <div
             class="alert alert-danger mt-2"

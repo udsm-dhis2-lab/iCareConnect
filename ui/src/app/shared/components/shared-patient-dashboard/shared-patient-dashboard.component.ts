@@ -134,6 +134,8 @@ export class SharedPatientDashboardComponent implements OnInit {
   useGeneralPrescription$: Observable<any>;
 
   @Output() assignBed: EventEmitter<boolean> = new EventEmitter<boolean>();
+  @Output() dichargePatient: EventEmitter<boolean> =
+    new EventEmitter<boolean>();
   constructor(
     private store: Store<AppState>,
     private dialog: MatDialog,
@@ -404,5 +406,10 @@ export class SharedPatientDashboardComponent implements OnInit {
   onAssignBed(event: Event): void {
     event.stopPropagation();
     this.assignBed.emit(true);
+  }
+
+  onDischargePatient(event: Event): void {
+    event.stopPropagation();
+    this.dichargePatient.emit(true);
   }
 }
