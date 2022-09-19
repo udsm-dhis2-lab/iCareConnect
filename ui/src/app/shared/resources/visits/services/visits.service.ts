@@ -118,6 +118,33 @@ export class VisitsService {
       );
   }
 
+  getAdmittedPatientsVisits(locationUuids): Observable<any> {
+    return zip(
+      ...locationUuids.map((locationUuid) => {
+        return from(
+          this.api.visit.getAllVisits({
+            includeInactive: false,
+            location: locationUuid,
+            v: "custom:(uuid,startDatetime,stopDatetime,location:(uuid,display),patient:(uuid,display,identifiers,person,voided)",
+          } as any)
+        ).pipe(
+          map((visitResults: any) => {
+            return visitResults?.results.map((result) => {
+              return {
+                ...result,
+                locationUuid: result?.location?.uuid,
+              };
+            });
+          })
+        );
+      })
+    ).pipe(
+      map((responses) => {
+        return keyBy(flatten(responses), "locationUuid");
+      })
+    );
+  }
+
   getAllVisits(
     location?: string | string[],
     includeInactive?: boolean,

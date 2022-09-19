@@ -138,6 +138,23 @@
               />
             </span>
             <button
+              *ngIf="isInpatient"
+              [disabled]="!activeVisit?.waitingToBeAdmitted"
+              mat-stroked-button
+              class="mr-2 float-right"
+              (click)="onAssignBed($event)"
+            >
+              Assign Bed
+            </button>
+            <button
+              (click)="onDischargePatient($event)"
+              *ngIf="activeVisit?.isAdmitted && isInpatient"
+              mat-stroked-button
+              class="mr-2 float-right"
+            >
+              Discharge
+            </button>
+            <button
               *ngIf="!isInpatient"
               mat-stroked-button
               (click)="

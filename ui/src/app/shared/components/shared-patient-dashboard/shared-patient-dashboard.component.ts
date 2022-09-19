@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { Observable } from "rxjs";
 import { ICARE_CONFIG } from "src/app/shared/resources/config";
@@ -10,6 +10,7 @@ import {
   go,
   loadCustomOpenMRSForms,
   loadForms,
+  loadLocationsByTagNames,
   loadOrderTypes,
   startConsultation,
 } from "src/app/store/actions";
@@ -132,6 +133,10 @@ export class SharedPatientDashboardComponent implements OnInit {
   generalPrescriptionOrderType$: Observable<any>;
   useGeneralPrescription$: Observable<any>;
   showPrintButton: boolean;
+
+  @Output() assignBed: EventEmitter<boolean> = new EventEmitter<boolean>();
+  @Output() dichargePatient: EventEmitter<boolean> =
+    new EventEmitter<boolean>();
   constructor(
     private store: Store<AppState>,
     private dialog: MatDialog,
@@ -227,6 +232,12 @@ export class SharedPatientDashboardComponent implements OnInit {
       );
     this.facilityDetails$ = this.configService.getFacilityDetails();
     this.facilityDetails$ = this.userService.getLoginLocations();
+
+    this.store.dispatch(
+      loadLocationsByTagNames({
+        tagNames: ["Transfer+Location", "Refer-to+Location"],
+      })
+    );
   }
 
   onToggleVitalsSummary(event: Event): void {
@@ -394,5 +405,15 @@ export class SharedPatientDashboardComponent implements OnInit {
         }
       });
     }
+  }
+
+  onAssignBed(event: Event): void {
+    event.stopPropagation();
+    this.assignBed.emit(true);
+  }
+
+  onDischargePatient(event: Event): void {
+    event.stopPropagation();
+    this.dichargePatient.emit(true);
   }
 }
