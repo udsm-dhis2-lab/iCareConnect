@@ -131,6 +131,7 @@ export class SharedPatientDashboardComponent implements OnInit {
   facilityDetails$: Observable<any>;
   generalPrescriptionOrderType$: Observable<any>;
   useGeneralPrescription$: Observable<any>;
+  showPrintButton: boolean;
   constructor(
     private store: Store<AppState>,
     private dialog: MatDialog,
@@ -289,9 +290,11 @@ export class SharedPatientDashboardComponent implements OnInit {
     facilityDetails,
     observations,
     generalPrescriptionOrderType,
-    useGeneralPrescription
+    useGeneralPrescription,
+    showPrintButton: boolean
   ): void {
     event.stopPropagation();
+    this.showPrintButton = showPrintButton;
     this.systemSettingsService
       .getSystemSettingsMatchingAKey("iCare.clinic.deathRegistry.form.causes")
       .subscribe((response) => {
@@ -314,6 +317,7 @@ export class SharedPatientDashboardComponent implements OnInit {
               facilityDetails: facilityDetails,
               observations: observations,
               generalPrescriptionOrderType: generalPrescriptionOrderType,
+              showPrintButton,
             },
             disableClose: false,
           });
