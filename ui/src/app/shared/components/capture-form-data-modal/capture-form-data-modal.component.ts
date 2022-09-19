@@ -14,8 +14,17 @@ import {
 } from "src/app/store/actions/observation.actions";
 import { loadActiveVisit } from "src/app/store/actions/visit.actions";
 import { AppState } from "src/app/store/reducers";
-import { getAllDiagnoses, getCurrentLocation, getLocationsByTagName, getParentLocation, getParentLocationTree } from "src/app/store/selectors";
-import { getCurrentUserDetails, getProviderDetails } from "src/app/store/selectors/current-user.selectors";
+import {
+  getAllDiagnoses,
+  getCurrentLocation,
+  getLocationsByTagName,
+  getParentLocation,
+  getParentLocationTree,
+} from "src/app/store/selectors";
+import {
+  getCurrentUserDetails,
+  getProviderDetails,
+} from "src/app/store/selectors/current-user.selectors";
 import {
   getCustomOpenMRSFormById,
   getFormsLoadingState,
@@ -57,6 +66,7 @@ export class CaptureFormDataModalComponent implements OnInit {
   encounterObject: any;
   deathRegistryFormUuid$: Observable<string>;
   causesOfDeathConcepts: any[];
+  showPrintButton: boolean;
   // Change logic to handle is valid (At least use form field required property)
   isValid: boolean = false;
 
@@ -83,6 +93,7 @@ export class CaptureFormDataModalComponent implements OnInit {
     this.currentLocation = data?.currentLocation;
     this.causesOfDeathConcepts = data?.causesOfDeathConcepts;
     this.observations = data?.observations;
+    this.showPrintButton = data?.showPrintButton;
     this.store.dispatch(
       loadCustomOpenMRSForm({
         formUuid: data?.form?.formUuid,
@@ -121,7 +132,7 @@ export class CaptureFormDataModalComponent implements OnInit {
       this.systemSettingsService.getSystemSettingsMatchingAKey(
         "iCare.forms.referralForm"
       );
-    
+
     this.diagnoses$ = this.store.select(getAllDiagnoses);
 
     this.drugsPrescribed = this.visit?.otherOrders.filter((order) => {
@@ -129,9 +140,9 @@ export class CaptureFormDataModalComponent implements OnInit {
         order?.order?.orderType?.uuid ===
         this.data?.generalPrescriptionOrderType
       ) {
-        return order
+        return order;
       }
-    })
+    });
   }
 
   onClose(e) {
@@ -367,7 +378,9 @@ export class CaptureFormDataModalComponent implements OnInit {
 
     //Loop over data to generate HTML table data
     this.drugsPrescribed.forEach((drug) => {
-      drugs = drugs + `
+      drugs =
+        drugs +
+        `
         <tr>
           <td>${drugsCounter}</td>
           <td>${drug?.order?.display}</td>
@@ -375,9 +388,11 @@ export class CaptureFormDataModalComponent implements OnInit {
       `;
       drugsCounter = drugsCounter + 1;
     });
-    
+
     observations.forEach((observation) => {
-      observation = observation + `
+      observation =
+        observation +
+        `
         <tr>
           <td>${obsCounter}</td>
           <td>${observation?.latest?.value}</td>
@@ -385,22 +400,26 @@ export class CaptureFormDataModalComponent implements OnInit {
       `;
       obsCounter = obsCounter + 1;
     });
-    
+
     e?.Diagnoses.forEach((diagnosis) => {
       if (diagnosis?.certainty === "PROVISIONAL") {
-        provisionalDiagnoses = provisionalDiagnoses +`
+        provisionalDiagnoses =
+          provisionalDiagnoses +
+          `
           <tr>
             <td>${provisionalDiagnosesCounter}</td>
             <td>${diagnosis?.display}</td>
           </tr>
           `;
-          provisionalDiagnosesCounter = provisionalDiagnosesCounter + 1;
+        provisionalDiagnosesCounter = provisionalDiagnosesCounter + 1;
       }
     });
-    
+
     e?.Diagnoses.forEach((diagnosis) => {
       if (diagnosis?.certainty === "CONFIRMED") {
-        confirmedDiagnoses = confirmedDiagnoses + `
+        confirmedDiagnoses =
+          confirmedDiagnoses +
+          `
           <tr>
             <td>${confirmedDiagnosesCounter}</td>
             <td>${diagnosis?.display}</td>
@@ -411,7 +430,9 @@ export class CaptureFormDataModalComponent implements OnInit {
     });
 
     this.visit.labOrders.forEach((labOrder) => {
-      labOrders = labOrders + `
+      labOrders =
+        labOrders +
+        `
         <tr>
           <td>${labOrdersCounter}</td>
           <td>${labOrder?.order?.display}</td>
@@ -445,8 +466,10 @@ export class CaptureFormDataModalComponent implements OnInit {
     });
 
     //Generate contents to be placed in HTML form to be generated
-    
-    drugs = drugs.length > 0 ? `
+
+    drugs =
+      drugs.length > 0
+        ? `
         <div>
             <h5>Drugs Prescribed</h5>
           </div>
@@ -460,8 +483,9 @@ export class CaptureFormDataModalComponent implements OnInit {
             <tbody>
               ${drugs}
             </tbody>
-          </table>` : drugs;
-    
+          </table>`
+        : drugs;
+
     observation =
       observation.length > 0
         ? `
@@ -587,8 +611,8 @@ export class CaptureFormDataModalComponent implements OnInit {
         <div class="row details text-small">
           <div class="details-1">
             <p>P.O Box ${e?.FacilityDetails?.postalCode}, ${
-              e?.FacilityDetails?.stateProvince
-            }</p>
+      e?.FacilityDetails?.stateProvince
+    }</p>
             <p>Direct: ............................................</p>
             <p>Email: ...........................................</p>
           </div>
@@ -599,8 +623,8 @@ export class CaptureFormDataModalComponent implements OnInit {
             </p>
             <p>
               Other Names: ${e?.CurrentPatient?.fname} ${
-              e?.CurrentPatient?.mname
-            }
+      e?.CurrentPatient?.mname
+    }
             </p>
             <p>
               Address:

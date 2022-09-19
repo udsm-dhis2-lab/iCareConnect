@@ -1,8 +1,8 @@
-import { Component, EventEmitter, OnInit, Output, Input } from '@angular/core';
-import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs';
-import { AppState } from 'src/app/store/reducers';
-import { getCurrentUserDetails } from 'src/app/store/selectors/current-user.selectors';
+import { Component, EventEmitter, OnInit, Output, Input } from "@angular/core";
+import { Store } from "@ngrx/store";
+import { Observable } from "rxjs";
+import { AppState } from "src/app/store/reducers";
+import { getCurrentUserDetails } from "src/app/store/selectors/current-user.selectors";
 
 @Component({
   selector: "app-print-button",
@@ -19,7 +19,7 @@ export class PrintButtonComponent implements OnInit {
   @Input() ElementToBePrinted: any;
 
   @Output() print = new EventEmitter();
-  currentUser:any
+  currentUser: any;
   todaysDate: string;
 
   constructor(private store: Store<AppState>) {}
@@ -53,17 +53,16 @@ export class PrintButtonComponent implements OnInit {
   }
 
   onPrint() {
-    
-    if(this.ElementToBePrinted) {
-      this.ElementToBePrinted['CurrentUser'] = this.currentUser
-      this.ElementToBePrinted['PrintingDate'] = this.todaysDate
+    if (this.ElementToBePrinted) {
+      this.ElementToBePrinted["CurrentUser"] = this.currentUser;
+      this.ElementToBePrinted["PrintingDate"] = this.todaysDate;
     } else {
       this.ElementToBePrinted = {
         CurrentUser: this.currentUser,
-        PrintingDate: this.todaysDate
-      }
+        PrintingDate: this.todaysDate,
+      };
     }
-
+    //console.log("the elemets ", this.ElementToBePrinted);
     this.print.emit(this.ElementToBePrinted);
   }
 }
