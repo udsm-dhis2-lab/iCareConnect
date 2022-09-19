@@ -14,7 +14,11 @@ import { Patient } from "src/app/shared/resources/patient/models/patient.model";
 import { Visit } from "src/app/shared/resources/visits/models/visit.model";
 import { admitPatient, loadLocationById } from "src/app/store/actions";
 import { AppState } from "src/app/store/reducers";
-import { getLocationById, getOrderTypesByName } from "src/app/store/selectors";
+import {
+  getAllLocationsUnderWardAsFlatArray,
+  getLocationById,
+  getOrderTypesByName,
+} from "src/app/store/selectors";
 import {
   getAdmissionStatusOfCurrentPatient,
   getAdmittingLoadingState,
@@ -42,6 +46,7 @@ export class AssignBedToPatientComponent implements OnInit {
   orderType$: Observable<any>;
   loadingVisit$: Observable<boolean>;
   currentLocation$: Observable<any>;
+  locationsIds$: Observable<string[]>;
   constructor(
     private dialogRef: MatDialogRef<AssignBedToPatientComponent>,
     @Inject(MAT_DIALOG_DATA) data,
@@ -71,6 +76,13 @@ export class AssignBedToPatientComponent implements OnInit {
     this.orderType$ = this.store.select(getOrderTypesByName, {
       name: "Bed Order",
     });
+    this.locationsIds$ = this.store.select(
+      getAllLocationsUnderWardAsFlatArray,
+      {
+        id: this.currentLocationId,
+        tagName: "Bed Location",
+      }
+    );
   }
 
   onClose(e) {

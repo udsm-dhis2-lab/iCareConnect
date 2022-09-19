@@ -105,44 +105,11 @@ export class InpatientComponent implements OnInit {
       this.bedOrdersWithBillStatus
     );
 
-    this.applicableForms = getApplicableForms(
-      ICARE_CONFIG,
-      this.currentUser,
-      this.formPrivilegesConfigs,
-      this.userPrivileges
-    );
-
     const locationFormsAttributes =
       this.bedsByLocationDetails.attributes.filter(
         (attribute) =>
           attribute?.attributeType?.display.toLowerCase() === "forms"
       ) || [];
-    const formsAssignedToCurrentLocation =
-      locationFormsAttributes?.length > 0
-        ? locationFormsAttributes.map((attribute) => attribute?.value)
-        : [];
-    const formUuids = map(this.applicableForms, (form) => {
-      return form?.id;
-    }).filter(
-      (formId) =>
-        formsAssignedToCurrentLocation?.length > 0 &&
-        (
-          formsAssignedToCurrentLocation.filter(
-            (assignedFormId) => assignedFormId === formId
-          ) || []
-        )?.length > 0
-    );
-    this.store.dispatch(
-      loadCustomOpenMRSForms({
-        formUuids: formUuids,
-      })
-    );
-
-    this.forms$ = this.store.select(getCustomOpenMRSFormsByIds, {
-      formUUids: map(this.applicableForms, (form) => {
-        return form?.id;
-      }),
-    });
 
     this.observations$ = this.store.select(getGroupedObservationByConcept);
     this.savingObservations$ = this.store.pipe(
