@@ -178,6 +178,15 @@
             [iCareGeneralConfigurations]="params?.iCareGeneralConfigurations"
             [currentLocation]="params?.currentLocation"
             [isInpatient]="true"
+            (assignBed)="
+              onAssignBed(
+                bedsByLocationDetails,
+                currentPatient,
+                provider,
+                activeVisit,
+                bedOrdersWithBillStatus
+              )
+            "
           ></app-shared-patient-dashboard>
           <div
             class="alert alert-danger mt-2"

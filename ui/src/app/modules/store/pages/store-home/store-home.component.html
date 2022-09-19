@@ -11,10 +11,7 @@
     <!-- store sidebar -->
     <div class="store-sidebar">
       <mat-card class="p-0 border">
-        <h3 class="pl-3 pt-3 pr-3">
-          Store: {{ params?.currentStore?.name }}
-          {{ params?.currentStore?.isMainStore }}
-        </h3>
+        <h3 class="pl-3 pt-3 pr-3">Store: {{ params?.currentStore?.name }}</h3>
         <mat-nav-list>
           <ng-container *ngFor="let storePage of storePages">
             <mat-list-item

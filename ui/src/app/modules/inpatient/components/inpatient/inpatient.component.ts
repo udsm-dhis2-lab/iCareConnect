@@ -165,6 +165,22 @@ export class InpatientComponent implements OnInit {
     this.currentLocation$ = this.store.select(getCurrentLocation);
   }
 
+  onAssignBed(location, patient, provider, visit, bedOrdersWithBillStatus) {
+    this.dialog.open(AssignBedToPatientComponent, {
+      width: "70%",
+      maxHeight: "570px",
+      data: {
+        location,
+        patient,
+        provider,
+        visit,
+        bedOrdersWithBillStatus,
+      },
+      disableClose: true,
+      panelClass: "custom-dialog-container",
+    });
+  }
+
   onAdmit(e, location, patient, provider, visit, bedOrdersWithBillStatus) {
     e.stopPropagation();
     this.dialog.open(AssignBedToPatientComponent, {
