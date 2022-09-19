@@ -66,6 +66,7 @@
         </mat-toolbar>
         <app-wards-list
           [locationBedsDetails]="params?.bedsByLocationDetails"
+          [locationsIds]="params?.locationsIds"
           [currentLocation]="currentLocation"
           (bedStatus)="onGetBedStatus($event, params?.orderType)"
         ></app-wards-list>
