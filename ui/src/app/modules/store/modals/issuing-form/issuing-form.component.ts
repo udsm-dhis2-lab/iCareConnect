@@ -38,40 +38,40 @@ export class IssuingFormComponent implements OnInit {
       .subscribe((response) => {
         if (response) {
           this.eligibleQuantity = response?.eligibleQuantity;
-          this.issueFormFields = [
-            new Textbox({
-              id: "item",
-              label: "Item",
-              key: "item",
-              disabled: true,
-              value: this.data?.issue?.name,
-            }),
-            new Textbox({
-              id: "requesting_store",
-              key: "requestingStore",
-              label: "Requesting Store",
-              disabled: true,
-              value: this.data?.issue?.requestingLocation?.name,
-            }),
-            new Textbox({
-              id: "requested_store",
-              key: "requestedStore",
-              label: "Requested Store",
-              disabled: true,
-              value: this.data?.issue?.requestedLocation?.name,
-            }),
-            new Textbox({
-              id: "quantity",
-              key: "quantity",
-              required: true,
-              label: `Quantity max(${this.data?.issue?.quantityRequested})`,
-              type: "number",
-              min: 0,
-              max: this.data?.issue?.quantityRequested,
-            }),
-          ];
         }
       });
+    this.issueFormFields = [
+      new Textbox({
+        id: "item",
+        label: "Item",
+        key: "item",
+        disabled: true,
+        value: this.data?.issue?.name,
+      }),
+      new Textbox({
+        id: "requesting_store",
+        key: "requestingStore",
+        label: "Requesting Store",
+        disabled: true,
+        value: this.data?.issue?.requestingLocation?.name,
+      }),
+      new Textbox({
+        id: "requested_store",
+        key: "requestedStore",
+        label: "Requested Store",
+        disabled: true,
+        value: this.data?.issue?.requestedLocation?.name,
+      }),
+      new Textbox({
+        id: "quantity",
+        key: "quantity",
+        required: true,
+        label: `Quantity max(${this.data?.issue?.quantityRequested})`,
+        type: "number",
+        min: 0,
+        max: this.data?.issue?.quantityRequested,
+      }),
+    ];
   }
 
   onCancel(e: Event): void {
