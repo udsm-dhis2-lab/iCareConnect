@@ -3,7 +3,8 @@
     admissionStatus: admissionStatus$ | async,
     orderType: orderType$ | async,
     loadingVisit: loadingVisit$ | async,
-    currentLocation: currentLocation$ | async
+    currentLocation: currentLocation$ | async,
+    locationsIds: locationsIds$ | async
   } as admissionParams"
 >
   <!-- {{ admissionParams?.currentLocation | json }} -->
@@ -27,6 +28,7 @@
         [currentLocation]="admissionParams?.currentLocation"
         [locationBedsDetails]="admissionParams?.currentLocation"
         [bedOrdersWithBillStatus]="bedOrdersWithBillStatus"
+        [locationsIds]="admissionParams?.locationsIds"
         (bedStatus)="onGetBedStatus($event, admissionParams?.orderType)"
       ></app-wards-list>
     </div>

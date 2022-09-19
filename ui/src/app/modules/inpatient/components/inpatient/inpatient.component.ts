@@ -105,44 +105,11 @@ export class InpatientComponent implements OnInit {
       this.bedOrdersWithBillStatus
     );
 
-    this.applicableForms = getApplicableForms(
-      ICARE_CONFIG,
-      this.currentUser,
-      this.formPrivilegesConfigs,
-      this.userPrivileges
-    );
-
     const locationFormsAttributes =
       this.bedsByLocationDetails.attributes.filter(
         (attribute) =>
           attribute?.attributeType?.display.toLowerCase() === "forms"
       ) || [];
-    const formsAssignedToCurrentLocation =
-      locationFormsAttributes?.length > 0
-        ? locationFormsAttributes.map((attribute) => attribute?.value)
-        : [];
-    const formUuids = map(this.applicableForms, (form) => {
-      return form?.id;
-    }).filter(
-      (formId) =>
-        formsAssignedToCurrentLocation?.length > 0 &&
-        (
-          formsAssignedToCurrentLocation.filter(
-            (assignedFormId) => assignedFormId === formId
-          ) || []
-        )?.length > 0
-    );
-    this.store.dispatch(
-      loadCustomOpenMRSForms({
-        formUuids: formUuids,
-      })
-    );
-
-    this.forms$ = this.store.select(getCustomOpenMRSFormsByIds, {
-      formUUids: map(this.applicableForms, (form) => {
-        return form?.id;
-      }),
-    });
 
     this.observations$ = this.store.select(getGroupedObservationByConcept);
     this.savingObservations$ = this.store.pipe(
@@ -163,6 +130,22 @@ export class InpatientComponent implements OnInit {
     this.loadingVisit$ = this.store.pipe(select(getVisitLoadingState));
     this.activeVisit$ = this.store.pipe(select(getActiveVisit));
     this.currentLocation$ = this.store.select(getCurrentLocation);
+  }
+
+  onAssignBed(location, patient, provider, visit, bedOrdersWithBillStatus) {
+    this.dialog.open(AssignBedToPatientComponent, {
+      width: "70%",
+      maxHeight: "570px",
+      data: {
+        location,
+        patient,
+        provider,
+        visit,
+        bedOrdersWithBillStatus,
+      },
+      disableClose: true,
+      panelClass: "custom-dialog-container",
+    });
   }
 
   onAdmit(e, location, patient, provider, visit, bedOrdersWithBillStatus) {
@@ -252,7 +235,6 @@ export class InpatientComponent implements OnInit {
     provider,
     lastBedOrder
   ) {
-    event.stopPropagation();
     this.dialog.open(DischargePatientModalComponent, {
       width: "30%",
       data: {
