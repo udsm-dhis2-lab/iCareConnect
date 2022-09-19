@@ -235,7 +235,6 @@ export class InpatientComponent implements OnInit {
     provider,
     lastBedOrder
   ) {
-    event.stopPropagation();
     this.dialog.open(DischargePatientModalComponent, {
       width: "30%",
       data: {
