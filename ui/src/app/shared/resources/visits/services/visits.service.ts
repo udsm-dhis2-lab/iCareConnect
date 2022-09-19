@@ -496,7 +496,7 @@ export class VisitsService {
     shouldIncludeEncounter?: boolean
   ): Observable<any> {
     const encounters = shouldIncludeEncounter
-      ? "encounters:(display,diagnoses,obs,orders,encounterDatetime,encounterType,location)"
+      ? "encounters:(display,diagnoses,obs,orders,encounterDatetime,encounterType,location),"
       : "";
     return from(
       this.api.visit.getAllVisits({
