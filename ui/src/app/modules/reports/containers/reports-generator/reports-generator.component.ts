@@ -102,7 +102,11 @@ export class ReportsGeneratorComponent implements OnInit {
                 (reportCategoryAccess) =>
                   this.userPrivileges[reportCategoryAccess?.privilege]
               ) || []
-            )?.length > 0,
+            )?.length > 0
+              ? true
+              : this.userPrivileges["REPORT_ALL"]
+              ? true
+              : false,
         };
         return formattedReportCategory;
       })
@@ -194,7 +198,8 @@ export class ReportsGeneratorComponent implements OnInit {
               reportAccessConfig?.id === report?.id &&
               this.userPrivileges[reportAccessConfig?.privilege]
           ) || []
-        )?.length > 0
+        )?.length > 0 ||
+        this.userPrivileges["REPORT_ALL"]
       ) {
         return report;
       }
