@@ -43,7 +43,7 @@
       ></mat-progress-bar>
       <mat-dialog-actions align="end" class="mb-2 ml-2 mr-2">
         <button mat-stroked-button (click)="onClose($event)">Cancel</button>
-        <div *ngIf="data.fromClinic" class="ml-5">
+        <div *ngIf="data.fromClinic && showPrintButton" class="ml-5">
           <app-print-button
             [iconName]="'print'"
             [toolTipText]="'Click to print refereal form'"
@@ -58,6 +58,19 @@
             }"
             (print)="onPrint($event)"
           ></app-print-button>
+          <!-- <app-print-button
+            [iconName]="'print'"
+            [toolTipText]="'Click to print refereal form'"
+            [showText]="'Print Referral Form'"
+            [classesList]="['float-right', 'button', 'mr-5']"
+            (print)="onPrint($event)"
+            [ElementToBePrinted]="{
+              CurrentPatient: data?.patient,
+              ObservationsGroupedByConcept: params?.observations,
+              ReferralFormsConcepts: params?.referralFormsConcepts,
+              Diagnoses: params?.diagnoses
+            }"
+          ></app-print-button> -->
         </div>
         <button
           mat-flat-button
@@ -69,7 +82,7 @@
             color="primary"
             *ngIf="params?.savingObservations"
             [diameter]="20"
-            style="display: inline-block !important;"
+            style="display: inline-block !important"
           ></mat-spinner>
           {{ savingObservations ? "Saving ..." : "Save" }}
         </button>

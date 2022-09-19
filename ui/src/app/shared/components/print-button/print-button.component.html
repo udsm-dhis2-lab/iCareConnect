@@ -1,4 +1,9 @@
-<button class="{{classes}}" mat-stroked-button matTooltip="{{ toolTipText }}" (click)="onPrint()">   
-    <mat-icon *ngIf="iconName">{{iconName}}</mat-icon>
-    {{ showText}}
+<button
+  class="float-right button mr-5"
+  mat-stroked-button
+  matTooltip="{{ toolTipText }}"
+  (click)="onPrint()"
+>
+  <mat-icon *ngIf="iconName">{{ iconName }}</mat-icon
+  >Print Referral Form
 </button>
