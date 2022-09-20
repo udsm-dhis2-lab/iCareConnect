@@ -246,7 +246,9 @@ export class ReportsGeneratorComponent implements OnInit {
       ...this.reportSelectionParams,
       ...paramValue,
     };
-    this.count = Object.keys(this.reportSelectionParams).length;
+    this.count = Object.keys(this.reportSelectionParams).filter(
+      (keyItem) => this.reportSelectionParams[keyItem] !== undefined
+    ).length;
   }
 
   getDHIS2ReportsSent(event: Event): void {
