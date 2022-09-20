@@ -127,7 +127,9 @@
               [disabled]="
                 !currentReport ||
                 !currentReport?.name ||
-                !(selectedReportParameters?.length === count)
+                (selectedReportParameters && !reportsExtraParams
+                  ? selectedReportParameters?.length !== count
+                  : false)
               "
               class="ml-2"
               mat-flat-button
