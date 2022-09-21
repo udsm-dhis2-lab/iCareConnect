@@ -124,7 +124,14 @@
               />
             </button>
             <button
-              [disabled]="!currentReport || !currentReport?.name"
+              [disabled]="
+                !currentReport ||
+                !currentReport?.name ||
+                (reportSelectionParams
+                  ? selectedReportParameters?.length !== count
+                  : false) ||
+                !this.showReportButton
+              "
               class="ml-2"
               mat-flat-button
               color="primary"
@@ -139,16 +146,6 @@
             >
               Get Report
             </button>
-            <!--  --------- My ligic on report button ----
-            (selectedReportParameters
-            ? selectedReportParameters?.length !== count
-            : selectedReportParameters && reportsExtraParams
-            ? false
-            : period
-            ? false
-            : selectedReportParameters && reportFromSelectedGroup
-            ? false
-            : false) -->
 
             <span *ngIf="reportConfigs && reportConfigs?.dhisConfigs">
               <!-- {{ reportConfigs?.countOfReportsSent | json }} -->
