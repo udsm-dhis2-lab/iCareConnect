@@ -10,7 +10,7 @@ import org.openmrs.api.db.hibernate.DbSession;
 import org.openmrs.module.icare.core.ListResult;
 import org.openmrs.module.icare.core.Pager;
 import org.openmrs.module.icare.core.dao.BaseDAO;
-import org.openmrs.module.icare.laboratory.models.Sample;
+import org.openmrs.module.icare.laboratory.models.*;
 import org.springframework.stereotype.Repository;
 
 import java.text.SimpleDateFormat;
@@ -25,7 +25,8 @@ import java.util.List;
  */
 
 public class SampleDAO extends BaseDAO<Sample> {
-	
+
+
 	public List<Sample> getSamplesByVisit(String id) {
 		DbSession session = this.getSession();
 		String queryStr = "SELECT sp \n" + "FROM Sample sp \n"
@@ -175,5 +176,66 @@ public class SampleDAO extends BaseDAO<Sample> {
 		
 		return query.list();
 	}
-	
+
+	public  WorkloadSummary getWorkloadSummary(Date startDate, Date endDate) {
+
+		WorkloadSummary workloadSummary = new WorkloadSummary();
+
+		DbSession session = getSession();
+
+		if (startDate != null && endDate != null) {
+
+			String queryStr = "SELECT COUNT(sample) FROM Sample sample WHERE sample IN(SELECT testalloc.sampleOrder.id.sample FROM TestAllocation testalloc WHERE testalloc IN (SELECT testallocstatus.testAllocation FROM TestAllocationStatus testallocstatus WHERE testallocstatus.status='REJECTED')) AND (sample.dateCreated BETWEEN :startDate AND :endDate)";
+			Query query = session.createQuery(queryStr);
+			query.setParameter("startDate", startDate);
+			query.setParameter("endDate", endDate);
+			workloadSummary.setSamplesWithRejectedResults((long) query.list().get(0));
+
+			queryStr = "SELECT COUNT(sample) FROM Sample sample WHERE sample IN(SELECT testalloc.sampleOrder.id.sample FROM TestAllocation testalloc WHERE testalloc IN (SELECT testallocstatus.testAllocation FROM TestAllocationStatus testallocstatus WHERE testallocstatus.status='APPROVED' ) ) AND (sample.dateCreated BETWEEN :startDate AND :endDate) ";
+			query = session.createQuery(queryStr);
+			query.setParameter("startDate", startDate);
+			query.setParameter("endDate", endDate);
+			workloadSummary.setSamplesAuthorized((long) query.list().get(0));
+
+			queryStr = "SELECT COUNT(sample) FROM Sample sample WHERE sample IN(SELECT testalloc.sampleOrder.id.sample FROM TestAllocation testalloc WHERE testalloc IN (SELECT testresult.testAllocation FROM Result testresult) ) AND (sample.dateCreated BETWEEN :startDate AND :endDate) ";
+			query = session.createQuery(queryStr);
+			query.setParameter("startDate", startDate);
+			query.setParameter("endDate", endDate);
+			workloadSummary.setSamplesWithResults((long) query.list().get(0));
+
+			queryStr = "SELECT COUNT(sample) FROM Sample sample WHERE sample IN(SELECT testalloc.sampleOrder.id.sample FROM TestAllocation testalloc WHERE testalloc NOT IN (SELECT testresult.testAllocation FROM Result testresult) ) AND (sample.dateCreated BETWEEN :startDate AND :endDate) ";
+			query = session.createQuery(queryStr);
+			query.setParameter("startDate", startDate);
+			query.setParameter("endDate", endDate);
+			workloadSummary.setSamplesWithNoResults((long) query.list().get(0));
+
+
+		} else {
+
+			String queryStr = "SELECT COUNT(sample) FROM Sample sample WHERE sample IN(SELECT testalloc.sampleOrder.id.sample FROM TestAllocation testalloc WHERE testalloc IN (SELECT testallocstatus.testAllocation FROM TestAllocationStatus testallocstatus WHERE testallocstatus.status='REJECTED')) ";
+			Query query = session.createQuery(queryStr);
+			workloadSummary.setSamplesWithRejectedResults((long) query.list().get(0));
+
+			queryStr = "SELECT COUNT(sample) FROM Sample sample WHERE sample IN(SELECT testalloc.sampleOrder.id.sample FROM TestAllocation testalloc WHERE testalloc IN (SELECT testallocstatus.testAllocation FROM TestAllocationStatus testallocstatus WHERE testallocstatus.status='APPROVED' )) ";
+			query = session.createQuery(queryStr);
+			workloadSummary.setSamplesAuthorized((long) query.list().get(0));
+
+			queryStr = "SELECT COUNT(sample) FROM Sample sample WHERE sample IN(SELECT testalloc.sampleOrder.id.sample FROM TestAllocation testalloc WHERE testalloc IN (SELECT testresult.testAllocation FROM Result testresult) ) ";
+			query = session.createQuery(queryStr);
+			workloadSummary.setSamplesWithResults((long) query.list().get(0));
+
+			queryStr = "SELECT COUNT(sample) FROM Sample sample WHERE sample IN(SELECT testalloc.sampleOrder.id.sample FROM TestAllocation testalloc WHERE testalloc NOT IN (SELECT testresult.testAllocation FROM Result testresult) )  ";
+			query = session.createQuery(queryStr);
+			workloadSummary.setSamplesWithNoResults((long) query.list().get(0));
+
+
+
+		}
+
+		return workloadSummary;
+
+
+	}
+
+
 }
