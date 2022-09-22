@@ -22,6 +22,9 @@ export class ClinicPatientListComponent implements OnInit {
   settingCurrentLocationStatus$: Observable<boolean>;
   consultationOrderType$: Observable<any>;
   consultationEncounterType$: Observable<any>;
+  radiologyOrderType$: Observable<any>;
+  drugOrderType$: Observable<any>;
+  labTestOrderType$: Observable<any>;
   constructor(
     private store: Store<AppState>,
     private systemSettingsService: SystemSettingsService
@@ -41,6 +44,17 @@ export class ClinicPatientListComponent implements OnInit {
        this.systemSettingsService.getSystemSettingsByKey(
          "iCare.clinic.consultation.encounterType"
        );
+     this.radiologyOrderType$ =
+       this.systemSettingsService.getSystemSettingsByKey(
+         "iCare.clinic.radiology.radiologyOrderType"
+       );
+     this.drugOrderType$ = this.systemSettingsService.getSystemSettingsByKey(
+       "iCare.clinic.drug.drugOrderType"
+     );
+     
+     this.labTestOrderType$ = this.systemSettingsService.getSystemSettingsByKey(
+       "iCare.clinic.laboratory.labTestOrderType"
+     );
   }
 
   onSelectPatient(patient: any) {
