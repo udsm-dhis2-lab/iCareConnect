@@ -69,6 +69,7 @@ export class ReportsGeneratorComponent implements OnInit {
   showFullReportRenderingArea: boolean = false;
   isQuickPivotSet: boolean = false;
   count: number = 1;
+  showReportButton: boolean = false;
 
   selectedReportParameters: {
     order?: string;
@@ -102,7 +103,11 @@ export class ReportsGeneratorComponent implements OnInit {
                 (reportCategoryAccess) =>
                   this.userPrivileges[reportCategoryAccess?.privilege]
               ) || []
-            )?.length > 0,
+            )?.length > 0
+              ? true
+              : this.userPrivileges["REPORT_ALL"]
+              ? true
+              : false,
         };
         return formattedReportCategory;
       })
@@ -159,6 +164,7 @@ export class ReportsGeneratorComponent implements OnInit {
         })
       );
     }
+    period ? (this.showReportButton = true) : (this.showReportButton = false);
   }
 
   toggleReportArea(event: Event): void {
@@ -167,6 +173,7 @@ export class ReportsGeneratorComponent implements OnInit {
   }
 
   setReportCategory(reportCategory) {
+    this.showReportButton = false;
     this.selectedReportGroup = reportCategory;
     this.selectedReportParameters = null;
     this.reportSelectionParams = null;
@@ -194,7 +201,8 @@ export class ReportsGeneratorComponent implements OnInit {
               reportAccessConfig?.id === report?.id &&
               this.userPrivileges[reportAccessConfig?.privilege]
           ) || []
-        )?.length > 0
+        )?.length > 0 ||
+        this.userPrivileges["REPORT_ALL"]
       ) {
         return report;
       }
@@ -203,6 +211,7 @@ export class ReportsGeneratorComponent implements OnInit {
 
   onSelectReport(e, report) {
     e.stopPropagation();
+    this.showReportButton = false;
     this.store.dispatch(loadReportLogsByReportId({ reportId: report?.id }));
     // this.store.dispatch(clearReportSelections());
 
@@ -246,7 +255,12 @@ export class ReportsGeneratorComponent implements OnInit {
       ...this.reportSelectionParams,
       ...paramValue,
     };
-    this.count = Object.keys(this.reportSelectionParams).length;
+    this.count = Object.keys(this.reportSelectionParams).filter(
+      (keyItem) => this.reportSelectionParams[keyItem] !== undefined
+    ).length;
+    paramValue
+      ? (this.showReportButton = true)
+      : (this.showReportButton = false);
   }
 
   getDHIS2ReportsSent(event: Event): void {

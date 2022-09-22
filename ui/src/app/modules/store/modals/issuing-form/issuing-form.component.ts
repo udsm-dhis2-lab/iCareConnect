@@ -3,11 +3,13 @@ import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { Field } from "src/app/shared/modules/form/models/field.model";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
 import { Textbox } from "src/app/shared/modules/form/models/text-box.model";
+import { LocationGet } from "src/app/shared/resources/openmrs";
 import {
   IssueInput,
   IssuingObject,
 } from "src/app/shared/resources/store/models/issuing.model";
 import { RequisitionInput } from "src/app/shared/resources/store/models/requisition-input.model";
+import { StockService } from "src/app/shared/resources/store/services/stock.service";
 
 @Component({
   selector: "app-issuing-form",
@@ -17,13 +19,27 @@ import { RequisitionInput } from "src/app/shared/resources/store/models/requisit
 export class IssuingFormComponent implements OnInit {
   issuingFormValue: FormValue;
   issueFormFields: Field<string>[];
+  eligibleQuantity: number = 0;
+  quantityToIssue: number;
+  isFormValid: boolean = false;
   constructor(
     private dialogRef: MatDialogRef<IssuingFormComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { issue: IssuingObject }
+    @Inject(MAT_DIALOG_DATA)
+    public data: { issue: IssuingObject; currentStore: LocationGet },
+    private stockService: StockService
   ) {}
 
   ngOnInit() {
-    // TODO: Get stock status of the item and use it to control how issuing should go on
+    this.stockService
+      .getAvailableStockOfAnItem(
+        this.data?.issue?.itemUuid,
+        this.data?.currentStore?.uuid
+      )
+      .subscribe((response) => {
+        if (response) {
+          this.eligibleQuantity = response?.eligibleQuantity;
+        }
+      });
     this.issueFormFields = [
       new Textbox({
         id: "item",
@@ -49,6 +65,7 @@ export class IssuingFormComponent implements OnInit {
       new Textbox({
         id: "quantity",
         key: "quantity",
+        required: true,
         label: `Quantity max(${this.data?.issue?.quantityRequested})`,
         type: "number",
         min: 0,
@@ -82,5 +99,9 @@ export class IssuingFormComponent implements OnInit {
 
   onUpdateForm(formValue: FormValue): void {
     this.issuingFormValue = formValue;
+    this.isFormValid = this.issuingFormValue.isValid;
+    this.quantityToIssue = this.issuingFormValue.getValues()?.quantity
+      ? Number(this.issuingFormValue.getValues()?.quantity?.value)
+      : 0;
   }
 }

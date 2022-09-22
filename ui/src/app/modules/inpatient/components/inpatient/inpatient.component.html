@@ -124,7 +124,7 @@
       No any admission order has been ordered
     </p>
   </div> -->
-  <div
+  <!-- <div
     class="col-md-12"
     *ngIf="
       (bedOrdersWithBillStatus?.length !== 0 &&
@@ -133,8 +133,9 @@
         !activeVisit?.transferedOutSide) ||
       (activeVisit?.isAdmitted && !activeVisit?.transferedOutSide)
     "
-  >
-    <div
+  > -->
+  <div class="col-md-12">
+    <!-- <div
       class="loading-overlay"
       style="align-items: baseline"
       *ngIf="
@@ -148,7 +149,7 @@
           Patient Bed Payment is overdue, click continue for next payment
         </div>
       </div>
-    </div>
+    </div> -->
     <div class="row">
       <div class="col-12">
         <div
@@ -178,6 +179,24 @@
             [iCareGeneralConfigurations]="params?.iCareGeneralConfigurations"
             [currentLocation]="params?.currentLocation"
             [isInpatient]="true"
+            (assignBed)="
+              onAssignBed(
+                bedsByLocationDetails,
+                currentPatient,
+                provider,
+                activeVisit,
+                bedOrdersWithBillStatus
+              )
+            "
+            (dichargePatient)="
+              dischargePatient(
+                $event,
+                activeVisit,
+                currentPatient,
+                provider,
+                lastBedOrder
+              )
+            "
           ></app-shared-patient-dashboard>
           <div
             class="alert alert-danger mt-2"

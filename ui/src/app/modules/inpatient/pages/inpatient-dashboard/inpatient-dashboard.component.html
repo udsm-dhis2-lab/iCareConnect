@@ -16,7 +16,7 @@
 >
   <div>
     <mat-progress-bar
-      *ngIf="params?.loadingVisit"
+      *ngIf="params?.loadingVisit || !params?.patientBillingDetails"
       mode="indeterminate"
     ></mat-progress-bar>
     <div
@@ -39,8 +39,7 @@
           *ngIf="
             !params?.loadingVisit &&
             params?.currentLocation &&
-            params?.bedsByLocationDetails &&
-            params?.formPrivilegesConfigs
+            params?.bedsByLocationDetails
           "
           [activeVisit]="params?.activeVisit"
           [patientBillingDetails]="params?.patientBillingDetails"
@@ -49,7 +48,6 @@
           [provider]="params?.provider"
           [currentUser]="params?.currentUser"
           [userPrivileges]="params?.userPrivileges"
-          [formPrivilegesConfigs]="params?.formPrivilegesConfigs"
         ></app-inpatient>
 
         <mat-progress-bar
@@ -57,8 +55,7 @@
             params?.loadingVisit ||
             !params?.currentLocation ||
             !params?.bedsByLocationDetails ||
-            !params?.patientBillingDetails ||
-            !params?.formPrivilegesConfigs
+            !params?.patientBillingDetails
           "
           mode="indeterminate"
         ></mat-progress-bar>

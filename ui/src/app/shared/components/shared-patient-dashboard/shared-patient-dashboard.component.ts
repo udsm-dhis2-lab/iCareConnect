@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { Observable } from "rxjs";
 import { ICARE_CONFIG } from "src/app/shared/resources/config";
@@ -10,6 +10,7 @@ import {
   go,
   loadCustomOpenMRSForms,
   loadForms,
+  loadLocationsByTagNames,
   loadOrderTypes,
   startConsultation,
 } from "src/app/store/actions";
@@ -131,6 +132,11 @@ export class SharedPatientDashboardComponent implements OnInit {
   facilityDetails$: Observable<any>;
   generalPrescriptionOrderType$: Observable<any>;
   useGeneralPrescription$: Observable<any>;
+  showPrintButton: boolean;
+
+  @Output() assignBed: EventEmitter<boolean> = new EventEmitter<boolean>();
+  @Output() dichargePatient: EventEmitter<boolean> =
+    new EventEmitter<boolean>();
   constructor(
     private store: Store<AppState>,
     private dialog: MatDialog,
@@ -226,6 +232,12 @@ export class SharedPatientDashboardComponent implements OnInit {
       );
     this.facilityDetails$ = this.configService.getFacilityDetails();
     this.facilityDetails$ = this.userService.getLoginLocations();
+
+    this.store.dispatch(
+      loadLocationsByTagNames({
+        tagNames: ["Transfer+Location", "Refer-to+Location"],
+      })
+    );
   }
 
   onToggleVitalsSummary(event: Event): void {
@@ -257,7 +269,15 @@ export class SharedPatientDashboardComponent implements OnInit {
   clearBills(event: Event) {
     event.stopPropagation();
     this.store.dispatch(clearBills());
-    this.store.dispatch(go({ path: ["/clinic/patient-list"] }));
+    this.store.dispatch(
+      go({
+        path: [
+          !this.isInpatient
+            ? "/clinic/patient-list"
+            : "/inpatient/" + this.currentLocation?.uuid,
+        ],
+      })
+    );
   }
 
   viewPatientHistory(event: Event, patientUuid) {
@@ -281,9 +301,11 @@ export class SharedPatientDashboardComponent implements OnInit {
     facilityDetails,
     observations,
     generalPrescriptionOrderType,
-    useGeneralPrescription
+    useGeneralPrescription,
+    showPrintButton: boolean
   ): void {
     event.stopPropagation();
+    this.showPrintButton = showPrintButton;
     this.systemSettingsService
       .getSystemSettingsMatchingAKey("iCare.clinic.deathRegistry.form.causes")
       .subscribe((response) => {
@@ -306,6 +328,7 @@ export class SharedPatientDashboardComponent implements OnInit {
               facilityDetails: facilityDetails,
               observations: observations,
               generalPrescriptionOrderType: generalPrescriptionOrderType,
+              showPrintButton,
             },
             disableClose: false,
           });
@@ -382,5 +405,15 @@ export class SharedPatientDashboardComponent implements OnInit {
         }
       });
     }
+  }
+
+  onAssignBed(event: Event): void {
+    event.stopPropagation();
+    this.assignBed.emit(true);
+  }
+
+  onDischargePatient(event: Event): void {
+    event.stopPropagation();
+    this.dichargePatient.emit(true);
   }
 }

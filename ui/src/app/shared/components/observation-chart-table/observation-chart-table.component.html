@@ -2,6 +2,7 @@
   <table class="table table-bordered table-striped" *ngIf="selectedForm">
     <thead>
       <tr>
+        <th>Date & Time</th>
         <th *ngFor="let formField of selectedForm?.formFields">
           {{ formField?.name }}
           <span class="ml-2" *ngIf="formField?.concept?.units"
@@ -13,6 +14,9 @@
     </thead>
     <tbody>
       <tr *ngFor="let encounter of obsChartEncountersData">
+        <td>
+          {{ encounter?.encounterDatetime | date: "medium" }}
+        </td>
         <td *ngFor="let formField of selectedForm?.formFields">
           <!-- TODO: Add support to check if the value is valueObject -->
           {{ encounter?.obsKeyedByConcept[formField?.concept?.uuid]?.value }}
@@ -20,6 +24,7 @@
         <td></td>
       </tr>
       <tr>
+        <td></td>
         <td *ngFor="let formField of selectedForm?.formFields">
           <app-form
             *ngIf="

@@ -1,4 +1,7 @@
-<mat-card class="mat-elevation-z5 border">
+<mat-card
+  class="mat-elevation-z5 border"
+  *ngIf="userPrivileges$ | async as userPrivileges"
+>
   <div *ngIf="stock">
     <div>
       <div class="d-flex justify-content-between">
@@ -7,15 +10,19 @@
             <mat-icon>arrow_backward</mat-icon>
           </button>
           <span class="ml-2 span-fit"
-            ><b> {{ stock.batches?.length }}</b> Batches of
-            <b>{{ stock?.name }}</b></span
+            ><b> {{ stock?.batches?.length }}</b> Batches of
+            <b>{{ stock?.name ? stock?.name : stock?.item?.display }}</b></span
           >
         </div>
         <button
           mat-flat-button
           mat-button
           color="primary"
-          [disabled]="saving"
+          [disabled]="
+            saving ||
+            !(isCurrentLocationMainStore$ | async) ||
+            !userPrivileges['STORE_ADD_NEW_BATCH']
+          "
           (click)="onOpenBatchForm($event, 'ADD')"
           [style.height]="'40px'"
         >
@@ -44,9 +51,11 @@
             <div class="w-100 d-flex justify-content-center">No data</div>
           </td>
         </tr>
-        <tr *ngFor="let stockBatch of stock.batches; let batchIndex = index">
+        <tr *ngFor="let stockBatch of stock?.batches; let batchIndex = index">
           <td>{{ batchIndex + 1 }}</td>
-          <td>{{ stockBatch?.batchNo }}</td>
+          <td>
+            {{ stockBatch?.batchNo ? stockBatch?.batchNo : stockBatch?.batch }}
+          </td>
           <td>{{ stockBatch?.quantity }}</td>
           <td>-</td>
           <td>
@@ -61,7 +70,10 @@
                     ? 'The batch has expired'
                     : 'Add stock on this batch'
                 "
-                [disabled]="stockBatch?.expiryDate < today"
+                [disabled]="
+                  stockBatch?.expiryDate < today ||
+                  !userPrivileges['STORE_ADD_STOCK_ON_BATCH']
+                "
                 mat-flat-button
                 color="primary"
                 (click)="onOpenBatchForm($event, 'ADD', stockBatch)"
@@ -70,7 +82,9 @@
               </button>
               <button
                 [disabled]="
-                  stockBatch?.expiryDate < today || stockBatch?.quantity === 0
+                  stockBatch?.expiryDate < today ||
+                  stockBatch?.quantity === 0 ||
+                  !userPrivileges['STORE_DEDUCT_STOCK_FROM_BATCH']
                 "
                 [title]="
                   stockBatch?.quantity === 0

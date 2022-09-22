@@ -10,7 +10,7 @@
         <div
           class="{{
             field?.type !== 'number' ||
-            (!field.min && !field.max && !field?.units)
+            (!field.min && !field?.max && !field?.units)
               ? 'col-12'
               : 'col-10'
           }}"
@@ -18,7 +18,7 @@
           <app-field
             [field]="field"
             [form]="form"
-            [value]="values[field?.key]"
+            [value]="values && values[field?.key] ? values[field?.key] : null"
             [isReport]="isReport"
             [fieldClass]="fieldClass"
             [isCheckBoxButton]="shouldRenderAsCheckBoxesButton"
