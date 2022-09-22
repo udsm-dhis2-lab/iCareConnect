@@ -7,8 +7,10 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.openmrs.*;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.icare.core.Summary;
 import org.openmrs.module.icare.laboratory.dao.TestOrderLocationDAO;
 import org.openmrs.module.icare.laboratory.models.TestOrderLocation;
+import org.openmrs.module.icare.laboratory.models.WorkloadSummary;
 import org.openmrs.module.icare.laboratory.services.LaboratoryService;
 import org.openmrs.module.icare.web.controller.core.BaseResourceControllerTest;
 import org.openmrs.module.webservices.rest.SimpleObject;
@@ -383,6 +385,36 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		    is("mrdt result"));
 		assertThat("The observation value text should be positive", observations.get(0).getValueText(), is("positive"));
 		
+	}
+
+	@Test
+	public void testGettingSummaryWorkload() throws Exception{
+
+		//Given
+		String dto = this.readFile("dto/test-allocation-reject.json");
+		Map<String, Object> testAllocationStatus = (new ObjectMapper()).readValue(dto, Map.class);
+
+		//When
+		MockHttpServletRequest newPostRequest = newPostRequest("lab/allocationstatus", testAllocationStatus);
+		MockHttpServletResponse handle = handle(newPostRequest);
+
+		//When
+		MockHttpServletRequest newGetRequest = newGetRequest("lab/workloadsummary",new Parameter("startDate","2020-12-27"),new Parameter("endDate","2022-10-10"));
+		handle = handle(newGetRequest);
+
+		String workloadsummaryData = handle.getContentAsString();
+		Map summaryMap = (new ObjectMapper()).readValue(workloadsummaryData, Map.class);
+
+		List<Map> summaryDetails = (List<Map>) summaryMap.get("results");
+
+		System.out.println(summaryMap);
+
+		assertThat("Has 1 rejected sample", summaryMap.get("samplesWithRejectedResults").equals(1));
+		assertThat("Has 1 authorized sample", summaryMap.get("samplesAuthorized").equals(1));
+		assertThat("Has 1  no result sample", summaryMap.get("samplesWithNoResults").equals(1));
+		assertThat("Has 1 result sample", summaryMap.get("samplesWithResults").equals(1));
+
+
 	}
 	
 	@Override
