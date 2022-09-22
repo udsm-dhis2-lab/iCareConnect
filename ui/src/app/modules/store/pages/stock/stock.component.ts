@@ -7,7 +7,6 @@ import { OpenmrsHttpClientService } from "src/app/shared/modules/openmrs-http-cl
 import { LedgerInput } from "src/app/shared/resources/store/models/ledger-input.model";
 import { LedgerTypeObject } from "src/app/shared/resources/store/models/ledger-type.model";
 import { StockObject } from "src/app/shared/resources/store/models/stock.model";
-import { StockService } from "src/app/shared/resources/store/services/stock.service";
 import {
   clearStockData,
   loadStocks,
@@ -36,33 +35,19 @@ import { AddNewStockReceivedComponent } from "../../modals/add-new-stock-receive
   styleUrls: ["./stock.component.scss"],
 })
 export class StockComponent implements OnInit {
-  stocks$: Observable<StockObject[]>;
-  loadingStocks$: Observable<boolean>;
   currentStock$: Observable<StockObject>;
   ledgerTypes$: Observable<LedgerTypeObject[]>;
   currentStore$: Observable<any>;
-  savingLedger$: Observable<boolean>;
   isCurrentLocationMainStore$: Observable<boolean>;
-  billableItems$: Observable<any[]>;
   searchTerm: string = "";
   stockLoadedState$: Observable<boolean>;
   userPrivileges$: Observable<any>;
-  constructor(
-    private store: Store<AppState>,
-    private dialog: MatDialog,
-    private httpClient: OpenmrsHttpClientService,
-    private stockService: StockService
-  ) {}
+  constructor(private store: Store<AppState>) {}
 
   ngOnInit() {
     this.stockLoadedState$ = this.store.select(getStockLoadedState);
-    this.store.dispatch(clearStockData());
-    this.store.dispatch(loadStocks());
-    this.stocks$ = this.store.pipe(select(getAllStocks));
-    this.loadingStocks$ = this.store.pipe(select(getStockLoadingState));
     this.ledgerTypes$ = this.store.pipe(select(getAllLedgerTypes));
     this.currentStore$ = this.store.pipe(select(getCurrentLocation));
-    this.savingLedger$ = this.store.pipe(select(getLedgerSavingStatus));
     this.currentStock$ = this.store.pipe(select(getCurrentStock));
     this.isCurrentLocationMainStore$ = this.store.pipe(
       select(getIfCurrentLocationIsMainStore)
@@ -82,33 +67,5 @@ export class StockComponent implements OnInit {
     setTimeout(() => {
       this.currentStock$ = this.store.pipe(select(getCurrentStock));
     }, 200);
-  }
-
-  onAddNewStockRecevied(event, ledgerTypes, currentStore, billableItems) {
-    event.stopPropagation();
-    this.dialog
-      .open(AddNewStockReceivedComponent, {
-        width: "700px",
-        data: {
-          ledgerTypes,
-          currentStore,
-          billableItems,
-        },
-      })
-      .afterClosed()
-      .subscribe((shouldReloadStock) => {
-        if (shouldReloadStock) {
-          this.store.dispatch(loadStocks());
-          this.stocks$ = this.store.pipe(select(getAllStocks));
-          this.loadingStocks$ = this.store.pipe(select(getStockLoadingState));
-          this.billableItems$ = this.httpClient
-            .get("icare/item?limit=20&startIndex=0")
-            .pipe(
-              map((response) => {
-                return response?.results.filter((item) => item?.stockable);
-              })
-            );
-        }
-      });
   }
 }

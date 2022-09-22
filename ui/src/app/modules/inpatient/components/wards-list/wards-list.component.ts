@@ -4,6 +4,7 @@ import { Observable } from "rxjs";
 import { getBillingConceptUuid } from "src/app/core";
 import { Location } from "src/app/core/models";
 import { VisitObject } from "src/app/shared/resources/visits/models/visit-object.model";
+import { VisitsService } from "src/app/shared/resources/visits/services";
 import { loadLocationById } from "src/app/store/actions";
 import { AppState } from "src/app/store/reducers";
 import { getBedsGroupedByTheCurrentLocationChildren } from "src/app/store/selectors";
@@ -22,11 +23,15 @@ export class WardsListComponent implements OnInit {
   @Output() bedStatus = new EventEmitter<any>();
   @Input() locationBedsDetails: any;
   @Input() bedOrdersWithBillStatus: any[];
+  @Input() locationsIds: string[];
   wardsInfo$: Observable<Location[]>;
   admissionVisitsAdded$: Observable<boolean>;
   admittedPatientsVisits$: Observable<VisitObject[]>;
 
-  constructor(private store: Store<AppState>) {}
+  constructor(
+    private store: Store<AppState>,
+    private visitService: VisitsService
+  ) {}
 
   ngOnInit(): void {
     this.wardsInfo$ = this.store.select(
@@ -36,8 +41,8 @@ export class WardsListComponent implements OnInit {
       }
     );
 
-    this.admittedPatientsVisits$ = this.store.select(
-      getAllAdmittedPatientVisits
+    this.admittedPatientsVisits$ = this.visitService.getAdmittedPatientsVisits(
+      this.locationsIds
     );
 
     this.admissionVisitsAdded$ = this.store.select(

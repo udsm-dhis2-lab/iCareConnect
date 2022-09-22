@@ -49,7 +49,7 @@ public class Item extends BaseOpenmrsData {
 	private List<ItemPrice> prices = new ArrayList<ItemPrice>(0);
 	
 	public enum Type {
-		DRUG
+		DRUG, CONCEPT
 	}
 	
 	public String getUnit() {

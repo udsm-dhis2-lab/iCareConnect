@@ -127,7 +127,10 @@
               [disabled]="
                 !currentReport ||
                 !currentReport?.name ||
-                !(selectedReportParameters?.length === count)
+                (reportSelectionParams
+                  ? selectedReportParameters?.length !== count
+                  : false) ||
+                !this.showReportButton
               "
               class="ml-2"
               mat-flat-button
@@ -143,6 +146,7 @@
             >
               Get Report
             </button>
+
             <span *ngIf="reportConfigs && reportConfigs?.dhisConfigs">
               <!-- {{ reportConfigs?.countOfReportsSent | json }} -->
               <button

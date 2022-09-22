@@ -136,6 +136,8 @@ public class ICareDao extends BaseDAO<Item> {
 		}
 		if (queryStr != null && type == Item.Type.DRUG) {
 			queryStr += " WHERE ip.drug IS NOT NULL";
+		} else if (queryStr != null && type == Item.Type.CONCEPT) {
+			queryStr += " WHERE ip.concept IS NOT NULL";
 		}
 		
 		if (search != null) {
@@ -156,6 +158,9 @@ public class ICareDao extends BaseDAO<Item> {
 			}
 			if (type == Item.Type.DRUG) {
 				queryStr += " AND ip.drug IS NOT NULL";
+			}
+			if (type == Item.Type.CONCEPT) {
+				queryStr += " AND ip.concept IS NOT NULL";
 			}
 		}
 		Query query = session.createQuery(queryStr);
