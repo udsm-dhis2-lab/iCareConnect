@@ -2,9 +2,9 @@ import { Component, Input, OnInit } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { Store } from "@ngrx/store";
 import { Observable } from "rxjs";
-import { filter, map, tap } from "rxjs/operators";
+import { map } from "rxjs/operators";
 import { LISConfigurationsModel } from "src/app/modules/laboratory/resources/models/lis-configurations.model";
-import { DeleteConfirmationComponent } from "src/app/shared/components/delete-confirmation/delete-confirmation.component";
+import { SharedConfirmationComponent } from "src/app/shared/components/shared-confirmation /shared-confirmation.component";
 import {
   addLabDepartments,
   loadLabSamplesByCollectionDates,
@@ -17,8 +17,6 @@ import {
   getLabConfigurations,
 } from "src/app/store/selectors";
 import { getCurrentUserPrivileges } from "src/app/store/selectors/current-user.selectors";
-import { BarCodeModalComponent } from "../../../sample-acceptance-and-results/components/bar-code-modal/bar-code-modal.component";
-
 
 @Component({
   selector: "app-sample-results-dashboard",
@@ -105,7 +103,7 @@ export class SampleResultsDashboardComponent implements OnInit {
 
   onUpdateStatus(event: Event, sample: any): void {
     
-    const confirmDialog = this.dialog.open(DeleteConfirmationComponent, {
+    const confirmDialog = this.dialog.open(SharedConfirmationComponent, {
       height: "200px",
       width: "15%",
       data: {
