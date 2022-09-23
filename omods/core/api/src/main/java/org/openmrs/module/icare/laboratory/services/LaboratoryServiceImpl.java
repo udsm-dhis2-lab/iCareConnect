@@ -551,10 +551,10 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 		
 		return testOrderLocation;
 	}
-
+	
 	public WorkloadSummary getWorkLoadSummary(Date startDate, Date endDate) {
-
-		return sampleDAO.getWorkloadSummary(startDate,endDate);
+		
+		return sampleDAO.getWorkloadSummary(startDate, endDate);
 	}
 	
 }
