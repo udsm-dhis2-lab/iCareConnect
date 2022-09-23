@@ -515,7 +515,6 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		results = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
 		maps = (List) results.get("results");
 		assertThat("Should return 11 reference terms", maps.size(), is(11));
-		
 	}
 	
 	@Test
@@ -593,6 +592,18 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		assertThat("Should have drug with display", drug.getDisplayName().equals(drugDetails.get(0).get("display")));
 		assertThat("Should have drug with name", drug.getName().equals(drugDetails.get(0).get("name")));
 		assertThat("Should have drug with same uuid", drug.getUuid().equals(drugDetails.get(0).get("uuid")));
-		
+	}
+	
+	@Test
+	public void testGetPatientFromExternalSystem() throws Exception {
+		MockHttpServletRequest newGetRequest = newGetRequest("icare/patient/externalsystems", new Parameter(
+		        "identifier", "2133573"), new Parameter(
+				"identifierReference", "t74raEkPShW"));
+		MockHttpServletResponse handle = handle(newGetRequest);
+		String patientData = handle.getContentAsString();
+		System.out.println(patientData);
+		//		Map patientDataMap = (new ObjectMapper()).readValue(patientData, Map.class);
+		//		List<Map> patientDataDetails = (List<Map>) patientDataMap;
+		//		System.out.println(patientDataDetails);
 	}
 }

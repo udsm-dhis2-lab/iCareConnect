@@ -33,6 +33,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.naming.ConfigurationException;
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.*;
 
 /**
@@ -452,4 +454,22 @@ public class ICareController {
 		
 	}
 	
+	@RequestMapping(value = "patient/externalsystems", method = RequestMethod.GET)
+	@ResponseBody
+	public Object getPatientFromExternalSystems(@RequestParam(value = "identifier", required = false) String identifier,
+	        @RequestParam(value = "identifierReference", required = false) String identifierReference) {
+		Object patientData = new Object();
+		try {
+			String patientFromExternalSystem = iCareService.getPatientFromExternalSystems(identifier, identifierReference);
+			patientData = (Object) patientFromExternalSystem;
+			
+		}
+		catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+		catch (URISyntaxException e) {
+			throw new RuntimeException(e);
+		}
+		return patientData;
+	}
 }
