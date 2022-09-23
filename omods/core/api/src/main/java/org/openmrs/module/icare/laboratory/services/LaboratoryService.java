@@ -12,8 +12,8 @@ import java.util.List;
 
 @Transactional
 public interface LaboratoryService extends OpenmrsService {
-
-    @Transactional
+	
+	@Transactional
 	Sample createSample(Sample sample);
 	
 	List<Sample> getSamplesByVisit(String id);
@@ -87,7 +87,7 @@ public interface LaboratoryService extends OpenmrsService {
 	TestOrderLocation addTestOrderWithLocation(TestOrderLocation testOrderLocation);
 	
 	List<Sample> getSamplesByVisitOrPatientAndOrDates(String visitId, String patient, Date startDate, Date endDate);
-
+	
 	WorkloadSummary getWorkLoadSummary(Date startDate, Date endDate);
 	
 }
