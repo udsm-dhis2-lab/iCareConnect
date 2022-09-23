@@ -65,7 +65,7 @@ public class SampleDAO extends BaseDAO<Sample> {
 		return query.list();
 	}
 	
-	public ListResult<Sample> getSamples(Date startDate, Date endDate, Pager pager, String locationUuid) {
+	public ListResult<Sample> getSamples(Date startDate, Date endDate, Pager pager, String locationUuid,String sampleCategory, String testCategory) {
 		
 		DbSession session = this.getSession();
 		String queryStr = "SELECT sp \n" + "FROM Sample sp \n";
@@ -84,6 +84,23 @@ public class SampleDAO extends BaseDAO<Sample> {
 			}
 			queryStr += " sp.visit.location = (SELECT l FROM Location l WHERE l.uuid = :locationUuid)";
 		}
+		if (sampleCategory != null){
+			if (!queryStr.contains("WHERE")) {
+				queryStr += " WHERE ";
+			}else{
+				queryStr += " AND ";
+			}
+			queryStr+= "sp IN( SELECT sst.sample FROM SampleStatus sst WHERE sst.category=:sampleCategory)";
+
+		}
+		if(testCategory != null){
+			if (!queryStr.contains("WHERE")) {
+				queryStr += " WHERE ";
+			}else{
+				queryStr += " AND ";
+			}
+			queryStr += "sp IN(SELECT testalloc.sampleOrder.id.sample FROM TestAllocation testalloc WHERE testalloc IN (SELECT testallocstatus.testAllocation FROM TestAllocationStatus testallocstatus WHERE testallocstatus.category=:testCategory))";
+		}
 		queryStr += " ORDER BY sp.dateCreated ";
 		Query query = session.createQuery(queryStr);
 		if (startDate != null && endDate != null) {
@@ -93,12 +110,21 @@ public class SampleDAO extends BaseDAO<Sample> {
 		if (locationUuid != null) {
 			query.setParameter("locationUuid", locationUuid);
 		}
+
+		if(sampleCategory != null){
+			query.setParameter("sampleCategory",sampleCategory);
+		}
+		if(testCategory != null){
+			query.setParameter("testCategory",testCategory);
+		}
+
 		if (pager.isAllowed()) {
 			pager.setTotal(query.list().size());
 			//pager.setPageCount(pager.getT);
 			query.setFirstResult((pager.getPage() - 1) * pager.getPageSize());
 			query.setMaxResults(pager.getPageSize());
 		}
+
 		ListResult<Sample> listResults = new ListResult();
 		
 		listResults.setPager(pager);
