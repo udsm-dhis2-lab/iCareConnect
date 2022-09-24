@@ -7,6 +7,7 @@ import org.openmrs.Patient;
 import org.openmrs.Person;
 import org.openmrs.Visit;
 import org.openmrs.api.db.hibernate.DbSession;
+import org.openmrs.module.icare.billing.models.Discount;
 import org.openmrs.module.icare.core.ListResult;
 import org.openmrs.module.icare.core.Pager;
 import org.openmrs.module.icare.core.dao.BaseDAO;
@@ -93,13 +94,21 @@ public class SampleDAO extends BaseDAO<Sample> {
 			queryStr+= "sp IN( SELECT sst.sample FROM SampleStatus sst WHERE sst.category=:sampleCategory)";
 
 		}
-		if(testCategory != null){
+		if(testCategory != null && testCategory != "Completed"){
 			if (!queryStr.contains("WHERE")) {
 				queryStr += " WHERE ";
 			}else{
 				queryStr += " AND ";
 			}
 			queryStr += "sp IN(SELECT testalloc.sampleOrder.id.sample FROM TestAllocation testalloc WHERE testalloc IN (SELECT testallocstatus.testAllocation FROM TestAllocationStatus testallocstatus WHERE testallocstatus.category=:testCategory))";
+		}
+		if(testCategory == "Completed"){
+			if (!queryStr.contains("WHERE")) {
+				queryStr += " WHERE ";
+			}else{
+				queryStr += " AND ";
+			}
+			queryStr+="";
 		}
 		queryStr += " ORDER BY sp.dateCreated ";
 		Query query = session.createQuery(queryStr);
@@ -257,5 +266,6 @@ public class SampleDAO extends BaseDAO<Sample> {
 		return workloadSummary;
 		
 	}
+
 	
 }
