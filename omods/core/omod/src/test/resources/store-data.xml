@@ -37,6 +37,8 @@
 
     <location location_id="201" name="store B" creator="1" date_created="2017-02-27 12:47:30" retired="false" uuid="44938888-e444-ggg3-8aee-61d22227c22e" />
 
+    <concept_class concept_class_id="1" name="Test" description="class for testing" creator="1" date_created="2017-02-27 12:47:30" uuid="8d4907b2-c2cc-11de-8d13-0010c6dffd0f" />
+
     <!-- item concepts -->
     <concept concept_id="1000" retired="false" datatype_id="2" class_id="7" is_set="false" creator="1"
              date_created="2017-02-14 15:51:57.0" version="" uuid="344ab1zz-x011-487z-868y-acc38ebc6252" />
@@ -45,7 +47,7 @@
                   date_created="2014-01-12 00:00:00.0" concept_name_type="FULLY_SPECIFIED" locale_preferred="1" voided="false"
                   uuid="8x8ab323-5ab0-11e8-b607-880027ie4210" />
 
-    <concept concept_id="1100" retired="false" datatype_id="2" class_id="7" is_set="false" creator="1"
+    <concept concept_id="1100" retired="false" datatype_id="2" class_id="1" is_set="false" creator="1"
              date_created="2017-02-14 15:51:57.0" version="" uuid="444xb1yz-1011-487z-868y-acc38ebc6252" />
 
     <concept_name concept_name_id="1000" concept_id="1100" name="bandage" locale="en_GB" creator="1"

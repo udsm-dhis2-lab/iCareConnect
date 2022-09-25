@@ -61,7 +61,7 @@ public class StoreServiceTestE2E extends StoreTestBase {
 		//Then
 		Ledger newLedger = storeService.getLedgerByUuid(ledger.getUuid());
 		assertThat("Ledger is created", newLedger != null, is(true));
-		List<Stock> stocks = storeService.getStockByLocation(location.getUuid(), null, null, null);
+		List<Stock> stocks = storeService.getStockByLocation(location.getUuid(), null, null, null, null);
 		assertThat("Stock size added", stocks.size(), is(1));
 		Stock stock = stocks.get(0);
 		assertThat("Stock is created with batch", stock.getBatch(), is(ledger.getBatchNo()));

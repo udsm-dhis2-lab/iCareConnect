@@ -368,12 +368,12 @@ public class StoreController {
 	@ResponseBody
 	public List<Map<String, Object>> listAllStockStatus(@RequestParam(required = false) String locationUuid,
 	        @RequestParam(required = false) String q, @RequestParam(defaultValue = "100") Integer limit,
-	        @RequestParam(defaultValue = "0") Integer startIndex) {
+	        @RequestParam(defaultValue = "0") Integer startIndex, @RequestParam(required = false) String conceptClassName) {
 		
 		List<Stock> stocksStatus;
 		
 		if (locationUuid != null) {
-			stocksStatus = this.storeService.getStockByLocation(locationUuid, q, startIndex, limit);
+			stocksStatus = this.storeService.getStockByLocation(locationUuid, q, startIndex, limit, conceptClassName);
 		} else {
 			stocksStatus = this.storeService.getAllStockStatusMetrics();
 		}
