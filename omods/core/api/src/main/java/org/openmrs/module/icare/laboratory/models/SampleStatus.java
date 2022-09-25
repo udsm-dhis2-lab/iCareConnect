@@ -42,12 +42,12 @@ public class SampleStatus { // implements java.io.Serializable {
 	
 	@Column(name = "status", length = 32)
 	private String status;
-
+	
 	@Column(name = "category", length = 32)
 	private String category;
-
+	
 	@Column(name = "retired")
-	private Boolean	retired;
+	private Boolean retired;
 	
 	public String getRemarks() {
 		return this.remarks;
@@ -96,23 +96,23 @@ public class SampleStatus { // implements java.io.Serializable {
 	public Integer getId() {
 		return id;
 	}
-
+	
 	public String getCategory() {
 		return category;
 	}
-
+	
 	public void setCategory(String category) {
 		this.category = category;
 	}
-
+	
 	public void setRetired(boolean retired) {
 		this.retired = retired;
 	}
-
+	
 	public Boolean getRetired() {
 		return retired;
 	}
-
+	
 	public static SampleStatus fromMap(Map<String, Object> map) throws ParseException {
 		SampleStatus sampleStatus = new SampleStatus();
 		
@@ -126,10 +126,10 @@ public class SampleStatus { // implements java.io.Serializable {
 		
 		sampleStatus.setStatus((map.get("status")).toString());
 		sampleStatus.setRemarks((map.get("remarks")).toString());
-		if(map.get("category")!= null){
+		if (map.get("category") != null) {
 			sampleStatus.setCategory((map.get("category")).toString());
 		}
-		if(map.get("retired") != null){
+		if (map.get("retired") != null) {
 			sampleStatus.setRetired((Boolean) map.get("retired"));
 		}
 		if (map.get("timestamp") == null) {
@@ -149,17 +149,18 @@ public class SampleStatus { // implements java.io.Serializable {
 		return sampleStatus;
 		
 	}
+	
 	public Map<String, Object> toMap() {
 		Map<String, Object> statusObject = new HashMap<String, Object>();
 		
 		statusObject.put("status", this.getStatus());
 		statusObject.put("timestamp", this.getTimestamp());
 		statusObject.put("remarks", this.getRemarks());
-		if(this.getCategory() != null){
-			statusObject.put("category",this.getCategory());
+		if (this.getCategory() != null) {
+			statusObject.put("category", this.getCategory());
 		}
-		if(this.retired != null){
-			statusObject.put("retired",this.getRetired());
+		if (this.retired != null) {
+			statusObject.put("retired", this.getRetired());
 		}
 		HashMap<String, Object> userObject = new HashMap<String, Object>();
 		if (this.getUser() != null) {
