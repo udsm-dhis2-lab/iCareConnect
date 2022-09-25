@@ -48,12 +48,12 @@ public class TestAllocationStatus implements java.io.Serializable {
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "timestamp", length = 19)
 	private Date timestamp;
-
+	
 	@Column(name = "category", length = 32)
 	private String category;
-
+	
 	@Column(name = "retired")
-	private Boolean	retired;
+	private Boolean retired;
 	
 	public String getStatus() {
 		return this.status;
@@ -110,23 +110,23 @@ public class TestAllocationStatus implements java.io.Serializable {
 	//	public void setUuid(String uuid) {
 	//		this.uuid = uuid;
 	//	}
-
+	
 	public String getCategory() {
 		return category;
 	}
-
+	
 	public void setCategory(String category) {
 		this.category = category;
 	}
-
+	
 	public void setRetired(boolean retired) {
 		this.retired = retired;
 	}
-
+	
 	public Boolean getRetired() {
 		return retired;
 	}
-
+	
 	public static TestAllocationStatus fromMap(Map<String, Object> map) {
 		TestAllocationStatus testAllocationStatus = new TestAllocationStatus();
 		
@@ -140,10 +140,10 @@ public class TestAllocationStatus implements java.io.Serializable {
 		
 		testAllocationStatus.setRemarks(((map.get("remarks")).toString()));
 		testAllocationStatus.setStatus((map.get("status")).toString());
-		if (map.get("category") != null){
+		if (map.get("category") != null) {
 			testAllocationStatus.setCategory((map.get("category")).toString());
 		}
-		if(map.get("retired") != null){
+		if (map.get("retired") != null) {
 			testAllocationStatus.setRetired((Boolean) map.get("retired"));
 		}
 		testAllocationStatus.setTimestamp(new Timestamp(new Date().getTime()));
@@ -157,11 +157,11 @@ public class TestAllocationStatus implements java.io.Serializable {
 		allocationStatusesObject.put("remarks", this.getRemarks());
 		allocationStatusesObject.put("timestamp", this.getTimestamp());
 		//allocationStatusesObject.put("uuid", this.getUuid());
-		if( this.getCategory() != null){
-			allocationStatusesObject.put("category",this.getCategory());
+		if (this.getCategory() != null) {
+			allocationStatusesObject.put("category", this.getCategory());
 		}
-		if(this.retired != null){
-			allocationStatusesObject.put("retired",this.getRetired());
+		if (this.retired != null) {
+			allocationStatusesObject.put("retired", this.getRetired());
 		}
 		Map<String, Object> testAllocationStatusUserObject = new HashMap<String, Object>();
 		testAllocationStatusUserObject.put("uuid", this.getUser().getUuid());

@@ -614,4 +614,16 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		
 		return issues;
 	}
+
+	@Test
+	public void getStockByConceptClassName() throws Exception{
+		MockHttpServletRequest newGetRequest = newGetRequest("store/stock", new Parameter("locationUuid",
+				"44939999-d333-fff2-9bff-61d11117c22e"),new Parameter("conceptClassName","Test"));
+		MockHttpServletResponse handleGet = handle(newGetRequest);
+
+		List<Map<String, Object>> stockList = (new ObjectMapper()).readValue(handleGet.getContentAsString(), List.class);
+
+		System.out.println(stockList);
+		assertThat("stock listing has 4 entries:", stockList.size(), is(4));
+	}
 }
