@@ -209,10 +209,10 @@
                       *ngIf="orderCount == 0"
                       [attr.rowspan]="sample?.orders?.length"
                     >
-                      <button *ngIf="!status" mat-button class="colored-button" (click)="onUpdateStatus($event, sample)">
+                      <button *ngIf="!status" mat-button class="colored-button" (click)="onUpdateStatus($event, sample, 'release')">
                         Release
                       </button>
-                      <button *ngIf="status" mat-button class="btn-danger" (click)="onUpdateStatus($event, sample)">
+                      <button *ngIf="status" mat-button class="btn-danger" (click)="onUpdateStatus($event, sample, 'restrict')">
                         Restrict
                       </button>
                 </tr>
