@@ -9,7 +9,10 @@
     labSamplesContainers: labSamplesContainers$ | async,
     configs: configs$ | async,
     codedSampleRejectionReasons: codedSampleRejectionReasons$ | async,
-    LISConfigurations: LISConfigurations$ | async
+    LISConfigurations: LISConfigurations$ | async,
+    currentUser: currentUser$ | async,
+    privileges: privileges$ | async,
+    providerDetails: providerDetails$ | async
   } as params"
 >
   <div
@@ -32,6 +35,9 @@
       [configs]="params?.configs"
       [LISConfigurations]="params?.LISConfigurations"
       [codedSampleRejectionReasons]="params?.codedSampleRejectionReasons"
+      [currentUser]="params?.currentUser"
+      [privileges]="params?.privileges"
+      [providerDetails]="params?.providerDetails"
     ></app-sample-results-dashboard>
   </div>
   <mat-progress-bar

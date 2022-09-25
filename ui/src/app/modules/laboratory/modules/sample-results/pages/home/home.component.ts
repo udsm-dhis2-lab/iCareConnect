@@ -12,6 +12,7 @@ import {
   getLabTestsContainers,
   getSampleTypesLoadedState,
 } from "src/app/store/selectors";
+import { getCurrentUserDetails, getCurrentUserPrivileges, getProviderDetails } from "src/app/store/selectors/current-user.selectors";
 import { getLISConfigurations } from "src/app/store/selectors/lis-configurations.selectors";
 import {
   getAllPatientsVisitsReferences,
@@ -36,6 +37,9 @@ export class HomeComponent implements OnInit {
   codedSampleRejectionReasons$: Observable<any>;
 
   LISConfigurations$: Observable<LISConfigurationsModel>;
+  currentUser$: Observable<any>;
+  privileges$: Observable<any>;
+  providerDetails$: Observable<any>;
   constructor(
     private store: Store<AppState>,
     private conceptService: ConceptsService
@@ -62,5 +66,9 @@ export class HomeComponent implements OnInit {
           : this.conceptService.getConceptsBySearchTerm("LAB_DEPARTMENT");
       }
     });
+
+    this.currentUser$ = this.store.select(getCurrentUserDetails);
+    this.privileges$ = this.store.select(getCurrentUserPrivileges);
+    this.providerDetails$ = this.store.select(getProviderDetails);
   }
 }

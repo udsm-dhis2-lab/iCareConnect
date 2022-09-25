@@ -8,6 +8,7 @@ import { SharedConfirmationComponent } from "src/app/shared/components/shared-co
 import {
   addLabDepartments,
   loadLabSamplesByCollectionDates,
+  setSampleStatus,
 } from "src/app/store/actions";
 import { AppState } from "src/app/store/reducers";
 import {
@@ -16,7 +17,6 @@ import {
   getFormattedLabSamplesLoadedState,
   getLabConfigurations,
 } from "src/app/store/selectors";
-import { getCurrentUserPrivileges } from "src/app/store/selectors/current-user.selectors";
 
 @Component({
   selector: "app-sample-results-dashboard",
@@ -32,6 +32,10 @@ export class SampleResultsDashboardComponent implements OnInit {
   @Input() configs: any;
   @Input() codedSampleRejectionReasons: any;
   @Input() LISConfigurations: LISConfigurationsModel;
+  @Input() currentUser: any;
+  @Input() privileges: any;
+  @Input() providerDetails: any;
+
   labConfigs$: Observable<any>;
   privileges$: Observable<any>;
   codedSampleRejectionReasons$: Observable<any[]>;
@@ -40,9 +44,11 @@ export class SampleResultsDashboardComponent implements OnInit {
   allSamples$: Observable<any[]>;
   selectedDepartment: string = "";
   status: boolean;
+  userUuid: any;
   constructor(private store: Store<AppState>, private dialog: MatDialog) {}
 
   ngOnInit(): void {
+    this.userUuid = this.currentUser?.uuid;
     this.store.dispatch(
       addLabDepartments({ labDepartments: this.labSamplesDepartments })
     );
@@ -63,8 +69,6 @@ export class SampleResultsDashboardComponent implements OnInit {
     );
 
     this.labConfigs$ = this.store.select(getLabConfigurations);
-
-    this.privileges$ = this.store.select(getCurrentUserPrivileges);
 
     this.samplesLoadedState$ = this.store.select(
       getFormattedLabSamplesLoadedState
@@ -101,22 +105,67 @@ export class SampleResultsDashboardComponent implements OnInit {
     }
   }
 
-  onUpdateStatus(event: Event, sample: any): void {
-    
+  onUpdateStatus(event: Event, sample: any, key: string): void {
     const confirmDialog = this.dialog.open(SharedConfirmationComponent, {
       height: "200px",
-      width: "15%",
+      width: "25%",
       data: {
-        modalTitle: "Release sample results for external use",
-        modalMessage: `You sure to release results of ${sample?.label}`,
+        modalTitle: `${key} sample results`.toUpperCase(),
+        modalMessage: `Are you sure to ${key} results of ${sample?.label} for external use`,
       },
       disableClose: false,
       panelClass: "custom-dialog-container",
     });
 
     confirmDialog.afterClosed().subscribe((res) => {
-      if (res.confirmed) {
-        this.status = !this.status;
+      if (res.confirmed && key === "release") {
+        // console.log("==> Sample: ", sample, ' \n ==> User: ', this.currentUser)
+          this.status = !this.status;
+          const data = {
+            sample: {
+              uuid: sample?.uuid,
+            },
+            user: {
+              uuid: this.userUuid,
+            },
+            status: "RELEASED",
+          };
+          this.store.dispatch(
+            setSampleStatus({
+              status: data,
+              details: {
+                ...sample,
+                acceptedBy: {
+                  uuid: this.providerDetails?.uuid,
+                  name: this.providerDetails?.display,
+                },
+              },
+            })
+        );
+      }
+      if (res.confirmed && key === "restrict") {
+          this.status = !this.status;
+          const data = {
+            sample: {
+              uuid: sample?.sampleUuid,
+            },
+            user: {
+              uuid: this.userUuid,
+            },
+            status: "RESTRICTED",
+          };
+          this.store.dispatch(
+            setSampleStatus({
+              status: data,
+              details: {
+                ...sample,
+                acceptedBy: {
+                  uuid: this.providerDetails?.uuid,
+                  name: this.providerDetails?.display,
+                },
+              },
+            })
+        );
       }
     });
   }
