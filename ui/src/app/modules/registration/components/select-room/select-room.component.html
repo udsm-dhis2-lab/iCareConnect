@@ -35,7 +35,6 @@
           color="{{ room.id === currentRoom ? 'primary' : '' }}"
           [selected]="room.id === currentRoom"
         >
-          {{ room.name }}
           <span
             class="patient-load-badge"
             *ngIf="params?.patientLoad[room.id] as patientLoad"
