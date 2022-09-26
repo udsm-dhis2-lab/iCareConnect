@@ -88,4 +88,6 @@ public interface LaboratoryService extends OpenmrsService {
 	
 	List<Sample> getSamplesByVisitOrPatientAndOrDates(String visitId, String patient, Date startDate, Date endDate);
 	
+	WorkloadSummary getWorkLoadSummary(Date startDate, Date endDate);
+	
 }

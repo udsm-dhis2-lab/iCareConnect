@@ -108,9 +108,11 @@
     <!-- {{ locationsForCurrentUser$ | async | json }} -->
     <mat-progress-bar
       *ngIf="
-        !params?.locationsForCurrentUser ||
+        (!params?.locationsForCurrentUser &&
+          !params?.lisConfigurations?.isLIS) ||
         !params?.lisConfigurations ||
-        !params?.userAssignedLocationsLoadedState
+        (!params?.userAssignedLocationsLoadedState &&
+          !params?.lisConfigurations?.isLIS)
       "
       mode="indeterminate"
     ></mat-progress-bar>
