@@ -8,7 +8,7 @@
           <span class="ml-2" *ngIf="formField?.concept?.units"
             >({{ formField?.concept?.units }})</span
           >
-          <ng-container *ngIf="formField?.formFields">
+          <!-- <ng-container *ngIf="formField?.formFields">
            <th *ngFor="let subFormField of formField?.formFields">
             {{ subFormField?.label }}
             <span class="ml-2" *ngIf="formField?.concept?.units"
@@ -21,7 +21,7 @@
                <span class="ml-2" *ngIf="formField?.concept?.units"
                  >({{ memberField?.units }})</span></th>
             </div>
-          </ng-container>
+          </ng-container> -->
         </th>
         <th></th>
       </tr>
@@ -55,7 +55,7 @@
           ></app-form>
 
 
-          <ng-container *ngIf="formField?.formFields">
+          <!-- <ng-container *ngIf="formField?.formFields">
            <td *ngFor="let subFormField of formField?.formFields">
             <app-form
             [fields]="[subFormField]"
@@ -76,7 +76,7 @@
               (formUpdate)="onFormUpdate($event)"
             ></app-form></td>
             </div>
-          </ng-container>
+          </ng-container> -->
 
 
           <!-- <div

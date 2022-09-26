@@ -17,6 +17,7 @@ export class ObservationChartTableComponent implements OnInit {
   formData: any;
   obsChartEncountersData: any[];
   atLeastOneFormFieldHasBeenFilled: boolean = false;
+
   @Output() saveObservation: EventEmitter<any> = new EventEmitter<any>();
   constructor() {}
 
@@ -26,7 +27,11 @@ export class ObservationChartTableComponent implements OnInit {
         this.activeVisit?.visit,
         this.obsChartEncounterType
       );
-  }
+      
+    // updatedFormFields
+
+    
+    }
 
   onFormUpdate(formValues: FormValue): void {
     const formValuesData = formValues.getValues();

@@ -23,7 +23,8 @@
     consultationOrderType: consultationOrderType$ | async,
     facilityDetails: facilityDetails$ | async,
     useGeneralPrescription: useGeneralPrescription$ | async,
-    generalPrescriptionOrderType: generalPrescriptionOrderType$ | async
+    generalPrescriptionOrderType: generalPrescriptionOrderType$ | async,
+    observationChartForm: observationChartForm$ | async
   } as dashboardParams"
 >
   <div
@@ -352,8 +353,7 @@
                   "
                   [provider]="dashboardParams?.provider"
                   (updateConsultationOrder)="onUpdateConsultationOrder()"
-                  [selectedForm]="
-                    selectedForm ? selectedForm : dashboardParams?.forms[0]
+                  [selectedForm]="dashboardParams?.observationChartForm === selectedForm?.uuid ? selectedForm : dashboardParams?.forms[0]?.uuid === dashboardParams?.observationChartForm ? dashboardParams?.forms[0] : {}
                   "
                 >
                 </app-patient-observations-chart>
