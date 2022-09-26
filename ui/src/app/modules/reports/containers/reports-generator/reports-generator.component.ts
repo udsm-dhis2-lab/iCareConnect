@@ -69,7 +69,6 @@ export class ReportsGeneratorComponent implements OnInit {
   showFullReportRenderingArea: boolean = false;
   isQuickPivotSet: boolean = false;
   count: number = 1;
-  showReportButton: boolean = false;
 
   selectedReportParameters: {
     order?: string;
@@ -164,7 +163,6 @@ export class ReportsGeneratorComponent implements OnInit {
         })
       );
     }
-    period ? (this.showReportButton = true) : (this.showReportButton = false);
   }
 
   toggleReportArea(event: Event): void {
@@ -173,7 +171,6 @@ export class ReportsGeneratorComponent implements OnInit {
   }
 
   setReportCategory(reportCategory) {
-    this.showReportButton = false;
     this.selectedReportGroup = reportCategory;
     this.selectedReportParameters = null;
     this.reportSelectionParams = null;
@@ -211,7 +208,6 @@ export class ReportsGeneratorComponent implements OnInit {
 
   onSelectReport(e, report) {
     e.stopPropagation();
-    this.showReportButton = false;
     this.store.dispatch(loadReportLogsByReportId({ reportId: report?.id }));
     // this.store.dispatch(clearReportSelections());
 
@@ -258,9 +254,6 @@ export class ReportsGeneratorComponent implements OnInit {
     this.count = Object.keys(this.reportSelectionParams).filter(
       (keyItem) => this.reportSelectionParams[keyItem] !== undefined
     ).length;
-    paramValue
-      ? (this.showReportButton = true)
-      : (this.showReportButton = false);
   }
 
   getDHIS2ReportsSent(event: Event): void {

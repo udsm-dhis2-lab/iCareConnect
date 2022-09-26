@@ -127,10 +127,12 @@
               [disabled]="
                 !currentReport ||
                 !currentReport?.name ||
-                (reportSelectionParams
+                (reportSelectionParams ||
+                (selectedReportParameters &&
+                  selectedReportParameters?.name?.length > 0 &&
+                  !reportConfigs?.dhisConfigs)
                   ? selectedReportParameters?.length !== count
-                  : false) ||
-                !this.showReportButton
+                  : false)
               "
               class="ml-2"
               mat-flat-button
@@ -287,11 +289,9 @@
           </div>
 
           <div class="mt-3" *ngIf="showReportArea && !loadingReport">
-            <div *ngFor="let dataSet of reportData?.dataSets">
-              <div
-                style="height: 70vh; overflow: auto"
-                *ngIf="!isQuickPivotSet"
-              >
+            <div
+              *ngFor="let dataSet of reportData?.dataSets"
+            >
                 <app-report-table
                   [data]="dataSet"
                   *ngIf="currentVisualization === 'TABLE' && !isQuickPivotSet"
