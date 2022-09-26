@@ -1,9 +1,33 @@
 <div class="observations-chart-table-container">
+  <!-- {{ selectedForm | json }} -->
   <table class="table table-bordered table-striped" *ngIf="selectedForm">
     <thead>
-      <tr [attr.rowspan]="2">
-        <th>Date & Time</th>
-        <ng-container *ngFor="let formField of formFields?.noChildren" class="w-100">
+      <tr>
+        <th rowspan="2"></th>
+        <th
+          [attr.rowspan]="formField?.setMembers?.length == 0 ? 2 : 1"
+          [attr.colspan]="formField?.setMembers?.length"
+          [ngClass]="{ 'text-center': formField?.setMembers?.length > 0 }"
+          *ngFor="let formField of selectedForm?.formFields"
+        >
+          {{ formField?.name }}
+        </th>
+      </tr>
+      <tr>
+        <ng-container *ngFor="let formField of selectedForm?.formFields">
+          <ng-container *ngIf="formField?.setMembers?.length > 0">
+            <th *ngFor="let member of formField?.setMembers">
+              {{ member?.name }}
+            </th>
+          </ng-container>
+        </ng-container>
+      </tr>
+      <!-- <tr [attr.rowspan]="2">
+        <th rowspan="2">Date & Time</th>
+        <ng-container
+          *ngFor="let formField of formFields?.noChildren"
+          class="w-100"
+        >
           <th>
             <span>
               {{ formField?.name }}
@@ -12,9 +36,18 @@
               </span>
             </span>
           </th>
-          </ng-container>
-        <ng-container *ngFor="let formField of formFields?.withChildren" class="w-100">
-          <th [attr.colspan]=" formField?.setMembers && formField?.setMembers?.length > 0 ? formField.setMembers?.length : 0">
+        </ng-container>
+        <ng-container
+          *ngFor="let formField of formFields?.withChildren"
+          class="w-100"
+        >
+          <th
+            [attr.colspan]="
+              formField?.setMembers && formField?.setMembers?.length > 0
+                ? formField.setMembers?.length
+                : 0
+            "
+          >
             <span>
               {{ formField?.name }}
               <span class="ml-2" *ngIf="formField?.concept?.units"
@@ -22,36 +55,49 @@
               </span>
             </span>
           </th>
-          </ng-container>
+        </ng-container>
         <th></th>
       </tr>
       <tr>
-        <ng-container *ngFor="let formField of formFields?.withChildren" class="w-100">
-          <ng-container *ngIf="
-                formField?.setMembers &&
-                formField?.setMembers?.length > 0
-              ">
-              <ng-container  *ngFor="let member of formField?.setMembers">
-                <th class="w-100">
-                  <span>
+        <ng-container
+          *ngFor="let formField of formFields?.withChildren"
+          class="w-100"
+        >
+          <ng-container
+            *ngIf="formField?.setMembers && formField?.setMembers?.length > 0"
+          >
+            <ng-container *ngFor="let member of formField?.setMembers">
+              <th class="w-100">
+                <span>
                   {{ member?.name }}
                 </span>
-                </th>
-              </ng-container>
+              </th>
             </ng-container>
+          </ng-container>
         </ng-container>
-      </tr>
+      </tr> -->
     </thead>
     <tbody>
       <tr *ngFor="let encounter of obsChartEncountersData">
+        <td></td>
+        <td *ngFor="let fieldHoldingData of fieldsHoldingData">
+          <!-- TODO: Add support to check if the value is valueObject -->
+          {{
+            encounter?.obsKeyedByConcept[fieldHoldingData?.uuid]
+              ? encounter?.obsKeyedByConcept[fieldHoldingData?.concept?.uuid]
+                  ?.value
+              : "-"
+          }}
+        </td>
+      </tr>
+      <!-- <tr *ngFor="let encounter of obsChartEncountersData">
         <td>
           {{ encounter?.encounterDatetime | date: "medium" }}
         </td>
         <td *ngFor="let formField of formFields?.noChildren">
-          <!-- TODO: Add support to check if the value is valueObject -->
           {{ encounter?.obsKeyedByConcept[formField?.concept?.uuid]?.value }}
         </td>
-      </tr>
+      </tr> -->
       <tr>
         <td></td>
         <td *ngFor="let formField of formFields?.noChildren">
@@ -68,7 +114,6 @@
             [fieldsData]=""
             (formUpdate)="onFormUpdate($event)"
           ></app-form>
-
 
           <!-- <ng-container *ngIf="formField?.formFields">
            <td *ngFor="let subFormField of formField?.formFields">
@@ -92,7 +137,6 @@
             ></app-form></td>
             </div>
           </ng-container> -->
-
 
           <!-- <div
             *ngIf="
@@ -132,14 +176,12 @@
           </div> -->
         </td>
         <ng-container *ngFor="let formField of formFields?.withChildren">
-          <ng-container *ngIf="
-              formField?.setMembers &&
-              formField?.setMembers?.length > 0
-            ">
+          <ng-container
+            *ngIf="formField?.setMembers && formField?.setMembers?.length > 0"
+          >
             <td *ngFor="let member of formField?.setMembers" class="w-100">
               <app-form
-                *ngIf="member.formFields && member.formFields?.length > 0
-                "
+                *ngIf="member.formFields && member.formFields?.length > 0"
                 [fields]="member?.formFields"
                 [isFormHorizontal]="true"
                 [isReport]="false"
@@ -148,8 +190,7 @@
               ></app-form>
 
               <app-form
-                *ngIf="member.formField
-                "
+                *ngIf="member.formField"
                 [fields]="[member?.formField]"
                 [isFormHorizontal]="true"
                 [isReport]="false"

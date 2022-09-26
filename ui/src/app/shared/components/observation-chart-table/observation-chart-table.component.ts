@@ -23,6 +23,7 @@ export class ObservationChartTableComponent implements OnInit {
   formFields: any;
 
   @Output() saveObservation: EventEmitter<any> = new EventEmitter<any>();
+  fieldsHoldingData: any[] = [];
   constructor() {}
 
   ngOnInit(): void {
@@ -30,8 +31,12 @@ export class ObservationChartTableComponent implements OnInit {
       getFormattedEncountersByEncounterTypeFromVisit(
         this.activeVisit?.visit,
         this.obsChartEncounterType
-      );  
-
+      );
+    this.selectedForm?.formFields?.forEach((field) => {
+      const fieldsToAttach =
+        field?.setMembers?.length > 0 ? field?.setMembers : [field];
+      this.fieldsHoldingData = [...this.fieldsHoldingData, ...fieldsToAttach];
+    });
     this.formFields = {
       ...this.formFields,
       withChildren: this.selectedForm?.formFields.filter((formField) => {
@@ -43,16 +48,15 @@ export class ObservationChartTableComponent implements OnInit {
         }
       }),
       noChildren: this.selectedForm.formFields.filter((formField) => {
-          if (
-            (!formField.setMembers ||
-              (formField?.setMembers && formField?.setMembers.length === 0)) &&
-            (!formField.formFields ||
-              (formField?.formFields && formField?.formFields.length === 0))
-          ) {
-            return formField;
-          }
+        if (
+          (!formField.setMembers ||
+            (formField?.setMembers && formField?.setMembers.length === 0)) &&
+          (!formField.formFields ||
+            (formField?.formFields && formField?.formFields.length === 0))
+        ) {
+          return formField;
         }
-      )
+      }),
     };
   }
 
