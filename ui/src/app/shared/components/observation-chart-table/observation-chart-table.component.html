@@ -25,13 +25,16 @@
     </thead>
     <tbody>
       <tr *ngFor="let encounter of obsChartEncountersData">
-        <td></td>
+        <td>
+          {{ encounter?.encounterDatetime | date: "medium" }}
+        </td>
         <td *ngFor="let fieldHoldingData of fieldsHoldingData">
           {{ encounter?.obsKeyedByConcept[fieldHoldingData?.concept?.uuid]?.value?.display ? encounter?.obsKeyedByConcept[fieldHoldingData?.concept?.uuid]
                   ?.value?.display : encounter?.obsKeyedByConcept[fieldHoldingData?.concept?.uuid]
                   ?.value ? encounter?.obsKeyedByConcept[fieldHoldingData?.concept?.uuid]
                   ?.value
-              : "-" }}
+                  : "-" }} 
+              <!-- {{ fieldHoldingData?.concept?.uuid | json }} -->
         </td>
       </tr>
       <tr>

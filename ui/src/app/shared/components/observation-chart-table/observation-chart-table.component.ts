@@ -12,15 +12,12 @@ import { FormValue } from "../../modules/form/models/form-value.model";
 export class ObservationChartTableComponent implements OnInit {
   @Input() selectedForm: any;
   @Input() activeVisit: any;
-  @Input() obsChartEncounterType: string;
+  @Input() obsChartEncounterType: any;
   @Input() patient: any;
   @Input() location: any;
   formData: any;
   obsChartEncountersData: any[];
   atLeastOneFormFieldHasBeenFilled: boolean = false;
-  fieldsWithSetMembersAndOrFormFields: any[];
-  fieldsWithoutSetMembersAndOrFormFields: any[];
-  formFields: any;
 
   @Output() saveObservation: EventEmitter<any> = new EventEmitter<any>();
   fieldsHoldingData: any[] = [];
@@ -37,27 +34,6 @@ export class ObservationChartTableComponent implements OnInit {
         field?.setMembers?.length > 0 ? field?.setMembers : [field];
       this.fieldsHoldingData = [...this.fieldsHoldingData, ...fieldsToAttach];
     });
-    this.formFields = {
-      ...this.formFields,
-      withChildren: this.selectedForm?.formFields.filter((formField) => {
-        if (
-          (formField?.setMembers && formField?.setMembers.length > 0) ||
-          (formField?.formFields && formField?.formFields.length > 0)
-        ) {
-          return formField;
-        }
-      }),
-      noChildren: this.selectedForm.formFields.filter((formField) => {
-        if (
-          (!formField.setMembers ||
-            (formField?.setMembers && formField?.setMembers.length === 0)) &&
-          (!formField.formFields ||
-            (formField?.formFields && formField?.formFields.length === 0))
-        ) {
-          return formField;
-        }
-      }),
-    };
   }
 
   onFormUpdate(formValues: FormValue): void {
