@@ -8,6 +8,7 @@ import org.openmrs.api.context.Context;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.icare.core.ListResult;
 import org.openmrs.module.icare.core.Pager;
+import org.openmrs.module.icare.core.Summary;
 import org.openmrs.module.icare.laboratory.dao.*;
 import org.openmrs.module.icare.laboratory.models.*;
 
@@ -549,6 +550,11 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 		testOrderLocationDAO.save(testOrderLocation);
 		
 		return testOrderLocation;
+	}
+	
+	public WorkloadSummary getWorkLoadSummary(Date startDate, Date endDate) {
+		
+		return sampleDAO.getWorkloadSummary(startDate, endDate);
 	}
 	
 }
