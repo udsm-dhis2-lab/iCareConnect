@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import { flatten } from "lodash";
 import { getObservationsFromForm } from "src/app/modules/clinic/helpers/get-observations-from-form.helper";
 import { getFormattedEncountersByEncounterTypeFromVisit } from "../../helpers/visits.helper";
 import { FormValue } from "../../modules/form/models/form-value.model";
@@ -17,6 +18,9 @@ export class ObservationChartTableComponent implements OnInit {
   formData: any;
   obsChartEncountersData: any[];
   atLeastOneFormFieldHasBeenFilled: boolean = false;
+  fieldsWithSetMembersAndOrFormFields: any[];
+  fieldsWithoutSetMembersAndOrFormFields: any[];
+  formFields: any;
 
   @Output() saveObservation: EventEmitter<any> = new EventEmitter<any>();
   constructor() {}
@@ -26,12 +30,31 @@ export class ObservationChartTableComponent implements OnInit {
       getFormattedEncountersByEncounterTypeFromVisit(
         this.activeVisit?.visit,
         this.obsChartEncounterType
-      );
-      
-    // updatedFormFields
+      );  
 
-    
-    }
+    this.formFields = {
+      ...this.formFields,
+      withChildren: this.selectedForm?.formFields.filter((formField) => {
+        if (
+          (formField?.setMembers && formField?.setMembers.length > 0) ||
+          (formField?.formFields && formField?.formFields.length > 0)
+        ) {
+          return formField;
+        }
+      }),
+      noChildren: this.selectedForm.formFields.filter((formField) => {
+          if (
+            (!formField.setMembers ||
+              (formField?.setMembers && formField?.setMembers.length === 0)) &&
+            (!formField.formFields ||
+              (formField?.formFields && formField?.formFields.length === 0))
+          ) {
+            return formField;
+          }
+        }
+      )
+    };
+  }
 
   onFormUpdate(formValues: FormValue): void {
     const formValuesData = formValues.getValues();
