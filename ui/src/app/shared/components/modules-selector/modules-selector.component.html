@@ -1,10 +1,9 @@
 <div>
   <div class="w-100 menu-items-container" *ngIf="!lisConfigurations?.isLIS">
     <div class="menu-items">
-      <!-- {{ currentModule | json }} -->
       <div
-      class="menu-item"
-      [ngClass]="{ 'selected-module': currentModule?.id === module?.id }"
+        class="menu-item"
+        [ngClass]="{ 'selected-module': currentModule?.id === module?.id }"
         (click)="onSelectModuleLocation($event, module)"
         *ngFor="let module of modulesReferences"
       >
@@ -28,5 +27,6 @@
         >{{ userLocation?.name }}</mat-chip
       >
     </mat-chip-list>
+    <!-- <mat-icon style="right: 0%">expand_more</mat-icon> -->
   </div>
 </div>
