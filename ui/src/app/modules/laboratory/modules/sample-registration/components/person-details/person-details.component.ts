@@ -30,7 +30,7 @@ export class PersonDetailsComponent implements OnInit {
   @Input() referFromFacilityVisitAttribute: string;
   patientIdentifierTypes: any[];
   @Output() personDetails: EventEmitter<any> = new EventEmitter<any>();
-  personDetailsCategory: string = "new";
+  personDetailsCategory: string = "other";
   personDetailsData: any = {};
   personFields: any[];
   personAgeField: any[];

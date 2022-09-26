@@ -454,7 +454,7 @@ public class ICareController {
 		
 	}
 	
-	@RequestMapping(value = "patient/externalsystems", method = RequestMethod.GET)
+	@RequestMapping(value = "client/externalsystems", method = RequestMethod.GET)
 	@ResponseBody
 	public Object getPatientFromExternalSystems(@RequestParam(value = "identifier", required = false) String identifier,
 	        @RequestParam(value = "identifierReference", required = false) String identifierReference) {
