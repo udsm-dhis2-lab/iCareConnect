@@ -138,6 +138,7 @@ export class SharedPatientDashboardComponent implements OnInit {
   @Output() dichargePatient: EventEmitter<boolean> =
     new EventEmitter<boolean>();
   observationChartForm$: Observable<any>;
+  observationChartEncounterType$: Observable<any>;
   constructor(
     private store: Store<AppState>,
     private dialog: MatDialog,
@@ -234,6 +235,10 @@ export class SharedPatientDashboardComponent implements OnInit {
     this.observationChartForm$ =
       this.systemSettingsService.getSystemSettingsByKey(
         "iCare.ipd.forms.observationChart"
+      );
+    this.observationChartEncounterType$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        "iCare.ipd.encounterType.observationChart"
       );
     this.facilityDetails$ = this.configService.getFacilityDetails();
     this.facilityDetails$ = this.userService.getLoginLocations();

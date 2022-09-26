@@ -24,7 +24,8 @@
     facilityDetails: facilityDetails$ | async,
     useGeneralPrescription: useGeneralPrescription$ | async,
     generalPrescriptionOrderType: generalPrescriptionOrderType$ | async,
-    observationChartForm: observationChartForm$ | async
+    observationChartForm: observationChartForm$ | async,
+    observationChartEncounterType: observationChartEncounterType$ | async
   } as dashboardParams"
 >
   <div
@@ -342,15 +343,14 @@
                   [visit]="activeVisit"
                   [forms]="dashboardParams?.forms"
                   [shouldUseOwnFormSelection]="false"
-                  [consultationOrderType]="
-                    dashboardParams?.consultationOrderType
-                  "
-                  [consultationEncounterType]="
-                    dashboardParams?.consultationEncounterType
+                  [obsChartEncounterType]="
+                    dashboardParams?.observationChartEncounterType
                   "
                   [provider]="dashboardParams?.provider"
-                  (updateConsultationOrder)="onUpdateConsultationOrder()"
                   [selectedForm]="selectedForm && dashboardParams?.observationChartForm === selectedForm?.uuid ? selectedForm : dashboardParams?.forms[0]?.uuid === dashboardParams?.observationChartForm ? dashboardParams?.forms[0] : {}
+                  "
+                  (saveObservations)="
+                    onSaveObservations($event, params?.currentPatient)
                   "
                 >
                 </app-patient-observations-chart>
