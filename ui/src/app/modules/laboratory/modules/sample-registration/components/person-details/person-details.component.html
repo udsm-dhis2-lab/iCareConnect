@@ -32,6 +32,9 @@
     *ngIf="personDetailsCategory === 'existing'"
     (personDetails)="onGetPersonDetails($event)"
   ></app-registered-patient-details>
+  <app-clients-from-external-systems
+    *ngIf="personDetailsCategory === 'other'"
+  ></app-clients-from-external-systems>
 
   <div class="row primary-identifier">
     <div class="col-10">

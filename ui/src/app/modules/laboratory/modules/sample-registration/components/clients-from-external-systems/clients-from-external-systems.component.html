@@ -1,1 +1,53 @@
-<p>clients-from-external-systems works!</p>
+<div class="row" *ngIf="{ clientsList: clientsList$ | async } as params">
+  <div class="col-md-2">
+    <mat-form-field class="w-100">
+      <mat-label>Select</mat-label>
+      <mat-select
+        required
+        [(ngModel)]="selectedSystem"
+        (selectionChange)="getSelectedSystem($event.value)"
+      >
+        <mat-option [value]="option" *ngFor="let option of systems"
+          >{{ option?.name }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+  <div class="col-md-2" *ngIf="selectedSystem">
+    <mat-form-field class="w-100">
+      <mat-label>Select</mat-label>
+      <mat-select
+        required
+        [(ngModel)]="selectedSearchCriteria"
+        (selectionChange)="getSelectedSearchCriteria($event.value)"
+      >
+        <mat-option
+          [value]="option"
+          *ngFor="let option of selectedSystem?.searchingCriteria"
+          >{{ option?.name }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+  <div class="col-md-2">
+    <!-- <mat-icon matPrefix class="text-muted">search</mat-icon> -->
+
+    <mat-form-field class="w-100">
+      <input
+        class="ml-2 w-100"
+        matInput
+        autocomplete="off"
+        placeholder="Search"
+        (keyup)="getSearchingText($event)"
+      />
+      <button
+        mat-button
+        matSuffix
+        (click)="searchClientsFromExternalSystems($event)"
+      >
+        <mat-icon>search</mat-icon>
+      </button>
+    </mat-form-field>
+  </div>
+  <div class="col-12"></div>
+</div>

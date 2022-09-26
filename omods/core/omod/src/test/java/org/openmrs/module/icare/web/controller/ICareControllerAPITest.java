@@ -596,9 +596,8 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 	
 	@Test
 	public void testGetPatientFromExternalSystem() throws Exception {
-		MockHttpServletRequest newGetRequest = newGetRequest("icare/patient/externalsystems", new Parameter(
-		        "identifier", "2133573"), new Parameter(
-				"identifierReference", "t74raEkPShW"));
+		MockHttpServletRequest newGetRequest = newGetRequest("icare/client/externalsystems", new Parameter("identifier",
+		        "2133573"), new Parameter("identifierReference", "t74raEkPShW"));
 		MockHttpServletResponse handle = handle(newGetRequest);
 		String patientData = handle.getContentAsString();
 		System.out.println(patientData);
