@@ -3,6 +3,7 @@ package org.openmrs.module.icare.laboratory.models;
 // Generated Oct 7, 2020 12:48:40 PM by Hibernate Tools 5.2.10.Final
 
 import org.openmrs.User;
+import org.openmrs.module.icare.billing.models.Discount;
 
 import javax.persistence.*;
 import java.text.ParseException;
@@ -41,6 +42,12 @@ public class SampleStatus { // implements java.io.Serializable {
 	
 	@Column(name = "status", length = 32)
 	private String status;
+	
+	@Column(name = "category", length = 32)
+	private String category;
+	
+	@Column(name = "retired")
+	private Boolean retired;
 	
 	public String getRemarks() {
 		return this.remarks;
@@ -90,6 +97,22 @@ public class SampleStatus { // implements java.io.Serializable {
 		return id;
 	}
 	
+	public String getCategory() {
+		return category;
+	}
+	
+	public void setCategory(String category) {
+		this.category = category;
+	}
+	
+	public void setRetired(boolean retired) {
+		this.retired = retired;
+	}
+	
+	public Boolean getRetired() {
+		return retired;
+	}
+	
 	public static SampleStatus fromMap(Map<String, Object> map) throws ParseException {
 		SampleStatus sampleStatus = new SampleStatus();
 		
@@ -103,7 +126,12 @@ public class SampleStatus { // implements java.io.Serializable {
 		
 		sampleStatus.setStatus((map.get("status")).toString());
 		sampleStatus.setRemarks((map.get("remarks")).toString());
-		
+		if (map.get("category") != null) {
+			sampleStatus.setCategory((map.get("category")).toString());
+		}
+		if (map.get("retired") != null) {
+			sampleStatus.setRetired((Boolean) map.get("retired"));
+		}
 		if (map.get("timestamp") == null) {
 			
 			sampleStatus.setTimestamp(new Date());
@@ -128,12 +156,16 @@ public class SampleStatus { // implements java.io.Serializable {
 		statusObject.put("status", this.getStatus());
 		statusObject.put("timestamp", this.getTimestamp());
 		statusObject.put("remarks", this.getRemarks());
-		
+		if (this.getCategory() != null) {
+			statusObject.put("category", this.getCategory());
+		}
+		if (this.retired != null) {
+			statusObject.put("retired", this.getRetired());
+		}
 		HashMap<String, Object> userObject = new HashMap<String, Object>();
 		if (this.getUser() != null) {
 			userObject.put("uuid", this.getUser().getUuid());
 			userObject.put("name", this.getUser().getDisplayString());
-			
 			statusObject.put("user", userObject);
 			
 		}

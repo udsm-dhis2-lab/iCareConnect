@@ -2,7 +2,10 @@
   *ngIf="{
     settingCurrentLocationStatus: settingCurrentLocationStatus$ | async,
     consultationEncounterType: consultationEncounterType$ | async,
-    consultationOrderType: consultationOrderType$ | async
+    consultationOrderType: consultationOrderType$ | async,
+    radiologyOrderType: radiologyOrderType$ | async,
+    drugOrderType: drugOrderType$ | async,
+    labTestOrderType: labTestOrderType$ | async
   } as params"
 >
   <mat-toolbar>
@@ -81,7 +84,35 @@
             <app-patient-list
               [currentLocation]="(currentLocation$ | async)?.id"
               [shouldShowParentLocation]="true"
-              [orderType]="'52a447d3-a64a-11e3-9aeb-50e549534c5e'"
+              [orderType]="params?.labTestOrderType"
+              [isTabularList]="true"
+              [itemsPerPage]="10"
+              (selectPatient)="onSelectPatient($event)"
+            ></app-patient-list>
+          </ng-template>
+          <!-- </div> -->
+        </mat-tab>
+        <mat-tab label="With Radiology Orders">
+          <!-- <div class="p-2" *ngIf="selectedTab.value === 2"> -->
+
+          <ng-template matTabContent>
+            <app-patient-list
+              [shouldShowParentLocation]="true"
+              [orderType]="params?.radiologyOrderType"
+              [isTabularList]="true"
+              [itemsPerPage]="10"
+              (selectPatient)="onSelectPatient($event)"
+            ></app-patient-list>
+          </ng-template>
+          <!-- </div> -->
+        </mat-tab>
+        <mat-tab label="With Medications">
+          <!-- <div class="p-2" *ngIf="selectedTab.value === 2"> -->
+
+          <ng-template matTabContent>
+            <app-patient-list
+              [shouldShowParentLocation]="true"
+              [orderType]="params?.drugOrderType"
               [isTabularList]="true"
               [itemsPerPage]="10"
               (selectPatient)="onSelectPatient($event)"

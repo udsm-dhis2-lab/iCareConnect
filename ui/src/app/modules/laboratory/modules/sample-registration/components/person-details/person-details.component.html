@@ -18,6 +18,15 @@
     >
       Existing
     </mat-radio-button>
+    <mat-radio-button
+      (change)="getSelection($event)"
+      class="person-details-btn ml-2"
+      [value]="'other'"
+      [checked]="personDetailsCategory === 'other'"
+      color="primary"
+    >
+      Other systems
+    </mat-radio-button>
   </mat-radio-group>
   <app-registered-patient-details
     *ngIf="personDetailsCategory === 'existing'"

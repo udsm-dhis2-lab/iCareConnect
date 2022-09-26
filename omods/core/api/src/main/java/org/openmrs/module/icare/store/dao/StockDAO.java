@@ -168,18 +168,29 @@ public class StockDAO extends BaseDAO<Stock> {
 		
 	}
 	
-	public List<Stock> getStockByLocation(String locationUuid, String search, Integer startIndex, Integer limit) {
+	public List<Stock> getStockByLocation(String locationUuid, String search, Integer startIndex, Integer limit,
+	        String conceptClassName) {
 		
 		DbSession session = this.getSession();
-		String queryStr = "SELECT st \n" + "FROM Stock st \n";
+		String queryStr = "SELECT st \n" + "FROM Stock st \n LEFT JOIN st.item it LEFT JOIN it.concept c";
 		
 		if (search != null) {
-			queryStr += " INNER JOIN st.item it INNER JOIN it.drug d WHERE lower(d.name) LIKE lower(:search) ";
+			queryStr += " LEFT JOIN it.drug d LEFT JOIN d.concept c1 LEFT JOIN c1.names cn1 LEFT JOIN c.names cn WHERE (lower(d.name) LIKE lower(:search) OR lower(cn1.name) like lower(:search) OR lower(cn.name) like lower(:search) ) ";
 		}
 		if (search != null) {
 			queryStr += " AND st.location = (SELECT l FROM Location l WHERE l.uuid = :locationUuid)";
 		} else {
 			queryStr += " WHERE st.location = (SELECT l FROM Location l WHERE l.uuid = :locationUuid)";
+		}
+		if (conceptClassName != null) {
+			
+			if (!queryStr.contains("WHERE")) {
+				queryStr += " WHERE ";
+			} else {
+				queryStr += " AND ";
+			}
+			queryStr += " c.conceptClass =(SELECT ccl FROM ConceptClass ccl WHERE ccl.name = :conceptClassName)";
+			
 		}
 		Query query = session.createQuery(queryStr);
 		query.setFirstResult(startIndex);
@@ -188,8 +199,12 @@ public class StockDAO extends BaseDAO<Stock> {
 		if (search != null) {
 			query.setParameter("search", "%" + search.replace(" ", "%") + "%");
 		}
-		query.setParameter("locationUuid", locationUuid);
-		
+		if (conceptClassName != null) {
+			query.setParameter("conceptClassName", conceptClassName);
+		}
+		if (locationUuid != null) {
+			query.setParameter("locationUuid", locationUuid);
+		}
 		return query.list();
 		
 	}

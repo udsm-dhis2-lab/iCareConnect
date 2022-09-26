@@ -3060,10 +3060,33 @@
         </sql>
     </changeSet>
 
+    <changeSet id="add_columns_to_sample_status" author="dennis-kibahila" dbms="mysql">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists columnName="category" tableName="lb_sample_status"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="lb_sample_status" >
+            <column name="category" type="VARCHAR(30)">
+                <constraints nullable="true"></constraints>
+            </column>
+            <column name="retired" type="BOOLEAN" defaultValueBoolean="false" />
+        </addColumn>
+    </changeSet>
 
-
-
-
+    <changeSet id="add_columns_to_test_allocation_status" author="dennis-kibahila" dbms="mysql">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists columnName="category" tableName="lb_test_allocation_status"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="lb_test_allocation_status" >
+            <column name="category" type="VARCHAR(30)">
+                <constraints nullable="true"></constraints>
+            </column>
+            <column name="retired" type="BOOLEAN" defaultValueBoolean="false" />
+        </addColumn>
+    </changeSet>
 
 
 
