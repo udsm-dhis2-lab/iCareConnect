@@ -1,9 +1,8 @@
 <div class="observations-chart-table-container">
-  <!-- {{ selectedForm | json }} -->
   <table class="table table-bordered table-striped" *ngIf="selectedForm">
     <thead>
       <tr>
-        <th rowspan="2"></th>
+        <th rowspan="2">Date</th>
         <th
           [attr.rowspan]="formField?.setMembers?.length == 0 ? 2 : 1"
           [attr.colspan]="formField?.setMembers?.length"
@@ -22,85 +21,22 @@
           </ng-container>
         </ng-container>
       </tr>
-      <!-- <tr [attr.rowspan]="2">
-        <th rowspan="2">Date & Time</th>
-        <ng-container
-          *ngFor="let formField of formFields?.noChildren"
-          class="w-100"
-        >
-          <th>
-            <span>
-              {{ formField?.name }}
-              <span class="ml-2" *ngIf="formField?.concept?.units"
-                >({{ formField?.concept?.units }})
-              </span>
-            </span>
-          </th>
-        </ng-container>
-        <ng-container
-          *ngFor="let formField of formFields?.withChildren"
-          class="w-100"
-        >
-          <th
-            [attr.colspan]="
-              formField?.setMembers && formField?.setMembers?.length > 0
-                ? formField.setMembers?.length
-                : 0
-            "
-          >
-            <span>
-              {{ formField?.name }}
-              <span class="ml-2" *ngIf="formField?.concept?.units"
-                >({{ formField?.concept?.units }})
-              </span>
-            </span>
-          </th>
-        </ng-container>
-        <th></th>
-      </tr>
-      <tr>
-        <ng-container
-          *ngFor="let formField of formFields?.withChildren"
-          class="w-100"
-        >
-          <ng-container
-            *ngIf="formField?.setMembers && formField?.setMembers?.length > 0"
-          >
-            <ng-container *ngFor="let member of formField?.setMembers">
-              <th class="w-100">
-                <span>
-                  {{ member?.name }}
-                </span>
-              </th>
-            </ng-container>
-          </ng-container>
-        </ng-container>
-      </tr> -->
+   
     </thead>
     <tbody>
       <tr *ngFor="let encounter of obsChartEncountersData">
         <td></td>
         <td *ngFor="let fieldHoldingData of fieldsHoldingData">
-          <!-- TODO: Add support to check if the value is valueObject -->
-          {{
-            encounter?.obsKeyedByConcept[fieldHoldingData?.uuid]
-              ? encounter?.obsKeyedByConcept[fieldHoldingData?.concept?.uuid]
+          {{ encounter?.obsKeyedByConcept[fieldHoldingData?.concept?.uuid]?.value?.display ? encounter?.obsKeyedByConcept[fieldHoldingData?.concept?.uuid]
+                  ?.value?.display : encounter?.obsKeyedByConcept[fieldHoldingData?.concept?.uuid]
+                  ?.value ? encounter?.obsKeyedByConcept[fieldHoldingData?.concept?.uuid]
                   ?.value
-              : "-"
-          }}
+              : "-" }}
         </td>
       </tr>
-      <!-- <tr *ngFor="let encounter of obsChartEncountersData">
-        <td>
-          {{ encounter?.encounterDatetime | date: "medium" }}
-        </td>
-        <td *ngFor="let formField of formFields?.noChildren">
-          {{ encounter?.obsKeyedByConcept[formField?.concept?.uuid]?.value }}
-        </td>
-      </tr> -->
       <tr>
         <td></td>
-        <td *ngFor="let formField of formFields?.noChildren">
+        <td *ngFor="let formField of fieldsHoldingData">
           <app-form
             *ngIf="
               formField &&
@@ -114,92 +50,18 @@
             [fieldsData]=""
             (formUpdate)="onFormUpdate($event)"
           ></app-form>
-
-          <!-- <ng-container *ngIf="formField?.formFields">
-           <td *ngFor="let subFormField of formField?.formFields">
-            <app-form
-            [fields]="[subFormField]"
-            [isFormHorizontal]="false"
-            [isReport]="false"
-            [fieldsData]=""
-            (formUpdate)="onFormUpdate($event)"
-          ></app-form></td>
-          </ng-container>
-          <ng-container *ngIf="formField?.setMembers">
-            <div *ngFor="let member of formField?.setMembers">
-              <td *ngFor="let memberField of member?.formFields">
-              <app-form
-              [fields]="[memberField]"
-              [isFormHorizontal]="false"
-              [isReport]="false"
-              [fieldsData]=""
-              (formUpdate)="onFormUpdate($event)"
-            ></app-form></td>
-            </div>
-          </ng-container> -->
-
-          <!-- <div
+          <app-form
             *ngIf="
-              formField?.formField &&
-              formField?.setMembers &&
-              formField?.setMembers?.length > 0
-            "
-          >
-            <td *ngFor="let member of formField?.setMembers">
-              <app-form
-                [fields]="member?.formFields"
-                [isFormHorizontal]="true"
-                [fieldsData]="params?.observations"
-                [isReport]="isReport"
-                (formUpdate)="onFormUpdate($event)"
-              >
-              </app-form>
-            </td>
-          </div>
-          <div
-            *ngIf="
-              formField?.formField &&
               formField?.formFields &&
               formField?.formFields?.length > 0
             "
-          >
-            <td *ngFor="let subField of formField?.formFields">
-              <app-form
-                [fields]="[subField]"
-                [isFormHorizontal]="false"
-                [fieldsData]="params?.observations"
-                [isReport]="isReport"
-                (formUpdate)="onFormUpdate($event)"
-              >
-              </app-form>
-            </td>
-          </div> -->
+            [fields]="formField?.formFields"
+            [isFormHorizontal]="true"
+            [isReport]="false"
+            [fieldsData]=""
+            (formUpdate)="onFormUpdate($event)"
+          ></app-form>
         </td>
-        <ng-container *ngFor="let formField of formFields?.withChildren">
-          <ng-container
-            *ngIf="formField?.setMembers && formField?.setMembers?.length > 0"
-          >
-            <td *ngFor="let member of formField?.setMembers" class="w-100">
-              <app-form
-                *ngIf="member.formFields && member.formFields?.length > 0"
-                [fields]="member?.formFields"
-                [isFormHorizontal]="true"
-                [isReport]="false"
-                [fieldsData]=""
-                (formUpdate)="onFormUpdate($event)"
-              ></app-form>
-
-              <app-form
-                *ngIf="member.formField"
-                [fields]="[member?.formField]"
-                [isFormHorizontal]="true"
-                [isReport]="false"
-                [fieldsData]=""
-                (formUpdate)="onFormUpdate($event)"
-              ></app-form>
-            </td>
-          </ng-container>
-        </ng-container>
         <td class="text-center">
           <button
             [disabled]="!atLeastOneFormFieldHasBeenFilled"
