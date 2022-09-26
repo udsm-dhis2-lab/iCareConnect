@@ -595,12 +595,14 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 	}
 	
 	@Test
-	public void testGetPatientFromExternalSystem() throws Exception {
+	public void testGetClientsFromExternalSystem() throws Exception {
 		MockHttpServletRequest newGetRequest = newGetRequest("icare/client/externalsystems", new Parameter("identifier",
 		        "2133573"), new Parameter("identifierReference", "t74raEkPShW"));
 		MockHttpServletResponse handle = handle(newGetRequest);
 		String patientData = handle.getContentAsString();
-		System.out.println(patientData);
+		//		Map clientDataMap = (new ObjectMapper()).readValue(patientData, Map.class);
+		//		System.out.println(clientDataMap.get("trackedEntityInstances"));
+		//		System.out.println(patientData);
 		//		Map patientDataMap = (new ObjectMapper()).readValue(patientData, Map.class);
 		//		List<Map> patientDataDetails = (List<Map>) patientDataMap;
 		//		System.out.println(patientDataDetails);

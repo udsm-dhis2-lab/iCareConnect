@@ -9,8 +9,12 @@
  */
 package org.openmrs.module.icare.web.controller;
 
+import com.mysql.fabric.xmlrpc.Client;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.map.util.JSONPObject;
+import org.json.JSONObject;
 import org.openmrs.*;
 import org.openmrs.api.*;
 import org.openmrs.api.context.Context;
@@ -456,13 +460,39 @@ public class ICareController {
 	
 	@RequestMapping(value = "client/externalsystems", method = RequestMethod.GET)
 	@ResponseBody
-	public Object getPatientFromExternalSystems(@RequestParam(value = "identifier", required = false) String identifier,
+	public List<Object> getClientsFromExternalSystems(@RequestParam(value = "identifier", required = false) String identifier,
 	        @RequestParam(value = "identifierReference", required = false) String identifierReference) {
-		Object patientData = new Object();
+//		Object patientData = new Object();
+		List<Object> formattedTrackedEntityInstances = new ArrayList<>();
 		try {
-			String patientFromExternalSystem = iCareService.getPatientFromExternalSystems(identifier, identifierReference);
-			patientData = (Object) patientFromExternalSystem;
-			
+			String patientFromExternalSystem = iCareService.getClientsFromExternalSystems(identifier, identifierReference);
+//			patientData = (Object) patientFromExternalSystem;
+			JSONObject test = new JSONObject(patientFromExternalSystem);
+			Map trackedEntityInstancesMap = (new ObjectMapper()).readValue(patientFromExternalSystem, Map.class);
+//			patientData = trackedEntityInstancesMap.get("trackedEntityInstances");
+			List<Object> trackedEntityInstances = (List<Object>)trackedEntityInstancesMap.get("trackedEntityInstances");
+			for (int count =0; count < trackedEntityInstances.size(); count++) {
+				Map<String, Object> clientFormattedData = new HashMap<>();
+				Map<String, Object> currentTrackedEntityInstance = new HashMap<>();
+				currentTrackedEntityInstance = (Map<String, Object> )trackedEntityInstances.get(count);
+				List<Object> enrollments = (List<Object>)currentTrackedEntityInstance.get("enrollments");
+				Map<String, Object> eventData = new HashMap<>();
+				Map<String, Object> currentEnrollment = (Map<String, Object> )enrollments.get(0);  // Expected to have only one enrollment
+				List<Object> events = (List<Object>)currentEnrollment.get("events");
+				eventData.put("hasResults", events.size() == 2);
+				clientFormattedData.put("hasResults", events.size() == 2);
+				clientFormattedData.put("trackedEntityInstance", currentTrackedEntityInstance.get("trackedEntityInstance"));
+				clientFormattedData.put("enrollment", currentEnrollment.get("enrollment"));
+				clientFormattedData.put("enrollmentDate", currentEnrollment.get("enrollmentDate"));
+				clientFormattedData.put("orgUnitName", currentEnrollment.get("orgUnitName"));
+				clientFormattedData.put("orgUnit", currentEnrollment.get("orgUnit"));
+				clientFormattedData.put("testRequestData", events.get(0));
+				clientFormattedData.put("status", currentEnrollment.get("status"));
+				clientFormattedData.put("program", currentEnrollment.get("program"));
+				clientFormattedData.put("registrationInfo", currentTrackedEntityInstance.get("attributes"));
+//				formattedTrackedEntityInstance.put("orgUnitName", (new ObjectMapper()).readValue(trackedEntityInstances[count], Map.class));
+				formattedTrackedEntityInstances.add(count,clientFormattedData);
+			}
 		}
 		catch (IOException e) {
 			throw new RuntimeException(e);
@@ -470,6 +500,6 @@ public class ICareController {
 		catch (URISyntaxException e) {
 			throw new RuntimeException(e);
 		}
-		return patientData;
+		return formattedTrackedEntityInstances;
 	}
 }

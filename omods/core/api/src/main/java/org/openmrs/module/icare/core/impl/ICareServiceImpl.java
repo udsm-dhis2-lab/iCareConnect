@@ -521,7 +521,7 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		return dao.getDrugs(concept, limit, startIndex);
 	}
 	
-	public String getPatientFromExternalSystems(String identifier, String identifierReference) throws IOException,
+	public String getClientsFromExternalSystems(String identifier, String identifierReference) throws IOException,
 	        URISyntaxException {
 		AdministrationService administrationService = Context.getService(AdministrationService.class);
 		
@@ -546,7 +546,6 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		        + ":EQ:"
 		        + identifier
 		        + "&ou=m0frOspS7JY&ouMode=DESCENDANTS&program=MNhYWMkR0Z7&fields=attributes[attribute,code,value],enrollments[*],orgUnit,trackedEntityInstance&paging=false";
-		System.out.println(path);
 		url = new URL(baseUrl.concat(path));
 		
 		HttpURLConnection con = (HttpURLConnection) url.openConnection();
