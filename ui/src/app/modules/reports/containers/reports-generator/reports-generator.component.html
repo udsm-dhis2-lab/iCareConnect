@@ -289,9 +289,11 @@
           </div>
 
           <div class="mt-3" *ngIf="showReportArea && !loadingReport">
-            <div
-              *ngFor="let dataSet of reportData?.dataSets"
-            >
+            <div *ngFor="let dataSet of reportData?.dataSets">
+              <div
+                style="height: 70vh; overflow: auto"
+                *ngIf="!isQuickPivotSet"
+              >
                 <app-report-table
                   [data]="dataSet"
                   *ngIf="currentVisualization === 'TABLE' && !isQuickPivotSet"
