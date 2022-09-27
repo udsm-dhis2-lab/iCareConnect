@@ -29,12 +29,26 @@
           {{ encounter?.encounterDatetime | date: "medium" }}
         </td>
         <td *ngFor="let fieldHoldingData of fieldsHoldingData">
-          {{ encounter?.obsKeyedByConcept[fieldHoldingData?.concept?.uuid]?.value?.display ? encounter?.obsKeyedByConcept[fieldHoldingData?.concept?.uuid]
-                  ?.value?.display : encounter?.obsKeyedByConcept[fieldHoldingData?.concept?.uuid]
-                  ?.value ? encounter?.obsKeyedByConcept[fieldHoldingData?.concept?.uuid]
-                  ?.value
-                  : "-" }} 
-              <!-- {{ fieldHoldingData?.concept?.uuid | json }} -->
+          <ng-container *ngIf="fieldHoldingData?.setMembers?.length > 0">
+            <ng-container *ngFor="let member of fieldHoldingData?.setMembers">  
+              <span *ngIf="!(member.dataType === 'Boolean')">
+                  {{ encounter?.obsKeyedByConcept[fieldHoldingData?.concept?.uuid]?.value?.display ? encounter?.obsKeyedByConcept[member?.uuid]
+                    ?.value?.display : encounter?.obsKeyedByConcept[member?.uuid]
+                    ?.value ? encounter?.obsKeyedByConcept[member?.uuid]
+                    ?.value
+                    : "-" }} 
+              </span>
+            </ng-container>
+          </ng-container>
+          <ng-container *ngIf="!fieldHoldingData?.setMembers?.length">
+            <span>
+              {{ encounter?.obsKeyedByConcept[fieldHoldingData?.concept?.uuid]?.value?.display ? encounter?.obsKeyedByConcept[fieldHoldingData?.concept?.uuid]
+                      ?.value?.display : encounter?.obsKeyedByConcept[fieldHoldingData?.concept?.uuid]
+                      ?.value ? encounter?.obsKeyedByConcept[fieldHoldingData?.concept?.uuid]
+                      ?.value
+                      : "-" }} 
+            </span>
+          </ng-container>
         </td>
       </tr>
       <tr>
