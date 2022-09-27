@@ -127,10 +127,12 @@
               [disabled]="
                 !currentReport ||
                 !currentReport?.name ||
-                (reportSelectionParams
+                (reportSelectionParams ||
+                (selectedReportParameters &&
+                  selectedReportParameters?.name?.length > 0 &&
+                  !reportConfigs?.dhisConfigs)
                   ? selectedReportParameters?.length !== count
-                  : false) ||
-                !this.showReportButton
+                  : false)
               "
               class="ml-2"
               mat-flat-button

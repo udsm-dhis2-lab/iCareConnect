@@ -15,11 +15,14 @@ export class BarCodeModalComponent implements OnInit {
   lineColor = "#000000";
   width = 1.2;
   height = 50;
-  fontSize = "13";
+  fontSize = "10";
   displayValue = true;
   sample: any;
   ordersToDisplay: any[];
   dialogData: any;
+  bcTextPosition: string = "top";
+  bcTextAlign: string = "center";
+
   constructor(
     private dialogRef: MatDialogRef<BarCodeModalComponent>,
     @Inject(MAT_DIALOG_DATA) data
