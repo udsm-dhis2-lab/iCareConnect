@@ -476,6 +476,7 @@ public class ICareController {
 			String lastNameAttributeUid = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.attributes.lastName");
 			String genderAttributeUid = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.attributes.gender");
 			String nationalityAttributeUid = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.attributes.nationality");
+			String dobAttributeUid = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.attributes.dob");
 			String passportNumberAttributeUid = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.attributes.passportNumber");
 			String phoneNumberAttributeUid = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.attributes.phoneNumber");
 
@@ -534,6 +535,9 @@ public class ICareController {
 					}
 					if (attribute.get("attribute").equals(nationalityAttributeUid)) {
 						clientFormattedData.put("nationality",attribute.get("value"));
+					}
+					if (attribute.get("attribute").equals(dobAttributeUid)) {
+						clientFormattedData.put("dob",attribute.get("value"));
 					}
 					if (attribute.get("attribute").equals(passportNumberAttributeUid)) {
 						clientFormattedData.put("passportNumber",attribute.get("value"));

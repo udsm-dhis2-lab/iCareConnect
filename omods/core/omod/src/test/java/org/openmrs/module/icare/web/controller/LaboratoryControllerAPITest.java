@@ -257,52 +257,48 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		assertThat("Page is 2", (Integer) pagerObject.get("page") == 1, is(true));
 		assertThat("List count is 1", ((List) sampleResults.get("results")).size() == 0, is(true));
 	}
-
+	
 	@Test
-	public void testGettingSamplesBySamplesbyCategory() throws Exception{
-
+	public void testGettingSamplesBySamplesbyCategory() throws Exception {
+		
 		// creating sample status
 		String dto = this.readFile("dto/sample-status-create-dto.json");
 		Map<String, Object> sampleStatus = (new ObjectMapper()).readValue(dto, Map.class);
-
+		
 		MockHttpServletRequest newPostRequest = newPostRequest("lab/samplestatus", sampleStatus);
 		MockHttpServletResponse handle = handle(newPostRequest);
-
+		
 		//Creating allocation status
 		//Given
 		String dto2 = this.readFile("dto/test-allocation-status-create.json");
 		Map<String, Object> testAllocationStatus = (new ObjectMapper()).readValue(dto2, Map.class);
-
+		
 		//When
-		MockHttpServletRequest newPostRequest2= newPostRequest("lab/allocationstatus", testAllocationStatus);
-		 MockHttpServletResponse handle2 = handle(newPostRequest2);
-
-
-		MockHttpServletRequest newGetRequest = newGetRequest("lab/samples", new Parameter("sampleCategory", "RECEIVED"),new Parameter("startDate", "2020-12-27"), new Parameter("endDate", "2022-10-10"));
+		MockHttpServletRequest newPostRequest2 = newPostRequest("lab/allocationstatus", testAllocationStatus);
+		MockHttpServletResponse handle2 = handle(newPostRequest2);
+		
+		MockHttpServletRequest newGetRequest = newGetRequest("lab/samples", new Parameter("sampleCategory", "RECEIVED"),
+		    new Parameter("startDate", "2020-12-27"), new Parameter("endDate", "2022-10-10"));
 		MockHttpServletResponse handleGet = handle(newGetRequest);
 		Map<String, Object> sampleResults = (new ObjectMapper()).readValue(handleGet.getContentAsString(), Map.class);
-
-		MockHttpServletRequest newGetRequest2 = newGetRequest("lab/samples", new Parameter("testCategory", "RESULTS"),new Parameter("startDate", "2020-12-27"), new Parameter("endDate", "2022-10-10"));
+		
+		MockHttpServletRequest newGetRequest2 = newGetRequest("lab/samples", new Parameter("testCategory", "RESULTS"),
+		    new Parameter("startDate", "2020-12-27"), new Parameter("endDate", "2022-10-10"));
 		MockHttpServletResponse handleGet2 = handle(newGetRequest2);
 		Map<String, Object> sampleResults2 = (new ObjectMapper()).readValue(handleGet2.getContentAsString(), Map.class);
-
-
-		MockHttpServletRequest newGetRequest3 = newGetRequest("lab/samples", new Parameter("testCategory", "Completed"),new Parameter("startDate", "2020-12-27"));
+		
+		MockHttpServletRequest newGetRequest3 = newGetRequest("lab/samples", new Parameter("testCategory", "Completed"),
+		    new Parameter("startDate", "2020-12-27"));
 		MockHttpServletResponse handleGet3 = handle(newGetRequest3);
 		Map<String, Object> sampleResults3 = (new ObjectMapper()).readValue(handleGet3.getContentAsString(), Map.class);
-
-
-
-		System.out.println("Results1: "+sampleResults);
-		System.out.println("Results2: "+sampleResults2);
-		System.out.println("Results3: "+sampleResults3);
-
+		
+		System.out.println("Results1: " + sampleResults);
+		System.out.println("Results2: " + sampleResults2);
+		System.out.println("Results3: " + sampleResults3);
+		
 		assertThat("Should return a sample", ((List) sampleResults.get("results")).size() == 1);
 		assertThat("Should return a sample", ((List) sampleResults2.get("results")).size() == 1);
-
-
-
-
+		
 	}
 	
 	@Test
