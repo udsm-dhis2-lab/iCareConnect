@@ -1,14 +1,27 @@
-<div *ngIf="{ 
-  filters: filters$ | async, 
+<div class="search-input-card p-2 border mb-3 mt-3">
+  <mat-icon matPrefix class="text-muted">search</mat-icon>
+  <input class="ml-2 w-100 search-input" matInput autocomplete="off" placeholder="Search Active Patients"
+  (keyup)="onSearchPatient($event)" />
+</div>
+<div class="w-100" *ngIf="filters$ | async as filters">
+      <app-patient-list-filters *ngIf="filters" [filterCategories]="filters"
+        (onFilterChanged)="filterPatientList($event)"></app-patient-list-filters>
+
+      <!-- <button
+        mat-button
+        class="ml-2 float-left"
+        id="registration-search-patient"
+        (click)="onSearchAllPatient($event)"
+      >
+        <mat-icon class="mr-2">search</mat-icon>
+        <span>Search From All Patients</span>
+      </button> -->
+</div>
+<mat-progress-bar *ngIf="loadingPatients" mode="indeterminate" class="mb-3"></mat-progress-bar>
+<div *ngIf="{  
   visits: visits$ | async 
 } as params">
-  <div class="search-input-card p-2 border mb-3">
-    <mat-icon matPrefix class="text-muted">search</mat-icon>
-    <input class="ml-2 w-100 search-input" matInput autocomplete="off" placeholder="Search Active Patients"
-      (keyup)="onSearchPatient($event)" />
-  </div>
-  <mat-progress-bar *ngIf="loadingPatients" mode="indeterminate" class="mb-3"></mat-progress-bar>
-  <div class="patient-list d-flex" *ngIf="params?.visits">
+  <div class="patient-list d-fle" *ngIf="params?.visits">
     <!-- {{ params?.visits | json }} -->
     <div class="text-center w-100 mt-5" *ngIf="searchTerm &&
         (params?.visits | filterBy: searchTerm:'patientName')?.length === 0
@@ -22,21 +35,8 @@
       <h3 class="text-muted">No available Patients for the current location</h3>
     </div> -->
     <div *ngIf="params?.visits && params?.visits.length > 0" class="w-100 patient-list-type-toggle-container d-flex">
-      <div class="w-75">
-        <app-patient-list-filters *ngIf="params?.filters" [filterCategories]="params?.filters"
-          (onFilterChanged)="filterPatientList($event)"></app-patient-list-filters>
-
-        <!-- <button
-          mat-button
-          class="ml-2 float-left"
-          id="registration-search-patient"
-          (click)="onSearchAllPatient($event)"
-        >
-          <mat-icon class="mr-2">search</mat-icon>
-          <span>Search From All Patients</span>
-        </button> -->
-      </div>
-      <div class="w-25">
+      
+      <div class="w-100">
         <button class="float-right" [ngClass]="{ 'active-list-type': isTabularList }"
           (click)="togglePatientTypeList('tabular')">
           <mat-icon> list </mat-icon>
