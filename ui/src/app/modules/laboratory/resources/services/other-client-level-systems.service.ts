@@ -19,7 +19,9 @@ export class OtherClientLevelSystemsService {
       )
       .pipe(
         map((response) => {
-          return response;
+          return response?.filter(
+            (responseItem) => responseItem?.events?.length > 0
+          );
         })
       );
   }
