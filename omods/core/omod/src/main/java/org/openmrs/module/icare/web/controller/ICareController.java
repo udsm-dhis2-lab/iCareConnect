@@ -482,6 +482,9 @@ public class ICareController {
 //			Get results stage uid
 			String resultsStageId = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.programStages.resultsStage");
 
+//			Get test request stage uid
+			String testRequestStageId = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.programStages.testRequestStage");
+
 //			patientData = (Object) patientFromExternalSystem;
 			JSONObject test = new JSONObject(patientFromExternalSystem);
 			Map trackedEntityInstancesMap = (new ObjectMapper()).readValue(patientFromExternalSystem, Map.class);
@@ -502,14 +505,16 @@ public class ICareController {
 					if (event.get("programStage").equals(resultsStageId)) {
 						clientFormattedData.put("hasResults", true);
 					}
-				}
 
+					if (event.get("programStage").equals(testRequestStageId)) {
+						clientFormattedData.put("testRequestData", event);
+					}
+				}
 				clientFormattedData.put("trackedEntityInstance", currentTrackedEntityInstance.get("trackedEntityInstance"));
 				clientFormattedData.put("enrollment", currentEnrollment.get("enrollment"));
 				clientFormattedData.put("enrollmentDate", currentEnrollment.get("enrollmentDate"));
 				clientFormattedData.put("orgUnitName", currentEnrollment.get("orgUnitName"));
 				clientFormattedData.put("orgUnit", currentEnrollment.get("orgUnit"));
-				clientFormattedData.put("testRequestData", events.get(0));
 				clientFormattedData.put("status", currentEnrollment.get("status"));
 				clientFormattedData.put("program", currentEnrollment.get("program"));
 				List<Object> attributes = (List<Object>) currentTrackedEntityInstance.get("attributes");
