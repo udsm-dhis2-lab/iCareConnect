@@ -75,7 +75,10 @@ export class ClientsFromExternalSystemsComponent implements OnInit {
     event.stopPropagation();
     this.isSearching = false;
     if (!client?.hasResults) {
-      this.selectedClientRequest.emit(client);
+      this.selectedClientRequest.emit({
+        ...client,
+        selectedSystem: this.selectedSystem,
+      });
     }
     this.showClientsList = false;
   }
