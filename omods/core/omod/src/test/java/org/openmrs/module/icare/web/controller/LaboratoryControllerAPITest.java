@@ -286,10 +286,19 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		MockHttpServletResponse handleGet2 = handle(newGetRequest2);
 		Map<String, Object> sampleResults2 = (new ObjectMapper()).readValue(handleGet2.getContentAsString(), Map.class);
 
+
+		MockHttpServletRequest newGetRequest3 = newGetRequest("lab/samples", new Parameter("testCategory", "Completed"),new Parameter("startDate", "2020-12-27"));
+		MockHttpServletResponse handleGet3 = handle(newGetRequest3);
+		Map<String, Object> sampleResults3 = (new ObjectMapper()).readValue(handleGet3.getContentAsString(), Map.class);
+
+
+
 		System.out.println("Results1: "+sampleResults);
 		System.out.println("Results2: "+sampleResults2);
+		System.out.println("Results3: "+sampleResults3);
 
 		assertThat("Should return a sample", ((List) sampleResults.get("results")).size() == 1);
+		assertThat("Should return a sample", ((List) sampleResults2.get("results")).size() == 1);
 
 
 
@@ -450,8 +459,8 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		
 		assertThat("Has 1 rejected sample", summaryMap.get("samplesWithRejectedResults").equals(1));
 		assertThat("Has 1 authorized sample", summaryMap.get("samplesAuthorized").equals(1));
-		assertThat("Has 1  no result sample", summaryMap.get("samplesWithNoResults").equals(1));
-		assertThat("Has 1 result sample", summaryMap.get("samplesWithResults").equals(1));
+		assertThat("Has 2  no completeresult sample", summaryMap.get("samplesWithNoResults").equals(2));
+		assertThat("Has Atleast 1 result sample", summaryMap.get("samplesWithResults").equals(1));
 		
 	}
 	

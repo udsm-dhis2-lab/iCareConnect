@@ -75,8 +75,8 @@ public class SampleDAO extends BaseDAO<Sample> {
 			if (!queryStr.contains("WHERE")) {
 				queryStr += " WHERE ";
 			}
-			queryStr += " cast(sp.dateTime as date) BETWEEN :startDate AND :endDate \n"
-			        + "OR cast(sp.dateCreated as date) BETWEEN :startDate AND :endDate";
+			queryStr += " (cast(sp.dateTime as date) BETWEEN :startDate AND :endDate) \n"
+			        + "OR (cast(sp.dateCreated as date) BETWEEN :startDate AND :endDate)";
 		}
 		
 		if (locationUuid != null) {
@@ -108,8 +108,14 @@ public class SampleDAO extends BaseDAO<Sample> {
 			}else{
 				queryStr += " AND ";
 			}
-			queryStr+="";
+			queryStr+="sp IN(SELECT testalloc.sampleOrder.id.sample FROM TestAllocation testalloc WHERE testalloc IN (SELECT testresults.testAllocation FROM Result testresults))) ";
+
+//			queryStr+="LEFT JOIN TestAllocation testalloc ON testalloc.sampleOrder.id.sample = sp JOIN Result testresults ON testresults.testAllocation = testalloc GROUP BY sp HAVING COUNT(testalloc)=COUNT(testresults) ";
+
+//			queryStr +=" LEFT JOIN sp.testAllocations al LEFT JOIN al.testAllocationResults ar GROUP BY sp HAVING COUNT(al.id) = COUNT(ar.testAllocation)";
+
 		}
+
 		queryStr += " ORDER BY sp.dateCreated ";
 		Query query = session.createQuery(queryStr);
 		if (startDate != null && endDate != null) {
@@ -123,7 +129,7 @@ public class SampleDAO extends BaseDAO<Sample> {
 		if(sampleCategory != null){
 			query.setParameter("sampleCategory",sampleCategory);
 		}
-		if(testCategory != null){
+		if(testCategory != null && testCategory != "Completed"){
 			query.setParameter("testCategory",testCategory);
 		}
 
