@@ -36,8 +36,6 @@ export class ClinicalNotesComponent implements OnInit {
   @Input() savingObservations: boolean;
   @Input() selectedForm: any;
   @Input() shouldUseOwnFormSelection: boolean;
-  @Input() consultationOrderType: any;
-  @Input() consultationEncounterType: any;
   @Input() provider: any;
   savingObservations$: Observable<boolean>;
   ordersUpdates$: Observable<any>;
