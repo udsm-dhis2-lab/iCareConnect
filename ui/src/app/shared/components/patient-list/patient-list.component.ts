@@ -188,11 +188,12 @@ export class PatientListComponent implements OnInit, OnChanges {
                   ) || [])[0]?.uri?.split("&startIndex=")[1]
                 : this.startingIndex,
               this.itemsPerPage,
-              null,
-              null,
-              null,
-              "ENCOUNTER",
-              "ASC"
+              this.orderType,
+              this.orderStatus,
+              this.orderStatusCode,
+              this.orderBy ? this.orderBy : "ENCOUNTER",
+              this.orderByDirection ? this.orderByDirection : "ASC",
+              this.filterBy
             )
             .pipe(
               tap(() => {
@@ -297,20 +298,26 @@ export class PatientListComponent implements OnInit, OnChanges {
 
     this.filterBy = event && typeof event === "string" ? event : "";
 
-    this.visits$ = this.visitService.getAllVisits(
-      this.currentLocation,
-      false,
-      false,
-      null,
-      0,
-      this.itemsPerPage,
-      this.orderType,
-      this.orderStatus,
-      this.orderStatusCode,
-      this.orderBy ? this.orderBy : "ENCOUNTER",
-      this.orderByDirection ? this.orderByDirection : "ASC",
-      this.filterBy
-    );
+    this.visits$ = this.visitService
+      .getAllVisits(
+        this.currentLocation,
+        false,
+        false,
+        null,
+        0,
+        this.itemsPerPage,
+        this.orderType,
+        this.orderStatus,
+        this.orderStatusCode,
+        this.orderBy ? this.orderBy : "ENCOUNTER",
+        this.orderByDirection ? this.orderByDirection : "ASC",
+        this.filterBy
+      )
+      .pipe(
+        tap(() => {
+          this.loadingPatients = false;
+        })
+      );
 
     // this.filteredVisits$.subscribe({
     //   next: (visits) => {
