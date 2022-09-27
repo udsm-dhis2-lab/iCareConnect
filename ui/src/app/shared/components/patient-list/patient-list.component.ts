@@ -62,6 +62,7 @@ export class PatientListComponent implements OnInit, OnChanges {
   visitAttributeType: any;
   paymentType: any;
   filterBy: any;
+  startingIndex: number = 0;
   constructor(
     private visitService: VisitsService,
     private store: Store<AppState>,
@@ -137,7 +138,7 @@ export class PatientListComponent implements OnInit, OnChanges {
             false,
             false,
             null,
-            0,
+            this.startingIndex,
             this.itemsPerPage,
             this.orderType,
             this.orderStatus,
@@ -166,6 +167,8 @@ export class PatientListComponent implements OnInit, OnChanges {
     this.page =
       details?.type === "next" ? Number(this.page) + 1 : Number(this.page) - 1;
 
+    this.startingIndex = details?.type === "next" ? this.startingIndex + Number(this.itemsPerPage) : this.startingIndex - Number(this.itemsPerPage)
+
     this.visits$ =
       this.service && this.service === "LABS"
         ? this.visitService.getLabVisits("", this.page, this.itemsPerPage).pipe(
@@ -183,7 +186,7 @@ export class PatientListComponent implements OnInit, OnChanges {
                 ? (details.visit?.pager.filter(
                     (pageLink) => pageLink?.rel === details?.type
                   ) || [])[0]?.uri?.split("&startIndex=")[1]
-                : 0,
+                : this.startingIndex,
               this.itemsPerPage,
               null,
               null,
@@ -199,7 +202,6 @@ export class PatientListComponent implements OnInit, OnChanges {
   }
 
   onSearchPatient(e) {
-    const orderType = "";
     e.stopPropagation();
     this.searchTerm = e?.target?.value;
     this.loadingPatients = true;
