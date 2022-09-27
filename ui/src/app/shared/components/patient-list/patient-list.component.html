@@ -1,15 +1,18 @@
-<div *ngIf="{ filters: filters$ | async } as params">
+<div *ngIf="{ 
+  filters: filters$ | async, 
+  visits: visits$ | async 
+} as params">
   <div class="search-input-card p-2 border mb-3">
     <mat-icon matPrefix class="text-muted">search</mat-icon>
     <input class="ml-2 w-100 search-input" matInput autocomplete="off" placeholder="Search Active Patients"
       (keyup)="onSearchPatient($event)" />
   </div>
   <mat-progress-bar *ngIf="loadingPatients" mode="indeterminate" class="mb-3"></mat-progress-bar>
-  <div class="patient-list d-flex" *ngIf="visits$ | async as visits">
-    <!-- {{ visits | json }} -->
+  <div class="patient-list d-flex" *ngIf="params?.visits">
+    <!-- {{ params?.visits | json }} -->
     <div class="text-center w-100 mt-5" *ngIf="
         searchTerm &&
-        (visits | filterBy: searchTerm:'patientName')?.length === 0
+        (params?.visits | filterBy: searchTerm:'patientName')?.length === 0
       ">
       <h3 class="text-muted">
         Patient with keyword "{{ searchTerm }}" could not be found
@@ -19,7 +22,7 @@
     <!-- <div class="text-center w-100 mt-5" *ngIf="visits?.length === 0">
       <h3 class="text-muted">No available Patients for the current location</h3>
     </div> -->
-    <div *ngIf="visits && visits.length > 0" class="w-100 patient-list-type-toggle-container d-flex">
+    <div *ngIf="params?.visits && params?.visits.length > 0" class="w-100 patient-list-type-toggle-container d-flex">
       <div class="w-75">
         <app-patient-list-filters *ngIf="params?.filters" [filterCategories]="params?.filters"
           (onFilterChanged)="filterPatientList($event)"></app-patient-list-filters>
@@ -47,7 +50,7 @@
     </div>
     <ng-container class="w-100" *ngIf="!isTabularList">
       <ng-container *ngFor="
-          let visit of visits$ | async  | filterBy: searchTerm:'patientName':null:service
+          let visit of params?.visits | filterBy: searchTerm:'patientName':null:service
         ">
         <div *ngIf="
             (paymentTypeSelected &&
@@ -82,20 +85,20 @@
     <!-- Tabular list -->
     <div class="tabular-patient-list" *ngIf="isTabularList && paymentTypeSelected != ''">
       <app-patients-tabular-list [shouldShowParentLocation]="shouldShowParentLocation"
-        [visits]="visits | filterBy: searchTerm:'patientName':null:service" [paymentTypeSelected]="paymentTypeSelected"
+        [visits]="params?.visits | filterBy: searchTerm:'patientName':null:service" [paymentTypeSelected]="paymentTypeSelected"
         (patientVisitDetails)="onSelectPatient(null, $event)" [itemsPerPage]="itemsPerPage" [page]="page"
         (shouldLoadNewList)="onLoadNewList($event)"></app-patients-tabular-list>
     </div>
     <!-- End of Tabular list -->
   </div>
 
-  <div *ngIf="visits$ | async as visits">
-    <div class="d-flex justify-content-end mt-2 mb-2" *ngIf="!isTabularList && visits && visits.length > 0">
-      <button [disabled]="page === 0" mat-stroked-button (click)="getAnotherList($event, visits[0], 'prev')">
+  <div *ngIf="params?.visits">
+    <div class="d-flex justify-content-end mt-2 mb-2" *ngIf="!isTabularList && params?.visits && params?.visits.length > 0">
+      <button [disabled]="page === 0" mat-stroked-button (click)="getAnotherList($event, params?.visits[0], 'prev')">
         Prev
       </button>
-      <button [disabled]="visits && visits[0]?.visit && !visits[0].visit?.pager" class="ml-2" mat-stroked-button
-        (click)="getAnotherList($event, visits[0], 'next')">
+      <button [disabled]="params?.visits && params?.visits[0]?.visit && !params?.visits[0].visit?.pager" class="ml-2" mat-stroked-button
+        (click)="getAnotherList($event, params?.visits[0], 'next')">
         Next
       </button>
     </div>

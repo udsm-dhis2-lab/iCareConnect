@@ -93,32 +93,32 @@ export class PatientListComponent implements OnInit, OnChanges {
     /**
      * TODO: find the best place to put this
      */
-    this.visits$.pipe(take(1)).subscribe((visits) => {
-      map(visits, (visit) => {
-        if (
-          visit["visit"]?.location?.tags.some(
-            (tag) => tag?.name === "Bed Location"
-          )
-        ) {
-          this.store.dispatch(
-            upsertAdmittedPatientLocation({
-              locationVisitDetails: {
-                id: visit["visit"]?.location?.uuid,
-                locationId: visit["visit"]?.location?.uuid,
-                ...visit["visit"],
-              },
-            })
-          );
-        } else {
-          this.store.dispatch(
-            upsertAdmittedPatientLocation({
-              locationVisitDetails: {},
-            })
-          );
-        }
-        this.store.dispatch(clearActiveVisit());
-      });
-    });
+    // this.visits$.pipe(take(1)).subscribe((visits) => {
+    //   map(visits, (visit) => {
+    //     if (
+    //       visit["visit"]?.location?.tags.some(
+    //         (tag) => tag?.name === "Bed Location"
+    //       )
+    //     ) {
+    //       this.store.dispatch(
+    //         upsertAdmittedPatientLocation({
+    //           locationVisitDetails: {
+    //             id: visit["visit"]?.location?.uuid,
+    //             locationId: visit["visit"]?.location?.uuid,
+    //             ...visit["visit"],
+    //           },
+    //         })
+    //       );
+    //     } else {
+    //       this.store.dispatch(
+    //         upsertAdmittedPatientLocation({
+    //           locationVisitDetails: {},
+    //         })
+    //       );
+    //     }
+    //     this.store.dispatch(clearActiveVisit());
+    //   });
+    // });
   }
 
   private getVisits(visits: Visit[]) {
