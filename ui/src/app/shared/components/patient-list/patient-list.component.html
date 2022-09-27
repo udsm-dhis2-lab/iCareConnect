@@ -10,8 +10,7 @@
   <mat-progress-bar *ngIf="loadingPatients" mode="indeterminate" class="mb-3"></mat-progress-bar>
   <div class="patient-list d-flex" *ngIf="params?.visits">
     <!-- {{ params?.visits | json }} -->
-    <div class="text-center w-100 mt-5" *ngIf="
-        searchTerm &&
+    <div class="text-center w-100 mt-5" *ngIf="searchTerm &&
         (params?.visits | filterBy: searchTerm:'patientName')?.length === 0
       ">
       <h3 class="text-muted">
@@ -97,7 +96,7 @@
       <button [disabled]="page === 0" mat-stroked-button (click)="getAnotherList($event, params?.visits[0], 'prev')">
         Prev
       </button>
-      <button [disabled]="params?.visits && params?.visits[0]?.visit && !params?.visits[0].visit?.pager" class="ml-2" mat-stroked-button
+      <button [disabled]="(params?.visits && params?.visits[0]?.visit && !params?.visits[0].visit?.pager) && itemsPerPage > params?.visits.length" class="ml-2" mat-stroked-button
         (click)="getAnotherList($event, params?.visits[0], 'next')">
         Next
       </button>
