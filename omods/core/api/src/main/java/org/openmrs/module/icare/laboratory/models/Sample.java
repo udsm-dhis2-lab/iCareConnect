@@ -54,6 +54,9 @@ public class Sample extends BaseOpenmrsData implements java.io.Serializable, JSO
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "sample")
 	private List<SampleStatus> sampleStatuses = new ArrayList<SampleStatus>(0);
 	
+	//	@OneToMany(fetch = FetchType.LAZY, mappedBy = "sampleOrder.id.sample")
+	//	private List<TestAllocation> testAllocations = new ArrayList<TestAllocation>(0);
+	
 	public Sample() {
 	}
 	
