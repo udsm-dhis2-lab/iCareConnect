@@ -30,6 +30,8 @@ export class ClientsFromExternalSystemsComponent implements OnInit {
   selectedSearchCriteria: any;
   searchingText: string;
   clientsList$: Observable<any>;
+  isSearching: boolean = false;
+  showClientsList: boolean = false;
   constructor(
     private otherClientLevelSystemsService: OtherClientLevelSystemsService
   ) {}
@@ -48,17 +50,30 @@ export class ClientsFromExternalSystemsComponent implements OnInit {
 
   searchClientsFromExternalSystems(event: Event): void {
     event.stopPropagation();
-    console.log(this.selectedSearchCriteria);
-    console.log("searchingText ", this.searchingText);
+    this.isSearching = true;
+    // "2133573"
     this.clientsList$ =
       this.otherClientLevelSystemsService.getClientsFromOtherSystems({
-        identifier: "2133573",
+        identifier: this.searchingText,
         identifierReference: this.selectedSearchCriteria?.referenceKey,
       });
-    this.clientsList$.subscribe((response) => console.log(response));
+    this.showClientsList = true;
   }
 
   getSelectedSearchCriteria(criteria: any): void {
     this.selectedSearchCriteria = criteria;
+  }
+
+  toggleList(event: Event): void {
+    event.stopPropagation();
+    this.showClientsList = !this.showClientsList;
+    this.isSearching = false;
+  }
+
+  onSelectClient(event: Event, client: any): void {
+    event.stopPropagation();
+    console.log(client);
+    this.isSearching = false;
+    this.showClientsList = false;
   }
 }
