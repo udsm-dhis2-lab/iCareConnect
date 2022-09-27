@@ -375,7 +375,6 @@ export class SingleRegistrationComponent implements OnInit {
       this.registrationCategory === "Clinical"
         ? personDetails
         : NON_CLINICAL_PERSON_DATA;
-    console.log("this.personDetailsData", this.personDetailsData);
   }
 
   onGetClinicalDataValues(clinicalData): void {
@@ -618,10 +617,6 @@ export class SingleRegistrationComponent implements OnInit {
                                   this.savingData = true;
 
                                   // Create encounter with orders
-                                  console.log(
-                                    "groupedTestOrdersByDepartments",
-                                    this.groupedTestOrdersByDepartments
-                                  );
                                   zip(
                                     ...this.groupedTestOrdersByDepartments.map(
                                       (groupedTestOrders) => {
