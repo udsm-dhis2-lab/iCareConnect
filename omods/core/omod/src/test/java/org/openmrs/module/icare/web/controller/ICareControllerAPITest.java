@@ -305,8 +305,9 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		//Get visits by Payment Status
 		//PAID
 		MockHttpServletRequest newGetRequest = newGetRequest("icare/visit", new Parameter("orderTypeUuid",
-		        "2msir5eb-5345-11e8-9922-40b034c3cfee"), new Parameter("OrderBy", "ENCOUNTER"), new Parameter(
-		        "orderByDirection", "ASC"), new Parameter("paymentStatus", "PAID"));
+		        "2msir5eb-5345-11e8-9922-40b034c3cfee"),new Parameter("attributeValueReference", "123"), new Parameter("OrderBy", "ENCOUNTER"), new Parameter(
+		        "orderByDirection", "ASC"), new Parameter("paymentStatus", "PAID"),new Parameter("q",
+				"Harry"));
 		
 		MockHttpServletResponse handle = handle(newGetRequest);
 		String visitData = handle.getContentAsString();
