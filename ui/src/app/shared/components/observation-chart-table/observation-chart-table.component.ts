@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import { flatten } from "lodash";
 import { getObservationsFromForm } from "src/app/modules/clinic/helpers/get-observations-from-form.helper";
 import { getFormattedEncountersByEncounterTypeFromVisit } from "../../helpers/visits.helper";
 import { FormValue } from "../../modules/form/models/form-value.model";
@@ -11,13 +12,15 @@ import { FormValue } from "../../modules/form/models/form-value.model";
 export class ObservationChartTableComponent implements OnInit {
   @Input() selectedForm: any;
   @Input() activeVisit: any;
-  @Input() obsChartEncounterType: string;
+  @Input() obsChartEncounterType: any;
   @Input() patient: any;
   @Input() location: any;
   formData: any;
   obsChartEncountersData: any[];
   atLeastOneFormFieldHasBeenFilled: boolean = false;
+
   @Output() saveObservation: EventEmitter<any> = new EventEmitter<any>();
+  fieldsHoldingData: any[] = [];
   constructor() {}
 
   ngOnInit(): void {
@@ -26,6 +29,13 @@ export class ObservationChartTableComponent implements OnInit {
         this.activeVisit?.visit,
         this.obsChartEncounterType
       );
+    this.selectedForm?.formFields?.forEach((field) => {
+      const fieldsToAttach =
+        !field?.setMembers || field?.setMembers?.length === 0
+          ? [field]
+          : field?.setMembers?.length > 0 ? field?.setMembers : [];
+      this.fieldsHoldingData = [...this.fieldsHoldingData, ...fieldsToAttach];
+    });
   }
 
   onFormUpdate(formValues: FormValue): void {

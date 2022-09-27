@@ -247,15 +247,16 @@
               </mat-form-field>
               <div class="ml-4 mr-4 h6">OR</div>
               <mat-form-field appearance="fill" class="w-100">
-                <mat-label>Date of birth</mat-label>
+                <mat-label>Select Date of birth</mat-label>
                 <input
                   matInput
+                  readonly="readonly"
                   [matDatepicker]="picker"
                   [(ngModel)]="patient['dob']"
-                  (dateInput)="dateSet()"
+                  (dateChange)="dateSet()"
                   name="dob"
                   [max]="maxDateForDateOfBirth"
-                  placeholder="Select Date of birth"
+                  placeholder="Date of birth"
                   [disabled]="addingPatient && !patientAdded"
                   id="dob"
                   required
