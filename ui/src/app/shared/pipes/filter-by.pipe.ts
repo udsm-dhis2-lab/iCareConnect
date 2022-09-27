@@ -50,9 +50,9 @@ export class FilterByPipe implements PipeTransform {
               )?.length > 0 && item[key]?.toLowerCase()?.includes(searchText)
               );
       } else {
-        // if(item?.visit && item?.visit?.patient && item?.visit?.patient.person.display.toLowerCase().includes(searchText.toLowerCase())) {
-        //   return item;
-        // }
+        if(item?.visit && item?.visit?.patient && item?.visit?.patient.person.display.toLowerCase().includes(searchText.toLowerCase())) {
+          return item;
+        }
         return item[key]?.toLowerCase()?.includes(searchText);
       }
     });

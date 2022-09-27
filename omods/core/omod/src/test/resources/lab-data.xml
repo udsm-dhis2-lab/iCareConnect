@@ -123,10 +123,16 @@
 
     <lb_sample_order sample_id="203" order_id="302" />
 
+    <lb_sample_order sample_id="203" order_id="300" />
+
+
+
 
     <!--<lb_test_allocation test_allocation_id="322" uuid="111xxx60-7777-11e3-1111-0sndiu87hsju" device_id="123" sample_id="202" order_id="301" label="Allocation Label Y"/> -->
 
     <lb_test_allocation test_allocation_id="322" uuid="111xxx60-7777-11e3-1111-0sndiu87hsju" sample_id="202" order_id="301" label="Allocation Label Y" date_created="2020-12-27 00:00:00" voided="false" creator="1"/>
+
+    <lb_test_allocation test_allocation_id="324" uuid="222yyy70-7777-11e3-1221-0sndiu87hsja" sample_id="203" order_id="300" label="Allocation Lable z" date_created="2020-12-27 00:00:00" voided="false" creator="1"/>
 
     <!-- test allocation with results -->
     <lb_test_allocation test_allocation_id="323" uuid="222yyy70-7777-11e3-1221-0sndiu87hsju" sample_id="203" order_id="302" label="Allocation Lable x" date_created="2020-12-27 00:00:00" voided="false" creator="1"/>

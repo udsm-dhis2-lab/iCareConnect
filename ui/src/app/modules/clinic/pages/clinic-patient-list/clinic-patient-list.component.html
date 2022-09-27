@@ -42,7 +42,7 @@
           <ng-template matTabContent>
             <app-patient-list
               [isTabularList]="true"
-              [itemsPerPage]="25"
+              [itemsPerPage]="10"
               [currentLocation]="(currentLocation$ | async)?.id"
               [orderType]="params?.consultationOrderType"
               (selectPatient)="onSelectPatient($event)"
@@ -55,7 +55,7 @@
           <ng-template matTabContent>
             <app-patient-list
               [isTabularList]="true"
-              [itemsPerPage]="25"
+              [itemsPerPage]="10"
               [currentLocation]="(currentLocation$ | async)?.id"
               [orderType]="params?.consultationOrderType"
               [orderStatus]="'RECEIVED'"
@@ -71,7 +71,7 @@
             <app-patient-list
               [currentLocation]="(currentLocation$ | async)?.id"
               [isTabularList]="true"
-              [itemsPerPage]="25"
+              [itemsPerPage]="10"
               [orderType]="'52a447d3-a64a-11e3-9aeb-50e549534c5e'"
               (selectPatient)="onSelectPatient($event)"
             ></app-patient-list>

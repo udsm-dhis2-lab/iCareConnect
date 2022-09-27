@@ -6,6 +6,7 @@ import org.openmrs.DrugOrder;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.icare.core.ICareService;
 import org.openmrs.module.icare.core.Item;
+import org.openmrs.module.icare.laboratory.models.Sample;
 import org.openmrs.module.icare.store.models.*;
 import org.openmrs.module.icare.store.services.StoreService;
 import org.openmrs.module.icare.store.util.StockOutException;

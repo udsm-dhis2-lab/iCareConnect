@@ -7,6 +7,7 @@ import org.openmrs.Patient;
 import org.openmrs.Person;
 import org.openmrs.Visit;
 import org.openmrs.api.db.hibernate.DbSession;
+import org.openmrs.module.icare.billing.models.Discount;
 import org.openmrs.module.icare.core.ListResult;
 import org.openmrs.module.icare.core.Pager;
 import org.openmrs.module.icare.core.dao.BaseDAO;
@@ -65,7 +66,8 @@ public class SampleDAO extends BaseDAO<Sample> {
 		return query.list();
 	}
 	
-	public ListResult<Sample> getSamples(Date startDate, Date endDate, Pager pager, String locationUuid) {
+	public ListResult<Sample> getSamples(Date startDate, Date endDate, Pager pager, String locationUuid,
+	        String sampleCategory, String testCategory) {
 		
 		DbSession session = this.getSession();
 		String queryStr = "SELECT sp \n" + "FROM Sample sp \n";
@@ -74,8 +76,8 @@ public class SampleDAO extends BaseDAO<Sample> {
 			if (!queryStr.contains("WHERE")) {
 				queryStr += " WHERE ";
 			}
-			queryStr += " cast(sp.dateTime as date) BETWEEN :startDate AND :endDate \n"
-			        + "OR cast(sp.dateCreated as date) BETWEEN :startDate AND :endDate";
+			queryStr += " (cast(sp.dateTime as date) BETWEEN :startDate AND :endDate) \n"
+			        + "OR (cast(sp.dateCreated as date) BETWEEN :startDate AND :endDate)";
 		}
 		
 		if (locationUuid != null) {
@@ -84,6 +86,37 @@ public class SampleDAO extends BaseDAO<Sample> {
 			}
 			queryStr += " sp.visit.location = (SELECT l FROM Location l WHERE l.uuid = :locationUuid)";
 		}
+		if (sampleCategory != null) {
+			if (!queryStr.contains("WHERE")) {
+				queryStr += " WHERE ";
+			} else {
+				queryStr += " AND ";
+			}
+			queryStr += "sp IN( SELECT sst.sample FROM SampleStatus sst WHERE sst.category=:sampleCategory)";
+			
+		}
+		if (testCategory != null && testCategory != "Completed") {
+			if (!queryStr.contains("WHERE")) {
+				queryStr += " WHERE ";
+			} else {
+				queryStr += " AND ";
+			}
+			queryStr += "sp IN(SELECT testalloc.sampleOrder.id.sample FROM TestAllocation testalloc WHERE testalloc IN (SELECT testallocstatus.testAllocation FROM TestAllocationStatus testallocstatus WHERE testallocstatus.category=:testCategory))";
+		}
+		if (testCategory == "Completed") {
+			if (!queryStr.contains("WHERE")) {
+				queryStr += " WHERE ";
+			} else {
+				queryStr += " AND ";
+			}
+			queryStr += "sp IN(SELECT testalloc.sampleOrder.id.sample FROM TestAllocation testalloc WHERE testalloc IN (SELECT testresults.testAllocation FROM Result testresults))) ";
+			
+			//			queryStr+="LEFT JOIN TestAllocation testalloc ON testalloc.sampleOrder.id.sample = sp JOIN Result testresults ON testresults.testAllocation = testalloc GROUP BY sp HAVING COUNT(testalloc)=COUNT(testresults) ";
+			
+			//			queryStr +=" LEFT JOIN sp.testAllocations al LEFT JOIN al.testAllocationResults ar GROUP BY sp HAVING COUNT(al.id) = COUNT(ar.testAllocation)";
+			
+		}
+		
 		queryStr += " ORDER BY sp.dateCreated ";
 		Query query = session.createQuery(queryStr);
 		if (startDate != null && endDate != null) {
@@ -93,12 +126,21 @@ public class SampleDAO extends BaseDAO<Sample> {
 		if (locationUuid != null) {
 			query.setParameter("locationUuid", locationUuid);
 		}
+		
+		if (sampleCategory != null) {
+			query.setParameter("sampleCategory", sampleCategory);
+		}
+		if (testCategory != null && testCategory != "Completed") {
+			query.setParameter("testCategory", testCategory);
+		}
+		
 		if (pager.isAllowed()) {
 			pager.setTotal(query.list().size());
 			//pager.setPageCount(pager.getT);
 			query.setFirstResult((pager.getPage() - 1) * pager.getPageSize());
 			query.setMaxResults(pager.getPageSize());
 		}
+		
 		ListResult<Sample> listResults = new ListResult();
 		
 		listResults.setPager(pager);

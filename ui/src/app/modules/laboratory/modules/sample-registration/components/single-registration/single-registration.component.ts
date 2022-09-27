@@ -88,6 +88,9 @@ export class SingleRegistrationComponent implements OnInit {
   broughtOnField: any;
   broughtByField: any;
 
+  // TODO: Find a way to softcode this
+  pimaCOVIDDetails: any;
+
   constructor(
     private samplesService: SamplesService,
     private labTestsService: LabTestsService,
@@ -582,6 +585,19 @@ export class SingleRegistrationComponent implements OnInit {
                                 ];
                               });
                             }
+
+                            if (this.personDetailsData?.pimaCOVIDLinkDetails) {
+                              visAttributes = [
+                                ...visAttributes,
+                                {
+                                  attributeType:
+                                    "d4789b04-041f-4cc2-8fce-05fb67e7aefc",
+                                  value: JSON.stringify(
+                                    this.personDetailsData?.pimaCOVIDLinkDetails
+                                  ),
+                                },
+                              ];
+                            }
                             const visitObject = {
                               patient: this.savingDataResponse?.uuid,
                               visitType: "54e8ffdc-dea0-4ef0-852f-c23e06d16066",
@@ -601,10 +617,6 @@ export class SingleRegistrationComponent implements OnInit {
                                   this.savingData = true;
 
                                   // Create encounter with orders
-                                  console.log(
-                                    "groupedTestOrdersByDepartments",
-                                    this.groupedTestOrdersByDepartments
-                                  );
                                   zip(
                                     ...this.groupedTestOrdersByDepartments.map(
                                       (groupedTestOrders) => {

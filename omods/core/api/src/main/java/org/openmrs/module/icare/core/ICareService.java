@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.naming.ConfigurationException;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.util.List;
 
 /**
@@ -126,4 +127,7 @@ public interface ICareService extends OpenmrsService {
 	Summary getSummary();
 	
 	List<Drug> getDrugs(String concept, Integer limit, Integer startIndex);
+	
+	String getClientsFromExternalSystems(String identifier, String identifierReference) throws IOException,
+	        URISyntaxException;
 }
