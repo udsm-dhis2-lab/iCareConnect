@@ -469,6 +469,7 @@ public class ICareController {
 
 			AdministrationService administrationService = Context.getService(AdministrationService.class);
 
+//			Get Attributes for extracting attribute values
 			String firstNameAttributeUid = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.attributes.firstName");
 //					"bVEIQbyClKX";
 			String middleNameAttributeUid = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.attributes.middleName");
@@ -476,7 +477,10 @@ public class ICareController {
 			String genderAttributeUid = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.attributes.gender");
 			String nationalityAttributeUid = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.attributes.nationality");
 			String passportNumberAttributeUid = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.attributes.passportNumber");
-			String phoneNumberAttributeUid = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.attributes.ph");
+			String phoneNumberAttributeUid = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.attributes.phoneNumber");
+
+//			Get results stage uid
+			String resultsStageId = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.programStages.resultsStage");
 
 //			patientData = (Object) patientFromExternalSystem;
 			JSONObject test = new JSONObject(patientFromExternalSystem);
@@ -492,7 +496,14 @@ public class ICareController {
 				Map<String, Object> currentEnrollment = (Map<String, Object> )enrollments.get(0);  // Expected to have only one enrollment
 				List<Object> events = (List<Object>)currentEnrollment.get("events");
 				eventData.put("hasResults", events.size() == 2);
-				clientFormattedData.put("hasResults", events.size() == 2);
+				clientFormattedData.put("events", events);
+				for (int eventCount =0; eventCount< events.size(); eventCount ++) {
+					Map<String, Object> event =(Map<String, Object>) events.get(eventCount);
+					if (event.get("programStage").equals(resultsStageId)) {
+						clientFormattedData.put("hasResults", true);
+					}
+				}
+
 				clientFormattedData.put("trackedEntityInstance", currentTrackedEntityInstance.get("trackedEntityInstance"));
 				clientFormattedData.put("enrollment", currentEnrollment.get("enrollment"));
 				clientFormattedData.put("enrollmentDate", currentEnrollment.get("enrollmentDate"));
