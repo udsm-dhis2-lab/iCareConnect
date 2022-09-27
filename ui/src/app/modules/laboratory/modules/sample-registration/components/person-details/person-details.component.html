@@ -1,4 +1,4 @@
-<div>
+<div style="z-index: 200">
   <mat-radio-group class="registration-category">
     <mat-radio-button
       (change)="getSelection($event)"
@@ -18,11 +18,24 @@
     >
       Existing
     </mat-radio-button>
+    <mat-radio-button
+      (change)="getSelection($event)"
+      class="person-details-btn ml-2"
+      [value]="'other'"
+      [checked]="personDetailsCategory === 'other'"
+      color="primary"
+    >
+      Other systems
+    </mat-radio-button>
   </mat-radio-group>
   <app-registered-patient-details
     *ngIf="personDetailsCategory === 'existing'"
     (personDetails)="onGetPersonDetails($event)"
   ></app-registered-patient-details>
+  <app-clients-from-external-systems
+    *ngIf="personDetailsCategory === 'other'"
+    (selectedClientRequest)="getSelectedClientRequest($event)"
+  ></app-clients-from-external-systems>
 
   <div class="row primary-identifier">
     <div class="col-10">

@@ -23,6 +23,9 @@ import org.openmrs.module.icare.billing.models.Prescription;
 import org.openmrs.module.icare.billing.services.insurance.Claim;
 import org.openmrs.module.icare.billing.services.insurance.ClaimResult;
 import org.openmrs.module.icare.billing.services.insurance.InsuranceService;
+import org.openmrs.module.icare.billing.services.insurance.VerificationException;
+import org.openmrs.module.icare.billing.services.insurance.nhif.AuthToken;
+import org.openmrs.module.icare.billing.services.insurance.nhif.NHIFConfig;
 import org.openmrs.module.icare.core.ICareService;
 import org.openmrs.module.icare.core.Item;
 import org.openmrs.module.icare.core.Message;
@@ -36,15 +39,9 @@ import org.openmrs.validator.ValidateUtil;
 
 import javax.naming.ConfigurationException;
 import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.SocketTimeoutException;
-import java.net.URL;
+import java.net.*;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -522,5 +519,65 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	@Override
 	public List<Drug> getDrugs(String concept, Integer limit, Integer startIndex) {
 		return dao.getDrugs(concept, limit, startIndex);
+	}
+	
+	public String getClientsFromExternalSystems(String identifier, String identifierReference) throws IOException,
+	        URISyntaxException {
+		AdministrationService administrationService = Context.getService(AdministrationService.class);
+		
+		String baseUrl = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.baseUrl");
+		//				"https://covid19-dev.moh.go.tz";
+		String username = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.username");
+		//				"lisintegration";
+		String password = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.password");
+		//				"Dhis@2022";
+		String ou = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.referenceOuUid");
+		//				"m0frOspS7JY";
+		String program = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.programUid");
+		//				"MNhYWMkR0Z7";
+		//		TODO: Find a way to softcode the API References
+		
+		URL url;
+		if (baseUrl == null || baseUrl.trim().equals("")) {
+			throw new VerificationException("Destination server address url is not set. Please set " + baseUrl + ".");
+		}
+		String path = "/api/trackedEntityInstances.json?filter="
+		        + identifierReference
+		        + ":EQ:"
+		        + identifier
+		        + "&ou=m0frOspS7JY&ouMode=DESCENDANTS&program=MNhYWMkR0Z7&fields=attributes[attribute,code,value],enrollments[*],orgUnit,trackedEntityInstance&paging=false";
+		url = new URL(baseUrl.concat(path));
+		
+		HttpURLConnection con = (HttpURLConnection) url.openConnection();
+		
+		String userCredentials = username.concat(":").concat(password);
+		String basicAuth = "Basic " + new String(Base64.getEncoder().encode(userCredentials.getBytes()));
+		
+		con.setRequestProperty("Authorization", basicAuth);
+		
+		con.setRequestMethod("GET");
+		con.setRequestProperty("Content-Type", "application/json; utf-8");
+		con.setRequestProperty("Accept", "application/json");
+		con.setRequestProperty("Authorization", basicAuth);
+		try {
+			BufferedReader bufferIn = new BufferedReader(new InputStreamReader(con.getInputStream()));
+			String inputLine;
+			StringBuffer content = new StringBuffer();
+			while ((inputLine = bufferIn.readLine()) != null) {
+				content.append(inputLine);
+			}
+			bufferIn.close();
+			return String.valueOf(content);
+		}
+		catch (Exception e) {
+			BufferedReader in = new BufferedReader(new InputStreamReader(con.getErrorStream()));
+			String inputLine;
+			StringBuffer content = new StringBuffer();
+			while ((inputLine = in.readLine()) != null) {
+				content.append(inputLine);
+			}
+			in.close();
+			return String.valueOf(content);
+		}
 	}
 }

@@ -20,6 +20,7 @@ import { TextArea } from "src/app/shared/modules/form/models/text-area.model";
 import { Textbox } from "src/app/shared/modules/form/models/text-box.model";
 import * as moment from "moment";
 import { MatDatepickerInputEvent } from "@angular/material/datepicker";
+import { PersonService } from "src/app/core/services/person.service";
 
 @Component({
   selector: "app-person-details",
@@ -30,7 +31,7 @@ export class PersonDetailsComponent implements OnInit {
   @Input() referFromFacilityVisitAttribute: string;
   patientIdentifierTypes: any[];
   @Output() personDetails: EventEmitter<any> = new EventEmitter<any>();
-  personDetailsCategory: string = "new";
+  personDetailsCategory: string = "other";
   personDetailsData: any = {};
   personFields: any[];
   personAgeField: any[];
@@ -49,7 +50,10 @@ export class PersonDetailsComponent implements OnInit {
   @ViewChildren("fieldItem")
   fieldItems: QueryList<FieldComponent>;
 
-  constructor(private registrationService: RegistrationService) {}
+  constructor(
+    private registrationService: RegistrationService,
+    private personService: PersonService
+  ) {}
 
   ngOnInit(): void {
     this.registrationService
@@ -101,31 +105,6 @@ export class PersonDetailsComponent implements OnInit {
       });
     });
   }
-
-  // onFormUpdateForAge(formValues: FormValue): void {
-  //   const values = formValues.getValues();
-  //   Object.keys(values).forEach((key) => {
-  //     this.personDetailsData[key] = values[key]?.value;
-  //   });
-
-  //   if (values["age"]?.value) {
-  //     this.personDetailsData["age"] = new Date(
-  //       new Date().getFullYear() - Number(values["age"]?.value),
-  //       6,
-  //       1
-  //     );
-  //     this.personDOBField = [
-  //       new DateField({
-  //         id: "dob",
-  //         key: "dob",
-  //         label: "Date of birth",
-  //         required: false,
-  //         value: this.personDetailsData ? this.personDetailsData?.dob : null,
-  //         type: "date",
-  //       }),
-  //     ];
-  //   }
-  // }
 
   getAge(event: any): void {
     event.stopPropagation();
@@ -345,5 +324,33 @@ export class PersonDetailsComponent implements OnInit {
     if (this.personDetailsCategory === "new") {
       this.setPersonDetails();
     }
+  }
+
+  getSelectedClientRequest(clientRequest: any): void {
+    console.log("clientRequest", clientRequest);
+    // 1. Check if client exists
+
+    this.personService
+      .getPatientsByIdentifier(clientRequest?.passportNumber)
+      .subscribe((response) => {
+        if (response) {
+          console.log("data", response);
+        }
+      });
+    const personDetailsData = {
+      preferredName: {
+        givenName: clientRequest?.firstName,
+        familyName2: clientRequest?.middleName,
+        familyName: clientRequest?.lastName,
+      },
+      gender:
+        clientRequest?.gender && clientRequest?.gender?.toLowerCase() == "me"
+          ? "M"
+          : "F",
+      email: clientRequest?.email,
+      phoneNumber: clientRequest?.phoneNumber,
+    };
+
+    this.setPersonDetails(personDetailsData);
   }
 }
