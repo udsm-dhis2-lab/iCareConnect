@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, EventEmitter, OnInit, Output } from "@angular/core";
 import { Observable } from "rxjs";
 import { OtherClientLevelSystemsService } from "src/app/modules/laboratory/resources/services/other-client-level-systems.service";
 
@@ -32,6 +32,7 @@ export class ClientsFromExternalSystemsComponent implements OnInit {
   clientsList$: Observable<any>;
   isSearching: boolean = false;
   showClientsList: boolean = false;
+  @Output() selectedClientRequest: EventEmitter<any> = new EventEmitter<any>();
   constructor(
     private otherClientLevelSystemsService: OtherClientLevelSystemsService
   ) {}
@@ -72,8 +73,10 @@ export class ClientsFromExternalSystemsComponent implements OnInit {
 
   onSelectClient(event: Event, client: any): void {
     event.stopPropagation();
-    console.log(client);
     this.isSearching = false;
+    if (!client?.hasResults) {
+      this.selectedClientRequest.emit(client);
+    }
     this.showClientsList = false;
   }
 }
