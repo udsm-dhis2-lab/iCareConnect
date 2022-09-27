@@ -20,8 +20,17 @@ export class PersonService {
   getPatientsByIdentifier(identifier: string): Observable<any> {
     return from(this.api.patient.getAllPatients({ q: identifier })).pipe(
       map((response) => {
-        console.log(response);
-        return response?.results;
+        return response?.results?.length > 0
+          ? response?.results?.map((result: any) => {
+              return {
+                ...result?.person,
+                identifiers: result?.identifiers,
+                uuid: result?.uuid,
+                voided: result?.voided,
+                display: result?.display,
+              };
+            }) || []
+          : response?.results;
       })
     );
   }

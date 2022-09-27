@@ -185,18 +185,19 @@ export class VisitsService {
       const orderTypeParameter = orderType ? `&orderTypeUuid=${orderType}` : "";
 
       const searchTerm = queryParam ? `&q=${queryParam}` : "";
+      const filterByConst = filterBy ? filterBy : ""
       return (
         locationUuids?.length > 0
           ? zip(
               ...locationUuids.map((locationUuid) => {
                 const locationParameter = `locationUuid=${locationUuid}`;
                 return this.httpClient.get(
-                  `icare/visit?${locationParameter}${orderTypeParameter}${orderStatusParameter}${orderStatusCodeParameter}${searchTerm}${sortingParameters}${filterBy}&startIndex=${startIndex}&limit=${limit}`
+                  `icare/visit?${locationParameter}${orderTypeParameter}${orderStatusParameter}${orderStatusCodeParameter}${searchTerm}${sortingParameters}${filterByConst}&startIndex=${startIndex}&limit=${limit}`
                 );
               })
             )
           : this.httpClient.get(
-              `icare/visit?${orderTypeParameter}${orderStatusParameter}${orderStatusCodeParameter}${searchTerm}${sortingParameters}${filterBy}&startIndex=${startIndex}&limit=${limit}`
+              `icare/visit?${orderTypeParameter}${orderStatusParameter}${orderStatusCodeParameter}${searchTerm}${sortingParameters}${filterByConst}&startIndex=${startIndex}&limit=${limit}`
             )
       ).pipe(
         map((visitResponse: any) => {
