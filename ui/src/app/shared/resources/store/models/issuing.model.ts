@@ -29,9 +29,9 @@ export interface IssueStatusObject {
 
 export interface IssueInput {
   requisitionUuid: string;
-  issuingLocationUuid: string;
-  issuedLocationUuid: string;
-  issueItems: Array<{
+  issuingLocationUuid?: string;
+  issuedLocationUuid?: string;
+  issueItems?: Array<{
     itemUuid: string;
     quantity: number;
   }>;
@@ -39,7 +39,7 @@ export interface IssueInput {
 
 export interface IssueStatusInput {
   issueUuid: string;
-  status: RequisitionStatus;
+  status: string;
   remarks?: string;
 }
 
