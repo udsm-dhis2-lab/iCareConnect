@@ -31,13 +31,13 @@
   <div class="overflow-x-auto">
     <table class="table border-bottom table-fit">
       <tr>
-        <th style="width: 8%; word-wrap: initial">#</th>
+        <th style="width: 5%; word-wrap: initial">#</th>
         <th style="width: 40%; word-wrap: break-word">Item</th>
         <th style="width: 10%">Available Quantity</th>
         <th style="width: 10%">Expired Quantity</th>
         <th style="width: 10%">Eligible Quantity</th>
         <th style="width: 10%"># of Batches</th>
-        <th style="width: 10%">
+        <th style="width: 12%">
           <span class="float-right">Actions</span>
         </th>
       </tr>
@@ -74,12 +74,22 @@
           <td>
             <div class="float-right">
               <button
+                class="action-buttons"
                 [disabled]="currentItemStock?.id === stock.id"
                 mat-flat-button
                 color="primary"
                 (click)="onToggleCurrentStock($event, stock)"
               >
                 View/Add Batches
+              </button>
+              <button
+                class="action-buttons"
+                [disabled]="currentItemStock?.id === stock.id"
+                mat-flat-button
+                color="primary"
+                (click)="onViewMinStock($event)"
+              >
+                View Other In-stores
               </button>
             </div>
           </td>
