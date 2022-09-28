@@ -1,5 +1,5 @@
-import { flatten, head, reverse, sortBy } from 'lodash';
-import { RequisitionStatus } from './requisition.model';
+import { flatten, head, reverse, sortBy } from "lodash";
+import { RequisitionStatus } from "./requisition.model";
 
 export interface IssuingObject {
   id: string;
@@ -16,6 +16,7 @@ export interface IssuingObject {
     status: RequisitionStatus;
     error?: any;
   };
+  requestDate?: Date;
 }
 
 export interface IssueStatusObject {
@@ -77,6 +78,10 @@ export class Issuing {
     return this.issue?.requisitionItems[0]?.item?.display;
   }
 
+  get requestDate(): Date {
+    return new Date(this.issue?.created);
+  }
+
   get latestIssueItem(): any {
     return head(
       reverse(
@@ -88,7 +93,7 @@ export class Issuing {
                 created: issue?.created,
               }))
             ),
-            'created'
+            "created"
           )
         )
       )
@@ -96,9 +101,9 @@ export class Issuing {
   }
 
   get quantityRequested(): number {
-    if(this.issue?.requisitionItems.length != 0){
-      return this.issue?.requisitionItems[0]?.quantity || 0; 
-    }else{
+    if (this.issue?.requisitionItems.length != 0) {
+      return this.issue?.requisitionItems[0]?.quantity || 0;
+    } else {
       return 0;
     }
   }
@@ -127,16 +132,16 @@ export class Issuing {
     if (requisitionIssues?.length === 0) {
       const requisitionStatus = head(this.issue?.requisitionStatuses);
 
-      return requisitionStatus?.status || 'PENDING';
+      return requisitionStatus?.status || "PENDING";
     }
 
-    return 'ISSUED';
+    return "ISSUED";
   }
 
   get remarks(): string {
     return this.issue?.issueStatuses
       ? this.issue?.issueStatuses[0].remarks
-      : '';
+      : "";
   }
 
   toJson(): IssuingObject {
@@ -151,6 +156,7 @@ export class Issuing {
       requestedLocation: this.requestedLocation,
       status: this.status,
       remarks: this.remarks,
+      requestDate: this.requestDate,
     };
   }
 

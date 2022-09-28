@@ -20,11 +20,11 @@ export class IssuingService {
     return this.httpClient
       .get(`store/requests?requestedLocationUuid=${locationUuid}`)
       .pipe(
-        map((issueResponse: any) =>
-          (issueResponse || []).map((issueItem) =>
+        map((issueResponse: any) => {
+          return (issueResponse || []).map((issueItem) =>
             new Issuing(issueItem).toJson()
-          )
-        )
+          );
+        })
       );
   }
 
