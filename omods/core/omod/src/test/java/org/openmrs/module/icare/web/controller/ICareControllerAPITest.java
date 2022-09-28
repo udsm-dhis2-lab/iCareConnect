@@ -257,7 +257,7 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		visitData = handle.getContentAsString();
 		visitMap = (new ObjectMapper()).readValue(visitData, Map.class);
 		visitDetails = (List<Map>) visitMap.get("results");
-		assertThat("Should return a visit", visitDetails.size() == 0);
+		assertThat("Should not return a visit", visitDetails.size() == 0);
 		
 		newGetRequest = newGetRequest("icare/visit", new Parameter("orderTypeUuid", "2msir5eb-5345-11e8-9922-40b034c3cfee"),
 		    new Parameter("q", "hermione"));
@@ -273,6 +273,7 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		visitData = handle.getContentAsString();
 		visitMap = (new ObjectMapper()).readValue(visitData, Map.class);
 		visitDetails = (List<Map>) visitMap.get("results");
+		System.out.println(visitDetails);
 		assertThat("Should return a visit", visitDetails.size() == 1);
 		
 	}
@@ -305,8 +306,9 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		//Get visits by Payment Status
 		//PAID
 		MockHttpServletRequest newGetRequest = newGetRequest("icare/visit", new Parameter("orderTypeUuid",
-		        "2msir5eb-5345-11e8-9922-40b034c3cfee"), new Parameter("OrderBy", "ENCOUNTER"), new Parameter(
-		        "orderByDirection", "ASC"), new Parameter("paymentStatus", "PAID"));
+		        "2msir5eb-5345-11e8-9922-40b034c3cfee"), new Parameter("attributeValueReference", "123"), new Parameter(
+		        "OrderBy", "ENCOUNTER"), new Parameter("orderByDirection", "ASC"), new Parameter("paymentStatus", "PAID"),
+		    new Parameter("q", "Harry"));
 		
 		MockHttpServletResponse handle = handle(newGetRequest);
 		String visitData = handle.getContentAsString();
