@@ -55,17 +55,25 @@ export class SampleResultsDashboardComponent implements OnInit {
 
   ngOnInit(): void {
     this.userUuid = this.currentUser?.uuid;
+    this.getCompletedSamples();
+  }
 
-    const moreInfo =  {
-        patients: this.patients,
-        sampleTypes: this.sampleTypes,
-        departments: this.labSamplesDepartments,
-        containers: this.labSamplesContainers,
-        configs: this.configs,
-        codedSampleRejectionReasons: this.codedSampleRejectionReasons,
-      }
-    
-    this.allSamples$ = this.samplesService.getSampleByStatusCategory('COMPLETED', this.datesParameters?.startDate, this.datesParameters?.endDate, moreInfo);
+  getCompletedSamples() {
+        const moreInfo = {
+          patients: this.patients,
+          sampleTypes: this.sampleTypes,
+          departments: this.labSamplesDepartments,
+          containers: this.labSamplesContainers,
+          configs: this.configs,
+          codedSampleRejectionReasons: this.codedSampleRejectionReasons,
+        };
+
+    this.allSamples$ = this.samplesService.getSampleByStatusCategory(
+          "COMPLETED",
+          this.datesParameters?.startDate,
+          this.datesParameters?.endDate,
+          moreInfo
+        );
   }
 
   setDepartment(department) {
@@ -99,54 +107,53 @@ export class SampleResultsDashboardComponent implements OnInit {
     });
 
     confirmDialog.afterClosed().subscribe((res) => {
+
       if (res.confirmed && key === "release") {
-        this.status = !this.status;
-        const data = {
+        const sampleStatus = {
           sample: {
             uuid: sample?.uuid,
           },
           user: {
             uuid: this.userUuid,
           },
+          remarks: "",
           status: "RELEASED",
+          category: "RELEASED"
         };
-        this.store.dispatch(
-          setSampleStatus({
-            status: data,
-            details: {
-              ...sample,
-              acceptedBy: {
-                uuid: this.providerDetails?.uuid,
-                name: this.providerDetails?.display,
-              },
-            },
-          })
-        );
+
+        this.samplesService
+          .setSampleStatus(sampleStatus)
+          .subscribe((response) => {
+            if (response.error) {
+              console.log("Error: " + response.error);
+            }
+            if (!response.error) {
+              console.log("Response: " + response);
+            }
+          });
       }
       if (res.confirmed && key === "restrict") {
-        this.status = !this.status;
-        const data = {
+        const sampleStatus = {
           sample: {
-            uuid: sample?.sampleUuid,
+            uuid: sample?.uuid,
           },
           user: {
             uuid: this.userUuid,
           },
+          remarks: "",
           status: "RESTRICTED",
+          category: "RESTRICTED",
         };
-        this.store.dispatch(
-          setSampleStatus({
-            status: data,
-            details: {
-              ...sample,
-              acceptedBy: {
-                uuid: this.providerDetails?.uuid,
-                name: this.providerDetails?.display,
-              },
-            },
-          })
-        );
+        this.samplesService.setSampleStatus(sampleStatus).subscribe((response) => {
+          if(response.error){
+            console.log("Error: " + response.error);
+          }
+          if(!response.error){
+            console.log("Response: " + response);
+          }
+        });
       }
+      this.getCompletedSamples()
     });
   }
 }

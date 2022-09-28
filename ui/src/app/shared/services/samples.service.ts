@@ -5,10 +5,8 @@ import { HttpClient } from "@angular/common/http";
 import { from, Observable, of, zip } from "rxjs";
 import { BASE_URL } from "../constants/constants.constants";
 import { catchError, delay, map } from "rxjs/operators";
-import { SampleObject, LabSampleModel } from "src/app/modules/laboratory/resources/models";
-import { keyDepartmentsByTestOrder, keySampleTypesByTestOrder } from "../helpers/sample-types.helper";
-import { generateSelectionOptions } from "../helpers/patient.helper";
-import { createSearchingText, formatResults, formatSample, formatUserChangedStatus, getResultsCommentsStatuses } from "../helpers/lab-samples.helper";
+import { SampleObject } from "src/app/modules/laboratory/resources/models";
+import { formatSample } from "../helpers/lab-samples.helper";
 
 @Injectable({
   providedIn: "root",
