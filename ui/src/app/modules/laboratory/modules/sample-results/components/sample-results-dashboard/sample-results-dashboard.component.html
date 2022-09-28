@@ -1,17 +1,10 @@
 <div
   *ngIf="{
-    allSamples: allSamples$ | async,
-    samplesLoadedState: samplesLoadedState$ | async,
-    privileges: privileges$ | async,
-    labConfigs: labConfigs$ | async,
-    codedSampleRejectionReasons: codedSampleRejectionReasons$ | async,
-    completedSamples: completedSamples$ | async
+    allSamples: allSamples$ | async
   } as sampleParams"
   >
   <mat-progress-bar
     *ngIf="
-      !sampleParams?.samplesLoadedState ||
-      !sampleParams?.labConfigs ||
       !sampleParams?.allSamples
     "
     mode="indeterminate"
@@ -19,9 +12,7 @@
 
   <div
     *ngIf="
-      sampleParams?.samplesLoadedState &&
-      sampleParams?.allSamples &&
-      sampleParams?.labConfigs
+      sampleParams?.allSamples
     "
   >
     <div class="sample-dashboard-summary">
@@ -201,19 +192,20 @@
                       }}
                     </td>
                     <td
+                      class="text-center"
                       *ngIf="orderCount == 0"
                       [attr.rowspan]="sample?.orders?.length"
                     >
-                      <span *ngIf="sample?.accepted"> Accepted </span>
+                      <span> {{ sample?.externalUseStatus[0]?.status ? sample?.externalUseStatus[0]?.status : '-' }}  </span>
                     </td>
                     <td
                       *ngIf="orderCount == 0"
                       [attr.rowspan]="sample?.orders?.length"
                     >
-                      <button *ngIf="!status" mat-button class="colored-button" (click)="onUpdateStatus($event, sample, 'release')">
+                      <button *ngIf="!sample.externalUseStatus.length || sample?.externalUseStatus[0]?.status !== 'RELEASED'" mat-button class="colored-button" (click)="onUpdateStatus($event, sample, 'release')">
                         Release
                       </button>
-                      <button *ngIf="status" mat-button class="btn-danger" (click)="onUpdateStatus($event, sample, 'restrict')">
+                      <button *ngIf="sample.externalUseStatus.length > 0 && sample?.externalUseStatus[0]?.status === 'RELEASED'" mat-button class="btn-danger" (click)="onUpdateStatus($event, sample, 'restrict')">
                         Restrict
                       </button>
                 </tr>
