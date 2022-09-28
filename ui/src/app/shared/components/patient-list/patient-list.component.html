@@ -79,8 +79,7 @@
         <div
           *ngIf="
             (paymentTypeSelected &&
-              visit?.visit?.paymentType === paymentTypeSelected) ||
-            !paymentTypeSelected
+              visit?.visit?.paymentType === paymentTypeSelected)
           "
           class="bg-light d-flex justify-content-center patient-item m-2"
           (click)="onSelectPatient($event, visit)"
