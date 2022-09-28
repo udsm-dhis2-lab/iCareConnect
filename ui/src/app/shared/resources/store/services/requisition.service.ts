@@ -1,17 +1,18 @@
-import { Injectable } from '@angular/core';
-import { Observable, of, throwError } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { OpenmrsHttpClientService } from 'src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service';
-import { RequisitionInput } from '../models/requisition-input.model';
+import { Injectable } from "@angular/core";
+import { Observable, of, throwError } from "rxjs";
+import { map } from "rxjs/operators";
+import { OpenmrsHttpClientService } from "src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service";
+import { RequisitionInput } from "../models/requisition-input.model";
 import {
   Requisition,
   RequisitionIssueInput,
   RequisitionObject,
   RequisitionStatus,
-} from '../models/requisition.model';
+} from "../models/requisition.model";
+import { orderBy } from "lodash";
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: "root",
 })
 export class RequisitionService {
   constructor(private httpClient: OpenmrsHttpClientService) {}
@@ -21,11 +22,11 @@ export class RequisitionService {
       .get(`store/requests?requestingLocationUuid=${locationUuid}`)
       .pipe(
         map((requestResponse) =>
-          (requestResponse || [])
+          orderBy(requestResponse || [], ["created"], ["desc"])
             .map((requestItem) => {
               const requisitionInstance = new Requisition(requestItem);
 
-              if (requisitionInstance.status === 'CANCELLED') {
+              if (requisitionInstance.status === "CANCELLED") {
                 return null;
               }
 
@@ -43,11 +44,11 @@ export class RequisitionService {
 
     if (!request) {
       return throwError({
-        message: 'Incorrect parameters supplied',
+        message: "Incorrect parameters supplied",
       });
     }
 
-    return this.httpClient.post('store/request', request).pipe(
+    return this.httpClient.post("store/request", request).pipe(
       map((response) => {
         return new Requisition(response).toJson();
       })
@@ -62,15 +63,15 @@ export class RequisitionService {
 
     if (!receipt) {
       return throwError({
-        message: 'Incorrect parameters supplied',
+        message: "Incorrect parameters supplied",
       });
     }
 
-    return this.httpClient.post('store/receive', receipt).pipe(
+    return this.httpClient.post("store/receive", receipt).pipe(
       map(() => {
         return {
           ...requisitionObject,
-          status: 'RECEIVED',
+          status: "RECEIVED",
           crudOperationStatus: null,
         };
       })
@@ -81,14 +82,14 @@ export class RequisitionService {
     requisitionIssueInput: RequisitionIssueInput
   ): Observable<string> {
     if (!requisitionIssueInput) {
-      return throwError({ message: 'You have provided incorrect parameters' });
+      return throwError({ message: "You have provided incorrect parameters" });
     }
 
     const requisitionIssueObject = Requisition.createRequisitionIssue(
       requisitionIssueInput
     );
 
-    return this.httpClient.post('store/receive', requisitionIssueObject).pipe(
+    return this.httpClient.post("store/receive", requisitionIssueObject).pipe(
       map((response) => {
         return null;
       })
@@ -106,7 +107,7 @@ export class RequisitionService {
       status
     );
     return this.httpClient
-      .post('store/requeststatus', requisitionStatus)
+      .post("store/requeststatus", requisitionStatus)
       .pipe(map(() => requisitionId));
   }
 }
