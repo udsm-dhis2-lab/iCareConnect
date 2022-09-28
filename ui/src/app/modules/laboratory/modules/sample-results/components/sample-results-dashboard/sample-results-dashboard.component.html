@@ -201,10 +201,10 @@
                       *ngIf="orderCount == 0"
                       [attr.rowspan]="sample?.orders?.length"
                     >
-                      <button *ngIf="!status" mat-button class="colored-button" (click)="onUpdateStatus($event, sample, 'release')">
+                      <button *ngIf="!sample.externalUseStatus.length || sample?.externalUseStatus[0]?.status !== 'RELEASED'" mat-button class="colored-button" (click)="onUpdateStatus($event, sample, 'release')">
                         Release
                       </button>
-                      <button *ngIf="status" mat-button class="btn-danger" (click)="onUpdateStatus($event, sample, 'restrict')">
+                      <button *ngIf="sample.externalUseStatus.length > 0 && sample?.externalUseStatus[0]?.status === 'RELEASED'" mat-button class="btn-danger" (click)="onUpdateStatus($event, sample, 'restrict')">
                         Restrict
                       </button>
                 </tr>
