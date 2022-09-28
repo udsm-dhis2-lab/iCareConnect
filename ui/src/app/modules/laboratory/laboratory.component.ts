@@ -131,6 +131,13 @@ export class LaboratoryComponent implements OnInit {
               path: ["/laboratory/sample-collection-home"],
             })
           );
+        } else if (currentRoute?.url === "/laboratory/sample-results-list") {
+          this.router.navigate(["laboratory"]);
+          this.store.dispatch(
+            go({
+              path: ["/laboratory/sample-results-list"],
+            })
+          );
         } else if (currentRoute?.url === "/laboratory") {
           this.router.navigate(["laboratory"]);
           this.store.dispatch(
