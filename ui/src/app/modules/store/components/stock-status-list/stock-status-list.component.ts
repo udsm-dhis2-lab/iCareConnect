@@ -1,6 +1,8 @@
 import { Component, Input, OnInit } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { Observable, of } from "rxjs";
+import { map } from "rxjs/operators";
+import { LocationService } from "src/app/core/services";
 import { LocationGet } from "src/app/shared/resources/openmrs";
 import { LedgerInput } from "src/app/shared/resources/store/models/ledger-input.model";
 import { StockObject } from "src/app/shared/resources/store/models/stock.model";
@@ -22,11 +24,17 @@ export class StockStatusListComponent implements OnInit {
   searchTerm: string;
   currentItemStock: StockObject;
   currentItemStock$: Observable<StockObject>;
+  locations$: Observable<any>;
   saving: boolean = false;
-  constructor(private stockService: StockService, private dialog: MatDialog) {}
+  constructor(
+    private stockService: StockService,
+    private dialog: MatDialog,
+    private locationService: LocationService
+  ) {}
 
   ngOnInit(): void {
     this.getStock();
+    this.getLocatons();
   }
 
   searchStock(event: any): void {
@@ -92,5 +100,11 @@ export class StockStatusListComponent implements OnInit {
         );
       }
     });
+  }
+
+  getLocatons(): void {
+    this.locations$ = this.locationService
+      .getLocationsByTagName("store")
+      .pipe(map((locations) => console.log("==> Locations: ", locations)));
   }
 }
