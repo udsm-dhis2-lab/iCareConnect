@@ -14,7 +14,7 @@ export class SystemSettingsComponent implements OnInit {
   ngOnInit(): void {
     this.systemSettingsGroups$ =
       this.systemSettingsService.getSystemSettingsByKey(
-        "iCare.systemSettings.groups"
+        "iCare.general.systemSettings.groups"
       );
   }
 }
