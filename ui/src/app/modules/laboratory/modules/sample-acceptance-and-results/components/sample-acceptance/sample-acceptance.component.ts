@@ -300,6 +300,7 @@ export class SampleAcceptanceComponent implements OnInit {
   }
 
   onOpenNewTab(e) {
+    console.log("test", e);
     if (e.index === 0) {
       this.store.dispatch(
         loadLabSamplesByCollectionDates({
