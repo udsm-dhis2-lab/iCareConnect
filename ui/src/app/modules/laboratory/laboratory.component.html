@@ -113,6 +113,17 @@
           <mat-chip
             class="w-20"
             routerLinkActive="active-route"
+            (click)="changeRoute($event, 'sample-results-list', true)"
+            [ngClass]="{
+              'active-route':
+                currentRoutePath === 'sample-results-list'
+            }"
+          >
+            Sample Results List
+          </mat-chip>
+          <mat-chip
+            class="w-20"
+            routerLinkActive="active-route"
             (click)="changeRoute($event, 'sample-tracking', true)"
             [ngClass]="{
               'active-route': currentRoutePath === 'sample-tracking'
