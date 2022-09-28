@@ -1,17 +1,10 @@
 <div
   *ngIf="{
-    allSamples: allSamples$ | async,
-    samplesLoadedState: samplesLoadedState$ | async,
-    privileges: privileges$ | async,
-    labConfigs: labConfigs$ | async,
-    codedSampleRejectionReasons: codedSampleRejectionReasons$ | async,
-    completedSamples: completedSamples$ | async
+    allSamples: allSamples$ | async
   } as sampleParams"
   >
   <mat-progress-bar
     *ngIf="
-      !sampleParams?.samplesLoadedState ||
-      !sampleParams?.labConfigs ||
       !sampleParams?.allSamples
     "
     mode="indeterminate"
@@ -19,9 +12,7 @@
 
   <div
     *ngIf="
-      sampleParams?.samplesLoadedState &&
-      sampleParams?.allSamples &&
-      sampleParams?.labConfigs
+      sampleParams?.allSamples
     "
   >
     <div class="sample-dashboard-summary">

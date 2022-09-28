@@ -55,43 +55,17 @@ export class SampleResultsDashboardComponent implements OnInit {
 
   ngOnInit(): void {
     this.userUuid = this.currentUser?.uuid;
-    this.store.dispatch(
-      addLabDepartments({ labDepartments: this.labSamplesDepartments })
-    );
-    this.store.dispatch(
-      loadLabSamplesByCollectionDates({
-        datesParameters: this.datesParameters,
+
+    const moreInfo =  {
         patients: this.patients,
         sampleTypes: this.sampleTypes,
         departments: this.labSamplesDepartments,
         containers: this.labSamplesContainers,
         configs: this.configs,
         codedSampleRejectionReasons: this.codedSampleRejectionReasons,
-      })
-    );
-
-    this.codedSampleRejectionReasons$ = this.store.select(
-      getCodedSampleRejectionReassons
-    );
-
-    this.labConfigs$ = this.store.select(getLabConfigurations);
-
-    this.samplesLoadedState$ = this.store.select(
-      getFormattedLabSamplesLoadedState
-    );
-    this.allSamples$ = this.store
-      .select(getFormattedLabSamplesForTracking, {
-        department: this.selectedDepartment,
-        searchingText: this.searchingText,
-      })
-      .pipe(
-        map((samples) => {
-          return samples?.length && samples?.length > 0
-            ? samples.filter((sample) => sample.accepted)
-            : [];
-        })
-      );
-    this.completedSamples$ = this.samplesService.getSampleByStatusCategory('COMPLETED', this.datesParameters?.startDate, this.datesParameters?.endDate);
+      }
+    
+    this.allSamples$ = this.samplesService.getSampleByStatusCategory('COMPLETED', this.datesParameters?.startDate, this.datesParameters?.endDate, moreInfo);
   }
 
   setDepartment(department) {
@@ -126,7 +100,6 @@ export class SampleResultsDashboardComponent implements OnInit {
 
     confirmDialog.afterClosed().subscribe((res) => {
       if (res.confirmed && key === "release") {
-        // console.log("==> Sample: ", sample, ' \n ==> User: ', this.currentUser)
         this.status = !this.status;
         const data = {
           sample: {

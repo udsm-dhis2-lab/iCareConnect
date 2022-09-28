@@ -1111,7 +1111,7 @@ export class LabSamplesEffects {
   );
 }
 
-function createSearchingText(sample) {
+export function createSearchingText(sample) {
   return (
     sample?.label +
     "-" +
