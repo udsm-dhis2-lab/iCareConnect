@@ -5,7 +5,8 @@ import { HttpClient } from "@angular/common/http";
 import { from, Observable, of, zip } from "rxjs";
 import { BASE_URL } from "../constants/constants.constants";
 import { catchError, delay, map } from "rxjs/operators";
-import { SampleObject, LabSampleModel } from "src/app/modules/laboratory/resources/models";
+import { SampleObject } from "src/app/modules/laboratory/resources/models";
+import { formatSample } from "../helpers/lab-samples.helper";
 
 @Injectable({
   providedIn: "root",
@@ -60,7 +61,12 @@ export class SamplesService {
     );
   }
 
-  getSampleByStatusCategory(category: string, startDate?: any, endDate?: any) {
+  getSampleByStatusCategory(
+    category: string,
+    startDate?: any,
+    endDate?: any,
+    formattingInfo?: any
+  ) {
     category = category ? `?sampleCategory=${category}` : "";
     const dates =
       startDate && endDate && category.length > 0
@@ -69,8 +75,10 @@ export class SamplesService {
         ? `?startDate=${startDate}&endDate=${endDate}`
         : "";
     return this.httpClient.get(BASE_URL + `lab/sample${category}${dates}`).pipe(
-      map((response: LabSampleModel[]) => {
-        return response;
+      map((response: any) => {
+        return _.map(response, (sample) => {
+          return formatSample(sample, formattingInfo);
+        });
       }),
       catchError((error) => of(error))
     );
