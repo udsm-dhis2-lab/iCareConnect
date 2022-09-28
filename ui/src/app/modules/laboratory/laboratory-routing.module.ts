@@ -63,6 +63,13 @@ const routes: Routes = [
             "./modules/sample-acceptance-and-results/sample-acceptance-and-results.module"
           ).then((m) => m.SampleAcceptanceAndResultsModule),
       },
+      {
+        path: "sample-results-list",
+        loadChildren: () =>
+          import("./modules/sample-results/sample-results.module").then(
+            (m) => m.SampleResultsModule,
+          ),
+      },
     ],
   },
 ];

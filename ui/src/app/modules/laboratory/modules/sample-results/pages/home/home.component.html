@@ -9,20 +9,24 @@
     labSamplesContainers: labSamplesContainers$ | async,
     configs: configs$ | async,
     codedSampleRejectionReasons: codedSampleRejectionReasons$ | async,
-    LISConfigurations: LISConfigurations$ | async
+    LISConfigurations: LISConfigurations$ | async,
+    currentUser: currentUser$ | async,
+    privileges: privileges$ | async,
+    providerDetails: providerDetails$ | async
   } as params"
 >
   <div
     *ngIf="
       params?.datesParameters &&
+      params?.sampleTypesLoadedState &&
       params?.labSamplesDepartments?.length > 0 &&
-      params?.labSamplesContainers &&
       params?.configs &&
+      params?.labSamplesContainers &&
       params?.codedSampleRejectionReasons &&
       params?.LISConfigurations
     "
   >
-    <app-sample-acceptance-dashboard
+    <app-sample-results-dashboard
       [datesParameters]="params?.datesParameters"
       [patients]="params?.visitReferences"
       [labSamplesDepartments]="params?.labSamplesDepartments"
@@ -31,25 +35,21 @@
       [configs]="params?.configs"
       [LISConfigurations]="params?.LISConfigurations"
       [codedSampleRejectionReasons]="params?.codedSampleRejectionReasons"
-    ></app-sample-acceptance-dashboard>
-
-    <!-- herhe -->
+      [currentUser]="params?.currentUser"
+      [privileges]="params?.privileges"
+      [providerDetails]="params?.providerDetails"
+    ></app-sample-results-dashboard>
   </div>
-
-  <!-- {{
-    params | json
-  }} -->
-
-  <!-- <mat-progress-bar
+  <mat-progress-bar
     *ngIf="
       !params?.datesParameters ||
       !params?.sampleTypesLoadedState ||
       params?.labSamplesDepartments?.length == 0 ||
-      !params?.labSamplesContainers ||
       !params?.configs ||
+      !params?.labSamplesContainers ||
       !params?.codedSampleRejectionReasons ||
       !params?.LISConfigurations
     "
     mode="indeterminate"
-  ></mat-progress-bar> -->
+  ></mat-progress-bar>
 </div>
