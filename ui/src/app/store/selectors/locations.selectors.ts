@@ -47,9 +47,7 @@ export const getStoreLocations = createSelector(
           (
             _.filter(
               location?.tags,
-              (tag) =>
-                tag?.display?.toLowerCase() === "main store" ||
-                tag?.display?.toLowerCase() === "sub store"
+              (tag) => tag?.display?.toLowerCase() === "store"
             ) || []
           )?.length > 0
         ) {
