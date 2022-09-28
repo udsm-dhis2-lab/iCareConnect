@@ -5,7 +5,7 @@ import { HttpClient } from "@angular/common/http";
 import { from, Observable, of, zip } from "rxjs";
 import { BASE_URL } from "../constants/constants.constants";
 import { catchError, delay, map } from "rxjs/operators";
-import { SampleObject } from "src/app/modules/laboratory/resources/models";
+import { SampleObject, LabSampleModel } from "src/app/modules/laboratory/resources/models";
 
 @Injectable({
   providedIn: "root",
@@ -56,6 +56,22 @@ export class SamplesService {
   getSampleByVisit(visit) {
     return this.httpClient.get(BASE_URL + `lab/sample?visit=${visit}`).pipe(
       map((response: any) => response?.results),
+      catchError((error) => of(error))
+    );
+  }
+
+  getSampleByStatusCategory(category: string, startDate?: any, endDate?: any) {
+    category = category ? `?sampleCategory=${category}` : "";
+    const dates =
+      startDate && endDate && category.length > 0
+        ? `&startDate=${startDate}&endDate=${endDate}`
+        : startDate && endDate && category.length === 0
+        ? `?startDate=${startDate}&endDate=${endDate}`
+        : "";
+    return this.httpClient.get(BASE_URL + `lab/sample${category}${dates}`).pipe(
+      map((response: LabSampleModel[]) => {
+        return response;
+      }),
       catchError((error) => of(error))
     );
   }
