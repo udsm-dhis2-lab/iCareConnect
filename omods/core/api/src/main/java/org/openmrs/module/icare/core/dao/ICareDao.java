@@ -315,10 +315,14 @@ public class ICareDao extends BaseDAO<Item> {
 		}
 		
 		if (search != null) {
-			queryStr += " AND lower(concat(pname.givenName,pname.middleName,pname.familyName)) LIKE lower(:search)";
+			queryStr += " AND (lower(concat(pname.givenName,pname.middleName,pname.familyName)) LIKE lower(:search) OR lower(pname.givenName) LIKE lower(:search) OR lower(pname.middleName) LIKE lower(:search) OR lower(pname.familyName) LIKE lower(:search) OR lower(concat(pname.givenName,'',pname.familyName)) LIKE lower(:search) OR lower(concat(pname.givenName,'',pname.middleName)) LIKE lower(:search) OR lower(concat(pname.middleName,'',pname.familyName)) LIKE lower(:search))";
 		}
 		if (locationUuid != null) {
 			queryStr += " AND v.location.uuid=:locationUuid ";
+		}
+		
+		if (attributeValueReference != null) {
+			queryStr += " AND v IN ( SELECT va.visit FROM VisitAttribute va WHERE va.valueReference=:attributeValueReference)";
 		}
 		
 		if (paymentStatus != null) {
@@ -328,11 +332,7 @@ public class ICareDao extends BaseDAO<Item> {
 				        + "(SELECT CASE WHEN SUM(pi.amount) IS NULL THEN 0 ELSE SUM(pi.amount) END FROM PaymentItem pi "
 				        + "WHERE pi.id.payment.invoice = invoice)+(SELECT CASE WHEN SUM(di.amount) IS NULL THEN 0 ELSE SUM(di.amount) END FROM DiscountInvoiceItem di WHERE di.id.invoice = invoice))"
 				        + ") ORDER BY v.startDatetime  ASC)";
-				//				queryStr += " AND v.id = invoice.visit.id "
-				//				        + "AND (SELECT SUM(item.price*item.quantity) FROM InvoiceItem item WHERE item.id.invoice = invoice) \n"
-				//				        + "<= (SELECT CASE WHEN (SUM(pi.amount) + SUM(di.amount)) IS NULL THEN 0 ELSE (SUM(pi.amount) + SUM(di.amount)) END FROM "
-				//				        + "PaymentItem pi, DiscountInvoiceItem di "
-				//				        + "WHERE pi.id.payment.invoice = invoice AND di.id.invoice = invoice)";
+				
 			}
 			
 			if (paymentStatus == VisitWrapper.PaymentStatus.PENDING) {
@@ -342,17 +342,7 @@ public class ICareDao extends BaseDAO<Item> {
 				        + "WHERE pi.id.payment.invoice = invoice)+(SELECT CASE WHEN SUM(di.amount) IS NULL THEN 0 ELSE SUM(di.amount) END FROM DiscountInvoiceItem di WHERE di.id.invoice = invoice))"
 				        + ") ORDER BY v.startDatetime  ASC)";
 				
-				//				queryStr += " AND v.id = invoice.visit.id "
-				//				        + "AND (SELECT SUM(item.price*item.quantity) FROM InvoiceItem item WHERE item.id.invoice = invoice) \n"
-				//				        + "> (SELECT CASE WHEN (SUM(pi.amount) + SUM(di.amount)) IS NULL THEN 0 ELSE (SUM(pi.amount) + SUM(di.amount)) END FROM "
-				//				        + "PaymentItem pi, DiscountInvoiceItem di "
-				//				        + "WHERE pi.id.payment.invoice = invoice AND di.id.invoice = invoice)";
-				
 			}
-		}
-		
-		if (attributeValueReference != null) {
-			queryStr += " AND v.id IN ( SELECT va.visit FROM VisitAttribute va WHERE va.valueReference=:attributeValueReference)";
 		}
 		
 		if (orderBy == VisitWrapper.OrderBy.VISIT) {
