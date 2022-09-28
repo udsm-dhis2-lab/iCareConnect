@@ -21,6 +21,7 @@ export class StockStatusListComponent implements OnInit {
   stocksList$: Observable<StockObject[]>;
   searchTerm: string;
   currentItemStock: StockObject;
+  currentItemStocks$: Observable<StockObject>;
   currentItemStock$: Observable<StockObject>;
   saving: boolean = false;
   constructor(private stockService: StockService, private dialog: MatDialog) {}
@@ -72,6 +73,19 @@ export class StockStatusListComponent implements OnInit {
     if (event) {
       event.stopPropagation();
       this.currentItemStock$ = this.stockService.getAvailableStockOfAnItem(
+        stock?.id,
+        this.currentLocation?.uuid
+      );
+    } else {
+      this.currentItemStock$ = of(null);
+      this.getStock();
+    }
+  }
+
+  onViewMinStock(event: Event, stock: StockObject): void {
+    if (event) {
+      event.stopPropagation();
+      this.currentItemStocks$ = this.stockService.getAvailableStockOfAnItem(
         stock?.id,
         this.currentLocation?.uuid
       );
