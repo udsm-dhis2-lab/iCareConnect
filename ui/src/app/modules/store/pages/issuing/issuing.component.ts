@@ -4,6 +4,7 @@ import { select, Store } from "@ngrx/store";
 import { Observable } from "rxjs";
 import { LocationGet } from "src/app/shared/resources/openmrs";
 import { IssuingObject } from "src/app/shared/resources/store/models/issuing.model";
+import { IssuingService } from "src/app/shared/resources/store/services/issuing.service";
 import {
   issueRequest,
   loadIssuings,
@@ -27,12 +28,19 @@ export class IssuingComponent implements OnInit {
   issuingList$: Observable<IssuingObject[]>;
   loadingIssuingList$: Observable<boolean>;
   currentStore$: Observable<LocationGet>;
-  constructor(private store: Store<AppState>, private dialog: MatDialog) {
+  constructor(
+    private store: Store<AppState>,
+    private dialog: MatDialog,
+    private issuingService: IssuingService
+  ) {
     store.dispatch(loadIssuings());
   }
 
   ngOnInit() {
-    this.issuingList$ = this.store.pipe(select(getAllIssuings));
+    // this.issuingList$ = this.store.pipe(select(getAllIssuings));
+    this.issuingList$ = this.issuingService.getAllIssuings(
+      JSON.parse(localStorage.getItem("currentLocation"))?.uuid
+    );
     this.loadingIssuingList$ = this.store.pipe(select(getIssuingLoadingState));
     this.currentStore$ = this.store.select(getCurrentLocation);
   }
@@ -50,6 +58,9 @@ export class IssuingComponent implements OnInit {
       if (result?.issueInput) {
         this.store.dispatch(
           issueRequest({ id: issue.id, issueInput: result.issueInput })
+        );
+        this.issuingList$ = this.issuingService.getAllIssuings(
+          JSON.parse(localStorage.getItem("currentLocation"))?.uuid
         );
       }
     });
