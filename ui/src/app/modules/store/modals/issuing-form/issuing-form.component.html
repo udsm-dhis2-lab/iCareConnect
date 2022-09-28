@@ -1,8 +1,19 @@
-<div>
+<div
+  *ngIf="{
+    stockStatusOfTheItemOnRequestedStore:
+      stockStatusOfTheItemOnRequestedStore$ | async,
+    stockStatusOfTheItemOnRequestingStore:
+      stockStatusOfTheItemOnRequestingStore$ | async
+  } as params"
+>
   <mat-toolbar color="primary">Issuing Form</mat-toolbar>
+  <!-- {{ params?.stockStatusOfTheItemOnRequestedStore | json }} -->
   <div class="p-3">
     <h3>
-      Eligible: <b>{{ eligibleQuantity }}</b>
+      Available on <b>{{ data?.issue?.requestingLocation?.name }}</b> :
+      <b>{{
+        params?.stockStatusOfTheItemOnRequestingStore?.eligibleQuantity
+      }}</b>
     </h3>
     <hr />
     <div class="requisition-form">
@@ -11,14 +22,19 @@
         (formUpdate)="onUpdateForm($event)"
       ></app-form>
       <div
-        *ngIf="eligibleQuantity === 0"
+        *ngIf="
+          params?.stockStatusOfTheItemOnRequestedStore?.eligibleQuantity === 0
+        "
         class="alert alert-warning"
         role="alert"
       >
         There is zero eligible stock for this item
       </div>
       <div
-        *ngIf="quantityToIssue > eligibleQuantity"
+        *ngIf="
+          quantityToIssue >
+          params?.stockStatusOfTheItemOnRequestedStore?.eligibleQuantity
+        "
         class="alert alert-warning"
         role="alert"
       >
@@ -33,8 +49,10 @@
         mat-flat-button
         [disabled]="
           !issuingFormValue?.isValid ||
-          eligibleQuantity === 0 ||
-          quantityToIssue > eligibleQuantity ||
+          params?.stockStatusOfTheItemOnRequestedStore?.eligibleQuantity ===
+            0 ||
+          quantityToIssue >
+            params?.stockStatusOfTheItemOnRequestedStore?.eligibleQuantity ||
           !isFormValid
         "
         (click)="onIssue($event)"
