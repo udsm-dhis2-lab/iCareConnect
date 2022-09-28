@@ -22,6 +22,15 @@
         (formUpdate)="onUpdateForm($event)"
       ></app-form>
       <div
+        class="w-100 ml-2 mr-2 mb-2"
+        *ngIf="params?.stockStatusOfTheItemOnRequestedStore"
+      >
+        Available Stock:
+        <b>
+          {{ params?.stockStatusOfTheItemOnRequestedStore?.eligibleQuantity }}
+        </b>
+      </div>
+      <div
         *ngIf="
           params?.stockStatusOfTheItemOnRequestedStore?.eligibleQuantity === 0
         "
@@ -33,7 +42,8 @@
       <div
         *ngIf="
           quantityToIssue >
-          params?.stockStatusOfTheItemOnRequestedStore?.eligibleQuantity
+            params?.stockStatusOfTheItemOnRequestedStore?.eligibleQuantity &&
+          params?.stockStatusOfTheItemOnRequestedStore?.eligibleQuantity !== 0
         "
         class="alert alert-warning"
         role="alert"
