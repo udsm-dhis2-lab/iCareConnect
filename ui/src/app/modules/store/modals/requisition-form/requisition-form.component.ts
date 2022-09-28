@@ -21,6 +21,7 @@ export class RequisitionFormComponent implements OnInit {
   currentLocationTagsUuids: any = {};
   stockStatusForSelectedStore$: Observable<any>;
   specifiedQuantity: number;
+  formData: any = {};
   constructor(
     private dialogRef: MatDialogRef<RequisitionFormComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
@@ -118,14 +119,13 @@ export class RequisitionFormComponent implements OnInit {
 
   onRequest(e: Event) {
     e.stopPropagation();
-    const formValues = this.requisitionFormValue.getValues();
     const requisitionInput: RequisitionInput = {
       requestingLocationUuid: this.data?.currentStore?.id,
-      requestedLocationUuid: formValues?.targetStore?.value,
+      requestedLocationUuid: this.formData?.targetStore?.value,
       items: [
         {
-          itemUuid: formValues?.requisitionItem?.value,
-          quantity: parseInt(formValues?.quantity.value, 10),
+          itemUuid: this.formData?.requisitionItem?.value,
+          quantity: parseInt(this.formData?.quantity.value, 10),
         },
       ],
     };
@@ -135,6 +135,10 @@ export class RequisitionFormComponent implements OnInit {
 
   onUpdateForm(formValue: FormValue): void {
     this.requisitionFormValue = formValue;
+    this.formData = {
+      ...this.formData,
+      ...this.requisitionFormValue.getValues(),
+    };
     const storeUid = formValue.getValues()?.targetStore?.value;
     const itemUuid = formValue.getValues()?.requisitionItem?.value;
     this.specifiedQuantity = Number(formValue.getValues()?.quantity?.value);
