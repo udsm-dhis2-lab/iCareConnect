@@ -1,5 +1,6 @@
 import { Component, Inject, OnInit } from "@angular/core";
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
+import { Observable } from "rxjs";
 import { Field } from "src/app/shared/modules/form/models/field.model";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
 import { Textbox } from "src/app/shared/modules/form/models/text-box.model";
@@ -20,6 +21,8 @@ export class IssuingFormComponent implements OnInit {
   issuingFormValue: FormValue;
   issueFormFields: Field<string>[];
   eligibleQuantity: number = 0;
+  stockStatusOfTheItemOnRequestingStore$: Observable<any>;
+  stockStatusOfTheItemOnRequestedStore$: Observable<any>;
   quantityToIssue: number;
   isFormValid: boolean = false;
   constructor(
@@ -30,16 +33,16 @@ export class IssuingFormComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.stockService
-      .getAvailableStockOfAnItem(
+    this.stockStatusOfTheItemOnRequestingStore$ =
+      this.stockService.getAvailableStockOfAnItem(
         this.data?.issue?.itemUuid,
-        this.data?.currentStore?.uuid
-      )
-      .subscribe((response) => {
-        if (response) {
-          this.eligibleQuantity = response?.eligibleQuantity;
-        }
-      });
+        this.data?.issue?.requestingLocation?.uuid
+      );
+    this.stockStatusOfTheItemOnRequestedStore$ =
+      this.stockService.getAvailableStockOfAnItem(
+        this.data?.issue?.itemUuid,
+        this.data?.issue?.requestedLocation?.uuid
+      );
     this.issueFormFields = [
       new Textbox({
         id: "item",
