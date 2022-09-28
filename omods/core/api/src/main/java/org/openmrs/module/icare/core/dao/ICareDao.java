@@ -315,7 +315,7 @@ public class ICareDao extends BaseDAO<Item> {
 		}
 		
 		if (search != null) {
-			queryStr += " AND (lower(concat(pname.givenName,pname.middleName,pname.familyName)) LIKE lower(:search) OR lower(pname.givenName) LIKE lower(:search) OR lower(pname.middleName) LIKE lower(:search) OR lower(pname.familyName) LIKE lower(:search))";
+			queryStr += " AND (lower(concat(pname.givenName,pname.middleName,pname.familyName)) LIKE lower(:search) OR lower(pname.givenName) LIKE lower(:search) OR lower(pname.middleName) LIKE lower(:search) OR lower(pname.familyName) LIKE lower(:search) OR lower(concat(pname.givenName,'',pname.familyName)) LIKE lower(:search) OR lower(concat(pname.givenName,'',pname.middleName)) LIKE lower(:search) OR lower(concat(pname.middleName,'',pname.familyName)) LIKE lower(:search))";
 		}
 		if (locationUuid != null) {
 			queryStr += " AND v.location.uuid=:locationUuid ";
