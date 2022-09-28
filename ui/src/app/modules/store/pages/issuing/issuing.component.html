@@ -52,7 +52,9 @@
         <!-- <td>
           <div class="text-warning">Waiting</div>
         </td> -->
-        <td>04 Sept 2020</td>
+        <td>
+          {{ issue?.requestDate | date: "medium" }}
+        </td>
         <td>
           <button
             mat-flat-button

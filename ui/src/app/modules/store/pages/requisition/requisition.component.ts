@@ -3,6 +3,8 @@ import { Component, OnInit } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { select, Store } from "@ngrx/store";
 import { Observable } from "rxjs";
+import { map } from "rxjs/operators";
+import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { RequisitionInput } from "src/app/shared/resources/store/models/requisition-input.model";
 import { RequisitionObject } from "src/app/shared/resources/store/models/requisition.model";
 import {
@@ -38,11 +40,36 @@ export class RequisitionComponent implements OnInit {
   stores$: Observable<any>;
   stockableItems$: Observable<any>;
   currentStore$: Observable<any>;
-  constructor(private store: Store<AppState>, private dialog: MatDialog) {
+  referenceTagsThatCanRequestFromMainStoreConfigs$: Observable<any>;
+  referenceTagsThatCanRequestFromPharmacyConfigs$: Observable<any>;
+  pharmacyLocationTagUuid$: Observable<any>;
+  mainStoreLocationTagUuid$: Observable<any>;
+  constructor(
+    private store: Store<AppState>,
+    private dialog: MatDialog,
+    private systemSettingsService: SystemSettingsService
+  ) {
     this.store.dispatch(loadRequisitions());
   }
 
   ngOnInit() {
+    this.referenceTagsThatCanRequestFromMainStoreConfigs$ =
+      this.systemSettingsService.getSystemSettingsMatchingAKey(
+        `iCare.store.mappings.canRequestFromMainStore.LocationTagsUuid`
+      );
+    this.referenceTagsThatCanRequestFromPharmacyConfigs$ =
+      this.systemSettingsService.getSystemSettingsMatchingAKey(
+        `iCare.store.mappings.canRequestFromPharmacyStore.LocationTagsUuid`
+      );
+
+    this.mainStoreLocationTagUuid$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        `iCare.store.settings.mainStore.locationTagUuid`
+      );
+    this.pharmacyLocationTagUuid$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        `iCare.store.settings.pharmacy.locationTagUuid`
+      );
     this.requisitions$ = this.store.pipe(select(getActiveRequisitions));
     this.loadingRequisitions$ = this.store.pipe(
       select(getRequisitionLoadingState)
@@ -56,7 +83,15 @@ export class RequisitionComponent implements OnInit {
     e.stopPropagation();
 
     if (params) {
-      const { currentStore, stockableItems, stores } = params;
+      const {
+        currentStore,
+        stockableItems,
+        stores,
+        mainStoreLocationTagUuid,
+        pharmacyLocationTagUuid,
+        referenceTagsThatCanRequestFromMainStoreConfigs,
+        referenceTagsThatCanRequestFromPharmacyConfigs,
+      } = params;
       const dialog = this.dialog.open(RequisitionFormComponent, {
         width: "30%",
         panelClass: "custom-dialog-container",
@@ -64,6 +99,10 @@ export class RequisitionComponent implements OnInit {
           currentStore,
           items: stockableItems,
           stores,
+          mainStoreLocationTagUuid,
+          pharmacyLocationTagUuid,
+          referenceTagsThatCanRequestFromMainStoreConfigs,
+          referenceTagsThatCanRequestFromPharmacyConfigs,
         },
       });
 
