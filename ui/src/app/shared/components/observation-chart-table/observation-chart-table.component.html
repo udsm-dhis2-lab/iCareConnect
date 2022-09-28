@@ -2,30 +2,58 @@
   <table class="table table-bordered table-striped" *ngIf="selectedForm">
     <thead>
       <tr>
-        <th>Date & Time</th>
-        <th *ngFor="let formField of selectedForm?.formFields">
+        <th rowspan="2">Date</th>
+        <th
+          [attr.rowspan]="formField?.setMembers?.length == 0 ? 2 : 1"
+          [attr.colspan]="formField?.setMembers?.length"
+          [ngClass]="{ 'text-center': formField?.setMembers?.length > 0 }"
+          *ngFor="let formField of selectedForm?.formFields"
+        >
           {{ formField?.name }}
-          <span class="ml-2" *ngIf="formField?.concept?.units"
-            >({{ formField?.concept?.units }})</span
-          >
         </th>
-        <th></th>
       </tr>
+      <tr>
+        <ng-container *ngFor="let formField of selectedForm?.formFields">
+          <ng-container *ngIf="formField?.setMembers?.length > 0">
+            <th *ngFor="let member of formField?.setMembers">
+              {{ member?.name }}
+            </th>
+          </ng-container>
+        </ng-container>
+      </tr>
+   
     </thead>
     <tbody>
       <tr *ngFor="let encounter of obsChartEncountersData">
         <td>
           {{ encounter?.encounterDatetime | date: "medium" }}
         </td>
-        <td *ngFor="let formField of selectedForm?.formFields">
-          <!-- TODO: Add support to check if the value is valueObject -->
-          {{ encounter?.obsKeyedByConcept[formField?.concept?.uuid]?.value }}
+        <td *ngFor="let fieldHoldingData of fieldsHoldingData">
+          <ng-container *ngIf="fieldHoldingData?.setMembers?.length > 0">
+            <ng-container *ngFor="let member of fieldHoldingData?.setMembers">  
+              <span *ngIf="!(member.dataType === 'Boolean')">
+                  {{ encounter?.obsKeyedByConcept[fieldHoldingData?.concept?.uuid]?.value?.display ? encounter?.obsKeyedByConcept[member?.uuid]
+                    ?.value?.display : encounter?.obsKeyedByConcept[member?.uuid]
+                    ?.value ? encounter?.obsKeyedByConcept[member?.uuid]
+                    ?.value
+                    : "-" }} 
+              </span>
+            </ng-container>
+          </ng-container>
+          <ng-container *ngIf="!fieldHoldingData?.setMembers?.length">
+            <span>
+              {{ encounter?.obsKeyedByConcept[fieldHoldingData?.concept?.uuid]?.value?.display ? encounter?.obsKeyedByConcept[fieldHoldingData?.concept?.uuid]
+                      ?.value?.display : encounter?.obsKeyedByConcept[fieldHoldingData?.concept?.uuid]
+                      ?.value ? encounter?.obsKeyedByConcept[fieldHoldingData?.concept?.uuid]
+                      ?.value
+                      : "-" }} 
+            </span>
+          </ng-container>
         </td>
-        <td></td>
       </tr>
       <tr>
         <td></td>
-        <td *ngFor="let formField of selectedForm?.formFields">
+        <td *ngFor="let formField of fieldsHoldingData">
           <app-form
             *ngIf="
               formField &&
@@ -39,24 +67,17 @@
             [fieldsData]=""
             (formUpdate)="onFormUpdate($event)"
           ></app-form>
-          <div
+          <app-form
             *ngIf="
-              !formField?.formField &&
-              formField?.setMembers &&
-              formField?.setMembers?.length > 0
+              formField?.formFields &&
+              formField?.formFields?.length > 0
             "
-          >
-            <td *ngIf="member?.formFields && member?.setMembers?.length == 0">
-              <app-form
-                [fields]="member?.formFields"
-                [isFormHorizontal]="true"
-                [fieldsData]="params?.observations"
-                [isReport]="isReport"
-                (formUpdate)="onFormUpdate($event)"
-              >
-              </app-form>
-            </td>
-          </div>
+            [fields]="formField?.formFields"
+            [isFormHorizontal]="true"
+            [isReport]="false"
+            [fieldsData]=""
+            (formUpdate)="onFormUpdate($event)"
+          ></app-form>
         </td>
         <td class="text-center">
           <button

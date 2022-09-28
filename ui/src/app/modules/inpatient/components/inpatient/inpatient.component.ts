@@ -105,12 +105,6 @@ export class InpatientComponent implements OnInit {
       this.bedOrdersWithBillStatus
     );
 
-    const locationFormsAttributes =
-      this.bedsByLocationDetails.attributes.filter(
-        (attribute) =>
-          attribute?.attributeType?.display.toLowerCase() === "forms"
-      ) || [];
-
     this.observations$ = this.store.select(getGroupedObservationByConcept);
     this.savingObservations$ = this.store.pipe(
       select(getSavingObservationStatus)
