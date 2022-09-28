@@ -192,10 +192,11 @@
                       }}
                     </td>
                     <td
+                      class="text-center"
                       *ngIf="orderCount == 0"
                       [attr.rowspan]="sample?.orders?.length"
                     >
-                      <span *ngIf="sample?.accepted"> Accepted </span>
+                      <span> {{ sample?.externalUseStatus[0]?.status ? sample?.externalUseStatus[0]?.status : '-' }}  </span>
                     </td>
                     <td
                       *ngIf="orderCount == 0"
