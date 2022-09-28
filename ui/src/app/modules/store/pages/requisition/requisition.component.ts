@@ -7,6 +7,7 @@ import { map } from "rxjs/operators";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { RequisitionInput } from "src/app/shared/resources/store/models/requisition-input.model";
 import { RequisitionObject } from "src/app/shared/resources/store/models/requisition.model";
+import { RequisitionService } from "src/app/shared/resources/store/services/requisition.service";
 import {
   cancelRequisition,
   createRequest,
@@ -47,7 +48,8 @@ export class RequisitionComponent implements OnInit {
   constructor(
     private store: Store<AppState>,
     private dialog: MatDialog,
-    private systemSettingsService: SystemSettingsService
+    private systemSettingsService: SystemSettingsService,
+    private requisitionService: RequisitionService
   ) {
     this.store.dispatch(loadRequisitions());
   }
@@ -70,13 +72,19 @@ export class RequisitionComponent implements OnInit {
       this.systemSettingsService.getSystemSettingsByKey(
         `iCare.store.settings.pharmacy.locationTagUuid`
       );
-    this.requisitions$ = this.store.pipe(select(getActiveRequisitions));
+    this.getAllRequisition();
     this.loadingRequisitions$ = this.store.pipe(
       select(getRequisitionLoadingState)
     );
     this.stores$ = this.store.pipe(select(getStoreLocations));
     this.currentStore$ = this.store.pipe(select(getCurrentLocation));
     this.stockableItems$ = this.store.pipe(select(getAllStockableItems));
+  }
+
+  getAllRequisition(): void {
+    this.requisitions$ = this.requisitionService.getAllRequisitions(
+      JSON.parse(localStorage.getItem("currentLocation"))?.uuid
+    );
   }
 
   onNewRequest(e: Event, params: any): void {
@@ -112,7 +120,14 @@ export class RequisitionComponent implements OnInit {
           if (data) {
             const { requisitionInput } = data;
 
-            this.store.dispatch(createRequest({ requisitionInput }));
+            // this.store.dispatch(createRequest({ requisitionInput }));
+            this.requisitionService
+              .createRequest(requisitionInput)
+              .subscribe((response) => {
+                if (response) {
+                  this.getAllRequisition();
+                }
+              });
           }
         });
     }
@@ -133,6 +148,7 @@ export class RequisitionComponent implements OnInit {
         this.store.dispatch(
           cancelRequisition({ id: id, reason: result?.reason })
         );
+        this.getAllRequisition();
       }
     });
   }
@@ -141,6 +157,7 @@ export class RequisitionComponent implements OnInit {
     e.stopPropagation();
 
     this.store.dispatch(receiveRequisition({ requisition }));
+    this.getAllRequisition();
   }
 
   onRejectRequisition(e: Event, requisition: RequisitionObject): void {
@@ -152,6 +169,7 @@ export class RequisitionComponent implements OnInit {
       this.store.dispatch(
         rejectRequisition({ id, issueUuid, rejectionReason })
       );
+      this.getAllRequisition();
     }
   }
 }
