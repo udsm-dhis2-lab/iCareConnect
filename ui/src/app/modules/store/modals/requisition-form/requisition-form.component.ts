@@ -6,6 +6,8 @@ import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
 import { Textbox } from "src/app/shared/modules/form/models/text-box.model";
 import { RequisitionInput } from "src/app/shared/resources/store/models/requisition-input.model";
 import { keyBy } from "lodash";
+import { Observable } from "rxjs";
+import { StockService } from "src/app/shared/resources/store/services/stock.service";
 
 @Component({
   selector: "app-requisition-form",
@@ -14,11 +16,15 @@ import { keyBy } from "lodash";
 })
 export class RequisitionFormComponent implements OnInit {
   requisitionFields: Field<string>[];
+  quantityField: Field<string>;
   requisitionFormValue: FormValue;
   currentLocationTagsUuids: any = {};
+  stockStatusForSelectedStore$: Observable<any>;
+  specifiedQuantity: number;
   constructor(
     private dialogRef: MatDialogRef<RequisitionFormComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: any
+    @Inject(MAT_DIALOG_DATA) public data: any,
+    private stockService: StockService
   ) {}
 
   ngOnInit() {
@@ -94,14 +100,15 @@ export class RequisitionFormComponent implements OnInit {
           })
           ?.filter((storeLocation) => storeLocation),
       }),
-      new Textbox({
-        id: "quantity",
-        key: "quantity",
-        label: "Quantity",
-        required: true,
-        type: "number",
-      }),
     ];
+    this.quantityField = new Textbox({
+      id: "quantity",
+      key: "quantity",
+      label: "Quantity",
+      min: 1,
+      required: true,
+      type: "number",
+    });
   }
 
   onCancel(e: Event): void {
@@ -128,5 +135,12 @@ export class RequisitionFormComponent implements OnInit {
 
   onUpdateForm(formValue: FormValue): void {
     this.requisitionFormValue = formValue;
+    const storeUid = formValue.getValues()?.targetStore?.value;
+    const itemUuid = formValue.getValues()?.requisitionItem?.value;
+    this.specifiedQuantity = Number(formValue.getValues()?.quantity?.value);
+    if (itemUuid && storeUid) {
+      this.stockStatusForSelectedStore$ =
+        this.stockService.getAvailableStockOfAnItem(itemUuid, storeUid);
+    }
   }
 }
