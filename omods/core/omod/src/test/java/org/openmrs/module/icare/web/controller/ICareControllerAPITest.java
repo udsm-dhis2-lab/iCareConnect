@@ -257,7 +257,7 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		visitData = handle.getContentAsString();
 		visitMap = (new ObjectMapper()).readValue(visitData, Map.class);
 		visitDetails = (List<Map>) visitMap.get("results");
-		assertThat("Should return a visit", visitDetails.size() == 0);
+		assertThat("Should not return a visit", visitDetails.size() == 0);
 		
 		newGetRequest = newGetRequest("icare/visit", new Parameter("orderTypeUuid", "2msir5eb-5345-11e8-9922-40b034c3cfee"),
 		    new Parameter("q", "hermione"));
@@ -273,6 +273,7 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		visitData = handle.getContentAsString();
 		visitMap = (new ObjectMapper()).readValue(visitData, Map.class);
 		visitDetails = (List<Map>) visitMap.get("results");
+		System.out.println(visitDetails);
 		assertThat("Should return a visit", visitDetails.size() == 1);
 		
 	}
@@ -305,8 +306,9 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		//Get visits by Payment Status
 		//PAID
 		MockHttpServletRequest newGetRequest = newGetRequest("icare/visit", new Parameter("orderTypeUuid",
-		        "2msir5eb-5345-11e8-9922-40b034c3cfee"), new Parameter("OrderBy", "ENCOUNTER"), new Parameter(
-		        "orderByDirection", "ASC"), new Parameter("paymentStatus", "PAID"));
+		        "2msir5eb-5345-11e8-9922-40b034c3cfee"), new Parameter("attributeValueReference", "123"), new Parameter(
+		        "OrderBy", "ENCOUNTER"), new Parameter("orderByDirection", "ASC"), new Parameter("paymentStatus", "PAID"),
+		    new Parameter("q", "Harry"));
 		
 		MockHttpServletResponse handle = handle(newGetRequest);
 		String visitData = handle.getContentAsString();
@@ -515,7 +517,6 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		results = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
 		maps = (List) results.get("results");
 		assertThat("Should return 11 reference terms", maps.size(), is(11));
-		
 	}
 	
 	@Test
@@ -593,6 +594,19 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		assertThat("Should have drug with display", drug.getDisplayName().equals(drugDetails.get(0).get("display")));
 		assertThat("Should have drug with name", drug.getName().equals(drugDetails.get(0).get("name")));
 		assertThat("Should have drug with same uuid", drug.getUuid().equals(drugDetails.get(0).get("uuid")));
-		
+	}
+	
+	@Test
+	public void testGetClientsFromExternalSystem() throws Exception {
+		MockHttpServletRequest newGetRequest = newGetRequest("icare/client/externalsystems", new Parameter("identifier",
+		        "2133573"), new Parameter("identifierReference", "t74raEkPShW"));
+		MockHttpServletResponse handle = handle(newGetRequest);
+		String patientData = handle.getContentAsString();
+		//		Map clientDataMap = (new ObjectMapper()).readValue(patientData, Map.class);
+		//		System.out.println(clientDataMap.get("trackedEntityInstances"));
+		//		System.out.println(patientData);
+		//		Map patientDataMap = (new ObjectMapper()).readValue(patientData, Map.class);
+		//		List<Map> patientDataDetails = (List<Map>) patientDataMap;
+		//		System.out.println(patientDataDetails);
 	}
 }
