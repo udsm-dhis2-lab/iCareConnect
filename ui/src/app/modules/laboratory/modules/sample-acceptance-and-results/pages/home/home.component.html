@@ -12,18 +12,6 @@
     LISConfigurations: LISConfigurations$ | async
   } as params"
 >
-  <!-- TODO JESSE - return conditions visitsLoadedState && sampleTypesLoadedState
-  <div
-    *ngIf="
-      params?.datesParameters &&
-      params?.visitsLoadedState &&
-      params?.sampleTypesLoadedState &&
-      params?.labSamplesDepartments?.length > 0 &&
-      params?.labSamplesContainers &&
-      params?.configs &&
-      params?.codedSampleRejectionReasons
-    "
-  > -->
   <div
     *ngIf="
       params?.datesParameters &&
@@ -52,7 +40,7 @@
     params | json
   }} -->
 
-  <mat-progress-bar
+  <!-- <mat-progress-bar
     *ngIf="
       !params?.datesParameters ||
       !params?.sampleTypesLoadedState ||
@@ -63,5 +51,5 @@
       !params?.LISConfigurations
     "
     mode="indeterminate"
-  ></mat-progress-bar>
+  ></mat-progress-bar> -->
 </div>
