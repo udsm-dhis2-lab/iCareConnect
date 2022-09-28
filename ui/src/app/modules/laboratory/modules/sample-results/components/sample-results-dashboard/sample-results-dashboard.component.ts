@@ -2,9 +2,10 @@ import { Component, Input, OnInit } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { Store } from "@ngrx/store";
 import { Observable } from "rxjs";
-import { map } from "rxjs/operators";
+import { catchError, map } from "rxjs/operators";
 import { LISConfigurationsModel } from "src/app/modules/laboratory/resources/models/lis-configurations.model";
 import { SharedConfirmationComponent } from "src/app/shared/components/shared-confirmation /shared-confirmation.component";
+import { SamplesService } from "src/app/shared/services/samples.service";
 import {
   addLabDepartments,
   loadLabSamplesByCollectionDates,
@@ -45,7 +46,12 @@ export class SampleResultsDashboardComponent implements OnInit {
   selectedDepartment: string = "";
   status: boolean;
   userUuid: any;
-  constructor(private store: Store<AppState>, private dialog: MatDialog) {}
+  completedSamples$: Observable<any>;
+  constructor(
+    private store: Store<AppState>,
+    private dialog: MatDialog,
+    private samplesService: SamplesService
+  ) {}
 
   ngOnInit(): void {
     this.userUuid = this.currentUser?.uuid;
@@ -85,6 +91,7 @@ export class SampleResultsDashboardComponent implements OnInit {
             : [];
         })
       );
+    this.completedSamples$ = this.samplesService.getSampleByStatusCategory('COMPLETED', this.datesParameters?.startDate, this.datesParameters?.endDate);
   }
 
   setDepartment(department) {
@@ -120,51 +127,51 @@ export class SampleResultsDashboardComponent implements OnInit {
     confirmDialog.afterClosed().subscribe((res) => {
       if (res.confirmed && key === "release") {
         // console.log("==> Sample: ", sample, ' \n ==> User: ', this.currentUser)
-          this.status = !this.status;
-          const data = {
-            sample: {
-              uuid: sample?.uuid,
-            },
-            user: {
-              uuid: this.userUuid,
-            },
-            status: "RELEASED",
-          };
-          this.store.dispatch(
-            setSampleStatus({
-              status: data,
-              details: {
-                ...sample,
-                acceptedBy: {
-                  uuid: this.providerDetails?.uuid,
-                  name: this.providerDetails?.display,
-                },
+        this.status = !this.status;
+        const data = {
+          sample: {
+            uuid: sample?.uuid,
+          },
+          user: {
+            uuid: this.userUuid,
+          },
+          status: "RELEASED",
+        };
+        this.store.dispatch(
+          setSampleStatus({
+            status: data,
+            details: {
+              ...sample,
+              acceptedBy: {
+                uuid: this.providerDetails?.uuid,
+                name: this.providerDetails?.display,
               },
-            })
+            },
+          })
         );
       }
       if (res.confirmed && key === "restrict") {
-          this.status = !this.status;
-          const data = {
-            sample: {
-              uuid: sample?.sampleUuid,
-            },
-            user: {
-              uuid: this.userUuid,
-            },
-            status: "RESTRICTED",
-          };
-          this.store.dispatch(
-            setSampleStatus({
-              status: data,
-              details: {
-                ...sample,
-                acceptedBy: {
-                  uuid: this.providerDetails?.uuid,
-                  name: this.providerDetails?.display,
-                },
+        this.status = !this.status;
+        const data = {
+          sample: {
+            uuid: sample?.sampleUuid,
+          },
+          user: {
+            uuid: this.userUuid,
+          },
+          status: "RESTRICTED",
+        };
+        this.store.dispatch(
+          setSampleStatus({
+            status: data,
+            details: {
+              ...sample,
+              acceptedBy: {
+                uuid: this.providerDetails?.uuid,
+                name: this.providerDetails?.display,
               },
-            })
+            },
+          })
         );
       }
     });
