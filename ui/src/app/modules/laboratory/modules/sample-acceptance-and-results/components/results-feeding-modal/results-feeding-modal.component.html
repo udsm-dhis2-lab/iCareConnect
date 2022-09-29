@@ -1150,12 +1150,15 @@
                             <div class="50 d-flex justify-content-left">
                               <mat-form-field
                                 class="w-25"
-                                *ngIf="LISConfigurations?.isLIS"
+                                *ngIf="
+                                  LISConfigurations?.isLIS &&
+                                  parameter?.datatype?.display === 'Numeric'
+                                "
                               >
                                 <mat-label
                                   >Enter value for {{ parameter?.display }}
                                 </mat-label>
-                                <input
+                                <!-- <input
                                   *ngIf="
                                     !parameter?.numeric &&
                                     parameter?.datatype?.display !== 'Numeric'
@@ -1189,7 +1192,7 @@
                                     )
                                   "
                                   id="{{ parameter?.display }}"
-                                />
+                                /> -->
 
                                 <input
                                   *ngIf="

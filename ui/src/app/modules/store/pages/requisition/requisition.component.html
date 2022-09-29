@@ -5,15 +5,29 @@
     stores: stores$ | async,
     currentStore: currentStore$ | async,
     stockableItems: stockableItems$ | async,
-    loadingRequisitions: loadingRequisitions$ | async
+    loadingRequisitions: loadingRequisitions$ | async,
+    referenceTagsThatCanRequestFromMainStoreConfigs:
+      referenceTagsThatCanRequestFromMainStoreConfigs$ | async,
+    referenceTagsThatCanRequestFromPharmacyConfigs:
+      referenceTagsThatCanRequestFromPharmacyConfigs$ | async,
+    mainStoreLocationTagUuid: mainStoreLocationTagUuid$ | async,
+    pharmacyLocationTagUuid: pharmacyLocationTagUuid$ | async
   } as params"
 >
   <mat-card class="border">
     <div class="d-flex justify-content-between">
       <mat-form-field class="w-25">
-        <input  autocomplete="off" type="text" matInput placeholder="Search" />
+        <input autocomplete="off" type="text" matInput placeholder="Search" />
       </mat-form-field>
       <button
+        [disabled]="
+          !params?.pharmacyLocationTagUuid ||
+          params?.pharmacyLocationTagUuid == 'none' ||
+          !params?.mainStoreLocationTagUuid ||
+          params?.mainStoreLocationTagUuid == 'none' ||
+          !params?.referenceTagsThatCanRequestFromPharmacyConfigs ||
+          !params?.referenceTagsThatCanRequestFromMainStoreConfigs
+        "
         (click)="onNewRequest($event, params)"
         mat-flat-button
         color="primary"
@@ -22,27 +36,50 @@
         New Request
       </button>
     </div>
+    <div class="col-12">
+      <mat-progress-bar
+        mode="indeterminate"
+        *ngIf="
+          !params?.pharmacyLocationTagUuid ||
+          !params?.mainStoreLocationTagUuid ||
+          !params?.referenceTagsThatCanRequestFromPharmacyConfigs ||
+          !params?.referenceTagsThatCanRequestFromMainStoreConfigs
+        "
+      ></mat-progress-bar>
+      <div
+        *ngIf="
+          params?.pharmacyLocationTagUuid == 'none' ||
+          params?.mainStoreLocationTagUuid == 'none' ||
+          params?.referenceTagsThatCanRequestFromPharmacyConfigs == 'none' ||
+          params?.referenceTagsThatCanRequestFromMainStoreConfigs == 'none'
+        "
+        class="alert alert-warning"
+        role="alert"
+      >
+        Contact IT, some settings are missing
+      </div>
+    </div>
 
     <table class="table">
       <tr>
         <td>#</td>
         <td>Item</td>
         <td>Quantity Requested</td>
+        <td>Requested On</td>
         <td>Quantity Issued</td>
-        <td>Target Store</td>
+        <td>Issued On</td>
+        <td>Requsted From</td>
         <td>Status</td>
         <td><span class="float-right">Actions</span></td>
       </tr>
 
-      <tr *ngIf="params.loadingRequisitions">
+      <tr *ngIf="!params.requisitions">
         <td colspan="7">
           <mat-progress-bar mode="indeterminate"></mat-progress-bar>
         </td>
       </tr>
 
-      <tr
-        *ngIf="!params.loadingRequisitions && params.requisitions.length === 0"
-      >
+      <tr *ngIf="params.requisitions && params.requisitions.length === 0">
         <td colspan="7">
           <div class="w-100 d-flex justify-content-center">No data</div>
         </td>
@@ -54,7 +91,11 @@
         <td>{{ requestIndex + 1 }}</td>
         <td>{{ request?.name }}</td>
         <td>{{ request?.quantityRequested }}</td>
+        <td>{{ request?.created | date }}</td>
         <td>{{ request?.quantityIssued || "-" }}</td>
+        <td>
+          {{ request?.quantityIssued ? (request?.issuedDate | date) : "-" }}
+        </td>
         <td>{{ request?.targetStore?.name }}</td>
         <td>
           <div
