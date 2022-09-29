@@ -3,8 +3,8 @@ import { MatCheckboxChange } from "@angular/material/checkbox";
 import { MatDialog } from "@angular/material/dialog";
 import { MatSelectChange } from "@angular/material/select";
 import { select, Store } from "@ngrx/store";
-import { uniqBy, groupBy } from "lodash";
-import { Observable, zip } from "rxjs";
+import { uniqBy, groupBy, orderBy, flatten } from "lodash";
+import { Observable, of, zip } from "rxjs";
 import { map } from "rxjs/operators";
 import { LocationGet } from "src/app/shared/resources/openmrs";
 import { IssuingObject } from "src/app/shared/resources/store/models/issuing.model";
@@ -37,6 +37,7 @@ export class IssuingComponent implements OnInit {
   stores$: Observable<any>;
   requestingLocation: any;
   selectedIssues: any = {};
+
   constructor(
     private store: Store<AppState>,
     private dialog: MatDialog,
@@ -136,6 +137,14 @@ export class IssuingComponent implements OnInit {
     });
   }
 
+  getBatchsNotExpired(batches): any {
+    return orderBy(
+      batches?.filter((batch) => batch?.expiryDate > Date.now()),
+      ["expiryDate"],
+      ["asc"]
+    );
+  }
+
   issueAllSelected(event: Event, selectedItemsToIssue: any): void {
     event.stopPropagation();
     let itemsToIssue = [];
@@ -150,31 +159,75 @@ export class IssuingComponent implements OnInit {
         data: groupedRequisitions,
       })
       .afterClosed()
-      .subscribe((groupedRequisitions) => {
+      .subscribe((requisitionData) => {
+        const groupedRequisitions = requisitionData?.requisitions;
+        const nonExpiredBatches = this.getBatchsNotExpired(
+          flatten(
+            requisitionData?.stockStatus.map(
+              (stockStatus) => stockStatus?.batches
+            )
+          )
+        );
+
         if (groupedRequisitions) {
           zip(
             ...Object.keys(groupedRequisitions).map((key) => {
+              const currentItemsToIssue = groupedRequisitions[key];
+              // Create items to issue by batches
+              const toIssueItemsByBatches = flatten(
+                currentItemsToIssue.map((item) => {
+                  // Determine all batches eligible to match the requested quantity
+                  const batchesForThisItem =
+                    nonExpiredBatches.filter(
+                      (batch) => batch?.item?.uuid === item?.itemUuid
+                    ) || [];
+                  let eligibleBatches = [];
+                  const quantityToIssue = Number(item?.quantityRequested);
+                  let eligibleToIssue = 0;
+                  let count = 0;
+                  while (
+                    batchesForThisItem?.length > 0 &&
+                    quantityToIssue > eligibleToIssue
+                  ) {
+                    const toIssue =
+                      quantityToIssue - eligibleToIssue >
+                      Number(batchesForThisItem[count]?.quantity)
+                        ? Number(batchesForThisItem[count]?.quantity)
+                        : quantityToIssue - eligibleToIssue;
+                    eligibleBatches = [
+                      ...eligibleBatches,
+                      {
+                        ...batchesForThisItem[count],
+                        ...item,
+                        toIssue: toIssue,
+                      },
+                    ];
+                    eligibleToIssue =
+                      eligibleToIssue +
+                      Number(batchesForThisItem[count]?.quantity);
+                    count++;
+                  }
+                  return eligibleBatches;
+                })
+              );
               const issueInput = {
                 requisitionUuid: key,
                 issuedLocationUuid:
                   groupedRequisitions[key][0]?.requestingLocation.uuid,
                 issuingLocationUuid:
                   groupedRequisitions[key][0].requestedLocation.uuid,
-                issueItems: groupedRequisitions[key].map(
-                  (matchedItemToIssue) => {
-                    return {
-                      itemUuid: matchedItemToIssue?.itemUuid,
-                      quantity: parseInt(
-                        matchedItemToIssue?.quantityRequested,
-                        10
-                      ),
-                    };
-                  }
-                ),
+                issueItems: toIssueItemsByBatches.map((matchedItemToIssue) => {
+                  // console.log("matchedItemToIssue", matchedItemToIssue);
+                  return {
+                    itemUuid: matchedItemToIssue?.itemUuid,
+                    quantity: matchedItemToIssue?.toIssue,
+                    batch: matchedItemToIssue?.batch,
+                    expiryDate: matchedItemToIssue?.expiryDate,
+                  };
+                }),
               };
               return this.issuingService.issueRequest(issueInput).pipe(
                 map((response) => {
-                  console.log(response);
                   return response;
                 })
               );

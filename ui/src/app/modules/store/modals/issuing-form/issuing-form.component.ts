@@ -173,6 +173,7 @@ export class IssuingFormComponent implements OnInit {
           this.orderedBatchesByExpirlyDate?.filter(
             (batch) => batch?.batch === this.formData?.batch?.value
           ) || [];
+        this.quantityFromEligibleBatches = this.eligibleBatches[0]?.quantity;
       } else {
         let batchQuantity = 0;
         let count = 0;
@@ -184,6 +185,7 @@ export class IssuingFormComponent implements OnInit {
             [...this.eligibleBatches, this.orderedBatchesByExpirlyDate[count]],
             "batch"
           );
+          this.quantityFromEligibleBatches = batchQuantity;
           count++;
         }
       }
