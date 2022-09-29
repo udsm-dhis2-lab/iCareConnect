@@ -16,7 +16,7 @@ import {
 import { VisitsService } from "../../../../shared/resources/visits/services";
 import { AppState } from "src/app/store/reducers";
 import { getCurrentLocation } from "src/app/store/selectors";
-import { loadCurrentPatient } from "src/app/store/actions";
+import { go, loadCurrentPatient } from "src/app/store/actions";
 
 @Component({
   selector: "app-exemption-home",
@@ -39,6 +39,7 @@ export class ExemptionHomeComponent implements OnInit {
   loadingPatients: boolean;
   visits$: any;
   visitsLength: number;
+  loading: boolean;
 
   constructor(
     private api: Api,
@@ -154,12 +155,19 @@ export class ExemptionHomeComponent implements OnInit {
   }
 
   onSelectVisit(visit: Visit) {
-    this.store.dispatch(
-      loadCurrentPatient({
-        uuid: visit.patientUuid,
-        isRegistrationPage: false,
-      })
-    );
-    this.router.navigate([`/billing/${visit.patientUuid}/exempt`]);
+    this.loading = true
+    //Delay to buy time before displaying data to grab the current clicked visit
+    setTimeout(() => {
+      this.store.dispatch(
+        loadCurrentPatient({
+          uuid: visit.patientUuid,
+          isRegistrationPage: false,
+        })
+      );
+      this.loading = false
+      this.store.dispatch(
+        go({ path: [`/billing/${visit.patientUuid}/exempt`] })
+      );
+    }, 500);
   }
 }
