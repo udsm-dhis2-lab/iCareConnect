@@ -130,21 +130,32 @@ export class IssuingFormComponent implements OnInit {
   onIssue(e: Event): void {
     e.stopPropagation();
     const formValues = this.formData;
-
+    let remainedQuantityToIssue = Number(formValues?.quantity.value);
     const issueInput: IssueInput = {
       requisitionUuid: this.data?.issue.requisitionUuid,
       issuedLocationUuid: this.data?.issue?.requestingLocation.uuid,
       issuingLocationUuid: this.data?.issue?.requestedLocation.uuid,
-      issueItems: [
-        {
+      issueItems: this.eligibleBatches?.map((batch) => {
+        remainedQuantityToIssue =
+          remainedQuantityToIssue > batch?.quantity
+            ? remainedQuantityToIssue - Number(batch?.quantity)
+            : remainedQuantityToIssue;
+
+        const toIssue =
+          remainedQuantityToIssue > 0
+            ? batch?.quantity
+            : remainedQuantityToIssue;
+        return {
           itemUuid: this.data?.issue?.itemUuid,
-          quantity: parseInt(formValues?.quantity.value, 10),
-        },
-      ],
+          quantity: parseInt(toIssue, 10),
+          batch: batch?.batch,
+          expiryDate: batch?.expiryDate,
+        };
+      }),
     };
 
-    console.log("issueInput", issueInput);
-    // this.dialogRef.close({ issueInput });
+    // console.log("issueInput", issueInput);
+    this.dialogRef.close({ issueInput });
   }
 
   onUpdateForm(formValue: FormValue, stockStatusOfAnItem: any): void {
