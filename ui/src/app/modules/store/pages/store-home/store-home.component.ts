@@ -15,6 +15,7 @@ import {
   getMetrics,
   getSettingCurrentLocationStatus,
 } from "src/app/store/selectors";
+import { getCurrentUserPrivileges } from "src/app/store/selectors/current-user.selectors";
 
 @Component({
   selector: "app-store-home",
@@ -28,6 +29,7 @@ export class StoreHomeComponent implements OnInit {
   stockMetrics$: Observable<any>;
   settingCurrentLocationStatus$: Observable<boolean>;
   currentStorePage: any;
+  privileges$: Observable<any>;
   constructor(private store: Store<AppState>) {
     this.store.dispatch(clearStockMetrics());
   }
@@ -62,15 +64,18 @@ export class StoreHomeComponent implements OnInit {
         name: "Issuing",
         url: "issuing",
       },
-      // {
-      //   id: 'translation',
-      //   name: 'Transaction',
-      //   url: 'transaction',
-      // },
+      {
+        id: "settings",
+        name: "Settings",
+        url: "settings",
+        privilege: "STORE_SETTINGS",
+      },
     ];
     this.currentStorePage = this.storePages[0];
 
     this.stockMetrics$ = this.store.select(getMetrics);
+
+    this.privileges$ = this.store.select(getCurrentUserPrivileges);
   }
 
   onChangeRoute(event: Event, url: string, page: any): void {
