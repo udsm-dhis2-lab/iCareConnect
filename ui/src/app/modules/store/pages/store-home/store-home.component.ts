@@ -62,11 +62,11 @@ export class StoreHomeComponent implements OnInit {
         name: "Issuing",
         url: "issuing",
       },
-      // {
-      //   id: 'translation',
-      //   name: 'Transaction',
-      //   url: 'transaction',
-      // },
+      {
+        id: "settings",
+        name: "Settings",
+        url: "settings",
+      },
     ];
     this.currentStorePage = this.storePages[0];
 
