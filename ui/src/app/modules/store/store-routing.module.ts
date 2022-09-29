@@ -6,6 +6,7 @@ import { RequisitionReceiptComponent } from "./pages/requisition-receipt/requisi
 import { RequisitionComponent } from "./pages/requisition/requisition.component";
 import { StockComponent } from "./pages/stock/stock.component";
 import { StoreHomeComponent } from "./pages/store-home/store-home.component";
+import { StoreSettingsComponent } from "./pages/store-settings/store-settings.component";
 import { StoreTransactionComponent } from "./pages/store-transaction/store-transaction.component";
 
 const routes: Routes = [
@@ -37,6 +38,10 @@ const routes: Routes = [
       {
         path: "transaction",
         component: StoreTransactionComponent,
+      },
+      {
+        path: "settings",
+        component: StoreSettingsComponent,
       },
       {
         path: "stockout-items/:location",

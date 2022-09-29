@@ -17,10 +17,18 @@
     </h3>
     <hr />
     <div class="requisition-form">
+      <mat-progress-loader
+        mode="indeterminate"
+        *ngIf="!params?.stockStatusOfTheItemOnRequestedStore"
+      ></mat-progress-loader>
       <app-form
+        *ngIf="params?.stockStatusOfTheItemOnRequestedStore"
         [fields]="issueFormFields"
-        (formUpdate)="onUpdateForm($event)"
+        (formUpdate)="
+          onUpdateForm($event, params?.stockStatusOfTheItemOnRequestedStore)
+        "
       ></app-form>
+
       <div
         class="w-100 ml-2 mr-2 mb-2"
         *ngIf="params?.stockStatusOfTheItemOnRequestedStore"
@@ -29,7 +37,41 @@
         <b>
           {{ params?.stockStatusOfTheItemOnRequestedStore?.eligibleQuantity }}
         </b>
+        <div class="w-100 mt-2">
+          <section>
+            <mat-checkbox
+              color="primary"
+              [checked]="autoSelectBatch"
+              (change)="
+                onToggleAutoSelection(
+                  $event,
+                  params?.stockStatusOfTheItemOnRequestedStore
+                )
+              "
+              >Auto select batch</mat-checkbox
+            >
+          </section>
+          <div *ngIf="eligibleBatches?.length > 0">
+            <span class="mr-2" *ngFor="let batch of eligibleBatches">
+              {{ batch?.batch }} ( {{ batch?.expiryDate | date }} ),
+            </span>
+          </div>
+        </div>
       </div>
+
+      <app-form
+        *ngIf="!autoSelectBatch"
+        [fields]="[batchSelectionField]"
+        (formUpdate)="
+          onUpdateForm($event, params?.stockStatusOfTheItemOnRequestedStore)
+        "
+      ></app-form>
+      <app-form
+        [fields]="[quantityFormField]"
+        (formUpdate)="
+          onUpdateForm($event, params?.stockStatusOfTheItemOnRequestedStore)
+        "
+      ></app-form>
       <div
         *ngIf="
           params?.stockStatusOfTheItemOnRequestedStore?.eligibleQuantity === 0
@@ -41,9 +83,11 @@
       </div>
       <div
         *ngIf="
-          quantityToIssue >
+          (quantityToIssue >
             params?.stockStatusOfTheItemOnRequestedStore?.eligibleQuantity &&
-          params?.stockStatusOfTheItemOnRequestedStore?.eligibleQuantity !== 0
+            params?.stockStatusOfTheItemOnRequestedStore?.eligibleQuantity !==
+              0) ||
+          quantityToIssue > quantityFromEligibleBatches
         "
         class="alert alert-warning"
         role="alert"
@@ -63,7 +107,8 @@
             0 ||
           quantityToIssue >
             params?.stockStatusOfTheItemOnRequestedStore?.eligibleQuantity ||
-          !isFormValid
+          !isFormValid ||
+          quantityToIssue > quantityFromEligibleBatches
         "
         (click)="onIssue($event)"
       >
