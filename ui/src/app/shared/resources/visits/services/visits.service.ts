@@ -205,7 +205,7 @@ export class VisitsService {
             locationUuids?.length > 0
               ? flatten(visitResponse.map((visitData) => visitData?.results))
               : visitResponse?.results;
-          // TODO: Softcode Insurance attribute value (Concept UUID) - 00000105IIIIIIIIIIIIIIIIIIIIIIIIIIII
+          // TODO: Softcode Insurance attribute value (Concept UUID) - 00000101IIIIIIIIIIIIIIIIIIIIIIIIIIII
           return (
             (flatten(results) || [])
               .map((visitResult: any) => {
@@ -222,7 +222,7 @@ export class VisitsService {
                           attribute &&
                           attribute?.display &&
                           attribute?.display ===
-                            "00000105IIIIIIIIIIIIIIIIIIIIIIIIIIII"
+                            "00000101IIIIIIIIIIIIIIIIIIIIIIIIIIII"
                       ) || []
                     ).length > 0
                       ? "Insurance"
