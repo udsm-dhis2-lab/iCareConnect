@@ -158,7 +158,7 @@ export class VisitsService {
     orderBy?: string,
     orderByDirection?: string,
     filterBy?: string
-  ): Observable<Visit[]> {
+  ): Observable<any> {
     const locationUuids: any = isArray(location)
       ? location
       : location
@@ -205,7 +205,7 @@ export class VisitsService {
             locationUuids?.length > 0
               ? flatten(visitResponse.map((visitData) => visitData?.results))
               : visitResponse?.results;
-          // TODO: Softcode Insurance attribute value (Concept UUID) - 00000105IIIIIIIIIIIIIIIIIIIIIIIIIIII
+          // TODO: Softcode Insurance attribute value (Concept UUID) - 00000101IIIIIIIIIIIIIIIIIIIIIIIIIIII
           return (
             (flatten(results) || [])
               .map((visitResult: any) => {
@@ -222,7 +222,7 @@ export class VisitsService {
                           attribute &&
                           attribute?.display &&
                           attribute?.display ===
-                            "00000105IIIIIIIIIIIIIIIIIIIIIIIIIIII"
+                            "00000101IIIIIIIIIIIIIIIIIIIIIIIIIIII"
                       ) || []
                     ).length > 0
                       ? "Insurance"
@@ -234,6 +234,9 @@ export class VisitsService {
                 !onlyInsurance ? visit : visit?.paymentType === "Insurance"
               ) || []
           );
+        }),
+        catchError((error) => {
+          return of(error)
         })
       );
     }
@@ -305,6 +308,9 @@ export class VisitsService {
               !onlyInsurance ? visit : visit.paymentType === "Insurance"
             ) || []
         );
+      }),
+      catchError((error) => {
+        return of(error);
       })
     );
   }
@@ -439,6 +445,9 @@ export class VisitsService {
         });
 
         return patientLoad;
+      }),
+      catchError((error) => {
+        return of(error);
       })
     );
   }
@@ -471,16 +480,27 @@ export class VisitsService {
             height="550px"
           />`),
         };
+      }),
+      catchError((error) => {
+        return of(error);
       })
     );
   }
 
   submitClaim(visitUuid): Observable<any> {
-    return this.httpClient.get(`icare/visit/${visitUuid}/claim`);
+    return this.httpClient.get(`icare/visit/${visitUuid}/claim`).pipe(
+        catchError((error) => {
+          return of(error)
+        })
+      );
   }
 
   addVisitAttribute(data, visitUuid): Observable<any> {
-    return this.httpClient.post(`visit/${visitUuid}`, data);
+    return this.httpClient.post(`visit/${visitUuid}`, data).pipe(
+        catchError((error) => {
+          return of(error)
+        })
+      );
   }
 
   getVisitDetailsByVisitUuid(uuid: string, params?: any): Observable<any> {
@@ -552,6 +572,9 @@ export class VisitsService {
               },
             };
           });
+      }),
+      catchError((error) => {
+        return of(error);
       })
     );
   }
@@ -587,6 +610,9 @@ export class VisitsService {
           : includeInactive && !omitCurrentVisit
           ? visits
           : visits[0];
+      }),
+      catchError((error) => {
+        return of(error);
       })
     );
   }
@@ -602,6 +628,9 @@ export class VisitsService {
     ).pipe(
       map((response) => {
         return response?.results?.length > 1 ? false : true;
+      }),
+      catchError((error) => {
+        return of(error);
       })
     );
   }
@@ -619,6 +648,9 @@ export class VisitsService {
     ).pipe(
       map((response) => {
         return response?.results?.length;
+      }),
+      catchError((error) => {
+        return of(error);
       })
     );
   }
@@ -664,6 +696,9 @@ export class VisitsService {
           : includeInactive && !omitCurrentVisit
           ? visits
           : visits[0];
+      }),
+      catchError((error) => {
+        return of(error);
       })
     );
   }
@@ -709,6 +744,9 @@ export class VisitsService {
     ).pipe(
       map((response) => {
         return getOrdersFromCurrentVisitEncounters(response, "radiology");
+      }),
+      catchError((error) => {
+        return of(error);
       })
     );
   }
@@ -745,7 +783,11 @@ export class VisitsService {
       ],
     };
     encounterData = omit(encounterData, "provider");
-    return from(this.api.encounter.createEncounter(encounterData));
+    return from(this.api.encounter.createEncounter(encounterData)).pipe(
+        catchError((error) => {
+          return of(error)
+        })
+    );
   }
 
   createBedOrder(data): Observable<any> {
@@ -759,7 +801,11 @@ export class VisitsService {
       ],
     };
     encounterData = omit(encounterData, "provider");
-    return from(this.api.encounter.createEncounter(encounterData));
+    return from(this.api.encounter.createEncounter(encounterData)).pipe(
+        catchError((error) => {
+          return of(error)
+        })
+    );
   }
 
   transferPatient(data): Observable<any> {
@@ -780,7 +826,11 @@ export class VisitsService {
         },
       ],
     };
-    return from(this.api.encounter.createEncounter(encounterData));
+    return from(this.api.encounter.createEncounter(encounterData)).pipe(
+        catchError((error) => {
+          return of(error)
+        })
+    );
   }
 
   getVisitsTypes(): Observable<any> {
