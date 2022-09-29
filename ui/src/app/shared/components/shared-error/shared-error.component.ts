@@ -6,6 +6,7 @@ import { SystemSettingsService } from "src/app/core/services/system-settings.ser
 import { AppState } from "src/app/store/reducers";
 import { getCurrentUserDetails } from "src/app/store/selectors/current-user.selectors";
 import { getGroupedObservationByConcept } from "src/app/store/selectors/observation.selectors";
+import { StandardError } from "../../models/error-type.models";
 
 @Component({
   selector: "app-shared-error",
@@ -13,7 +14,7 @@ import { getGroupedObservationByConcept } from "src/app/store/selectors/observat
   styleUrls: ["./shared-error.component.scss"],
 })
 export class SharedErrorComponent implements OnInit {
-  @Input() errors: any[];
+  @Input() errors: error[];
 
   toggleMore: boolean = false;
 
@@ -22,10 +23,7 @@ export class SharedErrorComponent implements OnInit {
    * Customize it accordingly by never delete what's already written as it may disrupt some other parts of the software
    */
 
-  constructor(
-    private store: Store<AppState>,
-    private systemSettingsService: SystemSettingsService
-  ) {}
+  constructor() {}
 
   ngOnInit() {}
 
@@ -33,8 +31,12 @@ export class SharedErrorComponent implements OnInit {
     return typeof error;
   }
 
-  onClickMore(e){
+  onClickMore(e) {
     e.stopPropagation();
     this.toggleMore = !this.toggleMore;
   }
+}
+
+interface error {
+  error: StandardError;
 }
