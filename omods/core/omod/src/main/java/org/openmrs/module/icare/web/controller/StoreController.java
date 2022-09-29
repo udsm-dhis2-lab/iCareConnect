@@ -231,8 +231,8 @@ public class StoreController {
 				issueItem.setQuantity((Double) issueItemObject.get("quantity"));
 			}
 			
-			if (issueItemObject.get("batchNo") instanceof String) {
-				issueItem.setBatchNo((String) issueItemObject.get("batchNo"));
+			if (issueItemObject.get("batch") instanceof String) {
+				issueItem.setBatchNo((String) issueItemObject.get("batch"));
 			}
 			
 			if (issueItemObject.get("expiryDate") instanceof Date) {
