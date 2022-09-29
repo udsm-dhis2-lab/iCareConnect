@@ -6,6 +6,10 @@
       </button>
       <span class="ml-2">Exemption</span>
     </mat-toolbar>
+    <mat-progress-bar
+      mode="indeterminate"
+      *ngIf="loading"
+    ></mat-progress-bar>
     <!-- patient list -->
     <div class="mat-elevation-z1" *ngIf="visitsLength > 0">
       <app-table [columns]="billingColumns" [loading]="loadingVisits" [loadingDataError]="loadingVisitsError"
