@@ -79,7 +79,7 @@
         <div
           *ngIf="
             (paymentTypeSelected &&
-              visit?.visit?.paymentType === paymentTypeSelected)
+              visit?.visit?.paymentType === paymentTypeSelected) || !paymentTypeSelected
           "
           class="bg-light d-flex justify-content-center patient-item m-2"
           (click)="onSelectPatient($event, visit)"
@@ -123,9 +123,10 @@
       class="tabular-patient-list"
       *ngIf="
         isTabularList &&
-        paymentTypeSelected != '' &&
         params?.visits &&
-        params?.visits.length > 0
+        params?.visits.length > 0 && 
+        ((paymentTypeSelected &&
+              visit?.visit?.paymentType === paymentTypeSelected) || !paymentTypeSelected)
       "
     >
       <app-patients-tabular-list
