@@ -297,6 +297,13 @@
                   'col-lg-8 col-md-8 col-sm-12 col-sx-12 obs-table': isInpatient
                 }"
               >
+               <mat-progress-bar
+                *ngIf="
+                  !readyForClinicalNotes
+                "
+                mode="indeterminate"
+              >
+              </mat-progress-bar>
                 <app-clinical-notes
                   *ngIf="
                     !isInpatient &&
@@ -356,12 +363,13 @@
                 </app-patient-observations-chart>
                  <app-ipd-forms
                   *ngIf="
-                    isInpatient &&
+                    isInpatient && 
+                    readyForClinicalNotes &&
                     !dashboardParams.loadingForms &&
                     dashboardParams.currentPatient &&
                     dashboardParams?.forms &&
                     dashboardParams?.forms?.length > 0 &&
-                    (selectedForm && selectedForm?.uuid && dashboardParams?.observationChartForm !== selectedForm?.uuid || (!selectedForm && dashboardParams?.observationChartForm !== dashboardParams?.forms[0].uuid))
+                    (selectedForm && selectedForm?.uuid && dashboardParams?.observationChartForm !== selectedForm?.uuid || (!selectedForm && dashboardParams?.observationChartForm !== dashboardParams?.forms[0]?.uuid))
                   "
                   [clinicalObservations]="
                     dashboardParams?.observationsGroupedByConcept
