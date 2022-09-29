@@ -138,28 +138,11 @@ export class IssuingComponent implements OnInit {
 
   issueAllSelected(event: Event, selectedItemsToIssue: any): void {
     event.stopPropagation();
-    console.log("selectedItemsToIssue", selectedItemsToIssue);
-
-    let requestingLocationsDetails = [];
     let itemsToIssue = [];
     Object.keys(selectedItemsToIssue).forEach((key) => {
-      requestingLocationsDetails = [
-        ...requestingLocationsDetails,
-        {
-          requestingLocationUuid:
-            selectedItemsToIssue[key]?.requestingLocation?.uuid,
-          requestingLocation: selectedItemsToIssue[key]?.requestingLocation,
-          requestedLocation: selectedItemsToIssue[key]?.requestedLocation,
-        },
-      ];
       itemsToIssue = [...itemsToIssue, selectedItemsToIssue[key]];
     });
-    requestingLocationsDetails = uniqBy(
-      requestingLocationsDetails,
-      "requestingLocationUuid"
-    );
     const groupedRequisitions = groupBy(itemsToIssue, "requisitionUuid");
-    console.log("groupedRequisitions", groupedRequisitions);
 
     this.dialog
       .open(ConfirmRequisitionsModalComponent, {

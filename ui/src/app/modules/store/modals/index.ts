@@ -1,8 +1,9 @@
-import { AddNewStockReceivedComponent } from './add-new-stock-received/add-new-stock-received.component';
-import { IssuingFormComponent } from './issuing-form/issuing-form.component';
-import { LedgerFormComponent } from './ledger-form/ledger-form.component';
-import { RequestCancelComponent } from './request-cancel/request-cancel.component';
-import { RequisitionFormComponent } from './requisition-form/requisition-form.component';
+import { AddNewStockReceivedComponent } from "./add-new-stock-received/add-new-stock-received.component";
+import { ConfirmRequisitionsModalComponent } from "./confirm-requisitions-modal/confirm-requisitions-modal.component";
+import { IssuingFormComponent } from "./issuing-form/issuing-form.component";
+import { LedgerFormComponent } from "./ledger-form/ledger-form.component";
+import { RequestCancelComponent } from "./request-cancel/request-cancel.component";
+import { RequisitionFormComponent } from "./requisition-form/requisition-form.component";
 
 export const storeModals: any[] = [
   LedgerFormComponent,
@@ -10,4 +11,5 @@ export const storeModals: any[] = [
   IssuingFormComponent,
   RequestCancelComponent,
   AddNewStockReceivedComponent,
+  ConfirmRequisitionsModalComponent,
 ];
