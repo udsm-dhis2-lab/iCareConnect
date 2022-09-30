@@ -83,21 +83,21 @@ export class RegistrationAddComponent implements OnInit {
   relationTypeOptions$: Observable<any>;
   selectedIdFormat: string;
   errors: any[] = [];
-  fakeErrors: any[] = [
-    {
-      error: {
-        message: "Invalid Submission",
-        code: "webservices.rest.error.invalid.submission",
-        globalErrors: [
-          {
-            code: "Identifier 12345 already in use by another patient",
-            message: "Identifier 12345 already in use by another patient",
-          },
-        ],
-        fieldErrors: {},
-      },
-    },
-  ];
+  // fakeErrors: any[] = [
+  //   {
+  //     error: {
+  //       message: "Invalid Submission",
+  //       code: "webservices.rest.error.invalid.submission",
+  //       globalErrors: [
+  //         {
+  //           code: "Identifier 12345 already in use by another patient",
+  //           message: "Identifier 12345 already in use by another patient",
+  //         },
+  //       ],
+  //       fieldErrors: {},
+  //     },
+  //   },
+  // ];
 
   constructor(
     private _snackBar: MatSnackBar,
