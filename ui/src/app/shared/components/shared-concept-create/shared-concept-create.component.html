@@ -1,15 +1,9 @@
-<div
-  class="row"
-  *ngIf="{
-    selectedTestMethodDetails: selectedTestMethodDetails$ | async,
-    conceptSources: conceptSources$ | async
-  } as params"
->
+<div class="row">
   <div
     class="col-lg-12 col-md-12 col-sx-12 col-sm-12"
     style="border-right: solid 1px #eee"
   >
-    <div *ngIf="itemTypeName">
+    <div *ngIf="itemTypeName && showItemTypeName">
       <div class="h5">New {{ itemTypeName }}</div>
       <hr />
     </div>
@@ -23,35 +17,13 @@
     </div>
     <div class="row">
       <div class="col-lg-6 col-md-6 col-sx-12 col-sm-12">
-        <div *ngIf="searchTermForTestMethod">
-          <app-form
-            [fields]="[testMethodField]"
-            (formUpdate)="onFormUpdateTestMethod($event)"
-          ></app-form>
-        </div>
-
-        <mat-progress-bar
-          *ngIf="
-            searchTermForTestMethod &&
-            testMethodSelected &&
-            !params?.selectedTestMethodDetails
-          "
-          mode="indeterminate"
-        ></mat-progress-bar>
         <div class="w-100">
           <app-form
             [fields]="basicConceptFields"
             (formUpdate)="onFormUpdate($event)"
           ></app-form>
         </div>
-        <div
-          *ngIf="
-            (isSet && !editingSet && !searchTermForTestMethod) ||
-            (searchTermForTestMethod &&
-              testMethodSelected &&
-              params?.selectedTestMethodDetails)
-          "
-        >
+        <div *ngIf="isSet">
           <div class="h5">
             {{ setMembersHeaderName }}
           </div>
@@ -70,19 +42,19 @@
       <div class="col-lg-6 col-md-6 col-sx-12 col-sm-12">
         <fieldset>
           <legend>{{ itemTypeName }} Codes</legend>
-          <div *ngIf="params?.conceptSources && readyToCollectCodes">
-            <app-codes-selection
-              [conceptSources]="params?.conceptSources"
-              [selectedCodes]="selectedCodingItems"
-              [mappings]="mappings"
-              (selectedCodesItems)="onGetSelectedCodes($event)"
-            ></app-codes-selection>
+          <div>
+            <app-form
+              [fields]="[codesMappingsSourceField]"
+              (formUpdate)="onFormUpdateForSource($event)"
+            ></app-form>
+            <app-multiple-items-selection
+              [items]="[]"
+              [itemType]="'conceptReferenceTerm'"
+              [source]="selectedCodingSource"
+              [selectedItems]="selectedCodes"
+              (getSelectedItems)="onGetSelectedMembers($event)"
+            ></app-multiple-items-selection>
           </div>
-
-          <mat-progress-bar
-            *ngIf="!params?.conceptSources"
-            mode="indeterminate"
-          ></mat-progress-bar>
         </fieldset>
       </div>
     </div>
@@ -99,13 +71,8 @@
       <button
         class="ml-2"
         mat-stroked-button
-        [disabled]="
-          (!isFormValid && !searchTermForTestMethod) ||
-          (!isFormValid &&
-            searchTermForTestMethod &&
-            selectedSetMembers?.length === 0)
-        "
-        (click)="onSave($event, selectedTestMethodDetails)"
+        [disabled]="!isFormValid"
+        (click)="onSave($event, null)"
         color="primary"
       >
         {{ !conceptUuid ? "Save" : "Update" }}
