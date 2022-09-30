@@ -48,10 +48,12 @@
               (formUpdate)="onFormUpdateForSource($event)"
             ></app-form>
             <app-multiple-items-selection
+              *ngIf="selectedCodingSource"
               [items]="[]"
               [itemType]="'conceptReferenceTerm'"
               [source]="selectedCodingSource"
-              [selectedItems]="selectedCodes"
+              [selectedItems]="selectedItems"
+              [multipleSelectionCompHeight]="multipleSelectionCompHeight"
               (getSelectedItems)="onGetSelectedMembers($event)"
             ></app-multiple-items-selection>
           </div>
