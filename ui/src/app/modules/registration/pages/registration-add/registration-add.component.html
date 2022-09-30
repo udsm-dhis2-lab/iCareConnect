@@ -664,6 +664,11 @@
             {{ errorMessage }}
           </p>
         </div>
+        <!-- Alerts -->
+        <div *ngIf="errors?.length > 0">
+          <app-shared-error [errors]="errors"></app-shared-error>
+        </div>
+        <!-- End Alerts -->
         <button
           mat-flat-button
           style="height: 45px"

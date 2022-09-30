@@ -132,4 +132,11 @@ export class StockService {
         })
       );
   }
+
+  // TODO: by Masembo
+  getItemStockInAllUnits(itemID: string): Observable<any> {
+    return this.httpClient.get(`store/item/${itemID}/stock?itemUuid=${itemID}`);
+  }
 }
+
+// https://icare.dhis2.udsm.ac.tz/openmrs/ws/rest/v1/store/item/{itemUUID}/stock?itemUuid={itemUUID}
