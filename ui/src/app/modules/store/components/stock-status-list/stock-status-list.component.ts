@@ -23,9 +23,10 @@ export class StockStatusListComponent implements OnInit {
   stocksList$: Observable<StockObject[]>;
   searchTerm: string;
   currentItemStock: StockObject;
+  currentItemStocks$: Observable<StockObject>;
   currentItemStock$: Observable<StockObject>;
-  locations$: Observable<any>;
   saving: boolean = false;
+  itemID?: string;
   constructor(
     private stockService: StockService,
     private dialog: MatDialog,
@@ -34,7 +35,6 @@ export class StockStatusListComponent implements OnInit {
 
   ngOnInit(): void {
     this.getStock();
-    this.getLocatons();
   }
 
   searchStock(event: any): void {
@@ -88,7 +88,6 @@ export class StockStatusListComponent implements OnInit {
       this.getStock();
     }
   }
-
   onSaveLedger(ledgerInput: LedgerInput, currentStock: any): void {
     this.saving = true;
     this.stockService.saveStockLedger(ledgerInput).subscribe((response) => {
@@ -101,10 +100,13 @@ export class StockStatusListComponent implements OnInit {
       }
     });
   }
-
-  getLocatons(): void {
-    this.locations$ = this.locationService
-      .getLocationsByTagName("store")
-      .pipe(map((locations) => console.log("==> Locations: ", locations)));
+  onViewStockStatus(event: Event, itemID): void {
+    if (event) {
+      event.stopPropagation();
+      this.itemID = itemID;
+    }
+  }
+  onClearItemID() {
+    this.itemID = undefined;
   }
 }
