@@ -20,11 +20,22 @@
     *ngIf="params?.currentMenuDepartments"
   >
     <mat-sidenav #sidenav class="maintenance-sidenav" mode="side" opened="true">
-      <app-maintenance-side-menu
+      <!-- <app-maintenance-side-menu
         [pages]="pages"
         [currentMenuDepartments]="params?.currentMenuDepartments"
         (selectedMenuItem)="getSelectedMenuItem($event)"
-      ></app-maintenance-side-menu>
+      ></app-maintenance-side-menu> -->
+
+      <mat-nav-list *ngFor="let page of pages">
+        <mat-list-item
+          (click)="onNnavigateToThis($event, page, null)"
+          [ngClass]="{
+            'selected-menu-item': currentMenu?.id === page?.id
+          }"
+        >
+          {{ page?.name }}
+        </mat-list-item>
+      </mat-nav-list>
     </mat-sidenav>
 
     <div class="page-sidenav-content">

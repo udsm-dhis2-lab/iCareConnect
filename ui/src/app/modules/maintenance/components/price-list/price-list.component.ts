@@ -73,6 +73,9 @@ export class PriceListComponent implements OnInit, OnChanges {
   paymentTypesAndSchemes: any[] = [];
   currentPage: number = 0;
 
+  priceListDepartments$: Observable<any[]>;
+  selectedPriceListDepartment: any;
+
   constructor(
     private dialog: MatDialog,
     private itemPriceService: ItemPriceService,
@@ -83,6 +86,8 @@ export class PriceListComponent implements OnInit, OnChanges {
   ngOnInit() {
     this.currentDepartmentId = this.departmentId;
     this.loadData();
+    this.priceListDepartments$ =
+      this.itemPriceService.getDepartmentsByMappingSearchQuery("PRICE_LIST");
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -234,7 +239,7 @@ export class PriceListComponent implements OnInit, OnChanges {
     );
   }
 
-  onSearch(e: any, departmentId: string) {
+  onSearch(e: any, departmentId: string): void {
     e.stopPropagation();
     this.itemSearchTerm = e?.target?.value;
     if (
@@ -253,5 +258,11 @@ export class PriceListComponent implements OnInit, OnChanges {
         })
       );
     }
+  }
+
+  getSelectedDepartment(event: MatSelectChange): void {
+    this.selectedPriceListDepartment = event?.value;
+    this.currentDepartmentId = this.selectedPriceListDepartment?.uuid;
+    this.loadData();
   }
 }
