@@ -82,7 +82,6 @@
               </button>
               <button
                 [disabled]="
-                  stockBatch?.expiryDate < today ||
                   stockBatch?.quantity === 0 ||
                   !userPrivileges['STORE_DEDUCT_STOCK_FROM_BATCH']
                 "

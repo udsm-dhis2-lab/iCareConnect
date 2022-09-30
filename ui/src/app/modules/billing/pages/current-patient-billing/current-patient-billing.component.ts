@@ -70,6 +70,7 @@ export class CurrentPatientBillingComponent implements OnInit {
   exemptionConcept$: Observable<any>;
   hasOpenExemptionRequest: boolean;
   isBillCleared: boolean;
+  errors: any[] = [];
 
   constructor(
     private route: ActivatedRoute,
@@ -175,12 +176,18 @@ export class CurrentPatientBillingComponent implements OnInit {
     this.exemptionEncounterType$ = this.systemSettingsService
       .getSystemSettingsByKey("icare.billing.exemption.encounterType")
       .pipe(
-        tap((orderType) => {
-          return orderType;
-        }),
-        catchError((error) => {
-          console.log("Error occured while trying to get orderType: ", error);
-          return of(new MatTableDataSource([]));
+        tap((response) => {
+          if(response?.error){
+            this.errors = [...this.errors, response.error];
+          }
+          if(response === 'none'){
+            this.errors = [...this.errors, 
+              {error: { 
+                message: "Missing Icare Exemption Configurations. Please set 'icare.billing.exemption.encounterType' or Contact IT"
+                }
+              }
+            ]
+          };
         })
       );
 
@@ -188,12 +195,21 @@ export class CurrentPatientBillingComponent implements OnInit {
     this.exemptionOrderType$ = this.systemSettingsService
       .getSystemSettingsByKey("icare.billing.exemption.orderType")
       .pipe(
-        tap((orderType) => {
-          return orderType;
-        }),
-        catchError((error) => {
-          console.log("Error occured while trying to get orderType: ", error);
-          return of(new MatTableDataSource([]));
+        tap((response) => {
+          if (response?.error) {
+            this.errors = [...this.errors, response.error];
+          }
+          if (response === "none") {
+            this.errors = [
+              ...this.errors,
+              {
+                error: {
+                  message:
+                    "Missing Icare Exemption Configurations. Please set 'icare.billing.exemption.orderType' or Contact IT",
+                },
+              },
+            ];
+          }
         })
       );
 
@@ -201,11 +217,21 @@ export class CurrentPatientBillingComponent implements OnInit {
     this.exemptionConcept$ = this.systemSettingsService
       .getSystemSettingsByKey("icare.billing.exemption.concept")
       .pipe(
-        tap((exemptionConcept) => {
-          return exemptionConcept;
-        }),
-        catchError((error) => {
-          return of(new MatTableDataSource([error]));
+        tap((response) => {
+          if (response?.error) {
+            this.errors = [...this.errors, response.error];
+          }
+          if (response === "none") {
+            this.errors = [
+              ...this.errors,
+              {
+                error: {
+                  message:
+                    "Missing Icare Exemption Configurations. Please set 'icare.billing.exemption.concept' or Contact IT",
+                },
+              },
+            ];
+          }
         })
       );
   }

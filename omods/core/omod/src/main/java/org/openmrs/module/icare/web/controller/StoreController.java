@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -228,6 +229,14 @@ public class StoreController {
 			}
 			if (issueItemObject.get("quantity") instanceof Double) {
 				issueItem.setQuantity((Double) issueItemObject.get("quantity"));
+			}
+			
+			if (issueItemObject.get("batch") instanceof String) {
+				issueItem.setBatchNo((String) issueItemObject.get("batch"));
+			}
+			
+			if (issueItemObject.get("expiryDate") instanceof Date) {
+				issueItem.setExpiryDate((Date) issueItemObject.get("expiryDate"));
 			}
 			
 			issueItem.setIssue(issue);
