@@ -17,10 +17,6 @@ export class SharedErrorComponent implements OnInit {
   @Input() errors: error[];
 
   toggleMore: boolean = false;
-  alert: any = {
-    type: "danger",
-    message: "This is an success alert",
-  };
 
   /**
    * This is the component specific for displaying erros.
