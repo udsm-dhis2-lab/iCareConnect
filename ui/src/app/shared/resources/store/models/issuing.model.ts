@@ -169,10 +169,12 @@ export class Issuing {
       requisition: { uuid: issueInput.requisitionUuid },
       issuedLocation: { uuid: issueInput.issuedLocationUuid },
       issueingLocation: { uuid: issueInput.issuingLocationUuid },
-      issueItems: (issueInput.issueItems || []).map((issueItem) => {
+      issueItems: (issueInput.issueItems || []).map((issueItem: any) => {
         return {
           item: { uuid: issueItem.itemUuid },
           quantity: issueItem.quantity,
+          batch: issueItem?.batch,
+          expiryDate: issueItem?.expiryDate,
         };
       }),
     };

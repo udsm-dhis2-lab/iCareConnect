@@ -1,7 +1,8 @@
 <div
   *ngIf="{
     settingCurrentLocationStatus: settingCurrentLocationStatus$ | async,
-    currentStore: currentStore$ | async
+    currentStore: currentStore$ | async,
+    privileges: privileges$ | async
   } as params"
 >
   <div
@@ -15,6 +16,11 @@
         <mat-nav-list>
           <ng-container *ngFor="let storePage of storePages">
             <mat-list-item
+              *ngIf="
+                (storePage?.privilege &&
+                  params?.privileges[storePage?.privilege]) ||
+                !storePage?.privilege
+              "
               [ngClass]="{
                 'not-allowed-menu-item':
                   params?.currentStore?.isMainStore &&
