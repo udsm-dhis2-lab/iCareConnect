@@ -610,17 +610,8 @@ export class RegistrationAddComponent implements OnInit {
                   .pipe(
                     tap((response) => {
                       if (response.error) {
-                        console.log(
-                          "Errors 2",
-                          response?.error?.error?.globalErrors[0]?.code
-                        );
-                        this.errors = [response.error];
-                      }
-                      if (response.error?.grobalErrors) {
-                        this.errors = [
-                          ...this.errors,
-                          response?.error?.globalErrors[0]?.code,
-                        ];
+                        this.errors = [...this.errors, response.error];
+                        return 0;
                       }
                     })
                   )
