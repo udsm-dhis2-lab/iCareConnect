@@ -7,7 +7,7 @@
                 <span aria-hidden="true">&times;</span>
             </button>
             <p class="text-left">
-              {{ error?.error?.message }} <span *ngIf="error?.error?.detail" class="more-less float-right" (click)="onClickMore($event)">{{ toggleMore ? 'Show less' : 'Show more' }}</span> 
+              {{ error?.error?.message }} {{ error?.error?.code ? '(' + error?.error?.code + ')' : "" }} <span *ngIf="error?.error?.detail" class="more-less float-right" (click)="onClickMore($event)">{{ toggleMore ? 'Show less' : 'Show more' }}</span> 
             </p>
             <div *ngIf="toggleMore && error?.error?.detail" class="mt-2" >
                 <p>{{ error?.error?.detail }}</p>

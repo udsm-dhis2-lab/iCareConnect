@@ -343,25 +343,5 @@ export class PatientListComponent implements OnInit, OnChanges {
           }
         })
       );
-
-    // this.filteredVisits$.subscribe({
-    //   next: (visits) => {
-    //     this.loadingPatients = false;
-    //     if (visits.length > 0) {
-    //       return (this.visits = visits);
-    //     }
-    //     else {
-    //       this.visits$.subscribe({
-    //         next: (visits) => {
-    //           this.visits = visits;
-    //         },
-    //       });
-    //     }
-
-    //   },
-    //   error: (error) => {
-    //     this.loadingPatients = false;
-    //   },
-    // });
   }
 }
