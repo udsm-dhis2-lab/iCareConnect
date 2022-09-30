@@ -17,32 +17,8 @@
   ></mat-progress-bar>
 
   <!-- Alerts -->
-  <div
-    class="alert alert-danger mt-2"
-    role="alert"
-    *ngIf="params?.exemptionOrderType && params?.exemptionOrderType === 'none'"
-  >
-    Missing Icare Exemption Configurations. Please set
-    "icare.billing.exemption.orderType" or Contact IT
-  </div>
-  <div
-    class="alert alert-danger mt-2"
-    role="alert"
-    *ngIf="
-      params?.exemptionEncounterType &&
-      params?.exemptionEncounterType === 'none'
-    "
-  >
-    Missing Icare Exemption Configurations. Please set
-    "icare.billing.exemption.encounterType" or Contact IT
-  </div>
-  <div
-    class="alert alert-danger mt-2"
-    role="alert"
-    *ngIf="params?.exemptionConcept && params?.exemptionConcept === 'none'"
-  >
-    Missing Icare Exemption Configurations. Please set
-    "icare.billing.exemption.concept" or Contact IT
+  <div *ngIf="errors.length > 0">
+    <app-shared-error [errors]="errors"></app-shared-error>
   </div>
   <!-- End Alerts -->
 
@@ -159,8 +135,8 @@
                         class="float-left"
                         mat-stroked-button
                         [ngClass]="
-                          !params?.exemptionEncounterType ||
-                          !params?.exemptionOrderType ||
+                          params?.exemptionEncounterType === 'none' ||
+                          params?.exemptionOrderType === 'none' || params?.exemptionConcept === 'none' ||
                           hasOpenExemptionRequest
                             ? 'button-faint'
                             : 'button'

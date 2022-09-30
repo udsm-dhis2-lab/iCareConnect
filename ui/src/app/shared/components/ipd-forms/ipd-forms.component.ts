@@ -75,17 +75,17 @@ export class IpdFormsComponent implements OnInit {
 
   onConfirm(e: Event, visit: any): void {
     e.stopPropagation();
-    // this.saveObservations.emit(
-    //   getObservationsFromForm(
-    //     this.formData[this.currentCustomForm?.id],
-    //     this.patient?.personUuid,
-    //     this.location?.id,
-    //     this.visit?.encounterUuid
-    //       ? this.visit?.encounterUuid
-    //       : JSON.parse(localStorage.getItem("patientConsultation"))[
-    //           "encounterUuid"
-    //         ]
-    //   )
-    // );
+    this.saveObservations.emit(
+      getObservationsFromForm(
+        this.formData[this.currentCustomForm?.id],
+        this.patient?.personUuid,
+        this.location?.id,
+        this.visit?.encounterUuid
+          ? this.visit?.encounterUuid
+          : JSON.parse(localStorage.getItem("patientConsultation"))[
+              "encounterUuid"
+            ]
+      )
+    );
   }
 }

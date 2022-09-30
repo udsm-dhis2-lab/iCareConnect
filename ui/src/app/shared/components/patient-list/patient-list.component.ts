@@ -8,13 +8,13 @@ import {
 } from "@angular/core";
 import { Store } from "@ngrx/store";
 import { Observable, of } from "rxjs";
-import { take, tap } from "rxjs/operators";
+import { map, tap } from "rxjs/operators";
 import { AppState } from "src/app/store/reducers";
 import { Patient } from "../../resources/patient/models/patient.model";
 import { Visit } from "../../resources/visits/models/visit.model";
 import { VisitsService } from "../../resources/visits/services";
 
-import { map, uniq } from "lodash";
+import { uniq } from "lodash";
 import {
   clearActiveVisit,
   upsertAdmittedPatientLocation,
@@ -63,6 +63,7 @@ export class PatientListComponent implements OnInit, OnChanges {
   paymentType: any;
   filterBy: any;
   startingIndex: number = 0;
+  errors: any[] = [];
   constructor(
     private visitService: VisitsService,
     private store: Store<AppState>,
@@ -75,9 +76,18 @@ export class PatientListComponent implements OnInit, OnChanges {
   ngOnChanges() {}
 
   ngOnInit() {
-    this.filters$ = this.systemSettingsService.getSystemSettingsMatchingAKey(
-      "iCare.filters." + (this.filterCategory ? this.filterCategory : "")
-    );
+    this.filters$ = this.systemSettingsService
+      .getSystemSettingsMatchingAKey(
+        "iCare.filters." + (this.filterCategory ? this.filterCategory : "")
+      )
+      .pipe(
+        tap((response: any) => {
+          this.loadingPatients = false;
+          if (response?.error) {
+            this.errors = [...this.errors, response?.error];
+          }
+        })
+      );
     if (this.defaultFilter) {
       this.paymentTypeSelected = this.defaultFilter;
     }
@@ -148,8 +158,11 @@ export class PatientListComponent implements OnInit, OnChanges {
             this.filterBy ? this.filterBy : ""
           )
           .pipe(
-            tap(() => {
+            tap((response: any) => {
               this.loadingPatients = false;
+              if (response?.error) {
+                this.errors = [...this.errors, response?.error];
+              }
             })
           );
   }
@@ -196,8 +209,11 @@ export class PatientListComponent implements OnInit, OnChanges {
               this.filterBy
             )
             .pipe(
-              tap(() => {
+              tap((response: any) => {
                 this.loadingPatients = false;
+                if (response?.error) {
+                  this.errors = [...this.errors, response?.error];
+                }
               })
             );
   }
@@ -222,8 +238,11 @@ export class PatientListComponent implements OnInit, OnChanges {
         this.filterBy ? this.filterBy : ""
       )
       .pipe(
-        tap(() => {
+        tap((response: any) => {
           this.loadingPatients = false;
+          if(response?.error) {
+            this.errors = [...this.errors, ...response?.error];
+          }
         })
       );
   }
@@ -314,8 +333,14 @@ export class PatientListComponent implements OnInit, OnChanges {
         this.filterBy
       )
       .pipe(
-        tap(() => {
+        tap((response: any) => {
           this.loadingPatients = false;
+          if(response?.error){
+            this.errors = [
+              ...this.errors,
+              response?.error 
+            ]  
+          }
         })
       );
 
