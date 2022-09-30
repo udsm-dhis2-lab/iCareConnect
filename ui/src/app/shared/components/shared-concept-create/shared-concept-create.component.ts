@@ -14,6 +14,7 @@ import {
 } from "src/app/shared/resources/openmrs";
 
 import { omit, uniqBy } from "lodash";
+import { Field } from "../../modules/form/models/field.model";
 
 @Component({
   selector: "app-shared-concept-create",
@@ -32,6 +33,8 @@ export class SharedConceptCreateComponent implements OnInit {
   @Input() conceptDataTypes: ConceptdatatypeGet[];
   @Input() inheritProperties: boolean;
   @Input() saveOnTheComponent: boolean;
+  @Input() showItemTypeName: boolean;
+  @Input() conceptSources: any[];
   basicConceptFields: any[];
   dataTypeField: any;
   unitsField: any;
@@ -42,21 +45,23 @@ export class SharedConceptCreateComponent implements OnInit {
   mappings: any[] = [];
   readyToCollectCodes: boolean = false;
 
+  codesMappingsSourceField: Field<string>;
+
   @Output() conceptCreated: EventEmitter<boolean> = new EventEmitter<boolean>();
+  @Output() conceptToCreate: EventEmitter<any> = new EventEmitter<any>();
 
   saving: boolean = false;
   editingSet: boolean = false;
   conceptUuid: string;
 
   selectedSetMembers: ConceptGetFull[] = [];
-
-  testMethodField: any;
   testMethodSelected: boolean = false;
   selectedTestMethodDetails$: Observable<ConceptGetFull[]>;
 
   conceptSources$: Observable<ConceptsourceGet[]>;
 
   selectedCodes: any[];
+  selectedCodingSource: any;
 
   alertType: string = "";
 
@@ -66,16 +71,12 @@ export class SharedConceptCreateComponent implements OnInit {
   conceptBeingEdited: ConceptGetFull;
   constructor(
     private conceptService: ConceptsService,
-    private billableItemService: BillableItemsService,
-    private conceptSourceService: ConceptSourcesService
+    private billableItemService: BillableItemsService
   ) {}
 
   ngOnInit(): void {
     this.createBasicConceptFields();
-    if (this.searchTermForTestMethod) {
-      this.createTestMethodField();
-    }
-
+    this.createCodesMappingSourceField();
     if (!this.dataType && this.conceptDataTypes) {
       this.createDataTypeField();
       this.createDisplayPrecisionField();
@@ -85,23 +86,9 @@ export class SharedConceptCreateComponent implements OnInit {
     if (this.inheritProperties) {
       this.createUnitField();
     }
-
-    this.conceptSources$ = this.conceptSourceService.getConceptSources();
   }
 
-  createTestMethodField(): void {
-    this.testMethodField = new Dropdown({
-      id: "testmethod",
-      key: "testmethod",
-      label: "Test method",
-      searchTerm: "TEST_METHODS",
-      required: true,
-      options: [],
-      conceptClass: "Test",
-      searchControlType: "concept",
-      shouldHaveLiveSearchForDropDownFields: true,
-    });
-  }
+  onFormUpdateForSource(formValues: FormValue): void {}
 
   createDataTypeField(data?: any): void {
     this.dataTypeField = new Dropdown({
@@ -136,6 +123,26 @@ export class SharedConceptCreateComponent implements OnInit {
       key: "units",
       label: "Units",
       type: "text",
+    });
+  }
+
+  createCodesMappingSourceField(data?: any): void {
+    this.codesMappingsSourceField = new Dropdown({
+      id: "source",
+      key: "source",
+      label: "Coding source",
+      value:
+        data && data?.length > 0
+          ? data[0]?.conceptReferenceTerm?.conceptSource?.uuid
+          : null,
+      options: this.conceptSources.map((source) => {
+        return {
+          key: source?.uuid,
+          label: source?.display,
+          value: source?.uuid,
+          name: source?.display,
+        };
+      }),
     });
   }
 
@@ -177,10 +184,16 @@ export class SharedConceptCreateComponent implements OnInit {
   onFormUpdate(formValues: FormValue): void {
     this.formData = { ...this.formData, ...formValues.getValues() };
     this.isFormValid = formValues.isValid;
+    this.conceptToCreate.emit(this.formData);
   }
 
   onFormUpdateForDataType(formValues: FormValue): void {
     this.formData = { ...this.formData, ...formValues.getValues() };
+    this.conceptToCreate.emit(this.formData);
+  }
+
+  onGetSelectedMembers(event): void {
+    console.log(event);
   }
 
   onFormUpdateTestMethod(formValues: FormValue): void {

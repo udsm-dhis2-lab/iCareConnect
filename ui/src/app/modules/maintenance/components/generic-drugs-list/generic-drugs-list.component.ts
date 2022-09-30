@@ -39,7 +39,7 @@ export class GenericDrugsListComponent implements OnInit {
   onAddNew(event: Event): void {
     event.stopPropagation();
     this.dialog.open(AddNewGenericDrugModalComponent, {
-      width: "30%",
+      width: "40%",
     });
   }
 }
