@@ -1,14 +1,18 @@
 <ng-container *ngIf="errors.length > 0">
-    <div *ngFor="let error of errors">
-       <div class="alert alert-danger mt-2"
-        role="alert"
-        *ngIf="error?.error">
-            <p class="text-left">
-              {{ error?.error?.message }} <span *ngIf="error?.error?.detail" class="more-less float-right" (click)="onClickMore($event)">{{ toggleMore ? 'less' : 'more' }}</span> 
-            </p>
-            <div *ngIf="toggleMore && error?.error?.detail" class="mt-2" >
-                <p>{{ error?.error?.detail }}</p>
-            </div>
-        </div>
+  <div *ngFor="let error of errors">
+    <div class="alert alert-danger mt-2" role="alert" *ngIf="error?.error">
+      <p class="text-left">
+        {{ error?.error?.message }}
+        <span
+          *ngIf="error?.error?.detail"
+          class="more-less float-right"
+          (click)="onClickMore($event)"
+          >{{ toggleMore ? "less" : "more" }}</span
+        >
+      </p>
+      <div *ngIf="toggleMore && error?.error?.detail" class="mt-2">
+        <p>{{ error?.error?.detail }}</p>
+      </div>
     </div>
+  </div>
 </ng-container>

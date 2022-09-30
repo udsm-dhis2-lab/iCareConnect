@@ -34,6 +34,7 @@ import { PhoneNumber } from "src/app/shared/modules/form/models/phone-number.mod
 import { ConceptsService } from "src/app/shared/resources/concepts/services/concepts.service";
 import { ThisReceiver } from "@angular/compiler";
 import { clearActiveVisit } from "src/app/store/actions/visit.actions";
+import { tap } from "rxjs/operators";
 
 @Component({
   selector: "app-registration-add",
@@ -81,6 +82,7 @@ export class RegistrationAddComponent implements OnInit {
   maritalstatusInfo$: Observable<any[]>;
   relationTypeOptions$: Observable<any>;
   selectedIdFormat: string;
+  errors: any[];
 
   constructor(
     private _snackBar: MatSnackBar,
@@ -563,7 +565,7 @@ export class RegistrationAddComponent implements OnInit {
                     ).join(" and ")}`
                   : "Error editing patient/client";
 
-                this.openSnackBar("Error editin patient", null);
+                this.openSnackBar("Error editing patient", null);
               }
             );
         } else {
@@ -590,6 +592,24 @@ export class RegistrationAddComponent implements OnInit {
                 };
                 this.registrationService
                   .createPatient(patientPayload)
+                  .pipe(
+                    tap((response) => {
+                      if (response.error) {
+                        this.errors = [
+                          ...this.errors,
+                          "custom error",
+                          response.error,
+                        ];
+                        console.log("Errors 2", this.errors);
+                      }
+                      if (response.error?.grobalErrors) {
+                        this.errors = [
+                          ...this.errors,
+                          response?.error?.globalErrors[0]?.code,
+                        ];
+                      }
+                    })
+                  )
                   .subscribe(
                     (patientResponse) => {
                       this.errorAddingPatient = false;
