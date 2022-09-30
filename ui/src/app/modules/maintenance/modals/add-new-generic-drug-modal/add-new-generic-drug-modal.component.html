@@ -1,0 +1,26 @@
+<div>
+  <mat-toolbar color="primary">Add New Generic Drug</mat-toolbar>
+  <div class="p-3">
+    <div>
+      <app-shared-concept-create
+        [conceptClass]="'Drug'"
+        [standardSearchTerm]="'ICARE_GENERIC_DRUG'"
+        [setMembersSearchTerm]=""
+        [dataType]="'N/A'"
+        [isSet]="false"
+        [saveOnTheComponent]="false"
+      ></app-shared-concept-create>
+    </div>
+    <div class="d-flex justify-content-end">
+      <button mat-stroked-button (click)="onClose($event)">Close</button>
+      <button
+        mat-flat-button
+        color="primary"
+        (click)="onSave($event)"
+        class="ml-2"
+      >
+        Save
+      </button>
+    </div>
+  </div>
+</div>
