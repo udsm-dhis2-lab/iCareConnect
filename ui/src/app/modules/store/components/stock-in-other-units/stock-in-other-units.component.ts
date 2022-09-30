@@ -21,10 +21,9 @@ export class StockInOtherUnitsComponent implements OnInit {
 
   ngOnInit(): void {
     this.locations$ = this.locationService.getLocationsByTagName("Store");
-    // this.stockStatusOfAnItem$ = this.stockService.getItemStockInAllUnits(
-    //   this.itemID
-    // );
-    this.stockInAllStores(this.itemID);
+    this.stockStatusOfAnItem$ = this.stockService.getItemStockInAllUnits(
+      this.itemID
+    );
   }
   getLocatons(): void {
     this.locations$ = this.locationService.getLocationsByTagName("Store");
@@ -39,12 +38,8 @@ export class StockInOtherUnitsComponent implements OnInit {
     //   })
     // );
   }
-  stockInAllStores(itemID): void {
-    this.stockStatusOfAnItem$ =
-      this.stockService.getItemStockInAllUnits(itemID);
-  }
+
   onClose(): void {
     this.clearItemID.emit();
-    // this.itemID = "";
   }
 }
