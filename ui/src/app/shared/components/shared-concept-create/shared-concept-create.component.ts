@@ -35,6 +35,7 @@ export class SharedConceptCreateComponent implements OnInit {
   @Input() saveOnTheComponent: boolean;
   @Input() showItemTypeName: boolean;
   @Input() conceptSources: any[];
+  @Input() multipleSelectionCompHeight: string;
   basicConceptFields: any[];
   dataTypeField: any;
   unitsField: any;
@@ -60,7 +61,7 @@ export class SharedConceptCreateComponent implements OnInit {
 
   conceptSources$: Observable<ConceptsourceGet[]>;
 
-  selectedCodes: any[];
+  selectedItems: any[] = [];
   selectedCodingSource: any;
 
   alertType: string = "";
@@ -88,7 +89,12 @@ export class SharedConceptCreateComponent implements OnInit {
     }
   }
 
-  onFormUpdateForSource(formValues: FormValue): void {}
+  onFormUpdateForSource(formValues: FormValue): void {
+    this.selectedCodingSource = null;
+    setTimeout(() => {
+      this.selectedCodingSource = formValues.getValues()?.source?.value;
+    }, 200);
+  }
 
   createDataTypeField(data?: any): void {
     this.dataTypeField = new Dropdown({
@@ -130,7 +136,7 @@ export class SharedConceptCreateComponent implements OnInit {
     this.codesMappingsSourceField = new Dropdown({
       id: "source",
       key: "source",
-      label: "Coding source",
+      label: "Mapping Reference",
       value:
         data && data?.length > 0
           ? data[0]?.conceptReferenceTerm?.conceptSource?.uuid
@@ -193,7 +199,8 @@ export class SharedConceptCreateComponent implements OnInit {
   }
 
   onGetSelectedMembers(event): void {
-    console.log(event);
+    // console.log(event);
+    this.selectedItems = event;
   }
 
   onFormUpdateTestMethod(formValues: FormValue): void {
@@ -256,8 +263,8 @@ export class SharedConceptCreateComponent implements OnInit {
       });
   }
 
-  onGetSelectedCodes(selectedCodes: any): void {
-    this.selectedCodes = selectedCodes;
+  onGetSelectedCodes(selectedItems: any): void {
+    this.selectedItems = selectedItems;
   }
 
   onSave(event: Event, selectedTestMethodDetails?: any): void {
@@ -273,7 +280,7 @@ export class SharedConceptCreateComponent implements OnInit {
     ];
     searchIndexedTerms = [
       ...searchIndexedTerms,
-      ...(this.selectedCodes || []).map((item) => {
+      ...(this.selectedItems || []).map((item) => {
         return {
           name: item?.display.split(" (")[0],
           locale: "en",
@@ -308,8 +315,8 @@ export class SharedConceptCreateComponent implements OnInit {
     const conceptMapType = "35543629-7d8c-11e1-909d-c80aa9edcf4e";
 
     let mappings =
-      this.selectedCodes && this.selectedCodes.length > 0
-        ? this.selectedCodes.map((item) => {
+      this.selectedItems && this.selectedItems.length > 0
+        ? this.selectedItems.map((item) => {
             return {
               conceptReferenceTerm: item?.uuid,
               conceptMapType,
