@@ -70,6 +70,9 @@ export class VisitsService {
           };
         });
         return keyBy(obs, "uuid");
+      }),
+      catchError((error) => {
+        return of(error);
       })
     );
   }
@@ -114,6 +117,9 @@ export class VisitsService {
             };
             return new Visit(formattedResult);
           });
+        }),
+        catchError((error) => {
+          return of(error);
         })
       );
   }
@@ -135,6 +141,9 @@ export class VisitsService {
                 locationUuid: result?.location?.uuid,
               };
             });
+          }),
+          catchError((error) => {
+            return of(error);
           })
         );
       })
