@@ -572,6 +572,9 @@ export class RegistrationAddComponent implements OnInit {
                 this.errorAddingPatient = true;
                 this.patientAdded = false;
                 this.addingPatient = false;
+                this.errors = [...this.errors, errorUpdatingPatient.error];
+
+                /* 
                 this.errorMessage = errorUpdatingPatient?.error?.error
                   ? errorUpdatingPatient?.error?.error?.message +
                     `: ${(
@@ -581,7 +584,7 @@ export class RegistrationAddComponent implements OnInit {
                     ).join(" and ")}`
                   : "Error editing patient/client";
 
-                this.openSnackBar("Error editing patient", null);
+                this.openSnackBar("Error editing patient", null); */
               }
             );
         } else {
@@ -611,56 +614,59 @@ export class RegistrationAddComponent implements OnInit {
                   .pipe(
                     tap((response) => {
                       if (response.error) {
+                        this.openSnackBar("Error registering patient", null);
+                        this.errorAddingPatient = true;
+                        this.patientAdded = false;
+                        this.addingPatient = false;
                         this.errors = [...this.errors, response.error];
-                        return 0;
                       }
                     })
                   )
                   .subscribe(
                     (patientResponse) => {
-                      this.errorAddingPatient = false;
-                      let patient = new Patient(patientResponse);
-                      //// console.log('patient created ::', {patient: {...patientResponse} as any}patientResponse);
+                      if (!patientResponse.error) {
+                        console.log("this response:", patientResponse);
+                        this.errorAddingPatient = false;
+                        let patient = new Patient(patientResponse);
+                        //// console.log('patient created ::', {patient: {...patientResponse} as any}patientResponse);
 
-                      //patient added succesfully
+                        //patient added succesfully
 
-                      this.store.dispatch(
-                        loadCurrentPatient({
-                          uuid: patientResponse["uuid"],
-                          isRegistrationPage: true,
-                        })
-                      );
-
-                      setTimeout(() => {
-                        this.patientAdded = true;
-                        this.addingPatient = false;
-
-                        // this.store.dispatch(addCurrentPatient({patient}))
-                        this.dialog
-                          .open(StartVisitModelComponent, {
-                            width: "85%",
-                            data: { patient: patientResponse },
+                        this.store.dispatch(
+                          loadCurrentPatient({
+                            uuid: patientResponse["uuid"],
+                            isRegistrationPage: true,
                           })
-                          .afterClosed()
-                          .subscribe((visitDetails) => {
-                            if (visitDetails) {
-                              // this.dialog.open(VisitStatusConfirmationModelComponent, {
-                              //   width: "30%",
-                              //   height: "100px",
-                              // });
-                            }
-                          });
+                        );
 
-                        // this.store.dispatch(go({ path: ['/registration/visit'] }));
-                      }, 500);
-                    },
-                    (patientError) => {
+                        setTimeout(() => {
+                          this.patientAdded = true;
+                          this.addingPatient = false;
+
+                          // this.store.dispatch(addCurrentPatient({patient}))
+                          this.dialog
+                            .open(StartVisitModelComponent, {
+                              width: "85%",
+                              data: { patient: patientResponse },
+                            })
+                            .afterClosed()
+                            .subscribe((visitDetails) => {
+                              if (visitDetails) {
+                                // this.dialog.open(VisitStatusConfirmationModelComponent, {
+                                //   width: "30%",
+                                //   height: "100px",
+                                // });
+                              }
+                            });
+
+                          // this.store.dispatch(go({ path: ['/registration/visit'] }));
+                        }, 500);
+                      }
+                    }
+                    /* (patientError) => {
                       this.errorAddingPatient = true;
                       this.patientAdded = false;
                       this.addingPatient = false;
-                      console.log(
-                        patientError?.error?.error?.globalErrors[0]?.code
-                      );
                       this.errorMessage = patientError?.error?.error
                         ? patientError?.error?.error?.message +
                           `: ${(
@@ -671,7 +677,7 @@ export class RegistrationAddComponent implements OnInit {
                         : "Error adding patient/client";
 
                       this.openSnackBar("Error registering patient", null);
-                    }
+                    } */
                   );
               }
             });
