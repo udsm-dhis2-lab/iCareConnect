@@ -26,7 +26,7 @@ export class StockStatusListComponent implements OnInit {
   currentItemStocks$: Observable<StockObject>;
   currentItemStock$: Observable<StockObject>;
   saving: boolean = false;
-  itemID: string;
+  itemID?: string;
   constructor(
     private stockService: StockService,
     private dialog: MatDialog,
@@ -105,5 +105,8 @@ export class StockStatusListComponent implements OnInit {
       event.stopPropagation();
       this.itemID = itemID;
     }
+  }
+  onClearItemID() {
+    this.itemID = undefined;
   }
 }

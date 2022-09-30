@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, Output } from "@angular/core";
+import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { from, Observable } from "rxjs";
 //import { groupBy, map, mergeMap, reduce, toArray } from "rxjs/operators";
 import { LocationService } from "src/app/core/services";
@@ -12,7 +12,8 @@ import { StockService } from "src/app/shared/resources/store/services/stock.serv
 export class StockInOtherUnitsComponent implements OnInit {
   locations$: Observable<any>;
   stockStatusOfAnItem$: Observable<any>;
-  @Input() itemID: string;
+  @Input() itemID?: string;
+  @Output() clearItemID: EventEmitter<any> = new EventEmitter();
   constructor(
     private locationService: LocationService,
     private stockService: StockService
@@ -20,9 +21,10 @@ export class StockInOtherUnitsComponent implements OnInit {
 
   ngOnInit(): void {
     this.locations$ = this.locationService.getLocationsByTagName("Store");
-    this.stockStatusOfAnItem$ = this.stockService.getItemStockInAllUnits(
-      this.itemID
-    );
+    // this.stockStatusOfAnItem$ = this.stockService.getItemStockInAllUnits(
+    //   this.itemID
+    // );
+    this.stockInAllStores(this.itemID);
   }
   getLocatons(): void {
     this.locations$ = this.locationService.getLocationsByTagName("Store");
@@ -42,6 +44,7 @@ export class StockInOtherUnitsComponent implements OnInit {
       this.stockService.getItemStockInAllUnits(itemID);
   }
   onClose(): void {
-    this.itemID = null;
+    this.clearItemID.emit();
+    // this.itemID = "";
   }
 }
