@@ -111,6 +111,7 @@
             Sample Acceptance & Results
           </mat-chip>
           <mat-chip
+            *ngIf="params?.LISConfigurations?.isLIS"
             class="w-20"
             routerLinkActive="active-route"
             (click)="changeRoute($event, 'sample-results-list', true)"
