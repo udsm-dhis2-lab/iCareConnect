@@ -87,7 +87,7 @@
                 [disabled]="currentItemStock?.id === stock.id"
                 mat-flat-button
                 color="primary"
-                (click)="onViewMinStock($event)"
+                (click)="onViewStockStatus($event, stock?.id)"
               >
                 View Other In-stores
               </button>
@@ -98,10 +98,10 @@
     </table>
   </div>
   <div class="overflowing-stock-list" *ngIf="params?.currentItemStock">
-    <mat-progress-bar
+    <!--  <mat-progress-bar
       mode="indeterminate"
       *ngIf="!params?.currentItemStock"
-    ></mat-progress-bar>
+    ></mat-progress-bar> -->
     <div class="loading-overlay" *ngIf="saving">
       <div class="text-center">
         <div>Saving ...</div>
@@ -120,5 +120,8 @@
       (saveLedger)="onSaveLedger($event, params?.currentItemStock)"
     >
     </app-stock-batch-list>
+  </div>
+  <div class="overflowing-stock-list" *ngIf="itemID">
+    <app-stock-in-other-units [itemID]="itemID"></app-stock-in-other-units>
   </div>
 </div>
