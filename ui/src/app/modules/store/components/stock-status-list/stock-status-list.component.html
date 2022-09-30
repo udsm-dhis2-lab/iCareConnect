@@ -122,6 +122,9 @@
     </app-stock-batch-list>
   </div>
   <div class="overflowing-stock-list" *ngIf="itemID">
-    <app-stock-in-other-units [itemID]="itemID"></app-stock-in-other-units>
+    <app-stock-in-other-units
+      [itemID]="itemID"
+      (clearItemID)="onClearItemID()"
+    ></app-stock-in-other-units>
   </div>
 </div>

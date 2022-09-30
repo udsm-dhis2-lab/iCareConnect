@@ -1,11 +1,9 @@
 <mat-card
   class="mat-elevation-z4 border"
-  *ngIf="
-    itemID && {
-      stockStatusOfAnItem: stockStatusOfAnItem$ | async,
-      locations: locations$ | async
-    } as params
-  "
+  *ngIf="{
+    stockStatusOfAnItem: stockStatusOfAnItem$ | async,
+    locations: locations$ | async
+  } as params"
 >
   <div>
     <div>
