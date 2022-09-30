@@ -37,6 +37,10 @@
                     ?.value ? encounter?.obsKeyedByConcept[member?.uuid]
                     ?.value
                     : "-" }} 
+              </span> &nbsp;
+              <span *ngIf="member.dataType === 'Boolean'">
+                {{ encounter?.obsKeyedByConcept[member?.uuid]
+                    ?.value?.display ? " (Abnormal)" : "" }}
               </span>
             </ng-container>
           </ng-container>
@@ -53,7 +57,7 @@
       </tr>
       <tr>
         <td></td>
-        <td *ngFor="let formField of fieldsHoldingData">
+        <td class="field" *ngFor="let formField of fieldsHoldingData">
           <app-form
             *ngIf="
               formField &&

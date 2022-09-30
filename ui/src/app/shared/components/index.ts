@@ -87,6 +87,7 @@ import { PatientObservationsChartComponent } from "./patient-observations-chart/
 import { ObservationChartTableComponent } from "./observation-chart-table/observation-chart-table.component";
 import { SharedConfirmationComponent } from "./shared-confirmation /shared-confirmation.component";
 import { IpdFormsComponent } from "./ipd-forms/ipd-forms.component";
+import { SharedErrorComponent } from "./shared-error/shared-error.component";
 
 export const components: any[] = [
   PatientSearchComponent,
@@ -177,7 +178,8 @@ export const components: any[] = [
   PatientObservationsChartComponent,
   ObservationChartTableComponent,
   SharedConfirmationComponent,
-  IpdFormsComponent
+  IpdFormsComponent,
+  SharedErrorComponent
 ];
 
 export const sharedEntryComponents: any[] = [
