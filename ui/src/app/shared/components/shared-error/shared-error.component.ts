@@ -43,10 +43,13 @@ export class SharedErrorComponent implements OnInit {
     return typeof error;
   }
 
-  onClickMore(e: Event, index: string) {
+  onClickMore(e: Event, errorIndex?: string, globalErrorIndex?: string) {
     e.stopPropagation();
     if (!this.toggleIndex) {
-      this.toggleIndex = index;
+      this.toggleIndex =
+        errorIndex && globalErrorIndex
+          ? `${errorIndex}${globalErrorIndex}`
+          : errorIndex && !globalErrorIndex ? errorIndex : '';
     } else {
       this.toggleIndex = undefined;
     }

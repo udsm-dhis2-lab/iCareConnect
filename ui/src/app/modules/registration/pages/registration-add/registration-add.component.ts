@@ -92,6 +92,7 @@ export class RegistrationAddComponent implements OnInit {
   //         {
   //           code: "Identifier 12345 already in use by another patient",
   //           message: "Identifier 12345 already in use by another patient",
+  //           detail: "This is the test detail for global error 1"
   //         },
   //       ],
   //       fieldErrors: {},
