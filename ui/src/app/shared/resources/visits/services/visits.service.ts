@@ -194,7 +194,7 @@ export class VisitsService {
       const orderTypeParameter = orderType ? `&orderTypeUuid=${orderType}` : "";
 
       const searchTerm = queryParam ? `&q=${queryParam}` : "";
-      const filterByConst = filterBy ? filterBy : ""
+      const filterByConst = filterBy ? filterBy : "";
       return (
         locationUuids?.length > 0
           ? zip(
@@ -245,7 +245,7 @@ export class VisitsService {
           );
         }),
         catchError((error) => {
-          return of(error)
+          return of(error);
         })
       );
     }
@@ -498,18 +498,18 @@ export class VisitsService {
 
   submitClaim(visitUuid): Observable<any> {
     return this.httpClient.get(`icare/visit/${visitUuid}/claim`).pipe(
-        catchError((error) => {
-          return of(error)
-        })
-      );
+      catchError((error) => {
+        return of(error);
+      })
+    );
   }
 
   addVisitAttribute(data, visitUuid): Observable<any> {
     return this.httpClient.post(`visit/${visitUuid}`, data).pipe(
-        catchError((error) => {
-          return of(error)
-        })
-      );
+      catchError((error) => {
+        return of(error);
+      })
+    );
   }
 
   getVisitDetailsByVisitUuid(uuid: string, params?: any): Observable<any> {
@@ -793,9 +793,9 @@ export class VisitsService {
     };
     encounterData = omit(encounterData, "provider");
     return from(this.api.encounter.createEncounter(encounterData)).pipe(
-        catchError((error) => {
-          return of(error)
-        })
+      catchError((error) => {
+        return of(error);
+      })
     );
   }
 
@@ -811,9 +811,9 @@ export class VisitsService {
     };
     encounterData = omit(encounterData, "provider");
     return from(this.api.encounter.createEncounter(encounterData)).pipe(
-        catchError((error) => {
-          return of(error)
-        })
+      catchError((error) => {
+        return of(error);
+      })
     );
   }
 
@@ -836,9 +836,9 @@ export class VisitsService {
       ],
     };
     return from(this.api.encounter.createEncounter(encounterData)).pipe(
-        catchError((error) => {
-          return of(error)
-        })
+      catchError((error) => {
+        return of(error);
+      })
     );
   }
 

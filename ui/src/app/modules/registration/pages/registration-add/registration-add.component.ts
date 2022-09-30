@@ -82,7 +82,22 @@ export class RegistrationAddComponent implements OnInit {
   maritalstatusInfo$: Observable<any[]>;
   relationTypeOptions$: Observable<any>;
   selectedIdFormat: string;
-  errors: any[];
+  errors: any[] = [];
+  fakeErrors: any[] = [
+    {
+      error: {
+        message: "Invalid Submission",
+        code: "webservices.rest.error.invalid.submission",
+        globalErrors: [
+          {
+            code: "Identifier 12345 already in use by another patient",
+            message: "Identifier 12345 already in use by another patient",
+          },
+        ],
+        fieldErrors: {},
+      },
+    },
+  ];
 
   constructor(
     private _snackBar: MatSnackBar,
@@ -595,12 +610,11 @@ export class RegistrationAddComponent implements OnInit {
                   .pipe(
                     tap((response) => {
                       if (response.error) {
-                        this.errors = [
-                          ...this.errors,
-                          "custom error",
-                          response.error,
-                        ];
-                        console.log("Errors 2", this.errors);
+                        console.log(
+                          "Errors 2",
+                          response?.error?.error?.globalErrors[0]?.code
+                        );
+                        this.errors = [response.error];
                       }
                       if (response.error?.grobalErrors) {
                         this.errors = [
@@ -652,16 +666,19 @@ export class RegistrationAddComponent implements OnInit {
                       this.errorAddingPatient = true;
                       this.patientAdded = false;
                       this.addingPatient = false;
+                      console.log(
+                        patientError?.error?.error?.globalErrors[0]?.code
+                      );
                       this.errorMessage = patientError?.error?.error
                         ? patientError?.error?.error?.message +
                           `: ${(
                             patientError?.error?.error?.globalErrors.map(
-                              (globalError) => globalError?.message
+                              (globalError) => globalError[0]?.message
                             ) || []
                           ).join(" and ")}`
                         : "Error adding patient/client";
 
-                      this.openSnackBar("Error creating patient", null);
+                      this.openSnackBar("Error registering patient", null);
                     }
                   );
               }

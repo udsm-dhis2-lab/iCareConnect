@@ -17,6 +17,7 @@ export class SharedErrorComponent implements OnInit {
   @Input() errors: error[];
 
   toggleMore: boolean = false;
+  toggleIndex?: string;
   /**
    * This is the component specific for displaying erros.
    * Customize it accordingly by never delete what's already written as it may disrupt some other parts of the software
@@ -29,6 +30,7 @@ export class SharedErrorComponent implements OnInit {
             detail?: "More details of the error if any"
             code?: "Error code if any"
           }
+        }
       ]
      *****************************************************************************************************************
    */
@@ -41,9 +43,13 @@ export class SharedErrorComponent implements OnInit {
     return typeof error;
   }
 
-  onClickMore(e) {
+  onClickMore(e: Event, index: string) {
     e.stopPropagation();
-    this.toggleMore = !this.toggleMore;
+    if (!this.toggleIndex) {
+      this.toggleIndex = index;
+    } else {
+      this.toggleIndex = undefined;
+    }
   }
 }
 
