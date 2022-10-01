@@ -139,7 +139,9 @@ export class IssuingComponent implements OnInit {
 
   getBatchsNotExpired(batches): any {
     return orderBy(
-      batches?.filter((batch) => batch?.expiryDate > Date.now()),
+      batches?.filter(
+        (batch) => Number(batch?.quantity) > 0 && batch?.expiryDate > Date.now()
+      ),
       ["expiryDate"],
       ["asc"]
     );
