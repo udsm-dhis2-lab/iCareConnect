@@ -61,7 +61,7 @@
           </td>
         </tr>
       </ng-container>
-      <ng-container *ngIf="forConsultation && isInpatient">
+      <ng-container *ngIf="forConsultation && !isInpatient">
         <tr>
           <td colspan="3">
             <app-form
