@@ -1,5 +1,4 @@
 import { LedgersListComponent } from "./ledgers-list/ledgers-list.component";
-import { ManageLedgerComponent } from "./manage-ledger/manage-ledger.component";
 import { StockBatchListComponent } from "./stock-batch-list/stock-batch-list.component";
 import { StockInOtherUnitsComponent } from "./stock-in-other-units/stock-in-other-units.component";
 import { StockOutItemsComponent } from "./stock-out-items/stock-out-items.component";
@@ -11,7 +10,6 @@ export const stockComponents: any[] = [
   StockStatusListComponent,
   StockOutItemsComponent,
   LedgersListComponent,
-  ManageLedgerComponent,
   StockInOtherUnitsComponent,
   TotalizeStockUnitsQuantityComponent,
 ];
