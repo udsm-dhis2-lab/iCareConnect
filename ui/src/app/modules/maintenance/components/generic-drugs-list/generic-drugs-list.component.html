@@ -1,32 +1,40 @@
-<div *ngIf="{ ledgerTypes: ledgerTypes$ | async } as params" class="p-3">
+<div *ngIf="{ drugConcepts: drugConcepts$ | async } as params">
   <mat-progress-bar
     mode="indeterminate"
-    *ngIf="!params?.ledgerTypes"
+    *ngIf="!params?.drugConcepts"
   ></mat-progress-bar>
-  <div *ngIf="params?.ledgerTypes" class="ledgers-list">
+  <div class="concepts-drugs-list" *ngIf="params?.drugConcepts">
     <table class="table">
       <thead>
         <tr>
           <th>SN</th>
-          <th>Ledger Type</th>
-          <th>Description</th>
-          <th>Operation</th>
-          <!-- <th></th> -->
+          <th>Generic Drug Name</th>
+          <th></th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let ledgerType of params?.ledgerTypes; let count = index">
+        <tr *ngFor="let drugConcept of params?.drugConcepts; let count = index">
           <td>
             {{ count + 1 }}
           </td>
           <td>
-            {{ ledgerType?.name }}
+            {{ drugConcept?.display }}
           </td>
-          <td></td>
           <td>
-            {{ ledgerType?.operation == "+" ? "Add" : "Deduct" }}
+            <button
+              mat-icon-button
+              [matMenuTriggerFor]="menu"
+              aria-label="Example icon-button with a menu"
+            >
+              <mat-icon>more_vert</mat-icon>
+            </button>
+            <mat-menu #menu="matMenu">
+              <button mat-menu-item (click)="onEdit($event)">Edit</button>
+              <button mat-menu-item (click)="onViewDrugs($event)">
+                View drugs
+              </button>
+            </mat-menu>
           </td>
-          <!-- <td></td> -->
         </tr>
       </tbody>
     </table>

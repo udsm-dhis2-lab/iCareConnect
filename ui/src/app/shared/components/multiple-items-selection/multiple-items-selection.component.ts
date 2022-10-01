@@ -19,6 +19,7 @@ export class MultipleItemsSelectionComponent implements OnInit {
   @Input() tag: string;
   @Input() source: string;
   @Input() conceptClass: string;
+  @Input() multipleSelectionCompHeight: string;
   currentSelectedItems: any[] = [];
   @Output() getSelectedItems: EventEmitter<any[]> = new EventEmitter<any[]>();
   items$: Observable<any[]>;

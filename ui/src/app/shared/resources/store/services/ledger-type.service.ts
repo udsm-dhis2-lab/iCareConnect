@@ -1,11 +1,11 @@
-import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { OpenmrsHttpClientService } from 'src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service';
-import { LedgerType, LedgerTypeObject } from '../models/ledger-type.model';
+import { Injectable } from "@angular/core";
+import { Observable, of } from "rxjs";
+import { catchError, map } from "rxjs/operators";
+import { OpenmrsHttpClientService } from "src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service";
+import { LedgerType, LedgerTypeObject } from "../models/ledger-type.model";
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: "root",
 })
 export class LedgerTypeService {
   constructor(private httpClient: OpenmrsHttpClientService) {}
@@ -20,5 +20,16 @@ export class LedgerTypeService {
           )
         )
       );
+  }
+
+  createLedgerType(data): Observable<LedgerTypeObject> {
+    return this.httpClient.post(`store/ledgertype`, data).pipe(
+      map((ledgerTypeResponse: any) =>
+        (ledgerTypeResponse || []).map((ledgerType) =>
+          new LedgerType(ledgerType).toJson()
+        )
+      ),
+      catchError((error) => of(error))
+    );
   }
 }

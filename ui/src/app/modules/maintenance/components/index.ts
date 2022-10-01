@@ -1,3 +1,5 @@
+import { DrugsListComponent } from "./drugs-list/drugs-list.component";
+import { GenericDrugsListComponent } from "./generic-drugs-list/generic-drugs-list.component";
 import { MaintenanceSideMenuComponent } from "./maintenance-side-menu/maintenance-side-menu.component";
 import { PriceListComponent } from "./price-list/price-list.component";
 import { PricingItemComponent } from "./pricing-item/pricing-item.component";
@@ -12,4 +14,6 @@ export const maintenanceComponents: any[] = [
   ProviderAttributesFormComponent,
   MaintenanceSideMenuComponent,
   SystemSettingsListComponent,
+  GenericDrugsListComponent,
+  DrugsListComponent,
 ];

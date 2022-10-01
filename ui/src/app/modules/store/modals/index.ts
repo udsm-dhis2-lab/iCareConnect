@@ -2,6 +2,7 @@ import { AddNewStockReceivedComponent } from "./add-new-stock-received/add-new-s
 import { ConfirmRequisitionsModalComponent } from "./confirm-requisitions-modal/confirm-requisitions-modal.component";
 import { IssuingFormComponent } from "./issuing-form/issuing-form.component";
 import { LedgerFormComponent } from "./ledger-form/ledger-form.component";
+import { ManageLedgerComponent } from "./manage-ledger/manage-ledger.component";
 import { RequestCancelComponent } from "./request-cancel/request-cancel.component";
 import { RequisitionFormComponent } from "./requisition-form/requisition-form.component";
 
@@ -12,4 +13,5 @@ export const storeModals: any[] = [
   RequestCancelComponent,
   AddNewStockReceivedComponent,
   ConfirmRequisitionsModalComponent,
+  ManageLedgerComponent,
 ];
