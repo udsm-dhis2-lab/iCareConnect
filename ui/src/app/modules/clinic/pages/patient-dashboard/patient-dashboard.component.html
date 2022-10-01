@@ -38,7 +38,10 @@
     [clinicConfigurations]="params?.iCareClinicConfigurations"
     [currentLocation]="params?.currentLocation"
   ></app-shared-patient-dashboard>
-  <div
+  <div *ngIf="errors">
+    <app-shared-error [errors]="errors"></app-shared-error>
+  </div>
+  <!-- <div
     class="alert alert-danger mt-2"
     role="alert"
     *ngIf="params?.iCareGeneralConfigurations === ''"
@@ -52,7 +55,7 @@
     *ngIf="params?.iCareClinicConfigurations === ''"
   >
     Missing Icare Clinic Configurations. Please set "icare.clinic.configurations" or Contact IT
-  </div>
+  </div> -->
 
   <mat-progress-bar
     mode="indeterminate"
