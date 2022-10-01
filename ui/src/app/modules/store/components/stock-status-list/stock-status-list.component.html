@@ -31,13 +31,13 @@
   <div class="overflow-x-auto">
     <table class="table border-bottom table-fit">
       <tr>
-        <th style="width: 8%; word-wrap: initial">#</th>
+        <th style="width: 5%; word-wrap: initial">#</th>
         <th style="width: 40%; word-wrap: break-word">Item</th>
         <th style="width: 10%">Available Quantity</th>
         <th style="width: 10%">Expired Quantity</th>
         <th style="width: 10%">Eligible Quantity</th>
         <th style="width: 10%"># of Batches</th>
-        <th style="width: 10%">
+        <th style="width: 12%">
           <span class="float-right">Actions</span>
         </th>
       </tr>
@@ -74,12 +74,22 @@
           <td>
             <div class="float-right">
               <button
+                class="action-buttons"
                 [disabled]="currentItemStock?.id === stock.id"
                 mat-flat-button
                 color="primary"
                 (click)="onToggleCurrentStock($event, stock)"
               >
                 View/Add Batches
+              </button>
+              <button
+                class="action-buttons"
+                [disabled]="currentItemStock?.id === stock.id"
+                mat-flat-button
+                color="primary"
+                (click)="onViewStockStatus($event, stock?.id)"
+              >
+                View Other In-stores
               </button>
             </div>
           </td>
@@ -88,10 +98,10 @@
     </table>
   </div>
   <div class="overflowing-stock-list" *ngIf="params?.currentItemStock">
-    <mat-progress-bar
+    <!--  <mat-progress-bar
       mode="indeterminate"
       *ngIf="!params?.currentItemStock"
-    ></mat-progress-bar>
+    ></mat-progress-bar> -->
     <div class="loading-overlay" *ngIf="saving">
       <div class="text-center">
         <div>Saving ...</div>
@@ -110,5 +120,11 @@
       (saveLedger)="onSaveLedger($event, params?.currentItemStock)"
     >
     </app-stock-batch-list>
+  </div>
+  <div class="overflowing-stock-list" *ngIf="itemID">
+    <app-stock-in-other-units
+      [itemID]="itemID"
+      (clearItemID)="onClearItemID()"
+    ></app-stock-in-other-units>
   </div>
 </div>

@@ -88,6 +88,7 @@ import { ObservationChartTableComponent } from "./observation-chart-table/observ
 import { SharedConfirmationComponent } from "./shared-confirmation /shared-confirmation.component";
 import { IpdFormsComponent } from "./ipd-forms/ipd-forms.component";
 import { SharedErrorComponent } from "./shared-error/shared-error.component";
+import { SharedConceptCreateComponent } from "./shared-concept-create/shared-concept-create.component";
 
 export const components: any[] = [
   PatientSearchComponent,
@@ -179,7 +180,8 @@ export const components: any[] = [
   ObservationChartTableComponent,
   SharedConfirmationComponent,
   IpdFormsComponent,
-  SharedErrorComponent
+  SharedErrorComponent,
+  SharedConceptCreateComponent,
 ];
 
 export const sharedEntryComponents: any[] = [
@@ -201,7 +203,7 @@ export const sharedEntryComponents: any[] = [
   ManageRolesComponent,
   SharedConfirmationDialogComponent,
   AttendProcedureOrderComponent,
-  SharedConfirmationComponent
+  SharedConfirmationComponent,
 ];
 
 export * from "./patient-vitals-summary/patient-vitals-summary.component";

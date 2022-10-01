@@ -8,6 +8,7 @@ import {
   EditUserComponent,
   PriceListHomeComponent,
 } from "./pages";
+import { DrugManagementComponent } from "./pages/drug-management/drug-management.component";
 import { PrivilegesAndRolesComponent } from "./pages/privileges-and-roles/privileges-and-roles.component";
 import { SystemSettingsComponent } from "./pages/system-settings/system-settings.component";
 
@@ -53,6 +54,10 @@ const routes: Routes = [
       {
         path: "system-privileges-and-roles",
         component: PrivilegesAndRolesComponent,
+      },
+      {
+        path: "drug",
+        component: DrugManagementComponent,
       },
     ],
   },

@@ -149,7 +149,7 @@ export class IssuingFormComponent implements OnInit {
           itemUuid: this.data?.issue?.itemUuid,
           quantity: parseInt(toIssue, 10),
           batch: batch?.batch,
-          expiryDate: batch?.expiryDate,
+          expiryDate: new Date(batch?.expiryDate),
         };
       }),
     };
