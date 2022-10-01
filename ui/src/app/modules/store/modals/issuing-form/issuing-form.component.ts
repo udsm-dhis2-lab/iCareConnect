@@ -142,21 +142,14 @@ export class IssuingFormComponent implements OnInit {
           remainedQuantityToIssue > batch?.quantity
             ? remainedQuantityToIssue - Number(batch?.quantity)
             : remainedQuantityToIssue;
-
-        const toIssue =
-          remainedQuantityToIssue > 0
-            ? batch?.quantity
-            : remainedQuantityToIssue;
         return {
           itemUuid: this.data?.issue?.itemUuid,
-          quantity: parseInt(toIssue, 10),
+          quantity: parseInt(remainedQuantityToIssue.toString(), 10),
           batch: batch?.batch,
           expiryDate: new Date(batch?.expiryDate),
         };
       }),
     };
-
-    // console.log("issueInput", issueInput);
     this.dialogRef.close({ issueInput });
   }
 
