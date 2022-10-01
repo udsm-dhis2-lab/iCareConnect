@@ -154,6 +154,18 @@
 		<description>Access for the clinic module to delete confirmed diagnosis</description>
 	</privilege>
 	<privilege>
+		<name>CLINIC_ADD_PROVISIONAL_DIAGNOSIS</name>
+		<description>Access for the clinic module to add provisional diagnosis</description>
+	</privilege>
+	<privilege>
+		<name>CLINIC_RETIRE_PROVISIONAL_DIAGNOSIS</name>
+		<description>Access for the clinic module to retire provisional diagnosis</description>
+	</privilege>
+	<privilege>
+		<name>CLINIC_DELETE_PROVISIONAL_DIAGNOSIS</name>
+		<description>Access for the clinic module to delete provisional diagnosis</description>
+	</privilege>
+	<privilege>
 		<name>CLINIC_ADD_PRESCRIPTION</name>
 		<description>Access for the clinic module to add prescription</description>
 	</privilege>

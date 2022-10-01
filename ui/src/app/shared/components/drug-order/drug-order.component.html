@@ -6,6 +6,9 @@
     drugs: drugsToBeDispensed
   } as params"
 >
+  <div *ngIf="errors.length > 0">
+    <app-shared-error [errors]="errors"></app-shared-error>
+  </div>
   <div *ngIf="!params?.drugOrderFormsMetadata || !params?.provider">
     <mat-progress-bar mode="indeterminate"></mat-progress-bar>
   </div>

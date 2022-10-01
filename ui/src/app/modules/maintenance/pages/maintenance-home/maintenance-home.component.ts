@@ -15,6 +15,7 @@ export class MaintenanceHomeComponent implements OnInit {
   pages: any[];
   currentMenuDepartments$: Observable<any[]>;
   routeParams$: Observable<Params>;
+  currentMenu: any;
   constructor(
     private store: Store<AppState>,
     private itemPriceService: ItemPriceService,
@@ -51,13 +52,23 @@ export class MaintenanceHomeComponent implements OnInit {
     }
   }
 
-  getSelectedMenuItem(menuItem): void {}
-
   setRoute(event: Event, id: string): void {
     event.stopPropagation();
     this.store.dispatch(
       go({
         path: ["maintenance/" + id],
+      })
+    );
+  }
+
+  onNnavigateToThis(event: Event, page: any): void {
+    event.stopPropagation();
+    this.currentMenu = page;
+
+    const currentPath = "/maintenance/" + page?.id;
+    this.store.dispatch(
+      go({
+        path: [currentPath],
       })
     );
   }

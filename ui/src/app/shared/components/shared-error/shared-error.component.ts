@@ -15,8 +15,8 @@ import { StandardError } from "../../models/error-type.models";
 })
 export class SharedErrorComponent implements OnInit {
   @Input() errors: error[];
+  @Input() alertType?: 'danger' | 'warning' | 'info' | 'success';
 
-  toggleMore: boolean = false;
   toggleIndex?: string;
   /**
    * This is the component specific for displaying erros.
@@ -37,7 +37,9 @@ export class SharedErrorComponent implements OnInit {
 
   constructor() {}
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.alertType = this.alertType ? this.alertType: 'danger';
+  }
 
   typeof(error) {
     return typeof error;
@@ -49,9 +51,55 @@ export class SharedErrorComponent implements OnInit {
       this.toggleIndex =
         errorIndex && globalErrorIndex
           ? `${errorIndex}${globalErrorIndex}`
-          : errorIndex && !globalErrorIndex ? errorIndex : '';
+          : errorIndex && !globalErrorIndex
+          ? errorIndex
+          : "";
     } else {
       this.toggleIndex = undefined;
+    }
+  }
+
+  onCloseError(event: Event, errorIndex: any, globalErrorIndex?: any){
+    event.stopPropagation();
+    // With error index and global error index set
+    if (
+      (errorIndex || errorIndex === 0) &&
+      (globalErrorIndex || globalErrorIndex === 0)
+    ){
+      let index = 0;
+      let filteredErrors = this.errors.filter((error) => {
+        let globalIndex = 0;
+        let globalErrorsFiltered;
+        if (errorIndex === index) {
+          globalErrorsFiltered = error.error.globalErrors.filter((globalError) => {
+              if (globalIndex !== globalErrorIndex){
+                globalIndex = globalIndex + 1;
+                return globalError;
+              }
+              globalIndex = globalIndex + 1;
+              return
+            }
+          );
+        }
+        error.error.globalErrors = globalErrorsFiltered?.filter(
+          (error) => error
+        );
+        index = index + 1;
+        return error;
+      });
+      this.errors = filteredErrors.filter((error) => error);
+    }
+    // For error index with no global error index
+    if((errorIndex || errorIndex === 0) && !globalErrorIndex && globalErrorIndex !== 0) {
+      let index = 0;
+      let filteredErrors = this.errors.filter((error) => {
+        if (errorIndex !== index) {
+          return error
+        }
+        index = index + 1;
+        return
+      });
+      this.errors = filteredErrors.filter((error) => error);
     }
   }
 }
