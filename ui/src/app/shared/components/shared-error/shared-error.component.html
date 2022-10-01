@@ -10,10 +10,11 @@
         class="close"
         data-dismiss="alert"
         aria-label="Close"
+        (click)="onCloseError($event, errorIndex)"
       >
         <span aria-hidden="true">&times;</span>
       </button>
-      <p class="text-left">
+      <p class="text-left"> {{ errorIndex + 1 }}. 
         {{ error?.error?.message }}
         {{ error?.error?.code ? "(" + error?.error?.code + ")" : "" }}
         <span
@@ -45,10 +46,11 @@
             class="close"
             data-dismiss="alert"
             aria-label="Close"
+            (click)="onCloseError($event, errorIndex, globalErrorIndex)"
           >
             <span aria-hidden="true">&times;</span>
           </button>
-          <p class="text-left">
+          <p class="text-left"> {{ errorIndex + 1 }}.{{ globalErrorIndex + 1 }} 
             {{ globalError?.message }}
             {{
               globalError?.code && globalError?.code !== globalError?.message
