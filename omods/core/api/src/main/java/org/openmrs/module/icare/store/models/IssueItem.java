@@ -121,6 +121,8 @@ public class IssueItem implements java.io.Serializable, Stockable {
 		Map<String, Object> issueItemObject = new HashMap<String, Object>();
 		
 		issueItemObject.put("quantity", this.getQuantity());
+		issueItemObject.put("batch", this.getBatchNo());
+		issueItemObject.put("expiryDate", this.getExpiryDate());
 		
 		Map<String, Object> itemObject = new HashMap<String, Object>();
 		itemObject.put("uuid", this.getId().getItem().getUuid());
