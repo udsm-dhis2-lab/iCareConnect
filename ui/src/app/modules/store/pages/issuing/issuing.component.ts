@@ -222,7 +222,7 @@ export class IssuingComponent implements OnInit {
                     itemUuid: matchedItemToIssue?.itemUuid,
                     quantity: matchedItemToIssue?.toIssue,
                     batch: matchedItemToIssue?.batch,
-                    expiryDate: matchedItemToIssue?.expiryDate,
+                    expiryDate: new Date(matchedItemToIssue?.expiryDate),
                   };
                 }),
               };
