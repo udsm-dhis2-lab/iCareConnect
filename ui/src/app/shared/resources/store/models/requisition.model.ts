@@ -37,6 +37,7 @@ export interface RequisitionObject {
     error?: any;
   };
   issuedDate: Date;
+  issueItems: any[];
 }
 
 export interface RequisitionReceiptObject {
@@ -49,14 +50,14 @@ export interface RequisitionReceiptObject {
   issueingLocation: {
     uuid: string;
   };
-  receiptItems: [
-    {
-      item: {
-        uuid: string;
-      };
-      quantity: number;
-    }
-  ];
+  receiptItems: {
+    item: {
+      uuid: string;
+    };
+    quantity: number;
+    expiryDate?: Date;
+    batch?: string;
+  }[];
 }
 
 export interface RequisitionSave {
@@ -129,6 +130,10 @@ export class Requisition {
 
   get issueUuid(): any {
     return head(this.requisition?.issues)?.uuid;
+  }
+
+  get issueItems(): any[] {
+    return head(this.requisition?.issues)?.issueItems;
   }
 
   get latestIssueItem(): any {
@@ -241,6 +246,7 @@ export class Requisition {
       status: this.status,
       remarks: this.remarks,
       issuedDate: this.issuedDate,
+      issueItems: this.issueItems,
     };
   }
 
@@ -316,12 +322,14 @@ export class Requisition {
       issueingLocation: {
         uuid: requisition?.targetStore?.uuid,
       },
-      receiptItems: [
-        {
-          item: { uuid: requisition.itemUuid },
-          quantity: requisition.quantityIssued,
-        },
-      ],
+      receiptItems: requisition?.issueItems?.map((issueItem) => {
+        return {
+          item: { uuid: issueItem?.item?.uuid },
+          quantity: Number(issueItem?.quantity),
+          expiryDate: new Date(issueItem?.expiryDate),
+          batch: issueItem?.batch,
+        };
+      }),
     };
   }
 }
