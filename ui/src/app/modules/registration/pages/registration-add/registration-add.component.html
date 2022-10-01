@@ -666,6 +666,11 @@
         </div>
       </div>
     </div>
+    <!-- Alerts -->
+    <div *ngIf="errors?.length > 0">
+      <app-shared-error [errors]="errors"></app-shared-error>
+    </div>
+    <!-- End Alerts -->
 
     <div class="row mt-4">
       <div class="offset-2 pl-3">
@@ -674,11 +679,6 @@
             {{ errorMessage }}
           </p>
         </div>
-        <!-- Alerts -->
-        <div *ngIf="errors?.length > 0">
-          <app-shared-error [errors]="errors"></app-shared-error>
-        </div>
-        <!-- End Alerts -->
         <button
           mat-flat-button
           style="height: 45px"

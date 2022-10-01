@@ -75,11 +75,11 @@ export class CurrentPatientDispensingComponent implements OnInit {
       );
     this.genericPrescriptionEncounterType$ =
       this.systemSettingsService.getSystemSettingsByKey(
-        "iCare.clinic.prescription.encounterType"
+        "iCare.clinic.genericprescription.encounterType"
       );
     this.genericPrescriptionOrderType$ =
       this.systemSettingsService.getSystemSettingsByKey(
-        "iCare.clinic.prescription.orderType"
+        "iCare.clinic.genericprescription.orderType"
       );
     this.useGenericPrescription$ =
       this.systemSettingsService.getSystemSettingsByKey(
