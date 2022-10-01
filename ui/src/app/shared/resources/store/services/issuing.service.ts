@@ -42,7 +42,6 @@ export class IssuingService {
       return throwError({ message: "You have provided incorrect parameters" });
     }
     const issueObject = Issuing.createIssue(issueInput);
-
     return this.httpClient.post("store/issue", issueObject).pipe(
       map((response) => response),
       catchError((error) => of(error))
