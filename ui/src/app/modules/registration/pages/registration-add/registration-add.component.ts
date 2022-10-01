@@ -257,29 +257,32 @@ export class RegistrationAddComponent implements OnInit {
     this.patient.maritalStatus =
       formValues[
         this.registrationFormConfigsKeyedByProperty["maritalStatus"]?.value
-      ].value;
+      ]?.value;
     this.patient.religion =
       formValues[
         this.registrationFormConfigsKeyedByProperty["religion"]?.value
-      ].value;
+      ]?.value;
     this.patient.education =
       formValues[
         this.registrationFormConfigsKeyedByProperty["education"]?.value
-      ].value;
+      ]?.value;
     this.patient["areaLeader"] =
       formValues[
         this.registrationFormConfigsKeyedByProperty["areaLeaderName"]?.value
-      ].value;
+      ]?.value;
     this.patient["areaLeaderNumber"] =
       formValues[
         this.registrationFormConfigsKeyedByProperty["areaLeaderNumber"]?.value
-      ].value;
+      ]?.value;
 
-    if (this.registrationFormConfigsKeyedByProperty["occupation"]?.value) {
+    if (
+      this.registrationFormConfigsKeyedByProperty["occupation"] &&
+      this.registrationFormConfigsKeyedByProperty["occupation"]?.value
+    ) {
       this.patient["occupation"] =
         formValues[
           this.registrationFormConfigsKeyedByProperty["occupation"]?.value
-        ].value;
+        ]?.value;
     }
   }
 
@@ -314,7 +317,6 @@ export class RegistrationAddComponent implements OnInit {
       "referenceKeyPart"
     );
     this.store.dispatch(clearActiveVisit());
-
     this.genderOptions$ = this.conceptService.getConceptDetailsByUuid(
       this.genderOptionsConceptUuid,
       "custom:(uuid,display,names,answers:(uuid,display,names,mappings))"
