@@ -34,6 +34,7 @@ import { PhoneNumber } from "src/app/shared/modules/form/models/phone-number.mod
 import { ConceptsService } from "src/app/shared/resources/concepts/services/concepts.service";
 import { ThisReceiver } from "@angular/compiler";
 import { clearActiveVisit } from "src/app/store/actions/visit.actions";
+import { tap } from "rxjs/operators";
 
 @Component({
   selector: "app-registration-add",
@@ -81,6 +82,23 @@ export class RegistrationAddComponent implements OnInit {
   maritalstatusInfo$: Observable<any[]>;
   relationTypeOptions$: Observable<any>;
   selectedIdFormat: string;
+  errors: any[] = [];
+  // fakeErrors: any[] = [
+  //   {
+  //     error: {
+  //       message: "Invalid Submission",
+  //       code: "webservices.rest.error.invalid.submission",
+  //       globalErrors: [
+  //         {
+  //           code: "Identifier 12345 already in use by another patient",
+  //           message: "Identifier 12345 already in use by another patient",
+  //           detail: "This is the test detail for global error 1"
+  //         },
+  //       ],
+  //       fieldErrors: {},
+  //     },
+  //   },
+  // ];
 
   constructor(
     private _snackBar: MatSnackBar,
@@ -191,6 +209,7 @@ export class RegistrationAddComponent implements OnInit {
     category: "phoneNumber",
   });
   isPhoneNumberCorrect: boolean = false;
+  showPatientType$: Observable<boolean>;
 
   onPrimaryMobileNumberFormUpdate(formValueObject: FormValue): void {
     this.patient["phone"] =
@@ -282,6 +301,10 @@ export class RegistrationAddComponent implements OnInit {
 
   ngOnInit(): void {
     this.currentLocation$ = this.store.select(getCurrentLocation);
+    this.showPatientType$ =
+      this.systemSettingsService.getSystemSettingsDetailsByKey(
+        `icare.registration.settings.showPatientTypeField`
+      );
     this.registrationFormConfigsKeyedByProperty = keyBy(
       this.registrationFormConfigs,
       "referenceKeyPart"
@@ -554,6 +577,9 @@ export class RegistrationAddComponent implements OnInit {
                 this.errorAddingPatient = true;
                 this.patientAdded = false;
                 this.addingPatient = false;
+                this.errors = [...this.errors, errorUpdatingPatient.error];
+
+                /* 
                 this.errorMessage = errorUpdatingPatient?.error?.error
                   ? errorUpdatingPatient?.error?.error?.message +
                     `: ${(
@@ -563,7 +589,7 @@ export class RegistrationAddComponent implements OnInit {
                     ).join(" and ")}`
                   : "Error editing patient/client";
 
-                this.openSnackBar("Error editin patient", null);
+                this.openSnackBar("Error editing patient", null); */
               }
             );
         } else {
@@ -590,45 +616,59 @@ export class RegistrationAddComponent implements OnInit {
                 };
                 this.registrationService
                   .createPatient(patientPayload)
+                  .pipe(
+                    tap((response) => {
+                      if (response.error) {
+                        this.openSnackBar("Error registering patient", null);
+                        this.errorAddingPatient = true;
+                        this.patientAdded = false;
+                        this.addingPatient = false;
+                        this.errors = [...this.errors, response.error];
+                      }
+                    })
+                  )
                   .subscribe(
                     (patientResponse) => {
-                      this.errorAddingPatient = false;
-                      let patient = new Patient(patientResponse);
-                      //// console.log('patient created ::', {patient: {...patientResponse} as any}patientResponse);
+                      if (!patientResponse.error) {
+                        // console.log("this response:", patientResponse);
+                        this.errorAddingPatient = false;
+                        let patient = new Patient(patientResponse);
+                        //// console.log('patient created ::', {patient: {...patientResponse} as any}patientResponse);
 
-                      //patient added succesfully
+                        //patient added succesfully
 
-                      this.store.dispatch(
-                        loadCurrentPatient({
-                          uuid: patientResponse["uuid"],
-                          isRegistrationPage: true,
-                        })
-                      );
-
-                      setTimeout(() => {
-                        this.patientAdded = true;
-                        this.addingPatient = false;
-
-                        // this.store.dispatch(addCurrentPatient({patient}))
-                        this.dialog
-                          .open(StartVisitModelComponent, {
-                            width: "85%",
-                            data: { patient: patientResponse },
+                        this.store.dispatch(
+                          loadCurrentPatient({
+                            uuid: patientResponse["uuid"],
+                            isRegistrationPage: true,
                           })
-                          .afterClosed()
-                          .subscribe((visitDetails) => {
-                            if (visitDetails) {
-                              // this.dialog.open(VisitStatusConfirmationModelComponent, {
-                              //   width: "30%",
-                              //   height: "100px",
-                              // });
-                            }
-                          });
+                        );
 
-                        // this.store.dispatch(go({ path: ['/registration/visit'] }));
-                      }, 500);
-                    },
-                    (patientError) => {
+                        setTimeout(() => {
+                          this.patientAdded = true;
+                          this.addingPatient = false;
+
+                          // this.store.dispatch(addCurrentPatient({patient}))
+                          this.dialog
+                            .open(StartVisitModelComponent, {
+                              width: "85%",
+                              data: { patient: patientResponse },
+                            })
+                            .afterClosed()
+                            .subscribe((visitDetails) => {
+                              if (visitDetails) {
+                                // this.dialog.open(VisitStatusConfirmationModelComponent, {
+                                //   width: "30%",
+                                //   height: "100px",
+                                // });
+                              }
+                            });
+
+                          // this.store.dispatch(go({ path: ['/registration/visit'] }));
+                        }, 500);
+                      }
+                    }
+                    /* (patientError) => {
                       this.errorAddingPatient = true;
                       this.patientAdded = false;
                       this.addingPatient = false;
@@ -636,13 +676,13 @@ export class RegistrationAddComponent implements OnInit {
                         ? patientError?.error?.error?.message +
                           `: ${(
                             patientError?.error?.error?.globalErrors.map(
-                              (globalError) => globalError?.message
+                              (globalError) => globalError[0]?.message
                             ) || []
                           ).join(" and ")}`
                         : "Error adding patient/client";
 
-                      this.openSnackBar("Error creating patient", null);
-                    }
+                      this.openSnackBar("Error registering patient", null);
+                    } */
                   );
               }
             });

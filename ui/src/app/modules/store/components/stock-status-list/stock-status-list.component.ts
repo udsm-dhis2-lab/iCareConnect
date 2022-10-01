@@ -1,6 +1,8 @@
 import { Component, Input, OnInit } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { Observable, of } from "rxjs";
+import { map } from "rxjs/operators";
+import { LocationService } from "src/app/core/services";
 import { LocationGet } from "src/app/shared/resources/openmrs";
 import { LedgerInput } from "src/app/shared/resources/store/models/ledger-input.model";
 import { StockObject } from "src/app/shared/resources/store/models/stock.model";
@@ -21,9 +23,15 @@ export class StockStatusListComponent implements OnInit {
   stocksList$: Observable<StockObject[]>;
   searchTerm: string;
   currentItemStock: StockObject;
+  currentItemStocks$: Observable<StockObject>;
   currentItemStock$: Observable<StockObject>;
   saving: boolean = false;
-  constructor(private stockService: StockService, private dialog: MatDialog) {}
+  itemID?: string;
+  constructor(
+    private stockService: StockService,
+    private dialog: MatDialog,
+    private locationService: LocationService
+  ) {}
 
   ngOnInit(): void {
     this.getStock();
@@ -80,7 +88,6 @@ export class StockStatusListComponent implements OnInit {
       this.getStock();
     }
   }
-
   onSaveLedger(ledgerInput: LedgerInput, currentStock: any): void {
     this.saving = true;
     this.stockService.saveStockLedger(ledgerInput).subscribe((response) => {
@@ -92,5 +99,14 @@ export class StockStatusListComponent implements OnInit {
         );
       }
     });
+  }
+  onViewStockStatus(event: Event, itemID): void {
+    if (event) {
+      event.stopPropagation();
+      this.itemID = itemID;
+    }
+  }
+  onClearItemID() {
+    this.itemID = undefined;
   }
 }

@@ -7,12 +7,16 @@
     genderOptions: genderOptions$ | async,
     additionalPatientInformation: additionalPatientInformation$ | async,
     occupationInfo: occupationInfo$ | async,
-    relationTypeOptions: relationTypeOptions$ | async
+    relationTypeOptions: relationTypeOptions$ | async,
+    showPatientType: showPatientType$ | async
   } as params"
 >
   <h2>{{ editMode ? "Edit Patient" : "Register New Patient" }}</h2>
 
-  <mat-progress-bar *ngIf="loadingForm" mode="indeterminate"></mat-progress-bar>
+  <mat-progress-bar
+    *ngIf="loadingForm || !params?.showPatientType"
+    mode="indeterminate"
+  ></mat-progress-bar>
 
   <div class="alert alert-danger" *ngIf="loadingFormError">
     Problem Opening registration form
@@ -53,7 +57,12 @@
             </div>
           </div>
         </div> -->
-        <div class="row mt-3">
+        <div
+          class="row mt-3"
+          *ngIf="
+            params?.showPatientType && params?.showPatientType?.value === 'true'
+          "
+        >
           <div class="col-sm-3">
             <label for="pat`ient-type">Patient Type</label>
           </div>
@@ -469,7 +478,7 @@
                 </app-dynamic-reg-form>
               </div>
             </div> -->
-            <div class="ml-3">
+            <div>
               <app-dynamic-reg-form
                 *ngIf="params?.additionalPatientInformation"
                 [concepts]="params?.additionalPatientInformation.setMembers"
@@ -648,6 +657,7 @@
           class="patient-photo"
           style="
             background-image: url('../../../../../assets/images/person_image.png');
+            cursor: not-allowed;
           "
         >
           <div class="float-right pt-2 pr-2">
@@ -664,6 +674,11 @@
             {{ errorMessage }}
           </p>
         </div>
+        <!-- Alerts -->
+        <div *ngIf="errors?.length > 0">
+          <app-shared-error [errors]="errors"></app-shared-error>
+        </div>
+        <!-- End Alerts -->
         <button
           mat-flat-button
           style="height: 45px"

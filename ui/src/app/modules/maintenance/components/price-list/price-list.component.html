@@ -6,7 +6,8 @@
     currentPaymentType: currentPaymentType$ | async,
     paymentSchemes: paymentSchemes$ | async,
     pricingItems: pricingItems$ | async,
-    itemPriceEntities: itemPriceEntities$ | async
+    itemPriceEntities: itemPriceEntities$ | async,
+    priceListDepartments: priceListDepartments$ | async
   } as params"
 >
   <div class="d-flex justify-content-between mb-2">
@@ -29,6 +30,19 @@
     </button>
   </div>
 
+  <div *ngIf="params?.priceListDepartments" class="w-100">
+    <mat-form-field class="w-25">
+      <mat-label>Depatments</mat-label>
+      <mat-select (selectionChange)="getSelectedDepartment($event)">
+        <mat-option
+          *ngFor="let department of params?.priceListDepartments"
+          [value]="department"
+          >{{ department?.display }}</mat-option
+        >
+      </mat-select>
+    </mat-form-field>
+  </div>
+
   <!-- loading section -->
 
   <!-- end of loading section -->
@@ -47,7 +61,7 @@
                 autocomplete="off"
                 type="text"
                 matInput
-                (keyup)="onSearch($event, departmentId)"
+                (keyup)="onSearch($event, currentDepartmentId)"
               />
             </mat-form-field>
           </th>
