@@ -11,6 +11,10 @@ import { RegistrationService } from "../../services/registration.services";
 export class RegisterNewClientHomeComponent implements OnInit {
   registrationMRNSourceReference$: Observable<any>;
   registrationFormConfigs$: Observable<any>;
+  occupationConceptUuid$: Observable<string>;
+  additionalClientInformationConceptUuid$: Observable<string>;
+  relationShipTypesConceptUuid$: Observable<string>;
+  genderOptionsConceptUuid$: Observable<string>;
   constructor(
     private registrationService: RegistrationService,
     private systemSettingsService: SystemSettingsService
@@ -23,5 +27,22 @@ export class RegisterNewClientHomeComponent implements OnInit {
       );
     this.registrationMRNSourceReference$ =
       this.registrationService.getRegistrationMRNSource();
+    this.occupationConceptUuid$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        "icare.registration.form.occupation"
+      );
+    this.additionalClientInformationConceptUuid$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        "iCare.registration.form.additionalClientInformation.conceptUuid"
+      );
+
+    this.relationShipTypesConceptUuid$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        "iCare.registration.form.clientRelationShipTypes.conceptUuid"
+      );
+    this.genderOptionsConceptUuid$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        "iCare.registration.genderOptions.conceptUuid"
+      );
   }
 }

@@ -1,22 +1,37 @@
 <div
   *ngIf="{
     registrationMRNSourceReference: registrationMRNSourceReference$ | async,
-    registrationFormConfigs: registrationFormConfigs$ | async
+    registrationFormConfigs: registrationFormConfigs$ | async,
+    occupationConceptUuid: occupationConceptUuid$ | async,
+    additionalClientInformationConceptUuid:
+      additionalClientInformationConceptUuid$ | async,
+    relationShipTypesConceptUuid: relationShipTypesConceptUuid$ | async,
+    genderOptionsConceptUuid: genderOptionsConceptUuid$ | async
   } as params"
 >
   <app-registration-add
     *ngIf="
-      params?.registrationMRNSourceReference && params?.registrationFormConfigs
+      params?.registrationMRNSourceReference &&
+      params?.registrationFormConfigs &&
+      params?.occupationConceptUuid &&
+      params?.additionalClientInformationConceptUuid &&
+      params?.relationShipTypesConceptUuid
     "
     [registrationMRNSourceReference]="params?.registrationMRNSourceReference"
     [registrationFormConfigs]="params?.registrationFormConfigs"
+    [occupationConceptUuid]="params?.occupationConceptUuid"
+    [additionalClientInformationConceptUuid]="
+      params?.additionalClientInformationConceptUuid
+    "
+    [relationShipTypesConceptUuid]="params?.relationShipTypesConceptUuid"
+    [genderOptionsConceptUuid]="params?.genderOptionsConceptUuid"
   ></app-registration-add>
 
   <div
     class="alert alert-danger mt-2 ml-2 mr-2"
     *ngIf="
       params?.registrationMRNSourceReference &&
-      params?.registrationMRNSourceReference == ''
+      params?.registrationMRNSourceReference == 'none'
     "
     role="alert"
   >
@@ -26,7 +41,11 @@
   <mat-progress-bar
     *ngIf="
       !params?.registrationMRNSourceReference ||
-      !params?.registrationFormConfigs
+      !params?.registrationFormConfigs ||
+      !params?.occupationConceptUuid ||
+      !params?.additionalClientInformationConceptUuid ||
+      !params?.relationShipTypesConceptUuid ||
+      !params?.genderOptionsConceptUuid
     "
     mode="indeterminate"
   ></mat-progress-bar>

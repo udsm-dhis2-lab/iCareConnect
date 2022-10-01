@@ -57,6 +57,10 @@ export class RegistrationAddComponent implements OnInit {
   @Input() patientInformation: any;
   @Input() registrationFormConfigs: any;
   @Input() editMode: boolean;
+  @Input() occupationConceptUuid: string;
+  @Input() additionalClientInformationConceptUuid: string;
+  @Input() relationShipTypesConceptUuid: string;
+  @Input() genderOptionsConceptUuid: string;
 
   registrationFormConfigsKeyedByProperty: any = {};
 
@@ -250,13 +254,6 @@ export class RegistrationAddComponent implements OnInit {
   }
 
   getAdditionalInformationValues(formValues): void {
-    //console.log("formValues", formValues)
-    //console.log(this.registrationFormConfigsKeyedByProperty)
-
-    /* this.patient.occupation =
-      formValues[
-        this.registrationFormConfigsKeyedByProperty["occupation"]?.value
-      ].value; */
     this.patient.maritalStatus =
       formValues[
         this.registrationFormConfigsKeyedByProperty["maritalStatus"]?.value
@@ -277,6 +274,13 @@ export class RegistrationAddComponent implements OnInit {
       formValues[
         this.registrationFormConfigsKeyedByProperty["areaLeaderNumber"]?.value
       ].value;
+
+    if (this.registrationFormConfigsKeyedByProperty["occupation"]?.value) {
+      this.patient["occupation"] =
+        formValues[
+          this.registrationFormConfigsKeyedByProperty["occupation"]?.value
+        ].value;
+    }
   }
 
   //setEducationDetails(education) {
@@ -312,20 +316,20 @@ export class RegistrationAddComponent implements OnInit {
     this.store.dispatch(clearActiveVisit());
 
     this.genderOptions$ = this.conceptService.getConceptDetailsByUuid(
-      "bad70d90-9bac-401a-8c49-a440f6a07bf5",
+      this.genderOptionsConceptUuid,
       "custom:(uuid,display,names,answers:(uuid,display,names,mappings))"
     );
     this.additionalPatientInformation$ =
       this.conceptService.getConceptDetailsByUuid(
-        "b2399b15-a38d-47f9-8e15-fc7e7c7dc1f3",
+        this.additionalClientInformationConceptUuid,
         "custom:(uuid,display,names,answers:(uuid,display,names),setMembers:(uuid,display,answers:(uuid,display,names)))"
       );
     this.occupationInfo$ = this.conceptService.getConceptDetailsByUuid(
-      "c3d16c94-4e03-4b19-9491-43d10f470981",
+      this.occupationConceptUuid,
       "custom:(uuid,display,names,answers:(uuid,display,names),setMembers:(uuid,display,answers:(uuid,display,names)))"
     );
     this.relationTypeOptions$ = this.conceptService.getConceptDetailsByUuid(
-      "a74b0803-0aae-43a7-84f9-2daa2cd19332",
+      this.relationShipTypesConceptUuid,
       "custom:(uuid,display,names,answers:(uuid,display,names,mappings))"
     );
     /*
