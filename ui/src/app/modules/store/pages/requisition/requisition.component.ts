@@ -156,8 +156,15 @@ export class RequisitionComponent implements OnInit {
   onReceiveRequisition(e: Event, requisition: RequisitionObject): void {
     e.stopPropagation();
 
-    this.store.dispatch(receiveRequisition({ requisition }));
-    this.getAllRequisition();
+    // this.store.dispatch(receiveRequisition({ requisition }));
+    this.requisitionService
+      .receiveRequisition(requisition)
+      .subscribe((response) => {
+        // Add support to catch error
+        if (response) {
+          this.getAllRequisition();
+        }
+      });
   }
 
   onRejectRequisition(e: Event, requisition: RequisitionObject): void {
