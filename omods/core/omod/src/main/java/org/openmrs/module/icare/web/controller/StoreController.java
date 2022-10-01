@@ -205,7 +205,8 @@ public class StoreController {
 	
 	@RequestMapping(value = "issue", method = RequestMethod.POST)
 	@ResponseBody
-	public Map<String, Object> postAnIssue(@RequestBody Map<String, Object> issueMap) throws StockOutException,ParseException {
+	public Map<String, Object> postAnIssue(@RequestBody Map<String, Object> issueMap) throws StockOutException,
+	        ParseException {
 		
 		Issue issue = Issue.fromMap(issueMap);
 		
@@ -238,11 +239,11 @@ public class StoreController {
 			
 			if (issueItemObject.get("expiryDate") instanceof String) {
 				SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-				if (issueItemObject.get("expiryDate").toString().length() == 10){
+				if (issueItemObject.get("expiryDate").toString().length() == 10) {
 					issueItem.setExpiryDate(dateFormat.parse(issueItemObject.get("expiryDate").toString()));
-				}else{
+				} else {
 					issueItem.setExpiryDate(dateFormat.parse(issueItemObject.get("expiryDate").toString()
-							.substring(0, issueItemObject.get("expiryDate").toString().indexOf("T"))));
+					        .substring(0, issueItemObject.get("expiryDate").toString().indexOf("T"))));
 				}
 			}
 			
