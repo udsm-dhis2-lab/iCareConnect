@@ -588,6 +588,7 @@
                     <mat-label>Insurance ID</mat-label>
                     <input
                       matInput
+                      pattern="\d{12}"
                       placeholder="Enter Text"
                       [(ngModel)]="visitDetails['InsuranceID']"
                     />
