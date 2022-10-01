@@ -116,11 +116,11 @@ export class DispensingFormComponent implements OnInit {
 
     this.generalPrescriptionEncounterType$ =
       this.systemSettingsService.getSystemSettingsByKey(
-        "iCare.clinic.prescription.encounterType"
+        "iCare.clinic.genericPrescription.encounterType"
       );
     this.generalPrescriptionOrderType$ =
       this.systemSettingsService.getSystemSettingsByKey(
-        "iCare.clinic.prescription.orderType"
+        "iCare.clinic.genericPrescription.orderType"
       );
     this.useGeneralPrescription$ =
       this.systemSettingsService.getSystemSettingsByKey(

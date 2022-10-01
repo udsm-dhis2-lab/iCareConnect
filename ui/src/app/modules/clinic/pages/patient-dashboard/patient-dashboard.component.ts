@@ -24,6 +24,7 @@ import { VisitObject } from "src/app/shared/resources/visits/models/visit-object
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { LocationGet } from "src/app/shared/resources/openmrs";
 import { getCurrentLocation } from "src/app/store/selectors";
+import { map } from "rxjs/operators";
 
 @Component({
   selector: "app-patient-dashboard",
@@ -42,6 +43,7 @@ export class PatientDashboardComponent implements OnInit {
   iCareClinicConfigurations$: Observable<any>;
   provider$: Observable<any>;
   currentLocation$: Observable<LocationGet>;
+  errors: any[] = [];
   constructor(
     private store: Store<AppState>,
     private route: ActivatedRoute,
@@ -52,11 +54,47 @@ export class PatientDashboardComponent implements OnInit {
     this.iCareGeneralConfigurations$ =
       this.systemSettingsService.getSystemSettingsByKey(
         "iCare.GeneralMetadata.Configurations"
+      ).pipe(
+        map((response) => {
+          if(response.error){
+            this.errors = [
+              ...this.errors,
+              response?.error
+            ];
+          }
+          if(response === ''){
+            this.errors = [
+              ...this.errors,
+              {
+                error: {
+                  message:
+                    "Missing General iCare Metadata Configurations, Please set 'iCare.GeneralMetadata.Configurations' or Contact IT",
+                },
+              },
+            ];
+          }
+        })
       );
-    this.iCareClinicConfigurations$ =
-      this.systemSettingsService.getSystemSettingsByKey(
-        "icare.clinic.configurations"
-      );
+    this.iCareClinicConfigurations$ = this.systemSettingsService
+      .getSystemSettingsByKey("icare.clinic.configurations")
+      .pipe(
+        map((response) => {
+          if (response.error) {
+            this.errors = [...this.errors, response?.error];
+          }
+          if (response === "") {
+            this.errors = [
+              ...this.errors,
+              {
+                error: {
+                  message:
+                    "Missing Icare Clinic Configurations. Please set 'icare.clinic.configurations' or Contact IT",
+                },
+              },
+            ];
+          }
+        })
+      );;
     const patientId = this.route.snapshot.params["patientID"];
     this.store.dispatch(loadFormPrivilegesConfigs());
     this.store.dispatch(loadRolesDetails());

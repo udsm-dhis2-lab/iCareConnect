@@ -305,7 +305,8 @@ public class StoreController {
 	
 	@RequestMapping(value = "receive", method = RequestMethod.POST)
 	@ResponseBody
-	public Map<String, Object> postAReceipt(@RequestBody Map<String, Object> receiptMap) throws StockOutException {
+	public Map<String, Object> postAReceipt(@RequestBody Map<String, Object> receiptMap) throws StockOutException,
+	        ParseException {
 		
 		Receipt receipt = new Receipt().fromMap(receiptMap);
 		
@@ -333,8 +334,22 @@ public class StoreController {
 			} else if (receiptItemObject.get("quantity") instanceof Integer) {
 				receiptItem.setQuantity((Double) receiptItemObject.get("quantity"));
 			}
-			receiptItem.setReceipt(receipt);
 			
+			if (receiptItemObject.get("batch") instanceof String) {
+				receiptItem.setBatchNo((String) receiptItemObject.get("batch"));
+			}
+			
+			if (receiptItemObject.get("expiryDate") instanceof String) {
+				SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+				if (receiptItemObject.get("expiryDate").toString().length() == 10) {
+					receiptItem.setExpiryDate(dateFormat.parse(receiptItemObject.get("expiryDate").toString()));
+				} else {
+					receiptItem.setExpiryDate(dateFormat.parse(receiptItemObject.get("expiryDate").toString()
+					        .substring(0, receiptItemObject.get("expiryDate").toString().indexOf("T"))));
+				}
+			}
+			
+			receiptItem.setReceipt(receipt);
 			receiptItems.add(receiptItem);
 		}
 		
