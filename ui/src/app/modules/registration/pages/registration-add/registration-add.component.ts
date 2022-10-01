@@ -209,6 +209,7 @@ export class RegistrationAddComponent implements OnInit {
     category: "phoneNumber",
   });
   isPhoneNumberCorrect: boolean = false;
+  showPatientType$: Observable<boolean>;
 
   onPrimaryMobileNumberFormUpdate(formValueObject: FormValue): void {
     this.patient["phone"] =
@@ -300,6 +301,10 @@ export class RegistrationAddComponent implements OnInit {
 
   ngOnInit(): void {
     this.currentLocation$ = this.store.select(getCurrentLocation);
+    this.showPatientType$ =
+      this.systemSettingsService.getSystemSettingsDetailsByKey(
+        `icare.registration.settings.showPatientTypeField`
+      );
     this.registrationFormConfigsKeyedByProperty = keyBy(
       this.registrationFormConfigs,
       "referenceKeyPart"
@@ -625,7 +630,7 @@ export class RegistrationAddComponent implements OnInit {
                   .subscribe(
                     (patientResponse) => {
                       if (!patientResponse.error) {
-                        console.log("this response:", patientResponse);
+                        // console.log("this response:", patientResponse);
                         this.errorAddingPatient = false;
                         let patient = new Patient(patientResponse);
                         //// console.log('patient created ::', {patient: {...patientResponse} as any}patientResponse);

@@ -1,7 +1,7 @@
 [
-    {
-        "key": "Sample-key",
-        "value": "Sample-value",
-        "description": "Sample-description"
-    }
+  {
+    "key": "icare.registration.settings.showPatientTypeField",
+    "value": "false",
+    "description": "For hiding or showing patient type form field"
+  }
 ]
