@@ -478,7 +478,7 @@
                 </app-dynamic-reg-form>
               </div>
             </div> -->
-            <div class="ml-3">
+            <div>
               <app-dynamic-reg-form
                 *ngIf="params?.additionalPatientInformation"
                 [concepts]="params?.additionalPatientInformation.setMembers"
@@ -657,6 +657,7 @@
           class="patient-photo"
           style="
             background-image: url('../../../../../assets/images/person_image.png');
+            cursor: not-allowed;
           "
         >
           <div class="float-right pt-2 pr-2">
