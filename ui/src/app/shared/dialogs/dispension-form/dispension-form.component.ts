@@ -67,6 +67,7 @@ export class DispensingFormComponent implements OnInit {
   @Output() updateConsultationOrder = new EventEmitter();
 
   intermediateVisit$: Observable<any>; // TODO: Change this to use current visit
+  errors: any[] = [];
 
   constructor(
     private drugOrderService: DrugOrdersService,
@@ -281,7 +282,15 @@ export class DispensingFormComponent implements OnInit {
             (errorResponse?.error?.message || "")
               .replace("[", "")
               .replace("]", "");
-          this.dialogRef.close(true);
+          this.errors = [
+            ...this.errors,
+            {
+              error: {
+                message: errorResponse?.error?.message || errorResponse?.message || "Error occured",
+              },
+            },
+          ];
+          // this.dialogRef.close(true);
           this.savingOrderSuccess = false;
         }
       );

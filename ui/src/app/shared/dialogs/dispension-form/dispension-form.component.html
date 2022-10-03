@@ -39,6 +39,9 @@
     </button>
   </mat-toolbar>
 
+  <div *ngIf="errors?.length > 0">
+    <app-shared-error [errors]="errors"></app-shared-error>
+  </div>
   <div
     class="alert alert-danger d-flex justify-content-between align-items-center"
     *ngIf="savingError"
@@ -177,19 +180,19 @@
                 [drugRoutesSettings]="params?.drugRoutesSettings"
                 [generalPrescriptionDurationConcept]="
                   params?.generalPrescriptionDurationConcept
-                "
+                "z
                 [generalPrescriptionDoseConcept]="
                   params?.generalPrescriptionDoseConcept
                 "
                 [generalPrescriptionFrequencyConcept]="
                   params?.generalPrescriptionFrequencyConcept
                 "
+                [drugsToBeDispensed]="drugsToBeDispensed$ | async"
                 (drugQuantity)="onChangeDrugQuantity($event)"
                 (drugOrdered)="onOrderingDrug($event)"
                 (cancelForm)="onCancel()"
                 (formUpdate)="onFormUpdate($event)"
                 (getDrugsByConceptUuid)="getDrugsByConceptUuid($event)"
-                [drugsToBeDispensed]="drugsToBeDispensed$ | async"
               ></app-drug-order>
             </div>
             <div>

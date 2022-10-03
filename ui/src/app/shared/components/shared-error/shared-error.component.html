@@ -14,7 +14,7 @@
       >
         <span aria-hidden="true">&times;</span>
       </button>
-      <p class="text-left"> {{ errorIndex + 1 }}. 
+      <p class="text-left">
         {{ error?.error?.message }}
         {{ error?.error?.code ? "(" + error?.error?.code + ")" : "" }}
         <span
@@ -50,7 +50,7 @@
           >
             <span aria-hidden="true">&times;</span>
           </button>
-          <p class="text-left"> {{ errorIndex + 1 }}.{{ globalErrorIndex + 1 }} 
+          <p class="text-left">
             {{ globalError?.message }}
             {{
               globalError?.code && globalError?.code !== globalError?.message
