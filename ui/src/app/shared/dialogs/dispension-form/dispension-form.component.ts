@@ -27,6 +27,7 @@ import { OrdersService } from "../../resources/order/services/orders.service";
 import { flatten, keyBy } from "lodash";
 import { VisitsService } from "../../resources/visits/services";
 import { LocationService } from "src/app/core/services";
+import { map } from "rxjs/operators";
 
 @Component({
   selector: "app-dispension-form",
@@ -114,43 +115,168 @@ export class DispensingFormComponent implements OnInit {
     this.getVisitByUuid(this.data?.visit?.uuid);
     this.drugOrder = this.data?.drugOrder;
     this.dispensingLocations$ =
-      this.locationService.getLocationsByTagName("Dispensing+Unit");
+      this.locationService.getLocationsByTagName("Dispensing+Unit").pipe(
+        map((response) => {
+          return response
+        })
+      );
 
     this.generalPrescriptionEncounterType$ =
       this.systemSettingsService.getSystemSettingsByKey(
         "iCare.clinic.genericPrescription.encounterType"
+      ).pipe(
+        map((response) => {
+          if(response?.error){
+            this.errors = [
+              ...this.errors,
+              response.error
+            ]
+          }
+          if(response === 'none'){
+            this.errors = [
+              ...this.errors,
+              {
+                error: {
+                  message: "Generic Prescription EncounterType Config is missing, Set 'iCare.clinic.genericPrescription.encounterType' or Contact IT",
+                }
+              },
+            ];
+          }
+          return response
+        })
       );
     this.generalPrescriptionOrderType$ =
       this.systemSettingsService.getSystemSettingsByKey(
         "iCare.clinic.genericPrescription.orderType"
+      ).pipe(
+        map((response) => {
+          if(response?.error){
+            this.errors = [
+              ...this.errors,
+              response.error
+            ]
+          }
+          if(response === 'none'){
+            this.errors = [
+              ...this.errors,
+              {
+                error: {
+                  message:
+                    "Generic Prescription OrderType Config is missing, Set 'iCare.clinic.genericPrescription.orderType' or Contact IT",
+                }
+              },
+            ];
+          }
+          return response
+        })
       );
     this.useGeneralPrescription$ =
       this.systemSettingsService.getSystemSettingsByKey(
         "iCare.clinic.useGeneralPrescription"
+      ).pipe(
+        map((response) => {
+          if(response?.error){
+            this.errors = [
+              ...this.errors,
+              response.error
+            ]
+          }
+          return response
+        })
       );
     this.dosingUnitsSettings$ =
       this.systemSettingsService.getSystemSettingsByKey(
         "order.drugDosingUnitsConceptUuid"
+      ).pipe(
+        map((response) => {
+          if(response?.error){
+            this.errors = [
+              ...this.errors,
+              response.error
+            ]
+          }
+          return response
+        })
       );
     this.durationUnitsSettings$ =
       this.systemSettingsService.getSystemSettingsByKey(
         "order.durationUnitsConceptUuid"
+      ).pipe(
+        map((response) => {
+          if(response?.error){
+            this.errors = [
+              ...this.errors,
+              response.error
+            ]
+          }
+          if(response === 'none'){
+            this.errors = [
+              ...this.errors,
+              {
+                error: {
+                  message: ""
+                }
+              }
+            ]
+          }
+          return response
+        })
       );
     this.drugRoutesSettings$ =
       this.systemSettingsService.getSystemSettingsByKey(
         "order.drugRoutesConceptUuid"
+      ).pipe(
+        map((response) => {
+          if(response?.error){
+            this.errors = [
+              ...this.errors,
+              response.error
+            ]
+          }
+          return response
+        })
       );
     this.generalPrescriptionDurationConcept$ =
       this.systemSettingsService.getSystemSettingsByKey(
         "iCare.clinic.prescription.duration"
+      ).pipe(
+        map((response) => {
+          if(response?.error){
+            this.errors = [
+              ...this.errors,
+              response.error
+            ]
+          }
+          return response
+        })
       );
     this.generalPrescriptionDoseConcept$ =
       this.systemSettingsService.getSystemSettingsByKey(
         "iCare.clinic.prescription.dose"
+      ).pipe(
+        map((response) => {
+          if(response?.error){
+            this.errors = [
+              ...this.errors,
+              response.error
+            ]
+          }
+          return response
+        })
       );
     this.generalPrescriptionFrequencyConcept$ =
       this.systemSettingsService.getSystemSettingsByKey(
         "iCare.clinic.prescription.frequency"
+      ).pipe(
+        map((response) => {
+          if(response?.error){
+            this.errors = [
+              ...this.errors,
+              response.error
+            ]
+          }
+          return response
+        })
       );
     this.currentPatient$ = this.store.pipe(select(getCurrentPatient));
     this.currentLocation$ = this.store.pipe(select(getCurrentLocation));
