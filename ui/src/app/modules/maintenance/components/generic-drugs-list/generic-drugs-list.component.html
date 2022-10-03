@@ -4,6 +4,7 @@
     *ngIf="!params?.drugConcepts"
   ></mat-progress-bar>
   <div class="concepts-drugs-list" *ngIf="params?.drugConcepts">
+    <!-- TODO: Show errors accordingly -->
     <table class="table">
       <thead>
         <tr>
@@ -15,7 +16,7 @@
       <tbody>
         <tr *ngFor="let drugConcept of params?.drugConcepts; let count = index">
           <td>
-            {{ count + 1 }}
+            {{ count + 1 + (page - 1) * pageCount }}
           </td>
           <td>
             {{ drugConcept?.display }}
@@ -30,7 +31,7 @@
             </button>
             <mat-menu #menu="matMenu">
               <button mat-menu-item (click)="onEdit($event)">Edit</button>
-              <button mat-menu-item (click)="onViewDrugs($event)">
+              <button mat-menu-item (click)="onViewDrugs($event, drugConcept)">
                 View drugs
               </button>
             </mat-menu>
@@ -40,7 +41,24 @@
     </table>
   </div>
 
-  <div class="d-flex justify-content-end">
+  <div class="d-flex justify-content-end mt-2">
+    <button
+      [disabled]="page === 1"
+      mat-stroked-button
+      (click)="onGetList($event, 'prev')"
+    >
+      Prev
+    </button>
+    <button
+      [disabled]="params?.drugConcepts && params?.drugConcepts < pageCount"
+      mat-stroked-button
+      (click)="onGetList($event, 'next')"
+      class="ml-2"
+    >
+      Next
+    </button>
+  </div>
+  <div class="d-flex justify-content-end mt-2">
     <button
       (click)="onAddNew($event)"
       tabindex="0"
