@@ -16,7 +16,8 @@
     generalPrescriptionFrequencyConcept:
       generalPrescriptionFrequencyConcept$ | async,
     intermediateVisit: intermediateVisit$ | async,
-    dispensingLocations: dispensingLocations$ | async
+    dispensingLocations: dispensingLocations$ | async,
+    genericPrescriptionConceptUuids: genericPrescriptionConceptUuids$ | async
   } as params"
 >
   <div class="loading-overlay" *ngIf="savingOrder">
@@ -111,7 +112,8 @@
                 params?.drugRoutesSettings &&
                 params?.generalPrescriptionDurationConcept &&
                 params?.generalPrescriptionDoseConcept &&
-                params?.generalPrescriptionFrequencyConcept
+                params?.generalPrescriptionFrequencyConcept && 
+                params?.genericPrescriptionConceptUuids
               "
             >
               <app-general-dispension-form
@@ -121,6 +123,7 @@
                 (generalPrescriptionFrequencyConceptEvent)="
                   getDosingFrequencies($event)
                 "
+                (genericPrescriptionConceptUuidsEvent)="getConceptsAsFields($event)"
                 [encounterType]="params?.generalPrescriptionEncounterType"
                 [orderType]="params?.generalPrescriptionOrderType"
                 [currentPatient]="params?.currentPatient"
@@ -134,6 +137,7 @@
                 [durationUnits$]="durationUnits$"
                 [drugRoutes$]="drugRoutes$"
                 [dosingFrequencies$]="dosingFrequencies$"
+                [genericPrescriptionConceptUuid]="params?.genericPrescriptionConceptUuid"
                 [generalPrescriptionDurationConcept]="
                   params?.generalPrescriptionDurationConcept
                 "
@@ -143,6 +147,8 @@
                 [generalPrescriptionFrequencyConcept]="
                   params?.generalPrescriptionFrequencyConcept
                 "
+                [genericPrescriptionConceptUuids]="params?.genericPrescriptionConceptUuids"
+                [conceptFields$]="conceptFields$"
                 (updateConsultationOrder)="onUpdateConsultationOrder()"
                 (orderSaved)="onOrderSaved($event, params?.currentVisit)"
               ></app-general-dispension-form>

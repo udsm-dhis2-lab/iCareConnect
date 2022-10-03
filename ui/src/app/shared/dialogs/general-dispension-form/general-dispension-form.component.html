@@ -1,4 +1,4 @@
-<div class="form">
+<div class="form" *ngIf="conceptFields$ | async as conceptFields">
   <div class="loading-overlay" *ngIf="savingOrder">
     <div class="text-center">
       <div>Saving order details...</div>
@@ -14,7 +14,13 @@
         (formUpdate)="onFormUpdate($event)"
       ></app-form>
     </div>
-    <div class="row">
+    <div *ngIf="conceptFields">
+      <app-concepts-form
+        [conceptFields]="conceptFields"
+        (formUpdate)="onFormUpdate($event)"
+      ></app-concepts-form>
+    </div>
+    <!-- <div class="row" *ngIf="generalPrescriptionDoseConcept">
       <div class="col-4">
         <app-form
           [fields]="[drugDoseField]"
@@ -37,7 +43,7 @@
         ></app-unit-field>
       </div>
     </div>
-    <div class="row">
+    <div class="row" *ngIf="generalPrescriptionDurationConcept">
       <div class="col-5">
         <app-form
           [fields]="[drugDurationField]"
@@ -51,16 +57,18 @@
         ></app-unit-field>
       </div>
     </div>
-    <div *ngIf="drugRoutes$ | async as drugRoutes">
-      <app-unit-field
-        [drugRoutes]="drugRoutes"
-        (formUpdate)="onFormUpdate($event)"
-      ></app-unit-field>
-    </div>
+    <div *ngIf="drugRoutesSettings">
+      <div *ngIf="drugRoutes$ | async as drugRoutes">
+        <app-unit-field
+          [drugRoutes]="drugRoutes"
+          (formUpdate)="onFormUpdate($event)"
+        ></app-unit-field>
+      </div>
+    </div> -->
     <div class="float-right">
       <button
         class="float-right"
-        (click)="saveOrder($event)"
+        (click)="saveOrder($event, conceptFields)"
         mat-flat-button
         [color]="savingError ? 'warn' : 'primary'"
         [disabled]="savingOrder"
