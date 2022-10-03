@@ -565,7 +565,7 @@ export class DrugOrdersService {
           drugOrderFrequencyField,
         ];
 
-        const data = {
+        return {
           ...metadata,
           drugFormField,
           doseField,
@@ -581,8 +581,6 @@ export class DrugOrdersService {
           durationFormFields,
           doseFormFields,
         };
-        console.log("data", data);
-        return data;
       }),
       catchError((error) => {
         return of(error);
