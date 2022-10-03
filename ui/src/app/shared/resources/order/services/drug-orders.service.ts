@@ -324,15 +324,19 @@ export class DrugOrdersService {
         "Reference application common drug allergens",
         "full"
       )
-    ).pipe(catchError((error) => {
+    ).pipe(
+      catchError((error) => {
         return of(error);
-      }));
+      })
+    );
   }
 
   getDosingUnit() {
-    return from(this.getSetMembersAsOptions("Dosing Unit", "full")).pipe(catchError((error) => {
+    return from(this.getSetMembersAsOptions("Dosing Unit", "full")).pipe(
+      catchError((error) => {
         return of(error);
-      }));
+      })
+    );
   }
 
   getOrderFrequency() {
@@ -378,8 +382,11 @@ export class DrugOrdersService {
         ...locations.map((location) =>
           this.stockService.getAvailableStocks(location.id)
         )
-      ).pipe(map((res) => flatten(res))),
-      this.getAllDrugs("full")
+      ).pipe(
+        map((res) => {
+          return flatten(res);
+        })
+      )
     ).pipe(
       map((res) => {
         const metadata = {
@@ -390,7 +397,6 @@ export class DrugOrdersService {
           drugRoutes: res[3],
           durationUnits: res[4],
           stockedDrugs: res[5],
-          drugs: res[6],
         };
 
         const drugFormField = new Dropdown({
@@ -559,7 +565,7 @@ export class DrugOrdersService {
           drugOrderFrequencyField,
         ];
 
-        return {
+        const data = {
           ...metadata,
           drugFormField,
           doseField,
@@ -575,9 +581,11 @@ export class DrugOrdersService {
           durationFormFields,
           doseFormFields,
         };
+        console.log("data", data);
+        return data;
       }),
       catchError((error) => {
-        return of(error)
+        return of(error);
       })
     );
   }

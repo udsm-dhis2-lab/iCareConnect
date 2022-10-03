@@ -15,7 +15,8 @@
     generalPrescriptionDoseConcept: generalPrescriptionDoseConcept$ | async,
     generalPrescriptionFrequencyConcept:
       generalPrescriptionFrequencyConcept$ | async,
-    intermediateVisit: intermediateVisit$ | async
+    intermediateVisit: intermediateVisit$ | async,
+    dispensingLocations: dispensingLocations$ | async
   } as params"
 >
   <div class="loading-overlay" *ngIf="savingOrder">
@@ -63,7 +64,9 @@
         <div class="row">
           <div class="col-12">
             <mat-progress-bar
-              *ngIf="!params?.useGeneralPrescription"
+              *ngIf="
+                !params?.useGeneralPrescription || !params?.dispensingLocations
+              "
               mode="indeterminate"
             ></mat-progress-bar>
           </div>
@@ -123,6 +126,12 @@
               ></app-general-dispension-form>
             </div>
           </div>
+          <div class="col-12">
+            <mat-progress-bar
+              mode="indeterminate"
+              *ngIf="!params?.dispensingLocations"
+            ></mat-progress-bar>
+          </div>
           <div
             class="col-7"
             *ngIf="
@@ -151,13 +160,14 @@
                 params?.drugRoutesSettings &&
                 params?.generalPrescriptionDurationConcept &&
                 params?.generalPrescriptionDoseConcept &&
-                params?.generalPrescriptionFrequencyConcept
+                params?.generalPrescriptionFrequencyConcept &&
+                params?.dispensingLocations
               "
             >
               <app-drug-order
                 [drugOrder]="data?.drugOrder"
                 [patient]="data?.patient"
-                [locations]="dispensingLocations$ | async"
+                [locations]="params?.dispensingLocations"
                 [fromDispensing]="data.fromDispensing"
                 [showAddButton]="false"
                 [hideActionButtons]="true"
