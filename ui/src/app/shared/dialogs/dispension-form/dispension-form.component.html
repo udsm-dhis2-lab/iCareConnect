@@ -15,7 +15,8 @@
     generalPrescriptionDoseConcept: generalPrescriptionDoseConcept$ | async,
     generalPrescriptionFrequencyConcept:
       generalPrescriptionFrequencyConcept$ | async,
-    intermediateVisit: intermediateVisit$ | async
+    intermediateVisit: intermediateVisit$ | async,
+    dispensingLocations: dispensingLocations$ | async
   } as params"
 >
   <div class="loading-overlay" *ngIf="savingOrder">
@@ -38,6 +39,9 @@
     </button>
   </mat-toolbar>
 
+  <div *ngIf="errors?.length > 0">
+    <app-shared-error [errors]="errors"></app-shared-error>
+  </div>
   <div
     class="alert alert-danger d-flex justify-content-between align-items-center"
     *ngIf="savingError"
@@ -63,7 +67,28 @@
         <div class="row">
           <div class="col-12">
             <mat-progress-bar
-              *ngIf="!params?.useGeneralPrescription"
+              mode="indeterminate"
+              *ngIf="!params?.dispensingLocations"
+            ></mat-progress-bar>
+          </div>
+          <!-- <div
+            class="col-7"
+            *ngIf="
+              !params?.useGeneralPrescription ||
+              params?.useGeneralPrescription === 'none'
+            "
+          >
+            <div class="alert alert-warning" role="alert">
+              Generic Prescription Config is missing, Contact IT
+            </div>
+          </div> -->
+        </div>
+        <div class="row">
+          <div class="col-12">
+            <mat-progress-bar
+              *ngIf="
+                !params?.useGeneralPrescription || !params?.dispensingLocations
+              "
               mode="indeterminate"
             ></mat-progress-bar>
           </div>
@@ -126,19 +151,8 @@
           <div
             class="col-7"
             *ngIf="
-              params?.useGeneralPrescription &&
-              params?.useGeneralPrescription === 'none'
-            "
-          >
-            <div class="alert alert-warning" role="alert">
-              Generic Prescription Config is missing, Contact IT
-            </div>
-          </div>
-          <div
-            class="col-7"
-            *ngIf="
-              (params?.useGeneralPrescription &&
-                params?.useGeneralPrescription === 'false') ||
+              ((params?.useGeneralPrescription &&
+                params?.useGeneralPrescription === 'false') || !params?.useGeneralPrescription) ||
               data?.fromDispensing
             "
           >
@@ -151,13 +165,14 @@
                 params?.drugRoutesSettings &&
                 params?.generalPrescriptionDurationConcept &&
                 params?.generalPrescriptionDoseConcept &&
-                params?.generalPrescriptionFrequencyConcept
+                params?.generalPrescriptionFrequencyConcept &&
+                params?.dispensingLocations
               "
             >
               <app-drug-order
                 [drugOrder]="data?.drugOrder"
                 [patient]="data?.patient"
-                [locations]="dispensingLocations$ | async"
+                [locations]="params?.dispensingLocations"
                 [fromDispensing]="data.fromDispensing"
                 [showAddButton]="false"
                 [hideActionButtons]="true"
@@ -167,19 +182,19 @@
                 [drugRoutesSettings]="params?.drugRoutesSettings"
                 [generalPrescriptionDurationConcept]="
                   params?.generalPrescriptionDurationConcept
-                "
+                "z
                 [generalPrescriptionDoseConcept]="
                   params?.generalPrescriptionDoseConcept
                 "
                 [generalPrescriptionFrequencyConcept]="
                   params?.generalPrescriptionFrequencyConcept
                 "
+                [drugsToBeDispensed]="drugsToBeDispensed$ | async"
                 (drugQuantity)="onChangeDrugQuantity($event)"
                 (drugOrdered)="onOrderingDrug($event)"
                 (cancelForm)="onCancel()"
                 (formUpdate)="onFormUpdate($event)"
                 (getDrugsByConceptUuid)="getDrugsByConceptUuid($event)"
-                [drugsToBeDispensed]="drugsToBeDispensed$ | async"
               ></app-drug-order>
             </div>
             <div>
