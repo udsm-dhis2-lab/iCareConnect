@@ -225,31 +225,16 @@ public class ICareController {
 		ConceptService conceptService = Context.getConceptService();
 		OrderService orderService = Context.getOrderService();
 		PatientService patientService = Context.getPatientService();
-
-		if (prescription.getDoseUnits().getUuid() != null){
-			prescription.setDoseUnits(conceptService.getConceptByUuid(prescription.getDoseUnits().getUuid()));
-		}
-		if (prescription.getDurationUnits().getUuid() != null){
-			prescription.setDurationUnits(conceptService.getConceptByUuid(prescription.getDurationUnits().getUuid()));
-		}
-		if (prescription.getRoute().getUuid() != null){
-			prescription.setRoute(conceptService.getConceptByUuid(prescription.getRoute().getUuid()));
-		}
-		if (prescription.getFrequency().getUuid() != null){
-			prescription.setFrequency(orderService.getOrderFrequencyByUuid(prescription.getFrequency().getUuid()));
-		}
-		if (prescription.getQuantityUnits().getUuid() != null){
+		
+		prescription.setDoseUnits(conceptService.getConceptByUuid(prescription.getDoseUnits().getUuid()));
+		prescription.setDurationUnits(conceptService.getConceptByUuid(prescription.getDurationUnits().getUuid()));
+		prescription.setRoute(conceptService.getConceptByUuid(prescription.getRoute().getUuid()));
+		prescription.setFrequency(orderService.getOrderFrequencyByUuid(prescription.getFrequency().getUuid()));
 		prescription.setQuantityUnits(conceptService.getConceptByUuid(prescription.getQuantityUnits().getUuid()));
-		}
 		//order.setNumRefills((Integer) orderObject.get("numRefills"));
-
-		if (prescription.getDrug().getUuid() != null){
-			prescription.setDrug(conceptService.getDrugByUuid(prescription.getDrug().getUuid()));
-		}
-
-		if(prescription.getPatient().getUuid() != null){
+		
+		prescription.setDrug(conceptService.getDrugByUuid(prescription.getDrug().getUuid()));
 		prescription.setPatient(patientService.getPatientByUuid(prescription.getPatient().getUuid()));
-		}
 		//order.setId(33009);
 		
 		ProviderService providerService = Context.getProviderService();

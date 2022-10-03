@@ -1,1 +1,47 @@
-<p>drugs-list works!</p>
+<div class="drugs-list-container" *ngIf="{ drugs: drugs$ | async } as params">
+  <mat-progress-bar
+    mode="indeterminate"
+    *ngIf="!params?.drugs"
+  ></mat-progress-bar>
+  <div class="drugs-list">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>SN</th>
+          <th>Drug</th>
+          <th *ngIf="!conceptUuid"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let drug of params?.drugs?.results; let count = index">
+          <td>
+            {{ count + 1 + (page - 1) * limit }}
+          </td>
+          <td>
+            {{ drug?.display }}
+          </td>
+          <td *ngIf="!conceptUuid">
+            <!-- TODO: For actions on drug management -->
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="d-flex justify-content-end mt-2" *ngIf="!conceptUuid">
+    <button
+      [disabled]="page === 1"
+      mat-stroked-button
+      (click)="onGetList($event, 'prev')"
+    >
+      Prev
+    </button>
+    <button
+      [disabled]="params?.drugs?.results && params?.drugs?.results < limit"
+      mat-stroked-button
+      (click)="onGetList($event, 'next')"
+      class="ml-2"
+    >
+      Next
+    </button>
+  </div>
+</div>

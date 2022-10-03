@@ -22,6 +22,7 @@ import {
   UserCreateModel,
 } from "../../../models/user.model";
 import { UserService } from "../../../services/users.service";
+import { orderBy } from "lodash";
 
 @Component({
   selector: "app-add-user",
@@ -102,7 +103,7 @@ export class AddUserComponent implements OnInit {
         }
       )
       .subscribe((res) => {
-        this.locations = res;
+        this.locations = orderBy(res, ["display"], ["asc"]);
 
         this.locationsDataSource = new MatTableDataSource(this.locations);
         this.selectedLocationsDataSource = new MatTableDataSource(
@@ -324,7 +325,11 @@ export class AddUserComponent implements OnInit {
     this.moveToAvailable = [];
     this.moveToSelected = [];
     this.clickedAvailable = [];
-    this.roles = [...this.roles, ...this.selectedRoles];
+    this.roles = orderBy(
+      [...this.roles, ...this.selectedRoles],
+      ["display"],
+      ["asc"]
+    );
     this.rolesDataSource = new MatTableDataSource(this.roles);
     this.selectedRoles = [];
     this.selectedRolesDatasource = new MatTableDataSource(this.selectedRoles);
@@ -353,10 +358,12 @@ export class AddUserComponent implements OnInit {
       if (!e.metaKey && !e.crtlKey && !e.shiftKey) {
         this.clickedRows = [];
         this.moveToAvailable = [];
-        this.selectedRoles = this.selectedRoles.filter(
-          ({ uuid }) => role.uuid !== uuid
+        this.selectedRoles = orderBy(
+          this.selectedRoles.filter(({ uuid }) => role.uuid !== uuid) || [],
+          ["display"],
+          ["asc"]
         );
-        this.roles = [...this.roles, role];
+        this.roles = orderBy([...this.roles, role], ["display"], ["asc"]);
         this.rolesDataSource = new MatTableDataSource(this.roles);
         this.selectedRolesDatasource = new MatTableDataSource(
           this.selectedRoles
@@ -491,7 +498,7 @@ export class AddUserComponent implements OnInit {
       this.searching = false;
     } else {
       this.service.getLoginLocations().subscribe((res) => {
-        this.locations = res.results;
+        this.locations = orderBy(res.results, ["display"], ["asc"]);
         if (this.locations.length === 0) {
           this.searching = true;
         }
@@ -501,15 +508,25 @@ export class AddUserComponent implements OnInit {
 
   getLocations(e: GlobalEventHandlersEvent, row: LocationGetFull) {
     e.stopPropagation();
-    this.locations = this.locations.filter(({ uuid }) => row.uuid !== uuid);
-    this.selectedLocations = [...this.selectedLocations, row];
+    this.locations = orderBy(this.locations, ["display"], ["asc"]).filter(
+      ({ uuid }) => row.uuid !== uuid
+    );
+    this.selectedLocations = orderBy(
+      [...this.selectedLocations, row],
+      ["display"],
+      ["asc"]
+    );
   }
 
   removeLocation(e: GlobalEventHandlersEvent, row: LocationGetFull) {
     e.stopPropagation();
-    this.selectedLocations = this.selectedLocations.filter(
-      ({ uuid }) => row.uuid !== uuid
-    );
+    this.selectedLocations = orderBy(
+      this.selectedLocations,
+      ["display"],
+      ["asc"]
+    ).filter(({ uuid }) => row.uuid !== uuid);
+
+    this.locations = orderBy([...this.locations, row], ["display"], ["asc"]);
   }
 
   get passwordMatch() {
