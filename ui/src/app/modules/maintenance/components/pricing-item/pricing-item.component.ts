@@ -1,16 +1,16 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { PaymentScheme } from 'src/app/shared/models/payment-scheme.model';
-import { PaymentTypeInterface } from 'src/app/shared/models/payment-type.model';
-import { Field } from 'src/app/shared/modules/form/models/field.model';
-import { FormValue } from 'src/app/shared/modules/form/models/form-value.model';
-import { Textbox } from 'src/app/shared/modules/form/models/text-box.model';
-import { ItemPriceInterface } from '../../models/item-price.model';
-import { PricingItemInterface } from '../../models/pricing-item.model';
+import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import { PaymentScheme } from "src/app/shared/models/payment-scheme.model";
+import { PaymentTypeInterface } from "src/app/shared/models/payment-type.model";
+import { Field } from "src/app/shared/modules/form/models/field.model";
+import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
+import { Textbox } from "src/app/shared/modules/form/models/text-box.model";
+import { ItemPriceInterface } from "../../models/item-price.model";
+import { PricingItemInterface } from "../../models/pricing-item.model";
 
 @Component({
-  selector: 'app-pricing-item',
-  templateUrl: './pricing-item.component.html',
-  styleUrls: ['./pricing-item.component.scss'],
+  selector: "app-pricing-item",
+  templateUrl: "./pricing-item.component.html",
+  styleUrls: ["./pricing-item.component.scss"],
 })
 export class PricingItemComponent implements OnInit {
   @Input() pricingItem: PricingItemInterface;
@@ -22,7 +22,7 @@ export class PricingItemComponent implements OnInit {
   fieldId: string;
   pricingItemField: Field<string>;
   payableItemField: Field<string>;
-  priceObject: any = {}
+  priceObject: any = {};
 
   @Output() saveItemPrice = new EventEmitter<any>();
   constructor() {}
@@ -35,7 +35,7 @@ export class PricingItemComponent implements OnInit {
               this.paymentScheme?.concept?.uuid &&
             priceInfo?.paymentType?.uuid === this.paymentScheme?.paymentTypeUuid
         ) || [])[0]?.price
-      : '';
+      : "";
   }
 
   get itemPayableValue(): number | string {
@@ -46,7 +46,7 @@ export class PricingItemComponent implements OnInit {
               this.paymentScheme?.concept?.uuid &&
             priceInfo?.paymentType?.uuid === this.paymentScheme?.paymentTypeUuid
         ) || [])[0]?.payable
-      : '';
+      : "";
   }
 
   ngOnInit() {
@@ -61,9 +61,9 @@ export class PricingItemComponent implements OnInit {
     });
 
     this.payableItemField = new Textbox({
-      id: this.fieldId +"-payable",
+      id: this.fieldId + "-payable",
       label: `Payable`,
-      key: this.fieldId +"-payable",
+      key: this.fieldId + "-payable",
       value: this.itemPayableValue?.toString(),
     });
   }
@@ -75,8 +75,6 @@ export class PricingItemComponent implements OnInit {
 
   onSaveItemPrice(e) {
     e.stopPropagation();
-    // const priceObject = (this.formValue.getValues() || {})[this.fieldId];
-    console.log("HERE")
     this.showForm = false;
     this.saveItemPrice.emit({
       item: {
@@ -85,16 +83,16 @@ export class PricingItemComponent implements OnInit {
       paymentType: { uuid: this.paymentScheme?.paymentTypeUuid },
       paymentScheme: { uuid: this.paymentScheme?.concept?.uuid },
       price: this.priceObject[this.fieldId]?.value,
-      payable: this.priceObject[this.fieldId+"-payable"]?.value,
+      payable: this.priceObject[this.fieldId + "-payable"]?.value,
     });
   }
 
   onPriceUpdate(formValue: FormValue) {
     this.formValue = formValue;
-    this.priceObject = {...this.priceObject, ...formValue.getValues()}
+    this.priceObject = { ...this.priceObject, ...formValue.getValues() };
   }
 
   onPayableUpdate(formValue: FormValue): void {
-    this.priceObject = {...this.priceObject, ...formValue.getValues()}
+    this.priceObject = { ...this.priceObject, ...formValue.getValues() };
   }
 }
