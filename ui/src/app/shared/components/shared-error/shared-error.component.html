@@ -1,7 +1,7 @@
 <ng-container *ngIf="errors.length > 0">
   <div *ngFor="let error of errors; let errorIndex = index">
     <div
-      class="alert alert-{{ alertType }} alert-dismissible fade show mt-2"
+      class="alert alert-{{ error.type || 'danger' }} alert-dismissible fade show mt-2"
       role="alert"
       *ngIf="error?.error"
     >
