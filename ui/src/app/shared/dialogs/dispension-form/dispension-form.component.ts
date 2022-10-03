@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Inject, OnInit, Output } from "@angular/core";
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { select, Store } from "@ngrx/store";
-import { Observable } from "rxjs";
+import { Observable, zip } from "rxjs";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
 import { DrugOrderError } from "src/app/shared/resources/order/constants/drug-order-error.constant";
@@ -69,6 +69,8 @@ export class DispensingFormComponent implements OnInit {
 
   intermediateVisit$: Observable<any>; // TODO: Change this to use current visit
   errors: any[] = [];
+  conceptFields$: Observable<any>;
+  genericPrescriptionConceptUuids$: Observable<any>;
 
   constructor(
     private drugOrderService: DrugOrdersService,
@@ -198,6 +200,16 @@ export class DispensingFormComponent implements OnInit {
           return response
         })
       );
+    this.genericPrescriptionConceptUuids$ = this.systemSettingsService
+      .getSystemSettingsMatchingAKey("iCare.clinic.genericPrescription.field")
+      .pipe(
+        map((response: any) => {
+          if (response?.error) {
+            this.errors = [...this.errors, response.error];
+          }
+          return response;
+        })
+      );
     this.durationUnitsSettings$ =
       this.systemSettingsService.getSystemSettingsByKey(
         "order.durationUnitsConceptUuid"
@@ -207,16 +219,6 @@ export class DispensingFormComponent implements OnInit {
             this.errors = [
               ...this.errors,
               response.error
-            ]
-          }
-          if(response === 'none'){
-            this.errors = [
-              ...this.errors,
-              {
-                error: {
-                  message: ""
-                }
-              }
             ]
           }
           return response
@@ -467,10 +469,34 @@ export class DispensingFormComponent implements OnInit {
       `custom:(uuid,name,conceptClass:(uuid,display),setMembers:(uuid,display),answers:(uuid,display)`
     );
   }
-
+  
   getDrugsByConceptUuid(conceptUuid: string) {
     this.drugsToBeDispensed$ =
-      this.drugsService.getDrugsUsingConceptUuid(conceptUuid);
+    this.drugsService.getDrugsUsingConceptUuid(conceptUuid);
+  }
+  
+  getConceptsAsFields(genericFieldsConcepts){
+    console.log("==> Vizia Orderl: ",genericFieldsConcepts);
+    this.conceptFields$ = zip(
+      ...genericFieldsConcepts.map((conceptSetting) =>
+        this.conceptsService.getConceptDetailsByUuid(
+          conceptSetting?.value,
+          `custom:(uuid,display,name,datatype,set,conceptClass:(uuid,display),setMembers:(uuid,display),answers:(uuid,display)`
+        ).pipe(map((response) => {
+          if(response?.error){
+            this.errors = [
+              ...this.errors,
+              response.error
+            ]
+          }
+          return {
+            ...response,
+            order: conceptSetting?.order
+          }
+        }))
+      )
+    );
+    
   }
 
   onCloseDialog(closeDialog: boolean): void {

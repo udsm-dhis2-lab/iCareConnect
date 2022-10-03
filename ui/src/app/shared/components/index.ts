@@ -89,6 +89,7 @@ import { SharedConfirmationComponent } from "./shared-confirmation /shared-confi
 import { IpdFormsComponent } from "./ipd-forms/ipd-forms.component";
 import { SharedErrorComponent } from "./shared-error/shared-error.component";
 import { SharedConceptCreateComponent } from "./shared-concept-create/shared-concept-create.component";
+import { ConceptsFormComponent } from "./concepts-form/concepts-forms.component";
 
 export const components: any[] = [
   PatientSearchComponent,
@@ -182,6 +183,7 @@ export const components: any[] = [
   IpdFormsComponent,
   SharedErrorComponent,
   SharedConceptCreateComponent,
+  ConceptsFormComponent
 ];
 
 export const sharedEntryComponents: any[] = [

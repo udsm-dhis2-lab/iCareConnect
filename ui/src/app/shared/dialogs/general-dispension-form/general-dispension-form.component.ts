@@ -1,26 +1,19 @@
 import {
   Component,
   EventEmitter,
-  Inject,
   Input,
   OnInit,
   Output,
 } from "@angular/core";
-import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
-import { select, Store } from "@ngrx/store";
+import { Store } from "@ngrx/store";
 import { Observable } from "rxjs";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
-import { DrugOrderError } from "src/app/shared/resources/order/constants/drug-order-error.constant";
 import {
   DrugOrder,
   DrugOrderObject,
 } from "src/app/shared/resources/order/models/drug-order.model";
 import { DrugOrdersService } from "src/app/shared/resources/order/services";
-import { Patient } from "src/app/shared/resources/patient/models/patient.model";
-import { Visit } from "src/app/shared/resources/visits/models/visit.model";
-import { loadActiveVisit } from "src/app/store/actions/visit.actions";
 import { AppState } from "src/app/store/reducers";
-import { getLocationsByTagName } from "src/app/store/selectors";
 import { Dropdown } from "../../modules/form/models/dropdown.model";
 import { Textbox } from "../../modules/form/models/text-box.model";
 import { ICARE_CONFIG } from "../../resources/config";
@@ -49,6 +42,8 @@ export class GeneralDispensingFormComponent implements OnInit {
   @Input() generalPrescriptionDoseConcept: any;
   @Input() generalPrescriptionFrequencyConcept: any;
   @Input() dosingFrequencies$: Observable<any>;
+  @Input() genericPrescriptionConceptUuids: any;
+  @Input() conceptFields$: Observable<any>;
 
   drugOrder: DrugOrderObject;
 
@@ -72,11 +67,15 @@ export class GeneralDispensingFormComponent implements OnInit {
   @Output() drugRoutesSettingsEvent: EventEmitter<any> = new EventEmitter();
   @Output() generalPrescriptionFrequencyConceptEvent: EventEmitter<any> =
     new EventEmitter();
+  @Output() genericPrescriptionConceptUuidsEvent: EventEmitter<any> =
+    new EventEmitter();
 
   @Output() showCloseDialog: EventEmitter<boolean> =
     new EventEmitter<boolean>();
   @Output() updateConsultationOrder = new EventEmitter();
   @Output() orderSaved: EventEmitter<boolean> = new EventEmitter<boolean>();
+  genericPrescriptionField: Textbox;
+  conceptFieldsMap: any[];
 
   constructor(
     private drugOrderService: DrugOrdersService,
@@ -93,6 +92,10 @@ export class GeneralDispensingFormComponent implements OnInit {
       this.generalPrescriptionFrequencyConcept
     );
 
+    this.genericPrescriptionConceptUuidsEvent.emit(
+      this.genericPrescriptionConceptUuids
+    );
+
     this.drugConceptField = new Dropdown({
       id: "drug",
       key: "drug",
@@ -105,21 +108,6 @@ export class GeneralDispensingFormComponent implements OnInit {
       shouldHaveLiveSearchForDropDownFields: true,
     });
 
-    this.drugDoseField = new Textbox({
-      id: "dose",
-      key: "dose",
-      label: "Dose",
-      required: true,
-      type: "number",
-    });
-
-    this.drugDurationField = new Textbox({
-      id: "duration",
-      key: "duration",
-      label: "Duration",
-      required: true,
-      type: "number",
-    });
   }
 
   onFormUpdate(formValues: FormValue): void {
@@ -127,7 +115,7 @@ export class GeneralDispensingFormComponent implements OnInit {
     this.formValues = { ...this.formValues, ...formValues.getValues() };
   }
 
-  saveOrder(e: any) {
+  saveOrder(e: any, conceptFields: any) {
     this.savingOrder = true;
     let encounterObject = {
       patient: this.currentPatient?.id,
@@ -156,67 +144,39 @@ export class GeneralDispensingFormComponent implements OnInit {
       visit: this.currentVisit?.uuid,
     };
 
-    const obs = [
-      {
+    const obs = conceptFields.map((conceptField) => {
+      return {
         person: this.currentPatient?.id,
-        concept: this.generalPrescriptionFrequencyConcept,
+        concept: conceptField?.uuid,
         obsDatetime: new Date(),
-        value: this.formValues["frequency"].value,
-      },
-      {
-        person: this.currentPatient?.id,
-        concept: this.generalPrescriptionDoseConcept,
-        obsDatetime: new Date(),
-        value: this.formValues["dose"].value.toString(),
-      },
-      {
-        person: this.currentPatient?.id,
-        concept: this.generalPrescriptionDurationConcept,
-        obsDatetime: new Date(),
-        value: this.formValues["duration"].value.toString(),
-      },
-      {
-        person: this.currentPatient?.id,
-        concept: this.durationUnitsSettings,
-        obsDatetime: new Date(),
-        value: this.formValues["durationUnit"].value,
-      },
-      {
-        person: this.currentPatient?.id,
-        concept: this.dosingUnitsSettings,
-        obsDatetime: new Date(),
-        value: this.formValues["dosingUnit"].value,
-      },
-      {
-        person: this.currentPatient?.id,
-        concept: this.drugRoutesSettings,
-        obsDatetime: new Date(),
-        value: this.formValues["route"].value,
-      },
-    ];
+        value: this.formValues[conceptField?.uuid].value,
+      };
+    });
 
-    this.ordersService
-      .createOrdersViaCreatingEncounter(encounterObject)
-      .subscribe((response) => {
-        if (response?.uuid) {
-          let data = {
-            encounterUuid: response?.uuid,
-            obs: obs.filter((observation) => {
-              if (observation.value && observation.value.length > 0) {
-                return observation;
-              }
-            }),
-          };
-          this.observationService
-            .saveObservationsViaEncounter(data)
-            .subscribe((res) => {
-              if (res) {
-                this.savingOrder = false;
-                this.orderSaved.emit(true);
-              }
-            });
-        }
-      });
+    console.log("==> Obs: ", obs)
+    
+    // this.ordersService
+    //   .createOrdersViaCreatingEncounter(encounterObject)
+    //   .subscribe((response) => {
+    //     if (response?.uuid) {
+    //       let data = {
+    //         encounterUuid: response?.uuid,
+    //         obs: obs.filter((observation) => {
+    //           if (observation.value && observation.value.length > 0) {
+    //             return observation;
+    //           }
+    //         }),
+    //       };
+    //       this.observationService
+    //         .saveObservationsViaEncounter(data)
+    //         .subscribe((res) => {
+    //           if (res) {
+    //             this.savingOrder = false;
+    //             this.orderSaved.emit(true);
+    //           }
+    //         });
+    //     }
+    //   });
 
     this.updateConsultationOrder.emit();
   }
