@@ -282,14 +282,25 @@ export class DispensingFormComponent implements OnInit {
             (errorResponse?.error?.message || "")
               .replace("[", "")
               .replace("]", "");
-          this.errors = [
-            ...this.errors,
-            {
-              error: {
-                message: errorResponse?.error?.message || errorResponse?.message || "Error occured",
+          if(errorResponse?.message){
+            this.errors = [
+              ...this.errors,
+              {
+                error: {
+                  message: errorResponse?.message || "Unknown error occured",
+                },
               },
-            },
-          ];
+            ];
+          } else {
+            this.errors = [
+              ...this.errors,
+              errorResponse.error || {
+                error: {
+                  message: "Unknown error occured",
+                }
+              }
+            ];
+          }
           // this.dialogRef.close(true);
           this.savingOrderSuccess = false;
         }
