@@ -11,6 +11,8 @@ import { AddNewGenericDrugModalComponent } from "../../modals/add-new-generic-dr
 })
 export class GenericDrugsListComponent implements OnInit {
   drugConcepts$: Observable<any[]>;
+  page: number = 1;
+  pageCount = 10;
   constructor(
     private conceptsService: ConceptsService,
     private dialog: MatDialog
@@ -23,7 +25,7 @@ export class GenericDrugsListComponent implements OnInit {
   getDrugsConcepts(): void {
     this.drugConcepts$ = this.conceptsService.getConceptsByParameters({
       searchingText: "ICARE_GENERIC_DRUG",
-      page: 1,
+      page: this.page,
       pageSize: 10,
     });
   }
@@ -36,10 +38,23 @@ export class GenericDrugsListComponent implements OnInit {
     // event.stopPropagation();
   }
 
+  onGetList(event: Event, actionType: string): void {
+    event.stopPropagation();
+    this.page = actionType == "next" ? this.page + 1 : this.page - 1;
+    this.getDrugsConcepts();
+  }
+
   onAddNew(event: Event): void {
     event.stopPropagation();
-    this.dialog.open(AddNewGenericDrugModalComponent, {
-      width: "50%",
-    });
+    this.dialog
+      .open(AddNewGenericDrugModalComponent, {
+        width: "50%",
+      })
+      .afterClosed()
+      .subscribe((shouldReload) => {
+        if (shouldReload) {
+          this.getDrugsConcepts();
+        }
+      });
   }
 }
