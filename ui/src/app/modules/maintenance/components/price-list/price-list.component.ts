@@ -191,7 +191,12 @@ export class PriceListComponent implements OnInit, OnChanges {
   }
 
   onSaveItem(itemPrice): void {
-    this.store.dispatch(saveItemPrice({ itemPrice }));
+    // this.store.dispatch(saveItemPrice({ itemPrice }));
+    this.pricingService.saveItemPrice(itemPrice).subscribe((response) => {
+      if (response && !response?.error) {
+        this.loadData();
+      }
+    });
   }
 
   onFormUpdate(

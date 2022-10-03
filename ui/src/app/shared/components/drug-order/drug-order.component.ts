@@ -9,7 +9,7 @@ import {
 } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { find } from "lodash";
-import { Observable, zip } from "rxjs";
+import { Observable, of, zip } from "rxjs";
 import { catchError, map } from "rxjs/operators";
 import { AppState } from "src/app/store/reducers";
 import { getProviderDetails } from "src/app/store/selectors/current-user.selectors";
@@ -82,42 +82,44 @@ export class DrugOrderComponent implements OnInit, AfterViewInit {
 
     this.loadingMetadata = true;
 
-    this.drugOrderFormsMetadata$ = this.drugOrderService.getDrugOrderMetadata(
-      this.drugOrder,
-      this.locations,
-      this.fromDispensing,
-      this.drugOrder,
-      {
-        dosingUnitsSettings: this.dosingUnitsSettings,
-        durationUnitsSettings: this.durationUnitsSettings,
-        drugRoutesSettings: this.drugRoutesSettings,
-        generalPrescriptionDurationConcept:
-          this.generalPrescriptionDurationConcept,
-        generalPrescriptionDoseConcept: this.generalPrescriptionDoseConcept,
-        generalPrescriptionFrequencyConcept:
-          this.generalPrescriptionFrequencyConcept,
-        fromDispensing: this.fromDispensing,
-      }
-    ).pipe(
-      map((response) => {
-        if(response?.error){
-          this.errors = [
-            ...this.errors,
-            response.error
-          ]
+    this.drugOrderFormsMetadata$ = this.drugOrderService
+      .getDrugOrderMetadata(
+        this.drugOrder,
+        this.locations,
+        this.fromDispensing,
+        this.drugOrder,
+        {
+          dosingUnitsSettings: this.dosingUnitsSettings,
+          durationUnitsSettings: this.durationUnitsSettings,
+          drugRoutesSettings: this.drugRoutesSettings,
+          generalPrescriptionDurationConcept:
+            this.generalPrescriptionDurationConcept,
+          generalPrescriptionDoseConcept: this.generalPrescriptionDoseConcept,
+          generalPrescriptionFrequencyConcept:
+            this.generalPrescriptionFrequencyConcept,
+          fromDispensing: this.fromDispensing,
         }
-        if(response === 'null' || !response){
-          this.errors = [
-            ...this.errors, 
-            {
-              error: {
-                message: 'Missing drug order forms metadata! Please contact IT'
-              }
-            }
-          ]
-        }
-      })
-    );
+      )
+      .pipe(
+        map((response) => {
+          if (response?.error) {
+            this.errors = [...this.errors, response.error];
+          }
+          if (response === "null" || !response) {
+            this.errors = [
+              ...this.errors,
+              {
+                error: {
+                  message:
+                    "Missing drug order forms metadata! Please contact IT",
+                },
+              },
+            ];
+          }
+
+          return response;
+        })
+      );
 
     this.provider$ = this.store.pipe(select(getProviderDetails));
     this.dispensingLocations$ = this.store.select(getLocationsByTagName, {

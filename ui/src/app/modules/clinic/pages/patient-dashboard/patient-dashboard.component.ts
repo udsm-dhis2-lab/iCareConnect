@@ -73,6 +73,7 @@ export class PatientDashboardComponent implements OnInit {
               },
             ];
           }
+          return response;
         })
       );
     this.iCareClinicConfigurations$ = this.systemSettingsService
@@ -93,6 +94,7 @@ export class PatientDashboardComponent implements OnInit {
               },
             ];
           }
+          return response;
         })
       );;
     const patientId = this.route.snapshot.params["patientID"];
