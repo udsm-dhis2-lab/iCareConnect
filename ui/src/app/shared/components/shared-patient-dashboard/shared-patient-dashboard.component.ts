@@ -226,7 +226,7 @@ export class SharedPatientDashboardComponent implements OnInit {
       );
     this.generalPrescriptionOrderType$ =
       this.systemSettingsService.getSystemSettingsByKey(
-        "iCare.clinic.prescription.orderType"
+        "iCare.clinic.genericPrescription.orderType"
       );
     this.useGeneralPrescription$ =
       this.systemSettingsService.getSystemSettingsByKey(
