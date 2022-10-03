@@ -26,6 +26,7 @@ import { DrugsService } from "../../resources/drugs/services/drugs.service";
 import { OrdersService } from "../../resources/order/services/orders.service";
 import { flatten, keyBy } from "lodash";
 import { VisitsService } from "../../resources/visits/services";
+import { LocationService } from "src/app/core/services";
 
 @Component({
   selector: "app-dispension-form",
@@ -76,6 +77,7 @@ export class DispensingFormComponent implements OnInit {
     private conceptsService: ConceptsService,
     private store: Store<AppState>,
     private visitService: VisitsService,
+    private locationService: LocationService,
     @Inject(MAT_DIALOG_DATA)
     public data: {
       drugOrder: any;
@@ -110,9 +112,8 @@ export class DispensingFormComponent implements OnInit {
   ngOnInit() {
     this.getVisitByUuid(this.data?.visit?.uuid);
     this.drugOrder = this.data?.drugOrder;
-    this.dispensingLocations$ = this.store.pipe(
-      select(getLocationsByTagName, { tagName: "Dispensing Unit" })
-    );
+    this.dispensingLocations$ =
+      this.locationService.getLocationsByTagName("Dispensing+Unit");
 
     this.generalPrescriptionEncounterType$ =
       this.systemSettingsService.getSystemSettingsByKey(
