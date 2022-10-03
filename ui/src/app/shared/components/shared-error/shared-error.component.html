@@ -1,7 +1,7 @@
 <ng-container *ngIf="errors.length > 0">
   <div *ngFor="let error of errors; let errorIndex = index">
     <div
-      class="alert alert-danger alert-dismissible fade show mt-2"
+      class="alert alert-{{ alertType }} alert-dismissible fade show mt-2"
       role="alert"
       *ngIf="error?.error"
     >
@@ -10,10 +10,11 @@
         class="close"
         data-dismiss="alert"
         aria-label="Close"
+        (click)="onCloseError($event, errorIndex)"
       >
         <span aria-hidden="true">&times;</span>
       </button>
-      <p class="text-left">
+      <p class="text-left"> {{ errorIndex + 1 }}. 
         {{ error?.error?.message }}
         {{ error?.error?.code ? "(" + error?.error?.code + ")" : "" }}
         <span
@@ -37,7 +38,7 @@
     <div *ngIf="error?.error?.globalErrors;">
       <ng-container *ngFor="let globalError of error?.error?.globalErrors; let globalErrorIndex = index">
         <div
-          class="alert alert-danger alert-dismissible fade show mt-2"
+          class="alert alert-{{ alertType }} alert-dismissible fade show mt-2"
           role="alert"
         >
           <button
@@ -45,10 +46,11 @@
             class="close"
             data-dismiss="alert"
             aria-label="Close"
+            (click)="onCloseError($event, errorIndex, globalErrorIndex)"
           >
             <span aria-hidden="true">&times;</span>
           </button>
-          <p class="text-left">
+          <p class="text-left"> {{ errorIndex + 1 }}.{{ globalErrorIndex + 1 }} 
             {{ globalError?.message }}
             {{
               globalError?.code && globalError?.code !== globalError?.message

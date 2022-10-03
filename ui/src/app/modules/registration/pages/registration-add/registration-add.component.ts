@@ -87,7 +87,7 @@ export class RegistrationAddComponent implements OnInit {
   relationTypeOptions$: Observable<any>;
   selectedIdFormat: string;
   errors: any[] = [];
-  // fakeErrors: any[] = [
+  // errors: any[] = [
   //   {
   //     error: {
   //       message: "Invalid Submission",
@@ -97,6 +97,20 @@ export class RegistrationAddComponent implements OnInit {
   //           code: "Identifier 12345 already in use by another patient",
   //           message: "Identifier 12345 already in use by another patient",
   //           detail: "This is the test detail for global error 1"
+  //         },
+  //       ],
+  //       fieldErrors: {},
+  //     },
+  //   },
+  //   {
+  //     error: {
+  //       message: "Invalid Submission 2",
+  //       code: "webservices.rest.error.invalid.submission 2",
+  //       globalErrors: [
+  //         {
+  //           code: "Identifier 12345 already in use by another patient 2",
+  //           message: "Identifier 12345 already in use by another patient 2",
+  //           detail: "This is the test detail for global error 2"
   //         },
   //       ],
   //       fieldErrors: {},
@@ -257,29 +271,32 @@ export class RegistrationAddComponent implements OnInit {
     this.patient.maritalStatus =
       formValues[
         this.registrationFormConfigsKeyedByProperty["maritalStatus"]?.value
-      ].value;
+      ]?.value;
     this.patient.religion =
       formValues[
         this.registrationFormConfigsKeyedByProperty["religion"]?.value
-      ].value;
+      ]?.value;
     this.patient.education =
       formValues[
         this.registrationFormConfigsKeyedByProperty["education"]?.value
-      ].value;
+      ]?.value;
     this.patient["areaLeader"] =
       formValues[
         this.registrationFormConfigsKeyedByProperty["areaLeaderName"]?.value
-      ].value;
+      ]?.value;
     this.patient["areaLeaderNumber"] =
       formValues[
         this.registrationFormConfigsKeyedByProperty["areaLeaderNumber"]?.value
-      ].value;
+      ]?.value;
 
-    if (this.registrationFormConfigsKeyedByProperty["occupation"]?.value) {
+    if (
+      this.registrationFormConfigsKeyedByProperty["occupation"] &&
+      this.registrationFormConfigsKeyedByProperty["occupation"]?.value
+    ) {
       this.patient["occupation"] =
         formValues[
           this.registrationFormConfigsKeyedByProperty["occupation"]?.value
-        ].value;
+        ]?.value;
     }
   }
 
@@ -314,7 +331,6 @@ export class RegistrationAddComponent implements OnInit {
       "referenceKeyPart"
     );
     this.store.dispatch(clearActiveVisit());
-
     this.genderOptions$ = this.conceptService.getConceptDetailsByUuid(
       this.genderOptionsConceptUuid,
       "custom:(uuid,display,names,answers:(uuid,display,names,mappings))"

@@ -1,15 +1,15 @@
-import { Component, Inject, OnInit } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { Store } from '@ngrx/store';
-import { go } from 'src/app/store/actions';
-import { updateVisit } from 'src/app/store/actions/visit.actions';
-import { AppState } from 'src/app/store/reducers';
-import { VisitsService } from '../../resources/visits/services';
+import { Component, Inject, OnInit } from "@angular/core";
+import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
+import { Store } from "@ngrx/store";
+import { go } from "src/app/store/actions";
+import { updateVisit } from "src/app/store/actions/visit.actions";
+import { AppState } from "src/app/store/reducers";
+import { VisitsService } from "../../resources/visits/services";
 
 @Component({
-  selector: 'app-discharge-patient-modal',
-  templateUrl: './discharge-patient-modal.component.html',
-  styleUrls: ['./discharge-patient-modal.component.scss'],
+  selector: "app-discharge-patient-modal",
+  templateUrl: "./discharge-patient-modal.component.html",
+  styleUrls: ["./discharge-patient-modal.component.scss"],
 })
 export class DischargePatientModalComponent implements OnInit {
   visitDetails: any;
@@ -27,15 +27,15 @@ export class DischargePatientModalComponent implements OnInit {
   ngOnInit(): void {
     this.dischargeObjects = {
       visitDetails: {
-        location: '6351fcf4-e311-4a19-90f9-35667d99a8af',
+        location: "6351fcf4-e311-4a19-90f9-35667d99a8af",
         uuid: this.visitDetails?.uuid,
       },
       encounterDetails: {
-        patient: this.visitDetails?.patient['uuid'],
+        patient: this.visitDetails?.patient["uuid"],
         location: this.visitDetails?.location?.uuid,
         visit: this.visitDetails?.uuid,
         provider: this.visitDetails?.provider?.uuid,
-        encounterType: '181820aa-88c9-479b-9077-af92f5364329',
+        encounterType: "181820aa-88c9-479b-9077-af92f5364329",
       },
     };
   }
@@ -55,9 +55,10 @@ export class DischargePatientModalComponent implements OnInit {
             })
           );
           setTimeout(() => {
-            this.store.dispatch(go({ path: ['/inpatient'] }));
+            this.store.dispatch(go({ path: ["/inpatient"] }));
           }, 200);
         }
       });
+    this.dialogRef.close(true);
   }
 }
