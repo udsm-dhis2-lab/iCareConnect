@@ -1,8 +1,5 @@
-SET @row_number = 0;
 SELECT
- (@row_number:=@row_number + 1) AS NAMBA,
 CONCAT(pn.given_name,' ',pn.family_name) AS `JINA LA MGONJWA`,
--- p.birthdate AS FAILINO,
 GROUP_CONCAT(DISTINCT CASE WHEN p.gender='M' THEN 'Me'  ELSE 'Ke' END) AS `JINSIA YA MGONJWA`,
 DATE_FORMAT(FROM_DAYS(DATEDIFF(v.date_started, p.birthdate)), '%Y') + 0 AS UMRI,
 pa.address1 AS `MAHALI ANAISHI`,
@@ -13,8 +10,8 @@ GROUP_CONCAT(DISTINCT CASE WHEN test_result_concept_name.name IS NULL THEN ob.va
 GROUP_CONCAT(DISTINCT CASE WHEN ed.certainty='CONFIRMED' THEN diagnosis_concept_name.name ELSE NULL END) AS `CONFIRMED DIAGNOSIS`,
 GROUP_CONCAT(DISTINCT d.name) AS `MATIBABU`,
 GROUP_CONCAT(DISTINCT result_encounter_type.name) AS `MATOKEO YA MWISHO`,
-v.date_stopped AS `TAREHE YA MATOKEO YA MWISHO`
--- GROUP_CONCAT(DISTINCT CASE WHEN vat.name='PaymentCategory' THEN payment_concept_name.name ELSE '' END)AS `MALIPO`
+v.date_stopped AS `TAREHE YA MATOKEO YA MWISHO`,
+GROUP_CONCAT(DISTINCT CASE WHEN vat.name='PaymentCategory' THEN payment_concept_name.name ELSE NULL END)AS `MALIPO`
 from visit v
 
 -- Addressing names and address
@@ -54,9 +51,13 @@ AND (result_encounter_type.encounter_type_id =1 OR result_encounter_type.encount
  LEFT JOIN concept visit_attribute_concept ON va.value_reference=visit_attribute_concept.uuid
  LEFT JOIN concept_name payment_concept_name ON payment_concept_name.concept_id=visit_attribute_concept.concept_id
 
+ -- ADDRESSING IPD ENCOUNTER
+LEFT JOIN encounter visit_encounter ON visit_encounter.visit_id=v.visit_id
+INNER JOIN encounter_type visit_encounter_type ON visit_encounter.encounter_type=visit_encounter_type.encounter_type_id AND visit_encounter_type.encounter_type_id = 2
+
 -- ADDRESSING VISIT TYPE
 LEFT JOIN visit_type vt ON vt.visit_type_id=v.visit_type_id
 
-WHERE vt.name='IPD' AND (v.date_started BETWEEN '2022-04-10' AND '2022-09-12')
+WHERE (v.date_started BETWEEN :startDate AND :endDate)
 GROUP BY v.visit_id,CONCAT(pn.given_name,' ',pn.family_name),pa.address1
 ORDER BY v.date_started ASC
