@@ -287,7 +287,7 @@ export class DispensingFormComponent implements OnInit {
               ...this.errors,
               {
                 error: {
-                  message: errorResponse?.message || "Unknown error occured",
+                  message: errorResponse?.message || "Error occurred while connecting to the server",
                 },
               },
             ];
@@ -296,7 +296,7 @@ export class DispensingFormComponent implements OnInit {
               ...this.errors,
               errorResponse.error || {
                 error: {
-                  message: "Unknown error occured",
+                  message: "Error occured while executing the command",
                 }
               }
             ];
