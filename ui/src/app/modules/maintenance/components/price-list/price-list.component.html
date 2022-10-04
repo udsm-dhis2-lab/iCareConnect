@@ -139,7 +139,7 @@
       <button
         [disabled]="currentPage == 0"
         mat-stroked-button
-        (click)="getAnotherList($event, 'prev')"
+        (click)="getAnotherList($event, 'prev', currentDepartmentId)"
       >
         Prev
       </button>
@@ -147,7 +147,7 @@
         [disabled]="params?.pricingItems && params?.pricingItems?.length < 25"
         class="ml-2"
         mat-stroked-button
-        (click)="getAnotherList($event, 'next')"
+        (click)="getAnotherList($event, 'next', currentDepartmentId)"
       >
         Next
       </button>
