@@ -80,8 +80,11 @@
               {{ drugOrder?.careSetting?.display }}
             </td>
             <td>
-              <button class="btn colored-button" (click)="onDispense(drugOrder)">
-                Dispense
+              <button
+                class="btn colored-button"
+                (click)="onVerify(drugOrder)"
+              >
+                Verify
               </button>
             </td>
           </tr>
