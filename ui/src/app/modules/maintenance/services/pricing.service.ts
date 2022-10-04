@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
-import { Observable } from "rxjs";
-import { map } from "rxjs/operators";
+import { Observable, of } from "rxjs";
+import { catchError, map } from "rxjs/operators";
 import { OpenmrsHttpClientService } from "src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service";
 import { ItemPrice, ItemPriceInterface } from "../models/item-price.model";
 import {
@@ -48,7 +48,7 @@ export class PricingService {
       .pipe(map((itemPriceResult) => itemPriceResult));
   }
 
-  createPricingItem(concept: any, drug: any): Observable<PricingItemInterface> {
+  createPricingItem(concept: any, drug: any): Observable<any> {
     const pricingItem = concept
       ? {
           concept: {
@@ -57,8 +57,9 @@ export class PricingService {
           unit: "Session",
         }
       : { drug: { uuid: drug.uuid }, unit: "Drug" };
-    return this.httpClient
-      .post("icare/item", pricingItem)
-      .pipe(map((res) => new PricingItem(res).toJson()));
+    return this.httpClient.post("icare/item", pricingItem).pipe(
+      map((res) => new PricingItem(res).toJson()),
+      catchError((error) => of(error))
+    );
   }
 }

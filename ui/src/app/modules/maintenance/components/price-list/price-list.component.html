@@ -1,3 +1,8 @@
+<!-- Alerts -->
+<div *ngIf="errors?.length > 0">
+  <app-shared-error [errors]="errors"></app-shared-error>
+</div>
+<!-- End Alerts -->
 <mat-card
   class="price-list-container"
   *ngIf="{
