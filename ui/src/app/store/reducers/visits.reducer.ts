@@ -1,5 +1,5 @@
-import { createReducer, on } from '@ngrx/store';
-import { initialVisitsState, visitsAdapter } from '../states';
+import { createReducer, on } from "@ngrx/store";
+import { initialVisitsState, visitsAdapter } from "../states";
 import {
   loadActiveVisits,
   addLoadedVisitsDetails,
@@ -12,12 +12,13 @@ import {
   loadingActiveVisitsWithLabOrdersFails,
   loadPatientsVisitDetailsByVisitUuids,
   addPatientVisitsDetails,
-} from '../actions';
+  clearVisitsDatesParameters,
+} from "../actions";
 import {
   loadingBaseState,
   loadedBaseState,
   errorBaseState,
-} from '../states/base.state';
+} from "../states/base.state";
 
 const reducer = createReducer(
   initialVisitsState,
@@ -33,6 +34,10 @@ const reducer = createReducer(
     error,
     ...errorBaseState,
     ...loadedBaseState,
+  })),
+  on(clearVisitsDatesParameters, (state) => ({
+    ...state,
+    parameters: null,
   })),
   on(setVisitsParameters, (state, { parameters }) => ({
     ...state,
