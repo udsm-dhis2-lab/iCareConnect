@@ -8,7 +8,8 @@
     additionalPatientInformation: additionalPatientInformation$ | async,
     occupationInfo: occupationInfo$ | async,
     relationTypeOptions: relationTypeOptions$ | async,
-    showPatientType: showPatientType$ | async
+    showPatientType: showPatientType$ | async,
+    residenceDetailsLocation: residenceDetailsLocation$ | async
   } as params"
 >
   <h2>{{ editMode ? "Edit Patient" : "Register New Patient" }}</h2>
@@ -338,37 +339,130 @@
           <div class="col-sm-3">
             <label for="">Contact Details</label>
           </div>
-          <div class="col-sm-6">
+          <div class="col-sm-9">
             <app-form
               [fields]="[primaryPhoneNumberFormField]"
               (formUpdate)="onPrimaryMobileNumberFormUpdate($event)"
             ></app-form>
 
-            <!-- options with input form field -->
-            <!--       <mat-form-field>
-              <mat-label>Residence</mat-label>
-              <mat-select (click)="addOption.disabled = true">
-                <mat-option
-                  *ngFor="let region of regions"
-                  [value]="region"
+            <!-- residence location options with input form field -->
+            <div class="d-flex mt-1">
+              <mat-form-field appearance="fill">
+                <mat-label>Region</mat-label>
+                <mat-select
+                  (click)="addOption.disabled = true"
+                  [(ngModel)]="patient['region']"
                 >
-                  {{ regions.name }}
-                </mat-option>
-                <mat-option [value]="newreg">{{ newreg }}</mat-option>
+                  <mat-option
+                    *ngFor="
+                      let location of params?.residenceDetailsLocation
+                        ?.childLocations;
+                      let regionindex = index
+                    "
+                    [value]="location.display"
+                    (click)="onSelectRegion($event, regionindex)"
+                  >
+                    {{ location.display }}
+                  </mat-option>
+                  <mat-option [value]="newreg">{{ newreg }}</mat-option>
+                  <mat-option #addOption>
+                    <mat-form-field>
+                      <mat-label>Add New Region</mat-label>
+                      <input
+                        matInput
+                        #newCat
+                        type="text"
+                        [(ngModel)]="newreg"
+                      />
+                      <mat-icon (click)="addOption.disabled = false" matSuffix
+                        >done_outline</mat-icon
+                      >
+                    </mat-form-field>
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+              <!-- District -->
+              <mat-form-field class="ml-1" appearance="fill">
+                <mat-label>District</mat-label>
+                <mat-select
+                  (click)="addOption2.disabled = true"
+                  [(ngModel)]="patient['district']"
+                >
+                  <mat-option
+                    *ngFor="
+                      let location of params?.residenceDetailsLocation
+                        ?.childLocations[regionindex]?.childLocations;
+                      let index = index
+                    "
+                    [value]="location.display"
+                    (click)="onSelectDistrict($event, index)"
+                  >
+                    {{ location.display }}
+                  </mat-option>
+                  <mat-option [value]="newDistrict">{{
+                    newDistrict
+                  }}</mat-option>
 
-                <mat-option #addOption>
-                  <mat-form-field>
-                    <mat-label>New Region</mat-label>
-                    <input matInput #newCat type="text" [(ngModel)]="newreg" />
-                    <mat-icon (click)="addOption.disabled = false" matSuffix
-                      >done_outline</mat-icon
-                    >
-                  </mat-form-field>
-                </mat-option>
-              </mat-select>
-            </mat-form-field> -->
+                  <mat-option #addOption2>
+                    <mat-form-field>
+                      <mat-label>Add New District</mat-label>
+                      <input
+                        matInput
+                        #newCat
+                        type="text"
+                        [(ngModel)]="newDistrict"
+                      />
+                      <mat-icon (click)="addOption2.disabled = false" matSuffix
+                        >done_outline</mat-icon
+                      >
+                    </mat-form-field>
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+              <!-- End of District -->
+              <!-- Area of Residence -->
+              <mat-form-field class="ml-1" appearance="fill">
+                <mat-label>Area Of Residence</mat-label>
+                <mat-select
+                  (click)="addOption3.disabled = true"
+                  [(ngModel)]="patient['village']"
+                >
+                  <mat-option
+                    *ngFor="
+                      let location of params?.residenceDetailsLocation
+                        ?.childLocations[regionindex]?.childLocations[
+                        districtindex
+                      ]?.childLocations;
+                      let index = index
+                    "
+                    [value]="location.display"
+                  >
+                    {{ location.display }}
+                  </mat-option>
+                  <mat-option [value]="newArea">{{ newArea }}</mat-option>
 
-            <div class="mt-3" *ngIf="showMoreContactDetails">
+                  <mat-option #addOption3>
+                    <mat-form-field>
+                      <mat-label>Add New Area </mat-label>
+                      <input
+                        matInput
+                        #newCat
+                        type="text"
+                        [(ngModel)]="newArea"
+                      />
+                      <mat-icon (click)="addOption3.disabled = false" matSuffix
+                        >done_outline</mat-icon
+                      >
+                    </mat-form-field>
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <!-- End of Area of Residence-->
+
+            <!--End of residence location options with input form field -->
+
+            <!-- <div class="mt-3" *ngIf="showMoreContactDetails">
               <div class="d-flex">
                 <div>
                   <mat-form-field appearance="fill" class="w-100">
@@ -420,15 +514,14 @@
                 </div>
               </div>
 
-              <!-- end of next of kin -->
-            </div>
+            </div> -->
 
-            <a
+            <!-- <a
               id="showMoreDetailsToggle"
               class="text-primary"
               (click)="onToggleOtherContactDetails($event)"
               >{{ showMoreContactDetails ? "Less" : "More" }} contact details</a
-            >
+            > -->
           </div>
         </div>
         <!-- end of contact details -->
@@ -602,11 +695,14 @@
                   [disabled]="addingPatient && !patientAdded"
                 />
               </mat-form-field>
-
-              <app-form
-                [fields]="[primaryPhoneNumberNextOfKinFormField]"
-                (formUpdate)="onPrimaryMobileNumberNextOfKinFormUpdate($event)"
-              ></app-form>
+              <div class="d-flex">
+                <app-form
+                  [fields]="[primaryPhoneNumberNextOfKinFormField]"
+                  (formUpdate)="
+                    onPrimaryMobileNumberNextOfKinFormUpdate($event)
+                  "
+                ></app-form>
+              </div>
 
               <!-- <mat-form-field appearance="fill" class="w-100">
                 <mat-label>Contact number</mat-label>
