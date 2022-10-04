@@ -416,6 +416,7 @@ export class DispensingFormComponent implements OnInit {
               {
                 error: {
                   message: errorResponse?.message || "Error occurred while connecting to the server",
+                  detail: errorResponse?.error || ''
                 },
               },
             ];
