@@ -42,13 +42,20 @@
 
     <div style="text-align: right">
       <button mat-stroked-button (click)="onCancel($event)">Cancel</button>
-      <button
+      <!-- <button
         id="btn-exemption-confirmed"
         class="ml-2 bg-success text-white"
         mat-flat-button
         color="primary"
         (click)="onSave($event)"
         [disabled]="!formValue?.isValid"
+      > -->
+      <button
+        id="btn-exemption-confirmed"
+        class="ml-2 bg-success text-white"
+        mat-flat-button
+        color="primary"
+        (click)="onSave($event)"
       >
         Save
       </button>
