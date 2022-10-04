@@ -3313,7 +3313,7 @@ export interface ConceptCreate {
   allowDecimal?: string;
   displayPrecision?: string;
   conceptClass: string;
-  descriptions?: string[];
+  descriptions?: any[];
   mappings?: string[];
 }
 

@@ -15,7 +15,6 @@ import { StandardError } from "../../models/error-type.models";
 })
 export class SharedErrorComponent implements OnInit {
   @Input() errors: error[];
-  @Input() alertType?: 'danger' | 'warning' | 'info' | 'success';
 
   toggleIndex?: string;
   /**
@@ -38,7 +37,6 @@ export class SharedErrorComponent implements OnInit {
   constructor() {}
 
   ngOnInit() {
-    this.alertType = this.alertType ? this.alertType: 'danger';
   }
 
   typeof(error) {
@@ -106,4 +104,5 @@ export class SharedErrorComponent implements OnInit {
 
 interface error {
   error: StandardError;
+  type?: "danger" | "warning" | "info" | "success";
 }
