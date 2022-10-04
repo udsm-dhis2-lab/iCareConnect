@@ -6,7 +6,8 @@
     additionalClientInformationConceptUuid:
       additionalClientInformationConceptUuid$ | async,
     relationShipTypesConceptUuid: relationShipTypesConceptUuid$ | async,
-    genderOptionsConceptUuid: genderOptionsConceptUuid$ | async
+    genderOptionsConceptUuid: genderOptionsConceptUuid$ | async,
+    residenceDetailsLocationUuid: residenceDetailsLocationUuid$ | async
   } as params"
 >
   <app-registration-add
@@ -16,7 +17,8 @@
       params?.occupationConceptUuid &&
       params?.additionalClientInformationConceptUuid &&
       params?.relationShipTypesConceptUuid &&
-      params?.genderOptionsConceptUuid
+      params?.genderOptionsConceptUuid &&
+      params?.residenceDetailsLocationUuid
     "
     [registrationMRNSourceReference]="params?.registrationMRNSourceReference"
     [registrationFormConfigs]="params?.registrationFormConfigs"
@@ -26,6 +28,7 @@
     "
     [relationShipTypesConceptUuid]="params?.relationShipTypesConceptUuid"
     [genderOptionsConceptUuid]="params?.genderOptionsConceptUuid"
+    [residenceDetailsLocationUuid]="params?.residenceDetailsLocationUuid"
   ></app-registration-add>
 
   <div
