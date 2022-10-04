@@ -23,6 +23,7 @@ export class ConceptsFormComponent implements OnInit {
     if (this.conceptFields?.length > 0) {
       this.conceptFields = orderBy(this.conceptFields, ['order'], ['asc'])
       this.conceptFieldsMap = this.conceptFields?.map((conceptField) => {
+        // TODO: Handle min/max values in numeric fields
         if (
           conceptField?.setMembers?.length === 0 &&
           conceptField?.answers.length === 0 &&
