@@ -56,8 +56,7 @@ export class ConceptsFormComponent implements OnInit {
         }
         if (
           conceptField?.setMembers?.length > 0 &&
-          conceptField?.answers.length === 0 &&
-          conceptField?.datatype?.display?.toLowerCase() === "coded"
+          conceptField?.answers.length === 0
         ) {
           return new Dropdown({
             id: conceptField?.uuid,
