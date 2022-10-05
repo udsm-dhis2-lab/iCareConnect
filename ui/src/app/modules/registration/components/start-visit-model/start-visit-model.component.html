@@ -99,7 +99,15 @@
           <span>Update Authorization</span>
         </ng-template>
         <div class="p-2" *ngIf="selectedTab.value === 1">
+          <div
+            class="alert alert-warning"
+            role="alert"
+            *ngIf="!params?.currentPatientVisit"
+          >
+            Update can only be done for client with active visit
+          </div>
           <app-update-visit-attribute
+            *ngIf="params?.currentPatientVisit"
             [patient]="patient"
           ></app-update-visit-attribute>
         </div>
@@ -119,7 +127,15 @@
           <span>Update Consultation Room </span>
         </ng-template>
         <div class="p-2" *ngIf="selectedTab.value === 3">
+          <div
+            class="alert alert-warning"
+            role="alert"
+            *ngIf="!params?.currentPatientVisit"
+          >
+            Update can only be done for client with active visit
+          </div>
           <app-update-doctors-room
+            *ngIf="params?.currentPatientVisit"
             [currentVisit]="params?.currentPatientVisit"
             [patient]="patient"
             [treatmentLocations]="params?.treatmentLocations"
