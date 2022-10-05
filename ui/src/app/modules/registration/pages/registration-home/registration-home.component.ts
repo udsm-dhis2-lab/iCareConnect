@@ -82,23 +82,10 @@ export class RegistrationHomeComponent implements OnInit {
       noDataLabel: "No Registered patients",
     });
 
-    //== This is how to use the selector from store selectors==
-    //this.treatmentLocations$ = this.store.select(getAllTreatmentLocations);
-    /*  this.patientSummary$.subscribe((data) => {
-      this.allPatients = data.allPatients;
-      this.allactiveVisits = data.activeVisits;
-      if (data?.locations?.length > 0) {
-        data.locations.forEach((location) => {
-          if (location?.tags[0]?.name === "Treatment Room") {
-            this.roomData.push({
-              name: location.name,
-              activePatients: location.activePatients,
-            });
-          }
-        });
-      }
-    }); */
+    this.getPatientsStatsSummary();
+  }
 
+  getPatientsStatsSummary(): void {
     this.patientSummary$ = this.patentService.getPatientSummary();
   }
 
@@ -192,6 +179,7 @@ export class RegistrationHomeComponent implements OnInit {
       .subscribe((visitDetails) => {
         if (visitDetails && !visitDetails?.close) {
           // TODO: Review the logics here
+          this.getPatientsStatsSummary();
           this.loadingData = true;
           setTimeout(() => {
             this.loadingData = false;
@@ -209,6 +197,7 @@ export class RegistrationHomeComponent implements OnInit {
           //     }, 100);
           //   });
         } else {
+          this.getPatientsStatsSummary();
           this.loadingData = true;
           setTimeout(() => {
             this.loadingData = false;
