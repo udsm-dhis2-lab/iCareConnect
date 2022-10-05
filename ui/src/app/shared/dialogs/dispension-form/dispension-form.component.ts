@@ -94,9 +94,7 @@ export class DispensingFormComponent implements OnInit {
       location: any;
       encounterUuid: string;
     }
-  ) {
-    // console.log("data disp", data);
-  }
+  ) {}
 
   get isValid(): boolean {
     return (
@@ -116,88 +114,74 @@ export class DispensingFormComponent implements OnInit {
   ngOnInit() {
     this.getVisitByUuid(this.data?.visit?.uuid);
     this.drugOrder = this.data?.drugOrder;
-    this.dispensingLocations$ =
-      this.locationService.getLocationsByTagName("Dispensing+Unit").pipe(
+    this.dispensingLocations$ = this.locationService
+      .getLocationsByTagName("Dispensing+Unit")
+      .pipe(
         map((response) => {
-          return response
+          return response;
         })
       );
 
-    this.generalPrescriptionEncounterType$ =
-      this.systemSettingsService.getSystemSettingsByKey(
-        "iCare.clinic.genericPrescription.encounterType"
-      ).pipe(
+    this.generalPrescriptionEncounterType$ = this.systemSettingsService
+      .getSystemSettingsByKey("iCare.clinic.genericPrescription.encounterType")
+      .pipe(
         map((response) => {
-          if(response?.error){
-            this.errors = [
-              ...this.errors,
-              response.error
-            ]
+          if (response?.error) {
+            this.errors = [...this.errors, response.error];
           }
-          if(response === 'none'){
+          if (response === "none") {
             this.errors = [
               ...this.errors,
               {
                 error: {
-                  message: "Generic Prescription EncounterType Config is missing, Set 'iCare.clinic.genericPrescription.encounterType' or Contact IT",
-                }
+                  message:
+                    "Generic Prescription EncounterType Config is missing, Set 'iCare.clinic.genericPrescription.encounterType' or Contact IT",
+                },
               },
             ];
           }
-          return response
+          return response;
         })
       );
-    this.generalPrescriptionOrderType$ =
-      this.systemSettingsService.getSystemSettingsByKey(
-        "iCare.clinic.genericPrescription.orderType"
-      ).pipe(
+    this.generalPrescriptionOrderType$ = this.systemSettingsService
+      .getSystemSettingsByKey("iCare.clinic.genericPrescription.orderType")
+      .pipe(
         map((response) => {
-          if(response?.error){
-            this.errors = [
-              ...this.errors,
-              response.error
-            ]
+          if (response?.error) {
+            this.errors = [...this.errors, response.error];
           }
-          if(response === 'none'){
+          if (response === "none") {
             this.errors = [
               ...this.errors,
               {
                 error: {
                   message:
                     "Generic Prescription OrderType Config is missing, Set 'iCare.clinic.genericPrescription.orderType' or Contact IT",
-                }
+                },
               },
             ];
           }
-          return response
+          return response;
         })
       );
-    this.useGeneralPrescription$ =
-      this.systemSettingsService.getSystemSettingsByKey(
-        "iCare.clinic.useGeneralPrescription"
-      ).pipe(
+    this.useGeneralPrescription$ = this.systemSettingsService
+      .getSystemSettingsByKey("iCare.clinic.useGeneralPrescription")
+      .pipe(
         map((response) => {
-          if(response?.error){
-            this.errors = [
-              ...this.errors,
-              response.error
-            ]
+          if (response?.error) {
+            this.errors = [...this.errors, response.error];
           }
-          return response
+          return response;
         })
       );
-    this.dosingUnitsSettings$ =
-      this.systemSettingsService.getSystemSettingsByKey(
-        "order.drugDosingUnitsConceptUuid"
-      ).pipe(
+    this.dosingUnitsSettings$ = this.systemSettingsService
+      .getSystemSettingsByKey("order.drugDosingUnitsConceptUuid")
+      .pipe(
         map((response) => {
-          if(response?.error){
-            this.errors = [
-              ...this.errors,
-              response.error
-            ]
+          if (response?.error) {
+            this.errors = [...this.errors, response.error];
           }
-          return response
+          return response;
         })
       );
     this.genericPrescriptionConceptUuids$ = this.systemSettingsService
@@ -210,74 +194,54 @@ export class DispensingFormComponent implements OnInit {
           return response;
         })
       );
-    this.durationUnitsSettings$ =
-      this.systemSettingsService.getSystemSettingsByKey(
-        "order.durationUnitsConceptUuid"
-      ).pipe(
+    this.durationUnitsSettings$ = this.systemSettingsService
+      .getSystemSettingsByKey("order.durationUnitsConceptUuid")
+      .pipe(
         map((response) => {
-          if(response?.error){
-            this.errors = [
-              ...this.errors,
-              response.error
-            ]
+          if (response?.error) {
+            this.errors = [...this.errors, response.error];
           }
-          return response
+          return response;
         })
       );
-    this.drugRoutesSettings$ =
-      this.systemSettingsService.getSystemSettingsByKey(
-        "order.drugRoutesConceptUuid"
-      ).pipe(
+    this.drugRoutesSettings$ = this.systemSettingsService
+      .getSystemSettingsByKey("order.drugRoutesConceptUuid")
+      .pipe(
         map((response) => {
-          if(response?.error){
-            this.errors = [
-              ...this.errors,
-              response.error
-            ]
+          if (response?.error) {
+            this.errors = [...this.errors, response.error];
           }
-          return response
+          return response;
         })
       );
-    this.generalPrescriptionDurationConcept$ =
-      this.systemSettingsService.getSystemSettingsByKey(
-        "iCare.clinic.prescription.duration"
-      ).pipe(
+    this.generalPrescriptionDurationConcept$ = this.systemSettingsService
+      .getSystemSettingsByKey("iCare.clinic.prescription.duration")
+      .pipe(
         map((response) => {
-          if(response?.error){
-            this.errors = [
-              ...this.errors,
-              response.error
-            ]
+          if (response?.error) {
+            this.errors = [...this.errors, response.error];
           }
-          return response
+          return response;
         })
       );
-    this.generalPrescriptionDoseConcept$ =
-      this.systemSettingsService.getSystemSettingsByKey(
-        "iCare.clinic.prescription.dose"
-      ).pipe(
+    this.generalPrescriptionDoseConcept$ = this.systemSettingsService
+      .getSystemSettingsByKey("iCare.clinic.prescription.dose")
+      .pipe(
         map((response) => {
-          if(response?.error){
-            this.errors = [
-              ...this.errors,
-              response.error
-            ]
+          if (response?.error) {
+            this.errors = [...this.errors, response.error];
           }
-          return response
+          return response;
         })
       );
-    this.generalPrescriptionFrequencyConcept$ =
-      this.systemSettingsService.getSystemSettingsByKey(
-        "iCare.clinic.prescription.frequency"
-      ).pipe(
+    this.generalPrescriptionFrequencyConcept$ = this.systemSettingsService
+      .getSystemSettingsByKey("iCare.clinic.prescription.frequency")
+      .pipe(
         map((response) => {
-          if(response?.error){
-            this.errors = [
-              ...this.errors,
-              response.error
-            ]
+          if (response?.error) {
+            this.errors = [...this.errors, response.error];
           }
-          return response
+          return response;
         })
       );
     this.currentPatient$ = this.store.pipe(select(getCurrentPatient));
@@ -378,7 +342,11 @@ export class DispensingFormComponent implements OnInit {
         : JSON.parse(localStorage.getItem("patientConsultation"))[
             "encounterUuid"
           ],
-      patientUuid: order?.patientUuid || this.data?.patientUuid,
+      patientUuid: this.data?.patient
+        ? this.data?.patient?.uuid
+        : order?.patientUuid
+        ? order?.patientUuid
+        : this.data?.patientUuid,
     };
     // console.log("this.data?.drugOrder", this.data?.drugOrder);
     this.drugOrderService
@@ -410,13 +378,15 @@ export class DispensingFormComponent implements OnInit {
             (errorResponse?.error?.message || "")
               .replace("[", "")
               .replace("]", "");
-          if(errorResponse?.message){
+          if (errorResponse?.message) {
             this.errors = [
               ...this.errors,
               {
                 error: {
-                  message: errorResponse?.message || "Error occurred while connecting to the server",
-                  detail: errorResponse?.error || ''
+                  message:
+                    errorResponse?.message ||
+                    "Error occurred while connecting to the server",
+                  detail: errorResponse?.error || "",
                 },
               },
             ];
@@ -426,8 +396,8 @@ export class DispensingFormComponent implements OnInit {
               errorResponse.error || {
                 error: {
                   message: "Error occured while executing the command",
-                }
-              }
+                },
+              },
             ];
           }
           // this.dialogRef.close(true);
@@ -470,34 +440,34 @@ export class DispensingFormComponent implements OnInit {
       `custom:(uuid,name,conceptClass:(uuid,display),setMembers:(uuid,display),answers:(uuid,display)`
     );
   }
-  
+
   getDrugsByConceptUuid(conceptUuid: string) {
     this.drugsToBeDispensed$ =
-    this.drugsService.getDrugsUsingConceptUuid(conceptUuid);
+      this.drugsService.getDrugsUsingConceptUuid(conceptUuid);
   }
-  
-  getConceptsAsFields(genericFieldsConcepts){
-    console.log("==> Vizia Orderl: ",genericFieldsConcepts);
+
+  getConceptsAsFields(genericFieldsConcepts) {
+    console.log("==> Vizia Orderl: ", genericFieldsConcepts);
     this.conceptFields$ = zip(
       ...genericFieldsConcepts.map((conceptSetting) =>
-        this.conceptsService.getConceptDetailsByUuid(
-          conceptSetting?.value,
-          `custom:(uuid,display,name,datatype,set,conceptClass:(uuid,display),setMembers:(uuid,display),answers:(uuid,display)`
-        ).pipe(map((response) => {
-          if(response?.error){
-            this.errors = [
-              ...this.errors,
-              response.error
-            ]
-          }
-          return {
-            ...response,
-            order: conceptSetting?.order
-          }
-        }))
+        this.conceptsService
+          .getConceptDetailsByUuid(
+            conceptSetting?.value,
+            `custom:(uuid,display,name,datatype,set,conceptClass:(uuid,display),setMembers:(uuid,display),answers:(uuid,display)`
+          )
+          .pipe(
+            map((response) => {
+              if (response?.error) {
+                this.errors = [...this.errors, response.error];
+              }
+              return {
+                ...response,
+                order: conceptSetting?.order,
+              };
+            })
+          )
       )
     );
-    
   }
 
   onCloseDialog(closeDialog: boolean): void {
