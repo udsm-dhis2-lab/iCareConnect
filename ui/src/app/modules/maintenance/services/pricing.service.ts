@@ -23,7 +23,7 @@ export class PricingService {
           filterInfo?.conceptSet && !filterInfo?.isDrug
             ? "&department=" + filterInfo?.conceptSet
             : ""
-        }${filterInfo?.isDrug ? "&type=DRUG" : "&type=CONCEPT"}`
+        }${filterInfo?.isDrug ? "&type=DRUG" : ""}`
       )
       .pipe(
         map((itemsResponse) =>
