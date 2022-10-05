@@ -245,8 +245,16 @@
       <mat-progress-bar mode="indeterminate"></mat-progress-bar>
     </div>
     <div class="col-12 d-flex justify-content-end mt-2 mb-2">
-      <button mat-stroked-button color="primary" (click)="onSave($event)">
-        Save
+      <button mat-flat-button color="primary" (click)="onSave($event, true)">
+        Save to Reject
+      </button>
+      <button
+        mat-flat-button
+        color="primary"
+        class="ml-2"
+        (click)="onSave($event)"
+      >
+        Save & Continue
       </button>
     </div>
   </div>

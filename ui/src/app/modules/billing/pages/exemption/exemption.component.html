@@ -10,12 +10,13 @@
   } as params"
 >
   <mat-progress-bar
-    *ngIf="!params?.currentPatient"
+    *ngIf="!params?.currentPatient || !params?.exemptionConcept"
     mode="indeterminate"
   ></mat-progress-bar>
   <div class="row" *ngIf="params?.currentPatient && params?.bills">
     <div class="col-md-12">
       <app-new-patient-profile
+        *ngIf="params?.exemptionConcept"
         [currentPatient]="params?.currentPatient"
       ></app-new-patient-profile>
     </div>

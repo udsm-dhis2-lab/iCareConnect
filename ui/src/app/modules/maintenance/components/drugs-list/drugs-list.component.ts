@@ -1,6 +1,8 @@
 import { Component, Input, OnInit } from "@angular/core";
+import { MatDialog } from "@angular/material/dialog";
 import { Observable } from "rxjs";
 import { DrugsService } from "src/app/shared/resources/drugs/services/drugs.service";
+import { ManageDrugModalComponent } from "../../modals/manage-drug-modal/manage-drug-modal.component";
 
 @Component({
   selector: "app-drugs-list",
@@ -14,7 +16,8 @@ export class DrugsListComponent implements OnInit {
   limit: number = 10;
 
   page: number = 1;
-  constructor(private drugService: DrugsService) {}
+  searchingText: string;
+  constructor(private drugService: DrugsService, private dialog: MatDialog) {}
 
   ngOnInit(): void {
     this.getDrugs();
@@ -27,6 +30,8 @@ export class DrugsListComponent implements OnInit {
       this.drugs$ = this.drugService.getAllDrugs({
         startIndex: this.startIndex,
         limit: this.limit,
+        q: this.searchingText,
+        v: "custom:(uuid,display,strength,concept:(uuid,display))",
       });
     }
   }
@@ -36,5 +41,39 @@ export class DrugsListComponent implements OnInit {
     this.page = actionType === "next" ? this.page + 1 : this.page - 1;
     this.startIndex = this.limit * this.page - 1 + 1;
     this.getDrugs();
+  }
+
+  onSearch(event): void {
+    this.getDrugs();
+  }
+
+  onEdit(event: Event, drug): void {
+    this.dialog
+      .open(ManageDrugModalComponent, {
+        width: "40%",
+        data: {
+          ...drug,
+        },
+      })
+      .afterClosed()
+      .subscribe((shouldReloadData) => {
+        if (shouldReloadData) {
+          this.getDrugs();
+        }
+      });
+  }
+
+  onAddNew(event: Event): void {
+    event.stopPropagation();
+    this.dialog
+      .open(ManageDrugModalComponent, {
+        width: "40%",
+      })
+      .afterClosed()
+      .subscribe((shouldReloadData) => {
+        if (shouldReloadData) {
+          this.getDrugs();
+        }
+      });
   }
 }

@@ -15,6 +15,7 @@ export class RegisterNewClientHomeComponent implements OnInit {
   additionalClientInformationConceptUuid$: Observable<string>;
   relationShipTypesConceptUuid$: Observable<string>;
   genderOptionsConceptUuid$: Observable<string>;
+  residenceDetailsLocationUuid$: Observable<any>;
   constructor(
     private registrationService: RegistrationService,
     private systemSettingsService: SystemSettingsService
@@ -43,6 +44,10 @@ export class RegisterNewClientHomeComponent implements OnInit {
     this.genderOptionsConceptUuid$ =
       this.systemSettingsService.getSystemSettingsByKey(
         "iCare.registration.genderOptions.conceptUuid"
+      );
+    this.residenceDetailsLocationUuid$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        "icare.registration.form.contactInfo.residenceLocationUuid"
       );
   }
 }

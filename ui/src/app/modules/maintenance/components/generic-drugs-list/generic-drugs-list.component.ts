@@ -15,6 +15,7 @@ export class GenericDrugsListComponent implements OnInit {
   drugConcepts$: Observable<any[]>;
   page: number = 1;
   pageCount = 10;
+  searchingText: string;
   constructor(
     private conceptsService: ConceptsService,
     private dialog: MatDialog
@@ -24,11 +25,16 @@ export class GenericDrugsListComponent implements OnInit {
     this.getDrugsConcepts();
   }
 
+  onSearch(event): void {
+    this.getDrugsConcepts();
+  }
+
   getDrugsConcepts(): void {
-    this.drugConcepts$ = this.conceptsService.getConceptsByParameters({
-      searchingText: "ICARE_GENERIC_DRUG",
-      page: this.page,
-      pageSize: 10,
+    this.drugConcepts$ = this.conceptsService.searchConcept({
+      searchTerm: "ICARE_GENERIC_DRUG",
+      startIndex: (this.page - 1) * this.pageCount + 1,
+      limit: this.pageCount,
+      q: this.searchingText,
     });
   }
 

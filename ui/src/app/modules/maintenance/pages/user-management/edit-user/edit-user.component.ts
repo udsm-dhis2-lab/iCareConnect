@@ -489,7 +489,7 @@ export class EditUserComponent implements OnInit {
       roles: this.selectedRoles,
     };
 
-    if (this.check.value && this.passwordStrong) {
+    if (this?.check?.value && this?.passwordStrong) {
       editedUser.password = data.password;
     }
 

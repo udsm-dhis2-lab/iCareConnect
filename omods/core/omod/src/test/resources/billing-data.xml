@@ -137,6 +137,14 @@
     <patient patient_id="1000" creator="1" date_created="2016-08-19 15:58:32" voided="false" allergy_status="Unknown" />
     <patient patient_id="2000" creator="1" date_created="2016-09-07 11:44:23" voided="false" allergy_status="Unknown" />
 
+    <!-- Patient Identifier type -->
+    <patient_identifier_type patient_identifier_type_id="22" name="MRN"  creator="1" date_created="2016-09-07 11:44:23" required="false" retired="0" uuid="b1090031-0a93-4999-9185-3d28e4ac9b89"/>
+
+    <!-- Patient Identifier -->
+    <patient_identifier patient_identifier_id="122" patient_id="1000" identifier="110620-2/10891/21" identifier_type="22" preferred="true"
+                        location_id="1" creator="1" date_created="2016-12-28 11:54:56" voided="false" uuid="ae50cf5e-02bf-4380-9b64-f06b2f944458" />
+
+
     <obs obs_id="2000" person_id="2000" concept_id="1000" obs_datetime="2016-09-07 11:44:23" creator="1" date_created="2016-09-07 11:44:23" voided="false" uuid="b21bhsld-9ab1-4b57-8a89-c0bf25806644" status="FINAL"/>
 
     <!-- Care Settings -->
