@@ -81,6 +81,7 @@
           (orderSelectAction)="
             onSelectAction($event, params?.patientVisit, params.currentLocation)
           "
+          (loadPatientVisit)="getPatientVisit()"
         ></app-patient-generic-drug-order-list>
       </div>
 
