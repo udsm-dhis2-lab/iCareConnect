@@ -28,7 +28,7 @@
       </p>
       <div
         *ngIf="errorIndex.toString() === toggleIndex && error?.error?.detail"
-        class="mt-2"
+        class="mt-2 error-detail"
       >
         <p>{{ error?.error?.detail }}</p>
       </div>

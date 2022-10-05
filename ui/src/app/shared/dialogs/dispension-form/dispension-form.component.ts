@@ -93,6 +93,7 @@ export class DispensingFormComponent implements OnInit {
       visit: Visit;
       location: any;
       encounterUuid: string;
+      useGenericPrescription?: any;
     }
   ) {}
 
@@ -360,7 +361,39 @@ export class DispensingFormComponent implements OnInit {
       )
       .subscribe(
         (res) => {
-          this.savingOrder = false;
+          if(res?.message){
+            this.savingOrder = false;
+            this.errors = [
+              ...this.errors,
+              {
+                error: {
+                  message:
+                    res?.message ||
+                    "Error occurred while connecting to the server",
+                  detail: res?.stackTrace ? JSON.stringify(res?.stackTrace) : "",
+                },
+              },
+            ];
+          }
+          if(this.data?.useGenericPrescription && !res?.message) {
+            const genericOrderPayload = {
+              uuid: order?.uuid,
+              fulfillerStatus: "RECEIVED",
+              encounter: order?.encounter?.uuid,
+            };
+            this.orderService
+              .updateOrdersViaEncounter([genericOrderPayload])
+              .subscribe({
+                next: (order) => {
+                  this.savingOrder = false;
+                  return order;
+                },
+                error: (error) => {
+                  this.savingOrder = false;
+                  return error;
+                },
+              });
+          }
           this.savingOrderSuccess = true;
           this.savedOrder = new DrugOrder(res);
           // this.dialogRef.close({
@@ -368,8 +401,11 @@ export class DispensingFormComponent implements OnInit {
           //   drugOrder: this.savedOrder,
           // });
           this.store.dispatch(
-            loadActiveVisit({ patientId: this.data?.patientUuid })
+            loadActiveVisit({ patientId: this.data?.patient ? this.data?.patient?.uuid : this.data?.patientUuid })
           );
+          if (this.data?.useGenericPrescription && !res?.message) {
+            this.dialogRef.close();
+          }
         },
         (errorResponse) => {
           this.savingOrder = false;
@@ -400,7 +436,6 @@ export class DispensingFormComponent implements OnInit {
               },
             ];
           }
-          // this.dialogRef.close(true);
           this.savingOrderSuccess = false;
         }
       );
