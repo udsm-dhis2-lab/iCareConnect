@@ -381,7 +381,7 @@ export class SingleRegistrationComponent implements OnInit {
     this.formData = { ...this.formData, ...clinicalData };
   }
 
-  onSave(event: Event): void {
+  onSave(event: Event, forRejection?: boolean): void {
     event.stopPropagation();
     // Identify if tests ordered are well configured
 
@@ -1113,7 +1113,10 @@ export class SingleRegistrationComponent implements OnInit {
                                                                                   "200px",
                                                                                 width:
                                                                                   "30%",
-                                                                                data,
+                                                                                data: {
+                                                                                  ...data,
+                                                                                  forRejection,
+                                                                                },
                                                                                 disableClose:
                                                                                   false,
                                                                                 panelClass:

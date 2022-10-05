@@ -621,7 +621,7 @@ export class RegistrationAddComponent implements OnInit {
                       identifier: this.currentMRN,
                       identifierType: "26742868-a38c-4e6a-ac1d-ae283c414c2e",
                       location: currentLocation?.uuid,
-                      preferred: false,
+                      preferred: true,
                     },
                   ],
                 };

@@ -15,6 +15,13 @@ const routes: Routes = [
         component: NoLabAccessComponent,
       },
       {
+        path: "dashboard",
+        loadChildren: () =>
+          import("./modules/dashboard/dashboard.module").then(
+            (m) => m.DashboardModule
+          ),
+      },
+      {
         path: "sample-registration",
         loadChildren: () =>
           import(
@@ -67,7 +74,7 @@ const routes: Routes = [
         path: "sample-results-list",
         loadChildren: () =>
           import("./modules/sample-results/sample-results.module").then(
-            (m) => m.SampleResultsModule,
+            (m) => m.SampleResultsModule
           ),
       },
     ],

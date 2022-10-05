@@ -42,8 +42,12 @@
               <tr>
                 <th style="width: 15%">Test Parameter</th>
                 <th style="width: 5%">Container</th>
-                <th style="width: 5%">Label</th>
-                <th style="width: 15%">Ordered By</th>
+                <th style="width: 5%" *ngIf="!LISConfigurations?.isLIS">
+                  Label
+                </th>
+                <th style="width: 15%" *ngIf="!LISConfigurations?.isLIS">
+                  Ordered By
+                </th>
                 <th colspan="2">Results</th>
                 <th style="width: 5%">Action</th>
               </tr>
@@ -80,10 +84,10 @@
                         N/A
                       </span>
                     </td>
-                    <td>
+                    <td *ngIf="!LISConfigurations?.isLIS">
                       {{ item?.order?.orderNumber }}
                     </td>
-                    <td>
+                    <td *ngIf="!LISConfigurations?.isLIS">
                       {{ item?.order?.orderer?.name }}
                     </td>
                     <td colspan="2">
@@ -648,7 +652,7 @@
                                       colspan="4"
                                       class="text-center text-danger"
                                     >
-                                      No backlog data for this test
+                                      Audit Trail
                                       <br />
                                       <!-- {{ params?.currentSample | json }} -->
                                     </td>
@@ -1490,7 +1494,7 @@
                                       colspan="4"
                                       class="text-center text-danger"
                                     >
-                                      No backlog data for this test
+                                      Audit Trail
                                     </td>
                                   </tr>
                                 </ng-container>

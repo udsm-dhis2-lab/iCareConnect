@@ -311,4 +311,15 @@ export class ExemptionComponent implements OnInit, AfterContentInit {
   onShowActionButtons(e: any) {
     this.showActionButtons = true;
   }
+
+  backToExemptionList(e: Event){
+    e.stopPropagation();
+    this.store.dispatch(
+      go({
+        path: [
+          `/billing/exemption`
+        ],
+      })
+    );
+  }
 }

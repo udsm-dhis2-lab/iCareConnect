@@ -3,6 +3,7 @@ package org.openmrs.module.icare.laboratory.dao;
 // Generated Oct 7, 2020 12:49:21 PM by Hibernate Tools 5.2.10.Final
 
 import org.hibernate.Query;
+import org.openmrs.Drug;
 import org.openmrs.Patient;
 import org.openmrs.Person;
 import org.openmrs.Visit;
