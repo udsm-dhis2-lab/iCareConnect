@@ -2,23 +2,29 @@
   <div class="h5">Sample Rejection</div>
   <div class="rejection-reasons">
     <app-form
+      *ngIf="dialogData?.forRejection"
       [fields]="[rejectionReasonField]"
       (formUpdate)="onFormUpdate($event)"
     >
     </app-form>
   </div>
   <div class="w-100 d-flex justify-content-end mt-2">
-    <button mat-stroked-button (click)="onFinalize($event, 'continue')">
-      Continue
+    <button
+      *ngIf="!dialogData?.forRejection"
+      mat-stroked-button
+      (click)="onFinalize($event, 'continue')"
+    >
+      Done
     </button>
     <button
+      *ngIf="!dialogData?.forRejection"
       mat-stroked-button
       color="primary"
       [disabled]="!isFormValid"
       (click)="onFinalize($event, 'reject')"
       class="ml-2"
     >
-      Reject & Continue
+      Done
     </button>
   </div>
 </div>

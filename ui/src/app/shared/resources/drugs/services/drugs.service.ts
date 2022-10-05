@@ -3,7 +3,7 @@ import { from, Observable, of, zip } from "rxjs";
 import { catchError, map } from "rxjs/operators";
 import { OpenmrsHttpClientService } from "../../../modules/openmrs-http-client/services/openmrs-http-client.service";
 import { omit } from "lodash";
-import { Api, DrugGet, EncounterCreate } from "../../openmrs";
+import { Api, DrugCreate, DrugGet, EncounterCreate } from "../../openmrs";
 import { HttpErrorResponse } from "@angular/common/http";
 
 @Injectable({
@@ -36,6 +36,15 @@ export class DrugsService {
   }): Observable<DrugGet[]> {
     return from(this.API.drug.getAllDrugs(params)).pipe(
       map((response) => response),
+      catchError((error) => of(error))
+    );
+  }
+
+  createDrug(data: any): Observable<DrugGet> {
+    return from(this.API.drug.createDrug(data)).pipe(
+      map((response) => {
+        return response;
+      }),
       catchError((error) => of(error))
     );
   }

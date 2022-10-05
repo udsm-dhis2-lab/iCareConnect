@@ -55,8 +55,22 @@
               ? 'horizontal'
               : ''
           }}"
-          [ngClass]="{ 'full-width-chip mat-chip-list-stacked': params?.LISConfigurations?.isLIS }"
+          [ngClass]="{
+            'full-width-chip mat-chip-list-stacked':
+              params?.LISConfigurations?.isLIS
+          }"
         >
+          <mat-chip
+            class="w-20"
+            *ngIf="params?.privileges && params?.LISConfigurations?.isLIS"
+            (click)="changeRoute($event, 'dashboard', false)"
+            routerLinkActive="active-route"
+            [ngClass]="{
+              'active-route': currentRoutePath === 'dashboard'
+            }"
+          >
+            Dashboard
+          </mat-chip>
           <mat-chip
             class="w-20"
             *ngIf="
@@ -115,7 +129,7 @@
               params?.privileges['Sample Acceptance and Results']
             "
           >
-            Sample Acceptance & Results
+            Sample Testing & Results
           </mat-chip>
           <mat-chip
             *ngIf="params?.LISConfigurations?.isLIS"
@@ -171,7 +185,7 @@
           'col-12': !params?.LISConfigurations?.isLIS
         }"
       >
-        <div class="w-100 no-print" *ngIf="showDate">
+        <div class="w-100 no-print d-flex justify-content-end" *ngIf="showDate">
           <mat-form-field appearance="fill" floatLabel="always">
             <mat-label>Select a date range</mat-label>
             <mat-date-range-input [rangePicker]="visitDatePicker">
