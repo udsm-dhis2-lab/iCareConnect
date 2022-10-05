@@ -1,4 +1,6 @@
-<div>
+<div *ngIf="{
+  exemptionOrderType: orderType$ | async
+} as params">
   <div class="border">
     <mat-toolbar>
       <button mat-icon-button [routerLink]="''" matTooltip="Go to Home page">
@@ -8,7 +10,7 @@
     </mat-toolbar>
     <mat-progress-bar
       mode="indeterminate"
-      *ngIf="loading"
+      *ngIf="loading || !params?.exemptionOrderType"
     ></mat-progress-bar>
     <!-- patient list -->
     <div class="mat-elevation-z1" *ngIf="visitsLength > 0">
