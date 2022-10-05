@@ -3,7 +3,20 @@
     mode="indeterminate"
     *ngIf="!params?.drugConcepts"
   ></mat-progress-bar>
-  <div class="concepts-drugs-list" *ngIf="params?.drugConcepts">
+  <div class="d-flex">
+    <mat-form-field class="w-50 mt-2">
+      <mat-label>Search</mat-label>
+      <mat-icon matPrefix>search</mat-icon
+      ><input
+        type="text"
+        placeholder="Search generic drug"
+        matInput
+        (keyup)="onSearch($event)"
+        [(ngModel)]="searchingText"
+      />
+    </mat-form-field>
+  </div>
+  <div class="concepts-drugs-list mb-2" *ngIf="params?.drugConcepts">
     <!-- TODO: Show errors accordingly -->
     <table class="table">
       <thead>

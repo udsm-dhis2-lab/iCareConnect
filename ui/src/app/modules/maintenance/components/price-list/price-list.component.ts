@@ -77,6 +77,7 @@ export class PriceListComponent implements OnInit, OnChanges {
   priceListDepartments$: Observable<any[]>;
   selectedPriceListDepartment: any;
   errors: any[] = [];
+  isDrug: boolean = false;
 
   constructor(
     private dialog: MatDialog,
@@ -108,6 +109,7 @@ export class PriceListComponent implements OnInit, OnChanges {
           startIndex: 0,
           searchTerm: null,
           conceptSet: this.currentDepartmentId,
+          isDrug: this.isDrug,
         },
       })
     );
@@ -276,6 +278,7 @@ export class PriceListComponent implements OnInit, OnChanges {
           startIndex: this.currentPage,
           searchTerm: this.itemSearchTerm,
           conceptSet: departmentId,
+          isDrug: this.isDrug,
         },
       })
     );
@@ -304,6 +307,7 @@ export class PriceListComponent implements OnInit, OnChanges {
 
   getSelectedDepartment(event: MatSelectChange): void {
     this.selectedPriceListDepartment = event?.value;
+    this.isDrug = event?.value == "Drug";
     this.currentDepartmentId = this.selectedPriceListDepartment?.uuid;
     this.loadData();
   }
