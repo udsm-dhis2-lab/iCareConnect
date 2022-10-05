@@ -30,10 +30,7 @@
   </div>
   <mat-toolbar color="primary">
     <span>Drug Order </span
-    ><span *ngIf="data?.patient">
-      - {{ data?.patient?.identifier }} - {{ data?.patient?.age }} -
-      {{ data?.patient?.gender }}</span
-    >
+    ><span *ngIf="data?.patient?.display"> - {{ data?.patient?.display }}</span>
     <span class="toolbar-spacer"></span>
     <button mat-icon-button mat-dialog-close matTooltip="close">
       <mat-icon>close</mat-icon>
@@ -112,7 +109,7 @@
                 params?.drugRoutesSettings &&
                 params?.generalPrescriptionDurationConcept &&
                 params?.generalPrescriptionDoseConcept &&
-                params?.generalPrescriptionFrequencyConcept && 
+                params?.generalPrescriptionFrequencyConcept &&
                 params?.genericPrescriptionConceptUuids
               "
             >
@@ -123,7 +120,9 @@
                 (generalPrescriptionFrequencyConceptEvent)="
                   getDosingFrequencies($event)
                 "
-                (genericPrescriptionConceptUuidsEvent)="getConceptsAsFields($event)"
+                (genericPrescriptionConceptUuidsEvent)="
+                  getConceptsAsFields($event)
+                "
                 [encounterType]="params?.generalPrescriptionEncounterType"
                 [orderType]="params?.generalPrescriptionOrderType"
                 [currentPatient]="params?.currentPatient"
@@ -137,7 +136,9 @@
                 [durationUnits$]="durationUnits$"
                 [drugRoutes$]="drugRoutes$"
                 [dosingFrequencies$]="dosingFrequencies$"
-                [genericPrescriptionConceptUuid]="params?.genericPrescriptionConceptUuid"
+                [genericPrescriptionConceptUuid]="
+                  params?.genericPrescriptionConceptUuid
+                "
                 [generalPrescriptionDurationConcept]="
                   params?.generalPrescriptionDurationConcept
                 "
@@ -147,7 +148,9 @@
                 [generalPrescriptionFrequencyConcept]="
                   params?.generalPrescriptionFrequencyConcept
                 "
-                [genericPrescriptionConceptUuids]="params?.genericPrescriptionConceptUuids"
+                [genericPrescriptionConceptUuids]="
+                  params?.genericPrescriptionConceptUuids
+                "
                 [conceptFields$]="conceptFields$"
                 (updateConsultationOrder)="onUpdateConsultationOrder()"
                 (orderSaved)="onOrderSaved($event, params?.currentVisit)"
@@ -157,8 +160,9 @@
           <div
             class="col-7"
             *ngIf="
-              ((params?.useGeneralPrescription &&
-                params?.useGeneralPrescription === 'false') || !params?.useGeneralPrescription) ||
+              (params?.useGeneralPrescription &&
+                params?.useGeneralPrescription === 'false') ||
+              !params?.useGeneralPrescription ||
               data?.fromDispensing
             "
           >
@@ -188,7 +192,8 @@
                 [drugRoutesSettings]="params?.drugRoutesSettings"
                 [generalPrescriptionDurationConcept]="
                   params?.generalPrescriptionDurationConcept
-                "z
+                "
+                z
                 [generalPrescriptionDoseConcept]="
                   params?.generalPrescriptionDoseConcept
                 "

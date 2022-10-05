@@ -127,7 +127,7 @@ export class PatientGenericDrugOrderListComponent implements OnInit {
       disableClose: true,
       data: {
         drugOrder: order,
-        patient: this.visit?.patient,
+        patient: this.visit?.visit?.patient,
         visit: this.visit,
         location: this.currentLocation,
         encounterUuid: this.encounterUuid,

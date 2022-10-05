@@ -60,6 +60,7 @@ export class PatientMedicationSummaryComponent implements OnInit {
       disableClose: true,
       data: {
         drugOrder: null,
+        patient: this.patientVisit.patient,
         patientUuid: this.patientVisit?.patientUuid,
         visit: this.patientVisit,
         location: localStorage.getItem("currentLocation")
