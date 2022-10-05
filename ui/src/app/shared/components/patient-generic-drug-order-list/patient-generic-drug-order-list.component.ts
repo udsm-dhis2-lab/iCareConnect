@@ -15,6 +15,7 @@ import { OrdersService } from "../../resources/order/services/orders.service";
 import { Visit } from "../../resources/visits/models/visit.model";
 
 import { flatten, keyBy } from "lodash";
+import { loadActiveVisit } from "src/app/store/actions/visit.actions";
 
 @Component({
   selector: "app-patient-generic-drug-order-list",
@@ -45,10 +46,51 @@ export class PatientGenericDrugOrderListComponent implements OnInit {
   drugOrdersKeyedByEncounter: any = {};
 
   @Output() orderSelectAction = new EventEmitter<TableSelectAction>();
+  @Output() loadPatientVisit = new EventEmitter<any>();
 
-  constructor(private dialog: MatDialog, private store: Store<AppState>) {}
+  constructor(
+    private dialog: MatDialog,
+    private store: Store<AppState>,
+    private ordersService: OrdersService
+  ) {}
 
   ngOnInit() {
+    this.getDrugOrders();
+
+    this.visitLoadingState$ = this.store.select(getVisitLoadingState);
+    this.tableConfig = new TableConfig({ noDataLabel: "No prescription" });
+    this.drugOrderColumns = [
+      {
+        id: "orderNumber",
+        label: "#",
+      },
+      {
+        id: "display",
+        label: "Item",
+      },
+      {
+        id: "orderedBy",
+        label: "Ordered by",
+      },
+      {
+        id: "quantity",
+        label: "Quantity",
+      },
+      {
+        id: "price",
+        label: "Price",
+      },
+      {
+        id: "paymentStatus",
+        label: "Status",
+      },
+    ];
+    this.isThereDiagnosisProvided$ = this.store.select(
+      getIfThereIsAnyDiagnosisInTheCurrentActiveVisit
+    );
+  }
+
+  getDrugOrders() {
     this.drugOrders = flatten(
       this.visit?.encounters
         ?.map((encounter) => {
@@ -87,38 +129,6 @@ export class PatientGenericDrugOrderListComponent implements OnInit {
     this.drugOrders = this.drugOrders?.filter(
       (order) => !this.drugOrdersKeyedByEncounter[order?.encounter?.uuid]
     );
-
-    this.visitLoadingState$ = this.store.select(getVisitLoadingState);
-    this.tableConfig = new TableConfig({ noDataLabel: "No prescription" });
-    this.drugOrderColumns = [
-      {
-        id: "orderNumber",
-        label: "#",
-      },
-      {
-        id: "display",
-        label: "Item",
-      },
-      {
-        id: "orderedBy",
-        label: "Ordered by",
-      },
-      {
-        id: "quantity",
-        label: "Quantity",
-      },
-      {
-        id: "price",
-        label: "Price",
-      },
-      {
-        id: "paymentStatus",
-        label: "Status",
-      },
-    ];
-    this.isThereDiagnosisProvided$ = this.store.select(
-      getIfThereIsAnyDiagnosisInTheCurrentActiveVisit
-    );
   }
 
   onVerify(order: any) {
@@ -133,7 +143,15 @@ export class PatientGenericDrugOrderListComponent implements OnInit {
         encounterUuid: this.encounterUuid,
         fromDispensing: true,
         showAddButton: false,
+        useGenericPrescription: this.useGenericPrescription,
       },
+    });
+
+    dialog.afterClosed().subscribe(() => {
+      // this.store.dispatch(
+      //   loadActiveVisit({ patientId: this.visit?.visit?.patient?.uuid })
+      // );
+      this.loadPatientVisit.emit();
     });
   }
 }
