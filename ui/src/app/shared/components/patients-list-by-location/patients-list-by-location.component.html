@@ -1,4 +1,17 @@
-<div class="p-4">
+<div class="row pl-4">
+  <div class="col-12">
+    <button
+      class="float-left mt-4"
+      mat-stroked-button
+      (click)="onClick($event, '/registration/home')"
+      matTooltip="Go to Home page"
+    >
+      <mat-icon>arrow_back</mat-icon>
+      Back
+    </button>
+  </div>
+</div>
+<div class="pl-4 pr-4">
   <app-patient-list
     [isTabularList]="false"
     [itemsPerPage]="10"

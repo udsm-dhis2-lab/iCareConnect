@@ -13,7 +13,6 @@
   } as params"
 >
   <h2>{{ editMode ? "Edit Patient" : "Register New Patient" }}</h2>
-
   <mat-progress-bar
     *ngIf="loadingForm || !params?.showPatientType"
     mode="indeterminate"
