@@ -44,6 +44,8 @@ export class StartVisitModelComponent implements OnInit {
   currentVisitLoadedState$: Observable<boolean>;
   currentPatientVisit$: Observable<any>;
 
+  startingVisit: boolean = false;
+
   constructor(
     private store: Store<AppState>,
     private visitService: VisitsService,
@@ -103,7 +105,15 @@ export class StartVisitModelComponent implements OnInit {
   }
 
   onStartVisit() {
-    this.dialogRef.close();
-    this.store.dispatch(go({ path: ["/registration/home"] }));
+    this.startingVisit = true;
+    this.store.select(getActiveVisit).subscribe((response) => {
+      if (response) {
+        this.startingVisit = false;
+        setTimeout(() => {
+          this.dialogRef.close();
+          this.store.dispatch(go({ path: ["/registration/home"] }));
+        }, 200);
+      }
+    });
   }
 }
