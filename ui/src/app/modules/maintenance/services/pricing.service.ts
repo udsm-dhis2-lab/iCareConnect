@@ -20,8 +20,10 @@ export class PricingService {
         `icare/item?limit=${filterInfo?.limit}&startIndex=${
           filterInfo?.limit * filterInfo?.startIndex
         }${filterInfo?.searchTerm ? "&q=" + filterInfo?.searchTerm : ""}${
-          filterInfo?.conceptSet ? "&department=" + filterInfo?.conceptSet : ""
-        }`
+          filterInfo?.conceptSet && !filterInfo?.isDrug
+            ? "&department=" + filterInfo?.conceptSet
+            : ""
+        }${filterInfo?.isDrug ? "&type=DRUG" : "&type=CONCEPT"}`
       )
       .pipe(
         map((itemsResponse) =>
