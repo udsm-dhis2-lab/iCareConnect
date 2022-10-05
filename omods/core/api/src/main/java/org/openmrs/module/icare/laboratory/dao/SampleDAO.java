@@ -3,6 +3,7 @@ package org.openmrs.module.icare.laboratory.dao;
 // Generated Oct 7, 2020 12:49:21 PM by Hibernate Tools 5.2.10.Final
 
 import org.hibernate.Query;
+import org.openmrs.Drug;
 import org.openmrs.Patient;
 import org.openmrs.Person;
 import org.openmrs.Visit;
@@ -68,7 +69,7 @@ public class SampleDAO extends BaseDAO<Sample> {
 	
 	public ListResult<Sample> getSamples(Date startDate, Date endDate, Pager pager, String locationUuid,
 	        String sampleCategory, String testCategory) {
-		
+
 		DbSession session = this.getSession();
 		String queryStr = "SELECT sp \n" + "FROM Sample sp \n";
 		
