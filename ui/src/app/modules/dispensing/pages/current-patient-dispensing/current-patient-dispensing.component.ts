@@ -104,9 +104,9 @@ export class CurrentPatientDispensingComponent implements OnInit {
     this.getPatientVisit();
   }
 
-  private getPatientVisit() {
+  getPatientVisit() {
     this.loading = true;
-
+    console.log("==> loading patients")
     this.patientVisit$ = this.visitService
       .getActiveVisit(this.patientId, false)
       .pipe(

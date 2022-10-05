@@ -5,3 +5,9 @@
     color: #8b8c8f !important;
     cursor: pointer;
 }
+
+.error-detail {
+    height: 60vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
