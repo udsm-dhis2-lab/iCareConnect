@@ -16,7 +16,12 @@ import {
 import { VisitsService } from "../../../../shared/resources/visits/services";
 import { AppState } from "src/app/store/reducers";
 import { getCurrentLocation } from "src/app/store/selectors";
-import { go, loadCurrentPatient } from "src/app/store/actions";
+import {
+  clearCurrentPatient,
+  go,
+  loadCurrentPatient,
+} from "src/app/store/actions";
+import { clearActiveVisit } from "src/app/store/actions/visit.actions";
 
 @Component({
   selector: "app-exemption-home",
@@ -102,6 +107,33 @@ export class ExemptionHomeComponent implements OnInit {
       },
     });
 
+    this.getExemptionVisits();
+  }
+
+  getVisits(orderType) {
+    return this.visitService
+      .getAllVisits(
+        null,
+        false,
+        false,
+        null,
+        0,
+        10,
+        orderType?.value,
+        null,
+        null,
+        this.orderBy ? this.orderBy : "ENCOUNTER",
+        this.orderByDirection ? this.orderByDirection : "ASC",
+        this.filterBy ? this.filterBy : ""
+      )
+      .pipe(
+        tap(() => {
+          this.loadingVisits = false;
+        })
+      );
+  }
+
+  getExemptionVisits() {
     //Get order type
     this.orderType$ = this.systemSettingsService
       .getSystemSettingsMatchingAKey("icare.billing.exemption.orderType")
@@ -131,43 +163,12 @@ export class ExemptionHomeComponent implements OnInit {
     });
   }
 
-  getVisits(orderType) {
-    return this.visitService
-      .getAllVisits(
-        null,
-        false,
-        false,
-        null,
-        0,
-        10,
-        orderType?.value,
-        null,
-        null,
-        this.orderBy ? this.orderBy : "ENCOUNTER",
-        this.orderByDirection ? this.orderByDirection : "ASC",
-        this.filterBy ? this.filterBy : ""
-      )
-      .pipe(
-        tap(() => {
-          this.loadingVisits = false;
-        })
-      );
-  }
-
-  onSelectVisit(visit: Visit) {
-    this.loading = true
-    //Delay to buy time before displaying data to grab the current clicked visit
-    setTimeout(() => {
-      this.store.dispatch(
-        loadCurrentPatient({
-          uuid: visit.patientUuid,
-          isRegistrationPage: false,
-        })
-      );
-      this.loading = false
-      this.store.dispatch(
-        go({ path: [`/billing/${visit.patientUuid}/exempt`] })
-      );
-    }, 500);
+  onSelectVisit(visit: any): void {
+    this.store.dispatch(clearCurrentPatient());
+    this.store.dispatch(clearActiveVisit());
+    this.loading = true;
+    this.store.dispatch(
+      go({ path: [`/billing/${visit?.patientUuid}/exempt`] })
+    );
   }
 }

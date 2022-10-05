@@ -1,0 +1,7 @@
+<div *ngIf="{ datesParameters: datesParameters$ | async } as params">
+  <h2>NPHL Dashboard</h2>
+  <app-dashboard
+    *ngIf="params?.datesParameters"
+    [datesParams]="params?.datesParameters"
+  ></app-dashboard>
+</div>

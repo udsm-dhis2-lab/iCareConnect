@@ -1,3 +1,8 @@
+<!-- Alerts -->
+<div *ngIf="errors?.length > 0">
+  <app-shared-error [errors]="errors"></app-shared-error>
+</div>
+<!-- End Alerts -->
 <mat-card
   class="price-list-container"
   *ngIf="{
@@ -30,10 +35,14 @@
     </button>
   </div>
 
-  <div *ngIf="params?.priceListDepartments" class="w-100">
+  <div
+    *ngIf="params?.priceListDepartments"
+    class="w-100 d-flex justify-content-between mt-3"
+  >
     <mat-form-field class="w-25">
       <mat-label>Depatments</mat-label>
       <mat-select (selectionChange)="getSelectedDepartment($event)">
+        <mat-option [value]="'Drug'">Drugs</mat-option>
         <mat-option
           *ngFor="let department of params?.priceListDepartments"
           [value]="department"
@@ -41,6 +50,25 @@
         >
       </mat-select>
     </mat-form-field>
+    <div class="w-75">
+      <div class="d-flex justify-content-end mb-2">
+        <button
+          [disabled]="currentPage == 0"
+          mat-stroked-button
+          (click)="getAnotherList($event, 'prev', currentDepartmentId)"
+        >
+          Prev
+        </button>
+        <button
+          [disabled]="params?.pricingItems && params?.pricingItems?.length < 25"
+          class="ml-2"
+          mat-stroked-button
+          (click)="getAnotherList($event, 'next', currentDepartmentId)"
+        >
+          Next
+        </button>
+      </div>
+    </div>
   </div>
 
   <!-- loading section -->
@@ -134,7 +162,7 @@
       <button
         [disabled]="currentPage == 0"
         mat-stroked-button
-        (click)="getAnotherList($event, 'prev')"
+        (click)="getAnotherList($event, 'prev', currentDepartmentId)"
       >
         Prev
       </button>
@@ -142,7 +170,7 @@
         [disabled]="params?.pricingItems && params?.pricingItems?.length < 25"
         class="ml-2"
         mat-stroked-button
-        (click)="getAnotherList($event, 'next')"
+        (click)="getAnotherList($event, 'next', currentDepartmentId)"
       >
         Next
       </button>

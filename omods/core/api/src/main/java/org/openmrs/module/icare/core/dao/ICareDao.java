@@ -287,7 +287,10 @@ public class ICareDao extends BaseDAO<Item> {
 		
 		Query query = null;
 		DbSession session = this.getSession();
-		String queryStr = "SELECT distinct v FROM Visit v" + " INNER JOIN v.patient p" + " INNER JOIN p.names pname";
+		new Patient();
+		String queryStr = "SELECT distinct v FROM Visit v" + " INNER JOIN v.patient p" + " LEFT JOIN p.names pname "
+		        + "LEFT JOIN p.identifiers pi ";
+		//				+ " INNER JOIN p.attributes pattr";
 		
 		if (orderTypeUuid != null) {
 			
@@ -315,7 +318,7 @@ public class ICareDao extends BaseDAO<Item> {
 		}
 		
 		if (search != null) {
-			queryStr += " AND (lower(concat(pname.givenName,pname.middleName,pname.familyName)) LIKE lower(:search) OR lower(pname.givenName) LIKE lower(:search) OR lower(pname.middleName) LIKE lower(:search) OR lower(pname.familyName) LIKE lower(:search) OR lower(concat(pname.givenName,'',pname.familyName)) LIKE lower(:search) OR lower(concat(pname.givenName,'',pname.middleName)) LIKE lower(:search) OR lower(concat(pname.middleName,'',pname.familyName)) LIKE lower(:search))";
+			queryStr += " AND (lower(concat(pname.givenName,pname.middleName,pname.familyName)) LIKE lower(:search) OR lower(pname.givenName) LIKE lower(:search) OR lower(pname.middleName) LIKE lower(:search) OR lower(pname.familyName) LIKE lower(:search) OR lower(concat(pname.givenName,'',pname.familyName)) LIKE lower(:search) OR lower(concat(pname.givenName,'',pname.middleName)) LIKE lower(:search) OR lower(concat(pname.middleName,'',pname.familyName)) LIKE lower(:search)  OR pi.identifier LIKE :search)";
 		}
 		if (locationUuid != null) {
 			queryStr += " AND v.location.uuid=:locationUuid ";
@@ -390,7 +393,6 @@ public class ICareDao extends BaseDAO<Item> {
 		
 		query.setFirstResult(startIndex);
 		query.setMaxResults(limit);
-		System.out.println(query);
 		return query.list();
 		
 	}

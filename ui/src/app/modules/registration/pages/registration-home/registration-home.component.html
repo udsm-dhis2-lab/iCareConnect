@@ -1,5 +1,9 @@
 <div>
-  <div *ngIf="patientSummary$ | async as patientSummary">
+  <div *ngIf="{ patientSummary: patientSummary$ | async } as params">
+    <mat-progress-bar
+      mode="indeterminate"
+      *ngIf="!params?.patientSummary"
+    ></mat-progress-bar>
     <div class="mt-4">
       <div class="border">
         <mat-toolbar>
@@ -24,14 +28,14 @@
           <span class="ml-2"
             >Total Patients:
             <span style="color: #42abed; font-weight: bold">{{
-              patientSummary?.allPatients
+              params?.patientSummary?.allPatients
             }}</span></span
           >
           &nbsp;&nbsp; | &nbsp;&nbsp;
           <span class="ml-2"
             >Active Visit:
             <span style="color: #42abed; font-weight: bold">{{
-              patientSummary?.activeVisits
+              params?.patientSummary?.activeVisits
             }}</span></span
           >
 
@@ -76,7 +80,7 @@
           <div *ngIf="!showCard" class="row mt-4 w-100 mb-4">
             <div
               class="col-lg-3 col-md-3 col-sx-12 col-sm-12 mt-2"
-              *ngFor="let location of patientSummary?.locations"
+              *ngFor="let location of params?.patientSummary?.locations"
             >
               <app-registration-summary-cards
                 [roomNo]="location?.name"

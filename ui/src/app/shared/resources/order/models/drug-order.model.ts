@@ -1,9 +1,9 @@
-import { find, flatten } from 'lodash';
-import { BillItem } from 'src/app/modules/billing/models/bill-item.model';
-import { Bill } from 'src/app/modules/billing/models/bill.model';
-import { Payment } from 'src/app/modules/billing/models/payment.model';
-import { PaymentStatus } from '../../../models/payment-status.model';
-import { OrderAction } from './order-action.model';
+import { find, flatten } from "lodash";
+import { BillItem } from "src/app/modules/billing/models/bill-item.model";
+import { Bill } from "src/app/modules/billing/models/bill.model";
+import { Payment } from "src/app/modules/billing/models/payment.model";
+import { PaymentStatus } from "../../../models/payment-status.model";
+import { OrderAction } from "./order-action.model";
 
 export interface DrugOrderObject {
   id?: string;
@@ -54,7 +54,7 @@ export class DrugOrder {
   }
 
   get display(): string {
-    return this.drugOrder?.display + ', ' + this.drugOrder?.instructions;
+    return this.drugOrder?.display + ", " + this.drugOrder?.instructions;
   }
 
   get type(): string {
@@ -104,9 +104,9 @@ export class DrugOrder {
   get paymentMode(): { display: string; uuid: string } {
     const matchedBill = (this.bills.filter(
       (bill: any) =>
-        this.bill && this.bill['bill'] && bill?.id === this.bill['bill']
+        this.bill && this.bill["bill"] && bill?.id === this.bill["bill"]
     ) || [])[0];
-    return matchedBill ? matchedBill['billDetails']?.paymentMode : null;
+    return matchedBill ? matchedBill["billDetails"]?.paymentMode : null;
   }
 
   get bill(): BillItem {
@@ -116,7 +116,7 @@ export class DrugOrder {
       })
     );
     // console.log('billItems', find(billItems, ['order.uuid', this.uuid]));
-    return find(billItems, ['order.uuid', this.uuid]);
+    return find(billItems, ["order.uuid", this.uuid]);
   }
 
   get paymentStatus(): PaymentStatus {
@@ -124,7 +124,7 @@ export class DrugOrder {
     // console.log('bill', this.bill);
     // console.log('drug id', this.drugUuid);
     return this.drugOrder
-      ? (this.bill && this.paymentMode?.display === 'Insurance') || !this.bill
+      ? (this.bill && this.paymentMode?.display === "Insurance") || !this.bill
         ? PaymentStatus.PAID
         : PaymentStatus.NOT_PAID
       : PaymentStatus.NOT_CALCULATED;
@@ -134,11 +134,11 @@ export class DrugOrder {
     let optionsToHide = [];
 
     if (this.paymentStatus !== PaymentStatus.NOT_CALCULATED) {
-      optionsToHide = [...optionsToHide, 'CALCULATE_PRESCRIPTION'];
+      optionsToHide = [...optionsToHide, "CALCULATE_PRESCRIPTION"];
     }
 
     if (this.paymentStatus !== PaymentStatus.PAID) {
-      optionsToHide = [...optionsToHide, 'DISPENSE_PRESCRIPTION'];
+      optionsToHide = [...optionsToHide, "DISPENSE_PRESCRIPTION"];
     }
 
     return optionsToHide;
@@ -313,9 +313,9 @@ export class DrugOrder {
       orderType: order?.orderType,
       concept: order.concept.uuid,
       drug: order?.drug?.uuid,
-      action: order?.action || 'NEW',
+      action: order?.action || "NEW",
       urgency: order?.urgency,
-      type: 'prescription',
+      type: "prescription",
       orderer: order?.orderer?.uuid || order?.providerUuid,
       patient: order.patientUuid,
       dose: order.dose,
@@ -326,7 +326,7 @@ export class DrugOrder {
       frequency: order?.frequency,
       duration: order?.duration,
       durationUnits: order?.durationUnits,
-      careSetting: order?.careSetting || 'OUTPATIENT',
+      careSetting: order?.careSetting || "OUTPATIENT",
       quantity: Number(order?.quantity) || undefined,
       quantityUnits: order?.doseUnits,
       numRefills: order.numRefills || 1,
