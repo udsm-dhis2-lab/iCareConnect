@@ -181,6 +181,8 @@ export class RegistrationHomeComponent implements OnInit {
         isRegistrationPage: true,
       })
     );
+
+    console.log("patient", patient);
     this.dialog
       .open(StartVisitModelComponent, {
         width: "85%",
