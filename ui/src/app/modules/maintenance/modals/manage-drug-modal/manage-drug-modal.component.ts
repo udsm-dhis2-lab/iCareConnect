@@ -3,6 +3,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
 import { Field } from "src/app/shared/modules/form/models/field.model";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
+import { TextArea } from "src/app/shared/modules/form/models/text-area.model";
 import { Textbox } from "src/app/shared/modules/form/models/text-box.model";
 import { DrugsService } from "src/app/shared/resources/drugs/services/drugs.service";
 
@@ -42,6 +43,13 @@ export class ManageDrugModalComponent implements OnInit {
         value: data && data?.display ? data?.display : null,
         required: true,
       }),
+      new TextArea({
+        id: "description",
+        key: "description",
+        label: "Description",
+        value: data && data?.description ? data?.description : null,
+        required: false,
+      }),
       new Dropdown({
         id: "genericDrug",
         key: "genericDrug",
@@ -73,11 +81,11 @@ export class ManageDrugModalComponent implements OnInit {
     if (confirmed) {
       this.saving = true;
       const data = {
-        drug: this.formData?.drug?.value,
-        concept: {
-          uuid: this.formData.genericDrug?.value,
-        },
-        strength: this.formData.strength?.value,
+        name: this.formData?.drug?.value,
+        concept: this.formData?.genericDrug?.value,
+        strength: this.formData?.strength?.value,
+        combination: false,
+        description: this.formData?.description?.value,
       };
       console.log("dsdsd", data);
       this.drugService.createDrug(data).subscribe((response: any) => {
@@ -85,6 +93,9 @@ export class ManageDrugModalComponent implements OnInit {
           console.log(response);
           this.shouldConfirm = false;
           this.saving = false;
+          setTimeout(() => {
+            this.dialogRef.close(true);
+          }, 200);
         } else {
           this.saving = false;
           this.errors = [response];
