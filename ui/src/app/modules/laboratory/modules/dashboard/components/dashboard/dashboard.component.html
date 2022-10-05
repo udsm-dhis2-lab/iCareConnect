@@ -1,0 +1,20 @@
+<div
+  class="dashboard-containber p-2"
+  *ngIf="{ samples: samples$ | async } as params"
+>
+  <!-- {{ params?.samples | json }} -->
+  <mat-progress-bar
+    mode="indeterminate"
+    *ngIf="!params?.samples"
+  ></mat-progress-bar>
+  <div class="row">
+    <div class="col-md-6">
+      <div class="mat-elevation-z1">
+        <app-dashboard-chart-item
+          *ngIf="params?.samples"
+          [samplesData]="params?.samples"
+        ></app-dashboard-chart-item>
+      </div>
+    </div>
+  </div>
+</div>

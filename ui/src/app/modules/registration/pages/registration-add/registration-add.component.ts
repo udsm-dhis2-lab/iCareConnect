@@ -34,7 +34,8 @@ import { PhoneNumber } from "src/app/shared/modules/form/models/phone-number.mod
 import { ConceptsService } from "src/app/shared/resources/concepts/services/concepts.service";
 import { ThisReceiver } from "@angular/compiler";
 import { clearActiveVisit } from "src/app/store/actions/visit.actions";
-import { tap } from "rxjs/operators";
+import { map, tap } from "rxjs/operators";
+import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
 
 @Component({
   selector: "app-registration-add",
@@ -61,6 +62,7 @@ export class RegistrationAddComponent implements OnInit {
   @Input() additionalClientInformationConceptUuid: string;
   @Input() relationShipTypesConceptUuid: string;
   @Input() genderOptionsConceptUuid: string;
+  @Input() residenceDetailsLocationUuid: string;
 
   registrationFormConfigsKeyedByProperty: any = {};
 
@@ -87,8 +89,12 @@ export class RegistrationAddComponent implements OnInit {
   relationTypeOptions$: Observable<any>;
   selectedIdFormat: string;
   errors: any[] = [];
-  regions: any[] = [{ name: "Dar es Salaam" }, { name: "Pwani" }];
+  regionindex: number;
   newreg: string;
+  newDistrict: string;
+  newArea: string;
+  residenceDetailsLocation$: Observable<any>;
+  districtindex: number;
   constructor(
     private _snackBar: MatSnackBar,
     private router: Router,
@@ -223,6 +229,16 @@ export class RegistrationAddComponent implements OnInit {
   setNewPatient(option) {
     this.patient.newPatient = option;
   }
+  onSelectRegion(e, regionindex: number): void {
+    if (e) {
+      this.regionindex = regionindex;
+    }
+  }
+  onSelectDistrict(e, index: number): void {
+    if (e) {
+      this.districtindex = index;
+    }
+  }
 
   dateSet() {
     //console.log(this.patient?.dob);
@@ -238,6 +254,7 @@ export class RegistrationAddComponent implements OnInit {
     };
   }
 
+  getResidenceContactDetails() {}
   getAdditionalInformationValues(formValues): void {
     this.patient.maritalStatus =
       formValues[
@@ -292,6 +309,9 @@ export class RegistrationAddComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.residenceDetailsLocation$ = this.locationService.getLocationById(
+      this.residenceDetailsLocationUuid
+    );
     this.currentLocation$ = this.store.select(getCurrentLocation);
     this.showPatientType$ =
       this.systemSettingsService.getSystemSettingsDetailsByKey(
@@ -601,7 +621,7 @@ export class RegistrationAddComponent implements OnInit {
                       identifier: this.currentMRN,
                       identifierType: "26742868-a38c-4e6a-ac1d-ae283c414c2e",
                       location: currentLocation?.uuid,
-                      preferred: false,
+                      preferred: true,
                     },
                   ],
                 };

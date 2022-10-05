@@ -84,9 +84,6 @@
     [vitalsForm]="vitalsForm"
   ></app-patient-vitals-summary>
 </div>
-<div
-  class="text-center p-4 text-warning"
-  *ngIf="patientVisits && !currentPatientVisit"
->
-  No Previous History
+<div *ngIf="patientVisits && !currentPatientVisit">
+  <div class="alert alert-warning" role="alert">No Previous History</div>
 </div>

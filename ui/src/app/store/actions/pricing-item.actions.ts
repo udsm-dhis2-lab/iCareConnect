@@ -10,6 +10,7 @@ export const initiatePricingItems = createAction(
       startIndex: number;
       searchTerm: string;
       conceptSet?: string;
+      isDrug?: boolean;
     };
   }>()
 );
@@ -22,6 +23,7 @@ export const loadPricingItems = createAction(
       startIndex: number;
       searchTerm: string;
       conceptSet?: string;
+      isDrug?: boolean;
     };
   }>()
 );
