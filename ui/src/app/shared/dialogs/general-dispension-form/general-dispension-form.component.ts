@@ -1,10 +1,4 @@
-import {
-  Component,
-  EventEmitter,
-  Input,
-  OnInit,
-  Output,
-} from "@angular/core";
+import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { Store } from "@ngrx/store";
 import { Observable } from "rxjs";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
@@ -107,7 +101,6 @@ export class GeneralDispensingFormComponent implements OnInit {
       searchTerm: "ICARE_GENERIC_DRUG",
       shouldHaveLiveSearchForDropDownFields: true,
     });
-
   }
 
   onFormUpdate(formValues: FormValue): void {
@@ -153,30 +146,28 @@ export class GeneralDispensingFormComponent implements OnInit {
       };
     });
 
-    console.log("==> Obs: ", obs)
-    
-    // this.ordersService
-    //   .createOrdersViaCreatingEncounter(encounterObject)
-    //   .subscribe((response) => {
-    //     if (response?.uuid) {
-    //       let data = {
-    //         encounterUuid: response?.uuid,
-    //         obs: obs.filter((observation) => {
-    //           if (observation.value && observation.value.length > 0) {
-    //             return observation;
-    //           }
-    //         }),
-    //       };
-    //       this.observationService
-    //         .saveObservationsViaEncounter(data)
-    //         .subscribe((res) => {
-    //           if (res) {
-    //             this.savingOrder = false;
-    //             this.orderSaved.emit(true);
-    //           }
-    //         });
-    //     }
-    //   });
+    this.ordersService
+      .createOrdersViaCreatingEncounter(encounterObject)
+      .subscribe((response) => {
+        if (response?.uuid) {
+          let data = {
+            encounterUuid: response?.uuid,
+            obs: obs.filter((observation) => {
+              if (observation.value && observation.value.length > 0) {
+                return observation;
+              }
+            }),
+          };
+          this.observationService
+            .saveObservationsViaEncounter(data)
+            .subscribe((res) => {
+              if (res) {
+                this.savingOrder = false;
+                this.orderSaved.emit(true);
+              }
+            });
+        }
+      });
 
     this.updateConsultationOrder.emit();
   }
