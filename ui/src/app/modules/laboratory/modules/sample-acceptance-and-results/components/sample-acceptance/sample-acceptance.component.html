@@ -497,14 +497,28 @@
                 }}
               </div>
             </td>
+
+            <td 
+            *ngIf="LISConfigurations?.isLIS"
+             style="
+               background-color: #d04747ab;
+               width: 40px;
+               margin-left: 20px;
+             "
+           ></td>
+           <td *ngIf="LISConfigurations?.isLIS">
+             <div style="margin-left: 3px">Has Amended results</div>
+           </td>
+
             <td
+            *ngIf="!LISConfigurations?.isLIS"
               style="
                 background-color: #d04747ab;
                 width: 40px;
                 margin-left: 20px;
               "
             ></td>
-            <td>
+            <td *ngIf="!LISConfigurations?.isLIS">
               <div style="margin-left: 3px">Has rejected results</div>
             </td>
           </tr>
@@ -776,16 +790,32 @@
                 }}
               </div>
             </td>
-            <td
+            <td 
+             *ngIf="LISConfigurations?.isLIS"
               style="
                 background-color: #d04747ab;
                 width: 40px;
                 margin-left: 20px;
               "
             ></td>
-            <td>
-              <div style="margin-left: 3px">Has rejected results</div>
+            <td *ngIf="LISConfigurations?.isLIS">
+              <div style="margin-left: 3px">Has Amended results</div>
             </td>
+
+
+            <td
+              *ngIf="!LISConfigurations?.isLIS"
+              style="
+                background-color: #d04747ab;
+                width: 40px;
+                margin-left: 20px;
+              "
+            ></td>
+          <td *ngIf="!LISConfigurations?.isLIS">
+            <div style="margin-left: 3px">Has rejected results</div>
+          </td>
+
+
             <td
               *ngIf="!LISConfigurations?.isLIS"
               style="
