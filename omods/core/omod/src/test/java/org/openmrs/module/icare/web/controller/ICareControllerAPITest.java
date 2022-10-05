@@ -427,14 +427,21 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		Patient patient = patientService.getPatientByUuid("1f6959e5-d15a-4025-bb48-340ee9e2c58d");
 		Visit newVisit = this.getVisit(patient);
 		
-		MockHttpServletRequest newGetRequest = newGetRequest("icare/visit", new Parameter("orderTypeUuid",
-		        "2msir5eb-5345-11e8-9922-40b034c3cfee")
+		MockHttpServletRequest newGetRequest = newGetRequest("icare/visit", new Parameter("search", "110620-2/10891/21"));
+		
+		MockHttpServletResponse handle = handle(newGetRequest);
+		Map<String, Object> patients = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
+		//		System.out.println(patients);
+		assertThat("Should return a patient visit ", ((List) patients.get("results")).size() > 0);
+		
+		newGetRequest = newGetRequest("icare/visit", new Parameter("orderTypeUuid", "2msir5eb-5345-11e8-9922-40b034c3cfee")
 		//7bc34d5bde5d829d31cc8c22a455896a97085951
 		//, new Parameter("fulfillerStatus","COMPL")
 		);
-		MockHttpServletResponse handle = handle(newGetRequest);
+		handle = handle(newGetRequest);
 		
 		Map<String, Object> orderResult = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
+		//		System.out.println((List) orderResult.get("results"));
 		assertThat("Should return a visit", ((List) orderResult.get("results")).size() == 2);
 		//Then
 		
@@ -533,7 +540,7 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 	@Test
 	public void getPatient() throws Exception {
 		
-		MockHttpServletRequest newGetRequest = newGetRequest("icare/patient", new Parameter("search", "Hermione"));
+		MockHttpServletRequest newGetRequest = newGetRequest("icare/patient", new Parameter("search", "james"));
 		MockHttpServletResponse handle = handle(newGetRequest);
 		String PatientData = handle.getContentAsString();
 		System.out.println("data: " + PatientData);
@@ -597,6 +604,7 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 	}
 	
 	@Test
+	@Ignore
 	public void testGetClientsFromExternalSystem() throws Exception {
 		MockHttpServletRequest newGetRequest = newGetRequest("icare/client/externalsystems", new Parameter("identifier",
 		        "2133573"), new Parameter("identifierReference", "t74raEkPShW"));
