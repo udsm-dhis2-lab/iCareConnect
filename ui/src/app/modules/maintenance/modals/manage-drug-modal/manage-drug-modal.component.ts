@@ -18,6 +18,8 @@ export class ManageDrugModalComponent implements OnInit {
   drugFormFields: Field<string>[];
   formData: any = {};
   isFormValid: boolean = false;
+  saving: boolean = false;
+  errors: any[];
   constructor(
     private dialogRef: MatDialogRef<ManageDrugModalComponent>,
     @Inject(MAT_DIALOG_DATA) data,
@@ -48,6 +50,7 @@ export class ManageDrugModalComponent implements OnInit {
         required: true,
         shouldHaveLiveSearchForDropDownFields: true,
         options: [],
+        conceptClass: "Drug",
         searchControlType: "concept",
       }),
       new Textbox({
@@ -68,6 +71,25 @@ export class ManageDrugModalComponent implements OnInit {
   onSave(event: Event, confirmed?: boolean): void {
     event.stopPropagation();
     if (confirmed) {
+      this.saving = true;
+      const data = {
+        drug: this.formData?.drug?.value,
+        concept: {
+          uuid: this.formData.genericDrug?.value,
+        },
+        strength: this.formData.strength?.value,
+      };
+      console.log("dsdsd", data);
+      this.drugService.createDrug(data).subscribe((response: any) => {
+        if (response && !response?.error) {
+          console.log(response);
+          this.shouldConfirm = false;
+          this.saving = false;
+        } else {
+          this.saving = false;
+          this.errors = [response];
+        }
+      });
     } else {
       this.shouldConfirm = true;
     }
