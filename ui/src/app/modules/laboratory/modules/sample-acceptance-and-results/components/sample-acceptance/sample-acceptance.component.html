@@ -136,7 +136,7 @@
                     {{ sample?.patient?.middleName }}
                     {{ sample?.patient?.familyName }}
                   </td>
-                  <td>{{ order?.order?.concept?.display }}</td>
+                  <td>{{ order?.order?.concept?.display.replace('TO:','') }}</td>
                   <!-- <td></td> -->
                   <td>
                     {{
@@ -373,7 +373,7 @@
                     {{ sample?.patient?.middleName }}
                     {{ sample?.patient?.familyName }}
                   </td>
-                  <td>{{ order?.order?.concept?.display }}</td>
+                  <td>{{ order?.order?.concept?.display.replace('TO:','') }}</td>
                   <td>
                     {{
                       !LISConfigurations?.isLIS
@@ -650,7 +650,8 @@
                     {{ sample?.patient?.middleName }}
                     {{ sample?.patient?.familyName }}
                   </td>
-                  <td>{{ order?.order?.concept?.display }}</td>
+            
+                  <td>{{ order?.order?.concept?.display.replace('TO:','') }} </td>
                   <!-- <td></td> -->
                   <td>
                     {{
@@ -952,7 +953,7 @@
                     {{ sample?.patient?.middleName }}
                     {{ sample?.patient?.familyName }}
                   </td>
-                  <td>{{ order?.order?.concept?.display }}</td>
+                  <td>{{ order?.order?.concept?.display.replace('TO:','') }}</td>
                   <td>{{ order?.order?.orderer?.name }}</td>
                   <!-- <td>{{ order?.order?.location?.name }}</td>
                   <td>{{ order?.order?.orderDate | date: "medium" }}</td> -->
@@ -1144,7 +1145,7 @@
                     {{ sample?.patient?.middleName }}
                     {{ sample?.patient?.familyName }}
                   </td>
-                  <td>{{ order?.order?.concept?.display }}</td>
+                  <td>{{ order?.order?.concept?.display.replace('TO:','') }}</td>
                   <!-- <td></td> -->
                   <td>{{ order?.order?.orderer?.name }}</td>
 
@@ -1324,7 +1325,7 @@
                     {{ sample?.patient?.middleName }}
                     {{ sample?.patient?.familyName }}
                   </td>
-                  <td>{{ order?.order?.concept?.display }}</td>
+                  <td>{{ order?.order?.concept?.display.replace('TO:','') }}</td>
                   <!-- <td></td> -->
                   <td>
                     {{
@@ -1537,7 +1538,7 @@
                     {{ sample?.patient?.middleName }}
                     {{ sample?.patient?.familyName }}
                   </td>
-                  <td>{{ order?.order?.concept?.display }}</td>
+                  <td>{{ order?.order?.concept?.display.replace('TO:','') }}</td>
                   <!-- <td></td> -->
                   <td>
                     {{
