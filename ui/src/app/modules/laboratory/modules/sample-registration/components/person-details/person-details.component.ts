@@ -31,7 +31,7 @@ export class PersonDetailsComponent implements OnInit {
   @Input() referFromFacilityVisitAttribute: string;
   patientIdentifierTypes: any[];
   @Output() personDetails: EventEmitter<any> = new EventEmitter<any>();
-  personDetailsCategory: string = "other";
+  personDetailsCategory: string = "new";
   personDetailsData: any = {};
   personFields: any[];
   personAgeField: any[];
@@ -52,12 +52,18 @@ export class PersonDetailsComponent implements OnInit {
   @ViewChildren("fieldItem")
   fieldItems: QueryList<FieldComponent>;
 
+  pinnedCategory: string;
+
   constructor(
     private registrationService: RegistrationService,
     private personService: PersonService
   ) {}
 
   ngOnInit(): void {
+    this.pinnedCategory = localStorage.getItem("pinnedCategory");
+    this.personDetailsCategory = this.pinnedCategory
+      ? this.pinnedCategory
+      : this.personDetailsCategory;
     this.registrationService
       .getPatientIdentifierTypes()
       .subscribe((response) => {
@@ -67,6 +73,13 @@ export class PersonDetailsComponent implements OnInit {
         }
       });
     this.setPersonDetails();
+  }
+
+  onPinThis(event: Event, category: string): void {
+    event.stopPropagation();
+    this.personDetailsCategory = category;
+    this.pinnedCategory = category;
+    localStorage.setItem("pinnedCategory", category);
   }
 
   setIdentifierFields(
