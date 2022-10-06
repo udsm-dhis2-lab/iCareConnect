@@ -28,6 +28,7 @@ import { flatten, keyBy } from "lodash";
 import { VisitsService } from "../../resources/visits/services";
 import { LocationService } from "src/app/core/services";
 import { map } from "rxjs/operators";
+import { ConceptGet } from "../../resources/openmrs";
 
 @Component({
   selector: "app-dispension-form",
@@ -71,6 +72,7 @@ export class DispensingFormComponent implements OnInit {
   errors: any[] = [];
   conceptFields$: Observable<any>;
   genericPrescriptionConceptUuids$: Observable<any>;
+  drugOrderConceptDetails$: Observable<ConceptGet>;
 
   constructor(
     private drugOrderService: DrugOrdersService,
@@ -82,6 +84,7 @@ export class DispensingFormComponent implements OnInit {
     private store: Store<AppState>,
     private visitService: VisitsService,
     private locationService: LocationService,
+    private conceptService: ConceptsService,
     @Inject(MAT_DIALOG_DATA)
     public data: {
       drugOrder: any;
@@ -249,6 +252,11 @@ export class DispensingFormComponent implements OnInit {
     this.currentLocation$ = this.store.pipe(select(getCurrentLocation));
     this.currentVisit$ = this.store.pipe(select(getActiveVisit));
     this.provider$ = this.store.select(getProviderDetails);
+
+    this.drugOrderConceptDetails$ = this.conceptService.getConceptDetailsByUuid(
+      this.data?.drugOrder?.concept?.uuid,
+      "custom:(uuid,display,setMembers:(uuid,display))"
+    );
   }
 
   onCancel(): void {
