@@ -17,7 +17,8 @@
       generalPrescriptionFrequencyConcept$ | async,
     intermediateVisit: intermediateVisit$ | async,
     dispensingLocations: dispensingLocations$ | async,
-    genericPrescriptionConceptUuids: genericPrescriptionConceptUuids$ | async
+    genericPrescriptionConceptUuids: genericPrescriptionConceptUuids$ | async,
+    drugOrderConceptDetails: drugOrderConceptDetails$ | async
   } as params"
 >
   <div class="loading-overlay" *ngIf="savingOrder">
@@ -85,7 +86,9 @@
           <div class="col-12">
             <mat-progress-bar
               *ngIf="
-                !params?.useGeneralPrescription || !params?.dispensingLocations
+                !params?.useGeneralPrescription ||
+                !params?.dispensingLocations ||
+                !params?.drugOrderConceptDetails
               "
               mode="indeterminate"
             ></mat-progress-bar>
@@ -179,54 +182,90 @@
                 params?.dispensingLocations
               "
             >
-              <app-drug-order
-                [drugOrder]="data?.drugOrder"
-                [patient]="data?.patient"
-                [locations]="params?.dispensingLocations"
-                [fromDispensing]="data.fromDispensing"
-                [showAddButton]="false"
-                [hideActionButtons]="true"
-                [encounterUuid]="data?.encounterUuid"
-                [dosingUnitsSettings]="params?.dosingUnitsSettings"
-                [durationUnitsSettings]="params?.durationUnitsSettings"
-                [drugRoutesSettings]="params?.drugRoutesSettings"
-                [generalPrescriptionDurationConcept]="
-                  params?.generalPrescriptionDurationConcept
-                "
-                z
-                [generalPrescriptionDoseConcept]="
-                  params?.generalPrescriptionDoseConcept
-                "
-                [generalPrescriptionFrequencyConcept]="
-                  params?.generalPrescriptionFrequencyConcept
-                "
-                [drugsToBeDispensed]="drugsToBeDispensed$ | async"
-                (drugQuantity)="onChangeDrugQuantity($event)"
-                (drugOrdered)="onOrderingDrug($event)"
-                (cancelForm)="onCancel()"
-                (formUpdate)="onFormUpdate($event)"
-                (getDrugsByConceptUuid)="getDrugsByConceptUuid($event)"
-              ></app-drug-order>
-            </div>
-            <div>
-              <button
-                class="float-right"
-                (click)="onUpdateOrder($event)"
-                mat-flat-button
-                [color]="savingError ? 'warn' : 'primary'"
-                [disabled]="
-                  savingOrder || countOfDispensingFormFieldsWithValues < 3
-                "
-              >
-                <mat-icon *ngIf="savingError" class="mr-2">error</mat-icon>
-                <mat-spinner
-                  color="primary"
-                  *ngIf="savingOrder"
-                  [diameter]="17"
-                  class="order__spinner mr-2"
-                ></mat-spinner>
-                <span>{{ savingOrder ? "Saving..." : "Save" }}</span>
-              </button>
+              <mat-accordion>
+                <mat-expansion-panel [expanded]="true">
+                  <mat-expansion-panel-header>
+                    <mat-panel-title> Drug </mat-panel-title>
+                  </mat-expansion-panel-header>
+                  <div>
+                    <app-drug-order
+                      [drugOrder]="data?.drugOrder"
+                      [patient]="data?.patient"
+                      [locations]="params?.dispensingLocations"
+                      [fromDispensing]="data.fromDispensing"
+                      [showAddButton]="false"
+                      [hideActionButtons]="true"
+                      [encounterUuid]="data?.encounterUuid"
+                      [dosingUnitsSettings]="params?.dosingUnitsSettings"
+                      [durationUnitsSettings]="params?.durationUnitsSettings"
+                      [drugRoutesSettings]="params?.drugRoutesSettings"
+                      [generalPrescriptionDurationConcept]="
+                        params?.generalPrescriptionDurationConcept
+                      "
+                      [generalPrescriptionDoseConcept]="
+                        params?.generalPrescriptionDoseConcept
+                      "
+                      [generalPrescriptionFrequencyConcept]="
+                        params?.generalPrescriptionFrequencyConcept
+                      "
+                      [drugsToBeDispensed]="drugsToBeDispensed$ | async"
+                      (drugQuantity)="onChangeDrugQuantity($event)"
+                      (drugOrdered)="onOrderingDrug($event)"
+                      (cancelForm)="onCancel()"
+                      (formUpdate)="onFormUpdate($event)"
+                      (getDrugsByConceptUuid)="getDrugsByConceptUuid($event)"
+                    ></app-drug-order>
+
+                    <div>
+                      <button
+                        class="float-right"
+                        (click)="onUpdateOrder($event)"
+                        mat-flat-button
+                        [color]="savingError ? 'warn' : 'primary'"
+                        [disabled]="
+                          savingOrder ||
+                          countOfDispensingFormFieldsWithValues < 3
+                        "
+                      >
+                        <mat-icon *ngIf="savingError" class="mr-2"
+                          >error</mat-icon
+                        >
+                        <mat-spinner
+                          color="primary"
+                          *ngIf="savingOrder"
+                          [diameter]="17"
+                          class="order__spinner mr-2"
+                        ></mat-spinner>
+                        <span>{{ savingOrder ? "Saving..." : "Save" }}</span>
+                      </button>
+                    </div>
+                  </div>
+                </mat-expansion-panel>
+                <mat-expansion-panel class="mb-2 border p-0" [expanded]="false">
+                  <mat-expansion-panel-header>
+                    <mat-panel-title> Consumables </mat-panel-title>
+                  </mat-expansion-panel-header>
+                  <!-- {{ params?.intermediateVisit | json }} -->
+
+                  <app-non-drug-order-container
+                    *ngIf="
+                      params?.drugOrderConceptDetails &&
+                      params?.drugOrderConceptDetails?.setMembers?.length > 0
+                    "
+                    [drugOrderConceptDetails]="params?.drugOrderConceptDetails"
+                  ></app-non-drug-order-container>
+                  <div
+                    class="alert alert-info"
+                    role="alert"
+                    *ngIf="
+                      params?.drugOrderConceptDetails &&
+                      params?.drugOrderConceptDetails?.setMembers?.length == 0
+                    "
+                  >
+                    Drug {{ drugOrder?.concept?.display }} has no consumables
+                  </div>
+                </mat-expansion-panel>
+              </mat-accordion>
             </div>
           </div>
           <div class="col-5">
