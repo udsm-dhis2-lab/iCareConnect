@@ -15,13 +15,27 @@
         [(ngModel)]="searchingText"
       />
     </mat-form-field>
+    <div class="w-50 d-flex justify-content-end">
+      <button mat-stroked-button (click)="onDownload($event)">
+        <mat-spinner
+          color="primary"
+          [diameter]="20"
+          style="display: inline-block !important; margin-right: 4px"
+          *ngIf="downloading"
+        >
+        </mat-spinner>
+        Download to Excel
+      </button>
+    </div>
   </div>
   <div class="drugs-list mt-2">
     <table class="table">
       <thead>
         <tr>
           <th>SN</th>
+          <th>Generic Drug</th>
           <th>Drug</th>
+          <th>Strength</th>
           <th *ngIf="!conceptUuid"></th>
         </tr>
       </thead>
@@ -31,7 +45,13 @@
             {{ count + 1 + (page - 1) * limit }}
           </td>
           <td>
+            {{ drug?.concept?.display }}
+          </td>
+          <td>
             {{ drug?.display }}
+          </td>
+          <td>
+            {{ drug?.strength ? drug?.strength : "-" }}
           </td>
           <td *ngIf="!conceptUuid">
             <!-- TODO: For actions on drug management -->

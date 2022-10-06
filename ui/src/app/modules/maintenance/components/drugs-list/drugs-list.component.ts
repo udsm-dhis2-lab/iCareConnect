@@ -1,6 +1,8 @@
 import { Component, Input, OnInit } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
-import { Observable } from "rxjs";
+import { flatten } from "lodash";
+import { Observable, zip } from "rxjs";
+import { map } from "rxjs/operators";
 import { DrugsService } from "src/app/shared/resources/drugs/services/drugs.service";
 import { ManageDrugModalComponent } from "../../modals/manage-drug-modal/manage-drug-modal.component";
 
@@ -17,6 +19,7 @@ export class DrugsListComponent implements OnInit {
 
   page: number = 1;
   searchingText: string;
+  downloading: boolean = false;
   constructor(private drugService: DrugsService, private dialog: MatDialog) {}
 
   ngOnInit(): void {
@@ -75,5 +78,26 @@ export class DrugsListComponent implements OnInit {
           this.getDrugs();
         }
       });
+  }
+
+  onDownload(event: Event): void {
+    event.stopPropagation();
+    this.downloading = true;
+    let references = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+    this.drugs$ = zip(
+      ...references.map((reference) => {
+        return this.drugService.getAllDrugs({
+          startIndex: (reference - 1) * 100,
+          limit: 100,
+          q: this.searchingText,
+          v: "custom:(uuid,display,strength,concept:(uuid,display))",
+        });
+      })
+    ).pipe(map((response) => flatten(response)));
+    this.drugs$.subscribe((response) => {
+      if (response) {
+        this.downloading = false;
+      }
+    });
   }
 }
