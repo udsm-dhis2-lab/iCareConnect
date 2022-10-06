@@ -38,7 +38,7 @@ export class PersonDetailsComponent implements OnInit {
   personDOBField: any[];
   personFieldsGroupThree: any[];
   identifiersFields: any[];
-  primaryIdentifierField: any;
+  primaryIdentifierFields: any;
   showOtherIdentifiers: boolean = false;
   patientUuid: string;
   identifierTypes: any[] = [];
@@ -87,11 +87,14 @@ export class PersonDetailsComponent implements OnInit {
     personDetails?: any,
     patientIdentifier?: string
   ): void {
-    const primaryIdentifier = (identifierTypes?.filter(
-      (identifier) => identifier?.required
-    ) || [])[0];
-    this.primaryIdentifierField = primaryIdentifier
-      ? new Textbox({
+    console.log("identifierTypes", identifierTypes);
+    const primaryIdentifiers =
+      identifierTypes?.filter(
+        (identifier) => identifier?.uniquenessBehavior === "UNIQUE"
+      ) || [];
+    this.primaryIdentifierFields = primaryIdentifiers?.map(
+      (primaryIdentifier) => {
+        return new Textbox({
           id: primaryIdentifier?.id,
           key: primaryIdentifier?.id,
           label: primaryIdentifier?.name,
@@ -103,9 +106,10 @@ export class PersonDetailsComponent implements OnInit {
                   identifier?.identifierType?.uuid === primaryIdentifier?.id
               ) || [])[0]?.identifier
             : null,
-          required: true,
-        })
-      : null;
+          required: primaryIdentifier?.required,
+        });
+      }
+    );
 
     const otherIdentifiers =
       identifierTypes?.filter((identifier) => !identifier?.required) || [];
@@ -118,7 +122,12 @@ export class PersonDetailsComponent implements OnInit {
         value: personDetails
           ? (personDetails?.identifiers?.filter(
               (identifier) =>
-                identifier?.identifierType?.uuid === primaryIdentifier?.id
+                (
+                  primaryIdentifiers?.filter(
+                    (primaryIdentifier) =>
+                      identifier?.identifierType?.uuid == primaryIdentifier?.id
+                  ) || []
+                )?.length === 0
             ) || [])[0]?.identifier
           : null,
         required: identifier?.required,
@@ -283,7 +292,7 @@ export class PersonDetailsComponent implements OnInit {
         id: "dob",
         key: "dob",
         label: "Date of birth",
-        required: false,
+        required: true,
         value: personDetails
           ? personDetails?.birthdate?.substring(0, 10)
           : null,

@@ -48,8 +48,17 @@ export class RegistrationService {
             if (patientIdenfierType.format === null) {
               patientIdenfierType.format = "";
             }
-            const { uuid, display, required, retired, description, format } =
-              patientIdenfierType;
+            const {
+              uuid,
+              display,
+              required,
+              retired,
+              description,
+              format,
+              uniquenessBehavior,
+              validator,
+              locationBehavior,
+            } = patientIdenfierType;
 
             if (retired) {
               return null;
@@ -61,6 +70,9 @@ export class RegistrationService {
               required,
               description,
               format,
+              uniquenessBehavior,
+              validator,
+              locationBehavior,
             };
           })
           .filter((identifierType) => identifierType);
