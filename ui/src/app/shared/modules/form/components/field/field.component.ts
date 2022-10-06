@@ -43,7 +43,6 @@ export class FieldComponent {
   @Output() fileFieldUpdate: EventEmitter<any> = new EventEmitter<any>();
 
   ngAfterViewInit() {
-    console.log(this.field);
     if (
       this.field?.searchTerm ||
       this.field?.source ||

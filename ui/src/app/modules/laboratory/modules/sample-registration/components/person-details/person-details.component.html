@@ -9,7 +9,22 @@
     >
       New
     </mat-radio-button>
-    <mat-radio-button
+    <button
+      mat-button
+      class="ml-2 mr-4 pinning-btn"
+      (click)="onPinThis($event, 'new')"
+    >
+      Pin
+      <span
+        *ngIf="pinnedCategory == 'new'"
+        matBadge="P"
+        matBadgeSize="small"
+        matBadgeColor="accent"
+        matBadgeOverlap="false"
+      >
+      </span>
+    </button>
+    <!-- <mat-radio-button
       (change)="getSelection($event)"
       class="person-details-btn ml-2"
       [value]="'existing'"
@@ -17,7 +32,7 @@
       color="primary"
     >
       Existing
-    </mat-radio-button>
+    </mat-radio-button> -->
     <mat-radio-button
       (change)="getSelection($event)"
       class="person-details-btn ml-2"
@@ -27,6 +42,21 @@
     >
       Other systems
     </mat-radio-button>
+    <button
+      mat-button
+      class="ml-2 pinning-btn"
+      (click)="onPinThis($event, 'other')"
+    >
+      Pin
+      <span
+        *ngIf="pinnedCategory == 'other'"
+        matBadge="P"
+        matBadgeSize="small"
+        matBadgeColor="accent"
+        matBadgeOverlap="false"
+      >
+      </span>
+    </button>
   </mat-radio-group>
   <app-registered-patient-details
     *ngIf="personDetailsCategory === 'existing'"
