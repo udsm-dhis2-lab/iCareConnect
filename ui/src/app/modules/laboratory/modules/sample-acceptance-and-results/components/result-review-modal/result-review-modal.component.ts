@@ -10,17 +10,17 @@ import * as moment from "moment";
 export class ResultReviewModalComponent implements OnInit {
   dialogData: any;
   results: any[] = [];
+  noResults: any[] = [];
   constructor(
     private dialogRef: MatDialogRef<ResultReviewModalComponent>,
-    @Inject(MAT_DIALOG_DATA) data
-  ) {
-    this.dialogData = data;
-  }
+    @Inject(MAT_DIALOG_DATA) public data
+  ) {}
 
   ngOnInit(): void {
-    this.dialogData?.sample.orders.forEach((order) => {
+    this.data?.sample.orders.forEach((order) => {
+      let resultObject;
       order?.testAllocations.forEach((testAllocation) => {
-        let resultObject = {
+        resultObject = {
           testName: testAllocation?.concept?.display,
           results: testAllocation?.results
         }
@@ -28,7 +28,11 @@ export class ResultReviewModalComponent implements OnInit {
         this.results = [
           ...this.results,
           resultObject
-        ]
+        ].filter(result => result.results?.length > 0)
+        this.noResults = [
+          ...this.noResults,
+          resultObject
+        ].filter(result => result.results?.length === 0)
       })
     })
   }
