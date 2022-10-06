@@ -16,6 +16,8 @@ import { Visit } from "../../resources/visits/models/visit.model";
 
 import { flatten, keyBy } from "lodash";
 import { loadActiveVisit } from "src/app/store/actions/visit.actions";
+import { SystemSettingsService } from "src/app/core/services/system-settings.service";
+import { map } from "rxjs/operators";
 
 @Component({
   selector: "app-patient-generic-drug-order-list",
@@ -47,11 +49,14 @@ export class PatientGenericDrugOrderListComponent implements OnInit {
 
   @Output() orderSelectAction = new EventEmitter<TableSelectAction>();
   @Output() loadPatientVisit = new EventEmitter<any>();
+  genericPrescriptionConceptUuids$: any;
+  errors: any[] = [];
 
   constructor(
     private dialog: MatDialog,
     private store: Store<AppState>,
-    private ordersService: OrdersService
+    private ordersService: OrdersService,
+    private systemSettingsService: SystemSettingsService
   ) {}
 
   ngOnInit() {
@@ -88,6 +93,17 @@ export class PatientGenericDrugOrderListComponent implements OnInit {
     this.isThereDiagnosisProvided$ = this.store.select(
       getIfThereIsAnyDiagnosisInTheCurrentActiveVisit
     );
+
+    this.genericPrescriptionConceptUuids$ = this.systemSettingsService
+      .getSystemSettingsMatchingAKey("iCare.clinic.genericPrescription.field")
+      .pipe(
+        map((response: any) => {
+          if (response?.error) {
+            this.errors = [...this.errors, response.error];
+          }
+          return response;
+        })
+      );
   }
 
   getDrugOrders() {
