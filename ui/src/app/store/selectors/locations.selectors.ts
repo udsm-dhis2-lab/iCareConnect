@@ -198,14 +198,18 @@ export const getLocationLoadingStatus = createSelector(
 
 export const getIfCurrentLocationIsMainStore = createSelector(
   getLocationsState,
-  (state: LocationsState) =>
-    state.currentUserCurrentLocation &&
-    state.currentUserCurrentLocation?.tags &&
-    (
-      state.currentUserCurrentLocation?.tags?.filter(
-        (tag) => tag?.display?.toLowerCase() === "main store"
-      ) || []
-    )?.length > 0
+  getCurrentLocation,
+  (state: LocationsState, currentLocation) => {
+    return currentLocation &&
+      currentLocation?.tags &&
+      (
+        currentLocation?.tags?.filter(
+          (tag) => tag?.display?.toLowerCase() === "main store"
+        ) || []
+      )?.length > 0
+      ? true
+      : false;
+  }
 );
 
 export const getAllTreatmentLocations = createSelector(
