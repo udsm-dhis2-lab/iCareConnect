@@ -23,5 +23,10 @@
     "key": "iCare.registration.genderOptions.conceptUuid",
     "value": "conceptUuid",
     "description": "Reference to gender options"
+  },
+  {
+    "key": "iCare.visits.settings.controlVisitsEndingStatuses.ConceptUuid",
+    "value": "conceptUuid",
+    "description": "Ending visit control"
   }
 ]

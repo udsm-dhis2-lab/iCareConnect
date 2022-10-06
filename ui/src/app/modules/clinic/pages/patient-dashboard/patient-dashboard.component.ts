@@ -25,6 +25,7 @@ import { SystemSettingsService } from "src/app/core/services/system-settings.ser
 import { LocationGet } from "src/app/shared/resources/openmrs";
 import { getCurrentLocation } from "src/app/store/selectors";
 import { map } from "rxjs/operators";
+import { getAllObservations } from "src/app/store/selectors/observation.selectors";
 
 @Component({
   selector: "app-patient-dashboard",
@@ -44,6 +45,8 @@ export class PatientDashboardComponent implements OnInit {
   provider$: Observable<any>;
   currentLocation$: Observable<LocationGet>;
   errors: any[] = [];
+  visitEndingControlStatusesConceptUuid$: Observable<string>;
+  observations$: Observable<any>;
   constructor(
     private store: Store<AppState>,
     private route: ActivatedRoute,
@@ -51,18 +54,14 @@ export class PatientDashboardComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.iCareGeneralConfigurations$ =
-      this.systemSettingsService.getSystemSettingsByKey(
-        "iCare.GeneralMetadata.Configurations"
-      ).pipe(
+    this.iCareGeneralConfigurations$ = this.systemSettingsService
+      .getSystemSettingsByKey("iCare.GeneralMetadata.Configurations")
+      .pipe(
         map((response) => {
-          if(response.error){
-            this.errors = [
-              ...this.errors,
-              response?.error
-            ];
+          if (response.error) {
+            this.errors = [...this.errors, response?.error];
           }
-          if(response === ''){
+          if (response === "") {
             this.errors = [
               ...this.errors,
               {
@@ -96,7 +95,7 @@ export class PatientDashboardComponent implements OnInit {
           }
           return response;
         })
-      );;
+      );
     const patientId = this.route.snapshot.params["patientID"];
     this.store.dispatch(loadFormPrivilegesConfigs());
     this.store.dispatch(loadRolesDetails());
@@ -113,5 +112,10 @@ export class PatientDashboardComponent implements OnInit {
     this.activeVisit$ = this.store.pipe(select(getActiveVisit));
     this.provider$ = this.store.select(getProviderDetails);
     this.currentLocation$ = this.store.select(getCurrentLocation);
+    this.visitEndingControlStatusesConceptUuid$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        `iCare.visits.settings.controlVisitsEndingStatuses.ConceptUuid`
+      );
+    this.observations$ = this.store.select(getAllObservations);
   }
 }

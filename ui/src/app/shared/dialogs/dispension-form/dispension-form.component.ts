@@ -361,7 +361,7 @@ export class DispensingFormComponent implements OnInit {
       )
       .subscribe(
         (res) => {
-          if(res?.message){
+          if (res?.message) {
             this.savingOrder = false;
             this.errors = [
               ...this.errors,
@@ -370,12 +370,14 @@ export class DispensingFormComponent implements OnInit {
                   message:
                     res?.message ||
                     "Error occurred while connecting to the server",
-                  detail: res?.stackTrace ? JSON.stringify(res?.stackTrace) : "",
+                  detail: res?.stackTrace
+                    ? JSON.stringify(res?.stackTrace)
+                    : "",
                 },
               },
             ];
           }
-          if(this.data?.useGenericPrescription && !res?.message) {
+          if (this.data?.useGenericPrescription && !res?.message) {
             const genericOrderPayload = {
               uuid: order?.uuid,
               fulfillerStatus: "RECEIVED",
@@ -401,7 +403,11 @@ export class DispensingFormComponent implements OnInit {
           //   drugOrder: this.savedOrder,
           // });
           this.store.dispatch(
-            loadActiveVisit({ patientId: this.data?.patient ? this.data?.patient?.uuid : this.data?.patientUuid })
+            loadActiveVisit({
+              patientId: this.data?.patient
+                ? this.data?.patient?.uuid
+                : this.data?.patientUuid,
+            })
           );
           if (this.data?.useGenericPrescription && !res?.message) {
             this.dialogRef.close();
@@ -482,7 +488,7 @@ export class DispensingFormComponent implements OnInit {
   }
 
   getConceptsAsFields(genericFieldsConcepts) {
-    console.log("==> Vizia Orderl: ", genericFieldsConcepts);
+    // console.log("==> Vizia Orderl: ", genericFieldsConcepts);
     this.conceptFields$ = zip(
       ...genericFieldsConcepts.map((conceptSetting) =>
         this.conceptsService
