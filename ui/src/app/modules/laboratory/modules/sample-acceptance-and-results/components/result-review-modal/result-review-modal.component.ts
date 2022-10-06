@@ -17,7 +17,6 @@ export class ResultReviewModalComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    console.log("==> Orders: ", this.data?.sample.orders);
     this.data?.sample.orders.forEach((order) => {
       let resultObject;
       order?.testAllocations.forEach((testAllocation) => {
