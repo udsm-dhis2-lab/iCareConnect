@@ -1,7 +1,8 @@
 <div>
-  <mat-toolbar color="primary">{{
-    dialogData?.display ? dialogData?.display : "New Drug"
-  }}</mat-toolbar>
+  <mat-toolbar color="primary"
+    >Update
+    {{ dialogData?.display ? dialogData?.display : "New Drug" }}</mat-toolbar
+  >
   <div class="p-3">
     <div class="loading-overlay" *ngIf="saving">
       <div class="text-center">
@@ -11,7 +12,7 @@
         </div>
       </div>
     </div>
-    <div style="max-height: 50vh; overflow: auto">
+    <div class="p-3" style="max-height: 50vh; overflow: auto">
       <app-form
         [fields]="drugFormFields"
         (formUpdate)="onFormUpdate($event)"
@@ -20,14 +21,16 @@
     <div *ngIf="errors && errors?.length > 0">
       <app-shared-error [errors]="errors"></app-shared-error>
     </div>
-    <p *ngIf="shouldConfirm">Please confirm</p>
+    <p *ngIf="shouldConfirm" class="text-right" style="font-size: 1.3rem">
+      <b> Please confirm </b>
+    </p>
     <div class="d-flex justify-content-end mt-2">
       <button mat-stroked-button (click)="onClose($event)">Close</button>
       <button
         mat-flat-button
         [disabled]="!isFormValid"
         color="primary"
-        (click)="onSave($event, shouldConfirm)"
+        (click)="onSave($event, dialogData, shouldConfirm)"
         class="ml-2"
       >
         {{ shouldConfirm ? "Confirm" : "Save" }}

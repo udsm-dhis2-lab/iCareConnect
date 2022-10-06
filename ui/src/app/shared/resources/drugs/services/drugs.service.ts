@@ -48,4 +48,13 @@ export class DrugsService {
       catchError((error) => of(error))
     );
   }
+
+  updateDrug(uuid: string, data: any): Observable<DrugGet> {
+    return from(this.API.drug.updateDrug(uuid, data)).pipe(
+      map((response) => {
+        return response;
+      }),
+      catchError((error) => of(error))
+    );
+  }
 }
