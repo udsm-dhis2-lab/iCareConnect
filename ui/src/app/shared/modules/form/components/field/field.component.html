@@ -134,6 +134,11 @@
       aria-label="{{ field?.label }}"
       [required]="field?.required"
       matInput
+      [value]="
+        field?.value && (members$ | async)?.length == 1
+          ? (members$ | async)[0]?.display
+          : ''
+      "
       autocomplete="off"
       (keyup)="searchItem($event, field)"
       [matAutocomplete]="auto"
@@ -141,28 +146,29 @@
     <span style="position: relative; float: right; margin-top: -30px">
       <mat-icon>arrow_drop_down</mat-icon>
     </span>
-    <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
+    <mat-autocomplete #auto="matAutocomplete">
       <mat-option aria-disabled="true" value=""> --Search-- </mat-option>
-      <mat-option
-        *ngFor="let option of members$ | async"
-        (click)="getSelectedItemFromOption($event, option, field)"
-        [value]="option?.display ? option?.display : option?.name"
-      >
-        <span
-          class="badge badge-success"
-          [ngClass]="{
-            'badge-success': getStockStatus(option),
-            'badge-danger': !getStockStatus(option)
-          }"
-          *ngIf="
-            field?.otherType === 'Drug' &&
-            !(option?.display === 'Search' || option?.name === 'Search')
-          "
+      <ng-container *ngFor="let option of members$ | async">
+        <mat-option
+          (click)="getSelectedItemFromOption($event, option, field)"
+          [value]="option?.display ? option?.display : option?.name"
         >
-          {{ getStockStatus(option) ? "In-stock" : "Out-stock" }}
-        </span>
-        {{ option?.display ? option?.display : option?.name }}
-      </mat-option>
+          <span
+            class="badge badge-success"
+            [ngClass]="{
+              'badge-success': getStockStatus(option),
+              'badge-danger': !getStockStatus(option)
+            }"
+            *ngIf="
+              field?.otherType === 'Drug' &&
+              !(option?.display === 'Search' || option?.name === 'Search')
+            "
+          >
+            {{ getStockStatus(option) ? "In-stock" : "Out-stock" }}
+          </span>
+          {{ option?.display ? option?.display : option?.name }}
+        </mat-option>
+      </ng-container>
     </mat-autocomplete>
   </mat-form-field>
 </div>
