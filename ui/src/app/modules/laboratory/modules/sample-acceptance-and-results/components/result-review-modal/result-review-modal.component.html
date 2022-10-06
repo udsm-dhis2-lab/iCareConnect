@@ -1,6 +1,12 @@
 <mat-toolbar color="primary">Lab Results - {{ dialogData?.sample?.patient?.givenName }} {{ dialogData?.sample?.patient?.familyName }}</mat-toolbar>
-<div class="row">
+<div class="row results-modal">
     <div class="col-12">
+      <div *ngIf="results.length > 0">
+        <div class="text-center">
+          <h3>Sample Tests with Results</h3>
+        </div>
+
+      </div>
       <!-- Table -->
       <table class="table table-bordered">
         <thead class="table-header">
@@ -14,7 +20,7 @@
           
         </thead>
         <tbody>
-          <ng-container *ngIf="results.length > 0">
+          <ng-container>
             <ng-container
               *ngFor="
                 let result of results;
@@ -57,12 +63,55 @@
               </tr>
             </ng-container>
           </ng-container>
-          <ng-container *ngIf="results.length == 0">
+          <ng-container *ngIf="results.length === 0">
             <tr>
               <td colspan="14" class="text-danger text-center">
-                No Results Yet
+                No Results Yet Jonas
               </td>
             </tr>
+          </ng-container>
+        </tbody>
+      </table>
+    </div>
+    <div class="col-12">
+      <div *ngIf="noResults.length > 0">
+        <div class="text-center">
+          <h3>Sample Tests with No Results</h3>
+        </div>
+
+      </div>
+      <!-- Table -->
+      <table class="table table-bordered">
+        <thead class="table-header">
+          <tr>
+            <th rowspan="2">SN</th>
+            <th rowspan="2">
+              Test Taken
+            </th>
+            <th colspan="2">Test Results</th>
+          </tr>
+          
+        </thead>
+        <tbody>
+          <ng-container>
+            <ng-container
+              *ngFor="
+                let test of noResults;
+                let count = index
+              "
+            >
+              <tr>
+                <td>
+                  {{ count + 1 }}
+                </td>
+                <td>
+                  {{ test.testName }}
+                </td>
+                <td>
+                    No Results Yet
+                </td>
+              </tr>
+            </ng-container>
           </ng-container>
         </tbody>
       </table>
