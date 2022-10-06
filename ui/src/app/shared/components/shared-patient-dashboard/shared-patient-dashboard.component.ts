@@ -69,6 +69,7 @@ import {
   getProviderDetails,
 } from "src/app/store/selectors/current-user.selectors";
 import {
+  ConceptGet,
   LocationGet,
   ObsCreate,
   ProviderGetFull,
@@ -82,6 +83,8 @@ import { SystemSettingsService } from "src/app/core/services/system-settings.ser
 import { OrdersService } from "../../resources/order/services/orders.service";
 import { ConfigsService } from "../../services/configs.service";
 import { UserService } from "src/app/modules/maintenance/services/users.service";
+import { ConceptsService } from "../../resources/concepts/services/concepts.service";
+import { VisitConsultationStatusModalComponent } from "../../dialogs/visit-consultation-status-modal/visit-consultation-status-modal.component";
 
 @Component({
   selector: "app-shared-patient-dashboard",
@@ -97,6 +100,8 @@ export class SharedPatientDashboardComponent implements OnInit {
   @Input() clinicConfigurations: any;
   @Input() currentLocation: LocationGet;
   @Input() isInpatient: boolean;
+  @Input() visitEndingControlStatusesConceptUuid: string;
+  @Input() observations: any;
   currentPatient$: Observable<Patient>;
   vitalSignObservations$: Observable<any>;
   loadingVisit$: Observable<boolean>;
@@ -139,19 +144,33 @@ export class SharedPatientDashboardComponent implements OnInit {
     new EventEmitter<boolean>();
   observationChartForm$: Observable<any>;
   observationChartEncounterType$: Observable<any>;
+
+  visitEndingControlStatusesConcept$: Observable<ConceptGet>;
+  codedVisitCloseStatus: any;
   constructor(
     private store: Store<AppState>,
     private dialog: MatDialog,
     private systemSettingsService: SystemSettingsService,
     private ordersService: OrdersService,
     private configService: ConfigsService,
-    private userService: UserService
+    private userService: UserService,
+    private conceptService: ConceptsService
   ) {
     this.store.dispatch(loadEncounterTypes());
   }
 
   ngOnInit(): void {
-    // console.log(this.currentLocation);
+    console.log(this.observations);
+    if (
+      this.visitEndingControlStatusesConceptUuid &&
+      this.visitEndingControlStatusesConceptUuid !== "none"
+    ) {
+      this.codedVisitCloseStatus = (this.observations?.filter(
+        (obs) =>
+          obs?.concept?.uuid === this.visitEndingControlStatusesConceptUuid
+      ) || [])[0]?.valueObject;
+    }
+
     this.onStartConsultation(this.activeVisit);
     this.store.dispatch(loadOrderTypes());
     this.orderTypes$ = this.store.select(getAllOrderTypes);
@@ -248,6 +267,14 @@ export class SharedPatientDashboardComponent implements OnInit {
         tagNames: ["Transfer+Location", "Refer-to+Location"],
       })
     );
+
+    if (this.visitEndingControlStatusesConceptUuid) {
+      this.visitEndingControlStatusesConcept$ =
+        this.conceptService.getConceptDetailsByUuid(
+          this.visitEndingControlStatusesConceptUuid,
+          "custom:(uuid,display,answers:(uuid,display))"
+        );
+    }
   }
 
   onToggleVitalsSummary(event: Event): void {
@@ -425,5 +452,29 @@ export class SharedPatientDashboardComponent implements OnInit {
   onDischargePatient(event: Event): void {
     event.stopPropagation();
     this.dichargePatient.emit(true);
+  }
+
+  onOpenModalToEndConsultation(
+    event: Event,
+    conceptForControllingHowToEndVisit: ConceptGet,
+    consultationEncounterType: string,
+    provider,
+    location,
+    visit,
+    patient
+  ): void {
+    console.log(patient);
+    event.stopPropagation();
+    this.dialog.open(VisitConsultationStatusModalComponent, {
+      width: "25%",
+      data: {
+        ...conceptForControllingHowToEndVisit,
+        consultationEncounterType,
+        provider,
+        patient,
+        visit,
+        location,
+      },
+    });
   }
 }
