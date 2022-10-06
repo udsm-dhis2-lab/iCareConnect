@@ -25,7 +25,9 @@
     useGeneralPrescription: useGeneralPrescription$ | async,
     generalPrescriptionOrderType: generalPrescriptionOrderType$ | async,
     observationChartForm: observationChartForm$ | async,
-    observationChartEncounterType: observationChartEncounterType$ | async
+    observationChartEncounterType: observationChartEncounterType$ | async,
+    visitEndingControlStatusesConcept:
+      visitEndingControlStatusesConcept$ | async
   } as dashboardParams"
 >
   <div
@@ -36,7 +38,8 @@
       !dashboardParams?.billLoadingState &&
       dashboardParams?.currentPatient &&
       dashboardParams?.forms &&
-      dashboardParams?.provider
+      dashboardParams?.provider &&
+      dashboardParams?.consultationEncounterType
     "
   >
     <div class="patient-dashboard-container mat-elevation-z1">
@@ -277,6 +280,39 @@
                 [patient]="dashboardParams?.currentPatient?.patient?.uuid"
               ></app-is-first-visit>
             </span>
+            <button
+              class="ml-2"
+              [disabled]="
+                codedVisitCloseStatus && codedVisitCloseStatus?.display
+              "
+              *ngIf="
+                dashboardParams?.visitEndingControlStatusesConcept &&
+                dashboardParams?.currentPatient &&
+                visitEndingControlStatusesConceptUuid !== 'none'
+              "
+              mat-stroked-button
+              (click)="
+                onOpenModalToEndConsultation(
+                  $event,
+                  dashboardParams?.visitEndingControlStatusesConcept,
+                  dashboardParams?.consultationEncounterType,
+                  dashboardParams?.provider,
+                  dashboardParams?.currentLocation,
+                  activeVisit,
+                  dashboardParams?.currentPatient?.patient
+                )
+              "
+            >
+              End consultation
+            </button>
+            <span
+              color="primary"
+              class="ml-2"
+              style="margin-top: 8px"
+              *ngIf="codedVisitCloseStatus && codedVisitCloseStatus?.display"
+            >
+              Visit status: {{ codedVisitCloseStatus?.display }}
+            </span>
           </div>
         </div>
         <!-- Patient clinic content -->
@@ -297,13 +333,11 @@
                   'col-lg-8 col-md-8 col-sm-12 col-sx-12 obs-table': isInpatient
                 }"
               >
-               <mat-progress-bar
-                *ngIf="
-                  !readyForClinicalNotes
-                "
-                mode="indeterminate"
-              >
-              </mat-progress-bar>
+                <mat-progress-bar
+                  *ngIf="!readyForClinicalNotes"
+                  mode="indeterminate"
+                >
+                </mat-progress-bar>
                 <app-clinical-notes
                   *ngIf="
                     !isInpatient &&
@@ -340,7 +374,12 @@
                     dashboardParams.currentPatient &&
                     dashboardParams?.forms &&
                     dashboardParams?.forms?.length > 0 &&
-                    (selectedForm && dashboardParams?.observationChartForm === selectedForm?.uuid || (!selectedForm?.uuid && dashboardParams?.observationChartForm === dashboardParams?.forms[0].uuid))
+                    ((selectedForm &&
+                      dashboardParams?.observationChartForm ===
+                        selectedForm?.uuid) ||
+                      (!selectedForm?.uuid &&
+                        dashboardParams?.observationChartForm ===
+                          dashboardParams?.forms[0].uuid))
                   "
                   [clinicalObservations]="
                     dashboardParams?.observationsGroupedByConcept
@@ -354,22 +393,35 @@
                     dashboardParams?.observationChartEncounterType
                   "
                   [provider]="dashboardParams?.provider"
-                  [selectedForm]="selectedForm && dashboardParams?.observationChartForm === selectedForm?.uuid ? selectedForm : dashboardParams?.forms[0]?.uuid === dashboardParams?.observationChartForm ? dashboardParams?.forms[0] : {}
+                  [selectedForm]="
+                    selectedForm &&
+                    dashboardParams?.observationChartForm === selectedForm?.uuid
+                      ? selectedForm
+                      : dashboardParams?.forms[0]?.uuid ===
+                        dashboardParams?.observationChartForm
+                      ? dashboardParams?.forms[0]
+                      : {}
                   "
                   (saveObservations)="
                     onSaveObservations($event, params?.currentPatient)
                   "
                 >
                 </app-patient-observations-chart>
-                 <app-ipd-forms
+                <app-ipd-forms
                   *ngIf="
-                    isInpatient && 
+                    isInpatient &&
                     readyForClinicalNotes &&
                     !dashboardParams.loadingForms &&
                     dashboardParams.currentPatient &&
                     dashboardParams?.forms &&
                     dashboardParams?.forms?.length > 0 &&
-                    (selectedForm && selectedForm?.uuid && dashboardParams?.observationChartForm !== selectedForm?.uuid || (!selectedForm && dashboardParams?.observationChartForm !== dashboardParams?.forms[0]?.uuid))
+                    ((selectedForm &&
+                      selectedForm?.uuid &&
+                      dashboardParams?.observationChartForm !==
+                        selectedForm?.uuid) ||
+                      (!selectedForm &&
+                        dashboardParams?.observationChartForm !==
+                          dashboardParams?.forms[0]?.uuid))
                   "
                   [clinicalObservations]="
                     dashboardParams?.observationsGroupedByConcept
@@ -381,14 +433,20 @@
                   [shouldUseOwnFormSelection]="false"
                   [provider]="dashboardParams?.provider"
                   [selectedForm]="
-                    selectedForm && dashboardParams?.observationChartForm !== selectedForm?.uuid ? selectedForm : dashboardParams?.forms[0]?.uuid !== dashboardParams?.observationChartForm ? dashboardParams?.forms[0] : {}
+                    selectedForm &&
+                    dashboardParams?.observationChartForm !== selectedForm?.uuid
+                      ? selectedForm
+                      : dashboardParams?.forms[0]?.uuid !==
+                        dashboardParams?.observationChartForm
+                      ? dashboardParams?.forms[0]
+                      : {}
                   "
                   (saveObservations)="
                     onSaveObservations($event, params?.currentPatient)
                   "
                 >
                 </app-ipd-forms>
-                
+
                 <div
                   class="alert alert-warning"
                   role="alert"
