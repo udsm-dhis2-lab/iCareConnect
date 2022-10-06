@@ -482,7 +482,6 @@ export class DispensingFormComponent implements OnInit {
   }
 
   getConceptsAsFields(genericFieldsConcepts) {
-    console.log("==> Vizia Orderl: ", genericFieldsConcepts);
     this.conceptFields$ = zip(
       ...genericFieldsConcepts.map((conceptSetting) =>
         this.conceptsService
