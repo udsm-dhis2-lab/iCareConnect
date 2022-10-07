@@ -201,6 +201,7 @@ export class OrderResultsRendererComponent implements OnInit {
                   return {
                     ...setMember,
                     disabled: !availability,
+                    message: "Test can not be performed on lab",
                   };
                 });
               })
@@ -250,6 +251,7 @@ export class OrderResultsRendererComponent implements OnInit {
           ...setMember?.formField,
           availability: availability,
           disabled: !availability,
+          message: "Test can not be performed on lab",
         };
       }
     );

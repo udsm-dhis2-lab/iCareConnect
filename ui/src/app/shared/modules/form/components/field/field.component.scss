@@ -54,6 +54,7 @@ input[type="number"]::-webkit-outer-spin-button {
   margin: 0;
 }
 
+ng-deep .disabled-form-selection-option,
 .disabled-form-selection-option {
   cursor: not-allowed !important;
   color: red;

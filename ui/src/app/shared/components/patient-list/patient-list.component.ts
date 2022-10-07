@@ -47,6 +47,7 @@ export class PatientListComponent implements OnInit, OnChanges {
   @Input() filterCategory: string;
   @Input() orderBy: string;
   @Input() orderByDirection: string;
+  @Input() doNotUseLocation: boolean;
 
   page: number = 0;
   visits$: Observable<Visit[]>;
@@ -93,43 +94,6 @@ export class PatientListComponent implements OnInit, OnChanges {
     }
     this.itemsPerPage = this.itemsPerPage ? this.itemsPerPage : 10;
     this.getVisits(this.visits);
-
-    // this.visits$.subscribe({
-    //   next: (visits) => {
-    //     // console.log("Visits: ", visits)
-    //    this.visits = visits
-    //   },
-    // });
-
-    /**
-     * TODO: find the best place to put this
-     */
-    // this.visits$.pipe(take(1)).subscribe((visits) => {
-    //   map(visits, (visit) => {
-    //     if (
-    //       visit["visit"]?.location?.tags.some(
-    //         (tag) => tag?.name === "Bed Location"
-    //       )
-    //     ) {
-    //       this.store.dispatch(
-    //         upsertAdmittedPatientLocation({
-    //           locationVisitDetails: {
-    //             id: visit["visit"]?.location?.uuid,
-    //             locationId: visit["visit"]?.location?.uuid,
-    //             ...visit["visit"],
-    //           },
-    //         })
-    //       );
-    //     } else {
-    //       this.store.dispatch(
-    //         upsertAdmittedPatientLocation({
-    //           locationVisitDetails: {},
-    //         })
-    //       );
-    //     }
-    //     this.store.dispatch(clearActiveVisit());
-    //   });
-    // });
   }
 
   private getVisits(visits: Visit[]) {
@@ -144,7 +108,7 @@ export class PatientListComponent implements OnInit, OnChanges {
         )
       : this.visitService
           .getAllVisits(
-            this.currentLocation,
+            !this.doNotUseLocation ? this.currentLocation : null,
             false,
             false,
             null,
@@ -180,7 +144,10 @@ export class PatientListComponent implements OnInit, OnChanges {
     this.page =
       details?.type === "next" ? Number(this.page) + 1 : Number(this.page) - 1;
 
-    this.startingIndex = details?.type === "next" ? this.startingIndex + Number(this.itemsPerPage) : this.startingIndex - Number(this.itemsPerPage)
+    this.startingIndex =
+      details?.type === "next"
+        ? this.startingIndex + Number(this.itemsPerPage)
+        : this.startingIndex - Number(this.itemsPerPage);
 
     this.visits$ =
       this.service && this.service === "LABS"
@@ -240,7 +207,7 @@ export class PatientListComponent implements OnInit, OnChanges {
       .pipe(
         tap((response: any) => {
           this.loadingPatients = false;
-          if(response?.error) {
+          if (response?.error) {
             this.errors = [...this.errors, ...response?.error];
           }
         })
@@ -335,11 +302,8 @@ export class PatientListComponent implements OnInit, OnChanges {
       .pipe(
         tap((response: any) => {
           this.loadingPatients = false;
-          if(response?.error){
-            this.errors = [
-              ...this.errors,
-              response?.error 
-            ]  
+          if (response?.error) {
+            this.errors = [...this.errors, response?.error];
           }
         })
       );
