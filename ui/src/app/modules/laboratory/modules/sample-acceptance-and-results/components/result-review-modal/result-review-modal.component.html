@@ -1,14 +1,18 @@
-<mat-toolbar color="primary">Lab Results - {{ dialogData?.sample?.patient?.givenName }} {{ dialogData?.sample?.patient?.familyName }}</mat-toolbar>
-<div class="row results-modal">
+<ng-container>
+  <mat-toolbar color="primary">
+    <span>
+      Lab Results - {{ dialogData?.sample?.patient?.givenName }} {{ dialogData?.sample?.patient?.familyName }}
+    </span>
+  </mat-toolbar>
+  <div class="row results-modal">
     <div class="col-12">
       <div *ngIf="results.length > 0">
         <div class="text-center">
           <h3>Sample Tests with Results</h3>
-        </div>
-
+        </div> 
       </div>
       <!-- Table -->
-      <table class="table table-bordered">
+      <table class="table table-bordered" *ngIf="results.length > 0">
         <thead class="table-header">
           <tr>
             <th rowspan="2">SN</th>
@@ -22,10 +26,10 @@
         <tbody>
           <ng-container>
             <ng-container
-              *ngFor="
-                let result of results;
-                let count = index
-              "
+            *ngFor="
+            let result of results;
+            let count = index
+            "
             >
               <tr>
                 <td>
@@ -36,7 +40,7 @@
                 </td>
                 <td *ngIf="result.results.length > 0">
                   <span *ngFor="
-                    let singleResult of result.results;
+                  let singleResult of result.results;
                     let counter = index">
                     <span *ngIf="singleResult?.valueCoded">
                       {{ counter + 1 }}. {{ singleResult?.valueCoded?.display }} <br>
@@ -54,7 +58,7 @@
                       {{ counter + 1 }}. {{ singleResult?.valueBoolean }} <br>
                     </span>
                   </span>
-
+                  
                 </td>
                 <td *ngIf="result.results.length === 0">
                   <span>
@@ -75,7 +79,7 @@
     </div>
     <div class="col-12">
       <div *ngIf="noResults.length > 0">
-        <div class="text-center">
+        <div class="textcenter">
           <h3>Sample Tests with No Results</h3>
         </div>
 
@@ -98,8 +102,8 @@
               *ngFor="
                 let test of noResults;
                 let count = index
-              "
-            >
+                "
+                >
               <tr>
                 <td>
                   {{ count + 1 }}
@@ -116,4 +120,10 @@
         </tbody>
       </table>
     </div>
-</div>
+  </div>
+  <div class="row w-100 justify-content-end">
+    <button mat-stroked-button (click)="onClose($event)">
+      Close
+    </button>
+  </div>
+  </ng-container>
