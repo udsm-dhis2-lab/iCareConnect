@@ -80,6 +80,7 @@
     >
       <mat-option
         *ngFor="let option of field?.options"
+        [disabled]="option?.disabled"
         [value]="option?.value"
         >{{ option.label }}</mat-option
       >
@@ -150,6 +151,8 @@
       <mat-option aria-disabled="true" value=""> --Search-- </mat-option>
       <ng-container *ngFor="let option of members$ | async">
         <mat-option
+          [disabled]="option?.disabled"
+          [ngClass]="{ 'disabled-form-selection-option': option?.disabled }"
           (click)="getSelectedItemFromOption($event, option, field)"
           [value]="option?.display ? option?.display : option?.name"
         >
