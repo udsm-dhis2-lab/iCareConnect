@@ -531,4 +531,8 @@ export class DispensingFormComponent implements OnInit {
     // });
     this.updateConsultationOrder.emit();
   }
+
+  onLoadVisit(visit: any){
+    this.getVisitByUuid(visit.uuid)
+  }
 }

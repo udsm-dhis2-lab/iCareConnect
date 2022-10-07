@@ -2,6 +2,7 @@ import { Component, EventEmitter, OnInit, Output, Input } from "@angular/core";
 import { Store } from "@ngrx/store";
 import { AppState } from "src/app/store/reducers";
 import { flatten, keyBy } from "lodash";
+import { EncountersService } from "../../services/encounters.service";
 
 @Component({
   selector: "app-current-prescriptions",
@@ -12,9 +13,12 @@ export class CurrentPrescriptionComponent implements OnInit {
   @Input() visit: any;
   @Input() genericPrescriptionOrderType: any;
 
-  drugsPrescribed: any;
+  @Output() loadVisit: EventEmitter<any> = new EventEmitter();
 
-  constructor() {}
+  drugsPrescribed: any;
+  errors: any[] = [];
+
+  constructor(private encounterService: EncountersService) {}
 
   ngOnInit(): void {
     this.drugsPrescribed = flatten(
@@ -43,5 +47,19 @@ export class CurrentPrescriptionComponent implements OnInit {
         })
         ?.filter((order) => order)
     );
+  }
+
+  stopDrugOrder(e: Event, drugOrder: any) {
+    this.encounterService.voidEncounter(drugOrder?.encounter).subscribe((response) => {
+      if(!response?.error){
+        this.loadVisit.emit(this.visit);
+      }
+      if(response?.error){
+        this.errors = [
+          ...this.errors,
+          response?.error
+        ]
+      }
+    })
   }
 }
