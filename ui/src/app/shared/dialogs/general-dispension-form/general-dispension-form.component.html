@@ -11,6 +11,11 @@
     <div>
       <app-form
         [fields]="[drugConceptField]"
+        (formUpdate)="onFormUpdate($event, 'drug')"
+      ></app-form>
+      <app-form
+        *ngIf="strengthFormField"
+        [fields]="[strengthFormField]"
         (formUpdate)="onFormUpdate($event)"
       ></app-form>
     </div>
