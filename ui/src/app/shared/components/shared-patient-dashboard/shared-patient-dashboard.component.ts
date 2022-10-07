@@ -403,7 +403,8 @@ export class SharedPatientDashboardComponent implements OnInit {
     locationType,
     currentPatient,
     visit,
-    currentLocation
+    currentLocation,
+    isIPD?: boolean
   ): void {
     event.stopPropagation();
     this.dialog.open(TransferWithinComponent, {
@@ -416,7 +417,9 @@ export class SharedPatientDashboardComponent implements OnInit {
           formUuid,
         },
         visit,
-        path: "/clinic/patient-list",
+        path: !isIPD
+          ? "/clinic/patient-list"
+          : "/inpatient/" + currentLocation?.uuid,
         locationType,
       },
       disableClose: false,

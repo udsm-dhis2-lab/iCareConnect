@@ -52,6 +52,7 @@
             [genericPrescriptionOrderType]="
               drugParams?.generalPrescriptionOrderType
             "
+            (loadVisit)="loadVisit($event)"
           ></app-current-prescriptions>
           <mat-progress-bar 
             *ngIf="!drugParams?.currentVisit || !drugParams?.generalPrescriptionOrderType"

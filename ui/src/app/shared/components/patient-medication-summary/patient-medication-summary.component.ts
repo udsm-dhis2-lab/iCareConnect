@@ -53,6 +53,20 @@ export class PatientMedicationSummaryComponent implements OnInit {
     );
   }
 
+  loadVisit(visit?: any){
+    let visitUuid = this.patientVisit?.uuid
+      ? this.patientVisit?.uuid
+      : visit
+      ? visit?.uuid
+      : "";
+    this.currentVisit$ = this.visitService.getVisitDetailsByVisitUuid(
+      visitUuid,
+      {
+        v: "custom:(uuid,display,patient,encounters:(uuid,display,obs,orders),attributes)",
+      }
+    );
+  }
+
   onAddOrder(e: Event) {
     e.stopPropagation();
     const dialog = this.dialog.open(DispensingFormComponent, {
@@ -78,12 +92,7 @@ export class PatientMedicationSummaryComponent implements OnInit {
       if (data?.updateConsultationOrder) {
         this.updateConsultationOrder.emit();
       }
-      this.currentVisit$ = this.visitService.getVisitDetailsByVisitUuid(
-        this.patientVisit?.uuid,
-        {
-          v: "custom:(uuid,display,patient,encounters:(uuid,display,obs,orders),attributes)",
-        }
-      );
+      this.loadVisit();
     });
   }
 }
