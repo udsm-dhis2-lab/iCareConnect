@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Inject, OnInit, Output } from "@angular/core";
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { select, Store } from "@ngrx/store";
-import { Observable, zip } from "rxjs";
+import { Observable, of, zip } from "rxjs";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
 import { DrugOrderError } from "src/app/shared/resources/order/constants/drug-order-error.constant";
@@ -252,11 +252,14 @@ export class DispensingFormComponent implements OnInit {
     this.currentLocation$ = this.store.pipe(select(getCurrentLocation));
     this.currentVisit$ = this.store.pipe(select(getActiveVisit));
     this.provider$ = this.store.select(getProviderDetails);
-
-    this.drugOrderConceptDetails$ = this.conceptService.getConceptDetailsByUuid(
-      this.data?.drugOrder?.concept?.uuid,
-      "custom:(uuid,display,setMembers:(uuid,display))"
-    );
+    
+    this.drugOrderConceptDetails$ = this.data?.drugOrder
+      ? this.conceptService.getConceptDetailsByUuid(
+          this.data?.drugOrder?.concept?.uuid,
+          "custom:(uuid,display,setMembers:(uuid,display))"
+        )
+      : of([]);
+    
   }
 
   onCancel(): void {
