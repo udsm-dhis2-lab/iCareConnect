@@ -69,21 +69,23 @@
               <mat-icon>arrow_back</mat-icon>
               Back to Client List
             </button>
-            <button
-              *ngFor="let form of dashboardParams?.forms"
-              class="mr-2"
-              [ngClass]="{
-                'selected-form':
-                  (selectedForm && selectedForm?.uuid === form?.uuid) ||
-                  (!selectedForm &&
-                    dashboardParams?.forms[0]?.uuid === form?.uuid)
-              }"
-              mat-stroked-button
-              [matMenuTriggerFor]="form?.name"
-              (click)="getSelectedForm($event, form)"
-            >
-              {{ form?.name }}
-            </button>
+            <div *ngIf="!activeVisit?.waitingToBeAdmitted">
+              <button
+                *ngFor="let form of dashboardParams?.forms"
+                class="mr-2"
+                [ngClass]="{
+                  'selected-form':
+                    (selectedForm && selectedForm?.uuid === form?.uuid) ||
+                    (!selectedForm &&
+                      dashboardParams?.forms[0]?.uuid === form?.uuid)
+                }"
+                mat-stroked-button
+                [matMenuTriggerFor]="form?.name"
+                (click)="getSelectedForm($event, form)"
+              >
+                {{ form?.name }}
+              </button>
+            </div>
           </div>
 
           <!-- <h2 class="text-left ml-2">Patient Dashboard</h2> -->
@@ -129,7 +131,11 @@
               class="text-danger mr-2"
               *ngIf="activeVisit?.waitingToBeAdmitted"
             >
-              Waiting to be given a bed
+              <!-- Waiting to be given a bed -->
+              <img
+              height="40"
+              width="40" 
+              src="data:image/png;base64,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" alt="">
             </span>
             <span
               class="mr-2"
@@ -322,7 +328,7 @@
             !(
               !activeVisit?.isEmergency &&
               dashboardParams?.hasPatientHavePendingPaymentForTheCurrentVisitType
-            )
+            ) && !activeVisit?.waitingToBeAdmitted
           "
         >
           <div class="p-2">
@@ -724,6 +730,18 @@
           role="alert"
         >
           Not paid for Consultation Service
+        </div>
+        
+        <div
+          class="alert alert-warning mt-4 ml-2 mr-2"
+          *ngIf="
+            !activeVisit?.isEmergency &&
+            dashboardParams?.hasPatientHavePendingPaymentForTheCurrentVisitType ||
+            activeVisit?.waitingToBeAdmitted
+          "
+          role="alert"
+        >
+          Assign bed to this patient to continue
         </div>
       </div>
     </div>
