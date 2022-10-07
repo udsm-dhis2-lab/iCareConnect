@@ -70,7 +70,7 @@
               Back to Client List
             </button>
             <ng-container *ngIf="!activeVisit?.waitingToBeAdmitted">
-              <!-- <button
+              <button
                 *ngFor="let form of dashboardParams?.forms"
                 class="mr-2"
                 [ngClass]="{
@@ -84,8 +84,8 @@
                 (click)="getSelectedForm($event, form)"
               >
                 {{ form?.name }}
-              </button> -->
-              <a
+              </button>
+              <!-- <a
                 *ngFor="let form of dashboardParams?.forms"
                 class="mr-2 form-listing"
                 [ngClass]="{
@@ -97,7 +97,7 @@
                 (click)="getSelectedForm($event, form)"
               >
                 {{ form?.name }}
-              </a>
+              </a> -->
             </ng-container>
           </div>
 
