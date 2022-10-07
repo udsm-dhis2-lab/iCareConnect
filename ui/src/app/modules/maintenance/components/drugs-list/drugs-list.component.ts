@@ -3,6 +3,7 @@ import { MatDialog } from "@angular/material/dialog";
 import { flatten } from "lodash";
 import { Observable, zip } from "rxjs";
 import { map } from "rxjs/operators";
+import { ExportDataService } from "src/app/core/services/export-data.service";
 import { DrugsService } from "src/app/shared/resources/drugs/services/drugs.service";
 import { ManageDrugModalComponent } from "../../modals/manage-drug-modal/manage-drug-modal.component";
 
@@ -20,7 +21,11 @@ export class DrugsListComponent implements OnInit {
   page: number = 1;
   searchingText: string;
   downloading: boolean = false;
-  constructor(private drugService: DrugsService, private dialog: MatDialog) {}
+  constructor(
+    private drugService: DrugsService,
+    private dialog: MatDialog,
+    private exportDataService: ExportDataService
+  ) {}
 
   ngOnInit(): void {
     this.getDrugs();
@@ -80,7 +85,7 @@ export class DrugsListComponent implements OnInit {
       });
   }
 
-  onDownload(event: Event): void {
+  onDownload(event: Event, fileName: string): void {
     event.stopPropagation();
     this.downloading = true;
     let references = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
@@ -97,6 +102,8 @@ export class DrugsListComponent implements OnInit {
     this.drugs$.subscribe((response) => {
       if (response) {
         this.downloading = false;
+        let data = response?.results
+        this.exportDataService.exportAsExcelFile(data, fileName);
       }
     });
   }

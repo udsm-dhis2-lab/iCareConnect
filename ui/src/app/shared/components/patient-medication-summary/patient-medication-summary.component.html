@@ -42,17 +42,21 @@
     </tbody>
   </table>
   <div
-    *ngIf="drugParams?.currentVisit && drugParams?.generalPrescriptionOrderType"
   >
     <table class="w-100 table table-bordered">
       <tbody>
         <tr class="p-4">
           <app-current-prescriptions
+            *ngIf="drugParams?.currentVisit && drugParams?.generalPrescriptionOrderType"
             [visit]="drugParams?.currentVisit"
             [genericPrescriptionOrderType]="
               drugParams?.generalPrescriptionOrderType
             "
           ></app-current-prescriptions>
+          <mat-progress-bar 
+            *ngIf="!drugParams?.currentVisit || !drugParams?.generalPrescriptionOrderType"
+            mode="indeterminate">
+          </mat-progress-bar>
         </tr>
         <tr *ngIf="!isInpatient">
           <td colspan="3">
