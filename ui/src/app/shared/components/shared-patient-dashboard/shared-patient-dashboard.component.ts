@@ -160,7 +160,6 @@ export class SharedPatientDashboardComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log(this.observations);
     if (
       this.visitEndingControlStatusesConceptUuid &&
       this.visitEndingControlStatusesConceptUuid !== "none"
