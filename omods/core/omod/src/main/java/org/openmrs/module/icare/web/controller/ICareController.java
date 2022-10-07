@@ -406,6 +406,7 @@ public class ICareController {
 			drugMap.put("name", drug.getName());
 			drugMap.put("description", drug.getDescription());
 			drugMap.put("retired", drug.getRetired());
+			drugMap.put("strength", drug.getStrength());
 
 			Map<String, Object> conceptMap = new HashMap<String, Object>();
 			conceptMap.put("uuid",drug.getConcept().getUuid());
