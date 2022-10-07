@@ -290,6 +290,7 @@
                   [genericPrescriptionOrderType]="
                     params?.generalPrescriptionOrderType
                   "
+                  (loadVisit)="onLoadVisit($event)"
                 ></app-current-prescriptions>
                 <mat-progress-bar
                   *ngIf="!params?.intermediateVisit"
