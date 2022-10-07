@@ -6,12 +6,10 @@ import { Store } from "@ngrx/store";
 import { AppState } from "src/app/store/reducers";
 import {
   go,
-  loadActiveVisits,
   setCurrentUserCurrentLocation,
   updateCurrentLocationStatus,
 } from "src/app/store/actions";
 import { ICARE_APPS } from "src/app/core/containers/modules/modules.constants";
-import { getUserAssignedLocations } from "src/app/store/selectors/current-user.selectors";
 
 @Component({
   selector: "app-modules-selector",
@@ -51,9 +49,19 @@ export class ModulesSelectorComponent implements OnInit {
         ? null
         : JSON.parse(localStorage.getItem("currentLocation"));
     if (storedNavigationDetails && locationMatchingNavigationDetails) {
-      this.currentLocation = storedLocation
-        ? storedLocation
-        : locationMatchingNavigationDetails;
+      const isStoredLocationHasModuleMatchingStoredNavigationData =
+        !storedLocation
+          ? false
+          : (
+              storedLocation?.modules?.filter(
+                (module) =>
+                  storedNavigationDetails?.path[0]?.indexOf(module?.id) > -1
+              ) || []
+            )?.length > 0;
+      this.currentLocation =
+        storedLocation && isStoredLocationHasModuleMatchingStoredNavigationData
+          ? storedLocation
+          : locationMatchingNavigationDetails;
 
       // this.store.dispatch(
       //   setCurrentUserCurrentLocation({ location: this.currentLocation })
@@ -227,7 +235,6 @@ export class ModulesSelectorComponent implements OnInit {
       (this.currentModule?.app?.considerLocationRoute
         ? "/" + this.currentLocation?.uuid
         : "");
-    console.log("URL", url);
     this.store.dispatch(
       go({
         path: [url],
