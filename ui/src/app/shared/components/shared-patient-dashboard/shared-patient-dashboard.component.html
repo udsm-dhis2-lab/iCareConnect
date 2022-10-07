@@ -59,7 +59,7 @@
             pr-3
           "
         >
-          <div class="w-50 d-flex justify-content-left">
+          <div class="d-flex justify-content-left">
             <button
               class="float-left mr-4"
               mat-stroked-button
@@ -69,7 +69,7 @@
               <mat-icon>arrow_back</mat-icon>
               Back to Client List
             </button>
-            <div *ngIf="!activeVisit?.waitingToBeAdmitted">
+            <ng-container *ngIf="!activeVisit?.waitingToBeAdmitted">
               <button
                 *ngFor="let form of dashboardParams?.forms"
                 class="mr-2"
@@ -85,7 +85,7 @@
               >
                 {{ form?.name }}
               </button>
-            </div>
+            </ng-container>
           </div>
 
           <!-- <h2 class="text-left ml-2">Patient Dashboard</h2> -->
