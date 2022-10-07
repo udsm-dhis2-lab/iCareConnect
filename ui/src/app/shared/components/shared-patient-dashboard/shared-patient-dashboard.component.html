@@ -69,21 +69,19 @@
               <mat-icon>arrow_back</mat-icon>
               Back to Client List
             </button>
-            <button
+            <a
               *ngFor="let form of dashboardParams?.forms"
-              class="mr-2"
+              class="mr-2 form-listing"
               [ngClass]="{
                 'selected-form':
                   (selectedForm && selectedForm?.uuid === form?.uuid) ||
                   (!selectedForm &&
                     dashboardParams?.forms[0]?.uuid === form?.uuid)
               }"
-              mat-stroked-button
-              [matMenuTriggerFor]="form?.name"
               (click)="getSelectedForm($event, form)"
             >
               {{ form?.name }}
-            </button>
+            </a>
           </div>
 
           <!-- <h2 class="text-left ml-2">Patient Dashboard</h2> -->
