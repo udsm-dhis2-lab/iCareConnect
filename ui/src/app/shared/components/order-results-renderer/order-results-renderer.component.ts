@@ -184,7 +184,25 @@ export class OrderResultsRendererComponent implements OnInit {
           orderBy(
             flatten(
               labDepartment?.setMembers.map((setMember) => {
-                return setMember?.setMembers;
+                return setMember?.setMembers?.map((setMember) => {
+                  const availabilityMapping = (setMember?.mappings?.filter(
+                    (mapping) =>
+                      mapping?.display
+                        ?.toLowerCase()
+                        ?.indexOf("lab test availability") > -1
+                  ) || [])[0];
+                  const availability = !availabilityMapping
+                    ? true
+                    : availabilityMapping?.display
+                        ?.toLowerCase()
+                        ?.indexOf(": no") > -1
+                    ? false
+                    : true;
+                  return {
+                    ...setMember,
+                    disabled: !availability,
+                  };
+                });
               })
             ),
             ["name"],
