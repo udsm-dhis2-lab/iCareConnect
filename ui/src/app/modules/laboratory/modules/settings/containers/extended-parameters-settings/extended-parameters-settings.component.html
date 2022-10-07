@@ -1,13 +1,23 @@
 <div>
   <mat-tab-group>
-    <mat-tab label="Parameters Control">
+    <mat-tab
+      label="{{
+        LISConfigurations?.isLIS ? 'Parameters Control' : 'Tests Comtrol'
+      }}"
+    >
       <ng-template matTabContent>
         <div class="p-3">
           <app-lab-orders-management></app-lab-orders-management>
         </div>
       </ng-template>
     </mat-tab>
-    <mat-tab label="Parameters Other Settings">
+    <mat-tab
+      label=" {{
+        LISConfigurations?.isLIS
+          ? 'Parameters Other Settings'
+          : 'Other Settings'
+      }}"
+    >
       <ng-template matTabContent>
         <div class="p-3">
           <app-test-settings></app-test-settings>

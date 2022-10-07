@@ -15,7 +15,7 @@ const routes: Routes = [
         component: NoLabAccessComponent,
       },
       {
-        path: "dashboard",
+        path: "dashboard-lab",
         loadChildren: () =>
           import("./modules/dashboard/dashboard.module").then(
             (m) => m.DashboardModule
