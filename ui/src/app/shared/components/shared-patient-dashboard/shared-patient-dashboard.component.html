@@ -59,7 +59,7 @@
             pr-3
           "
         >
-          <div class="w-50 d-flex justify-content-left">
+          <div class="d-flex justify-content-left">
             <button
               class="float-left mr-4"
               mat-stroked-button
@@ -69,19 +69,36 @@
               <mat-icon>arrow_back</mat-icon>
               Back to Client List
             </button>
-            <a
-              *ngFor="let form of dashboardParams?.forms"
-              class="mr-2 form-listing"
-              [ngClass]="{
-                'selected-form':
-                  (selectedForm && selectedForm?.uuid === form?.uuid) ||
-                  (!selectedForm &&
-                    dashboardParams?.forms[0]?.uuid === form?.uuid)
-              }"
-              (click)="getSelectedForm($event, form)"
-            >
-              {{ form?.name }}
-            </a>
+            <ng-container *ngIf="!activeVisit?.waitingToBeAdmitted">
+              <!-- <button
+                *ngFor="let form of dashboardParams?.forms"
+                class="mr-2"
+                [ngClass]="{
+                  'selected-form':
+                    (selectedForm && selectedForm?.uuid === form?.uuid) ||
+                    (!selectedForm &&
+                      dashboardParams?.forms[0]?.uuid === form?.uuid)
+                }"
+                mat-stroked-button
+                [matMenuTriggerFor]="form?.name"
+                (click)="getSelectedForm($event, form)"
+              >
+                {{ form?.name }}
+              </button> -->
+              <a
+                *ngFor="let form of dashboardParams?.forms"
+                class="mr-2 form-listing"
+                [ngClass]="{
+                  'selected-form':
+                    (selectedForm && selectedForm?.uuid === form?.uuid) ||
+                    (!selectedForm &&
+                      dashboardParams?.forms[0]?.uuid === form?.uuid)
+                }"
+                (click)="getSelectedForm($event, form)"
+              >
+                {{ form?.name }}
+              </a>
+            </ng-container>
           </div>
 
           <!-- <h2 class="text-left ml-2">Patient Dashboard</h2> -->
@@ -129,6 +146,7 @@
             >
               <!-- Waiting to be given a bed -->
               <img
+                matTooltip="Patient is waiting to be given a bed"
                 height="40"
                 width="40"
                 src="data:image/webp;base64,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"
