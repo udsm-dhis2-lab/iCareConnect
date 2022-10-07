@@ -213,15 +213,16 @@ export class ResultsFeedingModalComponent implements OnInit {
   }
 
   setEnteredParameterValue(item, val) {
-    if (this.LISConfigurations?.isLIS) {
-      if (this.temporaryValues[item?.uuid]) {
-        this.values[item?.uuid] = val;
-      } else {
-        this.temporaryValues[item?.uuid] = val;
-      }
-    } else {
-      this.values[item?.uuid] = val;
-    }
+    // if (this.LISConfigurations?.isLIS) {
+    //   if (this.temporaryValues[item?.uuid]) {
+    //     this.values[item?.uuid] = val;
+    //   } else {
+    //     this.temporaryValues[item?.uuid] = val;
+    //   }
+    // } else {
+    //   this.values[item?.uuid] = val;
+    // }
+    this.values[item?.uuid] = val;
   }
 
   onGoNext(event: Event, parameter): void {
@@ -230,27 +231,31 @@ export class ResultsFeedingModalComponent implements OnInit {
   }
 
   setValue(val, item) {
-    if (this.LISConfigurations?.isLIS) {
-      if (this.temporaryValues[item?.order?.concept?.uuid]) {
-        this.values[item?.order?.concept?.uuid] = val;
-      } else {
-        this.temporaryValues[item?.order?.concept?.uuid] = val;
-      }
-    } else {
-      this.values[item?.order?.concept?.uuid] = val;
-    }
+    // if (this.LISConfigurations?.isLIS) {
+    //   if (this.temporaryValues[item?.order?.concept?.uuid]) {
+    //     this.values[item?.order?.concept?.uuid] = val;
+    //   } else {
+    //     this.temporaryValues[item?.order?.concept?.uuid] = val;
+    //   }
+    // } else {
+    //   this.values[item?.order?.concept?.uuid] = val;
+    // }
+
+    this.values[item?.order?.concept?.uuid] = val;
   }
 
   setParameterValue(val, item) {
-    if (this.LISConfigurations?.isLIS) {
-      if (this.temporaryValues[item?.uuid]) {
-        this.values[item?.uuid] = val;
-      } else {
-        this.temporaryValues[item?.uuid] = val;
-      }
-    } else {
-      this.values[item?.uuid] = val;
-    }
+    // if (this.LISConfigurations?.isLIS) {
+    //   if (this.temporaryValues[item?.uuid]) {
+    //     this.values[item?.uuid] = val;
+    //   } else {
+    //     this.temporaryValues[item?.uuid] = val;
+    //   }
+    // } else {
+    //   this.values[item?.uuid] = val;
+    // }
+
+    this.values[item?.uuid] = val;
   }
 
   setCommentValue(val, item) {

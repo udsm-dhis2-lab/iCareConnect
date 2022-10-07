@@ -184,7 +184,26 @@ export class OrderResultsRendererComponent implements OnInit {
           orderBy(
             flatten(
               labDepartment?.setMembers.map((setMember) => {
-                return setMember?.setMembers;
+                return setMember?.setMembers?.map((setMember) => {
+                  const availabilityMapping = (setMember?.mappings?.filter(
+                    (mapping) =>
+                      mapping?.display
+                        ?.toLowerCase()
+                        ?.indexOf("lab test availability") > -1
+                  ) || [])[0];
+                  const availability = !availabilityMapping
+                    ? true
+                    : availabilityMapping?.display
+                        ?.toLowerCase()
+                        ?.indexOf(": no") > -1
+                    ? false
+                    : true;
+                  return {
+                    ...setMember,
+                    disabled: !availability,
+                    message: "Test can not be performed on lab",
+                  };
+                });
               })
             ),
             ["name"],
@@ -198,6 +217,7 @@ export class OrderResultsRendererComponent implements OnInit {
     event: Event,
     investigationAndProceduresFormsDetails
   ): void {
+    // TODO: Add support to use system settings to determine if its lab department
     event.stopPropagation();
     this.showCommonLabTests = !this.showCommonLabTests;
     const commonLabTestsSetId =
@@ -206,12 +226,35 @@ export class OrderResultsRendererComponent implements OnInit {
       (investigationAndProceduresFormsDetails?.setMembers.filter(
         (department) => department?.name.toLowerCase().indexOf("lab") > -1
       ) || [])[0];
+    // console.log("labDepartment", labDepartment);
     const commonLabTestsSet = !labDepartment
       ? null
       : (labDepartment?.setMembers.filter(
           (member) => member?.id === commonLabTestsSetId
         ) || [])[0];
-    this.commonLabTestsFields = commonLabTestsSet?.formFields;
+    // TODO: Find a better way to handle the following process - to identify test availability
+    this.commonLabTestsFields = commonLabTestsSet?.setMembers?.map(
+      (setMember) => {
+        // console.log(setMember);
+        const availabilityMapping = (setMember?.mappings?.filter(
+          (mapping) =>
+            mapping?.display?.toLowerCase()?.indexOf("lab test availability") >
+            -1
+        ) || [])[0];
+        // console.log("availabilityMapping", availabilityMapping);
+        const availability = !availabilityMapping
+          ? true
+          : availabilityMapping?.display?.toLowerCase()?.indexOf(": no") > -1
+          ? false
+          : true;
+        return {
+          ...setMember?.formField,
+          availability: availability,
+          disabled: !availability,
+          message: "Test can not be performed on lab",
+        };
+      }
+    );
   }
 
   onDeleteLabTest(e: any) {

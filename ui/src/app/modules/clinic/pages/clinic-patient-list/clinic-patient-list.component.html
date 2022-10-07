@@ -5,7 +5,8 @@
     consultationOrderType: consultationOrderType$ | async,
     radiologyOrderType: radiologyOrderType$ | async,
     drugOrderType: drugOrderType$ | async,
-    labTestOrderType: labTestOrderType$ | async
+    labTestOrderType: labTestOrderType$ | async,
+    showAllPatientsTab: showAllPatientsTab$ | async
   } as params"
 >
   <mat-toolbar>
@@ -121,10 +122,23 @@
           <!-- </div> -->
         </mat-tab>
 
-        <mat-tab label="Admitted Patients">
-          <!-- TODO: Remove hardcoded location Id -->
-          <!-- <div class="p-2" *ngIf="selectedTab.value === 3"> -->
+        <mat-tab
+          label="All Patients"
+          *ngIf="params?.showAllPatientsTab?.value === 'true'"
+        >
+          <ng-template matTabContent>
+            <app-patient-list
+              [shouldShowParentLocation]="true"
+              [doNotUseLocation]="true"
+              [isTabularList]="true"
+              [itemsPerPage]="10"
+              [orderType]="'iCARE901-ADMS-11e8-b450-525400e4297f'"
+              (selectPatient)="onSelectPatient($event)"
+            ></app-patient-list>
+          </ng-template>
+        </mat-tab>
 
+        <mat-tab label="Admitted Patients">
           <ng-template matTabContent>
             <app-patient-list
               [shouldShowParentLocation]="true"
@@ -134,7 +148,6 @@
               (selectPatient)="onSelectPatient($event)"
             ></app-patient-list>
           </ng-template>
-          <!-- </div> -->
         </mat-tab>
       </mat-tab-group>
     </div>

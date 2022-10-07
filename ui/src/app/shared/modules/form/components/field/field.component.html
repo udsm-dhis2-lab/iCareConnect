@@ -80,9 +80,18 @@
     >
       <mat-option
         *ngFor="let option of field?.options"
+        [disabled]="option?.disabled"
         [value]="option?.value"
-        >{{ option.label }}</mat-option
       >
+        <span
+          [ngClass]="{ 'disabled-form-selection-option': option?.disabled }"
+        >
+          {{ option.label }}
+        </span>
+        <span *ngIf="option?.disabled" class="ml-2"
+          >({{ option?.message }})</span
+        >
+      </mat-option>
     </mat-select>
     <!-- end of dropdown -->
     <!-- TODO: Remove hardcoded ID -->
@@ -134,6 +143,11 @@
       aria-label="{{ field?.label }}"
       [required]="field?.required"
       matInput
+      [value]="
+        field?.value && (members$ | async)?.length == 1
+          ? (members$ | async)[0]?.display
+          : ''
+      "
       autocomplete="off"
       (keyup)="searchItem($event, field)"
       [matAutocomplete]="auto"
@@ -141,28 +155,37 @@
     <span style="position: relative; float: right; margin-top: -30px">
       <mat-icon>arrow_drop_down</mat-icon>
     </span>
-    <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
+    <mat-autocomplete #auto="matAutocomplete">
       <mat-option aria-disabled="true" value=""> --Search-- </mat-option>
-      <mat-option
-        *ngFor="let option of members$ | async"
-        (click)="getSelectedItemFromOption($event, option, field)"
-        [value]="option?.display ? option?.display : option?.name"
-      >
-        <span
-          class="badge badge-success"
-          [ngClass]="{
-            'badge-success': getStockStatus(option),
-            'badge-danger': !getStockStatus(option)
-          }"
-          *ngIf="
-            field?.otherType === 'Drug' &&
-            !(option?.display === 'Search' || option?.name === 'Search')
-          "
+      <ng-container *ngFor="let option of members$ | async">
+        <mat-option
+          [disabled]="option?.disabled"
+          (click)="getSelectedItemFromOption($event, option, field)"
+          [value]="option?.display ? option?.display : option?.name"
         >
-          {{ getStockStatus(option) ? "In-stock" : "Out-stock" }}
-        </span>
-        {{ option?.display ? option?.display : option?.name }}
-      </mat-option>
+          <span
+            class="badge badge-success"
+            [ngClass]="{
+              'badge-success': getStockStatus(option),
+              'badge-danger': !getStockStatus(option)
+            }"
+            *ngIf="
+              field?.otherType === 'Drug' &&
+              !(option?.display === 'Search' || option?.name === 'Search')
+            "
+          >
+            {{ getStockStatus(option) ? "In-stock" : "Out-stock" }}
+          </span>
+          <span
+            [ngClass]="{ 'disabled-form-selection-option': option?.disabled }"
+          >
+            {{ option?.display ? option?.display : option?.name }}
+          </span>
+          <span *ngIf="option?.disabled" class="ml-2">
+            ({{ option?.message }})
+          </span>
+        </mat-option>
+      </ng-container>
     </mat-autocomplete>
   </mat-form-field>
 </div>
@@ -178,8 +201,11 @@
     [disabled]="shouldDisable"
     [title]="shouldDisable ? 'No price set for this item' : 'Can be ordered'"
   >
-    {{ field.label }}</mat-checkbox
-  >
+    <span [ngClass]="{ 'disabled-form-selection-option': field?.disabled }">
+      {{ field.label }}
+    </span>
+    <span *ngIf="field?.disabled" class="ml-2"> ({{ field?.message }}) </span>
+  </mat-checkbox>
 </div>
 
 <div [formGroup]="form" *ngIf="isBoolean && !isReport">
@@ -191,8 +217,12 @@
       [formControlName]="field?.key"
       [checked]="field?.value"
       (change)="onFieldUpdate()"
-      >{{ field?.label }}</mat-checkbox
     >
+      <span [ngClass]="{ 'disabled-form-selection-option': field?.disabled }">
+        {{ field.label }}
+      </span>
+      <span class="ml-2" *ngIf="field?.disabled"> ({{ field?.message }}) </span>
+    </mat-checkbox>
   </section>
 </div>
 

@@ -32,13 +32,8 @@
         [currentPatient]="params?.currentPatient"
       ></app-new-patient-profile>
     </div>
-
-    <div
-      class="alert alert-danger w-100 mt-2"
-      role="alert"
-      *ngIf="params?.generalMetadataConfigurations === ''"
-    >
-      Missing General iCare Metadata Configurations, Contact IT
+    <div *ngIf="errors">
+      <app-shared-error [errors]="errors"></app-shared-error>
     </div>
 
     <div
@@ -57,8 +52,7 @@
       <div
         class="border"
         *ngIf="
-          params?.currentVisitLoadedState &&
-          params?.useGenericPrescription === 'true'
+          params?.useGenericPrescription === 'true' && params?.patientVisit
         "
       >
         <app-patient-generic-drug-order-list

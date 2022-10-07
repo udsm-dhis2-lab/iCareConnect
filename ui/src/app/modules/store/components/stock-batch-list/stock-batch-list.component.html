@@ -1,6 +1,9 @@
 <mat-card
   class="mat-elevation-z5 border"
-  *ngIf="userPrivileges$ | async as userPrivileges"
+  *ngIf="{
+    userPrivileges: userPrivileges$ | async,
+    isCurrentLocationMainStore: isCurrentLocationMainStore$ | async
+  } as params"
 >
   <div *ngIf="stock">
     <div>
@@ -20,8 +23,9 @@
           color="primary"
           [disabled]="
             saving ||
-            !(isCurrentLocationMainStore$ | async) ||
-            !userPrivileges['STORE_ADD_NEW_BATCH']
+            !params?.isCurrentLocationMainStore ||
+            (params?.userPrivileges &&
+              !params?.userPrivileges['STORE_ADD_NEW_BATCH'])
           "
           (click)="onOpenBatchForm($event, 'ADD')"
           [style.height]="'40px'"
@@ -72,7 +76,8 @@
                 "
                 [disabled]="
                   stockBatch?.expiryDate < today ||
-                  !userPrivileges['STORE_ADD_STOCK_ON_BATCH']
+                  !params?.userPrivileges['STORE_ADD_STOCK_ON_BATCH'] ||
+                  !params?.isCurrentLocationMainStore
                 "
                 mat-flat-button
                 color="primary"
@@ -83,7 +88,7 @@
               <button
                 [disabled]="
                   stockBatch?.quantity === 0 ||
-                  !userPrivileges['STORE_DEDUCT_STOCK_FROM_BATCH']
+                  !params?.userPrivileges['STORE_DEDUCT_STOCK_FROM_BATCH']
                 "
                 [title]="
                   stockBatch?.quantity === 0

@@ -404,14 +404,14 @@ export class SampleAcceptanceComponent implements OnInit {
         maxHeight:
           sample?.orders?.length == 1 &&
           sample?.orders[0]?.order?.concept?.setMembers?.length == 0
-            ? "480px"
-            : "620px",
+            ? "60vh"
+            : "80vh",
       },
       maxHeight:
         sample?.orders?.length == 1 &&
         sample?.orders[0]?.concept?.setMembers?.length == 0
-          ? "610px"
-          : "860px",
+          ? "70vh"
+          : "90vh",
       width: "100%",
       disableClose: false,
       panelClass: "custom-dialog-container",

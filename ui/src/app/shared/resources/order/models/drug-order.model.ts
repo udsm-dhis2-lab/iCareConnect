@@ -20,27 +20,27 @@ export interface DrugOrderObject {
   reason?: string;
   reasonNonCoded?: string;
   urgency: string;
-  instructions: string;
+  instructions?: string;
   display?: string;
   drug?: any;
   genericName?: string;
   drugUuid?: string;
-  dose: string;
-  doseUnits: string;
-  frequency: string;
+  dose?: string;
+  doseUnits?: string;
+  frequency?: string;
   quantity: number;
-  numRefills: number;
+  numRefills?: number;
   dosingInstructions?: string;
   duration?: string;
   durationUnits?: string;
   route: string;
   brandName?: string;
-  dispenseAsWritten: boolean;
-  patient: string;
-  type: string;
-  orderType: string;
+  dispenseAsWritten?: boolean;
+  patient?: string;
+  type?: string;
+  orderType?: string;
   previousOrder?: string;
-  action: OrderAction;
+  action?: string;
 }
 export class DrugOrder {
   constructor(

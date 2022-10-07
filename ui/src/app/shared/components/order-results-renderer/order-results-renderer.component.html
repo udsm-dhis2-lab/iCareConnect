@@ -236,6 +236,7 @@
                 /> </span
             ></a>
             <div *ngIf="showCommonLabTests" class="w-100 mt-1">
+              <!-- {{ commonLabTestsFields | json }} -->
               <app-form
                 [fields]="commonLabTestsFields"
                 (formUpdate)="onFormUpdate($event)"

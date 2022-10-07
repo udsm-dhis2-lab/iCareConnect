@@ -31,14 +31,14 @@ export class PersonDetailsComponent implements OnInit {
   @Input() referFromFacilityVisitAttribute: string;
   patientIdentifierTypes: any[];
   @Output() personDetails: EventEmitter<any> = new EventEmitter<any>();
-  personDetailsCategory: string = "other";
+  personDetailsCategory: string = "new";
   personDetailsData: any = {};
   personFields: any[];
   personAgeField: any[];
   personDOBField: any[];
   personFieldsGroupThree: any[];
   identifiersFields: any[];
-  primaryIdentifierField: any;
+  primaryIdentifierFields: any;
   showOtherIdentifiers: boolean = false;
   patientUuid: string;
   identifierTypes: any[] = [];
@@ -52,12 +52,18 @@ export class PersonDetailsComponent implements OnInit {
   @ViewChildren("fieldItem")
   fieldItems: QueryList<FieldComponent>;
 
+  pinnedCategory: string;
+
   constructor(
     private registrationService: RegistrationService,
     private personService: PersonService
   ) {}
 
   ngOnInit(): void {
+    this.pinnedCategory = localStorage.getItem("pinnedCategory");
+    this.personDetailsCategory = this.pinnedCategory
+      ? this.pinnedCategory
+      : this.personDetailsCategory;
     this.registrationService
       .getPatientIdentifierTypes()
       .subscribe((response) => {
@@ -69,16 +75,26 @@ export class PersonDetailsComponent implements OnInit {
     this.setPersonDetails();
   }
 
+  onPinThis(event: Event, category: string): void {
+    event.stopPropagation();
+    this.personDetailsCategory = category;
+    this.pinnedCategory = category;
+    localStorage.setItem("pinnedCategory", category);
+  }
+
   setIdentifierFields(
     identifierTypes: any[],
     personDetails?: any,
     patientIdentifier?: string
   ): void {
-    const primaryIdentifier = (identifierTypes?.filter(
-      (identifier) => identifier?.required
-    ) || [])[0];
-    this.primaryIdentifierField = primaryIdentifier
-      ? new Textbox({
+    console.log("identifierTypes", identifierTypes);
+    const primaryIdentifiers =
+      identifierTypes?.filter(
+        (identifier) => identifier?.uniquenessBehavior === "UNIQUE"
+      ) || [];
+    this.primaryIdentifierFields = primaryIdentifiers?.map(
+      (primaryIdentifier) => {
+        return new Textbox({
           id: primaryIdentifier?.id,
           key: primaryIdentifier?.id,
           label: primaryIdentifier?.name,
@@ -90,9 +106,10 @@ export class PersonDetailsComponent implements OnInit {
                   identifier?.identifierType?.uuid === primaryIdentifier?.id
               ) || [])[0]?.identifier
             : null,
-          required: true,
-        })
-      : null;
+          required: primaryIdentifier?.required,
+        });
+      }
+    );
 
     const otherIdentifiers =
       identifierTypes?.filter((identifier) => !identifier?.required) || [];
@@ -105,7 +122,12 @@ export class PersonDetailsComponent implements OnInit {
         value: personDetails
           ? (personDetails?.identifiers?.filter(
               (identifier) =>
-                identifier?.identifierType?.uuid === primaryIdentifier?.id
+                (
+                  primaryIdentifiers?.filter(
+                    (primaryIdentifier) =>
+                      identifier?.identifierType?.uuid == primaryIdentifier?.id
+                  ) || []
+                )?.length === 0
             ) || [])[0]?.identifier
           : null,
         required: identifier?.required,
@@ -270,7 +292,7 @@ export class PersonDetailsComponent implements OnInit {
         id: "dob",
         key: "dob",
         label: "Date of birth",
-        required: false,
+        required: true,
         value: personDetails
           ? personDetails?.birthdate?.substring(0, 10)
           : null,

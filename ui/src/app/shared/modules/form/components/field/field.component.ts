@@ -43,7 +43,11 @@ export class FieldComponent {
   @Output() fileFieldUpdate: EventEmitter<any> = new EventEmitter<any>();
 
   ngAfterViewInit() {
-    if (this.field?.searchTerm || this.field?.source) {
+    if (
+      this.field?.searchTerm ||
+      this.field?.source ||
+      (this.field?.shouldHaveLiveSearchForDropDownFields && this.field?.value)
+    ) {
       this.members$ = this.formService.searchItem(
         {
           q:
@@ -54,6 +58,7 @@ export class FieldComponent {
           tag: this.field?.searchTerm,
           class: this.field?.conceptClass,
           source: this.field?.source,
+          value: this.field?.value,
           v:
             this.field?.searchControlType === "concept"
               ? "custom:(uuid,display,datatype,conceptClass,mappings)"

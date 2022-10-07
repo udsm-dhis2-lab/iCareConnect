@@ -4,6 +4,7 @@ import { CheckBox } from "../../modules/form/models/check-box.model";
 import { Dropdown } from "../../modules/form/models/dropdown.model";
 import { Textbox } from "../../modules/form/models/text-box.model";
 import { Boolean } from "../../modules/form/models/boolean.model";
+import { TextArea } from "../../modules/form/models/text-area.model";
 
 @Component({
   selector: "app-concepts-form",
@@ -23,11 +24,11 @@ export class ConceptsFormComponent implements OnInit {
     if (this.conceptFields?.length > 0) {
       this.conceptFields = orderBy(this.conceptFields, ['order'], ['asc'])
       this.conceptFieldsMap = this.conceptFields?.map((conceptField) => {
-        // TODO: Handle min/max values in numeric fields
+        // TODO: Handle min/max values for numeric fields
         if (
           conceptField?.setMembers?.length === 0 &&
           conceptField?.answers.length === 0 &&
-          conceptField?.datatype?.display?.toLowerCase() !== "boolean"
+          conceptField?.datatype?.display?.toLowerCase() === "numeric"
         ) {
           return new Textbox({
             id: conceptField?.uuid,
@@ -36,11 +37,22 @@ export class ConceptsFormComponent implements OnInit {
             required: false,
             conceptClass: conceptField?.conceptClass?.display,
             type:
-              conceptField?.datatype?.display?.toLowerCase() === "text"
-                ? "text"
-                : conceptField?.datatype?.display?.toLowerCase() === "numeric"
-                ? "number"
-                : "",
+              conceptField?.datatype?.display?.toLowerCase()
+          });
+        }
+        if (
+          conceptField?.setMembers?.length === 0 &&
+          conceptField?.answers.length === 0 &&
+          conceptField?.datatype?.display?.toLowerCase() === "text"
+        ) {
+          return new TextArea({
+            id: conceptField?.uuid,
+            key: conceptField?.uuid,
+            label: conceptField?.display,
+            required: false,
+            conceptClass: conceptField?.conceptClass?.display,
+            type:
+              conceptField?.datatype?.display?.toLowerCase()
           });
         }
         if (

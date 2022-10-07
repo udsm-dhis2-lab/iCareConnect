@@ -1,4 +1,7 @@
 <div [ngClass]="drugsPrescribed.length > 0 ? 'current-prescriptions' : ''">
+    <div *ngIf="errors.length > 0">
+        <app-shared-error [errors]="errors"></app-shared-error>
+    </div>
     <table class="table table-bordered table-striped">
         <ng-container *ngIf="drugsPrescribed.length > 0">
             <thead>
@@ -15,12 +18,17 @@
                     <td>{{ drug?.display }}</td>
                     <td> {{ drug.careSetting.display }}</td>
                     <td> {{ drug.dateActivated | date:'short' }}</td>
+                    <td>
+                        <button (click)="stopDrugOrder($event, drug)" class="btn btn-outline-danger">
+                            Stop Medication
+                        </button>
+                    </td>
                 </tr>
             </tbody>
         </ng-container>
         <ng-container *ngIf="drugsPrescribed.length === 0">
             <tbody>
-                <tr class="text-center">
+                <tr class="text-center p-3">
                     No Prescriptions Yet
                 </tr>
             </tbody>

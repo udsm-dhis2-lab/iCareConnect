@@ -195,6 +195,7 @@ export class VisitsService {
 
       const searchTerm = queryParam ? `&q=${queryParam}` : "";
       const filterByConst = filterBy ? filterBy : "";
+      //
       return (
         locationUuids?.length > 0
           ? zip(
@@ -206,7 +207,10 @@ export class VisitsService {
               })
             )
           : this.httpClient.get(
-              `icare/visit?${orderTypeParameter}${orderStatusParameter}${orderStatusCodeParameter}${searchTerm}${sortingParameters}${filterByConst}&startIndex=${startIndex}&limit=${limit}`
+              `icare/visit?${orderTypeParameter.replace(
+                "&",
+                ""
+              )}${orderStatusParameter}${orderStatusCodeParameter}${searchTerm}${sortingParameters}${filterByConst}&startIndex=${startIndex}&limit=${limit}`
             )
       ).pipe(
         map((visitResponse: any) => {

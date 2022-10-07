@@ -58,22 +58,32 @@ export class FormService {
         })
       );
     } else if (!searchControlType || searchControlType === "concept") {
-      return from(this.api.concept.getAllConcepts(parameters)).pipe(
-        map((response) => {
-          return orderBy(
-            response.results.filter(
-              (result: any) =>
-                parameters?.class &&
-                result.conceptClass?.display.toLowerCase() ===
-                  (field?.isDiagnosis
-                    ? "diagnosis"
-                    : parameters?.class.toLowerCase())
-            ) || [],
-            ["display"],
-            ["asc"]
-          );
-        })
-      );
+      if (parameters?.value) {
+        return from(this.api.concept.getConcept(parameters?.value)).pipe(
+          map((response) => {
+            return [response];
+          })
+        );
+      } else {
+        return from(
+          this.api.concept.getAllConcepts(omit(parameters, "value"))
+        ).pipe(
+          map((response) => {
+            return orderBy(
+              response.results.filter(
+                (result: any) =>
+                  parameters?.class &&
+                  result.conceptClass?.display.toLowerCase() ===
+                    (field?.isDiagnosis
+                      ? "diagnosis"
+                      : parameters?.class.toLowerCase())
+              ) || [],
+              ["display"],
+              ["asc"]
+            );
+          })
+        );
+      }
     } else if (searchControlType === "person") {
       return from(this.api.person.getAllPersons({ q: parameters?.q })).pipe(
         map((response) => {

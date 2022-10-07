@@ -2,7 +2,10 @@ import { Component, Input, OnInit } from "@angular/core";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { Router } from "@angular/router";
 import { Store } from "@ngrx/store";
-import { getDateDifferenceYearsMonthsDays } from "src/app/shared/helpers/date.helpers";
+import {
+  getAgeInYearsMontthsDays,
+  getDateDifferenceYearsMonthsDays,
+} from "src/app/shared/helpers/date.helpers";
 import { go, loadCurrentPatient } from "src/app/store/actions";
 import { getCurrentLocation } from "src/app/store/selectors";
 import { RegistrationService } from "../../services/registration.services";
@@ -243,8 +246,9 @@ export class RegistrationAddComponent implements OnInit {
   dateSet() {
     //console.log(this.patient?.dob);
 
-    let birthdate = new Date(this.patient?.dob);
-    let ageObject = getDateDifferenceYearsMonthsDays(birthdate, new Date());
+    // let birthdate = new Date(this.patient?.dob);
+    // let ageObject = getDateDifferenceYearsMonthsDays(birthdate, new Date());
+    let ageObject = getAgeInYearsMontthsDays(this.patient?.dob);
 
     this.patient.age = {
       ...this.patient.age,
@@ -303,9 +307,13 @@ export class RegistrationAddComponent implements OnInit {
     let currentDate = new Date();
     this.patient.dob = new Date(
       currentDate.getFullYear() - this.patient?.age?.years,
-      6,
-      1
+      currentDate.getMonth() - this.patient?.age?.months,
+      currentDate.getDate() - this.patient?.age?.days
     );
+    //   currentDate.getFullYear() - this.patient?.age?.years,()
+    //   6,
+    //   1
+    // );
   }
 
   ngOnInit(): void {

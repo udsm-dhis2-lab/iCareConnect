@@ -2,7 +2,7 @@ import { Component, OnInit } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { ActivatedRoute, Router } from "@angular/router";
 import { Observable, of } from "rxjs";
-import { catchError, tap } from "rxjs/operators";
+import { catchError, map, tap } from "rxjs/operators";
 import { DrugOrder } from "src/app/shared/resources/order/models/drug-order.model";
 import {
   ActionButtonStyle,
@@ -52,6 +52,7 @@ export class CurrentPatientDispensingComponent implements OnInit {
   genericPrescriptionEncounterType$: Observable<any>;
   genericPrescriptionOrderType$: Observable<any>;
   useGenericPrescription$: Observable<any>;
+  errors: any[] = [];
   constructor(
     private route: ActivatedRoute,
     private systemSettingsService: SystemSettingsService,
@@ -72,18 +73,70 @@ export class CurrentPatientDispensingComponent implements OnInit {
     this.generalMetadataConfigurations$ =
       this.systemSettingsService.getSystemSettingsByKey(
         "iCare.GeneralMetadata.Configurations"
+      ).pipe(
+        map((response) => {
+          if(response?.error){
+            this.errors = [
+              ...this.errors,
+              response?.error
+            ]
+          }
+          if(response === ''){
+            this.errors = [
+              ...this.errors,
+              {
+                error: {
+                  message:
+                    "Missing General iCare Metadata Configurations. Please set 'iCare.GeneralMetadata.Configurations' or Contact IT",
+                },
+              },
+            ];
+          }
+
+          return response;
+        })
       );
     this.genericPrescriptionEncounterType$ =
       this.systemSettingsService.getSystemSettingsByKey(
         "iCare.clinic.genericprescription.encounterType"
+      ).pipe(
+        map((response) => {
+          if(response?.error){
+            this.errors = [
+              ...this.errors,
+              response?.error
+            ]
+          }
+          return response;
+        })
       );
     this.genericPrescriptionOrderType$ =
       this.systemSettingsService.getSystemSettingsByKey(
         "iCare.clinic.genericprescription.orderType"
+      ).pipe(
+        map((response) => {
+          if(response?.error){
+            this.errors = [
+              ...this.errors,
+              response?.error
+            ]
+          }
+          return response;
+        })
       );
     this.useGenericPrescription$ =
       this.systemSettingsService.getSystemSettingsByKey(
         "iCare.clinic.useGeneralPrescription"
+      ).pipe(
+        map((response) => {
+          if(response?.error){
+            this.errors = [
+              ...this.errors,
+              response?.error
+            ]
+          }
+          return response;
+        })
       );
 
     this.dispensingActionOptions = [
@@ -106,17 +159,20 @@ export class CurrentPatientDispensingComponent implements OnInit {
 
   getPatientVisit() {
     this.loading = true;
-    console.log("==> loading patients")
     this.patientVisit$ = this.visitService
       .getActiveVisit(this.patientId, false)
       .pipe(
-        tap(() => {
+        map((response) => {
           this.loading = false;
-        }),
-        catchError((error) => {
           this.loading = false;
-          this.loadingError = error;
-          return of(null);
+          if(response?.error){
+            this.loadingError = response?.error;
+            this.errors = [
+              ...this.errors,
+              response?.errors
+            ]
+          }
+          return response;
         })
       );
   }

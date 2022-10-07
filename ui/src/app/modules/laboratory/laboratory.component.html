@@ -63,10 +63,10 @@
           <mat-chip
             class="w-20"
             *ngIf="params?.privileges && params?.LISConfigurations?.isLIS"
-            (click)="changeRoute($event, 'dashboard', false)"
+            (click)="changeRoute($event, 'dashboard', true)"
             routerLinkActive="active-route"
             [ngClass]="{
-              'active-route': currentRoutePath === 'dashboard'
+              'active-route': currentRoutePath === 'dashboard-lab'
             }"
           >
             Dashboard

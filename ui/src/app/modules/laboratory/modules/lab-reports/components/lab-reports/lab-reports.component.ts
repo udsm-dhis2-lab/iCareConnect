@@ -70,6 +70,7 @@ export class LabReportsComponent implements OnInit {
   resultsLoader: any = {};
   searchingText: string = "";
   facilityDetails$: any;
+  errors: any[] = [];
   constructor(
     private httpClient: HttpClient,
     private exportService: ExportService,
@@ -90,8 +91,8 @@ export class LabReportsComponent implements OnInit {
       getCodedSampleRejectionReassons
     );
 
-    this.currentReport = this.reports[0];
     this.reports = [...this.reports, ...this.configuredReports];
+    this.currentReport = this.reports[0];
     this.facilityDetails$ = this.store.select(getParentLocation);
   }
 
@@ -247,15 +248,17 @@ export class LabReportsComponent implements OnInit {
         break;
       }
     }
-
     this.loadingReport = true;
     // TODO: Find a better way to handle this
     // console.log('selectionDates', selectionDates);
-    if (this.currentReport.id == "TAT") {
+    if (this.currentReport.id === "patient_level_tat") {
       this.reportService
         .runDataSet(this.currentReport?.key, this.selectionDates)
         .subscribe((data: any) => {
           this.reportData = _.map(data, (row: any) => {
+            if (data?.error) {
+              this.errors = [...this.errors, data?.error];
+            }
             return {
               ...row,
               tat: (Number(row?.tat) / 60).toFixed(2),
@@ -280,8 +283,13 @@ export class LabReportsComponent implements OnInit {
       this.reportData = {};
       // laboratory.sqlGet.laboratory_samples_by_specimen_sources
       this.reportService
-        .runDataSet(this.currentReport?.key, this.selectionDates)
-        .subscribe((data: any) => {
+        .runDataSet(this.currentReport?.key, this.selectionDates).subscribe((data: any) => {
+          if(data?.error){
+            this.errors = [
+              ...this.errors,
+              data?.error
+            ]
+          }
           let reportGroups = {
             collected: 0,
             accepted: 0,
@@ -371,6 +379,9 @@ export class LabReportsComponent implements OnInit {
       this.reportService
         .runDataSet("545911ec-1dc3-4ac2-97bb-fb436158902a", this.selectionDates)
         .subscribe((data: any) => {
+          if (data?.error) {
+            this.errors = [...this.errors, data?.error];
+          }
           data = _.filter(data, (row: any) => {
             return row?.dep_nm == "" ? false : true;
           });
