@@ -27,7 +27,7 @@
 ::ng-deep .mat-option {
   word-wrap: break-word !important;
   white-space: pre-line !important;
-  border-bottom: 1px solid rgba(0,0,0,.125) !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.125) !important;
   text-overflow: ellipsis !important;
   display: block !important;
   line-height: 30px !important;
@@ -48,8 +48,14 @@
   -webkit-tap-highlight-color: transparent !important;
 }
 
-input[type='number']::-webkit-inner-spin-button,
-input[type='number']::-webkit-outer-spin-button {
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
   -webkit-appearance: none;
   margin: 0;
+}
+
+.disabled-form-selection-option {
+  cursor: not-allowed !important;
+  color: red;
+  text-decoration: line-through !important;
 }

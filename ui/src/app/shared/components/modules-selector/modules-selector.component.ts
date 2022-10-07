@@ -6,12 +6,10 @@ import { Store } from "@ngrx/store";
 import { AppState } from "src/app/store/reducers";
 import {
   go,
-  loadActiveVisits,
   setCurrentUserCurrentLocation,
   updateCurrentLocationStatus,
 } from "src/app/store/actions";
 import { ICARE_APPS } from "src/app/core/containers/modules/modules.constants";
-import { getUserAssignedLocations } from "src/app/store/selectors/current-user.selectors";
 
 @Component({
   selector: "app-modules-selector",
@@ -51,7 +49,19 @@ export class ModulesSelectorComponent implements OnInit {
         ? null
         : JSON.parse(localStorage.getItem("currentLocation"));
     if (storedNavigationDetails && locationMatchingNavigationDetails) {
-      this.currentLocation = locationMatchingNavigationDetails;
+      const isStoredLocationHasModuleMatchingStoredNavigationData =
+        !storedLocation
+          ? false
+          : (
+              storedLocation?.modules?.filter(
+                (module) =>
+                  storedNavigationDetails?.path[0]?.indexOf(module?.id) > -1
+              ) || []
+            )?.length > 0;
+      this.currentLocation =
+        storedLocation && isStoredLocationHasModuleMatchingStoredNavigationData
+          ? storedLocation
+          : locationMatchingNavigationDetails;
 
       // this.store.dispatch(
       //   setCurrentUserCurrentLocation({ location: this.currentLocation })
@@ -97,15 +107,19 @@ export class ModulesSelectorComponent implements OnInit {
         uniqBy(
           flatten(
             this.locations.map((location) => {
-              return location?.modules.map((module) => {
-                const matchedModules =
-                  ICARE_APPS.filter((app) => app?.id === module?.id) || [];
-                return {
-                  ...module,
-                  app: matchedModules[0],
-                  order: matchedModules[0]?.order,
-                };
-              });
+              return location?.modules
+                .map((module) => {
+                  const matchedModules =
+                    ICARE_APPS.filter((app) => app?.id === module?.id) || [];
+                  return matchedModules && matchedModules?.length > 0
+                    ? {
+                        ...module,
+                        app: matchedModules[0],
+                        order: matchedModules[0]?.order,
+                      }
+                    : null;
+                })
+                ?.filter((module) => module);
             })
           ),
           "id"
@@ -118,14 +132,16 @@ export class ModulesSelectorComponent implements OnInit {
         uniqBy(
           flatten(
             this.locations.map((location) => {
-              return location?.modules.map((module) => {
-                return {
-                  ...module,
-                  app: (orderBy(ICARE_APPS, ["order"], ["asc"]).filter(
-                    (app) => app?.id === module?.id
-                  ) || [])[0],
-                };
-              });
+              return location?.modules
+                .map((module) => {
+                  return {
+                    ...module,
+                    app: (orderBy(ICARE_APPS, ["order"], ["asc"]).filter(
+                      (app) => app?.id === module?.id
+                    ) || [])[0],
+                  };
+                })
+                ?.filter((module) => module);
             })
           ),
           "id"
@@ -204,10 +220,6 @@ export class ModulesSelectorComponent implements OnInit {
             ) || []
           ).length > 0 && !location?.retired
       ) || [];
-    // console.log(
-    //   "userLocationsForTheCurrentModule",
-    //   this.userLocationsForTheCurrentModule
-    // );
     this.currentLocation = this.userLocationsForTheCurrentModule[0];
     // localStorage.setItem("currentLocation", this.currentLocation);
     this.currentLocation = {

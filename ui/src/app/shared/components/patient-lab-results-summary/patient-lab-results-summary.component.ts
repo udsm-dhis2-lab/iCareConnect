@@ -41,7 +41,7 @@ export class PatientLabResultsSummaryComponent implements OnInit {
   provider$: Observable<any>;
   loadedLabOrders: boolean = false;
   creatingLabOrdersState$: Observable<boolean>;
-  
+
   @Output() updateConsultationOrder = new EventEmitter();
   constructor(
     private openMRSHttpClient: OpenmrsHttpClientService,

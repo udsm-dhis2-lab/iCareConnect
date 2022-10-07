@@ -90,6 +90,8 @@ import { IpdFormsComponent } from "./ipd-forms/ipd-forms.component";
 import { SharedErrorComponent } from "./shared-error/shared-error.component";
 import { SharedConceptCreateComponent } from "./shared-concept-create/shared-concept-create.component";
 import { ConceptsFormComponent } from "./concepts-form/concepts-forms.component";
+import { NonDrugOrderContainerComponent } from "./non-drug-order-container/non-drug-order-container.component";
+import { NonDrugOrderFormComponent } from "./non-drug-order-form/non-drug-order-form.component";
 
 export const components: any[] = [
   PatientSearchComponent,
@@ -183,7 +185,9 @@ export const components: any[] = [
   IpdFormsComponent,
   SharedErrorComponent,
   SharedConceptCreateComponent,
-  ConceptsFormComponent
+  ConceptsFormComponent,
+  NonDrugOrderContainerComponent,
+  NonDrugOrderFormComponent,
 ];
 
 export const sharedEntryComponents: any[] = [
