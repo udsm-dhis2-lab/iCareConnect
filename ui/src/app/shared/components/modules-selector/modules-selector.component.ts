@@ -51,7 +51,9 @@ export class ModulesSelectorComponent implements OnInit {
         ? null
         : JSON.parse(localStorage.getItem("currentLocation"));
     if (storedNavigationDetails && locationMatchingNavigationDetails) {
-      this.currentLocation = locationMatchingNavigationDetails;
+      this.currentLocation = storedLocation
+        ? storedLocation
+        : locationMatchingNavigationDetails;
 
       // this.store.dispatch(
       //   setCurrentUserCurrentLocation({ location: this.currentLocation })
@@ -97,15 +99,19 @@ export class ModulesSelectorComponent implements OnInit {
         uniqBy(
           flatten(
             this.locations.map((location) => {
-              return location?.modules.map((module) => {
-                const matchedModules =
-                  ICARE_APPS.filter((app) => app?.id === module?.id) || [];
-                return {
-                  ...module,
-                  app: matchedModules[0],
-                  order: matchedModules[0]?.order,
-                };
-              });
+              return location?.modules
+                .map((module) => {
+                  const matchedModules =
+                    ICARE_APPS.filter((app) => app?.id === module?.id) || [];
+                  return matchedModules && matchedModules?.length > 0
+                    ? {
+                        ...module,
+                        app: matchedModules[0],
+                        order: matchedModules[0]?.order,
+                      }
+                    : null;
+                })
+                ?.filter((module) => module);
             })
           ),
           "id"
@@ -118,14 +124,16 @@ export class ModulesSelectorComponent implements OnInit {
         uniqBy(
           flatten(
             this.locations.map((location) => {
-              return location?.modules.map((module) => {
-                return {
-                  ...module,
-                  app: (orderBy(ICARE_APPS, ["order"], ["asc"]).filter(
-                    (app) => app?.id === module?.id
-                  ) || [])[0],
-                };
-              });
+              return location?.modules
+                .map((module) => {
+                  return {
+                    ...module,
+                    app: (orderBy(ICARE_APPS, ["order"], ["asc"]).filter(
+                      (app) => app?.id === module?.id
+                    ) || [])[0],
+                  };
+                })
+                ?.filter((module) => module);
             })
           ),
           "id"
@@ -204,10 +212,6 @@ export class ModulesSelectorComponent implements OnInit {
             ) || []
           ).length > 0 && !location?.retired
       ) || [];
-    // console.log(
-    //   "userLocationsForTheCurrentModule",
-    //   this.userLocationsForTheCurrentModule
-    // );
     this.currentLocation = this.userLocationsForTheCurrentModule[0];
     // localStorage.setItem("currentLocation", this.currentLocation);
     this.currentLocation = {
@@ -223,6 +227,7 @@ export class ModulesSelectorComponent implements OnInit {
       (this.currentModule?.app?.considerLocationRoute
         ? "/" + this.currentLocation?.uuid
         : "");
+    console.log("URL", url);
     this.store.dispatch(
       go({
         path: [url],
