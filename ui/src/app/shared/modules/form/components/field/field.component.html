@@ -82,8 +82,16 @@
         *ngFor="let option of field?.options"
         [disabled]="option?.disabled"
         [value]="option?.value"
-        >{{ option.label }}</mat-option
       >
+        <span
+          [ngClass]="{ 'disabled-form-selection-option': option?.disabled }"
+        >
+          {{ option.label }}
+        </span>
+        <span *ngIf="option?.disabled" class="ml-2"
+          >({{ option?.message }})</span
+        >
+      </mat-option>
     </mat-select>
     <!-- end of dropdown -->
     <!-- TODO: Remove hardcoded ID -->
@@ -152,7 +160,6 @@
       <ng-container *ngFor="let option of members$ | async">
         <mat-option
           [disabled]="option?.disabled"
-          [ngClass]="{ 'disabled-form-selection-option': option?.disabled }"
           (click)="getSelectedItemFromOption($event, option, field)"
           [value]="option?.display ? option?.display : option?.name"
         >
@@ -169,7 +176,14 @@
           >
             {{ getStockStatus(option) ? "In-stock" : "Out-stock" }}
           </span>
-          {{ option?.display ? option?.display : option?.name }}
+          <span
+            [ngClass]="{ 'disabled-form-selection-option': option?.disabled }"
+          >
+            {{ option?.display ? option?.display : option?.name }}
+          </span>
+          <span *ngIf="option?.disabled" class="ml-2">
+            ({{ option?.message }})
+          </span>
         </mat-option>
       </ng-container>
     </mat-autocomplete>
@@ -187,8 +201,11 @@
     [disabled]="shouldDisable"
     [title]="shouldDisable ? 'No price set for this item' : 'Can be ordered'"
   >
-    {{ field.label }}</mat-checkbox
-  >
+    <span [ngClass]="{ 'disabled-form-selection-option': field?.disabled }">
+      {{ field.label }}
+    </span>
+    <span *ngIf="field?.disabled" class="ml-2"> ({{ field?.message }}) </span>
+  </mat-checkbox>
 </div>
 
 <div [formGroup]="form" *ngIf="isBoolean && !isReport">
@@ -200,8 +217,12 @@
       [formControlName]="field?.key"
       [checked]="field?.value"
       (change)="onFieldUpdate()"
-      >{{ field?.label }}</mat-checkbox
     >
+      <span [ngClass]="{ 'disabled-form-selection-option': field?.disabled }">
+        {{ field.label }}
+      </span>
+      <span class="ml-2" *ngIf="field?.disabled"> ({{ field?.message }}) </span>
+    </mat-checkbox>
   </section>
 </div>
 
