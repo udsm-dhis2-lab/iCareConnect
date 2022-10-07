@@ -51,6 +51,7 @@ export class ConfirmModalComponent implements OnInit {
       encounterType: dataObject?.encounterType,
       location: dataObject?.location,
       provider: dataObject?.provider,
+      visit: dataObject?.visit,
       orders:
         !this.details?.bedOrdersWithBillStatus ||
         this.details?.bedOrdersWithBillStatus?.length > 0
@@ -85,4 +86,5 @@ export class ConfirmModalComponent implements OnInit {
     event.stopPropagation();
     this.dialogRef.close();
   }
+  
 }
