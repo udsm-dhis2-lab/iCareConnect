@@ -15,13 +15,11 @@ import { AppState } from "src/app/store/reducers";
 import { getProviderDetails } from "src/app/store/selectors/current-user.selectors";
 import { FormComponent } from "../../modules/form/components/form/form.component";
 import { Dropdown } from "../../modules/form/models/dropdown.model";
-import { FormValue } from "../../modules/form/models/form-value.model";
 import { ProviderGet } from "../../resources/openmrs";
 import { DrugOrderMetadata } from "../../resources/order/models/drug-order-metadata.model";
 import { DrugOrderObject } from "../../resources/order/models/drug-order.model";
 import { DrugOrdersService } from "../../resources/order/services";
 import { Patient } from "../../resources/patient/models/patient.model";
-import { uniq, keyBy } from "lodash";
 import { getLocationsByTagName } from "src/app/store/selectors";
 
 @Component({
@@ -76,7 +74,6 @@ export class DrugOrderComponent implements OnInit, AfterViewInit {
 
   ngOnInit() {
     this.getDrugsByConceptUuid.emit(this.drugOrder?.concept?.uuid);
-
     this.isTheOrderFromDoctor =
       this.drugOrder && this.drugOrder.drugUuid ? false : true;
 

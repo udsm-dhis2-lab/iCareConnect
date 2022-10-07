@@ -97,7 +97,7 @@ export class LaboratoryComponent implements OnInit {
           this.currentSubModule = "dashboard";
           this.store.dispatch(
             go({
-              path: ["/laboratory/dashboard"],
+              path: ["/laboratory/dashboard-lab"],
             })
           );
         } else if (currentRoute?.url?.includes("/sample-tracking")) {

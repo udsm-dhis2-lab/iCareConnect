@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Inject, OnInit, Output } from "@angular/core";
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { select, Store } from "@ngrx/store";
-import { Observable, zip } from "rxjs";
+import { Observable, of, zip } from "rxjs";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
 import { DrugOrderError } from "src/app/shared/resources/order/constants/drug-order-error.constant";
@@ -28,6 +28,7 @@ import { flatten, keyBy } from "lodash";
 import { VisitsService } from "../../resources/visits/services";
 import { LocationService } from "src/app/core/services";
 import { map } from "rxjs/operators";
+import { ConceptGet } from "../../resources/openmrs";
 
 @Component({
   selector: "app-dispension-form",
@@ -71,6 +72,7 @@ export class DispensingFormComponent implements OnInit {
   errors: any[] = [];
   conceptFields$: Observable<any>;
   genericPrescriptionConceptUuids$: Observable<any>;
+  drugOrderConceptDetails$: Observable<ConceptGet>;
 
   constructor(
     private drugOrderService: DrugOrdersService,
@@ -82,6 +84,7 @@ export class DispensingFormComponent implements OnInit {
     private store: Store<AppState>,
     private visitService: VisitsService,
     private locationService: LocationService,
+    private conceptService: ConceptsService,
     @Inject(MAT_DIALOG_DATA)
     public data: {
       drugOrder: any;
@@ -249,6 +252,14 @@ export class DispensingFormComponent implements OnInit {
     this.currentLocation$ = this.store.pipe(select(getCurrentLocation));
     this.currentVisit$ = this.store.pipe(select(getActiveVisit));
     this.provider$ = this.store.select(getProviderDetails);
+    
+    this.drugOrderConceptDetails$ = this.data?.drugOrder
+      ? this.conceptService.getConceptDetailsByUuid(
+          this.data?.drugOrder?.concept?.uuid,
+          "custom:(uuid,display,setMembers:(uuid,display))"
+        )
+      : of([]);
+    
   }
 
   onCancel(): void {
@@ -361,7 +372,7 @@ export class DispensingFormComponent implements OnInit {
       )
       .subscribe(
         (res) => {
-          if(res?.message){
+          if (res?.message) {
             this.savingOrder = false;
             this.errors = [
               ...this.errors,
@@ -370,12 +381,14 @@ export class DispensingFormComponent implements OnInit {
                   message:
                     res?.message ||
                     "Error occurred while connecting to the server",
-                  detail: res?.stackTrace ? JSON.stringify(res?.stackTrace) : "",
+                  detail: res?.stackTrace
+                    ? JSON.stringify(res?.stackTrace)
+                    : "",
                 },
               },
             ];
           }
-          if(this.data?.useGenericPrescription && !res?.message) {
+          if (this.data?.useGenericPrescription && !res?.message) {
             const genericOrderPayload = {
               uuid: order?.uuid,
               fulfillerStatus: "RECEIVED",
@@ -401,7 +414,11 @@ export class DispensingFormComponent implements OnInit {
           //   drugOrder: this.savedOrder,
           // });
           this.store.dispatch(
-            loadActiveVisit({ patientId: this.data?.patient ? this.data?.patient?.uuid : this.data?.patientUuid })
+            loadActiveVisit({
+              patientId: this.data?.patient
+                ? this.data?.patient?.uuid
+                : this.data?.patientUuid,
+            })
           );
           if (this.data?.useGenericPrescription && !res?.message) {
             this.dialogRef.close();
@@ -482,7 +499,6 @@ export class DispensingFormComponent implements OnInit {
   }
 
   getConceptsAsFields(genericFieldsConcepts) {
-    console.log("==> Vizia Orderl: ", genericFieldsConcepts);
     this.conceptFields$ = zip(
       ...genericFieldsConcepts.map((conceptSetting) =>
         this.conceptsService
@@ -514,5 +530,9 @@ export class DispensingFormComponent implements OnInit {
     //   updateConsultationOrder: true,
     // });
     this.updateConsultationOrder.emit();
+  }
+
+  onLoadVisit(visit: any){
+    this.getVisitByUuid(visit.uuid)
   }
 }

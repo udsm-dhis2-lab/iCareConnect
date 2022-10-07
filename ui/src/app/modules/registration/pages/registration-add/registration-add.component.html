@@ -254,6 +254,28 @@
                   id="age"
                 />
               </mat-form-field>
+              <mat-form-field appearance="fill" class="w-25 ml-1">
+                <mat-label>Age (Months)</mat-label>
+                <input
+                  matInput
+                  placeholder="Enter Age"
+                  [(ngModel)]="patient['age']['months']"
+                  (keyup)="calculateDateOfBirth()"
+                  name="age"
+                  id="age"
+                />
+              </mat-form-field>
+              <mat-form-field appearance="fill" class="w-25 ml-1">
+                <mat-label>Age (Days)</mat-label>
+                <input
+                  matInput
+                  placeholder="Enter Age"
+                  [(ngModel)]="patient['age']['days']"
+                  (keyup)="calculateDateOfBirth()"
+                  name="age"
+                  id="age"
+                />
+              </mat-form-field>
               <div class="ml-4 mr-4 h6">OR</div>
               <mat-form-field appearance="fill" class="w-100">
                 <mat-label>Select Date of birth</mat-label>

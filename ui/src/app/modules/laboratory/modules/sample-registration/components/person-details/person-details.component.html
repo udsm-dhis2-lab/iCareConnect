@@ -9,7 +9,22 @@
     >
       New
     </mat-radio-button>
-    <mat-radio-button
+    <button
+      mat-button
+      class="ml-2 mr-4 pinning-btn"
+      (click)="onPinThis($event, 'new')"
+    >
+      Pin
+      <span
+        *ngIf="pinnedCategory == 'new'"
+        matBadge="P"
+        matBadgeSize="small"
+        matBadgeColor="accent"
+        matBadgeOverlap="false"
+      >
+      </span>
+    </button>
+    <!-- <mat-radio-button
       (change)="getSelection($event)"
       class="person-details-btn ml-2"
       [value]="'existing'"
@@ -17,7 +32,7 @@
       color="primary"
     >
       Existing
-    </mat-radio-button>
+    </mat-radio-button> -->
     <mat-radio-button
       (change)="getSelection($event)"
       class="person-details-btn ml-2"
@@ -27,6 +42,21 @@
     >
       Other systems
     </mat-radio-button>
+    <button
+      mat-button
+      class="ml-2 pinning-btn"
+      (click)="onPinThis($event, 'other')"
+    >
+      Pin
+      <span
+        *ngIf="pinnedCategory == 'other'"
+        matBadge="P"
+        matBadgeSize="small"
+        matBadgeColor="accent"
+        matBadgeOverlap="false"
+      >
+      </span>
+    </button>
   </mat-radio-group>
   <app-registered-patient-details
     *ngIf="personDetailsCategory === 'existing'"
@@ -40,7 +70,8 @@
   <div class="row primary-identifier">
     <div class="col-10">
       <app-form
-        [fields]="[primaryIdentifierField]"
+        [isFormHorizontal]="true"
+        [fields]="primaryIdentifierFields"
         (formUpdate)="onUpdatePrimaryIdentifierForm($event)"
       ></app-form>
     </div>
@@ -63,7 +94,7 @@
   ></app-form>
 
   <div class="row">
-    <div class="col-1">
+    <div class="col-3">
       <div class="row">
         <div class="col-12">
           <app-form
@@ -83,7 +114,7 @@
         </div> -->
       </div>
     </div>
-    <div class="col-3">
+    <div class="col-1">
       <mat-form-field
         class="w-100 no-padding"
         style="margin-left: 6px"

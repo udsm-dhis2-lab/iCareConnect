@@ -652,7 +652,7 @@
                                       colspan="4"
                                       class="text-center text-danger"
                                     >
-                                      Audit Trail
+                                      No Audit Trail for this test
                                       <br />
                                       <!-- {{ params?.currentSample | json }} -->
                                     </td>
@@ -761,13 +761,13 @@
                       </span>
                     </td>
                     <td
-                      *ngIf="count == 0"
+                      *ngIf="count == 0 && !LISConfigurations?.isLIS"
                       [attr.rowspan]="item?.order?.concept?.setMembers?.length"
                     >
                       {{ item?.order?.orderNumber }}
                     </td>
                     <td
-                      *ngIf="count == 0"
+                      *ngIf="count == 0 && !LISConfigurations?.isLIS"
                       [attr.rowspan]="item?.order?.concept?.setMembers?.length"
                     >
                       {{ item?.order?.orderer?.name }}
@@ -1494,7 +1494,7 @@
                                       colspan="4"
                                       class="text-center text-danger"
                                     >
-                                      Audit Trail
+                                      No Audit Trail for this test
                                     </td>
                                   </tr>
                                 </ng-container>
@@ -1516,10 +1516,7 @@
                           (!values[parameter?.uuid] &&
                             !values[parameter?.uuid + '-comment']) ||
                           item?.allocationsPairedBySetMember[parameter?.uuid]
-                            ?.firstSignOff ||
-                          (LISConfigurations?.isLIS &&
-                            temporaryValues[parameter?.uuid] !=
-                              values[parameter?.uuid])
+                            ?.firstSignOff
                         "
                         (click)="
                           onSaveParameterValue(
@@ -1701,7 +1698,7 @@
                     "
                   >
                     <td>{{ item?.order?.concept?.display }}</td>
-                    <td>
+                    <td *ngIf="!LISConfigurations?.isLIS">
                       {{ item?.order?.orderer?.name }}
                     </td>
                     <td colspan="2">
@@ -2104,7 +2101,8 @@
                       <td>
                         {{ item?.order?.concept?.display }}
                       </td>
-                      <td>
+                      <td
+                      *ngIf="!LISConfigurations?.isLIS">
                         {{ item?.order?.orderer?.name }}
                       </td>
                       <td>{{ parameter?.display }}</td>
@@ -2272,7 +2270,7 @@
                                           colspan="4"
                                           class="text-center text-danger"
                                         >
-                                          No Audit Trail data for this test
+                                          No Audit Trail for this test
                                         </td>
                                       </tr>
                                     </ng-container>

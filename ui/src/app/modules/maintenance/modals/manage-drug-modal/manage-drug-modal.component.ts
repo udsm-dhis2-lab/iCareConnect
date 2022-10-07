@@ -76,7 +76,7 @@ export class ManageDrugModalComponent implements OnInit {
     this.dialogRef.close();
   }
 
-  onSave(event: Event, confirmed?: boolean): void {
+  onSave(event: Event, drug, confirmed?: boolean): void {
     event.stopPropagation();
     if (confirmed) {
       this.saving = true;
@@ -88,7 +88,10 @@ export class ManageDrugModalComponent implements OnInit {
         description: this.formData?.description?.value,
       };
       console.log("dsdsd", data);
-      this.drugService.createDrug(data).subscribe((response: any) => {
+      (this.dialogData?.uuid
+        ? this.drugService.updateDrug(drug?.uuid, { uuid: drug?.uuid, ...data })
+        : this.drugService.createDrug(data)
+      ).subscribe((response: any) => {
         if (response && !response?.error) {
           console.log(response);
           this.shouldConfirm = false;

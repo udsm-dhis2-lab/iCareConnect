@@ -23,5 +23,15 @@
     "key": "iCare.registration.genderOptions.conceptUuid",
     "value": "conceptUuid",
     "description": "Reference to gender options"
+  },
+  {
+    "key": "iCare.visits.settings.controlVisitsEndingStatuses.ConceptUuid",
+    "value": "conceptUuid",
+    "description": "Ending visit control"
+  },
+  {
+    "key": "iCare.clinic.settings.patientsListGroups.showAllPatientsTab",
+    "value": "true",
+    "description": "For controlling patients list tab for all patients"
   }
 ]

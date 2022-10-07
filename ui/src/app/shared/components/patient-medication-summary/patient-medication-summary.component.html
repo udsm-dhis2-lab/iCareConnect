@@ -42,17 +42,22 @@
     </tbody>
   </table>
   <div
-    *ngIf="drugParams?.currentVisit && drugParams?.generalPrescriptionOrderType"
   >
     <table class="w-100 table table-bordered">
       <tbody>
         <tr class="p-4">
           <app-current-prescriptions
+            *ngIf="drugParams?.currentVisit && drugParams?.generalPrescriptionOrderType"
             [visit]="drugParams?.currentVisit"
             [genericPrescriptionOrderType]="
               drugParams?.generalPrescriptionOrderType
             "
+            (loadVisit)="loadVisit($event)"
           ></app-current-prescriptions>
+          <mat-progress-bar 
+            *ngIf="!drugParams?.currentVisit || !drugParams?.generalPrescriptionOrderType"
+            mode="indeterminate">
+          </mat-progress-bar>
         </tr>
         <tr *ngIf="!isInpatient">
           <td colspan="3">
@@ -81,7 +86,7 @@
   >
     <thead>
       <tr>
-        <th style="width: 10px">SN</th>
+        <th style="width: 10px">SN</th>drugParams?.useGeneralPrescription !== 'true'
         <th>Drug</th>
         <th>Instructions</th>
       </tr>
@@ -131,7 +136,7 @@
     class="w-100"
     *ngIf="
       drugParams?.patientVisitData?.drugOrders &&
-      drugParams?.patientVisitData?.drugOrders?.length === 0
+      drugParams?.patientVisitData?.drugOrders?.length === 0 && drugParams?.useGeneralPrescription !== 'true'
     "
   >
     <p class="text-center text-warning">No Prescription done.</p>

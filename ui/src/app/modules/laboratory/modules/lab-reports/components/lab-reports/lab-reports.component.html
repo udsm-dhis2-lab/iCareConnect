@@ -137,6 +137,9 @@
           </mat-form-field>
         </div>
       </div>
+      <div *ngIf="errors.length > 0">
+        <app-shared-error [errors]="errors"></app-shared-error>
+      </div>
       <div class="w-100 d-flex justify-content-end mt-1 mb-2">
         <button
           (click)="onDownloadCSV($event)"

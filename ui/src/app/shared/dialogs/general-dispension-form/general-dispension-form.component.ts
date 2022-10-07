@@ -11,6 +11,7 @@ import { AppState } from "src/app/store/reducers";
 import { Dropdown } from "../../modules/form/models/dropdown.model";
 import { Textbox } from "../../modules/form/models/text-box.model";
 import { ICARE_CONFIG } from "../../resources/config";
+import { DrugsService } from "../../resources/drugs/services/drugs.service";
 import { ObservationService } from "../../resources/observation/services/observation.service";
 import { OrdersService } from "../../resources/order/services/orders.service";
 
@@ -55,6 +56,7 @@ export class GeneralDispensingFormComponent implements OnInit {
   drugDurationField: Textbox;
   frequencyField: Dropdown;
   drugDoseField: Textbox;
+  strengthFormField: Dropdown;
 
   @Output() dosingUnitsSettingsEvent: EventEmitter<any> = new EventEmitter();
   @Output() durationUnitsSettingsEvent: EventEmitter<any> = new EventEmitter();
@@ -75,7 +77,8 @@ export class GeneralDispensingFormComponent implements OnInit {
     private drugOrderService: DrugOrdersService,
     private ordersService: OrdersService,
     private observationService: ObservationService,
-    private store: Store<AppState>
+    private store: Store<AppState>,
+    private drugService: DrugsService
   ) {}
 
   ngOnInit() {
@@ -103,9 +106,26 @@ export class GeneralDispensingFormComponent implements OnInit {
     });
   }
 
-  onFormUpdate(formValues: FormValue): void {
+  onFormUpdate(formValues: FormValue, fieldItem?: string): void {
     this.isFormValid = formValues.isValid;
     this.formValues = { ...this.formValues, ...formValues.getValues() };
+    // if (fieldItem == "drug") {
+    //   this.drugService
+    //     .getDrugsUsingConceptUuid(this.formValues?.drug?.value)
+    //     .subscribe((response) => {
+    //       if (response && !response?.error) {
+    //         console.log(response);
+    //         this.strengthFormField = new Dropdown({
+    //           id: "strength",
+    //           key: "strength",
+    //           label: "Strength",
+    //           options: [],
+    //         });
+    //       } else {
+    //         this.strengthFormField = null;
+    //       }
+    //     });
+    // }
   }
 
   saveOrder(e: any, conceptFields: any) {

@@ -45,3 +45,18 @@ button {
   overflow-x: auto;
   overflow-y: auto;
 }
+
+.form-listing {
+  border-radius: 30px;
+  padding: 8px 10px;
+  background-color: #eee;
+  text-align: center;
+  /* min-width: 70px; */
+  width: auto;
+  text-decoration: none;
+  color: #222;
+}
+
+.form-listing:hover {
+  cursor: pointer;
+}
