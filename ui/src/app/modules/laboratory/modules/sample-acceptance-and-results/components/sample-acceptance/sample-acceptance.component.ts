@@ -364,7 +364,7 @@ export class SampleAcceptanceComponent implements OnInit {
 
   onResultsReview(event: Event, sample, providerDetails): void {
     event.stopPropagation();
-    this.dialog.open(ResultReviewModalComponent, {
+    this.dialog.open(ResultsFeedingModalComponent, {
       data: {
         sample: sample,
         currentUser: this.currentUser,
