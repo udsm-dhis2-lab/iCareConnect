@@ -1,0 +1,10 @@
+<div class="manage-users-container" *ngIf="{ user: user$ | async } as params">
+  <mat-progress-bar
+    mode="indeterminate"
+    *ngIf="userId && !params?.user"
+  ></mat-progress-bar>
+  <app-add-user
+    *ngIf="(params?.user && userId) || !userId"
+    [user]="params?.user"
+  ></app-add-user>
+</div>

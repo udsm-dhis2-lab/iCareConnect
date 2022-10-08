@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild } from "@angular/core";
+import { Component, ElementRef, Input, OnInit, ViewChild } from "@angular/core";
 import {
   FormBuilder,
   FormControl,
@@ -15,6 +15,8 @@ import {
   LocationGet,
   LocationGetFull,
   RoleCreate,
+  UserGet,
+  UserGetFull,
 } from "src/app/shared/resources/openmrs";
 import {
   GlobalEventHandlersEvent,
@@ -22,7 +24,11 @@ import {
   UserCreateModel,
 } from "../../../models/user.model";
 import { UserService } from "../../../services/users.service";
-import { orderBy } from "lodash";
+import { orderBy, uniqBy } from "lodash";
+import { SystemUsersService } from "src/app/core/services/system-users.service";
+import { Store } from "@ngrx/store";
+import { AppState } from "src/app/store/reducers";
+import { go } from "src/app/store/actions";
 
 @Component({
   selector: "app-add-user",
@@ -30,6 +36,8 @@ import { orderBy } from "lodash";
   styleUrls: ["./add-user.component.scss"],
 })
 export class AddUserComponent implements OnInit {
+  @Input() user: any;
+
   @ViewChild("table", { static: false }) table: MatTable<any>;
   @ViewChild("filter", { static: false }) filter: ElementRef;
   loading: boolean = true;
@@ -65,8 +73,8 @@ export class AddUserComponent implements OnInit {
   selectedLocations: any = [];
   shouldCreateProvider: boolean = false;
   genderValues = [
-    { code: "F", value: "Female" },
-    { code: "M", value: "Male" },
+    { code: "F", value: "F", display: "Female" },
+    { code: "M", value: "M", display: "Female" },
   ];
 
   gender: { Female: string; Male: string; Unknown: string } = {
@@ -77,61 +85,185 @@ export class AddUserComponent implements OnInit {
   currentDataAvailable: RoleCreate[];
   passwordFocusOut: Boolean = false;
   passwordStrong: Boolean = true;
+
+  passwordIsRequired: boolean = true;
   constructor(
     private fb: FormBuilder,
     private service: UserService,
-    private router: Router,
     private _snackBar: MatSnackBar,
-    private locationService: LocationService
+    private locationService: LocationService,
+    private usersService: SystemUsersService,
+    private store: Store<AppState>
   ) {}
 
   ngOnInit() {
-    this.userForm = this.generateForm();
-    this.service.getRoles().subscribe((roles) => {
-      this.roles = roles.results;
-      this.rolesDataSource = new MatTableDataSource(this.roles);
-      this.selectedRolesDatasource = new MatTableDataSource(this.selectedRoles);
-      this.loading = false;
-    });
-    this.locationService
-      .getLocationsByTagNames(
-        ["Treatment+Room", "Admission+Location", "Module+Location"],
-        {
-          limit: 100,
-          startIndex: 0,
-          v: "custom:(uuid,display,name)",
-        }
-      )
-      .subscribe((res) => {
-        this.locations = orderBy(res, ["display"], ["asc"]);
+    // console.log(this.user);
+    if (this.user && this.user?.uuid) {
+      this.usersService
+        .getProviderByUserUuid(this.user?.uuid)
+        .subscribe((response) => {
+          if (response && !response?.error) {
+            if (response?.length > 0) {
+              // TODO: Softcode uuids for attributes types
+              //MCT NO: 79fa49fc-d584-4b74-9dcd-eb265372ade1
+              this.shouldCreateProvider = true;
+              this.user = {
+                ...this.user,
+                providerAttributes: response[0]?.attributes,
+                MCTNumber: (response[0]?.attributes?.filter(
+                  (attribute) =>
+                    attribute?.attributeType?.uuid ===
+                    "79fa49fc-d584-4b74-9dcd-eb265372ade1"
+                ) || [])[0]?.value,
+                phoneNumber: (response[0]?.attributes?.filter(
+                  (attribute) =>
+                    attribute?.attributeType?.uuid ===
+                    "685a0d80-25e5-4ed4-8a03-974a1d161bf3"
+                ) || [])[0]?.value,
+                qualification: (response[0]?.attributes?.filter(
+                  (attribute) =>
+                    attribute?.attributeType?.uuid ===
+                    "9c4420fa-5a22-4249-978c-da6e0f24880b"
+                ) || [])[0]?.value,
+              };
+              // this.userForm.controls?.MCTNumber?.value = (response[0]?.attributes?.filter(attribute => attribute?.attributeType?.uuid === '79fa49fc-d584-4b74-9dcd-eb265372ade1') || [])[0]?.value
+            }
 
-        this.locationsDataSource = new MatTableDataSource(this.locations);
-        this.selectedLocationsDataSource = new MatTableDataSource(
-          this.selectedLocations
+            this.userForm = this.generateForm(this.user);
+            this.passwordIsRequired = false;
+
+            this.service.getRoles().subscribe((roles) => {
+              this.roles = roles.results;
+              this.rolesDataSource = new MatTableDataSource(this.roles);
+              this.selectedRolesDatasource = new MatTableDataSource(
+                this.selectedRoles
+              );
+              this.loading = false;
+            });
+            this.locationService
+              .getLocationsByTagNames(
+                ["Treatment+Room", "Admission+Location", "Module+Location"],
+                {
+                  limit: 100,
+                  startIndex: 0,
+                  v: "custom:(uuid,display,name)",
+                }
+              )
+              .subscribe((res) => {
+                this.locations = orderBy(res, ["display"], ["asc"]);
+                this.selectedLocations = uniqBy(
+                  this.locations?.filter(
+                    (location) =>
+                      (
+                        JSON.parse(
+                          this.user?.userProperties?.locations
+                        )?.filter((id) => id === location?.uuid) || []
+                      )?.length > 0
+                  ) || [],
+                  "uuid"
+                );
+
+                this.locationsDataSource = new MatTableDataSource(
+                  this.locations
+                );
+                this.selectedLocationsDataSource = new MatTableDataSource(
+                  this.selectedLocations
+                );
+              });
+          }
+        });
+    } else {
+      this.userForm = this.generateForm(this.user);
+
+      this.service.getRoles().subscribe((roles) => {
+        this.roles = roles.results;
+        this.rolesDataSource = new MatTableDataSource(this.roles);
+        this.selectedRolesDatasource = new MatTableDataSource(
+          this.selectedRoles
         );
+        this.loading = false;
       });
+      this.locationService
+        .getLocationsByTagNames(
+          ["Treatment+Room", "Admission+Location", "Module+Location"],
+          {
+            limit: 100,
+            startIndex: 0,
+            v: "custom:(uuid,display,name)",
+          }
+        )
+        .subscribe((res) => {
+          this.locations = orderBy(res, ["display"], ["asc"]);
+          this.selectedLocations = uniqBy(
+            this.locations?.filter(
+              (location) =>
+                (
+                  JSON.parse(this.user?.userProperties?.locations)?.filter(
+                    (id) => id === location?.uuid
+                  ) || []
+                )?.length > 0
+            ) || [],
+            "uuid"
+          );
+
+          this.locationsDataSource = new MatTableDataSource(this.locations);
+          this.selectedLocationsDataSource = new MatTableDataSource(
+            this.selectedLocations
+          );
+        });
+    }
   }
 
-  generateForm() {
+  generateForm(user: any): any {
+    this.selectedRoles = user?.roles;
     return this.fb.group({
-      username: new FormControl("", Validators.required),
-      password: ["", [Validators.required, Validators.minLength(8)]],
-      gender: new FormControl(""),
-      middleName: new FormControl(""),
-      firstName: new FormControl("", Validators.required),
-      surname: new FormControl("", Validators.required),
+      username: new FormControl(user?.username, Validators.required),
+      password: [
+        "",
+        !user ? [Validators.required, Validators.minLength(8)] : [],
+      ],
+      gender: new FormControl(user?.person ? user?.person?.gender : null, [
+        Validators?.required,
+      ]),
+      middleName: new FormControl(
+        user?.person ? user?.person?.preferredName?.middleName : null
+      ),
+      firstName: new FormControl(
+        user?.person ? user?.person?.preferredName?.givenName : null,
+        Validators.required
+      ),
+      surname: new FormControl(
+        user?.person ? user?.person?.preferredName?.familyName : null,
+        Validators.required
+      ),
       confirmpassword: new FormControl(""),
-      addressDisplay: new FormControl(""),
-      country: new FormControl("", Validators.required),
-      district: new FormControl("", Validators.required),
-      city: new FormControl("", Validators.required),
+      addressDisplay: new FormControl(
+        user?.person ? user?.person?.preferredAddress?.address1 : null
+      ),
+      country: new FormControl(
+        user?.person ? user?.person?.preferredAddress?.country : null,
+        Validators.required
+      ),
+      district: new FormControl(
+        user?.person ? user?.person?.preferredAddress?.countyDistrict : null,
+        Validators.required
+      ),
+      city: new FormControl(
+        user?.person ? user?.person?.preferredAddress?.stateProvince : null,
+        Validators.required
+      ),
       postalCode: new FormControl(""),
-      addressDisplay2: new FormControl(""),
+      addressDisplay2: new FormControl(
+        user?.person ? user?.person?.preferredAddress?.address1 : null
+      ),
       checked: false,
-      birthdate: new FormControl("", Validators.required),
-      MCTNumber: new FormControl(""),
-      phoneNumber: new FormControl(""),
-      qualification: new FormControl(""),
+      birthdate: new FormControl(
+        user?.person ? new Date(user?.person?.birthdate) : null,
+        Validators.required
+      ),
+      MCTNumber: new FormControl(user?.MCTNumber),
+      phoneNumber: new FormControl(user?.phoneNumber),
+      qualification: new FormControl(user?.qualification),
     });
   }
 
@@ -164,7 +296,7 @@ export class AddUserComponent implements OnInit {
     console.log(selected);
   }
 
-  saveData(event: Event): void {
+  saveData(event: Event, userToUpdate?: any): void {
     event.stopPropagation();
     this.saving = true;
     const data = this.userForm.value;
@@ -199,7 +331,7 @@ export class AddUserComponent implements OnInit {
       display: data.firstName,
       addresses: [prefferedLocation],
       birthdate: processDateFromMaterialInput(data.birthdate),
-      gender: this.gender[data.gender],
+      gender: data.gender,
     };
     const user = {
       userProperties: {
@@ -212,7 +344,10 @@ export class AddUserComponent implements OnInit {
       roles: this.selectedRoles,
       person,
     };
-    this.service.createUser({ user }).subscribe(
+    (userToUpdate?.uuid
+      ? this.service.updateUser({ data: user, uuid: userToUpdate?.uuid })
+      : this.service.createUser({ user })
+    ).subscribe(
       (user) => {
         if (user) {
           // create provider
@@ -222,14 +357,35 @@ export class AddUserComponent implements OnInit {
             person: user?.person?.uuid,
             attributes: [
               {
+                uuid: userToUpdate?.providerAttributes
+                  ? (userToUpdate?.providerAttributes?.filter(
+                      (attribute) =>
+                        attribute?.attributeType?.uuid ===
+                        "79fa49fc-d584-4b74-9dcd-eb265372ade1"
+                    ) || [])[0]?.uuid
+                  : null,
                 attributeType: "79fa49fc-d584-4b74-9dcd-eb265372ade1",
                 value: data?.MCTNumber,
               },
               {
+                uuid: userToUpdate?.providerAttributes
+                  ? (userToUpdate?.providerAttributes?.filter(
+                      (attribute) =>
+                        attribute?.attributeType?.uuid ===
+                        "685a0d80-25e5-4ed4-8a03-974a1d161bf3"
+                    ) || [])[0]?.uuid
+                  : null,
                 attributeType: "685a0d80-25e5-4ed4-8a03-974a1d161bf3",
                 value: data?.phoneNumber,
               },
               {
+                uuid: userToUpdate?.providerAttributes
+                  ? (userToUpdate?.providerAttributes?.filter(
+                      (attribute) =>
+                        attribute?.attributeType?.uuid ===
+                        "9c4420fa-5a22-4249-978c-da6e0f24880b"
+                    ) || [])[0]?.uuid
+                  : null,
                 attributeType: "9c4420fa-5a22-4249-978c-da6e0f24880b",
                 value: data?.qualification,
               },
@@ -558,5 +714,10 @@ export class AddUserComponent implements OnInit {
 
   providerAccount(value: boolean) {
     this.shouldCreateProvider = value;
+  }
+
+  onCancel(event: Event): void {
+    event.stopPropagation();
+    this.store.dispatch(go({ path: ["/maintenance/users-management"] }));
   }
 }
