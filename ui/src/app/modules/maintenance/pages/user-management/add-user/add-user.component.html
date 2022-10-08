@@ -11,7 +11,7 @@
   <!-- loading section -->
   <mat-progress-bar *ngIf="loading" mode="indeterminate"></mat-progress-bar>
   <!-- end of loading section -->
-  <div class="table-responsive" *ngIf="!loading && userForm">
+  <div class="table-responsive p-3" *ngIf="!loading && userForm">
     <form [formGroup]="userForm">
       <ng-container>
         <div class="row">
@@ -121,7 +121,7 @@
               autocomplete="off"
               MatFormFieldControl="surname"
             >
-              <mat-label> Surname{{ userForm?.value?.surname }}</mat-label>
+              <mat-label>Surname</mat-label>
               <input
                 autocomplete="off"
                 matInput
@@ -552,7 +552,25 @@
         </div>
       </ng-container>
 
-      <div class="d-flex justify-content-end">
+      <div>
+        <!-- systemModules -->
+        <h4 class="mt-2">Others</h4>
+        <mat-form-field class="w-25 mt-2">
+          <mat-label>Preferred module</mat-label>
+          <mat-select
+            [(value)]="selectedModules[0]"
+            (selectionChange)="onGetPreferredModule($event)"
+          >
+            <mat-option
+              *ngFor="let systemModule of systemModules"
+              [value]="systemModule"
+              >{{ systemModule?.name }}</mat-option
+            >
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div class="d-flex justify-content-end mt-2">
         <button
           mat-flat-button
           (click)="onCancel($event)"
