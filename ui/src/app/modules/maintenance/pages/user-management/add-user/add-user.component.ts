@@ -24,11 +24,12 @@ import {
   UserCreateModel,
 } from "../../../models/user.model";
 import { UserService } from "../../../services/users.service";
-import { orderBy, uniqBy } from "lodash";
+import { orderBy, uniqBy, keyBy } from "lodash";
 import { SystemUsersService } from "src/app/core/services/system-users.service";
 import { Store } from "@ngrx/store";
 import { AppState } from "src/app/store/reducers";
 import { go } from "src/app/store/actions";
+import { MatSelectChange } from "@angular/material/select";
 
 @Component({
   selector: "app-add-user",
@@ -37,6 +38,7 @@ import { go } from "src/app/store/actions";
 })
 export class AddUserComponent implements OnInit {
   @Input() user: any;
+  @Input() systemModules: any;
 
   @ViewChild("table", { static: false }) table: MatTable<any>;
   @ViewChild("filter", { static: false }) filter: ElementRef;
@@ -87,6 +89,7 @@ export class AddUserComponent implements OnInit {
   passwordStrong: Boolean = true;
 
   passwordIsRequired: boolean = true;
+  selectedModules: any[] = [];
   constructor(
     private fb: FormBuilder,
     private service: UserService,
@@ -97,8 +100,17 @@ export class AddUserComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    // console.log(this.user);
     if (this.user && this.user?.uuid) {
+      this.selectedModules = this.user?.userProperties?.preferredModules
+        ? this.systemModules.filter(
+            (module) =>
+              (
+                JSON.parse(this.user?.userProperties?.preferredModules)?.filter(
+                  (moduleId) => moduleId === module?.id
+                ) || []
+              )?.length > 0
+          ) || []
+        : [];
       this.usersService
         .getProviderByUserUuid(this.user?.uuid)
         .subscribe((response) => {
@@ -141,14 +153,11 @@ export class AddUserComponent implements OnInit {
               this.loading = false;
             });
             this.locationService
-              .getLocationsByTagNames(
-                ["Treatment+Room", "Admission+Location", "Module+Location"],
-                {
-                  limit: 100,
-                  startIndex: 0,
-                  v: "custom:(uuid,display,name)",
-                }
-              )
+              .getLocationsByTagNames(["Treatment+Room", "Module+Location"], {
+                limit: 100,
+                startIndex: 0,
+                v: "custom:(uuid,display,name)",
+              })
               .subscribe((res) => {
                 this.locations = orderBy(res, ["display"], ["asc"]);
                 this.selectedLocations = uniqBy(
@@ -159,6 +168,13 @@ export class AddUserComponent implements OnInit {
                           this.user?.userProperties?.locations
                         )?.filter((id) => id === location?.uuid) || []
                       )?.length > 0
+                  ) || [],
+                  "uuid"
+                );
+
+                this.locations = uniqBy(
+                  this.locations?.filter(
+                    (loc) => !keyBy(this.selectedLocations, "uuid")[loc?.uuid]
                   ) || [],
                   "uuid"
                 );
@@ -296,6 +312,11 @@ export class AddUserComponent implements OnInit {
     console.log(selected);
   }
 
+  onGetPreferredModule(event: MatSelectChange): void {
+    // TODO: Add support to capture more that one module and order them accordingly
+    this.selectedModules = [event?.value];
+  }
+
   saveData(event: Event, userToUpdate?: any): void {
     event.stopPropagation();
     this.saving = true;
@@ -337,6 +358,9 @@ export class AddUserComponent implements OnInit {
       userProperties: {
         locations: JSON.stringify(
           this.selectedLocations.map(({ uuid }) => uuid)
+        ),
+        preferredModules: JSON.stringify(
+          this.selectedModules.map(({ id }) => id)
         ),
       },
       username: data?.username,
