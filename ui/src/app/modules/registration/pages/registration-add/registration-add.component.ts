@@ -6,7 +6,11 @@ import {
   getAgeInYearsMontthsDays,
   getDateDifferenceYearsMonthsDays,
 } from "src/app/shared/helpers/date.helpers";
-import { go, loadCurrentPatient } from "src/app/store/actions";
+import {
+  addCurrentPatient,
+  go,
+  loadCurrentPatient,
+} from "src/app/store/actions";
 import { getCurrentLocation } from "src/app/store/selectors";
 import { RegistrationService } from "../../services/registration.services";
 import { VisitsService } from "src/app/shared/resources/visits/services";
@@ -104,6 +108,7 @@ export class RegistrationAddComponent implements OnInit {
   patients$: Observable<any>;
   displayedColumn: string[] = ["id", "name", "gender", "age", "phone"];
   continueReg: boolean = false;
+  loadingData: boolean;
   constructor(
     private _snackBar: MatSnackBar,
     private router: Router,
@@ -823,6 +828,7 @@ export class RegistrationAddComponent implements OnInit {
       if (
         this?.patient?.fname &&
         this?.patient?.fname.length > 0 &&
+        this?.patient?.lname &&
         this.patient.lname.length > 0
       ) {
         let searchText =
@@ -842,6 +848,55 @@ export class RegistrationAddComponent implements OnInit {
         );
       }
     }
+  }
+
+  onSelectPatient(e: Event, patient: Patient): void {
+    if (e) {
+      // e.stopPropagation();
+    }
+
+    // this.store.dispatch(addCurrentPatient({ patient }));
+    console.log(patient);
+    this.store.dispatch(
+      addCurrentPatient({
+        patient: { ...patient["patient"], id: patient["patient"]["uuid"] },
+        isRegistrationPage: true,
+      })
+    );
+    this.dialog
+      .open(StartVisitModelComponent, {
+        width: "85%",
+        data: {
+          patient: { ...patient["patient"], id: patient["patient"]["uuid"] },
+        },
+      })
+      .afterClosed()
+      .subscribe((visitDetails) => {
+        if (visitDetails && !visitDetails?.close) {
+          // TODO: Review the logics here
+          this.loadingData = true;
+          setTimeout(() => {
+            this.loadingData = false;
+          }, 100);
+          // this.dialog
+          //   .open(VisitStatusConfirmationModelComponent, {
+          //     width: "30%",
+          //     height: "190px",
+          //   })
+          //   .afterClosed()
+          //   .subscribe(() => {
+          //     this.loadingData = true;
+          //     setTimeout(() => {
+          //       this.loadingData = false;
+          //     }, 100);
+          //   });
+        } else {
+          this.loadingData = true;
+          setTimeout(() => {
+            this.loadingData = false;
+          }, 100);
+        }
+      });
   }
   onContinueRegistrion() {
     this.continueReg = true;
