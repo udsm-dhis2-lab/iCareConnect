@@ -9,7 +9,8 @@
     occupationInfo: occupationInfo$ | async,
     relationTypeOptions: relationTypeOptions$ | async,
     showPatientType: showPatientType$ | async,
-    residenceDetailsLocation: residenceDetailsLocation$ | async
+    residenceDetailsLocation: residenceDetailsLocation$ | async,
+    patients: patients$ | async
   } as params"
 >
   <h2>{{ editMode ? "Edit Patient" : "Register New Patient" }}</h2>
@@ -126,81 +127,152 @@
         <div class="row mt-4">
           <div class="col-sm-3">Names</div>
 
-          <div class="col-sm-9 d-flex">
-            <mat-form-field appearance="fill" class="w-100">
-              <mat-label>First Name</mat-label>
-              <input
-                name="fname"
-                id="fname"
-                autocomplete="off"
-                matInput
-                placeholder="Enter First name"
-                [(ngModel)]="patient['fname']"
-                [disabled]="addingPatient && !patientAdded"
-                required
-                (keyup)="validateNamesInputs(patient['fname'], 'fname')"
-              />
-              <mat-error> First name is a mandatory field </mat-error>
-              <mat-hint
-                class="text-danger"
-                *ngIf="
-                  patient['fname']?.length > 1 &&
-                  validatedTexts['fname'] &&
-                  validatedTexts['fname'] === 'invalid'
-                "
-              >
-                Not a valid name
-              </mat-hint>
-            </mat-form-field>
+          <div class="col-sm-9">
+            <div class="d-flex w-100">
+              <mat-form-field appearance="fill" class="w-100">
+                <mat-label>First Name</mat-label>
+                <input
+                  name="fname"
+                  id="fname"
+                  autocomplete="off"
+                  matInput
+                  placeholder="Enter First name"
+                  [(ngModel)]="patient['fname']"
+                  [disabled]="addingPatient && !patientAdded"
+                  required
+                  (keyup)="validateNamesInputs(patient['fname'], 'fname')"
+                />
+                <mat-error> First name is a mandatory field </mat-error>
+                <mat-hint
+                  class="text-danger"
+                  *ngIf="
+                    patient['fname']?.length > 1 &&
+                    validatedTexts['fname'] &&
+                    validatedTexts['fname'] === 'invalid'
+                  "
+                >
+                  Not a valid name
+                </mat-hint>
+              </mat-form-field>
 
-            <mat-form-field appearance="fill" class="w-100 ml-3">
-              <mat-label>Middle Name</mat-label>
-              <input
-                name="mname"
-                autocomplete="off"
-                matInput
-                placeholder="Enter Middle name"
-                [(ngModel)]="patient['mname']"
-                [disabled]="addingPatient && !patientAdded"
-                (keyup)="validateNamesInputs(patient['mname'], 'mname')"
-              />
-              <mat-hint
-                class="text-danger"
-                *ngIf="
-                  patient['mname']?.length > 1 &&
-                  validatedTexts['mname'] &&
-                  validatedTexts['mname'] === 'invalid'
-                "
-              >
-                Not a valid name
-              </mat-hint>
-            </mat-form-field>
+              <mat-form-field appearance="fill" class="w-100 ml-3">
+                <mat-label>Middle Name</mat-label>
+                <input
+                  name="mname"
+                  autocomplete="off"
+                  matInput
+                  placeholder="Enter Middle name"
+                  [(ngModel)]="patient['mname']"
+                  [disabled]="addingPatient && !patientAdded"
+                  (keyup)="validateNamesInputs(patient['mname'], 'mname')"
+                />
+                <mat-hint
+                  class="text-danger"
+                  *ngIf="
+                    patient['mname']?.length > 1 &&
+                    validatedTexts['mname'] &&
+                    validatedTexts['mname'] === 'invalid'
+                  "
+                >
+                  Not a valid name
+                </mat-hint>
+              </mat-form-field>
 
-            <mat-form-field appearance="fill" class="w-100 ml-3">
-              <mat-label>Last Name</mat-label>
-              <input
-                matInput
-                autocomplete="off"
-                placeholder="Enter Last name"
-                [(ngModel)]="patient['lname']"
-                name="lname"
-                id="lname"
-                [disabled]="addingPatient && !patientAdded"
-                required
-                (keyup)="validateNamesInputs(patient['lname'], 'lname')"
-              />
-              <mat-error> Last name is a mandatory field </mat-error>
-              <mat-hint
-                class="text-danger"
-                *ngIf="
-                  patient['lname']?.length > 1 &&
-                  validatedTexts['lname'] &&
-                  validatedTexts['lname'] === 'invalid'
-                "
+              <mat-form-field appearance="fill" class="w-100 ml-3">
+                <mat-label>Last Name</mat-label>
+                <input
+                  matInput
+                  autocomplete="off"
+                  placeholder="Enter Last name"
+                  [(ngModel)]="patient['lname']"
+                  name="lname"
+                  id="lname"
+                  [disabled]="addingPatient && !patientAdded"
+                  required
+                  (keyup)="validateNamesInputs(patient['lname'], 'lname')"
+                  (change)="onChangeLname($event)"
+                />
+                <mat-error> Last name is a mandatory field </mat-error>
+                <mat-hint
+                  class="text-danger"
+                  *ngIf="
+                    patient['lname']?.length > 1 &&
+                    validatedTexts['lname'] &&
+                    validatedTexts['lname'] === 'invalid'
+                  "
+                >
+                  Not a valid name
+                </mat-hint>
+              </mat-form-field>
+            </div>
+            <div
+              *ngIf="params?.patients?.length > 0 && showList && !continueReg"
+              class="w-100"
+            >
+              <div class="w-100 d-flex">
+                <p class="alert alert-danger mt-1">
+                  There is patient with the same name. Would you like to
+                  Continue?
+                </p>
+                <button
+                  class="ml-3 mt-1"
+                  style="height: 42px; right: 0"
+                  mat-flat-button
+                  color="primary"
+                  (click)="onContinueRegistrion()"
+                >
+                  Continue
+                </button>
+              </div>
+              <table
+                mat-table
+                [dataSource]="params?.patients"
+                class="mat-elevation-z2 w-100"
               >
-                Not a valid name
-              </mat-hint>
-            </mat-form-field>
+                <!-- No Column -->
+                <ng-container matColumnDef="id">
+                  <th mat-header-cell *matHeaderCellDef>No</th>
+                  <td mat-cell *matCellDef="let element; let i = index">
+                    {{ i + 1 }}
+                  </td>
+                </ng-container>
+
+                <!-- Name Column -->
+                <ng-container matColumnDef="name">
+                  <th mat-header-cell *matHeaderCellDef>Name</th>
+                  <td mat-cell *matCellDef="let element">{{ element.name }}</td>
+                </ng-container>
+
+                <!-- Gender Column -->
+                <ng-container matColumnDef="gender">
+                  <th mat-header-cell *matHeaderCellDef>Gender</th>
+                  <td mat-cell *matCellDef="let element">
+                    {{ element.gender }}
+                  </td>
+                </ng-container>
+
+                <!-- Age Column -->
+                <ng-container matColumnDef="age">
+                  <th mat-header-cell *matHeaderCellDef>Age</th>
+                  <td mat-cell *matCellDef="let element">{{ element.age }}</td>
+                </ng-container>
+                <!-- Phone Column -->
+                <ng-container matColumnDef="phone">
+                  <th mat-header-cell *matHeaderCellDef>Phone</th>
+                  <td mat-cell *matCellDef="let element">
+                    {{ element.phone ? "0" + element.phone : "" }}
+                  </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumn"></tr>
+                <tr
+                  mat-row
+                  *matRowDef="let row; columns: displayedColumn"
+                  style="cursor: pointer"
+                  (click)="onSelectPatient($event, row)"
+                ></tr>
+              </table>
+            </div>
           </div>
         </div>
 

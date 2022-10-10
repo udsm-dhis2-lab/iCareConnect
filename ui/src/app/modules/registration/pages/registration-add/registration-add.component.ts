@@ -39,6 +39,7 @@ import { ThisReceiver } from "@angular/compiler";
 import { clearActiveVisit } from "src/app/store/actions/visit.actions";
 import { map, tap } from "rxjs/operators";
 import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
+import { PatientService } from "src/app/shared/resources/patient/services/patients.service";
 
 @Component({
   selector: "app-registration-add",
@@ -98,6 +99,11 @@ export class RegistrationAddComponent implements OnInit {
   newArea: string;
   residenceDetailsLocation$: Observable<any>;
   districtindex: number;
+  searching: boolean;
+  showList: boolean;
+  patients$: Observable<any>;
+  displayedColumn: string[] = ["id", "name", "gender", "age", "phone"];
+  continueReg: boolean = false;
   constructor(
     private _snackBar: MatSnackBar,
     private router: Router,
@@ -109,7 +115,8 @@ export class RegistrationAddComponent implements OnInit {
     private dialog: MatDialog,
     private systemSettingsService: SystemSettingsService,
     private identifierService: IdentifiersService,
-    private conceptService: ConceptsService
+    private conceptService: ConceptsService,
+    private patientService: PatientService
   ) {}
 
   get mandatoryFieldsMissing(): boolean {
@@ -807,6 +814,37 @@ export class RegistrationAddComponent implements OnInit {
       this.disabledIDType = false;
       this.selectedIdentifierType = null;
     }
+  }
+
+  onChangeLname(e) {
+    e.stopPropagation();
+    this.continueReg = false;
+    if (e) {
+      if (
+        this?.patient?.fname &&
+        this?.patient?.fname.length > 0 &&
+        this.patient.lname.length > 0
+      ) {
+        let searchText =
+          this?.patient?.fname +
+          (this?.patient?.mname && this?.patient?.mname.length > 0
+            ? " " + this?.patient?.mname + " "
+            : " ") +
+          this?.patient?.lname;
+
+        this.searching = true;
+        this.showList = false;
+        this.patients$ = this.patientService.getPatients(searchText).pipe(
+          tap(() => {
+            this.searching = false;
+            this.showList = true;
+          })
+        );
+      }
+    }
+  }
+  onContinueRegistrion() {
+    this.continueReg = true;
   }
 
   validateNamesInputs(value, key) {

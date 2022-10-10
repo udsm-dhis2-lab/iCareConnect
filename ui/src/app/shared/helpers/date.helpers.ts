@@ -49,7 +49,6 @@ export function getAgeInYearsMontthsDays(birthdate) {
   var year = elapsed.getFullYear() - 1970;
   var month = elapsed.getMonth();
   var day = elapsed.getDate();
-  console.log("The date new date is ", today, "birthdate", DOB);
 
   return {
     years: year,
