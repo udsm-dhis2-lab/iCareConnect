@@ -141,6 +141,7 @@
                   [disabled]="addingPatient && !patientAdded"
                   required
                   (keyup)="validateNamesInputs(patient['fname'], 'fname')"
+                  (change)="onChangeLname($event)"
                 />
                 <mat-error> First name is a mandatory field </mat-error>
                 <mat-hint
@@ -165,6 +166,7 @@
                   [(ngModel)]="patient['mname']"
                   [disabled]="addingPatient && !patientAdded"
                   (keyup)="validateNamesInputs(patient['mname'], 'mname')"
+                  (change)="onChangeLname($event)"
                 />
                 <mat-hint
                   class="text-danger"
@@ -210,13 +212,13 @@
               class="w-100"
             >
               <div class="w-100 d-flex">
-                <p class="alert alert-danger mt-1">
+                <p class="alert alert-danger mt-1 w-75">
                   There is patient with the same name. Would you like to
                   Continue?
                 </p>
                 <button
-                  class="ml-3 mt-1"
-                  style="height: 42px; right: 0"
+                  class="ml-3 mt-1 w-25"
+                  style="height: 42px"
                   mat-flat-button
                   color="primary"
                   (click)="onContinueRegistrion()"
