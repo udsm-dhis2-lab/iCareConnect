@@ -72,7 +72,12 @@
           <td
             style="background-color: #d04747ab; width: 40px; margin-left: 20px"
           ></td>
-          <td><div style="margin-left: 3px">Has rejected results</div></td>
+          <td
+          *ngIf="!LISConfigurations?.isLIS"
+          ><div style="margin-left: 3px">Has rejected results</div></td>
+          <td
+          *ngIf="LISConfigurations?.isLIS"
+          ><div style="margin-left: 3px">Has amended results</div></td>
           <td
             *ngIf="!LISConfigurations?.isLIS"
             style="background-color: #6fd67bcf; width: 40px; margin-left: 20px"
