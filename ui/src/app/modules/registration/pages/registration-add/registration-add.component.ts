@@ -856,7 +856,6 @@ export class RegistrationAddComponent implements OnInit {
     }
 
     // this.store.dispatch(addCurrentPatient({ patient }));
-    console.log(patient);
     this.store.dispatch(
       addCurrentPatient({
         patient: { ...patient["patient"], id: patient["patient"]["uuid"] },
