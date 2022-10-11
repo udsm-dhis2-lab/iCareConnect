@@ -75,7 +75,7 @@ export class StockService {
     return this._getStocks("store/stockout", locationUuid);
   }
 
-  saveStockLedger(ledgerInput: LedgerInput): Observable<StockBatch> {
+  saveStockLedger(ledgerInput: LedgerInput): Observable<any> {
     const storeLedger = Stock.createLedger(ledgerInput);
 
     if (!storeLedger) {
@@ -86,7 +86,10 @@ export class StockService {
 
     return this.httpClient
       .post("store/ledger", storeLedger)
-      .pipe(map((response) => new StockBatch(response)));
+      .pipe(
+        map((response) => new StockBatch(response)), 
+        catchError((error) => of(error))
+      )
   }
 
   getStockMetrics(locationUuid: string) {
