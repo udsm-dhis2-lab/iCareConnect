@@ -70,14 +70,17 @@ export class UserService {
     const url = `user`;
     return this.httpClient.post(url, user);
   }
+
   deletePerson({ uuid }): Observable<any> {
     const url = `person/${uuid}?purge=true`;
     return this.httpClient.delete(url);
   }
+
   getLocationByUuid({ uuid }): Observable<any> {
     const url = `location/${uuid}`;
     return this.httpClient.get(url);
   }
+
   getLoginLocations(): Observable<any> {
     return this.httpClient.get(
       "location?limit=100&tag=Login+Location&v=custom:(display,country,postalCode,stateProvince,uuid,tags,description,parentLocation,childLocations,attributes:(attributeType,uuid,value,display))"

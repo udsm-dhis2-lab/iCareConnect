@@ -1,5 +1,6 @@
 import { NgModule } from "@angular/core";
 import { RouterModule, Routes } from "@angular/router";
+import { ManageUsersComponent } from "./containers/manage-users/manage-users.component";
 import {
   AddUserComponent,
   UserManagementComponent,
@@ -40,8 +41,8 @@ const routes: Routes = [
         component: LocationManagementComponent,
       },
       {
-        path: "users-management/add-user",
-        component: AddUserComponent,
+        path: "users-management/manage-user",
+        component: ManageUsersComponent,
       },
       {
         path: "users-management/edit-user",
