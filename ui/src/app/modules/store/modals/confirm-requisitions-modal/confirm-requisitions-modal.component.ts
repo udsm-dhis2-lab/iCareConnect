@@ -22,7 +22,6 @@ export class ConfirmRequisitionsModalComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log("dialogData", this.dialogData);
     let requisitionItems = [];
     Object.keys(this.dialogData).forEach((key) => {
       requisitionItems = [...requisitionItems, ...this.dialogData[key]];
