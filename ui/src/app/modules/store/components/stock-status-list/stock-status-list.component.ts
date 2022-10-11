@@ -27,6 +27,7 @@ export class StockStatusListComponent implements OnInit {
   currentItemStock$: Observable<StockObject>;
   saving: boolean = false;
   itemID?: string;
+  errors: any[] = [];
   constructor(
     private stockService: StockService,
     private dialog: MatDialog,
@@ -91,12 +92,18 @@ export class StockStatusListComponent implements OnInit {
   onSaveLedger(ledgerInput: LedgerInput, currentStock: any): void {
     this.saving = true;
     this.stockService.saveStockLedger(ledgerInput).subscribe((response) => {
-      if (response) {
+      if (!response?.error) {
         this.saving = false;
         this.currentItemStock$ = this.stockService.getAvailableStockOfAnItem(
           currentStock?.id,
           this.currentLocation?.uuid
         );
+      }
+      if(response?.error){
+        this.errors = [
+          ...this.errors,
+          response?.error
+        ]
       }
     });
   }
