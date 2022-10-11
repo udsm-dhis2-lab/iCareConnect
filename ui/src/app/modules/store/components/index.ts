@@ -1,3 +1,4 @@
+import { IssuingStockByStoreComponent } from "./issuing-stock-by-store/issuing-stock-by-store.component";
 import { LedgersListComponent } from "./ledgers-list/ledgers-list.component";
 import { ReOrderLevelItemsListComponent } from "./re-order-level-items-list/re-order-level-items-list.component";
 import { StockBatchListComponent } from "./stock-batch-list/stock-batch-list.component";
@@ -14,4 +15,5 @@ export const stockComponents: any[] = [
   StockInOtherUnitsComponent,
   TotalizeStockUnitsQuantityComponent,
   ReOrderLevelItemsListComponent,
+  IssuingStockByStoreComponent
 ];
