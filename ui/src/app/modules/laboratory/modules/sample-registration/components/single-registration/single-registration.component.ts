@@ -175,11 +175,12 @@ export class SingleRegistrationComponent implements OnInit {
       //   shouldHaveLiveSearchForDropDownFields: true,
       // }),
     ];
-
+    
     this.receivedOnField = new DateField({
       id: "receivedOn",
       key: "receivedOn",
       label: "Received On",
+      max: this.maximumDate
     });
 
     this.receivedByField = new Dropdown({
@@ -231,11 +232,25 @@ export class SingleRegistrationComponent implements OnInit {
     this.createSampleBroughtByDetailsFields();
   }
 
+  get maximumDate() {
+    let maxDate = new Date();
+    let maxMonth =
+      (maxDate.getMonth() + 1).toString().length > 1
+        ? maxDate.getMonth() + 1
+        : `0${maxDate.getMonth() + 1}`;
+    let maxDay =
+      maxDate.getDate().toString().length > 1
+        ? maxDate.getDate()
+        : `0${maxDate.getDate() + 1}`;
+    return `${maxDate.getFullYear()}-${maxMonth}-${maxDay}`;
+  }
+
   createSampleCollectionDetailsFields(data?: any): void {
     this.sampleColectionDateField = new DateField({
       id: "collectedOn",
       key: "collectedOn",
       label: "Collected On",
+      max: this.maximumDate
     });
 
     this.sampleCollectedByField = new Textbox({
@@ -250,6 +265,7 @@ export class SingleRegistrationComponent implements OnInit {
       id: "broughtOn",
       key: "broughtOn",
       label: "Brought On",
+      max: this.maximumDate,
     });
 
     this.broughtByField = new Textbox({
@@ -766,7 +782,7 @@ export class SingleRegistrationComponent implements OnInit {
                                                                   let ordersWithConceptsDetails =
                                                                     [];
 
-                                                                  sampleResponse.orders.forEach(
+                                                                  sampleResponse?.orders?.forEach(
                                                                     (order) => {
                                                                       ordersWithConceptsDetails =
                                                                         [
@@ -1110,12 +1126,16 @@ export class SingleRegistrationComponent implements OnInit {
                                                                               SampleRegistrationFinalizationComponent,
                                                                               {
                                                                                 height:
-                                                                                  "200px",
+                                                                                  forRejection ? "200px" : "100px",
                                                                                 width:
                                                                                   "30%",
                                                                                 data: {
                                                                                   ...data,
-                                                                                  forRejection,
+                                                                                  forRejection: forRejection,
+                                                                                  popupHeader:
+                                                                                    forRejection
+                                                                                      ? "Sample Rejection"
+                                                                                      : "Sample Saved",
                                                                                 },
                                                                                 disableClose:
                                                                                   false,
@@ -1228,6 +1248,6 @@ export class SingleRegistrationComponent implements OnInit {
       data,
       disableClose: false,
       panelClass: "custom-dialog-container",
-    });
+    }).afterClosed().subscribe();
   }
 }

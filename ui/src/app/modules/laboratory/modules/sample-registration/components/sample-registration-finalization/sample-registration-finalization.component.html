@@ -1,5 +1,5 @@
 <div class="sample-registration-confirmation p-3">
-  <div class="h5">Sample Rejection</div>
+  <div class="h5">{{ dialogData?.popupHeader }}</div>
   <div class="rejection-reasons">
     <app-form
       *ngIf="dialogData?.forRejection"
@@ -17,7 +17,7 @@
       Done
     </button>
     <button
-      *ngIf="!dialogData?.forRejection"
+      *ngIf="dialogData?.forRejection"
       mat-stroked-button
       color="primary"
       [disabled]="!isFormValid"
