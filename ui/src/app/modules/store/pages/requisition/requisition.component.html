@@ -60,7 +60,7 @@
       </div>
     </div>
 
-    <table class="table">
+    <!-- <table class="table">
       <tr>
         <td>#</td>
         <td>Item</td>
@@ -170,6 +170,17 @@
           </div>
         </td>
       </tr>
-    </table>
+    </table> -->
+    
+    <app-requisition-by-store
+      *ngIf="params?.requisitions.length > 0"
+      [requisitions]="params?.requisitions"
+      [currentStore]="params?.currentStore"
+      (cancelRequisition)="onCancelRequisition($event)"
+      (rejectRequisition)="onRejectRequisition($event)"
+      (receiveRequisition)="onReceiveRequisition($event)"
+    >
+    </app-requisition-by-store>
+  
   </mat-card>
 </div>

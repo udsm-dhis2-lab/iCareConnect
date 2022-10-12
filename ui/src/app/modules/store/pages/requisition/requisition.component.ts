@@ -133,7 +133,10 @@ export class RequisitionComponent implements OnInit {
     }
   }
 
-  onCancelRequisition(e: Event, id: string): void {
+  onCancelRequisition(e: any, id?: string): void {
+    id = id ? id : e?.id;
+    e = id ? e : e?.event;
+    
     e.stopPropagation();
 
     const dialogToConfirmRejection = this.dialog.open(RequestCancelComponent, {
@@ -153,7 +156,9 @@ export class RequisitionComponent implements OnInit {
     });
   }
 
-  onReceiveRequisition(e: Event, requisition: RequisitionObject): void {
+  onReceiveRequisition(e: any, requisition?: RequisitionObject): void {
+    requisition = requisition ? requisition : e?.requisition;
+    e = requisition ? e : e?.event
     e.stopPropagation();
 
     // this.store.dispatch(receiveRequisition({ requisition }));
@@ -167,7 +172,9 @@ export class RequisitionComponent implements OnInit {
       });
   }
 
-  onRejectRequisition(e: Event, requisition: RequisitionObject): void {
+  onRejectRequisition(e: any, requisition?: RequisitionObject): void {
+    requisition = requisition ? requisition : e?.requisition;
+    e = requisition ? e : e?.event
     e.stopPropagation();
     if (requisition) {
       const { id, issueUuid } = requisition;
