@@ -122,7 +122,7 @@ public class TransactionUtil {
             for (int i = 0; i <= stockList.size() - 1; i++) {
 
                 System.out.println("iteration : " + i);
-                System.out.println("stcoke need is : " + stockNeed);
+                System.out.println("stock need is : " + stockNeed);
                 // for each stock check if stock need to be deducted
                 if (stockNeed > 0) {
 
