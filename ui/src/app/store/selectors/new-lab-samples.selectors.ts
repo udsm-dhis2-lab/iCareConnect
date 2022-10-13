@@ -516,10 +516,13 @@ function getOrdersWithResults(orders) {
   return (
     _.filter(orders, (order) => {
       if (
-        order?.testAllocations?.length > 0 &&
-        order?.testAllocations[0]?.results?.length > 0
+        order?.testAllocations?.length > 0
       ) {
-        return order;
+        return _.filter(order?.testAllocations, (testAllocation) => {
+          if(testAllocation.results && testAllocation.results.length > 0) {
+            return testAllocation;
+          }
+        }) || []
       }
     }) || []
   );
