@@ -513,19 +513,22 @@ function getOrdersWithFirstSigOff(orders) {
 }
 
 function getOrdersWithResults(orders) {
-  return (
-    _.filter(orders, (order) => {
-      if (
-        order?.testAllocations?.length > 0
-      ) {
-        return _.filter(order?.testAllocations, (testAllocation) => {
-          if(testAllocation.results && testAllocation.results.length > 0) {
-            return testAllocation;
-          }
-        }) || []
-      }
-    }) || []
-  );
+
+  let newOrders: any[] = [];
+
+  orders?.forEach((order) => {
+    if (order?.testAllocations?.length > 0) {
+      order.testAllocations.forEach((test) => {
+        if(test.results.length > 0){
+          newOrders = [
+            ...newOrders,
+            order
+          ]
+        }});
+    }
+  });
+
+  return newOrders;
 }
 
 function getOrdersWithRejectedResults(orders) {
