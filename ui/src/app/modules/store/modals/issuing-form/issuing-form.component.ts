@@ -138,13 +138,16 @@ export class IssuingFormComponent implements OnInit {
       issuedLocationUuid: this.data?.issue?.requestingLocation.uuid,
       issuingLocationUuid: this.data?.issue?.requestedLocation.uuid,
       issueItems: this.eligibleBatches?.map((batch) => {
-        remainedQuantityToIssue =
+        let quantityToIssue =
           remainedQuantityToIssue > batch?.quantity
-            ? remainedQuantityToIssue - Number(batch?.quantity)
-            : remainedQuantityToIssue;
+            ? batch?.quantity
+            : remainedQuantityToIssue
+        remainedQuantityToIssue = remainedQuantityToIssue > batch?.quantity
+          ? remainedQuantityToIssue - Number(batch?.quantity)
+          : 0;
         return {
           itemUuid: this.data?.issue?.itemUuid,
-          quantity: parseInt(remainedQuantityToIssue.toString(), 10),
+          quantity: parseInt(quantityToIssue.toString(), 10),
           batch: batch?.batch,
           expiryDate: new Date(batch?.expiryDate),
         };
