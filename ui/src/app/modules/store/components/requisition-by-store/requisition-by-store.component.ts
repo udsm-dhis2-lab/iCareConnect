@@ -69,11 +69,11 @@ export class RequisitionByStoreComponent implements OnInit {
     this.rejectRequisition.emit({ event: e, requisition: requisition });
   }
 
-  onCancelRequisition($event, requestId) {
-    this.cancelRequisition.emit({ event: $event, id: requestId });
+  onCancelRequisition(event, requestId) {
+    this.cancelRequisition.emit({ event: event, id: requestId });
   }
-  onReceiveRequisition($event, requisition) {
-    this.receiveRequisition.emit({ event: $event, requisition: requisition });
+  onReceiveRequisition($vent, requisition) {
+    this.receiveRequisition.emit({ event: event, requisition: requisition });
   }
 
   get selectedIssuesCount(): number {
