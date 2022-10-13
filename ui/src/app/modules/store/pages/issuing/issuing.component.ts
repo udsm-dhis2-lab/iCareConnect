@@ -37,6 +37,7 @@ export class IssuingComponent implements OnInit {
   stores$: Observable<any>;
   requestingLocation: any;
   selectedIssues: any = {};
+  errors: any[];
 
   constructor(
     private store: Store<AppState>,
@@ -74,6 +75,16 @@ export class IssuingComponent implements OnInit {
           .subscribe((response) => {
             if (response) {
               this.getAllIssuing();
+            }
+            if(response?.error && response?.message){
+              this.errors = [
+                ...this.errors,
+                {
+                  error: {
+                    
+                  }
+                }
+              ]
             }
           });
       }
