@@ -82,9 +82,11 @@ export class RequisitionComponent implements OnInit {
   }
 
   getAllRequisition(): void {
-    this.requisitions$ = this.requisitionService.getAllRequisitions(
-      JSON.parse(localStorage.getItem("currentLocation"))?.uuid
-    );
+    setTimeout(() => {
+      this.requisitions$ = this.requisitionService.getAllRequisitions(
+      JSON.parse(localStorage.getItem("currentLocation"))?.uuid);
+    }, 500)
+    
   }
 
   onNewRequest(e: Event, params: any): void {
@@ -135,8 +137,7 @@ export class RequisitionComponent implements OnInit {
 
   onCancelRequisition(e: any, id?: string): void {
     id = id ? id : e?.id;
-    e = id ? e : e?.event;
-    
+    e = !e?.event ? e : e?.event;
     e.stopPropagation();
 
     const dialogToConfirmRejection = this.dialog.open(RequestCancelComponent, {
@@ -146,7 +147,7 @@ export class RequisitionComponent implements OnInit {
     });
 
     dialogToConfirmRejection.afterClosed().subscribe((result) => {
-      //console.log('results :: ', result);
+      //console.log('==> results :: ', result);
       if (result) {
         this.store.dispatch(
           cancelRequisition({ id: id, reason: result?.reason })
@@ -158,7 +159,7 @@ export class RequisitionComponent implements OnInit {
 
   onReceiveRequisition(e: any, requisition?: RequisitionObject): void {
     requisition = requisition ? requisition : e?.requisition;
-    e = requisition ? e : e?.event
+    e = !e?.event ? e : e?.event;
     e.stopPropagation();
 
     // this.store.dispatch(receiveRequisition({ requisition }));
@@ -174,7 +175,7 @@ export class RequisitionComponent implements OnInit {
 
   onRejectRequisition(e: any, requisition?: RequisitionObject): void {
     requisition = requisition ? requisition : e?.requisition;
-    e = requisition ? e : e?.event
+    e = !e?.event ? e : e?.event;
     e.stopPropagation();
     if (requisition) {
       const { id, issueUuid } = requisition;

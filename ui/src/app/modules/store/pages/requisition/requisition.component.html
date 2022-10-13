@@ -173,7 +173,7 @@
     </table> -->
     
     <app-requisition-by-store
-      *ngIf="params?.requisitions.length > 0"
+      *ngIf="params?.requisitions?.length > 0"
       [requisitions]="params?.requisitions"
       [currentStore]="params?.currentStore"
       (cancelRequisition)="onCancelRequisition($event)"
