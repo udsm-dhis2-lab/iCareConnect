@@ -109,6 +109,7 @@ export class RegistrationAddComponent implements OnInit {
   displayedColumn: string[] = ["id", "name", "gender", "age", "phone"];
   continueReg: boolean = false;
   loadingData: boolean;
+  patientInformation$: any;
   constructor(
     private _snackBar: MatSnackBar,
     private router: Router,
@@ -157,6 +158,7 @@ export class RegistrationAddComponent implements OnInit {
       months: null,
       days: null,
     },
+    patientType: null,
     dob: null,
     birthplace: null,
     gender: null,
@@ -430,27 +432,54 @@ export class RegistrationAddComponent implements OnInit {
             this.otherPatientIdentifierTypes = tail(
               this.patientIdentifierTypes
             );
-
+            // this.selectedIdentifierType.id =
+            //   this.patientInformation?.patient?.identifiers.filter(
+            //     (identifier) =>
+            //       identifier.identifierType.display === "Student ID" ||
+            //       "Staff ID"
+            //   )[0]?.identifier;
+            this.patient.dob =
+              this.patientInformation.patient?.person?.birthdate;
+            this.dateSet();
             this.patient = {
               ...this.patient,
               fname: this.patientInformation?.fname
-                ? this.patientInformation?.fname
+                ? this.patientInformation.fname
+                : this.patientInformation.patient
+                ? this.patientInformation.patient?.person?.names[0]?.givenName
                 : "",
-              mname: this.patientInformation?.mname,
-              lname: this.patientInformation?.lname
-                ? this.patientInformation?.lname
+              mname:
+                this.patientInformation.patient?.person?.names[0]?.middleName,
+              // this.patientInformation.mname
+              //   ? this.patientInformation.mname
+              //   : this.patientInformation.patient
+              //   ? this.patientInformation.patient?.person?.names[0]?.middleName
+              //   : "",
+              lname: this.patientInformation
+                ? this.patientInformation.lname
+                : this.patientInformation.patient
+                ? this.patientInformation.patient?.person?.names[0]?.familyName
                 : "",
-              age: {
-                years: this.patientInformation?.patientFull?.person?.age,
-                months: null,
-                days: null,
-              },
-              dob: this.patientInformation?.patientFull?.person?.birthdate?.split(
-                "T"
-              )[0],
+              // age: {
+              //   years: this.patientInformation?.patientFull ? this.patientInformation?.patientFull?.person?.age : this.patientInformation?.patient?.person?.age,
+              //   months: null,
+              //   days: null,
+              // },
+              // dob: this.patientInformation?.patientFull?.person?.birthdate?.split(
+              //   "T"
+              // )[0],
+
+              //patientType:
               birthplace: this.patientInformation?.birthplace,
-              gender: this.patientInformation?.patientFull?.person?.gender,
-              phone: this.patientInformation?.phone,
+              gender: this.patientInformation?.patientFull?.person?.gender
+                ? this.patientInformation?.patientFull?.person?.gender
+                : this.patientInformation?.patient?.person?.gender,
+              phone:
+                this.patientInformation?.patient?.person?.attributes.filter(
+                  (attribute) => {
+                    return attribute.attributeType.display === "phone";
+                  }
+                )[0]?.value,
               cityVillage: this.patientInformation?.cityVillage,
               village: this.patientInformation?.street,
               district: this.patientInformation?.district,
@@ -458,23 +487,78 @@ export class RegistrationAddComponent implements OnInit {
               council: this.patientInformation?.council,
               referredFrom: null,
               tribe: this.patientInformation?.tribe,
-              maritalStatus: this.patientInformation?.maritalStatus,
-              occupation: this.patientInformation?.occupation,
-              education: this.patientInformation?.education,
+              maritalStatus:
+                this.patientInformation?.patient?.person?.attributes.filter(
+                  (attribute) => {
+                    return;
+                    attribute.attributeType.display === "maritalStatus";
+                  }
+                )[0]?.value,
+              occupation: null,
+
+              education:
+                this.patientInformation?.patient?.person?.attributes.filter(
+                  (attribute) => {
+                    return attribute.attributeType.display === "education";
+                  }
+                )[0]?.value,
               nationalId: null,
               nationalIdType: null,
-              kinFname: this.patientInformation?.kinFname,
-              kinLName: this.patientInformation?.kinLName,
-              kinRelationship: this.patientInformation?.kinRelationship,
-              kinPhone: this.patientInformation?.kinPhone,
-              areaLeader: this.patientInformation?.areaLeader,
-              areaLeaderNumber: this.patientInformation?.areaLeaderNumber,
-              religion: this?.patientInformation?.religion,
+              kinFname:
+                this.patientInformation?.patient?.person?.attributes.filter(
+                  (attribute) => {
+                    return attribute.attributeType.display === "kinFname";
+                  }
+                )[0]?.value,
+              kinLName:
+                this.patientInformation?.patient?.person?.attributes.filter(
+                  (attribute) => {
+                    return attribute.attributeType.display === "kinLName";
+                  }
+                )[0]?.value,
+              // kinRelationship:
+              //  this.patientInformation?.patient?.person?.attributes.filter(
+              //     (attribute) => { return
+              //       attribute.attributeType.display === "RelationshipType"
+              //   )[0]?.value,
+              kinPhone:
+                this.patientInformation?.patient?.person?.attributes.filter(
+                  (attribute) => {
+                    return attribute.attributeType.display === "kinPhone";
+                  }
+                )[0]?.value,
+              areaLeader:
+                this.patientInformation?.patient?.person?.attributes.filter(
+                  (attribute) => {
+                    return attribute.attributeType.display === "areaLeader";
+                  }
+                )[0]?.value,
+              areaLeaderNumber:
+                this.patientInformation?.patient?.person?.attributes.filter(
+                  (attribute) => {
+                    return (
+                      attribute.attributeType.display === "areaLeaderNumber"
+                    );
+                  }
+                )[0]?.value,
+              religion:
+                this.patientInformation?.patient?.person?.attributes.filter(
+                  (attribute) => {
+                    return attribute.attributeType.display === "religion";
+                  }
+                )[0]?.value,
               newPatient: this.patientInformation?.isNew,
-              RelationshipType: this.patientInformation?.relationshipType,
+              RelationshipType:
+                this.patientInformation?.patient?.person?.attributes.filter(
+                  (attribute) => {
+                    return (
+                      attribute.attributeType.display === "RelationshipType"
+                    );
+                  }
+                )[0]?.value,
               Id: this.patientInformation?.relatedPersonId,
             };
-
+            console.log("The kinFname: ", this.patient.kinFname);
             this.loadingForm = false;
           } else {
             // if (identifiersResponse) {
