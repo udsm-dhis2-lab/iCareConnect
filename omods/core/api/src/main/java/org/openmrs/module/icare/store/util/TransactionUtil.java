@@ -6,7 +6,7 @@ import org.openmrs.module.icare.ICareConfig;
 import org.openmrs.module.icare.store.models.Stock;
 import org.openmrs.module.icare.store.models.Transaction;
 import org.openmrs.module.icare.store.services.StoreService;
-
+import java.util.Date;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -43,6 +43,31 @@ public class TransactionUtil {
 		storeService.saveTransaction(transaction);
 	}
 	
+	public static void deductExpiredStock(Stockable stockable) throws StockOutException {
+		
+		Transaction transaction = new Transaction();
+		transaction.setItem(stockable.getItem());
+		transaction.setLocation(stockable.getLocation());
+		transaction.setBatchNo(stockable.getBatchNo());
+		transaction.setExpireDate(stockable.getExpiryDate());
+		
+		StoreService storeService = Context.getService(StoreService.class);
+		Stock stock = storeService.getStockByItemBatchLocation(stockable.getItem(), stockable.getBatchNo(),
+		    stockable.getExpiryDate(), stockable.getLocation());
+		if (stock.getQuantity() - stockable.getQuantity() < 0) {
+			throw new StockOutException("Negative Stock is not allowed");
+		} else {
+			
+			transaction.setPreviousQuantity(stock.getQuantity());
+			Double newQuantity = stock.getQuantity() - stockable.getQuantity();
+			transaction.setCurrentQuantity(newQuantity);
+			stock.setQuantity(newQuantity);
+			storeService.saveStock(stock);
+			storeService.saveTransaction(transaction);
+		}
+		
+	}
+	
 	public static void deductStock(Stockable stockable) throws StockOutException {
 
         Transaction transaction = new Transaction();
@@ -66,7 +91,6 @@ public class TransactionUtil {
         System.out.println("testing");
         List<Transaction> transactionList = new ArrayList<>();
 
-        // TODO Get non-expired quantity
         List<Stock> stockList = storeService.getStockByItemLocation(stockable.getItem(), stockable.getLocation());
 
         List<Map<String, Object>> stockListMap = new ArrayList<>();
@@ -208,10 +232,16 @@ public class TransactionUtil {
     }
 	
 	public static void operateOnStock(String operation, Stockable stockable) throws StockOutException {
+		Date todaysDate = new Date();
 		if (operation.equals("+")) {
 			TransactionUtil.addStock(stockable);
-		} else if (operation.equals("-")) {
+		} else if (operation.equals("-") && stockable.getExpiryDate().compareTo(todaysDate) > 0) {
+			//Deduction for non-expired drugs
 			TransactionUtil.deductStock(stockable);
+		} else if (operation.equals("-") && stockable.getExpiryDate().compareTo(todaysDate) < 0) {
+			// Deduction for expired drugs
+			TransactionUtil.deductExpiredStock(stockable);
+			
 		}
 	}
 }
