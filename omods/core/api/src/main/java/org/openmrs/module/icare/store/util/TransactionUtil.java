@@ -65,7 +65,10 @@ public class TransactionUtil {
 
         System.out.println("testing");
         List<Transaction> transactionList = new ArrayList<>();
+
+        // TODO Get non-expired quantity
         List<Stock> stockList = storeService.getStockByItemLocation(stockable.getItem(), stockable.getLocation());
+
         List<Map<String, Object>> stockListMap = new ArrayList<>();
         double totalStock = 0.00;
 
@@ -87,6 +90,7 @@ public class TransactionUtil {
             }
         } else {
 
+
             double stockNeed = stockable.getQuantity();
 
             System.out.println("stockList size is : " + stockList.size());
@@ -99,58 +103,75 @@ public class TransactionUtil {
                 if (stockNeed > 0) {
 
                     // should deduct all stock
-                    if (stockList.get(i).getQuantity() - stockNeed < 0) {
+                    if (stockList.get(i).getQuantity() - stockNeed < 0 ) {
+
+                        if(stockList.get(i).getBatch().equals(stockable.getBatchNo())){
+                          // System.out.println("batch: "+stockList.get(i).getBatch());
+
 
 
                         System.out.println("stock item is not enough, deduct all");
 
+                        System.out.println("loop batch: " +stockList.get(i).getBatch());
+                        System.out.println("incoming batch: "+stockable.getBatchNo());
+
+                        Transaction newTransaction = new Transaction();
+
                         // deduct to 0
-                        transactionList.add(i, new Transaction());
-                        transactionList.get(i).setItem(stockable.getItem());
-                        transactionList.get(i).setLocation(stockable.getLocation());
-                        transactionList.get(i).setBatchNo(stockList.get(i).getBatch());
-                        transactionList.get(i).setExpireDate(stockable.getExpiryDate());
-                        transactionList.get(i).setCurrentQuantity(0.0);
-                        transactionList.get(i).setPreviousQuantity(stockList.get(i).getQuantity());
+                        transactionList.add(newTransaction);
+                        newTransaction.setItem(stockable.getItem());
+                        newTransaction.setLocation(stockable.getLocation());
+                        newTransaction.setBatchNo(stockList.get(i).getBatch());
+                        newTransaction.setExpireDate(stockable.getExpiryDate());
+                        newTransaction.setCurrentQuantity(0.0);
+                        newTransaction.setPreviousQuantity(stockList.get(i).getQuantity());
 
                         stockNeed = stockNeed -stockList.get(i).getQuantity();
 
                         stockList.get(i).setQuantity(0.0);
 
                         storeService.saveStock(stockList.get(i));
-                        storeService.saveTransaction(transactionList.get(i));
+                        storeService.saveTransaction(newTransaction);
 
-
+                        }
 
 
                     } else {
 
+
+                        if (stockList.get(i).getBatch().equals(stockable.getBatchNo())){
                         System.out.println("stock item is enough");
+
+                        System.out.println("loop batch: " +stockList.get(i).getBatch());
+                        System.out.println("incoming batch: "+stockable.getBatchNo());
                         // deduction operations and transactions
-                        transactionList.add(i, new Transaction());
-                        transactionList.get(i).setItem(stockable.getItem());
-                        transactionList.get(i).setLocation(stockable.getLocation());
-                        transactionList.get(i).setBatchNo(stockList.get(i).getBatch());
-                        transactionList.get(i).setExpireDate(stockable.getExpiryDate());
-                        transactionList.get(i).setCurrentQuantity(stockList.get(i).getQuantity() - stockNeed);
-                        transactionList.get(i).setPreviousQuantity(stockList.get(i).getQuantity());
+                        Transaction newTransaction = new Transaction();
+                        transactionList.add(newTransaction);
+                        newTransaction.setItem(stockable.getItem());
+                        newTransaction.setLocation(stockable.getLocation());
+                        newTransaction.setBatchNo(stockList.get(i).getBatch());
+                        newTransaction.setExpireDate(stockable.getExpiryDate());
+                        newTransaction.setCurrentQuantity(stockList.get(i).getQuantity() - stockNeed);
+                        newTransaction.setPreviousQuantity(stockList.get(i).getQuantity());
 
                         stockList.get(i).setQuantity(stockList.get(i).getQuantity() - stockNeed);
 
                         storeService.saveStock(stockList.get(i));
-                        storeService.saveTransaction(transactionList.get(i));
+                        storeService.saveTransaction(newTransaction);
 
 
                         stockNeed = stockNeed - stockList.get(i).getQuantity();
                     }
 
-
-                } else {
-
-                    transactionList.add(i, null);
-                    // do nothing on this batch stck has already been deducted
+                    }
 
                 }
+                //else {
+
+                  //  transactionList.add(i, null);
+                    // do nothing on this batch stck has already been deducted
+
+                //}
 
             }
 
