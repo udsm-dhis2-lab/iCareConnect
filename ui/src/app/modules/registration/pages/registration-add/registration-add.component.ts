@@ -558,7 +558,7 @@ export class RegistrationAddComponent implements OnInit {
                 )[0]?.value,
               Id: this.patientInformation?.relatedPersonId,
             };
-            console.log("The kinFname: ", this.patient.kinFname);
+            // console.log("The kinFname: ", this.patient.kinFname);
             this.loadingForm = false;
           } else {
             // if (identifiersResponse) {
