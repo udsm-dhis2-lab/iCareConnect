@@ -3088,6 +3088,14 @@
         </addColumn>
     </changeSet>
 
+    <changeSet id="update_primary_key_for_st_issue_item" author="dennis-kibahila" dbms="mysql">
+
+        <sql>
+            ALTER TABLE st_issue_item DROP PRIMARY KEY, ADD PRIMARY KEY(issue_id,item_id,batch_no)
+        </sql>
+
+    </changeSet>
+
 
 
 </databaseChangeLog>

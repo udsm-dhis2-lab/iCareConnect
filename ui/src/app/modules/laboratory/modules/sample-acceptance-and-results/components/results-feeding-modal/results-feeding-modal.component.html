@@ -310,7 +310,7 @@
                                         item?.testAllocations[0]?.results
                                           ?.length - 1
                                       ]?.value
-                                    : null
+                                    : nullapp-results
                                 "
                                 style="text-align: center"
                                 [disabled]="
@@ -1664,7 +1664,8 @@
               <tr>
                 <th style="width: 15%">Test Order</th>
                 <th style="width: 10%">Ordered By</th>
-                <th colspan="2">Results</th>
+                <th *ngIf="LISConfigurations?.isLIS" colspan="1">Results</th>
+                <th *ngIf="!LISConfigurations?.isLIS" colspan="2">Results</th>
                 <th style="width: 10%">
                   {{ !LISConfigurations?.isLIS ? "Completed By" : "Fed By" }}
                 </th>
@@ -1961,7 +1962,8 @@
                           >d</span
                         >
                       </button>
-                    </td>
+                    </td>search
+
                     <td colspan="2" *ngIf="!LISConfigurations?.isLIS">
                       <!-- TODO: reject first approval -->
                       <button

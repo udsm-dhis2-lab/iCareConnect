@@ -6,6 +6,7 @@ import { LedgerInput } from "../models/ledger-input.model";
 import { StockBatch } from "../models/stock-batch.model";
 import { Stock, StockObject } from "../models/stock.model";
 import * as moment from "moment";
+import { off } from "process";
 
 @Injectable({
   providedIn: "root",
@@ -27,7 +28,7 @@ export class StockService {
   getAvailableStocks(
     locationUuid?: string,
     params?: { q?: string; limit?: number; startIndex?: number }
-  ): Observable<StockObject[]> {
+  ): Observable<any | StockObject[]> {
     return this._getStocks("store/stock", locationUuid, params);
   }
 
@@ -75,7 +76,7 @@ export class StockService {
     return this._getStocks("store/stockout", locationUuid);
   }
 
-  saveStockLedger(ledgerInput: LedgerInput): Observable<StockBatch> {
+  saveStockLedger(ledgerInput: LedgerInput): Observable<any> {
     const storeLedger = Stock.createLedger(ledgerInput);
 
     if (!storeLedger) {
@@ -86,7 +87,10 @@ export class StockService {
 
     return this.httpClient
       .post("store/ledger", storeLedger)
-      .pipe(map((response) => new StockBatch(response)));
+      .pipe(
+        map((response) => new StockBatch(response)), 
+        catchError((error) => of(error))
+      )
   }
 
   getStockMetrics(locationUuid: string) {
@@ -97,7 +101,7 @@ export class StockService {
     url: string,
     locationUuid?: string,
     params?: any
-  ): Observable<StockObject[]> {
+  ): Observable<any|StockObject[]> {
     let parameters = [];
     if (params?.q) {
       parameters = [...parameters, `q=${params?.q}`];
@@ -129,7 +133,8 @@ export class StockService {
           return Object.keys(groupedStockBatches).map((stockItemKey) => {
             return new Stock(groupedStockBatches[stockItemKey]).toJson();
           });
-        })
+        }),
+        catchError((error) => of(error))
       );
   }
 
