@@ -442,7 +442,7 @@
             ></app-form>
 
             <!-- residence location options with input form field -->
-            <div class="d-flex mt-1">
+            <div class="d-flex mt-1" *ngIf="!emergencyRegistration">
               <mat-form-field appearance="fill">
                 <mat-label>Region</mat-label>
                 <mat-select
