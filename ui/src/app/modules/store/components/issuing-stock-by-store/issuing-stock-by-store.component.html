@@ -13,7 +13,7 @@
             </strong></span>
           </div>
           <div class="w-25">
-            <span>Requesting Date {{ key?.date }}</span>
+            <span>Requesting Date: {{ key?.date }}</span>
           </div>
         </mat-panel-title>
       </mat-expansion-panel-header>
@@ -74,7 +74,8 @@
               [disabled]="
                 issue?.crudOperationStatus?.status === 'REJECTING' ||
                 issue?.status === 'ISSUED' ||
-                issue?.status === 'REJECTED'
+                issue?.status === 'REJECTED' ||
+                issue?.status === 'CANCELLED'
               "
               (click)="onReject($event, issue)"
             >

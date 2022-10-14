@@ -1,3 +1,4 @@
+import { RequisitionByStoreComponent } from "../components/requisition-by-store/requisition-by-store.component";
 import { IssuingComponent } from "./issuing/issuing.component";
 import { RequisitionReceiptComponent } from "./requisition-receipt/requisition-receipt.component";
 import { RequisitionComponent } from "./requisition/requisition.component";
@@ -14,4 +15,5 @@ export const storePages: any[] = [
   StoreTransactionComponent,
   RequisitionReceiptComponent,
   StoreSettingsComponent,
+  RequisitionByStoreComponent
 ];
