@@ -229,7 +229,9 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 		for (IssueItem issueItem : issue.getIssueItems()) {
 			TransactionUtil.operateOnStock("-", issueItem);
 		}
+		System.out.println("Kabla");
 		Issue newIssue = this.issueDAO.save(issue);
+		System.out.println("Baada");
 		IssueStatus issueStatus = new IssueStatus();
 		issueStatus.setIssue(newIssue);
 		issueStatus.setRemarks("Items have been issued");

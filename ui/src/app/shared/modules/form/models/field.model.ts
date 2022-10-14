@@ -12,8 +12,8 @@ export class Field<T> {
   disabled: boolean;
   options: DropdownOption[];
   placeholder: string;
-  min: number;
-  max: number;
+  min: number | string;
+  max: number | string;
   hidden: boolean;
   units: string;
   rows?: number;
@@ -39,8 +39,8 @@ export class Field<T> {
       disabled?: boolean;
       placeholder?: string;
       options?: DropdownOption[];
-      min?: number;
-      max?: number;
+      min?: number | string;
+      max?: number | string;
       hidden?: boolean;
       units?: string;
       conceptClass?: any;

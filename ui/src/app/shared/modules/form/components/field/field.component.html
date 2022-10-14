@@ -241,6 +241,8 @@
       [required]="field?.required"
       [ngxMatDatetimePicker]="fieldId"
       [placeholder]="field?.placeholder"
+      [max]="field?.max"
+      [min]="field?.min"
       [formControlName]="field?.key"
       (dateChange)="onFieldUpdate()"
     />
@@ -265,6 +267,8 @@
       [id]="field?.key"
       [required]="field?.required"
       [matDatepicker]="fieldId"
+      [max]="field?.max"
+      [min]="field?.min"
       [placeholder]="field?.placeholder"
       [formControlName]="field?.key"
       (dateChange)="onFieldUpdate()"

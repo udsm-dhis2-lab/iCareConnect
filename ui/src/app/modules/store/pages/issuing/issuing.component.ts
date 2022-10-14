@@ -3,7 +3,7 @@ import { MatCheckboxChange } from "@angular/material/checkbox";
 import { MatDialog } from "@angular/material/dialog";
 import { MatSelectChange } from "@angular/material/select";
 import { select, Store } from "@ngrx/store";
-import { uniqBy, groupBy, orderBy, flatten } from "lodash";
+import { uniqBy, groupBy, orderBy, flatten, omit } from "lodash";
 import { Observable, of, zip } from "rxjs";
 import { map } from "rxjs/operators";
 import { LocationGet } from "src/app/shared/resources/openmrs";
@@ -37,6 +37,7 @@ export class IssuingComponent implements OnInit {
   stores$: Observable<any>;
   requestingLocation: any;
   selectedIssues: any = {};
+  errors: any[];
 
   constructor(
     private store: Store<AppState>,
@@ -55,9 +56,9 @@ export class IssuingComponent implements OnInit {
     this.stores$ = this.store.pipe(select(getStoreLocations));
   }
 
-  onIssue(e: Event, issue: IssuingObject, currentStore: LocationGet): void {
-    e.stopPropagation();
-
+  onIssue(e: any, issue?: IssuingObject, currentStore?: LocationGet): void {
+    issue = issue ? issue : e?.issue;
+    currentStore = currentStore ? currentStore : e?.currentStore;
     const dialog = this.dialog.open(IssuingFormComponent, {
       width: "30%",
       panelClass: "custom-dialog-container",
@@ -75,24 +76,36 @@ export class IssuingComponent implements OnInit {
             if (response) {
               this.getAllIssuing();
             }
+            if(response?.error && response?.message){
+              this.errors = [
+                ...this.errors,
+                {
+                  error: {
+                    
+                  }
+                }
+              ]
+            }
           });
       }
     });
   }
 
-  getSelection(event: MatCheckboxChange, issue: any): void {
+  getSelection(event: any, issue?: any): void {
+    issue = event?.issue ? event?.issue : issue 
+    event = event?.event ? event?.event : event 
     if (event?.checked) {
       this.selectedIssues[issue?.id] = issue;
     } else {
-      let newSelectedIssues = {};
-      Object.keys(this.selectedIssues).forEach(function (id) {
-        if (id !== issue?.id) {
-          delete this.selectedIssues[id];
-          newSelectedIssues[id] = this.selectedIssues[id];
+      let newSelectedIssues: any;
+      Object.keys(this.selectedIssues).forEach((id) => {
+        if (id === issue?.id) {
+          newSelectedIssues = omit(this.selectedIssues, id);
         }
       });
       this.selectedIssues = newSelectedIssues;
     }
+
   }
 
   getSelectedStore(event: MatSelectChange): void {
@@ -107,9 +120,9 @@ export class IssuingComponent implements OnInit {
     );
   }
 
-  onReject(e: Event, issue: IssuingObject): void {
-    e.stopPropagation();
-
+  onReject(e, issue?: IssuingObject): void {
+    // e.stopPropagation();
+    issue = issue ? issue : e;
     const dialogToConfirmRejection = this.dialog.open(RequestCancelComponent, {
       width: "25%",
       panelClass: "custom-dialog-container",
