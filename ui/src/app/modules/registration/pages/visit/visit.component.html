@@ -715,6 +715,10 @@
                   $event,
                   'registration/edit/',
                   params?.currentPatient?.patient?.uuid
+                    ? params?.currentPatient?.patient?.uuid
+                    : params?.currentPatient && params?.currentPatient?.uuid
+                    ? params?.currentPatient?.uuid
+                    : params?.currentPatient?.person?.uuid
                 )
               "
             >
