@@ -420,9 +420,9 @@ export class DispensingFormComponent implements OnInit {
                 : this.data?.patientUuid,
             })
           );
-          if (this.data?.useGenericPrescription && !res?.message) {
-            this.dialogRef.close();
-          }
+          // if (this.data?.useGenericPrescription && !res?.message) {
+          //   this.dialogRef.close();
+          // }
         },
         (errorResponse) => {
           this.savingOrder = false;
