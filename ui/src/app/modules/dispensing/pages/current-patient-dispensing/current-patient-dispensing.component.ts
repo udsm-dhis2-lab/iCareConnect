@@ -1,8 +1,8 @@
 import { Component, OnInit } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
-import { ActivatedRoute, Router } from "@angular/router";
-import { Observable, of } from "rxjs";
-import { catchError, map, tap } from "rxjs/operators";
+import { ActivatedRoute } from "@angular/router";
+import { Observable } from "rxjs";
+import { map } from "rxjs/operators";
 import { DrugOrder } from "src/app/shared/resources/order/models/drug-order.model";
 import {
   ActionButtonStyle,
@@ -163,7 +163,6 @@ export class CurrentPatientDispensingComponent implements OnInit {
       .getActiveVisit(this.patientId, false)
       .pipe(
         map((response) => {
-          this.loading = false;
           this.loading = false;
           if(response?.error){
             this.loadingError = response?.error;
