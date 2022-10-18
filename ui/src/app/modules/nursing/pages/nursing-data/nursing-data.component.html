@@ -73,7 +73,7 @@
           <button
             class="float-right ml-2"
             [disabled]="
-              params?.doesPatientHasPendingPaymentForTheCurrentVisitType ||
+              (params?.doesPatientHasPendingPaymentForTheCurrentVisitType && (!params?.visit?.isEnsured || !params?.visit.isEmergency)) ||
               params?.visit?.isAdmitted
             "
             color="primary"
