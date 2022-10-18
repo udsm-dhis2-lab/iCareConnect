@@ -36,8 +36,7 @@ export class ConceptsFormComponent implements OnInit {
             label: conceptField?.display,
             required: false,
             conceptClass: conceptField?.conceptClass?.display,
-            type:
-              conceptField?.datatype?.display?.toLowerCase()
+            type: "number"
           });
         }
         if (
@@ -52,7 +51,7 @@ export class ConceptsFormComponent implements OnInit {
             required: false,
             conceptClass: conceptField?.conceptClass?.display,
             type:
-              conceptField?.datatype?.display?.toLowerCase()
+              conceptField?.datatype?.display?.toLowerCase(),
           });
         }
         if (

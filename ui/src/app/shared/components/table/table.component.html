@@ -1,7 +1,8 @@
 <div
   class="table-responsive"
   *ngIf="{
-    patientDrugOrdersStatuses: patientDrugOrdersStatuses$ | async
+    patientDrugOrdersStatuses: patientDrugOrdersStatuses$ | async,
+    activeVisit: activeVisit$ | async
   } as params"
 >
   <!-- TODO: Review the table for data display -->
@@ -44,7 +45,7 @@
                     params?.patientDrugOrdersStatuses[drugOrder?.uuid][
                       'status'
                     ] === 'DISPENSED') ||
-                  !drugOrder?.paid
+                  (!drugOrder?.paid && (!params?.activeVisit?.isAdmitted || !params?.activeVisit?.isEnsured || !params?.activeVisit?.isEmergency))
                 "
                 mat-flat-button
                 color="primary"
