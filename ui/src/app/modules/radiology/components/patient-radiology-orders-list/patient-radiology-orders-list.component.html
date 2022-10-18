@@ -1,4 +1,4 @@
-<div class="w-100 mt-2">
+<div class="w-100 mt-2" *ngIf="{ activeVisit: activeVisit$ | async } as params">
   <div class="loading-overlay" *ngIf="saving">
     <div class="text-center">
       <div>Saving data...</div>
