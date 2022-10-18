@@ -2,6 +2,8 @@ import { SelectionModel } from "@angular/cdk/collections";
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { MatTableDataSource } from "@angular/material/table";
+import { Observable } from "rxjs";
+import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { BillableItemsService } from "src/app/shared/resources/billable-items/services/billable-items.service";
 import { BillItem } from "../../models/bill-item.model";
 import { Bill } from "../../models/bill.model";
@@ -34,10 +36,12 @@ export class QuotationItemComponent implements OnInit {
 
   @Output() confirmPayment = new EventEmitter<PaymentInput>();
   @Output() paymentSuccess = new EventEmitter<any>();
+  gepgConceptUuid$: Observable<any>;
 
   constructor(
     private dialog: MatDialog,
-    private billableItemsService: BillableItemsService
+    private billableItemsService: BillableItemsService,
+    private systemSettingsService: SystemSettingsService
   ) {}
 
   get canDisableItemSelection(): boolean {
@@ -110,6 +114,10 @@ export class QuotationItemComponent implements OnInit {
         code: "GePG",
       },
     ];
+
+    this.gepgConceptUuid$ = this.systemSettingsService.getSystemSettingsByKey(
+      "icare.billing.payment.paymentMethod.gepg.field.1"
+    );
 
     this.selectedPaymentType = this.paymentTypes[0];
   }
@@ -188,7 +196,7 @@ export class QuotationItemComponent implements OnInit {
     console.log(e);
   }
 
-  getControlNumber(e: any) {
+  getControlNumber(e: any, gepgConceptUuid?: any) {
     e.stopPropagation();
     const dialog = this.dialog.open(BillConfirmationComponent, {
       width: "600px",
@@ -202,7 +210,29 @@ export class QuotationItemComponent implements OnInit {
         currentUser: this.currentUser,
         currentPatient: this.currentPatient,
         facilityDetails: this.facilityDetails,
+        gepgConceptUuid: gepgConceptUuid,
       },
+    });
+
+    dialog.afterClosed().subscribe((paymentResponse) => {
+      this.paymentSuccess.emit();
+      if (paymentResponse) {
+        this.dialog.open(PaymentReceiptComponent, {
+          width: "500px",
+          data: {
+            ...paymentResponse,
+            billItems: this.selection?.selected,
+            items: this.billItems,
+            bill: this.bill,
+            totalPayableBill: this.totalPayableBill,
+            paymentType: this.selectedPaymentType,
+            currentUser: this.currentUser,
+            currentPatient: this.currentPatient,
+            logo: this.logo,
+            facilityDetails: this.facilityDetails,
+          },
+        });
+      }
     });
   }
 }
