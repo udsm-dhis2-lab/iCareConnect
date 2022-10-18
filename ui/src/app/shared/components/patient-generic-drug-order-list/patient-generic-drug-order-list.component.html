@@ -51,7 +51,7 @@
   ></app-patient-medication-summary>
   <table class="table table-striped">
     <thead>
-      <tr>
+      <tr *ngIf="drugOrders.length > 0">
         <th>SN</th>
         <th>Drug</th>
         <th>Instructions</th>
@@ -62,8 +62,8 @@
       </tr>
     </thead>
     <tbody>
-      <ng-container *ngFor="let drugOrder of drugOrders; let count = index">
-        <ng-container *ngIf="drugOrders && drugOrders?.length > 0">
+      <ng-container *ngIf="drugOrders && drugOrders?.length > 0">
+        <ng-container *ngFor="let drugOrder of drugOrders; let count = index">
           <tr>
             <td>
               {{ count + 1 }}
@@ -104,6 +104,13 @@
             </td>
           </tr>
         </ng-container>
+      </ng-container>
+      <ng-container *ngIf="!drugOrders.length">
+        <tr class="text-center pt-3">
+          <h3>
+            No doctor's prescriptions for this patient
+          </h3>
+        </tr>
       </ng-container>
     </tbody>
   </table>

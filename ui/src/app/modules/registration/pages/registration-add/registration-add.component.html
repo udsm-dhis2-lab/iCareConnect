@@ -74,6 +74,7 @@
                 <mat-select
                   id="patientType"
                   name="patientType"
+                  [(ngModel)]="patient['patientType']"
                   (selectionChange)="
                     getPatientType($event.value, params?.occupationInfo)
                   "
@@ -441,7 +442,7 @@
             ></app-form>
 
             <!-- residence location options with input form field -->
-            <div class="d-flex mt-1">
+            <div class="d-flex mt-1" *ngIf="!emergencyRegistration">
               <mat-form-field appearance="fill">
                 <mat-label>Region</mat-label>
                 <mat-select
@@ -480,7 +481,7 @@
               <mat-form-field class="ml-1" appearance="fill">
                 <mat-label>District</mat-label>
                 <mat-select
-                  (click)="addOption2.disabled = true"
+                  (click)="addOptionDistrict.disabled = true"
                   [(ngModel)]="patient['district']"
                 >
                   <mat-option
@@ -498,7 +499,7 @@
                     newDistrict
                   }}</mat-option>
 
-                  <mat-option #addOption2>
+                  <mat-option #addOptionDistrict>
                     <mat-form-field>
                       <mat-label>Add New District</mat-label>
                       <input
@@ -507,7 +508,9 @@
                         type="text"
                         [(ngModel)]="newDistrict"
                       />
-                      <mat-icon (click)="addOption2.disabled = false" matSuffix
+                      <mat-icon
+                        (click)="addOptionDistrict.disabled = false"
+                        matSuffix
                         >done_outline</mat-icon
                       >
                     </mat-form-field>
@@ -519,7 +522,7 @@
               <mat-form-field class="ml-1" appearance="fill">
                 <mat-label>Area Of Residence</mat-label>
                 <mat-select
-                  (click)="addOption3.disabled = true"
+                  (click)="addOptionVillage.disabled = true"
                   [(ngModel)]="patient['village']"
                 >
                   <mat-option
@@ -536,7 +539,7 @@
                   </mat-option>
                   <mat-option [value]="newArea">{{ newArea }}</mat-option>
 
-                  <mat-option #addOption3>
+                  <mat-option #addOptionVillage>
                     <mat-form-field>
                       <mat-label>Add New Area </mat-label>
                       <input
@@ -545,7 +548,9 @@
                         type="text"
                         [(ngModel)]="newArea"
                       />
-                      <mat-icon (click)="addOption3.disabled = false" matSuffix
+                      <mat-icon
+                        (click)="addOptionVillage.disabled = false"
+                        matSuffix
                         >done_outline</mat-icon
                       >
                     </mat-form-field>
@@ -695,6 +700,8 @@
                 *ngIf="params?.additionalPatientInformation"
                 [concepts]="params?.additionalPatientInformation.setMembers"
                 (selectedValue)="getAdditionalInformationValues($event)"
+                [patientInformation]="patientInformation"
+                [editMode]="editMode"
               >
               </app-dynamic-reg-form>
 
@@ -790,6 +797,8 @@
                   [disabled]="addingPatient && !patientAdded"
                 />
               </mat-form-field>
+              {{ patient.kinFName | json }}
+
               <div class="d-flex">
                 <app-form
                   [fields]="[primaryPhoneNumberNextOfKinFormField]"
@@ -822,7 +831,7 @@
                   [disabled]="addingPatient && !patientAdded"
                 />
               </mat-form-field>
-
+              {{ patient.kinLName }}
               <!-- <mat-form-field appearance="fill" class="w-100 ml-2">
                 <mat-label>Relationship with patient</mat-label>
                 <input

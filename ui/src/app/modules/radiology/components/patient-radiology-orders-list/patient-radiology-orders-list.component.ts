@@ -1,9 +1,12 @@
 import { HttpClient } from "@angular/common/http";
 import { Component, Input, OnInit } from "@angular/core";
+import { select, Store } from "@ngrx/store";
 import { zip } from "rxjs";
 import { map } from "rxjs/operators";
 import { OrdersService } from "src/app/shared/resources/order/services/orders.service";
 import { VisitsService } from "src/app/shared/resources/visits/services";
+import { AppState } from "src/app/store/reducers";
+import { getActiveVisit } from "src/app/store/selectors/visit.selectors";
 
 @Component({
   selector: "app-patient-radiology-orders-list",
@@ -23,10 +26,12 @@ export class PatientRadiologyOrdersListComponent implements OnInit {
   obsKeyedByConcepts: any = {};
 
   saving: boolean = false;
+  activeVisit$: any;
   constructor(
     private httpClient: HttpClient,
     private visitService: VisitsService,
-    private ordersService: OrdersService
+    private ordersService: OrdersService,
+    private store: Store<AppState>
   ) {}
 
   ngOnInit(): void {
@@ -53,6 +58,8 @@ export class PatientRadiologyOrdersListComponent implements OnInit {
           });
         }
       });
+
+    this.activeVisit$ = this.store.pipe(select(getActiveVisit));
   }
 
   fileSelection(event, order): void {
