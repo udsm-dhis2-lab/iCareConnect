@@ -19,7 +19,8 @@
       params?.labSamplesContainers &&
       params?.configs &&
       params?.codedSampleRejectionReasons &&
-      params?.LISConfigurations
+      params?.LISConfigurations &&
+      params?.sampleTypes
     "
   >
     <app-sample-acceptance-dashboard
@@ -40,16 +41,14 @@
     params | json
   }} -->
 
-  <!-- <mat-progress-bar
+  <mat-progress-bar
     *ngIf="
-      !params?.datesParameters ||
-      !params?.sampleTypesLoadedState ||
+      !params?.sampleTypes ||
+      !params?.labSamplesDepartments ||
       params?.labSamplesDepartments?.length == 0 ||
-      !params?.labSamplesContainers ||
-      !params?.configs ||
       !params?.codedSampleRejectionReasons ||
       !params?.LISConfigurations
     "
     mode="indeterminate"
-  ></mat-progress-bar> -->
+  ></mat-progress-bar>
 </div>

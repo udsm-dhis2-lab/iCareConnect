@@ -24,7 +24,9 @@ export class SamplesService {
           dates?.endDate
       )
       .pipe(
-        map((response: any) => response?.results || []),
+        map((response: any) => {
+          return response?.results || [];
+        }),
         catchError((error) => of(error))
       );
   }

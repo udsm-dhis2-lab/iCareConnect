@@ -169,13 +169,16 @@ export const getFormattedLabSamplesToAccept = createSelector(
           ["asc", "desc"]
         ),
         (sample) => {
-          if (
+          if (!props?.searchingText) {
+            return sample;
+          } else if (
+            props?.searchingText &&
             sample?.searchingText
               ?.toLowerCase()
               .indexOf(props?.searchingText.toLowerCase()) > -1 &&
             sample?.department?.departmentName
-              .toLowerCase()
-              .indexOf(props?.department?.toLowerCase()) > -1
+              ?.toLowerCase()
+              ?.indexOf(props?.department?.toLowerCase()) > -1
           ) {
             return sample;
           }
@@ -513,18 +516,15 @@ function getOrdersWithFirstSigOff(orders) {
 }
 
 function getOrdersWithResults(orders) {
-
   let newOrders: any[] = [];
 
   orders?.forEach((order) => {
     if (order?.testAllocations?.length > 0) {
       order.testAllocations.forEach((test) => {
-        if(test.results.length > 0){
-          newOrders = [
-            ...newOrders,
-            order
-          ]
-        }});
+        if (test.results.length > 0) {
+          newOrders = [...newOrders, order];
+        }
+      });
     }
   });
 
