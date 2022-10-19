@@ -13,6 +13,7 @@ import { FilterServicesConceptPipe } from "./pipes/filter-services-concept.pipe"
 import { FormatIsoStrDateForDisplayPipe } from "./pipes/format-iso-str-date-for-display.pipe";
 import { FilterDiagnosesPipe } from "./pipes/filter-diagnoses.pipe";
 import { FilterItemsBySelectionsPipe } from "./pipes/filter-items-by-selections.pipe";
+import { HttpClientModule } from "@angular/common/http";
 @NgModule({
   imports: [CommonModule, ...materialModules, ...modules],
   exports: [
@@ -23,6 +24,7 @@ import { FilterItemsBySelectionsPipe } from "./pipes/filter-items-by-selections.
     ...components,
     ...sharedPipes,
     ...sharedDialogs,
+    HttpClientModule,
   ],
   entryComponents: [...sharedEntryComponents, ...sharedDialogs],
   declarations: [

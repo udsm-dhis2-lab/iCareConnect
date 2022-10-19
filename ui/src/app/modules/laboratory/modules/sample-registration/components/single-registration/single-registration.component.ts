@@ -175,12 +175,12 @@ export class SingleRegistrationComponent implements OnInit {
       //   shouldHaveLiveSearchForDropDownFields: true,
       // }),
     ];
-    
+
     this.receivedOnField = new DateField({
       id: "receivedOn",
       key: "receivedOn",
       label: "Received On",
-      max: this.maximumDate
+      max: this.maximumDate,
     });
 
     this.receivedByField = new Dropdown({
@@ -250,7 +250,7 @@ export class SingleRegistrationComponent implements OnInit {
       id: "collectedOn",
       key: "collectedOn",
       label: "Collected On",
-      max: this.maximumDate
+      max: this.maximumDate,
     });
 
     this.sampleCollectedByField = new Textbox({
@@ -1126,12 +1126,15 @@ export class SingleRegistrationComponent implements OnInit {
                                                                               SampleRegistrationFinalizationComponent,
                                                                               {
                                                                                 height:
-                                                                                  forRejection ? "200px" : "100px",
+                                                                                  forRejection
+                                                                                    ? "200px"
+                                                                                    : "100px",
                                                                                 width:
                                                                                   "30%",
                                                                                 data: {
                                                                                   ...data,
-                                                                                  forRejection: forRejection,
+                                                                                  forRejection:
+                                                                                    forRejection,
                                                                                   popupHeader:
                                                                                     forRejection
                                                                                       ? "Sample Rejection"
@@ -1211,6 +1214,8 @@ export class SingleRegistrationComponent implements OnInit {
                                             }
                                           } else {
                                             this.savingData = false;
+                                            this.errorMessage =
+                                              encounterResponse?.error?.message;
                                           }
                                         }
                                       );
@@ -1242,12 +1247,15 @@ export class SingleRegistrationComponent implements OnInit {
   }
 
   openBarCodeDialog(data): void {
-    this.dialog.open(BarCodeModalComponent, {
-      height: "200px",
-      width: "15%",
-      data,
-      disableClose: false,
-      panelClass: "custom-dialog-container",
-    }).afterClosed().subscribe();
+    this.dialog
+      .open(BarCodeModalComponent, {
+        height: "200px",
+        width: "15%",
+        data,
+        disableClose: false,
+        panelClass: "custom-dialog-container",
+      })
+      .afterClosed()
+      .subscribe();
   }
 }

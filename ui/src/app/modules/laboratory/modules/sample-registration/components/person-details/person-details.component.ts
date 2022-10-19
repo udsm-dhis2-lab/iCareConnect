@@ -87,7 +87,7 @@ export class PersonDetailsComponent implements OnInit {
     personDetails?: any,
     patientIdentifier?: string
   ): void {
-    console.log("identifierTypes", identifierTypes);
+    // console.log("identifierTypes", identifierTypes);
     const primaryIdentifiers =
       identifierTypes?.filter(
         (identifier) => identifier?.uniquenessBehavior === "UNIQUE"

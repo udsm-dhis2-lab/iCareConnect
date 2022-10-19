@@ -100,7 +100,9 @@ export const getFormattedLabSamplesForTracking = createSelector(
   (samples, props) => {
     return _.map(
       _.filter(_.orderBy(samples, ["dateCreated"], ["desc"]), (sample) => {
-        if (
+        if (!props?.searchingText) {
+          return sample;
+        } else if (
           sample?.searchingText
             ?.toLowerCase()
             .indexOf(props?.searchingText.toLowerCase()) > -1 &&
@@ -140,9 +142,11 @@ export const getAcceptedFormattedLabSamples = createSelector(
         if (
           sample?.accepted &&
           !sample?.markedForRecollection &&
-          sample?.searchingText
-            ?.toLowerCase()
-            .indexOf(props?.searchingText.toLowerCase()) > -1 &&
+          ((sample?.searchingText &&
+            sample?.searchingText
+              ?.toLowerCase()
+              .indexOf(props?.searchingText.toLowerCase()) > -1) ||
+            !sample?.searchingText) &&
           sample?.department?.departmentName
             .toLowerCase()
             .indexOf(props?.department?.toLowerCase()) > -1
@@ -169,13 +173,24 @@ export const getFormattedLabSamplesToAccept = createSelector(
           ["asc", "desc"]
         ),
         (sample) => {
-          if (
+          if (!props?.searchingText && !props?.department) {
+            return sample;
+          } else if (
+            props?.searchingText &&
+            !props?.department &&
+            sample?.searchingText
+              ?.toLowerCase()
+              .indexOf(props?.searchingText.toLowerCase()) > -1
+          ) {
+            return sample;
+          } else if (
+            props?.searchingText &&
             sample?.searchingText
               ?.toLowerCase()
               .indexOf(props?.searchingText.toLowerCase()) > -1 &&
             sample?.department?.departmentName
-              .toLowerCase()
-              .indexOf(props?.department?.toLowerCase()) > -1
+              ?.toLowerCase()
+              ?.indexOf(props?.department?.toLowerCase()) > -1
           ) {
             return sample;
           }
@@ -214,7 +229,9 @@ export const getFormattedRejectedLabSamples = createSelector(
           ["asc", "desc"]
         ),
         (sample) => {
-          if (
+          if (!props?.searchingText) {
+            return sample;
+          } else if (
             sample?.searchingText
               ?.toLowerCase()
               .indexOf(props?.searchingText.toLowerCase()) > -1 &&
@@ -298,7 +315,9 @@ export const getFormattedLabSamplesToFeedResults = createSelector(
           ["asc", "desc"]
         ),
         (sample) => {
-          if (
+          if (!props?.searchingText) {
+            return sample;
+          } else if (
             sample?.searchingText
               ?.toLowerCase()
               .indexOf(props?.searchingText.toLowerCase()) > -1 &&
@@ -338,7 +357,9 @@ export const getCompletedLabSamples = createSelector(
           ["asc", "asc"]
         ),
         (sample) => {
-          if (
+          if (!props?.searchingText) {
+            return sample;
+          } else if (
             sample?.searchingText
               ?.toLowerCase()
               .indexOf(props?.searchingText.toLowerCase()) > -1 &&
@@ -379,7 +400,9 @@ export const getPatientsWithCompletedLabSamples = createSelector(
           ["asc", "asc"]
         ),
         (sample) => {
-          if (
+          if (!props?.searchingText) {
+            return sample;
+          } else if (
             sample?.searchingText
               ?.toLowerCase()
               .indexOf(props?.searchingText.toLowerCase()) > -1 &&
@@ -468,10 +491,12 @@ export const getWorkList = createSelector(
           ["desc"]
         ),
         (sample) => {
-          if (
+          if (!props?.searchingText) {
+            return sample;
+          } else if (
             sample?.searchingText
               ?.toLowerCase()
-              .indexOf(props?.searchingText.toLowerCase()) > -1 &&
+              .indexOf(props?.searchingText?.toLowerCase()) > -1 &&
             sample?.department?.departmentName
               .toLowerCase()
               .indexOf(props?.department?.toLowerCase()) > -1
@@ -484,14 +509,34 @@ export const getWorkList = createSelector(
   }
 );
 
+function getTestAllocationsWithResults(allocations) {
+  return _.uniqBy(
+    allocations?.map((allocation) => {
+      return {
+        ...allocation,
+        conceptUuid: allocation?.concept?.uuid,
+        hasResult: allocation?.results?.length > 0,
+      };
+    }) || [],
+    "conceptUuid"
+  )?.filter((allocation) => allocation?.hasResult);
+}
+
 function getCompletedOrders(orders, isLIS?: boolean) {
   return (
     _.filter(orders, (order) => {
+      const testAllocationsWithResults = getTestAllocationsWithResults(
+        order?.testAllocations
+      );
+      console.log(order);
+      console.log("testAllocationsWithResults", testAllocationsWithResults);
       if (
         (!isLIS &&
-          order?.testAllocations?.length > 0 &&
+          testAllocationsWithResults?.length > 0 &&
           order?.testAllocations[0]?.secondSignOff) ||
-        (isLIS && order?.testAllocations[0]?.results?.length > 0)
+        (isLIS &&
+          testAllocationsWithResults?.length >=
+            order?.concept?.setMembers?.length)
       ) {
         return order;
       }
@@ -513,18 +558,15 @@ function getOrdersWithFirstSigOff(orders) {
 }
 
 function getOrdersWithResults(orders) {
-
   let newOrders: any[] = [];
 
   orders?.forEach((order) => {
     if (order?.testAllocations?.length > 0) {
       order.testAllocations.forEach((test) => {
-        if(test.results.length > 0){
-          newOrders = [
-            ...newOrders,
-            order
-          ]
-        }});
+        if (test.results.length > 0) {
+          newOrders = [...newOrders, order];
+        }
+      });
     }
   });
 
@@ -569,7 +611,9 @@ export const getPatientWithSampleDetails = createSelector(
           ["asc", "asc"]
         ),
         (sample) => {
-          if (
+          if (!props?.searchingText) {
+            return sample;
+          } else if (
             sample?.searchingText
               ?.toLowerCase()
               .indexOf(props?.searchingText.toLowerCase()) > -1 &&
