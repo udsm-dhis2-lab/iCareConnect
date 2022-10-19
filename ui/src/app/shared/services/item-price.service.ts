@@ -1,68 +1,14 @@
 import { Injectable } from "@angular/core";
 import { from, Observable, of, zip } from "rxjs";
 import { catchError, map, switchMap } from "rxjs/operators";
+import { getGroupedItems } from "src/app/modules/maintenance/helpers/get-grouped-items.helper";
+import { ItemPrice } from "src/app/modules/maintenance/models/item-price.model";
 import { OpenmrsHttpClientService } from "src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service";
 import { Api, ConceptCreate } from "src/app/shared/resources/openmrs";
-import { getGroupedItems } from "../helpers/get-grouped-items.helper";
-import { ItemPrice } from "../models/item-price.model";
-import {
-  PricingItem,
-  PricingItemInterface,
-} from "../models/pricing-item.model";
 
-const item = {
-  concept: {
-    uuid: "ae3e2c71-705c-4875-98c2-bc7cdb616793",
-  },
-  drug: {
-    uuid: "ae3e2c71-705c-4875-98c2-bc7cdb616793",
-  },
-  units: "Days",
-};
-
-const itemPrices = [
-  {
-    item: {
-      uuid: "ae3e2c71-705c-4875-98c2-bc7cdb616793",
-      display: "Item One",
-    },
-    paymentType: {
-      uuid: "ae3e2c71-705c-4875-98c2-bc7cdb616793",
-    },
-    paymentScheme: {
-      uuid: "ae3e2c71-705c-4875-98c2-bc7cdb616793",
-    },
-    price: 4000,
-  },
-  {
-    item: {
-      uuid: "ae3e2c71-705c-4875-98c2-bc7cdb616793",
-      display: "Item One",
-    },
-    paymentType: {
-      uuid: "ae3e2c71-705c-4875-98c2-bc7cdb616793",
-    },
-    paymentScheme: {
-      uuid: "fast-uuid",
-    },
-    price: 4500,
-  },
-  {
-    item: {
-      uuid: "ae3e2c71-705c-4875-98c2-bc7cdb616793",
-      display: "Item One",
-    },
-    paymentType: {
-      uuid: "ae3e2c71-705c-4875-98c2-bc7cdb616793",
-    },
-    paymentScheme: {
-      uuid: "timiza-uuid",
-    },
-    price: 4700,
-  },
-];
-
-@Injectable()
+@Injectable({
+  providedIn: "root",
+})
 export class ItemPriceService {
   constructor(private httpClient: OpenmrsHttpClientService, private api: Api) {}
 
