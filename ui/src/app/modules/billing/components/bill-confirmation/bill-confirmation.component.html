@@ -101,7 +101,7 @@
       Confirm Payment
     </button>
     
-    <app-print-button *ngIf="data?.paymentType?.code === 'GePG' && controlNumber" [iconName]="'print'" [toolTipText]="'Click to print control number'" [showText]="'Print Control Number'"
+    <app-print-button *ngIf="!params?.gepgConceptField && data?.paymentType?.code === 'GePG' && controlNumber" [iconName]="'print'" [toolTipText]="'Click to print control number'" [showText]="'Print Control Number'"
       [classesList]="['float-right', 'button', 'mr-5']"
       [ElementToBePrinted]="{ControlNumber: controlNumber, CurrentPatient: data?.currentPatient, FacilityDetails: facilityDetailsJson}"
       (print)="onPrint($event)"></app-print-button>
