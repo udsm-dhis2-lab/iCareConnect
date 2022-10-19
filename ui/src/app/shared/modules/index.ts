@@ -9,5 +9,5 @@ export const modules: any[] = [
   FormModule,
   NgxBarcodeModule,
   NgxOpenmrsLocationTreeModule,
-  NgxPrintModule
+  NgxPrintModule,
 ];

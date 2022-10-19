@@ -70,6 +70,7 @@ export class DynamicRegFormComponent implements OnInit {
       conceptUuid: "a74b0803-0aae-43a7-84f9-2daa2cd19332",
     },
   ];
+
   @Output() selectedValue: EventEmitter<any> = new EventEmitter<any>();
   constructor() {}
 
