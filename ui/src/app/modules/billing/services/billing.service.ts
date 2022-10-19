@@ -62,7 +62,7 @@ export class BillingService {
     patientUuid: string,
     isRegistrationPage?: boolean,
     status?: string
-  ): Observable<Bill[]> {
+  ): Observable<Bill[]|any> {
     status = status && status.length > 0 ? `&status=${status}` : "";
     return !isRegistrationPage
       ? this.httpClient
