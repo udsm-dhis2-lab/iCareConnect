@@ -640,6 +640,8 @@ export class RegistrationAddComponent implements OnInit {
     const { currentLocation } = params;
     //TODO: validate inputs
     this.ShowFieldsError = false;
+    this.addResidenceArea(this.newArea);
+    console.log("The changes are :", DarRegion);
 
     if (this.mandatoryFieldsMissing) {
       this.openSnackBar("Warning: Some mandatory fields are missing", null);
@@ -1026,5 +1028,22 @@ export class RegistrationAddComponent implements OnInit {
         return obj.DISTRICT;
       })
     );
+  }
+  addResidenceArea(area: string) {
+    if (area.length > 0) {
+      let areaUpper = area.toUpperCase();
+      const found = DarRegion.some((el) => el.STREET === areaUpper);
+      if (!found)
+        DarRegion.push({
+          REGION: this?.patient?.region ? this?.patient?.region : "",
+          REGIONCODE: null,
+          DISTRICT: this?.patient?.district ? this?.patient?.district : "",
+          DISTRICTCODE: null,
+          WARD: "",
+          WARDCODE: null,
+          STREET: areaUpper,
+          PLACES: "",
+        });
+    }
   }
 }
