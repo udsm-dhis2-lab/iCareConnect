@@ -7,7 +7,7 @@ import { Payment } from "../models/payment.model";
 import { Discount } from "../models/discount.model";
 import { PaymentInput } from "../models/payment-input.model";
 import { OpenmrsHttpClientService } from "src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service";
-import { map } from "rxjs/operators";
+import { catchError, map } from "rxjs/operators";
 import { omit } from "lodash";
 import { HttpClient } from "@angular/common/http";
 
@@ -90,7 +90,10 @@ export class BillingService {
                   };
                 }) || []
               ).map((bill) => new Bill(bill))
-            )
+            ),
+            catchError((err) => {
+              return of(err);
+            })
           )
       : of([]);
   }

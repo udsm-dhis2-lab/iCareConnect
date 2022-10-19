@@ -81,6 +81,7 @@
 
       <div class="border" *ngIf="params?.currentVisitLoadedState">
         <app-patient-drug-order-list
+          *ngIf="params?.patientVisit"
           [visit]="params?.patientVisit"
           [loading]="loading"
           [loadingError]="loadingError"

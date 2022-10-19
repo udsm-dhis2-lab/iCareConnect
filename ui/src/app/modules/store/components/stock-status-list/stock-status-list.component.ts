@@ -40,7 +40,9 @@ export class StockStatusListComponent implements OnInit {
 
   searchStock(event: any): void {
     this.searchTerm = event.target?.value;
-    this.getStock();
+    setTimeout(() => {
+      this.getStock();
+    }, 200)
   }
 
   onAddNewStockRecevied(

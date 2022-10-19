@@ -1,12 +1,13 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
-import { Store } from "@ngrx/store";
+import { select, Store } from "@ngrx/store";
 import { keyBy, uniqBy } from "lodash";
 import { Observable, of } from "rxjs";
 import { getProcedures } from "src/app/core/helpers/get-setmembers-from-departments.helper";
 import { loadForms } from "src/app/store/actions";
 import { loadActiveVisit } from "src/app/store/actions/visit.actions";
 import { AppState } from "src/app/store/reducers";
+import { getActiveVisit } from "src/app/store/selectors/visit.selectors";
 import { addBillStatusToOrderedItems } from "../../helpers/add-bill-status-to-ordered-items.helper";
 import { ICARE_CONFIG } from "../../resources/config";
 import { OrdersService } from "../../resources/order/services/orders.service";
@@ -39,6 +40,7 @@ export class AttendOrderedItemsComponent implements OnInit {
   proceduresSelected: any[] = [];
   creatingOrderResponse$: Observable<any>;
   orderedProcedures$: Observable<any>;
+  activeVisit$: Observable<any>;
   fields: string =
     "custom:(uuid,encounters:(uuid,location:(uuid,display),encounterType,display,encounterProviders,encounterDatetime,voided,obs,orders:(uuid,display,instructions,orderer,orderType,dateActivated,orderNumber,concept,display)))";
   @Output() done: EventEmitter<boolean> = new EventEmitter<boolean>();
@@ -46,7 +48,7 @@ export class AttendOrderedItemsComponent implements OnInit {
     private dialog: MatDialog,
     private visitService: VisitsService,
     private store: Store<AppState>,
-    private ordersService: OrdersService
+    private ordersService: OrdersService,
   ) {}
 
   ngOnInit(): void {
@@ -94,6 +96,7 @@ export class AttendOrderedItemsComponent implements OnInit {
         type: "textarea",
       },
     ];
+    this.activeVisit$ = this.store.pipe(select(getActiveVisit));
   }
 
   onCheck(event, orderedItem): void {
@@ -181,5 +184,7 @@ export class AttendOrderedItemsComponent implements OnInit {
         );
       }
     });
+
+    
   }
 }
