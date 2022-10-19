@@ -641,7 +641,6 @@ export class RegistrationAddComponent implements OnInit {
     //TODO: validate inputs
     this.ShowFieldsError = false;
     this.addResidenceArea(this.newArea);
-    console.log("The changes are :", DarRegion);
 
     if (this.mandatoryFieldsMissing) {
       this.openSnackBar("Warning: Some mandatory fields are missing", null);
