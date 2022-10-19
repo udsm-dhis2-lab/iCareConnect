@@ -223,12 +223,13 @@ export class InpatientComponent implements OnInit {
   }
 
   dischargePatient(
-    event: Event,
+    event: any,
     visit,
     currentPatient,
     provider,
     lastBedOrder
   ) {
+    console.log("--------------->",event)
     this.dialog.open(DischargePatientModalComponent, {
       width: "30%",
       data: {
@@ -236,6 +237,7 @@ export class InpatientComponent implements OnInit {
         provider,
         patient: currentPatient?.patient,
         lastBedOrder,
+        invoice: event?.invoice
       },
     });
   }

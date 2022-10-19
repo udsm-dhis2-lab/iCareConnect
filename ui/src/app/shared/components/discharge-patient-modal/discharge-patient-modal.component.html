@@ -16,7 +16,7 @@
 </mat-toolbar>
 
 <mat-dialog-content class="mat-typography">
-  <div>Are you sure to discharge this patient?</div>
+  <div><span *ngIf="visitDetails?.invoice?.length > 0" style="color: red;" >This patient has pending bills, <br></span>Are you sure to discharge this patient?</div>
 </mat-dialog-content>
 
 <mat-dialog-actions align="end" class="m-0 p-3">
