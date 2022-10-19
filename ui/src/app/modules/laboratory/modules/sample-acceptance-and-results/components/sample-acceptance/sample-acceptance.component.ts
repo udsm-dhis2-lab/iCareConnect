@@ -106,6 +106,7 @@ export class SampleAcceptanceComponent implements OnInit {
       {
         department: this.selectedDepartment,
         searchingText: this.searchingText,
+        isLIS: this.LISConfigurations?.isLIS,
       }
     );
 
