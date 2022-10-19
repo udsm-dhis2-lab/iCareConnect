@@ -18,9 +18,9 @@
                     <td>{{ drug?.display }}</td>
                     <td> {{ drug.careSetting.display }}</td>
                     <td> {{ drug.dateActivated | date:'short' }}</td>
-                    <td>
-                        <button (click)="stopDrugOrder($event, drug)" class="btn btn-outline-danger">
-                            Stop Medication
+                    <td *ngIf="fromClinic">
+                        <button (click)="stopDrugOrder($event, drug)" class="btn btn-text btn-outline-danger pb-2">
+                            <mat-icon class="icon">not_interested</mat-icon> Stop
                         </button>
                     </td>
                 </tr>
@@ -29,7 +29,7 @@
         <ng-container *ngIf="drugsPrescribed.length === 0">
             <tbody>
                 <tr class="text-center p-3">
-                    No Prescriptions Yet
+                    No Doctor's Prescriptions Yet
                 </tr>
             </tbody>
         </ng-container>

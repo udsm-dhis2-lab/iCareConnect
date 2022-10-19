@@ -12,6 +12,7 @@ import { EncountersService } from "../../services/encounters.service";
 export class CurrentPrescriptionComponent implements OnInit {
   @Input() visit: any;
   @Input() genericPrescriptionOrderType: any;
+  @Input() fromClinic: boolean;
 
   @Output() loadVisit: EventEmitter<any> = new EventEmitter();
 
@@ -21,6 +22,7 @@ export class CurrentPrescriptionComponent implements OnInit {
   constructor(private encounterService: EncountersService) {}
 
   ngOnInit(): void {
+    console.log("==> Current Visit: ", this.visit)
     this.drugsPrescribed = flatten(
       this.visit?.encounters
         ?.map((encounter) => {
