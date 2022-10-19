@@ -2,32 +2,42 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
 import { random } from 'lodash';
+import { Observable } from 'rxjs';
+import { FormValue } from 'src/app/shared/modules/form/models/form-value.model';
+import { ConceptsService } from 'src/app/shared/resources/concepts/services/concepts.service';
 import { AppState } from 'src/app/store/reducers';
 import { getCurrentUserDetails } from 'src/app/store/selectors/current-user.selectors';
 import { BillingService } from '../../services/billing.service';
 
 @Component({
-  selector: 'app-bill-confirmation',
-  templateUrl: './bill-confirmation.component.html',
-  styleUrls: ['./bill-confirmation.component.scss'],
+  selector: "app-bill-confirmation",
+  templateUrl: "./bill-confirmation.component.html",
+  styleUrls: ["./bill-confirmation.component.scss"],
 })
 export class BillConfirmationComponent implements OnInit {
-  controlNumber: number;
+  controlNumber?: number;
   generatingControlNumber: boolean;
   savingPayment: boolean;
   savingPaymentError: string;
   facilityDetailsJson: any;
   facilityLogoBase64: string;
   currentUser: any;
+  gepgConceptField$: Observable<any>;
+  isFormValid: boolean;
+  formValues: any;
 
   constructor(
     private matDialogRef: MatDialogRef<BillConfirmationComponent>,
     @Inject(MAT_DIALOG_DATA) public data,
     private billingService: BillingService,
-    private store: Store<AppState>
+    private store: Store<AppState>,
+    private conceptService: ConceptsService
   ) {}
 
   ngOnInit(): void {
+    this.gepgConceptField$ = this.conceptService.getConceptDetailsByUuid(
+      this.data?.gepgConceptUuid
+    );
     this.facilityDetailsJson = this.data?.facilityDetails
       ? this.data?.facilityDetails
       : null;
@@ -38,16 +48,35 @@ export class BillConfirmationComponent implements OnInit {
         : null;
 
     this.currentUser = this.store.select(getCurrentUserDetails).subscribe({
-        next: (currentUser) => {
-          return currentUser;
-        },
+      next: (currentUser) => {
+        return currentUser;
+      },
 
-        error: (error) => {
-          throw error;
-        }
-      }
-    );
+      error: (error) => {
+        throw error;
+      },
+    });
   }
+
+  get controlNumberValue(): string {
+    return `GEPG_MNL: ${this.controlNumber}`;
+  }
+
+ onFormUpdate(formValues: FormValue): void {
+    this.isFormValid = formValues.isValid;
+    this.formValues = { ...this.formValues, ...formValues.getValues() };
+
+    // Test controlNumber against regex to validate
+    const correntCN = new RegExp("\\d{11,}").test(
+      String(formValues.getValues()[this.data?.gepgConceptUuid]?.value)
+    );
+    if(correntCN){
+      this.controlNumber =
+        Number(formValues.getValues()[this.data?.gepgConceptUuid]?.value);
+    } else {
+      this.controlNumber = undefined;
+    }
+ }
 
   onCancel(e): void {
     e.stopPropagation();
@@ -58,11 +87,11 @@ export class BillConfirmationComponent implements OnInit {
     e.stopPropagation();
     this.savingPayment = true;
     this.billingService
-     .payBill(this.data?.bill, {
+      .payBill(this.data?.bill, {
         confirmedItems: this.data?.billItems,
         items: this.data?.items,
         paymentType: this.data?.paymentType,
-        referenceNumber: '',
+        referenceNumber: "",
       })
       .subscribe(
         (paymentResponse) => {
@@ -83,6 +112,28 @@ export class BillConfirmationComponent implements OnInit {
       this.controlNumber = random(99000000000, 99999999999);
       this.generatingControlNumber = false;
     }, 1000);
+  }
+
+  onGepgConfirmation(e): void {
+    e.stopPropagation();
+    this.savingPayment = true;
+    this.billingService
+      .payBill(this.data?.bill, {
+        confirmedItems: this.data?.billItems,
+        items: this.data?.items,
+        paymentType: this.data?.paymentType,
+        referenceNumber: this.controlNumberValue,
+      })
+      .subscribe(
+        (paymentResponse) => {
+          this.savingPayment = false;
+          this.matDialogRef.close(paymentResponse);
+        },
+        (error) => {
+          this.savingPayment = false;
+          this.savingPaymentError = error;
+        }
+      );
   }
 
   onPrint(e): void {
