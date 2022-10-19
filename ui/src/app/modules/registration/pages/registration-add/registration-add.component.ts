@@ -1029,7 +1029,7 @@ export class RegistrationAddComponent implements OnInit {
     );
   }
   addResidenceArea(area: string) {
-    if (area.length > 0) {
+    if (area?.length > 0) {
       let areaUpper = area.toUpperCase();
       const found = DarRegion.some((el) => el.STREET === areaUpper);
       if (!found)
