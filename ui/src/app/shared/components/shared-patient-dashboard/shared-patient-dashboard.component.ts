@@ -85,6 +85,8 @@ import { ConfigsService } from "../../services/configs.service";
 import { UserService } from "src/app/modules/maintenance/services/users.service";
 import { ConceptsService } from "../../resources/concepts/services/concepts.service";
 import { VisitConsultationStatusModalComponent } from "../../dialogs/visit-consultation-status-modal/visit-consultation-status-modal.component";
+import { BillingService } from "src/app/modules/billing/services/billing.service";
+import { tap, map as rxMap } from "rxjs/operators";
 
 @Component({
   selector: "app-shared-patient-dashboard",
@@ -140,13 +142,16 @@ export class SharedPatientDashboardComponent implements OnInit {
   showPrintButton: boolean;
 
   @Output() assignBed: EventEmitter<boolean> = new EventEmitter<boolean>();
-  @Output() dichargePatient: EventEmitter<boolean> =
+  @Output() dichargePatient: EventEmitter<any> =
     new EventEmitter<boolean>();
   observationChartForm$: Observable<any>;
   observationChartEncounterType$: Observable<any>;
 
   visitEndingControlStatusesConcept$: Observable<ConceptGet>;
   codedVisitCloseStatus: any;
+  errors: any[] = [];
+  patientInvoice$: Observable<any>;
+
   constructor(
     private store: Store<AppState>,
     private dialog: MatDialog,
@@ -154,7 +159,8 @@ export class SharedPatientDashboardComponent implements OnInit {
     private ordersService: OrdersService,
     private configService: ConfigsService,
     private userService: UserService,
-    private conceptService: ConceptsService
+    private conceptService: ConceptsService,
+    private billingService: BillingService
   ) {
     this.store.dispatch(loadEncounterTypes());
   }
@@ -274,6 +280,40 @@ export class SharedPatientDashboardComponent implements OnInit {
           "custom:(uuid,display,answers:(uuid,display))"
         );
     }
+
+    this.patientInvoice$ = this.billingService.getPatientBills(this.activeVisit?.patientUuid).pipe(
+      rxMap((res) => {
+        if(!res?.error){
+          res = res?.filter(bill => {
+            if(!bill.isInsurance && bill.items.length > 0){
+              return bill
+            }
+            return
+          }).filter(bill => bill)
+        };
+
+        if(res?.error){
+          if(res?.message){
+            this.errors = [
+              ...this.errors,
+              {
+                error: {
+                  message: res?.message || "Connection failed when trying to get patient invoices!",
+                  detail: res?.stackTrace
+                }
+              }
+            ]
+          }
+          if(!res?.message){
+            this.errors = [
+              ...this.errors,
+              res?.error
+            ]
+          }
+        }
+      return res;  
+      })
+    );
   }
 
   onToggleVitalsSummary(event: Event): void {
@@ -451,9 +491,9 @@ export class SharedPatientDashboardComponent implements OnInit {
     this.assignBed.emit(true);
   }
 
-  onDischargePatient(event: Event): void {
+  onDischargePatient(event: Event, invoice?:any): void {
     event.stopPropagation();
-    this.dichargePatient.emit(true);
+    this.dichargePatient.emit({discharge: true, invoice:invoice});
   }
 
   onOpenModalToEndConsultation(

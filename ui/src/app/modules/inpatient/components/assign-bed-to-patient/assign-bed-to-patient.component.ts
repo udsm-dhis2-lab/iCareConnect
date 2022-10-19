@@ -105,7 +105,7 @@ export class AssignBedToPatientComponent implements OnInit {
       .open(ConfirmModalComponent, {
         data: {
           header: "Bed Confirmation",
-          message: "Are you sure to assign this bed to the name patient?",
+          message: `Are you sure to assign this bed to ${this.currentPatient?.name}?`,
           is: true,
           dataObject: data,
           currentPatient: this.currentPatient,
