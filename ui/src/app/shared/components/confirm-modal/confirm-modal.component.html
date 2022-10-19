@@ -14,7 +14,7 @@
   <mat-dialog-content class="mat-typography">
     <div *ngIf="params?.admissionStatus" class="text-center p-3">
       <p class="text-center">
-        Successfully admitted <b>{{ currentPatient?.name }}</b>
+        {{ message ? message : 'Successfully admitted <b>'+{{ currentPatient?.name }}+'</b>' }}
       </p>
     </div>
     <div *ngIf="details?.occupied">
