@@ -17,7 +17,7 @@ import { VisitsService } from "src/app/shared/resources/visits/services";
 import { Patient } from "src/app/shared/resources/patient/models/patient.model";
 import { Observable, zip } from "rxjs";
 import { LocationService } from "src/app/core/services";
-import { tail, filter, keyBy } from "lodash";
+import { tail, filter, keyBy, groupBy, uniqBy, uniq } from "lodash";
 import { StartVisitModelComponent } from "../../components/start-visit-model/start-visit-model.component";
 import { VisitStatusConfirmationModelComponent } from "../../components/visit-status-confirmation-model/visit-status-confirmation-model.component";
 import { MatDialog } from "@angular/material/dialog";
@@ -44,7 +44,7 @@ import { clearActiveVisit } from "src/app/store/actions/visit.actions";
 import { map, tap } from "rxjs/operators";
 import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
 import { PatientService } from "src/app/shared/resources/patient/services/patients.service";
-
+import { DarRegion } from "src/app/shared/helpers/Patient-Residence-helper";
 @Component({
   selector: "app-registration-add",
   templateUrl: "./registration-add.component.html",
@@ -149,6 +149,7 @@ export class RegistrationAddComponent implements OnInit {
   patientIdentifierTypes: any;
   otherPatientIdentifierTypes: any;
   personAttributeTypes: any;
+  patientLocation: any;
   patient: any = {
     fname: null,
     mname: null,
@@ -330,7 +331,21 @@ export class RegistrationAddComponent implements OnInit {
     // );
   }
 
+  onSelectArea(e) {
+    this.patientLocation = DarRegion;
+    if (e) {
+      this.patient.district = this.patientLocation.filter((d) => {
+        return d.STREET === e?.value ? e?.value : e?.target?.value;
+      })[0].DISTRICT;
+
+      this.patient.region = this.patientLocation.filter((d) => {
+        return d.STREET === e?.value ? e?.value : e?.target?.value;
+      })[0].REGION;
+    }
+  }
   ngOnInit(): void {
+    this.patientLocation = DarRegion;
+
     this.residenceDetailsLocation$ = this.locationService.getLocationById(
       this.residenceDetailsLocationUuid
     );
@@ -482,8 +497,16 @@ export class RegistrationAddComponent implements OnInit {
                 )[0]?.value,
               cityVillage: this.patientInformation?.cityVillage,
               village: this.patientInformation?.street,
-              district: this.patientInformation?.district,
-              region: this.patientInformation?.region,
+              district: this.patientLocation.filter((d) => {
+                return d.STREET === this.patientInformation?.cityVillage
+                  ? this.patientInformation?.cityVillage
+                  : this.patientInformation?.street;
+              })[0].DISTRICT,
+              region: this.patientLocation.filter((d) => {
+                return d.STREET === this.patientInformation?.cityVillage
+                  ? this.patientInformation?.cityVillage
+                  : this.patientInformation?.street;
+              })[0].REGION,
               council: this.patientInformation?.council,
               referredFrom: null,
               tribe: this.patientInformation?.tribe,
@@ -988,5 +1011,20 @@ export class RegistrationAddComponent implements OnInit {
   validateNamesInputs(value, key) {
     var regex = /^[a-zA-Z ]{2,30}$/;
     this.validatedTexts[key] = regex.test(value) ? "valid" : "invalid";
+  }
+
+  get residenceRegion(): any[] {
+    return uniq(
+      this.patientLocation.map((obj) => {
+        return obj.REGION;
+      })
+    );
+  }
+  get residenceDistrict(): any[] {
+    return uniq(
+      this.patientLocation.map((obj) => {
+        return obj.DISTRICT;
+      })
+    );
   }
 }
