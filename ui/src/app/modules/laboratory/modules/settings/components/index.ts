@@ -12,10 +12,12 @@ import { LabConfigurationsComponent } from "./lab-configurations/lab-configurati
 import { LabOrdersManagementDashboardComponent } from "./lab-orders-management-dashboard/lab-orders-management-dashboard.component";
 import { LabOrdersManagementComponent } from "./lab-orders-management/lab-orders-management.component";
 import { LabsSectionManagementComponent } from "./labs-section-management/labs-section-management.component";
+import { LbPriceListContainerComponent } from "./lb-price-list-container/lb-price-list-container.component";
 import { OtherParametersConfigsComponent } from "./other-parameters-configs/other-parameters-configs.component";
 import { ParametersListComponent } from "./parameters-list/parameters-list.component";
 import { ParametersComponent } from "./parameters/parameters.component";
 import { SampleTypesListComponent } from "./sample-types-list/sample-types-list.component";
+import { SharedPriceListComponent } from "./shared-price-list/shared-price-list.component";
 import { StandardConceptCreationComponent } from "./standard-concept-creation/standard-concept-creation.component";
 import { StandardConceptsListComponent } from "./standard-concepts-list/standard-concepts-list.component";
 import { TestMethodsComponent } from "./test-methods/test-methods.component";
@@ -48,6 +50,8 @@ export const components: any[] = [
   UsersListComponent,
   AddNewUserComponent,
   CodedAnswersSelectionComponent,
+  LbPriceListContainerComponent,
+  SharedPriceListComponent,
 ];
 
 export const entrySettingComponents: any[] = [AddNewUserComponent];
