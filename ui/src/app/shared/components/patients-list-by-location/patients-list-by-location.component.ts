@@ -3,7 +3,7 @@ import { MatDialog } from "@angular/material/dialog";
 import { ActivatedRoute, Router } from "@angular/router";
 import { Store } from "@ngrx/store";
 import { StartVisitModelComponent } from "src/app/modules/registration/components/start-visit-model/start-visit-model.component";
-import { go } from "src/app/store/actions";
+import { addCurrentPatient, go } from "src/app/store/actions";
 import { AppState } from "src/app/store/reducers";
 import { PatientService } from "../../resources/patient/services/patients.service";
 
@@ -29,11 +29,18 @@ export class PatientsListByLocationComponent implements OnInit {
   onSelectPatient(patient: any): void {
     this.patientService.getPatient(patient?.patient?.uuid).subscribe(
       (patient) => {
+        let patientObject = { ...patient['patient'], id: patient['patient']['uuid']}
+        this.store.dispatch(
+          addCurrentPatient({
+            patient: patientObject,
+            isRegistrationPage: true,
+          })
+        );
         this.dialog
           .open(StartVisitModelComponent, {
             width: "85%",
             data: {
-              patient: { ...patient['patient'], id: patient['patient']['uuid']},
+              patient: patientObject,
             },
           })
           .afterClosed()
