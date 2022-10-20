@@ -44,7 +44,10 @@ import { clearActiveVisit } from "src/app/store/actions/visit.actions";
 import { map, tap } from "rxjs/operators";
 import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
 import { PatientService } from "src/app/shared/resources/patient/services/patients.service";
-import { DarRegion } from "src/app/shared/helpers/Patient-Residence-helper";
+import {
+  DarRegion,
+  onAddResidenceArea,
+} from "src/app/shared/helpers/Patient-Residence-helper";
 @Component({
   selector: "app-registration-add",
   templateUrl: "./registration-add.component.html",
@@ -140,7 +143,11 @@ export class RegistrationAddComponent implements OnInit {
   shouldShowMoreInfoForm: boolean = true;
   emergencyRegistration: boolean = false;
   ShowFieldsError = false;
-  selectedIdentifierType: any;
+  selectedIdentifierType: any = {
+    name: "",
+    id: "",
+    format: "",
+  };
   loadingForm: boolean;
   loadingFormError: string;
 
@@ -198,6 +205,7 @@ export class RegistrationAddComponent implements OnInit {
     min: 0,
     placeholder: "Mobile number",
     category: "phoneNumber",
+    // value: this?.editMode ? this    ""
   });
 
   primaryPhoneNumberAreaLeaderFormField: any = new PhoneNumber({
@@ -221,6 +229,27 @@ export class RegistrationAddComponent implements OnInit {
     placeholder: "Eg: 0711111111",
     category: "phoneNumber",
   });
+
+  areaDemo: any = new Dropdown({
+    // shouldHaveLiveSearchForDropDownFields: true,
+
+    id: "MASEMBO",
+    key: "MASEMBO",
+    label: "masembo",
+    placeholder: "MASEMBO",
+
+    // value: !this.editMode
+    //   ? ""
+    //   : this.attributeConceptMapping[concept?.uuid]?.value ||   "",
+    options: DarRegion.map((answer) => {
+      return {
+        key: answer?.STREET,
+        value: answer?.STREET,
+        label: answer?.STREET,
+      };
+    }),
+  });
+
   isPhoneNumberCorrect: boolean = false;
   showPatientType$: Observable<boolean>;
 
@@ -413,12 +442,11 @@ export class RegistrationAddComponent implements OnInit {
                       this.patientInformation?.patient?.identifiers?.filter(
                         (identifier) => {
                           return (
-                            identifier?.identifierType?.uuid ==
+                            identifier?.identifierType?.uuid ===
                             identifierType?.id
                           );
                         }
                       );
-
                     this.patient[identifierType.id] =
                       identifierObject?.length > 0
                         ? identifierObject[0]?.identifier
@@ -447,7 +475,26 @@ export class RegistrationAddComponent implements OnInit {
             this.otherPatientIdentifierTypes = tail(
               this.patientIdentifierTypes
             );
-            // this.selectedIdentifierType.id =
+
+            const otherIdentifierObject =
+              this.patientInformation?.patient?.identifiers?.filter(
+                (identifier) => {
+                  return (
+                    identifier?.identifierType?.uuid !==
+                    "26742868-a38c-4e6a-ac1d-ae283c414c2e"
+                  );
+                }
+              )[0];
+            this.patient["patientType"] =
+              otherIdentifierObject?.identifierType?.display?.split(" ")[0];
+
+            this.selectedIdentifierType.id =
+              otherIdentifierObject?.identifierType?.uuid;
+
+            this.patient[this.selectedIdentifierType?.id] =
+              otherIdentifierObject?.identifier;
+            // this.selectedIdentifierType.id = 6e7203dd-0d6b-4c92-998d-fdc82a71a1b0 sTAFF
+
             //   this.patientInformation?.patient?.identifiers.filter(
             //     (identifier) =>
             //       identifier.identifierType.display === "Student ID" ||
@@ -456,6 +503,13 @@ export class RegistrationAddComponent implements OnInit {
             this.patient.dob =
               this.patientInformation.patient?.person?.birthdate;
             this.dateSet();
+
+            this.primaryPhoneNumberFormField.value =
+              this.patientInformation?.patient?.person?.attributes.filter(
+                (attribute) => {
+                  return attribute.attributeType.display === "phone";
+                }
+              )[0].value;
             this.patient = {
               ...this.patient,
               fname: this.patientInformation?.fname
@@ -468,7 +522,8 @@ export class RegistrationAddComponent implements OnInit {
               // this.patientInformation.mname
               //   ? this.patientInformation.mname
               //   : this.patientInformation.patient
-              //   ? this.patientInformation.patient?.person?.names[0]?.middleName
+              //   ? this.patientInformation.patient?.person?.names[0]
+              //       ?.middleName
               //   : "",
               lname: this.patientInformation
                 ? this.patientInformation.lname
@@ -581,7 +636,7 @@ export class RegistrationAddComponent implements OnInit {
                 )[0]?.value,
               Id: this.patientInformation?.relatedPersonId,
             };
-            // console.log("The kinFname: ", this.patient.kinFname);
+
             this.loadingForm = false;
           } else {
             // if (identifiersResponse) {
@@ -607,6 +662,7 @@ export class RegistrationAddComponent implements OnInit {
             this.loadingForm = false;
           }
           // }
+          console.log("The patient details:", this.patient);
         }
       },
       (error) => {
@@ -1029,11 +1085,11 @@ export class RegistrationAddComponent implements OnInit {
     );
   }
   addResidenceArea(area: string) {
-    if (area.length > 0) {
+    if (area?.length > 0) {
       let areaUpper = area.toUpperCase();
       const found = DarRegion.some((el) => el.STREET === areaUpper);
-      if (!found)
-        DarRegion.push({
+      if (!found) {
+        let obj = {
           REGION: this?.patient?.region ? this?.patient?.region : "",
           REGIONCODE: null,
           DISTRICT: this?.patient?.district ? this?.patient?.district : "",
@@ -1042,7 +1098,9 @@ export class RegistrationAddComponent implements OnInit {
           WARDCODE: null,
           STREET: areaUpper,
           PLACES: "",
-        });
+        };
+        onAddResidenceArea(obj);
+      }
     }
   }
 }
