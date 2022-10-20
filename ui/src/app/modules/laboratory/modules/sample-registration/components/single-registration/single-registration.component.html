@@ -51,19 +51,21 @@
       </fieldset>
     </div>
     <div class="col-12">
-      <mat-stepper #stepper>
+
+    <!-- ===================================================== Commented Mat Stepper ============================================================================= -->
+      <!-- <mat-stepper #stepper>
         <mat-step errorMessage="Some fields not fed.">
           <ng-template matStepLabel>Sample Information</ng-template>
           <div class="row">
             <div class="col-lg-12 col-md-12 col-sx-12 col-sm-12">
               <div class="for-specimen-details">
                 <fieldset>
-                  <legend>Sample Information</legend>
+                  <legend>Sample Information</legend> -->
                   <!-- <app-sample-label
                     [label]="params?.labSampleLabel"
                     (sampleLabel)="onGetSampleLabel($event)"
                   ></app-sample-label> -->
-                  <app-form
+                  <!-- <app-form
                     [fields]="specimenDetailsFields"
                     [isFormHorizontal]="true"
                     (formUpdate)="onFormUpdate($event, 'specimenDetails')"
@@ -117,9 +119,9 @@
               </div>
             </div>
           </div>
-        </mat-step>
+        </mat-step> -->
 
-        <mat-step
+        <!-- <mat-step
           errorMessage="Some fields not fed."
           *ngIf="registrationCategory === 'Clinical'"
         >
@@ -134,9 +136,9 @@
               </fieldset>
             </div>
           </div>
-        </mat-step>
+        </mat-step> -->
 
-        <mat-step
+        <!-- <mat-step
           errorMessage="Some fields not fed."
           *ngIf="registrationCategory === 'Clinical'"
         >
@@ -153,9 +155,9 @@
               </fieldset>
             </div>
           </div>
-        </mat-step>
+        </mat-step> -->
 
-        <mat-step errorMessage="Some fields not fed.">
+        <!-- <mat-step errorMessage="Some fields not fed.">
           <ng-template matStepLabel>Brought By</ng-template>
           <div>
             <div class="brought-by-field">
@@ -187,13 +189,13 @@
               </fieldset>
             </div>
           </div>
-        </mat-step>
+        </mat-step> -->
 
-        <mat-step errorMessage="Some fields not fed.">
-          <ng-template matStepLabel>Tests</ng-template>
+        <!-- <mat-step errorMessage="Some fields not fed.">
+          <ng-template matStepLabel>Tests</ng-template> -->
           <!-- {{ formData?.specimen?.value }}
           {{ params?.testsUnderSpecimen | json }} -->
-          <div
+          <!-- <div
             *ngIf="
               (selectedSpecimenUuid && params?.testsUnderSpecimen) ||
               !selectedSpecimenUuid
@@ -209,7 +211,8 @@
             mode="indeterminate"
           ></mat-progress-bar>
         </mat-step>
-      </mat-stepper>
+      </mat-stepper> -->
+    <!-- ===================================================== Commented Mat Stepper ============================================================================= -->
     </div>
 
     <div class="col-12" *ngIf="savingDataResponse?.error">
