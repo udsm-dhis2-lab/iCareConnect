@@ -247,6 +247,7 @@
                       </div>
                       <div class="col-4">
                         <app-form
+                          *ngIf="maxForCollectedOn"
                           [fields]="[sampleColectionDateField]"
                           (formUpdate)="onFormUpdate($event)"
                         ></app-form>
@@ -269,6 +270,7 @@
                       </div>
                       <div class="col-4">
                         <app-form
+                        *ngIf="minForReceivedOn"
                           [fields]="[receivedOnField]"
                           (formUpdate)="onFormUpdate($event)"
                         ></app-form>
@@ -346,7 +348,7 @@
                     (click)="toggleFieldSet('broughtBy')"
                     class="d-flex"
                   >
-                    <span> Who brought sample </span>
+                    <span> Brought By </span>
                     <span>
                       <mat-icon *ngIf="!broughtBy"
                         >keyboard_arrow_down</mat-icon
