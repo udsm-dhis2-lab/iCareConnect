@@ -1,8 +1,11 @@
 import { Component, OnInit } from "@angular/core";
+import { MatDialog } from "@angular/material/dialog";
 import { ActivatedRoute, Router } from "@angular/router";
 import { Store } from "@ngrx/store";
+import { StartVisitModelComponent } from "src/app/modules/registration/components/start-visit-model/start-visit-model.component";
 import { go } from "src/app/store/actions";
 import { AppState } from "src/app/store/reducers";
+import { PatientService } from "../../resources/patient/services/patients.service";
 
 @Component({
   selector: "app-patients-list-by-location",
@@ -11,15 +14,34 @@ import { AppState } from "src/app/store/reducers";
 })
 export class PatientsListByLocationComponent implements OnInit {
   locationId: string;
-  constructor(private route: ActivatedRoute, private store: Store<AppState>) {}
+  patientSummary$: any;
+  constructor(
+    private route: ActivatedRoute,
+    private store: Store<AppState>,
+    private dialog: MatDialog,
+    private patientService: PatientService
+  ) {}
 
   ngOnInit(): void {
     this.locationId = this.route.snapshot.params["location"];
   }
 
   onSelectPatient(patient: any): void {
-    // console.log(patient);
+    this.patientService.getPatient(patient?.patient?.uuid).subscribe(
+      (patient) => {
+        this.dialog
+          .open(StartVisitModelComponent, {
+            width: "85%",
+            data: {
+              patient: { ...patient['patient'], id: patient['patient']['uuid']},
+            },
+          })
+          .afterClosed()
+          .subscribe();
+      }
+    );
   }
+
   onClick(e: Event, route: string) {
     this.store.dispatch(go({ path: [`${route}`] }));
   }
