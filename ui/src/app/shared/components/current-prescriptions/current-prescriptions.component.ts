@@ -22,7 +22,6 @@ export class CurrentPrescriptionComponent implements OnInit {
   constructor(private encounterService: EncountersService) {}
 
   ngOnInit(): void {
-    console.log("==> Current Visit: ", this.visit)
     this.drugsPrescribed = flatten(
       this.visit?.encounters
         ?.map((encounter) => {
