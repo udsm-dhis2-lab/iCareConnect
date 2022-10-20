@@ -1,4 +1,4 @@
-export const DarRegion = [
+export var DarRegion = [
   {
     REGION: "DAR-ES-SALAAM",
     REGIONCODE: 11,
@@ -5650,3 +5650,7 @@ export const DarRegion = [
     PLACES: "",
   },
 ];
+
+export function onAddResidenceArea(area: any) {
+  DarRegion.push(area);
+}
