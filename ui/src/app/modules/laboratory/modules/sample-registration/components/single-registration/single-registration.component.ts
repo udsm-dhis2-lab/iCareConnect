@@ -90,6 +90,11 @@ export class SingleRegistrationComponent implements OnInit {
 
   // TODO: Find a way to softcode this
   pimaCOVIDDetails: any;
+  sampleInformation: boolean;
+  clinicalData: any;
+  referingDoctor: any;
+  broughtBy: any;
+  tests: any;
 
   constructor(
     private samplesService: SamplesService,
@@ -1243,6 +1248,29 @@ export class SingleRegistrationComponent implements OnInit {
             this.errorMessage = `Lab section not configured ${conceptSetsResponse?.error?.error?.message}`;
           }
         });
+    }
+  }
+
+  toggleFieldSet(fieldName: string) {
+    switch (fieldName) {
+      case "sampleInformation":
+        this.sampleInformation = !this.sampleInformation;
+        break
+      case "clinicalData":
+        this.clinicalData =!this.clinicalData
+        break
+      case "referingDoctor":
+        this.referingDoctor =!this.referingDoctor;
+        break
+      case "broughtBy":
+        this.broughtBy =!this.broughtBy;
+        break
+      case "tests":
+        this.tests =!this.tests;
+        break
+      default:
+        break;
+
     }
   }
 
