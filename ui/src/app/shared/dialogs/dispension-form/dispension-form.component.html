@@ -31,7 +31,7 @@
     </div>
   </div>
   <mat-toolbar color="primary">
-    <span>Drug Order </span
+    <span>Patient's Drug Prescription </span
     ><span *ngIf="data?.patient?.display"> - {{ data?.patient?.display }}</span>
     <span class="toolbar-spacer"></span>
     <button mat-icon-button mat-dialog-close matTooltip="close">
@@ -119,7 +119,6 @@
                 params?.strengthConceptUuid
               "
             >
-              {{ params?.strengthConceptUuid }}
               <app-general-dispension-form
                 (dosingUnitsSettingsEvent)="getDosingUnits($event)"
                 (durationUnitsSettingsEvent)="getDurationUnits($event)"
@@ -190,7 +189,14 @@
               <mat-accordion>
                 <mat-expansion-panel class="mb-2 border p-0" [expanded]="true">
                   <mat-expansion-panel-header>
-                    <mat-panel-title> Drug </mat-panel-title>
+                    <mat-panel-title>
+                      Drug:
+                      <span
+                        style="color: #2a8fd1"
+                        class="ml-2"
+                        [innerHtml]="genericDrugPrescription"
+                      ></span
+                    ></mat-panel-title>
                   </mat-expansion-panel-header>
                   <div>
                     <app-drug-order

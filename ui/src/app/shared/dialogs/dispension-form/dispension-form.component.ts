@@ -117,6 +117,19 @@ export class DispensingFormComponent implements OnInit {
     );
   }
 
+  get genericDrugPrescription(): string {
+    return this.data?.drugOrder?.obs
+      ? "<b>" +
+          this.data?.drugOrder?.concept?.display +
+          "</b> " +
+          (
+            Object.keys(this.data?.drugOrder?.obs).map(
+              (key) => this.data?.drugOrder?.obs[key]?.value
+            ) || []
+          ).join("; ")
+      : "";
+  }
+
   ngOnInit() {
     this.getVisitByUuid(this.data?.visit?.uuid);
     this.drugOrder = this.data?.drugOrder;

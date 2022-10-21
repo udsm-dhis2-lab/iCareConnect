@@ -35,7 +35,7 @@ export class CurrentPrescriptionComponent implements OnInit {
               ...genericDrugOrder,
               formulatedDescription: (
                 encounter?.obs?.map((observation) => observation?.value) || []
-              ).join(";"),
+              ).join("; "),
               obs: keyBy(
                 encounter?.obs?.map((observation) => {
                   return {
