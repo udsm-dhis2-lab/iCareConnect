@@ -230,26 +230,6 @@ export class RegistrationAddComponent implements OnInit {
     category: "phoneNumber",
   });
 
-  areaDemo: any = new Dropdown({
-    // shouldHaveLiveSearchForDropDownFields: true,
-
-    id: "MASEMBO",
-    key: "MASEMBO",
-    label: "masembo",
-    placeholder: "MASEMBO",
-
-    // value: !this.editMode
-    //   ? ""
-    //   : this.attributeConceptMapping[concept?.uuid]?.value ||   "",
-    options: DarRegion.map((answer) => {
-      return {
-        key: answer?.STREET,
-        value: answer?.STREET,
-        label: answer?.STREET,
-      };
-    }),
-  });
-
   isPhoneNumberCorrect: boolean = false;
   showPatientType$: Observable<boolean>;
 
@@ -662,7 +642,6 @@ export class RegistrationAddComponent implements OnInit {
             this.loadingForm = false;
           }
           // }
-          console.log("The patient details:", this.patient);
         }
       },
       (error) => {
