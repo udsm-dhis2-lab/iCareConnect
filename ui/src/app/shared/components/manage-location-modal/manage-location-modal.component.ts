@@ -7,7 +7,6 @@ import { Textbox } from "../../modules/form/models/text-box.model";
 import { omit } from "lodash";
 import { LocationService } from "src/app/core/services";
 import { Dropdown } from "../../modules/form/models/dropdown.model";
-import { DropdownOption } from "../../modules/form/models/dropdown-option.model";
 
 @Component({
   selector: "app-manage-location-modal",
@@ -19,6 +18,7 @@ export class ManageLocationModalComponent implements OnInit {
 
   locationFields: any[] = [];
   serviceConceptsField: any;
+  formsField: any;
   formValues: any = {};
   isFormValid: boolean;
 
@@ -65,8 +65,6 @@ export class ManageLocationModalComponent implements OnInit {
         attribute?.attributeType?.display?.toLowerCase() === "services"
     ) || [])[0];
 
-    let x: DropdownOption;
-
     this.serviceConceptsField = new Dropdown({
       id: "service",
       key: "service",
@@ -88,7 +86,14 @@ export class ManageLocationModalComponent implements OnInit {
       shouldHaveLiveSearchForDropDownFields: true,
     });
 
-    console.log("serviceConceptsField", this.serviceConceptsField);
+    this.formsField = new Dropdown({
+      id: "form",
+      key: "form",
+      options: [],
+      label: "Form",
+      searchControlType: "form",
+      shouldHaveLiveSearchForDropDownFields: true,
+    });
   }
 
   onCancel(event: Event): void {
@@ -154,6 +159,11 @@ export class ManageLocationModalComponent implements OnInit {
   }
 
   onFormUpdateForServices(formValues: FormValue): void {
+    this.formValues = { ...this.formValues, ...formValues.getValues() };
+    console.log(this.formValues);
+  }
+
+  onFormUpdateForForm(formValues: FormValue): void {
     this.formValues = { ...this.formValues, ...formValues.getValues() };
     console.log(this.formValues);
   }

@@ -48,7 +48,7 @@ export class SharedLocationSettingsComponent implements OnInit {
     // event.stopPropagation();
     this.dialog
       .open(ManageLocationModalComponent, {
-        width: "40%",
+        width: "50%",
         data: {
           locationTag,
           locationTags: this.locationTags,
@@ -75,7 +75,7 @@ export class SharedLocationSettingsComponent implements OnInit {
           console.log(response);
           this.dialog
             .open(ManageLocationModalComponent, {
-              width: "40%",
+              width: "50%",
               data: {
                 edit: true,
                 location: response,
