@@ -177,14 +177,6 @@ export const getFormattedLabSamplesToAccept = createSelector(
             return sample;
           } else if (
             props?.searchingText &&
-            !props?.department &&
-            sample?.searchingText
-              ?.toLowerCase()
-              .indexOf(props?.searchingText.toLowerCase()) > -1
-          ) {
-            return sample;
-          } else if (
-            props?.searchingText &&
             sample?.searchingText
               ?.toLowerCase()
               .indexOf(props?.searchingText.toLowerCase()) > -1 &&
