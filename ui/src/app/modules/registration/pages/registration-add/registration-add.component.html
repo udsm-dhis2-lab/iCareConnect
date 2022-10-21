@@ -447,7 +447,19 @@
             <!-- residence location options with input form field -->
             <div class="d-flex mt-1" *ngIf="!emergencyRegistration">
               <!-- Area of Residence -->
-              <mat-form-field class="ml-1" appearance="fill">
+              <app-form
+                [fields]="[residenceField]"
+                (formUpdate)="onResidenceUpdate($event)"
+              ></app-form>
+              <app-form
+                [fields]="[districtField]"
+                (formUpdate)="onResidenceUpdate($event)"
+              ></app-form>
+              <app-form
+                [fields]="[regionField]"
+                (formUpdate)="onResidenceUpdate($event)"
+              ></app-form>
+              <!-- <mat-form-field class="ml-1" appearance="fill">
                 <mat-label>Area Of Residence</mat-label>
                 <mat-select
                   (click)="addOptionVillage.disabled = true"
@@ -478,11 +490,10 @@
                     </mat-form-field>
                   </mat-option>
                 </mat-select>
-              </mat-form-field>
-
+              </mat-form-field> -->
               <!-- End of Area of Residence-->
               <!-- District -->
-              <mat-form-field class="ml-1" appearance="fill">
+              <!-- <mat-form-field class="ml-1" appearance="fill">
                 <mat-label>District</mat-label>
                 <mat-select
                   (click)="addOptionDistrict.disabled = true"
@@ -498,7 +509,7 @@
                   >
                     {{ location }}
                   </mat-option>
-                  <!-- <mat-option [value]="newDistrict">{{
+                  <mat-option [value]="newDistrict">{{
                     newDistrict
                   }}</mat-option>
 
@@ -517,11 +528,11 @@
                         >done_outline</mat-icon
                       >
                     </mat-form-field>
-                  </mat-option> -->
+                  </mat-option>
                 </mat-select>
-              </mat-form-field>
+              </mat-form-field> -->
               <!-- End of District -->
-              <mat-form-field class="ml-1" appearance="fill">
+              <!-- <mat-form-field class="ml-1" appearance="fill">
                 <mat-label>Region</mat-label>
                 <mat-select
                   (click)="addOption.disabled = true"
@@ -537,7 +548,7 @@
                   >
                     {{ location }}
                   </mat-option>
-                  <!-- <mat-option [value]="newreg">{{ newreg }}</mat-option>
+                  <mat-option [value]="newreg">{{ newreg }}</mat-option>
                   <mat-option #addOption>
                     <mat-form-field>
                       <mat-label>Add New Region</mat-label>
@@ -551,9 +562,9 @@
                         >done_outline</mat-icon
                       >
                     </mat-form-field>
-                  </mat-option> -->
+                  </mat-option>
                 </mat-select>
-              </mat-form-field>
+              </mat-form-field> -->
               <!-- End of Region -->
 
               <!--End of residence location options with input form field -->

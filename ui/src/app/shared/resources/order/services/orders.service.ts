@@ -104,7 +104,6 @@ export class OrdersService {
       
         return zip(
           ...obs.map((ob) => {
-            console.log("==> Ob: ",ob)
             this.openMRSHttpClient.post(`encounter/${response?.uuid}`,{
                 uuid: response?.uuid,
                 obs: [ob],

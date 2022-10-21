@@ -92,6 +92,9 @@ import { SharedConceptCreateComponent } from "./shared-concept-create/shared-con
 import { ConceptsFormComponent } from "./concepts-form/concepts-forms.component";
 import { NonDrugOrderContainerComponent } from "./non-drug-order-container/non-drug-order-container.component";
 import { NonDrugOrderFormComponent } from "./non-drug-order-form/non-drug-order-form.component";
+import { ManageItemPriceComponent } from "./manage-item-price/manage-item-price.component";
+import { PriceListComponent } from "./price-list/price-list.component";
+import { PricingItemComponent } from "./pricing-item/pricing-item.component";
 
 export const components: any[] = [
   PatientSearchComponent,
@@ -188,6 +191,9 @@ export const components: any[] = [
   ConceptsFormComponent,
   NonDrugOrderContainerComponent,
   NonDrugOrderFormComponent,
+  ManageItemPriceComponent,
+  PriceListComponent,
+  PricingItemComponent,
 ];
 
 export const sharedEntryComponents: any[] = [
@@ -210,6 +216,7 @@ export const sharedEntryComponents: any[] = [
   SharedConfirmationDialogComponent,
   AttendProcedureOrderComponent,
   SharedConfirmationComponent,
+  ManageItemPriceComponent,
 ];
 
 export * from "./patient-vitals-summary/patient-vitals-summary.component";

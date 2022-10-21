@@ -12,6 +12,7 @@ import { EncountersService } from "../../services/encounters.service";
 export class CurrentPrescriptionComponent implements OnInit {
   @Input() visit: any;
   @Input() genericPrescriptionOrderType: any;
+  @Input() fromClinic: boolean;
 
   @Output() loadVisit: EventEmitter<any> = new EventEmitter();
 

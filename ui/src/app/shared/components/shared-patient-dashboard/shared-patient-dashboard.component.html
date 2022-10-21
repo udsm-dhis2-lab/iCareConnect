@@ -26,8 +26,8 @@
     generalPrescriptionOrderType: generalPrescriptionOrderType$ | async,
     observationChartForm: observationChartForm$ | async,
     observationChartEncounterType: observationChartEncounterType$ | async,
-    visitEndingControlStatusesConcept:
-      visitEndingControlStatusesConcept$ | async
+    visitEndingControlStatusesConcept: visitEndingControlStatusesConcept$ | async,
+    patientInvoice: patientInvoice$ | async
   } as dashboardParams"
 >
   <div
@@ -193,8 +193,8 @@
               Transfer within
             </button>
             <button
-              (click)="onDischargePatient($event)"
-              *ngIf="activeVisit?.isAdmitted && isInpatient"
+              (click)="onDischargePatient($event, dashboardParams?.patientInvoice)"
+              *ngIf="activeVisit?.isAdmitted && isInpatient "
               mat-stroked-button
               class="mr-2 float-right"
             >
@@ -522,7 +522,6 @@
                       *ngIf="activeVisit"
                       [fromDispensing]="false"
                       [patientVisit]="activeVisit"
-                      [forConsultation]="true"
                       [isInpatient]="isInpatient"
                       (updateConsultationOrder)="onUpdateConsultationOrder()"
                     ></app-patient-medication-summary>

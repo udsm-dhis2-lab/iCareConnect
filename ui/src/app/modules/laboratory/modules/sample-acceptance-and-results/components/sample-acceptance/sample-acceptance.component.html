@@ -46,7 +46,6 @@
         </mat-form-field>
       </div>
       <div class="p-1">
-        <!-- {{ sampleParams?.samplesToAccept | json }} -->
         <table class="table table-bordered">
           <thead class="table-header">
             <tr>
@@ -108,7 +107,7 @@
                     *ngIf="orderCount == 0"
                     [attr.rowspan]="sample?.orders?.length"
                   >
-                    {{ sample?.department?.departmentName }}
+                    {{ sample?.department?.departmentName ? sample?.department?.departmentName: 'Not set' }}
                   </td>
                   <td
                     *ngIf="orderCount == 0 && !LISConfigurations?.isLIS"
@@ -136,7 +135,9 @@
                     {{ sample?.patient?.middleName }}
                     {{ sample?.patient?.familyName }}
                   </td>
-                  <td>{{ order?.order?.concept?.display.replace('TO:','') }}</td>
+                  <td>
+                    {{ order?.order?.concept?.display.replace("TO:", "") }}
+                  </td>
                   <!-- <td></td> -->
                   <td>
                     {{
@@ -292,8 +293,10 @@
           <thead class="table-header">
             <tr>
               <th rowspan="2">SN</th>
-              <th rowspan="2" >Department</th>
-              <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">Sample / Specimen</th>
+              <th rowspan="2">Department</th>
+              <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">
+                Sample / Specimen
+              </th>
               <th rowspan="2">Sample ID</th>
               <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">MRN</th>
               <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">
@@ -379,7 +382,9 @@
                     {{ sample?.patient?.middleName }}
                     {{ sample?.patient?.familyName }}
                   </td>
-                  <td>{{ order?.order?.concept?.display.replace('TO:','') }}</td>
+                  <td>
+                    {{ order?.order?.concept?.display.replace("TO:", "") }}
+                  </td>
                   <!-- <td></td> -->
                   <td>
                     {{
@@ -602,7 +607,9 @@
                     {{ sample?.patient?.middleName }}
                     {{ sample?.patient?.familyName }}
                   </td>
-                  <td>{{ order?.order?.concept?.display.replace('TO:','') }}</td>
+                  <td>
+                    {{ order?.order?.concept?.display.replace("TO:", "") }}
+                  </td>
                   <td>
                     {{
                       !LISConfigurations?.isLIS
@@ -675,7 +682,8 @@
         </table>
       </div>
     </mat-tab>
-    <mat-tab label="Results Entry {{ !LISConfigurations?.isLIS ? '& Approval' : '' }}"
+    <mat-tab
+      label="Results Entry {{ !LISConfigurations?.isLIS ? '& Approval' : '' }}"
     >
       <div class="filter-and-legend">
         <mat-form-field class="w-50">
@@ -726,20 +734,20 @@
               </div>
             </td>
 
-            <td 
-            *ngIf="LISConfigurations?.isLIS"
-             style="
-               background-color: #d04747ab;
-               width: 40px;
-               margin-left: 20px;
-             "
-           ></td>
-           <td *ngIf="LISConfigurations?.isLIS">
-             <div style="margin-left: 3px">Has Amended results</div>
-           </td>
+            <td
+              *ngIf="LISConfigurations?.isLIS"
+              style="
+                background-color: #d04747ab;
+                width: 40px;
+                margin-left: 20px;
+              "
+            ></td>
+            <td *ngIf="LISConfigurations?.isLIS">
+              <div style="margin-left: 3px">Has Amended results</div>
+            </td>
 
             <td
-            *ngIf="!LISConfigurations?.isLIS"
+              *ngIf="!LISConfigurations?.isLIS"
               style="
                 background-color: #d04747ab;
                 width: 40px;
@@ -878,8 +886,10 @@
                     {{ sample?.patient?.middleName }}
                     {{ sample?.patient?.familyName }}
                   </td>
-            
-                  <td>{{ order?.order?.concept?.display.replace('TO:','') }} </td>
+
+                  <td>
+                    {{ order?.order?.concept?.display.replace("TO:", "") }}
+                  </td>
                   <!-- <td></td> -->
                   <td>
                     {{
@@ -1086,7 +1096,9 @@
                     {{ sample?.patient?.middleName }}
                     {{ sample?.patient?.familyName }}
                   </td>
-                  <td>{{ order?.order?.concept?.display.replace('TO:','') }}</td>
+                  <td>
+                    {{ order?.order?.concept?.display.replace("TO:", "") }}
+                  </td>
                   <!-- <td></td> -->
                   <td>{{ order?.order?.orderer?.name }}</td>
 
@@ -1192,8 +1204,8 @@
                 }}
               </div>
             </td>
-            <td 
-             *ngIf="LISConfigurations?.isLIS"
+            <td
+              *ngIf="LISConfigurations?.isLIS"
               style="
                 background-color: #d04747ab;
                 width: 40px;
@@ -1204,7 +1216,6 @@
               <div style="margin-left: 3px">Has Amended results</div>
             </td>
 
-
             <td
               *ngIf="!LISConfigurations?.isLIS"
               style="
@@ -1213,10 +1224,9 @@
                 margin-left: 20px;
               "
             ></td>
-          <td *ngIf="!LISConfigurations?.isLIS">
-            <div style="margin-left: 3px">Has rejected results</div>
-          </td>
-
+            <td *ngIf="!LISConfigurations?.isLIS">
+              <div style="margin-left: 3px">Has rejected results</div>
+            </td>
 
             <td
               *ngIf="!LISConfigurations?.isLIS"
@@ -1354,7 +1364,9 @@
                     {{ sample?.patient?.middleName }}
                     {{ sample?.patient?.familyName }}
                   </td>
-                  <td>{{ order?.order?.concept?.display.replace('TO:','') }}</td>
+                  <td>
+                    {{ order?.order?.concept?.display.replace("TO:", "") }}
+                  </td>
                   <td>{{ order?.order?.orderer?.name }}</td>
                   <!-- <td>{{ order?.order?.location?.name }}</td>
                   <td>{{ order?.order?.orderDate | date: "medium" }}</td> -->
@@ -1553,7 +1565,9 @@
                     {{ sample?.patient?.middleName }}
                     {{ sample?.patient?.familyName }}
                   </td>
-                  <td>{{ order?.order?.concept?.display.replace('TO:','') }}</td>
+                  <td>
+                    {{ order?.order?.concept?.display.replace("TO:", "") }}
+                  </td>
                   <!-- <td></td> -->
                   <td>
                     {{
@@ -1759,8 +1773,8 @@
                 }}
               </div>
             </td>
-            <td 
-             *ngIf="LISConfigurations?.isLIS"
+            <td
+              *ngIf="LISConfigurations?.isLIS"
               style="
                 background-color: #d04747ab;
                 width: 40px;
@@ -1771,7 +1785,6 @@
               <div style="margin-left: 3px">Has Amended results</div>
             </td>
 
-
             <td
               *ngIf="!LISConfigurations?.isLIS"
               style="
@@ -1780,10 +1793,9 @@
                 margin-left: 20px;
               "
             ></td>
-          <td *ngIf="!LISConfigurations?.isLIS">
-            <div style="margin-left: 3px">Has rejected results</div>
-          </td>
-
+            <td *ngIf="!LISConfigurations?.isLIS">
+              <div style="margin-left: 3px">Has rejected results</div>
+            </td>
 
             <td
               *ngIf="!LISConfigurations?.isLIS"
@@ -1921,7 +1933,9 @@
                     {{ sample?.patient?.middleName }}
                     {{ sample?.patient?.familyName }}
                   </td>
-                  <td>{{ order?.order?.concept?.display.replace('TO:','') }}</td>
+                  <td>
+                    {{ order?.order?.concept?.display.replace("TO:", "") }}
+                  </td>
                   <td>{{ order?.order?.orderer?.name }}</td>
                   <!-- <td>{{ order?.order?.location?.name }}</td>
                   <td>{{ order?.order?.orderDate | date: "medium" }}</td> -->
