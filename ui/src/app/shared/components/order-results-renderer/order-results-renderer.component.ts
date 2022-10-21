@@ -110,34 +110,37 @@ export class OrderResultsRendererComponent implements OnInit {
 
   onAddTest(event: Event): void {
     event.stopPropagation();
-    let labOrders = Object.keys(this.formValuesData)
-      .map((key) => {
-        if (
-          key !== "order" &&
-          key !== "remarks" &&
-          this.formValuesData[key]?.value
-        ) {
-          return {
-            concept: this.formValuesData[key]?.id,
-            orderType: (this.orderTypes.filter(
-              (orderType) => orderType?.conceptClassName === "Test"
-            ) || [])[0]?.uuid,
-            action: "NEW",
-            patient: this.visit?.patientUuid,
-            careSetting: !this.visit?.isAdmitted ? "OUTPATIENT" : "INPATIENT",
-            orderer: this.provider?.uuid,
-            urgency: "ROUTINE",
-            instructions: "",
-            encounter: JSON.parse(localStorage.getItem("patientConsultation"))[
-              "encounterUuid"
-            ],
-            type: "testorder",
-          };
-        } else {
-          return null;
-        }
-      })
-      .filter((labOrder) => labOrder);
+    let labOrders = uniqBy(
+      Object.keys(this.formValuesData)
+        .map((key) => {
+          if (
+            key !== "order" &&
+            key !== "remarks" &&
+            this.formValuesData[key]?.value
+          ) {
+            return {
+              concept: this.formValuesData[key]?.id,
+              orderType: (this.orderTypes.filter(
+                (orderType) => orderType?.conceptClassName === "Test"
+              ) || [])[0]?.uuid,
+              action: "NEW",
+              patient: this.visit?.patientUuid,
+              careSetting: !this.visit?.isAdmitted ? "OUTPATIENT" : "INPATIENT",
+              orderer: this.provider?.uuid,
+              urgency: "ROUTINE",
+              instructions: "",
+              encounter: JSON.parse(
+                localStorage.getItem("patientConsultation")
+              )["encounterUuid"],
+              type: "testorder",
+            };
+          } else {
+            return null;
+          }
+        })
+        .filter((labOrder) => labOrder),
+      "concept"
+    );
     if (this.formValuesData["order"]) {
       labOrders = [
         ...labOrders,
