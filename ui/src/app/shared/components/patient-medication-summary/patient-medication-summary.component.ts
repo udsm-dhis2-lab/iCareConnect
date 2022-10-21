@@ -1,4 +1,11 @@
-import { AfterViewInit, Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import {
+  AfterViewInit,
+  Component,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+} from "@angular/core";
 import { FormControl } from "@angular/forms";
 import { MatDialog } from "@angular/material/dialog";
 import { select, Store } from "@ngrx/store";
@@ -29,8 +36,7 @@ export class PatientMedicationSummaryComponent implements OnInit {
   patientVisitData$: Observable<any>;
   generalPrescriptionOrderType$: Observable<any>;
   useGeneralPrescription$: Observable<any>;
-  currentVisit$: Observable<unknown>;
-  selectedTab = new FormControl(0);
+  currentVisit$: Observable<any>;
 
   @Output() updateConsultationOrder = new EventEmitter();
   patientDrugOrdersStatuses$: Observable<any>;
@@ -61,18 +67,18 @@ export class PatientMedicationSummaryComponent implements OnInit {
       true
     );
 
-    if (this.patientVisit){
+    if (this.patientVisit) {
       this.drugOrders$ = this.ordersService
-          .getOrdersByVisitAndOrderType({
-            visit: this.patientVisit?.uuid,
-            orderType: "iCARESTS-PRES-1111-1111-525400e4297f",
+        .getOrdersByVisitAndOrderType({
+          visit: this.patientVisit?.uuid,
+          orderType: "iCARESTS-PRES-1111-1111-525400e4297f",
+        })
+        .pipe(
+          map((response) => {
+            console.log("==> Drug Orders: ", response);
+            return response;
           })
-          .pipe(
-            map((response) => {
-              console.log("==> Drug Orders: ", response);
-              return response;
-            })
-          );
+        );
       this.patientDrugOrdersStatuses$ = this.drugOrderService
         .getDrugOrderStatus(this.patientVisit?.uuid)
         .pipe(
@@ -81,7 +87,7 @@ export class PatientMedicationSummaryComponent implements OnInit {
             return response;
           })
         );
-  
+
       this.filteredDrugOrders$ = zip(
         this.drugOrders$,
         this.patientDrugOrdersStatuses$
@@ -91,7 +97,7 @@ export class PatientMedicationSummaryComponent implements OnInit {
           let drugOrdersStatuses = res[1];
           let toBeDispensedDrugOrders: any[] = [];
           let dispensedDrugOrders: any[] = [];
-  
+
           if (drugOrders?.length > 0) {
             drugOrders?.forEach((drugOrder) => {
               if (
@@ -100,11 +106,14 @@ export class PatientMedicationSummaryComponent implements OnInit {
               ) {
                 dispensedDrugOrders = [...dispensedDrugOrders, drugOrder];
               } else {
-                toBeDispensedDrugOrders = [...toBeDispensedDrugOrders, drugOrder];
+                toBeDispensedDrugOrders = [
+                  ...toBeDispensedDrugOrders,
+                  drugOrder,
+                ];
               }
             });
           }
-  
+
           return {
             dispensedDrugOrders: dispensedDrugOrders,
             toBeDispensedDrugOrders: toBeDispensedDrugOrders,
@@ -126,10 +135,6 @@ export class PatientMedicationSummaryComponent implements OnInit {
         v: "custom:(uuid,display,patient,encounters:(uuid,display,obs,orders),attributes)",
       }
     );
-  }
-
-  changeTab(val): void {
-    this.selectedTab.setValue(val);
   }
 
   onAddOrder(e: Event) {
