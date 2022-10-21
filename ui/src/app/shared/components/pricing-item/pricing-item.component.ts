@@ -4,8 +4,8 @@ import { PaymentTypeInterface } from "src/app/shared/models/payment-type.model";
 import { Field } from "src/app/shared/modules/form/models/field.model";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
 import { Textbox } from "src/app/shared/modules/form/models/text-box.model";
-import { ItemPriceInterface } from "../../models/item-price.model";
-import { PricingItemInterface } from "../../models/pricing-item.model";
+import { ItemPriceInterface } from "../../../modules/maintenance/models/item-price.model";
+import { PricingItemInterface } from "../../../modules/maintenance/models/pricing-item.model";
 
 @Component({
   selector: "app-pricing-item",

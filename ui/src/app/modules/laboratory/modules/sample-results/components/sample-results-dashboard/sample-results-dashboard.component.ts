@@ -69,7 +69,8 @@ export class SampleResultsDashboardComponent implements OnInit {
         };
 
     this.allSamples$ = this.samplesService.getSampleByStatusCategory(
-          "COMPLETED",
+          null,
+          "Completed",
           this.datesParameters?.startDate,
           this.datesParameters?.endDate,
           moreInfo

@@ -43,10 +43,11 @@
                   params?.patientDrugOrdersStatuses && 
                   params?.patientDrugOrdersStatuses[drugOrder?.uuid] && 
                   params?.patientDrugOrdersStatuses[drugOrder?.uuid]['status'] === 'DISPENSED') || 
-                  (!drugOrder?.paid && 
-                    (!params?.activeVisit?.isAdmitted && 
-                    params?.activeVisit?.isEmergency && 
-                    params?.activeVisit?.isEnsured)
+                  (
+                    !drugOrder?.paid && 
+                    !params?.activeVisit?.isAdmitted && 
+                    !params?.activeVisit?.isEmergency && 
+                    !params?.activeVisit?.isEnsured
                   )"
                 mat-flat-button
                 color="primary"
