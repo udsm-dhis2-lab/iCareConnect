@@ -18,7 +18,8 @@
     intermediateVisit: intermediateVisit$ | async,
     dispensingLocations: dispensingLocations$ | async,
     genericPrescriptionConceptUuids: genericPrescriptionConceptUuids$ | async,
-    drugOrderConceptDetails: drugOrderConceptDetails$ | async
+    drugOrderConceptDetails: drugOrderConceptDetails$ | async,
+    strengthConceptUuid: strengthConceptUuid$ | async
   } as params"
 >
   <div class="loading-overlay" *ngIf="savingOrder">
@@ -88,7 +89,8 @@
               *ngIf="
                 !params?.useGeneralPrescription ||
                 !params?.dispensingLocations ||
-                !params?.drugOrderConceptDetails
+                !params?.drugOrderConceptDetails ||
+                !params?.strengthConceptUuid
               "
               mode="indeterminate"
             ></mat-progress-bar>
@@ -113,9 +115,11 @@
                 params?.generalPrescriptionDurationConcept &&
                 params?.generalPrescriptionDoseConcept &&
                 params?.generalPrescriptionFrequencyConcept &&
-                params?.genericPrescriptionConceptUuids
+                params?.genericPrescriptionConceptUuids &&
+                params?.strengthConceptUuid
               "
             >
+              {{ params?.strengthConceptUuid }}
               <app-general-dispension-form
                 (dosingUnitsSettingsEvent)="getDosingUnits($event)"
                 (durationUnitsSettingsEvent)="getDurationUnits($event)"
@@ -155,6 +159,7 @@
                   params?.genericPrescriptionConceptUuids
                 "
                 [conceptFields$]="conceptFields$"
+                [strengthConceptUuid]="params?.strengthConceptUuid"
                 (updateConsultationOrder)="onUpdateConsultationOrder()"
                 (orderSaved)="onOrderSaved($event, params?.currentVisit)"
               ></app-general-dispension-form>

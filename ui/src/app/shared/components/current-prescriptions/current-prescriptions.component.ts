@@ -33,6 +33,9 @@ export class CurrentPrescriptionComponent implements OnInit {
           )?.map((genericDrugOrder) => {
             return {
               ...genericDrugOrder,
+              formulatedDescription: (
+                encounter?.obs?.map((observation) => observation?.value) || []
+              ).join(";"),
               obs: keyBy(
                 encounter?.obs?.map((observation) => {
                   return {
@@ -51,16 +54,15 @@ export class CurrentPrescriptionComponent implements OnInit {
   }
 
   stopDrugOrder(e: Event, drugOrder: any) {
-    this.encounterService.voidEncounter(drugOrder?.encounter).subscribe((response) => {
-      if(!response?.error){
-        this.loadVisit.emit(this.visit);
-      }
-      if(response?.error){
-        this.errors = [
-          ...this.errors,
-          response?.error
-        ]
-      }
-    })
+    this.encounterService
+      .voidEncounter(drugOrder?.encounter)
+      .subscribe((response) => {
+        if (!response?.error) {
+          this.loadVisit.emit(this.visit);
+        }
+        if (response?.error) {
+          this.errors = [...this.errors, response?.error];
+        }
+      });
   }
 }

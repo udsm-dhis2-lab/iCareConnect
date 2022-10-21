@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { Store } from "@ngrx/store";
+import { uniqBy } from "lodash";
 import { Observable } from "rxjs";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
 import {
@@ -39,6 +40,7 @@ export class GeneralDispensingFormComponent implements OnInit {
   @Input() dosingFrequencies$: Observable<any>;
   @Input() genericPrescriptionConceptUuids: any;
   @Input() conceptFields$: Observable<any>;
+  @Input() strengthConceptUuid: any;
 
   drugOrder: DrugOrderObject;
 
@@ -109,23 +111,36 @@ export class GeneralDispensingFormComponent implements OnInit {
   onFormUpdate(formValues: FormValue, fieldItem?: string): void {
     this.isFormValid = formValues.isValid;
     this.formValues = { ...this.formValues, ...formValues.getValues() };
-    // if (fieldItem == "drug") {
-    //   this.drugService
-    //     .getDrugsUsingConceptUuid(this.formValues?.drug?.value)
-    //     .subscribe((response) => {
-    //       if (response && !response?.error) {
-    //         console.log(response);
-    //         this.strengthFormField = new Dropdown({
-    //           id: "strength",
-    //           key: "strength",
-    //           label: "Strength",
-    //           options: [],
-    //         });
-    //       } else {
-    //         this.strengthFormField = null;
-    //       }
-    //     });
-    // }
+    if (fieldItem == "drug") {
+      this.drugService
+        .getDrugsUsingConceptUuid(this.formValues?.drug?.value)
+        .subscribe((response) => {
+          if (
+            response &&
+            !response?.error &&
+            response?.results?.length > 0 &&
+            this.strengthConceptUuid
+          ) {
+            this.strengthFormField = new Dropdown({
+              id: this.strengthConceptUuid,
+              key: this.strengthConceptUuid,
+              label: "Strength",
+              options: uniqBy(
+                (response?.results || [])?.map((result) => {
+                  return {
+                    key: result?.strength,
+                    value: result?.strength,
+                    label: result?.strength,
+                  };
+                }),
+                "key"
+              ),
+            });
+          } else {
+            this.strengthFormField = null;
+          }
+        });
+    }
   }
 
   saveOrder(e: any, conceptFields: any) {
@@ -172,11 +187,21 @@ export class GeneralDispensingFormComponent implements OnInit {
         if (response?.uuid) {
           let data = {
             encounterUuid: response?.uuid,
-            obs: obs.filter((observation) => {
-              if (observation.value && observation.value.length > 0) {
-                return observation;
-              }
-            }),
+            obs: [
+              ...(obs.filter((observation) => {
+                if (observation.value && observation.value.length > 0) {
+                  return observation;
+                }
+              }) || []),
+              this.strengthConceptUuid
+                ? {
+                    person: this.currentPatient?.id,
+                    concept: this.strengthConceptUuid,
+                    obsDatetime: new Date(),
+                    value: this.formValues[this.strengthConceptUuid].value,
+                  }
+                : null,
+            ]?.filter((observation) => observation),
           };
           this.observationService
             .saveObservationsViaEncounter(data)
