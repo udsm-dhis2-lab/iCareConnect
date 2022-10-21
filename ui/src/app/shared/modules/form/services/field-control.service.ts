@@ -9,7 +9,7 @@ export class FieldControlService {
 
   toFormGroup(fields: Field<string>[], fieldsData?: FieldsData): FormGroup {
     const group: any = {};
-    fields.forEach((field) => {
+    fields?.forEach((field) => {
       const fieldData = fieldsData ? fieldsData[field.id]?.latest : null;
       if (field?.key) {
         group[field.key] = field.required

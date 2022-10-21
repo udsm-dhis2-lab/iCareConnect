@@ -22,6 +22,7 @@ export class DischargePatientModalComponent implements OnInit {
     private store: Store<AppState>
   ) {
     this.visitDetails = data;
+    console.log(data);
   }
 
   ngOnInit(): void {

@@ -1,12 +1,9 @@
 import { Injectable } from "@angular/core";
 import { Observable, of } from "rxjs";
 import { catchError, map } from "rxjs/operators";
+import { ItemPrice } from "src/app/modules/maintenance/models/item-price.model";
+import { PricingItem } from "src/app/modules/maintenance/models/pricing-item.model";
 import { OpenmrsHttpClientService } from "src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service";
-import { ItemPrice, ItemPriceInterface } from "../models/item-price.model";
-import {
-  PricingItem,
-  PricingItemInterface,
-} from "../models/pricing-item.model";
 
 @Injectable({
   providedIn: "root",
@@ -15,6 +12,16 @@ export class PricingService {
   constructor(private httpClient: OpenmrsHttpClientService) {}
 
   getItems(filterInfo): Observable<PricingItem[]> {
+    console.log(
+      "TEST",
+      `icare/item?limit=${filterInfo?.limit}&startIndex=${
+        filterInfo?.limit * filterInfo?.startIndex
+      }${filterInfo?.searchTerm ? "&q=" + filterInfo?.searchTerm : ""}${
+        filterInfo?.conceptSet && !filterInfo?.isDrug
+          ? "&department=" + filterInfo?.conceptSet
+          : ""
+      }${filterInfo?.isDrug ? "&type=DRUG" : ""}`
+    );
     return this.httpClient
       .get(
         `icare/item?limit=${filterInfo?.limit}&startIndex=${

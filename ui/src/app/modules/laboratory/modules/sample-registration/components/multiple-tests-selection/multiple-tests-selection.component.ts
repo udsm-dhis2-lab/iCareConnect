@@ -70,10 +70,13 @@ export class MultipleTestsSelectionComponent implements OnInit {
   }
 
   getSelection(event: MatRadioChange): void {
-    this.testSelectionCategory = event?.value;
-    this.conceptsList$ =
-      this.testSelectionCategory === "All"
-        ? this.conceptService.getConceptsBySearchTerm("TEST_ORDERS")
-        : of(this.setMembersFromSpecimen);
+    this.testSelectionCategory = null;
+    setTimeout(() => {
+      this.testSelectionCategory = event?.value;
+      this.conceptsList$ =
+        this.testSelectionCategory === "All"
+          ? this.conceptService.getConceptsBySearchTerm("TEST_ORDERS")
+          : of(this.setMembersFromSpecimen);
+    }, 100);
   }
 }

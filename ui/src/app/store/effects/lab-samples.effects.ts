@@ -820,7 +820,7 @@ export class LabSamplesEffects {
           .pipe(
             mergeMap((response) => {
               // console.log('orders : ', action?.details?.orders);
-              // console.log('allocations : ', response?.allocations);
+              console.log("allocations : ", response);
 
               let reprocessedOrders = _.map(
                 action?.details?.orders,
@@ -893,6 +893,8 @@ export class LabSamplesEffects {
                   reprocessedOrders
                 ),
               };
+
+              console.log("formattedSample", formattedSample);
 
               return [updateLabSample({ sample: formattedSample })];
             })
