@@ -154,8 +154,10 @@ export class FieldComponent {
       class: this.field?.conceptClass,
       source: this.field?.source,
       v:
-        field?.searchControlType === "concept" ||
-        field?.conceptClass === "Diagnosis"
+        field?.searchControlType === "residenceLocation"
+          ? "custom:(uuid,display,parentLocation:(uuid,display,parentLocation:(uuid,display)))"
+          : field?.searchControlType === "concept" ||
+            field?.conceptClass === "Diagnosis"
           ? "custom:(uuid,display,datatype,conceptClass,mappings)"
           : "custom:(uuid,display)",
     };
@@ -175,7 +177,11 @@ export class FieldComponent {
       ? item?.uuid
       : item?.id;
     let objectToUpdate = {};
-    objectToUpdate[field?.key] = value;
+    objectToUpdate[field?.key] =
+      !field?.searchControlType ||
+      field?.searchControlType !== "residenceLocation"
+        ? value
+        : item;
     this.form.patchValue(objectToUpdate);
     this.fieldUpdate.emit(this.form);
   }

@@ -45,6 +45,7 @@ import { map, tap } from "rxjs/operators";
 import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
 import { PatientService } from "src/app/shared/resources/patient/services/patients.service";
 import { DarRegion } from "src/app/shared/helpers/Patient-Residence-helper";
+import { Field } from "src/app/shared/modules/form/models/field.model";
 @Component({
   selector: "app-registration-add",
   templateUrl: "./registration-add.component.html",
@@ -221,6 +222,10 @@ export class RegistrationAddComponent implements OnInit {
     placeholder: "Eg: 0711111111",
     category: "phoneNumber",
   });
+
+  residenceField: Field<string>;
+  districtField: Field<string>;
+  regionField: Field<string>;
   isPhoneNumberCorrect: boolean = false;
   showPatientType$: Observable<boolean>;
 
@@ -343,7 +348,76 @@ export class RegistrationAddComponent implements OnInit {
       })[0].REGION;
     }
   }
+
+  onResidenceUpdate(formValues: FormValue): void {
+    const residenceValues: any = formValues.getValues();
+
+    if (
+      residenceValues?.residenceArea &&
+      residenceValues?.residenceArea?.value?.display
+    ) {
+      this.patient["district"] =
+        residenceValues?.residenceArea?.value?.parentLocation?.display;
+      this.patient["village"] = residenceValues?.residenceArea?.value?.display;
+      // this.patient["ward"],
+      this.patient["region"] =
+        residenceValues?.residenceArea?.value?.parentLocation?.parentLocation?.display;
+      this.createDistrictAndRegionField({
+        district:
+          residenceValues?.residenceArea?.value?.parentLocation?.display,
+        region:
+          residenceValues?.residenceArea?.value?.parentLocation?.parentLocation
+            ?.display,
+      });
+    }
+  }
+
+  createDistrictAndRegionField(data?): void {
+    this.districtField = new Dropdown({
+      id: "district",
+      key: "district",
+      options: [
+        {
+          key: data?.district,
+          value: data?.district,
+          label: data?.district,
+        },
+      ],
+      label: "District",
+      value: data?.district,
+      searchControlType: "residenceLocation",
+      controlType: "location",
+    });
+    this.regionField = new Dropdown({
+      id: "region",
+      key: "region",
+      options: [
+        {
+          key: data?.region,
+          value: data?.region,
+          label: data?.region,
+        },
+      ],
+      label: "Region",
+      value: data?.region,
+      searchControlType: "residenceLocation",
+      controlType: "location",
+    });
+  }
+
   ngOnInit(): void {
+    this.residenceField = new Dropdown({
+      id: "residenceArea",
+      key: "residenceArea",
+      options: [],
+      label: "Area of Residence",
+      shouldHaveLiveSearchForDropDownFields: true,
+      searchControlType: "residenceLocation",
+      controlType: "location",
+    });
+
+    this.createDistrictAndRegionField();
+
     this.patientLocation = DarRegion;
 
     this.residenceDetailsLocation$ = this.locationService.getLocationById(
@@ -513,8 +587,7 @@ export class RegistrationAddComponent implements OnInit {
               maritalStatus:
                 this.patientInformation?.patient?.person?.attributes.filter(
                   (attribute) => {
-                    return;
-                    attribute.attributeType.display === "maritalStatus";
+                    return attribute.attributeType.display === "maritalStatus";
                   }
                 )[0]?.value,
               occupation: null,

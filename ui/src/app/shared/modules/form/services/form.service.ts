@@ -211,6 +211,17 @@ export class FormService {
       );
       // this.drugs = drugsResults?.results || [];
       // return formatDrugs(this.drugs);)
+    } else if (searchControlType === "residenceLocation") {
+      return from(
+        this.api.location.getAllLocations({
+          q: parameters?.q ? parameters?.q : null,
+          v: parameters?.v,
+        })
+      ).pipe(
+        map((response) => {
+          return response?.results || [];
+        })
+      );
     }
   }
 
