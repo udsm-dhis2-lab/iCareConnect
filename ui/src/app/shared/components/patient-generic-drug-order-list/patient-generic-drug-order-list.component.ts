@@ -126,6 +126,9 @@ export class PatientGenericDrugOrderListComponent implements OnInit {
           )?.map((genericDrugOrder) => {
             return {
               ...genericDrugOrder,
+              formulatedDescription: (
+                encounter?.obs?.map((observation) => observation?.value) || []
+              ).join(";"),
               obs: keyBy(
                 encounter?.obs?.map((observation) => {
                   return {

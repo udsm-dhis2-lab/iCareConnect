@@ -54,7 +54,7 @@
       <tr *ngIf="drugOrders.length > 0">
         <th>SN</th>
         <th>Drug</th>
-        <th>Instructions</th>
+        <th>Instructions/Description</th>
         <th>Prescribed By</th>
         <th>Date & Time</th>
         <th>Care setting</th>
@@ -72,8 +72,20 @@
               {{ drugOrder?.concept?.display }}
             </td>
             <td>
-              <ng-container *ngFor="let conceptSetting of params?.genericPrescriptionConceptUuids">
-                  <span>{{ drugOrder?.obs[conceptSetting?.value]?.value?.display ? drugOrder?.obs[conceptSetting?.value]?.value?.display : drugOrder?.obs[conceptSetting?.value]?.value }} </span> <br>
+              <ng-container
+                *ngFor="
+                  let conceptSetting of params?.genericPrescriptionConceptUuids
+                "
+              >
+                <!-- <span
+                  >{{
+                    drugOrder?.obs[conceptSetting?.value]?.value?.display
+                      ? drugOrder?.obs[conceptSetting?.value]?.value?.display
+                      : drugOrder?.obs[conceptSetting?.value]?.value
+                  }}
+                </span>
+                <br /> -->
+                {{ drugOrder?.formulatedDescription }}
               </ng-container>
             </td>
             <td>
@@ -86,10 +98,7 @@
               {{ drugOrder?.careSetting?.display }}
             </td>
             <td>
-              <button
-                class="btn colored-button"
-                (click)="onVerify(drugOrder)"
-              >
+              <button class="btn colored-button" (click)="onVerify(drugOrder)">
                 Verify
               </button>
             </td>
@@ -107,9 +116,7 @@
       </ng-container>
       <ng-container *ngIf="!drugOrders.length">
         <tr class="text-center pt-3">
-          <h3>
-            No doctor's prescriptions for this patient
-          </h3>
+          <h3>No doctor's prescriptions for this patient</h3>
         </tr>
       </ng-container>
     </tbody>
