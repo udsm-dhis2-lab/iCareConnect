@@ -94,6 +94,7 @@ import { NonDrugOrderContainerComponent } from "./non-drug-order-container/non-d
 import { NonDrugOrderFormComponent } from "./non-drug-order-form/non-drug-order-form.component";
 import { ManageItemPriceComponent } from "./manage-item-price/manage-item-price.component";
 import { PriceListComponent } from "./price-list/price-list.component";
+import { PricingItemComponent } from "./pricing-item/pricing-item.component";
 
 export const components: any[] = [
   PatientSearchComponent,
@@ -192,6 +193,7 @@ export const components: any[] = [
   NonDrugOrderFormComponent,
   ManageItemPriceComponent,
   PriceListComponent,
+  PricingItemComponent,
 ];
 
 export const sharedEntryComponents: any[] = [

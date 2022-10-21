@@ -90,6 +90,13 @@ export class SingleRegistrationComponent implements OnInit {
 
   // TODO: Find a way to softcode this
   pimaCOVIDDetails: any;
+  sampleInformation: boolean = true;
+  clinicalData: boolean = true;
+  referingDoctor: boolean = true;
+  broughtBy: boolean = true;
+  tests: boolean = true;
+  minForReceivedOn: boolean = false;
+  maxForCollectedOn: boolean;
 
   constructor(
     private samplesService: SamplesService,
@@ -241,8 +248,20 @@ export class SingleRegistrationComponent implements OnInit {
     let maxDay =
       maxDate.getDate().toString().length > 1
         ? maxDate.getDate()
-        : `0${maxDate.getDate() + 1}`;
+        : `0${maxDate.getDate()}`;
     return `${maxDate.getFullYear()}-${maxMonth}-${maxDay}`;
+  }
+
+  getDateStringFromDate(date){
+    let month =
+      (date.getMonth() + 1).toString().length > 1
+        ? date.getMonth() + 1
+        : `0${date.getMonth() + 1}`;
+    let day =
+      date.getDate().toString().length > 1
+        ? date.getDate()
+        : `0${date.getDate()}`;
+    return `${date.getFullYear()}-${month}-${day}`;
   }
 
   createSampleCollectionDetailsFields(data?: any): void {
@@ -318,6 +337,25 @@ export class SingleRegistrationComponent implements OnInit {
   }
 
   onFormUpdate(formValues: FormValue, itemKey?: string): void {
+    let collected_on_date = this.getDateStringFromDate(
+      new Date(formValues.getValues()?.collectedOn?.value)
+    );
+    let received_on_date;
+    if (formValues.getValues()?.receivedOn?.value){
+      received_on_date = this.getDateStringFromDate(
+        new Date(formValues.getValues()?.receivedOn?.value)
+      );
+    }
+    this.minForReceivedOn = false;
+    this.receivedOnField.min = collected_on_date;
+    this.minForReceivedOn = true;
+    if(received_on_date){
+      this.maxForCollectedOn = false;
+      this.sampleColectionDateField.max = received_on_date;
+    }
+    this.maxForCollectedOn = true;
+    
+    // this.getDateStringFromMoment_i();
     this.formData = { ...this.formData, ...formValues.getValues() };
     if (
       itemKey &&
@@ -1243,6 +1281,29 @@ export class SingleRegistrationComponent implements OnInit {
             this.errorMessage = `Lab section not configured ${conceptSetsResponse?.error?.error?.message}`;
           }
         });
+    }
+  }
+
+  toggleFieldSet(fieldName: string) {
+    switch (fieldName) {
+      case "sampleInformation":
+        this.sampleInformation = !this.sampleInformation;
+        break
+      case "clinicalData":
+        this.clinicalData =!this.clinicalData
+        break
+      case "referingDoctor":
+        this.referingDoctor =!this.referingDoctor;
+        break
+      case "broughtBy":
+        this.broughtBy =!this.broughtBy;
+        break
+      case "tests":
+        this.tests =!this.tests;
+        break
+      default:
+        break;
+
     }
   }
 
