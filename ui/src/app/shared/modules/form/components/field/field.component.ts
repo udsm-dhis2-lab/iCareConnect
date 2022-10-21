@@ -155,7 +155,7 @@ export class FieldComponent {
       source: this.field?.source,
       v:
         field?.searchControlType === "residenceLocation"
-          ? "custom:(uuid,display,parentLocation:(uuid,display,parentLocation:(uuid,display)))"
+          ? "custom:(uuid,display,parentLocation:(uuid,display,parentLocation:(uuid,display,parentLocation:(uuid,display))))"
           : field?.searchControlType === "concept" ||
             field?.conceptClass === "Diagnosis"
           ? "custom:(uuid,display,datatype,conceptClass,mappings)"

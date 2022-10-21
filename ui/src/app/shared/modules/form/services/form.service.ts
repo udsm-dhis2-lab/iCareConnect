@@ -219,7 +219,13 @@ export class FormService {
         })
       ).pipe(
         map((response) => {
-          return response?.results || [];
+          // TODO: Remove the hardcoded 'village' by creating a new location API that respondto search and tag together
+          return (
+            response?.results?.filter(
+              (village: any) =>
+                village?.display?.toLowerCase()?.indexOf("village") > -1
+            ) || []
+          );
         })
       );
     }
