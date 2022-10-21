@@ -14,6 +14,7 @@
   } as params"
 >
   <h2>{{ editMode ? "Edit Patient" : "Register New Patient" }}</h2>
+
   <mat-progress-bar
     *ngIf="loadingForm || !params?.showPatientType"
     mode="indeterminate"
@@ -117,6 +118,7 @@
                     !selectedIdentifierType || selectedIdentifierType.disabled
                   "
                   [(ngModel)]="patient[selectedIdentifierType?.id]"
+                  [value]="patient[selectedIdentifierType?.id]"
                 />
               </mat-form-field>
             </div>
@@ -161,6 +163,7 @@
                 <mat-label>Middle Name</mat-label>
                 <input
                   name="mname"
+                  id="mname"
                   autocomplete="off"
                   matInput
                   placeholder="Enter Middle name"
@@ -476,6 +479,7 @@
                   </mat-option>
                 </mat-select>
               </mat-form-field>
+
               <!-- End of Area of Residence-->
               <!-- District -->
               <mat-form-field class="ml-1" appearance="fill">
