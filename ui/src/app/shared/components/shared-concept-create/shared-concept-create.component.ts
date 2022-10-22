@@ -36,6 +36,7 @@ export class SharedConceptCreateComponent implements OnInit {
   @Input() showItemTypeName: boolean;
   @Input() conceptSources: any[];
   @Input() multipleSelectionCompHeight: string;
+  @Input() conceptData: any;
   basicConceptFields: any[];
   dataTypeField: any;
   unitsField: any;
@@ -76,10 +77,14 @@ export class SharedConceptCreateComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.createBasicConceptFields();
-    this.createCodesMappingSourceField();
+    this.createBasicConceptFields(this.conceptData);
+    this.createCodesMappingSourceField(this.conceptData);
+    this.selectedSetMembers =
+      this.conceptData && this.conceptData?.setMembers
+        ? this.conceptData?.setMembers
+        : [];
     if (!this.dataType && this.conceptDataTypes) {
-      this.createDataTypeField();
+      this.createDataTypeField(this.conceptData);
       this.createDisplayPrecisionField();
       this.createUnitField();
     }
@@ -223,6 +228,10 @@ export class SharedConceptCreateComponent implements OnInit {
 
   onGetSelectedSetMembers(selectedSetMembers: ConceptGetFull[]): void {
     this.selectedSetMembers = selectedSetMembers;
+    this.conceptToCreate.emit({
+      ...this.formData,
+      setMembers: this.selectedSetMembers,
+    });
   }
 
   onCancel(event: Event): void {
@@ -265,6 +274,7 @@ export class SharedConceptCreateComponent implements OnInit {
 
   onGetSelectedCodes(selectedItems: any): void {
     this.selectedItems = selectedItems;
+    this.conceptToCreate.emit({ ...this.formData, codes: selectedItems });
   }
 
   onSave(event: Event, selectedTestMethodDetails?: any): void {

@@ -48,8 +48,21 @@ export class GenericDrugsListComponent implements OnInit {
     });
   }
 
-  onEdit(event: Event): void {
+  onEdit(event: Event, genericDrug: any): void {
     // event.stopPropagation();
+    this.dialog
+      .open(AddNewGenericDrugModalComponent, {
+        width: "70%",
+        data: {
+          ...genericDrug,
+        },
+      })
+      .afterClosed()
+      .subscribe((hasChanges) => {
+        if (hasChanges) {
+          this.getDrugsConcepts();
+        }
+      });
   }
 
   onGetList(event: Event, actionType: string): void {
@@ -62,7 +75,7 @@ export class GenericDrugsListComponent implements OnInit {
     event.stopPropagation();
     this.dialog
       .open(AddNewGenericDrugModalComponent, {
-        width: "50%",
+        width: "70%",
       })
       .afterClosed()
       .subscribe((shouldReload) => {
