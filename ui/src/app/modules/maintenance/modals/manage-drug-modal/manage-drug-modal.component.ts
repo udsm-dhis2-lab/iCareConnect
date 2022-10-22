@@ -101,7 +101,6 @@ export class ManageDrugModalComponent implements OnInit {
         : this.drugService.createDrug(data)
       ).subscribe((response: any) => {
         if (response && !response?.error) {
-          console.log(response);
           this.shouldConfirm = false;
           this.saving = false;
           setTimeout(() => {

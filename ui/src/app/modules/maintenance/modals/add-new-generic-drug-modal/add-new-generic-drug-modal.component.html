@@ -1,5 +1,12 @@
-<div *ngIf="{ conceptSources: conceptSources$ | async } as params">
-  <mat-toolbar color="primary">Add New Generic Drug</mat-toolbar>
+<div
+  *ngIf="{
+    conceptSources: conceptSources$ | async,
+    conceptDetails: conceptDetails$ | async
+  } as params"
+>
+  <mat-toolbar color="primary">{{
+    dialogData?.uuid ? "Update " + dialogData?.display : "Add New Generic Drug"
+  }}</mat-toolbar>
   <div class="loading-overlay" *ngIf="saving">
     <div class="text-center">
       <div>Saving generic drug</div>
@@ -13,13 +20,22 @@
       mode="indetermane"
       *ngIf="!params?.conceptSources"
     ></mat-progress-bar>
-    <div *ngIf="params?.conceptSources">
+    <div
+      class="p-3"
+      style="height: 50vh; overflow: auto"
+      *ngIf="
+        params?.conceptSources &&
+        ((dialogData?.uuid && params?.conceptDetails) || !dialogData?.uuid)
+      "
+    >
       <app-shared-concept-create
         [conceptClass]="conceptClass"
         [standardSearchTerm]="standardSearchTerm"
-        [setMembersSearchTerm]=""
+        [setMembersSearchTerm]="'ICARE_GENERIC_NON_DRUG'"
         [dataType]="dataType"
-        [isSet]="false"
+        [conceptData]="params?.conceptDetails"
+        [setMembersHeaderName]="'Consumables'"
+        [isSet]="true"
         [saveOnTheComponent]="false"
         [conceptSources]="params?.conceptSources"
         [multipleSelectionCompHeight]="'10vh'"
