@@ -228,6 +228,17 @@ export class FormService {
           );
         })
       );
+    } else if (searchControlType === "form") {
+      return from(
+        this.api.form.getAllForms({
+          q: parameters?.q ? parameters?.q : null,
+          v: parameters?.v,
+        })
+      ).pipe(
+        map((response) => {
+          return response?.results || [];
+        })
+      );
     }
   }
 
