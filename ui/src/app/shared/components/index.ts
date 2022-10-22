@@ -95,6 +95,7 @@ import { NonDrugOrderFormComponent } from "./non-drug-order-form/non-drug-order-
 import { ManageItemPriceComponent } from "./manage-item-price/manage-item-price.component";
 import { PriceListComponent } from "./price-list/price-list.component";
 import { PricingItemComponent } from "./pricing-item/pricing-item.component";
+import { SharedLocationAttributesManagerComponent } from "./shared-location-attributes-manager/shared-location-attributes-manager.component";
 
 export const components: any[] = [
   PatientSearchComponent,
@@ -194,6 +195,7 @@ export const components: any[] = [
   ManageItemPriceComponent,
   PriceListComponent,
   PricingItemComponent,
+  SharedLocationAttributesManagerComponent,
 ];
 
 export const sharedEntryComponents: any[] = [
