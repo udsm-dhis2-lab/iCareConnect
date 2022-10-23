@@ -210,17 +210,19 @@ export class AddUserComponent implements OnInit {
         )
         .subscribe((res) => {
           this.locations = orderBy(res, ["display"], ["asc"]);
-          this.selectedLocations = uniqBy(
-            this.locations?.filter(
-              (location) =>
-                (
-                  JSON.parse(this.user?.userProperties?.locations)?.filter(
-                    (id) => id === location?.uuid
-                  ) || []
-                )?.length > 0
-            ) || [],
-            "uuid"
-          );
+          this.selectedLocations = this.user?.userProperties?.locations
+            ? uniqBy(
+                this.locations?.filter(
+                  (location) =>
+                    (
+                      JSON.parse(this.user?.userProperties?.locations)?.filter(
+                        (id) => id === location?.uuid
+                      ) || []
+                    )?.length > 0
+                ) || [],
+                "uuid"
+              )
+            : [];
 
           this.locationsDataSource = new MatTableDataSource(this.locations);
           this.selectedLocationsDataSource = new MatTableDataSource(
