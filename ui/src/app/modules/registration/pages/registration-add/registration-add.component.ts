@@ -368,11 +368,10 @@ export class RegistrationAddComponent implements OnInit {
         residenceValues?.residenceArea?.value?.parentLocation?.parentLocation?.display;
       this.createDistrictAndRegionField({
         district:
-          residenceValues?.residenceArea?.value?.parentLocation?.parentLocation
-            ?.display,
+          residenceValues?.residenceArea?.value?.parentLocation?.display,
         region:
           residenceValues?.residenceArea?.value?.parentLocation?.parentLocation
-            ?.parentLocation?.display,
+            ?.display,
       });
     }
   }
@@ -536,7 +535,11 @@ export class RegistrationAddComponent implements OnInit {
                 }
               )[0];
             this.patient["patientType"] =
-              otherIdentifierObject?.identifierType?.display?.split(" ")[0];
+              otherIdentifierObject?.identifierType?.uuid ===
+              ("6e7203dd-0d6b-4c92-998d-fdc82a71a1b0" ||
+                "9f6496ec-cf8e-4186-b8fc-aaf9e93b3406")
+                ? otherIdentifierObject?.identifierType?.display?.split(" ")[0]
+                : "Other";
 
             this.selectedIdentifierType.id =
               otherIdentifierObject?.identifierType?.uuid;
@@ -611,21 +614,10 @@ export class RegistrationAddComponent implements OnInit {
               council: this.patientInformation?.council,
               referredFrom: null,
               tribe: this.patientInformation?.tribe,
-              maritalStatus:
-                this.patientInformation?.patient?.person?.attributes.filter(
-                  (attribute) => {
-                    return;
-                    attribute.attributeType.display === "maritalStatus";
-                  }
-                )[0]?.value,
+              maritalStatus: null,
               occupation: null,
 
-              education:
-                this.patientInformation?.patient?.person?.attributes.filter(
-                  (attribute) => {
-                    return attribute.attributeType.display === "education";
-                  }
-                )[0]?.value,
+              education: null,
               nationalId: null,
               nationalIdType: null,
               kinFname:
@@ -772,10 +764,7 @@ export class RegistrationAddComponent implements OnInit {
                 stateProvince: this.patient["district"],
                 cityVillage: this.patient["village"],
                 countyDistrict: this.patient["ward"],
-                address1: this.patient["village"],
-                address2: this.patient["ward"],
-                address3: this.patient["district"],
-                address4: this.patient["region"],
+                address1: this.patient["region"],
                 postalCode: "",
               },
             ],
