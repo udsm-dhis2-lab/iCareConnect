@@ -41,6 +41,8 @@ export interface DrugOrderObject {
   orderType?: string;
   previousOrder?: string;
   action?: string;
+  obs?: any;
+  formulatedDescription?: string;
 }
 export class DrugOrder {
   constructor(

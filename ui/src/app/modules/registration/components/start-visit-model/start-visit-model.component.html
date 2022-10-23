@@ -36,7 +36,7 @@
             patient?.person?.age +
             " yrs" +
             " | Contact:" +
-            patientPhone
+            (patientPhone ? patientPhone : "")
         }}
       </p>
       <mat-progress-bar

@@ -73,6 +73,7 @@ export class DispensingFormComponent implements OnInit {
   conceptFields$: Observable<any>;
   genericPrescriptionConceptUuids$: Observable<any>;
   drugOrderConceptDetails$: Observable<ConceptGet>;
+  strengthConceptUuid$: Observable<string>;
 
   constructor(
     private drugOrderService: DrugOrdersService,
@@ -97,6 +98,7 @@ export class DispensingFormComponent implements OnInit {
       location: any;
       encounterUuid: string;
       useGenericPrescription?: any;
+      forConsultation: boolean;
     }
   ) {}
 
@@ -115,6 +117,19 @@ export class DispensingFormComponent implements OnInit {
     );
   }
 
+  get genericDrugPrescription(): string {
+    return this.data?.drugOrder?.obs
+      ? "<b>" +
+          this.data?.drugOrder?.concept?.display +
+          "</b> " +
+          (
+            Object.keys(this.data?.drugOrder?.obs).map(
+              (key) => this.data?.drugOrder?.obs[key]?.value
+            ) || []
+          ).join("; ")
+      : "";
+  }
+
   ngOnInit() {
     this.getVisitByUuid(this.data?.visit?.uuid);
     this.drugOrder = this.data?.drugOrder;
@@ -124,6 +139,11 @@ export class DispensingFormComponent implements OnInit {
         map((response) => {
           return response;
         })
+      );
+
+    this.strengthConceptUuid$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        "iCare.clinic.genericPrescription.strength.1"
       );
 
     this.generalPrescriptionEncounterType$ = this.systemSettingsService
@@ -252,14 +272,13 @@ export class DispensingFormComponent implements OnInit {
     this.currentLocation$ = this.store.pipe(select(getCurrentLocation));
     this.currentVisit$ = this.store.pipe(select(getActiveVisit));
     this.provider$ = this.store.select(getProviderDetails);
-    
+
     this.drugOrderConceptDetails$ = this.data?.drugOrder
       ? this.conceptService.getConceptDetailsByUuid(
           this.data?.drugOrder?.concept?.uuid,
           "custom:(uuid,display,setMembers:(uuid,display))"
         )
       : of([]);
-    
   }
 
   onCancel(): void {
@@ -316,12 +335,15 @@ export class DispensingFormComponent implements OnInit {
   }
 
   getVisitByUuid(uuid: string): void {
-    this.intermediateVisit$ = this.visitService.getVisitDetailsByVisitUuid(
-      uuid,
-      {
+    this.intermediateVisit$ = this.visitService
+      .getVisitDetailsByVisitUuid(uuid, {
         v: "custom:(uuid,display,patient,encounters:(uuid,display,obs,orders),attributes)",
-      }
-    );
+      })
+      .pipe(
+        map((response) => {
+          return response;
+        })
+      );
   }
 
   onUpdateOrder(e: Event) {
@@ -372,7 +394,9 @@ export class DispensingFormComponent implements OnInit {
       )
       .subscribe(
         (res) => {
-          if (res?.message) {
+          console.log("==> Drug order service: ", res);
+          this.getVisitByUuid(this.data?.visit?.uuid);
+          if (res?.message || res?.stackTrace) {
             this.savingOrder = false;
             this.errors = [
               ...this.errors,
@@ -413,13 +437,13 @@ export class DispensingFormComponent implements OnInit {
           //   action: 'ORDER_SAVED',
           //   drugOrder: this.savedOrder,
           // });
-          this.store.dispatch(
-            loadActiveVisit({
-              patientId: this.data?.patient
-                ? this.data?.patient?.uuid
-                : this.data?.patientUuid,
-            })
-          );
+          // this.store.dispatch(
+          //   loadActiveVisit({
+          //     patientId: this.data?.patient
+          //       ? this.data?.patient?.uuid
+          //       : this.data?.patientUuid,
+          //   })
+          // );
           // if (this.data?.useGenericPrescription && !res?.message) {
           //   this.dialogRef.close();
           // }
@@ -532,7 +556,7 @@ export class DispensingFormComponent implements OnInit {
     this.updateConsultationOrder.emit();
   }
 
-  onLoadVisit(visit: any){
-    this.getVisitByUuid(visit.uuid)
+  onLoadVisit(visit: any) {
+    this.getVisitByUuid(visit.uuid);
   }
 }

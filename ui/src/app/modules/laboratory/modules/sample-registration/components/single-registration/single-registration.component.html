@@ -37,10 +37,10 @@
         >
           <span> Patient Details </span>
           <span>
-            <mat-icon *ngIf="!patientFieldSetClosed"
+            <mat-icon *ngIf="patientFieldSetClosed"
               >keyboard_arrow_down</mat-icon
             >
-            <mat-icon *ngIf="patientFieldSetClosed">keyboard_arrow_up</mat-icon>
+            <mat-icon *ngIf="!patientFieldSetClosed">keyboard_arrow_up</mat-icon>
           </span>
         </legend>
         <app-person-details
@@ -51,19 +51,21 @@
       </fieldset>
     </div>
     <div class="col-12">
-      <mat-stepper #stepper>
+
+    <!-- ===================================================== Commented Mat Stepper ============================================================================= -->
+      <!-- <mat-stepper #stepper>
         <mat-step errorMessage="Some fields not fed.">
           <ng-template matStepLabel>Sample Information</ng-template>
           <div class="row">
             <div class="col-lg-12 col-md-12 col-sx-12 col-sm-12">
               <div class="for-specimen-details">
                 <fieldset>
-                  <legend>Sample Information</legend>
+                  <legend>Sample Information</legend> -->
                   <!-- <app-sample-label
                     [label]="params?.labSampleLabel"
                     (sampleLabel)="onGetSampleLabel($event)"
                   ></app-sample-label> -->
-                  <app-form
+                  <!-- <app-form
                     [fields]="specimenDetailsFields"
                     [isFormHorizontal]="true"
                     (formUpdate)="onFormUpdate($event, 'specimenDetails')"
@@ -117,9 +119,9 @@
               </div>
             </div>
           </div>
-        </mat-step>
+        </mat-step> -->
 
-        <mat-step
+        <!-- <mat-step
           errorMessage="Some fields not fed."
           *ngIf="registrationCategory === 'Clinical'"
         >
@@ -134,9 +136,9 @@
               </fieldset>
             </div>
           </div>
-        </mat-step>
+        </mat-step> -->
 
-        <mat-step
+        <!-- <mat-step
           errorMessage="Some fields not fed."
           *ngIf="registrationCategory === 'Clinical'"
         >
@@ -153,9 +155,9 @@
               </fieldset>
             </div>
           </div>
-        </mat-step>
+        </mat-step> -->
 
-        <mat-step errorMessage="Some fields not fed.">
+        <!-- <mat-step errorMessage="Some fields not fed.">
           <ng-template matStepLabel>Brought By</ng-template>
           <div>
             <div class="brought-by-field">
@@ -187,11 +189,13 @@
               </fieldset>
             </div>
           </div>
-        </mat-step>
+        </mat-step> -->
 
-        <mat-step errorMessage="Some fields not fed.">
-          <ng-template matStepLabel>Tests</ng-template>
-          <div
+        <!-- <mat-step errorMessage="Some fields not fed.">
+          <ng-template matStepLabel>Tests</ng-template> -->
+          <!-- {{ formData?.specimen?.value }}
+          {{ params?.testsUnderSpecimen | json }} -->
+          <!-- <div
             *ngIf="
               (selectedSpecimenUuid && params?.testsUnderSpecimen) ||
               !selectedSpecimenUuid
@@ -207,8 +211,209 @@
             mode="indeterminate"
           ></mat-progress-bar>
         </mat-step>
-      </mat-stepper>
-    </div>
+      </mat-stepper> -->
+    <!-- ===================================================== Commented Mat Stepper ============================================================================= -->
+        <ng-template matStepLabel>Sample Information</ng-template>
+          <div class="row">
+            <div class="col-lg-12 col-md-12 col-sx-12 col-sm-12">
+              <div class="for-specimen-details">
+                <fieldset>
+                  <legend
+                    (click)="toggleFieldSet('sampleInformation')"
+                    class="d-flex"
+                  >
+                    <span> Sample Information </span>
+                    <span>
+                      <mat-icon *ngIf="!sampleInformation"
+                        >keyboard_arrow_down</mat-icon
+                      >
+                      <mat-icon *ngIf="sampleInformation">keyboard_arrow_up</mat-icon>
+                    </span>
+                  </legend>
+                  <ng-container *ngIf="sampleInformation">
+
+                    <app-form
+                      [fields]="specimenDetailsFields"
+                      [isFormHorizontal]="true"
+                      (formUpdate)="onFormUpdate($event, 'specimenDetails')"
+                    ></app-form>
+  
+                    <div class="row">
+                      <div class="col-4">
+                        <app-form
+                          [fields]="[sampleCollectedByField]"
+                          (formUpdate)="onFormUpdate($event)"
+                        ></app-form>
+                      </div>
+                      <div class="col-4">
+                        <app-form
+                          *ngIf="maxForCollectedOn"
+                          [fields]="[sampleColectionDateField]"
+                          (formUpdate)="onFormUpdate($event)"
+                        ></app-form>
+                      </div>
+                      <div class="col-4">
+                        <input
+                          (change)="getSelectedRCollectedOnTime($event)"
+                          class="time-input-field"
+                          placeholder="Collected At"
+                          type="time"
+                        />
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-4">
+                        <app-form
+                          [fields]="[receivedByField]"
+                          (formUpdate)="onFormUpdate($event)"
+                        ></app-form>
+                      </div>
+                      <div class="col-4">
+                        <app-form
+                        *ngIf="minForReceivedOn"
+                          [fields]="[receivedOnField]"
+                          (formUpdate)="onFormUpdate($event)"
+                        ></app-form>
+                      </div>
+                      <div class="col-4">
+                        <input
+                          (change)="getSelectedReceivedOnTime($event)"
+                          class="time-input-field"
+                          placeholder="Received At"
+                          type="time"
+                        />
+                      </div>
+                    </div>
+                  </ng-container>
+                </fieldset>
+              </div>
+            </div>
+          </div>
+
+        
+          <ng-template matStepLabel>Clinical Data</ng-template>
+          <div>
+            <div class="clinical-data">
+              <fieldset>
+                <legend
+                    (click)="toggleFieldSet('clinicalData')"
+                    class="d-flex"
+                  >
+                    <span> Clinical Data </span>
+                    <span>
+                      <mat-icon *ngIf="!clinicalData"
+                        >keyboard_arrow_down</mat-icon
+                      >
+                      <mat-icon *ngIf="clinicalData">keyboard_arrow_up</mat-icon>
+                    </span>
+                  </legend>
+                  <ng-container *ngIf="clinicalData">
+                    <app-clinical-data
+                      (clinicalDataValues)="onGetClinicalDataValues($event)"
+                    ></app-clinical-data>
+                  </ng-container>
+              </fieldset>
+            </div>
+          </div>
+          <ng-template matStepLabel>Referring Doctor</ng-template>
+          <div>
+            <div class="referring-doctor-field">
+              <fieldset>
+                <legend
+                    (click)="toggleFieldSet('referingDoctor')"
+                    class="d-flex"
+                  >
+                    <span> Refering Doctor </span>
+                    <span>
+                      <mat-icon *ngIf="!referingDoctor"
+                        >keyboard_arrow_down</mat-icon
+                      >
+                      <mat-icon *ngIf="referingDoctor">keyboard_arrow_up</mat-icon>
+                    </span>
+                  </legend>
+                  <ng-container *ngIf="referingDoctor">
+                    <app-form
+                      [isFormHorizontal]="true"
+                      [fields]="referringDoctorFields"
+                      (formUpdate)="onFormUpdate($event)"
+                    ></app-form>
+                  </ng-container>
+              </fieldset>
+            </div>
+          </div>
+
+            <div class="brought-by-field">
+              <fieldset>
+                <legend
+                    (click)="toggleFieldSet('broughtBy')"
+                    class="d-flex"
+                  >
+                    <span> Brought By </span>
+                    <span>
+                      <mat-icon *ngIf="!broughtBy"
+                        >keyboard_arrow_down</mat-icon
+                      >
+                      <mat-icon *ngIf="broughtBy">keyboard_arrow_up</mat-icon>
+                    </span>
+                  </legend>
+                <div class="row" *ngIf="broughtBy">
+                  <div class="col-4">
+                    <app-form
+                      [fields]="[broughtByField]"
+                      (formUpdate)="onFormUpdate($event)"
+                    ></app-form>
+                  </div>
+                  <div class="col-4">
+                    <app-form
+                      [fields]="[broughtOnField]"
+                      (formUpdate)="onFormUpdate($event)"
+                    ></app-form>
+                  </div>
+                  <div class="col-4">
+                    <input
+                      (change)="getSelectedBroughtOnTime($event)"
+                      class="time-input-field"
+                      placeholder="Brought At"
+                      type="time"
+                    />
+                  </div>
+                </div>
+              </fieldset>
+            </div>
+
+          <ng-template matStepLabel>Tests</ng-template>
+          <div
+            *ngIf="
+              (selectedSpecimenUuid && params?.testsUnderSpecimen) ||
+              !selectedSpecimenUuid
+            "
+          >
+          <fieldset>
+              <legend
+                      (click)="toggleFieldSet('tests')"
+                      class="d-flex"
+                    >
+                      <span> Tests </span>
+                      <span>
+                        <mat-icon *ngIf="!tests"
+                          >keyboard_arrow_down</mat-icon
+                        >
+                        <mat-icon *ngIf="tests">keyboard_arrow_up</mat-icon>
+                      </span>
+              </legend>
+              <ng-container *ngIf="tests">
+                <app-multiple-tests-selection
+                  [setMembersFromSpecimen]="params?.testsUnderSpecimen"
+                  (testsData)="onFormUpdateForTest($event)"
+                ></app-multiple-tests-selection>
+              </ng-container>
+          </fieldset>
+          </div>
+          <mat-progress-bar
+            *ngIf="selectedSpecimenUuid && !params?.testsUnderSpecimen"
+            mode="indeterminate"
+          ></mat-progress-bar>
+  </div>
 
     <div class="col-12" *ngIf="savingDataResponse?.error">
       <div *ngIf="savingDataResponse?.error?.error">
@@ -235,14 +440,22 @@
         </div>
       </div>
     </div>
-    <div *ngIf="errorMessage" class="col-12 mt-2 p-3">
+    <div *ngIf="errorMessage" class="col-12 ml-2 mr-2">
       <div class="alert alert-danger" role="alert">
         {{ errorMessage }}
       </div>
     </div>
 
-    <div class="col-12" *ngIf="savingData">
+    <!-- <div class="col-12" *ngIf="savingData">
       <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    </div> -->
+    <div class="loading-overlay" *ngIf="savingData">
+      <div class="text-center">
+        <div>Saving sample...</div>
+        <div class="mt-3 d-flex justify-content-center w-100">
+          <mat-spinner diameter="50" strokeWidth="2"></mat-spinner>
+        </div>
+      </div>
     </div>
     <div class="col-12 d-flex justify-content-end mt-2 mb-2">
       <button mat-flat-button color="primary" (click)="onSave($event, true)">

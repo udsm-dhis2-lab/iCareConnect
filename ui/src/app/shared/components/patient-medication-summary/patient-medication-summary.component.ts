@@ -1,12 +1,22 @@
-import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import {
+  AfterViewInit,
+  Component,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+} from "@angular/core";
+import { FormControl } from "@angular/forms";
 import { MatDialog } from "@angular/material/dialog";
 import { select, Store } from "@ngrx/store";
-import { Observable } from "rxjs";
+import { Observable, zip } from "rxjs";
+import { map } from "rxjs/operators";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { AppState } from "src/app/store/reducers";
 import { getAllUniqueDrugOrders } from "src/app/store/selectors";
 import { getActiveVisit } from "src/app/store/selectors/visit.selectors";
 import { DispensingFormComponent } from "../../dialogs";
+import { DrugOrdersService } from "../../resources/order/services";
 import { OrdersService } from "../../resources/order/services/orders.service";
 import { Visit } from "../../resources/visits/models/visit.model";
 import { VisitsService } from "../../resources/visits/services";
@@ -21,18 +31,23 @@ export class PatientMedicationSummaryComponent implements OnInit {
   @Input() forConsultation: boolean;
   @Input() fromDispensing: boolean;
   @Input() isInpatient: boolean;
-  drugOrders$: Observable<any[]>;
+  @Input() previous: boolean;
+  drugOrders$: Observable<any>;
   patientVisitData$: Observable<any>;
   generalPrescriptionOrderType$: Observable<any>;
   useGeneralPrescription$: Observable<any>;
-  currentVisit$: Observable<unknown>;
+  currentVisit$: Observable<any>;
+
   @Output() updateConsultationOrder = new EventEmitter();
+  patientDrugOrdersStatuses$: Observable<any>;
+  filteredDrugOrders$: Observable<any>;
   constructor(
     private store: Store<AppState>,
     private ordersService: OrdersService,
     private dialog: MatDialog,
     private visitService: VisitsService,
-    private systemSettingsService: SystemSettingsService
+    private systemSettingsService: SystemSettingsService,
+    private drugOrderService: DrugOrdersService
   ) {}
 
   ngOnInit(): void {
@@ -51,9 +66,64 @@ export class PatientMedicationSummaryComponent implements OnInit {
       false,
       true
     );
+
+    if (this.patientVisit) {
+      this.drugOrders$ = this.ordersService
+        .getOrdersByVisitAndOrderType({
+          visit: this.patientVisit?.uuid,
+          orderType: "iCARESTS-PRES-1111-1111-525400e4297f",
+        })
+        .pipe(
+          map((response) => {
+            console.log("==> Drug Orders: ", response);
+            return response;
+          })
+        );
+      this.patientDrugOrdersStatuses$ = this.drugOrderService
+        .getDrugOrderStatus(this.patientVisit?.uuid)
+        .pipe(
+          map((response) => {
+            console.log("==> Drug Order Statuses: ", response);
+            return response;
+          })
+        );
+
+      this.filteredDrugOrders$ = zip(
+        this.drugOrders$,
+        this.patientDrugOrdersStatuses$
+      ).pipe(
+        map((res) => {
+          let drugOrders = res[0];
+          let drugOrdersStatuses = res[1];
+          let toBeDispensedDrugOrders: any[] = [];
+          let dispensedDrugOrders: any[] = [];
+
+          if (drugOrders?.length > 0) {
+            drugOrders?.forEach((drugOrder) => {
+              if (
+                drugOrder?.uuid in drugOrdersStatuses &&
+                drugOrdersStatuses[drugOrder?.uuid]["status"] === "DISPENSED"
+              ) {
+                dispensedDrugOrders = [...dispensedDrugOrders, drugOrder];
+              } else {
+                toBeDispensedDrugOrders = [
+                  ...toBeDispensedDrugOrders,
+                  drugOrder,
+                ];
+              }
+            });
+          }
+
+          return {
+            dispensedDrugOrders: dispensedDrugOrders,
+            toBeDispensedDrugOrders: toBeDispensedDrugOrders,
+          };
+        })
+      );
+    }
   }
 
-  loadVisit(visit?: any){
+  loadVisit(visit?: any) {
     let visitUuid = this.patientVisit?.uuid
       ? this.patientVisit?.uuid
       : visit
@@ -85,6 +155,7 @@ export class PatientMedicationSummaryComponent implements OnInit {
         ],
         fromDispensing: this.fromDispensing,
         showAddButton: false,
+        forConsultation: this.forConsultation,
       },
     });
 

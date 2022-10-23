@@ -24,10 +24,10 @@
           ></app-form>
         </div>
         <div *ngIf="isSet">
-          <div class="h5">
+          <div class="h6">
             {{ setMembersHeaderName }}
           </div>
-          <app-concept-set-members
+          <!-- <app-concept-set-members
             [setMembersSearchTerm]="setMembersSearchTerm"
             [selectedSetMembersItems]="selectedSetMembers"
             [standardSearchTerm]="standardSearchTerm"
@@ -36,7 +36,15 @@
               params?.selectedTestMethodDetails?.setMembers
             "
             (selectedSetMembers)="onGetSelectedSetMembers($event)"
-          ></app-concept-set-members>
+          ></app-concept-set-members> -->
+          <app-multiple-items-selection
+            [items]="[]"
+            [itemType]="'concept'"
+            [standardSearchTerm]="setMembersSearchTerm"
+            [selectedItems]="selectedSetMembers"
+            [multipleSelectionCompHeight]="multipleSelectionCompHeight"
+            (getSelectedItems)="onGetSelectedSetMembers($event)"
+          ></app-multiple-items-selection>
         </div>
       </div>
       <div class="col-lg-6 col-md-6 col-sx-12 col-sm-12">

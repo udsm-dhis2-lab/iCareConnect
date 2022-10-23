@@ -12,6 +12,12 @@
           [attributes]="params?.patientVisit[0]?.visit?.attributesToDisplay"
           [forRegistration]="true"
         ></app-patient-visit-attributes-details>
+        <p *ngIf="ID && !params?.patientVisit[0]">
+          ID:
+          <b>
+            {{ ID }}
+          </b>
+        </p>
         <p
           class="text-center"
           *ngIf="!params?.patientVisit || !params?.patientVisit[0]"

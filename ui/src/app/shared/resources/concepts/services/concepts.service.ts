@@ -32,7 +32,7 @@ export class ConceptsService {
 
   getConceptDetailsByUuid(uuid: string, fields?: string): Observable<any> {
     fields = fields && fields.length > 0 ? "?v=" + fields : "";
-    return this.httpClient.get("concept/" + uuid + fields ).pipe(
+    return this.httpClient.get("concept/" + uuid + fields).pipe(
       map((response) => {
         return {
           ...response,
@@ -50,7 +50,7 @@ export class ConceptsService {
                   };
                 })
               : [],
-          setMembers: (response?.setMembers ? response?.setMembers : []),
+          setMembers: response?.setMembers ? response?.setMembers : [],
         };
       }),
       catchError((error) => {
