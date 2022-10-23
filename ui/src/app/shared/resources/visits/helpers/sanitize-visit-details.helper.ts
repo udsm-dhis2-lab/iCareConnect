@@ -20,32 +20,35 @@ export function getOrdersFromCurrentVisitEncounters(
             order?.orderType?.display?.toLowerCase() === "radiology order"
         ) || [],
         (order) => {
-          const paid = !isEnsured
-            ? false
-            : isEnsured
-            ? true
-            : !bills
-            ? true
-            : !isEnsured && bills && bills?.length === 0
-            ? false
-            : isEnsured && bills && bills?.length === 0
-            ? true
-            : bills && bills?.length === 0
-            ? true
-            : (
-                bills.filter(
-                  (bill) =>
-                    (
-                      bill?.items.filter(
-                        (billItem) =>
-                          billItem?.billItem?.item?.concept?.uuid ===
-                          order?.concept?.uuid
-                      ) || []
-                    )?.length > 0
-                ) || []
-              )?.length > 0
-            ? false
-            : true;
+          const paid =
+            bills?.length == 0
+              ? true
+              : !isEnsured
+              ? false
+              : isEnsured
+              ? true
+              : !bills
+              ? true
+              : !isEnsured && bills && bills?.length === 0
+              ? false
+              : isEnsured && bills && bills?.length === 0
+              ? true
+              : bills && bills?.length === 0
+              ? true
+              : (
+                  bills.filter(
+                    (bill) =>
+                      (
+                        bill?.items.filter(
+                          (billItem) =>
+                            billItem?.billItem?.item?.concept?.uuid ===
+                            order?.concept?.uuid
+                        ) || []
+                      )?.length > 0
+                  ) || []
+                )?.length > 0
+              ? false
+              : true;
 
           const observation = encounter
             ? (encounter?.obs?.filter(
