@@ -38,7 +38,7 @@ export class PersonDetailsComponent implements OnInit {
   personDOBField: any[];
   personFieldsGroupThree: any[];
   identifiersFields: any[];
-  primaryIdentifierFields: any;
+  primaryIdentifierFields: any[];
   showOtherIdentifiers: boolean = false;
   patientUuid: string;
   identifierTypes: any[] = [];
@@ -87,7 +87,7 @@ export class PersonDetailsComponent implements OnInit {
     personDetails?: any,
     patientIdentifier?: string
   ): void {
-    console.log("identifierTypes", identifierTypes);
+    // console.log("identifierTypes", identifierTypes);
     const primaryIdentifiers =
       identifierTypes?.filter(
         (identifier) => identifier?.uniquenessBehavior === "UNIQUE"
@@ -224,7 +224,7 @@ export class PersonDetailsComponent implements OnInit {
       new Dropdown({
         id: "attribute-" + this.referFromFacilityVisitAttribute,
         key: "attribute-" + this.referFromFacilityVisitAttribute,
-        label: "Source/Received From",
+        label: "Location",
         options: [],
         searchControlType: "location",
         searchTerm: "Health Facility",

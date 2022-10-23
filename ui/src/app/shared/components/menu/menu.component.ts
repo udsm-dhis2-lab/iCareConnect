@@ -7,6 +7,7 @@ import {
   addLoadedUserDetails,
   addSessionStatus,
   authenticateUser,
+  go,
   loadAllLocations,
   loadLocationByIds,
   loadLocationsByTagName,
@@ -37,6 +38,7 @@ import { formatCurrentUserDetails } from "src/app/core/helpers";
 import { initiateEncounterType } from "src/app/store/actions/encounter-type.actions";
 import { getLISConfigurations } from "src/app/store/selectors/lis-configurations.selectors";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
+import { OpenmrsHttpClientService } from "../../modules/openmrs-http-client/services/openmrs-http-client.service";
 
 @Component({
   selector: "app-menu",
@@ -63,7 +65,8 @@ export class MenuComponent implements OnInit {
     public dialog: MatDialog,
     private store: Store<AppState>,
     private authService: AuthService,
-    private systemSettingsService: SystemSettingsService
+    private systemSettingsService: SystemSettingsService,
+    private httpClient: OpenmrsHttpClientService
   ) {
     this.store.dispatch(loadLoginLocations()); // This is also a main location
   }
@@ -120,6 +123,9 @@ export class MenuComponent implements OnInit {
     //   console.log("the sess response");
     //   console.log(sessionResponse);
     // });
+    setInterval(() => {
+      this.pingSession();
+    }, 100000);
   }
 
   onRouteHome(e: Event): void {
@@ -159,5 +165,15 @@ export class MenuComponent implements OnInit {
 
   onSupportClose(isOpened): void {
     this.isSupportOpened = isOpened;
+  }
+
+  pingSession(): void {
+    this.httpClient.get(`location?tag=Login+Location`).subscribe((response) => {
+      if (response && !response?.error) {
+        console.warn(response);
+      } else if (response && response?.error) {
+        this.store.dispatch(go({ path: ["login"] }));
+      }
+    });
   }
 }

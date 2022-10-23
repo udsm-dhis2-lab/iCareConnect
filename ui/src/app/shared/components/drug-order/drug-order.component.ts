@@ -73,6 +73,14 @@ export class DrugOrderComponent implements OnInit, AfterViewInit {
   ) {}
 
   ngOnInit() {
+    this.drugOrder = {
+      ...this.drugOrder,
+      formulatedDescription: (
+        Object.keys(this.drugOrder?.obs).map(
+          (key) => this.drugOrder?.obs[key]?.value
+        ) || []
+      )?.join("; "),
+    };
     this.getDrugsByConceptUuid.emit(this.drugOrder?.concept?.uuid);
     this.isTheOrderFromDoctor =
       this.drugOrder && this.drugOrder.drugUuid ? false : true;

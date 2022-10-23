@@ -54,9 +54,12 @@ export class StartVisitModelComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) data
   ) {
     this.patient = data?.patient;
-    this.patient?.person?.attributes.map((attribute) => {
-      if (attribute?.display.split(" = ")[0].toLowerCase() === "phone") {
-        this.patientPhone = attribute?.display.split(" = ")[1];
+    this.patient?.person?.attributes?.map((attribute) => {
+      if (
+        (attribute?.display?.split(" = ") || [])?.length > 0 &&
+        attribute?.display?.split(" = ")[0].toLowerCase() === "phone"
+      ) {
+        this.patientPhone = attribute?.display?.split(" = ")[1];
       }
     });
     this.store.dispatch(

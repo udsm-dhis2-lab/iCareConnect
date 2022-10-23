@@ -1,7 +1,8 @@
-<div>
-  <mat-toolbar color="primary"
-    >Update
-    {{ dialogData?.display ? dialogData?.display : "New Drug" }}</mat-toolbar
+<div *ngIf="{ drugsAvailable: drugsAvailable$ | async } as params">
+  <mat-toolbar color="primary">
+    {{
+      dialogData?.display ? "Update " + dialogData?.display : "New Drug"
+    }}</mat-toolbar
   >
   <div class="p-3">
     <div class="loading-overlay" *ngIf="saving">
@@ -13,10 +14,25 @@
       </div>
     </div>
     <div class="p-3" style="max-height: 50vh; overflow: auto">
-      <app-form
-        [fields]="drugFormFields"
-        (formUpdate)="onFormUpdate($event)"
-      ></app-form>
+      <div>
+        <app-form
+          [fields]="[genericDrugFormField]"
+          (formUpdate)="onFormUpdateForGenericDrug($event)"
+        ></app-form>
+      </div>
+      <div *ngIf="params?.drugsAvailable" style="width: 100%; overflow: auto">
+        <mat-chip-list aria-label="Available Drugs">
+          <mat-chip *ngFor="let availableDrug of params?.drugsAvailable">
+            {{ availableDrug?.display }}
+          </mat-chip>
+        </mat-chip-list>
+      </div>
+      <div>
+        <app-form
+          [fields]="drugFormFields"
+          (formUpdate)="onFormUpdate($event)"
+        ></app-form>
+      </div>
     </div>
     <div *ngIf="errors && errors?.length > 0">
       <app-shared-error [errors]="errors"></app-shared-error>
@@ -28,7 +44,7 @@
       <button mat-stroked-button (click)="onClose($event)">Close</button>
       <button
         mat-flat-button
-        [disabled]="!isFormValid"
+        [disabled]="!isFormValid || !formData?.genericDrug?.value"
         color="primary"
         (click)="onSave($event, dialogData, shouldConfirm)"
         class="ml-2"

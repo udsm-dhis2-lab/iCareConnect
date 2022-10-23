@@ -160,6 +160,17 @@ export class ModulesSelectorComponent implements OnInit {
       };
     }
 
+    this.modulesReferences = orderBy(
+      this.modulesReferences.map((module: any) => {
+        return {
+          ...module,
+          order: module?.app?.order,
+        };
+      }),
+      ["order"],
+      ["asc"]
+    );
+
     this.userLocationsForTheCurrentModule =
       this.locations.filter(
         (location: any) =>

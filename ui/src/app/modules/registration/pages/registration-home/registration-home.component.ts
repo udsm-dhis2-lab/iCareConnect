@@ -126,6 +126,7 @@ export class RegistrationHomeComponent implements OnInit {
       .afterClosed()
       .subscribe((response: { action: string; patient: Patient }) => {
         if (response?.action === "PATIENT_SELECT") {
+          this.store.dispatch(clearActiveVisit());
           this.store.dispatch(
             addCurrentPatient({
               patient: response.patient,
@@ -162,6 +163,7 @@ export class RegistrationHomeComponent implements OnInit {
     if (e) {
       e.stopPropagation();
     }
+    this.store.dispatch(clearActiveVisit());
     this.store.dispatch(
       addCurrentPatient({
         patient: { ...patient["patient"], id: patient["patient"]["uuid"] },

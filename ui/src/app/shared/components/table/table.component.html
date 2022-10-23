@@ -32,21 +32,23 @@
           <tr>
             <td>{{ count + 1 }}</td>
             <td>
-              {{ drugOrder?.drug?.display }}, {{ drugOrder?.instructions }}
+              {{ drugOrder?.drug?.display }} <br> {{ drugOrder?.instructions }}
             </td>
             <td>{{ drugOrder?.orderer?.display }}</td>
             <td>{{ drugOrder?.dateActivated | date: "medium" }}</td>
             <td>{{ drugOrder?.quantity }}</td>
             <td>
               <button
-                [disabled]="
-                  (params?.patientDrugOrdersStatuses &&
-                    params?.patientDrugOrdersStatuses[drugOrder?.uuid] &&
-                    params?.patientDrugOrdersStatuses[drugOrder?.uuid][
-                      'status'
-                    ] === 'DISPENSED') ||
-                  (!drugOrder?.paid && (!params?.activeVisit?.isAdmitted || !params?.activeVisit?.isEnsured || !params?.activeVisit?.isEmergency))
-                "
+                [disabled]="(
+                  params?.patientDrugOrdersStatuses && 
+                  params?.patientDrugOrdersStatuses[drugOrder?.uuid] && 
+                  params?.patientDrugOrdersStatuses[drugOrder?.uuid]['status'] === 'DISPENSED') || 
+                  (
+                    !drugOrder?.paid && 
+                    !params?.activeVisit?.isAdmitted && 
+                    !params?.activeVisit?.isEmergency && 
+                    !params?.activeVisit?.isEnsured
+                  )"
                 mat-flat-button
                 color="primary"
                 class="mt-1 mb-1 mr-1"

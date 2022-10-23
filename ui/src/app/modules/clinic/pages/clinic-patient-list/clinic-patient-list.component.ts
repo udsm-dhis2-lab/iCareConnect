@@ -65,7 +65,7 @@ export class ClinicPatientListComponent implements OnInit {
   onSelectPatient(patient: any) {
     setTimeout(() => {
       this.store.dispatch(
-        go({ path: [`/clinic/dashboard/${patient?.patient?.uuid}`] })
+        go({ path: [`/clinic/patient-dashboard/${patient?.patient?.uuid}`] })
       );
     }, 200);
   }

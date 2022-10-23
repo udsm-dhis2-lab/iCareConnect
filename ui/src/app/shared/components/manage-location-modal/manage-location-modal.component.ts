@@ -7,7 +7,7 @@ import { Textbox } from "../../modules/form/models/text-box.model";
 import { omit } from "lodash";
 import { LocationService } from "src/app/core/services";
 import { Dropdown } from "../../modules/form/models/dropdown.model";
-import { DropdownOption } from "../../modules/form/models/dropdown-option.model";
+import { Observable, of } from "rxjs";
 
 @Component({
   selector: "app-manage-location-modal",
@@ -19,13 +19,18 @@ export class ManageLocationModalComponent implements OnInit {
 
   locationFields: any[] = [];
   serviceConceptsField: any;
+  billingConceptsField: any;
+  formsField: any;
   formValues: any = {};
   isFormValid: boolean;
 
   selectedTags: any = {};
   errorMessage: string;
+  errors: any[];
 
   saving: boolean = false;
+
+  location$: Observable<any>;
   constructor(
     private dialogRef: MatDialogRef<ManageLocationModalComponent>,
     @Inject(MAT_DIALOG_DATA) data,
@@ -35,10 +40,16 @@ export class ManageLocationModalComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.selectedTags[this.dialogData?.locationTag?.uuid] =
-      this.dialogData?.locationTag?.uuid;
+    if (this.dialogData?.location) {
+      this.dialogData?.location?.tags?.forEach((tag) => {
+        this.selectedTags[tag?.uuid] = tag?.uuid;
+      });
+    } else {
+      this.selectedTags[this.dialogData?.locationTag?.uuid] =
+        this.dialogData?.locationTag?.uuid;
+    }
 
-    // if (this.dialogData?.location?.)
+    this.getLocation();
     this.locationFields = [
       new Textbox({
         id: "displayName",
@@ -65,30 +76,44 @@ export class ManageLocationModalComponent implements OnInit {
         attribute?.attributeType?.display?.toLowerCase() === "services"
     ) || [])[0];
 
-    let x: DropdownOption;
-
     this.serviceConceptsField = new Dropdown({
       id: "service",
       key: "service",
-      options: this.dialogData?.edit
-        ? [
-            {
-              key: serviceAttribute?.value,
-              value: serviceAttribute?.value,
-              label: "Test",
-              name: "Test",
-            },
-          ]
-        : [],
+      options: [],
       label: "Service",
       conceptClass: "Service",
       searchControlType: "concept",
-      value: serviceAttribute ? serviceAttribute?.value : null,
+      searchTerm: "ICARE_SERVICE",
+      shouldHaveLiveSearchForDropDownFields: true,
+    });
+
+    this.billingConceptsField = new Dropdown({
+      id: "billingConcept",
+      key: "billingConcept",
+      options: [],
+      label: "Service charge",
+      conceptClass: "Service",
+      searchControlType: "concept",
       searchTerm: "ICARE_CONSULTATION_SERVICE",
       shouldHaveLiveSearchForDropDownFields: true,
     });
 
-    console.log("serviceConceptsField", this.serviceConceptsField);
+    this.formsField = new Dropdown({
+      id: "form",
+      key: "form",
+      options: [],
+      label: "Form",
+      searchControlType: "form",
+      shouldHaveLiveSearchForDropDownFields: true,
+    });
+  }
+
+  getLocation(): void {
+    if (this.dialogData?.location) {
+      this.location$ = this.locationService.getLocationById(
+        this.dialogData?.location?.uuid
+      );
+    }
   }
 
   onCancel(event: Event): void {
@@ -111,7 +136,7 @@ export class ManageLocationModalComponent implements OnInit {
       },
       {
         attributeType: "iCAR7002-UDSM-attr-8efe-a0db56f09676",
-        value: this.formValues["service"]?.value,
+        value: this.formValues["billingConcept"]?.value,
       },
       {
         attributeType: "2c266002-2848-4d2b-bf1f-8b59d81e3f29",
@@ -126,16 +151,25 @@ export class ManageLocationModalComponent implements OnInit {
       attributes: attributes?.filter((attribute) => attribute?.value),
     };
     this.saving = true;
-    this.locationService.createLocation(data).subscribe((response: any) => {
+    this.location$ = of(null);
+    (this.dialogData?.location?.uuid
+      ? this.locationService.updateLocation({
+          ...data,
+          uuid: this.dialogData?.location?.uuid,
+        })
+      : this.locationService.createLocation(data)
+    ).subscribe((response: any) => {
       if (response && !response?.error) {
-        this.errorMessage = null;
+        this.getLocation();
+        this.errors = null;
         this.saving = false;
         setTimeout(() => {
-          this.dialogRef.close();
+          // this.dialogRef.close();
         }, 2000);
       } else {
         this.saving = false;
         this.errorMessage = response?.error?.message;
+        this.errors = [response];
       }
     });
   }
@@ -155,6 +189,9 @@ export class ManageLocationModalComponent implements OnInit {
 
   onFormUpdateForServices(formValues: FormValue): void {
     this.formValues = { ...this.formValues, ...formValues.getValues() };
-    console.log(this.formValues);
+  }
+
+  shouldLoadLocation(): void {
+    this.getLocation();
   }
 }

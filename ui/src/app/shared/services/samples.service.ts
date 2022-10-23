@@ -24,7 +24,9 @@ export class SamplesService {
           dates?.endDate
       )
       .pipe(
-        map((response: any) => response?.results || []),
+        map((response: any) => {
+          return response?.results || [];
+        }),
         catchError((error) => of(error))
       );
   }
@@ -62,19 +64,21 @@ export class SamplesService {
   }
 
   getSampleByStatusCategory(
-    category: string,
+    sampleCategory?: string,
+    testCategory?: string,
     startDate?: any,
     endDate?: any,
     formattingInfo?: any
   ) {
-    category = category ? `?sampleCategory=${category}` : "";
+    testCategory = testCategory ? `?testCategory=${testCategory}` : "";
+    sampleCategory = sampleCategory ? `?testCategory=${sampleCategory}` : "";
     const dates =
-      startDate && endDate && category.length > 0
+      startDate && endDate && (sampleCategory.length > 0 || testCategory.length > 0) 
         ? `&startDate=${startDate}&endDate=${endDate}`
-        : startDate && endDate && category.length === 0
+        : startDate && endDate && testCategory.length === 0 && sampleCategory.length === 0
         ? `?startDate=${startDate}&endDate=${endDate}`
         : "";
-    return this.httpClient.get(BASE_URL + `lab/sample${category}${dates}`).pipe(
+    return this.httpClient.get(BASE_URL + `lab/sample${testCategory}${sampleCategory}${dates}`).pipe(
       map((response: any) => {
         return _.map(response, (sample) => {
           return formatSample(sample, formattingInfo);

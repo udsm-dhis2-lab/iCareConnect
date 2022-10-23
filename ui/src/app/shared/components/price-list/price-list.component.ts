@@ -11,6 +11,7 @@ import { select, Store } from "@ngrx/store";
 import { find } from "lodash";
 import { Observable } from "rxjs";
 import { tap } from "rxjs/operators";
+import { ManageItemPriceComponent } from "src/app/shared/components/manage-item-price/manage-item-price.component";
 import { PaymentScheme } from "src/app/shared/models/payment-scheme.model";
 import { PaymentTypeInterface } from "src/app/shared/models/payment-type.model";
 import { Field } from "src/app/shared/modules/form/models/field.model";
@@ -23,23 +24,22 @@ import {
   loadPricingItems,
   saveItemPrice,
   upsertPricingItem,
-} from "../../../../store/actions/pricing-item.actions";
-import { getItemPriceEntities } from "../../../../store/selectors/item-price.selectors";
+} from "../../../store/actions/pricing-item.actions";
+import { getItemPriceEntities } from "../../../store/selectors/item-price.selectors";
 import {
   getAllPaymentTypes,
   getCurrentPaymentType,
   getPaymentSchemes,
   getPaymentTypeLoadingState,
-} from "../../../../store/selectors/payment-type.selectors";
+} from "../../../store/selectors/payment-type.selectors";
 import {
   getAllPricingItems,
   getPricingItemLoadingState,
-} from "../../../../store/selectors/pricing-item.selectors";
-import { ManageItemPriceComponent } from "../../modals";
-import { ItemPriceInterface } from "../../models/item-price.model";
-import { PricingItemInterface } from "../../models/pricing-item.model";
-import { PricingService } from "../../services";
+} from "../../../store/selectors/pricing-item.selectors";
+import { ItemPriceInterface } from "../../../modules/maintenance/models/item-price.model";
+import { PricingItemInterface } from "../../../modules/maintenance/models/pricing-item.model";
 import { ItemPriceService } from "../../services/item-price.service";
+import { PricingService } from "../../services/pricing.service";
 
 @Component({
   selector: "app-price-list",
