@@ -44,7 +44,6 @@ import { clearActiveVisit } from "src/app/store/actions/visit.actions";
 import { map, tap } from "rxjs/operators";
 import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
 import { PatientService } from "src/app/shared/resources/patient/services/patients.service";
-import { DarRegion } from "src/app/shared/helpers/Patient-Residence-helper";
 import { Field } from "src/app/shared/modules/form/models/field.model";
 @Component({
   selector: "app-registration-add",
@@ -141,7 +140,11 @@ export class RegistrationAddComponent implements OnInit {
   shouldShowMoreInfoForm: boolean = true;
   emergencyRegistration: boolean = false;
   ShowFieldsError = false;
-  selectedIdentifierType: any;
+  selectedIdentifierType: any = {
+    name: "",
+    id: "",
+    format: "",
+  };
   loadingForm: boolean;
   loadingFormError: string;
 
@@ -199,6 +202,7 @@ export class RegistrationAddComponent implements OnInit {
     min: 0,
     placeholder: "Mobile number",
     category: "phoneNumber",
+    // value: this?.editMode ? this    ""
   });
 
   primaryPhoneNumberAreaLeaderFormField: any = new PhoneNumber({
@@ -336,18 +340,18 @@ export class RegistrationAddComponent implements OnInit {
     // );
   }
 
-  onSelectArea(e) {
-    this.patientLocation = DarRegion;
-    if (e) {
-      this.patient.district = this.patientLocation.filter((d) => {
-        return d.STREET === e?.value ? e?.value : e?.target?.value;
-      })[0].DISTRICT;
+  // onSelectArea(e) {
+  //   this.patientLocation = DarRegion;
+  //   if (e) {
+  //     this.patient.district = this.patientLocation.filter((d) => {
+  //       return d.STREET === e?.value ? e?.value : e?.target?.value;
+  //     })[0].DISTRICT;
 
-      this.patient.region = this.patientLocation.filter((d) => {
-        return d.STREET === e?.value ? e?.value : e?.target?.value;
-      })[0].REGION;
-    }
-  }
+  //     this.patient.region = this.patientLocation.filter((d) => {
+  //       return d.STREET === e?.value ? e?.value : e?.target?.value;
+  //     })[0].REGION;
+  //   }
+  // }
 
   onResidenceUpdate(formValues: FormValue): void {
     const residenceValues: any = formValues.getValues();
@@ -419,7 +423,7 @@ export class RegistrationAddComponent implements OnInit {
 
     this.createDistrictAndRegionField();
 
-    this.patientLocation = DarRegion;
+    // this.patientLocation = DarRegion;
 
     this.residenceDetailsLocation$ = this.locationService.getLocationById(
       this.residenceDetailsLocationUuid
@@ -488,12 +492,11 @@ export class RegistrationAddComponent implements OnInit {
                       this.patientInformation?.patient?.identifiers?.filter(
                         (identifier) => {
                           return (
-                            identifier?.identifierType?.uuid ==
+                            identifier?.identifierType?.uuid ===
                             identifierType?.id
                           );
                         }
                       );
-
                     this.patient[identifierType.id] =
                       identifierObject?.length > 0
                         ? identifierObject[0]?.identifier
@@ -522,7 +525,26 @@ export class RegistrationAddComponent implements OnInit {
             this.otherPatientIdentifierTypes = tail(
               this.patientIdentifierTypes
             );
-            // this.selectedIdentifierType.id =
+
+            const otherIdentifierObject =
+              this.patientInformation?.patient?.identifiers?.filter(
+                (identifier) => {
+                  return (
+                    identifier?.identifierType?.uuid !==
+                    "26742868-a38c-4e6a-ac1d-ae283c414c2e"
+                  );
+                }
+              )[0];
+            this.patient["patientType"] =
+              otherIdentifierObject?.identifierType?.display?.split(" ")[0];
+
+            this.selectedIdentifierType.id =
+              otherIdentifierObject?.identifierType?.uuid;
+
+            this.patient[this.selectedIdentifierType?.id] =
+              otherIdentifierObject?.identifier;
+            // this.selectedIdentifierType.id = 6e7203dd-0d6b-4c92-998d-fdc82a71a1b0 sTAFF
+
             //   this.patientInformation?.patient?.identifiers.filter(
             //     (identifier) =>
             //       identifier.identifierType.display === "Student ID" ||
@@ -531,6 +553,13 @@ export class RegistrationAddComponent implements OnInit {
             this.patient.dob =
               this.patientInformation.patient?.person?.birthdate;
             this.dateSet();
+
+            this.primaryPhoneNumberFormField.value =
+              this.patientInformation?.patient?.person?.attributes.filter(
+                (attribute) => {
+                  return attribute.attributeType.display === "phone";
+                }
+              )[0]?.value;
             this.patient = {
               ...this.patient,
               fname: this.patientInformation?.fname
@@ -543,7 +572,8 @@ export class RegistrationAddComponent implements OnInit {
               // this.patientInformation.mname
               //   ? this.patientInformation.mname
               //   : this.patientInformation.patient
-              //   ? this.patientInformation.patient?.person?.names[0]?.middleName
+              //   ? this.patientInformation.patient?.person?.names[0]
+              //       ?.middleName
               //   : "",
               lname: this.patientInformation
                 ? this.patientInformation.lname
@@ -572,23 +602,20 @@ export class RegistrationAddComponent implements OnInit {
                 )[0]?.value,
               cityVillage: this.patientInformation?.cityVillage,
               village: this.patientInformation?.street,
-              district: this.patientLocation.filter((d) => {
-                return d.STREET === this.patientInformation?.cityVillage
-                  ? this.patientInformation?.cityVillage
-                  : this.patientInformation?.street;
-              })[0].DISTRICT,
-              region: this.patientLocation.filter((d) => {
-                return d.STREET === this.patientInformation?.cityVillage
-                  ? this.patientInformation?.cityVillage
-                  : this.patientInformation?.street;
-              })[0].REGION,
+              district:
+                this?.patientInformation?.patient?.person?.preferredAddress
+                  ?.stateProvince,
+              region:
+                this.patientInformation?.patient?.person?.preferredAddress
+                  ?.address1,
               council: this.patientInformation?.council,
               referredFrom: null,
               tribe: this.patientInformation?.tribe,
               maritalStatus:
                 this.patientInformation?.patient?.person?.attributes.filter(
                   (attribute) => {
-                    return attribute.attributeType.display === "maritalStatus";
+                    return;
+                    attribute.attributeType.display === "maritalStatus";
                   }
                 )[0]?.value,
               occupation: null,
@@ -655,7 +682,7 @@ export class RegistrationAddComponent implements OnInit {
                 )[0]?.value,
               Id: this.patientInformation?.relatedPersonId,
             };
-            // console.log("The kinFname: ", this.patient.kinFname);
+
             this.loadingForm = false;
           } else {
             // if (identifiersResponse) {
@@ -714,7 +741,6 @@ export class RegistrationAddComponent implements OnInit {
     const { currentLocation } = params;
     //TODO: validate inputs
     this.ShowFieldsError = false;
-    this.addResidenceArea(this.newArea);
 
     if (this.mandatoryFieldsMissing) {
       this.openSnackBar("Warning: Some mandatory fields are missing", null);
@@ -1105,21 +1131,22 @@ export class RegistrationAddComponent implements OnInit {
       })
     );
   }
-  addResidenceArea(area: string) {
-    if (area?.length > 0) {
-      let areaUpper = area.toUpperCase();
-      const found = DarRegion.some((el) => el.STREET === areaUpper);
-      if (!found)
-        DarRegion.push({
-          REGION: this?.patient?.region ? this?.patient?.region : "",
-          REGIONCODE: null,
-          DISTRICT: this?.patient?.district ? this?.patient?.district : "",
-          DISTRICTCODE: null,
-          WARD: "",
-          WARDCODE: null,
-          STREET: areaUpper,
-          PLACES: "",
-        });
-    }
-  }
+  // addResidenceArea(area: string) {
+  //   if (area?.length > 0) {
+  //     let areaUpper = area.toUpperCase();
+  //     const found = DarRegion.some((el) => el.STREET === areaUpper);
+  //     if (!found) {
+  //       let obj = {
+  //         REGION: this?.patient?.region ? this?.patient?.region : "",
+  //         REGIONCODE: null,
+  //         DISTRICT: this?.patient?.district ? this?.patient?.district : "",
+  //         DISTRICTCODE: null,
+  //         WARD: "",
+  //         WARDCODE: null,
+  //         STREET: areaUpper,
+  //         PLACES: "",
+  //       };
+  //     }
+  //   }
+  // }
 }
