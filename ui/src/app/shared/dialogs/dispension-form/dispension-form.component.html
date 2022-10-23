@@ -18,7 +18,8 @@
     intermediateVisit: intermediateVisit$ | async,
     dispensingLocations: dispensingLocations$ | async,
     genericPrescriptionConceptUuids: genericPrescriptionConceptUuids$ | async,
-    drugOrderConceptDetails: drugOrderConceptDetails$ | async
+    drugOrderConceptDetails: drugOrderConceptDetails$ | async,
+    strengthConceptUuid: strengthConceptUuid$ | async
   } as params"
 >
   <div class="loading-overlay" *ngIf="savingOrder">
@@ -30,7 +31,7 @@
     </div>
   </div>
   <mat-toolbar color="primary">
-    <span>Drug Order </span
+    <span>Patient's Drug Prescription </span
     ><span *ngIf="data?.patient?.display"> - {{ data?.patient?.display }}</span>
     <span class="toolbar-spacer"></span>
     <button mat-icon-button mat-dialog-close matTooltip="close">
@@ -88,7 +89,8 @@
               *ngIf="
                 !params?.useGeneralPrescription ||
                 !params?.dispensingLocations ||
-                !params?.drugOrderConceptDetails
+                !params?.drugOrderConceptDetails ||
+                !params?.strengthConceptUuid
               "
               mode="indeterminate"
             ></mat-progress-bar>
@@ -113,7 +115,8 @@
                 params?.generalPrescriptionDurationConcept &&
                 params?.generalPrescriptionDoseConcept &&
                 params?.generalPrescriptionFrequencyConcept &&
-                params?.genericPrescriptionConceptUuids
+                params?.genericPrescriptionConceptUuids &&
+                params?.strengthConceptUuid
               "
             >
               <app-general-dispension-form
@@ -155,6 +158,7 @@
                   params?.genericPrescriptionConceptUuids
                 "
                 [conceptFields$]="conceptFields$"
+                [strengthConceptUuid]="params?.strengthConceptUuid"
                 (updateConsultationOrder)="onUpdateConsultationOrder()"
                 (orderSaved)="onOrderSaved($event, params?.currentVisit)"
               ></app-general-dispension-form>
@@ -185,7 +189,14 @@
               <mat-accordion>
                 <mat-expansion-panel class="mb-2 border p-0" [expanded]="true">
                   <mat-expansion-panel-header>
-                    <mat-panel-title> Drug </mat-panel-title>
+                    <mat-panel-title>
+                      Drug:
+                      <span
+                        style="color: #2a8fd1"
+                        class="ml-2"
+                        [innerHtml]="genericDrugPrescription"
+                      ></span
+                    ></mat-panel-title>
                   </mat-expansion-panel-header>
                   <div>
                     <app-drug-order

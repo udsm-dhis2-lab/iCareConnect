@@ -125,7 +125,7 @@ export class MenuComponent implements OnInit {
     // });
     setInterval(() => {
       this.pingSession();
-    }, 10000);
+    }, 100000);
   }
 
   onRouteHome(e: Event): void {

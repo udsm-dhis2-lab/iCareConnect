@@ -1,5 +1,7 @@
 import { Component, Inject, OnInit } from "@angular/core";
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
+import { Observable } from "rxjs";
+import { map } from "rxjs/operators";
 import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
 import { Field } from "src/app/shared/modules/form/models/field.model";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
@@ -17,10 +19,13 @@ export class ManageDrugModalComponent implements OnInit {
   shouldConfirm: boolean;
 
   drugFormFields: Field<string>[];
+  genericDrugFormField: Field<string>;
   formData: any = {};
   isFormValid: boolean = false;
   saving: boolean = false;
   errors: any[];
+
+  drugsAvailable$: Observable<any[]>;
   constructor(
     private dialogRef: MatDialogRef<ManageDrugModalComponent>,
     @Inject(MAT_DIALOG_DATA) data,
@@ -30,7 +35,22 @@ export class ManageDrugModalComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.createGenericDrugField(this.dialogData);
     this.createDrugsFormField(this.dialogData);
+  }
+
+  createGenericDrugField(data): void {
+    this.genericDrugFormField = new Dropdown({
+      id: "genericDrug",
+      key: "genericDrug",
+      label: "Generic Drug",
+      value: data && data?.concept?.uuid ? data?.concept?.uuid : null,
+      required: true,
+      shouldHaveLiveSearchForDropDownFields: true,
+      options: [],
+      conceptClass: "Drug",
+      searchControlType: "concept",
+    });
   }
 
   createDrugsFormField(data?: any): void {
@@ -49,17 +69,6 @@ export class ManageDrugModalComponent implements OnInit {
         label: "Description",
         value: data && data?.description ? data?.description : null,
         required: false,
-      }),
-      new Dropdown({
-        id: "genericDrug",
-        key: "genericDrug",
-        label: "Generic Drug",
-        value: data && data?.concept?.uuid ? data?.concept?.uuid : null,
-        required: true,
-        shouldHaveLiveSearchForDropDownFields: true,
-        options: [],
-        conceptClass: "Drug",
-        searchControlType: "concept",
       }),
       new Textbox({
         id: "strength",
@@ -87,13 +96,11 @@ export class ManageDrugModalComponent implements OnInit {
         combination: false,
         description: this.formData?.description?.value,
       };
-      console.log("dsdsd", data);
       (this.dialogData?.uuid
         ? this.drugService.updateDrug(drug?.uuid, { uuid: drug?.uuid, ...data })
         : this.drugService.createDrug(data)
       ).subscribe((response: any) => {
         if (response && !response?.error) {
-          console.log(response);
           this.shouldConfirm = false;
           this.saving = false;
           setTimeout(() => {
@@ -112,5 +119,13 @@ export class ManageDrugModalComponent implements OnInit {
   onFormUpdate(formValue: FormValue): void {
     this.formData = formValue.getValues();
     this.isFormValid = formValue.isValid;
+  }
+
+  onFormUpdateForGenericDrug(formValue: FormValue): void {
+    this.formData = formValue.getValues();
+    this.isFormValid = formValue.isValid;
+    this.drugsAvailable$ = this.drugService
+      .getDrugsUsingConceptUuid(this.formData?.genericDrug?.value)
+      .pipe(map((response) => response?.results || []));
   }
 }

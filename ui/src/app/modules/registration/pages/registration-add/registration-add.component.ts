@@ -368,10 +368,11 @@ export class RegistrationAddComponent implements OnInit {
         residenceValues?.residenceArea?.value?.parentLocation?.parentLocation?.display;
       this.createDistrictAndRegionField({
         district:
-          residenceValues?.residenceArea?.value?.parentLocation?.display,
-        region:
           residenceValues?.residenceArea?.value?.parentLocation?.parentLocation
             ?.display,
+        region:
+          residenceValues?.residenceArea?.value?.parentLocation?.parentLocation
+            ?.parentLocation?.display,
       });
     }
   }
