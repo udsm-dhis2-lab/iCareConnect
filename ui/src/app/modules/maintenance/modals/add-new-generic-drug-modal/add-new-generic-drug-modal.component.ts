@@ -1,5 +1,6 @@
-import { Component, OnInit } from "@angular/core";
-import { MatDialogRef } from "@angular/material/dialog";
+import { Component, Inject, OnInit } from "@angular/core";
+import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
+import { omit } from "lodash";
 import { Observable } from "rxjs";
 import { ConceptSourcesService } from "src/app/core/services/concept-sources.service";
 import { ConceptsService } from "src/app/shared/resources/concepts/services/concepts.service";
@@ -23,14 +24,27 @@ export class AddNewGenericDrugModalComponent implements OnInit {
   saving: boolean = false;
   savingMessage: string;
   shouldConfirm: boolean = false;
+
+  dialogData: any;
+  conceptDetails$: Observable<any>;
   constructor(
     private dialogRef: MatDialogRef<AddNewGenericDrugModalComponent>,
     private conceptSourceService: ConceptSourcesService,
-    private conceptService: ConceptsService
-  ) {}
+    private conceptService: ConceptsService,
+    @Inject(MAT_DIALOG_DATA) data
+  ) {
+    this.dialogData = data;
+  }
 
   ngOnInit(): void {
     this.conceptSources$ = this.conceptSourceService.getConceptSources();
+    if (this.dialogData?.uuid) {
+      this.conceptUuid = this.dialogData?.uuid;
+      this.conceptDetails$ = this.conceptService.getConceptDetailsByUuid(
+        this.dialogData?.uuid,
+        "custom:(uuid,names,display,conceptClass,descriptions,setMembers:(uuid,display),mappings)"
+      );
+    }
   }
 
   onClose(event: Event): void {
@@ -60,7 +74,7 @@ export class AddNewGenericDrugModalComponent implements OnInit {
               ? this.conceptService.createConcept(this.conceptToCreate)
               : this.conceptService.updateConcept(
                   this.conceptUuid,
-                  this.conceptToCreate
+                  omit(this.conceptToCreate, "descriptions")
                 )
             ).subscribe((response: any) => {
               if (response && !response?.error) {
@@ -80,6 +94,18 @@ export class AddNewGenericDrugModalComponent implements OnInit {
 
   onGetConceptToCreate(conceptToCreate: any): void {
     let names = [];
+
+    const conceptMapType = "35543629-7d8c-11e1-909d-c80aa9edcf4e";
+
+    let mappings =
+      conceptToCreate?.codes && conceptToCreate?.codes?.length > 0
+        ? conceptToCreate?.codes?.map((item) => {
+            return {
+              conceptReferenceTerm: item?.uuid,
+              conceptMapType,
+            };
+          })
+        : [];
     this.conceptName = conceptToCreate?.name?.value;
     let searchIndexedTerms = [
       {
@@ -111,9 +137,10 @@ export class AddNewGenericDrugModalComponent implements OnInit {
         ? this.dataType
         : conceptToCreate?.datatype?.value,
       // Softcode concept class
-      set: false,
+      set: true,
+      setMembers: conceptToCreate?.setMembers?.map((member) => member?.uuid),
       conceptClass: this.conceptClass,
-      mappings: [],
+      mappings: mappings,
     };
   }
 }

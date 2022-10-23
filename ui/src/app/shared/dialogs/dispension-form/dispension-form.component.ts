@@ -73,6 +73,7 @@ export class DispensingFormComponent implements OnInit {
   conceptFields$: Observable<any>;
   genericPrescriptionConceptUuids$: Observable<any>;
   drugOrderConceptDetails$: Observable<ConceptGet>;
+  strengthConceptUuid$: Observable<string>;
 
   constructor(
     private drugOrderService: DrugOrdersService,
@@ -116,6 +117,19 @@ export class DispensingFormComponent implements OnInit {
     );
   }
 
+  get genericDrugPrescription(): string {
+    return this.data?.drugOrder?.obs
+      ? "<b>" +
+          this.data?.drugOrder?.concept?.display +
+          "</b> " +
+          (
+            Object.keys(this.data?.drugOrder?.obs).map(
+              (key) => this.data?.drugOrder?.obs[key]?.value
+            ) || []
+          ).join("; ")
+      : "";
+  }
+
   ngOnInit() {
     this.getVisitByUuid(this.data?.visit?.uuid);
     this.drugOrder = this.data?.drugOrder;
@@ -125,6 +139,11 @@ export class DispensingFormComponent implements OnInit {
         map((response) => {
           return response;
         })
+      );
+
+    this.strengthConceptUuid$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        "iCare.clinic.genericPrescription.strength.1"
       );
 
     this.generalPrescriptionEncounterType$ = this.systemSettingsService
@@ -316,14 +335,15 @@ export class DispensingFormComponent implements OnInit {
   }
 
   getVisitByUuid(uuid: string): void {
-    this.intermediateVisit$ = this.visitService.getVisitDetailsByVisitUuid(
-      uuid,
-      {
+    this.intermediateVisit$ = this.visitService
+      .getVisitDetailsByVisitUuid(uuid, {
         v: "custom:(uuid,display,patient,encounters:(uuid,display,obs,orders),attributes)",
-      }
-    ).pipe(map((response) => {
-      return response
-    }));
+      })
+      .pipe(
+        map((response) => {
+          return response;
+        })
+      );
   }
 
   onUpdateOrder(e: Event) {
@@ -374,7 +394,7 @@ export class DispensingFormComponent implements OnInit {
       )
       .subscribe(
         (res) => {
-          console.log("==> Drug order service: ", res)
+          console.log("==> Drug order service: ", res);
           this.getVisitByUuid(this.data?.visit?.uuid);
           if (res?.message || res?.stackTrace) {
             this.savingOrder = false;
@@ -410,7 +430,7 @@ export class DispensingFormComponent implements OnInit {
                   return error;
                 },
               });
-            }
+          }
           this.savingOrderSuccess = true;
           this.savedOrder = new DrugOrder(res);
           // this.dialogRef.close({

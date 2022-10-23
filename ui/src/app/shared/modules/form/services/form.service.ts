@@ -219,6 +219,23 @@ export class FormService {
         })
       ).pipe(
         map((response) => {
+          // TODO: Remove the hardcoded 'village' by creating a new location API that respondto search and tag together
+          return (
+            response?.results?.filter(
+              (village: any) =>
+                village?.display?.toLowerCase()?.indexOf("village") > -1
+            ) || []
+          );
+        })
+      );
+    } else if (searchControlType === "form") {
+      return from(
+        this.api.form.getAllForms({
+          q: parameters?.q ? parameters?.q : null,
+          v: parameters?.v,
+        })
+      ).pipe(
+        map((response) => {
           return response?.results || [];
         })
       );

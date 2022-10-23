@@ -2,10 +2,21 @@
   <p class="person-address" *ngIf="personDetails">
     <span>
       Address:
-      <b *ngIf="personDetails?.preferredAddress?.cityVillage">
-        {{ personDetails?.preferredAddress?.cityVillage }}
+      <b *ngIf="personDetails?.addresses">
+        {{
+          personDetails?.addresses[0]
+            ? personDetails?.addresses[0]?.address1
+              ? personDetails?.addresses[0]?.address1 + ", "
+              : "" +
+                personDetails?.addresses[0]?.address2 +
+                ", " +
+                personDetails?.addresses[0]?.address3 +
+                ", " +
+                personDetails?.addresses[0]?.address4
+            : " - "
+        }}
       </b>
-      <span *ngIf="!personDetails?.preferredAddress?.cityVillage"> - </span>
+      <span *ngIf="personDetails?.addresses?.length === 0"> - </span>
     </span>
   </p>
 </div>

@@ -277,7 +277,14 @@ export class LocationService {
 
   createLocation(data: any): Observable<LocationCreate> {
     return from(this.api.location.createLocation(data)).pipe(
-      map((response) => response?.results),
+      map((response) => response),
+      catchError((error) => of(error))
+    );
+  }
+
+  updateLocation(data: any): Observable<LocationCreate> {
+    return from(this.api.location.updateLocation(data?.uuid, data)).pipe(
+      map((response) => response),
       catchError((error) => of(error))
     );
   }
