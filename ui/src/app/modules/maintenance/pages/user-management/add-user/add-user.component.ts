@@ -76,13 +76,12 @@ export class AddUserComponent implements OnInit {
   shouldCreateProvider: boolean = false;
   genderValues = [
     { code: "F", value: "F", display: "Female" },
-    { code: "M", value: "M", display: "Female" },
+    { code: "M", value: "M", display: "Male" },
   ];
 
-  gender: { Female: string; Male: string; Unknown: string } = {
+  gender: { Female: string; Male: string } = {
     Female: "F",
     Male: "M",
-    Unknown: "U",
   };
   currentDataAvailable: RoleCreate[];
   passwordFocusOut: Boolean = false;
@@ -366,6 +365,7 @@ export class AddUserComponent implements OnInit {
         ),
       },
       username: data?.username,
+      systemId: data?.username,
       password: data?.password,
       roles: this.selectedRoles,
       person,
