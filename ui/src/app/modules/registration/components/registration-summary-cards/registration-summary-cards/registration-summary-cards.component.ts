@@ -19,6 +19,8 @@ export class RegistrationSummaryCardsComponent implements OnInit {
 
   routeToPatientsListByLocation(event: Event, location): void {
     event.stopPropagation();
-    this.store.dispatch(go({ path: [`/registration/list/${location?.uuid}`] }));
+    this.store.dispatch(
+      go({ path: [`/registration/patients-list/location/${location?.uuid}`] })
+    );
   }
 }

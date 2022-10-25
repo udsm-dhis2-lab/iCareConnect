@@ -3,7 +3,10 @@ import { MatDialog } from "@angular/material/dialog";
 import { MatRadioChange } from "@angular/material/radio";
 import * as moment from "moment";
 import { Observable, zip } from "rxjs";
-import { NON_CLINICAL_PERSON_DATA } from "src/app/core/constants/non-clinical-person.constant";
+import {
+  EQA_PERSON_DATA,
+  NON_CLINICAL_PERSON_DATA,
+} from "src/app/core/constants/non-clinical-person.constant";
 import {
   determineIfAtLeastOneTestHasNoDepartment,
   formulateSamplesByDepartments,
@@ -69,7 +72,7 @@ export class SingleRegistrationComponent implements OnInit {
 
   patientFieldSetClosed: boolean = false;
 
-  registrationCategory: string = "Clinical";
+  registrationCategory: string = "CLINICAL";
 
   receivedOnField: any;
   receivedByField: any;
@@ -252,7 +255,7 @@ export class SingleRegistrationComponent implements OnInit {
     return `${maxDate.getFullYear()}-${maxMonth}-${maxDay}`;
   }
 
-  getDateStringFromDate(date){
+  getDateStringFromDate(date) {
     let month =
       (date.getMonth() + 1).toString().length > 1
         ? date.getMonth() + 1
@@ -283,14 +286,14 @@ export class SingleRegistrationComponent implements OnInit {
     this.broughtOnField = new DateField({
       id: "broughtOn",
       key: "broughtOn",
-      label: "Brought On",
+      label: "Delivered On",
       max: this.maximumDate,
     });
 
     this.broughtByField = new Textbox({
       id: "broughtBy",
       key: "broughtBy",
-      label: "Brought By",
+      label: "Delivered By",
     });
   }
 
@@ -341,7 +344,7 @@ export class SingleRegistrationComponent implements OnInit {
       new Date(formValues.getValues()?.collectedOn?.value)
     );
     let received_on_date;
-    if (formValues.getValues()?.receivedOn?.value){
+    if (formValues.getValues()?.receivedOn?.value) {
       received_on_date = this.getDateStringFromDate(
         new Date(formValues.getValues()?.receivedOn?.value)
       );
@@ -349,12 +352,12 @@ export class SingleRegistrationComponent implements OnInit {
     this.minForReceivedOn = false;
     this.receivedOnField.min = collected_on_date;
     this.minForReceivedOn = true;
-    if(received_on_date){
+    if (received_on_date) {
       this.maxForCollectedOn = false;
       this.sampleColectionDateField.max = received_on_date;
     }
     this.maxForCollectedOn = true;
-    
+
     // this.getDateStringFromMoment_i();
     this.formData = { ...this.formData, ...formValues.getValues() };
     if (
@@ -426,8 +429,10 @@ export class SingleRegistrationComponent implements OnInit {
 
   onGetPersonDetails(personDetails: any): void {
     this.personDetailsData =
-      this.registrationCategory === "Clinical"
+      this.registrationCategory === "CLINICAL"
         ? personDetails
+        : this.registrationCategory === "EQA"
+        ? EQA_PERSON_DATA
         : NON_CLINICAL_PERSON_DATA;
   }
 
@@ -461,8 +466,10 @@ export class SingleRegistrationComponent implements OnInit {
     }
 
     this.personDetailsData =
-      this.registrationCategory === "Clinical"
+      this.registrationCategory === "CLINICAL"
         ? this.personDetailsData
+        : this.registrationCategory === "EQA"
+        ? EQA_PERSON_DATA
         : NON_CLINICAL_PERSON_DATA;
     if (this.testOrders?.length === 0) {
       this.errorMessage = "No test has been selected";
@@ -519,6 +526,8 @@ export class SingleRegistrationComponent implements OnInit {
                           addresses: [
                             {
                               address1: this.personDetailsData?.address,
+                              address2: this.personDetailsData?.address,
+                              address3: this.personDetailsData?.address,
                               cityVillage: "",
                               country: "",
                               postalCode: "",
@@ -527,7 +536,7 @@ export class SingleRegistrationComponent implements OnInit {
                           attributes: [],
                         },
                         identifiers:
-                          this.registrationCategory === "Clinical"
+                          this.registrationCategory === "CLINICAL"
                             ? (patientIdentifierTypes || [])
                                 .map((personIdentifierType) => {
                                   if (
@@ -608,7 +617,7 @@ export class SingleRegistrationComponent implements OnInit {
                               },
                             ];
 
-                            if (this.registrationCategory === "Clinical") {
+                            if (this.registrationCategory === "CLINICAL") {
                               const personDataAttributeKeys =
                                 Object.keys(this.personDetailsData).filter(
                                   (key) => key.indexOf("attribute-") === 0
@@ -904,21 +913,24 @@ export class SingleRegistrationComponent implements OnInit {
                                                                           "RECEIVED_ON",
                                                                         status:
                                                                           "RECEIVED_ON",
-                                                                        timestamp: `${moment(
-                                                                          this
-                                                                            .formData[
-                                                                            "receivedOn"
-                                                                          ]
-                                                                            ?.value
-                                                                        ).format(
-                                                                          "YYYY-MM-DD"
-                                                                        )} ${
-                                                                          this
-                                                                            .formData[
-                                                                            "receivedAt"
-                                                                          ]
-                                                                            ?.value
-                                                                        }:00.001`,
+                                                                        timestamp:
+                                                                          new Date(
+                                                                            `${moment(
+                                                                              this
+                                                                                .formData[
+                                                                                "receivedOn"
+                                                                              ]
+                                                                                ?.value
+                                                                            ).format(
+                                                                              "YYYY-MM-DD"
+                                                                            )}T${
+                                                                              this
+                                                                                .formData[
+                                                                                "receivedAt"
+                                                                              ]
+                                                                                ?.value
+                                                                            }:00.001Z`
+                                                                          ).getTime(),
                                                                       };
                                                                     statuses = [
                                                                       ...statuses,
@@ -981,19 +993,35 @@ export class SingleRegistrationComponent implements OnInit {
                                                                         "RECEIVED_BY",
                                                                       status:
                                                                         "RECEIVED_BY",
-                                                                      timestamp: `${moment(
-                                                                        this
-                                                                          .formData[
-                                                                          "receivedOn"
-                                                                        ]?.value
-                                                                      ).format(
-                                                                        "YYYY-MM-DD"
-                                                                      )} ${
-                                                                        this
-                                                                          .formData[
-                                                                          "receivedAt"
-                                                                        ]?.value
-                                                                      }:00.001`,
+                                                                      timestamp:
+                                                                        new Date(
+                                                                          (this
+                                                                            .formData[
+                                                                            "receivedOn"
+                                                                          ]
+                                                                            ?.value
+                                                                            ? `${moment(
+                                                                                this
+                                                                                  .formData[
+                                                                                  "receivedOn"
+                                                                                ]
+                                                                                  ?.value
+                                                                              ).format(
+                                                                                "YYYY-MM-DD"
+                                                                              )}`
+                                                                            : formatDateToYYMMDD(
+                                                                                new Date()
+                                                                              )
+                                                                          ).toString() +
+                                                                            "T" +
+                                                                            (this
+                                                                              .formData[
+                                                                              "receivedAt"
+                                                                            ]
+                                                                              ?.value
+                                                                              ? `${this.formData["receivedAt"]?.value}:00.001`
+                                                                              : "00:00:00:001Z")
+                                                                        ).getTime(),
                                                                     };
                                                                   statuses = [
                                                                     ...statuses,
@@ -1031,32 +1059,34 @@ export class SingleRegistrationComponent implements OnInit {
                                                                         status:
                                                                           "COLLECTED_BY",
                                                                         timestamp:
-                                                                          (this
-                                                                            .formData[
-                                                                            "collectedOn"
-                                                                          ]
-                                                                            ?.value
-                                                                            ? `${moment(
-                                                                                this
-                                                                                  .formData[
-                                                                                  "collectedOn"
-                                                                                ]
-                                                                                  ?.value
-                                                                              ).format(
-                                                                                "YYYY-MM-DD"
-                                                                              )}`
-                                                                            : formatDateToYYMMDD(
-                                                                                new Date()
-                                                                              )
-                                                                          ).toString() +
-                                                                          " " +
-                                                                          (this
-                                                                            .formData[
-                                                                            "collectedAt"
-                                                                          ]
-                                                                            ?.value
-                                                                            ? `${this.formData["collectedAt"]?.value}:00.001`
-                                                                            : "00:00:00:001"),
+                                                                          new Date(
+                                                                            (this
+                                                                              .formData[
+                                                                              "collectedOn"
+                                                                            ]
+                                                                              ?.value
+                                                                              ? `${moment(
+                                                                                  this
+                                                                                    .formData[
+                                                                                    "collectedOn"
+                                                                                  ]
+                                                                                    ?.value
+                                                                                ).format(
+                                                                                  "YYYY-MM-DD"
+                                                                                )}`
+                                                                              : formatDateToYYMMDD(
+                                                                                  new Date()
+                                                                                )
+                                                                            ).toString() +
+                                                                              "T" +
+                                                                              (this
+                                                                                .formData[
+                                                                                "collectedAt"
+                                                                              ]
+                                                                                ?.value
+                                                                                ? `${this.formData["collectedAt"]?.value}:00.001`
+                                                                                : "00:00:00:001Z")
+                                                                          ).getTime(),
                                                                       };
                                                                     statuses = [
                                                                       ...statuses,
@@ -1065,13 +1095,18 @@ export class SingleRegistrationComponent implements OnInit {
                                                                   }
 
                                                                   if (
-                                                                    this
+                                                                    (this
                                                                       .formData[
                                                                       "broughtBy"
                                                                     ]?.value ||
+                                                                      this
+                                                                        .formData[
+                                                                        "broughtOn"
+                                                                      ]
+                                                                        ?.value) &&
                                                                     this
                                                                       .formData[
-                                                                      "broughtOn"
+                                                                      "broughtAt"
                                                                     ]?.value
                                                                   ) {
                                                                     const broughtdByStatus =
@@ -1095,37 +1130,65 @@ export class SingleRegistrationComponent implements OnInit {
                                                                         status:
                                                                           "BROUGHT_BY",
                                                                         timestamp:
-                                                                          (this
-                                                                            .formData[
-                                                                            "broughtOn"
-                                                                          ]
-                                                                            ?.value
-                                                                            ? `${moment(
-                                                                                this
-                                                                                  .formData[
-                                                                                  "broughtOn"
-                                                                                ]
-                                                                                  ?.value
-                                                                              ).format(
-                                                                                "YYYY-MM-DD"
-                                                                              )}`
-                                                                            : formatDateToYYMMDD(
-                                                                                new Date()
-                                                                              )) +
-                                                                          " " +
-                                                                          (this
-                                                                            .formData[
-                                                                            "broughtAt"
-                                                                          ]
-                                                                            ?.value
-                                                                            ? `${this.formData["broughtAt"]?.value}:00.001`
-                                                                            : "00:00:00:001"),
+                                                                          new Date(
+                                                                            (this
+                                                                              .formData[
+                                                                              "broughtOn"
+                                                                            ]
+                                                                              ?.value
+                                                                              ? `${moment(
+                                                                                  this
+                                                                                    .formData[
+                                                                                    "broughtOn"
+                                                                                  ]
+                                                                                    ?.value
+                                                                                ).format(
+                                                                                  "YYYY-MM-DD"
+                                                                                )}`
+                                                                              : formatDateToYYMMDD(
+                                                                                  new Date()
+                                                                                )) +
+                                                                              "T" +
+                                                                              (this
+                                                                                .formData[
+                                                                                "broughtAt"
+                                                                              ]
+                                                                                ?.value
+                                                                                ? `${this.formData["broughtAt"]?.value}:00.001`
+                                                                                : "00:00:00:001Z")
+                                                                          ).getTime(),
                                                                       };
                                                                     statuses = [
                                                                       ...statuses,
                                                                       broughtdByStatus,
                                                                     ];
                                                                   }
+
+                                                                  statuses = [
+                                                                    ...statuses,
+                                                                    {
+                                                                      sample: {
+                                                                        uuid: sampleResponse?.uuid,
+                                                                      },
+                                                                      user: {
+                                                                        uuid: localStorage.getItem(
+                                                                          "userUuid"
+                                                                        ),
+                                                                      },
+                                                                      category:
+                                                                        "SAMPLE_REGISTRATION_CATEGORY",
+                                                                      remarks:
+                                                                        "Sample registration form type reference",
+                                                                      status:
+                                                                        this
+                                                                          .registrationCategory,
+                                                                    },
+                                                                  ];
+
+                                                                  console.log(
+                                                                    "statuses",
+                                                                    statuses
+                                                                  );
 
                                                                   if (
                                                                     statuses?.length >
@@ -1288,22 +1351,21 @@ export class SingleRegistrationComponent implements OnInit {
     switch (fieldName) {
       case "sampleInformation":
         this.sampleInformation = !this.sampleInformation;
-        break
+        break;
       case "clinicalData":
-        this.clinicalData =!this.clinicalData
-        break
+        this.clinicalData = !this.clinicalData;
+        break;
       case "referingDoctor":
-        this.referingDoctor =!this.referingDoctor;
-        break
+        this.referingDoctor = !this.referingDoctor;
+        break;
       case "broughtBy":
-        this.broughtBy =!this.broughtBy;
-        break
+        this.broughtBy = !this.broughtBy;
+        break;
       case "tests":
-        this.tests =!this.tests;
-        break
+        this.tests = !this.tests;
+        break;
       default:
         break;
-
     }
   }
 

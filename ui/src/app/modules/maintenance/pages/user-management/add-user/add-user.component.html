@@ -543,9 +543,9 @@
                 color="primary"
                 style="max-width: 160px"
                 (click)="unAssignAll()"
-                [disabled]="selectedRoles.length === 0"
+                [disabled]="selectedRoles?.length === 0"
               >
-                <span>← REMOVE ALL ({{ selectedRoles.length }})</span>
+                <span>← REMOVE ALL ({{ selectedRoles?.length }})</span>
               </button>
             </div>
           </div>
