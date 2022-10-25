@@ -223,9 +223,45 @@ export class FormService {
           return (
             response?.results?.filter(
               (village: any) =>
-                village?.display?.toLowerCase()?.indexOf("village") > -1
+                village?.display?.toLowerCase()?.indexOf("village") > -1 ||
+                village?.display?.toLowerCase()?.indexOf("street") > -1
             ) || []
           );
+        })
+      );
+    } else if (searchControlType === "healthFacility") {
+      return from(
+        this.api.location.getAllLocations({
+          q: parameters?.q ? parameters?.q : null,
+          v: parameters?.v,
+        })
+      ).pipe(
+        map((response) => {
+          console.log(response);
+          return (
+            response?.results?.filter(
+              (village: any) =>
+                village?.display?.toLowerCase()?.indexOf("dispensary") > -1 ||
+                village?.display?.toLowerCase()?.indexOf("hospital") > -1 ||
+                village?.display?.toLowerCase()?.indexOf("health") > -1 ||
+                village?.display?.toLowerCase()?.indexOf("clinic") > -1
+            ) || []
+          )?.map((location: any) => {
+            return {
+              ...location,
+              display:
+                location?.display + location?.parentLocation &&
+                location?.parentLocation?.parentLocation
+                  ? "(" +
+                    location?.parentLocation?.parentLocation?.display +
+                    " - " +
+                    location?.parentLocation?.parentLocation?.parentLocation
+                    ? location?.parentLocation?.parentLocation?.parentLocation
+                        ?.display
+                    : "" + ")"
+                  : "",
+            };
+          });
         })
       );
     } else if (searchControlType === "form") {
