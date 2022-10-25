@@ -1,21 +1,27 @@
 <div
   class="login-container icare__bg-primary"
-  *ngIf="{ authenticationLoading: authenticationLoading$ | async } as params"
->
+  *ngIf="{ 
+    authenticationLoading: authenticationLoading$ | async, 
+    parentLocation: parentLocation$ | async 
+  } as params
+  "> 
   <div class="login-content">
     <div class="page-description">
       <div class="h3 font-weight-bold">
-        <div *ngIf="(parentLocation$ | async)?.name">
-          {{ (parentLocation$ | async)?.name }}
+        <div *ngIf="params?.parentLocation?.name">
+          {{ params?.parentLocation?.name }}
         </div>
         <mat-progress-bar
-          *ngIf="!(parentLocation$ | async) || !(parentLocation$ | async)?.name"
+          *ngIf="!params?.parentLocation || !params?.parentLocation?.name"
           mode="indeterminate"
         ></mat-progress-bar>
       </div>
-      <div class="h5 font-weight-normal">
-        <div *ngIf="(parentLocation$ | async)?.name">
-          {{ (parentLocation$ | async)?.description }}
+      <div class="logo">
+        <img height="120" src="{{ logo }}" alt="{{ params?.parentLocation?.name }}">
+      </div>
+      <div class="h5 mt-3 font-weight-normal">
+        <div *ngIf="params?.parentLocation?.name">
+          {{ params?.parentLocation?.description }}
         </div>
         <!-- 
         <mat-progress-bar
