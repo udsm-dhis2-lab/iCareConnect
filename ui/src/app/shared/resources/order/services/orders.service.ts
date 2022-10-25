@@ -24,7 +24,6 @@ export class OrdersService {
       })
     ).pipe(
       map((response) => {
-        console.log("Orders Response", response);
         return response;
       })
     );
@@ -98,28 +97,30 @@ export class OrdersService {
     );
   }
 
-  createStandardEncounterWithObservations(encounter:any, obs:any): Observable<any> {
+  createStandardEncounterWithObservations(
+    encounter: any,
+    obs: any
+  ): Observable<any> {
     return from(this.API.encounter.createEncounter(encounter)).pipe(
       map((response) => {
-      
         return zip(
           ...obs.map((ob) => {
-            this.openMRSHttpClient.post(`encounter/${response?.uuid}`,{
+            this.openMRSHttpClient
+              .post(`encounter/${response?.uuid}`, {
                 uuid: response?.uuid,
                 obs: [ob],
-              }
-            ).pipe(
-              map((response) => {
+              })
+              .pipe(
+                map((response) => {
                   return {
                     ...ob,
                     ...response,
                   };
                 }),
-                catchError((error) => of(error)
-                )
-              )
-            })
-        )
+                catchError((error) => of(error))
+              );
+          })
+        );
       }),
       catchError((error) => of(error))
     );

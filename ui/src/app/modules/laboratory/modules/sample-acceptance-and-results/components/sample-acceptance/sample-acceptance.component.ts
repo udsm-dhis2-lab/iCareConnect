@@ -3,6 +3,7 @@ import { MatDialog } from "@angular/material/dialog";
 import { Store } from "@ngrx/store";
 import { Observable } from "rxjs";
 import { take } from "rxjs/operators";
+import { formatDateToYYMMDD } from "src/app/shared/helpers/format-date.helper";
 import {
   setSampleStatus,
   loadLabSamplesByCollectionDates,
@@ -174,7 +175,8 @@ export class SampleAcceptanceComponent implements OnInit {
       .afterClosed()
       .pipe(take(1))
       .subscribe((reason) => {
-        if (reason) {
+        console.log(reason);
+        if (reason && reason?.reasonUuid) {
           this.savingMessage[sample?.id + "-reject"] = true;
 
           const data = {
@@ -184,8 +186,9 @@ export class SampleAcceptanceComponent implements OnInit {
             user: {
               uuid: this.userUuid,
             },
-            remarks: reason?.reasonUuid,
-            status: "REJECTED",
+            remarks: reason?.reasonText,
+            category: "REJECTED",
+            status: reason?.reasonUuid,
           };
           this.store.dispatch(
             setSampleStatus({
