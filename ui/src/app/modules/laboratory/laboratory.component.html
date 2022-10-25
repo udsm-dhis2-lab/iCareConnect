@@ -63,7 +63,7 @@
           <mat-chip
             class="w-20"
             *ngIf="params?.privileges && params?.LISConfigurations?.isLIS"
-            (click)="changeRoute($event, 'dashboard', true)"
+            (click)="changeRoute($event, 'dashboard-lab', true)"
             routerLinkActive="active-route"
             [ngClass]="{
               'active-route': currentRoutePath === 'dashboard-lab'
@@ -84,7 +84,7 @@
               'active-route': currentRoutePath === 'sample-registration'
             }"
           >
-            Specimen Reception
+            Sample Reception & Registration
           </mat-chip>
           <mat-chip
             class="w-20"

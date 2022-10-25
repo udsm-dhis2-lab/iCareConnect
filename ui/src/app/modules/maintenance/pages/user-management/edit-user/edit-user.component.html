@@ -521,7 +521,7 @@
           (click)="assignAll()"
           [disabled]="roles.length === 0"
         >
-          <span style="padding: 10px">ASSIGN ALL ({{ roles.length }}) →</span>
+          <span style="padding: 10px">ASSIGN ALL ({{ roles?.length }}) →</span>
         </button>
         <button
           mat-flat-button
@@ -529,9 +529,9 @@
           color="primary"
           style="height: 30px; width: 160px"
           (click)="unAssignAll()"
-          [disabled]="selectedRoles.length === 0"
+          [disabled]="selectedRoles?.length === 0"
         >
-          <span>← REMOVE ALL ({{ selectedRoles.length }})</span>
+          <span>← REMOVE ALL ({{ selectedRoles?.length }})</span>
         </button>
       </div>
       <button

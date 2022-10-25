@@ -252,7 +252,7 @@ export class SingleRegistrationComponent implements OnInit {
     return `${maxDate.getFullYear()}-${maxMonth}-${maxDay}`;
   }
 
-  getDateStringFromDate(date){
+  getDateStringFromDate(date) {
     let month =
       (date.getMonth() + 1).toString().length > 1
         ? date.getMonth() + 1
@@ -283,14 +283,14 @@ export class SingleRegistrationComponent implements OnInit {
     this.broughtOnField = new DateField({
       id: "broughtOn",
       key: "broughtOn",
-      label: "Brought On",
+      label: "Delivered On",
       max: this.maximumDate,
     });
 
     this.broughtByField = new Textbox({
       id: "broughtBy",
       key: "broughtBy",
-      label: "Brought By",
+      label: "Delivered By",
     });
   }
 
@@ -341,7 +341,7 @@ export class SingleRegistrationComponent implements OnInit {
       new Date(formValues.getValues()?.collectedOn?.value)
     );
     let received_on_date;
-    if (formValues.getValues()?.receivedOn?.value){
+    if (formValues.getValues()?.receivedOn?.value) {
       received_on_date = this.getDateStringFromDate(
         new Date(formValues.getValues()?.receivedOn?.value)
       );
@@ -349,12 +349,12 @@ export class SingleRegistrationComponent implements OnInit {
     this.minForReceivedOn = false;
     this.receivedOnField.min = collected_on_date;
     this.minForReceivedOn = true;
-    if(received_on_date){
+    if (received_on_date) {
       this.maxForCollectedOn = false;
       this.sampleColectionDateField.max = received_on_date;
     }
     this.maxForCollectedOn = true;
-    
+
     // this.getDateStringFromMoment_i();
     this.formData = { ...this.formData, ...formValues.getValues() };
     if (
@@ -1288,22 +1288,21 @@ export class SingleRegistrationComponent implements OnInit {
     switch (fieldName) {
       case "sampleInformation":
         this.sampleInformation = !this.sampleInformation;
-        break
+        break;
       case "clinicalData":
-        this.clinicalData =!this.clinicalData
-        break
+        this.clinicalData = !this.clinicalData;
+        break;
       case "referingDoctor":
-        this.referingDoctor =!this.referingDoctor;
-        break
+        this.referingDoctor = !this.referingDoctor;
+        break;
       case "broughtBy":
-        this.broughtBy =!this.broughtBy;
-        break
+        this.broughtBy = !this.broughtBy;
+        break;
       case "tests":
-        this.tests =!this.tests;
-        break
+        this.tests = !this.tests;
+        break;
       default:
         break;
-
     }
   }
 

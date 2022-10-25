@@ -73,7 +73,8 @@
           <button
             class="float-right ml-2"
             [disabled]="
-              (params?.doesPatientHasPendingPaymentForTheCurrentVisitType && (!params?.visit?.isEnsured || !params?.visit.isEmergency)) ||
+              (params?.doesPatientHasPendingPaymentForTheCurrentVisitType &&
+                (!params?.visit?.isEnsured || !params?.visit.isEmergency)) ||
               params?.visit?.isAdmitted
             "
             color="primary"
@@ -185,7 +186,6 @@
               params?.visit && selectedTab.value === 0 && params?.currentBills
             "
           >
-            <!-- {{ params?.visit | json }} -->
             <app-attend-ordered-items
               [orderedItems]="params?.visit?.procedureOrders"
               [currentBills]="params?.currentBills"

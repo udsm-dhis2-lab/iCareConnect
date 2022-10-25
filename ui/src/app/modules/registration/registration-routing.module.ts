@@ -42,7 +42,7 @@ const routes: Routes = [
     component: PatientEditComponent,
   },
   {
-    path: "list/:location",
+    path: "patients-list/location/:location",
     component: PatientsListByLocationComponent,
   },
 ];
