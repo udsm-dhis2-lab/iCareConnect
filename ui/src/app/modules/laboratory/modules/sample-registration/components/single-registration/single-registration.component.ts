@@ -100,6 +100,16 @@ export class SingleRegistrationComponent implements OnInit {
   tests: boolean = true;
   minForReceivedOn: boolean = false;
   maxForCollectedOn: boolean;
+  minForBroughtOn: boolean;
+  receivedOnDateLatestValue: any;
+  broughtOnDateLatestValue: any;
+  collectedOnDateLatestValue: string;
+  receivedOnTimeValid: boolean = true;
+  broughtOnTimeValid: boolean = true;
+  collectedOnTimeValid: boolean = true;
+  broughtOnTime: any;
+  collectedOnTime: any;
+  receivedOnTime: any;
 
   constructor(
     private samplesService: SamplesService,
@@ -307,6 +317,8 @@ export class SingleRegistrationComponent implements OnInit {
   }
 
   getSelectedReceivedOnTime(event: Event): void {
+    this.receivedOnTime = (event.target as any)?.value;
+    this.receivedOnTimeValid = this.isValidTime(this.receivedOnTime, this.receivedOnDateLatestValue ? this.receivedOnDateLatestValue : this.maximumDate);
     this.formData = {
       ...this.formData,
       receivedAt: {
@@ -316,8 +328,15 @@ export class SingleRegistrationComponent implements OnInit {
       },
     };
   }
-
+  
   getSelectedRCollectedOnTime(event: Event): void {
+    this.collectedOnTime = (event.target as any)?.value;
+    this.collectedOnTimeValid = this.isValidTime(
+      this.collectedOnTime,
+      this.collectedOnDateLatestValue
+        ? this.collectedOnDateLatestValue
+        : this.maximumDate
+    );
     this.formData = {
       ...this.formData,
       collectedAt: {
@@ -329,6 +348,13 @@ export class SingleRegistrationComponent implements OnInit {
   }
 
   getSelectedBroughtOnTime(event: Event): void {
+    this.broughtOnTime = (event.target as any)?.value;
+    this.broughtOnTimeValid = this.isValidTime(
+      this.broughtOnTime,
+      this.broughtOnDateLatestValue
+        ? this.broughtOnDateLatestValue
+        : this.maximumDate
+    );
     this.formData = {
       ...this.formData,
       broughtAt: {
@@ -340,22 +366,61 @@ export class SingleRegistrationComponent implements OnInit {
   }
 
   onFormUpdate(formValues: FormValue, itemKey?: string): void {
-    let collected_on_date = this.getDateStringFromDate(
-      new Date(formValues.getValues()?.collectedOn?.value)
-    );
+    //Validate Date fields
+    let collected_on_date;
+    if (formValues.getValues()?.collectedOn?.value.toString()?.length > 0) {
+      collected_on_date = this.getDateStringFromDate(
+        new Date(formValues.getValues()?.collectedOn?.value)
+        );
+      this.collectedOnDateLatestValue = collected_on_date;
+      this.collectedOnTimeValid = this.isValidTime(
+        this.collectedOnTime,
+        this.collectedOnDateLatestValue
+          ? this.collectedOnDateLatestValue
+          : this.maximumDate
+      );
+    }
     let received_on_date;
-    if (formValues.getValues()?.receivedOn?.value) {
+    if (formValues.getValues()?.receivedOn?.value?.toString()?.length > 0) {
       received_on_date = this.getDateStringFromDate(
         new Date(formValues.getValues()?.receivedOn?.value)
       );
+      this.receivedOnDateLatestValue = received_on_date;
+      this.receivedOnTimeValid = this.isValidTime(
+        this.receivedOnTime,
+        this.receivedOnDateLatestValue
+          ? this.receivedOnDateLatestValue
+          : this.maximumDate
+      );
     }
+    let brought_on_date;
+    if (formValues.getValues()?.broughtOn?.value.toString()?.length > 0) {
+      brought_on_date = this.getDateStringFromDate(
+        new Date(formValues.getValues()?.broughtOn?.value)
+      );
+      this.broughtOnDateLatestValue = brought_on_date;
+      this.broughtOnTimeValid = this.isValidTime(
+        this.broughtOnTime,
+        this.broughtOnDateLatestValue
+          ? this.broughtOnDateLatestValue
+          : this.maximumDate
+      );
+    }
+    
+
+
     this.minForReceivedOn = false;
-    this.receivedOnField.min = collected_on_date;
+    this.receivedOnField.min = this.broughtOnDateLatestValue
+      ? this.broughtOnDateLatestValue
+      : this.collectedOnDateLatestValue;
+    this.broughtOnField.min = this.collectedOnDateLatestValue
+      ? this.collectedOnDateLatestValue
+      : this.receivedOnField.min;
     this.minForReceivedOn = true;
-    if (received_on_date) {
-      this.maxForCollectedOn = false;
-      this.sampleColectionDateField.max = received_on_date;
-    }
+    
+    this.maxForCollectedOn = false;
+    this.sampleColectionDateField.max = this.broughtOnDateLatestValue ? this.broughtOnDateLatestValue : this.receivedOnDateLatestValue ? this.receivedOnDateLatestValue : this.maximumDate;
+    this.broughtOnField.max = this.receivedOnDateLatestValue;
     this.maxForCollectedOn = true;
 
     // this.getDateStringFromMoment_i();
@@ -1367,6 +1432,43 @@ export class SingleRegistrationComponent implements OnInit {
       default:
         break;
     }
+  }
+
+  isValidTime(time, date) {
+    if(time){
+      let currentDate = new Date();
+  
+      console.log("==> Time", time)
+      console.log("==> Date", date)
+  
+      let hours = time.split(":")[0];
+      let mins = time.split(":")[1];
+      let year = date?.split("-")[0];
+      let month = date?.split("-")[1].toString()?.length > 1 ? date?.split("-")[1] : `0${date?.split("-")[1]}`
+      let day = date?.split("-")[2].toString()?.length > 1 ? date?.split("-")[2] : `0${date?.split("-")[2]}`;
+      let inputDateString = `${year}-${month}-${day}`
+  
+      let thisHours = currentDate.getHours();
+      let thisMinutes = currentDate.getMinutes();
+      let thisYear = currentDate.getFullYear();
+      let thisMonth = (currentDate.getMonth()+1).toString()?.length > 1 ? currentDate.getMonth()+1 : `0${currentDate.getMonth()+1}`;
+      let thisDay = currentDate.getDate().toString()?.length > 1 ? currentDate.getDate() : `0${currentDate.getDate()}`;
+      let currentDateString = `${thisYear}-${thisMonth}-${thisDay}`;
+  
+  
+      if (inputDateString === currentDateString && parseInt(hours) > thisHours) {
+        return false;
+      }
+      if ( 
+        inputDateString === currentDateString &&
+        parseInt(hours) === thisHours &&
+        parseInt(mins) > thisMinutes
+      ) {
+        return false;
+      }
+      return true;
+    }
+    return true
   }
 
   openBarCodeDialog(data): void {
