@@ -228,6 +228,7 @@ export class RegistrationAddComponent implements OnInit {
   });
 
   residenceField: Field<string>;
+  wardField: Field<string>;
   districtField: Field<string>;
   regionField: Field<string>;
   isPhoneNumberCorrect: boolean = false;
@@ -360,23 +361,41 @@ export class RegistrationAddComponent implements OnInit {
       residenceValues?.residenceArea &&
       residenceValues?.residenceArea?.value?.display
     ) {
-      this.patient["district"] =
-        residenceValues?.residenceArea?.value?.parentLocation?.display;
       this.patient["village"] = residenceValues?.residenceArea?.value?.display;
-      // this.patient["ward"],
-      this.patient["region"] =
+      this.patient["ward"] =
+        residenceValues?.residenceArea?.value?.parentLocation?.display;
+      this.patient["district"] =
         residenceValues?.residenceArea?.value?.parentLocation?.parentLocation?.display;
+      this.patient["region"] =
+        residenceValues?.residenceArea?.value?.parentLocation?.parentLocation?.parentLocation?.display;
       this.createDistrictAndRegionField({
+        ward: residenceValues?.residenceArea?.value?.parentLocation?.display,
         district:
-          residenceValues?.residenceArea?.value?.parentLocation?.display,
-        region:
           residenceValues?.residenceArea?.value?.parentLocation?.parentLocation
             ?.display,
+        region:
+          residenceValues?.residenceArea?.value?.parentLocation?.parentLocation
+            ?.parentLocation?.display,
       });
     }
   }
 
   createDistrictAndRegionField(data?): void {
+    this.wardField = new Dropdown({
+      id: "ward",
+      key: "ward",
+      options: [
+        {
+          key: data?.ward,
+          value: data?.ward,
+          label: data?.ward,
+        },
+      ],
+      label: "Ward",
+      value: data?.ward,
+      searchControlType: "residenceLocation",
+      controlType: "location",
+    });
     this.districtField = new Dropdown({
       id: "district",
       key: "district",
