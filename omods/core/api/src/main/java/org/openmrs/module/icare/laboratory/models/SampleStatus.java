@@ -32,7 +32,7 @@ public class SampleStatus { // implements java.io.Serializable {
 	@JoinColumn(name = "user_id")
 	private User user;
 	
-	@Column(name = "remarks", length = 65535)
+	@Column(name = " ", length = 65535)
 	private String remarks;
 	
 	@Temporal(TemporalType.TIMESTAMP)
@@ -40,10 +40,10 @@ public class SampleStatus { // implements java.io.Serializable {
 	//@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-ddTHH:mm:ss.SSSZ")
 	private Date timestamp;
 	
-	@Column(name = "status", length = 32)
+	@Column(name = "status", length = 256)
 	private String status;
 	
-	@Column(name = "category", length = 32)
+	@Column(name = "category", length = 256)
 	private String category;
 	
 	@Column(name = "retired")
