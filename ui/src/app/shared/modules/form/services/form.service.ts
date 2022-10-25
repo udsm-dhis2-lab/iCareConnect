@@ -246,19 +246,21 @@ export class FormService {
                 facility?.display?.toLowerCase()?.indexOf("clinic") > -1
             ) || []
           )?.map((location: any) => {
+            console.log(location?.parentLocation?.parentLocation);
+            console.log(location?.parentLocation?.parentLocation?.display);
             return {
               ...location,
               display:
                 location?.display +
                 (location?.parentLocation &&
                 location?.parentLocation?.parentLocation
-                  ? "(" +
+                  ? " -  ( " +
                     location?.parentLocation?.parentLocation?.display +
                     " - " +
                     location?.parentLocation?.parentLocation?.parentLocation
                     ? location?.parentLocation?.parentLocation?.parentLocation
                         ?.display
-                    : "" + ")"
+                    : "" + " )"
                   : ""),
             };
           });

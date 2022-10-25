@@ -3,7 +3,10 @@ import { MatDialog } from "@angular/material/dialog";
 import { MatRadioChange } from "@angular/material/radio";
 import * as moment from "moment";
 import { Observable, zip } from "rxjs";
-import { NON_CLINICAL_PERSON_DATA } from "src/app/core/constants/non-clinical-person.constant";
+import {
+  EQA_PERSON_DATA,
+  NON_CLINICAL_PERSON_DATA,
+} from "src/app/core/constants/non-clinical-person.constant";
 import {
   determineIfAtLeastOneTestHasNoDepartment,
   formulateSamplesByDepartments,
@@ -69,7 +72,7 @@ export class SingleRegistrationComponent implements OnInit {
 
   patientFieldSetClosed: boolean = false;
 
-  registrationCategory: string = "Clinical";
+  registrationCategory: string = "CLINICAL";
 
   receivedOnField: any;
   receivedByField: any;
@@ -426,8 +429,10 @@ export class SingleRegistrationComponent implements OnInit {
 
   onGetPersonDetails(personDetails: any): void {
     this.personDetailsData =
-      this.registrationCategory === "Clinical"
+      this.registrationCategory === "CLINICAL"
         ? personDetails
+        : this.registrationCategory === "EQA"
+        ? EQA_PERSON_DATA
         : NON_CLINICAL_PERSON_DATA;
   }
 
@@ -461,8 +466,10 @@ export class SingleRegistrationComponent implements OnInit {
     }
 
     this.personDetailsData =
-      this.registrationCategory === "Clinical"
+      this.registrationCategory === "CLINICAL"
         ? this.personDetailsData
+        : this.registrationCategory === "EQA"
+        ? EQA_PERSON_DATA
         : NON_CLINICAL_PERSON_DATA;
     if (this.testOrders?.length === 0) {
       this.errorMessage = "No test has been selected";
@@ -519,6 +526,8 @@ export class SingleRegistrationComponent implements OnInit {
                           addresses: [
                             {
                               address1: this.personDetailsData?.address,
+                              address2: this.personDetailsData?.address,
+                              address3: this.personDetailsData?.address,
                               cityVillage: "",
                               country: "",
                               postalCode: "",
@@ -527,7 +536,7 @@ export class SingleRegistrationComponent implements OnInit {
                           attributes: [],
                         },
                         identifiers:
-                          this.registrationCategory === "Clinical"
+                          this.registrationCategory === "CLINICAL"
                             ? (patientIdentifierTypes || [])
                                 .map((personIdentifierType) => {
                                   if (
@@ -608,7 +617,7 @@ export class SingleRegistrationComponent implements OnInit {
                               },
                             ];
 
-                            if (this.registrationCategory === "Clinical") {
+                            if (this.registrationCategory === "CLINICAL") {
                               const personDataAttributeKeys =
                                 Object.keys(this.personDetailsData).filter(
                                   (key) => key.indexOf("attribute-") === 0
@@ -1126,6 +1135,27 @@ export class SingleRegistrationComponent implements OnInit {
                                                                       broughtdByStatus,
                                                                     ];
                                                                   }
+
+                                                                  statuses = [
+                                                                    ...statuses,
+                                                                    {
+                                                                      sample: {
+                                                                        uuid: sampleResponse?.uuid,
+                                                                      },
+                                                                      user: {
+                                                                        uuid: localStorage.getItem(
+                                                                          "userUuid"
+                                                                        ),
+                                                                      },
+                                                                      category:
+                                                                        "SAMPLE_REGISTRATION_CATEGORY",
+                                                                      remarks:
+                                                                        "Sample registration form type reference",
+                                                                      status:
+                                                                        this
+                                                                          .registrationCategory,
+                                                                    },
+                                                                  ];
 
                                                                   if (
                                                                     statuses?.length >
