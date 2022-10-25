@@ -237,8 +237,8 @@ public class StockDAO extends BaseDAO<Stock> {
 		//String queryStr = "SELECT item FROM Item item \n"
 		//        + "WHERE item.stockable = true AND item.uuid NOT IN(SELECT stock.item.uuid FROM Stock stock WHERE stock.location.uuid =:locationUuid)";
 		//String queryStr = "SELECT item FROM Item item, Stock stock WHERE item.stockable = true AND stock.item=item AND stock.location.uuid =:locationUuid";
-		String queryStr = "SELECT item FROM Item item \n"
-		        + "WHERE item.stockable = true AND item NOT IN(SELECT stock.item FROM Stock stock WHERE stock.location.uuid =:locationUuid)";
+		String queryStr = "SELECT item FROM Item item LEFT JOIN item.concept c LEFT JOIN item.drug d \n"
+		        + "WHERE item.stockable = true AND (d.retired = false OR c.retired = false) AND item NOT IN(SELECT stock.item FROM Stock stock WHERE stock.location.uuid =:locationUuid) ";
 		
 		Query query = session.createQuery(queryStr);
 		//		query.setFirstResult(startIndex);
@@ -284,7 +284,7 @@ public class StockDAO extends BaseDAO<Stock> {
 		query for nearly expired
 		------------------------
 		------------------------- */
-		String nearlyExpired = "SELECT stc,(stc.expiryDate - current_date) FROM Stock stc WHERE stc.expiryDate <= current_date + 30 AND stc.location = (SELECT l FROM Location l WHERE l.uuid = :locationUuid)";
+		String nearlyExpired = "SELECT stc,(stc.expiryDate - current_date) FROM Stock stc LEFT JOIN stc.item it LEFT JOIN it.concept c LEFT JOIN it.drug d WHERE stc.expiryDate <= current_date + 30 AND (d.retired = false OR c.retired = false) AND stc.location = (SELECT l FROM Location l WHERE l.uuid = :locationUuid) ";
 		
 		Query queryNearlyExpired = session.createQuery(nearlyExpired);
 		
@@ -306,7 +306,7 @@ public class StockDAO extends BaseDAO<Stock> {
 		query for expired stock
 		------------------------
 		------------------------- */
-		String expiredQueryString = "SELECT stc FROM Stock stc WHERE stc.expiryDate <= current_date AND stc.location = (SELECT l FROM Location l WHERE l.uuid = :locationUuid)";
+		String expiredQueryString = "SELECT stc FROM Stock stc LEFT JOIN stc.item it LEFT JOIN it.concept c LEFT JOIN it.drug d WHERE stc.expiryDate <= current_date AND (d.retired = false OR c.retired = false) AND  stc.location = (SELECT l FROM Location l WHERE l.uuid = :locationUuid) ";
 		
 		Query queryExpired = session.createQuery(expiredQueryString);
 		
