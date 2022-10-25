@@ -3,6 +3,7 @@ import { MatDialog } from "@angular/material/dialog";
 import { Store } from "@ngrx/store";
 import { Observable } from "rxjs";
 import { take } from "rxjs/operators";
+import { formatDateToYYMMDD } from "src/app/shared/helpers/format-date.helper";
 import {
   setSampleStatus,
   loadLabSamplesByCollectionDates,
@@ -12,6 +13,7 @@ import { AppState } from "src/app/store/reducers";
 import {
   getAcceptedFormattedLabSamples,
   getCompletedLabSamples,
+  getFormattedAcceptedLabSamples,
   getFormattedLabSamplesForTracking,
   getFormattedLabSamplesToAccept,
   getFormattedLabSamplesToFeedResults,
@@ -58,6 +60,7 @@ export class SampleAcceptanceComponent implements OnInit {
   searchingText: string = "";
   labDepartments$: Observable<any>;
   selectedDepartment: string = "";
+  acceptedSamples$: Observable<any[]>;
   constructor(private store: Store<AppState>, private dialog: MatDialog) {}
 
   ngOnInit(): void {
@@ -114,6 +117,13 @@ export class SampleAcceptanceComponent implements OnInit {
       department: this.selectedDepartment,
       searchingText: this.searchingText,
     });
+
+    this.acceptedSamples$ = this.store.select(
+      getFormattedAcceptedLabSamples(
+        this.selectedDepartment,
+        this.searchingText
+      )
+    );
   }
 
   accept(e, sample, providerDetails) {
@@ -165,7 +175,8 @@ export class SampleAcceptanceComponent implements OnInit {
       .afterClosed()
       .pipe(take(1))
       .subscribe((reason) => {
-        if (reason) {
+        console.log(reason);
+        if (reason && reason?.reasonUuid) {
           this.savingMessage[sample?.id + "-reject"] = true;
 
           const data = {
@@ -175,8 +186,9 @@ export class SampleAcceptanceComponent implements OnInit {
             user: {
               uuid: this.userUuid,
             },
-            remarks: reason?.reasonUuid,
-            status: "REJECTED",
+            remarks: reason?.reasonText,
+            category: "REJECTED",
+            status: reason?.reasonUuid,
           };
           this.store.dispatch(
             setSampleStatus({
@@ -240,6 +252,12 @@ export class SampleAcceptanceComponent implements OnInit {
       department: this.selectedDepartment,
       searchingText: this.searchingText,
     });
+    this.acceptedSamples$ = this.store.select(
+      getFormattedAcceptedLabSamples(
+        this.selectedDepartment,
+        this.searchingText
+      )
+    );
   }
 
   onSearch(e) {
@@ -296,6 +314,12 @@ export class SampleAcceptanceComponent implements OnInit {
           department: this.selectedDepartment,
           searchingText: this.searchingText,
         }
+      );
+      this.acceptedSamples$ = this.store.select(
+        getFormattedAcceptedLabSamples(
+          this.selectedDepartment,
+          this.searchingText
+        )
       );
     }
   }

@@ -221,14 +221,24 @@ export class PersonDetailsComponent implements OnInit {
   setPersonDetails(personDetails?: any): void {
     this.patientUuid = personDetails?.uuid;
     this.personFields = [
+      // new Dropdown({
+      //   id: "attribute-" + this.referFromFacilityVisitAttribute,
+      //   key: "attribute-" + this.referFromFacilityVisitAttribute,
+      //   label: "Location",
+      //   options: [],
+      //   searchControlType: "location",
+      //   searchTerm: "Health Facility",
+      //   shouldHaveLiveSearchForDropDownFields: true,
+      // }),
       new Dropdown({
         id: "attribute-" + this.referFromFacilityVisitAttribute,
         key: "attribute-" + this.referFromFacilityVisitAttribute,
-        label: "Location",
         options: [],
-        searchControlType: "location",
-        searchTerm: "Health Facility",
+        label: "Location",
         shouldHaveLiveSearchForDropDownFields: true,
+        searchControlType: "healthFacility",
+        searchTerm: "Health Facility",
+        controlType: "location",
       }),
       new Textbox({
         id: "firstName",

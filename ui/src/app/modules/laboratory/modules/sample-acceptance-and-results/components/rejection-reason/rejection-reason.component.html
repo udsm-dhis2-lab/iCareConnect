@@ -2,19 +2,17 @@
   <mat-toolbar class="modal-header">Reason for rejecting a sample</mat-toolbar>
   <div class="w-100 p-3">
     <div class="rejection-reasons">
-      <app-form
-        [fields]="[rejectionReasonField]"
-        (formUpdate)="onFormUpdate($event)"
-      >
+      <app-form [fields]="rejectionFields" (formUpdate)="onFormUpdate($event)">
       </app-form>
     </div>
     <div class="w-100 d-flex justify-content-end mt-2">
       <button mat-stroked-button (click)="onCancel($event)">Cancel</button>
       <button
         [disabled]="!isFormValid"
-        mat-stroked-button
+        mat-flat-button
         (click)="saveReason($event)"
         class="ml-2"
+        color="primary"
       >
         Save
       </button>

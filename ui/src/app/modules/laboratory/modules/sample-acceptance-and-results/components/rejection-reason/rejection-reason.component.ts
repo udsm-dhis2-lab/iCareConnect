@@ -4,6 +4,8 @@ import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import * as _ from "lodash";
 import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
+import { TextArea } from "src/app/shared/modules/form/models/text-area.model";
+import { Textbox } from "src/app/shared/modules/form/models/text-box.model";
 
 @Component({
   selector: "app-rejection-reason",
@@ -12,8 +14,9 @@ import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
 })
 export class RejectionReasonComponent implements OnInit {
   codedSampleRejectionReasons: any[];
-  rejectionReasonField: any;
+  rejectionFields: any[];
   rejectionReason: string;
+  rejectionRemarks: string;
   isFormValid: boolean = false;
   constructor(
     private dialogRef: MatDialogRef<RejectionReasonComponent>,
@@ -23,28 +26,38 @@ export class RejectionReasonComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.rejectionReasonField = new Dropdown({
-      id: "rejectionReason",
-      key: "rejectionReason",
-      label: "Reason for Rejection",
-      searchTerm: "SAMPLE_REJECTION_REASONS",
-      required: true,
-      options: [],
-      conceptClass: "Misc",
-      searchControlType: "concept",
-      shouldHaveLiveSearchForDropDownFields: true,
-    });
+    this.rejectionFields = [
+      new Dropdown({
+        id: "rejectionReason",
+        key: "rejectionReason",
+        label: "Reason for Rejection",
+        searchTerm: "SAMPLE_REJECTION_REASONS",
+        required: true,
+        options: [],
+        conceptClass: "Misc",
+        searchControlType: "concept",
+        shouldHaveLiveSearchForDropDownFields: true,
+      }),
+      new TextArea({
+        id: "rejectionRemarks",
+        key: "rejectionRemarks",
+        label: "Remarks",
+        required: false,
+      }),
+    ];
   }
 
   onFormUpdate(formValue: FormValue): void {
-    this.rejectionReason = formValue.getValues()["rejectionReason"]?.value;
+    const formData = formValue.getValues();
+    this.rejectionReason = formData?.rejectionReason?.value;
+    this.rejectionRemarks = formData?.rejectionRemarks?.value;
     this.isFormValid = formValue.isValid;
   }
 
   saveReason(e) {
     e.stopPropagation();
     this.dialogRef.close({
-      reasonText: "",
+      reasonText: this.rejectionRemarks,
       reasonUuid: this.rejectionReason,
     });
   }
