@@ -11,8 +11,8 @@
         <mat-radio-button
           (change)="getSelection($event)"
           class="registration-category-btn"
-          [value]="'Clinical'"
-          [checked]="registrationCategory === 'Clinical'"
+          [value]="'CLINICAL'"
+          [checked]="registrationCategory === 'CLINICAL'"
           color="primary"
         >
           Clinical
@@ -20,8 +20,8 @@
         <mat-radio-button
           (change)="getSelection($event)"
           class="registration-category-btn ml-2"
-          [value]="'Non-Clinical'"
-          [checked]="registrationCategory === 'Non-Clinical'"
+          [value]="'NON_CLINICAL'"
+          [checked]="registrationCategory === 'NON_CLINICAL'"
           color="primary"
         >
           Non-Clinical
@@ -38,7 +38,7 @@
       </mat-radio-group>
     </div>
 
-    <div class="col-12" *ngIf="registrationCategory === 'Clinical'">
+    <div class="col-12" *ngIf="registrationCategory === 'CLINICAL'">
       <fieldset>
         <legend
           (click)="togglePatientDetailsFieldSet($event)"
@@ -133,7 +133,7 @@
 
       <!-- <mat-step
           errorMessage="Some fields not fed."
-          *ngIf="registrationCategory === 'Clinical'"
+          *ngIf="registrationCategory === 'CLINICAL'"
         >
           <ng-template matStepLabel>Clinical Data</ng-template>
           <div>
@@ -150,7 +150,7 @@
 
       <!-- <mat-step
           errorMessage="Some fields not fed."
-          *ngIf="registrationCategory === 'Clinical'"
+          *ngIf="registrationCategory === 'CLINICAL'"
         >
           <ng-template matStepLabel>Referring Doctor</ng-template>
           <div>
@@ -323,10 +323,10 @@
         </div>
       </div>
 
-      <ng-template *ngIf="registrationCategory === 'Clinical'" matStepLabel
+      <ng-template *ngIf="registrationCategory === 'CLINICAL'" matStepLabel
         >Clinical Data</ng-template
       >
-      <div *ngIf="registrationCategory === 'Clinical'">
+      <div *ngIf="registrationCategory === 'CLINICAL'">
         <div class="clinical-data">
           <fieldset>
             <legend (click)="toggleFieldSet('clinicalData')" class="d-flex">
@@ -344,10 +344,10 @@
           </fieldset>
         </div>
       </div>
-      <ng-template *ngIf="registrationCategory === 'Clinical'" matStepLabel
+      <ng-template *ngIf="registrationCategory === 'CLINICAL'" matStepLabel
         >Referring Doctor</ng-template
       >
-      <div *ngIf="registrationCategory === 'Clinical'">
+      <div *ngIf="registrationCategory === 'CLINICAL'">
         <div class="referring-doctor-field">
           <fieldset>
             <legend (click)="toggleFieldSet('referingDoctor')" class="d-flex">
