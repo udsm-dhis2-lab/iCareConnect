@@ -40,7 +40,7 @@ public class SampleStatus { // implements java.io.Serializable {
 	//@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-ddTHH:mm:ss.SSSZ")
 	private Date timestamp;
 	
-	@Column(name = "status", length = 256)
+	@Column(name = "status", length = 65535)
 	private String status;
 	
 	@Column(name = "category", length = 64)

@@ -172,7 +172,8 @@ public class StockDAO extends BaseDAO<Stock> {
 	        String conceptClassName) {
 		
 		DbSession session = this.getSession();
-		String queryStr = "SELECT st \n" + "FROM Stock st \n LEFT JOIN st.item it LEFT JOIN it.concept c LEFT JOIN it.drug d";
+		String queryStr = "SELECT st \n"
+		        + "FROM Stock st \n LEFT JOIN st.item it LEFT JOIN it.concept c LEFT JOIN it.drug d";
 		
 		if (search != null) {
 			queryStr += " LEFT JOIN d.concept c1 LEFT JOIN c1.names cn1 LEFT JOIN c.names cn WHERE (lower(d.name) LIKE lower(:search) OR lower(cn1.name) like lower(:search) OR lower(cn.name) like lower(:search) ) ";
@@ -182,7 +183,7 @@ public class StockDAO extends BaseDAO<Stock> {
 		} else {
 			queryStr += " WHERE st.location = (SELECT l FROM Location l WHERE l.uuid = :locationUuid)";
 		}
-
+		
 		if (conceptClassName != null) {
 			
 			if (!queryStr.contains("WHERE")) {
@@ -193,15 +194,14 @@ public class StockDAO extends BaseDAO<Stock> {
 			queryStr += " c.conceptClass =(SELECT ccl FROM ConceptClass ccl WHERE ccl.name = :conceptClassName)";
 			
 		}
-
+		
 		if (!queryStr.contains("WHERE")) {
 			queryStr += " WHERE ";
 		} else {
 			queryStr += " AND ";
 		}
 		queryStr += " (d.retired = false OR c.retired = false)";
-
-
+		
 		System.out.println(queryStr);
 		Query query = session.createQuery(queryStr);
 		query.setFirstResult(startIndex);
