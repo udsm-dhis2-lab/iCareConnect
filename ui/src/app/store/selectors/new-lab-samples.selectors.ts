@@ -100,17 +100,35 @@ export const getFormattedLabSamplesForTracking = createSelector(
   (samples, props) => {
     return _.map(
       _.filter(_.orderBy(samples, ["dateCreated"], ["desc"]), (sample) => {
-        if (!props?.searchingText) {
+        if (!props?.searchingText && !props?.department) {
           return sample;
-        } else if (
-          sample?.searchingText
-            ?.toLowerCase()
-            .indexOf(props?.searchingText.toLowerCase()) > -1 &&
-          sample?.department?.departmentName
-            .toLowerCase()
-            .indexOf(props?.department?.toLowerCase()) > -1
-        ) {
-          return sample;
+        } else if (props?.searchingText && props?.department) {
+          if (
+            sample?.searchingText
+              ?.toLowerCase()
+              .indexOf(props?.searchingText.toLowerCase()) > -1 &&
+            sample?.department?.departmentName
+              .toLowerCase()
+              .indexOf(props?.department?.toLowerCase()) > -1
+          ) {
+            return sample;
+          }
+        } else if (props?.searchingText && !props?.department) {
+          if (
+            sample?.searchingText
+              ?.toLowerCase()
+              .indexOf(props?.searchingText.toLowerCase()) > -1
+          ) {
+            return sample;
+          }
+        } else if (!props?.searchingText && props?.department) {
+          if (
+            sample?.department?.departmentName
+              .toLowerCase()
+              .indexOf(props?.department?.toLowerCase()) > -1
+          ) {
+            return sample;
+          }
         }
       }) || [],
       (sample) => {
@@ -175,16 +193,33 @@ export const getFormattedLabSamplesToAccept = createSelector(
         (sample) => {
           if (!props?.searchingText && !props?.department) {
             return sample;
-          } else if (
-            props?.searchingText &&
-            sample?.searchingText
-              ?.toLowerCase()
-              .indexOf(props?.searchingText.toLowerCase()) > -1 &&
-            sample?.department?.departmentName
-              ?.toLowerCase()
-              ?.indexOf(props?.department?.toLowerCase()) > -1
-          ) {
-            return sample;
+          } else if (props?.searchingText && props?.department) {
+            if (
+              sample?.searchingText
+                ?.toLowerCase()
+                .indexOf(props?.searchingText.toLowerCase()) > -1 &&
+              sample?.department?.departmentName
+                .toLowerCase()
+                .indexOf(props?.department?.toLowerCase()) > -1
+            ) {
+              return sample;
+            }
+          } else if (props?.searchingText && !props?.department) {
+            if (
+              sample?.searchingText
+                ?.toLowerCase()
+                .indexOf(props?.searchingText.toLowerCase()) > -1
+            ) {
+              return sample;
+            }
+          } else if (!props?.searchingText && props?.department) {
+            if (
+              sample?.department?.departmentName
+                .toLowerCase()
+                .indexOf(props?.department?.toLowerCase()) > -1
+            ) {
+              return sample;
+            }
           }
         }
       ) || []
@@ -201,7 +236,6 @@ export const getFormattedRejectedLabSamples = createSelector(
           _.map(
             _.filter(samples, (sample) => {
               if (sample?.rejected || sample?.markedForRecollection) {
-                // console.log(sample);
                 return sample;
               }
             }),
@@ -221,17 +255,35 @@ export const getFormattedRejectedLabSamples = createSelector(
           ["asc", "desc"]
         ),
         (sample) => {
-          if (!props?.searchingText) {
+          if (!props?.searchingText && !props?.department) {
             return sample;
-          } else if (
-            sample?.searchingText
-              ?.toLowerCase()
-              .indexOf(props?.searchingText.toLowerCase()) > -1 &&
-            sample?.department?.departmentName
-              .toLowerCase()
-              .indexOf(props?.department?.toLowerCase()) > -1
-          ) {
-            return sample;
+          } else if (props?.searchingText && props?.department) {
+            if (
+              sample?.searchingText
+                ?.toLowerCase()
+                .indexOf(props?.searchingText.toLowerCase()) > -1 &&
+              sample?.department?.departmentName
+                .toLowerCase()
+                .indexOf(props?.department?.toLowerCase()) > -1
+            ) {
+              return sample;
+            }
+          } else if (props?.searchingText && !props?.department) {
+            if (
+              sample?.searchingText
+                ?.toLowerCase()
+                .indexOf(props?.searchingText.toLowerCase()) > -1
+            ) {
+              return sample;
+            }
+          } else if (!props?.searchingText && props?.department) {
+            if (
+              sample?.department?.departmentName
+                .toLowerCase()
+                .indexOf(props?.department?.toLowerCase()) > -1
+            ) {
+              return sample;
+            }
           }
         }
       ) || [];
@@ -271,6 +323,71 @@ export const getFormattedRejectedLabSamples = createSelector(
   }
 );
 
+export const getFormattedAcceptedLabSamples = (
+  department: string,
+  searchingText: string
+) =>
+  createSelector(getAllFormattedLabSamples, (samples) => {
+    const acceptedSamples =
+      _.filter(
+        _.orderBy(
+          _.map(
+            _.filter(samples, (sample) => {
+              if (sample?.accepted) {
+                return sample;
+              }
+            }) || [],
+            (sample) => {
+              return {
+                ...sample,
+                keyForCheckingRecollection:
+                  sample?.mrn +
+                  "-" +
+                  sample?.departmentName +
+                  "-" +
+                  sample?.specimen?.specimenName,
+              };
+            }
+          ),
+          ["priorityOrderNumber", "dateCreated"],
+          ["asc", "desc"]
+        ),
+        (sample) => {
+          if (!searchingText && !department) {
+            return sample;
+          } else if (searchingText && department) {
+            if (
+              sample?.searchingText
+                ?.toLowerCase()
+                .indexOf(searchingText?.toLowerCase()) > -1 &&
+              sample?.department?.departmentName
+                ?.toLowerCase()
+                ?.indexOf(department?.toLowerCase()) > -1
+            ) {
+              return sample;
+            }
+          } else if (searchingText && !department) {
+            if (
+              sample?.searchingText
+                ?.toLowerCase()
+                .indexOf(searchingText?.toLowerCase()) > -1
+            ) {
+              return sample;
+            }
+          } else if (!searchingText && department) {
+            if (
+              sample?.department?.departmentName
+                ?.toLowerCase()
+                ?.indexOf(department?.toLowerCase()) > -1
+            ) {
+              return sample;
+            }
+          }
+        }
+      ) || [];
+    return acceptedSamples;
+  });
+
 export const getFormattedLabSamplesToFeedResults = createSelector(
   getAllFormattedLabSamples,
   (samples, props) => {
@@ -307,17 +424,35 @@ export const getFormattedLabSamplesToFeedResults = createSelector(
           ["asc", "desc"]
         ),
         (sample) => {
-          if (!props?.searchingText) {
+          if (!props?.searchingText && !props?.department) {
             return sample;
-          } else if (
-            sample?.searchingText
-              ?.toLowerCase()
-              .indexOf(props?.searchingText.toLowerCase()) > -1 &&
-            sample?.department?.departmentName
-              .toLowerCase()
-              .indexOf(props?.department?.toLowerCase()) > -1
-          ) {
-            return sample;
+          } else if (props?.searchingText && props?.department) {
+            if (
+              sample?.searchingText
+                ?.toLowerCase()
+                .indexOf(props?.searchingText.toLowerCase()) > -1 &&
+              sample?.department?.departmentName
+                .toLowerCase()
+                .indexOf(props?.department?.toLowerCase()) > -1
+            ) {
+              return sample;
+            }
+          } else if (props?.searchingText && !props?.department) {
+            if (
+              sample?.searchingText
+                ?.toLowerCase()
+                .indexOf(props?.searchingText.toLowerCase()) > -1
+            ) {
+              return sample;
+            }
+          } else if (!props?.searchingText && props?.department) {
+            if (
+              sample?.department?.departmentName
+                .toLowerCase()
+                .indexOf(props?.department?.toLowerCase()) > -1
+            ) {
+              return sample;
+            }
           }
         }
       ) || []
@@ -349,17 +484,35 @@ export const getCompletedLabSamples = createSelector(
           ["asc", "asc"]
         ),
         (sample) => {
-          if (!props?.searchingText) {
+          if (!props?.searchingText && !props?.department) {
             return sample;
-          } else if (
-            sample?.searchingText
-              ?.toLowerCase()
-              .indexOf(props?.searchingText.toLowerCase()) > -1 &&
-            sample?.department?.departmentName
-              .toLowerCase()
-              .indexOf(props?.department?.toLowerCase()) > -1
-          ) {
-            return sample;
+          } else if (props?.searchingText && props?.department) {
+            if (
+              sample?.searchingText
+                ?.toLowerCase()
+                .indexOf(props?.searchingText.toLowerCase()) > -1 &&
+              sample?.department?.departmentName
+                .toLowerCase()
+                .indexOf(props?.department?.toLowerCase()) > -1
+            ) {
+              return sample;
+            }
+          } else if (props?.searchingText && !props?.department) {
+            if (
+              sample?.searchingText
+                ?.toLowerCase()
+                .indexOf(props?.searchingText.toLowerCase()) > -1
+            ) {
+              return sample;
+            }
+          } else if (!props?.searchingText && props?.department) {
+            if (
+              sample?.department?.departmentName
+                .toLowerCase()
+                .indexOf(props?.department?.toLowerCase()) > -1
+            ) {
+              return sample;
+            }
           }
         }
       ) || []
@@ -392,17 +545,35 @@ export const getPatientsWithCompletedLabSamples = createSelector(
           ["asc", "asc"]
         ),
         (sample) => {
-          if (!props?.searchingText) {
+          if (!props?.searchingText && !props?.department) {
             return sample;
-          } else if (
-            sample?.searchingText
-              ?.toLowerCase()
-              .indexOf(props?.searchingText.toLowerCase()) > -1 &&
-            sample?.department?.departmentName
-              .toLowerCase()
-              .indexOf(props?.department?.toLowerCase()) > -1
-          ) {
-            return sample;
+          } else if (props?.searchingText && props?.department) {
+            if (
+              sample?.searchingText
+                ?.toLowerCase()
+                .indexOf(props?.searchingText.toLowerCase()) > -1 &&
+              sample?.department?.departmentName
+                .toLowerCase()
+                .indexOf(props?.department?.toLowerCase()) > -1
+            ) {
+              return sample;
+            }
+          } else if (props?.searchingText && !props?.department) {
+            if (
+              sample?.searchingText
+                ?.toLowerCase()
+                .indexOf(props?.searchingText.toLowerCase()) > -1
+            ) {
+              return sample;
+            }
+          } else if (!props?.searchingText && props?.department) {
+            if (
+              sample?.department?.departmentName
+                .toLowerCase()
+                .indexOf(props?.department?.toLowerCase()) > -1
+            ) {
+              return sample;
+            }
           }
         }
       ) || [];
@@ -483,17 +654,35 @@ export const getWorkList = createSelector(
           ["desc"]
         ),
         (sample) => {
-          if (!props?.searchingText) {
+          if (!props?.searchingText && !props?.department) {
             return sample;
-          } else if (
-            sample?.searchingText
-              ?.toLowerCase()
-              .indexOf(props?.searchingText?.toLowerCase()) > -1 &&
-            sample?.department?.departmentName
-              .toLowerCase()
-              .indexOf(props?.department?.toLowerCase()) > -1
-          ) {
-            return sample;
+          } else if (props?.searchingText && props?.department) {
+            if (
+              sample?.searchingText
+                ?.toLowerCase()
+                .indexOf(props?.searchingText.toLowerCase()) > -1 &&
+              sample?.department?.departmentName
+                .toLowerCase()
+                .indexOf(props?.department?.toLowerCase()) > -1
+            ) {
+              return sample;
+            }
+          } else if (props?.searchingText && !props?.department) {
+            if (
+              sample?.searchingText
+                ?.toLowerCase()
+                .indexOf(props?.searchingText.toLowerCase()) > -1
+            ) {
+              return sample;
+            }
+          } else if (!props?.searchingText && props?.department) {
+            if (
+              sample?.department?.departmentName
+                .toLowerCase()
+                .indexOf(props?.department?.toLowerCase()) > -1
+            ) {
+              return sample;
+            }
           }
         }
       ) || []
@@ -520,8 +709,6 @@ function getCompletedOrders(orders, isLIS?: boolean) {
       const testAllocationsWithResults = getTestAllocationsWithResults(
         order?.testAllocations
       );
-      console.log(order);
-      console.log("testAllocationsWithResults", testAllocationsWithResults);
       if (
         (!isLIS &&
           testAllocationsWithResults?.length > 0 &&
@@ -603,17 +790,35 @@ export const getPatientWithSampleDetails = createSelector(
           ["asc", "asc"]
         ),
         (sample) => {
-          if (!props?.searchingText) {
+          if (!props?.searchingText && !props?.department) {
             return sample;
-          } else if (
-            sample?.searchingText
-              ?.toLowerCase()
-              .indexOf(props?.searchingText.toLowerCase()) > -1 &&
-            sample?.department?.departmentName
-              .toLowerCase()
-              .indexOf(props?.department?.toLowerCase()) > -1
-          ) {
-            return sample;
+          } else if (props?.searchingText && props?.department) {
+            if (
+              sample?.searchingText
+                ?.toLowerCase()
+                .indexOf(props?.searchingText.toLowerCase()) > -1 &&
+              sample?.department?.departmentName
+                .toLowerCase()
+                .indexOf(props?.department?.toLowerCase()) > -1
+            ) {
+              return sample;
+            }
+          } else if (props?.searchingText && !props?.department) {
+            if (
+              sample?.searchingText
+                ?.toLowerCase()
+                .indexOf(props?.searchingText.toLowerCase()) > -1
+            ) {
+              return sample;
+            }
+          } else if (!props?.searchingText && props?.department) {
+            if (
+              sample?.department?.departmentName
+                .toLowerCase()
+                .indexOf(props?.department?.toLowerCase()) > -1
+            ) {
+              return sample;
+            }
           }
         }
       ) || [];
