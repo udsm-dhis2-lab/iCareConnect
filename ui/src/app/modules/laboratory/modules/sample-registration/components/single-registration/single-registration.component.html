@@ -266,10 +266,43 @@
                   <div class="col-4">
                     <input
                       (change)="getSelectedRCollectedOnTime($event)"
+                      [ngClass]="{
+                        'invalid-time-input': !collectedOnTimeValid
+                      }"
                       class="time-input-field"
                       placeholder="Collected At"
                       type="time"
                     />
+                    <p class="invalid-text" *ngIf="!collectedOnTimeValid">
+                      invalid time
+                    </p>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-4">
+                    <app-form
+                      [fields]="[broughtByField]"
+                      (formUpdate)="onFormUpdate($event)"
+                    ></app-form>
+                  </div>
+                  <div class="col-4">
+                    <app-form
+                      *ngIf="maxForCollectedOn && minForReceivedOn"
+                      [fields]="[broughtOnField]"
+                      (formUpdate)="onFormUpdate($event)"
+                    ></app-form>
+                  </div>
+                  <div class="col-4">
+                    <input
+                      (change)="getSelectedBroughtOnTime($event)"
+                      [ngClass]="{ 'invalid-time-input': !broughtOnTimeValid }"
+                      class="time-input-field"
+                      placeholder="Brought At"
+                      type="time"
+                    />
+                    <p class="invalid-text" *ngIf="!broughtOnTimeValid">
+                      invalid time
+                    </p>
                   </div>
                 </div>
                 <div class="row">
@@ -289,32 +322,14 @@
                   <div class="col-4">
                     <input
                       (change)="getSelectedReceivedOnTime($event)"
+                      [ngClass]="{ 'invalid-time-input': !receivedOnTimeValid }"
                       class="time-input-field"
                       placeholder="Received At"
                       type="time"
                     />
-                  </div>
-                </div>
-                <div class="row">
-                  <div class="col-4">
-                    <app-form
-                      [fields]="[broughtByField]"
-                      (formUpdate)="onFormUpdate($event)"
-                    ></app-form>
-                  </div>
-                  <div class="col-4">
-                    <app-form
-                      [fields]="[broughtOnField]"
-                      (formUpdate)="onFormUpdate($event)"
-                    ></app-form>
-                  </div>
-                  <div class="col-4">
-                    <input
-                      (change)="getSelectedBroughtOnTime($event)"
-                      class="time-input-field"
-                      placeholder="Brought At"
-                      type="time"
-                    />
+                    <p class="invalid-text" *ngIf="!receivedOnTimeValid">
+                      invalid time
+                    </p>
                   </div>
                 </div>
               </ng-container>
@@ -439,12 +454,28 @@
       </div>
     </div>
     <div class="col-12 d-flex justify-content-end mt-2 mb-2">
-      <button mat-flat-button color="primary" (click)="onSave($event, true)">
+      <button
+        mat-flat-button
+        [disabled]="
+          errorMessage ||
+          !broughtOnTimeValid ||
+          !receivedOnTimeValid ||
+          !collectedOnTimeValid
+        "
+        color="primary"
+        (click)="onSave($event, true)"
+      >
         Save to Reject
       </button>
       <button
         mat-flat-button
         color="primary"
+        [disabled]="
+          errorMessage ||
+          !broughtOnTimeValid ||
+          !receivedOnTimeValid ||
+          !collectedOnTimeValid
+        "
         class="ml-2"
         (click)="onSave($event)"
       >
