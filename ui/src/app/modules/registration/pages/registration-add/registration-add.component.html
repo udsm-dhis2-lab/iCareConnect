@@ -452,6 +452,10 @@
                 (formUpdate)="onResidenceUpdate($event)"
               ></app-form>
               <app-form
+                [fields]="[wardField]"
+                (formUpdate)="onResidenceUpdate($event)"
+              ></app-form>
+              <app-form
                 [fields]="[districtField]"
                 (formUpdate)="onResidenceUpdate($event)"
               ></app-form>
