@@ -112,9 +112,7 @@ export class NursingDataComponent implements OnInit {
     this.savingObservations$ = this.store.pipe(
       select(getSavingObservationStatus)
     );
-
     this.activeVisitDeathStatus$ = this.store.select(getActiveVisitDeathStatus);
-
     this.billLoadingState$ = this.store.pipe(select(getLoadingBillStatus));
     this.currentBills$ = this.store.select(getAllBills);
     this.doesPatientHasPendingPaymentForTheCurrentVisitType$ = this.store.pipe(

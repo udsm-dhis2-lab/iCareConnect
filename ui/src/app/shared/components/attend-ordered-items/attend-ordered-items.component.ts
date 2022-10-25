@@ -48,7 +48,7 @@ export class AttendOrderedItemsComponent implements OnInit {
     private dialog: MatDialog,
     private visitService: VisitsService,
     private store: Store<AppState>,
-    private ordersService: OrdersService,
+    private ordersService: OrdersService
   ) {}
 
   ngOnInit(): void {
@@ -184,7 +184,5 @@ export class AttendOrderedItemsComponent implements OnInit {
         );
       }
     });
-
-    
   }
 }
