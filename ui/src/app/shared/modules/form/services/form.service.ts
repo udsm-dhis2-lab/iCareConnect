@@ -237,20 +237,20 @@ export class FormService {
         })
       ).pipe(
         map((response) => {
-          console.log(response);
           return (
             response?.results?.filter(
-              (village: any) =>
-                village?.display?.toLowerCase()?.indexOf("dispensary") > -1 ||
-                village?.display?.toLowerCase()?.indexOf("hospital") > -1 ||
-                village?.display?.toLowerCase()?.indexOf("health") > -1 ||
-                village?.display?.toLowerCase()?.indexOf("clinic") > -1
+              (facility: any) =>
+                facility?.display?.toLowerCase()?.indexOf("dispensary") > -1 ||
+                facility?.display?.toLowerCase()?.indexOf("hospital") > -1 ||
+                facility?.display?.toLowerCase()?.indexOf("health") > -1 ||
+                facility?.display?.toLowerCase()?.indexOf("clinic") > -1
             ) || []
           )?.map((location: any) => {
             return {
               ...location,
               display:
-                location?.display + location?.parentLocation &&
+                location?.display +
+                (location?.parentLocation &&
                 location?.parentLocation?.parentLocation
                   ? "(" +
                     location?.parentLocation?.parentLocation?.display +
@@ -259,7 +259,7 @@ export class FormService {
                     ? location?.parentLocation?.parentLocation?.parentLocation
                         ?.display
                     : "" + ")"
-                  : "",
+                  : ""),
             };
           });
         })
