@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { MatDialog } from "@angular/material/dialog";
 import { Store } from "@ngrx/store";
 import { Observable } from "rxjs";
+import { map, tap } from "rxjs/operators";
 import { Credentials } from "src/app/core";
 import { Location } from "src/app/core/models";
 import {
@@ -29,6 +30,7 @@ export class LoginComponent implements OnInit {
   loginErrorStatus$: Observable<boolean>;
   parentLocation$: Observable<Location>;
   hide: boolean = true;
+  logo: any;
   constructor(
     private store: Store<AppState>,
     private formBuilder: FormBuilder,
@@ -42,7 +44,9 @@ export class LoginComponent implements OnInit {
       username: ["", Validators.required],
       password: ["", Validators.required],
     });
-    this.parentLocation$ = this.store.select(getParentLocation);
+    this.parentLocation$ = this.store.select(getParentLocation).pipe(tap((data) => {
+      this.logo = data?.attributes?.filter((attribute) => attribute?.attributeType?.display?.toLowerCase() === 'logo')[0]?.value
+    }));
     this.authenticationLoading$ = this.store.select(
       getAuthenticationLoadingState
     );
