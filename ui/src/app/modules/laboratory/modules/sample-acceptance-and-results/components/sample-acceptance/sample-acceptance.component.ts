@@ -19,6 +19,7 @@ import {
   getFormattedLabSamplesToFeedResults,
   getFormattedRejectedLabSamples,
   getLabDepartments,
+  getLabSamplesWithResults,
   getPatientsWithCompletedLabSamples,
   getSettingLabSampleStatusState,
   getWorkList,
@@ -61,6 +62,7 @@ export class SampleAcceptanceComponent implements OnInit {
   labDepartments$: Observable<any>;
   selectedDepartment: string = "";
   acceptedSamples$: Observable<any[]>;
+  samplesWithResults$: Observable<any[]>;
   constructor(private store: Store<AppState>, private dialog: MatDialog) {}
 
   ngOnInit(): void {
@@ -123,6 +125,10 @@ export class SampleAcceptanceComponent implements OnInit {
         this.selectedDepartment,
         this.searchingText
       )
+    );
+
+    this.samplesWithResults$ = this.store.select(
+      getLabSamplesWithResults(this.selectedDepartment, this.searchingText)
     );
   }
 
