@@ -63,6 +63,7 @@ export class SampleAcceptanceComponent implements OnInit {
   selectedDepartment: string = "";
   acceptedSamples$: Observable<any[]>;
   samplesWithResults$: Observable<any[]>;
+  showTabSampleTrackingForLis = false;
   constructor(private store: Store<AppState>, private dialog: MatDialog) {}
 
   ngOnInit(): void {
