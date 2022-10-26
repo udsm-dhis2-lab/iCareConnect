@@ -1,0 +1,50 @@
+<div>
+  <!-- {{ parameterResultsDetails | json }} -->
+  <span> {{ parameter?.display }}</span>
+  <span>
+    <!-- <b>
+      <span *ngIf="parameter?.answers?.length > 0">
+      </span>
+      <span *ngIf="parameter?.answers?.length == 0"> Answers </span>
+    </b> -->
+    <table
+      class="table"
+      *ngFor="let resultAllocation of parameterResultsDetails"
+    >
+      <tr *ngFor="let result of resultAllocation?.results">
+        <td>
+          {{
+            !result?.valueCoded?.display
+              ? result?.value
+              : result?.valueCoded?.display
+          }}
+        </td>
+        <!-- <td>
+          {{ result?.resultsFedBy?.name }}
+        </td> -->
+      </tr>
+    </table>
+  </span>
+  <!-- <span
+    *ngIf="
+      order?.testAllocations[count]?.secondSignOff &&
+      order?.order?.concept?.setMembers[count]?.lowNormal &&
+      order?.order?.concept?.setMembers[count]?.lowNormal >
+        order?.testAllocations[count]?.results[
+          order?.testAllocations[count]?.results?.length - 1
+        ]?.valueNumeric
+    "
+    ><img src="assets/images/arrowdownred.png" height="8px"
+  /></span>
+  <span
+    *ngIf="
+      order?.testAllocations[count]?.secondSignOff &&
+      order?.order?.concept?.setMembers[count]?.hiNormal &&
+      order?.testAllocations[count]?.results[
+        order?.testAllocations[count]?.results?.length - 1
+      ]?.valueNumeric > order?.order?.concept?.setMembers[count]?.hiNormal
+    "
+    ><img src="assets/images/arrowupred.png" height="8px"
+  /></span> -->
+  <br />
+</div>

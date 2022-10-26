@@ -32,15 +32,14 @@
             </div>
             <div class="col-8" style="display: inline-block; width: 66.67%">
               <h4 style="text-align: center">
-                <b
-                  >United Republic of Tanzania. <br />
-                  Ministry of Health.
+                <b>
+                  {{ facility?.display }}
                   <br />
                   <!-- <span *ngIf="labConfigs?.facilityDetails">
                     {{ labConfigs?.facilityDetails?.name }}<br />
                   </span> -->
                   <span *ngIf="facility.display">
-                    {{ facility.display }}<br />
+                    {{ facility?.description }}<br />
                   </span>
                   <small>
                     <!-- <span
@@ -48,12 +47,7 @@
                         labConfigs?.facilityDetails &&
                         labConfigs?.facilityDetails?.addressBox
                       ">P.O BOX: {{ labConfigs?.facilityDetails?.addressBox }}</span> -->
-                    <span
-                      *ngIf="
-                        facility &&
-                        facility.postalCode
-                      "
-                    >
+                    <span *ngIf="facility && facility.postalCode">
                       P.O BOX: {{ facility.postalCode }}
                     </span>
                     <!-- <span
@@ -63,17 +57,11 @@
                       "
                     >
                       TEL: {{ labConfigs?.facilityDetails?.addressTel }}
-                    </span>  -->
-                    </small
+                    </span>  --> </small
                   ><br />
                   <small>
-                    <span
-                      *ngIf="
-                        facility &&
-                        facility.stateProvince
-                      "
-                    >
-                      {{ facility.stateProvince }}
+                    <span *ngIf="facility && facility?.stateProvince">
+                      {{ facility?.stateProvince }}
                     </span>
                     <!-- <span
                       *ngIf="
@@ -283,7 +271,8 @@
                               <td>{{ order?.order?.orderNumber }}</td>
                               <td>{{ order?.order?.concept?.display }}</td>
                               <td>
-                                <p
+                                <div
+                                  class="w-100"
                                   *ngIf="
                                     order?.order?.concept?.setMembers?.length ==
                                     0
@@ -355,122 +344,30 @@
                                   >
                                     Processing ..
                                   </span>
-                                </p>
+                                </div>
 
-                                <p
+                                <div
+                                  class="w-100"
                                   *ngIf="
                                     order?.order?.concept?.setMembers?.length >
                                     0
                                   "
                                 >
-                                  <span
+                                  <div
                                     *ngFor="
                                       let parameter of order?.order?.concept
                                         ?.setMembers;
                                       let count = index
                                     "
                                   >
-                                    <span> {{ parameter?.display }} :</span>
-                                    <span>
-                                      <!-- 
-                                      {{order?.testAllocations[count]
-                                        ?.results[
-                                        order?.testAllocations[count]
-                                          ?.results?.length - 1
-                                      ] | json}} -->
-                                      <!-- l: {{parameter?.uuid}} -->
-                                      <b>
-                                        <span
-                                          *ngIf="parameter?.answers?.length > 0"
-                                        >
-                                          <!-- 1 -  -->
-                                          {{
-                                            getParameterConceptName(
-                                              parameter,
-                                              order?.testAllocations
-                                            )
-                                          }}
-                                        </span>
-                                        <span
-                                          *ngIf="
-                                            parameter?.answers?.length == 0
-                                          "
-                                        >
-                                          <!-- 2-  -->
-                                          {{
-                                            getResults(
-                                              parameter,
-                                              order?.testAllocations
-                                            )
-                                          }}
-                                        </span>
-
-                                        <!-- {{ parameter | json }} -->
-                                        <!-- {{
-                                          order?.testAllocations[count]
-                                            ?.results &&
-                                          order?.testAllocations[count]?.results
-                                            ?.length > 0 &&
-                                          parameter?.answers?.length == 0
-                                            ? order?.testAllocations[count]
-                                                ?.results[
-                                                order?.testAllocations[count]
-                                                  ?.results?.length - 1
-                                              ]?.value
-                                            : parameter?.answers?.length != 0
-                                            ? getParameterConceptName(
-                                                parameter?.answers,
-                                                order?.testAllocations[count]
-                                                  ?.results[
-                                                  order?.testAllocations[count]
-                                                    ?.results?.length - 1
-                                                ]?.value
-                                              )
-                                            : null
-                                        }}
-                                        {{ parameter?.units }} -->
-                                        <!-- {{ parameter | json }} -->
-                                      </b>
-                                    </span>
-                                    <span
-                                      *ngIf="
-                                        order?.testAllocations[count]
-                                          ?.secondSignOff &&
-                                        order?.order?.concept?.setMembers[count]
-                                          ?.lowNormal &&
-                                        order?.order?.concept?.setMembers[count]
-                                          ?.lowNormal >
-                                          order?.testAllocations[count]
-                                            ?.results[
-                                            order?.testAllocations[count]
-                                              ?.results?.length - 1
-                                          ]?.valueNumeric
-                                      "
-                                      ><img
-                                        src="assets/images/arrowdownred.png"
-                                        height="8px"
-                                    /></span>
-                                    <span
-                                      *ngIf="
-                                        order?.testAllocations[count]
-                                          ?.secondSignOff &&
-                                        order?.order?.concept?.setMembers[count]
-                                          ?.hiNormal &&
-                                        order?.testAllocations[count]?.results[
-                                          order?.testAllocations[count]?.results
-                                            ?.length - 1
-                                        ]?.valueNumeric >
-                                          order?.order?.concept?.setMembers[
-                                            count
-                                          ]?.hiNormal
-                                      "
-                                      ><img
-                                        src="assets/images/arrowupred.png"
-                                        height="8px"
-                                    /></span>
-                                    <br />
-                                  </span>
-                                </p>
+                                    <!-- {{ parameter | json }} -->
+                                    <app-shared-parameter-results
+                                      [order]="order"
+                                      [count]="count"
+                                      [parameter]="parameter"
+                                    ></app-shared-parameter-results>
+                                  </div>
+                                </div>
                               </td>
                               <td>
                                 <p
@@ -486,7 +383,7 @@
                                     style="font-size: 0.7rem"
                                     *ngIf="!order?.order?.concept?.units"
                                   >
-                                    N/A
+                                    -
                                   </span>
                                 </p>
                                 <p
@@ -517,7 +414,7 @@
                                         ]?.units
                                       "
                                     >
-                                      N/A
+                                      -
                                     </span>
                                     <br />
                                   </span>
@@ -538,7 +435,7 @@
                                     style="font-size: 0.7rem"
                                     *ngIf="!order?.order?.concept?.numeric"
                                   >
-                                    N/A
+                                    -
                                   </span>
                                 </p>
                                 <p
@@ -577,7 +474,7 @@
                                         ]?.numeric
                                       "
                                     >
-                                      N/A
+                                      -
                                     </span>
                                     <br />
                                   </span>
@@ -597,7 +494,7 @@
                                     style="font-size: 0.7rem"
                                     *ngIf="!order?.order?.concept?.numeric"
                                   >
-                                    N/A
+                                    -
                                   </span>
                                 </p>
                                 <p
@@ -637,7 +534,7 @@
                                         ]?.numeric
                                       "
                                     >
-                                      N/A
+                                      -
                                     </span>
                                     <br />
                                   </span>
@@ -752,7 +649,7 @@
                       {{
                         !LISConfigurations?.isLIS
                           ? "Approved By"
-                          : "Authorized At"
+                          : "Authorized On"
                       }}:
                     </b>
                     {{
