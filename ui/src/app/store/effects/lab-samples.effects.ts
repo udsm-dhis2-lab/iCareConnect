@@ -178,6 +178,7 @@ export class LabSamplesEffects {
                     name: sample?.creator?.display?.split(" (")[0],
                     uid: sample?.creator?.uuid,
                   },
+                  ordersWithResults: getOrdersWithResults(sample?.orders),
                   accepted:
                     (_.filter(sample?.statuses, { status: "ACCEPTED" }) || [])
                       ?.length > 0
@@ -1171,6 +1172,22 @@ function formatUserChangedStatus(statusDetails) {
       },
     };
   return null;
+}
+
+function getOrdersWithResults(orders) {
+  let newOrders: any[] = [];
+
+  orders?.forEach((order) => {
+    if (order?.testAllocations?.length > 0) {
+      order.testAllocations.forEach((test) => {
+        if (test.results.length > 0) {
+          newOrders = [...newOrders, order];
+        }
+      });
+    }
+  });
+
+  return newOrders;
 }
 
 function keyLevelTwoConceptSetMembers(members) {
