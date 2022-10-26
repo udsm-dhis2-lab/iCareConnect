@@ -156,7 +156,7 @@
       <mat-icon>arrow_drop_down</mat-icon>
     </span>
     <mat-autocomplete #auto="matAutocomplete">
-      <mat-option aria-disabled="true" value=""> --Search-- </mat-option>
+      <!-- <mat-option aria-disabled="true" value=""> --Search-- </mat-option> -->
       <ng-container *ngFor="let option of members$ | async">
         <mat-option
           [disabled]="option?.disabled"
