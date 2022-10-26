@@ -102,6 +102,7 @@ export class DrugOrderComponent implements OnInit, AfterViewInit {
           generalPrescriptionDoseConcept: this.generalPrescriptionDoseConcept,
           generalPrescriptionFrequencyConcept:
             this.generalPrescriptionFrequencyConcept,
+          specificDrugConceptUuid: "ba8aa8b0-2112-426a-a2b4-f3215e6286f0",
           fromDispensing: this.fromDispensing,
         }
       )

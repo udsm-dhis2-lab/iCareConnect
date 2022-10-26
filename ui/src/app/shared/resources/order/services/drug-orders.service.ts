@@ -403,7 +403,12 @@ export class DrugOrdersService {
           options: [],
           key: "drug",
           id: "drug",
-          value: drugOrder?.drug?.uuid,
+          value:
+            metadataConfigs?.specificDrugConceptUuid && fromDispensing
+              ? doctorPrescriptionDetails?.obs[
+                  metadataConfigs?.specificDrugConceptUuid
+                ]?.valueDrug?.uuid
+              : drugOrder?.drug?.uuid,
           required: true,
           label: "Drug",
         });
@@ -442,7 +447,7 @@ export class DrugOrdersService {
         });
 
         const drugOrderFrequencyField = new Dropdown({
-          id: "fequency",
+          id: "frequency",
           options: (metadata.drugOrderFrequencies || []).map(
             (orderFrequency) => ({
               id: orderFrequency.uuid,
