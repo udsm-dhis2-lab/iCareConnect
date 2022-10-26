@@ -1,23 +1,18 @@
 <div
   *ngIf="{
-    allSamples: allSamples$ | async
+    allSamples: allSamples$ | async,
+    samplesWithResults: samplesWithResults$ | async
   } as sampleParams"
-  >
+>
   <mat-progress-bar
-    *ngIf="
-      !sampleParams?.allSamples
-    "
+    *ngIf="!sampleParams?.allSamples"
     mode="indeterminate"
   ></mat-progress-bar>
 
-  <div
-    *ngIf="
-      sampleParams?.allSamples
-    "
-  >
-    <div class="sample-dashboard-summary">
+  <div *ngIf="sampleParams?.allSamples">
+    <!-- <div class="sample-dashboard-summary">
       <app-samples-summary-dashboard></app-samples-summary-dashboard>
-    </div>
+    </div> -->
     <div class="filtering-div">
       <mat-form-field class="w-50">
         <mat-label>Search</mat-label>
@@ -46,6 +41,7 @@
       </mat-form-field>
     </div>
     <div class="p-1">
+      <!-- {{ sampleParams?.samplesWithResults | json }} -->
       <table class="table table-bordered">
         <thead class="table-header">
           <tr>
@@ -78,142 +74,191 @@
           </tr>
         </thead>
         <tbody>
-          <ng-container *ngIf="sampleParams?.allSamples?.length > 0">
+          <ng-container *ngIf="sampleParams?.samplesWithResults?.length > 0">
             <ng-container
-              *ngFor="let sample of sampleParams?.allSamples; let count = index"
+              *ngFor="
+                let sample of sampleParams?.samplesWithResults;
+                let count = index
+              "
             >
               <tr
                 [ngStyle]="{
-                  'background-color':
-                    sample?.completed
-                      ? '#6fd67bcf' :
-                    sample?.atLestOneOrderWithRejectedResults &&
-                    !sample?.completed
-                      ? '#d04747ab'
-                      : order?.testAllocations[0]?.firstSignOff &&
-                        !LISConfigurations?.isLIS
-                      ? '#f5f171f7'
-                      : order?.testAllocations[0]?.firstSignOff &&
-                        LISConfigurations?.isLIS
-                      ? '#0080009e'
-                      : sample?.atLeastOneHasResults && !sample?.completed
-                      ? '#ec864acf'
-                      : ''
+                  'background-color': sample?.completed
+                    ? '#6fd67bcf'
+                    : sample?.atLestOneOrderWithRejectedResults &&
+                      !sample?.completed
+                    ? '#d04747ab'
+                    : order?.testAllocations[0]?.firstSignOff &&
+                      !LISConfigurations?.isLIS
+                    ? '#f5f171f7'
+                    : order?.testAllocations[0]?.firstSignOff &&
+                      LISConfigurations?.isLIS
+                    ? '#0080009e'
+                    : sample?.atLeastOneHasResults && !sample?.completed
+                    ? '#ec864acf'
+                    : ''
                 }"
                 [ngClass]="{ 'row-alternated': count % 2 !== 0 }"
                 *ngFor="let order of sample?.orders; let orderCount = index"
               >
-                    <td
-                      *ngIf="orderCount == 0"
-                      [attr.rowspan]="sample?.orders?.length"
-                    >
-                      {{ count + 1 }}
-                    </td>
-                    <td
-                      *ngIf="orderCount == 0"
-                      [attr.rowspan]="sample?.orders?.length"
-                    >
-                      {{ sample?.department?.departmentName }}
-                    </td>
-                    <td
-                      *ngIf="orderCount == 0 && !LISConfigurations?.isLIS"
-                      [attr.rowspan]="sample?.orders?.length"
-                    >
-                      {{ sample?.specimen?.name }}
-                    </td>
-                    <td
-                      *ngIf="orderCount == 0"
-                      [attr.rowspan]="sample?.orders?.length"
-                    >
-                      {{ sample?.label }}
-                    </td>
-                    <td
-                      *ngIf="orderCount == 0 && !LISConfigurations?.isLIS"
-                      [attr.rowspan]="sample?.orders?.length"
-                    >
-                      {{ sample?.patient?.identifiers[0]?.id }}
-                    </td>
-                    <td
-                      *ngIf="orderCount == 0 && !LISConfigurations?.isLIS"
-                      [attr.rowspan]="sample?.orders?.length"
-                    >
-                      {{ sample?.patient?.givenName }}
-                      {{ sample?.patient?.middleName }}
-                      {{ sample?.patient?.familyName }}
-                    </td>
-                    <td>{{ order?.order?.concept?.display }}</td>
-                    <td>
+                <td
+                  *ngIf="orderCount == 0"
+                  [attr.rowspan]="sample?.orders?.length"
+                >
+                  {{ count + 1 }}
+                </td>
+                <td
+                  *ngIf="orderCount == 0"
+                  [attr.rowspan]="sample?.orders?.length"
+                >
+                  {{ sample?.department?.departmentName }}
+                </td>
+                <td
+                  *ngIf="orderCount == 0 && !LISConfigurations?.isLIS"
+                  [attr.rowspan]="sample?.orders?.length"
+                >
+                  {{ sample?.specimen?.name }}
+                </td>
+                <td
+                  *ngIf="orderCount == 0"
+                  [attr.rowspan]="sample?.orders?.length"
+                >
+                  {{ sample?.label }}
+                </td>
+                <td
+                  *ngIf="orderCount == 0 && !LISConfigurations?.isLIS"
+                  [attr.rowspan]="sample?.orders?.length"
+                >
+                  {{ sample?.patient?.identifiers[0]?.id }}
+                </td>
+                <td
+                  *ngIf="orderCount == 0 && !LISConfigurations?.isLIS"
+                  [attr.rowspan]="sample?.orders?.length"
+                >
+                  {{ sample?.patient?.givenName }}
+                  {{ sample?.patient?.middleName }}
+                  {{ sample?.patient?.familyName }}
+                </td>
+                <td>{{ order?.order?.concept?.display }}</td>
+                <td>
+                  {{
+                    !LISConfigurations?.isLIS
+                      ? order?.order?.orderer?.name
+                      : order?.order?.orderNumber
+                  }}
+                </td>
+                <td
+                  *ngIf="orderCount == 0 && LISConfigurations?.isLIS"
+                  [attr.rowspan]="sample?.orders?.length"
+                >
+                  {{ sample?.receivedByStatus?.user?.name }}
+                </td>
+                <td
+                  *ngIf="orderCount == 0 && LISConfigurations?.isLIS"
+                  [attr.rowspan]="sample?.orders?.length"
+                >
+                  {{
+                    sample?.receivedOnStatus?.timestamp
+                      ? (sample?.receivedOnStatus?.timestamp | date: "medium")
+                      : ""
+                  }}
+                </td>
+                <td
+                  *ngIf="orderCount == 0"
+                  [attr.rowspan]="sample?.orders?.length"
+                >
+                  {{ sample?.collectedBy?.display }}
+                </td>
+                <td
+                  *ngIf="orderCount == 0"
+                  [attr.rowspan]="sample?.orders?.length"
+                >
+                  {{ sample?.created | date: "medium" }}
+                </td>
+                <td
+                  *ngIf="orderCount == 0"
+                  [attr.rowspan]="sample?.orders?.length"
+                >
+                  {{
+                    !LISConfigurations?.isLIS
+                      ? sample?.priorityHigh
+                        ? "Urgent"
+                        : "Routine"
+                      : sample?.priorityStatus?.status
+                      ? sample?.priorityStatus?.status
+                      : "Routine"
+                  }}
+                </td>
+                <td
+                  class="text-center"
+                  *ngIf="orderCount == 0"
+                  [attr.rowspan]="sample?.orders?.length"
+                >
+                  <a
+                    style="cursor: pointer"
+                    (click)="toggleSampleDetails($event, sample)"
+                  >
+                    <span>
                       {{
-                        !LISConfigurations?.isLIS
-                          ? order?.order?.orderer?.name
-                          : order?.order?.orderNumber
+                        sample?.releasedStatuses?.length > 0
+                          ? sample?.releasedStatuses[
+                              sample?.releasedStatuses?.length - 1
+                            ]?.status
+                          : "-"
                       }}
-                    </td>
-                    <td
-                      *ngIf="orderCount == 0 && LISConfigurations?.isLIS"
-                      [attr.rowspan]="sample?.orders?.length"
-                    >
-                      {{ sample?.receivedByStatus?.user?.name }}
-                    </td>
-                    <td
-                      *ngIf="orderCount == 0 && LISConfigurations?.isLIS"
-                      [attr.rowspan]="sample?.orders?.length"
-                    >
-                      {{
-                        sample?.receivedOnStatus?.timestamp
-                          ? (sample?.receivedOnStatus?.timestamp | date: "medium")
-                          : ""
-                      }}
-                    </td>
-                    <td
-                      *ngIf="orderCount == 0"
-                      [attr.rowspan]="sample?.orders?.length"
-                    >
-                      {{ sample?.collectedBy?.display }}
-                    </td>
-                    <td
-                      *ngIf="orderCount == 0"
-                      [attr.rowspan]="sample?.orders?.length"
-                    >
-                      {{ sample?.created | date: "medium" }}
-                    </td>
-                    <td
-                      *ngIf="orderCount == 0"
-                      [attr.rowspan]="sample?.orders?.length"
-                    >
-                      {{
-                        !LISConfigurations?.isLIS
-                          ? sample?.priorityHigh
-                            ? "Urgent"
-                            : "Routine"
-                          : sample?.priorityStatus?.status
-                          ? sample?.priorityStatus?.status
-                          : "Routine"
-                      }}
-                    </td>
-                    <td
-                      class="text-center"
-                      *ngIf="orderCount == 0"
-                      [attr.rowspan]="sample?.orders?.length"
-                    >
-                      <span> {{ sample?.externalUseStatus[0]?.status ? sample?.externalUseStatus[0]?.status : '-' }}  </span>
-                    </td>
-                    <td
-                      *ngIf="orderCount == 0"
-                      [attr.rowspan]="sample?.orders?.length"
-                    >
-                      <button *ngIf="!sample.externalUseStatus.length || sample?.externalUseStatus[0]?.status !== 'RELEASED'" mat-button class="colored-button" (click)="onUpdateStatus($event, sample, 'release')">
-                        Release
-                      </button>
-                      <button *ngIf="sample.externalUseStatus.length > 0 && sample?.externalUseStatus[0]?.status === 'RELEASED'" mat-button class="btn-danger" (click)="onUpdateStatus($event, sample, 'restrict')">
-                        Restrict
-                      </button>
-                </tr>
+                    </span>
+                  </a>
+                </td>
+                <td>
+                  <!-- *ngIf="
+                      !sample.externalUseStatus.length ||
+                      sample?.releasedStatuses[0]?.status !== 'RELEASED'
+                    " -->
+
+                  <!-- 
+                    *ngIf="
+                      sample.externalUseStatus.length > 0 &&
+                      sample?.externalUseStatus[0]?.status === 'RELEASED'
+                    " -->
+                  <button
+                    *ngIf="sample?.releasedStatuses?.length === 0"
+                    mat-stroked-button
+                    class="colored-button"
+                    (click)="onUpdateStatus($event, sample, 'release')"
+                  >
+                    Release
+                  </button>
+                  <button
+                    *ngIf="sample?.releasedStatuses?.length > 0"
+                    mat-stroked-button
+                    class="btn-danger"
+                    (click)="onUpdateStatus($event, sample, 'restrict')"
+                  >
+                    Restrict
+                  </button>
+                </td>
+              </tr>
+              <tr *ngIf="sampleDetailsToggleControl[sample?.id]">
+                <td colspan="100%" class="text-muted font-italic text-right">
+                  {{
+                    sample?.releasedStatuses?.length > 0
+                      ? "By " +
+                        sample?.releasedStatuses[
+                          sample?.releasedStatuses?.length - 1
+                        ]?.user?.name +
+                        " on " +
+                        sample?.releasedStatuses[
+                          sample?.releasedStatuses?.length - 1
+                        ]?.date
+                      : ""
+                  }}
+                </td>
+              </tr>
             </ng-container>
           </ng-container>
-          <ng-container *ngIf="sampleParams?.allSamples?.length == 0">
-            <tr> 
-              <td colspan="10" class="text-danger text-center">No samples</td>
+          <ng-container *ngIf="sampleParams?.samplesWithResults?.length == 0">
+            <tr>
+              <td colspan="100%" class="text-danger text-center">No samples</td>
             </tr>
           </ng-container>
         </tbody>

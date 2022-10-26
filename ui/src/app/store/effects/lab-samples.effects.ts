@@ -47,6 +47,8 @@ import {
 } from "src/app/modules/laboratory/store/actions";
 import { getLISConfigurations } from "../selectors/lis-configurations.selectors";
 
+import * as moment from "moment";
+
 @Injectable()
 export class LabSamplesEffects {
   constructor(
@@ -82,6 +84,42 @@ export class LabSamplesEffects {
                   department:
                     keyedDepartments[sample?.orders[0]?.order?.concept?.uuid],
                   collected: true,
+                  releasedStatuses: (
+                    sample?.statuses?.filter(
+                      (status) => status?.status === "RELEASED"
+                    ) || []
+                  ).map((status) => {
+                    return {
+                      ...status,
+                      date:
+                        new Date(status?.timestamp).toLocaleDateString() +
+                        " " +
+                        new Date(status?.timestamp).getHours().toString() +
+                        ":" +
+                        new Date(status?.timestamp).getMinutes().toString() +
+                        " ( " +
+                        moment(Number(status?.timestamp)).fromNow() +
+                        " )",
+                    };
+                  }),
+                  restrictedStatuses: (
+                    sample?.statuses?.filter(
+                      (status) => status?.status === "RESTRICTED"
+                    ) || []
+                  ).map((status) => {
+                    return {
+                      ...status,
+                      date:
+                        new Date(status?.timestamp).toLocaleDateString() +
+                        " " +
+                        new Date(status?.timestamp).getHours().toString() +
+                        ":" +
+                        new Date(status?.timestamp).getMinutes().toString() +
+                        " ( " +
+                        moment(Number(status?.timestamp)).fromNow() +
+                        " )",
+                    };
+                  }),
                   reasonForRejection:
                     sample?.statuses?.length > 0 &&
                     _.orderBy(sample?.statuses, ["timestamp"], ["desc"])[0]
@@ -819,9 +857,6 @@ export class LabSamplesEffects {
           .acceptSampleAndCreateAllocations(sampleAcceptStatusWithAllocations)
           .pipe(
             mergeMap((response) => {
-              // console.log('orders : ', action?.details?.orders);
-              console.log("allocations : ", response);
-
               let reprocessedOrders = _.map(
                 action?.details?.orders,
                 (order) => {
@@ -893,8 +928,6 @@ export class LabSamplesEffects {
                   reprocessedOrders
                 ),
               };
-
-              console.log("formattedSample", formattedSample);
 
               return [updateLabSample({ sample: formattedSample })];
             })
