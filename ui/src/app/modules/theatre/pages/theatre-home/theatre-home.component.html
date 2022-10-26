@@ -5,10 +5,12 @@
   ></mat-progress-bar>
   <div class="centered-container-patient-list">
     <div>
-      <div class="text-muted h6 mb-4 text-center">Search for a patient</div>
       <app-patient-list
-        (selectPatient)="onSelectPatient()"
-        [isTabularList]="isPatientListTabular"
+        [shouldShowParentLocation]="true"
+        [orderType]="'4ae7f8eb-0bd5-11e8-b450-525400e4297f'"
+        [isTabularList]="true"
+        [itemsPerPage]="10"
+        (selectPatient)="onSelectPatient($event)"
       ></app-patient-list>
     </div>
   </div>

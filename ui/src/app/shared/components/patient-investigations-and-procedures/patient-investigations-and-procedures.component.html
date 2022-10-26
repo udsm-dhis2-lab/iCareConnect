@@ -5,7 +5,9 @@
   >
     <mat-tab
       label="Laboratory"
-      *ngIf="userPrivileges['CLINIC_ADD_LABORATORY_INVESTIGATION']"
+      *ngIf="
+        userPrivileges['CLINIC_ADD_LABORATORY_INVESTIGATION'] && !isTheatre
+      "
     >
       <div class="mat-tab-container">
         <ng-template matTabContent>
@@ -29,19 +31,6 @@
             (updateConsultationOrder)="onUpdateConsultationOrder()"
           ></app-patient-lab-results-summary>
         </ng-template>
-        <!-- TODO: Lofic to handle provisional diagnosis check -->
-        <!-- <div
-          class="alert alert-warning"
-          role="alert"
-          *ngIf="
-            (clinicConfigurations?.provisionalDiagnosis
-              ?.shouldAffectImmediateSections &&
-              !patientVisit?.hasProvisonalDiagnosis) ||
-            !shouldShowLabSection
-          "
-        >
-          Provisional diagnosis should be provided first
-        </div> -->
       </div>
     </mat-tab>
     <mat-tab
@@ -65,8 +54,36 @@
         </ng-template></div
     ></mat-tab>
     <mat-tab
+      label="Laboratory"
+      *ngIf="userPrivileges['CLINIC_ADD_LABORATORY_INVESTIGATION'] && isTheatre"
+    >
+      <div class="mat-tab-container">
+        <ng-template matTabContent>
+          <app-patient-lab-results-summary
+            *ngIf="
+              !clinicConfigurations?.provisionalDiagnosis
+                ?.shouldAffectImmediateSections ||
+              (clinicConfigurations?.provisionalDiagnosis
+                ?.shouldAffectImmediateSections &&
+                patientVisit?.hasProvisonalDiagnosis) ||
+              shouldShowLabSection
+            "
+            [observations]="observations"
+            [patientVisit]="patientVisit"
+            [forConsultation]="forConsultation"
+            [investigationAndProceduresFormsDetails]="
+              investigationAndProceduresFormsDetails
+            "
+            [iCareGeneralConfigurations]="iCareGeneralConfigurations"
+            [isInpatient]="isInpatient"
+            (updateConsultationOrder)="onUpdateConsultationOrder()"
+          ></app-patient-lab-results-summary>
+        </ng-template>
+      </div>
+    </mat-tab>
+    <mat-tab
       label="Radiology"
-      *ngIf="userPrivileges['CLINIC_ADD_RADIOLOGY_INVESTIGATION']"
+      *ngIf="userPrivileges['CLINIC_ADD_RADIOLOGY_INVESTIGATION'] && !isTheatre"
     >
       <div class="mat-tab-container">
         <ng-template matTabContent>
