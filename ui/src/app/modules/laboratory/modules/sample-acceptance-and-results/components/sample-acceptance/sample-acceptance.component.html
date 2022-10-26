@@ -1165,7 +1165,11 @@
                         )
                       "
                     >
-                      {{ sample?.ordersWithResults?.length === 0 ? 'Results entry': 'Edit Results'}}
+                      {{
+                        sample?.ordersWithResults?.length === 0
+                          ? "Results entry"
+                          : "Edit Results"
+                      }}
                     </button>
                   </td>
                 </tr>
@@ -1359,7 +1363,7 @@
         </table>
       </div>
     </mat-tab>
-    <mat-tab label="Sample Tracking" *ngIf="LISConfigurations?.isLIS">
+    <mat-tab label="Sample Tracking" style="display: none">
       <div class="filter-and-legend">
         <mat-form-field class="w-50">
           <mat-label>Search</mat-label>
@@ -1646,7 +1650,10 @@
         </table>
       </div>
     </mat-tab>
-    <mat-tab label="Results Review" *ngIf="LISConfigurations?.isLIS">
+    <mat-tab
+      label="Sample Review & Authorization"
+      *ngIf="LISConfigurations?.isLIS"
+    >
       <div class="filter-and-legend">
         <mat-form-field class="w-50">
           <mat-label>Search</mat-label>
@@ -1860,7 +1867,7 @@
         </table>
       </div>
     </mat-tab>
-    <mat-tab label="Results">
+    <mat-tab label="Results" *ngIf="!LISConfigurations?.isLIS">
       <div class="filter-and-legend">
         <mat-form-field class="w-50">
           <mat-label>Search</mat-label>
@@ -1907,6 +1914,60 @@
                 {{ patient?.patient?.givenName }}
                 {{ patient?.patient?.middleName }}
                 {{ patient?.patient?.familyName }}
+              </td>
+              <td>
+                <button
+                  class="colored-button"
+                  mat-stroked-button
+                  (click)="
+                    onResultsToPrint(
+                      $event,
+                      patient,
+                      sampleParams?.providerDetails
+                    )
+                  "
+                >
+                  Print results
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </mat-tab>
+    <mat-tab label="Results" *ngIf="LISConfigurations?.isLIS">
+      <div class="filter-and-legend">
+        <mat-form-field class="w-50">
+          <mat-label>Search</mat-label>
+          <mat-icon matPrefix>search</mat-icon
+          ><input
+            matInput
+            (keyup)="onSearch($event)"
+            [(ngModel)]="searchingText"
+          />
+        </mat-form-field>
+      </div>
+      <div class="p-1">
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+              <th style="width: 10px !important">SN</th>
+              <th>Lab Number</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              *ngFor="
+                let sample of sampleParams?.samplesWithResults;
+                let count = index
+              "
+            >
+              <td>
+                {{ count + 1 }}
+              </td>
+              <td>
+                {{ sample?.id }}
               </td>
               <td>
                 <button

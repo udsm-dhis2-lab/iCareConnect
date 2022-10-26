@@ -351,6 +351,7 @@ export class SamplesService {
       },
       remarks: statusDetails.comments ? statusDetails.comments : "",
       status: statusDetails?.status,
+      category: statusDetails?.category,
     };
 
     return this.httpClientService.post("lab/samplestatus", data);
