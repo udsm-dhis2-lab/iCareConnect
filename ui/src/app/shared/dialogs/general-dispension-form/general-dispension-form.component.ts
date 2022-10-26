@@ -41,6 +41,7 @@ export class GeneralDispensingFormComponent implements OnInit {
   @Input() genericPrescriptionConceptUuids: any;
   @Input() conceptFields$: Observable<any>;
   @Input() strengthConceptUuid: any;
+  @Input() useSpecificDrugPrescription: any;
 
   drugOrder: DrugOrderObject;
 
@@ -83,7 +84,7 @@ export class GeneralDispensingFormComponent implements OnInit {
     private drugService: DrugsService
   ) {}
 
-  ngOnInit() {
+  async ngOnInit() {
     this.dosingUnitsSettingsEvent.emit(this.dosingUnitsSettings);
     this.durationUnitsSettingsEvent.emit(this.durationUnitsSettings);
     this.drugRoutesSettingsEvent.emit(this.drugRoutesSettings);
@@ -91,20 +92,53 @@ export class GeneralDispensingFormComponent implements OnInit {
       this.generalPrescriptionFrequencyConcept
     );
 
-    this.genericPrescriptionConceptUuidsEvent.emit(
-      this.genericPrescriptionConceptUuids
-    );
+    // this.genericPrescriptionConceptUuidsEvent.emit(
+    //   this.genericPrescriptionConceptUuids
+    // );
+    this.genericPrescriptionConceptUuidsEvent.emit([
+      this.generalPrescriptionDoseConcept,
+      this.generalPrescriptionDurationConcept,
+    ]);
 
-    this.drugConceptField = new Dropdown({
-      id: "drug",
-      key: "drug",
-      options: [],
-      label: "Search Drug",
-      conceptClass: "Drug",
-      searchControlType: "concept",
-      value: null,
-      searchTerm: "ICARE_GENERIC_DRUG",
-      shouldHaveLiveSearchForDropDownFields: true,
+    
+    if(this.useSpecificDrugPrescription){
+      const drugs = await this.drugOrderService.getAllDrugs("full");
+      this.drugConceptField = new Dropdown({
+        options: drugs,
+        key: "drug",
+        value: "drug",
+        required: true,
+        label: "Drug",
+        searchControlType: "drug",
+      });
+    } else {
+      this.drugConceptField = new Dropdown({
+        id: "drug",
+        key: "drug",
+        options: [],
+        label: "Search Drug",
+        conceptClass: "Drug",
+        searchControlType: "concept",
+        value: null,
+        searchTerm: "ICARE_GENERIC_DRUG",
+        shouldHaveLiveSearchForDropDownFields: true,
+      });
+    }
+
+    this.drugDoseField = new Textbox({
+      id: "dose",
+      key: "dose",
+      label: "Dose",
+      required: true,
+      type: "number",
+    });
+
+    this.drugDurationField = new Textbox({
+      id: "duration",
+      key: "duration",
+      label: "Duration",
+      required: true,
+      type: "number",
     });
   }
 
@@ -164,7 +198,9 @@ export class GeneralDispensingFormComponent implements OnInit {
             ? "OUTPATIENT"
             : "INPATIENT",
           patient: this.currentPatient?.id,
-          concept: this.formValues["drug"].value,
+          concept: this.useSpecificDrugPrescription
+            ? "20ede556-5558-4bc5-8d8b-5d3d045010a2"
+            : this.formValues["drug"].value,
           orderer: this.provider?.uuid,
           type: "order",
         },
@@ -172,7 +208,7 @@ export class GeneralDispensingFormComponent implements OnInit {
       visit: this.currentVisit?.uuid,
     };
 
-    const obs = conceptFields.map((conceptField) => {
+    let obs = conceptFields.map((conceptField) => {
       return {
         person: this.currentPatient?.id,
         concept: conceptField?.uuid,
@@ -180,6 +216,42 @@ export class GeneralDispensingFormComponent implements OnInit {
         value: this.formValues[conceptField?.uuid].value,
       };
     });
+
+
+    obs = [
+      ...obs,
+      this.useSpecificDrugPrescription ? 
+      {
+        person: this.currentPatient?.id,
+        concept: this.generalPrescriptionFrequencyConcept,
+        obsDatetime: new Date(),
+        valueDrug: this.formValues["drug"].value,
+      } : {},
+      {
+        person: this.currentPatient?.id,
+        concept: this.generalPrescriptionFrequencyConcept,
+        obsDatetime: new Date(),
+        value: this.formValues["frequency"].value,
+      },
+      {
+        person: this.currentPatient?.id,
+        concept: this.durationUnitsSettings,
+        obsDatetime: new Date(),
+        value: this.formValues["durationUnit"].value,
+      },
+      {
+        person: this.currentPatient?.id,
+        concept: this.dosingUnitsSettings,
+        obsDatetime: new Date(),
+        value: this.formValues["dosingUnit"].value,
+      },
+      {
+        person: this.currentPatient?.id,
+        concept: this.drugRoutesSettings,
+        obsDatetime: new Date(),
+        value: this.formValues["route"].value,
+      },
+    ].filter(ob => ob);
 
     this.ordersService
       .createOrdersViaCreatingEncounter(encounterObject)

@@ -19,7 +19,8 @@
     dispensingLocations: dispensingLocations$ | async,
     genericPrescriptionConceptUuids: genericPrescriptionConceptUuids$ | async,
     drugOrderConceptDetails: drugOrderConceptDetails$ | async,
-    strengthConceptUuid: strengthConceptUuid$ | async
+    strengthConceptUuid: strengthConceptUuid$ | async,
+    useSpecificDrugPrescription: useSpecificDrugPrescription$ | async
   } as params"
 >
   <div class="loading-overlay" *ngIf="savingOrder">
@@ -116,7 +117,8 @@
                 params?.generalPrescriptionDoseConcept &&
                 params?.generalPrescriptionFrequencyConcept &&
                 params?.genericPrescriptionConceptUuids &&
-                params?.strengthConceptUuid
+                params?.strengthConceptUuid &&
+                params?.useSpecificDrugPrescription
               "
             >
               <app-general-dispension-form
@@ -129,6 +131,7 @@
                 (genericPrescriptionConceptUuidsEvent)="
                   getConceptsAsFields($event)
                 "
+                [useSpecificDrugPrescription]="params?.useSpecificDrugPrescription"
                 [encounterType]="params?.generalPrescriptionEncounterType"
                 [orderType]="params?.generalPrescriptionOrderType"
                 [currentPatient]="params?.currentPatient"
