@@ -29,6 +29,7 @@ import { PersonService } from "src/app/core/services/person.service";
 })
 export class PersonDetailsComponent implements OnInit {
   @Input() referFromFacilityVisitAttribute: string;
+  @Input() maximumDate: string;
   patientIdentifierTypes: any[];
   @Output() personDetails: EventEmitter<any> = new EventEmitter<any>();
   personDetailsCategory: string = "new";
@@ -148,6 +149,7 @@ export class PersonDetailsComponent implements OnInit {
         id: "dob",
         key: "dob",
         label: "Date of birth",
+        max: this.maximumDate,
         required: false,
         value: this.personDetailsData ? this.personDetailsData?.dob : null,
         type: "date",
@@ -307,6 +309,7 @@ export class PersonDetailsComponent implements OnInit {
           ? personDetails?.birthdate?.substring(0, 10)
           : null,
         type: "date",
+        max: this.maximumDate,
       }),
     ];
     this.personFieldsGroupThree = [
