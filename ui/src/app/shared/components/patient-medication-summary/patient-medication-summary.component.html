@@ -220,7 +220,7 @@
         <div class="mat-tab-container">
           <ng-template matTabContent>
             <table
-              class="table"Doctor\'
+              class="table"
               *ngIf="
                 drugParams?.filteredDrugOrders?.toBeDispensedDrugOrders
                   ?.length > 0
@@ -257,21 +257,19 @@
                     {{ drugOrder?.dateActivated | date: "medium" }}
                   </td>
                 </tr>
-                <ng-container *ngIf="!isInpatient">
-                  <tr *ngIf="drugParams?.useGeneralPrescription !== 'true'">
-                      <td colspan="3">
-                        <button
-                          mat-flat-button
-                          class="float-right"
-                          color="primary"
-                          (click)="onAddOrder($event)"
-                        >
-                          <mat-icon>add</mat-icon>
-                          <span class="ml-2">Add Prescription</span>
-                        </button>
-                      </td>
-                    </tr>
-                </ng-container>
+                <tr *ngIf="!isInpatient && drugParams?.useGeneralPrescription !== 'true'">
+                  <td colspan="3">
+                    <button
+                      mat-flat-button
+                      class="float-right"
+                      color="primary"
+                      (click)="onAddOrder($event)"
+                    >
+                      <mat-icon>add</mat-icon>
+                      <span class="ml-2">Add Prescription</span>
+                    </button>
+                  </td>
+                </tr>
               </tbody>
             </table>
             <table
