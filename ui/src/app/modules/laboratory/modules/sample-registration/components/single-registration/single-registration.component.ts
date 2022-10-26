@@ -110,6 +110,7 @@ export class SingleRegistrationComponent implements OnInit {
   broughtOnTime: any;
   collectedOnTime: any;
   receivedOnTime: any;
+  maxForBroughtOn: boolean = true;
 
   constructor(
     private samplesService: SamplesService,
@@ -318,7 +319,17 @@ export class SingleRegistrationComponent implements OnInit {
 
   getSelectedReceivedOnTime(event: Event): void {
     this.receivedOnTime = (event.target as any)?.value;
-    this.receivedOnTimeValid = this.isValidTime(this.receivedOnTime, this.receivedOnDateLatestValue ? this.receivedOnDateLatestValue : this.maximumDate);
+    this.receivedOnTimeValid = this.isValidTime(
+      this.receivedOnTime, 
+      this.receivedOnDateLatestValue ? this.receivedOnDateLatestValue : this.maximumDate)
+    if(this.collectedOnTime || this.broughtOnTime){
+      this.receivedOnTimeValid = this.isValidTime(
+        this.broughtOnTime ? this.broughtOnTime : this.collectedOnTime,
+        this.broughtOnDateLatestValue ? this.broughtOnDateLatestValue : this?.collectedOnDateLatestValue ? this?.collectedOnDateLatestValue : this.maximumDate,
+        this.receivedOnTime, 
+        this.receivedOnDateLatestValue ? this.receivedOnDateLatestValue : this.maximumDate
+        )
+    }
     this.formData = {
       ...this.formData,
       receivedAt: {
@@ -335,8 +346,22 @@ export class SingleRegistrationComponent implements OnInit {
       this.collectedOnTime,
       this.collectedOnDateLatestValue
         ? this.collectedOnDateLatestValue
-        : this.maximumDate
+        : this.maximumDate,
     );
+    if (this.broughtOnTime || this.receivedOnTime) {
+      this.collectedOnTimeValid = this.isValidTime(
+        this.collectedOnTime,
+        this.collectedOnDateLatestValue
+          ? this.collectedOnDateLatestValue
+          : this.maximumDate,
+        this.broughtOnTime
+          ? this.broughtOnTime
+          : this.receivedOnTime,
+        this.broughtOnDateLatestValue
+          ? this.broughtOnDateLatestValue
+          : this?.receivedOnDateLatestValue
+      );
+    }
     this.formData = {
       ...this.formData,
       collectedAt: {
@@ -355,6 +380,30 @@ export class SingleRegistrationComponent implements OnInit {
         ? this.broughtOnDateLatestValue
         : this.maximumDate
     );
+
+    if (this.receivedOnTime) {
+      this.broughtOnTimeValid = this.isValidTime(
+        this.broughtOnTime,
+        this.broughtOnDateLatestValue
+          ? this.broughtOnDateLatestValue
+          : this.maximumDate,
+        this.receivedOnTime,
+        this.receivedOnDateLatestValue
+          ? this.receivedOnDateLatestValue
+          : undefined
+      );
+    }
+    if(this.collectedOnTime){
+      this.broughtOnTimeValid = this.isValidTime(
+        this.collectedOnTime,
+      this.collectedOnDateLatestValue ? this.collectedOnDateLatestValue : this.maximumDate,
+      this.broughtOnTime,
+        this.broughtOnDateLatestValue
+          ? this.broughtOnDateLatestValue
+          : this.maximumDate
+      )
+    }
+
     this.formData = {
       ...this.formData,
       broughtAt: {
@@ -367,8 +416,8 @@ export class SingleRegistrationComponent implements OnInit {
 
   onFormUpdate(formValues: FormValue, itemKey?: string): void {
     //Validate Date fields
-    let collected_on_date;
     if (formValues.getValues()?.collectedOn?.value.toString()?.length > 0) {
+      let collected_on_date;
       collected_on_date = this.getDateStringFromDate(
         new Date(formValues.getValues()?.collectedOn?.value)
         );
@@ -380,8 +429,8 @@ export class SingleRegistrationComponent implements OnInit {
           : this.maximumDate
       );
     }
-    let received_on_date;
     if (formValues.getValues()?.receivedOn?.value?.toString()?.length > 0) {
+      let received_on_date;
       received_on_date = this.getDateStringFromDate(
         new Date(formValues.getValues()?.receivedOn?.value)
       );
@@ -393,8 +442,8 @@ export class SingleRegistrationComponent implements OnInit {
           : this.maximumDate
       );
     }
-    let brought_on_date;
     if (formValues.getValues()?.broughtOn?.value.toString()?.length > 0) {
+      let brought_on_date;
       brought_on_date = this.getDateStringFromDate(
         new Date(formValues.getValues()?.broughtOn?.value)
       );
@@ -417,10 +466,11 @@ export class SingleRegistrationComponent implements OnInit {
       ? this.collectedOnDateLatestValue
       : this.receivedOnField.min;
     this.minForReceivedOn = true;
+
     
     this.maxForCollectedOn = false;
     this.sampleColectionDateField.max = this.broughtOnDateLatestValue ? this.broughtOnDateLatestValue : this.receivedOnDateLatestValue ? this.receivedOnDateLatestValue : this.maximumDate;
-    this.broughtOnField.max = this.receivedOnDateLatestValue;
+    this.broughtOnField.max = this.receivedOnDateLatestValue ? this.receivedOnDateLatestValue : this.maximumDate
     this.maxForCollectedOn = true;
 
     // this.getDateStringFromMoment_i();
@@ -1434,12 +1484,13 @@ export class SingleRegistrationComponent implements OnInit {
     }
   }
 
-  isValidTime(time, date) {
+  isValidTime(time: string, date: string, validTime?: string, validDate?: string): boolean {
     if(time){
       let currentDate = new Date();
   
       console.log("==> Time", time)
       console.log("==> Date", date)
+
   
       let hours = time.split(":")[0];
       let mins = time.split(":")[1];
@@ -1448,14 +1499,20 @@ export class SingleRegistrationComponent implements OnInit {
       let day = date?.split("-")[2].toString()?.length > 1 ? date?.split("-")[2] : `0${date?.split("-")[2]}`;
       let inputDateString = `${year}-${month}-${day}`
   
-      let thisHours = currentDate.getHours();
-      let thisMinutes = currentDate.getMinutes();
+      let thisHours = validTime
+        ? parseInt(validTime?.split(":")[0])
+        : currentDate.getHours();
+      let thisMinutes = validTime ? parseInt(validTime?.split(":")[1]) : currentDate.getMinutes();
       let thisYear = currentDate.getFullYear();
       let thisMonth = (currentDate.getMonth()+1).toString()?.length > 1 ? currentDate.getMonth()+1 : `0${currentDate.getMonth()+1}`;
       let thisDay = currentDate.getDate().toString()?.length > 1 ? currentDate.getDate() : `0${currentDate.getDate()}`;
       let currentDateString = `${thisYear}-${thisMonth}-${thisDay}`;
   
-  
+      currentDateString = validDate ? validDate : currentDateString;
+
+      console.log("==> Vs Time", thisHours);
+      console.log("==> Vs Date", currentDateString);
+
       if (inputDateString === currentDateString && parseInt(hours) > thisHours) {
         return false;
       }

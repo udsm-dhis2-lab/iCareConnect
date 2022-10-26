@@ -57,6 +57,7 @@
         <app-person-details
           *ngIf="!patientFieldSetClosed"
           [referFromFacilityVisitAttribute]="referFromFacilityVisitAttribute"
+          [maximumDate]="maximumDate"
           (personDetails)="onGetPersonDetails($event)"
         ></app-person-details>
       </fieldset>
