@@ -3,7 +3,9 @@ package org.openmrs.module.icare.web.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openmrs.Order;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.icare.billing.BillingServiceImpl;
 import org.openmrs.module.icare.billing.models.Discount;
 import org.openmrs.module.icare.billing.models.Invoice;
 import org.openmrs.module.icare.billing.models.Payment;
@@ -116,5 +118,12 @@ public class BillingController extends BaseController {
 			invoiceMaps.add(invoice.toMap());
 		}
 		return invoiceMaps;
+	}
+
+	@RequestMapping(value = "ipd", method = RequestMethod.GET)
+	@ResponseBody
+	public Order OPDAutocalc() throws Exception {
+		Order resp = billingService.createOrderForOngoingIPDPatients();
+		return resp;
 	}
 }
