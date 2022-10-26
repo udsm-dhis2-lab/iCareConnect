@@ -1364,7 +1364,7 @@
         </table>
       </div>
     </mat-tab>
-    <mat-tab label="Sample Tracking" style="display: none">
+    <mat-tab *ngIf="showTabSampleTrackingForLis" label="Sample Tracking">
       <div class="filter-and-legend">
         <mat-form-field class="w-50">
           <mat-label>Search</mat-label>
