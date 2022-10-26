@@ -9,90 +9,19 @@
       providerDetails: providerDetails$ | async
     } as params"
   >
-    <div class="col-md-2 col-sx-12 col-sm-12 no-print">
-      <div class="h3 p-3 text-muted" style="border-bottom: solid 1px #eee">
-        Reports list
-      </div>
-      <ul class="list-group" style="margin-top: 5px">
-        <li
-          class="list-group-item"
-          [ngClass]="{
-            'active-menu':
-              currentReport?.id === report?.id &&
-              (!report?.members ||
-                (report?.members && report?.members?.length == 0))
-          }"
-          *ngFor="let report of reports"
-        >
-          <a
-            class="p-2"
-            (click)="onSetCurrentReport($event, report)"
-            [ngStyle]="{
-              'margin-bottom':
-                report?.members && report?.members?.length >= 0
-                  ? '10px !important'
-                  : '2px'
-            }"
-          >
-            {{ report?.name }}
-            <span
-              (click)="onToggleSubMenus($event, report, report?.members)"
-              *ngIf="
-                report?.members &&
-                report?.members?.length >= 0 &&
-                !showSubMenu[report?.id]
-              "
-              style="float: right"
-            >
-              <i
-                class="fa fa-angle-down"
-                style="font-weight: 600; font-size: 1.4rem"
-              ></i>
-            </span>
-            <span
-              (click)="onToggleSubMenus($event, report, report?.members)"
-              *ngIf="
-                report?.members &&
-                report?.members?.length >= 0 &&
-                showSubMenu[report?.id]
-              "
-              style="float: right"
-            >
-              <i
-                class="fa fa-angle-up"
-                style="font-weight: 600; font-size: 1.4rem"
-              ></i>
-            </span>
-          </a>
-          <div
-            style="margin-left: 15px; margin-top: 20px"
-            *ngIf="
-              report?.members &&
-              report?.members?.length >= 0 &&
-              showSubMenu[report?.id]
-            "
-          >
-            <ul class="list-group">
-              <li
-                *ngFor="let member of report?.members"
-                [ngClass]="{
-                  'active-menu': currentReport?.id === member?.id
-                }"
-                class="list-group-item-header list-group-item text-left"
-                (click)="onSetCurrentReport($event, member)"
-              >
-                <a class="p-1">
-                  {{ member?.name }}
-                </a>
-              </li>
-            </ul>
-          </div>
-        </li>
-      </ul>
-    </div>
-    <div class="col-md-10 col-sx-12 col-sm-12 report">
+    <div class="col-md-12 col-sx-12 col-sm-12 report">
       <div class="w-100 d-flex justify-content-left no-print">
-        <div style="width: auto">
+        <div class="w-25">
+          <mat-form-field class="w-100">
+            <mat-label>Choose report</mat-label>
+            <mat-select [(ngModel)]="currentReport">
+              <mat-option [value]="report" *ngFor="let report of reports">
+                {{ report?.name }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div class="ml-2">
           <mat-button-toggle-group
             name="fontStyle"
             (change)="onSelectPeriod($event)"
@@ -137,7 +66,7 @@
           </mat-form-field>
         </div>
       </div>
-      <div *ngIf="errors.length > 0">
+      <div class="w-100" *ngIf="errors.length > 0">
         <app-shared-error [errors]="errors"></app-shared-error>
       </div>
       <div class="w-100 d-flex justify-content-end mt-1 mb-2">
@@ -187,24 +116,19 @@
                       >United Republic of Tanzania. <br />
                       Ministry of Health.
                       <br />
-                     <!-- <span *ngIf="labConfigs?.facilityDetails">
+                      <!-- <span *ngIf="labConfigs?.facilityDetails">
                         {{ labConfigs?.facilityDetails?.name }}<br />
                       </span> -->
                       <span *ngIf="facility.display">
                         {{ facility.display }}<br />
                       </span>
-                     <small>
-                    <!-- <span
+                      <small>
+                        <!-- <span
                       *ngIf="
                         labConfigs?.facilityDetails &&
                         labConfigs?.facilityDetails?.addressBox
                       ">P.O BOX: {{ labConfigs?.facilityDetails?.addressBox }}</span> -->
-                        <span
-                          *ngIf="
-                            facility &&
-                            facility.postalCode
-                          "
-                        >
+                        <span *ngIf="facility && facility.postalCode">
                           P.O BOX: {{ facility.postalCode }}
                         </span>
                         <!-- <span
@@ -214,16 +138,10 @@
                           "
                         >
                           TEL: {{ labConfigs?.facilityDetails?.addressTel }}
-                        </span>  -->
-                        </small
+                        </span>  --> </small
                       ><br />
                       <small>
-                        <span
-                          *ngIf="
-                            facility &&
-                            facility.stateProvince
-                          "
-                        >
+                        <span *ngIf="facility && facility.stateProvince">
                           {{ facility.stateProvince }}
                         </span>
                         <!-- <span
@@ -802,56 +720,45 @@
         </div>
         <div *ngIf="!currentReport?.hardCoded">
           <div class="row" *ngIf="facilityDetails$ | async as facility">
-                <div class="col-2" style="display: inline-block; width: 16.67%">
-                  <img src="assets/images/udsm-logo.webp" height="90" />
-                  <!-- <img src="assets/images/tanzania-logo.png" height="90" /> -->
-                </div>
-                <div class="col-8" style="display: inline-block; width: 66.67%">
-                  <h4 style="text-align: center">
-                    <b
-                      >United Republic of Tanzania. <br />
-                      Ministry of Health.
-                      <br />
-                     <!-- <span *ngIf="labConfigs?.facilityDetails">
+            <div class="col-2" style="display: inline-block; width: 16.67%">
+              <img src="assets/images/udsm-logo.webp" height="90" />
+              <!-- <img src="assets/images/tanzania-logo.png" height="90" /> -->
+            </div>
+            <div class="col-8" style="display: inline-block; width: 66.67%">
+              <h4 style="text-align: center">
+                <b
+                  >United Republic of Tanzania. <br />
+                  Ministry of Health.
+                  <br />
+                  <!-- <span *ngIf="labConfigs?.facilityDetails">
                         {{ labConfigs?.facilityDetails?.name }}<br />
                       </span> -->
-                      <span *ngIf="facility.display">
-                        {{ facility.display }}<br />
-                      </span>
-                     <small>
+                  <span *ngIf="facility.display">
+                    {{ facility.display }}<br />
+                  </span>
+                  <small>
                     <!-- <span
                       *ngIf="
                         labConfigs?.facilityDetails &&
                         labConfigs?.facilityDetails?.addressBox
                       ">P.O BOX: {{ labConfigs?.facilityDetails?.addressBox }}</span> -->
-                        <span
-                          *ngIf="
-                            facility &&
-                            facility.postalCode
-                          "
-                        >
-                          P.O BOX: {{ facility.postalCode }}
-                        </span>
-                        <!-- <span
+                    <span *ngIf="facility && facility.postalCode">
+                      P.O BOX: {{ facility.postalCode }}
+                    </span>
+                    <!-- <span
                           *ngIf="
                             labConfigs?.facilityDetails &&
                             labConfigs?.facilityDetails?.addressTel
                           "
                         >
                           TEL: {{ labConfigs?.facilityDetails?.addressTel }}
-                        </span>  -->
-                        </small
-                      ><br />
-                      <small>
-                        <span
-                          *ngIf="
-                            facility &&
-                            facility.stateProvince
-                          "
-                        >
-                          {{ facility.stateProvince }}
-                        </span>
-                        <!-- <span
+                        </span>  --> </small
+                  ><br />
+                  <small>
+                    <span *ngIf="facility && facility.stateProvince">
+                      {{ facility.stateProvince }}
+                    </span>
+                    <!-- <span
                           *ngIf="
                             labConfigs?.facilityDetails &&
                             labConfigs?.facilityDetails?.addressLocaton
@@ -859,11 +766,11 @@
                         >
                           {{ labConfigs?.facilityDetails?.addressLocaton }}
                         </span> -->
-                      </small>
-                    </b>
-                  </h4>
-                </div>
-              </div>
+                  </small>
+                </b>
+              </h4>
+            </div>
+          </div>
           <div class="header text-center h3 p-3">
             {{ currentReport?.name }}
           </div>

@@ -283,12 +283,10 @@ export class LabReportsComponent implements OnInit {
       this.reportData = {};
       // laboratory.sqlGet.laboratory_samples_by_specimen_sources
       this.reportService
-        .runDataSet(this.currentReport?.key, this.selectionDates).subscribe((data: any) => {
-          if(data?.error){
-            this.errors = [
-              ...this.errors,
-              data?.error
-            ]
+        .runDataSet(this.currentReport?.key, this.selectionDates)
+        .subscribe((data: any) => {
+          if (data?.error) {
+            this.errors = [...this.errors, data?.error];
           }
           let reportGroups = {
             collected: 0,
