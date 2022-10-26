@@ -3096,6 +3096,12 @@
 
     </changeSet>
 
+    <changeSet id="update_status_column_to_lb_sample_status" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE lb_sample_status MODIFY COLUMN status VARCHAR(100)
+        </sql>
+    </changeSet>
+
 
 
 </databaseChangeLog>
