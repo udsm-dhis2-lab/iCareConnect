@@ -14,3 +14,8 @@
 .clinical-history-summary div {
   padding: 15px;
 }
+
+::ng-deep .mat-select-value,
+::ng-deep .mat-select-disabled .mat-select-value {
+  color: #222 !important;
+}

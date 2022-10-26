@@ -151,10 +151,7 @@ export class StandardConceptCreationComponent implements OnInit {
         key: "name",
         label: "Name",
         value:
-          data && data?.display
-            ? (this.standardSearchTerm === "TEST_ORDERS" ? "TO: " : "") +
-              data?.display
-            : null,
+          data && data?.display ? data?.display?.replace("TO: ", "") : null,
         required: true,
       }),
       new Textbox({
@@ -274,7 +271,9 @@ export class StandardConceptCreationComponent implements OnInit {
     names = [
       ...names,
       {
-        name: this.formData["name"]?.value,
+        name:
+          (this.standardSearchTerm === "TEST_ORDERS" ? "TO: " : "") +
+          this.formData["name"]?.value,
         locale: "en",
         localePreferred: true,
         conceptNameType: "FULLY_SPECIFIED",
@@ -284,7 +283,9 @@ export class StandardConceptCreationComponent implements OnInit {
     names = [
       ...names,
       {
-        name: this.formData["shortName"]?.value,
+        name:
+          (this.standardSearchTerm === "TEST_ORDERS" ? "TO: " : "") +
+          this.formData["shortName"]?.value,
         locale: "en",
         localePreferred: false,
         conceptNameType: "SHORT",

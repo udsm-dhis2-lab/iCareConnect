@@ -162,7 +162,12 @@ export class ConceptsService {
     }
     return this.httpClient.get(`icare/concept?${queryParams}`).pipe(
       map((response) => {
-        return response?.results;
+        return response?.results.map((result) => {
+          return {
+            ...result,
+            display: result?.display?.replace("TO: ", ""),
+          };
+        });
       }),
       catchError((error) => {
         return of(error);
