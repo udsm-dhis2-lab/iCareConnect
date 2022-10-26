@@ -483,7 +483,7 @@ export class SingleRegistrationComponent implements OnInit {
       : this.collectedOnDateLatestValue;
     this.broughtOnField.min = this.collectedOnDateLatestValue
       ? this.collectedOnDateLatestValue
-      : this.receivedOnField.min;
+      : ""
     this.minForReceivedOn = true;
 
     
