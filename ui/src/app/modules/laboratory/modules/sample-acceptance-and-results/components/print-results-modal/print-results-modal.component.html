@@ -684,12 +684,10 @@
   </div>
 
   <div class="w-100 mt-2 d-flex justify-content-end">
-    <button mat-stroked-button color="primary" (click)="onClose($event)">
-      Cancel
-    </button>
+    <button mat-stroked-button (click)="onClose($event)">Cancel</button>
     <button
       class="ml-2"
-      mat-stroked-button
+      mat-flat-button
       color="primary"
       (click)="onPrint($event, currentDepartmentSamples)"
     >
