@@ -146,6 +146,7 @@ export class SampleAcceptanceComponent implements OnInit {
       },
       remarks: "accepted",
       status: "ACCEPTED",
+      category: "ACCEPTED",
     };
 
     this.store.dispatch(
@@ -156,6 +157,7 @@ export class SampleAcceptanceComponent implements OnInit {
           acceptedBy: {
             uuid: providerDetails?.uuid,
             name: providerDetails?.display,
+            display: providerDetails?.display,
           },
         },
       })
@@ -181,7 +183,6 @@ export class SampleAcceptanceComponent implements OnInit {
       .afterClosed()
       .pipe(take(1))
       .subscribe((reason) => {
-        console.log(reason);
         if (reason && reason?.reasonUuid) {
           this.savingMessage[sample?.id + "-reject"] = true;
 
@@ -205,6 +206,7 @@ export class SampleAcceptanceComponent implements OnInit {
                 acceptedBy: {
                   uuid: providerDetails?.uuid,
                   name: providerDetails?.display,
+                  display: providerDetails?.display,
                 },
               },
             })

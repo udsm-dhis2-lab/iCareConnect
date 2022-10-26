@@ -134,8 +134,13 @@ export class LabSamplesEffects {
                             )[0]?.remarks
                         ) || [])[0]
                       : sample?.statuses?.length > 0 &&
-                        _.orderBy(sample?.statuses, ["timestamp"], ["desc"])[0]
-                          ?.status == "RECOLLECT"
+                        (_.orderBy(sample?.statuses, ["timestamp"], ["desc"])[0]
+                          ?.status == "RECOLLECT" ||
+                          _.orderBy(
+                            sample?.statuses,
+                            ["timestamp"],
+                            ["desc"]
+                          )[0]?.category == "RECOLLECT")
                       ? (action.codedSampleRejectionReasons.filter(
                           (reason) =>
                             reason.uuid ===
@@ -148,20 +153,26 @@ export class LabSamplesEffects {
                       : null,
                   markedForRecollection:
                     sample?.statuses?.length > 0 &&
-                    _.orderBy(sample?.statuses, ["timestamp"], ["desc"])[0]
-                      ?.status == "RECOLLECT"
+                    (_.orderBy(sample?.statuses, ["timestamp"], ["desc"])[0]
+                      ?.status == "RECOLLECT" ||
+                      _.orderBy(sample?.statuses, ["timestamp"], ["desc"])[0]
+                        ?.category == "RECOLLECT")
                       ? true
                       : false,
                   rejected:
                     sample?.statuses?.length > 0 &&
-                    _.orderBy(sample?.statuses, ["timestamp"], ["desc"])[0]
-                      ?.status == "REJECTED"
+                    (_.orderBy(sample?.statuses, ["timestamp"], ["desc"])[0]
+                      ?.status == "REJECTED" ||
+                      _.orderBy(sample?.statuses, ["timestamp"], ["desc"])[0]
+                        ?.category == "REJECTED")
                       ? true
                       : false,
                   rejectedBy:
                     sample?.statuses?.length > 0 &&
-                    _.orderBy(sample?.statuses, ["timestamp"], ["desc"])[0]
-                      ?.status == "REJECTED"
+                    (_.orderBy(sample?.statuses, ["timestamp"], ["desc"])[0]
+                      ?.status == "REJECTED" ||
+                      _.orderBy(sample?.statuses, ["timestamp"], ["desc"])[0]
+                        ?.category == "REJECTED")
                       ? _.orderBy(sample?.statuses, ["timestamp"], ["desc"])[0]
                           ?.user
                       : null,
