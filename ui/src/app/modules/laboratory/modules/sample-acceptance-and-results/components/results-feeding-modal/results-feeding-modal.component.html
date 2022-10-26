@@ -310,7 +310,7 @@
                                         item?.testAllocations[0]?.results
                                           ?.length - 1
                                       ]?.value
-                                    : nullapp-results
+                                    : nullapp - results
                                 "
                                 style="text-align: center"
                                 [disabled]="
@@ -1626,7 +1626,10 @@
             </tbody>
           </table>
 
-          <div class="clinical-history-summary">
+          <div
+            class="clinical-history-summary"
+            *ngIf="!LISConfigurations?.isLIS"
+          >
             <a (click)="showClinicalNotes($event)" class="clinical-notes-btn">
               Diagnosis & Clinical notes summary
               <i
@@ -1962,7 +1965,8 @@
                           >d</span
                         >
                       </button>
-                    </td>search
+                    </td>
+                    search
 
                     <td colspan="2" *ngIf="!LISConfigurations?.isLIS">
                       <!-- TODO: reject first approval -->
@@ -2103,8 +2107,7 @@
                       <td>
                         {{ item?.order?.concept?.display }}
                       </td>
-                      <td
-                      *ngIf="!LISConfigurations?.isLIS">
+                      <td *ngIf="!LISConfigurations?.isLIS">
                         {{ item?.order?.orderer?.name }}
                       </td>
                       <td>{{ parameter?.display }}</td>
@@ -2526,7 +2529,7 @@
             </tbody>
           </table>
         </div>
-        <div class="clinical-history-summary">
+        <div class="clinical-history-summary" *ngIf="!LISConfigurations?.isLIS">
           <a (click)="showClinicalNotes($event)" class="clinical-notes-btn">
             Diagnosis & Clinical notes summary
             <i
