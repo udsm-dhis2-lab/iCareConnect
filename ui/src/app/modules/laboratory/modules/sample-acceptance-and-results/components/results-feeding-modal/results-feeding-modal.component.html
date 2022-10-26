@@ -182,7 +182,7 @@
                                 "
                                 [disabled]="
                                   item?.testAllocations?.length > 0 &&
-                                  item?.testAllocations[0]?.firstSignOff
+                                  item?.testAllocations[0]?.firstSignOff && !LISConfigurations?.isLIS
                                 "
                                 required
                                 id="{{ item?.order?.concept?.display }}"
@@ -201,7 +201,7 @@
                               <mat-select
                                 [disabled]="
                                   item?.testAllocations?.length > 0 &&
-                                  item?.testAllocations[0]?.firstSignOff
+                                  item?.testAllocations[0]?.firstSignOff && !LISConfigurations?.isLIS
                                 "
                                 required
                                 [value]="
@@ -242,7 +242,7 @@
                               >
                               <mat-select
                                 [disabled]="
-                                  item?.testAllocations[0]?.firstSignOff
+                                  item?.testAllocations[0]?.firstSignOff && !LISConfigurations?.isLIS
                                 "
                                 required
                                 [value]="
@@ -293,7 +293,7 @@
                                     : null
                                 "
                                 [disabled]="
-                                  item?.testAllocations[0]?.firstSignOff
+                                  item?.testAllocations[0]?.firstSignOff && !LISConfigurations?.isLIS
                                 "
                                 [(ngModel)]="values[item?.order?.concept?.uuid]"
                               />
@@ -314,7 +314,7 @@
                                 "
                                 style="text-align: center"
                                 [disabled]="
-                                  item?.testAllocations[0]?.firstSignOff
+                                  item?.testAllocations[0]?.firstSignOff && !LISConfigurations?.isLIS
                                 "
                                 matInput
                                 required
@@ -382,7 +382,7 @@
                                 style="text-align: center"
                                 [disabled]="
                                   item?.testAllocations?.length > 0 &&
-                                  item?.testAllocations[0]?.firstSignOff
+                                  item?.testAllocations[0]?.firstSignOff && !LISConfigurations?.isLIS
                                 "
                                 matInput
                                 required
@@ -398,7 +398,7 @@
                                 !LISConfigurations?.isLIS
                               "
                               [disabled]="
-                                item?.testAllocations[0]?.firstSignOff
+                                item?.testAllocations[0]?.firstSignOff && !LISConfigurations?.isLIS
                               "
                               style="font-size: 0.6rem; margin-left: 5px"
                               mat-button
@@ -476,7 +476,7 @@
                               <textarea
                                 [disabled]="
                                   (item?.testAllocations?.length > 0 &&
-                                    item?.testAllocations[0]?.firstSignOff) ||
+                                    item?.testAllocations[0]?.firstSignOff && !LISConfigurations?.isLIS) ||
                                   item?.secondSignOff
                                 "
                                 (keyup)="
@@ -552,7 +552,7 @@
                             <table class="table table-bordered">
                               <thead class="table-header">
                                 <th>Value</th>
-                                <th>Remarks</th>
+                                <th>Remarks</th>Audit Tra
                                 <th>Date Time</th>
                                 <th>Completed By</th>
                               </thead>
@@ -670,7 +670,7 @@
                           !item?.testAllocations[0] ||
                           (!values[item?.order?.concept?.uuid] &&
                             !values[item?.order?.concept?.uuid + '-comment']) ||
-                          item?.testAllocations[0]?.firstSignOff
+                          (item?.testAllocations[0]?.firstSignOff && !LISConfigurations?.isLIS)
                         "
                         (click)="
                           onSave(
@@ -855,7 +855,7 @@
                                 [disabled]="
                                   item?.allocationsPairedBySetMember[
                                     parameter?.uuid
-                                  ]?.firstSignOff
+                                  ]?.firstSignOff && !LISConfigurations?.isLIS
                                 "
                                 required
                                 id="{{ parameter?.display }}"
@@ -879,7 +879,7 @@
                                   [disabled]="
                                     item?.allocationsPairedBySetMember[
                                       parameter?.uuid
-                                    ]?.firstSignOff
+                                    ]?.firstSignOff && !LISConfigurations?.isLIS
                                   "
                                   required
                                   [value]="
@@ -947,7 +947,7 @@
                                 [disabled]="
                                   item?.allocationsPairedBySetMember[
                                     parameter?.uuid
-                                  ]?.firstSignOff
+                                  ]?.firstSignOff && !LISConfigurations?.isLIS
                                 "
                                 required
                                 [value]="
@@ -1033,7 +1033,7 @@
                                 [disabled]="
                                   item?.allocationsPairedBySetMember[
                                     parameter?.uuid
-                                  ]?.firstSignOff
+                                  ]?.firstSignOff && !LISConfigurations?.isLIS
                                 "
                                 (keyup.enter)="
                                   setEnteredParameterValue(
@@ -1072,7 +1072,7 @@
                                 [disabled]="
                                   item?.allocationsPairedBySetMember[
                                     parameter?.uuid
-                                  ]?.firstSignOff
+                                  ]?.firstSignOff && !LISConfigurations?.isLIS
                                 "
                                 matInput
                                 required
@@ -1140,7 +1140,7 @@
                                 [disabled]="
                                   item?.allocationsPairedBySetMember[
                                     parameter?.uuid
-                                  ]?.firstSignOff
+                                  ]?.firstSignOff && !LISConfigurations?.isLIS
                                 "
                                 (change)="
                                   setEnteredParameterValue(
@@ -1227,7 +1227,7 @@
                                   [disabled]="
                                     item?.allocationsPairedBySetMember[
                                       parameter?.uuid
-                                    ]?.firstSignOff
+                                    ]?.firstSignOff && !LISConfigurations?.isLIS
                                   "
                                   matInput
                                   required
@@ -1515,8 +1515,8 @@
                             !file) ||
                           (!values[parameter?.uuid] &&
                             !values[parameter?.uuid + '-comment']) ||
-                          item?.allocationsPairedBySetMember[parameter?.uuid]
-                            ?.firstSignOff
+                          (item?.allocationsPairedBySetMember[parameter?.uuid]
+                            ?.firstSignOff && !LISConfigurations?.isLIS)
                         "
                         (click)="
                           onSaveParameterValue(
@@ -2298,8 +2298,8 @@
                       <td colspan="2" *ngIf="!LISConfigurations?.isLIS">
                         <button
                           [disabled]="
-                            item?.allocationsPairedBySetMember[parameter?.uuid]
-                              ?.firstSignOff ||
+                            (item?.allocationsPairedBySetMember[parameter?.uuid]
+                              ?.firstSignOff && !LISConfigurations?.isLIS) ||
                             item?.allocationsPairedBySetMember[parameter?.uuid]
                               ?.results[
                               item?.allocationsPairedBySetMember[
@@ -2334,8 +2334,8 @@
                               ]?.firstSignOff
                           }"
                           [disabled]="
-                            item?.allocationsPairedBySetMember[parameter?.uuid]
-                              ?.firstSignOff ||
+                            (item?.allocationsPairedBySetMember[parameter?.uuid]
+                              ?.firstSignOff && !LISConfigurations?.isLIS) ||
                             item?.allocationsPairedBySetMember[parameter?.uuid]
                               ?.results?.length == 0 ||
                             item?.allocationsPairedBySetMember[parameter?.uuid]
@@ -2486,7 +2486,7 @@
                             [disabled]="
                               item?.allocationsPairedBySetMember[
                                 parameter?.uuid
-                              ]?.firstSignOff
+                              ]?.firstSignOff && !LISConfigurations?.isLIS
                             "
                             mat-stroked-button
                             (click)="
