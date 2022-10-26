@@ -199,7 +199,7 @@ export class GeneralDispensingFormComponent implements OnInit {
             : "INPATIENT",
           patient: this.currentPatient?.id,
           concept: this.useSpecificDrugPrescription
-            ? "20ede556-5558-4bc5-8d8b-5d3d045010a2"
+            ? "ba8aa8b0-2112-426a-a2b4-f3215e6286f0"
             : this.formValues["drug"].value,
           orderer: this.provider?.uuid,
           type: "order",
