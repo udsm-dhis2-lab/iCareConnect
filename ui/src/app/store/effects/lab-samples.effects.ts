@@ -302,11 +302,16 @@ export class LabSamplesEffects {
                                 : null,
                             firstSignOff:
                               allocation?.statuses?.length > 0 &&
-                              _.orderBy(
+                              (_.orderBy(
                                 allocation?.statuses,
                                 ["timestamp"],
                                 ["desc"]
-                              )[0]?.status == "APPROVED"
+                              )[0]?.status == "APPROVED" ||
+                                _.orderBy(
+                                  allocation?.statuses,
+                                  ["timestamp"],
+                                  ["desc"]
+                                )[0]?.status == "AUTHORIZED")
                                 ? true
                                 : false,
                             secondSignOff:
@@ -325,11 +330,16 @@ export class LabSamplesEffects {
                                 : false,
                             rejected:
                               allocation?.statuses?.length > 0 &&
-                              _.orderBy(
+                              (_.orderBy(
                                 allocation?.statuses,
                                 ["timestamp"],
                                 ["desc"]
-                              )[0]?.status == "REJECTED"
+                              )[0]?.status == "REJECTED" ||
+                                _.orderBy(
+                                  allocation?.statuses,
+                                  ["timestamp"],
+                                  ["desc"]
+                                )[0]?.category == "REJECTED")
                                 ? true
                                 : false,
                             rejectionStatus:

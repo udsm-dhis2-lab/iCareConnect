@@ -12,7 +12,8 @@
     patientsWithCompletedSamples: patientsWithCompletedSamples$ | async,
     rejectedSamples: rejectedSamples$ | async,
     acceptedSamples: acceptedSamples$ | async,
-    samplesWithResults: samplesWithResults$ | async
+    samplesWithResults: samplesWithResults$ | async,
+    patientsWithResults: patientsWithResults$ | async
   } as sampleParams"
 >
   <mat-tab-group (selectedTabChange)="onOpenNewTab($event)">
@@ -1951,40 +1952,68 @@
         <table class="table table-bordered">
           <thead>
             <tr>
-              <th style="width: 10px !important">SN</th>
-              <th>Lab Number</th>
+              <!-- <th style="width: 10px !important">SN</th> -->
+              <th>System Identification</th>
+              <th>Department</th>
+              <th>LAB ID/No.</th>
               <th>Action</th>
             </tr>
           </thead>
           <tbody>
-            <tr
-              *ngFor="
-                let sample of sampleParams?.samplesWithResults;
-                let count = index
-              "
-            >
-              <td>
-                {{ count + 1 }}
-              </td>
-              <td>
-                {{ sample?.id }}
-              </td>
-              <td>
-                <button
-                  class="colored-button"
-                  mat-stroked-button
-                  (click)="
-                    onResultsToPrint(
-                      $event,
-                      patient,
-                      sampleParams?.providerDetails
-                    )
+            <ng-container>
+              <ng-container
+                *ngFor="
+                  let patient of sampleParams?.patientsWithResults;
+                  let pCount = index
+                "
+              >
+                <ng-container
+                  *ngFor="
+                    let department of patient?.departments;
+                    let dCount = index
                   "
                 >
-                  Print results
-                </button>
-              </td>
-            </tr>
+                  <tr
+                    *ngFor="
+                      let sample of department?.samples;
+                      let sCount = index
+                    "
+                  >
+                    <!--
+                    <td
+                    > 
+                      *ngIf="pCount == 0"
+                      [attr.rowspan]="patient?.departments?.length"
+                      {{ count + 1 }}
+                    </td> -->
+                    <td>
+                      {{ patient?.mrn }}
+                    </td>
+                    <td>
+                      {{ department?.departmentName }}
+                    </td>
+                    <td>
+                      {{ sample?.id }}
+                    </td>
+                    <td>
+                      <button
+                        class="colored-button"
+                        mat-stroked-button
+                        (click)="
+                          onResultsToPrint(
+                            $event,
+                            patient,
+                            sampleParams?.providerDetails
+                          )
+                        "
+                      >
+                        Print results
+                      </button>
+                    </td>
+                  </tr>
+                </ng-container>
+              </ng-container>
+            </ng-container>
           </tbody>
         </table>
       </div>

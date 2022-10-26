@@ -3,6 +3,7 @@ import { MatDialog } from "@angular/material/dialog";
 import { Store } from "@ngrx/store";
 import { Observable } from "rxjs";
 import { take } from "rxjs/operators";
+import { SampleResultsPrintingComponent } from "src/app/modules/laboratory/components/sample-results-printing/sample-results-printing.component";
 import { formatDateToYYMMDD } from "src/app/shared/helpers/format-date.helper";
 import {
   setSampleStatus,
@@ -21,6 +22,7 @@ import {
   getLabDepartments,
   getLabSamplesWithResults,
   getPatientsWithCompletedLabSamples,
+  getPatientWithResults,
   getSettingLabSampleStatusState,
   getWorkList,
 } from "src/app/store/selectors";
@@ -63,6 +65,7 @@ export class SampleAcceptanceComponent implements OnInit {
   selectedDepartment: string = "";
   acceptedSamples$: Observable<any[]>;
   samplesWithResults$: Observable<any[]>;
+  patientsWithResults$: Observable<any>;
   constructor(private store: Store<AppState>, private dialog: MatDialog) {}
 
   ngOnInit(): void {
@@ -129,6 +132,10 @@ export class SampleAcceptanceComponent implements OnInit {
 
     this.samplesWithResults$ = this.store.select(
       getLabSamplesWithResults(this.selectedDepartment, this.searchingText)
+    );
+
+    this.patientsWithResults$ = this.store.select(
+      getPatientWithResults(this.selectedDepartment, this.searchingText)
     );
   }
 
@@ -270,6 +277,10 @@ export class SampleAcceptanceComponent implements OnInit {
     this.samplesWithResults$ = this.store.select(
       getLabSamplesWithResults(this.selectedDepartment, this.searchingText)
     );
+
+    this.patientsWithResults$ = this.store.select(
+      getPatientWithResults(this.selectedDepartment, this.searchingText)
+    );
   }
 
   onSearch(e) {
@@ -336,6 +347,10 @@ export class SampleAcceptanceComponent implements OnInit {
 
       this.samplesWithResults$ = this.store.select(
         getLabSamplesWithResults(this.selectedDepartment, this.searchingText)
+      );
+
+      this.patientsWithResults$ = this.store.select(
+        getPatientWithResults(this.selectedDepartment, this.searchingText)
       );
     }
   }
@@ -469,7 +484,6 @@ export class SampleAcceptanceComponent implements OnInit {
         user: providerDetails,
       },
       width: "60%",
-      height: "750px",
       disableClose: false,
     });
   }
@@ -506,5 +520,16 @@ export class SampleAcceptanceComponent implements OnInit {
     this.settingLabSampleStatus$ = this.store.select(
       getSettingLabSampleStatusState
     );
+  }
+
+  onPrintSampleResults(event: Event, sample: any): void {
+    console.log(sample);
+    event.stopPropagation();
+    this.dialog.open(SampleResultsPrintingComponent, {
+      width: "70%",
+      data: {
+        sample,
+      },
+    });
   }
 }
