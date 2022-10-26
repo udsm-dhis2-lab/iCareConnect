@@ -45,6 +45,7 @@ export class DrugOrderComponent implements OnInit, AfterViewInit {
   @Input() generalPrescriptionDurationConcept: string;
   @Input() generalPrescriptionDoseConcept: string;
   @Input() generalPrescriptionFrequencyConcept: string;
+  @Input() specicDrugConceptUuid: string;
 
   drugsConceptsField: any;
   @Output() drugOrdered = new EventEmitter<any>();
@@ -102,7 +103,7 @@ export class DrugOrderComponent implements OnInit, AfterViewInit {
           generalPrescriptionDoseConcept: this.generalPrescriptionDoseConcept,
           generalPrescriptionFrequencyConcept:
             this.generalPrescriptionFrequencyConcept,
-          specificDrugConceptUuid: "ba8aa8b0-2112-426a-a2b4-f3215e6286f0",
+          specificDrugConceptUuid: this.specicDrugConceptUuid,
           fromDispensing: this.fromDispensing,
         }
       )

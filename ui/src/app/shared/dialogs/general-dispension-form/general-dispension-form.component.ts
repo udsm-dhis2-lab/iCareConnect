@@ -42,6 +42,7 @@ export class GeneralDispensingFormComponent implements OnInit {
   @Input() conceptFields$: Observable<any>;
   @Input() strengthConceptUuid: any;
   @Input() useSpecificDrugPrescription: any;
+  @Input() specicDrugConceptUuid: any;
 
   drugOrder: DrugOrderObject;
 
@@ -100,8 +101,7 @@ export class GeneralDispensingFormComponent implements OnInit {
       this.generalPrescriptionDurationConcept,
     ]);
 
-    
-    if(this.useSpecificDrugPrescription){
+    if (this.useSpecificDrugPrescription) {
       const drugs = await this.drugOrderService.getAllDrugs("full");
       this.drugConceptField = new Dropdown({
         options: drugs,
@@ -198,9 +198,10 @@ export class GeneralDispensingFormComponent implements OnInit {
             ? "OUTPATIENT"
             : "INPATIENT",
           patient: this.currentPatient?.id,
-          concept: this.useSpecificDrugPrescription
-            ? "ba8aa8b0-2112-426a-a2b4-f3215e6286f0"
-            : this.formValues["drug"].value,
+          concept:
+            this.useSpecificDrugPrescription && this.specicDrugConceptUuid
+              ? this.specicDrugConceptUuid
+              : this.formValues["drug"].value,
           orderer: this.provider?.uuid,
           type: "order",
         },
@@ -217,16 +218,16 @@ export class GeneralDispensingFormComponent implements OnInit {
       };
     });
 
-
     obs = [
       ...obs,
-      this.useSpecificDrugPrescription ? 
-      {
-        person: this.currentPatient?.id,
-        concept: this.generalPrescriptionFrequencyConcept,
-        obsDatetime: new Date(),
-        valueDrug: this.formValues["drug"].value,
-      } : {},
+      this.useSpecificDrugPrescription
+        ? {
+            person: this.currentPatient?.id,
+            concept: this.specicDrugConceptUuid,
+            obsDatetime: new Date(),
+            valueDrug: this.formValues["drug"].value,
+          }
+        : {},
       {
         person: this.currentPatient?.id,
         concept: this.generalPrescriptionFrequencyConcept,
@@ -251,7 +252,7 @@ export class GeneralDispensingFormComponent implements OnInit {
         obsDatetime: new Date(),
         value: this.formValues["route"].value,
       },
-    ].filter(ob => ob);
+    ].filter((ob) => ob);
 
     this.ordersService
       .createOrdersViaCreatingEncounter(encounterObject)

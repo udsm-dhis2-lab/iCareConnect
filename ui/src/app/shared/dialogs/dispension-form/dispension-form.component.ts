@@ -75,6 +75,7 @@ export class DispensingFormComponent implements OnInit {
   drugOrderConceptDetails$: Observable<ConceptGet>;
   strengthConceptUuid$: Observable<string>;
   useSpecificDrugPrescription$: Observable<any>;
+  specicDrugConceptUuid$: Observable<any>;
 
   constructor(
     private drugOrderService: DrugOrdersService,
@@ -146,10 +147,11 @@ export class DispensingFormComponent implements OnInit {
       this.systemSettingsService.getSystemSettingsByKey(
         "iCare.clinic.genericPrescription.strength.1"
       );
-    this.useSpecificDrugPrescription$ =
-      this.systemSettingsService.getSystemSettingsByKey(
+    this.useSpecificDrugPrescription$ = this.systemSettingsService
+      .getSystemSettingsByKey(
         "iCare.clinic.genericPrescription.useSpecificDrug"
-      ).pipe(
+      )
+      .pipe(
         tap((response) => {
           if (response === "none") {
             this.errors = [
@@ -158,6 +160,27 @@ export class DispensingFormComponent implements OnInit {
                 error: {
                   message:
                     "Generic Use Specific drug Config is missing, Set 'iCare.clinic.genericPrescription.useSpecificDrug' or Contact IT (Close to continue)",
+                },
+                type: "warning",
+              },
+            ];
+          }
+        })
+      );
+
+    this.specicDrugConceptUuid$ = this.systemSettingsService
+      .getSystemSettingsByKey(
+        "iCare.clinic.genericPrescription.specificDrugConceptUuid"
+      )
+      .pipe(
+        tap((response) => {
+          if (response === "none") {
+            this.errors = [
+              ...this.errors,
+              {
+                error: {
+                  message:
+                    "Generic Use Specific drug Concept config is missing, Set 'iCare.clinic.genericPrescription.specificDrugConceptUuid' or Contact IT (Close to continue)",
                 },
                 type: "warning",
               },
@@ -546,9 +569,7 @@ export class DispensingFormComponent implements OnInit {
       ...genericFieldsConcepts.map((conceptSetting) =>
         this.conceptsService
           .getConceptDetailsByUuid(
-            conceptSetting?.value
-              ? conceptSetting?.value
-              : conceptSetting,
+            conceptSetting?.value ? conceptSetting?.value : conceptSetting,
             `custom:(uuid,display,name,datatype,set,conceptClass:(uuid,display),setMembers:(uuid,display),answers:(uuid,display)`
           )
           .pipe(
