@@ -27,7 +27,7 @@ import { OrdersService } from "../../resources/order/services/orders.service";
 import { flatten, keyBy } from "lodash";
 import { VisitsService } from "../../resources/visits/services";
 import { LocationService } from "src/app/core/services";
-import { map } from "rxjs/operators";
+import { map, tap } from "rxjs/operators";
 import { ConceptGet } from "../../resources/openmrs";
 
 @Component({
@@ -74,6 +74,7 @@ export class DispensingFormComponent implements OnInit {
   genericPrescriptionConceptUuids$: Observable<any>;
   drugOrderConceptDetails$: Observable<ConceptGet>;
   strengthConceptUuid$: Observable<string>;
+  useSpecificDrugPrescription$: Observable<any>;
 
   constructor(
     private drugOrderService: DrugOrdersService,
@@ -144,6 +145,25 @@ export class DispensingFormComponent implements OnInit {
     this.strengthConceptUuid$ =
       this.systemSettingsService.getSystemSettingsByKey(
         "iCare.clinic.genericPrescription.strength.1"
+      );
+    this.useSpecificDrugPrescription$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        "iCare.clinic.genericPrescription.useSpecificDrug"
+      ).pipe(
+        tap((response) => {
+          if (response === "none") {
+            this.errors = [
+              ...this.errors,
+              {
+                error: {
+                  message:
+                    "Generic Use Specific drug Config is missing, Set 'iCare.clinic.genericPrescription.useSpecificDrug' or Contact IT (Close to continue)",
+                },
+                type: "warning",
+              },
+            ];
+          }
+        })
       );
 
     this.generalPrescriptionEncounterType$ = this.systemSettingsService
@@ -394,7 +414,6 @@ export class DispensingFormComponent implements OnInit {
       )
       .subscribe(
         (res) => {
-          console.log("==> Drug order service: ", res);
           this.getVisitByUuid(this.data?.visit?.uuid);
           if (res?.message || res?.stackTrace) {
             this.savingOrder = false;
@@ -527,7 +546,9 @@ export class DispensingFormComponent implements OnInit {
       ...genericFieldsConcepts.map((conceptSetting) =>
         this.conceptsService
           .getConceptDetailsByUuid(
-            conceptSetting?.value,
+            conceptSetting?.value
+              ? conceptSetting?.value
+              : conceptSetting,
             `custom:(uuid,display,name,datatype,set,conceptClass:(uuid,display),setMembers:(uuid,display),answers:(uuid,display)`
           )
           .pipe(
