@@ -323,12 +323,26 @@ export class SingleRegistrationComponent implements OnInit {
       this.receivedOnTime, 
       this.receivedOnDateLatestValue ? this.receivedOnDateLatestValue : this.maximumDate)
     if(this.collectedOnTime || this.broughtOnTime){
-      this.receivedOnTimeValid = this.isValidTime(
+      let valid1 = this.isValidTime(
         this.broughtOnTime ? this.broughtOnTime : this.collectedOnTime,
-        this.broughtOnDateLatestValue ? this.broughtOnDateLatestValue : this?.collectedOnDateLatestValue ? this?.collectedOnDateLatestValue : this.maximumDate,
-        this.receivedOnTime, 
-        this.receivedOnDateLatestValue ? this.receivedOnDateLatestValue : this.maximumDate
-        )
+        this.broughtOnDateLatestValue
+          ? this.broughtOnDateLatestValue
+          : this?.collectedOnDateLatestValue
+          ? this?.collectedOnDateLatestValue
+          : this.maximumDate,
+        this.receivedOnTime,
+        this.receivedOnDateLatestValue
+          ? this.receivedOnDateLatestValue
+          : this.maximumDate
+      );
+
+      let valid2 = (this.receivedOnTimeValid = this.isValidTime(
+        this.receivedOnTime,
+        this.receivedOnDateLatestValue
+          ? this.receivedOnDateLatestValue
+          : this.maximumDate
+      ));
+      this.receivedOnTimeValid = valid1 && valid2 ? true : false;
     }
     this.formData = {
       ...this.formData,
@@ -374,7 +388,11 @@ export class SingleRegistrationComponent implements OnInit {
 
   getSelectedBroughtOnTime(event: Event): void {
     this.broughtOnTime = (event.target as any)?.value;
-    this.broughtOnTimeValid = this.isValidTime(
+    let valid1:boolean = true;
+    let valid2:boolean = true;
+    let valid3:boolean = true;
+    let valid4:boolean = true;
+    valid1 = this.isValidTime(
       this.broughtOnTime,
       this.broughtOnDateLatestValue
         ? this.broughtOnDateLatestValue
@@ -382,7 +400,7 @@ export class SingleRegistrationComponent implements OnInit {
     );
 
     if (this.receivedOnTime) {
-      this.broughtOnTimeValid = this.isValidTime(
+      valid2 = this.isValidTime(
         this.broughtOnTime,
         this.broughtOnDateLatestValue
           ? this.broughtOnDateLatestValue
@@ -390,20 +408,21 @@ export class SingleRegistrationComponent implements OnInit {
         this.receivedOnTime,
         this.receivedOnDateLatestValue
           ? this.receivedOnDateLatestValue
-          : undefined
-      );
+          : this.maximumDate
+        );
+        valid3 = valid1 && valid2 ? true : false;
     }
     if(this.collectedOnTime){
-      this.broughtOnTimeValid = this.isValidTime(
-        this.collectedOnTime,
+      valid4 = this.isValidTime(
+      this.collectedOnTime,
       this.collectedOnDateLatestValue ? this.collectedOnDateLatestValue : this.maximumDate,
       this.broughtOnTime,
         this.broughtOnDateLatestValue
           ? this.broughtOnDateLatestValue
-          : this.maximumDate
+          : this.maximumDate,
       )
     }
-
+    this.broughtOnTimeValid = valid1 && valid2 && valid3 && valid4;
     this.formData = {
       ...this.formData,
       broughtAt: {
@@ -1488,10 +1507,6 @@ export class SingleRegistrationComponent implements OnInit {
     if(time){
       let currentDate = new Date();
   
-      console.log("==> Time", time)
-      console.log("==> Date", date)
-
-  
       let hours = time.split(":")[0];
       let mins = time.split(":")[1];
       let year = date?.split("-")[0];
@@ -1509,9 +1524,6 @@ export class SingleRegistrationComponent implements OnInit {
       let currentDateString = `${thisYear}-${thisMonth}-${thisDay}`;
   
       currentDateString = validDate ? validDate : currentDateString;
-
-      console.log("==> Vs Time", thisHours);
-      console.log("==> Vs Date", currentDateString);
 
       if (inputDateString === currentDateString && parseInt(hours) > thisHours) {
         return false;
