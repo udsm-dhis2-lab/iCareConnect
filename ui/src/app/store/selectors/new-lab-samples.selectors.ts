@@ -396,7 +396,6 @@ export const getFormattedLabSamplesToFeedResults = createSelector(
       _.filter(samples, (sample) => {
         const completedOrders = getCompletedOrders(sample?.orders);
         const ordersWithResults = getOrdersWithResults(sample?.orders);
-        console.log("ordersWithResults", ordersWithResults);
         if (
           sample?.accepted &&
           !sample?.markedForRecollection &&
