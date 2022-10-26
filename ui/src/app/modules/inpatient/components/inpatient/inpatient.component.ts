@@ -2,22 +2,15 @@ import { Component, Input, OnInit, Provider } from "@angular/core";
 import { FormControl } from "@angular/forms";
 import { MatDialog } from "@angular/material/dialog";
 import { select, Store } from "@ngrx/store";
-import { map } from "lodash";
 import { Observable } from "rxjs";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { CreatePatientBedOrderModalComponent } from "src/app/shared/components/create-patient-bed-order-modal/create-patient-bed-order-modal.component";
 import { DischargePatientModalComponent } from "src/app/shared/components/discharge-patient-modal/discharge-patient-modal.component";
 import { TransferPatientOutsideComponent } from "src/app/shared/components/transfer-patient-outside/transfer-patient-outside.component";
 import { TransferWithinComponent } from "src/app/shared/components/transfer-within/transfer-within.component";
-import { getApplicableForms } from "src/app/shared/helpers/identify-applicable-forms.helper";
-import { ICARE_CONFIG } from "src/app/shared/resources/config";
 import { Patient } from "src/app/shared/resources/patient/models/patient.model";
 import { Visit } from "src/app/shared/resources/visits/models/visit.model";
-import {
-  go,
-  loadCurrentPatient,
-  loadCustomOpenMRSForms,
-} from "src/app/store/actions";
+import { go } from "src/app/store/actions";
 import { clearBills } from "src/app/store/actions/bill.actions";
 import { saveObservationsUsingEncounter } from "src/app/store/actions/observation.actions";
 import { AppState } from "src/app/store/reducers";
@@ -26,7 +19,6 @@ import {
   getCurrentUserDetails,
   getCurrentUserPrivileges,
 } from "src/app/store/selectors/current-user.selectors";
-import { getCustomOpenMRSFormsByIds } from "src/app/store/selectors/form.selectors";
 import {
   getGroupedObservationByConcept,
   getSavingObservationStatus,
@@ -222,14 +214,8 @@ export class InpatientComponent implements OnInit {
     });
   }
 
-  dischargePatient(
-    event: any,
-    visit,
-    currentPatient,
-    provider,
-    lastBedOrder
-  ) {
-    console.log("--------------->",event)
+  dischargePatient(event: any, visit, currentPatient, provider, lastBedOrder) {
+    console.log("--------------->", event);
     this.dialog.open(DischargePatientModalComponent, {
       width: "30%",
       data: {
@@ -237,7 +223,7 @@ export class InpatientComponent implements OnInit {
         provider,
         patient: currentPatient?.patient,
         lastBedOrder,
-        invoice: event?.invoice
+        invoice: event?.invoice,
       },
     });
   }
