@@ -214,7 +214,7 @@
         label="{{
           drugParams?.useGeneralPrescription === 'true'
             ? 'To Be Dispensed'
-            : 'Previous Prescriptions'
+            : `Doctor's Prescriptions`
         }}"
       >
         <div class="mat-tab-container">
@@ -257,6 +257,19 @@
                     {{ drugOrder?.dateActivated | date: "medium" }}
                   </td>
                 </tr>
+                <tr *ngIf="!isInpatient || drugParams?.useGeneralPrescription !== 'true'">
+                    <td colspan="3">
+                      <button
+                        mat-flat-button
+                        class="float-right"
+                        color="primary"
+                        (click)="onAddOrder($event)"
+                      >
+                        <mat-icon>add</mat-icon>
+                        <span class="ml-2">Add Prescription</span>
+                      </button>
+                    </td>
+                  </tr>
               </tbody>
             </table>
             <table
