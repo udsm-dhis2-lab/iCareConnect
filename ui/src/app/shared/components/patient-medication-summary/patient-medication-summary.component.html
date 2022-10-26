@@ -221,13 +221,12 @@
           <ng-template matTabContent>
             <table
               class="table"
-              *ngIf="
-                drugParams?.filteredDrugOrders?.toBeDispensedDrugOrders
-                  ?.length > 0
-              "
             >
               <thead>
-                <tr>
+                <tr  *ngIf="
+                drugParams?.filteredDrugOrders?.toBeDispensedDrugOrders
+                  ?.length > 0
+              ">
                   <th>SN</th>
                   <th>Drug Details</th>
                   <th>
@@ -257,8 +256,22 @@
                     {{ drugOrder?.dateActivated | date: "medium" }}
                   </td>
                 </tr>
+                <tr 
+                *ngIf="
+                  drugParams?.filteredDrugOrders?.toBeDispensedDrugOrders
+                    ?.length === 0
+                " 
+                class="text-center p-3">
+                  No
+                  {{
+                    drugParams?.useGeneralPrescription === "true"
+                      ? "drugs to be dispensed"
+                      : "previous prescriptions"
+                  }}
+                  for this patient
+                </tr>
                 <tr *ngIf="!isInpatient && drugParams?.useGeneralPrescription !== 'true'">
-                  <td colspan="3">
+                  <td colspan="4">
                     <button
                       mat-flat-button
                       class="float-right"
@@ -271,23 +284,6 @@
                   </td>
                 </tr>
               </tbody>
-            </table>
-            <table
-              class="table table-striped"
-              *ngIf="
-                drugParams?.filteredDrugOrders?.toBeDispensedDrugOrders
-                  ?.length === 0
-              "
-            >
-              <tr class="text-center p-3">
-                No
-                {{
-                  drugParams?.useGeneralPrescription === "true"
-                    ? "drugs to be dispensed"
-                    : "previous prescriptions"
-                }}
-                for this patient
-              </tr>
             </table>
           </ng-template>
         </div>
