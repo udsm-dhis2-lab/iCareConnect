@@ -23,7 +23,8 @@
       params?.configs &&
       params?.labSamplesContainers &&
       params?.codedSampleRejectionReasons &&
-      params?.LISConfigurations
+      params?.LISConfigurations &&
+      params?.labSamplesDepartments
     "
   >
     <app-sample-results-dashboard
@@ -44,6 +45,7 @@
     *ngIf="
       !params?.datesParameters ||
       !params?.sampleTypesLoadedState ||
+      !params?.labSamplesDepartments ||
       params?.labSamplesDepartments?.length == 0 ||
       !params?.configs ||
       !params?.labSamplesContainers ||

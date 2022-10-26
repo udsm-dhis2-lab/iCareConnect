@@ -264,6 +264,10 @@ export class SampleAcceptanceComponent implements OnInit {
         this.searchingText
       )
     );
+
+    this.samplesWithResults$ = this.store.select(
+      getLabSamplesWithResults(this.selectedDepartment, this.searchingText)
+    );
   }
 
   onSearch(e) {
@@ -326,6 +330,10 @@ export class SampleAcceptanceComponent implements OnInit {
           this.selectedDepartment,
           this.searchingText
         )
+      );
+
+      this.samplesWithResults$ = this.store.select(
+        getLabSamplesWithResults(this.selectedDepartment, this.searchingText)
       );
     }
   }
