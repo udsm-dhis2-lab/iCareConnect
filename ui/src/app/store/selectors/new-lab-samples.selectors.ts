@@ -460,6 +460,57 @@ export const getFormattedLabSamplesToFeedResults = createSelector(
   }
 );
 
+export const getLabSamplesWithResults = (department, searchingText) =>
+  createSelector(getAllFormattedLabSamples, (samples) => {
+    const samplesWithResults = _.filter(samples, (sample) => {
+      const ordersWithResults = getOrdersWithResults(sample?.orders);
+      if (sample?.accepted && ordersWithResults?.length > 0) {
+        return sample;
+      }
+    });
+    return (
+      _.filter(
+        _.orderBy(
+          samplesWithResults,
+          ["dateCreated", "priorityOrderNumber"],
+          ["asc", "asc"]
+        ),
+        (sample) => {
+          if (!searchingText && !department) {
+            return sample;
+          } else if (searchingText && department) {
+            if (
+              sample?.searchingText
+                ?.toLowerCase()
+                .indexOf(searchingText.toLowerCase()) > -1 &&
+              sample?.department?.departmentName
+                .toLowerCase()
+                .indexOf(department?.toLowerCase()) > -1
+            ) {
+              return sample;
+            }
+          } else if (searchingText && !department) {
+            if (
+              sample?.searchingText
+                ?.toLowerCase()
+                .indexOf(searchingText.toLowerCase()) > -1
+            ) {
+              return sample;
+            }
+          } else if (!searchingText && department) {
+            if (
+              sample?.department?.departmentName
+                .toLowerCase()
+                .indexOf(department?.toLowerCase()) > -1
+            ) {
+              return sample;
+            }
+          }
+        }
+      ) || []
+    );
+  });
+
 export const getCompletedLabSamples = createSelector(
   getAllFormattedLabSamples,
   getLISConfigurations,

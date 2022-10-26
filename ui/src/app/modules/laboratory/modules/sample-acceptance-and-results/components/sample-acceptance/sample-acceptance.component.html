@@ -11,7 +11,8 @@
     completedSamples: completedSamples$ | async,
     patientsWithCompletedSamples: patientsWithCompletedSamples$ | async,
     rejectedSamples: rejectedSamples$ | async,
-    acceptedSamples: acceptedSamples$ | async
+    acceptedSamples: acceptedSamples$ | async,
+    samplesWithResults: samplesWithResults$ | async
   } as sampleParams"
 >
   <mat-tab-group (selectedTabChange)="onOpenNewTab($event)">
@@ -1718,10 +1719,10 @@
             </tr>
           </thead>
           <tbody>
-            <ng-container *ngIf="sampleParams?.completedSamples?.length > 0">
+            <ng-container *ngIf="sampleParams?.samplesWithResults?.length > 0">
               <ng-container
                 *ngFor="
-                  let sample of sampleParams?.completedSamples;
+                  let sample of sampleParams?.samplesWithResults;
                   let count = index
                 "
               >
@@ -1848,9 +1849,9 @@
                 </tr>
               </ng-container>
             </ng-container>
-            <ng-container *ngIf="sampleParams?.completedSamples?.length == 0">
+            <ng-container *ngIf="sampleParams?.samplesWithResults?.length == 0">
               <tr>
-                <td colspan="14" class="text-danger text-center">
+                <td colspan="100%" class="text-danger text-center">
                   No Sample With Results
                 </td>
               </tr>
