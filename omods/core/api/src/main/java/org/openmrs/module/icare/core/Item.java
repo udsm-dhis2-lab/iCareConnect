@@ -115,6 +115,7 @@ public class Item extends BaseOpenmrsData {
 			HashMap<String, Object> drug = new HashMap<String, Object>();
 			drug.put("uuid", this.getDrug().getUuid());
 			drug.put("display", this.getDrug().getDisplayName());
+			drug.put("concept",this.getDrug().getConcept());
 			itemMap.put("drug", drug);
 		}
 		itemMap.put("display", this.getDisplayString());
