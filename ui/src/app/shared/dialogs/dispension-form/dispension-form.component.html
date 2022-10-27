@@ -243,10 +243,13 @@
                     <div>
                       <button
                         class="float-right"
-                        (click)="onUpdateOrder($event)"
+                        (click)="
+                          onUpdateOrder($event, params?.specificDrugConceptUuid)
+                        "
                         mat-flat-button
                         [color]="savingError ? 'warn' : 'primary'"
                         [disabled]="
+                          !params?.specificDrugConceptUuid ||
                           savingOrder ||
                           countOfDispensingFormFieldsWithValues < 3
                         "

@@ -389,7 +389,7 @@ export class DispensingFormComponent implements OnInit {
       );
   }
 
-  onUpdateOrder(e: Event) {
+  onUpdateOrder(e: Event, specificDrugConceptUuid?: string) {
     e.stopPropagation();
     this.savingOrder = true;
     this.savingOrderSuccess = false;
@@ -397,133 +397,142 @@ export class DispensingFormComponent implements OnInit {
     this.savedOrder = null;
 
     const order = this.drugOrderData?.order || {};
-    const formattedOrder = {
-      ...order,
-      orderType: "iCARESTS-PRES-1111-1111-525400e4297f",
-      drug: order?.concept
-        ? order?.drug
-        : {
-            uuid: order?.drug.split(":")[0],
-          },
-      concept: order?.concept
-        ? order?.concept
-        : { uuid: order?.drug.split(":")[1] },
-      action: order?.action || "NEW",
-      urgency: "ROUTINE",
-      location: localStorage.getItem("currentLocation")
-        ? JSON.parse(localStorage.getItem("currentLocation"))["uuid"]
-        : null,
-      providerUuid: this.drugOrderData?.provider?.uuid,
-      encounterUuid: this.data?.fromDispensing
-        ? this.data?.drugOrder?.encounter?.uuid
-        : JSON.parse(localStorage.getItem("patientConsultation"))[
-            "encounterUuid"
-          ],
-      patientUuid: this.data?.patient
-        ? this.data?.patient?.uuid
-        : order?.patientUuid
-        ? order?.patientUuid
-        : this.data?.patientUuid,
-    };
-    // console.log("this.data?.drugOrder", this.data?.drugOrder);
-    this.drugOrderService
-      .saveDrugOrder(
-        DrugOrder.getOrderForSaving(formattedOrder),
-        "PRESCRIBE",
-        this.data.visit,
-        order?.location?.uuid ||
-          JSON.parse(localStorage.getItem("currentLocation"))["uuid"],
-        this.drugOrderData?.provider?.uuid
-      )
-      .subscribe(
-        (res) => {
-          this.getVisitByUuid(this.data?.visit?.uuid);
-          if (res?.message || res?.stackTrace) {
-            this.savingOrder = false;
-            this.errors = [
-              ...this.errors,
-              {
-                error: {
-                  message:
-                    res?.message ||
-                    "Error occurred while connecting to the server",
-                  detail: res?.stackTrace
-                    ? JSON.stringify(res?.stackTrace)
-                    : "",
-                },
-              },
-            ];
-          }
-          if (this.data?.useGenericPrescription && !res?.message) {
-            const genericOrderPayload = {
-              uuid: order?.uuid,
-              fulfillerStatus: "RECEIVED",
-              encounter: order?.encounter?.uuid,
-            };
-            this.orderService
-              .updateOrdersViaEncounter([genericOrderPayload])
-              .subscribe({
-                next: (order) => {
+    this.drugsService
+      .getDrug(order?.obs[specificDrugConceptUuid]?.value)
+      .subscribe((response) => {
+        if (response) {
+          const formattedOrder = {
+            ...order,
+            orderType: "iCARESTS-PRES-1111-1111-525400e4297f",
+            drug: {
+              uuid: response?.uuid,
+            },
+            concept: {
+              uuid: response?.concept?.uuid,
+            },
+            action: order?.action || "NEW",
+            urgency: "ROUTINE",
+            location: localStorage.getItem("currentLocation")
+              ? JSON.parse(localStorage.getItem("currentLocation"))["uuid"]
+              : null,
+            providerUuid: this.drugOrderData?.provider?.uuid,
+            encounterUuid: this.data?.fromDispensing
+              ? this.data?.drugOrder?.encounter?.uuid
+              : JSON.parse(localStorage.getItem("patientConsultation"))[
+                  "encounterUuid"
+                ],
+            patientUuid: this.data?.patient
+              ? this.data?.patient?.uuid
+              : order?.patientUuid
+              ? order?.patientUuid
+              : this.data?.patientUuid,
+          };
+          // console.log("this.data?.drugOrder", this.data?.drugOrder);
+          this.drugOrderService
+            .saveDrugOrder(
+              DrugOrder.getOrderForSaving(formattedOrder),
+              "PRESCRIBE",
+              this.data.visit,
+              order?.location?.uuid ||
+                JSON.parse(localStorage.getItem("currentLocation"))["uuid"],
+              this.drugOrderData?.provider?.uuid
+            )
+            .subscribe(
+              (res) => {
+                if (this.data.fromDispensing) {
+                  setTimeout(() => {
+                    this.dialogRef.close(true);
+                  }, 200);
+                }
+                this.getVisitByUuid(this.data?.visit?.uuid);
+                if (res?.message || res?.stackTrace) {
                   this.savingOrder = false;
-                  return order;
-                },
-                error: (error) => {
-                  this.savingOrder = false;
-                  return error;
-                },
-              });
-          }
-          this.savingOrderSuccess = true;
-          this.savedOrder = new DrugOrder(res);
-          // this.dialogRef.close({
-          //   action: 'ORDER_SAVED',
-          //   drugOrder: this.savedOrder,
-          // });
-          // this.store.dispatch(
-          //   loadActiveVisit({
-          //     patientId: this.data?.patient
-          //       ? this.data?.patient?.uuid
-          //       : this.data?.patientUuid,
-          //   })
-          // );
-          // if (this.data?.useGenericPrescription && !res?.message) {
-          //   this.dialogRef.close();
-          // }
-        },
-        (errorResponse) => {
-          this.savingOrder = false;
-          this.savingError =
-            DrugOrderError[errorResponse?.error?.message] ||
-            (errorResponse?.error?.message || "")
-              .replace("[", "")
-              .replace("]", "");
-          if (errorResponse?.message) {
-            this.errors = [
-              ...this.errors,
-              {
-                error: {
-                  message:
-                    errorResponse?.message ||
-                    "Error occurred while connecting to the server",
-                  detail: errorResponse?.error || "",
-                },
+                  this.errors = [
+                    ...this.errors,
+                    {
+                      error: {
+                        message:
+                          res?.message ||
+                          "Error occurred while connecting to the server",
+                        detail: res?.stackTrace
+                          ? JSON.stringify(res?.stackTrace)
+                          : "",
+                      },
+                    },
+                  ];
+                }
+                if (this.data?.useGenericPrescription && !res?.message) {
+                  const genericOrderPayload = {
+                    uuid: order?.uuid,
+                    fulfillerStatus: "RECEIVED",
+                    encounter: order?.encounter?.uuid,
+                  };
+                  this.orderService
+                    .updateOrdersViaEncounter([genericOrderPayload])
+                    .subscribe({
+                      next: (order) => {
+                        this.savingOrder = false;
+                        return order;
+                      },
+                      error: (error) => {
+                        this.savingOrder = false;
+                        return error;
+                      },
+                    });
+                }
+                this.savingOrderSuccess = true;
+                this.savedOrder = new DrugOrder(res);
+                // this.dialogRef.close({
+                //   action: 'ORDER_SAVED',
+                //   drugOrder: this.savedOrder,
+                // });
+                // this.store.dispatch(
+                //   loadActiveVisit({
+                //     patientId: this.data?.patient
+                //       ? this.data?.patient?.uuid
+                //       : this.data?.patientUuid,
+                //   })
+                // );
+                // if (this.data?.useGenericPrescription && !res?.message) {
+                //   this.dialogRef.close();
+                // }
               },
-            ];
-          } else {
-            this.errors = [
-              ...this.errors,
-              errorResponse.error || {
-                error: {
-                  message: "Error occured while executing the command",
-                },
-              },
-            ];
-          }
-          this.savingOrderSuccess = false;
-        }
-      );
+              (errorResponse) => {
+                this.savingOrder = false;
+                this.savingError =
+                  DrugOrderError[errorResponse?.error?.message] ||
+                  (errorResponse?.error?.message || "")
+                    .replace("[", "")
+                    .replace("]", "");
+                if (errorResponse?.message) {
+                  this.errors = [
+                    ...this.errors,
+                    {
+                      error: {
+                        message:
+                          errorResponse?.message ||
+                          "Error occurred while connecting to the server",
+                        detail: errorResponse?.error || "",
+                      },
+                    },
+                  ];
+                } else {
+                  this.errors = [
+                    ...this.errors,
+                    errorResponse.error || {
+                      error: {
+                        message: "Error occured while executing the command",
+                      },
+                    },
+                  ];
+                }
+                this.savingOrderSuccess = false;
+              }
+            );
 
-    this.onUpdateConsultationOrder();
+          this.onUpdateConsultationOrder();
+        }
+      });
   }
 
   onClearError(e: MouseEvent) {
