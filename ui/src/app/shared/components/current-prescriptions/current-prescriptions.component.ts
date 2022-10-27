@@ -21,7 +21,7 @@ export class CurrentPrescriptionComponent implements OnInit {
 
   drugsPrescribed: any;
   errors: any[] = [];
-  specicDrugConceptUuid$: Observable<any>;
+  specificDrugConceptUuid$: Observable<any>;
   
   constructor(
     private systemSettingsService: SystemSettingsService, 
@@ -32,7 +32,7 @@ export class CurrentPrescriptionComponent implements OnInit {
 
     this.getDrugsPrescribed()
 
-    this.specicDrugConceptUuid$ = this.systemSettingsService
+    this.specificDrugConceptUuid$ = this.systemSettingsService
       .getSystemSettingsByKey(
         "iCare.clinic.genericPrescription.specificDrugConceptUuid"
       )
@@ -64,11 +64,14 @@ export class CurrentPrescriptionComponent implements OnInit {
                 order.orderType?.uuid === this.genericPrescriptionOrderType
             ) || []
           )?.map((genericDrugOrder) => {
+            let formulatedDescription = encounter?.obs?.map((ob) => {
+              if(ob?.comment === null){
+                return ob
+              }
+            }).filter((ob) => ob)
             return {
               ...genericDrugOrder,
-              formulatedDescription: (
-                encounter?.obs?.map((observation) => observation?.value) || []
-              ).join("; "),
+              formulatedDescription: formulatedDescription,
               obs: keyBy(
                 encounter?.obs?.map((observation) => {
                   return {
