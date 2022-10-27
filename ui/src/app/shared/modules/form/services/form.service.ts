@@ -227,7 +227,7 @@ export class FormService {
               }),
               "itemUuid"
             );
-            const data = Object.keys(groupedByItemUuid).map((itemUuid) => {
+            return Object.keys(groupedByItemUuid).map((itemUuid) => {
               const totalQuantity = sumBy(
                 groupedByItemUuid[itemUuid].map((batchData) => {
                   return batchData;
@@ -235,19 +235,20 @@ export class FormService {
                 "quantity"
               );
               return {
-                uuid: groupedByItemUuid[itemUuid][0]?.item?.uuid,
-                id: groupedByItemUuid[itemUuid][0]?.item?.uuid,
+                uuid: groupedByItemUuid[itemUuid][0]?.item?.drug?.uuid,
+                id: groupedByItemUuid[itemUuid][0]?.item?.drug?.uuid,
                 display:
                   groupedByItemUuid[itemUuid][0]?.item?.display +
                   " (" +
                   totalQuantity.toLocaleString("en-US") +
                   ") ",
+                itemUuid,
+                value: groupedByItemUuid[itemUuid][0]?.item?.drug?.uuid,
+                batches: groupedByItemUuid[itemUuid],
                 name: groupedByItemUuid[itemUuid][0]?.item?.display,
                 quantity: totalQuantity,
               };
             });
-            console.log(data);
-            return data;
           })
         );
     } else if (searchControlType === "residenceLocation") {
