@@ -21,7 +21,7 @@
     drugOrderConceptDetails: drugOrderConceptDetails$ | async,
     strengthConceptUuid: strengthConceptUuid$ | async,
     useSpecificDrugPrescription: useSpecificDrugPrescription$ | async,
-    specicDrugConceptUuid: specicDrugConceptUuid$ | async
+    specificDrugConceptUuid: specificDrugConceptUuid$| async
   } as params"
 >
   <div class="loading-overlay" *ngIf="savingOrder">
@@ -120,7 +120,7 @@
                 params?.genericPrescriptionConceptUuids &&
                 params?.strengthConceptUuid &&
                 params?.useSpecificDrugPrescription &&
-                params?.specicDrugConceptUuid
+                params?.specificDrugConceptUuid
               "
             >
               <app-general-dispension-form
@@ -150,7 +150,7 @@
                 [genericPrescriptionConceptUuid]="
                   params?.genericPrescriptionConceptUuid
                 "
-                [specicDrugConceptUuid]="params?.specicDrugConceptUuid"
+                [specificDrugConceptUuid]="params?.specificDrugConceptUuid"
                 [generalPrescriptionDurationConcept]="
                   params?.generalPrescriptionDurationConcept
                 "
@@ -190,7 +190,7 @@
                 params?.generalPrescriptionDoseConcept &&
                 params?.generalPrescriptionFrequencyConcept &&
                 params?.dispensingLocations && 
-                params?.specicDrugConceptUuid
+                params?.specificDrugConceptUuid
               "
             >
               <mat-accordion>
@@ -226,7 +226,7 @@
                       [generalPrescriptionFrequencyConcept]="
                         params?.generalPrescriptionFrequencyConcept
                       "
-                      [specicDrugConceptUuid]="params?.specicDrugConceptUuid"
+                      [specificDrugConceptUuid]="params?.specificDrugConceptUuid"
                       [drugsToBeDispensed]="drugsToBeDispensed$ | async"
                       (drugQuantity)="onChangeDrugQuantity($event)"
                       (drugOrdered)="onOrderingDrug($event)"

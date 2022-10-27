@@ -75,7 +75,7 @@ export class DispensingFormComponent implements OnInit {
   drugOrderConceptDetails$: Observable<ConceptGet>;
   strengthConceptUuid$: Observable<string>;
   useSpecificDrugPrescription$: Observable<any>;
-  specicDrugConceptUuid$: Observable<any>;
+  specificDrugConceptUuid$: Observable<any>;
 
   constructor(
     private drugOrderService: DrugOrdersService,
@@ -168,7 +168,7 @@ export class DispensingFormComponent implements OnInit {
         })
       );
 
-    this.specicDrugConceptUuid$ = this.systemSettingsService
+    this.specificDrugConceptUuid$ = this.systemSettingsService
       .getSystemSettingsByKey(
         "iCare.clinic.genericPrescription.specificDrugConceptUuid"
       )
