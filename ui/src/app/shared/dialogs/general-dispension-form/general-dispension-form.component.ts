@@ -102,16 +102,21 @@ export class GeneralDispensingFormComponent implements OnInit {
       this.generalPrescriptionDurationConcept,
     ]);
 
-    if (this.useSpecificDrugPrescription !== 'none' && this.specicDrugConceptUuid) {
-      console.log("==> Drug: ", this.useSpecificDrugPrescription, "==> Balaa")
+    if (
+      this.useSpecificDrugPrescription !== "none" &&
+      this.specicDrugConceptUuid
+    ) {
+      // console.log("==> Drug: ", this.useSpecificDrugPrescription, "==> Balaa");
       const drugs = await this.drugOrderService.getAllDrugs("full");
       this.drugConceptField = new Dropdown({
         options: drugs,
         key: "drug",
         value: "drug",
         required: true,
+        locationUuid: "7f65d926-57d6-4402-ae10-a5b3bcbf7986",
         label: "Drug",
-        searchControlType: "drug",
+        searchControlType: "drugStock",
+        shouldHaveLiveSearchForDropDownFields: true,
       });
     } else {
       this.drugConceptField = new Dropdown({
@@ -287,11 +292,8 @@ export class GeneralDispensingFormComponent implements OnInit {
               }
             });
         }
-        if(response?.error){
-          this.errors = [
-            ...this.errors,
-            response?.error
-          ]
+        if (response?.error) {
+          this.errors = [...this.errors, response?.error];
         }
       });
 
