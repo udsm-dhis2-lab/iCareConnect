@@ -234,8 +234,6 @@ export class GeneralDispensingFormComponent implements OnInit {
       };
     });
 
-    // console.log("this.specificDrugConceptUuid", this.specificDrugConceptUuid);
-
     obs = [
       ...obs,
       this.useSpecificDrugPrescription && this.specificDrugConceptUuid
@@ -243,7 +241,7 @@ export class GeneralDispensingFormComponent implements OnInit {
             person: this.currentPatient?.id,
             concept: this.specificDrugConceptUuid,
             obsDatetime: new Date(),
-            value: this.formValues["drug"]?.value?.uuid,
+            value: this.formValues["drug"]?.value?.uuid.toString(),
             comment: this.formValues["drug"]?.value?.name,
           }
         : {},
@@ -286,7 +284,7 @@ export class GeneralDispensingFormComponent implements OnInit {
                   return observation;
                 }
               }) || []),
-              this.strengthConceptUuid
+              this.strengthConceptUuid && !this.specificDrugConceptUuid
                 ? {
                     person: this.currentPatient?.id,
                     concept: this.strengthConceptUuid,

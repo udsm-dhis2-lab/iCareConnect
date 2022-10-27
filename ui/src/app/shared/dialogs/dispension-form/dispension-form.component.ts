@@ -439,11 +439,11 @@ export class DispensingFormComponent implements OnInit {
             )
             .subscribe(
               (res) => {
-                if (this.data.fromDispensing) {
-                  setTimeout(() => {
-                    this.dialogRef.close(true);
-                  }, 200);
-                }
+                // if (this.data.fromDispensing) {
+                //   setTimeout(() => {
+                //     this.dialogRef.close(true);
+                //   }, 200);
+                // }
                 this.getVisitByUuid(this.data?.visit?.uuid);
                 if (res?.message || res?.stackTrace) {
                   this.savingOrder = false;
