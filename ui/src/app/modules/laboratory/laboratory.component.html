@@ -11,7 +11,7 @@
     <div
       class="row"
       *ngIf="
-        params?.sampleTypes?.length == 0 ||
+        !params?.sampleTypes ||
         !params?.privileges ||
         !params?.userRoles ||
         (params?.userRoles && params?.userRoles.length == 0) ||
@@ -29,7 +29,7 @@
     <div
       class="row"
       *ngIf="
-        params?.sampleTypes?.length > 0 &&
+        params?.sampleTypes &&
         params?.privileges &&
         params?.userRoles &&
         params?.userRoles.length > 0 &&
