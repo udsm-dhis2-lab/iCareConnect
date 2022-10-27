@@ -7,7 +7,7 @@ import { getFormQueryFields } from "../helpers/get-form-query-field.helper";
 import { getSanitizedFormObject } from "../helpers/get-sanitized-form-object.helper";
 import { FormConfig } from "../models/form-config.model";
 import { ICAREForm } from "../models/form.model";
-import { orderBy, uniqBy, omit, keyBy, groupBy } from "lodash";
+import { orderBy, uniqBy, omit, keyBy, groupBy, sumBy } from "lodash";
 
 @Injectable({ providedIn: "root" })
 export class FormService {
@@ -211,6 +211,46 @@ export class FormService {
       );
       // this.drugs = drugsResults?.results || [];
       // return formatDrugs(this.drugs);)
+    } else if (searchControlType === "drugStock") {
+      return this.httpClient
+        .get(
+          `store/stock?locationUuid=${field?.locationUuid}&q=${parameters?.q}`
+        )
+        .pipe(
+          map((response) => {
+            const groupedByItemUuid = groupBy(
+              response.map((batch) => {
+                return {
+                  ...batch,
+                  itemUuid: batch?.item?.uuid,
+                };
+              }),
+              "itemUuid"
+            );
+            return Object.keys(groupedByItemUuid).map((itemUuid) => {
+              const totalQuantity = sumBy(
+                groupedByItemUuid[itemUuid].map((batchData) => {
+                  return batchData;
+                }),
+                "quantity"
+              );
+              return {
+                uuid: groupedByItemUuid[itemUuid][0]?.item?.drug?.uuid,
+                id: groupedByItemUuid[itemUuid][0]?.item?.drug?.uuid,
+                display:
+                  groupedByItemUuid[itemUuid][0]?.item?.display +
+                  " (" +
+                  totalQuantity.toLocaleString("en-US") +
+                  ") ",
+                itemUuid,
+                value: groupedByItemUuid[itemUuid][0]?.item?.drug?.uuid,
+                batches: groupedByItemUuid[itemUuid],
+                name: groupedByItemUuid[itemUuid][0]?.item?.display,
+                quantity: totalQuantity,
+              };
+            });
+          })
+        );
     } else if (searchControlType === "residenceLocation") {
       return from(
         this.api.location.getAllLocations({

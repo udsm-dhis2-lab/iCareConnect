@@ -1,6 +1,8 @@
 <div *ngIf="drugOrderFormsMetadata && provider">
   <div class="drug-order">
+    <!-- TODO: Find a better way to handle this depending on generic presc settings -->
     <app-form
+      *ngIf="!fromDispensing"
       [fields]="[drugFormField]"
       (formUpdate)="onFormUpdate('drug', $event)"
     ></app-form>

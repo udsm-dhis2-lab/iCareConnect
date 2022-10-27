@@ -1,11 +1,14 @@
-<div [ngClass]="drugsPrescribed.length > 0 ? 'current-prescriptions' : ''"
-  *ngIf="{ specicDrugConceptUuid : specicDrugConceptUuid$ | async } as params"
-  >
+<div
+  [ngClass]="drugsPrescribed.length > 0 ? 'current-prescriptions' : ''"
+  *ngIf="{ specicDrugConceptUuid: specicDrugConceptUuid$ | async } as params"
+>
   <div *ngIf="errors.length > 0">
     <app-shared-error [errors]="errors"></app-shared-error>
   </div>
   <table class="table table-bordered table-striped">
-    <ng-container *ngIf="drugsPrescribed.length > 0 && params?.specicDrugConceptUuid">
+    <ng-container
+      *ngIf="drugsPrescribed.length > 0 && params?.specicDrugConceptUuid"
+    >
       <thead>
         <tr>
           <th>S/N</th>
@@ -18,7 +21,9 @@
       <tbody>
         <tr *ngFor="let drug of drugsPrescribed; let index = index">
           <td>{{ index + 1 }}</td>
-          <td>{{drug.obs[params?.specificDrugConceptUuid] ? drug.obs[params?.specificDrugConceptUuid]?.valueDrug : drug?.display }} - {{ drug | json }}</td>
+          <td>
+            <!-- {{drug.obs[params?.specificDrugConceptUuid] ? drug.obs[params?.specificDrugConceptUuid]?.valueDrug : drug?.display }} - {{ drug | json }} -->
+          </td>
           <td>
             {{ drug?.formulatedDescription }}
           </td>

@@ -21,7 +21,7 @@
     drugOrderConceptDetails: drugOrderConceptDetails$ | async,
     strengthConceptUuid: strengthConceptUuid$ | async,
     useSpecificDrugPrescription: useSpecificDrugPrescription$ | async,
-    specificDrugConceptUuid: specificDrugConceptUuid$| async
+    specificDrugConceptUuid: specificDrugConceptUuid$ | async
   } as params"
 >
   <div class="loading-overlay" *ngIf="savingOrder">
@@ -133,7 +133,9 @@
                 (genericPrescriptionConceptUuidsEvent)="
                   getConceptsAsFields($event)
                 "
-                [useSpecificDrugPrescription]="params?.useSpecificDrugPrescription"
+                [useSpecificDrugPrescription]="
+                  params?.useSpecificDrugPrescription
+                "
                 [encounterType]="params?.generalPrescriptionEncounterType"
                 [orderType]="params?.generalPrescriptionOrderType"
                 [currentPatient]="params?.currentPatient"
@@ -189,7 +191,7 @@
                 params?.generalPrescriptionDurationConcept &&
                 params?.generalPrescriptionDoseConcept &&
                 params?.generalPrescriptionFrequencyConcept &&
-                params?.dispensingLocations && 
+                params?.dispensingLocations &&
                 params?.specificDrugConceptUuid
               "
             >
@@ -198,12 +200,13 @@
                   <mat-expansion-panel-header>
                     <mat-panel-title>
                       Drug:
-                      <span
-                        style="color: #2a8fd1"
-                        class="ml-2"
-                        [innerHtml]="genericDrugPrescription"
-                      ></span
-                    ></mat-panel-title>
+                      <span style="color: #2a8fd1" class="ml-2">
+                        {{
+                          drugOrder?.obs[params?.specificDrugConceptUuid]
+                            ?.comment
+                        }}
+                      </span></mat-panel-title
+                    >
                   </mat-expansion-panel-header>
                   <div>
                     <app-drug-order
@@ -226,7 +229,9 @@
                       [generalPrescriptionFrequencyConcept]="
                         params?.generalPrescriptionFrequencyConcept
                       "
-                      [specificDrugConceptUuid]="params?.specificDrugConceptUuid"
+                      [specificDrugConceptUuid]="
+                        params?.specificDrugConceptUuid
+                      "
                       [drugsToBeDispensed]="drugsToBeDispensed$ | async"
                       (drugQuantity)="onChangeDrugQuantity($event)"
                       (drugOrdered)="onOrderingDrug($event)"
