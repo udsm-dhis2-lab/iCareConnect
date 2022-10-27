@@ -7,6 +7,9 @@
       </div>
     </div>
   </div>
+  <div *ngIf="errors">
+    <app-shared-error [errors]="errors"></app-shared-error>
+  </div>
   <div *ngIf="!savingOrder">
     <div>
       <app-form
