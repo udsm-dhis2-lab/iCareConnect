@@ -7,7 +7,7 @@ import { getFormQueryFields } from "../helpers/get-form-query-field.helper";
 import { getSanitizedFormObject } from "../helpers/get-sanitized-form-object.helper";
 import { FormConfig } from "../models/form-config.model";
 import { ICAREForm } from "../models/form.model";
-import { orderBy, uniqBy, omit, keyBy, groupBy } from "lodash";
+import { orderBy, uniqBy, omit, keyBy, groupBy, sumBy } from "lodash";
 
 @Injectable({ providedIn: "root" })
 export class FormService {
@@ -40,7 +40,8 @@ export class FormService {
     parameters,
     searchControlType?,
     filteringItems?,
-    field?
+    field?,
+    locationUuid?: string
   ): Observable<any[]> {
     if (parameters?.class === "Diagnosis") {
       return from(this.api.concept.getAllConcepts(parameters)).pipe(
@@ -211,6 +212,35 @@ export class FormService {
       );
       // this.drugs = drugsResults?.results || [];
       // return formatDrugs(this.drugs);)
+    } else if (searchControlType === "drugStock") {
+      return this.httpClient
+        .get(`store/stock?locationUuid=${locationUuid}&q=${parameters?.q}`)
+        .pipe(
+          map((response) => {
+            const groupedByBatch = groupBy(response, "batch");
+
+            const data = Object.keys(groupedByBatch).map((batch) => {
+              const totalQuantity = sumBy(
+                groupedByBatch[batch].map((batchData) => {
+                  return {
+                    batchData,
+                  };
+                }),
+                "quantity"
+              );
+              return {
+                uuid: groupedByBatch[0]?.item?.uuid,
+                id: groupedByBatch[0]?.item?.uuid,
+                display:
+                  groupedByBatch[0]?.item?.display + " (" + totalQuantity + ")",
+                name: groupedByBatch[0]?.item?.display,
+                quantity: totalQuantity,
+              };
+            });
+            console.log(data);
+            return data;
+          })
+        );
     } else if (searchControlType === "residenceLocation") {
       return from(
         this.api.location.getAllLocations({
