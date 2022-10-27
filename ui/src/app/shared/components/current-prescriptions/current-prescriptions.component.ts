@@ -3,6 +3,9 @@ import { Store } from "@ngrx/store";
 import { AppState } from "src/app/store/reducers";
 import { flatten, keyBy } from "lodash";
 import { EncountersService } from "../../services/encounters.service";
+import { SystemSettingsService } from "src/app/core/services/system-settings.service";
+import { tap } from "rxjs/operators";
+import { Observable } from "rxjs";
 
 @Component({
   selector: "app-current-prescriptions",
@@ -18,17 +21,47 @@ export class CurrentPrescriptionComponent implements OnInit {
 
   drugsPrescribed: any;
   errors: any[] = [];
-
-  constructor(private encounterService: EncountersService) {}
+  specicDrugConceptUuid$: Observable<any>;
+  
+  constructor(
+    private systemSettingsService: SystemSettingsService, 
+    private encounterService: EncountersService,
+  ) {}
 
   ngOnInit(): void {
+
+    this.getDrugsPrescribed()
+
+    this.specicDrugConceptUuid$ = this.systemSettingsService
+      .getSystemSettingsByKey(
+        "iCare.clinic.genericPrescription.specificDrugConceptUuid"
+      )
+      .pipe(
+        tap((response) => {
+          if (response === "none") {
+            this.errors = [
+              ...this.errors,
+              {
+                error: {
+                  message:
+                    "Generic Use Specific drug Concept config is missing, Set 'iCare.clinic.genericPrescription.specificDrugConceptUuid' or Contact IT (Close to continue)",
+                },
+                type: "warning",
+              },
+            ];
+          }
+        })
+      );
+  }
+
+  getDrugsPrescribed(){
     this.drugsPrescribed = flatten(
       this.visit?.encounters
         ?.map((encounter) => {
           return (
             encounter?.orders.filter(
               (order) =>
-                order.orderType?.uuid == this.genericPrescriptionOrderType
+                order.orderType?.uuid === this.genericPrescriptionOrderType
             ) || []
           )?.map((genericDrugOrder) => {
             return {
