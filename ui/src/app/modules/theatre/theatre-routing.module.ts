@@ -1,15 +1,15 @@
-import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
-import { TheatreHomeComponent } from './pages/theatre-home/theatre-home.component';
-import { TheatreOrdersComponent } from './pages/theatre-orders/theatre-orders.component';
+import { NgModule } from "@angular/core";
+import { RouterModule, Routes } from "@angular/router";
+import { TheatreDashboardComponent } from "./pages/theatre-dashboard/theatre-dashboard.component";
+import { TheatreHomeComponent } from "./pages/theatre-home/theatre-home.component";
 const routes: Routes = [
   {
-    path: '',
+    path: "",
     component: TheatreHomeComponent,
   },
   {
-    path: 'orders',
-    component: TheatreOrdersComponent,
+    path: "patient-theatre/:patient",
+    component: TheatreDashboardComponent,
   },
 ];
 
