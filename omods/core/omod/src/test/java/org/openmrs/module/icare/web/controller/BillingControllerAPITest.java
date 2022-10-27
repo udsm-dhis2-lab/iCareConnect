@@ -512,9 +512,9 @@ public class BillingControllerAPITest extends BaseResourceControllerTest {
 
 		AdministrationService adminService = Context.getService(AdministrationService.class);
 		ConceptService conceptService  = Context.getService(ConceptService.class);
-		adminService.setGlobalProperty(ICareConfig.BED_ORDER_TYPE, "iCARE901-ADMS-11e8-b450-525400e4297f");
+		adminService.setGlobalProperty(ICareConfig.BED_ORDER_TYPE, "2msir5eb-5345-11e8-9922-40b034c3cfef");
 		//adminService.setGlobalProperty(ICareConfig.SERVICE_ATTRIBUTE,"SERVICE0IIIIIIIIIIIIIIIIIIIIIIIATYPE");
-		adminService.setGlobalProperty(ICareConfig.BED_ORDER_CONCEPT,"e0dffb20-4412-4478-abe5-ac9152aadf78");
+		adminService.setGlobalProperty(ICareConfig.BED_ORDER_CONCEPT,"a457ac00-5345-11e8-9c7c-40mcpekrcfee");
 
 		MockHttpServletRequest newGetRequest = newGetRequest("billing/ipd");
 		MockHttpServletResponse handler = handle(newGetRequest);
@@ -524,7 +524,7 @@ public class BillingControllerAPITest extends BaseResourceControllerTest {
 		order = (new ObjectMapper()).readValue(handler.getContentAsString(), Order.class);
 
 		System.out.println(order.getUuid());
-		assertThat("The order should be created", order.getUuid().length() > 1);
+		assertThat("The order should be created", order.getUuid().length() > 0);
 	}
 
 	@Override
