@@ -40,8 +40,7 @@ export class FormService {
     parameters,
     searchControlType?,
     filteringItems?,
-    field?,
-    locationUuid?: string
+    field?
   ): Observable<any[]> {
     if (parameters?.class === "Diagnosis") {
       return from(this.api.concept.getAllConcepts(parameters)).pipe(
@@ -214,26 +213,36 @@ export class FormService {
       // return formatDrugs(this.drugs);)
     } else if (searchControlType === "drugStock") {
       return this.httpClient
-        .get(`store/stock?locationUuid=${locationUuid}&q=${parameters?.q}`)
+        .get(
+          `store/stock?locationUuid=${field?.locationUuid}&q=${parameters?.q}`
+        )
         .pipe(
           map((response) => {
-            const groupedByBatch = groupBy(response, "batch");
-
-            const data = Object.keys(groupedByBatch).map((batch) => {
+            const groupedByItemUuid = groupBy(
+              response.map((batch) => {
+                return {
+                  ...batch,
+                  itemUuid: batch?.item?.uuid,
+                };
+              }),
+              "itemUuid"
+            );
+            const data = Object.keys(groupedByItemUuid).map((itemUuid) => {
               const totalQuantity = sumBy(
-                groupedByBatch[batch].map((batchData) => {
-                  return {
-                    batchData,
-                  };
+                groupedByItemUuid[itemUuid].map((batchData) => {
+                  return batchData;
                 }),
                 "quantity"
               );
               return {
-                uuid: groupedByBatch[0]?.item?.uuid,
-                id: groupedByBatch[0]?.item?.uuid,
+                uuid: groupedByItemUuid[itemUuid][0]?.item?.uuid,
+                id: groupedByItemUuid[itemUuid][0]?.item?.uuid,
                 display:
-                  groupedByBatch[0]?.item?.display + " (" + totalQuantity + ")",
-                name: groupedByBatch[0]?.item?.display,
+                  groupedByItemUuid[itemUuid][0]?.item?.display +
+                  " (" +
+                  totalQuantity.toLocaleString("en-US") +
+                  ") ",
+                name: groupedByItemUuid[itemUuid][0]?.item?.display,
                 quantity: totalQuantity,
               };
             });
