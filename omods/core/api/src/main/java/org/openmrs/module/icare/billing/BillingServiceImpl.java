@@ -687,7 +687,6 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 						+ ICareConfig.BED_ORDER_CONCEPT + ".");
 			}
 
-
 				OrderType bedOrderOrderType = new OrderType();
 				bedOrderOrderType.setUuid(bedOrderTypeUUID);
 
@@ -716,6 +715,7 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 				orderContext.setCareSetting(orderService.getCareSetting(1));
 				System.out.println(orderContext);
 				System.out.println(order);
+			    encounters.get(0).addOrder(order);
 				//System.out.println(orderService.saveOrder(order, orderContext));
 				newOrder = orderService.saveOrder(order, orderContext);
 
