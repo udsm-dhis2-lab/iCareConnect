@@ -42,7 +42,7 @@ export class GeneralDispensingFormComponent implements OnInit {
   @Input() conceptFields$: Observable<any>;
   @Input() strengthConceptUuid: any;
   @Input() useSpecificDrugPrescription: any;
-  @Input() specicDrugConceptUuid: any;
+  @Input() specificDrugConceptUuid: any;
 
   drugOrder: DrugOrderObject;
 
@@ -77,6 +77,7 @@ export class GeneralDispensingFormComponent implements OnInit {
   genericPrescriptionField: Textbox;
   conceptFieldsMap: any[];
   errors: any[] = [];
+  selectedDrug: any;
 
   constructor(
     private drugOrderService: DrugOrdersService,
@@ -102,8 +103,7 @@ export class GeneralDispensingFormComponent implements OnInit {
       this.generalPrescriptionDurationConcept,
     ]);
 
-    if (this.useSpecificDrugPrescription !== 'none' && this.specicDrugConceptUuid) {
-      console.log("==> Drug: ", this.useSpecificDrugPrescription, "==> Balaa")
+    if (this.useSpecificDrugPrescription !== 'none' && this.specificDrugConceptUuid) {
       const drugs = await this.drugOrderService.getAllDrugs("full");
       this.drugConceptField = new Dropdown({
         options: drugs,
@@ -127,27 +127,35 @@ export class GeneralDispensingFormComponent implements OnInit {
       });
     }
 
-    this.drugDoseField = new Textbox({
-      id: "dose",
-      key: "dose",
-      label: "Dose",
-      required: true,
-      type: "number",
-    });
+    // this.drugDoseField = new Textbox({
+    //   id: "dose",
+    //   key: "dose",
+    //   label: "Dose",
+    //   required: true,
+    //   type: "number",
+    // });
 
-    this.drugDurationField = new Textbox({
-      id: "duration",
-      key: "duration",
-      label: "Duration",
-      required: true,
-      type: "number",
-    });
+    // this.drugDurationField = new Textbox({
+    //   id: "duration",
+    //   key: "duration",
+    //   label: "Duration",
+    //   required: true,
+    //   type: "number",
+    // });
   }
 
   onFormUpdate(formValues: FormValue, fieldItem?: string): void {
     this.isFormValid = formValues.isValid;
     this.formValues = { ...this.formValues, ...formValues.getValues() };
-    if (fieldItem == "drug") {
+
+    if(formValues.getValues()?.drug?.value?.length > 0){
+      this.selectedDrug = formValues
+        .getValues()
+        ?.drug?.options?.filter(
+          (option) => option?.name === formValues.getValues()?.drug?.value
+        )[0];
+    }
+    if (fieldItem == "drug" && !this.specificDrugConceptUuid) {
       this.drugService
         .getDrugsUsingConceptUuid(this.formValues?.drug?.value)
         .subscribe((response) => {
@@ -201,8 +209,8 @@ export class GeneralDispensingFormComponent implements OnInit {
             : "INPATIENT",
           patient: this.currentPatient?.id,
           concept:
-            this.useSpecificDrugPrescription && this.specicDrugConceptUuid
-              ? this.specicDrugConceptUuid
+            this.useSpecificDrugPrescription && this.specificDrugConceptUuid
+              ? this.specificDrugConceptUuid || this.selectedDrug?.conceptUuid
               : this.formValues["drug"].value,
           orderer: this.provider?.uuid,
           type: "order",
@@ -222,12 +230,13 @@ export class GeneralDispensingFormComponent implements OnInit {
 
     obs = [
       ...obs,
-      this.useSpecificDrugPrescription
+      this.useSpecificDrugPrescription && this.specificDrugConceptUuid
         ? {
             person: this.currentPatient?.id,
-            concept: this.specicDrugConceptUuid,
+            concept: this.specificDrugConceptUuid,
             obsDatetime: new Date(),
-            valueDrug: this.formValues["drug"].value,
+            valueDrug: this.selectedDrug?.uuid,
+            value: this.selectedDrug?.uuid,
           }
         : {},
       {
@@ -254,7 +263,8 @@ export class GeneralDispensingFormComponent implements OnInit {
         obsDatetime: new Date(),
         value: this.formValues["route"].value,
       },
-    ].filter((ob) => ob);
+    ].filter((ob) => ob?.value && ob?.value !== "");
+
 
     this.ordersService
       .createOrdersViaCreatingEncounter(encounterObject)
@@ -265,7 +275,7 @@ export class GeneralDispensingFormComponent implements OnInit {
             obs: [
               ...(obs.filter((observation) => {
                 if (observation.value && observation.value.length > 0) {
-                  return observation;
+                  return observation; 
                 }
               }) || []),
               this.strengthConceptUuid
