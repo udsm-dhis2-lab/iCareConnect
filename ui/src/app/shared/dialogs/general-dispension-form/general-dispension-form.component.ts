@@ -76,6 +76,7 @@ export class GeneralDispensingFormComponent implements OnInit {
   @Output() orderSaved: EventEmitter<boolean> = new EventEmitter<boolean>();
   genericPrescriptionField: Textbox;
   conceptFieldsMap: any[];
+  errors: any[] = [];
 
   constructor(
     private drugOrderService: DrugOrdersService,
@@ -101,7 +102,8 @@ export class GeneralDispensingFormComponent implements OnInit {
       this.generalPrescriptionDurationConcept,
     ]);
 
-    if (this.useSpecificDrugPrescription) {
+    if (this.useSpecificDrugPrescription !== 'none' && this.specicDrugConceptUuid) {
+      console.log("==> Drug: ", this.useSpecificDrugPrescription, "==> Balaa")
       const drugs = await this.drugOrderService.getAllDrugs("full");
       this.drugConceptField = new Dropdown({
         options: drugs,
@@ -271,7 +273,7 @@ export class GeneralDispensingFormComponent implements OnInit {
                     person: this.currentPatient?.id,
                     concept: this.strengthConceptUuid,
                     obsDatetime: new Date(),
-                    value: this.formValues[this.strengthConceptUuid].value,
+                    value: this.formValues[this.strengthConceptUuid]?.value,
                   }
                 : null,
             ]?.filter((observation) => observation),
@@ -284,6 +286,12 @@ export class GeneralDispensingFormComponent implements OnInit {
                 this.orderSaved.emit(true);
               }
             });
+        }
+        if(response?.error){
+          this.errors = [
+            ...this.errors,
+            response?.error
+          ]
         }
       });
 
