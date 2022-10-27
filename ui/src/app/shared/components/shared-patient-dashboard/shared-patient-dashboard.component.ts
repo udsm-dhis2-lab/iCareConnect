@@ -102,6 +102,7 @@ export class SharedPatientDashboardComponent implements OnInit {
   @Input() clinicConfigurations: any;
   @Input() currentLocation: LocationGet;
   @Input() isInpatient: boolean;
+  @Input() isTheatre: boolean;
   @Input() visitEndingControlStatusesConceptUuid: string;
   @Input() observations: any;
   currentPatient$: Observable<Patient>;
@@ -142,8 +143,7 @@ export class SharedPatientDashboardComponent implements OnInit {
   showPrintButton: boolean;
 
   @Output() assignBed: EventEmitter<boolean> = new EventEmitter<boolean>();
-  @Output() dichargePatient: EventEmitter<any> =
-    new EventEmitter<boolean>();
+  @Output() dichargePatient: EventEmitter<any> = new EventEmitter<boolean>();
   observationChartForm$: Observable<any>;
   observationChartEncounterType$: Observable<any>;
 
@@ -281,39 +281,42 @@ export class SharedPatientDashboardComponent implements OnInit {
         );
     }
 
-    this.patientInvoice$ = this.billingService.getPatientBills(this.activeVisit?.patientUuid).pipe(
-      rxMap((res) => {
-        if(!res?.error){
-          res = res?.filter(bill => {
-            if(!bill.isInsurance && bill.items.length > 0){
-              return bill
-            }
-            return
-          }).filter(bill => bill)
-        };
-
-        if(res?.error){
-          if(res?.message){
-            this.errors = [
-              ...this.errors,
-              {
-                error: {
-                  message: res?.message || "Connection failed when trying to get patient invoices!",
-                  detail: res?.stackTrace
+    this.patientInvoice$ = this.billingService
+      .getPatientBills(this.activeVisit?.patientUuid)
+      .pipe(
+        rxMap((res) => {
+          if (!res?.error) {
+            res = res
+              ?.filter((bill) => {
+                if (!bill.isInsurance && bill.items.length > 0) {
+                  return bill;
                 }
-              }
-            ]
+                return;
+              })
+              .filter((bill) => bill);
           }
-          if(!res?.message){
-            this.errors = [
-              ...this.errors,
-              res?.error
-            ]
+
+          if (res?.error) {
+            if (res?.message) {
+              this.errors = [
+                ...this.errors,
+                {
+                  error: {
+                    message:
+                      res?.message ||
+                      "Connection failed when trying to get patient invoices!",
+                    detail: res?.stackTrace,
+                  },
+                },
+              ];
+            }
+            if (!res?.message) {
+              this.errors = [...this.errors, res?.error];
+            }
           }
-        }
-      return res;  
-      })
-    );
+          return res;
+        })
+      );
   }
 
   onToggleVitalsSummary(event: Event): void {
@@ -491,9 +494,9 @@ export class SharedPatientDashboardComponent implements OnInit {
     this.assignBed.emit(true);
   }
 
-  onDischargePatient(event: Event, invoice?:any): void {
+  onDischargePatient(event: Event, invoice?: any): void {
     event.stopPropagation();
-    this.dichargePatient.emit({discharge: true, invoice:invoice});
+    this.dichargePatient.emit({ discharge: true, invoice: invoice });
   }
 
   onOpenModalToEndConsultation(
