@@ -86,12 +86,6 @@ export class DrugOrderFormComponent implements OnInit {
     this.isDrugSet = data["drug"] ? true : this.isDrugSet;
     if (this.isDrugSet && data["drug"]) {
     }
-    // this.shouldFeedQuantity =
-    //   data['drug'] && data['drug'].value.split(':')[2] === 'true'
-    //     ? true
-    //     : data['drug'] && data['drug'].value.split(':')[2] === 'false'
-    //     ? false
-    //     : this.shouldFeedQuantity
     this.shouldFeedQuantity = true;
     if (!this.shouldFeedQuantity) {
       this.quantityField = null;

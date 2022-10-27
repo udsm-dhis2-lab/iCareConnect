@@ -77,8 +77,10 @@ export class DrugOrderComponent implements OnInit, AfterViewInit {
     this.drugOrder = {
       ...this.drugOrder,
       formulatedDescription: (
-        Object.keys(this.drugOrder?.obs).map(
-          (key) => this.drugOrder?.obs[key]?.value
+        Object.keys(this.drugOrder?.obs).map((key) =>
+          this.drugOrder?.obs[key]?.value
+            ? this.drugOrder?.obs[key]?.value
+            : this.drugOrder?.obs[key]?.value?.display
         ) || []
       )?.join("; "),
     };

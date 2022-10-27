@@ -179,8 +179,10 @@ export class FieldComponent {
       : item?.id;
     let objectToUpdate = {};
     objectToUpdate[field?.key] =
-      !field?.searchControlType ||
-      field?.searchControlType !== "residenceLocation"
+      field?.searchControlType === "drugStock"
+        ? item
+        : !field?.searchControlType ||
+          field?.searchControlType !== "residenceLocation"
         ? value
         : item;
     this.form.patchValue(objectToUpdate);

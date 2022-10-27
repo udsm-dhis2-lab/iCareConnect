@@ -103,15 +103,21 @@ export class GeneralDispensingFormComponent implements OnInit {
       this.generalPrescriptionDurationConcept,
     ]);
 
-    if (this.useSpecificDrugPrescription !== 'none' && this.specificDrugConceptUuid) {
+    if (
+      this.useSpecificDrugPrescription !== "none" &&
+      this.specificDrugConceptUuid
+    ) {
+      // console.log("==> Drug: ", this.useSpecificDrugPrescription, "==> Balaa");
       const drugs = await this.drugOrderService.getAllDrugs("full");
       this.drugConceptField = new Dropdown({
         options: drugs,
         key: "drug",
         value: "drug",
         required: true,
+        locationUuid: "7f65d926-57d6-4402-ae10-a5b3bcbf7986",
         label: "Drug",
-        searchControlType: "drug",
+        searchControlType: "drugStock",
+        shouldHaveLiveSearchForDropDownFields: true,
       });
     } else {
       this.drugConceptField = new Dropdown({
@@ -148,7 +154,7 @@ export class GeneralDispensingFormComponent implements OnInit {
     this.isFormValid = formValues.isValid;
     this.formValues = { ...this.formValues, ...formValues.getValues() };
 
-    if(formValues.getValues()?.drug?.value?.length > 0){
+    if (formValues.getValues()?.drug?.value?.length > 0) {
       this.selectedDrug = formValues
         .getValues()
         ?.drug?.options?.filter(
@@ -228,6 +234,8 @@ export class GeneralDispensingFormComponent implements OnInit {
       };
     });
 
+    // console.log("this.specificDrugConceptUuid", this.specificDrugConceptUuid);
+
     obs = [
       ...obs,
       this.useSpecificDrugPrescription && this.specificDrugConceptUuid
@@ -235,8 +243,8 @@ export class GeneralDispensingFormComponent implements OnInit {
             person: this.currentPatient?.id,
             concept: this.specificDrugConceptUuid,
             obsDatetime: new Date(),
-            valueDrug: this.selectedDrug?.uuid,
-            value: this.selectedDrug?.uuid,
+            value: this.formValues["drug"]?.value?.uuid,
+            comment: this.formValues["drug"]?.value?.name,
           }
         : {},
       {
@@ -265,7 +273,7 @@ export class GeneralDispensingFormComponent implements OnInit {
       },
     ].filter((ob) => ob?.value && ob?.value !== "");
 
-
+    console.log(JSON.stringify(obs));
     this.ordersService
       .createOrdersViaCreatingEncounter(encounterObject)
       .subscribe((response) => {
@@ -275,7 +283,7 @@ export class GeneralDispensingFormComponent implements OnInit {
             obs: [
               ...(obs.filter((observation) => {
                 if (observation.value && observation.value.length > 0) {
-                  return observation; 
+                  return observation;
                 }
               }) || []),
               this.strengthConceptUuid
@@ -297,11 +305,8 @@ export class GeneralDispensingFormComponent implements OnInit {
               }
             });
         }
-        if(response?.error){
-          this.errors = [
-            ...this.errors,
-            response?.error
-          ]
+        if (response?.error) {
+          this.errors = [...this.errors, response?.error];
         }
       });
 

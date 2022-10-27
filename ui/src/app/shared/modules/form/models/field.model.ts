@@ -25,6 +25,7 @@ export class Field<T> {
   searchTerm?: string;
   source?: string;
   isDiagnosis?: boolean;
+  locationUuid?: string;
 
   constructor(
     options: {
@@ -51,6 +52,7 @@ export class Field<T> {
       category?: string;
       searchTerm?: string;
       source?: string;
+      locationUuid?: string;
     } = {}
   ) {
     this.value = options.value;
@@ -76,5 +78,6 @@ export class Field<T> {
     this.searchTerm = options?.searchTerm;
     this.source = options?.source;
     this.isDiagnosis = options?.isDiagnosis;
+    this.locationUuid = options?.locationUuid;
   }
 }
