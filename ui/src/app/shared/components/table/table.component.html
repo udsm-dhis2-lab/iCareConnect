@@ -21,6 +21,7 @@
         <tr>
           <th>SN</th>
           <th>Drug</th>
+          <th>Instructions</th>
           <th>Prescribed By</th>
           <th>Date & Time</th>
           <th>Quanity</th>
@@ -32,23 +33,27 @@
           <tr>
             <td>{{ count + 1 }}</td>
             <td>
-              {{ drugOrder?.drug?.display }} <br> {{ drugOrder?.instructions }}
+              {{ drugOrder?.drug?.display }}
+            </td>
+            <td>
+              {{ drugOrder?.instructions }}
             </td>
             <td>{{ drugOrder?.orderer?.display }}</td>
             <td>{{ drugOrder?.dateActivated | date: "medium" }}</td>
             <td>{{ drugOrder?.quantity }}</td>
             <td>
               <button
-                [disabled]="(
-                  params?.patientDrugOrdersStatuses && 
-                  params?.patientDrugOrdersStatuses[drugOrder?.uuid] && 
-                  params?.patientDrugOrdersStatuses[drugOrder?.uuid]['status'] === 'DISPENSED') || 
-                  (
-                    !drugOrder?.paid && 
-                    !params?.activeVisit?.isAdmitted && 
-                    !params?.activeVisit?.isEmergency && 
-                    !params?.activeVisit?.isEnsured
-                  )"
+                [disabled]="
+                  (params?.patientDrugOrdersStatuses &&
+                    params?.patientDrugOrdersStatuses[drugOrder?.uuid] &&
+                    params?.patientDrugOrdersStatuses[drugOrder?.uuid][
+                      'status'
+                    ] === 'DISPENSED') ||
+                  (!drugOrder?.paid &&
+                    !params?.activeVisit?.isAdmitted &&
+                    !params?.activeVisit?.isEmergency &&
+                    !params?.activeVisit?.isEnsured)
+                "
                 mat-flat-button
                 color="primary"
                 class="mt-1 mb-1 mr-1"

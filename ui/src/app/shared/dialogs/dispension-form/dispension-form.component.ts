@@ -439,11 +439,6 @@ export class DispensingFormComponent implements OnInit {
             )
             .subscribe(
               (res) => {
-                // if (this.data.fromDispensing) {
-                //   setTimeout(() => {
-                //     this.dialogRef.close(true);
-                //   }, 200);
-                // }
                 this.getVisitByUuid(this.data?.visit?.uuid);
                 if (res?.message || res?.stackTrace) {
                   this.savingOrder = false;
@@ -472,6 +467,16 @@ export class DispensingFormComponent implements OnInit {
                     .subscribe({
                       next: (order) => {
                         this.savingOrder = false;
+                        if (this.data.fromDispensing) {
+                          this.savingOrderSuccess = true;
+                          this.savedOrder = new DrugOrder(res);
+                          setTimeout(() => {
+                            this.dialogRef.close({
+                              action: "ORDER_SAVED",
+                              drugOrder: this.savedOrder,
+                            });
+                          }, 200);
+                        }
                         return order;
                       },
                       error: (error) => {
@@ -480,8 +485,6 @@ export class DispensingFormComponent implements OnInit {
                       },
                     });
                 }
-                this.savingOrderSuccess = true;
-                this.savedOrder = new DrugOrder(res);
                 // this.dialogRef.close({
                 //   action: 'ORDER_SAVED',
                 //   drugOrder: this.savedOrder,
