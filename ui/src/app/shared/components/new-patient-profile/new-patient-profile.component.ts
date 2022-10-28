@@ -19,31 +19,34 @@ export class NewPatientProfileComponent implements OnInit {
   constructor(private store: Store<AppState>) {}
 
   ngOnInit(): void {
+    console.log("==> Patient: ", this.currentPatient.patient);
     const phoneDetails =
       this.currentPatient.patient.person.attributes &&
       this.currentPatient.patient.person.attributes?.length > 0
         ? (this.currentPatient.patient.person.attributes.filter(
-            (attribute) => attribute.display.indexOf('phone') === 0
+            (attribute) => attribute?.display?.indexOf('phone') === 0
           ) || [])[0]
         : null;
     const middleNameDetails =
       this.currentPatient.patient.person.attributes &&
       this.currentPatient.patient.person.attributes?.length > 0
         ? (this.currentPatient.patient.person.attributes.filter(
-            (attribute) => attribute.display.indexOf('mname') === 0
+            (attribute) => attribute?.display?.indexOf('mname') === 0
           ) || [])[0]
         : null;
     this.patientDetails = {
       ...this.currentPatient.patient,
       person: {
         ...this.currentPatient.patient.person,
-        phone: phoneDetails ? phoneDetails?.display.split('= ')[1] : '',
+        phone: phoneDetails ? phoneDetails?.display.split("= ")[1] : "",
         middleName: middleNameDetails
-          ? middleNameDetails?.display.split('= ')[1]
-          : '',
+          ? middleNameDetails?.display.split("= ")[1]
+          : "",
       },
       mrn: (this.currentPatient?.patient?.identifiers.filter(
-        (identifier) => identifier?.identifierType?.display === 'MRN'
+        (identifier) =>
+          identifier?.identifierType?.display === "MRN" ||
+          identifier?.identifierType?.display === "OpenEMPI ID"
       ) || [])[0]?.identifier,
     };
 
