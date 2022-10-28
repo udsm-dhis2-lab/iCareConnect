@@ -514,6 +514,7 @@ public class BillingControllerAPITest extends BaseResourceControllerTest {
 		ConceptService conceptService  = Context.getService(ConceptService.class);
 		adminService.setGlobalProperty(ICareConfig.BED_ORDER_TYPE, "2msir5eb-5345-11e8-9922-40b034c3cfef");
 		//adminService.setGlobalProperty(ICareConfig.SERVICE_ATTRIBUTE,"SERVICE0IIIIIIIIIIIIIIIIIIIIIIIATYPE");
+		System.out.println("Yuhu:" + Context.getProviderService().getProvider(1));
 		adminService.setGlobalProperty(ICareConfig.BED_ORDER_CONCEPT,"e721ec30-5344-11e8-ie7c-40b6etw3cfee");
 
 		MockHttpServletRequest newGetRequest = newGetRequest("billing/ipd");
