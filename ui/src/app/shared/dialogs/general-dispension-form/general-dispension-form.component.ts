@@ -275,38 +275,43 @@ export class GeneralDispensingFormComponent implements OnInit {
     this.ordersService
       .createOrdersViaCreatingEncounter(encounterObject)
       .subscribe((response) => {
-        if (response?.uuid) {
-          let data = {
-            encounterUuid: response?.uuid,
-            obs: [
-              ...(obs.filter((observation) => {
-                if (observation.value && observation.value.length > 0) {
-                  return observation;
-                }
-              }) || []),
-              this.strengthConceptUuid && !this.specificDrugConceptUuid
-                ? {
-                    person: this.currentPatient?.id,
-                    concept: this.strengthConceptUuid,
-                    obsDatetime: new Date(),
-                    value: this.formValues[this.strengthConceptUuid]?.value,
+          if (response?.uuid) {
+            let data = {
+              encounterUuid: response?.uuid,
+              obs: [
+                ...(obs.filter((observation) => {
+                  if (observation.value && observation.value.length > 0) {
+                    return observation;
                   }
-                : null,
-            ]?.filter((observation) => observation),
-          };
-          this.observationService
-            .saveObservationsViaEncounter(data)
-            .subscribe((res) => {
-              if (res) {
+                }) || []),
+                this.strengthConceptUuid && !this.specificDrugConceptUuid
+                  ? {
+                      person: this.currentPatient?.id,
+                      concept: this.strengthConceptUuid,
+                      obsDatetime: new Date(),
+                      value: this.formValues[this.strengthConceptUuid]?.value,
+                    }
+                  : null,
+              ]?.filter((observation) => observation),
+            };
+            this.observationService
+              .saveObservationsViaEncounter(data)
+              .subscribe((res) => {
+                if (res?.error) {
+                  this.errors = [...this.errors, response?.error];
+                }
+                
+                if (res) {
+                  this.orderSaved.emit(true);
+                }
                 this.savingOrder = false;
-                this.orderSaved.emit(true);
-              }
-            });
-        }
-        if (response?.error) {
-          this.errors = [...this.errors, response?.error];
-        }
-      });
+              });
+            }
+          if (response?.error) {
+            this.errors = [...this.errors, response?.error];
+          }
+          this.savingOrder = false;
+        });
 
     this.updateConsultationOrder.emit();
   }
