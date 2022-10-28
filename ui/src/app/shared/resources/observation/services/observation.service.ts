@@ -44,7 +44,10 @@ export class ObservationService {
   saveObservationsViaEncounter(details): Observable<any> {
     return this.httpClient.post("encounter/" + details["encounterUuid"], {
       obs: details["obs"],
-    });
+    }).pipe(
+      map((response) => response),
+      catchError((error) => error)    
+      );
   }
 
   saveEncounterWithObsDetails(data): Observable<any> {
