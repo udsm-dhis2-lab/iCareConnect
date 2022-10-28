@@ -45,12 +45,18 @@ export class FilterByPipe implements PipeTransform {
               return (
                 attribute?.value?.toLowerCase() == item?.id?.toLowerCase() &&
                 !attribute?.voided
-                );
-              }) || []
-              )?.length > 0 && item[key]?.toLowerCase()?.includes(searchText)
               );
+            }) || []
+          )?.length > 0 && item[key]?.toLowerCase()?.includes(searchText)
+        );
       } else {
-        if(item?.visit && item?.visit?.patient && item?.visit?.patient.person.display.toLowerCase().includes(searchText.toLowerCase())) {
+        if (
+          item?.visit &&
+          item?.visit?.patient &&
+          item?.visit?.patient.person.display
+            .toLowerCase()
+            .includes(searchText.toLowerCase())
+        ) {
           return item;
         }
         return item[key]?.toLowerCase()?.includes(searchText);
