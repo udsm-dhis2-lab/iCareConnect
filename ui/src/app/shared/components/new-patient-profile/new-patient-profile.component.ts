@@ -19,6 +19,7 @@ export class NewPatientProfileComponent implements OnInit {
   constructor(private store: Store<AppState>) {}
 
   ngOnInit(): void {
+    console.log("==> Patient: ", this.currentPatient.patient);
     const phoneDetails =
       this.currentPatient.patient.person.attributes &&
       this.currentPatient.patient.person.attributes?.length > 0
@@ -37,13 +38,15 @@ export class NewPatientProfileComponent implements OnInit {
       ...this.currentPatient.patient,
       person: {
         ...this.currentPatient.patient.person,
-        phone: phoneDetails ? phoneDetails?.display.split('= ')[1] : '',
+        phone: phoneDetails ? phoneDetails?.display.split("= ")[1] : "",
         middleName: middleNameDetails
-          ? middleNameDetails?.display.split('= ')[1]
-          : '',
+          ? middleNameDetails?.display.split("= ")[1]
+          : "",
       },
       mrn: (this.currentPatient?.patient?.identifiers.filter(
-        (identifier) => identifier?.identifierType?.display === 'MRN'
+        (identifier) =>
+          identifier?.identifierType?.display === "MRN" ||
+          identifier?.identifierType?.display === "OpenEMPI ID"
       ) || [])[0]?.identifier,
     };
 
