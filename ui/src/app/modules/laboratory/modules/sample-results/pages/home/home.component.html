@@ -19,7 +19,7 @@
     *ngIf="
       params?.datesParameters &&
       params?.sampleTypesLoadedState &&
-      params?.labSamplesDepartments?.length > 0 &&
+      params?.labSamplesDepartments &&
       params?.configs &&
       params?.labSamplesContainers &&
       params?.codedSampleRejectionReasons &&
@@ -46,7 +46,7 @@
       !params?.datesParameters ||
       !params?.sampleTypesLoadedState ||
       !params?.labSamplesDepartments ||
-      params?.labSamplesDepartments?.length == 0 ||
+      !params?.labSamplesDepartments ||
       !params?.configs ||
       !params?.labSamplesContainers ||
       !params?.codedSampleRejectionReasons ||
