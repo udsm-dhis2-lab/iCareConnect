@@ -271,7 +271,7 @@ export class GeneralDispensingFormComponent implements OnInit {
       },
     ].filter((ob) => ob?.value && ob?.value !== "");
 
-    console.log(JSON.stringify(obs));
+    // console.log(JSON.stringify(obs));
     this.ordersService
       .createOrdersViaCreatingEncounter(encounterObject)
       .subscribe((response) => {
