@@ -1,5 +1,6 @@
 package org.openmrs.module.icare.web.controller;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -55,6 +56,7 @@ public class ReportControllerTest extends BaseResourceControllerTest {
 		
 	}
 	
+	@Ignore("Depends on DHIS Server")
 	@Test
 	public void testGettingDataElements() throws Exception {
 		
