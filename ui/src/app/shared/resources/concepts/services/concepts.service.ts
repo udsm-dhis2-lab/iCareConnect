@@ -28,6 +28,32 @@ export class ConceptsService {
             response?.display?.indexOf(":") > -1
               ? response?.display?.split(":")[1]
               : response?.display,
+          setMembers: response?.setMembers?.map((setMember) => {
+            return {
+              ...setMember,
+              display:
+                setMember?.display?.indexOf(":") > -1
+                  ? setMember?.display?.split(":")[1]
+                  : setMember?.display,
+              name:
+                response?.display?.indexOf(":") > -1
+                  ? response?.display?.split(":")[1]
+                  : response?.display,
+            };
+          }),
+          answers: response?.answers?.map((answer) => {
+            return {
+              ...answer,
+              display:
+                answer?.display?.indexOf(":") > -1
+                  ? answer?.display?.split(":")[1]
+                  : answer?.display,
+              name:
+                answer?.display?.indexOf(":") > -1
+                  ? answer?.display?.split(":")[1]
+                  : answer?.display,
+            };
+          }),
         };
       }),
       catchError((error) => {
@@ -42,6 +68,14 @@ export class ConceptsService {
       map((response) => {
         return {
           ...response,
+          display:
+            response?.display?.indexOf(":") > -1
+              ? response?.display?.split(":")[1]
+              : response?.display,
+          name:
+            response?.display?.indexOf(":") > -1
+              ? response?.display?.split(":")[1]
+              : response?.display,
           answers:
             response?.answers && response?.answers?.length > 0
               ? response?.answers.map((answer) => {
@@ -64,7 +98,21 @@ export class ConceptsService {
                   };
                 })
               : [],
-          setMembers: response?.setMembers ? response?.setMembers : [],
+          setMembers: response?.setMembers
+            ? response?.setMembers?.map((setMember) => {
+                return {
+                  ...setMember,
+                  display:
+                    setMember?.display?.indexOf(":") > -1
+                      ? setMember?.display?.split(":")[1]
+                      : setMember?.display,
+                  name:
+                    response?.display?.indexOf(":") > -1
+                      ? response?.display?.split(":")[1]
+                      : response?.display,
+                };
+              })
+            : [],
         };
       }),
       catchError((error) => {
@@ -90,14 +138,14 @@ export class ConceptsService {
                   ...item,
                   department: {
                     display:
-                      department?.display?.indexOf(":") > -1
-                        ? department?.display?.split(":")[1]
-                        : department?.display,
+                      item?.display?.indexOf(":") > -1
+                        ? item?.display?.split(":")[1]
+                        : item?.display,
                     name:
-                      department?.display?.indexOf(":") > -1
-                        ? department?.display?.split(":")[1]
-                        : department?.display,
-                    uuid: department?.uuid,
+                      item?.display?.indexOf(":") > -1
+                        ? item?.display?.split(":")[1]
+                        : item?.display,
+                    uuid: item?.uuid,
                   },
                 };
               });
