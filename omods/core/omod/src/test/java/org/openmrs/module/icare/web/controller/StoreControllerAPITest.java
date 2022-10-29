@@ -438,7 +438,7 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		
 		List<Map<String, Object>> stockList = (new ObjectMapper()).readValue(handleGet.getContentAsString(), List.class);
 		
-		assertThat("stock listing has 5 entries:", stockList.size(), is(5));
+		assertThat("stock listing has 6 entries:", stockList.size(), is(6));
 		
 		//assertThat("The stock quantity is 100", (stockList.get(0).get("quantity")).toString(), is("100.0"));
 		
@@ -454,7 +454,7 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		
 		List<Map<String, Object>> stockList = (new ObjectMapper()).readValue(handleGet.getContentAsString(), List.class);
 		
-		assertThat("stock listing has 5 entries:", stockList.size(), is(5));
+		assertThat("stock listing has 6 entries:", stockList.size(), is(6));
 		
 		//assertThat("The stock quantity is 100", (stockList.get(0).get("quantity")).toString(), is("100.0"));
 		
@@ -537,7 +537,7 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		//Then
 		String result = handleGet.getContentAsString();
 		List<Map<String, Object>> stockoutList = (new ObjectMapper()).readValue(result, List.class);
-		assertThat("stockOut listing has no entry:", stockoutList.size(), is(1));
+		assertThat("stockOut listing has two entry:", stockoutList.size(), is(2));
 	}
 	
 	@Test
@@ -554,10 +554,10 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		
 		System.out.println(stockoutList);
 		
-		assertThat("stockOut listing has no entry:", stockoutList.size(), is(3));
+		assertThat("stockOut listing has no entry:", stockoutList.size(), is(4));
 		
 		newGetRequest = newGetRequest("store/stockout", new Parameter("location", "44939999-d333-fff2-9bff-61d11117c22e"),
-		    new Parameter("q", "bandage"));
+		    new Parameter("q", "syringe"));
 		handleGet = handle(newGetRequest);
 		//Then
 		List<Map<String, Object>> stockoutListBySearch = (new ObjectMapper()).readValue(handleGet.getContentAsString(),
@@ -637,6 +637,6 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		List<Map<String, Object>> stockList = (new ObjectMapper()).readValue(handleGet.getContentAsString(), List.class);
 		
 		System.out.println(stockList);
-		assertThat("stock listing has 4 entries:", stockList.size(), is(4));
+		assertThat("stock listing has 4 entries:", stockList.size(), is(5));
 	}
 }
