@@ -161,7 +161,8 @@
         <mat-option
           [ngClass]="{
             'stock-out-item': option?.isStockOut,
-            'in-stock-item': !option?.isStockOut
+            'in-stock-item':
+              !option?.isStockOut && field?.searchControlType === 'drugStock'
           }"
           [disabled]="option?.disabled"
           (click)="getSelectedItemFromOption($event, option, field)"
