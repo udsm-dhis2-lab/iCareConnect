@@ -21,8 +21,14 @@ export class ConceptsService {
     return from(
       this.api.concept.getAllConcepts({ name: name, v: fields })
     ).pipe(
-      map((response) => {
-        return response;
+      map((response: any) => {
+        return {
+          ...response,
+          display:
+            response?.display?.indexOf(":") > -1
+              ? response?.display?.split(":")[1]
+              : response?.display,
+        };
       }),
       catchError((error) => {
         return of(error);
@@ -41,6 +47,14 @@ export class ConceptsService {
               ? response?.answers.map((answer) => {
                   return {
                     ...answer,
+                    display:
+                      answer?.display?.indexOf(":") > -1
+                        ? answer?.display?.split(":")[1]
+                        : answer?.display,
+                    name:
+                      answer?.display?.indexOf(":") > -1
+                        ? answer?.display?.split(":")[1]
+                        : answer?.display,
                     code:
                       answer?.names && answer?.names?.length > 0
                         ? (answer?.names?.filter(
@@ -75,7 +89,14 @@ export class ConceptsService {
                 return {
                   ...item,
                   department: {
-                    display: department?.display,
+                    display:
+                      department?.display?.indexOf(":") > -1
+                        ? department?.display?.split(":")[1]
+                        : department?.display,
+                    name:
+                      department?.display?.indexOf(":") > -1
+                        ? department?.display?.split(":")[1]
+                        : department?.display,
                     uuid: department?.uuid,
                   },
                 };
@@ -165,7 +186,14 @@ export class ConceptsService {
         return response?.results.map((result) => {
           return {
             ...result,
-            display: result?.display?.replace("TO: ", ""),
+            display:
+              result?.display?.indexOf(":") > -1
+                ? result?.display?.split(":")[1]
+                : result?.display,
+            name:
+              result?.display?.indexOf(":") > -1
+                ? result?.display?.split(":")[1]
+                : result?.display,
           };
         });
       }),
@@ -196,7 +224,19 @@ export class ConceptsService {
     }
     return from(this.api.concept.getAllConcepts(query)).pipe(
       map((response) => {
-        return response?.results;
+        return response?.results.map((result) => {
+          return {
+            ...result,
+            display:
+              result?.display?.indexOf(":") > -1
+                ? result?.display?.split(":")[1]
+                : result?.display,
+            name:
+              result?.display?.indexOf(":") > -1
+                ? result?.display?.split(":")[1]
+                : result?.display,
+          };
+        });
       }),
       catchError((error) => {
         return of(error);
@@ -217,7 +257,21 @@ export class ConceptsService {
       query["startIndex"] = (parameters?.page - 1) * parameters?.pageSize + 1;
     }
     return from(this.api.concept.getAllConcepts(query)).pipe(
-      map((response) => response?.results),
+      map((response) => {
+        return response?.results.map((result) => {
+          return {
+            ...result,
+            display:
+              result?.display?.indexOf(":") > -1
+                ? result?.display?.split(":")[1]
+                : result?.display,
+            name:
+              result?.display?.indexOf(":") > -1
+                ? result?.display?.split(":")[1]
+                : result?.display,
+          };
+        });
+      }),
       catchError((error) => {
         return of(error);
       })
@@ -231,7 +285,21 @@ export class ConceptsService {
         v: "custom:(uuid,display,names,descriptions,setMembers:(uuid,display,datatype,answers:(uuid,display),setMembers:(uuid,display,datatype,answers:(uuid,display))))",
       })
     ).pipe(
-      map((response) => response?.results),
+      map((response) => {
+        return response?.results.map((result) => {
+          return {
+            ...result,
+            display:
+              result?.display?.indexOf(":") > -1
+                ? result?.display?.split(":")[1]
+                : result?.display,
+            name:
+              result?.display?.indexOf(":") > -1
+                ? result?.display?.split(":")[1]
+                : result?.display,
+          };
+        });
+      }),
       catchError((error) => {
         return of(error);
       })
@@ -256,6 +324,14 @@ export class ConceptsService {
               response?.results?.map((result) => {
                 return {
                   ...result,
+                  display:
+                    result?.display?.indexOf(":") > -1
+                      ? result?.display?.split(":")[1]
+                      : result?.display,
+                  name:
+                    result?.display?.indexOf(":") > -1
+                      ? result?.display?.split(":")[1]
+                      : result?.display,
                   concept: uuid,
                   setMembers: [
                     {
