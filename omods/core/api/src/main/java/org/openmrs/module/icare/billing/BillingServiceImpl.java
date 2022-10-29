@@ -689,8 +689,9 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 
 				OrderType bedOrderOrderType = Context.getOrderService().getOrderTypeByUuid(bedOrderTypeUUID);
 
-				CareSetting cs = new CareSetting();
-				cs.setCareSettingType(CareSetting.CareSettingType.INPATIENT);
+				//CareSetting cs = new CareSetting();
+				//cs.setCareSettingType(CareSetting.CareSettingType.INPATIENT);
+
 
 				Provider provider = Context.getProviderService().getProvider(1);
 
@@ -700,9 +701,9 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 				//List<Encounter> encounters = new ArrayList<>(visit.getEncounters().toArray()[0]);
 
 				order.setPatient(visit.getPatient());
-				System.out.println("aaaa "+visit.getPatient());
+				System.out.println("aaaa "+visit.getPatient().getId());
 				order.setAction(Order.Action.NEW);
-				order.setCareSetting(cs);
+				//order.setCareSetting(cs);
 				order.setOrderType(bedOrderOrderType);
 				order.setConcept(concept);
 				order.setOrderer(provider);

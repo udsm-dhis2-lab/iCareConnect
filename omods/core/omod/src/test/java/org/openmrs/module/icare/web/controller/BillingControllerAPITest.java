@@ -515,7 +515,7 @@ public class BillingControllerAPITest extends BaseResourceControllerTest {
 		adminService.setGlobalProperty(ICareConfig.BED_ORDER_TYPE, "2msir5eb-5345-11e8-9922-40b034c3cfef");
 		//adminService.setGlobalProperty(ICareConfig.SERVICE_ATTRIBUTE,"SERVICE0IIIIIIIIIIIIIIIIIIIIIIIATYPE");
 		System.out.println("Yuhu:" + Context.getProviderService().getProvider(1));
-		adminService.setGlobalProperty(ICareConfig.BED_ORDER_CONCEPT,"e721ec30-5344-11e8-ie7c-40b6etw3cfee");
+		adminService.setGlobalProperty(ICareConfig.BED_ORDER_CONCEPT,"e721ec30-mfy4-11e8-ie7c-40b69mdy79ee");
 
 		MockHttpServletRequest newGetRequest = newGetRequest("billing/ipd");
 		MockHttpServletResponse handler = handle(newGetRequest);
@@ -526,6 +526,7 @@ public class BillingControllerAPITest extends BaseResourceControllerTest {
 
 		System.out.println(order.getUuid());
 		assertThat("The order should be created", order.getUuid().length() > 0);
+
 	}
 
 	@Override
