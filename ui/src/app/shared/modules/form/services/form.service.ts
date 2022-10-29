@@ -264,12 +264,15 @@ export class FormService {
                     batches: groupedByItemUuid[itemUuid],
                     name: groupedByItemUuid[itemUuid][0]?.item?.drug?.display,
                     quantity: totalQuantity,
+                    isStockOut: totalQuantity === 0 ? true : false,
                   };
                 });
               })
             );
         })
-      ).pipe(map((responses) => flatten(responses)));
+      ).pipe(
+        map((responses) => orderBy(flatten(responses), ["display"], ["asc"]))
+      );
     } else if (searchControlType === "residenceLocation") {
       return from(
         this.api.location.getAllLocations({
