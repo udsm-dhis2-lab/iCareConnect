@@ -78,6 +78,7 @@
     <st_stock stock_id="13" item_id="123" batch="batch-xyz4" expiry_date="2022-11-30 00:00:00" location_id="200" quantity="10"/>
 
     <st_stock stock_id="15" item_id="123" batch="batch-xyz6" expiry_date="2022-11-30 00:00:00" location_id="200" quantity="11"/>
+    <st_stock stock_id="16" item_id="125" batch="batch-xyz7" expiry_date="2022-11-30 00:00:00" location_id="200" quantity="0"/>
 
     <st_reorder_level location_id="200" item_id="123" quantity="150"/>
 

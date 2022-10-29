@@ -202,7 +202,6 @@ public class StockDAO extends BaseDAO<Stock> {
 		}
 		queryStr += " (d.retired = false OR c.retired = false)";
 		
-		System.out.println(queryStr);
 		Query query = session.createQuery(queryStr);
 		query.setFirstResult(startIndex);
 		query.setMaxResults(limit);
@@ -232,17 +231,38 @@ public class StockDAO extends BaseDAO<Stock> {
 	}
 	
 	//TODO fix getting by location query
-	public List<Item> getStockedOutByLocation(String locationUuid) {
+	public List<Item> getStockedOutByLocation(String locationUuid, String q, Integer startIndex, Integer limit,
+	        String conceptClassName) {
 		DbSession session = this.getSession();
 		//String queryStr = "SELECT item FROM Item item \n"
 		//        + "WHERE item.stockable = true AND item.uuid NOT IN(SELECT stock.item.uuid FROM Stock stock WHERE stock.location.uuid =:locationUuid)";
 		//String queryStr = "SELECT item FROM Item item, Stock stock WHERE item.stockable = true AND stock.item=item AND stock.location.uuid =:locationUuid";
-		String queryStr = "SELECT item FROM Item item LEFT JOIN item.concept c LEFT JOIN item.drug d \n"
-		        + "WHERE item.stockable = true AND (d.retired = false OR c.retired = false) AND item NOT IN(SELECT stock.item FROM Stock stock WHERE stock.location.uuid =:locationUuid) ";
+		String queryStr = "SELECT item FROM Item item LEFT JOIN item.concept c LEFT JOIN item.drug d \n";
+		
+		if (q != null) {
+			queryStr += " LEFT JOIN c.names cn";
+			queryStr += " WHERE lower(d.name) LIKE lower(:q) OR lower(cn.name) like lower(:q) ";
+		}
+		
+		if (!queryStr.contains("WHERE")) {
+			queryStr += " WHERE ";
+		} else {
+			queryStr += " AND ";
+		}
+		queryStr += "  item.stockable = true AND (d.retired = false OR c.retired = false) AND item NOT IN(SELECT stock.item FROM Stock stock WHERE stock.location.uuid =:locationUuid AND stock.quantity = 0) ";
 		
 		Query query = session.createQuery(queryStr);
 		//		query.setFirstResult(startIndex);
 		//		query.setMaxResults(limit);
+		
+		if (q != null) {
+			query.setFirstResult(startIndex);
+			query.setMaxResults(limit);
+			query.setParameter("q", "%" + q.replace(" ", "%") + "%");
+		}
+		//		if (conceptClassName != null) {
+		//			query.setParameter("conceptClassName", conceptClassName);
+		//		}
 		
 		query.setParameter("locationUuid", locationUuid);
 		
@@ -299,7 +319,7 @@ public class StockDAO extends BaseDAO<Stock> {
 		query for out of stock
 		------------------------
 		------------------------- */
-		metricsMap.put("stockedOut", this.getStockedOutByLocation(locationUuid).size());
+		metricsMap.put("stockedOut", this.getStockedOutByLocation(locationUuid, "", 0, 0, "").size());
 		
 		/* ------------------------
 		-----------------------
