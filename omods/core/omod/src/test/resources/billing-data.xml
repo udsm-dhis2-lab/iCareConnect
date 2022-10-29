@@ -194,6 +194,13 @@
     <visit_attribute visit_attribute_id="104" visit_id="10" attribute_type_id="104" value_reference="123" uuid="298b75eb-er45-12e8-9c7c-42b0yt63cfep" creator="1"
                           voided="0" date_created="2020-12-27 00:00:00" />
 
+    <visit_attribute visit_attribute_id="105" visit_id="20" attribute_type_id="101" value_reference="e721ec30-5344-11e8-ie7c-40b6etw379ee" uuid="298b75eb-er45-12e8-9c7c-42b0yt63cfer" creator="1"
+                     voided="0" date_created="2020-12-27 00:00:00" />
+
+    <visit_attribute visit_attribute_id="106" visit_id="20" attribute_type_id="102" value_reference="e7jnec30-5344-11e8-ie7c-40b6etw3cfee" uuid="298b75eb-er45-12e8-9c7c-42b0yt63cfeO" creator="1"
+                     voided="0" date_created="2020-12-27 00:00:00" />
+
+
     <!-- Encounters -->
     <encounter_type encounter_type_id="2" name="Admission"  creator="1"
                     retired="false" date_created="2020-12-27 00:00:00" uuid="2msir5eb-5345-11e8-9c7c-40b034c3cfer"/>
