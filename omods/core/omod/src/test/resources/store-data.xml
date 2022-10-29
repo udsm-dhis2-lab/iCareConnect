@@ -54,6 +54,13 @@
                   date_created="2014-01-12 00:00:00.0" concept_name_type="FULLY_SPECIFIED" locale_preferred="1" voided="false"
                   uuid="8xxab323-5ab0-11e8-b607-880027ie4411" />
 
+    <concept concept_id="1110" retired="false" datatype_id="2" class_id="1" is_set="false" creator="1"
+             date_created="2017-02-14 15:51:57.0" version="" uuid="444xb1yz-1011-487z-868y-acc38ebc6232" />
+
+    <concept_name concept_name_id="1100" concept_id="1110" name="spirit" locale="en_GB" creator="1"
+                  date_created="2014-01-12 00:00:00.0" concept_name_type="FULLY_SPECIFIED" locale_preferred="1" voided="false"
+                  uuid="8xxab323-5ab0-11e8-b607-880027ie4415" />
+
     <!-- items -->
     <item item_id="123" uuid="8o00d43570-8y37-11f3-1234-08002007777" concept_id="1100" date_created="2020-12-27 00:00:00" voided="false" creator="1" stockable="true"/>
 
@@ -62,6 +69,9 @@
 
     <!-- item with no stock -->
     <item item_id="125" uuid="8777d43571-yy77-11ff-2244-08002007677" concept_id="1000" date_created="2020-12-27 00:00:00" voided="false" creator="1" stockable="true"/>
+
+    <!-- item with zero stock -->
+    <item item_id="127" uuid="8777d43571-yy77-11ff-2244-08002007647" concept_id="1110" date_created="2020-12-27 00:00:00" voided="false" creator="1" stockable="true"/>
 
     <!-- Non stockable item -->
     <item item_id="126" uuid="8777d43571-yy77-11ff-2244-08002007788" concept_id="1000" date_created="2020-12-27 00:00:00" voided="false" creator="1" stockable="false"/>
@@ -78,7 +88,8 @@
     <st_stock stock_id="13" item_id="123" batch="batch-xyz4" expiry_date="2022-11-30 00:00:00" location_id="200" quantity="10"/>
 
     <st_stock stock_id="15" item_id="123" batch="batch-xyz6" expiry_date="2022-11-30 00:00:00" location_id="200" quantity="11"/>
-    <st_stock stock_id="16" item_id="125" batch="batch-xyz7" expiry_date="2022-11-30 00:00:00" location_id="200" quantity="0"/>
+
+    <st_stock stock_id="16" item_id="127" batch="batch-xyz7" expiry_date="2022-11-30 00:00:00" location_id="200" quantity="0"/>
 
     <st_reorder_level location_id="200" item_id="123" quantity="150"/>
 
