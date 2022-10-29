@@ -305,7 +305,6 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		MockHttpServletRequest newPostRequest = newPostRequest("store/issue", issue);
 		
 		MockHttpServletResponse handle = handle(newPostRequest);
-		;
 		
 		// get stock from the same location for the same item
 		MockHttpServletRequest getStockRequest = newGetRequest("store/stock");
