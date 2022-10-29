@@ -70,14 +70,28 @@ export class FormService {
         ).pipe(
           map((response) => {
             return orderBy(
-              response.results.filter(
-                (result: any) =>
-                  parameters?.class &&
-                  result.conceptClass?.display.toLowerCase() ===
-                    (field?.isDiagnosis
-                      ? "diagnosis"
-                      : parameters?.class.toLowerCase())
-              ) || [],
+              (
+                response.results.filter(
+                  (result: any) =>
+                    parameters?.class &&
+                    result.conceptClass?.display.toLowerCase() ===
+                      (field?.isDiagnosis
+                        ? "diagnosis"
+                        : parameters?.class.toLowerCase())
+                ) || []
+              )?.map((result) => {
+                return {
+                  ...result,
+                  display:
+                    result?.display?.indexOf(":") > -1
+                      ? result?.display?.split(":")[1]
+                      : result?.display,
+                  name:
+                    result?.display?.indexOf(":") > -1
+                      ? result?.display?.split(":")[1]
+                      : result?.display,
+                };
+              }),
               ["display"],
               ["asc"]
             );
