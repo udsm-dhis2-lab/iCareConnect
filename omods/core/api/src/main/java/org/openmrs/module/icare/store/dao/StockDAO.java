@@ -223,7 +223,7 @@ public class StockDAO extends BaseDAO<Stock> {
 		
 		DbSession session = this.getSession();
 		String queryStr = "SELECT item FROM Item item \n"
-		        + "WHERE item.stockable = true AND item NOT IN(SELECT stock.item FROM Stock stock)";
+		        + "WHERE item.stockable = true AND (item NOT IN(SELECT stock.item FROM Stock stock) OR item IN(SELECT stock.item FROM Stock stock WHERE stock.quantity = 0))";
 		
 		Query query = session.createQuery(queryStr);
 		
