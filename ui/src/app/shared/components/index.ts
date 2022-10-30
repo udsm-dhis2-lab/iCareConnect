@@ -96,8 +96,11 @@ import { ManageItemPriceComponent } from "./manage-item-price/manage-item-price.
 import { PriceListComponent } from "./price-list/price-list.component";
 import { PricingItemComponent } from "./pricing-item/pricing-item.component";
 import { SharedLocationAttributesManagerComponent } from "./shared-location-attributes-manager/shared-location-attributes-manager.component";
+import { PatientAddressComponent } from "./patient-address/patient-address.component";
 
 export const components: any[] = [
+  PatientAddressComponent,
+
   PatientSearchComponent,
   PatientProfileComponent,
   DrugOrderComponent,
@@ -199,6 +202,8 @@ export const components: any[] = [
 ];
 
 export const sharedEntryComponents: any[] = [
+  PatientAddressComponent,
+
   LocationSelectModalComponent,
   CaptureFormDataModalComponent,
   AdmissionFormComponent,

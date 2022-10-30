@@ -1,5 +1,4 @@
 import { OtherPatientDetailsComponent } from "./other-patient-details/other-patient-details.component";
-import { PatientAddressComponent } from "./patient-address/patient-address.component";
 import { StartVisitModelComponent } from "./start-visit-model/start-visit-model.component";
 import { UpdateDoctorsRoomComponent } from "./update-doctors-room/update-doctors-room.component";
 import { VisitClaimComponent } from "./visit-claim/visit-claim.component";
@@ -14,7 +13,6 @@ export const regComponents: any[] = [
   VisitClaimComponent,
   VisitsHistoryForPatientComponent,
   OtherPatientDetailsComponent,
-  PatientAddressComponent,
   UpdateDoctorsRoomComponent,
   DynamicRegFormComponent,
   RegistrationSummaryCardsComponent,

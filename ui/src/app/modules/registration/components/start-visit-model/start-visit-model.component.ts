@@ -3,7 +3,7 @@ import { FormControl } from "@angular/forms";
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { Store } from "@ngrx/store";
 import { Observable } from "rxjs";
-import { tap } from "rxjs/operators";
+import { map, tap } from "rxjs/operators";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { Patient } from "src/app/shared/resources/patient/models/patient.model";
 import { VisitsService } from "src/app/shared/resources/visits/services";
@@ -45,6 +45,7 @@ export class StartVisitModelComponent implements OnInit {
   currentPatientVisit$: Observable<any>;
 
   startingVisit: boolean = false;
+  errors: any[];
 
   constructor(
     private store: Store<AppState>,
@@ -109,14 +110,24 @@ export class StartVisitModelComponent implements OnInit {
 
   onStartVisit() {
     this.startingVisit = true;
-    this.store.select(getActiveVisit).subscribe((response) => {
-      if (response) {
-        this.startingVisit = false;
-        setTimeout(() => {
-          this.dialogRef.close();
-          this.store.dispatch(go({ path: ["/registration/home"] }));
-        }, 200);
-      }
-    });
+    this.store
+      .select(getActiveVisit)
+      .pipe(
+        map((response: any) => {
+          if (response?.error) {
+            this.errors = [...this.errors, response.error];
+          }
+          return response;
+        })
+      )
+      .subscribe((response) => {
+        if (response) {
+          this.startingVisit = false;
+          setTimeout(() => {
+            this.dialogRef.close();
+            this.store.dispatch(go({ path: ["/registration/home"] }));
+          }, 200);
+        }
+      });
   }
 }
