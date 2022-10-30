@@ -7,27 +7,37 @@
       </div>
     </div>
   </div>
+  <div *ngIf="errors">
+    <app-shared-error [errors]="errors"></app-shared-error>
+  </div>
   <div *ngIf="!savingOrder">
     <div>
       <app-form
         [fields]="[drugConceptField]"
         (formUpdate)="onFormUpdate($event, 'drug')"
       ></app-form>
-      <app-form
+      <!-- <app-form
         *ngIf="strengthFormField"
         [fields]="[strengthFormField]"
         (formUpdate)="onFormUpdate($event)"
-      ></app-form>
+      ></app-form> -->
     </div>
-    <div *ngIf="conceptFields">
+    <!-- <div *ngIf="conceptFields">
       <app-concepts-form
         [conceptFields]="conceptFields"
         (formUpdate)="onFormUpdate($event)"
       ></app-concepts-form>
-    </div>
-    <!-- <div class="row" *ngIf="generalPrescriptionDoseConcept">
+    </div> -->
+    <!-- <div *ngIf="conceptFields">
+    </div> -->
+    <div class="row" *ngIf="conceptFields">
       <div class="col-4">
-        <app-form
+        <app-concepts-form
+          [conceptFields]="[conceptFields[0]]"
+          [textfield]="true"
+          (formUpdate)="onFormUpdate($event)"
+        ></app-concepts-form>
+        <app-form *ngIf="!conceptFields"
           [fields]="[drugDoseField]"
           (formUpdate)="onFormUpdate($event)"
         ></app-form>
@@ -48,9 +58,14 @@
         ></app-unit-field>
       </div>
     </div>
-    <div class="row" *ngIf="generalPrescriptionDurationConcept">
+    <div class="row" *ngIf="conceptFields">
       <div class="col-5">
-        <app-form
+        <app-concepts-form
+          [conceptFields]="[conceptFields[1]]"
+          [textfield]="true"
+          (formUpdate)="onFormUpdate($event)"
+        ></app-concepts-form>
+        <app-form *ngIf="!conceptFields"
           [fields]="[drugDurationField]"
           (formUpdate)="onFormUpdate($event)"
         ></app-form>
@@ -69,7 +84,7 @@
           (formUpdate)="onFormUpdate($event)"
         ></app-unit-field>
       </div>
-    </div> -->
+    </div>
     <div class="float-right">
       <button
         class="float-right"

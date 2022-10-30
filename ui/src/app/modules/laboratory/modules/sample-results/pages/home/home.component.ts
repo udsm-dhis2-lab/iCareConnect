@@ -12,7 +12,11 @@ import {
   getLabTestsContainers,
   getSampleTypesLoadedState,
 } from "src/app/store/selectors";
-import { getCurrentUserDetails, getCurrentUserPrivileges, getProviderDetails } from "src/app/store/selectors/current-user.selectors";
+import {
+  getCurrentUserDetails,
+  getCurrentUserPrivileges,
+  getProviderDetails,
+} from "src/app/store/selectors/current-user.selectors";
 import { getLISConfigurations } from "src/app/store/selectors/lis-configurations.selectors";
 import {
   getAllPatientsVisitsReferences,
@@ -64,6 +68,9 @@ export class HomeComponent implements OnInit {
         this.labSamplesDepartments$ = !LISConfigs?.isLIS
           ? this.store.select(getLabDepartments)
           : this.conceptService.getConceptsBySearchTerm("LAB_DEPARTMENT");
+        this.sampleTypes$ = !LISConfigs?.isLIS
+          ? this.store.select(getAllSampleTypes)
+          : this.conceptService.getConceptsBySearchTerm("SPECIMEN_SOURCE");
       }
     });
 

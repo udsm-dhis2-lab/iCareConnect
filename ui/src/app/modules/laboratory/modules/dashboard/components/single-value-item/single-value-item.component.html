@@ -1,0 +1,7 @@
+<div *ngIf="{ singleValue: singleValue$ | async } as params">
+  <mat-progress-bar
+    mode="indeterminate"
+    *ngIf="!params?.singleValue && params?.singleValue != 0"
+  ></mat-progress-bar>
+  {{ params?.singleValue }}
+</div>

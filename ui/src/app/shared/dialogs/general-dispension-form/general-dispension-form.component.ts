@@ -41,6 +41,8 @@ export class GeneralDispensingFormComponent implements OnInit {
   @Input() genericPrescriptionConceptUuids: any;
   @Input() conceptFields$: Observable<any>;
   @Input() strengthConceptUuid: any;
+  @Input() useSpecificDrugPrescription: any;
+  @Input() specificDrugConceptUuid: any;
 
   drugOrder: DrugOrderObject;
 
@@ -74,6 +76,8 @@ export class GeneralDispensingFormComponent implements OnInit {
   @Output() orderSaved: EventEmitter<boolean> = new EventEmitter<boolean>();
   genericPrescriptionField: Textbox;
   conceptFieldsMap: any[];
+  errors: any[] = [];
+  selectedDrug: any;
 
   constructor(
     private drugOrderService: DrugOrdersService,
@@ -83,7 +87,7 @@ export class GeneralDispensingFormComponent implements OnInit {
     private drugService: DrugsService
   ) {}
 
-  ngOnInit() {
+  async ngOnInit() {
     this.dosingUnitsSettingsEvent.emit(this.dosingUnitsSettings);
     this.durationUnitsSettingsEvent.emit(this.durationUnitsSettings);
     this.drugRoutesSettingsEvent.emit(this.drugRoutesSettings);
@@ -91,27 +95,73 @@ export class GeneralDispensingFormComponent implements OnInit {
       this.generalPrescriptionFrequencyConcept
     );
 
-    this.genericPrescriptionConceptUuidsEvent.emit(
-      this.genericPrescriptionConceptUuids
-    );
+    // this.genericPrescriptionConceptUuidsEvent.emit(
+    //   this.genericPrescriptionConceptUuids
+    // );
+    this.genericPrescriptionConceptUuidsEvent.emit([
+      this.generalPrescriptionDoseConcept,
+      this.generalPrescriptionDurationConcept,
+    ]);
 
-    this.drugConceptField = new Dropdown({
-      id: "drug",
-      key: "drug",
-      options: [],
-      label: "Search Drug",
-      conceptClass: "Drug",
-      searchControlType: "concept",
-      value: null,
-      searchTerm: "ICARE_GENERIC_DRUG",
-      shouldHaveLiveSearchForDropDownFields: true,
-    });
+    if (
+      this.useSpecificDrugPrescription !== "none" &&
+      this.specificDrugConceptUuid
+    ) {
+      // console.log("==> Drug: ", this.useSpecificDrugPrescription, "==> Balaa");
+      const drugs = await this.drugOrderService.getAllDrugs("full");
+      this.drugConceptField = new Dropdown({
+        options: drugs,
+        key: "drug",
+        value: "drug",
+        required: true,
+        locationUuid: "7f65d926-57d6-4402-ae10-a5b3bcbf7986",
+        label: "Drug",
+        searchControlType: "drugStock",
+        shouldHaveLiveSearchForDropDownFields: true,
+      });
+    } else {
+      this.drugConceptField = new Dropdown({
+        id: "drug",
+        key: "drug",
+        options: [],
+        label: "Search Drug",
+        conceptClass: "Drug",
+        searchControlType: "concept",
+        value: null,
+        searchTerm: "ICARE_GENERIC_DRUG",
+        shouldHaveLiveSearchForDropDownFields: true,
+      });
+    }
+
+    // this.drugDoseField = new Textbox({
+    //   id: "dose",
+    //   key: "dose",
+    //   label: "Dose",
+    //   required: true,
+    //   type: "number",
+    // });
+
+    // this.drugDurationField = new Textbox({
+    //   id: "duration",
+    //   key: "duration",
+    //   label: "Duration",
+    //   required: true,
+    //   type: "number",
+    // });
   }
 
   onFormUpdate(formValues: FormValue, fieldItem?: string): void {
     this.isFormValid = formValues.isValid;
     this.formValues = { ...this.formValues, ...formValues.getValues() };
-    if (fieldItem == "drug") {
+
+    if (formValues.getValues()?.drug?.value?.length > 0) {
+      this.selectedDrug = formValues
+        .getValues()
+        ?.drug?.options?.filter(
+          (option) => option?.name === formValues.getValues()?.drug?.value
+        )[0];
+    }
+    if (fieldItem == "drug" && !this.specificDrugConceptUuid) {
       this.drugService
         .getDrugsUsingConceptUuid(this.formValues?.drug?.value)
         .subscribe((response) => {
@@ -164,7 +214,10 @@ export class GeneralDispensingFormComponent implements OnInit {
             ? "OUTPATIENT"
             : "INPATIENT",
           patient: this.currentPatient?.id,
-          concept: this.formValues["drug"].value,
+          concept:
+            this.useSpecificDrugPrescription && this.specificDrugConceptUuid
+              ? this.specificDrugConceptUuid || this.selectedDrug?.conceptUuid
+              : this.formValues["drug"].value,
           orderer: this.provider?.uuid,
           type: "order",
         },
@@ -172,7 +225,7 @@ export class GeneralDispensingFormComponent implements OnInit {
       visit: this.currentVisit?.uuid,
     };
 
-    const obs = conceptFields.map((conceptField) => {
+    let obs = conceptFields.map((conceptField) => {
       return {
         person: this.currentPatient?.id,
         concept: conceptField?.uuid,
@@ -181,38 +234,84 @@ export class GeneralDispensingFormComponent implements OnInit {
       };
     });
 
+    obs = [
+      ...obs,
+      this.useSpecificDrugPrescription && this.specificDrugConceptUuid
+        ? {
+            person: this.currentPatient?.id,
+            concept: this.specificDrugConceptUuid,
+            obsDatetime: new Date(),
+            value: this.formValues["drug"]?.value?.uuid.toString(),
+            comment: this.formValues["drug"]?.value?.name,
+          }
+        : {},
+      {
+        person: this.currentPatient?.id,
+        concept: this.generalPrescriptionFrequencyConcept,
+        obsDatetime: new Date(),
+        value: this.formValues["frequency"].value,
+      },
+      {
+        person: this.currentPatient?.id,
+        concept: this.durationUnitsSettings,
+        obsDatetime: new Date(),
+        value: this.formValues["durationUnit"].value,
+      },
+      {
+        person: this.currentPatient?.id,
+        concept: this.dosingUnitsSettings,
+        obsDatetime: new Date(),
+        value: this.formValues["dosingUnit"].value,
+      },
+      {
+        person: this.currentPatient?.id,
+        concept: this.drugRoutesSettings,
+        obsDatetime: new Date(),
+        value: this.formValues["route"].value,
+      },
+    ].filter((ob) => ob?.value && ob?.value !== "");
+
+    // console.log(JSON.stringify(obs));
     this.ordersService
       .createOrdersViaCreatingEncounter(encounterObject)
       .subscribe((response) => {
-        if (response?.uuid) {
-          let data = {
-            encounterUuid: response?.uuid,
-            obs: [
-              ...(obs.filter((observation) => {
-                if (observation.value && observation.value.length > 0) {
-                  return observation;
-                }
-              }) || []),
-              this.strengthConceptUuid
-                ? {
-                    person: this.currentPatient?.id,
-                    concept: this.strengthConceptUuid,
-                    obsDatetime: new Date(),
-                    value: this.formValues[this.strengthConceptUuid].value,
+          if (response?.uuid) {
+            let data = {
+              encounterUuid: response?.uuid,
+              obs: [
+                ...(obs.filter((observation) => {
+                  if (observation.value && observation.value.length > 0) {
+                    return observation;
                   }
-                : null,
-            ]?.filter((observation) => observation),
-          };
-          this.observationService
-            .saveObservationsViaEncounter(data)
-            .subscribe((res) => {
-              if (res) {
+                }) || []),
+                this.strengthConceptUuid && !this.specificDrugConceptUuid
+                  ? {
+                      person: this.currentPatient?.id,
+                      concept: this.strengthConceptUuid,
+                      obsDatetime: new Date(),
+                      value: this.formValues[this.strengthConceptUuid]?.value,
+                    }
+                  : null,
+              ]?.filter((observation) => observation),
+            };
+            this.observationService
+              .saveObservationsViaEncounter(data)
+              .subscribe((res) => {
+                if (res?.error) {
+                  this.errors = [...this.errors, response?.error];
+                }
+                
+                if (res) {
+                  this.orderSaved.emit(true);
+                }
                 this.savingOrder = false;
-                this.orderSaved.emit(true);
-              }
-            });
-        }
-      });
+              });
+            }
+          if (response?.error) {
+            this.errors = [...this.errors, response?.error];
+          }
+          this.savingOrder = false;
+        });
 
     this.updateConsultationOrder.emit();
   }

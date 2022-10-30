@@ -11,8 +11,8 @@
         <mat-radio-button
           (change)="getSelection($event)"
           class="registration-category-btn"
-          [value]="'Clinical'"
-          [checked]="registrationCategory === 'Clinical'"
+          [value]="'CLINICAL'"
+          [checked]="registrationCategory === 'CLINICAL'"
           color="primary"
         >
           Clinical
@@ -20,8 +20,8 @@
         <mat-radio-button
           (change)="getSelection($event)"
           class="registration-category-btn ml-2"
-          [value]="'Non-Clinical'"
-          [checked]="registrationCategory === 'Non-Clinical'"
+          [value]="'NON_CLINICAL'"
+          [checked]="registrationCategory === 'NON_CLINICAL'"
           color="primary"
         >
           Non-Clinical
@@ -38,7 +38,7 @@
       </mat-radio-group>
     </div>
 
-    <div class="col-12" *ngIf="registrationCategory === 'Clinical'">
+    <div class="col-12" *ngIf="registrationCategory === 'CLINICAL'">
       <fieldset>
         <legend
           (click)="togglePatientDetailsFieldSet($event)"
@@ -57,6 +57,7 @@
         <app-person-details
           *ngIf="!patientFieldSetClosed"
           [referFromFacilityVisitAttribute]="referFromFacilityVisitAttribute"
+          [maximumDate]="maximumDate"
           (personDetails)="onGetPersonDetails($event)"
         ></app-person-details>
       </fieldset>
@@ -133,7 +134,7 @@
 
       <!-- <mat-step
           errorMessage="Some fields not fed."
-          *ngIf="registrationCategory === 'Clinical'"
+          *ngIf="registrationCategory === 'CLINICAL'"
         >
           <ng-template matStepLabel>Clinical Data</ng-template>
           <div>
@@ -150,7 +151,7 @@
 
       <!-- <mat-step
           errorMessage="Some fields not fed."
-          *ngIf="registrationCategory === 'Clinical'"
+          *ngIf="registrationCategory === 'CLINICAL'"
         >
           <ng-template matStepLabel>Referring Doctor</ng-template>
           <div>
@@ -266,10 +267,43 @@
                   <div class="col-4">
                     <input
                       (change)="getSelectedRCollectedOnTime($event)"
+                      [ngClass]="{
+                        'invalid-time-input': !collectedOnTimeValid
+                      }"
                       class="time-input-field"
                       placeholder="Collected At"
                       type="time"
                     />
+                    <p class="invalid-text" *ngIf="!collectedOnTimeValid">
+                      invalid time
+                    </p>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-4">
+                    <app-form
+                      [fields]="[broughtByField]"
+                      (formUpdate)="onFormUpdate($event)"
+                    ></app-form>
+                  </div>
+                  <div class="col-4">
+                    <app-form
+                      *ngIf="maxForCollectedOn && minForReceivedOn"
+                      [fields]="[broughtOnField]"
+                      (formUpdate)="onFormUpdate($event)"
+                    ></app-form>
+                  </div>
+                  <div class="col-4">
+                    <input
+                      (change)="getSelectedBroughtOnTime($event)"
+                      [ngClass]="{ 'invalid-time-input': !broughtOnTimeValid }"
+                      class="time-input-field"
+                      placeholder="Brought At"
+                      type="time"
+                    />
+                    <p class="invalid-text" *ngIf="!broughtOnTimeValid">
+                      invalid time
+                    </p>
                   </div>
                 </div>
                 <div class="row">
@@ -289,32 +323,14 @@
                   <div class="col-4">
                     <input
                       (change)="getSelectedReceivedOnTime($event)"
+                      [ngClass]="{ 'invalid-time-input': !receivedOnTimeValid }"
                       class="time-input-field"
                       placeholder="Received At"
                       type="time"
                     />
-                  </div>
-                </div>
-                <div class="row">
-                  <div class="col-4">
-                    <app-form
-                      [fields]="[broughtByField]"
-                      (formUpdate)="onFormUpdate($event)"
-                    ></app-form>
-                  </div>
-                  <div class="col-4">
-                    <app-form
-                      [fields]="[broughtOnField]"
-                      (formUpdate)="onFormUpdate($event)"
-                    ></app-form>
-                  </div>
-                  <div class="col-4">
-                    <input
-                      (change)="getSelectedBroughtOnTime($event)"
-                      class="time-input-field"
-                      placeholder="Brought At"
-                      type="time"
-                    />
+                    <p class="invalid-text" *ngIf="!receivedOnTimeValid">
+                      invalid time
+                    </p>
                   </div>
                 </div>
               </ng-container>
@@ -323,10 +339,10 @@
         </div>
       </div>
 
-      <ng-template *ngIf="registrationCategory === 'Clinical'" matStepLabel
+      <ng-template *ngIf="registrationCategory === 'CLINICAL'" matStepLabel
         >Clinical Data</ng-template
       >
-      <div *ngIf="registrationCategory === 'Clinical'">
+      <div *ngIf="registrationCategory === 'CLINICAL'">
         <div class="clinical-data">
           <fieldset>
             <legend (click)="toggleFieldSet('clinicalData')" class="d-flex">
@@ -344,10 +360,10 @@
           </fieldset>
         </div>
       </div>
-      <ng-template *ngIf="registrationCategory === 'Clinical'" matStepLabel
+      <ng-template *ngIf="registrationCategory === 'CLINICAL'" matStepLabel
         >Referring Doctor</ng-template
       >
-      <div *ngIf="registrationCategory === 'Clinical'">
+      <div *ngIf="registrationCategory === 'CLINICAL'">
         <div class="referring-doctor-field">
           <fieldset>
             <legend (click)="toggleFieldSet('referingDoctor')" class="d-flex">
@@ -439,12 +455,28 @@
       </div>
     </div>
     <div class="col-12 d-flex justify-content-end mt-2 mb-2">
-      <button mat-flat-button color="primary" (click)="onSave($event, true)">
+      <button
+        mat-flat-button
+        [disabled]="
+          errorMessage ||
+          !broughtOnTimeValid ||
+          !receivedOnTimeValid ||
+          !collectedOnTimeValid
+        "
+        color="primary"
+        (click)="onSave($event, true)"
+      >
         Save to Reject
       </button>
       <button
         mat-flat-button
         color="primary"
+        [disabled]="
+          errorMessage ||
+          !broughtOnTimeValid ||
+          !receivedOnTimeValid ||
+          !collectedOnTimeValid
+        "
         class="ml-2"
         (click)="onSave($event)"
       >

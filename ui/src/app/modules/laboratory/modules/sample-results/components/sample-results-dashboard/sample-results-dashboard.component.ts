@@ -5,6 +5,7 @@ import { Observable } from "rxjs";
 import { catchError, map } from "rxjs/operators";
 import { LISConfigurationsModel } from "src/app/modules/laboratory/resources/models/lis-configurations.model";
 import { SharedConfirmationComponent } from "src/app/shared/components/shared-confirmation /shared-confirmation.component";
+import { ConceptsService } from "src/app/shared/resources/concepts/services/concepts.service";
 import { SamplesService } from "src/app/shared/services/samples.service";
 import {
   addLabDepartments,
@@ -17,7 +18,11 @@ import {
   getFormattedLabSamplesForTracking,
   getFormattedLabSamplesLoadedState,
   getLabConfigurations,
+  getLabDepartments,
+  getLabSamplesWithResults,
+  getSamplesWithResults,
 } from "src/app/store/selectors";
+import { getLISConfigurations } from "src/app/store/selectors/lis-configurations.selectors";
 
 @Component({
   selector: "app-sample-results-dashboard",
@@ -47,6 +52,8 @@ export class SampleResultsDashboardComponent implements OnInit {
   status: boolean;
   userUuid: any;
   completedSamples$: Observable<any>;
+  samplesWithResults$: Observable<any[]>;
+  sampleDetailsToggleControl: any = {};
   constructor(
     private store: Store<AppState>,
     private dialog: MatDialog,
@@ -59,22 +66,40 @@ export class SampleResultsDashboardComponent implements OnInit {
   }
 
   getCompletedSamples() {
-        const moreInfo = {
-          patients: this.patients,
-          sampleTypes: this.sampleTypes,
-          departments: this.labSamplesDepartments,
-          containers: this.labSamplesContainers,
-          configs: this.configs,
-          codedSampleRejectionReasons: this.codedSampleRejectionReasons,
-        };
+    this.store.dispatch(
+      addLabDepartments({ labDepartments: this.labSamplesDepartments })
+    );
+    this.store.dispatch(
+      loadLabSamplesByCollectionDates({
+        datesParameters: this.datesParameters,
+        patients: this.patients,
+        sampleTypes: this.sampleTypes,
+        departments: this.labSamplesDepartments,
+        containers: this.labSamplesContainers,
+        configs: this.configs,
+        codedSampleRejectionReasons: this.codedSampleRejectionReasons,
+      })
+    );
+
+    const moreInfo = {
+      patients: this.patients,
+      sampleTypes: this.sampleTypes,
+      departments: this.labSamplesDepartments,
+      containers: this.labSamplesContainers,
+      configs: this.configs,
+      codedSampleRejectionReasons: this.codedSampleRejectionReasons,
+    };
 
     this.allSamples$ = this.samplesService.getSampleByStatusCategory(
-          null,
-          "Completed",
-          this.datesParameters?.startDate,
-          this.datesParameters?.endDate,
-          moreInfo
-        );
+      null,
+      "Completed",
+      this.datesParameters?.startDate,
+      this.datesParameters?.endDate,
+      moreInfo
+    );
+    this.samplesWithResults$ = this.store.select(
+      getLabSamplesWithResults(this.selectedDepartment, this.searchingText)
+    );
   }
 
   setDepartment(department) {
@@ -95,20 +120,29 @@ export class SampleResultsDashboardComponent implements OnInit {
     }
   }
 
+  toggleSampleDetails(event: Event, sample: any): void {
+    event.stopPropagation();
+    this.sampleDetailsToggleControl[sample?.id] = !this
+      .sampleDetailsToggleControl[sample?.id]
+      ? true
+      : false;
+    console.log("sampleDetailsToggleControl", this.sampleDetailsToggleControl);
+  }
+
   onUpdateStatus(event: Event, sample: any, key: string): void {
+    event.stopPropagation();
     const confirmDialog = this.dialog.open(SharedConfirmationComponent, {
-      height: "200px",
       width: "25%",
       data: {
-        modalTitle: `${key} sample results`.toUpperCase(),
-        modalMessage: `Are you sure to ${key} results of ${sample?.label} for external use`,
+        modalTitle: `${key} sample results`,
+        modalMessage: `Are you sure to ${key} results of ${sample?.label} for external use?`,
+        showRemarksInput: true,
       },
       disableClose: false,
       panelClass: "custom-dialog-container",
     });
 
     confirmDialog.afterClosed().subscribe((res) => {
-
       if (res.confirmed && key === "release") {
         const sampleStatus = {
           sample: {
@@ -117,9 +151,9 @@ export class SampleResultsDashboardComponent implements OnInit {
           user: {
             uuid: this.userUuid,
           },
-          remarks: "",
+          remarks: res?.remarks,
           status: "RELEASED",
-          category: "RELEASED"
+          category: "RELEASED",
         };
 
         this.samplesService
@@ -141,20 +175,22 @@ export class SampleResultsDashboardComponent implements OnInit {
           user: {
             uuid: this.userUuid,
           },
-          remarks: "",
+          remarks: res?.remarks,
           status: "RESTRICTED",
           category: "RESTRICTED",
         };
-        this.samplesService.setSampleStatus(sampleStatus).subscribe((response) => {
-          if(response.error){
-            console.log("Error: " + response.error);
-          }
-          if(!response.error){
-            console.log("Response: " + response);
-          }
-        });
+        this.samplesService
+          .setSampleStatus(sampleStatus)
+          .subscribe((response) => {
+            if (response.error) {
+              console.log("Error: " + response.error);
+            }
+            if (!response.error) {
+              console.log("Response: " + response);
+            }
+          });
       }
-      this.getCompletedSamples()
+      this.getCompletedSamples();
     });
   }
 }

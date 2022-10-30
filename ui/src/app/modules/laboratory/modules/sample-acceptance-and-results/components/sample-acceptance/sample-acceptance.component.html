@@ -11,7 +11,9 @@
     completedSamples: completedSamples$ | async,
     patientsWithCompletedSamples: patientsWithCompletedSamples$ | async,
     rejectedSamples: rejectedSamples$ | async,
-    acceptedSamples: acceptedSamples$ | async
+    acceptedSamples: acceptedSamples$ | async,
+    samplesWithResults: samplesWithResults$ | async,
+    patientsWithResults: patientsWithResults$ | async
   } as sampleParams"
 >
   <mat-tab-group (selectedTabChange)="onOpenNewTab($event)">
@@ -1164,7 +1166,11 @@
                         )
                       "
                     >
-                      Results entry
+                      {{
+                        sample?.ordersWithResults?.length === 0
+                          ? "Results entry"
+                          : "Edit Results"
+                      }}
                     </button>
                   </td>
                 </tr>
@@ -1358,7 +1364,7 @@
         </table>
       </div>
     </mat-tab>
-    <mat-tab label="Sample Tracking" *ngIf="LISConfigurations?.isLIS">
+    <mat-tab *ngIf="showTabSampleTrackingForLis" label="Sample Tracking">
       <div class="filter-and-legend">
         <mat-form-field class="w-50">
           <mat-label>Search</mat-label>
@@ -1630,7 +1636,7 @@
                         )
                       "
                     >
-                      View results
+                      View
                     </button>
                   </td>
                 </tr>
@@ -1645,7 +1651,10 @@
         </table>
       </div>
     </mat-tab>
-    <mat-tab label="Results Review" *ngIf="LISConfigurations?.isLIS">
+    <mat-tab
+      label="Results Review & Authorization"
+      *ngIf="LISConfigurations?.isLIS"
+    >
       <div class="filter-and-legend">
         <mat-form-field class="w-50">
           <mat-label>Search</mat-label>
@@ -1718,10 +1727,10 @@
             </tr>
           </thead>
           <tbody>
-            <ng-container *ngIf="sampleParams?.completedSamples?.length > 0">
+            <ng-container *ngIf="sampleParams?.samplesWithResults?.length > 0">
               <ng-container
                 *ngFor="
-                  let sample of sampleParams?.completedSamples;
+                  let sample of sampleParams?.samplesWithResults;
                   let count = index
                 "
               >
@@ -1848,9 +1857,9 @@
                 </tr>
               </ng-container>
             </ng-container>
-            <ng-container *ngIf="sampleParams?.completedSamples?.length == 0">
+            <ng-container *ngIf="sampleParams?.samplesWithResults?.length == 0">
               <tr>
-                <td colspan="14" class="text-danger text-center">
+                <td colspan="100%" class="text-danger text-center">
                   No Sample With Results
                 </td>
               </tr>
@@ -1859,7 +1868,7 @@
         </table>
       </div>
     </mat-tab>
-    <mat-tab label="Results">
+    <mat-tab label="Authorized Results" *ngIf="!LISConfigurations?.isLIS">
       <div class="filter-and-legend">
         <mat-form-field class="w-50">
           <mat-label>Search</mat-label>
@@ -1923,6 +1932,88 @@
                 </button>
               </td>
             </tr>
+          </tbody>
+        </table>
+      </div>
+    </mat-tab>
+    <mat-tab label="Results" *ngIf="LISConfigurations?.isLIS">
+      <div class="filter-and-legend">
+        <mat-form-field class="w-50">
+          <mat-label>Search</mat-label>
+          <mat-icon matPrefix>search</mat-icon
+          ><input
+            matInput
+            (keyup)="onSearch($event)"
+            [(ngModel)]="searchingText"
+          />
+        </mat-form-field>
+      </div>
+      <div class="p-1">
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+              <!-- <th style="width: 10px !important">SN</th> -->
+              <th>System Identification</th>
+              <th>Department</th>
+              <th>LAB ID/No.</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <ng-container>
+              <ng-container
+                *ngFor="
+                  let patient of sampleParams?.patientsWithResults;
+                  let pCount = index
+                "
+              >
+                <ng-container
+                  *ngFor="
+                    let department of patient?.departments;
+                    let dCount = index
+                  "
+                >
+                  <tr
+                    *ngFor="
+                      let sample of department?.samples;
+                      let sCount = index
+                    "
+                  >
+                    <!--
+                    <td
+                    > 
+                      *ngIf="pCount == 0"
+                      [attr.rowspan]="patient?.departments?.length"
+                      {{ count + 1 }}
+                    </td> -->
+                    <td>
+                      {{ patient?.mrn }}
+                    </td>
+                    <td>
+                      {{ department?.departmentName }}
+                    </td>
+                    <td>
+                      {{ sample?.id }}
+                    </td>
+                    <td>
+                      <button
+                        class="colored-button"
+                        mat-stroked-button
+                        (click)="
+                          onResultsToPrint(
+                            $event,
+                            patient,
+                            sampleParams?.providerDetails
+                          )
+                        "
+                      >
+                        Print results
+                      </button>
+                    </td>
+                  </tr>
+                </ng-container>
+              </ng-container>
+            </ng-container>
           </tbody>
         </table>
       </div>

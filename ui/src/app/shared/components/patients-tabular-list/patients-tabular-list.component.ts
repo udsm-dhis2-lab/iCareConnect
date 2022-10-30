@@ -1,14 +1,14 @@
-import { EventEmitter, OnChanges, Output, ViewChild } from '@angular/core';
-import { Component, Input, OnInit } from '@angular/core';
-import { MatPaginator } from '@angular/material/paginator';
-import { MatTableDataSource } from '@angular/material/table';
-import { sanitizePatientsVisitsForTabularPatientListing } from '../../helpers/sanitize-visits-list-for-patient-tabular-listing.helper';
-import { Visit } from '../../resources/visits/models/visit.model';
+import { EventEmitter, OnChanges, Output, ViewChild } from "@angular/core";
+import { Component, Input, OnInit } from "@angular/core";
+import { MatPaginator } from "@angular/material/paginator";
+import { MatTableDataSource } from "@angular/material/table";
+import { sanitizePatientsVisitsForTabularPatientListing } from "../../helpers/sanitize-visits-list-for-patient-tabular-listing.helper";
+import { Visit } from "../../resources/visits/models/visit.model";
 
 @Component({
-  selector: 'app-patients-tabular-list',
-  templateUrl: './patients-tabular-list.component.html',
-  styleUrls: ['./patients-tabular-list.component.scss'],
+  selector: "app-patients-tabular-list",
+  templateUrl: "./patients-tabular-list.component.html",
+  styleUrls: ["./patients-tabular-list.component.scss"],
 })
 export class PatientsTabularListComponent implements OnInit, OnChanges {
   @Input() visits: Visit[];
@@ -23,14 +23,14 @@ export class PatientsTabularListComponent implements OnInit, OnChanges {
   currentPage: number = 0;
 
   displayedColumns: string[] = [
-    'position',
-    'names',
-    'mrn',
-    'gender',
-    'age',
-    'location',
-    'paymentType',
-    'startDatetime',
+    "position",
+    "names",
+    "mrn",
+    "gender",
+    "age",
+    "location",
+    "paymentType",
+    "startDatetime",
   ];
   dataSource: any;
   constructor() {}
@@ -74,9 +74,9 @@ export class PatientsTabularListComponent implements OnInit, OnChanges {
   getAnotherList(event: Event, visit, type): void {
     event.stopPropagation();
     this.page =
-      type === 'next'
+      type === "next"
         ? this.page + 1
-        : type === 'prev'
+        : type === "prev"
         ? this.page - 1
         : this.page;
     this.shouldLoadNewList.emit({ ...visit, type, page: this.page });

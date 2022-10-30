@@ -7,7 +7,7 @@ import { getFormQueryFields } from "../helpers/get-form-query-field.helper";
 import { getSanitizedFormObject } from "../helpers/get-sanitized-form-object.helper";
 import { FormConfig } from "../models/form-config.model";
 import { ICAREForm } from "../models/form.model";
-import { orderBy, uniqBy, omit, keyBy, groupBy } from "lodash";
+import { orderBy, uniqBy, omit, keyBy, groupBy, sumBy, flatten } from "lodash";
 
 @Injectable({ providedIn: "root" })
 export class FormService {
@@ -70,14 +70,28 @@ export class FormService {
         ).pipe(
           map((response) => {
             return orderBy(
-              response.results.filter(
-                (result: any) =>
-                  parameters?.class &&
-                  result.conceptClass?.display.toLowerCase() ===
-                    (field?.isDiagnosis
-                      ? "diagnosis"
-                      : parameters?.class.toLowerCase())
-              ) || [],
+              (
+                response.results.filter(
+                  (result: any) =>
+                    parameters?.class &&
+                    result.conceptClass?.display.toLowerCase() ===
+                      (field?.isDiagnosis
+                        ? "diagnosis"
+                        : parameters?.class.toLowerCase())
+                ) || []
+              )?.map((result) => {
+                return {
+                  ...result,
+                  display:
+                    result?.display?.indexOf(":") > -1
+                      ? result?.display?.split(":")[1]
+                      : result?.display,
+                  name:
+                    result?.display?.indexOf(":") > -1
+                      ? result?.display?.split(":")[1]
+                      : result?.display,
+                };
+              }),
               ["display"],
               ["asc"]
             );
@@ -211,6 +225,68 @@ export class FormService {
       );
       // this.drugs = drugsResults?.results || [];
       // return formatDrugs(this.drugs);)
+    } else if (searchControlType === "drugStock") {
+      return zip(
+        ...["stock?locationUuid", "stockout?location"].map((stockApiPath) => {
+          return this.httpClient
+            .get(
+              `store/${stockApiPath}=${field?.locationUuid}&q=${parameters?.q}`
+            )
+            .pipe(
+              map((response) => {
+                let formattedResponse = [];
+                if (stockApiPath === "stockout?location") {
+                  formattedResponse = response?.map((responseItem) => {
+                    return {
+                      ...responseItem,
+                      item: {
+                        drug: responseItem?.drug,
+                        uuid: responseItem?.uuid,
+                      },
+                      quantity: 0,
+                    };
+                  });
+                } else {
+                  formattedResponse = response;
+                }
+                const groupedByItemUuid = groupBy(
+                  formattedResponse.map((batch) => {
+                    return {
+                      ...batch,
+                      itemUuid: batch?.item?.uuid,
+                    };
+                  }),
+                  "itemUuid"
+                );
+                return Object.keys(groupedByItemUuid).map((itemUuid) => {
+                  const totalQuantity = sumBy(
+                    groupedByItemUuid[itemUuid].map((batchData) => {
+                      return batchData;
+                    }),
+                    "quantity"
+                  );
+                  return {
+                    uuid: groupedByItemUuid[itemUuid][0]?.item?.drug?.uuid,
+                    id: groupedByItemUuid[itemUuid][0]?.item?.drug?.uuid,
+                    display:
+                      groupedByItemUuid[itemUuid][0]?.item?.drug?.display +
+                      " (" +
+                      totalQuantity.toLocaleString("en-US") +
+                      ") ",
+                    itemUuid,
+                    value: groupedByItemUuid[itemUuid][0]?.item?.drug?.uuid,
+                    batches: groupedByItemUuid[itemUuid],
+                    name: groupedByItemUuid[itemUuid][0]?.item?.drug?.display,
+                    quantity: totalQuantity,
+                    isStockOut: totalQuantity === 0 ? true : false,
+                  };
+                });
+              })
+            );
+        })
+      ).pipe(
+        map((responses) => orderBy(flatten(responses), ["display"], ["asc"]))
+      );
     } else if (searchControlType === "residenceLocation") {
       return from(
         this.api.location.getAllLocations({
@@ -246,19 +322,21 @@ export class FormService {
                 facility?.display?.toLowerCase()?.indexOf("clinic") > -1
             ) || []
           )?.map((location: any) => {
+            console.log(location?.parentLocation?.parentLocation);
+            console.log(location?.parentLocation?.parentLocation?.display);
             return {
               ...location,
               display:
                 location?.display +
                 (location?.parentLocation &&
                 location?.parentLocation?.parentLocation
-                  ? "(" +
+                  ? " -  ( " +
                     location?.parentLocation?.parentLocation?.display +
                     " - " +
                     location?.parentLocation?.parentLocation?.parentLocation
                     ? location?.parentLocation?.parentLocation?.parentLocation
                         ?.display
-                    : "" + ")"
+                    : "" + " )"
                   : ""),
             };
           });
