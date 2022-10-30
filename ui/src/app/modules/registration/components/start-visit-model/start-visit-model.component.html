@@ -153,4 +153,7 @@
       </mat-tab>
     </mat-tab-group>
   </div>
+  <div *ngIf="errors?.length > 0">
+    <app-shared-error [errors]="errors"></app-shared-error>
+  </div>
 </mat-dialog-content>

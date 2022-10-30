@@ -43,7 +43,7 @@ export class NewPatientProfileComponent implements OnInit {
           : '',
       },
       mrn: (this.currentPatient?.patient?.identifiers.filter(
-        (identifier) => identifier?.identifierType?.display === 'MRN'
+        (identifier) => identifier?.identifierType?.display === "MRN"
       ) || [])[0]?.identifier,
     };
 
