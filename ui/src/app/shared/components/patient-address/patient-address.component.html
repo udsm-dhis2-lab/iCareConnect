@@ -1,9 +1,8 @@
 <div *ngIf="personDetails$ | async as personDetails">
   <p class="person-address" *ngIf="personDetails">
     <span>
-      Address:
-
-      <b *ngIf="personDetails?.addresses"
+      <b> Address: </b>
+      <span *ngIf="personDetails?.addresses"
         ><span
           *ngIf="
             !personDetails?.addresses[0]?.cityVillage &&
@@ -41,7 +40,7 @@
               : " - "
           }}
         </span>
-      </b>
+      </span>
       <span *ngIf="personDetails?.addresses?.length === 0"> - </span>
     </span>
   </p>

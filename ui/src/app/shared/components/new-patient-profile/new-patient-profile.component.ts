@@ -1,13 +1,13 @@
-import { Component, Input, OnInit, ViewChild } from '@angular/core';
-import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs';
-import { AppState } from 'src/app/store/reducers';
-import { getActiveVisit } from 'src/app/store/selectors/visit.selectors';
+import { Component, Input, OnInit, ViewChild } from "@angular/core";
+import { Store } from "@ngrx/store";
+import { Observable } from "rxjs";
+import { AppState } from "src/app/store/reducers";
+import { getActiveVisit } from "src/app/store/selectors/visit.selectors";
 
 @Component({
-  selector: 'app-new-patient-profile',
-  templateUrl: './new-patient-profile.component.html',
-  styleUrls: ['./new-patient-profile.component.scss'],
+  selector: "app-new-patient-profile",
+  templateUrl: "./new-patient-profile.component.html",
+  styleUrls: ["./new-patient-profile.component.scss"],
 })
 export class NewPatientProfileComponent implements OnInit {
   @Input() currentPatient: any;
@@ -24,14 +24,14 @@ export class NewPatientProfileComponent implements OnInit {
       this.currentPatient.patient.person.attributes &&
       this.currentPatient.patient.person.attributes?.length > 0
         ? (this.currentPatient.patient.person.attributes.filter(
-            (attribute) => attribute?.display?.indexOf('phone') === 0
+            (attribute) => attribute?.display?.indexOf("phone") === 0
           ) || [])[0]
         : null;
     const middleNameDetails =
       this.currentPatient.patient.person.attributes &&
       this.currentPatient.patient.person.attributes?.length > 0
         ? (this.currentPatient.patient.person.attributes.filter(
-            (attribute) => attribute?.display?.indexOf('mname') === 0
+            (attribute) => attribute?.display?.indexOf("mname") === 0
           ) || [])[0]
         : null;
     this.patientDetails = {
