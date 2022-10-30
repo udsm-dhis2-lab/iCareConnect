@@ -521,7 +521,7 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		
 		List<Map<String, Object>> stockoutList = (new ObjectMapper()).readValue(handleGet.getContentAsString(), List.class);
 		
-		assertThat("stockOut listing has one entry:", stockoutList.size(), is(1));
+		assertThat("stockOut listing has one entry:", stockoutList.size(), is(2));
 	}
 	
 	@Test

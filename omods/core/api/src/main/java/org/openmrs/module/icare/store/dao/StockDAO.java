@@ -176,7 +176,7 @@ public class StockDAO extends BaseDAO<Stock> {
 		        + "FROM Stock st \n LEFT JOIN st.item it LEFT JOIN it.concept c LEFT JOIN it.drug d";
 		
 		if (search != null) {
-			queryStr += " LEFT JOIN d.concept c1 LEFT JOIN c1.names cn1 LEFT JOIN c.names cn WHERE (lower(d.name) LIKE lower(:search) OR lower(cn1.name) like lower(:search) OR lower(cn.name) like lower(:search) ) ";
+			queryStr += " LEFT JOIN c.names cn WHERE (lower(d.name) LIKE lower(:search) OR lower(cn.name) like lower(:search) ) ";
 		}
 		if (search != null) {
 			queryStr += " AND st.location = (SELECT l FROM Location l WHERE l.uuid = :locationUuid)";
@@ -223,7 +223,7 @@ public class StockDAO extends BaseDAO<Stock> {
 		
 		DbSession session = this.getSession();
 		String queryStr = "SELECT item FROM Item item \n"
-		        + "WHERE item.stockable = true AND item NOT IN(SELECT stock.item FROM Stock stock)";
+		        + "WHERE item.stockable = true AND (item NOT IN(SELECT stock.item FROM Stock stock) OR item IN(SELECT stock.item FROM Stock stock WHERE stock.quantity = 0))";
 		
 		Query query = session.createQuery(queryStr);
 		
