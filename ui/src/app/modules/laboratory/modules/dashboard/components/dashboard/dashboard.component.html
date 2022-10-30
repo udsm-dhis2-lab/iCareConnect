@@ -8,6 +8,13 @@
     *ngIf="!params?.samples"
   ></mat-progress-bar>
   <div class="row">
+    <div class="col-12">
+      <app-single-value-container
+        [datesParams]="datesParams"
+      ></app-single-value-container>
+    </div>
+  </div>
+  <div class="row mt-4">
     <div class="col-md-6">
       <div class="mat-elevation-z1">
         <app-dashboard-chart-item

@@ -19,7 +19,9 @@
     dispensingLocations: dispensingLocations$ | async,
     genericPrescriptionConceptUuids: genericPrescriptionConceptUuids$ | async,
     drugOrderConceptDetails: drugOrderConceptDetails$ | async,
-    strengthConceptUuid: strengthConceptUuid$ | async
+    strengthConceptUuid: strengthConceptUuid$ | async,
+    useSpecificDrugPrescription: useSpecificDrugPrescription$ | async,
+    specificDrugConceptUuid: specificDrugConceptUuid$ | async
   } as params"
 >
   <div class="loading-overlay" *ngIf="savingOrder">
@@ -116,7 +118,9 @@
                 params?.generalPrescriptionDoseConcept &&
                 params?.generalPrescriptionFrequencyConcept &&
                 params?.genericPrescriptionConceptUuids &&
-                params?.strengthConceptUuid
+                params?.strengthConceptUuid &&
+                params?.useSpecificDrugPrescription &&
+                params?.specificDrugConceptUuid
               "
             >
               <app-general-dispension-form
@@ -128,6 +132,9 @@
                 "
                 (genericPrescriptionConceptUuidsEvent)="
                   getConceptsAsFields($event)
+                "
+                [useSpecificDrugPrescription]="
+                  params?.useSpecificDrugPrescription
                 "
                 [encounterType]="params?.generalPrescriptionEncounterType"
                 [orderType]="params?.generalPrescriptionOrderType"
@@ -145,6 +152,7 @@
                 [genericPrescriptionConceptUuid]="
                   params?.genericPrescriptionConceptUuid
                 "
+                [specificDrugConceptUuid]="params?.specificDrugConceptUuid"
                 [generalPrescriptionDurationConcept]="
                   params?.generalPrescriptionDurationConcept
                 "
@@ -183,7 +191,8 @@
                 params?.generalPrescriptionDurationConcept &&
                 params?.generalPrescriptionDoseConcept &&
                 params?.generalPrescriptionFrequencyConcept &&
-                params?.dispensingLocations
+                params?.dispensingLocations &&
+                params?.specificDrugConceptUuid
               "
             >
               <mat-accordion>
@@ -191,12 +200,13 @@
                   <mat-expansion-panel-header>
                     <mat-panel-title>
                       Drug:
-                      <span
-                        style="color: #2a8fd1"
-                        class="ml-2"
-                        [innerHtml]="genericDrugPrescription"
-                      ></span
-                    ></mat-panel-title>
+                      <span style="color: #2a8fd1" class="ml-2">
+                        {{
+                          drugOrder?.obs[params?.specificDrugConceptUuid]
+                            ?.comment
+                        }}
+                      </span></mat-panel-title
+                    >
                   </mat-expansion-panel-header>
                   <div>
                     <app-drug-order
@@ -219,6 +229,9 @@
                       [generalPrescriptionFrequencyConcept]="
                         params?.generalPrescriptionFrequencyConcept
                       "
+                      [specificDrugConceptUuid]="
+                        params?.specificDrugConceptUuid
+                      "
                       [drugsToBeDispensed]="drugsToBeDispensed$ | async"
                       (drugQuantity)="onChangeDrugQuantity($event)"
                       (drugOrdered)="onOrderingDrug($event)"
@@ -230,10 +243,13 @@
                     <div>
                       <button
                         class="float-right"
-                        (click)="onUpdateOrder($event)"
+                        (click)="
+                          onUpdateOrder($event, params?.specificDrugConceptUuid)
+                        "
                         mat-flat-button
                         [color]="savingError ? 'warn' : 'primary'"
                         [disabled]="
+                          !params?.specificDrugConceptUuid ||
                           savingOrder ||
                           countOfDispensingFormFieldsWithValues < 3
                         "

@@ -172,7 +172,8 @@ public class StockDAO extends BaseDAO<Stock> {
 	        String conceptClassName) {
 		
 		DbSession session = this.getSession();
-		String queryStr = "SELECT st \n" + "FROM Stock st \n LEFT JOIN st.item it LEFT JOIN it.concept c LEFT JOIN it.drug d";
+		String queryStr = "SELECT st \n"
+		        + "FROM Stock st \n LEFT JOIN st.item it LEFT JOIN it.concept c LEFT JOIN it.drug d";
 		
 		if (search != null) {
 			queryStr += " LEFT JOIN d.concept c1 LEFT JOIN c1.names cn1 LEFT JOIN c.names cn WHERE (lower(d.name) LIKE lower(:search) OR lower(cn1.name) like lower(:search) OR lower(cn.name) like lower(:search) ) ";
@@ -182,7 +183,7 @@ public class StockDAO extends BaseDAO<Stock> {
 		} else {
 			queryStr += " WHERE st.location = (SELECT l FROM Location l WHERE l.uuid = :locationUuid)";
 		}
-
+		
 		if (conceptClassName != null) {
 			
 			if (!queryStr.contains("WHERE")) {
@@ -193,16 +194,14 @@ public class StockDAO extends BaseDAO<Stock> {
 			queryStr += " c.conceptClass =(SELECT ccl FROM ConceptClass ccl WHERE ccl.name = :conceptClassName)";
 			
 		}
-
+		
 		if (!queryStr.contains("WHERE")) {
 			queryStr += " WHERE ";
 		} else {
 			queryStr += " AND ";
 		}
 		queryStr += " (d.retired = false OR c.retired = false)";
-
-
-		System.out.println(queryStr);
+		
 		Query query = session.createQuery(queryStr);
 		query.setFirstResult(startIndex);
 		query.setMaxResults(limit);
@@ -232,17 +231,38 @@ public class StockDAO extends BaseDAO<Stock> {
 	}
 	
 	//TODO fix getting by location query
-	public List<Item> getStockedOutByLocation(String locationUuid) {
+	public List<Item> getStockedOutByLocation(String locationUuid, String q, Integer startIndex, Integer limit,
+	        String conceptClassName) {
 		DbSession session = this.getSession();
 		//String queryStr = "SELECT item FROM Item item \n"
 		//        + "WHERE item.stockable = true AND item.uuid NOT IN(SELECT stock.item.uuid FROM Stock stock WHERE stock.location.uuid =:locationUuid)";
 		//String queryStr = "SELECT item FROM Item item, Stock stock WHERE item.stockable = true AND stock.item=item AND stock.location.uuid =:locationUuid";
-		String queryStr = "SELECT item FROM Item item \n"
-		        + "WHERE item.stockable = true AND item NOT IN(SELECT stock.item FROM Stock stock WHERE stock.location.uuid =:locationUuid)";
+		String queryStr = "SELECT item FROM Item item LEFT JOIN item.concept c LEFT JOIN item.drug d \n";
+		
+		if (q != null) {
+			queryStr += " LEFT JOIN c.names cn";
+			queryStr += " WHERE lower(d.name) LIKE lower(:q) OR lower(cn.name) like lower(:q) ";
+		}
+		
+		if (!queryStr.contains("WHERE")) {
+			queryStr += " WHERE ";
+		} else {
+			queryStr += " AND ";
+		}
+		queryStr += "  item.stockable = true AND (d.retired = false OR c.retired = false) AND (item NOT IN(SELECT stock.item FROM Stock stock WHERE stock.location.uuid =:locationUuid) OR item IN(SELECT stock.item FROM Stock stock WHERE stock.location.uuid =:locationUuid AND stock.quantity = 0))";
 		
 		Query query = session.createQuery(queryStr);
 		//		query.setFirstResult(startIndex);
 		//		query.setMaxResults(limit);
+		
+		if (q != null) {
+			query.setFirstResult(startIndex);
+			query.setMaxResults(limit);
+			query.setParameter("q", "%" + q.replace(" ", "%") + "%");
+		}
+		//		if (conceptClassName != null) {
+		//			query.setParameter("conceptClassName", conceptClassName);
+		//		}
 		
 		query.setParameter("locationUuid", locationUuid);
 		
@@ -284,7 +304,7 @@ public class StockDAO extends BaseDAO<Stock> {
 		query for nearly expired
 		------------------------
 		------------------------- */
-		String nearlyExpired = "SELECT stc,(stc.expiryDate - current_date) FROM Stock stc WHERE stc.expiryDate <= current_date + 30 AND stc.location = (SELECT l FROM Location l WHERE l.uuid = :locationUuid)";
+		String nearlyExpired = "SELECT stc,(stc.expiryDate - current_date) FROM Stock stc LEFT JOIN stc.item it LEFT JOIN it.concept c LEFT JOIN it.drug d WHERE stc.expiryDate <= current_date + 30 AND (d.retired = false OR c.retired = false) AND stc.location = (SELECT l FROM Location l WHERE l.uuid = :locationUuid) ";
 		
 		Query queryNearlyExpired = session.createQuery(nearlyExpired);
 		
@@ -299,14 +319,14 @@ public class StockDAO extends BaseDAO<Stock> {
 		query for out of stock
 		------------------------
 		------------------------- */
-		metricsMap.put("stockedOut", this.getStockedOutByLocation(locationUuid).size());
+		metricsMap.put("stockedOut", this.getStockedOutByLocation(locationUuid, "", 0, 0, "").size());
 		
 		/* ------------------------
 		-----------------------
 		query for expired stock
 		------------------------
 		------------------------- */
-		String expiredQueryString = "SELECT stc FROM Stock stc WHERE stc.expiryDate <= current_date AND stc.location = (SELECT l FROM Location l WHERE l.uuid = :locationUuid)";
+		String expiredQueryString = "SELECT stc FROM Stock stc LEFT JOIN stc.item it LEFT JOIN it.concept c LEFT JOIN it.drug d WHERE stc.expiryDate <= current_date AND (d.retired = false OR c.retired = false) AND  stc.location = (SELECT l FROM Location l WHERE l.uuid = :locationUuid) ";
 		
 		Query queryExpired = session.createQuery(expiredQueryString);
 		

@@ -73,19 +73,26 @@ export class SamplesService {
     testCategory = testCategory ? `?testCategory=${testCategory}` : "";
     sampleCategory = sampleCategory ? `?testCategory=${sampleCategory}` : "";
     const dates =
-      startDate && endDate && (sampleCategory.length > 0 || testCategory.length > 0) 
+      startDate &&
+      endDate &&
+      (sampleCategory.length > 0 || testCategory.length > 0)
         ? `&startDate=${startDate}&endDate=${endDate}`
-        : startDate && endDate && testCategory.length === 0 && sampleCategory.length === 0
+        : startDate &&
+          endDate &&
+          testCategory.length === 0 &&
+          sampleCategory.length === 0
         ? `?startDate=${startDate}&endDate=${endDate}`
         : "";
-    return this.httpClient.get(BASE_URL + `lab/sample${testCategory}${sampleCategory}${dates}`).pipe(
-      map((response: any) => {
-        return _.map(response, (sample) => {
-          return formatSample(sample, formattingInfo);
-        });
-      }),
-      catchError((error) => of(error))
-    );
+    return this.httpClient
+      .get(BASE_URL + `lab/sample${testCategory}${sampleCategory}${dates}`)
+      .pipe(
+        map((response: any) => {
+          return _.map(response, (sample) => {
+            return formatSample(sample, formattingInfo);
+          });
+        }),
+        catchError((error) => of(error))
+      );
   }
 
   collectSample(data): Observable<any> {
@@ -130,6 +137,7 @@ export class SamplesService {
 
   setSampleStatus(data): Observable<any> {
     if (data) {
+      console.log(data);
       return this.httpClient.post(BASE_URL + "lab/samplestatus", data).pipe(
         map((response) => response),
         catchError((error) => of(error))

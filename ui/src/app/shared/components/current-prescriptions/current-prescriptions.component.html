@@ -1,9 +1,14 @@
-<div [ngClass]="drugsPrescribed.length > 0 ? 'current-prescriptions' : ''">
+<div
+  [ngClass]="drugsPrescribed.length > 0 ? 'current-prescriptions' : ''"
+  *ngIf="{ specificDrugConceptUuid: specificDrugConceptUuid$ | async } as params"
+>
   <div *ngIf="errors.length > 0">
     <app-shared-error [errors]="errors"></app-shared-error>
   </div>
   <table class="table table-bordered table-striped">
-    <ng-container *ngIf="drugsPrescribed.length > 0">
+    <ng-container
+      *ngIf="drugsPrescribed.length > 0 && params?.specificDrugConceptUuid"
+    >
       <thead>
         <tr>
           <th>S/N</th>
@@ -16,9 +21,13 @@
       <tbody>
         <tr *ngFor="let drug of drugsPrescribed; let index = index">
           <td>{{ index + 1 }}</td>
-          <td>{{ drug?.display }}</td>
           <td>
-            {{ drug?.formulatedDescription }}
+            {{ drug.obs[params?.specificDrugConceptUuid] ? drug.obs[params?.specificDrugConceptUuid]?.comment : drug?.display }}
+          </td>
+          <td>
+              <span *ngFor="let instruction of drug?.formulatedDescription; let instructonIndex=index">
+               {{ instructonIndex + 1 }}. {{ instruction?.concept?.display }} - {{ instruction?.value?.display ? instruction?.value?.display : instruction?.value }} <br>
+              </span>
           </td>
           <td>{{ drug.careSetting.display }}</td>
           <td>{{ drug.dateActivated | date: "short" }}</td>

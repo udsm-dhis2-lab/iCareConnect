@@ -1,13 +1,13 @@
-import { HttpClient } from '@angular/common/http';
-import { Component, Input, OnChanges, OnInit } from '@angular/core';
+import { HttpClient } from "@angular/common/http";
+import { Component, Input, OnChanges, OnInit } from "@angular/core";
 
-import * as _ from 'lodash';
-import { BASE_URL } from 'src/app/shared/constants/constants.constants';
+import * as _ from "lodash";
+import { BASE_URL } from "src/app/shared/constants/constants.constants";
 
 @Component({
-  selector: 'app-custom-reports',
-  templateUrl: './custom-reports.component.html',
-  styleUrls: ['./custom-reports.component.scss'],
+  selector: "app-custom-reports",
+  templateUrl: "./custom-reports.component.html",
+  styleUrls: ["./custom-reports.component.scss"],
 })
 export class CustomReportsComponent implements OnInit, OnChanges {
   @Input() report: any;
@@ -15,7 +15,7 @@ export class CustomReportsComponent implements OnInit, OnChanges {
   reportData: any;
   loadingReport: boolean = false;
   reportHeaders: any[];
-  searchingText: string = '';
+  searchingText: string = "";
   constructor(private httpClient: HttpClient) {}
 
   ngOnInit(): void {}
@@ -25,11 +25,11 @@ export class CustomReportsComponent implements OnInit, OnChanges {
     this.httpClient
       .get(
         BASE_URL +
-          'reportingrest/dataSet/' +
+          "reportingrest/dataSet/" +
           this.report?.key +
-          '?startDate=' +
+          "?startDate=" +
           this.selectionDates?.startDate +
-          '&endDate=' +
+          "&endDate=" +
           this.selectionDates?.endDate
       )
       .subscribe((data: any) => {
@@ -41,12 +41,11 @@ export class CustomReportsComponent implements OnInit, OnChanges {
                 })
               : [];
           this.reportData = data?.rows?.map((row) => {
-            // console.log('row tetete', row);
             return {
               ...row,
               searchingText: _.map(Object.keys(row), (key) => {
                 return row[key];
-              }).join(' '),
+              }).join(" "),
             };
           });
           this.loadingReport = false;

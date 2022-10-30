@@ -6,8 +6,14 @@ export function formatSampleTypes(samples) {
     return {
       id: sample.uuid,
       uuid: sample.uuid,
-      name: sample.display,
-      display: sample.display,
+      name:
+        sample?.display?.indexOf(":") > -1
+          ? sample?.display?.split(":")[1]
+          : sample?.display,
+      display:
+        sample?.display?.indexOf(":") > -1
+          ? sample?.display?.split(":")[1]
+          : sample?.display,
       links: sample.links,
       ...sample,
       setMembers: sample.setMembers ? formatSampleTypes(sample.setMembers) : [],
@@ -22,7 +28,10 @@ export function formatSetMembers(SetMembers, SampleType, configs) {
     return {
       id: test.uuid,
       uuid: test.uuid,
-      name: test.display,
+      name:
+        test?.display?.indexOf(":") > -1
+          ? test?.display?.split(":")[1]
+          : test?.display,
       state: getSetMemberState(test, configs),
       sampletype: SampleType,
       mappings: test.mappings,
@@ -183,12 +192,35 @@ export function keyDepartmentsByTestOrder(items) {
   _.map(items, (item) => {
     _.map(item?.setMembers, (test) => {
       keyedTests[test?.uuid] = {
-        departmentName: item?.display,
+        departmentName:
+          item?.display?.indexOf(":") > -1
+            ? item?.display?.split(":")[1]
+            : item?.display,
         departmentUuid: item?.uuid,
         ...item,
-        keyedConcept: (item?.setMembers.filter(
-          (member) => member?.uuid === test?.uuid
-        ) || [])[0],
+        display:
+          item?.display?.indexOf(":") > -1
+            ? item?.display?.split(":")[1]
+            : item?.display,
+        name:
+          item?.display?.indexOf(":") > -1
+            ? item?.display?.split(":")[1]
+            : item?.display,
+        keyedConcept: (item?.setMembers
+          ?.map((member) => {
+            return {
+              ...member,
+              display:
+                member?.display?.indexOf(":") > -1
+                  ? member?.display?.split(":")[1]
+                  : member?.display,
+              name:
+                member?.display?.indexOf(":") > -1
+                  ? member?.display?.split(":")[1]
+                  : member?.display,
+            };
+          })
+          ?.filter((member) => member?.uuid === test?.uuid) || [])[0],
       };
     });
   });
@@ -201,7 +233,18 @@ export function keySampleTypesByTestOrder(items) {
     _.map(item?.setMembers, (test) => {
       keyedTests[test?.uuid] = {
         ...test,
-        specimenName: item?.name,
+        display:
+          test?.display?.indexOf(":") > -1
+            ? test?.display?.split(":")[1]
+            : test?.display,
+        name:
+          test?.display?.indexOf(":") > -1
+            ? test?.display?.split(":")[1]
+            : test?.display,
+        specimenName:
+          item?.display?.indexOf(":") > -1
+            ? item?.display?.split(":")[1]
+            : item?.display,
         specimenUuid: item?.id,
       };
     });
@@ -220,9 +263,21 @@ function keyVisitsBymRN(visitsReferences) {
 function formulateConcept(concept) {
   return {
     ...concept,
+    display:
+      concept?.display?.indexOf(":") > -1
+        ? concept?.display?.split(":")[1]
+        : concept?.display,
+    name:
+      concept?.display?.indexOf(":") > -1
+        ? concept?.display?.split(":")[1]
+        : concept?.display,
     setMembers: _.map(concept?.setMembers, (setMember) => {
       return {
         ...setMember,
+        display:
+          setMember?.display?.indexOf(":") > -1
+            ? setMember?.display?.split(":")[1]
+            : setMember?.display,
         selectionOptions:
           setMember?.hiNormal && setMember?.lowNormal
             ? generateSelectionOptions(
@@ -230,6 +285,15 @@ function formulateConcept(concept) {
                 setMember?.hiNormal
               )
             : [],
+      };
+    }),
+    answers: _.map(concept?.answers, (answer) => {
+      return {
+        ...answer,
+        display:
+          answer?.display?.indexOf(":") > -1
+            ? answer?.display?.split(":")[1]
+            : answer?.display,
       };
     }),
   };

@@ -154,8 +154,9 @@ export class FieldComponent {
       class: this.field?.conceptClass,
       source: this.field?.source,
       v:
-        field?.searchControlType === "residenceLocation"
-          ? "custom:(uuid,display,parentLocation:(uuid,display,parentLocation:(uuid,display,parentLocation:(uuid,display))))"
+        field?.searchControlType === "residenceLocation" ||
+        field?.searchControlType === "healthFacility"
+          ? "custom:(uuid,display,parentLocation:(uuid,display,parentLocation:(uuid,display,parentLocation:(uuid,display,parentLocation:(uuid,display)))))"
           : field?.searchControlType === "concept" ||
             field?.conceptClass === "Diagnosis"
           ? "custom:(uuid,display,datatype,conceptClass,mappings)"
@@ -178,8 +179,10 @@ export class FieldComponent {
       : item?.id;
     let objectToUpdate = {};
     objectToUpdate[field?.key] =
-      !field?.searchControlType ||
-      field?.searchControlType !== "residenceLocation"
+      field?.searchControlType === "drugStock"
+        ? item
+        : !field?.searchControlType ||
+          field?.searchControlType !== "residenceLocation"
         ? value
         : item;
     this.form.patchValue(objectToUpdate);

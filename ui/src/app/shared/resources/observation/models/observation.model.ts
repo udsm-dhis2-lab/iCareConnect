@@ -46,13 +46,13 @@ export class Observation {
   }
 
   get value(): string | number {
-    return this.obs?.value.hasOwnProperty("uuid")
-      ? this.obs?.value?.uuid
-      : this.obs?.value;
+    return this.obs?.value?.hasOwnProperty("uuid")
+    ? this.obs?.value?.uuid
+    : this.obs?.value;
   }
 
   get valueObject(): any {
-    const valueObject = this.obs?.value.hasOwnProperty("uuid")
+    const valueObject = this.obs?.value?.hasOwnProperty("uuid")
       ? this.obs?.value
       : null;
     return valueObject;

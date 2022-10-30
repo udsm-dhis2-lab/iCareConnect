@@ -60,3 +60,11 @@ ng-deep .disabled-form-selection-option,
   color: red;
   text-decoration: line-through !important;
 }
+
+.stock-out-item {
+  color: #dc3545 !important;
+}
+
+.in-stock-item {
+  color: #28a745 !important;
+}

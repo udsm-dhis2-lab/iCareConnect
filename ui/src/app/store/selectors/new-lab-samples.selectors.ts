@@ -390,7 +390,8 @@ export const getFormattedAcceptedLabSamples = (
 
 export const getFormattedLabSamplesToFeedResults = createSelector(
   getAllFormattedLabSamples,
-  (samples, props) => {
+  getLISConfigurations,
+  (samples, LISConfigs, props) => {
     const unCompletedSamples = _.map(
       _.filter(samples, (sample) => {
         const completedOrders = getCompletedOrders(sample?.orders);
@@ -405,6 +406,8 @@ export const getFormattedLabSamplesToFeedResults = createSelector(
       (sample) => {
         return {
           ...sample,
+          hasResult:
+            getOrdersWithResults(sample?.orders)?.length > 0 ? true : false,
           atLeastOneHasFirstSignOff:
             getOrdersWithFirstSigOff(sample?.orders)?.length > 0 ? true : false,
           atLeastOneHasResults:
@@ -416,10 +419,13 @@ export const getFormattedLabSamplesToFeedResults = createSelector(
         };
       }
     );
+
     return (
       _.filter(
         _.orderBy(
-          unCompletedSamples,
+          !LISConfigs?.isLIS
+            ? unCompletedSamples
+            : unCompletedSamples?.filter((sample) => !sample?.hasResult) || [],
           ["priorityOrderNumber", "dateCreated"],
           ["asc", "desc"]
         ),
@@ -459,6 +465,57 @@ export const getFormattedLabSamplesToFeedResults = createSelector(
     );
   }
 );
+
+export const getLabSamplesWithResults = (department, searchingText) =>
+  createSelector(getAllFormattedLabSamples, (samples) => {
+    const samplesWithResults = _.filter(samples, (sample) => {
+      const ordersWithResults = getOrdersWithResults(sample?.orders);
+      if (sample?.accepted && ordersWithResults?.length > 0) {
+        return sample;
+      }
+    });
+    return (
+      _.filter(
+        _.orderBy(
+          samplesWithResults,
+          ["dateCreated", "priorityOrderNumber"],
+          ["asc", "asc"]
+        ),
+        (sample) => {
+          if (!searchingText && !department) {
+            return sample;
+          } else if (searchingText && department) {
+            if (
+              sample?.searchingText
+                ?.toLowerCase()
+                .indexOf(searchingText.toLowerCase()) > -1 &&
+              sample?.department?.departmentName
+                .toLowerCase()
+                .indexOf(department?.toLowerCase()) > -1
+            ) {
+              return sample;
+            }
+          } else if (searchingText && !department) {
+            if (
+              sample?.searchingText
+                ?.toLowerCase()
+                .indexOf(searchingText.toLowerCase()) > -1
+            ) {
+              return sample;
+            }
+          } else if (!searchingText && department) {
+            if (
+              sample?.department?.departmentName
+                .toLowerCase()
+                .indexOf(department?.toLowerCase()) > -1
+            ) {
+              return sample;
+            }
+          }
+        }
+      ) || []
+    );
+  });
 
 export const getCompletedLabSamples = createSelector(
   getAllFormattedLabSamples,
@@ -520,12 +577,80 @@ export const getCompletedLabSamples = createSelector(
   }
 );
 
+export const getPatientWithResults = (
+  department: string,
+  searchingText: string
+) =>
+  createSelector(getAllFormattedLabSamples, (samples: any[]) => {
+    const filteredSamplesWithResults =
+      _.filter(
+        _.orderBy(
+          _.filter(samples, (sample) => {
+            const ordersWithResults = getOrdersWithResults(sample?.orders);
+            if (sample?.accepted && ordersWithResults.length) {
+              return sample;
+            }
+          }),
+          ["dateCreated", "priorityOrderNumber"],
+          ["asc", "asc"]
+        ),
+        (sample) => {
+          if (!searchingText && !department) {
+            return sample;
+          } else if (searchingText && department) {
+            if (
+              sample?.searchingText
+                ?.toLowerCase()
+                .indexOf(searchingText.toLowerCase()) > -1 &&
+              sample?.department?.departmentName
+                .toLowerCase()
+                .indexOf(department?.toLowerCase()) > -1
+            ) {
+              return sample;
+            }
+          } else if (searchingText && !department) {
+            if (
+              sample?.searchingText
+                ?.toLowerCase()
+                .indexOf(searchingText.toLowerCase()) > -1
+            ) {
+              return sample;
+            }
+          } else if (!searchingText && department) {
+            if (
+              sample?.department?.departmentName
+                .toLowerCase()
+                .indexOf(department?.toLowerCase()) > -1
+            ) {
+              return sample;
+            }
+          }
+        }
+      ) || [];
+    const groupedByMRN = _.groupBy(filteredSamplesWithResults, "mrn");
+
+    return _.map(Object.keys(groupedByMRN), (key) => {
+      const samplesKeyedByDepartments = _.groupBy(
+        groupedByMRN[key],
+        "departmentName"
+      );
+      return {
+        mrn: key,
+        patient: groupedByMRN[key][0]?.patient,
+        departments: _.map(Object.keys(samplesKeyedByDepartments), (dep) => {
+          return {
+            departmentName: dep,
+            samples: samplesKeyedByDepartments[dep],
+          };
+        }),
+      };
+    });
+  });
+
 export const getPatientsWithCompletedLabSamples = createSelector(
   getAllFormattedLabSamples,
   getLISConfigurations,
   (samples, lisConfigs, props) => {
-    // console.log('SAMP ', samples);
-
     const filteredCompletedSamples =
       _.filter(
         _.orderBy(
@@ -577,12 +702,7 @@ export const getPatientsWithCompletedLabSamples = createSelector(
           }
         }
       ) || [];
-
-    // console.log('filtered completed samples :: ', filteredCompletedSamples);
-
     const groupedByMRN = _.groupBy(filteredCompletedSamples, "mrn");
-
-    // console.log('grouped by mrn samples :: ', groupedByMRN);
 
     return _.map(Object.keys(groupedByMRN), (key) => {
       const samplesKeyedByDepartments = _.groupBy(

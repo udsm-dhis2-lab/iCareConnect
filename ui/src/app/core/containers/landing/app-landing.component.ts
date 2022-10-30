@@ -35,7 +35,7 @@ export class LandingComponent implements OnInit {
           go({
             path: isNavigationDetailsAvailable
               ? navigationDetails?.path
-              : ["/laboratory/sample-registration"],
+              : ["/laboratory/dashboard-lab"],
           })
         );
       }

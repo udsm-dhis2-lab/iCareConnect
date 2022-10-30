@@ -227,11 +227,13 @@ export class CurrentPatientDispensingComponent implements OnInit {
             drugOrderDispenseDetails
           );
 
-          this.store.dispatch(
-            loadActiveVisit({
-              patientId: patientVisit.patient["uuid"],
-            })
-          );
+          // this.store.dispatch(
+          //   loadActiveVisit({
+          //     patientId: patientVisit.patient["uuid"],
+          //   })
+          // );
+
+          this.getPatientVisit();
 
           break;
         default:

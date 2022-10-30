@@ -26,6 +26,17 @@ export class DrugsService {
     );
   }
 
+  getDrug(id): Observable<any> {
+    return this.openMRSHttpClient.get(`drug/${id}`).pipe(
+      map((response) => {
+        return response;
+      }),
+      catchError((errorResponse: HttpErrorResponse) => {
+        return of(errorResponse?.error);
+      })
+    );
+  }
+
   getAllDrugs(params: {
     limit?: number;
     startIndex?: number;

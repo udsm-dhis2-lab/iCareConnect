@@ -156,18 +156,24 @@
       <mat-icon>arrow_drop_down</mat-icon>
     </span>
     <mat-autocomplete #auto="matAutocomplete">
-      <mat-option aria-disabled="true" value=""> --Search-- </mat-option>
+      <!-- <mat-option aria-disabled="true" value=""> --Search-- </mat-option> -->
       <ng-container *ngFor="let option of members$ | async">
         <mat-option
+          [ngClass]="{
+            'stock-out-item': option?.isStockOut,
+            'in-stock-item':
+              !option?.isStockOut && field?.searchControlType === 'drugStock'
+          }"
           [disabled]="option?.disabled"
           (click)="getSelectedItemFromOption($event, option, field)"
           [value]="option?.display ? option?.display : option?.name"
         >
-          <span
+          <!-- <span
             class="badge badge-success"
             [ngClass]="{
               'badge-success': getStockStatus(option),
-              'badge-danger': !getStockStatus(option)
+              'badge-danger': !getStockStatus(option),
+              'stock-out-item': option?.isStockOut
             }"
             *ngIf="
               field?.otherType === 'Drug' &&
@@ -175,9 +181,11 @@
             "
           >
             {{ getStockStatus(option) ? "In-stock" : "Out-stock" }}
-          </span>
+          </span> -->
           <span
-            [ngClass]="{ 'disabled-form-selection-option': option?.disabled }"
+            [ngClass]="{
+              'disabled-form-selection-option': option?.disabled
+            }"
           >
             {{ option?.display ? option?.display : option?.name }}
           </span>
