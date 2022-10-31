@@ -50,6 +50,7 @@ export class SingleRegistrationComponent implements OnInit {
   @Input() referFromFacilityVisitAttribute: string;
   @Input() referringDoctorAttributes: SystemSettingsWithKeyDetails[];
   @Input() labSections: ConceptGetFull[];
+  @Input() labNumberCharactersCount: string;
 
   departmentField: any = {};
   specimenDetailsFields: any;
@@ -576,6 +577,19 @@ export class SingleRegistrationComponent implements OnInit {
         : NON_CLINICAL_PERSON_DATA;
   }
 
+  formatToSpecifiedChars(labNumber): string {
+    let generatedStr = "";
+    for (
+      let count = 0;
+      count <
+      Number(this.labNumberCharactersCount) - labNumber.toString()?.length;
+      count++
+    ) {
+      generatedStr = generatedStr + "0";
+    }
+    return generatedStr + labNumber.toString();
+  }
+
   onGetClinicalDataValues(clinicalData): void {
     this.formData = { ...this.formData, ...clinicalData };
   }
@@ -910,16 +924,12 @@ export class SingleRegistrationComponent implements OnInit {
                                                           sampleLabelResponse
                                                         ) {
                                                           // Create sample
+                                                          // TODO: Softcode base characters (NPHL)
                                                           const sampleLabel =
-                                                            "LIS/TZ/" +
-                                                            new Date().getFullYear() +
-                                                            "/" +
-                                                            (new Date().getMonth() +
-                                                              1) +
-                                                            "/" +
-                                                            new Date().getDate() +
-                                                            "/" +
-                                                            sampleLabelResponse;
+                                                            "NPHL" +
+                                                            this.formatToSpecifiedChars(
+                                                              sampleLabelResponse
+                                                            );
                                                           const sample = {
                                                             visit: {
                                                               uuid: visitResponse?.uuid,
