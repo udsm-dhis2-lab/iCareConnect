@@ -36,9 +36,9 @@ export class ConceptsService {
                   ? setMember?.display?.split(":")[1]
                   : setMember?.display,
               name:
-                response?.display?.indexOf(":") > -1
-                  ? response?.display?.split(":")[1]
-                  : response?.display,
+                setMember?.display?.indexOf(":") > -1
+                  ? setMember?.display?.split(":")[1]
+                  : setMember?.display,
             };
           }),
           answers: response?.answers?.map((answer) => {
@@ -107,9 +107,9 @@ export class ConceptsService {
                       ? setMember?.display?.split(":")[1]
                       : setMember?.display,
                   name:
-                    response?.display?.indexOf(":") > -1
-                      ? response?.display?.split(":")[1]
-                      : response?.display,
+                    setMember?.display?.indexOf(":") > -1
+                      ? setMember?.display?.split(":")[1]
+                      : setMember?.display,
                 };
               })
             : [],
@@ -334,7 +334,7 @@ export class ConceptsService {
       })
     ).pipe(
       map((response) => {
-        return response?.results.map((result) => {
+        return response?.results.map((result: ConceptGetFull) => {
           return {
             ...result,
             display:
@@ -345,6 +345,21 @@ export class ConceptsService {
               result?.display?.indexOf(":") > -1
                 ? result?.display?.split(":")[1]
                 : result?.display,
+            setMembers: result?.setMembers
+              ? result?.setMembers?.map((setMember) => {
+                  return {
+                    ...setMember,
+                    display:
+                      setMember?.display?.indexOf(":") > -1
+                        ? setMember?.display?.split(":")[1]
+                        : setMember?.display,
+                    name:
+                      setMember?.display?.indexOf(":") > -1
+                        ? setMember?.display?.split(":")[1]
+                        : setMember?.display,
+                  };
+                })
+              : [],
           };
         });
       }),

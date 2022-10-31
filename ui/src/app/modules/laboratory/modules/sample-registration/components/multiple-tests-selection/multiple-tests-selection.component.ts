@@ -35,7 +35,21 @@ export class MultipleTestsSelectionComponent implements OnInit {
 
     this.conceptsList$ = !this.setMembersFromSpecimen
       ? this.conceptService.getConceptsBySearchTerm("TEST_ORDERS")
-      : of(this.setMembersFromSpecimen);
+      : of(
+          this.setMembersFromSpecimen?.map((setMember) => {
+            return {
+              ...setMember,
+              display:
+                setMember?.display?.indexOf(":") > -1
+                  ? setMember?.display?.split(":")[1]
+                  : setMember?.display,
+              name:
+                setMember?.display?.indexOf(":") > -1
+                  ? setMember?.display?.split(":")[1]
+                  : setMember?.display,
+            };
+          })
+        );
 
     // this.testsFormField = new Dropdown({
     //   id: "test1",
