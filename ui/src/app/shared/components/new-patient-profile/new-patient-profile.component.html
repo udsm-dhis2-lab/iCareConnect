@@ -19,8 +19,8 @@
           |
           {{ patientDetails?.person?.age }} Yrs |
           {{ patientDetails?.person?.birthdate | date }}
-          )</span
-        >
+          )
+        </span>
       </div>
       <div
         class="
@@ -61,6 +61,10 @@
                 {{ (activeVisit$ | async)?.isEnsured ? "INSURANCE" : "CASH" }}
               </span>
             </span>
+            <app-patient-address
+              [personUuid]="currentPatient?.patient?.person?.uuid"
+            >
+            </app-patient-address>
           </div>
         </div>
         <div

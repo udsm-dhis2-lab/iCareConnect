@@ -305,7 +305,6 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		MockHttpServletRequest newPostRequest = newPostRequest("store/issue", issue);
 		
 		MockHttpServletResponse handle = handle(newPostRequest);
-		;
 		
 		// get stock from the same location for the same item
 		MockHttpServletRequest getStockRequest = newGetRequest("store/stock");
@@ -522,7 +521,7 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		
 		List<Map<String, Object>> stockoutList = (new ObjectMapper()).readValue(handleGet.getContentAsString(), List.class);
 		
-		assertThat("stockOut listing has one entry:", stockoutList.size(), is(1));
+		assertThat("stockOut listing has one entry:", stockoutList.size(), is(2));
 	}
 	
 	@Test

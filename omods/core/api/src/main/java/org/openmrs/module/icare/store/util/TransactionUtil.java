@@ -54,6 +54,9 @@ public class TransactionUtil {
 		StoreService storeService = Context.getService(StoreService.class);
 		Stock stock = storeService.getStockByItemBatchLocation(stockable.getItem(), stockable.getBatchNo(),
 		    stockable.getExpiryDate(), stockable.getLocation());
+		
+		System.out.println(stockable.getItem() + "ff");
+		
 		if (stock.getQuantity() - stockable.getQuantity() < 0) {
 			throw new StockOutException("Negative Stock is not allowed");
 		} else {
