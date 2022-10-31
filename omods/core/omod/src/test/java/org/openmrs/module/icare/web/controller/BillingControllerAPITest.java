@@ -15,11 +15,9 @@ import org.junit.Test;
 import org.openmrs.ConceptComplex;
 import org.openmrs.Patient;
 import org.openmrs.Visit;
-import org.openmrs.api.ConceptService;
-import org.openmrs.api.PatientService;
+import org.openmrs.api.*;
 import org.openmrs.api.context.Context;
 import org.openmrs.*;
-import org.openmrs.api.EncounterService;
 import org.openmrs.module.icare.ICareConfig;
 import org.openmrs.module.icare.billing.models.Invoice;
 import org.openmrs.module.icare.billing.models.InvoiceItem;
@@ -46,7 +44,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import org.openmrs.api.AdministrationService;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
@@ -517,15 +514,21 @@ public class BillingControllerAPITest extends BaseResourceControllerTest {
 		System.out.println("Yuhu:" + Context.getProviderService().getProvider(1));
 		adminService.setGlobalProperty(ICareConfig.BED_ORDER_CONCEPT,"e721ec30-mfy4-11e8-ie7c-40b69mdy79ee");
 
-		MockHttpServletRequest newGetRequest = newGetRequest("billing/ipd");
-		MockHttpServletResponse handler = handle(newGetRequest);
 
-		System.out.println(handler.getContentAsString());
+		order = billingService.createOrderForOngoingIPDPatients();
 
-		order = (new ObjectMapper()).readValue(handler.getContentAsString(), Order.class);
+		OrderService orderService = Context.getService(OrderService.class);
+		Order createdOrders = orderService.getOrderByUuid(order.getUuid());
 
-		System.out.println(order.getUuid());
-		assertThat("The order should be created", order.getUuid().length() > 0);
+		List<Invoice> patientInvoices = billingService.getPatientsInvoices("1f6959e5-d15a-4025-bb48-340ee9e2c58d");
+
+		assertThat("Invoice should have 1 item", patientInvoices.get(0).getInvoiceItems().size(), is(1));
+
+		System.out.println(order);
+
+
+		//System.out.println(order.getUuid());
+		assertThat("The order should be created", createdOrders.getUuid().length() > 1);
 
 	}
 

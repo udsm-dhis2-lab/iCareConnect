@@ -120,10 +120,4 @@ public class BillingController extends BaseController {
 		return invoiceMaps;
 	}
 
-	@RequestMapping(value = "ipd", method = RequestMethod.GET)
-	@ResponseBody
-	public Order OPDAutocalc() throws Exception {
-		Order resp = billingService.createOrderForOngoingIPDPatients();
-		return resp;
-	}
 }

@@ -668,6 +668,8 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 
 		Order order = new Order();
 		Order newOrder = new Order();
+		OrderService orderService = Context.getService(OrderService.class);
+
 
 		List<Visit> visits = dao.getOpenAdmittedVisit();
 
@@ -689,36 +691,30 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 
 				OrderType bedOrderOrderType = Context.getOrderService().getOrderTypeByUuid(bedOrderTypeUUID);
 
-				//CareSetting cs = new CareSetting();
-				//cs.setCareSettingType(CareSetting.CareSettingType.INPATIENT);
-
-
 				Provider provider = Context.getProviderService().getProvider(1);
 
 				Concept concept = Context.getConceptService().getConceptByUuid(bedOrderConceptUUID);
 				System.out.println(concept.getUuid());
 
-				//List<Encounter> encounters = new ArrayList<>(visit.getEncounters().toArray()[0]);
 
 				order.setPatient(visit.getPatient());
 				System.out.println("aaaa "+visit.getPatient().getId());
 				order.setAction(Order.Action.NEW);
-				//order.setCareSetting(cs);
+				order.setCareSetting(orderService.getCareSettingByName("Inpatient"));
 				order.setOrderType(bedOrderOrderType);
 				order.setConcept(concept);
 				order.setOrderer(provider);
 				order.setEncounter((Encounter) visit.getEncounters().toArray()[0]);
-				OrderService orderService = Context.getService(OrderService.class);
 				OrderContext orderContext = new OrderContext();
 				orderContext.setCareSetting(orderService.getCareSetting(1));
 				System.out.println(orderContext);
 				System.out.println(order);
-			    //encounters.get(0).addOrder(order);
-				//System.out.println(orderService.saveOrder(order, orderContext));
+
 				newOrder = orderService.saveOrder(order, orderContext);
 
 			}
 		return newOrder;
+
 
 		}
 }
