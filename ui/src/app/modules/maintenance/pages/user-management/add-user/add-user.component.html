@@ -28,6 +28,7 @@
                 [value]="userForm?.value?.username"
                 placeholder="Username"
                 formControlName="username"
+                required=" required"
                 (keyup)="search($event)"
                 autocomplete="off"
               />
@@ -78,6 +79,7 @@
                 autocomplete="off"
                 matInput
                 placeholder="Confirm Password"
+                required=" required"
                 [type]="hide ? 'password' : 'text'"
                 [errorStateMatcher]="confirmErrorMatcher"
                 formControlName="confirmpassword"
@@ -94,6 +96,7 @@
               <input
                 autocomplete="off"
                 matInput
+                required=" required"
                 [value]="userForm?.value?.firstName"
                 placeholder="First Name"
                 formControlName="firstName"
@@ -126,6 +129,7 @@
                 autocomplete="off"
                 matInput
                 placeholder="Surname"
+                required=" required"
                 [value]="userForm?.value?.surname"
                 formControlName="surname"
                 autocomplete="off"
@@ -138,7 +142,7 @@
               (click)="onClickGender($event)"
             >
               <mat-label> Gender </mat-label>
-              <mat-select formControlName="gender">
+              <mat-select formControlName="gender" required=" required">
                 <mat-option
                   *ngFor="let option of genderValues"
                   [value]="option.value"
