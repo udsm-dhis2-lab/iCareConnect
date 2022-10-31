@@ -30,6 +30,7 @@ export class RegisterSampleComponent implements OnInit {
   referFromFacilityVisitAttribute$: Observable<string>;
 
   referringDoctorAttributes$: Observable<any>;
+  labNumberCharactersCount$: Observable<string>;
   constructor(
     private samplesService: SamplesService,
     private systemSettingsService: SystemSettingsService,
@@ -70,6 +71,11 @@ export class RegisterSampleComponent implements OnInit {
     this.agencyConceptConfigs$ = this.store.select(getConceptById, {
       id: this.LISConfigurations?.agencyConceptUuid,
     });
+
+    this.labNumberCharactersCount$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        "lis.settings.labNumber.charactersCount"
+      );
   }
 
   getSelection(event: MatRadioChange): void {
