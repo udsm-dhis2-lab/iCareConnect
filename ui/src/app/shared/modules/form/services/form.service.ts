@@ -226,6 +226,7 @@ export class FormService {
       // this.drugs = drugsResults?.results || [];
       // return formatDrugs(this.drugs);)
     } else if (searchControlType === "drugStock") {
+      let stockOutItemsReference = {};
       return zip(
         ...["stock?locationUuid", "stockout?location"].map((stockApiPath) => {
           return this.httpClient
@@ -237,6 +238,7 @@ export class FormService {
                 let formattedResponse = [];
                 if (stockApiPath === "stockout?location") {
                   formattedResponse = response?.map((responseItem) => {
+                    stockOutItemsReference[responseItem?.uuid] = responseItem;
                     return {
                       ...responseItem,
                       item: {
@@ -285,7 +287,33 @@ export class FormService {
             );
         })
       ).pipe(
-        map((responses) => orderBy(flatten(responses), ["display"], ["asc"]))
+        map((responses) => {
+          const allDrugItems = orderBy(
+            flatten(responses),
+            ["display", ["quantity"]],
+            ["asc"]["asc"]
+          );
+          const drugIitemsGroupedByItemUuid = groupBy(allDrugItems, "itemUuid");
+          const formattedDrugItems = Object.keys(
+            drugIitemsGroupedByItemUuid
+          ).map((itemUuid) => {
+            const totalQuantity = sumBy(
+              drugIitemsGroupedByItemUuid[itemUuid].map((batchData) => {
+                return batchData;
+              }),
+              "quantity"
+            );
+            return {
+              ...drugIitemsGroupedByItemUuid[itemUuid][0],
+              batches: drugIitemsGroupedByItemUuid[itemUuid],
+              name: drugIitemsGroupedByItemUuid[itemUuid][0]?.item?.drug
+                ?.display,
+              quantity: totalQuantity,
+              isStockOut: totalQuantity === 0 ? true : false,
+            };
+          });
+          return formattedDrugItems;
+        })
       );
     } else if (searchControlType === "residenceLocation") {
       return from(
