@@ -6,7 +6,8 @@
     preferredPersonIdentifier: preferredPersonIdentifier$ | async,
     agencyConceptConfigs: agencyConceptConfigs$ | async,
     referFromFacilityVisitAttribute: referFromFacilityVisitAttribute$ | async,
-    referringDoctorAttributes: referringDoctorAttributes$ | async
+    referringDoctorAttributes: referringDoctorAttributes$ | async,
+    labNumberCharactersCount: labNumberCharactersCount$ | async
   } as params"
 >
   <div class="row">
@@ -17,7 +18,8 @@
             !params?.mrnGeneratorSourceUuid ||
             !params?.preferredPersonIdentifier ||
             !params?.referringDoctorAttributes ||
-            !params?.referFromFacilityVisitAttribute
+            !params?.referFromFacilityVisitAttribute ||
+            !params?.labNumberCharactersCount
           "
           mode="indeterminate"
         ></mat-progress-bar>
@@ -26,7 +28,8 @@
             params?.mrnGeneratorSourceUuid &&
             params?.preferredPersonIdentifier &&
             params?.referringDoctorAttributes &&
-            params?.referFromFacilityVisitAttribute
+            params?.referFromFacilityVisitAttribute &&
+            params?.labNumberCharactersCount
           "
           [mrnGeneratorSourceUuid]="params?.mrnGeneratorSourceUuid"
           [preferredPersonIdentifier]="params?.preferredPersonIdentifier"
@@ -35,6 +38,7 @@
           [referFromFacilityVisitAttribute]="
             params?.referFromFacilityVisitAttribute
           "
+          [labNumberCharactersCount]="params?.labNumberCharactersCount"
           [referringDoctorAttributes]="params?.referringDoctorAttributes"
           [labSections]="labSections"
         ></app-single-registration>
