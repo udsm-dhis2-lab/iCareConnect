@@ -194,10 +194,23 @@
     <visit_attribute visit_attribute_id="104" visit_id="10" attribute_type_id="104" value_reference="123" uuid="298b75eb-er45-12e8-9c7c-42b0yt63cfep" creator="1"
                           voided="0" date_created="2020-12-27 00:00:00" />
 
+    <visit_attribute visit_attribute_id="105" visit_id="20" attribute_type_id="101" value_reference="e721ec30-5344-11e8-ie7c-40b6etw379ee" uuid="298b75eb-er45-12e8-9c7c-42b0yt63cfer" creator="1"
+                     voided="0" date_created="2020-12-27 00:00:00" />
+
+    <visit_attribute visit_attribute_id="106" visit_id="20" attribute_type_id="102" value_reference="e7jnec30-5344-11e8-ie7c-40b6etw3cfee" uuid="298b75eb-er45-12e8-9c7c-42b0yt63cfeO" creator="1"
+                     voided="0" date_created="2020-12-27 00:00:00" />
+
+
     <!-- Encounters -->
+    <encounter_type encounter_type_id="2" name="Admission"  creator="1"
+                    retired="false" date_created="2020-12-27 00:00:00" uuid="2msir5eb-5345-11e8-9c7c-40b034c3cfer"/>
+
     <encounter encounter_id="100" patient_id="1000" uuid="444395c-dd07-488d-8fd7-a748c9570000" visit_id="10" encounter_datetime="2020-10-14 00:00:00" date_created="2020-10-14 00:00:00" voided="false"/>
 
     <encounter encounter_id="200" patient_id="2000" uuid="444395c-dd07-488d-8fd7-a748c9570001" visit_id="20" encounter_datetime="2020-10-15 00:00:00" date_created="2020-10-15 00:00:00" voided="false"/>
+
+    <encounter encounter_id="300" patient_id="2000" encounter_type="2" uuid="444395c-dd07-488d-8fd7-a748c9570003" visit_id="20" encounter_datetime="2020-10-15 00:00:00" date_created="2020-10-15 00:00:00" voided="false"/>
+
 
     <encounter_type encounter_type_id="1" name="Registration"  creator="1"
                     retired="false" date_created="2020-12-27 00:00:00" uuid="2msir5eb-5345-11e8-9c7c-40b034c3cfee"/>
@@ -209,9 +222,14 @@
 <!--Order-->
     <order_type order_type_id="1" name="Misc Order"  creator="1" java_class_name="org.openmrs.Order"
                     retired="false" date_created="2020-12-27 00:00:00" uuid="2msir5eb-5345-11e8-9922-40b034c3cfee"/>
+    <order_type order_type_id="2" name="Bed Order"  creator="1" java_class_name="org.openmrs.Order"
+                retired="false" date_created="2020-12-27 00:00:00" uuid="2msir5eb-5345-11e8-9922-40b034c3cfef"/>
+
     <orders orderer="200" concept_id ="1003" creator="1" date_activated="2018-12-27 00:00:00" order_number="124" urgency="ROUTINE" care_setting="1" order_action="NEW" voided="false" order_type_id="1" date_created="2020-10-14 00:00:00" uuid="7634gd66-3333-4abd-8fd7-a748c9575" order_id="301" patient_id="1000" encounter_id="100"/>
 
     <orders orderer="200" concept_id ="1003" creator="1" date_activated="2018-12-27 00:00:00" order_number="125" urgency="ROUTINE" care_setting="1" order_action="NEW" voided="false" order_type_id="1" date_created="2020-10-15 00:00:00" uuid="7634gd66-3333-4abd-8fd7-a748c9575" order_id="301" patient_id="2000" encounter_id="100"/>
+
+    <orders orderer="200" concept_id ="1003" creator="1" date_activated="2018-12-27 00:00:00" order_number="126" urgency="ROUTINE" care_setting="1" order_action="NEW" voided="false" order_type_id="2" date_created="2020-10-15 00:00:00" uuid="7634gd66-3333-4abd-8fd7-a748c9576" order_id="302" patient_id="2000" encounter_id="300"/>
 
 
     <st_ledger_type ledger_type_id="321" uuid="8800zx3570-8z37-11ff-2234-01102007887" operation="+" name="stock in" date_created="2020-12-27 00:00:00" voided="false" creator="1"/>

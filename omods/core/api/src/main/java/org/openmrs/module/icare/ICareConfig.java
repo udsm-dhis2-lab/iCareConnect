@@ -86,4 +86,7 @@ public class ICareConfig {
 	public static final String EXEMPTION_REQUEST_ORDER_TYPE = "icare.orders.standard.exemption";
 	
 	public static final String END_CONSULTATION_CONCEPT = "iCare.visits.settings.controlVisitsEndingStatuses.ConceptUuid";
+
+	public static final String BED_ORDER_CONCEPT="icare.billing.accomodationChargesConcept";
+
 }
