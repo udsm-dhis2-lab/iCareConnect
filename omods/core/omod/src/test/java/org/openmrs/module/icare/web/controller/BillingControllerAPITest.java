@@ -522,13 +522,12 @@ public class BillingControllerAPITest extends BaseResourceControllerTest {
 
 		List<Invoice> patientInvoices = billingService.getPatientsInvoices("1f6959e5-d15a-4025-bb48-340ee9e2c58d");
 
+		assertThat("The order should be created", createdOrders.getUuid().length() > 1);
 		assertThat("Invoice should have 1 item", patientInvoices.get(0).getInvoiceItems().size(), is(1));
 
 		System.out.println(order);
 
 
-		//System.out.println(order.getUuid());
-		assertThat("The order should be created", createdOrders.getUuid().length() > 1);
 
 	}
 
