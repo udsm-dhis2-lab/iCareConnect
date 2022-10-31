@@ -261,11 +261,13 @@ export class FormService {
                   "itemUuid"
                 );
                 return Object.keys(groupedByItemUuid).map((itemUuid) => {
-                  const totalQuantity = sumBy(
-                    groupedByItemUuid[itemUuid].map((batchData) => {
-                      return batchData;
-                    }),
-                    "quantity"
+                  const totalQuantity = Number(
+                    sumBy(
+                      groupedByItemUuid[itemUuid].map((batchData) => {
+                        return batchData;
+                      }),
+                      "quantity"
+                    )
                   );
                   return {
                     uuid: groupedByItemUuid[itemUuid][0]?.item?.drug?.uuid,
@@ -297,17 +299,22 @@ export class FormService {
           const formattedDrugItems = Object.keys(
             drugIitemsGroupedByItemUuid
           ).map((itemUuid) => {
-            const totalQuantity = sumBy(
-              drugIitemsGroupedByItemUuid[itemUuid].map((batchData) => {
-                return batchData;
-              }),
-              "quantity"
+            const totalQuantity = Number(
+              sumBy(
+                drugIitemsGroupedByItemUuid[itemUuid].map((batchData) => {
+                  return batchData;
+                }),
+                "quantity"
+              )
             );
             return {
               ...drugIitemsGroupedByItemUuid[itemUuid][0],
               batches: drugIitemsGroupedByItemUuid[itemUuid],
-              name: drugIitemsGroupedByItemUuid[itemUuid][0]?.item?.drug
-                ?.display,
+              display:
+                drugIitemsGroupedByItemUuid[itemUuid][0]?.name +
+                " (" +
+                totalQuantity.toLocaleString("en-US") +
+                ") ",
               quantity: totalQuantity,
               isStockOut: totalQuantity === 0 ? true : false,
             };
