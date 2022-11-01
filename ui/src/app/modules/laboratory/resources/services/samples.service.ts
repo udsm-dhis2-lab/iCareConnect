@@ -327,7 +327,7 @@ export class SamplesService {
             _.map(patient?.identifiers, (identifier) => {
               if (identifier?.name == "MRN" || identifier?.display == "MRN") {
                 mrNo = identifier?.id;
-              } else if (identifier?.display.indexOf("MRN") > -1) {
+              } else if (identifier?.display?.indexOf("MRN") > -1) {
                 mrNo = identifier?.identifier;
               }
             });

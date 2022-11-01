@@ -31,6 +31,7 @@ export class RegisterSampleComponent implements OnInit {
 
   referringDoctorAttributes$: Observable<any>;
   labNumberCharactersCount$: Observable<string>;
+  testsFromExternalSystemsConfigs$: Observable<any[]>;
   constructor(
     private samplesService: SamplesService,
     private systemSettingsService: SystemSettingsService,
@@ -60,6 +61,11 @@ export class RegisterSampleComponent implements OnInit {
     this.referringDoctorAttributes$ =
       this.systemSettingsService.getSystemSettingsMatchingAKey(
         "lis.attributes.referringDoctor"
+      );
+
+    this.testsFromExternalSystemsConfigs$ =
+      this.systemSettingsService.getSystemSettingsMatchingAKey(
+        `iCare.externalSystems.integrated.tests`
       );
     this.store.dispatch(
       loadConceptByUuid({

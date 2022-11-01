@@ -19,7 +19,6 @@ export class NewPatientProfileComponent implements OnInit {
   constructor(private store: Store<AppState>) {}
 
   ngOnInit(): void {
-    console.log("==> Patient: ", this.currentPatient.patient);
     const phoneDetails =
       this.currentPatient.patient.person.attributes &&
       this.currentPatient.patient.person.attributes?.length > 0
