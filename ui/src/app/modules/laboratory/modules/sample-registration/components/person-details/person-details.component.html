@@ -65,6 +65,7 @@
   <app-clients-from-external-systems
     *ngIf="personDetailsCategory === 'other'"
     (selectedClientRequest)="getSelectedClientRequest($event)"
+    (system)="onGetSelectedSystem($event)"
   ></app-clients-from-external-systems>
 
   <div class="row primary-identifier">

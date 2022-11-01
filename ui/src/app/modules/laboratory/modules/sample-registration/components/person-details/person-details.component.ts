@@ -54,6 +54,10 @@ export class PersonDetailsComponent implements OnInit {
   fieldItems: QueryList<FieldComponent>;
 
   pinnedCategory: string;
+  @Output() selecedSystem: EventEmitter<any> = new EventEmitter<any>();
+
+  @Output() fromExternalSystem: EventEmitter<boolean> =
+    new EventEmitter<boolean>();
 
   constructor(
     private registrationService: RegistrationService,
@@ -360,6 +364,9 @@ export class PersonDetailsComponent implements OnInit {
 
   getSelection(event: MatRadioChange): void {
     this.personDetailsCategory = event?.value;
+    this.fromExternalSystem.emit(
+      this.personDetailsCategory === "other" ? true : false
+    );
 
     this.personDetails.emit({
       ...this.personDetailsData,
@@ -370,6 +377,10 @@ export class PersonDetailsComponent implements OnInit {
     if (this.personDetailsCategory === "new") {
       this.setPersonDetails();
     }
+  }
+
+  onGetSelectedSystem(system: any): void {
+    this.selecedSystem.emit(system);
   }
 
   getSelectedClientRequest(clientRequest: any): void {
