@@ -59,6 +59,8 @@
           [referFromFacilityVisitAttribute]="referFromFacilityVisitAttribute"
           [maximumDate]="maximumDate"
           (personDetails)="onGetPersonDetails($event)"
+          (fromExternalSystem)="onGetIsDataFromExternalSystem($event)"
+          (selecedSystem)="onGetSelectedSystem($event)"
         ></app-person-details>
       </fieldset>
     </div>
@@ -225,7 +227,7 @@
       </mat-stepper> -->
       <!-- ===================================================== Commented Mat Stepper ============================================================================= -->
       <ng-template matStepLabel>Sample Information</ng-template>
-      <div class="row">
+      <div class="row" *ngIf="!fromExternalSystem">
         <div class="col-lg-12 col-md-12 col-sx-12 col-sm-12">
           <div class="for-specimen-details">
             <fieldset>
@@ -342,7 +344,7 @@
       <ng-template *ngIf="registrationCategory === 'CLINICAL'" matStepLabel
         >Clinical Data</ng-template
       >
-      <div *ngIf="registrationCategory === 'CLINICAL'">
+      <div *ngIf="registrationCategory === 'CLINICAL' && !fromExternalSystem">
         <div class="clinical-data">
           <fieldset>
             <legend (click)="toggleFieldSet('clinicalData')" class="d-flex">
@@ -360,10 +362,12 @@
           </fieldset>
         </div>
       </div>
-      <ng-template *ngIf="registrationCategory === 'CLINICAL'" matStepLabel
+      <ng-template
+        *ngIf="registrationCategory === 'CLINICAL' && !fromExternalSystem"
+        matStepLabel
         >Referring Doctor</ng-template
       >
-      <div *ngIf="registrationCategory === 'CLINICAL'">
+      <div *ngIf="registrationCategory === 'CLINICAL' && !fromExternalSystem">
         <div class="referring-doctor-field">
           <fieldset>
             <legend (click)="toggleFieldSet('referingDoctor')" class="d-flex">
@@ -386,8 +390,9 @@
       <ng-template matStepLabel>Tests</ng-template>
       <div
         *ngIf="
-          (selectedSpecimenUuid && params?.testsUnderSpecimen) ||
-          !selectedSpecimenUuid
+          ((selectedSpecimenUuid || fromExternalSystem) &&
+            params?.testsUnderSpecimen) ||
+          (!selectedSpecimenUuid && !fromExternalSystem)
         "
       >
         <fieldset>
@@ -401,6 +406,9 @@
           <ng-container *ngIf="tests">
             <app-multiple-tests-selection
               [setMembersFromSpecimen]="params?.testsUnderSpecimen"
+              [selectedMembers]="
+                fromExternalSystem ? params?.testsUnderSpecimen : []
+              "
               (testsData)="onFormUpdateForTest($event)"
             ></app-multiple-tests-selection>
           </ng-container>

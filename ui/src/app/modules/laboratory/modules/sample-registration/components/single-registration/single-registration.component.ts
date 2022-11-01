@@ -2,15 +2,12 @@ import { Component, Input, OnInit } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { MatRadioChange } from "@angular/material/radio";
 import * as moment from "moment";
-import { Observable, zip } from "rxjs";
+import { Observable, of, zip } from "rxjs";
 import {
   EQA_PERSON_DATA,
   NON_CLINICAL_PERSON_DATA,
 } from "src/app/core/constants/non-clinical-person.constant";
-import {
-  determineIfAtLeastOneTestHasNoDepartment,
-  formulateSamplesByDepartments,
-} from "src/app/core/helpers/create-samples-as-per-departments.helper";
+import { formulateSamplesByDepartments } from "src/app/core/helpers/create-samples-as-per-departments.helper";
 import { Location } from "src/app/core/models";
 import { SystemSettingsWithKeyDetails } from "src/app/core/models/system-settings.model";
 import { LocationService } from "src/app/core/services";
@@ -35,6 +32,7 @@ import { uniqBy, keyBy, omit } from "lodash";
 import { OrdersService } from "src/app/shared/resources/order/services/orders.service";
 import { SampleRegistrationFinalizationComponent } from "../sample-registration-finalization/sample-registration-finalization.component";
 import { ConceptsService } from "src/app/shared/resources/concepts/services/concepts.service";
+import { map } from "rxjs/operators";
 
 @Component({
   selector: "app-single-registration",
@@ -51,6 +49,7 @@ export class SingleRegistrationComponent implements OnInit {
   @Input() referringDoctorAttributes: SystemSettingsWithKeyDetails[];
   @Input() labSections: ConceptGetFull[];
   @Input() labNumberCharactersCount: string;
+  @Input() testsFromExternalSystemsConfigs: any[];
 
   departmentField: any = {};
   specimenDetailsFields: any;
@@ -112,6 +111,8 @@ export class SingleRegistrationComponent implements OnInit {
   collectedOnTime: any;
   receivedOnTime: any;
   maxForBroughtOn: boolean = true;
+  selectedSystem: any;
+  fromExternalSystem: boolean;
 
   constructor(
     private samplesService: SamplesService,
@@ -130,6 +131,10 @@ export class SingleRegistrationComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    console.log(
+      "testsFromExternalSystemsConfigs",
+      this.testsFromExternalSystemsConfigs
+    );
     this.labSampleLabel$ = this.samplesService.getSampleLabel();
     this.referringDoctorFields = this.referringDoctorAttributes.map(
       (attribute) => {
@@ -575,6 +580,28 @@ export class SingleRegistrationComponent implements OnInit {
         : this.registrationCategory === "EQA"
         ? EQA_PERSON_DATA
         : NON_CLINICAL_PERSON_DATA;
+    if (this.fromExternalSystem && this.selectedSystem) {
+      // console.log(
+      //   "this.testsFromExternalSystemsConfigs",
+      //   this.testsFromExternalSystemsConfigs
+      // );
+      // console.log(this.selectedSystem);
+      // console.log(
+      //   this.testsFromExternalSystemsConfigs.filter(
+      //     (testConfigs) =>
+      //       testConfigs?.referenceKeyPart ===
+      //       this.selectedSystem?.testsSearchingKey
+      //   ) || []
+      // );
+      const uuid = (this.testsFromExternalSystemsConfigs.filter(
+        (testConfigs) =>
+          testConfigs?.referenceKeyPart ===
+          this.selectedSystem?.testsSearchingKey
+      ) || [])[0]?.value;
+      this.testsUnderSpecimen$ = this.conceptService
+        .getConceptDetailsByUuid(uuid, "custom:(uuid,display)")
+        .pipe(map((response) => [response]));
+    }
   }
 
   formatToSpecifiedChars(labNumber): string {
@@ -1589,5 +1616,14 @@ export class SingleRegistrationComponent implements OnInit {
       })
       .afterClosed()
       .subscribe();
+  }
+
+  onGetIsDataFromExternalSystem(fromExternalSystem: boolean): void {
+    this.fromExternalSystem = fromExternalSystem;
+    this.testsUnderSpecimen$ = of(null);
+  }
+
+  onGetSelectedSystem(system): void {
+    this.selectedSystem = system;
   }
 }

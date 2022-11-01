@@ -15,6 +15,7 @@ import { MatRadioChange } from "@angular/material/radio";
 })
 export class MultipleTestsSelectionComponent implements OnInit {
   @Input() setMembersFromSpecimen: ConceptGetFull[];
+  @Input() selectedMembers: any[];
   testsFormField: any;
   testsFormData: any = {};
   conceptsList$: Observable<ConceptGetFull[]>;
@@ -33,6 +34,12 @@ export class MultipleTestsSelectionComponent implements OnInit {
       this.testSelectionCategory = "All";
     }
 
+    this.selectedSetMembersItems = [
+      ...this.selectedSetMembersItems,
+      ...this.selectedMembers,
+    ];
+    this.testSelectionCategory =
+      this.selectedSetMembersItems?.length > 0 ? "by-specimen" : "All";
     this.conceptsList$ = !this.setMembersFromSpecimen
       ? this.conceptService.getConceptsBySearchTerm("TEST_ORDERS")
       : of(
