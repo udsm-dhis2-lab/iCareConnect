@@ -422,7 +422,7 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 					try {
 						if (!(visitWrapper.isInsurance() && visitWrapper.getInsuranceName().toLowerCase().equals("nhif"))) {
 							Context.getVisitService().endVisit(visit, new Date());
-
+							
 						}
 					}
 					catch (ConfigurationException e) {

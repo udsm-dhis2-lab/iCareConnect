@@ -264,11 +264,11 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 
 
 					}*/
-
+					
 					//If it exists update the discount item amount with the price times quantity
-
+					
 					//If it does not exist then create a discount invoice item and set the amount based on the price times the quantity
-
+					
 					//Save the discounts
 				}
 				
@@ -665,56 +665,52 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 	}
 	
 	public Order createOrderForOngoingIPDPatients() throws Exception {
-
+		
 		Order order = new Order();
 		Order newOrder = new Order();
 		OrderService orderService = Context.getService(OrderService.class);
-
-
+		
 		List<Visit> visits = dao.getOpenAdmittedVisit();
 
-
+		
 		for (Visit visit : visits) {
-
+			
 			AdministrationService administrationService = Context.getService(AdministrationService.class);
-
+			
 			String bedOrderTypeUUID = administrationService.getGlobalProperty(ICareConfig.BED_ORDER_TYPE);
-			if(bedOrderTypeUUID ==null){
+			if (bedOrderTypeUUID == null) {
 				throw new ConfigurationException("Bed Order Type is not configured. Please check "
-						+ ICareConfig.BED_ORDER_TYPE + ".");
+				        + ICareConfig.BED_ORDER_TYPE + ".");
 			}
 			String bedOrderConceptUUID = administrationService.getGlobalProperty(ICareConfig.BED_ORDER_CONCEPT);
-			if(bedOrderConceptUUID ==null){
+			if (bedOrderConceptUUID == null) {
 				throw new ConfigurationException("Bed Order Concept is not configured. Please check "
-						+ ICareConfig.BED_ORDER_CONCEPT + ".");
+				        + ICareConfig.BED_ORDER_CONCEPT + ".");
 			}
-
-				OrderType bedOrderOrderType = Context.getOrderService().getOrderTypeByUuid(bedOrderTypeUUID);
-
-				Provider provider = Context.getProviderService().getProvider(1);
-
-				Concept concept = Context.getConceptService().getConceptByUuid(bedOrderConceptUUID);
-				System.out.println(concept.getUuid());
-
-
-				order.setPatient(visit.getPatient());
-				System.out.println("aaaa "+visit.getPatient().getId());
-				order.setAction(Order.Action.NEW);
-				order.setCareSetting(orderService.getCareSettingByName("Inpatient"));
-				order.setOrderType(bedOrderOrderType);
-				order.setConcept(concept);
-				order.setOrderer(provider);
-				order.setEncounter((Encounter) visit.getEncounters().toArray()[0]);
-				OrderContext orderContext = new OrderContext();
-				orderContext.setCareSetting(orderService.getCareSetting(1));
-				System.out.println(orderContext);
-				System.out.println(order);
-
-				newOrder = orderService.saveOrder(order, orderContext);
-
-			}
-		return newOrder;
-
-
+			
+			OrderType bedOrderOrderType = Context.getOrderService().getOrderTypeByUuid(bedOrderTypeUUID);
+			
+			Provider provider = Context.getProviderService().getProvider(1);
+			
+			Concept concept = Context.getConceptService().getConceptByUuid(bedOrderConceptUUID);
+			System.out.println(concept.getUuid());
+			
+			order.setPatient(visit.getPatient());
+			order.setAction(Order.Action.NEW);
+			order.setCareSetting(orderService.getCareSettingByName("Inpatient"));
+			order.setOrderType(bedOrderOrderType);
+			order.setConcept(concept);
+			order.setOrderer(provider);
+			order.setEncounter((Encounter) visit.getEncounters().toArray()[0]);
+			OrderContext orderContext = new OrderContext();
+			orderContext.setCareSetting(orderService.getCareSetting(1));
+			System.out.println(orderContext);
+			System.out.println(order);
+			
+			newOrder = orderService.saveOrder(order, orderContext);
+			
 		}
+		return newOrder;
+		
+	}
 }
