@@ -617,4 +617,13 @@ public class ICareDao extends BaseDAO<Item> {
 		query.setParameter("concept", concept);
 		return query.list();
 	}
+
+	public List<Visit> getOpenAdmittedVisit() {
+		DbSession session = getSession();
+		String queryStr = "SELECT v FROM Visit v LEFT JOIN v.encounters e LEFT JOIN e.orders o LEFT JOIN o.orderType ot WHERE ot.name='Bed Order' AND v.stopDatetime IS NULL";
+		Query query = session.createQuery(queryStr);
+
+		return query.list();
+	}
+
 }
