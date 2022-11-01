@@ -101,7 +101,7 @@ export class AddUserComponent implements OnInit {
   ngOnInit() {
     if (this.user && this.user?.uuid) {
       this.selectedModules = this.user?.userProperties?.preferredModules
-        ? this.systemModules.filter(
+        ? this.systemModules?.filter(
             (module) =>
               (
                 JSON.parse(this.user?.userProperties?.preferredModules)?.filter(
