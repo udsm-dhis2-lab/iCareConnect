@@ -410,9 +410,9 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	public void stopVisits() throws APIException {
 		AdministrationService adminService = Context.getService(AdministrationService.class);
 		String hoursVisitEnd = adminService.getGlobalProperty(ICareConfig.VISIT_LENGTH_IN_HOURS);
-		
 		if (hoursVisitEnd == null || hoursVisitEnd.trim().equals("")) {
 			//newDate = new Date(System.currentTimeMillis() - TimeUnit.HOURS.toMillis(24));
+
 		} else {
 			Date newDate = new Date(System.currentTimeMillis() - TimeUnit.HOURS.toMillis(Integer.valueOf(hoursVisitEnd)));
 			List<Visit> visits = dao.getOpenVisit();
@@ -504,7 +504,7 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		if (visit.getStopDatetime() == null) {
 			for (Encounter encounter : visit.getEncounters()) {
 				for (Order order : encounter.getOrders()) {
-					if (order.getOrderType().getName().equals("Bed Order") && (new Date()).before(order.getAutoExpireDate())) {
+					if (order.getOrderType().getName().equals("Bed Order")) {
 						return true;
 					}
 				}
