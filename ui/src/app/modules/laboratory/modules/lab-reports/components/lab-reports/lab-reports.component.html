@@ -91,7 +91,7 @@
         <div *ngIf="!currentReport?.hardCoded">
           <div class="row">
             <div class="col-2" style="display: inline-block; width: 16.67%">
-              <img src="assets/images/udsm-logo.webp" height="90" />
+              <img [src]="params?.facilityDetails?.logo" height="90" />
               <!-- <img src="assets/images/tanzania-logo.png" height="90" /> -->
             </div>
             <div class="col-8" style="display: inline-block; width: 66.67%">
