@@ -73,7 +73,7 @@ export class StockService {
   }
 
   getStockOuts(locationUuid?: string): Observable<StockObject[]> {
-    return this._getStocks("store/stockout", locationUuid);
+    return this._getStocks("store/stockout", locationUuid, null, true);
   }
 
   saveStockLedger(ledgerInput: LedgerInput): Observable<any> {
@@ -85,12 +85,10 @@ export class StockService {
       });
     }
 
-    return this.httpClient
-      .post("store/ledger", storeLedger)
-      .pipe(
-        map((response) => new StockBatch(response)), 
-        catchError((error) => of(error))
-      )
+    return this.httpClient.post("store/ledger", storeLedger).pipe(
+      map((response) => new StockBatch(response)),
+      catchError((error) => of(error))
+    );
   }
 
   getStockMetrics(locationUuid: string) {
@@ -100,8 +98,9 @@ export class StockService {
   private _getStocks(
     url: string,
     locationUuid?: string,
-    params?: any
-  ): Observable<any|StockObject[]> {
+    params?: any,
+    isStockOut?: boolean
+  ): Observable<any | StockObject[]> {
     let parameters = [];
     if (params?.q) {
       parameters = [...parameters, `q=${params?.q}`];
@@ -117,7 +116,7 @@ export class StockService {
     }
     return this.httpClient
       .get(
-        `${url}?locationUuid=${locationUuid}${
+        `${url}?${isStockOut ? "location" : "locationUuid"}=${locationUuid}${
           parameters?.length > 0 ? "&" + parameters?.join("&") : ""
         }`
       )

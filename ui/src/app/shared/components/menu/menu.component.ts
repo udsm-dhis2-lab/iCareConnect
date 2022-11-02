@@ -1,7 +1,7 @@
 import { Component, OnInit } from "@angular/core";
 import { Router } from "@angular/router";
 import { select, Store } from "@ngrx/store";
-import { Observable } from "rxjs";
+import { Observable, of } from "rxjs";
 import { Location } from "src/app/core/models";
 import {
   addLoadedUserDetails,
@@ -39,6 +39,7 @@ import { initiateEncounterType } from "src/app/store/actions/encounter-type.acti
 import { getLISConfigurations } from "src/app/store/selectors/lis-configurations.selectors";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { OpenmrsHttpClientService } from "../../modules/openmrs-http-client/services/openmrs-http-client.service";
+import { catchError, map } from "rxjs/operators";
 
 @Component({
   selector: "app-menu",
@@ -168,12 +169,20 @@ export class MenuComponent implements OnInit {
   }
 
   pingSession(): void {
-    this.httpClient.get(`location?tag=Login+Location`).subscribe((response) => {
-      if (response && !response?.error) {
-        console.warn(response);
-      } else if (response && response?.error) {
-        this.store.dispatch(go({ path: ["login"] }));
-      }
-    });
+    this.httpClient
+      .get(`location?tag=Login+Location`)
+      .pipe(
+        map((response) => {
+          return response;
+        }),
+        catchError((error) => of(error))
+      )
+      .subscribe((response) => {
+        if (response && !response?.error) {
+          console.warn(response);
+        } else if (response && response?.error) {
+          this.store.dispatch(go({ path: ["login"] }));
+        }
+      });
   }
 }

@@ -15,7 +15,7 @@
   <div
     *ngIf="
       params?.datesParameters &&
-      params?.labSamplesDepartments?.length > 0 &&
+      params?.labSamplesDepartments &&
       params?.labSamplesContainers &&
       params?.configs &&
       params?.codedSampleRejectionReasons &&
@@ -45,7 +45,7 @@
     *ngIf="
       !params?.sampleTypes ||
       !params?.labSamplesDepartments ||
-      params?.labSamplesDepartments?.length == 0 ||
+      !params?.labSamplesDepartments ||
       !params?.codedSampleRejectionReasons ||
       !params?.LISConfigurations
     "

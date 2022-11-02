@@ -414,4 +414,5 @@ public class BillingOrderTest extends BillingTestBase {
 		assertThat("Invoice should have 1 item", patientInvoices.get(0).getInvoiceItems().size(), is(1));
 		
 	}
+	
 }

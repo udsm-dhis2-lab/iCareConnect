@@ -664,4 +664,53 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 		return invoice;
 	}
 	
+	public Order createOrderForOngoingIPDPatients() throws Exception {
+		
+		Order order = new Order();
+		Order newOrder = new Order();
+		OrderService orderService = Context.getService(OrderService.class);
+		
+		List<Visit> visits = dao.getOpenAdmittedVisit();
+
+		
+		for (Visit visit : visits) {
+			
+			AdministrationService administrationService = Context.getService(AdministrationService.class);
+			
+			String bedOrderTypeUUID = administrationService.getGlobalProperty(ICareConfig.BED_ORDER_TYPE);
+			if (bedOrderTypeUUID == null) {
+				throw new ConfigurationException("Bed Order Type is not configured. Please check "
+				        + ICareConfig.BED_ORDER_TYPE + ".");
+			}
+			String bedOrderConceptUUID = administrationService.getGlobalProperty(ICareConfig.BED_ORDER_CONCEPT);
+			if (bedOrderConceptUUID == null) {
+				throw new ConfigurationException("Bed Order Concept is not configured. Please check "
+				        + ICareConfig.BED_ORDER_CONCEPT + ".");
+			}
+			
+			OrderType bedOrderOrderType = Context.getOrderService().getOrderTypeByUuid(bedOrderTypeUUID);
+			
+			Provider provider = Context.getProviderService().getProvider(1);
+			
+			Concept concept = Context.getConceptService().getConceptByUuid(bedOrderConceptUUID);
+			System.out.println(concept.getUuid());
+			
+			order.setPatient(visit.getPatient());
+			order.setAction(Order.Action.NEW);
+			order.setCareSetting(orderService.getCareSettingByName("Inpatient"));
+			order.setOrderType(bedOrderOrderType);
+			order.setConcept(concept);
+			order.setOrderer(provider);
+			order.setEncounter((Encounter) visit.getEncounters().toArray()[0]);
+			OrderContext orderContext = new OrderContext();
+			orderContext.setCareSetting(orderService.getCareSetting(1));
+			System.out.println(orderContext);
+			System.out.println(order);
+			
+			newOrder = orderService.saveOrder(order, orderContext);
+			
+		}
+		return newOrder;
+		
+	}
 }

@@ -13,6 +13,7 @@ import { TextArea } from "../../modules/form/models/text-area.model";
 })
 export class ConceptsFormComponent implements OnInit {
   @Input() conceptFields: any[];
+  @Input() textfield: boolean;
 
   @Output() formUpdate = new EventEmitter();
   conceptFieldsMap: any[];
@@ -42,9 +43,24 @@ export class ConceptsFormComponent implements OnInit {
         if (
           conceptField?.setMembers?.length === 0 &&
           conceptField?.answers.length === 0 &&
-          conceptField?.datatype?.display?.toLowerCase() === "text"
+          conceptField?.datatype?.display?.toLowerCase() === "text" && !this.textfield
         ) {
           return new TextArea({
+            id: conceptField?.uuid,
+            key: conceptField?.uuid,
+            label: conceptField?.display,
+            required: false,
+            conceptClass: conceptField?.conceptClass?.display,
+            type:
+              conceptField?.datatype?.display?.toLowerCase(),
+          });
+        }
+        if (
+          conceptField?.setMembers?.length === 0 &&
+          conceptField?.answers.length === 0 &&
+          conceptField?.datatype?.display?.toLowerCase() === "text" && this.textfield
+        ) {
+          return new Textbox({
             id: conceptField?.uuid,
             key: conceptField?.uuid,
             label: conceptField?.display,

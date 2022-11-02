@@ -218,7 +218,10 @@ export class LabSamplesEffects {
                           ...order?.order?.concept,
                           ...keyedSpecimenSources[order?.order?.concept?.uuid],
                           uuid: order?.order?.concept?.uuid,
-                          display: order?.order?.concept?.display,
+                          display:
+                            order?.order?.concept?.display?.indexOf(":") > -1
+                              ? order?.order?.concept?.display?.split(":")[1]
+                              : order?.order?.concept?.display,
                           selectionOptions:
                             keyedSpecimenSources[order?.order?.concept?.uuid]
                               ?.hiNormal &&
@@ -243,6 +246,10 @@ export class LabSamplesEffects {
                                   (member) => {
                                     return {
                                       ...member,
+                                      display:
+                                        member?.display?.indexOf(":") > -1
+                                          ? member?.display?.split(":")[1]
+                                          : member?.display,
                                       selectionOptions:
                                         member?.hiNormal && member?.lowNormal
                                           ? generateSelectionOptions(

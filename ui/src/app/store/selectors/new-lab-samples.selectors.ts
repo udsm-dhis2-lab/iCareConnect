@@ -390,7 +390,8 @@ export const getFormattedAcceptedLabSamples = (
 
 export const getFormattedLabSamplesToFeedResults = createSelector(
   getAllFormattedLabSamples,
-  (samples, props) => {
+  getLISConfigurations,
+  (samples, LISConfigs, props) => {
     const unCompletedSamples = _.map(
       _.filter(samples, (sample) => {
         const completedOrders = getCompletedOrders(sample?.orders);
@@ -405,6 +406,8 @@ export const getFormattedLabSamplesToFeedResults = createSelector(
       (sample) => {
         return {
           ...sample,
+          hasResult:
+            getOrdersWithResults(sample?.orders)?.length > 0 ? true : false,
           atLeastOneHasFirstSignOff:
             getOrdersWithFirstSigOff(sample?.orders)?.length > 0 ? true : false,
           atLeastOneHasResults:
@@ -416,10 +419,13 @@ export const getFormattedLabSamplesToFeedResults = createSelector(
         };
       }
     );
+
     return (
       _.filter(
         _.orderBy(
-          unCompletedSamples,
+          !LISConfigs?.isLIS
+            ? unCompletedSamples
+            : unCompletedSamples?.filter((sample) => !sample?.hasResult) || [],
           ["priorityOrderNumber", "dateCreated"],
           ["asc", "desc"]
         ),

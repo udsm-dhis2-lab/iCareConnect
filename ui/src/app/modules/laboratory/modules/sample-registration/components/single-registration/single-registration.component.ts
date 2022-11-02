@@ -2,15 +2,12 @@ import { Component, Input, OnInit } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { MatRadioChange } from "@angular/material/radio";
 import * as moment from "moment";
-import { Observable, zip } from "rxjs";
+import { Observable, of, zip } from "rxjs";
 import {
   EQA_PERSON_DATA,
   NON_CLINICAL_PERSON_DATA,
 } from "src/app/core/constants/non-clinical-person.constant";
-import {
-  determineIfAtLeastOneTestHasNoDepartment,
-  formulateSamplesByDepartments,
-} from "src/app/core/helpers/create-samples-as-per-departments.helper";
+import { formulateSamplesByDepartments } from "src/app/core/helpers/create-samples-as-per-departments.helper";
 import { Location } from "src/app/core/models";
 import { SystemSettingsWithKeyDetails } from "src/app/core/models/system-settings.model";
 import { LocationService } from "src/app/core/services";
@@ -35,6 +32,7 @@ import { uniqBy, keyBy, omit } from "lodash";
 import { OrdersService } from "src/app/shared/resources/order/services/orders.service";
 import { SampleRegistrationFinalizationComponent } from "../sample-registration-finalization/sample-registration-finalization.component";
 import { ConceptsService } from "src/app/shared/resources/concepts/services/concepts.service";
+import { map } from "rxjs/operators";
 
 @Component({
   selector: "app-single-registration",
@@ -50,6 +48,8 @@ export class SingleRegistrationComponent implements OnInit {
   @Input() referFromFacilityVisitAttribute: string;
   @Input() referringDoctorAttributes: SystemSettingsWithKeyDetails[];
   @Input() labSections: ConceptGetFull[];
+  @Input() labNumberCharactersCount: string;
+  @Input() testsFromExternalSystemsConfigs: any[];
 
   departmentField: any = {};
   specimenDetailsFields: any;
@@ -111,6 +111,8 @@ export class SingleRegistrationComponent implements OnInit {
   collectedOnTime: any;
   receivedOnTime: any;
   maxForBroughtOn: boolean = true;
+  selectedSystem: any;
+  fromExternalSystem: boolean;
 
   constructor(
     private samplesService: SamplesService,
@@ -129,6 +131,10 @@ export class SingleRegistrationComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    console.log(
+      "testsFromExternalSystemsConfigs",
+      this.testsFromExternalSystemsConfigs
+    );
     this.labSampleLabel$ = this.samplesService.getSampleLabel();
     this.referringDoctorFields = this.referringDoctorAttributes.map(
       (attribute) => {
@@ -320,9 +326,12 @@ export class SingleRegistrationComponent implements OnInit {
   getSelectedReceivedOnTime(event: Event): void {
     this.receivedOnTime = (event.target as any)?.value;
     this.receivedOnTimeValid = this.isValidTime(
-      this.receivedOnTime, 
-      this.receivedOnDateLatestValue ? this.receivedOnDateLatestValue : this.maximumDate)
-    if(this.collectedOnTime || this.broughtOnTime){
+      this.receivedOnTime,
+      this.receivedOnDateLatestValue
+        ? this.receivedOnDateLatestValue
+        : this.maximumDate
+    );
+    if (this.collectedOnTime || this.broughtOnTime) {
       let valid1 = this.isValidTime(
         this.broughtOnTime ? this.broughtOnTime : this.collectedOnTime,
         this.broughtOnDateLatestValue
@@ -353,14 +362,14 @@ export class SingleRegistrationComponent implements OnInit {
       },
     };
   }
-  
+
   getSelectedRCollectedOnTime(event: Event): void {
     this.collectedOnTime = (event.target as any)?.value;
     this.collectedOnTimeValid = this.isValidTime(
       this.collectedOnTime,
       this.collectedOnDateLatestValue
         ? this.collectedOnDateLatestValue
-        : this.maximumDate,
+        : this.maximumDate
     );
     if (this.broughtOnTime || this.receivedOnTime) {
       this.collectedOnTimeValid = this.isValidTime(
@@ -368,9 +377,7 @@ export class SingleRegistrationComponent implements OnInit {
         this.collectedOnDateLatestValue
           ? this.collectedOnDateLatestValue
           : this.maximumDate,
-        this.broughtOnTime
-          ? this.broughtOnTime
-          : this.receivedOnTime,
+        this.broughtOnTime ? this.broughtOnTime : this.receivedOnTime,
         this.broughtOnDateLatestValue
           ? this.broughtOnDateLatestValue
           : this?.receivedOnDateLatestValue
@@ -388,10 +395,10 @@ export class SingleRegistrationComponent implements OnInit {
 
   getSelectedBroughtOnTime(event: Event): void {
     this.broughtOnTime = (event.target as any)?.value;
-    let valid1:boolean = true;
-    let valid2:boolean = true;
-    let valid3:boolean = true;
-    let valid4:boolean = true;
+    let valid1: boolean = true;
+    let valid2: boolean = true;
+    let valid3: boolean = true;
+    let valid4: boolean = true;
     valid1 = this.isValidTime(
       this.broughtOnTime,
       this.broughtOnDateLatestValue
@@ -409,18 +416,20 @@ export class SingleRegistrationComponent implements OnInit {
         this.receivedOnDateLatestValue
           ? this.receivedOnDateLatestValue
           : this.maximumDate
-        );
-        valid3 = valid1 && valid2 ? true : false;
+      );
+      valid3 = valid1 && valid2 ? true : false;
     }
-    if(this.collectedOnTime){
+    if (this.collectedOnTime) {
       valid4 = this.isValidTime(
-      this.collectedOnTime,
-      this.collectedOnDateLatestValue ? this.collectedOnDateLatestValue : this.maximumDate,
-      this.broughtOnTime,
+        this.collectedOnTime,
+        this.collectedOnDateLatestValue
+          ? this.collectedOnDateLatestValue
+          : this.maximumDate,
+        this.broughtOnTime,
         this.broughtOnDateLatestValue
           ? this.broughtOnDateLatestValue
-          : this.maximumDate,
-      )
+          : this.maximumDate
+      );
     }
     this.broughtOnTimeValid = valid1 && valid2 && valid3 && valid4;
     this.formData = {
@@ -439,7 +448,7 @@ export class SingleRegistrationComponent implements OnInit {
       let collected_on_date;
       collected_on_date = this.getDateStringFromDate(
         new Date(formValues.getValues()?.collectedOn?.value)
-        );
+      );
       this.collectedOnDateLatestValue = collected_on_date;
       this.collectedOnTimeValid = this.isValidTime(
         this.collectedOnTime,
@@ -474,8 +483,6 @@ export class SingleRegistrationComponent implements OnInit {
           : this.maximumDate
       );
     }
-    
-
 
     this.minForReceivedOn = false;
     this.receivedOnField.min = this.broughtOnDateLatestValue
@@ -483,13 +490,18 @@ export class SingleRegistrationComponent implements OnInit {
       : this.collectedOnDateLatestValue;
     this.broughtOnField.min = this.collectedOnDateLatestValue
       ? this.collectedOnDateLatestValue
-      : ""
+      : "";
     this.minForReceivedOn = true;
 
-    
     this.maxForCollectedOn = false;
-    this.sampleColectionDateField.max = this.broughtOnDateLatestValue ? this.broughtOnDateLatestValue : this.receivedOnDateLatestValue ? this.receivedOnDateLatestValue : this.maximumDate;
-    this.broughtOnField.max = this.receivedOnDateLatestValue ? this.receivedOnDateLatestValue : this.maximumDate
+    this.sampleColectionDateField.max = this.broughtOnDateLatestValue
+      ? this.broughtOnDateLatestValue
+      : this.receivedOnDateLatestValue
+      ? this.receivedOnDateLatestValue
+      : this.maximumDate;
+    this.broughtOnField.max = this.receivedOnDateLatestValue
+      ? this.receivedOnDateLatestValue
+      : this.maximumDate;
     this.maxForCollectedOn = true;
 
     // this.getDateStringFromMoment_i();
@@ -568,6 +580,41 @@ export class SingleRegistrationComponent implements OnInit {
         : this.registrationCategory === "EQA"
         ? EQA_PERSON_DATA
         : NON_CLINICAL_PERSON_DATA;
+    if (this.fromExternalSystem && this.selectedSystem) {
+      // console.log(
+      //   "this.testsFromExternalSystemsConfigs",
+      //   this.testsFromExternalSystemsConfigs
+      // );
+      // console.log(this.selectedSystem);
+      // console.log(
+      //   this.testsFromExternalSystemsConfigs.filter(
+      //     (testConfigs) =>
+      //       testConfigs?.referenceKeyPart ===
+      //       this.selectedSystem?.testsSearchingKey
+      //   ) || []
+      // );
+      const uuid = (this.testsFromExternalSystemsConfigs.filter(
+        (testConfigs) =>
+          testConfigs?.referenceKeyPart ===
+          this.selectedSystem?.testsSearchingKey
+      ) || [])[0]?.value;
+      this.testsUnderSpecimen$ = this.conceptService
+        .getConceptDetailsByUuid(uuid, "custom:(uuid,display)")
+        .pipe(map((response) => [response]));
+    }
+  }
+
+  formatToSpecifiedChars(labNumber): string {
+    let generatedStr = "";
+    for (
+      let count = 0;
+      count <
+      Number(this.labNumberCharactersCount) - labNumber.toString()?.length;
+      count++
+    ) {
+      generatedStr = generatedStr + "0";
+    }
+    return generatedStr + labNumber.toString();
   }
 
   onGetClinicalDataValues(clinicalData): void {
@@ -904,16 +951,12 @@ export class SingleRegistrationComponent implements OnInit {
                                                           sampleLabelResponse
                                                         ) {
                                                           // Create sample
+                                                          // TODO: Softcode base characters (NPHL)
                                                           const sampleLabel =
-                                                            "LIS/TZ/" +
-                                                            new Date().getFullYear() +
-                                                            "/" +
-                                                            (new Date().getMonth() +
-                                                              1) +
-                                                            "/" +
-                                                            new Date().getDate() +
-                                                            "/" +
-                                                            sampleLabelResponse;
+                                                            "NPHL" +
+                                                            this.formatToSpecifiedChars(
+                                                              sampleLabelResponse
+                                                            );
                                                           const sample = {
                                                             visit: {
                                                               uuid: visitResponse?.uuid,
@@ -1262,7 +1305,7 @@ export class SingleRegistrationComponent implements OnInit {
                                                                             ?.value ||
                                                                           "NO PERSON SPECIFIED",
                                                                         status:
-                                                                          "BROUGHT_BY",
+                                                                          "DELIVERED_BY",
                                                                         timestamp:
                                                                           new Date(
                                                                             (this
@@ -1503,32 +1546,54 @@ export class SingleRegistrationComponent implements OnInit {
     }
   }
 
-  isValidTime(time: string, date: string, validTime?: string, validDate?: string): boolean {
-    if(time){
+  isValidTime(
+    time: string,
+    date: string,
+    validTime?: string,
+    validDate?: string
+  ): boolean {
+    if (time) {
       let currentDate = new Date();
-  
+
       let hours = time.split(":")[0];
       let mins = time.split(":")[1];
       let year = date?.split("-")[0];
-      let month = date?.split("-")[1].toString()?.length > 1 ? date?.split("-")[1] : `0${date?.split("-")[1]}`
-      let day = date?.split("-")[2].toString()?.length > 1 ? date?.split("-")[2] : `0${date?.split("-")[2]}`;
-      let inputDateString = `${year}-${month}-${day}`
-  
+      let month =
+        date?.split("-")[1].toString()?.length > 1
+          ? date?.split("-")[1]
+          : `0${date?.split("-")[1]}`;
+      let day =
+        date?.split("-")[2].toString()?.length > 1
+          ? date?.split("-")[2]
+          : `0${date?.split("-")[2]}`;
+      let inputDateString = `${year}-${month}-${day}`;
+
       let thisHours = validTime
         ? parseInt(validTime?.split(":")[0])
         : currentDate.getHours();
-      let thisMinutes = validTime ? parseInt(validTime?.split(":")[1]) : currentDate.getMinutes();
+      let thisMinutes = validTime
+        ? parseInt(validTime?.split(":")[1])
+        : currentDate.getMinutes();
       let thisYear = currentDate.getFullYear();
-      let thisMonth = (currentDate.getMonth()+1).toString()?.length > 1 ? currentDate.getMonth()+1 : `0${currentDate.getMonth()+1}`;
-      let thisDay = currentDate.getDate().toString()?.length > 1 ? currentDate.getDate() : `0${currentDate.getDate()}`;
+      let thisMonth =
+        (currentDate.getMonth() + 1).toString()?.length > 1
+          ? currentDate.getMonth() + 1
+          : `0${currentDate.getMonth() + 1}`;
+      let thisDay =
+        currentDate.getDate().toString()?.length > 1
+          ? currentDate.getDate()
+          : `0${currentDate.getDate()}`;
       let currentDateString = `${thisYear}-${thisMonth}-${thisDay}`;
-  
+
       currentDateString = validDate ? validDate : currentDateString;
 
-      if (inputDateString === currentDateString && parseInt(hours) > thisHours) {
+      if (
+        inputDateString === currentDateString &&
+        parseInt(hours) > thisHours
+      ) {
         return false;
       }
-      if ( 
+      if (
         inputDateString === currentDateString &&
         parseInt(hours) === thisHours &&
         parseInt(mins) > thisMinutes
@@ -1537,7 +1602,7 @@ export class SingleRegistrationComponent implements OnInit {
       }
       return true;
     }
-    return true
+    return true;
   }
 
   openBarCodeDialog(data): void {
@@ -1551,5 +1616,14 @@ export class SingleRegistrationComponent implements OnInit {
       })
       .afterClosed()
       .subscribe();
+  }
+
+  onGetIsDataFromExternalSystem(fromExternalSystem: boolean): void {
+    this.fromExternalSystem = fromExternalSystem;
+    this.testsUnderSpecimen$ = of(null);
+  }
+
+  onGetSelectedSystem(system): void {
+    this.selectedSystem = system;
   }
 }

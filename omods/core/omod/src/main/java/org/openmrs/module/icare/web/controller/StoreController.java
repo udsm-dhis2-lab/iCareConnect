@@ -489,10 +489,11 @@ public class StoreController {
 	@ResponseBody
 	public List<Map<String, Object>> getItemsStockedOut(
 	        @RequestParam(required = false, value = "location") String locationUuid,
-	        @RequestParam(defaultValue = "100") Integer limit, @RequestParam(defaultValue = "0") Integer startIndex) {
+	        @RequestParam(required = false) String q, @RequestParam(defaultValue = "100") Integer limit,
+	        @RequestParam(defaultValue = "0") Integer startIndex, @RequestParam(required = false) String conceptClassName) {
 		List<Item> stockObjects = null;
 		if (locationUuid != null) {
-			stockObjects = storeService.getStockoutByLocation(locationUuid);
+			stockObjects = storeService.getStockoutByLocation(locationUuid, q, startIndex, limit, conceptClassName);
 		} else {
 			stockObjects = storeService.getStockout();
 		}

@@ -17,7 +17,8 @@ import { Visit } from "../../resources/visits/models/visit.model";
 import { flatten, keyBy } from "lodash";
 import { loadActiveVisit } from "src/app/store/actions/visit.actions";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
-import { map } from "rxjs/operators";
+import { map, tap } from "rxjs/operators";
+import { Api } from "../../resources/openmrs";
 
 @Component({
   selector: "app-patient-generic-drug-order-list",
@@ -50,12 +51,15 @@ export class PatientGenericDrugOrderListComponent implements OnInit {
   @Output() orderSelectAction = new EventEmitter<TableSelectAction>();
   @Output() loadPatientVisit = new EventEmitter<any>();
   genericPrescriptionConceptUuids$: any;
+  specificDrugConceptUuid$: Observable<string>;
   errors: any[] = [];
+  encounter$: Observable<any>;
 
   constructor(
     private dialog: MatDialog,
     private store: Store<AppState>,
     private ordersService: OrdersService,
+    private api: Api,
     private systemSettingsService: SystemSettingsService
   ) {}
 
@@ -102,6 +106,27 @@ export class PatientGenericDrugOrderListComponent implements OnInit {
             this.errors = [...this.errors, response.error];
           }
           return response;
+        })
+      );
+
+    this.specificDrugConceptUuid$ = this.systemSettingsService
+      .getSystemSettingsByKey(
+        "iCare.clinic.genericPrescription.specificDrugConceptUuid"
+      )
+      .pipe(
+        tap((response) => {
+          if (response === "none") {
+            this.errors = [
+              ...this.errors,
+              {
+                error: {
+                  message:
+                    "Generic Use Specific drug Concept config is missing, Set 'iCare.clinic.genericPrescription.specificDrugConceptUuid' or Contact IT (Close to continue)",
+                },
+                type: "warning",
+              },
+            ];
+          }
         })
       );
   }

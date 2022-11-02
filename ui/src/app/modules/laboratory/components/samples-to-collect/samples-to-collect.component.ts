@@ -167,8 +167,6 @@ export class SamplesToCollectComponent implements OnInit, OnChanges {
     });
     this.updateLabOrderResponse$ =
       this.labOrdersService.updateLabOrders(orders);
-    // console.log('sample scheduledDate', orders);
-    // console.log('details', details);
 
     this.store.dispatch(
       collectSample({

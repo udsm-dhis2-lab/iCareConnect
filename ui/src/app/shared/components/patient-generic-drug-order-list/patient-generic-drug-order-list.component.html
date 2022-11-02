@@ -2,7 +2,8 @@
   *ngIf="{
     isThereDiagnosisProvided: isThereDiagnosisProvided$ | async,
     visitLoadingState: visitLoadingState$ | async,
-    genericPrescriptionConceptUuids: genericPrescriptionConceptUuids$ | async
+    genericPrescriptionConceptUuids: genericPrescriptionConceptUuids$ | async,
+    specificDrugConceptUuid: specificDrugConceptUuid$ | async
   } as params"
 >
   <div class="d-flex justify-content-between p-3">
@@ -54,14 +55,14 @@
       <tr *ngIf="drugOrders.length > 0">
         <th>SN</th>
         <th>Drug</th>
-        <th>Instructions/Description</th>
+        <th>Instructions</th>
         <th>Prescribed By</th>
         <th>Date & Time</th>
         <th>Care setting</th>
         <th></th>
       </tr>
     </thead>
-    <tbody>
+    <tbody *ngIf="params?.specificDrugConceptUuid">
       <ng-container *ngIf="drugOrders && drugOrders?.length > 0">
         <ng-container *ngFor="let drugOrder of drugOrders; let count = index">
           <tr>
@@ -69,7 +70,12 @@
               {{ count + 1 }}
             </td>
             <td>
-              {{ drugOrder?.concept?.display }}
+              {{
+                params?.specificDrugConceptUuid &&
+                drugOrder?.obs[params?.specificDrugConceptUuid]
+                  ? drugOrder?.obs[params?.specificDrugConceptUuid]?.comment
+                  : "-"
+              }}
             </td>
             <td>
               <ng-container
@@ -85,7 +91,7 @@
                   }}
                 </span>
                 <br /> -->
-                {{ drugOrder?.formulatedDescription }}
+                {{ drugOrder?.instructions }}
               </ng-container>
             </td>
             <td>

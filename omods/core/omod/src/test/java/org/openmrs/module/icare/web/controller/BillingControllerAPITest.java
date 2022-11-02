@@ -15,10 +15,10 @@ import org.junit.Test;
 import org.openmrs.ConceptComplex;
 import org.openmrs.Patient;
 import org.openmrs.Visit;
-import org.openmrs.api.PatientService;
+import org.openmrs.api.*;
 import org.openmrs.api.context.Context;
 import org.openmrs.*;
-import org.openmrs.api.EncounterService;
+import org.openmrs.module.icare.ICareConfig;
 import org.openmrs.module.icare.billing.models.Invoice;
 import org.openmrs.module.icare.billing.models.InvoiceItem;
 import org.openmrs.module.icare.billing.models.ItemPrice;
@@ -500,6 +500,31 @@ public class BillingControllerAPITest extends BaseResourceControllerTest {
 		assertThat(totalPrice, equalTo(discountPrice));
 		assertThat("The discount items should be three i.e includes the registration invoice item", invoice
 		        .getDiscountItems().size() == 3);
+		
+	}
+	
+	@Test
+	public void createOrderForOngoingIPDPatients() throws Exception {
+		Order order = new Order();
+		
+		AdministrationService adminService = Context.getService(AdministrationService.class);
+		ConceptService conceptService = Context.getService(ConceptService.class);
+		adminService.setGlobalProperty(ICareConfig.BED_ORDER_TYPE, "2msir5eb-5345-11e8-9922-40b034c3cfef");
+		//adminService.setGlobalProperty(ICareConfig.SERVICE_ATTRIBUTE,"SERVICE0IIIIIIIIIIIIIIIIIIIIIIIATYPE");
+		System.out.println("Yuhu:" + Context.getProviderService().getProvider(1));
+		adminService.setGlobalProperty(ICareConfig.BED_ORDER_CONCEPT, "e721ec30-mfy4-11e8-ie7c-40b69mdy79ee");
+		
+		order = billingService.createOrderForOngoingIPDPatients();
+		
+		OrderService orderService = Context.getService(OrderService.class);
+		Order createdOrders = orderService.getOrderByUuid(order.getUuid());
+		
+		List<Invoice> patientInvoices = billingService.getPatientsInvoices("1f6959e5-d15a-4025-bb48-340ee9e2c58d");
+		
+		assertThat("The order should be created", createdOrders.getUuid().length() > 1);
+		assertThat("Invoice should have 1 item", patientInvoices.get(0).getInvoiceItems().size(), is(1));
+		
+		System.out.println(order);
 		
 	}
 	
