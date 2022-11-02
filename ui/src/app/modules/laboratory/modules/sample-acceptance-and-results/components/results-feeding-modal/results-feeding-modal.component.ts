@@ -29,6 +29,9 @@ import { HttpClient } from "@angular/common/http";
 import { ObsCreate } from "src/app/shared/resources/openmrs";
 import { VisitsService } from "src/app/shared/resources/visits/services";
 import { OpenmrsHttpClientService } from "src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service";
+import { Textbox } from "src/app/shared/modules/form/models/text-box.model";
+import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
+import { TextArea } from "src/app/shared/modules/form/models/text-area.model";
 
 @Component({
   selector: "app-results-feeding-modal",
@@ -74,6 +77,9 @@ export class ResultsFeedingModalComponent implements OnInit {
 
   ordersKeyedByConcepts: any = {};
   obsKeyedByConcepts: any = {};
+  amendUuid: any;
+  amendmentRemarksField: any;
+  amendmentRemarks: any;
   constructor(
     private dialog: MatDialog,
     private dialogRef: MatDialogRef<ResultsFeedingModalComponent>,
@@ -200,6 +206,14 @@ export class ResultsFeedingModalComponent implements OnInit {
     this.savingLabResultsStatusState$ = this.store.select(
       getSavingLabTestResultsStatusState
     );
+
+    this.amendmentRemarksField = new TextArea({
+      id: "amendmentRemarks",
+      key: "amendmentRemarks",
+      label: "Amendment Remarks",
+      type: "text",
+      controlType: "textarea",
+    });
   }
 
   onClose(e) {
@@ -324,6 +338,11 @@ export class ResultsFeedingModalComponent implements OnInit {
     // console.log('configs :: ', configs);
 
     return configs.length > 0 && configs[0]?.length > 0 ? configs[0][0] : null;
+  }
+
+  onFormUpdate(formValues: FormValue): void {
+    this.amendmentRemarks = formValues.getValues()?.amendmentRemarks?.value;
+    console.log("==> Amendment Results: ", this.amendmentRemarks);
   }
 
   onSave(e, item, testOrders, currentSample, allocation) {
@@ -702,6 +721,12 @@ export class ResultsFeedingModalComponent implements OnInit {
           );
         }
       });
+  }
+
+  amendResults(e, itemUuid) {
+    e?.stopPropagation();
+    console.log("==> Clicked Uuid: ", itemUuid?.allocationUuid);
+    this.amendUuid = itemUuid;
   }
 
   rejectFirstApproval(e, item, currentSample, allocation) {
