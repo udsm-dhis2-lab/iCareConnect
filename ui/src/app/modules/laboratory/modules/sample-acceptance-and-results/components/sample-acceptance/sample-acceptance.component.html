@@ -1990,7 +1990,12 @@
                       {{ patient?.mrn }}
                     </td>
                     <td>
-                      {{ department?.departmentName }}
+                      {{
+                        department?.departmentName &&
+                        department?.departmentName !== "undefined"
+                          ? department?.departmentName
+                          : "Not set"
+                      }}
                     </td>
                     <td>
                       {{ sample?.id }}
@@ -2008,6 +2013,14 @@
                         "
                       >
                         Print results
+                      </button>
+
+                      <button
+                        class="colored-button ml-2"
+                        mat-stroked-button
+                        (click)="onReviewResults($event, patient, sample)"
+                      >
+                        Review
                       </button>
                     </td>
                   </tr>
