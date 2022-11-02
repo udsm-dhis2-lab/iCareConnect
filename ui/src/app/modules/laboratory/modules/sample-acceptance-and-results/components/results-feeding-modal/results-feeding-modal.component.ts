@@ -92,7 +92,6 @@ export class ResultsFeedingModalComponent implements OnInit {
   ) {
     this.dialogData = data;
     this.sample = data?.sample;
-    console.log("dssd", this.sample);
     this.labConfigs = data?.labConfigs;
     this.maxHeight = data?.maxHeight;
     this.userUuid = data?.currentUser?.uuid;
