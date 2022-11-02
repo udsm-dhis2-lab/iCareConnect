@@ -72,7 +72,12 @@
           <td
             style="background-color: #d04747ab; width: 40px; margin-left: 20px"
           ></td>
-          <td><div style="margin-left: 3px">Has rejected results</div></td>
+          <td
+          *ngIf="!LISConfigurations?.isLIS"
+          ><div style="margin-left: 3px">Has rejected results</div></td>
+          <td
+          *ngIf="LISConfigurations?.isLIS"
+          ><div style="margin-left: 3px">Has amended results</div></td>
           <td
             *ngIf="!LISConfigurations?.isLIS"
             style="background-color: #6fd67bcf; width: 40px; margin-left: 20px"
@@ -140,6 +145,8 @@
               <tr
                 [ngStyle]="{
                   'background-color':
+                    sample?.completed
+                      ? '#6fd67bcf' :
                     sample?.atLestOneOrderWithRejectedResults &&
                     !sample?.completed
                       ? '#d04747ab'
@@ -151,8 +158,6 @@
                       ? '#0080009e'
                       : sample?.atLeastOneHasResults && !sample?.completed
                       ? '#ec864acf'
-                      : sample?.completed
-                      ? '#6fd67bcf'
                       : ''
                 }"
                 [ngClass]="{ 'row-alternated': count % 2 !== 0 }"
@@ -260,7 +265,7 @@
                   *ngIf="orderCount == 0"
                   [attr.rowspan]="sample?.orders?.length"
                 >
-                  <button mat-button (click)="onPrintBarCodes($event, sample)">
+                  <button mat-button class="colored-button " (click)="onPrintBarCodes($event, sample)">
                     Print Barcodes
                   </button>
                 </td>

@@ -206,6 +206,74 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 					existingInvoice.getInvoiceItems().add(invoiceItem);
 				}
 			}
+			
+			//Automatic discount creation for full exempted discounts
+			
+			List<DiscountInvoiceItem> discountInvoiceItems = existingInvoice.getDiscountItems();
+			
+			Boolean isFullExemptedCheck = false;
+			
+			for (DiscountInvoiceItem discountItem : discountInvoiceItems) {
+				if (discountItem.getDiscount().getExempted()) {
+					isFullExemptedCheck = true;
+				}
+			}
+			if (isFullExemptedCheck) {
+				
+				for (InvoiceItem invoiceItem : existingInvoice.getInvoiceItems()) {
+					
+					//Find the coresponding discount item
+					boolean found = false;
+					for (DiscountInvoiceItem discountItem : discountInvoiceItems) {
+						if (discountItem.getItem().getUuid().equals(invoiceItem.getItem().getUuid())) {
+							found = true;
+							discountItem.setAmount(invoiceItem.getPrice() * invoiceItem.getQuantity());
+						}
+					}
+					if (!found) {
+						DiscountInvoiceItem discountInvoiceItem = new DiscountInvoiceItem();
+						discountInvoiceItem.setAmount(invoiceItem.getPrice() * invoiceItem.getQuantity());
+						discountInvoiceItem.setDiscount(discountInvoiceItems.get(0).getDiscount());
+						discountInvoiceItem.setItem(invoiceItem.getItem());
+						discountInvoiceItem.setInvoice(invoiceItem.getInvoice());
+						discountInvoiceItems.add(discountInvoiceItem);
+					}
+					/*String itemUUID = invoiceItem.getItem().getUuid();
+
+					List<DiscountInvoiceItem> existingInvoiceDiscountItems = invoiceItem.getInvoice().getDiscountItems();
+					List<String> ExistingDiscountsitemUUIDs = new ArrayList<>();
+
+					for(DiscountInvoiceItem existingDiscountItem : existingInvoiceDiscountItems){
+
+						ExistingDiscountsitemUUIDs.add(existingDiscountItem.getItem().getUuid());
+					}
+
+					if(ExistingDiscountsitemUUIDs.contains(itemUUID)){
+
+
+
+
+					}else{
+
+						DiscountInvoiceItem discountInvoiceItem = new DiscountInvoiceItem();
+						discountInvoiceItem.setAmount(invoiceItem.getPrice() * invoiceItem.getQuantity());
+						discountInvoiceItem.setDiscount(discountInvoiceItems.get(0).getDiscount());
+						discountInvoiceItem.setItem(invoiceItem.getItem());
+						discountInvoiceItem.setInvoice(invoiceItem.getInvoice());
+						discountInvoiceItems.add(discountInvoiceItem);
+
+
+					}*/
+					
+					//If it exists update the discount item amount with the price times quantity
+					
+					//If it does not exist then create a discount invoice item and set the amount based on the price times the quantity
+					
+					//Save the discounts
+				}
+				
+			}
+			
 			this.invoiceDAO.save(existingInvoice);
 		}
 		return orderMetaData.getOrder();
@@ -313,6 +381,14 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 			newItems.add(newItem);
 		}
 		discount.setItems(newItems);
+		
+		if (discount.getAttachment() != null) {
+			Obs obs = Context.getObsService().getObsByUuid(discount.getAttachment().getUuid());
+			if (obs == null) {
+				throw new Exception("Attachment with id '" + obs.getUuid() + "' does not exist.");
+			}
+			discount.setAttachment(obs);
+		}
 		//discount.setCreator(Context.getAuthenticatedUser());
 		
 		return discountDAO.save(discount);
@@ -588,4 +664,53 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 		return invoice;
 	}
 	
+	public Order createOrderForOngoingIPDPatients() throws Exception {
+		
+		Order order = new Order();
+		Order newOrder = new Order();
+		OrderService orderService = Context.getService(OrderService.class);
+		
+		List<Visit> visits = dao.getOpenAdmittedVisit();
+
+		
+		for (Visit visit : visits) {
+			
+			AdministrationService administrationService = Context.getService(AdministrationService.class);
+			
+			String bedOrderTypeUUID = administrationService.getGlobalProperty(ICareConfig.BED_ORDER_TYPE);
+			if (bedOrderTypeUUID == null) {
+				throw new ConfigurationException("Bed Order Type is not configured. Please check "
+				        + ICareConfig.BED_ORDER_TYPE + ".");
+			}
+			String bedOrderConceptUUID = administrationService.getGlobalProperty(ICareConfig.BED_ORDER_CONCEPT);
+			if (bedOrderConceptUUID == null) {
+				throw new ConfigurationException("Bed Order Concept is not configured. Please check "
+				        + ICareConfig.BED_ORDER_CONCEPT + ".");
+			}
+			
+			OrderType bedOrderOrderType = Context.getOrderService().getOrderTypeByUuid(bedOrderTypeUUID);
+			
+			Provider provider = Context.getProviderService().getProvider(1);
+			
+			Concept concept = Context.getConceptService().getConceptByUuid(bedOrderConceptUUID);
+			System.out.println(concept.getUuid());
+			
+			order.setPatient(visit.getPatient());
+			order.setAction(Order.Action.NEW);
+			order.setCareSetting(orderService.getCareSettingByName("Inpatient"));
+			order.setOrderType(bedOrderOrderType);
+			order.setConcept(concept);
+			order.setOrderer(provider);
+			order.setEncounter((Encounter) visit.getEncounters().toArray()[0]);
+			OrderContext orderContext = new OrderContext();
+			orderContext.setCareSetting(orderService.getCareSetting(1));
+			System.out.println(orderContext);
+			System.out.println(order);
+			
+			newOrder = orderService.saveOrder(order, orderContext);
+			
+		}
+		return newOrder;
+		
+	}
 }

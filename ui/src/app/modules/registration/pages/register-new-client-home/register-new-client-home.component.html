@@ -1,21 +1,42 @@
 <div
+  class="p-3"
   *ngIf="{
-    registrationConfigurations: registrationConfigurations$ | async
+    registrationMRNSourceReference: registrationMRNSourceReference$ | async,
+    registrationFormConfigs: registrationFormConfigs$ | async,
+    occupationConceptUuid: occupationConceptUuid$ | async,
+    additionalClientInformationConceptUuid:
+      additionalClientInformationConceptUuid$ | async,
+    relationShipTypesConceptUuid: relationShipTypesConceptUuid$ | async,
+    genderOptionsConceptUuid: genderOptionsConceptUuid$ | async,
+    residenceDetailsLocationUuid: residenceDetailsLocationUuid$ | async
   } as params"
 >
   <app-registration-add
     *ngIf="
-      params?.registrationConfigurations &&
-      params?.registrationConfigurations['sourceUuid']
+      params?.registrationMRNSourceReference &&
+      params?.registrationFormConfigs &&
+      params?.occupationConceptUuid &&
+      params?.additionalClientInformationConceptUuid &&
+      params?.relationShipTypesConceptUuid &&
+      params?.genderOptionsConceptUuid &&
+      params?.residenceDetailsLocationUuid
     "
-    [registrationConfigurations]="params?.registrationConfigurations"
+    [registrationMRNSourceReference]="params?.registrationMRNSourceReference"
+    [registrationFormConfigs]="params?.registrationFormConfigs"
+    [occupationConceptUuid]="params?.occupationConceptUuid"
+    [additionalClientInformationConceptUuid]="
+      params?.additionalClientInformationConceptUuid
+    "
+    [relationShipTypesConceptUuid]="params?.relationShipTypesConceptUuid"
+    [genderOptionsConceptUuid]="params?.genderOptionsConceptUuid"
+    [residenceDetailsLocationUuid]="params?.residenceDetailsLocationUuid"
   ></app-registration-add>
 
   <div
     class="alert alert-danger mt-2 ml-2 mr-2"
     *ngIf="
-      params?.registrationConfigurations &&
-      !params?.registrationConfigurations['sourceUuid']
+      params?.registrationMRNSourceReference &&
+      params?.registrationMRNSourceReference == 'none'
     "
     role="alert"
   >
@@ -23,7 +44,14 @@
   </div>
 
   <mat-progress-bar
-    *ngIf="!params?.registrationConfigurations"
+    *ngIf="
+      !params?.registrationMRNSourceReference ||
+      !params?.registrationFormConfigs ||
+      !params?.occupationConceptUuid ||
+      !params?.additionalClientInformationConceptUuid ||
+      !params?.relationShipTypesConceptUuid ||
+      !params?.genderOptionsConceptUuid
+    "
     mode="indeterminate"
   ></mat-progress-bar>
 </div>

@@ -1,14 +1,17 @@
 <ng-container
   *ngIf="{
     form: form$ | async,
-    provider: provider$ | async,
-    visit: currentVisit$ | async,
     savingObservations: savingObservations$ | async,
-    observations: observations$ | async
+    observations: observations$ | async,
+    deathRegistryFormUuid: deathRegistryFormUuid$ | async,
+    referralFormsConcepts: referralFormsConcepts$ | async,
+    diagnoses: diagnoses$ | async
   } as params"
 >
   <mat-progress-bar
-    *ngIf="!params?.form || !params?.observations"
+    *ngIf="
+      !params?.form || !params?.observations || !params?.deathRegistryFormUuid
+    "
     mode="indeterminate"
   ></mat-progress-bar>
   <ng-container>
@@ -19,32 +22,71 @@
         <mat-icon>close</mat-icon>
       </button>
     </mat-toolbar>
-    <mat-dialog-content *ngIf="params?.form && params?.observations">
-      <app-capture-form-data
-        [form]="params?.form"
-        [observations]="params?.observations"
-        (formDataUpdate)="onFormUpdate($event, params?.form)"
-      ></app-capture-form-data>
-    </mat-dialog-content>
-    <mat-progress-bar
-      *ngIf="!params?.form || !params?.observations"
-      mode="indeterminate"
-    ></mat-progress-bar>
-    <mat-dialog-actions align="end">
-      <button mat-stroked-button (click)="onClose($event)">Cancel</button>
-      <button
-        mat-flat-button
-        color="primary"
-        (click)="saveCurrentFormData($event)"
-      >
-        <mat-spinner
+    <div
+      *ngIf="
+        params?.form && params?.observations && params?.deathRegistryFormUuid
+      "
+    >
+      <mat-dialog-content class="mt-2 ml-1 mr-1">
+        <app-capture-form-data
+          [form]="params?.form"
+          [visit]="visit"
+          [observations]="params?.observations"
+          (formDataUpdate)="
+            onFormUpdate($event, params?.form, params?.deathRegistryFormUuid)
+          "
+        ></app-capture-form-data>
+      </mat-dialog-content>
+      <mat-progress-bar
+        *ngIf="!params?.form || !params?.observations"
+        mode="indeterminate"
+      ></mat-progress-bar>
+      <mat-dialog-actions align="end" class="mb-2 ml-2 mr-2">
+        <button mat-stroked-button (click)="onClose($event)">Cancel</button>
+        <div *ngIf="data.fromClinic && showPrintButton" class="ml-5">
+          <app-print-button
+            [iconName]="'print'"
+            [toolTipText]="'Click to print refereal form'"
+            [showText]="'Print Referral Form'"
+            [classesList]="['float-right', 'button', 'mr-5']"
+            [ElementToBePrinted]="{
+              FacilityDetails: data?.facilityDetails[0],
+              CurrentPatient: data?.patient,
+              ObservationsGroupedByConcept: data?.observations,
+              ReferralFormsConcepts: params?.referralFormsConcepts,
+              Diagnoses: params?.diagnoses
+            }"
+            (print)="onPrint($event)"
+          ></app-print-button>
+          <!-- <app-print-button
+            [iconName]="'print'"
+            [toolTipText]="'Click to print refereal form'"
+            [showText]="'Print Referral Form'"
+            [classesList]="['float-right', 'button', 'mr-5']"
+            (print)="onPrint($event)"
+            [ElementToBePrinted]="{
+              CurrentPatient: data?.patient,
+              ObservationsGroupedByConcept: params?.observations,
+              ReferralFormsConcepts: params?.referralFormsConcepts,
+              Diagnoses: params?.diagnoses
+            }"
+          ></app-print-button> -->
+        </div>
+        <button
+          mat-flat-button
+          [disabled]="!params?.deathRegistryFormUuid || !isValid"
           color="primary"
-          *ngIf="params?.savingObservations"
-          [diameter]="20"
-          style="display: inline-block !important; margin-right: 4px"
-        ></mat-spinner>
-        {{ savingObservations ? "Saving ..." : "Save" }}
-      </button>
-    </mat-dialog-actions>
+          (click)="saveCurrentFormData($event, params?.deathRegistryFormUuid)"
+        >
+          <mat-spinner
+            color="primary"
+            *ngIf="params?.savingObservations"
+            [diameter]="20"
+            style="display: inline-block !important"
+          ></mat-spinner>
+          {{ savingObservations ? "Saving ..." : "Save" }}
+        </button>
+      </mat-dialog-actions>
+    </div>
   </ng-container>
 </ng-container>

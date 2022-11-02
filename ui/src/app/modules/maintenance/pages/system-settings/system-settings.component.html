@@ -1,63 +1,9 @@
-<mat-tab-group>
-  <mat-tab label="Billing">
-    <ng-template matTabContent>
-      <app-system-settings-list
-        [key]="'icare.billing'"
-      ></app-system-settings-list>
-    </ng-template>
-  </mat-tab>
-  <mat-tab label="Integration">
-    <ng-template matTabContent>
-      <app-system-settings-list
-        [key]="'icare.integration'"
-      ></app-system-settings-list>
-    </ng-template>
-  </mat-tab>
-  <mat-tab label="Users">
-    <ng-template matTabContent>
-      <app-system-settings-list
-        [key]="'icare.person'"
-      ></app-system-settings-list>
-    </ng-template>
-  </mat-tab>
-  <mat-tab label="Registration">
-    <ng-template matTabContent>
-      <app-system-settings-list
-        [key]="'icare.registration'"
-      ></app-system-settings-list>
-    </ng-template>
-  </mat-tab>
-  <mat-tab label="DHIS2">
-    <ng-template matTabContent>
-      <app-system-settings-list [key]="'dhis2'"></app-system-settings-list>
-    </ng-template>
-  </mat-tab>
-  <mat-tab label="Location Types">
-    <ng-template matTabContent>
-      <app-system-settings-list
-        [key]="'icare.location.types'"
-      ></app-system-settings-list>
-    </ng-template>
-  </mat-tab>
-  <mat-tab label="Modules">
-    <ng-template matTabContent>
-      <app-system-settings-list
-        [key]="'icare.modules'"
-      ></app-system-settings-list>
-    </ng-template>
-  </mat-tab>
-  <mat-tab label="Patient metadata">
-    <ng-template matTabContent>
-      <app-system-settings-list
-        [key]="'icare.patient'"
-      ></app-system-settings-list>
-    </ng-template>
-  </mat-tab>
-  <mat-tab label="Modules">
-    <ng-template matTabContent>
-      <app-system-settings-list
-        [key]="'icare.modules'"
-      ></app-system-settings-list>
-    </ng-template>
-  </mat-tab>
-</mat-tab-group>
+<div *ngIf="systemSettingsGroups$ | async as systemSettingsGroups">
+  <mat-tab-group>
+    <mat-tab [label]="group?.name" *ngFor="let group of systemSettingsGroups">
+      <ng-template matTabContent>
+        <app-system-settings-list [key]="group?.id"></app-system-settings-list>
+      </ng-template>
+    </mat-tab>
+  </mat-tab-group>
+</div>

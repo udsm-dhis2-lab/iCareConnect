@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { Observable } from "rxjs";
 import { ICARE_CONFIG } from "src/app/shared/resources/config";
@@ -10,6 +10,7 @@ import {
   go,
   loadCustomOpenMRSForms,
   loadForms,
+  loadLocationsByTagNames,
   loadOrderTypes,
   startConsultation,
 } from "src/app/store/actions";
@@ -19,6 +20,7 @@ import {
   getAllOrderTypes,
   getConsultationInProgressStatus,
   getCurrentLocation,
+  getParentLocation,
   getStartingConsultationLoadingStatus,
 } from "src/app/store/selectors";
 import {
@@ -66,9 +68,25 @@ import {
   getCurrentUserPrivileges,
   getProviderDetails,
 } from "src/app/store/selectors/current-user.selectors";
-import { ObsCreate, ProviderGetFull } from "../../resources/openmrs";
-import { saveObservations } from "src/app/store/actions/observation.actions";
+import {
+  ConceptGet,
+  LocationGet,
+  ObsCreate,
+  ProviderGetFull,
+} from "../../resources/openmrs";
+import {
+  loadPreviousObservations,
+  saveObservations,
+} from "src/app/store/actions/observation.actions";
 import { loadEncounterTypes } from "src/app/store/actions/encounter-type.actions";
+import { SystemSettingsService } from "src/app/core/services/system-settings.service";
+import { OrdersService } from "../../resources/order/services/orders.service";
+import { ConfigsService } from "../../services/configs.service";
+import { UserService } from "src/app/modules/maintenance/services/users.service";
+import { ConceptsService } from "../../resources/concepts/services/concepts.service";
+import { VisitConsultationStatusModalComponent } from "../../dialogs/visit-consultation-status-modal/visit-consultation-status-modal.component";
+import { BillingService } from "src/app/modules/billing/services/billing.service";
+import { tap, map as rxMap } from "rxjs/operators";
 
 @Component({
   selector: "app-shared-patient-dashboard",
@@ -82,6 +100,11 @@ export class SharedPatientDashboardComponent implements OnInit {
   @Input() activeVisit: any;
   @Input() iCareGeneralConfigurations: any;
   @Input() clinicConfigurations: any;
+  @Input() currentLocation: LocationGet;
+  @Input() isInpatient: boolean;
+  @Input() isTheatre: boolean;
+  @Input() visitEndingControlStatusesConceptUuid: string;
+  @Input() observations: any;
   currentPatient$: Observable<Patient>;
   vitalSignObservations$: Observable<any>;
   loadingVisit$: Observable<boolean>;
@@ -108,31 +131,57 @@ export class SharedPatientDashboardComponent implements OnInit {
   forms$: Observable<any>;
   orderTypes$: Observable<any>;
   countOfVitalsElementsFilled$: Observable<number>;
+  selectedForm: any;
+  readyForClinicalNotes: boolean = true;
+  consultationEncounterType$: Observable<any>;
+  consultationOrderType$: Observable<any>;
 
-  constructor(private store: Store<AppState>, private dialog: MatDialog) {
+  showVitalsSummary: boolean = false;
+  facilityDetails$: Observable<any>;
+  generalPrescriptionOrderType$: Observable<any>;
+  useGeneralPrescription$: Observable<any>;
+  showPrintButton: boolean;
+
+  @Output() assignBed: EventEmitter<boolean> = new EventEmitter<boolean>();
+  @Output() dichargePatient: EventEmitter<any> = new EventEmitter<boolean>();
+  observationChartForm$: Observable<any>;
+  observationChartEncounterType$: Observable<any>;
+
+  visitEndingControlStatusesConcept$: Observable<ConceptGet>;
+  codedVisitCloseStatus: any;
+  errors: any[] = [];
+  patientInvoice$: Observable<any>;
+
+  constructor(
+    private store: Store<AppState>,
+    private dialog: MatDialog,
+    private systemSettingsService: SystemSettingsService,
+    private ordersService: OrdersService,
+    private configService: ConfigsService,
+    private userService: UserService,
+    private conceptService: ConceptsService,
+    private billingService: BillingService
+  ) {
     this.store.dispatch(loadEncounterTypes());
-
-    console.log(this.userPrivileges);
   }
 
   ngOnInit(): void {
+    if (
+      this.visitEndingControlStatusesConceptUuid &&
+      this.visitEndingControlStatusesConceptUuid !== "none"
+    ) {
+      this.codedVisitCloseStatus = (this.observations?.filter(
+        (obs) =>
+          obs?.concept?.uuid === this.visitEndingControlStatusesConceptUuid
+      ) || [])[0]?.valueObject;
+    }
+
     this.onStartConsultation(this.activeVisit);
     this.store.dispatch(loadOrderTypes());
     this.orderTypes$ = this.store.select(getAllOrderTypes);
-    this.applicableForms = getApplicableForms(
-      ICARE_CONFIG,
-      this.currentUser,
-      this.formPrivilegesConfigs,
-      this.userPrivileges
-    );
     this.store.dispatch(
       loadCustomOpenMRSForms({
-        formUuids: filter(
-          map(this.applicableForms, (form) => {
-            return form?.id;
-          }),
-          (uuid) => uuid
-        ),
+        formUuids: this.currentLocation?.forms,
       })
     );
 
@@ -179,20 +228,111 @@ export class SharedPatientDashboardComponent implements OnInit {
 
     this.loadingPaymentStatus$ = this.store.select(getLoadingPaymentStatus);
 
-    this.store.dispatch(
-      loadForms({ formConfigs: ICARE_CONFIG?.consultation?.forms })
-    );
+    // this.store.dispatch(
+    //   loadForms({ formConfigs: ICARE_CONFIG?.consultation?.forms })
+    // );
     this.consultationForms$ = this.store.pipe(
       select(getFormEntitiesByNames(CONSULTATION_FORM_CONFIGS))
     );
 
     this.forms$ = this.store.select(getCustomOpenMRSFormsByIds, {
-      formUUids: map(this.applicableForms, (form) => {
-        return form?.id;
-      }),
+      formUUids: this.currentLocation?.forms,
     });
 
     this.currentLocation$ = this.store.select(getCurrentLocation);
+    this.consultationOrderType$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        "iCare.clinic.consultation.orderType"
+      );
+    this.consultationEncounterType$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        "iCare.clinic.consultation.encounterType"
+      );
+    this.generalPrescriptionOrderType$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        "iCare.clinic.genericPrescription.orderType"
+      );
+    this.useGeneralPrescription$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        "iCare.clinic.useGeneralPrescription"
+      );
+    this.observationChartForm$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        "iCare.ipd.forms.observationChart"
+      );
+    this.observationChartEncounterType$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        "iCare.ipd.encounterType.observationChart"
+      );
+    this.facilityDetails$ = this.configService.getFacilityDetails();
+    this.facilityDetails$ = this.userService.getLoginLocations();
+
+    this.store.dispatch(
+      loadLocationsByTagNames({
+        tagNames: ["Transfer+Location", "Refer-to+Location"],
+      })
+    );
+
+    if (this.visitEndingControlStatusesConceptUuid) {
+      this.visitEndingControlStatusesConcept$ =
+        this.conceptService.getConceptDetailsByUuid(
+          this.visitEndingControlStatusesConceptUuid,
+          "custom:(uuid,display,answers:(uuid,display))"
+        );
+    }
+
+    this.patientInvoice$ = this.billingService
+      .getPatientBills(this.activeVisit?.patientUuid)
+      .pipe(
+        rxMap((res) => {
+          if (!res?.error) {
+            res = res
+              ?.filter((bill) => {
+                if (!bill.isInsurance && bill.items.length > 0) {
+                  return bill;
+                }
+                return;
+              })
+              .filter((bill) => bill);
+          }
+
+          if (res?.error) {
+            if (res?.message) {
+              this.errors = [
+                ...this.errors,
+                {
+                  error: {
+                    message:
+                      res?.message ||
+                      "Connection failed when trying to get patient invoices!",
+                    detail: res?.stackTrace,
+                  },
+                },
+              ];
+            }
+            if (!res?.message) {
+              this.errors = [...this.errors, res?.error];
+            }
+          }
+          return res;
+        })
+      );
+  }
+
+  onToggleVitalsSummary(event: Event): void {
+    event.stopPropagation();
+    this.showVitalsSummary = !this.showVitalsSummary;
+  }
+
+  getSelectedForm(event: Event, form: any): void {
+    this.readyForClinicalNotes = false;
+    if (event) {
+      event.stopPropagation();
+    }
+    this.selectedForm = form;
+    setTimeout(() => {
+      this.readyForClinicalNotes = true;
+    }, 50);
   }
 
   onSaveObservations(observations: ObsCreate[], patient): void {
@@ -208,7 +348,15 @@ export class SharedPatientDashboardComponent implements OnInit {
   clearBills(event: Event) {
     event.stopPropagation();
     this.store.dispatch(clearBills());
-    this.store.dispatch(go({ path: ["/clinic/patient-list"] }));
+    this.store.dispatch(
+      go({
+        path: [
+          !this.isInpatient
+            ? "/clinic/patient-list"
+            : "/inpatient/" + this.currentLocation?.uuid,
+        ],
+      })
+    );
   }
 
   viewPatientHistory(event: Event, patientUuid) {
@@ -228,22 +376,43 @@ export class SharedPatientDashboardComponent implements OnInit {
     visit,
     currentLocation,
     privileges,
-    provider
+    provider,
+    facilityDetails,
+    observations,
+    generalPrescriptionOrderType,
+    useGeneralPrescription,
+    showPrintButton: boolean
   ): void {
     event.stopPropagation();
-    this.dialog.open(CaptureFormDataModalComponent, {
-      width: "60%",
-      data: {
-        patient: currentPatient,
-        form: { formUuid },
-        privileges,
-        provider,
-        visit,
-        locationType,
-        currentLocation,
-      },
-      disableClose: false,
-    });
+    this.showPrintButton = showPrintButton;
+    this.systemSettingsService
+      .getSystemSettingsMatchingAKey("iCare.clinic.deathRegistry.form.causes")
+      .subscribe((response) => {
+        const concepts = response?.map((response: any) => {
+          return response?.value;
+        });
+        if (response) {
+          this.dialog.open(CaptureFormDataModalComponent, {
+            width: "60%",
+            data: {
+              patient: currentPatient,
+              form: { formUuid },
+              privileges,
+              provider,
+              visit,
+              locationType,
+              currentLocation,
+              causesOfDeathConcepts: concepts,
+              fromClinic: true,
+              facilityDetails: facilityDetails,
+              observations: observations,
+              generalPrescriptionOrderType: generalPrescriptionOrderType,
+              showPrintButton,
+            },
+            disableClose: false,
+          });
+        }
+      });
   }
 
   onOpenAdmitPopup(
@@ -277,7 +446,8 @@ export class SharedPatientDashboardComponent implements OnInit {
     locationType,
     currentPatient,
     visit,
-    currentLocation
+    currentLocation,
+    isIPD?: boolean
   ): void {
     event.stopPropagation();
     this.dialog.open(TransferWithinComponent, {
@@ -290,11 +460,66 @@ export class SharedPatientDashboardComponent implements OnInit {
           formUuid,
         },
         visit,
-        path: "/clinic/patient-list",
+        path: !isIPD
+          ? "/clinic/patient-list"
+          : "/inpatient/" + currentLocation?.uuid,
         locationType,
       },
       disableClose: false,
       panelClass: "custom-dialog-container",
+    });
+  }
+
+  onUpdateConsultationOrder() {
+    if (!this.activeVisit.consultationStarted) {
+      const orders = [
+        {
+          uuid: this.activeVisit.consultationStatusOrder?.uuid,
+          accessionNumber:
+            this.activeVisit.consultationStatusOrder?.orderNumber,
+          fulfillerStatus: "RECEIVED",
+          encounter: this.activeVisit.consultationStatusOrder?.encounter?.uuid,
+        },
+      ];
+      this.ordersService.updateOrdersViaEncounter(orders).subscribe((order) => {
+        if (!order.error) {
+          console.log("==> Order results: ", order);
+        }
+      });
+    }
+  }
+
+  onAssignBed(event: Event): void {
+    event.stopPropagation();
+    this.assignBed.emit(true);
+  }
+
+  onDischargePatient(event: Event, invoice?: any): void {
+    event.stopPropagation();
+    this.dichargePatient.emit({ discharge: true, invoice: invoice });
+  }
+
+  onOpenModalToEndConsultation(
+    event: Event,
+    conceptForControllingHowToEndVisit: ConceptGet,
+    consultationEncounterType: string,
+    provider,
+    location,
+    visit,
+    patient
+  ): void {
+    console.log(patient);
+    event.stopPropagation();
+    this.dialog.open(VisitConsultationStatusModalComponent, {
+      width: "25%",
+      data: {
+        ...conceptForControllingHowToEndVisit,
+        consultationEncounterType,
+        provider,
+        patient,
+        visit,
+        location,
+      },
     });
   }
 }

@@ -44,8 +44,21 @@ export class RegistrationService {
       map((res) => {
         return (res.results || [])
           .map((patientIdenfierType: any) => {
-            const { uuid, display, required, retired, description, format } =
-              patientIdenfierType;
+            // In order to get empty results on the format key if the value is null
+            if (patientIdenfierType.format === null) {
+              patientIdenfierType.format = "";
+            }
+            const {
+              uuid,
+              display,
+              required,
+              retired,
+              description,
+              format,
+              uniquenessBehavior,
+              validator,
+              locationBehavior,
+            } = patientIdenfierType;
 
             if (retired) {
               return null;
@@ -57,6 +70,9 @@ export class RegistrationService {
               required,
               description,
               format,
+              uniquenessBehavior,
+              validator,
+              locationBehavior,
             };
           })
           .filter((identifierType) => identifierType);
@@ -130,12 +146,12 @@ export class RegistrationService {
     );
   }
 
-  getRegistrationConfigurations() {
+  getRegistrationMRNSource() {
     return this.httpClient
-      .get("systemsetting?q=iCare.registrationConfigurations&v=full")
+      .get("systemsetting?q=icare.registration.mrnSource&v=full")
       .pipe(
         map((response) => {
-          return JSON.parse(response?.results[0]?.value);
+          return response?.results[0]?.value;
         }),
         catchError((error) => {
           return error;

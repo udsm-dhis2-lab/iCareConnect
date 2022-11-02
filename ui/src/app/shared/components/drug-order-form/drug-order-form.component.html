@@ -1,17 +1,20 @@
 <div *ngIf="drugOrderFormsMetadata && provider">
   <div class="drug-order">
+    <!-- TODO: Find a better way to handle this depending on generic presc settings -->
     <app-form
+      *ngIf="!fromDispensing"
       [fields]="[drugFormField]"
       (formUpdate)="onFormUpdate('drug', $event)"
     ></app-form>
 
     <app-form
+      *ngIf="!fromDispensing"
       [fields]="[drugOrderFormsMetadata?.instructionField]"
       (formUpdate)="onFormUpdate('instructions', $event)"
     ></app-form>
 
     <app-form
-      *ngIf="fromDispensing && quantityField"
+      *ngIf="!fromDispensing && quantityField"
       [fields]="[quantityField]"
       (formUpdate)="onFormUpdate('quantity', $event)"
     ></app-form>
@@ -25,12 +28,13 @@
     </div>
 
     <a
+      *ngIf="!fromDispensing"
       class="mb-1 mt-1"
       style="cursor: pointer"
       (click)="toggleOtherDetails($event)"
       >{{ !showOtherDetails ? "More details" : "Less details" }}</a
     >
-    <div *ngIf="showOtherDetails">
+    <div *ngIf="showOtherDetails || fromDispensing">
       <app-form
         [fields]="drugOrderFormsMetadata?.doseFormFields"
         [isFormHorizontal]="true"
@@ -52,12 +56,19 @@
     <!-- <app-form
       [fields]="[drugOrderFormsMetadata?.orderReasonField]"
       (formUpdate)="onFormUpdate('reason', $event)"
+    ></app-form> -->
+
+    <app-form
+      *ngIf="fromDispensing && quantityField"
+      [fields]="[quantityField]"
+      (formUpdate)="onFormUpdate('quantity', $event)"
     ></app-form>
 
     <app-form
+      *ngIf="fromDispensing"
       [fields]="[drugOrderFormsMetadata?.instructionField]"
       (formUpdate)="onFormUpdate('instructions', $event)"
-    ></app-form> -->
+    ></app-form>
   </div>
 
   <!-- <div class="d-flex justify-content-end mt-2" *ngIf="!hideActionButtons">

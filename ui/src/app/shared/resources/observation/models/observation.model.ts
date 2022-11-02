@@ -1,4 +1,4 @@
-import { ObservationObject } from './obsevation-object.model';
+import { ObservationObject } from "./obsevation-object.model";
 
 export class Observation {
   constructor(private obs) {}
@@ -46,9 +46,16 @@ export class Observation {
   }
 
   get value(): string | number {
-    return this.obs?.value.hasOwnProperty('uuid')
-      ? this.obs?.value?.uuid
-      : this.obs?.value;
+    return this.obs?.value?.hasOwnProperty("uuid")
+    ? this.obs?.value?.uuid
+    : this.obs?.value;
+  }
+
+  get valueObject(): any {
+    const valueObject = this.obs?.value?.hasOwnProperty("uuid")
+      ? this.obs?.value
+      : null;
+    return valueObject;
   }
 
   get status(): string {
@@ -68,6 +75,7 @@ export class Observation {
       encounterUuid: this.encounterUuid,
       voided: this.voided,
       value: this.value,
+      valueObject: this.valueObject,
       status: this.status,
     };
   }

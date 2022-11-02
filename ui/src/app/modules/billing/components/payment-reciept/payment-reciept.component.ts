@@ -45,8 +45,10 @@ export class PaymentReceiptComponent implements OnInit {
     );
 
     each(this.data?.billItems, (item) => {
-      this.totalBill = this.totalBill + item?.amount;
+      this.totalBill = this.totalBill + item?.payable;
     });
+
+    console.log("==> Bill: ", this.data?.billItems)
   }
 
   onCancel(e): void {
@@ -140,7 +142,7 @@ export class PaymentReceiptComponent implements OnInit {
     // Change image from base64 then replace some text with empty string to get an image
     let image = "";
 
-    this.facilityDetailsJson.attributes.map((attribute) => {
+    this.facilityDetailsJson.attributes.forEach((attribute) => {
       let attributeTypeName =
         attribute && attribute.attributeType
           ? attribute?.attributeType?.name.toLowerCase()
@@ -151,8 +153,8 @@ export class PaymentReceiptComponent implements OnInit {
     });
 
     let patientMRN =
-      e.CurrentPatient.MRN ||
-      e.CurrentPatient.patient?.identifiers[0]?.identifier.replace(
+      this.data?.currentPatient?.MRN ||
+      this.data?.currentPatient?.patient?.identifiers[0]?.identifier.replace(
         "MRN = ",
         ""
       );
@@ -166,9 +168,9 @@ export class PaymentReceiptComponent implements OnInit {
         
 
         <div class="info">
-          <h2>${e.FacilityDetails.display}</h2>
-          <h3>P.O Box ${e.FacilityDetails.postalCode} ${e.FacilityDetails.stateProvince}</h3>
-          <h3>${e.FacilityDetails.country}</h3>
+          <h2>${this.facilityDetailsJson?.display}</h2>
+          <h3>P.O Box ${this.facilityDetailsJson?.postalCode} ${this.facilityDetailsJson?.stateProvince}</h3>
+          <h3>${this.facilityDetailsJson?.country}</h3>
         </div>
         <!--End Info-->
       </center>
@@ -178,7 +180,7 @@ export class PaymentReceiptComponent implements OnInit {
       <div id="mid">
         <div class="patient-info">
           <p> 
-              Patient Name : ${e.CurrentPatient.name}</br>
+              Patient Name : ${this.data?.currentPatient?.name}</br>
           </p>
           <p> 
               MRN : ${patientMRN}</br>
@@ -196,7 +198,7 @@ export class PaymentReceiptComponent implements OnInit {
             </div>
 
             <div class=""printDate>
-              <p>Printed on: ${e.PrintingDate}</p>
+              <p>Printed on: ${e?.PrintingDate}</p>
             </div>
           </div>
         </div>

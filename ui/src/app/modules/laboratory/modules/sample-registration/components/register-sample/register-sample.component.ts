@@ -30,6 +30,8 @@ export class RegisterSampleComponent implements OnInit {
   referFromFacilityVisitAttribute$: Observable<string>;
 
   referringDoctorAttributes$: Observable<any>;
+  labNumberCharactersCount$: Observable<string>;
+  testsFromExternalSystemsConfigs$: Observable<any[]>;
   constructor(
     private samplesService: SamplesService,
     private systemSettingsService: SystemSettingsService,
@@ -60,6 +62,11 @@ export class RegisterSampleComponent implements OnInit {
       this.systemSettingsService.getSystemSettingsMatchingAKey(
         "lis.attributes.referringDoctor"
       );
+
+    this.testsFromExternalSystemsConfigs$ =
+      this.systemSettingsService.getSystemSettingsMatchingAKey(
+        `iCare.externalSystems.integrated.tests`
+      );
     this.store.dispatch(
       loadConceptByUuid({
         uuid: this.LISConfigurations?.agencyConceptUuid,
@@ -70,6 +77,11 @@ export class RegisterSampleComponent implements OnInit {
     this.agencyConceptConfigs$ = this.store.select(getConceptById, {
       id: this.LISConfigurations?.agencyConceptUuid,
     });
+
+    this.labNumberCharactersCount$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        "lis.settings.labNumber.charactersCount"
+      );
   }
 
   getSelection(event: MatRadioChange): void {

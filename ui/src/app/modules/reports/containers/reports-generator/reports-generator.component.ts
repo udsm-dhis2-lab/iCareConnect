@@ -68,6 +68,7 @@ export class ReportsGeneratorComponent implements OnInit {
   hasError: boolean;
   showFullReportRenderingArea: boolean = false;
   isQuickPivotSet: boolean = false;
+  count: number = 1;
 
   selectedReportParameters: {
     order?: string;
@@ -101,7 +102,11 @@ export class ReportsGeneratorComponent implements OnInit {
                 (reportCategoryAccess) =>
                   this.userPrivileges[reportCategoryAccess?.privilege]
               ) || []
-            )?.length > 0,
+            )?.length > 0
+              ? true
+              : this.userPrivileges["REPORT_ALL"]
+              ? true
+              : false,
         };
         return formattedReportCategory;
       })
@@ -136,7 +141,6 @@ export class ReportsGeneratorComponent implements OnInit {
     // console.log("reports", this.reports);
 
     this.store.dispatch(loadDHIS2ReportsConfigs());
-    // this.store.dispatch(loadAllLocations());
     this.currentVisualization = "TABLE";
     this.loadingReportGroup = true;
 
@@ -194,7 +198,8 @@ export class ReportsGeneratorComponent implements OnInit {
               reportAccessConfig?.id === report?.id &&
               this.userPrivileges[reportAccessConfig?.privilege]
           ) || []
-        )?.length > 0
+        )?.length > 0 ||
+        this.userPrivileges["REPORT_ALL"]
       ) {
         return report;
       }
@@ -219,9 +224,16 @@ export class ReportsGeneratorComponent implements OnInit {
       (this.reportsParametersConfigurations.filter(
         (reportConfigs) => reportConfigs?.id === this.currentReport?.id
       ) || [])[0];
-    this.selectedReportParameters = matchedReportWithParametersConfigs
-      ? matchedReportWithParametersConfigs?.parameters
-      : report?.parameters;
+    this.selectedReportParameters = (
+      matchedReportWithParametersConfigs
+        ? matchedReportWithParametersConfigs?.parameters
+        : report?.parameters
+    ).map((param) => {
+      return {
+        ...param,
+        name: this.sanitizeParameter(param?.lable ? param.lable : param?.name),
+      };
+    });
 
     this.reportData = null;
     this.reportError = null;
@@ -239,6 +251,9 @@ export class ReportsGeneratorComponent implements OnInit {
       ...this.reportSelectionParams,
       ...paramValue,
     };
+    this.count = Object.keys(this.reportSelectionParams).filter(
+      (keyItem) => this.reportSelectionParams[keyItem] !== undefined
+    ).length;
   }
 
   getDHIS2ReportsSent(event: Event): void {
@@ -423,5 +438,10 @@ export class ReportsGeneratorComponent implements OnInit {
     setTimeout(() => {
       this.isQuickPivotSet = !this.isQuickPivotSet;
     }, 100);
+  }
+
+  sanitizeParameter(text) {
+    const result = text.replace(/([A-Z])/g, " $1");
+    return result.charAt(0).toUpperCase() + result.slice(1);
   }
 }

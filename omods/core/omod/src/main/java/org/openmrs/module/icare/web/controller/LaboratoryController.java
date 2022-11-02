@@ -200,7 +200,9 @@ public class LaboratoryController {
 	        @RequestParam(defaultValue = "true", value = "paging", required = false) boolean paging,
 	        @RequestParam(defaultValue = "50", value = "pageSize", required = false) Integer pageSize,
 	        @RequestParam(defaultValue = "1", value = "page", required = false) Integer page,
-	        @RequestParam(value = "location", required = false) String locationUuid) throws ParseException {
+	        @RequestParam(value = "location", required = false) String locationUuid,
+	        @RequestParam(value = "sampleCategory", required = false) String sampleCategory,
+	        @RequestParam(value = "testCategory", required = false) String testCategory) throws ParseException {
 		
 		Date start = null;
 		Date end = null;
@@ -216,7 +218,8 @@ public class LaboratoryController {
 		pager.setAllowed(paging);
 		pager.setPageSize(pageSize);
 		pager.setPage(page);
-		ListResult<Sample> sampleResults = laboratoryService.getSamples(start, end, pager, locationUuid);
+		ListResult<Sample> sampleResults = laboratoryService.getSamples(start, end, pager, locationUuid, sampleCategory,
+		    testCategory);
 		return sampleResults.toMap();
 		/*List<Sample> samples;
 		
@@ -572,6 +575,27 @@ public class LaboratoryController {
 		
 		return laboratoryService.addTestOrderWithLocation(TestOrderLocation.fromMap(testOrderLocation));
 		
+	}
+	
+	@RequestMapping(value = "workloadsummary", method = RequestMethod.GET)
+	@ResponseBody
+	public Map<String, Object> onGetWorkloadSummary(@RequestParam(value = "startDate", required = false) String startDate,
+	        @RequestParam(value = "endDate", required = false) String endDate) throws ParseException {
+		
+		Date start = null;
+		Date end = null;
+		if (startDate != null && endDate != null) {
+			
+			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+			
+			start = formatter.parse(startDate);
+			end = formatter.parse(endDate);
+			
+		}
+		
+		WorkloadSummary workloadSummary = laboratoryService.getWorkLoadSummary(start, end);
+		
+		return workloadSummary.toMap();
 	}
 	
 }

@@ -1,5 +1,6 @@
 import { NgModule } from "@angular/core";
 import { RouterModule, Routes } from "@angular/router";
+import { ManageUsersComponent } from "./containers/manage-users/manage-users.component";
 import {
   AddUserComponent,
   UserManagementComponent,
@@ -8,6 +9,7 @@ import {
   EditUserComponent,
   PriceListHomeComponent,
 } from "./pages";
+import { DrugManagementComponent } from "./pages/drug-management/drug-management.component";
 import { PrivilegesAndRolesComponent } from "./pages/privileges-and-roles/privileges-and-roles.component";
 import { SystemSettingsComponent } from "./pages/system-settings/system-settings.component";
 
@@ -31,7 +33,7 @@ const routes: Routes = [
         component: PriceListHomeComponent,
       },
       {
-        path: "users",
+        path: "users-management",
         component: UserManagementComponent,
       },
       {
@@ -39,11 +41,11 @@ const routes: Routes = [
         component: LocationManagementComponent,
       },
       {
-        path: "users/add-user",
-        component: AddUserComponent,
+        path: "users-management/manage-user",
+        component: ManageUsersComponent,
       },
       {
-        path: "users/edit-user",
+        path: "users-management/edit-user",
         component: EditUserComponent,
       },
       {
@@ -53,6 +55,10 @@ const routes: Routes = [
       {
         path: "system-privileges-and-roles",
         component: PrivilegesAndRolesComponent,
+      },
+      {
+        path: "drug",
+        component: DrugManagementComponent,
       },
     ],
   },

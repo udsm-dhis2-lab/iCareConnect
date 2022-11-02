@@ -1,15 +1,15 @@
-import { Component, OnInit } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
-import { ActivatedRoute } from '@angular/router';
-import { select, Store } from '@ngrx/store';
-import { Observable, of, zip } from 'rxjs';
-import { catchError, map, take } from 'rxjs/operators';
-import { BillingService } from 'src/app/modules/billing/services/billing.service';
-import { PaymentService } from 'src/app/modules/billing/services/payment.service';
-import { ObservationObject } from 'src/app/shared/resources/observation/models/obsevation-object.model';
-import { Patient } from 'src/app/shared/resources/patient/models/patient.model';
-import { Visit } from 'src/app/shared/resources/visits/models/visit.model';
-import { VisitsService } from 'src/app/shared/resources/visits/services';
+import { Component, OnInit } from "@angular/core";
+import { MatDialog } from "@angular/material/dialog";
+import { ActivatedRoute } from "@angular/router";
+import { select, Store } from "@ngrx/store";
+import { Observable, of, zip } from "rxjs";
+import { catchError, map, take } from "rxjs/operators";
+import { BillingService } from "src/app/modules/billing/services/billing.service";
+import { PaymentService } from "src/app/modules/billing/services/payment.service";
+import { ObservationObject } from "src/app/shared/resources/observation/models/obsevation-object.model";
+import { Patient } from "src/app/shared/resources/patient/models/patient.model";
+import { Visit } from "src/app/shared/resources/visits/models/visit.model";
+import { VisitsService } from "src/app/shared/resources/visits/services";
 import {
   go,
   loadCurrentPatient,
@@ -17,36 +17,36 @@ import {
   loadLocationsByTagName,
   loadOrderTypes,
   loadRolesDetails,
-} from 'src/app/store/actions';
+} from "src/app/store/actions";
 import {
   clearBills,
   loadPatientBills,
-} from 'src/app/store/actions/bill.actions';
-import { loadFormPrivilegesConfigs } from 'src/app/store/actions/form-privileges-configs.actions';
-import { loadActiveVisit } from 'src/app/store/actions/visit.actions';
-import { AppState } from 'src/app/store/reducers';
+} from "src/app/store/actions/bill.actions";
+import { loadFormPrivilegesConfigs } from "src/app/store/actions/form-privileges-configs.actions";
+import { loadActiveVisit } from "src/app/store/actions/visit.actions";
+import { AppState } from "src/app/store/reducers";
 import {
   getAllBedsUnderCurrentWard,
   getCurrentLocation,
-} from 'src/app/store/selectors';
-import { getCurrentPatient } from 'src/app/store/selectors/current-patient.selectors';
+} from "src/app/store/selectors";
+import { getCurrentPatient } from "src/app/store/selectors/current-patient.selectors";
 import {
   getCurrentUserDetails,
   getCurrentUserPrivileges,
   getProviderDetails,
-} from 'src/app/store/selectors/current-user.selectors';
-import { getFormPrivilegesConfigs } from 'src/app/store/selectors/form-privileges-configs.selectors';
-import { getVitalSignObservations } from 'src/app/store/selectors/observation.selectors';
+} from "src/app/store/selectors/current-user.selectors";
+import { getFormPrivilegesConfigs } from "src/app/store/selectors/form-privileges-configs.selectors";
+import { getVitalSignObservations } from "src/app/store/selectors/observation.selectors";
 import {
   getActiveVisit,
   getVisitLoadingState,
-} from 'src/app/store/selectors/visit.selectors';
-import { AssignBedToPatientComponent } from '../../components/assign-bed-to-patient/assign-bed-to-patient.component';
+} from "src/app/store/selectors/visit.selectors";
+import { AssignBedToPatientComponent } from "../../components/assign-bed-to-patient/assign-bed-to-patient.component";
 
 @Component({
-  selector: 'app-inpatient-dashboard',
-  templateUrl: './inpatient-dashboard.component.html',
-  styleUrls: ['./inpatient-dashboard.component.scss'],
+  selector: "app-inpatient-dashboard",
+  templateUrl: "./inpatient-dashboard.component.html",
+  styleUrls: ["./inpatient-dashboard.component.scss"],
 })
 export class InpatientDashboardComponent implements OnInit {
   visitLoadedState$: Observable<boolean>;
@@ -78,7 +78,7 @@ export class InpatientDashboardComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    const patientId = this.route.snapshot.queryParams['patient'];
+    const patientId = this.route.snapshot.queryParams["patient"];
     this.store.dispatch(loadActiveVisit({ patientId }));
     this.store.dispatch(loadCurrentPatient({ uuid: patientId }));
     this.store.dispatch(loadPatientBills({ patientUuid: patientId }));
@@ -91,7 +91,6 @@ export class InpatientDashboardComponent implements OnInit {
     this.currentUser$ = this.store.select(getCurrentUserDetails);
 
     this.userPrivileges$ = this.store.select(getCurrentUserPrivileges);
-    this.formPrivilegesConfigs$ = this.store.select(getFormPrivilegesConfigs);
 
     this.provider$ = this.store.select(getProviderDetails);
 
@@ -130,7 +129,7 @@ export class InpatientDashboardComponent implements OnInit {
         getAllBedsUnderCurrentWard,
         {
           id: location?.uuid,
-          tagName: 'Bed Location',
+          tagName: "Bed Location",
         }
       );
     });

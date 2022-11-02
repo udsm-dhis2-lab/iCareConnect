@@ -75,8 +75,33 @@ import { SharedPrivilegesAndRolesManagementComponent } from "./shared-privileges
 import { PrivilegesListComponent } from "./privileges-list/privileges-list.component";
 import { RolesListComponent } from "./roles-list/roles-list.component";
 import { SharedConfirmationDialogComponent } from "./shared-confirmation-dialog/shared-confirmation-dialog.component";
+import { DeleteConfirmationComponent } from "./delete-confirmation/delete-confirmation.component";
+import { UnitFieldComponent } from "./unit-field/unit-field.component";
+import { PatientGenericDrugOrderListComponent } from "./patient-generic-drug-order-list/patient-generic-drug-order-list.component";
+import { CurrentPrescriptionComponent } from "./current-prescriptions/current-prescriptions.component";
+import { IcareSupportGoogleFormComponent } from "./icare-support-google-form/icare-support-google-form.component";
+import { PatientsListByLocationComponent } from "./patients-list-by-location/patients-list-by-location.component";
+import { AttendProcedureOrderComponent } from "./attend-procedure-order/attend-procedure-order.component";
+import { SharedBmiComponent } from "./shared-bmi/shared-bmi.component";
+import { PatientObservationsChartComponent } from "./patient-observations-chart/patient-observations-chart.component";
+import { ObservationChartTableComponent } from "./observation-chart-table/observation-chart-table.component";
+import { SharedConfirmationComponent } from "./shared-confirmation /shared-confirmation.component";
+import { IpdFormsComponent } from "./ipd-forms/ipd-forms.component";
+import { SharedErrorComponent } from "./shared-error/shared-error.component";
+import { SharedConceptCreateComponent } from "./shared-concept-create/shared-concept-create.component";
+import { ConceptsFormComponent } from "./concepts-form/concepts-forms.component";
+import { NonDrugOrderContainerComponent } from "./non-drug-order-container/non-drug-order-container.component";
+import { NonDrugOrderFormComponent } from "./non-drug-order-form/non-drug-order-form.component";
+import { ManageItemPriceComponent } from "./manage-item-price/manage-item-price.component";
+import { PriceListComponent } from "./price-list/price-list.component";
+import { PricingItemComponent } from "./pricing-item/pricing-item.component";
+import { SharedLocationAttributesManagerComponent } from "./shared-location-attributes-manager/shared-location-attributes-manager.component";
+import { SharedParameterResultsComponent } from "./shared-parameter-results/shared-parameter-results.component";
+import { PatientAddressComponent } from "./patient-address/patient-address.component";
 
 export const components: any[] = [
+  PatientAddressComponent,
+
   PatientSearchComponent,
   PatientProfileComponent,
   DrugOrderComponent,
@@ -154,9 +179,33 @@ export const components: any[] = [
   PrivilegesListComponent,
   RolesListComponent,
   SharedConfirmationDialogComponent,
+  DeleteConfirmationComponent,
+  UnitFieldComponent,
+  PatientGenericDrugOrderListComponent,
+  CurrentPrescriptionComponent,
+  IcareSupportGoogleFormComponent,
+  PatientsListByLocationComponent,
+  AttendProcedureOrderComponent,
+  SharedBmiComponent,
+  PatientObservationsChartComponent,
+  ObservationChartTableComponent,
+  SharedConfirmationComponent,
+  IpdFormsComponent,
+  SharedErrorComponent,
+  SharedConceptCreateComponent,
+  ConceptsFormComponent,
+  NonDrugOrderContainerComponent,
+  NonDrugOrderFormComponent,
+  ManageItemPriceComponent,
+  PriceListComponent,
+  PricingItemComponent,
+  SharedLocationAttributesManagerComponent,
+  SharedParameterResultsComponent,
 ];
 
 export const sharedEntryComponents: any[] = [
+  PatientAddressComponent,
+
   LocationSelectModalComponent,
   CaptureFormDataModalComponent,
   AdmissionFormComponent,
@@ -174,6 +223,9 @@ export const sharedEntryComponents: any[] = [
   ManagePrivilegesComponent,
   ManageRolesComponent,
   SharedConfirmationDialogComponent,
+  AttendProcedureOrderComponent,
+  SharedConfirmationComponent,
+  ManageItemPriceComponent,
 ];
 
 export * from "./patient-vitals-summary/patient-vitals-summary.component";

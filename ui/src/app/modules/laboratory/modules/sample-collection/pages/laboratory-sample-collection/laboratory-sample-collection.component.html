@@ -11,8 +11,7 @@
     patient: patient$ | async,
     payments: payments$ | async,
     containers: containers$ | async,
-    datesParameters: datesParameters$ | async,
-    visitReferences: visitReferences$ | async
+    datesParameters: datesParameters$ | async
   } as params"
 >
   <div
@@ -92,19 +91,22 @@
                         [payments]="params?.payments"
                         [labDepartments]="params?.labDepartments"
                         [datesParameters]="params?.datesParameters"
-                        [patients]="params?.visitReferences"
                         (isSaveCollectedSample)="onSaveSampleCollection($event)"
                         (samplesToCollect)="onGetSamplesToCollect($event)"
                       >
                       </app-samples-to-collect>
                     </div>
                     <mat-progress-bar
+                      class="mt-2"
                       *ngIf="
                         !params?.payments ||
                         !params?.visitLoadedState ||
                         !params?.specimenSources ||
                         !params?.labOrders ||
-                        !params?.visit
+                        !params?.visit ||
+                        !params?.labDepartments ||
+                        !params?.containers ||
+                        !params?.datesParameters
                       "
                       mode="indeterminate"
                     ></mat-progress-bar>

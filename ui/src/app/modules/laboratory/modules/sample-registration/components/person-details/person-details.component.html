@@ -1,4 +1,4 @@
-<div>
+<div style="z-index: 200">
   <mat-radio-group class="registration-category">
     <mat-radio-button
       (change)="getSelection($event)"
@@ -9,7 +9,22 @@
     >
       New
     </mat-radio-button>
-    <mat-radio-button
+    <button
+      mat-button
+      class="ml-2 mr-4 pinning-btn"
+      (click)="onPinThis($event, 'new')"
+    >
+      Pin
+      <span
+        *ngIf="pinnedCategory == 'new'"
+        matBadge="P"
+        matBadgeSize="small"
+        matBadgeColor="accent"
+        matBadgeOverlap="false"
+      >
+      </span>
+    </button>
+    <!-- <mat-radio-button
       (change)="getSelection($event)"
       class="person-details-btn ml-2"
       [value]="'existing'"
@@ -17,23 +32,53 @@
       color="primary"
     >
       Existing
+    </mat-radio-button> -->
+    <mat-radio-button
+      (change)="getSelection($event)"
+      class="person-details-btn ml-2"
+      [value]="'other'"
+      [checked]="personDetailsCategory === 'other'"
+      color="primary"
+    >
+      Other systems
     </mat-radio-button>
+    <button
+      mat-button
+      class="ml-2 pinning-btn"
+      (click)="onPinThis($event, 'other')"
+    >
+      Pin
+      <span
+        *ngIf="pinnedCategory == 'other'"
+        matBadge="P"
+        matBadgeSize="small"
+        matBadgeColor="accent"
+        matBadgeOverlap="false"
+      >
+      </span>
+    </button>
   </mat-radio-group>
   <app-registered-patient-details
     *ngIf="personDetailsCategory === 'existing'"
     (personDetails)="onGetPersonDetails($event)"
   ></app-registered-patient-details>
+  <app-clients-from-external-systems
+    *ngIf="personDetailsCategory === 'other'"
+    (selectedClientRequest)="getSelectedClientRequest($event)"
+    (system)="onGetSelectedSystem($event)"
+  ></app-clients-from-external-systems>
 
   <div class="row primary-identifier">
     <div class="col-10">
       <app-form
-        [fields]="[primaryIdentifierField]"
+        [isFormHorizontal]="true"
+        [fields]="primaryIdentifierFields"
         (formUpdate)="onUpdatePrimaryIdentifierForm($event)"
       ></app-form>
     </div>
     <div class="col-2">
       <a class="show-more-toggle" (click)="toggleIdentifiers($event)">{{
-        showOtherIdentifiers ? "Less" : "More"
+        showOtherIdentifiers ? "Hide" : "Other"
       }}</a>
     </div>
   </div>
@@ -50,27 +95,14 @@
   ></app-form>
 
   <div class="row">
-    <div class="col-1">
+    <div class="col-3">
       <div class="row">
         <div class="col-12">
-          <mat-form-field
-            class="w-100 no-padding"
-            style="margin-left: 6px"
-            appearance="fill"
-          >
-            <mat-label>Age</mat-label>
-            <input
-              matInput
-              type="number"
-              (change)="getAge($event)"
-              required
-              min="0"
-              max="150"
-              [value]="age"
-              placeholder="Age"
-              autocomplete="off"
-            />
-          </mat-form-field>
+          <app-form
+            [fields]="personDOBField"
+            [isFormHorizontal]="true"
+            (formUpdate)="onFormUpdate($event)"
+          ></app-form>
         </div>
         <!-- <div class="col-6">
           <span style="font-size: 0.8rem">
@@ -83,12 +115,25 @@
         </div> -->
       </div>
     </div>
-    <div class="col-3">
-      <app-form
-        [fields]="personDOBField"
-        [isFormHorizontal]="true"
-        (formUpdate)="onFormUpdate($event)"
-      ></app-form>
+    <div class="col-1">
+      <mat-form-field
+        class="w-100 no-padding"
+        style="margin-left: 6px"
+        appearance="fill"
+      >
+        <mat-label>Age</mat-label>
+        <input
+          matInput
+          type="number"
+          (change)="getAge($event)"
+          required
+          min="0"
+          max="150"
+          [value]="age"
+          placeholder="Age"
+          autocomplete="off"
+        />
+      </mat-form-field>
     </div>
     <div class="col-8"></div>
   </div>

@@ -1,7 +1,6 @@
 <div
   *ngIf="{
-    orders: orders$ | async,
-    creatingOrdersResponse: creatingOrdersResponse$ | async
+    orders: orders$ | async
   } as params"
 >
   <table class="table table-bordered">
@@ -62,7 +61,7 @@
           </td>
         </tr>
       </ng-container>
-      <ng-container *ngIf="forConsultation">
+      <ng-container *ngIf="forConsultation && !isInpatient">
         <tr>
           <td colspan="3">
             <app-form

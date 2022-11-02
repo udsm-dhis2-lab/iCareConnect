@@ -144,69 +144,38 @@ export class VisitsService {
       BASE_URL +
       `obs?patient=${patientUuid}&v=custom:(encounter:(visit,location:(uuid,display),obs:(uuid,display,obsDatetime,concept:(display),groupMembers:(uuid,display,concept,value,groupMembers:(uuid,concept:(display),value)))))&concept=${conceptUuid}`;
 
-    return this.httpClient.get(url);
+    return this.httpClient.get(url).pipe(
+      map((response) => response),
+      catchError((error) => of(error))
+    );
   }
 
   getLabOrdersMetadataDependencies(configs): Observable<any> {
     return forkJoin(
-      this.httpClient.get(
-        BASE_URL +
-          "concept/" +
-          configs["testContainers"] +
-          "?v=custom:(uuid,display,setMembers:(uuid,display,setMembers:(uuid,display)))"
-      ),
-      this.httpClient.get(
-        BASE_URL +
-          "concept/" +
-          configs["sampleRejectionReasonsCoded"] +
-          "?v=custom:(uuid,display,answers:(uuid,display))"
-      ),
-      this.httpClient.get(
-        BASE_URL +
-          "concept/" +
-          configs["labDepartments"] +
-          "?v=custom:(uuid,display,setMembers:(uuid,display,setMembers:(uuid,display)))"
-      )
-    );
-  }
-
-  getLabOrdersByVisitStarDate(
-    visitStartDate,
-    endDate,
-    configs
-  ): Observable<any> {
-    // 378f0a01-a68e-4b90-82ea-844efa7132a8
-    return forkJoin(
-      this.httpClient.get(
-        BASE_URL +
-          "bahmnicore/sql?q=laboratory.sqlGet.patient_lab_orders_by_visit_start_date&visitStartDate=" +
-          visitStartDate +
-          "&visitEndDate=" +
-          endDate +
-          "T23:59:59"
-      ),
-      this.httpClient.get(
-        BASE_URL +
-          "concept/" +
-          configs["testContainers"] +
-          "?v=custom:(uuid,display,setMembers:(uuid,display,setMembers:(uuid,display)))"
-      ),
-      this.httpClient.get(BASE_URL + "lab/samples").pipe(
-        map((response: any) => response?.results),
-        catchError((error) => of(error))
-      ),
-      this.httpClient.get(
-        BASE_URL +
-          "concept/" +
-          configs["sampleRejectionReasonsCoded"] +
-          "?v=custom:(uuid,display,answers:(uuid,display))"
-      ),
-      this.httpClient.get(
-        BASE_URL +
-          "concept/" +
-          configs["labDepartments"] +
-          "?v=custom:(uuid,display,setMembers:(uuid,display,setMembers:(uuid,display)))"
-      )
+      configs?.testContainers
+        ? this.httpClient.get(
+            BASE_URL +
+              "concept/" +
+              configs["testContainers"] +
+              "?v=custom:(uuid,display,setMembers:(uuid,display,setMembers:(uuid,display)))"
+          )
+        : of([]),
+      configs?.sampleRejectionReasonsCoded
+        ? this.httpClient.get(
+            BASE_URL +
+              "concept/" +
+              configs["sampleRejectionReasonsCoded"] +
+              "?v=custom:(uuid,display,answers:(uuid,display))"
+          )
+        : of([]),
+      configs?.labDepartments
+        ? this.httpClient.get(
+            BASE_URL +
+              "concept/" +
+              configs["labDepartments"] +
+              "?v=custom:(uuid,display,setMembers:(uuid,display,setMembers:(uuid,display,setMembers:(uuid,display,conceptClass,datatype,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,numeric,descriptions,allowDecimal,displayPrecision,answers:(uuid,display)))))"
+          )
+        : of([])
     );
   }
 

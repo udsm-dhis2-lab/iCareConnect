@@ -13,7 +13,9 @@
       "item": {
         "uuid": "8o00d43570-8y37-11f3-1234-08002007777"
       },
-      "quantity": 15
+      "quantity": 15,
+      "expiryDate": "10000-12-30T21:00:00.000Z",
+      "batch": "batch-xyz"
     }
   ]
 }

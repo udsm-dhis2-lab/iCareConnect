@@ -82,7 +82,7 @@
       Prev
     </button>
     <button
-      [disabled]="visits && visits[0].visit && !visits[0].visit?.pager"
+      [disabled]="(visits && visits[0].visit && !visits[0].visit?.pager) && itemsPerPage > visits.length"
       class="ml-2"
       mat-stroked-button
       (click)="getAnotherList($event, visits ? visits[0] : null, 'next')"

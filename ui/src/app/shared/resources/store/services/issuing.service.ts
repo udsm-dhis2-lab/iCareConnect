@@ -1,4 +1,5 @@
 import { Injectable } from "@angular/core";
+import { orderBy } from "lodash";
 import { Observable, of, throwError } from "rxjs";
 import { catchError, map } from "rxjs/operators";
 import { OpenmrsHttpClientService } from "src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service";
@@ -8,7 +9,6 @@ import {
   Issuing,
   IssuingObject,
 } from "../models/issuing.model";
-import { Requisition, RequisitionStatus } from "../models/requisition.model";
 
 @Injectable({
   providedIn: "root",
@@ -16,15 +16,24 @@ import { Requisition, RequisitionStatus } from "../models/requisition.model";
 export class IssuingService {
   constructor(private httpClient: OpenmrsHttpClientService) {}
 
-  getAllIssuings(locationUuid?: string): Observable<IssuingObject[]> {
+  getAllIssuings(
+    locationUuid?: string,
+    requestingLocationUuid?: string
+  ): Observable<IssuingObject[]> {
     return this.httpClient
-      .get(`store/requests?requestedLocationUuid=${locationUuid}`)
+      .get(
+        `store/requests?${
+          requestingLocationUuid
+            ? "requestingLocationUuid=" + requestingLocationUuid
+            : "requestedLocationUuid=" + locationUuid
+        }`
+      )
       .pipe(
-        map((issueResponse: any) =>
-          (issueResponse || []).map((issueItem) =>
-            new Issuing(issueItem).toJson()
-          )
-        )
+        map((issueResponse: any) => {
+          return (orderBy(issueResponse, ["created"], ["desc"]) || []).map(
+            (issueItem) => new Issuing(issueItem).toJson()
+          );
+        })
       );
   }
 
@@ -33,7 +42,6 @@ export class IssuingService {
       return throwError({ message: "You have provided incorrect parameters" });
     }
     const issueObject = Issuing.createIssue(issueInput);
-
     return this.httpClient.post("store/issue", issueObject).pipe(
       map((response) => response),
       catchError((error) => of(error))

@@ -20,7 +20,8 @@ public interface LaboratoryService extends OpenmrsService {
 	
 	List<Sample> getAllSamples();
 	
-	ListResult<Sample> getSamples(Date startDate, Date endDate, Pager pager, String location);
+	ListResult<Sample> getSamples(Date startDate, Date endDate, Pager pager, String location, String sampleCategory,
+	        String testCategory);
 	
 	List<Sample> getSampleByDates(Date startDate, Date endDate);
 	
@@ -87,5 +88,7 @@ public interface LaboratoryService extends OpenmrsService {
 	TestOrderLocation addTestOrderWithLocation(TestOrderLocation testOrderLocation);
 	
 	List<Sample> getSamplesByVisitOrPatientAndOrDates(String visitId, String patient, Date startDate, Date endDate);
+	
+	WorkloadSummary getWorkLoadSummary(Date startDate, Date endDate);
 	
 }

@@ -5,9 +5,8 @@
   } as params"
 >
   <div *ngIf="locationBedsDetails?.areChildLocationsBeds">
-    <div *ngFor="let childLocation of locationBedsDetails?.childMembers">
+    <div *ngFor="let childLocation of locationBedsDetails?.beds">
       <div
-        *ngIf="childLocation && childLocation?.isBed"
         class="bed mb-2"
         [ngClass]="{
           'bg-light': !params?.admittedPatientsVisits[childLocation?.uuid],
@@ -78,6 +77,12 @@
           <span class="ml-4"></span>
         </mat-panel-title>
       </mat-expansion-panel-header>
+      <!-- {{ ward | json }} -->
+      <!-- <app-wards-list
+          [locationBedsDetails]="params?.bedsByLocationDetails"
+          [currentLocation]="currentLocation"
+          (bedStatus)="onGetBedStatus($event, params?.orderType)"
+        ></app-wards-list> -->
 
       <div
         class="row"

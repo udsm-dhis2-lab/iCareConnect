@@ -24,7 +24,9 @@
           *ngFor="let vitalItem of params?.vitalSignObservations?.noChildren"
         >
           {{ vitalItem?.display }}
-          <em class="text-muted"> ({{ vitalItem?.units }}) </em>
+          <em class="text-muted" *ngIf="vitalItem?.units">
+            ({{ vitalItem?.units }})
+          </em>
         </th>
       </tr>
       <tr>
@@ -32,7 +34,18 @@
           class="text-center"
           *ngFor="let vitalItem of params?.vitalSignObservations?.noChildren"
         >
-          {{ vitalItem?.value ? vitalItem?.value : " - "
+          {{
+            params?.observationsGroupedByConcept[vitalItem?.id]?.latest
+              ?.value &&
+            !params?.observationsGroupedByConcept[vitalItem?.id]?.latest
+              ?.valueObject
+              ? params?.observationsGroupedByConcept[vitalItem?.id]?.latest
+                  ?.value
+              : params?.observationsGroupedByConcept[vitalItem?.id]?.latest
+                  ?.valueObject
+              ? params?.observationsGroupedByConcept[vitalItem?.id]?.latest
+                  ?.valueObject?.display
+              : " - "
           }}{{ vitalItem?.value ? vitalItem?.units : "" }}
         </td>
       </tr>
@@ -42,7 +55,7 @@
         "
       >
         <tr>
-          <th class="text-center" colspan="100%">
+          <th class="text-left" colspan="100%">
             {{ vitalChildItem?.display }}
           </th>
         </tr>
@@ -52,7 +65,14 @@
               {{ child?.formField?.name }}
             </td>
             <td>
-              {{ child?.formField?.value }}
+              {{
+                child?.formField?.value && !child?.formField?.valueObject
+                  ? child?.formField?.value
+                  : child?.formField?.valueObject &&
+                    child?.formField?.valueObject?.display
+                  ? child?.formField?.valueObject?.display
+                  : "-"
+              }}
             </td>
           </tr>
           <tr *ngIf="child?.formFields && child?.formFields?.length > 0">
@@ -61,7 +81,27 @@
                 {{ formField?.label }}
               </span>
               <span>
-                {{ formField?.value ? formField?.value : " - " }}
+                <b>
+                  {{
+                    params?.observationsGroupedByConcept[formField?.key]
+                      ? params?.observationsGroupedByConcept[formField?.key]
+                          ?.latest?.value &&
+                        !params?.observationsGroupedByConcept[formField?.key]
+                          ?.latest?.valueObject
+                        ? params?.observationsGroupedByConcept[formField?.key]
+                            ?.latest?.value
+                        : params?.observationsGroupedByConcept[formField?.key]
+                            ?.latest?.valueObject
+                        ? params?.observationsGroupedByConcept[formField?.key]
+                            ?.latest?.valueObject?.display
+                        : "=="
+                      : "-"
+                  }}
+                </b>
+                <!-- {{
+                  params?.observationsGroupedByConcept[formField?.key]?.latest
+                    | json
+                }} -->
                 <em
                   *ngIf="formField?.min && formField?.max && formField?.value"
                   class="text-muted range-label"

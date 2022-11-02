@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild } from "@angular/core";
+import { Component, ElementRef, Input, OnInit, ViewChild } from "@angular/core";
 import {
   FormBuilder,
   FormControl,
@@ -9,14 +9,27 @@ import { MatSnackBar } from "@angular/material/snack-bar";
 import { MatTable, MatTableDataSource } from "@angular/material/table";
 import { Router } from "@angular/router";
 import * as moment from "moment";
+import { LocationService } from "src/app/core/services";
 import { processDateFromMaterialInput } from "src/app/shared/helpers/utils.helpers";
-import { LocationGetFull, RoleCreate } from "src/app/shared/resources/openmrs";
+import {
+  LocationGet,
+  LocationGetFull,
+  RoleCreate,
+  UserGet,
+  UserGetFull,
+} from "src/app/shared/resources/openmrs";
 import {
   GlobalEventHandlersEvent,
   PersonCreateModel,
   UserCreateModel,
 } from "../../../models/user.model";
 import { UserService } from "../../../services/users.service";
+import { orderBy, uniqBy, keyBy } from "lodash";
+import { SystemUsersService } from "src/app/core/services/system-users.service";
+import { Store } from "@ngrx/store";
+import { AppState } from "src/app/store/reducers";
+import { go } from "src/app/store/actions";
+import { MatSelectChange } from "@angular/material/select";
 
 @Component({
   selector: "app-add-user",
@@ -24,6 +37,9 @@ import { UserService } from "../../../services/users.service";
   styleUrls: ["./add-user.component.scss"],
 })
 export class AddUserComponent implements OnInit {
+  @Input() user: any;
+  @Input() systemModules: any;
+
   @ViewChild("table", { static: false }) table: MatTable<any>;
   @ViewChild("filter", { static: false }) filter: ElementRef;
   loading: boolean = true;
@@ -40,6 +56,9 @@ export class AddUserComponent implements OnInit {
   rolesLoading: boolean = true;
   touchtime: number = 0;
   selectedRolesDatasource: MatTableDataSource<RoleCreate>;
+
+  selectedLocationsDataSource: MatTableDataSource<LocationGet[]>;
+  locationsDataSource: MatTableDataSource<LocationGet[]>;
   moveToAvailable: any[] = [];
   moveToSelected: any[] = [];
   clickedAvailable: any[] = [];
@@ -56,59 +75,212 @@ export class AddUserComponent implements OnInit {
   selectedLocations: any = [];
   shouldCreateProvider: boolean = false;
   genderValues = [
-    { code: "F", value: "Female" },
-    { code: "U", value: "Unknown" },
-    { code: "M", value: "Male" },
+    { code: "F", value: "F", display: "Female" },
+    { code: "M", value: "M", display: "Male" },
   ];
 
-  gender: { Female: string; Male: string; Unknown: string } = {
+  gender: { Female: string; Male: string } = {
     Female: "F",
     Male: "M",
-    Unknown: "U",
   };
   currentDataAvailable: RoleCreate[];
   passwordFocusOut: Boolean = false;
   passwordStrong: Boolean = true;
+
+  passwordIsRequired: boolean = true;
+  selectedModules: any[] = [];
   constructor(
     private fb: FormBuilder,
     private service: UserService,
-    private router: Router,
-    private _snackBar: MatSnackBar
+    private _snackBar: MatSnackBar,
+    private locationService: LocationService,
+    private usersService: SystemUsersService,
+    private store: Store<AppState>
   ) {}
 
   ngOnInit() {
-    this.userForm = this.generateForm();
-    this.service.getRoles().subscribe((roles) => {
-      this.roles = roles.results;
-      this.rolesDataSource = new MatTableDataSource(this.roles);
-      this.selectedRolesDatasource = new MatTableDataSource(this.selectedRoles);
-      this.loading = false;
-    });
-    this.service.getLoginLocations().subscribe((res) => {
-      this.locations = res.results;
-    });
+    if (this.user && this.user?.uuid) {
+      this.selectedModules = this.user?.userProperties?.preferredModules
+        ? this.systemModules?.filter(
+            (module) =>
+              (
+                JSON.parse(this.user?.userProperties?.preferredModules)?.filter(
+                  (moduleId) => moduleId === module?.id
+                ) || []
+              )?.length > 0
+          ) || []
+        : [];
+      this.usersService
+        .getProviderByUserUuid(this.user?.uuid)
+        .subscribe((response) => {
+          if (response && !response?.error) {
+            if (response?.length > 0) {
+              // TODO: Softcode uuids for attributes types
+              //MCT NO: 79fa49fc-d584-4b74-9dcd-eb265372ade1
+              this.shouldCreateProvider = true;
+              this.user = {
+                ...this.user,
+                providerAttributes: response[0]?.attributes,
+                MCTNumber: (response[0]?.attributes?.filter(
+                  (attribute) =>
+                    attribute?.attributeType?.uuid ===
+                    "79fa49fc-d584-4b74-9dcd-eb265372ade1"
+                ) || [])[0]?.value,
+                phoneNumber: (response[0]?.attributes?.filter(
+                  (attribute) =>
+                    attribute?.attributeType?.uuid ===
+                    "685a0d80-25e5-4ed4-8a03-974a1d161bf3"
+                ) || [])[0]?.value,
+                qualification: (response[0]?.attributes?.filter(
+                  (attribute) =>
+                    attribute?.attributeType?.uuid ===
+                    "9c4420fa-5a22-4249-978c-da6e0f24880b"
+                ) || [])[0]?.value,
+              };
+              // this.userForm.controls?.MCTNumber?.value = (response[0]?.attributes?.filter(attribute => attribute?.attributeType?.uuid === '79fa49fc-d584-4b74-9dcd-eb265372ade1') || [])[0]?.value
+            }
+
+            this.userForm = this.generateForm(this.user);
+            this.passwordIsRequired = false;
+
+            this.service.getRoles().subscribe((roles) => {
+              this.roles = roles.results;
+              this.rolesDataSource = new MatTableDataSource(this.roles);
+              this.selectedRolesDatasource = new MatTableDataSource(
+                this.selectedRoles
+              );
+              this.loading = false;
+            });
+            this.locationService
+              .getLocationsByTagNames(["Treatment+Room", "Module+Location"], {
+                limit: 100,
+                startIndex: 0,
+                v: "custom:(uuid,display,name)",
+              })
+              .subscribe((res) => {
+                this.locations = orderBy(res, ["display"], ["asc"]);
+                this.selectedLocations = uniqBy(
+                  this.locations?.filter(
+                    (location) =>
+                      (
+                        JSON.parse(
+                          this.user?.userProperties?.locations
+                        )?.filter((id) => id === location?.uuid) || []
+                      )?.length > 0
+                  ) || [],
+                  "uuid"
+                );
+
+                this.locations = uniqBy(
+                  this.locations?.filter(
+                    (loc) => !keyBy(this.selectedLocations, "uuid")[loc?.uuid]
+                  ) || [],
+                  "uuid"
+                );
+
+                this.locationsDataSource = new MatTableDataSource(
+                  this.locations
+                );
+                this.selectedLocationsDataSource = new MatTableDataSource(
+                  this.selectedLocations
+                );
+              });
+          }
+        });
+    } else {
+      this.userForm = this.generateForm(this.user);
+
+      this.service.getRoles().subscribe((roles) => {
+        this.roles = roles.results;
+        this.rolesDataSource = new MatTableDataSource(this.roles);
+        this.selectedRolesDatasource = new MatTableDataSource(
+          this.selectedRoles
+        );
+        this.loading = false;
+      });
+      this.locationService
+        .getLocationsByTagNames(
+          ["Treatment+Room", "Admission+Location", "Module+Location"],
+          {
+            limit: 100,
+            startIndex: 0,
+            v: "custom:(uuid,display,name)",
+          }
+        )
+        .subscribe((res) => {
+          this.locations = orderBy(res, ["display"], ["asc"]);
+          this.selectedLocations = this.user?.userProperties?.locations
+            ? uniqBy(
+                this.locations?.filter(
+                  (location) =>
+                    (
+                      JSON.parse(this.user?.userProperties?.locations)?.filter(
+                        (id) => id === location?.uuid
+                      ) || []
+                    )?.length > 0
+                ) || [],
+                "uuid"
+              )
+            : [];
+
+          this.locationsDataSource = new MatTableDataSource(this.locations);
+          this.selectedLocationsDataSource = new MatTableDataSource(
+            this.selectedLocations
+          );
+        });
+    }
   }
 
-  generateForm() {
+  generateForm(user: any): any {
+    this.selectedRoles = user?.roles;
     return this.fb.group({
-      username: new FormControl("", Validators.required),
-      password: ["", [Validators.required, Validators.minLength(8)]],
-      gender: new FormControl(""),
-      middleName: new FormControl(""),
-      firstName: new FormControl("", Validators.required),
-      surname: new FormControl("", Validators.required),
+      username: new FormControl(user?.username, Validators.required),
+      password: [
+        "",
+        !user ? [Validators.required, Validators.minLength(8)] : [],
+      ],
+      gender: new FormControl(user?.person ? user?.person?.gender : null, [
+        Validators?.required,
+      ]),
+      middleName: new FormControl(
+        user?.person ? user?.person?.preferredName?.middleName : null
+      ),
+      firstName: new FormControl(
+        user?.person ? user?.person?.preferredName?.givenName : null,
+        Validators.required
+      ),
+      surname: new FormControl(
+        user?.person ? user?.person?.preferredName?.familyName : null,
+        Validators.required
+      ),
       confirmpassword: new FormControl(""),
-      addressDisplay: new FormControl(""),
-      country: new FormControl("", Validators.required),
-      district: new FormControl("", Validators.required),
-      city: new FormControl("", Validators.required),
+      addressDisplay: new FormControl(
+        user?.person ? user?.person?.preferredAddress?.address1 : null
+      ),
+      country: new FormControl(
+        user?.person ? user?.person?.preferredAddress?.country : null,
+        Validators.required
+      ),
+      district: new FormControl(
+        user?.person ? user?.person?.preferredAddress?.countyDistrict : null,
+        Validators.required
+      ),
+      city: new FormControl(
+        user?.person ? user?.person?.preferredAddress?.stateProvince : null,
+        Validators.required
+      ),
       postalCode: new FormControl(""),
-      addressDisplay2: new FormControl(""),
+      addressDisplay2: new FormControl(
+        user?.person ? user?.person?.preferredAddress?.address1 : null
+      ),
       checked: false,
-      birthdate: new FormControl("", Validators.required),
-      MCTNumber: new FormControl(""),
-      phoneNumber: new FormControl(""),
-      qualification: new FormControl(""),
+      birthdate: new FormControl(
+        user?.person ? new Date(user?.person?.birthdate) : null,
+        Validators.required
+      ),
+      MCTNumber: new FormControl(user?.MCTNumber),
+      phoneNumber: new FormControl(user?.phoneNumber),
+      qualification: new FormControl(user?.qualification),
     });
   }
 
@@ -131,7 +303,23 @@ export class AddUserComponent implements OnInit {
     this.selectedRolesDatasource.filter = filterValue.trim().toLowerCase();
   }
 
-  saveData() {
+  applyFilterLocations(event: Event) {
+    const filterValue = (event.target as HTMLInputElement).value;
+    this.locationsDataSource.filter = filterValue.trim().toLowerCase();
+    this.selectedLocationsDataSource.filter = filterValue.trim().toLowerCase();
+  }
+
+  onGetSelectedLocationItems(selected) {
+    console.log(selected);
+  }
+
+  onGetPreferredModule(event: MatSelectChange): void {
+    // TODO: Add support to capture more that one module and order them accordingly
+    this.selectedModules = [event?.value];
+  }
+
+  saveData(event: Event, userToUpdate?: any): void {
+    event.stopPropagation();
     this.saving = true;
     const data = this.userForm.value;
     const years = moment().diff(data.birthdate, "years", false);
@@ -165,20 +353,27 @@ export class AddUserComponent implements OnInit {
       display: data.firstName,
       addresses: [prefferedLocation],
       birthdate: processDateFromMaterialInput(data.birthdate),
-      gender: this.gender[data.gender],
+      gender: data.gender,
     };
     const user = {
       userProperties: {
         locations: JSON.stringify(
           this.selectedLocations.map(({ uuid }) => uuid)
         ),
+        preferredModules: JSON.stringify(
+          this.selectedModules.map(({ id }) => id)
+        ),
       },
       username: data?.username,
+      systemId: data?.username,
       password: data?.password,
       roles: this.selectedRoles,
       person,
     };
-    this.service.createUser({ user }).subscribe(
+    (userToUpdate?.uuid
+      ? this.service.updateUser({ data: user, uuid: userToUpdate?.uuid })
+      : this.service.createUser({ user })
+    ).subscribe(
       (user) => {
         if (user) {
           // create provider
@@ -188,14 +383,35 @@ export class AddUserComponent implements OnInit {
             person: user?.person?.uuid,
             attributes: [
               {
+                uuid: userToUpdate?.providerAttributes
+                  ? (userToUpdate?.providerAttributes?.filter(
+                      (attribute) =>
+                        attribute?.attributeType?.uuid ===
+                        "79fa49fc-d584-4b74-9dcd-eb265372ade1"
+                    ) || [])[0]?.uuid
+                  : null,
                 attributeType: "79fa49fc-d584-4b74-9dcd-eb265372ade1",
                 value: data?.MCTNumber,
               },
               {
+                uuid: userToUpdate?.providerAttributes
+                  ? (userToUpdate?.providerAttributes?.filter(
+                      (attribute) =>
+                        attribute?.attributeType?.uuid ===
+                        "685a0d80-25e5-4ed4-8a03-974a1d161bf3"
+                    ) || [])[0]?.uuid
+                  : null,
                 attributeType: "685a0d80-25e5-4ed4-8a03-974a1d161bf3",
                 value: data?.phoneNumber,
               },
               {
+                uuid: userToUpdate?.providerAttributes
+                  ? (userToUpdate?.providerAttributes?.filter(
+                      (attribute) =>
+                        attribute?.attributeType?.uuid ===
+                        "9c4420fa-5a22-4249-978c-da6e0f24880b"
+                    ) || [])[0]?.uuid
+                  : null,
                 attributeType: "9c4420fa-5a22-4249-978c-da6e0f24880b",
                 value: data?.qualification,
               },
@@ -216,7 +432,7 @@ export class AddUserComponent implements OnInit {
                         panelClass: ["snack-color"],
                       }
                     );
-                    window.location.href = "#/maintenance/users/";
+                    window.location.href = "#/maintenance/users-management/";
                     this.saving = false;
                   }
                 })
@@ -230,12 +446,11 @@ export class AddUserComponent implements OnInit {
                   panelClass: ["snack-color"],
                 }
               );
-          window.location.href = "#/maintenance/users/";
+          window.location.href = "#/maintenance/users-management/";
           this.saving = false;
         }
       },
       (error: { error: any }) => {
-        console.log(error);
         this._snackBar.open(
           `An error ocurred. Please try again. Hint: ${
             error.error?.error?.message || error.error.message
@@ -292,7 +507,11 @@ export class AddUserComponent implements OnInit {
     this.moveToAvailable = [];
     this.moveToSelected = [];
     this.clickedAvailable = [];
-    this.roles = [...this.roles, ...this.selectedRoles];
+    this.roles = orderBy(
+      [...this.roles, ...this.selectedRoles],
+      ["display"],
+      ["asc"]
+    );
     this.rolesDataSource = new MatTableDataSource(this.roles);
     this.selectedRoles = [];
     this.selectedRolesDatasource = new MatTableDataSource(this.selectedRoles);
@@ -321,10 +540,12 @@ export class AddUserComponent implements OnInit {
       if (!e.metaKey && !e.crtlKey && !e.shiftKey) {
         this.clickedRows = [];
         this.moveToAvailable = [];
-        this.selectedRoles = this.selectedRoles.filter(
-          ({ uuid }) => role.uuid !== uuid
+        this.selectedRoles = orderBy(
+          this.selectedRoles.filter(({ uuid }) => role.uuid !== uuid) || [],
+          ["display"],
+          ["asc"]
         );
-        this.roles = [...this.roles, role];
+        this.roles = orderBy([...this.roles, role], ["display"], ["asc"]);
         this.rolesDataSource = new MatTableDataSource(this.roles);
         this.selectedRolesDatasource = new MatTableDataSource(
           this.selectedRoles
@@ -459,7 +680,7 @@ export class AddUserComponent implements OnInit {
       this.searching = false;
     } else {
       this.service.getLoginLocations().subscribe((res) => {
-        this.locations = res.results;
+        this.locations = orderBy(res.results, ["display"], ["asc"]);
         if (this.locations.length === 0) {
           this.searching = true;
         }
@@ -469,15 +690,25 @@ export class AddUserComponent implements OnInit {
 
   getLocations(e: GlobalEventHandlersEvent, row: LocationGetFull) {
     e.stopPropagation();
-    this.locations = this.locations.filter(({ uuid }) => row.uuid !== uuid);
-    this.selectedLocations = [...this.selectedLocations, row];
+    this.locations = orderBy(this.locations, ["display"], ["asc"]).filter(
+      ({ uuid }) => row.uuid !== uuid
+    );
+    this.selectedLocations = orderBy(
+      [...this.selectedLocations, row],
+      ["display"],
+      ["asc"]
+    );
   }
 
   removeLocation(e: GlobalEventHandlersEvent, row: LocationGetFull) {
     e.stopPropagation();
-    this.selectedLocations = this.selectedLocations.filter(
-      ({ uuid }) => row.uuid !== uuid
-    );
+    this.selectedLocations = orderBy(
+      this.selectedLocations,
+      ["display"],
+      ["asc"]
+    ).filter(({ uuid }) => row.uuid !== uuid);
+
+    this.locations = orderBy([...this.locations, row], ["display"], ["asc"]);
   }
 
   get passwordMatch() {
@@ -509,5 +740,10 @@ export class AddUserComponent implements OnInit {
 
   providerAccount(value: boolean) {
     this.shouldCreateProvider = value;
+  }
+
+  onCancel(event: Event): void {
+    event.stopPropagation();
+    this.store.dispatch(go({ path: ["/maintenance/users-management"] }));
   }
 }

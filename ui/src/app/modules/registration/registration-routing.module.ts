@@ -1,5 +1,6 @@
 import { NgModule } from "@angular/core";
 import { RouterModule, Routes } from "@angular/router";
+import { PatientsListByLocationComponent } from "src/app/shared/components/patients-list-by-location/patients-list-by-location.component";
 import { RegistrationPatientComponent } from "./components/registration-patient/registration-patient.component";
 import { RegistrationSearchComponent } from "./components/registration-search/registration-search.component";
 import { PatientEditComponent } from "./pages/patient-edit/patient-edit.component";
@@ -39,6 +40,10 @@ const routes: Routes = [
   {
     path: "edit/:patientId",
     component: PatientEditComponent,
+  },
+  {
+    path: "patients-list/location/:location",
+    component: PatientsListByLocationComponent,
   },
 ];
 

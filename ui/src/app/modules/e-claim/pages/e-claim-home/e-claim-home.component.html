@@ -13,8 +13,8 @@
       </mat-toolbar>
       <div>
         <app-patient-list
-          [itemsPerPage]="20"
-          [isTabularList]="true"
+          [itemsPerPage]="10"
+          [isTabularList]="false"
           [defaultFilter]="'Insurance'"
           (selectPatient)="onSelectPatient($event)"
         ></app-patient-list>

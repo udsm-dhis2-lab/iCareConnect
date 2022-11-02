@@ -56,6 +56,7 @@ export class NursingDataComponent implements OnInit {
   @Input() userPrivileges: any;
   @Input() nursingConfigurations: any;
   @Input() patient: any;
+  @Input() currentLocation: any;
   provider$: Observable<ProviderGetFull>;
   visit$: Observable<Visit>;
   currentLocation$: Observable<Location>;
@@ -76,7 +77,7 @@ export class NursingDataComponent implements OnInit {
   activeVisitLoadedState$: Observable<boolean>;
   conceptsWithDepartmentsDetails$: Observable<any>;
   orderTypes$: Observable<any[]>;
-
+  locationFormsIds: string[] = [];
   constructor(
     private store: Store<AppState>,
     private dialog: MatDialog,
@@ -84,6 +85,14 @@ export class NursingDataComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.locationFormsIds = this.currentLocation?.forms
+      ? this.currentLocation?.forms
+      : [];
+    this.store.dispatch(
+      loadCustomOpenMRSForms({
+        formUuids: this.locationFormsIds,
+      })
+    );
     this.store.dispatch(loadOrderTypes());
     this.orderTypes$ = this.store.select(getAllOrderTypes);
     this.privileges$ = this.store.select(getCurrentUserPrivileges);
@@ -91,23 +100,8 @@ export class NursingDataComponent implements OnInit {
       this.conceptsService.getConceptsDepartmentDetails(
         this.nursingConfigurations?.departmentsReference?.id
       );
-    this.applicableForms = getApplicableForms(
-      ICARE_CONFIG,
-      this.currentUser,
-      this.formPrivilegesConfigs,
-      this.userPrivileges
-    );
-    this.store.dispatch(
-      loadCustomOpenMRSForms({
-        formUuids: map(this.applicableForms, (form) => {
-          return form?.id;
-        }),
-      })
-    );
     this.forms$ = this.store.select(getCustomOpenMRSFormsByIds, {
-      formUUids: map(this.applicableForms, (form) => {
-        return form?.id;
-      }),
+      formUUids: this.locationFormsIds,
     });
     this.provider$ = this.store.select(getProviderDetails);
     this.visit$ = this.store.select(getActiveVisit);
@@ -118,9 +112,7 @@ export class NursingDataComponent implements OnInit {
     this.savingObservations$ = this.store.pipe(
       select(getSavingObservationStatus)
     );
-
     this.activeVisitDeathStatus$ = this.store.select(getActiveVisitDeathStatus);
-
     this.billLoadingState$ = this.store.pipe(select(getLoadingBillStatus));
     this.currentBills$ = this.store.select(getAllBills);
     this.doesPatientHasPendingPaymentForTheCurrentVisitType$ = this.store.pipe(
@@ -155,7 +147,7 @@ export class NursingDataComponent implements OnInit {
     event.stopPropagation();
 
     this.dialog.open(AdmissionFormComponent, {
-      height: "230px",
+      minHeight: "230px",
       width: "45%",
       data: {
         patient: currentPatient,

@@ -1,29 +1,29 @@
-import { Injectable } from '@angular/core';
-import { from, Observable, of, throwError, zip } from 'rxjs';
-import { catchError, map, switchMap, tap } from 'rxjs/operators';
-import { flatten, keyBy } from 'lodash';
+import { Injectable } from "@angular/core";
+import { from, Observable, of, throwError, zip } from "rxjs";
+import { catchError, map, switchMap, tap } from "rxjs/operators";
+import { flatten, keyBy } from "lodash";
 import {
   DrugOrder,
   DrugOrderObject,
-} from 'src/app/shared/resources/order/models/drug-order.model';
-import { Dropdown } from 'src/app/shared/modules/form/models/dropdown.model';
-import { Textbox } from 'src/app/shared/modules/form/models/text-box.model';
-import { OpenmrsHttpClientService } from 'src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service';
-import { Api, ConceptGet } from '../../openmrs';
+} from "src/app/shared/resources/order/models/drug-order.model";
+import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
+import { Textbox } from "src/app/shared/modules/form/models/text-box.model";
+import { OpenmrsHttpClientService } from "src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service";
+import { Api, ConceptGet } from "../../openmrs";
 import {
   formatConceptAnswersAsOptions,
   formatConceptSetMembersAsOptions,
   formatDrugOrderFrequencyConcept,
-} from '../helpers/sanitise-concepts-for-prescription.helper';
-import { formatDrugs } from '../helpers/sanitize-drug.helper';
-import { DrugOrderMetadata } from '../models/drug-order-metadata.model';
-import { Visit } from '../../visits/models/visit.model';
-import { StockService } from '../../store/services/stock.service';
-import { IndexDbService } from 'src/app/core/services/index-db.service';
-import { OrderIntention } from '../models';
+} from "../helpers/sanitise-concepts-for-prescription.helper";
+import { formatDrugs } from "../helpers/sanitize-drug.helper";
+import { DrugOrderMetadata } from "../models/drug-order-metadata.model";
+import { Visit } from "../../visits/models/visit.model";
+import { StockService } from "../../store/services/stock.service";
+import { IndexDbService } from "src/app/core/services/index-db.service";
+import { OrderIntention } from "../models";
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: "root",
 })
 export class DrugOrdersService {
   private drugs: any[];
@@ -63,7 +63,7 @@ export class DrugOrdersService {
 
   async getConceptDetails(conceptName): Promise<any> {
     const conceptResults = await this.api.concept.getAllConcepts({
-      v: 'full',
+      v: "full",
       name: conceptName,
     });
     const concept: ConceptGet = (conceptResults?.results || [])[0];
@@ -115,7 +115,7 @@ export class DrugOrdersService {
   getDrugOrderStatus(visitUuid): Observable<any> {
     return this.openmrsService.get(`store/orderStatus/${visitUuid}`).pipe(
       map((response) => {
-        return keyBy(response, 'order');
+        return keyBy(response, "order");
       }),
       catchError((error) => {
         return of(error);
@@ -155,7 +155,7 @@ export class DrugOrdersService {
     location?: string,
     provider?: string
   ): Observable<any> {
-    return this.openmrsService.post('icare/prescription', order);
+    return this.openmrsService.post("icare/prescription", order);
     return this.getDrugOrderEncounter(
       {
         order,
@@ -177,7 +177,11 @@ export class DrugOrdersService {
   }
 
   updateDrugOrder(order): Observable<any> {
-    return from(this.openmrsService.put('order/' + order.uuid, order));
+    return from(this.openmrsService.put("order/" + order.uuid, order)).pipe(
+      catchError((error) => {
+        return of(error);
+      })
+    );
   }
 
   getDrugOrderEncounter(
@@ -194,7 +198,11 @@ export class DrugOrdersService {
     const encounterID = `${order.patient}_${location}_${orderIntention}`;
 
     if (this._encounterEntities[encounterID]) {
-      return of(this._encounterEntities[encounterID]);
+      return of(this._encounterEntities[encounterID]).pipe(
+        catchError((error) => {
+          return of(error);
+        })
+      );
     }
 
     return this.getOrderEncounterType(orderIntention).pipe(
@@ -205,12 +213,12 @@ export class DrugOrdersService {
           location,
           encounterType: encounterTypeResponse
             ? encounterTypeResponse.uuid
-            : '28ac28e3-e8a6-45f3-ae42-ec3d664a955b',
+            : "28ac28e3-e8a6-45f3-ae42-ec3d664a955b",
           encounterProviders: [
             {
               provider: order?.orderer,
               // TODO: Find best way to get encounter provider details
-              encounterRole: '240b26f9-dd88-4172-823d-4a8bfeb7841f',
+              encounterRole: "240b26f9-dd88-4172-823d-4a8bfeb7841f",
             },
           ],
         };
@@ -220,6 +228,9 @@ export class DrugOrdersService {
         ).pipe(
           tap((encounterResponse) => {
             this._encounterEntities[encounterID] = encounterResponse;
+          }),
+          catchError((error) => {
+            return of(error);
           })
         );
       })
@@ -229,14 +240,18 @@ export class DrugOrdersService {
   getOrderType(): Observable<any> {
     return from(
       this.api.systemsetting.getAllSystemSettings({
-        q: 'drugOrder.orderType',
-        v: 'custom:(uuid,display,property,value)' as any,
+        q: "drugOrder.orderType",
+        v: "custom:(uuid,display,property,value)" as any,
       })
     ).pipe(
       switchMap((res) => {
         const orderTypeSetting: any = res?.results ? res.results[0] : null;
         return orderTypeSetting?.value
-          ? from(this.api.ordertype.getOrderType(orderTypeSetting.value))
+          ? from(this.api.ordertype.getOrderType(orderTypeSetting.value)).pipe(
+              catchError((error) => {
+                return of(error);
+              })
+            )
           : of(null);
       })
     );
@@ -244,9 +259,9 @@ export class DrugOrdersService {
 
   getOrderEncounterType(orderIntention: OrderIntention) {
     switch (orderIntention) {
-      case 'DISPENSE':
+      case "DISPENSE":
         return this.getDispensingEncounterType();
-      case 'PRESCRIBE':
+      case "PRESCRIBE":
         return this.getPrescriptionEncounterType();
       default:
         return of(null);
@@ -258,8 +273,8 @@ export class DrugOrdersService {
       ? of(this._encounterType.dispensing)
       : from(
           this.api.systemsetting.getAllSystemSettings({
-            q: 'drugOrder.dispensingEncounterType',
-            v: 'custom:(uuid,display,property,value)' as any,
+            q: "drugOrder.dispensingEncounterType",
+            v: "custom:(uuid,display,property,value)" as any,
           })
         ).pipe(
           switchMap((res) => {
@@ -283,8 +298,8 @@ export class DrugOrdersService {
       ? of(this._encounterType.prescription)
       : from(
           this.api.systemsetting.getAllSystemSettings({
-            q: 'drugOrder.prescriptionEncounterType',
-            v: 'custom:(uuid,display,property,value)' as any,
+            q: "drugOrder.prescriptionEncounterType",
+            v: "custom:(uuid,display,property,value)" as any,
           })
         ).pipe(
           switchMap((res) => {
@@ -306,35 +321,57 @@ export class DrugOrdersService {
   getDrugsConcepts() {
     return from(
       this.getSetMembersAsOptions(
-        'Reference application common drug allergens',
-        'full'
+        "Reference application common drug allergens",
+        "full"
       )
+    ).pipe(
+      catchError((error) => {
+        return of(error);
+      })
     );
   }
 
   getDosingUnit() {
-    return from(this.getSetMembersAsOptions('Dosing Unit', 'full'));
+    return from(this.getSetMembersAsOptions("Dosing Unit", "full")).pipe(
+      catchError((error) => {
+        return of(error);
+      })
+    );
   }
 
   getOrderFrequency() {
-    return from(this.getDrugOrdersFrequency('full'));
+    return from(this.getDrugOrdersFrequency("full")).pipe(
+      catchError((error) => {
+        return of(error);
+      })
+    );
   }
 
   getDrugRoutes() {
     return from(
-      this.getSetMembersAsOptions('Routes of administration', 'full')
+      this.getSetMembersAsOptions("Routes of administration", "full")
+    ).pipe(
+      catchError((error) => {
+        return of(error);
+      })
     );
   }
 
   getDurationUnits() {
-    return from(this.getConceptAnswersAsOptions('Duration units', 'full'));
+    return from(this.getConceptAnswersAsOptions("Duration units", "full")).pipe(
+      catchError((error) => {
+        return of(error);
+      })
+    );
   }
 
   getDrugOrderMetadata(
     drugOrder: DrugOrderObject,
     locations: any[],
-    fromDispensing: boolean
-  ): Observable<DrugOrderMetadata> {
+    fromDispensing: boolean,
+    doctorPrescriptionDetails: any,
+    metadataConfigs: any
+  ): Observable<any> {
     return zip(
       this.getOrderType(),
       this.getDosingUnit(),
@@ -345,8 +382,11 @@ export class DrugOrdersService {
         ...locations.map((location) =>
           this.stockService.getAvailableStocks(location.id)
         )
-      ).pipe(map((res) => flatten(res))),
-      this.getAllDrugs('full')
+      ).pipe(
+        map((res) => {
+          return flatten(res);
+        })
+      )
     ).pipe(
       map((res) => {
         const metadata = {
@@ -357,58 +397,81 @@ export class DrugOrdersService {
           drugRoutes: res[3],
           durationUnits: res[4],
           stockedDrugs: res[5],
-          drugs: res[6],
         };
 
         const drugFormField = new Dropdown({
           options: [],
-          key: 'drug',
-          id: 'drug',
-          value: drugOrder?.drug?.uuid,
+          key: "drug",
+          id: "drug",
+          value:
+            metadataConfigs?.specificDrugConceptUuid && fromDispensing
+              ? doctorPrescriptionDetails?.obs[
+                  metadataConfigs?.specificDrugConceptUuid
+                ]?.valueDrug?.uuid
+              : drugOrder?.drug?.uuid,
           required: true,
-          label: 'Drug',
+          label: "Drug",
         });
 
         const doseField = new Textbox({
-          id: 'dose',
-          key: 'dose',
-          label: 'Dose',
+          id: "dose",
+          key: "dose",
+          label: "Dose",
           order: 2,
           required: true,
-          type: 'number',
-          value: drugOrder?.dose,
+          type: "number",
+          value: !metadataConfigs?.fromDispensing
+            ? drugOrder?.dose
+            : doctorPrescriptionDetails?.obs[
+                metadataConfigs?.generalPrescriptionDoseConcept
+              ]?.value,
         });
 
         const dosingUnitsField = new Dropdown({
-          id: 'doseUnits',
+          id: "doseUnits",
           options: (metadata.dosingUnits || []).map((dosingUnit) => ({
             id: dosingUnit.uuid,
             key: dosingUnit.uuid,
             label: dosingUnit.name,
             value: dosingUnit.uuid,
           })),
-          label: 'Dosing unit',
+          label: "Dosing unit",
           order: 3,
           required: true,
-          key: 'doseUnits',
-          value: drugOrder?.doseUnits,
+          key: "doseUnits",
+          value: !metadataConfigs?.fromDispensing
+            ? drugOrder?.doseUnits
+            : doctorPrescriptionDetails?.obs[
+                metadataConfigs?.dosingUnitsSettings
+              ]?.value?.uuid,
         });
 
+        console.log(
+          "==> Frequency: ",
+          doctorPrescriptionDetails?.obs[
+            metadataConfigs?.generalPrescriptionFrequencyConcept
+          ]?.value?.display
+        );
+        console.log("==> Frequencies: ", metadata.drugOrderFrequencies);
+
         const drugOrderFrequencyField = new Dropdown({
-          id: 'fequency',
-          options: (metadata.drugOrderFrequencies || []).map(
-            (orderFrequency) => ({
+          id: "frequency",
+          options: (metadata.drugOrderFrequencies || []).map((orderFrequency) => ({
               id: orderFrequency.uuid,
               key: orderFrequency.uuid,
               label: orderFrequency.name,
               value: orderFrequency.uuid,
             })
           ),
-          label: 'Frequency',
+          label: "Frequency",
           order: 4,
           required: true,
-          key: 'frequency',
-          value: drugOrder?.frequency,
+          key: "frequency",
+          value: !metadataConfigs.fromDispensing
+            ? drugOrder?.frequency
+            : doctorPrescriptionDetails?.obs[
+                metadataConfigs?.generalPrescriptionFrequencyConcept
+              ]?.value?.uuid,
         });
 
         const drugRoutesField = new Dropdown({
@@ -418,12 +481,16 @@ export class DrugOrdersService {
             label: orderFrequency.name,
             value: orderFrequency.uuid,
           })),
-          label: 'Route',
+          label: "Route",
           order: 5,
           required: true,
-          key: 'route',
-          id: 'route',
-          value: drugOrder?.route,
+          key: "route",
+          id: "route",
+          value: !metadataConfigs.fromDispensing
+            ? drugOrder?.route
+            : doctorPrescriptionDetails?.obs[
+                metadataConfigs?.drugRoutesSettings
+              ]?.value?.uuid,
         });
 
         const durationUnitsFormField = new Dropdown({
@@ -433,22 +500,30 @@ export class DrugOrdersService {
             label: durationUnit.name,
             value: durationUnit.uuid,
           })),
-          label: 'Duration Units',
+          label: "Duration Units",
           order: 6,
           required: true,
-          key: 'durationUnits',
-          id: 'durationUnits',
-          value: drugOrder?.durationUnits,
+          key: "durationUnits",
+          id: "durationUnits",
+          value: !metadataConfigs.fromDispensing
+            ? drugOrder?.durationUnits
+            : doctorPrescriptionDetails?.obs[
+                metadataConfigs?.durationUnitsSettings
+              ]?.value?.uuid,
         });
 
         const doseDurationField = new Textbox({
-          key: 'duration',
-          id: 'duration',
-          label: 'Duration',
+          key: "duration",
+          id: "duration",
+          label: "Duration",
           order: 2,
           required: true,
-          type: 'text',
-          value: drugOrder?.duration,
+          type: "text",
+          value: !metadataConfigs.fromDispensing
+            ? drugOrder?.duration
+            : doctorPrescriptionDetails?.obs[
+                metadataConfigs?.generalPrescriptionDurationConcept
+              ]?.value,
         });
 
         const genericNameField = new Dropdown({
@@ -460,39 +535,39 @@ export class DrugOrdersService {
           })),
           value: drugOrder?.genericName,
           disabled: fromDispensing,
-          controlType: 'dropDown',
-          key: 'concept',
-          id: 'concept',
-          label: 'Drug name',
+          controlType: "dropDown",
+          key: "concept",
+          id: "concept",
+          label: "Drug name",
           required: true,
-          type: 'text',
+          type: "text",
         });
 
         const orderReasonField = new Textbox({
           value: drugOrder?.reason,
-          key: 'orderReason',
-          id: 'orderReason',
+          key: "orderReason",
+          id: "orderReason",
           required: false,
-          label: 'Reason',
-          type: 'text',
+          label: "Reason",
+          type: "text",
         });
 
         const instructionField = new Textbox({
           value: drugOrder?.instructions,
-          key: 'instructions',
-          id: 'instructions',
-          label: 'Instructions',
+          key: "instructions",
+          id: "instructions",
+          label: "Instructions",
           required: false,
-          type: 'text',
+          type: "text",
         });
 
         const quantityField = new Textbox({
           value: drugOrder?.quantity?.toString(),
-          key: 'quantity',
-          id: 'quantity',
-          label: 'Quantity',
+          key: "quantity",
+          id: "quantity",
+          label: "Quantity",
           required: true,
-          type: 'number',
+          type: "number",
         });
 
         const durationFormFields = [doseDurationField, durationUnitsFormField];
@@ -518,6 +593,9 @@ export class DrugOrdersService {
           durationFormFields,
           doseFormFields,
         };
+      }),
+      catchError((error) => {
+        return of(error);
       })
     );
   }

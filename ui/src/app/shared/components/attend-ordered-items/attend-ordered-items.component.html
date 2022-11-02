@@ -1,13 +1,15 @@
 <div
   class="ordered-items-container"
   *ngIf="{
-    orderedProcedures: orderedProcedures$ | async
+    orderedProcedures: orderedProcedures$ | async,
+    activeVisit : activeVisit$ | async 
   } as params"
 >
   <table class="table table-bordered">
+    
     <thead>
       <tr>
-        <th>Department</th>
+        <th *ngIf="conceptsWithDepartmentsDetails">Department</th>
         <th>{{ orderTypeName }}</th>
         <th>Instructions</th>
         <th>Order Date & Time</th>
@@ -34,7 +36,7 @@
       >
         <ng-container *ngFor="let orderedItem of params?.orderedProcedures">
           <tr [ngClass]="{ 'text-danger': !orderedItem?.paid }">
-            <td>
+            <td *ngIf="conceptsWithDepartmentsDetails">
               {{
                 departmentsDetailsKeyedBySetmembers[orderedItem?.concept?.uuid]
                   ?.department?.display
@@ -63,7 +65,7 @@
                     orderedItem?.value && orderedItem?.value === 'True'
                   "
                   [disabled]="
-                    !orderedItem?.paid ||
+                    (!orderedItem?.paid && !params.activeVisit?.isAdmitted && !params.activeVisit?.isEnsured && !params.activeVisit?.isEmergency) ||
                     (orderedItem?.value && orderedItem?.value === 'True')
                   "
                   (change)="onCheck($event, orderedItem)"
@@ -75,7 +77,7 @@
               <mat-form-field class="w-100" *ngIf="!orderedItem?.remarks">
                 <mat-label>Remarks</mat-label>
                 <textarea
-                  [disabled]="!orderedItem?.paid"
+                  [disabled]="(!orderedItem?.paid && !params.activeVisit.isAdmitted && !params.activeVisit?.isEnsured && !params.activeVisit?.isEmergency)"
                   [(ngModel)]="comments[orderedItem?.concept?.uuid]"
                   matInput
                 ></textarea>
@@ -87,7 +89,7 @@
             <td>
               <button
                 [disabled]="
-                  !orderedItem?.paid ||
+                  (!orderedItem?.paid && !params.activeVisit.isAdmitted && !params.activeVisit?.isEnsured && !params.activeVisit?.isEmergency) ||
                   (orderedItem?.value && orderedItem?.value === 'True') ||
                   !status[orderedItem?.concept?.uuid]
                 "
@@ -112,7 +114,7 @@
         </tr>
       </ng-container>
       <ng-container>
-        <tr>
+        <tr *ngIf="nursingConfigurations">
           <td colspan="100% d-flex justify-content-end">
             <button
               mat-stroked-button

@@ -1,18 +1,18 @@
-import { RequisitionInput } from './requisition-input.model';
+import { RequisitionInput } from "./requisition-input.model";
 
-import { head, sortBy, reverse, flatten } from 'lodash';
+import { head, sortBy, reverse, flatten } from "lodash";
 
 export type RequisitionStatus =
-  | 'REQUESTED'
-  | 'CANCELLING'
-  | 'CANCELLED'
-  | 'REJECTING'
-  | 'REJECTED'
-  | 'ISSUING'
-  | 'ISSUED'
-  | 'RECEIVING'
-  | 'RECEIVED'
-  | 'FAILED';
+  | "REQUESTED"
+  | "CANCELLING"
+  | "CANCELLED"
+  | "REJECTING"
+  | "REJECTED"
+  | "ISSUING"
+  | "ISSUED"
+  | "RECEIVING"
+  | "RECEIVED"
+  | "FAILED";
 
 export interface RequisitionStatusObject {
   requisition: { uuid: string };
@@ -36,6 +36,8 @@ export interface RequisitionObject {
     status: RequisitionStatus;
     error?: any;
   };
+  issuedDate: Date;
+  issueItems: any[];
 }
 
 export interface RequisitionReceiptObject {
@@ -48,14 +50,14 @@ export interface RequisitionReceiptObject {
   issueingLocation: {
     uuid: string;
   };
-  receiptItems: [
-    {
-      item: {
-        uuid: string;
-      };
-      quantity: number;
-    }
-  ];
+  receiptItems: {
+    item: {
+      uuid: string;
+    };
+    quantity: number;
+    expiryDate?: Date;
+    batch?: string;
+  }[];
 }
 
 export interface RequisitionSave {
@@ -130,6 +132,10 @@ export class Requisition {
     return head(this.requisition?.issues)?.uuid;
   }
 
+  get issueItems(): any[] {
+    return head(this.requisition?.issues)?.issueItems;
+  }
+
   get latestIssueItem(): any {
     return head(
       reverse(
@@ -141,7 +147,7 @@ export class Requisition {
                 created: issue?.created,
               }))
             ),
-            'created'
+            "created"
           )
         )
       )
@@ -163,11 +169,17 @@ export class Requisition {
                 created: issue?.created,
               }));
             }),
-            'created'
+            "created"
           )
         )
       )
     );
+  }
+
+  get issuedDate(): Date {
+    return this.requisition.issues?.length > 0
+      ? new Date(this.requisition?.issues[0]?.created)
+      : null;
   }
 
   get quantityRequested(): number {
@@ -200,7 +212,7 @@ export class Requisition {
     );
 
     if (isReceived) {
-      return 'RECEIVED';
+      return "RECEIVED";
     }
 
     const latestIssueStatus = this.latestIssueStatus;
@@ -208,10 +220,10 @@ export class Requisition {
     if (!latestIssueStatus) {
       const requisitionStatus = head(this.requisition?.requisitionStatuses);
 
-      return requisitionStatus?.status || 'PENDING';
+      return requisitionStatus?.status || "PENDING";
     }
 
-    return latestIssueStatus?.status || 'ISSUED';
+    return latestIssueStatus?.status || "ISSUED";
   }
 
   get remarks(): string {
@@ -233,6 +245,8 @@ export class Requisition {
       requestingStore: this.requestingStore,
       status: this.status,
       remarks: this.remarks,
+      issuedDate: this.issuedDate,
+      issueItems: this.issueItems,
     };
   }
 
@@ -308,12 +322,14 @@ export class Requisition {
       issueingLocation: {
         uuid: requisition?.targetStore?.uuid,
       },
-      receiptItems: [
-        {
-          item: { uuid: requisition.itemUuid },
-          quantity: requisition.quantityIssued,
-        },
-      ],
+      receiptItems: requisition?.issueItems?.map((issueItem) => {
+        return {
+          item: { uuid: issueItem?.item?.uuid },
+          quantity: Number(issueItem?.quantity),
+          expiryDate: new Date(issueItem?.expiryDate),
+          batch: issueItem?.batch,
+        };
+      }),
     };
   }
 }

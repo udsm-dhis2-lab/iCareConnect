@@ -4,18 +4,24 @@ package org.openmrs.module.icare.web.controller;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;*/
 
+import org.apache.commons.io.IOUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.hamcrest.CoreMatchers;
+import org.hamcrest.Matcher;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.openmrs.ConceptComplex;
 import org.openmrs.Patient;
 import org.openmrs.Visit;
-import org.openmrs.api.PatientService;
+import org.openmrs.api.*;
 import org.openmrs.api.context.Context;
+import org.openmrs.*;
+import org.openmrs.module.icare.ICareConfig;
 import org.openmrs.module.icare.billing.models.Invoice;
 import org.openmrs.module.icare.billing.models.InvoiceItem;
+import org.openmrs.module.icare.billing.models.ItemPrice;
 import org.openmrs.module.icare.billing.models.Payment;
 import org.openmrs.module.icare.billing.services.BillingService;
 import org.openmrs.module.icare.core.ICareService;
@@ -25,12 +31,21 @@ import org.openmrs.module.webservices.rest.SimpleObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.mock.web.MockMultipartHttpServletRequest;
+import org.springframework.web.bind.annotation.RequestMethod;
 
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -189,9 +204,12 @@ public class BillingControllerAPITest extends BaseResourceControllerTest {
 		//Given
 		PatientService patientService = Context.getService(PatientService.class);
 		Patient patient = patientService.getPatientByUuid("1f6959e5-d15a-4025-bb48-340ee9e2c58d");
+		
 		createVisit(patient);
 		List<Invoice> invoices = billingService.getPendingInvoices(patient.getUuid());
 		Invoice invoice = invoices.get(0);
+		
+		System.out.println(Context.getObsService().getObservationsByPerson(patient));
 		
 		String dto = this.readFile("dto/discount-create.json");
 		Map<String, Object> discount = (new ObjectMapper()).readValue(dto, Map.class);
@@ -422,6 +440,92 @@ public class BillingControllerAPITest extends BaseResourceControllerTest {
 		handler = handle(newGetRequest);
 		List invoicePayment = (new ObjectMapper()).readValue(handler.getContentAsString(), List.class);
 		assertThat("Should still contain a invoice", invoicePayment.size(), is(1));*/
+	}
+	
+	@Test
+	@Ignore("Need to finish the test to accomodate the new discount creation")
+	public void testAutomaticFullDiscountCreation() throws Exception {
+		
+		//Discount Creation
+		PatientService patientService = Context.getService(PatientService.class);
+		Patient patient = patientService.getPatientByUuid("1f6959e5-d15a-4025-bb48-340ee9e2c58d");
+		createVisit(patient);
+		List<Invoice> invoices = billingService.getPendingInvoices(patient.getUuid());
+		
+		Invoice invoice = invoices.get(0);
+		Visit visit = invoice.getVisit();
+		
+		String dto = this.readFile("dto/discount-create.json");
+		Map<String, Object> discount = (new ObjectMapper()).readValue(dto, Map.class);
+		discount.put("exempted", true);
+		
+		//When
+		((Map) ((Map) ((List) discount.get("items")).get(0)).get("invoice")).put("uuid", invoice.getUuid());
+		MockHttpServletRequest newGetRequest = newPostRequest("billing/discount", discount);
+		MockHttpServletResponse handle = handle(newGetRequest);
+		
+		System.out.println(invoice.getInvoiceItems().size());
+		
+		///Create a new bill
+		//Given
+		OrderType orderType = new OrderType();
+		orderType.setJavaClassName("org.openmrs.module.icare.billing.models.Prescription");
+		orderType.setName("Prescription");
+		Context.getOrderService().saveOrderType(orderType);
+		
+		Map<String, Object> result = getResourceDTOMap("core/ledger-add");
+		MockHttpServletRequest newPostRequest = null;
+		//		MockHttpServletResponse
+		handle = null;
+		newPostRequest = newPostRequest("store/ledger", result);
+		handle = handle(newPostRequest);
+		
+		result = getResourceDTOMap("drug-create-dto");
+		patientService = Context.getService(PatientService.class);
+		patient = patientService.getPatientByUuid("1f6959e5-d15a-4025-bb48-340ee9e2c58d");
+		//Visit visit = this.getVisit(patient);
+		
+		EncounterService encounterService = Context.getService(EncounterService.class);
+		Encounter encounter = encounterService.getEncountersByVisit(visit, false).get(0);
+		result.put("encounter", encounter.getUuid());
+		
+		//When
+		newGetRequest = newPostRequest("icare/prescription", result);
+		handle = handle(newGetRequest);
+		
+		//logics to check if full discount is created automatically
+		Double discountPrice = invoice.getDiscountItems().get(1).getAmount();
+		Double totalPrice = invoice.getInvoiceItems().get(1).getPrice() * invoice.getInvoiceItems().get(1).getQuantity();
+		
+		assertThat(totalPrice, equalTo(discountPrice));
+		assertThat("The discount items should be three i.e includes the registration invoice item", invoice
+		        .getDiscountItems().size() == 3);
+		
+	}
+	
+	@Test
+	public void createOrderForOngoingIPDPatients() throws Exception {
+		Order order = new Order();
+		
+		AdministrationService adminService = Context.getService(AdministrationService.class);
+		ConceptService conceptService = Context.getService(ConceptService.class);
+		adminService.setGlobalProperty(ICareConfig.BED_ORDER_TYPE, "2msir5eb-5345-11e8-9922-40b034c3cfef");
+		//adminService.setGlobalProperty(ICareConfig.SERVICE_ATTRIBUTE,"SERVICE0IIIIIIIIIIIIIIIIIIIIIIIATYPE");
+		System.out.println("Yuhu:" + Context.getProviderService().getProvider(1));
+		adminService.setGlobalProperty(ICareConfig.BED_ORDER_CONCEPT, "e721ec30-mfy4-11e8-ie7c-40b69mdy79ee");
+		
+		order = billingService.createOrderForOngoingIPDPatients();
+		
+		OrderService orderService = Context.getService(OrderService.class);
+		Order createdOrders = orderService.getOrderByUuid(order.getUuid());
+		
+		List<Invoice> patientInvoices = billingService.getPatientsInvoices("1f6959e5-d15a-4025-bb48-340ee9e2c58d");
+		
+		assertThat("The order should be created", createdOrders.getUuid().length() > 1);
+		assertThat("Invoice should have 1 item", patientInvoices.get(0).getInvoiceItems().size(), is(1));
+		
+		System.out.println(order);
+		
 	}
 	
 	@Override
