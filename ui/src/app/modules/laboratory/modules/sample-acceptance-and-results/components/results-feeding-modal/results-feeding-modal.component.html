@@ -2500,6 +2500,7 @@
                           >
                             Amend
                           </button>
+                          <!-- {{item?.testAllocations[0] | json}} -->
                           <button
                             class="ml-2"
                             [ngClass]="{
@@ -2511,7 +2512,7 @@
                             [disabled]="
                               item?.allocationsPairedBySetMember[
                                 parameter?.uuid
-                              ]?.firstSignOff && !LISConfigurations?.isLIS
+                              ]?.firstSignOff
                             "
                             mat-stroked-button
                             (click)="
