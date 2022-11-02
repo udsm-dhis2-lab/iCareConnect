@@ -671,7 +671,6 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 		OrderService orderService = Context.getService(OrderService.class);
 		
 		List<Visit> visits = dao.getOpenAdmittedVisit();
-
 		
 		for (Visit visit : visits) {
 			
