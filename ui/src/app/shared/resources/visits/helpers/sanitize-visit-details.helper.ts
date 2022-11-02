@@ -71,7 +71,7 @@ export function getOrdersFromCurrentVisitEncounters(
               uuid: order?.orderer?.uuid,
               display: order?.orderer?.display,
             },
-            value: observation ? observation?.value?.display : null,
+            value: observation ? observation?.value : null,
             remarks: observation ? observation?.comment : null,
             obsDatetime: observation ? observation?.obsDatetime : null,
             paid,
