@@ -209,8 +209,7 @@ export class LabSamplesEffects {
                         return allocation?.statuses;
                       })
                     );
-
-                    return {
+                    const formattedOrder = {
                       ...order,
                       order: {
                         ...order?.order,
@@ -238,11 +237,12 @@ export class LabSamplesEffects {
                               : [],
                           setMembers:
                             keyedDepartments[order?.order?.concept?.uuid]
-                              ?.keyedConcept?.setMembers?.length == 0
+                              ?.setMembers?.length == 0
                               ? []
                               : _.map(
-                                  keyedDepartments[order?.order?.concept?.uuid]
-                                    ?.keyedConcept?.setMembers,
+                                  keyedSpecimenSources[
+                                    order?.order?.concept?.uuid
+                                  ]?.setMembers,
                                   (member) => {
                                     return {
                                       ...member,
@@ -372,6 +372,8 @@ export class LabSamplesEffects {
                         }
                       ),
                     };
+                    // console.log(formattedOrder);
+                    return formattedOrder;
                   }),
                   searchingText: createSearchingText(sample),
                   priorityStatus: (sample?.statuses?.filter(
