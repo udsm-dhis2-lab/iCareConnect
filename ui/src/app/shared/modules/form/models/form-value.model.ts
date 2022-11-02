@@ -1,12 +1,14 @@
-import { FormGroup } from '@angular/forms';
-import { find } from 'lodash';
-import { Field } from './field.model';
+import { FormGroup } from "@angular/forms";
+import { find } from "lodash";
+import { Field } from "./field.model";
 export class FormValue {
   form: FormGroup;
   fields: Field<string>[];
-  constructor(form: FormGroup, fields: Field<string>[]) {
+  fileValues: any;
+  constructor(form: FormGroup, fields: Field<string>[], fileValues?: any) {
     this.form = form;
     this.fields = fields;
+    this.fileValues = fileValues;
   }
 
   get isValid(): boolean {
@@ -19,15 +21,18 @@ export class FormValue {
 
   getValues(): { [id: string]: { id: string; value: string; options: any[] } } {
     const newValues = {};
-    const formValues = this.form?.getRawValue();
+    const formValues = !this.fileValues
+      ? this.form?.getRawValue()
+      : this.fileValues;
 
     Object.keys(formValues).forEach((key) => {
-      const field = find(this.fields, ['key', key]);
+      const field = find(this.fields, ["key", key]);
       if (field) {
         newValues[key] = {
           id: field.id,
           value: formValues[key],
           options: field.options,
+          isFile: this.fileValues ? true : false,
         };
       }
     });

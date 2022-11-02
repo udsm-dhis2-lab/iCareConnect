@@ -125,6 +125,7 @@
               </button> -->
             </td>
             <td
+              class="text-center"
               *ngIf="ordersCount === 0"
               [attr.rowspan]="specimenSourceWithOrders?.orders?.length"
             >
@@ -142,8 +143,7 @@
                   )
                 "
                 mat-stroked-button
-                color="primary"
-                class="mr-2 collect-sample-btn"
+                class="mr-2 mt-2 text-white colored-button"
               >
                 Collect
               </button>

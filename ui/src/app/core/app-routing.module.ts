@@ -141,11 +141,23 @@ const routes: Routes = [
           ),
       },
       {
-        path: "radiology",
+        path: "theatre",
         loadChildren: () =>
           import("../modules/theatre/theatre.module").then(
             (m) => m.TheatreModule
           ),
+      },
+      {
+        path: "radiology",
+        loadChildren: () =>
+          import("../modules/radiology/radiology.module").then(
+            (m) => m.RadiologyModule
+          ),
+      },
+      {
+        path: "dhis2",
+        loadChildren: () =>
+          import("../modules/dhis2/dhis2.module").then((m) => m.DHIS2Module),
       },
     ],
   },

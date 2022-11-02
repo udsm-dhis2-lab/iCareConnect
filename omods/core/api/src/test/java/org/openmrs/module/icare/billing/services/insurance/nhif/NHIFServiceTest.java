@@ -258,7 +258,7 @@ public class NHIFServiceTest extends BillingTestBase {
 		
 		assertThat("Check Set Serial Number", folio.getSerialNo(), is("01099\\" + dt.format(visit.getStartDatetime())
 		        + "\\00" + visit.getId()));
-		assertThat("Check Set Folio Claim Year", folio.getClaimYear(), is(2021));
+		assertThat("Check Set Folio Claim Year", folio.getClaimYear(), is(2022));
 		assertThat("Check Set Folio Claim Month", folio.getClaimMonth(), is(visit.getStartDatetime().getMonth() + 1));
 		assertThat("Check Set Folio Number", folio.getFolioNo(), is(visit.getId().longValue()));
 		assertThat("Check the start Date", folio.getAttendanceDate(), is(visit.getStartDatetime()));

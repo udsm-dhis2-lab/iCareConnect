@@ -31,6 +31,11 @@ export class ConfirmSavingOrderObservationModalComponent implements OnInit {
     ) || [])[0];
   }
 
+  onClose(event: Event): void {
+    event.stopPropagation();
+    this.dialogData.close();
+  }
+
   onConfirm(event: Event, data: any): void {
     event.stopPropagation();
     this.savingData = true;
@@ -53,7 +58,7 @@ export class ConfirmSavingOrderObservationModalComponent implements OnInit {
           setTimeout(() => {
             this.savingData = false;
             setTimeout(() => {
-              this.dialogRef.close();
+              this.dialogRef.close(true);
             }, 500);
           }, 200);
         }

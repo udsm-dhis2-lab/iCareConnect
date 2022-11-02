@@ -316,6 +316,24 @@ public class VisitWrapper {
 		}
 		locationMap.put("tags", locationTagsMap);
 		visitMap.put("location", locationMap);
+
+		List<Map<String,Object>> encountersMap = new ArrayList<>();
+		for(Encounter encounter:visit.getEncounters()){
+			Map<String,Object> encounterMap = new HashMap<>();
+			encounterMap.put("uuid",encounter.getUuid());
+			encounterMap.put("id",encounter.getEncounterId());
+			encounterMap.put("encounterDateTime",encounter.getEncounterDatetime());
+			encounterMap.put("voidedReason",encounter.getVoidReason());
+			encounterMap.put("voided",encounter.getVoided());
+			encounterMap.put("dateVoided",encounter.getDateVoided());
+			encounterMap.put("createdOn",encounter.getDateCreated());
+			encounterMap.put("changedOn",encounter.getDateChanged());
+			//encounterMap.put("diagnoses",encounter.getDiagnoses());
+
+			encountersMap.add(encounterMap);
+		}
+		visitMap.put("encounters",encountersMap);
+
 		return visitMap;
 	}
 	
@@ -325,5 +343,9 @@ public class VisitWrapper {
 	
 	public enum OrderByDirection {
 		ASC, DESC;
+	}
+	
+	public enum PaymentStatus {
+		PAID, PENDING;
 	}
 }

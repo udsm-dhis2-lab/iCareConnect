@@ -48,7 +48,7 @@
               *ngFor="let concept of params?.conceptsList; let count = index"
             >
               <td>
-                {{ count + 1 }}
+                {{ count + 1 + (page - 1) * pageSize }}
               </td>
               <td>
                 {{ concept?.display }}

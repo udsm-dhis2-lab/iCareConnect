@@ -41,11 +41,12 @@
         <div *ngIf="!params?.settingCurrentLocationStatus">
           <div class="w-100 text-centered">
             <!-- TODO: Softcode the order uuid -->
+            <!-- {{ locationsIds$ | async | json }} -->
             <app-patient-list
+              [currentLocation]="params?.locationsIds"
               (selectPatient)="onSelectPatient($event)"
               [shouldShowParentLocation]="true"
               [isTabularList]="true"
-              [orderType]="'iCARE901-ADMS-11e8-b450-525400e4297f'"
             ></app-patient-list>
           </div>
         </div>
@@ -65,6 +66,7 @@
         </mat-toolbar>
         <app-wards-list
           [locationBedsDetails]="params?.bedsByLocationDetails"
+          [locationsIds]="params?.locationsIds"
           [currentLocation]="currentLocation"
           (bedStatus)="onGetBedStatus($event, params?.orderType)"
         ></app-wards-list>

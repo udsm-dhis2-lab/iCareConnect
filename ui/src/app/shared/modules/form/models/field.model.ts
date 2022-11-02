@@ -12,8 +12,8 @@ export class Field<T> {
   disabled: boolean;
   options: DropdownOption[];
   placeholder: string;
-  min: number;
-  max: number;
+  min: number | string;
+  max: number | string;
   hidden: boolean;
   units: string;
   rows?: number;
@@ -24,6 +24,8 @@ export class Field<T> {
   category?: string;
   searchTerm?: string;
   source?: string;
+  isDiagnosis?: boolean;
+  locationUuid?: string;
 
   constructor(
     options: {
@@ -38,17 +40,19 @@ export class Field<T> {
       disabled?: boolean;
       placeholder?: string;
       options?: DropdownOption[];
-      min?: number;
-      max?: number;
+      min?: number | string;
+      max?: number | string;
       hidden?: boolean;
       units?: string;
       conceptClass?: any;
       searchControlType?: string;
       shouldHaveLiveSearchForDropDownFields?: boolean;
       filteringItems?: any[];
+      isDiagnosis?: boolean;
       category?: string;
       searchTerm?: string;
       source?: string;
+      locationUuid?: string;
     } = {}
   ) {
     this.value = options.value;
@@ -73,5 +77,7 @@ export class Field<T> {
     this.conceptClass = options?.conceptClass;
     this.searchTerm = options?.searchTerm;
     this.source = options?.source;
+    this.isDiagnosis = options?.isDiagnosis;
+    this.locationUuid = options?.locationUuid;
   }
 }

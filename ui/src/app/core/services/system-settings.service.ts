@@ -31,7 +31,7 @@ export class SystemSettingsService {
             response?.results[0]?.value.indexOf("[") > -1
             ? JSON.parse(response?.results[0]?.value)
             : response?.results[0]?.value
-          : "";
+          : "none";
       }),
       catchError((error) => of(error))
     );
@@ -66,9 +66,24 @@ export class SystemSettingsService {
                       name: result?.property
                         .split(".")
                         [result?.property.split(".").length - 1]?.toUpperCase(),
+                      referenceKeyPart:
+                        result?.property.split(".")[
+                          result?.property.split(".").length - 1
+                        ],
                       property: result?.property,
                       description: result?.description,
                       value: result?.value,
+                      order: Number(
+                        result?.property.split(".")[
+                          result?.property.split(".").length - 1
+                        ]
+                      )
+                        ? Number(
+                            result?.property.split(".")[
+                              result?.property.split(".").length - 1
+                            ]
+                          )
+                        : null,
                     }
                   : {
                       uuid: result?.uuid,
@@ -77,9 +92,24 @@ export class SystemSettingsService {
                           result?.property.split(".").length - 1
                         ]
                       ),
+                      referenceKeyPart:
+                        result?.property.split(".")[
+                          result?.property.split(".").length - 1
+                        ],
                       property: result?.property,
                       description: result?.description,
                       value: result?.value,
+                      order: Number(
+                        result?.property.split(".")[
+                          result?.property.split(".").length - 1
+                        ]
+                      )
+                        ? Number(
+                            result?.property.split(".")[
+                              result?.property.split(".").length - 1
+                            ]
+                          )
+                        : null,
                     };
               })
             : [];

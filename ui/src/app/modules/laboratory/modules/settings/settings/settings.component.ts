@@ -1,6 +1,11 @@
 import { Component, OnInit } from "@angular/core";
 import { FormControl } from "@angular/forms";
 import { Router } from "@angular/router";
+import { Store } from "@ngrx/store";
+import { Observable } from "rxjs";
+import { AppState } from "src/app/store/reducers";
+import { getLISConfigurations } from "src/app/store/selectors/lis-configurations.selectors";
+import { LISConfigurationsModel } from "../../../resources/models/lis-configurations.model";
 
 @Component({
   selector: "app-settings",
@@ -9,9 +14,13 @@ import { Router } from "@angular/router";
 })
 export class SettingsComponent implements OnInit {
   selectedTab = new FormControl(0);
-  constructor(private router: Router) {}
 
-  ngOnInit(): void {}
+  LISConfigurations$: Observable<LISConfigurationsModel>;
+  constructor(private router: Router, private store: Store<AppState>) {}
+
+  ngOnInit(): void {
+    this.LISConfigurations$ = this.store.select(getLISConfigurations);
+  }
 
   changeRoute(e, val, path) {
     e.stopPropagation();

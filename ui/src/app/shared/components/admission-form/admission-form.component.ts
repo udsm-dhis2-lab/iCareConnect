@@ -89,10 +89,11 @@ export class AdmissionFormComponent implements OnInit {
       getAdmissionStatusOfCurrentPatient
     );
     this.provider$ = this.store.select(getProviderDetails);
-    this.admissionLocations$ = this.store.select(getLocationsByTagName, {
-      tagName: "Admission Location",
-    });
+    // this.admissionLocations$ = this.store.select(getLocationsByTagName, {
+    //   tagName: "Admission Location",
+    // });
 
+    this.admissionLocations$ = this.locationService.getLocationsByTagName("Admission+Location");
     this.observationLocations$ = this.locationService.getLocationsByTagName(
       "Observation+Location"
     );

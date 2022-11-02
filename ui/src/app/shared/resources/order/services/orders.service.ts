@@ -3,7 +3,7 @@ import { from, Observable, of, zip } from "rxjs";
 import { catchError, map } from "rxjs/operators";
 import { OpenmrsHttpClientService } from "../../../modules/openmrs-http-client/services/openmrs-http-client.service";
 import { omit } from "lodash";
-import { Api } from "../../openmrs";
+import { Api, EncounterCreate } from "../../openmrs";
 import { HttpErrorResponse } from "@angular/common/http";
 
 @Injectable({
@@ -24,7 +24,6 @@ export class OrdersService {
       })
     ).pipe(
       map((response) => {
-        console.log("Orders Response", response);
         return response;
       })
     );
@@ -48,6 +47,18 @@ export class OrdersService {
             catchError((error) => of(error))
           )
       )
+    );
+  }
+
+  updateOrderStatus(order): Observable<any> {
+    return this.openMRSHttpClient.put(`order/${order?.uuid}`, order).pipe(
+      map((response) => {
+        return {
+          ...order,
+          ...response,
+        };
+      }),
+      catchError((error) => of(error))
     );
   }
 
@@ -86,6 +97,35 @@ export class OrdersService {
     );
   }
 
+  createStandardEncounterWithObservations(
+    encounter: any,
+    obs: any
+  ): Observable<any> {
+    return from(this.API.encounter.createEncounter(encounter)).pipe(
+      map((response) => {
+        return zip(
+          ...obs.map((ob) => {
+            this.openMRSHttpClient
+              .post(`encounter/${response?.uuid}`, {
+                uuid: response?.uuid,
+                obs: [ob],
+              })
+              .pipe(
+                map((response) => {
+                  return {
+                    ...ob,
+                    ...response,
+                  };
+                }),
+                catchError((error) => of(error))
+              );
+          })
+        );
+      }),
+      catchError((error) => of(error))
+    );
+  }
+
   createOrdersViaEncounter(orders): Observable<any> {
     const encounterUuid = orders[0]?.encounter;
     const data = {
@@ -102,6 +142,13 @@ export class OrdersService {
       catchError((errorResponse: HttpErrorResponse) => {
         return of(errorResponse?.error);
       })
+    );
+  }
+
+  createOrder(order): Observable<any> {
+    return from(this.API.order.createOrder(order)).pipe(
+      map((order) => order),
+      catchError((error) => of(error))
     );
   }
 

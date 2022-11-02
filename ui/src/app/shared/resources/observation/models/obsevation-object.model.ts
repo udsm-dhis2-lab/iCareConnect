@@ -10,5 +10,6 @@ export interface ObservationObject {
   encounterUuid: string;
   voided: boolean;
   value: string | number;
+  valueObject?: any;
   status: string;
 }

@@ -153,7 +153,7 @@ export const reducers: ActionReducerMap<AppState> = {
   visitsDetails: visitsReducer,
   patient: patientReducer,
   patientNotes: patientNotesReducer,
-  labSamples: labSamplesReducer,
+  labSamples: newLabSamplesReducer,
   samples: newLabSamplesReducer,
   DHIS2Reports: DHIS2ReportsReducer,
   formPrivileges: formPrivilegesReducer,

@@ -229,7 +229,9 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 		for (IssueItem issueItem : issue.getIssueItems()) {
 			TransactionUtil.operateOnStock("-", issueItem);
 		}
+		System.out.println("Kabla");
 		Issue newIssue = this.issueDAO.save(issue);
+		System.out.println("Baada");
 		IssueStatus issueStatus = new IssueStatus();
 		issueStatus.setIssue(newIssue);
 		issueStatus.setRemarks("Items have been issued");
@@ -335,9 +337,10 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 	}
 	
 	@Override
-	public List<Stock> getStockByLocation(String locationUuid) {
+	public List<Stock> getStockByLocation(String locationUuid, String search, Integer startIndex, Integer limit,
+	        String conceptClassName) {
 		
-		return this.stockDAO.getStockByLocation(locationUuid);
+		return this.stockDAO.getStockByLocation(locationUuid, search, startIndex, limit, conceptClassName);
 	}
 	
 	@Override
@@ -540,8 +543,9 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 	}
 	
 	@Override
-	public List<Item> getStockoutByLocation(String locationUuid) {
-		return this.stockDAO.getStockedOutByLocation(locationUuid);
+	public List<Item> getStockoutByLocation(String locationUuid, String q, Integer startIndex, Integer limit,
+	        String conceptClassName) {
+		return this.stockDAO.getStockedOutByLocation(locationUuid, q, startIndex, limit, conceptClassName);
 	}
 	
 	@Override

@@ -13,7 +13,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.openmrs.*;
 import org.openmrs.api.*;
 import org.openmrs.api.context.Context;
+import org.openmrs.api.db.PatientDAO;
 import org.openmrs.api.impl.BaseOpenmrsService;
+import org.openmrs.logic.op.In;
 import org.openmrs.module.icare.ICareConfig;
 import org.openmrs.module.icare.billing.ItemNotPayableException;
 import org.openmrs.module.icare.billing.models.ItemPrice;
@@ -21,10 +23,15 @@ import org.openmrs.module.icare.billing.models.Prescription;
 import org.openmrs.module.icare.billing.services.insurance.Claim;
 import org.openmrs.module.icare.billing.services.insurance.ClaimResult;
 import org.openmrs.module.icare.billing.services.insurance.InsuranceService;
+import org.openmrs.module.icare.billing.services.insurance.VerificationException;
+import org.openmrs.module.icare.billing.services.insurance.nhif.AuthToken;
+import org.openmrs.module.icare.billing.services.insurance.nhif.NHIFConfig;
 import org.openmrs.module.icare.core.ICareService;
 import org.openmrs.module.icare.core.Item;
 import org.openmrs.module.icare.core.Message;
+import org.openmrs.module.icare.core.Summary;
 import org.openmrs.module.icare.core.dao.ICareDao;
+import org.openmrs.module.icare.core.utils.PatientWrapper;
 import org.openmrs.module.icare.core.utils.VisitWrapper;
 import org.openmrs.module.icare.report.dhis2.DHIS2Config;
 import org.openmrs.module.icare.store.models.OrderStatus;
@@ -32,15 +39,9 @@ import org.openmrs.validator.ValidateUtil;
 
 import javax.naming.ConfigurationException;
 import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.SocketTimeoutException;
-import java.net.URL;
+import java.net.*;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -48,6 +49,8 @@ import java.util.regex.Pattern;
 public class ICareServiceImpl extends BaseOpenmrsService implements ICareService {
 	
 	ICareDao dao;
+	
+	PatientDAO patientDAO;
 	
 	UserService userService;
 	
@@ -234,7 +237,7 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	public List<Visit> getVisitsByOrderType(String search, String orderTypeUuid, String locationUuid,
 	        OrderStatus.OrderStatusCode prescriptionStatus, Order.FulfillerStatus fulfillerStatus, Integer limit,
 	        Integer startIndex, VisitWrapper.OrderBy orderBy, VisitWrapper.OrderByDirection orderByDirection,
-	        String attributeValueReference, String paymentStatus) {
+	        String attributeValueReference, VisitWrapper.PaymentStatus paymentStatus) {
 		return this.dao.getVisitsByOrderType(search, orderTypeUuid, locationUuid, prescriptionStatus, fulfillerStatus,
 		    limit, startIndex, orderBy, orderByDirection, attributeValueReference, paymentStatus);
 	}
@@ -253,6 +256,53 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 			        + ".");
 		}
 		message.setPhoneNumber(messagePhoneNumber);
+		return sendMessageRequest(message);
+		/*String urlString = "https://us-central1-maximal-journey-328212.cloudfunctions.net/messaging";
+		URL url = new URL(urlString);
+		HttpURLConnection con = (HttpURLConnection) url.openConnection();
+		//con.setReadTimeout(15000);
+		//con.setConnectTimeout(15000);
+		con.setRequestMethod("POST");
+		//String bearer = String.format("Bearer %1s", authToken.getAccessToken());
+		//con.addRequestProperty("Authorization", bearer);
+		con.addRequestProperty("Content-Type", "application/json");
+		con.setDoInput(true);
+		con.setDoOutput(true);
+		
+		OutputStream os = con.getOutputStream();
+		BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+		String json = new ObjectMapper().writeValueAsString(message.toMap());
+		writer.write(json);
+		
+		writer.flush();
+		writer.close();
+		os.close();
+		try {
+			BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+			String inputLine;
+			StringBuffer content = new StringBuffer();
+			while ((inputLine = in.readLine()) != null) {
+				content.append(inputLine);
+			}
+			in.close();
+			return message;
+		}
+		catch (SocketTimeoutException e) {
+			throw e;
+		}
+		catch (Exception e) {
+			BufferedReader in = new BufferedReader(new InputStreamReader(con.getErrorStream()));
+			String inputLine;
+			StringBuffer content = new StringBuffer();
+			while ((inputLine = in.readLine()) != null) {
+				content.append(inputLine);
+			}
+			in.close();
+			throw e;
+		}*/
+	}
+	
+	public Message sendMessageRequest(Message message) throws Exception {
 		String urlString = "https://us-central1-maximal-journey-328212.cloudfunctions.net/messaging";
 		URL url = new URL(urlString);
 		HttpURLConnection con = (HttpURLConnection) url.openConnection();
@@ -372,6 +422,7 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 					try {
 						if (!(visitWrapper.isInsurance() && visitWrapper.getInsuranceName().toLowerCase().equals("nhif"))) {
 							Context.getVisitService().endVisit(visit, new Date());
+							
 						}
 					}
 					catch (ConfigurationException e) {
@@ -438,6 +489,17 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		return dao.getConceptsSetsByConcept(concept);
 	}
 	
+	@Override
+	public List<PatientWrapper> getPatients(String search, String patientUUID, PatientWrapper.VisitStatus visitStatus,
+	        Integer startIndex, Integer limit, PatientWrapper.OrderByDirection orderByDirection) {
+		return dao.getPatients(search, patientUUID, visitStatus, startIndex, limit, orderByDirection);
+	}
+	
+	@Override
+	public Patient savePatient(Patient patient) {
+		return patientDAO.savePatient(patient);
+	}
+	
 	Boolean patientIsAdmitted(Visit visit) {
 		if (visit.getStopDatetime() == null) {
 			for (Encounter encounter : visit.getEncounters()) {
@@ -449,5 +511,74 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 			}
 		}
 		return false;
+	}
+	
+	public Summary getSummary() {
+		return dao.getSummary();
+	}
+	
+	@Override
+	public List<Drug> getDrugs(String concept, Integer limit, Integer startIndex) {
+		return dao.getDrugs(concept, limit, startIndex);
+	}
+	
+	public String getClientsFromExternalSystems(String identifier, String identifierReference) throws IOException,
+	        URISyntaxException {
+		AdministrationService administrationService = Context.getService(AdministrationService.class);
+		
+		String baseUrl = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.baseUrl");
+		//				"https://covid19-dev.moh.go.tz";
+		String username = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.username");
+		//				"lisintegration";
+		String password = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.password");
+		//				"Dhis@2022";
+		String ou = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.referenceOuUid");
+		//				"m0frOspS7JY";
+		String program = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.programUid");
+		//				"MNhYWMkR0Z7";
+		//		TODO: Find a way to softcode the API References
+		
+		URL url;
+		if (baseUrl == null || baseUrl.trim().equals("")) {
+			throw new VerificationException("Destination server address url is not set. Please set " + baseUrl + ".");
+		}
+		String path = "/api/trackedEntityInstances.json?filter="
+		        + identifierReference
+		        + ":EQ:"
+		        + identifier
+		        + "&ou=m0frOspS7JY&ouMode=DESCENDANTS&program=MNhYWMkR0Z7&fields=attributes[attribute,code,value],enrollments[*],orgUnit,trackedEntityInstance&paging=false";
+		url = new URL(baseUrl.concat(path));
+		
+		HttpURLConnection con = (HttpURLConnection) url.openConnection();
+		
+		String userCredentials = username.concat(":").concat(password);
+		String basicAuth = "Basic " + new String(Base64.getEncoder().encode(userCredentials.getBytes()));
+		
+		con.setRequestProperty("Authorization", basicAuth);
+		
+		con.setRequestMethod("GET");
+		con.setRequestProperty("Content-Type", "application/json; utf-8");
+		con.setRequestProperty("Accept", "application/json");
+		con.setRequestProperty("Authorization", basicAuth);
+		try {
+			BufferedReader bufferIn = new BufferedReader(new InputStreamReader(con.getInputStream()));
+			String inputLine;
+			StringBuffer content = new StringBuffer();
+			while ((inputLine = bufferIn.readLine()) != null) {
+				content.append(inputLine);
+			}
+			bufferIn.close();
+			return String.valueOf(content);
+		}
+		catch (Exception e) {
+			BufferedReader in = new BufferedReader(new InputStreamReader(con.getErrorStream()));
+			String inputLine;
+			StringBuffer content = new StringBuffer();
+			while ((inputLine = in.readLine()) != null) {
+				content.append(inputLine);
+			}
+			in.close();
+			return String.valueOf(content);
+		}
 	}
 }

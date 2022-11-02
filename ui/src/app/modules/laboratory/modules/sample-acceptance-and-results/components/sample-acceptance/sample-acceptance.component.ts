@@ -3,6 +3,8 @@ import { MatDialog } from "@angular/material/dialog";
 import { Store } from "@ngrx/store";
 import { Observable } from "rxjs";
 import { take } from "rxjs/operators";
+import { SampleResultsPrintingComponent } from "src/app/modules/laboratory/components/sample-results-printing/sample-results-printing.component";
+import { formatDateToYYMMDD } from "src/app/shared/helpers/format-date.helper";
 import {
   setSampleStatus,
   loadLabSamplesByCollectionDates,
@@ -12,12 +14,15 @@ import { AppState } from "src/app/store/reducers";
 import {
   getAcceptedFormattedLabSamples,
   getCompletedLabSamples,
+  getFormattedAcceptedLabSamples,
   getFormattedLabSamplesForTracking,
   getFormattedLabSamplesToAccept,
   getFormattedLabSamplesToFeedResults,
   getFormattedRejectedLabSamples,
   getLabDepartments,
+  getLabSamplesWithResults,
   getPatientsWithCompletedLabSamples,
+  getPatientWithResults,
   getSettingLabSampleStatusState,
   getWorkList,
 } from "src/app/store/selectors";
@@ -58,6 +63,10 @@ export class SampleAcceptanceComponent implements OnInit {
   searchingText: string = "";
   labDepartments$: Observable<any>;
   selectedDepartment: string = "";
+  acceptedSamples$: Observable<any[]>;
+  samplesWithResults$: Observable<any[]>;
+  patientsWithResults$: Observable<any>;
+  showTabSampleTrackingForLis = false;
   constructor(private store: Store<AppState>, private dialog: MatDialog) {}
 
   ngOnInit(): void {
@@ -106,6 +115,7 @@ export class SampleAcceptanceComponent implements OnInit {
       {
         department: this.selectedDepartment,
         searchingText: this.searchingText,
+        isLIS: this.LISConfigurations?.isLIS,
       }
     );
 
@@ -113,6 +123,21 @@ export class SampleAcceptanceComponent implements OnInit {
       department: this.selectedDepartment,
       searchingText: this.searchingText,
     });
+
+    this.acceptedSamples$ = this.store.select(
+      getFormattedAcceptedLabSamples(
+        this.selectedDepartment,
+        this.searchingText
+      )
+    );
+
+    this.samplesWithResults$ = this.store.select(
+      getLabSamplesWithResults(this.selectedDepartment, this.searchingText)
+    );
+
+    this.patientsWithResults$ = this.store.select(
+      getPatientWithResults(this.selectedDepartment, this.searchingText)
+    );
   }
 
   accept(e, sample, providerDetails) {
@@ -129,6 +154,7 @@ export class SampleAcceptanceComponent implements OnInit {
       },
       remarks: "accepted",
       status: "ACCEPTED",
+      category: "ACCEPTED",
     };
 
     this.store.dispatch(
@@ -139,6 +165,7 @@ export class SampleAcceptanceComponent implements OnInit {
           acceptedBy: {
             uuid: providerDetails?.uuid,
             name: providerDetails?.display,
+            display: providerDetails?.display,
           },
         },
       })
@@ -164,7 +191,7 @@ export class SampleAcceptanceComponent implements OnInit {
       .afterClosed()
       .pipe(take(1))
       .subscribe((reason) => {
-        if (reason) {
+        if (reason && reason?.reasonUuid) {
           this.savingMessage[sample?.id + "-reject"] = true;
 
           const data = {
@@ -174,8 +201,9 @@ export class SampleAcceptanceComponent implements OnInit {
             user: {
               uuid: this.userUuid,
             },
-            remarks: reason?.reasonUuid,
-            status: "REJECTED",
+            remarks: reason?.reasonText,
+            category: "REJECTED",
+            status: reason?.reasonUuid,
           };
           this.store.dispatch(
             setSampleStatus({
@@ -186,6 +214,7 @@ export class SampleAcceptanceComponent implements OnInit {
                 acceptedBy: {
                   uuid: providerDetails?.uuid,
                   name: providerDetails?.display,
+                  display: providerDetails?.display,
                 },
               },
             })
@@ -239,6 +268,20 @@ export class SampleAcceptanceComponent implements OnInit {
       department: this.selectedDepartment,
       searchingText: this.searchingText,
     });
+    this.acceptedSamples$ = this.store.select(
+      getFormattedAcceptedLabSamples(
+        this.selectedDepartment,
+        this.searchingText
+      )
+    );
+
+    this.samplesWithResults$ = this.store.select(
+      getLabSamplesWithResults(this.selectedDepartment, this.searchingText)
+    );
+
+    this.patientsWithResults$ = this.store.select(
+      getPatientWithResults(this.selectedDepartment, this.searchingText)
+    );
   }
 
   onSearch(e) {
@@ -296,10 +339,25 @@ export class SampleAcceptanceComponent implements OnInit {
           searchingText: this.searchingText,
         }
       );
+      this.acceptedSamples$ = this.store.select(
+        getFormattedAcceptedLabSamples(
+          this.selectedDepartment,
+          this.searchingText
+        )
+      );
+
+      this.samplesWithResults$ = this.store.select(
+        getLabSamplesWithResults(this.selectedDepartment, this.searchingText)
+      );
+
+      this.patientsWithResults$ = this.store.select(
+        getPatientWithResults(this.selectedDepartment, this.searchingText)
+      );
     }
   }
 
   onOpenNewTab(e) {
+    // console.log("test", e);
     if (e.index === 0) {
       this.store.dispatch(
         loadLabSamplesByCollectionDates({
@@ -363,7 +421,7 @@ export class SampleAcceptanceComponent implements OnInit {
 
   onResultsReview(event: Event, sample, providerDetails): void {
     event.stopPropagation();
-    this.dialog.open(ResultReviewModalComponent, {
+    this.dialog.open(ResultsFeedingModalComponent, {
       data: {
         sample: sample,
         currentUser: this.currentUser,
@@ -403,14 +461,14 @@ export class SampleAcceptanceComponent implements OnInit {
         maxHeight:
           sample?.orders?.length == 1 &&
           sample?.orders[0]?.order?.concept?.setMembers?.length == 0
-            ? "480px"
-            : "620px",
+            ? "60vh"
+            : "80vh",
       },
       maxHeight:
         sample?.orders?.length == 1 &&
         sample?.orders[0]?.concept?.setMembers?.length == 0
-          ? "610px"
-          : "860px",
+          ? "70vh"
+          : "90vh",
       width: "100%",
       disableClose: false,
       panelClass: "custom-dialog-container",
@@ -427,7 +485,6 @@ export class SampleAcceptanceComponent implements OnInit {
         user: providerDetails,
       },
       width: "60%",
-      height: "750px",
       disableClose: false,
     });
   }
@@ -464,5 +521,16 @@ export class SampleAcceptanceComponent implements OnInit {
     this.settingLabSampleStatus$ = this.store.select(
       getSettingLabSampleStatusState
     );
+  }
+
+  onPrintSampleResults(event: Event, sample: any): void {
+    console.log(sample);
+    event.stopPropagation();
+    this.dialog.open(SampleResultsPrintingComponent, {
+      width: "70%",
+      data: {
+        sample,
+      },
+    });
   }
 }

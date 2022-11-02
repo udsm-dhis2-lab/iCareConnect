@@ -21,18 +21,12 @@ import { VisitObject } from "src/app/shared/resources/visits/models/visit-object
 import { ConceptCreateFull } from "src/app/shared/resources/openmrs";
 import { SampleObject } from "../../resources/models";
 import { getPatientPendingBillStatus } from "src/app/store/selectors/bill.selectors";
-import {
-  collectSample,
-  loadLabSamplesByCollectionDates,
-  loadLabSamplesByVisit,
-} from "src/app/store/actions";
+import { collectSample } from "src/app/store/actions";
 import { SamplesService } from "src/app/shared/services/samples.service";
 import { BarCodeModalComponent } from "../../modules/sample-acceptance-and-results/components/bar-code-modal/bar-code-modal.component";
 import { formatDateToYYMMDD } from "src/app/shared/helpers/format-date.helper";
 import { MatDialog } from "@angular/material/dialog";
 import { LabOrdersService } from "../../resources/services/lab-orders.service";
-import { take } from "rxjs/operators";
-import { getPatientsSamplesToCollect } from "src/app/store/selectors";
 
 @Component({
   selector: "app-samples-to-collect",
@@ -173,8 +167,6 @@ export class SamplesToCollectComponent implements OnInit, OnChanges {
     });
     this.updateLabOrderResponse$ =
       this.labOrdersService.updateLabOrders(orders);
-    // console.log('sample scheduledDate', orders);
-    // console.log('details', details);
 
     this.store.dispatch(
       collectSample({

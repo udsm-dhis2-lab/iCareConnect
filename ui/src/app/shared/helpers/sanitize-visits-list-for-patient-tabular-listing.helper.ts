@@ -22,12 +22,16 @@ export function sanitizePatientsVisitsForTabularPatientListing(
         (
           visitDetails?.visit?.patient?.identifiers?.filter(
             (identifier) =>
-              identifier?.identifierType?.display?.toLowerCase() === "mrn"
+              identifier?.identifierType?.display?.toLowerCase() === "mrn" ||
+              identifier?.identifierType?.display?.toLowerCase() ===
+                "openempi id"
           ) || []
         )?.length > 0
           ? (visitDetails?.visit?.patient?.identifiers?.filter(
               (identifier) =>
-                identifier?.identifierType?.display?.toLowerCase() === "mrn"
+                identifier?.identifierType?.display?.toLowerCase() === "mrn" ||
+                identifier?.identifierType?.display?.toLowerCase() ===
+                  "openempi id"
             ) || [])[0]?.identifier
           : "",
       location:

@@ -9,7 +9,11 @@ import { patientObj } from "src/app/shared/models/patient";
 import { Patient } from "src/app/shared/resources/patient/models/patient.model";
 import { VisitObject } from "src/app/shared/resources/visits/models/visit-object.model";
 import { go, loadConceptByUuid } from "src/app/store/actions";
-import { startVisit, updateVisit } from "src/app/store/actions/visit.actions";
+import {
+  clearActiveVisit,
+  startVisit,
+  updateVisit,
+} from "src/app/store/actions/visit.actions";
 import { AppState } from "src/app/store/reducers";
 import {
   getConceptById,
@@ -490,7 +494,7 @@ export class VisitComponent implements OnInit {
           },
         ],
       };
-      
+
       visitPayload = {
         ...visitPayload,
         attributes:
@@ -499,15 +503,13 @@ export class VisitComponent implements OnInit {
       };
       this.store.dispatch(
         startVisit({ visit: visitPayload, isEmergency: this.isEmergencyVisit })
-        );
-      
-
+      );
     } else {
       this.openSnackBar("Error: location is not set", null);
     }
 
+    this.store.dispatch(clearActiveVisit());
     this.startVisitEvent.emit();
-
   }
 
   openSnackBar(message: string, action: string) {

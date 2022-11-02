@@ -1,20 +1,31 @@
-import { ConceptGet } from 'src/app/shared/resources/openmrs';
-import { FormFieldType } from '../constants/form-field-type.constant';
-import { Boolean } from '../models/boolean.model';
-import { CheckBox } from '../models/check-box.model';
-import { Dropdown } from '../models/dropdown.model';
-import { Field } from '../models/field.model';
-import { ICAREForm } from '../models/form.model';
-import { TextArea } from '../models/text-area.model';
-import { Textbox } from '../models/text-box.model';
-import { getFormFieldOptions } from './get-form-field-options.helper';
+import { ConceptGet } from "src/app/shared/resources/openmrs";
+import { FormFieldType } from "../constants/form-field-type.constant";
+import { Boolean } from "../models/boolean.model";
+import { CheckBox } from "../models/check-box.model";
+import { ComplexDefaultFileField } from "../models/complex-file.model";
+import { Dropdown } from "../models/dropdown.model";
+import { Field } from "../models/field.model";
+import { ICAREForm } from "../models/form.model";
+import { TextArea } from "../models/text-area.model";
+import { Textbox } from "../models/text-box.model";
+import { getFormFieldOptions } from "./get-form-field-options.helper";
 
 export function getSanitizedFormObject(
   concept: ConceptGet,
-  fieldsInfo?
+  fieldsInfo?,
+  conceptsForDiagnosis?: string[]
 ): ICAREForm {
   if (!concept) {
     return null;
+  }
+  let isDiagnosis;
+  if (conceptsForDiagnosis && conceptsForDiagnosis?.length > 0) {
+    isDiagnosis =
+      (
+        conceptsForDiagnosis?.filter(
+          (conceptForDiagnosis) => conceptForDiagnosis === concept?.uuid
+        ) || []
+      )?.length > 0;
   }
 
   const {
@@ -28,15 +39,11 @@ export function getSanitizedFormObject(
     mappings,
     units,
   } = concept;
-
   const formObject = {
     id: uuid,
     uuid,
     name: name?.name ? name?.name : display,
-    dataType:
-      datatype?.display == 'N/A' && answers?.length > 0
-        ? 'Coded'
-        : datatype?.display,
+    dataType: answers?.length > 0 || isDiagnosis ? "Coded" : datatype?.display,
     formClass: conceptClass?.display,
     concept: concept,
     fieldNumber: fieldsInfo?.fieldNumber,
@@ -44,10 +51,13 @@ export function getSanitizedFormObject(
     minOccurs: fieldsInfo?.minOccurs,
     maxOccurs: fieldsInfo?.fieldPart,
     required: fieldsInfo?.required,
+    searchControlType: "concept",
+    shouldHaveLiveSearchForDropDownFields: isDiagnosis ? true : false,
+    conceptClass: conceptClass?.display,
     captureData: setMembers?.length == 0 ? true : false,
     options: getFormFieldOptions(answers),
     setMembers: (setMembers || []).map((setMember) =>
-      getSanitizedFormObject(setMember, fieldsInfo)
+      getSanitizedFormObject(setMember, fieldsInfo, conceptsForDiagnosis)
     ),
     mappings: mappings,
     units: units,
@@ -55,12 +65,12 @@ export function getSanitizedFormObject(
 
   return {
     ...formObject,
-    formField: getFormField(formObject),
-    formFields: getFormFields(formObject),
+    formField: getFormField(formObject, isDiagnosis),
+    formFields: getFormFields(formObject, isDiagnosis),
   };
 }
 
-function getFormFields(formObject: ICAREForm): Field<string>[] {
+function getFormFields(formObject: ICAREForm, isDiagnosis): Field<string>[] {
   if (!formObject) {
     return undefined;
   }
@@ -71,18 +81,21 @@ function getFormFields(formObject: ICAREForm): Field<string>[] {
 
   return hasLowestMembers
     ? formObject.setMembers
-        .map((member) => getFormField(member))
+        .map((member) => getFormField(member, isDiagnosis))
         .filter((formField) => formField)
     : undefined;
 }
 
-function getFormField(formObject: ICAREForm): Field<string> {
+function getFormField(
+  formObject: ICAREForm,
+  isDiagnosis: boolean
+): Field<string> {
   switch (formObject.dataType) {
     case FormFieldType.NUMERIC:
       return new Textbox({
         key: formObject.uuid,
         label: formObject.name,
-        type: 'number',
+        type: "number",
         id: formObject.id,
         conceptClass: formObject?.concept?.conceptClass,
         min: formObject?.concept?.lowCritical
@@ -100,14 +113,18 @@ function getFormField(formObject: ICAREForm): Field<string> {
           : formObject?.concept?.hiNormal
           ? formObject?.concept?.hiNormal
           : null,
+        searchControlType: "concept",
         units: formObject?.concept?.units,
       });
     case FormFieldType.CODED: {
       return new Dropdown({
         key: formObject.uuid,
         label: formObject.name,
-        conceptClass: formObject?.concept?.conceptClass,
+        searchControlType: "concept",
+        conceptClass: formObject?.concept?.conceptClass?.display,
         id: formObject.id,
+        shouldHaveLiveSearchForDropDownFields: isDiagnosis ? true : false,
+        isDiagnosis,
         options: formObject.options,
       });
     }
@@ -115,7 +132,17 @@ function getFormField(formObject: ICAREForm): Field<string> {
       return new TextArea({
         key: formObject.uuid,
         label: formObject.name,
-        conceptClass: formObject?.concept?.conceptClass,
+        conceptClass: formObject?.concept?.conceptClass?.display,
+        id: formObject.id,
+        options: formObject.options,
+      });
+    }
+
+    case FormFieldType.COMPLEX: {
+      return new ComplexDefaultFileField({
+        key: formObject.uuid,
+        label: formObject.name,
+        conceptClass: formObject?.concept?.conceptClass?.display,
         id: formObject.id,
         options: formObject.options,
       });
@@ -125,7 +152,7 @@ function getFormField(formObject: ICAREForm): Field<string> {
       return new Boolean({
         key: formObject.uuid,
         label: formObject.name,
-        conceptClass: formObject?.concept?.conceptClass,
+        conceptClass: formObject?.concept?.conceptClass?.display,
         id: formObject.id,
         options: formObject.options,
       });

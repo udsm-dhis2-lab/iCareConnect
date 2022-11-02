@@ -1,10 +1,13 @@
 import { Component, Inject, Input, OnInit } from "@angular/core";
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
+import { Store } from "@ngrx/store";
 import { isThisSecond } from "date-fns";
 
 import * as _ from "lodash";
-import { sample } from "rxjs/operators";
+import { map, sample } from "rxjs/operators";
 import { PatientService } from "src/app/shared/services/patient.service";
+import { AppState } from "src/app/store/reducers";
+import { getParentLocation } from "src/app/store/selectors";
 
 @Component({
   selector: "app-print-results-modal",
@@ -22,10 +25,12 @@ export class PrintResultsModalComponent implements OnInit {
   errorLoadingPhone: boolean;
   phoneNumber: string;
   LISConfigurations: any;
+  facilityDetails$: any;
   constructor(
     private patientService: PatientService,
     private dialogRef: MatDialogRef<PrintResultsModalComponent>,
-    @Inject(MAT_DIALOG_DATA) data
+    @Inject(MAT_DIALOG_DATA) data,
+    private store: Store<AppState>
   ) {
     this.patientDetailsAndSamples = data?.patientDetailsAndSamples;
     this.LISConfigurations = data?.LISConfigurations;
@@ -46,6 +51,22 @@ export class PrintResultsModalComponent implements OnInit {
       );
     this.labConfigs = data?.labConfigs;
     this.user = data?.user;
+    this.facilityDetails$ = this.store.select(getParentLocation).pipe(
+      map((response) => {
+        // TODO: Softcode attribute type uuid
+        return {
+          ...response,
+          logo:
+            response?.attributes?.length > 0
+              ? (response?.attributes?.filter(
+                  (attribute) =>
+                    attribute?.attributeType?.uuid ===
+                    "e935ea8e-5959-458b-a10b-c06446849dc3"
+                ) || [])[0]?.value
+              : null,
+        };
+      })
+    );
   }
 
   ngOnInit(): void {

@@ -40,8 +40,14 @@ export class FieldComponent {
   @Output() fieldUpdate: EventEmitter<FormGroup> =
     new EventEmitter<FormGroup>();
 
+  @Output() fileFieldUpdate: EventEmitter<any> = new EventEmitter<any>();
+
   ngAfterViewInit() {
-    if (this.field?.searchTerm || this.field?.source) {
+    if (
+      this.field?.searchTerm ||
+      this.field?.source ||
+      (this.field?.shouldHaveLiveSearchForDropDownFields && this.field?.value)
+    ) {
       this.members$ = this.formService.searchItem(
         {
           q:
@@ -52,6 +58,7 @@ export class FieldComponent {
           tag: this.field?.searchTerm,
           class: this.field?.conceptClass,
           source: this.field?.source,
+          value: this.field?.value,
           v:
             this.field?.searchControlType === "concept"
               ? "custom:(uuid,display,datatype,conceptClass,mappings)"
@@ -116,6 +123,12 @@ export class FieldComponent {
     this.fieldUpdate.emit(this.form);
   }
 
+  fileChangeEvent(event, field): void {
+    let objectToUpdate = {};
+    objectToUpdate[field?.key] = event.target.files[0];
+    this.fileFieldUpdate.emit(objectToUpdate);
+  }
+
   updateFieldOnDemand(objectToUpdate): void {
     this.form.patchValue(objectToUpdate);
     const theKey = Object.keys(objectToUpdate);
@@ -136,12 +149,16 @@ export class FieldComponent {
     const parameters = {
       q: searchingText,
       limit: 50,
-      tag: field?.searchTerm,
+      tag:
+        this.field?.searchControlType === "location" ? field?.searchTerm : null,
       class: this.field?.conceptClass,
       source: this.field?.source,
       v:
-        field?.searchControlType === "concept" ||
-        field?.conceptClass === "Diagnosis"
+        field?.searchControlType === "residenceLocation" ||
+        field?.searchControlType === "healthFacility"
+          ? "custom:(uuid,display,parentLocation:(uuid,display,parentLocation:(uuid,display,parentLocation:(uuid,display,parentLocation:(uuid,display)))))"
+          : field?.searchControlType === "concept" ||
+            field?.conceptClass === "Diagnosis"
           ? "custom:(uuid,display,datatype,conceptClass,mappings)"
           : "custom:(uuid,display)",
     };
@@ -153,7 +170,7 @@ export class FieldComponent {
     );
   }
 
-  getSelectedItemFromOption(event: Event, item, key): void {
+  getSelectedItemFromOption(event: Event, item, field): void {
     event.stopPropagation();
     const value = item?.isDrug
       ? item?.formattedKey
@@ -161,7 +178,13 @@ export class FieldComponent {
       ? item?.uuid
       : item?.id;
     let objectToUpdate = {};
-    objectToUpdate[key] = value;
+    objectToUpdate[field?.key] =
+      field?.searchControlType === "drugStock"
+        ? item
+        : !field?.searchControlType ||
+          field?.searchControlType !== "residenceLocation"
+        ? value
+        : item;
     this.form.patchValue(objectToUpdate);
     this.fieldUpdate.emit(this.form);
   }

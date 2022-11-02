@@ -5,12 +5,12 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.openmrs.Concept;
-import org.openmrs.Encounter;
-import org.openmrs.Obs;
+import org.openmrs.*;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.icare.core.Summary;
 import org.openmrs.module.icare.laboratory.dao.TestOrderLocationDAO;
 import org.openmrs.module.icare.laboratory.models.TestOrderLocation;
+import org.openmrs.module.icare.laboratory.models.WorkloadSummary;
 import org.openmrs.module.icare.laboratory.services.LaboratoryService;
 import org.openmrs.module.icare.web.controller.core.BaseResourceControllerTest;
 import org.openmrs.module.webservices.rest.SimpleObject;
@@ -259,6 +259,49 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 	}
 	
 	@Test
+	public void testGettingSamplesBySamplesbyCategory() throws Exception {
+		
+		// creating sample status
+		String dto = this.readFile("dto/sample-status-create-dto.json");
+		Map<String, Object> sampleStatus = (new ObjectMapper()).readValue(dto, Map.class);
+		
+		MockHttpServletRequest newPostRequest = newPostRequest("lab/samplestatus", sampleStatus);
+		MockHttpServletResponse handle = handle(newPostRequest);
+		
+		//Creating allocation status
+		//Given
+		String dto2 = this.readFile("dto/test-allocation-status-create.json");
+		Map<String, Object> testAllocationStatus = (new ObjectMapper()).readValue(dto2, Map.class);
+		
+		//When
+		MockHttpServletRequest newPostRequest2 = newPostRequest("lab/allocationstatus", testAllocationStatus);
+		MockHttpServletResponse handle2 = handle(newPostRequest2);
+		
+		MockHttpServletRequest newGetRequest = newGetRequest("lab/samples", new Parameter("sampleCategory", "RECEIVED"),
+		    new Parameter("startDate", "2020-12-27"), new Parameter("endDate", "2022-10-10"));
+		MockHttpServletResponse handleGet = handle(newGetRequest);
+		Map<String, Object> sampleResults = (new ObjectMapper()).readValue(handleGet.getContentAsString(), Map.class);
+		
+		MockHttpServletRequest newGetRequest2 = newGetRequest("lab/samples", new Parameter("testCategory", "RESULTS"),
+		    new Parameter("startDate", "2020-12-27"), new Parameter("endDate", "2022-10-10"));
+		MockHttpServletResponse handleGet2 = handle(newGetRequest2);
+		Map<String, Object> sampleResults2 = (new ObjectMapper()).readValue(handleGet2.getContentAsString(), Map.class);
+		
+		MockHttpServletRequest newGetRequest3 = newGetRequest("lab/samples", new Parameter("testCategory", "Completed"),
+		    new Parameter("startDate", "2020-12-27"));
+		MockHttpServletResponse handleGet3 = handle(newGetRequest3);
+		Map<String, Object> sampleResults3 = (new ObjectMapper()).readValue(handleGet3.getContentAsString(), Map.class);
+		
+		System.out.println("Results1: " + sampleResults);
+		System.out.println("Results2: " + sampleResults2);
+		System.out.println("Results3: " + sampleResults3);
+		
+		assertThat("Should return a sample", ((List) sampleResults.get("results")).size() == 1);
+		assertThat("Should return a sample", ((List) sampleResults2.get("results")).size() == 1);
+		
+	}
+	
+	@Test
 	public void testUpdatingSampleOrder() throws Exception {
 		
 		SimpleObject sampleOrder = new SimpleObject();
@@ -388,19 +431,32 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 	}
 	
 	@Test
-	public void addTestOrderLocation() throws Exception {
+	public void testGettingSummaryWorkload() throws Exception {
+		
 		//Given
-		//		String dto = this.readFile("dto/test-allocation-approve.json");
+		String dto = this.readFile("dto/test-allocation-reject.json");
+		Map<String, Object> testAllocationStatus = (new ObjectMapper()).readValue(dto, Map.class);
 		
-		String dto = "{\"location\":{\"uuid\":\"iCARE890-TEST-MOTR-9beb-d30dcfc0c66e\"},\"concept\":{\"uuid\":\"a8102d6d-c528-477a-80bd-acc38ebc6252\"},\"user\":{\"uuid\":\"e4ef4d4d-5cf2-47ff-af6b-bb9abdabdd60\"}}";
-		
-		Map<String, Object> testOrderLocation = (new ObjectMapper()).readValue(dto, Map.class);
-		
-		MockHttpServletRequest newPostRequest = newPostRequest("lab/testorderlocation", testOrderLocation);
-		
+		//When
+		MockHttpServletRequest newPostRequest = newPostRequest("lab/allocationstatus", testAllocationStatus);
 		MockHttpServletResponse handle = handle(newPostRequest);
 		
-		//assertThat("test order inserted",);
+		//When
+		MockHttpServletRequest newGetRequest = newGetRequest("lab/workloadsummary",
+		    new Parameter("startDate", "2020-12-27"), new Parameter("endDate", "2022-10-10"));
+		handle = handle(newGetRequest);
+		
+		String workloadsummaryData = handle.getContentAsString();
+		Map summaryMap = (new ObjectMapper()).readValue(workloadsummaryData, Map.class);
+		
+		List<Map> summaryDetails = (List<Map>) summaryMap.get("results");
+		
+		System.out.println(summaryMap);
+		
+		assertThat("Has 1 rejected sample", summaryMap.get("samplesWithRejectedResults").equals(1));
+		assertThat("Has 1 authorized sample", summaryMap.get("samplesAuthorized").equals(1));
+		assertThat("Has 2  no completeresult sample", summaryMap.get("samplesWithNoResults").equals(2));
+		assertThat("Has Atleast 1 result sample", summaryMap.get("samplesWithResults").equals(1));
 		
 	}
 	

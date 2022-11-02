@@ -20,6 +20,7 @@ import { TextArea } from "src/app/shared/modules/form/models/text-area.model";
 import { Textbox } from "src/app/shared/modules/form/models/text-box.model";
 import * as moment from "moment";
 import { MatDatepickerInputEvent } from "@angular/material/datepicker";
+import { PersonService } from "src/app/core/services/person.service";
 
 @Component({
   selector: "app-person-details",
@@ -28,6 +29,7 @@ import { MatDatepickerInputEvent } from "@angular/material/datepicker";
 })
 export class PersonDetailsComponent implements OnInit {
   @Input() referFromFacilityVisitAttribute: string;
+  @Input() maximumDate: string;
   patientIdentifierTypes: any[];
   @Output() personDetails: EventEmitter<any> = new EventEmitter<any>();
   personDetailsCategory: string = "new";
@@ -37,11 +39,13 @@ export class PersonDetailsComponent implements OnInit {
   personDOBField: any[];
   personFieldsGroupThree: any[];
   identifiersFields: any[];
-  primaryIdentifierField: any;
+  primaryIdentifierFields: any[];
   showOtherIdentifiers: boolean = false;
   patientUuid: string;
   identifierTypes: any[] = [];
   age: number = 0;
+
+  selectedClientData: any;
 
   @ViewChild(FormComponent, { static: false })
   formComponent: FormComponent;
@@ -49,9 +53,22 @@ export class PersonDetailsComponent implements OnInit {
   @ViewChildren("fieldItem")
   fieldItems: QueryList<FieldComponent>;
 
-  constructor(private registrationService: RegistrationService) {}
+  pinnedCategory: string;
+  @Output() selecedSystem: EventEmitter<any> = new EventEmitter<any>();
+
+  @Output() fromExternalSystem: EventEmitter<boolean> =
+    new EventEmitter<boolean>();
+
+  constructor(
+    private registrationService: RegistrationService,
+    private personService: PersonService
+  ) {}
 
   ngOnInit(): void {
+    this.pinnedCategory = localStorage.getItem("pinnedCategory");
+    this.personDetailsCategory = this.pinnedCategory
+      ? this.pinnedCategory
+      : this.personDetailsCategory;
     this.registrationService
       .getPatientIdentifierTypes()
       .subscribe((response) => {
@@ -63,25 +80,41 @@ export class PersonDetailsComponent implements OnInit {
     this.setPersonDetails();
   }
 
-  setIdentifierFields(identifierTypes: any[], personDetails?: any): void {
-    const primaryIdentifier = (identifierTypes?.filter(
-      (identifier) => identifier?.required
-    ) || [])[0];
-    this.primaryIdentifierField = primaryIdentifier
-      ? new Textbox({
+  onPinThis(event: Event, category: string): void {
+    event.stopPropagation();
+    this.personDetailsCategory = category;
+    this.pinnedCategory = category;
+    localStorage.setItem("pinnedCategory", category);
+  }
+
+  setIdentifierFields(
+    identifierTypes: any[],
+    personDetails?: any,
+    patientIdentifier?: string
+  ): void {
+    // console.log("identifierTypes", identifierTypes);
+    const primaryIdentifiers =
+      identifierTypes?.filter(
+        (identifier) => identifier?.uniquenessBehavior === "UNIQUE"
+      ) || [];
+    this.primaryIdentifierFields = primaryIdentifiers?.map(
+      (primaryIdentifier) => {
+        return new Textbox({
           id: primaryIdentifier?.id,
           key: primaryIdentifier?.id,
           label: primaryIdentifier?.name,
-          value:
-            personDetails && personDetails?.identifiers?.length > 0
-              ? (personDetails?.identifiers?.filter(
-                  (identifier) =>
-                    identifier?.identifierType?.uuid === primaryIdentifier?.id
-                ) || [])[0]?.identifier
-              : null,
-          required: true,
-        })
-      : null;
+          value: patientIdentifier
+            ? patientIdentifier
+            : personDetails && personDetails?.identifiers?.length > 0
+            ? (personDetails?.identifiers?.filter(
+                (identifier) =>
+                  identifier?.identifierType?.uuid === primaryIdentifier?.id
+              ) || [])[0]?.identifier
+            : null,
+          required: primaryIdentifier?.required,
+        });
+      }
+    );
 
     const otherIdentifiers =
       identifierTypes?.filter((identifier) => !identifier?.required) || [];
@@ -94,7 +127,12 @@ export class PersonDetailsComponent implements OnInit {
         value: personDetails
           ? (personDetails?.identifiers?.filter(
               (identifier) =>
-                identifier?.identifierType?.uuid === primaryIdentifier?.id
+                (
+                  primaryIdentifiers?.filter(
+                    (primaryIdentifier) =>
+                      identifier?.identifierType?.uuid == primaryIdentifier?.id
+                  ) || []
+                )?.length === 0
             ) || [])[0]?.identifier
           : null,
         required: identifier?.required,
@@ -102,34 +140,8 @@ export class PersonDetailsComponent implements OnInit {
     });
   }
 
-  // onFormUpdateForAge(formValues: FormValue): void {
-  //   const values = formValues.getValues();
-  //   Object.keys(values).forEach((key) => {
-  //     this.personDetailsData[key] = values[key]?.value;
-  //   });
-
-  //   if (values["age"]?.value) {
-  //     this.personDetailsData["age"] = new Date(
-  //       new Date().getFullYear() - Number(values["age"]?.value),
-  //       6,
-  //       1
-  //     );
-  //     this.personDOBField = [
-  //       new DateField({
-  //         id: "dob",
-  //         key: "dob",
-  //         label: "Date of birth",
-  //         required: false,
-  //         value: this.personDetailsData ? this.personDetailsData?.dob : null,
-  //         type: "date",
-  //       }),
-  //     ];
-  //   }
-  // }
-
   getAge(event: any): void {
     event.stopPropagation();
-    console.log(event.target.value);
     this.personDetailsData["age"] = event.target.value;
     this.personDetailsData["dob"] = new Date(
       new Date().getFullYear() - Number(this.personDetailsData["age"]),
@@ -141,6 +153,7 @@ export class PersonDetailsComponent implements OnInit {
         id: "dob",
         key: "dob",
         label: "Date of birth",
+        max: this.maximumDate,
         required: false,
         value: this.personDetailsData ? this.personDetailsData?.dob : null,
         type: "date",
@@ -176,6 +189,7 @@ export class PersonDetailsComponent implements OnInit {
       ...this.personDetailsData,
       isNewPatient: this.personDetailsCategory === "new",
       patientUuid: this.patientUuid,
+      pimaCOVIDLinkDetails: this.selectedClientData,
     });
   }
 
@@ -188,6 +202,7 @@ export class PersonDetailsComponent implements OnInit {
       ...this.personDetailsData,
       isNewPatient: this.personDetailsCategory === "new",
       patientUuid: this.patientUuid,
+      pimaCOVIDLinkDetails: this.selectedClientData,
     });
   }
 
@@ -200,6 +215,7 @@ export class PersonDetailsComponent implements OnInit {
       ...this.personDetailsData,
       isNewPatient: this.personDetailsCategory === "new",
       patientUuid: this.patientUuid,
+      pimaCOVIDLinkDetails: this.selectedClientData,
     });
   }
 
@@ -211,14 +227,24 @@ export class PersonDetailsComponent implements OnInit {
   setPersonDetails(personDetails?: any): void {
     this.patientUuid = personDetails?.uuid;
     this.personFields = [
+      // new Dropdown({
+      //   id: "attribute-" + this.referFromFacilityVisitAttribute,
+      //   key: "attribute-" + this.referFromFacilityVisitAttribute,
+      //   label: "Location",
+      //   options: [],
+      //   searchControlType: "location",
+      //   searchTerm: "Health Facility",
+      //   shouldHaveLiveSearchForDropDownFields: true,
+      // }),
       new Dropdown({
         id: "attribute-" + this.referFromFacilityVisitAttribute,
         key: "attribute-" + this.referFromFacilityVisitAttribute,
-        label: "Source/Received From",
         options: [],
-        searchControlType: "location",
-        searchTerm: "Health Facility",
+        label: "Location",
         shouldHaveLiveSearchForDropDownFields: true,
+        searchControlType: "healthFacility",
+        searchTerm: "Health Facility",
+        controlType: "location",
       }),
       new Textbox({
         id: "firstName",
@@ -282,11 +308,12 @@ export class PersonDetailsComponent implements OnInit {
         id: "dob",
         key: "dob",
         label: "Date of birth",
-        required: false,
+        required: true,
         value: personDetails
           ? personDetails?.birthdate?.substring(0, 10)
           : null,
         type: "date",
+        max: this.maximumDate,
       }),
     ];
     this.personFieldsGroupThree = [
@@ -326,6 +353,7 @@ export class PersonDetailsComponent implements OnInit {
         ...this.personDetailsData,
         isNewPatient: this.personDetailsCategory === "new",
         patientUuid: this.patientUuid,
+        pimaCOVIDLinkDetails: this.selectedClientData,
       });
     }
   }
@@ -336,14 +364,61 @@ export class PersonDetailsComponent implements OnInit {
 
   getSelection(event: MatRadioChange): void {
     this.personDetailsCategory = event?.value;
+    this.fromExternalSystem.emit(
+      this.personDetailsCategory === "other" ? true : false
+    );
 
     this.personDetails.emit({
       ...this.personDetailsData,
       isNewPatient: this.personDetailsCategory === "new",
       patientUuid: this.patientUuid,
+      pimaCOVIDLinkDetails: this.selectedClientData,
     });
     if (this.personDetailsCategory === "new") {
       this.setPersonDetails();
     }
+  }
+
+  onGetSelectedSystem(system: any): void {
+    this.selecedSystem.emit(system);
+  }
+
+  getSelectedClientRequest(clientRequest: any): void {
+    this.selectedClientData = clientRequest;
+    // First Check if client exists
+    this.personService
+      .getPatientsByIdentifier(clientRequest?.passportNumber)
+      .subscribe((response) => {
+        if (response) {
+          if (response?.length > 0) {
+            this.personDetailsCategory === "existing";
+            this.setPersonDetails(response[0]);
+            this.setIdentifierFields(this.identifierTypes, response[0]);
+          } else {
+            const personDetailsData = {
+              preferredName: {
+                givenName: clientRequest?.firstName,
+                familyName2: clientRequest?.middleName,
+                familyName: clientRequest?.lastName,
+              },
+              gender:
+                clientRequest?.gender &&
+                clientRequest?.gender?.toLowerCase() == "me"
+                  ? "M"
+                  : "F",
+              email: clientRequest?.email,
+              phoneNumber: clientRequest?.phoneNumber,
+              birthdate: clientRequest?.dob,
+            };
+
+            this.setPersonDetails(personDetailsData);
+            this.setIdentifierFields(
+              this.identifierTypes,
+              personDetailsData,
+              clientRequest?.passportNumber
+            );
+          }
+        }
+      });
   }
 }

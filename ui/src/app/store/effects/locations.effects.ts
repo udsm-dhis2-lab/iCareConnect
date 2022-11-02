@@ -3,7 +3,7 @@ import { MatDialog } from "@angular/material/dialog";
 import { Actions, createEffect, ofType, OnInitEffects } from "@ngrx/effects";
 import { ROUTER_NAVIGATED } from "@ngrx/router-store";
 import { Action, select, Store } from "@ngrx/store";
-import { error } from "protractor";
+import { orderBy } from "lodash";
 import { of } from "rxjs";
 import {
   catchError,
@@ -33,13 +33,24 @@ import {
   upsertLocation,
   go,
   loadAllLocationsByLoginTag,
+  loadLocationByIds,
+  upsertLocations,
+  updateCurrentLocationStatus,
+  loadMainLocation,
+  setAllUserAssignedLocationsLoadedState,
+  loadLocationsByTagNames,
 } from "../actions";
 import { AppState } from "../reducers";
-import { getCurrentLocation, getUrl } from "../selectors";
+import {
+  getCurrentLocation,
+  getLocationEntities,
+  getLocations,
+  getUrl,
+} from "../selectors";
 import { getAuthenticationState } from "../selectors/current-user.selectors";
 
 @Injectable()
-export class LocationsEffects implements OnInitEffects {
+export class LocationsEffects {
   routerReady$ = createEffect(
     () =>
       this.actions$.pipe(
@@ -76,6 +87,24 @@ export class LocationsEffects implements OnInitEffects {
     { dispatch: false }
   );
 
+  minLocations$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(loadMainLocation),
+      switchMap(() => {
+        return this.locationService.getMainLocation().pipe(
+          map((locationsResults) => {
+            return addLoadedLocations({
+              locations: formatLocationsPayLoad(
+                locationsResults?.results || []
+              ),
+            });
+          }),
+          catchError((error) => of(loadingLocationsFails({ error })))
+        );
+      })
+    )
+  );
+
   locations$ = createEffect(() =>
     this.actions$.pipe(
       ofType(loadLoginLocations),
@@ -109,15 +138,112 @@ export class LocationsEffects implements OnInitEffects {
   loadLocation$ = createEffect(() =>
     this.actions$.pipe(
       ofType(loadLocationById),
-      switchMap((action) => {
+
+      withLatestFrom(this.store.select(getLocationEntities)),
+      switchMap(([action, entities]: [any, any]) => {
         return this.locationService.getLocationById(action.locationUuid).pipe(
-          map((locationResponse) => {
-            return upsertLocation({
-              location: (formatLocationsPayLoad([locationResponse] || []) ||
-                [])[0],
-            });
+          switchMap((locationResponse) => {
+            if (
+              locationResponse &&
+              (formatLocationsPayLoad([locationResponse] || []) || [])?.length >
+                0
+            ) {
+              const location = {
+                ...locationResponse,
+                ...(formatLocationsPayLoad([locationResponse] || []) || [])[0],
+              };
+              if (action?.isCurrentLocation) {
+                return [
+                  setCurrentUserCurrentLocation({
+                    location,
+                  }),
+                  entities[locationResponse?.uuid]
+                    ? upsertLocation({
+                        location: {
+                          ...locationResponse,
+                          ...(formatLocationsPayLoad(
+                            [locationResponse] || []
+                          ) || [])[0],
+                        },
+                      })
+                    : addLoadedLocations({
+                        locations: [
+                          {
+                            ...locationResponse,
+                            ...(formatLocationsPayLoad(
+                              [locationResponse] || []
+                            ) || [])[0],
+                          },
+                        ],
+                      }),
+                  updateCurrentLocationStatus({ settingLocation: false }),
+                ];
+              } else {
+                return [
+                  upsertLocation({
+                    location: {
+                      ...locationResponse,
+                      ...(formatLocationsPayLoad([locationResponse] || []) ||
+                        [])[0],
+                    },
+                  }),
+                ];
+              }
+            }
           })
         );
+      })
+    )
+  );
+
+  loadLocationsByIds$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(loadLocationByIds),
+      withLatestFrom(this.store.select(getLocationEntities)),
+      switchMap(([action, locationsEntities]: [any, any]) => {
+        const locationsToLoad = action.locationUuids?.filter(
+          (uuid) => !locationsEntities[uuid]
+        );
+        return this.locationService
+          .getLocationByIds(locationsToLoad, action?.params)
+          .pipe(
+            switchMap((locationsResponse) => {
+              const formattedLocs = orderBy(
+                formatLocationsPayLoad(locationsResponse || [])?.filter(
+                  (location) => location || []
+                ),
+                ["display"],
+                ["asc"]
+              );
+              let currentUserCurrentLocation;
+              const storedCurrentLocation =
+                localStorage.getItem("currentLocation");
+              if (
+                !storedCurrentLocation ||
+                storedCurrentLocation === "null" ||
+                !JSON.parse(storedCurrentLocation)?.uuid
+              ) {
+                currentUserCurrentLocation = formattedLocs[0];
+              } else {
+                currentUserCurrentLocation = JSON.parse(storedCurrentLocation);
+              }
+              return [
+                addLoadedLocations({
+                  locations: formattedLocs || [],
+                }),
+                setCurrentUserCurrentLocation({
+                  location: currentUserCurrentLocation,
+                }),
+                action?.isUserLocations
+                  ? setAllUserAssignedLocationsLoadedState({
+                      allLoadedState:
+                        locationsToLoad?.length === formattedLocs?.length,
+                    })
+                  : null,
+                updateCurrentLocationStatus({ settingLocation: false }),
+              ];
+            })
+          );
       })
     )
   );
@@ -148,25 +274,62 @@ export class LocationsEffects implements OnInitEffects {
     this.actions$.pipe(
       ofType(loadLocationsByTagName),
       switchMap((action) => {
-        return this.locationService.getLocationsByTagName(action.tagName).pipe(
-          map((locationsResponse: any) => {
-            return addLoadedLocations({
-              locations: formatLocationsPayLoad(
-                locationsResponse?.results || []
-              ),
-            });
-          }),
-          catchError((error) => {
-            return of(loadingLocationByTagNameFails({ error }));
+        return this.locationService
+          .getLocationsByTagName(action.tagName, {
+            limit: 100,
+            startIndex: 0,
+            v: "custom:(uuid,name,display,description,parentLocation:(uuid,name),tags,attributes,childLocations,retired)",
           })
-        );
+          .pipe(
+            switchMap((locationsResponse: any) => {
+              // console.log("locationsResponse", locationsResponse);
+              return [
+                addLoadedLocations({
+                  locations: formatLocationsPayLoad(locationsResponse || []),
+                }),
+                upsertLocations({
+                  locations: formatLocationsPayLoad(locationsResponse || []),
+                }),
+                updateCurrentLocationStatus({ settingLocation: false }),
+              ];
+            }),
+            catchError((error) => {
+              return of(loadingLocationByTagNameFails({ error }));
+            })
+          );
       })
     )
   );
 
-  ngrxOnInitEffects(): Action {
-    return loadLoginLocations();
-  }
+  locationByTagNames$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(loadLocationsByTagNames),
+      switchMap((action) => {
+        return this.locationService
+          .getLocationsByTagNames(action.tagNames, {
+            limit: 100,
+            startIndex: 0,
+            v: "custom:(uuid,name,display,description,parentLocation:(uuid,name),tags,attributes,childLocations,retired)",
+          })
+          .pipe(
+            switchMap((locationsResponse: any) => {
+              return [
+                addLoadedLocations({
+                  locations: formatLocationsPayLoad(locationsResponse || []),
+                }),
+                upsertLocations({
+                  locations: formatLocationsPayLoad(locationsResponse || []),
+                }),
+                updateCurrentLocationStatus({ settingLocation: false }),
+              ];
+            }),
+            catchError((error) => {
+              return of(loadingLocationByTagNameFails({ error }));
+            })
+          );
+      })
+    )
+  );
 
   constructor(
     private actions$: Actions,

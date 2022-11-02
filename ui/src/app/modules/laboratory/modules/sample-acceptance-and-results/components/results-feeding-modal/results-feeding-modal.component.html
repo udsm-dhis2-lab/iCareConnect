@@ -42,8 +42,12 @@
               <tr>
                 <th style="width: 15%">Test Parameter</th>
                 <th style="width: 5%">Container</th>
-                <th style="width: 5%">Label</th>
-                <th style="width: 15%">Ordered By</th>
+                <th style="width: 5%" *ngIf="!LISConfigurations?.isLIS">
+                  Label
+                </th>
+                <th style="width: 15%" *ngIf="!LISConfigurations?.isLIS">
+                  Ordered By
+                </th>
                 <th colspan="2">Results</th>
                 <th style="width: 5%">Action</th>
               </tr>
@@ -80,10 +84,10 @@
                         N/A
                       </span>
                     </td>
-                    <td>
+                    <td *ngIf="!LISConfigurations?.isLIS">
                       {{ item?.order?.orderNumber }}
                     </td>
-                    <td>
+                    <td *ngIf="!LISConfigurations?.isLIS">
                       {{ item?.order?.orderer?.name }}
                     </td>
                     <td colspan="2">
@@ -178,7 +182,7 @@
                                 "
                                 [disabled]="
                                   item?.testAllocations?.length > 0 &&
-                                  item?.testAllocations[0]?.firstSignOff
+                                  item?.testAllocations[0]?.firstSignOff && !LISConfigurations?.isLIS
                                 "
                                 required
                                 id="{{ item?.order?.concept?.display }}"
@@ -197,7 +201,7 @@
                               <mat-select
                                 [disabled]="
                                   item?.testAllocations?.length > 0 &&
-                                  item?.testAllocations[0]?.firstSignOff
+                                  item?.testAllocations[0]?.firstSignOff && !LISConfigurations?.isLIS
                                 "
                                 required
                                 [value]="
@@ -238,7 +242,7 @@
                               >
                               <mat-select
                                 [disabled]="
-                                  item?.testAllocations[0]?.firstSignOff
+                                  item?.testAllocations[0]?.firstSignOff && !LISConfigurations?.isLIS
                                 "
                                 required
                                 [value]="
@@ -289,7 +293,7 @@
                                     : null
                                 "
                                 [disabled]="
-                                  item?.testAllocations[0]?.firstSignOff
+                                  item?.testAllocations[0]?.firstSignOff && !LISConfigurations?.isLIS
                                 "
                                 [(ngModel)]="values[item?.order?.concept?.uuid]"
                               />
@@ -306,11 +310,11 @@
                                         item?.testAllocations[0]?.results
                                           ?.length - 1
                                       ]?.value
-                                    : null
+                                    : nullapp - results
                                 "
                                 style="text-align: center"
                                 [disabled]="
-                                  item?.testAllocations[0]?.firstSignOff
+                                  item?.testAllocations[0]?.firstSignOff && !LISConfigurations?.isLIS
                                 "
                                 matInput
                                 required
@@ -378,7 +382,7 @@
                                 style="text-align: center"
                                 [disabled]="
                                   item?.testAllocations?.length > 0 &&
-                                  item?.testAllocations[0]?.firstSignOff
+                                  item?.testAllocations[0]?.firstSignOff && !LISConfigurations?.isLIS
                                 "
                                 matInput
                                 required
@@ -394,7 +398,7 @@
                                 !LISConfigurations?.isLIS
                               "
                               [disabled]="
-                                item?.testAllocations[0]?.firstSignOff
+                                item?.testAllocations[0]?.firstSignOff && !LISConfigurations?.isLIS
                               "
                               style="font-size: 0.6rem; margin-left: 5px"
                               mat-button
@@ -436,7 +440,10 @@
                               >)
                             </span>
 
-                            <div class="w-100">
+                            <div
+                              class="w-100"
+                              *ngIf="parameter?.datatype?.display !== 'Complex'"
+                            >
                               <mat-checkbox
                                 [checked]="
                                   item?.testAllocations[0]?.results?.length > 0
@@ -469,7 +476,7 @@
                               <textarea
                                 [disabled]="
                                   (item?.testAllocations?.length > 0 &&
-                                    item?.testAllocations[0]?.firstSignOff) ||
+                                    item?.testAllocations[0]?.firstSignOff && !LISConfigurations?.isLIS) ||
                                   item?.secondSignOff
                                 "
                                 (keyup)="
@@ -540,12 +547,12 @@
                             </div>
                           </div>
                         </mat-tab>
-                        <mat-tab label="Backlog">
+                        <mat-tab label="Audit Trail">
                           <div class="p-3">
                             <table class="table table-bordered">
                               <thead class="table-header">
                                 <th>Value</th>
-                                <th>Remarks</th>
+                                <th>Remarks</th>Audit Tra
                                 <th>Date Time</th>
                                 <th>Completed By</th>
                               </thead>
@@ -645,7 +652,7 @@
                                       colspan="4"
                                       class="text-center text-danger"
                                     >
-                                      No backlog data for this test
+                                      No Audit Trail for this test
                                       <br />
                                       <!-- {{ params?.currentSample | json }} -->
                                     </td>
@@ -663,7 +670,7 @@
                           !item?.testAllocations[0] ||
                           (!values[item?.order?.concept?.uuid] &&
                             !values[item?.order?.concept?.uuid + '-comment']) ||
-                          item?.testAllocations[0]?.firstSignOff
+                          (item?.testAllocations[0]?.firstSignOff && !LISConfigurations?.isLIS)
                         "
                         (click)="
                           onSave(
@@ -754,13 +761,13 @@
                       </span>
                     </td>
                     <td
-                      *ngIf="count == 0"
+                      *ngIf="count == 0 && !LISConfigurations?.isLIS"
                       [attr.rowspan]="item?.order?.concept?.setMembers?.length"
                     >
                       {{ item?.order?.orderNumber }}
                     </td>
                     <td
-                      *ngIf="count == 0"
+                      *ngIf="count == 0 && !LISConfigurations?.isLIS"
                       [attr.rowspan]="item?.order?.concept?.setMembers?.length"
                     >
                       {{ item?.order?.orderer?.name }}
@@ -774,19 +781,54 @@
                       <mat-tab-group>
                         <mat-tab label="Current">
                           <div class="p-3">
+                            <!-- {{ parameter?.datatype?.display }} -->
+
+                            <!-- {{ parameter | json }} -->
+                            <div
+                              *ngIf="parameter?.datatype?.display === 'Complex'"
+                            >
+                              <input
+                                type="file"
+                                style="
+                                  border: none;
+                                  background-color: transparent;
+                                "
+                                class="form-control"
+                                name="file"
+                                accept=".pdf, .doc"
+                                id="file-selector-{{ parameter?.uuid }}"
+                                (change)="fileSelection($event, parameter)"
+                              />
+                              <div
+                                *ngIf="obsKeyedByConcepts[parameter?.uuid]"
+                                class="text-right"
+                              >
+                                <a
+                                  [href]="
+                                    obsKeyedByConcepts[parameter?.uuid]?.uri
+                                  "
+                                  target="_blank"
+                                  ><img
+                                    src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABmJLR0QA/wD/AP+gvaeTAAABbklEQVRIibXUTygEUQDH8e/MDi1WbZQoHDZ/tkSxrfynxIE9yMUmJ83FwcEBZ1H+XBwUN26y5cBJ7YEtLtuWf4dVm9aiOMmBcpodB1H7b3bM7vyOM+/9Pu/15g2YHCH5gep1LOqfHvcJB7HY/4AJh6qnWq1rRXgKP6MoA8J+JJppnKinLC1Q34Yir9VgkQLqZIMj7wCA6mxHkVc1kZwAPUjOQAIiSqfJ7wwfcqYIvmhCZ152oBX9QHM37F5D/7hJQKML4gq09JkEPN6BzQ5vLyYBl2fw8Q6vDyYBRTawloBHhkKrCUCXB0J+iFzB7CbUOsE9BE0dIKR87X+R9C3DAiPTcHsOZZXgGgT3MHx9gijC3hIEDg0CpXbwzkNFNZRXwcUx7CxASw/0joFUAPc3Gadr3+TOUZBXoNgGy1MQDmZdT/JN1t7BzMbPgR5t6ypPF21gaw4sEgRPDJVnB0J+w8W/Mf1nl7oDlXWz0bzmG0ZVX0NFOd9TAAAAAElFTkSuQmCC"
+                                  />
+                                  Download
+                                </a>
+                              </div>
+                            </div>
                             <mat-form-field
                               class="w-75"
                               *ngIf="
                                 !notInRangeIsSet[parameter?.uuid] &&
                                 !parameter?.numeric &&
                                 parameter?.datatype?.display !== 'Numeric' &&
+                                parameter?.datatype?.display !== 'Complex' &&
                                 parameter?.answers &&
                                 parameter?.answers.length == 0 &&
                                 !LISConfigurations?.isLIS
                               "
                             >
                               <mat-label
-                                >Value for {{ parameter?.display }} - NANA
+                                >Value for {{ parameter?.display }}
                               </mat-label>
                               <textarea
                                 (keyup)="
@@ -813,7 +855,7 @@
                                 [disabled]="
                                   item?.allocationsPairedBySetMember[
                                     parameter?.uuid
-                                  ]?.firstSignOff
+                                  ]?.firstSignOff && !LISConfigurations?.isLIS
                                 "
                                 required
                                 id="{{ parameter?.display }}"
@@ -837,7 +879,7 @@
                                   [disabled]="
                                     item?.allocationsPairedBySetMember[
                                       parameter?.uuid
-                                    ]?.firstSignOff
+                                    ]?.firstSignOff && !LISConfigurations?.isLIS
                                   "
                                   required
                                   [value]="
@@ -901,12 +943,11 @@
                                 >Select value for
                                 {{ parameter?.display }}</mat-label
                               >
-                              <!-- {{parameter | json}} -->
                               <mat-select
                                 [disabled]="
                                   item?.allocationsPairedBySetMember[
                                     parameter?.uuid
-                                  ]?.firstSignOff
+                                  ]?.firstSignOff && !LISConfigurations?.isLIS
                                 "
                                 required
                                 [value]="
@@ -992,7 +1033,7 @@
                                 [disabled]="
                                   item?.allocationsPairedBySetMember[
                                     parameter?.uuid
-                                  ]?.firstSignOff
+                                  ]?.firstSignOff && !LISConfigurations?.isLIS
                                 "
                                 (keyup.enter)="
                                   setEnteredParameterValue(
@@ -1031,7 +1072,7 @@
                                 [disabled]="
                                   item?.allocationsPairedBySetMember[
                                     parameter?.uuid
-                                  ]?.firstSignOff
+                                  ]?.firstSignOff && !LISConfigurations?.isLIS
                                 "
                                 matInput
                                 required
@@ -1067,15 +1108,61 @@
                                 Go to range
                               </button>
                             </mat-form-field>
+
+                            <mat-form-field
+                              class="w-50"
+                              *ngIf="
+                                parameter?.datatype?.display === 'Numeric' &&
+                                (!parameter?.lowNormal || !parameter?.hiNormal)
+                              "
+                            >
+                              <mat-label
+                                >Enter value for {{ parameter?.display }}
+                              </mat-label>
+                              <input
+                                matInput
+                                autocomplete="off"
+                                [type]="'number'"
+                                class="text-left"
+                                [value]="
+                                  item?.allocationsPairedBySetMember[
+                                    parameter?.uuid
+                                  ]?.results?.length > 0
+                                    ? item?.allocationsPairedBySetMember[
+                                        parameter?.uuid
+                                      ]?.results[
+                                        item?.allocationsPairedBySetMember[
+                                          parameter?.uuid
+                                        ]?.results?.length - 1
+                                      ]?.value
+                                    : null
+                                "
+                                [disabled]="
+                                  item?.allocationsPairedBySetMember[
+                                    parameter?.uuid
+                                  ]?.firstSignOff && !LISConfigurations?.isLIS
+                                "
+                                (change)="
+                                  setEnteredParameterValue(
+                                    parameter,
+                                    $event.target.value
+                                  )
+                                "
+                              />
+                            </mat-form-field>
+
                             <div class="50 d-flex justify-content-left">
                               <mat-form-field
                                 class="w-25"
-                                *ngIf="LISConfigurations?.isLIS"
+                                *ngIf="
+                                  LISConfigurations?.isLIS &&
+                                  parameter?.datatype?.display === 'Numeric'
+                                "
                               >
                                 <mat-label
                                   >Enter value for {{ parameter?.display }}
                                 </mat-label>
-                                <input
+                                <!-- <input
                                   *ngIf="
                                     !parameter?.numeric &&
                                     parameter?.datatype?.display !== 'Numeric'
@@ -1109,7 +1196,7 @@
                                     )
                                   "
                                   id="{{ parameter?.display }}"
-                                />
+                                /> -->
 
                                 <input
                                   *ngIf="
@@ -1140,7 +1227,7 @@
                                   [disabled]="
                                     item?.allocationsPairedBySetMember[
                                       parameter?.uuid
-                                    ]?.firstSignOff
+                                    ]?.firstSignOff && !LISConfigurations?.isLIS
                                   "
                                   matInput
                                   required
@@ -1254,7 +1341,10 @@
                               >)
                             </span>
 
-                            <div class="w-100">
+                            <div
+                              class="w-100"
+                              *ngIf="parameter?.datatype?.display !== 'Complex'"
+                            >
                               <mat-checkbox
                                 [checked]="
                                   values[parameter?.uuid + '-abnormal']
@@ -1294,7 +1384,7 @@
                             </mat-form-field>
                           </div>
                         </mat-tab>
-                        <mat-tab label="Backlog">
+                        <mat-tab label="Audit Trail">
                           <div class="p-3">
                             <table class="table table-bordered">
                               <thead class="table-header">
@@ -1404,7 +1494,7 @@
                                       colspan="4"
                                       class="text-center text-danger"
                                     >
-                                      No backlog data for this test
+                                      No Audit Trail for this test
                                     </td>
                                   </tr>
                                 </ng-container>
@@ -1417,16 +1507,16 @@
                     <td>
                       <button
                         [disabled]="
-                          !item?.allocationsPairedBySetMember[
-                            parameter?.uuid
-                          ] ||
+                          (parameter?.datatype?.display !== 'Complex' &&
+                            !item?.allocationsPairedBySetMember[
+                              parameter?.uuid
+                            ]) ||
+                          (parameter?.datatype?.display === 'Complex' &&
+                            !file) ||
                           (!values[parameter?.uuid] &&
                             !values[parameter?.uuid + '-comment']) ||
-                          item?.allocationsPairedBySetMember[parameter?.uuid]
-                            ?.firstSignOff ||
-                          (LISConfigurations?.isLIS &&
-                            temporaryValues[parameter?.uuid] !=
-                              values[parameter?.uuid])
+                          (item?.allocationsPairedBySetMember[parameter?.uuid]
+                            ?.firstSignOff && !LISConfigurations?.isLIS)
                         "
                         (click)="
                           onSaveParameterValue(
@@ -1434,7 +1524,10 @@
                             item,
                             parameter,
                             params?.currentSample,
-                            item?.allocationsPairedBySetMember[parameter?.uuid]
+                            item?.allocationsPairedBySetMember[parameter?.uuid],
+                            parameter?.datatype?.display === 'Complex'
+                              ? 'file'
+                              : null
                           )
                         "
                         mat-stroked-button
@@ -1533,7 +1626,10 @@
             </tbody>
           </table>
 
-          <div class="clinical-history-summary">
+          <div
+            class="clinical-history-summary"
+            *ngIf="!LISConfigurations?.isLIS"
+          >
             <a (click)="showClinicalNotes($event)" class="clinical-notes-btn">
               Diagnosis & Clinical notes summary
               <i
@@ -1571,7 +1667,8 @@
               <tr>
                 <th style="width: 15%">Test Order</th>
                 <th style="width: 10%">Ordered By</th>
-                <th colspan="2">Results</th>
+                <th *ngIf="LISConfigurations?.isLIS" colspan="1">Results</th>
+                <th *ngIf="!LISConfigurations?.isLIS" colspan="2">Results</th>
                 <th style="width: 10%">
                   {{ !LISConfigurations?.isLIS ? "Completed By" : "Fed By" }}
                 </th>
@@ -1605,7 +1702,7 @@
                     "
                   >
                     <td>{{ item?.order?.concept?.display }}</td>
-                    <td>
+                    <td *ngIf="!LISConfigurations?.isLIS">
                       {{ item?.order?.orderer?.name }}
                     </td>
                     <td colspan="2">
@@ -1686,7 +1783,7 @@
                             </div>
                           </div>
                         </mat-tab>
-                        <mat-tab label="Backlog">
+                        <mat-tab label="Audit Trail">
                           <div class="p-3">
                             <div>
                               <table class="table table-bordered">
@@ -1791,7 +1888,7 @@
                                         colspan="4"
                                         class="text-center text-danger"
                                       >
-                                        No backlog data for this test
+                                        No Audit Trail data for this test
                                       </td>
                                     </tr>
                                   </ng-container>
@@ -1869,6 +1966,8 @@
                         >
                       </button>
                     </td>
+                    search
+
                     <td colspan="2" *ngIf="!LISConfigurations?.isLIS">
                       <!-- TODO: reject first approval -->
                       <button
@@ -2008,7 +2107,7 @@
                       <td>
                         {{ item?.order?.concept?.display }}
                       </td>
-                      <td>
+                      <td *ngIf="!LISConfigurations?.isLIS">
                         {{ item?.order?.orderer?.name }}
                       </td>
                       <td>{{ parameter?.display }}</td>
@@ -2096,7 +2195,7 @@
                               </div>
                             </div>
                           </mat-tab>
-                          <mat-tab label="Backlog">
+                          <mat-tab label="Audit Trail">
                             <div class="p-3">
                               <div>
                                 <table class="table table-bordered">
@@ -2176,7 +2275,7 @@
                                           colspan="4"
                                           class="text-center text-danger"
                                         >
-                                          No backlog data for this test
+                                          No Audit Trail for this test
                                         </td>
                                       </tr>
                                     </ng-container>
@@ -2199,8 +2298,8 @@
                       <td colspan="2" *ngIf="!LISConfigurations?.isLIS">
                         <button
                           [disabled]="
-                            item?.allocationsPairedBySetMember[parameter?.uuid]
-                              ?.firstSignOff ||
+                            (item?.allocationsPairedBySetMember[parameter?.uuid]
+                              ?.firstSignOff && !LISConfigurations?.isLIS) ||
                             item?.allocationsPairedBySetMember[parameter?.uuid]
                               ?.results[
                               item?.allocationsPairedBySetMember[
@@ -2235,8 +2334,8 @@
                               ]?.firstSignOff
                           }"
                           [disabled]="
-                            item?.allocationsPairedBySetMember[parameter?.uuid]
-                              ?.firstSignOff ||
+                            (item?.allocationsPairedBySetMember[parameter?.uuid]
+                              ?.firstSignOff && !LISConfigurations?.isLIS) ||
                             item?.allocationsPairedBySetMember[parameter?.uuid]
                               ?.results?.length == 0 ||
                             item?.allocationsPairedBySetMember[parameter?.uuid]
@@ -2387,7 +2486,7 @@
                             [disabled]="
                               item?.allocationsPairedBySetMember[
                                 parameter?.uuid
-                              ]?.firstSignOff
+                              ]?.firstSignOff && !LISConfigurations?.isLIS
                             "
                             mat-stroked-button
                             (click)="
@@ -2430,7 +2529,7 @@
             </tbody>
           </table>
         </div>
-        <div class="clinical-history-summary">
+        <div class="clinical-history-summary" *ngIf="!LISConfigurations?.isLIS">
           <a (click)="showClinicalNotes($event)" class="clinical-notes-btn">
             Diagnosis & Clinical notes summary
             <i

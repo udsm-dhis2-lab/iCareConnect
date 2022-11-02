@@ -20,3 +20,9 @@
 .full-width {
   width: 100%;
 }
+
+.selected-menu-item,
+.selected-menu-item:hover {
+  background-color: #42abed !important;
+  color: #fff !important;
+}

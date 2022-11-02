@@ -19,6 +19,7 @@ import {
   loadRolesDetails,
   loadOrderTypes,
   go,
+  clearVisitsDatesParameters,
 } from "src/app/store/actions";
 import { loadSpecimenSources } from "./store/actions/specimen-sources-and-tests-management.actions";
 import { getAllSampleTypes } from "src/app/store/selectors";
@@ -91,6 +92,14 @@ export class LaboratoryComponent implements OnInit {
               path: ["/laboratory/sample-acceptance-and-results"],
             })
           );
+        } else if (currentRoute?.url?.includes("/dashboard")) {
+          this.enableDate(this.datesRangeDifference, this.showDate);
+          this.currentSubModule = "dashboard";
+          this.store.dispatch(
+            go({
+              path: ["/laboratory/dashboard-lab"],
+            })
+          );
         } else if (currentRoute?.url?.includes("/sample-tracking")) {
           this.enableDate(this.datesRangeDifference, this.showDate);
           this.currentSubModule = "tracking";
@@ -129,6 +138,13 @@ export class LaboratoryComponent implements OnInit {
           this.store.dispatch(
             go({
               path: ["/laboratory/sample-collection-home"],
+            })
+          );
+        } else if (currentRoute?.url === "/laboratory/sample-results-list") {
+          this.router.navigate(["laboratory"]);
+          this.store.dispatch(
+            go({
+              path: ["/laboratory/sample-results-list"],
             })
           );
         } else if (currentRoute?.url === "/laboratory") {
@@ -281,7 +297,7 @@ export class LaboratoryComponent implements OnInit {
       this.store.dispatch(clearLoadedLabOrders());
 
       this.store.dispatch(clearLoadedLabSamples());
-
+      this.store.dispatch(clearVisitsDatesParameters());
       this.parameters = {
         ...this.parameters,
         startDate: `${this.startDate.getFullYear()}-${
@@ -296,7 +312,11 @@ export class LaboratoryComponent implements OnInit {
         loadLabConfigurations({ periodParameters: this.parameters })
       );
 
-      this.store.dispatch(setVisitsParameters({ parameters: this.parameters }));
+      setTimeout(() => {
+        this.store.dispatch(
+          setVisitsParameters({ parameters: this.parameters })
+        );
+      }, 200);
 
       // this.store.dispatch(loadActiveVisits({ parameters: this.parameters }));
 

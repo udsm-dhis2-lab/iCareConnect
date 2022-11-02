@@ -1,19 +1,19 @@
-import { Injectable } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
-import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { find } from 'lodash';
-import { of } from 'rxjs';
-import { catchError, map, switchMap, tap } from 'rxjs/operators';
-import { addCurrentPatient } from 'src/app/store/actions';
-import { PaymentReceiptComponent } from '../../modules/billing/components/payment-reciept/payment-reciept.component';
-import { BillItemObject } from '../../modules/billing/models/bill-item-object.model';
-import { BillItem } from '../../modules/billing/models/bill-item.model';
-import { BillObject } from '../../modules/billing/models/bill-object.model';
-import { Bill } from '../../modules/billing/models/bill.model';
-import { Discount } from '../../modules/billing/models/discount.model';
-import { Payment } from '../../modules/billing/models/payment.model';
-import { BillingService } from '../../modules/billing/services/billing.service';
-import { upsertPatientBillItems } from '../actions/bill-item.actions';
+import { Injectable } from "@angular/core";
+import { MatDialog } from "@angular/material/dialog";
+import { Actions, createEffect, ofType } from "@ngrx/effects";
+import { find } from "lodash";
+import { of } from "rxjs";
+import { catchError, map, switchMap, tap } from "rxjs/operators";
+import { addCurrentPatient } from "src/app/store/actions";
+import { PaymentReceiptComponent } from "../../modules/billing/components/payment-reciept/payment-reciept.component";
+import { BillItemObject } from "../../modules/billing/models/bill-item-object.model";
+import { BillItem } from "../../modules/billing/models/bill-item.model";
+import { BillObject } from "../../modules/billing/models/bill-object.model";
+import { Bill } from "../../modules/billing/models/bill.model";
+import { Discount } from "../../modules/billing/models/discount.model";
+import { Payment } from "../../modules/billing/models/payment.model";
+import { BillingService } from "../../modules/billing/services/billing.service";
+import { upsertPatientBillItems } from "../actions/bill-item.actions";
 import {
   confirmPatientBill,
   confirmPatientBillFail,
@@ -26,8 +26,8 @@ import {
   showPaymentReceipt,
   upsertPatientBills,
   upsertPatientPendingBill,
-} from '../actions/bill.actions';
-import { upsertPatientPayments } from '../actions/payment.actions';
+} from "../actions/bill.actions";
+import { upsertPatientPayments } from "../actions/payment.actions";
 
 @Injectable()
 export class BillEffects {
@@ -90,7 +90,7 @@ export class BillEffects {
               );
             });
 
-            if (billPaymentResult.status === 'PENDING') {
+            if (billPaymentResult.status === "PENDING") {
               const newPendingBill = new Bill({
                 ...bill,
                 items: paymentInput.confirmedItems,
@@ -132,8 +132,8 @@ export class BillEffects {
         tap(({ receiptData }) => {
           this.dialog.open(PaymentReceiptComponent, {
             data: { receiptData },
-            width: '40%',
-            panelClass: 'custom-dialog-container',
+            width: "40%",
+            panelClass: "custom-dialog-container",
           });
         })
       ),
@@ -149,7 +149,7 @@ export class BillEffects {
             const newBill = new Bill({
               ...bill,
               items: bill.items.map((item) => {
-                const discountedItem = find(discount?.items, ['id', item.id]);
+                const discountedItem = find(discount?.items, ["id", item.id]);
                 return new BillItem(
                   {
                     ...item.toJson(),

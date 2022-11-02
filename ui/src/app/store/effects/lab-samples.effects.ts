@@ -47,6 +47,8 @@ import {
 } from "src/app/modules/laboratory/store/actions";
 import { getLISConfigurations } from "../selectors/lis-configurations.selectors";
 
+import * as moment from "moment";
+
 @Injectable()
 export class LabSamplesEffects {
   constructor(
@@ -82,6 +84,42 @@ export class LabSamplesEffects {
                   department:
                     keyedDepartments[sample?.orders[0]?.order?.concept?.uuid],
                   collected: true,
+                  releasedStatuses: (
+                    sample?.statuses?.filter(
+                      (status) => status?.status === "RELEASED"
+                    ) || []
+                  ).map((status) => {
+                    return {
+                      ...status,
+                      date:
+                        new Date(status?.timestamp).toLocaleDateString() +
+                        " " +
+                        new Date(status?.timestamp).getHours().toString() +
+                        ":" +
+                        new Date(status?.timestamp).getMinutes().toString() +
+                        " ( " +
+                        moment(Number(status?.timestamp)).fromNow() +
+                        " )",
+                    };
+                  }),
+                  restrictedStatuses: (
+                    sample?.statuses?.filter(
+                      (status) => status?.status === "RESTRICTED"
+                    ) || []
+                  ).map((status) => {
+                    return {
+                      ...status,
+                      date:
+                        new Date(status?.timestamp).toLocaleDateString() +
+                        " " +
+                        new Date(status?.timestamp).getHours().toString() +
+                        ":" +
+                        new Date(status?.timestamp).getMinutes().toString() +
+                        " ( " +
+                        moment(Number(status?.timestamp)).fromNow() +
+                        " )",
+                    };
+                  }),
                   reasonForRejection:
                     sample?.statuses?.length > 0 &&
                     _.orderBy(sample?.statuses, ["timestamp"], ["desc"])[0]
@@ -96,8 +134,13 @@ export class LabSamplesEffects {
                             )[0]?.remarks
                         ) || [])[0]
                       : sample?.statuses?.length > 0 &&
-                        _.orderBy(sample?.statuses, ["timestamp"], ["desc"])[0]
-                          ?.status == "RECOLLECT"
+                        (_.orderBy(sample?.statuses, ["timestamp"], ["desc"])[0]
+                          ?.status == "RECOLLECT" ||
+                          _.orderBy(
+                            sample?.statuses,
+                            ["timestamp"],
+                            ["desc"]
+                          )[0]?.category == "RECOLLECT")
                       ? (action.codedSampleRejectionReasons.filter(
                           (reason) =>
                             reason.uuid ===
@@ -110,20 +153,26 @@ export class LabSamplesEffects {
                       : null,
                   markedForRecollection:
                     sample?.statuses?.length > 0 &&
-                    _.orderBy(sample?.statuses, ["timestamp"], ["desc"])[0]
-                      ?.status == "RECOLLECT"
+                    (_.orderBy(sample?.statuses, ["timestamp"], ["desc"])[0]
+                      ?.status == "RECOLLECT" ||
+                      _.orderBy(sample?.statuses, ["timestamp"], ["desc"])[0]
+                        ?.category == "RECOLLECT")
                       ? true
                       : false,
                   rejected:
                     sample?.statuses?.length > 0 &&
-                    _.orderBy(sample?.statuses, ["timestamp"], ["desc"])[0]
-                      ?.status == "REJECTED"
+                    (_.orderBy(sample?.statuses, ["timestamp"], ["desc"])[0]
+                      ?.status == "REJECTED" ||
+                      _.orderBy(sample?.statuses, ["timestamp"], ["desc"])[0]
+                        ?.category == "REJECTED")
                       ? true
                       : false,
                   rejectedBy:
                     sample?.statuses?.length > 0 &&
-                    _.orderBy(sample?.statuses, ["timestamp"], ["desc"])[0]
-                      ?.status == "REJECTED"
+                    (_.orderBy(sample?.statuses, ["timestamp"], ["desc"])[0]
+                      ?.status == "REJECTED" ||
+                      _.orderBy(sample?.statuses, ["timestamp"], ["desc"])[0]
+                        ?.category == "REJECTED")
                       ? _.orderBy(sample?.statuses, ["timestamp"], ["desc"])[0]
                           ?.user
                       : null,
@@ -140,6 +189,7 @@ export class LabSamplesEffects {
                     name: sample?.creator?.display?.split(" (")[0],
                     uid: sample?.creator?.uuid,
                   },
+                  ordersWithResults: getOrdersWithResults(sample?.orders),
                   accepted:
                     (_.filter(sample?.statuses, { status: "ACCEPTED" }) || [])
                       ?.length > 0
@@ -168,7 +218,10 @@ export class LabSamplesEffects {
                           ...order?.order?.concept,
                           ...keyedSpecimenSources[order?.order?.concept?.uuid],
                           uuid: order?.order?.concept?.uuid,
-                          display: order?.order?.concept?.display,
+                          display:
+                            order?.order?.concept?.display?.indexOf(":") > -1
+                              ? order?.order?.concept?.display?.split(":")[1]
+                              : order?.order?.concept?.display,
                           selectionOptions:
                             keyedSpecimenSources[order?.order?.concept?.uuid]
                               ?.hiNormal &&
@@ -193,6 +246,10 @@ export class LabSamplesEffects {
                                   (member) => {
                                     return {
                                       ...member,
+                                      display:
+                                        member?.display?.indexOf(":") > -1
+                                          ? member?.display?.split(":")[1]
+                                          : member?.display,
                                       selectionOptions:
                                         member?.hiNormal && member?.lowNormal
                                           ? generateSelectionOptions(
@@ -252,11 +309,16 @@ export class LabSamplesEffects {
                                 : null,
                             firstSignOff:
                               allocation?.statuses?.length > 0 &&
-                              _.orderBy(
+                              (_.orderBy(
                                 allocation?.statuses,
                                 ["timestamp"],
                                 ["desc"]
-                              )[0]?.status == "APPROVED"
+                              )[0]?.status == "APPROVED" ||
+                                _.orderBy(
+                                  allocation?.statuses,
+                                  ["timestamp"],
+                                  ["desc"]
+                                )[0]?.status == "AUTHORIZED")
                                 ? true
                                 : false,
                             secondSignOff:
@@ -275,11 +337,16 @@ export class LabSamplesEffects {
                                 : false,
                             rejected:
                               allocation?.statuses?.length > 0 &&
-                              _.orderBy(
+                              (_.orderBy(
                                 allocation?.statuses,
                                 ["timestamp"],
                                 ["desc"]
-                              )[0]?.status == "REJECTED"
+                              )[0]?.status == "REJECTED" ||
+                                _.orderBy(
+                                  allocation?.statuses,
+                                  ["timestamp"],
+                                  ["desc"]
+                                )[0]?.category == "REJECTED")
                                 ? true
                                 : false,
                             rejectionStatus:
@@ -350,7 +417,6 @@ export class LabSamplesEffects {
     this.actions$.pipe(
       ofType(loadLabSamplesByVisit),
       switchMap((action) => {
-        console.log("dispatch details :: ", action);
         return this.sampleService.getSampleByVisit(action.visit).pipe(
           map((response) => {
             const keyedDepartments = keyDepartmentsByTestOrder(
@@ -820,9 +886,6 @@ export class LabSamplesEffects {
           .acceptSampleAndCreateAllocations(sampleAcceptStatusWithAllocations)
           .pipe(
             mergeMap((response) => {
-              // console.log('orders : ', action?.details?.orders);
-              // console.log('allocations : ', response?.allocations);
-
               let reprocessedOrders = _.map(
                 action?.details?.orders,
                 (order) => {
@@ -1112,7 +1175,7 @@ export class LabSamplesEffects {
   );
 }
 
-function createSearchingText(sample) {
+export function createSearchingText(sample) {
   return (
     sample?.label +
     "-" +
@@ -1137,6 +1200,22 @@ function formatUserChangedStatus(statusDetails) {
       },
     };
   return null;
+}
+
+function getOrdersWithResults(orders) {
+  let newOrders: any[] = [];
+
+  orders?.forEach((order) => {
+    if (order?.testAllocations?.length > 0) {
+      order.testAllocations.forEach((test) => {
+        if (test.results.length > 0) {
+          newOrders = [...newOrders, order];
+        }
+      });
+    }
+  });
+
+  return newOrders;
 }
 
 function keyLevelTwoConceptSetMembers(members) {

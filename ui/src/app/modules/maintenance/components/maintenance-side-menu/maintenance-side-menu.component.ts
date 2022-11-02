@@ -9,9 +9,9 @@ import {
 import { MatSidenav } from "@angular/material/sidenav";
 import { Store } from "@ngrx/store";
 import { Observable, of } from "rxjs";
+import { ItemPriceService } from "src/app/shared/services/item-price.service";
 import { go } from "src/app/store/actions";
 import { AppState } from "src/app/store/reducers";
-import { ItemPriceService } from "../../services/item-price.service";
 
 @Component({
   selector: "app-maintenance-side-menu",

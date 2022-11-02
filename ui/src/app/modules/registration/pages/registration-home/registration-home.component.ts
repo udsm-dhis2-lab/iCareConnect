@@ -6,6 +6,7 @@ import { MatTableDataSource } from "@angular/material/table";
 import { Store } from "@ngrx/store";
 import { Observable, merge } from "rxjs";
 import { map, startWith, switchMap } from "rxjs/operators";
+import { LocationService } from "src/app/core/services";
 import { PatientListDialogComponent } from "src/app/shared/dialogs";
 import { TableConfig } from "src/app/shared/models/table-config.model";
 import { Patient } from "src/app/shared/resources/patient/models/patient.model";
@@ -13,8 +14,11 @@ import { Visit } from "src/app/shared/resources/visits/models/visit.model";
 import { VisitsService } from "src/app/shared/resources/visits/services";
 import { addCurrentPatient, go } from "src/app/store/actions";
 import { AppState } from "src/app/store/reducers";
+import { getAllTreatmentLocations } from "src/app/store/selectors";
 import { StartVisitModelComponent } from "../../components/start-visit-model/start-visit-model.component";
 import { VisitStatusConfirmationModelComponent } from "../../components/visit-status-confirmation-model/visit-status-confirmation-model.component";
+import { PatientService } from "src/app/shared/services/patient.service";
+import { clearActiveVisit } from "src/app/store/actions/visit.actions";
 
 @Component({
   selector: "app-registration-home",
@@ -33,14 +37,25 @@ export class RegistrationHomeComponent implements OnInit {
   isExpanded: boolean = true;
   isDark: boolean = false;
   documentURL: string;
+  patientSummary$: Observable<{
+    allPatients: number;
+    activeVisits: number;
+    locations: any[];
+  }>;
+
+  //card variables
+  roomData: { name: string; activePatients: number }[];
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
+  treatmentLocations$: Observable<any>;
+  showCard: boolean;
 
   constructor(
     private store: Store<AppState>,
     private visitService: VisitsService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private patentService: PatientService
   ) {
     this.documentURL = "http://icare.dhis2.udsm.ac.tz/docs/";
   }
@@ -51,6 +66,7 @@ export class RegistrationHomeComponent implements OnInit {
 
   ngOnInit() {
     this.loadingData = false;
+    this.store.dispatch(clearActiveVisit());
     this.visitColumns = [
       { id: "index", label: "#" },
       { id: "patientName", label: "Name" },
@@ -65,6 +81,12 @@ export class RegistrationHomeComponent implements OnInit {
     this.registrationTableConfig = new TableConfig({
       noDataLabel: "No Registered patients",
     });
+
+    this.getPatientsStatsSummary();
+  }
+
+  getPatientsStatsSummary(): void {
+    this.patientSummary$ = this.patentService.getPatientSummary();
   }
 
   goToAddNewClientPage(event: Event, path: string): void {
@@ -104,6 +126,7 @@ export class RegistrationHomeComponent implements OnInit {
       .afterClosed()
       .subscribe((response: { action: string; patient: Patient }) => {
         if (response?.action === "PATIENT_SELECT") {
+          this.store.dispatch(clearActiveVisit());
           this.store.dispatch(
             addCurrentPatient({
               patient: response.patient,
@@ -133,11 +156,14 @@ export class RegistrationHomeComponent implements OnInit {
         }
       });
   }
-
+  onDisplayList(showCard: boolean) {
+    this.showCard = showCard;
+  }
   onSelectPatient(patient: Patient, e?: Event): void {
     if (e) {
       e.stopPropagation();
     }
+    this.store.dispatch(clearActiveVisit());
     this.store.dispatch(
       addCurrentPatient({
         patient: { ...patient["patient"], id: patient["patient"]["uuid"] },
@@ -155,6 +181,7 @@ export class RegistrationHomeComponent implements OnInit {
       .subscribe((visitDetails) => {
         if (visitDetails && !visitDetails?.close) {
           // TODO: Review the logics here
+          this.getPatientsStatsSummary();
           this.loadingData = true;
           setTimeout(() => {
             this.loadingData = false;
@@ -172,6 +199,7 @@ export class RegistrationHomeComponent implements OnInit {
           //     }, 100);
           //   });
         } else {
+          this.getPatientsStatsSummary();
           this.loadingData = true;
           setTimeout(() => {
             this.loadingData = false;

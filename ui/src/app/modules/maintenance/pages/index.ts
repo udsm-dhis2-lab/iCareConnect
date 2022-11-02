@@ -6,6 +6,7 @@ import { UserManagementComponent } from "./user-management/user-management-home/
 import { PriceListHomeComponent } from "./price-list-home/price-list-home.component";
 import { SystemSettingsComponent } from "./system-settings/system-settings.component";
 import { PrivilegesAndRolesComponent } from "./privileges-and-roles/privileges-and-roles.component";
+import { DrugManagementComponent } from "./drug-management/drug-management.component";
 
 export const maintenancePages: any[] = [
   MaintenanceHomeComponent,
@@ -16,6 +17,7 @@ export const maintenancePages: any[] = [
   PriceListHomeComponent,
   SystemSettingsComponent,
   PrivilegesAndRolesComponent,
+  DrugManagementComponent,
 ];
 
 export {

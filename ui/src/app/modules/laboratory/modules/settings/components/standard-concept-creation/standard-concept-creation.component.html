@@ -42,14 +42,7 @@
             (formUpdate)="onFormUpdate($event)"
           ></app-form>
         </div>
-        <div
-          *ngIf="
-            (isSet && !editingSet && !searchTermForTestMethod) ||
-            (searchTermForTestMethod &&
-              testMethodSelected &&
-              params?.selectedTestMethodDetails)
-          "
-        >
+        <div *ngIf="isSet">
           <div class="h5">
             {{ setMembersHeaderName }}
           </div>

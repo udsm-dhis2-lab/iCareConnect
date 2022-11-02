@@ -22,6 +22,10 @@ import {
 } from "src/app/store/selectors/visit.selectors";
 import { VisitObject } from "src/app/shared/resources/visits/models/visit-object.model";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
+import { LocationGet } from "src/app/shared/resources/openmrs";
+import { getCurrentLocation } from "src/app/store/selectors";
+import { map } from "rxjs/operators";
+import { getAllObservations } from "src/app/store/selectors/observation.selectors";
 
 @Component({
   selector: "app-patient-dashboard",
@@ -39,6 +43,10 @@ export class PatientDashboardComponent implements OnInit {
   iCareGeneralConfigurations$: Observable<any>;
   iCareClinicConfigurations$: Observable<any>;
   provider$: Observable<any>;
+  currentLocation$: Observable<LocationGet>;
+  errors: any[] = [];
+  visitEndingControlStatusesConceptUuid$: Observable<string>;
+  observations$: Observable<any>;
   constructor(
     private store: Store<AppState>,
     private route: ActivatedRoute,
@@ -46,13 +54,47 @@ export class PatientDashboardComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.iCareGeneralConfigurations$ =
-      this.systemSettingsService.getSystemSettingsByKey(
-        "iCare.GeneralMetadata.Configurations"
+    this.iCareGeneralConfigurations$ = this.systemSettingsService
+      .getSystemSettingsByKey("iCare.GeneralMetadata.Configurations")
+      .pipe(
+        map((response) => {
+          if (response.error) {
+            this.errors = [...this.errors, response?.error];
+          }
+          if (response === "") {
+            this.errors = [
+              ...this.errors,
+              {
+                error: {
+                  message:
+                    "Missing General iCare Metadata Configurations, Please set 'iCare.GeneralMetadata.Configurations' or Contact IT",
+                },
+              },
+            ];
+          }
+          return response;
+        })
       );
-    this.iCareClinicConfigurations$ =
-      this.systemSettingsService.getSystemSettingsByKey(
-        "icare.clinic.configurations"
+    this.iCareClinicConfigurations$ = this.systemSettingsService
+      .getSystemSettingsByKey("icare.clinic.configurations")
+      .pipe(
+        map((response) => {
+          if (response.error) {
+            this.errors = [...this.errors, response?.error];
+          }
+          if (response === "") {
+            this.errors = [
+              ...this.errors,
+              {
+                error: {
+                  message:
+                    "Missing Icare Clinic Configurations. Please set 'icare.clinic.configurations' or Contact IT",
+                },
+              },
+            ];
+          }
+          return response;
+        })
       );
     const patientId = this.route.snapshot.params["patientID"];
     this.store.dispatch(loadFormPrivilegesConfigs());
@@ -69,5 +111,11 @@ export class PatientDashboardComponent implements OnInit {
     this.loadingVisit$ = this.store.pipe(select(getVisitLoadingState));
     this.activeVisit$ = this.store.pipe(select(getActiveVisit));
     this.provider$ = this.store.select(getProviderDetails);
+    this.currentLocation$ = this.store.select(getCurrentLocation);
+    this.visitEndingControlStatusesConceptUuid$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        `iCare.visits.settings.controlVisitsEndingStatuses.ConceptUuid`
+      );
+    this.observations$ = this.store.select(getAllObservations);
   }
 }

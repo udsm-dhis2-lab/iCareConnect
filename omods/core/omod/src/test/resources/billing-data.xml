@@ -137,6 +137,16 @@
     <patient patient_id="1000" creator="1" date_created="2016-08-19 15:58:32" voided="false" allergy_status="Unknown" />
     <patient patient_id="2000" creator="1" date_created="2016-09-07 11:44:23" voided="false" allergy_status="Unknown" />
 
+    <!-- Patient Identifier type -->
+    <patient_identifier_type patient_identifier_type_id="22" name="MRN"  creator="1" date_created="2016-09-07 11:44:23" required="false" retired="0" uuid="b1090031-0a93-4999-9185-3d28e4ac9b89"/>
+
+    <!-- Patient Identifier -->
+    <patient_identifier patient_identifier_id="122" patient_id="1000" identifier="110620-2/10891/21" identifier_type="22" preferred="true"
+                        location_id="1" creator="1" date_created="2016-12-28 11:54:56" voided="false" uuid="ae50cf5e-02bf-4380-9b64-f06b2f944458" />
+
+
+    <obs obs_id="2000" person_id="2000" concept_id="1000" obs_datetime="2016-09-07 11:44:23" creator="1" date_created="2016-09-07 11:44:23" voided="false" uuid="b21bhsld-9ab1-4b57-8a89-c0bf25806644" status="FINAL"/>
+
     <!-- Care Settings -->
     <care_setting care_setting_id="1" name="Outpatient" description="Out-patient care setting" care_setting_type="OUTPATIENT"
                   creator="1" date_created="2013-12-27 00:00:00" retired="false" uuid="6f0c9a92-6f24-11e3-af88-005056821db0" />
@@ -184,10 +194,23 @@
     <visit_attribute visit_attribute_id="104" visit_id="10" attribute_type_id="104" value_reference="123" uuid="298b75eb-er45-12e8-9c7c-42b0yt63cfep" creator="1"
                           voided="0" date_created="2020-12-27 00:00:00" />
 
+    <visit_attribute visit_attribute_id="105" visit_id="20" attribute_type_id="101" value_reference="e721ec30-5344-11e8-ie7c-40b6etw379ee" uuid="298b75eb-er45-12e8-9c7c-42b0yt63cfer" creator="1"
+                     voided="0" date_created="2020-12-27 00:00:00" />
+
+    <visit_attribute visit_attribute_id="106" visit_id="20" attribute_type_id="102" value_reference="e7jnec30-5344-11e8-ie7c-40b6etw3cfee" uuid="298b75eb-er45-12e8-9c7c-42b0yt63cfeO" creator="1"
+                     voided="0" date_created="2020-12-27 00:00:00" />
+
+
     <!-- Encounters -->
+    <encounter_type encounter_type_id="2" name="Admission"  creator="1"
+                    retired="false" date_created="2020-12-27 00:00:00" uuid="2msir5eb-5345-11e8-9c7c-40b034c3cfer"/>
+
     <encounter encounter_id="100" patient_id="1000" uuid="444395c-dd07-488d-8fd7-a748c9570000" visit_id="10" encounter_datetime="2020-10-14 00:00:00" date_created="2020-10-14 00:00:00" voided="false"/>
 
     <encounter encounter_id="200" patient_id="2000" uuid="444395c-dd07-488d-8fd7-a748c9570001" visit_id="20" encounter_datetime="2020-10-15 00:00:00" date_created="2020-10-15 00:00:00" voided="false"/>
+
+    <encounter encounter_id="300" patient_id="2000" encounter_type="2" uuid="444395c-dd07-488d-8fd7-a748c9570003" visit_id="20" encounter_datetime="2020-10-15 00:00:00" date_created="2020-10-15 00:00:00" voided="false"/>
+
 
     <encounter_type encounter_type_id="1" name="Registration"  creator="1"
                     retired="false" date_created="2020-12-27 00:00:00" uuid="2msir5eb-5345-11e8-9c7c-40b034c3cfee"/>
@@ -199,27 +222,34 @@
 <!--Order-->
     <order_type order_type_id="1" name="Misc Order"  creator="1" java_class_name="org.openmrs.Order"
                     retired="false" date_created="2020-12-27 00:00:00" uuid="2msir5eb-5345-11e8-9922-40b034c3cfee"/>
+    <order_type order_type_id="2" name="Bed Order"  creator="1" java_class_name="org.openmrs.Order"
+                retired="false" date_created="2020-12-27 00:00:00" uuid="2msir5eb-5345-11e8-9922-40b034c3cfef"/>
+
     <orders orderer="200" concept_id ="1003" creator="1" date_activated="2018-12-27 00:00:00" order_number="124" urgency="ROUTINE" care_setting="1" order_action="NEW" voided="false" order_type_id="1" date_created="2020-10-14 00:00:00" uuid="7634gd66-3333-4abd-8fd7-a748c9575" order_id="301" patient_id="1000" encounter_id="100"/>
 
     <orders orderer="200" concept_id ="1003" creator="1" date_activated="2018-12-27 00:00:00" order_number="125" urgency="ROUTINE" care_setting="1" order_action="NEW" voided="false" order_type_id="1" date_created="2020-10-15 00:00:00" uuid="7634gd66-3333-4abd-8fd7-a748c9575" order_id="301" patient_id="2000" encounter_id="100"/>
+
+    <orders orderer="200" concept_id ="1003" creator="1" date_activated="2018-12-27 00:00:00" order_number="126" urgency="ROUTINE" care_setting="1" order_action="NEW" voided="false" order_type_id="2" date_created="2020-10-15 00:00:00" uuid="7634gd66-3333-4abd-8fd7-a748c9576" order_id="302" patient_id="2000" encounter_id="300"/>
 
 
     <st_ledger_type ledger_type_id="321" uuid="8800zx3570-8z37-11ff-2234-01102007887" operation="+" name="stock in" date_created="2020-12-27 00:00:00" voided="false" creator="1"/>
 
     <item item_id="123" unit="Data" uuid="8o00d43570-8y37-11f3-1234-08002007777" concept_id="1003" date_created="2020-12-27 00:00:00" voided="false" creator="1" stockable="true"/>
     <!--<st_device_type device_type_id="22" uuid="2msir5eb-5345-11e8-9c7c-40b034c3cfee" name="lab_device_"/>-->
+    <item item_id="124" unit="Data" uuid="8o00d43570-8y37-11f3-1234-08002007779" concept_id="1003" date_created="2020-12-27 00:00:00" voided="false" creator="1" stockable="true"/>
 
     <!-- Invoice -->
     <bl_invoice invoice_id="11" visit_id="10" payment_mode_id="1003" uuid="298b75eb-er45-12e8-9c7cs" creator="1" voided="0" date_created="2020-12-27 00:00:00" />
     <!-- Invoice Item-->
     <bl_invoice_item order_id="301" invoice_id="11" item_id="123" quantity="1" price="100" />
+    <bl_invoice_item order_id="301" invoice_id="11" item_id="124" quantity="1" price="10" />
 
     <!--Payment-->
     <bl_payment payment_id="1" uuid="98b75eb-er45-12e8-9c7cs" invoice_id="11" reference_number="abc123" payment_type_id="500" received_by="abc" date_created="2020-12-27 00:00:00" voided="0" creator="1" />
-    <bl_payment_item order_id="301" item_id="123" amount="90" payment_id="1" />
+    <bl_payment_item order_id="301" item_id="123" amount="50" payment_id="1" />
 
     <!--Discount -->
     <bl_discount discount_id="1" uuid="8b75eb-er45-12e8" discount_criteria_id="500" patient_id="1000" creator="1" date_created="2020-12-27 00:00:00" voided="0" />
-    <bl_discount_invoice_item discount_id="1" invoice_id="11" item_id="123" amount="10" />
+    <bl_discount_invoice_item discount_id="1" invoice_id="11" item_id="123" amount="60" />
 
 </dataset>

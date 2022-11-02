@@ -6,7 +6,7 @@ import org.openmrs.module.icare.ICareConfig;
 import org.openmrs.module.icare.store.models.Stock;
 import org.openmrs.module.icare.store.models.Transaction;
 import org.openmrs.module.icare.store.services.StoreService;
-
+import java.util.Date;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -43,6 +43,34 @@ public class TransactionUtil {
 		storeService.saveTransaction(transaction);
 	}
 	
+	public static void deductExpiredStock(Stockable stockable) throws StockOutException {
+		
+		Transaction transaction = new Transaction();
+		transaction.setItem(stockable.getItem());
+		transaction.setLocation(stockable.getLocation());
+		transaction.setBatchNo(stockable.getBatchNo());
+		transaction.setExpireDate(stockable.getExpiryDate());
+		
+		StoreService storeService = Context.getService(StoreService.class);
+		Stock stock = storeService.getStockByItemBatchLocation(stockable.getItem(), stockable.getBatchNo(),
+		    stockable.getExpiryDate(), stockable.getLocation());
+		
+		System.out.println(stockable.getItem() + "ff");
+		
+		if (stock.getQuantity() - stockable.getQuantity() < 0) {
+			throw new StockOutException("Negative Stock is not allowed");
+		} else {
+			
+			transaction.setPreviousQuantity(stock.getQuantity());
+			Double newQuantity = stock.getQuantity() - stockable.getQuantity();
+			transaction.setCurrentQuantity(newQuantity);
+			stock.setQuantity(newQuantity);
+			storeService.saveStock(stock);
+			storeService.saveTransaction(transaction);
+		}
+		
+	}
+	
 	public static void deductStock(Stockable stockable) throws StockOutException {
 
         Transaction transaction = new Transaction();
@@ -65,7 +93,9 @@ public class TransactionUtil {
 
         System.out.println("testing");
         List<Transaction> transactionList = new ArrayList<>();
+
         List<Stock> stockList = storeService.getStockByItemLocation(stockable.getItem(), stockable.getLocation());
+
         List<Map<String, Object>> stockListMap = new ArrayList<>();
         double totalStock = 0.00;
 
@@ -87,6 +117,7 @@ public class TransactionUtil {
             }
         } else {
 
+
             double stockNeed = stockable.getQuantity();
 
             System.out.println("stockList size is : " + stockList.size());
@@ -94,63 +125,80 @@ public class TransactionUtil {
             for (int i = 0; i <= stockList.size() - 1; i++) {
 
                 System.out.println("iteration : " + i);
-                System.out.println("stcoke need is : " + stockNeed);
+                System.out.println("stock need is : " + stockNeed);
                 // for each stock check if stock need to be deducted
                 if (stockNeed > 0) {
 
                     // should deduct all stock
-                    if (stockList.get(i).getQuantity() - stockNeed < 0) {
+                    if (stockList.get(i).getQuantity() - stockNeed < 0 ) {
+
+                        if(stockList.get(i).getBatch().equals(stockable.getBatchNo())){
+                          // System.out.println("batch: "+stockList.get(i).getBatch());
+
 
 
                         System.out.println("stock item is not enough, deduct all");
 
+                        System.out.println("loop batch: " +stockList.get(i).getBatch());
+                        System.out.println("incoming batch: "+stockable.getBatchNo());
+
+                        Transaction newTransaction = new Transaction();
+
                         // deduct to 0
-                        transactionList.add(i, new Transaction());
-                        transactionList.get(i).setItem(stockable.getItem());
-                        transactionList.get(i).setLocation(stockable.getLocation());
-                        transactionList.get(i).setBatchNo(stockList.get(i).getBatch());
-                        transactionList.get(i).setExpireDate(stockable.getExpiryDate());
-                        transactionList.get(i).setCurrentQuantity(0.0);
-                        transactionList.get(i).setPreviousQuantity(stockList.get(i).getQuantity());
+                        transactionList.add(newTransaction);
+                        newTransaction.setItem(stockable.getItem());
+                        newTransaction.setLocation(stockable.getLocation());
+                        newTransaction.setBatchNo(stockList.get(i).getBatch());
+                        newTransaction.setExpireDate(stockable.getExpiryDate());
+                        newTransaction.setCurrentQuantity(0.0);
+                        newTransaction.setPreviousQuantity(stockList.get(i).getQuantity());
 
                         stockNeed = stockNeed -stockList.get(i).getQuantity();
 
                         stockList.get(i).setQuantity(0.0);
 
                         storeService.saveStock(stockList.get(i));
-                        storeService.saveTransaction(transactionList.get(i));
+                        storeService.saveTransaction(newTransaction);
 
-
+                        }
 
 
                     } else {
 
+
+                        if (stockList.get(i).getBatch().equals(stockable.getBatchNo())){
                         System.out.println("stock item is enough");
+
+                        System.out.println("loop batch: " +stockList.get(i).getBatch());
+                        System.out.println("incoming batch: "+stockable.getBatchNo());
                         // deduction operations and transactions
-                        transactionList.add(i, new Transaction());
-                        transactionList.get(i).setItem(stockable.getItem());
-                        transactionList.get(i).setLocation(stockable.getLocation());
-                        transactionList.get(i).setBatchNo(stockList.get(i).getBatch());
-                        transactionList.get(i).setExpireDate(stockable.getExpiryDate());
-                        transactionList.get(i).setCurrentQuantity(stockList.get(i).getQuantity() - stockNeed);
-                        transactionList.get(i).setPreviousQuantity(stockList.get(i).getQuantity());
+                        Transaction newTransaction = new Transaction();
+                        transactionList.add(newTransaction);
+                        newTransaction.setItem(stockable.getItem());
+                        newTransaction.setLocation(stockable.getLocation());
+                        newTransaction.setBatchNo(stockList.get(i).getBatch());
+                        newTransaction.setExpireDate(stockable.getExpiryDate());
+                        newTransaction.setCurrentQuantity(stockList.get(i).getQuantity() - stockNeed);
+                        newTransaction.setPreviousQuantity(stockList.get(i).getQuantity());
 
                         stockList.get(i).setQuantity(stockList.get(i).getQuantity() - stockNeed);
 
                         storeService.saveStock(stockList.get(i));
-                        storeService.saveTransaction(transactionList.get(i));
+                        storeService.saveTransaction(newTransaction);
 
 
                         stockNeed = stockNeed - stockList.get(i).getQuantity();
                     }
 
-
-                } else {
-
-                    transactionList.add(i, null);
-                    // do nothing on this batch stck has already been deducted
+                    }
 
                 }
+                //else {
+
+                  //  transactionList.add(i, null);
+                    // do nothing on this batch stck has already been deducted
+
+                //}
 
             }
 
@@ -187,10 +235,16 @@ public class TransactionUtil {
     }
 	
 	public static void operateOnStock(String operation, Stockable stockable) throws StockOutException {
+		Date todaysDate = new Date();
 		if (operation.equals("+")) {
 			TransactionUtil.addStock(stockable);
-		} else if (operation.equals("-")) {
+		} else if (operation.equals("-") && stockable.getExpiryDate().compareTo(todaysDate) > 0) {
+			//Deduction for non-expired drugs
 			TransactionUtil.deductStock(stockable);
+		} else if (operation.equals("-") && stockable.getExpiryDate().compareTo(todaysDate) < 0) {
+			// Deduction for expired drugs
+			TransactionUtil.deductExpiredStock(stockable);
+			
 		}
 	}
 }

@@ -23,6 +23,9 @@ class IssueItemId implements java.io.Serializable {
 	@JoinColumn(name = "item_id", nullable = false)
 	private Item item;
 	
+	@Column(name = "batch_no", length = 32)
+	private String batchNo;
+	
 	public Issue getIssue() {
 		return issue;
 	}
@@ -39,6 +42,14 @@ class IssueItemId implements java.io.Serializable {
 		this.item = item;
 	}
 	
+	public String getBatchNo() {
+		return this.batchNo;
+	}
+	
+	public void setBatchNo(String batchNo) {
+		this.batchNo = batchNo;
+	}
+	
 }
 
 @Entity
@@ -50,9 +61,6 @@ public class IssueItem implements java.io.Serializable, Stockable {
 	
 	@Column(name = "quantity")
 	private Double quantity;
-	
-	@Column(name = "batch_no", length = 32)
-	private String batchNo;
 	
 	@Temporal(TemporalType.DATE)
 	@Column(name = "expiry_date", length = 10)
@@ -80,11 +88,15 @@ public class IssueItem implements java.io.Serializable, Stockable {
 	}
 	
 	public String getBatchNo() {
-		return this.batchNo;
+		return this.id.getBatchNo();
 	}
 	
 	public void setBatchNo(String batchNo) {
-		this.batchNo = batchNo;
+		if (id == null) {
+			this.id = new IssueItemId();
+		}
+		
+		this.id.setBatchNo(batchNo);
 	}
 	
 	public Date getExpiryDate() {
@@ -121,6 +133,8 @@ public class IssueItem implements java.io.Serializable, Stockable {
 		Map<String, Object> issueItemObject = new HashMap<String, Object>();
 		
 		issueItemObject.put("quantity", this.getQuantity());
+		issueItemObject.put("batch", this.getBatchNo());
+		issueItemObject.put("expiryDate", this.getExpiryDate());
 		
 		Map<String, Object> itemObject = new HashMap<String, Object>();
 		itemObject.put("uuid", this.getId().getItem().getUuid());
