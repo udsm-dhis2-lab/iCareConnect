@@ -1,4 +1,7 @@
-<div class="container my-3" *ngIf="facilityDetails$ | async as facility">
+<div
+  class="container my-3"
+  *ngIf="{ facility: facilityDetails$ | async } as params"
+>
   <div id="results-to-print" style="color: gray">
     <mat-accordion>
       <mat-expansion-panel
@@ -27,19 +30,19 @@
         >
           <div class="row">
             <div class="col-2" style="display: inline-block; width: 16.67%">
-              <img src="assets/images/udsm-logo.webp" height="90" />
+              <img [src]="params?.facility?.logo" height="90" />
               <!-- <img src="assets/images/tanzania-logo.png" height="90" /> -->
             </div>
             <div class="col-8" style="display: inline-block; width: 66.67%">
               <h4 style="text-align: center">
                 <b>
-                  {{ facility?.display }}
+                  {{ params?.facility?.display }}
                   <br />
                   <!-- <span *ngIf="labConfigs?.facilityDetails">
                     {{ labConfigs?.facilityDetails?.name }}<br />
                   </span> -->
-                  <span *ngIf="facility.display">
-                    {{ facility?.description }}<br />
+                  <span *ngIf="params?.facility?.display">
+                    {{ params?.facility?.description }}<br />
                   </span>
                   <small>
                     <!-- <span
@@ -47,8 +50,10 @@
                         labConfigs?.facilityDetails &&
                         labConfigs?.facilityDetails?.addressBox
                       ">P.O BOX: {{ labConfigs?.facilityDetails?.addressBox }}</span> -->
-                    <span *ngIf="facility && facility.postalCode">
-                      P.O BOX: {{ facility.postalCode }}
+                    <span
+                      *ngIf="params?.facility && params?.facility?.postalCode"
+                    >
+                      P.O BOX: {{ params?.facility?.postalCode }}
                     </span>
                     <!-- <span
                       *ngIf="
@@ -60,8 +65,12 @@
                     </span>  --> </small
                   ><br />
                   <small>
-                    <span *ngIf="facility && facility?.stateProvince">
-                      {{ facility?.stateProvince }}
+                    <span
+                      *ngIf="
+                        params?.facility && params?.facility?.stateProvince
+                      "
+                    >
+                      {{ params?.facility?.stateProvince }}
                     </span>
                     <!-- <span
                       *ngIf="
