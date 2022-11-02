@@ -12,6 +12,7 @@ export class ClientsFromExternalSystemsComponent implements OnInit {
     {
       id: "pimacovid",
       name: "PIMA COVID-19",
+      testsSearchingKey: "pimaCovidTestOrderUuid",
       searchingCriteria: [
         {
           id: "zxdIGVIuhWU",
@@ -33,12 +34,14 @@ export class ClientsFromExternalSystemsComponent implements OnInit {
   isSearching: boolean = false;
   showClientsList: boolean = false;
   @Output() selectedClientRequest: EventEmitter<any> = new EventEmitter<any>();
+  @Output() system: EventEmitter<any> = new EventEmitter<any>();
   constructor(
     private otherClientLevelSystemsService: OtherClientLevelSystemsService
   ) {}
 
   ngOnInit(): void {
     this.selectedSystem = this.systems[0];
+    this.system.emit(this.selectedSystem);
   }
 
   getSelectedSystem(system: any): void {

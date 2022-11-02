@@ -31,6 +31,7 @@ import {
 import { generateSelectionOptions } from "src/app/shared/helpers/patient.helper";
 import { ExportService } from "src/app/shared/services/export.service";
 import { LabReportsService } from "src/app/modules/laboratory/resources/services/reports.service";
+import { map } from "rxjs/operators";
 // import { Agent } from 'http';
 
 @Component({
@@ -93,7 +94,22 @@ export class LabReportsComponent implements OnInit {
 
     this.reports = [...this.reports, ...this.configuredReports];
     this.currentReport = this.reports[0];
-    this.facilityDetails$ = this.store.select(getParentLocation);
+    this.facilityDetails$ = this.store.select(getParentLocation).pipe(
+      map((response) => {
+        // TODO: Softcode attribute type uuid
+        return {
+          ...response,
+          logo:
+            response?.attributes?.length > 0
+              ? (response?.attributes?.filter(
+                  (attribute) =>
+                    attribute?.attributeType?.uuid ===
+                    "e935ea8e-5959-458b-a10b-c06446849dc3"
+                ) || [])[0]?.value
+              : null,
+        };
+      })
+    );
   }
 
   onSetCurrentReport(e, report) {
@@ -283,12 +299,10 @@ export class LabReportsComponent implements OnInit {
       this.reportData = {};
       // laboratory.sqlGet.laboratory_samples_by_specimen_sources
       this.reportService
-        .runDataSet(this.currentReport?.key, this.selectionDates).subscribe((data: any) => {
-          if(data?.error){
-            this.errors = [
-              ...this.errors,
-              data?.error
-            ]
+        .runDataSet(this.currentReport?.key, this.selectionDates)
+        .subscribe((data: any) => {
+          if (data?.error) {
+            this.errors = [...this.errors, data?.error];
           }
           let reportGroups = {
             collected: 0,

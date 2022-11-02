@@ -40,7 +40,21 @@ export class MultipleItemsSelectionComponent implements OnInit {
     ) {
       this.items$ =
         this.items?.length > 0
-          ? of(this.items)
+          ? of(
+              this.items?.map((item) => {
+                return {
+                  ...item,
+                  display:
+                    item?.display?.indexOf(":") > -1
+                      ? item?.display?.split(":")[1]
+                      : item?.display,
+                  name:
+                    item?.display?.indexOf(":") > -1
+                      ? item?.display?.split(":")[1]
+                      : item?.display,
+                };
+              })
+            )
           : this.conceptService.searchConcept({
               q: this.standardSearchTerm,
               conceptClass: this.conceptClass,

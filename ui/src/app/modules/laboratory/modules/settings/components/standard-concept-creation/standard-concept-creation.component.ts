@@ -245,7 +245,9 @@ export class StandardConceptCreationComponent implements OnInit {
 
   onSave(event: Event, selectedTestMethodDetails?: any): void {
     event.stopPropagation();
-    const conceptName = this.formData["name"]?.value;
+    const conceptName =
+      (this.standardSearchTerm ? this.standardSearchTerm + ":" : "") +
+      this.formData["name"]?.value;
     let searchIndexedTerms = [
       {
         name: this.standardSearchTerm,
@@ -272,7 +274,7 @@ export class StandardConceptCreationComponent implements OnInit {
       ...names,
       {
         name:
-          (this.standardSearchTerm === "TEST_ORDERS" ? "TO: " : "") +
+          (this.standardSearchTerm ? this.standardSearchTerm + ":" : "") +
           this.formData["name"]?.value,
         locale: "en",
         localePreferred: true,
@@ -284,7 +286,7 @@ export class StandardConceptCreationComponent implements OnInit {
       ...names,
       {
         name:
-          (this.standardSearchTerm === "TEST_ORDERS" ? "TO: " : "") +
+          (this.standardSearchTerm ? this.standardSearchTerm + ":" : "") +
           this.formData["shortName"]?.value,
         locale: "en",
         localePreferred: false,

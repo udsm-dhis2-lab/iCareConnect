@@ -1,33 +1,33 @@
-import { Component, OnInit } from '@angular/core';
-import { select, Store } from '@ngrx/store';
-import { Observable } from 'rxjs';
-import { ObsCreate, ProviderGetFull } from 'src/app/shared/resources/openmrs';
-import { Patient } from 'src/app/shared/resources/patient/models/patient.model';
-import { Visit } from 'src/app/shared/resources/visits/models/visit.model';
-import { AppState } from 'src/app/store/reducers';
-import { getCurrentLocation } from 'src/app/store/selectors';
-import { getCurrentPatient } from 'src/app/store/selectors/current-patient.selectors';
-import { getProviderDetails } from 'src/app/store/selectors/current-user.selectors';
-import { getActiveVisit } from 'src/app/store/selectors/visit.selectors';
-import { OpenmrsHttpClientService } from 'src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service';
-import { OpenMRSForm } from 'src/app/shared/modules/form/models/custom-openmrs-form.model';
-import { go, loadCustomOpenMRSForms } from 'src/app/store/actions';
-import { getCustomOpenMRSFormsByIds } from 'src/app/store/selectors/form.selectors';
-import { take } from 'rxjs/operators';
+import { Component, OnInit } from "@angular/core";
+import { select, Store } from "@ngrx/store";
+import { Observable } from "rxjs";
+import { ObsCreate, ProviderGetFull } from "src/app/shared/resources/openmrs";
+import { Patient } from "src/app/shared/resources/patient/models/patient.model";
+import { Visit } from "src/app/shared/resources/visits/models/visit.model";
+import { AppState } from "src/app/store/reducers";
+import { getCurrentLocation } from "src/app/store/selectors";
+import { getCurrentPatient } from "src/app/store/selectors/current-patient.selectors";
+import { getProviderDetails } from "src/app/store/selectors/current-user.selectors";
+import { getActiveVisit } from "src/app/store/selectors/visit.selectors";
+import { OpenmrsHttpClientService } from "src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service";
+import { OpenMRSForm } from "src/app/shared/modules/form/models/custom-openmrs-form.model";
+import { go, loadCustomOpenMRSForms } from "src/app/store/actions";
+import { getCustomOpenMRSFormsByIds } from "src/app/store/selectors/form.selectors";
+import { take } from "rxjs/operators";
 import {
   getGroupedObservationByConcept,
   getSavingObservationStatus,
   getVitalSignObservations,
-} from 'src/app/store/selectors/observation.selectors';
-import { saveObservations } from 'src/app/store/actions/observation.actions';
-import { ICARE_CONFIG } from 'src/app/shared/resources/config';
+} from "src/app/store/selectors/observation.selectors";
+import { saveObservations } from "src/app/store/actions/observation.actions";
+import { ICARE_CONFIG } from "src/app/shared/resources/config";
 
-import { map } from 'lodash';
+import { map } from "lodash";
 
 @Component({
-  selector: 'app-theatre-orders',
-  templateUrl: './theatre-orders.component.html',
-  styleUrls: ['./theatre-orders.component.scss'],
+  selector: "app-theatre-orders",
+  templateUrl: "./theatre-orders.component.html",
+  styleUrls: ["./theatre-orders.component.scss"],
 })
 export class TheatreOrdersComponent implements OnInit {
   provider$: Observable<ProviderGetFull>;
@@ -47,26 +47,13 @@ export class TheatreOrdersComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.store.dispatch(
-      loadCustomOpenMRSForms({
-        formUuids: map(ICARE_CONFIG.nursingForms?.forms, (form) => {
-          return form?.uuid;
-        }),
-      })
-    );
-
-    this.forms$ = this.store.select(getCustomOpenMRSFormsByIds, {
-      formUUids: map(ICARE_CONFIG.nursingForms?.forms, (form) => {
-        return form?.uuid;
-      }),
-    });
     this.provider$ = this.store.select(getProviderDetails);
     this.visit$ = this.store.select(getActiveVisit);
     this.currentLocation$ = this.store.pipe(select(getCurrentLocation));
     this.patient$ = this.store.pipe(select(getCurrentPatient));
     this.patient$.pipe(take(1)).subscribe((currentPatient: Patient) => {
       if (!currentPatient) {
-        this.store.dispatch(go({ path: ['/theatre'] }));
+        this.store.dispatch(go({ path: ["/theatre"] }));
       }
     });
     this.observations$ = this.store.select(getGroupedObservationByConcept);

@@ -21,7 +21,7 @@
             [filterCategories]="filters"
             (onFilterChanged)="filterPatientList($event)"
           ></app-patient-list-filters>
-  
+
           <!-- <button
             mat-button
             class="ml-2 float-left"
@@ -49,6 +49,7 @@
           </button>
         </div>
       </div>
+      <!-- {{ params?.visits | json }} -->
       <div
         class="text-center w-100 mt-5"
         *ngIf="
@@ -60,7 +61,7 @@
           Patient with keyword "{{ searchTerm }}" could not be found
         </h3>
       </div>
-  
+
       <mat-progress-bar
         *ngIf="loadingPatients"
         mode="indeterminate"
@@ -79,7 +80,8 @@
           <div
             *ngIf="
               (paymentTypeSelected &&
-                visit?.visit?.paymentType === paymentTypeSelected) || !paymentTypeSelected
+                visit?.visit?.paymentType === paymentTypeSelected) ||
+              !paymentTypeSelected
             "
             class="bg-light d-flex justify-content-center patient-item m-2"
             (click)="onSelectPatient($event, visit)"
@@ -117,16 +119,17 @@
           </div>
         </ng-container>
       </ng-container>
-  
+
       <!-- Tabular list -->
       <div
         class="tabular-patient-list"
         *ngIf="
           isTabularList &&
           params?.visits &&
-          params?.visits.length > 0 && 
+          params?.visits.length > 0 &&
           ((paymentTypeSelected &&
-                visit?.visit?.paymentType === paymentTypeSelected) || !paymentTypeSelected)
+            visit?.visit?.paymentType === paymentTypeSelected) ||
+            !paymentTypeSelected)
         "
       >
         <app-patients-tabular-list
@@ -143,13 +146,11 @@
       </div>
       <!-- End of Tabular list -->
 
-       <div
+      <div
         class="text-center w-100 mt-5"
         *ngIf="!params?.visits || !params?.visits?.length > 0"
       >
-        <h3 class="text-muted">
-          No patient found
-        </h3>
+        <h3 class="text-muted">No patient found</h3>
       </div>
     </div>
   </div>
@@ -181,4 +182,4 @@
       </button>
     </div>
   </div>
-  </div>
+</div>

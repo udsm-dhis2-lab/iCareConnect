@@ -45,6 +45,7 @@ export class DrugOrderComponent implements OnInit, AfterViewInit {
   @Input() generalPrescriptionDurationConcept: string;
   @Input() generalPrescriptionDoseConcept: string;
   @Input() generalPrescriptionFrequencyConcept: string;
+  @Input() specicDrugConceptUuid: string;
 
   drugsConceptsField: any;
   @Output() drugOrdered = new EventEmitter<any>();
@@ -76,8 +77,10 @@ export class DrugOrderComponent implements OnInit, AfterViewInit {
     this.drugOrder = {
       ...this.drugOrder,
       formulatedDescription: (
-        Object.keys(this.drugOrder?.obs).map(
-          (key) => this.drugOrder?.obs[key]?.value
+        Object.keys(this.drugOrder?.obs).map((key) =>
+          this.drugOrder?.obs[key]?.value
+            ? this.drugOrder?.obs[key]?.value
+            : this.drugOrder?.obs[key]?.value?.display
         ) || []
       )?.join("; "),
     };
@@ -102,6 +105,7 @@ export class DrugOrderComponent implements OnInit, AfterViewInit {
           generalPrescriptionDoseConcept: this.generalPrescriptionDoseConcept,
           generalPrescriptionFrequencyConcept:
             this.generalPrescriptionFrequencyConcept,
+          specificDrugConceptUuid: this.specicDrugConceptUuid,
           fromDispensing: this.fromDispensing,
         }
       )
