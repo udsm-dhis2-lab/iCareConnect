@@ -1,5 +1,21 @@
 <div
   *ngIf="{
-    observationsGroupedByIPDRounds: observationsGroupedByIPDRounds$ | async
+    observationsGroupedByIPDRounds: observationsGroupedByIPDRounds$ | async,
+    form: form$ | async
   } as params"
-></div>
+>
+  <div *ngIf="params?.form">
+    <h3> Latest data fed for {{ params?.form?.name }}</h3>
+    <div class="row">
+      <div class="col-12">
+        <div class="obs" *ngFor="let formField of params?.form?.formFields">
+            {{ formField?.field?.concept?.display }} - {{ 
+              params?.observationsGroupedByIPDRounds[formField?.field?.concept?.uuid]?.latest?.valueObject?.toString().length > 0 ? 
+              params?.observationsGroupedByIPDRounds[formField?.field?.concept?.uuid]?.latest?.valueObject?.display : 
+              params?.observationsGroupedByIPDRounds[formField?.field?.concept?.uuid]?.latest?.value
+            }}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
