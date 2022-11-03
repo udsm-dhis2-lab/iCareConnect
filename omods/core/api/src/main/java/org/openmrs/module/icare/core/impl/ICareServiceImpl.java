@@ -419,15 +419,15 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 			for (Visit visit : visits) {
 				if (!patientIsAdmitted(visit) && newDate.after(visit.getStartDatetime())) {
 					VisitWrapper visitWrapper = new VisitWrapper(visit);
-					try {
-						if (!(visitWrapper.isInsurance() && visitWrapper.getInsuranceName().toLowerCase().equals("nhif"))) {
-							Context.getVisitService().endVisit(visit, new Date());
-							
-						}
-					}
-					catch (ConfigurationException e) {
-						e.printStackTrace();
-					}
+					//try {
+					//if (!(visitWrapper.isInsurance() && visitWrapper.getInsuranceName().toLowerCase().equals("nhif"))) {
+					Context.getVisitService().endVisit(visit, new Date());
+					
+					//}
+					//}
+					//catch (ConfigurationException e) {
+					//	e.printStackTrace();
+					//}
 				}
 			}
 		}
