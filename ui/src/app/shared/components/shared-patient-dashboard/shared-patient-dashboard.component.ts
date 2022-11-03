@@ -151,6 +151,7 @@ export class SharedPatientDashboardComponent implements OnInit {
   codedVisitCloseStatus: any;
   errors: any[] = [];
   patientInvoice$: Observable<any>;
+  IPDRoundConceptUuid$: Observable<string>;
 
   constructor(
     private store: Store<AppState>,
@@ -166,6 +167,10 @@ export class SharedPatientDashboardComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.IPDRoundConceptUuid$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        "iCare.ipd.settings.IPDRoundConceptUuid"
+      );
     if (
       this.visitEndingControlStatusesConceptUuid &&
       this.visitEndingControlStatusesConceptUuid !== "none"

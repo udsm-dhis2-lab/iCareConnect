@@ -2,6 +2,8 @@ export interface ObservationObject {
   id: string;
   uuid: string;
   concept: any;
+  conceptUuid?: string;
+  obsDatetime?: string;
   personUuid: string;
   observationType?: any;
   observationDatetime: string;
@@ -12,4 +14,6 @@ export interface ObservationObject {
   value: string | number;
   valueObject?: any;
   status: string;
+  obsDate?: any;
+  obsTime?: any;
 }

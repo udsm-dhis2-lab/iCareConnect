@@ -28,7 +28,8 @@
     observationChartEncounterType: observationChartEncounterType$ | async,
     visitEndingControlStatusesConcept:
       visitEndingControlStatusesConcept$ | async,
-    patientInvoice: patientInvoice$ | async
+    patientInvoice: patientInvoice$ | async,
+    IPDRoundConceptUuid: IPDRoundConceptUuid$ | async
   } as dashboardParams"
 >
   <div
@@ -384,6 +385,15 @@
                   mode="indeterminate"
                 >
                 </mat-progress-bar>
+                <app-shared-ipd-round-container
+                  *ngIf="
+                    dashboardParams?.IPDRoundConceptUuid &&
+                    activeVisit?.isAdmitted
+                  "
+                  [activeVisit]="activeVisit"
+                  [conceptUuid]="dashboardParams?.IPDRoundConceptUuid"
+                  [observations]="dashboardParams?.observationsGroupedByConcept"
+                ></app-shared-ipd-round-container>
                 <app-clinical-notes
                   *ngIf="
                     !isInpatient &&

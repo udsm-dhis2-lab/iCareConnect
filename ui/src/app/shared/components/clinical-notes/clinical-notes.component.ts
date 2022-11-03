@@ -46,6 +46,7 @@ export class ClinicalNotesComponent implements OnInit {
   currentCustomFormName: string;
   formData: any;
   searchingText: string;
+  atLeastOneFieldHasData: boolean = false;
   @Output() saveObservations = new EventEmitter();
   @Input() forms: any[];
   @Output() currentSelectedFormForEmitting = new EventEmitter<any>();
@@ -85,62 +86,17 @@ export class ClinicalNotesComponent implements OnInit {
       ...(this.formData[this.currentCustomForm.id] || {}),
       ...(isRawValue ? formValue : formValue.getValues()),
     };
+    this.atLeastOneFieldHasData =
+      (
+        Object.keys(this.formData[this.currentCustomForm.id])
+          ?.map((key) => this.formData[this.currentCustomForm.id][key]?.value)
+          ?.filter((value) => value) || []
+      )?.length > 0;
   }
 
   onConfirm(e: Event, visit: any): void {
     e.stopPropagation();
     this.updateConsultationOrder.emit();
-    // if (!visit.consultationStarted) {
-    //   const orders = [
-    //     {
-    //       uuid: visit.consultationStatusOrder?.uuid,
-    //       accessionNumber: visit.consultationStatusOrder?.orderNumber,
-    //       fulfillerStatus: "RECEIVED",
-    //       encounter: visit.consultationStatusOrder?.encounter?.uuid,
-    //     },
-    //   ];
-    //   this.ordersUpdates$ = this.ordersService.updateOrdersViaEncounter(orders);
-
-      // const consultationEncounter = {
-      //   encounterDatetime: new Date(),
-      //   patient: this.patient.personUuid,
-      //   encounterType: this.consultationEncounterType,
-      //   location: this.location.uuid,
-      //   encounterProviders: [
-      //     {
-      //       provider: this.provider.uuid,
-      //       encounterRole: ICARE_CONFIG?.encounterRole?.uuid,
-      //     },
-      //   ],
-      //   visit: visit.uuid,
-      //   orders: [
-      //     {
-      //       orderType: this.consultationOrderType,
-      //       action: "NEW",
-      //       urgency: "ROUTINE",
-      //       careSetting: !visit?.isAdmitted
-      //         ? "OUTPATIENT"
-      //         : "INPATIENT",
-      //       patient: this.patient.personUuid,
-      //       concept: visit.consultationStatusOrder.concept.uuid,
-      //       orderer: this.provider?.uuid,
-      //       type: "order",
-      //       fulfillerStatus: "RECEIVED",
-      //     },
-      //   ],
-      // };
-
-      // this.ordersService
-      //   .createOrdersViaCreatingEncounter(consultationEncounter)
-      //   .subscribe({
-      //     next: (encounter) => {
-      //       if(!encounter?.error){
-      //         return encounter;
-      //       };
-      //       return encounter?.error;
-      //     }
-      //   });
-      // }
     this.saveObservations.emit(
       getObservationsFromForm(
         this.formData[this.currentCustomForm?.id],
@@ -153,5 +109,13 @@ export class ClinicalNotesComponent implements OnInit {
             ]
       )
     );
+  }
+
+  onClear(event: Event, form: any): void {
+    event.stopPropagation();
+    this.currentCustomForm = null;
+    setTimeout(() => {
+      this.currentCustomForm = form;
+    }, 20);
   }
 }
