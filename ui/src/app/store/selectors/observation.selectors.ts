@@ -5,7 +5,7 @@ import { observationAdapter, ObservationState } from "../states";
 import { sortBy, reverse, head } from "lodash";
 import { getFormEntitiesByNames, getFormsEntities } from "./form.selectors";
 import { ICARE_CONFIG } from "src/app/shared/resources/config";
-import { flatten, orderBy, goupBy } from "lodash";
+import { flatten, orderBy, groupBy } from "lodash";
 
 const getObservationState = createSelector(
   getRootState,
@@ -67,7 +67,7 @@ export const getGroupedObservationByDateAndTimeOfIPDRounds = (
 
       groupedObs = [
         ...groupedObs,
-        goupBy(reverse(sortBy(obsGroup, "observationDatetime")), "conceptUuid"),
+        groupBy(reverse(sortBy(obsGroup, "observationDatetime")), "conceptUuid"),
       ];
     }
 
