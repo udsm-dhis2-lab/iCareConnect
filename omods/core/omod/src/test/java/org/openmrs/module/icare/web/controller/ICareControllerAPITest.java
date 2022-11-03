@@ -196,6 +196,21 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		Map<String, Object> map = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
 		
 	}
+
+	@Test
+	public void gettingDrugItemPrice() throws Exception{
+
+		MockHttpServletRequest newGetRequest = newGetRequest("icare/itemprice",new Parameter("visitUuid","298b75eb-er45-12e8-9c7c-42b0yt63cfepj"),new Parameter("drugUuid","c365e560-c3ec-11e3-9c1a-0800200c9a26"));
+		MockHttpServletResponse handle = handle(newGetRequest);
+		Map<String, Object> results = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
+		Map<String, Object> maps = (Map<String, Object>) results.get("results");
+
+		System.out.println(maps.get("price"));
+
+		assertThat("Should return a 3 item Prices", maps.get("price").equals(3000.0));
+
+
+	}
 	
 	@Test
 	@Ignore
