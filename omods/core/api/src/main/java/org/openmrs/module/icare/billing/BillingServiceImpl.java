@@ -666,14 +666,15 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 	
 	public Order createOrderForOngoingIPDPatients() throws Exception {
 		
-		Order order = new Order();
 		Order newOrder = new Order();
 		OrderService orderService = Context.getService(OrderService.class);
 		
 		List<Visit> visits = dao.getOpenAdmittedVisit();
+		System.out.println(visits.size());
 		
 		for (Visit visit : visits) {
-			
+			Order order = new Order();
+			System.out.println(visit.getId());
 			AdministrationService administrationService = Context.getService(AdministrationService.class);
 			
 			String bedOrderTypeUUID = administrationService.getGlobalProperty(ICareConfig.BED_ORDER_TYPE);

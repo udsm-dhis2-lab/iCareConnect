@@ -412,7 +412,7 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		String hoursVisitEnd = adminService.getGlobalProperty(ICareConfig.VISIT_LENGTH_IN_HOURS);
 		if (hoursVisitEnd == null || hoursVisitEnd.trim().equals("")) {
 			//newDate = new Date(System.currentTimeMillis() - TimeUnit.HOURS.toMillis(24));
-
+			
 		} else {
 			Date newDate = new Date(System.currentTimeMillis() - TimeUnit.HOURS.toMillis(Integer.valueOf(hoursVisitEnd)));
 			List<Visit> visits = dao.getOpenVisit();
