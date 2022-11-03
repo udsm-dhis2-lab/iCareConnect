@@ -126,13 +126,30 @@ public class ICareController {
 	
 	@RequestMapping(value = "itemprice", method = RequestMethod.GET)
     @ResponseBody
-    public Map<String, Object> onGet(@RequestParam(defaultValue = "100") Integer limit, @RequestParam(defaultValue = "0") Integer startIndex, @RequestParam(required = false) String paymentType) {
-        List<Map<String, Object>> items = new ArrayList<Map<String, Object>>();
-        for (ItemPrice item : iCareService.getItemPrices(paymentType, limit, startIndex)) {
-            items.add(item.toMap());
-        }
-        Map<String, Object> results = new HashMap<>();
-        results.put("results", items);
+    public Map<String, Object> onGet(@RequestParam(defaultValue = "100") Integer limit, @RequestParam(defaultValue = "0") Integer startIndex, @RequestParam(required = false) String paymentType, @RequestParam(required = false) String visitUuid, @RequestParam(required = false) String drugUuid ) throws ConfigurationException {
+		Map<String, Object> results = new HashMap<>();
+		if (visitUuid == null && drugUuid ==null) {
+			List<Map<String, Object>> items = new ArrayList<Map<String, Object>>();
+
+
+			for (ItemPrice item : iCareService.getItemPrices(paymentType, limit, startIndex)) {
+				items.add(item.toMap());
+			}
+			results.put("results", items);
+			System.out.println("aad");
+		}
+
+		if (visitUuid != null && drugUuid !=null){
+
+			Visit visit = Context.getService(VisitService.class).getVisitByUuid(visitUuid);
+			Drug drug = Context.getService(ConceptService.class).getDrugByUuid(drugUuid);
+
+			ItemPrice item = iCareService.getItemPrice(visit,drug);
+
+			results.put("results",item.toMap());
+
+		}
+
         return results;
     }
 	
