@@ -177,7 +177,7 @@ export class PatientGenericDrugOrderListComponent implements OnInit {
 
   onVerify(order: any) {
     const dialog = this.dialog.open(DispensingFormComponent, {
-      width: "80%",
+      width: "100%",
       disableClose: true,
       data: {
         drugOrder: order,
