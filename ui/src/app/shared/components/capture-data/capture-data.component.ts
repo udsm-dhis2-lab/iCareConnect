@@ -54,7 +54,7 @@ export class CaptureDataComponent implements OnInit {
     this.encounterData = {
       visit: this.visit?.uuid,
       patient: this.patient?.id,
-      encounterType: ICARE_CONFIG.vitals.encounterTypeUuid,
+      encounterType: ICARE_CONFIG?.consultation?.encounterTypeUuid,
       location: this.location?.uuid,
       obs: [],
       orders: [],
@@ -101,6 +101,5 @@ export class CaptureDataComponent implements OnInit {
     this.encounterData.obs =
       obs.filter((observation) => observation?.value != "") || [];
     this.saveObservations.emit(this.encounterData);
-    
   }
 }
