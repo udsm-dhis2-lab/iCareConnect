@@ -41,13 +41,20 @@ export class ObservationService {
     );
   }
 
-  saveObservationsViaEncounter(details): Observable<any> {
-    return this.httpClient.post("encounter/" + details["encounterUuid"], {
-      obs: details["obs"],
-    }).pipe(
-      map((response) => response),
-      catchError((error) => error)    
-      );
+  saveObservationsViaEncounter(data): Observable<any> {
+    return data?.encounterUuid
+      ? this.httpClient
+          .post("encounter/" + data?.encounterUuid, {
+            obs: data["obs"],
+          })
+          .pipe(
+            map((response) => response),
+            catchError((error) => error)
+          )
+      : this.httpClient.post(`encounter`, data).pipe(
+          map((response) => response),
+          catchError((error) => error)
+        );
   }
 
   saveEncounterWithObsDetails(data): Observable<any> {

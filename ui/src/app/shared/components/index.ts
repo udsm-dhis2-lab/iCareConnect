@@ -98,6 +98,7 @@ import { PricingItemComponent } from "./pricing-item/pricing-item.component";
 import { SharedLocationAttributesManagerComponent } from "./shared-location-attributes-manager/shared-location-attributes-manager.component";
 import { SharedParameterResultsComponent } from "./shared-parameter-results/shared-parameter-results.component";
 import { PatientAddressComponent } from "./patient-address/patient-address.component";
+import { SharedIPDRoundContainerComponent } from "./shared-ipd-round-container/shared-ipd-round-container.component";
 
 export const components: any[] = [
   PatientAddressComponent,
@@ -201,6 +202,7 @@ export const components: any[] = [
   PricingItemComponent,
   SharedLocationAttributesManagerComponent,
   SharedParameterResultsComponent,
+  SharedIPDRoundContainerComponent,
 ];
 
 export const sharedEntryComponents: any[] = [
