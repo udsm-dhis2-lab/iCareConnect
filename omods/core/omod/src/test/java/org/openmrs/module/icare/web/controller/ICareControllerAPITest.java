@@ -82,7 +82,7 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		handle = handle(newGetRequest);
 		Map<String, Object> results = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
 		List<Map<String, Object>> maps = (List) results.get("results");
-		assertThat("Should return a 8 items", maps.size(), is(8));
+		assertThat("Should return a 9 items", maps.size(), is(9));
 		
 		newGetRequest = newGetRequest("icare/item", new Parameter("q", "opd"));
 		handle = handle(newGetRequest);
@@ -119,7 +119,7 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		String contentString = handle.getContentAsString();
 		Map<String, Object> results = (new ObjectMapper()).readValue(contentString, Map.class);
 		List<Map<String, Object>> maps = (List) results.get("results");
-		assertThat("Should return a 8 items", maps.size(), is(8));
+		assertThat("Should return a 8 items", maps.size(), is(9));
 		boolean found = false;
 		for (Map<String, Object> itemMap : maps) {
 			if (itemMap.get("unit").equals("DrugUnits")) {
@@ -171,7 +171,7 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		handle = handle(newGetRequest);
 		Map<String, Object> results = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
 		List<Map<String, Object>> maps = (List) results.get("results");
-		assertThat("Should return a 3 item Prices", maps.size(), is(3));
+		assertThat("Should return a 3 item Prices", maps.size(), is(4));
 	}
 	
 	@Test
@@ -499,7 +499,7 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		MockHttpServletResponse handle = handle(newGetRequest);
 		Map<String, Object> results = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
 		List<Map<String, Object>> maps = (List) results.get("results");
-		assertThat("Should return 1 item", maps.size(), is(1));
+		assertThat("Should return 1 item", maps.size(), is(2));
 		
 	}
 	
@@ -522,7 +522,7 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		handle = handle(newGetRequest);
 		results = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
 		maps = (List) results.get("results");
-		assertThat("Should return 1 item", maps.size(), is(12));
+		assertThat("Should return 1 item", maps.size(), is(13));
 	}
 	
 	@Test
