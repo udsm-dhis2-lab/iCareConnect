@@ -102,4 +102,12 @@ export class CaptureDataComponent implements OnInit {
       obs.filter((observation) => observation?.value != "") || [];
     this.saveObservations.emit(this.encounterData);
   }
+
+  onClear(event: Event, form: any): void {
+    event.stopPropagation();
+    this.currentCustomForm = null;
+    setTimeout(() => {
+      this.currentCustomForm = form;
+    }, 20);
+  }
 }
