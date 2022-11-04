@@ -342,7 +342,6 @@ export class ResultsFeedingModalComponent implements OnInit {
 
   onFormUpdate(formValues: FormValue): void {
     this.amendmentRemarks = formValues.getValues()?.amendmentRemarks?.value;
-    console.log("==> Amendment Results: ", this.amendmentRemarks);
   }
 
   onSave(e, item, testOrders, currentSample, allocation) {
@@ -470,10 +469,15 @@ export class ResultsFeedingModalComponent implements OnInit {
       };
 
       const resultsComments = {
-        status: this.values[item?.uuid + "-comment"]
+        status: this.amendmentRemarks
+          ? "AMENDED"
+          : this.values[item?.uuid + "-comment"]
           ? "ANSWER DESCRIPTION"
           : "COMMENT",
-        remarks: this.values[item?.uuid + "-comment"]
+        category: this.amendmentRemarks ? "AMENDED" : "COMMENT",
+        remarks: this.amendmentRemarks
+          ? this.amendmentRemarks
+          : this.values[item?.uuid + "-comment"]
           ? this.values[item?.uuid + "-comment"]
           : "NO DESCRPTION FOR PARAMETER",
         user: {
@@ -725,7 +729,6 @@ export class ResultsFeedingModalComponent implements OnInit {
 
   amendResults(e, itemUuid) {
     e?.stopPropagation();
-    console.log("==> Clicked Uuid: ", itemUuid?.allocationUuid);
     this.amendUuid = itemUuid;
   }
 
