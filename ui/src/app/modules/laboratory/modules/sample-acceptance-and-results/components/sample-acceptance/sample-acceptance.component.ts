@@ -10,6 +10,7 @@ import {
   loadLabSamplesByCollectionDates,
   acceptSample,
   setSampleStatuses,
+  clearLoadedLabSamples,
 } from "src/app/store/actions";
 import { AppState } from "src/app/store/reducers";
 import {
@@ -176,6 +177,11 @@ export class SampleAcceptanceComponent implements OnInit {
     this.settingLabSampleStatus$ = this.store.select(
       getSettingLabSampleStatusState
     );
+    setTimeout(() => {
+      this.store.dispatch(clearLoadedLabSamples());
+      this.getSamplesData();
+      this.saving = false;
+    }, 1000);
   }
 
   reject(e, sample, providerDetails) {
@@ -205,7 +211,9 @@ export class SampleAcceptanceComponent implements OnInit {
               user: {
                 uuid: this.userUuid,
               },
-              remarks: response?.rejectionRemarks,
+              remarks: response?.rejectionRemarks
+                ? response?.rejectionRemarks
+                : "None",
               category: "REJECTED",
               status: reason?.uuid,
             };
@@ -226,9 +234,10 @@ export class SampleAcceptanceComponent implements OnInit {
           );
           // TODO: Remove this bad coding after improve of APIs
           setTimeout(() => {
+            this.store.dispatch(clearLoadedLabSamples());
             this.getSamplesData();
             this.saving = false;
-          }, 200);
+          }, 1000);
         }
       });
   }
