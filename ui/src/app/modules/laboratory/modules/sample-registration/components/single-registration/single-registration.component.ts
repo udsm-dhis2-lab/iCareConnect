@@ -1001,6 +1001,22 @@ export class SingleRegistrationComponent implements OnInit {
                                                                       ...sample,
                                                                     },
                                                                   ];
+                                                                // TODO: Find a better way to control three labels to be printed
+
+                                                                this.sampleLabelsUsedDetails =
+                                                                  [
+                                                                    ...this
+                                                                      .sampleLabelsUsedDetails,
+                                                                    ...this
+                                                                      .sampleLabelsUsedDetails,
+                                                                  ];
+                                                                this.sampleLabelsUsedDetails =
+                                                                  [
+                                                                    ...this
+                                                                      .sampleLabelsUsedDetails,
+                                                                    ...this
+                                                                      .sampleLabelsUsedDetails,
+                                                                  ];
 
                                                                 // Create sample allocations
 
