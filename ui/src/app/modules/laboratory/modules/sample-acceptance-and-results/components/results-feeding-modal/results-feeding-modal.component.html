@@ -2100,7 +2100,7 @@
                                     ]?.value
                                   "
                                   (selectionChange)="
-                                    setValue($event.value, item)
+                                    setParameterValue($event.value, parameter)
                                   "
                                 >
                                   <mat-option
@@ -2280,7 +2280,7 @@
                               >
                                 <app-form
                                   [fields]="[amendmentRemarksField]"
-                                  (formUpdate)="onFormUpdate($event)"
+                                  (formUpdate)="onFormUpdate($event,parameter)"
                                 ></app-form>
                               </div>
                               <button
