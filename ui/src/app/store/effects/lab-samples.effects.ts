@@ -74,6 +74,10 @@ export class LabSamplesEffects {
                 action.sampleTypes
               );
               const samples = _.map(response, (sample) => {
+                const rejectionStatuses =
+                  sample?.statuses?.filter(
+                    (status) => status?.category == "REJECTED"
+                  ) || [];
                 return {
                   ...sample,
                   id: sample?.label,
@@ -121,36 +125,17 @@ export class LabSamplesEffects {
                         " )",
                     };
                   }),
-                  reasonForRejection:
-                    sample?.statuses?.length > 0 &&
-                    _.orderBy(sample?.statuses, ["timestamp"], ["desc"])[0]
-                      ?.status == "REJECTED"
-                      ? (action.codedSampleRejectionReasons.filter(
-                          (reason) =>
-                            reason.uuid ===
-                            _.orderBy(
-                              sample?.statuses,
-                              ["timestamp"],
-                              ["desc"]
-                            )[0]?.remarks
-                        ) || [])[0]
-                      : sample?.statuses?.length > 0 &&
-                        (_.orderBy(sample?.statuses, ["timestamp"], ["desc"])[0]
-                          ?.status == "RECOLLECT" ||
-                          _.orderBy(
-                            sample?.statuses,
-                            ["timestamp"],
-                            ["desc"]
-                          )[0]?.category == "RECOLLECT")
-                      ? (action.codedSampleRejectionReasons.filter(
-                          (reason) =>
-                            reason.uuid ===
-                            _.orderBy(
-                              sample?.statuses,
-                              ["timestamp"],
-                              ["desc"]
-                            )[1]?.remarks
-                        ) || [])[0]
+                  reasonsForRejection:
+                    rejectionStatuses?.length > 0
+                      ? rejectionStatuses?.map((status) => {
+                          return {
+                            uuid: status?.status,
+                            display:
+                              (action.codedSampleRejectionReasons?.filter(
+                                (reason) => reason?.uuid === status?.status
+                              ) || [])[0]?.display,
+                          };
+                        })
                       : null,
                   markedForRecollection:
                     sample?.statuses?.length > 0 &&
@@ -160,22 +145,10 @@ export class LabSamplesEffects {
                         ?.category == "RECOLLECT")
                       ? true
                       : false,
-                  rejected:
-                    sample?.statuses?.length > 0 &&
-                    (_.orderBy(sample?.statuses, ["timestamp"], ["desc"])[0]
-                      ?.status == "REJECTED" ||
-                      _.orderBy(sample?.statuses, ["timestamp"], ["desc"])[0]
-                        ?.category == "REJECTED")
-                      ? true
-                      : false,
+                  rejected: rejectionStatuses?.length > 0 ? true : false,
                   rejectedBy:
-                    sample?.statuses?.length > 0 &&
-                    (_.orderBy(sample?.statuses, ["timestamp"], ["desc"])[0]
-                      ?.status == "REJECTED" ||
-                      _.orderBy(sample?.statuses, ["timestamp"], ["desc"])[0]
-                        ?.category == "REJECTED")
-                      ? _.orderBy(sample?.statuses, ["timestamp"], ["desc"])[0]
-                          ?.user
+                    rejectionStatuses?.length > 0
+                      ? rejectionStatuses[0]?.user
                       : null,
                   departmentName:
                     keyedDepartments[sample?.orders[0]?.order?.concept?.uuid]

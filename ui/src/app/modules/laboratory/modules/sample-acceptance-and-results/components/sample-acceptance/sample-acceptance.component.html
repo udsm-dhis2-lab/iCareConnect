@@ -16,6 +16,15 @@
     patientsWithResults: patientsWithResults$ | async
   } as sampleParams"
 >
+
+<div class="loading-overlay" *ngIf="saving">
+  <div class="text-center">
+    <div>Saving ....</div>
+    <div class="mt-3 d-flex justify-content-center w-100">
+      <mat-spinner diameter="50" strokeWidth="2"></mat-spinner>
+    </div>
+  </div>
+</div>
   <mat-tab-group (selectedTabChange)="onOpenNewTab($event)">
     <mat-tab label="Sample Acceptance">
       <div class="filter-and-legend">
