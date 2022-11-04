@@ -2115,10 +2115,7 @@
                               <mat-form-field
                                 class="w-25 numeric-field"
                                 *ngIf="
-                                  parameter?.datatype?.display === 'Numeric' &&
-                                  item?.allocationsPairedBySetMember[
-                                    parameter?.uuid
-                                  ]?.uuid == amendUuid
+                                  parameter?.datatype?.display === 'Numeric'
                                 "
                               >
                                 <mat-label
@@ -2126,8 +2123,10 @@
                                   {{ item?.order?.concept?.display }}
                                 </mat-label>
                                 <input
-                                  *ngIf="
-                                    parameter?.datatype?.display === 'Numeric'
+                                  [disabled]="
+                                    item?.allocationsPairedBySetMember[
+                                      parameter?.uuid
+                                    ]?.uuid !== amendUuid
                                   "
                                   type="number"
                                   (change)="
@@ -2139,15 +2138,11 @@
                                   [value]="
                                     item?.allocationsPairedBySetMember[
                                       parameter?.uuid
-                                    ]?.results?.length > 0
-                                      ? item?.allocationsPairedBySetMember[
-                                          parameter?.uuid
-                                        ]?.results[
-                                          item?.allocationsPairedBySetMember[
-                                            parameter?.uuid
-                                          ]?.results?.length - 1
-                                        ]?.valueNumeric
-                                      : null
+                                    ]?.results[
+                                      item?.allocationsPairedBySetMember[
+                                        parameter?.uuid
+                                      ]?.results?.length - 1
+                                    ]?.value
                                   "
                                   style="text-align: center"
                                   [disabled]="
@@ -2185,6 +2180,11 @@
                                   {{ parameter?.display }}
                                 </mat-label>
                                 <input
+                                  [disabled]="
+                                    item?.allocationsPairedBySetMember[
+                                      parameter?.uuid
+                                    ]?.uuid !== amendUuid
+                                  "
                                   type="text"
                                   (change)="
                                     setEnteredParameterValue(
@@ -2195,15 +2195,11 @@
                                   [value]="
                                     item?.allocationsPairedBySetMember[
                                       parameter?.uuid
-                                    ]?.results?.length > 0
-                                      ? item?.allocationsPairedBySetMember[
-                                          item?.order?.concept?.uuid
-                                        ]?.results[
-                                          item?.allocationsPairedBySetMember[
-                                            item?.order?.concept?.uuid
-                                          ]?.results?.length - 1
-                                        ]?.valueNumeric
-                                      : null
+                                    ]?.results[
+                                      item?.allocationsPairedBySetMember[
+                                        parameter?.uuid
+                                      ]?.results?.length - 1
+                                    ]?.value
                                   "
                                   style="text-align: left"
                                   [disabled]="
@@ -2232,7 +2228,7 @@
                                   parameter?.answers.length === 0
                                 "
                               >
-                                <span>
+                                <!-- <span>
                                   {{
                                     item?.allocationsPairedBySetMember[
                                       parameter?.uuid
@@ -2242,7 +2238,7 @@
                                       ]?.results?.length - 1
                                     ]?.value
                                   }}
-                                </span>
+                                </span> -->
                                 <span
                                   *ngIf="parameter?.units"
                                   style="margin-right: 10px"
@@ -2314,6 +2310,7 @@
                                   )
                                 "
                                 mat-flat-button
+                                color="primary"
                                 class="ml-2 float-right"
                               >
                                 <mat-spinner
@@ -2323,10 +2320,6 @@
                                   "
                                   color="primary"
                                   [diameter]="20"
-                                  style="
-                                    display: inline-block !important;
-                                    margin-right: 4px;
-                                  "
                                 >
                                 </mat-spinner>
                                 <!-- {{
@@ -2339,7 +2332,7 @@
                                     ? "Update"
                                     : "Save"
                                 }} -->
-                                Save ammended results
+                                Update
                               </button>
                             </div>
                           </mat-tab>
