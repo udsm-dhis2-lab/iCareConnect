@@ -152,10 +152,13 @@
       (keyup)="searchItem($event, field)"
       [matAutocomplete]="auto"
     />
-    <span style="position: relative; float: right; margin-top: -30px">
+    <span
+      style="position: relative; float: right; margin-top: -30px"
+      *ngIf="!field?.multiple"
+    >
       <mat-icon>arrow_drop_down</mat-icon>
     </span>
-    <mat-autocomplete #auto="matAutocomplete">
+    <mat-autocomplete #auto="matAutocomplete" *ngIf="!field?.multiple">
       <!-- <mat-option aria-disabled="true" value=""> --Search-- </mat-option> -->
       <ng-container *ngFor="let option of members$ | async">
         <mat-option
@@ -195,6 +198,24 @@
         </mat-option>
       </ng-container>
     </mat-autocomplete>
+
+    <mat-select
+      *ngIf="field?.multiple"
+      [formControlName]="field?.key"
+      [required]="field?.required"
+      (selectionChange)="onFieldUpdate()"
+      multiple
+    >
+      <!-- <mat-select-trigger>
+        {{toppings.value?.[0] || ''}}
+        <span *ngIf="(toppings.value?.length || 0) > 1" class="example-additional-selection">
+          (+{{(toppings.value?.length || 0) - 1}} {{toppings.value?.length === 2 ? 'other' : 'others'}})
+        </span>
+      </mat-select-trigger> -->
+      <mat-option *ngFor="let option of members$ | async" [value]="option">{{
+        option?.display
+      }}</mat-option>
+    </mat-select>
   </mat-form-field>
 </div>
 <div [formGroup]="form" *ngIf="isCheckBoxButton && !isReport">
