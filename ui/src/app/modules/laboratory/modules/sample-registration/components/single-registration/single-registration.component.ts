@@ -131,10 +131,6 @@ export class SingleRegistrationComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log(
-      "testsFromExternalSystemsConfigs",
-      this.testsFromExternalSystemsConfigs
-    );
     this.labSampleLabel$ = this.samplesService.getSampleLabel();
     this.referringDoctorFields = this.referringDoctorAttributes.map(
       (attribute) => {
