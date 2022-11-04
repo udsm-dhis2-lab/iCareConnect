@@ -609,12 +609,18 @@ export class SingleRegistrationComponent implements OnInit {
     for (
       let count = 0;
       count <
-      Number(this.labNumberCharactersCount) - labNumber.toString()?.length;
+      Number(this.labNumberCharactersCount) -
+        (labNumber.toString()?.length + 6);
       count++
     ) {
       generatedStr = generatedStr + "0";
     }
-    return generatedStr + labNumber.toString();
+    return (
+      new Date().getFullYear().toString() +
+      new Date().getMonth().toString() +
+      generatedStr +
+      labNumber.toString()
+    );
   }
 
   onGetClinicalDataValues(clinicalData): void {
@@ -627,6 +633,7 @@ export class SingleRegistrationComponent implements OnInit {
 
     // Identify referring doctor fields entered values
     let attributeMissingOnDoctorsAttributes;
+    this.sampleLabelsUsedDetails = [];
     const doctorsAttributesWithValues =
       this.referringDoctorAttributes.filter(
         (attribute) => this.formData["attribute-" + attribute?.value]?.value
@@ -662,6 +669,7 @@ export class SingleRegistrationComponent implements OnInit {
         .getConceptSetsByConceptUuids(orderConceptUuids)
         .subscribe((conceptSetsResponse: any) => {
           if (conceptSetsResponse && !conceptSetsResponse?.error) {
+            // console.log("conceptSetsResponse", conceptSetsResponse);
             this.groupedTestOrdersByDepartments = formulateSamplesByDepartments(
               conceptSetsResponse,
               this.testOrders
@@ -1362,10 +1370,10 @@ export class SingleRegistrationComponent implements OnInit {
                                                                     },
                                                                   ];
 
-                                                                  console.log(
-                                                                    "statuses",
-                                                                    statuses
-                                                                  );
+                                                                  // console.log(
+                                                                  //   "statuses",
+                                                                  //   statuses
+                                                                  // );
 
                                                                   if (
                                                                     statuses?.length >
