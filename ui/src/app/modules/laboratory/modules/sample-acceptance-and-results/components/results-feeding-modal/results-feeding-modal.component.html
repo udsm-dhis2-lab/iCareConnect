@@ -16,6 +16,15 @@
     </span></mat-toolbar
   >
 
+  <div class="loading-overlay" *ngIf="saving">
+    <div class="text-center">
+      <div>Saving data</div>
+      <div class="mt-3 d-flex justify-content-center w-100">
+        <mat-spinner diameter="50" strokeWidth="2"></mat-spinner>
+      </div>
+    </div>
+  </div>
+
   <div style="padding: 10px">
     <span *ngIf="!LISConfigurations?.isLIS"
       >Patient:
@@ -2280,7 +2289,7 @@
                               >
                                 <app-form
                                   [fields]="[amendmentRemarksField]"
-                                  (formUpdate)="onFormUpdate($event,parameter)"
+                                  (formUpdate)="onFormUpdate($event, parameter)"
                                 ></app-form>
                               </div>
                               <button
@@ -2356,8 +2365,9 @@
                                     >
                                       <ng-container
                                         *ngFor="
-                                          let result of item?.testAllocations[
-                                            count
+                                          let result of item
+                                            ?.allocationsPairedBySetMember[
+                                            parameter?.uuid
                                           ]?.results;
                                           let i = index
                                         "
@@ -2372,7 +2382,39 @@
                                           "
                                         >
                                           <td>
-                                            {{ result?.value }}
+                                            <mat-form-field
+                                              class="w-100"
+                                              *ngIf="
+                                                parameter?.answers &&
+                                                parameter?.answers.length > 0
+                                              "
+                                            >
+                                              <mat-select
+                                                [disabled]="true"
+                                                required
+                                                [value]="result?.value"
+                                                (selectionChange)="
+                                                  setValue($event.value, item)
+                                                "
+                                              >
+                                                <mat-option
+                                                  *ngFor="
+                                                    let option of parameter?.answers
+                                                  "
+                                                  [value]="option.uuid"
+                                                >
+                                                  {{ option.display }}
+                                                </mat-option>
+                                              </mat-select>
+                                            </mat-form-field>
+                                            <div
+                                              *ngIf="
+                                                parameter?.answers &&
+                                                parameter?.answers.length == 0
+                                              "
+                                            >
+                                              {{ result?.value }}
+                                            </div>
                                           </td>
                                           <td>
                                             {{
