@@ -9,6 +9,7 @@ import {
   setSampleStatus,
   loadLabSamplesByCollectionDates,
   acceptSample,
+  setSampleStatuses,
 } from "src/app/store/actions";
 import { AppState } from "src/app/store/reducers";
 import {
@@ -190,28 +191,30 @@ export class SampleAcceptanceComponent implements OnInit {
       })
       .afterClosed()
       .pipe(take(1))
-      .subscribe((reason) => {
-        if (reason && reason?.reasonUuid) {
+      .subscribe((response) => {
+        if (response && response?.reasons) {
           this.savingMessage[sample?.id + "-reject"] = true;
 
-          const data = {
-            sample: {
-              uuid: sample?.uuid,
-            },
-            user: {
-              uuid: this.userUuid,
-            },
-            remarks: reason?.reasonText,
-            category: "REJECTED",
-            status: reason?.reasonUuid,
-          };
+          const data = response?.reasons?.map((reason) => {
+            return {
+              sample: {
+                uuid: sample?.uuid,
+              },
+              user: {
+                uuid: this.userUuid,
+              },
+              remarks: response?.rejectionRemarks,
+              category: "REJECTED",
+              status: reason?.uuid,
+            };
+          });
           this.store.dispatch(
-            setSampleStatus({
-              status: data,
+            setSampleStatuses({
+              statuses: data,
               details: {
                 ...sample,
-                rejectionReason: reason?.reasonText,
-                acceptedBy: {
+                rejectionReason: response?.rejectionRemarks,
+                rejectedBy: {
                   uuid: providerDetails?.uuid,
                   name: providerDetails?.display,
                   display: providerDetails?.display,

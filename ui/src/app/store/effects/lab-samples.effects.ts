@@ -21,6 +21,7 @@ import {
   addFormattedLabSamples,
   loadLabSamplesByVisit,
   acceptSample,
+  setSampleStatuses,
 } from "../actions";
 
 import * as _ from "lodash";
@@ -963,6 +964,67 @@ export class LabSamplesEffects {
               return [updateLabSample({ sample: formattedSample })];
             })
           );
+      })
+    )
+  );
+
+  setSampleStatuses$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(setSampleStatuses),
+      withLatestFrom(this.store.select(getProviderDetails)),
+      switchMap(([action, provider]: [any, any]) => {
+        return this.sampleService.saveSampleStatuses(action.statuses).pipe(
+          mergeMap((response) => {
+            let formattedSample: any = {};
+            formattedSample = {
+              ...action?.details,
+              collected: true,
+              accepted: action?.status?.status == "ACCEPTED" ? true : false,
+              rejected: action?.status?.status == "REJECTED" ? true : false,
+              acceptedAt:
+                action?.status?.status == "ACCEPTED"
+                  ? new Date().getTime()
+                  : null,
+              rejectedAt:
+                action?.status?.status == "REJECTED"
+                  ? new Date().getTime()
+                  : null,
+              rejectionReason: action.details?.rejectionReason,
+              acceptedBy:
+                action?.status?.status == "ACCEPTED"
+                  ? formatUserChangedStatus(response[0])
+                  : null,
+              rejectedBy:
+                action?.status?.status == "REJECTED"
+                  ? formatUserChangedStatus(response[0])
+                  : null,
+              orders: _.map(action?.details?.orders, (order) => {
+                return {
+                  ...order,
+                  collected: true,
+                  accepted: action?.status?.status == "ACCEPTED" ? true : false,
+                  rejected: action?.status?.status == "REJECTED" ? true : false,
+                  acceptedBy:
+                    action?.status?.status == "ACCEPTED"
+                      ? {
+                          name: response[0]?.user?.name.split("(")[0],
+                          uuid: response[0]?.user?.uuid,
+                        }
+                      : null,
+                  rejectedBy:
+                    action?.status?.status == "REJECTED"
+                      ? {
+                          name: response[0]?.user?.name.split("(")[0],
+                          uuid: response[0]?.user?.uuid,
+                        }
+                      : null,
+                  testAllocations: [],
+                };
+              }),
+            };
+            return [updateLabSample({ sample: formattedSample })];
+          })
+        );
       })
     )
   );
