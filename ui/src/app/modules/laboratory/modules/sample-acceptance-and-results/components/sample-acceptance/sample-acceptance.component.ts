@@ -68,6 +68,7 @@ export class SampleAcceptanceComponent implements OnInit {
   samplesWithResults$: Observable<any[]>;
   patientsWithResults$: Observable<any>;
   showTabSampleTrackingForLis = false;
+  saving: boolean = false;
   constructor(private store: Store<AppState>, private dialog: MatDialog) {}
 
   ngOnInit(): void {
@@ -193,6 +194,7 @@ export class SampleAcceptanceComponent implements OnInit {
       .pipe(take(1))
       .subscribe((response) => {
         if (response && response?.reasons) {
+          this.saving = true;
           this.savingMessage[sample?.id + "-reject"] = true;
 
           const data = response?.reasons?.map((reason) => {
@@ -222,6 +224,11 @@ export class SampleAcceptanceComponent implements OnInit {
               },
             })
           );
+          // TODO: Remove this bad coding after improve of APIs
+          setTimeout(() => {
+            this.getSamplesData();
+            this.saving = false;
+          }, 200);
         }
       });
   }
@@ -359,20 +366,24 @@ export class SampleAcceptanceComponent implements OnInit {
     }
   }
 
+  getSamplesData(): void {
+    this.store.dispatch(
+      loadLabSamplesByCollectionDates({
+        datesParameters: this.datesParameters,
+        patients: this.patients,
+        sampleTypes: this.sampleTypes,
+        departments: this.labSamplesDepartments,
+        containers: this.labSamplesContainers,
+        configs: this.labConfigs,
+        codedSampleRejectionReasons: this.codedSampleRejectionReasons,
+      })
+    );
+  }
+
   onOpenNewTab(e) {
     // console.log("test", e);
     if (e.index === 0) {
-      this.store.dispatch(
-        loadLabSamplesByCollectionDates({
-          datesParameters: this.datesParameters,
-          patients: this.patients,
-          sampleTypes: this.sampleTypes,
-          departments: this.labSamplesDepartments,
-          containers: this.labSamplesContainers,
-          configs: this.labConfigs,
-          codedSampleRejectionReasons: this.codedSampleRejectionReasons,
-        })
-      );
+      this.getSamplesData();
     }
     this.searchingText = "";
     this.selectedDepartment = "";
