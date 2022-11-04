@@ -33,12 +33,7 @@ export class BarCodeModalComponent implements OnInit {
     this.dialogData = data;
   }
 
-  ngOnInit(): void {
-    // console.log(
-    //   "sampleLabelsUsedDetails",
-    //   this.dialogData?.sampleLabelsUsedDetails
-    // );
-  }
+  ngOnInit(): void {}
 
   onPrint(e) {
     e.stopPropagation();
