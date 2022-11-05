@@ -81,6 +81,10 @@ export class Observation {
     return this.obs?.concept?.uuid;
   }
 
+  get provider(): any {
+    return this.obs?.encounterProvider;
+  }
+
   toJson(): ObservationObject {
     return {
       id: this.uuid,
@@ -99,6 +103,7 @@ export class Observation {
       valueObject: this.valueObject,
       status: this.status,
       conceptUuid: this.conceptUuid,
+      provider: this.provider,
     };
   }
 }

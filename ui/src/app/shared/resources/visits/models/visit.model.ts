@@ -302,10 +302,22 @@ export class Visit {
     return flatten(
       flatten(
         this.encounters?.map((encounter) =>
-          (encounter?.obs || []).map((observation) => ({
-            ...observation,
-            encounterType: encounter.encounterType,
-          }))
+          (encounter?.obs || []).map((observation) => {
+            const encounterProvider = encounter?.encounterProviders[0];
+            const formattedObs = {
+              ...observation,
+              encounterProvider: {
+                ...encounterProvider?.provider,
+                name:
+                  encounterProvider?.provider &&
+                  encounterProvider?.provider?.display?.indexOf(":") > -1
+                    ? encounterProvider?.provider?.display?.split(":")[0]
+                    : encounterProvider?.provider?.display?.split("- ")[1],
+              },
+              encounterType: encounter.encounterType,
+            };
+            return formattedObs;
+          })
         )
       )
     ).map((observation) => new Observation(observation));
