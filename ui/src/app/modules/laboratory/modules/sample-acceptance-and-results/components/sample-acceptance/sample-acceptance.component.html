@@ -16,15 +16,14 @@
     patientsWithResults: patientsWithResults$ | async
   } as sampleParams"
 >
-
-<div class="loading-overlay" *ngIf="saving">
-  <div class="text-center">
-    <div>Saving ....</div>
-    <div class="mt-3 d-flex justify-content-center w-100">
-      <mat-spinner diameter="50" strokeWidth="2"></mat-spinner>
+  <div class="loading-overlay" *ngIf="saving">
+    <div class="text-center">
+      <div>Saving ....</div>
+      <div class="mt-3 d-flex justify-content-center w-100">
+        <mat-spinner diameter="50" strokeWidth="2"></mat-spinner>
+      </div>
     </div>
   </div>
-</div>
   <mat-tab-group (selectedTabChange)="onOpenNewTab($event)">
     <mat-tab label="Sample Acceptance">
       <div class="filter-and-legend">
@@ -257,7 +256,22 @@
                         </mat-spinner>
                         Reject
                       </button>
+                      <a (click)="onToggleViewSampleDetails($event, sample)">
+                        <mat-icon *ngIf="samplesToViewMoreDetails[sample?.id]"
+                          >expand_more</mat-icon
+                        >
+                        <mat-icon *ngIf="!samplesToViewMoreDetails[sample?.id]"
+                          >expand_less</mat-icon
+                        >
+                      </a>
                     </div>
+                  </td>
+                </tr>
+                <tr *ngIf="samplesToViewMoreDetails[sample?.id]">
+                  <td colspan="100%">
+                    <app-shared-sample-details
+                      [sample]="sample"
+                    ></app-shared-sample-details>
                   </td>
                 </tr>
               </ng-container>

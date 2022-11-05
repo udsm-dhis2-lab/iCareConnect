@@ -4,7 +4,6 @@ import { Store } from "@ngrx/store";
 import { Observable } from "rxjs";
 import { take } from "rxjs/operators";
 import { SampleResultsPrintingComponent } from "src/app/modules/laboratory/components/sample-results-printing/sample-results-printing.component";
-import { formatDateToYYMMDD } from "src/app/shared/helpers/format-date.helper";
 import {
   setSampleStatus,
   loadLabSamplesByCollectionDates,
@@ -70,6 +69,7 @@ export class SampleAcceptanceComponent implements OnInit {
   patientsWithResults$: Observable<any>;
   showTabSampleTrackingForLis = false;
   saving: boolean = false;
+  samplesToViewMoreDetails: any = {};
   constructor(private store: Store<AppState>, private dialog: MatDialog) {}
 
   ngOnInit(): void {
@@ -141,6 +141,15 @@ export class SampleAcceptanceComponent implements OnInit {
     this.patientsWithResults$ = this.store.select(
       getPatientWithResults(this.selectedDepartment, this.searchingText)
     );
+  }
+
+  onToggleViewSampleDetails(event: Event, sample: any): void {
+    event.stopPropagation();
+    this.samplesToViewMoreDetails[sample?.id] = !this.samplesToViewMoreDetails[
+      sample?.id
+    ]
+      ? sample
+      : null;
   }
 
   accept(e, sample, providerDetails) {
