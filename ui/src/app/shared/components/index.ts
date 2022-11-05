@@ -99,6 +99,7 @@ import { SharedLocationAttributesManagerComponent } from "./shared-location-attr
 import { SharedParameterResultsComponent } from "./shared-parameter-results/shared-parameter-results.component";
 import { PatientAddressComponent } from "./patient-address/patient-address.component";
 import { SharedIPDRoundContainerComponent } from "./shared-ipd-round-container/shared-ipd-round-container.component";
+import { SharedSampleDetailsComponent } from "./shared-sample-details/shared-sample-details.component";
 
 export const components: any[] = [
   PatientAddressComponent,
@@ -203,6 +204,7 @@ export const components: any[] = [
   SharedLocationAttributesManagerComponent,
   SharedParameterResultsComponent,
   SharedIPDRoundContainerComponent,
+  SharedSampleDetailsComponent,
 ];
 
 export const sharedEntryComponents: any[] = [

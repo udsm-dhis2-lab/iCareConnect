@@ -44,6 +44,7 @@ export class PersonDetailsComponent implements OnInit {
   patientUuid: string;
   identifierTypes: any[] = [];
   age: number = 0;
+  month: number = 0;
 
   selectedClientData: any;
 
@@ -142,11 +143,14 @@ export class PersonDetailsComponent implements OnInit {
 
   getAge(event: any): void {
     event.stopPropagation();
-    this.personDetailsData["age"] = event.target.value;
+    this.personDetailsData["age"] = this.age;
+    this.personDetailsData["month"] = this.month;
+
+    let monthDate = this.personDetailsData["month"] ? new Date().getMonth() - Number(this.personDetailsData["month"]) : new Date().getMonth();
     this.personDetailsData["dob"] = new Date(
       new Date().getFullYear() - Number(this.personDetailsData["age"]),
-      6,
-      1
+      monthDate,
+      new Date().getDate()
     );
     this.personDOBField = [
       new DateField({
@@ -170,6 +174,7 @@ export class PersonDetailsComponent implements OnInit {
       const dob = moment(new Date(values["dob"]?.value));
       const today = moment(new Date());
       this.age = today.diff(dob, "years");
+      this.month = Number(today.diff(dob, "months")) % 12;
       this.personDetailsData["age"] = this.age.toString();
       this.personAgeField = [
         new Textbox({

@@ -4,11 +4,12 @@ import { Store } from "@ngrx/store";
 import { Observable } from "rxjs";
 import { take } from "rxjs/operators";
 import { SampleResultsPrintingComponent } from "src/app/modules/laboratory/components/sample-results-printing/sample-results-printing.component";
-import { formatDateToYYMMDD } from "src/app/shared/helpers/format-date.helper";
 import {
   setSampleStatus,
   loadLabSamplesByCollectionDates,
   acceptSample,
+  setSampleStatuses,
+  clearLoadedLabSamples,
 } from "src/app/store/actions";
 import { AppState } from "src/app/store/reducers";
 import {
@@ -67,6 +68,8 @@ export class SampleAcceptanceComponent implements OnInit {
   samplesWithResults$: Observable<any[]>;
   patientsWithResults$: Observable<any>;
   showTabSampleTrackingForLis = false;
+  saving: boolean = false;
+  samplesToViewMoreDetails: any = {};
   constructor(private store: Store<AppState>, private dialog: MatDialog) {}
 
   ngOnInit(): void {
@@ -140,6 +143,15 @@ export class SampleAcceptanceComponent implements OnInit {
     );
   }
 
+  onToggleViewSampleDetails(event: Event, sample: any): void {
+    event.stopPropagation();
+    this.samplesToViewMoreDetails[sample?.id] = !this.samplesToViewMoreDetails[
+      sample?.id
+    ]
+      ? sample
+      : null;
+  }
+
   accept(e, sample, providerDetails) {
     e.stopPropagation();
 
@@ -174,6 +186,11 @@ export class SampleAcceptanceComponent implements OnInit {
     this.settingLabSampleStatus$ = this.store.select(
       getSettingLabSampleStatusState
     );
+    setTimeout(() => {
+      this.store.dispatch(clearLoadedLabSamples());
+      this.getSamplesData();
+      this.saving = false;
+    }, 1000);
   }
 
   reject(e, sample, providerDetails) {
@@ -190,28 +207,33 @@ export class SampleAcceptanceComponent implements OnInit {
       })
       .afterClosed()
       .pipe(take(1))
-      .subscribe((reason) => {
-        if (reason && reason?.reasonUuid) {
+      .subscribe((response) => {
+        if (response && response?.reasons) {
+          this.saving = true;
           this.savingMessage[sample?.id + "-reject"] = true;
 
-          const data = {
-            sample: {
-              uuid: sample?.uuid,
-            },
-            user: {
-              uuid: this.userUuid,
-            },
-            remarks: reason?.reasonText,
-            category: "REJECTED",
-            status: reason?.reasonUuid,
-          };
+          const data = response?.reasons?.map((reason) => {
+            return {
+              sample: {
+                uuid: sample?.uuid,
+              },
+              user: {
+                uuid: this.userUuid,
+              },
+              remarks: response?.rejectionRemarks
+                ? response?.rejectionRemarks
+                : "None",
+              category: "REJECTED",
+              status: reason?.uuid,
+            };
+          });
           this.store.dispatch(
-            setSampleStatus({
-              status: data,
+            setSampleStatuses({
+              statuses: data,
               details: {
                 ...sample,
-                rejectionReason: reason?.reasonText,
-                acceptedBy: {
+                rejectionReason: response?.rejectionRemarks,
+                rejectedBy: {
                   uuid: providerDetails?.uuid,
                   name: providerDetails?.display,
                   display: providerDetails?.display,
@@ -219,6 +241,12 @@ export class SampleAcceptanceComponent implements OnInit {
               },
             })
           );
+          // TODO: Remove this bad coding after improve of APIs
+          setTimeout(() => {
+            this.store.dispatch(clearLoadedLabSamples());
+            this.getSamplesData();
+            this.saving = false;
+          }, 1000);
         }
       });
   }
@@ -356,20 +384,24 @@ export class SampleAcceptanceComponent implements OnInit {
     }
   }
 
+  getSamplesData(): void {
+    this.store.dispatch(
+      loadLabSamplesByCollectionDates({
+        datesParameters: this.datesParameters,
+        patients: this.patients,
+        sampleTypes: this.sampleTypes,
+        departments: this.labSamplesDepartments,
+        containers: this.labSamplesContainers,
+        configs: this.labConfigs,
+        codedSampleRejectionReasons: this.codedSampleRejectionReasons,
+      })
+    );
+  }
+
   onOpenNewTab(e) {
     // console.log("test", e);
     if (e.index === 0) {
-      this.store.dispatch(
-        loadLabSamplesByCollectionDates({
-          datesParameters: this.datesParameters,
-          patients: this.patients,
-          sampleTypes: this.sampleTypes,
-          departments: this.labSamplesDepartments,
-          containers: this.labSamplesContainers,
-          configs: this.labConfigs,
-          codedSampleRejectionReasons: this.codedSampleRejectionReasons,
-        })
-      );
+      this.getSamplesData();
     }
     this.searchingText = "";
     this.selectedDepartment = "";

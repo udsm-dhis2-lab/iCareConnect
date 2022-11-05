@@ -135,6 +135,21 @@ export class SamplesService {
     }
   }
 
+  saveSampleStatuses(statusesData): Observable<any> {
+    if (statusesData) {
+      return zip(
+        ...statusesData.map((status) => {
+          return this.httpClient.post(BASE_URL + "lab/samplestatus", status);
+        })
+      ).pipe(
+        map((response) => response),
+        catchError((error) => of(error))
+      );
+    } else {
+      return from([null]);
+    }
+  }
+
   setSampleStatus(data): Observable<any> {
     if (data) {
       console.log(data);
