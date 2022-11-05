@@ -80,6 +80,7 @@ export class ResultsFeedingModalComponent implements OnInit {
   amendUuid: any;
   amendmentRemarksField: any;
   amendmentRemarks: any;
+  saving: boolean = false;
   constructor(
     private dialog: MatDialog,
     private dialogRef: MatDialogRef<ResultsFeedingModalComponent>,
@@ -342,11 +343,11 @@ export class ResultsFeedingModalComponent implements OnInit {
 
   onFormUpdate(formValues: FormValue): void {
     this.amendmentRemarks = formValues.getValues()?.amendmentRemarks?.value;
-    console.log("==> Amendment Results: ", this.amendmentRemarks);
   }
 
   onSave(e, item, testOrders, currentSample, allocation) {
     e.stopPropagation();
+    this.saving = true;
     this.savingMessage[item?.order?.concept?.uuid] = true;
     const resultObject = {
       concept: {
@@ -427,6 +428,9 @@ export class ResultsFeedingModalComponent implements OnInit {
         sampleIdentifier: this.sample?.id,
       }
     );
+    setTimeout(() => {
+      this.saving = false;
+    }, 1000);
   }
 
   onSaveParameterValue(
@@ -439,6 +443,7 @@ export class ResultsFeedingModalComponent implements OnInit {
   ) {
     e.stopPropagation();
     this.savingMessage[parameter?.uuid] = true;
+    this.saving = true;
     if (!type || type !== "file") {
       const resultObject = {
         concept: {
@@ -470,10 +475,15 @@ export class ResultsFeedingModalComponent implements OnInit {
       };
 
       const resultsComments = {
-        status: this.values[item?.uuid + "-comment"]
+        status: this.amendmentRemarks
+          ? "AMENDED"
+          : this.values[item?.uuid + "-comment"]
           ? "ANSWER DESCRIPTION"
           : "COMMENT",
-        remarks: this.values[item?.uuid + "-comment"]
+        category: this.amendmentRemarks ? "AMENDED" : "COMMENT",
+        remarks: this.amendmentRemarks
+          ? this.amendmentRemarks
+          : this.values[item?.uuid + "-comment"]
           ? this.values[item?.uuid + "-comment"]
           : "NO DESCRPTION FOR PARAMETER",
         user: {
@@ -576,6 +586,10 @@ export class ResultsFeedingModalComponent implements OnInit {
           }
         });
     }
+
+    setTimeout(() => {
+      this.saving = false;
+    }, 1000);
   }
 
   onGetFileInfo(data, item, parameter, provider, attachmentConceptUuid) {
@@ -703,6 +717,7 @@ export class ResultsFeedingModalComponent implements OnInit {
         if (feedback && feedback.length > 1) {
           const rejectStatus = {
             status: "REJECTED",
+            category: "REJECTED",
             remarks: feedback,
             user: {
               uuid: this.userUuid,
@@ -725,7 +740,6 @@ export class ResultsFeedingModalComponent implements OnInit {
 
   amendResults(e, itemUuid) {
     e?.stopPropagation();
-    console.log("==> Clicked Uuid: ", itemUuid?.allocationUuid);
     this.amendUuid = itemUuid;
   }
 
@@ -743,6 +757,7 @@ export class ResultsFeedingModalComponent implements OnInit {
         if (feedback && feedback.length > 1) {
           const rejectStatus = {
             status: "REJECTED",
+            catetory: "REJECTED",
             remarks: feedback,
             user: {
               uuid: this.userUuid,

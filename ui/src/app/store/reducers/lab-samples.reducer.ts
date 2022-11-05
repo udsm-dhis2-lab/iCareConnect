@@ -11,6 +11,7 @@ import {
   saveTestsContainerAllocation,
   setLoadedSamples,
   setSampleStatus,
+  setSampleStatuses,
   updateLabSample,
   updateLabSamples,
   updateSample,
@@ -73,6 +74,11 @@ const newReducer = createReducer(
     })
   ),
   on(setSampleStatus, (state) => ({
+    ...state,
+    settingLabSampleStatus: true,
+    setSampleStatus: false,
+  })),
+  on(setSampleStatuses, (state) => ({
     ...state,
     settingLabSampleStatus: true,
     setSampleStatus: false,

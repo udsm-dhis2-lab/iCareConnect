@@ -54,15 +54,7 @@
                       *ngIf="params?.facility && params?.facility?.postalCode"
                     >
                       P.O BOX: {{ params?.facility?.postalCode }}
-                    </span>
-                    <!-- <span
-                      *ngIf="
-                        labConfigs?.facilityDetails &&
-                        labConfigs?.facilityDetails?.addressTel
-                      "
-                    >
-                      TEL: {{ labConfigs?.facilityDetails?.addressTel }}
-                    </span>  --> </small
+                    </span></small
                   ><br />
                   <small>
                     <span
@@ -266,18 +258,22 @@
                             "
                           >
                             <tr>
-                              <td>Test #</td>
-                              <td>Test</td>
+                              <td *ngIf="!LISConfigurations?.isLIS">Test #</td>
+                              <td>Parameter</td>
                               <td>Results</td>
                               <td>SI Units</td>
-                              <td>LL</td>
-                              <td>UL</td>
+                              <td *ngIf="!LISConfigurations?.isLIS">LL</td>
+                              <td *ngIf="!LISConfigurations?.isLIS">UL</td>
                               <td>Remarks</td>
-                              <td>Order date & Time</td>
+                              <td *ngIf="!LISConfigurations?.isLIS">
+                                Order date & Time
+                              </td>
                             </tr>
 
                             <tr *ngFor="let order of sample?.orders">
-                              <td>{{ order?.order?.orderNumber }}</td>
+                              <td *ngIf="!LISConfigurations?.isLIS">
+                                {{ order?.order?.orderNumber }}
+                              </td>
                               <td>{{ order?.order?.concept?.display }}</td>
                               <td>
                                 <div
@@ -430,7 +426,7 @@
                                 </p>
                               </td>
 
-                              <td>
+                              <td *ngIf="!LISConfigurations?.isLIS">
                                 <p
                                   *ngIf="
                                     order?.order?.concept?.setMembers?.length ==
@@ -489,7 +485,7 @@
                                   </span>
                                 </p>
                               </td>
-                              <td>
+                              <td *ngIf="!LISConfigurations?.isLIS">
                                 <p
                                   *ngIf="
                                     order?.order?.concept?.setMembers?.length ==
@@ -598,7 +594,7 @@
                                   </span>
                                 </p>
                               </td>
-                              <td>
+                              <td *ngIf="!LISConfigurations?.isLIS">
                                 {{ order?.order?.orderDate | date: "medium" }}
                               </td>
                             </tr>
