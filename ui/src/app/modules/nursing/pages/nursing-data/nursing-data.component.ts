@@ -100,9 +100,9 @@ export class NursingDataComponent implements OnInit {
       this.conceptsService.getConceptsDepartmentDetails(
         this.nursingConfigurations?.departmentsReference?.id
       );
-    this.forms$ = this.store.select(getCustomOpenMRSFormsByIds, {
-      formUUids: this.locationFormsIds,
-    });
+    this.forms$ = this.store.select(
+      getCustomOpenMRSFormsByIds(this.locationFormsIds)
+    );
     this.provider$ = this.store.select(getProviderDetails);
     this.visit$ = this.store.select(getActiveVisit);
     this.currentLocation$ = this.store.pipe(select(getCurrentLocation));

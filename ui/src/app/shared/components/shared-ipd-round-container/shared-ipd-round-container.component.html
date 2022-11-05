@@ -1,21 +1,67 @@
 <div
   *ngIf="{
     observationsGroupedByIPDRounds: observationsGroupedByIPDRounds$ | async,
-    form: form$ | async
+    IPDRounds: IPDRounds$ | async,
+    customForms: customForms$ | async
   } as params"
 >
-  <div *ngIf="params?.form">
-    <h3> Latest data fed for {{ params?.form?.name }}</h3>
-    <div class="row">
-      <div class="col-12">
-        <div class="obs" *ngFor="let formField of params?.form?.formFields">
-            {{ formField?.field?.concept?.display }} - {{ 
-              params?.observationsGroupedByIPDRounds[formField?.field?.concept?.uuid]?.latest?.valueObject?.toString().length > 0 ? 
-              params?.observationsGroupedByIPDRounds[formField?.field?.concept?.uuid]?.latest?.valueObject?.display : 
-              params?.observationsGroupedByIPDRounds[formField?.field?.concept?.uuid]?.latest?.value
-            }}
+  <ng-progress-bar
+    mode="indeterminate"
+    *ngIf="!params?.customForms || !params?.observationsGroupedByIPDRounds"
+  ></ng-progress-bar>
+  <div
+    *ngIf="
+      params?.customForms &&
+      params?.observationsGroupedByIPDRounds &&
+      params?.IPDRounds
+    "
+  >
+    <!-- {{ params?.IPDRounds[0] | json }} -->
+    <mat-accordion>
+      <mat-expansion-panel
+        *ngFor="
+          let IPDRound of params?.observationsGroupedByIPDRounds;
+          let count = index
+        "
+      >
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            {{
+              params?.IPDRounds[count]
+                ? (params?.IPDRounds[count]?.observationDatetime
+                  | date: "medium")
+                : "-"
+            }}</mat-panel-title
+          >
+          <mat-panel-description>
+            <!-- This is a summary of the content -->
+          </mat-panel-description>
+        </mat-expansion-panel-header>
+
+        <div>Visit Notes</div>
+        <div class="w-100" *ngFor="let form of params?.customForms">
+          <div class="obs" *ngFor="let formField of form?.formFields">
+            {{ formField?.concept?.display }}:
+            <span
+              *ngFor="
+                let obs of IPDRound[formField?.concept?.uuid];
+                let count = index
+              "
+            >
+              {{ !obs?.valueObject ? obs?.value : obs?.valueObject?.display }}
+              <span class="ml-1 text-muted" style="font-size: 0.6rem">
+                ({{ obs?.provider?.name }} at
+                {{ obs?.observationDatetime | date: "medium" }})
+              </span>
+              <span
+                class="ml-1"
+                *ngIf="count < IPDRound[formField?.concept?.uuid]?.length - 1"
+                >,</span
+              >
+            </span>
+          </div>
         </div>
-      </div>
-    </div>
+      </mat-expansion-panel>
+    </mat-accordion>
   </div>
 </div>

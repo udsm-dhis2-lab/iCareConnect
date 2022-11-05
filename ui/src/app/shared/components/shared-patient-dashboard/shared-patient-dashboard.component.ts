@@ -240,9 +240,9 @@ export class SharedPatientDashboardComponent implements OnInit {
       select(getFormEntitiesByNames(CONSULTATION_FORM_CONFIGS))
     );
 
-    this.forms$ = this.store.select(getCustomOpenMRSFormsByIds, {
-      formUUids: this.currentLocation?.forms,
-    });
+    this.forms$ = this.store.select(
+      getCustomOpenMRSFormsByIds(this.currentLocation?.forms)
+    );
 
     this.currentLocation$ = this.store.select(getCurrentLocation);
     this.consultationOrderType$ =

@@ -24,6 +24,32 @@ export const getObservationsByType = (type: string) =>
     )
   );
 
+export const getIPDRounds = (IPDRoundConceptUuid: string) =>
+  createSelector(getAllObservations, (observations: ObservationObject[]) => {
+    const ipdRoundsObs = orderBy(
+      (observations || [])?.filter(
+        (obs) => obs?.concept?.uuid == IPDRoundConceptUuid
+      ),
+      ["observationDatetime"],
+      ["asc"]
+    );
+    let rounds = [];
+    for (let count = 0; count < ipdRoundsObs?.length; count++) {
+      const date = new Date(ipdRoundsObs[count]?.observationDatetime);
+      rounds = [
+        ...rounds,
+        {
+          minTime: ipdRoundsObs[count]?.obsTime - 2,
+          maxTime: ipdRoundsObs[count]?.obsTime + 2,
+          date: ipdRoundsObs[count]?.obsDate,
+          ipdRound: count,
+          maxDateTime: date.setTime(date.getTime() + 2 * 60 * 60 * 1000),
+        },
+      ];
+    }
+    return rounds;
+  });
+
 export const getGroupedObservationByDateAndTimeOfIPDRounds = (
   IPDRoundConceptUuid: string
 ) =>
@@ -67,33 +93,36 @@ export const getGroupedObservationByDateAndTimeOfIPDRounds = (
 
       groupedObs = [
         ...groupedObs,
-        groupBy(reverse(sortBy(obsGroup, "observationDatetime")), "conceptUuid"),
+        groupBy(
+          reverse(sortBy(obsGroup, "observationDatetime")),
+          "conceptUuid"
+        ),
       ];
     }
 
     // console.log("groupedObs", groupedObs);
 
-    (observations || []).forEach((observation) => {
-      if (observation?.concept?.uuid) {
-        const conceptObservation =
-          groupedObservations[observation.concept.uuid];
+    // (observations || []).forEach((observation) => {
+    //   if (observation?.concept?.uuid) {
+    //     const conceptObservation =
+    //       groupedObservations[observation.concept.uuid];
 
-        const conceptObservations = reverse(
-          sortBy(
-            [...(conceptObservation?.history || []), observation],
-            "observationDatetime"
-          )
-        );
+    //     const conceptObservations = reverse(
+    //       sortBy(
+    //         [...(conceptObservation?.history || []), observation],
+    //         "observationDatetime"
+    //       )
+    //     );
 
-        groupedObservations[observation.concept.uuid] = {
-          uuid: observation.concept.uuid,
-          latest: head(conceptObservations),
-          history: conceptObservations,
-        };
-      }
-    });
+    //     groupedObservations[observation.concept.uuid] = {
+    //       uuid: observation.concept.uuid,
+    //       latest: head(conceptObservations),
+    //       history: conceptObservations,
+    //     };
+    //   }
+    // });
 
-    return groupedObservations;
+    return groupedObs;
   });
 
 export const getGroupedObservationByConcept = createSelector(
