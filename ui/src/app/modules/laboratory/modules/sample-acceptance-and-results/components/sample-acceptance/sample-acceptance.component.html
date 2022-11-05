@@ -257,10 +257,10 @@
                         Reject
                       </button>
                       <a (click)="onToggleViewSampleDetails($event, sample)">
-                        <mat-icon *ngIf="samplesToViewMoreDetails[sample?.id]"
+                        <mat-icon *ngIf="!samplesToViewMoreDetails[sample?.id]"
                           >expand_more</mat-icon
                         >
-                        <mat-icon *ngIf="!samplesToViewMoreDetails[sample?.id]"
+                        <mat-icon *ngIf="samplesToViewMoreDetails[sample?.id]"
                           >expand_less</mat-icon
                         >
                       </a>
