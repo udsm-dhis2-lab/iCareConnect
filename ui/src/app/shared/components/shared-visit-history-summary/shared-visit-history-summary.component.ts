@@ -19,16 +19,23 @@ export class SharedVisitHistorySummaryComponent implements OnInit {
   @Input() location: any;
   observations$: Observable<any>;
   customForms$: Observable<any[]>;
+  observationChartForm$: Observable<any>;
   errors: any[] = [];
   constructor(
     private store: Store<AppState>,
-    private visitService: VisitsService
+    private visitService: VisitsService,
+    private formService: FormService
   ) {}
 
   ngOnInit(): void {
     // TODO: Visit Notes form to be softcoded
     this.customForms$ = this.store.select(
       getCustomOpenMRSFormsByIds(this.location?.forms || [])
+    );
+
+    // TODO: Find a way to softcode this
+    this.observationChartForm$ = this.formService.getCustomeOpenMRSForm(
+      "2a7d282f-a97a-4618-9515-9c0028d575d8"
     );
     // First create round zero provided when no any round has been made
 

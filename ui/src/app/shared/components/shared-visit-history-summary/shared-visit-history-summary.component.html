@@ -1,7 +1,8 @@
 <div
   *ngIf="{
     observations: observations$ | async,
-    customForms: customForms$ | async
+    customForms: customForms$ | async,
+    observationChartForm: observationChartForm$ | async
   } as params"
 >
   <mat-progress-bar
@@ -139,5 +140,13 @@
         </span>
       </div> -->
     </div>
+    <!-- {{ params?.observationChartForm | json }} -->
+    <!-- <app-observation-chart-table
+      *ngIf="params?.observationChartForm"
+      [activeVisit]="activeVisit"
+      [selectedForm]="params?.observationChartForm"
+      [obsChartEncounterType]="'f2b1e4e4-1dc7-4c36-b56e-481fa4928b01'"
+      [shouldNotEnterData]="true"
+    ></app-observation-chart-table> -->
   </div>
 </div>
