@@ -317,6 +317,7 @@ export class SharedPatientDashboardComponent implements OnInit {
           return res;
         })
       );
+    this.showRoundDetails = this.activeVisit?.isAdmitted;
   }
 
   onToggleVitalsSummary(event: Event): void {
