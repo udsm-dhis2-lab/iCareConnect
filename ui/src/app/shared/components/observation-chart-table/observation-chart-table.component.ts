@@ -15,6 +15,7 @@ export class ObservationChartTableComponent implements OnInit {
   @Input() obsChartEncounterType: any;
   @Input() patient: any;
   @Input() location: any;
+  @Input() shouldNotEnterData: boolean;
   formData: any;
   obsChartEncountersData: any[];
   atLeastOneFormFieldHasBeenFilled: boolean = false;
@@ -33,7 +34,9 @@ export class ObservationChartTableComponent implements OnInit {
       const fieldsToAttach =
         !field?.setMembers || field?.setMembers?.length === 0
           ? [field]
-          : field?.setMembers?.length > 0 ? field?.setMembers : [];
+          : field?.setMembers?.length > 0
+          ? field?.setMembers
+          : [];
       this.fieldsHoldingData = [...this.fieldsHoldingData, ...fieldsToAttach];
     });
   }

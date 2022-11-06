@@ -148,7 +148,7 @@ export class SharedPatientDashboardComponent implements OnInit {
   errors: any[] = [];
   patientInvoice$: Observable<any>;
   @Input() IPDRoundConceptUuid: string;
-  showRoundDetails: boolean = false;
+  showRoundDetails: boolean = true;
   currentRound: any;
   latestRound$: Observable<any>;
 
@@ -174,9 +174,6 @@ export class SharedPatientDashboardComponent implements OnInit {
         (obs) =>
           obs?.concept?.uuid === this.visitEndingControlStatusesConceptUuid
       ) || [])[0]?.valueObject;
-    }
-    if (this.activeVisit?.isAdmitted) {
-      this.showRoundDetails = true;
     }
 
     this.onStartConsultation(this.activeVisit);
