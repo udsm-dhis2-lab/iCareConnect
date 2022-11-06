@@ -12,7 +12,7 @@
           [attributes]="params?.patientVisit[0]?.visit?.attributesToDisplay"
           [forRegistration]="true"
         ></app-patient-visit-attributes-details>
-        <p *ngIf="ID && !params?.patientVisit[0]">
+        <p *ngIf="ID && !params?.patientVisit?.length">
           ID:
           <b>
             {{ ID }}
@@ -20,7 +20,7 @@
         </p>
         <p
           class="text-center"
-          *ngIf="!params?.patientVisit || !params?.patientVisit[0]"
+          *ngIf="!params?.patientVisit || !params?.patientVisit?.length"
         >
           No previous visit history
         </p>
