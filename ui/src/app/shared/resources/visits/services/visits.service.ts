@@ -47,11 +47,21 @@ export class VisitsService {
       map((response) => {
         let formattedObs = [];
         response.encounters.map((encounter: any) => {
+          const encounterProvider = encounter?.encounterProviders[0];
           formattedObs = [
             ...formattedObs,
             ...encounter?.obs.map((observation) => {
               return {
                 ...observation,
+                encounterProvider: {
+                  ...encounterProvider?.provider,
+                  name:
+                    encounterProvider?.provider &&
+                    encounterProvider?.provider?.display?.indexOf(":") > -1
+                      ? encounterProvider?.provider?.display?.split(":")[0]
+                      : encounterProvider?.provider?.display?.split("- ")[1],
+                },
+                encounterType: encounter.encounterType,
                 conceptUuid: observation?.concept?.uuid,
               };
             }),
@@ -61,10 +71,14 @@ export class VisitsService {
         const obs = Object.keys(groupedObsByConcept).map((key) => {
           return {
             uuid: key,
-            history: groupedObsByConcept[key],
+            history: orderBy(
+              groupedObsByConcept[key],
+              ["obsDatetime"],
+              ["asc"]
+            ),
             latest: orderBy(
               groupedObsByConcept[key],
-              ["observationDatetime"],
+              ["obsDatetime"],
               ["desc"]
             )[0],
           };
@@ -602,7 +616,7 @@ export class VisitsService {
         this.api.visit.getAllVisits({
           includeInactive: includeInactive,
           patient: patient,
-          v: `custom:(uuid,visitType,location:(uuid,display,tags,parentLocation:(uuid,display)),startDatetime,attributes,stopDatetime,patient:(uuid,display,identifiers,person,voided),encounters:(uuid,form,location,obs,orders,diagnoses,encounterDatetime,encounterType))`,
+          v: `custom:(uuid,visitType,location:(uuid,display,tags,parentLocation:(uuid,display)),startDatetime,attributes,stopDatetime,patient:(uuid,display,identifiers,person,voided),encounters:(uuid,form,location,obs,orders,diagnoses,encounterProviders,encounterDatetime,encounterType))`,
         } as any)
       )
     ).pipe(
@@ -681,7 +695,7 @@ export class VisitsService {
         this.api.visit.getAllVisits({
           includeInactive: includeInactive,
           patient,
-          v: `custom:(uuid,visitType,location:(uuid,display,tags,parentLocation:(uuid,display)),startDatetime,attributes,stopDatetime,patient:(uuid,display,identifiers,person,voided),encounters:(uuid,form,location,obs,orders,diagnoses,encounterDatetime,encounterType))`,
+          v: `custom:(uuid,visitType,location:(uuid,display,tags,parentLocation:(uuid,display)),startDatetime,attributes,stopDatetime,patient:(uuid,display,identifiers,person,voided),encounters:(uuid,form,location,obs,orders,diagnoses,encounterProviders,encounterDatetime,encounterType))`,
         } as any)
       ),
       shouldNotLoadNonVisitItems
