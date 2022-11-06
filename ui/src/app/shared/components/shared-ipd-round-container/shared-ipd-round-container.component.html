@@ -1,7 +1,6 @@
 <div
   *ngIf="{
     observationsGroupedByIPDRounds: observationsGroupedByIPDRounds$ | async,
-    IPDRounds: IPDRounds$ | async,
     customForms: customForms$ | async
   } as params"
 >
@@ -9,14 +8,7 @@
     mode="indeterminate"
     *ngIf="!params?.customForms || !params?.observationsGroupedByIPDRounds"
   ></ng-progress-bar>
-  <div
-    *ngIf="
-      params?.customForms &&
-      params?.observationsGroupedByIPDRounds &&
-      params?.IPDRounds
-    "
-  >
-    <!-- {{ params?.IPDRounds[0] | json }} -->
+  <div *ngIf="params?.customForms && params?.observationsGroupedByIPDRounds">
     <mat-accordion>
       <mat-expansion-panel
         *ngFor="
@@ -26,13 +18,14 @@
       >
         <mat-expansion-panel-header>
           <mat-panel-title>
-            {{
-              params?.IPDRounds[count]
-                ? (params?.IPDRounds[count]?.observationDatetime
-                  | date: "medium")
-                : "-"
-            }}</mat-panel-title
-          >
+            <b>{{ count }}: </b>
+            <span class="ml-3">
+              {{
+                IPDRound?.roundData?.obsData?.observationDatetime
+                  | date: "medium"
+              }}
+            </span>
+          </mat-panel-title>
           <mat-panel-description>
             <!-- This is a summary of the content -->
           </mat-panel-description>
@@ -44,7 +37,7 @@
             {{ formField?.concept?.display }}:
             <span
               *ngFor="
-                let obs of IPDRound[formField?.concept?.uuid];
+                let obs of IPDRound?.groupedData[formField?.concept?.uuid];
                 let count = index
               "
             >
@@ -55,7 +48,10 @@
               </span>
               <span
                 class="ml-1"
-                *ngIf="count < IPDRound[formField?.concept?.uuid]?.length - 1"
+                *ngIf="
+                  count <
+                  IPDRound?.groupedData[formField?.concept?.uuid]?.length - 1
+                "
                 >,</span
               >
             </span>

@@ -13,6 +13,7 @@
         [fields]="[formField?.formField]"
         [isFormHorizontal]="false"
         [isReport]="isReport"
+        [fieldsData]="observations"
         (formUpdate)="onFormUpdate($event)"
       >
       </app-form>
@@ -53,6 +54,7 @@
             [fields]="member?.formFields"
             [isFormHorizontal]="true"
             [isReport]="isReport"
+            [fieldsData]="observations"
             (formUpdate)="onFormUpdate($event)"
           >
           </app-form>
@@ -70,6 +72,7 @@
             [fields]="[member]"
             [isFormHorizontal]="true"
             [isReport]="isReport"
+            [fieldsData]="observations"
             (formUpdate)="onFormUpdate($event)"
           >
           </app-form>
@@ -86,6 +89,7 @@
             [dataType]="member?.dataType"
             [isFormHorizontal]="true"
             [isReport]="isReport"
+            [fieldsData]="observations"
             (formUpdate)="onFormUpdate($event)"
           >
           </app-form>
@@ -128,6 +132,7 @@
                 [fields]="[subMember?.formField]"
                 [isFormHorizontal]="true"
                 [isReport]="isReport"
+                [fieldsData]="observations"
                 (formUpdate)="onFormUpdate($event)"
               >
               </app-form>

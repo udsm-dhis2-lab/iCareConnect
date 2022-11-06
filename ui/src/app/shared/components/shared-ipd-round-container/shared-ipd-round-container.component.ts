@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { Store } from "@ngrx/store";
 import { sortBy } from "lodash";
 import { Observable } from "rxjs";
@@ -6,10 +6,7 @@ import { map, tap } from "rxjs/operators";
 import { saveObservations } from "src/app/store/actions/observation.actions";
 import { AppState } from "src/app/store/reducers";
 import { getCustomOpenMRSFormsByIds } from "src/app/store/selectors/form.selectors";
-import {
-  getGroupedObservationByDateAndTimeOfIPDRounds,
-  getIPDRounds,
-} from "src/app/store/selectors/observation.selectors";
+import { getGroupedObservationByDateAndTimeOfIPDRounds } from "src/app/store/selectors/observation.selectors";
 import { FormService } from "../../modules/form/services/form.service";
 import { Visit } from "../../resources/visits/models/visit.model";
 
@@ -27,7 +24,7 @@ export class SharedIPDRoundContainerComponent implements OnInit {
   form$: Observable<any>;
   customForms$: Observable<any[]>;
   errors: any[] = [];
-  IPDRounds$: Observable<any[]>;
+  latestRound$: Observable<any>;
   constructor(
     private store: Store<AppState>,
     private formService: FormService
@@ -60,7 +57,5 @@ export class SharedIPDRoundContainerComponent implements OnInit {
     this.observationsGroupedByIPDRounds$ = this.store.select(
       getGroupedObservationByDateAndTimeOfIPDRounds(this.conceptUuid)
     );
-
-    this.IPDRounds$ = this.store.select(getIPDRounds(this.conceptUuid));
   }
 }

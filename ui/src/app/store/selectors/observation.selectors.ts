@@ -24,6 +24,32 @@ export const getObservationsByType = (type: string) =>
     )
   );
 
+export const getLatestIPDRound = (IPDRoundConceptUuid: string) =>
+  createSelector(getAllObservations, (observations: ObservationObject[]) => {
+    const ipdRoundsObs = orderBy(
+      (observations || [])?.filter(
+        (obs) => obs?.concept?.uuid == IPDRoundConceptUuid
+      ),
+      ["observationDatetime"],
+      ["asc"]
+    );
+    let rounds = [];
+    for (let count = 0; count < ipdRoundsObs?.length; count++) {
+      const date = new Date(ipdRoundsObs[count]?.observationDatetime);
+      rounds = [
+        ...rounds,
+        {
+          minTime: ipdRoundsObs[count]?.obsTime - 2,
+          maxTime: ipdRoundsObs[count]?.obsTime + 2,
+          date: ipdRoundsObs[count]?.obsDate,
+          ipdRound: count,
+          maxDateTime: date.setTime(date.getTime() + 2 * 60 * 60 * 1000),
+        },
+      ];
+    }
+    return rounds[rounds?.length - 1];
+  });
+
 export const getIPDRounds = (IPDRoundConceptUuid: string) =>
   createSelector(getAllObservations, (observations: ObservationObject[]) => {
     const ipdRoundsObs = orderBy(
@@ -76,6 +102,7 @@ export const getGroupedObservationByDateAndTimeOfIPDRounds = (
           maxTime: ipdRoundsObs[count]?.obsTime + 2,
           date: ipdRoundsObs[count]?.obsDate,
           ipdRound: count,
+          obsData: ipdRoundsObs[count],
           maxDateTime: date.setTime(date.getTime() + 2 * 60 * 60 * 1000),
         },
       ];
@@ -93,10 +120,13 @@ export const getGroupedObservationByDateAndTimeOfIPDRounds = (
 
       groupedObs = [
         ...groupedObs,
-        groupBy(
-          reverse(sortBy(obsGroup, "observationDatetime")),
-          "conceptUuid"
-        ),
+        {
+          roundData: dateTimeRanges[count],
+          groupedData: groupBy(
+            reverse(sortBy(obsGroup, "observationDatetime")),
+            "conceptUuid"
+          ),
+        },
       ];
     }
 
