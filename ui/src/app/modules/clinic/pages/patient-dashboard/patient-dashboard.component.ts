@@ -47,6 +47,7 @@ export class PatientDashboardComponent implements OnInit {
   errors: any[] = [];
   visitEndingControlStatusesConceptUuid$: Observable<string>;
   observations$: Observable<any>;
+  IPDRoundConceptUuid$: Observable<any>;
   constructor(
     private store: Store<AppState>,
     private route: ActivatedRoute,
@@ -54,6 +55,27 @@ export class PatientDashboardComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.IPDRoundConceptUuid$ = this.systemSettingsService
+      .getSystemSettingsByKey("iCare.ipd.settings.IPDRoundConceptUuid")
+      .pipe(
+        map((response) => {
+          if (response.error) {
+            this.errors = [...this.errors, response?.error];
+          }
+          if (response === "") {
+            this.errors = [
+              ...this.errors,
+              {
+                error: {
+                  message:
+                    "Missing IPD Round Metadata Configurations, Please set 'iCare.ipd.settings.IPDRoundConceptUuid' or Contact IT",
+                },
+              },
+            ];
+          }
+          return response;
+        })
+      );
     this.iCareGeneralConfigurations$ = this.systemSettingsService
       .getSystemSettingsByKey("iCare.GeneralMetadata.Configurations")
       .pipe(
