@@ -175,6 +175,9 @@ export class SharedPatientDashboardComponent implements OnInit {
           obs?.concept?.uuid === this.visitEndingControlStatusesConceptUuid
       ) || [])[0]?.valueObject;
     }
+    if (this.activeVisit?.isAdmitted) {
+      this.showRoundDetails = true;
+    }
 
     this.onStartConsultation(this.activeVisit);
     this.store.dispatch(loadOrderTypes());
@@ -330,6 +333,7 @@ export class SharedPatientDashboardComponent implements OnInit {
       event.stopPropagation();
     }
     this.selectedForm = form;
+    this.showRoundDetails = false;
     setTimeout(() => {
       this.readyForClinicalNotes = true;
     }, 50);

@@ -77,8 +77,11 @@
                 class="mr-2"
                 [ngClass]="{
                   'selected-form':
-                    (selectedForm && selectedForm?.uuid === form?.uuid) ||
+                    (selectedForm &&
+                      !showRoundDetails &&
+                      selectedForm?.uuid === form?.uuid) ||
                     (!selectedForm &&
+                      !showRoundDetails &&
                       dashboardParams?.forms[0]?.uuid === form?.uuid)
                 }"
                 mat-stroked-button
@@ -100,6 +103,11 @@
               >
                 {{ form?.name }}
               </a> -->
+              <button mat-button (click)="onToggleVisibityIcons($event)">
+                <mat-icon *ngIf="showRoundDetails">visibility_off</mat-icon>
+                <mat-icon *ngIf="!showRoundDetails">visibility</mat-icon>
+                Visit Information
+              </button>
             </ng-container>
           </div>
 
@@ -380,43 +388,21 @@
                   'col-lg-8 col-md-8 col-sm-12 col-sx-12 obs-table': isInpatient
                 }"
               >
-                <div
-                  class="w-100 d-flex justify-content-between"
-                  *ngIf="IPDRoundConceptUuid && activeVisit?.isAdmitted"
-                >
-                  <div class="w-50">
-                    <button mat-button (click)="onToggleVisibityIcons($event)">
-                      <mat-icon *ngIf="showRoundDetails"
-                        >visibility_off</mat-icon
-                      >
-                      <mat-icon *ngIf="!showRoundDetails">visibility</mat-icon>
-                      IPD Rounds
-                    </button>
-                  </div>
-                  <div class="w-50">
-                    <p class="float-right">
-                      Current Round:
-
-                      {{
-                        dashboardParams?.latestRound?.maxDateTime
-                          | date: "medium"
-                      }}
-                    </p>
-                  </div>
-                </div>
                 <div style="height: 90vh; overflow: auto">
                   <mat-progress-bar
                     *ngIf="!readyForClinicalNotes"
                     mode="indeterminate"
                   >
                   </mat-progress-bar>
-                  <div
-                    class="w-100"
-                    *ngIf="IPDRoundConceptUuid && activeVisit?.isAdmitted"
-                  >
+                  <div class="w-100" *ngIf="activeVisit?.isAdmitted">
                     <div class="w-100">
                       <div class="w-100 mt-2">
-                        <app-shared-ipd-round-container
+                        <app-shared-visit-history-summary
+                          *ngIf="showRoundDetails"
+                          [location]="dashboardParams?.currentLocation"
+                          [activeVisit]="activeVisit"
+                        ></app-shared-visit-history-summary>
+                        <!-- <app-shared-ipd-round-container
                           *ngIf="showRoundDetails"
                           [location]="dashboardParams?.currentLocation"
                           [activeVisit]="activeVisit"
@@ -424,7 +410,7 @@
                           [observations]="
                             dashboardParams?.observationsGroupedByConcept
                           "
-                        ></app-shared-ipd-round-container>
+                        ></app-shared-ipd-round-container> -->
                       </div>
                     </div>
                   </div>
@@ -435,7 +421,8 @@
                       !dashboardParams.loadingForms &&
                       dashboardParams.currentPatient &&
                       dashboardParams?.forms &&
-                      dashboardParams?.forms?.length > 0
+                      dashboardParams?.forms?.length > 0 &&
+                      !showRoundDetails
                     "
                     [clinicalObservations]="
                       dashboardParams?.observationsGroupedByConcept
