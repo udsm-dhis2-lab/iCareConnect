@@ -113,6 +113,7 @@ export class SingleRegistrationComponent implements OnInit {
   maxForBroughtOn: boolean = true;
   selectedSystem: any;
   fromExternalSystem: boolean;
+  transportMeans: Dropdown;
 
   constructor(
     private samplesService: SamplesService,
@@ -227,6 +228,27 @@ export class SingleRegistrationComponent implements OnInit {
           name: member?.display,
         };
       }),
+      shouldHaveLiveSearchForDropDownFields: false,
+    });
+
+    this.transportMeans = new Dropdown({
+      id: "transport",
+      key: "transport",
+      label: "Means of Transport",
+      options: [
+        {
+          key: "transport",
+          value: "Ice Cold",
+          label: "Ice Cold",
+          name: "Ice Cold",
+        },
+        {
+          key: "transport",
+          value: "Room Temperature",
+          label: "Room Temperature",
+          name: "Room Temperature",
+        },
+      ],
       shouldHaveLiveSearchForDropDownFields: false,
     });
 
@@ -1360,6 +1382,32 @@ export class SingleRegistrationComponent implements OnInit {
                                                                       broughtdByStatus,
                                                                     ];
                                                                   }
+                                                                  const meansOfTransportStatus =
+                                                                    {
+                                                                      sample:
+                                                                        {
+                                                                          uuid: sampleResponse?.uuid,
+                                                                        },
+                                                                      user: {
+                                                                        uuid: localStorage.getItem(
+                                                                          "userUuid"
+                                                                        ),
+                                                                      },
+                                                                      remarks:
+                                                                        this
+                                                                          .formData[
+                                                                          "transport"
+                                                                        ]?.value ||
+                                                                        "NO TRANSPORT MEANS SPECIFIED",
+                                                                      status:
+                                                                        "TRANSPORT_MEANS"
+                                                                    };
+                                                                  statuses = [
+                                                                    ...statuses,
+                                                                    meansOfTransportStatus
+                                                                  ];
+                                                                  
+
 
                                                                   statuses = [
                                                                     ...statuses,
