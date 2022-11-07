@@ -174,6 +174,7 @@ export class LabSamplesEffects {
                       status: "ACCEPTED",
                     }) || [])[0]
                   ),
+                  authorizationInfo: getAuthorizationDetails(sample),
                   acceptedAt: (_.filter(sample?.statuses, {
                     status: "ACCEPTED",
                   }) || [])[0]?.timestamp,
@@ -271,7 +272,11 @@ export class LabSamplesEffects {
                         order?.testAllocations,
                         (allocation) => {
                           const authorizationStatus = _.orderBy(
-                            allocation?.statuses,
+                            allocation?.statuses?.filter(
+                              (status) =>
+                                status?.status == "APPROVED" ||
+                                status?.category == "APPROVED"
+                            ) || [],
                             ["timestamp"],
                             ["desc"]
                           )[0];
@@ -1299,6 +1304,44 @@ export class LabSamplesEffects {
       )
     )
   );
+}
+
+function getAuthorizationDetails(sample) {
+  const approvedAllocations = _.flatten(
+    sample?.orders?.map((order) => {
+      return (
+        order?.testAllocations?.filter(
+          (allocation) =>
+            (
+              allocation?.statuses?.filter(
+                (status) =>
+                  status?.status == "APPROVED" || status?.category == "APPROVED"
+              ) || []
+            )?.length > 0
+        ) || []
+      );
+    })
+  );
+  const allocationStatuses = _.uniqBy(
+    _.flatten(
+      approvedAllocations?.map((allocation) => {
+        return allocation?.statuses?.map((status) => {
+          return {
+            ...status,
+            allocation: allocation,
+          };
+        });
+      })
+    )?.map((status) => {
+      return {
+        ...status,
+        ...status?.user,
+        name: status?.user?.display?.split(" (")[0],
+      };
+    }),
+    "name"
+  );
+  return allocationStatuses;
 }
 
 export function createSearchingText(sample) {

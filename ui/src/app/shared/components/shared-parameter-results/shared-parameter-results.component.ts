@@ -55,6 +55,20 @@ export class SharedParameterResultsComponent implements OnInit {
                 status?.status === "APPROVED" || status?.category === "APPROVED"
             ) || []
           )?.length > 0,
+        authorizedBy: {
+          ...(result?.statuses?.filter(
+            (status) =>
+              status?.status === "APPROVED" || status?.category === "APPROVED"
+          ) || [])[0],
+          ...(result?.statuses?.filter(
+            (status) =>
+              status?.status === "APPROVED" || status?.category === "APPROVED"
+          ) || [])[0]?.user,
+          name: (result?.statuses?.filter(
+            (status) =>
+              status?.status === "APPROVED" || status?.category === "APPROVED"
+          ) || [])[0]?.user?.display?.split(" (")[0],
+        },
         amended: result?.results?.length > 1 ? true : false,
         results: orderBy(result?.results, ["dateCreated"]["desc"])?.map(
           (resultValue, index) => {
