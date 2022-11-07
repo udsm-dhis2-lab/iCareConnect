@@ -60,6 +60,12 @@ export class HomeComponent implements OnInit {
         this.sampleTypes$ = !LISConfigs?.isLIS
           ? this.store.select(getAllSampleTypes)
           : this.conceptService.getConceptsBySearchTerm("SPECIMEN_SOURCE");
+
+        this.codedSampleRejectionReasons$ = !LISConfigs?.isLIS
+          ? this.store.select(getCodedSampleRejectionReassons)
+          : this.conceptService.getConceptsBySearchTerm(
+              "SAMPLE_REJECTION_REASONS"
+            );
       }
     });
   }

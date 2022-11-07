@@ -76,7 +76,7 @@ export class LabSamplesEffects {
               const samples = _.map(response, (sample) => {
                 const rejectionStatuses =
                   sample?.statuses?.filter(
-                    (status) => status?.category == "REJECTED"
+                    (status) => status?.category?.indexOf("REJECTED") > -1
                   ) || [];
                 return {
                   ...sample,
@@ -148,7 +148,15 @@ export class LabSamplesEffects {
                   rejected: rejectionStatuses?.length > 0 ? true : false,
                   rejectedBy:
                     rejectionStatuses?.length > 0
-                      ? rejectionStatuses[0]?.user
+                      ? {
+                          ...{
+                            ...rejectionStatuses[0]?.user,
+                            name: rejectionStatuses[0]?.user?.name?.split(
+                              " ("
+                            )[0],
+                          },
+                          ...rejectionStatuses[0],
+                        }
                       : null,
                   departmentName:
                     keyedDepartments[sample?.orders[0]?.order?.concept?.uuid]
@@ -186,6 +194,16 @@ export class LabSamplesEffects {
                     );
                     const formattedOrder = {
                       ...order,
+                      searchingText:
+                        order?.order?.concept?.display?.toLowerCase() +
+                        " " +
+                        (
+                          keyedSpecimenSources[
+                            order?.order?.concept?.uuid
+                          ]?.setMembers?.map((member) =>
+                            member?.display?.toLowerCase()
+                          ) || []
+                        )?.join(" "),
                       order: {
                         ...order?.order,
                         concept: {

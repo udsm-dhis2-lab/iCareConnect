@@ -4,10 +4,13 @@ import { Store } from "@ngrx/store";
 import { isThisSecond } from "date-fns";
 
 import * as _ from "lodash";
+import { Observable } from "rxjs";
 import { map, sample } from "rxjs/operators";
 import { PatientService } from "src/app/shared/services/patient.service";
+import { setSampleStatuses } from "src/app/store/actions";
 import { AppState } from "src/app/store/reducers";
 import { getParentLocation } from "src/app/store/selectors";
+import { getProviderDetails } from "src/app/store/selectors/current-user.selectors";
 
 @Component({
   selector: "app-print-results-modal",
@@ -26,6 +29,7 @@ export class PrintResultsModalComponent implements OnInit {
   phoneNumber: string;
   LISConfigurations: any;
   facilityDetails$: any;
+  providerDetails$: Observable<any>;
   constructor(
     private patientService: PatientService,
     private dialogRef: MatDialogRef<PrintResultsModalComponent>,
@@ -74,6 +78,7 @@ export class PrintResultsModalComponent implements OnInit {
 
     this.currentDepartmentSamples =
       this.patientDetailsAndSamples?.departments[0];
+    this.providerDetails$ = this.store.select(getProviderDetails);
   }
 
   setPanel(e, samplesGroupedByDepartment) {
@@ -81,7 +86,7 @@ export class PrintResultsModalComponent implements OnInit {
     this.currentDepartmentSamples = samplesGroupedByDepartment;
   }
 
-  onPrint(e, samplesGroupedByDepartment): void {
+  onPrint(e, samplesGroupedByDepartment, providerDetails): void {
     e.stopPropagation();
 
     // const doc = new jsPDF();
@@ -96,32 +101,61 @@ export class PrintResultsModalComponent implements OnInit {
     // });
     // doc.save('results_for' + this.samples['samples'][0]['mrNo'] + '.pdf');
 
-    var contents = document.getElementById(
-      samplesGroupedByDepartment?.departmentName
-    ).innerHTML;
-    const iframe: any = document.createElement("iframe");
-    iframe.name = "frame3";
-    iframe.style.position = "absolute";
-    iframe.style.width = "100%";
-    iframe.style.top = "-1000000px";
-    document.body.appendChild(iframe);
-    var frameDoc = iframe.contentWindow
-      ? iframe.contentWindow
-      : iframe.contentDocument.document
-      ? iframe.contentDocument.document
-      : iframe.contentDocument;
-    frameDoc.document.open();
-    frameDoc.document.write(
-      "<html><head> <style>button {display:none;}</style>"
+    const data = samplesGroupedByDepartment?.samples?.map((sample) => {
+      return {
+        sample: {
+          uuid: sample?.uuid,
+        },
+        user: {
+          uuid: localStorage.getItem("userUuid"),
+        },
+        remarks: "PRINTED",
+        category: "PRINT",
+        status: "PRINTED",
+      };
+    });
+    this.store.dispatch(
+      setSampleStatuses({
+        statuses: data,
+        details: {
+          ...sample,
+          printedBy: {
+            uuid: providerDetails?.uuid,
+            name: providerDetails?.display,
+            display: providerDetails?.display,
+          },
+        },
+      })
     );
-    frameDoc.document.write("</head><body>");
-    frameDoc.document.write(contents);
-    frameDoc.document.write("</body></html>");
-    frameDoc.document.close();
-    setTimeout(function () {
-      window.frames["frame3"].focus();
-      window.frames["frame3"].print();
-      document.body.removeChild(iframe);
+
+    setTimeout(() => {
+      var contents = document.getElementById(
+        samplesGroupedByDepartment?.departmentName
+      ).innerHTML;
+      const iframe: any = document.createElement("iframe");
+      iframe.name = "frame3";
+      iframe.style.position = "absolute";
+      iframe.style.width = "100%";
+      iframe.style.top = "-1000000px";
+      document.body.appendChild(iframe);
+      var frameDoc = iframe.contentWindow
+        ? iframe.contentWindow
+        : iframe.contentDocument.document
+        ? iframe.contentDocument.document
+        : iframe.contentDocument;
+      frameDoc.document.open();
+      frameDoc.document.write(
+        "<html><head> <style>button {display:none;}</style>"
+      );
+      frameDoc.document.write("</head><body>");
+      frameDoc.document.write(contents);
+      frameDoc.document.write("</body></html>");
+      frameDoc.document.close();
+      setTimeout(function () {
+        window.frames["frame3"].focus();
+        window.frames["frame3"].print();
+        document.body.removeChild(iframe);
+      }, 500);
     }, 500);
 
     //window.print();

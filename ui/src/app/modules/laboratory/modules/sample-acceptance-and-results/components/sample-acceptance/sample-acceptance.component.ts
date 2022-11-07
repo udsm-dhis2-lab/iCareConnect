@@ -223,7 +223,7 @@ export class SampleAcceptanceComponent implements OnInit {
               remarks: response?.rejectionRemarks
                 ? response?.rejectionRemarks
                 : "None",
-              category: "REJECTED",
+              category: "REJECTED_LABORATORY",
               status: reason?.uuid,
             };
           });
