@@ -265,7 +265,11 @@
                         <mat-icon *ngIf="samplesToViewMoreDetails[sample?.id]"
                           >expand_less</mat-icon
                         >
-                        {{!samplesToViewMoreDetails[sample?.id] 'View' ? 'Hide'}}
+                        {{
+                          !samplesToViewMoreDetails[sample?.id]
+                            ? "View"
+                            : "Hide"
+                        }}
                         Details
                       </a>
                     </div>
