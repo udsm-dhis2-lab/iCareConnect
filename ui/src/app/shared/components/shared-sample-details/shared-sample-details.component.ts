@@ -7,7 +7,16 @@ import { Component, Input, OnInit } from "@angular/core";
 })
 export class SharedSampleDetailsComponent implements OnInit {
   @Input() sample: any;
+  isClinical: boolean;
   constructor() {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    // console.log(this.sample);
+    this.isClinical =
+      (
+        this.sample?.statuses?.filter(
+          (status) => status?.status === "CLINICAL"
+        ) || []
+      )?.length > 0;
+  }
 }
