@@ -277,8 +277,10 @@ export class LabSamplesEffects {
                           )[0];
                           return {
                             ...allocation,
+                            parameterUuid: allocation?.concept?.uuid,
                             authorizationInfo:
-                              authorizationStatus?.status === "APPROVED"
+                              authorizationStatus?.status === "APPROVED" ||
+                              authorizationStatus?.category === "APPROVED"
                                 ? authorizationStatus
                                 : null,
                             firstSignOff:
@@ -344,6 +346,89 @@ export class LabSamplesEffects {
                             allocationUuid: allocation?.uuid,
                           };
                         }
+                      ),
+                      allocationsGroupedByParameterUuid: _.groupBy(
+                        _.map(order?.testAllocations, (allocation) => {
+                          const authorizationStatus = _.orderBy(
+                            allocation?.statuses,
+                            ["timestamp"],
+                            ["desc"]
+                          )[0];
+                          if (allocation?.results?.length > 0) {
+                            return {
+                              ...allocation,
+                              parameterUuid: allocation?.concept?.uuid,
+                              authorizationInfo:
+                                authorizationStatus?.status === "APPROVED" ||
+                                authorizationStatus?.category === "APPROVED"
+                                  ? authorizationStatus
+                                  : null,
+                              firstSignOff:
+                                allocation?.statuses?.length > 0 &&
+                                (_.orderBy(
+                                  allocation?.statuses,
+                                  ["timestamp"],
+                                  ["desc"]
+                                )[0]?.status == "APPROVED" ||
+                                  _.orderBy(
+                                    allocation?.statuses,
+                                    ["timestamp"],
+                                    ["desc"]
+                                  )[0]?.status == "AUTHORIZED")
+                                  ? true
+                                  : false,
+                              secondSignOff:
+                                allocation?.statuses?.length > 0 &&
+                                _.orderBy(
+                                  allocation?.statuses,
+                                  ["timestamp"],
+                                  ["desc"]
+                                )[0]?.status == "APPROVED" &&
+                                _.orderBy(
+                                  allocation?.statuses,
+                                  ["timestamp"],
+                                  ["desc"]
+                                )[1]?.status == "APPROVED"
+                                  ? true
+                                  : false,
+                              rejected:
+                                allocation?.statuses?.length > 0 &&
+                                (_.orderBy(
+                                  allocation?.statuses,
+                                  ["timestamp"],
+                                  ["desc"]
+                                )[0]?.status == "REJECTED" ||
+                                  _.orderBy(
+                                    allocation?.statuses,
+                                    ["timestamp"],
+                                    ["desc"]
+                                  )[0]?.category == "REJECTED")
+                                  ? true
+                                  : false,
+                              rejectionStatus:
+                                allocation?.statuses?.length > 0 &&
+                                _.orderBy(
+                                  allocation?.statuses,
+                                  ["timestamp"],
+                                  ["desc"]
+                                )[0]?.status == "REJECTED"
+                                  ? _.orderBy(
+                                      allocation?.statuses,
+                                      ["timestamp"],
+                                      ["desc"]
+                                    )[0]
+                                  : null,
+                              results: formatResults(allocation?.results),
+                              statuses: allocation?.statuses,
+                              resultsCommentsStatuses:
+                                getResultsCommentsStatuses(
+                                  allocation?.statuses
+                                ),
+                              allocationUuid: allocation?.uuid,
+                            };
+                          }
+                        })?.filter((alloc) => alloc),
+                        "parameterUuid"
                       ),
                     };
                     // console.log(formattedOrder);
