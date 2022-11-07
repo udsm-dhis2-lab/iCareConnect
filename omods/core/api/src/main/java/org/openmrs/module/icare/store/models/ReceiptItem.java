@@ -25,6 +25,9 @@ class ReceiptItemId implements java.io.Serializable {
 	@JoinColumn(name = "item_id", nullable = false)
 	private Item item;
 	
+	@Column(name = "batch_no", length = 32)
+	private String batchNo;
+	
 	public Receipt getReceipt() {
 		return receipt;
 	}
@@ -40,6 +43,14 @@ class ReceiptItemId implements java.io.Serializable {
 	public void setItem(Item item) {
 		this.item = item;
 	}
+	
+	public String getBatchNo() {
+		return this.batchNo;
+	}
+	
+	public void setBatchNo(String batchNo) {
+		this.batchNo = batchNo;
+	}
 }
 
 @Entity
@@ -51,9 +62,6 @@ public class ReceiptItem implements java.io.Serializable, Stockable {
 	
 	@Column(name = "quantity")
 	private Double quantity;
-	
-	@Column(name = "batch_no", length = 32)
-	private String batchNo;
 	
 	@Temporal(TemporalType.DATE)
 	@Column(name = "expiry_date", length = 10)
@@ -78,11 +86,15 @@ public class ReceiptItem implements java.io.Serializable, Stockable {
 	}
 	
 	public String getBatchNo() {
-		return this.batchNo;
+		return this.id.getBatchNo();
 	}
 	
 	public void setBatchNo(String batchNo) {
-		this.batchNo = batchNo;
+		if (id == null) {
+			this.id = new ReceiptItemId();
+		}
+		
+		this.id.setBatchNo(batchNo);
 	}
 	
 	public Date getExpiryDate() {
