@@ -39,12 +39,12 @@
     </mat-tab>
    
    
-  <mat-tab label="Sample Transport Means">
+  <mat-tab label="Transport Conditions">
       <ng-template matTabContent>
         <div class="p-3">
           <app-standard-concept-creation
             [conceptClass]="'Misc'"
-            [standardSearchTerm]="'SAMPLE_TRANSPORT_MEANS'"
+            [standardSearchTerm]="'SAMPLE_TRANSPORT_CONDITION'"
             (conceptCreated)="getConceptCreated($event)"
           ></app-standard-concept-creation>
         </div>
