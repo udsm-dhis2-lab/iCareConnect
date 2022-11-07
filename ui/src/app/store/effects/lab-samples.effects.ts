@@ -166,6 +166,9 @@ export class LabSamplesEffects {
                     name: sample?.creator?.display?.split(" (")[0],
                     uid: sample?.creator?.uuid,
                   },
+                  collectedByStatus: (sample?.statuses?.filter(
+                    (status) => status?.category === "COLLECTED_BY"
+                  ) || [])[0],
                   registeredBy: {
                     display: sample?.creator?.display?.split(" (")[0],
                     name: sample?.creator?.display?.split(" (")[0],
@@ -466,6 +469,12 @@ export class LabSamplesEffects {
                       status?.category === "RECEIVED_ON" ||
                       status?.status === "RECEIVED_ON"
                   ) || [])[0],
+                  deliveredByStatus: (sample?.statuses?.filter(
+                    (status) =>
+                      status?.category === "DELIVERED_BY" ||
+                      status?.status === "DELIVERED_BY"
+                  ) || [])[0],
+
                   receivedByStatus: (sample?.statuses?.filter(
                     (status) =>
                       status?.category === "RECEIVED_BY" ||
