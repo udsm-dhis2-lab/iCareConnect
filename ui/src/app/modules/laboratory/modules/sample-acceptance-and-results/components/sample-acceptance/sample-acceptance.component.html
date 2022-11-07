@@ -279,7 +279,10 @@
                     </div>
                   </td>
                 </tr>
-                <tr *ngIf="samplesToViewMoreDetails[sample?.id]">
+                <tr
+                  *ngIf="samplesToViewMoreDetails[sample?.id]"
+                  class="sample-details-row"
+                >
                   <td colspan="10">
                     <app-shared-sample-details
                       [sample]="sample"

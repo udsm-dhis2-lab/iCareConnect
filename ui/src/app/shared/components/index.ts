@@ -101,6 +101,7 @@ import { PatientAddressComponent } from "./patient-address/patient-address.compo
 import { SharedIPDRoundContainerComponent } from "./shared-ipd-round-container/shared-ipd-round-container.component";
 import { SharedSampleDetailsComponent } from "./shared-sample-details/shared-sample-details.component";
 import { SharedVisitHistorySummaryComponent } from "./shared-visit-history-summary/shared-visit-history-summary.component";
+import { SharedSystemSettingsListComponent } from "./shared-system-settings-list/shared-system-settings-list.component";
 
 export const components: any[] = [
   PatientAddressComponent,
@@ -207,6 +208,7 @@ export const components: any[] = [
   SharedIPDRoundContainerComponent,
   SharedSampleDetailsComponent,
   SharedVisitHistorySummaryComponent,
+  SharedSystemSettingsListComponent,
 ];
 
 export const sharedEntryComponents: any[] = [

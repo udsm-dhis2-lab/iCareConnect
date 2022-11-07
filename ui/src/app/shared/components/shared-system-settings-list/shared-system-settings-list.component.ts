@@ -2,14 +2,14 @@ import { Component, Input, OnInit } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { Observable } from "rxjs";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
-import { ManageSystemSettingComponent } from "../../../../shared/dialogs/manage-system-setting/manage-system-setting.component";
+import { ManageSystemSettingComponent } from "../../dialogs/manage-system-setting/manage-system-setting.component";
 
 @Component({
-  selector: "app-system-settings-list",
-  templateUrl: "./system-settings-list.component.html",
-  styleUrls: ["./system-settings-list.component.scss"],
+  selector: "app-shared-system-settings-list",
+  templateUrl: "./shared-system-settings-list.component.html",
+  styleUrls: ["./shared-system-settings-list.component.scss"],
 })
-export class SystemSettingsListComponent implements OnInit {
+export class SharedSystemSettingsListComponent implements OnInit {
   systemSettings$: Observable<any>;
   page: number = 1;
   pageSize: number = 10;
