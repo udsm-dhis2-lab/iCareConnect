@@ -21,6 +21,9 @@ import { Textbox } from "src/app/shared/modules/form/models/text-box.model";
 import * as moment from "moment";
 import { MatDatepickerInputEvent } from "@angular/material/datepicker";
 import { PersonService } from "src/app/core/services/person.service";
+import { Observable } from "rxjs";
+import { map, tap } from "rxjs/operators";
+import { PatientService } from "src/app/shared/services/patient.service";
 
 @Component({
   selector: "app-person-details",
@@ -45,6 +48,7 @@ export class PersonDetailsComponent implements OnInit {
   identifierTypes: any[] = [];
   age: number = 0;
   month: number = 0;
+  searchByIdentifier: boolean = false;
 
   selectedClientData: any;
 
@@ -59,10 +63,14 @@ export class PersonDetailsComponent implements OnInit {
 
   @Output() fromExternalSystem: EventEmitter<boolean> =
     new EventEmitter<boolean>();
+  existingPersons$: Observable<any>;
+  showSearchedDetails: boolean = false;
+  lastIdentifier: string;
 
   constructor(
     private registrationService: RegistrationService,
-    private personService: PersonService
+    private personService: PersonService,
+    private patientService: PatientService
   ) {}
 
   ngOnInit(): void {
@@ -93,7 +101,8 @@ export class PersonDetailsComponent implements OnInit {
     personDetails?: any,
     patientIdentifier?: string
   ): void {
-    // console.log("identifierTypes", identifierTypes);
+    console.log("==> IdentifierTypes", identifierTypes);
+    console.log("==> Patient Details: ", personDetails?.identifiers);
     const primaryIdentifiers =
       identifierTypes?.filter(
         (identifier) => identifier?.uniquenessBehavior === "UNIQUE"
@@ -146,7 +155,9 @@ export class PersonDetailsComponent implements OnInit {
     this.personDetailsData["age"] = this.age;
     this.personDetailsData["month"] = this.month;
 
-    let monthDate = this.personDetailsData["month"] ? new Date().getMonth() - Number(this.personDetailsData["month"]) : new Date().getMonth();
+    let monthDate = this.personDetailsData["month"]
+      ? new Date().getMonth() - Number(this.personDetailsData["month"])
+      : new Date().getMonth();
     this.personDetailsData["dob"] = new Date(
       new Date().getFullYear() - Number(this.personDetailsData["age"]),
       monthDate,
@@ -200,8 +211,11 @@ export class PersonDetailsComponent implements OnInit {
 
   onUpdatePrimaryIdentifierForm(formValues: FormValue): void {
     const values = formValues.getValues();
+    let identifier;
     Object.keys(values).forEach((key) => {
       this.personDetailsData[key] = values[key]?.value;
+      identifier = values[key]?.value;
+      this.lastIdentifier = key;
     });
     this.personDetails.emit({
       ...this.personDetailsData,
@@ -209,6 +223,20 @@ export class PersonDetailsComponent implements OnInit {
       patientUuid: this.patientUuid,
       pimaCOVIDLinkDetails: this.selectedClientData,
     });
+    this.searchByIdentifier = true;
+    this.showSearchedDetails = true;
+    this.existingPersons$ = this.personService
+      .getPatientsByIdentifier(identifier)
+      .pipe(
+        tap((response) => {
+          this.searchByIdentifier = false;
+        })
+      );
+  }
+
+  onShowSearchedDetails(e: Event) {
+    e.stopPropagation();
+    this.showSearchedDetails = false;
   }
 
   onUpdateIdentifierForm(formValues: FormValue): void {
@@ -227,6 +255,28 @@ export class PersonDetailsComponent implements OnInit {
   toggleIdentifiers(event: Event): void {
     event.stopPropagation();
     this.showOtherIdentifiers = !this.showOtherIdentifiers;
+  }
+
+  onSelectExisting(e: Event, person: any) {
+    e.stopPropagation();
+    this.patientService
+      .getPatientsDetails(person?.uuid)
+      .pipe(
+        tap((personDetails) => {
+          if (!personDetails?.error) {
+            const person = {
+              ...personDetails?.person,
+              identifiers: personDetails?.identifiers
+            };
+            this.setPersonDetails(person);
+            this.showSearchedDetails = false;
+          }
+          if (personDetails?.error) {
+            console.log("==> Error when trying to get details: ");
+          }
+        })
+      )
+      .subscribe();
   }
 
   setPersonDetails(personDetails?: any): void {

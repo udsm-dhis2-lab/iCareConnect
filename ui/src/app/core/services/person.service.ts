@@ -1,4 +1,5 @@
 import { Injectable } from "@angular/core";
+import { offset } from "highcharts";
 import { from, Observable, of } from "rxjs";
 import { catchError, map } from "rxjs/operators";
 import { OpenmrsHttpClientService } from "src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service";
@@ -31,6 +32,9 @@ export class PersonService {
               };
             }) || []
           : response?.results;
+      }),
+      catchError((error) => {
+        return of(error)
       })
     );
   }
