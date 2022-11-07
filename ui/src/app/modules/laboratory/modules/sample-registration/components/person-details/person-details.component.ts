@@ -101,8 +101,6 @@ export class PersonDetailsComponent implements OnInit {
     personDetails?: any,
     patientIdentifier?: string
   ): void {
-    console.log("==> IdentifierTypes", identifierTypes);
-    console.log("==> Patient Details: ", personDetails?.identifiers);
     const primaryIdentifiers =
       identifierTypes?.filter(
         (identifier) => identifier?.uniquenessBehavior === "UNIQUE"
@@ -264,9 +262,10 @@ export class PersonDetailsComponent implements OnInit {
       .pipe(
         tap((personDetails) => {
           if (!personDetails?.error) {
+            this.patientUuid = personDetails?.uuid;
             const person = {
               ...personDetails?.person,
-              identifiers: personDetails?.identifiers
+              identifiers: personDetails?.identifiers,
             };
             this.setPersonDetails(person);
             this.showSearchedDetails = false;
