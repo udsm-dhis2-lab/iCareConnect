@@ -25,8 +25,8 @@
     </div>
   </div>
 
-  <div style="padding: 10px">
-    <span *ngIf="!LISConfigurations?.isLIS"
+  <div style="padding: 10px" *ngIf="!LISConfigurations?.isLIS">
+    <span
       >Patient:
       {{ params?.currentSample?.patient?.givenName }}
       {{ params?.currentSample?.patient?.midllename }}
@@ -40,6 +40,17 @@
     *ngIf="loadingTestTimeSettings"
   ></mat-progress-bar>
   <div style="padding: 10px" *ngIf="!loadingTestTimeSettings">
+    <div class="w-50" *ngIf="LISConfigurations?.isLIS">
+      <mat-form-field class="w-50">
+        <mat-label>Search</mat-label>
+        <mat-icon matPrefix>search</mat-icon
+        ><input
+          matInput
+          (keyup)="onSearch($event)"
+          [(ngModel)]="searchingText"
+        />
+      </mat-form-field>
+    </div>
     <mat-tab-group>
       <mat-tab label="Results" *ngIf="dialogData?.actionType === 'Entry'">
         <div
@@ -49,7 +60,7 @@
           <table class="table table-bordered">
             <thead class="table-header">
               <tr>
-                <th style="width: 15%">Test Parameter</th>
+                <th style="width: 15%">Test Order</th>
                 <th style="width: 5%">Container</th>
                 <th style="width: 5%" *ngIf="!LISConfigurations?.isLIS">
                   Label
@@ -62,7 +73,12 @@
               </tr>
             </thead>
             <tbody>
-              <ng-container *ngFor="let item of params?.testOrders">
+              <ng-container
+                *ngFor="
+                  let item of params?.testOrders
+                    | searchTestDetails: searchingText
+                "
+              >
                 <ng-container
                   *ngIf="item?.order?.concept?.setMembers?.length == 0"
                 >

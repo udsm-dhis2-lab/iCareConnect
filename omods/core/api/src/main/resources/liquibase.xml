@@ -3102,6 +3102,14 @@
         </sql>
     </changeSet>
 
+    <changeSet id="update_primary_key_for_st_receipt_item" author="dennis-kibahila" dbms="mysql">
+
+        <sql>
+            ALTER TABLE st_receipt_item DROP PRIMARY KEY, ADD PRIMARY KEY(receipt_id,item_id,batch_no)
+        </sql>
+
+    </changeSet>
+
 
 
 </databaseChangeLog>

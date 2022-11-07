@@ -40,6 +40,7 @@ import { getLISConfigurations } from "src/app/store/selectors/lis-configurations
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { OpenmrsHttpClientService } from "../../modules/openmrs-http-client/services/openmrs-http-client.service";
 import { catchError, map } from "rxjs/operators";
+import { ManageUserProfileModalComponent } from "../../dialogs/manage-user-profile-modal/manage-user-profile-modal.component";
 
 @Component({
   selector: "app-menu",
@@ -184,5 +185,11 @@ export class MenuComponent implements OnInit {
           this.store.dispatch(go({ path: ["login"] }));
         }
       });
+  }
+
+  onUpdateProfile(): void {
+    this.dialog.open(ManageUserProfileModalComponent, {
+      width: "40%",
+    });
   }
 }

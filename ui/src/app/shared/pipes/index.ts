@@ -13,6 +13,7 @@ import { FilterDiagnosesPipe } from "./filter-diagnoses.pipe";
 import { UpdatePrivilegesWithSelectedAttributePipe } from "./update-privileges-with-selected-attribute.pipe";
 import { UpdateRolesWithSelectedAttributePipe } from "./update-roles-with-selected-attribute.pipe";
 import { SanitizeDangerousUrlPipe } from "./sanitize-dangerous-url.pipe";
+import { SearchTestDetailsPipe } from "./search-test-details.pipe";
 
 export const sharedPipes: any[] = [
   FilterByPipe,
@@ -30,4 +31,5 @@ export const sharedPipes: any[] = [
   UpdatePrivilegesWithSelectedAttributePipe,
   UpdateRolesWithSelectedAttributePipe,
   SanitizeDangerousUrlPipe,
+  SearchTestDetailsPipe,
 ];
