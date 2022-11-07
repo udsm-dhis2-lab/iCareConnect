@@ -98,12 +98,31 @@
                     </td>
                     <td>{{ patientDetailsAndSamples?.mrn }}</td>
                     <td>
-                      <b> Ordering Doctor </b>
+                      <b>
+                        {{
+                          !LISConfigurations?.isLIS
+                            ? "Ordering Doctor"
+                            : "Registered By"
+                        }}
+                      </b>
                     </td>
                     <td>
                       {{
                         samplesGroupedByDepartment["samples"][0]["orders"][0]
                           ?.order?.orderer?.name
+                      }}
+                    </td>
+                  </tr>
+                  <tr *ngIf="LISConfigurations?.isLIS">
+                    <td></td>
+                    <td></td>
+                    <td>
+                      <b> Registered On </b>
+                    </td>
+                    <td>
+                      {{
+                        samplesGroupedByDepartment["samples"][0]?.dateCreated
+                          | date: "medium"
                       }}
                     </td>
                   </tr>
@@ -143,26 +162,34 @@
                     </td>
                     <td>
                       {{
-                        samplesGroupedByDepartment?.samples[0]?.collectedBy
-                          ?.name
+                        !LISConfigurations?.isLIS
+                          ? samplesGroupedByDepartment?.samples[0]?.collectedBy
+                              ?.name
+                          : samplesGroupedByDepartment?.samples[0]
+                              ?.collectedByStatus?.remarks
                       }}
                     </td>
                   </tr>
                   <tr>
                     <td>
-                      <b> Location/Source </b>
+                      <b *ngIf="!LISConfigurations?.isLIS"> Location/Source </b>
                     </td>
                     <td>
-                      {{
-                        samplesGroupedByDepartment["samples"][0]?.orders[0]
-                          ?.order?.location?.name
-                      }}
+                      <span *ngIf="!LISConfigurations?.isLIS">
+                        {{
+                          samplesGroupedByDepartment["samples"][0]?.orders[0]
+                            ?.order?.location?.name
+                        }}
+                      </span>
                     </td>
-                    <td><b>Sample Collected At</b></td>
+                    <td><b>Sample Collected On</b></td>
                     <td>
                       {{
-                        samplesGroupedByDepartment?.samples[0]?.created
-                          | date: "medium"
+                        !LISConfigurations?.isLIS
+                          ? (samplesGroupedByDepartment?.samples[0]?.created
+                            | date: "medium")
+                          : (samplesGroupedByDepartment?.samples[0]
+                              ?.collectedByStatus?.timestamp | date: "medium")
                       }}
                     </td>
                   </tr>
@@ -171,12 +198,18 @@
                       <b> Phone </b>
                     </td>
                     <td>{{ phoneNumber }}</td>
-                    <td><b>Sample Accepted At/Arrival Date</b></td>
                     <td>
-                      {{
-                        samplesGroupedByDepartment?.samples[0]?.acceptedAt
-                          | date: "medium"
-                      }}
+                      <b *ngIf="!LISConfigurations?.isLIS"
+                        >Sample Accepted At/Arrival Date</b
+                      >
+                    </td>
+                    <td>
+                      <span *ngIf="!LISConfigurations?.isLIS">
+                        {{
+                          samplesGroupedByDepartment?.samples[0]?.acceptedAt
+                            | date: "medium"
+                        }}
+                      </span>
                     </td>
                   </tr>
                   <tr>
@@ -189,6 +222,19 @@
                       {{
                         samplesGroupedByDepartment?.samples[0]?.acceptedBy?.user
                           ?.name
+                      }}
+                    </td>
+                  </tr>
+                  <tr *ngIf="LISConfigurations?.isLIS">
+                    <td></td>
+                    <td></td>
+                    <td>
+                      <b> Sample Accepted On </b>
+                    </td>
+                    <td>
+                      {{
+                        samplesGroupedByDepartment?.samples[0]?.acceptedBy
+                          ?.timestamp | date: "medium"
                       }}
                     </td>
                   </tr>
