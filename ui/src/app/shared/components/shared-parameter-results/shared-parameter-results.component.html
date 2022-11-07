@@ -40,7 +40,10 @@
                   >
                     <em>
                       By {{ resultAllocation?.authorizedBy?.name }} On
-                      {{ resultAllocation?.authorizedBy | date: "medium" }}</em
+                      {{
+                        resultAllocation?.authorizedBy?.timestamp
+                          | date: "medium"
+                      }}</em
                     >
                   </span>
                 </td>

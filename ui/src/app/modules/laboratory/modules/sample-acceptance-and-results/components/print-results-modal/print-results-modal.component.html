@@ -192,7 +192,7 @@
                       }}
                     </td>
                   </tr>
-                  <tr>
+                  <tr *ngIf="!LISConfigurations?.isLIS">
                     <td></td>
                     <td></td>
                     <td>
@@ -209,7 +209,7 @@
                     </td>
                   </tr>
 
-                  <tr>
+                  <tr *ngIf="!LISConfigurations?.isLIS">
                     <td></td>
                     <td></td>
                     <td>
