@@ -83,6 +83,35 @@
     </div>
   </div>
 
+  <mat-progress-bar
+  *ngIf="searchByIdentifier && showSearchedDetails"
+  mode="indeterminate"
+  ></mat-progress-bar>
+  <div *ngIf="existingPersons$ | async as persons">
+        <mat-progress-bar
+          *ngIf="!persons && !searchByIdentifier && showSearchedDetails"
+          mode="indeterminate"
+        ></mat-progress-bar>
+        <div *ngIf="persons.length > 0 && showSearchedDetails" class="existing-table" >
+          <table class="table w-100 table-bordered table-striped">
+            <tbody>
+              <tr *ngFor="let person of persons">
+                <td class="w-75">{{ person?.display }}</td>
+                <td class="w-25">
+                  <button 
+                  class="colored-button"
+                  color="primary"
+                  mat-stroked-button 
+                  (click)="onSelectExisting($event, person)">
+                    Select
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+  </div>
+
   <app-form
     *ngIf="showOtherIdentifiers"
     [fields]="identifiersFields"
