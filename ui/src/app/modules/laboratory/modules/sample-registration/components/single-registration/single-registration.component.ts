@@ -231,25 +231,38 @@ export class SingleRegistrationComponent implements OnInit {
       shouldHaveLiveSearchForDropDownFields: false,
     });
 
+    // this.transportMeans = new Dropdown({
+    //   id: "transport",
+    //   key: "transport",
+    //   label: "Means of Transport",
+    //   options: [
+    //     {
+    //       key: "transport",
+    //       value: "Ice Cold",
+    //       label: "Ice Cold",
+    //       name: "Ice Cold",
+    //     },
+    //     {
+    //       key: "transport",
+    //       value: "Room Temperature",
+    //       label: "Room Temperature",
+    //       name: "Room Temperature",
+    //     },
+    //   ],
+    //   shouldHaveLiveSearchForDropDownFields: false,
+    // });
+
     this.transportMeans = new Dropdown({
       id: "transport",
       key: "transport",
       label: "Means of Transport",
-      options: [
-        {
-          key: "transport",
-          value: "Ice Cold",
-          label: "Ice Cold",
-          name: "Ice Cold",
-        },
-        {
-          key: "transport",
-          value: "Room Temperature",
-          label: "Room Temperature",
-          name: "Room Temperature",
-        },
-      ],
-      shouldHaveLiveSearchForDropDownFields: false,
+      searchTerm: "SAMPLE_TRANSPORT_MEANS",
+      required: true,
+      options: [],
+      multiple: false,
+      conceptClass: "Misc",
+      searchControlType: "concept",
+      shouldHaveLiveSearchForDropDownFields: true,
     });
 
     const currentLocation = JSON.parse(localStorage.getItem("currentLocation"));
@@ -1410,7 +1423,7 @@ export class SingleRegistrationComponent implements OnInit {
                                                                                       : "Sample Saved",
                                                                                 },
                                                                                 disableClose:
-                                                                                  false,
+                                                                                  true,
                                                                                 panelClass:
                                                                                   "custom-dialog-container",
                                                                               }
