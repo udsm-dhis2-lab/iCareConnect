@@ -462,6 +462,7 @@ export class SingleRegistrationComponent implements OnInit {
 
   onFormUpdate(formValues: FormValue, itemKey?: string): void {
     //Validate Date fields
+    this.formData = { ...this.formData, ...formValues.getValues() };
     if (formValues.getValues()?.collectedOn?.value.toString()?.length > 0) {
       let collected_on_date;
       collected_on_date = this.getDateStringFromDate(
@@ -523,7 +524,6 @@ export class SingleRegistrationComponent implements OnInit {
     this.maxForCollectedOn = true;
 
     // this.getDateStringFromMoment_i();
-    this.formData = { ...this.formData, ...formValues.getValues() };
     if (
       itemKey &&
       itemKey === "specimenDetails" &&
@@ -539,7 +539,7 @@ export class SingleRegistrationComponent implements OnInit {
 
   onFormUpdateForTest(testValues: any): void {
     Object.keys(this.formData).forEach((key) => {
-      if (!testValues[key]) {
+      if (!testValues[key] && key?.indexOf("test") > -1) {
         this.formData = omit(this.formData, key);
       }
     });
@@ -1102,6 +1102,8 @@ export class SingleRegistrationComponent implements OnInit {
                                                                             "agency"
                                                                           ]
                                                                             ?.value,
+                                                                        category:
+                                                                          "PRIORITY",
                                                                         status:
                                                                           "PRIORITY",
                                                                       };
@@ -1132,6 +1134,8 @@ export class SingleRegistrationComponent implements OnInit {
                                                                           "RECEIVED_ON",
                                                                         status:
                                                                           "RECEIVED_ON",
+                                                                        category:
+                                                                          "RECEIVED_ON",
                                                                         timestamp:
                                                                           new Date(
                                                                             `${moment(
@@ -1149,7 +1153,7 @@ export class SingleRegistrationComponent implements OnInit {
                                                                               ]
                                                                                 ?.value
                                                                             }:00.001Z`
-                                                                          ).getTime(),
+                                                                          ),
                                                                       };
                                                                     statuses = [
                                                                       ...statuses,
@@ -1180,8 +1184,14 @@ export class SingleRegistrationComponent implements OnInit {
                                                                             "condition"
                                                                           ]
                                                                             ?.value,
-                                                                        status:
+                                                                        category:
                                                                           "CONDITION",
+                                                                        status:
+                                                                          this
+                                                                            .formData[
+                                                                            "condition"
+                                                                          ]
+                                                                            ?.value,
                                                                       };
                                                                     statuses = [
                                                                       ...statuses,
@@ -1208,6 +1218,8 @@ export class SingleRegistrationComponent implements OnInit {
                                                                               "userUuid"
                                                                             ),
                                                                       },
+                                                                      category:
+                                                                        "RECEIVED_BY",
                                                                       remarks:
                                                                         "RECEIVED_BY",
                                                                       status:
@@ -1240,7 +1252,7 @@ export class SingleRegistrationComponent implements OnInit {
                                                                               ?.value
                                                                               ? `${this.formData["receivedAt"]?.value}:00.001`
                                                                               : "00:00:00:001Z")
-                                                                        ).getTime(),
+                                                                        ),
                                                                     };
                                                                   statuses = [
                                                                     ...statuses,
@@ -1277,6 +1289,8 @@ export class SingleRegistrationComponent implements OnInit {
                                                                           "NO COLLECTOR SPECIFIED",
                                                                         status:
                                                                           "COLLECTED_BY",
+                                                                        category:
+                                                                          "COLLECTED_BY",
                                                                         timestamp:
                                                                           new Date(
                                                                             (this
@@ -1305,7 +1319,7 @@ export class SingleRegistrationComponent implements OnInit {
                                                                                 ?.value
                                                                                 ? `${this.formData["collectedAt"]?.value}:00.001`
                                                                                 : "00:00:00:001Z")
-                                                                          ).getTime(),
+                                                                          ),
                                                                       };
                                                                     statuses = [
                                                                       ...statuses,
@@ -1348,6 +1362,8 @@ export class SingleRegistrationComponent implements OnInit {
                                                                           "NO PERSON SPECIFIED",
                                                                         status:
                                                                           "DELIVERED_BY",
+                                                                        category:
+                                                                          "DELIVERED_BY",
                                                                         timestamp:
                                                                           new Date(
                                                                             (this
@@ -1375,19 +1391,25 @@ export class SingleRegistrationComponent implements OnInit {
                                                                                 ?.value
                                                                                 ? `${this.formData["broughtAt"]?.value}:00.001`
                                                                                 : "00:00:00:001Z")
-                                                                          ).getTime(),
+                                                                          ),
                                                                       };
                                                                     statuses = [
                                                                       ...statuses,
                                                                       broughtdByStatus,
                                                                     ];
                                                                   }
+                                                                  if (
+                                                                    this
+                                                                      .formData[
+                                                                      "transport"
+                                                                    ]?.value
+                                                                  ) {
+                                                                  }
                                                                   const meansOfTransportStatus =
                                                                     {
-                                                                      sample:
-                                                                        {
-                                                                          uuid: sampleResponse?.uuid,
-                                                                        },
+                                                                      sample: {
+                                                                        uuid: sampleResponse?.uuid,
+                                                                      },
                                                                       user: {
                                                                         uuid: localStorage.getItem(
                                                                           "userUuid"
@@ -1397,17 +1419,18 @@ export class SingleRegistrationComponent implements OnInit {
                                                                         this
                                                                           .formData[
                                                                           "transport"
-                                                                        ]?.value ||
+                                                                        ]
+                                                                          ?.value ||
                                                                         "NO TRANSPORT MEANS SPECIFIED",
+                                                                      category:
+                                                                        "TRANSPORT_MEANS",
                                                                       status:
-                                                                        "TRANSPORT_MEANS"
+                                                                        "TRANSPORT_MEANS",
                                                                     };
                                                                   statuses = [
                                                                     ...statuses,
-                                                                    meansOfTransportStatus
+                                                                    meansOfTransportStatus,
                                                                   ];
-                                                                  
-
 
                                                                   statuses = [
                                                                     ...statuses,

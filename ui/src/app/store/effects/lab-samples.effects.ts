@@ -354,10 +354,14 @@ export class LabSamplesEffects {
                     (status) => status?.remarks === "PRIORITY"
                   ) || [])[0],
                   receivedOnStatus: (sample?.statuses?.filter(
-                    (status) => status?.remarks === "RECEIVED_ON"
+                    (status) =>
+                      status?.category === "RECEIVED_ON" ||
+                      status?.status === "RECEIVED_ON"
                   ) || [])[0],
                   receivedByStatus: (sample?.statuses?.filter(
-                    (status) => status?.remarks === "RECEIVED_BY"
+                    (status) =>
+                      status?.category === "RECEIVED_BY" ||
+                      status?.status === "RECEIVED_BY"
                   ) || [])[0],
                   priorityHigh:
                     (
