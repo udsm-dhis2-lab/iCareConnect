@@ -192,7 +192,7 @@
                       }}
                     </td>
                   </tr>
-                  <tr>
+                  <tr *ngIf="!LISConfigurations?.isLIS">
                     <td></td>
                     <td></td>
                     <td>
@@ -209,7 +209,7 @@
                     </td>
                   </tr>
 
-                  <tr>
+                  <tr *ngIf="!LISConfigurations?.isLIS">
                     <td></td>
                     <td></td>
                     <td>
@@ -261,7 +261,7 @@
                               <td *ngIf="!LISConfigurations?.isLIS">Test #</td>
                               <td>Parameter</td>
                               <td>Results</td>
-                              <td>SI Units</td>
+                              <!-- <td>SI Units</td> -->
                               <td *ngIf="!LISConfigurations?.isLIS">LL</td>
                               <td *ngIf="!LISConfigurations?.isLIS">UL</td>
                               <td>Remarks</td>
@@ -367,14 +367,24 @@
                                   >
                                     <!-- {{ parameter | json }} -->
                                     <app-shared-parameter-results
+                                      *ngIf="
+                                        order
+                                          ?.allocationsGroupedByParameterUuid[
+                                          parameter?.uuid
+                                        ]
+                                      "
                                       [order]="order"
                                       [count]="count"
                                       [parameter]="parameter"
+                                      [units]="
+                                        order?.order?.concept?.setMembers[count]
+                                          ?.units
+                                      "
                                     ></app-shared-parameter-results>
                                   </div>
                                 </div>
                               </td>
-                              <td>
+                              <!-- <td>
                                 <p
                                   *ngIf="
                                     order?.order?.concept?.setMembers?.length ==
@@ -397,34 +407,44 @@
                                     0
                                   "
                                 >
-                                  <span
+                                  <ng-container
                                     *ngFor="
                                       let allocation of order?.testAllocations;
                                       let count = index
                                     "
                                   >
-                                    <span
+                                    <ng-container
                                       *ngIf="
-                                        order?.order?.concept?.setMembers[count]
-                                          ?.units
+                                        order
+                                          ?.allocationsGroupedByParameterUuid[
+                                          allocation?.concept?.uuid
+                                        ]
                                       "
                                     >
-                                      {{ order?.order?.concept?.units }}
-                                    </span>
-                                    <span
-                                      style="font-size: 0.7rem"
-                                      *ngIf="
-                                        !order?.order?.concept?.setMembers[
-                                          count
-                                        ]?.units
-                                      "
-                                    >
-                                      -
-                                    </span>
-                                    <br />
-                                  </span>
+                                      <span
+                                        *ngIf="
+                                          order?.order?.concept?.setMembers[
+                                            count
+                                          ]?.units
+                                        "
+                                      >
+                                        {{ order?.order?.concept?.units }}
+                                      </span>
+                                      <span
+                                        style="font-size: 0.7rem"
+                                        *ngIf="
+                                          !order?.order?.concept?.setMembers[
+                                            count
+                                          ]?.units
+                                        "
+                                      >
+                                        -
+                                      </span>
+                                      <br />
+                                    </ng-container>
+                                  </ng-container>
                                 </p>
-                              </td>
+                              </td> -->
 
                               <td *ngIf="!LISConfigurations?.isLIS">
                                 <p
@@ -610,22 +630,21 @@
                   <table>
                     <tr>
                       <td>
-                        <img
-                          src="assets/images/arrowupred.png"
-                          height="12px"
-                        />above normal range
+                        <img src="assets/images/arrowupred.png" height="12px" />
+                        <span class="ml-1"> Above normal range </span>
                       </td>
                       <td>
                         &nbsp;
                         <img
                           src="assets/images/arrowdownred.png"
                           height="12px"
-                        />below normal range
+                        /><span class="ml-1"> Below normal range </span>
                       </td>
                       <td></td>
                     </tr>
                   </table>
                 </div>
+                <!-- {{ samplesGroupedByDepartment?.samples[0] | json }} -->
                 <div
                   style="text-align: left; padding: 6px 0"
                   class="providers-details"
@@ -646,9 +665,8 @@
                           ? samplesGroupedByDepartment?.samples[0]?.orders[0]
                               ?.testAllocations[0]?.statuses[0]?.user?.display
                           : null
-                        : samplesGroupedByDepartment?.samples[0]?.orders[0]
-                            ?.testAllocations[0]?.authorizationInfo?.user
-                            ?.display
+                        : samplesGroupedByDepartment?.samples[0]
+                            ?.authorizationInfo[0]?.name
                     }},
                     <b>
                       {{
@@ -665,9 +683,8 @@
                               ?.testAllocations[0]?.statuses[0]?.timestamp
                             | date: "medium")
                           : null
-                        : (samplesGroupedByDepartment?.samples[0]?.orders[0]
-                            ?.testAllocations[0]?.authorizationInfo?.timestamp
-                          | date: "medium")
+                        : (samplesGroupedByDepartment?.samples[0]
+                            ?.authorizationInfo[0]?.timestamp | date: "medium")
                     }}
                   </span>
                 </div>

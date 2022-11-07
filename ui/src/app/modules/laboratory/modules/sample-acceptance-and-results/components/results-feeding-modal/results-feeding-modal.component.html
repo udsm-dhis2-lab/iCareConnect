@@ -458,7 +458,7 @@
 
                             <div
                               class="w-100"
-                              *ngIf="parameter?.datatype?.display !== 'Complex'"
+                              *ngIf="parameter?.datatype?.display === 'Numeric'"
                             >
                               <mat-checkbox
                                 [checked]="
@@ -1315,7 +1315,7 @@
 
                             <div
                               class="w-100"
-                              *ngIf="parameter?.datatype?.display !== 'Complex'"
+                              *ngIf="parameter?.datatype?.display === 'Numeric'"
                             >
                               <mat-checkbox
                                 [checked]="

@@ -174,6 +174,7 @@ export class LabSamplesEffects {
                       status: "ACCEPTED",
                     }) || [])[0]
                   ),
+                  authorizationInfo: getAuthorizationDetails(sample),
                   acceptedAt: (_.filter(sample?.statuses, {
                     status: "ACCEPTED",
                   }) || [])[0]?.timestamp,
@@ -271,14 +272,20 @@ export class LabSamplesEffects {
                         order?.testAllocations,
                         (allocation) => {
                           const authorizationStatus = _.orderBy(
-                            allocation?.statuses,
+                            allocation?.statuses?.filter(
+                              (status) =>
+                                status?.status == "APPROVED" ||
+                                status?.category == "APPROVED"
+                            ) || [],
                             ["timestamp"],
                             ["desc"]
                           )[0];
                           return {
                             ...allocation,
+                            parameterUuid: allocation?.concept?.uuid,
                             authorizationInfo:
-                              authorizationStatus?.status === "APPROVED"
+                              authorizationStatus?.status === "APPROVED" ||
+                              authorizationStatus?.category === "APPROVED"
                                 ? authorizationStatus
                                 : null,
                             firstSignOff:
@@ -344,6 +351,89 @@ export class LabSamplesEffects {
                             allocationUuid: allocation?.uuid,
                           };
                         }
+                      ),
+                      allocationsGroupedByParameterUuid: _.groupBy(
+                        _.map(order?.testAllocations, (allocation) => {
+                          const authorizationStatus = _.orderBy(
+                            allocation?.statuses,
+                            ["timestamp"],
+                            ["desc"]
+                          )[0];
+                          if (allocation?.results?.length > 0) {
+                            return {
+                              ...allocation,
+                              parameterUuid: allocation?.concept?.uuid,
+                              authorizationInfo:
+                                authorizationStatus?.status === "APPROVED" ||
+                                authorizationStatus?.category === "APPROVED"
+                                  ? authorizationStatus
+                                  : null,
+                              firstSignOff:
+                                allocation?.statuses?.length > 0 &&
+                                (_.orderBy(
+                                  allocation?.statuses,
+                                  ["timestamp"],
+                                  ["desc"]
+                                )[0]?.status == "APPROVED" ||
+                                  _.orderBy(
+                                    allocation?.statuses,
+                                    ["timestamp"],
+                                    ["desc"]
+                                  )[0]?.status == "AUTHORIZED")
+                                  ? true
+                                  : false,
+                              secondSignOff:
+                                allocation?.statuses?.length > 0 &&
+                                _.orderBy(
+                                  allocation?.statuses,
+                                  ["timestamp"],
+                                  ["desc"]
+                                )[0]?.status == "APPROVED" &&
+                                _.orderBy(
+                                  allocation?.statuses,
+                                  ["timestamp"],
+                                  ["desc"]
+                                )[1]?.status == "APPROVED"
+                                  ? true
+                                  : false,
+                              rejected:
+                                allocation?.statuses?.length > 0 &&
+                                (_.orderBy(
+                                  allocation?.statuses,
+                                  ["timestamp"],
+                                  ["desc"]
+                                )[0]?.status == "REJECTED" ||
+                                  _.orderBy(
+                                    allocation?.statuses,
+                                    ["timestamp"],
+                                    ["desc"]
+                                  )[0]?.category == "REJECTED")
+                                  ? true
+                                  : false,
+                              rejectionStatus:
+                                allocation?.statuses?.length > 0 &&
+                                _.orderBy(
+                                  allocation?.statuses,
+                                  ["timestamp"],
+                                  ["desc"]
+                                )[0]?.status == "REJECTED"
+                                  ? _.orderBy(
+                                      allocation?.statuses,
+                                      ["timestamp"],
+                                      ["desc"]
+                                    )[0]
+                                  : null,
+                              results: formatResults(allocation?.results),
+                              statuses: allocation?.statuses,
+                              resultsCommentsStatuses:
+                                getResultsCommentsStatuses(
+                                  allocation?.statuses
+                                ),
+                              allocationUuid: allocation?.uuid,
+                            };
+                          }
+                        })?.filter((alloc) => alloc),
+                        "parameterUuid"
                       ),
                     };
                     // console.log(formattedOrder);
@@ -1214,6 +1304,44 @@ export class LabSamplesEffects {
       )
     )
   );
+}
+
+function getAuthorizationDetails(sample) {
+  const approvedAllocations = _.flatten(
+    sample?.orders?.map((order) => {
+      return (
+        order?.testAllocations?.filter(
+          (allocation) =>
+            (
+              allocation?.statuses?.filter(
+                (status) =>
+                  status?.status == "APPROVED" || status?.category == "APPROVED"
+              ) || []
+            )?.length > 0
+        ) || []
+      );
+    })
+  );
+  const allocationStatuses = _.uniqBy(
+    _.flatten(
+      approvedAllocations?.map((allocation) => {
+        return allocation?.statuses?.map((status) => {
+          return {
+            ...status,
+            allocation: allocation,
+          };
+        });
+      })
+    )?.map((status) => {
+      return {
+        ...status,
+        ...status?.user,
+        name: status?.user?.display?.split(" (")[0],
+      };
+    }),
+    "name"
+  );
+  return allocationStatuses;
 }
 
 export function createSearchingText(sample) {
