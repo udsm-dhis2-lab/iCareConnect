@@ -1,5 +1,5 @@
 <div class="row">
-  <div class="col-md-4">
+  <div class="col-md-6">
     <p>FileNO: {{ sample?.mrn }}</p>
     <p>
       Names:
@@ -13,39 +13,38 @@
       </span>
     </p>
   </div>
-  <div class="col-md-4">
+  <div class="col-md-6">
     <!-- {{ sample?.specimen?.specimenName }} -->
     <div class="h6">Test Orders Details</div>
-    <table class="table order-table mt-2">
-      <tbody>
-        <ng-container *ngFor="let order of sample?.orders; let count = index">
-          <tr
-            *ngFor="
-              let allocation of order?.testAllocations;
-              let countAllocation = index
-            "
-          >
-            <td
-              *ngIf="countAllocation == 0"
-              [attr.rowspan]="order?.testAllocations?.length"
+    <div class="order-table">
+      <table class="table mt-2">
+        <tbody>
+          <ng-container *ngFor="let order of sample?.orders; let count = index">
+            <tr
+              *ngFor="
+                let allocation of order?.testAllocations;
+                let countAllocation = index
+              "
             >
-              {{ count + 1 }}
-            </td>
-            <td
-              *ngIf="countAllocation == 0"
-              [attr.rowspan]="order?.testAllocations?.length"
-            >
-              {{ order?.order?.concept?.display }}
-            </td>
-            <td>
-              {{ allocation?.concept?.display }}
-            </td>
-          </tr>
-        </ng-container>
-      </tbody>
-    </table>
-  </div>
-  <div class="col-md-4">
-    {{ sample?.patient?.mrn }}
+              <td
+                *ngIf="countAllocation == 0"
+                [attr.rowspan]="order?.testAllocations?.length"
+              >
+                {{ count + 1 }}
+              </td>
+              <td
+                *ngIf="countAllocation == 0"
+                [attr.rowspan]="order?.testAllocations?.length"
+              >
+                {{ order?.order?.concept?.display }}
+              </td>
+              <td>
+                {{ allocation?.concept?.display }}
+              </td>
+            </tr>
+          </ng-container>
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>
