@@ -16,6 +16,7 @@ export class ManageUserProfileModalComponent implements OnInit {
   isFormValid: boolean = false;
   userProperties: any;
   saving: boolean = false;
+  updated: boolean = false;
   constructor(
     private store: Store<AppState>,
     private userService: UserService,
@@ -40,6 +41,10 @@ export class ManageUserProfileModalComponent implements OnInit {
       .subscribe((response) => {
         if (response) {
           this.saving = false;
+          this.updated = true;
+          setTimeout(() => {
+            this.dialogRef.close();
+          }, 2000);
         }
       });
   }

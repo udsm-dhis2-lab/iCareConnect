@@ -74,7 +74,7 @@ export class ResultsFeedingModalComponent implements OnInit {
 
   temporaryValues: any = {};
   file: any;
-
+  searchingText: string;
   ordersKeyedByConcepts: any = {};
   obsKeyedByConcepts: any = {};
   amendUuid: any;
@@ -225,6 +225,10 @@ export class ResultsFeedingModalComponent implements OnInit {
   setEnteredValue(item, val) {
     this.values[item?.order?.concept?.uuid] = val;
     this.temporaryValues[item?.order?.concept?.uuid] = val;
+  }
+
+  onSearch(event: KeyboardEvent): void {
+    this.searchingText = (event.target as HTMLInputElement)?.value;
   }
 
   setEnteredParameterValue(item, val) {
