@@ -54,6 +54,9 @@ export class SampleResultsDashboardComponent implements OnInit {
   completedSamples$: Observable<any>;
   samplesWithResults$: Observable<any[]>;
   sampleDetailsToggleControl: any = {};
+  samplesToViewMoreDetails: any = {};
+  saving: boolean = false;
+  shouldConfirm: boolean = false;
   constructor(
     private store: Store<AppState>,
     private dialog: MatDialog,
@@ -192,5 +195,29 @@ export class SampleResultsDashboardComponent implements OnInit {
       }
       this.getCompletedSamples();
     });
+  }
+
+  onToggleViewSampleDetails(event: Event, sample: any): void {
+    event.stopPropagation();
+    this.samplesToViewMoreDetails[sample?.id] = !this.samplesToViewMoreDetails[
+      sample?.id
+    ]
+      ? sample
+      : null;
+  }
+
+  onSend(event: Event, sample: any, confirmed?: boolean): void {
+    event.stopPropagation();
+    console.log(sample);
+    console.log(confirmed);
+    if (confirmed) {
+      this.shouldConfirm = false;
+      this.saving = true;
+      setTimeout(() => {
+        this.saving = false;
+      }, 1000);
+    } else {
+      this.shouldConfirm = true;
+    }
   }
 }

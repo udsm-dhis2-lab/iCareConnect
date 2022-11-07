@@ -1,9 +1,13 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { Store } from "@ngrx/store";
+import { sortBy } from "lodash";
 import { Observable } from "rxjs";
+import { map, tap } from "rxjs/operators";
 import { saveObservations } from "src/app/store/actions/observation.actions";
 import { AppState } from "src/app/store/reducers";
+import { getCustomOpenMRSFormsByIds } from "src/app/store/selectors/form.selectors";
 import { getGroupedObservationByDateAndTimeOfIPDRounds } from "src/app/store/selectors/observation.selectors";
+import { FormService } from "../../modules/form/services/form.service";
 import { Visit } from "../../resources/visits/models/visit.model";
 
 @Component({
@@ -17,13 +21,20 @@ export class SharedIPDRoundContainerComponent implements OnInit {
   @Input() location: any;
   @Input() observations: any[];
   observationsGroupedByIPDRounds$: Observable<any>;
-  constructor(private store: Store<AppState>) {}
+  form$: Observable<any>;
+  customForms$: Observable<any[]>;
+  errors: any[] = [];
+  latestRound$: Observable<any>;
+  constructor(
+    private store: Store<AppState>,
+    private formService: FormService
+  ) {}
 
   ngOnInit(): void {
-    // console.log(this.activeVisit);
-    // console.log(this.conceptUuid);
-    // console.log(this.observations);
-    console.log(this.observations[this.conceptUuid]);
+    // TODO: Visit Notes form to be softcoded
+    this.customForms$ = this.store.select(
+      getCustomOpenMRSFormsByIds(this.location?.forms || [])
+    );
     // First create round zero provided when no any round has been made
     if (!this.observations[this.conceptUuid]) {
       const obs = [

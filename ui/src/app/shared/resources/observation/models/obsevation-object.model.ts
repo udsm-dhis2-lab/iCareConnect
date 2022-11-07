@@ -16,4 +16,5 @@ export interface ObservationObject {
   status: string;
   obsDate?: any;
   obsTime?: any;
+  provider?: any;
 }

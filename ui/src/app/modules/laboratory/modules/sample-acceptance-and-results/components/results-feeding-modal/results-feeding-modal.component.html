@@ -16,8 +16,17 @@
     </span></mat-toolbar
   >
 
-  <div style="padding: 10px">
-    <span *ngIf="!LISConfigurations?.isLIS"
+  <div class="loading-overlay" *ngIf="saving">
+    <div class="text-center">
+      <div>Saving data</div>
+      <div class="mt-3 d-flex justify-content-center w-100">
+        <mat-spinner diameter="50" strokeWidth="2"></mat-spinner>
+      </div>
+    </div>
+  </div>
+
+  <div style="padding: 10px" *ngIf="!LISConfigurations?.isLIS">
+    <span
       >Patient:
       {{ params?.currentSample?.patient?.givenName }}
       {{ params?.currentSample?.patient?.midllename }}
@@ -31,6 +40,17 @@
     *ngIf="loadingTestTimeSettings"
   ></mat-progress-bar>
   <div style="padding: 10px" *ngIf="!loadingTestTimeSettings">
+    <div class="w-50" *ngIf="LISConfigurations?.isLIS">
+      <mat-form-field class="w-50">
+        <mat-label>Search</mat-label>
+        <mat-icon matPrefix>search</mat-icon
+        ><input
+          matInput
+          (keyup)="onSearch($event)"
+          [(ngModel)]="searchingText"
+        />
+      </mat-form-field>
+    </div>
     <mat-tab-group>
       <mat-tab label="Results" *ngIf="dialogData?.actionType === 'Entry'">
         <div
@@ -40,7 +60,7 @@
           <table class="table table-bordered">
             <thead class="table-header">
               <tr>
-                <th style="width: 15%">Test Parameter</th>
+                <th style="width: 15%">Test Order</th>
                 <th style="width: 5%">Container</th>
                 <th style="width: 5%" *ngIf="!LISConfigurations?.isLIS">
                   Label
@@ -53,7 +73,12 @@
               </tr>
             </thead>
             <tbody>
-              <ng-container *ngFor="let item of params?.testOrders">
+              <ng-container
+                *ngFor="
+                  let item of params?.testOrders
+                    | searchTestDetails: searchingText
+                "
+              >
                 <ng-container
                   *ngIf="item?.order?.concept?.setMembers?.length == 0"
                 >
@@ -449,7 +474,7 @@
 
                             <div
                               class="w-100"
-                              *ngIf="parameter?.datatype?.display !== 'Complex'"
+                              *ngIf="parameter?.datatype?.display === 'Numeric'"
                             >
                               <mat-checkbox
                                 [checked]="
@@ -1306,7 +1331,7 @@
 
                             <div
                               class="w-100"
-                              *ngIf="parameter?.datatype?.display !== 'Complex'"
+                              *ngIf="parameter?.datatype?.display === 'Numeric'"
                             >
                               <mat-checkbox
                                 [checked]="
@@ -2100,7 +2125,7 @@
                                     ]?.value
                                   "
                                   (selectionChange)="
-                                    setValue($event.value, item)
+                                    setParameterValue($event.value, parameter)
                                   "
                                 >
                                   <mat-option
@@ -2115,10 +2140,7 @@
                               <mat-form-field
                                 class="w-25 numeric-field"
                                 *ngIf="
-                                  parameter?.datatype?.display === 'Numeric' &&
-                                  item?.allocationsPairedBySetMember[
-                                    parameter?.uuid
-                                  ]?.uuid == amendUuid
+                                  parameter?.datatype?.display === 'Numeric'
                                 "
                               >
                                 <mat-label
@@ -2126,8 +2148,10 @@
                                   {{ item?.order?.concept?.display }}
                                 </mat-label>
                                 <input
-                                  *ngIf="
-                                    parameter?.datatype?.display === 'Numeric'
+                                  [disabled]="
+                                    item?.allocationsPairedBySetMember[
+                                      parameter?.uuid
+                                    ]?.uuid !== amendUuid
                                   "
                                   type="number"
                                   (change)="
@@ -2139,15 +2163,11 @@
                                   [value]="
                                     item?.allocationsPairedBySetMember[
                                       parameter?.uuid
-                                    ]?.results?.length > 0
-                                      ? item?.allocationsPairedBySetMember[
-                                          parameter?.uuid
-                                        ]?.results[
-                                          item?.allocationsPairedBySetMember[
-                                            parameter?.uuid
-                                          ]?.results?.length - 1
-                                        ]?.valueNumeric
-                                      : null
+                                    ]?.results[
+                                      item?.allocationsPairedBySetMember[
+                                        parameter?.uuid
+                                      ]?.results?.length - 1
+                                    ]?.value
                                   "
                                   style="text-align: center"
                                   [disabled]="
@@ -2185,6 +2205,11 @@
                                   {{ parameter?.display }}
                                 </mat-label>
                                 <input
+                                  [disabled]="
+                                    item?.allocationsPairedBySetMember[
+                                      parameter?.uuid
+                                    ]?.uuid !== amendUuid
+                                  "
                                   type="text"
                                   (change)="
                                     setEnteredParameterValue(
@@ -2195,15 +2220,11 @@
                                   [value]="
                                     item?.allocationsPairedBySetMember[
                                       parameter?.uuid
-                                    ]?.results?.length > 0
-                                      ? item?.allocationsPairedBySetMember[
-                                          item?.order?.concept?.uuid
-                                        ]?.results[
-                                          item?.allocationsPairedBySetMember[
-                                            item?.order?.concept?.uuid
-                                          ]?.results?.length - 1
-                                        ]?.valueNumeric
-                                      : null
+                                    ]?.results[
+                                      item?.allocationsPairedBySetMember[
+                                        parameter?.uuid
+                                      ]?.results?.length - 1
+                                    ]?.value
                                   "
                                   style="text-align: left"
                                   [disabled]="
@@ -2232,7 +2253,7 @@
                                   parameter?.answers.length === 0
                                 "
                               >
-                                <span>
+                                <!-- <span>
                                   {{
                                     item?.allocationsPairedBySetMember[
                                       parameter?.uuid
@@ -2242,7 +2263,7 @@
                                       ]?.results?.length - 1
                                     ]?.value
                                   }}
-                                </span>
+                                </span> -->
                                 <span
                                   *ngIf="parameter?.units"
                                   style="margin-right: 10px"
@@ -2284,7 +2305,7 @@
                               >
                                 <app-form
                                   [fields]="[amendmentRemarksField]"
-                                  (formUpdate)="onFormUpdate($event)"
+                                  (formUpdate)="onFormUpdate($event, parameter)"
                                 ></app-form>
                               </div>
                               <button
@@ -2314,6 +2335,7 @@
                                   )
                                 "
                                 mat-flat-button
+                                color="primary"
                                 class="ml-2 float-right"
                               >
                                 <mat-spinner
@@ -2323,10 +2345,6 @@
                                   "
                                   color="primary"
                                   [diameter]="20"
-                                  style="
-                                    display: inline-block !important;
-                                    margin-right: 4px;
-                                  "
                                 >
                                 </mat-spinner>
                                 <!-- {{
@@ -2339,7 +2357,7 @@
                                     ? "Update"
                                     : "Save"
                                 }} -->
-                                Save ammended results
+                                Update
                               </button>
                             </div>
                           </mat-tab>
@@ -2363,8 +2381,9 @@
                                     >
                                       <ng-container
                                         *ngFor="
-                                          let result of item?.testAllocations[
-                                            count
+                                          let result of item
+                                            ?.allocationsPairedBySetMember[
+                                            parameter?.uuid
                                           ]?.results;
                                           let i = index
                                         "
@@ -2379,7 +2398,39 @@
                                           "
                                         >
                                           <td>
-                                            {{ result?.value }}
+                                            <mat-form-field
+                                              class="w-100"
+                                              *ngIf="
+                                                parameter?.answers &&
+                                                parameter?.answers.length > 0
+                                              "
+                                            >
+                                              <mat-select
+                                                [disabled]="true"
+                                                required
+                                                [value]="result?.value"
+                                                (selectionChange)="
+                                                  setValue($event.value, item)
+                                                "
+                                              >
+                                                <mat-option
+                                                  *ngFor="
+                                                    let option of parameter?.answers
+                                                  "
+                                                  [value]="option.uuid"
+                                                >
+                                                  {{ option.display }}
+                                                </mat-option>
+                                              </mat-select>
+                                            </mat-form-field>
+                                            <div
+                                              *ngIf="
+                                                parameter?.answers &&
+                                                parameter?.answers.length == 0
+                                              "
+                                            >
+                                              {{ result?.value }}
+                                            </div>
                                           </td>
                                           <td>
                                             {{

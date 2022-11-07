@@ -17,7 +17,7 @@ import { BarCodeModalComponent } from "../../../sample-acceptance-and-results/co
 export class SampleRegistrationFinalizationComponent implements OnInit {
   dialogData: any;
   rejectionReasonField: any;
-  rejectionReason: string;
+  rejectionReasons: any;
   isFormValid: boolean = false;
   saving: boolean = false;
   constructor(
@@ -31,11 +31,12 @@ export class SampleRegistrationFinalizationComponent implements OnInit {
 
   ngOnInit(): void {
     this.rejectionReasonField = new Dropdown({
-      id: "rejectionReason",
-      key: "rejectionReason",
-      label: "Reason for Rejection",
+      id: "rejectionReasons",
+      key: "rejectionReasons",
+      label: "Reasons for Rejection",
       searchTerm: "SAMPLE_REJECTION_REASONS",
       required: true,
+      multiple: true,
       options: [],
       conceptClass: "Misc",
       searchControlType: "concept",
@@ -46,18 +47,31 @@ export class SampleRegistrationFinalizationComponent implements OnInit {
   onFinalize(event: Event, actionType: string): void {
     event.stopPropagation();
     if (actionType == "reject") {
-      const rejectionStatus = {
-        sample: {
-          uuid: this.dialogData?.sample?.uuid,
-        },
-        user: {
-          uuid: localStorage.getItem("userUuid"),
-        },
-        remarks: this.rejectionReason,
-        status: "REJECTED",
-      };
+      const rejectionReasons = this.rejectionReasons?.map((reason) => {
+        return {
+          sample: {
+            uuid: this.dialogData?.sample?.uuid,
+          },
+          user: {
+            uuid: localStorage.getItem("userUuid"),
+          },
+          remarks: "None",
+          category: "REJECTED_REGISTRATION",
+          status: reason?.uuid,
+        };
+      });
+      // const rejectionStatus = {
+      //   sample: {
+      //     uuid: this.dialogData?.sample?.uuid,
+      //   },
+      //   user: {
+      //     uuid: localStorage.getItem("userUuid"),
+      //   },
+      //   remarks: this.rejectionReasons,
+      //   status: "REJECTED",
+      // };
       this.samplesService
-        .setMultipleSampleStatuses([rejectionStatus])
+        .setMultipleSampleStatuses(rejectionReasons)
         .subscribe((response) => {
           if (response) {
             this.dialogRef.close();
@@ -69,7 +83,8 @@ export class SampleRegistrationFinalizationComponent implements OnInit {
   }
 
   onFormUpdate(formValue: FormValue): void {
-    this.rejectionReason = formValue.getValues()["rejectionReason"]?.value;
+    // this.rejectionReason = formValue.getValues()["rejectionReason"]?.value;
+    this.rejectionReasons = formValue.getValues()?.rejectionReasons?.value;
     this.isFormValid = formValue.isValid;
   }
 }

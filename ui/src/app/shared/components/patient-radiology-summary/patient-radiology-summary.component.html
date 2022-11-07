@@ -49,7 +49,6 @@
             <a
               *ngIf="order?.value?.links?.uri.split('openmrs').length > 2"
               href="{{
-                baseUrl +
                   '/openmrs' +
                   order?.value?.links?.uri.split('openmrs')[2]
               }}"
@@ -59,7 +58,6 @@
             <a
               *ngIf="order?.value?.links?.uri.split('openmrs').length == 2"
               href="{{
-                baseUrl +
                   '/openmrs' +
                   order?.value?.links?.uri.split('openmrs')[1]
               }}"

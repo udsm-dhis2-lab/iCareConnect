@@ -132,7 +132,8 @@
     isCommonField &&
     !isReport &&
     field?.shouldHaveLiveSearchForDropDownFields &&
-    field?.controlType === 'dropdown'
+    field?.controlType === 'dropdown' &&
+    !field?.multiple
   "
 >
   <mat-form-field class="w-100" appearance="fill">
@@ -152,7 +153,10 @@
       (keyup)="searchItem($event, field)"
       [matAutocomplete]="auto"
     />
-    <span style="position: relative; float: right; margin-top: -30px">
+    <span
+      style="position: relative; float: right; margin-top: -30px"
+      *ngIf="!field?.multiple"
+    >
       <mat-icon>arrow_drop_down</mat-icon>
     </span>
     <mat-autocomplete #auto="matAutocomplete">
@@ -195,6 +199,36 @@
         </mat-option>
       </ng-container>
     </mat-autocomplete>
+  </mat-form-field>
+</div>
+<div
+  [formGroup]="form"
+  *ngIf="
+    isCommonField &&
+    !isReport &&
+    field?.shouldHaveLiveSearchForDropDownFields &&
+    field?.controlType === 'dropdown' &&
+    field?.multiple
+  "
+>
+  <mat-form-field class="w-100" appearance="fill">
+    <mat-label>{{ field?.label }}</mat-label>
+    <mat-select
+      [formControlName]="field?.key"
+      [required]="field?.required"
+      (selectionChange)="onFieldUpdate()"
+      multiple
+    >
+      <!-- <mat-select-trigger>
+        {{toppings.value?.[0] || ''}}
+        <span *ngIf="(toppings.value?.length || 0) > 1" class="example-additional-selection">
+          (+{{(toppings.value?.length || 0) - 1}} {{toppings.value?.length === 2 ? 'other' : 'others'}})
+        </span>
+      </mat-select-trigger> -->
+      <mat-option *ngFor="let option of members$ | async" [value]="option">{{
+        option?.display
+      }}</mat-option>
+    </mat-select>
   </mat-form-field>
 </div>
 <div [formGroup]="form" *ngIf="isCheckBoxButton && !isReport">

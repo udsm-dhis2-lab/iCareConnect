@@ -16,6 +16,14 @@
     patientsWithResults: patientsWithResults$ | async
   } as sampleParams"
 >
+  <div class="loading-overlay" *ngIf="saving">
+    <div class="text-center">
+      <div>Saving ....</div>
+      <div class="mt-3 d-flex justify-content-center w-100">
+        <mat-spinner diameter="50" strokeWidth="2"></mat-spinner>
+      </div>
+    </div>
+  </div>
   <mat-tab-group (selectedTabChange)="onOpenNewTab($event)">
     <mat-tab label="Sample Acceptance">
       <div class="filter-and-legend">
@@ -202,6 +210,85 @@
                     *ngIf="orderCount == 0"
                     [attr.rowspan]="sample?.orders?.length"
                   >
+                    <div class="d-flex justify-content-center">
+                      <button
+                        *ngIf="!LISConfigurations?.isLIS"
+                        [disabled]="
+                          sample.accepted ||
+                          sample.rejected ||
+                          sampleParams?.settingLabSampleStatus
+                        "
+                        mat-stroked-button
+                        class="accept-button"
+                        (click)="
+                          accept($event, sample, sampleParams?.providerDetails)
+                        "
+                      >
+                        <mat-spinner
+                          *ngIf="
+                            sampleParams?.settingLabSampleStatus &&
+                            savingMessage[sample.id + '-accept']
+                          "
+                          [diameter]="16"
+                        >
+                        </mat-spinner>
+                        Accept
+                      </button>
+
+                      <button
+                        *ngIf="!LISConfigurations?.isLIS"
+                        [disabled]="sample.accepted || sample.rejected"
+                        mat-stroked-button
+                        (click)="
+                          reject($event, sample, sampleParams?.providerDetails)
+                        "
+                        class="ml-2 reject-button"
+                      >
+                        <mat-spinner
+                          *ngIf="
+                            sampleParams?.settingLabSampleStatus &&
+                            savingMessage[sample.id + '-reject']
+                          "
+                          [diameter]="16"
+                          style="
+                            display: inline-block !important;
+                            margin-right: 4px;
+                          "
+                        >
+                        </mat-spinner>
+                        Reject
+                      </button>
+                      <button
+                        mat-flat-button
+                        color="primary"
+                        (click)="onToggleViewSampleDetails($event, sample)"
+                      >
+                        <mat-icon *ngIf="!samplesToViewMoreDetails[sample?.id]"
+                          >expand_more</mat-icon
+                        >
+                        <mat-icon *ngIf="samplesToViewMoreDetails[sample?.id]"
+                          >expand_less</mat-icon
+                        >
+                        {{
+                          !samplesToViewMoreDetails[sample?.id]
+                            ? "View"
+                            : "Hide"
+                        }}
+                        Details
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+                <tr
+                  *ngIf="samplesToViewMoreDetails[sample?.id]"
+                  class="sample-details-row"
+                >
+                  <td colspan="10">
+                    <app-shared-sample-details
+                      [sample]="sample"
+                    ></app-shared-sample-details>
+                  </td>
+                  <td>
                     <div class="d-flex justify-content-center">
                       <button
                         [disabled]="
@@ -441,7 +528,10 @@
                         : "Routine"
                     }}
                   </td>
-                  <td>
+                  <td
+                    *ngIf="orderCount == 0"
+                    [attr.rowspan]="sample?.orders?.length"
+                  >
                     {{ sample?.acceptedBy?.user?.display }}
                   </td>
                 </tr>
@@ -642,10 +732,29 @@
                     }}
                   </td>
                   <td>
-                    {{ sample?.rejectedBy?.display }}
+                    {{ sample?.rejectedBy?.name }}
+                    <span class="text-muted">
+                      <em>
+                        (On
+                        {{ sample?.rejectedBy?.timestamp | date: "medium" }})
+                      </em>
+                    </span>
                   </td>
                   <td>
-                    {{ sample?.reasonForRejection?.display }}
+                    <span
+                      *ngFor="
+                        let rejectionReason of sample?.reasonsForRejection;
+                        let reasonCount = index
+                      "
+                    >
+                      {{ rejectionReason?.display }}
+                      <span
+                        *ngIf="
+                          reasonCount < sample?.reasonsForRejection?.length - 1
+                        "
+                        >,</span
+                      >
+                    </span>
                   </td>
                   <td
                     *ngIf="orderCount == 0 && !LISConfigurations?.isLIS"
@@ -872,6 +981,34 @@
                   >
                     <span *ngIf="sample?.accepted"> Accepted </span>
                     <span *ngIf="sample?.rejected"> Rejected </span>
+                  </td>
+                  <td
+                    *ngIf="orderCount == 0"
+                    [attr.rowspan]="sample?.orders?.length"
+                  >
+                    <button
+                      mat-flat-button
+                      color="primary"
+                      (click)="onToggleViewSampleDetails($event, sample)"
+                    >
+                      <mat-icon *ngIf="!samplesToViewMoreDetails[sample?.id]"
+                        >expand_more</mat-icon
+                      >
+                      <mat-icon *ngIf="samplesToViewMoreDetails[sample?.id]"
+                        >expand_less</mat-icon
+                      >
+                      {{
+                        !samplesToViewMoreDetails[sample?.id] ? "View" : "Hide"
+                      }}
+                      Details
+                    </button>
+                  </td>
+                </tr>
+                <tr *ngIf="samplesToViewMoreDetails[sample?.id]">
+                  <td colspan="12">
+                    <app-shared-sample-details
+                      [sample]="sample"
+                    ></app-shared-sample-details>
                   </td>
                 </tr>
               </ng-container>

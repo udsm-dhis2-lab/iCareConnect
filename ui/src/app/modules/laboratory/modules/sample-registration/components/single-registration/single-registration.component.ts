@@ -113,6 +113,8 @@ export class SingleRegistrationComponent implements OnInit {
   maxForBroughtOn: boolean = true;
   selectedSystem: any;
   fromExternalSystem: boolean;
+  transportCondition: Dropdown;
+  transportationTemperature: Dropdown;
 
   constructor(
     private samplesService: SamplesService,
@@ -131,10 +133,6 @@ export class SingleRegistrationComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log(
-      "testsFromExternalSystemsConfigs",
-      this.testsFromExternalSystemsConfigs
-    );
     this.labSampleLabel$ = this.samplesService.getSampleLabel();
     this.referringDoctorFields = this.referringDoctorAttributes.map(
       (attribute) => {
@@ -171,7 +169,7 @@ export class SingleRegistrationComponent implements OnInit {
       new Dropdown({
         id: "agency",
         key: "agency",
-        label: "Agency/Priority",
+        label: "Urgency/Priority",
         options: [],
         conceptClass: "priority",
         searchControlType: "concept",
@@ -232,6 +230,32 @@ export class SingleRegistrationComponent implements OnInit {
         };
       }),
       shouldHaveLiveSearchForDropDownFields: false,
+    });
+
+    this.transportCondition = new Dropdown({
+      id: "transportCondition",
+      key: "transportCondition",
+      label: "Transport Condition",
+      searchTerm: "SAMPLE_TRANSPORT_CONDITION",
+      required: false,
+      options: [],
+      multiple: false,
+      conceptClass: "Misc",
+      searchControlType: "concept",
+      shouldHaveLiveSearchForDropDownFields: true,
+    });
+
+    this.transportationTemperature = new Dropdown({
+      id: "transportationTemperature",
+      key: "transportationTemperature",
+      label: "Transportation Temperature",
+      searchTerm: "SAMPLE_TRANSPORT_CONDITION",
+      required: false,
+      options: [],
+      multiple: false,
+      conceptClass: "Misc",
+      searchControlType: "concept",
+      shouldHaveLiveSearchForDropDownFields: true,
     });
 
     const currentLocation = JSON.parse(localStorage.getItem("currentLocation"));
@@ -444,6 +468,7 @@ export class SingleRegistrationComponent implements OnInit {
 
   onFormUpdate(formValues: FormValue, itemKey?: string): void {
     //Validate Date fields
+    this.formData = { ...this.formData, ...formValues.getValues() };
     if (formValues.getValues()?.collectedOn?.value.toString()?.length > 0) {
       let collected_on_date;
       collected_on_date = this.getDateStringFromDate(
@@ -505,7 +530,6 @@ export class SingleRegistrationComponent implements OnInit {
     this.maxForCollectedOn = true;
 
     // this.getDateStringFromMoment_i();
-    this.formData = { ...this.formData, ...formValues.getValues() };
     if (
       itemKey &&
       itemKey === "specimenDetails" &&
@@ -521,7 +545,7 @@ export class SingleRegistrationComponent implements OnInit {
 
   onFormUpdateForTest(testValues: any): void {
     Object.keys(this.formData).forEach((key) => {
-      if (!testValues[key]) {
+      if (!testValues[key] && key?.indexOf("test") > -1) {
         this.formData = omit(this.formData, key);
       }
     });
@@ -609,12 +633,18 @@ export class SingleRegistrationComponent implements OnInit {
     for (
       let count = 0;
       count <
-      Number(this.labNumberCharactersCount) - labNumber.toString()?.length;
+      Number(this.labNumberCharactersCount) -
+        (labNumber.toString()?.length + 6);
       count++
     ) {
       generatedStr = generatedStr + "0";
     }
-    return generatedStr + labNumber.toString();
+    return (
+      new Date().getFullYear().toString() +
+      new Date().getMonth().toString() +
+      generatedStr +
+      labNumber.toString()
+    );
   }
 
   onGetClinicalDataValues(clinicalData): void {
@@ -627,6 +657,7 @@ export class SingleRegistrationComponent implements OnInit {
 
     // Identify referring doctor fields entered values
     let attributeMissingOnDoctorsAttributes;
+    this.sampleLabelsUsedDetails = [];
     const doctorsAttributesWithValues =
       this.referringDoctorAttributes.filter(
         (attribute) => this.formData["attribute-" + attribute?.value]?.value
@@ -662,6 +693,7 @@ export class SingleRegistrationComponent implements OnInit {
         .getConceptSetsByConceptUuids(orderConceptUuids)
         .subscribe((conceptSetsResponse: any) => {
           if (conceptSetsResponse && !conceptSetsResponse?.error) {
+            // console.log("conceptSetsResponse", conceptSetsResponse);
             this.groupedTestOrdersByDepartments = formulateSamplesByDepartments(
               conceptSetsResponse,
               this.testOrders
@@ -731,7 +763,9 @@ export class SingleRegistrationComponent implements OnInit {
                                             personIdentifierType.id
                                           ],
                                       identifierType: personIdentifierType.id,
-                                      location: this.currentLocation?.uuid,
+                                      location:
+                                        this.currentLocation?.uuid ||
+                                        "7fdfa2cb-bc95-405a-88c6-32b7673c0453", // TODO: Find a way to softcode this,
                                       preferred: true,
                                     };
                                   } else {
@@ -741,7 +775,9 @@ export class SingleRegistrationComponent implements OnInit {
                                           personIdentifierType.id
                                         ],
                                       identifierType: personIdentifierType.id,
-                                      location: this.currentLocation?.uuid,
+                                      location:
+                                        this.currentLocation?.uuid ||
+                                        "7fdfa2cb-bc95-405a-88c6-32b7673c0453", // TODO: Find a way to softcode this,
                                       preferred: false,
                                     };
                                   }
@@ -755,7 +791,9 @@ export class SingleRegistrationComponent implements OnInit {
                                   identifier: identifierResponse[0],
                                   identifierType:
                                     this.preferredPersonIdentifier,
-                                  location: this.currentLocation?.uuid,
+                                  location:
+                                    this.currentLocation?.uuid ||
+                                    "7fdfa2cb-bc95-405a-88c6-32b7673c0453", // TODO: Find a way to softcode this
                                   preferred: true,
                                 },
                               ],
@@ -997,6 +1035,22 @@ export class SingleRegistrationComponent implements OnInit {
                                                                       ...sample,
                                                                     },
                                                                   ];
+                                                                // TODO: Find a better way to control three labels to be printed
+
+                                                                this.sampleLabelsUsedDetails =
+                                                                  [
+                                                                    ...this
+                                                                      .sampleLabelsUsedDetails,
+                                                                    ...this
+                                                                      .sampleLabelsUsedDetails,
+                                                                  ];
+                                                                this.sampleLabelsUsedDetails =
+                                                                  [
+                                                                    ...this
+                                                                      .sampleLabelsUsedDetails,
+                                                                    ...this
+                                                                      .sampleLabelsUsedDetails,
+                                                                  ];
 
                                                                 // Create sample allocations
 
@@ -1060,6 +1114,8 @@ export class SingleRegistrationComponent implements OnInit {
                                                                             "agency"
                                                                           ]
                                                                             ?.value,
+                                                                        category:
+                                                                          "PRIORITY",
                                                                         status:
                                                                           "PRIORITY",
                                                                       };
@@ -1090,24 +1146,8 @@ export class SingleRegistrationComponent implements OnInit {
                                                                           "RECEIVED_ON",
                                                                         status:
                                                                           "RECEIVED_ON",
-                                                                        timestamp:
-                                                                          new Date(
-                                                                            `${moment(
-                                                                              this
-                                                                                .formData[
-                                                                                "receivedOn"
-                                                                              ]
-                                                                                ?.value
-                                                                            ).format(
-                                                                              "YYYY-MM-DD"
-                                                                            )}T${
-                                                                              this
-                                                                                .formData[
-                                                                                "receivedAt"
-                                                                              ]
-                                                                                ?.value
-                                                                            }:00.001Z`
-                                                                          ).getTime(),
+                                                                        category:
+                                                                          "RECEIVED_ON",
                                                                       };
                                                                     statuses = [
                                                                       ...statuses,
@@ -1138,8 +1178,14 @@ export class SingleRegistrationComponent implements OnInit {
                                                                             "condition"
                                                                           ]
                                                                             ?.value,
-                                                                        status:
+                                                                        category:
                                                                           "CONDITION",
+                                                                        status:
+                                                                          this
+                                                                            .formData[
+                                                                            "condition"
+                                                                          ]
+                                                                            ?.value,
                                                                       };
                                                                     statuses = [
                                                                       ...statuses,
@@ -1166,39 +1212,12 @@ export class SingleRegistrationComponent implements OnInit {
                                                                               "userUuid"
                                                                             ),
                                                                       },
+                                                                      category:
+                                                                        "RECEIVED_BY",
                                                                       remarks:
                                                                         "RECEIVED_BY",
                                                                       status:
                                                                         "RECEIVED_BY",
-                                                                      timestamp:
-                                                                        new Date(
-                                                                          (this
-                                                                            .formData[
-                                                                            "receivedOn"
-                                                                          ]
-                                                                            ?.value
-                                                                            ? `${moment(
-                                                                                this
-                                                                                  .formData[
-                                                                                  "receivedOn"
-                                                                                ]
-                                                                                  ?.value
-                                                                              ).format(
-                                                                                "YYYY-MM-DD"
-                                                                              )}`
-                                                                            : formatDateToYYMMDD(
-                                                                                new Date()
-                                                                              )
-                                                                          ).toString() +
-                                                                            "T" +
-                                                                            (this
-                                                                              .formData[
-                                                                              "receivedAt"
-                                                                            ]
-                                                                              ?.value
-                                                                              ? `${this.formData["receivedAt"]?.value}:00.001`
-                                                                              : "00:00:00:001Z")
-                                                                        ).getTime(),
                                                                     };
                                                                   statuses = [
                                                                     ...statuses,
@@ -1235,35 +1254,8 @@ export class SingleRegistrationComponent implements OnInit {
                                                                           "NO COLLECTOR SPECIFIED",
                                                                         status:
                                                                           "COLLECTED_BY",
-                                                                        timestamp:
-                                                                          new Date(
-                                                                            (this
-                                                                              .formData[
-                                                                              "collectedOn"
-                                                                            ]
-                                                                              ?.value
-                                                                              ? `${moment(
-                                                                                  this
-                                                                                    .formData[
-                                                                                    "collectedOn"
-                                                                                  ]
-                                                                                    ?.value
-                                                                                ).format(
-                                                                                  "YYYY-MM-DD"
-                                                                                )}`
-                                                                              : formatDateToYYMMDD(
-                                                                                  new Date()
-                                                                                )
-                                                                            ).toString() +
-                                                                              "T" +
-                                                                              (this
-                                                                                .formData[
-                                                                                "collectedAt"
-                                                                              ]
-                                                                                ?.value
-                                                                                ? `${this.formData["collectedAt"]?.value}:00.001`
-                                                                                : "00:00:00:001Z")
-                                                                          ).getTime(),
+                                                                        category:
+                                                                          "COLLECTED_BY",
                                                                       };
                                                                     statuses = [
                                                                       ...statuses,
@@ -1306,38 +1298,82 @@ export class SingleRegistrationComponent implements OnInit {
                                                                           "NO PERSON SPECIFIED",
                                                                         status:
                                                                           "DELIVERED_BY",
-                                                                        timestamp:
-                                                                          new Date(
-                                                                            (this
-                                                                              .formData[
-                                                                              "broughtOn"
-                                                                            ]
-                                                                              ?.value
-                                                                              ? `${moment(
-                                                                                  this
-                                                                                    .formData[
-                                                                                    "broughtOn"
-                                                                                  ]
-                                                                                    ?.value
-                                                                                ).format(
-                                                                                  "YYYY-MM-DD"
-                                                                                )}`
-                                                                              : formatDateToYYMMDD(
-                                                                                  new Date()
-                                                                                )) +
-                                                                              "T" +
-                                                                              (this
-                                                                                .formData[
-                                                                                "broughtAt"
-                                                                              ]
-                                                                                ?.value
-                                                                                ? `${this.formData["broughtAt"]?.value}:00.001`
-                                                                                : "00:00:00:001Z")
-                                                                          ).getTime(),
+                                                                        category:
+                                                                          "DELIVERED_BY",
                                                                       };
                                                                     statuses = [
                                                                       ...statuses,
                                                                       broughtdByStatus,
+                                                                    ];
+                                                                  }
+                                                                  if (
+                                                                    this
+                                                                      .formData[
+                                                                      "transportCondition"
+                                                                    ]?.value
+                                                                      .length >
+                                                                    0
+                                                                  ) {
+                                                                    const transportCondition =
+                                                                      {
+                                                                        sample:
+                                                                          {
+                                                                            uuid: sampleResponse?.uuid,
+                                                                          },
+                                                                        user: {
+                                                                          uuid: localStorage.getItem(
+                                                                            "userUuid"
+                                                                          ),
+                                                                        },
+                                                                        remarks:
+                                                                          this
+                                                                            .formData[
+                                                                            "transportCondition"
+                                                                          ]
+                                                                            ?.value ||
+                                                                          "NO TRANSPORT CONDITION SPECIFIED",
+                                                                        category:
+                                                                          "TRANSPORT_CONDITION",
+                                                                        status:
+                                                                          "TRANSPORT_CONDITION",
+                                                                      };
+                                                                    statuses = [
+                                                                      ...statuses,
+                                                                      transportCondition,
+                                                                    ];
+                                                                  }
+                                                                  if (
+                                                                    this
+                                                                      .formData[
+                                                                      "transportationTemperature"
+                                                                    ]?.value?.length > 0
+                                                                  ) {
+                                                                    const transportationTemperature =
+                                                                      {
+                                                                        sample:
+                                                                          {
+                                                                            uuid: sampleResponse?.uuid,
+                                                                          },
+                                                                        user: {
+                                                                          uuid: localStorage.getItem(
+                                                                            "userUuid"
+                                                                          ),
+                                                                        },
+                                                                        remarks:
+                                                                          this
+                                                                            .formData[
+                                                                            "transportationTemperature"
+                                                                          ]
+                                                                            ?.value ||
+                                                                          "NO TRANSPORTATION TEMPERATURE SPECIFIED",
+                                                                        category:
+                                                                          "TRANSPORT_TEMPERATURE",
+                                                                        status:
+                                                                          "TRANSPORT_TEMPERATURE",
+                                                                      };
+                                                                    statuses = [
+                                                                      ...statuses,
+                                                                      transportationTemperature,
                                                                     ];
                                                                   }
 
@@ -1362,10 +1398,10 @@ export class SingleRegistrationComponent implements OnInit {
                                                                     },
                                                                   ];
 
-                                                                  console.log(
-                                                                    "statuses",
-                                                                    statuses
-                                                                  );
+                                                                  // console.log(
+                                                                  //   "statuses",
+                                                                  //   statuses
+                                                                  // );
 
                                                                   if (
                                                                     statuses?.length >
@@ -1419,7 +1455,7 @@ export class SingleRegistrationComponent implements OnInit {
                                                                                       : "Sample Saved",
                                                                                 },
                                                                                 disableClose:
-                                                                                  false,
+                                                                                  true,
                                                                                 panelClass:
                                                                                   "custom-dialog-container",
                                                                               }
@@ -1510,6 +1546,18 @@ export class SingleRegistrationComponent implements OnInit {
                                 }
                               });
                           } else {
+                            this.errorMessage = !patientResponse?.error?.error
+                              ?.fieldErrors
+                              ? patientResponse?.error?.error?.message
+                              : !Object.keys(
+                                  patientResponse?.error?.error?.fieldErrors
+                                )?.length
+                              ? "Error occured hence couldn't save the form"
+                              : patientResponse?.error?.error?.fieldErrors[
+                                  Object.keys(
+                                    patientResponse?.error?.error?.fieldErrors
+                                  )[0]
+                                ][0]?.message;
                             this.savingData = false;
                           }
                         });

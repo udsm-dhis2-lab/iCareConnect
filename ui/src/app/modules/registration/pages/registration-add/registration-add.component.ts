@@ -110,6 +110,7 @@ export class RegistrationAddComponent implements OnInit {
   continueReg: boolean = false;
   loadingData: boolean;
   patientInformation$: any;
+  openEMPId: any;
   constructor(
     private _snackBar: MatSnackBar,
     private router: Router,
@@ -496,6 +497,12 @@ export class RegistrationAddComponent implements OnInit {
             const patientIdentifierTypes = results[0];
             const facilityCode = results[1];
             const autoFilledIdentifier = results[2];
+            this.openEMPId =
+              this.patientInformation?.patient?.identifiers?.filter(
+                (identifier) =>
+                  identifier?.identifierType?.uuid ===
+                  "a5d38e09-efcb-4d91-a526-50ce1ba5011a" //TODO: SOftcode this bahmni/afyacare identifier type
+              )[0];
             this.patientIdentifierTypes = filter(
               patientIdentifierTypes.map((identifierType) => {
                 // TODO: Need to find best way to autofill identifier through regex
@@ -504,7 +511,7 @@ export class RegistrationAddComponent implements OnInit {
                 if (isAutoFilled) {
                   if (this.patientInformation?.MRN) {
                     this.patient[identifierType.id] =
-                      this.patientInformation?.MRN;
+                      this.patientInformation?.MRN || this.openEMPId?.uuid;
                   } else {
                     const identifierObject =
                       this.patientInformation?.patient?.identifiers?.filter(
@@ -519,10 +526,11 @@ export class RegistrationAddComponent implements OnInit {
                       identifierObject?.length > 0
                         ? identifierObject[0]?.identifier
                         : null;
-                    this.patient["MRN"] =
-                      identifierObject?.length > 0
-                        ? identifierObject[0]?.identifier
-                        : null;
+                    this.patient["MRN"] = this.openEMPId
+                      ? this.openEMPId?.identifier
+                      : identifierObject?.length > 0
+                      ? identifierObject[0]?.identifier
+                      : null;
                   }
                 } else {
                   this.patient[identifierType.id] = null;
@@ -706,7 +714,7 @@ export class RegistrationAddComponent implements OnInit {
               (idType) => {
                 return (
                   idType?.id != "8d79403a-c2cc-11de-8d13-0010c6dffd0f" &&
-                  idType?.id != "a5d38e09-efcb-4d91-a526-50ce1ba5011a" &&
+                  // idType?.id != "a5d38e09-efcb-4d91-a526-50ce1ba5011a" &&
                   idType?.id != "05a29f94-c0ed-11e2-94be-8c13b969e334" &&
                   idType?.id != "8d793bee-c2cc-11de-8d13-0010c6dffd0f"
                 );
@@ -796,16 +804,35 @@ export class RegistrationAddComponent implements OnInit {
               })
               .filter((attribute) => attribute.value),
           },
-          identifiers: (this.patientIdentifierTypes || [])
-            .map((personIdentifierType) => {
-              return {
-                identifier: this.patient[personIdentifierType?.id],
-                identifierType: personIdentifierType?.id,
-                location: currentLocation?.uuid,
-                preferred: false,
-              };
-            })
-            .filter((patientIdentifier) => patientIdentifier?.identifier),
+          identifiers: this.openEMPId
+            ? [
+                ...(this.patientIdentifierTypes || [])
+                  .map((personIdentifierType) => {
+                    return {
+                      identifier: this.patient[personIdentifierType?.id],
+                      identifierType: personIdentifierType?.id,
+                      location: currentLocation?.uuid,
+                      preferred: false,
+                    };
+                  })
+                  .filter((patientIdentifier) => patientIdentifier?.identifier),
+                {
+                  identifier: this.openEMPId?.identifier,
+                  identifierType: "26742868-a38c-4e6a-ac1d-ae283c414c2e",
+                  location: currentLocation?.uuid,
+                  preferred: false,
+                },
+              ].filter((patientIdentifier) => patientIdentifier?.identifier)
+            : (this.patientIdentifierTypes || [])
+                .map((personIdentifierType) => {
+                  return {
+                    identifier: this.patient[personIdentifierType?.id],
+                    identifierType: personIdentifierType?.id,
+                    location: currentLocation?.uuid,
+                    preferred: false,
+                  };
+                })
+                .filter((patientIdentifier) => patientIdentifier?.identifier),
         };
 
         //TODO: add check for edit mode to see if can create or edit mode
@@ -814,21 +841,26 @@ export class RegistrationAddComponent implements OnInit {
             .updatePatient(patientPayload, this.patientInformation?.id)
             .subscribe(
               (updatePatientResponse) => {
-                this.notificationService.show(
-                  new Notification({
-                    message: "Patient details updated succesfully",
-                    type: "SUCCESS",
-                  })
-                );
+                if (!updatePatientResponse?.error){
+                  this.notificationService.show(
+                    new Notification({
+                      message: "Patient details updated succesfully",
+                      type: "SUCCESS",
+                    })
+                  );
 
                 this.store.dispatch(go({ path: ["/registration/home"] }));
+                }
+
+                if(updatePatientResponse?.error){
+                  this.errorAddingPatient = true;
+                  this.patientAdded = false;
+                  this.addingPatient = false;
+                  this.errors = [...this.errors, updatePatientResponse.error];
+                  this.openSnackBar("Error editing patient", null);
+                }
               },
               (errorUpdatingPatient) => {
-                this.errorAddingPatient = true;
-                this.patientAdded = false;
-                this.addingPatient = false;
-                this.errors = [...this.errors, errorUpdatingPatient.error];
-
                 /* 
                 this.errorMessage = errorUpdatingPatient?.error?.error
                   ? errorUpdatingPatient?.error?.error?.message +
