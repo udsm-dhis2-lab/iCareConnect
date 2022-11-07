@@ -963,6 +963,37 @@
                     <span *ngIf="sample?.accepted"> Accepted </span>
                     <span *ngIf="sample?.rejected"> Rejected </span>
                   </td>
+                  <td
+                  *ngIf="orderCount == 0"
+                  [attr.rowspan]="sample?.orders?.length"
+                >
+
+                   <button
+                        mat-flat-button
+                        color="primary"
+                        (click)="onToggleViewSampleDetails($event, sample)"
+                      >
+                        <mat-icon *ngIf="!samplesToViewMoreDetails[sample?.id]"
+                          >expand_more</mat-icon
+                        >
+                        <mat-icon *ngIf="samplesToViewMoreDetails[sample?.id]"
+                          >expand_less</mat-icon
+                        >
+                        {{
+                          !samplesToViewMoreDetails[sample?.id]
+                            ? "View"
+                            : "Hide"
+                        }}
+                        Details
+                      </button>
+                </td>
+                </tr>
+                <tr *ngIf="samplesToViewMoreDetails[sample?.id]">
+                  <td colspan="12">
+                    <app-shared-sample-details
+                      [sample]="sample"
+                    ></app-shared-sample-details>
+                  </td>
                 </tr>
               </ng-container>
             </ng-container>
