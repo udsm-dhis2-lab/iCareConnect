@@ -400,7 +400,7 @@ public class StoreController {
 	@RequestMapping(value = "stock", method = RequestMethod.GET)
 	@ResponseBody
 	public List<Map<String, Object>> listAllStockStatus(@RequestParam(required = false) String locationUuid,
-	        @RequestParam(required = false) String q, @RequestParam(defaultValue = "100") Integer limit,
+	        @RequestParam(required = false) String q, @RequestParam(defaultValue = "100000") Integer limit,
 	        @RequestParam(defaultValue = "0") Integer startIndex, @RequestParam(required = false) String conceptClassName) {
 		
 		List<Stock> stocksStatus;
@@ -489,7 +489,7 @@ public class StoreController {
 	@ResponseBody
 	public List<Map<String, Object>> getItemsStockedOut(
 	        @RequestParam(required = false, value = "location") String locationUuid,
-	        @RequestParam(required = false) String q, @RequestParam(defaultValue = "100") Integer limit,
+	        @RequestParam(required = false) String q, @RequestParam(defaultValue = "1000000") Integer limit,
 	        @RequestParam(defaultValue = "0") Integer startIndex, @RequestParam(required = false) String conceptClassName) {
 		List<Item> stockObjects = null;
 		if (locationUuid != null) {
