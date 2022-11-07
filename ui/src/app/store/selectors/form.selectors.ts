@@ -1,9 +1,9 @@
-import { createSelector } from '@ngrx/store';
-import { FormConfig } from 'src/app/shared/modules/form/models/form-config.model';
-import { ICAREForm } from 'src/app/shared/modules/form/models/form.model';
-import { AppState, getRootState } from '../reducers';
-import { formAdapter, FormState } from '../states/form.state';
-import { filter } from 'lodash';
+import { createSelector } from "@ngrx/store";
+import { FormConfig } from "src/app/shared/modules/form/models/form-config.model";
+import { ICAREForm } from "src/app/shared/modules/form/models/form.model";
+import { AppState, getRootState } from "../reducers";
+import { formAdapter, FormState } from "../states/form.state";
+import { filter } from "lodash";
 
 const getFormState = createSelector(
   getRootState,
@@ -43,12 +43,11 @@ export const getCustomOpenMRSFormById = createSelector(
   (formEntities, props) => formEntities[props?.id] || null
 );
 
-export const getCustomOpenMRSFormsByIds = createSelector(
-  getAllForms,
-  (allForms, props) =>
+export const getCustomOpenMRSFormsByIds = (formUUids: string[]) =>
+  createSelector(getAllForms, (allForms) =>
     filter(allForms, (form) => {
-      if (props?.formUUids.indexOf(form.uuid) > -1) {
+      if (formUUids.indexOf(form.uuid) > -1) {
         return form;
       }
     })
-);
+  );

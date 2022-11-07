@@ -29,7 +29,7 @@
     visitEndingControlStatusesConcept:
       visitEndingControlStatusesConcept$ | async,
     patientInvoice: patientInvoice$ | async,
-    IPDRoundConceptUuid: IPDRoundConceptUuid$ | async
+    latestRound: latestRound$ | async
   } as dashboardParams"
 >
   <div
@@ -77,8 +77,11 @@
                 class="mr-2"
                 [ngClass]="{
                   'selected-form':
-                    (selectedForm && selectedForm?.uuid === form?.uuid) ||
+                    (selectedForm &&
+                      !showRoundDetails &&
+                      selectedForm?.uuid === form?.uuid) ||
                     (!selectedForm &&
+                      !showRoundDetails &&
                       dashboardParams?.forms[0]?.uuid === form?.uuid)
                 }"
                 mat-stroked-button
@@ -100,6 +103,11 @@
               >
                 {{ form?.name }}
               </a> -->
+              <button mat-button (click)="onToggleVisibityIcons($event)">
+                <mat-icon *ngIf="showRoundDetails">visibility_off</mat-icon>
+                <mat-icon *ngIf="!showRoundDetails">visibility</mat-icon>
+                Visit Information
+              </button>
             </ng-container>
           </div>
 
@@ -380,141 +388,157 @@
                   'col-lg-8 col-md-8 col-sm-12 col-sx-12 obs-table': isInpatient
                 }"
               >
-                <mat-progress-bar
-                  *ngIf="!readyForClinicalNotes"
-                  mode="indeterminate"
-                >
-                </mat-progress-bar>
-                <app-shared-ipd-round-container
-                  *ngIf="
-                    dashboardParams?.IPDRoundConceptUuid &&
-                    activeVisit?.isAdmitted
-                  "
-                  [activeVisit]="activeVisit"
-                  [conceptUuid]="dashboardParams?.IPDRoundConceptUuid"
-                  [observations]="dashboardParams?.observationsGroupedByConcept"
-                ></app-shared-ipd-round-container>
-                <app-clinical-notes
-                  *ngIf="
-                    !isInpatient &&
-                    readyForClinicalNotes &&
-                    !dashboardParams.loadingForms &&
-                    dashboardParams.currentPatient &&
-                    dashboardParams?.forms &&
-                    dashboardParams?.forms?.length > 0
-                  "
-                  [clinicalObservations]="
-                    dashboardParams?.observationsGroupedByConcept
-                  "
-                  [patient]="dashboardParams?.currentPatient"
-                  [location]="dashboardParams?.currentLocation"
-                  [visit]="activeVisit"
-                  [forms]="dashboardParams?.forms"
-                  [shouldUseOwnFormSelection]="false"
-                  [provider]="dashboardParams?.provider"
-                  (updateConsultationOrder)="onUpdateConsultationOrder()"
-                  [selectedForm]="
-                    selectedForm ? selectedForm : dashboardParams?.forms[0]
-                  "
-                  (saveObservations)="
-                    onSaveObservations($event, params?.currentPatient)
-                  "
-                >
-                </app-clinical-notes>
+                <div>
+                  <mat-progress-bar
+                    *ngIf="!readyForClinicalNotes"
+                    mode="indeterminate"
+                  >
+                  </mat-progress-bar>
+                  <div class="w-100" *ngIf="activeVisit?.isAdmitted">
+                    <div class="w-100">
+                      <div class="w-100 mt-2">
+                        <app-shared-visit-history-summary
+                          *ngIf="showRoundDetails"
+                          [location]="dashboardParams?.currentLocation"
+                          [activeVisit]="activeVisit"
+                        ></app-shared-visit-history-summary>
+                        <!-- <app-shared-ipd-round-container
+                          *ngIf="showRoundDetails"
+                          [location]="dashboardParams?.currentLocation"
+                          [activeVisit]="activeVisit"
+                          [conceptUuid]="IPDRoundConceptUuid"
+                          [observations]="
+                            dashboardParams?.observationsGroupedByConcept
+                          "
+                        ></app-shared-ipd-round-container> -->
+                      </div>
+                    </div>
+                  </div>
+                  <app-clinical-notes
+                    *ngIf="
+                      !isInpatient &&
+                      readyForClinicalNotes &&
+                      !dashboardParams.loadingForms &&
+                      dashboardParams.currentPatient &&
+                      dashboardParams?.forms &&
+                      dashboardParams?.forms?.length > 0 &&
+                      !showRoundDetails
+                    "
+                    [clinicalObservations]="
+                      dashboardParams?.observationsGroupedByConcept
+                    "
+                    [patient]="dashboardParams?.currentPatient"
+                    [location]="dashboardParams?.currentLocation"
+                    [visit]="activeVisit"
+                    [forms]="dashboardParams?.forms"
+                    [shouldUseOwnFormSelection]="false"
+                    [provider]="dashboardParams?.provider"
+                    (updateConsultationOrder)="onUpdateConsultationOrder()"
+                    [selectedForm]="
+                      selectedForm ? selectedForm : dashboardParams?.forms[0]
+                    "
+                    (saveObservations)="
+                      onSaveObservations($event, params?.currentPatient)
+                    "
+                  >
+                  </app-clinical-notes>
 
-                <!-- For IPD -->
-                <app-patient-observations-chart
-                  *ngIf="
-                    isInpatient &&
-                    !dashboardParams.loadingForms &&
-                    dashboardParams.currentPatient &&
-                    dashboardParams?.forms &&
-                    dashboardParams?.forms?.length > 0 &&
-                    ((selectedForm &&
-                      dashboardParams?.observationChartForm ===
-                        selectedForm?.uuid) ||
-                      (!selectedForm?.uuid &&
+                  <!-- For IPD -->
+                  <app-patient-observations-chart
+                    *ngIf="
+                      isInpatient &&
+                      !dashboardParams.loadingForms &&
+                      dashboardParams.currentPatient &&
+                      dashboardParams?.forms &&
+                      dashboardParams?.forms?.length > 0 &&
+                      ((selectedForm &&
                         dashboardParams?.observationChartForm ===
-                          dashboardParams?.forms[0].uuid))
-                  "
-                  [clinicalObservations]="
-                    dashboardParams?.observationsGroupedByConcept
-                  "
-                  [patient]="dashboardParams?.currentPatient"
-                  [location]="dashboardParams?.currentLocation"
-                  [visit]="activeVisit"
-                  [forms]="dashboardParams?.forms"
-                  [shouldUseOwnFormSelection]="false"
-                  [obsChartEncounterType]="
-                    dashboardParams?.observationChartEncounterType
-                  "
-                  [provider]="dashboardParams?.provider"
-                  [selectedForm]="
-                    selectedForm &&
-                    dashboardParams?.observationChartForm === selectedForm?.uuid
-                      ? selectedForm
-                      : dashboardParams?.forms[0]?.uuid ===
-                        dashboardParams?.observationChartForm
-                      ? dashboardParams?.forms[0]
-                      : {}
-                  "
-                  (saveObservations)="
-                    onSaveObservations($event, params?.currentPatient)
-                  "
-                >
-                </app-patient-observations-chart>
-                <app-ipd-forms
-                  *ngIf="
-                    isInpatient &&
-                    readyForClinicalNotes &&
-                    !dashboardParams.loadingForms &&
-                    dashboardParams.currentPatient &&
-                    dashboardParams?.forms &&
-                    dashboardParams?.forms?.length > 0 &&
-                    ((selectedForm &&
-                      selectedForm?.uuid &&
-                      dashboardParams?.observationChartForm !==
-                        selectedForm?.uuid) ||
-                      (!selectedForm &&
+                          selectedForm?.uuid) ||
+                        (!selectedForm?.uuid &&
+                          dashboardParams?.observationChartForm ===
+                            dashboardParams?.forms[0].uuid))
+                    "
+                    [clinicalObservations]="
+                      dashboardParams?.observationsGroupedByConcept
+                    "
+                    [patient]="dashboardParams?.currentPatient"
+                    [location]="dashboardParams?.currentLocation"
+                    [visit]="activeVisit"
+                    [forms]="dashboardParams?.forms"
+                    [shouldUseOwnFormSelection]="false"
+                    [obsChartEncounterType]="
+                      dashboardParams?.observationChartEncounterType
+                    "
+                    [provider]="dashboardParams?.provider"
+                    [selectedForm]="
+                      selectedForm &&
+                      dashboardParams?.observationChartForm ===
+                        selectedForm?.uuid
+                        ? selectedForm
+                        : dashboardParams?.forms[0]?.uuid ===
+                          dashboardParams?.observationChartForm
+                        ? dashboardParams?.forms[0]
+                        : {}
+                    "
+                    (saveObservations)="
+                      onSaveObservations($event, params?.currentPatient)
+                    "
+                  >
+                  </app-patient-observations-chart>
+                  <app-ipd-forms
+                    *ngIf="
+                      isInpatient &&
+                      readyForClinicalNotes &&
+                      !dashboardParams.loadingForms &&
+                      dashboardParams.currentPatient &&
+                      dashboardParams?.forms &&
+                      dashboardParams?.forms?.length > 0 &&
+                      ((selectedForm &&
+                        selectedForm?.uuid &&
                         dashboardParams?.observationChartForm !==
-                          dashboardParams?.forms[0]?.uuid))
-                  "
-                  [clinicalObservations]="
-                    dashboardParams?.observationsGroupedByConcept
-                  "
-                  [patient]="dashboardParams?.currentPatient"
-                  [location]="dashboardParams?.currentLocation"
-                  [visit]="activeVisit"
-                  [forms]="dashboardParams?.forms"
-                  [shouldUseOwnFormSelection]="false"
-                  [provider]="dashboardParams?.provider"
-                  [selectedForm]="
-                    selectedForm &&
-                    dashboardParams?.observationChartForm !== selectedForm?.uuid
-                      ? selectedForm
-                      : dashboardParams?.forms[0]?.uuid !==
-                        dashboardParams?.observationChartForm
-                      ? dashboardParams?.forms[0]
-                      : {}
-                  "
-                  (saveObservations)="
-                    onSaveObservations($event, params?.currentPatient)
-                  "
-                >
-                </app-ipd-forms>
+                          selectedForm?.uuid) ||
+                        (!selectedForm &&
+                          dashboardParams?.observationChartForm !==
+                            dashboardParams?.forms[0]?.uuid))
+                    "
+                    [clinicalObservations]="
+                      dashboardParams?.observationsGroupedByConcept
+                    "
+                    [patient]="dashboardParams?.currentPatient"
+                    [location]="dashboardParams?.currentLocation"
+                    [visit]="activeVisit"
+                    [forms]="dashboardParams?.forms"
+                    [shouldUseOwnFormSelection]="false"
+                    [provider]="dashboardParams?.provider"
+                    [selectedForm]="
+                      selectedForm &&
+                      dashboardParams?.observationChartForm !==
+                        selectedForm?.uuid
+                        ? selectedForm
+                        : dashboardParams?.forms[0]?.uuid !==
+                          dashboardParams?.observationChartForm
+                        ? dashboardParams?.forms[0]
+                        : {}
+                    "
+                    (saveObservations)="
+                      onSaveObservations($event, params?.currentPatient)
+                    "
+                  >
+                  </app-ipd-forms>
 
-                <div
-                  class="alert alert-warning"
-                  role="alert"
-                  *ngIf="
-                    readyForClinicalNotes &&
-                    !dashboardParams.loadingForms &&
-                    dashboardParams.currentPatient &&
-                    dashboardParams?.forms &&
-                    dashboardParams?.forms?.length === 0
-                  "
-                >
-                  NO Forms assigned for Location, Contact IT
+                  <div
+                    class="alert alert-warning"
+                    role="alert"
+                    *ngIf="
+                      readyForClinicalNotes &&
+                      !dashboardParams.loadingForms &&
+                      dashboardParams.currentPatient &&
+                      dashboardParams?.forms &&
+                      dashboardParams?.forms?.length === 0
+                    "
+                  >
+                    NO Forms assigned for Location, Contact IT
+                  </div>
                 </div>
               </div>
 

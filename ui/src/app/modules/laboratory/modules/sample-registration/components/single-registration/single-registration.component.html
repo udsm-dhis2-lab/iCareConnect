@@ -266,7 +266,7 @@
                       (formUpdate)="onFormUpdate($event)"
                     ></app-form>
                   </div>
-                  <div class="col-4">
+                  <div class="col-1">
                     <input
                       (change)="getSelectedRCollectedOnTime($event)"
                       [ngClass]="{
@@ -279,6 +279,12 @@
                     <p class="invalid-text" *ngIf="!collectedOnTimeValid">
                       invalid time
                     </p>
+                  </div>
+                  <div class="col-3">
+                    <app-form
+                      [fields]="[transportCondition]"
+                      (formUpdate)="onFormUpdate($event)"
+                    ></app-form>
                   </div>
                 </div>
                 <div class="row">
@@ -322,7 +328,7 @@
                       (formUpdate)="onFormUpdate($event)"
                     ></app-form>
                   </div>
-                  <div class="col-4">
+                  <div class="col-1">
                     <input
                       (change)="getSelectedReceivedOnTime($event)"
                       [ngClass]="{ 'invalid-time-input': !receivedOnTimeValid }"
@@ -333,6 +339,12 @@
                     <p class="invalid-text" *ngIf="!receivedOnTimeValid">
                       invalid time
                     </p>
+                  </div>
+                  <div class="col-3">
+                    <app-form
+                      [fields]="[transportationTemperature]"
+                      (formUpdate)="onFormUpdate($event)"
+                    ></app-form>
                   </div>
                 </div>
               </ng-container>

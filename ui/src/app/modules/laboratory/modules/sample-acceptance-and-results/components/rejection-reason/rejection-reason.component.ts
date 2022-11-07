@@ -15,7 +15,7 @@ import { Textbox } from "src/app/shared/modules/form/models/text-box.model";
 export class RejectionReasonComponent implements OnInit {
   codedSampleRejectionReasons: any[];
   rejectionFields: any[];
-  rejectionReason: string;
+  rejectionReasons: any;
   rejectionRemarks: string;
   isFormValid: boolean = false;
   constructor(
@@ -34,6 +34,7 @@ export class RejectionReasonComponent implements OnInit {
         searchTerm: "SAMPLE_REJECTION_REASONS",
         required: true,
         options: [],
+        multiple: true,
         conceptClass: "Misc",
         searchControlType: "concept",
         shouldHaveLiveSearchForDropDownFields: true,
@@ -49,7 +50,7 @@ export class RejectionReasonComponent implements OnInit {
 
   onFormUpdate(formValue: FormValue): void {
     const formData = formValue.getValues();
-    this.rejectionReason = formData?.rejectionReason?.value;
+    this.rejectionReasons = formData?.rejectionReason?.value;
     this.rejectionRemarks = formData?.rejectionRemarks?.value;
     this.isFormValid = formValue.isValid;
   }
@@ -57,8 +58,8 @@ export class RejectionReasonComponent implements OnInit {
   saveReason(e) {
     e.stopPropagation();
     this.dialogRef.close({
-      reasonText: this.rejectionRemarks,
-      reasonUuid: this.rejectionReason,
+      rejectionRemarks: this.rejectionRemarks,
+      reasons: this.rejectionReasons,
     });
   }
 

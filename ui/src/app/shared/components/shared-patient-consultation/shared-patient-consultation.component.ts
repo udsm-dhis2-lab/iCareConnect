@@ -129,12 +129,6 @@ export class SharedPatientConsultationComponent implements OnInit {
     );
 
     this.store.dispatch(loadOrderTypes());
-
-    this.forms$ = this.store.select(getCustomOpenMRSFormsByIds, {
-      formUUids: map(this.applicableForms, (form) => {
-        return form?.id;
-      }),
-    });
     this.billableItems$ = this.billableItemsService.getItemsWithPrices();
   }
 

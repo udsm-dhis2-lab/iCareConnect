@@ -15,7 +15,8 @@
     currentLocation: currentLocation$ | async,
     visitEndingControlStatusesConceptUuid:
       visitEndingControlStatusesConceptUuid$ | async,
-    observations: observations$ | async
+    observations: observations$ | async,
+    IPDRoundConceptUuid: IPDRoundConceptUuid$ | async
   } as params"
 >
   <app-shared-patient-dashboard
@@ -33,7 +34,8 @@
       params?.iCareClinicConfigurations !== '' &&
       params?.currentLocation &&
       params?.visitEndingControlStatusesConceptUuid &&
-      params?.observations
+      params?.observations &&
+      params?.IPDRoundConceptUuid
     "
     [formPrivilegesConfigs]="params?.privilegesConfigs"
     [currentUser]="params?.currentUser"
@@ -46,6 +48,7 @@
       params?.visitEndingControlStatusesConceptUuid
     "
     [observations]="params?.observations"
+    [IPDRoundConceptUuid]="params?.IPDRoundConceptUuid"
   ></app-shared-patient-dashboard>
   <div *ngIf="errors">
     <app-shared-error [errors]="errors"></app-shared-error>
@@ -76,7 +79,8 @@
       !params?.provider ||
       !params?.currentLocation ||
       !params?.visitEndingControlStatusesConceptUuid ||
-      !params?.observations
+      !params?.observations ||
+      !params?.IPDRoundConceptUuid
     "
   ></mat-progress-bar>
 </div>

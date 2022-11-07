@@ -1,0 +1,50 @@
+<div class="row">
+  <div class="col-md-6">
+    <p>FileNO: {{ sample?.mrn }}</p>
+    <p>
+      Names:
+      {{ sample?.patient?.givenName + " " + sample?.patient?.familyName }}
+    </p>
+    <p>
+      <span> Gender:{{ sample?.patient?.gender }} </span>
+      <span class="ml-2">
+        Age: {{ sample?.patient?.age }}
+        <span class="text-muted"> ({{ sample?.patient?.dob | date }}) </span>
+      </span>
+    </p>
+  </div>
+  <div class="col-md-6">
+    <!-- {{ sample?.specimen?.specimenName }} -->
+    <div class="h6">Test Orders Details</div>
+    <div class="order-table">
+      <table class="table mt-2">
+        <tbody>
+          <ng-container *ngFor="let order of sample?.orders; let count = index">
+            <tr
+              *ngFor="
+                let allocation of order?.testAllocations;
+                let countAllocation = index
+              "
+            >
+              <td
+                *ngIf="countAllocation == 0"
+                [attr.rowspan]="order?.testAllocations?.length"
+              >
+                {{ count + 1 }}
+              </td>
+              <td
+                *ngIf="countAllocation == 0"
+                [attr.rowspan]="order?.testAllocations?.length"
+              >
+                {{ order?.order?.concept?.display }}
+              </td>
+              <td>
+                {{ allocation?.concept?.display }}
+              </td>
+            </tr>
+          </ng-container>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

@@ -397,7 +397,14 @@ export class FormService {
      */
     const fields =
       "?v=custom:(uuid,display,name,encounterType,formFields:(uuid,display,fieldNumber,required,retired,fieldPart,maxOccurs,pageNumber,minOccurs,field:(uuid,display,concept:(uuid,display,conceptClass,datatype,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,numeric,descriptions,allowDecimal,displayPrecision,setMembers:(uuid,display,conceptClass,datatype,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,numeric,descriptions,allowDecimal,displayPrecision,answers,setMembers:(uuid,display,conceptClass,datatype,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,numeric,descriptions,allowDecimal,displayPrecision,answers)),answers:(uuid,display,conceptClass,datatype,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,numeric,descriptions,allowDecimal,displayPrecision,answers)))))";
-    return this.httpClient.get("form/" + uuid + fields);
+    return this.httpClient.get("form/" + uuid + fields).pipe(
+      map((response) => {
+        return response
+      }),
+      catchError((error) => {
+        return of(error)
+      })
+    );
   }
 
   getCustomeOpenMRSForms(uuids): Observable<any> {

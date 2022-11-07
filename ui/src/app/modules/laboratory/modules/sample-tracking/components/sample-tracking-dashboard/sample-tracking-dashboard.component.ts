@@ -38,6 +38,7 @@ export class SampleTrackingDashboardComponent implements OnInit {
   searchingText: string = "";
   allSamples$: Observable<any[]>;
   selectedDepartment: string = "";
+  samplesToViewMoreDetails: any = {};
   constructor(private store: Store<AppState>, private dialog: MatDialog) {}
 
   ngOnInit(): void {
@@ -89,6 +90,15 @@ export class SampleTrackingDashboardComponent implements OnInit {
         searchingText: this.searchingText,
       });
     }
+  }
+
+  onToggleViewSampleDetails(event: Event, sample: any): void {
+    event.stopPropagation();
+    this.samplesToViewMoreDetails[sample?.id] = !this.samplesToViewMoreDetails[
+      sample?.id
+    ]
+      ? sample
+      : null;
   }
 
   onPrintBarCodes(event: Event, sample: any): void {
