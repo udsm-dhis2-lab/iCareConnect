@@ -31,3 +31,13 @@ button,
 button:hover {
   outline: none !important;
 }
+.colored-button {
+  border: solid 1px rgb(80, 138, 196);
+  background-color: rgb(80, 138, 196);
+  color: #fff;
+}
+
+.existing-table {
+  height: 200px !important;
+  overflow: auto;
+}
