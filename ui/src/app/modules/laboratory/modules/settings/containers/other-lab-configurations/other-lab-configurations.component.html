@@ -37,6 +37,19 @@
         </div>
       </ng-template>
     </mat-tab>
+   
+   
+  <mat-tab label="Sample Transport Means">
+      <ng-template matTabContent>
+        <div class="p-3">
+          <app-standard-concept-creation
+            [conceptClass]="'Misc'"
+            [standardSearchTerm]="'SAMPLE_TRANSPORT_MEANS'"
+            (conceptCreated)="getConceptCreated($event)"
+          ></app-standard-concept-creation>
+        </div>
+      </ng-template>
+    </mat-tab>
 
     <mat-tab label="Tests Codes and Coding Sources">
       <ng-template matTabContent>
