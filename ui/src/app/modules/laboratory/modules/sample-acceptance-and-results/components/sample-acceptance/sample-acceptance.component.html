@@ -212,6 +212,7 @@
                   >
                     <div class="d-flex justify-content-center">
                       <button
+                        *ngIf="!LISConfigurations?.isLIS"
                         [disabled]="
                           sample.accepted ||
                           sample.rejected ||
@@ -235,6 +236,7 @@
                       </button>
 
                       <button
+                        *ngIf="!LISConfigurations?.isLIS"
                         [disabled]="sample.accepted || sample.rejected"
                         mat-stroked-button
                         (click)="
@@ -263,15 +265,64 @@
                         <mat-icon *ngIf="samplesToViewMoreDetails[sample?.id]"
                           >expand_less</mat-icon
                         >
+                        {{!samplesToViewMoreDetails[sample?.id] 'View' ? 'Hide'}}
+                        details
                       </a>
                     </div>
                   </td>
                 </tr>
                 <tr *ngIf="samplesToViewMoreDetails[sample?.id]">
-                  <td colspan="100%">
+                  <td colspan="10">
                     <app-shared-sample-details
                       [sample]="sample"
                     ></app-shared-sample-details>
+                  </td>
+                  <td>
+                    <button
+                      [disabled]="
+                        sample.accepted ||
+                        sample.rejected ||
+                        sampleParams?.settingLabSampleStatus
+                      "
+                      mat-stroked-button
+                      class="accept-button"
+                      (click)="
+                        accept($event, sample, sampleParams?.providerDetails)
+                      "
+                    >
+                      <mat-spinner
+                        *ngIf="
+                          sampleParams?.settingLabSampleStatus &&
+                          savingMessage[sample.id + '-accept']
+                        "
+                        [diameter]="16"
+                      >
+                      </mat-spinner>
+                      Accept
+                    </button>
+
+                    <button
+                      [disabled]="sample.accepted || sample.rejected"
+                      mat-stroked-button
+                      (click)="
+                        reject($event, sample, sampleParams?.providerDetails)
+                      "
+                      class="ml-2 reject-button"
+                    >
+                      <mat-spinner
+                        *ngIf="
+                          sampleParams?.settingLabSampleStatus &&
+                          savingMessage[sample.id + '-reject']
+                        "
+                        [diameter]="16"
+                        style="
+                          display: inline-block !important;
+                          margin-right: 4px;
+                        "
+                      >
+                      </mat-spinner>
+                      Reject
+                    </button>
                   </td>
                 </tr>
               </ng-container>
@@ -464,7 +515,10 @@
                         : "Routine"
                     }}
                   </td>
-                  <td>
+                  <td
+                    *ngIf="orderCount == 0"
+                    [attr.rowspan]="sample?.orders?.length"
+                  >
                     {{ sample?.acceptedBy?.user?.display }}
                   </td>
                 </tr>
