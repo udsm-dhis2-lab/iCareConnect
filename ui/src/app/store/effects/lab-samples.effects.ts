@@ -186,6 +186,16 @@ export class LabSamplesEffects {
                     );
                     const formattedOrder = {
                       ...order,
+                      searchingText:
+                        order?.order?.concept?.display?.toLowerCase() +
+                        " " +
+                        (
+                          keyedSpecimenSources[
+                            order?.order?.concept?.uuid
+                          ]?.setMembers?.map((member) =>
+                            member?.display?.toLowerCase()
+                          ) || []
+                        )?.join(" "),
                       order: {
                         ...order?.order,
                         concept: {
