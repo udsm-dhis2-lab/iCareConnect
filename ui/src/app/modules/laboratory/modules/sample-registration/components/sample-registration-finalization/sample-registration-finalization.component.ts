@@ -56,7 +56,7 @@ export class SampleRegistrationFinalizationComponent implements OnInit {
             uuid: localStorage.getItem("userUuid"),
           },
           remarks: "None",
-          category: "REJECTED",
+          category: "REJECTED_REGISTRATION",
           status: reason?.uuid,
         };
       });

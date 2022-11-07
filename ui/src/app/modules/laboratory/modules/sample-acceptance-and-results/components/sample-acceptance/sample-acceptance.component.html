@@ -732,10 +732,29 @@
                     }}
                   </td>
                   <td>
-                    {{ sample?.rejectedBy?.display }}
+                    {{ sample?.rejectedBy?.name }}
+                    <span class="text-muted">
+                      <em>
+                        (On
+                        {{ sample?.rejectedBy?.timestamp | date: "medium" }})
+                      </em>
+                    </span>
                   </td>
                   <td>
-                    {{ sample?.reasonForRejection?.display }}
+                    <span
+                      *ngFor="
+                        let rejectionReason of sample?.reasonsForRejection;
+                        let reasonCount = index
+                      "
+                    >
+                      {{ rejectionReason?.display }}
+                      <span
+                        *ngIf="
+                          reasonCount < sample?.reasonsForRejection?.length - 1
+                        "
+                        >,</span
+                      >
+                    </span>
                   </td>
                   <td
                     *ngIf="orderCount == 0 && !LISConfigurations?.isLIS"
@@ -964,29 +983,26 @@
                     <span *ngIf="sample?.rejected"> Rejected </span>
                   </td>
                   <td
-                  *ngIf="orderCount == 0"
-                  [attr.rowspan]="sample?.orders?.length"
-                >
-
-                   <button
-                        mat-flat-button
-                        color="primary"
-                        (click)="onToggleViewSampleDetails($event, sample)"
+                    *ngIf="orderCount == 0"
+                    [attr.rowspan]="sample?.orders?.length"
+                  >
+                    <button
+                      mat-flat-button
+                      color="primary"
+                      (click)="onToggleViewSampleDetails($event, sample)"
+                    >
+                      <mat-icon *ngIf="!samplesToViewMoreDetails[sample?.id]"
+                        >expand_more</mat-icon
                       >
-                        <mat-icon *ngIf="!samplesToViewMoreDetails[sample?.id]"
-                          >expand_more</mat-icon
-                        >
-                        <mat-icon *ngIf="samplesToViewMoreDetails[sample?.id]"
-                          >expand_less</mat-icon
-                        >
-                        {{
-                          !samplesToViewMoreDetails[sample?.id]
-                            ? "View"
-                            : "Hide"
-                        }}
-                        Details
-                      </button>
-                </td>
+                      <mat-icon *ngIf="samplesToViewMoreDetails[sample?.id]"
+                        >expand_less</mat-icon
+                      >
+                      {{
+                        !samplesToViewMoreDetails[sample?.id] ? "View" : "Hide"
+                      }}
+                      Details
+                    </button>
+                  </td>
                 </tr>
                 <tr *ngIf="samplesToViewMoreDetails[sample?.id]">
                   <td colspan="12">
