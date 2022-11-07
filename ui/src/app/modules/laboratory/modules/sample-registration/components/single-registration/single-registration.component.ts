@@ -237,7 +237,7 @@ export class SingleRegistrationComponent implements OnInit {
       key: "transportCondition",
       label: "Transport Condition",
       searchTerm: "SAMPLE_TRANSPORT_CONDITION",
-      required: true,
+      required: false,
       options: [],
       multiple: false,
       conceptClass: "Misc",
@@ -250,7 +250,7 @@ export class SingleRegistrationComponent implements OnInit {
       key: "transportationTemperature",
       label: "Transportation Temperature",
       searchTerm: "SAMPLE_TRANSPORT_CONDITION",
-      required: true,
+      required: false,
       options: [],
       multiple: false,
       conceptClass: "Misc",
@@ -1546,6 +1546,18 @@ export class SingleRegistrationComponent implements OnInit {
                                 }
                               });
                           } else {
+                            this.errorMessage = !patientResponse?.error?.error
+                              ?.fieldErrors
+                              ? patientResponse?.error?.error?.message
+                              : !Object.keys(
+                                  patientResponse?.error?.error?.fieldErrors
+                                )?.length
+                              ? "Error occured hence couldn't save the form"
+                              : patientResponse?.error?.error?.fieldErrors[
+                                  Object.keys(
+                                    patientResponse?.error?.error?.fieldErrors
+                                  )[0]
+                                ][0]?.message;
                             this.savingData = false;
                           }
                         });
