@@ -25,8 +25,8 @@
     </div>
   </div>
 
-  <div style="padding: 10px">
-    <span *ngIf="!LISConfigurations?.isLIS"
+  <div style="padding: 10px" *ngIf="!LISConfigurations?.isLIS">
+    <span
       >Patient:
       {{ params?.currentSample?.patient?.givenName }}
       {{ params?.currentSample?.patient?.midllename }}
@@ -40,7 +40,7 @@
     *ngIf="loadingTestTimeSettings"
   ></mat-progress-bar>
   <div style="padding: 10px" *ngIf="!loadingTestTimeSettings">
-    <div class="w-50">
+    <div class="w-50" *ngIf="LISConfigurations?.isLIS">
       <mat-form-field class="w-50">
         <mat-label>Search</mat-label>
         <mat-icon matPrefix>search</mat-icon
@@ -51,7 +51,6 @@
         />
       </mat-form-field>
     </div>
-    {{ searchingText }}
     <mat-tab-group>
       <mat-tab label="Results" *ngIf="dialogData?.actionType === 'Entry'">
         <div
