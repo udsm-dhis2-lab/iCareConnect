@@ -265,11 +265,41 @@
                   *ngIf="orderCount == 0"
                   [attr.rowspan]="sample?.orders?.length"
                 >
-                  <button mat-button class="colored-button " (click)="onPrintBarCodes($event, sample)">
-                    Print Barcodes
-                  </button>
+
+                   <button
+                        mat-flat-button
+                        color="primary"
+                        (click)="onToggleViewSampleDetails($event, sample)"
+                      >
+                        <mat-icon *ngIf="!samplesToViewMoreDetails[sample?.id]"
+                          >expand_more</mat-icon
+                        >
+                        <mat-icon *ngIf="samplesToViewMoreDetails[sample?.id]"
+                          >expand_less</mat-icon
+                        >
+                        {{
+                          !samplesToViewMoreDetails[sample?.id]
+                            ? "View"
+                            : "Hide"
+                        }}
+                        Details
+                      </button>
                 </td>
               </tr>
+              <tr *ngIf="samplesToViewMoreDetails[sample?.id]">
+                  <td colspan="11">
+                    <app-shared-sample-details
+                      [sample]="sample"
+                    ></app-shared-sample-details>
+                  </td>
+                  <td>
+                    <div class="d-flex justify-content-center">
+                      <button mat-button class="colored-button " (click)="onPrintBarCodes($event, sample)">
+                      Print Barcodes
+                    </button>
+                    </div>
+                  </td>
+                </tr>
             </ng-container>
           </ng-container>
           <ng-container *ngIf="sampleParams?.allSamples?.length == 0">
