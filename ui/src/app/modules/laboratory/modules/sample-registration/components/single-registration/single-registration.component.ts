@@ -113,7 +113,8 @@ export class SingleRegistrationComponent implements OnInit {
   maxForBroughtOn: boolean = true;
   selectedSystem: any;
   fromExternalSystem: boolean;
-  transportMeans: Dropdown;
+  transportCondition: Dropdown;
+  transportationTemperature: Dropdown;
 
   constructor(
     private samplesService: SamplesService,
@@ -231,32 +232,24 @@ export class SingleRegistrationComponent implements OnInit {
       shouldHaveLiveSearchForDropDownFields: false,
     });
 
-    // this.transportMeans = new Dropdown({
-    //   id: "transport",
-    //   key: "transport",
-    //   label: "Means of Transport",
-    //   options: [
-    //     {
-    //       key: "transport",
-    //       value: "Ice Cold",
-    //       label: "Ice Cold",
-    //       name: "Ice Cold",
-    //     },
-    //     {
-    //       key: "transport",
-    //       value: "Room Temperature",
-    //       label: "Room Temperature",
-    //       name: "Room Temperature",
-    //     },
-    //   ],
-    //   shouldHaveLiveSearchForDropDownFields: false,
-    // });
+    this.transportCondition = new Dropdown({
+      id: "transportCondition",
+      key: "transportCondition",
+      label: "Transport Condition",
+      searchTerm: "SAMPLE_TRANSPORT_CONDITION",
+      required: true,
+      options: [],
+      multiple: false,
+      conceptClass: "Misc",
+      searchControlType: "concept",
+      shouldHaveLiveSearchForDropDownFields: true,
+    });
 
-    this.transportMeans = new Dropdown({
-      id: "transport",
-      key: "transport",
-      label: "Means of Transport",
-      searchTerm: "SAMPLE_TRANSPORT_MEANS",
+    this.transportationTemperature = new Dropdown({
+      id: "transportationTemperature",
+      key: "transportationTemperature",
+      label: "Transportation Temperature",
+      searchTerm: "SAMPLE_TRANSPORT_CONDITION",
       required: true,
       options: [],
       multiple: false,
@@ -798,7 +791,9 @@ export class SingleRegistrationComponent implements OnInit {
                                   identifier: identifierResponse[0],
                                   identifierType:
                                     this.preferredPersonIdentifier,
-                                  location: this.currentLocation?.uuid || '7fdfa2cb-bc95-405a-88c6-32b7673c0453', // TODO: Find a way to softcode this
+                                  location:
+                                    this.currentLocation?.uuid ||
+                                    "7fdfa2cb-bc95-405a-88c6-32b7673c0453", // TODO: Find a way to softcode this
                                   preferred: true,
                                 },
                               ],
@@ -1314,36 +1309,73 @@ export class SingleRegistrationComponent implements OnInit {
                                                                   if (
                                                                     this
                                                                       .formData[
-                                                                      "transport"
+                                                                      "transportCondition"
                                                                     ]?.value
+                                                                      .length >
+                                                                    0
                                                                   ) {
+                                                                    const transportCondition =
+                                                                      {
+                                                                        sample:
+                                                                          {
+                                                                            uuid: sampleResponse?.uuid,
+                                                                          },
+                                                                        user: {
+                                                                          uuid: localStorage.getItem(
+                                                                            "userUuid"
+                                                                          ),
+                                                                        },
+                                                                        remarks:
+                                                                          this
+                                                                            .formData[
+                                                                            "transportCondition"
+                                                                          ]
+                                                                            ?.value ||
+                                                                          "NO TRANSPORT CONDITION SPECIFIED",
+                                                                        category:
+                                                                          "TRANSPORT_CONDITION",
+                                                                        status:
+                                                                          "TRANSPORT_CONDITION",
+                                                                      };
+                                                                    statuses = [
+                                                                      ...statuses,
+                                                                      transportCondition,
+                                                                    ];
                                                                   }
-                                                                  const meansOfTransportStatus =
-                                                                    {
-                                                                      sample: {
-                                                                        uuid: sampleResponse?.uuid,
-                                                                      },
-                                                                      user: {
-                                                                        uuid: localStorage.getItem(
-                                                                          "userUuid"
-                                                                        ),
-                                                                      },
-                                                                      remarks:
-                                                                        this
-                                                                          .formData[
-                                                                          "transport"
-                                                                        ]
-                                                                          ?.value ||
-                                                                        "NO TRANSPORT MEANS SPECIFIED",
-                                                                      category:
-                                                                        "TRANSPORT_MEANS",
-                                                                      status:
-                                                                        "TRANSPORT_MEANS",
-                                                                    };
-                                                                  statuses = [
-                                                                    ...statuses,
-                                                                    meansOfTransportStatus,
-                                                                  ];
+                                                                  if (
+                                                                    this
+                                                                      .formData[
+                                                                      "transportationTemperature"
+                                                                    ]?.value?.length > 0
+                                                                  ) {
+                                                                    const transportationTemperature =
+                                                                      {
+                                                                        sample:
+                                                                          {
+                                                                            uuid: sampleResponse?.uuid,
+                                                                          },
+                                                                        user: {
+                                                                          uuid: localStorage.getItem(
+                                                                            "userUuid"
+                                                                          ),
+                                                                        },
+                                                                        remarks:
+                                                                          this
+                                                                            .formData[
+                                                                            "transportationTemperature"
+                                                                          ]
+                                                                            ?.value ||
+                                                                          "NO TRANSPORTATION TEMPERATURE SPECIFIED",
+                                                                        category:
+                                                                          "TRANSPORT_TEMPERATURE",
+                                                                        status:
+                                                                          "TRANSPORT_TEMPERATURE",
+                                                                      };
+                                                                    statuses = [
+                                                                      ...statuses,
+                                                                      transportationTemperature,
+                                                                    ];
+                                                                  }
 
                                                                   statuses = [
                                                                     ...statuses,
