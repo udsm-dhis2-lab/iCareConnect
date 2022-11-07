@@ -22,7 +22,7 @@
                   >
                     <em
                       >(By
-                      {{ result?.value ? result?.resultsFedBy?.name : "-" }} at
+                      {{ result?.value ? result?.resultsFedBy?.name : "-" }} On
                       {{ result?.dateCreated | date: "medium" }})</em
                     >
                   </span>
@@ -33,6 +33,16 @@
                       ? "Authorized"
                       : "Un-Authorized"
                   }}
+                  <span
+                    *ngIf="resultAllocation?.authorized"
+                    class="ml-3 text-muted float-right"
+                    style="font-size: 0.7rem"
+                  >
+                    <em>
+                      By {{ resultAllocation?.authorizedBy?.name }} On
+                      {{ resultAllocation?.authorizedBy | date: "medium" }}</em
+                    >
+                  </span>
                 </td>
               </tr>
             </ng-container>
