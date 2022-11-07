@@ -357,8 +357,6 @@ export class FormService {
                 facility?.display?.toLowerCase()?.indexOf("clinic") > -1
             ) || []
           )?.map((location: any) => {
-            console.log(location?.parentLocation?.parentLocation);
-            console.log(location?.parentLocation?.parentLocation?.display);
             return {
               ...location,
               display:
@@ -399,10 +397,10 @@ export class FormService {
       "?v=custom:(uuid,display,name,encounterType,formFields:(uuid,display,fieldNumber,required,retired,fieldPart,maxOccurs,pageNumber,minOccurs,field:(uuid,display,concept:(uuid,display,conceptClass,datatype,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,numeric,descriptions,allowDecimal,displayPrecision,setMembers:(uuid,display,conceptClass,datatype,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,numeric,descriptions,allowDecimal,displayPrecision,answers,setMembers:(uuid,display,conceptClass,datatype,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,numeric,descriptions,allowDecimal,displayPrecision,answers)),answers:(uuid,display,conceptClass,datatype,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,numeric,descriptions,allowDecimal,displayPrecision,answers)))))";
     return this.httpClient.get("form/" + uuid + fields).pipe(
       map((response) => {
-        return response
+        return response;
       }),
       catchError((error) => {
-        return of(error)
+        return of(error);
       })
     );
   }
