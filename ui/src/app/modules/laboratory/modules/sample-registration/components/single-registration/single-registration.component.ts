@@ -757,7 +757,9 @@ export class SingleRegistrationComponent implements OnInit {
                                             personIdentifierType.id
                                           ],
                                       identifierType: personIdentifierType.id,
-                                      location: this.currentLocation?.uuid,
+                                      location:
+                                        this.currentLocation?.uuid ||
+                                        "7fdfa2cb-bc95-405a-88c6-32b7673c0453", // TODO: Find a way to softcode this,
                                       preferred: true,
                                     };
                                   } else {
@@ -767,7 +769,9 @@ export class SingleRegistrationComponent implements OnInit {
                                           personIdentifierType.id
                                         ],
                                       identifierType: personIdentifierType.id,
-                                      location: this.currentLocation?.uuid,
+                                      location:
+                                        this.currentLocation?.uuid ||
+                                        "7fdfa2cb-bc95-405a-88c6-32b7673c0453", // TODO: Find a way to softcode this,
                                       preferred: false,
                                     };
                                   }
@@ -781,7 +785,7 @@ export class SingleRegistrationComponent implements OnInit {
                                   identifier: identifierResponse[0],
                                   identifierType:
                                     this.preferredPersonIdentifier,
-                                  location: this.currentLocation?.uuid,
+                                  location: this.currentLocation?.uuid || '7fdfa2cb-bc95-405a-88c6-32b7673c0453', // TODO: Find a way to softcode this
                                   preferred: true,
                                 },
                               ],
