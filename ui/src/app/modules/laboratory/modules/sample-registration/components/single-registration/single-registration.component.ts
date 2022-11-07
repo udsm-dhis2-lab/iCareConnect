@@ -168,7 +168,7 @@ export class SingleRegistrationComponent implements OnInit {
       new Dropdown({
         id: "agency",
         key: "agency",
-        label: "Agency/Priority",
+        label: "Urgency/Priority",
         options: [],
         conceptClass: "priority",
         searchControlType: "concept",

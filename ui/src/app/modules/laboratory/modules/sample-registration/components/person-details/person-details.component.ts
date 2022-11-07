@@ -326,7 +326,7 @@ export class PersonDetailsComponent implements OnInit {
         id: "mobileNumber",
         key: "mobileNumber",
         label: "Mobile number",
-        required: true,
+        required: false,
         type: "number",
         value: personDetails ? personDetails?.phoneNumber : null,
         min: 0,
