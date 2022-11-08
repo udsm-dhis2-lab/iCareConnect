@@ -483,7 +483,7 @@ public class ICareController {
 	@ResponseBody
 	public List<Object> getClientsFromExternalSystems(@RequestParam(value = "identifier", required = false) String identifier,
 	        @RequestParam(value = "identifierReference", required = false) String identifierReference,
-			@RequestParam(value = "basicAuth", required = false) String basicAuth) {
+			@RequestParam(value = "basicauth", required = false) String basicauth) {
 //		Object patientData = new Object();
 		List<Object> formattedTrackedEntityInstances = new ArrayList<>();
 		try {
