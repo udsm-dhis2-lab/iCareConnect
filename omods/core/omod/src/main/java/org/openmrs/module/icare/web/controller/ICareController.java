@@ -482,11 +482,12 @@ public class ICareController {
 	@RequestMapping(value = "client/externalsystems", method = RequestMethod.GET)
 	@ResponseBody
 	public List<Object> getClientsFromExternalSystems(@RequestParam(value = "identifier", required = false) String identifier,
-	        @RequestParam(value = "identifierReference", required = false) String identifierReference) {
+	        @RequestParam(value = "identifierReference", required = false) String identifierReference,
+			@RequestParam(value = "basicAuth", required = false) String basicAuth) {
 //		Object patientData = new Object();
 		List<Object> formattedTrackedEntityInstances = new ArrayList<>();
 		try {
-			String patientFromExternalSystem = iCareService.getClientsFromExternalSystems(identifier, identifierReference);
+			String patientFromExternalSystem = iCareService.getClientsFromExternalSystems(identifier, identifierReference, "bGlzaW50ZWdyYXRpb246RGhpc0AyMDIy");
 
 			AdministrationService administrationService = Context.getService(AdministrationService.class);
 

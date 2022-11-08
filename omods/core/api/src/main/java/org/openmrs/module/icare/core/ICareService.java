@@ -128,6 +128,6 @@ public interface ICareService extends OpenmrsService {
 	
 	List<Drug> getDrugs(String concept, Integer limit, Integer startIndex);
 	
-	String getClientsFromExternalSystems(String identifier, String identifierReference) throws IOException,
+	String getClientsFromExternalSystems(String identifier, String identifierReference, String basicAuthKey) throws IOException,
 	        URISyntaxException;
 }
