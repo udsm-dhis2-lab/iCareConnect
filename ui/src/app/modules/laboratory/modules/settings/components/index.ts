@@ -9,6 +9,7 @@ import { ConceptSetMembersComponent } from "./concept-set-members/concept-set-me
 import { ConceptSourcesComponent } from "./concept-sources/concept-sources.component";
 import { ConfigsComponent } from "./configs/configs.component";
 import { LabConfigurationsComponent } from "./lab-configurations/lab-configurations.component";
+import { LabEditUserModalComponent } from "./lab-edit-user-modal/lab-edit-user-modal.component";
 import { LabOrdersManagementDashboardComponent } from "./lab-orders-management-dashboard/lab-orders-management-dashboard.component";
 import { LabOrdersManagementComponent } from "./lab-orders-management/lab-orders-management.component";
 import { LabsSectionManagementComponent } from "./labs-section-management/labs-section-management.component";
@@ -52,6 +53,10 @@ export const components: any[] = [
   CodedAnswersSelectionComponent,
   LbPriceListContainerComponent,
   SharedPriceListComponent,
+  LabEditUserModalComponent,
 ];
 
-export const entrySettingComponents: any[] = [AddNewUserComponent];
+export const entrySettingComponents: any[] = [
+  AddNewUserComponent,
+  LabEditUserModalComponent,
+];
