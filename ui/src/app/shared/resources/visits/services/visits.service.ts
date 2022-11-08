@@ -123,6 +123,25 @@ export class VisitsService {
         })
       );
   }
+  getAdmittedPatientsVisitsByEncounterType(
+    encounterTypeUuid: string
+  ): Observable<any[]> {
+    return this.httpClient
+      .get(`icare/visit?encounterTypeUuid=${encounterTypeUuid}`)
+      .pipe(
+        map((visitResults: any) => {
+          return visitResults?.results.map((result) => {
+            return {
+              ...result,
+              locationUuid: result?.location?.uuid,
+            };
+          });
+        }),
+        catchError((error) => {
+          return of(error);
+        })
+      );
+  }
 
   getAdmittedPatientsVisits(locationUuids): Observable<any> {
     return zip(
@@ -166,7 +185,8 @@ export class VisitsService {
     orderStatusCode?: string,
     orderBy?: string,
     orderByDirection?: string,
-    filterBy?: string
+    filterBy?: string,
+    encounterType?: string
   ): Observable<any> {
     const locationUuids: any = isArray(location)
       ? location
@@ -175,84 +195,90 @@ export class VisitsService {
       : [];
 
     // Parameters for sorting
-    const orderByParameter = orderBy ? `&OrderBy=${orderBy}` : "";
-    const orderDirectionParameter = orderByDirection
-      ? `&orderByDirection=${orderByDirection}`
-      : "";
-    const sortingParameters =
-      orderByParameter || orderDirectionParameter
-        ? orderByParameter + orderDirectionParameter
-        : "";
-
-    if (orderType || !orderType) {
-      const orderStatusParameter = orderStatus
-        ? `&fulfillerStatus=${orderStatus}`
-        : "";
-      const orderStatusCodeParameter = orderStatusCode
-        ? `&orderStatusCode=${orderStatusCode}`
-        : "";
-      const orderTypeParameter = orderType ? `&orderTypeUuid=${orderType}` : "";
-
-      const searchTerm = queryParam ? `&q=${queryParam}` : "";
-      const filterByConst = filterBy ? filterBy : "";
-      //
-      return (
-        locationUuids?.length > 0
-          ? zip(
-              ...locationUuids.map((locationUuid) => {
-                const locationParameter = `locationUuid=${locationUuid}`;
-                return this.httpClient.get(
-                  `icare/visit?${locationParameter}${orderTypeParameter}${orderStatusParameter}${orderStatusCodeParameter}${searchTerm}${sortingParameters}${filterByConst}&startIndex=${startIndex}&limit=${limit}`
-                );
-              })
-            )
-          : this.httpClient.get(
-              `icare/visit?${orderTypeParameter.replace(
-                "&",
-                ""
-              )}${orderStatusParameter}${orderStatusCodeParameter}${searchTerm}${sortingParameters}${filterByConst}&startIndex=${startIndex}&limit=${limit}`
-            )
-      ).pipe(
-        map((visitResponse: any) => {
-          const results =
-            locationUuids?.length > 0
-              ? flatten(visitResponse.map((visitData) => visitData?.results))
-              : visitResponse?.results;
-          // TODO: Softcode Insurance attribute value (Concept UUID) - 00000101IIIIIIIIIIIIIIIIIIIIIIIIIIII
-          return (
-            (flatten(results) || [])
-              .map((visitResult: any) => {
-                const formattedResult = {
-                  pager:
-                    locationUuids?.length > 0
-                      ? visitResponse[0].links
-                      : visitResponse?.links,
-                  ...visitResult,
-                  paymentType:
-                    (
-                      visitResult?.attributes.filter(
-                        (attribute) =>
-                          attribute &&
-                          attribute?.display &&
-                          attribute?.display ===
-                            "00000101IIIIIIIIIIIIIIIIIIIIIIIIIIII"
-                      ) || []
-                    ).length > 0
-                      ? "Insurance"
-                      : "Cash",
-                };
-                return new Visit(formattedResult);
-              })
-              .filter((visit) =>
-                !onlyInsurance ? visit : visit?.paymentType === "Insurance"
-              ) || []
-          );
-        }),
-        catchError((error) => {
-          return of(error);
-        })
-      );
+    let parametersString = "";
+    if (orderBy) {
+      parametersString += `&OrderBy=${orderBy}`;
     }
+    if (orderStatus) {
+      parametersString += `&fulfillerStatus=${orderStatus}`;
+    }
+    if (orderByDirection) {
+      parametersString += `&orderByDirection=${orderByDirection}`;
+    }
+    if (orderStatusCode) {
+      parametersString += `&orderStatusCode=${orderStatusCode}`;
+    }
+    if (orderType) {
+      parametersString += `&orderTypeUuid=${orderType}`;
+    }
+    if (queryParam) {
+      parametersString += `&q=${queryParam}`;
+    }
+    if (filterBy) {
+      parametersString += filterBy;
+    }
+
+    if (encounterType) {
+      parametersString += `&encounterTypeUuid=${encounterType}`;
+    }
+    //
+    return (
+      locationUuids?.length > 0
+        ? zip(
+            ...locationUuids.map((locationUuid) => {
+              const locationParameter = `locationUuid=${locationUuid}`;
+              return this.httpClient.get(
+                `icare/visit?${locationParameter}${parametersString}&startIndex=${startIndex}&limit=${limit}`
+              );
+            })
+          )
+        : this.httpClient.get(
+            `icare/visit?${parametersString.replace(
+              "&",
+              ""
+            )}&startIndex=${startIndex}&limit=${limit}`
+          )
+    ).pipe(
+      map((visitResponse: any) => {
+        const results =
+          locationUuids?.length > 0
+            ? flatten(visitResponse.map((visitData) => visitData?.results))
+            : visitResponse?.results;
+        // TODO: Softcode Insurance attribute value (Concept UUID) - 00000101IIIIIIIIIIIIIIIIIIIIIIIIIIII
+        return (
+          (flatten(results) || [])
+            .map((visitResult: any) => {
+              const formattedResult = {
+                pager:
+                  locationUuids?.length > 0
+                    ? visitResponse[0].links
+                    : visitResponse?.links,
+                ...visitResult,
+                paymentType:
+                  (
+                    visitResult?.attributes.filter(
+                      (attribute) =>
+                        attribute &&
+                        attribute?.display &&
+                        attribute?.display ===
+                          "00000101IIIIIIIIIIIIIIIIIIIIIIIIIIII"
+                    ) || []
+                  ).length > 0
+                    ? "Insurance"
+                    : "Cash",
+              };
+              return new Visit(formattedResult);
+            })
+            .filter((visit) =>
+              !onlyInsurance ? visit : visit?.paymentType === "Insurance"
+            ) || []
+        );
+      }),
+      catchError((error) => {
+        return of(error);
+      })
+    );
+    // }
     return (
       locationUuids?.length > 0
         ? zip(

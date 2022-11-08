@@ -48,6 +48,7 @@ export class PatientListComponent implements OnInit, OnChanges {
   @Input() orderBy: string;
   @Input() orderByDirection: string;
   @Input() doNotUseLocation: boolean;
+  @Input() encounterType: string;
 
   page: number = 0;
   visits$: Observable<Visit[]>;
@@ -119,7 +120,8 @@ export class PatientListComponent implements OnInit, OnChanges {
             this.orderStatusCode,
             this.orderBy ? this.orderBy : "ENCOUNTER",
             this.orderByDirection ? this.orderByDirection : "ASC",
-            this.filterBy ? this.filterBy : ""
+            this.filterBy ? this.filterBy : "",
+            this.encounterType
           )
           .pipe(
             tap((response: any) => {
@@ -173,7 +175,8 @@ export class PatientListComponent implements OnInit, OnChanges {
               this.orderStatusCode,
               this.orderBy ? this.orderBy : "ENCOUNTER",
               this.orderByDirection ? this.orderByDirection : "ASC",
-              this.filterBy
+              this.filterBy,
+              this.encounterType
             )
             .pipe(
               tap((response: any) => {
@@ -202,7 +205,8 @@ export class PatientListComponent implements OnInit, OnChanges {
         this.orderStatusCode,
         this.orderBy ? this.orderBy : "ENCOUNTER",
         this.orderByDirection ? this.orderByDirection : "ASC",
-        this.filterBy ? this.filterBy : ""
+        this.filterBy ? this.filterBy : "",
+        this.encounterType
       )
       .pipe(
         tap((response: any) => {
@@ -297,7 +301,8 @@ export class PatientListComponent implements OnInit, OnChanges {
         this.orderStatusCode,
         this.orderBy ? this.orderBy : "ENCOUNTER",
         this.orderByDirection ? this.orderByDirection : "ASC",
-        this.filterBy
+        this.filterBy,
+        this.encounterType
       )
       .pipe(
         tap((response: any) => {
