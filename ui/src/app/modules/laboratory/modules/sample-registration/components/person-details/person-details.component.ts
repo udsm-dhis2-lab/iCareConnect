@@ -93,7 +93,13 @@ export class PersonDetailsComponent implements OnInit {
     event.stopPropagation();
     this.personDetailsCategory = category;
     this.pinnedCategory = category;
-    localStorage.setItem("pinnedCategory", category);
+    const storedCategory = localStorage.getItem("pinnedCategory");
+    if (storedCategory != this.pinnedCategory) {
+      localStorage.setItem("pinnedCategory", category);
+    } else {
+      this.pinnedCategory = null;
+      localStorage.removeItem("pinnedCategory");
+    }
   }
 
   setIdentifierFields(
