@@ -509,9 +509,11 @@ public class LaboratoryController {
 	
 	@RequestMapping(value = "sampleidgen", method = RequestMethod.GET)
 	@ResponseBody
-	public String generateSampleLabel() {
-		String sampleLabel = laboratoryService.generateSampleLabel();
-		return sampleLabel;
+	public Map<String, Object> generateSampleLabel() {
+		String sampleLabel = (String) laboratoryService.generateSampleLabel();
+		Map<String, Object> label = new HashMap<>();
+		label.put("label", sampleLabel);
+		return label;
 	}
 	
 	@RequestMapping(value = "samplelable", method = RequestMethod.GET)
