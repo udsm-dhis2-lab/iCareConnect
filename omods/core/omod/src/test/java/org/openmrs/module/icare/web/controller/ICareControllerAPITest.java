@@ -654,15 +654,27 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		administrationService.setGlobalProperty("iCare.externalSystems.integrated.pimaCovid.programUid", "MNhYWMkR0Z7");
 		String dto = this.readFile("dto/lab-request-data.json");
 		Map<String, Object> labRequest = (new ObjectMapper()).readValue(dto, Map.class);
-		MockHttpServletRequest newGetRequest = newPostRequest("icare/externalsystems/results", labRequest);
+		MockHttpServletRequest newGetRequest = newPostRequest("icare/externalsystems/labrequest", labRequest);
 		MockHttpServletResponse handle = handle(newGetRequest);
-		String patientData = handle.getContentAsString();
-		System.out.println(patientData);
-		//		Map clientDataMap = (new ObjectMapper()).readValue(patientData, Map.class);
-		//		System.out.println(clientDataMap.get("trackedEntityInstances"));
-		//		System.out.println(patientData);
-		//		Map patientDataMap = (new ObjectMapper()).readValue(patientData, Map.class);
-		//		List<Map> patientDataDetails = (List<Map>) patientDataMap;
-		//		System.out.println(patientDataDetails);
+		String data = handle.getContentAsString();
+		System.out.println(data);
+	}
+	
+	@Test
+	public void testPimaCovidLabResult() throws Exception {
+		AdministrationService administrationService = Context.getService(AdministrationService.class);
+		
+		administrationService.setGlobalProperty("iCare.externalSystems.integrated.pimaCovid.baseUrl",
+		    "https://covid19-dev.moh.go.tz");
+		administrationService.setGlobalProperty("iCare.externalSystems.integrated.pimaCovid.username", "lisintegration");
+		administrationService.setGlobalProperty("iCare.externalSystems.integrated.pimaCovid.password", "Dhis@2022");
+		administrationService.setGlobalProperty("iCare.externalSystems.integrated.pimaCovid.referenceOuUid", "m0frOspS7JY");
+		administrationService.setGlobalProperty("iCare.externalSystems.integrated.pimaCovid.programUid", "MNhYWMkR0Z7");
+		String dto = this.readFile("dto/lab-request-data.json");
+		Map<String, Object> labRequest = (new ObjectMapper()).readValue(dto, Map.class);
+		MockHttpServletRequest newGetRequest = newPostRequest("icare/externalsystems/labresult", labRequest);
+		MockHttpServletResponse handle = handle(newGetRequest);
+		String data = handle.getContentAsString();
+		System.out.println(data);
 	}
 }

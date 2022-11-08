@@ -631,7 +631,7 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		reader.close();
 		return responseContent.toString();
 	}
-
+	
 	public String savePimaCovidLabResult(Map<String, Object> results)
 			throws IOException {
 		AdministrationService administrationService = Context.getService(AdministrationService.class);
