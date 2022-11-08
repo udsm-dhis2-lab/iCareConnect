@@ -9,6 +9,7 @@ import { SystemUsersService } from "src/app/core/services/system-users.service";
 import { AppState } from "src/app/store/reducers";
 import { getCurrentUserDetails } from "src/app/store/selectors/current-user.selectors";
 import { AddNewUserComponent } from "../add-new-user/add-new-user.component";
+import { LabEditUserModalComponent } from "../lab-edit-user-modal/lab-edit-user-modal.component";
 
 @Component({
   selector: "app-user-management-dashboard",
@@ -33,6 +34,7 @@ export class UserManagementDashboardComponent implements OnInit, AfterViewInit {
   page: number = 1;
   pageCount: number = 25;
   @ViewChild(MatPaginator) paginator: MatPaginator;
+  filterValue: string = "";
   public data = {};
 
   constructor(
@@ -46,11 +48,7 @@ export class UserManagementDashboardComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     // TODO: current user to be used for privilages control
     this.currentUser$ = this.store.select(getCurrentUserDetails);
-    this.users$ = this.service.getUsers({
-      q: "",
-      limit: this.pageCount,
-      startIndex: (this.page - 1) * this.pageCount,
-    });
+    this.getUsers();
   }
 
   ngAfterViewInit() {
@@ -62,10 +60,15 @@ export class UserManagementDashboardComponent implements OnInit, AfterViewInit {
   getRecord(row: any): void {
     this.data = row;
     localStorage.setItem("selectedUser", JSON.stringify(row));
-    this.router.navigate(["edit-user"], {
-      state: this.data,
-      relativeTo: this.route,
-      queryParams: { id: row.uuid },
+    // this.router.navigate(["edit-user"], {
+    //   state: this.data,
+    //   relativeTo: this.route,
+    //   queryParams: { id: row.uuid },
+    // });
+    this.dialog.open(LabEditUserModalComponent, {
+      width: "70%",
+      data: this.data,
+      maxHeight: "70vh",
     });
   }
 
@@ -85,12 +88,22 @@ export class UserManagementDashboardComponent implements OnInit, AfterViewInit {
 
   applyFilter(event: Event): void {
     event.stopPropagation();
-    const filterValue = (event.target as HTMLInputElement).value;
+    this.filterValue = (event.target as HTMLInputElement).value;
     this.page = 1;
+    this.getUsers();
+  }
+
+  getUsers(): void {
     this.users$ = this.service.getUsers({
-      q: filterValue,
+      q: this.filterValue,
       limit: this.pageCount,
       startIndex: (this.page - 1) * this.pageCount,
     });
+  }
+
+  getUsersList(event: Event, action: string): void {
+    event.stopPropagation();
+    this.page = action === "next" ? this.page + 1 : this.page - 1;
+    this.getUsers();
   }
 }

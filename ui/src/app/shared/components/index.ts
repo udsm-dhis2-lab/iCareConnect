@@ -103,6 +103,7 @@ import { SharedSampleDetailsComponent } from "./shared-sample-details/shared-sam
 import { SharedVisitHistorySummaryComponent } from "./shared-visit-history-summary/shared-visit-history-summary.component";
 import { SharedSystemSettingsListComponent } from "./shared-system-settings-list/shared-system-settings-list.component";
 import { SharedUserProfileManagementComponent } from "./shared-user-profile-management/shared-user-profile-management.component";
+import { SharedManageUserComponent } from "./shared-manage-user/shared-manage-user.component";
 
 export const components: any[] = [
   PatientAddressComponent,
@@ -211,6 +212,7 @@ export const components: any[] = [
   SharedVisitHistorySummaryComponent,
   SharedSystemSettingsListComponent,
   SharedUserProfileManagementComponent,
+  SharedManageUserComponent,
 ];
 
 export const sharedEntryComponents: any[] = [
