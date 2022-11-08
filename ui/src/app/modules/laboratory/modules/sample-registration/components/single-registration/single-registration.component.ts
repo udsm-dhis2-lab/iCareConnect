@@ -982,19 +982,14 @@ export class SingleRegistrationComponent implements OnInit {
                                                   );
 
                                                   this.samplesService
-                                                    .getSampleLabel()
+                                                    .getIncreamentalSampleLabel()
                                                     .subscribe(
-                                                      (sampleLabelResponse) => {
-                                                        if (
-                                                          sampleLabelResponse
-                                                        ) {
-                                                          // Create sample
-                                                          // TODO: Softcode base characters (NPHL)
-                                                          const sampleLabel =
-                                                            "NPHL" +
-                                                            this.formatToSpecifiedChars(
-                                                              sampleLabelResponse
-                                                            );
+                                                      (sampleLabel) => {
+                                                        if (sampleLabel) {
+                                                          console.log(
+                                                            "sampleLabel",
+                                                            sampleLabel
+                                                          );
                                                           const sample = {
                                                             visit: {
                                                               uuid: visitResponse?.uuid,
@@ -1346,7 +1341,9 @@ export class SingleRegistrationComponent implements OnInit {
                                                                     this
                                                                       .formData[
                                                                       "transportationTemperature"
-                                                                    ]?.value?.length > 0
+                                                                    ]?.value
+                                                                      ?.length >
+                                                                    0
                                                                   ) {
                                                                     const transportationTemperature =
                                                                       {

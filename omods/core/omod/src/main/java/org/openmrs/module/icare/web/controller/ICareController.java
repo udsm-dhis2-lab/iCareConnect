@@ -12,6 +12,7 @@ package org.openmrs.module.icare.web.controller;
 import com.mysql.fabric.xmlrpc.Client;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.azeckoski.reflectutils.transcoders.ObjectEncoder;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.util.JSONPObject;
 import org.json.JSONObject;
@@ -27,6 +28,7 @@ import org.openmrs.module.icare.core.ICareService;
 import org.openmrs.module.icare.core.Item;
 import org.openmrs.module.icare.core.Message;
 import org.openmrs.module.icare.core.Summary;
+import org.openmrs.module.icare.core.models.PimaCovidLabRequest;
 import org.openmrs.module.icare.core.utils.PatientWrapper;
 import org.openmrs.module.icare.core.utils.VisitWrapper;
 import org.openmrs.module.icare.store.models.OrderStatus;
@@ -39,6 +41,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.naming.ConfigurationException;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.text.ParseException;
 import java.util.*;
 
 /**
@@ -482,17 +485,17 @@ public class ICareController {
 	@RequestMapping(value = "client/externalsystems", method = RequestMethod.GET)
 	@ResponseBody
 	public List<Object> getClientsFromExternalSystems(@RequestParam(value = "identifier", required = false) String identifier,
-	        @RequestParam(value = "identifierReference", required = false) String identifierReference) {
+	        @RequestParam(value = "identifierReference", required = false) String identifierReference,
+			@RequestParam(value = "basicAuth", required = false) String basicAuth) {
 //		Object patientData = new Object();
 		List<Object> formattedTrackedEntityInstances = new ArrayList<>();
 		try {
-			String patientFromExternalSystem = iCareService.getClientsFromExternalSystems(identifier, identifierReference);
+			String patientFromExternalSystem = iCareService.getClientsFromExternalSystems(identifier, identifierReference, basicAuth);
 
 			AdministrationService administrationService = Context.getService(AdministrationService.class);
 
 //			Get Attributes for extracting attribute values
 			String firstNameAttributeUid = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.attributes.firstName");
-//					"bVEIQbyClKX";
 			String middleNameAttributeUid = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.attributes.middleName");
 			String lastNameAttributeUid = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.attributes.lastName");
 			String genderAttributeUid = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.attributes.gender");
@@ -511,65 +514,69 @@ public class ICareController {
 			JSONObject test = new JSONObject(patientFromExternalSystem);
 			Map trackedEntityInstancesMap = (new ObjectMapper()).readValue(patientFromExternalSystem, Map.class);
 //			patientData = trackedEntityInstancesMap.get("trackedEntityInstances");
-			List<Object> trackedEntityInstances = (List<Object>)trackedEntityInstancesMap.get("trackedEntityInstances");
-			for (int count =0; count < trackedEntityInstances.size(); count++) {
-				Map<String, Object> clientFormattedData = new HashMap<>();
-				Map<String, Object> currentTrackedEntityInstance = new HashMap<>();
-				currentTrackedEntityInstance = (Map<String, Object> )trackedEntityInstances.get(count);
-				List<Object> enrollments = (List<Object>)currentTrackedEntityInstance.get("enrollments");
-				Map<String, Object> eventData = new HashMap<>();
-				Map<String, Object> currentEnrollment = (Map<String, Object> )enrollments.get(0);  // Expected to have only one enrollment
-				List<Object> events = (List<Object>)currentEnrollment.get("events");
-				eventData.put("hasResults", events.size() == 2);
-				clientFormattedData.put("events", events);
-				for (int eventCount =0; eventCount< events.size(); eventCount ++) {
-					Map<String, Object> event =(Map<String, Object>) events.get(eventCount);
-					if (event.get("programStage").equals(resultsStageId)) {
-						clientFormattedData.put("hasResults", true);
-					}
+			if (trackedEntityInstancesMap != null && trackedEntityInstancesMap.get("trackedEntityInstances") != null) {
+				List<Object> trackedEntityInstances = (List<Object>)trackedEntityInstancesMap.get("trackedEntityInstances");
+				if (trackedEntityInstances.size() > 0) {
+					for (int count =0; count < trackedEntityInstances.size(); count++) {
+						Map<String, Object> clientFormattedData = new HashMap<>();
+						Map<String, Object> currentTrackedEntityInstance = new HashMap<>();
+						currentTrackedEntityInstance = (Map<String, Object> )trackedEntityInstances.get(count);
+						List<Object> enrollments = (List<Object>)currentTrackedEntityInstance.get("enrollments");
+						Map<String, Object> eventData = new HashMap<>();
+						Map<String, Object> currentEnrollment = (Map<String, Object> )enrollments.get(0);  // Expected to have only one enrollment
+						List<Object> events = (List<Object>)currentEnrollment.get("events");
+						eventData.put("hasResults", events.size() == 2);
+						clientFormattedData.put("events", events);
+						for (int eventCount =0; eventCount< events.size(); eventCount ++) {
+							Map<String, Object> event =(Map<String, Object>) events.get(eventCount);
+							if (event.get("programStage").equals(resultsStageId)) {
+								clientFormattedData.put("hasResults", true);
+							}
 
-					if (event.get("programStage").equals(testRequestStageId)) {
-						clientFormattedData.put("testRequestData", event);
-					}
-				}
-				clientFormattedData.put("trackedEntityInstance", currentTrackedEntityInstance.get("trackedEntityInstance"));
-				clientFormattedData.put("enrollment", currentEnrollment.get("enrollment"));
-				clientFormattedData.put("enrollmentDate", currentEnrollment.get("enrollmentDate"));
-				clientFormattedData.put("orgUnitName", currentEnrollment.get("orgUnitName"));
-				clientFormattedData.put("orgUnit", currentEnrollment.get("orgUnit"));
-				clientFormattedData.put("status", currentEnrollment.get("status"));
-				clientFormattedData.put("program", currentEnrollment.get("program"));
-				List<Object> attributes = (List<Object>) currentTrackedEntityInstance.get("attributes");
-				for (int attributeCount =0; attributeCount < attributes.size(); attributeCount ++) {
-					Map<String, Object> attribute = (Map<String, Object> )attributes.get(attributeCount);
-					if (attribute.get("attribute").equals(firstNameAttributeUid)) {
-						clientFormattedData.put("firstName",attribute.get("value"));
-					}
-					if (attribute.get("attribute").equals(middleNameAttributeUid)) {
-						clientFormattedData.put("middleName",attribute.get("value"));
-					}
-					if (attribute.get("attribute").equals(lastNameAttributeUid)) {
-						clientFormattedData.put("lastName",attribute.get("value"));
-					}
-					if (attribute.get("attribute").equals(genderAttributeUid)) {
-						clientFormattedData.put("gender",attribute.get("value"));
-					}
-					if (attribute.get("attribute").equals(nationalityAttributeUid)) {
-						clientFormattedData.put("nationality",attribute.get("value"));
-					}
-					if (attribute.get("attribute").equals(dobAttributeUid)) {
-						clientFormattedData.put("dob",attribute.get("value"));
-					}
-					if (attribute.get("attribute").equals(passportNumberAttributeUid)) {
-						clientFormattedData.put("passportNumber",attribute.get("value"));
-					}
-					if (attribute.get("attribute").equals(phoneNumberAttributeUid)) {
-						clientFormattedData.put("phoneNumber",attribute.get("value"));
-					}
-				}
-				clientFormattedData.put("attributes", currentTrackedEntityInstance.get("attributes"));
+							if (event.get("programStage").equals(testRequestStageId)) {
+								clientFormattedData.put("testRequestData", event);
+							}
+						}
+						clientFormattedData.put("trackedEntityInstance", currentTrackedEntityInstance.get("trackedEntityInstance"));
+						clientFormattedData.put("enrollment", currentEnrollment.get("enrollment"));
+						clientFormattedData.put("enrollmentDate", currentEnrollment.get("enrollmentDate"));
+						clientFormattedData.put("orgUnitName", currentEnrollment.get("orgUnitName"));
+						clientFormattedData.put("orgUnit", currentEnrollment.get("orgUnit"));
+						clientFormattedData.put("status", currentEnrollment.get("status"));
+						clientFormattedData.put("program", currentEnrollment.get("program"));
+						List<Object> attributes = (List<Object>) currentTrackedEntityInstance.get("attributes");
+						for (int attributeCount =0; attributeCount < attributes.size(); attributeCount ++) {
+							Map<String, Object> attribute = (Map<String, Object> )attributes.get(attributeCount);
+							if (attribute.get("attribute").equals(firstNameAttributeUid)) {
+								clientFormattedData.put("firstName",attribute.get("value"));
+							}
+							if (attribute.get("attribute").equals(middleNameAttributeUid)) {
+								clientFormattedData.put("middleName",attribute.get("value"));
+							}
+							if (attribute.get("attribute").equals(lastNameAttributeUid)) {
+								clientFormattedData.put("lastName",attribute.get("value"));
+							}
+							if (attribute.get("attribute").equals(genderAttributeUid)) {
+								clientFormattedData.put("gender",attribute.get("value"));
+							}
+							if (attribute.get("attribute").equals(nationalityAttributeUid)) {
+								clientFormattedData.put("nationality",attribute.get("value"));
+							}
+							if (attribute.get("attribute").equals(dobAttributeUid)) {
+								clientFormattedData.put("dob",attribute.get("value"));
+							}
+							if (attribute.get("attribute").equals(passportNumberAttributeUid)) {
+								clientFormattedData.put("passportNumber",attribute.get("value"));
+							}
+							if (attribute.get("attribute").equals(phoneNumberAttributeUid)) {
+								clientFormattedData.put("phoneNumber",attribute.get("value"));
+							}
+						}
+						clientFormattedData.put("attributes", currentTrackedEntityInstance.get("attributes"));
 //				formattedTrackedEntityInstance.put("orgUnitName", (new ObjectMapper()).readValue(trackedEntityInstances[count], Map.class));
-				formattedTrackedEntityInstances.add(count,clientFormattedData);
+						formattedTrackedEntityInstances.add(count,clientFormattedData);
+					}
+				}
 			}
 		}
 		catch (IOException e) {
@@ -579,5 +586,41 @@ public class ICareController {
 			throw new RuntimeException(e);
 		}
 		return formattedTrackedEntityInstances;
+	}
+	
+	@RequestMapping(value = "externalsystems/labrequest", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public String createLabRequest(@RequestBody Map<String, Object> labRequestObject) throws ParseException {
+		
+		Map<String, Object> labRequest = labRequestObject;
+		String response;
+		try {
+			response = iCareService.createPimaCovidLabRequest(labRequest, "");
+		}
+		catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+		catch (URISyntaxException e) {
+			throw new RuntimeException(e);
+		}
+		return response;
+	}
+	
+	@RequestMapping(value = "externalsystems/labresult", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public String saveLabResults(@RequestBody Map<String, Object> labResultObject) throws ParseException {
+		
+		Map<String, Object> labResult = labResultObject;
+		String response;
+		try {
+			response = iCareService.savePimaCovidLabResult(labResult);
+		}
+		catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+		catch (URISyntaxException e) {
+			throw new RuntimeException(e);
+		}
+		return response;
 	}
 }

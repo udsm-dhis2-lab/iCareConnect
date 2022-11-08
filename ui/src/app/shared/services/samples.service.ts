@@ -7,12 +7,16 @@ import { BASE_URL } from "../constants/constants.constants";
 import { catchError, delay, map } from "rxjs/operators";
 import { SampleObject } from "src/app/modules/laboratory/resources/models";
 import { formatSample } from "../helpers/lab-samples.helper";
+import { OpenmrsHttpClientService } from "../modules/openmrs-http-client/services/openmrs-http-client.service";
 
 @Injectable({
   providedIn: "root",
 })
 export class SamplesService {
-  constructor(private httpClient: HttpClient) {}
+  constructor(
+    private httpClient: HttpClient,
+    private opeMRSHttpClientService: OpenmrsHttpClientService
+  ) {}
 
   getLabSamplesByCollectionDates(dates): Observable<any> {
     return this.httpClient
@@ -35,6 +39,15 @@ export class SamplesService {
     return this.httpClient.get(`${BASE_URL}lab/samplelable`).pipe(
       map((response: { label: number }) => {
         return response?.label;
+      }),
+      catchError((error) => of(error))
+    );
+  }
+
+  getIncreamentalSampleLabel(): Observable<string> {
+    return this.opeMRSHttpClientService.get(`lab/sampleidgen`).pipe(
+      map((response) => {
+        return response?.label.toString();
       }),
       catchError((error) => of(error))
     );

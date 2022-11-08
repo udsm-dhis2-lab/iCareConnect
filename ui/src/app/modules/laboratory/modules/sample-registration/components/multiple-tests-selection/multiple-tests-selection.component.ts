@@ -25,21 +25,13 @@ export class MultipleTestsSelectionComponent implements OnInit {
   constructor(private conceptService: ConceptsService) {}
 
   ngOnInit(): void {
-    if (
-      this.setMembersFromSpecimen &&
-      this.setMembersFromSpecimen?.length > 0
-    ) {
-      this.testSelectionCategory = "by-specimen";
-    } else {
-      this.testSelectionCategory = "All";
-    }
-
     this.selectedSetMembersItems = [
       ...this.selectedSetMembersItems,
       ...this.selectedMembers,
     ];
     this.testSelectionCategory =
-      this.selectedSetMembersItems?.length > 0 ? "by-specimen" : "All";
+      this.selectedSetMembersItems?.length > 0 ? "by-specimen" : this.setMembersFromSpecimen &&
+      this.setMembersFromSpecimen?.length > 0 ? "by-specimen" : "All";
     this.conceptsList$ = !this.setMembersFromSpecimen
       ? this.conceptService.getConceptsBySearchTerm("TEST_ORDERS")
       : of(

@@ -6,12 +6,15 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.openmrs.*;
+import org.openmrs.api.AdministrationService;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.icare.ICareConfig;
 import org.openmrs.module.icare.core.Summary;
 import org.openmrs.module.icare.laboratory.dao.TestOrderLocationDAO;
 import org.openmrs.module.icare.laboratory.models.TestOrderLocation;
 import org.openmrs.module.icare.laboratory.models.WorkloadSummary;
 import org.openmrs.module.icare.laboratory.services.LaboratoryService;
+import org.openmrs.module.icare.report.dhis2.DHIS2Config;
 import org.openmrs.module.icare.web.controller.core.BaseResourceControllerTest;
 import org.openmrs.module.webservices.rest.SimpleObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +41,16 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 	public void setUp() throws SQLException {
 		initializeInMemoryDatabase();
 		executeDataSet("lab-data.xml");
+	}
+	
+	@Test
+	public void testGenerateSampleLabel() throws Exception {
+		AdministrationService adminService = Context.getService(AdministrationService.class);
+		adminService.setGlobalProperty(ICareConfig.SAMPLE_ID_FORMAT, "NPHL/D{YYYY}/COUNT");
+		MockHttpServletRequest newGetRequest = newGetRequest("lab/sampleidgen");
+		MockHttpServletResponse handle = handle(newGetRequest);
+		String label = handle.getContentAsString();
+		System.out.println(label);
 	}
 	
 	@Test
@@ -319,6 +332,13 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		
 		MockHttpServletResponse handleGet = handle(newGetResquest);
 		
+	}
+	
+	@Test
+	public void testGeneratingSampleLabel() throws Exception {
+		MockHttpServletRequest newGetRequest = newGetRequest("lab/samplelable");
+		MockHttpServletResponse handleGet = handle(newGetRequest);
+		System.out.println(handleGet.getContentAsString());
 	}
 	
 	@Test
