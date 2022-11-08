@@ -54,7 +54,7 @@ public class StockDAO extends BaseDAO<Stock> {
 		String queryStr = "SELECT st \n" + "FROM Stock st \n"
 		        + "WHERE st.item = (SELECT it FROM Item it WHERE it.uuid = :itemUuid) "
 		        + "AND st.location = (SELECT l FROM Location l WHERE l.uuid = :locationUuid)\n"
-		        + "AND st.item.stockable = true ORDER BY st.expiryDate DESC";
+		        + "AND st.item.stockable = true AND st.quantity > 0 ORDER BY st.expiryDate DESC";
 		
 		Query query = session.createQuery(queryStr);
 		query.setParameter("itemUuid", itemUuid);
@@ -319,7 +319,7 @@ public class StockDAO extends BaseDAO<Stock> {
 		query for out of stock
 		------------------------
 		------------------------- */
-		metricsMap.put("stockedOut", this.getStockedOutByLocation(locationUuid, "", 0, 0, "").size());
+		metricsMap.put("stockedOut", this.getStockedOutByLocation(locationUuid, null, 0, 0, null).size());
 		
 		/* ------------------------
 		-----------------------
