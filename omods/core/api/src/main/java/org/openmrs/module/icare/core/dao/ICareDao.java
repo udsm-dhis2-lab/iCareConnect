@@ -280,9 +280,9 @@ public class ICareDao extends BaseDAO<Item> {
 		return prescription;
 	}
 	
-	public List<Visit> getVisitsByOrderType(String search, String orderTypeUuid, String locationUuid,
-	        OrderStatus.OrderStatusCode orderStatusCode, Order.FulfillerStatus fulfillerStatus, Integer limit,
-	        Integer startIndex, VisitWrapper.OrderBy orderBy, VisitWrapper.OrderByDirection orderByDirection,
+	public List<Visit> getVisitsByOrderType(String search, String orderTypeUuid, String encounterTypeUuid,
+	        String locationUuid, OrderStatus.OrderStatusCode orderStatusCode, Order.FulfillerStatus fulfillerStatus,
+	        Integer limit, Integer startIndex, VisitWrapper.OrderBy orderBy, VisitWrapper.OrderByDirection orderByDirection,
 	        String attributeValueReference, VisitWrapper.PaymentStatus paymentStatus) {
 		
 		Query query = null;
@@ -292,8 +292,7 @@ public class ICareDao extends BaseDAO<Item> {
 		        + "LEFT JOIN p.identifiers pi ";
 		//				+ " INNER JOIN p.attributes pattr";
 		
-		if (orderTypeUuid != null) {
-			
+		if (orderTypeUuid != null && encounterTypeUuid == null) {
 			queryStr = queryStr + " INNER JOIN v.encounters e" + " INNER JOIN e.orders o" + " INNER JOIN o.orderType ot"
 			        + " WHERE ot.uuid=:orderTypeUuid " + " AND v.stopDatetime IS NULL ";
 			
@@ -312,6 +311,9 @@ public class ICareDao extends BaseDAO<Item> {
 				}
 			}
 			
+		} else if (encounterTypeUuid != null && orderTypeUuid == null) {
+			queryStr += " INNER JOIN v.encounters e INNER JOIN e.encounterType et ";
+			queryStr += " WHERE et.uuid = :encounterTypeUuid AND v.stopDatetime IS NULL ";
 		} else {
 			queryStr = queryStr + " INNER JOIN v.encounters e WHERE v.stopDatetime IS NULL ";
 			
@@ -379,6 +381,10 @@ public class ICareDao extends BaseDAO<Item> {
 			} else {
 				query.setParameter("orderStatusCode", orderStatusCode);
 			}
+		}
+		
+		if (encounterTypeUuid != null) {
+			query.setParameter("encounterTypeUuid", encounterTypeUuid);
 		}
 		
 		if (locationUuid != null) {
