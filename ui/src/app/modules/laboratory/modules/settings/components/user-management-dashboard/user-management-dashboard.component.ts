@@ -30,6 +30,8 @@ export class UserManagementDashboardComponent implements OnInit, AfterViewInit {
   ];
   dataSource: MatTableDataSource<any>;
   users$: Observable<any>;
+  page: number = 1;
+  pageCount: number = 25;
   @ViewChild(MatPaginator) paginator: MatPaginator;
   public data = {};
 
@@ -44,7 +46,11 @@ export class UserManagementDashboardComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     // TODO: current user to be used for privilages control
     this.currentUser$ = this.store.select(getCurrentUserDetails);
-    this.users$ = this.service.getUsers({ q: "" });
+    this.users$ = this.service.getUsers({
+      q: "",
+      limit: this.pageCount,
+      startIndex: (this.page - 1) * this.pageCount,
+    });
   }
 
   ngAfterViewInit() {
@@ -80,6 +86,11 @@ export class UserManagementDashboardComponent implements OnInit, AfterViewInit {
   applyFilter(event: Event): void {
     event.stopPropagation();
     const filterValue = (event.target as HTMLInputElement).value;
-    this.users$ = this.service.getUsers({ q: filterValue });
+    this.page = 1;
+    this.users$ = this.service.getUsers({
+      q: filterValue,
+      limit: this.pageCount,
+      startIndex: (this.page - 1) * this.pageCount,
+    });
   }
 }

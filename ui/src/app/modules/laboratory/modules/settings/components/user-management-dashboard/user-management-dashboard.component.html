@@ -42,7 +42,7 @@
     </mat-form-field>
     <app-users-list
       *ngIf="params?.users"
-      [users]="params?.users?.results"
+      [users]="params?.users"
       [currentUser]="params?.currentUser"
       (edit)="getRecord($event)"
     ></app-users-list>
