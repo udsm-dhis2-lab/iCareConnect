@@ -62,7 +62,7 @@ export class VisitsService {
                       : encounterProvider?.provider?.display?.split("- ")[1],
                 },
                 encounterType: encounter.encounterType,
-                conceptUuid: observation?.concept?.uuid,
+                conceptUuid: observation?.concept?.uuid || observation?.uuid,
               };
             }),
           ];
