@@ -619,19 +619,19 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 	}
 	
 	@Test
-	@Ignore
 	public void testGetClientsFromExternalSystem() throws Exception {
 		AdministrationService administrationService = Context.getService(AdministrationService.class);
 
-		administrationService.setGlobalProperty("iCare.externalSystems.integrated.pimaCovid.baseUrl","https://covid19-dev.moh.go.tz");
-		administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.username","lisintegration");
-		administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.password","Dhis@2022");
-		administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.referenceOuUid","m0frOspS7JY");
-		administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.programUid","MNhYWMkR0Z7");
+		administrationService.setGlobalProperty("iCare.externalSystems.integrated.pimaCovid.baseUrl","https://covid19-admin.moh.go.tz");
+		administrationService.setGlobalProperty("iCare.externalSystems.integrated.pimaCovid.username","lisintegration");
+		administrationService.setGlobalProperty("iCare.externalSystems.integrated.pimaCovid.password","Dhis@2022");
+		administrationService.setGlobalProperty("iCare.externalSystems.integrated.pimaCovid.referenceOuUid","m0frOspS7JY");
+		administrationService.setGlobalProperty("iCare.externalSystems.integrated.pimaCovid.programUid","MNhYWMkR0Z7");
 		MockHttpServletRequest newGetRequest = newGetRequest("icare/client/externalsystems", new Parameter("identifier",
-		        "2133573"), new Parameter("identifierReference", "t74raEkPShW"));
+		        "TAE185936"), new Parameter("identifierReference", "zxdIGVIuhWU"), new Parameter("basicAuth", "b21vc2hpOkdpdGh1YjRjb2RlIQ=="));
 		MockHttpServletResponse handle = handle(newGetRequest);
 		String patientData = handle.getContentAsString();
+		System.out.println(patientData);
 		//		Map clientDataMap = (new ObjectMapper()).readValue(patientData, Map.class);
 		//		System.out.println(clientDataMap.get("trackedEntityInstances"));
 		//		System.out.println(patientData);
