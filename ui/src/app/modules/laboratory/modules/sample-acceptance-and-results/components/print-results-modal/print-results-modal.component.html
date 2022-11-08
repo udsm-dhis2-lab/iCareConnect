@@ -8,7 +8,6 @@
 >
   <div id="results-to-print" style="color: gray">
     <mat-accordion>
-      {{ params?.visit | json }}
       <mat-expansion-panel
         [expanded]="
           samplesGroupedByDepartment.departmentName ==
@@ -194,7 +193,7 @@
                           ? (samplesGroupedByDepartment?.samples[0]?.created
                             | date: "medium")
                           : (samplesGroupedByDepartment?.samples[0]
-                              ?.collectedByStatus?.timestamp | date: "medium")
+                              ?.collectedOnStatus | date: "medium")
                       }}
                     </td>
                   </tr>
@@ -217,7 +216,7 @@
                       </span>
                     </td>
                   </tr>
-                  <tr *ngIf="params?.referringDoctorAttributes">
+                  <tr *ngIf="LISConfigurations?.isLIS && params?.referringDoctorAttributes">
                     <td></td>
                     <td></td>
                     <td>
@@ -229,6 +228,36 @@
                         
                         {{ params?.visit?.attributes[params?.referringDoctorAttributes[0].value] ? "(" +params?.visit?.attributesKeyedByAttributeType[params?.referringDoctorAttributes[0].value].value + ")" : ""}}
                         
+                      </span>
+                    </td>
+                  </tr>
+                  <tr *ngIf="LISConfigurations?.isLIS">
+                    <td></td>
+                    <td></td>
+                    <td>
+                      <b> Received by  </b>
+                    </td>
+                    <td>
+                      <span>
+                        {{
+                          samplesGroupedByDepartment?.samples[0]
+                              ?.receivedByStatus?.remarks
+                        }}
+                      </span>
+                    </td>
+                  </tr>
+                  <tr *ngIf="LISConfigurations?.isLIS">
+                    <td></td>
+                    <td></td>
+                    <td>
+                      <b> Received On  </b>
+                    </td>
+                    <td>
+                      <span>
+                        {{
+                          samplesGroupedByDepartment?.samples[0]
+                              ?.receivedOnStatus?.remarks
+                        }}
                       </span>
                     </td>
                   </tr>
