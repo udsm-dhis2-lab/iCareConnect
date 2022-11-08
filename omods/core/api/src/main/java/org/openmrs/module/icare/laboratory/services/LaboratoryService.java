@@ -83,6 +83,8 @@ public interface LaboratoryService extends OpenmrsService {
 	
 	SampleLable updateSampleLable(SampleLable sampleLable, Integer previousLable);
 	
+	String generateSampleLabel();
+	
 	List<Visit> getSamplePendingVisits(Integer limit, Integer startIndex);
 	
 	TestOrderLocation addTestOrderWithLocation(TestOrderLocation testOrderLocation);

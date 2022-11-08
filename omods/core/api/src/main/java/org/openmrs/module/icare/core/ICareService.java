@@ -19,6 +19,7 @@ import org.openmrs.module.icare.billing.models.ItemPrice;
 import org.openmrs.module.icare.billing.models.Prescription;
 import org.openmrs.module.icare.billing.services.insurance.Claim;
 import org.openmrs.module.icare.billing.services.insurance.ClaimResult;
+import org.openmrs.module.icare.core.models.PimaCovidLabRequest;
 import org.openmrs.module.icare.core.utils.PatientWrapper;
 import org.openmrs.module.icare.core.utils.VisitWrapper;
 import org.openmrs.module.icare.store.models.OrderStatus;
@@ -29,6 +30,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Map;
 
 /**
  * The main service of this module, which is exposed for other modules. See
@@ -128,6 +130,11 @@ public interface ICareService extends OpenmrsService {
 	
 	List<Drug> getDrugs(String concept, Integer limit, Integer startIndex);
 	
-	String getClientsFromExternalSystems(String identifier, String identifierReference) throws IOException,
+	String getClientsFromExternalSystems(String identifier, String identifierReference, String basicAuthKey)
+	        throws IOException, URISyntaxException;
+	
+	String createPimaCovidLabRequest(Map<String, Object> labRequest, String basicAuthKey) throws IOException,
 	        URISyntaxException;
+	
+	String savePimaCovidLabResult(Map<String, Object> labResult) throws IOException, URISyntaxException;
 }

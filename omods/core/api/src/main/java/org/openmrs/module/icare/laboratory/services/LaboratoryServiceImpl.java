@@ -504,6 +504,11 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	}
 	
 	@Override
+	public String generateSampleLabel() {
+		return this.sampleLableDAO.generateSampleLabel();
+	}
+	
+	@Override
 	public SampleLable addSampleLable(SampleLable sampleLable) {
 		return this.sampleLableDAO.save(sampleLable);
 	}

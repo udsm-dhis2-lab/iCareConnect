@@ -619,17 +619,62 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 	}
 	
 	@Test
-	@Ignore
 	public void testGetClientsFromExternalSystem() throws Exception {
+		AdministrationService administrationService = Context.getService(AdministrationService.class);
+		
+		administrationService.setGlobalProperty("iCare.externalSystems.integrated.pimaCovid.baseUrl",
+		    "https://covid19-dev.moh.go.tz");
+		administrationService.setGlobalProperty("iCare.externalSystems.integrated.pimaCovid.username", "lisintegration");
+		administrationService.setGlobalProperty("iCare.externalSystems.integrated.pimaCovid.password", "Dhis@2022");
+		administrationService.setGlobalProperty("iCare.externalSystems.integrated.pimaCovid.referenceOuUid", "m0frOspS7JY");
+		administrationService.setGlobalProperty("iCare.externalSystems.integrated.pimaCovid.programUid", "MNhYWMkR0Z7");
 		MockHttpServletRequest newGetRequest = newGetRequest("icare/client/externalsystems", new Parameter("identifier",
-		        "2133573"), new Parameter("identifierReference", "t74raEkPShW"));
+		        "TAE185936"), new Parameter("identifierReference", "zxdIGVIuhWU"), new Parameter("basicAuth",
+		        "b21vc2hpOkdpdGh1YjRjb2RlIQ=="));
 		MockHttpServletResponse handle = handle(newGetRequest);
 		String patientData = handle.getContentAsString();
+		System.out.println(patientData);
 		//		Map clientDataMap = (new ObjectMapper()).readValue(patientData, Map.class);
 		//		System.out.println(clientDataMap.get("trackedEntityInstances"));
 		//		System.out.println(patientData);
 		//		Map patientDataMap = (new ObjectMapper()).readValue(patientData, Map.class);
 		//		List<Map> patientDataDetails = (List<Map>) patientDataMap;
 		//		System.out.println(patientDataDetails);
+	}
+	
+	@Test
+	public void testPimaCovidLabRequest() throws Exception {
+		AdministrationService administrationService = Context.getService(AdministrationService.class);
+		
+		administrationService.setGlobalProperty("iCare.externalSystems.integrated.pimaCovid.baseUrl",
+		    "https://covid19-dev.moh.go.tz");
+		administrationService.setGlobalProperty("iCare.externalSystems.integrated.pimaCovid.username", "lisintegration");
+		administrationService.setGlobalProperty("iCare.externalSystems.integrated.pimaCovid.password", "Dhis@2022");
+		administrationService.setGlobalProperty("iCare.externalSystems.integrated.pimaCovid.referenceOuUid", "m0frOspS7JY");
+		administrationService.setGlobalProperty("iCare.externalSystems.integrated.pimaCovid.programUid", "MNhYWMkR0Z7");
+		String dto = this.readFile("dto/lab-request-data.json");
+		Map<String, Object> labRequest = (new ObjectMapper()).readValue(dto, Map.class);
+		MockHttpServletRequest newGetRequest = newPostRequest("icare/externalsystems/labrequest", labRequest);
+		MockHttpServletResponse handle = handle(newGetRequest);
+		String data = handle.getContentAsString();
+		System.out.println(data);
+	}
+	
+	@Test
+	public void testPimaCovidLabResult() throws Exception {
+		AdministrationService administrationService = Context.getService(AdministrationService.class);
+		
+		administrationService.setGlobalProperty("iCare.externalSystems.integrated.pimaCovid.baseUrl",
+		    "https://covid19-dev.moh.go.tz");
+		administrationService.setGlobalProperty("iCare.externalSystems.integrated.pimaCovid.username", "lisintegration");
+		administrationService.setGlobalProperty("iCare.externalSystems.integrated.pimaCovid.password", "Dhis@2022");
+		administrationService.setGlobalProperty("iCare.externalSystems.integrated.pimaCovid.referenceOuUid", "m0frOspS7JY");
+		administrationService.setGlobalProperty("iCare.externalSystems.integrated.pimaCovid.programUid", "MNhYWMkR0Z7");
+		String dto = this.readFile("dto/lab-request-data.json");
+		Map<String, Object> labRequest = (new ObjectMapper()).readValue(dto, Map.class);
+		MockHttpServletRequest newGetRequest = newPostRequest("icare/externalsystems/labresult", labRequest);
+		MockHttpServletResponse handle = handle(newGetRequest);
+		String data = handle.getContentAsString();
+		System.out.println(data);
 	}
 }
