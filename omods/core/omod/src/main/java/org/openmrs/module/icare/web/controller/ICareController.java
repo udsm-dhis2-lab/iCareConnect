@@ -587,12 +587,11 @@ public class ICareController {
 		}
 		return formattedTrackedEntityInstances;
 	}
-
-
+	
 	@RequestMapping(value = "externalsystems/labrequest", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public String createLabRequest(@RequestBody Map<String, Object> labRequestObject) throws ParseException {
-
+		
 		Map<String, Object> labRequest = labRequestObject;
 		String response;
 		try {
@@ -607,7 +606,7 @@ public class ICareController {
 		return response;
 	}
 	
-	@RequestMapping(value = "externalsystems/results", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "externalsystems/labresult", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public String saveLabResults(@RequestBody Map<String, Object> labResultObject) throws ParseException {
 		

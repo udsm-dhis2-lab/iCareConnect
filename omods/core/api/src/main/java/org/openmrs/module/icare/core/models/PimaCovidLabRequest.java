@@ -17,11 +17,11 @@ public class PimaCovidLabRequest {
 	private String program;
 	
 	private List<Object> dataValues;
-
+	
 	private String enrollment;
-
+	
 	private String trackedEntityInstance;
-
+	
 	private String orgUnit;
 	
 	public String getProgramStage() {
@@ -47,31 +47,31 @@ public class PimaCovidLabRequest {
 	public void setDataValues(List<Object> dataValues) {
 		this.dataValues = dataValues;
 	}
-
-	public  String getEnrollment() {
-		return  this.enrollment;
+	
+	public String getEnrollment() {
+		return this.enrollment;
 	}
-
-	public  void setEnrollment(String enrollment) {
+	
+	public void setEnrollment(String enrollment) {
 		this.enrollment = enrollment;
 	}
-
-	public  String getTrackedEntityInstance() {
-		return  this.trackedEntityInstance;
+	
+	public String getTrackedEntityInstance() {
+		return this.trackedEntityInstance;
 	}
-
-	public  void setTrackedEntityInstance(String trackedEntityInstance) {
+	
+	public void setTrackedEntityInstance(String trackedEntityInstance) {
 		this.trackedEntityInstance = trackedEntityInstance;
 	}
-
-	public  String getOrgUnit() {
-		return  this.orgUnit;
+	
+	public String getOrgUnit() {
+		return this.orgUnit;
 	}
-
-	public  void setOrgUnit(String orgUnit) {
+	
+	public void setOrgUnit(String orgUnit) {
 		this.orgUnit = orgUnit;
 	}
-
+	
 	private String basicAuth;
 	
 	private String getBasicAuth() {
