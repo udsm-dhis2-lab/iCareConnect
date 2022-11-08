@@ -529,17 +529,11 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		AdministrationService administrationService = Context.getService(AdministrationService.class);
 		
 		String baseUrl = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.baseUrl");
-		//				"https://covid19-dev.moh.go.tz";
 		String username = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.username");
-		//				"lisintegration";
 		String password = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.password");
-		//				"Dhis@2022";
 		String ou = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.referenceOuUid");
-		//				"m0frOspS7JY";
 		String program = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.programUid");
-		//				"MNhYWMkR0Z7";
 		//		TODO: Find a way to softcode the API References
-		
 		URL url;
 		if (baseUrl == null || baseUrl.trim().equals("")) {
 			throw new VerificationException("Destination server address url is not set. Please set " + baseUrl + ".");
@@ -548,7 +542,7 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		        + identifierReference
 		        + ":EQ:"
 		        + identifier
-		        + "&ou=" + ou +"&ouMode=DESCENDANTS&program=MNhYWMkR0Z7&fields=attributes[attribute,code,value],enrollments[*],orgUnit,trackedEntityInstance&paging=false";
+		        + "&ou=" + ou +"&ouMode=DESCENDANTS&program="+ program +"&fields=attributes[attribute,code,value],enrollments[*],orgUnit,trackedEntityInstance&paging=false";
 		url = new URL(baseUrl.concat(path));
 		
 		HttpURLConnection con = (HttpURLConnection) url.openConnection();
