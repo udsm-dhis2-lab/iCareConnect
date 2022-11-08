@@ -1,4 +1,7 @@
-<div class="row">
+<div class="row" *ngIf="{
+  obs: obs$ | async,
+  sampleConditions: sampleConditions$ | async
+} as params">
   <div class="col-md-6">
     <p>FileNO: {{ sample?.mrn }}</p>
     <p>
@@ -11,6 +14,15 @@
         Age: {{ sample?.patient?.age }}
         <span class="text-muted"> ({{ sample?.patient?.dob | date }}) </span>
       </span>
+    </p>
+    <p *ngIf="params.obs">
+      <span>Clinical Notes: {{ params.obs?.latest?.value }}</span>
+    </p>
+    <p *ngIf="params.sampleConditions?.TRANSPORT_CONDITION">
+      <span>Transport Condition: {{ params.sampleConditions?.TRANSPORT_CONDITION }}</span>
+    </p>
+    <p *ngIf="params.sampleConditions?.TRANSPORT_TEMPERATURE">
+      <span>Transportation Temperature: {{ params.sampleConditions?.TRANSPORT_TEMPERATURE }}</span>
     </p>
   </div>
   <div class="col-md-6">
