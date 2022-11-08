@@ -433,7 +433,9 @@ export class SharedManageUserComponent implements OnInit {
                         panelClass: ["snack-color"],
                       }
                     );
-                    window.location.href = "#/maintenance/users-management/";
+                    if (!this.hideModuleSelection) {
+                      window.location.href = "#/maintenance/users-management/";
+                    }
                     this.saving = false;
                   }
                 })
@@ -447,7 +449,9 @@ export class SharedManageUserComponent implements OnInit {
                   panelClass: ["snack-color"],
                 }
               );
-          window.location.href = "#/maintenance/users-management/";
+          if (!this.hideModuleSelection) {
+            window.location.href = "#/maintenance/users-management/";
+          }
           this.saving = false;
         }
       },
@@ -745,6 +749,7 @@ export class SharedManageUserComponent implements OnInit {
 
   onCancel(event: Event): void {
     event.stopPropagation();
-    this.store.dispatch(go({ path: ["/maintenance/users-management"] }));
+    if (!this.hideModuleSelection)
+      this.store.dispatch(go({ path: ["/maintenance/users-management"] }));
   }
 }
