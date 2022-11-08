@@ -10,9 +10,11 @@
 package org.openmrs.module.icare.core.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.hibernate.Session;
 import org.openmrs.*;
 import org.openmrs.api.*;
 import org.openmrs.api.context.Context;
+import org.openmrs.api.context.UserContext;
 import org.openmrs.api.db.PatientDAO;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.logic.op.In;
@@ -522,7 +524,7 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		return dao.getDrugs(concept, limit, startIndex);
 	}
 	
-	public String getClientsFromExternalSystems(String identifier, String identifierReference) throws IOException,
+	public String getClientsFromExternalSystems(String identifier, String identifierReference, String basicAuthKey) throws IOException,
 	        URISyntaxException {
 		AdministrationService administrationService = Context.getService(AdministrationService.class);
 		
@@ -546,14 +548,14 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		        + identifierReference
 		        + ":EQ:"
 		        + identifier
-		        + "&ou=m0frOspS7JY&ouMode=DESCENDANTS&program=MNhYWMkR0Z7&fields=attributes[attribute,code,value],enrollments[*],orgUnit,trackedEntityInstance&paging=false";
+		        + "&ou=" + ou +"&ouMode=DESCENDANTS&program=MNhYWMkR0Z7&fields=attributes[attribute,code,value],enrollments[*],orgUnit,trackedEntityInstance&paging=false";
 		url = new URL(baseUrl.concat(path));
 		
 		HttpURLConnection con = (HttpURLConnection) url.openConnection();
 		
-		String userCredentials = username.concat(":").concat(password);
-		String basicAuth = "Basic " + new String(Base64.getEncoder().encode(userCredentials.getBytes()));
-		
+//		String userCredentials = username.concat(":").concat(password);
+//		String basicAuth = "Basic " + new String(Base64.getEncoder().encode(userCredentials.getBytes()));
+		String basicAuth = "Basic " + basicAuthKey;
 		con.setRequestProperty("Authorization", basicAuth);
 		
 		con.setRequestMethod("GET");

@@ -621,6 +621,13 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 	@Test
 	@Ignore
 	public void testGetClientsFromExternalSystem() throws Exception {
+		AdministrationService administrationService = Context.getService(AdministrationService.class);
+
+		administrationService.setGlobalProperty("iCare.externalSystems.integrated.pimaCovid.baseUrl","https://covid19-dev.moh.go.tz");
+		administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.username","lisintegration");
+		administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.password","Dhis@2022");
+		administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.referenceOuUid","m0frOspS7JY");
+		administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.programUid","MNhYWMkR0Z7");
 		MockHttpServletRequest newGetRequest = newGetRequest("icare/client/externalsystems", new Parameter("identifier",
 		        "2133573"), new Parameter("identifierReference", "t74raEkPShW"));
 		MockHttpServletResponse handle = handle(newGetRequest);
