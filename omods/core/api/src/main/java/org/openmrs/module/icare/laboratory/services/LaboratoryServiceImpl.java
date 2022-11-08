@@ -502,6 +502,11 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	public List<SampleLable> getSampleLables() {
 		return IteratorUtils.toList(this.sampleLableDAO.findAll().iterator());
 	}
+
+	@Override
+	public String generateSampleLabel() {
+		return this.sampleLableDAO.generateSampleLabel();
+	}
 	
 	@Override
 	public SampleLable addSampleLable(SampleLable sampleLable) {

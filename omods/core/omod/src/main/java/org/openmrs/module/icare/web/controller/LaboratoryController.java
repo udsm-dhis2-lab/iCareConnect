@@ -506,6 +506,14 @@ public class LaboratoryController {
 			return configsMapList;
 		}
 	}
+
+
+	@RequestMapping(value = "sampleidgen", method = RequestMethod.GET)
+	@ResponseBody
+	public String generateSampleLabel() {
+		String sampleLabel = laboratoryService.generateSampleLabel();
+		return  sampleLabel;
+	}
 	
 	@RequestMapping(value = "samplelable", method = RequestMethod.GET)
 	@ResponseBody
