@@ -169,11 +169,27 @@ export class LabSamplesEffects {
                   collectedByStatus: (sample?.statuses?.filter(
                     (status) => status?.category === "COLLECTED_BY"
                   ) || [])[0],
+                  collectedOnStatus: (sample?.statuses?.filter(
+                    (status) => status?.category === "COLLECTED_ON"
+                  ) || [])[0],
+                  broughtOnStatus: (sample?.statuses?.filter(
+                    (status) => status?.category === "BROUGHT_ON"
+                  ) || [])[0],
                   registeredBy: {
                     display: sample?.creator?.display?.split(" (")[0],
                     name: sample?.creator?.display?.split(" (")[0],
                     uid: sample?.creator?.uuid,
                   },
+                  sampleConditionStatus: (sample?.statuses?.filter(
+                    (status) => status?.category === "CONDITION"
+                  ) || [])[0],
+                  sampleTransportConditionStatus: (sample?.statuses?.filter(
+                    (status) => status?.category === "TRANSPORT_CONDITION"
+                  ) || [])[0],
+                  sampleTransportationTemperatureStatus:
+                    (sample?.statuses?.filter(
+                      (status) => status?.category === "TRANSPORT_TEMPERATURE"
+                    ) || [])[0],
                   ordersWithResults: getOrdersWithResults(sample?.orders),
                   accepted:
                     (_.filter(sample?.statuses, { status: "ACCEPTED" }) || [])
