@@ -27,7 +27,7 @@ export class ClinicalDataComponent implements OnInit {
       new TextArea({
         id: "notes",
         key: "notes",
-        label: "Notes",
+        label: "Clinical Information / History",
         type: "text",
       }),
       new Textbox({
