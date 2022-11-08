@@ -28,20 +28,18 @@ import java.util.List;
  */
 
 public class SampleDAO extends BaseDAO<Sample> {
-
-
-//	TODO: Add also support to get samples by day and month
+	
+	//	TODO: Add also support to get samples by day and month
 	public long getNumberOfRegisteredSamplesThisYear() {
 		DbSession session = this.getSession();
 		new Sample();
-		String queryStr = "SELECT COUNT(sp) FROM Sample sp \n"
-				+ "WHERE YEAR(sp.dateTime) = :year";
+		String queryStr = "SELECT COUNT(sp) FROM Sample sp \n" + "WHERE YEAR(sp.dateTime) = :year";
 		Calendar calendar = Calendar.getInstance();
 		Query query = session.createQuery(queryStr);
 		query.setParameter("year", calendar.get(Calendar.YEAR));
 		return (long) query.list().get(0);
 	}
-
+	
 	public List<Sample> getSamplesByVisit(String id) {
 		DbSession session = this.getSession();
 		String queryStr = "SELECT sp \n" + "FROM Sample sp \n"

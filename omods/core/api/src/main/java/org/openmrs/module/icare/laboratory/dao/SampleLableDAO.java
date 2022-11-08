@@ -15,7 +15,7 @@ import java.util.*;
 import java.util.regex.Pattern;
 
 public class SampleLableDAO extends BaseDAO<SampleLable> {
-
+	
 	public SampleLable updateSampleLable(SampleLable sampleLable, Integer previosLable) {
 		DbSession session = this.getSession();
 		String queryStr = "UPDATE SampleLable set " + "currentLable = :currentLable," + " time = :time " + "where id = :id";
@@ -37,17 +37,16 @@ public class SampleLableDAO extends BaseDAO<SampleLable> {
 			
 		}
 	}
-
+	
 	public String generateSampleLabel() {
 		AdministrationService adminService = Context.getService(AdministrationService.class);
 		String idFormat = adminService.getGlobalProperty(ICareConfig.SAMPLE_ID_FORMAT);
-		if(idFormat.contains("D{YYYY}") || idFormat.contains("D{YYY}") || idFormat.contains("D{YY}")){
+		if (idFormat.contains("D{YYYY}") || idFormat.contains("D{YYY}") || idFormat.contains("D{YY}")) {
 			SimpleDateFormat formatter = new SimpleDateFormat("YYYY", Locale.ENGLISH);
 			idFormat = idFormat.replace("D{YYYY}", formatter.format(new Date()).substring(2));
 			DbSession session = this.getSession();
 			new Sample();
-			String queryStr = "SELECT COUNT(sp) FROM Sample sp \n"
-					+ "WHERE YEAR(sp.dateTime) = :year";
+			String queryStr = "SELECT COUNT(sp) FROM Sample sp \n" + "WHERE YEAR(sp.dateTime) = :year";
 			Calendar calendar = Calendar.getInstance();
 			Query query = session.createQuery(queryStr);
 			query.setParameter("year", calendar.get(Calendar.YEAR));
@@ -56,6 +55,6 @@ public class SampleLableDAO extends BaseDAO<SampleLable> {
 		} else {
 			idFormat = "";
 		}
-		return  idFormat;
+		return idFormat;
 	}
 }

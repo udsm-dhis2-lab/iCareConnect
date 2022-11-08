@@ -42,7 +42,7 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		initializeInMemoryDatabase();
 		executeDataSet("lab-data.xml");
 	}
-
+	
 	@Test
 	public void testGenerateSampleLabel() throws Exception {
 		AdministrationService adminService = Context.getService(AdministrationService.class);
@@ -52,6 +52,7 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		String label = handle.getContentAsString();
 		System.out.println(label);
 	}
+	
 	@Test
 	public void testConversion() {
 		SimpleObject sample = new SimpleObject();
@@ -332,7 +333,7 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		MockHttpServletResponse handleGet = handle(newGetResquest);
 		
 	}
-
+	
 	@Test
 	public void testGeneratingSampleLabel() throws Exception {
 		MockHttpServletRequest newGetRequest = newGetRequest("lab/samplelable");
