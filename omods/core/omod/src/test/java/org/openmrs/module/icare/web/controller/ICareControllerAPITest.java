@@ -441,7 +441,7 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		handle = handle(newGetRequest);
 		
 		Map<String, Object> orderResult = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
-		//		System.out.println((List) orderResult.get("results"));
+		System.out.println((List) orderResult.get("results"));
 		assertThat("Should return a visit", ((List) orderResult.get("results")).size() == 2);
 		//Then
 		
@@ -461,6 +461,7 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		handle = handle(newGetRequest);
 		
 		orderResult = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
+		System.out.println("orderResult");
 		System.out.println(orderResult);
 		assertThat("Should return one visit", ((List) orderResult.get("results")).size() == 1);
 		

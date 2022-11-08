@@ -292,8 +292,7 @@ public class ICareDao extends BaseDAO<Item> {
 		        + "LEFT JOIN p.identifiers pi ";
 		//				+ " INNER JOIN p.attributes pattr";
 		
-		if (orderTypeUuid != null) {
-			
+		if (orderTypeUuid != null && encounterTypeUuid == null) {
 			queryStr = queryStr + " INNER JOIN v.encounters e" + " INNER JOIN e.orders o" + " INNER JOIN o.orderType ot"
 			        + " WHERE ot.uuid=:orderTypeUuid " + " AND v.stopDatetime IS NULL ";
 			
