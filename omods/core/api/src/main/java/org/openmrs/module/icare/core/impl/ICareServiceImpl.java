@@ -33,6 +33,7 @@ import org.openmrs.module.icare.core.Item;
 import org.openmrs.module.icare.core.Message;
 import org.openmrs.module.icare.core.Summary;
 import org.openmrs.module.icare.core.dao.ICareDao;
+import org.openmrs.module.icare.core.models.PimaCovidLabRequest;
 import org.openmrs.module.icare.core.utils.PatientWrapper;
 import org.openmrs.module.icare.core.utils.VisitWrapper;
 import org.openmrs.module.icare.report.dhis2.DHIS2Config;
@@ -524,8 +525,8 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		return dao.getDrugs(concept, limit, startIndex);
 	}
 	
-	public String getClientsFromExternalSystems(String identifier, String identifierReference, String basicAuthKey) throws IOException,
-	        URISyntaxException {
+	public String getClientsFromExternalSystems(String identifier, String identifierReference, String basicAuthKey)
+	        throws IOException, URISyntaxException {
 		AdministrationService administrationService = Context.getService(AdministrationService.class);
 		
 		String baseUrl = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.baseUrl");
@@ -538,18 +539,18 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		if (baseUrl == null || baseUrl.trim().equals("")) {
 			throw new VerificationException("Destination server address url is not set. Please set " + baseUrl + ".");
 		}
-		String path = "/api/trackedEntityInstances.json?filter="
-		        + identifierReference
-		        + ":EQ:"
-		        + identifier
-		        + "&ou=" + ou +"&ouMode=DESCENDANTS&program="+ program +"&fields=attributes[attribute,code,value],enrollments[*],orgUnit,trackedEntityInstance&paging=false";
+		//		this.getCreator().getUserProperties().get("")
+		String path = "/api/trackedEntityInstances.json?filter=" + identifierReference + ":EQ:" + identifier + "&ou=" + ou
+		        + "&ouMode=DESCENDANTS&program=" + program
+		        + "&fields=attributes[attribute,code,value],enrollments[*],orgUnit,trackedEntityInstance&paging=false";
 		url = new URL(baseUrl.concat(path));
 		
 		HttpURLConnection con = (HttpURLConnection) url.openConnection();
 		
-//		String userCredentials = username.concat(":").concat(password);
-//		String basicAuth = "Basic " + new String(Base64.getEncoder().encode(userCredentials.getBytes()));
-		String basicAuth = "Basic " + basicAuthKey;
+		String userCredentials = username.concat(":").concat(password);
+		String basicAuth = "Basic " + new String(Base64.getEncoder().encode(userCredentials.getBytes()));
+		//		String basicAuth = "Basic " + basicAuthKey;
+		System.out.println(basicAuth);
 		con.setRequestProperty("Authorization", basicAuth);
 		
 		con.setRequestMethod("GET");
@@ -576,5 +577,110 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 			in.close();
 			return String.valueOf(content);
 		}
+	}
+	
+	public String createPimaCovidLabRequest(Map<String, Object> request, String basicAuthKey)
+	        throws IOException {
+		AdministrationService administrationService = Context.getService(AdministrationService.class);
+		
+		String baseUrl = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.baseUrl");
+		String username = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.username");
+		String password = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.password");
+		URL url;
+		if (baseUrl == null || baseUrl.trim().equals("")) {
+			throw new VerificationException("Destination server address url is not set. Please set " + baseUrl + ".");
+		}
+		//		this.getCreator().getUserProperties().get("")
+		String path = "/api/events.json?";
+		url = new URL(baseUrl.concat(path));
+		System.out.println(request);
+		String returnValue = "";
+
+		BufferedReader reader;
+		String line;
+		StringBuffer responseContent = new StringBuffer();
+		
+		HttpURLConnection con = (HttpURLConnection) url.openConnection();
+		
+//		String basicAuth = "Basic " + basicAuthKey;
+		String userCredentials = username.concat(":").concat(password);
+		String basicAuth = "Basic " + new String(Base64.getEncoder().encode(userCredentials.getBytes()));
+		
+		con.setRequestMethod("POST");
+		con.setRequestProperty("Content-Type", "application/json; utf-8");
+		con.setRequestProperty("Accept", "application/json");
+		con.setRequestProperty("Authorization", basicAuth);
+		con.setDoOutput(true);
+
+		ObjectMapper mapper = new ObjectMapper();
+		// Converting the Object to JSONString
+		String jsonString = mapper.writeValueAsString(request);
+		System.out.println(jsonString);
+
+		// int status = httpURLConnection.getResponseCode();
+
+		try (OutputStream outputStream = con.getOutputStream()) {
+			byte[] input = jsonString.getBytes("utf-8");
+			outputStream.write(input, 0, input.length);
+		}
+
+		reader = new BufferedReader(new InputStreamReader(con.getInputStream()));
+		while ((line = reader.readLine()) != null) {
+			responseContent.append(line);
+		}
+		reader.close();
+		return responseContent.toString();
+	}
+
+	public String savePimaCovidLabResult(Map<String, Object> results)
+			throws IOException {
+		AdministrationService administrationService = Context.getService(AdministrationService.class);
+
+		String baseUrl = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.baseUrl");
+		String username = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.username");
+		String password = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.password");
+		URL url;
+		if (baseUrl == null || baseUrl.trim().equals("")) {
+			throw new VerificationException("Destination server address url is not set. Please set " + baseUrl + ".");
+		}
+		//		this.getCreator().getUserProperties().get("")
+		String path = "/api/events.json?";
+		url = new URL(baseUrl.concat(path));
+		System.out.println(results);
+
+		BufferedReader reader;
+		String line;
+		StringBuffer responseContent = new StringBuffer();
+
+		HttpURLConnection con = (HttpURLConnection) url.openConnection();
+
+//		String basicAuth = "Basic " + basicAuthKey;
+		String userCredentials = username.concat(":").concat(password);
+		String basicAuth = "Basic " + new String(Base64.getEncoder().encode(userCredentials.getBytes()));
+
+		con.setRequestMethod("POST");
+		con.setRequestProperty("Content-Type", "application/json; utf-8");
+		con.setRequestProperty("Accept", "application/json");
+		con.setRequestProperty("Authorization", basicAuth);
+		con.setDoOutput(true);
+
+		ObjectMapper mapper = new ObjectMapper();
+		// Converting the Object to JSONString
+		String jsonString = mapper.writeValueAsString(results);
+		System.out.println(jsonString);
+
+		// int status = httpURLConnection.getResponseCode();
+
+		try (OutputStream outputStream = con.getOutputStream()) {
+			byte[] input = jsonString.getBytes("utf-8");
+			outputStream.write(input, 0, input.length);
+		}
+
+		reader = new BufferedReader(new InputStreamReader(con.getInputStream()));
+		while ((line = reader.readLine()) != null) {
+			responseContent.append(line);
+		}
+		reader.close();
+		return responseContent.toString();
 	}
 }
