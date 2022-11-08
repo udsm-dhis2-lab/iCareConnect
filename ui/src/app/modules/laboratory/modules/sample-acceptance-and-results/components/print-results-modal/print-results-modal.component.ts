@@ -1,11 +1,11 @@
 import { Component, Inject, Input, OnInit } from "@angular/core";
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { Store } from "@ngrx/store";
-import { isThisSecond } from "date-fns";
-
 import * as _ from "lodash";
 import { Observable } from "rxjs";
-import { map, sample } from "rxjs/operators";
+import { map, sample, tap } from "rxjs/operators";
+import { SystemSettingsService } from "src/app/core/services/system-settings.service";
+import { VisitsService } from "src/app/shared/resources/visits/services/visits.service";
 import { PatientService } from "src/app/shared/services/patient.service";
 import { setSampleStatuses } from "src/app/store/actions";
 import { AppState } from "src/app/store/reducers";
@@ -30,8 +30,12 @@ export class PrintResultsModalComponent implements OnInit {
   LISConfigurations: any;
   facilityDetails$: any;
   providerDetails$: Observable<any>;
+  visit$: Observable<any>;
+  referringDoctorAttributes$: any;
   constructor(
     private patientService: PatientService,
+    private visitService: VisitsService,
+    private systemSettingsService: SystemSettingsService,
     private dialogRef: MatDialogRef<PrintResultsModalComponent>,
     @Inject(MAT_DIALOG_DATA) data,
     private store: Store<AppState>
@@ -75,7 +79,37 @@ export class PrintResultsModalComponent implements OnInit {
 
   ngOnInit(): void {
     this.currentDateTime = new Date();
-
+    this.referringDoctorAttributes$ =
+      this.systemSettingsService.getSystemSettingsMatchingAKey(
+        "lis.attributes.referringDoctor"
+      )
+    this.visit$ = this.visitService
+      .getVisitDetailsByVisitUuid(
+        this.patientDetailsAndSamples?.departments[0]?.samples[0]?.visit?.uuid,
+        {
+          query: {
+            v: "full",
+          },
+        }
+      )
+      .pipe(
+        map((response) => {
+          if (!response?.error) {
+            return {
+              ...response,
+              attributesKeyedByAttributeType: _.keyBy(
+                response?.attributes.map((attribute) => {
+                  return {
+                    ...attribute,
+                    attributeTypeUuid: attribute?.attributeType?.uuid,
+                  };
+                }),
+                "attributeTypeUuid"
+              ),
+            };
+          }
+        })
+      );
     this.currentDepartmentSamples =
       this.patientDetailsAndSamples?.departments[0];
     this.providerDetails$ = this.store.select(getProviderDetails);

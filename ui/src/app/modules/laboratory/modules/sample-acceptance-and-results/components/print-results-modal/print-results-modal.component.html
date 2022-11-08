@@ -1,9 +1,14 @@
 <div
   class="container my-3"
-  *ngIf="{ facility: facilityDetails$ | async } as params"
+  *ngIf="{ 
+    facility: facilityDetails$ | async,
+    visit: visit$ | async,
+    referringDoctorAttributes:referringDoctorAttributes$ | async
+  } as params"
 >
   <div id="results-to-print" style="color: gray">
     <mat-accordion>
+      {{ params?.visit | json }}
       <mat-expansion-panel
         [expanded]="
           samplesGroupedByDepartment.departmentName ==
@@ -89,7 +94,7 @@
                 {{ samplesGroupedByDepartment?.departmentName }} Report
               </div>
               <div>
-                <!-- {{samplesGroupedByDepartment["samples"][0]?.orders[0] | json}} -->
+                <!-- {{ samplesGroupedByDepartment["samples"][0]?.orders[0] | json }} -->
 
                 <table style="width: 100%">
                   <tr>
@@ -135,7 +140,7 @@
                       {{ patientDetailsAndSamples?.patient?.middleName }}
                       {{ patientDetailsAndSamples?.patient?.familyName }}
                     </td>
-                    <td><b>Sample IDS</b></td>
+                    <td><b>Sample ID</b></td>
                     <td>
                       <span
                         *ngFor="
@@ -212,6 +217,21 @@
                       </span>
                     </td>
                   </tr>
+                  <tr *ngIf="params?.referringDoctorAttributes">
+                    <td></td>
+                    <td></td>
+                    <td>
+                      <b> Requesting Doctor  </b>
+                    </td>
+                    <td>
+                      <span>{{ params?.visit?.attributesKeyedByAttributeType[params?.referringDoctorAttributes[1].value] ? params?.visit?.attributesKeyedByAttributeType[params?.referringDoctorAttributes[1].value].value : " - " }}
+                        {{ params?.visit?.attributes[params?.referringDoctorAttributes[2].value] ? "(" +params?.visit?.attributesKeyedByAttributeType[params?.referringDoctorAttributes[2].value].value + ")" : ""}}
+                        
+                        {{ params?.visit?.attributes[params?.referringDoctorAttributes[0].value] ? "(" +params?.visit?.attributesKeyedByAttributeType[params?.referringDoctorAttributes[0].value].value + ")" : ""}}
+                        
+                      </span>
+                    </td>
+                  </tr>
                   <tr>
                     <td></td>
                     <td></td>
@@ -260,6 +280,22 @@
                     <td></td>
                     <td>
                       <b>Results Fed At</b>
+                    </td>
+                    <td>
+                      {{
+                        samplesGroupedByDepartment?.samples[0]?.orders[0]
+                          ?.testAllocations[0]?.resultsCommentsStatuses[
+                          samplesGroupedByDepartment?.samples[0]?.orders[0]
+                            ?.testAllocations[0]?.results?.length - 1
+                        ]?.timestamp | date: "medium"
+                      }}
+                    </td>
+                  </tr>
+                  <tr *ngIf="!LISConfigurations?.isLIS">
+                    <td></td>
+                    <td></td>
+                    <td>
+                      <b>Requested By</b>
                     </td>
                     <td>
                       {{

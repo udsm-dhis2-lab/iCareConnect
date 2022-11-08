@@ -347,6 +347,10 @@ export class SingleRegistrationComponent implements OnInit {
     this.registrationCategory = event?.value;
   }
 
+  getTimestampFromDateAndTime(date: string, time: string): number {
+    return new Date(`${date} ${time}`).getTime();
+  }
+
   getSelectedReceivedOnTime(event: Event): void {
     this.receivedOnTime = (event.target as any)?.value;
     this.receivedOnTimeValid = this.isValidTime(
@@ -1138,7 +1142,7 @@ export class SingleRegistrationComponent implements OnInit {
                                                                           ),
                                                                         },
                                                                         remarks:
-                                                                          "RECEIVED_ON",
+                                                                          this.getTimestampFromDateAndTime(this.receivedOnDateLatestValue, this.receivedOnTime),
                                                                         status:
                                                                           "RECEIVED_ON",
                                                                         category:
@@ -1147,6 +1151,76 @@ export class SingleRegistrationComponent implements OnInit {
                                                                     statuses = [
                                                                       ...statuses,
                                                                       receivedOnStatus,
+                                                                    ];
+                                                                  }
+
+                                                                  if (
+                                                                    this
+                                                                      .formData[
+                                                                      "broughtOn"
+                                                                    ]?.value
+                                                                  ) {
+                                                                    const broughtOnStatus =
+                                                                      {
+                                                                        sample:
+                                                                          {
+                                                                            uuid: sampleResponse?.uuid,
+                                                                          },
+                                                                        user: {
+                                                                          uuid: localStorage.getItem(
+                                                                            "userUuid"
+                                                                          ),
+                                                                        },
+                                                                        remarks:
+                                                                          this.getTimestampFromDateAndTime(
+                                                                            this
+                                                                              .broughtOnDateLatestValue,
+                                                                            this
+                                                                              .broughtOnTime
+                                                                          ),
+                                                                        status:
+                                                                          "BROUGHT_ON",
+                                                                        category:
+                                                                          "BROUGHT_ON",
+                                                                      };
+                                                                    statuses = [
+                                                                      ...statuses,
+                                                                      broughtOnStatus,
+                                                                    ];
+                                                                  }
+
+                                                                  if (
+                                                                    this
+                                                                      .formData[
+                                                                      "collectedOn"
+                                                                    ]?.value
+                                                                  ) {
+                                                                    const collectedOnStatus =
+                                                                      {
+                                                                        sample:
+                                                                          {
+                                                                            uuid: sampleResponse?.uuid,
+                                                                          },
+                                                                        user: {
+                                                                          uuid: localStorage.getItem(
+                                                                            "userUuid"
+                                                                          ),
+                                                                        },
+                                                                        remarks:
+                                                                          this.getTimestampFromDateAndTime(
+                                                                            this
+                                                                              .collectedOnDateLatestValue,
+                                                                            this
+                                                                              .collectedOnTime
+                                                                          ),
+                                                                        status:
+                                                                          "COLLECTED_ON",
+                                                                        category:
+                                                                          "COLLECTED_ON",
+                                                                      };
+                                                                    statuses = [
+                                                                      ...statuses,
+                                                                      collectedOnStatus,
                                                                     ];
                                                                   }
 
@@ -1223,10 +1297,6 @@ export class SingleRegistrationComponent implements OnInit {
                                                                     this
                                                                       .formData[
                                                                       "collectedBy"
-                                                                    ]?.value ||
-                                                                    this
-                                                                      .formData[
-                                                                      "collectedOn"
                                                                     ]?.value
                                                                   ) {
                                                                     const collectedByStatus =
@@ -1259,18 +1329,9 @@ export class SingleRegistrationComponent implements OnInit {
                                                                   }
 
                                                                   if (
-                                                                    (this
-                                                                      .formData[
-                                                                      "broughtBy"
-                                                                    ]?.value ||
-                                                                      this
-                                                                        .formData[
-                                                                        "broughtOn"
-                                                                      ]
-                                                                        ?.value) &&
                                                                     this
                                                                       .formData[
-                                                                      "broughtAt"
+                                                                      "broughtBy"
                                                                     ]?.value
                                                                   ) {
                                                                     const broughtdByStatus =
