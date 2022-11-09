@@ -1425,15 +1425,31 @@ function getOrdersWithResults(orders) {
 
   orders?.forEach((order) => {
     if (order?.testAllocations?.length > 0) {
-      order.testAllocations.forEach((test) => {
-        if (test.results.length > 0) {
-          newOrders = [...newOrders, order];
+      order?.testAllocations?.forEach((allocation) => {
+        if (allocation?.results?.length > 0) {
+          newOrders = [
+            ...newOrders,
+            {
+              ...order,
+              conceptUuid: allocation?.concept?.uuid,
+            },
+          ];
         }
       });
     }
   });
 
-  return newOrders;
+  return (
+    newOrders?.map((order) => {
+      return {
+        ...order,
+        testAllocations:
+          order?.testAllocations?.filter(
+            (allocation) => allocation?.results?.length > 0
+          ) || [],
+      };
+    }) || []
+  );
 }
 
 function keyLevelTwoConceptSetMembers(members) {
