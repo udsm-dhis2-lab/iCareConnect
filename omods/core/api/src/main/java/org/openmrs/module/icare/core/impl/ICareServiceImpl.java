@@ -550,7 +550,7 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		String userCredentials = username.concat(":").concat(password);
 		String basicAuth = "Basic " + new String(Base64.getEncoder().encode(userCredentials.getBytes()));
 		//		String basicAuth = "Basic " + basicAuthKey;
-//		System.out.println(basicAuth);
+		//		System.out.println(basicAuth);
 		con.setRequestProperty("Authorization", basicAuth);
 		
 		con.setRequestMethod("GET");

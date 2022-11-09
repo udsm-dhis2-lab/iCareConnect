@@ -440,13 +440,13 @@ export class PersonDetailsComponent implements OnInit {
   }
 
   onGetSelectedSystem(system: any): void {
+    this.fromExternalSystem.emit(true);
     this.selecedSystem.emit(system);
   }
 
   getSelectedClientRequest(clientRequest: any): void {
     this.selectedClientData = clientRequest;
     // First Check if client exists
-    console.log(clientRequest);
     this.personService
       .getPatientsByIdentifier(clientRequest?.passportNumber)
       .subscribe((response) => {

@@ -33,6 +33,7 @@ import { OrdersService } from "src/app/shared/resources/order/services/orders.se
 import { SampleRegistrationFinalizationComponent } from "../sample-registration-finalization/sample-registration-finalization.component";
 import { ConceptsService } from "src/app/shared/resources/concepts/services/concepts.service";
 import { map } from "rxjs/operators";
+import { OtherClientLevelSystemsService } from "src/app/modules/laboratory/resources/services/other-client-level-systems.service";
 
 @Component({
   selector: "app-single-registration",
@@ -116,6 +117,7 @@ export class SingleRegistrationComponent implements OnInit {
   transportCondition: Dropdown;
   transportationTemperature: Dropdown;
   labRequestPayload: any;
+  savingLabRequest: boolean = false;
 
   constructor(
     private samplesService: SamplesService,
@@ -128,7 +130,8 @@ export class SingleRegistrationComponent implements OnInit {
     private diagnosisService: DiagnosisService,
     private dialog: MatDialog,
     private orderService: OrdersService,
-    private conceptService: ConceptsService
+    private conceptService: ConceptsService,
+    private otherSystemsService: OtherClientLevelSystemsService
   ) {
     this.currentLocation = JSON.parse(localStorage.getItem("currentLocation"));
   }
@@ -878,10 +881,22 @@ export class SingleRegistrationComponent implements OnInit {
                                 ...visAttributes,
                                 {
                                   attributeType:
-                                    "d4789b04-041f-4cc2-8fce-05fb67e7aefc",
-                                  value: JSON.stringify(
-                                    this.personDetailsData?.pimaCOVIDLinkDetails
-                                  ),
+                                    "0acd3180-710d-4417-8768-97bc45a02395",
+                                  value: JSON.stringify({
+                                    program:
+                                      this.personDetailsData
+                                        ?.pimaCOVIDLinkDetails?.program,
+                                    enrollment:
+                                      this.personDetailsData
+                                        ?.pimaCOVIDLinkDetails?.enrollment,
+                                    trackedEntityInstance:
+                                      this.personDetailsData
+                                        ?.pimaCOVIDLinkDetails
+                                        ?.trackedEntityInstance,
+                                    orgUnit:
+                                      this.personDetailsData
+                                        ?.pimaCOVIDLinkDetails?.orgUnit,
+                                  }),
                                 },
                               ];
                             }
@@ -1605,6 +1620,21 @@ export class SingleRegistrationComponent implements OnInit {
                                   //     this.savingDataResponse = encounterResponse;
 
                                   //   });
+
+                                  // Send to Extrnal System
+                                  this.savingLabRequest = true;
+                                  const labRequest =
+                                    this.createLabRequestPayload(
+                                      this.personDetailsData
+                                        ?.pimaCOVIDLinkDetails
+                                    );
+                                  this.otherSystemsService
+                                    .sendLabRequest(labRequest)
+                                    .subscribe((response) => {
+                                      if (response) {
+                                        this.savingLabRequest = false;
+                                      }
+                                    });
                                 } else {
                                   this.savingData = false;
                                 }
@@ -1739,21 +1769,22 @@ export class SingleRegistrationComponent implements OnInit {
     this.selectedSystem = system;
   }
 
-  createLabRequestPayload(): void {
+  createLabRequestPayload(data): any {
     this.labRequestPayload = {
-      program: "MNhYWMkR0Z7",
+      program: data?.program,
       programStage: "emVt37lHjub",
-      orgUnit: "AadoHGEAxeE",
-      trackedEntityInstance: "bX5tJ6vDHr6",
-      enrollment: "iSlVdUlMvW5",
+      orgUnit: data?.orgUnit,
+      trackedEntityInstance: data?.trackedEntityInstance,
+      enrollment: data?.enrollment,
       dataValues: [
-        { dataElement: "Q98LhagGLFj", value: new Date() },
+        { dataElement: "Q98LhagGLFj", value: new Date().toISOString() },
         { dataElement: "D0RBm3alWd9", value: "RT - PCR" },
         { dataElement: "RfWBPHo9MnC", value: new Date() },
         { dataElement: "HTBFvtjeztu", value: true },
         { dataElement: "xzuzLYN1f0J", value: true },
       ],
-      eventDate: new Date(),
+      eventDate: new Date().toISOString(),
     };
+    return this.labRequestPayload;
   }
 }
