@@ -274,12 +274,7 @@
                       <span>
                         {{
                           samplesGroupedByDepartment?.samples[0]
-                            ?.receivedByStatus?.remarks &&
-                          samplesGroupedByDepartment?.samples[0]
-                            ?.receivedByStatus?.remarks !== "RECEIVED_BY"
-                            ? samplesGroupedByDepartment?.samples[0]
-                                ?.receivedByStatus?.remarks
-                            : "-"
+                            ?.receivedByStatus?.user?.name
                         }}
                       </span>
                     </td>
@@ -294,7 +289,7 @@
                       <span>
                         {{
                           samplesGroupedByDepartment?.samples[0]
-                            ?.receivedOnStatus?.remarks
+                            ?.receivedOnStatus?.remarks | date: "medium"
                         }}
                       </span>
                     </td>
