@@ -175,6 +175,9 @@ export class LabSamplesEffects {
                   collectedOnStatus: (sample?.statuses?.filter(
                     (status) => status?.category === "COLLECTED_ON"
                   ) || [])[0],
+                  acceptanceRemarksStatus: (sample?.statuses?.filter(
+                    (status) => status?.category === "ACCEPTANCE_REMARKS"
+                  ) || [])[0],
                   broughtOnStatus: (sample?.statuses?.filter(
                     (status) => status?.category === "BROUGHT_ON"
                   ) || [])[0],
