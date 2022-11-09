@@ -115,6 +115,7 @@ export class SingleRegistrationComponent implements OnInit {
   fromExternalSystem: boolean;
   transportCondition: Dropdown;
   transportationTemperature: Dropdown;
+  labRequestPayload: any;
 
   constructor(
     private samplesService: SamplesService,
@@ -1142,7 +1143,12 @@ export class SingleRegistrationComponent implements OnInit {
                                                                           ),
                                                                         },
                                                                         remarks:
-                                                                          this.getTimestampFromDateAndTime(this.receivedOnDateLatestValue, this.receivedOnTime),
+                                                                          this.getTimestampFromDateAndTime(
+                                                                            this
+                                                                              .receivedOnDateLatestValue,
+                                                                            this
+                                                                              .receivedOnTime
+                                                                          ),
                                                                         status:
                                                                           "RECEIVED_ON",
                                                                         category:
@@ -1731,5 +1737,23 @@ export class SingleRegistrationComponent implements OnInit {
 
   onGetSelectedSystem(system): void {
     this.selectedSystem = system;
+  }
+
+  createLabRequestPayload(): void {
+    this.labRequestPayload = {
+      program: "MNhYWMkR0Z7",
+      programStage: "emVt37lHjub",
+      orgUnit: "AadoHGEAxeE",
+      trackedEntityInstance: "bX5tJ6vDHr6",
+      enrollment: "iSlVdUlMvW5",
+      dataValues: [
+        { dataElement: "Q98LhagGLFj", value: new Date() },
+        { dataElement: "D0RBm3alWd9", value: "RT - PCR" },
+        { dataElement: "RfWBPHo9MnC", value: new Date() },
+        { dataElement: "HTBFvtjeztu", value: true },
+        { dataElement: "xzuzLYN1f0J", value: true },
+      ],
+      eventDate: new Date(),
+    };
   }
 }

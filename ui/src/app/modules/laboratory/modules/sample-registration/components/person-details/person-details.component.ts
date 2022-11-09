@@ -446,6 +446,7 @@ export class PersonDetailsComponent implements OnInit {
   getSelectedClientRequest(clientRequest: any): void {
     this.selectedClientData = clientRequest;
     // First Check if client exists
+    console.log(clientRequest);
     this.personService
       .getPatientsByIdentifier(clientRequest?.passportNumber)
       .subscribe((response) => {

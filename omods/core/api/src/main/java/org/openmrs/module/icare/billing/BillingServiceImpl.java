@@ -670,10 +670,7 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 		OrderService orderService = Context.getService(OrderService.class);
 		
 		List<Visit> visits = dao.getOpenAdmittedVisit();
-<<<<<<< HEAD
 		System.out.println(visits.size());
-=======
->>>>>>> hotfix/ipd_payments_stock_invoice
 		
 		for (Visit visit : visits) {
 			Order order = new Order();
