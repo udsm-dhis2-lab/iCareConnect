@@ -34,4 +34,13 @@ export class OtherClientLevelSystemsService {
         catchError((error) => of(error))
       );
   }
+
+  sendLabResult(data: any): Observable<any> {
+    return this.httpClientService
+      .post(`icare/externalsystems/labresult`, data)
+      .pipe(
+        map((response) => response),
+        catchError((error) => of(error))
+      );
+  }
 }

@@ -92,19 +92,8 @@
             >
               <tr
                 [ngStyle]="{
-                  'background-color': sample?.completed
-                    ? '#6fd67bcf'
-                    : sample?.atLestOneOrderWithRejectedResults &&
-                      !sample?.completed
-                    ? '#d04747ab'
-                    : order?.testAllocations[0]?.firstSignOff &&
-                      !LISConfigurations?.isLIS
-                    ? '#f5f171f7'
-                    : order?.testAllocations[0]?.firstSignOff &&
-                      LISConfigurations?.isLIS
+                  'background-color': sample?.integrationStatus
                     ? '#0080009e'
-                    : sample?.atLeastOneHasResults && !sample?.completed
-                    ? '#ec864acf'
                     : ''
                 }"
                 [ngClass]="{ 'row-alternated': count % 2 !== 0 }"
@@ -209,10 +198,8 @@
                   >
                     <span>
                       {{
-                        sample?.releasedStatuses?.length > 0
-                          ? sample?.releasedStatuses[
-                              sample?.releasedStatuses?.length - 1
-                            ]?.status
+                        sample?.integrationStatus
+                          ? "Already Sent to Pima COVID"
                           : "-"
                       }}
                     </span>
@@ -276,6 +263,7 @@
                 <td colspan="11">
                   <app-shared-sample-details
                     [sample]="sample"
+                    (visitDetails)="onGetVisitDetails($event)"
                   ></app-shared-sample-details>
                 </td>
                 <td>
@@ -283,7 +271,12 @@
                   <div class="d-flex justify-content-center">
                     <button
                       mat-flat-button
-                      [disabled]="shouldConfirm"
+                      [disabled]="
+                        shouldConfirm ||
+                        !externalSystemPayload ||
+                        sample?.authorizationInfo?.length == 0 ||
+                        sample?.integrationStatus
+                      "
                       color="primary"
                       (click)="onSend($event, sample, shouldConfirm)"
                     >

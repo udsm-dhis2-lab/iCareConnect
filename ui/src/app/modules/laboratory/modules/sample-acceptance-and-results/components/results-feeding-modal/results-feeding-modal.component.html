@@ -1655,7 +1655,9 @@
             <thead class="table-header">
               <tr>
                 <th style="width: 15%">Test Order</th>
-                <th style="width: 10%">Ordered By</th>
+                <th style="width: 10%">
+                  {{ !LISConfigurations?.isLIS ? "Ordered By" : "Parameter" }}
+                </th>
                 <th *ngIf="LISConfigurations?.isLIS" colspan="1">Results</th>
                 <th *ngIf="!LISConfigurations?.isLIS" colspan="2">Results</th>
                 <th style="width: 10%">
