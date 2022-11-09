@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
-import { Observable } from "rxjs";
-import { map } from "rxjs/operators";
+import { Observable, of } from "rxjs";
+import { catchError, map } from "rxjs/operators";
 import { OpenmrsHttpClientService } from "src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service";
 
 @Injectable({
@@ -23,6 +23,15 @@ export class OtherClientLevelSystemsService {
             (responseItem) => responseItem?.events?.length > 0
           );
         })
+      );
+  }
+
+  sendLabRequest(data: any): Observable<any> {
+    return this.httpClientService
+      .post(`icare/externalsystems/labrequest`, data)
+      .pipe(
+        map((response) => response),
+        catchError((error) => of(error))
       );
   }
 }
