@@ -89,6 +89,9 @@ export class LabSamplesEffects {
                   department:
                     keyedDepartments[sample?.orders[0]?.order?.concept?.uuid],
                   collected: true,
+                  integrationStatus: (sample?.statuses?.filter(
+                    (status) => status?.category === "RESULTS_INTEGRATION"
+                  ) || [])[0],
                   releasedStatuses: (
                     sample?.statuses?.filter(
                       (status) => status?.status === "RELEASED"

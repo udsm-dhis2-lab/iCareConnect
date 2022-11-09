@@ -1,8 +1,11 @@
-<div class="row" *ngIf="{
-  obs: obs$ | async,
-  sampleConditions: sampleConditions$ | async
-} as params">
-  <div class="col-md-6">
+<div
+  class="row"
+  *ngIf="{
+    obs: obs$ | async,
+    sampleConditions: sampleConditions$ | async
+  } as params"
+>
+  <div [ngClass]="{ 'col-md-6': !hasResults, 'col-md-4': hasResults }">
     <div class="d-flex">
       <div class="w-50">
         <p>FileNO: {{ sample?.mrn }}</p>
@@ -14,24 +17,35 @@
           <span> Gender:{{ sample?.patient?.gender }} </span>
           <span class="ml-2">
             Age: {{ sample?.patient?.age }}
-            <span class="text-muted"> ({{ sample?.patient?.dob | date }}) </span>
+            <span class="text-muted">
+              ({{ sample?.patient?.dob | date }})
+            </span>
           </span>
         </p>
         <p *ngIf="params.sampleConditions?.TRANSPORT_CONDITION">
-          <span>Transport Condition: {{ params.sampleConditions?.TRANSPORT_CONDITION }}</span>
+          <span
+            >Transport Condition:
+            {{ params.sampleConditions?.TRANSPORT_CONDITION }}</span
+          >
         </p>
         <p *ngIf="params.sampleConditions?.TRANSPORT_TEMPERATURE">
-          <span>Transportation Temperature: {{ params.sampleConditions?.TRANSPORT_TEMPERATURE }}</span>
+          <span
+            >Transportation Temperature:
+            {{ params.sampleConditions?.TRANSPORT_TEMPERATURE }}</span
+          >
         </p>
       </div>
       <div class="w-50">
         <p *ngIf="params.obs">
-          <span>Clinical Information / History: <br> {{ params.obs?.latest?.value }}</span>
+          <span
+            >Clinical Information / History: <br />
+            {{ params.obs?.latest?.value }}</span
+          >
         </p>
       </div>
     </div>
   </div>
-  <div class="col-md-6">
+  <div [ngClass]="{ 'col-md-6': !hasResults, 'col-md-4': hasResults }">
     <!-- {{ sample?.specimen?.specimenName }} -->
     <div class="h6">Test Orders Details</div>
     <div class="order-table">
@@ -65,4 +79,8 @@
       </table>
     </div>
   </div>
+  <div
+    [ngClass]="{ 'col-md-4': hasResults }"
+    [ngStyle]="{ display: hasResults ? 'block' : 'none' }"
+  ></div>
 </div>

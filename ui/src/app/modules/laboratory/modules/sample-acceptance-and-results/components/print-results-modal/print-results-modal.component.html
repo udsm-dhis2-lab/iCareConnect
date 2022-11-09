@@ -1,9 +1,9 @@
 <div
   class="container my-3"
-  *ngIf="{ 
+  *ngIf="{
     facility: facilityDetails$ | async,
     visit: visit$ | async,
-    referringDoctorAttributes:referringDoctorAttributes$ | async
+    referringDoctorAttributes: referringDoctorAttributes$ | async
   } as params"
 >
   <div id="results-to-print" style="color: gray">
@@ -216,32 +216,50 @@
                       </span>
                     </td>
                   </tr>
-                  <tr *ngIf="LISConfigurations?.isLIS && params?.referringDoctorAttributes">
+                  <tr
+                    *ngIf="
+                      LISConfigurations?.isLIS &&
+                      params?.referringDoctorAttributes
+                    "
+                  >
                     <td></td>
                     <td></td>
                     <td>
-                      <b> Requesting Doctor  </b>
+                      <b> Requesting Doctor </b>
                     </td>
                     <td>
-                      <span>{{ params?.visit?.attributesKeyedByAttributeType[params?.referringDoctorAttributes[1].value] ? params?.visit?.attributesKeyedByAttributeType[params?.referringDoctorAttributes[1].value].value : " - " }}
-                        {{ params?.visit?.attributes[params?.referringDoctorAttributes[2].value] ? "(" +params?.visit?.attributesKeyedByAttributeType[params?.referringDoctorAttributes[2].value].value + ")" : ""}}
-                        
-                        {{ params?.visit?.attributes[params?.referringDoctorAttributes[0].value] ? "(" +params?.visit?.attributesKeyedByAttributeType[params?.referringDoctorAttributes[0].value].value + ")" : ""}}
-                        
-                      </span>
-                    </td>
-                  </tr>
-                  <tr *ngIf="LISConfigurations?.isLIS">
-                    <td></td>
-                    <td></td>
-                    <td>
-                      <b> Received by  </b>
-                    </td>
-                    <td>
-                      <span>
+                      <span
+                        >{{
+                          params?.visit?.attributesKeyedByAttributeType[
+                            params?.referringDoctorAttributes[1].value
+                          ]
+                            ? params?.visit?.attributesKeyedByAttributeType[
+                                params?.referringDoctorAttributes[1].value
+                              ].value
+                            : " - "
+                        }}
                         {{
-                          samplesGroupedByDepartment?.samples[0]
-                              ?.receivedByStatus?.remarks
+                          params?.visit?.attributes[
+                            params?.referringDoctorAttributes[2].value
+                          ]
+                            ? "(" +
+                              params?.visit?.attributesKeyedByAttributeType[
+                                params?.referringDoctorAttributes[2].value
+                              ].value +
+                              ")"
+                            : ""
+                        }}
+
+                        {{
+                          params?.visit?.attributes[
+                            params?.referringDoctorAttributes[0].value
+                          ]
+                            ? "(" +
+                              params?.visit?.attributesKeyedByAttributeType[
+                                params?.referringDoctorAttributes[0].value
+                              ].value +
+                              ")"
+                            : ""
                         }}
                       </span>
                     </td>
@@ -250,13 +268,33 @@
                     <td></td>
                     <td></td>
                     <td>
-                      <b> Received On  </b>
+                      <b> Received by </b>
                     </td>
                     <td>
                       <span>
                         {{
                           samplesGroupedByDepartment?.samples[0]
-                              ?.receivedOnStatus?.remarks
+                            ?.receivedByStatus?.remarks &&
+                          samplesGroupedByDepartment?.samples[0]
+                            ?.receivedByStatus?.remarks !== "RECEIVED_BY"
+                            ? samplesGroupedByDepartment?.samples[0]
+                                ?.receivedByStatus?.remarks
+                            : "-"
+                        }}
+                      </span>
+                    </td>
+                  </tr>
+                  <tr *ngIf="LISConfigurations?.isLIS">
+                    <td></td>
+                    <td></td>
+                    <td>
+                      <b> Received On </b>
+                    </td>
+                    <td>
+                      <span>
+                        {{
+                          samplesGroupedByDepartment?.samples[0]
+                            ?.receivedOnStatus?.remarks
                         }}
                       </span>
                     </td>

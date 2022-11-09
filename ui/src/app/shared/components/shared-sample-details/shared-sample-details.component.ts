@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { keyBy } from "lodash";
 import { Observable, zip } from "rxjs";
 import { map, tap } from "rxjs/operators";
@@ -17,6 +17,8 @@ export class SharedSampleDetailsComponent implements OnInit {
   obs$: Observable<any>;
   sampleConditions$: Observable<any>;
   sampleConditionsKeys: any[];
+  @Output() visitDetails: EventEmitter<any> = new EventEmitter<any>();
+  @Input() hasResults: boolean;
   constructor(
     private visitService: VisitsService,
     private conceptService: ConceptsService
@@ -27,16 +29,20 @@ export class SharedSampleDetailsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log(this.sample);
-    this.obs$ = this.visitService.getVisitObservationsByVisitUuid({
-      uuid: this.sample?.visit?.uuid,
-      query: {
-        v: "custom:(uuid,visitType,startDatetime,encounters:(uuid,encounterDatetime,encounterType,location,obs,orders,encounterProviders),stopDatetime,attributes:(uuid,display),location:(uuid,display,tags,parentLocation:(uuid,display)),patient:(uuid,display,identifiers,person,voided)",
-      },
-    }).pipe(map((obs) => {
-      
-      return !obs?.error && obs["3a010ff3-6361-4141-9f4e-dd863016db5a"] ? obs['3a010ff3-6361-4141-9f4e-dd863016db5a'] : "";
-    }));
+    this.obs$ = this.visitService
+      .getVisitObservationsByVisitUuid({
+        uuid: this.sample?.visit?.uuid,
+        query: {
+          v: "custom:(uuid,visitType,startDatetime,encounters:(uuid,encounterDatetime,encounterType,location,obs,orders,encounterProviders),stopDatetime,attributes:(uuid,display),location:(uuid,display,tags,parentLocation:(uuid,display)),patient:(uuid,display,identifiers,person,voided)",
+        },
+      })
+      .pipe(
+        map((obs) => {
+          return !obs?.error && obs["3a010ff3-6361-4141-9f4e-dd863016db5a"]
+            ? obs["3a010ff3-6361-4141-9f4e-dd863016db5a"]
+            : "";
+        })
+      );
     this.sampleConditions$ = zip(
       this.conceptService.getConceptDetailsByUuid(
         this.sampleStatusesByCategory["CONDITION"]?.remarks
@@ -50,15 +56,16 @@ export class SharedSampleDetailsComponent implements OnInit {
       this.conceptService.getConceptDetailsByUuid(
         this.sampleStatusesByCategory["PRIORITY"]?.remarks
       )
-    ).pipe(map((response) => {  console.log("==> ZIp Response: ", response)
-
+    ).pipe(
+      map((response) => {
         return {
           CONDITION: response[0]?.display,
           TRANSPORT_CONDITION: response[1]?.display,
           TRANSPORT_TEMPERATURE: response[2]?.display,
           PRIORITY: response[3]?.display,
         };
-    }));
+      })
+    );
     this.sampleConditionsKeys = Object.keys(this.sampleStatusesByCategory);
     this.isClinical =
       (
@@ -66,5 +73,14 @@ export class SharedSampleDetailsComponent implements OnInit {
           (status) => status?.status === "CLINICAL"
         ) || []
       )?.length > 0;
+    this.visitService
+      .getVisitDetailsByVisitUuid(this.sample?.visit?.uuid, {
+        v: "custom:(uuid,visitType,startDatetime,attributes:(uuid,display,value,attributeType:(uuid,display))",
+      })
+      ?.subscribe((response) => {
+        if (response) {
+          this.visitDetails.emit(response);
+        }
+      });
   }
 }
