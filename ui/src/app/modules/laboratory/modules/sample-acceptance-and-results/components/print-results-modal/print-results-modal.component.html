@@ -370,7 +370,11 @@
                     </td>
                   </tr>
                   <tr *ngIf="LISConfigurations?.isLIS">
-                    {{ samplesGroupedByDepartment?.samples[0]?.acceptanceRemarksStatus?.remarks.length > 0 ? 'Results compromization remarks during sample acceptance: ' + samplesGroupedByDepartment?.samples[0]?.acceptanceRemarksStatus?.remarks : "" }}
+                    <td></td>
+                    <td></td>
+                    <td>
+                      {{ samplesGroupedByDepartment?.samples[0]?.acceptanceRemarksStatus?.remarks.length > 0 ? 'Results compromization remarks: ' + samplesGroupedByDepartment?.samples[0]?.acceptanceRemarksStatus?.remarks : "" }}
+                    </td>
                   </tr>
                 </table>
                 <div
