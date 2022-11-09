@@ -71,7 +71,7 @@
               <mat-icon>arrow_back</mat-icon>
               Back to Client List
             </button>
-            <ng-container *ngIf="!activeVisit?.waitingToBeAdmitted">
+            <ng-container>
               <button
                 *ngFor="let form of dashboardParams?.forms"
                 class="mr-2"
@@ -375,8 +375,7 @@
             !(
               !activeVisit?.isEmergency &&
               dashboardParams?.hasPatientHavePendingPaymentForTheCurrentVisitType
-            ) &&
-            !activeVisit?.waitingToBeAdmitted
+            )
           "
         >
           <div class="p-2">
@@ -394,7 +393,7 @@
                     mode="indeterminate"
                   >
                   </mat-progress-bar>
-                  <div class="w-100" *ngIf="activeVisit?.isAdmitted">
+                  <div class="w-100">
                     <div class="w-100">
                       <div class="w-100 mt-2">
                         <app-shared-visit-history-summary
@@ -810,13 +809,13 @@
           Not paid for Consultation Service
         </div>
 
-        <div
+        <!-- <div
           class="alert alert-warning mt-4 ml-2 mr-2"
           *ngIf="activeVisit?.waitingToBeAdmitted"
           role="alert"
         >
           Assign bed to this patient to continue
-        </div>
+        </div> -->
       </div>
     </div>
   </div>

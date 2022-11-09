@@ -144,7 +144,7 @@ export class PatientProceduresSummaryComponent implements OnInit {
   onOpenAttendProcedure(event: Event, proceduredOrder): void {
     event.stopPropagation();
     this.dialog.open(AttendProcedureOrderComponent, {
-      width: "45%",
+      width: "65%",
       height: "auto",
       data: {
         proceduredOrder,

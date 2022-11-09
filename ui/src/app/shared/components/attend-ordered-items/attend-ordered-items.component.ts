@@ -62,12 +62,6 @@ export class AttendOrderedItemsComponent implements OnInit {
       this.currentBills,
       this.visit?.isEnsured
     );
-    this.orderedItems = addBillStatusToOrderedItems(
-      this.orderedItems,
-      this.currentBills,
-      this.encounters,
-      this.visit
-    );
     this.procedureFields = [
       {
         id: "procedure",
