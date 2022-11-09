@@ -638,7 +638,7 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		administrationService.setGlobalProperty("iCare.externalSystems.integrated.pimaCovid.referenceOuUid", "m0frOspS7JY");
 		administrationService.setGlobalProperty("iCare.externalSystems.integrated.pimaCovid.programUid", "MNhYWMkR0Z7");
 		MockHttpServletRequest newGetRequest = newGetRequest("icare/client/externalsystems", new Parameter("identifier",
-		        "TAE185936"), new Parameter("identifierReference", "zxdIGVIuhWU"), new Parameter("basicAuth",
+		        "20224"), new Parameter("identifierReference", "zxdIGVIuhWU"), new Parameter("basicAuth",
 		        "b21vc2hpOkdpdGh1YjRjb2RlIQ=="));
 		MockHttpServletResponse handle = handle(newGetRequest);
 		String patientData = handle.getContentAsString();
