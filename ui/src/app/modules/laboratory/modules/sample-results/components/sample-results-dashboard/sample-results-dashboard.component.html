@@ -1,7 +1,8 @@
 <div
   *ngIf="{
     allSamples: allSamples$ | async,
-    samplesWithResults: samplesWithResults$ | async
+    samplesWithResults: samplesWithResults$ | async,
+    testResultsMapping: testResultsMapping$ | async
   } as sampleParams"
 >
   <mat-progress-bar
@@ -267,7 +268,9 @@
                   ></app-shared-sample-details>
                 </td>
                 <td>
-                  <div *ngIf="shouldConfirm">Please Confirm</div>
+                  <div class="alert alert-warning" role="alert">
+                    {{ message }}
+                  </div>
                   <div class="d-flex justify-content-center">
                     <button
                       mat-flat-button
@@ -275,10 +278,18 @@
                         shouldConfirm ||
                         !externalSystemPayload ||
                         sample?.authorizationInfo?.length == 0 ||
+                        !sampleParams?.testResultsMapping ||
                         sample?.integrationStatus
                       "
                       color="primary"
-                      (click)="onSend($event, sample, shouldConfirm)"
+                      (click)="
+                        onSend(
+                          $event,
+                          sample,
+                          shouldConfirm,
+                          sampleParams?.testResultsMapping
+                        )
+                      "
                     >
                       Send
                     </button>
@@ -287,7 +298,14 @@
                       color="primary"
                       mat-flat-button
                       *ngIf="shouldConfirm"
-                      (click)="onSend($event, sample, shouldConfirm)"
+                      (click)="
+                        onSend(
+                          $event,
+                          sample,
+                          shouldConfirm,
+                          sampleParams?.testResultsMapping
+                        )
+                      "
                     >
                       Confirm
                     </button>

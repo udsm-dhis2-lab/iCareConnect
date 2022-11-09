@@ -4,6 +4,7 @@ import { Store } from "@ngrx/store";
 import { orderBy } from "lodash";
 import { Observable, zip } from "rxjs";
 import { catchError, map } from "rxjs/operators";
+import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { LISConfigurationsModel } from "src/app/modules/laboratory/resources/models/lis-configurations.model";
 import { OtherClientLevelSystemsService } from "src/app/modules/laboratory/resources/services/other-client-level-systems.service";
 import { SharedConfirmationComponent } from "src/app/shared/components/shared-confirmation /shared-confirmation.component";
@@ -61,16 +62,24 @@ export class SampleResultsDashboardComponent implements OnInit {
   shouldConfirm: boolean = false;
 
   externalSystemPayload: any;
+  message: string;
+  testResultsMapping$: Observable<any>;
   constructor(
     private store: Store<AppState>,
     private dialog: MatDialog,
     private samplesService: SamplesService,
-    private otherSystemsService: OtherClientLevelSystemsService
+    private otherSystemsService: OtherClientLevelSystemsService,
+    private conceptService: ConceptsService,
+    private systemSettingsService: SystemSettingsService
   ) {}
 
   ngOnInit(): void {
     this.userUuid = this.currentUser?.uuid;
     this.getCompletedSamples();
+    this.testResultsMapping$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        "iCare.laboratory.settings.externalSystems.pimaCOVID.testResults.mappingSourceUuid"
+      );
   }
 
   getCompletedSamples() {
@@ -134,7 +143,6 @@ export class SampleResultsDashboardComponent implements OnInit {
       .sampleDetailsToggleControl[sample?.id]
       ? true
       : false;
-    console.log("sampleDetailsToggleControl", this.sampleDetailsToggleControl);
   }
 
   onUpdateStatus(event: Event, sample: any, key: string): void {
@@ -222,40 +230,88 @@ export class SampleResultsDashboardComponent implements OnInit {
       : null;
   }
 
-  onSend(event: Event, sample: any, confirmed?: boolean): void {
+  onSend(
+    event: Event,
+    sample: any,
+    confirmed?: boolean,
+    testResultsMapping?: string
+  ): void {
     event.stopPropagation();
     if (confirmed) {
+      const result = orderBy(
+        (sample?.ordersWithResults[0]?.testAllocations?.filter(
+          (allocation) =>
+            allocation?.concept?.uuid === "9c657ac6-deed-4167-b7ea-a2d794c3c66e"
+        ) || [])[0]?.results,
+        ["dateCreated"],
+        ["desc"]
+      )[0]?.valueCoded;
+
+      const resultUuid = result?.uuid;
+      // const diaplayValue = result?.display;
+      this.conceptService
+        .getConceptDetailsByUuid(
+          resultUuid,
+          "custom:(uuid,display,mappings:(display,conceptReferenceTerm:(uuid,name,code,conceptSource)))"
+        )
+        .subscribe((response) => {
+          if (response && !response?.error) {
+            if (response?.mappings?.length > 0) {
+              const mapping = (response?.mappings?.filter(
+                (mapping) =>
+                  mapping?.conceptReferenceTerm?.conceptSource?.uuid ===
+                  testResultsMapping
+              ) || [])[0];
+              const mappedResult = mapping?.conceptReferenceTerm?.code;
+              if (mappedResult) {
+                this.shouldConfirm = false;
+                this.saving = true;
+                const sampleStatus = {
+                  sample: {
+                    uuid: sample?.uuid,
+                  },
+                  user: {
+                    uuid: this.userUuid,
+                  },
+                  remarks: "SENT TO PIMACOVID SYSTEM",
+                  category: "RESULTS_INTEGRATION",
+                  status: "RESULTS_INTEGRATION",
+                };
+                const requests = [
+                  this.otherSystemsService.sendLabResult(data),
+                  this.samplesService.setSampleStatus(sampleStatus),
+                ];
+                zip(
+                  ...requests.map((request) => {
+                    return request;
+                  })
+                ).subscribe((response) => {
+                  if (response) {
+                    this.saving = false;
+                  }
+                });
+              } else {
+                this.message =
+                  "Answer has not been maaped on LIS settings, contact IT/Section Manager";
+                setTimeout(() => {
+                  this.message = "";
+                }, 2000);
+              }
+            } else {
+              this.message =
+                "Missing mappings with PimaCOVID System, contact IT/Section Manager";
+              setTimeout(() => {
+                this.message = "";
+              }, 2000);
+            }
+          }
+        });
       const data = this.createResultsPayload(
         this.externalSystemPayload,
         sample
       );
-      this.shouldConfirm = false;
-      this.saving = true;
-      const sampleStatus = {
-        sample: {
-          uuid: sample?.uuid,
-        },
-        user: {
-          uuid: this.userUuid,
-        },
-        remarks: "SENT TO PIMACOVID SYSTEM",
-        category: "RESULTS_INTEGRATION",
-        status: "RESULTS_INTEGRATION",
-      };
-      const requests = [
-        this.otherSystemsService.sendLabResult(data),
-        this.samplesService.setSampleStatus(sampleStatus),
-      ];
-      zip(
-        ...requests.map((request) => {
-          return request;
-        })
-      ).subscribe((response) => {
-        if (response) {
-          this.saving = false;
-        }
-      });
     } else {
+      this.message = "Please Confirm";
       this.shouldConfirm = true;
     }
   }
