@@ -369,6 +369,9 @@
                       }}
                     </td>
                   </tr>
+                  <tr *ngIf="LISConfigurations?.isLIS">
+                    {{ samplesGroupedByDepartment?.samples[0]?.acceptanceRemarksStatus?.remarks.length > 0 ? 'Results compromization remarks during sample acceptance: ' + samplesGroupedByDepartment?.samples[0]?.acceptanceRemarksStatus?.remarks : "" }}
+                  </tr>
                 </table>
                 <div
                   style="border-bottom: solid 1px #222; padding: 8px 0"

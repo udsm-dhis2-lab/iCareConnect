@@ -4,12 +4,15 @@ import { Store } from "@ngrx/store";
 import { Observable } from "rxjs";
 import { take } from "rxjs/operators";
 import { SampleResultsPrintingComponent } from "src/app/modules/laboratory/components/sample-results-printing/sample-results-printing.component";
+import { SamplesService } from "src/app/modules/laboratory/resources/services/samples.service";
+import { SharedConfirmationComponent } from "src/app/shared/components/shared-confirmation /shared-confirmation.component";
 import {
   setSampleStatus,
   loadLabSamplesByCollectionDates,
   acceptSample,
   setSampleStatuses,
   clearLoadedLabSamples,
+  updateSample,
 } from "src/app/store/actions";
 import { AppState } from "src/app/store/reducers";
 import {
@@ -70,7 +73,11 @@ export class SampleAcceptanceComponent implements OnInit {
   showTabSampleTrackingForLis = false;
   saving: boolean = false;
   samplesToViewMoreDetails: any = {};
-  constructor(private store: Store<AppState>, private dialog: MatDialog) {}
+  constructor(
+    private store: Store<AppState>,
+    private dialog: MatDialog,
+    private sampleService: SamplesService
+  ) {}
 
   ngOnInit(): void {
     this.userUuid = this.currentUser?.uuid;
@@ -154,43 +161,74 @@ export class SampleAcceptanceComponent implements OnInit {
 
   accept(e, sample, providerDetails) {
     e.stopPropagation();
-
-    this.savingMessage[sample?.id + "-accept"] = true;
-
-    const data = {
-      sample: {
-        uuid: sample?.uuid,
+    const confirmDialog = this.dialog.open(SharedConfirmationComponent, {
+      width: "25%",
+      data: {
+        modalTitle: `Accept Sample`,
+        modalMessage: `Please, provide results compromization remarks if any upon accepting this sample. Click confirm to accept the sample!`,
+        showRemarksInput: true,
       },
-      user: {
-        uuid: this.userUuid,
-      },
-      remarks: "accepted",
-      status: "ACCEPTED",
-      category: "ACCEPTED",
-    };
+      disableClose: false,
+      panelClass: "custom-dialog-container",
+    });
 
-    this.store.dispatch(
-      acceptSample({
-        status: data,
-        details: {
-          ...sample,
-          acceptedBy: {
-            uuid: providerDetails?.uuid,
-            name: providerDetails?.display,
-            display: providerDetails?.display,
+    confirmDialog.afterClosed().subscribe((confirmationObject) => {
+      if (confirmationObject?.confirmed) {
+        if (confirmationObject?.remarks.length > 0) {
+          const confirmationRemarks = {
+            sample: {
+              uuid: sample?.uuid,
+            },
+            user: {
+              uuid: this.userUuid,
+            },
+            remarks: confirmationObject?.remarks,
+            status: "ACCEPTANCE_REMARKS",
+            category: "ACCEPTANCE_REMARKS",
+          };
+          this.sampleService.saveSampleStatus(confirmationRemarks).subscribe((response) => {
+            console.log(response?.error ? "Error Occured" : `Success: ${response}`)
+          });
+        }
+
+        this.savingMessage[sample?.id + "-accept"] = true;
+
+        const data = {
+          sample: {
+            uuid: sample?.uuid,
           },
-        },
-      })
-    );
+          user: {
+            uuid: this.userUuid,
+          },
+          remarks: "accepted",
+          status: "ACCEPTED",
+          category: "ACCEPTED",
+        };
 
-    this.settingLabSampleStatus$ = this.store.select(
-      getSettingLabSampleStatusState
-    );
-    setTimeout(() => {
-      this.store.dispatch(clearLoadedLabSamples());
-      this.getSamplesData();
-      this.saving = false;
-    }, 1000);
+        this.store.dispatch(
+          acceptSample({
+            status: data,
+            details: {
+              ...sample,
+              acceptedBy: {
+                uuid: providerDetails?.uuid,
+                name: providerDetails?.display,
+                display: providerDetails?.display,
+              },
+            },
+          })
+        );
+
+        this.settingLabSampleStatus$ = this.store.select(
+          getSettingLabSampleStatusState
+        );
+        setTimeout(() => {
+          this.store.dispatch(clearLoadedLabSamples());
+          this.getSamplesData();
+          this.saving = false;
+        }, 1000);
+      }
+    });
   }
 
   reject(e, sample, providerDetails) {
