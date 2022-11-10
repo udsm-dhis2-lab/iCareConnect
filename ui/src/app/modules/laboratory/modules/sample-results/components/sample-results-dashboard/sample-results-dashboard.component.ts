@@ -277,6 +277,11 @@ export class SampleResultsDashboardComponent implements OnInit {
                   category: "RESULTS_INTEGRATION",
                   status: "RESULTS_INTEGRATION",
                 };
+
+                const data = this.createResultsPayload(
+                  this.externalSystemPayload,
+                  mappedResult
+                );
                 const requests = [
                   this.otherSystemsService.sendLabResult(data),
                   this.samplesService.setSampleStatus(sampleStatus),
@@ -306,31 +311,13 @@ export class SampleResultsDashboardComponent implements OnInit {
             }
           }
         });
-      const data = this.createResultsPayload(
-        this.externalSystemPayload,
-        sample
-      );
     } else {
       this.message = "Please Confirm";
       this.shouldConfirm = true;
     }
   }
 
-  createResultsPayload(referencePayload, sample): any {
-    const mapping = {
-      "Not Detected": "Not performed",
-      Detected: "Positive",
-      POS: "Positive",
-    };
-    const result = orderBy(
-      (sample?.ordersWithResults[0]?.testAllocations?.filter(
-        (allocation) =>
-          allocation?.concept?.uuid === "9c657ac6-deed-4167-b7ea-a2d794c3c66e"
-      ) || [])[0]?.results,
-      ["dateCreated"],
-      ["desc"]
-    )[0]?.valueCoded?.display;
-    // console.log(sample);
+  createResultsPayload(referencePayload: any, mappedResult: string): any {
     const labResultPayload = {
       program: referencePayload?.program,
       programStage: "QreyZUwCOlg",
@@ -339,7 +326,7 @@ export class SampleResultsDashboardComponent implements OnInit {
       enrollment: referencePayload?.enrollment,
       dataValues: [
         { dataElement: "Cl2I1H6Y3oj", value: new Date().toISOString() },
-        { dataElement: "ovY6E8BSdto", value: mapping[result] },
+        { dataElement: "ovY6E8BSdto", value: mappedResult },
         { dataElement: "eDrW5iJLYbP", value: "PCR" },
       ],
       eventDate: new Date().toISOString(),
