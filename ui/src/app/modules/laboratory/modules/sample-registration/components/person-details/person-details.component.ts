@@ -440,6 +440,7 @@ export class PersonDetailsComponent implements OnInit {
   }
 
   onGetSelectedSystem(system: any): void {
+    this.fromExternalSystem.emit(true);
     this.selecedSystem.emit(system);
   }
 

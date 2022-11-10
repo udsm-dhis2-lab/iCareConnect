@@ -11,7 +11,7 @@ export function addBillStatusToOrderedItems(items, bills, encounters, visit) {
                       bill?.items.filter(
                         (billItem) =>
                           billItem?.billItem?.item?.concept?.uuid ===
-                          item?.order?.concept?.uuid
+                          item?.concept?.uuid
                       ) || []
                     )?.length > 0
                 ) || []

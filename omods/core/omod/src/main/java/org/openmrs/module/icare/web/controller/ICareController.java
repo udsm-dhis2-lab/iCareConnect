@@ -285,6 +285,7 @@ public class ICareController {
     public Map<String, Object> getPendingVisit(@RequestParam(defaultValue = "100") Integer limit,
                                                @RequestParam(defaultValue = "0") Integer startIndex,
                                                @RequestParam(required = false) String orderTypeUuid,
+											   @RequestParam(required = false) String encounterTypeUuid,
                                                @RequestParam(required = false) String q,
                                                @RequestParam(required = false) String locationUuid,
                                                @RequestParam(required = false) OrderStatus.OrderStatusCode orderStatusCode,
@@ -295,7 +296,7 @@ public class ICareController {
 											   @RequestParam(required = false) VisitWrapper.PaymentStatus paymentStatus
 											   ) {
 
-        List<Visit> visits = iCareService.getVisitsByOrderType(q, orderTypeUuid, locationUuid, orderStatusCode, fulfillerStatus, limit, startIndex, orderBy, orderByDirection, attributeValueReference, paymentStatus);
+        List<Visit> visits = iCareService.getVisitsByOrderType(q, orderTypeUuid, encounterTypeUuid, locationUuid, orderStatusCode, fulfillerStatus, limit, startIndex, orderBy, orderByDirection, attributeValueReference, paymentStatus);
 
         List<Map<String, Object>> responseSamplesObject = new ArrayList<Map<String, Object>>();
         for (Visit visit : visits) {
@@ -503,6 +504,7 @@ public class ICareController {
 			String dobAttributeUid = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.attributes.dob");
 			String passportNumberAttributeUid = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.attributes.passportNumber");
 			String phoneNumberAttributeUid = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.attributes.phoneNumber");
+			String emailAttributeUid = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.attributes.email");
 
 //			Get results stage uid
 			String resultsStageId = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.programStages.resultsStage");
@@ -570,6 +572,9 @@ public class ICareController {
 							}
 							if (attribute.get("attribute").equals(phoneNumberAttributeUid)) {
 								clientFormattedData.put("phoneNumber",attribute.get("value"));
+							}
+							if (attribute.get("attribute").equals(emailAttributeUid)) {
+								clientFormattedData.put("email",attribute.get("value"));
 							}
 						}
 						clientFormattedData.put("attributes", currentTrackedEntityInstance.get("attributes"));

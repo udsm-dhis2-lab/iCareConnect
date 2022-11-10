@@ -456,7 +456,7 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		handle = handle(newGetRequest);
 		
 		Map<String, Object> orderResult = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
-		//		System.out.println((List) orderResult.get("results"));
+		System.out.println((List) orderResult.get("results"));
 		assertThat("Should return a visit", ((List) orderResult.get("results")).size() == 2);
 		//Then
 		
@@ -470,6 +470,15 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 				}
 			}
 		}
+		
+		newGetRequest = newGetRequest("icare/visit", new Parameter("encounterTypeUuid",
+		        "2msir5eb-5345-11e8-9c7c-40b034c3cfer"));
+		handle = handle(newGetRequest);
+		
+		orderResult = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
+		System.out.println("orderResult");
+		System.out.println(orderResult);
+		assertThat("Should return one visit", ((List) orderResult.get("results")).size() == 1);
 		
 		newGetRequest = newGetRequest("icare/visit", new Parameter("orderTypeUuid", "2msir5eb-5345-11e8-9922-40b034c3cfee"),
 		    new Parameter("fulfillerStatus", "COMPLETED"));
@@ -629,7 +638,7 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		administrationService.setGlobalProperty("iCare.externalSystems.integrated.pimaCovid.referenceOuUid", "m0frOspS7JY");
 		administrationService.setGlobalProperty("iCare.externalSystems.integrated.pimaCovid.programUid", "MNhYWMkR0Z7");
 		MockHttpServletRequest newGetRequest = newGetRequest("icare/client/externalsystems", new Parameter("identifier",
-		        "TAE185936"), new Parameter("identifierReference", "zxdIGVIuhWU"), new Parameter("basicAuth",
+		        "20224"), new Parameter("identifierReference", "zxdIGVIuhWU"), new Parameter("basicAuth",
 		        "b21vc2hpOkdpdGh1YjRjb2RlIQ=="));
 		MockHttpServletResponse handle = handle(newGetRequest);
 		String patientData = handle.getContentAsString();

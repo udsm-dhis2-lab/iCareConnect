@@ -1,6 +1,10 @@
 <div
   class="container my-3"
-  *ngIf="{ facility: facilityDetails$ | async } as params"
+  *ngIf="{
+    facility: facilityDetails$ | async,
+    visit: visit$ | async,
+    referringDoctorAttributes: referringDoctorAttributes$ | async
+  } as params"
 >
   <div id="results-to-print" style="color: gray">
     <mat-accordion>
@@ -89,7 +93,7 @@
                 {{ samplesGroupedByDepartment?.departmentName }} Report
               </div>
               <div>
-                <!-- {{samplesGroupedByDepartment["samples"][0]?.orders[0] | json}} -->
+                <!-- {{ samplesGroupedByDepartment["samples"][0]?.orders[0] | json }} -->
 
                 <table style="width: 100%">
                   <tr>
@@ -135,7 +139,7 @@
                       {{ patientDetailsAndSamples?.patient?.middleName }}
                       {{ patientDetailsAndSamples?.patient?.familyName }}
                     </td>
-                    <td><b>Sample IDS</b></td>
+                    <td><b>Sample ID</b></td>
                     <td>
                       <span
                         *ngFor="
@@ -189,7 +193,7 @@
                           ? (samplesGroupedByDepartment?.samples[0]?.created
                             | date: "medium")
                           : (samplesGroupedByDepartment?.samples[0]
-                              ?.collectedByStatus?.timestamp | date: "medium")
+                              ?.collectedOnStatus | date: "medium")
                       }}
                     </td>
                   </tr>
@@ -208,6 +212,84 @@
                         {{
                           samplesGroupedByDepartment?.samples[0]?.acceptedAt
                             | date: "medium"
+                        }}
+                      </span>
+                    </td>
+                  </tr>
+                  <tr
+                    *ngIf="
+                      LISConfigurations?.isLIS &&
+                      params?.referringDoctorAttributes
+                    "
+                  >
+                    <td></td>
+                    <td></td>
+                    <td>
+                      <b> Requesting Doctor </b>
+                    </td>
+                    <td>
+                      <span
+                        >{{
+                          params?.visit?.attributesKeyedByAttributeType[
+                            params?.referringDoctorAttributes[1].value
+                          ]
+                            ? params?.visit?.attributesKeyedByAttributeType[
+                                params?.referringDoctorAttributes[1].value
+                              ].value
+                            : " - "
+                        }}
+                        {{
+                          params?.visit?.attributes[
+                            params?.referringDoctorAttributes[2].value
+                          ]
+                            ? "(" +
+                              params?.visit?.attributesKeyedByAttributeType[
+                                params?.referringDoctorAttributes[2].value
+                              ].value +
+                              ")"
+                            : ""
+                        }}
+
+                        {{
+                          params?.visit?.attributes[
+                            params?.referringDoctorAttributes[0].value
+                          ]
+                            ? "(" +
+                              params?.visit?.attributesKeyedByAttributeType[
+                                params?.referringDoctorAttributes[0].value
+                              ].value +
+                              ")"
+                            : ""
+                        }}
+                      </span>
+                    </td>
+                  </tr>
+                  <tr *ngIf="LISConfigurations?.isLIS">
+                    <td></td>
+                    <td></td>
+                    <td>
+                      <b> Received by </b>
+                    </td>
+                    <td>
+                      <span>
+                        {{
+                          samplesGroupedByDepartment?.samples[0]
+                            ?.receivedByStatus?.user?.name
+                        }}
+                      </span>
+                    </td>
+                  </tr>
+                  <tr *ngIf="LISConfigurations?.isLIS">
+                    <td></td>
+                    <td></td>
+                    <td>
+                      <b> Received On </b>
+                    </td>
+                    <td>
+                      <span>
+                        {{
+                          samplesGroupedByDepartment?.samples[0]
+                            ?.receivedOnStatus?.remarks | date: "medium"
                         }}
                       </span>
                     </td>
@@ -269,6 +351,29 @@
                             ?.testAllocations[0]?.results?.length - 1
                         ]?.timestamp | date: "medium"
                       }}
+                    </td>
+                  </tr>
+                  <tr *ngIf="!LISConfigurations?.isLIS">
+                    <td></td>
+                    <td></td>
+                    <td>
+                      <b>Requested By</b>
+                    </td>
+                    <td>
+                      {{
+                        samplesGroupedByDepartment?.samples[0]?.orders[0]
+                          ?.testAllocations[0]?.resultsCommentsStatuses[
+                          samplesGroupedByDepartment?.samples[0]?.orders[0]
+                            ?.testAllocations[0]?.results?.length - 1
+                        ]?.timestamp | date: "medium"
+                      }}
+                    </td>
+                  </tr>
+                  <tr *ngIf="LISConfigurations?.isLIS">
+                    <td></td>
+                    <td></td>
+                    <td>
+                      {{ samplesGroupedByDepartment?.samples[0]?.acceptanceRemarksStatus?.remarks.length > 0 ? 'Results compromization remarks: ' + samplesGroupedByDepartment?.samples[0]?.acceptanceRemarksStatus?.remarks : "" }}
                     </td>
                   </tr>
                 </table>

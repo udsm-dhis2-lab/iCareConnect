@@ -34,6 +34,9 @@ export class SampleAcceptanceDashboardComponent implements OnInit {
   codedSampleRejectionReasons$: Observable<any[]>;
   samplesLoadedState$: Observable<any>;
   currentUser$: Observable<any>;
+
+  page: number = 1;
+  pageCount: number = 100;
   constructor(private store: Store<AppState>) {}
 
   ngOnInit(): void {
@@ -51,6 +54,8 @@ export class SampleAcceptanceDashboardComponent implements OnInit {
         containers: this.labSamplesContainers,
         configs: this.configs,
         codedSampleRejectionReasons: this.codedSampleRejectionReasons,
+        startIndex: (this.page - 1) * this.pageCount,
+        limit: this.pageCount,
       })
     );
 
@@ -64,6 +69,24 @@ export class SampleAcceptanceDashboardComponent implements OnInit {
 
     this.samplesLoadedState$ = this.store.select(
       getFormattedLabSamplesLoadedState
+    );
+  }
+
+  getSamples(event: Event, action: string): void {
+    event.stopPropagation();
+    this.page = action === "next" ? this.page + 1 : this.page - 1;
+    this.store.dispatch(
+      loadLabSamplesByCollectionDates({
+        datesParameters: this.datesParameters,
+        patients: this.patients,
+        sampleTypes: this.sampleTypes,
+        departments: this.labSamplesDepartments,
+        containers: this.labSamplesContainers,
+        configs: this.configs,
+        codedSampleRejectionReasons: this.codedSampleRejectionReasons,
+        startIndex: (this.page - 1) * this.pageCount,
+        limit: this.pageCount,
+      })
     );
   }
 }

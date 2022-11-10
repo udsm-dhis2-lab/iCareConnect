@@ -64,7 +64,11 @@ export class LabSamplesEffects {
       withLatestFrom(this.store.select(getLISConfigurations)),
       switchMap(([action, lisConfigs]: [any, any]) => {
         return this.sampleService
-          .getLabSamplesByCollectionDates(action.datesParameters)
+          .getLabSamplesByCollectionDates(
+            action?.datesParameters,
+            action?.startIndex,
+            action?.limit
+          )
           .pipe(
             map((response) => {
               const keyedDepartments = keyDepartmentsByTestOrder(
@@ -89,6 +93,9 @@ export class LabSamplesEffects {
                   department:
                     keyedDepartments[sample?.orders[0]?.order?.concept?.uuid],
                   collected: true,
+                  integrationStatus: (sample?.statuses?.filter(
+                    (status) => status?.category === "RESULTS_INTEGRATION"
+                  ) || [])[0],
                   releasedStatuses: (
                     sample?.statuses?.filter(
                       (status) => status?.status === "RELEASED"
@@ -169,11 +176,30 @@ export class LabSamplesEffects {
                   collectedByStatus: (sample?.statuses?.filter(
                     (status) => status?.category === "COLLECTED_BY"
                   ) || [])[0],
+                  collectedOnStatus: (sample?.statuses?.filter(
+                    (status) => status?.category === "COLLECTED_ON"
+                  ) || [])[0],
+                  acceptanceRemarksStatus: (sample?.statuses?.filter(
+                    (status) => status?.category === "ACCEPTANCE_REMARKS"
+                  ) || [])[0],
+                  broughtOnStatus: (sample?.statuses?.filter(
+                    (status) => status?.category === "BROUGHT_ON"
+                  ) || [])[0],
                   registeredBy: {
                     display: sample?.creator?.display?.split(" (")[0],
                     name: sample?.creator?.display?.split(" (")[0],
                     uid: sample?.creator?.uuid,
                   },
+                  sampleConditionStatus: (sample?.statuses?.filter(
+                    (status) => status?.category === "CONDITION"
+                  ) || [])[0],
+                  sampleTransportConditionStatus: (sample?.statuses?.filter(
+                    (status) => status?.category === "TRANSPORT_CONDITION"
+                  ) || [])[0],
+                  sampleTransportationTemperatureStatus:
+                    (sample?.statuses?.filter(
+                      (status) => status?.category === "TRANSPORT_TEMPERATURE"
+                    ) || [])[0],
                   ordersWithResults: getOrdersWithResults(sample?.orders),
                   accepted:
                     (_.filter(sample?.statuses, { status: "ACCEPTED" }) || [])
@@ -1403,15 +1429,31 @@ function getOrdersWithResults(orders) {
 
   orders?.forEach((order) => {
     if (order?.testAllocations?.length > 0) {
-      order.testAllocations.forEach((test) => {
-        if (test.results.length > 0) {
-          newOrders = [...newOrders, order];
+      order?.testAllocations?.forEach((allocation) => {
+        if (allocation?.results?.length > 0) {
+          newOrders = [
+            ...newOrders,
+            {
+              ...order,
+              conceptUuid: allocation?.concept?.uuid,
+            },
+          ];
         }
       });
     }
   });
 
-  return newOrders;
+  return (
+    newOrders?.map((order) => {
+      return {
+        ...order,
+        testAllocations:
+          order?.testAllocations?.filter(
+            (allocation) => allocation?.results?.length > 0
+          ) || [],
+      };
+    }) || []
+  );
 }
 
 function keyLevelTwoConceptSetMembers(members) {

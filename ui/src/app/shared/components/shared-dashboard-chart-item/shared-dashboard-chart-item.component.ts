@@ -1,12 +1,11 @@
 import { Component, Input, OnInit } from "@angular/core";
 import * as Highcharts from "highcharts";
-
 @Component({
-  selector: "app-dashboard-chart-item",
-  templateUrl: "./dashboard-chart-item.component.html",
-  styleUrls: ["./dashboard-chart-item.component.scss"],
+  selector: "app-shared-dashboard-chart-item",
+  templateUrl: "./shared-dashboard-chart-item.component.html",
+  styleUrls: ["./shared-dashboard-chart-item.component.scss"],
 })
-export class DashboardChartItemComponent implements OnInit {
+export class SharedDashboardChartItemComponent implements OnInit {
   @Input() samplesData: any;
   chart: any;
   constructor() {}

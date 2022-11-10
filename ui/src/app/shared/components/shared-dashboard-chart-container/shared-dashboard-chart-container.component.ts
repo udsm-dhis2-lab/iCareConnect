@@ -3,11 +3,11 @@ import { Observable } from "rxjs";
 import { SamplesService } from "src/app/modules/laboratory/resources/services/samples.service";
 
 @Component({
-  selector: "app-dashboard",
-  templateUrl: "./dashboard.component.html",
-  styleUrls: ["./dashboard.component.scss"],
+  selector: "app-shared-dashboard-chart-container",
+  templateUrl: "./shared-dashboard-chart-container.component.html",
+  styleUrls: ["./shared-dashboard-chart-container.component.scss"],
 })
-export class DashboardComponent implements OnInit {
+export class SharedDashboardChartContainerComponent implements OnInit {
   @Input() datesParams: any;
   samples$: Observable<any>;
   constructor(private sampleService: SamplesService) {}

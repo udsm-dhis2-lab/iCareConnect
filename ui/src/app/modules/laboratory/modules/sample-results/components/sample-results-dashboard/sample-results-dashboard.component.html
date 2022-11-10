@@ -1,7 +1,8 @@
 <div
   *ngIf="{
     allSamples: allSamples$ | async,
-    samplesWithResults: samplesWithResults$ | async
+    samplesWithResults: samplesWithResults$ | async,
+    testResultsMapping: testResultsMapping$ | async
   } as sampleParams"
 >
   <mat-progress-bar
@@ -92,19 +93,8 @@
             >
               <tr
                 [ngStyle]="{
-                  'background-color': sample?.completed
-                    ? '#6fd67bcf'
-                    : sample?.atLestOneOrderWithRejectedResults &&
-                      !sample?.completed
-                    ? '#d04747ab'
-                    : order?.testAllocations[0]?.firstSignOff &&
-                      !LISConfigurations?.isLIS
-                    ? '#f5f171f7'
-                    : order?.testAllocations[0]?.firstSignOff &&
-                      LISConfigurations?.isLIS
+                  'background-color': sample?.integrationStatus
                     ? '#0080009e'
-                    : sample?.atLeastOneHasResults && !sample?.completed
-                    ? '#ec864acf'
                     : ''
                 }"
                 [ngClass]="{ 'row-alternated': count % 2 !== 0 }"
@@ -209,10 +199,8 @@
                   >
                     <span>
                       {{
-                        sample?.releasedStatuses?.length > 0
-                          ? sample?.releasedStatuses[
-                              sample?.releasedStatuses?.length - 1
-                            ]?.status
+                        sample?.integrationStatus
+                          ? "Already Sent to Pima COVID"
                           : "-"
                       }}
                     </span>
@@ -276,16 +264,32 @@
                 <td colspan="11">
                   <app-shared-sample-details
                     [sample]="sample"
+                    (visitDetails)="onGetVisitDetails($event)"
                   ></app-shared-sample-details>
                 </td>
                 <td>
-                  <div *ngIf="shouldConfirm">Please Confirm</div>
+                  <div class="alert alert-warning" role="alert">
+                    {{ message }}
+                  </div>
                   <div class="d-flex justify-content-center">
                     <button
                       mat-flat-button
-                      [disabled]="shouldConfirm"
+                      [disabled]="
+                        shouldConfirm ||
+                        !externalSystemPayload ||
+                        sample?.authorizationInfo?.length == 0 ||
+                        !sampleParams?.testResultsMapping ||
+                        sample?.integrationStatus
+                      "
                       color="primary"
-                      (click)="onSend($event, sample, shouldConfirm)"
+                      (click)="
+                        onSend(
+                          $event,
+                          sample,
+                          shouldConfirm,
+                          sampleParams?.testResultsMapping
+                        )
+                      "
                     >
                       Send
                     </button>
@@ -294,7 +298,14 @@
                       color="primary"
                       mat-flat-button
                       *ngIf="shouldConfirm"
-                      (click)="onSend($event, sample, shouldConfirm)"
+                      (click)="
+                        onSend(
+                          $event,
+                          sample,
+                          shouldConfirm,
+                          sampleParams?.testResultsMapping
+                        )
+                      "
                     >
                       Confirm
                     </button>
