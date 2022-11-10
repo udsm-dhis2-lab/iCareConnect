@@ -33,7 +33,7 @@
           <td>{{ drug.dateActivated | date: "short" }}</td>
           <td *ngIf="fromClinic">
             <button
-              (click)="stopDrugOrder($event, drug)"
+              (click)="stopDrugOrder($event, drug, drug.obs[params?.specificDrugConceptUuid]?.comment)"
               class="btn btn-text btn-outline-danger pb-2"
             >
               <mat-icon class="icon">not_interested</mat-icon> Stop
