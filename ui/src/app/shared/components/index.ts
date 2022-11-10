@@ -104,6 +104,11 @@ import { SharedVisitHistorySummaryComponent } from "./shared-visit-history-summa
 import { SharedSystemSettingsListComponent } from "./shared-system-settings-list/shared-system-settings-list.component";
 import { SharedUserProfileManagementComponent } from "./shared-user-profile-management/shared-user-profile-management.component";
 import { SharedManageUserComponent } from "./shared-manage-user/shared-manage-user.component";
+import { SharedDashboardContainerComponent } from "./shared-dashboard-container/shared-dashboard-container.component";
+import { SharedDashboardChartContainerComponent } from "./shared-dashboard-chart-container/shared-dashboard-chart-container.component";
+import { SharedDashboardChartItemComponent } from "./shared-dashboard-chart-item/shared-dashboard-chart-item.component";
+import { SharedDashboardSingleValueItemComponent } from "./shared-dashboard-single-value-item/shared-dashboard-single-value-item.component";
+import { SharedDashboardSingleValueContainerComponent } from "./shared-dashboard-single-value-container/shared-dashboard-single-value-container.component";
 
 export const components: any[] = [
   PatientAddressComponent,
@@ -213,11 +218,15 @@ export const components: any[] = [
   SharedSystemSettingsListComponent,
   SharedUserProfileManagementComponent,
   SharedManageUserComponent,
+  SharedDashboardContainerComponent,
+  SharedDashboardChartContainerComponent,
+  SharedDashboardChartItemComponent,
+  SharedDashboardSingleValueItemComponent,
+  SharedDashboardSingleValueContainerComponent,
 ];
 
 export const sharedEntryComponents: any[] = [
   PatientAddressComponent,
-
   LocationSelectModalComponent,
   CaptureFormDataModalComponent,
   AdmissionFormComponent,
