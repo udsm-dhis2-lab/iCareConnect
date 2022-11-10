@@ -1006,10 +1006,6 @@ export class SingleRegistrationComponent implements OnInit {
                                                     .subscribe(
                                                       (sampleLabel) => {
                                                         if (sampleLabel) {
-                                                          console.log(
-                                                            "sampleLabel",
-                                                            sampleLabel
-                                                          );
                                                           const sample = {
                                                             visit: {
                                                               uuid: visitResponse?.uuid,
@@ -1481,6 +1477,33 @@ export class SingleRegistrationComponent implements OnInit {
                                                                   //   "statuses",
                                                                   //   statuses
                                                                   // );
+
+                                                                  if (
+                                                                    this
+                                                                      .personDetailsData
+                                                                      ?.pimaCOVIDLinkDetails
+                                                                  ) {
+                                                                    statuses = [
+                                                                      ...statuses,
+                                                                      {
+                                                                        sample:
+                                                                          {
+                                                                            uuid: sampleResponse?.uuid,
+                                                                          },
+                                                                        user: {
+                                                                          uuid: localStorage.getItem(
+                                                                            "userUuid"
+                                                                          ),
+                                                                        },
+                                                                        category:
+                                                                          "INTEGRATION_PIMACOVID",
+                                                                        remarks:
+                                                                          "Sample registration from external systems",
+                                                                        status:
+                                                                          "INTEGRATION WITH PimaCOVID",
+                                                                      },
+                                                                    ];
+                                                                  }
 
                                                                   if (
                                                                     statuses?.length >
