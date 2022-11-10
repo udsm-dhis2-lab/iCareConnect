@@ -30,8 +30,7 @@ export class SamplesService {
           dates?.startDate +
           "&endDate=" +
           dates?.endDate +
-          (startIndex ? "&startIndex=" + startIndex : "&startIndex=0") +
-          (limit ? `&limit=${limit}` : "&limit=100")
+          "&paging=false"
       )
       .pipe(
         map((response: any) => {
