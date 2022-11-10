@@ -6,6 +6,8 @@ import { EncountersService } from "../../services/encounters.service";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { tap } from "rxjs/operators";
 import { Observable } from "rxjs";
+import { SharedConfirmationComponent } from "../shared-confirmation /shared-confirmation.component";
+import { MatDialog } from "@angular/material/dialog";
 
 @Component({
   selector: "app-current-prescriptions",
@@ -26,6 +28,7 @@ export class CurrentPrescriptionComponent implements OnInit {
   constructor(
     private systemSettingsService: SystemSettingsService, 
     private encounterService: EncountersService,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
@@ -89,16 +92,34 @@ export class CurrentPrescriptionComponent implements OnInit {
     );
   }
 
-  stopDrugOrder(e: Event, drugOrder: any) {
-    this.encounterService
-      .voidEncounter(drugOrder?.encounter)
-      .subscribe((response) => {
-        if (!response?.error) {
-          this.loadVisit.emit(this.visit);
-        }
-        if (response?.error) {
-          this.errors = [...this.errors, response?.error];
-        }
-      });
+  stopDrugOrder(e: Event, drugOrder: any, drugName: string) {
+    const confirmDialog = this.dialog.open(SharedConfirmationComponent, {
+      width: "25%",
+      data: {
+        modalTitle: `Stop Medicaton`,
+        modalMessage: `You are about to stop ${drugName} for this patient, Click confirm to finish!`,
+        showRemarksInput: false,
+      },
+      disableClose: false,
+      panelClass: "custom-dialog-container",
+    });
+
+    confirmDialog.afterClosed().subscribe((confirmationObject) => {
+      if (confirmationObject?.confirmed) {
+        this.encounterService
+          .voidEncounter({
+            ...drugOrder?.encounter,
+            voidReason: confirmationObject?.remarks || ""
+          })
+          .subscribe((response) => {
+            if (!response?.error) {
+              this.loadVisit.emit(this.visit);
+            }
+            if (response?.error) {
+              this.errors = [...this.errors, response?.error];
+            }
+          });
+      }
+    })
   }
 }
