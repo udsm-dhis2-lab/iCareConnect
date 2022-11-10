@@ -73,6 +73,8 @@ export class SampleAcceptanceComponent implements OnInit {
   showTabSampleTrackingForLis = false;
   saving: boolean = false;
   samplesToViewMoreDetails: any = {};
+  @Input() page: number;
+  @Input() pageCount: number;
   constructor(
     private store: Store<AppState>,
     private dialog: MatDialog,
@@ -186,9 +188,13 @@ export class SampleAcceptanceComponent implements OnInit {
             status: "ACCEPTANCE_REMARKS",
             category: "ACCEPTANCE_REMARKS",
           };
-          this.sampleService.saveSampleStatus(confirmationRemarks).subscribe((response) => {
-            console.log(response?.error ? "Error Occured" : `Success: ${response}`)
-          });
+          this.sampleService
+            .saveSampleStatus(confirmationRemarks)
+            .subscribe((response) => {
+              console.log(
+                response?.error ? "Error Occured" : `Success: ${response}`
+              );
+            });
         }
 
         this.savingMessage[sample?.id + "-accept"] = true;

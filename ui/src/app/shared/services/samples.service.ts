@@ -18,14 +18,20 @@ export class SamplesService {
     private opeMRSHttpClientService: OpenmrsHttpClientService
   ) {}
 
-  getLabSamplesByCollectionDates(dates): Observable<any> {
+  getLabSamplesByCollectionDates(
+    dates,
+    startIndex?: number,
+    limit?: number
+  ): Observable<any> {
     return this.httpClient
       .get(
         BASE_URL +
           "lab/samples?startDate=" +
           dates?.startDate +
           "&endDate=" +
-          dates?.endDate
+          dates?.endDate +
+          (startIndex ? "&startIndex=" + startIndex : "&startIndex=0") +
+          (limit ? `&limit=${limit}` : "&limit=100")
       )
       .pipe(
         map((response: any) => {
