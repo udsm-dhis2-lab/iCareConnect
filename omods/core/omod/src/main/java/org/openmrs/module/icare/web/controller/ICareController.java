@@ -504,6 +504,7 @@ public class ICareController {
 			String dobAttributeUid = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.attributes.dob");
 			String passportNumberAttributeUid = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.attributes.passportNumber");
 			String phoneNumberAttributeUid = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.attributes.phoneNumber");
+			String emailAttributeUid = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.attributes.email");
 
 //			Get results stage uid
 			String resultsStageId = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.programStages.resultsStage");
@@ -571,6 +572,9 @@ public class ICareController {
 							}
 							if (attribute.get("attribute").equals(phoneNumberAttributeUid)) {
 								clientFormattedData.put("phoneNumber",attribute.get("value"));
+							}
+							if (attribute.get("attribute").equals(emailAttributeUid)) {
+								clientFormattedData.put("email",attribute.get("value"));
 							}
 						}
 						clientFormattedData.put("attributes", currentTrackedEntityInstance.get("attributes"));
