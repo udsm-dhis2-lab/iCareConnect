@@ -112,7 +112,7 @@
                     *ngIf="orderCount == 0"
                     [attr.rowspan]="sample?.orders?.length"
                   >
-                    {{ count + 1 }}
+                    {{ count + 1 + (page - 1) * pageCount }}
                   </td>
                   <td
                     *ngIf="orderCount == 0"

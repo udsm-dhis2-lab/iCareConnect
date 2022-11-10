@@ -10,7 +10,7 @@
         <th>Radiology order</th>
         <th>Results</th>
         <th>Date & Time</th>
-        <th style="width: 60px"></th>
+        <th style="width: 160px"></th>
       </tr>
     </thead>
     <tbody>
@@ -49,8 +49,7 @@
             <a
               *ngIf="order?.value?.links?.uri.split('openmrs').length > 2"
               href="{{
-                  '/openmrs' +
-                  order?.value?.links?.uri.split('openmrs')[2]
+                '/openmrs' + order?.value?.links?.uri.split('openmrs')[2]
               }}"
             >
               Download Results
@@ -58,8 +57,7 @@
             <a
               *ngIf="order?.value?.links?.uri.split('openmrs').length == 2"
               href="{{
-                  '/openmrs' +
-                  order?.value?.links?.uri.split('openmrs')[1]
+                '/openmrs' + order?.value?.links?.uri.split('openmrs')[1]
               }}"
             >
               Download Results

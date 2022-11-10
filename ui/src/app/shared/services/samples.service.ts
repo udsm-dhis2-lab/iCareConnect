@@ -18,14 +18,19 @@ export class SamplesService {
     private opeMRSHttpClientService: OpenmrsHttpClientService
   ) {}
 
-  getLabSamplesByCollectionDates(dates): Observable<any> {
+  getLabSamplesByCollectionDates(
+    dates,
+    startIndex?: number,
+    limit?: number
+  ): Observable<any> {
     return this.httpClient
       .get(
         BASE_URL +
           "lab/samples?startDate=" +
           dates?.startDate +
           "&endDate=" +
-          dates?.endDate
+          dates?.endDate +
+          "&paging=false"
       )
       .pipe(
         map((response: any) => {
@@ -165,7 +170,6 @@ export class SamplesService {
 
   setSampleStatus(data): Observable<any> {
     if (data) {
-      console.log(data);
       return this.httpClient.post(BASE_URL + "lab/samplestatus", data).pipe(
         map((response) => response),
         catchError((error) => of(error))
