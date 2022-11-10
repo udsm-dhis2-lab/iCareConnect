@@ -238,38 +238,7 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 						discountInvoiceItem.setInvoice(invoiceItem.getInvoice());
 						discountInvoiceItems.add(discountInvoiceItem);
 					}
-					/*String itemUUID = invoiceItem.getItem().getUuid();
 
-					List<DiscountInvoiceItem> existingInvoiceDiscountItems = invoiceItem.getInvoice().getDiscountItems();
-					List<String> ExistingDiscountsitemUUIDs = new ArrayList<>();
-
-					for(DiscountInvoiceItem existingDiscountItem : existingInvoiceDiscountItems){
-
-						ExistingDiscountsitemUUIDs.add(existingDiscountItem.getItem().getUuid());
-					}
-
-					if(ExistingDiscountsitemUUIDs.contains(itemUUID)){
-
-
-
-
-					}else{
-
-						DiscountInvoiceItem discountInvoiceItem = new DiscountInvoiceItem();
-						discountInvoiceItem.setAmount(invoiceItem.getPrice() * invoiceItem.getQuantity());
-						discountInvoiceItem.setDiscount(discountInvoiceItems.get(0).getDiscount());
-						discountInvoiceItem.setItem(invoiceItem.getItem());
-						discountInvoiceItem.setInvoice(invoiceItem.getInvoice());
-						discountInvoiceItems.add(discountInvoiceItem);
-
-
-					}*/
-					
-					//If it exists update the discount item amount with the price times quantity
-					
-					//If it does not exist then create a discount invoice item and set the amount based on the price times the quantity
-					
-					//Save the discounts
 				}
 				
 			}
