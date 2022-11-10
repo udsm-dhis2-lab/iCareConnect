@@ -259,6 +259,7 @@
                         Reject
                       </button>
                       <button
+                        *ngIf="LISConfigurations?.isLIS"
                         mat-flat-button
                         color="primary"
                         (click)="onToggleViewSampleDetails($event, sample)"
