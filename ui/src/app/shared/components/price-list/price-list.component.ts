@@ -233,7 +233,24 @@ export class PriceListComponent implements OnInit, OnChanges {
     // this.store.dispatch(saveItemPrice({ itemPrice }));
     this.pricingService.saveItemPrice(itemPrice).subscribe((response) => {
       if (response && !response?.error) {
-        this.loadData();
+        // this.loadData();
+        if (
+          (this.itemSearchTerm && this.itemSearchTerm.length >= 3) ||
+          this.itemSearchTerm === ""
+        ) {
+          this.store.dispatch(clearPricingItems());
+          this.store.dispatch(
+            loadPricingItems({
+              filterInfo: {
+                limit: 25,
+                startIndex: this.currentPage,
+                searchTerm:
+                  this.itemSearchTerm !== "" ? this.itemSearchTerm : null,
+                conceptSet: this.currentDepartmentId,
+              },
+            })
+          );
+        }
       }
     });
   }
