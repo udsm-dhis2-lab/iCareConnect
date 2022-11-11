@@ -137,4 +137,7 @@ public interface ICareService extends OpenmrsService {
 	        URISyntaxException;
 	
 	String savePimaCovidLabResult(Map<String, Object> labResult) throws IOException, URISyntaxException;
+	
+	String verifyExternalSystemCredentials(String username, String password, String systemKey) throws IOException,
+	        URISyntaxException;
 }

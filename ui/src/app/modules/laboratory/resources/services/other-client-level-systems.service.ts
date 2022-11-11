@@ -43,4 +43,15 @@ export class OtherClientLevelSystemsService {
         catchError((error) => of(error))
       );
   }
+
+  verifyCredentials(data: any): Observable<any> {
+    return this.httpClientService
+      .get(
+        `icare/externalsystems/verifycredentials?username=${data?.username}&password=${data?.password}&systemKey=${data?.systemKey}`
+      )
+      .pipe(
+        map((response) => response),
+        catchError((error) => of(error))
+      );
+  }
 }

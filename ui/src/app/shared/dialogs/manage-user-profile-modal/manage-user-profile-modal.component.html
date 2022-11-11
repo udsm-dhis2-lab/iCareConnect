@@ -23,15 +23,27 @@
         (isFormValid)="onGetFormValid($event)"
       ></app-shared-user-profile-management>
     </div>
+    <div *ngIf="errors && errors?.length > 0">
+      <app-shared-error [errors]="errors"></app-shared-error>
+    </div>
     <div class="alert alert-success" role="alert" *ngIf="updated">
       Successfully Updated
     </div>
     <div class="d-flex justify-content-end mt-2">
-      <button mat-flat-button (click)="onClose($event)">Cancel</button>
+      <button mat-stroked-button (click)="onClose($event)">Cancel</button>
+      <button
+        mat-stroked-button
+        color="primary"
+        [disabled]="!params?.currentUser || !isFormValid || verified"
+        (click)="onVerifyCredentials($event)"
+        class="ml-2"
+      >
+        Verify
+      </button>
       <button
         class="ml-2"
         mat-flat-button
-        [disabled]="!params?.currentUser || !isFormValid"
+        [disabled]="!params?.currentUser || !isFormValid || !verified"
         color="primary"
         (click)="onSave($event, params?.currentUser)"
       >
