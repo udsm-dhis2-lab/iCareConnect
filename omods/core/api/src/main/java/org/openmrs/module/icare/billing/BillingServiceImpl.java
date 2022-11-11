@@ -238,7 +238,7 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 						discountInvoiceItem.setInvoice(invoiceItem.getInvoice());
 						discountInvoiceItems.add(discountInvoiceItem);
 					}
-
+					
 				}
 				
 			}

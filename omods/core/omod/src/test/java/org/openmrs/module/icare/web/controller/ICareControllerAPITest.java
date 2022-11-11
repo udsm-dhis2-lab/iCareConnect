@@ -686,4 +686,17 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		String data = handle.getContentAsString();
 		System.out.println(data);
 	}
+	
+	@Test
+	public void testExternalSystemsAuthenticationVerification() throws Exception {
+		AdministrationService administrationService = Context.getService(AdministrationService.class);
+		String systemKey = "pimaCovid";
+		administrationService.setGlobalProperty("iCare.externalSystems.integrated." + systemKey + ".baseUrl",
+		    "https://covid19-dev.moh.go.tz");
+		MockHttpServletRequest newGetRequest = newGetRequest("icare/externalsystems/verifycredentials", new Parameter(
+		        "username", "lisintegration"), new Parameter("password", "Dhis@2022"), new Parameter("systemKey", systemKey));
+		MockHttpServletResponse handle = handle(newGetRequest);
+		String userDetails = handle.getContentAsString();
+		System.out.println(userDetails);
+	}
 }

@@ -1,7 +1,7 @@
 import { Component, OnInit } from "@angular/core";
 import { Router } from "@angular/router";
 import { select, Store } from "@ngrx/store";
-import { Observable, of } from "rxjs";
+import { Observable, of, zip } from "rxjs";
 import { Location } from "src/app/core/models";
 import {
   addLoadedUserDetails,
@@ -188,8 +188,25 @@ export class MenuComponent implements OnInit {
   }
 
   onUpdateProfile(): void {
-    this.dialog.open(ManageUserProfileModalComponent, {
-      width: "40%",
+    // TODO: Add support to capture multiple systems credentials ("pimaCovid" can be used as system reference key to support that)
+    const requests = [
+      this.systemSettingsService.getSystemSettingsByKey(
+        `iCare.externalSystems.integrated.pimaCovid.usernamePropertyKey`
+      ),
+      this.systemSettingsService.getSystemSettingsByKey(
+        `iCare.externalSystems.integrated.pimaCovid.passwordPropertyKey`
+      ),
+    ];
+    zip(...requests.map((request) => request)).subscribe((responses) => {
+      if (responses[0] && responses[1]) {
+        this.dialog.open(ManageUserProfileModalComponent, {
+          width: "40%",
+          data: {
+            usernamePropertyKey: responses[0],
+            passwordPropertyKey: responses[1],
+          },
+        });
+      }
     });
   }
 }

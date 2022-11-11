@@ -628,4 +628,23 @@ public class ICareController {
 		}
 		return response;
 	}
+	
+	@RequestMapping(value = "externalsystems/verifycredentials", method = RequestMethod.GET)
+	@ResponseBody
+	public String verifyExternalSystemCredentials(@RequestParam(value = "username", required = true) String username,
+	        @RequestParam(value = "password", required = true) String password,
+	        @RequestParam(value = "systemKey", required = true) String systemKey) throws ParseException {
+		
+		String verificationInfo = new String();
+		try {
+			verificationInfo = iCareService.verifyExternalSystemCredentials(username, password, systemKey);
+		}
+		catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+		catch (URISyntaxException e) {
+			throw new RuntimeException(e);
+		}
+		return verificationInfo;
+	}
 }
