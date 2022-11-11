@@ -90,7 +90,7 @@
                   padding: 10px 4px;
                 "
               >
-                {{ samplesGroupedByDepartment?.departmentName }} Report
+                {{ samplesGroupedByDepartment?.departmentName }} {{ authorized ? "Report" : "Provisional Report" }}
               </div>
               <div>
                 <!-- {{ samplesGroupedByDepartment["samples"][0]?.orders[0] | json }} -->
@@ -193,7 +193,7 @@
                           ? (samplesGroupedByDepartment?.samples[0]?.created
                             | date: "medium")
                           : (samplesGroupedByDepartment?.samples[0]
-                              ?.collectedOnStatus | date: "medium")
+                              ?.collectedOnStatus?.remarks | date: "medium")
                       }}
                     </td>
                   </tr>
