@@ -551,7 +551,7 @@ export class SampleAcceptanceComponent implements OnInit {
     });
   }
 
-  onResultsToPrint(e, patientDetailsAndSamples, providerDetails) {
+  onResultsToPrint(e, patientDetailsAndSamples, providerDetails, authorized) {
     e.stopPropagation();
     this.dialog.open(PrintResultsModalComponent, {
       data: {
@@ -559,6 +559,7 @@ export class SampleAcceptanceComponent implements OnInit {
         labConfigs: this.labConfigs,
         LISConfigurations: this.LISConfigurations,
         user: providerDetails,
+        authorized: authorized
       },
       width: "60%",
       disableClose: false,

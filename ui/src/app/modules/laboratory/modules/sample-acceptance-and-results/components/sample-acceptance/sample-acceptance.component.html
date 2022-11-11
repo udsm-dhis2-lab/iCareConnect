@@ -2172,10 +2172,10 @@
                           onResultsToPrint(
                             $event,
                             patient,
-                            sampleParams?.providerDetails
+                            sampleParams?.providerDetails,
+                            sample?.authorizationInfo?.length > 0
                           )
                         "
-                        [disabled]="sample?.authorizationInfo?.length == 0"
                       >
                         Print results
                       </button>
