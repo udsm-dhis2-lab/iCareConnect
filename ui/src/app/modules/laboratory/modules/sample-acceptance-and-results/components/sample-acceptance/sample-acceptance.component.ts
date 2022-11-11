@@ -112,7 +112,7 @@ export class SampleAcceptanceComponent implements OnInit {
     });
 
     this.worklist$ = this.store.select(getWorkList, {
-      userUuid: this.userUuid,
+      undefined, // userUuid: this.userUuid ,
       department: "",
       searchingText: this.searchingText,
     });
