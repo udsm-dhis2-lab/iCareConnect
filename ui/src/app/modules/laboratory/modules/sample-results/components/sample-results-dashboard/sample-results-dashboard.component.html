@@ -268,7 +268,7 @@
                   ></app-shared-sample-details>
                 </td>
                 <td>
-                  <div class="alert alert-warning" role="alert">
+                  <div *ngIf="message" class="alert alert-warning" role="alert">
                     {{ message }}
                   </div>
                   <div class="d-flex justify-content-center">
