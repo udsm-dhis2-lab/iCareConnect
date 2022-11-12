@@ -68,6 +68,8 @@ export class FieldComponent {
         this.field?.filteringItems,
         this.field
       );
+    } else if (this.field?.options?.length > 0) {
+      this.members$ = of(this.field?.options);
     }
     this.fieldUpdate.emit(this.form);
   }
@@ -144,7 +146,7 @@ export class FieldComponent {
   }
 
   searchItem(event: any, field?: any): void {
-    event.stopPropagation();
+    // event.stopPropagation();
     const searchingText = event.target.value;
     const parameters = {
       q: searchingText,
@@ -170,13 +172,26 @@ export class FieldComponent {
     );
   }
 
+  searchItemFromOptions(event, field): void {
+    const searchingText = event.target.value;
+    this.members$ = of(
+      field?.options?.filter(
+        (option) =>
+          option?.label?.toLowerCase()?.indexOf(searchingText?.toLowerCase()) >
+          -1
+      ) || []
+    );
+  }
+
   getSelectedItemFromOption(event: Event, item, field): void {
     event.stopPropagation();
     const value = item?.isDrug
       ? item?.formattedKey
       : item?.uuid
       ? item?.uuid
-      : item?.id;
+      : item?.id
+      ? item?.id
+      : item?.value;
     let objectToUpdate = {};
     objectToUpdate[field?.key] =
       field?.searchControlType === "drugStock"
@@ -185,6 +200,7 @@ export class FieldComponent {
           field?.searchControlType !== "residenceLocation"
         ? value
         : item;
+    console.log("objectToUpdate", objectToUpdate);
     this.form.patchValue(objectToUpdate);
     this.fieldUpdate.emit(this.form);
   }
