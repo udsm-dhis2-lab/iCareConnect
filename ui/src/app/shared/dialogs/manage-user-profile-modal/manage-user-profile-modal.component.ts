@@ -79,6 +79,7 @@ export class ManageUserProfileModalComponent implements OnInit {
 
   onVerifyCredentials(event: Event): void {
     event.stopPropagation();
+    this.errors = [];
     this.externalSystemsService
       .verifyCredentials({
         username: this.username,
@@ -89,7 +90,7 @@ export class ManageUserProfileModalComponent implements OnInit {
         if (response && !response?.error) {
           this.verified = true;
         } else {
-          this.errors = [...response?.errors, response?.error];
+          this.errors = [...this.errors, response?.error];
         }
       });
   }

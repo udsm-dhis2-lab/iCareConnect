@@ -82,27 +82,14 @@
                       selectedForm?.uuid === form?.uuid) ||
                     (!selectedForm &&
                       !showRoundDetails &&
+                      dashboardParams?.forms[0] &&
                       dashboardParams?.forms[0]?.uuid === form?.uuid)
                 }"
                 mat-stroked-button
-                [matMenuTriggerFor]="form?.name"
                 (click)="getSelectedForm($event, form)"
               >
                 {{ form?.name }}
               </button>
-              <!-- <a
-                *ngFor="let form of dashboardParams?.forms"
-                class="mr-2 form-listing"
-                [ngClass]="{
-                  'selected-form':
-                    (selectedForm && selectedForm?.uuid === form?.uuid) ||
-                    (!selectedForm &&
-                      dashboardParams?.forms[0]?.uuid === form?.uuid)
-                }"
-                (click)="getSelectedForm($event, form)"
-              >
-                {{ form?.name }}
-              </a> -->
               <button mat-button (click)="onToggleVisibityIcons($event)">
                 <mat-icon *ngIf="showRoundDetails">visibility_off</mat-icon>
                 <mat-icon *ngIf="!showRoundDetails">visibility</mat-icon>
@@ -111,7 +98,6 @@
             </ng-container>
           </div>
 
-          <!-- <h2 class="text-left ml-2">Patient Dashboard</h2> -->
           <div class="w-50 d-flex justify-content-end">
             <div class="mr-2">
               <app-shared-bmi></app-shared-bmi>
@@ -154,7 +140,6 @@
               class="text-danger mr-2"
               *ngIf="activeVisit?.waitingToBeAdmitted"
             >
-              <!-- Waiting to be given a bed -->
               <img
                 matTooltip="Patient is waiting to be given a bed"
                 height="40"
@@ -368,7 +353,6 @@
             </span>
           </div>
         </div>
-        <!-- Patient clinic content -->
         <div
           *ngIf="
             !dashboardParams?.startingConsultation &&
@@ -401,15 +385,6 @@
                           [location]="dashboardParams?.currentLocation"
                           [activeVisit]="activeVisit"
                         ></app-shared-visit-history-summary>
-                        <!-- <app-shared-ipd-round-container
-                          *ngIf="showRoundDetails"
-                          [location]="dashboardParams?.currentLocation"
-                          [activeVisit]="activeVisit"
-                          [conceptUuid]="IPDRoundConceptUuid"
-                          [observations]="
-                            dashboardParams?.observationsGroupedByConcept
-                          "
-                        ></app-shared-ipd-round-container> -->
                       </div>
                     </div>
                   </div>
@@ -441,8 +416,6 @@
                     "
                   >
                   </app-clinical-notes>
-
-                  <!-- For IPD -->
                   <app-patient-observations-chart
                     *ngIf="
                       isInpatient &&
@@ -705,7 +678,48 @@
               </div>
             </div>
           </div>
-          <!-- <mat-tab label="Trends">
+          <div
+            *ngIf="
+              (!activeVisit?.isEnsured &&
+                !dashboardParams?.loadingVisit &&
+                activeVisit &&
+                dashboardParams?.startingConsultation) ||
+              (!activeVisit?.isEmergency &&
+                dashboardParams?.hasPatientHavePendingPaymentForTheCurrentVisitType)
+            "
+            class="alert alert-danger p-3 ml-2 mr-2"
+            role="alert"
+          >
+            Consultation Fee not paid
+          </div>
+        </div>
+        <div
+          class="alert alert-danger mt-4 ml-2 mr-2"
+          *ngIf="
+            !activeVisit?.isEmergency &&
+            dashboardParams?.hasPatientHavePendingPaymentForTheCurrentVisitType
+          "
+          role="alert"
+        >
+          Not paid for Consultation Service
+        </div>
+      </div>
+    </div>
+  </div>
+  <mat-progress-bar
+    *ngIf="
+      dashboardParams?.loadingPaymentStatus ||
+      !dashboardParams?.encounterTypes ||
+      dashboardParams?.billLoadingState ||
+      !dashboardParams?.currentPatient ||
+      dashboardParams?.loadingForms
+    "
+    mode="indeterminate"
+  >
+  </mat-progress-bar>
+</div>
+
+<!-- <mat-tab label="Trends">
             <div class="p-3">
               <div class="row">
                 <div class="col-lg-4 col-md-4 col-sm-12 col-sx-12 mb-3">
@@ -781,53 +795,4 @@
               </div>
             </div>
           </mat-tab> -->
-          <!-- </mat-tab-group> -->
-          <div
-            *ngIf="
-              (!activeVisit?.isEnsured &&
-                !dashboardParams?.loadingVisit &&
-                activeVisit &&
-                dashboardParams?.startingConsultation) ||
-              (!activeVisit?.isEmergency &&
-                dashboardParams?.hasPatientHavePendingPaymentForTheCurrentVisitType)
-            "
-            class="alert alert-danger p-3 ml-2 mr-2"
-            role="alert"
-          >
-            Consultation Fee not paid
-          </div>
-          <!-- end of Patient clinic content -->
-        </div>
-        <div
-          class="alert alert-danger mt-4 ml-2 mr-2"
-          *ngIf="
-            !activeVisit?.isEmergency &&
-            dashboardParams?.hasPatientHavePendingPaymentForTheCurrentVisitType
-          "
-          role="alert"
-        >
-          Not paid for Consultation Service
-        </div>
-
-        <!-- <div
-          class="alert alert-warning mt-4 ml-2 mr-2"
-          *ngIf="activeVisit?.waitingToBeAdmitted"
-          role="alert"
-        >
-          Assign bed to this patient to continue
-        </div> -->
-      </div>
-    </div>
-  </div>
-  <mat-progress-bar
-    *ngIf="
-      dashboardParams?.loadingPaymentStatus ||
-      !dashboardParams?.encounterTypes ||
-      dashboardParams?.billLoadingState ||
-      !dashboardParams?.currentPatient ||
-      dashboardParams?.loadingForms
-    "
-    mode="indeterminate"
-  >
-  </mat-progress-bar>
-</div>
+<!-- </mat-tab-group> -->

@@ -134,26 +134,6 @@ export class DrugOrderComponent implements OnInit, AfterViewInit {
     this.dispensingLocations$ = this.store.select(getLocationsByTagName, {
       tagName: "Dispensing Unit",
     });
-    // zip(
-    //   this.drugOrderService.getDrugOrderMetadata(
-    //     this.drugOrder,
-    //     this.locations,
-    //     this.fromDispensing
-    //   ),
-    //   this.store.pipe(select(getProviderDetails)).pipe(take(1))
-    // ).subscribe(
-    //   (res) => {
-    //     console.log('res', res);
-    //     this.loadingMetadata = false;
-    //     this.drugOrderMetadata = res[0];
-    //     this.drugFormField = this.drugOrderMetadata.drugFormField;
-    //     this.provider = res[1];
-    //   },
-    //   (error) => {
-    //     this.loadingMetadata = false;
-    //     this.loadingMetadataError = error;
-    //   }
-    // );
   }
 
   ngAfterViewInit(): void {}
