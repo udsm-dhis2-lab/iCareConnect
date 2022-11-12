@@ -84,7 +84,7 @@
     />
     <span
       style="position: relative; float: right; margin-top: -30px"
-      *ngIf="!field?.multiple"
+      *ngIf="field?.options?.length > 0"
     >
       <mat-icon>arrow_drop_down</mat-icon>
     </span>

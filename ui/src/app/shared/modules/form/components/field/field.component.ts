@@ -200,7 +200,6 @@ export class FieldComponent {
           field?.searchControlType !== "residenceLocation"
         ? value
         : item;
-    console.log("objectToUpdate", objectToUpdate);
     this.form.patchValue(objectToUpdate);
     this.fieldUpdate.emit(this.form);
   }
