@@ -76,6 +76,7 @@
       placeholder="Search {{ field?.label }}"
       aria-label="{{ field?.label }}"
       [required]="field?.required"
+      [formControlName]="field?.key"
       matInput
       [value]="field?.value"
       autocomplete="off"
@@ -88,7 +89,10 @@
     >
       <mat-icon>arrow_drop_down</mat-icon>
     </span>
-    <mat-autocomplete #auto="matAutocomplete">
+    <mat-autocomplete
+      #auto="matAutocomplete"
+      [displayWith]="displayLabelFunc.bind(this)"
+    >
       <ng-container *ngFor="let option of members$ | async">
         <mat-option
           [disabled]="option?.disabled"
@@ -118,9 +122,6 @@
       [required]="field?.required"
       (selectionChange)="onFieldUpdate()"
     >
-      <mat-option [disabled]="true">
-        <input class="w-100" type="text" />
-      </mat-option>
       <mat-option
         *ngFor="let option of field?.options"
         [disabled]="option?.disabled"
