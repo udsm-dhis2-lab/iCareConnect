@@ -29,7 +29,7 @@ export class SharedUserProfileManagementComponent implements OnInit {
         id: "password",
         key: "password",
         label: "Password",
-        type: "pasword",
+        type: "password",
         value: this.currentUser?.userProperties?.pimaCOVIDPassword,
         required: true,
       }),

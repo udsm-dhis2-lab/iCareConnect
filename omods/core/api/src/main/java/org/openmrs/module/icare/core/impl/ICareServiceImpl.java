@@ -528,12 +528,17 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	public String getClientsFromExternalSystems(String identifier, String identifierReference, String basicAuthKey)
 	        throws IOException, URISyntaxException {
 		AdministrationService administrationService = Context.getService(AdministrationService.class);
-		
-		String baseUrl = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.baseUrl");
-		String username = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.username");
-		String password = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.password");
-		String ou = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.referenceOuUid");
-		String program = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.programUid");
+		String systemKey = "pimaCovid";
+		String baseUrl = administrationService.getGlobalProperty("iCare.externalSystems.integrated." + systemKey
+		        + ".baseUrl");
+		String username = administrationService.getGlobalProperty("iCare.externalSystems.integrated." + systemKey
+		        + ".username");
+		String password = administrationService.getGlobalProperty("iCare.externalSystems.integrated." + systemKey
+		        + ".password");
+		String ou = administrationService.getGlobalProperty("iCare.externalSystems.integrated." + systemKey
+		        + ".referenceOuUid");
+		String program = administrationService.getGlobalProperty("iCare.externalSystems.integrated." + systemKey
+		        + ".programUid");
 		//		TODO: Find a way to softcode the API References
 		URL url;
 		if (baseUrl == null || baseUrl.trim().equals("")) {
@@ -549,9 +554,6 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		
 		String userCredentials = username.concat(":").concat(password);
 		String basicAuth = "Basic " + new String(Base64.getEncoder().encode(userCredentials.getBytes()));
-		//		String basicAuth = "Basic " + basicAuthKey;
-		//		System.out.println(basicAuth);
-		con.setRequestProperty("Authorization", basicAuth);
 		
 		con.setRequestMethod("GET");
 		con.setRequestProperty("Content-Type", "application/json; utf-8");
@@ -639,11 +641,16 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		String baseUrl = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.baseUrl");
 		String username = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.username");
 		String password = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.password");
+		String usernamePropertyKey = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.usernamePropertyKey");
+		String passwordPropertyKey = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.passwordPropertyKey");
 		URL url;
 		if (baseUrl == null || baseUrl.trim().equals("")) {
 			throw new VerificationException("Destination server address url is not set. Please set " + baseUrl + ".");
 		}
 		//		this.getCreator().getUserProperties().get("")
+		String usernameProperty = Context.getAuthenticatedUser().getUserProperties().get(usernamePropertyKey);
+		String passwordPropertyEncrypted = Context.getAuthenticatedUser().getUserProperties().get(passwordPropertyKey);
+
 		String path = "/api/events.json?";
 		url = new URL(baseUrl.concat(path));
 		System.out.println(results);
@@ -682,5 +689,51 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		}
 		reader.close();
 		return responseContent.toString();
+	}
+	
+	public String verifyExternalSystemCredentials(String username, String password, String systemKey) throws IOException {
+		AdministrationService administrationService = Context.getService(AdministrationService.class);
+		
+		String baseUrl = administrationService.getGlobalProperty("iCare.externalSystems.integrated." + systemKey
+		        + ".baseUrl");
+		URL url;
+		if (baseUrl == null || baseUrl.trim().equals("")) {
+			throw new VerificationException("Destination server address url is not set. Please set base url for system"
+			        + systemKey + ".");
+		}
+		
+		// TODO: Consider to change this to /api/me.json?fields=name
+		String path = "/api/organisationUnits.json?";
+		url = new URL(baseUrl.concat(path));
+		
+		HttpURLConnection con = (HttpURLConnection) url.openConnection();
+		
+		String userCredentials = username.concat(":").concat(password);
+		String basicAuth = "Basic " + new String(Base64.getEncoder().encode(userCredentials.getBytes()));
+		
+		con.setRequestMethod("GET");
+		con.setRequestProperty("Content-Type", "application/json; utf-8");
+		con.setRequestProperty("Accept", "application/json");
+		con.setRequestProperty("Authorization", basicAuth);
+		try {
+			BufferedReader bufferIn = new BufferedReader(new InputStreamReader(con.getInputStream()));
+			String inputLine;
+			StringBuffer content = new StringBuffer();
+			while ((inputLine = bufferIn.readLine()) != null) {
+				content.append(inputLine);
+			}
+			bufferIn.close();
+			return String.valueOf(content);
+		}
+		catch (Exception e) {
+			BufferedReader in = new BufferedReader(new InputStreamReader(con.getErrorStream()));
+			String inputLine;
+			StringBuffer content = new StringBuffer();
+			while ((inputLine = in.readLine()) != null) {
+				content.append(inputLine);
+			}
+			in.close();
+			return String.valueOf(content);
+		}
 	}
 }
