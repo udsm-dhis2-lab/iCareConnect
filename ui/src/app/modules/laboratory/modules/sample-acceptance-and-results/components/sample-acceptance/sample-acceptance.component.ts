@@ -110,9 +110,9 @@ export class SampleAcceptanceComponent implements OnInit {
       department: "",
       searchingText: this.searchingText,
     });
-
+    
     this.worklist$ = this.store.select(getWorkList, {
-      userUuid: this.userUuid,
+      userUuid : this.LISConfigurations?.isLis ? undefined : this.userUuid,
       department: "",
       searchingText: this.searchingText,
     });
@@ -551,7 +551,7 @@ export class SampleAcceptanceComponent implements OnInit {
     });
   }
 
-  onResultsToPrint(e, patientDetailsAndSamples, providerDetails) {
+  onResultsToPrint(e, patientDetailsAndSamples, providerDetails, authorized) {
     e.stopPropagation();
     this.dialog.open(PrintResultsModalComponent, {
       data: {
@@ -559,6 +559,7 @@ export class SampleAcceptanceComponent implements OnInit {
         labConfigs: this.labConfigs,
         LISConfigurations: this.LISConfigurations,
         user: providerDetails,
+        authorized: authorized
       },
       width: "60%",
       disableClose: false,
