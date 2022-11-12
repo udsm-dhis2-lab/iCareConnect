@@ -17,8 +17,8 @@ export class UnitFieldComponent implements OnInit {
 
   constructor() {}
 
-  ngOnInit(): void{
-    if(this.dosingUnits) {
+  ngOnInit(): void {
+    if (this.dosingUnits) {
       this.unitField = new Dropdown({
         id: "dosingUnit",
         key: "dosingUnit",
@@ -35,7 +35,7 @@ export class UnitFieldComponent implements OnInit {
       });
     }
 
-    if(this.dosingFrequencies) {
+    if (this.dosingFrequencies) {
       this.unitField = new Dropdown({
         id: "frequency",
         key: "frequency",
@@ -52,7 +52,7 @@ export class UnitFieldComponent implements OnInit {
       });
     }
 
-    if(this.durationUnits) {
+    if (this.durationUnits) {
       this.unitField = new Dropdown({
         id: "durationUnit",
         key: "durationUnit",
@@ -69,7 +69,7 @@ export class UnitFieldComponent implements OnInit {
       });
     }
 
-    if(this.drugRoutes) {
+    if (this.drugRoutes) {
       this.unitField = new Dropdown({
         id: "route",
         key: "route",
