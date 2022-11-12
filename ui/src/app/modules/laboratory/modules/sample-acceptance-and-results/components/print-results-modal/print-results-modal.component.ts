@@ -32,6 +32,7 @@ export class PrintResultsModalComponent implements OnInit {
   providerDetails$: Observable<any>;
   visit$: Observable<any>;
   referringDoctorAttributes$: any;
+  authorized: any;
   constructor(
     private patientService: PatientService,
     private visitService: VisitsService,
@@ -52,6 +53,7 @@ export class PrintResultsModalComponent implements OnInit {
           this.errorLoadingPhone = false;
           this.loadingPatientPhone = false;
           this.phoneNumber = response;
+          this.authorized = data.authorized;
         },
         (error) => {
           this.errorLoadingPhone = true;
@@ -82,7 +84,7 @@ export class PrintResultsModalComponent implements OnInit {
     this.referringDoctorAttributes$ =
       this.systemSettingsService.getSystemSettingsMatchingAKey(
         "lis.attributes.referringDoctor"
-      )
+      );
     this.visit$ = this.visitService
       .getVisitDetailsByVisitUuid(
         this.patientDetailsAndSamples?.departments[0]?.samples[0]?.visit?.uuid,

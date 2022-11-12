@@ -154,7 +154,7 @@
                     {{ order?.order?.concept?.display.replace("TO:", "") }}
                   </td>
                   <!-- <td></td> -->
-                  <td>
+                  <td>WorkList
                     {{
                       !LISConfigurations?.isLIS
                         ? order?.order?.orderer?.name
@@ -259,6 +259,7 @@
                         Reject
                       </button>
                       <button
+                        *ngIf="LISConfigurations?.isLIS"
                         mat-flat-button
                         color="primary"
                         (click)="onToggleViewSampleDetails($event, sample)"
@@ -1287,10 +1288,36 @@
                         : "Routine"
                     }}
                   </td>
-                  <td
+                  
+                <td
                     *ngIf="orderCount == 0"
                     [attr.rowspan]="sample?.orders?.length"
                   >
+                    <button
+                      mat-flat-button
+                      color="primary"
+                      (click)="onToggleViewSampleDetails($event, sample)"
+                    >
+                      <mat-icon *ngIf="!samplesToViewMoreDetails[sample?.id]"
+                        >expand_more</mat-icon
+                      >
+                      <mat-icon *ngIf="samplesToViewMoreDetails[sample?.id]"
+                        >expand_less</mat-icon
+                      >
+                      {{
+                        !samplesToViewMoreDetails[sample?.id] ? "View" : "Hide"
+                      }}
+                      Details
+                    </button>
+                  </td>
+                </tr>
+                <tr *ngIf="samplesToViewMoreDetails[sample?.id]">
+                  <td colspan="10">
+                    <app-shared-sample-details
+                      [sample]="sample"
+                    ></app-shared-sample-details>
+                  </td>
+                  <td>
                     <button
                       class="colored-button"
                       mat-button
@@ -2145,7 +2172,8 @@
                           onResultsToPrint(
                             $event,
                             patient,
-                            sampleParams?.providerDetails
+                            sampleParams?.providerDetails,
+                            sample?.authorizationInfo?.length > 0
                           )
                         "
                       >
