@@ -602,7 +602,7 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		//assertThat("Should return a visit", visitDetails.size() == 1);
 		
 		assertThat("Has 8 patient", summaryMap.get("allPatients").equals(8));
-		assertThat("Has 8 activeVisits", summaryMap.get("activeVisits").equals(8));
+		assertThat("Has 8 activeVisits", summaryMap.get("activeVisits").equals(9));
 		assertThat("Has 1 location", ((List) summaryMap.get("locations")).size() == 1);
 		
 	}
