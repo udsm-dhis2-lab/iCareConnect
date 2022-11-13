@@ -69,7 +69,51 @@
     <!-- end of textbox -->
 
     <!-- dropdown -->
-    <mat-select
+
+    <input
+      type="text"
+      *ngSwitchCase="'dropdown'"
+      placeholder="Search {{ field?.label }}"
+      aria-label="{{ field?.label }}"
+      [required]="field?.required"
+      [formControlName]="field?.key"
+      matInput
+      [value]="field?.value"
+      autocomplete="off"
+      (keyup)="searchItemFromOptions($event, field)"
+      [matAutocomplete]="auto"
+    />
+    <span
+      style="position: relative; float: right; margin-top: -30px"
+      *ngIf="field?.options?.length > 0"
+    >
+      <mat-icon>arrow_drop_down</mat-icon>
+    </span>
+    <mat-autocomplete
+      #auto="matAutocomplete"
+      [displayWith]="displayLabelFunc.bind(this)"
+    >
+      <ng-container *ngFor="let option of members$ | async">
+        <mat-option
+          [disabled]="option?.disabled"
+          (click)="getSelectedItemFromOption($event, option, field)"
+          [value]="option?.label"
+        >
+          <span
+            [ngClass]="{
+              'disabled-form-selection-option': option?.disabled
+            }"
+          >
+            {{ option?.label }}
+          </span>
+          <span *ngIf="option?.disabled" class="ml-2">
+            ({{ option?.message }})
+          </span>
+        </mat-option>
+      </ng-container>
+    </mat-autocomplete>
+
+    <!-- <mat-select
       [id]="field?.key"
       *ngSwitchCase="'dropdown'"
       [placeholder]="field?.placeholder"
@@ -92,7 +136,7 @@
           >({{ option?.message }})</span
         >
       </mat-option>
-    </mat-select>
+    </mat-select> -->
     <!-- end of dropdown -->
     <!-- TODO: Remove hardcoded ID -->
     <!-- text area field -->
@@ -160,7 +204,6 @@
       <mat-icon>arrow_drop_down</mat-icon>
     </span>
     <mat-autocomplete #auto="matAutocomplete">
-      <!-- <mat-option aria-disabled="true" value=""> --Search-- </mat-option> -->
       <ng-container *ngFor="let option of members$ | async">
         <mat-option
           [ngClass]="{
@@ -172,20 +215,6 @@
           (click)="getSelectedItemFromOption($event, option, field)"
           [value]="option?.display ? option?.display : option?.name"
         >
-          <!-- <span
-            class="badge badge-success"
-            [ngClass]="{
-              'badge-success': getStockStatus(option),
-              'badge-danger': !getStockStatus(option),
-              'stock-out-item': option?.isStockOut
-            }"
-            *ngIf="
-              field?.otherType === 'Drug' &&
-              !(option?.display === 'Search' || option?.name === 'Search')
-            "
-          >
-            {{ getStockStatus(option) ? "In-stock" : "Out-stock" }}
-          </span> -->
           <span
             [ngClass]="{
               'disabled-form-selection-option': option?.disabled
