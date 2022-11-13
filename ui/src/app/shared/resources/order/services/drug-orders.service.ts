@@ -437,6 +437,11 @@ export class DrugOrdersService {
               ]?.value?.uuid,
         });
 
+        const freq =
+          doctorPrescriptionDetails?.obs[
+            metadataConfigs?.generalPrescriptionFrequencyConcept
+          ]?.value?.uuid;
+
         const drugOrderFrequencyField = new Dropdown({
           id: "frequency",
           options: (metadata.drugOrderFrequencies || []).map(
@@ -453,9 +458,7 @@ export class DrugOrdersService {
           key: "frequency",
           value: drugOrder?.frequency
             ? drugOrder?.frequency
-            : doctorPrescriptionDetails?.obs[
-                metadataConfigs?.generalPrescriptionFrequencyConcept
-              ]?.value?.uuid,
+            : freq?.split("AAAA")[0] + "OFAAAAAAAAAAAAAAA",
         });
 
         const drugRoutesField = new Dropdown({

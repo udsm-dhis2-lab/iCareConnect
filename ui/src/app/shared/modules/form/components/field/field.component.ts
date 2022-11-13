@@ -211,8 +211,8 @@ export class FieldComponent {
 
   displayLabelFunc(value?: any): string {
     return value
-      ? this.field?.options?.find((option) =>
-          option?.key === value?.key ? value?.key : value
+      ? this.field?.options?.find(
+          (option) => option?.key === (value?.key ? value?.key : value)
         )?.label
       : undefined;
   }
