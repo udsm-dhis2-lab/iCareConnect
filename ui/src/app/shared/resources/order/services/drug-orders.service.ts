@@ -451,7 +451,7 @@ export class DrugOrdersService {
           order: 4,
           required: true,
           key: "frequency",
-          value: !metadataConfigs.fromDispensing
+          value: drugOrder?.frequency
             ? drugOrder?.frequency
             : doctorPrescriptionDetails?.obs[
                 metadataConfigs?.generalPrescriptionFrequencyConcept
