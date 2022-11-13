@@ -277,7 +277,7 @@ export class PersonDetailsComponent implements OnInit {
             this.showSearchedDetails = false;
           }
           if (personDetails?.error) {
-            console.log("==> Error when trying to get details: ");
+            // console.log("==> Error when trying to get details: ");
           }
         })
       )
