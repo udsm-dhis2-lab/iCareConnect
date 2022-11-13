@@ -200,7 +200,7 @@ public class StockDAO extends BaseDAO<Stock> {
 		} else {
 			queryStr += " AND ";
 		}
-		queryStr += " (d.retired = false OR c.retired = false)";
+		queryStr += " (d.retired = false OR c.retired = false) AND it.voided=false";
 		
 		Query query = session.createQuery(queryStr);
 		query.setFirstResult(startIndex);
@@ -223,7 +223,7 @@ public class StockDAO extends BaseDAO<Stock> {
 		
 		DbSession session = this.getSession();
 		String queryStr = "SELECT item FROM Item item \n"
-		        + "WHERE item.stockable = true AND (item NOT IN(SELECT stock.item FROM Stock stock) OR item IN(SELECT stock.item FROM Stock stock WHERE stock.quantity = 0))";
+		        + "WHERE item.stockable = true AND item.voided=false AND (item NOT IN(SELECT stock.item FROM Stock stock) OR item IN(SELECT stock.item FROM Stock stock WHERE stock.quantity = 0))";
 		
 		Query query = session.createQuery(queryStr);
 		
