@@ -417,6 +417,18 @@ export class Visit {
       : false;
   }
 
+  get hasConfirmedDiagnosis(): boolean {
+    const diagnoses = this.diagnoses;
+    return diagnoses.length > 0
+      ? (
+          diagnoses.filter(
+            (diagnosis: any) =>
+              diagnosis?.diagnosisDetails?.certainty === "CONFIRMED"
+          ) || []
+        )?.length > 0
+      : false;
+  }
+
   toJson(): VisitObject {
     return {
       id: this.uuid,
@@ -444,6 +456,7 @@ export class Visit {
       consultationStarted: this.consultationStarted,
       consultationStatusOrder: this.consultationStatusOrder,
       hasProvisonalDiagnosis: this.hasProvisonalDiagnosis,
+      hasConfirmedDiagnosis: this.hasConfirmedDiagnosis,
     };
   }
 
