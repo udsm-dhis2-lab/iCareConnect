@@ -85,7 +85,6 @@ export class PatientMedicationSummaryComponent implements OnInit {
         })
         .pipe(
           map((response) => {
-            console.log("==> Drug Orders: ", response);
             return response;
           })
         );
@@ -93,7 +92,6 @@ export class PatientMedicationSummaryComponent implements OnInit {
         .getDrugOrderStatus(this.patientVisit?.uuid)
         .pipe(
           map((response) => {
-            console.log("==> Drug Order Statuses: ", response);
             return response;
           })
         );

@@ -494,7 +494,7 @@ export class SharedPatientDashboardComponent implements OnInit {
       ];
       this.ordersService.updateOrdersViaEncounter(orders).subscribe((order) => {
         if (!order.error) {
-          console.log("==> Order results: ", order);
+          // console.log("==> Order results: ", order);
         }
       });
     }
