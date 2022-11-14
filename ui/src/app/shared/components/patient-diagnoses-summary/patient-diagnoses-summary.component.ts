@@ -37,6 +37,7 @@ export class PatientDiagnosesSummaryComponent implements OnInit {
   diagnosesData: any = {};
   savingDiagnosisState$: Observable<boolean>;
   @Output() updateConsultationOrder = new EventEmitter();
+  @Output() updateMedicationComponent = new EventEmitter();
   constructor(private store: Store<AppState>, private dialog: MatDialog) {}
 
   ngOnInit(): void {
@@ -64,10 +65,17 @@ export class PatientDiagnosesSummaryComponent implements OnInit {
     map(Object.keys(this.formValuesData), (key) => {
       if (this.formValuesData[key]) {
         if (key === "diagnosis") {
-          this.diagnosesData[key] = {
-            coded: this.formValuesData[key].value,
-            nonCoded: null,
-            specificName: null,
+          console.log(
+            "==> Diagnosis after addition: ",
+            this.diagnosesData[key], "==> Key: ", key
+          );
+          this.diagnosesData = {
+            ...this.diagnosesData,
+            [key]: {
+              coded: this.formValuesData[key].value,
+              nonCoded: null,
+              specificName: null,
+            },
           };
         } else {
           const options = this.formValuesData[key]?.options || [];
@@ -105,6 +113,7 @@ export class PatientDiagnosesSummaryComponent implements OnInit {
         currentDiagnosisUuid: null,
       })
     );
+    this.updateMedicationComponent.emit();
     this.updateConsultationOrder.emit();
   }
 
@@ -119,16 +128,21 @@ export class PatientDiagnosesSummaryComponent implements OnInit {
       ? diagnosisData?.diagnosisDetails?.uuid
       : diagnosisData?.uuid;
     // e.stopPropagation();
-    this.dialog.open(AddDiagnosisModalComponent, {
-      width: "75%",
-      data: {
-        patient: this.patientVisit?.patientUuid,
-        diagnosisForm: this.diagnosisForm,
-        visit: null,
-        edit: true,
-        currentDiagnosisUuid: currentDiagnosisUuid,
-      },
-    });
+    this.dialog
+      .open(AddDiagnosisModalComponent, {
+        width: "75%",
+        data: {
+          patient: this.patientVisit?.patientUuid,
+          diagnosisForm: this.diagnosisForm,
+          visit: null,
+          edit: true,
+          currentDiagnosisUuid: currentDiagnosisUuid,
+        },
+      })
+      .afterClosed()
+      .subscribe(() => {
+        this.updateMedicationComponent.emit();
+      });
   }
 
   onDelete(e: Event, diagnosisData) {
@@ -141,6 +155,8 @@ export class PatientDiagnosesSummaryComponent implements OnInit {
           ? diagnosisData?.diagnosisDetails
           : diagnosisData,
       },
+    }).afterClosed().subscribe(() => {
+      this.updateMedicationComponent.emit();
     });
   }
 }
