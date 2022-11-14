@@ -411,7 +411,9 @@ export class Visit {
     return diagnoses.length > 0
       ? (
           diagnoses.filter(
-            (diagnosis) => diagnosis["diagnosisDetails"]["certainty"]
+            (diagnosis) =>
+              diagnosis["diagnosisDetails"]["certainty"] &&
+              !diagnosis["diagnosisDetails"].voided
           ) || []
         )?.length > 0
       : false;
@@ -423,7 +425,7 @@ export class Visit {
       ? (
           diagnoses.filter(
             (diagnosis: any) =>
-              diagnosis?.diagnosisDetails?.certainty === "CONFIRMED"
+              diagnosis?.diagnosisDetails?.certainty === "CONFIRMED" && !diagnosis?.diagnosisDetails?.voided
           ) || []
         )?.length > 0
       : false;

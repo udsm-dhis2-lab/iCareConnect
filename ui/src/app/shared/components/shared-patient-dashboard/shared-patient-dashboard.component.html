@@ -642,6 +642,7 @@
                         "
                         [isInpatient]="isInpatient"
                         (updateConsultationOrder)="onUpdateConsultationOrder()"
+                        (updateMedicationComponent)="onUpdateMedicationComponent()"
                       ></app-patient-diagnoses-summary>
                     </div>
                     <mat-progress-bar
@@ -666,7 +667,7 @@
                       <mat-panel-title>Medication </mat-panel-title>
                     </mat-expansion-panel-header>
                     <app-patient-medication-summary
-                      *ngIf="activeVisit"
+                      *ngIf="activeVisit && updateMedication"
                       [fromDispensing]="false"
                       [patientVisit]="activeVisit"
                       [forConsultation]="true"
