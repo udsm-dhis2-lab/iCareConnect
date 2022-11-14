@@ -413,6 +413,7 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	public void stopVisits() throws APIException {
 		AdministrationService adminService = Context.getService(AdministrationService.class);
 		String hoursVisitEnd = adminService.getGlobalProperty(ICareConfig.VISIT_LENGTH_IN_HOURS);
+
 		if (hoursVisitEnd == null || hoursVisitEnd.trim().equals("")) {
 			//newDate = new Date(System.currentTimeMillis() - TimeUnit.HOURS.toMillis(24));
 			
@@ -420,7 +421,7 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 			Date newDate = new Date(System.currentTimeMillis() - TimeUnit.HOURS.toMillis(Integer.valueOf(hoursVisitEnd)));
 			List<Visit> visits = dao.getOpenVisit();
 			for (Visit visit : visits) {
-				if (!patientIsAdmitted(visit) && newDate.after(visit.getStartDatetime())) {
+				if ((!patientIsAdmitted(visit) && newDate.after(visit.getStartDatetime())) || patientIsDischarged(visit)) {
 					VisitWrapper visitWrapper = new VisitWrapper(visit);
 					//try {
 					//if (!(visitWrapper.isInsurance() && visitWrapper.getInsuranceName().toLowerCase().equals("nhif"))) {
@@ -514,6 +515,16 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 			}
 		}
 		return false;
+	}
+
+	Boolean patientIsDischarged(Visit visit){
+		Boolean dischargeState = false;
+		for(Encounter encounter : visit.getEncounters()){
+			if(encounter.getEncounterType().getName().equals("Discharge")){
+				dischargeState = true;
+			}
+		}
+		return dischargeState;
 	}
 	
 	public Summary getSummary() {
