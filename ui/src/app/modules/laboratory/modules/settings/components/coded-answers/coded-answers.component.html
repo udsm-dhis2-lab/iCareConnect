@@ -1,4 +1,9 @@
-<div *ngIf="{ codedAnswers: codedAnswers$ | async } as params">
+<div
+  *ngIf="{
+    codedAnswers: codedAnswers$ | async,
+    conceptSources: conceptSources$ | async
+  } as params"
+>
   <div class="w-100">
     <mat-radio-group class="category">
       <mat-radio-button
@@ -36,15 +41,31 @@
         {{ alertMessage }}
       </div>
       <div *ngIf="!hasError">
-        <app-form
+        <app-shared-concept-create
+          *ngIf="params?.conceptSources"
+          [conceptClass]="conceptClass"
+          [standardSearchTerm]="standardSearchTerm"
+          [dataType]="'N/A'"
+          [setMembersHeaderName]="''"
+          [isSet]="false"
+          [conceptSources]="params?.conceptSources"
+          [saveOnTheComponent]="false"
+          [multipleSelectionCompHeight]="'10vh'"
+          (conceptToCreate)="onGetConceptToCreate($event)"
+        ></app-shared-concept-create>
+        <mat-progress-loader
+          color="primary"
+          *ngIf="!params?.conceptSources"
+        ></mat-progress-loader>
+        <!-- <app-form
           [fields]="codedAnswersFields"
           (formUpdate)="onFormUpdate($event)"
-        ></app-form>
+        ></app-form> -->
 
         <div class="w-100 d-flex justify-content-end mt-2">
           <button
             mat-stroked-button
-            [disabled]="!isFormValid"
+            [disabled]="!formData?.name?.value || !formData?.shortName?.value"
             (click)="onSave($event)"
           >
             Save
