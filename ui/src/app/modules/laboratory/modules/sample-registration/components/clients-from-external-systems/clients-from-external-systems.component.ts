@@ -77,12 +77,10 @@ export class ClientsFromExternalSystemsComponent implements OnInit {
   onSelectClient(event: Event, client: any): void {
     event.stopPropagation();
     this.isSearching = false;
-    if (!client?.hasResults) {
-      this.selectedClientRequest.emit({
-        ...client,
-        selectedSystem: this.selectedSystem,
-      });
-    }
+    this.selectedClientRequest.emit({
+      ...client,
+      selectedSystem: this.selectedSystem,
+    });
     this.showClientsList = false;
   }
 }
