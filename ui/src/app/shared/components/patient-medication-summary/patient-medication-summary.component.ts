@@ -12,6 +12,7 @@ import { select, Store } from "@ngrx/store";
 import { Observable, zip } from "rxjs";
 import { map } from "rxjs/operators";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
+import { loadActiveVisit } from "src/app/store/actions/visit.actions";
 import { AppState } from "src/app/store/reducers";
 import { getAllUniqueDrugOrders } from "src/app/store/selectors";
 import { getActiveVisit } from "src/app/store/selectors/visit.selectors";
@@ -41,6 +42,7 @@ export class PatientMedicationSummaryComponent implements OnInit {
   @Output() updateConsultationOrder = new EventEmitter();
   patientDrugOrdersStatuses$: Observable<any>;
   filteredDrugOrders$: Observable<any>;
+  visitDetails$: Observable<any>;
   constructor(
     private store: Store<AppState>,
     private ordersService: OrdersService,
@@ -59,8 +61,16 @@ export class PatientMedicationSummaryComponent implements OnInit {
       this.systemSettingsService.getSystemSettingsByKey(
         "iCare.clinic.useGeneralPrescription"
       );
-    this.currentVisit$ = this.store.pipe(select(getActiveVisit));
     this.patientVisitData$ = this.visitService.getActiveVisit(
+      this.patientVisit?.patientUuid,
+      false,
+      false,
+      true
+    );
+
+    // console.log(this.patientVisit);
+
+    this.currentVisit$ = this.visitService.getActiveVisit(
       this.patientVisit?.patientUuid,
       false,
       false,
@@ -75,7 +85,6 @@ export class PatientMedicationSummaryComponent implements OnInit {
         })
         .pipe(
           map((response) => {
-            console.log("==> Drug Orders: ", response);
             return response;
           })
         );
@@ -83,7 +92,6 @@ export class PatientMedicationSummaryComponent implements OnInit {
         .getDrugOrderStatus(this.patientVisit?.uuid)
         .pipe(
           map((response) => {
-            console.log("==> Drug Order Statuses: ", response);
             return response;
           })
         );

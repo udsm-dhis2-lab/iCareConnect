@@ -1,10 +1,10 @@
-import { Observable } from 'rxjs';
+import { Observable } from "rxjs";
 import { Component, Inject, OnInit } from "@angular/core";
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { each } from "lodash";
 import { getCurrentUserDetails } from "src/app/store/selectors/current-user.selectors";
-import { Store } from '@ngrx/store';
-import { AppState } from 'src/app/store/reducers';
+import { Store } from "@ngrx/store";
+import { AppState } from "src/app/store/reducers";
 
 @Component({
   selector: "app-payment-reciept",
@@ -34,21 +34,18 @@ export class PaymentReceiptComponent implements OnInit {
         : null;
 
     this.currentUser = this.store.select(getCurrentUserDetails).subscribe({
-        next: (currentUser) => {
-          return currentUser;
-        },
+      next: (currentUser) => {
+        return currentUser;
+      },
 
-        error: (error) => {
-          throw error;
-        }
-      }
-    );
+      error: (error) => {
+        throw error;
+      },
+    });
 
     each(this.data?.billItems, (item) => {
       this.totalBill = this.totalBill + item?.payable;
     });
-
-    console.log("==> Bill: ", this.data?.billItems)
   }
 
   onCancel(e): void {
@@ -57,7 +54,6 @@ export class PaymentReceiptComponent implements OnInit {
   }
 
   onPrint(e): void {
-
     var contents = document.getElementById("dialog-bill-receipt").innerHTML;
     const frame1: any = document.createElement("iframe");
     frame1.name = "frame3";
