@@ -91,9 +91,7 @@
           >
             <tr
               [id]="client?.enrollment"
-              [ngStyle]="{
-                cursor: client?.hasResults ? 'not-allowed' : 'pointer'
-              }"
+              style="cursor: pointer"
               [ngClass]="{ 'client-has-results': client?.hasResults }"
               (click)="onSelectClient($event, client)"
             >
