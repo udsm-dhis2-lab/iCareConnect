@@ -59,11 +59,7 @@ export class PatientMedicationSummaryComponent implements OnInit {
 
     // console.log(this.patientVisit);
 
-    this.currentVisit$ = this.visitService
-      .getActiveVisit(this.patientVisit?.patientUuid, false, false, true)
-      .pipe(tap((response) => {
-        console.log("==> Loaded Visit: ", response?.hasConfirmedDiagnosis)
-      }));
+    this.currentVisit$ = this.visitService.getActiveVisit(this.patientVisit?.patientUuid, false, false, true);
 
     if (this.patientVisit) {
       this.drugOrders$ = this.ordersService
@@ -120,22 +116,16 @@ export class PatientMedicationSummaryComponent implements OnInit {
   }
 
   loadVisit(visit?: any) {
-    // let visitUuid = this.patientVisit?.uuid
-    //   ? this.patientVisit?.uuid
-    //   : visit
-    //   ? visit?.uuid
-    //   : "";
-    // this.currentVisit$ = this.visitService.getVisitDetailsByVisitUuid(
-    //   visitUuid,
-    //   {
-    //     v: "custom:(uuid,display,patient,encounters:(uuid,display,obs,orders),attributes)",
-    //   }
-    // );
-    this.currentVisit$ = this.visitService.getActiveVisit(
-      visit ? visit?.patient?.uuid : this.patientVisit?.patientUuid,
-      false,
-      false,
-      true
+    let visitUuid = this.patientVisit?.uuid
+      ? this.patientVisit?.uuid
+      : visit
+      ? visit?.uuid
+      : "";
+    this.currentVisit$ = this.visitService.getVisitDetailsByVisitUuid(
+      visitUuid,
+      {
+        v: "custom:(uuid,display,patient,encounters:(uuid,display,obs,orders),attributes)",
+      }
     );
   }
 

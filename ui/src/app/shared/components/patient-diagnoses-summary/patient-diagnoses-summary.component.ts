@@ -65,10 +65,6 @@ export class PatientDiagnosesSummaryComponent implements OnInit {
     map(Object.keys(this.formValuesData), (key) => {
       if (this.formValuesData[key]) {
         if (key === "diagnosis") {
-          console.log(
-            "==> Diagnosis after addition: ",
-            this.diagnosesData[key], "==> Key: ", key
-          );
           this.diagnosesData = {
             ...this.diagnosesData,
             [key]: {
