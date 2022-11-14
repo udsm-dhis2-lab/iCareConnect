@@ -209,7 +209,9 @@ export class PersonDetailsComponent implements OnInit {
       ...this.personDetailsData,
       isNewPatient: this.personDetailsCategory === "new",
       patientUuid: this.patientUuid,
-      pimaCOVIDLinkDetails: this.selectedClientData,
+      pimaCOVIDLinkDetails: !this.selectedClientData?.hasResults
+        ? this.selectedClientData
+        : null,
     });
   }
 
@@ -225,7 +227,9 @@ export class PersonDetailsComponent implements OnInit {
       ...this.personDetailsData,
       isNewPatient: this.personDetailsCategory === "new",
       patientUuid: this.patientUuid,
-      pimaCOVIDLinkDetails: this.selectedClientData,
+      pimaCOVIDLinkDetails: !this.selectedClientData?.hasResults
+        ? this.selectedClientData
+        : null,
     });
     this.searchByIdentifier = true;
     this.showSearchedDetails = true;
@@ -252,7 +256,9 @@ export class PersonDetailsComponent implements OnInit {
       ...this.personDetailsData,
       isNewPatient: this.personDetailsCategory === "new",
       patientUuid: this.patientUuid,
-      pimaCOVIDLinkDetails: this.selectedClientData,
+      pimaCOVIDLinkDetails: !this.selectedClientData?.hasResults
+        ? this.selectedClientData
+        : null,
     });
   }
 
@@ -413,7 +419,9 @@ export class PersonDetailsComponent implements OnInit {
         ...this.personDetailsData,
         isNewPatient: this.personDetailsCategory === "new",
         patientUuid: this.patientUuid,
-        pimaCOVIDLinkDetails: this.selectedClientData,
+        pimaCOVIDLinkDetails: !this.selectedClientData?.hasResults
+          ? this.selectedClientData
+          : null,
       });
     }
   }
@@ -432,7 +440,9 @@ export class PersonDetailsComponent implements OnInit {
       ...this.personDetailsData,
       isNewPatient: this.personDetailsCategory === "new",
       patientUuid: this.patientUuid,
-      pimaCOVIDLinkDetails: this.selectedClientData,
+      pimaCOVIDLinkDetails: !this.selectedClientData?.hasResults
+        ? this.selectedClientData
+        : null,
     });
     if (this.personDetailsCategory === "new") {
       this.setPersonDetails();
