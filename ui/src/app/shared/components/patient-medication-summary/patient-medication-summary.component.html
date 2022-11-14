@@ -156,10 +156,10 @@
 >
   <mat-progress-bar
     mode="indeterminate"
-    *ngIf="!drugParams?.useGeneralPrescription"
+    *ngIf="!drugParams?.useGeneralPrescription || !drugParams?.currentVisit"
   ></mat-progress-bar>
-  <div *ngIf="drugParams?.useGeneralPrescription">
-    <mat-tab-group>
+  <div *ngIf="drugParams?.useGeneralPrescription && drugParams?.currentVisit">
+    <mat-tab-group *ngIf="drugParams?.currentVisit?.hasConfirmedDiagnosis">
       <mat-tab
         label="Doctor's Prescriptions"
         *ngIf="drugParams?.useGeneralPrescription === 'true' && !previous"
@@ -219,14 +219,14 @@
       >
         <div class="mat-tab-container">
           <ng-template matTabContent>
-            <table
-              class="table"
-            >
+            <table class="table">
               <thead>
-                <tr  *ngIf="
-                drugParams?.filteredDrugOrders?.toBeDispensedDrugOrders
-                  ?.length > 0
-              ">
+                <tr
+                  *ngIf="
+                    drugParams?.filteredDrugOrders?.toBeDispensedDrugOrders
+                      ?.length > 0
+                  "
+                >
                   <th>SN</th>
                   <th>Drug Details</th>
                   <th>
@@ -256,12 +256,13 @@
                     {{ drugOrder?.dateActivated | date: "medium" }}
                   </td>
                 </tr>
-                <tr 
-                *ngIf="
-                  drugParams?.filteredDrugOrders?.toBeDispensedDrugOrders
-                    ?.length === 0
-                " 
-                class="text-center p-3">
+                <tr
+                  *ngIf="
+                    drugParams?.filteredDrugOrders?.toBeDispensedDrugOrders
+                      ?.length === 0
+                  "
+                  class="text-center p-3"
+                >
                   No
                   {{
                     drugParams?.useGeneralPrescription === "true"
@@ -270,7 +271,12 @@
                   }}
                   for this patient
                 </tr>
-                <tr *ngIf="!isInpatient && drugParams?.useGeneralPrescription !== 'true'">
+                <tr
+                  *ngIf="
+                    !isInpatient &&
+                    drugParams?.useGeneralPrescription !== 'true'
+                  "
+                >
                   <td colspan="4">
                     <button
                       mat-flat-button
@@ -360,5 +366,12 @@
         </div>
       </mat-tab>
     </mat-tab-group>
+    <div
+      *ngIf="!drugParams?.currentVisit?.hasConfirmedDiagnosis"
+      class="alert alert-warning"
+      role="alert"
+    >
+      NO Confirmed/Final Diagnosis provided. Please provide before Medication
+    </div>
   </div>
 </div>

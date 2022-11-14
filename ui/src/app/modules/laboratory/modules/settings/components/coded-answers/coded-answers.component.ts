@@ -1,6 +1,7 @@
 import { Component, OnInit } from "@angular/core";
 import { MatRadioChange } from "@angular/material/radio";
 import { Observable } from "rxjs";
+import { ConceptSourcesService } from "src/app/core/services/concept-sources.service";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
 import { Textbox } from "src/app/shared/modules/form/models/text-box.model";
 import { ConceptsService } from "src/app/shared/resources/concepts/services/concepts.service";
@@ -30,7 +31,15 @@ export class CodedAnswersComponent implements OnInit {
   conceptBeingEdited: ConceptGetFull;
 
   alertMessage: string;
-  constructor(private conceptService: ConceptsService) {}
+  standardSearchTerm: string = "LIS_CODED_ANSWERS";
+  conceptClass: string = "Coded answer";
+  conceptSources$: Observable<any[]>;
+  conceptToEdit$: Observable<any>;
+
+  constructor(
+    private conceptService: ConceptsService,
+    private conceptSourceService: ConceptSourcesService
+  ) {}
 
   ngOnInit(): void {
     this.createCodedAnswersFields();
@@ -41,6 +50,7 @@ export class CodedAnswersComponent implements OnInit {
       startIndex: (this.page - 1) * this.pageSize,
       searchTerm: "LIS_CODED_ANSWERS",
     });
+    this.conceptSources$ = this.conceptSourceService.getConceptSources();
   }
 
   getList(event: Event, actionType: string): void {
@@ -89,10 +99,12 @@ export class CodedAnswersComponent implements OnInit {
     this.formData = { ...this.formData, ...values };
   }
 
+  onGetConceptToCreate(conceptDetails: any): void {
+    this.formData = conceptDetails;
+  }
+
   onSave(event: Event): void {
     event.stopPropagation();
-    // class:3f3e1f30-b6ef-43a3-bd36-3fd0d0a94eaf (Coded answers)
-    // datatype: 8d4a4c94-c2cc-11de-8d13-0010c6dffd0f (NA)
     const searchTerms = [
       {
         name: "LIS_CODED_ANSWERS",
@@ -133,7 +145,6 @@ export class CodedAnswersComponent implements OnInit {
       datatype: "8d4a4c94-c2cc-11de-8d13-0010c6dffd0f",
       conceptClass: "Coded answer",
     };
-
     this.conceptService
       .searchConcept({ q: conceptName, conceptClass: "Coded answer" })
       .subscribe((response) => {

@@ -281,7 +281,7 @@ export class OrderResultsRendererComponent implements OnInit {
           encounter: e?.encounter?.uuid,
         };
         this.ordersService.updateOrdersViaEncounter([order]).subscribe();
-        console.log("==> Deleted Lab test: ", e);
+        // console.log("==> Deleted Lab test: ", e);
       }
     });
   }
