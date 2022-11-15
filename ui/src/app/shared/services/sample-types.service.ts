@@ -52,7 +52,7 @@ export class SampleTypesService {
                   BASE_URL +
                     "concept/" +
                     parsedConfigs["sampleTypes"].id +
-                    "?v=custom:(uuid,display,name,setMembers:(uuid,display,setMembers:(uuid,display,datatype,mappings:(uuid,display,conceptReferenceTerm:(name,code)),hiNormal,lowNormal,units,numeric,answers,setMembers:(uuid,display,hiNormal,lowNormal,units,numeric,answers:(uuid,display)))))"
+                    "?v=custom:(uuid,display,setMembers:(uuid,display,setMembers:(uuid,display,setMembers:(uuid,display,conceptClass,datatype,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,numeric,descriptions,allowDecimal,displayPrecision,answers:(uuid,display)))))"
                 )
                 .pipe(map((sampleTypes) => sampleTypes["setMembers"]))
             : of([]);
@@ -74,7 +74,7 @@ export class SampleTypesService {
                   BASE_URL +
                     "concept/" +
                     parsedConfigs["labDepartments"] +
-                    "?v=custom:(uuid,display,name,setMembers:(uuid,display,setMembers:(uuid,display,datatype,mappings:(uuid,display,conceptReferenceTerm:(name,code)),hiNormal,lowNormal,units,numeric,answers,setMembers:(uuid,display,hiNormal,lowNormal,units,numeric,answers:(uuid,display)))))"
+                    "?v=custom:(uuid,display,setMembers:(uuid,display,setMembers:(uuid,display,setMembers:(uuid,display,conceptClass,datatype,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,numeric,descriptions,allowDecimal,displayPrecision,answers:(uuid,display)))))"
                 )
                 .pipe(
                   map((departments: any) => {
