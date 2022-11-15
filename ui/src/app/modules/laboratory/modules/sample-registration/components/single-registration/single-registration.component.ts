@@ -224,7 +224,7 @@ export class SingleRegistrationComponent implements OnInit {
     this.agencyFormField = new Dropdown({
       id: "agency",
       key: "agency",
-      label: "Agency/Priority",
+      label: "urgency/Priority",
       options: this.agencyConceptConfigs?.setMembers.map((member) => {
         return {
           key: member?.uuid,
@@ -253,7 +253,7 @@ export class SingleRegistrationComponent implements OnInit {
       id: "transportationTemperature",
       key: "transportationTemperature",
       label: "Transportation Temperature",
-      searchTerm: "SAMPLE_TRANSPORT_CONDITION",
+      searchTerm: "SAMPLE_TRANSPORT_TEMPERATURE",
       required: false,
       options: [],
       multiple: false,
