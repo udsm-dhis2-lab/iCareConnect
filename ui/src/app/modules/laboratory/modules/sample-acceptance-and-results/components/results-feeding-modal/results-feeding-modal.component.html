@@ -260,7 +260,49 @@
                                 item?.order?.concept.numeric &&
                                 item?.order?.concept.lowNormal &&
                                 item?.order?.concept.hiNormal &&
-                                !LISConfigurations?.isLIS
+                                !LISConfigurations?.isLIS &&
+                                !item?.order?.concept
+                                  ?.shouldUseGeneratedNumericOptions
+                              "
+                            >
+                              <mat-label
+                                >Enter value for
+                                {{ item?.order?.concept?.display }}</mat-label
+                              >
+
+                              <input
+                                matInput
+                                [type]="'number'"
+                                class="text-center"
+                                [value]="
+                                  item?.testAllocations?.length > 0 &&
+                                  item?.testAllocations[0]?.results?.length > 0
+                                    ? item?.testAllocations[0]?.results[
+                                        item?.testAllocations[0]?.results
+                                          ?.length - 1
+                                      ]?.value
+                                    : null
+                                "
+                                [disabled]="
+                                  item?.testAllocations[0]?.firstSignOff &&
+                                  !LISConfigurations?.isLIS
+                                "
+                                [min]="item?.order?.concept.lowNormal"
+                                [max]="item?.order?.concept.hiNormal"
+                                [(ngModel)]="values[item?.order?.concept?.uuid]"
+                              />
+                            </mat-form-field>
+
+                            <mat-form-field
+                              class="w-50"
+                              *ngIf="
+                                !notInRangeIsSet[item?.order?.concept?.uuid] &&
+                                item?.order?.concept.numeric &&
+                                item?.order?.concept.lowNormal &&
+                                item?.order?.concept.hiNormal &&
+                                !LISConfigurations?.isLIS &&
+                                item?.order?.concept
+                                  ?.shouldUseGeneratedNumericOptions
                               "
                             >
                               <mat-label
@@ -426,7 +468,9 @@
                                 item?.order?.concept.numeric &&
                                 item?.order?.concept.lowNormal &&
                                 item?.order?.concept.hiNormal &&
-                                !LISConfigurations?.isLIS
+                                !LISConfigurations?.isLIS &&
+                                item?.order?.concept
+                                  ?.shouldUseGeneratedNumericOptions
                               "
                               [disabled]="
                                 item?.testAllocations[0]?.firstSignOff &&
@@ -977,7 +1021,45 @@
                                 >Select value for
                                 {{ parameter?.display }}</mat-label
                               >
-                              <mat-select
+
+                              <input
+                                *ngIf="
+                                  !parameter?.numeric &&
+                                  parameter?.datatype?.display !== 'Numeric'
+                                "
+                                matInput
+                                autocomplete="off"
+                                [type]="'number'"
+                                [min]="parameter?.lowNormal"
+                                [max]="parameter?.hiNormal"
+                                class="text-left"
+                                [value]="
+                                  item?.allocationsPairedBySetMember[
+                                    parameter?.uuid
+                                  ]?.results?.length > 0
+                                    ? item?.allocationsPairedBySetMember[
+                                        parameter?.uuid
+                                      ]?.results[
+                                        item?.allocationsPairedBySetMember[
+                                          parameter?.uuid
+                                        ]?.results?.length - 1
+                                      ]?.value
+                                    : null
+                                "
+                                [disabled]="
+                                  item?.allocationsPairedBySetMember[
+                                    parameter?.uuid
+                                  ]?.firstSignOff && !LISConfigurations?.isLIS
+                                "
+                                (keyup.enter)="
+                                  setEnteredParameterValue(
+                                    parameter,
+                                    $event.target.value
+                                  )
+                                "
+                              />
+
+                              <!-- <mat-select
                                 [disabled]="
                                   item?.allocationsPairedBySetMember[
                                     parameter?.uuid
@@ -1009,7 +1091,7 @@
                                   [value]="option"
                                   >{{ option }}
                                 </mat-option>
-                              </mat-select>
+                              </mat-select> -->
                             </mat-form-field>
 
                             <button
