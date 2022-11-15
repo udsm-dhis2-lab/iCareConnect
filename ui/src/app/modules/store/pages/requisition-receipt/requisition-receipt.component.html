@@ -11,7 +11,7 @@
   <mat-card class="border">
     <div class="d-flex justify-content-between">
       <mat-form-field class="w-25">
-        <input autocomplete="off" type="text" matInput placeholder="Search" />
+        <input autocomplete="off" type="text" matInput placeholder="Search" (keyup)="searchStock($event)" />
       </mat-form-field>
       <!-- <button
         (click)="onNewRequest($event, params)"
@@ -59,14 +59,18 @@
       </tr>
     </table> -->
     <ng-container>
-      <div *ngIf="params.loadingRequisitions">
-        <mat-progress-bar mode="indeterminate"></mat-progress-bar>
-      </div>
-      <app-requisition-receipt-by-store 
-      *ngIf="!params?.loadingRequisitions"
+      <mat-progress-bar mode="indeterminate" *ngIf="!filterLoaded"></mat-progress-bar>
+      <app-requisition-receipt-by-store
+      *ngIf="params?.requisitions.length > 0 && filterLoaded"
       [requisitions]="params?.requisitions"
       ></app-requisition-receipt-by-store>
-      
+      <table class="table table-striped w-100" *ngIf="!params?.requisitions.length && filterLoaded">
+        <tbody>
+          <tr class="text-center">
+            <td>No received items records.</td>
+          </tr>
+        </tbody>
+      </table>
     </ng-container>
   </mat-card>
 </div>
