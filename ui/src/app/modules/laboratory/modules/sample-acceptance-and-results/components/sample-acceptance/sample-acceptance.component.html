@@ -1313,7 +1313,7 @@
                   </td>
                 </tr>
                 <tr *ngIf="samplesToViewMoreDetails[sample?.id]">
-                  <td colspan="10">
+                  <td [attr.colspan]="!LISConfigurations?.isLIS ? 11 : 10">
                     <app-shared-sample-details
                       [sample]="sample"
                     ></app-shared-sample-details>
