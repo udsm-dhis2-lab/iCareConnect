@@ -1,21 +1,10 @@
-import {
-  AfterViewInit,
-  Component,
-  EventEmitter,
-  Input,
-  OnInit,
-  Output,
-} from "@angular/core";
-import { FormControl } from "@angular/forms";
+import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
-import { select, Store } from "@ngrx/store";
+import { Store } from "@ngrx/store";
 import { Observable, zip } from "rxjs";
-import { map } from "rxjs/operators";
+import { map, tap } from "rxjs/operators";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
-import { loadActiveVisit } from "src/app/store/actions/visit.actions";
 import { AppState } from "src/app/store/reducers";
-import { getAllUniqueDrugOrders } from "src/app/store/selectors";
-import { getActiveVisit } from "src/app/store/selectors/visit.selectors";
 import { DispensingFormComponent } from "../../dialogs";
 import { DrugOrdersService } from "../../resources/order/services";
 import { OrdersService } from "../../resources/order/services/orders.service";
@@ -70,12 +59,7 @@ export class PatientMedicationSummaryComponent implements OnInit {
 
     // console.log(this.patientVisit);
 
-    this.currentVisit$ = this.visitService.getActiveVisit(
-      this.patientVisit?.patientUuid,
-      false,
-      false,
-      true
-    );
+    this.currentVisit$ = this.visitService.getActiveVisit(this.patientVisit?.patientUuid, false, false, true);
 
     if (this.patientVisit) {
       this.drugOrders$ = this.ordersService
