@@ -39,12 +39,24 @@
     </mat-tab>
    
    
-  <mat-tab label="Transport Conditions">
+    <mat-tab label="Transport Conditions">
       <ng-template matTabContent>
         <div class="p-3">
           <app-standard-concept-creation
             [conceptClass]="'Misc'"
             [standardSearchTerm]="'SAMPLE_TRANSPORT_CONDITION'"
+            (conceptCreated)="getConceptCreated($event)"
+          ></app-standard-concept-creation>
+        </div>
+      </ng-template>
+    </mat-tab>
+    
+    <mat-tab label="Transport Temperatures">
+      <ng-template matTabContent>
+        <div class="p-3">
+          <app-standard-concept-creation
+            [conceptClass]="'Misc'"
+            [standardSearchTerm]="'SAMPLE_TRANSPORT_TEMPERATURE'"
             (conceptCreated)="getConceptCreated($event)"
           ></app-standard-concept-creation>
         </div>

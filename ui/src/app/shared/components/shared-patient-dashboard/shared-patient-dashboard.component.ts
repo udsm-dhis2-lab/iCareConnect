@@ -151,6 +151,7 @@ export class SharedPatientDashboardComponent implements OnInit {
   showRoundDetails: boolean = true;
   currentRound: any;
   latestRound$: Observable<any>;
+  updateMedication: boolean = true;
 
   constructor(
     private store: Store<AppState>,
@@ -503,6 +504,13 @@ export class SharedPatientDashboardComponent implements OnInit {
   onAssignBed(event: Event): void {
     event.stopPropagation();
     this.assignBed.emit(true);
+  }
+
+  onUpdateMedicationComponent() {
+    this.updateMedication = false;
+    setTimeout(() => {
+      this.updateMedication = true;
+    }, 500);
   }
 
   onDischargePatient(event: Event, invoice?: any): void {
