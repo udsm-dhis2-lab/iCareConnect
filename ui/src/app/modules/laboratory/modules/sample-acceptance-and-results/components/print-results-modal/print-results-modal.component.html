@@ -99,7 +99,7 @@
                 <table style="width: 100%">
                   <tr>
                     <td>
-                      <b> MRN </b>
+                      <b> {{ LISConfigurations?.isLIS ? "Patient File Number" : "MRN" }} </b>
                     </td>
                     <td>{{ patientDetailsAndSamples?.mrn }}</td>
                     <td>
@@ -153,11 +153,11 @@
                   </tr>
                   <tr>
                     <td>
-                      <b> Age (dob)/ Gender </b>
+                      <b> Age / Gender </b>
                     </td>
                     <td>
                       {{ patientDetailsAndSamples?.patient?.age }}
-                      yrs ({{ patientDetailsAndSamples?.patient?.dob | date }})
+                      yrs
                       /
                       {{ patientDetailsAndSamples?.patient?.gender }}
                     </td>
