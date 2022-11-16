@@ -3,7 +3,8 @@
   *ngIf="{
     facility: facilityDetails$ | async,
     visit: visit$ | async,
-    referringDoctorAttributes: referringDoctorAttributes$ | async
+    referringDoctorAttributes: referringDoctorAttributes$ | async,
+    refferedFromFacility: refferedFromFacility$ | async
   } as params"
 >
   <div id="results-to-print" style="color: gray">
@@ -219,17 +220,26 @@
                   <tr
                     *ngIf="
                       LISConfigurations?.isLIS &&
-                      params?.referringDoctorAttributes
+                      (params?.referringDoctorAttributes || params?.refferedFromFacility)
                     "
                   >
-                    <td></td>
-                    <td></td>
                     <td>
-                      <b> Requesting Doctor </b>
+                      <span *ngIf="params?.refferedFromFacility">
+                        <b> Refering Facility </b>
+                      </span>
                     </td>
                     <td>
-                      <span
-                        >{{
+                      <span *ngIf="params?.refferedFromFacility">
+                        {{ params?.refferedFromFacility?.display }}
+                      </span>
+                    </td>
+                    <td>
+                      <span *ngIf="params?.referringDoctorAttributes">
+                        <b> Requesting Doctor </b>
+                      </span>
+                    </td>
+                    <td>
+                      <span *ngIf="params?.referringDoctorAttributes">{{
                           params?.visit?.attributesKeyedByAttributeType[
                             params?.referringDoctorAttributes[1].value
                           ]
