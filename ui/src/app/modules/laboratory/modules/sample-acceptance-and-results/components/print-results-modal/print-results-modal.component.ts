@@ -4,6 +4,7 @@ import { Store } from "@ngrx/store";
 import * as _ from "lodash";
 import { Observable } from "rxjs";
 import { map, sample, tap } from "rxjs/operators";
+import { LocationService } from "src/app/core/services/location.service";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { VisitsService } from "src/app/shared/resources/visits/services/visits.service";
 import { PatientService } from "src/app/shared/services/patient.service";
@@ -33,9 +34,11 @@ export class PrintResultsModalComponent implements OnInit {
   visit$: Observable<any>;
   referringDoctorAttributes$: any;
   authorized: any;
+  refferedFromFacility$: Observable<any>;
   constructor(
     private patientService: PatientService,
     private visitService: VisitsService,
+    private locationService: LocationService,
     private systemSettingsService: SystemSettingsService,
     private dialogRef: MatDialogRef<PrintResultsModalComponent>,
     @Inject(MAT_DIALOG_DATA) data,
@@ -95,20 +98,22 @@ export class PrintResultsModalComponent implements OnInit {
         }
       )
       .pipe(
-        map((response) => {
+        tap((response) => {
           if (!response?.error) {
-            return {
-              ...response,
-              attributesKeyedByAttributeType: _.keyBy(
-                response?.attributes.map((attribute) => {
-                  return {
-                    ...attribute,
-                    attributeTypeUuid: attribute?.attributeType?.uuid,
-                  };
-                }),
-                "attributeTypeUuid"
-              ),
-            };
+            const attributesKeyedByAttributeType = _.keyBy(
+              response?.attributes.map((attribute) => {
+                return {
+                  ...attribute,
+                  attributeTypeUuid: attribute?.attributeType?.uuid,
+                };
+              }),
+              "attributeTypeUuid"
+            );
+            this.refferedFromFacility$ = this.locationService.getLocationById(
+              attributesKeyedByAttributeType[
+                "47da17a9-a910-4382-8149-736de57dab18"
+              ].value
+            );
           }
         })
       );
