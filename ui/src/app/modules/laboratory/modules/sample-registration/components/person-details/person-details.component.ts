@@ -306,7 +306,7 @@ export class PersonDetailsComponent implements OnInit {
         id: "attribute-" + this.referFromFacilityVisitAttribute,
         key: "attribute-" + this.referFromFacilityVisitAttribute,
         options: [],
-        label: "Location",
+        label: "Facility Name",
         shouldHaveLiveSearchForDropDownFields: true,
         searchControlType: "healthFacility",
         searchTerm: "Health Facility",
