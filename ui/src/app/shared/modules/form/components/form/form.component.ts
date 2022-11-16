@@ -22,6 +22,7 @@ import { FieldComponent } from "../field/field.component";
 })
 export class FormComponent implements OnInit, OnChanges {
   @Input() fields: Field<string>[];
+  @Input() dataType: any;
   @Input() isFormHorizontal: boolean;
   @Input() showSaveButton: boolean;
   @Input() fieldsData: FieldsData;
@@ -31,6 +32,7 @@ export class FormComponent implements OnInit, OnChanges {
   @Input() isReport: boolean;
 
   @Output() formUpdate: EventEmitter<any> = new EventEmitter<any>();
+  @Output() fileFormUpdate: EventEmitter<any> = new EventEmitter<any>();
 
   values: any;
 
@@ -63,6 +65,11 @@ export class FormComponent implements OnInit, OnChanges {
 
       this.values = form.getRawValue();
     }
+  }
+
+  onFileFieldUpdate(fileData: File): void {
+    this.formUpdate.emit(new FormValue(this.form, this.fields, fileData));
+    this.values = fileData;
   }
 
   onClear(): void {

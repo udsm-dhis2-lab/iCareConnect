@@ -1,15 +1,23 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, Input, OnInit, Output, EventEmitter } from "@angular/core";
+import { MatDialog } from "@angular/material/dialog";
 import { Store } from "@ngrx/store";
 import { keyBy, flatten, orderBy, uniqBy } from "lodash";
 import { Observable } from "rxjs";
-import { createLabOrders, deleteLabOrder } from "src/app/store/actions";
+import {
+  createLabOrders,
+  deleteLabOrder,
+  voidOrder,
+} from "src/app/store/actions";
 import { AppState } from "src/app/store/reducers";
 import {
   getCreatingLabOrderState,
   getLabOrderVoidingState,
 } from "src/app/store/selectors";
 import { FormValue } from "../../modules/form/models/form-value.model";
+import { InvestigationProcedureService } from "../../resources/investigation-procedure/services/investigation-procedure.service";
+import { OrdersService } from "../../resources/order/services/orders.service";
 import { Visit } from "../../resources/visits/models/visit.model";
+import { DeleteConfirmationComponent } from "../delete-confirmation/delete-confirmation.component";
 
 @Component({
   selector: "app-order-results-renderer",
@@ -22,6 +30,7 @@ export class OrderResultsRendererComponent implements OnInit {
   @Input() codedResultsData: any;
   @Input() observationsKeyedByConcept: any;
   @Input() forConsultation: boolean;
+  @Input() isInpatient: boolean;
   @Input() investigationAndProceduresFormsDetails: any;
   @Input() visit: Visit;
   @Input() orderTypes: any[];
@@ -42,7 +51,13 @@ export class OrderResultsRendererComponent implements OnInit {
   voidingLabOrderState$: Observable<boolean>;
 
   isFormValid: boolean = false;
-  constructor(private store: Store<AppState>) {}
+  @Output() updateConsultationOrder = new EventEmitter();
+  constructor(
+    private store: Store<AppState>,
+    private dialog: MatDialog,
+    private investigationPrecedureService: InvestigationProcedureService,
+    private ordersService: OrdersService
+  ) {}
 
   ngOnInit(): void {
     this.testSetMembersKeyedByConceptUuid = keyBy(
@@ -95,34 +110,37 @@ export class OrderResultsRendererComponent implements OnInit {
 
   onAddTest(event: Event): void {
     event.stopPropagation();
-    let labOrders = Object.keys(this.formValuesData)
-      .map((key) => {
-        if (
-          key !== "order" &&
-          key !== "remarks" &&
-          this.formValuesData[key]?.value
-        ) {
-          return {
-            concept: this.formValuesData[key]?.id,
-            orderType: (this.orderTypes.filter(
-              (orderType) => orderType?.conceptClassName === "Test"
-            ) || [])[0]?.uuid,
-            action: "NEW",
-            patient: this.visit?.patientUuid,
-            careSetting: !this.visit?.isAdmitted ? "OUTPATIENT" : "INPATIENT",
-            orderer: this.provider?.uuid,
-            urgency: "ROUTINE",
-            instructions: "",
-            encounter: JSON.parse(localStorage.getItem("patientConsultation"))[
-              "encounterUuid"
-            ],
-            type: "testorder",
-          };
-        } else {
-          return null;
-        }
-      })
-      .filter((labOrder) => labOrder);
+    let labOrders = uniqBy(
+      Object.keys(this.formValuesData)
+        .map((key) => {
+          if (
+            key !== "order" &&
+            key !== "remarks" &&
+            this.formValuesData[key]?.value
+          ) {
+            return {
+              concept: this.formValuesData[key]?.id,
+              orderType: (this.orderTypes.filter(
+                (orderType) => orderType?.conceptClassName === "Test"
+              ) || [])[0]?.uuid,
+              action: "NEW",
+              patient: this.visit?.patientUuid,
+              careSetting: !this.visit?.isAdmitted ? "OUTPATIENT" : "INPATIENT",
+              orderer: this.provider?.uuid,
+              urgency: "ROUTINE",
+              instructions: "",
+              encounter: JSON.parse(
+                localStorage.getItem("patientConsultation")
+              )["encounterUuid"],
+              type: "testorder",
+            };
+          } else {
+            return null;
+          }
+        })
+        .filter((labOrder) => labOrder),
+      "concept"
+    );
     if (this.formValuesData["order"]) {
       labOrders = [
         ...labOrders,
@@ -151,6 +169,8 @@ export class OrderResultsRendererComponent implements OnInit {
         patientId: this.visit?.patientUuid,
       })
     );
+
+    this.updateConsultationOrder.emit();
   }
 
   onDelete(event: Event, labOrder): void {
@@ -167,7 +187,26 @@ export class OrderResultsRendererComponent implements OnInit {
           orderBy(
             flatten(
               labDepartment?.setMembers.map((setMember) => {
-                return setMember?.setMembers;
+                return setMember?.setMembers?.map((setMember) => {
+                  const availabilityMapping = (setMember?.mappings?.filter(
+                    (mapping) =>
+                      mapping?.display
+                        ?.toLowerCase()
+                        ?.indexOf("lab test availability") > -1
+                  ) || [])[0];
+                  const availability = !availabilityMapping
+                    ? true
+                    : availabilityMapping?.display
+                        ?.toLowerCase()
+                        ?.indexOf(": no") > -1
+                    ? false
+                    : true;
+                  return {
+                    ...setMember,
+                    disabled: !availability,
+                    message: "Test can not be performed on lab",
+                  };
+                });
               })
             ),
             ["name"],
@@ -181,6 +220,7 @@ export class OrderResultsRendererComponent implements OnInit {
     event: Event,
     investigationAndProceduresFormsDetails
   ): void {
+    // TODO: Add support to use system settings to determine if its lab department
     event.stopPropagation();
     this.showCommonLabTests = !this.showCommonLabTests;
     const commonLabTestsSetId =
@@ -189,11 +229,60 @@ export class OrderResultsRendererComponent implements OnInit {
       (investigationAndProceduresFormsDetails?.setMembers.filter(
         (department) => department?.name.toLowerCase().indexOf("lab") > -1
       ) || [])[0];
+    // console.log("labDepartment", labDepartment);
     const commonLabTestsSet = !labDepartment
       ? null
       : (labDepartment?.setMembers.filter(
           (member) => member?.id === commonLabTestsSetId
         ) || [])[0];
-    this.commonLabTestsFields = commonLabTestsSet?.formFields;
+    // TODO: Find a better way to handle the following process - to identify test availability
+    this.commonLabTestsFields = commonLabTestsSet?.setMembers?.map(
+      (setMember) => {
+        // console.log(setMember);
+        const availabilityMapping = (setMember?.mappings?.filter(
+          (mapping) =>
+            mapping?.display?.toLowerCase()?.indexOf("lab test availability") >
+            -1
+        ) || [])[0];
+        // console.log("availabilityMapping", availabilityMapping);
+        const availability = !availabilityMapping
+          ? true
+          : availabilityMapping?.display?.toLowerCase()?.indexOf(": no") > -1
+          ? false
+          : true;
+        return {
+          ...setMember?.formField,
+          availability: availability,
+          disabled: !availability,
+          message: "Test can not be performed on lab",
+        };
+      }
+    );
+  }
+
+  onDeleteLabTest(e: any) {
+    const dialog = this.dialog.open(DeleteConfirmationComponent, {
+      width: "600px",
+      disableClose: true,
+      data: {
+        modalTitle: "Delete Lab Test",
+        modalMessage: `Are you sure you want to delete "${e?.concept?.display}" from the lab orders list?`,
+      },
+    });
+
+    dialog.afterClosed().subscribe((data) => {
+      if (data) {
+        // this.store.dispatch(voidOrder({ order: e }));
+        let order = {
+          uuid: e?.uuid,
+          action: "DISCONTINUE",
+          location: e?.location?.uuid,
+          dateStopped: new Date(),
+          encounter: e?.encounter?.uuid,
+        };
+        this.ordersService.updateOrdersViaEncounter([order]).subscribe();
+        // console.log("==> Deleted Lab test: ", e);
+      }
+    });
   }
 }

@@ -7,10 +7,22 @@
 }
 
 .reject-button {
-  color: red;
+  color: #fff;
+  background-color: #db5454;
+  border: solid 1px #db5454;
 }
 
 .accept-button {
   background-color: #2a8fd1 !important;
   color: #fff !important;
+}
+
+.colored-button {
+  border: solid 1px rgb(80, 138, 196);
+  background-color: rgb(80, 138, 196);
+  color: #fff;
+}
+
+.sample-details-row {
+  background-color: #e2e2e245 !important;
 }

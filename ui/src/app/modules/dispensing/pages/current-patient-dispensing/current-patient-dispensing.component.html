@@ -7,7 +7,10 @@
     currentLocation: currentLocation$ | async,
     currentVisitLoadedState: currentVisitLoadedState$ | async,
     currentVisitLoadingState: currentVisitLoadingState$ | async,
-    generalMetadataConfigurations: generalMetadataConfigurations$ | async
+    generalMetadataConfigurations: generalMetadataConfigurations$ | async,
+    genericPrescriptionOrderType: genericPrescriptionOrderType$ | async,
+    genericPrescriptionEncounterType: genericPrescriptionEncounterType$ | async,
+    useGenericPrescription: useGenericPrescription$ | async
   } as params"
 >
   <button mat-button color="light" (click)="onBack($event)">
@@ -29,13 +32,8 @@
         [currentPatient]="params?.currentPatient"
       ></app-new-patient-profile>
     </div>
-
-    <div
-      class="alert alert-danger w-100 mt-2"
-      role="alert"
-      *ngIf="params?.generalMetadataConfigurations === ''"
-    >
-      Missing General iCare Metadata Configurations, Contact IT
+    <div *ngIf="errors">
+      <app-shared-error [errors]="errors"></app-shared-error>
     </div>
 
     <div
@@ -51,8 +49,39 @@
       >
         {{ params?.response?.message }}
       </p>
+      <div
+        class="border"
+        *ngIf="
+          params?.useGenericPrescription === 'true' && params?.patientVisit
+        "
+      >
+        <app-patient-generic-drug-order-list
+          [visit]="params?.patientVisit"
+          [loading]="loading"
+          [loadingError]="loadingError"
+          [actionOptions]="dispensingActionOptions"
+          [currentLocation]="params.currentLocation"
+          [currentPatient]="params?.currentPatient"
+          [genericPrescriptionOrderType]="params?.genericPrescriptionOrderType"
+          [genericPrescriptionEncounterType]="
+            params?.genericPrescriptionEncounterType
+          "
+          [useGenericPrescription]="
+            params?.useGenericPrescription === 'true' ? true : false
+          "
+          [generalMetadataConfigurations]="
+            params?.generalMetadataConfigurations
+          "
+          (orderSelectAction)="
+            onSelectAction($event, params?.patientVisit, params.currentLocation)
+          "
+          (loadPatientVisit)="getPatientVisit()"
+        ></app-patient-generic-drug-order-list>
+      </div>
+
       <div class="border" *ngIf="params?.currentVisitLoadedState">
         <app-patient-drug-order-list
+          *ngIf="params?.patientVisit"
           [visit]="params?.patientVisit"
           [loading]="loading"
           [loadingError]="loadingError"

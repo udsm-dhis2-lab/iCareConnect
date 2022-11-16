@@ -12,7 +12,7 @@ export class FilterLocationByServicePipe implements PipeTransform {
       locations.filter(
         (location) =>
           (
-            location.attributes.filter(
+            location.attributes?.filter(
               (attribute) =>
                 attribute?.attributeType?.display.toLowerCase() ===
                   "services" && !attribute?.voided
@@ -23,7 +23,7 @@ export class FilterLocationByServicePipe implements PipeTransform {
       ? locationsWithAttributeService.filter(
           (location) =>
             (
-              location.attributes.filter(
+              location?.attributes?.filter(
                 (attribute) =>
                   attribute?.attributeType?.display.toLowerCase() ==
                     "services" && attribute?.value === service.uuid

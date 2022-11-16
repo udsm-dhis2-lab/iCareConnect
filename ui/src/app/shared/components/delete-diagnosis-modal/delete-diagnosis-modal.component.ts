@@ -24,5 +24,6 @@ export class DeleteDiagnosisModalComponent implements OnInit {
   onConfirmDelete(event: Event, diagnosis): void {
     event.stopPropagation();
     this.store.dispatch(deleteDiagnosis({ uuid: diagnosis?.uuid }));
+    this.dialogRef.close();
   }
 }

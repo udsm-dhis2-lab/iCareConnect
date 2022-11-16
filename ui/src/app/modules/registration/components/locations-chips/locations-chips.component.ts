@@ -41,7 +41,8 @@ export class LocationsChipsComponent implements OnInit {
     );
     this.locations = this.locations?.filter((location) => {
       return (
-        location?.billingConcept == visitTypeConcept &&
+        //TODO: This has to be checked on as it seems different in this case
+        // location?.billingConcept !== visitTypeConcept &&
         location?.uuid !== this.currentVisit?.location?.uuid
       );
     });

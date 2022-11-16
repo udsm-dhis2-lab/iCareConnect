@@ -40,13 +40,21 @@
       />
       <mat-icon matSuffix>search</mat-icon>
     </mat-form-field>
-    <app-users-list
-      *ngIf="params?.users"
-      [users]="params?.users?.results"
-      [currentUser]="params?.currentUser"
-      (edit)="getRecord($event)"
-    ></app-users-list>
-
+    <div class="w-100" *ngIf="params?.users">
+      <lab-users-list
+        [users]="params?.users"
+        [currentUser]="params?.currentUser"
+        [pageCount]="pageCount"
+        [page]="page"
+        (edit)="getRecord($event)"
+      ></lab-users-list>
+      <div class="d-flex justify-content-end mt-2">
+        <button mat-button (click)="getUsersList($event, 'prev')">Prev</button>
+        <button mat-button class="ml-2" (click)="getUsersList($event, 'next')">
+          Next
+        </button>
+      </div>
+    </div>
     <!-- loading section -->
     <mat-progress-bar
       *ngIf="!params?.users"

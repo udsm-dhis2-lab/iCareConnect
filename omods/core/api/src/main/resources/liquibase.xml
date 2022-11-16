@@ -3043,5 +3043,73 @@
         </createTable>
     </changeSet>
 
+    <changeSet id="add_is_full_exempted_column_to_bl_discount" author="dennis-kibahila" dbms="mysql">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists columnName="is_full_exempted" tableName="bl_discount"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bl_discount" >
+            <column name="is_full_exempted" defaultValueBoolean="false" type="BOOLEAN"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="update_attachment_column_to_bl_discount" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE bl_discount MODIFY COLUMN attachment_id VARCHAR(100)
+        </sql>
+    </changeSet>
+
+    <changeSet id="add_columns_to_sample_status" author="dennis-kibahila" dbms="mysql">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists columnName="category" tableName="lb_sample_status"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="lb_sample_status" >
+            <column name="category" type="VARCHAR(30)">
+                <constraints nullable="true"></constraints>
+            </column>
+            <column name="retired" type="BOOLEAN" defaultValueBoolean="false" />
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="add_columns_to_test_allocation_status" author="dennis-kibahila" dbms="mysql">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists columnName="category" tableName="lb_test_allocation_status"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="lb_test_allocation_status" >
+            <column name="category" type="VARCHAR(30)">
+                <constraints nullable="true"></constraints>
+            </column>
+            <column name="retired" type="BOOLEAN" defaultValueBoolean="false" />
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="update_primary_key_for_st_issue_item" author="dennis-kibahila" dbms="mysql">
+
+        <sql>
+            ALTER TABLE st_issue_item DROP PRIMARY KEY, ADD PRIMARY KEY(issue_id,item_id,batch_no)
+        </sql>
+
+    </changeSet>
+
+    <changeSet id="update_status_column_to_lb_sample_status" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE lb_sample_status MODIFY COLUMN status VARCHAR(100)
+        </sql>
+    </changeSet>
+
+    <changeSet id="update_primary_key_for_st_receipt_item" author="dennis-kibahila" dbms="mysql">
+
+        <sql>
+            ALTER TABLE st_receipt_item DROP PRIMARY KEY, ADD PRIMARY KEY(receipt_id,item_id,batch_no)
+        </sql>
+
+    </changeSet>
+
+
 
 </databaseChangeLog>

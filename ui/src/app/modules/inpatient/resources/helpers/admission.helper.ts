@@ -1,4 +1,4 @@
-import * as _ from 'lodash';
+import * as _ from "lodash";
 let beds = [];
 export function getBedsFromAdmissionLocation(location, allBeds) {
   _.map(location?.childLocations, (childLocation) => {
@@ -15,7 +15,7 @@ export function getBedsFromAdmissionLocation(location, allBeds) {
       getBedsFromAdmissionLocation(childLocation, allBeds);
     }
   });
-  return _.uniqBy(beds, 'uuid');
+  return _.uniqBy(beds, "uuid");
 }
 
 function checkIfTheLocationIsAvailableOnBeds(location, locationBeds) {
@@ -42,10 +42,10 @@ export function getBedsUnderCurrentLocation(locations, currentLocationUuid) {
           ...bedsUnderCurrentLocation,
           ...location?.childLocations.map((location) => {
             const patientPerBedAttribute =
-              location.attributes && location.attributes?.length > 0
-                ? (location.attributes.filter(
+              location?.attributes && location?.attributes?.length > 0
+                ? (location?.attributes?.filter(
                     (attribute) =>
-                      attribute?.attributeType?.display === 'Patients per bed'
+                      attribute?.attributeType?.display === "Patients per bed"
                   ) || [])[0]
                 : null;
             return {
@@ -57,7 +57,7 @@ export function getBedsUnderCurrentLocation(locations, currentLocationUuid) {
             };
           }),
         ],
-        'uuid'
+        "uuid"
       );
     }
   });
@@ -82,7 +82,7 @@ export function getCabinentsUnderCurrentLocation(
     ) {
       cabinetsUnderCurrentLocation = _.uniqBy(
         [...cabinetsUnderCurrentLocation, ...location?.childLocations],
-        'uuid'
+        "uuid"
       );
     }
   });

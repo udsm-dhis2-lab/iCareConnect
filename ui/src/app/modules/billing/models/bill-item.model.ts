@@ -1,4 +1,4 @@
-import { BillItemObject } from './bill-item-object.model';
+import { BillItemObject } from "./bill-item-object.model";
 
 export class BillItem {
   constructor(private billItem: any, private bill: string) {}
@@ -21,6 +21,10 @@ export class BillItem {
 
   get amount(): number {
     return this.quantity * this.price;
+  }
+
+  get calculatedPayableAmount(): number {
+    return this.quantity * this.price - this.discount;
   }
 
   get order(): any {
@@ -63,6 +67,7 @@ export class BillItem {
       payable: this.payable,
       bill: this.bill,
       order: this.order,
+      calculatedPayableAmount: this.calculatedPayableAmount,
     };
   }
 }

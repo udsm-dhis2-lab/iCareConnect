@@ -21,6 +21,9 @@ import { DrugOrdersService } from "../../resources/order/services";
 import { MatDialog } from "@angular/material/dialog";
 import { ShortMessageConstructionComponent } from "../../dialogs";
 import { Patient } from "../../resources/patient/models/patient.model";
+import { AppState } from "src/app/store/reducers";
+import { select, Store } from "@ngrx/store";
+import { getActiveVisit } from "src/app/store/selectors/visit.selectors";
 
 @Component({
   selector: "app-table",
@@ -54,9 +57,11 @@ export class TableComponent implements OnInit {
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
   patientDrugOrdersStatuses$: Observable<any>;
+  activeVisit$: Observable<any>;
   constructor(
     private drugOrderService: DrugOrdersService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private store: Store<AppState>
   ) {}
 
   ngOnInit() {
@@ -75,6 +80,7 @@ export class TableComponent implements OnInit {
     );
 
     this.displayedColumns = this.columns.map((visitColumn) => visitColumn.id);
+    this.activeVisit$ = this.store.pipe(select(getActiveVisit));
   }
 
   ngAfterViewInit() {
@@ -103,7 +109,12 @@ export class TableComponent implements OnInit {
     });
   }
 
-  onOpenMessageConstruction(event: Event, drugOrder: any, currentPatient: Patient, generalMetadataConfigurations: any): void {
+  onOpenMessageConstruction(
+    event: Event,
+    drugOrder: any,
+    currentPatient: Patient,
+    generalMetadataConfigurations: any
+  ): void {
     event.stopPropagation();
     this.dialog.open(ShortMessageConstructionComponent, {
       width: "60%",
@@ -119,7 +130,7 @@ export class TableComponent implements OnInit {
             ")",
           drug: drugOrder?.drug?.display,
           patient: currentPatient,
-          generalMetadataConfigurations
+          generalMetadataConfigurations,
         },
       },
     });

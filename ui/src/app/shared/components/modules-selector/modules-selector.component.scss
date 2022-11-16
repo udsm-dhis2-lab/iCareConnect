@@ -66,3 +66,15 @@
   white-space: nowrap;
   overflow: hidden;
 }
+
+// My css
+::ng-deep .mat-chip-list-wrapper {
+  flex-wrap: nowrap !important;
+  overflow-x: auto;
+  mat-chip {
+    flex: 0 0 auto;
+  }
+}
+::-webkit-scrollbar {
+  height: 0;
+}

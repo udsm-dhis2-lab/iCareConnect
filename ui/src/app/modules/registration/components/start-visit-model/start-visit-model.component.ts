@@ -3,11 +3,20 @@ import { FormControl } from "@angular/forms";
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { Store } from "@ngrx/store";
 import { Observable } from "rxjs";
-import { tap } from "rxjs/operators";
+import { map, tap } from "rxjs/operators";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { Patient } from "src/app/shared/resources/patient/models/patient.model";
 import { VisitsService } from "src/app/shared/resources/visits/services";
-import { go, loadCurrentPatient } from "src/app/store/actions";
+import {
+  go,
+  loadCurrentPatient,
+  loadLocationsByTagName,
+  loadLocationsByTagNames,
+} from "src/app/store/actions";
+import {
+  clearActiveVisit,
+  clearVisits,
+} from "src/app/store/actions/visit.actions";
 import { AppState } from "src/app/store/reducers";
 import { getAllTreatmentLocations } from "src/app/store/selectors";
 import {
@@ -35,6 +44,9 @@ export class StartVisitModelComponent implements OnInit {
   currentVisitLoadedState$: Observable<boolean>;
   currentPatientVisit$: Observable<any>;
 
+  startingVisit: boolean = false;
+  errors: any[];
+
   constructor(
     private store: Store<AppState>,
     private visitService: VisitsService,
@@ -43,11 +55,19 @@ export class StartVisitModelComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) data
   ) {
     this.patient = data?.patient;
-    this.patient.person.attributes.map((attribute) => {
-        if(attribute?.display.split(" = ")[0].toLowerCase() === "phone" ){
-          this.patientPhone =  attribute.display.split(' = ')[1];
-        }
-    })
+    this.patient?.person?.attributes?.map((attribute) => {
+      if (
+        (attribute?.display?.split(" = ") || [])?.length > 0 &&
+        attribute?.display?.split(" = ")[0].toLowerCase() === "phone"
+      ) {
+        this.patientPhone = attribute?.display?.split(" = ")[1];
+      }
+    });
+    this.store.dispatch(
+      loadLocationsByTagNames({
+        tagNames: ["Treatment+Room", "Admission+Location"],
+      })
+    );
   }
 
   ngOnInit(): void {
@@ -74,6 +94,7 @@ export class StartVisitModelComponent implements OnInit {
 
   onCloseDialog(close: boolean, currentPatientVisit: any): void {
     this.dialogRef.close({ visitDetails: currentPatientVisit, close });
+    this.store.dispatch(clearActiveVisit());
   }
 
   changeTab(index): void {
@@ -87,8 +108,26 @@ export class StartVisitModelComponent implements OnInit {
     }, 200);
   }
 
-  onStartVisit(){
-    this.dialogRef.close();
-    this.store.dispatch(go({ path: ["/registration/home"] }));
+  onStartVisit() {
+    this.startingVisit = true;
+    this.store
+      .select(getActiveVisit)
+      .pipe(
+        map((response: any) => {
+          if (response?.error) {
+            this.errors = [...this.errors, response.error];
+          }
+          return response;
+        })
+      )
+      .subscribe((response) => {
+        if (response) {
+          this.startingVisit = false;
+          setTimeout(() => {
+            this.dialogRef.close();
+            this.store.dispatch(go({ path: ["/registration/home"] }));
+          }, 200);
+        }
+      });
   }
 }

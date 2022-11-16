@@ -48,9 +48,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr
-              *ngFor="let test of (currentSampleGroup$ | async)['setMembers']"
-            >
+            <tr *ngFor="let test of (currentSampleGroup$ | async)?.setMembers">
               <td>
                 {{ test["name"] }}
                 <mat-progress-bar

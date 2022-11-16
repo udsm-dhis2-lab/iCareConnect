@@ -69,7 +69,8 @@ p {
   font-weight: bold;
 }
 
-.table-roles {
+.table-roles,
+.table-locations {
   height: 400px;
   max-width: 100%;
   overflow: auto;
@@ -117,4 +118,3 @@ th {
     transform: rotate(359deg);
   }
 }
-

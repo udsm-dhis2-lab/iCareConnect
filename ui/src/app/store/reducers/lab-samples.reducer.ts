@@ -1,4 +1,4 @@
-import { createReducer, on } from '@ngrx/store';
+import { createReducer, on } from "@ngrx/store";
 import {
   addFormattedLabSamples,
   addReloadedLabSamples,
@@ -11,18 +11,19 @@ import {
   saveTestsContainerAllocation,
   setLoadedSamples,
   setSampleStatus,
+  setSampleStatuses,
   updateLabSample,
   updateLabSamples,
   updateSample,
-} from '../actions';
+} from "../actions";
 import {
   initialLabSamplesState,
   labSamplesAdapter,
   newLabSamplesAdapter,
-} from '../states';
-import { loadedBaseState, loadingBaseState } from '../states/base.state';
+} from "../states";
+import { loadedBaseState, loadingBaseState } from "../states/base.state";
 
-import * as _ from 'lodash';
+import * as _ from "lodash";
 
 const newReducer = createReducer(
   initialLabSamplesState,
@@ -30,9 +31,12 @@ const newReducer = createReducer(
     ...state,
     ...loadingBaseState,
   })),
-  on(addFormattedLabSamples, (state, { samples }) =>
-    newLabSamplesAdapter.addMany(samples, { ...state, ...loadedBaseState })
-  ),
+  on(addFormattedLabSamples, (state, { samples }) => {
+    return newLabSamplesAdapter.addMany(samples, {
+      ...state,
+      ...loadedBaseState,
+    });
+  }),
   on(updateLabSample, (state, { sample }) =>
     newLabSamplesAdapter.updateOne(
       { id: sample?.id, changes: sample },
@@ -70,6 +74,11 @@ const newReducer = createReducer(
     })
   ),
   on(setSampleStatus, (state) => ({
+    ...state,
+    settingLabSampleStatus: true,
+    setSampleStatus: false,
+  })),
+  on(setSampleStatuses, (state) => ({
     ...state,
     settingLabSampleStatus: true,
     setSampleStatus: false,

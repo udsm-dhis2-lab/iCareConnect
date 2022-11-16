@@ -1,4 +1,4 @@
-import { ObservationObject } from './obsevation-object.model';
+import { ObservationObject } from "./obsevation-object.model";
 
 export class Observation {
   constructor(private obs) {}
@@ -46,13 +46,43 @@ export class Observation {
   }
 
   get value(): string | number {
-    return this.obs?.value.hasOwnProperty('uuid')
+    return this.obs?.value?.hasOwnProperty("uuid")
       ? this.obs?.value?.uuid
       : this.obs?.value;
   }
 
+  get valueObject(): any {
+    const valueObject = this.obs?.value?.hasOwnProperty("uuid")
+      ? this.obs?.value
+      : null;
+    return valueObject;
+  }
+
   get status(): string {
     return this.obs.status;
+  }
+
+  get obsTime(): number {
+    return new Date(this.obs.obsDatetime).getHours();
+  }
+
+  get obsDate(): any {
+    const obsDateTime = new Date(this.obs.obsDatetime);
+    return new Date(
+      obsDateTime.getFullYear() +
+        "-" +
+        obsDateTime.getMonth() +
+        "-" +
+        obsDateTime.getDate()
+    );
+  }
+
+  get conceptUuid(): string {
+    return this.obs?.concept?.uuid;
+  }
+
+  get provider(): any {
+    return this.obs?.encounterProvider;
   }
 
   toJson(): ObservationObject {
@@ -66,9 +96,14 @@ export class Observation {
       valueCodedName: this.valueCodedName,
       location: this.location,
       encounterUuid: this.encounterUuid,
+      obsDate: this.obsDate,
+      obsTime: this.obsTime,
       voided: this.voided,
       value: this.value,
+      valueObject: this.valueObject,
       status: this.status,
+      conceptUuid: this.conceptUuid,
+      provider: this.provider,
     };
   }
 }

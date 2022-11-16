@@ -1,10 +1,10 @@
-import { Injectable } from '@angular/core';
-import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { select, Store } from '@ngrx/store';
-import { from, of } from 'rxjs';
-import { concatMap, map, switchMap, tap, withLatestFrom } from 'rxjs/operators';
-import { ICAREForm } from 'src/app/shared/modules/form/models/form.model';
-import { FormService } from 'src/app/shared/modules/form/services';
+import { Injectable } from "@angular/core";
+import { Actions, createEffect, ofType } from "@ngrx/effects";
+import { select, Store } from "@ngrx/store";
+import { from, of } from "rxjs";
+import { concatMap, map, switchMap, tap, withLatestFrom } from "rxjs/operators";
+import { ICAREForm } from "src/app/shared/modules/form/models/form.model";
+import { FormService } from "src/app/shared/modules/form/services";
 import {
   initiateFormLoadingState,
   loadCustomOpenMRSForm,
@@ -12,16 +12,16 @@ import {
   loadForms,
   loadFormsFailed,
   upsertForms,
-} from '../actions';
-import { AppState } from '../reducers';
-import { getFormsByNames, getFormsEntities } from '../selectors/form.selectors';
+} from "../actions";
+import { AppState } from "../reducers";
+import { getFormsByNames, getFormsEntities } from "../selectors/form.selectors";
 import {
   NotificationService,
   Notification,
-} from 'src/app/shared/services/notification.service';
+} from "src/app/shared/services/notification.service";
 
-import * as _ from 'lodash';
-import { getSanitizedFormObject } from 'src/app/shared/modules/form/helpers/get-sanitized-form-object.helper';
+import * as _ from "lodash";
+import { getSanitizedFormObject } from "src/app/shared/modules/form/helpers/get-sanitized-form-object.helper";
 
 @Injectable()
 export class FormEffects {
@@ -40,8 +40,8 @@ export class FormEffects {
           if (formFromStore.length === 0) {
             this.notificationService.show(
               new Notification({
-                message: 'Loading Consultation forms',
-                type: 'LOADING',
+                message: "Loading Consultation forms",
+                type: "LOADING",
               })
             );
 
@@ -50,8 +50,8 @@ export class FormEffects {
               (forms: ICAREForm[]) => {
                 this.notificationService.show(
                   new Notification({
-                    message: 'Consultation forms successfully loaded',
-                    type: 'SUCCESS',
+                    message: "Consultation forms successfully loaded",
+                    type: "SUCCESS",
                   })
                 );
 
@@ -60,8 +60,8 @@ export class FormEffects {
               (error) => {
                 this.notificationService.show(
                   new Notification({
-                    message: 'Error loading consultation forms',
-                    type: 'ERROR',
+                    message: "Error loading consultation forms",
+                    type: "ERROR",
                   })
                 );
 
@@ -88,11 +88,12 @@ export class FormEffects {
                 _.map(formResponse?.formFields, (formField) => {
                   return getSanitizedFormObject(
                     formField?.field?.concept,
-                    formField
+                    formField,
+                    action?.causesOfDeathConcepts
                   );
                 }),
-                ['fieldNumber'],
-                ['asc']
+                ["fieldNumber"],
+                ["asc"]
               );
 
               const formattedForm = {
@@ -129,7 +130,8 @@ export class FormEffects {
                       ...formattedFormFields,
                       getSanitizedFormObject(
                         formField?.field?.concept,
-                        formField
+                        formField,
+                        action.causesOfDeathConcepts
                       ),
                     ];
                   }
@@ -142,8 +144,8 @@ export class FormEffects {
                     ...formResponse,
                     formFields: _.orderBy(
                       formattedFormFields,
-                      ['fieldNumber', 'fieldPart'],
-                      ['asc', 'asc']
+                      ["fieldNumber", "fieldPart"],
+                      ["asc", "asc"]
                     ),
                     isForm: true,
                   },

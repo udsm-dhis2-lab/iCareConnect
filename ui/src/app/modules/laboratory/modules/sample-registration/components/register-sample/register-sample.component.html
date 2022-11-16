@@ -6,7 +6,9 @@
     preferredPersonIdentifier: preferredPersonIdentifier$ | async,
     agencyConceptConfigs: agencyConceptConfigs$ | async,
     referFromFacilityVisitAttribute: referFromFacilityVisitAttribute$ | async,
-    referringDoctorAttributes: referringDoctorAttributes$ | async
+    referringDoctorAttributes: referringDoctorAttributes$ | async,
+    labNumberCharactersCount: labNumberCharactersCount$ | async,
+    testsFromExternalSystemsConfigs: testsFromExternalSystemsConfigs$ | async
   } as params"
 >
   <div class="row">
@@ -17,7 +19,9 @@
             !params?.mrnGeneratorSourceUuid ||
             !params?.preferredPersonIdentifier ||
             !params?.referringDoctorAttributes ||
-            !params?.referFromFacilityVisitAttribute
+            !params?.referFromFacilityVisitAttribute ||
+            !params?.labNumberCharactersCount ||
+            !params?.testsFromExternalSystemsConfigs
           "
           mode="indeterminate"
         ></mat-progress-bar>
@@ -26,7 +30,9 @@
             params?.mrnGeneratorSourceUuid &&
             params?.preferredPersonIdentifier &&
             params?.referringDoctorAttributes &&
-            params?.referFromFacilityVisitAttribute
+            params?.referFromFacilityVisitAttribute &&
+            params?.labNumberCharactersCount &&
+            params?.testsFromExternalSystemsConfigs
           "
           [mrnGeneratorSourceUuid]="params?.mrnGeneratorSourceUuid"
           [preferredPersonIdentifier]="params?.preferredPersonIdentifier"
@@ -35,8 +41,12 @@
           [referFromFacilityVisitAttribute]="
             params?.referFromFacilityVisitAttribute
           "
+          [labNumberCharactersCount]="params?.labNumberCharactersCount"
           [referringDoctorAttributes]="params?.referringDoctorAttributes"
           [labSections]="labSections"
+          [testsFromExternalSystemsConfigs]="
+            params?.testsFromExternalSystemsConfigs
+          "
         ></app-single-registration>
       </div>
       <!-- <div class="batch-sample-registration">

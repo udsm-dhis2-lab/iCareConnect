@@ -1,5 +1,5 @@
-import { createReducer, on } from '@ngrx/store';
-import { initialLocationsState, locationsAdapter } from '../states';
+import { createReducer, on } from "@ngrx/store";
+import { initialLocationsState, locationsAdapter } from "../states";
 import {
   loadLocationsByTagName,
   loadingLocationsFails,
@@ -11,12 +11,15 @@ import {
   loadingLocationByTagNameFails,
   clearLocations,
   updateCurrentLocationStatus,
-} from '../actions';
+  upsertLocations,
+  loadLocationByIds,
+  setAllUserAssignedLocationsLoadedState,
+} from "../actions";
 import {
   loadingBaseState,
   loadedBaseState,
   errorBaseState,
-} from '../states/base.state';
+} from "../states/base.state";
 
 const reducer = createReducer(
   initialLocationsState,
@@ -31,6 +34,7 @@ const reducer = createReducer(
       loadingByTagName: false,
       loadedByTagName: true,
       errorLoadingByTagName: null,
+      loadingLocationById: false,
     })
   ),
   on(loadingLocationsFails, (state, { error }) => ({
@@ -45,10 +49,20 @@ const reducer = createReducer(
   })),
   on(loadLocationById, (state) => ({
     ...state,
+    loadingLocationById: true,
   })),
+  on(loadLocationByIds, (state) => {
+    return {
+      ...state,
+      loadingLocationById: true,
+    };
+  }),
   on(upsertLocation, (state, { location }) =>
     locationsAdapter.upsertOne(location, { ...state })
   ),
+  on(upsertLocations, (state, { locations }) => {
+    return locationsAdapter.upsertMany(locations, { ...state });
+  }),
   on(loadLocationsByTagName, (state) => ({
     ...state,
     loadingByTagName: true,
@@ -67,7 +81,13 @@ const reducer = createReducer(
   on(updateCurrentLocationStatus, (state, { settingLocation }) => ({
     ...state,
     settingLocation,
-  }))
+  })),
+  on(setAllUserAssignedLocationsLoadedState, (state, { allLoadedState }) => {
+    return {
+      ...state,
+      allUserAssignedLocationsLoadedState: allLoadedState,
+    };
+  })
 );
 
 export function locationsReducer(state, action) {

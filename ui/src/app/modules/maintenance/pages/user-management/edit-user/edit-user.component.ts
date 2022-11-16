@@ -9,6 +9,7 @@ import { MatSnackBar } from "@angular/material/snack-bar";
 import { MatTable, MatTableDataSource } from "@angular/material/table";
 import { Router } from "@angular/router";
 import * as moment from "moment";
+import { LocationService } from "src/app/core/services";
 import { LocationGetFull, RoleCreate } from "src/app/shared/resources/openmrs";
 import {
   GlobalEventHandlersEvent,
@@ -54,10 +55,9 @@ export class EditUserComponent implements OnInit {
     { code: "M", value: "Male" },
   ];
 
-  gender: { F: string; M: string; U: string } = {
+  gender: { F: string; M: string } = {
     F: "Femaile",
     M: "Male",
-    U: "Unknown",
   };
   currentDataAvailable: RoleCreate[];
   selectedLocations: any[] = [];
@@ -72,10 +72,23 @@ export class EditUserComponent implements OnInit {
     private fb: FormBuilder,
     private router: Router,
     private service: UserService,
-    private _snackBar: MatSnackBar
+    private _snackBar: MatSnackBar,
+    private locationService: LocationService
   ) {}
 
   ngOnInit() {
+    this.locationService
+      .getLocationsByTagNames(
+        ["Treatment+Room", "Admission+Location", "Module+Location"],
+        {
+          limit: 100,
+          startIndex: 0,
+          v: "custom:(uuid,display,name)",
+        }
+      )
+      .subscribe((response) => {
+        this.locations = response;
+      });
     this.selectedUserId = this.router["currentUrlTree"].queryParams;
     if (this.selectedUserId) {
       this.service.getUserById(this.selectedUserId.id).subscribe((user) => {
@@ -94,7 +107,9 @@ export class EditUserComponent implements OnInit {
                   this.roles = roles.results;
                   this.selectedUser = user;
                   this.selectedUser.person = person;
-                const locations = user.userProperties.locations.split("'").join('"')
+                  const locations = user.userProperties.locations
+                    .split("'")
+                    .join('"');
                   for (const location of JSON.parse(locations)) {
                     this.service
                       .getLocationByUuid({ uuid: location })
@@ -474,7 +489,7 @@ export class EditUserComponent implements OnInit {
       roles: this.selectedRoles,
     };
 
-    if (this.check.value && this.passwordStrong) {
+    if (this?.check?.value && this?.passwordStrong) {
       editedUser.password = data.password;
     }
 

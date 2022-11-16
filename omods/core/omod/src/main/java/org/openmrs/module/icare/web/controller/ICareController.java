@@ -9,8 +9,13 @@
  */
 package org.openmrs.module.icare.web.controller;
 
+import com.mysql.fabric.xmlrpc.Client;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.azeckoski.reflectutils.transcoders.ObjectEncoder;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.map.util.JSONPObject;
+import org.json.JSONObject;
 import org.openmrs.*;
 import org.openmrs.api.*;
 import org.openmrs.api.context.Context;
@@ -22,6 +27,9 @@ import org.openmrs.module.icare.billing.services.insurance.ClaimResult;
 import org.openmrs.module.icare.core.ICareService;
 import org.openmrs.module.icare.core.Item;
 import org.openmrs.module.icare.core.Message;
+import org.openmrs.module.icare.core.Summary;
+import org.openmrs.module.icare.core.models.PimaCovidLabRequest;
+import org.openmrs.module.icare.core.utils.PatientWrapper;
 import org.openmrs.module.icare.core.utils.VisitWrapper;
 import org.openmrs.module.icare.store.models.OrderStatus;
 import org.openmrs.module.webservices.rest.web.RestConstants;
@@ -31,10 +39,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.naming.ConfigurationException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.text.ParseException;
+import java.util.*;
 
 /**
  * This class configured as controller using annotation and mapped with the URL of
@@ -61,6 +69,18 @@ public class ICareController {
         results.put("identifiers", ids);
         return results;
     }
+	
+	/**
+	 * Initially called after the getUsers method to get the landing form name
+	 * 
+	 * @return String form view name
+	 */
+	@RequestMapping(value = "summary", method = RequestMethod.GET)
+	@ResponseBody
+	public Map<String, Object> onGetSummary() {
+		Summary summary = iCareService.getSummary();
+		return summary.toMap();
+	}
 	
 	/**
 	 * Initially called after the getUsers method to get the landing form name
@@ -109,13 +129,30 @@ public class ICareController {
 	
 	@RequestMapping(value = "itemprice", method = RequestMethod.GET)
     @ResponseBody
-    public Map<String, Object> onGet(@RequestParam(defaultValue = "100") Integer limit, @RequestParam(defaultValue = "0") Integer startIndex, @RequestParam(required = false) String paymentType) {
-        List<Map<String, Object>> items = new ArrayList<Map<String, Object>>();
-        for (ItemPrice item : iCareService.getItemPrices(paymentType, limit, startIndex)) {
-            items.add(item.toMap());
-        }
-        Map<String, Object> results = new HashMap<>();
-        results.put("results", items);
+    public Map<String, Object> onGet(@RequestParam(defaultValue = "100") Integer limit, @RequestParam(defaultValue = "0") Integer startIndex, @RequestParam(required = false) String paymentType, @RequestParam(required = false) String visitUuid, @RequestParam(required = false) String drugUuid ) throws ConfigurationException {
+		Map<String, Object> results = new HashMap<>();
+		if (visitUuid == null && drugUuid ==null) {
+			List<Map<String, Object>> items = new ArrayList<Map<String, Object>>();
+
+
+			for (ItemPrice item : iCareService.getItemPrices(paymentType, limit, startIndex)) {
+				items.add(item.toMap());
+			}
+			results.put("results", items);
+			System.out.println("aad");
+		}
+
+		if (visitUuid != null && drugUuid !=null){
+
+			Visit visit = Context.getService(VisitService.class).getVisitByUuid(visitUuid);
+			Drug drug = Context.getService(ConceptService.class).getDrugByUuid(drugUuid);
+
+			ItemPrice item = iCareService.getItemPrice(visit,drug);
+
+			results.put("results",item.toMap());
+
+		}
+
         return results;
     }
 	
@@ -216,7 +253,10 @@ public class ICareController {
 		prescription.setQuantityUnits(conceptService.getConceptByUuid(prescription.getQuantityUnits().getUuid()));
 		//order.setNumRefills((Integer) orderObject.get("numRefills"));
 		
-		prescription.setDrug(conceptService.getDrugByUuid(prescription.getDrug().getUuid()));
+		if (prescription.getDrug().getUuid() != null) {
+			prescription.setDrug(conceptService.getDrugByUuid(prescription.getDrug().getUuid()));
+		}
+		
 		prescription.setPatient(patientService.getPatientByUuid(prescription.getPatient().getUuid()));
 		//order.setId(33009);
 		
@@ -245,6 +285,7 @@ public class ICareController {
     public Map<String, Object> getPendingVisit(@RequestParam(defaultValue = "100") Integer limit,
                                                @RequestParam(defaultValue = "0") Integer startIndex,
                                                @RequestParam(required = false) String orderTypeUuid,
+											   @RequestParam(required = false) String encounterTypeUuid,
                                                @RequestParam(required = false) String q,
                                                @RequestParam(required = false) String locationUuid,
                                                @RequestParam(required = false) OrderStatus.OrderStatusCode orderStatusCode,
@@ -252,10 +293,10 @@ public class ICareController {
                                                @RequestParam(defaultValue = "DESC") VisitWrapper.OrderByDirection orderByDirection,
                                                @RequestParam(required = false) Order.FulfillerStatus fulfillerStatus,
 											   @RequestParam(required = false) String attributeValueReference,
-											   @RequestParam(required = false) String paymentStatus
+											   @RequestParam(required = false) VisitWrapper.PaymentStatus paymentStatus
 											   ) {
 
-        List<Visit> visits = iCareService.getVisitsByOrderType(q, orderTypeUuid, locationUuid, orderStatusCode, fulfillerStatus, limit, startIndex, orderBy, orderByDirection, attributeValueReference, paymentStatus);
+        List<Visit> visits = iCareService.getVisitsByOrderType(q, orderTypeUuid, encounterTypeUuid, locationUuid, orderStatusCode, fulfillerStatus, limit, startIndex, orderBy, orderByDirection, attributeValueReference, paymentStatus);
 
         List<Map<String, Object>> responseSamplesObject = new ArrayList<Map<String, Object>>();
         for (Visit visit : visits) {
@@ -373,5 +414,237 @@ public class ICareController {
 		Map<String, Object> results = new HashMap<>();
 		results.put("results", conceptSetsList);
 		return results;
+	}
+	
+	@RequestMapping(value = "drug", method = RequestMethod.GET)
+	@ResponseBody
+	public Map<String, Object> getDrugs(@RequestParam(value = "concept", required = false) String concept, @RequestParam(defaultValue = "50") Integer limit, @RequestParam(defaultValue = "0") Integer startIndex) {
+		List<Map<String, Object>> drugsList = new ArrayList<>();
+		for (Drug drug: iCareService.getDrugs(concept, limit, startIndex)) {
+			Map<String, Object> drugMap = new HashMap<String, Object>();
+			drugMap.put("uuid", drug.getUuid());
+			drugMap.put("display", drug.getDisplayName());
+			drugMap.put("name", drug.getName());
+			drugMap.put("description", drug.getDescription());
+			drugMap.put("retired", drug.getRetired());
+			drugMap.put("strength", drug.getStrength());
+
+			Map<String, Object> conceptMap = new HashMap<String, Object>();
+			conceptMap.put("uuid",drug.getConcept().getUuid());
+			conceptMap.put("display",drug.getConcept().getDisplayString());
+			drugMap.put("concept", conceptMap);
+			drugsList.add(drugMap);
+		}
+		Map<String, Object> results = new HashMap<>();
+		results.put("results", drugsList);
+		return results;
+	}
+	
+	@RequestMapping(value ="patient", method = RequestMethod.GET)
+	@ResponseBody
+	public Map<String, Object> getPatient(@RequestParam(required = false) String search,@RequestParam(required = false) String patientUUID,@RequestParam(required = false) PatientWrapper.VisitStatus visitStatus,@RequestParam(defaultValue = "100") Integer limit,
+										  @RequestParam(defaultValue = "0") Integer startIndex,@RequestParam(defaultValue = "DESC") PatientWrapper.OrderByDirection orderByDirection){
+
+		List<PatientWrapper> patients = iCareService.getPatients(search,patientUUID,visitStatus,startIndex,limit,orderByDirection);
+
+		List<Map<String, Object>> responseSamplesObject = new ArrayList<Map<String, Object>>();
+		for (PatientWrapper patient: patients){
+
+			responseSamplesObject.add((Map<String, Object>) patient.toMap());
+
+		}
+		Map<String, Object> results = new HashMap<>();
+		results.put("results",responseSamplesObject);
+
+		return results;
+	}
+	
+	@RequestMapping(value = "patient", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public Map<String, Object> createPatient(@RequestBody Map<String, Object> patientObject) throws Exception {
+		
+		Patient patient = new Patient();
+		patient.setIdentifiers((Set<PatientIdentifier>) patientObject.get("identifiers"));
+		patient.setBirthdate((Date) patientObject.get("birthdate"));
+		patient.setAddresses((Set<PersonAddress>) patientObject.get("addresses"));
+		patient.setNames((Set<PersonName>) patientObject.get("names"));
+		patient.setDead((Boolean) patientObject.get("dead"));
+		patient.setGender((String) patientObject.get("gender"));
+		
+		patient = iCareService.savePatient(patient);
+		
+		Map<String, Object> patientcreated = new HashMap<String, Object>();
+		patientcreated.put("identifiers", patient.getIdentifiers());
+		patientcreated.put("names", patient.getNames());
+		patientcreated.put("addresses", patient.getAddresses());
+		patientcreated.put("gender", patient.getGender());
+		
+		return patientcreated;
+		
+	}
+	
+	@RequestMapping(value = "client/externalsystems", method = RequestMethod.GET)
+	@ResponseBody
+	public List<Object> getClientsFromExternalSystems(@RequestParam(value = "identifier", required = false) String identifier,
+	        @RequestParam(value = "identifierReference", required = false) String identifierReference,
+			@RequestParam(value = "basicAuth", required = false) String basicAuth) {
+//		Object patientData = new Object();
+		List<Object> formattedTrackedEntityInstances = new ArrayList<>();
+		try {
+			String patientFromExternalSystem = iCareService.getClientsFromExternalSystems(identifier, identifierReference, basicAuth);
+
+			AdministrationService administrationService = Context.getService(AdministrationService.class);
+
+//			Get Attributes for extracting attribute values
+			String firstNameAttributeUid = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.attributes.firstName");
+			String middleNameAttributeUid = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.attributes.middleName");
+			String lastNameAttributeUid = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.attributes.lastName");
+			String genderAttributeUid = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.attributes.gender");
+			String nationalityAttributeUid = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.attributes.nationality");
+			String dobAttributeUid = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.attributes.dob");
+			String passportNumberAttributeUid = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.attributes.passportNumber");
+			String phoneNumberAttributeUid = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.attributes.phoneNumber");
+			String emailAttributeUid = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.attributes.email");
+
+//			Get results stage uid
+			String resultsStageId = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.programStages.resultsStage");
+
+//			Get test request stage uid
+			String testRequestStageId = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.programStages.testRequestStage");
+
+//			patientData = (Object) patientFromExternalSystem;
+			JSONObject test = new JSONObject(patientFromExternalSystem);
+			Map trackedEntityInstancesMap = (new ObjectMapper()).readValue(patientFromExternalSystem, Map.class);
+//			patientData = trackedEntityInstancesMap.get("trackedEntityInstances");
+			if (trackedEntityInstancesMap != null && trackedEntityInstancesMap.get("trackedEntityInstances") != null) {
+				List<Object> trackedEntityInstances = (List<Object>)trackedEntityInstancesMap.get("trackedEntityInstances");
+				if (trackedEntityInstances.size() > 0) {
+					for (int count =0; count < trackedEntityInstances.size(); count++) {
+						Map<String, Object> clientFormattedData = new HashMap<>();
+						Map<String, Object> currentTrackedEntityInstance = new HashMap<>();
+						currentTrackedEntityInstance = (Map<String, Object> )trackedEntityInstances.get(count);
+						List<Object> enrollments = (List<Object>)currentTrackedEntityInstance.get("enrollments");
+						Map<String, Object> eventData = new HashMap<>();
+						Map<String, Object> currentEnrollment = (Map<String, Object> )enrollments.get(0);  // Expected to have only one enrollment
+						List<Object> events = (List<Object>)currentEnrollment.get("events");
+						eventData.put("hasResults", events.size() == 2);
+						clientFormattedData.put("events", events);
+						for (int eventCount =0; eventCount< events.size(); eventCount ++) {
+							Map<String, Object> event =(Map<String, Object>) events.get(eventCount);
+							if (event.get("programStage").equals(resultsStageId)) {
+								clientFormattedData.put("hasResults", true);
+							}
+
+							if (event.get("programStage").equals(testRequestStageId)) {
+								clientFormattedData.put("testRequestData", event);
+							}
+						}
+						clientFormattedData.put("trackedEntityInstance", currentTrackedEntityInstance.get("trackedEntityInstance"));
+						clientFormattedData.put("enrollment", currentEnrollment.get("enrollment"));
+						clientFormattedData.put("enrollmentDate", currentEnrollment.get("enrollmentDate"));
+						clientFormattedData.put("orgUnitName", currentEnrollment.get("orgUnitName"));
+						clientFormattedData.put("orgUnit", currentEnrollment.get("orgUnit"));
+						clientFormattedData.put("status", currentEnrollment.get("status"));
+						clientFormattedData.put("program", currentEnrollment.get("program"));
+						List<Object> attributes = (List<Object>) currentTrackedEntityInstance.get("attributes");
+						for (int attributeCount =0; attributeCount < attributes.size(); attributeCount ++) {
+							Map<String, Object> attribute = (Map<String, Object> )attributes.get(attributeCount);
+							if (attribute.get("attribute").equals(firstNameAttributeUid)) {
+								clientFormattedData.put("firstName",attribute.get("value"));
+							}
+							if (attribute.get("attribute").equals(middleNameAttributeUid)) {
+								clientFormattedData.put("middleName",attribute.get("value"));
+							}
+							if (attribute.get("attribute").equals(lastNameAttributeUid)) {
+								clientFormattedData.put("lastName",attribute.get("value"));
+							}
+							if (attribute.get("attribute").equals(genderAttributeUid)) {
+								clientFormattedData.put("gender",attribute.get("value"));
+							}
+							if (attribute.get("attribute").equals(nationalityAttributeUid)) {
+								clientFormattedData.put("nationality",attribute.get("value"));
+							}
+							if (attribute.get("attribute").equals(dobAttributeUid)) {
+								clientFormattedData.put("dob",attribute.get("value"));
+							}
+							if (attribute.get("attribute").equals(passportNumberAttributeUid)) {
+								clientFormattedData.put("passportNumber",attribute.get("value"));
+							}
+							if (attribute.get("attribute").equals(phoneNumberAttributeUid)) {
+								clientFormattedData.put("phoneNumber",attribute.get("value"));
+							}
+							if (attribute.get("attribute").equals(emailAttributeUid)) {
+								clientFormattedData.put("email",attribute.get("value"));
+							}
+						}
+						clientFormattedData.put("attributes", currentTrackedEntityInstance.get("attributes"));
+//				formattedTrackedEntityInstance.put("orgUnitName", (new ObjectMapper()).readValue(trackedEntityInstances[count], Map.class));
+						formattedTrackedEntityInstances.add(count,clientFormattedData);
+					}
+				}
+			}
+		}
+		catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+		catch (URISyntaxException e) {
+			throw new RuntimeException(e);
+		}
+		return formattedTrackedEntityInstances;
+	}
+	
+	@RequestMapping(value = "externalsystems/labrequest", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public String createLabRequest(@RequestBody Map<String, Object> labRequestObject) throws ParseException {
+		
+		Map<String, Object> labRequest = labRequestObject;
+		String response;
+		try {
+			response = iCareService.createPimaCovidLabRequest(labRequest, "");
+		}
+		catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+		catch (URISyntaxException e) {
+			throw new RuntimeException(e);
+		}
+		return response;
+	}
+	
+	@RequestMapping(value = "externalsystems/labresult", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public String saveLabResults(@RequestBody Map<String, Object> labResultObject) throws ParseException {
+		
+		Map<String, Object> labResult = labResultObject;
+		String response;
+		try {
+			response = iCareService.savePimaCovidLabResult(labResult);
+		}
+		catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+		catch (URISyntaxException e) {
+			throw new RuntimeException(e);
+		}
+		return response;
+	}
+	
+	@RequestMapping(value = "externalsystems/verifycredentials", method = RequestMethod.GET)
+	@ResponseBody
+	public String verifyExternalSystemCredentials(@RequestParam(value = "username", required = true) String username,
+	        @RequestParam(value = "password", required = true) String password,
+	        @RequestParam(value = "systemKey", required = true) String systemKey) throws ParseException {
+		
+		String verificationInfo = new String();
+		try {
+			verificationInfo = iCareService.verifyExternalSystemCredentials(username, password, systemKey);
+		}
+		catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+		catch (URISyntaxException e) {
+			throw new RuntimeException(e);
+		}
+		return verificationInfo;
 	}
 }

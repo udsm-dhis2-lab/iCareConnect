@@ -2,25 +2,31 @@ import { Component, Input, OnInit, Provider } from "@angular/core";
 import { FormControl } from "@angular/forms";
 import { MatDialog } from "@angular/material/dialog";
 import { select, Store } from "@ngrx/store";
-import { map } from "lodash";
 import { Observable } from "rxjs";
+import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { CreatePatientBedOrderModalComponent } from "src/app/shared/components/create-patient-bed-order-modal/create-patient-bed-order-modal.component";
 import { DischargePatientModalComponent } from "src/app/shared/components/discharge-patient-modal/discharge-patient-modal.component";
 import { TransferPatientOutsideComponent } from "src/app/shared/components/transfer-patient-outside/transfer-patient-outside.component";
 import { TransferWithinComponent } from "src/app/shared/components/transfer-within/transfer-within.component";
-import { getApplicableForms } from "src/app/shared/helpers/identify-applicable-forms.helper";
-import { ICARE_CONFIG } from "src/app/shared/resources/config";
 import { Patient } from "src/app/shared/resources/patient/models/patient.model";
 import { Visit } from "src/app/shared/resources/visits/models/visit.model";
-import { loadCustomOpenMRSForms } from "src/app/store/actions";
+import { go } from "src/app/store/actions";
 import { clearBills } from "src/app/store/actions/bill.actions";
 import { saveObservationsUsingEncounter } from "src/app/store/actions/observation.actions";
 import { AppState } from "src/app/store/reducers";
-import { getCustomOpenMRSFormsByIds } from "src/app/store/selectors/form.selectors";
+import { getCurrentLocation } from "src/app/store/selectors";
+import {
+  getCurrentUserDetails,
+  getCurrentUserPrivileges,
+} from "src/app/store/selectors/current-user.selectors";
 import {
   getGroupedObservationByConcept,
   getSavingObservationStatus,
 } from "src/app/store/selectors/observation.selectors";
+import {
+  getActiveVisit,
+  getVisitLoadingState,
+} from "src/app/store/selectors/visit.selectors";
 import {
   addBillStatusOnBedOrders,
   getCountOfUnPaidBedOrders,
@@ -54,7 +60,19 @@ export class InpatientComponent implements OnInit {
   lastBedOrder: any;
   observationsGroupedByConcept$: Observable<any>;
 
-  constructor(private store: Store<AppState>, private dialog: MatDialog) {}
+  // For shared patient dashboard
+  iCareGeneralConfigurations$: any;
+  currentUser$: Observable<any>;
+  userPrivileges$: Observable<any>;
+  loadingVisit$: Observable<any>;
+  activeVisit$: Observable<any>;
+  currentLocation$: Observable<any>;
+
+  constructor(
+    private store: Store<AppState>,
+    private dialog: MatDialog,
+    private systemSettingsService: SystemSettingsService
+  ) {}
 
   ngOnInit(): void {
     const bedOrders =
@@ -79,45 +97,6 @@ export class InpatientComponent implements OnInit {
       this.bedOrdersWithBillStatus
     );
 
-    this.applicableForms = getApplicableForms(
-      ICARE_CONFIG,
-      this.currentUser,
-      this.formPrivilegesConfigs,
-      this.userPrivileges
-    );
-
-    const locationFormsAttributes =
-      this.bedsByLocationDetails.attributes.filter(
-        (attribute) =>
-          attribute?.attributeType?.display.toLowerCase() === "forms"
-      ) || [];
-    const formsAssignedToCurrentLocation =
-      locationFormsAttributes?.length > 0
-        ? locationFormsAttributes.map((attribute) => attribute?.value)
-        : [];
-    const formUuids = map(this.applicableForms, (form) => {
-      return form?.id;
-    }).filter(
-      (formId) =>
-        formsAssignedToCurrentLocation?.length > 0 &&
-        (
-          formsAssignedToCurrentLocation.filter(
-            (assignedFormId) => assignedFormId === formId
-          ) || []
-        )?.length > 0
-    );
-    this.store.dispatch(
-      loadCustomOpenMRSForms({
-        formUuids: formUuids,
-      })
-    );
-
-    this.forms$ = this.store.select(getCustomOpenMRSFormsByIds, {
-      formUUids: map(this.applicableForms, (form) => {
-        return form?.id;
-      }),
-    });
-
     this.observations$ = this.store.select(getGroupedObservationByConcept);
     this.savingObservations$ = this.store.pipe(
       select(getSavingObservationStatus)
@@ -126,13 +105,40 @@ export class InpatientComponent implements OnInit {
     this.observationsGroupedByConcept$ = this.store.select(
       getGroupedObservationByConcept
     );
+
+    // New for shared consultation
+    this.iCareGeneralConfigurations$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        "iCare.GeneralMetadata.Configurations"
+      );
+    this.currentUser$ = this.store.select(getCurrentUserDetails);
+    this.userPrivileges$ = this.store.select(getCurrentUserPrivileges);
+    this.loadingVisit$ = this.store.pipe(select(getVisitLoadingState));
+    this.activeVisit$ = this.store.pipe(select(getActiveVisit));
+    this.currentLocation$ = this.store.select(getCurrentLocation);
+  }
+
+  onAssignBed(location, patient, provider, visit, bedOrdersWithBillStatus) {
+    this.dialog.open(AssignBedToPatientComponent, {
+      width: "70%",
+      maxHeight: "570px",
+      data: {
+        location,
+        patient,
+        provider,
+        visit,
+        bedOrdersWithBillStatus,
+      },
+      disableClose: true,
+      panelClass: "custom-dialog-container",
+    });
   }
 
   onAdmit(e, location, patient, provider, visit, bedOrdersWithBillStatus) {
     e.stopPropagation();
     this.dialog.open(AssignBedToPatientComponent, {
       width: "70%",
-      height: "570px",
+      maxHeight: "570px",
       data: {
         location,
         patient,
@@ -208,14 +214,8 @@ export class InpatientComponent implements OnInit {
     });
   }
 
-  dischargePatient(
-    event: Event,
-    visit,
-    currentPatient,
-    provider,
-    lastBedOrder
-  ) {
-    event.stopPropagation();
+  dischargePatient(event: any, visit, currentPatient, provider, lastBedOrder) {
+    console.log("--------------->", event);
     this.dialog.open(DischargePatientModalComponent, {
       width: "30%",
       data: {
@@ -223,6 +223,7 @@ export class InpatientComponent implements OnInit {
         provider,
         patient: currentPatient?.patient,
         lastBedOrder,
+        invoice: event?.invoice,
       },
     });
   }
@@ -243,5 +244,10 @@ export class InpatientComponent implements OnInit {
       .subscribe(() => {
         window.location.reload();
       });
+  }
+
+  getBackToPatientsList(event: Event): void {
+    event.stopPropagation();
+    this.store.dispatch(go({ path: ["/inpatient"] }));
   }
 }

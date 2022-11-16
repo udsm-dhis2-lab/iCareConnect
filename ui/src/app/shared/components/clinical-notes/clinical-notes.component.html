@@ -5,13 +5,20 @@
     ordersUpdates: ordersUpdates$ | async
   } as params"
 >
-  <div class="w-100 d-flex justify-content-start">
+  <div
+    class="w-100 d-flex justify-content-start"
+    *ngIf="shouldUseOwnFormSelection"
+  >
     <mat-form-field appearance="fill" class="w-100">
-      <mat-label>{{currentCustomFormName ? currentCustomFormName : 'Select forms'}}</mat-label>
+      <mat-label>{{
+        currentCustomFormName ? currentCustomFormName : "Select forms"
+      }}</mat-label>
       <mat-select [(value)]="currentCustomFormName">
-        <mat-option *ngFor="let clinicalForm of forms | searchItem: searchingText"
-        (click)="onSetClinicalForm($event, clinicalForm)">
-        {{ clinicalForm?.name }}
+        <mat-option
+          *ngFor="let clinicalForm of forms | searchItem: searchingText"
+          (click)="onSetClinicalForm($event, clinicalForm)"
+        >
+          {{ clinicalForm?.name }}
         </mat-option>
       </mat-select>
     </mat-form-field>
@@ -27,17 +34,24 @@
       [form]="currentCustomForm"
       [visit]="visit"
       [patient]="patient"
-      [observations]="clinicalObservations"
       (formDataUpdate)="onFormUpdate($event)"
     ></app-capture-form-data>
 
     <!-- buttons -->
     <div class="d-flex justify-content-end">
       <button
+        [disabled]="!atLeastOneFieldHasData"
+        mat-stroked-button
+        (click)="onClear($event, currentCustomForm)"
+      >
+        Clear
+      </button>
+      <button
         mat-flat-button
         (click)="onConfirm($event, visit)"
         color="primary"
-        [disabled]="params?.savingObservations"
+        [disabled]="params?.savingObservations || !atLeastOneFieldHasData"
+        class="ml-2"
       >
         <mat-spinner
           color="primary"

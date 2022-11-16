@@ -466,6 +466,7 @@ function mergeOrdersDetails(orders, ordersWithStatus, sample) {
                     order?.concept.hiNormal
                   )
                 : [],
+            shouldUseGeneratedNumericOptions: false,
             remarks: orderWithStatus?.remarks,
             obsUuid: orderWithStatus?.uuid,
             allValues: orderWithStatus?.allValues,

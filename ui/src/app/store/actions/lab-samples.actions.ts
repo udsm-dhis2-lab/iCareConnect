@@ -1,7 +1,7 @@
-import { createAction, props } from '@ngrx/store';
+import { createAction, props } from "@ngrx/store";
 
 export const loadLabSamplesByCollectionDates = createAction(
-  '[Lab samples] load lab samples',
+  "[Lab samples] load lab samples",
   props<{
     datesParameters: any;
     patients: any[];
@@ -10,12 +10,13 @@ export const loadLabSamplesByCollectionDates = createAction(
     containers: any;
     configs: any;
     codedSampleRejectionReasons: any;
+    startIndex?: number;
+    limit?: number;
   }>()
 );
 
-
 export const loadLabSamplesByVisit = createAction(
-  '[Lab samples] load lab samples for visit',
+  "[Lab samples] load lab samples for visit",
   props<{
     visit: string;
     sampleTypes: any;
@@ -26,49 +27,53 @@ export const loadLabSamplesByVisit = createAction(
   }>()
 );
 
-
 export const addFormattedLabSamples = createAction(
-  '[Lab samples] add loaded and formatted lab samples',
+  "[Lab samples] add loaded and formatted lab samples",
   props<{ samples: any[] }>()
 );
 
 export const setLoadedSamples = createAction(
-  '[Lab samples] set loaded lab samples',
+  "[Lab samples] set loaded lab samples",
   props<{ labSamples: any[] }>()
 );
 
 export const updateLabSample = createAction(
-  '[Lab Sample] update sample',
+  "[Lab Sample] update sample",
   props<{ sample: any }>()
 );
 
 export const updateLabSamples = createAction(
-  '[Lab Sample] update lab samples',
+  "[Lab Sample] update lab samples",
   props<{ samples: any[] }>()
 );
 
 export const collectSample = createAction(
-  '[Sample] collect sample',
+  "[Sample] collect sample",
   props<{ sampleData: any; details: any; priorityDetails: any }>()
 );
 
 export const creatingSampleFails = createAction(
-  '[Sample] creating samples works',
+  "[Sample] creating samples works",
   props<{ error: any }>()
 );
 
 export const setSampleStatus = createAction(
-  '[Sample] set sample status',
+  "[Sample] set sample status",
   props<{ status: any; details: any }>()
 );
 
+export const setSampleStatuses = createAction(
+  "[Sample] set sample statuses",
+  props<{ statuses: any; details?: any }>()
+);
+
 export const acceptSample = createAction(
-  '[Sample] accept sample',
+  "[Sample] accept sample",
   props<{ status: any; details: any }>()
 );
 
 export const setSampleStatusFails = createAction(
-  '[Sample] setting sample status fails',
+  "[Sample] setting sample status fails",
   props<{ error: any }>()
 );
 
@@ -82,12 +87,12 @@ export const setSampleStatusFails = createAction(
 // );
 
 export const saveTestsContainerAllocation = createAction(
-  '[Sample] save test container details',
+  "[Sample] save test container details",
   props<{ orders: any; sampleDetails: any }>()
 );
 
 export const saveLabTestResults = createAction(
-  '[Sample] save lab results',
+  "[Sample] save lab results",
   props<{
     results: any;
     comments: any;
@@ -98,7 +103,7 @@ export const saveLabTestResults = createAction(
 );
 
 export const saveLabTestResultsStatus = createAction(
-  '[Sample] save lab results status',
+  "[Sample] save lab results status",
   props<{
     resultsStatus: any;
     sampleDetails: any;
@@ -108,15 +113,15 @@ export const saveLabTestResultsStatus = createAction(
 );
 
 export const markSampleAsToRecollect = createAction(
-  '[Sample] save lab results status',
+  "[Sample] save lab results status",
   props<{ reCollectStatus: any; sampleDetails: any }>()
 );
 
 export const clearLoadedLabSamples = createAction(
-  '[Samples] clear loaded lab samples'
+  "[Samples] clear loaded lab samples"
 );
 
 export const addReloadedLabSamples = createAction(
-  '[Samples] add new loaded samples',
+  "[Samples] add new loaded samples",
   props<{ newSamples: any }>()
 );

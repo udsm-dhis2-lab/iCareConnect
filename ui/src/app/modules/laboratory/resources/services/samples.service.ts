@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { Observable, of } from "rxjs";
+import { Observable, of, zip } from "rxjs";
 import { OpenmrsHttpClientService } from "src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service";
 import { Api } from "src/app/shared/resources/openmrs";
 import { SampleObject, SampleIdentifier } from "../models";
@@ -327,7 +327,7 @@ export class SamplesService {
             _.map(patient?.identifiers, (identifier) => {
               if (identifier?.name == "MRN" || identifier?.display == "MRN") {
                 mrNo = identifier?.id;
-              } else if (identifier?.display.indexOf("MRN") > -1) {
+              } else if (identifier?.display?.indexOf("MRN") > -1) {
                 mrNo = identifier?.identifier;
               }
             });
@@ -351,6 +351,7 @@ export class SamplesService {
       },
       remarks: statusDetails.comments ? statusDetails.comments : "",
       status: statusDetails?.status,
+      category: statusDetails?.category,
     };
 
     return this.httpClientService.post("lab/samplestatus", data);
@@ -394,5 +395,40 @@ export class SamplesService {
 
   saveResultsForLabTest(resultsDetails): Observable<any> {
     return this.httpClientService.post("lab/results", resultsDetails);
+  }
+
+  getAggregatedSamplesByDifferentStatuses(
+    statusCategories: string[],
+    startDate?: any,
+    endDate?: any
+  ): Observable<any[]> {
+    // category = category ? `?sampleCategory=${category}` : "";
+
+    return zip(
+      ...statusCategories.map((statusCategory) => {
+        const category = statusCategory
+          ? `?sampleCategory=${statusCategory}`
+          : "";
+        const dates =
+          startDate && endDate && category.length > 0
+            ? `&startDate=${startDate}&endDate=${endDate}`
+            : startDate && endDate && category.length === 0
+            ? `?startDate=${startDate}&endDate=${endDate}`
+            : "";
+        return this.httpClientService.get(`lab/sample${category}${dates}`).pipe(
+          map((response) => {
+            return {
+              category: statusCategory,
+              samplesCount: response?.length,
+              samples: response,
+            };
+          })
+        );
+      })
+    ).pipe(
+      map((response) => {
+        return response;
+      })
+    );
   }
 }

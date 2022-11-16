@@ -8,13 +8,13 @@ import {
 } from "@angular/core";
 import { Store } from "@ngrx/store";
 import { Observable, of } from "rxjs";
-import { take, tap } from "rxjs/operators";
+import { map, tap } from "rxjs/operators";
 import { AppState } from "src/app/store/reducers";
 import { Patient } from "../../resources/patient/models/patient.model";
 import { Visit } from "../../resources/visits/models/visit.model";
 import { VisitsService } from "../../resources/visits/services";
 
-import { map, uniq } from "lodash";
+import { uniq } from "lodash";
 import {
   clearActiveVisit,
   upsertAdmittedPatientLocation,
@@ -24,7 +24,7 @@ import { clearBills } from "src/app/store/actions/bill.actions";
 import { clearBillItems } from "src/app/store/actions/bill-item.actions";
 import { PatientListDialogComponent } from "../../dialogs";
 import { MatDialog } from "@angular/material/dialog";
-import { go } from "src/app/store/actions";
+import { addCurrentPatient, go } from "src/app/store/actions";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 
 @Component({
@@ -47,9 +47,12 @@ export class PatientListComponent implements OnInit, OnChanges {
   @Input() filterCategory: string;
   @Input() orderBy: string;
   @Input() orderByDirection: string;
+  @Input() doNotUseLocation: boolean;
+  @Input() encounterType: string;
 
   page: number = 0;
   visits$: Observable<Visit[]>;
+  filteredVisits$: Observable<Visit[]>;
   searchTerm: string;
   loadingPatients: boolean;
   locationsUuids: string[] = [];
@@ -60,6 +63,9 @@ export class PatientListComponent implements OnInit, OnChanges {
   @Output() selectPatient = new EventEmitter<any>();
   visitAttributeType: any;
   paymentType: any;
+  filterBy: any;
+  startingIndex: number = 0;
+  errors: any[] = [];
   constructor(
     private visitService: VisitsService,
     private store: Store<AppState>,
@@ -72,50 +78,30 @@ export class PatientListComponent implements OnInit, OnChanges {
   ngOnChanges() {}
 
   ngOnInit() {
-
-    this.filters$ = this.systemSettingsService.getSystemSettingsMatchingAKey(
-      "iCare.filters." + (this.filterCategory ? this.filterCategory : "")
-    );
+    this.filters$ = this.systemSettingsService
+      .getSystemSettingsMatchingAKey(
+        "iCare.filters." + (this.filterCategory ? this.filterCategory : "")
+      )
+      .pipe(
+        tap((response: any) => {
+          this.loadingPatients = false;
+          if (response?.error) {
+            this.errors = [...this.errors, response?.error];
+          }
+        })
+      );
     if (this.defaultFilter) {
       this.paymentTypeSelected = this.defaultFilter;
     }
     this.itemsPerPage = this.itemsPerPage ? this.itemsPerPage : 10;
     this.getVisits(this.visits);
-
-    /**
-     * TODO: find the best place to put this
-     */
-    this.visits$.pipe(take(1)).subscribe((visits) => {
-      map(visits, (visit) => {
-        if ( visit["visit"]?.location?.tags.some(
-            (tag) => tag?.name === "Bed Location"
-          )){
-          this.store.dispatch(
-            upsertAdmittedPatientLocation({
-              locationVisitDetails: {
-                id: visit["visit"]?.location?.uuid,
-                locationId: visit["visit"]?.location?.uuid,
-                ...visit["visit"],
-              },
-            })
-          );
-        } else {
-          this.store.dispatch(
-            upsertAdmittedPatientLocation({
-              locationVisitDetails: {},
-            })
-          );
-        }
-        this.store.dispatch(clearActiveVisit());
-      });
-    });
   }
 
   private getVisits(visits: Visit[]) {
     this.loadingPatients = true;
     this.visits$ = visits
-    ? of(visits)
-    : this.service && this.service === "LABS"
+      ? of(visits)
+      : this.service && this.service === "LABS"
       ? this.visitService.getLabVisits("", 0, this.itemsPerPage).pipe(
           tap(() => {
             this.loadingPatients = false;
@@ -123,24 +109,28 @@ export class PatientListComponent implements OnInit, OnChanges {
         )
       : this.visitService
           .getAllVisits(
-            this.currentLocation,
+            !this.doNotUseLocation ? this.currentLocation : null,
             false,
             false,
             null,
-            0,
+            this.startingIndex,
             this.itemsPerPage,
             this.orderType,
             this.orderStatus,
             this.orderStatusCode,
-            this.orderBy ? this.orderBy: "ENCOUNTER",
-            this.orderByDirection ? this.orderByDirection : "ASC"
-            )
+            this.orderBy ? this.orderBy : "ENCOUNTER",
+            this.orderByDirection ? this.orderByDirection : "ASC",
+            this.filterBy ? this.filterBy : "",
+            this.encounterType
+          )
           .pipe(
-            tap(() => {
+            tap((response: any) => {
               this.loadingPatients = false;
+              if (response?.error) {
+                this.errors = [...this.errors, response?.error];
+              }
             })
           );
-    
   }
 
   getAnotherList(event: Event, visit, type): void {
@@ -155,6 +145,11 @@ export class PatientListComponent implements OnInit, OnChanges {
     this.loadingPatients = true;
     this.page =
       details?.type === "next" ? Number(this.page) + 1 : Number(this.page) - 1;
+
+    this.startingIndex =
+      details?.type === "next"
+        ? this.startingIndex + Number(this.itemsPerPage)
+        : this.startingIndex - Number(this.itemsPerPage);
 
     this.visits$ =
       this.service && this.service === "LABS"
@@ -173,17 +168,22 @@ export class PatientListComponent implements OnInit, OnChanges {
                 ? (details.visit?.pager.filter(
                     (pageLink) => pageLink?.rel === details?.type
                   ) || [])[0]?.uri?.split("&startIndex=")[1]
-                : 0,
+                : this.startingIndex,
               this.itemsPerPage,
-              null,
-              null,
-              null,
-              "ENCOUNTER",
-              "ASC"
+              this.orderType,
+              this.orderStatus,
+              this.orderStatusCode,
+              this.orderBy ? this.orderBy : "ENCOUNTER",
+              this.orderByDirection ? this.orderByDirection : "ASC",
+              this.filterBy,
+              this.encounterType
             )
             .pipe(
-              tap(() => {
+              tap((response: any) => {
                 this.loadingPatients = false;
+                if (response?.error) {
+                  this.errors = [...this.errors, response?.error];
+                }
               })
             );
   }
@@ -200,15 +200,20 @@ export class PatientListComponent implements OnInit, OnChanges {
         this.searchTerm,
         0,
         this.itemsPerPage,
-        null,
-        null,
-        null,
-        "ENCOUNTER",
-        "ASC"
+        this.orderType,
+        this.orderStatus,
+        this.orderStatusCode,
+        this.orderBy ? this.orderBy : "ENCOUNTER",
+        this.orderByDirection ? this.orderByDirection : "ASC",
+        this.filterBy ? this.filterBy : "",
+        this.encounterType
       )
       .pipe(
-        tap(() => {
+        tap((response: any) => {
           this.loadingPatients = false;
+          if (response?.error) {
+            this.errors = [...this.errors, ...response?.error];
+          }
         })
       );
   }
@@ -249,9 +254,8 @@ export class PatientListComponent implements OnInit, OnChanges {
       this.paymentTypeSelected =
         event && event.paymentType && event.paymentType.display
           ? event.paymentType.display
-          : "" ;
+          : "";
     }, 100);
-
   }
 
   onSearchAllPatient(event: Event) {
@@ -269,22 +273,44 @@ export class PatientListComponent implements OnInit, OnChanges {
           this.store.dispatch(clearBills());
           this.store.dispatch(clearBillItems());
           this.selectPatient.emit(response?.patient);
-          // this.store.dispatch(
-          //   addCurrentPatient({
-          //     patient: response?.patient,
-          //     isRegistrationPage: this.isRegistrationPage,
-          //   })
-          // );
+          this.store.dispatch(
+            addCurrentPatient({
+              patient: response?.patient,
+              isRegistrationPage: this.isRegistrationPage,
+            })
+          );
         }
       });
   }
 
-  filterPatientList(event: any){
-    this.visitAttributeType = event.visitAttributeType.value;
-    this.paymentType = event.paymentType.uuid;
+  filterPatientList(event: any) {
+    this.loadingPatients = true;
 
-    // console.log(
-    //   `filterValue: ${this.visitAttributeType}==>${this.paymentType}`
-    // );
+    this.filterBy = event && typeof event === "string" ? event : "";
+
+    this.visits$ = this.visitService
+      .getAllVisits(
+        this.currentLocation,
+        false,
+        false,
+        null,
+        0,
+        this.itemsPerPage,
+        this.orderType,
+        this.orderStatus,
+        this.orderStatusCode,
+        this.orderBy ? this.orderBy : "ENCOUNTER",
+        this.orderByDirection ? this.orderByDirection : "ASC",
+        this.filterBy,
+        this.encounterType
+      )
+      .pipe(
+        tap((response: any) => {
+          this.loadingPatients = false;
+          if (response?.error) {
+            this.errors = [...this.errors, response?.error];
+          }
+        })
+      );
   }
 }
