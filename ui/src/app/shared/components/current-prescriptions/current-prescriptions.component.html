@@ -1,0 +1,53 @@
+<div
+  [ngClass]="drugsPrescribed.length > 0 ? 'current-prescriptions' : ''"
+  *ngIf="{ specificDrugConceptUuid: specificDrugConceptUuid$ | async } as params"
+>
+  <div *ngIf="errors.length > 0">
+    <app-shared-error [errors]="errors"></app-shared-error>
+  </div>
+  <table class="table table-bordered table-striped">
+    <ng-container
+      *ngIf="drugsPrescribed.length > 0 && params?.specificDrugConceptUuid"
+    >
+      <thead>
+        <tr>
+          <th>S/N</th>
+          <th>Drug Name</th>
+          <th>Description</th>
+          <th>IPD/OPD</th>
+          <th>Date Ordered</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let drug of drugsPrescribed; let index = index">
+          <td>{{ index + 1 }}</td>
+          <td>
+            {{ drug.obs[params?.specificDrugConceptUuid] ? drug.obs[params?.specificDrugConceptUuid]?.comment : drug?.display }}
+          </td>
+          <td>
+              <span *ngFor="let instruction of drug?.formulatedDescription; let instructonIndex=index">
+               {{ instructonIndex + 1 }}. {{ instruction?.concept?.display }} - {{ instruction?.value?.display ? instruction?.value?.display : instruction?.value }} <br>
+              </span>
+          </td>
+          <td>{{ drug.careSetting.display }}</td>
+          <td>{{ drug.dateActivated | date: "short" }}</td>
+          <td *ngIf="fromClinic">
+            <button
+              (click)="stopDrugOrder($event, drug, drug.obs[params?.specificDrugConceptUuid]?.comment)"
+              class="btn btn-text btn-outline-danger pb-2"
+            >
+              <mat-icon class="icon">not_interested</mat-icon> Stop
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </ng-container>
+    <ng-container *ngIf="drugsPrescribed.length === 0">
+      <tbody>
+        <tr class="text-center p-3">
+          No Doctor's Prescriptions Yet
+        </tr>
+      </tbody>
+    </ng-container>
+  </table>
+</div>

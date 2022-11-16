@@ -40,57 +40,79 @@ export const { selectEntities: getLocationEntities, selectAll: getLocations } =
 export const getStoreLocations = createSelector(
   getLocations,
   (locations: Location[]) => {
-    return _.filter(locations, (location) => {
-      if (
-        (
-          _.filter(
-            location?.tags,
-            (tag) =>
-              tag?.display.toLowerCase() === "main store" ||
-              tag?.display.toLowerCase() === "sub store"
-          ) || []
-        )?.length > 0
-      ) {
-        return location;
+    return _.filter(
+      locations?.filter((location: any) => !location?.retired),
+      (location) => {
+        if (
+          (
+            _.filter(
+              location?.tags,
+              (tag) => tag?.display?.toLowerCase() === "store"
+            ) || []
+          )?.length > 0
+        ) {
+          return location;
+        }
       }
-    });
+    );
+  }
+);
+
+export const getModuleLocations = createSelector(
+  getLocations,
+  (locations: Location[]) => {
+    return _.filter(
+      locations?.filter((location: any) => !location?.retired),
+      (location) => {
+        if (
+          (
+            _.filter(
+              location?.tags,
+              (tag) => tag?.display?.toLowerCase() === "module location"
+            ) || []
+          )?.length > 0
+        ) {
+          return location;
+        }
+      }
+    );
   }
 );
 
 export const getParentLocation = createSelector(
   getLocations,
   (locations: Location[]) => {
-
-    const allParentLocations =
-      _.filter(locations, { parentLocation: null }) || [];
-
-    const mainLocation =
-      allParentLocations && allParentLocations.length > 1
-        ? (allParentLocations.filter(
-            (location) =>
-              (
-                location?.tags.filter(
-                  (tag) => tag?.display.toLowerCase() === "main location"
-                ) || []
-              ).length > 0
-          ) || [])[0]
-        : allParentLocations && allParentLocations?.length == 1
-        ? allParentLocations[0]
-        : {
-            name: "",
-            description: "",
-            id: "iCare-udsm",
-          };
-    return mainLocation;
+    return (locations?.filter(
+      (location) =>
+        (
+          location?.tags?.filter(
+            (tag) => tag?.display?.toLowerCase() === "login location"
+          ) || []
+        ).length > 0
+    ) || [])[0];
   }
+);
+
+export const loadingLocationsByIdState = createSelector(
+  getLocationsState,
+  (locationsState: LocationsState) => locationsState?.loadingLocationById
 );
 
 export const getParentLocationTree = createSelector(
   getLocations,
   (locations: Location[]) => {
-    return _.filter(locations, { parentLocation: null }) &&
-      _.filter(locations, { parentLocation: null }).length > 0
-      ? _.filter(locations, { parentLocation: null })
+    return _.filter(
+      locations?.filter((location: any) => !location?.retired),
+      { parentLocation: null }
+    ) &&
+      _.filter(
+        locations?.filter((location: any) => !location?.retired),
+        { parentLocation: null }
+      ).length > 0
+      ? _.filter(
+          locations?.filter((location: any) => !location?.retired),
+          { parentLocation: null }
+        )
       : null;
   }
 );
@@ -100,10 +122,10 @@ export const getChildLocationsOfTheFirstLevelParentLocation = createSelector(
   (locations: Location[]) =>
     _.filter(locations, (location) => {
       if (
-        location.parentLocation &&
+        location?.parentLocation &&
         (
-          location.tags.filter(
-            (tag) => tag?.display.toLowerCase() === "login location"
+          location?.tags?.filter(
+            (tag) => tag?.display?.toLowerCase() === "login location"
           ) || []
         )?.length > 0
       ) {
@@ -111,7 +133,7 @@ export const getChildLocationsOfTheFirstLevelParentLocation = createSelector(
           ...location,
           attributes:
             location?.attributes && location?.attributes?.length > 0
-              ? location?.attributes.filter((attribute) => !attribute?.voided)
+              ? location?.attributes?.filter((attribute) => !attribute?.voided)
               : [],
         };
       }
@@ -124,10 +146,12 @@ export const getCurrentLocation = createSelector(
     const formsAttributes =
       state.currentUserCurrentLocation &&
       state.currentUserCurrentLocation?.attributes
-        ? state.currentUserCurrentLocation.attributes.filter(
+        ? state.currentUserCurrentLocation.attributes?.filter(
             (attribute) => attribute?.attributeType?.display === "Forms"
           ) || []
         : [];
+
+    // console.log(state.currentUserCurrentLocation);
     const localStoredLocation = localStorage.getItem("currentLocation");
     const location = state.currentUserCurrentLocation
       ? state.currentUserCurrentLocation
@@ -142,7 +166,7 @@ export const getCurrentLocation = createSelector(
       minorProcedureLocation: location
         ? location &&
           (
-            location.tags.filter(
+            location?.tags?.filter(
               (tag) => tag?.display === "Minor Procedure Location"
             ) || []
           )?.length > 0
@@ -153,6 +177,16 @@ export const getCurrentLocation = createSelector(
               return attribute?.value;
             })
           : [],
+      isMainStore:
+        location?.tags?.length > 0
+          ? (
+              location?.tags?.filter(
+                (tag) =>
+                  tag?.display?.toLowerCase() === "main store" ||
+                  tag?.display?.toLowerCase()?.indexOf("main store") > -1
+              ) || []
+            )?.length > 0
+          : false,
     };
   }
 );
@@ -164,57 +198,70 @@ export const getLocationLoadingStatus = createSelector(
 
 export const getIfCurrentLocationIsMainStore = createSelector(
   getLocationsState,
-  (state: LocationsState) =>
-    state.currentUserCurrentLocation &&
-    state.currentUserCurrentLocation?.tags &&
-    (
-      state.currentUserCurrentLocation.tags.filter(
-        (tag) => tag?.display.toLowerCase() === "main store"
-      ) || []
-    )?.length > 0
+  getCurrentLocation,
+  (state: LocationsState, currentLocation) => {
+    return currentLocation &&
+      currentLocation?.tags &&
+      (
+        currentLocation?.tags?.filter(
+          (tag) => tag?.display?.toLowerCase() === "main store"
+        ) || []
+      )?.length > 0
+      ? true
+      : false;
+  }
 );
 
 export const getAllTreatmentLocations = createSelector(
   getLocations,
   (locations: Location[]) => {
-    return _.filter(locations, (location) => {
-      // Remove voided attributes
-      const formattedLocation = {
-        ...location,
-        attributes:
-          location?.attributes.filter((attribute) => !attribute?.voided) || [],
-      };
-      if (
-        (_.filter(formattedLocation?.tags, { display: "Treatment Room" }) || [])
-          ?.length > 0
-      ) {
-        const matchedBillingConceptConfigurations =
-          (formattedLocation?.attributes.filter(
-            (attribute) =>
-              attribute?.attributeType?.display.toLowerCase() ===
-              "billing concept"
-          ) || [])[0];
-        return {
-          ...formattedLocation,
-          billingConcept: matchedBillingConceptConfigurations
-            ? matchedBillingConceptConfigurations?.value
-            : null,
+    return _.filter(
+      locations?.filter((location: any) => !location?.retired),
+      (location) => {
+        // Remove voided attributes
+        const formattedLocation = {
+          ...location,
+          attributes:
+            location?.attributes?.filter((attribute) => !attribute?.voided) ||
+            [],
         };
+        if (
+          (
+            _.filter(formattedLocation?.tags, { display: "Treatment Room" }) ||
+            []
+          )?.length > 0
+        ) {
+          const matchedBillingConceptConfigurations =
+            (formattedLocation?.attributes?.filter(
+              (attribute) =>
+                attribute?.attributeType?.display?.toLowerCase() ===
+                "billing concept"
+            ) || [])[0];
+          return {
+            ...formattedLocation,
+            billingConcept: matchedBillingConceptConfigurations
+              ? matchedBillingConceptConfigurations?.value
+              : null,
+          };
+        }
       }
-    });
+    );
   }
 );
 
 export const getLocationById = createSelector(
   getLocations,
   (locations: Location[], props) =>
-    (_.filter(locations, { id: props?.id }) || [])[0]
+    (_.filter(locations, { id: props?.id, retired: false }) || [])[0]
 );
 
 export const getBedsGroupedByTheCurrentLocationChildren = createSelector(
   getLocations,
   (locations: Location[], props) => {
-    const currentLocation = (_.filter(locations, { id: props?.id }) || [])[0];
+    const currentLocation = (_.filter(locations, {
+      id: props?.id,
+      retired: false,
+    }) || [])[0];
 
     if (currentLocation?.areChildLocationsBeds) {
       return currentLocation;
@@ -225,16 +272,21 @@ export const getBedsGroupedByTheCurrentLocationChildren = createSelector(
         childLocations: [],
       };
       let beds = [];
-      _.map(currentLocation?.childLocations, (childLocation, index) => {
-        let ward = {
-          ...childLocation,
-          childLocations: getBedsUnderCurrentLocation(
-            locations,
-            childLocation?.uuid
-          ),
-        };
-        beds = [...beds, ward];
-      });
+      _.map(
+        currentLocation?.childLocations?.filter(
+          (location) => !location?.retired
+        ),
+        (childLocation, index) => {
+          let ward = {
+            ...childLocation,
+            childLocations: getBedsUnderCurrentLocation(
+              locations,
+              childLocation?.uuid
+            ),
+          };
+          beds = [...beds, ward];
+        }
+      );
       formattedCurrentLocation.childLocations = beds;
       return formattedCurrentLocation;
     }
@@ -244,7 +296,10 @@ export const getBedsGroupedByTheCurrentLocationChildren = createSelector(
 export const getCabinetsGroupedByTheCurrentLocationChildren = createSelector(
   getLocations,
   (locations: Location[], props) => {
-    const currentLocation = (_.filter(locations, { id: props?.id }) || [])[0];
+    const currentLocation = (_.filter(locations, {
+      id: props?.id,
+      retired: false,
+    }) || [])[0];
 
     if (currentLocation?.areChildLocationsCabinets) {
       return currentLocation;
@@ -255,35 +310,45 @@ export const getCabinetsGroupedByTheCurrentLocationChildren = createSelector(
         childLocations: [],
       };
       let cabinets = [];
-      _.map(currentLocation?.childLocations, (childLocation, index) => {
-        let cabinet = {
-          ...childLocation,
-          childLocations: getCabinentsUnderCurrentLocation(
-            locations,
-            childLocation?.uuid
-          ),
-        };
-        cabinets = [...cabinets, cabinet];
-      });
+      _.map(
+        currentLocation?.childLocations?.filter(
+          (location) => !location?.retired
+        ),
+        (childLocation, index) => {
+          let cabinet = {
+            ...childLocation,
+            childLocations: getCabinentsUnderCurrentLocation(
+              locations,
+              childLocation?.uuid
+            ),
+          };
+          cabinets = [...cabinets, cabinet];
+        }
+      );
       formattedCurrentLocation.childLocations = cabinets;
       return formattedCurrentLocation;
     }
   }
 );
 
+export const getUserAssignedLocationsLoadedState = createSelector(
+  getLocationsState,
+  (state: LocationsState) => state.allUserAssignedLocationsLoadedState
+);
+
 function getChildLocationMembers(childLocations, locations) {
   if (childLocations?.length === 0) {
     return [];
   }
-  return childLocations.map((location) => {
-    const currentLocation = (locations.filter(
-      (loc) => loc.uuid === location.uuid
+  return childLocations?.map((location) => {
+    const currentLocation = (locations?.filter(
+      (loc) => loc?.uuid === location?.uuid && !loc?.retired
     ) || [])[0];
     const patientPerBedAttribute =
       currentLocation &&
-      currentLocation.attributes &&
-      currentLocation.attributes?.length > 0
-        ? (currentLocation.attributes.filter(
+      currentLocation?.attributes &&
+      currentLocation?.attributes?.length > 0
+        ? (currentLocation?.attributes?.filter(
             (attribute) =>
               attribute?.attributeType?.display === "Patients per bed"
           ) || [])[0]
@@ -298,7 +363,7 @@ function getChildLocationMembers(childLocations, locations) {
         currentLocation &&
         currentLocation?.tags &&
         (
-          currentLocation.tags.filter(
+          currentLocation?.tags.filter(
             (tag) => tag?.display === "Bed Location"
           ) || []
         )?.length > 0,
@@ -313,7 +378,7 @@ export const getAllLocationsUnderWardAsFlatArray = createSelector(
   getLocations,
   (locations: Location[], props) => {
     let currentLocation = (locations.filter(
-      (location) => location?.uuid === props?.id
+      (location: any) => location?.uuid === props?.id && !location?.retired
     ) || [])[0];
     if (!currentLocation) {
       return [];
@@ -323,7 +388,7 @@ export const getAllLocationsUnderWardAsFlatArray = createSelector(
       currentLocation &&
       currentLocation.attributes &&
       currentLocation.attributes?.length > 0
-        ? (currentLocation.attributes.filter(
+        ? (currentLocation?.attributes?.filter(
             (attribute) =>
               attribute?.attributeType?.display === "Patients per bed"
           ) || [])[0]
@@ -339,7 +404,7 @@ export const getAllLocationsUnderWardAsFlatArray = createSelector(
         currentLocation &&
         currentLocation?.tags &&
         (
-          currentLocation.tags.filter(
+          currentLocation?.tags?.filter(
             (tag) => tag?.display === "Bed Location"
           ) || []
         )?.length > 0,
@@ -349,7 +414,9 @@ export const getAllLocationsUnderWardAsFlatArray = createSelector(
     };
     return _.uniq([
       currentLocation?.uuid,
-      ...flattenList([formattedLocation]).map((item) => item.id),
+      ...flattenList([formattedLocation])
+        .map((item) => item.id)
+        ?.filter((uuid) => uuid),
     ]);
   }
 );
@@ -378,7 +445,8 @@ function getItems(location): string[] {
 
 export const getAllBedsUnderCurrentWard = createSelector(
   getLocations,
-  (locations: Location[], props) => {
+  getLocationEntities,
+  (locations: Location[], locationEntities, props) => {
     let currentLocation = (locations.filter(
       (location) => location?.uuid === props?.id
     ) || [])[0];
@@ -388,20 +456,25 @@ export const getAllBedsUnderCurrentWard = createSelector(
     const formattedLocation = {
       ...currentLocation,
       childMembers: getChildLocationMembers(
-        currentLocation?.childLocations,
+        (
+          currentLocation?.childLocations?.filter(
+            (location: any) => !location?.retired
+          ) || []
+        ).map((childLocation) => {
+          // console.log("CHILD", locationEntities[childLocation?.uuid]);
+          return locationEntities[childLocation?.uuid];
+        }),
         locations
       ),
       isBed:
         currentLocation &&
         currentLocation?.tags &&
         (
-          currentLocation.tags.filter(
+          currentLocation?.tags?.filter(
             (tag) => tag?.display === "Bed Location"
           ) || []
         )?.length > 0,
     };
-
-    // console.log('formattedLocation', formattedLocation);
     return formattedLocation;
     // const beds = getBedsUnderCurrentLocation(locations, props?.id);
 

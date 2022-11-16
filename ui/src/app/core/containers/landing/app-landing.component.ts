@@ -1,6 +1,5 @@
 import { Component, OnInit } from "@angular/core";
 import { Store } from "@ngrx/store";
-import * as path from "path";
 import { Observable } from "rxjs";
 import { go, loadLISConfigurations } from "src/app/store/actions";
 import { AppState } from "src/app/store/reducers";
@@ -36,7 +35,7 @@ export class LandingComponent implements OnInit {
           go({
             path: isNavigationDetailsAvailable
               ? navigationDetails?.path
-              : ["/laboratory/sample-registration"],
+              : ["/laboratory/dashboard-lab"],
           })
         );
       }

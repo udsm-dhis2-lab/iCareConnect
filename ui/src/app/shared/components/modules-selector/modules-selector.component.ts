@@ -6,7 +6,6 @@ import { Store } from "@ngrx/store";
 import { AppState } from "src/app/store/reducers";
 import {
   go,
-  loadActiveVisits,
   setCurrentUserCurrentLocation,
   updateCurrentLocationStatus,
 } from "src/app/store/actions";
@@ -22,7 +21,7 @@ export class ModulesSelectorComponent implements OnInit {
   @Input() lisConfigurations: any;
   modulesReferences: string[];
   currentModule: any;
-  currentLocation: any;
+  @Input() currentLocation: any;
   userLocationsForTheCurrentModule: Location[];
   constructor(private store: Store<AppState>) {}
 
@@ -31,40 +30,44 @@ export class ModulesSelectorComponent implements OnInit {
       localStorage.getItem("navigationDetails") != "undefined"
         ? JSON.parse(localStorage.getItem("navigationDetails"))
         : null;
-    let locationMatchingNavigationDetails = (this.locations.filter(
-      (location) =>
-        (
-          location?.modules.filter(
-            (module) =>
-              storedNavigationDetails?.path[0]?.indexOf(module?.id) > -1
-          ) || []
-        )?.length > 0
-    ) || [])[0];
-
-    localStorage.setItem(
-      "currentLocation",
-      JSON.stringify(locationMatchingNavigationDetails)
-    );
+    let locationMatchingNavigationDetails =
+      storedNavigationDetails?.path[0] !== ""
+        ? (this.locations.filter(
+            (location) =>
+              (
+                location?.modules.filter(
+                  (module) =>
+                    storedNavigationDetails?.path[0]?.indexOf(module?.id) > -1
+                ) || []
+              )?.length > 0
+          ) || [])[0]
+        : null;
 
     const storedLocation =
-      localStorage.getItem("currentLocation") != "undefined"
-        ? JSON.parse(localStorage.getItem("currentLocation"))
-        : null;
-    if (storedNavigationDetails) {
-      this.currentLocation = {
-        ...locationMatchingNavigationDetails,
-        id: locationMatchingNavigationDetails?.uuid,
-        ...this.locations.filter(
-          (loc) => loc?.uuid === storedLocation?.uuid || []
-        )[0],
-      };
+      localStorage.getItem("currentLocation") == "undefined" ||
+      !localStorage.getItem("currentLocation")
+        ? null
+        : JSON.parse(localStorage.getItem("currentLocation"));
+    if (storedNavigationDetails && locationMatchingNavigationDetails) {
+      const isStoredLocationHasModuleMatchingStoredNavigationData =
+        !storedLocation
+          ? false
+          : (
+              storedLocation?.modules?.filter(
+                (module) =>
+                  storedNavigationDetails?.path[0]?.indexOf(module?.id) > -1
+              ) || []
+            )?.length > 0;
+      this.currentLocation =
+        storedLocation && isStoredLocationHasModuleMatchingStoredNavigationData
+          ? storedLocation
+          : locationMatchingNavigationDetails;
 
-      this.store.dispatch(
-        setCurrentUserCurrentLocation({ location: this.currentLocation })
-      );
-
+      // this.store.dispatch(
+      //   setCurrentUserCurrentLocation({ location: this.currentLocation })
+      // );
       const modules = (
-        this.currentLocation.attributes.filter(
+        this.currentLocation?.attributes?.filter(
           (attribute) =>
             attribute?.attributeType?.display?.toLowerCase() === "modules" &&
             !attribute?.voided
@@ -78,8 +81,21 @@ export class ModulesSelectorComponent implements OnInit {
           location: this.currentLocation,
         };
       });
-      
+
       // Hinglight the current location
+      // console.log("modules", modules);
+      if (
+        !this.currentLocation?.modules ||
+        (this.currentLocation?.modules &&
+          this.currentLocation?.modules?.length == 0)
+      ) {
+        this.currentLocation = (this.locations?.filter(
+          (loc) => loc?.modules?.length > 0
+        ) || [])[0];
+        // this.store.dispatch(
+        //   setCurrentUserCurrentLocation({ location: this.currentLocation })
+        // );
+      }
       this.currentModule = {
         ...this.currentLocation?.modules[0],
         ...(modules.filter(
@@ -91,15 +107,19 @@ export class ModulesSelectorComponent implements OnInit {
         uniqBy(
           flatten(
             this.locations.map((location) => {
-              return location?.modules.map((module) => {
-                const matchedModules =
-                  ICARE_APPS.filter((app) => app?.id === module?.id) || [];
-                return {
-                  ...module,
-                  app: matchedModules[0],
-                  order: matchedModules[0]?.order,
-                };
-              });
+              return location?.modules
+                .map((module) => {
+                  const matchedModules =
+                    ICARE_APPS.filter((app) => app?.id === module?.id) || [];
+                  return matchedModules && matchedModules?.length > 0
+                    ? {
+                        ...module,
+                        app: matchedModules[0],
+                        order: matchedModules[0]?.order,
+                      }
+                    : null;
+                })
+                ?.filter((module) => module);
             })
           ),
           "id"
@@ -112,14 +132,16 @@ export class ModulesSelectorComponent implements OnInit {
         uniqBy(
           flatten(
             this.locations.map((location) => {
-              return location?.modules.map((module) => {
-                return {
-                  ...module,
-                  app: (orderBy(ICARE_APPS, ["order"], ["asc"]).filter(
-                    (app) => app?.id === module?.id
-                  ) || [])[0],
-                };
-              });
+              return location?.modules
+                .map((module) => {
+                  return {
+                    ...module,
+                    app: (orderBy(ICARE_APPS, ["order"], ["asc"]).filter(
+                      (app) => app?.id === module?.id
+                    ) || [])[0],
+                  };
+                })
+                ?.filter((module) => module);
             })
           ),
           "id"
@@ -138,17 +160,28 @@ export class ModulesSelectorComponent implements OnInit {
       };
     }
 
+    this.modulesReferences = orderBy(
+      this.modulesReferences.map((module: any) => {
+        return {
+          ...module,
+          order: module?.app?.order,
+        };
+      }),
+      ["order"],
+      ["asc"]
+    );
+
     this.userLocationsForTheCurrentModule =
       this.locations.filter(
-        (location) =>
+        (location: any) =>
           (
             location?.modules.filter(
               (module) => module?.id === this.currentModule?.id
             ) || []
-          ).length > 0
+          ).length > 0 && !location?.retired
       ) || [];
     this.store.dispatch(
-      setCurrentUserCurrentLocation({ location: this.currentModule?.location })
+      setCurrentUserCurrentLocation({ location: this.currentLocation })
     );
     // Get the navigation details from localstorage
     const navigationDetails = JSON.parse(
@@ -167,8 +200,9 @@ export class ModulesSelectorComponent implements OnInit {
         path: !isNavigationDetailsAvailable
           ? [
               this.currentModule?.app?.path +
-                (this.currentModule?.app?.path === "/laboratory"
-                  ? "/sample-registration"
+                (this.currentModule?.app?.path === "/laboratory" &&
+                this.lisConfigurations?.isLIS
+                  ? "/dashboard-lab"
                   : "") +
                 (this.currentModule?.app?.considerLocationRoute
                   ? "/" + this.currentLocation?.uuid
@@ -190,16 +224,15 @@ export class ModulesSelectorComponent implements OnInit {
     this.currentModule = module;
     this.userLocationsForTheCurrentModule =
       this.locations.filter(
-        (location) =>
+        (location: any) =>
           (
             location?.modules.filter(
               (module) => module?.id === this.currentModule?.id
             ) || []
-          ).length > 0
+          ).length > 0 && !location?.retired
       ) || [];
-
     this.currentLocation = this.userLocationsForTheCurrentModule[0];
-    localStorage.setItem("currentLocation", this.currentModule?.location);
+    // localStorage.setItem("currentLocation", this.currentLocation);
     this.currentLocation = {
       ...module?.location,
       id: module?.location?.uuid,

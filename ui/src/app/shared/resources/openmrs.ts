@@ -572,6 +572,8 @@ export interface EncounterUpdate {
   provider?: string;
   orders?: OrderCreate[];
   obs?: ObsCreate[];
+  void?: boolean;
+  voidReason?: string;
 }
 
 export interface AppointmentschedulingTimeslotGet {
@@ -810,6 +812,8 @@ export interface LocationGet {
   tags?: LocationtagGetRef[];
   parentLocation?: LocationGetRef;
   childLocations?: LocationGetRef[];
+  attributes?: any[];
+  forms?: any[];
 }
 
 export interface LocationGetRef {
@@ -3309,7 +3313,7 @@ export interface ConceptCreate {
   allowDecimal?: string;
   displayPrecision?: string;
   conceptClass: string;
-  descriptions?: string[];
+  descriptions?: any[];
   mappings?: string[];
 }
 

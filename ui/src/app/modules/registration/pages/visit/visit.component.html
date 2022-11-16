@@ -60,10 +60,15 @@
       </div>
 
       <!-- active visit section -->
-      <mat-card class="col-12" *ngIf="params?.activeVisit && !editMode">
+      <mat-card
+        class="col-12"
+        *ngIf="
+          params?.activeVisit && !params?.activeVisit?.stopDate && !editMode
+        "
+      >
         <h2>Patient already has active visit</h2>
         <div class="row mt-2">
-          <div class="col-3">Visit type</div>
+          <div class="col-3">Service Departments</div>
           <div class="col-9">{{ params?.activeVisit?.visitType?.name }}</div>
         </div>
         <div class="row mt-2">
@@ -152,7 +157,13 @@
       <div
         class="col-12 p-3 border"
         style="border-radius: 5px"
-        *ngIf="(!params?.activeVisit && !params?.loadingVisit) || editMode"
+        *ngIf="
+          (params?.activeVisit &&
+            params?.activeVisit?.stopDate &&
+            !params?.loadingVisit) ||
+          editMode ||
+          !params?.activeVisit
+        "
       >
         <!-- 
       {{
@@ -283,13 +294,13 @@
                       ).length > 0
                     "
                   >
-                    <mat-form-field class="w-100">
+                    <!--  <mat-form-field class="w-100">
                       <input
                         matInput
                         placeholder="Search Rooms"
                         (keyup)="searchRoom($event)"
                       />
-                    </mat-form-field>
+                    </mat-form-field> -->
                     <mat-chip-list
                       aria-label="Locations"
                       *ngIf="
@@ -372,6 +383,8 @@
                     />
                   </mat-form-field> -->
                 </div>
+
+                <!--Room Searching  -->
                 <div
                   class="w-100 rooms-status-container"
                   *ngIf="
@@ -390,13 +403,13 @@
                       ).length > 0
                     "
                   >
-                    <mat-form-field class="w-100">
+                    <!-- <mat-form-field class="w-100">
                       <input
                         matInput
                         placeholder="Search Rooms"
                         (keyup)="searchRoom($event)"
                       />
-                    </mat-form-field>
+                    </mat-form-field> -->
 
                     <mat-chip-list aria-label="Locations">
                       <mat-chip
@@ -449,6 +462,7 @@
                     <p class="text-warning">Please select service</p>
                   </div>
                 </div>
+                <!-- End Room Searching -->
               </div>
             </div>
             <!-- {{ visitDetails | json }} -->
@@ -577,6 +591,7 @@
                     <mat-label>Insurance ID</mat-label>
                     <input
                       matInput
+                      pattern="\d{12}"
                       placeholder="Enter Text"
                       [(ngModel)]="visitDetails['InsuranceID']"
                     />
@@ -700,6 +715,10 @@
                   $event,
                   'registration/edit/',
                   params?.currentPatient?.patient?.uuid
+                    ? params?.currentPatient?.patient?.uuid
+                    : params?.currentPatient && params?.currentPatient?.uuid
+                    ? params?.currentPatient?.uuid
+                    : params?.currentPatient?.person?.uuid
                 )
               "
             >

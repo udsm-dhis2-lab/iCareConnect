@@ -2,16 +2,26 @@
   *ngIf="{
     currentPatient: currentPatient$ | async,
     logo: facilityLogo$ | async,
-    facilityDetails: facilityDetails$ | async
+    facilityDetails: facilityDetails$ | async,
+    currentLocation: currentLocation$ | async,
+    provider: provider$ | async,
+    currentUser: currentUser$ | async,
+    exemptionEncounterType: exemptionEncounterType$ | async,
+    exemptionOrderType: exemptionOrderType$ | async,
+    exemptionConcept: exemptionConcept$ | async
   } as params"
 >
-  <!-- {{ params?.facilityDetails }} -->
-  <!-- | -->
-  <!-- {{ params?.logo | json}} -->
   <mat-progress-bar
     mode="indeterminate"
     *ngIf="loading || !params?.currentPatient"
   ></mat-progress-bar>
+
+  <!-- Alerts -->
+  <div *ngIf="errors.length > 0">
+    <app-shared-error [errors]="errors"></app-shared-error>
+  </div>
+  <!-- End Alerts -->
+
   <div *ngIf="patientBillingDetails$ | async as patientBillingDetails" class="">
     <ng-container>
       <div class="row mt-3">
@@ -34,7 +44,6 @@
         <div class="col-md-12 col-sm-12" *ngIf="params?.currentPatient">
           <div class="border">
             <mat-tab-group>
-
               <!-- Pending payments -->
 
               <mat-tab>
@@ -51,7 +60,7 @@
                 <div
                   *ngIf="patientBillingDetails?.bills?.length == 0"
                   class="py-4"
-                  style="text-align: center"
+                  style="text-align: center; height: 20vh"
                 >
                   No pending bills
                 </div>
@@ -63,37 +72,130 @@
                       params?.logo &&
                       params?.facilityDetails
                     "
-                    [patientBillingDetails] = "patientBillingDetails"
+                    [patientBillingDetails]="patientBillingDetails"
                     [bills]="patientBillingDetails?.bills"
+                    [exemptionOrderType]="params?.exemptionOrderType"
                     [currentPatient]="params?.currentPatient"
                     [facilityDetails]="params?.facilityDetails"
                     [logo]="params?.logo"
                     (confirmPayment)="onConfirmBillPayment($event)"
                     (billPaymentSuccess)="onPaymentSuccess()"
+                    (checkOpenExemptionRequest)="
+                      onCheckOpenExemptionRequest($event)
+                    "
                     id="quotation"
                   ></app-quotations>
                 </div>
                 <div class="row mt-3">
                   <div class="col-12">
                     <!-- Make ElementToBePrinted as an object -->
-                    <div *ngIf="patientBillingDetails?.payments.length > 0 && patientBillingDetails.bills.length > 0">
-                      <app-print-button [iconName]="'print'" [toolTipText]="'Click to print invoice and receipt in one document'"
+                    <div
+                      *ngIf="
+                        patientBillingDetails?.payments.length > 0 &&
+                        patientBillingDetails.bills.length > 0
+                      "
+                    >
+                      <app-print-button
+                        [iconName]="'print'"
+                        [toolTipText]="
+                          'Click to print invoice and receipt in one document'
+                        "
                         [showText]="'Print All'"
-                        [ElementToBePrinted]="{Payments: patientBillingDetails?.payments, Bill: patientBillingDetails.bills, CurrentPatient: params?.currentPatient, FacilityDetails: params?.facilityDetails, Logo: params?.logo}" [
-                        [classesList]="['float-right', 'button']" (print)="onPrint($event)"></app-print-button>
+                        [ElementToBePrinted]="{
+                          Payments: patientBillingDetails?.payments,
+                          Bill: patientBillingDetails.bills,
+                          CurrentPatient: params?.currentPatient,
+                          FacilityDetails: params?.facilityDetails,
+                          Logo: params?.logo
+                        }"
+                        [classesList]="['float-right', 'button']"
+                        (print)="onPrint($event)"
+                      ></app-print-button>
                     </div>
                     <div *ngIf="patientBillingDetails.bills.length > 0">
-                      <app-print-button [iconName]="'print'" [toolTipText]="'Click to print invoice'" [showText]="'Print Invoice'"
+                      <app-print-button
+                        [iconName]="'print'"
+                        [toolTipText]="'Click to print invoice'"
+                        [showText]="'Print Invoice'"
                         [classesList]="['float-right', 'button', 'mr-5']"
-                        [ElementToBePrinted]="{Bill: patientBillingDetails.bills, CurrentPatient: params?.currentPatient, FacilityDetails: params?.facilityDetails, Logo: params?.logo}"
-                        [currentPatient]="params?.currentPatient" [facilityDetails]="params?.facilityDetails" [logo]="params?.logo"
-                        (print)="onPrint($event)"></app-print-button>
+                        [ElementToBePrinted]="{
+                          Bill: patientBillingDetails.bills,
+                          CurrentPatient: params?.currentPatient,
+                          FacilityDetails: params?.facilityDetails,
+                          Logo: params?.logo
+                        }"
+                        [currentPatient]="params?.currentPatient"
+                        [facilityDetails]="params?.facilityDetails"
+                        [logo]="params?.logo"
+                        (print)="onPrint($event)"
+                      ></app-print-button>
                     </div>
-                    
+                    <div *ngIf="patientBillingDetails.bills.length > 0">
+                      <button
+                        class="float-left"
+                        mat-stroked-button
+                        [ngClass]="
+                          params?.exemptionEncounterType === 'none' ||
+                          params?.exemptionOrderType === 'none' || params?.exemptionConcept === 'none' ||
+                          hasOpenExemptionRequest
+                            ? 'button-faint'
+                            : 'button'
+                        "
+                        matTooltip="Send patient to administration for exemption"
+                        (click)="
+                          requestExemption(patientBillingDetails, params)
+                        "
+                      >
+                        Request Exemption
+                      </button>
+                    </div>
                   </div>
                 </div>
               </mat-tab>
-              
+
+              <!-- Loans / Debts -->
+              <mat-tab>
+                <ng-template mat-tab-label>
+                  <span
+                    [matBadge]="discountItemsCount"
+                    matBadgePosition="after"
+                    matBadgeOverlap="false"
+                    [matBadgeHidden]="discountItemsCount === 0"
+                    >Loans / Debts
+                  </span>
+                </ng-template>
+
+                <div
+                  *ngIf="discountItemsCount === 0"
+                  class="py-4"
+                  style="text-align: center"
+                >
+                  No Items in debt
+                </div>
+                <div>
+                  <app-discounts
+                    *ngIf="
+                      discountItemsCount > 0 &&
+                      params?.currentPatient &&
+                      params?.logo &&
+                      params?.facilityDetails
+                    "
+                    [discountItems]="discountItems"
+                    [discountItemsCount]="discountItemsCount"
+                    [currentPatient]="params?.currentPatient"
+                    [facilityDetails]="params?.facilityDetails"
+                    [isBillCleared]="isBillCleared"
+                    [logo]="params?.logo"
+                    [bill]="bill"
+                    [bills]="patientBillingDetails?.bills"
+                    (confirmPayment)="onConfirmBillPayment(event)"
+                    (billPaymentSuccess)="onPaymentSuccess()"
+                    id="exemptions"
+                  >
+                  </app-discounts>
+                </div>
+              </mat-tab>
+
               <!-- Pending Payments (Covered by Insurance) -->
               <mat-tab>
                 <ng-template mat-tab-label>
@@ -124,7 +226,6 @@
                   >
                   </app-quotations>
                 </div>
-                
               </mat-tab>
 
               <!-- Payments made -->
@@ -159,33 +260,59 @@
                     [payments]="patientBillingDetails?.payments"
                     [currentPatient]="params?.currentPatient"
                     [facilityDetails]="params?.facilityDetails"
-                    [logo]="params?.logo" id="payments"
+                    [logo]="params?.logo"
+                    id="payments"
                   ></app-payments>
                 </div>
 
                 <div class="row mt-3">
                   <div class="col-12">
                     <!-- Make ElementToBePrinted as an object -->
-                    <div *ngIf="patientBillingDetails?.payments.length > 0 && patientBillingDetails.bills.length > 0 ">
-                      <app-print-button [iconName]="'print'" [toolTipText]="'Click to print bills and receipt in one document'"
+                    <div
+                      *ngIf="
+                        patientBillingDetails?.payments.length > 0 &&
+                        patientBillingDetails.bills.length > 0
+                      "
+                    >
+                      <app-print-button
+                        [iconName]="'print'"
+                        [toolTipText]="
+                          'Click to print bills and receipt in one document'
+                        "
                         [showText]="'Print All'"
-                        [ElementToBePrinted]="{Payments: patientBillingDetails?.payments, Bill: patientBillingDetails.bills, CurrentPatient: params?.currentPatient, FacilityDetails: params?.facilityDetails, Logo: params?.logo}"
-                        [classesList]="['float-right', 'button']" (print)="onPrint($event)"></app-print-button>
+                        [ElementToBePrinted]="{
+                          Payments: patientBillingDetails?.payments,
+                          Bill: patientBillingDetails.bills,
+                          CurrentPatient: params?.currentPatient,
+                          FacilityDetails: params?.facilityDetails,
+                          Logo: params?.logo
+                        }"
+                        [classesList]="['float-right', 'button']"
+                        (print)="onPrint($event)"
+                      ></app-print-button>
                     </div>
 
                     <div *ngIf="patientBillingDetails?.payments.length > 0">
-                      <app-print-button [iconName]="'print'" [toolTipText]="'Click to print receipt'" [showText]="'Print Receipt'" [ElementToBePrinted]="{Payments: patientBillingDetails?.payments, CurrentPatient: params?.currentPatient, FacilityDetails: params?.facilityDetails, Logo: params?.logo}"
-                        [classesList]="['float-right', 'button', 'mr-5']" (print)="onPrint($event)"></app-print-button>
+                      <app-print-button
+                        [iconName]="'print'"
+                        [toolTipText]="'Click to print receipt'"
+                        [showText]="'Print Receipt'"
+                        [ElementToBePrinted]="{
+                          Payments: patientBillingDetails?.payments,
+                          CurrentPatient: params?.currentPatient,
+                          FacilityDetails: params?.facilityDetails,
+                          Logo: params?.logo
+                        }"
+                        [classesList]="['float-right', 'button', 'mr-5']"
+                        (print)="onPrint($event)"
+                      ></app-print-button>
                     </div>
-                    
                   </div>
-                  
                 </div>
               </mat-tab>
             </mat-tab-group>
           </div>
         </div>
-
       </div>
     </ng-container>
   </div>

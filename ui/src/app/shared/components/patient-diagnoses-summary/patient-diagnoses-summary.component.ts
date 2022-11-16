@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { from, Observable, of } from "rxjs";
 import { AppState } from "src/app/store/reducers";
@@ -28,6 +28,7 @@ export class PatientDiagnosesSummaryComponent implements OnInit {
   @Input() patientVisit: Visit;
   @Input() isConfirmedDiagnosis: boolean;
   @Input() forConsultation: boolean;
+  @Input() isInpatient: boolean;
   @Input() diagnosisFormDetails: any;
   diagnosisForm: any;
   diagnosisField: any;
@@ -35,6 +36,8 @@ export class PatientDiagnosesSummaryComponent implements OnInit {
   formValuesData: any = {};
   diagnosesData: any = {};
   savingDiagnosisState$: Observable<boolean>;
+  @Output() updateConsultationOrder = new EventEmitter();
+  @Output() updateMedicationComponent = new EventEmitter();
   constructor(private store: Store<AppState>, private dialog: MatDialog) {}
 
   ngOnInit(): void {
@@ -60,16 +63,19 @@ export class PatientDiagnosesSummaryComponent implements OnInit {
     this.diagnosisField = null;
     this.diagnosisRankField = null;
     map(Object.keys(this.formValuesData), (key) => {
-      if (this.formValuesData[key] && this.formValuesData[key].value) {
+      if (this.formValuesData[key]) {
         if (key === "diagnosis") {
-          this.diagnosesData[key] = {
-            coded: this.formValuesData[key].value,
-            nonCoded: null,
-            specificName: null,
+          this.diagnosesData = {
+            ...this.diagnosesData,
+            [key]: {
+              coded: this.formValuesData[key].value,
+              nonCoded: null,
+              specificName: null,
+            },
           };
         } else {
           const options = this.formValuesData[key]?.options || [];
-          const keyedOptions = keyBy(options, "key");
+          const keyedOptions = keyBy(options, "value");
           this.diagnosesData[key] =
             keyedOptions[this.formValuesData[key].value]?.value === "Secondary"
               ? 1
@@ -103,6 +109,8 @@ export class PatientDiagnosesSummaryComponent implements OnInit {
         currentDiagnosisUuid: null,
       })
     );
+    this.updateMedicationComponent.emit();
+    this.updateConsultationOrder.emit();
   }
 
   onEdit(e: Event, diagnosisData, currentDiagnosisUuid) {
@@ -116,16 +124,21 @@ export class PatientDiagnosesSummaryComponent implements OnInit {
       ? diagnosisData?.diagnosisDetails?.uuid
       : diagnosisData?.uuid;
     // e.stopPropagation();
-    this.dialog.open(AddDiagnosisModalComponent, {
-      width: "75%",
-      data: {
-        patient: this.patientVisit?.patientUuid,
-        diagnosisForm: this.diagnosisForm,
-        visit: null,
-        edit: true,
-        currentDiagnosisUuid: currentDiagnosisUuid,
-      },
-    });
+    this.dialog
+      .open(AddDiagnosisModalComponent, {
+        width: "75%",
+        data: {
+          patient: this.patientVisit?.patientUuid,
+          diagnosisForm: this.diagnosisForm,
+          visit: null,
+          edit: true,
+          currentDiagnosisUuid: currentDiagnosisUuid,
+        },
+      })
+      .afterClosed()
+      .subscribe(() => {
+        this.updateMedicationComponent.emit();
+      });
   }
 
   onDelete(e: Event, diagnosisData) {
@@ -138,6 +151,8 @@ export class PatientDiagnosesSummaryComponent implements OnInit {
           ? diagnosisData?.diagnosisDetails
           : diagnosisData,
       },
+    }).afterClosed().subscribe(() => {
+      this.updateMedicationComponent.emit();
     });
   }
 }

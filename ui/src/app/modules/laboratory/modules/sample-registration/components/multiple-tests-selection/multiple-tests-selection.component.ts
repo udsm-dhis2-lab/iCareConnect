@@ -15,6 +15,7 @@ import { MatRadioChange } from "@angular/material/radio";
 })
 export class MultipleTestsSelectionComponent implements OnInit {
   @Input() setMembersFromSpecimen: ConceptGetFull[];
+  @Input() selectedMembers: any[];
   testsFormField: any;
   testsFormData: any = {};
   conceptsList$: Observable<ConceptGetFull[]>;
@@ -24,18 +25,30 @@ export class MultipleTestsSelectionComponent implements OnInit {
   constructor(private conceptService: ConceptsService) {}
 
   ngOnInit(): void {
-    if (
-      this.setMembersFromSpecimen &&
-      this.setMembersFromSpecimen?.length > 0
-    ) {
-      this.testSelectionCategory = "by-specimen";
-    } else {
-      this.testSelectionCategory = "All";
-    }
-
+    this.selectedSetMembersItems = [
+      ...this.selectedSetMembersItems,
+      ...this.selectedMembers,
+    ];
+    this.testSelectionCategory =
+      this.selectedSetMembersItems?.length > 0 ? "by-specimen" : this.setMembersFromSpecimen &&
+      this.setMembersFromSpecimen?.length > 0 ? "by-specimen" : "All";
     this.conceptsList$ = !this.setMembersFromSpecimen
       ? this.conceptService.getConceptsBySearchTerm("TEST_ORDERS")
-      : of(this.setMembersFromSpecimen);
+      : of(
+          this.setMembersFromSpecimen?.map((setMember) => {
+            return {
+              ...setMember,
+              display:
+                setMember?.display?.indexOf(":") > -1
+                  ? setMember?.display?.split(":")[1]
+                  : setMember?.display,
+              name:
+                setMember?.display?.indexOf(":") > -1
+                  ? setMember?.display?.split(":")[1]
+                  : setMember?.display,
+            };
+          })
+        );
 
     // this.testsFormField = new Dropdown({
     //   id: "test1",
@@ -70,10 +83,13 @@ export class MultipleTestsSelectionComponent implements OnInit {
   }
 
   getSelection(event: MatRadioChange): void {
-    this.testSelectionCategory = event?.value;
-    this.conceptsList$ =
-      this.testSelectionCategory === "All"
-        ? this.conceptService.getConceptsBySearchTerm("TEST_ORDERS")
-        : of(this.setMembersFromSpecimen);
+    this.testSelectionCategory = null;
+    setTimeout(() => {
+      this.testSelectionCategory = event?.value;
+      this.conceptsList$ =
+        this.testSelectionCategory === "All"
+          ? this.conceptService.getConceptsBySearchTerm("TEST_ORDERS")
+          : of(this.setMembersFromSpecimen);
+    }, 100);
   }
 }

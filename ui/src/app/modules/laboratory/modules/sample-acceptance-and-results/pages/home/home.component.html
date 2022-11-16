@@ -12,26 +12,15 @@
     LISConfigurations: LISConfigurations$ | async
   } as params"
 >
-  <!-- TODO JESSE - return conditions visitsLoadedState && sampleTypesLoadedState
   <div
     *ngIf="
       params?.datesParameters &&
-      params?.visitsLoadedState &&
-      params?.sampleTypesLoadedState &&
-      params?.labSamplesDepartments?.length > 0 &&
-      params?.labSamplesContainers &&
-      params?.configs &&
-      params?.codedSampleRejectionReasons
-    "
-  > -->
-  <div
-    *ngIf="
-      params?.datesParameters &&
-      params?.labSamplesDepartments?.length > 0 &&
+      params?.labSamplesDepartments &&
       params?.labSamplesContainers &&
       params?.configs &&
       params?.codedSampleRejectionReasons &&
-      params?.LISConfigurations
+      params?.LISConfigurations &&
+      params?.sampleTypes
     "
   >
     <app-sample-acceptance-dashboard
@@ -54,11 +43,9 @@
 
   <mat-progress-bar
     *ngIf="
-      !params?.datesParameters ||
-      !params?.sampleTypesLoadedState ||
-      params?.labSamplesDepartments?.length == 0 ||
-      !params?.labSamplesContainers ||
-      !params?.configs ||
+      !params?.sampleTypes ||
+      !params?.labSamplesDepartments ||
+      !params?.labSamplesDepartments ||
       !params?.codedSampleRejectionReasons ||
       !params?.LISConfigurations
     "

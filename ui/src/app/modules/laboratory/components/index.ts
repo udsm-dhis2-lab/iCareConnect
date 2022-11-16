@@ -11,6 +11,7 @@ import { SamplesTrackingComponent } from "./samples-tracking/samples-tracking.co
 import { ResultsAndSignOffsModalComponent } from "./results-and-sign-offs-modal/results-and-sign-offs-modal.component";
 import { CaptureLabResultsComponent } from "./capture-lab-results/capture-lab-results.component";
 import { CaptureLabResultsApprovalComponent } from "./capture-lab-results-approval/capture-lab-results-approval.component";
+import { SampleResultsPrintingComponent } from "./sample-results-printing/sample-results-printing.component";
 
 export const labComponents: any[] = [
   LabSamplesStatusesComponent,
@@ -26,4 +27,7 @@ export const labComponents: any[] = [
   ResultsAndSignOffsModalComponent,
   CaptureLabResultsComponent,
   CaptureLabResultsApprovalComponent,
+  SampleResultsPrintingComponent,
 ];
+
+export const entryComponents: any[] = [SampleResultsPrintingComponent];

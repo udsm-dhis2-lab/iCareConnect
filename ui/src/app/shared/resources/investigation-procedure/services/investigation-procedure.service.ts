@@ -4,7 +4,7 @@ import { Observable, from, zip, of } from "rxjs";
 import { OpenmrsHttpClientService } from "src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service";
 import { Store } from "@ngrx/store";
 import { AppState } from "src/app/store/reducers";
-import { map } from "rxjs/operators";
+import { catchError, map } from "rxjs/operators";
 
 @Injectable({
   providedIn: "root",
@@ -36,8 +36,26 @@ export class InvestigationProcedureService {
     return from(this.httpClientService.delete("order/" + uuid));
   }
 
-  discontinueOrder(order): Observable<OrderCreate> {
-    return from(this.api.order.createOrder(order));
+  discontinueOrder(order): Observable<any> {
+    console.log(order);
+    return this.httpClientService
+      .post(`order/${order?.encounter?.uuid}`, {
+        uuid: order?.encounter?.uuid,
+        orders: [
+          {
+            uuid: order?.uuid,
+            action: "DISCONTINUE",
+            dateStopped: new Date(),
+          },
+        ],
+      })
+      .pipe(
+        map((response) => {
+          console.log(response);
+          return response;
+        }),
+        catchError((error) => of(error))
+      );
   }
 
   saveOrdersUsingEncounter(data, encounterUuid): Observable<any> {

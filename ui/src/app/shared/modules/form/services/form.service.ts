@@ -7,7 +7,7 @@ import { getFormQueryFields } from "../helpers/get-form-query-field.helper";
 import { getSanitizedFormObject } from "../helpers/get-sanitized-form-object.helper";
 import { FormConfig } from "../models/form-config.model";
 import { ICAREForm } from "../models/form.model";
-import { orderBy, uniqBy, omit, keyBy, groupBy } from "lodash";
+import { orderBy, uniqBy, omit, keyBy, groupBy, sumBy, flatten } from "lodash";
 
 @Injectable({ providedIn: "root" })
 export class FormService {
@@ -58,20 +58,46 @@ export class FormService {
         })
       );
     } else if (!searchControlType || searchControlType === "concept") {
-      return from(this.api.concept.getAllConcepts(parameters)).pipe(
-        map((response) => {
-          return orderBy(
-            response.results.filter(
-              (result: any) =>
-                parameters?.class &&
-                result.conceptClass?.display.toLowerCase() ===
-                  parameters?.class.toLowerCase()
-            ) || [],
-            ["display"],
-            ["asc"]
-          );
-        })
-      );
+      if (parameters?.value) {
+        return from(this.api.concept.getConcept(parameters?.value)).pipe(
+          map((response) => {
+            return [response];
+          })
+        );
+      } else {
+        return from(
+          this.api.concept.getAllConcepts(omit(parameters, "value"))
+        ).pipe(
+          map((response) => {
+            return orderBy(
+              (
+                response.results.filter(
+                  (result: any) =>
+                    parameters?.class &&
+                    result.conceptClass?.display.toLowerCase() ===
+                      (field?.isDiagnosis
+                        ? "diagnosis"
+                        : parameters?.class.toLowerCase())
+                ) || []
+              )?.map((result) => {
+                return {
+                  ...result,
+                  display:
+                    result?.display?.indexOf(":") > -1
+                      ? result?.display?.split(":")[1]
+                      : result?.display,
+                  name:
+                    result?.display?.indexOf(":") > -1
+                      ? result?.display?.split(":")[1]
+                      : result?.display,
+                };
+              }),
+              ["display"],
+              ["asc"]
+            );
+          })
+        );
+      }
     } else if (searchControlType === "person") {
       return from(this.api.person.getAllPersons({ q: parameters?.q })).pipe(
         map((response) => {
@@ -97,10 +123,14 @@ export class FormService {
         })
       );
     } else if (searchControlType === "searchFromOptions") {
-
       return of(
         field?.options.filter(
-          (option) => option?.name.toLowerCase().indexOf(parameters?.q.toLowerCase()) > -1 || option?.formField?.label.toLowerCase().indexOf(parameters?.q.toLowerCase()) > -1
+          (option) =>
+            option?.name.toLowerCase().indexOf(parameters?.q.toLowerCase()) >
+              -1 ||
+            option?.formField?.label
+              .toLowerCase()
+              .indexOf(parameters?.q.toLowerCase()) > -1
         )
       );
     } else if (searchControlType === "billableItem") {
@@ -195,6 +225,167 @@ export class FormService {
       );
       // this.drugs = drugsResults?.results || [];
       // return formatDrugs(this.drugs);)
+    } else if (searchControlType === "drugStock") {
+      let stockOutItemsReference = {};
+      return zip(
+        ...["stock?locationUuid", "stockout?location"].map((stockApiPath) => {
+          return this.httpClient
+            .get(
+              `store/${stockApiPath}=${field?.locationUuid}&q=${parameters?.q}`
+            )
+            .pipe(
+              map((response) => {
+                let formattedResponse = [];
+                if (stockApiPath === "stockout?location") {
+                  formattedResponse = response?.map((responseItem) => {
+                    stockOutItemsReference[responseItem?.uuid] = responseItem;
+                    return {
+                      ...responseItem,
+                      item: {
+                        drug: responseItem?.drug,
+                        uuid: responseItem?.uuid,
+                      },
+                      quantity: 0,
+                    };
+                  });
+                } else {
+                  formattedResponse = response;
+                }
+                const groupedByItemUuid = groupBy(
+                  formattedResponse.map((batch) => {
+                    return {
+                      ...batch,
+                      itemUuid: batch?.item?.uuid,
+                    };
+                  }),
+                  "itemUuid"
+                );
+                return Object.keys(groupedByItemUuid).map((itemUuid) => {
+                  const totalQuantity = Number(
+                    sumBy(
+                      groupedByItemUuid[itemUuid].map((batchData) => {
+                        return batchData;
+                      }),
+                      "quantity"
+                    )
+                  );
+                  return {
+                    uuid: groupedByItemUuid[itemUuid][0]?.item?.drug?.uuid,
+                    id: groupedByItemUuid[itemUuid][0]?.item?.drug?.uuid,
+                    display:
+                      groupedByItemUuid[itemUuid][0]?.item?.drug?.display +
+                      " (" +
+                      totalQuantity.toLocaleString("en-US") +
+                      ") ",
+                    itemUuid,
+                    value: groupedByItemUuid[itemUuid][0]?.item?.drug?.uuid,
+                    batches: groupedByItemUuid[itemUuid],
+                    name: groupedByItemUuid[itemUuid][0]?.item?.drug?.display,
+                    quantity: totalQuantity,
+                    isStockOut: totalQuantity === 0 ? true : false,
+                  };
+                });
+              })
+            );
+        })
+      ).pipe(
+        map((responses) => {
+          const allDrugItems = orderBy(
+            flatten(responses),
+            ["display", ["quantity"]],
+            ["asc"]["asc"]
+          );
+          const drugIitemsGroupedByItemUuid = groupBy(allDrugItems, "itemUuid");
+          const formattedDrugItems = Object.keys(
+            drugIitemsGroupedByItemUuid
+          ).map((itemUuid) => {
+            const totalQuantity = Number(
+              sumBy(
+                drugIitemsGroupedByItemUuid[itemUuid].map((batchData) => {
+                  return batchData;
+                }),
+                "quantity"
+              )
+            );
+            return {
+              ...drugIitemsGroupedByItemUuid[itemUuid][0],
+              batches: drugIitemsGroupedByItemUuid[itemUuid],
+              display:
+                drugIitemsGroupedByItemUuid[itemUuid][0]?.name +
+                " (" +
+                totalQuantity.toLocaleString("en-US") +
+                ") ",
+              quantity: totalQuantity,
+              isStockOut: totalQuantity === 0 ? true : false,
+            };
+          });
+          return formattedDrugItems;
+        })
+      );
+    } else if (searchControlType === "residenceLocation") {
+      return from(
+        this.api.location.getAllLocations({
+          q: parameters?.q ? parameters?.q : null,
+          v: parameters?.v,
+        })
+      ).pipe(
+        map((response) => {
+          // TODO: Remove the hardcoded 'village' by creating a new location API that respondto search and tag together
+          return (
+            response?.results?.filter(
+              (village: any) =>
+                village?.display?.toLowerCase()?.indexOf("village") > -1 ||
+                village?.display?.toLowerCase()?.indexOf("street") > -1
+            ) || []
+          );
+        })
+      );
+    } else if (searchControlType === "healthFacility") {
+      return from(
+        this.api.location.getAllLocations({
+          q: parameters?.q ? parameters?.q : null,
+          v: parameters?.v,
+        })
+      ).pipe(
+        map((response) => {
+          return (
+            response?.results?.filter(
+              (facility: any) =>
+                facility?.display?.toLowerCase()?.indexOf("dispensary") > -1 ||
+                facility?.display?.toLowerCase()?.indexOf("hospital") > -1 ||
+                facility?.display?.toLowerCase()?.indexOf("health") > -1 ||
+                facility?.display?.toLowerCase()?.indexOf("clinic") > -1
+            ) || []
+          )?.map((location: any) => {
+            return {
+              ...location,
+              display:
+                location?.display +
+                (location?.parentLocation &&
+                location?.parentLocation?.parentLocation
+                  ? " -  ( " +
+                    location?.parentLocation?.parentLocation?.display +
+                    " - " +
+                    location?.parentLocation?.parentLocation?.parentLocation
+                    ? location?.parentLocation?.parentLocation?.parentLocation
+                        ?.display
+                    : "" + " )"
+                  : ""),
+            };
+          });
+        })
+      );
+    } else if (searchControlType === "form") {
+      return from(
+        this.api.form.getAllForms({
+          q: parameters?.q ? parameters?.q : null,
+          v: parameters?.v,
+        })
+      ).pipe(
+        map((response) => {
+          return response?.results || [];
+        })
+      );
     }
   }
 
@@ -204,7 +395,14 @@ export class FormService {
      */
     const fields =
       "?v=custom:(uuid,display,name,encounterType,formFields:(uuid,display,fieldNumber,required,retired,fieldPart,maxOccurs,pageNumber,minOccurs,field:(uuid,display,concept:(uuid,display,conceptClass,datatype,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,numeric,descriptions,allowDecimal,displayPrecision,setMembers:(uuid,display,conceptClass,datatype,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,numeric,descriptions,allowDecimal,displayPrecision,answers,setMembers:(uuid,display,conceptClass,datatype,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,numeric,descriptions,allowDecimal,displayPrecision,answers)),answers:(uuid,display,conceptClass,datatype,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,numeric,descriptions,allowDecimal,displayPrecision,answers)))))";
-    return this.httpClient.get("form/" + uuid + fields);
+    return this.httpClient.get("form/" + uuid + fields).pipe(
+      map((response) => {
+        return response;
+      }),
+      catchError((error) => {
+        return of(error);
+      })
+    );
   }
 
   getCustomeOpenMRSForms(uuids): Observable<any> {

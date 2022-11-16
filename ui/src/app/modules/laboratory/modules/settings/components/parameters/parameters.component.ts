@@ -221,17 +221,6 @@ export class ParametersComponent implements OnInit {
         conceptNameType: "INDEX_TERM",
       },
     ];
-    searchIndexedTerms = [
-      ...searchIndexedTerms,
-      ...this.selectedCodeItems.map((item) => {
-        return {
-          name: item?.display.split(" (")[0],
-          locale: "en",
-          localePreferred: false,
-          conceptNameType: "INDEX_TERM",
-        };
-      }),
-    ];
 
     this.saving = true;
     names = [

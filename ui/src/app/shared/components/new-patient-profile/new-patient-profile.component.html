@@ -1,7 +1,7 @@
 <div class="patient-profile-container" *ngIf="patientDetails">
   <div class="row">
     <div class="col-md-1 col-sm-6 col-sx-6">
-      <mat-icon class="text-muted" style="font-size: 100px">person</mat-icon>
+      <mat-icon class="text-muted" style="font-size: 80px">person</mat-icon>
     </div>
     <div class="col-md-11 col-sm-6 col-sx-6">
       <div
@@ -19,8 +19,8 @@
           |
           {{ patientDetails?.person?.age }} Yrs |
           {{ patientDetails?.person?.birthdate | date }}
-          )</span
-        >
+          )
+        </span>
       </div>
       <div
         class="
@@ -31,34 +31,40 @@
           justify-content-between
         "
       >
-        <div class="col-md-3 col-sm-6 col-sx-6">
+        <div class="col-md-5 col-sm-6 col-sx-6">
           <div class="item-left p-items">
             MRN: <span class="text-muted"> {{ patientDetails?.mrn }}</span>
-          </div>
-          <div class="item-left p-items">
-            <span> Phone: </span>
-            <span class="text-muted">
-              {{
-                patientDetails?.person?.phone
-                  ? patientDetails?.person?.phone
-                  : " - "
-              }}
+            <span class="ml-2">
+              Phone:
+              <span class="text-muted">
+                {{
+                  patientDetails?.person?.phone
+                    ? patientDetails?.person?.phone
+                    : " - "
+                }}
+              </span>
             </span>
 
-            <span>Email:</span>
-            <span class="text-muted">
-              {{
-                patientDetails?.person?.email
-                  ? patientDetails?.person?.email
-                  : " - "
-              }}
+            <span
+              >Email:
+              <span class="text-muted">
+                {{
+                  patientDetails?.person?.email
+                    ? patientDetails?.person?.email
+                    : " - "
+                }}
+              </span>
             </span>
-          </div>
-          <div class="item-left p-items">
-            Payment type:
-            <span class="text-muted">
-              {{ (activeVisit$ | async)?.isEnsured ? "INSURANCE" : "CASH" }}
+            <span class="ml-2">
+              Payment type:
+              <span class="text-muted">
+                {{ (activeVisit$ | async)?.isEnsured ? "INSURANCE" : "CASH" }}
+              </span>
             </span>
+            <app-patient-address
+              [personUuid]="currentPatient?.patient?.person?.uuid"
+            >
+            </app-patient-address>
           </div>
         </div>
         <div
@@ -66,7 +72,7 @@
             (activeVisit$ | async)?.isEnsured &&
             (activeVisit$ | async) as activeVisit
           "
-          class="col-md-9 col-sm-12 col-sx-12"
+          class="col-md-7 col-sm-12 col-sx-12"
         >
           <app-patient-visit-attributes-details
             [attributes]="activeVisit?.patientProfileAttributes"

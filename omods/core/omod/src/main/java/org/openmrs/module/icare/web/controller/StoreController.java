@@ -6,6 +6,7 @@ import org.openmrs.DrugOrder;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.icare.core.ICareService;
 import org.openmrs.module.icare.core.Item;
+import org.openmrs.module.icare.laboratory.models.Sample;
 import org.openmrs.module.icare.store.models.*;
 import org.openmrs.module.icare.store.services.StoreService;
 import org.openmrs.module.icare.store.util.StockOutException;
@@ -15,7 +16,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -202,7 +205,8 @@ public class StoreController {
 	
 	@RequestMapping(value = "issue", method = RequestMethod.POST)
 	@ResponseBody
-	public Map<String, Object> postAnIssue(@RequestBody Map<String, Object> issueMap) throws StockOutException {
+	public Map<String, Object> postAnIssue(@RequestBody Map<String, Object> issueMap) throws StockOutException,
+	        ParseException {
 		
 		Issue issue = Issue.fromMap(issueMap);
 		
@@ -227,6 +231,20 @@ public class StoreController {
 			}
 			if (issueItemObject.get("quantity") instanceof Double) {
 				issueItem.setQuantity((Double) issueItemObject.get("quantity"));
+			}
+			
+			if (issueItemObject.get("batch") instanceof String) {
+				issueItem.setBatchNo((String) issueItemObject.get("batch"));
+			}
+			
+			if (issueItemObject.get("expiryDate") instanceof String) {
+				SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+				if (issueItemObject.get("expiryDate").toString().length() == 10) {
+					issueItem.setExpiryDate(dateFormat.parse(issueItemObject.get("expiryDate").toString()));
+				} else {
+					issueItem.setExpiryDate(dateFormat.parse(issueItemObject.get("expiryDate").toString()
+					        .substring(0, issueItemObject.get("expiryDate").toString().indexOf("T"))));
+				}
 			}
 			
 			issueItem.setIssue(issue);
@@ -287,7 +305,8 @@ public class StoreController {
 	
 	@RequestMapping(value = "receive", method = RequestMethod.POST)
 	@ResponseBody
-	public Map<String, Object> postAReceipt(@RequestBody Map<String, Object> receiptMap) throws StockOutException {
+	public Map<String, Object> postAReceipt(@RequestBody Map<String, Object> receiptMap) throws StockOutException,
+	        ParseException {
 		
 		Receipt receipt = new Receipt().fromMap(receiptMap);
 		
@@ -315,8 +334,22 @@ public class StoreController {
 			} else if (receiptItemObject.get("quantity") instanceof Integer) {
 				receiptItem.setQuantity((Double) receiptItemObject.get("quantity"));
 			}
-			receiptItem.setReceipt(receipt);
 			
+			if (receiptItemObject.get("batch") instanceof String) {
+				receiptItem.setBatchNo((String) receiptItemObject.get("batch"));
+			}
+			
+			if (receiptItemObject.get("expiryDate") instanceof String) {
+				SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+				if (receiptItemObject.get("expiryDate").toString().length() == 10) {
+					receiptItem.setExpiryDate(dateFormat.parse(receiptItemObject.get("expiryDate").toString()));
+				} else {
+					receiptItem.setExpiryDate(dateFormat.parse(receiptItemObject.get("expiryDate").toString()
+					        .substring(0, receiptItemObject.get("expiryDate").toString().indexOf("T"))));
+				}
+			}
+			
+			receiptItem.setReceipt(receipt);
 			receiptItems.add(receiptItem);
 		}
 		
@@ -366,12 +399,14 @@ public class StoreController {
 	
 	@RequestMapping(value = "stock", method = RequestMethod.GET)
 	@ResponseBody
-	public List<Map<String, Object>> listAllStockStatus(@RequestParam(required = false) String locationUuid) {
+	public List<Map<String, Object>> listAllStockStatus(@RequestParam(required = false) String locationUuid,
+	        @RequestParam(required = false) String q, @RequestParam(defaultValue = "100000") Integer limit,
+	        @RequestParam(defaultValue = "0") Integer startIndex, @RequestParam(required = false) String conceptClassName) {
 		
 		List<Stock> stocksStatus;
 		
 		if (locationUuid != null) {
-			stocksStatus = this.storeService.getStockByLocation(locationUuid);
+			stocksStatus = this.storeService.getStockByLocation(locationUuid, q, startIndex, limit, conceptClassName);
 		} else {
 			stocksStatus = this.storeService.getAllStockStatusMetrics();
 		}
@@ -453,10 +488,12 @@ public class StoreController {
 	@RequestMapping(value = "stockout", method = RequestMethod.GET)
 	@ResponseBody
 	public List<Map<String, Object>> getItemsStockedOut(
-	        @RequestParam(required = false, value = "location") String locationUuid) {
+	        @RequestParam(required = false, value = "location") String locationUuid,
+	        @RequestParam(required = false) String q, @RequestParam(defaultValue = "1000000") Integer limit,
+	        @RequestParam(defaultValue = "0") Integer startIndex, @RequestParam(required = false) String conceptClassName) {
 		List<Item> stockObjects = null;
 		if (locationUuid != null) {
-			stockObjects = storeService.getStockoutByLocation(locationUuid);
+			stockObjects = storeService.getStockoutByLocation(locationUuid, q, startIndex, limit, conceptClassName);
 		} else {
 			stockObjects = storeService.getStockout();
 		}

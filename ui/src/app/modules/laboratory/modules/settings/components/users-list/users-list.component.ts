@@ -12,7 +12,7 @@ import { MatTableDataSource } from "@angular/material/table";
 import { CaptureSignatureComponent } from "src/app/shared/components/capture-signature/capture-signature.component";
 
 @Component({
-  selector: "app-users-list",
+  selector: "lab-users-list",
   templateUrl: "./users-list.component.html",
   styleUrls: ["./users-list.component.scss"],
 })
@@ -31,6 +31,8 @@ export class UsersListComponent implements OnInit {
   @Output() edit: EventEmitter<any> = new EventEmitter<any>();
   @Input() currentUser: any;
   @Input() users: any[];
+  @Input() pageCount: number;
+  @Input() page: number;
   constructor(private dialog: MatDialog) {}
 
   ngOnInit(): void {

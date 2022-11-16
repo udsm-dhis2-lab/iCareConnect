@@ -16,6 +16,7 @@ import {
   getCodedSampleRejectionReassons,
   getLabDepartments,
   getLabTestsContainers,
+  getParentLocation,
 } from "src/app/store/selectors";
 import { formatDateToYYMMDD } from "src/app/shared/helpers/format-date.helper";
 import { BASE_URL } from "src/app/shared/constants/constants.constants";
@@ -30,6 +31,7 @@ import {
 import { generateSelectionOptions } from "src/app/shared/helpers/patient.helper";
 import { ExportService } from "src/app/shared/services/export.service";
 import { LabReportsService } from "src/app/modules/laboratory/resources/services/reports.service";
+import { map } from "rxjs/operators";
 // import { Agent } from 'http';
 
 @Component({
@@ -68,6 +70,8 @@ export class LabReportsComponent implements OnInit {
 
   resultsLoader: any = {};
   searchingText: string = "";
+  facilityDetails$: any;
+  errors: any[] = [];
   constructor(
     private httpClient: HttpClient,
     private exportService: ExportService,
@@ -88,8 +92,24 @@ export class LabReportsComponent implements OnInit {
       getCodedSampleRejectionReassons
     );
 
-    this.currentReport = this.reports[0];
     this.reports = [...this.reports, ...this.configuredReports];
+    this.currentReport = this.reports[0];
+    this.facilityDetails$ = this.store.select(getParentLocation).pipe(
+      map((response) => {
+        // TODO: Softcode attribute type uuid
+        return {
+          ...response,
+          logo:
+            response?.attributes?.length > 0
+              ? (response?.attributes?.filter(
+                  (attribute) =>
+                    attribute?.attributeType?.uuid ===
+                    "e935ea8e-5959-458b-a10b-c06446849dc3"
+                ) || [])[0]?.value
+              : null,
+        };
+      })
+    );
   }
 
   onSetCurrentReport(e, report) {
@@ -244,15 +264,17 @@ export class LabReportsComponent implements OnInit {
         break;
       }
     }
-
     this.loadingReport = true;
     // TODO: Find a better way to handle this
     // console.log('selectionDates', selectionDates);
-    if (this.currentReport.id == "TAT") {
+    if (this.currentReport.id === "patient_level_tat") {
       this.reportService
         .runDataSet(this.currentReport?.key, this.selectionDates)
         .subscribe((data: any) => {
           this.reportData = _.map(data, (row: any) => {
+            if (data?.error) {
+              this.errors = [...this.errors, data?.error];
+            }
             return {
               ...row,
               tat: (Number(row?.tat) / 60).toFixed(2),
@@ -279,6 +301,9 @@ export class LabReportsComponent implements OnInit {
       this.reportService
         .runDataSet(this.currentReport?.key, this.selectionDates)
         .subscribe((data: any) => {
+          if (data?.error) {
+            this.errors = [...this.errors, data?.error];
+          }
           let reportGroups = {
             collected: 0,
             accepted: 0,
@@ -368,6 +393,9 @@ export class LabReportsComponent implements OnInit {
       this.reportService
         .runDataSet("545911ec-1dc3-4ac2-97bb-fb436158902a", this.selectionDates)
         .subscribe((data: any) => {
+          if (data?.error) {
+            this.errors = [...this.errors, data?.error];
+          }
           data = _.filter(data, (row: any) => {
             return row?.dep_nm == "" ? false : true;
           });

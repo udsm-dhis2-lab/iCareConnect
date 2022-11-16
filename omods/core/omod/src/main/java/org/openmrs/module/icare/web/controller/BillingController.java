@@ -1,24 +1,24 @@
 package org.openmrs.module.icare.web.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openmrs.Order;
+import org.openmrs.api.context.Context;
+import org.openmrs.module.icare.billing.BillingServiceImpl;
 import org.openmrs.module.icare.billing.models.Discount;
 import org.openmrs.module.icare.billing.models.Invoice;
 import org.openmrs.module.icare.billing.models.Payment;
 import org.openmrs.module.icare.billing.services.BillingService;
 import org.openmrs.module.icare.billing.services.insurance.SyncResult;
+import org.openmrs.module.webservices.rest.SimpleObject;
 import org.openmrs.module.webservices.rest.web.RestConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-//import com.google.gson.Gson;
-//import com.google.gson.GsonBuilder;
+import java.util.*;
 
 @Controller
 @RequestMapping(value = "/rest/" + RestConstants.VERSION_1 + "/billing")
@@ -33,9 +33,15 @@ public class BillingController extends BaseController {
 	@ResponseBody
 	public List<Map<String, Object>> onGetPatientPendingBillsMap(
 	        @RequestParam(value = "patient", required = false) String patient,
-	        @RequestParam(value = "visit", required = false) String visit) {
+	        @RequestParam(value = "visit", required = false) String visit,
+	        @RequestParam(value = "status", required = false) String status) {
 		if (patient != null) {
-			List<Invoice> invoices = onGetPatientPendingBills(patient);
+			List<Invoice> invoices;
+			if (status == "all") {
+				invoices = billingService.getPatientsInvoices(patient);
+			} else {
+				invoices = onGetPatientPendingBills(patient);
+			}
 			List<Map<String, Object>> invoiceMaps = new ArrayList<Map<String, Object>>();
 			for (Invoice invoice : invoices) {
 				invoiceMaps.add(invoice.toMap());
@@ -49,8 +55,9 @@ public class BillingController extends BaseController {
 			}
 			return invoiceMaps;
 		} else {
-			return null;
+			return new ArrayList();
 		}
+		
 	}
 	
 	public List<Invoice> onGetPatientPendingBills(@RequestParam("patient") String patient) {
@@ -100,4 +107,17 @@ public class BillingController extends BaseController {
 	public Discount onPostDiscountInvoice(Discount discount) throws Exception {
 		return billingService.discountInvoice(discount);
 	}
+	
+	@RequestMapping(value = "patient/allInvoices", method = RequestMethod.GET)
+	@ResponseBody
+	public List<Map<String, Object>> onGetAllPatientInvoices(
+	        @RequestParam(value = "patient", required = false) String patient) {
+		List<Invoice> invoices = billingService.getPatientsInvoices(patient);
+		List<Map<String, Object>> invoiceMaps = new ArrayList<Map<String, Object>>();
+		for (Invoice invoice : invoices) {
+			invoiceMaps.add(invoice.toMap());
+		}
+		return invoiceMaps;
+	}
+	
 }

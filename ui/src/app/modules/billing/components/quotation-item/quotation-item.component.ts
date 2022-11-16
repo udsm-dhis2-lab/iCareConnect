@@ -2,9 +2,10 @@ import { SelectionModel } from "@angular/cdk/collections";
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { MatTableDataSource } from "@angular/material/table";
-import { PaymentTypeInterface } from "src/app/shared/models/payment-type.model";
+import { Observable } from "rxjs";
+import { SystemSettingsService } from "src/app/core/services/system-settings.service";
+import { BillableItemsService } from "src/app/shared/resources/billable-items/services/billable-items.service";
 import { BillItem } from "../../models/bill-item.model";
-import { BillObject } from "../../models/bill-object.model";
 import { Bill } from "../../models/bill.model";
 import { PaymentInput } from "../../models/payment-input.model";
 import { BillConfirmationComponent } from "../bill-confirmation/bill-confirmation.component";
@@ -35,8 +36,13 @@ export class QuotationItemComponent implements OnInit {
 
   @Output() confirmPayment = new EventEmitter<PaymentInput>();
   @Output() paymentSuccess = new EventEmitter<any>();
+  gepgConceptUuid$: Observable<any>;
 
-  constructor(private dialog: MatDialog) {}
+  constructor(
+    private dialog: MatDialog,
+    private billableItemsService: BillableItemsService,
+    private systemSettingsService: SystemSettingsService
+  ) {}
 
   get canDisableItemSelection(): boolean {
     return (this.billItems || []).some((item) => item.payable === 0);
@@ -84,7 +90,11 @@ export class QuotationItemComponent implements OnInit {
       { id: "quantity", label: "Quantity" },
       { id: "price", label: "Unit Price", isCurrency: true },
       { id: "discount", label: "Discount", isCurrency: true },
-      { id: "amount", label: "Amount", isCurrency: true },
+      {
+        id: "calculatedPayableAmount",
+        label: "Payable Amount",
+        isCurrency: true,
+      },
     ];
     this.displayedColumns = [
       ...this.columns.map((column) => column.id),
@@ -104,6 +114,10 @@ export class QuotationItemComponent implements OnInit {
         code: "GePG",
       },
     ];
+
+    this.gepgConceptUuid$ = this.systemSettingsService.getSystemSettingsByKey(
+      "icare.billing.payment.paymentMethod.gepg.field.1"
+    );
 
     this.selectedPaymentType = this.paymentTypes[0];
   }
@@ -180,5 +194,45 @@ export class QuotationItemComponent implements OnInit {
 
   onChangePaymentType(e) {
     console.log(e);
+  }
+
+  getControlNumber(e: any, gepgConceptUuid?: any) {
+    e.stopPropagation();
+    const dialog = this.dialog.open(BillConfirmationComponent, {
+      width: "600px",
+      disableClose: true,
+      data: {
+        billItems: this.selection?.selected,
+        items: this.billItems,
+        bill: this.bill,
+        totalPayableBill: this.totalPayableBill,
+        paymentType: this.selectedPaymentType,
+        currentUser: this.currentUser,
+        currentPatient: this.currentPatient,
+        facilityDetails: this.facilityDetails,
+        gepgConceptUuid: gepgConceptUuid,
+      },
+    });
+
+    dialog.afterClosed().subscribe((paymentResponse) => {
+      this.paymentSuccess.emit();
+      if (paymentResponse) {
+        this.dialog.open(PaymentReceiptComponent, {
+          width: "500px",
+          data: {
+            ...paymentResponse,
+            billItems: this.selection?.selected,
+            items: this.billItems,
+            bill: this.bill,
+            totalPayableBill: this.totalPayableBill,
+            paymentType: this.selectedPaymentType,
+            currentUser: this.currentUser,
+            currentPatient: this.currentPatient,
+            logo: this.logo,
+            facilityDetails: this.facilityDetails,
+          },
+        });
+      }
+    });
   }
 }

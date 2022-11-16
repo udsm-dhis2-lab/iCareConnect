@@ -16,11 +16,25 @@ import { Bill } from "../../models/bill.model";
 import { PaymentInput } from "../../models/payment-input.model";
 import { BillingService } from "../../services/billing.service";
 import { PaymentService } from "../../services/payment.service";
-import { Store } from "@ngrx/store";
+import { select, Store } from "@ngrx/store";
 import { AppState } from "src/app/store/reducers";
-import { getParentLocation } from "src/app/store/selectors";
+import { getCurrentLocation, getParentLocation } from "src/app/store/selectors";
 import { DomSanitizer } from "@angular/platform-browser";
-import { getCurrentUserDetails } from "src/app/store/selectors/current-user.selectors";
+import {
+  getCurrentUserDetails,
+  getProviderDetails,
+} from "src/app/store/selectors/current-user.selectors";
+import { EncountersService } from "src/app/shared/services/encounters.service";
+import { OrdersService } from "src/app/shared/resources/order/services/orders.service";
+import { any } from "cypress/types/bluebird";
+import { ICARE_CONFIG } from "src/app/shared/resources/config";
+import { getEncounterTypeByName } from "src/app/store/selectors/encounter-type.selectors";
+import { SystemSettingsService } from "src/app/core/services/system-settings.service";
+import { MatTableDataSource } from "@angular/material/table";
+import { getIsPatientSentForExemption } from "src/app/store/selectors/visit.selectors";
+import { go, loadCurrentPatient } from "src/app/store/actions";
+import { MatDialog } from "@angular/material/dialog";
+import { ExemptionConfirmationComponent } from "../../components/exemption-confirmation/exemption-confirmation.component";
 
 @Component({
   selector: "app-current-patient-billing",
@@ -46,6 +60,17 @@ export class CurrentPatientBillingComponent implements OnInit {
   currentPatient$: Observable<Patient>;
   parentLocation$: Observable<any>;
   currentUser$: Observable<any>;
+  provider$: Observable<any>;
+  creatingOrdersResponse$: Observable<any>;
+  discountItems: any[] = [];
+  discountItemsCount: any = 0;
+  bill: Bill;
+  exemptionEncounterType$: Observable<any>;
+  exemptionOrderType$: Observable<any>;
+  exemptionConcept$: Observable<any>;
+  hasOpenExemptionRequest: boolean;
+  isBillCleared: boolean;
+  errors: any[] = [];
 
   constructor(
     private route: ActivatedRoute,
@@ -54,7 +79,11 @@ export class CurrentPatientBillingComponent implements OnInit {
     private paymentService: PaymentService,
     private patientService: PatientService,
     private configService: ConfigsService,
-    private store: Store<AppState>
+    private encounterService: EncountersService,
+    private ordersService: OrdersService,
+    private systemSettingsService: SystemSettingsService,
+    private store: Store<AppState>,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit() {
@@ -62,10 +91,149 @@ export class CurrentPatientBillingComponent implements OnInit {
     this._getPatientDetails();
 
     this.currentPatient$ = this.patientService.getPatient(this.patientId);
-
-    this.facilityDetails$ = this.configService.getFacilityDetails();
+    this.store.dispatch(
+      loadCurrentPatient({ uuid: this.patientId, isRegistrationPage: false })
+    );
+    this.currentUser$ = this.store.select(getCurrentUserDetails);
     this.facilityLogo$ = this.configService.getLogo();
     this.facilityDetails$ = this.store.select(getParentLocation);
+    this.currentLocation$ = this.store.pipe(select(getCurrentLocation));
+    this.provider$ = this.store.select(getProviderDetails);
+
+    this.billingService
+      .getAllPatientInvoices(this.patientId, false, "all")
+      .subscribe({
+        next: (bills) => {
+          bills.forEach((bill) => {
+            if (bill) {
+              this.bill = bill;
+              //Get discounted Items
+
+              bill.billDetails.discountItems.forEach((discountItem) => {
+                let paidAmount: number = 0;
+                let paidItems: any[] = [];
+                let givenItems: any[] = [];
+                let item: any;
+
+                //Get total amount that is already paid for an item
+                bill.billDetails.payments.forEach((payment) => {
+                  payment.items.forEach((paymentItem) => {
+                    if (discountItem.item.uuid === paymentItem.item.uuid) {
+                      paidItems = [...paidItems, paymentItem];
+                    }
+                  });
+                });
+
+                //Get total amount of the item from the list of items the patient has
+                bill.billDetails.items.forEach((givenItem) => {
+                  if (discountItem.item.uuid === givenItem.item.uuid) {
+                    givenItems = [...givenItems, givenItem];
+                    item = givenItem
+                  }
+                });
+
+                //calculate total amount paid
+                paidItems.forEach((paymentItem) => {
+                  paidAmount = paidAmount + parseInt(paymentItem.amount, 10);
+                });
+
+                //Check if bill was cleared
+                let payableAmount = givenItems[0].price - discountItem.amount;
+                if (paidAmount >= payableAmount) {
+                  this.isBillCleared = true;
+                }
+
+                // return givenItem with discounted amount if paid amount is less than item's price
+                if (paidAmount < givenItems[0].price) {
+                  givenItems[0] = {
+                    ...givenItems[0],
+                    price: discountItem.amount,
+                  };
+
+                  //Filterout for items that were exempted twice
+                  this.discountItems = this.discountItems.filter(
+                    (discountItem) => {
+                      if (
+                        !(discountItem.item.uuid === givenItems[0].item.uuid)
+                      ) {
+                        return discountItem;
+                      }
+                    }
+                  );
+
+                  this.discountItems = [...this.discountItems, givenItems[0]];
+                }
+              });
+
+              this.discountItemsCount =
+                this.discountItems.length > 0 ? this.discountItems.length : 0;
+            }
+          });
+        },
+      });
+
+    // Get exemption encounter Type
+    this.exemptionEncounterType$ = this.systemSettingsService
+      .getSystemSettingsByKey("icare.billing.exemption.encounterType")
+      .pipe(
+        tap((response) => {
+          if(response?.error){
+            this.errors = [...this.errors, response.error];
+          }
+          if(response === 'none'){
+            this.errors = [...this.errors, 
+              {error: { 
+                message: "Missing Icare Exemption Configurations. Please set 'icare.billing.exemption.encounterType' or Contact IT"
+                }
+              }
+            ]
+          };
+        })
+      );
+
+    //Get exemption order type
+    this.exemptionOrderType$ = this.systemSettingsService
+      .getSystemSettingsByKey("icare.billing.exemption.orderType")
+      .pipe(
+        tap((response) => {
+          if (response?.error) {
+            this.errors = [...this.errors, response.error];
+          }
+          if (response === "none") {
+            this.errors = [
+              ...this.errors,
+              {
+                error: {
+                  message:
+                    "Missing Icare Exemption Configurations. Please set 'icare.billing.exemption.orderType' or Contact IT",
+                },
+              },
+            ];
+          }
+        })
+      );
+
+    //Get exemption Concept
+    this.exemptionConcept$ = this.systemSettingsService
+      .getSystemSettingsByKey("icare.billing.exemption.concept")
+      .pipe(
+        tap((response) => {
+          if (response?.error) {
+            this.errors = [...this.errors, response.error];
+          }
+          if (response === "none") {
+            this.errors = [
+              ...this.errors,
+              {
+                error: {
+                  message:
+                    "Missing Icare Exemption Configurations. Please set 'icare.billing.exemption.concept' or Contact IT",
+                },
+              },
+            ];
+          }
+        })
+      );
   }
 
   private _getPatientDetails() {
@@ -81,10 +249,13 @@ export class CurrentPatientBillingComponent implements OnInit {
         const visit = res[0];
         const bills = res[1];
         const payments = res[2];
-
         return {
           visit,
-          bills: bills.filter((bill) => !bill.isInsurance),
+          bills: bills.filter((bill) => {
+            if (!bill.isInsurance && bill.items.length > 0) {
+              return bill;
+            }
+          }),
           payments,
           paymentItemCount: payments
             .map((payment) => payment?.items?.length || 0)
@@ -107,6 +278,72 @@ export class CurrentPatientBillingComponent implements OnInit {
 
   onPaymentSuccess() {
     this._getPatientDetails();
+  }
+
+  onCheckOpenExemptionRequest(orderTypeUuid: any): any {
+    this.store
+      .select(getIsPatientSentForExemption(orderTypeUuid))
+      .subscribe((value) => (this.hasOpenExemptionRequest = value));
+  }
+
+  requestExemption(patientBillingDetails, params) {
+    let currentDate = new Date();
+
+    let exemptionEncounterStart = {
+      visit: patientBillingDetails.visit?.uuid,
+      encounterDatetime: currentDate.toISOString(),
+      patient: params.currentPatient?.id,
+      encounterType: params?.exemptionEncounterType,
+      location: params.currentLocation?.uuid,
+      encounterProviders: [
+        {
+          provider: params.provider?.uuid,
+          encounterRole: ICARE_CONFIG?.encounterRole?.uuid,
+          // encounterRole: "240b26f9-dd88-4172-823d-4a8bfeb7841f",
+        },
+      ],
+      orders: [
+        {
+          orderType: params?.exemptionOrderType,
+          action: "NEW",
+          urgency: "ROUTINE",
+          careSetting: !patientBillingDetails.visit?.isAdmitted
+            ? "OUTPATIENT"
+            : "INPATIENT",
+          patient: params?.currentPatient?.id,
+          concept: params?.exemptionConcept,
+          orderer: params.provider?.uuid,
+          type: "order",
+        },
+      ],
+    };
+
+    const dialog = this.dialog.open(ExemptionConfirmationComponent, {
+      width: "25%",
+      panelClass: "custom-dialog-container",
+      data: {
+        modelTitle: "Request confirmation",
+        modelMessage:
+          "This is to confirm that you are requesting exemption  for this patient",
+      },
+    });
+
+    dialog.afterClosed().subscribe((data) => {
+      if (data?.confirmed) {
+        this.ordersService
+          .createOrdersViaCreatingEncounter(exemptionEncounterStart)
+          .subscribe({
+            next: (encounter) => {
+              this.hasOpenExemptionRequest = true;
+              this.store.dispatch(go({ path: ["/billing"] }));
+              return encounter;
+            },
+            error: (err) => {
+              return err;
+            },
+          });
+      }
+    });
   }
 
   onPrint(e: any): void {
@@ -208,8 +445,9 @@ export class CurrentPatientBillingComponent implements OnInit {
       }
     });
 
-    let patientMRN = e.CurrentPatient.MRN ||
-      e.CurrentPatient.patient?.identifiers[0]?.identifier.replace(
+    let patientMRN =
+      e.CurrentPatient?.MRN ||
+      e.CurrentPatient?.patient?.identifiers[0]?.identifier.replace(
         "MRN = ",
         ""
       );
@@ -323,7 +561,6 @@ export class CurrentPatientBillingComponent implements OnInit {
         </table>`);
       }
     }
-    
 
     frameDoc.document.write(`
           <div class="footer">

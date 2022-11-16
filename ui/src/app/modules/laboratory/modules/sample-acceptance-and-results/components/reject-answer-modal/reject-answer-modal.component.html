@@ -19,13 +19,7 @@
       ></textarea>
     </mat-form-field>
     <div class="d-flex justify-content-end mt-2">
-      <button
-        mat-stroked-button
-        (click)="onClose($event)"
-        [disabled]="(reason && reason?.length >= 2) || reason !== ''"
-      >
-        Cancel
-      </button>
+      <button mat-stroked-button (click)="onClose($event)">Cancel</button>
       <button
         color="primary"
         mat-stroked-button

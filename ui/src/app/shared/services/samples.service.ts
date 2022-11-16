@@ -6,24 +6,36 @@ import { from, Observable, of, zip } from "rxjs";
 import { BASE_URL } from "../constants/constants.constants";
 import { catchError, delay, map } from "rxjs/operators";
 import { SampleObject } from "src/app/modules/laboratory/resources/models";
+import { formatSample } from "../helpers/lab-samples.helper";
+import { OpenmrsHttpClientService } from "../modules/openmrs-http-client/services/openmrs-http-client.service";
 
 @Injectable({
   providedIn: "root",
 })
 export class SamplesService {
-  constructor(private httpClient: HttpClient) {}
+  constructor(
+    private httpClient: HttpClient,
+    private opeMRSHttpClientService: OpenmrsHttpClientService
+  ) {}
 
-  getLabSamplesByCollectionDates(dates): Observable<any> {
+  getLabSamplesByCollectionDates(
+    dates,
+    startIndex?: number,
+    limit?: number
+  ): Observable<any> {
     return this.httpClient
       .get(
         BASE_URL +
           "lab/samples?startDate=" +
           dates?.startDate +
           "&endDate=" +
-          dates?.endDate
+          dates?.endDate +
+          "&paging=false"
       )
       .pipe(
-        map((response: any) => response?.results || []),
+        map((response: any) => {
+          return response?.results || [];
+        }),
         catchError((error) => of(error))
       );
   }
@@ -32,6 +44,15 @@ export class SamplesService {
     return this.httpClient.get(`${BASE_URL}lab/samplelable`).pipe(
       map((response: { label: number }) => {
         return response?.label;
+      }),
+      catchError((error) => of(error))
+    );
+  }
+
+  getIncreamentalSampleLabel(): Observable<string> {
+    return this.opeMRSHttpClientService.get(`lab/sampleidgen`).pipe(
+      map((response) => {
+        return response?.label.toString();
       }),
       catchError((error) => of(error))
     );
@@ -58,6 +79,38 @@ export class SamplesService {
       map((response: any) => response?.results),
       catchError((error) => of(error))
     );
+  }
+
+  getSampleByStatusCategory(
+    sampleCategory?: string,
+    testCategory?: string,
+    startDate?: any,
+    endDate?: any,
+    formattingInfo?: any
+  ) {
+    testCategory = testCategory ? `?testCategory=${testCategory}` : "";
+    sampleCategory = sampleCategory ? `?testCategory=${sampleCategory}` : "";
+    const dates =
+      startDate &&
+      endDate &&
+      (sampleCategory.length > 0 || testCategory.length > 0)
+        ? `&startDate=${startDate}&endDate=${endDate}`
+        : startDate &&
+          endDate &&
+          testCategory.length === 0 &&
+          sampleCategory.length === 0
+        ? `?startDate=${startDate}&endDate=${endDate}`
+        : "";
+    return this.httpClient
+      .get(BASE_URL + `lab/sample${testCategory}${sampleCategory}${dates}`)
+      .pipe(
+        map((response: any) => {
+          return _.map(response, (sample) => {
+            return formatSample(sample, formattingInfo);
+          });
+        }),
+        catchError((error) => of(error))
+      );
   }
 
   collectSample(data): Observable<any> {
@@ -89,6 +142,21 @@ export class SamplesService {
     if (statuses) {
       return zip(
         ...statuses.map((status) => {
+          return this.httpClient.post(BASE_URL + "lab/samplestatus", status);
+        })
+      ).pipe(
+        map((response) => response),
+        catchError((error) => of(error))
+      );
+    } else {
+      return from([null]);
+    }
+  }
+
+  saveSampleStatuses(statusesData): Observable<any> {
+    if (statusesData) {
+      return zip(
+        ...statusesData.map((status) => {
           return this.httpClient.post(BASE_URL + "lab/samplestatus", status);
         })
       ).pipe(

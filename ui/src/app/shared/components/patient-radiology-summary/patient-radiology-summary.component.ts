@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { Observable } from "rxjs";
 import { FormValue } from "../../modules/form/models/form-value.model";
 import { OrdersService } from "../../resources/order/services/orders.service";
@@ -15,11 +15,12 @@ export class PatientRadiologySummaryComponent implements OnInit {
   @Input() patientVisit: Visit;
   @Input() investigationAndProceduresFormsDetails: any;
   @Input() forConsultation: boolean;
+  @Input() isInpatient: boolean;
   @Input() provider: any;
   @Input() orderTypes: any[];
   addingOrder: boolean = false;
   hasError: boolean = false;
-  error: string;
+  errors: any[] = [];
   formFields: any[];
   isFormValid: boolean = false;
   formValuesData: any = {};
@@ -28,6 +29,7 @@ export class PatientRadiologySummaryComponent implements OnInit {
     "custom:(uuid,encounters:(uuid,location:(uuid,display),encounterType,display,encounterProviders,encounterDatetime,voided,obs,orders:(uuid,display,orderer,orderType,dateActivated,orderNumber,concept,display)))";
   creatingOrdersResponse$: Observable<any>;
   formDetails: FormValue;
+  @Output() updateConsultationOrder = new EventEmitter();
   constructor(
     private ordersService: OrdersService,
     private visitService: VisitsService
@@ -38,34 +40,40 @@ export class PatientRadiologySummaryComponent implements OnInit {
       this.patientVisit.uuid,
       this.fields
     );
-    this.formFields = [
-      {
-        id: "radiology",
-        key: "radiology",
-        label: "Order",
-        name: "Order",
-        controlType: "dropdown",
-        type: "text",
-        options:
-          this.investigationAndProceduresFormsDetails &&
-          this.investigationAndProceduresFormsDetails?.setMembers
-            ? this.getRadiologyServices(
-                this.investigationAndProceduresFormsDetails?.setMembers
-              )
-            : [],
-        conceptClass: "radiology",
-        searchControlType: "searchFromOptions",
-        shouldHaveLiveSearchForDropDownFields: true,
-      },
-      {
-        id: "remarks",
-        key: "remarks",
-        label: "Remarks / Instructions",
-        name: "Remarks / Instructions",
-        controlType: "textbox",
-        type: "textarea",
-      },
-    ];
+
+    this.getFormFields()
+  }
+
+
+  getFormFields(){
+        this.formFields = [
+          {
+            id: "radiology",
+            key: "radiology",
+            label: "Order",
+            name: "Order",
+            controlType: "dropdown",
+            type: "text",
+            options:
+              this.investigationAndProceduresFormsDetails &&
+              this.investigationAndProceduresFormsDetails?.setMembers
+                ? this.getRadiologyServices(
+                    this.investigationAndProceduresFormsDetails?.setMembers
+                  )
+                : [],
+            conceptClass: "radiology",
+            searchControlType: "searchFromOptions",
+            shouldHaveLiveSearchForDropDownFields: true,
+          },
+          {
+            id: "remarks",
+            key: "remarks",
+            label: "Remarks / Instructions",
+            name: "Remarks / Instructions",
+            controlType: "textbox",
+            type: "textarea",
+          },
+        ];
   }
 
   onFormUpdate(formValues: FormValue): void {
@@ -123,10 +131,7 @@ export class PatientRadiologySummaryComponent implements OnInit {
         },
       ];
     }
-    this.creatingOrdersResponse$ =
-      this.ordersService.createOrdersViaEncounter(orders);
-
-    this.creatingOrdersResponse$.subscribe((response) => {
+    this.ordersService.createOrdersViaEncounter(orders).subscribe((response) => {
       if (response) {
         this.addingOrder = false;
         if (!response?.error) {
@@ -135,12 +140,19 @@ export class PatientRadiologySummaryComponent implements OnInit {
             this.fields
           );
           this.hasError = false;
+          this.getFormFields();
         } else {
-          console.log("response", response);
           this.hasError = true;
-          this.error = response?.error?.message;
+          this.errors = [
+            ...this.errors,
+            {
+              error: response?.error
+            }
+          ]
+          this.getFormFields();
         }
       }
     });
+    this.updateConsultationOrder.emit();
   }
 }

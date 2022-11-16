@@ -46,6 +46,38 @@ export class ProcedureOrder {
     return this.order?.orderType?.display;
   }
 
+  get orderInstructions(): string {
+    return this.order?.instructions;
+  }
+
+  get orderTypeDetails(): any {
+    return this.order?.orderType;
+  }
+
+  get dateActivated(): string {
+    return this.order?.dateActivated;
+  }
+
+  get dateStopped(): string {
+    return this.order?.dateStopped;
+  }
+
+  get careSetting(): any {
+    return this.order?.careSetting;
+  }
+
+  get action(): string {
+    return this.order?.action;
+  }
+
+  get orderReason(): string {
+    return this.order?.orderReason;
+  }
+
+  get urgency(): string {
+    return this.order?.urgency;
+  }
+
   toJson(): any {
     return {
       id: this.uuid,
@@ -58,6 +90,14 @@ export class ProcedureOrder {
       orderType: this.orderType,
       display: this.display,
       type: this.type,
+      instructions: this.orderInstructions,
+      orderTypeDetails: this.orderTypeDetails,
+      dateActivated: this.dateActivated,
+      dateStopped: this.dateStopped,
+      careSetting: this.careSetting,
+      action: this.action,
+      orderReason: this.orderReason,
+      urgency: this.urgency,
     };
   }
 }

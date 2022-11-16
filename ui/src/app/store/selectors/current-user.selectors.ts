@@ -1,7 +1,12 @@
 import { CurrentUserState } from "../states";
 import { createSelector } from "@ngrx/store";
 import { getRootState, AppState } from "../reducers";
-import { getChildLocationsOfTheFirstLevelParentLocation } from "./locations.selectors";
+import {
+  getChildLocationsOfTheFirstLevelParentLocation,
+  getLocations,
+  getModuleLocations,
+  getUserAssignedLocationsLoadedState,
+} from "./locations.selectors";
 import { sanitizeUserLocations } from "src/app/shared/helpers/sanitize-user-locations.helper";
 
 import { keyBy, flatten, indexOf } from "lodash";
@@ -45,9 +50,12 @@ export const getProviderDetails = createSelector(
 
 export const getUserAssignedLocations = createSelector(
   getCurrentUserState,
-  getChildLocationsOfTheFirstLevelParentLocation,
-  (state: CurrentUserState, availableLoginLocations) => {
-    return sanitizeUserLocations(state.userLocations, availableLoginLocations);
+  getLocations,
+  getUserAssignedLocationsLoadedState,
+  (state: CurrentUserState, locations, userAssignedLocationsLoadedState) => {
+    return userAssignedLocationsLoadedState
+      ? sanitizeUserLocations(state.userLocations, locations)
+      : null;
   }
 );
 

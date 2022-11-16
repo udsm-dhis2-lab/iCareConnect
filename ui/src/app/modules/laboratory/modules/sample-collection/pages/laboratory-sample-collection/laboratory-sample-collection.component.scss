@@ -78,3 +78,9 @@
 .back-to-client-list {
   padding: 10px 15px;
 }
+
+::ng-deep .mat-button-disabled {
+  background-color: #cccccc !important;
+  color: #666666 !important;
+  cursor: not-allowed !important;
+}

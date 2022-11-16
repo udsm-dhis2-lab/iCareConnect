@@ -46,7 +46,7 @@ export const setCurrentStock = createAction(
 
 export const loadCurrentStock = createAction(
   "[Stock] load current stock",
-  props<{ currentStockItemId: string }>()
+  props<{ currentStockItemId: string; locationUuid: string }>()
 );
 
 export const updateCurrentStockItem = createAction(

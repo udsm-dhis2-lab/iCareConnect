@@ -1,7 +1,6 @@
 <div
   *ngIf="{
-    orders: orders$ | async,
-    creatingOrdersResponse: creatingOrdersResponse$ | async
+    orders: orders$ | async
   } as params"
 >
   <table class="table table-bordered">
@@ -9,8 +8,9 @@
       <tr>
         <th style="width: 10px">SN</th>
         <th>Radiology order</th>
+        <th>Results</th>
         <th>Date & Time</th>
-        <th style="width: 60px"></th>
+        <th style="width: 160px"></th>
       </tr>
     </thead>
     <tbody>
@@ -23,6 +23,45 @@
           </td>
           <td>
             {{ order?.display }}
+          </td>
+          <td *ngIf="order?.value?.display">
+            <a
+              *ngIf="order?.value?.links?.uri.split('openmrs').length > 2"
+              href="{{
+                '/openmrs' + order?.value?.links?.uri.split('openmrs')[2]
+              }}"
+            >
+              Download Results
+            </a>
+            <a
+              *ngIf="order?.value?.links?.uri.split('openmrs').length == 2"
+              href="{{
+                '/openmrs' + order?.value?.links?.uri.split('openmrs')[1]
+              }}"
+            >
+              Download Results
+            </a>
+          </td>
+          <td *ngIf="!order?.value?.display && !order?.value?.length">
+            No results
+          </td>
+          <td *ngIf="!order?.value?.display">
+            <a
+              *ngIf="order?.value?.links?.uri.split('openmrs').length > 2"
+              href="{{
+                '/openmrs' + order?.value?.links?.uri.split('openmrs')[2]
+              }}"
+            >
+              Download Results
+            </a>
+            <a
+              *ngIf="order?.value?.links?.uri.split('openmrs').length == 2"
+              href="{{
+                '/openmrs' + order?.value?.links?.uri.split('openmrs')[1]
+              }}"
+            >
+              Download Results
+            </a>
           </td>
           <td>
             {{ order?.dateActivated | date: "medium" }}
@@ -53,16 +92,12 @@
           </td>
         </tr>
       </ng-container>
-      <ng-container *ngIf="hasError">
-        <tr>
-          <td colspan="100%">
-            <div class="alert alert-danger" role="alert">
-              {{ error }}
-            </div>
-          </td>
-        </tr>
-      </ng-container>
-      <ng-container *ngIf="forConsultation">
+      <tr *ngIf="errors">
+        <td colspan="100%">
+          <app-shared-error [errors]="errors"></app-shared-error>
+        </td>
+      </tr>
+      <ng-container *ngIf="forConsultation && !isInpatient && formFields">
         <tr>
           <td colspan="3">
             <app-form

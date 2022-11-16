@@ -1,27 +1,33 @@
+import { OpenmrsHttpClientService } from 'src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service';
 import { Injectable } from '@angular/core';
 
 import * as _ from 'lodash';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { from, Observable, of } from 'rxjs';
 import { BASE_URL } from '../constants/constants.constants';
-import { delay } from 'rxjs/operators';
+import { catchError, delay, map } from 'rxjs/operators';
+import { Api } from '../resources/openmrs';
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: "root",
 })
 export class EncountersService {
-  constructor(private httpClient: HttpClient) {}
+  constructor(
+    private httpClient: HttpClient,
+    private OpenmrsHttpClientService: OpenmrsHttpClientService,
+    private API: Api
+  ) {}
 
   async getData(id) {
     return await this.httpClient
-      .get(BASE_URL + 'encounter/' + id)
+      .get(BASE_URL + "encounter/" + id)
       .pipe(delay(1000))
       .toPromise();
   }
 
   async getEncountersData(id) {
     return await this.httpClient
-      .get(BASE_URL + 'encounter/' + id + '?v=full')
+      .get(BASE_URL + "encounter/" + id + "?v=full")
       .pipe(delay(1000))
       .toPromise();
   }
@@ -32,7 +38,7 @@ export class EncountersService {
       let ordersData = [];
       _.each(encounterDetails, (encounterDetail) => {
         idsLoaded[encounterDetail.encounter.uuid]
-          ? ''
+          ? ""
           : this.getData(encounterDetail.encounter.uuid).then((data) => {
               ordersData = [...ordersData, data];
               observer.next(ordersData);
@@ -42,5 +48,30 @@ export class EncountersService {
       });
     });
     return data;
+  }
+
+  createEncounter(encounter): Observable<any> {
+    return from(this.API.encounter.createEncounter(encounter)).pipe(
+      map((encounter) => {
+        return encounter
+      }),
+      catchError((err) => {
+        return of(err);
+      }));
+  }
+
+voidEncounter(encounter): Observable<any> {
+    const voidReason = encounter?.voidReason.length > 0 ? `?voidReason=${encounter?.voidReason}` : "";
+    return from(this.OpenmrsHttpClientService.delete(`encounter/${encounter?.uuid}${voidReason}`)).pipe(
+      map((encounter) => {return encounter}),
+      catchError((err) => {return of(err);})
+    )
+  }
+
+
+updateEncounter(encounter): Observable<any> {
+    return from(this.API.encounter.updateEncounter(encounter.uuid, encounter)).pipe(
+      map((encounter) => {return encounter})
+    )
   }
 }

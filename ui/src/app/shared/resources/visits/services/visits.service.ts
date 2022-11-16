@@ -1,3 +1,4 @@
+import { ClassGetter } from "@angular/compiler/src/output/output_ast";
 import { Injectable } from "@angular/core";
 import { DomSanitizer } from "@angular/platform-browser";
 import { isArray, omit, orderBy, flatten, groupBy, keyBy } from "lodash";
@@ -46,12 +47,22 @@ export class VisitsService {
       map((response) => {
         let formattedObs = [];
         response.encounters.map((encounter: any) => {
+          const encounterProvider = encounter?.encounterProviders[0];
           formattedObs = [
             ...formattedObs,
             ...encounter?.obs.map((observation) => {
               return {
                 ...observation,
-                conceptUuid: observation?.concept?.uuid,
+                encounterProvider: {
+                  ...encounterProvider?.provider,
+                  name:
+                    encounterProvider?.provider &&
+                    encounterProvider?.provider?.display?.indexOf(":") > -1
+                      ? encounterProvider?.provider?.display?.split(":")[0]
+                      : encounterProvider?.provider?.display?.split("- ")[1],
+                },
+                encounterType: encounter.encounterType,
+                conceptUuid: observation?.concept?.uuid || observation?.uuid,
               };
             }),
           ];
@@ -60,15 +71,22 @@ export class VisitsService {
         const obs = Object.keys(groupedObsByConcept).map((key) => {
           return {
             uuid: key,
-            history: groupedObsByConcept[key],
+            history: orderBy(
+              groupedObsByConcept[key],
+              ["obsDatetime"],
+              ["asc"]
+            ),
             latest: orderBy(
               groupedObsByConcept[key],
-              ["observationDatetime"],
+              ["obsDatetime"],
               ["desc"]
             )[0],
           };
         });
         return keyBy(obs, "uuid");
+      }),
+      catchError((error) => {
+        return of(error);
       })
     );
   }
@@ -113,8 +131,60 @@ export class VisitsService {
             };
             return new Visit(formattedResult);
           });
+        }),
+        catchError((error) => {
+          return of(error);
         })
       );
+  }
+  getAdmittedPatientsVisitsByEncounterType(
+    encounterTypeUuid: string
+  ): Observable<any[]> {
+    return this.httpClient
+      .get(`icare/visit?encounterTypeUuid=${encounterTypeUuid}`)
+      .pipe(
+        map((visitResults: any) => {
+          return visitResults?.results.map((result) => {
+            return {
+              ...result,
+              locationUuid: result?.location?.uuid,
+            };
+          });
+        }),
+        catchError((error) => {
+          return of(error);
+        })
+      );
+  }
+
+  getAdmittedPatientsVisits(locationUuids): Observable<any> {
+    return zip(
+      ...locationUuids.map((locationUuid) => {
+        return from(
+          this.api.visit.getAllVisits({
+            includeInactive: false,
+            location: locationUuid,
+            v: "custom:(uuid,startDatetime,stopDatetime,location:(uuid,display),patient:(uuid,display,identifiers,person,voided)",
+          } as any)
+        ).pipe(
+          map((visitResults: any) => {
+            return visitResults?.results.map((result) => {
+              return {
+                ...result,
+                locationUuid: result?.location?.uuid,
+              };
+            });
+          }),
+          catchError((error) => {
+            return of(error);
+          })
+        );
+      })
+    ).pipe(
+      map((responses) => {
+        return keyBy(flatten(responses), "locationUuid");
+      })
+    );
   }
 
   getAllVisits(
@@ -129,49 +199,82 @@ export class VisitsService {
     orderStatusCode?: string,
     orderBy?: string,
     orderByDirection?: string,
-  ): Observable<Visit[]> {
-    const locationUuids: any = isArray(location) ? location : [location];
+    filterBy?: string,
+    encounterType?: string
+  ): Observable<any> {
+    const locationUuids: any = isArray(location)
+      ? location
+      : location
+      ? [location]
+      : [];
 
     // Parameters for sorting
-    const orderByParameter = orderBy ? `&OrderBy=${orderBy}` : "";
-    const orderDirectionParameter = orderByDirection
-      ? `&orderByDirection=${orderByDirection}`
-      : "";
-    const sortingParameters =
-      orderByParameter || orderDirectionParameter
-        ? orderByParameter + orderDirectionParameter
-        : "";
-
+    let parametersString = "";
+    if (orderBy) {
+      parametersString += `&OrderBy=${orderBy}`;
+    }
+    if (orderStatus) {
+      parametersString += `&fulfillerStatus=${orderStatus}`;
+    }
+    if (orderByDirection) {
+      parametersString += `&orderByDirection=${orderByDirection}`;
+    }
+    if (orderStatusCode) {
+      parametersString += `&orderStatusCode=${orderStatusCode}`;
+    }
     if (orderType) {
-      const orderStatusParameter = orderStatus
-        ? `&fulfillerStatus=${orderStatus}`
-        : "";
-      const orderStatusCodeParameter = orderStatusCode
-        ? `&orderStatusCode=${orderStatusCode}`
-        : "";
-      const locationParameter = location ? `locationUuid=${location}&` : "";
-      const orderTypeParameter = orderType
-        ? `&orderTypeUuid=${orderType}`
-        : "";
+      parametersString += `&orderTypeUuid=${orderType}`;
+    }
+    if (queryParam) {
+      parametersString += `&q=${queryParam}`;
+    }
+    if (filterBy) {
+      parametersString += filterBy;
+    }
 
-      return this.httpClient
-        .get(
-          `icare/visit?${locationParameter}${orderTypeParameter}${orderStatusParameter}${orderStatusCodeParameter}${sortingParameters}&startIndex=${startIndex}&limit=${limit}`
-        )
-        .pipe(
-          map((visitResponse) => {
-            const results = visitResponse?.results;
-            return (flatten(results) || []).map((visitResult: any) => {
+    if (encounterType) {
+      parametersString += `&encounterTypeUuid=${encounterType}`;
+    }
+    //
+    return (
+      locationUuids?.length > 0
+        ? zip(
+            ...locationUuids.map((locationUuid) => {
+              const locationParameter = `locationUuid=${locationUuid}`;
+              return this.httpClient.get(
+                `icare/visit?${locationParameter}${parametersString}&startIndex=${startIndex}&limit=${limit}`
+              );
+            })
+          )
+        : this.httpClient.get(
+            `icare/visit?${parametersString.replace(
+              "&",
+              ""
+            )}&startIndex=${startIndex}&limit=${limit}`
+          )
+    ).pipe(
+      map((visitResponse: any) => {
+        const results =
+          locationUuids?.length > 0
+            ? flatten(visitResponse.map((visitData) => visitData?.results))
+            : visitResponse?.results;
+        // TODO: Softcode Insurance attribute value (Concept UUID) - 00000101IIIIIIIIIIIIIIIIIIIIIIIIIIII
+        return (
+          (flatten(results) || [])
+            .map((visitResult: any) => {
               const formattedResult = {
-                pager: null,
+                pager:
+                  locationUuids?.length > 0
+                    ? visitResponse[0].links
+                    : visitResponse?.links,
                 ...visitResult,
                 paymentType:
                   (
                     visitResult?.attributes.filter(
                       (attribute) =>
                         attribute &&
-                        attribute.display &&
-                        attribute.display ===
+                        attribute?.display &&
+                        attribute?.display ===
                           "00000101IIIIIIIIIIIIIIIIIIIIIIIIIIII"
                     ) || []
                   ).length > 0
@@ -179,42 +282,66 @@ export class VisitsService {
                     : "Cash",
               };
               return new Visit(formattedResult);
-            });
-          })
+            })
+            .filter((visit) =>
+              !onlyInsurance ? visit : visit?.paymentType === "Insurance"
+            ) || []
         );
-    }
-
-    return zip(
-      ...locationUuids.map((locationUuid) => {
-        
-        return from(
-          this.api.visit.getAllVisits({
-            includeInactive:
-              includeInactive === undefined ? false : includeInactive,
-            location: locationUuid,
-            v: "custom:(uuid,visitType,startDatetime,encounters:(uuid,diagnoses,encounterDatetime,encounterType,location,obs,orders),stopDatetime,attributes:(uuid,display),location:(uuid,display,tags,parentLocation:(uuid,display)),patient:(uuid,display,identifiers,person,voided)",
-            q: queryParam,
-            limit: limit ? limit : 100,
-            startIndex: startIndex ? startIndex : 0,
-            orderBy: orderBy ? orderBy : null,
-            orderByDirection: orderByDirection ? orderByDirection : null 
-          } as any)
-        ).pipe(
-          map((result: any) => {
-            return result;
-          })
-        );
+      }),
+      catchError((error) => {
+        return of(error);
       })
+    );
+    // }
+    return (
+      locationUuids?.length > 0
+        ? zip(
+            ...locationUuids.map((locationUuid) => {
+              return from(
+                this.api.visit.getAllVisits({
+                  includeInactive:
+                    includeInactive === undefined ? false : includeInactive,
+                  location: locationUuid,
+                  v: "custom:(uuid,visitType,startDatetime,encounters:(uuid,diagnoses,encounterDatetime,encounterType,location,obs,orders),stopDatetime,attributes:(uuid,display),location:(uuid,display,tags,parentLocation:(uuid,display)),patient:(uuid,display,identifiers,person,voided)",
+                  q: queryParam,
+                  limit: limit ? limit : 100,
+                  startIndex: startIndex ? startIndex : 0,
+                } as any)
+              ).pipe(
+                map((result: any) => {
+                  return result;
+                })
+              );
+            })
+          )
+        : from(
+            this.api.visit.getAllVisits({
+              includeInactive:
+                includeInactive === undefined ? false : includeInactive,
+              v: "custom:(uuid,visitType,startDatetime,encounters:(uuid,diagnoses,encounterDatetime,encounterType,location,obs,orders),stopDatetime,attributes:(uuid,display),location:(uuid,display,tags,parentLocation:(uuid,display)),patient:(uuid,display,identifiers,person,voided)",
+              q: queryParam,
+              limit: limit ? limit : 100,
+              startIndex: startIndex ? startIndex : 0,
+            } as any)
+          ).pipe(
+            map((result: any) => {
+              return result;
+            })
+          )
     ).pipe(
       map((visitResponse: any) => {
-        const results = flatten(
-          visitResponse.map((visitData) => visitData?.results)
-        );
+        const results =
+          locationUuids?.length > 0
+            ? flatten(visitResponse.map((visitData) => visitData?.results))
+            : visitResponse?.results;
         return (
           (flatten(results) || [])
             .map((visitResult: any) => {
               const formattedResult = {
-                pager: visitResponse[0].links,
+                pager:
+                  locationUuids?.length > 0
+                    ? visitResponse[0]?.links
+                    : visitResponse?.links,
                 ...visitResult,
                 paymentType:
                   (
@@ -234,9 +361,129 @@ export class VisitsService {
               !onlyInsurance ? visit : visit.paymentType === "Insurance"
             ) || []
         );
+      }),
+      catchError((error) => {
+        return of(error);
       })
     );
   }
+
+  // getAllVisits(
+  //   location?: string | string[],
+  //   includeInactive?: boolean,
+  //   onlyInsurance?: boolean,
+  //   queryParam?: string,
+  //   startIndex?: number,
+  //   limit?: number,
+  //   orderType?: string,
+  //   orderStatus?: string,
+  //   orderStatusCode?: string,
+  //   orderBy?: string,
+  //   orderByDirection?: string,
+  //   filterBy?: string
+  // ): Observable<Visit[]> {
+  //   const locationUuids: any = isArray(location) ? location : [location];
+
+  //   // Parameters for sorting
+  //   const orderByParameter = orderBy ? `&OrderBy=${orderBy}` : "";
+  //   const orderDirectionParameter = orderByDirection
+  //     ? `&orderByDirection=${orderByDirection}`
+  //     : "";
+  //   const sortingParameters =
+  //     orderByParameter || orderDirectionParameter
+  //       ? orderByParameter + orderDirectionParameter
+  //       : "";
+
+  //   if (orderType) {
+  //     const orderStatusParameter = orderStatus
+  //       ? `&fulfillerStatus=${orderStatus}`
+  //       : "";
+  //     const orderStatusCodeParameter = orderStatusCode
+  //       ? `&orderStatusCode=${orderStatusCode}`
+  //       : "";
+  //     const locationParameter = location ? `locationUuid=${location}&` : "";
+  //     const orderTypeParameter = orderType ? `&orderTypeUuid=${orderType}` : "";
+
+  //     return this.httpClient
+  //       .get(
+  //         `icare/visit?${locationParameter}${orderTypeParameter}${orderStatusParameter}${orderStatusCodeParameter}${sortingParameters}${filterBy}&startIndex=${startIndex}&limit=${limit}`
+  //       )
+  //       .pipe(
+  //         map((visitResponse) => {
+  //           const results = visitResponse?.results;
+  //           return (flatten(results) || []).map((visitResult: any) => {
+  //             const formattedResult = {
+  //               pager: null,
+  //               ...visitResult,
+  //               paymentType:
+  //                 (
+  //                   visitResult?.attributes.filter(
+  //                     (attribute) =>
+  //                       attribute &&
+  //                       attribute.display &&
+  //                       attribute.display ===
+  //                         "00000101IIIIIIIIIIIIIIIIIIIIIIIIIIII"
+  //                   ) || []
+  //                 ).length > 0
+  //                   ? "Insurance"
+  //                   : "Cash",
+  //             };
+  //             return new Visit(formattedResult);
+  //           });
+  //         })
+  //       );
+  //   }
+
+  //   return zip(
+  //     ...locationUuids.map((locationUuid) => {
+  //       return from(
+  //         this.api.visit.getAllVisits({
+  //           includeInactive:
+  //             includeInactive === undefined ? false : includeInactive,
+  //           location: locationUuid,
+  //           v: "custom:(uuid,visitType,startDatetime,encounters:(uuid,diagnoses,encounterDatetime,encounterType,location,obs,orders),stopDatetime,attributes:(uuid,display),location:(uuid,display,tags,parentLocation:(uuid,display)),patient:(uuid,display,identifiers,person,voided)",
+  //           q: queryParam,
+  //           limit: limit ? limit : 100,
+  //           startIndex: startIndex ? startIndex : 0,
+  //         } as any)
+  //       ).pipe(
+  //         map((result: any) => {
+  //           return result;
+  //         })
+  //       );
+  //     })
+  //   ).pipe(
+  //     map((visitResponse: any) => {
+  //       const results = flatten(
+  //         visitResponse.map((visitData) => visitData?.results)
+  //       );
+  //       return (
+  //         (flatten(results) || [])
+  //           .map((visitResult: any) => {
+  //             const formattedResult = {
+  //               pager: visitResponse[0].links,
+  //               ...visitResult,
+  //               paymentType:
+  //                 (
+  //                   visitResult?.attributes.filter(
+  //                     (attribute) =>
+  //                       attribute &&
+  //                       attribute.display &&
+  //                       attribute.display?.indexOf("Insurance ID") > -1
+  //                   ) || []
+  //                 ).length > 0
+  //                   ? "Insurance"
+  //                   : "Cash",
+  //             };
+  //             return new Visit(formattedResult);
+  //           })
+  //           .filter((visit) =>
+  //             !onlyInsurance ? visit : visit.paymentType === "Insurance"
+  //           ) || []
+  //       );
+  //     })
+  //   );
+  // }
 
   getPatientLoadByLocation(): Observable<{ [uuid: string]: number }> {
     return this.getAllVisits().pipe(
@@ -251,6 +498,9 @@ export class VisitsService {
         });
 
         return patientLoad;
+      }),
+      catchError((error) => {
+        return of(error);
       })
     );
   }
@@ -283,16 +533,36 @@ export class VisitsService {
             height="550px"
           />`),
         };
+      }),
+      catchError((error) => {
+        return of(error);
       })
     );
   }
 
   submitClaim(visitUuid): Observable<any> {
-    return this.httpClient.get(`icare/visit/${visitUuid}/claim`);
+    return this.httpClient.get(`icare/visit/${visitUuid}/claim`).pipe(
+      catchError((error) => {
+        return of(error);
+      })
+    );
   }
 
   addVisitAttribute(data, visitUuid): Observable<any> {
-    return this.httpClient.post(`visit/${visitUuid}`, data);
+    return this.httpClient.post(`visit/${visitUuid}`, data).pipe(
+      catchError((error) => {
+        return of(error);
+      })
+    );
+  }
+
+  getVisitDetailsByVisitUuid(uuid: string, params?: any): Observable<any> {
+    return from(this.api.visit.getVisit(uuid, params)).pipe(
+      map((response) => {
+        return response;
+      }),
+      catchError((error) => of(error))
+    );
   }
 
   getLastPatientVisit(
@@ -308,7 +578,7 @@ export class VisitsService {
         patient: patientUuid,
         v: `custom:(uuid,visitType,startDatetime,${encounters}attributes,stopDatetime,patient:(uuid,display,identifiers,person:(uuid,age,birthdate,gender,dead,preferredAddress:(cityVillage)),voided))`,
         limit: 2,
-        startIndex: 0
+        startIndex: 0,
       } as any)
     ).pipe(
       map((visitResponse) => {
@@ -355,6 +625,9 @@ export class VisitsService {
               },
             };
           });
+      }),
+      catchError((error) => {
+        return of(error);
       })
     );
   }
@@ -364,13 +637,12 @@ export class VisitsService {
     includeInactive: boolean,
     omitCurrentVisit?: boolean
   ): Observable<any> {
-
     return zip(
       from(
         this.api.visit.getAllVisits({
           includeInactive: includeInactive,
           patient: patient,
-          v: `custom:(uuid,visitType,location:(uuid,display,tags,parentLocation:(uuid,display)),startDatetime,attributes,stopDatetime,patient:(uuid,display,identifiers,person,voided),encounters:(uuid,form,location,obs,orders,diagnoses,encounterDatetime,encounterType))`,
+          v: `custom:(uuid,visitType,location:(uuid,display,tags,parentLocation:(uuid,display)),startDatetime,attributes,stopDatetime,patient:(uuid,display,identifiers,person,voided),encounters:(uuid,form,location,obs,orders,diagnoses,encounterProviders,encounterDatetime,encounterType))`,
         } as any)
       )
     ).pipe(
@@ -391,6 +663,9 @@ export class VisitsService {
           : includeInactive && !omitCurrentVisit
           ? visits
           : visits[0];
+      }),
+      catchError((error) => {
+        return of(error);
       })
     );
   }
@@ -406,6 +681,9 @@ export class VisitsService {
     ).pipe(
       map((response) => {
         return response?.results?.length > 1 ? false : true;
+      }),
+      catchError((error) => {
+        return of(error);
       })
     );
   }
@@ -423,6 +701,9 @@ export class VisitsService {
     ).pipe(
       map((response) => {
         return response?.results?.length;
+      }),
+      catchError((error) => {
+        return of(error);
       })
     );
   }
@@ -435,13 +716,12 @@ export class VisitsService {
   ): Observable<any> {
     // TODO Load order separately to allow inclusion of more attributes
     // https://icare.dhis2udsm.org/openmrs/ws/rest/v1/order?patient=${patient}&v=full
-
     return zip(
       from(
         this.api.visit.getAllVisits({
           includeInactive: includeInactive,
           patient,
-          v: `custom:(uuid,visitType,location:(uuid,display,tags,parentLocation:(uuid,display)),startDatetime,attributes,stopDatetime,patient:(uuid,display,identifiers,person,voided),encounters:(uuid,form,location,obs,orders,diagnoses,encounterDatetime,encounterType))`,
+          v: `custom:(uuid,visitType,location:(uuid,display,tags,parentLocation:(uuid,display)),startDatetime,attributes,stopDatetime,patient:(uuid,display,identifiers,person,voided),encounters:(uuid,form,location,obs,orders,diagnoses,encounterProviders,encounterDatetime,encounterType))`,
         } as any)
       ),
       shouldNotLoadNonVisitItems
@@ -452,7 +732,6 @@ export class VisitsService {
         : this.paymentService.getPatientPayments(patient)
     ).pipe(
       map((response: any[]) => {
-        
         const visitResponse = response[0];
         const patientBills = response[1];
         const patientPayments = response[2];
@@ -470,6 +749,9 @@ export class VisitsService {
           : includeInactive && !omitCurrentVisit
           ? visits
           : visits[0];
+      }),
+      catchError((error) => {
+        return of(error);
       })
     );
   }
@@ -515,6 +797,9 @@ export class VisitsService {
     ).pipe(
       map((response) => {
         return getOrdersFromCurrentVisitEncounters(response, "radiology");
+      }),
+      catchError((error) => {
+        return of(error);
       })
     );
   }
@@ -522,6 +807,7 @@ export class VisitsService {
   /**TODO: Move to admission shared service */
 
   admitPatient(data): Observable<any> {
+    // console.log("data", data);
     let encounterData: any = {
       ...data,
       encounterProviders: [
@@ -533,7 +819,10 @@ export class VisitsService {
     };
     encounterData = omit(encounterData, "provider");
     encounterData = omit(encounterData, "visitLocation");
-    return from(this.api.encounter.createEncounter(encounterData));
+    return from(this.api.encounter.createEncounter(encounterData)).pipe(
+      map((response) => response),
+      catchError((err) => of(err))
+    );
   }
   // this.store.dispatch(updateVisit({ details: visitDetails, visitUuid }));
   dischargePatient(data): Observable<any> {
@@ -547,7 +836,11 @@ export class VisitsService {
       ],
     };
     encounterData = omit(encounterData, "provider");
-    return from(this.api.encounter.createEncounter(encounterData));
+    return from(this.api.encounter.createEncounter(encounterData)).pipe(
+      catchError((error) => {
+        return of(error);
+      })
+    );
   }
 
   createBedOrder(data): Observable<any> {
@@ -561,7 +854,11 @@ export class VisitsService {
       ],
     };
     encounterData = omit(encounterData, "provider");
-    return from(this.api.encounter.createEncounter(encounterData));
+    return from(this.api.encounter.createEncounter(encounterData)).pipe(
+      catchError((error) => {
+        return of(error);
+      })
+    );
   }
 
   transferPatient(data): Observable<any> {
@@ -582,7 +879,11 @@ export class VisitsService {
         },
       ],
     };
-    return from(this.api.encounter.createEncounter(encounterData));
+    return from(this.api.encounter.createEncounter(encounterData)).pipe(
+      catchError((error) => {
+        return of(error);
+      })
+    );
   }
 
   getVisitsTypes(): Observable<any> {

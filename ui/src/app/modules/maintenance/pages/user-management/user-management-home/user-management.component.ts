@@ -5,6 +5,7 @@ import { MatTableDataSource } from "@angular/material/table";
 import { ActivatedRoute, Router } from "@angular/router";
 import { Store } from "@ngrx/store";
 import { Observable } from "rxjs";
+import { go } from "src/app/store/actions";
 import { AppState } from "src/app/store/reducers";
 import { getCurrentUserDetails } from "src/app/store/selectors/current-user.selectors";
 import { CaptureSignatureComponent } from "../../../../../shared/components/capture-signature/capture-signature.component";
@@ -45,7 +46,6 @@ export class UserManagementComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     // TODO: current user to be used for privilages control
     this.currentUser$ = this.store.select(getCurrentUserDetails);
-    this.users$ = this.service.getUsers({ q: "" });
   }
 
   ngAfterViewInit() {
@@ -57,11 +57,17 @@ export class UserManagementComponent implements OnInit, AfterViewInit {
   getRecord(row: UserCreateModel): void {
     this.data = row;
     localStorage.setItem("selectedUser", JSON.stringify(row));
-    this.router.navigate(["edit-user"], {
-      state: this.data,
-      relativeTo: this.route,
-      queryParams: { id: row.uuid },
-    });
+    // this.router.navigate(["manage-user"], {
+    //   state: this.data,
+    //   relativeTo: this.route,
+    //   queryParams: { id: row.uuid },
+    // });
+    this.store.dispatch(
+      go({
+        path: ["/maintenance/users-management/manage-user"],
+        query: { queryParams: { id: row.uuid } },
+      })
+    );
   }
 
   onEditChild(e) {}
@@ -74,5 +80,12 @@ export class UserManagementComponent implements OnInit, AfterViewInit {
     event.stopPropagation();
     const filterValue = (event.target as HTMLInputElement).value;
     this.users$ = this.service.getUsers({ q: filterValue });
+  }
+
+  onRouteToManageUser(event: Event): void {
+    event.stopPropagation();
+    this.store.dispatch(
+      go({ path: ["/maintenance/users-management/manage-user"] })
+    );
   }
 }

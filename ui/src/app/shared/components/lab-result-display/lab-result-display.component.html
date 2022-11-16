@@ -20,7 +20,7 @@
   >
 </div>
 <div *ngIf="forSetMember">
-  <b>
+  <b *ngIf="!observationsKeyedByConcept[concept?.uuid]?.latest?.value?.links?.uri">
     {{
       observationsKeyedByConcept &&
       observationsKeyedByConcept[concept?.uuid]?.latest
@@ -28,4 +28,9 @@
         : "No result"
     }}
   </b>
+  <span *ngIf="observationsKeyedByConcept[concept?.uuid]?.latest?.value?.links?.uri">
+    <a *ngIf="observationsKeyedByConcept[concept?.uuid]?.latest?.value?.links?.uri.split('openmrs').length > 2" href="{{ baseUrl + '/openmrs' + observationsKeyedByConcept[concept?.uuid]?.latest?.value?.links?.uri.split('openmrs')[2] }}"> Download Results </a>
+    <a *ngIf="observationsKeyedByConcept[concept?.uuid]?.latest?.value?.links?.uri.split('openmrs').length == 2 " href="{{ baseUrl + '/openmrs' + observationsKeyedByConcept[concept?.uuid]?.latest?.value?.links?.uri.split('openmrs')[1] }}"> Download Results
+    </a>
+  </span>
 </div>

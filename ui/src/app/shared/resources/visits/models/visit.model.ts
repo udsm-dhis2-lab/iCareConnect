@@ -21,7 +21,7 @@ import { OtherOrder } from "./other-orders.model";
 export class Visit {
   // TODO: Need to find best way to type incoming patient
   constructor(
-    private visit: any,
+    public visit: any,
     public bills?: Bill[],
     public payments?: Payment[]
   ) {}
@@ -115,12 +115,14 @@ export class Visit {
   }
 
   get waitingToBeAdmitted(): boolean {
+    // TODO: Softcode tag name and admission encounter type uuid
     return (
       !this.location?.tags.some((tag) => tag?.name === "Bed Location") &&
       (
         this.visit.encounters.filter(
           (encounter) =>
-            encounter?.encounterType?.display.toLowerCase() === "admission"
+            encounter?.encounterType?.uuid ===
+            "e22e39fd-7db2-45e7-80f1-60fa0d5a4378"
         ) || []
       ).length > 0
     );
@@ -300,10 +302,22 @@ export class Visit {
     return flatten(
       flatten(
         this.encounters?.map((encounter) =>
-          (encounter?.obs || []).map((observation) => ({
-            ...observation,
-            encounterType: encounter.encounterType,
-          }))
+          (encounter?.obs || []).map((observation) => {
+            const encounterProvider = encounter?.encounterProviders[0];
+            const formattedObs = {
+              ...observation,
+              encounterProvider: {
+                ...encounterProvider?.provider,
+                name:
+                  encounterProvider?.provider &&
+                  encounterProvider?.provider?.display?.indexOf(":") > -1
+                    ? encounterProvider?.provider?.display?.split(":")[0]
+                    : encounterProvider?.provider?.display?.split("- ")[1],
+              },
+              encounterType: encounter.encounterType,
+            };
+            return formattedObs;
+          })
         )
       )
     ).map((observation) => new Observation(observation));
@@ -397,7 +411,21 @@ export class Visit {
     return diagnoses.length > 0
       ? (
           diagnoses.filter(
-            (diagnosis) => diagnosis["diagnosisDetails"]["certainty"]
+            (diagnosis) =>
+              diagnosis["diagnosisDetails"]["certainty"] &&
+              !diagnosis["diagnosisDetails"].voided
+          ) || []
+        )?.length > 0
+      : false;
+  }
+
+  get hasConfirmedDiagnosis(): boolean {
+    const diagnoses = this.diagnoses;
+    return diagnoses.length > 0
+      ? (
+          diagnoses.filter(
+            (diagnosis: any) =>
+              diagnosis?.diagnosisDetails?.certainty === "CONFIRMED" && !diagnosis?.diagnosisDetails?.voided
           ) || []
         )?.length > 0
       : false;
@@ -430,6 +458,7 @@ export class Visit {
       consultationStarted: this.consultationStarted,
       consultationStatusOrder: this.consultationStatusOrder,
       hasProvisonalDiagnosis: this.hasProvisonalDiagnosis,
+      hasConfirmedDiagnosis: this.hasConfirmedDiagnosis,
     };
   }
 
@@ -479,5 +508,46 @@ export class Visit {
           observer.error(error);
         });
     });
+  }
+}
+
+export class VisitExt extends Visit {
+  constructor(
+    public visit: any,
+    public bills?: Bill[],
+    public payments?: Payment[]
+  ) {
+    super(visit);
+  }
+
+  get uuid(): string {
+    return this.visit?.uuid;
+  }
+
+  get isEmergency(): boolean {
+    let emergencyAttributeArray = filter(
+      this.visit?.attributes || [],
+      (attribute) => {
+        return attribute?.attributeType?.display == "EmergencyVisit";
+      }
+    );
+
+    return emergencyAttributeArray?.length > 0 ? true : false;
+  }
+
+  get patient(): Patient {
+    return new Patient(this.visit?.visit?.patient);
+  }
+
+  get patientUuid(): string {
+    return this.visit.visit.patient.uuid;
+  }
+
+  get patientName(): string {
+    return this.visit?.patient?.name;
+  }
+
+  get patientGender(): string {
+    return this.patient?.gender;
   }
 }

@@ -1,9 +1,13 @@
 <div>
-  <div>
+  <div *ngIf="{ patientSummary: patientSummary$ | async } as params">
+    <mat-progress-bar
+      mode="indeterminate"
+      *ngIf="!params?.patientSummary"
+    ></mat-progress-bar>
     <div class="mt-4">
       <div class="border">
         <mat-toolbar>
-          <button
+          <!--   <button
             mat-icon-button
             (click)="onBack($event)"
             matTooltip="Go to Home page"
@@ -19,7 +23,21 @@
           >
             <mat-icon class="mr-2">search</mat-icon>
             <span>Search from all Patient</span>
-          </button>
+          </button> -->
+
+          <span class="ml-2"
+            >Total Patients:
+            <span style="color: #42abed; font-weight: bold">{{
+              params?.patientSummary?.allPatients
+            }}</span></span
+          >
+          &nbsp;&nbsp; | &nbsp;&nbsp;
+          <span class="ml-2"
+            >Active Visit:
+            <span style="color: #42abed; font-weight: bold">{{
+              params?.patientSummary?.activeVisits
+            }}</span></span
+          >
 
           <span class="toolbar-spacer"></span>
 
@@ -31,12 +49,12 @@
             <mat-icon inline>person_add</mat-icon>
             <span class="ml-2">Register New Patient</span>
           </button>
-          <a class="ml-2 help" (click)="toggleIcareHelp($event)">
+          <!-- <a class="ml-2 help" (click)="toggleIcareHelp($event)">
             <span>
               <img height="20" src="assets/icons/help_icon-48.png" />
             </span>
-            <!-- <span> Help </span> -->
-          </a>
+            <span> Help </span>
+          </a> -->
         </mat-toolbar>
 
         <div class="centered-container-patient-list">
@@ -46,14 +64,32 @@
             [documentURL]="documentURL"
             [appName]="'Registration'"
           ></icare-help>
-          <app-patient-list
+          <!--    <app-patient-list
             *ngIf="!loadingData"
-            [itemsPerPage]="15"
+            [itemsPerPage]="10"
             [isRegistrationPage]="true"
             [isTabularList]="true"
             (selectPatient)="onSelectPatient($event)"
-          ></app-patient-list>
+          ></app-patient-list> -->
 
+          <app-patient-search
+            (selectPatient)="onSelectPatient($event)"
+            (displayList)="onDisplayList($event)"
+          ></app-patient-search>
+
+          <div *ngIf="!showCard" class="row mt-4 w-100 mb-4">
+            <div
+              class="col-lg-3 col-md-3 col-sx-12 col-sm-12 mt-2"
+              *ngFor="let location of params?.patientSummary?.locations"
+            >
+              <app-registration-summary-cards
+                [roomNo]="location?.name"
+                [location]="location"
+                [totalActivePatients]="location?.activeVisits"
+              >
+              </app-registration-summary-cards>
+            </div>
+          </div>
           <mat-progress-bar
             mode="indeterminate"
             *ngIf="loadingData"

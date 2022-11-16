@@ -40,8 +40,14 @@ export class FieldComponent {
   @Output() fieldUpdate: EventEmitter<FormGroup> =
     new EventEmitter<FormGroup>();
 
+  @Output() fileFieldUpdate: EventEmitter<any> = new EventEmitter<any>();
+
   ngAfterViewInit() {
-    if (this.field?.searchTerm || this.field?.source) {
+    if (
+      this.field?.searchTerm ||
+      this.field?.source ||
+      (this.field?.shouldHaveLiveSearchForDropDownFields && this.field?.value)
+    ) {
       this.members$ = this.formService.searchItem(
         {
           q:
@@ -52,6 +58,7 @@ export class FieldComponent {
           tag: this.field?.searchTerm,
           class: this.field?.conceptClass,
           source: this.field?.source,
+          value: this.field?.value,
           v:
             this.field?.searchControlType === "concept"
               ? "custom:(uuid,display,datatype,conceptClass,mappings)"
@@ -61,6 +68,8 @@ export class FieldComponent {
         this.field?.filteringItems,
         this.field
       );
+    } else if (this.field?.options?.length > 0) {
+      this.members$ = of(this.field?.options);
     }
     this.fieldUpdate.emit(this.form);
   }
@@ -116,6 +125,12 @@ export class FieldComponent {
     this.fieldUpdate.emit(this.form);
   }
 
+  fileChangeEvent(event, field): void {
+    let objectToUpdate = {};
+    objectToUpdate[field?.key] = event.target.files[0];
+    this.fileFieldUpdate.emit(objectToUpdate);
+  }
+
   updateFieldOnDemand(objectToUpdate): void {
     this.form.patchValue(objectToUpdate);
     const theKey = Object.keys(objectToUpdate);
@@ -131,17 +146,21 @@ export class FieldComponent {
   }
 
   searchItem(event: any, field?: any): void {
-    event.stopPropagation();
+    // event.stopPropagation();
     const searchingText = event.target.value;
     const parameters = {
       q: searchingText,
       limit: 50,
-      tag: field?.searchTerm,
+      tag:
+        this.field?.searchControlType === "location" ? field?.searchTerm : null,
       class: this.field?.conceptClass,
       source: this.field?.source,
       v:
-        field?.searchControlType === "concept" ||
-        field?.conceptClass === "Diagnosis"
+        field?.searchControlType === "residenceLocation" ||
+        field?.searchControlType === "healthFacility"
+          ? "custom:(uuid,display,parentLocation:(uuid,display,parentLocation:(uuid,display,parentLocation:(uuid,display,parentLocation:(uuid,display)))))"
+          : field?.searchControlType === "concept" ||
+            field?.conceptClass === "Diagnosis"
           ? "custom:(uuid,display,datatype,conceptClass,mappings)"
           : "custom:(uuid,display)",
     };
@@ -153,15 +172,34 @@ export class FieldComponent {
     );
   }
 
-  getSelectedItemFromOption(event: Event, item, key): void {
+  searchItemFromOptions(event, field): void {
+    const searchingText = event.target.value;
+    this.members$ = of(
+      field?.options?.filter(
+        (option) =>
+          option?.label?.toLowerCase()?.indexOf(searchingText?.toLowerCase()) >
+          -1
+      ) || []
+    );
+  }
+
+  getSelectedItemFromOption(event: Event, item, field): void {
     event.stopPropagation();
     const value = item?.isDrug
       ? item?.formattedKey
       : item?.uuid
       ? item?.uuid
-      : item?.id;
+      : item?.id
+      ? item?.id
+      : item?.value;
     let objectToUpdate = {};
-    objectToUpdate[key] = value;
+    objectToUpdate[field?.key] =
+      field?.searchControlType === "drugStock"
+        ? item
+        : !field?.searchControlType ||
+          field?.searchControlType !== "residenceLocation"
+        ? value
+        : item;
     this.form.patchValue(objectToUpdate);
     this.fieldUpdate.emit(this.form);
   }
@@ -169,5 +207,13 @@ export class FieldComponent {
   getStockStatus(option) {
     const optionName = option?.display ? option?.display : option?.name;
     return optionName.includes("Available, Location") ? true : false;
+  }
+
+  displayLabelFunc(value?: any): string {
+    return value
+      ? this.field?.options?.find(
+          (option) => option?.key === (value?.key ? value?.key : value)
+        )?.label
+      : undefined;
   }
 }

@@ -301,6 +301,7 @@ public class BillingOrderTest extends BillingTestBase {
 		}
 		AdministrationService administrationService = Context.getAdministrationService();
 		administrationService.setGlobalProperty(ICareConfig.STOCK_LOCATIONS, locations);
+		administrationService.setGlobalProperty(ICareConfig.ALLOW_NEGATIVE_STOCK, "true");
 		
 		EncounterService encounterService = Context.getEncounterService();
 		Encounter previousEncounter = encounterService.getEncounterByUuid("333395c-dd07-488d-8fd7-a748c9570000");
@@ -413,4 +414,5 @@ public class BillingOrderTest extends BillingTestBase {
 		assertThat("Invoice should have 1 item", patientInvoices.get(0).getInvoiceItems().size(), is(1));
 		
 	}
+	
 }
