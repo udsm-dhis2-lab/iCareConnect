@@ -29,6 +29,7 @@ export class PatientMedicationSummaryComponent implements OnInit {
   currentVisit$: Observable<any>;
 
   @Output() updateConsultationOrder = new EventEmitter();
+  @Output() updateMedicationComponent = new EventEmitter();
   patientDrugOrdersStatuses$: Observable<any>;
   filteredDrugOrders$: Observable<any>;
   visitDetails$: Observable<any>;
@@ -59,7 +60,12 @@ export class PatientMedicationSummaryComponent implements OnInit {
 
     // console.log(this.patientVisit);
 
-    this.currentVisit$ = this.visitService.getActiveVisit(this.patientVisit?.patientUuid, false, false, true);
+    this.currentVisit$ = this.visitService.getActiveVisit(
+      this.patientVisit?.patientUuid,
+      false,
+      false,
+      true
+    );
 
     if (this.patientVisit) {
       this.drugOrders$ = this.ordersService
@@ -127,6 +133,8 @@ export class PatientMedicationSummaryComponent implements OnInit {
         v: "custom:(uuid,display,patient,encounters:(uuid,display,obs,orders),attributes)",
       }
     );
+
+    this.updateMedicationComponent.emit();
   }
 
   onAddOrder(e: Event) {
