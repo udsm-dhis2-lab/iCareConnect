@@ -216,6 +216,7 @@ export class PersonDetailsComponent implements OnInit {
   }
 
   onUpdatePrimaryIdentifierForm(formValues: FormValue): void {
+    this.patientUuid = undefined;
     const values = formValues.getValues();
     let identifier;
     Object.keys(values).forEach((key) => {
