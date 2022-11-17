@@ -13,13 +13,16 @@ import { AppState } from "src/app/store/reducers";
 import { getProviderDetails } from "src/app/store/selectors/current-user.selectors";
 import { SamplesService } from "src/app/shared/services/samples.service";
 import {
+  clearLabSample,
   loadPatientNotes,
+  loadSampleByUuid,
   saveLabTestResults,
   saveLabTestResultsStatus,
 } from "src/app/store/actions";
 import {
   getFormattedLabSampleBySampleIdentifier,
   getFormattedLabSampleOrdersBySampleIdentifier,
+  getLabSampleLoadingState,
   getSavingLabTestResultsState,
   getSavingLabTestResultsStatusState,
 } from "src/app/store/selectors";
@@ -81,6 +84,11 @@ export class ResultsFeedingModalComponent implements OnInit {
   amendmentRemarksField: any;
   amendmentRemarks: any;
   saving: boolean = false;
+  bulkResultsToSave: any = [];
+  hasFedResults: boolean = false;
+  saveAllMessage: string;
+  labSampleLoadingState$: Observable<boolean>;
+
   constructor(
     private dialog: MatDialog,
     private dialogRef: MatDialogRef<ResultsFeedingModalComponent>,
@@ -106,12 +114,15 @@ export class ResultsFeedingModalComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.labSampleLoadingState$ = this.store.select(getLabSampleLoadingState);
     this.testOrders$ = this.store.select(
       getFormattedLabSampleOrdersBySampleIdentifier,
       {
         sampleIdentifier: this.sample?.id,
       }
     );
+
+    this.loadSampleByUuid();
 
     this.loadingTestTimeSettings = true;
 
@@ -217,6 +228,10 @@ export class ResultsFeedingModalComponent implements OnInit {
     });
   }
 
+  loadSampleByUuid(): void {
+    this.store.dispatch(loadSampleByUuid({ uuid: this.sample?.uuid }));
+  }
+
   onClose(e) {
     e.stopPropagation();
     this.dialogRef.close();
@@ -250,31 +265,11 @@ export class ResultsFeedingModalComponent implements OnInit {
   }
 
   setValue(val, item) {
-    // if (this.LISConfigurations?.isLIS) {
-    //   if (this.temporaryValues[item?.order?.concept?.uuid]) {
-    //     this.values[item?.order?.concept?.uuid] = val;
-    //   } else {
-    //     this.temporaryValues[item?.order?.concept?.uuid] = val;
-    //   }
-    // } else {
-    //   this.values[item?.order?.concept?.uuid] = val;
-    // }
-
     this.values[item?.order?.concept?.uuid] = val;
   }
 
-  setParameterValue(val, item) {
-    // if (this.LISConfigurations?.isLIS) {
-    //   if (this.temporaryValues[item?.uuid]) {
-    //     this.values[item?.uuid] = val;
-    //   } else {
-    //     this.temporaryValues[item?.uuid] = val;
-    //   }
-    // } else {
-    //   this.values[item?.uuid] = val;
-    // }
-
-    this.values[item?.uuid] = val;
+  setParameterValue(val: any, parameter: any): void {
+    this.values[parameter?.uuid] = val;
   }
 
   setCommentValue(val, item) {
@@ -434,6 +429,7 @@ export class ResultsFeedingModalComponent implements OnInit {
     );
     setTimeout(() => {
       this.saving = false;
+      this.loadSampleByUuid();
     }, 1000);
   }
 
@@ -511,22 +507,8 @@ export class ResultsFeedingModalComponent implements OnInit {
           allocation,
         })
       );
-
-      this.savingLabResultsState$ = this.store.select(
-        getSavingLabTestResultsState
-      );
-
-      this.savingLabResultsState$.pipe(take(1)).subscribe((state) => {
-        if (state) {
-          this.savingMessage[parameter?.uuid] = null;
-        }
-      });
-      this.testOrders$ = this.store.select(
-        getFormattedLabSampleOrdersBySampleIdentifier,
-        {
-          sampleIdentifier: this.sample?.id,
-        }
-      );
+      this.getLoadingAndTestOrdersData(parameter);
+      console.log("GETEEE");
     } else {
       // Attachment
       this.savingLabResultsState$ = of(false);
@@ -590,9 +572,36 @@ export class ResultsFeedingModalComponent implements OnInit {
           }
         });
     }
+  }
 
+  getLoadingAndTestOrdersData(parameter?: any): void {
     setTimeout(() => {
       this.saving = false;
+      this.loadSampleByUuid();
+      this.savingLabResultsState$ = this.store.select(
+        getSavingLabTestResultsState
+      );
+
+      this.savingLabResultsState$.pipe(take(1)).subscribe((state) => {
+        if (state) {
+          if (parameter) {
+            this.savingMessage[parameter?.uuid] = null;
+          }
+        }
+      });
+      this.currentSample$ = this.store.select(
+        getFormattedLabSampleBySampleIdentifier,
+        {
+          sampleIdentifier: this.sample?.id,
+        }
+      );
+
+      this.testOrders$ = this.store.select(
+        getFormattedLabSampleOrdersBySampleIdentifier,
+        {
+          sampleIdentifier: this.sample?.id,
+        }
+      );
     }, 1000);
   }
 
@@ -662,6 +671,8 @@ export class ResultsFeedingModalComponent implements OnInit {
         this.savingMessage[item?.concept?.uuid + "-" + signOff] = null;
       }
     });
+
+    this.getLoadingAndTestOrdersData();
   }
 
   onSaveSignOffForParameter(
@@ -704,6 +715,8 @@ export class ResultsFeedingModalComponent implements OnInit {
         this.savingMessage[parameter?.uuid + "-" + signOff] = null;
       }
     });
+
+    this.getLoadingAndTestOrdersData();
   }
 
   rejectResults(e, item, currentSample, allocation) {
@@ -738,8 +751,14 @@ export class ResultsFeedingModalComponent implements OnInit {
               allocation,
             })
           );
+
+          setTimeout(() => {
+            this.loadSampleByUuid();
+          }, 100);
         }
       });
+
+    this.getLoadingAndTestOrdersData();
   }
 
   amendResults(e, itemUuid) {
@@ -778,17 +797,161 @@ export class ResultsFeedingModalComponent implements OnInit {
               allocation,
             })
           );
+
+          setTimeout(() => {
+            this.loadSampleByUuid();
+          }, 100);
         }
       });
+
+    this.getLoadingAndTestOrdersData();
   }
 
   fileSelection(event, parameter): void {
     event.stopPropagation();
-    const fileInputElement: HTMLElement = document.getElementById(
-      "file-selector-" + parameter?.uuid
-    );
+    // const fileInputElement: HTMLElement = document.getElementById(
+    //   "file-selector-" + parameter?.uuid
+    // );
     this.file = event.target.files[0];
     this.values[parameter?.uuid] = this.file;
     this.values[parameter?.uuid + "-comment"] = "Attachment";
+  }
+
+  onCheckToSetValue(event, sample, item, parameter, allocation): void {
+    const resultObject = {
+      concept: {
+        uuid: parameter?.uuid,
+      },
+      testAllocation: {
+        uuid: allocation?.allocationUuid,
+      },
+      valueNumeric: parameter?.numeric ? this.values[parameter?.uuid] : null,
+      valueText:
+        !parameter?.numeric && parameter?.answers?.length == 0
+          ? this.values[parameter?.uuid]
+          : null,
+
+      valueCoded:
+        parameter.answers && parameter.answers.length > 0
+          ? {
+              uuid: this.values[parameter?.uuid],
+            }
+          : null,
+      abnormal: this.values[parameter?.uuid + "-abnormal"]
+        ? this.values[parameter?.uuid + "-abnormal"]
+        : false,
+      additionalReqTimeLimit: this.getTimeConfigs(item?.order?.concept?.uuid)
+        ?.additionalReqTimeLimit,
+      standardTAT: this.getTimeConfigs(item?.order?.concept?.uuid)?.standardTAT,
+      urgentTAT: this.getTimeConfigs(item?.order?.concept?.uuid)?.urgentTAT,
+    };
+
+    const resultsComments = {
+      status: this.amendmentRemarks
+        ? "AMENDED"
+        : this.values[item?.uuid + "-comment"]
+        ? "ANSWER DESCRIPTION"
+        : "COMMENT",
+      category: this.amendmentRemarks ? "AMENDED" : "COMMENT",
+      remarks: this.amendmentRemarks
+        ? this.amendmentRemarks
+        : this.values[item?.uuid + "-comment"]
+        ? this.values[item?.uuid + "-comment"]
+        : "NO DESCRPTION FOR PARAMETER",
+      user: {
+        uuid: this.userUuid,
+      },
+      testAllocation: {
+        uuid: allocation.allocationUuid,
+      },
+    };
+    this.bulkResultsToSave = event?.checked
+      ? [
+          ...this.bulkResultsToSave,
+          {
+            sampleId: sample?.id,
+            resultsData: resultObject,
+            resultComments: resultsComments,
+          },
+        ]
+      : this.bulkResultsToSave?.filter(
+          (result) => result?.sampleId != sample?.id
+        ) || [];
+  }
+
+  onSaveAll(event: Event, values: any, currentSample): void {
+    event.stopPropagation();
+    this.hasFedResults =
+      (Object.keys(values)?.filter((key) => values[key]) || [])?.length > 0;
+    if (this.hasFedResults) {
+      this.saveAllMessage = null;
+      const testAllocations = _.flatten(
+        currentSample?.orders?.map((order) =>
+          order?.testAllocations?.map((alloc) => {
+            return {
+              ...alloc,
+              parameter: (order?.order?.concept?.setMembers?.filter(
+                (setMember) => setMember?.uuid === alloc?.parameterUuid
+              ) || [])[0],
+            };
+          })
+        ) || []
+      );
+      const resultsToSave = testAllocations
+        ?.map((testAllocation) => {
+          if (this.values[testAllocation?.parameterUuid])
+            return {
+              concept: {
+                uuid: testAllocation?.parameterUuid,
+              },
+              testAllocation: {
+                uuid: testAllocation?.allocationUuid,
+              },
+              valueNumeric: testAllocation?.parameter?.numeric
+                ? this.values[testAllocation?.parameterUuid]
+                : null,
+              valueText:
+                !testAllocation?.parameter?.numeric &&
+                testAllocation?.parameter?.answers?.length == 0
+                  ? this.values[testAllocation?.parameterUuid]
+                  : null,
+
+              valueCoded:
+                testAllocation?.parameter?.answers &&
+                testAllocation?.parameter?.answers.length > 0
+                  ? {
+                      uuid: this.values[testAllocation?.parameterUuid],
+                    }
+                  : null,
+              abnormal: this.values[testAllocation?.parameterUuid + "-abnormal"]
+                ? this.values[testAllocation?.parameterUuid + "-abnormal"]
+                : false,
+              additionalReqTimeLimit: this.getTimeConfigs(
+                testAllocation?.order?.concept?.uuid
+              )?.additionalReqTimeLimit,
+              standardTAT: this.getTimeConfigs(
+                testAllocation?.order?.concept?.uuid
+              )?.standardTAT,
+              urgentTAT: this.getTimeConfigs(
+                testAllocation?.order?.concept?.uuid
+              )?.urgentTAT,
+            };
+        })
+        ?.filter((allocWithResults) => allocWithResults);
+
+      this.store.dispatch(
+        saveLabTestResults({
+          results: resultsToSave,
+          comments: [],
+          sampleDetails: currentSample,
+          concept: null,
+          allocation: null,
+          isResultAnArray: true,
+        })
+      );
+      this.getLoadingAndTestOrdersData();
+    } else {
+      this.saveAllMessage = "Please feed results first";
+    }
   }
 }

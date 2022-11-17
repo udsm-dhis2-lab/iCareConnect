@@ -1052,15 +1052,13 @@ export class SingleRegistrationComponent implements OnInit {
                                                                   [
                                                                     ...this
                                                                       .sampleLabelsUsedDetails,
-                                                                    ...this
-                                                                      .sampleLabelsUsedDetails,
+                                                                    sample,
                                                                   ];
                                                                 this.sampleLabelsUsedDetails =
                                                                   [
                                                                     ...this
                                                                       .sampleLabelsUsedDetails,
-                                                                    ...this
-                                                                      .sampleLabelsUsedDetails,
+                                                                    sample,
                                                                   ];
 
                                                                 // Create sample allocations
@@ -1643,21 +1641,24 @@ export class SingleRegistrationComponent implements OnInit {
                                   //     this.savingDataResponse = encounterResponse;
 
                                   //   });
-
-                                  // Send to Extrnal System
-                                  this.savingLabRequest = true;
-                                  const labRequest =
-                                    this.createLabRequestPayload(
-                                      this.personDetailsData
-                                        ?.pimaCOVIDLinkDetails
-                                    );
-                                  this.otherSystemsService
-                                    .sendLabRequest(labRequest)
-                                    .subscribe((response) => {
-                                      if (response) {
-                                        this.savingLabRequest = false;
-                                      }
-                                    });
+                                  if (
+                                    this.personDetailsData?.pimaCOVIDLinkDetails
+                                  ) {
+                                    // Send to Extrnal System
+                                    this.savingLabRequest = true;
+                                    const labRequest =
+                                      this.createLabRequestPayload(
+                                        this.personDetailsData
+                                          ?.pimaCOVIDLinkDetails
+                                      );
+                                    this.otherSystemsService
+                                      .sendLabRequest(labRequest)
+                                      .subscribe((response) => {
+                                        if (response) {
+                                          this.savingLabRequest = false;
+                                        }
+                                      });
+                                  }
                                 } else {
                                   this.savingData = false;
                                 }

@@ -5,7 +5,8 @@
     currentSample: currentSample$ | async,
     testOrders: testOrders$ | async,
     savingLabResultsState: savingLabResultsState$ | async,
-    savingLabResultsStatusState: savingLabResultsStatusState$ | async
+    savingLabResultsStatusState: savingLabResultsStatusState$ | async,
+    labSampleLoadingState: labSampleLoadingState$ | async
   } as params"
 >
   <mat-toolbar class="modal-header"
@@ -16,7 +17,7 @@
     </span></mat-toolbar
   >
 
-  <div class="loading-overlay" *ngIf="saving">
+  <div class="loading-overlay" *ngIf="params?.savingLabResultsState">
     <div class="text-center">
       <div>Saving data</div>
       <div class="mt-3 d-flex justify-content-center w-100">
@@ -35,11 +36,15 @@
     <b>{{ params?.currentSample?.patient?.age }} Yrs</b>
   </div>
 
+  <!-- {{ params?.currentSample | json }} -->
   <mat-progress-bar
     mode="indeterminate"
-    *ngIf="loadingTestTimeSettings"
+    *ngIf="loadingTestTimeSettings || params?.labSampleLoadingState"
   ></mat-progress-bar>
-  <div style="padding: 10px" *ngIf="!loadingTestTimeSettings">
+  <div
+    style="padding: 10px"
+    *ngIf="!loadingTestTimeSettings && !params?.labSampleLoadingState"
+  >
     <div class="w-50" *ngIf="LISConfigurations?.isLIS">
       <mat-form-field class="w-50">
         <mat-label>Search</mat-label>
@@ -743,47 +748,51 @@
                       </mat-tab-group>
                     </td>
                     <td>
-                      <button
-                        [disabled]="
-                          !item?.testAllocations[0] ||
-                          (!values[item?.order?.concept?.uuid] &&
-                            !values[item?.order?.concept?.uuid + '-comment']) ||
-                          (item?.testAllocations[0]?.firstSignOff &&
-                            !LISConfigurations?.isLIS)
-                        "
-                        (click)="
-                          onSave(
-                            $event,
-                            item,
-                            params?.testOrders,
-                            params?.currentSample,
-                            item?.testAllocations[0]
-                          )
-                        "
-                        mat-stroked-button
-                        class="ml-2"
-                      >
-                        <mat-spinner
-                          *ngIf="
-                            params?.savingLabResultsState &&
-                            savingMessage[item?.order?.concept?.uuid]
+                      <div class="d-flex justify-content-end">
+                        <button
+                          [disabled]="
+                            !item?.testAllocations[0] ||
+                            (!values[item?.order?.concept?.uuid] &&
+                              !values[
+                                item?.order?.concept?.uuid + '-comment'
+                              ]) ||
+                            (item?.testAllocations[0]?.firstSignOff &&
+                              !LISConfigurations?.isLIS)
                           "
-                          color="primary"
-                          [diameter]="20"
-                          style="
-                            display: inline-block !important;
-                            margin-right: 4px;
+                          (click)="
+                            onSave(
+                              $event,
+                              item,
+                              params?.testOrders,
+                              params?.currentSample,
+                              item?.testAllocations[0]
+                            )
                           "
+                          mat-stroked-button
+                          class="ml-2"
                         >
-                        </mat-spinner>
-                        {{
-                          item?.testAllocations?.length == 0 ||
-                          (item?.testAllocations[0]?.results &&
-                            item?.testAllocations[0]?.results?.length == 0)
-                            ? "Save"
-                            : "Update"
-                        }}
-                      </button>
+                          <mat-spinner
+                            *ngIf="
+                              params?.savingLabResultsState &&
+                              savingMessage[item?.order?.concept?.uuid]
+                            "
+                            color="primary"
+                            [diameter]="20"
+                            style="
+                              display: inline-block !important;
+                              margin-right: 4px;
+                            "
+                          >
+                          </mat-spinner>
+                          {{
+                            item?.testAllocations?.length == 0 ||
+                            (item?.testAllocations[0]?.results &&
+                              item?.testAllocations[0]?.results?.length == 0)
+                              ? "Save"
+                              : "Update"
+                          }}
+                        </button>
+                      </div>
                       <span
                         *ngIf="!item?.testAllocations[0]"
                         class="text-warning"
@@ -1340,73 +1349,108 @@
                       </mat-tab-group>
                     </td>
                     <td>
-                      <button
-                        [disabled]="
-                          (parameter?.datatype?.display !== 'Complex' &&
-                            !item?.allocationsPairedBySetMember[
-                              parameter?.uuid
-                            ]) ||
-                          (parameter?.datatype?.display === 'Complex' &&
-                            !file) ||
-                          (!values[parameter?.uuid] &&
-                            !values[parameter?.uuid + '-comment']) ||
-                          (item?.allocationsPairedBySetMember[parameter?.uuid]
-                            ?.firstSignOff &&
-                            !LISConfigurations?.isLIS)
-                        "
-                        (click)="
-                          onSaveParameterValue(
-                            $event,
-                            item,
-                            parameter,
-                            params?.currentSample,
-                            item?.allocationsPairedBySetMember[parameter?.uuid],
-                            parameter?.datatype?.display === 'Complex'
-                              ? 'file'
-                              : null
-                          )
-                        "
-                        mat-stroked-button
-                        class="ml-2"
-                      >
-                        <mat-spinner
-                          *ngIf="
-                            params?.savingLabResultsState &&
-                            savingMessage[parameter?.uuid]
+                      <div class="d-flex justify-content-end">
+                        <!-- <section>
+                          <mat-checkbox
+                            [disabled]="
+                              (parameter?.datatype?.display !== 'Complex' &&
+                                !item?.allocationsPairedBySetMember[
+                                  parameter?.uuid
+                                ]) ||
+                              (parameter?.datatype?.display === 'Complex' &&
+                                !file) ||
+                              (!values[parameter?.uuid] &&
+                                !values[parameter?.uuid + '-comment']) ||
+                              (item?.allocationsPairedBySetMember[
+                                parameter?.uuid
+                              ]?.firstSignOff &&
+                                !LISConfigurations?.isLIS)
+                            "
+                            (change)="
+                              onCheckToSetValue(
+                                $event,
+                                sample,
+                                item,
+                                parameter,
+                                item?.allocationsPairedBySetMember[
+                                  parameter?.uuid
+                                ]
+                              )
+                            "
+                            color="primary"
+                            >Check</mat-checkbox
+                          >
+                        </section> -->
+                        <button
+                          [disabled]="
+                            (parameter?.datatype?.display !== 'Complex' &&
+                              !item?.allocationsPairedBySetMember[
+                                parameter?.uuid
+                              ]) ||
+                            (parameter?.datatype?.display === 'Complex' &&
+                              !file) ||
+                            (!values[parameter?.uuid] &&
+                              !values[parameter?.uuid + '-comment']) ||
+                            (item?.allocationsPairedBySetMember[parameter?.uuid]
+                              ?.firstSignOff &&
+                              !LISConfigurations?.isLIS)
                           "
-                          color="primary"
-                          [diameter]="20"
-                          style="
-                            display: inline-block !important;
-                            margin-right: 4px;
+                          (click)="
+                            onSaveParameterValue(
+                              $event,
+                              item,
+                              parameter,
+                              params?.currentSample,
+                              item?.allocationsPairedBySetMember[
+                                parameter?.uuid
+                              ],
+                              parameter?.datatype?.display === 'Complex'
+                                ? 'file'
+                                : null
+                            )
+                          "
+                          mat-stroked-button
+                          class="ml-2"
+                        >
+                          <mat-spinner
+                            *ngIf="
+                              params?.savingLabResultsState &&
+                              savingMessage[parameter?.uuid]
+                            "
+                            color="primary"
+                            [diameter]="20"
+                            style="
+                              display: inline-block !important;
+                              margin-right: 4px;
+                            "
+                          >
+                          </mat-spinner>
+                          {{
+                            item?.allocationsPairedBySetMember[
+                              parameter?.uuid
+                            ] &&
+                            item?.allocationsPairedBySetMember[parameter?.uuid]
+                              ?.results?.length > 0
+                              ? "Update"
+                              : "Save"
+                          }}
+                        </button>
+
+                        <span
+                          class="mt-2"
+                          *ngIf="
+                            LISConfigurations?.isLIS &&
+                            temporaryValues[parameter?.uuid] &&
+                            values[parameter?.uuid] &&
+                            temporaryValues[parameter?.uuid] !=
+                              values[parameter?.uuid]
                           "
                         >
-                        </mat-spinner>
-                        {{
-                          item?.allocationsPairedBySetMember[parameter?.uuid] &&
-                          item?.allocationsPairedBySetMember[parameter?.uuid]
-                            ?.results?.length > 0
-                            ? "Update"
-                            : "Save"
-                        }}
-                      </button>
-
-                      <!-- {{item?.allocationsPairedBySetMember | json}} -->
-                      <span
-                        class="mt-2"
-                        *ngIf="
-                          LISConfigurations?.isLIS &&
-                          temporaryValues[parameter?.uuid] &&
-                          values[parameter?.uuid] &&
-                          temporaryValues[parameter?.uuid] !=
-                            values[parameter?.uuid]
-                        "
-                      >
-                        <div class="alert alert-warning" role="alert">
-                          You have incorrect entered results
-                        </div>
-                      </span>
-
+                          <div class="alert alert-warning" role="alert">
+                            You have incorrect entered results
+                          </div>
+                        </span>
+                      </div>
                       <span
                         *ngIf="
                           !item?.allocationsPairedBySetMember[parameter?.uuid]
@@ -2590,8 +2634,22 @@
         </div>
       </mat-tab>
     </mat-tab-group>
-    <div class="w-100 d-flex justify-content-end mb-2 mt-2">
-      <button mat-stroked-button (click)="onClose($event)">Close</button>
+    <div class="w-100 mb-2 mt-2">
+      <div class="alert alert-warning" role="alert" *ngIf="saveAllMessage">
+        {{ saveAllMessage }}
+      </div>
+      <div class="d-flex justify-content-end">
+        <button mat-stroked-button (click)="onClose($event)">Close</button>
+        <button
+          class="ml-2"
+          mat-flat-button
+          color="primary"
+          *ngIf="dialogData?.actionType === 'Entry'"
+          (click)="onSaveAll($event, values, params?.currentSample)"
+        >
+          Save All
+        </button>
+      </div>
     </div>
   </div>
 </div>

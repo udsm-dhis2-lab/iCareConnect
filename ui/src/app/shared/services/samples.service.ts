@@ -18,6 +18,13 @@ export class SamplesService {
     private opeMRSHttpClientService: OpenmrsHttpClientService
   ) {}
 
+  getSampleByUuid(uuid: string): Observable<any> {
+    return this.opeMRSHttpClientService.get(`lab/sample/${uuid}`).pipe(
+      map((response) => response),
+      catchError((error) => of(error))
+    );
+  }
+
   getLabSamplesByCollectionDates(
     dates,
     startIndex?: number,
@@ -267,10 +274,30 @@ export class SamplesService {
     return this.httpClient.post(BASE_URL + "lab/results", result);
   }
 
+  saveLabResults(results): Observable<any> {
+    return zip(
+      ...results?.map((result) => {
+        return this.httpClient.post(BASE_URL + "lab/results", result);
+      }),
+      catchError((error) => of(error))
+    );
+  }
+
   saveLabResultStatus(resultStatus): Observable<any> {
     return this.httpClient.post(
       BASE_URL + "lab/allocationstatus",
       resultStatus
+    );
+  }
+
+  saveLabResultStatuses(resultStatuses): Observable<any> {
+    return zip(
+      ...resultStatuses?.map((resultStatus) => {
+        return this.httpClient.post(
+          BASE_URL + "lab/allocationstatus",
+          resultStatus
+        );
+      })
     );
   }
 

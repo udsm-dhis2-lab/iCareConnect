@@ -1,5 +1,5 @@
-import { Injectable } from '@angular/core';
-import { Actions, createEffect, ofType } from '@ngrx/effects';
+import { Injectable } from "@angular/core";
+import { Actions, createEffect, ofType } from "@ngrx/effects";
 import {
   loadSampleTypesUuid,
   loadSampleTypes,
@@ -11,16 +11,16 @@ import {
   setLabConfigurations,
   loadConfigsForLabOrdersManagement,
   loadLabOrdersMetaDataDependencies,
-} from '../actions';
-import { switchMap, map, catchError, mergeMap } from 'rxjs/operators';
-import { of } from 'rxjs';
-import { Store } from '@ngrx/store';
-import * as _ from 'lodash';
-import { SampleTypesService } from 'src/app/shared/services/sample-types.service';
+} from "../actions";
+import { switchMap, map, catchError, mergeMap } from "rxjs/operators";
+import { of } from "rxjs";
+import { Store } from "@ngrx/store";
+import * as _ from "lodash";
+import { SampleTypesService } from "src/app/shared/services/sample-types.service";
 import {
   formatSetMembers,
   formatSampleTypes,
-} from 'src/app/shared/helpers/sample-types.helper';
+} from "src/app/shared/helpers/sample-types.helper";
 
 @Injectable()
 export class SampleTypesEffects {
@@ -43,7 +43,7 @@ export class SampleTypesEffects {
                   SetMembers: formatSetMembers(
                     sampletype.setMembers,
                     sampletype.display,
-                    'configs'
+                    "configs"
                   ),
                 })
               );
@@ -54,7 +54,7 @@ export class SampleTypesEffects {
             });
           }),
           catchError((error) => {
-            console.log('error :: ', error);
+            console.log("error :: ", error);
 
             return of(loadingSampleTypesFails({ error }));
           })
@@ -71,7 +71,9 @@ export class SampleTypesEffects {
           switchMap((configs) => {
             return [
               loadLabOrdersMetaDataDependencies({
-                configs: JSON.parse(configs?.results[0]?.value),
+                configs: configs?.results[0]
+                  ? JSON.parse(configs?.results[0]?.value)
+                  : null,
               }),
               setLabConfigurations({
                 configs: JSON.parse(configs?.results[0]?.value),

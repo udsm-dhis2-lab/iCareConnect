@@ -1,10 +1,15 @@
 import { createReducer, on } from "@ngrx/store";
 import {
   addFormattedLabSamples,
+  addLoadedSample,
+  addLoadedSampleRejectionCodedReasons,
   addReloadedLabSamples,
+  clearLabSample,
   clearLoadedLabSamples,
   collectSample,
   loadLabSamplesByCollectionDates,
+  loadSampleByUuid,
+  loadSampleRejectionCodedReasons,
   markSampleAsToRecollect,
   saveLabTestResults,
   saveLabTestResultsStatus,
@@ -36,6 +41,36 @@ const newReducer = createReducer(
       ...state,
       ...loadedBaseState,
     });
+  }),
+  on(loadSampleByUuid, (state) => {
+    return { ...state };
+  }),
+  on(clearLabSample, (state, { label }) => {
+    return newLabSamplesAdapter.removeOne(label, state);
+  }),
+  on(addLoadedSample, (state, { sample }) => {
+    const matchedSample = state?.entities[sample?.id];
+    return !matchedSample
+      ? newLabSamplesAdapter.addOne(sample, {
+          ...state,
+          ...loadedBaseState,
+        })
+      : newLabSamplesAdapter.updateOne(
+          { id: sample?.id, changes: sample },
+          {
+            ...state,
+            collectingSample: false,
+            collectedSample: true,
+            settingLabSampleStatus: false,
+            setSampleStatus: true,
+            savingResults: false,
+            savedResults: true,
+            savingStatus: false,
+            savedStatus: true,
+            markingReCollect: false,
+            markedAsReCollect: true,
+          }
+        );
   }),
   on(updateLabSample, (state, { sample }) =>
     newLabSamplesAdapter.updateOne(
@@ -124,6 +159,9 @@ const reducer = createReducer(
     return labSamplesAdapter.upsertMany(samples, {
       ...state,
     });
+  }),
+  on(loadSampleRejectionCodedReasons, (state) => {
+    return state;
   })
 );
 
