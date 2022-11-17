@@ -232,6 +232,7 @@ export class ReportsGeneratorComponent implements OnInit {
       return {
         ...param,
         name: this.sanitizeParameter(param?.lable ? param.lable : param?.name),
+        type: param?.type === 'DATETIME' ? 'DATE' : param?.type
       };
     });
 
