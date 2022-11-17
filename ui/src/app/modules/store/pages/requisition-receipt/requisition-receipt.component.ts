@@ -45,21 +45,22 @@ export class RequisitionReceiptComponent implements OnInit {
 
   searchStock(event: any): void {
     this.filterLoaded = false;
-    this.searchTerm = event.target?.value;
+    this.searchTerm = event ? event?.target?.value : "";
     setTimeout(() => {
       this.requisitions$ = this.store
         .pipe(select(getRequisitionsReceived))
         .pipe(
           map((requisitions) => {
-            this.filterLoaded = true;
             if (this.searchTerm?.length > 0){
               let filteredRequisitions = requisitions?.filter((requisition) => {
-                if (requisition?.name?.includes(this.searchTerm)) {
+                if (requisition?.name?.toLowerCase().includes(this.searchTerm.toLowerCase())) {
                   return requisition;
                 }
               });
+              this.filterLoaded = true;
               return filteredRequisitions;
             }
+            this.filterLoaded = true;
             return requisitions;
           })
         );

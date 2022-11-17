@@ -4,7 +4,7 @@ import { AppState } from "src/app/store/reducers";
 import { flatten, keyBy } from "lodash";
 import { EncountersService } from "../../services/encounters.service";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
-import { tap } from "rxjs/operators";
+import { map, tap } from "rxjs/operators";
 import { Observable } from "rxjs";
 import { SharedConfirmationComponent } from "../shared-confirmation /shared-confirmation.component";
 import { MatDialog } from "@angular/material/dialog";
@@ -24,6 +24,7 @@ export class CurrentPrescriptionComponent implements OnInit {
   drugsPrescribed: any;
   errors: any[] = [];
   specificDrugConceptUuid$: Observable<any>;
+  prescriptionArrangementFields$: Observable<any>;
   
   constructor(
     private systemSettingsService: SystemSettingsService, 
@@ -53,6 +54,31 @@ export class CurrentPrescriptionComponent implements OnInit {
               },
             ];
           }
+        })
+      );
+    this.prescriptionArrangementFields$ = this.systemSettingsService
+      .getSystemSettingsByKey("iCare.clinic.prescription.arrangement")
+      .pipe(
+        map((response) => {
+          if (response === "none") {
+            this.errors = [
+              ...this.errors,
+              {
+                error: {
+                  message:
+                    "Arrangement setting isn't defined, Set 'iCare.clinic.prescription.arrangement' or Contact IT (Close to continue)",
+                },
+                type: "warning",
+              },
+            ];
+          }
+          if(response?.error){
+            this.errors = [...this.errors, response?.error];
+          }
+          return {
+            ...response,
+            keys: Object.keys(response).length
+          };
         })
       );
   }

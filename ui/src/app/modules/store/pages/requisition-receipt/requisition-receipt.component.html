@@ -59,7 +59,7 @@
       </tr>
     </table> -->
     <ng-container>
-      <mat-progress-bar mode="indeterminate" *ngIf="!filterLoaded"></mat-progress-bar>
+      <mat-progress-bar mode="indeterminate" *ngIf="!params?.requisitions.length || !filterLoaded"></mat-progress-bar>
       <app-requisition-receipt-by-store
       *ngIf="params?.requisitions.length > 0 && filterLoaded"
       [requisitions]="params?.requisitions"
