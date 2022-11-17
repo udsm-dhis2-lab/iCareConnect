@@ -65,11 +65,15 @@ export class FormService {
           })
         );
       } else {
-        return from(
-          this.api.concept.getAllConcepts(omit(parameters, "value"))
-        ).pipe(
+        let params = omit(parameters, "value");
+        const hasSearchTerm = field?.searchTerm ? true : false;
+        params = {
+          ...params,
+          q: hasSearchTerm ? field?.searchTerm : params?.q,
+        };
+        return from(this.api.concept.getAllConcepts(params)).pipe(
           map((response) => {
-            return orderBy(
+            const concepts = orderBy(
               (
                 response.results.filter(
                   (result: any) =>
@@ -95,6 +99,24 @@ export class FormService {
               ["display"],
               ["asc"]
             );
+            if (!hasSearchTerm) {
+              return concepts;
+            } else if (
+              hasSearchTerm &&
+              parameters?.q?.toLowerCase() != field?.searchTerm?.toLowerCase()
+            ) {
+              return concepts?.filter((listItem) => {
+                if (
+                  listItem?.name
+                    ?.toLowerCase()
+                    ?.indexOf(parameters?.q?.toLowerCase()) > -1
+                ) {
+                  return listItem;
+                }
+              });
+            } else {
+              return concepts;
+            }
           })
         );
       }
