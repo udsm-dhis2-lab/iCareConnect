@@ -148,7 +148,7 @@
                       {{ patientDetailsAndSamples?.patient?.givenName }}
                       {{ patientDetailsAndSamples?.patient?.middleName }}
                       {{ patientDetailsAndSamples?.patient?.familyName }}
-                      {{ phoneNumber ? "("+phoneNumber+")": "" }}
+                      {{ !phoneNumber.length ? "("+phoneNumber+")": "" }}
                     </td>
                     <td><b>Laboratory Number</b></td>
                     <td>
@@ -280,21 +280,6 @@
                       </span>
                     </td>
                   </tr>
-                  <!-- <tr *ngIf="LISConfigurations?.isLIS">
-                    <td></td>
-                    <td></td>
-                    <td>
-                      <b> Received by </b>
-                    </td>
-                    <td>
-                      <span>
-                        {{
-                          samplesGroupedByDepartment?.samples[0]
-                            ?.receivedByStatus?.user?.name
-                        }}
-                      </span>
-                    </td>
-                  </tr> -->
                   <tr *ngIf="LISConfigurations?.isLIS">
                     <td>
                       <span *ngIf="params?.referringDoctorAttributes">
