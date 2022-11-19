@@ -562,6 +562,7 @@ export class SampleAcceptanceComponent implements OnInit {
         authorized: authorized
       },
       width: "60%",
+      height: "100%",
       disableClose: false,
     });
   }
