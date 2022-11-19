@@ -86,7 +86,7 @@ export const getParentLocation = createSelector(
       (location) =>
         (
           location?.tags?.filter(
-            (tag) => tag?.display?.toLowerCase() === "login location"
+            (tag) => tag?.display?.toLowerCase() === "main location"
           ) || []
         ).length > 0
     ) || [])[0];
