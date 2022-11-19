@@ -410,7 +410,7 @@ export class PersonDetailsComponent implements OnInit {
         key: "address",
         label: "Address",
         value: personDetails ? personDetails?.address : null,
-        required: true,
+        required: false,
         type: "text",
       }),
     ];
