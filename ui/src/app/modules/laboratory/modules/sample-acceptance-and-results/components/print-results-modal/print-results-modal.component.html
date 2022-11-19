@@ -4,7 +4,8 @@
     facility: facilityDetails$ | async,
     visit: visit$ | async,
     referringDoctorAttributes: referringDoctorAttributes$ | async,
-    refferedFromFacility: refferedFromFacility$ | async
+    refferedFromFacility: refferedFromFacility$ | async,
+    obs: obs$ | async
   } as params"
 >
   <div id="results-to-print" style="color: gray">
@@ -148,7 +149,7 @@
                       {{ patientDetailsAndSamples?.patient?.givenName }}
                       {{ patientDetailsAndSamples?.patient?.middleName }}
                       {{ patientDetailsAndSamples?.patient?.familyName }}
-                      {{ !phoneNumber.length ? "("+phoneNumber+")": "" }}
+                      {{ !phoneNumber?.length ? "("+phoneNumber+")": "" }}
                     </td>
                     <td><b>Laboratory Number</b></td>
                     <td>
@@ -271,7 +272,7 @@
                   >
                     <td>
                       <span *ngIf="params?.refferedFromFacility">
-                        <b> Referring Facility </b>
+                        <b> Facility </b>
                       </span>
                     </td>
                     <td>
@@ -323,13 +324,19 @@
                       </span>
                     </td>
                   </tr>
-                  <tr *ngIf="!LISConfigurations?.isLIS">
-                    <td></td>
-                    <td></td>
-                    <td>
-                      <b> Sample Accepted By </b>
+                  <tr>
+                    <td> 
+                      <span *ngIf="params?.obs && LISConfigurations?.isLIS"><b>Clinical Data </b> </span>
                     </td>
                     <td>
+                        <span *ngIf="params.obs && LISConfigurations?.isLIS">
+                          {{ params.obs?.latest?.value }}
+                        </span>
+                    </td>
+                    <td *ngIf="!LISConfigurations?.isLIS">
+                      <b> Sample Accepted By </b>
+                    </td>
+                    <td *ngIf="!LISConfigurations?.isLIS">
                       {{
                         samplesGroupedByDepartment?.samples[0]?.acceptedBy?.user
                           ?.name
