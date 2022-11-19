@@ -8,6 +8,7 @@ import { map, flatten, keyBy, filter, uniqBy, orderBy, groupBy } from "lodash";
 import {
   formatResults,
   formatUserChangedStatus,
+  getAuthorizationDetailsByOrder,
   getResultsCommentsStatuses,
   mergeTestAllocations,
 } from "src/app/core/helpers/lab-samples.helpers";
@@ -75,6 +76,7 @@ export class LabSample {
       );
       const formattedOrder = {
         ...order,
+        authorizationInfo: getAuthorizationDetailsByOrder(order),
         searchingText:
           order?.order?.concept?.display?.toLowerCase() +
           " " +

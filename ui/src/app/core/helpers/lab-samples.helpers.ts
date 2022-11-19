@@ -19,6 +19,39 @@ export function mergeTestAllocations(allocations: any): any {
   return alls;
 }
 
+export function getAuthorizationDetailsByOrder(order) {
+  const approvedAllocations =
+    order?.testAllocations?.filter(
+      (allocation) =>
+        (
+          allocation?.statuses?.filter(
+            (status) =>
+              status?.status == "APPROVED" || status?.category == "APPROVED"
+          ) || []
+        )?.length > 0
+    ) || [];
+  const allocationStatuses = uniqBy(
+    approvedAllocations
+      ?.map((allocation) => {
+        return allocation?.statuses?.map((status) => {
+          return {
+            ...status,
+            allocation: allocation,
+          };
+        });
+      })
+      ?.map((status) => {
+        return {
+          ...status,
+          ...status?.user,
+          name: status?.user?.display?.split(" (")[0],
+        };
+      }),
+    "name"
+  );
+  return allocationStatuses;
+}
+
 export function getAuthorizationDetails(sample) {
   const approvedAllocations = flatten(
     sample?.orders?.map((order) => {
