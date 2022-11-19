@@ -112,8 +112,6 @@ export class PrintResultsModalComponent implements OnInit {
                 "attributeTypeUuid"
               )
             }
-
-            console.log("==> Attributes: ", response);
             this.refferedFromFacility$ = this.locationService.getLocationById(
               response?.attributesKeyedByAttributeType[
                 "47da17a9-a910-4382-8149-736de57dab18"
