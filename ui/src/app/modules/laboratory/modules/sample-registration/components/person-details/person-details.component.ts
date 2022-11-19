@@ -216,7 +216,6 @@ export class PersonDetailsComponent implements OnInit {
   }
 
   onUpdatePrimaryIdentifierForm(formValues: FormValue): void {
-    this.patientUuid = undefined;
     const values = formValues.getValues();
     let identifier;
     Object.keys(values).forEach((key) => {
@@ -239,6 +238,18 @@ export class PersonDetailsComponent implements OnInit {
       .pipe(
         tap((response) => {
           this.searchByIdentifier = false;
+          if(response.length > 0){
+            response.forEach((patient) => {
+              let incomingIdentifier = patient?.identifiers?.filter((id) => {
+                if(id.identifier === identifier){
+                  return id;
+                }
+              })[0]?.identifier
+              if(!incomingIdentifier){
+                this.patientUuid = undefined;
+              }
+            })
+          }
         })
       );
   }
