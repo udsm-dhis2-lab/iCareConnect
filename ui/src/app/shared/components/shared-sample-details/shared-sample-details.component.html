@@ -2,13 +2,14 @@
   class="row"
   *ngIf="{
     obs: obs$ | async,
-    sampleConditions: sampleConditions$ | async
+    sampleConditions: sampleConditions$ | async,
+    sampleDetails: sampleDetails$ | async
   } as params"
 >
   <div [ngClass]="{ 'col-md-6': !hasResults, 'col-md-4': hasResults }">
     <div class="d-flex">
       <div class="w-50">
-        <p>FileNO: {{ sample?.mrn }}</p>
+        <p>FileNO: {{ params?.sampleDetails?.mrn }}</p>
         <p>
           Names:
           {{ sample?.patient?.givenName + " " + sample?.patient?.familyName }}
