@@ -5,7 +5,10 @@ import { HttpClient } from "@angular/common/http";
 import { from, Observable, of, zip } from "rxjs";
 import { BASE_URL } from "../constants/constants.constants";
 import { catchError, delay, map } from "rxjs/operators";
-import { SampleObject } from "src/app/modules/laboratory/resources/models";
+import {
+  LabSample,
+  SampleObject,
+} from "src/app/modules/laboratory/resources/models";
 import { formatSample } from "../helpers/lab-samples.helper";
 import { OpenmrsHttpClientService } from "../modules/openmrs-http-client/services/openmrs-http-client.service";
 
@@ -21,6 +24,26 @@ export class SamplesService {
   getSampleByUuid(uuid: string): Observable<any> {
     return this.opeMRSHttpClientService.get(`lab/sample/${uuid}`).pipe(
       map((response) => response),
+      catchError((error) => of(error))
+    );
+  }
+
+  getFormattedSampleByUuid(
+    uuid: string,
+    departments: any[],
+    specimenSources: any[],
+    codedRejectedReasons: any[]
+  ): Observable<any> {
+    return this.opeMRSHttpClientService.get(`lab/sample/${uuid}`).pipe(
+      map(
+        (response) =>
+          new LabSample(
+            response,
+            departments,
+            specimenSources,
+            codedRejectedReasons
+          )
+      ),
       catchError((error) => of(error))
     );
   }
