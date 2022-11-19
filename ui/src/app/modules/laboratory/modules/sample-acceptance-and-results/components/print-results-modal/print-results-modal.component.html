@@ -102,24 +102,21 @@
                       <b> {{ LISConfigurations?.isLIS ? "Patient File Number" : "MRN" }} </b>
                     </td>
                     <td>{{ patientDetailsAndSamples?.mrn }}</td>
-                    <td>
-                      <b>
+                    <ng-container *ngIf="!LISConfigurations?.isLIS">
+                      <td>
+                        <b>Ordering Doctor
+                        </b>
+                      </td>
+                      <td>
                         {{
-                          !LISConfigurations?.isLIS
-                            ? "Ordering Doctor"
-                            : "Registered By"
+                          samplesGroupedByDepartment["samples"][0]["orders"][0]
+                            ?.order?.orderer?.name
                         }}
-                      </b>
-                    </td>
-                    <td>
-                      {{
-                        samplesGroupedByDepartment["samples"][0]["orders"][0]
-                          ?.order?.orderer?.name
-                      }}
-                    </td>
+                      </td>
+                    </ng-container>
                   </tr>
-                  <tr *ngIf="LISConfigurations?.isLIS">
-                    <!-- <td></td>
+                  <!-- <tr *ngIf="LISConfigurations?.isLIS">
+                    <td></td>
                     <td></td>
                     <td>
                       <b> Registered On </b>
@@ -129,19 +126,8 @@
                         samplesGroupedByDepartment["samples"][0]?.dateCreated
                           | date: "medium"
                       }}
-                    </td> -->
-                    <td>
-                      <b> Received by </b>
                     </td>
-                    <td>
-                      <span>
-                        {{
-                          samplesGroupedByDepartment?.samples[0]
-                            ?.receivedByStatus?.user?.name
-                        }}
-                      </span>
-                    </td>
-                  </tr>
+                  </tr> -->
                   <tr>
                     <td>
                       <b> Patient Name </b>
@@ -285,7 +271,7 @@
                       </span>
                     </td>
                   </tr>
-                  <!-- <tr *ngIf="LISConfigurations?.isLIS">
+                  <tr *ngIf="LISConfigurations?.isLIS">
                     <td></td>
                     <td></td>
                     <td>
@@ -299,7 +285,7 @@
                         }}
                       </span>
                     </td>
-                  </tr> -->
+                  </tr>
                   <tr *ngIf="LISConfigurations?.isLIS">
                     <td></td>
                     <td></td>
