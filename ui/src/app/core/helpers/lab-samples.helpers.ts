@@ -26,26 +26,24 @@ export function getAuthorizationDetailsByOrder(order) {
         (
           allocation?.statuses?.filter(
             (status) =>
-              status?.status == "APPROVED" || status?.category == "APPROVED"
+              status?.status === "APPROVED" || status?.category === "APPROVED"
           ) || []
         )?.length > 0
     ) || [];
   const allocationStatuses = uniqBy(
     approvedAllocations
       ?.map((allocation) => {
-        return allocation?.statuses?.map((status) => {
-          return {
-            ...status,
-            allocation: allocation,
-          };
-        });
-      })
-      ?.map((status) => {
         return {
-          ...status,
-          ...status?.user,
-          name: status?.user?.display?.split(" (")[0],
-        };
+          ...allocation,
+          statuses: allocation?.statuses?.map((status) => {
+            return {
+              ...status,
+              ...status?.user,
+              name: status?.user?.display?.split(" (")[0],
+              allocation: allocation,
+            };
+          })
+        }
       }),
     "name"
   );
@@ -61,7 +59,7 @@ export function getAuthorizationDetails(sample) {
             (
               allocation?.statuses?.filter(
                 (status) =>
-                  status?.status == "APPROVED" || status?.category == "APPROVED"
+                  status?.status === "APPROVED" || status?.category === "APPROVED"
               ) || []
             )?.length > 0
         ) || []
