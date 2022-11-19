@@ -4,6 +4,13 @@ import {
 } from "src/app/shared/helpers/sample-types.helper";
 
 import * as moment from "moment";
+import { map, flatten, keyBy, filter, uniqBy, orderBy, groupBy } from "lodash";
+import {
+  formatResults,
+  formatUserChangedStatus,
+  getResultsCommentsStatuses,
+  mergeTestAllocations,
+} from "src/app/core/helpers/lab-samples.helpers";
 export interface SampleObject {
   id?: string;
   uuid?: string;
@@ -60,11 +67,205 @@ export class LabSample {
   }
 
   get orders(): any[] {
-    return this.sample?.orders;
+    return map(this.sample?.orders, (order) => {
+      const allocationStatuses = flatten(
+        order.testAllocations.map((allocation) => {
+          return allocation?.statuses;
+        })
+      );
+      const formattedOrder = {
+        ...order,
+        searchingText:
+          order?.order?.concept?.display?.toLowerCase() +
+          " " +
+          (
+            this.keyedSpecimenSources[
+              order?.order?.concept?.uuid
+            ]?.setMembers?.map((member) => member?.display?.toLowerCase()) || []
+          )?.join(" "),
+        order: {
+          ...order?.order,
+          concept: {
+            ...order?.order?.concept,
+            ...this.keyedSpecimenSources[order?.order?.concept?.uuid],
+            uuid: order?.order?.concept?.uuid,
+            display:
+              order?.order?.concept?.display?.indexOf(":") > -1
+                ? order?.order?.concept?.display?.split(":")[1]
+                : order?.order?.concept?.display,
+            setMembers:
+              this.keyedDepartments[order?.order?.concept?.uuid]?.setMembers
+                ?.length == 0
+                ? []
+                : map(
+                    this.keyedSpecimenSources[order?.order?.concept?.uuid]
+                      ?.setMembers,
+                    (member) => {
+                      return {
+                        ...member,
+                        display:
+                          member?.display?.indexOf(":") > -1
+                            ? member?.display?.split(":")[1]
+                            : member?.display,
+                      };
+                    }
+                  ),
+            keyedAnswers: keyBy(
+              this.keyedSpecimenSources[order?.order?.concept?.uuid]?.answers,
+              "uuid"
+            ),
+          },
+        },
+        firstSignOff: false,
+        secondSignOff: false,
+        collected: true,
+        collectedBy: {
+          display: this.sample?.creator?.display?.split(" (")[0],
+          name: this.sample?.creator?.display?.split(" (")[0],
+          uid: this.sample?.creator?.uuid,
+        },
+        accepted:
+          (filter(this.sample?.statuses, { status: "ACCEPTED" }) || [])
+            ?.length > 0
+            ? true
+            : false,
+        acceptedBy: formatUserChangedStatus(
+          (filter(this.sample?.statuses, {
+            status: "ACCEPTED",
+          }) || [])[0]
+        ),
+        allocationStatuses: allocationStatuses,
+        testAllocations: uniqBy(
+          map(mergeTestAllocations(order?.testAllocations), (allocation) => {
+            const authorizationStatus = orderBy(
+              allocation?.statuses?.filter(
+                (status) =>
+                  status?.status == "APPROVED" || status?.category == "APPROVED"
+              ) || [],
+              ["timestamp"],
+              ["desc"]
+            )[0];
+            return {
+              ...allocation,
+              parameterUuid: allocation?.concept?.uuid,
+              authorizationInfo:
+                authorizationStatus?.status === "APPROVED" ||
+                authorizationStatus?.category === "APPROVED"
+                  ? authorizationStatus
+                  : null,
+              firstSignOff:
+                allocation?.statuses?.length > 0 &&
+                (orderBy(allocation?.statuses, ["timestamp"], ["desc"])[0]
+                  ?.status == "APPROVED" ||
+                  orderBy(allocation?.statuses, ["timestamp"], ["desc"])[0]
+                    ?.status == "AUTHORIZED")
+                  ? true
+                  : false,
+              secondSignOff:
+                allocation?.statuses?.length > 0 &&
+                orderBy(allocation?.statuses, ["timestamp"], ["desc"])[0]
+                  ?.status == "APPROVED" &&
+                orderBy(allocation?.statuses, ["timestamp"], ["desc"])[1]
+                  ?.status == "APPROVED"
+                  ? true
+                  : false,
+              rejected:
+                allocation?.statuses?.length > 0 &&
+                (orderBy(allocation?.statuses, ["timestamp"], ["desc"])[0]
+                  ?.status == "REJECTED" ||
+                  orderBy(allocation?.statuses, ["timestamp"], ["desc"])[0]
+                    ?.category == "REJECTED")
+                  ? true
+                  : false,
+              rejectionStatus:
+                allocation?.statuses?.length > 0 &&
+                orderBy(allocation?.statuses, ["timestamp"], ["desc"])[0]
+                  ?.status == "REJECTED"
+                  ? orderBy(allocation?.statuses, ["timestamp"], ["desc"])[0]
+                  : null,
+              results: formatResults(allocation?.results),
+              statuses: allocation?.statuses,
+              resultsCommentsStatuses: getResultsCommentsStatuses(
+                allocation?.statuses
+              ),
+              allocationUuid: allocation?.uuid,
+            };
+          }),
+          "parameterUuid"
+        ),
+        allocationsGroupedByParameterUuid: groupBy(
+          map(order?.testAllocations, (allocation) => {
+            const authorizationStatus = orderBy(
+              allocation?.statuses,
+              ["timestamp"],
+              ["desc"]
+            )[0];
+            if (allocation?.results?.length > 0) {
+              return {
+                ...allocation,
+                parameterUuid: allocation?.concept?.uuid,
+                authorizationInfo:
+                  authorizationStatus?.status === "APPROVED" ||
+                  authorizationStatus?.category === "APPROVED"
+                    ? authorizationStatus
+                    : null,
+                firstSignOff:
+                  allocation?.statuses?.length > 0 &&
+                  (orderBy(allocation?.statuses, ["timestamp"], ["desc"])[0]
+                    ?.status == "APPROVED" ||
+                    orderBy(allocation?.statuses, ["timestamp"], ["desc"])[0]
+                      ?.status == "AUTHORIZED")
+                    ? true
+                    : false,
+                secondSignOff:
+                  allocation?.statuses?.length > 0 &&
+                  orderBy(allocation?.statuses, ["timestamp"], ["desc"])[0]
+                    ?.status == "APPROVED" &&
+                  orderBy(allocation?.statuses, ["timestamp"], ["desc"])[1]
+                    ?.status == "APPROVED"
+                    ? true
+                    : false,
+                rejected:
+                  allocation?.statuses?.length > 0 &&
+                  (orderBy(allocation?.statuses, ["timestamp"], ["desc"])[0]
+                    ?.status == "REJECTED" ||
+                    orderBy(allocation?.statuses, ["timestamp"], ["desc"])[0]
+                      ?.category == "REJECTED")
+                    ? true
+                    : false,
+                rejectionStatus:
+                  allocation?.statuses?.length > 0 &&
+                  orderBy(allocation?.statuses, ["timestamp"], ["desc"])[0]
+                    ?.status == "REJECTED"
+                    ? orderBy(allocation?.statuses, ["timestamp"], ["desc"])[0]
+                    : null,
+                results: formatResults(allocation?.results),
+                statuses: allocation?.statuses,
+                resultsCommentsStatuses: getResultsCommentsStatuses(
+                  allocation?.statuses
+                ),
+                allocationUuid: allocation?.uuid,
+              };
+            }
+          })?.filter((alloc) => alloc),
+          "parameterUuid"
+        ),
+      };
+      return formattedOrder;
+    });
   }
 
   get ordersWithResults(): any[] {
-    return this.sample?.orders;
+    return (
+      this.orders?.filter(
+        (order) =>
+          (
+            order?.testAllocations?.filter(
+              (allocation) => allocation?.results?.length > 0
+            ) || []
+          )?.length > 0
+      ) || []
+    );
   }
 
   get statuses(): any {

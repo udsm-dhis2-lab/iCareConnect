@@ -1,6 +1,6 @@
 <ng-container *ngIf="parameterResultsDetails">
   <div>
-    <span>
+    <span *ngIf="!hideParameterLabel">
       <b>{{ parameter?.display }}</b></span
     >
     <span>
