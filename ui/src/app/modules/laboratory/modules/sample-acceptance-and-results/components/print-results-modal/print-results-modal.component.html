@@ -114,6 +114,18 @@
                         }}
                       </td>
                     </ng-container>
+                    <ng-container *ngIf="LISConfigurations?.isLIS">
+                      <td><b>Collection Date & Time</b></td>
+                      <td>
+                        {{
+                          !LISConfigurations?.isLIS
+                            ? (samplesGroupedByDepartment?.samples[0]?.created
+                              | date: "medium")
+                            : (samplesGroupedByDepartment?.samples[0]
+                                ?.collectedOnStatus?.remarks | date: "medium")
+                        }}
+                      </td>
+                    </ng-container>
                   </tr>
                   <!-- <tr *ngIf="LISConfigurations?.isLIS">
                     <td></td>
@@ -136,6 +148,7 @@
                       {{ patientDetailsAndSamples?.patient?.givenName }}
                       {{ patientDetailsAndSamples?.patient?.middleName }}
                       {{ patientDetailsAndSamples?.patient?.familyName }}
+                      {{ phoneNumber ? "("+phoneNumber+")": "" }}
                     </td>
                     <td><b>Laboratory Number</b></td>
                     <td>
@@ -157,19 +170,35 @@
                       yrs
                       
                     </td>
-
-                    <td>
-                      <b> Sample Collected By </b>
-                    </td>
-                    <td>
-                      {{
-                        !LISConfigurations?.isLIS
-                          ? samplesGroupedByDepartment?.samples[0]?.collectedBy
-                              ?.name
-                          : samplesGroupedByDepartment?.samples[0]
-                              ?.collectedByStatus?.remarks
-                      }}
-                    </td>
+                    <ng-container *ngIf="LISConfigurations?.isLIS">
+                      <td>
+                        <b> Received date & time </b>
+                      </td>
+                      <td>
+                        <span>
+                          {{
+                            samplesGroupedByDepartment?.samples[0]
+                              ?.receivedOnStatus?.remarks | date: "medium"
+                          }}
+                        </span>
+                      </td>
+                    </ng-container>
+                    <ng-container *ngIf="!LISConfigurations?.isLIS">
+                      <td>
+                        <b> Sample Collected By </b>
+                      </td>
+                      <td>
+                        <span>
+                          {{
+                            !LISConfigurations?.isLIS
+                              ? samplesGroupedByDepartment?.samples[0]?.collectedBy
+                                  ?.name
+                              : samplesGroupedByDepartment?.samples[0]
+                                  ?.collectedByStatus?.remarks
+                          }}
+                        </span>
+                      </td>
+                    </ng-container>
                   </tr>
                   <tr>
                     <ng-container *ngIf="LISConfigurations?.isLIS">
@@ -195,35 +224,44 @@
                         </span>
                       </td>
                     </ng-container>
-                    <td><b>Collection Date & Time</b></td>
+                    <ng-container *ngIf="LISConfigurations?.isLIS">
+                      <td>
+                      <b> Accepted date & time </b>
+                    </td>
                     <td>
                       {{
-                        !LISConfigurations?.isLIS
-                          ? (samplesGroupedByDepartment?.samples[0]?.created
-                            | date: "medium")
-                          : (samplesGroupedByDepartment?.samples[0]
-                              ?.collectedOnStatus?.remarks | date: "medium")
+                        samplesGroupedByDepartment?.samples[0]?.acceptedBy
+                          ?.timestamp | date: "medium"
                       }}
                     </td>
+                    </ng-container>
                   </tr>
-                  <tr>
+                  <tr *ngIf="!LISConfigurations?.isLIS">
                     <td>
                       <b> Phone </b>
                     </td>
                     <td>{{ phoneNumber }}</td>
-                    <td>
-                      <b *ngIf="!LISConfigurations?.isLIS"
-                        >Sample Accepted At/Arrival Date</b
-                      >
-                    </td>
-                    <td>
-                      <span *ngIf="!LISConfigurations?.isLIS">
-                        {{
-                          samplesGroupedByDepartment?.samples[0]?.acceptedAt
-                            | date: "medium"
-                        }}
-                      </span>
-                    </td>
+                    <ng-container *ngIf="">
+                      <td>
+                        <b>Sample Accepted At/Arrival Date</b>
+                      </td>
+                      <td>
+                        <span>
+                          {{
+                            samplesGroupedByDepartment?.samples[0]?.acceptedAt
+                              | date: "medium"
+                          }}
+                        </span>
+                      </td>
+                    </ng-container>
+                    <ng-container *ngIf="LISConfigurations?.isLIS && samplesGroupedByDepartment?.samples[0]?.acceptanceRemarksStatus?.remarks.length > 0">
+                      <td>
+                        <b>Results compromization remarks</b>
+                      </td>
+                      <td>
+                        {{ samplesGroupedByDepartment?.samples[0]?.acceptanceRemarksStatus?.remarks }}
+                      </td>
+                    </ng-container>
                   </tr>
                   <tr
                     *ngIf="
@@ -233,7 +271,7 @@
                   >
                     <td>
                       <span *ngIf="params?.refferedFromFacility">
-                        <b> Refering Facility </b>
+                        <b> Referring Facility </b>
                       </span>
                     </td>
                     <td>
@@ -241,6 +279,23 @@
                         {{ params?.refferedFromFacility?.display }}
                       </span>
                     </td>
+                  </tr>
+                  <!-- <tr *ngIf="LISConfigurations?.isLIS">
+                    <td></td>
+                    <td></td>
+                    <td>
+                      <b> Received by </b>
+                    </td>
+                    <td>
+                      <span>
+                        {{
+                          samplesGroupedByDepartment?.samples[0]
+                            ?.receivedByStatus?.user?.name
+                        }}
+                      </span>
+                    </td>
+                  </tr> -->
+                  <tr *ngIf="LISConfigurations?.isLIS">
                     <td>
                       <span *ngIf="params?.referringDoctorAttributes">
                         <b> Requested by </b>
@@ -283,37 +338,7 @@
                       </span>
                     </td>
                   </tr>
-                  <tr *ngIf="LISConfigurations?.isLIS">
-                    <td></td>
-                    <td></td>
-                    <td>
-                      <b> Received by </b>
-                    </td>
-                    <td>
-                      <span>
-                        {{
-                          samplesGroupedByDepartment?.samples[0]
-                            ?.receivedByStatus?.user?.name
-                        }}
-                      </span>
-                    </td>
-                  </tr>
-                  <tr *ngIf="LISConfigurations?.isLIS">
-                    <td></td>
-                    <td></td>
-                    <td>
-                      <b> Received date & time </b>
-                    </td>
-                    <td>
-                      <span>
-                        {{
-                          samplesGroupedByDepartment?.samples[0]
-                            ?.receivedOnStatus?.remarks | date: "medium"
-                        }}
-                      </span>
-                    </td>
-                  </tr>
-                  <tr>
+                  <tr *ngIf="!LISConfigurations?.isLIS">
                     <td></td>
                     <td></td>
                     <td>
@@ -323,19 +348,6 @@
                       {{
                         samplesGroupedByDepartment?.samples[0]?.acceptedBy?.user
                           ?.name
-                      }}
-                    </td>
-                  </tr>
-                  <tr *ngIf="LISConfigurations?.isLIS">
-                    <td></td>
-                    <td></td>
-                    <td>
-                      <b> Accepted date & time </b>
-                    </td>
-                    <td>
-                      {{
-                        samplesGroupedByDepartment?.samples[0]?.acceptedBy
-                          ?.timestamp | date: "medium"
                       }}
                     </td>
                   </tr>
@@ -386,13 +398,6 @@
                             ?.testAllocations[0]?.results?.length - 1
                         ]?.timestamp | date: "medium"
                       }}
-                    </td>
-                  </tr>
-                  <tr *ngIf="LISConfigurations?.isLIS">
-                    <td></td>
-                    <td></td>
-                    <td>
-                      {{ samplesGroupedByDepartment?.samples[0]?.acceptanceRemarksStatus?.remarks.length > 0 ? 'Results compromization remarks: ' + samplesGroupedByDepartment?.samples[0]?.acceptanceRemarksStatus?.remarks : "" }}
                     </td>
                   </tr>
                 </table>
