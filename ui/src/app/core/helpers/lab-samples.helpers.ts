@@ -1,4 +1,23 @@
-import { orderBy, map, filter, flatten, uniqBy } from "lodash";
+import { orderBy, map, filter, flatten, uniqBy, groupBy } from "lodash";
+
+export function mergeTestAllocations(allocations: any): any {
+  const formattedTestAllocations = allocations?.map((allocation) => {
+    return {
+      ...allocation,
+      parameterUuid: allocation?.concept?.uuid,
+    };
+  });
+  const groupedAllocations = groupBy(formattedTestAllocations, "parameterUuid");
+  const alls = Object.keys(groupedAllocations)?.map((key) => {
+    const allocationWithResults = (groupedAllocations[key]?.filter(
+      (allocation) => allocation?.results?.length > 0
+    ) || [])[0];
+    return allocationWithResults
+      ? allocationWithResults
+      : groupedAllocations[key][0];
+  });
+  return alls;
+}
 
 export function getAuthorizationDetails(sample) {
   const approvedAllocations = flatten(

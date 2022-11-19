@@ -36,6 +36,7 @@ export class SharedSampleDetailsComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.hasResults = false;
     this.sampleDetails$ = this.sampleService.getFormattedSampleByUuid(
       this.sample?.uuid,
       this.departments,
