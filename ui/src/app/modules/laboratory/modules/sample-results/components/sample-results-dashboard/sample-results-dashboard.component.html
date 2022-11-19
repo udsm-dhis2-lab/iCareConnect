@@ -159,8 +159,8 @@
                   [attr.rowspan]="sample?.orders?.length"
                 >
                   {{
-                    sample?.receivedOnStatus?.timestamp
-                      ? (sample?.receivedOnStatus?.timestamp | date: "medium")
+                    sample?.receivedOnStatus?.remarks
+                      ? (sample?.receivedOnStatus?.remarks | date: "medium")
                       : ""
                   }}
                 </td>
