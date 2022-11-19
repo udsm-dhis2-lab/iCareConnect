@@ -61,6 +61,7 @@ import {
   getLabTestsContainers,
 } from "../selectors";
 import { SampleTypesService } from "src/app/shared/services/sample-types.service";
+import { getAuthorizationDetailsByOrder } from "src/app/core/helpers/lab-samples.helpers";
 
 @Injectable()
 export class LabSamplesEffects {
@@ -240,6 +241,7 @@ export class LabSamplesEffects {
                     );
                     const formattedOrder = {
                       ...order,
+                      authorizationInfo: getAuthorizationDetailsByOrder(order),
                       searchingText:
                         order?.order?.concept?.display?.toLowerCase() +
                         " " +
@@ -723,6 +725,7 @@ export class LabSamplesEffects {
                     );
                     const formattedOrder = {
                       ...order,
+                      authorizationInfo: getAuthorizationDetailsByOrder(order),
                       searchingText:
                         order?.order?.concept?.display?.toLowerCase() +
                         " " +
