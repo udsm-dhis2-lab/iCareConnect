@@ -25,6 +25,7 @@ export class SharedSampleDetailsComponent implements OnInit {
   @Input() codedReasonsForRejection: any[];
 
   sampleDetails$: Observable<any>;
+  externalSystems$: Observable<any[]>;
   constructor(
     private visitService: VisitsService,
     private conceptService: ConceptsService,

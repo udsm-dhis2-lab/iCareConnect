@@ -1,5 +1,6 @@
 import { Component, EventEmitter, OnInit, Output } from "@angular/core";
 import { Observable } from "rxjs";
+import { DHIS2BasedSystems } from "src/app/core/constants/external-dhis2-based-systems.constants";
 import { OtherClientLevelSystemsService } from "src/app/modules/laboratory/resources/services/other-client-level-systems.service";
 
 @Component({
@@ -8,25 +9,7 @@ import { OtherClientLevelSystemsService } from "src/app/modules/laboratory/resou
   styleUrls: ["./clients-from-external-systems.component.scss"],
 })
 export class ClientsFromExternalSystemsComponent implements OnInit {
-  systems: any[] = [
-    {
-      id: "pimacovid",
-      name: "PIMA COVID-19",
-      testsSearchingKey: "pimaCovidTestOrderUuid",
-      searchingCriteria: [
-        {
-          id: "zxdIGVIuhWU",
-          name: "Passport ID",
-          referenceKey: "zxdIGVIuhWU",
-        },
-        {
-          id: "t74raEkPShW",
-          name: "Booking ID",
-          referenceKey: "t74raEkPShW",
-        },
-      ],
-    },
-  ];
+  systems: any[] = DHIS2BasedSystems;
   selectedSystem: any;
   selectedSearchCriteria: any;
   searchingText: string;
@@ -55,7 +38,6 @@ export class ClientsFromExternalSystemsComponent implements OnInit {
   searchClientsFromExternalSystems(event: Event): void {
     event.stopPropagation();
     this.isSearching = true;
-    // "2133573"
     this.clientsList$ =
       this.otherClientLevelSystemsService.getClientsFromOtherSystems({
         identifier: this.searchingText,
