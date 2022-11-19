@@ -62,7 +62,10 @@
         <table class="table mt-2">
           <tbody>
             <ng-container
-              *ngFor="let order of sample?.orders; let count = index"
+              *ngFor="
+                let order of params?.sampleDetails?.orders;
+                let count = index
+              "
             >
               <tr
                 *ngFor="
