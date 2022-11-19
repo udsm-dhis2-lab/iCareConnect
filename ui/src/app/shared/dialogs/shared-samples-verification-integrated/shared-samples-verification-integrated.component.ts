@@ -1,7 +1,7 @@
 import { Component, Inject, OnInit } from "@angular/core";
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
-import { Observable, zip } from "rxjs";
-import { map } from "rxjs/operators";
+import { Observable, of, zip } from "rxjs";
+import { catchError, map } from "rxjs/operators";
 import { DHIS2BasedSystems } from "src/app/core/constants/external-dhis2-based-systems.constants";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { OtherClientLevelSystemsService } from "src/app/modules/laboratory/resources/services/other-client-level-systems.service";
@@ -30,6 +30,7 @@ export class SharedSamplesVerificationIntegratedComponent implements OnInit {
   labRequestStageId$: Observable<any>;
   trackedEntityInstancesWithoutLabRequest: any;
   saving: boolean = false;
+  verified: boolean = false;
   constructor(
     private dialogRef: MatDialogRef<SharedSamplesVerificationIntegratedComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
@@ -152,8 +153,6 @@ export class SharedSamplesVerificationIntegratedComponent implements OnInit {
     labRequestStageId: string
   ): void {
     event.stopPropagation();
-    console.log(labRequest);
-    console.log(this.data);
     const visitAttribute = {
       attributeType: "0acd3180-710d-4417-8768-97bc45a02395",
       value: JSON.stringify({
@@ -206,8 +205,13 @@ export class SharedSamplesVerificationIntegratedComponent implements OnInit {
                       ) || []
                     )?.length === 0
                 );
+                this.verified = true;
                 return this.trackedEntityInstancesWithoutLabRequest;
               }
+            }),
+            catchError((error) => {
+              this.verified = false;
+              return of(error);
             })
           );
         this.saving = false;
