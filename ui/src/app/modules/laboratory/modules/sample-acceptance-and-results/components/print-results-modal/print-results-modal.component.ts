@@ -98,22 +98,31 @@ export class PrintResultsModalComponent implements OnInit {
         }
       )
       .pipe(
-        tap((response) => {
+        map((response) => {
           if (!response?.error) {
-            const attributesKeyedByAttributeType = _.keyBy(
-              response?.attributes.map((attribute) => {
-                return {
-                  ...attribute,
-                  attributeTypeUuid: attribute?.attributeType?.uuid,
-                };
-              }),
-              "attributeTypeUuid"
-            );
+            response = {
+              ...response,
+              attributesKeyedByAttributeType: _.keyBy(
+                response?.attributes.map((attribute) => {
+                  return {
+                    ...attribute,
+                    attributeTypeUuid: attribute?.attributeType?.uuid,
+                  };
+                }),
+                "attributeTypeUuid"
+              )
+            }
+
+            console.log("==> Attributes: ", response);
             this.refferedFromFacility$ = this.locationService.getLocationById(
-              attributesKeyedByAttributeType[
+              response?.attributesKeyedByAttributeType[
                 "47da17a9-a910-4382-8149-736de57dab18"
-              ].value
-            );
+              ]?.value
+            ).pipe(map((response) => {
+              return response?.error ? {} : response
+            }));
+
+            return response
           }
         })
       );
