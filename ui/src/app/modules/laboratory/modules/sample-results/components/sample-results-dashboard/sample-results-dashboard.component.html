@@ -264,6 +264,9 @@
                 <td colspan="11">
                   <app-shared-sample-details
                     [sample]="sample"
+                    [departments]="labSamplesDepartments"
+                    [codedReasonsForRejection]="codedSampleRejectionReasons"
+                    [specimenSources]="sampleTypes"
                     (visitDetails)="onGetVisitDetails($event)"
                   ></app-shared-sample-details>
                 </td>
