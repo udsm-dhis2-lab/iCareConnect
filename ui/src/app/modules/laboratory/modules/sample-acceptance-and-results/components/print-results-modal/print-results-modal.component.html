@@ -91,7 +91,7 @@
                   padding: 10px 4px;
                 "
               >
-                {{ samplesGroupedByDepartment?.departmentName }} {{ authorized ? "Report" : "Provisional Report" }}
+                {{ samplesGroupedByDepartment?.departmentName }} {{ authorized ? "Final Report" : "Provisional Report" }}
               </div>
               <div>
                 <!-- {{ samplesGroupedByDepartment["samples"][0]?.orders[0] | json }} -->
@@ -119,7 +119,7 @@
                     </td>
                   </tr>
                   <tr *ngIf="LISConfigurations?.isLIS">
-                    <td></td>
+                    <!-- <td></td>
                     <td></td>
                     <td>
                       <b> Registered On </b>
@@ -129,6 +129,17 @@
                         samplesGroupedByDepartment["samples"][0]?.dateCreated
                           | date: "medium"
                       }}
+                    </td> -->
+                    <td>
+                      <b> Received by </b>
+                    </td>
+                    <td>
+                      <span>
+                        {{
+                          samplesGroupedByDepartment?.samples[0]
+                            ?.receivedByStatus?.user?.name
+                        }}
+                      </span>
                     </td>
                   </tr>
                   <tr>
@@ -274,7 +285,7 @@
                       </span>
                     </td>
                   </tr>
-                  <tr *ngIf="LISConfigurations?.isLIS">
+                  <!-- <tr *ngIf="LISConfigurations?.isLIS">
                     <td></td>
                     <td></td>
                     <td>
@@ -288,7 +299,7 @@
                         }}
                       </span>
                     </td>
-                  </tr>
+                  </tr> -->
                   <tr *ngIf="LISConfigurations?.isLIS">
                     <td></td>
                     <td></td>
