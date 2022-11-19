@@ -239,7 +239,6 @@ export class PersonDetailsComponent implements OnInit {
         tap((response) => {
           this.searchByIdentifier = false;
           if(response.length > 0){
-            console.log("==> ID: ", response);
             response.forEach((patient) => {
               let incomingIdentifier = patient?.identifiers?.filter((id) => {
                 if(id.identifier === identifier){
