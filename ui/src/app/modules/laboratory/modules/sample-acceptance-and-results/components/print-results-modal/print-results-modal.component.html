@@ -150,13 +150,12 @@
                   </tr>
                   <tr>
                     <td>
-                      <b> Age / Gender </b>
+                      <b> Age </b>
                     </td>
                     <td>
                       {{ patientDetailsAndSamples?.patient?.age }}
                       yrs
-                      /
-                      {{ patientDetailsAndSamples?.patient?.gender }}
+                      
                     </td>
 
                     <td>
@@ -173,18 +172,30 @@
                     </td>
                   </tr>
                   <tr>
-                    <td>
-                      <b *ngIf="!LISConfigurations?.isLIS"> Location/Source </b>
-                    </td>
-                    <td>
-                      <span *ngIf="!LISConfigurations?.isLIS">
-                        {{
-                          samplesGroupedByDepartment["samples"][0]?.orders[0]
-                            ?.order?.location?.name
-                        }}
-                      </span>
-                    </td>
-                    <td><b>Sample Collected On</b></td>
+                    <ng-container *ngIf="LISConfigurations?.isLIS">
+                      <td>
+                        <b> Gender </b>
+                      </td>
+                      <td>
+                        <span>
+                          {{ patientDetailsAndSamples?.patient?.gender }}
+                        </span>
+                      </td>
+                    </ng-container>
+                    <ng-container *ngIf="!LISConfigurations?.isLIS">
+                      <td>
+                        <b> Location/Source </b>
+                      </td>
+                      <td>
+                        <span>
+                          {{
+                            samplesGroupedByDepartment["samples"][0]?.orders[0]
+                              ?.order?.location?.name
+                          }}
+                        </span>
+                      </td>
+                    </ng-container>
+                    <td><b>Collection Date & Time</b></td>
                     <td>
                       {{
                         !LISConfigurations?.isLIS
@@ -232,11 +243,12 @@
                     </td>
                     <td>
                       <span *ngIf="params?.referringDoctorAttributes">
-                        <b> Requesting Doctor </b>
+                        <b> Requested by </b>
                       </span>
                     </td>
                     <td>
-                      <span *ngIf="params?.referringDoctorAttributes">{{
+                      <span *ngIf="params?.referringDoctorAttributes">
+                        {{
                           params?.visit?.attributesKeyedByAttributeType[
                             params?.referringDoctorAttributes[1].value
                           ]
@@ -290,7 +302,7 @@
                     <td></td>
                     <td></td>
                     <td>
-                      <b> Received On </b>
+                      <b> Received date & time </b>
                     </td>
                     <td>
                       <span>
@@ -318,7 +330,7 @@
                     <td></td>
                     <td></td>
                     <td>
-                      <b> Sample Accepted On </b>
+                      <b> Accepted date & time </b>
                     </td>
                     <td>
                       {{
@@ -783,7 +795,7 @@
                   </tbody>
                 </table>
 
-                <div style="padding: 15px 0">
+                <div style="padding: 15px 0" *ngIf="!LISConfigurations?.isLIS">
                   <span>KEY</span>
                   <table>
                     <tr>
@@ -851,7 +863,7 @@
                   class="providers-details"
                 >
                   <span>
-                    <b>Printed By :</b>{{ user?.display }}, <b>Printed At :</b>
+                    <b>Printed By :</b>{{ user?.person?.display }}, <b>Printed At :</b>
                     {{ currentDateTime }}
                   </span>
                 </div>
