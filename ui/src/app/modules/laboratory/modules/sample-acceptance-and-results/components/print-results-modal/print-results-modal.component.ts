@@ -213,7 +213,17 @@ export class PrintResultsModalComponent implements OnInit {
         : iframe.contentDocument;
       frameDoc.document.open();
       frameDoc.document.write(
-        "<html><head> <style>button {display:none;} .mat-expansion-panel-body {font-size: 0.2rem !important;}</style>"
+        `
+          <html>
+            <head> 
+              <style>
+              button {
+                display:none;
+              } 
+              .mat-expansion-panel-body {
+                font-size: 0.2rem !important;
+              }
+            </style>`
       );
       frameDoc.document.write("</head><body>");
       frameDoc.document.write(contents);
