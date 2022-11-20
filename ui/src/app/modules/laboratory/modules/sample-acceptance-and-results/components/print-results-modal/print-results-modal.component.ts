@@ -49,7 +49,6 @@ export class PrintResultsModalComponent implements OnInit {
     this.LISConfigurations = data?.LISConfigurations;
     this.loadingPatientPhone = true;
     this.errorLoadingPhone = false;
-
     this.patientService
       .getPatientPhone(data?.patientDetailsAndSamples?.patient?.uuid)
       .subscribe(

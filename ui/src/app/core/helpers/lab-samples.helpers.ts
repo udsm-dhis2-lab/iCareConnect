@@ -31,20 +31,25 @@ export function getAuthorizationDetailsByOrder(order) {
         )?.length > 0
     ) || [];
   const allocationStatuses = uniqBy(
-    approvedAllocations
-      ?.map((allocation) => {
-        return {
-          ...allocation,
-          statuses: allocation?.statuses?.map((status) => {
-            return {
-              ...status,
-              ...status?.user,
-              name: status?.user?.display?.split(" (")[0],
-              allocation: allocation,
-            };
-          })
-        }
-      }),
+    approvedAllocations?.map((allocation) => {
+      return {
+        ...allocation,
+        statuses:
+          allocation?.statuses
+            ?.map((status) => {
+              return {
+                ...status,
+                ...status?.user,
+                name: status?.user?.display?.split(" (")[0],
+                allocation: allocation,
+              };
+            })
+            ?.filter(
+              (status) =>
+                status?.status === "APPROVED" || status?.category === "APPROVED"
+            ) || [],
+      };
+    }),
     "name"
   );
   return allocationStatuses;
@@ -59,7 +64,8 @@ export function getAuthorizationDetails(sample) {
             (
               allocation?.statuses?.filter(
                 (status) =>
-                  status?.status === "APPROVED" || status?.category === "APPROVED"
+                  status?.status === "APPROVED" ||
+                  status?.category === "APPROVED"
               ) || []
             )?.length > 0
         ) || []
