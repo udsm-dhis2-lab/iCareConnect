@@ -443,7 +443,7 @@
                           >
                             <tr>
                               <td *ngIf="!LISConfigurations?.isLIS">Test #</td>
-                              <td>Parameter</td>
+                              <td>Test</td>
                               <td>Results</td>
                               <!-- <td>SI Units</td> -->
                               <td *ngIf="!LISConfigurations?.isLIS">LL</td>
@@ -776,7 +776,7 @@
                                   {{ order?.order?.orderDate | date: "medium" }}
                                 </td>
                               </tr>
-                              <tr>
+                              <tr class="mb-2">
                                 <td colspan="100%">
                                   <div *ngIf="order?.authorizationInfo[0]">
                                     <b>Authorised By: </b
