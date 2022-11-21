@@ -543,15 +543,6 @@ export class SampleAcceptanceComponent implements OnInit {
           sample?.orders[0]?.order?.concept?.setMembers?.length == 0
             ? "60vh"
             : "80vh",
-        loadSampleActionObject: {
-          datesParameters: this.datesParameters,
-          patients: this.patients,
-          sampleTypes: this.sampleTypes,
-          departments: this.labSamplesDepartments,
-          containers: this.labSamplesContainers,
-          configs: this.labConfigs,
-          codedSampleRejectionReasons: this.codedSampleRejectionReasons,
-        },
       },
       maxHeight:
         sample?.orders?.length == 1 &&
