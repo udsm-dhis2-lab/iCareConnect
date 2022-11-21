@@ -287,9 +287,16 @@ export class PersonDetailsComponent implements OnInit {
         tap((personDetails) => {
           if (!personDetails?.error) {
             this.patientUuid = personDetails?.uuid;
+            const phoneNumber = personDetails?.person?.attributes?.filter((attribute) => {
+                if(attribute?.attributeType?.uuid === "aeb3a16c-f5b6-4848-aa51-d7e3146886d6") //TODO: Find a way to softcode this
+                {
+                  return attribute
+                }
+              })[0]?.value
             const person = {
               ...personDetails?.person,
               identifiers: personDetails?.identifiers,
+              phoneNumber: phoneNumber,
             };
             this.setPersonDetails(person);
             this.showSearchedDetails = false;
