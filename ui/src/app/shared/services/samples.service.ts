@@ -98,6 +98,15 @@ export class SamplesService {
     // return of(sample);
   }
 
+  createSampleOrder(sampleOrder): Observable<any> {
+    return this.httpClient.post(BASE_URL + "lab/sampleorder", sampleOrder).pipe(
+      map((response) => {
+        return response;
+      }),
+      catchError((error) => of(error))
+    );
+  }
+
   getTestTimeSettings(conceptUuid: string) {
     return this.httpClient.get(
       `${BASE_URL}lab/testtime?concept=${conceptUuid}`

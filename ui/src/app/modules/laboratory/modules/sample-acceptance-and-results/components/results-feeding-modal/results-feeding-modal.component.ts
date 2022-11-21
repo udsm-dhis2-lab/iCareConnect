@@ -88,6 +88,7 @@ export class ResultsFeedingModalComponent implements OnInit {
   hasFedResults: boolean = false;
   saveAllMessage: string;
   labSampleLoadingState$: Observable<boolean>;
+  visitDetails$: Observable<any>;
 
   constructor(
     private dialog: MatDialog,
@@ -125,6 +126,37 @@ export class ResultsFeedingModalComponent implements OnInit {
     this.loadSampleByUuid();
 
     this.loadingTestTimeSettings = true;
+
+    this.visitDetails$ = this.visitService
+      .getVisitDetailsByVisitUuid(this.sample?.visit?.uuid, {
+        v: "custom:(encounters:(uuid,display,obs,orders,encounterDatetime,encounterType,location))",
+      })
+      .pipe(
+        map((response) => {
+          if (response) {
+            return {
+              ...response,
+              encounters: response?.encounters?.map((encounter) => {
+                return {
+                  ...encounter,
+                  orders: encounter?.orders?.map((order) => {
+                    return {
+                      ...order,
+                      concept: {
+                        ...order?.concept,
+                        display:
+                          order?.concept?.display?.indexOf(":") > -1
+                            ? order?.concept?.display?.split(":")[1]
+                            : order?.concept?.display,
+                      },
+                    };
+                  }),
+                };
+              }),
+            };
+          }
+        })
+      );
 
     forkJoin(
       _.map(this.sample?.orders, (order) => {
@@ -173,33 +205,29 @@ export class ResultsFeedingModalComponent implements OnInit {
                   : false;
             }
 
-            if (parameter?.datatype?.display === "Complex") {
-              // Find obs
-              this.visitService
-                .getVisitDetailsByVisitUuid(this.sample?.visit?.uuid, {
-                  v: "custom:(encounters:(uuid,display,obs,orders,encounterDatetime,encounterType,location))",
-                })
-                .subscribe((response) => {
-                  if (response && response?.encounters?.length > 0) {
-                    response?.encounters?.forEach((encounter, index) => {
-                      encounter?.obs?.forEach((obs) => {
-                        this.obsKeyedByConcepts[obs?.concept?.uuid] = {
-                          ...obs,
-                          uri:
-                            obs?.value?.links && obs?.value?.links?.uri
-                              ? obs?.value?.links?.uri?.replace("http", "https")
-                              : null,
-                        };
-                      });
+            // if (parameter?.datatype?.display === "Complex") {
 
-                      encounter?.orders?.forEach((order) => {
-                        this.ordersKeyedByConcepts[order?.concept?.uuid] =
-                          order;
-                      });
-                    });
-                  }
+            // Find obs
+            this.visitDetails$.subscribe((response) => {
+              if (response && response?.encounters?.length > 0) {
+                response?.encounters?.forEach((encounter, index) => {
+                  encounter?.obs?.forEach((obs) => {
+                    this.obsKeyedByConcepts[obs?.concept?.uuid] = {
+                      ...obs,
+                      uri:
+                        obs?.value?.links && obs?.value?.links?.uri
+                          ? obs?.value?.links?.uri?.replace("http", "https")
+                          : null,
+                    };
+                  });
+
+                  encounter?.orders?.forEach((order) => {
+                    this.ordersKeyedByConcepts[order?.concept?.uuid] = order;
+                  });
                 });
-            }
+              }
+            });
+            // }
           });
         }
       });
