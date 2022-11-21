@@ -752,7 +752,9 @@ export class SingleRegistrationComponent implements OnInit {
                                     this.personDetailsData?.middleName,
                                 },
                               ],
-                              gender: this.personDetailsData?.gender,
+                              gender: this.personDetailsData?.gender.length > 0
+                                ? this.personDetailsData?.gender
+                                : "U",
                               age: this.personDetailsData?.age,
                               birthdate: this.personDetailsData?.dob
                                 ? this.personDetailsData?.dob
@@ -772,9 +774,10 @@ export class SingleRegistrationComponent implements OnInit {
                               ],
                               attributes: [
                                 {
-                                  attributeType: "aeb3a16c-f5b6-4848-aa51-d7e3146886d6", //TODO: Find a way to softcode this
+                                  attributeType:
+                                    "aeb3a16c-f5b6-4848-aa51-d7e3146886d6", //TODO: Find a way to softcode this
                                   value: this.personDetailsData?.mobileNumber,
-                                }
+                                },
                               ],
                             },
                             identifiers:
