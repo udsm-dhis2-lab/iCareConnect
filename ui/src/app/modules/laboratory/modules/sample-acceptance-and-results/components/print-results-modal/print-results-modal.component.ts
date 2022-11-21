@@ -221,10 +221,18 @@ export class PrintResultsModalComponent implements OnInit {
               .mat-expansion-panel-body {
                 font-size: 0.2rem !important;
               }
+              .content table,.providers-details {
+                font-size: 0.8rem !important;
+              }
+              
             </style>`
       );
       frameDoc.document.write("</head><body>");
-      frameDoc.document.write(contents);
+      frameDoc.document.write(`
+          <div class="content">
+           ${contents}
+          </div>
+      `);
       frameDoc.document.write("</body></html>");
       frameDoc.document.close();
       setTimeout(function () {
