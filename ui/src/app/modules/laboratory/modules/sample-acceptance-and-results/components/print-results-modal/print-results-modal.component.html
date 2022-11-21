@@ -5,7 +5,8 @@
     visit: visit$ | async,
     referringDoctorAttributes: referringDoctorAttributes$ | async,
     refferedFromFacility: refferedFromFacility$ | async,
-    obs: obs$ | async
+    obs: obs$ | async,
+    phoneNumber: phoneNumber$ | async
   } as params"
 >
   <div id="results-to-print" style="color: gray">
@@ -155,7 +156,9 @@
                       {{ patientDetailsAndSamples?.patient?.givenName }}
                       {{ patientDetailsAndSamples?.patient?.middleName }}
                       {{ patientDetailsAndSamples?.patient?.familyName }}
-                      {{ !phoneNumber?.length ? "(" + phoneNumber + ")" : "" }}
+                      <span *ngIf="params?.phoneNumber?.length > 0">
+                        ({{ phoneNumber }})
+                      </span>
                     </td>
                     <td><b>Laboratory Number</b></td>
                     <td>

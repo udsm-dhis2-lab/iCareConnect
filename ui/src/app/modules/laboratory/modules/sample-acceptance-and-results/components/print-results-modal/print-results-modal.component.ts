@@ -3,7 +3,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { Store } from "@ngrx/store";
 import * as _ from "lodash";
 import { Observable } from "rxjs";
-import { map, sample, tap } from "rxjs/operators";
+import { catchError, map, sample, tap } from "rxjs/operators";
 import { LocationService } from "src/app/core/services/location.service";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { VisitsService } from "src/app/shared/resources/visits/services/visits.service";
@@ -36,6 +36,7 @@ export class PrintResultsModalComponent implements OnInit {
   authorized: any;
   refferedFromFacility$: Observable<any>;
   obs$: Observable<any>;
+  phoneNumber$: Observable<any>;
   constructor(
     private patientService: PatientService,
     private visitService: VisitsService,
@@ -49,18 +50,15 @@ export class PrintResultsModalComponent implements OnInit {
     this.LISConfigurations = data?.LISConfigurations;
     this.loadingPatientPhone = true;
     this.errorLoadingPhone = false;
-    this.patientService
+    this.phoneNumber$ = this.patientService
       .getPatientPhone(data?.patientDetailsAndSamples?.patient?.uuid)
-      .subscribe(
-        (response: any) => {
+      .pipe(
+        tap((response) => {
           this.errorLoadingPhone = false;
           this.loadingPatientPhone = false;
           this.phoneNumber = response;
           this.authorized = data.authorized;
-        },
-        (error) => {
-          this.errorLoadingPhone = true;
-        }
+        })
       );
     this.labConfigs = data?.labConfigs;
     this.user = data?.user;
