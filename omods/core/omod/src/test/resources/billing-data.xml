@@ -273,4 +273,7 @@
     <bl_discount discount_id="1" uuid="8b75eb-er45-12e8" discount_criteria_id="500" patient_id="1000" creator="1" date_created="2020-12-27 00:00:00" voided="0" />
     <bl_discount_invoice_item discount_id="1" invoice_id="11" item_id="123" amount="60" />
 
+    <lb-sample sample_id="1" visit_id="10" uuid="ec2c9ec1-e742-4f89-979a-01560a607d01" label="LB/22/00078" concept_id="500" creator="300" date_created="2022-11-21 00:00:00" changed_by="" date_changed="" voided="" date_voided="" voided_by="" void_reason="" date_time="2022-11-21 00:00:00"/>
+    <lb_sample_order sample_id="1" order_id="302" technician="300"/>
+
 </dataset>

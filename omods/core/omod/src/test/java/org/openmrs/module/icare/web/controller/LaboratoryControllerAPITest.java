@@ -3,6 +3,7 @@ package org.openmrs.module.icare.web.controller;
 import org.apache.commons.collections.IteratorUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.openmrs.*;
@@ -107,6 +108,18 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 			}
 		}
 		assertThat("Created sample is found:", found, is(true));
+	}
+	
+	@Test
+	public void testAddSampleOrder() throws Exception {
+		//Given
+		String dto = this.readFile("dto/sample-order-create-dto2.json");
+		Map<String, Object> sampleOrder = (new ObjectMapper()).readValue(dto, Map.class);
+		MockHttpServletRequest newSampleOrderUpdateRequest = newPostRequest("lab/sampleorder", sampleOrder);
+		
+		MockHttpServletResponse handleSampleOrder = handle(newSampleOrderUpdateRequest);
+		String response = handleSampleOrder.getContentAsString();
+		System.out.println(response);
 	}
 	
 	@Test
