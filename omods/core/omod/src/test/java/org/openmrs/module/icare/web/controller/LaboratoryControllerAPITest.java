@@ -116,16 +116,16 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		String dto = this.readFile("dto/sample-order-create-dto2.json");
 		Map<String, Object> sampleOrder = (new ObjectMapper()).readValue(dto, Map.class);
 		MockHttpServletRequest newSampleOrderCreateRequest = newPostRequest("lab/sampleorder", sampleOrder);
-
+		
 		MockHttpServletResponse handleSampleOrder = handle(newSampleOrderCreateRequest);
 		String response = handleSampleOrder.getContentAsString();
 		System.out.println(response);
-
+		
 		MockHttpServletRequest newGetRequest = newGetRequest("lab/sample", new Parameter("uuid",
-				"ec2c9ec1-e742-4f89-979a-01560a607d01"));
-
+		        "ec2c9ec1-e742-4f89-979a-01560a607d01"));
+		
 		MockHttpServletResponse handleGet = handle(newGetRequest);
-
+		
 		System.out.println(handleGet.getContentAsString());
 	}
 	
