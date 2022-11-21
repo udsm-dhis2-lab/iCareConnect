@@ -223,6 +223,15 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	
 	@Override
 	public SampleOrder saveSampleOrder(SampleOrder sampleOrder) {
+
+		Order order = Context.getOrderService().getOrderByUuid(sampleOrder.getOrder().getUuid());
+		Sample sample = this.sampleDAO.findByUuid(sampleOrder.getSample().getUuid());
+		User technician = Context.getUserService().getUserByUuid(sampleOrder.getTechnician().getUuid());
+
+		sampleOrder.setSample(sample);
+		sampleOrder.setOrder(order);
+		sampleOrder.setTechnician(technician);
+
 		return this.sampleOrderDAO.save(sampleOrder);
 	}
 	
