@@ -78,10 +78,11 @@ public class SampleOrder implements Serializable {
 		sample.setUuid(((Map) map.get("sample")).get("uuid").toString());
 		sampleOrder.setSample(sample);
 		
-		User user = new User();
-		user.setUuid(((Map) map.get("technician")).get("uuid").toString());
-		sampleOrder.setTechnician(user);
-		
+		if (map.get("technician") != null) {
+			User user = new User();
+			user.setUuid(((Map) map.get("technician")).get("uuid").toString());
+			sampleOrder.setTechnician(user);
+		}
 		return sampleOrder;
 	}
 	

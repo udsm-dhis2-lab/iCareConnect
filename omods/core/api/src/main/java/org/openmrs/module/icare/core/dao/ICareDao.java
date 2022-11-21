@@ -128,7 +128,7 @@ public class ICareDao extends BaseDAO<Item> {
 		getSession().saveOrUpdate(itemPrice);
 		return itemPrice;
 	}
-
+	
 	public List<Item> getItems() {
 		DbSession session = getSession();
 		String queryStr = "SELECT ip FROM Item ip WHERE ip.voided=false";
