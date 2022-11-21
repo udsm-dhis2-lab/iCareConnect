@@ -158,15 +158,7 @@ export class PersonDetailsComponent implements OnInit {
     event.stopPropagation();
     this.personDetailsData["age"] = this.age;
     this.personDetailsData["month"] = this.month;
-
-    let monthDate = this.personDetailsData["month"]
-      ? new Date().getMonth() - Number(this.personDetailsData["month"])
-      : new Date().getMonth();
-    this.personDetailsData["dob"] = new Date(
-      new Date().getFullYear() - Number(this.personDetailsData["age"]),
-      monthDate,
-      new Date().getDate()
-    );
+    console.log("==> Age: ", this.personDetailsData["age"]);
     this.personDOBField = [
       new DateField({
         id: "dob",
@@ -174,10 +166,24 @@ export class PersonDetailsComponent implements OnInit {
         label: "Date of birth",
         max: this.maximumDate,
         required: false,
-        value: this.personDetailsData ? this.personDetailsData?.dob : null,
         type: "date",
       }),
     ];
+    if (this.personDetailsData["age"] || this.personDetailsData["month"]){
+      let monthDate = this.personDetailsData["month"]
+          ? new Date().getMonth() - Number(this.personDetailsData["month"])
+          : new Date().getMonth();
+      this.personDetailsData["dob"] = new Date(
+        new Date().getFullYear() - Number(this.personDetailsData["age"]),
+        monthDate,
+        new Date().getDate()
+      );
+      this.personDOBField[0].value = this.personDetailsData
+        ? this.personDetailsData?.dob
+        : null;
+    } else {
+      this.personDOBField[0].value = null;
+    }
   }
 
   onFormUpdate(formValues: FormValue): void {
@@ -358,7 +364,7 @@ export class PersonDetailsComponent implements OnInit {
         id: "gender",
         key: "gender",
         label: "Gender",
-        required: true,
+        required: false,
         type: "text",
         value: personDetails ? personDetails?.gender : null,
         options: [
