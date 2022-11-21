@@ -647,4 +647,19 @@ public class ICareController {
 		}
 		return verificationInfo;
 	}
+	
+	@RequestMapping(value = "voidorder", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> voidOrder(@RequestBody Map<String, Object> voidObj) throws IOException {
+		Map<String, Object> returnResponse = new HashMap<>();
+		String response;
+		try {
+			response = iCareService.voidOrder((String) voidObj.get("uuid"), (String) voidObj.get("voidReason"));
+		}
+		catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+		returnResponse.put("uuid", response);
+		return returnResponse;
+	}
 }
