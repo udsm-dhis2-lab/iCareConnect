@@ -112,10 +112,10 @@ export class SharedAddTestorderToSampleComponent implements OnInit {
             this.conceptsService
               .getConceptDetailsByUuid(saveOrderResponse[0]?.order?.concept?.uuid)
               .pipe(
-                tap((response) => {
+                tap((conceptResponse) => {
                   let allocations = [];
 
-                    if (response?.setMembers?.length === 0) {
+                    if (conceptResponse?.setMembers?.length === 0) {
                       allocations = [
                         ...allocations,
                         {
@@ -130,13 +130,13 @@ export class SharedAddTestorderToSampleComponent implements OnInit {
                             uuid: saveOrderResponse[0]?.sample?.uuid,
                           },
                           concept: {
-                            uuid: response.uuid,
+                            uuid: conceptResponse.uuid,
                           },
                           label: saveOrderResponse[0]?.order?.orderNumber,
                         },
                       ];
                     } else {
-                      each(response?.setMembers, (setMember) => {
+                      each(conceptResponse?.setMembers, (setMember) => {
                         allocations = [
                           ...allocations,
                           {
