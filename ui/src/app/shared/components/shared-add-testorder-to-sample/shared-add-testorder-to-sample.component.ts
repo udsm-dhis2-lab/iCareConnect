@@ -1,9 +1,11 @@
 import { Component, Input, OnInit } from "@angular/core";
-import { flatten } from "lodash";
+import { flatten, each } from "lodash";
 import { zip } from "rxjs";
+import { catchError, map, tap } from "rxjs/operators";
 import { Dropdown } from "../../modules/form/models/dropdown.model";
 import { Field } from "../../modules/form/models/field.model";
 import { FormValue } from "../../modules/form/models/form-value.model";
+import { ConceptsService } from "../../resources/concepts/services/concepts.service";
 import { ICARE_CONFIG } from "../../resources/config";
 import { OrdersService } from "../../resources/order/services/orders.service";
 import { SamplesService } from "../../services/samples.service";
@@ -17,6 +19,7 @@ export class SharedAddTestorderToSampleComponent implements OnInit {
   @Input() provider: any;
   @Input() visit: any;
   @Input() sample: any;
+  @Input() currentUser: any;
   existingOrdersDetails: any;
   formField: Field<string>;
   isFormValid: boolean = false;
@@ -24,7 +27,8 @@ export class SharedAddTestorderToSampleComponent implements OnInit {
   valuesToSave: any;
   constructor(
     private orderService: OrdersService,
-    private sampleService: SamplesService
+    private sampleService: SamplesService,
+    private conceptsService: ConceptsService
   ) {}
 
   ngOnInit(): void {
@@ -100,9 +104,100 @@ export class SharedAddTestorderToSampleComponent implements OnInit {
               };
               return this.sampleService.createSampleOrder(sampleOrder);
             })
-          ).subscribe((saveOrderResponse) => {
+          ).subscribe((saveOrderResponse: any) => {
             console.log(saveOrderResponse);
-            // Create test allocations
+            const orderWithAllocation = this.sample.orders.filter(
+              (order) => order?.testAllocations?.length > 0
+            )[0];
+            this.conceptsService
+              .getConceptDetailsByUuid(saveOrderResponse[0]?.order?.concept?.uuid)
+              .pipe(
+                tap((response) => {
+                  let allocations = [];
+
+                    if (response?.setMembers?.length === 0) {
+                      allocations = [
+                        ...allocations,
+                        {
+                          order: {
+                            uuid: saveOrderResponse[0]?.order?.uuid,
+                          },
+                          container: {
+                            uuid: orderWithAllocation?.testAllocations[0]
+                              ?.container?.uuid,
+                          },
+                          sample: {
+                            uuid: saveOrderResponse[0]?.sample?.uuid,
+                          },
+                          concept: {
+                            uuid: response.uuid,
+                          },
+                          label: saveOrderResponse[0]?.order?.orderNumber,
+                        },
+                      ];
+                    } else {
+                      each(response?.setMembers, (setMember) => {
+                        allocations = [
+                          ...allocations,
+                          {
+                            order: {
+                              uuid: saveOrderResponse[0]?.order?.uuid,
+                            },
+                            container: {
+                              uuid: orderWithAllocation?.testAllocations[0]
+                                ?.container?.uuid,
+                            },
+                            sample: {
+                              uuid: saveOrderResponse[0]?.sample?.uuid,
+                            },
+                            concept: {
+                              uuid: setMember.uuid,
+                            },
+                            label: saveOrderResponse[0]?.order?.orderNumber,
+                          },
+                        ];
+                      });
+                    }
+
+                  const status = {
+                    sample: {
+                      uuid: orderWithAllocation?.sample?.uuid,
+                    },
+                    user: {
+                      uuid: this.currentUser?.uuid,
+                    },
+                    remarks: "added test",
+                    status: "ADDED_TEST",
+                    category: "ADDED_TEST",
+                  };
+
+                  let sampleAcceptStatusWithAllocations = {
+                    status: status,
+                    allocations: allocations,
+                  };
+                  this.sampleService
+                    .acceptSampleAndCreateAllocations(
+                      sampleAcceptStatusWithAllocations
+                    )
+                    .pipe(
+                      map((response) => {
+                        // console.log(
+                        //   "==> Allocations response: ",
+                        //   response
+                        // );
+                      }),
+                      catchError((error) => {
+                        // console.log(
+                        //   "==> Failed to create allocations: ",
+                        //   error
+                        // );
+                        return error;
+                      })
+                    )
+                    .subscribe();
+                })
+              ).subscribe();
+
             this.saving = false;
           });
         }
