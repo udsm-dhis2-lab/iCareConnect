@@ -36,12 +36,16 @@ export class SampleTypesService {
   }
 
   getCodedRejectionReasons(): Observable<any> {
-    return (this.httpClient
-      .get(BASE_URL + "systemsetting?q=iCare.laboratory.configurations&v=full")
-      .pipe(map((response: any) => response?.results[0])),
-    this.httpClient
-      .get(BASE_URL + "systemsetting?q=iCare.LIS&v=full")
-      .pipe(map((response: any) => response?.results[0]))).pipe(
+    return zip(
+      this.httpClient
+        .get(
+          BASE_URL + "systemsetting?q=iCare.laboratory.configurations&v=full"
+        )
+        .pipe(map((response: any) => response?.results[0])),
+      this.httpClient
+        .get(BASE_URL + "systemsetting?q=iCare.LIS&v=full")
+        .pipe(map((response: any) => response?.results[0]))
+    ).pipe(
       mergeMap((configs: any) => {
         let parsedConfigs = configs[0]
           ? JSON.parse(configs[0]?.value) || {}
@@ -73,19 +77,22 @@ export class SampleTypesService {
   }
 
   getSampleTypes(): Observable<any> {
-    return (this.httpClient
-      .get(BASE_URL + "systemsetting?q=iCare.laboratory.configurations&v=full")
-      .pipe(map((response: any) => response?.results[0])),
-    this.httpClient
-      .get(BASE_URL + "systemsetting?q=iCare.LIS&v=full")
-      .pipe(map((response: any) => response?.results[0]))).pipe(
+    return zip(
+      this.httpClient
+        .get(
+          BASE_URL + "systemsetting?q=iCare.laboratory.configurations&v=full"
+        )
+        .pipe(map((response: any) => response?.results[0])),
+      this.httpClient
+        .get(BASE_URL + "systemsetting?q=iCare.LIS&v=full")
+        .pipe(map((response: any) => response?.results[0]))
+    ).pipe(
       mergeMap((configs: any) => {
         let parsedConfigs = configs[0]
           ? JSON.parse(configs[0]?.value) || {}
           : {};
 
         const isLIS = configs[1] && configs[1]?.value === "true" ? true : false;
-
         return parsedConfigs?.sampleTypes &&
           parsedConfigs?.sampleTypes?.id &&
           !isLIS

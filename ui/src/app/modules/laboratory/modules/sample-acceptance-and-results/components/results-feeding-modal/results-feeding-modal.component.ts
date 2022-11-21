@@ -10,7 +10,10 @@ import * as _ from "lodash";
 import { map, take } from "rxjs/operators";
 import { RejectAnswerModalComponent } from "../reject-answer-modal/reject-answer-modal.component";
 import { AppState } from "src/app/store/reducers";
-import { getCurrentUserDetails, getProviderDetails } from "src/app/store/selectors/current-user.selectors";
+import {
+  getCurrentUserDetails,
+  getProviderDetails,
+} from "src/app/store/selectors/current-user.selectors";
 import { SamplesService } from "src/app/shared/services/samples.service";
 import {
   clearLabSample,
@@ -118,6 +121,7 @@ export class ResultsFeedingModalComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    console.log(this.sample);
     this.labSampleLoadingState$ = this.store.select(getLabSampleLoadingState);
     this.testOrders$ = this.store.select(
       getFormattedLabSampleOrdersBySampleIdentifier,

@@ -761,7 +761,7 @@ export class LabSamplesEffects {
                                 )
                               : [],
                           setMembers:
-                            keyedDepartments[order?.order?.concept?.uuid]
+                            keyedSpecimenSources[order?.order?.concept?.uuid]
                               ?.setMembers?.length == 0
                               ? []
                               : _.map(
