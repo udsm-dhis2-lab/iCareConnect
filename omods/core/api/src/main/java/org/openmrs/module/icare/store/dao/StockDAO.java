@@ -229,7 +229,6 @@ public class StockDAO extends BaseDAO<Stock> {
 		
 		return query.list();
 	}
-
 	
 	//TODO fix getting by location query
 	public List<Item> getStockedOutByLocation(String locationUuid, String q, Integer startIndex, Integer limit,

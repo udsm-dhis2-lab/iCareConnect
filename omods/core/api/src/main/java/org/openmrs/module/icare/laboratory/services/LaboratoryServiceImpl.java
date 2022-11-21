@@ -80,15 +80,12 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	
 	@Override
 	public Sample createSample(Sample sample) {
-		
 		this.sampleDAO.save(sample);
-		
 		return sample;
 	}
 	
 	@Override
 	public List<Sample> getSamplesByVisit(String id) {
-		
 		return this.sampleDAO.getSamplesByVisit(id);
 	}
 	
@@ -121,7 +118,6 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 		}
 		sampleStatus.setSample(sample);
 		sampleStatus.setUser(user);
-		
 		return this.sampleStatusDAO.save(sampleStatus);
 	}
 	
