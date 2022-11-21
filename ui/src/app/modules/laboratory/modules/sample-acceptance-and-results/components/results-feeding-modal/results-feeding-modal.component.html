@@ -887,7 +887,7 @@
                                 "
                                 class="form-control"
                                 name="file"
-                                accept=".pdf, .doc"
+                                accept=".pdf, .doc,.jpeg,.png,.jpg,.docx,.xlxs,.xls"
                                 id="file-selector-{{ parameter?.uuid }}"
                                 (change)="fileSelection($event, parameter)"
                               />
@@ -2639,7 +2639,7 @@
       </mat-tab>
       <mat-tab
         label="New Test Order"
-        *ngIf="dialogData?.actionType === 'Entry'"
+        *ngIf="dialogData?.actionType === 'Entry' && LISConfigurations?.isLIS"
       >
         <div class="p-3">
           <div
@@ -2657,7 +2657,6 @@
             [visit]="params?.visitDetails"
             [sample]="params?.currentSample"
             [currentUser]="params?.currentUser"
-            [loadSampleActionObject]="loadSampleActionObject"
           ></app-shared-add-testorder-to-sample>
         </div>
       </mat-tab>

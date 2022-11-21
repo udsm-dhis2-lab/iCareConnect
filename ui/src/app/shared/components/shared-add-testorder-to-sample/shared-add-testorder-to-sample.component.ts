@@ -3,7 +3,7 @@ import { Store } from "@ngrx/store";
 import { flatten, each } from "lodash";
 import { zip } from "rxjs";
 import { catchError, map, tap } from "rxjs/operators";
-import { loadLabSamplesByCollectionDates } from "src/app/store/actions";
+import { loadLabSamplesByCollectionDates, loadSampleByUuid } from "src/app/store/actions";
 import { AppState } from "src/app/store/reducers";
 import { Dropdown } from "../../modules/form/models/dropdown.model";
 import { Field } from "../../modules/form/models/field.model";
@@ -23,7 +23,6 @@ export class SharedAddTestorderToSampleComponent implements OnInit {
   @Input() visit: any;
   @Input() sample: any;
   @Input() currentUser: any;
-  @Input() loadSampleActionObject: any;
   existingOrdersDetails: any;
   formField: Field<string>;
   isFormValid: boolean = false;
@@ -203,9 +202,7 @@ export class SharedAddTestorderToSampleComponent implements OnInit {
                     )
                     .subscribe((response) => {
                       this.store.dispatch(
-                        loadLabSamplesByCollectionDates(
-                          this.loadSampleActionObject
-                        )
+                        loadSampleByUuid({ uuid: this.sample?.uuid })
                       );
                     });
                 })
