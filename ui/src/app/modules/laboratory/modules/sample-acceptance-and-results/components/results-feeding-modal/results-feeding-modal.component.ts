@@ -10,7 +10,7 @@ import * as _ from "lodash";
 import { map, take } from "rxjs/operators";
 import { RejectAnswerModalComponent } from "../reject-answer-modal/reject-answer-modal.component";
 import { AppState } from "src/app/store/reducers";
-import { getProviderDetails } from "src/app/store/selectors/current-user.selectors";
+import { getCurrentUserDetails, getProviderDetails } from "src/app/store/selectors/current-user.selectors";
 import { SamplesService } from "src/app/shared/services/samples.service";
 import {
   clearLabSample,
@@ -89,6 +89,7 @@ export class ResultsFeedingModalComponent implements OnInit {
   saveAllMessage: string;
   labSampleLoadingState$: Observable<boolean>;
   visitDetails$: Observable<any>;
+  currentUser$: Observable<any>;
 
   constructor(
     private dialog: MatDialog,
@@ -246,6 +247,8 @@ export class ResultsFeedingModalComponent implements OnInit {
     this.savingLabResultsStatusState$ = this.store.select(
       getSavingLabTestResultsStatusState
     );
+
+    this.currentUser$ = this.store.select(getCurrentUserDetails);
 
     this.amendmentRemarksField = new TextArea({
       id: "amendmentRemarks",

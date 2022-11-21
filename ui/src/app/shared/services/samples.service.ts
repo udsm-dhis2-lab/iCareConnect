@@ -219,8 +219,8 @@ export class SamplesService {
   }
 
   acceptSampleAndCreateAllocations(statusWithAllocations: {
-    status: any;
-    allocations: any[];
+    status?: any;
+    allocations?: any[];
   }): Observable<any> {
     return this.httpClient.post(
       BASE_URL + "lab/sampleaccept",
