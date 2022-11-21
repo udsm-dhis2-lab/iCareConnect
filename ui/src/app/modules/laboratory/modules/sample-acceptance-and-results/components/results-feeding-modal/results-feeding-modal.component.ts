@@ -90,6 +90,7 @@ export class ResultsFeedingModalComponent implements OnInit {
   labSampleLoadingState$: Observable<boolean>;
   visitDetails$: Observable<any>;
   currentUser$: Observable<any>;
+  loadSampleActionObject: any;
 
   constructor(
     private dialog: MatDialog,
@@ -107,6 +108,7 @@ export class ResultsFeedingModalComponent implements OnInit {
     this.maxHeight = data?.maxHeight;
     this.userUuid = data?.currentUser?.uuid;
     this.LISConfigurations = data?.LISConfigurations;
+    this.loadSampleActionObject - data?.loadSampleActionObject;
     this.store.dispatch(
       loadPatientNotes({
         patientUuid: this.sample?.patient?.uuid,

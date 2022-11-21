@@ -1,7 +1,10 @@
 import { Component, Input, OnInit } from "@angular/core";
+import { Store } from "@ngrx/store";
 import { flatten, each } from "lodash";
 import { zip } from "rxjs";
 import { catchError, map, tap } from "rxjs/operators";
+import { loadLabSamplesByCollectionDates } from "src/app/store/actions";
+import { AppState } from "src/app/store/reducers";
 import { Dropdown } from "../../modules/form/models/dropdown.model";
 import { Field } from "../../modules/form/models/field.model";
 import { FormValue } from "../../modules/form/models/form-value.model";
@@ -20,6 +23,7 @@ export class SharedAddTestorderToSampleComponent implements OnInit {
   @Input() visit: any;
   @Input() sample: any;
   @Input() currentUser: any;
+  @Input() loadSampleActionObject: any;
   existingOrdersDetails: any;
   formField: Field<string>;
   isFormValid: boolean = false;
@@ -28,7 +32,8 @@ export class SharedAddTestorderToSampleComponent implements OnInit {
   constructor(
     private orderService: OrdersService,
     private sampleService: SamplesService,
-    private conceptsService: ConceptsService
+    private conceptsService: ConceptsService,
+    private store: Store<AppState>
   ) {}
 
   ngOnInit(): void {
@@ -110,12 +115,35 @@ export class SharedAddTestorderToSampleComponent implements OnInit {
               (order) => order?.testAllocations?.length > 0
             )[0];
             this.conceptsService
-              .getConceptDetailsByUuid(saveOrderResponse[0]?.order?.concept?.uuid)
+              .getConceptDetailsByUuid(
+                saveOrderResponse[0]?.order?.concept?.uuid
+              )
               .pipe(
                 tap((conceptResponse) => {
                   let allocations = [];
 
-                    if (conceptResponse?.setMembers?.length === 0) {
+                  if (conceptResponse?.setMembers?.length === 0) {
+                    allocations = [
+                      ...allocations,
+                      {
+                        order: {
+                          uuid: saveOrderResponse[0]?.order?.uuid,
+                        },
+                        container: {
+                          uuid: orderWithAllocation?.testAllocations[0]
+                            ?.container?.uuid,
+                        },
+                        sample: {
+                          uuid: saveOrderResponse[0]?.sample?.uuid,
+                        },
+                        concept: {
+                          uuid: conceptResponse.uuid,
+                        },
+                        label: saveOrderResponse[0]?.order?.orderNumber,
+                      },
+                    ];
+                  } else {
+                    each(conceptResponse?.setMembers, (setMember) => {
                       allocations = [
                         ...allocations,
                         {
@@ -130,34 +158,13 @@ export class SharedAddTestorderToSampleComponent implements OnInit {
                             uuid: saveOrderResponse[0]?.sample?.uuid,
                           },
                           concept: {
-                            uuid: conceptResponse.uuid,
+                            uuid: setMember.uuid,
                           },
                           label: saveOrderResponse[0]?.order?.orderNumber,
                         },
                       ];
-                    } else {
-                      each(conceptResponse?.setMembers, (setMember) => {
-                        allocations = [
-                          ...allocations,
-                          {
-                            order: {
-                              uuid: saveOrderResponse[0]?.order?.uuid,
-                            },
-                            container: {
-                              uuid: orderWithAllocation?.testAllocations[0]
-                                ?.container?.uuid,
-                            },
-                            sample: {
-                              uuid: saveOrderResponse[0]?.sample?.uuid,
-                            },
-                            concept: {
-                              uuid: setMember.uuid,
-                            },
-                            label: saveOrderResponse[0]?.order?.orderNumber,
-                          },
-                        ];
-                      });
-                    }
+                    });
+                  }
 
                   const status = {
                     sample: {
@@ -194,9 +201,16 @@ export class SharedAddTestorderToSampleComponent implements OnInit {
                         return error;
                       })
                     )
-                    .subscribe();
+                    .subscribe((response) => {
+                      this.store.dispatch(
+                        loadLabSamplesByCollectionDates(
+                          this.loadSampleActionObject
+                        )
+                      );
+                    });
                 })
-              ).subscribe();
+              )
+              .subscribe();
 
             this.saving = false;
           });
