@@ -6,7 +6,8 @@
     testOrders: testOrders$ | async,
     savingLabResultsState: savingLabResultsState$ | async,
     savingLabResultsStatusState: savingLabResultsStatusState$ | async,
-    labSampleLoadingState: labSampleLoadingState$ | async
+    labSampleLoadingState: labSampleLoadingState$ | async,
+    visitDetails: visitDetails$ | async
   } as params"
 >
   <mat-toolbar class="modal-header"
@@ -2631,6 +2632,28 @@
             >
             </app-lab-clinical-notes-summary>
           </div>
+        </div>
+      </mat-tab>
+      <mat-tab
+        label="New Test Order"
+        *ngIf="dialogData?.actionType === 'Entry'"
+      >
+        <div class="p-3">
+          <div
+            class="w-100"
+            *ngIf="!params?.providerDetails || !params?.visitDetails"
+          >
+            <mat-spinner
+              style="text-align: center"
+              color="primary"
+            ></mat-spinner>
+          </div>
+          <app-shared-add-testorder-to-sample
+            *ngIf="params?.providerDetails && params?.visitDetails"
+            [provider]="params?.providerDetails"
+            [visit]="params?.visitDetails"
+            [sample]="params?.currentSample"
+          ></app-shared-add-testorder-to-sample>
         </div>
       </mat-tab>
     </mat-tab-group>

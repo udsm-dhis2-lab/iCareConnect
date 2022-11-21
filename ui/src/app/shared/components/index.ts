@@ -109,6 +109,7 @@ import { SharedDashboardChartContainerComponent } from "./shared-dashboard-chart
 import { SharedDashboardChartItemComponent } from "./shared-dashboard-chart-item/shared-dashboard-chart-item.component";
 import { SharedDashboardSingleValueItemComponent } from "./shared-dashboard-single-value-item/shared-dashboard-single-value-item.component";
 import { SharedDashboardSingleValueContainerComponent } from "./shared-dashboard-single-value-container/shared-dashboard-single-value-container.component";
+import { SharedAddTestorderToSampleComponent } from "./shared-add-testorder-to-sample/shared-add-testorder-to-sample.component";
 
 export const components: any[] = [
   PatientAddressComponent,
@@ -223,6 +224,7 @@ export const components: any[] = [
   SharedDashboardChartItemComponent,
   SharedDashboardSingleValueItemComponent,
   SharedDashboardSingleValueContainerComponent,
+  SharedAddTestorderToSampleComponent,
 ];
 
 export const sharedEntryComponents: any[] = [
