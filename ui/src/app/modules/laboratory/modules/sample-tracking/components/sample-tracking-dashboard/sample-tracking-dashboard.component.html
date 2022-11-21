@@ -111,7 +111,7 @@
           <tr>
             <th rowspan="2">SN</th>
             <th rowspan="2">Department</th>
-            <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">
+            <th rowspan="2">
               Sample / Specimen
             </th>
             <th rowspan="2">Sample ID</th>
@@ -176,7 +176,7 @@
                   {{ sample?.department?.departmentName }}
                 </td>
                 <td
-                  *ngIf="orderCount == 0 && !LISConfigurations?.isLIS"
+                  *ngIf="orderCount == 0"
                   [attr.rowspan]="sample?.orders?.length"
                 >
                   {{ sample?.specimen?.name }}
