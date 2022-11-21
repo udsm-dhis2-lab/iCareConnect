@@ -93,6 +93,8 @@
     <orders orderer="200" concept_id ="500" creator="400" date_activated="2018-12-27 00:00:00" order_number="123" urgency="ROUTINE" care_setting="1" order_action="NEW" voided="false" order_type_id="211" date_created="2019-10-14 13:56:44" uuid="6746395c-1117-4abd-8fd7-a748c9575abcd" order_id="300" patient_id="500" encounter_id="100"/>
 
     <orders orderer="200" concept_id ="500" creator="400" date_activated="2018-12-27 00:00:00" order_number="124" urgency="ROUTINE" care_setting="1" order_action="NEW" voided="false" order_type_id="211" date_created="2019-10-14 13:56:44" uuid="7634gd66-3333-4abd-8fd7-a748c9575abcd" order_id="301" patient_id="500" encounter_id="100"/>
+    <orders orderer="200" concept_id ="500" creator="400" date_activated="2022-11-21 00:00:00" order_number="124" urgency="ROUTINE" care_setting="1" order_action="NEW" voided="false" order_type_id="211" date_created="2019-10-14 13:56:44" uuid="7634gd66-3333-4abd-8fd7-a748c9575abaa" order_id="301" patient_id="500" encounter_id="100"/>
+
 
 
     <orders orderer="200" concept_id ="500" creator="400" date_activated="2018-12-27 00:00:00" order_number="125" urgency="ROUTINE" care_setting="1" order_action="NEW" voided="false" order_type_id="211" date_created="2019-10-14 13:56:44" uuid="8634xx66-3444-4acc-8qd7-6648c9575abcd" order_id="302" patient_id="500" encounter_id="100"/>
@@ -112,6 +114,7 @@
     <lb_sample uuid="x311y666-zz77-11e3-1111-08002007777" sample_id="202" visit_id="500" label="Sample Label y" concept_id="600" date_created="2020-12-27 00:00:00" voided="false" creator="1"/>
 
     <lb_sample uuid="231vb22d-zcy7-11e3-1111-08002007777" sample_id="203" visit_id="500" label="Sample Label x" concept_id="600" date_created="2020-12-27 00:00:00" voided="false" creator="1"/>
+    <lb_sample uuid="ec2c9ec1-e742-4f89-979a-01560a607d0" sample_id="204" visit_id="500" label="LB/22/00078" concept_id="600" creator="1" date_created="2022-11-21 00:00:00" voided="false" date_time="2022-11-21 00:00:00"/>
 
 
 
@@ -124,6 +127,9 @@
     <lb_sample_order sample_id="203" order_id="302" />
 
     <lb_sample_order sample_id="203" order_id="300" />
+
+    <lb_sample_order sample_id="204" order_id="300"/>
+
 
 
 
@@ -144,5 +150,6 @@
 
     <!-- Location -->
     <location location_id ="602" uuid = "iCARE890-TEST-MOTR-9beb-d30dcfc0c66e" name = "My location" description = "Testing" date_created="2017-02-14 15:51:57.0" retired="false" />
+
 
 </dataset>
