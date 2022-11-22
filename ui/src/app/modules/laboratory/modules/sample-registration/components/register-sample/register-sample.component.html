@@ -8,7 +8,8 @@
     referFromFacilityVisitAttribute: referFromFacilityVisitAttribute$ | async,
     referringDoctorAttributes: referringDoctorAttributes$ | async,
     labNumberCharactersCount: labNumberCharactersCount$ | async,
-    testsFromExternalSystemsConfigs: testsFromExternalSystemsConfigs$ | async
+    testsFromExternalSystemsConfigs: testsFromExternalSystemsConfigs$ | async,
+    currentUser: currentUser$ | async
   } as params"
 >
   <div class="row">
@@ -41,6 +42,7 @@
           [referFromFacilityVisitAttribute]="
             params?.referFromFacilityVisitAttribute
           "
+          [currentUser]="params?.currentUser"
           [labNumberCharactersCount]="params?.labNumberCharactersCount"
           [referringDoctorAttributes]="params?.referringDoctorAttributes"
           [labSections]="labSections"

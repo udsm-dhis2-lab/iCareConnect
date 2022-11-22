@@ -35,6 +35,9 @@ import { ConceptsService } from "src/app/shared/resources/concepts/services/conc
 import { map } from "rxjs/operators";
 import { OtherClientLevelSystemsService } from "src/app/modules/laboratory/resources/services/other-client-level-systems.service";
 import { SharedConfirmationComponent } from "src/app/shared/components/shared-confirmation /shared-confirmation.component";
+import { Store } from "@ngrx/store";
+import { AppState } from "src/app/store/reducers";
+import { getLocationsByIds } from "src/app/store/selectors";
 
 @Component({
   selector: "app-single-registration",
@@ -52,6 +55,7 @@ export class SingleRegistrationComponent implements OnInit {
   @Input() labSections: ConceptGetFull[];
   @Input() labNumberCharactersCount: string;
   @Input() testsFromExternalSystemsConfigs: any[];
+  @Input() currentUser: any;
 
   departmentField: any = {};
   specimenDetailsFields: any;
@@ -119,6 +123,8 @@ export class SingleRegistrationComponent implements OnInit {
   transportationTemperature: Dropdown;
   labRequestPayload: any;
   savingLabRequest: boolean = false;
+  labLocations$: Observable<any>;
+  currentLabLocation: any;
 
   constructor(
     private samplesService: SamplesService,
@@ -132,12 +138,18 @@ export class SingleRegistrationComponent implements OnInit {
     private dialog: MatDialog,
     private orderService: OrdersService,
     private conceptService: ConceptsService,
-    private otherSystemsService: OtherClientLevelSystemsService
+    private otherSystemsService: OtherClientLevelSystemsService,
+    private store: Store<AppState>
   ) {
     this.currentLocation = JSON.parse(localStorage.getItem("currentLocation"));
   }
 
   ngOnInit(): void {
+    console.log(this.currentUser);
+    const userLocationsIds = JSON.parse(
+      this.currentUser?.userProperties?.locations
+    );
+    this.labLocations$ = this.store.select(getLocationsByIds(userLocationsIds));
     this.labSampleLabel$ = this.samplesService.getSampleLabel();
     this.referringDoctorFields = this.referringDoctorAttributes.map(
       (attribute) => {
@@ -660,21 +672,28 @@ export class SingleRegistrationComponent implements OnInit {
     this.formData = { ...this.formData, ...clinicalData };
   }
 
-  onSave(event: Event, forRejection?: boolean): void {
+  onSave(event: Event, forRejection?: boolean, labLocations?: any[]): void {
     event.stopPropagation();
-    
+    if (labLocations?.length === 1) {
+      this.currentLabLocation = labLocations[0];
+    } else {
+      this.currentLabLocation = null;
+      // Then user should define the lab
+    }
     let confirmationDialogue = this.dialog.open(SharedConfirmationComponent, {
       width: "25%",
       data: {
         modalTitle: forRejection ? `Save to reject sample` : `Save sample`,
-        modalMessage: forRejection ? `You are about to register to reject the current sample. Proceed?` : `Proceed with saving sample?`,
+        modalMessage: forRejection
+          ? `You are about to register to reject the current sample. Proceed?`
+          : `Proceed with saving sample?`,
         showRemarksInput: false,
         confirmationButtonText: "Proceed",
       },
     });
 
     confirmationDialogue.afterClosed().subscribe((closingObject) => {
-      if(closingObject?.confirmed){
+      if (closingObject?.confirmed) {
         // Identify if tests ordered are well configured
 
         // Identify referring doctor fields entered values
@@ -752,9 +771,10 @@ export class SingleRegistrationComponent implements OnInit {
                                     this.personDetailsData?.middleName,
                                 },
                               ],
-                              gender: this.personDetailsData?.gender.length > 0
-                                ? this.personDetailsData?.gender
-                                : "U",
+                              gender:
+                                this.personDetailsData?.gender.length > 0
+                                  ? this.personDetailsData?.gender
+                                  : "U",
                               age: this.personDetailsData?.age,
                               birthdate: this.personDetailsData?.dob
                                 ? this.personDetailsData?.dob
@@ -1063,6 +1083,11 @@ export class SingleRegistrationComponent implements OnInit {
                                                                       index
                                                                     ][0]
                                                                       ?.departmentUuid,
+                                                                  },
+                                                                  location: {
+                                                                    uuid: this
+                                                                      .currentLabLocation
+                                                                      ?.uuid,
                                                                   },
                                                                   orders:
                                                                     encounterResponse?.orders.map(
@@ -1770,8 +1795,7 @@ export class SingleRegistrationComponent implements OnInit {
             });
         }
       }
-    })
-    
+    });
   }
 
   toggleFieldSet(fieldName: string) {
