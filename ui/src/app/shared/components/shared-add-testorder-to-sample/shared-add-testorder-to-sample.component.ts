@@ -1,16 +1,24 @@
 import { Component, Input, OnInit } from "@angular/core";
 import { Store } from "@ngrx/store";
 import { flatten, each } from "lodash";
-import { zip } from "rxjs";
+import { Observable, zip } from "rxjs";
 import { catchError, map, tap } from "rxjs/operators";
-import { loadLabSamplesByCollectionDates, loadSampleByUuid } from "src/app/store/actions";
+import {
+  loadLabSamplesByCollectionDates,
+  loadSampleByUuid,
+} from "src/app/store/actions";
 import { AppState } from "src/app/store/reducers";
+import {
+  getLabSampleLoadingState,
+  getTestOrdersFromSampleBySampleLabel,
+} from "src/app/store/selectors";
 import { Dropdown } from "../../modules/form/models/dropdown.model";
 import { Field } from "../../modules/form/models/field.model";
 import { FormValue } from "../../modules/form/models/form-value.model";
 import { ConceptsService } from "../../resources/concepts/services/concepts.service";
 import { ICARE_CONFIG } from "../../resources/config";
 import { OrdersService } from "../../resources/order/services/orders.service";
+import { VisitsService } from "../../resources/visits/services";
 import { SamplesService } from "../../services/samples.service";
 
 @Component({
@@ -28,11 +36,14 @@ export class SharedAddTestorderToSampleComponent implements OnInit {
   isFormValid: boolean = false;
   saving: boolean = false;
   valuesToSave: any;
+  existingOrdersDetails$: Observable<any>;
+  labSampleLoadingState$: Observable<any>;
   constructor(
     private orderService: OrdersService,
     private sampleService: SamplesService,
     private conceptsService: ConceptsService,
-    private store: Store<AppState>
+    private store: Store<AppState>,
+    private visitService: VisitsService
   ) {}
 
   ngOnInit(): void {
@@ -40,6 +51,11 @@ export class SharedAddTestorderToSampleComponent implements OnInit {
       this.visit?.encounters?.map((encounter) => encounter?.orders)
     );
 
+    this.labSampleLoadingState$ = this.store.select(getLabSampleLoadingState);
+
+    this.existingOrdersDetails$ = this.store.select(
+      getTestOrdersFromSampleBySampleLabel(this.sample?.id)
+    );
     this.formField = new Dropdown({
       id: "testorders",
       key: "testorders",
