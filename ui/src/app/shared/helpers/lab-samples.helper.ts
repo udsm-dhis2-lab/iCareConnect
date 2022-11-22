@@ -66,18 +66,18 @@ export function getResultsCommentsStatuses(statuses) {
 }
 
 export function formatSample(sample, formattingInfo) {
-    const keyedDepartments = keyDepartmentsByTestOrder(
-      formattingInfo?.departments
-    );
-    const keyedSpecimenSources = keySampleTypesByTestOrder(
-      formattingInfo?.sampleTypes
-    )
-    const externalUseStatuses = sample?.statuses.filter(
-      (status) => status.status === "RELEASED" || status.status === "RESTRICTED"
-    ); 
+  const keyedDepartments = keyDepartmentsByTestOrder(
+    formattingInfo?.departments
+  );
+  const keyedSpecimenSources = keySampleTypesByTestOrder(
+    formattingInfo?.sampleTypes
+  );
+  const externalUseStatuses = sample?.statuses?.filter(
+    (status) => status.status === "RELEASED" || status.status === "RESTRICTED"
+  );
   return {
     ...sample,
-    externalUseStatus: _.orderBy(externalUseStatuses, ['timestamp'], ['desc']),
+    externalUseStatus: _.orderBy(externalUseStatuses, ["timestamp"], ["desc"]),
     id: sample?.label,
     specimen: keyedSpecimenSources[sample?.orders[0]?.order?.concept?.uuid],
     mrn: sample?.patient?.identifiers[0]?.id,
@@ -277,7 +277,7 @@ export function formatSample(sample, formattingInfo) {
     ) || [])[0],
     priorityHigh:
       (
-        sample?.statuses.filter(
+        sample?.statuses?.filter(
           (status) => status?.status === "HIGH" || status?.status === "Urgent"
         ) || []
       )?.length > 0
@@ -285,7 +285,7 @@ export function formatSample(sample, formattingInfo) {
         : false,
     priorityOrderNumber:
       (
-        sample?.statuses.filter(
+        sample?.statuses?.filter(
           (status) => status?.status === "HIGH" || status?.status === "Urgent"
         ) || []
       )?.length > 0

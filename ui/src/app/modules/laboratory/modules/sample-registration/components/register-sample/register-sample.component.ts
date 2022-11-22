@@ -7,9 +7,14 @@ import { LabSampleModel } from "src/app/modules/laboratory/resources/models";
 import { LISConfigurationsModel } from "src/app/modules/laboratory/resources/models/lis-configurations.model";
 import { ConceptGetFull } from "src/app/shared/resources/openmrs";
 import { SamplesService } from "src/app/shared/services/samples.service";
-import { loadConceptByUuid } from "src/app/store/actions";
+import {
+  loadConceptByUuid,
+  loadLocationsByTagName,
+  loadLocationsByTagNames,
+} from "src/app/store/actions";
 import { AppState } from "src/app/store/reducers";
 import { getConceptById } from "src/app/store/selectors";
+import { getCurrentUserDetails } from "src/app/store/selectors/current-user.selectors";
 
 @Component({
   selector: "app-register-sample",
@@ -21,6 +26,7 @@ export class RegisterSampleComponent implements OnInit {
   @Input() LISConfigurations: LISConfigurationsModel;
   @Input() labSections: ConceptGetFull[];
   registrationCategory: string = "single";
+  currentUser$: Observable<any>;
 
   labSamples$: Observable<{ pager: any; results: LabSampleModel[] }>;
   mrnGeneratorSourceUuid$: Observable<string>;
@@ -32,6 +38,7 @@ export class RegisterSampleComponent implements OnInit {
   referringDoctorAttributes$: Observable<any>;
   labNumberCharactersCount$: Observable<string>;
   testsFromExternalSystemsConfigs$: Observable<any[]>;
+  labLocations$: Observable<any>;
   constructor(
     private samplesService: SamplesService,
     private systemSettingsService: SystemSettingsService,
@@ -43,6 +50,12 @@ export class RegisterSampleComponent implements OnInit {
       page: 1,
       pageSize: 10,
     };
+
+    this.currentUser$ = this.store.select(getCurrentUserDetails);
+
+    this.store.dispatch(
+      loadLocationsByTagNames({ tagNames: ["Lab+Location"] })
+    );
 
     this.loadSamplesByPaginationDetails(paginationParameters);
 
