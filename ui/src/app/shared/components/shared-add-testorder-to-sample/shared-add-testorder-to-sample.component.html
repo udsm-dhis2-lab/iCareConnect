@@ -15,18 +15,29 @@
       ></app-form>
     </div>
     <div class="col-md-6">
-      <table>
-        <tbody>
-          <tr *ngFor="let order of existingOrdersDetails">
-            <td>
-              {{ order?.concept?.display }}
-            </td>
-            <td>
-              {{ order?.dateCreated | date: "medium" }}
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="ml-2 mr-2">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>SN</th>
+              <th>Test Order</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let order of existingOrdersDetails; let count = index">
+              <td>
+                {{ count + 1 }}
+              </td>
+              <td>
+                {{ order?.concept?.display }}
+              </td>
+              <!-- <td>
+                {{ order?.dateCreated | date: "medium" }}
+              </td> -->
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
   <div class="d-flex justify-content-end">
