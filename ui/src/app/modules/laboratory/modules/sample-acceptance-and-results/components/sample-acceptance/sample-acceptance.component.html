@@ -288,7 +288,7 @@
                   *ngIf="samplesToViewMoreDetails[sample?.id]"
                   class="sample-details-row"
                 >
-                  <td [attr.colspan]="!LISConfigurations?.isLIS ? 11 : 12">
+                  <td colspan="11">
                     <app-shared-sample-details
                       [sample]="sample"
                     ></app-shared-sample-details>
@@ -1009,7 +1009,7 @@
                   </td>
                 </tr>
                 <tr *ngIf="samplesToViewMoreDetails[sample?.id]">
-                  <td colspan="12">
+                  <td colspan="11">
                     <app-shared-sample-details
                       [sample]="sample"
                     ></app-shared-sample-details>
@@ -1313,7 +1313,7 @@
                   </td>
                 </tr>
                 <tr *ngIf="samplesToViewMoreDetails[sample?.id]">
-                  <td [attr.colspan]="!LISConfigurations?.isLIS ? 12 : 11">
+                  <td colspan="11">
                     <app-shared-sample-details
                       [sample]="sample"
                     ></app-shared-sample-details>
