@@ -288,7 +288,7 @@
                   *ngIf="samplesToViewMoreDetails[sample?.id]"
                   class="sample-details-row"
                 >
-                  <td colspan="10">
+                  <td [attr.colspan]="!LISConfigurations?.isLIS ? 11 : 12">
                     <app-shared-sample-details
                       [sample]="sample"
                     ></app-shared-sample-details>

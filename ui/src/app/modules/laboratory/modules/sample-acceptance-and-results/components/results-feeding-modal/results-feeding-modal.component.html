@@ -18,9 +18,6 @@
       - {{ params?.currentSample?.containerDetails?.display }}
     </span></mat-toolbar
   >
-
-  {{ params?.testOrders | json }}
-
   <div class="loading-overlay" *ngIf="params?.savingLabResultsState">
     <div class="text-center">
       <div>Saving data</div>
