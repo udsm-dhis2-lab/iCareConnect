@@ -304,7 +304,17 @@ public class LaboratoryController {
 		SampleStatus savedSampleStatus = laboratoryService.updateSampleStatus(sampleStatus);
 		
 		return savedSampleStatus.toMap();//sampleStatusResponse;
-		
+	}
+	
+	@RequestMapping(value = "sampleorder", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public Map<String, Object> createsampleorder(@RequestBody Map<String, Object> sampleOrderObject) throws Exception {
+		//save a sample order with the technician
+		//		System.out.println(sampleOrderObject);
+		SampleOrder sampleOrder = SampleOrder.fromMap(sampleOrderObject);
+		SampleOrder newSampleOrder = laboratoryService.saveSampleOrder(sampleOrder);
+		//save the sampleorder
+		return newSampleOrder.toMap();
 	}
 	
 	@RequestMapping(value = "assign", method = RequestMethod.POST)

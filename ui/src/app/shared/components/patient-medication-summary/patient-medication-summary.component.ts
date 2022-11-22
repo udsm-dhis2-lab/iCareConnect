@@ -1,21 +1,10 @@
-import {
-  AfterViewInit,
-  Component,
-  EventEmitter,
-  Input,
-  OnInit,
-  Output,
-} from "@angular/core";
-import { FormControl } from "@angular/forms";
+import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
-import { select, Store } from "@ngrx/store";
+import { Store } from "@ngrx/store";
 import { Observable, zip } from "rxjs";
-import { map } from "rxjs/operators";
+import { map, tap } from "rxjs/operators";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
-import { loadActiveVisit } from "src/app/store/actions/visit.actions";
 import { AppState } from "src/app/store/reducers";
-import { getAllUniqueDrugOrders } from "src/app/store/selectors";
-import { getActiveVisit } from "src/app/store/selectors/visit.selectors";
 import { DispensingFormComponent } from "../../dialogs";
 import { DrugOrdersService } from "../../resources/order/services";
 import { OrdersService } from "../../resources/order/services/orders.service";
@@ -40,6 +29,7 @@ export class PatientMedicationSummaryComponent implements OnInit {
   currentVisit$: Observable<any>;
 
   @Output() updateConsultationOrder = new EventEmitter();
+  @Output() updateMedicationComponent = new EventEmitter();
   patientDrugOrdersStatuses$: Observable<any>;
   filteredDrugOrders$: Observable<any>;
   visitDetails$: Observable<any>;
@@ -143,6 +133,8 @@ export class PatientMedicationSummaryComponent implements OnInit {
         v: "custom:(uuid,display,patient,encounters:(uuid,display,obs,orders),attributes)",
       }
     );
+
+    this.updateMedicationComponent.emit();
   }
 
   onAddOrder(e: Event) {

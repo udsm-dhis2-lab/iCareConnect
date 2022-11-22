@@ -1,4 +1,59 @@
-import { orderBy, map, filter, flatten, uniqBy } from "lodash";
+import { orderBy, map, filter, flatten, uniqBy, groupBy } from "lodash";
+
+export function mergeTestAllocations(allocations: any): any {
+  const formattedTestAllocations = allocations?.map((allocation) => {
+    return {
+      ...allocation,
+      parameterUuid: allocation?.concept?.uuid,
+    };
+  });
+  const groupedAllocations = groupBy(formattedTestAllocations, "parameterUuid");
+  const alls = Object.keys(groupedAllocations)?.map((key) => {
+    const allocationWithResults = (groupedAllocations[key]?.filter(
+      (allocation) => allocation?.results?.length > 0
+    ) || [])[0];
+    return allocationWithResults
+      ? allocationWithResults
+      : groupedAllocations[key][0];
+  });
+  return alls;
+}
+
+export function getAuthorizationDetailsByOrder(order) {
+  const approvedAllocations =
+    order?.testAllocations?.filter(
+      (allocation) =>
+        (
+          allocation?.statuses?.filter(
+            (status) =>
+              status?.status === "APPROVED" || status?.category === "APPROVED"
+          ) || []
+        )?.length > 0
+    ) || [];
+  const allocationStatuses = uniqBy(
+    approvedAllocations?.map((allocation) => {
+      return {
+        ...allocation,
+        statuses:
+          allocation?.statuses
+            ?.map((status) => {
+              return {
+                ...status,
+                ...status?.user,
+                name: status?.user?.display?.split(" (")[0],
+                allocation: allocation,
+              };
+            })
+            ?.filter(
+              (status) =>
+                status?.status === "APPROVED" || status?.category === "APPROVED"
+            ) || [],
+      };
+    }),
+    "name"
+  );
+  return allocationStatuses;
+}
 
 export function getAuthorizationDetails(sample) {
   const approvedAllocations = flatten(
@@ -9,7 +64,8 @@ export function getAuthorizationDetails(sample) {
             (
               allocation?.statuses?.filter(
                 (status) =>
-                  status?.status == "APPROVED" || status?.category == "APPROVED"
+                  status?.status === "APPROVED" ||
+                  status?.category === "APPROVED"
               ) || []
             )?.length > 0
         ) || []

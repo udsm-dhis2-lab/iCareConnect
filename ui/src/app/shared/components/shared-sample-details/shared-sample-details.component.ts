@@ -5,6 +5,7 @@ import { map, tap } from "rxjs/operators";
 import { ConceptsService } from "../../resources/concepts/services/concepts.service";
 import { Observation } from "../../resources/observation/models/observation.model";
 import { VisitsService } from "../../resources/visits/services/visits.service";
+import { SamplesService } from "../../services/samples.service";
 
 @Component({
   selector: "app-shared-sample-details",
@@ -19,9 +20,16 @@ export class SharedSampleDetailsComponent implements OnInit {
   sampleConditionsKeys: any[];
   @Output() visitDetails: EventEmitter<any> = new EventEmitter<any>();
   @Input() hasResults: boolean;
+  @Input() departments: any[];
+  @Input() specimenSources: any[];
+  @Input() codedReasonsForRejection: any[];
+
+  sampleDetails$: Observable<any>;
+  externalSystems$: Observable<any[]>;
   constructor(
     private visitService: VisitsService,
-    private conceptService: ConceptsService
+    private conceptService: ConceptsService,
+    private sampleService: SamplesService
   ) {}
 
   get sampleStatusesByCategory() {
@@ -29,6 +37,13 @@ export class SharedSampleDetailsComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.hasResults = false;
+    this.sampleDetails$ = this.sampleService.getFormattedSampleByUuid(
+      this.sample?.uuid,
+      this.departments,
+      this.specimenSources,
+      this.codedReasonsForRejection
+    );
     this.obs$ = this.visitService
       .getVisitObservationsByVisitUuid({
         uuid: this.sample?.visit?.uuid,

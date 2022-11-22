@@ -898,4 +898,15 @@ export class VisitsService {
       catchError((error) => of(error))
     );
   }
+
+  createVisitAttribute(visitUuid: string, visitAttribute): Observable<any> {
+    return from(
+      this.api.visit.createVisitAttribute(visitUuid, visitAttribute)
+    ).pipe(
+      map((response) => {
+        return response;
+      }),
+      catchError((error) => of(error))
+    );
+  }
 }

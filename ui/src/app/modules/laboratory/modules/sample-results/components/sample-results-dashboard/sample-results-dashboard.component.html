@@ -2,7 +2,9 @@
   *ngIf="{
     allSamples: allSamples$ | async,
     samplesWithResults: samplesWithResults$ | async,
-    testResultsMapping: testResultsMapping$ | async
+    testResultsMapping: testResultsMapping$ | async,
+    externalSystemsReferenceConceptUuid:
+      externalSystemsReferenceConceptUuid$ | async
   } as sampleParams"
 >
   <mat-progress-bar
@@ -60,7 +62,7 @@
             <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">
               Sample / Specimen
             </th>
-            <th rowspan="2">Sample ID</th>
+            <th rowspan="2">Laboratory ID</th>
             <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">MRN</th>
             <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">Patient Names</th>
             <th colspan="2" class="text-center">Test Orders Details</th>
@@ -157,8 +159,8 @@
                   [attr.rowspan]="sample?.orders?.length"
                 >
                   {{
-                    sample?.receivedOnStatus?.timestamp
-                      ? (sample?.receivedOnStatus?.timestamp | date: "medium")
+                    sample?.receivedOnStatus?.remarks
+                      ? (sample?.receivedOnStatus?.remarks | date: "medium")
                       : ""
                   }}
                 </td>
@@ -253,23 +255,38 @@
                       }}
                       Details
                     </button>
+                    {{ params?.externalSystemsReferenceConceptUuid }}
                   </div>
                 </td>
               </tr>
 
               <tr
-                *ngIf="samplesToViewMoreDetails[sample?.id]"
+                *ngIf="
+                  samplesToViewMoreDetails[sample?.id] &&
+                  sampleParams?.externalSystemsReferenceConceptUuid
+                "
                 class="sample-details-row"
               >
                 <td colspan="11">
                   <app-shared-sample-details
                     [sample]="sample"
+                    [departments]="labSamplesDepartments"
+                    [codedReasonsForRejection]="codedSampleRejectionReasons"
+                    [specimenSources]="sampleTypes"
+                    [hasResults]="true"
+                    [externalSystemsReferenceConceptUuid]="
+                      sampleParams?.externalSystemsReferenceConceptUuid
+                    "
                     (visitDetails)="onGetVisitDetails($event)"
                   ></app-shared-sample-details>
                 </td>
                 <td>
-                  <div *ngIf="message" class="alert alert-warning" role="alert">
-                    {{ message }}
+                  <div
+                    *ngIf="message[sample?.id]"
+                    class="alert alert-warning"
+                    role="alert"
+                  >
+                    {{ message[sample?.id] }}
                   </div>
                   <div class="d-flex justify-content-center">
                     <button
@@ -308,6 +325,20 @@
                       "
                     >
                       Confirm
+                    </button>
+                  </div>
+                  <div class="mt-2">
+                    <button
+                      mat-stroked-button
+                      (click)="
+                        onVerifyIfIsFromExternalSystem(
+                          $event,
+                          sample,
+                          sampleParams?.externalSystemsReferenceConceptUuid
+                        )
+                      "
+                    >
+                      Verify for External System
                     </button>
                   </div>
                 </td>

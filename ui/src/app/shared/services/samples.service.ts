@@ -5,7 +5,10 @@ import { HttpClient } from "@angular/common/http";
 import { from, Observable, of, zip } from "rxjs";
 import { BASE_URL } from "../constants/constants.constants";
 import { catchError, delay, map } from "rxjs/operators";
-import { SampleObject } from "src/app/modules/laboratory/resources/models";
+import {
+  LabSample,
+  SampleObject,
+} from "src/app/modules/laboratory/resources/models";
 import { formatSample } from "../helpers/lab-samples.helper";
 import { OpenmrsHttpClientService } from "../modules/openmrs-http-client/services/openmrs-http-client.service";
 
@@ -17,6 +20,33 @@ export class SamplesService {
     private httpClient: HttpClient,
     private opeMRSHttpClientService: OpenmrsHttpClientService
   ) {}
+
+  getSampleByUuid(uuid: string): Observable<any> {
+    return this.opeMRSHttpClientService.get(`lab/sample/${uuid}`).pipe(
+      map((response) => response),
+      catchError((error) => of(error))
+    );
+  }
+
+  getFormattedSampleByUuid(
+    uuid: string,
+    departments: any[],
+    specimenSources: any[],
+    codedRejectedReasons: any[]
+  ): Observable<any> {
+    return this.opeMRSHttpClientService.get(`lab/sample/${uuid}`).pipe(
+      map(
+        (response) =>
+          new LabSample(
+            response,
+            departments,
+            specimenSources,
+            codedRejectedReasons
+          )
+      ),
+      catchError((error) => of(error))
+    );
+  }
 
   getLabSamplesByCollectionDates(
     dates,
@@ -66,6 +96,15 @@ export class SamplesService {
       catchError((error) => of(error))
     );
     // return of(sample);
+  }
+
+  createSampleOrder(sampleOrder): Observable<any> {
+    return this.httpClient.post(BASE_URL + "lab/sampleorder", sampleOrder).pipe(
+      map((response) => {
+        return response;
+      }),
+      catchError((error) => of(error))
+    );
   }
 
   getTestTimeSettings(conceptUuid: string) {
@@ -180,8 +219,8 @@ export class SamplesService {
   }
 
   acceptSampleAndCreateAllocations(statusWithAllocations: {
-    status: any;
-    allocations: any[];
+    status?: any;
+    allocations?: any[];
   }): Observable<any> {
     return this.httpClient.post(
       BASE_URL + "lab/sampleaccept",
@@ -267,10 +306,30 @@ export class SamplesService {
     return this.httpClient.post(BASE_URL + "lab/results", result);
   }
 
+  saveLabResults(results): Observable<any> {
+    return zip(
+      ...results?.map((result) => {
+        return this.httpClient.post(BASE_URL + "lab/results", result);
+      }),
+      catchError((error) => of(error))
+    );
+  }
+
   saveLabResultStatus(resultStatus): Observable<any> {
     return this.httpClient.post(
       BASE_URL + "lab/allocationstatus",
       resultStatus
+    );
+  }
+
+  saveLabResultStatuses(resultStatuses): Observable<any> {
+    return zip(
+      ...resultStatuses?.map((resultStatus) => {
+        return this.httpClient.post(
+          BASE_URL + "lab/allocationstatus",
+          resultStatus
+        );
+      })
     );
   }
 

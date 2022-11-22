@@ -11,6 +11,7 @@ export class SharedParameterResultsComponent implements OnInit {
   @Input() parameter: any;
   @Input() count: number;
   @Input() units: string;
+  @Input() hideParameterLabel: boolean;
 
   parameterResultsDetails: any;
   constructor() {}
@@ -45,7 +46,7 @@ export class SharedParameterResultsComponent implements OnInit {
     // console.log(this.count);
     this.parameterResultsDetails = this.order?.allocationsGroupedByParameter[
       this.parameter?.uuid
-    ].map((result) => {
+    ]?.map((result) => {
       return {
         ...result,
         authorized:

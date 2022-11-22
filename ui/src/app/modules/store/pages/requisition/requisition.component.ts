@@ -2,7 +2,7 @@ import { ThrowStmt } from "@angular/compiler";
 import { Component, OnInit } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { select, Store } from "@ngrx/store";
-import { Observable } from "rxjs";
+import { Observable, of } from "rxjs";
 import { map } from "rxjs/operators";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { RequisitionInput } from "src/app/shared/resources/store/models/requisition-input.model";
@@ -45,6 +45,10 @@ export class RequisitionComponent implements OnInit {
   referenceTagsThatCanRequestFromPharmacyConfigs$: Observable<any>;
   pharmacyLocationTagUuid$: Observable<any>;
   mainStoreLocationTagUuid$: Observable<any>;
+  loadedRequisitions: boolean;
+  searchTerm: any;
+  requisitions: RequisitionObject[];
+  storedRequisitions: RequisitionObject[];
   constructor(
     private store: Store<AppState>,
     private dialog: MatDialog,
@@ -81,12 +85,39 @@ export class RequisitionComponent implements OnInit {
     this.stockableItems$ = this.store.pipe(select(getAllStockableItems));
   }
 
-  getAllRequisition(): void {
+  getAllRequisition(event?: any): void {
+    this.loadedRequisitions = false;
+    this.searchTerm = event ? event?.target?.value : "";
+    this.requisitions$ = this.requisitionService
+      .getAllRequisitions(
+        JSON.parse(localStorage.getItem("currentLocation"))?.uuid
+      )
+      .pipe(
+        map((requisitions) => {
+          this.requisitions = requisitions;
+          this.storedRequisitions = requisitions;
+          this.loadedRequisitions = true;
+          return requisitions;
+        })
+      );
+  }
+
+  onSearchRequisition(event?: any){
+    this.requisitions = undefined
+    this.loadedRequisitions = false;
+    this.searchTerm = event ? event?.target?.value : "";
     setTimeout(() => {
-      this.requisitions$ = this.requisitionService.getAllRequisitions(
-      JSON.parse(localStorage.getItem("currentLocation"))?.uuid);
-    }, 500)
-    
+      if (this.searchTerm?.length > 0){
+        this.requisitions = this.storedRequisitions.filter((requisition) => {
+          if(requisition?.name?.toLowerCase().includes(this.searchTerm.toLowerCase())){
+            return requisition
+          }
+        });
+      } else {
+        this.requisitions = this.storedRequisitions
+      }
+      this.loadedRequisitions = true;
+    }, 200)
   }
 
   onNewRequest(e: Event, params: any): void {
