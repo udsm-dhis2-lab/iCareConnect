@@ -1,6 +1,7 @@
 package org.openmrs.module.icare.web.controller;
 
 import org.openmrs.Concept;
+import org.openmrs.Location;
 import org.openmrs.User;
 import org.openmrs.Visit;
 import org.openmrs.api.*;
@@ -45,6 +46,9 @@ public class LaboratoryController {
 	@Autowired
 	UserService userService;
 	
+	@Autowired
+	LocationService locationService;
+	
 	@RequestMapping(value = "visit", method = RequestMethod.GET)
 	@ResponseBody
 	public Map<String, Object> getPendingVisit(@RequestParam(defaultValue = "100") Integer limit,
@@ -75,8 +79,15 @@ public class LaboratoryController {
 		Visit existingVisit = visitService.getVisitByUuid(((Map) sample.get("visit")).get("uuid").toString());
 		Concept concept = conceptService.getConceptByUuid(((Map) sample.get("concept")).get("uuid").toString());
 		
+		if (sample.get("location") != null) {
+			Location location = locationService.getLocationByUuid(((Map) sample.get("location")).get("uuid").toString());
+			newSample.setLocation(location);
+			System.out.println(location.getName());
+		}
+		
 		newSample.setVisit(existingVisit);
 		newSample.setConcept(concept);
+		
 		newSample.setLabel((String) sample.get("label"));
 		
 		List<SampleOrder> sampleOrders = new ArrayList<SampleOrder>();
