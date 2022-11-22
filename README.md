@@ -48,6 +48,19 @@ Navigate to [http://localhost:4200](http://localhost:4200)
 
 ## Build
 
+After making the changes to the backend we build the application so that the omod contains the backend changes by following the steps below:
+
+Navigate to application root folder
+
+```bash
+cd omods/core
+```
+Run the following command to build the application
+```bash
+mvn clean package -DskipTests
+```
+Upload the omod to openmrs. 
+
 ## Running unit tests
 
 ## Running end-to-end tests
