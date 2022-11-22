@@ -11,22 +11,40 @@
 Clone repository
 
 ```bash
- git clone https://github.com/hisptz/icare.git
+ git clone https://github.com/udsm-dhis2-lab/icare.git
 ```
 
 Navigate to application root folder
 
 ```bash
-cd icare
+cd icare/ui
 ```
 
 Install all required dependencies for the app
 
 ```bash
-
+npm install
 ```
 
 ## Development server
+
+Duplicate  proxy-config.example.json and rename the copied file to proxy-config.json
+
+Copy the following and paste it to the file proxy-config.json
+```bash
+{
+  "/": {
+    "target":"https://icare.dhis2.udsm.ac.tz",
+    "secure": "false",
+    "changeOrigin": "true"
+  }
+}
+```
+Start the development server 
+```bash
+npm start
+```
+Navigate to [http://localhost:4200](http://localhost:4200)
 
 ## Build
 
