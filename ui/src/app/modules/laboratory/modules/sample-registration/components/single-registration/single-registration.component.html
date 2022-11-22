@@ -2,7 +2,8 @@
   class="single-registration"
   *ngIf="{
     labSampleLabel: labSampleLabel$ | async,
-    testsUnderSpecimen: testsUnderSpecimen$ | async
+    testsUnderSpecimen: testsUnderSpecimen$ | async,
+    labLocations: labLocations$ | async
   } as params"
 >
   <div class="row" *ngIf="isRegistrationReady">
@@ -484,7 +485,7 @@
           !collectedOnTimeValid
         "
         color="primary"
-        (click)="onSave($event, true)"
+        (click)="onSave($event, true, params?.labLocations)"
       >
         Save to Reject
       </button>
@@ -498,7 +499,7 @@
           !collectedOnTimeValid
         "
         class="ml-2"
-        (click)="onSave($event)"
+        (click)="onSave($event, false,  params?.labLocations)"
       >
         Save & Continue
       </button>

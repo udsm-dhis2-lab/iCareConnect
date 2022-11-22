@@ -810,6 +810,11 @@ export const getWorkList = createSelector(
   }
 );
 
+export const getTestOrdersFromSampleBySampleLabel = (label) =>
+  createSelector(getAllFormattedLabSampleEntities, (sampleEntities) => {
+    return sampleEntities[label]?.orders;
+  });
+
 function getTestAllocationsWithResults(allocations) {
   return _.uniqBy(
     allocations?.map((allocation) => {
