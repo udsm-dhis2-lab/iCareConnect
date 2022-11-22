@@ -118,7 +118,6 @@ export class ResultsFeedingModalComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log(this.sample);
     this.labSampleLoadingState$ = this.store.select(getLabSampleLoadingState);
     this.testOrders$ = this.store.select(
       getFormattedLabSampleOrdersBySampleIdentifier,
