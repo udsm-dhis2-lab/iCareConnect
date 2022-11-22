@@ -54,6 +54,12 @@ public class Sample extends BaseOpenmrsData implements java.io.Serializable, JSO
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "sample")
 	private List<SampleStatus> sampleStatuses = new ArrayList<SampleStatus>(0);
 	
+	@ManyToOne
+	@JoinColumn(name = "location_id")
+	@JsonSerialize(using = ChildIdOnlySerializer.class)
+	@JsonDeserialize(using = ChildIdOnlyDeserializer.class)
+	private Location location;
+	
 	//	@OneToMany(fetch = FetchType.LAZY, mappedBy = "sampleOrder.id.sample")
 	//	private List<TestAllocation> testAllocations = new ArrayList<TestAllocation>(0);
 	
@@ -115,6 +121,13 @@ public class Sample extends BaseOpenmrsData implements java.io.Serializable, JSO
 			creatorObject.put("display", this.getCreator().getDisplayString());
 		}
 		
+		Map<String, Object> locationObject = new HashMap<String, Object>();
+		
+		if (this.getLocation() != null) {
+			locationObject.put("uuid", this.getLocation().getUuid());
+		}
+		
+		sampleObject.put("location", locationObject);
 		sampleObject.put("creator", creatorObject);
 		
 		sampleObject.put("voided", this.getVoided());
@@ -249,6 +262,14 @@ public class Sample extends BaseOpenmrsData implements java.io.Serializable, JSO
 	
 	public List<SampleStatus> getSampleStatuses() {
 		return sampleStatuses;
+	}
+	
+	public void setLocation(Location location) {
+		this.location = location;
+	}
+	
+	public Location getLocation() {
+		return location;
 	}
 	
 	public void setSampleStatuses(List<SampleStatus> sampleStatuses) {

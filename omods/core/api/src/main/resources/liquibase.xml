@@ -3110,6 +3110,26 @@
 
     </changeSet>
 
+    <changeSet id="add_location_column_to_lb_sample" author="dennis-kibahila" dbms="mysql">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists columnName="location_id" tableName="lb_sample"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="lb_sample" >
+            <column name="location_id" type="INT">
+                <constraints nullable="true"></constraints>
+            </column>
+
+        </addColumn>
+
+        <addForeignKeyConstraint
+                baseColumnNames="location_id"
+                baseTableName="lb_sample"
+                constraintName="lb_sample_result_location_id_location_location_id_fk"
+                referencedColumnNames="location_id"
+                referencedTableName="location"/>
+    </changeSet>
 
 
 </databaseChangeLog>
