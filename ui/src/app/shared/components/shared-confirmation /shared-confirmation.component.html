@@ -23,7 +23,7 @@
         color="primary"
         (click)="onConfirm($event)"
       >
-        Confirm
+        {{ data?.confirmationButtonText ? data?.confirmationButtonText : "Confirm" }}
       </button>
     </div>
   </div>

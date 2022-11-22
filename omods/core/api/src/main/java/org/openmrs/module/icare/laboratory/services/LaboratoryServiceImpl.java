@@ -80,15 +80,12 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	
 	@Override
 	public Sample createSample(Sample sample) {
-		
 		this.sampleDAO.save(sample);
-		
 		return sample;
 	}
 	
 	@Override
 	public List<Sample> getSamplesByVisit(String id) {
-		
 		return this.sampleDAO.getSamplesByVisit(id);
 	}
 	
@@ -121,7 +118,6 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 		}
 		sampleStatus.setSample(sample);
 		sampleStatus.setUser(user);
-		
 		return this.sampleStatusDAO.save(sampleStatus);
 	}
 	
@@ -227,6 +223,20 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	
 	@Override
 	public SampleOrder saveSampleOrder(SampleOrder sampleOrder) {
+		
+		Order order = Context.getOrderService().getOrderByUuid(sampleOrder.getOrder().getUuid());
+		Sample sample = this.sampleDAO.findByUuid(sampleOrder.getSample().getUuid());
+		User technician = null;
+		if (sampleOrder.getTechnician().getUuid() != null) {
+			technician = Context.getUserService().getUserByUuid(sampleOrder.getTechnician().getUuid());
+		}
+		
+		sampleOrder.setSample(sample);
+		sampleOrder.setOrder(order);
+		if (technician != null) {
+			sampleOrder.setTechnician(technician);
+		}
+		
 		return this.sampleOrderDAO.save(sampleOrder);
 	}
 	

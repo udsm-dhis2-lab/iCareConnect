@@ -20,6 +20,7 @@ import {
   getCompletedLabSamples,
   getFormattedAcceptedLabSamples,
   getFormattedLabSamplesForTracking,
+  getFormattedLabSamplesLoadedState,
   getFormattedLabSamplesToAccept,
   getFormattedLabSamplesToFeedResults,
   getFormattedRejectedLabSamples,
@@ -63,7 +64,7 @@ export class SampleAcceptanceComponent implements OnInit {
   providerDetails$: Observable<any>;
   savingMessage: any = {};
   settingLabSampleStatus$: Observable<any>;
-  userUuid;
+  userUuid: string;
   searchingText: string = "";
   labDepartments$: Observable<any>;
   selectedDepartment: string = "";
@@ -75,6 +76,7 @@ export class SampleAcceptanceComponent implements OnInit {
   samplesToViewMoreDetails: any = {};
   @Input() page: number;
   @Input() pageCount: number;
+  samplesLoadedState$: Observable<boolean>;
   constructor(
     private store: Store<AppState>,
     private dialog: MatDialog,
@@ -83,6 +85,9 @@ export class SampleAcceptanceComponent implements OnInit {
 
   ngOnInit(): void {
     this.userUuid = this.currentUser?.uuid;
+    this.samplesLoadedState$ = this.store.select(
+      getFormattedLabSamplesLoadedState
+    );
     this.labDepartments$ = this.store.select(getLabDepartments);
     this.samplesAccepted$ = this.store.select(getAcceptedFormattedLabSamples, {
       department: "",
@@ -110,9 +115,9 @@ export class SampleAcceptanceComponent implements OnInit {
       department: "",
       searchingText: this.searchingText,
     });
-    
+
     this.worklist$ = this.store.select(getWorkList, {
-      userUuid : this.LISConfigurations?.isLis ? undefined : this.userUuid,
+      userUuid: this.LISConfigurations?.isLis ? undefined : this.userUuid,
       department: "",
       searchingText: this.searchingText,
     });
@@ -442,9 +447,8 @@ export class SampleAcceptanceComponent implements OnInit {
     );
   }
 
-  onOpenNewTab(e) {
-    // console.log("test", e);
-    if (e.index === 0) {
+  onOpenNewTab(e): void {
+    if (e.index === 0 || e.index === 6) {
       this.getSamplesData();
     }
     this.searchingText = "";
@@ -559,9 +563,10 @@ export class SampleAcceptanceComponent implements OnInit {
         labConfigs: this.labConfigs,
         LISConfigurations: this.LISConfigurations,
         user: providerDetails,
-        authorized: authorized
+        authorized: authorized,
       },
       width: "60%",
+      height: "100%",
       disableClose: false,
     });
   }

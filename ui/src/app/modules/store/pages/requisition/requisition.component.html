@@ -17,7 +17,7 @@
   <mat-card class="border">
     <div class="d-flex justify-content-between">
       <mat-form-field class="w-25">
-        <input autocomplete="off" type="text" matInput placeholder="Search" />
+        <input autocomplete="off" type="text" matInput placeholder="Search" (keyup)="onSearchRequisition($event)" />
       </mat-form-field>
       <button
         [disabled]="
@@ -171,10 +171,10 @@
         </td>
       </tr>
     </table> -->
-    
+    <mat-progress-bar mode="indeterminate" *ngIf="!requisitions && !loadedRequisitions"></mat-progress-bar>
     <app-requisition-by-store
-      *ngIf="params?.requisitions?.length > 0"
-      [requisitions]="params?.requisitions"
+      *ngIf="loadedRequisitions && requisitions"
+      [requisitions]="requisitions"
       [currentStore]="params?.currentStore"
       (cancelRequisition)="onCancelRequisition($event)"
       (rejectRequisition)="onRejectRequisition($event)"

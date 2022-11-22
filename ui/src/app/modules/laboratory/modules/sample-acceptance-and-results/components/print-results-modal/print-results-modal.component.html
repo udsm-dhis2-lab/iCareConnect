@@ -3,7 +3,10 @@
   *ngIf="{
     facility: facilityDetails$ | async,
     visit: visit$ | async,
-    referringDoctorAttributes: referringDoctorAttributes$ | async
+    referringDoctorAttributes: referringDoctorAttributes$ | async,
+    refferedFromFacility: refferedFromFacility$ | async,
+    obs: obs$ | async,
+    phoneNumber: phoneNumber$ | async
   } as params"
 >
   <div id="results-to-print" style="color: gray">
@@ -90,7 +93,8 @@
                   padding: 10px 4px;
                 "
               >
-                {{ samplesGroupedByDepartment?.departmentName }} {{ authorized ? "Report" : "Provisional Report" }}
+                {{ samplesGroupedByDepartment?.departmentName }}
+                {{ authorized ? "Final Report" : "Provisional Report" }}
               </div>
               <div>
                 <!-- {{ samplesGroupedByDepartment["samples"][0]?.orders[0] | json }} -->
@@ -98,26 +102,40 @@
                 <table style="width: 100%">
                   <tr>
                     <td>
-                      <b> MRN </b>
-                    </td>
-                    <td>{{ patientDetailsAndSamples?.mrn }}</td>
-                    <td>
                       <b>
                         {{
-                          !LISConfigurations?.isLIS
-                            ? "Ordering Doctor"
-                            : "Registered By"
+                          LISConfigurations?.isLIS
+                            ? "Patient File Number"
+                            : "MRN"
                         }}
                       </b>
                     </td>
-                    <td>
-                      {{
-                        samplesGroupedByDepartment["samples"][0]["orders"][0]
-                          ?.order?.orderer?.name
-                      }}
-                    </td>
+                    <td>{{ patientDetailsAndSamples?.mrn }}</td>
+                    <ng-container *ngIf="!LISConfigurations?.isLIS">
+                      <td>
+                        <b>Ordering Doctor </b>
+                      </td>
+                      <td>
+                        {{
+                          samplesGroupedByDepartment["samples"][0]["orders"][0]
+                            ?.order?.orderer?.name
+                        }}
+                      </td>
+                    </ng-container>
+                    <ng-container *ngIf="LISConfigurations?.isLIS">
+                      <td><b>Collection Date & Time</b></td>
+                      <td>
+                        {{
+                          !LISConfigurations?.isLIS
+                            ? (samplesGroupedByDepartment?.samples[0]?.created
+                              | date: "medium")
+                            : (samplesGroupedByDepartment?.samples[0]
+                                ?.collectedOnStatus?.remarks | date: "medium")
+                        }}
+                      </td>
+                    </ng-container>
                   </tr>
-                  <tr *ngIf="LISConfigurations?.isLIS">
+                  <!-- <tr *ngIf="LISConfigurations?.isLIS">
                     <td></td>
                     <td></td>
                     <td>
@@ -129,7 +147,7 @@
                           | date: "medium"
                       }}
                     </td>
-                  </tr>
+                  </tr> -->
                   <tr>
                     <td>
                       <b> Patient Name </b>
@@ -138,8 +156,11 @@
                       {{ patientDetailsAndSamples?.patient?.givenName }}
                       {{ patientDetailsAndSamples?.patient?.middleName }}
                       {{ patientDetailsAndSamples?.patient?.familyName }}
+                      <span *ngIf="params?.phoneNumber?.length > 0">
+                        ({{ phoneNumber }})
+                      </span>
                     </td>
-                    <td><b>Sample ID</b></td>
+                    <td><b>Laboratory Number</b></td>
                     <td>
                       <span
                         *ngFor="
@@ -152,84 +173,141 @@
                   </tr>
                   <tr>
                     <td>
-                      <b> Age (dob)/ Gender </b>
+                      <b> Age </b>
                     </td>
                     <td>
                       {{ patientDetailsAndSamples?.patient?.age }}
-                      yrs ({{ patientDetailsAndSamples?.patient?.dob | date }})
-                      /
-                      {{ patientDetailsAndSamples?.patient?.gender }}
+                      yrs
                     </td>
-
-                    <td>
-                      <b> Sample Collected By </b>
-                    </td>
-                    <td>
-                      {{
-                        !LISConfigurations?.isLIS
-                          ? samplesGroupedByDepartment?.samples[0]?.collectedBy
-                              ?.name
-                          : samplesGroupedByDepartment?.samples[0]
-                              ?.collectedByStatus?.remarks
-                      }}
-                    </td>
+                    <ng-container *ngIf="LISConfigurations?.isLIS">
+                      <td>
+                        <b> Received date & time </b>
+                      </td>
+                      <td>
+                        <span>
+                          {{
+                            samplesGroupedByDepartment?.samples[0]
+                              ?.receivedOnStatus?.remarks | date: "medium"
+                          }}
+                        </span>
+                      </td>
+                    </ng-container>
+                    <ng-container *ngIf="!LISConfigurations?.isLIS">
+                      <td>
+                        <b> Sample Collected By </b>
+                      </td>
+                      <td>
+                        <span>
+                          {{
+                            !LISConfigurations?.isLIS
+                              ? samplesGroupedByDepartment?.samples[0]
+                                  ?.collectedBy?.name
+                              : samplesGroupedByDepartment?.samples[0]
+                                  ?.collectedByStatus?.remarks
+                          }}
+                        </span>
+                      </td>
+                    </ng-container>
                   </tr>
                   <tr>
-                    <td>
-                      <b *ngIf="!LISConfigurations?.isLIS"> Location/Source </b>
-                    </td>
-                    <td>
-                      <span *ngIf="!LISConfigurations?.isLIS">
+                    <ng-container *ngIf="LISConfigurations?.isLIS">
+                      <td>
+                        <b> Gender </b>
+                      </td>
+                      <td>
+                        <span>
+                          {{ patientDetailsAndSamples?.patient?.gender }}
+                        </span>
+                      </td>
+                    </ng-container>
+                    <ng-container *ngIf="!LISConfigurations?.isLIS">
+                      <td>
+                        <b> Location/Source </b>
+                      </td>
+                      <td>
+                        <span>
+                          {{
+                            samplesGroupedByDepartment["samples"][0]?.orders[0]
+                              ?.order?.location?.name
+                          }}
+                        </span>
+                      </td>
+                    </ng-container>
+                    <ng-container *ngIf="LISConfigurations?.isLIS">
+                      <td>
+                        <b> Accepted date & time </b>
+                      </td>
+                      <td>
                         {{
-                          samplesGroupedByDepartment["samples"][0]?.orders[0]
-                            ?.order?.location?.name
+                          samplesGroupedByDepartment?.samples[0]?.acceptedBy
+                            ?.timestamp | date: "medium"
                         }}
-                      </span>
-                    </td>
-                    <td><b>Sample Collected On</b></td>
-                    <td>
-                      {{
-                        !LISConfigurations?.isLIS
-                          ? (samplesGroupedByDepartment?.samples[0]?.created
-                            | date: "medium")
-                          : (samplesGroupedByDepartment?.samples[0]
-                              ?.collectedOnStatus?.remarks | date: "medium")
-                      }}
-                    </td>
+                      </td>
+                    </ng-container>
                   </tr>
-                  <tr>
+                  <tr *ngIf="!LISConfigurations?.isLIS">
                     <td>
                       <b> Phone </b>
                     </td>
                     <td>{{ phoneNumber }}</td>
-                    <td>
-                      <b *ngIf="!LISConfigurations?.isLIS"
-                        >Sample Accepted At/Arrival Date</b
-                      >
-                    </td>
-                    <td>
-                      <span *ngIf="!LISConfigurations?.isLIS">
+                    <ng-container *ngIf="">
+                      <td>
+                        <b>Sample Accepted At/Arrival Date</b>
+                      </td>
+                      <td>
+                        <span>
+                          {{
+                            samplesGroupedByDepartment?.samples[0]?.acceptedAt
+                              | date: "medium"
+                          }}
+                        </span>
+                      </td>
+                    </ng-container>
+                    <ng-container
+                      *ngIf="
+                        LISConfigurations?.isLIS &&
+                        samplesGroupedByDepartment?.samples[0]
+                          ?.acceptanceRemarksStatus?.remarks.length > 0
+                      "
+                    >
+                      <td>
+                        <b>Results compromization remarks</b>
+                      </td>
+                      <td>
                         {{
-                          samplesGroupedByDepartment?.samples[0]?.acceptedAt
-                            | date: "medium"
+                          samplesGroupedByDepartment?.samples[0]
+                            ?.acceptanceRemarksStatus?.remarks
                         }}
-                      </span>
-                    </td>
+                      </td>
+                    </ng-container>
                   </tr>
                   <tr
                     *ngIf="
                       LISConfigurations?.isLIS &&
-                      params?.referringDoctorAttributes
+                      (params?.referringDoctorAttributes ||
+                        params?.refferedFromFacility)
                     "
                   >
-                    <td></td>
-                    <td></td>
                     <td>
-                      <b> Requesting Doctor </b>
+                      <span *ngIf="params?.refferedFromFacility">
+                        <b> Facility </b>
+                      </span>
                     </td>
                     <td>
-                      <span
-                        >{{
+                      <span *ngIf="params?.refferedFromFacility">
+                        {{ params?.refferedFromFacility?.display }}
+                      </span>
+                    </td>
+                  </tr>
+                  <tr *ngIf="LISConfigurations?.isLIS">
+                    <td>
+                      <span *ngIf="params?.referringDoctorAttributes">
+                        <b> Requested by </b>
+                      </span>
+                    </td>
+                    <td>
+                      <span *ngIf="params?.referringDoctorAttributes">
+                        {{
                           params?.visit?.attributesKeyedByAttributeType[
                             params?.referringDoctorAttributes[1].value
                           ]
@@ -264,59 +342,24 @@
                       </span>
                     </td>
                   </tr>
-                  <tr *ngIf="LISConfigurations?.isLIS">
-                    <td></td>
-                    <td></td>
-                    <td>
-                      <b> Received by </b>
-                    </td>
-                    <td>
-                      <span>
-                        {{
-                          samplesGroupedByDepartment?.samples[0]
-                            ?.receivedByStatus?.user?.name
-                        }}
-                      </span>
-                    </td>
-                  </tr>
-                  <tr *ngIf="LISConfigurations?.isLIS">
-                    <td></td>
-                    <td></td>
-                    <td>
-                      <b> Received On </b>
-                    </td>
-                    <td>
-                      <span>
-                        {{
-                          samplesGroupedByDepartment?.samples[0]
-                            ?.receivedOnStatus?.remarks | date: "medium"
-                        }}
-                      </span>
-                    </td>
-                  </tr>
                   <tr>
-                    <td></td>
-                    <td></td>
                     <td>
+                      <span *ngIf="params?.obs && LISConfigurations?.isLIS"
+                        ><b>Clinical Data </b>
+                      </span>
+                    </td>
+                    <td>
+                      <span *ngIf="params.obs && LISConfigurations?.isLIS">
+                        {{ params.obs?.latest?.value }}
+                      </span>
+                    </td>
+                    <td *ngIf="!LISConfigurations?.isLIS">
                       <b> Sample Accepted By </b>
                     </td>
-                    <td>
+                    <td *ngIf="!LISConfigurations?.isLIS">
                       {{
                         samplesGroupedByDepartment?.samples[0]?.acceptedBy?.user
                           ?.name
-                      }}
-                    </td>
-                  </tr>
-                  <tr *ngIf="LISConfigurations?.isLIS">
-                    <td></td>
-                    <td></td>
-                    <td>
-                      <b> Sample Accepted On </b>
-                    </td>
-                    <td>
-                      {{
-                        samplesGroupedByDepartment?.samples[0]?.acceptedBy
-                          ?.timestamp | date: "medium"
                       }}
                     </td>
                   </tr>
@@ -369,13 +412,6 @@
                       }}
                     </td>
                   </tr>
-                  <tr *ngIf="LISConfigurations?.isLIS">
-                    <td></td>
-                    <td></td>
-                    <td>
-                      {{ samplesGroupedByDepartment?.samples[0]?.acceptanceRemarksStatus?.remarks.length > 0 ? 'Results compromization remarks: ' + samplesGroupedByDepartment?.samples[0]?.acceptanceRemarksStatus?.remarks : "" }}
-                    </td>
-                  </tr>
                 </table>
                 <div
                   style="border-bottom: solid 1px #222; padding: 8px 0"
@@ -410,7 +446,7 @@
                           >
                             <tr>
                               <td *ngIf="!LISConfigurations?.isLIS">Test #</td>
-                              <td>Parameter</td>
+                              <td>Test</td>
                               <td>Results</td>
                               <!-- <td>SI Units</td> -->
                               <td *ngIf="!LISConfigurations?.isLIS">LL</td>
@@ -421,215 +457,302 @@
                               </td>
                             </tr>
 
-                            <tr *ngFor="let order of sample?.orders">
-                              <td *ngIf="!LISConfigurations?.isLIS">
-                                {{ order?.order?.orderNumber }}
-                              </td>
-                              <td>{{ order?.order?.concept?.display }}</td>
-                              <td>
-                                <div
-                                  class="w-100"
-                                  *ngIf="
-                                    order?.order?.concept?.setMembers?.length ==
-                                    0
-                                  "
-                                >
-                                  <span
+                            <ng-container *ngFor="let order of sample?.orders">
+                              <tr>
+                                <td *ngIf="!LISConfigurations?.isLIS">
+                                  {{ order?.order?.orderNumber }}
+                                </td>
+                                <td>
+                                  {{ order?.order?.concept?.display }} <br />
+                                  <!-- <span
                                     *ngIf="
-                                      order?.testAllocations[0]
-                                        ?.secondSignOff &&
-                                      order?.order?.concept?.lowNormal &&
+                                      order?.authorizationInfo[0]?.statuses
+                                        ?.length > 0
+                                    "
+                                  >
+                                    <i
+                                      >Authorised by
+                                      {{
+                                        order?.authorizationInfo[0]?.statuses[0]
+                                          ?.name
+                                      }}
+                                      On
+                                      {{
+                                        order?.authorizationInfo[0]?.statuses[0]
+                                          ?.timestamp | date: "medium"
+                                      }}
+                                    </i>
+                                  </span> -->
+                                </td>
+                                <td>
+                                  <div
+                                    class="w-100"
+                                    *ngIf="
                                       order?.order?.concept?.setMembers
-                                        ?.length == 0 &&
-                                      order?.order?.concept?.lowNormal >
+                                        ?.length == 0
+                                    "
+                                  >
+                                    <span
+                                      *ngIf="
+                                        order?.testAllocations[0]
+                                          ?.secondSignOff &&
+                                        order?.order?.concept?.lowNormal &&
+                                        order?.order?.concept?.setMembers
+                                          ?.length == 0 &&
+                                        order?.order?.concept?.lowNormal >
+                                          order?.testAllocations[0]?.results[
+                                            order?.testAllocations[0]?.results
+                                              ?.length - 1
+                                          ]?.valueNumeric
+                                      "
+                                      ><img
+                                        src="assets/images/arrowdownred.png"
+                                        height="8px"
+                                    /></span>
+                                    <span
+                                      *ngIf="
+                                        order?.testAllocations[0]
+                                          ?.secondSignOff &&
+                                        order?.order?.concept?.setMembers
+                                          ?.length == 0 &&
+                                        order?.order?.concept?.hiNormal &&
                                         order?.testAllocations[0]?.results[
                                           order?.testAllocations[0]?.results
                                             ?.length - 1
-                                        ]?.valueNumeric
-                                    "
-                                    ><img
-                                      src="assets/images/arrowdownred.png"
-                                      height="8px"
-                                  /></span>
-                                  <span
-                                    *ngIf="
-                                      order?.testAllocations[0]
-                                        ?.secondSignOff &&
-                                      order?.order?.concept?.setMembers
-                                        ?.length == 0 &&
-                                      order?.order?.concept?.hiNormal &&
-                                      order?.testAllocations[0]?.results[
-                                        order?.testAllocations[0]?.results
-                                          ?.length - 1
-                                      ]?.valueNumeric > order?.concept?.hiNormal
-                                    "
-                                    ><img
-                                      src="assets/images/arrowupred.png"
-                                      height="8px"
-                                  /></span>
+                                        ]?.valueNumeric >
+                                          order?.concept?.hiNormal
+                                      "
+                                      ><img
+                                        src="assets/images/arrowupred.png"
+                                        height="8px"
+                                    /></span>
 
-                                  <span
-                                    *ngIf="
-                                      order?.order?.concept?.setMembers
-                                        ?.length == 0 &&
-                                      order?.testAllocations[0]?.results[0]
-                                        ?.value
-                                    "
-                                  >
-                                    {{
-                                      order?.order?.concept?.answers?.length ==
-                                      0
-                                        ? order?.testAllocations[0]?.results[
-                                            order?.testAllocations[0]?.results
-                                              ?.length - 1
-                                          ]?.value
-                                        : order?.order?.concept?.keyedAnswers[
-                                            order?.testAllocations[0]?.results[
+                                    <span
+                                      *ngIf="
+                                        order?.order?.concept?.setMembers
+                                          ?.length == 0 &&
+                                        order?.testAllocations[0]?.results[0]
+                                          ?.value
+                                      "
+                                    >
+                                      {{
+                                        order?.order?.concept?.answers
+                                          ?.length == 0
+                                          ? order?.testAllocations[0]?.results[
                                               order?.testAllocations[0]?.results
                                                 ?.length - 1
                                             ]?.value
-                                          ]?.display
-                                    }}
-                                  </span>
-                                  <span
-                                    class="text-warning"
-                                    *ngIf="
-                                      !order?.testAllocations[0]?.results[0]
-                                        ?.value
-                                    "
-                                  >
-                                    Processing ..
-                                  </span>
-                                </div>
-
-                                <div
-                                  class="w-100"
-                                  *ngIf="
-                                    order?.order?.concept?.setMembers?.length >
-                                    0
-                                  "
-                                >
-                                  <div
-                                    *ngFor="
-                                      let parameter of order?.order?.concept
-                                        ?.setMembers;
-                                      let count = index
-                                    "
-                                  >
-                                    <!-- {{ parameter | json }} -->
-                                    <app-shared-parameter-results
+                                          : order?.order?.concept?.keyedAnswers[
+                                              order?.testAllocations[0]
+                                                ?.results[
+                                                order?.testAllocations[0]
+                                                  ?.results?.length - 1
+                                              ]?.value
+                                            ]?.display
+                                      }}
+                                    </span>
+                                    <span
+                                      class="text-warning"
                                       *ngIf="
-                                        order
-                                          ?.allocationsGroupedByParameterUuid[
-                                          parameter?.uuid
-                                        ]
+                                        !order?.testAllocations[0]?.results[0]
+                                          ?.value
                                       "
-                                      [order]="order"
-                                      [count]="count"
-                                      [parameter]="parameter"
-                                      [units]="
-                                        order?.order?.concept?.setMembers[count]
-                                          ?.units
-                                      "
-                                    ></app-shared-parameter-results>
+                                    >
+                                      Processing ..
+                                    </span>
                                   </div>
-                                </div>
-                              </td>
-                              <!-- <td>
-                                <p
-                                  *ngIf="
-                                    order?.order?.concept?.setMembers?.length ==
-                                    0
-                                  "
-                                >
-                                  <span *ngIf="order?.order?.concept?.units">
-                                    {{ order?.order?.concept?.units }}
-                                  </span>
-                                  <span
-                                    style="font-size: 0.7rem"
-                                    *ngIf="!order?.order?.concept?.units"
-                                  >
-                                    -
-                                  </span>
-                                </p>
-                                <p
-                                  *ngIf="
-                                    order?.order?.concept?.setMembers?.length >
-                                    0
-                                  "
-                                >
-                                  <ng-container
-                                    *ngFor="
-                                      let allocation of order?.testAllocations;
-                                      let count = index
+
+                                  <div
+                                    class="w-100"
+                                    *ngIf="
+                                      order?.order?.concept?.setMembers
+                                        ?.length > 0
                                     "
                                   >
-                                    <ng-container
-                                      *ngIf="
-                                        order
-                                          ?.allocationsGroupedByParameterUuid[
-                                          allocation?.concept?.uuid
-                                        ]
+                                    <div
+                                      *ngFor="
+                                        let parameter of order?.order?.concept
+                                          ?.setMembers;
+                                        let count = index
+                                      "
+                                    >
+                                      <!-- {{ parameter | json }} -->
+                                      <app-shared-parameter-results
+                                        *ngIf="
+                                          order
+                                            ?.allocationsGroupedByParameterUuid[
+                                            parameter?.uuid
+                                          ]
+                                        "
+                                        [order]="order"
+                                        [count]="count"
+                                        [parameter]="parameter"
+                                        [units]="
+                                          order?.order?.concept?.setMembers[
+                                            count
+                                          ]?.units
+                                        "
+                                      ></app-shared-parameter-results>
+                                    </div>
+                                  </div>
+                                </td>
+                                <td *ngIf="!LISConfigurations?.isLIS">
+                                  <p
+                                    *ngIf="
+                                      order?.order?.concept?.setMembers
+                                        ?.length == 0
+                                    "
+                                  >
+                                    <span
+                                      *ngIf="order?.order?.concept?.numeric"
+                                    >
+                                      {{ order?.order?.concept?.lowNormal }}
+                                    </span>
+                                    <span
+                                      style="font-size: 0.7rem"
+                                      *ngIf="!order?.order?.concept?.numeric"
+                                    >
+                                      -
+                                    </span>
+                                  </p>
+                                  <p
+                                    *ngIf="
+                                      order?.order?.concept?.setMembers
+                                        ?.length > 0
+                                    "
+                                  >
+                                    <span
+                                      *ngFor="
+                                        let allocation of order?.testAllocations;
+                                        let count = index
                                       "
                                     >
                                       <span
                                         *ngIf="
                                           order?.order?.concept?.setMembers[
                                             count
-                                          ]?.units
+                                          ]?.numeric
                                         "
                                       >
-                                        {{ order?.order?.concept?.units }}
+                                        {{
+                                          order?.order?.concept?.setMembers[
+                                            count
+                                          ]?.display
+                                        }}
+                                        :authori
+                                        {{
+                                          order?.order?.concept?.setMembers[
+                                            count
+                                          ]?.lowNormal
+                                        }}
                                       </span>
                                       <span
                                         style="font-size: 0.7rem"
                                         *ngIf="
                                           !order?.order?.concept?.setMembers[
                                             count
-                                          ]?.units
+                                          ]?.numeric
                                         "
                                       >
                                         -
                                       </span>
                                       <br />
-                                    </ng-container>
-                                  </ng-container>
-                                </p>
-                              </td> -->
-
-                              <td *ngIf="!LISConfigurations?.isLIS">
-                                <p
-                                  *ngIf="
-                                    order?.order?.concept?.setMembers?.length ==
-                                    0
-                                  "
-                                >
-                                  <span *ngIf="order?.order?.concept?.numeric">
-                                    {{ order?.order?.concept?.lowNormal }}
-                                  </span>
-                                  <span
-                                    style="font-size: 0.7rem"
-                                    *ngIf="!order?.order?.concept?.numeric"
-                                  >
-                                    -
-                                  </span>
-                                </p>
-                                <p
-                                  *ngIf="
-                                    order?.order?.concept?.setMembers?.length >
-                                    0
-                                  "
-                                >
-                                  <span
-                                    *ngFor="
-                                      let allocation of order?.testAllocations;
-                                      let count = index
+                                    </span>
+                                  </p>
+                                </td>
+                                <td *ngIf="!LISConfigurations?.isLIS">
+                                  <p
+                                    *ngIf="
+                                      order?.order?.concept?.setMembers
+                                        ?.length == 0
                                     "
                                   >
                                     <span
-                                      *ngIf="
-                                        order?.order?.concept?.setMembers[count]
-                                          ?.numeric
+                                      *ngIf="order?.order?.concept?.numeric"
+                                    >
+                                      {{ order?.order?.concept?.hiNormal }}
+                                    </span>
+                                    <span
+                                      style="font-size: 0.7rem"
+                                      *ngIf="!order?.order?.concept?.numeric"
+                                    >
+                                      -
+                                    </span>
+                                  </p>
+                                  <p
+                                    *ngIf="
+                                      order?.order?.concept?.setMembers
+                                        ?.length > 0
+                                    "
+                                  >
+                                    <span
+                                      *ngFor="
+                                        let allocation of order?.testAllocations;
+                                        let count = index
+                                      "
+                                    >
+                                      <span>
+                                        {{
+                                          order?.order?.concept?.setMembers[
+                                            count
+                                          ]?.display
+                                        }}
+                                      </span>
+                                      <span
+                                        *ngIf="
+                                          order?.order?.concept?.setMembers[
+                                            count
+                                          ]?.numeric
+                                        "
+                                      >
+                                        {{
+                                          order?.order?.concept?.setMembers[
+                                            count
+                                          ]?.hiNormal
+                                        }}
+                                      </span>
+                                      <span
+                                        style="font-size: 0.7rem"
+                                        *ngIf="
+                                          !order?.order?.concept?.setMembers[
+                                            count
+                                          ]?.numeric
+                                        "
+                                      >
+                                        -
+                                      </span>
+                                      <br />
+                                    </span>
+                                  </p>
+                                </td>
+                                <td>
+                                  <p
+                                    *ngIf="
+                                      order?.order?.concept?.setMembers
+                                        ?.length == 0
+                                    "
+                                  >
+                                    {{
+                                      order?.testAllocations[0]
+                                        ?.resultsCommentsStatuses[0]
+                                        ?.remarks !== "NO DESCRPTION"
+                                        ? order?.testAllocations[0]
+                                            ?.resultsCommentsStatuses[0]
+                                            ?.remarks
+                                        : null
+                                    }}
+                                  </p>
+                                  <p
+                                    *ngIf="
+                                      order?.order?.concept?.setMembers
+                                        ?.length > 0
+                                    "
+                                  >
+                                    <span
+                                      *ngFor="
+                                        let allocation of order?.order
+                                          ?.testAllocations;
+                                        let count = index
                                       "
                                     >
                                       {{
@@ -638,137 +761,44 @@
                                       }}
                                       :
                                       {{
-                                        order?.order?.concept?.setMembers[count]
-                                          ?.lowNormal
+                                        order?.order?.testAllocations[count]
+                                          ?.resultsCommentsStatuses[0]
+                                          ?.remarks !==
+                                        "NO DESCRPTION FOR PARAMETER"
+                                          ? order?.order?.allocations[count]
+                                              ?.resultsCommentsStatuses[0]
+                                              ?.remarks
+                                          : null
                                       }}
-                                    </span>
-                                    <span
-                                      style="font-size: 0.7rem"
-                                      *ngIf="
-                                        !order?.order?.concept?.setMembers[
-                                          count
-                                        ]?.numeric
-                                      "
-                                    >
-                                      -
-                                    </span>
-                                    <br />
-                                  </span>
-                                </p>
-                              </td>
-                              <td *ngIf="!LISConfigurations?.isLIS">
-                                <p
-                                  *ngIf="
-                                    order?.order?.concept?.setMembers?.length ==
-                                    0
-                                  "
-                                >
-                                  <span *ngIf="order?.order?.concept?.numeric">
-                                    {{ order?.order?.concept?.hiNormal }}
-                                  </span>
-                                  <span
-                                    style="font-size: 0.7rem"
-                                    *ngIf="!order?.order?.concept?.numeric"
-                                  >
-                                    -
-                                  </span>
-                                </p>
-                                <p
-                                  *ngIf="
-                                    order?.order?.concept?.setMembers?.length >
-                                    0
-                                  "
-                                >
-                                  <span
-                                    *ngFor="
-                                      let allocation of order?.testAllocations;
-                                      let count = index
-                                    "
-                                  >
-                                    <span>
-                                      {{
-                                        order?.order?.concept?.setMembers[count]
-                                          ?.display
-                                      }}
-                                    </span>
-                                    <span
-                                      *ngIf="
-                                        order?.order?.concept?.setMembers[count]
-                                          ?.numeric
-                                      "
-                                    >
-                                      {{
-                                        order?.order?.concept?.setMembers[count]
-                                          ?.hiNormal
-                                      }}
-                                    </span>
-                                    <span
-                                      style="font-size: 0.7rem"
-                                      *ngIf="
-                                        !order?.order?.concept?.setMembers[
-                                          count
-                                        ]?.numeric
-                                      "
-                                    >
-                                      -
-                                    </span>
-                                    <br />
-                                  </span>
-                                </p>
-                              </td>
-                              <td>
-                                <p
-                                  *ngIf="
-                                    order?.order?.concept?.setMembers?.length ==
-                                    0
-                                  "
-                                >
-                                  {{
-                                    order?.testAllocations[0]
-                                      ?.resultsCommentsStatuses[0]?.remarks !==
-                                    "NO DESCRPTION"
-                                      ? order?.testAllocations[0]
-                                          ?.resultsCommentsStatuses[0]?.remarks
-                                      : null
-                                  }}
-                                </p>
-                                <p
-                                  *ngIf="
-                                    order?.order?.concept?.setMembers?.length >
-                                    0
-                                  "
-                                >
-                                  <span
-                                    *ngFor="
-                                      let allocation of order?.order
-                                        ?.testAllocations;
-                                      let count = index
-                                    "
-                                  >
-                                    {{
-                                      order?.order?.concept?.setMembers[count]
-                                        ?.display
-                                    }}
-                                    :
-                                    {{
-                                      order?.order?.testAllocations[count]
-                                        ?.resultsCommentsStatuses[0]
-                                        ?.remarks !==
-                                      "NO DESCRPTION FOR PARAMETER"
-                                        ? order?.order?.allocations[count]
-                                            ?.resultsCommentsStatuses[0]
-                                            ?.remarks
-                                        : null
-                                    }}
 
-                                    <br />
-                                  </span>
-                                </p>
-                              </td>
-                              <td *ngIf="!LISConfigurations?.isLIS">
-                                {{ order?.order?.orderDate | date: "medium" }}
-                              </td>
-                            </tr>
+                                      <br />
+                                    </span>
+                                  </p>
+                                </td>
+                                <td *ngIf="!LISConfigurations?.isLIS">
+                                  {{ order?.order?.orderDate | date: "medium" }}
+                                </td>
+                              </tr>
+                              <tr class="mb-2">
+                                <td colspan="100%">
+                                  <div *ngIf="order?.authorizationInfo[0]">
+                                    <b>Authorised By: </b
+                                    >{{
+                                      order?.authorizationInfo[0]?.statuses[0]
+                                        ?.name
+                                    }}
+                                    <b class="ml-4">On: </b
+                                    >{{
+                                      order?.authorizationInfo[0]?.statuses[0]
+                                        ?.timestamp | date: "medium"
+                                    }}
+                                  </div>
+                                  <div *ngIf="!order?.authorizationInfo[0]">
+                                    Un-Authorized
+                                  </div>
+                                </td>
+                              </tr>
+                            </ng-container>
                           </table>
                         </div>
                       </td>
@@ -776,7 +806,7 @@
                   </tbody>
                 </table>
 
-                <div style="padding: 15px 0">
+                <div style="padding: 15px 0" *ngIf="!LISConfigurations?.isLIS">
                   <span>KEY</span>
                   <table>
                     <tr>
@@ -796,7 +826,7 @@
                   </table>
                 </div>
                 <!-- {{ samplesGroupedByDepartment?.samples[0] | json }} -->
-                <div
+                <!-- <div
                   style="text-align: left; padding: 6px 0"
                   class="providers-details"
                 >
@@ -838,14 +868,26 @@
                             ?.authorizationInfo[0]?.timestamp | date: "medium")
                     }}
                   </span>
-                </div>
+                </div> -->
                 <div
-                  style="text-align: left; padding: 6px 0"
+                  style="text-align: left; padding: 6px 0; margin: 5vh 0 0 0"
                   class="providers-details"
                 >
                   <span>
-                    <b>Printed By :</b>{{ user?.display }}, <b>Printed At :</b>
+                    <b>Printed By :</b>{{ user?.person?.display }},
+                    <b>Printed At :</b>
                     {{ currentDateTime }}
+                  </span>
+                </div>
+                <div
+                  style="text-align: center; margin: 2vh 0 0 0"
+                  class="providers-details"
+                >
+                  <span>
+                    <b
+                      >----------------------------- END OF LABORATORY REPORT
+                      -----------------------------</b
+                    >
                   </span>
                 </div>
               </div>

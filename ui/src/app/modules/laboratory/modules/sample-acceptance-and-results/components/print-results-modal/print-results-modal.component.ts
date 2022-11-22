@@ -3,7 +3,8 @@ import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { Store } from "@ngrx/store";
 import * as _ from "lodash";
 import { Observable } from "rxjs";
-import { map, sample, tap } from "rxjs/operators";
+import { catchError, map, sample, tap } from "rxjs/operators";
+import { LocationService } from "src/app/core/services/location.service";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { VisitsService } from "src/app/shared/resources/visits/services/visits.service";
 import { PatientService } from "src/app/shared/services/patient.service";
@@ -33,9 +34,13 @@ export class PrintResultsModalComponent implements OnInit {
   visit$: Observable<any>;
   referringDoctorAttributes$: any;
   authorized: any;
+  refferedFromFacility$: Observable<any>;
+  obs$: Observable<any>;
+  phoneNumber$: Observable<any>;
   constructor(
     private patientService: PatientService,
     private visitService: VisitsService,
+    private locationService: LocationService,
     private systemSettingsService: SystemSettingsService,
     private dialogRef: MatDialogRef<PrintResultsModalComponent>,
     @Inject(MAT_DIALOG_DATA) data,
@@ -45,19 +50,15 @@ export class PrintResultsModalComponent implements OnInit {
     this.LISConfigurations = data?.LISConfigurations;
     this.loadingPatientPhone = true;
     this.errorLoadingPhone = false;
-
-    this.patientService
+    this.phoneNumber$ = this.patientService
       .getPatientPhone(data?.patientDetailsAndSamples?.patient?.uuid)
-      .subscribe(
-        (response: any) => {
+      .pipe(
+        tap((response) => {
           this.errorLoadingPhone = false;
           this.loadingPatientPhone = false;
           this.phoneNumber = response;
           this.authorized = data.authorized;
-        },
-        (error) => {
-          this.errorLoadingPhone = true;
-        }
+        })
       );
     this.labConfigs = data?.labConfigs;
     this.user = data?.user;
@@ -85,6 +86,22 @@ export class PrintResultsModalComponent implements OnInit {
       this.systemSettingsService.getSystemSettingsMatchingAKey(
         "lis.attributes.referringDoctor"
       );
+    this.obs$ = this.visitService
+      .getVisitObservationsByVisitUuid({
+        uuid: this.patientDetailsAndSamples?.departments[0]?.samples[0]?.visit
+          ?.uuid,
+        query: {
+          v: "custom:(uuid,visitType,startDatetime,encounters:(uuid,encounterDatetime,encounterType,location,obs,orders,encounterProviders),stopDatetime,attributes:(uuid,display),location:(uuid,display,tags,parentLocation:(uuid,display)),patient:(uuid,display,identifiers,person,voided)",
+        },
+      })
+      .pipe(
+        map((obs) => {
+          return !obs?.error && obs["3a010ff3-6361-4141-9f4e-dd863016db5a"]
+            ? obs["3a010ff3-6361-4141-9f4e-dd863016db5a"]
+            : "";
+        })
+      );
+
     this.visit$ = this.visitService
       .getVisitDetailsByVisitUuid(
         this.patientDetailsAndSamples?.departments[0]?.samples[0]?.visit?.uuid,
@@ -97,7 +114,7 @@ export class PrintResultsModalComponent implements OnInit {
       .pipe(
         map((response) => {
           if (!response?.error) {
-            return {
+            response = {
               ...response,
               attributesKeyedByAttributeType: _.keyBy(
                 response?.attributes.map((attribute) => {
@@ -109,6 +126,19 @@ export class PrintResultsModalComponent implements OnInit {
                 "attributeTypeUuid"
               ),
             };
+            this.refferedFromFacility$ = this.locationService
+              .getLocationById(
+                response?.attributesKeyedByAttributeType[
+                  "47da17a9-a910-4382-8149-736de57dab18"
+                ]?.value
+              )
+              .pipe(
+                map((response) => {
+                  return response?.error ? {} : response;
+                })
+              );
+
+            return response;
           }
         })
       );
@@ -181,10 +211,28 @@ export class PrintResultsModalComponent implements OnInit {
         : iframe.contentDocument;
       frameDoc.document.open();
       frameDoc.document.write(
-        "<html><head> <style>button {display:none;}</style>"
+        `
+          <html>
+            <head> 
+              <style>
+              button {
+                display:none;
+              } 
+              .mat-expansion-panel-body {
+                font-size: 0.2rem !important;
+              }
+              .content table,.providers-details {
+                font-size: 0.8rem !important;
+              }
+              
+            </style>`
       );
       frameDoc.document.write("</head><body>");
-      frameDoc.document.write(contents);
+      frameDoc.document.write(`
+          <div class="content">
+           ${contents}
+          </div>
+      `);
       frameDoc.document.write("</body></html>");
       frameDoc.document.close();
       setTimeout(function () {

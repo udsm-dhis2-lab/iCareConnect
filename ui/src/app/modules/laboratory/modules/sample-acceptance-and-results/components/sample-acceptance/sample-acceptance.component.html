@@ -13,7 +13,8 @@
     rejectedSamples: rejectedSamples$ | async,
     acceptedSamples: acceptedSamples$ | async,
     samplesWithResults: samplesWithResults$ | async,
-    patientsWithResults: patientsWithResults$ | async
+    patientsWithResults: patientsWithResults$ | async,
+    samplesLoadedState: samplesLoadedState$ | async
   } as sampleParams"
 >
   <div class="loading-overlay" *ngIf="saving">
@@ -56,16 +57,18 @@
           </mat-select>
         </mat-form-field>
       </div>
-      <div class="p-1">
+      <mat-progress-bar
+        mode="indeterminate"
+        *ngIf="!sampleParams?.samplesLoadedState"
+      ></mat-progress-bar>
+      <div class="p-1" *ngIf="sampleParams?.samplesLoadedState">
         <table class="table table-bordered">
           <thead class="table-header">
             <tr>
               <th rowspan="2">SN</th>
               <th rowspan="2">Department/Section</th>
-              <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">
-                Sample / Specimen
-              </th>
-              <th rowspan="2">Sample ID</th>
+              <th rowspan="2">Sample / Specimen</th>
+              <th rowspan="2">Laboratory ID</th>
               <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">MRN</th>
               <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">
                 Patient Names
@@ -125,7 +128,7 @@
                     }}
                   </td>
                   <td
-                    *ngIf="orderCount == 0 && !LISConfigurations?.isLIS"
+                    *ngIf="orderCount == 0"
                     [attr.rowspan]="sample?.orders?.length"
                   >
                     {{ sample?.specimen?.specimenName }}
@@ -177,7 +180,7 @@
                   >
                     {{
                       sample?.receivedOnStatus?.timestamp
-                        ? (sample?.receivedOnStatus?.timestamp | date: "medium")
+                        ? (sample?.receivedOnStatus?.remarks | date: "medium")
                         : ""
                     }}
                   </td>
@@ -384,16 +387,19 @@
           </mat-select>
         </mat-form-field>
       </div>
-      <div class="p-1">
+
+      <mat-progress-bar
+        mode="indeterminate"
+        *ngIf="!sampleParams?.samplesLoadedState"
+      ></mat-progress-bar>
+      <div class="p-1" *ngIf="sampleParams?.samplesLoadedState">
         <table class="table table-bordered">
           <thead class="table-header">
             <tr>
               <th rowspan="2">SN</th>
               <th rowspan="2">Department</th>
-              <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">
-                Sample / Specimen
-              </th>
-              <th rowspan="2">Sample ID</th>
+              <th rowspan="2">Sample / Specimen</th>
+              <th rowspan="2">Laboratory ID</th>
               <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">MRN</th>
               <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">
                 Patient Names
@@ -447,7 +453,7 @@
                     {{ sample?.department?.departmentName }}
                   </td>
                   <td
-                    *ngIf="orderCount == 0 && !LISConfigurations?.isLIS"
+                    *ngIf="orderCount == 0"
                     [attr.rowspan]="sample?.orders?.length"
                   >
                     {{ sample?.specimen?.specimenName }}
@@ -500,7 +506,7 @@
                   >
                     {{
                       sample?.receivedOnStatus?.timestamp
-                        ? (sample?.receivedOnStatus?.timestamp | date: "medium")
+                        ? (sample?.receivedOnStatus?.remarks | date: "medium")
                         : ""
                     }}
                   </td>
@@ -587,10 +593,8 @@
             <tr>
               <th rowspan="2">SN</th>
               <th rowspan="2">Department</th>
-              <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">
-                Sample / Specimen
-              </th>
-              <th rowspan="2">Sample ID</th>
+              <th rowspan="2">Sample / Specimen</th>
+              <th rowspan="2">Laboratory ID</th>
               <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">MRN</th>
               <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">
                 Patient Names
@@ -650,7 +654,7 @@
                     {{ sample?.department?.departmentName }}
                   </td>
                   <td
-                    *ngIf="orderCount == 0 && !LISConfigurations?.isLIS"
+                    *ngIf="orderCount == 0"
                     [attr.rowspan]="sample?.orders?.length"
                   >
                     {{ sample?.specimen?.specimenName }}
@@ -703,7 +707,7 @@
                   >
                     {{
                       sample?.receivedOnStatus?.timestamp
-                        ? (sample?.receivedOnStatus?.timestamp | date: "medium")
+                        ? (sample?.receivedOnStatus?.remarks | date: "medium")
                         : ""
                     }}
                   </td>
@@ -843,10 +847,8 @@
             <tr>
               <th rowspan="2">SN</th>
               <th rowspan="2">Department</th>
-              <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">
-                Sample / Specimen
-              </th>
-              <th rowspan="2">Sample ID</th>
+              <th rowspan="2">Sample / Specimen</th>
+              <th rowspan="2">Laboratory ID</th>
               <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">MRN</th>
               <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">
                 Patient Names
@@ -898,7 +900,7 @@
                     {{ sample?.department?.departmentName }}
                   </td>
                   <td
-                    *ngIf="orderCount == 0 && !LISConfigurations?.isLIS"
+                    *ngIf="orderCount == 0"
                     [attr.rowspan]="sample?.orders?.length"
                   >
                     {{ sample?.specimen?.specimenName }}
@@ -947,7 +949,7 @@
                   >
                     {{
                       sample?.receivedOnStatus?.timestamp
-                        ? (sample?.receivedOnStatus?.timestamp | date: "medium")
+                        ? (sample?.receivedOnStatus?.remarks | date: "medium")
                         : ""
                     }}
                   </td>
@@ -1129,10 +1131,8 @@
             <tr>
               <th rowspan="2">SN</th>
               <th rowspan="2">Department</th>
-              <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">
-                Sample / Specimen
-              </th>
-              <th rowspan="2">Sample ID</th>
+              <th rowspan="2">Sample / Specimen</th>
+              <th rowspan="2">Laboratory ID</th>
               <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">MRN</th>
               <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">
                 Patient Names
@@ -1205,7 +1205,7 @@
                     {{ sample?.department?.departmentName }}
                   </td>
                   <td
-                    *ngIf="orderCount == 0 && !LISConfigurations?.isLIS"
+                    *ngIf="orderCount == 0"
                     [attr.rowspan]="sample?.orders?.length"
                   >
                     {{ sample?.specimen?.specimenName }}
@@ -1259,7 +1259,7 @@
                   >
                     {{
                       sample?.receivedOnStatus?.timestamp
-                        ? (sample?.receivedOnStatus?.timestamp | date: "medium")
+                        ? (sample?.receivedOnStatus?.remarks | date: "medium")
                         : ""
                     }}
                   </td>
@@ -1313,7 +1313,7 @@
                   </td>
                 </tr>
                 <tr *ngIf="samplesToViewMoreDetails[sample?.id]">
-                  <td colspan="10">
+                  <td [attr.colspan]="!LISConfigurations?.isLIS ? 12 : 11">
                     <app-shared-sample-details
                       [sample]="sample"
                     ></app-shared-sample-details>
@@ -1391,10 +1391,8 @@
             <tr>
               <th rowspan="2">SN</th>
               <th rowspan="2">Department</th>
-              <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">
-                Sample / Specimen
-              </th>
-              <th rowspan="2">Sample ID</th>
+              <th rowspan="2">Sample / Specimen</th>
+              <th rowspan="2">Laboratory ID</th>
               <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">MRN</th>
               <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">
                 Patient Names
@@ -1444,7 +1442,7 @@
                     {{ sample?.department?.departmentName }}
                   </td>
                   <td
-                    *ngIf="orderCount == 0 && !LISConfigurations?.isLIS"
+                    *ngIf="orderCount == 0"
                     [attr.rowspan]="sample?.orders?.length"
                   >
                     {{ sample?.specimen?.specimenName }}
@@ -1641,10 +1639,8 @@
             <tr>
               <th rowspan="2">SN</th>
               <th rowspan="2">Department</th>
-              <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">
-                Sample / Specimen
-              </th>
-              <th rowspan="2">Sample ID</th>
+              <th rowspan="2">Sample / Specimen</th>
+              <th rowspan="2">Laboratory ID</th>
               <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">MRN</th>
               <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">
                 Patient Names
@@ -1713,7 +1709,7 @@
                     {{ sample?.department?.departmentName }}
                   </td>
                   <td
-                    *ngIf="orderCount == 0 && !LISConfigurations?.isLIS"
+                    *ngIf="orderCount == 0"
                     [attr.rowspan]="sample?.orders?.length"
                   >
                     {{ sample?.specimen?.specimenName }}
@@ -1756,7 +1752,7 @@
                   >
                     {{
                       sample?.receivedOnStatus?.timestamp
-                        ? (sample?.receivedOnStatus?.timestamp | date: "medium")
+                        ? (sample?.receivedOnStatus?.remarks | date: "medium")
                         : ""
                     }}
                   </td>
@@ -1856,10 +1852,8 @@
             <tr>
               <th rowspan="2">SN</th>
               <th rowspan="2">Department</th>
-              <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">
-                Sample / Specimen
-              </th>
-              <th rowspan="2">Sample ID</th>
+              <th rowspan="2">Sample / Specimen</th>
+              <th rowspan="2">Laboratory ID</th>
               <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">MRN</th>
               <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">
                 Patient Names
@@ -1916,7 +1910,7 @@
                     {{ sample?.department?.departmentName }}
                   </td>
                   <td
-                    *ngIf="orderCount == 0 && !LISConfigurations?.isLIS"
+                    *ngIf="orderCount == 0"
                     [attr.rowspan]="sample?.orders?.length"
                   >
                     {{ sample?.specimen?.specimenName }}
@@ -1970,7 +1964,7 @@
                   >
                     {{
                       sample?.receivedOnStatus?.timestamp
-                        ? (sample?.receivedOnStatus?.timestamp | date: "medium")
+                        ? (sample?.receivedOnStatus?.remarks | date: "medium")
                         : ""
                     }}
                   </td>
@@ -2113,12 +2107,17 @@
           />
         </mat-form-field>
       </div>
-      <div class="p-1">
+
+      <mat-progress-bar
+        mode="indeterminate"
+        *ngIf="!sampleParams?.samplesLoadedState"
+      ></mat-progress-bar>
+      <div class="p-1" *ngIf="sampleParams?.samplesLoadedState">
         <table class="table table-bordered">
           <thead>
             <tr>
               <!-- <th style="width: 10px !important">SN</th> -->
-              <th>System Identification</th>
+              <th>Patient Identification Number</th>
               <th>Department</th>
               <th>LAB ID/No.</th>
               <th>Action</th>
@@ -2178,7 +2177,7 @@
                           )
                         "
                       >
-                        Print results
+                        Preview Report
                       </button>
 
                       <button
@@ -2309,10 +2308,8 @@
             <tr>
               <th rowspan="2">SN</th>
               <th rowspan="2">Department</th>
-              <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">
-                Sample / Specimen
-              </th>
-              <th rowspan="2">Sample ID</th>
+              <th rowspan="2">Sample / Specimen</th>
+              <th rowspan="2">Laboratory ID</th>
               <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">MRN</th>
               <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">
                 Patient Names
@@ -2381,7 +2378,7 @@
                     {{ sample?.department?.departmentName }}
                   </td>
                   <td
-                    *ngIf="orderCount == 0 && !LISConfigurations?.isLIS"
+                    *ngIf="orderCount == 0"
                     [attr.rowspan]="sample?.orders?.length"
                   >
                     {{ sample?.specimen?.specimenName }}
@@ -2424,7 +2421,7 @@
                   >
                     {{
                       sample?.receivedOnStatus?.timestamp
-                        ? (sample?.receivedOnStatus?.timestamp | date: "medium")
+                        ? (sample?.receivedOnStatus?.remarks | date: "medium")
                         : ""
                     }}
                   </td>

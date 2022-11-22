@@ -632,4 +632,26 @@ public class ICareDao extends BaseDAO<Item> {
 		return query.list();
 	}
 	
+	public String voidOrder(String uuid, String voidReason) {
+		DbSession session = getSession();
+		new Order();
+		String queryStr = "UPDATE Order o SET o.voided = 1,o.voidReason=:voidReason WHERE o.uuid =:uuid";
+		Query sqlQuery = session.createQuery(queryStr);
+		
+		if (uuid == null) {
+			return "";
+		} else {
+			sqlQuery.setParameter("uuid", uuid);
+		}
+		
+		if (voidReason != null) {
+			sqlQuery.setParameter("voidReason", voidReason);
+		} else {
+			sqlQuery.setParameter("voidReason", "");
+		}
+		sqlQuery.executeUpdate();
+		
+		return uuid;
+	}
+	
 }

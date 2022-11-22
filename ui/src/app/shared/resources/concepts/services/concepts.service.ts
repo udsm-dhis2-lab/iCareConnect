@@ -360,6 +360,21 @@ export class ConceptsService {
                   };
                 })
               : [],
+            answers: result?.answers
+              ? result?.answers?.map((answer) => {
+                  return {
+                    ...answer,
+                    display:
+                      answer?.display?.indexOf(":") > -1
+                        ? answer?.display?.split(":")[1]
+                        : answer?.display,
+                    name:
+                      answer?.display?.indexOf(":") > -1
+                        ? answer?.display?.split(":")[1]
+                        : answer?.display,
+                  };
+                })
+              : [],
           };
         });
       }),

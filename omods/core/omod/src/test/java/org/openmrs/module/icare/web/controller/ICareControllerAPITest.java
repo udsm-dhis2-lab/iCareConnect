@@ -699,4 +699,14 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		String userDetails = handle.getContentAsString();
 		System.out.println(userDetails);
 	}
+	
+	@Test
+	public void testVoidOrder() throws Exception {
+		String dto = this.readFile("dto/order-void-object-dto.json");
+		Map<String, Object> orderVoidDetails = (new ObjectMapper()).readValue(dto, Map.class);
+		MockHttpServletRequest voidOrderRequest = newPostRequest("icare/voidorder", orderVoidDetails);
+		
+		MockHttpServletResponse returnResponse = handle(voidOrderRequest);
+		System.out.println(returnResponse.getContentAsString());
+	}
 }
