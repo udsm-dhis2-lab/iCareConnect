@@ -3,15 +3,18 @@ package org.openmrs.module.icare.laboratory.services;
 import org.apache.commons.collections.IteratorUtils;
 import org.openmrs.*;
 //import org.openmrs.api.ObsService;
+import org.openmrs.api.AdministrationService;
 import org.openmrs.api.ObsService;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.impl.BaseOpenmrsService;
+import org.openmrs.module.icare.ICareConfig;
 import org.openmrs.module.icare.core.ListResult;
 import org.openmrs.module.icare.core.Pager;
 import org.openmrs.module.icare.core.Summary;
 import org.openmrs.module.icare.laboratory.dao.*;
 import org.openmrs.module.icare.laboratory.models.*;
 
+import javax.naming.ConfigurationException;
 import java.util.*;
 
 public class LaboratoryServiceImpl extends BaseOpenmrsService implements LaboratoryService {
@@ -347,7 +350,16 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 		
 		//		if (countTestAllocationApprovedStatuses(testAllocation.getUuid()) == 2) {
 		
-		if (testAllocationStatus.getRemarks().equals("SECOND_APPROVAL")) {
+		AdministrationService administrationService = Context.getAdministrationService();
+		String labResultApprovalConfig = administrationService
+		        .getGlobalProperty(ICareConfig.LAB_RESULT_APPROVAL_CONFIGURATION);
+		if (labResultApprovalConfig == null) {
+			throw new ConfigurationException("Lab result approval configuration is not set. Please set '"
+			        + ICareConfig.LAB_RESULT_APPROVAL_CONFIGURATION + "'");
+		}
+		
+		if ((testAllocationStatus.getRemarks().equals("SECOND_APPROVAL") && labResultApprovalConfig.equals("2"))
+		        || (testAllocationStatus.getRemarks().equals("APPROVED") && labResultApprovalConfig.equals("1"))) {
 			List<Result> resList = testAllocation.getTestAllocationResults();
 			
 			Collections.sort(resList, new Comparator<Result>() {
