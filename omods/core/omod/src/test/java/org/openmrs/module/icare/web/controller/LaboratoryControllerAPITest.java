@@ -294,6 +294,9 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 	@Test
 	public void testGettingSamplesBySamplesbyCategory() throws Exception {
 		
+		AdministrationService adminService = Context.getService(AdministrationService.class);
+		adminService.setGlobalProperty(ICareConfig.LAB_RESULT_APPROVAL_CONFIGURATION, "2");
+		
 		// creating sample status
 		String dto = this.readFile("dto/sample-status-create-dto.json");
 		Map<String, Object> sampleStatus = (new ObjectMapper()).readValue(dto, Map.class);
@@ -405,6 +408,9 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 	@Test
 	public void testAddingTestAllocationStatus() throws Exception {
 		
+		AdministrationService adminService = Context.getService(AdministrationService.class);
+		adminService.setGlobalProperty(ICareConfig.LAB_RESULT_APPROVAL_CONFIGURATION, "2");
+		
 		//Given
 		String dto = this.readFile("dto/test-allocation-status-create.json");
 		Map<String, Object> testAllocationStatus = (new ObjectMapper()).readValue(dto, Map.class);
@@ -448,6 +454,9 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 	@Test
 	public void testSavingObservationAfterApprovalIsComplete() throws Exception {
 		
+		AdministrationService adminService = Context.getService(AdministrationService.class);
+		adminService.setGlobalProperty(ICareConfig.LAB_RESULT_APPROVAL_CONFIGURATION, "2");
+		
 		//Given
 		String dto = this.readFile("dto/test-allocation-approve.json");
 		Map<String, Object> testAllocationStatus = (new ObjectMapper()).readValue(dto, Map.class);
@@ -472,6 +481,9 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 	
 	@Test
 	public void testGettingSummaryWorkload() throws Exception {
+		
+		AdministrationService adminService = Context.getService(AdministrationService.class);
+		adminService.setGlobalProperty(ICareConfig.LAB_RESULT_APPROVAL_CONFIGURATION, "2");
 		
 		//Given
 		String dto = this.readFile("dto/test-allocation-reject.json");
