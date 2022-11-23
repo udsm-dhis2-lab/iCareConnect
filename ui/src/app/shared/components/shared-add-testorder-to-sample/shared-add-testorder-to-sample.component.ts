@@ -81,7 +81,7 @@ export class SharedAddTestorderToSampleComponent implements OnInit {
       this.saving = true;
     }, 100);
     const encounter = {
-      visit: this.visit?.uuid,
+      visit: this.sample?.visit?.uuid,
       encounterDatetime: new Date().toISOString(),
       patient: this.existingOrdersDetails[0]?.patient?.uuid,
       encounterType: this.visit?.encounters[0]?.encounterType?.uuid,
@@ -105,6 +105,7 @@ export class SharedAddTestorderToSampleComponent implements OnInit {
         };
       }),
     };
+
     this.orderService
       .createOrdersViaCreatingEncounter(encounter)
       .subscribe((response) => {
@@ -125,105 +126,105 @@ export class SharedAddTestorderToSampleComponent implements OnInit {
               return this.sampleService.createSampleOrder(sampleOrder);
             })
           ).subscribe((saveOrderResponse: any) => {
-            console.log(saveOrderResponse);
             const orderWithAllocation = this.sample.orders.filter(
               (order) => order?.testAllocations?.length > 0
             )[0];
-            this.conceptsService
-              .getConceptDetailsByUuid(
-                saveOrderResponse[0]?.order?.concept?.uuid
-              )
-              .pipe(
-                tap((conceptResponse) => {
-                  let allocations = [];
 
-                  if (conceptResponse?.setMembers?.length === 0) {
-                    allocations = [
-                      ...allocations,
-                      {
-                        order: {
-                          uuid: saveOrderResponse[0]?.order?.uuid,
-                        },
-                        container: {
-                          uuid: orderWithAllocation?.testAllocations[0]
-                            ?.container?.uuid,
-                        },
+            if(!saveOrderResponse?.error){
+              zip(
+                ...saveOrderResponse?.map((responseOrder) => {
+                  return this.conceptsService.getConceptDetailsByUuid(
+                    responseOrder?.order?.concept?.uuid
+                  ).pipe(
+                    map((concept) => {
+                      let allocations = [];
+
+                      if (concept?.setMembers?.length === 0) {
+                        allocations = [
+                          ...allocations,
+                          {
+                            order: {
+                              uuid: responseOrder?.order?.uuid,
+                            },
+                            container: {
+                              uuid: orderWithAllocation?.testAllocations[0]
+                                ?.container?.uuid,
+                            },
+                            sample: {
+                              uuid: responseOrder?.sample?.uuid,
+                            },
+                            concept: {
+                              uuid: concept.uuid,
+                            },
+                            label: responseOrder?.order?.orderNumber,
+                          },
+                        ];
+                      } else {
+                        each(concept?.setMembers, (setMember) => {
+                          allocations = [
+                            ...allocations,
+                            {
+                              order: {
+                                uuid: responseOrder?.order?.uuid,
+                              },
+                              container: {
+                                uuid: orderWithAllocation?.testAllocations[0]
+                                  ?.container?.uuid,
+                              },
+                              sample: {
+                                uuid: responseOrder?.sample?.uuid,
+                              },
+                              concept: {
+                                uuid: setMember.uuid,
+                              },
+                              label: responseOrder?.order?.orderNumber,
+                            },
+                          ];
+                        });
+                      }
+
+                      const status = {
                         sample: {
-                          uuid: saveOrderResponse[0]?.sample?.uuid,
+                          uuid: orderWithAllocation?.sample?.uuid,
                         },
-                        concept: {
-                          uuid: conceptResponse.uuid,
+                        user: {
+                          uuid: this.currentUser?.uuid,
                         },
-                        label: saveOrderResponse[0]?.order?.orderNumber,
-                      },
-                    ];
-                  } else {
-                    each(conceptResponse?.setMembers, (setMember) => {
-                      allocations = [
-                        ...allocations,
-                        {
-                          order: {
-                            uuid: saveOrderResponse[0]?.order?.uuid,
-                          },
-                          container: {
-                            uuid: orderWithAllocation?.testAllocations[0]
-                              ?.container?.uuid,
-                          },
-                          sample: {
-                            uuid: saveOrderResponse[0]?.sample?.uuid,
-                          },
-                          concept: {
-                            uuid: setMember.uuid,
-                          },
-                          label: saveOrderResponse[0]?.order?.orderNumber,
-                        },
-                      ];
-                    });
-                  }
+                        remarks: "added test",
+                        status: "ADDED_TEST",
+                        category: "ADDED_TEST",
+                      };
 
-                  const status = {
-                    sample: {
-                      uuid: orderWithAllocation?.sample?.uuid,
-                    },
-                    user: {
-                      uuid: this.currentUser?.uuid,
-                    },
-                    remarks: "added test",
-                    status: "ADDED_TEST",
-                    category: "ADDED_TEST",
-                  };
+                      let sampleAcceptStatusWithAllocations = {
+                        status: status,
+                        allocations: allocations,
+                      };
 
-                  let sampleAcceptStatusWithAllocations = {
-                    status: status,
-                    allocations: allocations,
-                  };
-                  this.sampleService
-                    .acceptSampleAndCreateAllocations(
-                      sampleAcceptStatusWithAllocations
-                    )
-                    .pipe(
-                      map((response) => {
-                        // console.log(
-                        //   "==> Allocations response: ",
-                        //   response
-                        // );
-                      }),
-                      catchError((error) => {
-                        // console.log(
-                        //   "==> Failed to create allocations: ",
-                        //   error
-                        // );
-                        return error;
-                      })
-                    )
-                    .subscribe((response) => {
-                      this.store.dispatch(
-                        loadSampleByUuid({ uuid: this.sample?.uuid })
-                      );
-                    });
+                      return sampleAcceptStatusWithAllocations;
+                    })
+                  );
                 })
-              )
-              .subscribe();
+              ).subscribe(
+                  ((conceptResponse: any) => {
+                    if(!conceptResponse?.error){
+                      zip(
+                        ...conceptResponse.map(
+                          (sampleAcceptStatusWithAllocations) => {
+                            return this.sampleService.acceptSampleAndCreateAllocations(
+                              sampleAcceptStatusWithAllocations
+                            );
+                          }
+                        )
+                      ).subscribe(
+                          (response) => {
+                          this.store.dispatch(
+                            loadSampleByUuid({ uuid: this.sample?.uuid })
+                          );
+                        });
+                    }
+                  })
+                );
+            }
 
             this.saving = false;
           });
@@ -231,6 +232,7 @@ export class SharedAddTestorderToSampleComponent implements OnInit {
       });
     // 1. Save order
     // 2. Save sample order
-    // 3. Set test allocations
+    // 3. Get concept details
+    // 4. Set test allocations
   }
 }
