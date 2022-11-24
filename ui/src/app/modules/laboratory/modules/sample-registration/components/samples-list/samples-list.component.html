@@ -1,11 +1,12 @@
 <div *ngIf="{ samples: samples$ | async } as params">
-  <table class="table">
+  <table class="table mt-2">
     <thead>
       <tr>
         <th>SN</th>
         <th>Date Registered</th>
         <th>Label/Lab No.</th>
         <th>Lab</th>
+        <th>Registered By</th>
         <th></th>
       </tr>
     </thead>
@@ -17,10 +18,17 @@
           </td>
         </tr>
       </ng-container>
-      <ng-container *ngIf="params?.samples && params?.samples?.length > 0">
-        <tr *ngFor="let sample of params?.samples; let count = index">
+      <ng-container
+        *ngIf="params?.samples && params?.samples?.results?.length > 0"
+      >
+        <tr *ngFor="let sample of params?.samples?.results; let count = index">
           <td>
-            {{ count + 1 }}
+            {{
+              count +
+                1 +
+                (params?.samples?.pager?.page - 1) *
+                  params?.samples?.pager?.pageSize
+            }}
           </td>
           <td>
             {{ sample?.dateCreated | date: "medium" }}
@@ -30,6 +38,9 @@
           </td>
           <td>
             {{ sample?.location?.display }}
+          </td>
+          <td>
+            {{ sample?.creator?.name }}
           </td>
           <td>
             <button mat-icon-button [matMenuTriggerFor]="menu">
@@ -44,7 +55,9 @@
           </td>
         </tr>
       </ng-container>
-      <ng-container *ngIf="params?.samples && params?.samples?.length > 0">
+      <ng-container
+        *ngIf="params?.samples && params?.samples?.results?.length === 0"
+      >
         <tr>
           <td colspan="100%">
             <div class="alert alert-warning" role="alert">No samples</div>
@@ -53,4 +66,24 @@
       </ng-container>
     </tbody>
   </table>
+  <div class="d-flex justify-content-end">
+    <button
+      mat-stroked-button
+      [disabled]="
+        !params?.samples?.pager ||
+        (params?.samples?.pager && params?.samples?.pager?.page === 1)
+      "
+      (click)="onGetSamples($event, 'prev', params?.samples?.pager)"
+    >
+      Prev
+    </button>
+    <button
+      mat-stroked-button
+      class="ml-2"
+      [disabled]="!params?.samples?.pager"
+      (click)="onGetSamples($event, 'next', params?.samples?.pager)"
+    >
+      Next
+    </button>
+  </div>
 </div>
