@@ -8,6 +8,7 @@ import { RegisterSampleComponent } from "./register-sample/register-sample.compo
 import { RegisteredPatientDetailsComponent } from "./registered-patient-details/registered-patient-details.component";
 import { SampleLabelComponent } from "./sample-label/sample-label.component";
 import { SampleRegistrationFinalizationComponent } from "./sample-registration-finalization/sample-registration-finalization.component";
+import { SamplesListComponent } from "./samples-list/samples-list.component";
 import { SingleRegistrationComponent } from "./single-registration/single-registration.component";
 
 export const sampleRegistrationComponents: any[] = [
@@ -22,6 +23,7 @@ export const sampleRegistrationComponents: any[] = [
   MultipleTestsSelectionComponent,
   SampleRegistrationFinalizationComponent,
   ClientsFromExternalSystemsComponent,
+  SamplesListComponent,
 ];
 
 export const regModals: any[] = [SampleRegistrationFinalizationComponent];
