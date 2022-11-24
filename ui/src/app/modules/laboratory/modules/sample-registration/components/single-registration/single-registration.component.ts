@@ -145,7 +145,6 @@ export class SingleRegistrationComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log(this.currentUser);
     const userLocationsIds = JSON.parse(
       this.currentUser?.userProperties?.locations
     );

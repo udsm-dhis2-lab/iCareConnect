@@ -13,47 +13,68 @@
   } as params"
 >
   <div class="row">
-    <div class="col-lg-12 col-md-12 col-sm-12 col-sx-12">
-      <div class="single-sample-registration">
-        <mat-progress-bar
-          *ngIf="
-            !params?.mrnGeneratorSourceUuid ||
-            !params?.preferredPersonIdentifier ||
-            !params?.referringDoctorAttributes ||
-            !params?.referFromFacilityVisitAttribute ||
-            !params?.labNumberCharactersCount ||
-            !params?.testsFromExternalSystemsConfigs
-          "
-          mode="indeterminate"
-        ></mat-progress-bar>
-        <app-single-registration
-          *ngIf="
-            params?.mrnGeneratorSourceUuid &&
-            params?.preferredPersonIdentifier &&
-            params?.referringDoctorAttributes &&
-            params?.referFromFacilityVisitAttribute &&
-            params?.labNumberCharactersCount &&
-            params?.testsFromExternalSystemsConfigs
-          "
-          [mrnGeneratorSourceUuid]="params?.mrnGeneratorSourceUuid"
-          [preferredPersonIdentifier]="params?.preferredPersonIdentifier"
-          [provider]="provider"
-          [agencyConceptConfigs]="params?.agencyConceptConfigs"
-          [referFromFacilityVisitAttribute]="
-            params?.referFromFacilityVisitAttribute
-          "
-          [currentUser]="params?.currentUser"
-          [labNumberCharactersCount]="params?.labNumberCharactersCount"
-          [referringDoctorAttributes]="params?.referringDoctorAttributes"
-          [labSections]="labSections"
-          [testsFromExternalSystemsConfigs]="
-            params?.testsFromExternalSystemsConfigs
-          "
-        ></app-single-registration>
+    <div class="col-12">
+      <div class="w-100 d-flex justify-content-end">
+        <mat-button-toggle-group>
+          <mat-button-toggle
+            (click)="setTabGroup($event, 'NEW')"
+            [value]="'NEW'"
+            [ngClass]="{ 'selected-tab-group': selectedTabGroup === 'NEW' }"
+            >New Sample</mat-button-toggle
+          >
+          <mat-button-toggle
+            (click)="setTabGroup($event, 'LIST')"
+            [value]="'LIST'"
+            [ngClass]="{ 'selected-tab-group': selectedTabGroup === 'LIST' }"
+            >Registered Samples</mat-button-toggle
+          >
+        </mat-button-toggle-group>
       </div>
-      <!-- <div class="batch-sample-registration">
-        <app-batch-registration></app-batch-registration>
-      </div> -->
+      <div class="w-100" *ngIf="selectedTabGroup === 'NEW'">
+        <div class="single-sample-registration">
+          <mat-progress-bar
+            *ngIf="
+              !params?.mrnGeneratorSourceUuid ||
+              !params?.preferredPersonIdentifier ||
+              !params?.referringDoctorAttributes ||
+              !params?.referFromFacilityVisitAttribute ||
+              !params?.labNumberCharactersCount ||
+              !params?.testsFromExternalSystemsConfigs
+            "
+            mode="indeterminate"
+          ></mat-progress-bar>
+          <app-single-registration
+            *ngIf="
+              params?.mrnGeneratorSourceUuid &&
+              params?.preferredPersonIdentifier &&
+              params?.referringDoctorAttributes &&
+              params?.referFromFacilityVisitAttribute &&
+              params?.labNumberCharactersCount &&
+              params?.testsFromExternalSystemsConfigs
+            "
+            [mrnGeneratorSourceUuid]="params?.mrnGeneratorSourceUuid"
+            [preferredPersonIdentifier]="params?.preferredPersonIdentifier"
+            [provider]="provider"
+            [agencyConceptConfigs]="params?.agencyConceptConfigs"
+            [referFromFacilityVisitAttribute]="
+              params?.referFromFacilityVisitAttribute
+            "
+            [currentUser]="params?.currentUser"
+            [labNumberCharactersCount]="params?.labNumberCharactersCount"
+            [referringDoctorAttributes]="params?.referringDoctorAttributes"
+            [labSections]="labSections"
+            [testsFromExternalSystemsConfigs]="
+              params?.testsFromExternalSystemsConfigs
+            "
+          ></app-single-registration>
+        </div>
+        <!-- <div class="batch-sample-registration">
+          <app-batch-registration></app-batch-registration>
+        </div> -->
+      </div>
+      <div class="w-100" *ngIf="selectedTabGroup === 'LIST'">
+        <app-samples-list></app-samples-list>
+      </div>
     </div>
   </div>
 </div>
