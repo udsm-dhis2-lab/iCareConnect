@@ -44,8 +44,7 @@ public class LaboratoryServiceTest extends LaboratoryTestBase {
 	
 	@Test
 	public void testCreatingSampleAndAllocatingTest() throws Exception {
-
-
+		
 		AdministrationService adminService = Context.getService(AdministrationService.class);
 		adminService.setGlobalProperty(ICareConfig.LAB_RESULT_APPROVAL_CONFIGURATION, "2");
 		

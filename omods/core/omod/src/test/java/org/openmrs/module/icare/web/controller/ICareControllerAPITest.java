@@ -5,9 +5,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.openmrs.*;
-import org.openmrs.api.AdministrationService;
-import org.openmrs.api.EncounterService;
-import org.openmrs.api.PatientService;
+import org.openmrs.api.*;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.icare.ICareConfig;
 import org.openmrs.module.icare.billing.models.Invoice;
@@ -700,13 +698,18 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		System.out.println(userDetails);
 	}
 	
-	@Test
-	public void testVoidOrder() throws Exception {
-		String dto = this.readFile("dto/order-void-object-dto.json");
-		Map<String, Object> orderVoidDetails = (new ObjectMapper()).readValue(dto, Map.class);
-		MockHttpServletRequest voidOrderRequest = newPostRequest("icare/voidorder", orderVoidDetails);
-		
-		MockHttpServletResponse returnResponse = handle(voidOrderRequest);
-		System.out.println(returnResponse.getContentAsString());
-	}
+		@Test
+		public void testVoidOrder() throws Exception {
+			String dto = this.readFile("dto/order-void-object-dto.json");
+			Map<String, Object> orderVoidDetails = (new ObjectMapper()).readValue(dto, Map.class);
+			MockHttpServletRequest voidOrderRequest = newPostRequest("icare/voidorder", orderVoidDetails);
+
+			MockHttpServletResponse returnResponse = handle(voidOrderRequest);
+
+			OrderService orderService = Context.getService(OrderService.class);
+			Order voidedOrder = orderService.getOrderByUuid(orderVoidDetails.get("uuid").toString());
+
+			assertThat("The order is voided", voidedOrder.getVoided() == true);
+
+		}
 }
