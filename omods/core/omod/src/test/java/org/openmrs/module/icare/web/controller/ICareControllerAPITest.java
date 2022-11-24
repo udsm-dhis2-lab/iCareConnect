@@ -712,4 +712,19 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 			assertThat("The order is voided", voidedOrder.getVoided() == true);
 
 		}
+
+	@Test
+	public void testVoidEncounter() throws Exception {
+		String dto = this.readFile("dto/encounter-void-object-dto.json");
+		Map<String, Object> encounterVoidDetails = (new ObjectMapper()).readValue(dto, Map.class);
+		MockHttpServletRequest voidEncounterRequest = newPostRequest("icare/voidencounter", encounterVoidDetails);
+
+		MockHttpServletResponse returnResponse = handle(voidEncounterRequest);
+
+		EncounterService encounterService = Context.getService(EncounterService.class);
+		Encounter voidedEncounter = encounterService.getEncounterByUuid(encounterVoidDetails.get("uuid").toString());
+
+		assertThat("The encounter is voided", voidedEncounter.getVoided() == true);
+
+	}
 }
