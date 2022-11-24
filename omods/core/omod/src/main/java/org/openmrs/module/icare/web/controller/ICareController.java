@@ -60,7 +60,7 @@ public class ICareController {
 	
 	@Autowired
 	OrderService orderService;
-
+	
 	@Autowired
 	EncounterService encounterService;
 	
@@ -675,7 +675,7 @@ public class ICareController {
 		returnResponse.put("uuid", voidedorder.getUuid());
 		return returnResponse;
 	}
-
+	
 	@RequestMapping(value = "voidencounter", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> voidEncounter(@RequestBody Map<String, Object> voidObj) {
