@@ -58,6 +58,12 @@ public class ICareController {
 	@Autowired
 	BillingService billingService;
 	
+	@Autowired
+	OrderService orderService;
+
+	@Autowired
+	EncounterService encounterService;
+	
 	/** Logger for this class and subclasses */
 	protected final Log log = LogFactory.getLog(getClass());
 	
@@ -650,16 +656,37 @@ public class ICareController {
 	
 	@RequestMapping(value = "voidorder", method = RequestMethod.POST)
 	@ResponseBody
-	public Map<String, Object> voidOrder(@RequestBody Map<String, Object> voidObj) throws IOException {
+	public Map<String, Object> voidOrder(@RequestBody Map<String, Object> voidObj) {
 		Map<String, Object> returnResponse = new HashMap<>();
-		String response;
-		try {
-			response = iCareService.voidOrder((String) voidObj.get("uuid"), (String) voidObj.get("voidReason"));
+//		String response;
+//		try {
+//			response = iCareService.voidOrder((String) voidObj.get("uuid"), (String) voidObj.get("voidReason"));
+//		}
+//		catch (IOException e) {
+//			throw new RuntimeException(e);
+//		}
+
+		Order order = orderService.getOrderByUuid((String) voidObj.get("uuid"));
+		if (order == null){
+			throw new APIException("The order uuid does not exist");
 		}
-		catch (IOException e) {
-			throw new RuntimeException(e);
+		Order voidedorder =orderService.voidOrder(order,(String) voidObj.get("voidReason"));
+
+		returnResponse.put("uuid", voidedorder.getUuid());
+		return returnResponse;
+	}
+
+	@RequestMapping(value = "voidencounter", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> voidEncounter(@RequestBody Map<String, Object> voidObj) {
+		Map<String, Object> returnResponse = new HashMap<>();
+		Encounter encounter = encounterService.getEncounterByUuid((String) voidObj.get("uuid"));
+		if (encounter == null){
+			throw new APIException("This encounter uuid does not exist");
 		}
-		returnResponse.put("uuid", response);
+		Encounter voidedEncounter =encounterService.voidEncounter(encounter,(String) voidObj.get("voidReason"));
+
+		returnResponse.put("encounter", voidedEncounter.getUuid());
 		return returnResponse;
 	}
 }
