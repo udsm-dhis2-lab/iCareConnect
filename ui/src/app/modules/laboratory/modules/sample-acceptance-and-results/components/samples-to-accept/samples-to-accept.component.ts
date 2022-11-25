@@ -1,6 +1,6 @@
 import { Component, OnInit, Input } from "@angular/core";
 import * as _ from "lodash";
-import { FormControl } from "@angular/forms";
+import { UntypedFormControl } from "@angular/forms";
 import { RejectionReasonComponent } from "../rejection-reason/rejection-reason.component";
 import { MatDialog } from "@angular/material/dialog";
 import { Store } from "@ngrx/store";
@@ -69,7 +69,7 @@ export class SamplesToAcceptComponent implements OnInit {
   savingChanges: boolean = false;
   savingMessage: any = {};
 
-  selected = new FormControl(0);
+  selected = new UntypedFormControl(0);
   itemsToFeedResults: any = {};
   samplesWithCompletedTestResults: any[];
   samplesToTrack: any[];

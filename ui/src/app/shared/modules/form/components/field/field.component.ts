@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
-import { FormGroup } from "@angular/forms";
+import { UntypedFormGroup } from "@angular/forms";
 import { MomentDateAdapter } from "@angular/material-moment-adapter";
 import {
   DateAdapter,
@@ -29,7 +29,7 @@ export class FieldComponent {
   @Input() field: Field<string>;
   @Input() isReport: boolean;
   @Input() value: any;
-  @Input() form: FormGroup;
+  @Input() form: UntypedFormGroup;
   @Input() isCheckBoxButton: boolean;
   @Input() fieldClass: string;
   @Input() shouldDisable: boolean;
@@ -37,8 +37,8 @@ export class FieldComponent {
 
   constructor(private formService: FormService) {}
 
-  @Output() fieldUpdate: EventEmitter<FormGroup> =
-    new EventEmitter<FormGroup>();
+  @Output() fieldUpdate: EventEmitter<UntypedFormGroup> =
+    new EventEmitter<UntypedFormGroup>();
 
   @Output() fileFieldUpdate: EventEmitter<any> = new EventEmitter<any>();
 

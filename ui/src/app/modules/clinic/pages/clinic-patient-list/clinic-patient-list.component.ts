@@ -1,5 +1,5 @@
 import { Component, OnInit } from "@angular/core";
-import { FormControl } from "@angular/forms";
+import { UntypedFormControl } from "@angular/forms";
 import { select, Store } from "@ngrx/store";
 import { Observable } from "rxjs";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
@@ -18,7 +18,7 @@ import {
 })
 export class ClinicPatientListComponent implements OnInit {
   currentLocation$: Observable<any>;
-  selectedTab = new FormControl(0);
+  selectedTab = new UntypedFormControl(0);
   settingCurrentLocationStatus$: Observable<boolean>;
   consultationOrderType$: Observable<any>;
   consultationEncounterType$: Observable<any>;
