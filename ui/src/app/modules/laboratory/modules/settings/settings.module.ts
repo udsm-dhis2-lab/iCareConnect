@@ -21,26 +21,25 @@ import { ExtendedParametersSettingsComponent } from "./containers/extended-param
 import { settingsContainers } from "./containers";
 
 @NgModule({
-  declarations: [
-    SettingsComponent,
-    HomeComponent,
-    TestSettingsComponent,
-    ...components,
-    ...settingsContainers,
-    TestSelectorComponent,
-    TestTimeComponent,
-    TestMaleRangeComponent,
-    TestFemaleRangeComponent,
-    TimeSettingsListComponent,
-    TestMaleRangeListComponent,
-    TestFemaleRangeListComponent,
-    TestMethodsDashboardComponent,
-    SpecimenSourcesDashboardComponent,
-    ParametersDashboardComponent,
-    ProfilesAndAccessControlComponent,
-    ExtendedParametersSettingsComponent,
-  ],
-  imports: [CommonModule, SettingsRoutingModule, SharedModule],
-  entryComponents: [...entrySettingComponents],
+    declarations: [
+        SettingsComponent,
+        HomeComponent,
+        TestSettingsComponent,
+        ...components,
+        ...settingsContainers,
+        TestSelectorComponent,
+        TestTimeComponent,
+        TestMaleRangeComponent,
+        TestFemaleRangeComponent,
+        TimeSettingsListComponent,
+        TestMaleRangeListComponent,
+        TestFemaleRangeListComponent,
+        TestMethodsDashboardComponent,
+        SpecimenSourcesDashboardComponent,
+        ParametersDashboardComponent,
+        ProfilesAndAccessControlComponent,
+        ExtendedParametersSettingsComponent,
+    ],
+    imports: [CommonModule, SettingsRoutingModule, SharedModule]
 })
 export class SettingsModule {}

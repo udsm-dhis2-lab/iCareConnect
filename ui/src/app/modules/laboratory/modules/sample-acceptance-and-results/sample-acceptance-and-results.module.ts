@@ -10,18 +10,17 @@ import { SearchTestsPipe } from "../lab-reports/pipes/filter-tests.pipe";
 import { entryComponents } from "../../components";
 
 @NgModule({
-  declarations: [
-    HomeComponent,
-    ...components,
-    ...sampleAcceptanceContainers,
-    FilterSamplesPipe,
-    SearchTestsPipe,
-  ],
-  imports: [
-    CommonModule,
-    SampleAcceptanceAndResultsRoutingModule,
-    SharedModule,
-  ],
-  entryComponents: [...sampleAcceptanceAndResultsModals, ...entryComponents],
+    declarations: [
+        HomeComponent,
+        ...components,
+        ...sampleAcceptanceContainers,
+        FilterSamplesPipe,
+        SearchTestsPipe,
+    ],
+    imports: [
+        CommonModule,
+        SampleAcceptanceAndResultsRoutingModule,
+        SharedModule,
+    ]
 })
 export class SampleAcceptanceAndResultsModule {}
