@@ -40,11 +40,19 @@
   <!-- {{ params?.currentSample | json }} -->
   <mat-progress-bar
     mode="indeterminate"
-    *ngIf="loadingTestTimeSettings || params?.labSampleLoadingState"
+    *ngIf="
+      loadingTestTimeSettings ||
+      params?.labSampleLoadingState ||
+      !params?.currentSample
+    "
   ></mat-progress-bar>
   <div
     style="padding: 10px"
-    *ngIf="!loadingTestTimeSettings && !params?.labSampleLoadingState"
+    *ngIf="
+      !loadingTestTimeSettings &&
+      !params?.labSampleLoadingState &&
+      params?.currentSample
+    "
   >
     <div class="w-50" *ngIf="LISConfigurations?.isLIS">
       <mat-form-field class="w-50">
