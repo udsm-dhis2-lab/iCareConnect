@@ -1,7 +1,6 @@
-import { ClassGetter } from "@angular/compiler/src/output/output_ast";
 import { Injectable } from "@angular/core";
 import { DomSanitizer } from "@angular/platform-browser";
-import { isArray, omit, orderBy, flatten, groupBy, keyBy } from "lodash";
+import { flatten, groupBy, isArray, keyBy, omit, orderBy } from "lodash";
 import { from, Observable, of, zip } from "rxjs";
 import { catchError, map } from "rxjs/operators";
 import { BillingService } from "src/app/modules/billing/services/billing.service";
@@ -9,11 +8,10 @@ import { PaymentService } from "src/app/modules/billing/services/payment.service
 import { OpenmrsHttpClientService } from "src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service";
 import { ICARE_CONFIG } from "../../config";
 import { Api } from "../../openmrs";
-import { DrugOrder } from "../../order/models";
 import { DrugOrdersService } from "../../order/services";
 import {
   getDrugOrdersFromCurrentVisitEncounters,
-  getOrdersFromCurrentVisitEncounters,
+  getOrdersFromCurrentVisitEncounters
 } from "../helpers";
 import { Visit } from "../models/visit.model";
 
