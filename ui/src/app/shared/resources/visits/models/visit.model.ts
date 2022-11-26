@@ -13,7 +13,7 @@ import { DrugOrder } from "src/app/shared/resources/order/models/drug-order.mode
 import * as moment from "moment";
 import { ICARE_CONFIG } from "../../config";
 import { Observable, of } from "rxjs";
-import { MatTableDataSource } from "@angular/material/table";
+import { MatLegacyTableDataSource as MatTableDataSource } from "@angular/material/legacy-table";
 import { Bill } from "src/app/modules/billing/models/bill.model";
 import { Payment } from "src/app/modules/billing/models/payment.model";
 import { OtherOrder } from "./other-orders.model";

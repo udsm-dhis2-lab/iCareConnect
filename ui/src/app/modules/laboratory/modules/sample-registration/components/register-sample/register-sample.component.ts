@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from "@angular/core";
-import { MatRadioChange } from "@angular/material/radio";
+import { MatLegacyRadioChange as MatRadioChange } from "@angular/material/legacy-radio";
 import { Store } from "@ngrx/store";
 import { Observable } from "rxjs";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";

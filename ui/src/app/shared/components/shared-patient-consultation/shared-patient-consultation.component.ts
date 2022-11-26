@@ -47,7 +47,7 @@ import { BillableItemsService } from "src/app/shared/resources/billable-items/se
 import { getApplicableForms } from "../../helpers/identify-applicable-forms.helper";
 import { VisitsService } from "../../resources/visits/services";
 import { PatientVisitHistoryModalComponent } from "../patient-visit-history-modal/patient-visit-history-modal.component";
-import { MatDialog } from "@angular/material/dialog";
+import { MatLegacyDialog as MatDialog } from "@angular/material/legacy-dialog";
 import { clearBills } from "src/app/store/actions/bill.actions";
 import { AddDiagnosisModalComponent } from "../add-diagnosis-modal/add-diagnosis-modal.component";
 

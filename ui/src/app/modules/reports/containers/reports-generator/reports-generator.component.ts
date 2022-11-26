@@ -25,7 +25,7 @@ import {
 import { SendToDhis2ModalComponent } from "../../components/send-to-dhis2-modal/send-to-dhis2-modal.component";
 import { SendingStatusModalComponent } from "../../components/sending-status-modal/sending-status-modal.component";
 import { take } from "rxjs/operators";
-import { MatDialog } from "@angular/material/dialog";
+import { MatLegacyDialog as MatDialog } from "@angular/material/legacy-dialog";
 import { ExportDataService } from "src/app/core/services/export-data.service";
 import { Dhis2ReportsSentSummaryComponent } from "../../components/dhis2-reports-sent-summary/dhis2-reports-sent-summary.component";
 

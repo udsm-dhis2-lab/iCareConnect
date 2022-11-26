@@ -1,6 +1,6 @@
 import { Component, Inject, OnInit } from "@angular/core";
-import { MatCheckboxChange } from "@angular/material/checkbox";
-import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
+import { MatLegacyCheckboxChange as MatCheckboxChange } from "@angular/material/legacy-checkbox";
+import { MatLegacyDialogRef as MatDialogRef, MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA } from "@angular/material/legacy-dialog";
 import { orderBy, uniqBy } from "lodash";
 import { Observable } from "rxjs";
 import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";

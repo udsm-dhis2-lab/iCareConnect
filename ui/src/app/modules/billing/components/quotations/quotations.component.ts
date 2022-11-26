@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
-import { MatDialog } from "@angular/material/dialog";
+import { MatLegacyDialog as MatDialog } from "@angular/material/legacy-dialog";
 import { BillItemObject } from "../../models/bill-item-object.model";
 import { BillItem } from "../../models/bill-item.model";
 import { BillObject } from "../../models/bill-object.model";
@@ -7,7 +7,7 @@ import { BillConfirmationComponent } from "../bill-confirmation/bill-confirmatio
 import { keys } from "lodash";
 import { PaymentInput } from "../../models/payment-input.model";
 import { PaymentTypeInterface } from "src/app/shared/models/payment-type.model";
-import { MatTableDataSource } from "@angular/material/table";
+import { MatLegacyTableDataSource as MatTableDataSource } from "@angular/material/legacy-table";
 import {
   trigger,
   state,

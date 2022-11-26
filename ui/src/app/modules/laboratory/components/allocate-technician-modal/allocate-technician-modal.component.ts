@@ -7,7 +7,7 @@ import {
   getLabSampleById,
   getAllLabSamples,
 } from '../../store/selectors/samples.selectors';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA, MatLegacyDialogRef as MatDialogRef } from '@angular/material/legacy-dialog';
 import { allocateTechnicianToLabTest, loadUsers } from '../../store/actions';
 import { UserGet } from 'src/app/shared/resources/openmrs';
 import { getAllUsers } from '../../store/selectors/users.selectors';

@@ -1,7 +1,7 @@
 import { HttpClient } from "@angular/common/http";
 import { Component, Input, OnInit } from "@angular/core";
 import { MatButtonToggleChange } from "@angular/material/button-toggle";
-import { MatDialog } from "@angular/material/dialog";
+import { MatLegacyDialog as MatDialog } from "@angular/material/legacy-dialog";
 import { Store } from "@ngrx/store";
 import * as _ from "lodash";
 import * as Highcharts from "highcharts";

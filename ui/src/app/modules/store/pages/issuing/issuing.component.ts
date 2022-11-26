@@ -1,7 +1,7 @@
 import { Component, OnInit } from "@angular/core";
-import { MatCheckboxChange } from "@angular/material/checkbox";
-import { MatDialog } from "@angular/material/dialog";
-import { MatSelectChange } from "@angular/material/select";
+import { MatLegacyCheckboxChange as MatCheckboxChange } from "@angular/material/legacy-checkbox";
+import { MatLegacyDialog as MatDialog } from "@angular/material/legacy-dialog";
+import { MatLegacySelectChange as MatSelectChange } from "@angular/material/legacy-select";
 import { select, Store } from "@ngrx/store";
 import { uniqBy, groupBy, orderBy, flatten, omit } from "lodash";
 import { Observable, of, zip } from "rxjs";

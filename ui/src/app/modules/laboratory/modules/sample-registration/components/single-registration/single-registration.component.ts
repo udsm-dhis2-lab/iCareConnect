@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from "@angular/core";
-import { MatDialog } from "@angular/material/dialog";
-import { MatRadioChange } from "@angular/material/radio";
+import { MatLegacyDialog as MatDialog } from "@angular/material/legacy-dialog";
+import { MatLegacyRadioChange as MatRadioChange } from "@angular/material/legacy-radio";
 import * as moment from "moment";
 import { Observable, of, zip } from "rxjs";
 import {

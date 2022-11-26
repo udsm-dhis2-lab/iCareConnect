@@ -5,8 +5,8 @@ import {
   UntypedFormGroup,
   Validators,
 } from "@angular/forms";
-import { MatSnackBar } from "@angular/material/snack-bar";
-import { MatTable, MatTableDataSource } from "@angular/material/table";
+import { MatLegacySnackBar as MatSnackBar } from "@angular/material/legacy-snack-bar";
+import { MatLegacyTable as MatTable, MatLegacyTableDataSource as MatTableDataSource } from "@angular/material/legacy-table";
 import { Router } from "@angular/router";
 import * as moment from "moment";
 import { LocationService } from "src/app/core/services";

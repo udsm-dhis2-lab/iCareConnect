@@ -7,7 +7,7 @@ import {
   getAllLabSamples,
   getLabSamplesGroupedBymrNo,
 } from '../../store/selectors/samples.selectors';
-import { MatDialog } from '@angular/material/dialog';
+import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { TrackedSampleModalComponent } from '../../components/tracked-sample-modal/tracked-sample-modal.component';
 import { loadAllLabSamples } from '../../store/actions';
 

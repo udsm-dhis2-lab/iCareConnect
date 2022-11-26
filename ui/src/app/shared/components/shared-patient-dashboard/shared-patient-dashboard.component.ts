@@ -59,7 +59,7 @@ const CONSULTATION_FORM_CONFIGS: FormConfig[] = [
 ];
 import { clearBills } from "src/app/store/actions/bill.actions";
 import { PatientVisitHistoryModalComponent } from "../patient-visit-history-modal/patient-visit-history-modal.component";
-import { MatDialog } from "@angular/material/dialog";
+import { MatLegacyDialog as MatDialog } from "@angular/material/legacy-dialog";
 import { TransferWithinComponent } from "../transfer-within/transfer-within.component";
 import { AdmissionFormComponent } from "../admission-form/admission-form.component";
 import { CaptureFormDataModalComponent } from "../capture-form-data-modal/capture-form-data-modal.component";

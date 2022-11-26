@@ -1,5 +1,5 @@
 import { Component, OnInit } from "@angular/core";
-import { MatDialog } from "@angular/material/dialog";
+import { MatLegacyDialog as MatDialog } from "@angular/material/legacy-dialog";
 import { Observable } from "rxjs";
 import { ReOrderLevelService } from "src/app/shared/resources/store/services/re-order-level.service";
 import { ManageReOrderLevelModalComponent } from "../../modals/manage-re-order-level-modal/manage-re-order-level-modal.component";

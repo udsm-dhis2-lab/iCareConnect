@@ -18,7 +18,7 @@ import {
 } from 'src/app/store/selectors';
 import { FormValue } from 'src/app/shared/modules/form/models/form-value.model';
 import { VisitObject } from 'src/app/shared/resources/visits/models/visit-object.model';
-import { MatDialog } from '@angular/material/dialog';
+import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { AddDiagnosisModalComponent } from '../add-diagnosis-modal/add-diagnosis-modal.component';
 
 @Component({

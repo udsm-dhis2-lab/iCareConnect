@@ -5,7 +5,7 @@ import { PatientdiagnosesCreate } from '../../resources/openmrs';
 
 import { map, filter, keyBy } from 'lodash';
 import { Patient } from '../../resources/patient/models/patient.model';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatLegacyDialogRef as MatDialogRef, MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA } from '@angular/material/legacy-dialog';
 import { Store } from '@ngrx/store';
 import { AppState } from 'src/app/store/reducers';
 import {

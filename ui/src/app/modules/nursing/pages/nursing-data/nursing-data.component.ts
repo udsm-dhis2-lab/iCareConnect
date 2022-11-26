@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from "@angular/core";
 import { UntypedFormControl } from "@angular/forms";
-import { MatDialog } from "@angular/material/dialog";
+import { MatLegacyDialog as MatDialog } from "@angular/material/legacy-dialog";
 import { select, Store } from "@ngrx/store";
 import { map } from "lodash";
 import { Observable } from "rxjs";

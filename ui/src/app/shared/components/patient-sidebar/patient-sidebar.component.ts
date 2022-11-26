@@ -1,5 +1,5 @@
 import { Component, Input, OnInit, Output } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
+import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { select, Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { AdmissionFormComponent } from 'src/app/shared/components/admission-form/admission-form.component';

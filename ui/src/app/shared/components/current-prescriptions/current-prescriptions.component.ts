@@ -7,7 +7,7 @@ import { SystemSettingsService } from "src/app/core/services/system-settings.ser
 import { map, tap } from "rxjs/operators";
 import { Observable } from "rxjs";
 import { SharedConfirmationComponent } from "../shared-confirmation /shared-confirmation.component";
-import { MatDialog } from "@angular/material/dialog";
+import { MatLegacyDialog as MatDialog } from "@angular/material/legacy-dialog";
 
 @Component({
   selector: "app-current-prescriptions",

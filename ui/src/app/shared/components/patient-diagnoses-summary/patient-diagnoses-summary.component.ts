@@ -13,7 +13,7 @@ import { DiagnosisObject } from "../../resources/diagnosis/models/diagnosis-obje
 import { Visit } from "../../resources/visits/models/visit.model";
 import { map, filter, keyBy } from "lodash";
 import { saveDiagnosis } from "src/app/store/actions/diagnosis.actions";
-import { MatDialog } from "@angular/material/dialog";
+import { MatLegacyDialog as MatDialog } from "@angular/material/legacy-dialog";
 import { AddDiagnosisModalComponent } from "../add-diagnosis-modal/add-diagnosis-modal.component";
 import { DeleteDiagnosisModalComponent } from "../delete-diagnosis-modal/delete-diagnosis-modal.component";
 

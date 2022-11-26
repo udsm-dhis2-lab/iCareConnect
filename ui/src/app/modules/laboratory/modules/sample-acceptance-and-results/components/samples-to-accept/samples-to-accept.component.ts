@@ -2,7 +2,7 @@ import { Component, OnInit, Input } from "@angular/core";
 import * as _ from "lodash";
 import { UntypedFormControl } from "@angular/forms";
 import { RejectionReasonComponent } from "../rejection-reason/rejection-reason.component";
-import { MatDialog } from "@angular/material/dialog";
+import { MatLegacyDialog as MatDialog } from "@angular/material/legacy-dialog";
 import { Store } from "@ngrx/store";
 import { Observable } from "rxjs";
 import { ResultsFeedingModalComponent } from "../results-feeding-modal/results-feeding-modal.component";
