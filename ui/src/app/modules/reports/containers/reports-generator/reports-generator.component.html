@@ -11,7 +11,7 @@
       class="side-menu-panel"
       [ngStyle]="{ display: showFullReportRenderingArea ? 'none' : 'block' }"
       [ngClass]="{
-        'col-md-3 col-sm-12 col-sx-12': !showFullReportRenderingArea
+        'col-lg-2 col-md-2 col-sm-12 col-sx-12': !showFullReportRenderingArea
       }"
     >
       <mat-accordion class="p-0">
@@ -104,7 +104,8 @@
     <ng-container>
       <div
         [ngClass]="{
-          'col-md-9 col-sm-12 col-sx-12': !showFullReportRenderingArea,
+          'col-lg-10 col-md-10 col-sm-12 col-sx-12':
+            !showFullReportRenderingArea,
           'col-md-12 col-sm-12 col-sx-12': showFullReportRenderingArea
         }"
         class="d-print-none"
