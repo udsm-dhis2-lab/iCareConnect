@@ -8,7 +8,8 @@
     savingLabResultsStatusState: savingLabResultsStatusState$ | async,
     labSampleLoadingState: labSampleLoadingState$ | async,
     visitDetails: visitDetails$ | async,
-    currentUser: currentUser$ | async
+    currentUser: currentUser$ | async,
+    multipleResultsAttributeType: multipleResultsAttributeType$ | async
   } as params"
 >
   <mat-toolbar class="modal-header"
@@ -884,6 +885,9 @@
                                   ]?.results?.length - 1
                                 ]?.value
                               "
+                              [multipleResultsAttributeType]="
+                                params?.multipleResultsAttributeType
+                              "
                               (formData)="onGetFormData($event, parameter)"
                             ></app-result-entry-form>
 
@@ -1687,6 +1691,9 @@
                                   ]?.uuid === amendUuid
                                     ? false
                                     : true
+                                "
+                                [multipleResultsAttributeType]="
+                                  params?.multipleResultsAttributeType
                                 "
                                 (formData)="onGetFormData($event, parameter)"
                               ></app-result-entry-form>
