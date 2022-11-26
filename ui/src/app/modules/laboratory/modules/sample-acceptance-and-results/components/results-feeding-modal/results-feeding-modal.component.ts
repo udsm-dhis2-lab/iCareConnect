@@ -38,6 +38,7 @@ import { OpenmrsHttpClientService } from "src/app/shared/modules/openmrs-http-cl
 import { Textbox } from "src/app/shared/modules/form/models/text-box.model";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
 import { TextArea } from "src/app/shared/modules/form/models/text-area.model";
+import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 
 @Component({
   selector: "app-results-feeding-modal",
@@ -93,6 +94,8 @@ export class ResultsFeedingModalComponent implements OnInit {
   labSampleLoadingState$: Observable<boolean>;
   visitDetails$: Observable<any>;
   currentUser$: Observable<any>;
+
+  multipleResultsAttributeType$: Observable<any>;
   constructor(
     private dialog: MatDialog,
     private dialogRef: MatDialogRef<ResultsFeedingModalComponent>,
@@ -101,7 +104,8 @@ export class ResultsFeedingModalComponent implements OnInit {
     private dataService: DataService,
     private sampleService: SamplesService,
     private httpClient: HttpClient,
-    private visitService: VisitsService
+    private visitService: VisitsService,
+    private systemSettingsService: SystemSettingsService
   ) {
     this.dialogData = data;
     this.sample = data?.sample;
@@ -118,6 +122,10 @@ export class ResultsFeedingModalComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.multipleResultsAttributeType$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        `iCare.laboratory.settings.testParameters.attributes.multipleResultsAttributeTypeUuid`
+      );
     this.labSampleLoadingState$ = this.store.select(getLabSampleLoadingState);
     this.testOrders$ = this.store.select(
       getFormattedLabSampleOrdersBySampleIdentifier,

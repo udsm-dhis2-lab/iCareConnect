@@ -14,11 +14,14 @@ export class ResultEntryFormComponent implements OnInit {
   @Input() hasMultipleAnswers: boolean;
   @Input() value: any;
   @Input() disabled: boolean;
+  @Input() multipleResultsAttributeType: string;
   formField: Field<string>;
   @Output() formData: EventEmitter<any> = new EventEmitter<any>();
   constructor() {}
 
   ngOnInit(): void {
+    console.log(this.parameter);
+    console.log(this.multipleResultsAttributeType);
     this.formField =
       this.parameter?.datatype?.display === "Numeric"
         ? new Textbox({
