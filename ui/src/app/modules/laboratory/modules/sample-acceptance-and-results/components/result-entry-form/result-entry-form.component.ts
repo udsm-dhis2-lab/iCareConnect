@@ -20,8 +20,14 @@ export class ResultEntryFormComponent implements OnInit {
   constructor() {}
 
   ngOnInit(): void {
-    console.log(this.parameter);
-    console.log(this.multipleResultsAttributeType);
+    this.hasMultipleAnswers =
+      (
+        this.parameter?.attributes?.filter(
+          (attribute) =>
+            attribute?.attributeType?.uuid == this.multipleResultsAttributeType
+        ) || []
+      )?.length > 0;
+    console.log("hasMultiple answers", this.hasMultipleAnswers);
     this.formField =
       this.parameter?.datatype?.display === "Numeric"
         ? new Textbox({

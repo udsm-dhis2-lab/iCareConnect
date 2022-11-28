@@ -66,7 +66,11 @@
         />
       </mat-form-field>
     </div>
-    <mat-tab-group>
+    <app-shared-error
+      *ngIf="errors?.length > 0"
+      [errors]="errors"
+    ></app-shared-error>
+    <mat-tab-group *ngIf="errors?.length == 0">
       <mat-tab label="Results" *ngIf="dialogData?.actionType === 'Entry'">
         <div
           style="margin-top: 15px; overflow: auto"
@@ -873,7 +877,10 @@
                     <td>
                       <mat-tab-group>
                         <mat-tab label="Current">
-                          <div class="p-3">
+                          <div
+                            class="p-3"
+                            *ngIf="params?.multipleResultsAttributeType"
+                          >
                             <app-result-entry-form
                               [parameter]="parameter"
                               [value]="
@@ -933,6 +940,10 @@
                               ></textarea>
                             </mat-form-field>
                           </div>
+                          <mat-progress-bar
+                            mode="indeterminate"
+                            *ngIf="!params?.multipleResultsAttributeType"
+                          ></mat-progress-bar>
                         </mat-tab>
                         <mat-tab label="Audit Trail">
                           <div class="p-3">
@@ -1664,7 +1675,10 @@
                       <td>
                         <mat-tab-group>
                           <mat-tab label="Current.">
-                            <div class="p-3">
+                            <div
+                              class="p-3"
+                              *ngIf="params?.multipleResultsAttributeType"
+                            >
                               <app-result-entry-form
                                 *ngIf="
                                   (amendUuid &&
@@ -1945,6 +1959,10 @@
                                 Save
                               </button>
                             </div>
+                            <mat-progress-bar
+                              mode="indeterminate"
+                              *ngIf="!params?.multipleResultsAttributeType"
+                            ></mat-progress-bar>
                           </mat-tab>
                           <mat-tab label="Audit Trail">
                             <div class="p-3">
