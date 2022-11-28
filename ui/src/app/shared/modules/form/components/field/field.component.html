@@ -70,48 +70,94 @@
 
     <!-- dropdown -->
 
-    <input
-      type="text"
-      *ngSwitchCase="'dropdown'"
-      placeholder="Search {{ field?.label }}"
-      aria-label="{{ field?.label }}"
-      [required]="field?.required"
-      [formControlName]="field?.key"
-      matInput
-      [value]="field?.value"
-      autocomplete="off"
-      (keyup)="searchItemFromOptions($event, field)"
-      [matAutocomplete]="auto"
-    />
-    <span
-      style="position: relative; float: right; margin-top: -30px"
-      *ngIf="field?.options?.length > 0"
-    >
-      <mat-icon>arrow_drop_down</mat-icon>
-    </span>
-    <mat-autocomplete
-      #auto="matAutocomplete"
-      [displayWith]="displayLabelFunc.bind(this)"
-    >
-      <ng-container *ngFor="let option of members$ | async">
-        <mat-option
-          [disabled]="option?.disabled"
-          (click)="getSelectedItemFromOption($event, option, field)"
-          [value]="option?.label"
-        >
-          <span
-            [ngClass]="{
-              'disabled-form-selection-option': option?.disabled
-            }"
+    <ng-container *ngIf="!field?.multiple">
+      <input
+        type="text"
+        *ngSwitchCase="'dropdown'"
+        placeholder="Search {{ field?.label }}"
+        aria-label="{{ field?.label }}"
+        [required]="field?.required"
+        [formControlName]="field?.key"
+        matInput
+        [value]="field?.value"
+        autocomplete="off"
+        (keyup)="searchItemFromOptions($event, field)"
+        [matAutocomplete]="auto"
+      />
+      <span
+        style="position: relative; float: right; margin-top: -30px"
+        *ngIf="field?.options?.length > 0"
+      >
+        <mat-icon>arrow_drop_down</mat-icon>
+      </span>
+
+      <mat-autocomplete
+        #auto="matAutocomplete"
+        [displayWith]="displayLabelFunc.bind(this)"
+      >
+        <ng-container *ngFor="let option of members$ | async">
+          <mat-option
+            [disabled]="option?.disabled"
+            (click)="getSelectedItemFromOption($event, option, field)"
+            [value]="option?.label"
           >
-            {{ option?.label }}
-          </span>
-          <span *ngIf="option?.disabled" class="ml-2">
-            ({{ option?.message }})
-          </span>
-        </mat-option>
-      </ng-container>
-    </mat-autocomplete>
+            <span
+              [ngClass]="{
+                'disabled-form-selection-option': option?.disabled
+              }"
+            >
+              {{ option?.label }}
+            </span>
+            <span *ngIf="option?.disabled" class="ml-2">
+              ({{ option?.message }})
+            </span>
+          </mat-option>
+        </ng-container>
+      </mat-autocomplete>
+    </ng-container>
+
+    <ng-container *ngIf="field?.multiple">
+      <!-- <input
+        type="text"
+        placeholder="Search {{ field?.label }}"
+        aria-label="{{ field?.label }}"
+        [required]="field?.required"
+        [formControlName]="field?.key"
+        matInput
+        [value]="field?.value"
+        autocomplete="off"
+        (keyup)="searchItemFromOptions($event, field)"
+      /> -->
+      <mat-select
+        [formControlName]="field?.key"
+        [required]="field?.required"
+        (selectionChange)="onFieldUpdate()"
+        multiple
+      >
+        <!-- <mat-select-trigger>
+        {{toppings.value?.[0] || ''}}
+        <span *ngIf="(toppings.value?.length || 0) > 1" class="example-additional-selection">
+          (+{{(toppings.value?.length || 0) - 1}} {{toppings.value?.length === 2 ? 'other' : 'others'}})
+        </span>
+      </mat-select-trigger> -->
+        <!-- <mat-option>
+          <input
+            type="text"
+            placeholder="Search {{ field?.label }}"
+            aria-label="{{ field?.label }}"
+            [required]="field?.required"
+            [formControlName]="field?.key"
+            matInput
+            [value]="field?.value"
+            autocomplete="off"
+            (keyup)="searchItemFromOptions($event, field)"
+          />
+        </mat-option> -->
+        <mat-option *ngFor="let option of members$ | async" [value]="option">{{
+          option?.label
+        }}</mat-option>
+      </mat-select>
+    </ng-container>
 
     <!-- <mat-select
       [id]="field?.key"

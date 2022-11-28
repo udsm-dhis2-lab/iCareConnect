@@ -68,3 +68,7 @@ ng-deep .disabled-form-selection-option,
 .in-stock-item {
   color: #28a745 !important;
 }
+
+::ng-deep .mat-option:first-child .mat-pseudo-checkbox {
+  display: none;
+}
