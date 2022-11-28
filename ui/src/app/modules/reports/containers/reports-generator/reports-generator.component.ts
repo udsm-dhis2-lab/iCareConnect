@@ -88,6 +88,9 @@ export class ReportsGeneratorComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    console.log(this.reportCategories);
+    console.log(this.reportGroups);
+    console.log(this.reportsCategoriesConfigurations);
     this.reportCategories = this.reportsCategoriesConfigurations
       .map((category) => {
         const reportCategoryAccesses =
@@ -232,9 +235,11 @@ export class ReportsGeneratorComponent implements OnInit {
       return {
         ...param,
         name: this.sanitizeParameter(param?.lable ? param.lable : param?.name),
-        type: param?.type === 'DATETIME' ? 'DATE' : param?.type
+        type: param?.type === "DATETIME" ? "DATE" : param?.type,
       };
     });
+
+    console.log(this.selectedReportParameters);
 
     this.reportData = null;
     this.reportError = null;
