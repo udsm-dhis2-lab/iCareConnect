@@ -53,5 +53,18 @@ export class HomeComponent implements OnInit {
     this.codedSampleRejectionReasons$ = this.store.select(
       getCodedSampleRejectionReassons
     );
+
+    this.LISConfigurations$ = this.store.select(getLISConfigurations);
+    // Load departments depending either is LIS or not
+    this.LISConfigurations$.subscribe((LISConfigs) => {
+      if (LISConfigs) {
+        this.labSamplesDepartments$ = !LISConfigs?.isLIS
+          ? this.store.select(getLabDepartments)
+          : this.conceptService.getConceptsBySearchTerm("LAB_DEPARTMENT");
+        this.sampleTypes$ = !LISConfigs?.isLIS
+          ? this.store.select(getAllSampleTypes)
+          : this.conceptService.getConceptsBySearchTerm("SPECIMEN_SOURCE");
+      }
+    });
   }
 }
