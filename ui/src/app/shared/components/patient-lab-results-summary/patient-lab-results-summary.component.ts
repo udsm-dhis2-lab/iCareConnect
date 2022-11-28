@@ -53,121 +53,134 @@ export class PatientLabResultsSummaryComponent implements OnInit {
   labResultsObject: any = [];
 
   ngOnInit(): void {
-    this.store.dispatch(loadOrderTypes());
-    this.orderTypes$ = this.store.select(getAllOrderTypes);
-    this.provider$ = this.store.select(getProviderDetails);
-    this.creatingLabOrdersState$ = this.store.select(getCreatingLabOrderState);
-    if (!this.patientVisit) {
-      const labDeptConceptArray = filter(
-        this.labConceptsTree?.setMembers,
-        (setMember) => {
-          return setMember?.name === "Lab departments" ? true : false;
-        }
+    this.loadLabResultsComponent();
+  }
+
+  loadLabResultsComponent(): void {
+    this.creatingLabOrdersState$ = undefined;
+      this.store.dispatch(loadOrderTypes());
+      this.orderTypes$ = this.store.select(getAllOrderTypes);
+      this.provider$ = this.store.select(getProviderDetails);
+      this.creatingLabOrdersState$ = this.store.select(
+        getCreatingLabOrderState
       );
+      if (!this.patientVisit) {
+        const labDeptConceptArray = filter(
+          this.labConceptsTree?.setMembers,
+          (setMember) => {
+            return setMember?.name === "Lab departments" ? true : false;
+          }
+        );
 
-      each(
-        labDeptConceptArray?.length > 0
-          ? labDeptConceptArray[0]?.setMembers
-          : [],
-        (departmentConcept) => {
-          each(departmentConcept?.setMembers, (testConcept) => {
-            let test: any = {};
-            if (testConcept?.setMembers?.length > 0) {
-              test["name"] = testConcept?.name;
-              test["value"] = null;
-              test["parameters"] = [];
-              test["concept"] = testConcept;
+        each(
+          labDeptConceptArray?.length > 0
+            ? labDeptConceptArray[0]?.setMembers
+            : [],
+          (departmentConcept) => {
+            each(departmentConcept?.setMembers, (testConcept) => {
+              let test: any = {};
+              if (testConcept?.setMembers?.length > 0) {
+                test["name"] = testConcept?.name;
+                test["value"] = null;
+                test["parameters"] = [];
+                test["concept"] = testConcept;
 
-              each(testConcept?.setMembers, (parameter) => {
-                test?.parameters?.push({
-                  concept: parameter,
-                  name: parameter?.name,
-                  value: this.observations[parameter?.uuid]
-                    ? this.observations[parameter?.uuid]?.latest
-                    : null,
+                each(testConcept?.setMembers, (parameter) => {
+                  test?.parameters?.push({
+                    concept: parameter,
+                    name: parameter?.name,
+                    value: this.observations[parameter?.uuid]
+                      ? this.observations[parameter?.uuid]?.latest
+                      : null,
+                  });
                 });
-              });
 
-              this.labResultsObject.push(test);
-            } else {
-              test["name"] = testConcept?.name;
-              test["value"] = this.observations[testConcept?.uuid]
-                ? this.observations[testConcept?.uuid]?.latest
-                : null;
-              test["parameters"] = null;
-              test["concept"] = testConcept;
-
-              this.labResultsObject.push(test);
-            }
-          });
-        }
-      );
-
-      this.filteredLabTestsResults = filter(this.labResultsObject, (res) => {
-        return res?.value || res?.parameters ? true : false;
-      });
-    } else {
-      let obsValuesConcepts = [];
-      let testsConcepts = [];
-      // TODO: Remove subscribe within this ts
-      this.labOrders$ = this.store.select(getAllNewLabOrders);
-      this.creatingLabOrdersState$.subscribe((creatingLabOrderState) => {
-        if (!creatingLabOrderState) {
-          this.visitService
-            .getActiveVisit(this.patientVisit?.patientUuid, false, false, true)
-            .subscribe((visitResponse) => {
-              if (visitResponse) {
-                this.loadedLabOrders = true;
-                this.labOrdersResultsInformation = visitResponse?.labOrders.map(
-                  (labOrder: any) => {
-                    testsConcepts = uniqBy(
-                      [...testsConcepts, labOrder?.order?.concept],
-                      "uuid"
-                    );
-                    // TODO: For multiple orders for the same test consider using encounter and dates
-                    const observation: any =
-                      this.observations[labOrder?.order?.concept?.uuid] &&
-                      this.observations[labOrder?.order?.concept?.uuid]?.latest
-                        ? this.observations[labOrder?.order?.concept?.uuid]
-                            ?.latest
-                        : null;
-                    if (observation) {
-                      obsValuesConcepts = [
-                        ...obsValuesConcepts,
-                        {
-                          value: observation?.value,
-                          concept: observation?.concept?.uuid,
-                        },
-                      ];
-                    }
-
-                    this.testSetMembersDetails$ =
-                      this.getSetMembersForTheConcepts(testsConcepts);
-                    this.codedResultsData$ =
-                      obsValuesConcepts?.length > 0
-                        ? this.getValuesForCocedConcepts(obsValuesConcepts)
-                        : of([]);
-
-                    this.codedResultsData$.subscribe((data) => {
-                      if (data) {
-                        this.keyedResults = keyBy(data, "test");
-                      }
-                    });
-                    return {
-                      ...labOrder?.order,
-                      voided: labOrder?.voided,
-                      result: observation,
-                    };
-                  }
-                );
+                this.labResultsObject.push(test);
               } else {
-                this.loadedLabOrders = false;
-                this.labOrdersResultsInformation = null;
+                test["name"] = testConcept?.name;
+                test["value"] = this.observations[testConcept?.uuid]
+                  ? this.observations[testConcept?.uuid]?.latest
+                  : null;
+                test["parameters"] = null;
+                test["concept"] = testConcept;
+
+                this.labResultsObject.push(test);
               }
             });
-        }
-      });
-    }
+          }
+        );
+
+        this.filteredLabTestsResults = filter(this.labResultsObject, (res) => {
+          return res?.value || res?.parameters ? true : false;
+        });
+      } else {
+        let obsValuesConcepts = [];
+        let testsConcepts = [];
+        // TODO: Remove subscribe within this ts
+        this.labOrders$ = this.store.select(getAllNewLabOrders);
+        this.creatingLabOrdersState$.subscribe((creatingLabOrderState) => {
+          if (!creatingLabOrderState) {
+            this.visitService
+              .getActiveVisit(
+                this.patientVisit?.patientUuid,
+                false,
+                false,
+                true
+              )
+              .subscribe((visitResponse) => {
+                if (visitResponse) {
+                  this.loadedLabOrders = true;
+                  this.labOrdersResultsInformation =
+                    visitResponse?.labOrders.map((labOrder: any) => {
+                      console.log("==> Lab Orders: ", labOrder)
+                      testsConcepts = uniqBy(
+                        [...testsConcepts, labOrder?.order?.concept],
+                        "uuid"
+                      );
+                      // TODO: For multiple orders for the same test consider using encounter and dates
+                      const observation: any =
+                        this.observations[labOrder?.order?.concept?.uuid] &&
+                        this.observations[labOrder?.order?.concept?.uuid]
+                          ?.latest
+                          ? this.observations[labOrder?.order?.concept?.uuid]
+                              ?.latest
+                          : null;
+                      if (observation) {
+                        obsValuesConcepts = [
+                          ...obsValuesConcepts,
+                          {
+                            value: observation?.value,
+                            concept: observation?.concept?.uuid,
+                          },
+                        ];
+                      }
+
+                      this.testSetMembersDetails$ =
+                        this.getSetMembersForTheConcepts(testsConcepts);
+                      this.codedResultsData$ =
+                        obsValuesConcepts?.length > 0
+                          ? this.getValuesForCocedConcepts(obsValuesConcepts)
+                          : of([]);
+
+                      this.codedResultsData$.subscribe((data) => {
+                        if (data) {
+                          this.keyedResults = keyBy(data, "test");
+                        }
+                      });
+                      return {
+                        ...labOrder?.order,
+                        voided: labOrder?.voided,
+                        result: observation,
+                      };
+                    });
+                } else {
+                  this.loadedLabOrders = false;
+                  this.labOrdersResultsInformation = null;
+                }
+              });
+          }
+        });
+      }
   }
 
   getSetMembersForTheConcepts(concepts) {
