@@ -5,7 +5,7 @@ SELECT
 	GROUP_CONCAT(DISTINCT CASE WHEN p.gender='M' THEN 'Me'  ELSE 'Ke' END) AS `JINSIA YA MGONJWA`,
     pi.identifier AS `NAMBA YA JALADA/KADI`,
 	DATE_FORMAT(FROM_DAYS(DATEDIFF(v.date_started, p.birthdate)), '%Y') + 0 AS UMRI,
-	pa.address1 AS `MAHALI ANAISHI`,
+	CONCAT(pa.city_village,',',pa.state_province,' - ',pa.address1) AS `MAHALI ANAISHI`,
 	DATE_FORMAT(v.date_started, "%d/%m/%Y %h:%i %p") AS `TAREHE YA KULAZWA`,
 	GROUP_CONCAT(DISTINCT diagnosis_concept_name.name) AS `DIAGNOSIS KABLA YA KUTHIBITISHWA`,
 	GROUP_CONCAT(DISTINCT CASE WHEN ot.name='Test Order' THEN test_order_concept_name.name ELSE NULL END) AS `VIPIMO VILIVYOAGIZWA`,
@@ -13,7 +13,7 @@ SELECT
 	GROUP_CONCAT(DISTINCT CASE WHEN ed.certainty='CONFIRMED' THEN diagnosis_concept_name.name ELSE NULL END) AS `CONFIRMED DIAGNOSIS`,
 	GROUP_CONCAT(DISTINCT d.name) AS `MATIBABU`,
 	GROUP_CONCAT(DISTINCT result_encounter_type.name) AS `MATOKEO YA MWISHO`,
-	v.date_stopped AS `TAREHE YA MATOKEO YA MWISHO`,
+	DATE_FORMAT(v.date_stopped,"%d/%m/%Y %h:%i %p") AS `TAREHE YA MATOKEO YA MWISHO`,
 	GROUP_CONCAT(DISTINCT CASE WHEN vat.name='PaymentCategory' THEN payment_concept_name.name ELSE NULL END)AS `MALIPO`
 	from visit v
 
@@ -41,7 +41,7 @@ LEFT JOIN concept diagnosis_concept ON ed.diagnosis_coded=diagnosis_concept.conc
 LEFT JOIN concept_name diagnosis_concept_name ON diagnosis_concept_name.concept_id=diagnosis_concept.concept_id
 
 -- Addressing Matibabu
-LEFT JOIN drug_order do ON do.order_id=test_order_order.order_id
+LEFT JOIN prescription do ON do.order_id=test_order_order.order_id
 LEFT JOIN drug d ON d.drug_id=do.drug_inventory_id
 
 -- MATOKEO
@@ -63,5 +63,5 @@ INNER JOIN encounter_type visit_encounter_type ON visit_encounter.encounter_type
 LEFT JOIN visit_type vt ON vt.visit_type_id=v.visit_type_id
 
 WHERE (v.date_started BETWEEN :startDate AND :endDate)
-GROUP BY v.visit_id,`JINA LA MGONJWA`,pa.address1,`NAMBA YA JALADA/KADI`
+GROUP BY v.visit_id,`JINA LA MGONJWA`,`MAHALI ANAISHI`,`NAMBA YA JALADA/KADI`
 ORDER BY v.date_started ASC) AS VISITDETAILS, (SELECT @row_number:=0) AS temp
