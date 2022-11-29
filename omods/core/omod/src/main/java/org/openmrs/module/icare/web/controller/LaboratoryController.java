@@ -174,8 +174,7 @@ public class LaboratoryController {
 				}
 			}
 			catch (Exception e) {
-				System.out
-				        .println("Dates provided were not in correct format, please format in year-month-date e.g 1990-01-05");
+				System.out.println("Dates provided were not in correct format, please format in year-month-date e.g 1990-01-05");
 			}
 		}
 		
