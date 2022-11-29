@@ -134,25 +134,6 @@
         (selectionChange)="onFieldUpdate()"
         multiple
       >
-        <!-- <mat-select-trigger>
-        {{toppings.value?.[0] || ''}}
-        <span *ngIf="(toppings.value?.length || 0) > 1" class="example-additional-selection">
-          (+{{(toppings.value?.length || 0) - 1}} {{toppings.value?.length === 2 ? 'other' : 'others'}})
-        </span>
-      </mat-select-trigger> -->
-        <!-- <mat-option>
-          <input
-            type="text"
-            placeholder="Search {{ field?.label }}"
-            aria-label="{{ field?.label }}"
-            [required]="field?.required"
-            [formControlName]="field?.key"
-            matInput
-            [value]="field?.value"
-            autocomplete="off"
-            (keyup)="searchItemFromOptions($event, field)"
-          />
-        </mat-option> -->
         <mat-option *ngFor="let option of members$ | async" [value]="option">{{
           option?.label
         }}</mat-option>
