@@ -3,7 +3,7 @@ SELECT
 		CASE WHEN COUNT(othervisit.visit_id)> 0  THEN '' ELSE '*' END AS `HUDHURIO LA KWANZA`,
 		DATE_FORMAT(v.date_started, "%d/%m/%Y %h:%i %p") AS TAREHE,
 		UPPER(CONCAT(pn.given_name,' ',pn.family_name)) AS `JINA LA MGONJWA`,
-		pa.address1 AS `MAHALI ANAISHI`,
+		CONCAT(pa.city_village,',',pa.state_province,' - ',pa.address1) AS `MAHALI ANAISHI`,
 		DATE_FORMAT(FROM_DAYS(DATEDIFF(v.date_started, p.birthdate)), '%Y') + 0 AS UMRI,
 		CASE WHEN p.gender='M' THEN 'Me'  ELSE 'Ke' END AS `JINSIA YA MGONJWA`,
 		GROUP_CONCAT(DISTINCT CASE WHEN ob2.concept_id='165861' THEN ob2.value_numeric  ELSE null END) AS `UZITO(kg)`,
@@ -40,7 +40,7 @@ SELECT
 	LEFT JOIN concept diagnosis_concept ON ed.diagnosis_coded=diagnosis_concept.concept_id
 	LEFT JOIN concept_name diagnosis_concept_name ON diagnosis_concept_name.concept_id=diagnosis_concept.concept_id
 	-- Addressing Matibabu
-	LEFT JOIN drug_order do ON do.order_id=test_order_order.order_id
+	LEFT JOIN prescription do ON do.order_id=test_order_order.order_id
 	LEFT JOIN drug d ON d.drug_id=do.drug_inventory_id
 	-- MATOKEO
 	-- LEFT JOIN encounter result_encounter ON result_encounter.visit_id=v.visit_id
