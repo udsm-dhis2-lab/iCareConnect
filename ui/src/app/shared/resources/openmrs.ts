@@ -4537,6 +4537,9 @@ class HttpClient<SecurityDataType> {
   providedIn: "root",
 })
 export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
+  constructor() {
+    super();
+  }
   person = {
     /**
      * @tags person
