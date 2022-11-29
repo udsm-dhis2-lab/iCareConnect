@@ -20,7 +20,7 @@ export class VisitsService {
             BASE_URL +
               "visit/" +
               uuid +
-              "?v=custom:(uuid,startDatetime,display,patient,encounters:(uuid,location:(uuid,display),encounterType,display,patient,visit,encounterProviders,encounterDatetime,voided,obs,orders:(uuid,display,orderer,dateActivated,orderNumber,concept:(uuid,display,conceptClass,datatype,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,numeric,descriptions,allowDecimal,displayPrecision,answers,setMembers:(uuid,display),answers:(uuid,display)),display)),voided,attributes,visitType)"
+              "?v=custom:(uuid,startDatetime,display,patient,encounters:(uuid,location:(uuid,display),encounterType,display,patient,visit,encounterProviders,encounterDatetime,voided,voidReason,obs,orders:(uuid,display,orderer,dateActivated,orderNumber,concept:(uuid,display,conceptClass,datatype,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,numeric,descriptions,allowDecimal,displayPrecision,answers,setMembers:(uuid,display),answers:(uuid,display)),display)),voided,attributes,visitType)"
           )
         );
       })
@@ -142,7 +142,7 @@ export class VisitsService {
   getPatientsVisitsNotes(patientUuid, conceptUuid) {
     let url =
       BASE_URL +
-      `obs?patient=${patientUuid}&v=custom:(encounter:(visit,location:(uuid,display),obs:(uuid,display,obsDatetime,concept:(display),groupMembers:(uuid,display,concept,value,groupMembers:(uuid,concept:(display),value)))))&concept=${conceptUuid}`;
+      `obs?patient=${patientUuid}&v=custom:(encounter:(visit,location:(uuid,display),obs:(uuid,display,obsDatetime,concept:(display),groupMembers:(uuid,display,concept,value,groupMembers:(uuid,concept:(display),value,voided,voidReason)))))&concept=${conceptUuid}`;
 
     return this.httpClient.get(url).pipe(
       map((response) => response),

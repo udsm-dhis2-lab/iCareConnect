@@ -38,6 +38,7 @@ import { OpenmrsHttpClientService } from "src/app/shared/modules/openmrs-http-cl
 import { Textbox } from "src/app/shared/modules/form/models/text-box.model";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
 import { TextArea } from "src/app/shared/modules/form/models/text-area.model";
+import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 
 @Component({
   selector: "app-results-feeding-modal",
@@ -93,6 +94,8 @@ export class ResultsFeedingModalComponent implements OnInit {
   labSampleLoadingState$: Observable<boolean>;
   visitDetails$: Observable<any>;
   currentUser$: Observable<any>;
+
+  multipleResultsAttributeType$: Observable<any>;
   constructor(
     private dialog: MatDialog,
     private dialogRef: MatDialogRef<ResultsFeedingModalComponent>,
@@ -101,7 +104,8 @@ export class ResultsFeedingModalComponent implements OnInit {
     private dataService: DataService,
     private sampleService: SamplesService,
     private httpClient: HttpClient,
-    private visitService: VisitsService
+    private visitService: VisitsService,
+    private systemSettingsService: SystemSettingsService
   ) {
     this.dialogData = data;
     this.sample = data?.sample;
@@ -118,6 +122,10 @@ export class ResultsFeedingModalComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.multipleResultsAttributeType$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        `iCare.laboratory.settings.testParameters.attributes.multipleResultsAttributeTypeUuid`
+      );
     this.labSampleLoadingState$ = this.store.select(getLabSampleLoadingState);
     this.testOrders$ = this.store.select(
       getFormattedLabSampleOrdersBySampleIdentifier,
@@ -259,6 +267,10 @@ export class ResultsFeedingModalComponent implements OnInit {
       type: "text",
       controlType: "textarea",
     });
+  }
+
+  onGetFormData(val: any, parameter: any): void {
+    this.values[parameter?.uuid] = val;
   }
 
   loadSampleByUuid(): void {
@@ -748,6 +760,51 @@ export class ResultsFeedingModalComponent implements OnInit {
         this.savingMessage[parameter?.uuid + "-" + signOff] = null;
       }
     });
+
+    this.getLoadingAndTestOrdersData();
+  }
+
+  onSaveSignOffForParameters(e, item, signOff, currentSample, allocation) {
+    e.stopPropagation();
+
+    const approvalStatuses = item?.order?.concept?.setMembers
+      ?.map((parameter: any) => {
+        this.savingMessage[parameter?.uuid + "-first"] =
+          signOff == "second" ? false : true;
+        this.savingMessage[parameter?.uuid + "-" + signOff] = true;
+        const approvalStatus = {
+          status: "APPROVED",
+          remarks: signOff == "first" ? "APPROVED" : "SECOND_APPROVAL",
+          user: {
+            uuid: this.userUuid,
+          },
+          testAllocation: {
+            uuid: item?.allocationsPairedBySetMember[parameter?.uuid]
+              ?.allocationUuid,
+          },
+        };
+        if (
+          item?.allocationsPairedBySetMember[parameter?.uuid]?.results?.length >
+          0
+        ) {
+          return approvalStatus;
+        }
+      })
+      ?.filter((approvalStatus) => approvalStatus);
+
+    this.store.dispatch(
+      saveLabTestResultsStatus({
+        resultsStatus: approvalStatuses,
+        sampleDetails: currentSample,
+        concept: item?.order?.concept,
+        allocation,
+        isResultAnArray: true,
+      })
+    );
+
+    this.savingLabResultsStatusState$ = this.store.select(
+      getSavingLabTestResultsStatusState
+    );
 
     this.getLoadingAndTestOrdersData();
   }

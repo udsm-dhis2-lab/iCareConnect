@@ -39,6 +39,8 @@ export class RegisterSampleComponent implements OnInit {
   labNumberCharactersCount$: Observable<string>;
   testsFromExternalSystemsConfigs$: Observable<any[]>;
   labLocations$: Observable<any>;
+
+  selectedTabGroup: string = "NEW";
   constructor(
     private samplesService: SamplesService,
     private systemSettingsService: SystemSettingsService,
@@ -114,5 +116,10 @@ export class RegisterSampleComponent implements OnInit {
       this.samplesService.getCollectedSamplesByPaginationDetails(
         paginationParameters
       );
+  }
+
+  setTabGroup(event: Event, group: string): void {
+    event.stopPropagation();
+    this.selectedTabGroup = group;
   }
 }

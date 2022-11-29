@@ -11,6 +11,7 @@ import {
 } from "./pages";
 import { DrugManagementComponent } from "./pages/drug-management/drug-management.component";
 import { PrivilegesAndRolesComponent } from "./pages/privileges-and-roles/privileges-and-roles.component";
+import { ReportsManagementComponent } from "./pages/reports-management/reports-management.component";
 import { SystemSettingsComponent } from "./pages/system-settings/system-settings.component";
 
 // TODO: Improve routing, at least include child routing

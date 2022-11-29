@@ -124,7 +124,7 @@ export class CurrentPrescriptionComponent implements OnInit {
       data: {
         modalTitle: `Stop Medicaton`,
         modalMessage: `You are about to stop ${drugName} for this patient, Click confirm to finish!`,
-        showRemarksInput: false,
+        showRemarksInput: true,
       },
       disableClose: false,
       panelClass: "custom-dialog-container",
@@ -133,9 +133,9 @@ export class CurrentPrescriptionComponent implements OnInit {
     confirmDialog.afterClosed().subscribe((confirmationObject) => {
       if (confirmationObject?.confirmed) {
         this.encounterService
-          .voidEncounter({
+          .voidEncounterWithReason({
             ...drugOrder?.encounter,
-            voidReason: confirmationObject?.remarks || ""
+            voidReason: confirmationObject?.remarks || "",
           })
           .subscribe((response) => {
             if (!response?.error) {
