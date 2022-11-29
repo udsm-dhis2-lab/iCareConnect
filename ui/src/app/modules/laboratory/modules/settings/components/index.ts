@@ -14,6 +14,7 @@ import { LabOrdersManagementDashboardComponent } from "./lab-orders-management-d
 import { LabOrdersManagementComponent } from "./lab-orders-management/lab-orders-management.component";
 import { LabsSectionManagementComponent } from "./labs-section-management/labs-section-management.component";
 import { LbPriceListContainerComponent } from "./lb-price-list-container/lb-price-list-container.component";
+import { ManageConceptAttributesComponent } from "./manage-concept-attributes/manage-concept-attributes.component";
 import { OtherParametersConfigsComponent } from "./other-parameters-configs/other-parameters-configs.component";
 import { ParametersListComponent } from "./parameters-list/parameters-list.component";
 import { ParametersComponent } from "./parameters/parameters.component";
@@ -54,6 +55,7 @@ export const components: any[] = [
   LbPriceListContainerComponent,
   SharedPriceListComponent,
   LabEditUserModalComponent,
+  ManageConceptAttributesComponent,
 ];
 
 export const entrySettingComponents: any[] = [

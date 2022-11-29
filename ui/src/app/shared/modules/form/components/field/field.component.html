@@ -287,26 +287,11 @@
     </mat-select>
   </mat-form-field>
 </div>
-<div [formGroup]="form" *ngIf="isCheckBoxButton && !isReport">
-  <mat-checkbox
-    color="primary"
-    [hidden]="field?.hidden"
-    [id]="field?.id"
-    [formControlName]="field?.key"
-    [checked]="field?.value"
-    (change)="onFieldUpdate()"
-    [required]="field?.required"
-    [disabled]="shouldDisable"
-    [title]="shouldDisable ? 'No price set for this item' : 'Can be ordered'"
-  >
-    <span [ngClass]="{ 'disabled-form-selection-option': field?.disabled }">
-      {{ field.label }}
-    </span>
-    <span *ngIf="field?.disabled" class="ml-2"> ({{ field?.message }}) </span>
-  </mat-checkbox>
-</div>
 
-<div [formGroup]="form" *ngIf="isBoolean && !isReport">
+<div
+  [formGroup]="form"
+  *ngIf="(isBoolean || field?.controlType === 'checkbox') && !isReport"
+>
   <section>
     <mat-checkbox
       [hidden]="field?.hidden"
@@ -315,6 +300,7 @@
       [formControlName]="field?.key"
       [checked]="field?.value"
       (change)="onFieldUpdate()"
+      color="primary"
     >
       <span [ngClass]="{ 'disabled-form-selection-option': field?.disabled }">
         {{ field.label }}
