@@ -241,6 +241,9 @@
                     ></app-drug-order>
 
                     <div>
+                      <span *ngIf="showPrice">
+                        Price: {{ drugPrice }}
+                      </span>
                       <button
                         class="float-right"
                         (click)="
