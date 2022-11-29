@@ -330,7 +330,7 @@ export class ConceptsService {
     return from(
       this.api.concept.getAllConcepts({
         q: searchTerm,
-        v: "custom:(uuid,display,names,descriptions,setMembers:(uuid,display,datatype,answers:(uuid,display),setMembers:(uuid,display,datatype,answers:(uuid,display))))",
+        v: "custom:(uuid,display,names,descriptions,setMembers:(uuid,display,datatype,attributes:(uuid,display,value,attributeType:(uuid,display)),answers:(uuid,display),setMembers:(uuid,display,attributes:(uuid,display,value,attributeType:(uuid,display)),datatype,answers:(uuid,display))))",
       })
     ).pipe(
       map((response) => {

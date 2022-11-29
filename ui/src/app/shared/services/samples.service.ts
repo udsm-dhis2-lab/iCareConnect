@@ -125,23 +125,43 @@ export class SamplesService {
     testCategory?: string,
     startDate?: any,
     endDate?: any,
-    formattingInfo?: any
+    formattingInfo?: any,
+    paging?: boolean,
+    page?: number,
+    pageSize?: number
   ) {
-    testCategory = testCategory ? `?testCategory=${testCategory}` : "";
-    sampleCategory = sampleCategory ? `?testCategory=${sampleCategory}` : "";
-    const dates =
-      startDate &&
-      endDate &&
-      (sampleCategory.length > 0 || testCategory.length > 0)
-        ? `&startDate=${startDate}&endDate=${endDate}`
-        : startDate &&
-          endDate &&
-          testCategory.length === 0 &&
-          sampleCategory.length === 0
-        ? `?startDate=${startDate}&endDate=${endDate}`
-        : "";
+    let queryParams = [];
+    if (sampleCategory) {
+      queryParams = [...queryParams, `sampleCategory=${sampleCategory}`];
+    }
+
+    if (testCategory) {
+      queryParams = [...queryParams, `testCategory=${testCategory}`];
+    }
+
+    if (startDate) {
+      queryParams = [...queryParams, `startDate=${startDate}`];
+    }
+
+    if (endDate) {
+      queryParams = [...queryParams, `endDate=${endDate}`];
+    }
+
+    if (paging) {
+      queryParams = [...queryParams, `paging=${paging}`];
+    } else {
+      queryParams = [...queryParams, `paging=false`];
+    }
+
+    if (page) {
+      queryParams = [...queryParams, `page=${page}`];
+    }
+
+    if (pageSize) {
+      queryParams = [...queryParams, `pageSize=${pageSize}`];
+    }
     return this.httpClient
-      .get(BASE_URL + `lab/sample${testCategory}${sampleCategory}${dates}`)
+      .get(BASE_URL + `lab/sample?${queryParams.join("&")}`)
       .pipe(
         map((response: any) => {
           return _.map(response, (sample) => {
@@ -156,21 +176,77 @@ export class SamplesService {
     return this.httpClient.post(BASE_URL + "lab/sample", data);
   }
 
+  getSamplesByPaginationDetails(
+    paginationParameters: { page: number; pageSize: number },
+    dates?: { startDate: string; endDate: string },
+    departments?: any[],
+    specimenSources?: any[],
+    codedSampleRejectionReasons?: any[]
+  ): Observable<{ pager: any; results: any[] }> {
+    let queryParams = [];
+    if (paginationParameters && paginationParameters?.page) {
+      queryParams = [...queryParams, `page=${paginationParameters?.page}`];
+    }
+
+    if (paginationParameters && paginationParameters?.pageSize) {
+      queryParams = [
+        ...queryParams,
+        `pageSize=${paginationParameters?.pageSize}`,
+      ];
+    }
+
+    if (dates && dates?.startDate) {
+      queryParams = [...queryParams, `startDate=${dates?.startDate}`];
+    }
+
+    if (dates && dates?.endDate) {
+      queryParams = [...queryParams, `endDate=${dates?.endDate}`];
+    }
+    return this.httpClient
+      .get(BASE_URL + `lab/samples?${queryParams?.join("&")}`)
+      .pipe(
+        map((response: any) => {
+          return {
+            ...response,
+            results: response?.results?.map((result) => {
+              return new LabSample(
+                result,
+                departments,
+                specimenSources,
+                codedSampleRejectionReasons
+              );
+            }),
+          };
+        }),
+        catchError((error) => of(error))
+      );
+  }
+
   getCollectedSamplesByPaginationDetails(
     paginationParameters: { page: number; pageSize: number },
     dates?: { startDate: string; endDate: string }
   ): Observable<{ pager: any; results: any[] }> {
+    let queryParams = [];
+    if (paginationParameters && paginationParameters?.page) {
+      queryParams = [...queryParams, `page=${paginationParameters?.page}`];
+    }
+
+    if (paginationParameters && paginationParameters?.pageSize) {
+      queryParams = [
+        ...queryParams,
+        `pageSize=${paginationParameters?.pageSize}`,
+      ];
+    }
+
+    if (dates && dates?.startDate) {
+      queryParams = [...queryParams, `startDate=${dates?.startDate}`];
+    }
+
+    if (dates && dates?.endDate) {
+      queryParams = [...queryParams, `endDate=${dates?.endDate}`];
+    }
     return this.httpClient
-      .get(
-        BASE_URL +
-          `lab/samples?page=${paginationParameters?.page}&pageSize=${
-            paginationParameters?.pageSize
-          }${
-            dates
-              ? "&startDate=" + dates?.startDate + "&endDate=" + dates?.endDate
-              : ""
-          }`
-      )
+      .get(BASE_URL + `lab/samples?${queryParams?.join("&")}`)
       .pipe(
         map((response: any) => response),
         catchError((error) => of(error))

@@ -101,6 +101,7 @@ export class LabSamplesEffects {
                   sample?.statuses?.filter(
                     (status) => status?.category?.indexOf("REJECTED") > -1
                   ) || [];
+                console.log("keyedSpecimenSources", keyedSpecimenSources);
                 return {
                   ...sample,
                   id: sample?.label,

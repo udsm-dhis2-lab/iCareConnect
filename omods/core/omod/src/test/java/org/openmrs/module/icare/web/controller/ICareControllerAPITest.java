@@ -698,18 +698,33 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		System.out.println(userDetails);
 	}
 	
-		@Test
-		public void testVoidOrder() throws Exception {
-			String dto = this.readFile("dto/order-void-object-dto.json");
-			Map<String, Object> orderVoidDetails = (new ObjectMapper()).readValue(dto, Map.class);
-			MockHttpServletRequest voidOrderRequest = newPostRequest("icare/voidorder", orderVoidDetails);
-
-			MockHttpServletResponse returnResponse = handle(voidOrderRequest);
-
-			OrderService orderService = Context.getService(OrderService.class);
-			Order voidedOrder = orderService.getOrderByUuid(orderVoidDetails.get("uuid").toString());
-
-			assertThat("The order is voided", voidedOrder.getVoided() == true);
-
-		}
+	@Test
+	public void testVoidOrder() throws Exception {
+		String dto = this.readFile("dto/order-void-object-dto.json");
+		Map<String, Object> orderVoidDetails = (new ObjectMapper()).readValue(dto, Map.class);
+		MockHttpServletRequest voidOrderRequest = newPostRequest("icare/voidorder", orderVoidDetails);
+		
+		MockHttpServletResponse returnResponse = handle(voidOrderRequest);
+		
+		OrderService orderService = Context.getService(OrderService.class);
+		Order voidedOrder = orderService.getOrderByUuid(orderVoidDetails.get("uuid").toString());
+		
+		assertThat("The order is voided", voidedOrder.getVoided() == true);
+		
+	}
+	
+	@Test
+	public void testVoidEncounter() throws Exception {
+		String dto = this.readFile("dto/encounter-void-object-dto.json");
+		Map<String, Object> encounterVoidDetails = (new ObjectMapper()).readValue(dto, Map.class);
+		MockHttpServletRequest voidEncounterRequest = newPostRequest("icare/voidencounter", encounterVoidDetails);
+		
+		MockHttpServletResponse returnResponse = handle(voidEncounterRequest);
+		
+		EncounterService encounterService = Context.getService(EncounterService.class);
+		Encounter voidedEncounter = encounterService.getEncounterByUuid(encounterVoidDetails.get("uuid").toString());
+		
+		assertThat("The encounter is voided", voidedEncounter.getVoided() == true);
+		
+	}
 }

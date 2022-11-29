@@ -57,6 +57,27 @@
                   src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAABmJLR0QA/wD/AP+gvaeTAAAA2ElEQVRoge3YQQrCMBSE4bmeuyyULvT0yTFa0EU7IDUJpk3yUpgPulEL/+gmFhARERGRVhyAsF3OuKXYA8AM4L1dC4CXaVGBffylRqTiLzFiwm/8nHhtMmpMin3zC4AngHvivWF+iVw8DTvin3gabkRJPA0z4kg8mY84E09mI2rEU/cRNeOp24gW8dR8RMt4ajaiRzxVH9EznqqNsIin0yMs4+nwCBe50er4mzqeZ/+ehsgNlmf32IiQu+F7gHU87Uf43IdvWEd4jPUkgU84PNZGEREREbm6DyOF4ZDs7v8cAAAAAElFTkSuQmCC"
                 />
               </a>
+
+                <button
+                  *ngIf="!isInpatient"
+                  mat-icon-button
+                  [matMenuTriggerFor]="menu"
+                  aria-label="Options"
+                >
+                  <mat-icon>more_vert</mat-icon>
+                </button>
+                <mat-menu #menu="matMenu">
+                  <!-- <button mat-menu-item (click)="onEdit($event, diagnosisInfo)">
+                    <mat-icon>edit</mat-icon>
+                    <span>Edit</span>
+                  </button> -->
+                  <button
+                    mat-menu-item
+                  >
+                    <mat-icon>delete</mat-icon>
+                    <span>Delete</span>
+                  </button>
+                </mat-menu>
             </td>
             <td>
               <a
