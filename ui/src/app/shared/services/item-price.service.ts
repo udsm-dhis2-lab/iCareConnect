@@ -1,6 +1,7 @@
 import { Injectable } from "@angular/core";
 import { from, Observable, of, zip } from "rxjs";
 import { catchError, map, switchMap } from "rxjs/operators";
+import { resultsComponents } from "src/app/modules/laboratory/modules/sample-results/components";
 import { getGroupedItems } from "src/app/modules/maintenance/helpers/get-grouped-items.helper";
 import { ItemPrice } from "src/app/modules/maintenance/models/item-price.model";
 import { OpenmrsHttpClientService } from "src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service";
@@ -21,6 +22,21 @@ export class ItemPriceService {
         )
       )
     );
+  }
+
+  getItemPrice(pricePayload: { visitUuid: string; drugUuid: string }): Observable<any[]> {
+    return this.httpClient
+      .get(
+        `icare/itemprice?visitUuid=${pricePayload?.visitUuid}&drugUuid=${pricePayload?.drugUuid}`
+      )
+      .pipe(
+        map((response) => {
+          return response?.results;
+        }),
+        catchError((err) => {
+          return err
+        })
+      );
   }
 
   createItem(item: any, paymentSchemes: any[]): Observable<any> {
