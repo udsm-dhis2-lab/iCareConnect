@@ -121,9 +121,19 @@
           </div>
           <div *ngIf="selectionDates && dateChanged">
             <app-custom-reports
+              *ngIf="
+                currentReport &&
+                (!currentReport?.category ||
+                  currentReport?.category !== 'standard')
+              "
               [report]="currentReport"
               [selectionDates]="selectionDates"
             ></app-custom-reports>
+            <app-standard-reports
+              *ngIf="currentReport && currentReport?.category == 'standard'"
+              [report]="currentReport"
+              [selectionDates]="selectionDates"
+            ></app-standard-reports>
           </div>
         </div>
       </mat-card>
