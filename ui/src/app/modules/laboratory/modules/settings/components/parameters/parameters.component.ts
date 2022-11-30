@@ -12,6 +12,7 @@ import {
 } from "src/app/shared/resources/openmrs";
 
 import { omit, uniqBy } from "lodash";
+import { Observable } from "rxjs";
 
 @Component({
   selector: "app-parameters",
@@ -48,6 +49,9 @@ export class ParametersComponent implements OnInit {
   selectedCodingSource: string;
 
   isFormValid: boolean = false;
+  conceptsAttributesTypes$: Observable<any>;
+  attributesValues: any[];
+  showAttributes: boolean = true;
   constructor(
     private conceptService: ConceptsService,
     private conceptReferenceService: ReferenceTermsService
@@ -58,6 +62,7 @@ export class ParametersComponent implements OnInit {
     this.createUnitField();
     this.createCodesMappingSourceField();
     this.createCodeField([]);
+    this.conceptsAttributesTypes$ = this.conceptService.getConceptsAttributes();
   }
 
   onFormUpdate(formValue: FormValue): void {
@@ -148,7 +153,7 @@ export class ParametersComponent implements OnInit {
         id: "name",
         key: "name",
         label: "Name",
-        value: data && data?.name ? data?.name?.name : null,
+        value: data && data?.display ? data?.display : null,
         required: true,
       }),
       new Textbox({
@@ -207,6 +212,10 @@ export class ParametersComponent implements OnInit {
 
   onGetSelectedCodes(items: any): void {
     this.selectedCodeItems = items;
+  }
+
+  onGetAttributeValues(attributesValues: any): void {
+    this.attributesValues = attributesValues;
   }
 
   onSave(event: Event, uuid?: string): void {
@@ -311,6 +320,7 @@ export class ParametersComponent implements OnInit {
           ? this.formData["precision"]?.value
           : null,
       mappings: uniqBy(mappings, "conceptReferenceTerm"),
+      attributes: this.attributesValues,
     };
 
     const keys = Object.keys(this.concept);
@@ -395,10 +405,12 @@ export class ParametersComponent implements OnInit {
 
   onGetSelectedParameter(selectedParameter: ConceptGetFull): void {
     this.parameterUuid = selectedParameter?.uuid;
+
+    this.conceptsAttributesTypes$ = this.conceptService.getConceptsAttributes();
     this.conceptService
       .getConceptDetailsByUuid(
         this.parameterUuid,
-        "custom:(uuid,display,datatype,set,retired,descriptions,name,names,setMembers:(uuid,display),conceptClass:(uuid,display),answers:(uuid,display),mappings:(conceptReferenceTerm:(uuid,display,conceptSource:(uuid,display))))"
+        "custom:(uuid,display,datatype,set,retired,descriptions,name,names,setMembers:(uuid,display),conceptClass:(uuid,display),answers:(uuid,display),attributes:(uuid,display,value,attributeType:(uuid,display)),mappings:(conceptReferenceTerm:(uuid,display,conceptSource:(uuid,display))))"
       )
       .subscribe((response) => {
         if (response) {

@@ -96,6 +96,7 @@ export class ResultsFeedingModalComponent implements OnInit {
   currentUser$: Observable<any>;
 
   multipleResultsAttributeType$: Observable<any>;
+  errors: any[] = [];
   constructor(
     private dialog: MatDialog,
     private dialogRef: MatDialogRef<ResultsFeedingModalComponent>,
@@ -122,9 +123,19 @@ export class ResultsFeedingModalComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.multipleResultsAttributeType$ =
-      this.systemSettingsService.getSystemSettingsByKey(
+    this.multipleResultsAttributeType$ = this.systemSettingsService
+      .getSystemSettingsByKey(
         `iCare.laboratory.settings.testParameters.attributes.multipleResultsAttributeTypeUuid`
+      )
+      .pipe(
+        map((response) => {
+          if (response && !response?.error) {
+            return response;
+          } else {
+            this.errors = [...this.errors, response];
+            return response;
+          }
+        })
       );
     this.labSampleLoadingState$ = this.store.select(getLabSampleLoadingState);
     this.testOrders$ = this.store.select(
@@ -292,15 +303,6 @@ export class ResultsFeedingModalComponent implements OnInit {
   }
 
   setEnteredParameterValue(item, val) {
-    // if (this.LISConfigurations?.isLIS) {
-    //   if (this.temporaryValues[item?.uuid]) {
-    //     this.values[item?.uuid] = val;
-    //   } else {
-    //     this.temporaryValues[item?.uuid] = val;
-    //   }
-    // } else {
-    //   this.values[item?.uuid] = val;
-    // }
     this.values[item?.uuid] = val;
   }
 
@@ -490,34 +492,46 @@ export class ResultsFeedingModalComponent implements OnInit {
     this.savingMessage[parameter?.uuid] = true;
     this.saving = true;
     if (!type || type !== "file") {
-      const resultObject = {
-        concept: {
-          uuid: parameter?.uuid,
-        },
-        testAllocation: {
-          uuid: allocation?.allocationUuid,
-        },
-        valueNumeric: parameter?.numeric ? this.values[parameter?.uuid] : null,
-        valueText:
-          !parameter?.numeric && parameter?.answers?.length == 0
-            ? this.values[parameter?.uuid]
-            : null,
-
-        valueCoded:
-          parameter.answers && parameter.answers.length > 0
-            ? {
-                uuid: this.values[parameter?.uuid],
+      const results = this.values[parameter?.uuid]
+        ? (
+            (!this.values[parameter?.uuid][0]?.value
+              ? [{ value: this.values[parameter?.uuid] }]
+              : this.values[parameter?.uuid]
+            )?.map((valueOption) => {
+              if (valueOption?.value) {
+                return {
+                  concept: {
+                    uuid: parameter?.uuid,
+                  },
+                  testAllocation: {
+                    uuid: allocation?.allocationUuid,
+                  },
+                  valueNumeric: parameter?.numeric ? valueOption?.value : null,
+                  valueText:
+                    !parameter?.numeric && parameter?.answers?.length == 0
+                      ? valueOption?.value
+                      : null,
+                  valueCoded:
+                    parameter.answers && parameter.answers.length > 0
+                      ? {
+                          uuid: valueOption?.value,
+                        }
+                      : null,
+                  abnormal: this.values[parameter?.uuid + "-abnormal"]
+                    ? this.values[parameter?.uuid + "-abnormal"]
+                    : false,
+                  additionalReqTimeLimit: this.getTimeConfigs(
+                    item?.order?.concept?.uuid
+                  )?.additionalReqTimeLimit,
+                  standardTAT: this.getTimeConfigs(item?.order?.concept?.uuid)
+                    ?.standardTAT,
+                  urgentTAT: this.getTimeConfigs(item?.order?.concept?.uuid)
+                    ?.urgentTAT,
+                };
               }
-            : null,
-        abnormal: this.values[parameter?.uuid + "-abnormal"]
-          ? this.values[parameter?.uuid + "-abnormal"]
-          : false,
-        additionalReqTimeLimit: this.getTimeConfigs(item?.order?.concept?.uuid)
-          ?.additionalReqTimeLimit,
-        standardTAT: this.getTimeConfigs(item?.order?.concept?.uuid)
-          ?.standardTAT,
-        urgentTAT: this.getTimeConfigs(item?.order?.concept?.uuid)?.urgentTAT,
-      };
+            }) || []
+          )?.filter((data) => data)
+        : [];
 
       const resultsComments = {
         status: this.amendmentRemarks
@@ -538,22 +552,17 @@ export class ResultsFeedingModalComponent implements OnInit {
           uuid: allocation.allocationUuid,
         },
       };
-
-      let formattedDataObject = {};
-      _.map(this.getAllKeysWithData(resultObject), (key) => {
-        formattedDataObject[key] = resultObject[key];
-      });
       this.store.dispatch(
         saveLabTestResults({
-          results: formattedDataObject,
+          results: results,
           comments: resultsComments,
           sampleDetails: currentSample,
-          concept: item?.order?.concept,
-          allocation,
+          concept: null,
+          allocation: null,
+          isResultAnArray: true,
         })
       );
       this.getLoadingAndTestOrdersData(parameter);
-      console.log("GETEEE");
     } else {
       // Attachment
       this.savingLabResultsState$ = of(false);
@@ -987,47 +996,101 @@ export class ResultsFeedingModalComponent implements OnInit {
           })
         ) || []
       );
-      const resultsToSave = testAllocations
-        ?.map((testAllocation) => {
-          if (this.values[testAllocation?.parameterUuid])
-            return {
-              concept: {
-                uuid: testAllocation?.parameterUuid,
-              },
-              testAllocation: {
-                uuid: testAllocation?.allocationUuid,
-              },
-              valueNumeric: testAllocation?.parameter?.numeric
-                ? this.values[testAllocation?.parameterUuid]
-                : null,
-              valueText:
-                !testAllocation?.parameter?.numeric &&
-                testAllocation?.parameter?.answers?.length == 0
+      const resultsToSave = _.flatten(
+        testAllocations
+          ?.map((testAllocation) => {
+            if (
+              this.values[testAllocation?.parameterUuid] &&
+              !this.values[testAllocation?.parameterUuid][0]?.value
+            ) {
+              return {
+                concept: {
+                  uuid: testAllocation?.parameterUuid,
+                },
+                testAllocation: {
+                  uuid: testAllocation?.allocationUuid,
+                },
+                valueNumeric: testAllocation?.parameter?.numeric
                   ? this.values[testAllocation?.parameterUuid]
                   : null,
+                valueText:
+                  !testAllocation?.parameter?.numeric &&
+                  testAllocation?.parameter?.answers?.length == 0
+                    ? this.values[testAllocation?.parameterUuid]
+                    : null,
 
-              valueCoded:
-                testAllocation?.parameter?.answers &&
-                testAllocation?.parameter?.answers.length > 0
-                  ? {
-                      uuid: this.values[testAllocation?.parameterUuid],
-                    }
-                  : null,
-              abnormal: this.values[testAllocation?.parameterUuid + "-abnormal"]
-                ? this.values[testAllocation?.parameterUuid + "-abnormal"]
-                : false,
-              additionalReqTimeLimit: this.getTimeConfigs(
-                testAllocation?.order?.concept?.uuid
-              )?.additionalReqTimeLimit,
-              standardTAT: this.getTimeConfigs(
-                testAllocation?.order?.concept?.uuid
-              )?.standardTAT,
-              urgentTAT: this.getTimeConfigs(
-                testAllocation?.order?.concept?.uuid
-              )?.urgentTAT,
-            };
-        })
-        ?.filter((allocWithResults) => allocWithResults);
+                valueCoded:
+                  testAllocation?.parameter?.answers &&
+                  testAllocation?.parameter?.answers.length > 0
+                    ? {
+                        uuid: this.values[testAllocation?.parameterUuid],
+                      }
+                    : null,
+                abnormal: this.values[
+                  testAllocation?.parameterUuid + "-abnormal"
+                ]
+                  ? this.values[testAllocation?.parameterUuid + "-abnormal"]
+                  : false,
+                additionalReqTimeLimit: this.getTimeConfigs(
+                  testAllocation?.order?.concept?.uuid
+                )?.additionalReqTimeLimit,
+                standardTAT: this.getTimeConfigs(
+                  testAllocation?.order?.concept?.uuid
+                )?.standardTAT,
+                urgentTAT: this.getTimeConfigs(
+                  testAllocation?.order?.concept?.uuid
+                )?.urgentTAT,
+              };
+            } else if (
+              this.values[testAllocation?.parameterUuid] &&
+              this.values[testAllocation?.parameterUuid][0]?.value
+            ) {
+              return this.values[testAllocation?.parameterUuid]?.map(
+                (valueOption) => {
+                  return {
+                    concept: {
+                      uuid: testAllocation?.parameterUuid,
+                    },
+                    testAllocation: {
+                      uuid: testAllocation?.allocationUuid,
+                    },
+                    valueNumeric: testAllocation?.parameter?.numeric
+                      ? this.values[testAllocation?.parameterUuid]
+                      : null,
+                    valueText:
+                      !testAllocation?.parameter?.numeric &&
+                      testAllocation?.parameter?.answers?.length == 0
+                        ? this.values[testAllocation?.parameterUuid]
+                        : null,
+
+                    valueCoded:
+                      testAllocation?.parameter?.answers &&
+                      testAllocation?.parameter?.answers.length > 0
+                        ? {
+                            uuid: valueOption?.value,
+                          }
+                        : null,
+                    abnormal: this.values[
+                      testAllocation?.parameterUuid + "-abnormal"
+                    ]
+                      ? this.values[testAllocation?.parameterUuid + "-abnormal"]
+                      : false,
+                    additionalReqTimeLimit: this.getTimeConfigs(
+                      testAllocation?.order?.concept?.uuid
+                    )?.additionalReqTimeLimit,
+                    standardTAT: this.getTimeConfigs(
+                      testAllocation?.order?.concept?.uuid
+                    )?.standardTAT,
+                    urgentTAT: this.getTimeConfigs(
+                      testAllocation?.order?.concept?.uuid
+                    )?.urgentTAT,
+                  };
+                }
+              );
+            }
+          })
+          ?.filter((allocWithResults) => allocWithResults)
+      );
 
       this.store.dispatch(
         saveLabTestResults({

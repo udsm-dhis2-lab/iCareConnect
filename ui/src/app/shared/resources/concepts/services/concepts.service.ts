@@ -431,5 +431,13 @@ export class ConceptsService {
     );
   }
 
-  get;
+  getConceptsAttributes(): Observable<any> {
+    return from(
+      this.api.conceptattributetype.getAllConceptAttributeTypes({ v: "full" })
+    ).pipe(
+      map((response) => {
+        return response?.results;
+      })
+    );
+  }
 }

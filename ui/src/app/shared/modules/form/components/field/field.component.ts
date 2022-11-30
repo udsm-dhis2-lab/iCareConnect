@@ -114,7 +114,9 @@ export class FieldComponent {
   }
 
   get isCommonField(): boolean {
-    return !this.isCheckBoxButton && !this.isDate && !this.isBoolean;
+    return (
+      this.field?.controlType !== "checkbox" && !this.isDate && !this.isBoolean
+    );
   }
 
   get fieldId(): string {
