@@ -178,12 +178,12 @@ export class OrderResultsRendererComponent implements OnInit {
 
   onDeleteTest(event: Event, labOrder): void {
     event.stopPropagation();
-    this.store.dispatch(deleteLabOrder({ uuid: labOrder?.uuid }));
+    // this.store.dispatch(deleteLabOrder({ uuid: labOrder?.uuid }));
     const confirmDialog = this.dialog.open(SharedConfirmationComponent, {
       width: "25%",
       data: {
-        modalTitle: `Stop Medicaton`,
-        modalMessage: `You are about to delete ${labOrder?.concept?.display} for this patient, Click confirm to finish!`,
+        modalTitle: `Delete ${labOrder?.concept?.display}`,
+        modalMessage: `You are about to delete ${labOrder?.concept?.display} for this patient, Click confirm to delete!`,
         showRemarksInput: true,
       },
       disableClose: false,
@@ -196,7 +196,6 @@ export class OrderResultsRendererComponent implements OnInit {
           voidReason: confirmationObject?.remarks || "",
         }).subscribe((response) => {
           if (!response?.error) {
-              console.log("==> here")
               this.reloadOrderComponent.emit();
             }
             if (response?.error) {
