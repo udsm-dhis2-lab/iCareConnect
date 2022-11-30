@@ -134,7 +134,7 @@ export class RequisitionComponent implements OnInit {
         referenceTagsThatCanRequestFromPharmacyConfigs,
       } = params;
       const dialog = this.dialog.open(RequisitionFormComponent, {
-        width: "30%",
+        width: "50%",
         panelClass: "custom-dialog-container",
         data: {
           currentStore,
