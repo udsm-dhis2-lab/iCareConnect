@@ -259,13 +259,12 @@ export class SharedAddTestorderToSampleComponent implements OnInit {
       .subscribe((response) => {
         if (response.confirmed) {
           const voidObject = {
-            uuid: order?.uuid,
+            uuid: order?.order?.uuid,
             voidReason: response?.remarks || "No reason provided",
           };
           this.orderService.voidOrderWithReason(voidObject).subscribe(
             (response: any) => {
               if(!response?.error && !response?.stackTrace){
-                console.log("==> Success: ",response)
                 this.store.dispatch(
                   loadSampleByUuid({ uuid: this.sample?.uuid })
                 );
