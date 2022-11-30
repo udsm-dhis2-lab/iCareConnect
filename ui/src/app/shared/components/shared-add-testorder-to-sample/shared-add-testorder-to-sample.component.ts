@@ -1,4 +1,5 @@
 import { Component, Input, OnInit } from "@angular/core";
+import { MatDialog } from "@angular/material/dialog";
 import { Store } from "@ngrx/store";
 import { flatten, each } from "lodash";
 import { Observable, zip } from "rxjs";
@@ -20,6 +21,7 @@ import { ICARE_CONFIG } from "../../resources/config";
 import { OrdersService } from "../../resources/order/services/orders.service";
 import { VisitsService } from "../../resources/visits/services";
 import { SamplesService } from "../../services/samples.service";
+import { SharedConfirmationComponent } from "../shared-confirmation /shared-confirmation.component";
 
 @Component({
   selector: "app-shared-add-testorder-to-sample",
@@ -38,12 +40,14 @@ export class SharedAddTestorderToSampleComponent implements OnInit {
   valuesToSave: any;
   existingOrdersDetails$: Observable<any>;
   labSampleLoadingState$: Observable<any>;
+  errors: any[] = [];
   constructor(
     private orderService: OrdersService,
     private sampleService: SamplesService,
     private conceptsService: ConceptsService,
     private store: Store<AppState>,
-    private visitService: VisitsService
+    private visitService: VisitsService,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
@@ -56,6 +60,10 @@ export class SharedAddTestorderToSampleComponent implements OnInit {
     this.existingOrdersDetails$ = this.store.select(
       getTestOrdersFromSampleBySampleLabel(this.sample?.id)
     );
+    this.getOrderField();
+  }
+
+  getOrderField() {
     this.formField = new Dropdown({
       id: "testorders",
       key: "testorders",
@@ -130,37 +138,18 @@ export class SharedAddTestorderToSampleComponent implements OnInit {
               (order) => order?.testAllocations?.length > 0
             )[0];
 
-            if(!saveOrderResponse?.error){
+            if (!saveOrderResponse?.error) {
               zip(
                 ...saveOrderResponse?.map((responseOrder) => {
-                  return this.conceptsService.getConceptDetailsByUuid(
-                    responseOrder?.order?.concept?.uuid
-                  ).pipe(
-                    map((concept) => {
-                      let allocations = [];
+                  return this.conceptsService
+                    .getConceptDetailsByUuid(
+                      responseOrder?.order?.concept?.uuid
+                    )
+                    .pipe(
+                      map((concept) => {
+                        let allocations = [];
 
-                      if (concept?.setMembers?.length === 0) {
-                        allocations = [
-                          ...allocations,
-                          {
-                            order: {
-                              uuid: responseOrder?.order?.uuid,
-                            },
-                            container: {
-                              uuid: orderWithAllocation?.testAllocations[0]
-                                ?.container?.uuid,
-                            },
-                            sample: {
-                              uuid: responseOrder?.sample?.uuid,
-                            },
-                            concept: {
-                              uuid: concept.uuid,
-                            },
-                            label: responseOrder?.order?.orderNumber,
-                          },
-                        ];
-                      } else {
-                        each(concept?.setMembers, (setMember) => {
+                        if (concept?.setMembers?.length === 0) {
                           allocations = [
                             ...allocations,
                             {
@@ -175,55 +164,74 @@ export class SharedAddTestorderToSampleComponent implements OnInit {
                                 uuid: responseOrder?.sample?.uuid,
                               },
                               concept: {
-                                uuid: setMember.uuid,
+                                uuid: concept.uuid,
                               },
                               label: responseOrder?.order?.orderNumber,
                             },
                           ];
-                        });
-                      }
+                        } else {
+                          each(concept?.setMembers, (setMember) => {
+                            allocations = [
+                              ...allocations,
+                              {
+                                order: {
+                                  uuid: responseOrder?.order?.uuid,
+                                },
+                                container: {
+                                  uuid: orderWithAllocation?.testAllocations[0]
+                                    ?.container?.uuid,
+                                },
+                                sample: {
+                                  uuid: responseOrder?.sample?.uuid,
+                                },
+                                concept: {
+                                  uuid: setMember.uuid,
+                                },
+                                label: responseOrder?.order?.orderNumber,
+                              },
+                            ];
+                          });
+                        }
 
-                      const status = {
-                        sample: {
-                          uuid: orderWithAllocation?.sample?.uuid,
-                        },
-                        user: {
-                          uuid: this.currentUser?.uuid,
-                        },
-                        remarks: "added test",
-                        status: "ADDED_TEST",
-                        category: "ADDED_TEST",
-                      };
+                        const status = {
+                          sample: {
+                            uuid: orderWithAllocation?.sample?.uuid,
+                          },
+                          user: {
+                            uuid: this.currentUser?.uuid,
+                          },
+                          remarks: "added test",
+                          status: "ADDED_TEST",
+                          category: "ADDED_TEST",
+                        };
 
-                      let sampleAcceptStatusWithAllocations = {
-                        status: status,
-                        allocations: allocations,
-                      };
+                        let sampleAcceptStatusWithAllocations = {
+                          status: status,
+                          allocations: allocations,
+                        };
 
-                      return sampleAcceptStatusWithAllocations;
-                    })
-                  );
+                        return sampleAcceptStatusWithAllocations;
+                      })
+                    );
                 })
-              ).subscribe(
-                  ((conceptResponse: any) => {
-                    if(!conceptResponse?.error){
-                      zip(
-                        ...conceptResponse.map(
-                          (sampleAcceptStatusWithAllocations) => {
-                            return this.sampleService.acceptSampleAndCreateAllocations(
-                              sampleAcceptStatusWithAllocations
-                            );
-                          }
-                        )
-                      ).subscribe(
-                          (response) => {
-                          this.store.dispatch(
-                            loadSampleByUuid({ uuid: this.sample?.uuid })
-                          );
-                        });
-                    }
-                  })
-                );
+              ).subscribe((conceptResponse: any) => {
+                if (!conceptResponse?.error) {
+                  zip(
+                    ...conceptResponse.map(
+                      (sampleAcceptStatusWithAllocations) => {
+                        return this.sampleService.acceptSampleAndCreateAllocations(
+                          sampleAcceptStatusWithAllocations
+                        );
+                      }
+                    )
+                  ).subscribe((response) => {
+                    this.getOrderField();
+                    this.store.dispatch(
+                      loadSampleByUuid({ uuid: this.sample?.uuid })
+                    );
+                  });
+                }
+              });
             }
 
             this.saving = false;
@@ -234,5 +242,53 @@ export class SharedAddTestorderToSampleComponent implements OnInit {
     // 2. Save sample order
     // 3. Get concept details
     // 4. Set test allocations
+  }
+
+  onRemoveSampleOrder(e: Event, order: any) {
+    e.stopPropagation();
+    this.dialog
+      .open(SharedConfirmationComponent, {
+        width: "20%",
+        data: {
+          modalTitle: `Remove ${order?.order?.concept?.display}`,
+          modalMessage: `Confirm that you want to remove ${order?.order?.concept?.display} test from ${order?.sample?.label}`,
+          showRemarksInput: true,
+        },
+      })
+      .afterClosed()
+      .subscribe((response) => {
+        if (response.confirmed) {
+          const voidObject = {
+            uuid: order?.uuid,
+            voidReason: response?.remarks || "No reason provided",
+          };
+          this.orderService.voidOrderWithReason(voidObject).subscribe(
+            (response: any) => {
+              if(!response?.error && !response?.stackTrace){
+                console.log("==> Success: ",response)
+                this.store.dispatch(
+                  loadSampleByUuid({ uuid: this.sample?.uuid })
+                );
+              } else {
+                if(response?.error){
+                  this.errors = [
+                    ...this.errors,
+                    response?.error
+                  ]
+                } else {
+                  this.errors = [ 
+                    ...this.errors,
+                    {
+                      error: {
+                        message: response?.message
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          );
+        }
+      });
   }
 }

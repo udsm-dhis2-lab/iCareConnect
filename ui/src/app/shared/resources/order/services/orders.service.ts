@@ -90,7 +90,7 @@ export class OrdersService {
     return this.openMRSHttpClient.delete(`order/${uuid}`);
   }
 
-  voidOrderWithReason(order): Observable<any> {
+  voidOrderWithReason(order: {uuid: string, voidReason: string}): Observable<any> {
     const voidReason =
       order?.voidReason.length > 0 ? order?.voidReason : "No reason";
     return from(
