@@ -176,8 +176,8 @@ export class OrderResultsRendererComponent implements OnInit {
     this.updateConsultationOrder.emit();
   }
 
-  onDeleteTest(event: Event, labOrder): void {
-    event.stopPropagation();
+  onDeleteTest(e: Event, labOrder): void {
+    e.stopPropagation();
     // this.store.dispatch(deleteLabOrder({ uuid: labOrder?.uuid }));
     const confirmDialog = this.dialog.open(SharedConfirmationComponent, {
       width: "25%",
