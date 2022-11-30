@@ -1,4 +1,8 @@
-<div>
+<div
+  *ngIf="{
+    conceptsAttributesTypes: conceptsAttributesTypes$ | async
+  } as params"
+>
   <div class="row">
     <div class="col-12">
       <mat-tab-group>
@@ -33,6 +37,28 @@
                           [fields]="basicParametersFields"
                           (formUpdate)="onFormUpdate($event)"
                         ></app-form>
+
+                        <fieldset
+                          *ngIf="
+                            formData['datatype']?.value !==
+                            '8d4a48b6-c2cc-11de-8d13-0010c6dffd0f'
+                          "
+                        >
+                          <legend>Others</legend>
+                          <div *ngIf="params?.conceptsAttributesTypes">
+                            <app-manage-concept-attributes
+                              [conceptsAttributesTypes]="
+                                params?.conceptsAttributesTypes
+                              "
+                              [concept]="conceptBeingEdited"
+                              (attributesValues)="onGetAttributeValues($event)"
+                            ></app-manage-concept-attributes>
+                          </div>
+                          <mat-progress-bar
+                            mode="indeterminate"
+                            *ngIf="!params?.conceptsAttributesTypes"
+                          ></mat-progress-bar>
+                        </fieldset>
                         <div
                           *ngIf="
                             formData['datatype']?.value ===
@@ -46,6 +72,7 @@
                         </div>
                       </div>
                       <div class="col-lg-6 col-md-6 col-sx-12 col-sm-12">
+                        <!-- TODO: Use system settings to remove harcoded uuid -->
                         <app-form
                           *ngIf="
                             formData['datatype']?.value ===
@@ -78,6 +105,28 @@
                           [fields]="[unitsField]"
                           (formUpdate)="onFormUpdate($event)"
                         ></app-form>
+
+                        <fieldset
+                          *ngIf="
+                            formData['datatype']?.value ===
+                            '8d4a48b6-c2cc-11de-8d13-0010c6dffd0f'
+                          "
+                        >
+                          <legend>Others</legend>
+                          <div *ngIf="params?.conceptsAttributesTypes">
+                            <app-manage-concept-attributes
+                              [conceptsAttributesTypes]="
+                                params?.conceptsAttributesTypes
+                              "
+                              [concept]="conceptBeingEdited"
+                              (attributesValues)="onGetAttributeValues($event)"
+                            ></app-manage-concept-attributes>
+                          </div>
+                          <mat-progress-bar
+                            mode="indeterminate"
+                            *ngIf="!params?.conceptsAttributesTypes"
+                          ></mat-progress-bar>
+                        </fieldset>
                         <fieldset>
                           <legend>Codes</legend>
                           <div>
