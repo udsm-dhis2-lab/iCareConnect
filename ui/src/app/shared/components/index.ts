@@ -85,7 +85,7 @@ import { AttendProcedureOrderComponent } from "./attend-procedure-order/attend-p
 import { SharedBmiComponent } from "./shared-bmi/shared-bmi.component";
 import { PatientObservationsChartComponent } from "./patient-observations-chart/patient-observations-chart.component";
 import { ObservationChartTableComponent } from "./observation-chart-table/observation-chart-table.component";
-import { SharedConfirmationComponent } from "./shared-confirmation /shared-confirmation.component";
+import { SharedConfirmationComponent } from "./shared-confirmation/shared-confirmation.component";
 import { IpdFormsComponent } from "./ipd-forms/ipd-forms.component";
 import { SharedErrorComponent } from "./shared-error/shared-error.component";
 import { SharedConceptCreateComponent } from "./shared-concept-create/shared-concept-create.component";
