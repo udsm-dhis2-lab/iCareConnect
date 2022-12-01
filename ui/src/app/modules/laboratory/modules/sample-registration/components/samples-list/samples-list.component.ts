@@ -1,4 +1,5 @@
 import { Component, Input, OnInit } from "@angular/core";
+import { MatSelectChange } from "@angular/material/select";
 import { Observable } from "rxjs";
 import { map, tap } from "rxjs/operators";
 import { SamplesService } from "src/app/shared/services/samples.service";
@@ -16,7 +17,7 @@ export class SamplesListComponent implements OnInit {
   page: number;
   pageSize: number;
   errors: any[] = [];
-
+  pageCounts: any[] = [5, 10, 20, 25, 50, 100];
   constructor(private samplesService: SamplesService) {}
 
   ngOnInit(): void {

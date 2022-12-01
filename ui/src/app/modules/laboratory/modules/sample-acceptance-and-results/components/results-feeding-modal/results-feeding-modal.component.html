@@ -70,7 +70,11 @@
       *ngIf="errors?.length > 0"
       [errors]="errors"
     ></app-shared-error>
-    <mat-tab-group *ngIf="errors?.length == 0">
+    <mat-tab-group 
+      #tabGroup
+      *ngIf="errors?.length == 0"
+      (selectedTabChange)="tabSelection($event)"
+      >
       <mat-tab label="Results" *ngIf="dialogData?.actionType === 'Entry'">
         <div
           style="margin-top: 15px; overflow: auto"
@@ -2392,7 +2396,7 @@
           class="ml-2"
           mat-flat-button
           color="primary"
-          *ngIf="dialogData?.actionType === 'Entry'"
+          *ngIf="dialogData?.actionType === 'Entry' && selectedIndex === 0"
           (click)="onSaveAll($event, values, params?.currentSample)"
         >
           Save All

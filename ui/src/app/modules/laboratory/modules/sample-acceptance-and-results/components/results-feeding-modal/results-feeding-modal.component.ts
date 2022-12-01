@@ -39,6 +39,7 @@ import { Textbox } from "src/app/shared/modules/form/models/text-box.model";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
 import { TextArea } from "src/app/shared/modules/form/models/text-area.model";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
+import { MatTabChangeEvent } from "@angular/material/tabs";
 
 @Component({
   selector: "app-results-feeding-modal",
@@ -94,6 +95,7 @@ export class ResultsFeedingModalComponent implements OnInit {
   labSampleLoadingState$: Observable<boolean>;
   visitDetails$: Observable<any>;
   currentUser$: Observable<any>;
+  selectedIndex: number = 0;
 
   multipleResultsAttributeType$: Observable<any>;
   errors: any[] = [];
@@ -1107,4 +1109,8 @@ export class ResultsFeedingModalComponent implements OnInit {
       this.saveAllMessage = "Please feed results first";
     }
   }
+
+  tabSelection(matTabEvent: MatTabChangeEvent): void {
+    this.selectedIndex = matTabEvent.index;
+  };
 }
