@@ -78,7 +78,9 @@ export class MultipleItemsSelectionComponent implements OnInit {
           searchTerm: this.standardSearchTerm,
         })
         .pipe(
-          map((response) => response?.filter((item) => !item?.retired) || [])
+          map((response) => {
+            return response?.filter((item) => !item?.retired) || [];
+          })
         );
     } else {
       this.items$ = of(
