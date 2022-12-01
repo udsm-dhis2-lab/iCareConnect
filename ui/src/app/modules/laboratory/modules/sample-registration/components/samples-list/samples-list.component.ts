@@ -1,5 +1,6 @@
 import { Component, Input, OnInit } from "@angular/core";
 import { Observable } from "rxjs";
+import { map, tap } from "rxjs/operators";
 import { SamplesService } from "src/app/shared/services/samples.service";
 
 @Component({
@@ -12,27 +13,64 @@ export class SamplesListComponent implements OnInit {
   @Input() specimenSources: any[];
   @Input() codedSampleRejectionReasons: any[];
   samples$: Observable<any>;
-  page: number = 1;
-  pageSize: number = 10;
+  page: number;
+  pageSize: number;
+  errors: any[] = [];
+
   constructor(private samplesService: SamplesService) {}
 
   ngOnInit(): void {
+    this.page = 1;
+    this.pageSize = 10;
     this.getList();
   }
 
   getList(): void {
-    this.samples$ = this.samplesService.getSamplesByPaginationDetails(
-      { page: this.page, pageSize: this.pageSize },
-      null,
-      this.departments,
-      this.specimenSources,
-      this.codedSampleRejectionReasons
-    );
+    this.samples$ = this.samplesService
+      .getSamplesByPaginationDetails(
+        { page: this.page, pageSize: this.pageSize },
+        null,
+        this.departments,
+        this.specimenSources,
+        this.codedSampleRejectionReasons
+      )
+      .pipe(
+        tap((response: any) => {
+          if (response?.error || response.stackTrace) {
+            this.errors =
+              response?.error && !response?.stackTrace
+                ? [...this.errors, response?.error]
+                : response?.stackTrace
+                ? [
+                    ...this.errors,
+                    {
+                      error: {
+                        message: response?.message,
+                      },
+                    },
+                  ]
+                : [
+                    ...this.errors,
+                    {
+                      error: {
+                        message: "Unknown error occurred!",
+                      },
+                    },
+                  ];
+          }
+        })
+      );
   }
 
   onGetSamples(event: Event, action: string, pager: any): void {
     event.stopPropagation();
     this.page = action === "prev" ? this.page - 1 : this.page + 1;
+    this.getList();
+  }
+
+  onPageChange(event){
+    this.page = event.pageIndex + 1;
+    this.pageSize  = Number(event?.pageSize)
     this.getList();
   }
 }
