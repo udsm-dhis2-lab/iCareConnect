@@ -18,4 +18,13 @@ export class ConceptMappingsService {
       catchError((error) => of(error))
     );
   }
+
+  deleteConceptMapping(parentUuid: string, uuid: string): Observable<any> {
+    return from(
+      this.api.concept.deleteConceptMap(parentUuid, uuid, { purge: true })
+    ).pipe(
+      map((response) => response),
+      catchError((error) => of(error))
+    );
+  }
 }
