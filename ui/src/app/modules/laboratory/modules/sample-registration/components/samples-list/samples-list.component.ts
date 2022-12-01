@@ -1,4 +1,5 @@
 import { Component, Input, OnInit } from "@angular/core";
+import { MatSelectChange } from "@angular/material/select";
 import { Observable } from "rxjs";
 import { SamplesService } from "src/app/shared/services/samples.service";
 
@@ -14,6 +15,7 @@ export class SamplesListComponent implements OnInit {
   samples$: Observable<any>;
   page: number = 1;
   pageSize: number = 10;
+  pageCounts: any[] = [5, 10, 20, 25, 50, 100];
   constructor(private samplesService: SamplesService) {}
 
   ngOnInit(): void {
@@ -33,6 +35,13 @@ export class SamplesListComponent implements OnInit {
   onGetSamples(event: Event, action: string, pager: any): void {
     event.stopPropagation();
     this.page = action === "prev" ? this.page - 1 : this.page + 1;
+    this.getList();
+  }
+
+  getSelectedPageItemsCount(event: Event): void {
+    event.stopPropagation();
+    console.log(event);
+    this.pageSize = Number((event?.target as HTMLInputElement)?.value);
     this.getList();
   }
 }
