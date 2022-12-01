@@ -544,6 +544,7 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		newGetRequest = newGetRequest("icare/conceptreferenceterm", new Parameter("q", ""));
 		handle = handle(newGetRequest);
 		results = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
+		System.out.println(results);
 		maps = (List) results.get("results");
 		assertThat("Should return 11 reference terms", maps.size(), is(11));
 	}

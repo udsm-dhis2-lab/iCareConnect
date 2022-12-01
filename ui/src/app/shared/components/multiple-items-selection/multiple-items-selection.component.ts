@@ -37,10 +37,8 @@ export class MultipleItemsSelectionComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    console.log("selectedItems", this.selectedItems);
     this.currentSelectedItems =
       this.selectedItems?.filter((item) => !item?.retired) || [];
-    console.log("currentSelectedItems", this.currentSelectedItems);
     if (
       this.itemType &&
       this.itemType === "concept" &&
@@ -80,7 +78,9 @@ export class MultipleItemsSelectionComponent implements OnInit {
           searchTerm: this.standardSearchTerm,
         })
         .pipe(
-          map((response) => response?.filter((item) => !item?.retired) || [])
+          map((response) => {
+            return response?.filter((item) => !item?.retired) || [];
+          })
         );
     } else {
       this.items$ = of(

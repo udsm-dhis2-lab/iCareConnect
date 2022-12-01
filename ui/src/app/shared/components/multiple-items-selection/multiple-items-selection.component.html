@@ -65,7 +65,7 @@
       <li
         class="item-in-list"
         (click)="removeSelectedItem($event, item, items, itemType)"
-        *ngFor="let item of selectedItems"
+        *ngFor="let item of currentSelectedItems"
       >
         {{ item?.display }}
       </li>
