@@ -67,6 +67,19 @@
     </tbody>
   </table>
   <div class="d-flex justify-content-end">
+    <span class="mr-4 text-muted mt-1">
+      <select
+        class="item-count-selection"
+        (change)="getSelectedPageItemsCount($event)"
+      >
+        <option [value]="pageCount" *ngFor="let pageCount of pageCounts">
+          {{ pageCount }}
+        </option>
+      </select>
+    </span>
+    <span class="mr-4 text-muted mt-2" style="font-size: 1.2rem">
+      {{ params?.samples?.pager?.total }}
+    </span>
     <button
       mat-stroked-button
       [disabled]="
