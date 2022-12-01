@@ -241,7 +241,7 @@ export class Visit {
           order &&
           order.type === "testorder" &&
           !order?.dateStopped &&
-          !order?.previousOrder
+          !order?.previousOrder && !order?.voided
       )
       .map((order) => new LabOrder(order));
   }
