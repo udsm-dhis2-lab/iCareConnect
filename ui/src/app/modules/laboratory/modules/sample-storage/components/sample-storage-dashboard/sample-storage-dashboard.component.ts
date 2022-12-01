@@ -124,13 +124,11 @@ export class SampleStorageDashboardComponent implements OnInit {
   }
 
   onSearch(e) {
-    if (e) {
-      e.stopPropagation();
-      this.allSamples$ = this.store.select(getFormattedLabSamplesForTracking, {
-        department: this.selectedDepartment,
-        searchingText: this.searchingText,
-      });
-    }
+    this.searchingText = e;
+    this.allSamples$ = this.store.select(getFormattedLabSamplesForTracking, {
+      department: this.selectedDepartment,
+      searchingText: this.searchingText,
+    });
   }
 
   toggleSampleDetails(event: Event, sample: any): void {

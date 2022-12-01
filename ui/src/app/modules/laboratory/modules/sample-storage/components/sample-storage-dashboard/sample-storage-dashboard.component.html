@@ -26,6 +26,7 @@
           [allSamples]="sampleParams?.allSamples"
           [externalSystemsReferenceConceptUuid]="sampleParams?.externalSystemsReferenceConceptUuid"
           [LISConfigurations]="LISConfigurations"
+          (sampleSearch)="onSearch($event)"
           (dispose)="onDispose($event)"
         ></app-sample-disposal>
       </div>
