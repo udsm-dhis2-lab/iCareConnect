@@ -1,3 +1,4 @@
-import { StandardReportsComponent } from "./standard-reports/standard-reports.component";
+import { CustomReportsComponent } from "./custom-reports/custom-reports.component";
+import { LabReportsComponent } from "./lab-reports/lab-reports.component";
 
-export const components: any[] = [StandardReportsComponent];
+export const components: any[] = [LabReportsComponent, CustomReportsComponent];
