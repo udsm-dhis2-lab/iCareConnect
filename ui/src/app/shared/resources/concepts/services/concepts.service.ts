@@ -76,6 +76,19 @@ export class ConceptsService {
             response?.display?.indexOf(":") > -1
               ? response?.display?.split(":")[1]
               : response?.display,
+          names: response?.names?.map((name) => {
+            return {
+              ...name,
+              display:
+                name?.display?.indexOf(":") > -1
+                  ? name?.display?.split(":")[1]
+                  : name?.display,
+              name:
+                name?.display?.indexOf(":") > -1
+                  ? name?.display?.split(":")[1]
+                  : name?.display,
+            };
+          }),
           answers:
             response?.answers && response?.answers?.length > 0
               ? response?.answers.map((answer) => {
@@ -242,6 +255,15 @@ export class ConceptsService {
               result?.display?.indexOf(":") > -1
                 ? result?.display?.split(":")[1]
                 : result?.display,
+            names: result?.names?.filter((name) => {
+              return {
+                ...name,
+                display:
+                  name?.display?.indexOf(":") > -1
+                    ? name?.display?.split(":")[1]
+                    : name?.display,
+              };
+            }),
           };
         });
       }),

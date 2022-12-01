@@ -20,6 +20,8 @@ export class CodesSelectionComponent implements OnInit {
 
   selectedCodingSource: string;
   @Output() selectedCodesItems: EventEmitter<any[]> = new EventEmitter<any[]>();
+
+  errors: any[] = [];
   constructor(private conceptReferenceService: ReferenceTermsService) {}
 
   ngOnInit(): void {
@@ -73,5 +75,18 @@ export class CodesSelectionComponent implements OnInit {
             })
           );
         });
+  }
+
+  onDelete(event: Event, item: any): void {
+    event.stopPropagation();
+    console.log(item);
+    this.conceptReferenceService
+      .deleteConceptReferenceTerm(item?.uuid)
+      .subscribe((response) => {
+        if (response && !response?.error) {
+        } else {
+          this.errors = [...this.errors, response];
+        }
+      });
   }
 }
