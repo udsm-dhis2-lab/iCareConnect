@@ -63,7 +63,6 @@ public class SampleDAO extends BaseDAO<Sample> {
 		query.setParameter("endDate", endDate);
 		
 		return query.list();
-		
 	}
 	
 	public List<Visit> getPendingSampleCollectionVisits(Integer limit, Integer startIndex) {
@@ -80,8 +79,8 @@ public class SampleDAO extends BaseDAO<Sample> {
 	}
 	
 	public ListResult<Sample> getSamples(Date startDate, Date endDate, Pager pager, String locationUuid,
-	        String sampleCategory, String testCategory) {
-		
+	        String sampleCategory, String testCategory, String q) {
+		new Sample();
 		DbSession session = this.getSession();
 		String queryStr = "SELECT sp \n" + "FROM Sample sp \n";
 		
@@ -116,6 +115,16 @@ public class SampleDAO extends BaseDAO<Sample> {
 			}
 			queryStr += "sp IN(SELECT testalloc.sampleOrder.id.sample FROM TestAllocation testalloc WHERE testalloc IN (SELECT testallocstatus.testAllocation FROM TestAllocationStatus testallocstatus WHERE testallocstatus.category=:testCategory))";
 		}
+
+		if (q != null) {
+			if (!queryStr.contains("WHERE")) {
+				queryStr += " WHERE ";
+			} else {
+				queryStr += " AND ";
+			}
+			queryStr += "lower(sp.label) like lower(:q)";
+		}
+
 		if (testCategory == "Completed") {
 			if (!queryStr.contains("WHERE")) {
 				queryStr += " WHERE ";
@@ -143,6 +152,11 @@ public class SampleDAO extends BaseDAO<Sample> {
 		if (sampleCategory != null) {
 			query.setParameter("sampleCategory", sampleCategory);
 		}
+
+		if (q != null) {
+			query.setParameter("q", "%" + q.replace(" ", "%") + "%");
+		}
+
 		if (testCategory != null && testCategory != "Completed") {
 			query.setParameter("testCategory", testCategory);
 		}
@@ -155,11 +169,8 @@ public class SampleDAO extends BaseDAO<Sample> {
 		}
 		
 		ListResult<Sample> listResults = new ListResult();
-		
 		listResults.setPager(pager);
 		listResults.setResults(query.list());
-		
-		//
 		return listResults;
 	}
 	
