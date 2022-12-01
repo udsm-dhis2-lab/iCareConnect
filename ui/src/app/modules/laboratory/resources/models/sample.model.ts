@@ -440,6 +440,13 @@ export class LabSample {
     ) || [])[0];
   }
 
+  get disposedStatus(): any {
+    return (this.sample?.statuses?.filter(
+      (status) =>
+        status?.category === "DISPOSED" || status?.status === "DISPOSED"
+    ) || [])[0];
+  }
+
   get deliveredByStatus(): any {
     return (this.sample?.statuses?.filter(
       (status) =>
@@ -501,6 +508,7 @@ export class LabSample {
       collectedBy: this.collectedBy,
       authorizationInfo: this.authorizationInfo,
       priorityStatus: this.priorityStatus,
+      disposedStatus: this.disposedStatus,
       receivedOnStatus: this.receivedOnStatus,
       deliveredByStatus: this.deliveredByStatus,
       receivedByStatus: this.receivedByStatus,

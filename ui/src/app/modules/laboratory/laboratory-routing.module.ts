@@ -77,6 +77,13 @@ const routes: Routes = [
             (m) => m.SampleResultsModule
           ),
       },
+      {
+        path: "sample-storage",
+        loadChildren: () =>
+          import("./modules/sample-storage/sample-storage.module").then(
+            (m) => m.SampleStorageModule
+          ),
+      },
     ],
   },
 ];
