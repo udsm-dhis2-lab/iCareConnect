@@ -152,7 +152,10 @@ public class Sample extends BaseOpenmrsData implements java.io.Serializable, JSO
 		List<Map<String, Object>> orders = new ArrayList<Map<String, Object>>();
 		
 		for (SampleOrder sampleOrder : this.getSampleOrders()) {
-			orders.add(sampleOrder.toMap());
+			
+			if (!sampleOrder.getOrder().getVoided()) {
+				orders.add(sampleOrder.toMap());
+			}
 		}
 		
 		sampleObject.put("orders", orders);
