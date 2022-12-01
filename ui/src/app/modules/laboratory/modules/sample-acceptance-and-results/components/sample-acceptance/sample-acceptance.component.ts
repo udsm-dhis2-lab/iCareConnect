@@ -2,7 +2,7 @@ import { Component, Input, OnInit } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { Store } from "@ngrx/store";
 import { Observable } from "rxjs";
-import { take } from "rxjs/operators";
+import { map, take } from "rxjs/operators";
 import { SampleResultsPrintingComponent } from "src/app/modules/laboratory/components/sample-results-printing/sample-results-printing.component";
 import { SamplesService } from "src/app/modules/laboratory/resources/services/samples.service";
 import { SharedConfirmationComponent } from "src/app/shared/components/shared-confirmation /shared-confirmation.component";
@@ -89,72 +89,13 @@ export class SampleAcceptanceComponent implements OnInit {
       getFormattedLabSamplesLoadedState
     );
     this.labDepartments$ = this.store.select(getLabDepartments);
-    this.samplesAccepted$ = this.store.select(getAcceptedFormattedLabSamples, {
-      department: "",
-      searchingText: this.searchingText,
-    });
-    this.samplesToAccept$ = this.store.select(getFormattedLabSamplesToAccept, {
-      department: "",
-      searchingText: this.searchingText,
-    });
-
-    this.samplesToFeedResults$ = this.store.select(
-      getFormattedLabSamplesToFeedResults,
-      {
-        department: "",
-        searchingText: this.searchingText,
-      }
-    );
-
     this.providerDetails$ = this.store.select(getProviderDetails);
 
     this.settingLabSampleStatus$ = this.store.select(
       getSettingLabSampleStatusState
     );
-    this.allSamples$ = this.store.select(getFormattedLabSamplesForTracking, {
-      department: "",
-      searchingText: this.searchingText,
-    });
 
-    this.worklist$ = this.store.select(getWorkList, {
-      userUuid: this.LISConfigurations?.isLis ? undefined : this.userUuid,
-      department: "",
-      searchingText: this.searchingText,
-    });
-
-    this.completedSamples$ = this.store.select(getCompletedLabSamples, {
-      department: "",
-      searchingText: this.searchingText,
-    });
-
-    this.patientsWithCompletedSamples$ = this.store.select(
-      getPatientsWithCompletedLabSamples,
-      {
-        department: this.selectedDepartment,
-        searchingText: this.searchingText,
-        isLIS: this.LISConfigurations?.isLIS,
-      }
-    );
-
-    this.rejectedSamples$ = this.store.select(getFormattedRejectedLabSamples, {
-      department: this.selectedDepartment,
-      searchingText: this.searchingText,
-    });
-
-    this.acceptedSamples$ = this.store.select(
-      getFormattedAcceptedLabSamples(
-        this.selectedDepartment,
-        this.searchingText
-      )
-    );
-
-    this.samplesWithResults$ = this.store.select(
-      getLabSamplesWithResults(this.selectedDepartment, this.searchingText)
-    );
-
-    this.patientsWithResults$ = this.store.select(
-      getPatientWithResults(this.selectedDepartment, this.searchingText)
-    );
+    this.getSamples()
   }
 
   onToggleViewSampleDetails(event: Event, sample: any): void {
@@ -302,72 +243,26 @@ export class SampleAcceptanceComponent implements OnInit {
 
   setDepartment(department) {
     this.selectedDepartment = department;
-    this.allSamples$ = this.store.select(getFormattedLabSamplesForTracking, {
-      department: this.selectedDepartment,
-      searchingText: this.searchingText,
-    });
 
-    this.samplesToFeedResults$ = this.store.select(
-      getFormattedLabSamplesToFeedResults,
-      {
-        department: this.selectedDepartment,
-        searchingText: this.searchingText,
-      }
-    );
-
-    this.samplesAccepted$ = this.store.select(getAcceptedFormattedLabSamples, {
-      department: this.selectedDepartment,
-      searchingText: this.searchingText,
-    });
-    this.samplesToAccept$ = this.store.select(getFormattedLabSamplesToAccept, {
-      department: this.selectedDepartment,
-      searchingText: this.searchingText,
-    });
-
-    this.worklist$ = this.store.select(getWorkList, {
-      userUuid: this.userUuid,
-      department: this.selectedDepartment,
-      searchingText: this.searchingText,
-    });
-
-    this.completedSamples$ = this.store.select(getCompletedLabSamples, {
-      department: this.selectedDepartment,
-      searchingText: this.searchingText,
-    });
-    this.patientsWithCompletedSamples$ = this.store.select(
-      getPatientsWithCompletedLabSamples,
-      {
-        department: this.selectedDepartment,
-        searchingText: this.searchingText,
-      }
-    );
-    this.rejectedSamples$ = this.store.select(getFormattedRejectedLabSamples, {
-      department: this.selectedDepartment,
-      searchingText: this.searchingText,
-    });
-    this.acceptedSamples$ = this.store.select(
-      getFormattedAcceptedLabSamples(
-        this.selectedDepartment,
-        this.searchingText
-      )
-    );
-
-    this.samplesWithResults$ = this.store.select(
-      getLabSamplesWithResults(this.selectedDepartment, this.searchingText)
-    );
-
-    this.patientsWithResults$ = this.store.select(
-      getPatientWithResults(this.selectedDepartment, this.searchingText)
-    );
+      this.getSamples();
   }
 
   onSearch(e) {
     if (e) {
       e.stopPropagation();
-      this.allSamples$ = this.store.select(getFormattedLabSamplesForTracking, {
+      this.getSamples()
+    }
+  }
+
+  getSamples(){
+    this.allSamples$ = this.store.select(getFormattedLabSamplesForTracking, {
         department: this.selectedDepartment,
         searchingText: this.searchingText,
-      });
+      }).pipe(
+        map((samples) => {
+          return samples.filter((s) => !s.disposed);
+        })
+      );;
 
       this.samplesToFeedResults$ = this.store.select(
         getFormattedLabSamplesToFeedResults,
@@ -375,7 +270,11 @@ export class SampleAcceptanceComponent implements OnInit {
           department: this.selectedDepartment,
           searchingText: this.searchingText,
         }
-      );
+      ).pipe(
+        map((samples) => {
+          return samples.filter((s) => !s.disposed);
+        })
+      );;
 
       this.samplesAccepted$ = this.store.select(
         getAcceptedFormattedLabSamples,
@@ -383,30 +282,49 @@ export class SampleAcceptanceComponent implements OnInit {
           department: this.selectedDepartment,
           searchingText: this.searchingText,
         }
-      );
+      ).pipe(
+        map((samples) => {
+          return samples.filter((s) => !s.disposed);
+        })
+      );;
       this.samplesToAccept$ = this.store.select(
         getFormattedLabSamplesToAccept,
         {
           department: this.selectedDepartment,
           searchingText: this.searchingText,
         }
-      );
+      ).pipe(
+        map((samples) => {
+          return samples.filter((s) => !s.disposed);
+        })
+      );;
 
-      this.worklist$ = this.store.select(getWorkList, {
-        userUuid: this.userUuid,
-        department: this.selectedDepartment,
-        searchingText: this.searchingText,
-      });
+      this.worklist$ = this.store
+        .select(getWorkList, {
+          userUuid: this.LISConfigurations?.isLis ? undefined : this.userUuid,
+          department: this.selectedDepartment,
+          searchingText: this.searchingText,
+        })
+        .pipe(
+          map((samples) => {
+            return samples.filter((s) => !s.disposed);
+          })
+        );;
 
       this.completedSamples$ = this.store.select(getCompletedLabSamples, {
-        department: this.selectedDepartment,
+        department: this.selectedDepartment || "",
         searchingText: this.searchingText,
-      });
+      }).pipe(
+        map((samples) => {
+          return samples.filter((s) => !s.disposed);
+        })
+      );
       this.patientsWithCompletedSamples$ = this.store.select(
         getPatientsWithCompletedLabSamples,
         {
           department: this.selectedDepartment,
           searchingText: this.searchingText,
+          isLIS: this.LISConfigurations?.isLIS,
         }
       );
       this.rejectedSamples$ = this.store.select(
@@ -415,22 +333,33 @@ export class SampleAcceptanceComponent implements OnInit {
           department: this.selectedDepartment,
           searchingText: this.searchingText,
         }
-      );
+      ).pipe(
+        map((samples) => {
+          return samples.filter((s) => !s.disposed);
+        })
+      );;
       this.acceptedSamples$ = this.store.select(
         getFormattedAcceptedLabSamples(
           this.selectedDepartment,
           this.searchingText
         )
-      );
+      ).pipe(
+        map((samples) => {
+          return samples.filter((s) => !s.disposed);
+        })
+      );;
 
       this.samplesWithResults$ = this.store.select(
         getLabSamplesWithResults(this.selectedDepartment, this.searchingText)
-      );
+      ).pipe(
+        map((samples) => {
+          return samples.filter((s) => !s.disposed);
+        })
+      );;
 
       this.patientsWithResults$ = this.store.select(
         getPatientWithResults(this.selectedDepartment, this.searchingText)
       );
-    }
   }
 
   getSamplesData(): void {
@@ -453,50 +382,9 @@ export class SampleAcceptanceComponent implements OnInit {
     }
     this.searchingText = "";
     this.selectedDepartment = "";
-    this.allSamples$ = this.store.select(getFormattedLabSamplesForTracking, {
-      department: this.selectedDepartment,
-      searchingText: this.searchingText,
-    });
 
-    this.samplesToFeedResults$ = this.store.select(
-      getFormattedLabSamplesToFeedResults,
-      {
-        department: this.selectedDepartment,
-        searchingText: this.searchingText,
-      }
-    );
+    this.getSamples();
 
-    this.samplesAccepted$ = this.store.select(getAcceptedFormattedLabSamples, {
-      department: this.selectedDepartment,
-      searchingText: this.searchingText,
-    });
-    this.samplesToAccept$ = this.store.select(getFormattedLabSamplesToAccept, {
-      department: this.selectedDepartment,
-      searchingText: this.searchingText,
-    });
-
-    this.worklist$ = this.store.select(getWorkList, {
-      userUuid: this.userUuid,
-      department: this.selectedDepartment,
-      searchingText: this.searchingText,
-    });
-
-    this.completedSamples$ = this.store.select(getCompletedLabSamples, {
-      department: this.selectedDepartment,
-      searchingText: this.searchingText,
-    });
-    this.patientsWithCompletedSamples$ = this.store.select(
-      getPatientsWithCompletedLabSamples,
-      {
-        department: this.selectedDepartment,
-        searchingText: this.searchingText,
-      }
-    );
-
-    this.rejectedSamples$ = this.store.select(getFormattedRejectedLabSamples, {
-      department: this.selectedDepartment,
-      searchingText: this.searchingText,
-    });
   }
 
   onResultsReview(event: Event, sample, providerDetails): void {
