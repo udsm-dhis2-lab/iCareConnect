@@ -13,6 +13,7 @@ import {
 
 import { omit, uniqBy } from "lodash";
 import { Observable } from "rxjs";
+import { ConceptMappingsService } from "src/app/core/services/concept-mappings.service";
 
 @Component({
   selector: "app-parameters",
@@ -55,9 +56,12 @@ export class ParametersComponent implements OnInit {
   showAttributes: boolean = true;
 
   errors: any[] = [];
+
+  selectedConceptDetails$: Observable<any>;
   constructor(
     private conceptService: ConceptsService,
-    private conceptReferenceService: ReferenceTermsService
+    private conceptReferenceService: ReferenceTermsService,
+    private conceptMappingService: ConceptMappingsService
   ) {}
 
   ngOnInit(): void {
@@ -82,12 +86,11 @@ export class ParametersComponent implements OnInit {
     this.selectedAnswers = selectedAnswers;
   }
 
-  onDelete(event: Event, item: any): void {
+  onDeleteMapping(event: Event, item: any): void {
     event.stopPropagation();
-    console.log(item);
-    this.conceptReferenceService
-      .deleteConceptReferenceTerm(item?.uuid)
-      .subscribe((response) => {
+    this.conceptMappingService
+      .deleteConceptMapping(item?.conceptUuid, item?.mappingUuid)
+      .subscribe((response: any) => {
         if (response && !response?.error) {
           this.onGetSelectedParameter(this.selectedParameter);
         } else {
@@ -424,28 +427,32 @@ export class ParametersComponent implements OnInit {
     this.parameterUuid = selectedParameter?.uuid;
     this.selectedParameter = selectedParameter;
     this.conceptsAttributesTypes$ = this.conceptService.getConceptsAttributes();
-    this.conceptService
-      .getConceptDetailsByUuid(
-        this.parameterUuid,
-        "custom:(uuid,display,datatype,set,retired,descriptions,name,names,setMembers:(uuid,display),conceptClass:(uuid,display),answers:(uuid,display),attributes:(uuid,display,value,attributeType:(uuid,display)),mappings:(conceptReferenceTerm:(uuid,display,retired,conceptSource:(uuid,display))))"
-      )
-      .subscribe((response) => {
-        if (response) {
-          this.conceptBeingEdited = response;
-          this.selectedCodeItems =
-            response?.mappings.map(
-              (mapping) => mapping?.conceptReferenceTerm
-            ) || [];
-          this.selectedCodingSource =
-            response?.mappings[0]?.conceptReferenceTerm?.conceptSource;
-          this.createBasicParametersFields(response);
-          this.createUnitField();
-          this.createCodesMappingSourceField(response?.mappings);
-          this.createCodeField([]);
-          this.selectedAnswers = response?.answers;
-          this.createLowAndHighNormalFields(response);
-        }
-      });
+    this.selectedConceptDetails$ = this.conceptService.getConceptDetailsByUuid(
+      this.parameterUuid,
+      "custom:(uuid,display,datatype,set,retired,descriptions,name,names,setMembers:(uuid,display),conceptClass:(uuid,display),answers:(uuid,display),attributes:(uuid,display,value,attributeType:(uuid,display)),mappings:(uuid,conceptReferenceTerm:(uuid,display,retired,conceptSource:(uuid,display))))"
+    );
+
+    this.selectedConceptDetails$.subscribe((response) => {
+      if (response) {
+        this.conceptBeingEdited = response;
+        this.selectedCodeItems =
+          response?.mappings.map((mapping) => {
+            return {
+              ...mapping?.conceptReferenceTerm,
+              mappingUuid: mapping?.uuid,
+              conceptUuid: this.parameterUuid,
+            };
+          }) || [];
+        this.selectedCodingSource =
+          response?.mappings[0]?.conceptReferenceTerm?.conceptSource;
+        this.createBasicParametersFields(response);
+        this.createUnitField();
+        this.createCodesMappingSourceField(response?.mappings);
+        this.createCodeField([]);
+        this.selectedAnswers = response?.answers;
+        this.createLowAndHighNormalFields(response);
+      }
+    });
   }
 
   resetFields() {

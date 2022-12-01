@@ -1,6 +1,7 @@
 <div
   *ngIf="{
-    conceptsAttributesTypes: conceptsAttributesTypes$ | async
+    conceptsAttributesTypes: conceptsAttributesTypes$ | async,
+    selectedConceptDetails: selectedConceptDetails$ | async
   } as params"
 >
   <div class="row">
@@ -134,6 +135,7 @@
                           <legend>Codes</legend>
                           <div>
                             <table
+                              *ngIf="params?.selectedConceptDetails"
                               class="table"
                               style="max-height: 120; overflow: auto"
                             >
@@ -159,8 +161,12 @@
                                       </button>
                                       <mat-menu #menu="matMenu">
                                         <button
-                                          [disabled]="item?.retired"
-                                          (click)="onDelete($event, item)"
+                                          [disabled]="
+                                            item?.retired || !item?.mappingUuid
+                                          "
+                                          (click)="
+                                            onDeleteMapping($event, item)
+                                          "
                                           mat-menu-item
                                         >
                                           <mat-icon>delete</mat-icon>
