@@ -32,6 +32,7 @@ export class ParametersComponent implements OnInit {
 
   saving: boolean = false;
   codedOptions: any[];
+  selectedParameter: any;
   parameterUuid: string;
 
   selectedAnswers: any[] = [];
@@ -52,6 +53,8 @@ export class ParametersComponent implements OnInit {
   conceptsAttributesTypes$: Observable<any>;
   attributesValues: any[];
   showAttributes: boolean = true;
+
+  errors: any[] = [];
   constructor(
     private conceptService: ConceptsService,
     private conceptReferenceService: ReferenceTermsService
@@ -77,6 +80,20 @@ export class ParametersComponent implements OnInit {
 
   onGetSelectedAnswers(selectedAnswers: any[]): void {
     this.selectedAnswers = selectedAnswers;
+  }
+
+  onDelete(event: Event, item: any): void {
+    event.stopPropagation();
+    console.log(item);
+    this.conceptReferenceService
+      .deleteConceptReferenceTerm(item?.uuid)
+      .subscribe((response) => {
+        if (response && !response?.error) {
+          this.onGetSelectedParameter(this.selectedParameter);
+        } else {
+          this.errors = [...this.errors, response];
+        }
+      });
   }
 
   createLowAndHighNormalFields(data?: any): void {
@@ -405,12 +422,12 @@ export class ParametersComponent implements OnInit {
 
   onGetSelectedParameter(selectedParameter: ConceptGetFull): void {
     this.parameterUuid = selectedParameter?.uuid;
-
+    this.selectedParameter = selectedParameter;
     this.conceptsAttributesTypes$ = this.conceptService.getConceptsAttributes();
     this.conceptService
       .getConceptDetailsByUuid(
         this.parameterUuid,
-        "custom:(uuid,display,datatype,set,retired,descriptions,name,names,setMembers:(uuid,display),conceptClass:(uuid,display),answers:(uuid,display),attributes:(uuid,display,value,attributeType:(uuid,display)),mappings:(conceptReferenceTerm:(uuid,display,conceptSource:(uuid,display))))"
+        "custom:(uuid,display,datatype,set,retired,descriptions,name,names,setMembers:(uuid,display),conceptClass:(uuid,display),answers:(uuid,display),attributes:(uuid,display,value,attributeType:(uuid,display)),mappings:(conceptReferenceTerm:(uuid,display,retired,conceptSource:(uuid,display))))"
       )
       .subscribe((response) => {
         if (response) {
