@@ -37,10 +37,8 @@ export class MultipleItemsSelectionComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    console.log("selectedItems", this.selectedItems);
     this.currentSelectedItems =
       this.selectedItems?.filter((item) => !item?.retired) || [];
-    console.log("currentSelectedItems", this.currentSelectedItems);
     if (
       this.itemType &&
       this.itemType === "concept" &&
