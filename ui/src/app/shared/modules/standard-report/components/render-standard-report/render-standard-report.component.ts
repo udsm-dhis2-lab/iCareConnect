@@ -1,4 +1,6 @@
 import { Component, Input, OnInit } from "@angular/core";
+import { Observable } from "rxjs";
+import { DatasetReportsService } from "../../services/dataset-reports.service";
 
 @Component({
   selector: "lib-render-standard-report",
@@ -7,7 +9,15 @@ import { Component, Input, OnInit } from "@angular/core";
 })
 export class RenderStandardReportComponent implements OnInit {
   @Input() report: any;
-  constructor() {}
+  @Input() parameters: any;
+  evaluatedDataSetsReport$: Observable<any>;
+  constructor(private datasetReportService: DatasetReportsService) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.evaluatedDataSetsReport$ =
+      this.datasetReportService.getEvaluatedDatasetReport(
+        this.report?.queries?.map((query) => query?.uuid),
+        this.parameters
+      );
+  }
 }
