@@ -42,6 +42,7 @@ export class SampleDisposalComponent implements OnInit {
   ngOnInit(): void {}
 
   onSearch(e) {
+    e.stopPropagation();
     this.sampleSearch.emit(this.searchingText);
   }
 
