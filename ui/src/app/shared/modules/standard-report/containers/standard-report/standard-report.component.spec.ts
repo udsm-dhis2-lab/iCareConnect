@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { StandardReportsComponent } from './standard-reports.component';
+import { StandardReportComponent } from './standard-report.component';
 
-describe('StandardReportsComponent', () => {
-  let component: StandardReportsComponent;
-  let fixture: ComponentFixture<StandardReportsComponent>;
+describe('StandardReportComponent', () => {
+  let component: StandardReportComponent;
+  let fixture: ComponentFixture<StandardReportComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ StandardReportsComponent ]
+      declarations: [ StandardReportComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(StandardReportsComponent);
+    fixture = TestBed.createComponent(StandardReportComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
