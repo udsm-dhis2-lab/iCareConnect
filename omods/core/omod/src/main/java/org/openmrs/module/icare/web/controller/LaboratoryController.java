@@ -214,7 +214,7 @@ public class LaboratoryController {
 	        @RequestParam(value = "location", required = false) String locationUuid,
 	        @RequestParam(value = "sampleCategory", required = false) String sampleCategory,
 	        @RequestParam(value = "testCategory", required = false) String testCategory,
-			@RequestParam(value = "q", required = false) String q) throws ParseException {
+	        @RequestParam(value = "q", required = false) String q) throws ParseException {
 		
 		Date start = null;
 		Date end = null;
