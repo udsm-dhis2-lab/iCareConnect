@@ -179,6 +179,7 @@ export class SamplesService {
   getSamplesByPaginationDetails(
     paginationParameters: { page: number; pageSize: number },
     dates?: { startDate: string; endDate: string },
+    searchText?: string,
     departments?: any[],
     specimenSources?: any[],
     codedSampleRejectionReasons?: any[]
@@ -195,9 +196,15 @@ export class SamplesService {
       ];
     }
 
-    if (dates && dates?.startDate) {
-      queryParams = [...queryParams, `startDate=${dates?.startDate}`];
+    if (searchText && searchText.length > 0){
+      queryParams = [
+        ...queryParams,
+        `q=${searchText}`
+      ]
     }
+      if (dates && dates?.startDate) {
+        queryParams = [...queryParams, `startDate=${dates?.startDate}`];
+      }
 
     if (dates && dates?.endDate) {
       queryParams = [...queryParams, `endDate=${dates?.endDate}`];

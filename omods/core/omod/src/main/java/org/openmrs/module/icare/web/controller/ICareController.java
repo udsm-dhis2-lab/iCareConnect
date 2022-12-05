@@ -393,12 +393,15 @@ public class ICareController {
 			Map<String, Object> conceptReferenceTermMap = new HashMap<String, Object>();
 			conceptReferenceTermMap.put("uuid", conceptReferenceTerm.getUuid().toString());
 			conceptReferenceTermMap.put("display", conceptReferenceTerm.getName().toString());
+			conceptReferenceTermMap.put("retired", conceptReferenceTerm.getRetired().booleanValue());
 			conceptReferenceTermMap.put("code", conceptReferenceTerm.getCode());
+			conceptReferenceTermMap.put("name", conceptReferenceTerm.getName());
 
 //			Source details
 			Map<String, Object> sourceDetails = new HashMap<String, Object>();
 			sourceDetails.put("uuid", conceptReferenceTerm.getConceptSource().getUuid().toString() );
 			sourceDetails.put("name", conceptReferenceTerm.getConceptSource().getName().toString() );
+			sourceDetails.put("retired", conceptReferenceTerm.getConceptSource().getRetired().booleanValue() );
 			conceptReferenceTermMap.put("source", sourceDetails);
 			conceptReferenceTermsList.add(conceptReferenceTermMap);
 		}
@@ -415,6 +418,7 @@ public class ICareController {
 			Map<String, Object> conceptSet = new HashMap<String, Object>();
 			conceptSet.put("uuid", conceptSets.getConceptSet().getUuid());
 			conceptSet.put("display", conceptSets.getConceptSet().getDisplayString());
+			conceptSet.put("retired", conceptSets.getConceptSet().getRetired().booleanValue());
 			conceptSetsList.add(conceptSet);
 		}
 		Map<String, Object> results = new HashMap<>();

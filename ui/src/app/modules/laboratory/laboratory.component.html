@@ -155,6 +155,21 @@
           </mat-chip>
           <mat-chip
             class="w-20"
+            *ngIf="
+              params?.privileges &&
+              params?.privileges['Laboratory Orders'] &&
+              params?.LISConfigurations?.isLIS
+            "
+            routerLinkActive="active-route"
+            (click)="changeRoute($event, 'sample-storage', true)"
+            [ngClass]="{
+              'active-route': currentRoutePath === 'sample-storage'
+            }"
+          >
+            Sample Storage & Disposal
+          </mat-chip>
+          <mat-chip
+            class="w-20"
             routerLinkActive="active-route"
             (click)="changeRoute($event, 'settings', true)"
             [ngClass]="{
