@@ -1,6 +1,7 @@
 <div
   *ngIf="{
-    conceptsAttributesTypes: conceptsAttributesTypes$ | async
+    conceptsAttributesTypes: conceptsAttributesTypes$ | async,
+    selectedConceptDetails: selectedConceptDetails$ | async
   } as params"
 >
   <div class="row">
@@ -29,6 +30,9 @@
                     </div>
                   </div>
                   <div>
+                    <div *ngIf="errors && errors?.length > 0">
+                      <app-shared-error [errors]="errors"></app-shared-error>
+                    </div>
                     <div class="h4 text-left">New Parameter</div>
                     <hr />
                     <div class="row">
@@ -130,6 +134,50 @@
                         <fieldset>
                           <legend>Codes</legend>
                           <div>
+                            <table
+                              *ngIf="params?.selectedConceptDetails"
+                              class="table"
+                              style="max-height: 120; overflow: auto"
+                            >
+                              <tbody>
+                                <ng-container
+                                  *ngFor="let item of selectedCodeItems"
+                                >
+                                  <tr
+                                    [ngClass]="{
+                                      'retired-reference-term': item?.retired
+                                    }"
+                                  >
+                                    <td>
+                                      {{ item?.display }}
+                                    </td>
+                                    <td>
+                                      <button
+                                        mat-icon-button
+                                        [matMenuTriggerFor]="menu"
+                                        aria-label="Codes' deletion"
+                                      >
+                                        <mat-icon>more_vert</mat-icon>
+                                      </button>
+                                      <mat-menu #menu="matMenu">
+                                        <button
+                                          [disabled]="
+                                            item?.retired || !item?.mappingUuid
+                                          "
+                                          (click)="
+                                            onDeleteMapping($event, item)
+                                          "
+                                          mat-menu-item
+                                        >
+                                          <mat-icon>delete</mat-icon>
+                                          <span>Delete</span>
+                                        </button>
+                                      </mat-menu>
+                                    </td>
+                                  </tr>
+                                </ng-container>
+                              </tbody>
+                            </table>
                             <app-form
                               [fields]="[codesMappingsSourceField]"
                               (formUpdate)="onFormUpdateForSource($event)"

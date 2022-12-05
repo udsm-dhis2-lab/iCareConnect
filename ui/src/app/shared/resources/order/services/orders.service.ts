@@ -90,6 +90,24 @@ export class OrdersService {
     return this.openMRSHttpClient.delete(`order/${uuid}`);
   }
 
+  voidOrderWithReason(order: {uuid: string, voidReason: string}): Observable<any> {
+    const voidReason =
+      order?.voidReason.length > 0 ? order?.voidReason : "No reason";
+    return from(
+      this.openMRSHttpClient.post(`icare/voidorder`, {
+        uuid: order?.uuid,
+        voidReason: voidReason,
+      })
+    ).pipe(
+      map((order) => {
+        return order;
+      }),
+      catchError((err) => {
+        return of(err);
+      })
+    );
+  }
+
   createOrdersViaCreatingEncounter(encounter): Observable<any> {
     return this.openMRSHttpClient.post(`encounter`, encounter).pipe(
       map((response) => response),

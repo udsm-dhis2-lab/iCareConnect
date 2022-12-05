@@ -218,7 +218,7 @@ export class StandardConceptCreationComponent implements OnInit {
     this.conceptService
       .getConceptDetailsByUuid(
         concept?.uuid,
-        "custom:(uuid,display,datatype,set,retired,descriptions,name,names,setMembers:(uuid,display),conceptClass:(uuid,display),answers:(uuid,display),mappings:(conceptReferenceTerm:(uuid,display,conceptSource:(uuid,display))))"
+        "custom:(uuid,display,datatype,set,retired,descriptions,name,names,setMembers:(uuid,display),conceptClass:(uuid,display),answers:(uuid,display),mappings:(uuid,conceptReferenceTerm:(uuid,display,conceptSource:(uuid,display))))"
       )
       .subscribe((response) => {
         if (response) {
@@ -226,9 +226,13 @@ export class StandardConceptCreationComponent implements OnInit {
           this.editingSet = true;
           this.readyToCollectCodes = false;
           this.selectedCodingItems =
-            response?.mappings.map(
-              (mapping) => mapping?.conceptReferenceTerm
-            ) || [];
+            response?.mappings.map((mapping) => {
+              return {
+                ...mapping?.conceptReferenceTerm,
+                mappingUuid: mapping?.uuid,
+                conceptUuid: concept?.uuid,
+              };
+            }) || [];
           this.mappings = response?.mappings;
           setTimeout(() => {
             this.editingSet = false;

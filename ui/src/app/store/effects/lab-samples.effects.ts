@@ -522,6 +522,11 @@ export class LabSamplesEffects {
                   priorityStatus: (sample?.statuses?.filter(
                     (status) => status?.remarks === "PRIORITY"
                   ) || [])[0],
+                  disposedStatus: (sample?.statuses?.filter(
+                    (status) =>
+                      status?.category === "DISPOSED" ||
+                      status?.status === "DISPOSED"
+                  ) || [])[0],
                   receivedOnStatus: (sample?.statuses?.filter(
                     (status) =>
                       status?.category === "RECEIVED_ON" ||
@@ -721,6 +726,19 @@ export class LabSamplesEffects {
                       (status) => status?.category === "TRANSPORT_TEMPERATURE"
                     ) || [])[0],
                   ordersWithResults: getOrdersWithResults(sample?.orders),
+                  disposed:
+                    (_.filter(sample?.statuses, { status: "DISPOSED" }) || [])
+                      ?.length > 0
+                      ? true
+                      : false,
+                  disposedAt: (_.filter(sample?.statuses, {
+                    status: "DISPOSED",
+                  }) || [])[0]?.timestamp,
+                  disposedBy: formatUserChangedStatus(
+                    (_.filter(sample?.statuses, {
+                      status: "DISPOSED",
+                    }) || [])[0]
+                  ),
                   accepted:
                     (_.filter(sample?.statuses, { status: "ACCEPTED" }) || [])
                       ?.length > 0
