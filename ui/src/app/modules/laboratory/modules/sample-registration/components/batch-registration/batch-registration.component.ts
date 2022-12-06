@@ -25,9 +25,11 @@ export class BatchRegistrationComponent implements OnInit {
   addFixedField: Dropdown;
   addStaticField: Dropdown;
   batchSetField: Textbox;
-  batchSetDescription: Textbox;
   existingBatchsetField: TextArea;
   selectedField: Dropdown;
+  batchNameField: Textbox;
+  batchDescription: TextArea;
+  batchsetNameField: Textbox;
 
   constructor() {}
 
@@ -47,6 +49,7 @@ export class BatchRegistrationComponent implements OnInit {
       label: "Select fixed field",
       options: [],
       shouldHaveLiveSearchForDropDownFields: true,
+      multiple: true
     });
 
     this.addStaticField = new Dropdown({
@@ -55,18 +58,19 @@ export class BatchRegistrationComponent implements OnInit {
       label: "Select static field",
       options: [],
       shouldHaveLiveSearchForDropDownFields: true,
+      multiple: true
     });
 
-    this.batchSetField = new Textbox({
-      id: "batchSetName",
-      key: "batchSetName",
-      label: "Batch Set Name",
+    this.batchNameField = new Textbox({
+      id: "batchName",
+      key: "batchName",
+      label: "Batch Name",
     });
 
-    this.batchSetDescription = new TextArea({
-      id: "batchSetDescription",
-      key: "batchSetDescription",
-      label: "Batchset Description",
+    this.batchDescription = new TextArea({
+      id: "batchDescription",
+      key: "batchDescription",
+      label: "Batch Description",
     });
 
     this.existingBatchsetField = new Dropdown({
@@ -75,6 +79,12 @@ export class BatchRegistrationComponent implements OnInit {
       label: "Select exising batch set",
       options: [],
       shouldHaveLiveSearchForDropDownFields: true,
+    });
+
+    this.batchsetNameField = new Textbox({
+      id: "batchSetName",
+      key: "batchSetName",
+      label: "Type Batchset Name"
     });
   }
 
