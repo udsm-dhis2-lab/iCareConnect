@@ -277,7 +277,7 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		
 		//System.out.println(Context.getVisitService().getVisitByUuid("d9c1d8ac-2b8e-427f-804d-b858c52e6f11").getLocation().getUuid());
 		handleGet = handle(newGetRequest);
-
+		
 		//System.out.println(Context.getVisitService().getVisitByUuid("d9c1d8ac-2b8e-427f-804d-b858c52e6f11").getLocation().getUuid());
 		sampleResults = (new ObjectMapper()).readValue(handleGet.getContentAsString(), Map.class);
 		
@@ -288,10 +288,10 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		assertThat("Page Size is 2", (Integer) pagerObject.get("pageSize") == 50, is(true));
 		assertThat("Page is 2", (Integer) pagerObject.get("page") == 1, is(true));
 		assertThat("List by location count is 1", ((List) sampleResults.get("results")).size() == 0, is(true));
-
+		
 		//	Search test section
-		newGetRequest = newGetRequest("lab/samples", new Parameter("page", "1"), new Parameter(
-				"pageSize", "2"),new Parameter("q", "x"));
+		newGetRequest = newGetRequest("lab/samples", new Parameter("page", "1"), new Parameter("pageSize", "2"),
+		    new Parameter("q", "x"));
 		handleGet = handle(newGetRequest);
 		Map<String, Object> response = (new ObjectMapper()).readValue(handleGet.getContentAsString(), Map.class);
 		assertThat("List by search q count is 1", ((List) response.get("results")).size() == 1, is(true));
