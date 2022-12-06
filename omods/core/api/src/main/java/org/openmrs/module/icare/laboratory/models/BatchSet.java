@@ -94,7 +94,21 @@ public class BatchSet extends BaseOpenmrsData implements java.io.Serializable, J
 		batchSetObject.put("description", this.getDescription());
 		batchSetObject.put("fields", this.getFields());
 		batchSetObject.put("name", this.getBatchSetName());
-		
+		batchSetObject.put("uuid", this.getUuid());
+
+		if (this.getDateCreated() != null) {
+			batchSetObject.put("dateCreated", this.getDateCreated());
+		}
+
+		Map<String, Object> creatorObject = new HashMap<String, Object>();
+
+		if (this.getCreator() != null) {
+			creatorObject.put("uuid", this.getCreator().getUuid());
+			creatorObject.put("display", this.getCreator().getDisplayString());
+		}
+		batchSetObject.put("creator", creatorObject);
+
+
 		return batchSetObject;
 		
 	}
