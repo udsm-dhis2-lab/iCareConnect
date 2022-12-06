@@ -21,20 +21,32 @@ export class BatchRegistrationComponent implements OnInit {
   @Input() labSections: any;
   @Input() testsFromExternalSystemsConfigs: any;
   formData: any;
+  useExistingBatchset: boolean = false;
   addFixedField: Dropdown;
   addStaticField: Dropdown;
   batchSetField: Textbox;
   batchSetDescription: Textbox;
+  existingBatchsetField: TextArea;
+  selectedField: Dropdown;
 
   constructor() {}
 
   ngOnInit(): void {
-    this.addFixedField =  new Dropdown({
+    this.selectedField = new Dropdown({
+      id: "selectedFieldTest",
+      key: "selectedFieldTest",
+      label: "Selected Field",
+      options: [],
+      shouldHaveLiveSearchForDropDownFields: true,
+    });
+
+
+    this.addFixedField = new Dropdown({
       id: "addFixedField",
       key: "addFixedField",
       label: "Select fixed field",
       options: [],
-      shouldHaveLiveSearchForDropDownFields: true
+      shouldHaveLiveSearchForDropDownFields: true,
     });
 
     this.addStaticField = new Dropdown({
@@ -42,7 +54,7 @@ export class BatchRegistrationComponent implements OnInit {
       key: "addStaticField",
       label: "Select static field",
       options: [],
-      shouldHaveLiveSearchForDropDownFields: true
+      shouldHaveLiveSearchForDropDownFields: true,
     });
 
     this.batchSetField = new Textbox({
@@ -50,19 +62,28 @@ export class BatchRegistrationComponent implements OnInit {
       key: "batchSetName",
       label: "Batch Set Name",
     });
-    
+
     this.batchSetDescription = new TextArea({
       id: "batchSetDescription",
       key: "batchSetDescription",
-      label: "Batchset Description"
+      label: "Batchset Description",
     });
 
+    this.existingBatchsetField = new Dropdown({
+      id: "existingBatchset",
+      key: "existingBatchSet",
+      label: "Select exising batch set",
+      options: [],
+      shouldHaveLiveSearchForDropDownFields: true,
+    });
   }
 
-  onFormUpdate(formValues: FormValue ): void {
+  onUseExistingBatchset(e: any){
+    this.useExistingBatchset = !this.useExistingBatchset;
+  };
+
+  onFormUpdate(formValues: FormValue): void {
     //Validate Date fields
     this.formData = { ...this.formData, ...formValues.getValues() };
   }
-
-
 }
