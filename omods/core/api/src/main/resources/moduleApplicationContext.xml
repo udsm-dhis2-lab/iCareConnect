@@ -144,6 +144,17 @@
                         <property name="sessionFactory" ref="dbSessionFactory" />
                     </bean>
                 </property>
+
+                <property name="BatchSetDAO">
+                    <bean class="org.openmrs.module.icare.laboratory.dao.BatchSetDAO">
+                        <property name="sessionFactory" ref="dbSessionFactory" />
+                    </bean>
+                </property>
+                <property name="BatchDAO">
+                    <bean class="org.openmrs.module.icare.laboratory.dao.BatchDAO">
+                        <property name="sessionFactory" ref="dbSessionFactory" />
+                    </bean>
+                </property>
             </bean>
         </property>
         <property name="preInterceptors">
@@ -224,6 +235,7 @@
                         <property name="sessionFactory" ref="dbSessionFactory" />
                     </bean>
                 </property>
+
             </bean>
         </property>
         <property name="preInterceptors">
