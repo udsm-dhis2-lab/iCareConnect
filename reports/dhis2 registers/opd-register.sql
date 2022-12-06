@@ -1,7 +1,7 @@
 SELECT `HUDHURIO LA KWANZA`,(@row_number:=@row_number+1) AS "Na",TAREHE,`JINA LA MGONJWA`,`MAHALI ANAISHI`,UMRI,`JINSIA YA MGONJWA`,`UZITO(kg)`,`UREFU(cm)`,`VIPIMO`,`MATOKEO YA VIPIMO`,DIAGNOSIS,`MATIBABU`,`MATOKEO YA MAHUDHURIO`,`MALIPO` FROM(
 SELECT
 		CASE WHEN COUNT(othervisit.visit_id)> 0  THEN '' ELSE '*' END AS `HUDHURIO LA KWANZA`,
-		DATE_FORMAT(v.date_started, "%d/%m/%Y %h:%i %p") AS TAREHE,
+		DATE_FORMAT(CONVERT_TZ(v.date_started,'Etc/GMT+3','GMT'), "%d/%m/%Y %h:%i %p") AS TAREHE,
 		UPPER(CONCAT(pn.given_name,' ',pn.family_name)) AS `JINA LA MGONJWA`,
 		CONCAT(pa.city_village,',',pa.state_province,' - ',pa.address1) AS `MAHALI ANAISHI`,
 		DATE_FORMAT(FROM_DAYS(DATEDIFF(v.date_started, p.birthdate)), '%Y') + 0 AS UMRI,
@@ -9,7 +9,7 @@ SELECT
 		GROUP_CONCAT(DISTINCT CASE WHEN ob2.concept_id='165861' THEN ob2.value_numeric  ELSE null END) AS `UZITO(kg)`,
 		GROUP_CONCAT(DISTINCT CASE WHEN ob2.concept_id='165860' THEN ob2.value_numeric  ELSE null END) AS `UREFU(cm)`,
 		GROUP_CONCAT(DISTINCT CASE WHEN ot.name='Test Order' THEN test_order_concept_name.name ELSE NULL END) AS `VIPIMO`,
-		GROUP_CONCAT(DISTINCT CASE WHEN test_result_concept_name.name IS NULL THEN ob.value_text ELSE test_result_concept_name.name END)AS `MATOKEO YA VIPIMO`,
+		GROUP_CONCAT(DISTINCT CASE WHEN test_result_concept_name.name IS NULL THEN CONCAT(test_order_concept_name.name,'-',ob.value_text) ELSE CONCAT(test_order_concept_name.name,'-',test_result_concept_name.name) END)AS `MATOKEO YA VIPIMO`,
 		GROUP_CONCAT(DISTINCT CASE WHEN ed.certainty='CONFIRMED' THEN diagnosis_concept_name.name ELSE NULL END) AS DIAGNOSIS,
 		GROUP_CONCAT(DISTINCT d.name) AS `MATIBABU`,
 		GROUP_CONCAT(DISTINCT result_encounter_type.name) AS `MATOKEO YA MAHUDHURIO`,
@@ -18,8 +18,8 @@ SELECT
     -- INNER JOIN visit_type vt ON vt.visit_type_id=v.visit_type_id
 	-- Addressing names and address
 	INNER JOIN person p ON p.person_id=v.patient_id
-	INNER JOIN person_name pn ON p.person_id=pn.person_id
-	LEFT JOIN person_address pa ON p.person_id=pa.person_id
+	INNER JOIN person_name pn ON p.person_id=pn.person_id AND pn.preferred =1
+	LEFT JOIN person_address pa ON p.person_id=pa.person_id AND pa.preferred =1
 	-- Addressing hudhuriao la kwanza
 	LEFT JOIN visit othervisit ON p.person_id=othervisit.patient_id
 	AND othervisit.visit_id <> v.visit_id AND othervisit.date_started < v.date_started  AND YEAR(othervisit.date_started)=YEAR(v.date_started)
@@ -49,10 +49,10 @@ SELECT
 	-- MALIPO
 	LEFT JOIN visit_attribute va ON va.visit_id = v.visit_id AND va.attribute_type_id=1
 	LEFT JOIN concept visit_attribute_concept ON va.value_reference=visit_attribute_concept.uuid
-	LEFT JOIN concept_name payment_concept_name ON payment_concept_name.concept_id=visit_attribute_concept.concept_id
+	LEFT JOIN concept_name payment_concept_name ON payment_concept_name.concept_id=visit_attribute_concept.concept_id AND payment_concept_name.concept_name_type = 'FULLY_SPECIFIED'
 	-- WHERE v.uuid='15eb0b9a-f1bf-4333-8c3f-28de3ae19866'
 	-- ADDRESSING VISIT TYPE
 	-- LEFT JOIN visit_type vt ON vt.visit_type_id=v.visit_type_id
-	WHERE v.visit_type_id=2 AND v.voided=0 AND (v.date_started BETWEEN :startDate AND :endDate)
-	GROUP BY v.date_started,`JINA LA MGONJWA`,pa.address1,v.uuid, payment_concept_name.name
+	WHERE (v.visit_type_id=2 OR v.visit_type_id=5) AND v.voided=0 AND CAST(CONVERT_TZ(v.date_started,'Etc/GMT+3','GMT') AS DATE) BETWEEN :startDate AND :endDate
+	GROUP BY v.visit_id,v.date_started,`JINA LA MGONJWA`,`MAHALI ANAISHI`,v.uuid, payment_concept_name.name
 	ORDER BY v.date_started ASC) AS VISITDETAILS, (SELECT @row_number:=0) AS temp

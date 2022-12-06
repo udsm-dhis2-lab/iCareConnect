@@ -14,20 +14,28 @@
 >
   <div class="row">
     <div class="col-12">
-      <div class="w-100 d-flex justify-content-end">
+      <div class="w-100 d-flex mb-4">
         <mat-button-toggle-group>
           <mat-button-toggle
             (click)="setTabGroup($event, 'NEW')"
             [value]="'NEW'"
             [ngClass]="{ 'selected-tab-group': selectedTabGroup === 'NEW' }"
-            >New Sample</mat-button-toggle
-          >
+            >Register Sample
+          </mat-button-toggle>
+          
+          <mat-button-toggle
+            (click)="setTabGroup($event, 'BATCH')"
+            [value]="'BATCH'"
+            [ngClass]="{ 'selected-tab-group': selectedTabGroup === 'BATCH' }"
+            >Batch Registration
+          </mat-button-toggle>
+
           <mat-button-toggle
             (click)="setTabGroup($event, 'LIST')"
             [value]="'LIST'"
             [ngClass]="{ 'selected-tab-group': selectedTabGroup === 'LIST' }"
-            >Registered Samples</mat-button-toggle
-          >
+            >Registered Samples
+          </mat-button-toggle>
         </mat-button-toggle-group>
       </div>
       <div class="w-100" *ngIf="selectedTabGroup === 'NEW'">
@@ -71,6 +79,11 @@
         <!-- <div class="batch-sample-registration">
           <app-batch-registration></app-batch-registration>
         </div> -->
+      </div>
+      <div class="w-100" *ngIf="selectedTabGroup === 'BATCH'">
+        <div class="w-100 text-center justify-content-center">
+          <h3> BATCH RESGISTRATION PAGE</h3>
+        </div>
       </div>
       <div class="w-100" *ngIf="selectedTabGroup === 'LIST'">
         <app-samples-list></app-samples-list>
