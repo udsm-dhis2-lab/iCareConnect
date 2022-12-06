@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import { ComplexDefaultFileField } from "src/app/shared/modules/form/models/complex-file.model";
 import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
 import { Field } from "src/app/shared/modules/form/models/field.model";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
@@ -27,7 +28,6 @@ export class ResultEntryFormComponent implements OnInit {
             attribute?.attributeType?.uuid == this.multipleResultsAttributeType
         ) || []
       )?.length > 0;
-    console.log("hasMultiple answers", this.hasMultipleAnswers);
     this.formField =
       this.parameter?.datatype?.display === "Numeric"
         ? new Textbox({
@@ -60,6 +60,15 @@ export class ResultEntryFormComponent implements OnInit {
             }),
             min: this.parameter?.min,
             max: this.parameter?.max,
+            required: true,
+          })
+        : this.parameter?.datatype?.display === "Complex"
+        ? new ComplexDefaultFileField({
+            id: this.parameter?.uuid,
+            key: this.parameter?.uuid,
+            label: this.parameter?.display,
+            value: this.value,
+            disabled: this.disabled,
             required: true,
           })
         : new Textbox({
