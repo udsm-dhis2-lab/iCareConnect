@@ -74,7 +74,7 @@ public class Result extends BaseOpenmrsData implements java.io.Serializable {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "instrument_id", unique = true, nullable = true)
-	private String instrument_id;
+	private Integer instrument_id;
 	
 	public Integer getId() {
 		return id;

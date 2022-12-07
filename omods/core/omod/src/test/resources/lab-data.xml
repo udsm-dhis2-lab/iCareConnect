@@ -144,7 +144,7 @@
     <lb_test_allocation test_allocation_id="323" uuid="222yyy70-7777-11e3-1221-0sndiu87hsju" sample_id="203" order_id="302" label="Allocation Lable x" date_created="2020-12-27 00:00:00" voided="false" creator="1"/>
 
 
-    <lb_test_result uuid="222yyy70-7777-11e3-1221-0sndiu87hsj3" test_result_id="123" test_allocation_id="323" concept_id="900" value_text="positive" date_created="2020-12-27 00:00:00" voided="false" creator="1"/>
+    <lb_test_result uuid="222yyy70-7777-11e3-1221-0sndiu87hsj3" test_result_id="123" test_allocation_id="323" concept_id="900" value_text="positive" date_created="2020-12-27 00:00:00" voided="false" creator="1" instrument_id="1"/>
 
     <lb_test_allocation_status test_allocation_status_id="1" test_allocation_id="323" user_id="400" status="APPROVED" remarks="" timestamp="2020-10-14 13:56:44" />
 
