@@ -16,81 +16,87 @@
             </div>
         </div>
         <div class="row">
-                    <div class="col-4">
-            <div class="row">
-                <div class="col-12">
-                    <app-form
-                        [fields]="[batchNameField]"
-                        (formUpdate)="onFormUpdate($event)"
-                    ></app-form>
-                </div>
-                <div class="col-12">
-                    <app-form
-                        [fields]="[batchDescription]"
-                        (formUpdate)="onFormUpdate($event)"
-                    ></app-form>
-                </div>
-                <div class="col-12 d-flex ml-1">
-                    <h4 class="w-75">Use existing fixed fields from batch set</h4>
-                    <mat-slide-toggle
-                        [color]="'primary'"
-                        class="example-margin w-25"
-                        (click)="onUseExistingBatchset($event)"
-                        >
-                    </mat-slide-toggle>
-                </div>
-                <div class="col-12">
-                    <app-form
-                        [fields]="useExistingBatchset ? [existingBatchsetField] : [batchsetNameField]"
-                        (formUpdate)="onFormUpdate($event)"
-                    ></app-form>
-                </div>
-            </div>
-        </div>
-        <div class="col-4">
-            <div class="row">            
-                <div class="col-10">
-                    <app-form
-                        [fields]="[selectedField]"
-                        (formUpdate)="onFormUpdate($event)"
-                    ></app-form>
-                </div>
-                <div class="col-1">
-                    <button class="remove-field" mat-button><mat-icon>delete_outline</mat-icon></button>
-                </div>
-                <div class="col-10">
-                    <app-form
-                        [fields]="[addFixedField]"
-                        (formUpdate)="onFormUpdate($event)"
-                    ></app-form>
-                </div>
-                <div class="col-2">
-                    <button class="save-field" mat-flat-button color="primary"> Save </button>
+            <!--  Bach Information -->
+            <div class="col-4">
+                <div class="row">
+                    <div class="col-12">
+                        <app-form
+                            [fields]="[batchNameField]"
+                            (formUpdate)="onFormUpdate($event)"
+                        ></app-form>
+                    </div>
+                    <div class="col-12">
+                        <app-form
+                            [fields]="[batchDescription]"
+                            (formUpdate)="onFormUpdate($event)"
+                        ></app-form>
+                    </div>
+                    <div class="col-12 d-flex ml-1">
+                        <h4 class="w-75">Use existing fixed fields from batch set</h4>
+                        <mat-slide-toggle
+                            [color]="'primary'"
+                            class="example-margin w-25"
+                            (click)="onUseExistingBatchset($event)"
+                            >
+                        </mat-slide-toggle>
+                    </div>
+                    <div class="col-12">
+                        <app-form
+                            [fields]="useExistingBatchset ? [existingBatchsetField] : [batchsetNameField]"
+                            (formUpdate)="onFormUpdate($event)"
+                        ></app-form>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="col-4">
-            <div class="row">
-                <div class="col-10">
-                    <app-form
-                        [fields]="[selectedField]"
-                        (formUpdate)="onFormUpdate($event)"
-                    ></app-form>
-                </div>
-                <div class="col-1">
-                    <button class="remove-field" mat-button><mat-icon>delete_outline</mat-icon></button>
-                </div>
-                <div class="col-10">
-                    <app-form
-                        [fields]="[addStaticField]"
-                        (formUpdate)="onFormUpdate($event)"
-                    ></app-form>
-                </div>
-                <div class="col-2">
-                    <button class="save-field" mat-flat-button color="primary"> Save </button>
+
+            <!-- Fixed fields -->
+            <div class="col-4">
+                <div class="row">
+                    <!-- If available fixed fields -->
+                    <div class="col-10">
+                        <app-form
+                            [fields]="[selectedField]"
+                            (formUpdate)="onFormUpdate($event)"
+                        ></app-form>
+                    </div>
+                    <div class="col-1">
+                        <button class="remove-field" mat-button><mat-icon>delete_outline</mat-icon></button>
+                    </div>
+                    <div class="col-10">
+                        <app-form
+                            [fields]="[addFixedField]"
+                            (formUpdate)="onFormUpdate($event)"
+                        ></app-form>
+                    </div>
+                    <div class="col-2">
+                        <button class="save-field" mat-flat-button color="primary"> Save </button>
+                    </div>
                 </div>
             </div>
-        </div>
+
+            <!-- Static fields -->
+            <div class="col-4">
+                <div class="row">
+                    <div class="col-10">
+                        <app-form
+                            [fields]="[selectedField]"
+                            (formUpdate)="onFormUpdate($event)"
+                        ></app-form>
+                    </div>
+                    <div class="col-1">
+                        <button class="remove-field" mat-button><mat-icon>delete_outline</mat-icon></button>
+                    </div>
+                    <div class="col-10">
+                        <app-form
+                            [fields]="[addStaticField]"
+                            (formUpdate)="onFormUpdate($event)"
+                        ></app-form>
+                    </div>
+                    <div class="col-2">
+                        <button class="save-field" mat-flat-button color="primary"> Save </button>
+                    </div>
+                </div>
+            </div>
         </div>
     </fieldset>
 
