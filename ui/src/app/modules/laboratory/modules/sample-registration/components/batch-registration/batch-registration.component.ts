@@ -30,10 +30,18 @@ export class BatchRegistrationComponent implements OnInit {
   batchNameField: Textbox;
   batchDescription: TextArea;
   batchsetNameField: Textbox;
+  addAnotherSample: any;
+  warning: any;
 
   constructor() {}
 
   ngOnInit(): void {
+    this.warning = {
+      error: {
+        message: "This feature is still under construction!",
+      },
+      type: "warning",
+    };
     this.selectedField = new Dropdown({
       id: "selectedFieldTest",
       key: "selectedFieldTest",
@@ -42,14 +50,13 @@ export class BatchRegistrationComponent implements OnInit {
       shouldHaveLiveSearchForDropDownFields: true,
     });
 
-
     this.addFixedField = new Dropdown({
       id: "addFixedField",
       key: "addFixedField",
       label: "Select fixed field",
       options: [],
       shouldHaveLiveSearchForDropDownFields: true,
-      multiple: true
+      multiple: true,
     });
 
     this.addStaticField = new Dropdown({
@@ -58,7 +65,7 @@ export class BatchRegistrationComponent implements OnInit {
       label: "Select static field",
       options: [],
       shouldHaveLiveSearchForDropDownFields: true,
-      multiple: true
+      multiple: true,
     });
 
     this.batchNameField = new Textbox({
@@ -84,16 +91,25 @@ export class BatchRegistrationComponent implements OnInit {
     this.batchsetNameField = new Textbox({
       id: "batchSetName",
       key: "batchSetName",
-      label: "Type Batchset Name"
+      label: "Type Batchset Name",
     });
   }
 
-  onUseExistingBatchset(e: any){
+  onUseExistingBatchset(e: any) {
     this.useExistingBatchset = !this.useExistingBatchset;
-  };
+  }
+
+  onAddAnotherSample(e: any) {
+    e.stopPropagation();
+    this.addAnotherSample = !this.addAnotherSample;
+  }
 
   onFormUpdate(formValues: FormValue): void {
     //Validate Date fields
     this.formData = { ...this.formData, ...formValues.getValues() };
+  }
+
+  onPageChange(e: any){
+    console.log("==> On page change.")
   }
 }
