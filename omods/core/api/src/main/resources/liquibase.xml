@@ -835,6 +835,18 @@
                 referencedColumnNames="test_allocation_id"/>
 
     </changeSet>
+    <changeSet id="add_columns_to_lb_test_result" author="josephat-mwakyusa" dbms="mysql">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists columnName="intrument_id" tableName="lb_test_result"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="lb_test_result" >
+            <column name="intrument_id" type="INT">
+                <constraints nullable="true"></constraints>
+            </column>
+        </addColumn>
+    </changeSet>
 
     <changeSet id="create_st_requisition" author="jesse-justin" dbms="mysql">
         <preConditions onFail="MARK_RAN">
