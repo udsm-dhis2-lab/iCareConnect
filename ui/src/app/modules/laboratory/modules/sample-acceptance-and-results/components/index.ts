@@ -26,6 +26,7 @@ import { RejectAnswerModalComponent } from "./reject-answer-modal/reject-answer-
 import { LabClinicalNotesSummaryComponent } from "./lab-clinical-notes-summary/lab-clinical-notes-summary.component";
 import { ResultReviewModalComponent } from "./result-review-modal/result-review-modal.component";
 import { ResultEntryFormComponent } from "./result-entry-form/result-entry-form.component";
+import { SharedResultsEntryAndViewModalComponent } from "./shared-results-entry-and-view-modal/shared-results-entry-and-view-modal.component";
 
 export const components: any[] = [
   PatientsByVisitsListComponent,
@@ -56,6 +57,7 @@ export const components: any[] = [
   LabClinicalNotesSummaryComponent,
   ResultReviewModalComponent,
   ResultEntryFormComponent,
+  SharedResultsEntryAndViewModalComponent,
 ];
 
 export const sampleAcceptanceAndResultsModals: any[] = [
