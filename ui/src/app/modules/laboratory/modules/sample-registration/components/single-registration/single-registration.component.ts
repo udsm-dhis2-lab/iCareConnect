@@ -56,6 +56,7 @@ export class SingleRegistrationComponent implements OnInit {
   @Input() labNumberCharactersCount: string;
   @Input() testsFromExternalSystemsConfigs: any[];
   @Input() currentUser: any;
+  @Input() isBatchRegistration: any;
 
   departmentField: any = {};
   specimenDetailsFields: any;
