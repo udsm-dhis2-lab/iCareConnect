@@ -70,10 +70,10 @@ public class Result extends BaseOpenmrsData implements java.io.Serializable {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "concept_id", unique = true, nullable = false)
 	private Concept concept;
-
-
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "instrument_id", unique = true, nullable = true)
+	
+	//	@ManyToOne(fetch = FetchType.LAZY)
+	//	TODO: Add relationship with instrument provided is alread set
+	@Column(name = "instrument_id", unique = false, nullable = true)
 	private Integer instrument_id;
 	
 	public Integer getId() {
@@ -343,5 +343,13 @@ public class Result extends BaseOpenmrsData implements java.io.Serializable {
 	
 	public void setAddReqTimeLimit(Integer addReqTimeLimit) {
 		this.addReqTimeLimit = addReqTimeLimit;
+	}
+	
+	public Integer getInstrumentId() {
+		return this.instrument_id;
+	}
+	
+	public void setInstrumentId(Integer instrument_id) {
+		this.instrument_id = instrument_id;
 	}
 }

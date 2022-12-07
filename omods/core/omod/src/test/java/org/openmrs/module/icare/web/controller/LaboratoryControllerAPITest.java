@@ -130,6 +130,14 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 	}
 	
 	@Test
+	public void testGetSampleOrdersBySampleUuid() throws Exception {
+		MockHttpServletRequest sampleRequest = newGetRequest("lab/sample/x311y666-zz77-11e3-1111-08002007777/orders");
+		MockHttpServletResponse response = handle(sampleRequest);
+		String data = response.getContentAsString();
+		System.out.println(data);
+	}
+	
+	@Test
 	public void testUpdateSampleOrder() throws Exception {
 		//Given
 		String dto = this.readFile("dto/sample-order-create-dto.json");
@@ -211,22 +219,33 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		MockHttpServletResponse handleSampleGet = handle(sampleGetRequest);
 		
 	}
-
+	
 	@Test
 	public void testGetAllocationByUuid() throws Exception {
-		MockHttpServletRequest getAllocationRequest = newGetRequest("lab/allocation",new Parameter("uuid", "111xxx60-7777-11e3-1111-0sndiu87hsju"));
+		MockHttpServletRequest getAllocationRequest = newGetRequest("lab/allocation", new Parameter("uuid",
+		        "111xxx60-7777-11e3-1111-0sndiu87hsju"));
 		MockHttpServletResponse allocationByAllocation = handle(getAllocationRequest);
 		String data = allocationByAllocation.getContentAsString();
 		System.out.println(data);
 	}
-
+	
 	@Test
 	@Ignore
 	public void testGetAllocationsByOrderUuid() throws Exception {
-		MockHttpServletRequest getAllocationsRequest = newGetRequest("lab/allocationsbyorder",new Parameter("uuid", "7634gd66-3333-4abd-8fd7-a748c9575abcd"));
+		MockHttpServletRequest getAllocationsRequest = newGetRequest("lab/allocationsbyorder", new Parameter("uuid",
+		        "7634gd66-3333-4abd-8fd7-a748c9575abcd"));
 		MockHttpServletResponse allocationByOrder = handle(getAllocationsRequest);
 		System.out.println(allocationByOrder.getContentAsString());
 	}
+	
+	@Test
+	public void testGetAllocationsBySampleUuid() throws Exception {
+		MockHttpServletRequest getAllocationsRequest = newGetRequest("lab/allocationsbysample", new Parameter("uuid",
+		        "x311y666-zz77-11e3-1111-08002007777"));
+		MockHttpServletResponse allocationByOrder = handle(getAllocationsRequest);
+		System.out.println(allocationByOrder.getContentAsString());
+	}
+	
 	@Test
 	public void testGettingSampleByVisitOrPatientUuidAndOrDates() throws Exception {
 		
