@@ -316,6 +316,20 @@ public class LaboratoryController {
 		return newSampleOrder.toMap();
 	}
 	
+	@RequestMapping(value = "sample/{sampleUuid}/orders", method = RequestMethod.GET)
+	@ResponseBody
+	public List<Map<String, Object>> getSampleOrdersBySampleUuid(@PathVariable String sampleUuid) {
+		List<Map<String, Object>> orders = new ArrayList();
+		List<Sample> samples = laboratoryService.getSampleOrdersBySampleUuid(sampleUuid);
+		for (Sample sample : samples) {
+			for (SampleOrder order : sample.getSampleOrders()) {
+				orders.add(order.toMap());
+			}
+		}
+		return orders;
+		
+	}
+	
 	@RequestMapping(value = "assign", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> updateSampleOrder(@RequestBody Map<String, Object> sampleOrderObject) throws Exception {
@@ -340,18 +354,40 @@ public class LaboratoryController {
 		return laboratoryService.getAllAllocations();
 		
 	}
+	
 	@RequestMapping(value = "allocation", method = RequestMethod.GET)
 	@ResponseBody
 	public Map<String, Object> getAllocation(@RequestParam(value = "uuid", required = true) String uuid) {
 		return laboratoryService.getAllocationByUuid(uuid).toMap();
 	}
-
+	
 	@RequestMapping(value = "allocationsbyorder", method = RequestMethod.GET)
 	@ResponseBody
-	public List<TestAllocation> getAllocationByOrder(@RequestParam(value = "uuid", required = true) String uuid) {
-		return  laboratoryService.getAllocationsByOrder(uuid);
+	public List<TestAllocation> getAllocationsByOrder(@RequestParam(value = "uuid", required = true) String uuid) {
+		return laboratoryService.getAllocationsByOrder(uuid);
 	}
+	
+	@RequestMapping(value = "allocationsbysample", method = RequestMethod.GET)
+	@ResponseBody
+	public List<Map<String, Object>> getAllocationsBySample(@RequestParam(value = "uuid", required = true) String uuid) {
+		List<Map<String, Object>> allocations = new ArrayList<>();
+		 List<Sample> samplesResponse = laboratoryService.getAllocationsBySample(uuid);
+		 if (samplesResponse.size() > 0) {
+			 for(Sample sample: samplesResponse) {
+				 if (sample.getSampleOrders().size() > 0) {
+					 for (SampleOrder order: sample.getSampleOrders()) {
+						 if (order.getTestAllocations().size() > 0) {
+							 for (TestAllocation allocation: order.getTestAllocations()) {
+								 allocations.add(allocation.toMap());
+							 }
+						 }
+					 }
+				 }
+			 }
+		 }
 
+		 return  allocations;
+	}
 	
 	@RequestMapping(value = "results", method = RequestMethod.POST)
 	@ResponseBody
