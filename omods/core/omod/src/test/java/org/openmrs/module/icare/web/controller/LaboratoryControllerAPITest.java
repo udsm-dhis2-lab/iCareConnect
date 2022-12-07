@@ -211,7 +211,22 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		MockHttpServletResponse handleSampleGet = handle(sampleGetRequest);
 		
 	}
-	
+
+	@Test
+	public void testGetAllocationByUuid() throws Exception {
+		MockHttpServletRequest getAllocationRequest = newGetRequest("lab/allocation",new Parameter("uuid", "111xxx60-7777-11e3-1111-0sndiu87hsju"));
+		MockHttpServletResponse allocationByAllocation = handle(getAllocationRequest);
+		String data = allocationByAllocation.getContentAsString();
+		System.out.println(data);
+	}
+
+	@Test
+	@Ignore
+	public void testGetAllocationsByOrderUuid() throws Exception {
+		MockHttpServletRequest getAllocationsRequest = newGetRequest("lab/allocationsbyorder",new Parameter("uuid", "7634gd66-3333-4abd-8fd7-a748c9575abcd"));
+		MockHttpServletResponse allocationByOrder = handle(getAllocationsRequest);
+		System.out.println(allocationByOrder.getContentAsString());
+	}
 	@Test
 	public void testGettingSampleByVisitOrPatientUuidAndOrDates() throws Exception {
 		

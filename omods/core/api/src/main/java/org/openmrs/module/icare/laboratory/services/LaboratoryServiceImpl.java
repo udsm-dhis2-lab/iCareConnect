@@ -268,14 +268,16 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	
 	@Override
 	public List<TestAllocation> getAllocationBySample(String sampleId) {
-		
 		return this.testAllocationDAO.getAllocationBySample(sampleId);
-		
+	}
+
+	@Override
+	public List<TestAllocation> getAllocationsByOrder(String orderUuid) {
+		return this.testAllocationDAO.getAllocationsByOrder(orderUuid);
 	}
 	
 	@Override
 	public List<TestAllocation> getAllAllocations() {
-		
 		return IteratorUtils.toList(this.testAllocationDAO.findAll().iterator());
 	}
 	

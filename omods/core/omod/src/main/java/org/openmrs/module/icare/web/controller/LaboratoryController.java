@@ -13,13 +13,11 @@ import org.openmrs.module.icare.laboratory.models.*;
 import org.openmrs.module.icare.laboratory.services.LaboratoryService;
 import org.openmrs.module.webservices.rest.web.RestConstants;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -336,12 +334,24 @@ public class LaboratoryController {
 		return createdTestAllocation.toMap();
 	}
 	
-	@RequestMapping(value = "allocation", method = RequestMethod.GET)
+	@RequestMapping(value = "allocations", method = RequestMethod.GET)
 	@ResponseBody
 	public List<TestAllocation> getAllocation() {
 		return laboratoryService.getAllAllocations();
 		
 	}
+	@RequestMapping(value = "allocation", method = RequestMethod.GET)
+	@ResponseBody
+	public Map<String, Object> getAllocation(@RequestParam(value = "uuid", required = true) String uuid) {
+		return laboratoryService.getAllocationByUuid(uuid).toMap();
+	}
+
+	@RequestMapping(value = "allocationsbyorder", method = RequestMethod.GET)
+	@ResponseBody
+	public List<TestAllocation> getAllocationByOrder(@RequestParam(value = "uuid", required = true) String uuid) {
+		return  laboratoryService.getAllocationsByOrder(uuid);
+	}
+
 	
 	@RequestMapping(value = "results", method = RequestMethod.POST)
 	@ResponseBody

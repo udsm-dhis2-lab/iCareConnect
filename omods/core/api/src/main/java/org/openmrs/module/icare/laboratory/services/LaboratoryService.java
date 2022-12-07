@@ -39,6 +39,8 @@ public interface LaboratoryService extends OpenmrsService {
 	SampleOrder saveSampleOrder(SampleOrder sampleOrder);
 	
 	List<TestAllocation> getAllocationBySample(String sampleUuid);
+
+	List<TestAllocation> getAllocationsByOrder(String orderUuid);
 	
 	List<TestAllocation> getAllAllocations();
 	

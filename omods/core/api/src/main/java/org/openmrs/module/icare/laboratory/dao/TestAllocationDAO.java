@@ -6,6 +6,7 @@ import org.hibernate.Query;
 import org.openmrs.api.db.hibernate.DbSession;
 import org.openmrs.module.icare.core.dao.BaseDAO;
 import org.openmrs.module.icare.laboratory.models.Sample;
+import org.openmrs.module.icare.laboratory.models.SampleOrder;
 import org.openmrs.module.icare.laboratory.models.TestAllocation;
 import org.springframework.stereotype.Repository;
 
@@ -23,13 +24,22 @@ public class TestAllocationDAO extends BaseDAO<TestAllocation> {
 		
 		DbSession session = this.getSession();
 		String queryStr = "SELECT al \n" + "FROM TestAllocation al \n"
-		        + "WHERE al.sampleOrder.id.sample.uuid = :sampleUuid))";
+		        + "WHERE al.sampleOrder.id.sample.uuid = :sampleUuid";
 		
 		Query query = session.createQuery(queryStr);
 		query.setParameter("sampleUuid", sampleUuid);
 		
 		return query.list();
-		
+	}
+
+	public List<TestAllocation> getAllocationsByOrder(String orderUuid) {
+		DbSession session = this.getSession();
+		String queryStr = "SELECT al \n" + "FROM TestAllocation al \n"
+				+ " INNER JOIN SampleOrder so INNER JOIN Order o \n"
+				+ " WHERE o.uuid = :orderUuid";
+		Query query = session.createQuery(queryStr);
+		query.setParameter("orderUuid", orderUuid);
+		return query.list();
 	}
 	
 }
