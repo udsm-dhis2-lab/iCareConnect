@@ -19,7 +19,7 @@ export class SamplesListComponent implements OnInit {
   page: number;
   pageSize: number;
   errors: any[] = [];
-  pageCounts: any[] = [5, 10, 20, 25, 50, 100];
+  pageCounts: any[] = [5, 10, 20, 25, 50, 100, 200];
   searchText: string;
   subject = new Subject<string>();
   constructor(private samplesService: SamplesService) {
