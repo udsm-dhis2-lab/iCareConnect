@@ -100,6 +100,10 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
       });
   }
 
+  onAuthorize(event: Event): void {
+    event.stopPropagation();
+  }
+
   onGetFieldData(
     dataObject: any,
     parameter: ConceptGet,
