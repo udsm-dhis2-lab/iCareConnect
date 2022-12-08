@@ -14,6 +14,7 @@ import { UpdatePrivilegesWithSelectedAttributePipe } from "./update-privileges-w
 import { UpdateRolesWithSelectedAttributePipe } from "./update-roles-with-selected-attribute.pipe";
 import { SanitizeDangerousUrlPipe } from "./sanitize-dangerous-url.pipe";
 import { SearchTestDetailsPipe } from "./search-test-details.pipe";
+import { CreateLabFieldsPipe } from "./create-lab-fields.pipe";
 
 export const sharedPipes: any[] = [
   FilterByPipe,
@@ -32,4 +33,5 @@ export const sharedPipes: any[] = [
   UpdateRolesWithSelectedAttributePipe,
   SanitizeDangerousUrlPipe,
   SearchTestDetailsPipe,
+  CreateLabFieldsPipe,
 ];

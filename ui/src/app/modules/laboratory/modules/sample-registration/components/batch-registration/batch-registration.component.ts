@@ -20,6 +20,7 @@ export class BatchRegistrationComponent implements OnInit {
   @Input() referringDoctorAttributes: any;
   @Input() labSections: any;
   @Input() testsFromExternalSystemsConfigs: any;
+  @Input() allRegistrationFields: any;
   formData: any;
   useExistingBatchset: boolean = false;
   addFixedField: Dropdown;
@@ -109,7 +110,7 @@ export class BatchRegistrationComponent implements OnInit {
     this.formData = { ...this.formData, ...formValues.getValues() };
   }
 
-  onPageChange(e: any){
-    console.log("==> On page change.")
+  onPageChange(e: any) {
+    console.log("==> On page change.");
   }
 }
