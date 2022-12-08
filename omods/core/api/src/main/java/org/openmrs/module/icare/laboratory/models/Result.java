@@ -339,6 +339,7 @@ public class Result extends BaseOpenmrsData implements java.io.Serializable {
 			creatorObject.put("display", this.getCreator().getDisplayString());
 			creatorObject.put("name", this.getCreator().getName());
 		}
+		//		TODO: Generate result uuid here
 		resultsObject.put("resultGroup", this.valueGroupId);
 		resultsObject.put("creator", creatorObject);
 		return resultsObject;

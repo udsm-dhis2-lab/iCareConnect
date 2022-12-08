@@ -1,0 +1,26 @@
+.entry-col {
+  border-right: solid 1px #eee;
+  border-bottom: solid 1px #eee;
+}
+
+@media screen and (min-width: 792px) {
+  .parameter-test-default {
+    flex: 0 0 8.333333% !important;
+    max-width: 8.333333% !important;
+  }
+  .parameter-test-text {
+    flex: 0 0 16.666667% !important;
+    max-width: 16.666667% !important;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .parameter-test-default {
+    flex: 0 0 16.666667% !important;
+    max-width: 16.666667% !important;
+  }
+  .parameter-test-text {
+    flex: 0 0 33.333333% !important;
+    max-width: 33.333333% !important;
+  }
+}
