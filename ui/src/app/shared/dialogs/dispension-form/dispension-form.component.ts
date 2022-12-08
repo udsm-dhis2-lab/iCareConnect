@@ -301,7 +301,7 @@ export class DispensingFormComponent implements OnInit {
         })
       );
     this.generalPrescriptionDoseConcept$ = this.systemSettingsService
-      .getSystemSettingsByKey("iCare.clinic.prescriptiResponseon.dose")
+      .getSystemSettingsByKey("iCare.clinic.prescription.dose")
       .pipe(
         map((response) => {
           if (response?.error) {
