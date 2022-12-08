@@ -54,6 +54,7 @@ export class SingleRegistrationComponent implements OnInit {
   @Input() testsFromExternalSystemsConfigs: any[];
   @Input() currentUser: any;
   @Input() isBatchRegistration: any;
+  @Input() allRegistrationFields: any;
 
   departmentField: any = {};
   specimenDetailsFields: any;
@@ -148,16 +149,22 @@ export class SingleRegistrationComponent implements OnInit {
     );
     this.labLocations$ = this.store.select(getLocationsByIds(userLocationsIds));
     this.labSampleLabel$ = this.samplesService.getSampleLabel();
-    this.referringDoctorFields = this.referringDoctorAttributes.map(
-      (attribute) => {
-        return new Textbox({
-          id: "attribute-" + attribute?.value,
-          key: "attribute-" + attribute?.value,
-          label: attribute?.name,
-          type: "text",
-        });
-      }
-    );
+    // this.referringDoctorFields = this.referringDoctorAttributes.map(
+    //   (attribute) => {
+    //     return new Textbox({
+    //       id: "attribute-" + attribute?.value,
+    //       key: "attribute-" + attribute?.value,
+    //       label: attribute?.name,
+    //       type: "text",
+    //     });
+    //   }
+    // );
+    this.referringDoctorFields = Object.keys(
+      this.allRegistrationFields?.referringDoctorFields
+    ).map((key) => {
+      console.log("==> key")
+      return this.allRegistrationFields?.referringDoctorFields[key];
+    });
 
     this.specimenDetailsFields = [
       new Dropdown({
