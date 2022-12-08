@@ -47,13 +47,12 @@ export class TestParameterEntryComponent implements OnInit {
           ? this.latestResult?.valueModifier
           : null,
       };
-      console.log("gdsgds", this.latestResult);
     }
   }
 
   onGetFormData(data: any, parameter: any): void {
     this.data.emit({
-      value: data,
+      value: !data?.uuid ? data : data?.uuid,
       previousValue: this.latestResult?.value,
       parameter: {
         ...parameter,
