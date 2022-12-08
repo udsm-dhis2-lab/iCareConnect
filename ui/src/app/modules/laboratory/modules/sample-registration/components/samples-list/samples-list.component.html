@@ -88,9 +88,10 @@
     </tbody>
   </table>
   <mat-paginator 
+    [hidden]="!pageCounts"
     [length]="params?.samples?.pager?.total"
     [pageSize]=""
-    [pageSizeOptions]="[10, 20, 50, 100]"
+    [pageSizeOptions]="pageCounts"
     (page)="onPageChange($event)"
   >
 

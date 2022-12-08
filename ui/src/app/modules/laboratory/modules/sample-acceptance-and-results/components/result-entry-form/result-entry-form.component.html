@@ -1,4 +1,5 @@
 <app-form
+  class="{{ disabled ? 'disabled' : '' }}"
   *ngIf="formField"
   [fields]="[formField]"
   (formUpdate)="onFormUpdate($event)"

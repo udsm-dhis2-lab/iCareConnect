@@ -99,6 +99,7 @@ export class ResultsFeedingModalComponent implements OnInit {
 
   multipleResultsAttributeType$: Observable<any>;
   errors: any[] = [];
+  files: any[] = [];
   constructor(
     private dialog: MatDialog,
     private dialogRef: MatDialogRef<ResultsFeedingModalComponent>,
@@ -282,7 +283,40 @@ export class ResultsFeedingModalComponent implements OnInit {
     });
   }
 
-  onGetFormData(val: any, parameter: any): void {
+  onGetFormData(
+    val: any,
+    parameter: any,
+    item?: any,
+    currentSample?: any,
+    allocation?: any
+  ): void {
+    //Work around of the below logic to overwrite a file
+    // let newFiles = [];
+    // const availableFile = newFiles.find(file => file.parameterUuid === parameter.uuid);
+    // const index = newFiles.indexOf(availableFile);
+    // newFiles = index < 0 ? [...newFiles, {}] : [...newFiles.slice(0, index), availableFile, newFiles.slice(index + 1)];
+    let existingFile = this.files.find(
+          (file) => file.parameterUuid === parameter?.uuid
+        )
+    if (
+      parameter?.datatype?.display === "Complex"
+    ) {
+      this.files = [
+        ...this.files.filter((file) => file.parameterUuid !== parameter?.uuid),
+        existingFile
+          ? {
+              ...existingFile,
+              valueFile: val,
+            }
+          : {
+              parameterUuid: parameter?.uuid,
+              valueFile: val,
+              item: item,
+              currentSample: currentSample,
+              allocation: allocation,
+            },
+      ];
+    }
     this.values[parameter?.uuid] = val;
   }
 
@@ -580,7 +614,14 @@ export class ResultsFeedingModalComponent implements OnInit {
         status: "PRELIMINARY",
         comment: this.values[parameter?.uuid + "-comment"],
       };
-      data.append("file", this.file);
+      data.append(
+        "file",
+        this.file ||
+          this.files.filter(
+            (fileObject) =>
+              fileObject.parameterUuid === parameter?.uuid
+          )[0]?.valueFile
+      );
       data.append("json", JSON.stringify(jsonData));
 
       // void first the existing observation
@@ -986,6 +1027,10 @@ export class ResultsFeedingModalComponent implements OnInit {
       (Object.keys(values)?.filter((key) => values[key]) || [])?.length > 0;
     if (this.hasFedResults) {
       this.saveAllMessage = null;
+
+      //Save files first
+      this.saveFilesAsObservations(this.files);
+
       const testAllocations = _.flatten(
         currentSample?.orders?.map((order) =>
           order?.testAllocations?.map((alloc) => {
@@ -1110,7 +1155,76 @@ export class ResultsFeedingModalComponent implements OnInit {
     }
   }
 
+
+  saveFilesAsObservations(fileObjects: any[]) {
+    fileObjects.forEach((file) => {
+      this.savingLabResultsState$ = of(false);
+      let data = new FormData();
+      const jsonData = {
+        concept: file?.parameterUuid,
+        person: this.sample?.patient?.uuid,
+        encounter:
+          this.ordersKeyedByConcepts[file?.item?.order?.concept?.uuid]
+            ?.encounter?.uuid,
+        obsDatetime: new Date(),
+        voided: false,
+        status: "PRELIMINARY",
+        comment: this.values[file?.parameterUuid + "-comment"],
+      };
+      data.append("file", file?.valueFile);
+      data.append("json", JSON.stringify(jsonData));
+
+      // void first the existing observation
+      if (
+        this.obsKeyedByConcepts[file?.parameterUuid] &&
+        this.obsKeyedByConcepts[file?.parameterUuid]?.value
+      ) {
+        const existingObs = {
+          concept: file?.parameterUuid,
+          person: this.sample?.patient?.uuid,
+          obsDatetime:
+            this.obsKeyedByConcepts[file?.parameterUuid]?.encounter
+              ?.obsDatetime,
+          encounter:
+            this.obsKeyedByConcepts[file?.parameterUuid]?.encounter?.uuid,
+          status: "PRELIMINARY",
+          comment:
+            this.obsKeyedByConcepts[file?.parameterUuid]?.encounter?.comment,
+        };
+        this.httpClient
+          .post(
+            `../../../openmrs/ws/rest/v1/obs/${
+              this.obsKeyedByConcepts[file?.parameterUuid]?.uuid
+            }`,
+            {
+              ...existingObs,
+              voided: true,
+            }
+          )
+          .subscribe((response) => {
+            if (response) {
+              this.savingLabResultsState$ = of(false);
+            }
+          });
+      }
+      this.httpClient
+        .post(`../../../openmrs/ws/rest/v1/obs`, data)
+        .subscribe((response: any) => {
+          if (response) {
+            this.obsKeyedByConcepts[file?.parameterUuid] = {
+              ...response,
+              uri: response?.value?.links
+                ? response?.value?.links?.uri?.replace("http", "https")
+                : null,
+            };
+
+            this.savingLabResultsState$ = of(false);
+          }
+        });
+    });
+  }
+
   tabSelection(matTabEvent: MatTabChangeEvent): void {
     this.selectedIndex = matTabEvent.index;
-  };
+  }
 }
