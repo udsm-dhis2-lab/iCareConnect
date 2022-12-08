@@ -7,21 +7,7 @@
   <app-result-entry-form
     *ngIf="params?.testParameter"
     [parameter]="params?.testParameter"
-    [value]="
-      latestResult?.valueNumeric
-        ? latestResult?.valueNumeric
-        : latestResult?.valueBoolean
-        ? latestResult?.valueBoolean
-        : latestResult?.valueComplex
-        ? latestResult?.valueComplex
-        : latestResult?.valueCoded
-        ? latestResult?.valueCoded
-        : latestResult?.valueText
-        ? latestResult?.valueText
-        : latestResult?.valueModifier
-        ? latestResult?.valueModifier
-        : null
-    "
+    [value]="latestResult?.value"
     [multipleResultsAttributeType]="multipleResultsAttributeType"
     (formData)="onGetFormData($event, params?.testParameter)"
   ></app-result-entry-form>
