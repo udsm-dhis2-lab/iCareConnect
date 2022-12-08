@@ -399,6 +399,21 @@ public class LaboratoryController {
 		
 	}
 	
+	@RequestMapping(value = "multipleresults", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> saveMultipleResults(@RequestBody List<Map<String, Object>> results) throws Exception {
+		System.out.println(results);
+		List<Result> formattedResults = new ArrayList<>();
+		for(Map<String, Object> resultObject: results) {
+			Result result = Result.fromMap(resultObject);
+			result.setCreator(Context.getAuthenticatedUser());
+			formattedResults.add(result);
+		}
+		Map<String, Object> savedResultsResponse = laboratoryService.saveMultipleResults(formattedResults);
+		return savedResultsResponse;
+
+	}
+	
 	@RequestMapping(value = "results", method = RequestMethod.GET)
 	@ResponseBody
 	public List<Result> getResults() {

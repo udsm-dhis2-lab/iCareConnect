@@ -3,9 +3,7 @@ package org.openmrs.module.icare.laboratory.models;
 import org.openmrs.*;
 
 import javax.persistence.*;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import static javax.persistence.GenerationType.IDENTITY;
 
@@ -73,8 +71,12 @@ public class Result extends BaseOpenmrsData implements java.io.Serializable {
 	
 	//	@ManyToOne(fetch = FetchType.LAZY)
 	//	TODO: Add relationship with instrument provided is alread set
-	@Column(name = "instrument_id", unique = false, nullable = true)
-	private Integer instrument_id;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "instrument_id", unique = false, nullable = true)
+	private Concept instrument;
+	
+	@Transient
+	private String resultGroupUuid;
 	
 	public Integer getId() {
 		return id;
@@ -188,8 +190,20 @@ public class Result extends BaseOpenmrsData implements java.io.Serializable {
 		this.valueComplex = valueComplex;
 	}
 	
+	public String getResultGroupUuid() {
+		return this.resultGroupUuid;
+	}
+	
+	public void setResultGroupUuid(String uuid) {
+		this.resultGroupUuid = uuid;
+	}
+	
 	public static Result fromMap(Map<String, Object> map) {
 		Result result = new Result();
+		
+		if ((map.get("resultGroupUuid")) != null) {
+			result.setResultGroupUuid((map.get("resultGroupUuid").toString()));
+		}
 		
 		if ((map.get("valueText")) != null) {
 			result.setValueText((map.get("valueText").toString()));
@@ -236,22 +250,22 @@ public class Result extends BaseOpenmrsData implements java.io.Serializable {
 		}
 		
 		if (map.get("standardTAT") != null) {
-			
 			result.setStandardTAT((Integer) map.get("standardTAT"));
-			
 		}
 		
 		if (map.get("urgentTAT") != null) {
-			
 			result.setUrgentTAT((Integer) map.get("urgentTAT"));
-			
 		}
 		
 		if (map.get("additionalReqTimeLimit") != null) {
-			
 			result.setAddReqTimeLimit((Integer) map.get("additionalReqTimeLimit"));
-			
 		}
+		
+		//		if (map.get("instrument") != null) {
+		//			Concept instrument = new Concept();
+		//			instrument.setUuid(((Map) map.get("instrument")).get("uuid").toString());
+		//			result.setInstrument(instrument);
+		//		}
 		
 		Concept concept = new Concept();
 		concept.setUuid(((Map) map.get("concept")).get("uuid").toString());
@@ -293,15 +307,24 @@ public class Result extends BaseOpenmrsData implements java.io.Serializable {
 		}
 		
 		if (this.getValueCoded() != null) {
-			
 			Map<String, Object> resultsCodedObject = new HashMap<String, Object>();
-			
 			resultsCodedObject.put("uuid", this.getValueCoded().getUuid());
 			resultsCodedObject.put("display", this.getValueCoded().getDisplayString());
 			resultsCodedObject.put("name", this.getValueCoded().getName().getName());
-			
 			resultsObject.put("valueCoded", resultsCodedObject);
 		}
+		
+		Map<String, Object> instrument = new HashMap<String, Object>();
+		if (this.getInstrument() != null) {
+			instrument.put("uuid", this.getInstrument().getUuid());
+			instrument.put("display", this.getInstrument().getDisplayString());
+			instrument.put("name", this.getInstrument().getName().getName());
+		} else {
+			instrument = null;
+		}
+		
+		resultsObject.put("instrument", instrument);
+		
 		HashMap<String, Object> resultsConceptObject = new HashMap<String, Object>();
 		resultsConceptObject.put("uuid", this.getConcept().getUuid());
 		resultsObject.put("concept", resultsConceptObject);
@@ -316,8 +339,8 @@ public class Result extends BaseOpenmrsData implements java.io.Serializable {
 			creatorObject.put("display", this.getCreator().getDisplayString());
 			creatorObject.put("name", this.getCreator().getName());
 		}
+		resultsObject.put("resultGroup", this.valueGroupId);
 		resultsObject.put("creator", creatorObject);
-		
 		return resultsObject;
 	}
 	
@@ -345,11 +368,12 @@ public class Result extends BaseOpenmrsData implements java.io.Serializable {
 		this.addReqTimeLimit = addReqTimeLimit;
 	}
 	
-	public Integer getInstrumentId() {
-		return this.instrument_id;
+	public Concept getInstrument() {
+		return instrument;
 	}
 	
-	public void setInstrumentId(Integer instrument_id) {
-		this.instrument_id = instrument_id;
+	public void setInstrument(Concept instrument) {
+		this.instrument = instrument;
 	}
+	
 }

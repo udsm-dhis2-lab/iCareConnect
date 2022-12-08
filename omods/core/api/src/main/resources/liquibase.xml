@@ -833,7 +833,6 @@
                 constraintName="lb_test_result_lb_test_allocation_test_allocation_id"
                 referencedTableName="lb_test_allocation"
                 referencedColumnNames="test_allocation_id"/>
-
     </changeSet>
     <changeSet id="add_columns_to_lb_test_result" author="josephat-mwakyusa" dbms="mysql">
         <preConditions onFail="MARK_RAN">
@@ -846,6 +845,12 @@
                 <constraints nullable="true"></constraints>
             </column>
         </addColumn>
+        <addForeignKeyConstraint
+                baseColumnNames="instrument_id"
+                baseTableName="lb_test_result"
+                constraintName="lb_test_result_instrument_id_concept_concept_id_fk"
+                referencedColumnNames="concept_id"
+                referencedTableName="concept"/>
     </changeSet>
 
     <changeSet id="create_st_requisition" author="jesse-justin" dbms="mysql">

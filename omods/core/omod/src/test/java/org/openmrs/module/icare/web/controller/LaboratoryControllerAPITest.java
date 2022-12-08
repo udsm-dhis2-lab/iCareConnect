@@ -442,7 +442,20 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		assertThat("result valueText should be 5.88", newResultsObject.get("valueText").toString(), is("5.88"));
 		assertThat("result concept uuid should be 111111xx-0000-477a-8u8u-acc38ebc6252",
 		    ((Map) newResultsObject.get("concept")).get("uuid").toString(), is("111111xx-0000-477a-8u8u-acc38ebc6252"));
+	}
+	
+	@Test
+	public void testCreateMultipleResults() throws Exception {
+		//Given
+		String dto = this.readFile("dto/lab-related-results-create.json");
+		List<Map<String, Object>> results = (new ObjectMapper()).readValue(dto, List.class);
 		
+		MockHttpServletRequest newPostRequest = newPostRequest("lab/multipleresults", results);
+		
+		MockHttpServletResponse handle = handle(newPostRequest);
+		
+		Map<String, Object> resultsObject = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
+		System.out.println(resultsObject);
 	}
 	
 	@Test

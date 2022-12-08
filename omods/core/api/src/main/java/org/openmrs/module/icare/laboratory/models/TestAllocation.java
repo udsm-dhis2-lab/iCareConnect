@@ -78,7 +78,6 @@ public class TestAllocation extends BaseOpenmrsData implements java.io.Serializa
 	}
 	
 	public Sample getSample() {
-		System.out.println("TESTSTSTST");
 		return this.sampleOrder.getSample();
 	}
 	
@@ -191,6 +190,7 @@ public class TestAllocation extends BaseOpenmrsData implements java.io.Serializa
 		sample.put("uuid", this.sampleOrder.getSample().getUuid());
 		sample.put("label", this.sampleOrder.getSample().getLabel());
 		testAllocationMap.put("sample", sample);
+		testAllocationMap.put("isSet", this.getSampleOrder().getOrder().getConcept().getSetMembers().size() > 1);
 		return testAllocationMap;
 	}
 	

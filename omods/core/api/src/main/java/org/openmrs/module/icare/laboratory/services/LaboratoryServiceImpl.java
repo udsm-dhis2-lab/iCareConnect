@@ -329,6 +329,51 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 		
 	}
 	
+	public Map<String, Object> saveMultipleResults(List<Result> results) throws Exception {
+		List<Map<String, Object>> resultResponses = new ArrayList<>();
+		for (Result result: results) {
+			if (result.getConcept().getUuid() == null) {
+				throw new Exception("Concept is null. Concept for the result must be provided");
+			}
+			if (result.getTestAllocation().getUuid() == null) {
+				throw new Exception("Test Allocation is null. Test allocation uuid must be provided");
+			}
+
+			Concept concept = Context.getConceptService().getConceptByUuid(result.getConcept().getUuid());
+			if (concept == null) {
+				throw new Exception("Concept with id '" + result.getConcept().getUuid() + "' does not exist");
+			}
+
+			result.setConcept(concept);
+
+			TestAllocation testAllocation = this.testAllocationDAO.findByUuid(result.getTestAllocation().getUuid());
+			if (testAllocation == null) {
+				throw new Exception("Test Allocation with id '" + result.getTestAllocation().getUuid() + "' does not exist");
+			}
+			result.setTestAllocation(testAllocation);
+
+			if (result.getValueCoded() != null) {
+				Concept valueCoded = Context.getConceptService().getConceptByUuid(result.getValueCoded().getUuid());
+				result.setValueCoded(valueCoded);
+			}
+
+			if (result.getValueDrug() != null) {
+				Drug drug = Context.getConceptService().getDrugByUuid(result.getValueDrug().getUuid());
+				result.setValueDrug(drug);
+			}
+
+			if (result.getResultGroupUuid() != null && getResultsByUuid(result.getResultGroupUuid()) != null) {
+				Integer valueGroupId = this.getResultsId(result.getResultGroupUuid());
+				result.setValueGroupId(valueGroupId);
+			}
+			Result response = this.resultDAO.save(result);
+			resultResponses.add(response.toMap());
+		}
+		Map<String, Object> res = new HashMap<>();
+		res.put("responses",resultResponses);
+		return  res;
+	}
+	
 	@Override
 	public Sample getSampleByUuid(String sampleUuid) {
 		return this.sampleDAO.findByUuid(sampleUuid);
@@ -337,6 +382,14 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	@Override
 	public List<Result> getResults() {
 		return IteratorUtils.toList(this.resultDAO.findAll().iterator());
+	}
+	
+	private Result getResultsByUuid(String uuid) {
+		return this.resultDAO.findByUuid(uuid);
+	}
+	
+	private Integer getResultsId(String uuid) {
+		return this.resultDAO.findByUuid(uuid).getId();
 	}
 	
 	@Override
