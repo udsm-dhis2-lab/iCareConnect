@@ -9,6 +9,7 @@ import org.openmrs.module.icare.laboratory.models.*;
 import javax.transaction.Transactional;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @Transactional
 public interface LaboratoryService extends OpenmrsService {
@@ -50,6 +51,8 @@ public interface LaboratoryService extends OpenmrsService {
 	
 	@Transactional
 	Result recordTestAllocationResults(Result result) throws Exception;
+	
+	Map<String, Object> saveMultipleResults(List<Result> results) throws Exception;
 	
 	Sample getSampleByUuid(String sampleUuid);
 	
