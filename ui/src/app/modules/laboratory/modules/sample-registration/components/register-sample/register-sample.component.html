@@ -20,7 +20,7 @@
             (click)="setTabGroup($event, 'NEW')"
             [value]="'NEW'"
             [ngClass]="{ 'selected-tab-group': selectedTabGroup === 'NEW' }"
-            >Register Sample
+            >Sample Registration
           </mat-button-toggle>
           
           <mat-button-toggle
@@ -81,8 +81,23 @@
         </div> -->
       </div>
       <div class="w-100" *ngIf="selectedTabGroup === 'BATCH'">
-        <div class="w-100 text-center justify-content-center">
-          <h3> BATCH RESGISTRATION PAGE</h3>
+        <div class="w-100">
+          <app-batch-registration
+            [mrnGeneratorSourceUuid]="params?.mrnGeneratorSourceUuid"
+            [preferredPersonIdentifier]="params?.preferredPersonIdentifier"
+            [provider]="provider"
+            [agencyConceptConfigs]="params?.agencyConceptConfigs"
+            [referFromFacilityVisitAttribute]="
+              params?.referFromFacilityVisitAttribute
+            "
+            [currentUser]="params?.currentUser"
+            [labNumberCharactersCount]="params?.labNumberCharactersCount"
+            [referringDoctorAttributes]="params?.referringDoctorAttributes"
+            [labSections]="labSections"
+            [testsFromExternalSystemsConfigs]="
+              params?.testsFromExternalSystemsConfigs
+            "
+          ></app-batch-registration>
         </div>
       </div>
       <div class="w-100" *ngIf="selectedTabGroup === 'LIST'">

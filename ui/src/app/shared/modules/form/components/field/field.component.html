@@ -290,7 +290,8 @@
 
 <div
   [formGroup]="form"
-  *ngIf="(isBoolean || field?.controlType === 'checkbox') && !isReport"
+  *ngIf="(isBoolean || field?.controlType === 'checkbox' ||
+      isCheckBoxButton) && !isReport"
 >
   <section>
     <mat-checkbox
