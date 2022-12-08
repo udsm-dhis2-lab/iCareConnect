@@ -29,6 +29,7 @@ export class TestParameterEntryComponent implements OnInit {
       this.allocation?.results?.length > 0
         ? orderBy(this.allocation?.results, ["dateCreated"], ["desc"])[0]
         : null;
+
     if (this.latestResult) {
       this.latestResult = {
         ...this.latestResult,
@@ -39,13 +40,14 @@ export class TestParameterEntryComponent implements OnInit {
           : this.latestResult?.valueComplex
           ? this.latestResult?.valueComplex
           : this.latestResult?.valueCoded
-          ? this.latestResult?.valueCoded
+          ? this.latestResult?.valueCoded?.uuid
           : this.latestResult?.valueText
           ? this.latestResult?.valueText
           : this.latestResult?.valueModifier
           ? this.latestResult?.valueModifier
           : null,
       };
+      console.log("gdsgds", this.latestResult);
     }
   }
 

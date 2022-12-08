@@ -21,7 +21,14 @@
     <table class="table table-bordered" *ngIf="!errors || errors?.length == 0">
       <tbody>
         <tr *ngFor="let order of params?.sampleAllocations">
-          <td style="width: 100px">
+          <td
+            *ngIf="params?.sampleAllocations[0]?.allocations[0]?.isSet"
+            [ngStyle]="{
+              'width:': params?.sampleAllocations[0]?.allocations[0]?.isSet
+                ? '100px'
+                : '30%'
+            }"
+          >
             {{ order?.concept?.display }}
           </td>
           <td>
@@ -29,15 +36,18 @@
               <div
                 [ngClass]="{
                   'parameter-test-default':
-                    allocationData?.allocation?.parameter?.datatype.name ==
+                    (allocationData?.allocation?.parameter?.datatype.name ==
                       'Numeric' ||
-                    allocationData?.allocation?.parameter?.datatype.name ==
-                      'Coded',
+                      allocationData?.allocation?.parameter?.datatype.name ==
+                        'Coded') &&
+                    allocationData?.allocation?.isSet,
                   'parameter-test-text':
                     allocationData?.allocation?.parameter?.datatype.name !=
                       'Numeric' &&
                     allocationData?.allocation?.parameter?.datatype.name !=
-                      'Coded'
+                      'Coded' &&
+                    allocationData?.allocation?.isSet,
+                  'col-12': !allocationData?.allocation?.isSet
                 }"
                 class="entry-col"
                 *ngFor="let allocationData of order?.allocations"
@@ -67,14 +77,25 @@
             </div>
           </td>
           <td style="width: 100px">
-            <button
-              [disabled]="!isFormValid"
-              mat-flat-button
-              color="primary"
-              (click)="onSave($event)"
-            >
-              Save
-            </button>
+            <div class="mt-4">
+              <button
+                [disabled]="!isFormValid"
+                mat-flat-button
+                color="primary"
+                (click)="onSave($event)"
+              >
+                Save
+              </button>
+            </div>
+            <div class="mt-4">
+              <button
+                mat-flat-button
+                color="primary"
+                (click)="onAuthorize($event)"
+              >
+                Authorize
+              </button>
+            </div>
           </td>
         </tr>
       </tbody>
