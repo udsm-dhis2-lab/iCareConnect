@@ -52,7 +52,7 @@ public interface LaboratoryService extends OpenmrsService {
 	@Transactional
 	Result recordTestAllocationResults(Result result) throws Exception;
 	
-	Map<String, Object> saveMultipleResults(List<Result> results) throws Exception;
+	List<Map<String, Object>> saveMultipleResults(List<Result> results) throws Exception;
 	
 	Sample getSampleByUuid(String sampleUuid);
 	

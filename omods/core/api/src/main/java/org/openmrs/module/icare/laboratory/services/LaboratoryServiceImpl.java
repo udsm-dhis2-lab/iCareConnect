@@ -329,7 +329,7 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 		
 	}
 	
-	public Map<String, Object> saveMultipleResults(List<Result> results) throws Exception {
+	public List<Map<String, Object>> saveMultipleResults(List<Result> results) throws Exception {
 		List<Map<String, Object>> resultResponses = new ArrayList<>();
 		for (Result result: results) {
 			if (result.getConcept().getUuid() == null) {
@@ -366,12 +366,17 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 				Integer valueGroupId = this.getResultsId(result.getResultGroupUuid());
 				result.setValueGroupId(valueGroupId);
 			}
+			System.out.println(result.getStatus());
 			Result response = this.resultDAO.save(result);
+			Integer resultId = response.getId();
+			TestAllocationStatus resultStatus = new TestAllocationStatus();
+			resultStatus.setStatus(result.getStatus());
+			resultStatus.setCategory(result.getStatusCategory());
+			resultStatus.setRemarks(result.getStatusRemarks());
+//			this.testAllocationStatusDAO.save(resultStatus);
 			resultResponses.add(response.toMap());
 		}
-		Map<String, Object> res = new HashMap<>();
-		res.put("responses",resultResponses);
-		return  res;
+		return  resultResponses;
 	}
 	
 	@Override

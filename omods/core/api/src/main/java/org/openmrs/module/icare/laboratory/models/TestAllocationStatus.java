@@ -36,6 +36,10 @@ public class TestAllocationStatus implements java.io.Serializable {
 	private TestAllocation testAllocation;
 	
 	@ManyToOne
+	@JoinColumn(name = "test_result_id", nullable = true)
+	private Result testResult;
+	
+	@ManyToOne
 	@JoinColumn(name = "user_id", nullable = false)
 	private User user;
 	
@@ -87,6 +91,14 @@ public class TestAllocationStatus implements java.io.Serializable {
 		this.testAllocation = testAllocation;
 	}
 	
+	public Result getTestResult() {
+		return testResult;
+	}
+	
+	public void setTestResult(Result testResult) {
+		this.testResult = testResult;
+	}
+	
 	public Date getTimestamp() {
 		return timestamp;
 	}
@@ -134,6 +146,12 @@ public class TestAllocationStatus implements java.io.Serializable {
 		testAllocation.setUuid(((Map) map.get("testAllocation")).get("uuid").toString());
 		testAllocationStatus.setTestAllocation(testAllocation);
 		
+		if (map.get("testResult") != null && ((Map) map.get("testResult")).get("uuid") != null) {
+			Result testResult = new Result();
+			testResult.setUuid(((Map) map.get("testResult")).get("uuid").toString());
+			testAllocationStatus.setTestResult(testResult);
+		}
+		
 		User user = new User();
 		user.setUuid(((Map) map.get("user")).get("uuid").toString());
 		testAllocationStatus.setUser(user);
@@ -163,6 +181,14 @@ public class TestAllocationStatus implements java.io.Serializable {
 		if (this.retired != null) {
 			allocationStatusesObject.put("retired", this.getRetired());
 		}
+		Map<String, Object> result = new HashMap<>();
+
+		if (this.testResult != null) {
+			result.put("uuid", this.getTestResult().getUuid());
+		} else {
+			result = null;
+		}
+		allocationStatusesObject.put("result", result);
 		Map<String, Object> testAllocationStatusUserObject = new HashMap<String, Object>();
 		testAllocationStatusUserObject.put("uuid", this.getUser().getUuid());
 		testAllocationStatusUserObject.put("display", this.getUser().getDisplayString());
