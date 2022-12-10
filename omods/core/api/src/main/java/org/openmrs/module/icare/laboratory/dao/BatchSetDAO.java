@@ -19,7 +19,7 @@ public class BatchSetDAO extends BaseDAO<BatchSet> {
 			if (!queryStr.contains("WHERE")) {
 				queryStr += " WHERE ";
 			}
-			queryStr += " (cast(bt.dateCreated as date) BETWEEN :startDate AND :endDate)";
+			queryStr += " (cast(bs.dateCreated as date) BETWEEN :startDate AND :endDate)";
 		}
 		
 		if (q != null) {
@@ -29,7 +29,7 @@ public class BatchSetDAO extends BaseDAO<BatchSet> {
 				queryStr += " AND ";
 			}
 			
-			queryStr += "lower(bs.name) like lower(:q) OR (bs.label) LIKE lower(:q)";
+			queryStr += "lower(bs.batchSetName) like lower(:q) OR (bs.label) LIKE lower(:q)";
 		}
 		
 		//Construct a query object

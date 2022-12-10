@@ -523,6 +523,7 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 	@Test
 	public void CreatingAndGettingBatches() throws Exception {
 
+	//1. Creating batches
 		//Given
 		String dto = this.readFile("dto/batch-create-dto.json");
 		List<Map<String, Object>> batchObject = (new ObjectMapper()).readValue(dto, List.class);
@@ -530,17 +531,47 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		//When
 		MockHttpServletRequest newPostRequest = newPostRequest("lab/batch", batchObject);
 		MockHttpServletResponse handle = handle(newPostRequest);
+		List<Map<String, Object>> createdbatches = (new ObjectMapper()).readValue(handle.getContentAsString(), List.class);
 
+		assertThat("created 2 batches",createdbatches.size(),is(2));
+
+ 	//2. Getting batches
 		//When
 		MockHttpServletRequest newGetRequest = newGetRequest("lab/batches",new Parameter("startDate", "2022-12-10"), new Parameter("endDate", "2022-12-10"),new Parameter("q","batch-lab"));
 		MockHttpServletResponse handle2 = handle(newGetRequest);
 
-		List<Map<String, Object>> sampleResults = (new ObjectMapper()).readValue(handle2.getContentAsString(), List.class);
+		List<Map<String, Object>> batches = (new ObjectMapper()).readValue(handle2.getContentAsString(), List.class);
 
-		System.out.println();
-		
+		assertThat("Has 1 batch",batches.size(),is(1));
 
-		
+	}
+
+	@Test
+	public void CreatingAndGettingBatchSets() throws Exception{
+
+		//1. Creating batchSets
+		//Given
+		String dto = this.readFile("dto/batch-set-create-dto.json");
+		List<Map<String, Object>> batchObject = (new ObjectMapper()).readValue(dto, List.class);
+
+		//When
+		MockHttpServletRequest newPostRequest = newPostRequest("lab/batchset", batchObject);
+		MockHttpServletResponse handle = handle(newPostRequest);
+		List<Map<String, Object>> createdbatchSets = (new ObjectMapper()).readValue(handle.getContentAsString(), List.class);
+
+		System.out.println(createdbatchSets);
+
+		assertThat("created 1 batchSet",createdbatchSets.size(),is(2));
+
+		//2. Getting batchSets
+		//When
+		MockHttpServletRequest newGetRequest = newGetRequest("lab/batchsets",new Parameter("startDate", "2022-12-09"), new Parameter("endDate", "2022-12-09"),new Parameter("q","My batch set"));
+		MockHttpServletResponse handle2 = handle(newGetRequest);
+
+		List<Map<String, Object>> batches = (new ObjectMapper()).readValue(handle2.getContentAsString(), List.class);
+
+		assertThat("Has 1 batchSet",batches.size(),is(1));
+
 	}
 	
 	@Override
