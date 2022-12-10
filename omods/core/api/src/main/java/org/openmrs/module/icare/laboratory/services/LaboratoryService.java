@@ -9,6 +9,7 @@ import org.openmrs.module.icare.laboratory.models.*;
 import javax.transaction.Transactional;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @Transactional
 public interface LaboratoryService extends OpenmrsService {
@@ -38,7 +39,11 @@ public interface LaboratoryService extends OpenmrsService {
 	
 	SampleOrder saveSampleOrder(SampleOrder sampleOrder);
 	
-	List<TestAllocation> getAllocationBySample(String sampleUuid);
+	List<Sample> getSampleOrdersBySampleUuid(String sampleUuid);
+	
+	List<Sample> getAllocationsBySample(String sampleUuid);
+	
+	List<TestAllocation> getAllocationsByOrder(String orderUuid);
 	
 	List<TestAllocation> getAllAllocations();
 	
@@ -47,11 +52,16 @@ public interface LaboratoryService extends OpenmrsService {
 	@Transactional
 	Result recordTestAllocationResults(Result result) throws Exception;
 	
+	List<Map<String, Object>> saveMultipleResults(List<Result> results) throws Exception;
+	
 	Sample getSampleByUuid(String sampleUuid);
 	
 	List<Result> getResults();
 	
 	TestAllocationStatus updateTestAllocationStatus(TestAllocationStatus testAllocationStatus) throws Exception;
+	
+	List<Map<String, Object>> updateTestAllocationStatuses(List<TestAllocationStatus> testAllocationStatuses)
+	        throws Exception;
 	
 	Device getDeviceByUuid(String deviceUuid);
 	
@@ -93,4 +103,13 @@ public interface LaboratoryService extends OpenmrsService {
 	
 	WorkloadSummary getWorkLoadSummary(Date startDate, Date endDate);
 	
+	List<Batch> getBatches(Date start, Date end, String q, Integer startIndex, Integer limit);
+	
+	Batch createBatch(Batch batch);
+	
+	BatchSet createBatchSet(BatchSet batchSet);
+	
+	List<BatchSet> getBatchSets(Date start, Date end, String q, Integer startIndex, Integer limit);
+
+	BatchSet getBatchSetByUuid(String batchSetUuid);
 }

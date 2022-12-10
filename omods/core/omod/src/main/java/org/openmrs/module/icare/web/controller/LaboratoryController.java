@@ -13,13 +13,11 @@ import org.openmrs.module.icare.laboratory.models.*;
 import org.openmrs.module.icare.laboratory.services.LaboratoryService;
 import org.openmrs.module.webservices.rest.web.RestConstants;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -48,6 +46,8 @@ public class LaboratoryController {
 	
 	@Autowired
 	LocationService locationService;
+
+
 	
 	@RequestMapping(value = "visit", method = RequestMethod.GET)
 	@ResponseBody
@@ -318,6 +318,20 @@ public class LaboratoryController {
 		return newSampleOrder.toMap();
 	}
 	
+	@RequestMapping(value = "sample/{sampleUuid}/orders", method = RequestMethod.GET)
+	@ResponseBody
+	public List<Map<String, Object>> getSampleOrdersBySampleUuid(@PathVariable String sampleUuid) {
+		List<Map<String, Object>> orders = new ArrayList();
+		List<Sample> samples = laboratoryService.getSampleOrdersBySampleUuid(sampleUuid);
+		for (Sample sample : samples) {
+			for (SampleOrder order : sample.getSampleOrders()) {
+				orders.add(order.toMap());
+			}
+		}
+		return orders;
+		
+	}
+	
 	@RequestMapping(value = "assign", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> updateSampleOrder(@RequestBody Map<String, Object> sampleOrderObject) throws Exception {
@@ -336,11 +350,45 @@ public class LaboratoryController {
 		return createdTestAllocation.toMap();
 	}
 	
-	@RequestMapping(value = "allocation", method = RequestMethod.GET)
+	@RequestMapping(value = "allocations", method = RequestMethod.GET)
 	@ResponseBody
 	public List<TestAllocation> getAllocation() {
 		return laboratoryService.getAllAllocations();
 		
+	}
+	
+	@RequestMapping(value = "allocation", method = RequestMethod.GET)
+	@ResponseBody
+	public Map<String, Object> getAllocation(@RequestParam(value = "uuid", required = true) String uuid) {
+		return laboratoryService.getAllocationByUuid(uuid).toMap();
+	}
+	
+	@RequestMapping(value = "allocationsbyorder", method = RequestMethod.GET)
+	@ResponseBody
+	public List<TestAllocation> getAllocationsByOrder(@RequestParam(value = "uuid", required = true) String uuid) {
+		return laboratoryService.getAllocationsByOrder(uuid);
+	}
+	
+	@RequestMapping(value = "allocationsbysample", method = RequestMethod.GET)
+	@ResponseBody
+	public List<Map<String, Object>> getAllocationsBySample(@RequestParam(value = "uuid", required = true) String uuid) {
+		List<Map<String, Object>> allocations = new ArrayList<>();
+		 List<Sample> samplesResponse = laboratoryService.getAllocationsBySample(uuid);
+		 if (samplesResponse.size() > 0) {
+			 for(Sample sample: samplesResponse) {
+				 if (sample.getSampleOrders().size() > 0) {
+					 for (SampleOrder order: sample.getSampleOrders()) {
+						 if (order.getTestAllocations().size() > 0) {
+							 for (TestAllocation allocation: order.getTestAllocations()) {
+								 allocations.add(allocation.toMap());
+							 }
+						 }
+					 }
+				 }
+			 }
+		 }
+
+		 return  allocations;
 	}
 	
 	@RequestMapping(value = "results", method = RequestMethod.POST)
@@ -351,6 +399,20 @@ public class LaboratoryController {
 		Result savedResults = laboratoryService.recordTestAllocationResults(result);
 		return savedResults.toMap();
 		
+	}
+	
+	@RequestMapping(value = "multipleresults", method = RequestMethod.POST)
+	@ResponseBody
+	public List<Map<String, Object>> saveMultipleResults(@RequestBody List<Map<String, Object>> results) throws Exception {
+		List<Result> formattedResults = new ArrayList<>();
+		for(Map<String, Object> resultObject: results) {
+			Result result = Result.fromMap(resultObject);
+			result.setCreator(Context.getAuthenticatedUser());
+			formattedResults.add(result);
+		}
+		List<Map<String, Object>> savedResultsResponse = laboratoryService.saveMultipleResults(formattedResults);
+		return savedResultsResponse;
+
 	}
 	
 	@RequestMapping(value = "results", method = RequestMethod.GET)
@@ -368,6 +430,22 @@ public class LaboratoryController {
 		TestAllocationStatus testAllocationStatus = TestAllocationStatus.fromMap(testAllocationStatusObject);
 		TestAllocationStatus savedTestAllocationStatus = laboratoryService.updateTestAllocationStatus(testAllocationStatus);
 		return savedTestAllocationStatus.toMap();
+		
+	}
+	
+	@RequestMapping(value = "allocationstatuses", method = RequestMethod.POST)
+	@ResponseBody
+	public List<Map<String, Object>> saveTestAllocationStatuses(
+	        @RequestBody List<Map<String, Object>> testAllocationStatusesObject) throws Exception {
+		List<TestAllocationStatus> testAllocationStatuses = new ArrayList<TestAllocationStatus>();
+		for (Map<String, Object> testAllocationStatusObject : testAllocationStatusesObject) {
+			TestAllocationStatus testAllocationStatus = TestAllocationStatus.fromMap(testAllocationStatusObject);
+			testAllocationStatuses.add(testAllocationStatus);
+		}
+		
+		List<Map<String, Object>> savedTestAllocationStatuses = laboratoryService
+		        .updateTestAllocationStatuses(testAllocationStatuses);
+		return savedTestAllocationStatuses;
 		
 	}
 	
@@ -627,6 +705,103 @@ public class LaboratoryController {
 		WorkloadSummary workloadSummary = laboratoryService.getWorkLoadSummary(start, end);
 		
 		return workloadSummary.toMap();
+	}
+	
+	@RequestMapping(value = "batch", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public List<Map<String, Object>> addBatch(@RequestBody List<Map<String, Object>> batchesObject) throws Exception {
+
+		Batch batch = new Batch();
+		List<Map<String, Object>> newBatches = new ArrayList<Map<String, Object>>();
+
+		for (Map<String, Object> batchObject :  batchesObject){
+
+			batch = Batch.fromMap(batchObject);
+
+			if((batchObject.get("batchSet")) != null) {
+
+				BatchSet batchSet = laboratoryService.getBatchSetByUuid(((Map) batchObject.get("batchSet")).get("uuid").toString());
+				batch.setBatchSet(batchSet);
+
+			}
+
+			Batch newBatch = laboratoryService.createBatch(batch);
+			newBatches.add(newBatch.toMap());
+		}
+		return newBatches;
+	}
+	
+	@RequestMapping(value = "batches", method = RequestMethod.GET)
+	@ResponseBody
+	public List<Map<String, Object>> getbatches(@RequestParam(value = "startDate", required = false) String startDate,
+	        @RequestParam(value = "endDate", required = false) String endDate,
+	        @RequestParam(value = "q", required = false) String q,@RequestParam(defaultValue = "0") Integer startIndex, @RequestParam(defaultValue = "100") Integer limit) throws ParseException {
+
+		
+		Date start = null;
+		Date end = null;
+		if (startDate != null && endDate != null) {
+			
+			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+			start = formatter.parse(startDate);
+			end = formatter.parse(endDate);
+		}
+
+		List<Batch> batches = laboratoryService.getBatches(start, end, q, startIndex, limit);
+
+		
+		List<Map<String, Object>> responseBatchesObject = new ArrayList<Map<String, Object>>();
+		for (Batch batch : batches) {
+			Map<String, Object> batchObject = batch.toMap();
+			responseBatchesObject.add(batchObject);
+		}
+		
+		return responseBatchesObject;
+		
+	}
+	
+	@RequestMapping(value = "batchset", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public List<Map<String, Object>> addBatchSet(@RequestBody List<Map<String, Object>> batchSetsObject) {
+
+		BatchSet batchSet = new BatchSet();
+		List<Map<String,Object>> newBatchSets = new ArrayList<Map<String,Object>>();
+
+		for(Map<String, Object> batchSetObject : batchSetsObject){
+
+			batchSet = BatchSet.fromMap(batchSetObject);
+			BatchSet newBatchSet = laboratoryService.createBatchSet(batchSet);
+			newBatchSets.add(newBatchSet.toMap());
+		}
+		
+		return newBatchSets;
+
+	}
+	
+	@RequestMapping(value = "batchsets", method = RequestMethod.GET)
+	@ResponseBody
+	public List<Map<String, Object>> getbatchsets(@RequestParam(value = "startDate", required = false) String startDate,
+	        @RequestParam(value = "endDate", required = false) String endDate,@RequestParam(value = "q", required = false) String q,@RequestParam(defaultValue = "0") Integer startIndex, @RequestParam(defaultValue = "100") Integer limit) throws ParseException {
+		
+		Date start = null;
+		Date end = null;
+		if (startDate != null && endDate != null) {
+			
+			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+			start = formatter.parse(startDate);
+			end = formatter.parse(endDate);
+		}
+		
+		List<BatchSet> batchsets = laboratoryService.getBatchSets(start, end, q, startIndex, limit);
+		
+		List<Map<String, Object>> responseBatchSetsObject = new ArrayList<Map<String, Object>>();
+		for (BatchSet batchSet : batchsets) {
+			Map<String, Object> batchObject = batchSet.toMap();
+			responseBatchSetsObject.add(batchObject);
+		}
+		
+		return responseBatchSetsObject;
+		
 	}
 	
 }

@@ -97,7 +97,7 @@ export class NursingDataComponent implements OnInit {
     this.orderTypes$ = this.store.select(getAllOrderTypes);
     this.privileges$ = this.store.select(getCurrentUserPrivileges);
     this.conceptsWithDepartmentsDetails$ =
-      this.conceptsService.getConceptsDepartmentDetails(
+      this.conceptsService.getDepartmentDetails(
         this.nursingConfigurations?.departmentsReference?.id
       );
     this.forms$ = this.store.select(
