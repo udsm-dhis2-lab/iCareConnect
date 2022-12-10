@@ -152,7 +152,7 @@
     <location location_id ="602" uuid = "iCARE890-TEST-MOTR-9beb-d30dcfc0c66e" name = "My location" description = "Testing" date_created="2017-02-14 15:51:57.0" retired="false" />
 
     <!-- Batch set -->
-    <lb_batch_set batch_set_id ="602" uuid = "iCARE890-TEST-MOTR-9beb-d30dcfc0c665" name = "My batch set" description = "Testing batchset" date_created="2017-02-14 15:51:57.0" voided="0" creator="1" />
+    <lb_batch_set batch_set_id ="602" uuid = "iCARE890-TEST-MOTR-9beb-d30dcfc0c665" name = "My batch set" description = "Testing batchset" date_created="2022-12-09 15:51:57.0" voided="0" creator="1" />
 
     <!-- Batch  -->
     <lb_batch batch_id ="601" uuid = "iCARE890-TEST-MOTR-9beb-d30dcfc0c635" name = "My batch" label="batch-label" description = "Testing batch" batch_set_id="602" date_created="2022-12-10 15:51:57.0" voided="0" creator="1" />

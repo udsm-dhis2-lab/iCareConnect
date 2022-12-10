@@ -614,7 +614,7 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	}
 	
 	@Override
-	public List<BatchSet> getBatchSets(Date startDate, Date endDate, String q, Integer limit, Integer startIndex) {
+	public List<BatchSet> getBatchSets(Date startDate, Date endDate, String q, Integer startIndex, Integer limit) {
 		return batchSetDAO.getBatchSets(startDate, endDate, q, startIndex, limit);
 	}
 
