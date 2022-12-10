@@ -286,7 +286,7 @@ public class Result extends BaseOpenmrsData implements java.io.Serializable {
 	
 	public Map<String, Object> toMap() {
 		Map<String, Object> resultsObject = new HashMap<String, Object>();
-		
+		resultsObject.put("uuid", this.getUuid());
 		resultsObject.put("valueText", this.getValueText());
 		resultsObject.put("valueNumeric", this.getValueNumeric());
 		resultsObject.put("valueBoolean", this.getValueBoolean());
