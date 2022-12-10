@@ -261,6 +261,12 @@ public class Result extends BaseOpenmrsData implements java.io.Serializable {
 			result.setAddReqTimeLimit((Integer) map.get("additionalReqTimeLimit"));
 		}
 		
+		if (map.get("status") != null && ((Map) map.get("status")).get("status") != null) {
+			result.setStatusCategory(((Map) map.get("status")).get("category").toString());
+			result.setStatus(((Map) map.get("status")).get("status").toString());
+			result.setStatusRemarks(((Map) map.get("status")).get("remarks").toString());
+		}
+		
 		//		if (map.get("instrument") != null) {
 		//			Concept instrument = new Concept();
 		//			instrument.setUuid(((Map) map.get("instrument")).get("uuid").toString());
@@ -376,5 +382,45 @@ public class Result extends BaseOpenmrsData implements java.io.Serializable {
 	public void setInstrument(Concept instrument) {
 		this.instrument = instrument;
 	}
+	
+	/*
+	For statuses passed via results object
+	* */
+	@Transient
+	private String status;
+	
+	@Transient
+	private String category;
+	
+	@Transient
+	private String remarks;
+	
+	public String getStatus() {
+		return this.status;
+	}
+	
+	public void setStatus(String status) {
+		this.status = status;
+	}
+	
+	public String getStatusCategory() {
+		return this.category;
+	}
+	
+	public void setStatusCategory(String category) {
+		this.category = category;
+	}
+	
+	public String getStatusRemarks() {
+		return this.remarks;
+	}
+	
+	public void setStatusRemarks(String remarks) {
+		this.remarks = remarks;
+	}
+	
+	/*
+	End of result's statuses
+	 */
 	
 }

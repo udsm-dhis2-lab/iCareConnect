@@ -454,7 +454,8 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		
 		MockHttpServletResponse handle = handle(newPostRequest);
 		
-		Map<String, Object> resultsObject = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
+		List<Map<String, Object>> resultsObject = (new ObjectMapper()).readValue(handle.getContentAsString(),
+		    ArrayList.class);
 		System.out.println(resultsObject);
 	}
 	
