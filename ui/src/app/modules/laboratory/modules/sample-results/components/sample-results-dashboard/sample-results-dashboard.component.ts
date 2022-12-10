@@ -363,4 +363,8 @@ export class SampleResultsDashboardComponent implements OnInit {
         }, 100);
       });
   }
+
+  getSelectedDepartments(selectedDepartments: any[]): void {
+    console.log(selectedDepartments);
+  }
 }

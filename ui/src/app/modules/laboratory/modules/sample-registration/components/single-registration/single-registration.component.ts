@@ -1,7 +1,6 @@
 import { Component, Input, OnInit } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { MatRadioChange } from "@angular/material/radio";
-import * as moment from "moment";
 import { Observable, of, zip } from "rxjs";
 import {
   EQA_PERSON_DATA,
@@ -12,11 +11,9 @@ import { Location } from "src/app/core/models";
 import { SystemSettingsWithKeyDetails } from "src/app/core/models/system-settings.model";
 import { LocationService } from "src/app/core/services";
 import { IdentifiersService } from "src/app/core/services/identifiers.service";
-import { LabSampleModel } from "src/app/modules/laboratory/resources/models";
 import { LabOrdersService } from "src/app/modules/laboratory/resources/services/lab-orders.service";
 import { LabTestsService } from "src/app/modules/laboratory/resources/services/lab-tests.service";
 import { RegistrationService } from "src/app/modules/registration/services/registration.services";
-import { formatDateToYYMMDD } from "src/app/shared/helpers/format-date.helper";
 import { DateField } from "src/app/shared/modules/form/models/date-field.model";
 import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
@@ -56,6 +53,7 @@ export class SingleRegistrationComponent implements OnInit {
   @Input() labNumberCharactersCount: string;
   @Input() testsFromExternalSystemsConfigs: any[];
   @Input() currentUser: any;
+  @Input() isBatchRegistration: any;
 
   departmentField: any = {};
   specimenDetailsFields: any;
