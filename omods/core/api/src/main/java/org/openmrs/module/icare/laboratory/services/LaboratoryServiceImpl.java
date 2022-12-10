@@ -41,6 +41,10 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	
 	TestOrderLocationDAO testOrderLocationDAO;
 	
+	BatchDAO batchDAO;
+	
+	BatchSetDAO batchSetDAO;
+	
 	public void setSampleDAO(SampleDAO sampleDAO) {
 		this.sampleDAO = sampleDAO;
 	}
@@ -79,6 +83,14 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	
 	public void setSampleLableDAO(SampleLableDAO sampleLableDAO) {
 		this.sampleLableDAO = sampleLableDAO;
+	}
+
+	public void setBatchSetDAO(BatchSetDAO batchSetDAO) {
+		this.batchSetDAO = batchSetDAO;
+	}
+
+	public void setBatchDAO(BatchDAO batchDAO) {
+		this.batchDAO = batchDAO;
 	}
 	
 	@Override
@@ -267,15 +279,22 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	}
 	
 	@Override
-	public List<TestAllocation> getAllocationBySample(String sampleId) {
-		
-		return this.testAllocationDAO.getAllocationBySample(sampleId);
-		
+	public List<Sample> getSampleOrdersBySampleUuid(String sampleUuid) {
+		return IteratorUtils.toList(this.sampleOrderDAO.getSampleOrdersBySampleUuid(sampleUuid).iterator());
+	}
+	
+	@Override
+	public List<Sample> getAllocationsBySample(String sampleId) {
+		return this.testAllocationDAO.getAllocationsBySample(sampleId);
+	}
+	
+	@Override
+	public List<TestAllocation> getAllocationsByOrder(String orderUuid) {
+		return this.testAllocationDAO.getAllocationsByOrder(orderUuid);
 	}
 	
 	@Override
 	public List<TestAllocation> getAllAllocations() {
-		
 		return IteratorUtils.toList(this.testAllocationDAO.findAll().iterator());
 	}
 	
@@ -322,6 +341,64 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 		
 	}
 	
+	public List<Map<String, Object>> saveMultipleResults(List<Result> results) throws Exception {
+		List<Map<String, Object>> resultResponses = new ArrayList<>();
+		for (Result result: results) {
+			if (result.getConcept().getUuid() == null) {
+				throw new Exception("Concept is null. Concept for the result must be provided");
+			}
+			if (result.getTestAllocation().getUuid() == null) {
+				throw new Exception("Test Allocation is null. Test allocation uuid must be provided");
+			}
+
+			Concept concept = Context.getConceptService().getConceptByUuid(result.getConcept().getUuid());
+			if (concept == null) {
+				throw new Exception("Concept with id '" + result.getConcept().getUuid() + "' does not exist");
+			}
+
+			result.setConcept(concept);
+
+			TestAllocation testAllocation = this.testAllocationDAO.findByUuid(result.getTestAllocation().getUuid());
+			if (testAllocation == null) {
+				throw new Exception("Test Allocation with id '" + result.getTestAllocation().getUuid() + "' does not exist");
+			}
+			result.setTestAllocation(testAllocation);
+
+			if (result.getValueCoded() != null) {
+				Concept valueCoded = Context.getConceptService().getConceptByUuid(result.getValueCoded().getUuid());
+				result.setValueCoded(valueCoded);
+			}
+
+			if (result.getValueDrug() != null) {
+				Drug drug = Context.getConceptService().getDrugByUuid(result.getValueDrug().getUuid());
+				result.setValueDrug(drug);
+			}
+
+			if (result.getResultGroupUuid() != null && getResultsByUuid(result.getResultGroupUuid()) != null) {
+				Integer valueGroupId = this.getResultsId(result.getResultGroupUuid());
+				result.setValueGroupId(valueGroupId);
+			}
+			Result response = this.resultDAO.save(result);
+			/*
+			Save status via results
+			* */
+			TestAllocationStatus resultStatus = new TestAllocationStatus();
+			resultStatus.setStatus(result.getStatus());
+			resultStatus.setCategory(result.getStatusCategory());
+			resultStatus.setRemarks(result.getStatusRemarks());
+			resultStatus.setTestResult(response);
+			resultStatus.setUser(response.getCreator());
+			resultStatus.setTestAllocation(response.getTestAllocation());
+			this.testAllocationStatusDAO.save(resultStatus);
+			/*
+			End of save status via results
+			* */
+//			TODO: Add support to accommodate new status on the allocation response
+			resultResponses.add(response.toMap());
+		}
+		return  resultResponses;
+	}
+	
 	@Override
 	public Sample getSampleByUuid(String sampleUuid) {
 		return this.sampleDAO.findByUuid(sampleUuid);
@@ -330,6 +407,14 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	@Override
 	public List<Result> getResults() {
 		return IteratorUtils.toList(this.resultDAO.findAll().iterator());
+	}
+	
+	private Result getResultsByUuid(String uuid) {
+		return this.resultDAO.findByUuid(uuid);
+	}
+	
+	private Integer getResultsId(String uuid) {
+		return this.resultDAO.findByUuid(uuid).getId();
 	}
 	
 	@Override
@@ -344,8 +429,14 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 		if (user == null) {
 			throw new Exception("The user is not authenticated.");
 		}
+		
+		Result testResult = this.resultDAO.findByUuid(testAllocationStatus.getTestResult().getUuid());
+		//		System.out.println(testAllocationStatus.getTestResult().getUuid());
 		testAllocationStatus.setTestAllocation(testAllocation);
 		testAllocationStatus.setUser(user);
+		if (testResult != null) {
+			testAllocationStatus.setTestResult(testResult);
+		}
 		TestAllocationStatus createdStatus = this.testAllocationStatusDAO.save(testAllocationStatus);
 		
 		//		if (countTestAllocationApprovedStatuses(testAllocation.getUuid()) == 2) {
@@ -444,6 +535,15 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 		}
 		
 		return createdStatus;
+	}
+	
+	public List<Map<String, Object>> updateTestAllocationStatuses(List<TestAllocationStatus> testAllocationStatuses) throws Exception {
+		List<Map<String, Object>> responses = new ArrayList<>();
+		for(TestAllocationStatus testAllocationStatus: testAllocationStatuses) {
+			TestAllocationStatus response = this.updateTestAllocationStatus(testAllocationStatus);
+			responses.add(response.toMap());
+		}
+		return responses;
 	}
 	
 	@Override
@@ -583,6 +683,31 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	public WorkloadSummary getWorkLoadSummary(Date startDate, Date endDate) {
 		
 		return sampleDAO.getWorkloadSummary(startDate, endDate);
+	}
+	
+	@Override
+	public List<Batch> getBatches(Date startDate, Date endDate, String q, Integer startIndex, Integer limit) {
+		return batchDAO.getBatches(startDate, endDate, q, startIndex, limit);
+	}
+	
+	@Override
+	public Batch createBatch(Batch batch) {
+		return batchDAO.save(batch);
+	}
+	
+	@Override
+	public BatchSet createBatchSet(BatchSet batchSet) {
+
+		return batchSetDAO.save(batchSet);
+	}
+	
+	@Override
+	public List<BatchSet> getBatchSets(Date startDate, Date endDate, String q, Integer startIndex, Integer limit) {
+		return batchSetDAO.getBatchSets(startDate, endDate, q, startIndex, limit);
+	}
+
+	public BatchSet getBatchSetByUuid(String batchSetUuid){
+		return  batchSetDAO.findByUuid(batchSetUuid);
 	}
 	
 }

@@ -46,7 +46,6 @@ export class ResultEntryFormComponent implements OnInit {
             id: this.parameter?.uuid,
             key: this.parameter?.uuid,
             label: this.parameter?.display,
-            type: "number",
             value: this.value,
             disabled: this.disabled,
             multiple: this.hasMultipleAnswers,
