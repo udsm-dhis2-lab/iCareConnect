@@ -134,7 +134,7 @@ export class ConceptsService {
     );
   }
 
-  getConceptsDepartmentDetails(referenceConcept: string): Observable<any> {
+  getDepartmentDetails(referenceConcept: string): Observable<any> {
     return this.httpClient
       .get(
         "concept/" +
@@ -348,11 +348,16 @@ export class ConceptsService {
     );
   }
 
-  getConceptsBySearchTerm(searchTerm: string): Observable<ConceptGetFull[]> {
+  getConceptsBySearchTerm(
+    searchTerm: string,
+    fields?: string
+  ): Observable<ConceptGetFull[]> {
     return from(
       this.api.concept.getAllConcepts({
         q: searchTerm,
-        v: "custom:(uuid,display,names,descriptions,setMembers:(uuid,display,datatype,attributes:(uuid,display,value,attributeType:(uuid,display)),answers:(uuid,display),setMembers:(uuid,display,attributes:(uuid,display,value,attributeType:(uuid,display)),datatype,answers:(uuid,display))))",
+        v: !fields
+          ? "custom:(uuid,display,names,descriptions,setMembers:(uuid,display,datatype,attributes:(uuid,display,value,attributeType:(uuid,display)),answers:(uuid,display),setMembers:(uuid,display,attributes:(uuid,display,value,attributeType:(uuid,display)),datatype,answers:(uuid,display))))"
+          : fields,
       })
     ).pipe(
       map((response) => {
