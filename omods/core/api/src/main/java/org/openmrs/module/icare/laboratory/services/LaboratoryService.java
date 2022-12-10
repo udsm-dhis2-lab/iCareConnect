@@ -60,6 +60,9 @@ public interface LaboratoryService extends OpenmrsService {
 	
 	TestAllocationStatus updateTestAllocationStatus(TestAllocationStatus testAllocationStatus) throws Exception;
 	
+	List<Map<String, Object>> updateTestAllocationStatuses(List<TestAllocationStatus> testAllocationStatuses)
+	        throws Exception;
+	
 	Device getDeviceByUuid(String deviceUuid);
 	
 	TestRangeConfig createTestRangeConfig(TestRangeConfig testRangeConfig);

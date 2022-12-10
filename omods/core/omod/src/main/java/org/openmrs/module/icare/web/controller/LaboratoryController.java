@@ -431,6 +431,22 @@ public class LaboratoryController {
 		
 	}
 	
+	@RequestMapping(value = "allocationstatuses", method = RequestMethod.POST)
+	@ResponseBody
+	public List<Map<String, Object>> saveTestAllocationStatuses(
+	        @RequestBody List<Map<String, Object>> testAllocationStatusesObject) throws Exception {
+		List<TestAllocationStatus> testAllocationStatuses = new ArrayList<TestAllocationStatus>();
+		for (Map<String, Object> testAllocationStatusObject : testAllocationStatusesObject) {
+			TestAllocationStatus testAllocationStatus = TestAllocationStatus.fromMap(testAllocationStatusObject);
+			testAllocationStatuses.add(testAllocationStatus);
+		}
+		
+		List<Map<String, Object>> savedTestAllocationStatuses = laboratoryService
+		        .updateTestAllocationStatuses(testAllocationStatuses);
+		return savedTestAllocationStatuses;
+		
+	}
+	
 	@RequestMapping(value = "testtime", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> addTestTimeConfiguration(@RequestBody HashMap<String, Object> testTimeConfigurationMap) {
