@@ -51,7 +51,8 @@ public class Invoice extends BaseChangeableOpenmrsData implements java.io.Serial
 	public List<InvoiceItem> getInvoiceItems() {
 		return this.invoiceItems;
 	}
-	
+
+
 	public Invoice() {
 		
 	}

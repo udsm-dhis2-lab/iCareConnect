@@ -2,10 +2,12 @@ package org.openmrs.module.icare.laboratory.models;
 
 import org.openmrs.BaseOpenmrsData;
 import org.openmrs.User;
+import org.openmrs.Visit;
 import org.openmrs.module.icare.core.JSONConverter;
 
 import javax.persistence.*;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static javax.persistence.GenerationType.IDENTITY;
@@ -32,7 +34,7 @@ public class Batch extends BaseOpenmrsData implements java.io.Serializable, JSON
 	private String fields;
 	
 	@ManyToOne
-	@JoinColumn(name = "batch_set_id", nullable = false)
+	@JoinColumn(name = "batch_set_id", nullable = true)
 	private BatchSet batchSet;
 	
 	@Override
@@ -50,7 +52,7 @@ public class Batch extends BaseOpenmrsData implements java.io.Serializable, JSON
 		this.batchName = batchName;
 	}
 	
-	public String getBatchSetName() {
+	public String getBatchName() {
 		return batchName;
 	}
 	
@@ -78,15 +80,23 @@ public class Batch extends BaseOpenmrsData implements java.io.Serializable, JSON
 		return fields;
 	}
 	
-	public static BatchSet fromMap(Map<String, Object> batchMap) {
-		
-		BatchSet batchSet = new BatchSet();
-		batchSet.setBatchSetName(batchMap.get("name").toString());
-		batchSet.setFields(batchMap.get("fields").toString());
-		batchSet.setDescription(batchMap.get("description").toString());
-		batchSet.setLabel(batchMap.get("label").toString());
-		
+	public BatchSet getBatchSet() {
 		return batchSet;
+	}
+	
+	public void setBatchSet(BatchSet batchSet) {
+		this.batchSet = batchSet;
+	}
+	
+	public static Batch fromMap(Map<String, Object> batchMap) {
+		
+		Batch batch = new Batch();
+		batch.setBatchName(batchMap.get("name").toString());
+		batch.setFields(batchMap.get("fields").toString());
+		batch.setDescription(batchMap.get("description").toString());
+		batch.setLabel(batchMap.get("label").toString());
+
+		return batch;
 		
 	}
 	
@@ -97,7 +107,26 @@ public class Batch extends BaseOpenmrsData implements java.io.Serializable, JSON
 		batchObject.put("label", this.getLabel());
 		batchObject.put("description", this.getDescription());
 		batchObject.put("fields", this.getFields());
-		batchObject.put("name", this.getBatchSetName());
+		batchObject.put("name", this.getBatchName());
+		batchObject.put("uuid", this.getUuid());
+		if (this.getDateCreated() != null) {
+			batchObject.put("dateCreated", this.getDateCreated());
+		}
+		
+		Map<String, Object> creatorObject = new HashMap<String, Object>();
+		
+		if (this.getCreator() != null) {
+			creatorObject.put("uuid", this.getCreator().getUuid());
+			creatorObject.put("display", this.getCreator().getDisplayString());
+		}
+		batchObject.put("creator", creatorObject);
+		
+		Map<String, Object> batchSetObject = new HashMap<String, Object>();
+		if (this.getBatchSet() != null) {
+			batchSetObject.put("uuid", this.getBatchSet().getUuid());
+			batchSetObject.put("name", this.getBatchSet().getBatchSetName());
+			batchObject.put("batchSet", batchSetObject);
+		}
 		
 		return batchObject;
 		
