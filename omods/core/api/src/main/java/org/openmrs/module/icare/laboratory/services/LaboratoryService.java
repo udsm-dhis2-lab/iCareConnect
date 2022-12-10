@@ -9,6 +9,7 @@ import org.openmrs.module.icare.laboratory.models.*;
 import javax.transaction.Transactional;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @Transactional
 public interface LaboratoryService extends OpenmrsService {
@@ -93,4 +94,13 @@ public interface LaboratoryService extends OpenmrsService {
 	
 	WorkloadSummary getWorkLoadSummary(Date startDate, Date endDate);
 	
+	List<Batch> getBatches(Date start, Date end, String q, Integer startIndex, Integer limit);
+	
+	Batch createBatch(Batch batch);
+	
+	BatchSet createBatchSet(BatchSet batchSet);
+	
+	List<BatchSet> getBatchSets(Date start, Date end, String q, Integer startIndex, Integer limit);
+
+	BatchSet getBatchSetByUuid(String batchSetUuid);
 }

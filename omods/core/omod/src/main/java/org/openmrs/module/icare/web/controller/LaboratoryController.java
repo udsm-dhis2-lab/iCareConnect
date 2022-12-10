@@ -48,6 +48,8 @@ public class LaboratoryController {
 	
 	@Autowired
 	LocationService locationService;
+
+
 	
 	@RequestMapping(value = "visit", method = RequestMethod.GET)
 	@ResponseBody
@@ -627,6 +629,103 @@ public class LaboratoryController {
 		WorkloadSummary workloadSummary = laboratoryService.getWorkLoadSummary(start, end);
 		
 		return workloadSummary.toMap();
+	}
+	
+	@RequestMapping(value = "batch", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public List<Map<String, Object>> addBatch(@RequestBody List<Map<String, Object>> batchesObject) throws Exception {
+
+		Batch batch = new Batch();
+		List<Map<String, Object>> newBatches = new ArrayList<Map<String, Object>>();
+
+		for (Map<String, Object> batchObject :  batchesObject){
+
+			batch = Batch.fromMap(batchObject);
+
+			if((batchObject.get("batchSet")) != null) {
+
+				BatchSet batchSet = laboratoryService.getBatchSetByUuid(((Map) batchObject.get("batchSet")).get("uuid").toString());
+				batch.setBatchSet(batchSet);
+
+			}
+
+			Batch newBatch = laboratoryService.createBatch(batch);
+			newBatches.add(newBatch.toMap());
+		}
+		return newBatches;
+	}
+	
+	@RequestMapping(value = "batches", method = RequestMethod.GET)
+	@ResponseBody
+	public List<Map<String, Object>> getbatches(@RequestParam(value = "startDate", required = false) String startDate,
+	        @RequestParam(value = "endDate", required = false) String endDate,
+	        @RequestParam(value = "q", required = false) String q,@RequestParam(defaultValue = "0") Integer startIndex, @RequestParam(defaultValue = "100") Integer limit) throws ParseException {
+
+		
+		Date start = null;
+		Date end = null;
+		if (startDate != null && endDate != null) {
+			
+			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+			start = formatter.parse(startDate);
+			end = formatter.parse(endDate);
+		}
+
+		List<Batch> batches = laboratoryService.getBatches(start, end, q, startIndex, limit);
+
+		
+		List<Map<String, Object>> responseBatchesObject = new ArrayList<Map<String, Object>>();
+		for (Batch batch : batches) {
+			Map<String, Object> batchObject = batch.toMap();
+			responseBatchesObject.add(batchObject);
+		}
+		
+		return responseBatchesObject;
+		
+	}
+	
+	@RequestMapping(value = "batchset", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public List<Map<String, Object>> addBatchSet(@RequestBody List<Map<String, Object>> batchSetsObject) {
+
+		BatchSet batchSet = new BatchSet();
+		List<Map<String,Object>> newBatchSets = new ArrayList<Map<String,Object>>();
+
+		for(Map<String, Object> batchSetObject : batchSetsObject){
+
+			batchSet = BatchSet.fromMap(batchSetObject);
+			BatchSet newBatchSet = laboratoryService.createBatchSet(batchSet);
+			newBatchSets.add(newBatchSet.toMap());
+		}
+		
+		return newBatchSets;
+
+	}
+	
+	@RequestMapping(value = "batchsets", method = RequestMethod.GET)
+	@ResponseBody
+	public List<Map<String, Object>> getbatchsets(@RequestParam(value = "startDate", required = false) String startDate,
+	        @RequestParam(value = "endDate", required = false) String endDate,@RequestParam(value = "q", required = false) String q,@RequestParam(defaultValue = "0") Integer startIndex, @RequestParam(defaultValue = "100") Integer limit) throws ParseException {
+		
+		Date start = null;
+		Date end = null;
+		if (startDate != null && endDate != null) {
+			
+			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+			start = formatter.parse(startDate);
+			end = formatter.parse(endDate);
+		}
+		
+		List<BatchSet> batchsets = laboratoryService.getBatchSets(start, end, q, startIndex, limit);
+		
+		List<Map<String, Object>> responseBatchSetsObject = new ArrayList<Map<String, Object>>();
+		for (BatchSet batchSet : batchsets) {
+			Map<String, Object> batchObject = batchSet.toMap();
+			responseBatchSetsObject.add(batchObject);
+		}
+		
+		return responseBatchSetsObject;
+		
 	}
 	
 }
