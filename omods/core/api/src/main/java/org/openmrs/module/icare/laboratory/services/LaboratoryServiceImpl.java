@@ -40,10 +40,10 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	SampleLableDAO sampleLableDAO;
 	
 	TestOrderLocationDAO testOrderLocationDAO;
-
+	
 	BatchDAO batchDAO;
-
-	BatchSetDao batchSetDao;
+	
+	BatchSetDAO batchSetDAO;
 	
 	public void setSampleDAO(SampleDAO sampleDAO) {
 		this.sampleDAO = sampleDAO;
@@ -83,6 +83,14 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	
 	public void setSampleLableDAO(SampleLableDAO sampleLableDAO) {
 		this.sampleLableDAO = sampleLableDAO;
+	}
+
+	public void setBatchSetDAO(BatchSetDAO batchSetDAO) {
+		this.batchSetDAO = batchSetDAO;
+	}
+
+	public void setBatchDAO(BatchDAO batchDAO) {
+		this.batchDAO = batchDAO;
 	}
 	
 	@Override
@@ -588,26 +596,30 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 		
 		return sampleDAO.getWorkloadSummary(startDate, endDate);
 	}
-
+	
 	@Override
-	public List<Batch> getBatches(Date startDate, Date endDate,String q,Integer limit, Integer startIndex){
-		return batchDAO.getBatches(startDate,endDate,q,startIndex,limit);
+	public List<Batch> getBatches(Date startDate, Date endDate, String q, Integer startIndex, Integer limit) {
+		return batchDAO.getBatches(startDate, endDate, q, startIndex, limit);
 	}
-
+	
 	@Override
-	public Batch createBatch(Batch batch){
+	public Batch createBatch(Batch batch) {
 		return batchDAO.save(batch);
 	}
-
+	
 	@Override
-	public  BatchSet createBatchSet(BatchSet batchSet){
-		return batchSetDao.save(batchSet);
+	public BatchSet createBatchSet(BatchSet batchSet) {
+
+		return batchSetDAO.save(batchSet);
+	}
+	
+	@Override
+	public List<BatchSet> getBatchSets(Date startDate, Date endDate, String q, Integer limit, Integer startIndex) {
+		return batchSetDAO.getBatchSets(startDate, endDate, q, startIndex, limit);
 	}
 
-	@Override
-	public List<BatchSet> getBatchSets(Date startDate, Date endDate,String q,Integer limit, Integer startIndex) {
-		return batchSetDao.getBatchSets(startDate,endDate,q,startIndex,limit);
+	public BatchSet getBatchSetByUuid(String batchSetUuid){
+		return  batchSetDAO.findByUuid(batchSetUuid);
 	}
-
-
+	
 }

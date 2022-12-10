@@ -10,7 +10,6 @@ import org.openmrs.*;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.icare.ICareConfig;
-import org.openmrs.module.icare.core.Summary;
 import org.openmrs.module.icare.laboratory.dao.TestOrderLocationDAO;
 import org.openmrs.module.icare.laboratory.models.TestOrderLocation;
 import org.openmrs.module.icare.laboratory.models.WorkloadSummary;
@@ -23,7 +22,10 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
 import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -37,7 +39,7 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 	
 	@Mock
 	TestOrderLocationDAO testOrderLocationDAO;
-	
+
 	@Before
 	public void setUp() throws SQLException {
 		initializeInMemoryDatabase();
@@ -515,6 +517,29 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		assertThat("Has 1 authorized sample", summaryMap.get("samplesAuthorized").equals(1));
 		assertThat("Has 2  no completeresult sample", summaryMap.get("samplesWithNoResults").equals(2));
 		assertThat("Has Atleast 1 result sample", summaryMap.get("samplesWithResults").equals(1));
+		
+	}
+	
+	@Test
+	public void CreatingAndGettingBatches() throws Exception {
+
+		//Given
+		String dto = this.readFile("dto/batch-create-dto.json");
+		List<Map<String, Object>> batchObject = (new ObjectMapper()).readValue(dto, List.class);
+		
+		//When
+		MockHttpServletRequest newPostRequest = newPostRequest("lab/batch", batchObject);
+		MockHttpServletResponse handle = handle(newPostRequest);
+
+		//When
+		MockHttpServletRequest newGetRequest = newGetRequest("lab/batches",new Parameter("startDate", "2022-12-10"), new Parameter("endDate", "2022-12-10"),new Parameter("q","batch-lab"));
+		MockHttpServletResponse handle2 = handle(newGetRequest);
+
+		List<Map<String, Object>> sampleResults = (new ObjectMapper()).readValue(handle2.getContentAsString(), List.class);
+
+		System.out.println();
+		
+
 		
 	}
 	
