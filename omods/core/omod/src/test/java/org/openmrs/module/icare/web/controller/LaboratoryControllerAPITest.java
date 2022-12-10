@@ -504,6 +504,27 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		}
 		assertThat("Sample should be found", sampleFound, is(true));
 	}
+
+
+	@Test
+	public void testAddingTestAllocationStatuses() throws Exception {
+
+		AdministrationService adminService = Context.getService(AdministrationService.class);
+		adminService.setGlobalProperty(ICareConfig.LAB_RESULT_APPROVAL_CONFIGURATION, "2");
+
+		//Given
+		String dto = this.readFile("dto/test-allocation-statuses-create.json");
+		List<Map<String, Object>> testAllocationStatuses = (new ObjectMapper()).readValue(dto, ArrayList.class);
+
+		//When
+		MockHttpServletRequest newPostRequest = newPostRequest("lab/allocationstatuses", testAllocationStatuses);
+		MockHttpServletResponse handle = handle(newPostRequest);
+
+		//Then
+		List<Map<String, Object>> testAllocationStatusesResult = (new ObjectMapper()).readValue(handle.getContentAsString(),
+				ArrayList.class);
+		System.out.println(testAllocationStatusesResult);
+	}
 	
 	@Test
 	public void testSavingObservationAfterApprovalIsComplete() throws Exception {

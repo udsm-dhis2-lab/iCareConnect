@@ -417,8 +417,12 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 		if (user == null) {
 			throw new Exception("The user is not authenticated.");
 		}
+		
+		Result testResult = this.resultDAO.getTestResultsByUuid(testAllocationStatus.getTestResult().getUuid());
+		System.out.println(testAllocationStatus.getTestResult().getUuid());
 		testAllocationStatus.setTestAllocation(testAllocation);
 		testAllocationStatus.setUser(user);
+		testAllocationStatus.setTestResult(testResult);
 		TestAllocationStatus createdStatus = this.testAllocationStatusDAO.save(testAllocationStatus);
 		
 		//		if (countTestAllocationApprovedStatuses(testAllocation.getUuid()) == 2) {
@@ -517,6 +521,15 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 		}
 		
 		return createdStatus;
+	}
+	
+	public List<Map<String, Object>> updateTestAllocationStatuses(List<TestAllocationStatus> testAllocationStatuses) throws Exception {
+		List<Map<String, Object>> responses = new ArrayList<>();
+		for(TestAllocationStatus testAllocationStatus: testAllocationStatuses) {
+			TestAllocationStatus response = this.updateTestAllocationStatus(testAllocationStatus);
+			responses.add(response.toMap());
+		}
+		return responses;
 	}
 	
 	@Override

@@ -6,6 +6,7 @@ import org.hibernate.Query;
 import org.openmrs.Order;
 import org.openmrs.api.db.hibernate.DbSession;
 import org.openmrs.module.icare.core.dao.BaseDAO;
+import org.openmrs.module.icare.laboratory.models.Result;
 import org.openmrs.module.icare.laboratory.models.Sample;
 import org.openmrs.module.icare.laboratory.models.SampleOrder;
 import org.openmrs.module.icare.laboratory.models.TestAllocation;
@@ -41,5 +42,4 @@ public class TestAllocationDAO extends BaseDAO<TestAllocation> {
 		query.setParameter("orderUuid", orderUuid);
 		return query.list();
 	}
-	
 }
