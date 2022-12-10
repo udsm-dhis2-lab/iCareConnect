@@ -45,9 +45,9 @@ public abstract class BaseDAO<T> {
 		String queryStr = "SELECT i FROM " + getType() + " i WHERE i.uuid = :uuid";
 		Query query = session.createQuery(queryStr);
 		query.setParameter("uuid", uuid);
-		List<T> invoices = query.list();
-		if (invoices.size() > 0) {
-			return invoices.get(0);
+		List<T> list = query.list();
+		if (list.size() > 0) {
+			return list.get(0);
 		} else {
 			return null;
 		}
