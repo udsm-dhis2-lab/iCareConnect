@@ -366,14 +366,22 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 				Integer valueGroupId = this.getResultsId(result.getResultGroupUuid());
 				result.setValueGroupId(valueGroupId);
 			}
-			System.out.println(result.getStatus());
 			Result response = this.resultDAO.save(result);
-			Integer resultId = response.getId();
+			/*
+			Save status via results
+			* */
 			TestAllocationStatus resultStatus = new TestAllocationStatus();
 			resultStatus.setStatus(result.getStatus());
 			resultStatus.setCategory(result.getStatusCategory());
 			resultStatus.setRemarks(result.getStatusRemarks());
-//			this.testAllocationStatusDAO.save(resultStatus);
+			resultStatus.setTestResult(response);
+			resultStatus.setUser(response.getCreator());
+			resultStatus.setTestAllocation(response.getTestAllocation());
+			this.testAllocationStatusDAO.save(resultStatus);
+			/*
+			End of save status via results
+			* */
+//			TODO: Add support to accommodate new status on the allocation response
 			resultResponses.add(response.toMap());
 		}
 		return  resultResponses;
