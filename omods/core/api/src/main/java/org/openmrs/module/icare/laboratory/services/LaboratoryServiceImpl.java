@@ -418,11 +418,13 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 			throw new Exception("The user is not authenticated.");
 		}
 		
-		Result testResult = this.resultDAO.getTestResultsByUuid(testAllocationStatus.getTestResult().getUuid());
-		System.out.println(testAllocationStatus.getTestResult().getUuid());
+		Result testResult = this.resultDAO.findByUuid(testAllocationStatus.getTestResult().getUuid());
+		//		System.out.println(testAllocationStatus.getTestResult().getUuid());
 		testAllocationStatus.setTestAllocation(testAllocation);
 		testAllocationStatus.setUser(user);
-		testAllocationStatus.setTestResult(testResult);
+		if (testResult != null) {
+			testAllocationStatus.setTestResult(testResult);
+		}
 		TestAllocationStatus createdStatus = this.testAllocationStatusDAO.save(testAllocationStatus);
 		
 		//		if (countTestAllocationApprovedStatuses(testAllocation.getUuid()) == 2) {

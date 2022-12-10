@@ -8,6 +8,9 @@ import { SampleAllocationObject } from "src/app/shared/resources/sample-allocati
 import { SampleAllocationService } from "src/app/shared/resources/sample-allocations/services/sample-allocation.service";
 
 import { omit } from "lodash";
+import { HttpClient } from "@angular/common/http";
+import { OrdersService } from "src/app/shared/resources/order/services/orders.service";
+import { zip } from "cypress/types/lodash";
 
 @Component({
   selector: "app-shared-results-entry-and-view-modal",
@@ -21,14 +24,23 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
   dataValues: any = {};
   saving: boolean = false;
   isFormValid: boolean = false;
+  shouldConfirm: boolean = false;
+  allocationStatuses: any[] = [];
+  userUuid: string;
+  obsKeyedByConcepts: any = {};
+  files: any[] = [];
   constructor(
     private dialogRef: MatDialogRef<SharedResultsEntryAndViewModalComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     private sampleAllocationService: SampleAllocationService,
-    private systemSettingsService: SystemSettingsService
+    private systemSettingsService: SystemSettingsService,
+    private httpClient: HttpClient,
+    private ordersService: OrdersService
   ) {}
 
   ngOnInit(): void {
+    console.log(this.data);
+    this.userUuid = localStorage.getItem("userUuid");
     this.multipleResultsAttributeType$ = this.systemSettingsService
       .getSystemSettingsByKey(
         `iCare.laboratory.settings.testParameters.attributes.multipleResultsAttributeTypeUuid`
@@ -58,11 +70,35 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
     this.dialogRef.close();
   }
 
-  onSave(event: Event): void {
+  onSave(event: Event, order: any): void {
     event.stopPropagation();
     const data = Object.keys(this.dataValues)
       .map((key) => {
         const dataValue = this.dataValues[key];
+        if (
+          dataValue?.parameter?.isFile ||
+          dataValue?.parameter?.datatype?.display === "Complex"
+        ) {
+          let existingFile = this.files.find(
+            (file) => file.parameterUuid === dataValue?.parameter?.uuid
+          );
+          this.files = [
+            ...this.files.filter(
+              (file) => file?.parameterUuid !== dataValue?.parameter?.uuid
+            ),
+            existingFile
+              ? {
+                  ...existingFile,
+                  valueFile: dataValue?.value,
+                }
+              : {
+                  parameterUuid: dataValue?.parameter?.uuid,
+                  valueFile: dataValue?.value,
+                  currentSample: this.data?.sample,
+                  allocation: dataValue?.allocation,
+                },
+          ];
+        }
         return {
           concept: {
             uuid: key,
@@ -88,6 +124,7 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
       );
     this.saving = true;
 
+    this.saveFilesAsObservations(this.files, order);
     this.sampleAllocationService
       .saveResultsViaAllocations(data)
       .subscribe((response) => {
@@ -100,8 +137,59 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
       });
   }
 
-  onAuthorize(event: Event): void {
+  onAuthorize(
+    event: Event,
+    allocationsData: any[],
+    confirmed?: boolean,
+    approvalStatusType?: string
+  ): void {
     event.stopPropagation();
+    if (confirmed) {
+      this.allocationStatuses = allocationsData
+        ?.map((allocationData) => {
+          if (allocationData?.allocation?.finalResult) {
+            // TODO: Find a better way to handle second approval
+            const approvalStatus = {
+              status: !approvalStatusType ? "APPROVED" : approvalStatusType,
+              remarks: "APPROVED",
+              category: "RESULT_AUTHORIZATION",
+              user: {
+                uuid: this.userUuid,
+              },
+              testAllocation: {
+                uuid: allocationData?.allocation?.uuid,
+              },
+              testResult: {
+                uuid: allocationData?.allocation?.finalResult?.uuid,
+              },
+            };
+            return approvalStatus;
+          }
+        })
+        ?.filter((allStatus) => allStatus);
+      this.saving = true;
+      this.shouldConfirm = false;
+      this.sampleAllocationService
+        .saveAllocationStatuses(this.allocationStatuses)
+        .subscribe((response) => {
+          if (response && !response?.error) {
+            this.saving = false;
+            setTimeout(() => {
+              this.getAllocations();
+            }, 100);
+          } else {
+            this.saving = false;
+            this.errors = [this.errors, response];
+          }
+        });
+    } else {
+      this.shouldConfirm = true;
+    }
+  }
+
+  onCancelAuthorize(event: Event): void {
+    event.stopPropagation();
+    this.shouldConfirm = false;
   }
 
   onGetFieldData(
@@ -127,5 +215,76 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
       this.dataValues = omit(this.dataValues, parameter?.uuid);
     }
     this.isFormValid = Object.keys(this.dataValues)?.length > 0;
+  }
+
+  saveFilesAsObservations(fileObjects: any[], order: any): any {
+    // TODO: COnsider returning encounter on test allocation api
+    this.ordersService
+      .getOrderByUuid(order?.uuid)
+      .subscribe((response: any) => {
+        if (response && !response?.error) {
+          fileObjects.forEach((file) => {
+            let data = new FormData();
+            const jsonData = {
+              concept: file?.parameterUuid,
+              person: this.data?.sample?.patient?.uuid,
+              encounter: response?.encounter?.uuid,
+              obsDatetime: new Date(),
+              voided: false,
+              status: "PRELIMINARY",
+            };
+            data.append("file", file?.valueFile);
+            data.append("json", JSON.stringify(jsonData));
+
+            // void first the existing observation
+            if (
+              this.obsKeyedByConcepts[file?.parameterUuid] &&
+              this.obsKeyedByConcepts[file?.parameterUuid]?.value
+            ) {
+              const existingObs = {
+                concept: file?.parameterUuid,
+                person: this.data?.sample?.patient?.uuid,
+                obsDatetime:
+                  this.obsKeyedByConcepts[file?.parameterUuid]?.encounter
+                    ?.obsDatetime,
+                encounter:
+                  this.obsKeyedByConcepts[file?.parameterUuid]?.encounter?.uuid,
+                status: "PRELIMINARY",
+                comment:
+                  this.obsKeyedByConcepts[file?.parameterUuid]?.encounter
+                    ?.comment,
+              };
+              this.httpClient
+                .post(
+                  `../../../openmrs/ws/rest/v1/obs/${
+                    this.obsKeyedByConcepts[file?.parameterUuid]?.uuid
+                  }`,
+                  {
+                    ...existingObs,
+                    voided: true,
+                  }
+                )
+                .subscribe((response) => {
+                  if (response) {
+                  }
+                });
+            } else {
+              console.warn("None to void");
+            }
+            this.httpClient
+              .post(`../../../openmrs/ws/rest/v1/obs`, data)
+              .subscribe((response: any) => {
+                if (response) {
+                  this.obsKeyedByConcepts[file?.parameterUuid] = {
+                    ...response,
+                    uri: response?.value?.links
+                      ? response?.value?.links?.uri?.replace("http", "https")
+                      : null,
+                  };
+                }
+              });
+          });
+        }
+      });
   }
 }

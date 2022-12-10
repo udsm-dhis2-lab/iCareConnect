@@ -1,14 +1,18 @@
+import { orderBy } from "lodash";
 import { ConceptGet } from "../../openmrs";
 
 export interface AlloCationStatusObject {
+  uuid?: string;
   category?: string;
   remarks?: string;
   status: string;
   user: any;
+  result?: any;
   timestamp: Number;
 }
 
 export interface ResultObject {
+  uuid?: string;
   valueBoolean: boolean;
   testAllocation: any;
   valueText: string;
@@ -28,6 +32,7 @@ export interface ResultObject {
   valueDateTime: number;
   valueComplex: any;
   value?: any;
+  status?: any;
 }
 
 export interface SampleAllocationObject {
@@ -46,6 +51,7 @@ export interface SampleAllocationObject {
     uuid: string;
   };
   orderUuid?: string;
+  finalResult?: ResultObject;
 }
 
 export class SampleAllocation {
@@ -87,9 +93,12 @@ export class SampleAllocation {
   }
 
   get results(): ResultObject[] {
-    return this.allocation?.results.map((result) => {
+    return this.allocation?.results.map((result: ResultObject) => {
       return {
         ...result,
+        statuses: this.allocation?.statuses?.filter(
+          (status) => status?.result && status?.result?.uuid === result?.uuid
+        ),
         value: result?.valueNumeric
           ? result?.valueNumeric
           : result?.valueBoolean
@@ -107,6 +116,53 @@ export class SampleAllocation {
     });
   }
 
+  get finalResult(): any {
+    const finalResult =
+      this.allocation?.results?.length > 0
+        ? orderBy(this.allocation?.results, ["dateCreated"], ["desc"])[0]
+        : null;
+    return finalResult
+      ? {
+          ...finalResult,
+          statuses:
+            this.allocation?.statuses?.filter(
+              (status) => status?.result?.uuid === finalResult?.uuid
+            ) || [],
+          authorizationStatuses:
+            this.allocation?.statuses?.filter(
+              (status) =>
+                status?.category === "RESULT_AUTHORIZATION" &&
+                status?.result?.uuid === finalResult?.uuid
+            ) || [],
+          secondAuthorizationStatuses:
+            this.allocation?.statuses?.filter(
+              (status) =>
+                status?.category === "RESULT_AUTHORIZATION" &&
+                status?.status == "SECOND_APPROVAL" &&
+                status?.result?.uuid === finalResult?.uuid
+            ) || [],
+        }
+      : null;
+  }
+
+  get authorizationStatuses(): any[] {
+    return (
+      this.allocation?.statuses?.filter(
+        (status) => status?.category === "RESULT_AUTHORIZATION"
+      ) || []
+    );
+  }
+
+  get secondAuthorizationStatuses(): any[] {
+    return (
+      this.allocation?.statuses?.filter(
+        (status) =>
+          status?.category === "RESULT_AUTHORIZATION" &&
+          status?.status == "SECOND_APPROVAL"
+      ) || []
+    );
+  }
+
   toJson(): SampleAllocationObject {
     return {
       id: this.id,
@@ -119,6 +175,7 @@ export class SampleAllocation {
       orderUuid: this.orderUuid,
       statuses: this.statuses,
       results: this.results,
+      finalResult: this.finalResult,
     };
   }
 }
