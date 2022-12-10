@@ -7,6 +7,7 @@ import org.openmrs.module.icare.core.JSONConverter;
 
 import javax.persistence.*;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static javax.persistence.GenerationType.IDENTITY;
@@ -33,7 +34,7 @@ public class Batch extends BaseOpenmrsData implements java.io.Serializable, JSON
 	private String fields;
 	
 	@ManyToOne
-	@JoinColumn(name = "batch_set_id", nullable = false)
+	@JoinColumn(name = "batch_set_id", nullable = true)
 	private BatchSet batchSet;
 	
 	@Override
@@ -51,7 +52,7 @@ public class Batch extends BaseOpenmrsData implements java.io.Serializable, JSON
 		this.batchName = batchName;
 	}
 	
-	public String getBatchSetName() {
+	public String getBatchName() {
 		return batchName;
 	}
 	
@@ -78,15 +79,15 @@ public class Batch extends BaseOpenmrsData implements java.io.Serializable, JSON
 	public String getFields() {
 		return fields;
 	}
-
+	
 	public BatchSet getBatchSet() {
 		return batchSet;
 	}
-
+	
 	public void setBatchSet(BatchSet batchSet) {
 		this.batchSet = batchSet;
 	}
-
+	
 	public static Batch fromMap(Map<String, Object> batchMap) {
 		
 		Batch batch = new Batch();
@@ -95,12 +96,6 @@ public class Batch extends BaseOpenmrsData implements java.io.Serializable, JSON
 		batch.setDescription(batchMap.get("description").toString());
 		batch.setLabel(batchMap.get("label").toString());
 
-		if(batchMap.get("batchset")!= null){
-			BatchSet batchSet = new BatchSet();
-			batchSet.setUuid(((Map) batchMap.get("batchset")).get("uuid").toString());
-			batch.setBatchSet(batchSet);
-		}
-		
 		return batch;
 		
 	}
@@ -112,25 +107,25 @@ public class Batch extends BaseOpenmrsData implements java.io.Serializable, JSON
 		batchObject.put("label", this.getLabel());
 		batchObject.put("description", this.getDescription());
 		batchObject.put("fields", this.getFields());
-		batchObject.put("name", this.getBatchSetName());
+		batchObject.put("name", this.getBatchName());
 		batchObject.put("uuid", this.getUuid());
 		if (this.getDateCreated() != null) {
 			batchObject.put("dateCreated", this.getDateCreated());
 		}
-
+		
 		Map<String, Object> creatorObject = new HashMap<String, Object>();
-
+		
 		if (this.getCreator() != null) {
 			creatorObject.put("uuid", this.getCreator().getUuid());
 			creatorObject.put("display", this.getCreator().getDisplayString());
 		}
 		batchObject.put("creator", creatorObject);
-
-		Map<String, Object> batchSetOject = new HashMap<String, Object>();
-		if(this.getBatchSet() != null){
-			batchSetOject.put("uuid",this.getBatchSet().getUuid());
-			batchSetOject.put("name",this.getBatchSet().getBatchSetName());
-			batchObject.put("batchSet",batchSetOject);
+		
+		Map<String, Object> batchSetObject = new HashMap<String, Object>();
+		if (this.getBatchSet() != null) {
+			batchSetObject.put("uuid", this.getBatchSet().getUuid());
+			batchSetObject.put("name", this.getBatchSet().getBatchSetName());
+			batchObject.put("batchSet", batchSetObject);
 		}
 		
 		return batchObject;

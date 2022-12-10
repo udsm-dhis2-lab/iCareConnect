@@ -1,0 +1,7 @@
+{
+  "label": "Test-Batch",
+  "name" : "Test-Batch-Name",
+  "description": "This is a test -batch",
+  "fields" : "dynamic,fixed"
+
+}
