@@ -347,6 +347,9 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 			result.setValueDrug(drug);
 		}
 		
+		Date date = new Date();
+		result.setDateCreated(date);
+		
 		this.resultDAO.save(result);
 		
 		return result;
@@ -390,7 +393,12 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 				Integer valueGroupId = this.getResultsId(result.getResultGroupUuid());
 				result.setValueGroupId(valueGroupId);
 			}
+
+			Date date = new Date();
+			result.setDateCreated(date);
+
 			Result response = this.resultDAO.save(result);
+
 			/*
 			Save status via results
 			* */
@@ -472,7 +480,8 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 				}
 			});
 			
-			Result allocationResults = resList.get(resList.size() - 1);
+			Result allocationResults = testResult;
+			//					resList.get(resList.size() - 1);
 			//			for (Result allocationResults : testAllocation.getTestAllocationResults()) {
 			
 			if (allocationResults != null) {
