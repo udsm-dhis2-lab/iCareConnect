@@ -360,8 +360,8 @@ export class LabSamplesEffects {
                               ...allocation,
                               parameterUuid: allocation?.concept?.uuid,
                               authorizationInfo:
-                                authorizationStatus?.status === "APPROVED" ||
-                                authorizationStatus?.category === "APPROVED"
+                                authorizationStatus?.status === "AUTHORIZED" ||
+                                authorizationStatus?.status === "APPROVED"
                                   ? authorizationStatus
                                   : null,
                               firstSignOff:
@@ -384,12 +384,7 @@ export class LabSamplesEffects {
                                   allocation?.statuses,
                                   ["timestamp"],
                                   ["desc"]
-                                )[0]?.status == "APPROVED" &&
-                                _.orderBy(
-                                  allocation?.statuses,
-                                  ["timestamp"],
-                                  ["desc"]
-                                )[1]?.status == "APPROVED"
+                                )[0]?.status == "AUTHORIZED"
                                   ? true
                                   : false,
                               rejected:
@@ -444,7 +439,7 @@ export class LabSamplesEffects {
                               parameterUuid: allocation?.concept?.uuid,
                               authorizationInfo:
                                 authorizationStatus?.status === "APPROVED" ||
-                                authorizationStatus?.category === "APPROVED"
+                                authorizationStatus?.status === "AUTHORIZED"
                                   ? authorizationStatus
                                   : null,
                               firstSignOff:
@@ -467,12 +462,7 @@ export class LabSamplesEffects {
                                   allocation?.statuses,
                                   ["timestamp"],
                                   ["desc"]
-                                )[0]?.status == "APPROVED" &&
-                                _.orderBy(
-                                  allocation?.statuses,
-                                  ["timestamp"],
-                                  ["desc"]
-                                )[1]?.status == "APPROVED"
+                                )[0]?.status == "AUTHORIZED"
                                   ? true
                                   : false,
                               rejected:
@@ -828,8 +818,30 @@ export class LabSamplesEffects {
                           ),
                         },
                       },
-                      firstSignOff: false,
-                      secondSignOff: false,
+                      firstSignOff:
+                        (
+                          mergeTestAllocations(order?.testAllocations)?.filter(
+                            (allocation) =>
+                              (
+                                allocation?.statuses?.filter(
+                                  (status) =>
+                                    status?.status === "APPROVED" ||
+                                    status?.status === "AUTHORIZED"
+                                ) || []
+                              )?.length > 0
+                          ) || []
+                        )?.length > 0,
+                      secondSignOff:
+                        (
+                          mergeTestAllocations(order?.testAllocations)?.filter(
+                            (allocation) =>
+                              (
+                                allocation?.statuses?.filter(
+                                  (status) => status?.status === "AUTHORIZED"
+                                ) || []
+                              )?.length > 0
+                          ) || []
+                        )?.length > 0,
                       collected: true,
                       collectedBy: {
                         display: sample?.creator?.display?.split(" (")[0],
@@ -862,7 +874,7 @@ export class LabSamplesEffects {
                               allocation?.statuses?.filter(
                                 (status) =>
                                   status?.status == "APPROVED" ||
-                                  status?.category == "APPROVED"
+                                  status?.status == "AUTHORIZED"
                               ) || [],
                               ["timestamp"],
                               ["desc"]
@@ -872,7 +884,7 @@ export class LabSamplesEffects {
                               parameterUuid: allocation?.concept?.uuid,
                               authorizationInfo:
                                 authorizationStatus?.status === "APPROVED" ||
-                                authorizationStatus?.category === "APPROVED"
+                                authorizationStatus?.status === "AUTHORIZED"
                                   ? authorizationStatus
                                   : null,
                               firstSignOff:
@@ -895,12 +907,7 @@ export class LabSamplesEffects {
                                   allocation?.statuses,
                                   ["timestamp"],
                                   ["desc"]
-                                )[0]?.status == "APPROVED" &&
-                                _.orderBy(
-                                  allocation?.statuses,
-                                  ["timestamp"],
-                                  ["desc"]
-                                )[1]?.status == "APPROVED"
+                                )[0]?.status == "AUTHORIZED"
                                   ? true
                                   : false,
                               rejected:
@@ -978,12 +985,7 @@ export class LabSamplesEffects {
                                   allocation?.statuses,
                                   ["timestamp"],
                                   ["desc"]
-                                )[0]?.status == "APPROVED" &&
-                                _.orderBy(
-                                  allocation?.statuses,
-                                  ["timestamp"],
-                                  ["desc"]
-                                )[1]?.status == "APPROVED"
+                                )[0]?.status == "AUTHORIZED"
                                   ? true
                                   : false,
                               rejected:
@@ -1255,11 +1257,16 @@ export class LabSamplesEffects {
                           ...allocation,
                           firstSignOff:
                             allocation?.statuses?.length > 0 &&
-                            _.orderBy(
+                            (_.orderBy(
                               allocation?.statuses,
                               ["timestamp"],
                               ["desc"]
-                            )[0]?.status == "APPROVED"
+                            )[0]?.status == "APPROVED" ||
+                              _.orderBy(
+                                allocation?.statuses,
+                                ["timestamp"],
+                                ["desc"]
+                              )[0]?.status == "AUTHORIZED")
                               ? true
                               : false,
                           secondSignOff:
@@ -1268,12 +1275,7 @@ export class LabSamplesEffects {
                               allocation?.statuses,
                               ["timestamp"],
                               ["desc"]
-                            )[0]?.status == "APPROVED" &&
-                            _.orderBy(
-                              allocation?.statuses,
-                              ["timestamp"],
-                              ["desc"]
-                            )[1]?.status == "APPROVED"
+                            )[0]?.status == "AUTHORIZED"
                               ? true
                               : false,
                           rejected:
