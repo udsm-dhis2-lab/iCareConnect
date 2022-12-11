@@ -137,7 +137,7 @@ public class BatchSetStatus implements java.io.Serializable {
 		batchSetStatusObject.put("status", this.getStatus());
 		batchSetStatusObject.put("remarks", this.getRemarks());
 		batchSetStatusObject.put("timestamp", this.getTimestamp());
-		//allocationStatusesObject.put("uuid", this.getUuid());
+
 		if (this.getCategory() != null) {
 			batchSetStatusObject.put("category", this.getCategory());
 		}
@@ -148,6 +148,11 @@ public class BatchSetStatus implements java.io.Serializable {
 		batchSetStatusUserObject.put("uuid", this.getUser().getUuid());
 		batchSetStatusUserObject.put("display", this.getUser().getDisplayString());
 		batchSetStatusObject.put("user", batchSetStatusUserObject);
+
+		Map<String,Object> batchSetStatusBatchSetObject = new HashMap<>();
+		batchSetStatusBatchSetObject.put("uuid",this.getBatchSet().getUuid());
+		batchSetStatusBatchSetObject.put("display", this.getBatchSet().getBatchSetName());
+		batchSetStatusObject.put("batchset",batchSetStatusBatchSetObject);
 		
 		return batchSetStatusObject;
 	}
