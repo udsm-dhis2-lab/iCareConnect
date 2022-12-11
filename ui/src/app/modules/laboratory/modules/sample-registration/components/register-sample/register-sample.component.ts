@@ -6,6 +6,7 @@ import { map, take, tap, withLatestFrom } from "rxjs/operators";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { LabSampleModel } from "src/app/modules/laboratory/resources/models";
 import { LISConfigurationsModel } from "src/app/modules/laboratory/resources/models/lis-configurations.model";
+import { RegistrationService } from "src/app/modules/registration/services/registration.services";
 import { DateField } from "src/app/shared/modules/form/models/date-field.model";
 import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
 import { PhoneNumber } from "src/app/shared/modules/form/models/phone-number.model";
@@ -66,6 +67,7 @@ export class RegisterSampleComponent implements OnInit {
   allRegistrationFields: any;
   clinicalFormFields: any;
   manyObservables$: Observable<any>;
+  identifierTypes$: Observable<any>;
 
   get maximumDate() {
     let maxDate = new Date();
@@ -83,7 +85,8 @@ export class RegisterSampleComponent implements OnInit {
   constructor(
     private samplesService: SamplesService,
     private systemSettingsService: SystemSettingsService,
-    private store: Store<AppState>
+    private store: Store<AppState>,
+    private registrationService: RegistrationService
   ) {}
 
   ngOnInit(): void {
@@ -113,25 +116,14 @@ export class RegisterSampleComponent implements OnInit {
         "lis.attribute.referFromFacility"
       );
 
-    this.referFromFacilityVisitAttribute$.subscribe((response) => {
-      console.log("==> referFromFacilityVisitAttribute", response)
-    });
-    
     this.agencyConceptConfigs$ = this.store.select(getConceptById, {
       id: this.LISConfigurations?.agencyConceptUuid,
     });
-    
+
     this.referringDoctorAttributes$ = this.systemSettingsService
-      .getSystemSettingsMatchingAKey("lis.attributes.referringDoctor")
-      .pipe(
-        withLatestFrom(this.agencyConceptConfigs$),
-        map(([response1, response2]: [any, any]) => {
-          if(response1 && response2){
-            this.initializeRegistrationFields(response1, response2);
-          }
-          return response1;
-        })
-      )
+      .getSystemSettingsMatchingAKey("lis.attributes.referringDoctor");
+
+    this.identifierTypes$ = this.registrationService.getPatientIdentifierTypes();
 
     this.testsFromExternalSystemsConfigs$ =
       this.systemSettingsService.getSystemSettingsMatchingAKey(
@@ -148,6 +140,8 @@ export class RegisterSampleComponent implements OnInit {
       this.systemSettingsService.getSystemSettingsByKey(
         "lis.settings.labNumber.charactersCount"
       );
+
+  this.initializeRegistrationFields();
   }
 
   getSelection(event: MatRadioChange): void {
@@ -175,22 +169,7 @@ export class RegisterSampleComponent implements OnInit {
   }
 
   initializeRegistrationFields(
-    referringDoctorAttributes,
-    agencyConceptConfigs
   ) {
-    this.referringDoctorFields = referringDoctorAttributes?.forEach(
-      (attribute) => {
-        return {
-          ...this.referringDoctorFields,
-          ["attribute-" + attribute?.value]: new Textbox({
-            id: "attribute-" + attribute?.value,
-            key: "attribute-" + attribute?.value,
-            label: attribute?.name,
-            type: "text",
-          }),
-        };
-      }
-    );
     this.specimenDetailsFields = {
       specimen: new Dropdown({
         id: "specimen",
@@ -215,15 +194,7 @@ export class RegisterSampleComponent implements OnInit {
       agency: new Dropdown({
         id: "agency",
         key: "agency",
-        label: "urgency/Priority",
-        options: agencyConceptConfigs?.setMembers.map((member) => {
-          return {
-            key: member?.uuid,
-            value: member?.display,
-            label: member?.display,
-            name: member?.display,
-          };
-        }),
+        label: "Urgency/Priority",
         shouldHaveLiveSearchForDropDownFields: false,
       }),
       receivedBy: new Dropdown({
@@ -264,6 +235,28 @@ export class RegisterSampleComponent implements OnInit {
         searchControlType: "concept",
         shouldHaveLiveSearchForDropDownFields: true,
       }),
+      collectedOn: new DateField({
+        id: "collectedOn",
+        key: "collectedOn",
+        label: "Collected On",
+        max: this.maximumDate,
+      }),
+      collectedBy: new Textbox({
+        id: "collectedBy",
+        key: "collectedBy",
+        label: "Collected By",
+      }),
+      broughtOn: new DateField({
+        id: "broughtOn",
+        key: "broughtOn",
+        label: "Delivered On",
+        max: this.maximumDate,
+      }),
+      broughtBy: new Textbox({
+        id: "broughtBy",
+        key: "broughtBy",
+        label: "Delivered By",
+      }),
     };
     this.clinicalFormFields = {
       icd10: new Dropdown({
@@ -288,16 +281,6 @@ export class RegisterSampleComponent implements OnInit {
       }),
     };
     this.personFields = {
-      ["attribute-" + this.referFromFacilityVisitAttribute]: new Dropdown({
-        id: "attribute-" + this.referFromFacilityVisitAttribute,
-        key: "attribute-" + this.referFromFacilityVisitAttribute,
-        options: [],
-        label: "Facility Name",
-        shouldHaveLiveSearchForDropDownFields: true,
-        searchControlType: "healthFacility",
-        searchTerm: "Health Facility",
-        controlType: "location",
-      }),
       firstName: new Textbox({
         id: "firstName",
         key: "firstName",
@@ -388,14 +371,11 @@ export class RegisterSampleComponent implements OnInit {
     };
 
     this.allRegistrationFields = {
-      referringDoctorFields: this.referringDoctorFields,
       specimenDetailFields: this.specimenDetailsFields,
       personFields: this.personFields,
       patientAgeFields: this.patientAgeFields,
       personFieldsGroupThree: this.personFieldsGroupThree,
       clinicalFormFields: this.clinicalFormFields,
     };
-
-    console.log("==> All ", this.allRegistrationFields);
   }
 }

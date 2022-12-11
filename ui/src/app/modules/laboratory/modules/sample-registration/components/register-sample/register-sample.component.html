@@ -10,7 +10,7 @@
     labNumberCharactersCount: labNumberCharactersCount$ | async,
     testsFromExternalSystemsConfigs: testsFromExternalSystemsConfigs$ | async,
     currentUser: currentUser$ | async,
-    manyObservables: manyObservables$ | async
+    identifierTypes: identifierTypes$ | async
   } as params"
 >
   <div class="row">
@@ -59,7 +59,8 @@
               params?.referringDoctorAttributes &&
               params?.referFromFacilityVisitAttribute &&
               params?.labNumberCharactersCount &&
-              params?.testsFromExternalSystemsConfigs
+              params?.testsFromExternalSystemsConfigs && 
+              params?.identifierTypes
             "
           >
             <app-single-registration
@@ -77,11 +78,11 @@
               [testsFromExternalSystemsConfigs]="
                 params?.testsFromExternalSystemsConfigs
               "
-              [allRegistrationFields]="allRegistrationFields | createLabFields: params?.referringDoctorAttributes : params?.agencyConceptConfigs : params?.referFromFacilityVisitAttribute"
+              [allRegistrationFields]="allRegistrationFields | createLabFields: params?.referringDoctorAttributes : params?.agencyConceptConfigs : params?.referFromFacilityVisitAttribute : params?.identifierTypes"
             ></app-single-registration>
           </div>
         </div>
-        <!-- <div class="batch-sample-registration">
+        <!-- <div class="batch-sample-registration">referFrom
           <app-batch-registration></app-batch-registration>
         </div> -->
       </div>
@@ -89,7 +90,8 @@
         <div class="w-100" *ngIf="
               params?.preferredPersonIdentifier &&
               params?.referringDoctorAttributes &&
-              params?.referFromFacilityVisitAttribute
+              params?.referFromFacilityVisitAttribute && 
+              params?.identifierTypes
           ">
           <app-batch-registration
             [mrnGeneratorSourceUuid]="params?.mrnGeneratorSourceUuid"
@@ -106,7 +108,7 @@
             [testsFromExternalSystemsConfigs]="
               params?.testsFromExternalSystemsConfigs
             "
-            [allRegistrationFields]="allRegistrationFields | createLabFields: params?.referringDoctorAttributes : params?.agencyConceptConfigs : params?.referFromFacilityVisitAttribute"
+            [allRegistrationFields]="allRegistrationFields | createLabFields: params?.referringDoctorAttributes : params?.agencyConceptConfigs : params?.referFromFacilityVisitAttribute : params?.identifierTypes"
           ></app-batch-registration>
         </div>
       </div>
