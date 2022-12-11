@@ -137,7 +137,7 @@ public class BatchSetStatus implements java.io.Serializable {
 		batchSetStatusObject.put("status", this.getStatus());
 		batchSetStatusObject.put("remarks", this.getRemarks());
 		batchSetStatusObject.put("timestamp", this.getTimestamp());
-		//allocationStatusesObject.put("uuid", this.getUuid());
+
 		if (this.getCategory() != null) {
 			batchSetStatusObject.put("category", this.getCategory());
 		}

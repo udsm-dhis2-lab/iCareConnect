@@ -727,5 +727,20 @@ public class LaboratoryController {
 		return responseBatchSetsObject;
 		
 	}
+
+	@RequestMapping(value = "batchsetstatus", method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public Map<String,Object> addBatchSetStatus(@RequestBody Map<String,Object> batchSetStatusObject) throws Exception {
+
+		BatchSetStatus batchSetStatus = BatchSetStatus.fromMap(batchSetStatusObject);
+		BatchSetStatus savedbatchSetStatus = laboratoryService.addBatchSetStatus(batchSetStatus);
+
+		return savedbatchSetStatus.toMap();
+
+	}
+
+
+
+
 	
 }
