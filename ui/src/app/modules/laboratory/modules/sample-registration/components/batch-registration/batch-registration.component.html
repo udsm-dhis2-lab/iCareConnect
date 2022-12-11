@@ -58,7 +58,7 @@
                             <div class="col-10">
                                 <app-form
                                     [fields]="[selectedFixedField]"
-                                    (formUpdate)="onFormUpdate($event)"
+                                    (formUpdate)="onFormUpdate($event, 'SelectedFixedField')"
                                 ></app-form>
                             </div>
                             <div class="col-1">
@@ -73,7 +73,7 @@
                         ></app-form>
                     </div>
                     <div class="col-2">
-                        <button class="save-field" mat-flat-button color="primary" matTooltip="Save all fixed fields"> Save </button>
+                        <button disabled="!selectedFixedFields?.length" class="save-field" mat-flat-button color="primary" matTooltip="Save all fixed fields"> Save </button>
                     </div>
                 </div>
             </div>
@@ -86,7 +86,7 @@
                             <div class="col-10">
                                 <app-form
                                     [fields]="[selectedStaticField]"
-                                    (formUpdate)="onFormUpdate($event)"
+                                    (formUpdate)="onFormUpdate($event, 'SelectedStaticField')"
                                 ></app-form>
                             </div>
                             <div class="col-1">
@@ -101,7 +101,7 @@
                         ></app-form>
                     </div>
                     <div class="col-2">
-                        <button class="save-field" mat-flat-button color="primary" matTooltip="Save all static fields"> Save </button>
+                        <button disabled="!selectedStaticFields?.length" class="save-field" mat-flat-button color="primary" matTooltip="Save all static fields"> Save </button>
                     </div>
                 </div>
             </div>
