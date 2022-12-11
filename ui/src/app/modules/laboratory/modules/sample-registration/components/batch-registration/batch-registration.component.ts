@@ -86,6 +86,9 @@ export class BatchRegistrationComponent implements OnInit {
       };
     });
 
+    this.instantiateBatchRegistrationFields()
+  }
+  instantiateBatchRegistrationFields() {
     this.addFixedField =
       this.allRegistrationFields?.batchRegistrationFields?.addFixedField;
     this.addFixedField.options = this.fixedFieldsOptions;
