@@ -16,27 +16,27 @@ public class BatchDAO extends BaseDAO<Batch> {
 		
 		DbSession session = this.getSession();
 		String queryStr = "SELECT bt FROM Batch bt";
-
+		
 		if (startDate != null && endDate != null) {
 			if (!queryStr.contains("WHERE")) {
 				queryStr += " WHERE ";
 			}
 			queryStr += " (cast(bt.dateCreated as date) BETWEEN :startDate AND :endDate)";
 		}
-
+		
 		if (q != null) {
 			if (!queryStr.contains("WHERE")) {
 				queryStr += " WHERE ";
 			} else {
 				queryStr += " AND ";
 			}
-
+			
 			queryStr += "lower(bt.batchName) like lower(:q) OR (bt.label) LIKE lower(:q)";
 		}
-
+		
 		//Construct a query object
 		Query query = session.createQuery(queryStr);
-
+		
 		//Attach arguments accordingly
 		if (startDate != null) {
 			query.setParameter("startDate", startDate);
@@ -44,18 +44,17 @@ public class BatchDAO extends BaseDAO<Batch> {
 		if (endDate != null && startDate != null) {
 			query.setParameter("endDate", endDate);
 		}
-
+		
 		if (q != null) {
 			query.setParameter("q", "%" + q.replace(" ", "%") + "%");
 		}
-		System.out.println("startIndex: "+startIndex);
+		System.out.println("startIndex: " + startIndex);
 		query.setFirstResult(startIndex);
 		query.setMaxResults(limit);
-
+		
 		System.out.println(query.list());
-
+		
 		return query.list();
-
 		
 	}
 	

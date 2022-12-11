@@ -95,7 +95,7 @@ public class Batch extends BaseOpenmrsData implements java.io.Serializable, JSON
 		batch.setFields(batchMap.get("fields").toString());
 		batch.setDescription(batchMap.get("description").toString());
 		batch.setLabel(batchMap.get("label").toString());
-
+		
 		return batch;
 		
 	}
