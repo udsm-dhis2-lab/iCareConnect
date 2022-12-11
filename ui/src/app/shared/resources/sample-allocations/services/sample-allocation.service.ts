@@ -46,7 +46,6 @@ export class SampleAllocationService {
                 )
               )?.filter((result) => result?.authorizationIsReady) || []
             )?.length > 0;
-
           return {
             ...groupedAllocations[key][0]?.order,
             authorizationStatuses: flatten(

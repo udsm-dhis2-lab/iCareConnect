@@ -136,7 +136,7 @@ export class SampleAllocation {
                 status?.result?.uuid === finalResult?.uuid
             ) || [],
           authorizationIsReady:
-            Number(this.allocation?.resultApprovalConfiguration) ===
+            Number(this.allocation?.resultApprovalConfiguration) <=
             (
               this.allocation?.statuses?.filter(
                 (status) =>
@@ -146,13 +146,6 @@ export class SampleAllocation {
                   status?.result?.uuid === finalResult?.uuid
               ) || []
             )?.length,
-          secondAuthorizationStatuses:
-            this.allocation?.statuses?.filter(
-              (status) =>
-                status?.category === "RESULT_AUTHORIZATION" &&
-                status?.status == "SECOND_APPROVAL" &&
-                status?.result?.uuid === finalResult?.uuid
-            ) || [],
         }
       : null;
   }
