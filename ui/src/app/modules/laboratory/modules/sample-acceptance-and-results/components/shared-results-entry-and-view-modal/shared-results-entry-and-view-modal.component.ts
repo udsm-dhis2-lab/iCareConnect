@@ -39,7 +39,6 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    console.log(this.data);
     this.userUuid = localStorage.getItem("userUuid");
     this.multipleResultsAttributeType$ = this.systemSettingsService
       .getSystemSettingsByKey(
@@ -139,18 +138,23 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
 
   onAuthorize(
     event: Event,
-    allocationsData: any[],
+    order: any,
     confirmed?: boolean,
     approvalStatusType?: string
   ): void {
     event.stopPropagation();
     if (confirmed) {
+      const allocationsData = order?.allocations;
       this.allocationStatuses = allocationsData
         ?.map((allocationData) => {
           if (allocationData?.allocation?.finalResult) {
             // TODO: Find a better way to handle second approval
             const approvalStatus = {
-              status: !approvalStatusType ? "APPROVED" : approvalStatusType,
+              status:
+                order?.authorizationStatuses?.length === 0 &&
+                !this.data?.LISConfigurations?.isLIS
+                  ? "APPROVED"
+                  : "AUTHORIZED",
               remarks: "APPROVED",
               category: "RESULT_AUTHORIZATION",
               user: {

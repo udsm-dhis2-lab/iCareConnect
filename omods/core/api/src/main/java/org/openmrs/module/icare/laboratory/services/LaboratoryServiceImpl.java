@@ -84,11 +84,11 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	public void setSampleLableDAO(SampleLableDAO sampleLableDAO) {
 		this.sampleLableDAO = sampleLableDAO;
 	}
-
+	
 	public void setBatchSetDAO(BatchSetDAO batchSetDAO) {
 		this.batchSetDAO = batchSetDAO;
 	}
-
+	
 	public void setBatchDAO(BatchDAO batchDAO) {
 		this.batchDAO = batchDAO;
 	}
@@ -449,8 +449,7 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 			        + ICareConfig.LAB_RESULT_APPROVAL_CONFIGURATION + "'");
 		}
 		
-		if ((testAllocationStatus.getRemarks().equals("SECOND_APPROVAL") && labResultApprovalConfig.equals("2"))
-		        || (testAllocationStatus.getRemarks().equals("APPROVED") && labResultApprovalConfig.equals("1"))) {
+		if ((testAllocationStatus.getStatus().equals("AUTHORIZED") && labResultApprovalConfig.equals("2"))) {
 			List<Result> resList = testAllocation.getTestAllocationResults();
 			
 			Collections.sort(resList, new Comparator<Result>() {
@@ -480,7 +479,8 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 				
 				List<TestAllocationStatus> resultsRemarks = new ArrayList<TestAllocationStatus>();
 				for (TestAllocationStatus status : testAllocationStatuses) {
-					if (status.getStatus().equals("COMMENT") || status.getStatus().equals("ANSWER DESCRIPTION")) {
+					if (status.getStatus() != null
+					        && (status.getStatus().equals("COMMENT") || status.getStatus().equals("ANSWER DESCRIPTION"))) {
 						resultsRemarks.add(status);
 					}
 				}
@@ -495,7 +495,7 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 				observation.setDateCreated(new Date());
 				observation.setVoided(false);
 				for (TestAllocationStatus resultsRemark : resultsRemarks) {
-					if (resultsRemark.getStatus().equals("ANSWER DESCRIPTION")) {
+					if (resultsRemark.getStatus() != null && resultsRemark.getStatus().equals("ANSWER DESCRIPTION")) {
 						observation.setComment(resultsRemark.getRemarks());
 					}
 				}
@@ -697,7 +697,7 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	
 	@Override
 	public BatchSet createBatchSet(BatchSet batchSet) {
-
+		
 		return batchSetDAO.save(batchSet);
 	}
 	
@@ -705,9 +705,9 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	public List<BatchSet> getBatchSets(Date startDate, Date endDate, String q, Integer startIndex, Integer limit) {
 		return batchSetDAO.getBatchSets(startDate, endDate, q, startIndex, limit);
 	}
-
-	public BatchSet getBatchSetByUuid(String batchSetUuid){
-		return  batchSetDAO.findByUuid(batchSetUuid);
+	
+	public BatchSet getBatchSetByUuid(String batchSetUuid) {
+		return batchSetDAO.findByUuid(batchSetUuid);
 	}
 	
 }
