@@ -3,7 +3,7 @@ import { from, Observable, of, zip } from "rxjs";
 import { catchError, map } from "rxjs/operators";
 import { OpenmrsHttpClientService } from "../../../modules/openmrs-http-client/services/openmrs-http-client.service";
 import { omit } from "lodash";
-import { Api, EncounterCreate } from "../../openmrs";
+import { Api, EncounterCreate, OrderGetFull } from "../../openmrs";
 import { HttpErrorResponse } from "@angular/common/http";
 
 @Injectable({
@@ -19,13 +19,20 @@ export class OrdersService {
     return zip(
       ...orderUuids.map((orderUuid) => {
         return this.openMRSHttpClient.get(
-          `order/${orderUuid}?v=custom:(uuid,orderNumber,concept:(uuid,display,setMembers:(uuid,display)))`
+          `order/${orderUuid}?v=custom:(uuid,orderNumber,encounter,concept:(uuid,display,setMembers:(uuid,display)))`
         );
       })
     ).pipe(
       map((response) => {
         return response;
       })
+    );
+  }
+
+  getOrderByUuid(uuid): Observable<OrderGetFull> {
+    return from(this.API.order.getOrder(uuid)).pipe(
+      map((response) => response),
+      catchError((error) => of(error))
     );
   }
 
@@ -90,7 +97,10 @@ export class OrdersService {
     return this.openMRSHttpClient.delete(`order/${uuid}`);
   }
 
-  voidOrderWithReason(order: {uuid: string, voidReason: string}): Observable<any> {
+  voidOrderWithReason(order: {
+    uuid: string;
+    voidReason: string;
+  }): Observable<any> {
     const voidReason =
       order?.voidReason.length > 0 ? order?.voidReason : "No reason";
     return from(

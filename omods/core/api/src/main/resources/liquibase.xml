@@ -833,7 +833,24 @@
                 constraintName="lb_test_result_lb_test_allocation_test_allocation_id"
                 referencedTableName="lb_test_allocation"
                 referencedColumnNames="test_allocation_id"/>
-
+    </changeSet>
+    <changeSet id="add_columns_to_lb_test_result" author="josephat-mwakyusa" dbms="mysql">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists columnName="instrument_id" tableName="lb_test_result"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="lb_test_result" >
+            <column name="instrument_id" type="INTEGER">
+                <constraints nullable="true"></constraints>
+            </column>
+        </addColumn>
+        <addForeignKeyConstraint
+                baseColumnNames="instrument_id"
+                baseTableName="lb_test_result"
+                constraintName="lb_test_result_instrument_id_concept_concept_id_fk"
+                referencedColumnNames="concept_id"
+                referencedTableName="concept"/>
     </changeSet>
 
     <changeSet id="create_st_requisition" author="jesse-justin" dbms="mysql">
@@ -3086,6 +3103,25 @@
             </column>
             <column name="retired" type="BOOLEAN" defaultValueBoolean="false" />
         </addColumn>
+    </changeSet>
+
+    <changeSet id="add_columns_to_lb_test_allocation_status" author="josephat-mwakyusa" dbms="mysql">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists columnName="test_result_id" tableName="lb_test_allocation_status"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="lb_test_allocation_status" >
+            <column name="test_result_id" type="INTEGER">
+                <constraints nullable="true"></constraints>
+            </column>
+        </addColumn>
+        <addForeignKeyConstraint
+                baseColumnNames="test_result_id"
+                baseTableName="lb_test_allocation_status"
+                constraintName="lb_test_allocation_status_test_result_id_fk"
+                referencedColumnNames="test_result_id"
+                referencedTableName="lb_test_result"/>
     </changeSet>
 
     <changeSet id="update_primary_key_for_st_issue_item" author="dennis-kibahila" dbms="mysql">
