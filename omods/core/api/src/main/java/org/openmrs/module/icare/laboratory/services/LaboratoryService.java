@@ -103,4 +103,7 @@ public interface LaboratoryService extends OpenmrsService {
 	List<BatchSet> getBatchSets(Date start, Date end, String q, Integer startIndex, Integer limit);
 
 	BatchSet getBatchSetByUuid(String batchSetUuid);
+
+    BatchSetStatus addBatchSetStatus(BatchSetStatus batchSetStatus) throws Exception;
+
 }
