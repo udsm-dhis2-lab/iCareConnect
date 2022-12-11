@@ -155,5 +155,4 @@ public class BatchStatus implements java.io.Serializable {
 		
 		return batchStatusObject;
 	}
-	
 }

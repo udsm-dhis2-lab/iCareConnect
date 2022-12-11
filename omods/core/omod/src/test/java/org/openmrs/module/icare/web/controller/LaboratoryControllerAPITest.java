@@ -40,7 +40,7 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 	
 	@Mock
 	TestOrderLocationDAO testOrderLocationDAO;
-
+	
 	@Before
 	public void setUp() throws SQLException {
 		initializeInMemoryDatabase();
@@ -591,8 +591,8 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 	
 	@Test
 	public void CreatingAndGettingBatches() throws Exception {
-
-	//1. Creating batches
+		
+		//1. Creating batches
 		//Given
 		String dto = this.readFile("dto/batch-create-dto.json");
 		List<Map<String, Object>> batchObject = (new ObjectMapper()).readValue(dto, List.class);
@@ -601,70 +601,72 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		MockHttpServletRequest newPostRequest = newPostRequest("lab/batch", batchObject);
 		MockHttpServletResponse handle = handle(newPostRequest);
 		List<Map<String, Object>> createdbatches = (new ObjectMapper()).readValue(handle.getContentAsString(), List.class);
-
-		assertThat("created 2 batches",createdbatches.size(),is(2));
-
- 	//2. Getting batches
+		
+		assertThat("created 2 batches", createdbatches.size(), is(2));
+		
+		//2. Getting batches
 		//When
-		MockHttpServletRequest newGetRequest = newGetRequest("lab/batches",new Parameter("startDate", "2022-12-10"), new Parameter("endDate", "2022-12-10"),new Parameter("q","batch-lab"));
+		MockHttpServletRequest newGetRequest = newGetRequest("lab/batches", new Parameter("startDate", "2022-12-10"),
+		    new Parameter("endDate", "2022-12-10"), new Parameter("q", "batch-lab"));
 		MockHttpServletResponse handle2 = handle(newGetRequest);
-
+		
 		List<Map<String, Object>> batches = (new ObjectMapper()).readValue(handle2.getContentAsString(), List.class);
-
-		assertThat("Has 1 batch",batches.size(),is(1));
-
+		
+		assertThat("Has 1 batch", batches.size(), is(1));
+		
 	}
-
+	
 	@Test
-	public void CreatingAndGettingBatchSets() throws Exception{
-
+	public void CreatingAndGettingBatchSets() throws Exception {
+		
 		//1. Creating batchSets
 		//Given
 		String dto = this.readFile("dto/batch-set-create-dto.json");
 		List<Map<String, Object>> batchObject = (new ObjectMapper()).readValue(dto, List.class);
-
+		
 		//When
 		MockHttpServletRequest newPostRequest = newPostRequest("lab/batchset", batchObject);
 		MockHttpServletResponse handle = handle(newPostRequest);
 		List<Map<String, Object>> createdbatchSets = (new ObjectMapper()).readValue(handle.getContentAsString(), List.class);
-
-		assertThat("created 1 batchSet",createdbatchSets.size(),is(2));
-
+		
+		assertThat("created 1 batchSet", createdbatchSets.size(), is(2));
+		
 		//2. Getting batchSets
 		//When
-		MockHttpServletRequest newGetRequest = newGetRequest("lab/batchsets",new Parameter("startDate", "2022-12-09"), new Parameter("endDate", "2022-12-09"),new Parameter("q","My batch set"));
+		MockHttpServletRequest newGetRequest = newGetRequest("lab/batchsets", new Parameter("startDate", "2022-12-09"),
+		    new Parameter("endDate", "2022-12-09"), new Parameter("q", "My batch set"));
 		MockHttpServletResponse handle2 = handle(newGetRequest);
-
+		
 		List<Map<String, Object>> batches = (new ObjectMapper()).readValue(handle2.getContentAsString(), List.class);
-
-		assertThat("Has 1 batchSet",batches.size(),is(1));
-
+		
+		assertThat("Has 1 batchSet", batches.size(), is(1));
+		
 	}
-
+	
 	@Test
-	public void creatingBatchStatusAndBatchSetStatus() throws Exception{
-
+	public void creatingBatchStatusAndBatchSetStatus() throws Exception {
+		
 		//1.Creating BatchSetStatus
 		//Given
 		String dto = this.readFile("dto/batch-set-status-create-dto.json");
-		Map<String,Object> batchSetStatusObject = (new ObjectMapper()).readValue(dto,Map.class);
-
-		MockHttpServletRequest newPostRequest = newPostRequest("lab/batchsetstatus",batchSetStatusObject);
+		Map<String, Object> batchSetStatusObject = (new ObjectMapper()).readValue(dto, Map.class);
+		
+		MockHttpServletRequest newPostRequest = newPostRequest("lab/batchsetstatus", batchSetStatusObject);
 		MockHttpServletResponse handle = handle(newPostRequest);
-		Map<String,Object> createdBatchSetStatus = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
-
-		assertThat("created batchSet status",createdBatchSetStatus.get("status") != null);
-
+		Map<String, Object> createdBatchSetStatus = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
+		
+		assertThat("created batchSet status", createdBatchSetStatus.get("status") != null);
+		
 		//2. Creating BatchStatus
 		//Given
 		String dto1 = this.readFile("dto/batch-status-create-dto.json");
-		Map<String,Object> batchStatusObject  = (new ObjectMapper()).readValue(dto1,Map.class);
-
-		MockHttpServletRequest newPostRequest1 = newPostRequest("lab/batchstatus",batchStatusObject);
+		Map<String, Object> batchStatusObject = (new ObjectMapper()).readValue(dto1, Map.class);
+		
+		MockHttpServletRequest newPostRequest1 = newPostRequest("lab/batchstatus", batchStatusObject);
 		MockHttpServletResponse handle1 = handle(newPostRequest1);
-		Map<String,Object> createdBatchStatus = (new ObjectMapper()).readValue(handle1.getContentAsString(), Map.class);
-
-		assertThat("created batch status",createdBatchStatus.get("status") != null);
+		Map<String, Object> createdBatchStatus = (new ObjectMapper()).readValue(handle1.getContentAsString(), Map.class);
+		
+		assertThat("created batch status", createdBatchStatus.get("status") != null);
 	}
 	
 	@Override

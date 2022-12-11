@@ -46,8 +46,6 @@ public class LaboratoryController {
 	
 	@Autowired
 	LocationService locationService;
-
-
 	
 	@RequestMapping(value = "visit", method = RequestMethod.GET)
 	@ResponseBody
@@ -710,21 +708,22 @@ public class LaboratoryController {
 	@RequestMapping(value = "batch", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public List<Map<String, Object>> addBatch(@RequestBody List<Map<String, Object>> batchesObject) throws Exception {
-
+		
 		Batch batch = new Batch();
 		List<Map<String, Object>> newBatches = new ArrayList<Map<String, Object>>();
-
-		for (Map<String, Object> batchObject :  batchesObject){
-
+		
+		for (Map<String, Object> batchObject : batchesObject) {
+			
 			batch = Batch.fromMap(batchObject);
-
-			if((batchObject.get("batchSet")) != null) {
-
-				BatchSet batchSet = laboratoryService.getBatchSetByUuid(((Map) batchObject.get("batchSet")).get("uuid").toString());
+			
+			if ((batchObject.get("batchSet")) != null) {
+				
+				BatchSet batchSet = laboratoryService.getBatchSetByUuid(((Map) batchObject.get("batchSet")).get("uuid")
+				        .toString());
 				batch.setBatchSet(batchSet);
-
+				
 			}
-
+			
 			Batch newBatch = laboratoryService.addBatch(batch);
 			newBatches.add(newBatch.toMap());
 		}
@@ -735,8 +734,8 @@ public class LaboratoryController {
 	@ResponseBody
 	public List<Map<String, Object>> getbatches(@RequestParam(value = "startDate", required = false) String startDate,
 	        @RequestParam(value = "endDate", required = false) String endDate,
-	        @RequestParam(value = "q", required = false) String q,@RequestParam(defaultValue = "0") Integer startIndex, @RequestParam(defaultValue = "100") Integer limit) throws ParseException {
-
+	        @RequestParam(value = "q", required = false) String q, @RequestParam(defaultValue = "0") Integer startIndex,
+	        @RequestParam(defaultValue = "100") Integer limit) throws ParseException {
 		
 		Date start = null;
 		Date end = null;
@@ -746,9 +745,8 @@ public class LaboratoryController {
 			start = formatter.parse(startDate);
 			end = formatter.parse(endDate);
 		}
-
+		
 		List<Batch> batches = laboratoryService.getBatches(start, end, q, startIndex, limit);
-
 		
 		List<Map<String, Object>> responseBatchesObject = new ArrayList<Map<String, Object>>();
 		for (Batch batch : batches) {
@@ -763,36 +761,38 @@ public class LaboratoryController {
 	@RequestMapping(value = "batchset", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public List<Map<String, Object>> addBatchSet(@RequestBody List<Map<String, Object>> batchSetsObject) {
-
+		
 		BatchSet batchSet = new BatchSet();
-		List<Map<String,Object>> newBatchSets = new ArrayList<Map<String,Object>>();
-
-		for(Map<String, Object> batchSetObject : batchSetsObject){
-
+		List<Map<String, Object>> newBatchSets = new ArrayList<Map<String, Object>>();
+		
+		for (Map<String, Object> batchSetObject : batchSetsObject) {
+			
 			batchSet = BatchSet.fromMap(batchSetObject);
 			BatchSet newBatchSet = laboratoryService.addBatchSet(batchSet);
 			newBatchSets.add(newBatchSet.toMap());
 		}
 		
 		return newBatchSets;
-
+		
 	}
-
-	@RequestMapping(value = "batchstatus",method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_VALUE)
+	
+	@RequestMapping(value = "batchstatus", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
-	public Map<String,Object> addBatchStatus(@RequestBody Map<String,Object> batchStatusObject) throws Exception{
-
+	public Map<String, Object> addBatchStatus(@RequestBody Map<String, Object> batchStatusObject) throws Exception {
+		
 		BatchStatus batchStatus = BatchStatus.fromMap(batchStatusObject);
-
+		
 		BatchStatus savedBatchStatus = laboratoryService.addBatchStatus(batchStatus);
-
+		
 		return savedBatchStatus.toMap();
 	}
 	
 	@RequestMapping(value = "batchsets", method = RequestMethod.GET)
 	@ResponseBody
 	public List<Map<String, Object>> getbatchsets(@RequestParam(value = "startDate", required = false) String startDate,
-	        @RequestParam(value = "endDate", required = false) String endDate,@RequestParam(value = "q", required = false) String q,@RequestParam(defaultValue = "0") Integer startIndex, @RequestParam(defaultValue = "100") Integer limit) throws ParseException {
+	        @RequestParam(value = "endDate", required = false) String endDate,
+	        @RequestParam(value = "q", required = false) String q, @RequestParam(defaultValue = "0") Integer startIndex,
+	        @RequestParam(defaultValue = "100") Integer limit) throws ParseException {
 		
 		Date start = null;
 		Date end = null;
@@ -810,24 +810,17 @@ public class LaboratoryController {
 			Map<String, Object> batchObject = batchSet.toMap();
 			responseBatchSetsObject.add(batchObject);
 		}
-		
 		return responseBatchSetsObject;
-		
 	}
-
-	@RequestMapping(value = "batchsetstatus", method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_VALUE)
+	
+	@RequestMapping(value = "batchsetstatus", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
-	public Map<String,Object> addBatchSetStatus(@RequestBody Map<String,Object> batchSetStatusObject) throws Exception {
-
+	public Map<String, Object> addBatchSetStatus(@RequestBody Map<String, Object> batchSetStatusObject) throws Exception {
+		
 		BatchSetStatus batchSetStatus = BatchSetStatus.fromMap(batchSetStatusObject);
 		BatchSetStatus savedbatchSetStatus = laboratoryService.addBatchSetStatus(batchSetStatus);
-
+		
 		return savedbatchSetStatus.toMap();
-
 	}
-
-
-
-
 	
 }
