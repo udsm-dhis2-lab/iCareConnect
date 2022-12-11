@@ -46,6 +46,8 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	BatchSetDAO batchSetDAO;
 
 	BatchSetStatusDAO batchSetStatusDAO;
+
+	BatchStatusDAO batchStatusDAO;
 	
 	public void setSampleDAO(SampleDAO sampleDAO) {
 		this.sampleDAO = sampleDAO;
@@ -97,6 +99,10 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 
 	public void setBatchSetStatusDAO(BatchSetStatusDAO batchSetStatusDAO){
 		this.batchSetStatusDAO = batchSetStatusDAO;
+	}
+
+	public void setBatchStatusDAO(BatchStatusDAO batchStatusDAO){
+		this.batchStatusDAO = batchStatusDAO;
 	}
 
 	@Override
@@ -607,16 +613,38 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	public List<Batch> getBatches(Date startDate, Date endDate, String q, Integer startIndex, Integer limit) {
 		return batchDAO.getBatches(startDate, endDate, q, startIndex, limit);
 	}
+
+	@Override
+	public Batch getBatchByUuid(String batchUuid){
+		return batchDAO.findByUuid(batchUuid);
+	}
 	
 	@Override
-	public Batch createBatch(Batch batch) {
+	public Batch addBatch(Batch batch) {
 		return batchDAO.save(batch);
 	}
 	
 	@Override
-	public BatchSet createBatchSet(BatchSet batchSet) {
-
+	public BatchSet addBatchSet(BatchSet batchSet) {
 		return batchSetDAO.save(batchSet);
+	}
+
+	@Override
+	public BatchStatus addBatchStatus(BatchStatus batchStatus) throws Exception{
+
+		Batch batch = this.getBatchByUuid(batchStatus.getBatch().getUuid());
+
+		if(batch == null){
+			throw new Exception("The batch with id "+batchStatus.getBatch().getUuid()+" does not exist");
+		}
+		User user = Context.getUserService().getUserByUuid(batchStatus.getUser().getUuid());
+		if(user == null){
+			throw new Exception ("The user with id "+batchStatus.getUser().getUuid()+" does not exist");
+		}
+
+		batchStatus.setBatch(batch);
+		batchStatus.setUser(user);
+		return batchStatusDAO.save(batchStatus);
 	}
 	
 	@Override

@@ -574,7 +574,7 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 	}
 
 	@Test
-	public void creatingAndGettingBatchSetStatus() throws Exception{
+	public void creatingBatchStatusAndBatchSetStatus() throws Exception{
 
 		//1.Creating BatchSetStatus
 		//Given
@@ -587,11 +587,16 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 
 		assertThat("created batchSet status",createdBatchSetStatus.get("status") != null);
 
-		//2. Getting BatchSetStatus
+		//2. Creating BatchStatus
 		//Given
+		String dto1 = this.readFile("dto/batch-status-create-dto.json");
+		Map<String,Object> batchStatusObject  = (new ObjectMapper()).readValue(dto1,Map.class);
 
+		MockHttpServletRequest newPostRequest1 = newPostRequest("lab/batchstatus",batchStatusObject);
+		MockHttpServletResponse handle1 = handle(newPostRequest1);
+		Map<String,Object> createdBatchStatus = (new ObjectMapper()).readValue(handle1.getContentAsString(), Map.class);
 
-
+		assertThat("created batch status",createdBatchStatus.get("status") != null);
 	}
 	
 	@Override
