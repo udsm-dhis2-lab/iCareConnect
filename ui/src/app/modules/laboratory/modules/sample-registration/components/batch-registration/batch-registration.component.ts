@@ -1,5 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { flatten, omit } from "lodash";
+import { DropdownOption } from 'src/app/shared/modules/form/models/dropdown-option.model';
 import { Dropdown } from 'src/app/shared/modules/form/models/dropdown.model';
 import { FormValue } from 'src/app/shared/modules/form/models/form-value.model';
 import { TextArea } from 'src/app/shared/modules/form/models/text-area.model';
@@ -34,6 +35,10 @@ export class BatchRegistrationComponent implements OnInit {
   batchsetNameField: Textbox;
   addAnotherSample: any;
   warning: any;
+  selectedFixedFields: any[] = [];
+  fixedFieldsOptions: DropdownOption[];
+  staticFieldsOptions: DropdownOption[];
+  selectedStaticFields: any[] = [];
 
   constructor() {}
 
@@ -52,7 +57,7 @@ export class BatchRegistrationComponent implements OnInit {
       shouldHaveLiveSearchForDropDownFields: true,
     });
 
-    let allFields: any[] = []
+    let allFields: any[] = [];
     flatten(
       Object.keys(
         omit(this.allRegistrationFields, ["batchRegistrationFields"])
@@ -64,8 +69,15 @@ export class BatchRegistrationComponent implements OnInit {
       return (allFields = [...allFields, ...tempoFields]);
     });
 
-    this.addFixedField = this.allRegistrationFields?.batchRegistrationFields?.addFixedField;
-    this.addFixedField.options = allFields.map((field) => {
+    this.fixedFieldsOptions = allFields.map((field) => {
+      return {
+        key: field?.id,
+        label: field.label,
+        value: field,
+        name: field?.label,
+      };
+    });
+    this.staticFieldsOptions = allFields.map((field) => {
       return {
         key: field?.id,
         label: field.label,
@@ -74,16 +86,13 @@ export class BatchRegistrationComponent implements OnInit {
       };
     });
 
+    this.addFixedField =
+      this.allRegistrationFields?.batchRegistrationFields?.addFixedField;
+    this.addFixedField.options = this.fixedFieldsOptions;
+
     this.addStaticField =
       this.allRegistrationFields?.batchRegistrationFields?.addStaticField;
-    this.addStaticField.options = allFields.map((field) => {
-      return {
-        key: field?.id,
-        label: field.label,
-        value: field,
-        name: field?.label,
-      };
-    });
+    this.addStaticField.options = this.staticFieldsOptions;
 
     this.batchNameField =
       this.allRegistrationFields?.batchRegistrationFields?.batchNameField;
@@ -107,9 +116,19 @@ export class BatchRegistrationComponent implements OnInit {
     this.addAnotherSample = !this.addAnotherSample;
   }
 
-  onFormUpdate(formValues: FormValue): void {
+  onFormUpdate(formValues: FormValue, key?: string): void {
     //Validate Date fields
     this.formData = { ...this.formData, ...formValues.getValues() };
+    if (key === "Fixed") {
+      this.selectedFixedFields = this.formData["addFixedField"]?.value?.map(
+        (value) => value?.value
+      );
+    }
+    if (key === "Static") {
+      this.selectedStaticFields = this.formData["addStaticField"]?.value?.map(
+        (value) => value?.value
+      );
+    }
   }
 
   onPageChange(e: any) {
