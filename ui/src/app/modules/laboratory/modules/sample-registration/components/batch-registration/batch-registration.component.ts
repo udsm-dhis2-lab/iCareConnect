@@ -129,6 +129,12 @@ export class BatchRegistrationComponent implements OnInit {
         (value) => value?.value
       );
     }
+
+    if(key === "SelectedFixedField"){
+      
+    }
+    if (key === "SelectedStaticField") {
+    }
   }
 
   onPageChange(e: any) {
