@@ -149,135 +149,93 @@ export class SingleRegistrationComponent implements OnInit {
     );
     this.labLocations$ = this.store.select(getLocationsByIds(userLocationsIds));
     this.labSampleLabel$ = this.samplesService.getSampleLabel();
-    // this.referringDoctorFields = this.referringDoctorAttributes.map(
-    //   (attribute) => {
-    //     return new Textbox({
-    //       id: "attribute-" + attribute?.value,
-    //       key: "attribute-" + attribute?.value,
-    //       label: attribute?.name,
-    //       type: "text",
-    //     });
-    //   }
-    // );
     this.referringDoctorFields = Object.keys(
       this.allRegistrationFields?.referringDoctorFields
     ).map((key) => {
-      console.log("==> key")
       return this.allRegistrationFields?.referringDoctorFields[key];
     });
 
-    this.specimenDetailsFields = [
-      new Dropdown({
-        id: "specimen",
-        key: "specimen",
-        label: "Specimen",
-        searchTerm: "SPECIMEN_SOURCE",
-        options: [],
-        conceptClass: "Specimen",
-        searchControlType: "concept",
-        shouldHaveLiveSearchForDropDownFields: true,
-      }),
-      new Dropdown({
-        id: "condition",
-        key: "condition",
-        label: "Condition",
-        options: [],
-        conceptClass: "condition",
-        searchControlType: "concept",
-        searchTerm: "SAMPLE_CONDITIONS",
-        shouldHaveLiveSearchForDropDownFields: true,
-      }),
-      new Dropdown({
-        id: "agency",
-        key: "agency",
-        label: "Urgency/Priority",
-        options: [],
-        conceptClass: "priority",
-        searchControlType: "concept",
-        searchTerm: "SAMPLE_PRIORITIES",
-        shouldHaveLiveSearchForDropDownFields: true,
-      }),
-      // new Dropdown({
-      //   id: "receivinglab",
-      //   key: "receivinglab",
-      //   label: "Receiving Lab",
-      //   options: [],
-      //   searchControlType: "concept",
-      //   conceptClass: "Lab Department",
-      //   shouldHaveLiveSearchForDropDownFields: true,
-      // }),
-      // new DateField({
-      //   id: "receivedOn",
-      //   key: "receivedOn",
-      //   label: "Received On",
-      // }),
-      // new Dropdown({
-      //   id: "department",
-      //   key: "department",
-      //   label: "Department",
-      //   options: [],
-      //   searchControlType: "concept",
-      //   conceptClass: "Lab Department",
-      //   shouldHaveLiveSearchForDropDownFields: true,
-      // }),
-    ];
+    this.specimenDetailsFields = Object.keys(
+      this.allRegistrationFields?.specimenDetailFields
+    )
+      .slice(0, 3)
+      .map((key) => {
+        return this.allRegistrationFields?.specimenDetailFields[key];
+      });
 
-    this.receivedOnField = new DateField({
-      id: "receivedOn",
-      key: "receivedOn",
-      label: "Received On",
-      max: this.maximumDate,
-    });
+    // this.specimenDetailsFields = [
+    //   new Dropdown({
+    //     id: "specimen",
+    //     key: "specimen",
+    //     label: "Specimen",
+    //     searchTerm: "SPECIMEN_SOURCE",
+    //     options: [],
+    //     conceptClass: "Specimen",
+    //     searchControlType: "concept",
+    //     shouldHaveLiveSearchForDropDownFields: true,
+    //   }),
+    //   new Dropdown({
+    //     id: "condition",
+    //     key: "condition",
+    //     label: "Condition",
+    //     options: [],
+    //     conceptClass: "condition",
+    //     searchControlType: "concept",
+    //     searchTerm: "SAMPLE_CONDITIONS",
+    //     shouldHaveLiveSearchForDropDownFields: true,
+    //   }),
+    //   new Dropdown({
+    //     id: "agency",
+    //     key: "agency",
+    //     label: "Urgency/Priority",
+    //     options: [],
+    //     conceptClass: "priority",
+    //     searchControlType: "concept",
+    //     searchTerm: "SAMPLE_PRIORITIES",
+    //     shouldHaveLiveSearchForDropDownFields: true,
+    //   }),
+    //   // new Dropdown({
+    //   //   id: "receivinglab",
+    //   //   key: "receivinglab",
+    //   //   label: "Receiving Lab",
+    //   //   options: [],
+    //   //   searchControlType: "concept",
+    //   //   conceptClass: "Lab Department",
+    //   //   shouldHaveLiveSearchForDropDownFields: true,
+    //   // }),
+    //   // new DateField({
+    //   //   id: "receivedOn",
+    //   //   key: "receivedOn",
+    //   //   label: "Received On",
+    //   // }),
+    //   // new Dropdown({
+    //   //   id: "department",
+    //   //   key: "department",
+    //   //   label: "Department",
+    //   //   options: [],
+    //   //   searchControlType: "concept",
+    //   //   conceptClass: "Lab Department",
+    //   //   shouldHaveLiveSearchForDropDownFields: true,
+    //   // }),
+    // ];
 
-    this.receivedByField = new Dropdown({
-      id: "receivedBy",
-      key: "receivedBy",
-      label: "Received By",
-      options: [],
-      shouldHaveLiveSearchForDropDownFields: true,
-      searchControlType: "user",
-    });
+    this.receivedOnField =
+      this.allRegistrationFields.specimenDetailFields.receivedOn;
+    this.receivedByField =
+      this.allRegistrationFields.specimenDetailFields.receivedBy;
+    this.transportCondition =
+      this.allRegistrationFields.specimenDetailFields.transportCondition;
+    this.transportationTemperature =
+      this.allRegistrationFields.specimenDetailFields.transportationTemperature;
 
-    this.agencyFormField = new Dropdown({
-      id: "agency",
-      key: "agency",
-      label: "urgency/Priority",
-      options: this.agencyConceptConfigs?.setMembers.map((member) => {
-        return {
-          key: member?.uuid,
-          value: member?.display,
-          label: member?.display,
-          name: member?.display,
-        };
-      }),
-      shouldHaveLiveSearchForDropDownFields: false,
-    });
-
-    this.transportCondition = new Dropdown({
-      id: "transportCondition",
-      key: "transportCondition",
-      label: "Transport Condition",
-      searchTerm: "SAMPLE_TRANSPORT_CONDITION",
-      required: false,
-      options: [],
-      multiple: false,
-      conceptClass: "Misc",
-      searchControlType: "concept",
-      shouldHaveLiveSearchForDropDownFields: true,
-    });
-
-    this.transportationTemperature = new Dropdown({
-      id: "transportationTemperature",
-      key: "transportationTemperature",
-      label: "Transportation Temperature",
-      searchTerm: "SAMPLE_TRANSPORT_TEMPERATURE",
-      required: false,
-      options: [],
-      multiple: false,
-      conceptClass: "Misc",
-      searchControlType: "concept",
-      shouldHaveLiveSearchForDropDownFields: true,
-    });
+    this.sampleColectionDateField =
+      this.allRegistrationFields.specimenDetailFields.collectedOn;
+    this.sampleCollectedByField =
+      this.allRegistrationFields.specimenDetailFields.collectedBy;
+    this.broughtOnField =
+      this.allRegistrationFields.specimenDetailFields.broughtOn;
+    this.broughtByField =
+      this.allRegistrationFields.specimenDetailFields.broughtBy;
 
     const currentLocation = JSON.parse(localStorage.getItem("currentLocation"));
     const labsAvailable =
@@ -300,8 +258,6 @@ export class SingleRegistrationComponent implements OnInit {
     //   shouldHaveLiveSearchForDropDownFields: false,
     // });getSelectedRCollectedOnTime
 
-    this.createSampleCollectionDetailsFields();
-    this.createSampleBroughtByDetailsFields();
   }
 
   get maximumDate() {
@@ -327,36 +283,6 @@ export class SingleRegistrationComponent implements OnInit {
         ? date.getDate()
         : `0${date.getDate()}`;
     return `${date.getFullYear()}-${month}-${day}`;
-  }
-
-  createSampleCollectionDetailsFields(data?: any): void {
-    this.sampleColectionDateField = new DateField({
-      id: "collectedOn",
-      key: "collectedOn",
-      label: "Collected On",
-      max: this.maximumDate,
-    });
-
-    this.sampleCollectedByField = new Textbox({
-      id: "collectedBy",
-      key: "collectedBy",
-      label: "Collected By",
-    });
-  }
-
-  createSampleBroughtByDetailsFields(data?: any): void {
-    this.broughtOnField = new DateField({
-      id: "broughtOn",
-      key: "broughtOn",
-      label: "Delivered On",
-      max: this.maximumDate,
-    });
-
-    this.broughtByField = new Textbox({
-      id: "broughtBy",
-      key: "broughtBy",
-      label: "Delivered By",
-    });
   }
 
   togglePatientDetailsFieldSet(event: Event): void {
