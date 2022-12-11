@@ -1,4 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { flatten, omit } from "lodash";
 import { Dropdown } from 'src/app/shared/modules/form/models/dropdown.model';
 import { FormValue } from 'src/app/shared/modules/form/models/form-value.model';
 import { TextArea } from 'src/app/shared/modules/form/models/text-area.model';
@@ -51,49 +52,50 @@ export class BatchRegistrationComponent implements OnInit {
       shouldHaveLiveSearchForDropDownFields: true,
     });
 
-    this.addFixedField = new Dropdown({
-      id: "addFixedField",
-      key: "addFixedField",
-      label: "Select fixed field",
-      options: [],
-      shouldHaveLiveSearchForDropDownFields: true,
-      multiple: true,
+    let allFields: any[] = []
+    flatten(
+      Object.keys(
+        omit(this.allRegistrationFields, ["batchRegistrationFields"])
+      ).map((key) => this.allRegistrationFields[key])
+    ).map((objectFields) => {
+      let tempoFields = Object.keys(objectFields).map(
+        (key) => objectFields[key]
+      );
+      return (allFields = [...allFields, ...tempoFields]);
     });
 
-    this.addStaticField = new Dropdown({
-      id: "addStaticField",
-      key: "addStaticField",
-      label: "Select static field",
-      options: [],
-      shouldHaveLiveSearchForDropDownFields: true,
-      multiple: true,
+    this.addFixedField = this.allRegistrationFields?.batchRegistrationFields?.addFixedField;
+    this.addFixedField.options = allFields.map((field) => {
+      return {
+        key: field?.id,
+        label: field.label,
+        value: field,
+        name: field?.label,
+      };
     });
 
-    this.batchNameField = new Textbox({
-      id: "batchName",
-      key: "batchName",
-      label: "Batch Name",
+    this.addStaticField =
+      this.allRegistrationFields?.batchRegistrationFields?.addStaticField;
+    this.addStaticField.options = allFields.map((field) => {
+      return {
+        key: field?.id,
+        label: field.label,
+        value: field,
+        name: field?.label,
+      };
     });
 
-    this.batchDescription = new TextArea({
-      id: "batchDescription",
-      key: "batchDescription",
-      label: "Batch Description",
-    });
+    this.batchNameField =
+      this.allRegistrationFields?.batchRegistrationFields?.batchNameField;
 
-    this.existingBatchsetField = new Dropdown({
-      id: "existingBatchset",
-      key: "existingBatchSet",
-      label: "Select exising batch set",
-      options: [],
-      shouldHaveLiveSearchForDropDownFields: true,
-    });
+    this.batchDescription =
+      this.allRegistrationFields?.batchRegistrationFields?.batchDescriptionField;
 
-    this.batchsetNameField = new Textbox({
-      id: "batchSetName",
-      key: "batchSetName",
-      label: "Type Batchset Name",
-    });
+    this.existingBatchsetField =
+      this.allRegistrationFields?.batchRegistrationFields?.existingBatchsetField;
+
+    this.batchsetNameField =
+      this.allRegistrationFields?.batchRegistrationFields?.batchSetNameField;
   }
 
   onUseExistingBatchset(e: any) {

@@ -68,6 +68,7 @@ export class RegisterSampleComponent implements OnInit {
   clinicalFormFields: any;
   manyObservables$: Observable<any>;
   identifierTypes$: Observable<any>;
+  batchRegistrationFields: any;
 
   get maximumDate() {
     let maxDate = new Date();
@@ -370,7 +371,46 @@ export class RegisterSampleComponent implements OnInit {
       }),
     };
 
+    this.batchRegistrationFields = {
+      addFixedField: new Dropdown({
+        id: "addFixedField",
+        key: "addFixedField",
+        label: "Select fixed field",
+        shouldHaveLiveSearchForDropDownFields: false,
+        multiple: true,
+      }),
+      addStaticField: new Dropdown({
+        id: "addStaticField",
+        key: "addStaticField",
+        label: "Select static field",
+        shouldHaveLiveSearchForDropDownFields: false,
+        multiple: true,
+      }),
+      batchNameField: new Textbox({
+        id: "batchName",
+        key: "batchName",
+        label: "Batch Name",
+      }),
+      batchDescriptionField: new TextArea({
+        id: "batchDescription",
+        key: "batchDescription",
+        label: "Batch Description",
+      }),
+      existingBatchsetField: new Dropdown({
+        id: "existingBatchset",
+        key: "existingBatchSet",
+        label: "Select exising batch set",
+        shouldHaveLiveSearchForDropDownFields: false,
+      }),
+      batchSetNameField: new Textbox({
+        id: "batchSetName",
+        key: "batchSetName",
+        label: "Type Batchset Name",
+      })
+    }
+
     this.allRegistrationFields = {
+      batchRegistrationFields: this.batchRegistrationFields,
       specimenDetailFields: this.specimenDetailsFields,
       personFields: this.personFields,
       patientAgeFields: this.patientAgeFields,

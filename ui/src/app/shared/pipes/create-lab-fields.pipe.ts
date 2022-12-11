@@ -8,7 +8,6 @@ import { Textbox } from "../modules/form/models/text-box.model";
 })
 export class CreateLabFieldsPipe implements PipeTransform {
   transform(allRegistrationFields: any, ...args: any[]): any {
-      console.log("==> Identifiers: ", args[2]);
       if(allRegistrationFields && args.length > 0){
         let fields = {
           ...allRegistrationFields,
