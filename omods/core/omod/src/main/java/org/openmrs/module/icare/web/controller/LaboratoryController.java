@@ -725,7 +725,7 @@ public class LaboratoryController {
 
 			}
 
-			Batch newBatch = laboratoryService.createBatch(batch);
+			Batch newBatch = laboratoryService.addBatch(batch);
 			newBatches.add(newBatch.toMap());
 		}
 		return newBatches;
@@ -770,12 +770,23 @@ public class LaboratoryController {
 		for(Map<String, Object> batchSetObject : batchSetsObject){
 
 			batchSet = BatchSet.fromMap(batchSetObject);
-			BatchSet newBatchSet = laboratoryService.createBatchSet(batchSet);
+			BatchSet newBatchSet = laboratoryService.addBatchSet(batchSet);
 			newBatchSets.add(newBatchSet.toMap());
 		}
 		
 		return newBatchSets;
 
+	}
+
+	@RequestMapping(value = "batchstatus",method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public Map<String,Object> addBatchStatus(@RequestBody Map<String,Object> batchStatusObject) throws Exception{
+
+		BatchStatus batchStatus = BatchStatus.fromMap(batchStatusObject);
+
+		BatchStatus savedBatchStatus = laboratoryService.addBatchStatus(batchStatus);
+
+		return savedBatchStatus.toMap();
 	}
 	
 	@RequestMapping(value = "batchsets", method = RequestMethod.GET)
@@ -803,5 +814,20 @@ public class LaboratoryController {
 		return responseBatchSetsObject;
 		
 	}
+
+	@RequestMapping(value = "batchsetstatus", method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public Map<String,Object> addBatchSetStatus(@RequestBody Map<String,Object> batchSetStatusObject) throws Exception {
+
+		BatchSetStatus batchSetStatus = BatchSetStatus.fromMap(batchSetStatusObject);
+		BatchSetStatus savedbatchSetStatus = laboratoryService.addBatchSetStatus(batchSetStatus);
+
+		return savedbatchSetStatus.toMap();
+
+	}
+
+
+
+
 	
 }
