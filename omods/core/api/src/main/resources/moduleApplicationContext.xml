@@ -163,6 +163,12 @@
                     </bean>
                 </property>
 
+                <property name="batchStatusDAO">
+                    <bean class="org.openmrs.module.icare.laboratory.dao.BatchStatusDAO">
+                        <property name="sessionFactory" ref="dbSessionFactory" />
+                    </bean>
+                </property>
+
 
             </bean>
         </property>

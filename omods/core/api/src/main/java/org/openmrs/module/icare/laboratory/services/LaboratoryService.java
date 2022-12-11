@@ -95,10 +95,12 @@ public interface LaboratoryService extends OpenmrsService {
 	WorkloadSummary getWorkLoadSummary(Date startDate, Date endDate);
 	
 	List<Batch> getBatches(Date start, Date end, String q, Integer startIndex, Integer limit);
+
+	Batch getBatchByUuid(String batchUuid);
 	
-	Batch createBatch(Batch batch);
+	Batch addBatch(Batch batch);
 	
-	BatchSet createBatchSet(BatchSet batchSet);
+	BatchSet addBatchSet(BatchSet batchSet);
 	
 	List<BatchSet> getBatchSets(Date start, Date end, String q, Integer startIndex, Integer limit);
 
@@ -106,4 +108,5 @@ public interface LaboratoryService extends OpenmrsService {
 
     BatchSetStatus addBatchSetStatus(BatchSetStatus batchSetStatus) throws Exception;
 
+	BatchStatus addBatchStatus(BatchStatus batchStatus) throws Exception;
 }
