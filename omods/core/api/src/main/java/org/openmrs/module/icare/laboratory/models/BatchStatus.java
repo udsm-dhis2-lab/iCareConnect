@@ -147,8 +147,12 @@ public class BatchStatus implements java.io.Serializable {
 		batchStatusUserObject.put("uuid", this.getUser().getUuid());
 		batchStatusUserObject.put("display", this.getUser().getDisplayString());
 		batchStatusObject.put("user", batchStatusUserObject);
+
+		Map<String,Object> batchStatusBatchObject = new HashMap<>();
+		batchStatusBatchObject.put("uuid",this.getBatch().getUuid());
+		batchStatusBatchObject.put("display", this.getBatch().getBatchName());
+		batchStatusObject.put("batchset",batchStatusBatchObject);
 		
 		return batchStatusObject;
 	}
-	
 }

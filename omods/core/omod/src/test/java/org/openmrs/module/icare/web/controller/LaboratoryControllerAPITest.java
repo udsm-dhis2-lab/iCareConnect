@@ -2,6 +2,7 @@ package org.openmrs.module.icare.web.controller;
 
 import org.apache.commons.collections.IteratorUtils;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -628,10 +629,7 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		MockHttpServletResponse handle = handle(newPostRequest);
 		List<Map<String, Object>> createdbatchSets = (new ObjectMapper()).readValue(handle.getContentAsString(), List.class);
 		
-		System.out.println(createdbatchSets);
-		
 		assertThat("created 1 batchSet", createdbatchSets.size(), is(2));
-		
 		//2. Getting batchSets
 		//When
 		MockHttpServletRequest newGetRequest = newGetRequest("lab/batchsets", new Parameter("startDate", "2022-12-09"),
@@ -642,6 +640,32 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		
 		assertThat("Has 1 batchSet", batches.size(), is(1));
 		
+	}
+	
+	@Test
+	public void creatingBatchStatusAndBatchSetStatus() throws Exception {
+		
+		//1.Creating BatchSetStatus
+		//Given
+		String dto = this.readFile("dto/batch-set-status-create-dto.json");
+		Map<String, Object> batchSetStatusObject = (new ObjectMapper()).readValue(dto, Map.class);
+		
+		MockHttpServletRequest newPostRequest = newPostRequest("lab/batchsetstatus", batchSetStatusObject);
+		MockHttpServletResponse handle = handle(newPostRequest);
+		Map<String, Object> createdBatchSetStatus = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
+		
+		assertThat("created batchSet status", createdBatchSetStatus.get("status") != null);
+		
+		//2. Creating BatchStatus
+		//Given
+		String dto1 = this.readFile("dto/batch-status-create-dto.json");
+		Map<String, Object> batchStatusObject = (new ObjectMapper()).readValue(dto1, Map.class);
+		
+		MockHttpServletRequest newPostRequest1 = newPostRequest("lab/batchstatus", batchStatusObject);
+		MockHttpServletResponse handle1 = handle(newPostRequest1);
+		Map<String, Object> createdBatchStatus = (new ObjectMapper()).readValue(handle1.getContentAsString(), Map.class);
+		
+		assertThat("created batch status", createdBatchStatus.get("status") != null);
 	}
 	
 	@Override
