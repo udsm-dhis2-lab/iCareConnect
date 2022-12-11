@@ -133,6 +133,14 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 	}
 	
 	@Test
+	public void testGetSampleOrdersBySampleUuid() throws Exception {
+		MockHttpServletRequest sampleRequest = newGetRequest("lab/sample/x311y666-zz77-11e3-1111-08002007777/orders");
+		MockHttpServletResponse response = handle(sampleRequest);
+		String data = response.getContentAsString();
+		System.out.println(data);
+	}
+	
+	@Test
 	public void testUpdateSampleOrder() throws Exception {
 		//Given
 		String dto = this.readFile("dto/sample-order-create-dto.json");
@@ -213,6 +221,32 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		
 		MockHttpServletResponse handleSampleGet = handle(sampleGetRequest);
 		
+	}
+	
+	@Test
+	public void testGetAllocationByUuid() throws Exception {
+		MockHttpServletRequest getAllocationRequest = newGetRequest("lab/allocation", new Parameter("uuid",
+		        "111xxx60-7777-11e3-1111-0sndiu87hsju"));
+		MockHttpServletResponse allocationByAllocation = handle(getAllocationRequest);
+		String data = allocationByAllocation.getContentAsString();
+		System.out.println(data);
+	}
+	
+	@Test
+	@Ignore
+	public void testGetAllocationsByOrderUuid() throws Exception {
+		MockHttpServletRequest getAllocationsRequest = newGetRequest("lab/allocationsbyorder", new Parameter("uuid",
+		        "7634gd66-3333-4abd-8fd7-a748c9575abcd"));
+		MockHttpServletResponse allocationByOrder = handle(getAllocationsRequest);
+		System.out.println(allocationByOrder.getContentAsString());
+	}
+	
+	@Test
+	public void testGetAllocationsBySampleUuid() throws Exception {
+		MockHttpServletRequest getAllocationsRequest = newGetRequest("lab/allocationsbysample", new Parameter("uuid",
+		        "x311y666-zz77-11e3-1111-08002007777"));
+		MockHttpServletResponse allocationByOrder = handle(getAllocationsRequest);
+		System.out.println(allocationByOrder.getContentAsString());
 	}
 	
 	@Test
@@ -411,7 +445,21 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		assertThat("result valueText should be 5.88", newResultsObject.get("valueText").toString(), is("5.88"));
 		assertThat("result concept uuid should be 111111xx-0000-477a-8u8u-acc38ebc6252",
 		    ((Map) newResultsObject.get("concept")).get("uuid").toString(), is("111111xx-0000-477a-8u8u-acc38ebc6252"));
+	}
+	
+	@Test
+	public void testCreateMultipleResults() throws Exception {
+		//Given
+		String dto = this.readFile("dto/lab-related-results-create.json");
+		List<Map<String, Object>> results = (new ObjectMapper()).readValue(dto, List.class);
 		
+		MockHttpServletRequest newPostRequest = newPostRequest("lab/multipleresults", results);
+		
+		MockHttpServletResponse handle = handle(newPostRequest);
+		
+		List<Map<String, Object>> resultsObject = (new ObjectMapper()).readValue(handle.getContentAsString(),
+		    ArrayList.class);
+		System.out.println(resultsObject);
 	}
 	
 	@Test
@@ -458,6 +506,26 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 			}
 		}
 		assertThat("Sample should be found", sampleFound, is(true));
+	}
+	
+	@Test
+	public void testAddingTestAllocationStatuses() throws Exception {
+		
+		AdministrationService adminService = Context.getService(AdministrationService.class);
+		adminService.setGlobalProperty(ICareConfig.LAB_RESULT_APPROVAL_CONFIGURATION, "2");
+		
+		//Given
+		String dto = this.readFile("dto/test-allocation-statuses-create.json");
+		List<Map<String, Object>> testAllocationStatuses = (new ObjectMapper()).readValue(dto, ArrayList.class);
+		
+		//When
+		MockHttpServletRequest newPostRequest = newPostRequest("lab/allocationstatuses", testAllocationStatuses);
+		MockHttpServletResponse handle = handle(newPostRequest);
+		
+		//Then
+		List<Map<String, Object>> testAllocationStatusesResult = (new ObjectMapper()).readValue(handle.getContentAsString(),
+		    ArrayList.class);
+		System.out.println(testAllocationStatusesResult);
 	}
 	
 	@Test
