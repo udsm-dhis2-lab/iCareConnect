@@ -82,6 +82,10 @@ public class LaboratoryController {
 			newSample.setLocation(location);
 			System.out.println(location.getName());
 		}
+		if(sample.get("batch") != null){
+			Batch batch = laboratoryService.getBatchByUuid(((Map) sample.get("batch")).get("uuid").toString());
+			newSample.setBatch(batch);
+		}
 		
 		newSample.setVisit(existingVisit);
 		newSample.setConcept(concept);
