@@ -2,10 +2,13 @@ import { Injectable } from '@angular/core';
 import * as FileSaver from 'file-saver';
 import * as XLSX from 'xlsx';
 import * as _ from 'lodash';
+import * as pdfmake from 'pdfmake/build/pdfmake';
+import * as pdfFonts from 'pdfmake/build/vfs_fonts';
 
 const EXCEL_TYPE =
   'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
 const EXCEL_EXTENSION = '.xlsx';
+  pdfmake.vfs = pdfFonts.pdfMake.vfs;
 @Injectable({
   providedIn: 'root',
 })
@@ -35,4 +38,30 @@ export class ExportDataService {
       fileName + '_export_' + new Date().getTime() + EXCEL_EXTENSION
     );
   }
+
+exportAsPdfFile(json: any[], pdfFileName: string): void {
+  const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(json);
+  const workbook: XLSX.WorkBook = {
+    Sheets: { data: worksheet },
+    SheetNames: ['data'],
+  };
+  const excelBuffer: any = XLSX.write(workbook, {
+    bookType: 'xlsx',
+    type: 'array',
+  });
+
+  const docDefinition = {
+    content: [
+      {
+        table: {
+          body: json
+        }
+      }
+    ]
+  };
+
+  pdfmake.createPdf(docDefinition).saveAsPdfFile(excelBuffer, pdfFileName);
+}
+
+
 }

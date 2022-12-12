@@ -104,6 +104,7 @@ export class DrugsListComponent implements OnInit {
         this.downloading = false;
         let data = response?.results
         this.exportDataService.exportAsExcelFile(data, fileName);
+        this.exportDataService.exportAsPdfFile(data, fileName);
       }
     });
   }
