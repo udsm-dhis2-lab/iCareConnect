@@ -123,14 +123,7 @@ export class IssuingComponent implements OnInit {
 
   //FIXME: This is a fix for the search functionality
   // search issues by search term
-  searchIssuing(event: any): void {
-    this.searchTerm = event.target?.value;
-    setTimeout(() => {
-      // call the search function
-      this.getIssuing();
-    }, 200)
-  }
-
+ 
     getIssuing(): void {
     if (this.searchTerm) {
       // return issuingList with search term
