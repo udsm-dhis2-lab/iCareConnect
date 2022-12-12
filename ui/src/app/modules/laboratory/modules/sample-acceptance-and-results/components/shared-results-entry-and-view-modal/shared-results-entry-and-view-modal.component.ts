@@ -29,6 +29,9 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
   userUuid: string;
   obsKeyedByConcepts: any = {};
   files: any[] = [];
+  remarksData: any = {};
+  showSideNavigation: boolean = false;
+  selectedAllocation: any;
   constructor(
     private dialogRef: MatDialogRef<SharedResultsEntryAndViewModalComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
@@ -55,6 +58,12 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
         })
       );
     this.getAllocations();
+  }
+
+  toggleSideNavigation(event: Event, allocation?: any): void {
+    event.stopPropagation();
+    this.selectedAllocation = allocation ? allocation : this.selectedAllocation;
+    this.showSideNavigation = !this.showSideNavigation;
   }
 
   getAllocations(): void {
@@ -116,6 +125,11 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
               }
             : null,
           abnormal: false,
+          status: {
+            category: "RESULT_REMARKS",
+            status: "REMARKS",
+            remarks: this.remarksData[order?.concept?.uuid],
+          },
         };
       })
       ?.filter(
@@ -290,5 +304,9 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
           });
         }
       });
+  }
+
+  onGetRemarks(remarks: string, order: any): void {
+    this.remarksData[order?.concept?.uuid] = remarks;
   }
 }
