@@ -3,6 +3,10 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "outDir": "./out-tsc/app",
+    "target": "es2017",
+    "lib": [
+      "es2017"
+    ],
     "types": []
   },
   "files": [
