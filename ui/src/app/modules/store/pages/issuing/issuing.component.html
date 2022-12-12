@@ -10,7 +10,8 @@
   <mat-card>
     <div class="d-flex justify-content-between">
       <mat-form-field class="w-25">
-        <input autocomplete="off" type="text" matInput placeholder="Search" />
+        <mat-label>Search</mat-label>
+        <input autocomplete="off" type="text" matInput placeholder="" (keyup)="searchIssuing($event)"/>
       </mat-form-field>
       <mat-form-field class="w-25 float-right">
         <mat-label>Choose Store</mat-label>
