@@ -2102,7 +2102,7 @@
                         >
                           Amend
                         </button>
-                        <button
+                        <!-- <button
                           [ngClass]="{
                             'text-success':
                               item?.allocationsPairedBySetMember[
@@ -2153,8 +2153,46 @@
                               ]?.firstSignOff
                             "
                             >d</span
+                          > -->
+                          <button
+                          [ngClass]="{
+                            'text-success': item?.testAllocations[0]?.firstSignOff
+                          }"
+                          [disabled]="
+                            item?.testAllocations[0]?.firstSignOff ||
+                            item?.testAllocations[0]?.results?.length == 0 ||
+                            item?.testAllocations[0]?.rejected
+                          "
+                          mat-stroked-button
+                          (click)="
+                            onSaveSignOff(
+                              $event,
+                              item,
+                              'first',
+                              params?.currentSample,
+                              item?.testAllocations[0]
+                            )
+                          "
+                          class="float-right"
+                        >
+                          <mat-spinner
+                            *ngIf="
+                              params?.savingLabResultsStatusState &&
+                              savingMessage[item?.order?.concept?.uuid + '-first']
+                            "
+                            color="primary"
+                            [diameter]="20"
+                            style="
+                              display: inline-block !important;
+                              margin-right: 4px;
+                            "
                           >
-                        </button>
+                          </mat-spinner>
+                          Approve<span
+                            *ngIf="item?.testAllocations[0]?.firstSignOff"
+                            >d</span
+                          >
+                        </button> 
                       </td>
                       <td colspan="2" *ngIf="!LISConfigurations?.isLIS">
                         <!-- TODO: reject first approval -->
@@ -2180,54 +2218,43 @@
                           Amend
                         </button>
                         <button
-                          [ngClass]="{
-                            'text-success':
-                              item?.allocationsPairedBySetMember[
-                                parameter?.uuid
-                              ]?.secondSignOff
-                          }"
-                          [disabled]="
-                            item?.allocationsPairedBySetMember[parameter?.uuid]
-                              ?.secondSignOff ||
-                            !item?.allocationsPairedBySetMember[parameter?.uuid]
-                              ?.firstSignOff
+                        [ngClass]="{
+                          'text-success': item?.testAllocations[0]?.firstSignOff
+                        }"
+                        [disabled]="
+                          item?.testAllocations[0]?.firstSignOff ||
+                          item?.testAllocations[0]?.results?.length == 0 ||
+                          item?.testAllocations[0]?.rejected
+                        "
+                        mat-stroked-button
+                        (click)="
+                          onSaveSignOff(
+                            $event,
+                            item,
+                            'first',
+                            params?.currentSample,
+                            item?.testAllocations[0]
+                          )
+                        "
+                        class="float-right"
+                      >
+                        <mat-spinner
+                          *ngIf="
+                            params?.savingLabResultsStatusState &&
+                            savingMessage[item?.order?.concept?.uuid + '-first']
                           "
-                          mat-stroked-button
-                          (click)="
-                            onSaveSignOffForParameter(
-                              $event,
-                              item,
-                              parameter,
-                              'second',
-                              params?.currentSample,
-                              item?.allocationsPairedBySetMember[
-                                parameter?.uuid
-                              ]
-                            )
+                          color="primary"
+                          [diameter]="20"
+                          style="
+                            display: inline-block !important;
+                            margin-right: 4px;
                           "
-                          class="float-right"
                         >
-                          <mat-spinner
-                            *ngIf="
-                              params?.savingLabResultsStatusState &&
-                              savingMessage[parameter?.uuid + '-second']
-                            "
-                            color="primary"
-                            [diameter]="20"
-                            style="
-                              display: inline-block !important;
-                              margin-right: 4px;
-                            "
-                          >
-                          </mat-spinner>
-                          Approve<span
-                            *ngIf="
-                              item?.allocationsPairedBySetMember[
-                                parameter?.uuid
-                              ]?.secondSignOff
-                            "
-                            >d</span
-                          >
+                        </mat-spinner>
+                        Approve<span
+                          *ngIf="item?.testAllocations[0]?.firstSignOff"
+                          >d</span
+                        >
                         </button>
                       </td>
                       <td
