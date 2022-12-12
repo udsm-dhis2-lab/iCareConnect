@@ -92,15 +92,17 @@ export class LaboratoryComponent implements OnInit {
               path: ["/laboratory/sample-acceptance-and-results"],
             })
           );
-        } else if (currentRoute?.url?.includes("/dashboard")) {
-          this.enableDate(this.datesRangeDifference, this.showDate);
-          this.currentSubModule = "dashboard";
-          this.store.dispatch(
-            go({
-              path: ["/laboratory/dashboard-lab"],
-            })
-          );
-        } else if (currentRoute?.url?.includes("/sample-tracking")) {
+        } 
+        // else if (currentRoute?.url?.includes("/dashboard")) {
+        //   this.enableDate(this.datesRangeDifference, this.showDate);
+        //   this.currentSubModule = "dashboard";
+        //   this.store.dispatch(
+        //     go({
+        //       path: ["/laboratory/dashboard-lab"],
+        //     })
+        //   );
+        // } 
+        else if (currentRoute?.url?.includes("/sample-tracking")) {
           this.enableDate(this.datesRangeDifference, this.showDate);
           this.currentSubModule = "tracking";
           this.store.dispatch(
