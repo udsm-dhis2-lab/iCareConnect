@@ -81,6 +81,7 @@
                           params?.multipleResultsAttributeType
                         "
                         [allocation]="allocationData?.allocation"
+                        [disabled]="data?.actionType === 'review'"
                         (data)="
                           onGetFieldData(
                             $event,
@@ -96,6 +97,7 @@
               <td style="width: 100px">
                 <div class="mt-4">
                   <button
+                    *ngIf="data?.actionType !== 'review'"
                     [disabled]="!isFormValid"
                     mat-flat-button
                     color="primary"

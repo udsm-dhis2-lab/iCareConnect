@@ -13,6 +13,7 @@ import {
   setSampleStatuses,
   clearLoadedLabSamples,
   updateSample,
+  loadSampleByUuid,
 } from "src/app/store/actions";
 import { AppState } from "src/app/store/reducers";
 import {
@@ -393,27 +394,23 @@ export class SampleAcceptanceComponent implements OnInit {
 
   onResultsReview(event: Event, sample, providerDetails): void {
     event.stopPropagation();
-    this.dialog.open(ResultsFeedingModalComponent, {
-      data: {
-        sample: sample,
-        currentUser: this.currentUser,
-        labConfigs: this.labConfigs,
-        LISConfigurations: this.LISConfigurations,
-        maxHeight:
-          sample?.orders?.length == 1 &&
-          sample?.orders[0]?.order?.concept?.setMembers?.length == 0
-            ? "480px"
-            : "620px",
-      },
-      maxHeight:
-        sample?.orders?.length == 1 &&
-        sample?.orders[0]?.concept?.setMembers?.length == 0
-          ? "610px"
-          : "860px",
-      width: "100%",
-      disableClose: false,
-      panelClass: "custom-dialog-container",
-    });
+    this.dialog
+      .open(SharedResultsEntryAndViewModalComponent, {
+        data: {
+          sample: sample,
+          currentUser: this.currentUser,
+          labConfigs: this.labConfigs,
+          LISConfigurations: this.LISConfigurations,
+          actionType: "review",
+        },
+        width: "100%",
+        disableClose: false,
+        panelClass: "custom-dialog-container",
+      })
+      .afterClosed()
+      .subscribe(() => {
+        this.store.dispatch(loadSampleByUuid({ uuid: sample?.uuid }));
+      });
   }
 
   onResultsEntryAndReview(
@@ -423,18 +420,23 @@ export class SampleAcceptanceComponent implements OnInit {
     actionType: string
   ): void {
     e.stopPropagation();
-    this.dialog.open(SharedResultsEntryAndViewModalComponent, {
-      data: {
-        sample: sample,
-        currentUser: this.currentUser,
-        labConfigs: this.labConfigs,
-        LISConfigurations: this.LISConfigurations,
-        actionType,
-      },
-      width: "100%",
-      disableClose: false,
-      panelClass: "custom-dialog-container",
-    });
+    this.dialog
+      .open(SharedResultsEntryAndViewModalComponent, {
+        data: {
+          sample: sample,
+          currentUser: this.currentUser,
+          labConfigs: this.labConfigs,
+          LISConfigurations: this.LISConfigurations,
+          actionType,
+        },
+        width: "100%",
+        disableClose: false,
+        panelClass: "custom-dialog-container",
+      })
+      .afterClosed()
+      .subscribe(() => {
+        this.store.dispatch(loadSampleByUuid({ uuid: sample?.uuid }));
+      });
   }
 
   onResultsToPrint(e, patientDetailsAndSamples, providerDetails, authorized) {
