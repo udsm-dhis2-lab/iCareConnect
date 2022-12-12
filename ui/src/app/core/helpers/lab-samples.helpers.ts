@@ -19,14 +19,20 @@ export function mergeTestAllocations(allocations: any): any {
   return alls;
 }
 
-export function getAuthorizationDetailsByOrder(order) {
+export function getAuthorizationDetailsByOrder(order: any, isLIS?: boolean) {
   const approvedAllocations =
     order?.testAllocations?.filter(
       (allocation) =>
         (
           allocation?.statuses?.filter(
             (status) =>
-              status?.status === "APPROVED" || status?.category === "APPROVED"
+              ((status?.status === "APPROVED" ||
+                status?.status === "AUTHORIZED") &&
+                isLIS) ||
+              (!isLIS &&
+                (status?.remarks?.toLowerCase()?.indexOf("second_approval") >
+                  -1 ||
+                  status?.status === "AUTHORIZED"))
           ) || []
         )?.length > 0
     ) || [];
@@ -44,10 +50,7 @@ export function getAuthorizationDetailsByOrder(order) {
                 allocation: allocation,
               };
             })
-            ?.filter(
-              (status) =>
-                status?.status === "APPROVED" || status?.category === "APPROVED"
-            ) || [],
+            ?.filter((status) => status?.status === "APPROVED") || [],
       };
     }),
     "name"

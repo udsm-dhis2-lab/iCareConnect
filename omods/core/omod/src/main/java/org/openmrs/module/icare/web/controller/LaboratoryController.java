@@ -825,6 +825,7 @@ public class LaboratoryController {
 		BatchSetStatus savedbatchSetStatus = laboratoryService.addBatchSetStatus(batchSetStatus);
 		
 		return savedbatchSetStatus.toMap();
+
 	}
-	
+
 }
