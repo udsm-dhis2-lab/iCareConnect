@@ -709,7 +709,7 @@ public class LaboratoryController {
 		return workloadSummary.toMap();
 	}
 	
-	@RequestMapping(value = "batch", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "batches", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public List<Map<String, Object>> addBatch(@RequestBody List<Map<String, Object>> batchesObject) throws Exception {
 		
@@ -762,7 +762,7 @@ public class LaboratoryController {
 		
 	}
 	
-	@RequestMapping(value = "batchset", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "batchsets", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public List<Map<String, Object>> addBatchSet(@RequestBody List<Map<String, Object>> batchSetsObject) {
 		

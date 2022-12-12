@@ -599,7 +599,7 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		List<Map<String, Object>> batchObject = (new ObjectMapper()).readValue(dto, List.class);
 		
 		//When
-		MockHttpServletRequest newPostRequest = newPostRequest("lab/batch", batchObject);
+		MockHttpServletRequest newPostRequest = newPostRequest("lab/batches", batchObject);
 		MockHttpServletResponse handle = handle(newPostRequest);
 		List<Map<String, Object>> createdbatches = (new ObjectMapper()).readValue(handle.getContentAsString(), List.class);
 		
@@ -626,7 +626,7 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		List<Map<String, Object>> batchObject = (new ObjectMapper()).readValue(dto, List.class);
 		
 		//When
-		MockHttpServletRequest newPostRequest = newPostRequest("lab/batchset", batchObject);
+		MockHttpServletRequest newPostRequest = newPostRequest("lab/batchsets", batchObject);
 		MockHttpServletResponse handle = handle(newPostRequest);
 		List<Map<String, Object>> createdbatchSets = (new ObjectMapper()).readValue(handle.getContentAsString(), List.class);
 		
