@@ -107,6 +107,12 @@
 
     <orders orderer="200" concept_id ="500" creator="400" date_activated="2018-12-27 00:00:00" order_number="125" urgency="ROUTINE" care_setting="1" order_action="NEW" voided="false" order_type_id="211" date_created="2019-10-14 13:56:44" uuid="8634xx66-3444-4acc-8qd7-6648c9575abcd" order_id="302" patient_id="500" encounter_id="100"/>
 
+    <!-- Batch set -->
+    <lb_batch_set batch_set_id ="602" uuid = "iCARE890-TEST-MOTR-9beb-d30dcfc0c665" name = "My batch set" description = "Testing batchset" date_created="2022-12-09 15:51:57.0" voided="0" creator="1" />
+
+    <!-- Batch  -->
+    <lb_batch batch_id ="601" uuid = "iCARE890-TEST-MOTR-9beb-d30dcfc0c635" name = "My batch" label="batch-label" description = "Testing batch" batch_set_id="602" date_created="2022-12-10 15:51:57.0" voided="0" creator="1" />
+
 
     <!-- Care Settings -->
     <care_setting care_setting_id="1" name="Outpatient" description="Out-patient care setting" care_setting_type="OUTPATIENT"
@@ -117,7 +123,7 @@
 
     <item item_id="666" uuid="1odcd43560-z337-11e3-1234-08002007777" concept_id="500" date_created="2020-12-27 00:00:00" voided="false" creator="1"/>
 
-    <lb_sample uuid="d365e560-zz77-11e3-1111-08002007777" sample_id="201" visit_id="500" label="Sample Label y" concept_id="600" date_created="2020-12-27 00:00:00" voided="false" creator="1"/>
+    <lb_sample uuid="d365e560-zz77-11e3-1111-08002007777" sample_id="201" visit_id="500" label="Sample Label y" concept_id="600" date_created="2020-12-27 00:00:00" voided="false" creator="1" batch_id="601"/>
 
     <lb_sample uuid="x311y666-zz77-11e3-1111-08002007777" sample_id="202" visit_id="500" label="Sample Label y" concept_id="600" date_created="2020-12-27 00:00:00" voided="false" creator="1"/>
 
@@ -158,12 +164,6 @@
 
     <!-- Location -->
     <location location_id ="602" uuid = "iCARE890-TEST-MOTR-9beb-d30dcfc0c66e" name = "My location" description = "Testing" date_created="2017-02-14 15:51:57.0" retired="false" />
-
-    <!-- Batch set -->
-    <lb_batch_set batch_set_id ="602" uuid = "iCARE890-TEST-MOTR-9beb-d30dcfc0c665" name = "My batch set" description = "Testing batchset" date_created="2022-12-09 15:51:57.0" voided="0" creator="1" />
-
-    <!-- Batch  -->
-    <lb_batch batch_id ="601" uuid = "iCARE890-TEST-MOTR-9beb-d30dcfc0c635" name = "My batch" label="batch-label" description = "Testing batch" batch_set_id="602" date_created="2022-12-10 15:51:57.0" voided="0" creator="1" />
 
 
 </dataset>
