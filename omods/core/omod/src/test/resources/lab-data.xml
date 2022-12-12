@@ -79,6 +79,14 @@
                   date_created="2014-01-12 00:00:00.0" concept_name_type="FULLY_SPECIFIED" locale_preferred="1" voided="false"
                   uuid="8889b329-52b9-11e8-b60d-880027ae421d" />
 
+    <!-- instrument concept -->
+    <concept concept_id="810" retired="false" datatype_id="2" class_id="15" is_set="false" creator="1"
+             date_created="2017-02-14 15:51:57.0" version="" uuid="123111zz-0011-477v-8y8y-acc38ebc6252" />
+
+    <concept_name concept_name_id="510" concept_id="810" name="Cobas Taqman" locale="en_GB" creator="1"
+                  date_created="2014-01-12 00:00:00.0" concept_name_type="FULLY_SPECIFIED" locale_preferred="1" voided="false"
+                  uuid="1239b329-52b9-11e8-b60d-880027ae421d" />
+
     <!-- results concept * note the data type determines * -->
     <concept concept_id="900" retired="false" datatype_id="3" class_id="7" is_set="false" creator="1"
              date_created="2017-02-14 15:51:57.0" version="" uuid="334112yz-0111-488v-8yyy-acc38ebc6252" />
@@ -144,12 +152,18 @@
     <lb_test_allocation test_allocation_id="323" uuid="222yyy70-7777-11e3-1221-0sndiu87hsju" sample_id="203" order_id="302" label="Allocation Lable x" date_created="2020-12-27 00:00:00" voided="false" creator="1"/>
 
 
-    <lb_test_result uuid="222yyy70-7777-11e3-1221-0sndiu87hsj3" test_result_id="123" test_allocation_id="323" concept_id="900" value_text="positive" date_created="2020-12-27 00:00:00" voided="false" creator="1"/>
+    <lb_test_result uuid="222yyy70-7777-11e3-1221-0sndiu87hsj3" test_result_id="123" test_allocation_id="323" concept_id="900" value_text="positive" date_created="2020-12-27 00:00:00" voided="false" creator="1" instrument_id="10"/>
 
     <lb_test_allocation_status test_allocation_status_id="1" test_allocation_id="323" user_id="400" status="APPROVED" remarks="" timestamp="2020-10-14 13:56:44" />
 
     <!-- Location -->
     <location location_id ="602" uuid = "iCARE890-TEST-MOTR-9beb-d30dcfc0c66e" name = "My location" description = "Testing" date_created="2017-02-14 15:51:57.0" retired="false" />
+
+    <!-- Batch set -->
+    <lb_batch_set batch_set_id ="602" uuid = "iCARE890-TEST-MOTR-9beb-d30dcfc0c665" name = "My batch set" description = "Testing batchset" date_created="2022-12-09 15:51:57.0" voided="0" creator="1" />
+
+    <!-- Batch  -->
+    <lb_batch batch_id ="601" uuid = "iCARE890-TEST-MOTR-9beb-d30dcfc0c635" name = "My batch" label="batch-label" description = "Testing batch" batch_set_id="602" date_created="2022-12-10 15:51:57.0" voided="0" creator="1" />
 
 
 </dataset>

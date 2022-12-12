@@ -5,6 +5,7 @@ package org.openmrs.module.icare.laboratory.models;
 import org.hibernate.annotations.GenericGenerator;
 import org.openmrs.BaseOpenmrsData;
 import org.openmrs.Concept;
+import org.openmrs.ConceptName;
 import org.openmrs.Order;
 
 import javax.persistence.*;
@@ -74,6 +75,10 @@ public class TestAllocation extends BaseOpenmrsData implements java.io.Serializa
 	
 	public SampleOrder getSampleOrder() {
 		return sampleOrder;
+	}
+	
+	public Sample getSample() {
+		return this.sampleOrder.getSample();
 	}
 	
 	public void setSampleOrder(SampleOrder sampleOrder) {
@@ -158,7 +163,15 @@ public class TestAllocation extends BaseOpenmrsData implements java.io.Serializa
 			Map<String, Object> testConceptMap = new HashMap<String, Object>();
 			testConceptMap.put("uuid", this.getTestConcept().getUuid());
 			testConceptMap.put("display", this.getTestConcept().getDisplayString());
+			Map<String, Object> datatype = new HashMap<>();
+			datatype.put("uuid", this.getTestConcept().getDatatype().getUuid());
+			datatype.put("name", this.getTestConcept().getDatatype().getName());
+			datatype.put("description", this.getTestConcept().getDatatype().getDescription());
+			testConceptMap.put("datatype", datatype);
+//			testConceptMap.put("names", this.getTestConcept().getNames());
+//			testConceptMap.put("shortNames", this.getTestConcept().getShortNames());
 			testAllocationMap.put("concept", testConceptMap);
+			testAllocationMap.put("parameter", testConceptMap);
 		}
 		
 		List<Map<String, Object>> testAllocationStatusMap = new ArrayList<Map<String, Object>>();
@@ -172,6 +185,24 @@ public class TestAllocation extends BaseOpenmrsData implements java.io.Serializa
 			resultssMap.add(result.toMap());
 		}
 		testAllocationMap.put("results", resultssMap);
+		Map<String, Object> order = new HashMap<String, Object>();
+		order.put("uuid", this.sampleOrder.getOrder().getUuid());
+		Map<String, Object> orderer = new HashMap<String, Object>();
+		orderer.put("uuid", this.sampleOrder.getOrder().getOrderer().getUuid());
+		orderer.put("name", this.sampleOrder.getOrder().getOrderer().getName());
+		orderer.put("display", this.sampleOrder.getOrder().getOrderer().getName());
+		order.put("orderer", orderer);
+		Map<String, Object> orderConcept = new HashMap<>();
+		orderConcept.put("uuid", this.sampleOrder.getOrder().getConcept().getUuid());
+		orderConcept.put("display", this.sampleOrder.getOrder().getConcept().getDisplayString());
+		order.put("concept", orderConcept);
+		testAllocationMap.put("order", order);
+		
+		Map<String, Object> sample = new HashMap<String, Object>();
+		sample.put("uuid", this.sampleOrder.getSample().getUuid());
+		sample.put("label", this.sampleOrder.getSample().getLabel());
+		testAllocationMap.put("sample", sample);
+		testAllocationMap.put("isSet", this.getSampleOrder().getOrder().getConcept().getSetMembers().size() > 1);
 		return testAllocationMap;
 	}
 	

@@ -1,0 +1,20 @@
+[
+  {
+    "valueText": "5.88",
+    "concept": {
+      "uuid": "111111xx-0000-477a-8u8u-acc38ebc6252"
+    },
+    "testAllocation": {
+      "uuid": "111xxx60-7777-11e3-1111-0sndiu87hsju"
+    },
+    "instrument": {
+      "uuid": "123111zz-0011-477v-8y8y-acc38ebc6252"
+    },
+    "status": {
+      "category": "Testing-category",
+      "status": "Testing",
+      "remarks": "Testing remarks"
+    },
+    "resultGroupUuid": "222yyy70-7777-11e3-1221-0sndiu87hsj3"
+  }
+]
