@@ -94,7 +94,7 @@ export class DrugsListComponent implements OnInit {
         return this.drugService.getAllDrugs({
           startIndex: (reference - 1) * 100,
           limit: 100,
-          q: this.searchingText,
+          q: this.searchingText,b n
           v: "custom:(uuid,display,strength,concept:(uuid,display))",
         });
       })
