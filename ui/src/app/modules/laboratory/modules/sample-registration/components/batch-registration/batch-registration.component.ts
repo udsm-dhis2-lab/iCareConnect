@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { flatten, omit } from "lodash";
+import { flatten, omit, keyBy } from "lodash";
 import { DropdownOption } from 'src/app/shared/modules/form/models/dropdown-option.model';
 import { Dropdown } from 'src/app/shared/modules/form/models/dropdown.model';
 import { FormValue } from 'src/app/shared/modules/form/models/form-value.model';
@@ -25,6 +25,7 @@ export class BatchRegistrationComponent implements OnInit {
   @Input() allRegistrationFields: any;
   formData: any;
   useExistingBatchset: boolean = false;
+  validForm: boolean = false;
   addFixedField: Dropdown;
   addStaticField: Dropdown;
   batchSetField: Textbox;
@@ -39,6 +40,9 @@ export class BatchRegistrationComponent implements OnInit {
   fixedFieldsOptions: DropdownOption[];
   staticFieldsOptions: DropdownOption[];
   selectedStaticFields: any[] = [];
+  staticFieldsOptionsObject: { [key: string]: any };
+  fixedFieldsOptionsObject: { [key: string]: any };
+  allFields: any[] = [];
 
   constructor() {}
 
@@ -49,15 +53,7 @@ export class BatchRegistrationComponent implements OnInit {
       },
       type: "warning",
     };
-    this.selectedField = new Dropdown({
-      id: "selectedFieldTest",
-      key: "selectedFieldTest",
-      label: "Selected Field",
-      options: [],
-      shouldHaveLiveSearchForDropDownFields: true,
-    });
 
-    let allFields: any[] = [];
     flatten(
       Object.keys(
         omit(this.allRegistrationFields, ["batchRegistrationFields"])
@@ -66,10 +62,10 @@ export class BatchRegistrationComponent implements OnInit {
       let tempoFields = Object.keys(objectFields).map(
         (key) => objectFields[key]
       );
-      return (allFields = [...allFields, ...tempoFields]);
+      return (this.allFields = [...this.allFields, ...tempoFields]);
     });
 
-    this.fixedFieldsOptions = allFields.map((field) => {
+    this.fixedFieldsOptions = this.allFields.map((field) => {
       return {
         key: field?.id,
         label: field.label,
@@ -77,7 +73,7 @@ export class BatchRegistrationComponent implements OnInit {
         name: field?.label,
       };
     });
-    this.staticFieldsOptions = allFields.map((field) => {
+    this.staticFieldsOptions = this.allFields.map((field) => {
       return {
         key: field?.id,
         label: field.label,
@@ -86,7 +82,21 @@ export class BatchRegistrationComponent implements OnInit {
       };
     });
 
-    this.instantiateBatchRegistrationFields()
+    this.fixedFieldsOptionsObject = keyBy(
+      this.fixedFieldsOptions.map((field) => {
+        return field?.value;
+      }),
+      "key"
+    );
+    this.staticFieldsOptionsObject = keyBy(
+      this.staticFieldsOptions.map((field) => {
+        return field?.value;
+      }),
+      "key"
+    );
+    // console.log("==> Fixed fields Object: ", this.fixedFieldsOptionsObject);
+
+    this.instantiateBatchRegistrationFields();
   }
   instantiateBatchRegistrationFields() {
     this.addFixedField =
@@ -119,25 +129,138 @@ export class BatchRegistrationComponent implements OnInit {
     this.addAnotherSample = !this.addAnotherSample;
   }
 
-  onFormUpdate(formValues: FormValue, key?: string): void {
+  onFormUpdate(formValues: FormValue, key?: string, fieldKey?: string): void {
     //Validate Date fields
     this.formData = { ...this.formData, ...formValues.getValues() };
     if (key === "Fixed") {
-      this.selectedFixedFields = this.formData["addFixedField"]?.value?.map(
-        (value) => value?.value
+      this.selectedFixedFields = (
+        this.formData["addFixedField"]?.value || []
+      )?.map((field) => field?.value);
+
+      const selectedFixedFieldIDs = this.selectedFixedFields.map(
+        (field) => field?.key
       );
+
+      this.staticFieldsOptions = this.staticFieldsOptions.filter((field) => {
+        return !selectedFixedFieldIDs.includes(field.key);
+      });
+      // this.addStaticField.options = [];
+      setTimeout(() => {
+        this.addStaticField.options = selectedFixedFieldIDs.length
+          ? this.staticFieldsOptions
+          : this.allFields.map((field) => {
+              return {
+                key: field?.id,
+                label: field.label,
+                value: field,
+                name: field?.label,
+              };
+            });
+      }, 500);
     }
     if (key === "Static") {
-      this.selectedStaticFields = this.formData["addStaticField"]?.value?.map(
-        (value) => value?.value
+      this.selectedStaticFields = (
+        this.formData["addStaticField"]?.value || []
+      )?.map((field) => field?.value);
+      const selectedStaticFieldIDs = this.selectedStaticFields.map(
+        (field) => field?.key
       );
+
+      this.fixedFieldsOptions = this.fixedFieldsOptions.filter((field) => {
+        return !selectedStaticFieldIDs.includes(field.key);
+      });
+      // this.addFixedField.options = [];
+      setTimeout(() => {
+        this.addFixedField.options = selectedStaticFieldIDs.length
+          ? this.fixedFieldsOptions
+          : this.allFields.map((field) => {
+              return {
+                key: field?.id,
+                label: field.label,
+                value: field,
+                name: field?.label,
+              };
+            });
+      }, 500);
     }
 
-    if(key === "SelectedFixedField"){
-      
+    // Handle all dynamically displayed fields (Fixed and Static)
+    if (key === "SelectedFixedField" && fieldKey) {
+      this.fixedFieldsOptionsObject =
+        this.fixedFieldsOptionsObject && this.fixedFieldsOptionsObject[fieldKey]
+          ? {
+              ...this.fixedFieldsOptionsObject,
+              [fieldKey]: {
+                ...this.fixedFieldsOptionsObject[fieldKey],
+                value: this.formData[fieldKey].value,
+              },
+            }
+          : this.fixedFieldsOptionsObject;
     }
-    if (key === "SelectedStaticField") {
+    if (key === "SelectedStaticField" && fieldKey) {
+      this.staticFieldsOptionsObject =
+        this.staticFieldsOptionsObject &&
+        this.staticFieldsOptionsObject[fieldKey]
+          ? {
+              ...this.staticFieldsOptionsObject,
+              [fieldKey]: {
+                ...this.staticFieldsOptionsObject[fieldKey],
+                value: this.formData[fieldKey].value,
+              },
+            }
+          : this.staticFieldsOptionsObject;
     }
+
+    console.log("==> Test Static Field: ", this.staticFieldsOptionsObject);
+
+    //Handle all other fields in batch registration
+    this.batchNameField.value = this.formData[this.batchNameField.key]?.value;
+    this.batchDescription.value =
+      this.formData[this.batchDescription.key]?.value;
+    this.existingBatchsetField.value =
+      this.formData[this.existingBatchsetField.key]?.value;
+    this.batchsetNameField.value =
+      this.formData[this.batchsetNameField.key]?.value;
+
+    if (
+      (this.batchsetNameField.value || this.existingBatchsetField.value) &&
+      this.batchNameField.value &&
+      (this.selectedFixedFields?.length > 0 ||
+        this.selectedStaticFields?.length > 0)
+    ) {
+      this.validForm = true;
+    } else {
+      this.validForm = false;
+    }
+  }
+
+  onSave(e: any) {
+    const fixedFieldsOptionsUpdated = Object.keys(this.fixedFieldsOptionsObject).map((key) => {
+        return this.fixedFieldsOptionsObject[key];
+      })
+      .filter((field) => {
+        return field && field.value;
+      });
+    const staticFieldsOptionsUpdated = Object.keys(this.staticFieldsOptionsObject).map((key) => {
+        return this.staticFieldsOptionsObject[key];
+      })
+      .filter((field) => {
+        return field && field.value;
+      });
+      // this.existingBatchsetField.value;
+      const batchSetInformation = {
+        batchSetName: this.batchsetNameField.value,
+        batches: [
+          {
+            batchName: this.batchNameField.value,
+            batchDescription: this.batchDescription.value,
+            fields: keyBy(staticFieldsOptionsUpdated, "key"),
+          },
+        ],
+        fields: keyBy(fixedFieldsOptionsUpdated, "key"),
+      };
+
+      console.log("==> BatchSet Information; ",batchSetInformation)
   }
 
   onPageChange(e: any) {

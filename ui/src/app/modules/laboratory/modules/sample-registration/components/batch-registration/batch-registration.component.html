@@ -19,18 +19,6 @@
             <!--  Bach Information -->
             <div class="col-4">
                 <div class="row">
-                    <div class="col-12">
-                        <app-form
-                            [fields]="[batchNameField]"
-                            (formUpdate)="onFormUpdate($event)"
-                        ></app-form>
-                    </div>
-                    <div class="col-12">
-                        <app-form
-                            [fields]="[batchDescription]"
-                            (formUpdate)="onFormUpdate($event)"
-                        ></app-form>
-                    </div>
                     <div class="col-12 d-flex ml-1">
                         <h4 class="w-75">Use existing fixed fields from batch set</h4>
                         <mat-slide-toggle
@@ -46,6 +34,18 @@
                             (formUpdate)="onFormUpdate($event)"
                         ></app-form>
                     </div>
+                    <div class="col-12">
+                        <app-form
+                            [fields]="[batchNameField]"
+                            (formUpdate)="onFormUpdate($event)"
+                        ></app-form>
+                    </div>
+                    <div class="col-12">
+                        <app-form
+                            [fields]="[batchDescription]"
+                            (formUpdate)="onFormUpdate($event)"
+                        ></app-form>
+                    </div>
                 </div>
             </div>
 
@@ -58,7 +58,7 @@
                             <div class="col-10">
                                 <app-form
                                     [fields]="[selectedFixedField]"
-                                    (formUpdate)="onFormUpdate($event, 'SelectedFixedField')"
+                                    (formUpdate)="onFormUpdate($event, 'SelectedFixedField', selectedFixedField.key)"
                                 ></app-form>
                             </div>
                             <div class="col-1">
@@ -67,14 +67,26 @@
                         </ng-container>
                     </ng-container>
                     <div class="col-10">
+                        <mat-progress-bar
+                            *ngIf="!addFixedField?.options?.length"
+                            mode="indeterminate">
+                        </mat-progress-bar>
                         <app-form
+                            *ngIf="addFixedField?.options?.length > 0"
                             [fields]="[addFixedField]"
                             (formUpdate)="onFormUpdate($event, 'Fixed')"
                         ></app-form>
                     </div>
-                    <div class="col-2">
-                        <button disabled="!selectedFixedFields?.length" class="save-field" mat-flat-button color="primary" matTooltip="Save all fixed fields"> Save </button>
-                    </div>
+                    <!-- <div class="col-2">
+                        <button 
+                            [disabled]="!selectedFixedFields?.length" 
+                            class="save-field" 
+                            mat-flat-button 
+                            color="primary" 
+                            matTooltip="Save all fixed fields"
+                            (click)="onSave($event, 'Fixed')"
+                        > Save </button>
+                    </div> -->
                 </div>
             </div>
 
@@ -86,7 +98,7 @@
                             <div class="col-10">
                                 <app-form
                                     [fields]="[selectedStaticField]"
-                                    (formUpdate)="onFormUpdate($event, 'SelectedStaticField')"
+                                    (formUpdate)="onFormUpdate($event, 'SelectedStaticField', selectedStaticField.key)"
                                 ></app-form>
                             </div>
                             <div class="col-1">
@@ -95,13 +107,40 @@
                         </ng-container>
                     </ng-container>
                     <div class="col-10">
+                        <mat-progress-bar
+                            *ngIf="!addStaticField?.options?.length"
+                            mode="indeterminate">
+                        </mat-progress-bar>
                         <app-form
+                            *ngIf="addStaticField?.options?.length > 0"
                             [fields]="[addStaticField]"
                             (formUpdate)="onFormUpdate($event, 'Static')"
                         ></app-form>
                     </div>
-                    <div class="col-2">
-                        <button disabled="!selectedStaticFields?.length" class="save-field" mat-flat-button color="primary" matTooltip="Save all static fields"> Save </button>
+                    <!-- <div class="col-2">
+                        <button 
+                        [disabled]="!selectedStaticFields?.length" 
+                        class="save-field" 
+                        mat-flat-button 
+                        color="primary" 
+                        matTooltip="Save all static fields"
+                        (click)="onSave($event, 'Static')"
+                        > Save </button>
+                    </div> -->
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="d-flex justify-content-end">
+                    <div class="w-25 d-flex justify-content-end">
+                        <button
+                        [disabled]="!validForm"
+                        mat-flat-button 
+                        color="primary" 
+                        matTooltip="Save batch information"
+                        (click)="onSave($event)"
+                        > Save Batch</button>
                     </div>
                 </div>
             </div>
