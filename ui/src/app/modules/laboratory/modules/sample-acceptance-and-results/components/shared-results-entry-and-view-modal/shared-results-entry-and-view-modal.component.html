@@ -85,7 +85,10 @@
                           params?.multipleResultsAttributeType
                         "
                         [allocation]="allocationData?.allocation"
-                        [disabled]="data?.actionType === 'review'"
+                        [disabled]="
+                          data?.actionType === 'review' &&
+                          !data?.LISConfigurations?.isLIS
+                        "
                         (data)="
                           onGetFieldData(
                             $event,
@@ -158,6 +161,10 @@
               <td colspan="100%">
                 <app-shared-remarks-entry
                   [order]="order"
+                  [disabled]="
+                    data?.actionType === 'review' &&
+                    !data?.LISConfigurations?.isLIS
+                  "
                   (remarks)="onGetRemarks($event, order)"
                 ></app-shared-remarks-entry>
               </td>

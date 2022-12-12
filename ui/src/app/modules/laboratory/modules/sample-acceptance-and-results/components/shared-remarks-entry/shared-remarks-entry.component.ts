@@ -10,6 +10,7 @@ import { Textbox } from "src/app/shared/modules/form/models/text-box.model";
 })
 export class SharedRemarksEntryComponent implements OnInit {
   @Input() order: any;
+  @Input() disabled: boolean;
   remarksField: any;
   @Output() remarks: EventEmitter<string> = new EventEmitter<string>();
   constructor() {}
@@ -20,6 +21,7 @@ export class SharedRemarksEntryComponent implements OnInit {
       key: "remarks",
       label: "Remarks",
       required: false,
+      disabled: this.disabled,
     });
   }
 

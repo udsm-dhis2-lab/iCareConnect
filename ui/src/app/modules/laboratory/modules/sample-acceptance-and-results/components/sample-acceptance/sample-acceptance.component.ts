@@ -502,24 +502,14 @@ export class SampleAcceptanceComponent implements OnInit {
 
   onReviewResults(event: Event, patient: any, sample: any): void {
     event.stopPropagation();
-    this.dialog.open(ResultsFeedingModalComponent, {
+    this.dialog.open(SharedResultsEntryAndViewModalComponent, {
       data: {
         sample: sample,
         currentUser: this.currentUser,
         labConfigs: this.labConfigs,
         LISConfigurations: this.LISConfigurations,
-        actionType: "Review",
-        maxHeight:
-          sample?.orders?.length == 1 &&
-          sample?.orders[0]?.concept?.setMembers?.length == 0
-            ? "60vh"
-            : "80vh",
+        actionType: "review",
       },
-      maxHeight:
-        sample?.orders?.length == 1 &&
-        sample?.orders[0]?.concept?.setMembers?.length == 0
-          ? "70vh"
-          : "90vh",
       width: "100%",
       disableClose: false,
       panelClass: "custom-dialog-container",
