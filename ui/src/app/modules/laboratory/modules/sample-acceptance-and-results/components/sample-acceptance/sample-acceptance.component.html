@@ -1428,6 +1428,7 @@
                 <tr
                   *ngFor="let order of sample?.orders; let orderCount = index"
                   [ngClass]="{ 'row-alternated': count % 2 !== 0 }"
+                  style="background-color: #6fd67bcf;"
                 >
                   <td
                     *ngIf="orderCount == 0"
