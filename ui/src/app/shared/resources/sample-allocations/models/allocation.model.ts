@@ -52,6 +52,7 @@ export interface SampleAllocationObject {
   };
   orderUuid?: string;
   finalResult?: ResultObject;
+  resultApprovalConfiguration?: any;
 }
 
 export class SampleAllocation {
@@ -99,6 +100,18 @@ export class SampleAllocation {
         statuses: this.allocation?.statuses?.filter(
           (status) => status?.result && status?.result?.uuid === result?.uuid
         ),
+        remarksStatus: (this.allocation?.statuses?.filter(
+          (status) =>
+            status?.result &&
+            status?.result?.uuid === result?.uuid &&
+            status?.category === "RESULT_REMARKS"
+        ) || [])[0],
+        authorizationStatus: (this.allocation?.statuses?.filter(
+          (status) =>
+            status?.result &&
+            status?.result?.uuid === result?.uuid &&
+            status?.status === "AUTHORIZED"
+        ) || [])[0],
         value: result?.valueNumeric
           ? result?.valueNumeric
           : result?.valueBoolean
@@ -134,13 +147,17 @@ export class SampleAllocation {
                 status?.category === "RESULT_AUTHORIZATION" &&
                 status?.result?.uuid === finalResult?.uuid
             ) || [],
-          secondAuthorizationStatuses:
-            this.allocation?.statuses?.filter(
-              (status) =>
-                status?.category === "RESULT_AUTHORIZATION" &&
-                status?.status == "SECOND_APPROVAL" &&
-                status?.result?.uuid === finalResult?.uuid
-            ) || [],
+          authorizationIsReady:
+            Number(this.allocation?.resultApprovalConfiguration) <=
+            (
+              this.allocation?.statuses?.filter(
+                (status) =>
+                  status?.category === "RESULT_AUTHORIZATION" &&
+                  (status?.status == "APPROVED" ||
+                    status?.status == "AUTHORIZED") &&
+                  status?.result?.uuid === finalResult?.uuid
+              ) || []
+            )?.length,
         }
       : null;
   }
@@ -161,6 +178,10 @@ export class SampleAllocation {
           status?.status == "SECOND_APPROVAL"
       ) || []
     );
+  }
+
+  get resultApprovalConfiguration(): any {
+    return this.allocation?.resultApprovalConfiguration;
   }
 
   toJson(): SampleAllocationObject {

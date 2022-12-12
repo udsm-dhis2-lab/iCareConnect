@@ -347,6 +347,9 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 			result.setValueDrug(drug);
 		}
 		
+		Date date = new Date();
+		result.setDateCreated(date);
+		
 		this.resultDAO.save(result);
 		
 		return result;
@@ -390,7 +393,12 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 				Integer valueGroupId = this.getResultsId(result.getResultGroupUuid());
 				result.setValueGroupId(valueGroupId);
 			}
+
+			Date date = new Date();
+			result.setDateCreated(date);
+
 			Result response = this.resultDAO.save(result);
+
 			/*
 			Save status via results
 			* */
@@ -461,8 +469,7 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 			        + ICareConfig.LAB_RESULT_APPROVAL_CONFIGURATION + "'");
 		}
 		
-		if ((testAllocationStatus.getRemarks().equals("SECOND_APPROVAL") && labResultApprovalConfig.equals("2"))
-		        || (testAllocationStatus.getRemarks().equals("APPROVED") && labResultApprovalConfig.equals("1"))) {
+		if ((testAllocationStatus.getStatus().equals("AUTHORIZED") && labResultApprovalConfig.equals("2"))) {
 			List<Result> resList = testAllocation.getTestAllocationResults();
 			
 			Collections.sort(resList, new Comparator<Result>() {
@@ -473,7 +480,8 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 				}
 			});
 			
-			Result allocationResults = resList.get(resList.size() - 1);
+			Result allocationResults = testResult;
+			//					resList.get(resList.size() - 1);
 			//			for (Result allocationResults : testAllocation.getTestAllocationResults()) {
 			
 			if (allocationResults != null) {
@@ -492,7 +500,8 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 				
 				List<TestAllocationStatus> resultsRemarks = new ArrayList<TestAllocationStatus>();
 				for (TestAllocationStatus status : testAllocationStatuses) {
-					if (status.getStatus().equals("COMMENT") || status.getStatus().equals("ANSWER DESCRIPTION")) {
+					if (status.getStatus() != null
+					        && (status.getStatus().equals("COMMENT") || status.getStatus().equals("ANSWER DESCRIPTION"))) {
 						resultsRemarks.add(status);
 					}
 				}
@@ -507,7 +516,7 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 				observation.setDateCreated(new Date());
 				observation.setVoided(false);
 				for (TestAllocationStatus resultsRemark : resultsRemarks) {
-					if (resultsRemark.getStatus().equals("ANSWER DESCRIPTION")) {
+					if (resultsRemark.getStatus() != null && resultsRemark.getStatus().equals("ANSWER DESCRIPTION")) {
 						observation.setComment(resultsRemark.getRemarks());
 					}
 				}
@@ -712,7 +721,6 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 		return batchDAO.save(batch);
 	}
 	
-	@Override
 	public BatchSet addBatchSet(BatchSet batchSet) {
 		return batchSetDAO.save(batchSet);
 	}
