@@ -12,9 +12,9 @@
       />
     </div>
     <div class="patient-list d-flex">
-      <!-- <div class="text-center w-100 mt-5" *ngIf="visits?.length === 0">
+      <div class="text-center w-100 mt-5" *ngIf="visits?.length === 0">
         <h3 class="text-muted">No available Patients for the current location</h3>
-      </div> -->
+      </div>
       <div class="w-100 patient-list-type-toggle-container d-flex">
         <div class="w-75" *ngIf="filters$ | async as filters">
           <app-patient-list-filters
@@ -22,7 +22,7 @@
             (onFilterChanged)="filterPatientList($event)"
           ></app-patient-list-filters>
 
-          <!-- <button
+          <button
             mat-button
             class="ml-2 float-left"
             id="registration-search-patient"
@@ -30,7 +30,7 @@
           >
             <mat-icon class="mr-2">search</mat-icon>
             <span>Search From All Patients</span>
-          </button> -->
+          </button>
         </div>
         <div class="w-25">
           <button
@@ -45,7 +45,7 @@
             [ngClass]="{ 'active-list-type': !isTabularList }"
             (click)="togglePatientTypeList('account_box')"
           >
-            <mat-icon> account_box </mat-icon>
+            <mat-icon> grid_on </mat-icon>
           </button>
         </div>
       </div>

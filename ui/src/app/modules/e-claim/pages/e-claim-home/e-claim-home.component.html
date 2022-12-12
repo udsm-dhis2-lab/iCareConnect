@@ -11,11 +11,12 @@
         </button>
         <span class="ml-2">Clients for E-claim</span>
       </mat-toolbar>
+	 	  
       <div>
         <app-patient-list
-          [itemsPerPage]="10"
+          [itemsPerPage]="6"
           [isTabularList]="false"
-          [defaultFilter]="'Insurance'"
+          
           (selectPatient)="onSelectPatient($event)"
         ></app-patient-list>
       </div>
