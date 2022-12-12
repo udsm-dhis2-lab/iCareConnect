@@ -47,7 +47,7 @@ export class SystemUsersService {
   }
 
   getRoles() {
-    const url = "role?startIndex=0";
+    const url = "role?startIndex=0&limit=100";
     return this.httpClient.get(url).pipe(
       map((response) => {
         return response?.results;
