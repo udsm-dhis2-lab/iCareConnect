@@ -17,7 +17,7 @@
     </span>
     <span class="ml-2"> - {{ data?.sample?.label }} </span>
   </mat-toolbar>
-  <div class="p-3">
+  <div class="p-3" style="z-index: 20">
     <div style="max-height: 75vh; overflow: auto">
       <div class="loading-overlay" *ngIf="saving">
         <div class="text-center">
@@ -39,6 +39,7 @@
           <ng-container *ngFor="let order of params?.sampleAllocations">
             <tr>
               <td
+                rowspan="3"
                 *ngIf="params?.sampleAllocations[0]?.allocations[0]?.isSet"
                 [ngStyle]="{
                   'width:': params?.sampleAllocations[0]?.allocations[0]?.isSet
@@ -66,6 +67,9 @@
                         allocationData?.allocation?.isSet,
                       'col-12': !allocationData?.allocation?.isSet
                     }"
+                    (dblclick)="
+                      toggleSideNavigation($event, allocationData?.allocation)
+                    "
                     class="entry-col"
                     *ngFor="let allocationData of order?.allocations"
                   >
@@ -94,7 +98,7 @@
                   </div>
                 </div>
               </td>
-              <td style="width: 100px">
+              <td rowspan="3" style="width: 100px">
                 <div class="mt-4">
                   <button
                     *ngIf="data?.actionType !== 'review'"
@@ -151,6 +155,14 @@
               </td>
             </tr>
             <tr>
+              <td colspan="100%">
+                <app-shared-remarks-entry
+                  [order]="order"
+                  (remarks)="onGetRemarks($event, order)"
+                ></app-shared-remarks-entry>
+              </td>
+            </tr>
+            <tr>
               <td colspan="100%" class="text-muted test-order-description">
                 <em>
                   Ordered By:
@@ -166,6 +178,72 @@
     </div>
     <div class="d-flex justify-content-end">
       <button (click)="onClose($event)" mat-stroked-button>Close</button>
+    </div>
+  </div>
+  <div class="side-navigation" *ngIf="showSideNavigation">
+    <div class="p-3">
+      <div class="w-100 d-flex justify-content-end">
+        <button mat-button (click)="toggleSideNavigation($event)">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+      <div class="h6">
+        {{ selectedAllocation?.allocation?.concept?.display }}
+      </div>
+      <div style="height: 40vh; overflow: auto">
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+              <th>Result</th>
+              <th>Fed By</th>
+              <th>Fed/Amended On</th>
+              <th>Remarks</th>
+              <th>Authorization</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let result of selectedAllocation?.results">
+              <td>
+                {{
+                  result?.valueText
+                    ? result?.valueText
+                    : result?.valueNumeric
+                    ? result?.valueNumeric
+                    : result?.valueCoded
+                    ? result?.valueCoded?.display
+                    : "-"
+                }}
+              </td>
+              <td>
+                {{ result?.creator?.display }}
+              </td>
+              <td>
+                {{ result?.dateCreated | date: "medium" }}
+              </td>
+              <td>
+                {{
+                  result?.remarksStatus ? result?.remarksStatus?.remarks : "-"
+                }}
+              </td>
+              <td>
+                <div *ngIf="result?.authorizationStatus">
+                  On
+                  <b>
+                    {{
+                      result?.authorizationStatus?.timestamp | date: "medium"
+                    }}
+                  </b>
+                  by
+                  <span class="text-muted">
+                    {{ result?.authorizationStatus?.user?.display }}
+                  </span>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div></div>
     </div>
   </div>
 </div>

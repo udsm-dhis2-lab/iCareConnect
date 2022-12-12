@@ -100,6 +100,18 @@ export class SampleAllocation {
         statuses: this.allocation?.statuses?.filter(
           (status) => status?.result && status?.result?.uuid === result?.uuid
         ),
+        remarksStatus: (this.allocation?.statuses?.filter(
+          (status) =>
+            status?.result &&
+            status?.result?.uuid === result?.uuid &&
+            status?.category === "RESULT_REMARKS"
+        ) || [])[0],
+        authorizationStatus: (this.allocation?.statuses?.filter(
+          (status) =>
+            status?.result &&
+            status?.result?.uuid === result?.uuid &&
+            status?.status === "AUTHORIZED"
+        ) || [])[0],
         value: result?.valueNumeric
           ? result?.valueNumeric
           : result?.valueBoolean

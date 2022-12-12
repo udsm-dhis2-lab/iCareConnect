@@ -28,6 +28,7 @@ import { ResultReviewModalComponent } from "./result-review-modal/result-review-
 import { ResultEntryFormComponent } from "./result-entry-form/result-entry-form.component";
 import { SharedResultsEntryAndViewModalComponent } from "./shared-results-entry-and-view-modal/shared-results-entry-and-view-modal.component";
 import { TestParameterEntryComponent } from "./test-parameter-entry/test-parameter-entry.component";
+import { SharedRemarksEntryComponent } from "./shared-remarks-entry/shared-remarks-entry.component";
 
 export const components: any[] = [
   PatientsByVisitsListComponent,
@@ -60,6 +61,7 @@ export const components: any[] = [
   ResultEntryFormComponent,
   SharedResultsEntryAndViewModalComponent,
   TestParameterEntryComponent,
+  SharedRemarksEntryComponent,
 ];
 
 export const sampleAcceptanceAndResultsModals: any[] = [
