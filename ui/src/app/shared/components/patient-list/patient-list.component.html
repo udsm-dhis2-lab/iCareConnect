@@ -104,7 +104,7 @@
                 >person</mat-icon
               >
               <p class="patient-name">
-                {{ visit?.visit?.patient?.person?.display }}
+                {{ visit?.visit?.patient?.person?.display.toUpperCase() }}
               </p>
               <p class="patient-mrn">
                 {{ visit?.visit?.patient?.identifiers[0]?.identifier }}
