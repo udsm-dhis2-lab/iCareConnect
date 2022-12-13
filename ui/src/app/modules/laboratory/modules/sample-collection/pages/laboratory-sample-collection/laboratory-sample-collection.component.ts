@@ -33,6 +33,7 @@ import { loadActiveVisit } from "src/app/store/actions/visit.actions";
   templateUrl: "./laboratory-sample-collection.component.html",
   styleUrls: ["./laboratory-sample-collection.component.scss"],
 })
+
 export class LaboratorySampleCollectionComponent implements OnInit {
   patient$: Observable<Patient>;
   labOrders$: Observable<LabOrder[]>;
@@ -50,6 +51,7 @@ export class LaboratorySampleCollectionComponent implements OnInit {
   countOfSamplesToCollect: number = 0;
   datesParameters$: Observable<any>;
   visitReferences$: Observable<any>;
+
   constructor(
     private store: Store<AppState>,
     private sampleTypesService: SampleTypesService,
@@ -103,4 +105,6 @@ export class LaboratorySampleCollectionComponent implements OnInit {
   onGetSamplesToCollect(count: number): void {
     this.countOfSamplesToCollect = count;
   }
+
+  
 }

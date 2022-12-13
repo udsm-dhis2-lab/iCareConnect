@@ -5,13 +5,16 @@
   ></mat-progress-bar>
   <div>
     <div>
-      <!-- <div class="text-muted h6 mb-4 text-center">Search for a patient</div> -->
+      <!-- <div class="text-muted h6 mb-4 text-center">Search for a patient</div> -->     
+      <!-- added 2 items per page to at least be able to test the bug because 10 items per page are a lot since data coming from backend are few-->
+
       <app-patient-list
         [orderType]="'52a447d3-a64a-11e3-9aeb-50e549534c5e'"
         [itemsPerPage]="10"
         [isTabularList]="true"
         (selectPatient)="onSelectPatient($event)"
       ></app-patient-list>
-    </div>
+   
+      </div>
   </div>
 </div>

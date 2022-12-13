@@ -4,6 +4,11 @@ import { MatLegacyPaginator as MatPaginator } from "@angular/material/legacy-pag
 import { MatLegacyTableDataSource as MatTableDataSource } from "@angular/material/legacy-table";
 import { sanitizePatientsVisitsForTabularPatientListing } from "../../helpers/sanitize-visits-list-for-patient-tabular-listing.helper";
 import { Visit } from "../../resources/visits/models/visit.model";
+import { ActivatedRoute } from "@angular/router";
+import { addCurrentPatient, go } from "src/app/store/actions";
+import { select, Store } from "@ngrx/store";
+import { AppState } from "src/app/store/reducers";
+
 
 @Component({
   selector: "app-patients-tabular-list",
@@ -22,6 +27,8 @@ export class PatientsTabularListComponent implements OnInit, OnChanges {
     new EventEmitter<boolean>();
   currentPage: number = 0;
 
+  
+
   displayedColumns: string[] = [
     "position",
     "names",
@@ -33,7 +40,11 @@ export class PatientsTabularListComponent implements OnInit, OnChanges {
     "startDatetime",
   ];
   dataSource: any;
-  constructor() {}
+
+  constructor(
+  private  route: ActivatedRoute,
+  private store: Store<AppState>
+  ) {}
 
   ngOnInit(): void {
     this.dataSource = new MatTableDataSource(
@@ -80,5 +91,20 @@ export class PatientsTabularListComponent implements OnInit, OnChanges {
         ? this.page - 1
         : this.page;
     this.shouldLoadNewList.emit({ ...visit, type, page: this.page });
+     
+    // console.log(this.route.url);
+
+    // trying to move to change the whole state of the url whenever a next or previous button is clicked 
+    // so this is to be able to track the page number in the url so even when a certain patient is clicked
+    // it has to be possible to go back to the page number that was clicked , since page number will be contained in a url 
+    this.store.dispatch(
+    go({
+      path: [
+        `/laboratory/sample-collection/${this.page}/`,
+      ],
+    })
+    );
+
+
   }
 }
