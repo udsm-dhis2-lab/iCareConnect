@@ -2577,6 +2577,12 @@
 
     </changeSet>
 
+    <changeSet id="update_date_created_column_to_datetime" author="josephat-mwakyusa" dbms="mysql">
+        <sql>
+            ALTER TABLE lb_test_result MODIFY COLUMN date_created DATETIME
+        </sql>
+    </changeSet>
+
     <changeSet id="add_uuid_column_to_lb_test_result" author="jesse-justin" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -3341,6 +3347,27 @@
                 constraintName="lb_batch_status_user_id_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
+    </changeSet>
+
+    <changeSet id="add_batch_column_to_lb_sample" author="dennis-kibahila" dbms="mysql">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists columnName="batch_id" tableName="lb_sample"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="lb_sample" >
+            <column name="batch_id" type="INT">
+                <constraints nullable="true"></constraints>
+            </column>
+
+        </addColumn>
+
+        <addForeignKeyConstraint
+                baseColumnNames="batch_id"
+                baseTableName="lb_sample"
+                constraintName="lb_sample_batch_id_lb_batch_batch_id_fk"
+                referencedColumnNames="batch_id"
+                referencedTableName="lb_batch"/>
     </changeSet>
 
 

@@ -28,3 +28,14 @@
 .test-order-description {
   font-size: 0.7rem !important;
 }
+
+.side-navigation {
+  position: fixed;
+  right: 10%;
+  bottom: 25%;
+  top: 25%;
+  border: solid 1px #eee;
+  width: 50%;
+  background-color: #fff;
+  z-index: 1000;
+}

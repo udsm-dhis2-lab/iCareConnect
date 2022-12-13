@@ -835,12 +835,8 @@ function getCompletedOrders(orders, isLIS?: boolean) {
         order?.testAllocations
       );
       if (
-        (!isLIS &&
-          testAllocationsWithResults?.length > 0 &&
-          order?.testAllocations[0]?.secondSignOff) ||
-        (isLIS &&
-          testAllocationsWithResults?.length >=
-            order?.concept?.setMembers?.length)
+        testAllocationsWithResults?.length > 0 &&
+        order?.authorizationInfo?.length > 0
       ) {
         return order;
       }

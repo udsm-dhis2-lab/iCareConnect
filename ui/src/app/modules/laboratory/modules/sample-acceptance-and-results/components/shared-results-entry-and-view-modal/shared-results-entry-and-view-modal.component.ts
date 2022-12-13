@@ -29,6 +29,9 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
   userUuid: string;
   obsKeyedByConcepts: any = {};
   files: any[] = [];
+  remarksData: any = {};
+  showSideNavigation: boolean = false;
+  selectedAllocation: any;
   constructor(
     private dialogRef: MatDialogRef<SharedResultsEntryAndViewModalComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
@@ -39,7 +42,6 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    console.log(this.data);
     this.userUuid = localStorage.getItem("userUuid");
     this.multipleResultsAttributeType$ = this.systemSettingsService
       .getSystemSettingsByKey(
@@ -56,6 +58,12 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
         })
       );
     this.getAllocations();
+  }
+
+  toggleSideNavigation(event: Event, allocation?: any): void {
+    event.stopPropagation();
+    this.selectedAllocation = allocation ? allocation : this.selectedAllocation;
+    this.showSideNavigation = !this.showSideNavigation;
   }
 
   getAllocations(): void {
@@ -117,6 +125,11 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
               }
             : null,
           abnormal: false,
+          status: {
+            category: "RESULT_REMARKS",
+            status: "REMARKS",
+            remarks: this.remarksData[order?.concept?.uuid],
+          },
         };
       })
       ?.filter(
@@ -139,18 +152,27 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
 
   onAuthorize(
     event: Event,
-    allocationsData: any[],
+    order: any,
     confirmed?: boolean,
     approvalStatusType?: string
   ): void {
     event.stopPropagation();
     if (confirmed) {
+      const allocationsData = order?.allocations;
       this.allocationStatuses = allocationsData
         ?.map((allocationData) => {
-          if (allocationData?.allocation?.finalResult) {
-            // TODO: Find a better way to handle second approval
+          if (
+            allocationData?.allocation?.finalResult &&
+            allocationData?.allocation?.parameter?.datatype?.display !=
+              "Complex"
+          ) {
+            // TODO: Find a better way to handle second complex (file) data types
             const approvalStatus = {
-              status: !approvalStatusType ? "APPROVED" : approvalStatusType,
+              status:
+                order?.authorizationStatuses?.length === 0 &&
+                !this.data?.LISConfigurations?.isLIS
+                  ? "APPROVED"
+                  : "AUTHORIZED",
               remarks: "APPROVED",
               category: "RESULT_AUTHORIZATION",
               user: {
@@ -286,5 +308,9 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
           });
         }
       });
+  }
+
+  onGetRemarks(remarks: string, order: any): void {
+    this.remarksData[order?.concept?.uuid] = remarks;
   }
 }

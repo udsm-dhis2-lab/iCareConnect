@@ -1,28 +1,51 @@
 import { Injectable } from "@angular/core";
-import { Observable, of } from "rxjs";
+import { Observable, of, zip } from "rxjs";
 import { OpenmrsHttpClientService } from "src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service";
 import { SampleAllocation } from "../models/allocation.model";
 
 import { groupBy, flatten } from "lodash";
 import { catchError, map } from "rxjs/operators";
+import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 
 @Injectable({
   providedIn: "root",
 })
 export class SampleAllocationService {
-  constructor(private httpClient: OpenmrsHttpClientService) {}
+  constructor(
+    private httpClient: OpenmrsHttpClientService,
+    private systemSettingsService: SystemSettingsService
+  ) {}
 
   getAllocationsBySampleUuid(uuid: string): Observable<any[]> {
-    return this.httpClient.get(`lab/allocationsbysample?uuid=${uuid}`).pipe(
-      map((response) => {
+    return zip(
+      this.systemSettingsService
+        .getSystemSettingsByKey(`iCare.laboratory.resultApprovalConfiguration`)
+        .pipe(
+          map((response) => response),
+          catchError((error) => of(error))
+        ),
+      this.httpClient.get(`lab/allocationsbysample?uuid=${uuid}`)
+    ).pipe(
+      map((responses) => {
         const groupedAllocations = groupBy(
-          response?.map((allocation) => {
-            const all: SampleAllocation = new SampleAllocation(allocation);
+          responses[1]?.map((allocation) => {
+            const all: SampleAllocation = new SampleAllocation({
+              ...allocation,
+              resultApprovalConfiguration: responses[0],
+            });
             return all;
           }),
           "orderUuid"
         );
         return Object.keys(groupedAllocations).map((key) => {
+          const authorizationIsReady =
+            (
+              flatten(
+                groupedAllocations[key]?.map(
+                  (allocation) => allocation?.finalResult || []
+                )
+              )?.filter((result) => result?.authorizationIsReady) || []
+            )?.length > 0;
           return {
             ...groupedAllocations[key][0]?.order,
             authorizationStatuses: flatten(
@@ -31,10 +54,10 @@ export class SampleAllocationService {
                   allocation?.finalResult?.authorizationStatuses || []
               )
             ),
-            secondAuthorizationStatuses: flatten(
+            authorizationIsReady,
+            finalResults: flatten(
               groupedAllocations[key]?.map(
-                (allocation) =>
-                  allocation?.finalResult?.secondAuthorizationStatuses || []
+                (allocation) => allocation?.finalResult || []
               )
             ),
             allocations: groupedAllocations[key]?.map((allocation) => {
@@ -42,8 +65,7 @@ export class SampleAllocationService {
             }),
           };
         });
-      }),
-      catchError((error) => of(error))
+      })
     );
   }
 
