@@ -32,7 +32,6 @@ public class SampleDAO extends BaseDAO<Sample> {
 	//	TODO: Add also support to get samples by day and month
 	public long getNumberOfRegisteredSamplesThisYear() {
 		DbSession session = this.getSession();
-		new Sample();
 		String queryStr = "SELECT COUNT(sp) FROM Sample sp \n" + "WHERE YEAR(sp.dateTime) = :year";
 		Calendar calendar = Calendar.getInstance();
 		Query query = session.createQuery(queryStr);

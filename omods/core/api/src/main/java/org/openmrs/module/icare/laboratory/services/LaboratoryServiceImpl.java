@@ -296,8 +296,19 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	}
 	
 	@Override
-	public List<Sample> getAllocationsBySample(String sampleId) {
-		return this.testAllocationDAO.getAllocationsBySample(sampleId);
+	public List<Sample> getAllocationsBySample(String sampleUuid) {
+		Sample sample = this.sampleDAO.findByUuid(sampleUuid);
+		List<Map<String, Object>> allocations = new ArrayList<>();
+		if (sample.getSampleOrders().size() > 0) {
+			for (SampleOrder order: sample.getSampleOrders()) {
+				if (order.getTestAllocations().size() > 0) {
+					for (TestAllocation allocation: order.getTestAllocations()) {
+						allocations.add(allocation.toMap());
+					}
+				}
+			}
+		}
+		return this.testAllocationDAO.getAllocationsBySample(sampleUuid);
 	}
 	
 	@Override
@@ -389,9 +400,14 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 				result.setValueDrug(drug);
 			}
 
-			if (result.getResultGroupUuid() != null && getResultsByUuid(result.getResultGroupUuid()) != null) {
-				Integer valueGroupId = this.getResultsId(result.getResultGroupUuid());
-				result.setValueGroupId(valueGroupId);
+			if (result.getValueGroup() != null && this.getResultsByUuid(result.getValueGroup().getUuid()) != null) {
+				Result valueGroup = this.resultDAO.findByUuid(result.getValueGroup().getUuid());
+				result.setValueGroup(valueGroup);
+			}
+
+			if (result.getInstrument() != null) {
+				Concept instrument = Context.getConceptService().getConceptByUuid(result.getInstrument().getUuid());
+				result.setInstrument(instrument);
 			}
 
 			Date date = new Date();
