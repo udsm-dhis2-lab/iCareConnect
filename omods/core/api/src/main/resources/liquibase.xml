@@ -3349,5 +3349,26 @@
                 referencedTableName="users"/>
     </changeSet>
 
+    <changeSet id="add_batch_column_to_lb_sample" author="dennis-kibahila" dbms="mysql">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists columnName="batch_id" tableName="lb_sample"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="lb_sample" >
+            <column name="batch_id" type="INT">
+                <constraints nullable="true"></constraints>
+            </column>
+
+        </addColumn>
+
+        <addForeignKeyConstraint
+                baseColumnNames="batch_id"
+                baseTableName="lb_sample"
+                constraintName="lb_sample_batch_id_lb_batch_batch_id_fk"
+                referencedColumnNames="batch_id"
+                referencedTableName="lb_batch"/>
+    </changeSet>
+
 
 </databaseChangeLog>

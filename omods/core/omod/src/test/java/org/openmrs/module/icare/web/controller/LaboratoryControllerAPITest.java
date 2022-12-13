@@ -317,6 +317,7 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		
 		//System.out.println(Context.getVisitService().getVisitByUuid("d9c1d8ac-2b8e-427f-804d-b858c52e6f11").getLocation().getUuid());
 		sampleResults = (new ObjectMapper()).readValue(handleGet.getContentAsString(), Map.class);
+		//System.out.println("aaaa "+sampleResults);
 		
 		pagerObject = (Map<String, Object>) sampleResults.get("pager");
 		System.out.println((Integer) pagerObject.get("pageCount"));
@@ -598,7 +599,7 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		List<Map<String, Object>> batchObject = (new ObjectMapper()).readValue(dto, List.class);
 		
 		//When
-		MockHttpServletRequest newPostRequest = newPostRequest("lab/batch", batchObject);
+		MockHttpServletRequest newPostRequest = newPostRequest("lab/batches", batchObject);
 		MockHttpServletResponse handle = handle(newPostRequest);
 		List<Map<String, Object>> createdbatches = (new ObjectMapper()).readValue(handle.getContentAsString(), List.class);
 		
@@ -625,11 +626,12 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		List<Map<String, Object>> batchObject = (new ObjectMapper()).readValue(dto, List.class);
 		
 		//When
-		MockHttpServletRequest newPostRequest = newPostRequest("lab/batchset", batchObject);
+		MockHttpServletRequest newPostRequest = newPostRequest("lab/batchsets", batchObject);
 		MockHttpServletResponse handle = handle(newPostRequest);
 		List<Map<String, Object>> createdbatchSets = (new ObjectMapper()).readValue(handle.getContentAsString(), List.class);
 		
 		assertThat("created 1 batchSet", createdbatchSets.size(), is(2));
+
 		//2. Getting batchSets
 		//When
 		MockHttpServletRequest newGetRequest = newGetRequest("lab/batchsets", new Parameter("startDate", "2022-12-09"),

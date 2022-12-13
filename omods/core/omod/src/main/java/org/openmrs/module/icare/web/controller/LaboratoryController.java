@@ -82,6 +82,10 @@ public class LaboratoryController {
 			newSample.setLocation(location);
 			System.out.println(location.getName());
 		}
+		if(sample.get("batch") != null){
+			Batch batch = laboratoryService.getBatchByUuid(((Map) sample.get("batch")).get("uuid").toString());
+			newSample.setBatch(batch);
+		}
 		
 		newSample.setVisit(existingVisit);
 		newSample.setConcept(concept);
@@ -705,7 +709,7 @@ public class LaboratoryController {
 		return workloadSummary.toMap();
 	}
 	
-	@RequestMapping(value = "batch", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "batches", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public List<Map<String, Object>> addBatch(@RequestBody List<Map<String, Object>> batchesObject) throws Exception {
 		
@@ -758,7 +762,7 @@ public class LaboratoryController {
 		
 	}
 	
-	@RequestMapping(value = "batchset", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "batchsets", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public List<Map<String, Object>> addBatchSet(@RequestBody List<Map<String, Object>> batchSetsObject) {
 		
@@ -810,7 +814,6 @@ public class LaboratoryController {
 			Map<String, Object> batchObject = batchSet.toMap();
 			responseBatchSetsObject.add(batchObject);
 		}
-		
 		return responseBatchSetsObject;
 	}
 	
@@ -822,6 +825,7 @@ public class LaboratoryController {
 		BatchSetStatus savedbatchSetStatus = laboratoryService.addBatchSetStatus(batchSetStatus);
 		
 		return savedbatchSetStatus.toMap();
-		
+
 	}
+
 }
