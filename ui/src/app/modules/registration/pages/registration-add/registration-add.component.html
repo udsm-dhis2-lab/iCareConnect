@@ -294,17 +294,15 @@
               <mat-label>Gender</mat-label>
               <mat-select
                 id="sex"
-                name="sex"
                 [(ngModel)]="patient['gender']"
                 name="gender"
-                required="required"
+                required
                 placeholder="Select Gender"
                 [disabled]="addingPatient && !patientAdded"
               >
                 <mat-option
-                  [value]="option?.code ? option?.code : option?.display"
-                  *ngFor="let option of params?.genderOptions?.answers"
-                >
+                  [value]="option?.code || option?.display"
+                  *ngFor="let option of params?.genderOptions?.answers" >
                   {{ option?.display }}
                 </mat-option>
               </mat-select>
