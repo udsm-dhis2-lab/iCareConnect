@@ -236,7 +236,7 @@ function starting() {
     });
 }
 function restartVersion() {
-    Return $http.post(‘http://localhost/organization/restartVer’, {
+    Return $http.post(‘http://localhost:4200’, {
     }).then(function(response) {
         Return response.data;
     });
