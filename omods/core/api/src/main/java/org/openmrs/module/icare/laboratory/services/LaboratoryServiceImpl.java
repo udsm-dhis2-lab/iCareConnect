@@ -44,9 +44,9 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	BatchDAO batchDAO;
 	
 	BatchSetDAO batchSetDAO;
-
+	
 	BatchSetStatusDAO batchSetStatusDAO;
-
+	
 	BatchStatusDAO batchStatusDAO;
 	
 	public void setSampleDAO(SampleDAO sampleDAO) {
@@ -88,23 +88,23 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	public void setSampleLableDAO(SampleLableDAO sampleLableDAO) {
 		this.sampleLableDAO = sampleLableDAO;
 	}
-
+	
 	public void setBatchSetDAO(BatchSetDAO batchSetDAO) {
 		this.batchSetDAO = batchSetDAO;
 	}
-
+	
 	public void setBatchDAO(BatchDAO batchDAO) {
 		this.batchDAO = batchDAO;
 	}
-
-	public void setBatchSetStatusDAO(BatchSetStatusDAO batchSetStatusDAO){
+	
+	public void setBatchSetStatusDAO(BatchSetStatusDAO batchSetStatusDAO) {
 		this.batchSetStatusDAO = batchSetStatusDAO;
 	}
-
-	public void setBatchStatusDAO(BatchStatusDAO batchStatusDAO){
+	
+	public void setBatchStatusDAO(BatchStatusDAO batchStatusDAO) {
 		this.batchStatusDAO = batchStatusDAO;
 	}
-
+	
 	@Override
 	public Sample createSample(Sample sample) {
 		this.sampleDAO.save(sample);
@@ -347,6 +347,9 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 			result.setValueDrug(drug);
 		}
 		
+		Date date = new Date();
+		result.setDateCreated(date);
+		
 		this.resultDAO.save(result);
 		
 		return result;
@@ -390,7 +393,12 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 				Integer valueGroupId = this.getResultsId(result.getResultGroupUuid());
 				result.setValueGroupId(valueGroupId);
 			}
+
+			Date date = new Date();
+			result.setDateCreated(date);
+
 			Result response = this.resultDAO.save(result);
+
 			/*
 			Save status via results
 			* */
@@ -461,8 +469,7 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 			        + ICareConfig.LAB_RESULT_APPROVAL_CONFIGURATION + "'");
 		}
 		
-		if ((testAllocationStatus.getRemarks().equals("SECOND_APPROVAL") && labResultApprovalConfig.equals("2"))
-		        || (testAllocationStatus.getRemarks().equals("APPROVED") && labResultApprovalConfig.equals("1"))) {
+		if ((testAllocationStatus.getStatus().equals("AUTHORIZED") && labResultApprovalConfig.equals("2"))) {
 			List<Result> resList = testAllocation.getTestAllocationResults();
 			
 			Collections.sort(resList, new Comparator<Result>() {
@@ -473,7 +480,8 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 				}
 			});
 			
-			Result allocationResults = resList.get(resList.size() - 1);
+			Result allocationResults = testResult;
+			//					resList.get(resList.size() - 1);
 			//			for (Result allocationResults : testAllocation.getTestAllocationResults()) {
 			
 			if (allocationResults != null) {
@@ -492,7 +500,8 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 				
 				List<TestAllocationStatus> resultsRemarks = new ArrayList<TestAllocationStatus>();
 				for (TestAllocationStatus status : testAllocationStatuses) {
-					if (status.getStatus().equals("COMMENT") || status.getStatus().equals("ANSWER DESCRIPTION")) {
+					if (status.getStatus() != null
+					        && (status.getStatus().equals("COMMENT") || status.getStatus().equals("ANSWER DESCRIPTION"))) {
 						resultsRemarks.add(status);
 					}
 				}
@@ -507,7 +516,7 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 				observation.setDateCreated(new Date());
 				observation.setVoided(false);
 				for (TestAllocationStatus resultsRemark : resultsRemarks) {
-					if (resultsRemark.getStatus().equals("ANSWER DESCRIPTION")) {
+					if (resultsRemark.getStatus() != null && resultsRemark.getStatus().equals("ANSWER DESCRIPTION")) {
 						observation.setComment(resultsRemark.getRemarks());
 					}
 				}
@@ -701,9 +710,9 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	public List<Batch> getBatches(Date startDate, Date endDate, String q, Integer startIndex, Integer limit) {
 		return batchDAO.getBatches(startDate, endDate, q, startIndex, limit);
 	}
-
+	
 	@Override
-	public Batch getBatchByUuid(String batchUuid){
+	public Batch getBatchByUuid(String batchUuid) {
 		return batchDAO.findByUuid(batchUuid);
 	}
 	
@@ -712,24 +721,23 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 		return batchDAO.save(batch);
 	}
 	
-	@Override
 	public BatchSet addBatchSet(BatchSet batchSet) {
 		return batchSetDAO.save(batchSet);
 	}
-
+	
 	@Override
-	public BatchStatus addBatchStatus(BatchStatus batchStatus) throws Exception{
-
+	public BatchStatus addBatchStatus(BatchStatus batchStatus) throws Exception {
+		
 		Batch batch = this.getBatchByUuid(batchStatus.getBatch().getUuid());
-
-		if(batch == null){
-			throw new Exception("The batch with id "+batchStatus.getBatch().getUuid()+" does not exist");
+		
+		if (batch == null) {
+			throw new Exception("The batch with id " + batchStatus.getBatch().getUuid() + " does not exist");
 		}
 		User user = Context.getUserService().getUserByUuid(batchStatus.getUser().getUuid());
-		if(user == null){
-			throw new Exception ("The user with id "+batchStatus.getUser().getUuid()+" does not exist");
+		if (user == null) {
+			throw new Exception("The user with id " + batchStatus.getUser().getUuid() + " does not exist");
 		}
-
+		
 		batchStatus.setBatch(batch);
 		batchStatus.setUser(user);
 		return batchStatusDAO.save(batchStatus);
@@ -739,31 +747,31 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	public List<BatchSet> getBatchSets(Date startDate, Date endDate, String q, Integer startIndex, Integer limit) {
 		return batchSetDAO.getBatchSets(startDate, endDate, q, startIndex, limit);
 	}
-
+	
 	@Override
-	public BatchSet getBatchSetByUuid(String batchSetUuid){
-		return  batchSetDAO.findByUuid(batchSetUuid);
+	public BatchSet getBatchSetByUuid(String batchSetUuid) {
+		return batchSetDAO.findByUuid(batchSetUuid);
 	}
-
+	
 	@Override
 	public BatchSetStatus addBatchSetStatus(BatchSetStatus batchSetStatus) throws Exception {
-
+		
 		BatchSet batchSet = this.getBatchSetByUuid(batchSetStatus.getBatchSet().getUuid());
-		if( batchSet == null){
-			throw  new Exception("The batchSet with id "+batchSetStatus.getBatchSet().getUuid()+" does not exist");
+		if (batchSet == null) {
+			throw new Exception("The batchSet with id " + batchSetStatus.getBatchSet().getUuid() + " does not exist");
 		}
-
+		
 		User user = Context.getUserService().getUserByUuid(batchSetStatus.getUser().getUuid());
-		if( user == null){
-			throw new Exception(" The user with id "+batchSetStatus.getUser().getUuid()+" does not exist");
+		if (user == null) {
+			throw new Exception(" The user with id " + batchSetStatus.getUser().getUuid() + " does not exist");
 		}
-
+		
 		batchSetStatus.setBatchSet(batchSet);
 		batchSetStatus.setUser(user);
-
+		
 		BatchSetStatus savedBatchSetStatus = batchSetStatusDAO.save(batchSetStatus);
-
+		
 		return savedBatchSetStatus;
 	}
-
+	
 }

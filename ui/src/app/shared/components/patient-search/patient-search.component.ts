@@ -73,41 +73,6 @@ export class PatientSearchComponent implements OnInit {
         })
       );
 
-      // this.patients$ = this.patientService.getPatients(e.target.value)
-      // .pipe(
-      //   map((results) => {
-      //     return {
-      //       ...results,
-      //       insurance:
-      //         results?.map((res) => {
-      //           return (
-      //             res?.patient?.person?.attributes?.filter((attribute) => {
-      //               return (
-      //                 attribute?.attributeType?.uuid ===
-      //                 "58867285-7f8e-4ddf-aef6-f0c3d8f73305"
-      //               );
-      //             })[0] || []
-      //           );
-      //         })[0]?.value || [],
-      //       phoneNumber:
-      //         results?.map((res) => {
-      //           return (
-      //             res?.patient?.person?.attributes?.filter((attribute) => {
-      //               return (
-      //                 attribute?.attributeType?.uuid ===
-      //                 "96878413-bbae-4ee0-812f-241a4fc94500"
-      //               );
-      //             })[0] || []
-      //           );
-      //         })[0]?.value || [],
-      //     };
-      //   }),
-      //   tap(() => {
-      //     this.searching = false;
-      //     this.showList = true;
-      //   })
-      // );
-
       if (e.target.value.length > 0) {
         this.focused = true;
       } else {

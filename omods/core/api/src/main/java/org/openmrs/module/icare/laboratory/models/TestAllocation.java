@@ -166,6 +166,7 @@ public class TestAllocation extends BaseOpenmrsData implements java.io.Serializa
 			Map<String, Object> datatype = new HashMap<>();
 			datatype.put("uuid", this.getTestConcept().getDatatype().getUuid());
 			datatype.put("name", this.getTestConcept().getDatatype().getName());
+			datatype.put("display", this.getTestConcept().getDatatype().getName());
 			datatype.put("description", this.getTestConcept().getDatatype().getDescription());
 			testConceptMap.put("datatype", datatype);
 //			testConceptMap.put("names", this.getTestConcept().getNames());

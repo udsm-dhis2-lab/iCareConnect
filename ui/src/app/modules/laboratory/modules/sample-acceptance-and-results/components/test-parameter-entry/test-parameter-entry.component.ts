@@ -15,6 +15,7 @@ export class TestParameterEntryComponent implements OnInit {
   @Input() parameterUuid: string;
   @Input() multipleResultsAttributeType: string;
   @Input() allocation: SampleAllocationObject;
+  @Input() disabled: boolean;
   testParameter$: Observable<ConceptGet>;
   @Output() data: EventEmitter<any> = new EventEmitter<any>();
   latestResult: any;
