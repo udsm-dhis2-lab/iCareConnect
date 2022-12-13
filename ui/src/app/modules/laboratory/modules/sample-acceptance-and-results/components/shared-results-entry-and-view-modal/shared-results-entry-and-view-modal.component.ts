@@ -161,8 +161,12 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
       const allocationsData = order?.allocations;
       this.allocationStatuses = allocationsData
         ?.map((allocationData) => {
-          if (allocationData?.allocation?.finalResult) {
-            // TODO: Find a better way to handle second approval
+          if (
+            allocationData?.allocation?.finalResult &&
+            allocationData?.allocation?.parameter?.datatype?.display !=
+              "Complex"
+          ) {
+            // TODO: Find a better way to handle second complex (file) data types
             const approvalStatus = {
               status:
                 order?.authorizationStatuses?.length === 0 &&
