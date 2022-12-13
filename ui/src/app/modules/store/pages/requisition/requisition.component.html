@@ -1,3 +1,6 @@
+<div ng-show=”vm.starting”>
+    <img ng-src=”spinnerURL” />
+<div ng-hide=”vm.starting”>
 <div
   class="requisition-container"
   *ngIf="{
@@ -183,4 +186,6 @@
     </app-requisition-by-store>
   
   </mat-card>
+</div>
+</div>
 </div>
