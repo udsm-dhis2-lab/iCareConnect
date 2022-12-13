@@ -1,3 +1,6 @@
+<div ng-show=”vm.starting”>
+    <img ng-src=”loading_.gif” />
+<div ng-hide=”vm.starting”>
 <div
   class="requisition-container"
   *ngIf="{
@@ -73,4 +76,6 @@
       </table>
     </ng-container>
   </mat-card>
+</div>
+</div>
 </div>
