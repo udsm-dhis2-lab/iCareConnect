@@ -60,7 +60,6 @@
           [referFromFacilityVisitAttribute]="referFromFacilityVisitAttribute"
           [allRegistrationFields]="allRegistrationFields"
           [maximumDate]="maximumDate"
-          [existingFields]="existingFields"
           (personDetails)="onGetPersonDetails($event)"
           (fromExternalSystem)="onGetIsDataFromExternalSystem($event)"
           (selecedSystem)="onGetSelectedSystem($event)"
@@ -378,7 +377,6 @@
             <ng-container *ngIf="allRegistrationFields.clinicalFormFields">
               <app-clinical-data
                 [clinicalFields]="allRegistrationFields.clinicalFormFields"
-                [existingFields]="existingFields"
                 (clinicalDataValues)="onGetClinicalDataValues($event)"
               ></app-clinical-data>
             </ng-container>

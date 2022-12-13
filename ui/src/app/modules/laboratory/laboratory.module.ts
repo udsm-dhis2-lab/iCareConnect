@@ -12,6 +12,7 @@ import { LaboratoryComponent } from './laboratory.component';
 
 @NgModule({
   declarations: [...labPages, ...labComponents, LaboratoryComponent],
+  exports: [...labComponents],
   imports: [
     CommonModule,
     LaboratoryRoutingModule,
