@@ -183,7 +183,7 @@
             </table>
         </div>
         <button mat-flat-button style="border:1px solid #cecece" (click)="onAddAnotherSample($event)"> {{ addAnotherSample ? 'Hide sample form' : 'Add another sample' }} </button>
-        <div class="dynamic-fields mt-4" *ngIf="addAnotherSample ">
+        <div class="dynamic-fields mt-4" *ngIf="addAnotherSample">
             <app-single-registration
                 [mrnGeneratorSourceUuid]="mrnGeneratorSourceUuid"
                 [preferredPersonIdentifier]="mrnGeneratorSourceUuid"
@@ -197,7 +197,7 @@
                 [testsFromExternalSystemsConfigs]="testsFromExternalSystemsConfigs"
                 [isBatchRegistration]="true"
                 [allRegistrationFields]="allRegistrationFields"
-                [existingBatchSets]="existingBatchSets"
+                [selectedFixedFields]="selectedFixedFields"
             ></app-single-registration>
         </div>
     </fieldset>

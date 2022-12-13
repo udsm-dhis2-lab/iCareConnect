@@ -46,8 +46,7 @@ export class BatchRegistrationComponent implements OnInit {
   staticFieldsOptionsObject: { [key: string]: any };
   fixedFieldsOptionsObject: { [key: string]: any };
   allFields: any[] = [];
-  existingBatchSetFields: any;
-
+  
   constructor(private sampleService: SamplesService) {}
 
   ngOnInit(): void {
@@ -98,7 +97,6 @@ export class BatchRegistrationComponent implements OnInit {
       }),
       "key"
     );
-    console.log("==> Fixed fields Object: ", this.existingBatchSets);
 
     this.instantiateBatchRegistrationFields();
   }
@@ -244,11 +242,11 @@ export class BatchRegistrationComponent implements OnInit {
     //Clear batchSet Name field or existingBatchSet values depending on what field is being used.
     if(this.useExistingBatchset && key === "Existing Batchset"){
       this.batchsetNameField.value = null;
-      this.existingBatchSetFields = this.existingBatchSets.filter(
-        (batchSet) => batchSet.name === this.existingBatchsetField.value
-      )[0]?.fields;
-      if (this.existingBatchSetFields?.length > 0){
-        this.selectedFixedFields  = JSON.parse(this.existingBatchSetFields);
+      let existingBatchSetFields = this.existingBatchSets.filter(
+          (batchSet) => batchSet.name === this.existingBatchsetField.value
+        )[0]?.fields;
+      if (existingBatchSetFields?.length > 0){
+        this.selectedFixedFields  = JSON.parse(existingBatchSetFields)['fixedFields'];
       }
     }
     if (
@@ -296,7 +294,11 @@ export class BatchRegistrationComponent implements OnInit {
       {
         name: this.batchsetNameField.value,
         label: this.batchsetNameField.value,
-        fields: JSON.stringify(fixedFieldsWithValues),
+        fields: JSON.stringify({
+          fixedFields: fixedFieldsWithValues,
+          staticFields: staticFieldsWithValues,
+          // dynamicFields: dynamicFieldsWithValues
+        }),
         description: "",
       },
     ];
@@ -306,10 +308,11 @@ export class BatchRegistrationComponent implements OnInit {
         label: this.batchNameField.value,
         name: this.batchNameField.value,
         description: this.batchDescription.value,
-        fields: JSON.stringify(staticFieldsWithValues),
+        fields: JSON.stringify({
+          staticFields: staticFieldsWithValues
+        }),
       },
     ];
-    console.log("==> batch set save: ", batchSetsInformation)
     if (this.useExistingBatchset){
       let batchSet = this.existingBatchSets.filter(
         (batchSet) => batchSet.name === this.existingBatchsetField.value

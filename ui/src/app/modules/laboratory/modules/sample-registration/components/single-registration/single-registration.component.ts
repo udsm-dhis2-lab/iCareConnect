@@ -14,10 +14,8 @@ import { IdentifiersService } from "src/app/core/services/identifiers.service";
 import { LabOrdersService } from "src/app/modules/laboratory/resources/services/lab-orders.service";
 import { LabTestsService } from "src/app/modules/laboratory/resources/services/lab-tests.service";
 import { RegistrationService } from "src/app/modules/registration/services/registration.services";
-import { DateField } from "src/app/shared/modules/form/models/date-field.model";
 import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
-import { Textbox } from "src/app/shared/modules/form/models/text-box.model";
 import { ICARE_CONFIG } from "src/app/shared/resources/config";
 import { DiagnosisService } from "src/app/shared/resources/diagnosis/services";
 import { ConceptGetFull } from "src/app/shared/resources/openmrs";
@@ -55,7 +53,7 @@ export class SingleRegistrationComponent implements OnInit {
   @Input() currentUser: any;
   @Input() isBatchRegistration: any;
   @Input() allRegistrationFields: any;
-  @Input() existingBatchSets: any[];
+  @Input() selectedFixedFields: any[];
 
   departmentField: any = {};
   specimenDetailsFields: any;
@@ -146,6 +144,11 @@ export class SingleRegistrationComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    console.log("==> Selected Fields: ", this.selectedFixedFields);
+    this.existingFields =
+      this.selectedFixedFields?.length > 0
+        ? keyBy(this.selectedFixedFields, "key")
+        : {}; 
     const userLocationsIds = JSON.parse(
       this.currentUser?.userProperties?.locations
     );
@@ -159,13 +162,10 @@ export class SingleRegistrationComponent implements OnInit {
 
     this.specimenDetailsFields = Object.keys(
       this.allRegistrationFields?.specimenDetailFields
-    )
-      .slice(0, 3)
+    ).slice(0, 3)
       .map((key) => {
         return this.allRegistrationFields?.specimenDetailFields[key];
       });
-
-    this.existingFields = this.existingBatchSets.length > 0 ? keyBy(this.existingBatchSets, "key") : {} 
 
     // this.specimenDetailsFields = [
     //   new Dropdown({
@@ -224,37 +224,37 @@ export class SingleRegistrationComponent implements OnInit {
     // ];
 
     this.receivedOnField =
-      this.isBatchRegistration && this.existingBatchSets.length > 0
+      this.isBatchRegistration && this.existingFields?.receivedOn
         ? this.existingFields?.receivedOn
         : this.allRegistrationFields?.specimenDetailFields?.receivedOn;
     this.receivedByField =
-      this.isBatchRegistration && this.existingBatchSets.length > 0
+      this.isBatchRegistration && this.existingFields?.receivedBy
         ? this.existingFields?.receivedBy
         : this.allRegistrationFields?.specimenDetailFields?.receivedBy;
     this.transportCondition =
-      this.isBatchRegistration && this.existingBatchSets.length > 0
+      this.isBatchRegistration && this.existingFields?.transportCondition
         ? this.existingFields?.transportCondition
         : this.allRegistrationFields?.specimenDetailFields?.transportCondition;
     this.transportationTemperature =
-      this.isBatchRegistration && this.existingBatchSets.length > 0
+      this.isBatchRegistration && this.existingFields?.transportationTemperature
         ? this.existingFields?.transportationTemperature
         : this.allRegistrationFields?.specimenDetailFields
             ?.transportationTemperature;
 
     this.sampleColectionDateField =
-      this.isBatchRegistration && this.existingBatchSets.length > 0
+      this.isBatchRegistration && this.existingFields?.collectedOn
         ? this.existingFields?.collectedOn
         : this.allRegistrationFields?.specimenDetailFields?.collectedOn;
     this.sampleCollectedByField =
-      this.isBatchRegistration && this.existingBatchSets.length > 0
+      this.isBatchRegistration && this.existingFields?.collectedBy
         ? this.existingFields?.collectedBy
         : this.allRegistrationFields?.specimenDetailFields?.collectedBy;
     this.broughtOnField =
-      this.isBatchRegistration && this.existingBatchSets.length > 0
+      this.isBatchRegistration && this.existingFields?.broughtOn
         ? this.existingFields?.broughtOn
         : this.allRegistrationFields?.specimenDetailFields?.broughtOn;
     this.broughtByField =
-      this.isBatchRegistration && this.existingBatchSets.length > 0
+      this.isBatchRegistration && this.existingFields?.broughtBy
         ? this.existingFields?.broughtBy
         : this.allRegistrationFields?.specimenDetailFields?.broughtBy;
 
