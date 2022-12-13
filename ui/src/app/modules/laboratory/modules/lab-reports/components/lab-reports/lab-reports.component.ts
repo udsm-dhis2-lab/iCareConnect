@@ -1100,12 +1100,13 @@ export class LabReportsComponent implements OnInit {
     let filteredData = [];
     _.each(allData, (data: any) => {
       if (
-        formatDateToYYMMDD(new Date(data["Date"])) >= dates?.startDate &&
-        formatDateToYYMMDD(new Date(data["Date"])) <= dates?.endDate
+        formatDateToYYMMDD(new Date(data["Date"])) >= dates?.startDate.toISOString() &&
+        formatDateToYYMMDD(new Date(data["Date"])) <= dates?.endDate.toISOString()
       ) {
         filteredData = [...filteredData, data];
       }
     });
+    console.log(dates?.startDate.toISOString())
     return filteredData;
   }
 
