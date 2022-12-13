@@ -35,6 +35,7 @@ export class IssuingComponent implements OnInit {
   loadingIssuingList$: Observable<boolean>;
   currentStore$: Observable<LocationGet>;
   stores$: Observable<any>;
+  searchTerm:string;
   requestingLocation: any;
   selectedIssues: any = {};
   errors: any[];
@@ -111,6 +112,13 @@ export class IssuingComponent implements OnInit {
   getSelectedStore(event: MatSelectChange): void {
     this.requestingLocation = event?.value;
     this.getAllIssuing();
+  }
+
+  searchIssuing(event: any) : void {
+    this.searchTerm = event.target?.value;
+    setTimeout(() => {
+      this.getAllIssuing();
+    }, 200)
   }
 
   getAllIssuing(): void {
