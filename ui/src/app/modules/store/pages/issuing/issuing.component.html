@@ -9,9 +9,16 @@
 >
   <mat-card>
     <div class="d-flex justify-content-between">
+
+      <!-- identified bug issue #63 (no function linked to the input html element) -->
+
       <mat-form-field class="w-25">
+        
+         <!-- linked the search function(searchIssuing($event)) with the input element (event listener) -->
+
         <input autocomplete="off" type="text" matInput placeholder="Search" (keyup) = "searchIssuing($event)" />
       </mat-form-field>
+
       <mat-form-field class="w-25 float-right">
         <mat-label>Choose Store</mat-label>
         <mat-select (selectionChange)="getSelectedStore($event)" name="store">

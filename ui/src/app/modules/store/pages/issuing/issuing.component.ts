@@ -110,12 +110,18 @@ export class IssuingComponent implements OnInit {
     this.getAllIssuing();
   }
 
+  // creating the search function
+
+  //the event listener
+
   searchIssuing(event: any): void {
     this.searchTerm = event.target?.value;
     setTimeout(() => {
       this.getAllIssuing();
     }, 200);
   }
+  
+  // the search function
 
   getAllIssuing(): void {
     if (this.searchTerm) {
@@ -140,6 +146,8 @@ export class IssuingComponent implements OnInit {
       );
     }
   }
+
+//end of creating a search function
 
   onReject(e, issue?: IssuingObject): void {
     // e.stopPropagation();
