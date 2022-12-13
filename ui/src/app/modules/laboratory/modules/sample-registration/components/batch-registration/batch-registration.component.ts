@@ -5,6 +5,7 @@ import { Dropdown } from 'src/app/shared/modules/form/models/dropdown.model';
 import { FormValue } from 'src/app/shared/modules/form/models/form-value.model';
 import { TextArea } from 'src/app/shared/modules/form/models/text-area.model';
 import { Textbox } from 'src/app/shared/modules/form/models/text-box.model';
+import { SamplesService } from 'src/app/shared/services/samples.service';
 
 @Component({
   selector: "app-batch-registration",
@@ -44,7 +45,9 @@ export class BatchRegistrationComponent implements OnInit {
   fixedFieldsOptionsObject: { [key: string]: any };
   allFields: any[] = [];
 
-  constructor() {}
+  constructor(
+    private sampleService: SamplesService
+  ) {}
 
   ngOnInit(): void {
     this.warning = {
@@ -206,6 +209,8 @@ export class BatchRegistrationComponent implements OnInit {
               [fieldKey]: {
                 ...this.staticFieldsOptionsObject[fieldKey],
                 value: this.formData[fieldKey].value,
+                disabled: true
+
               },
             }
           : this.staticFieldsOptionsObject;
@@ -250,17 +255,32 @@ export class BatchRegistrationComponent implements OnInit {
       // this.existingBatchsetField.value;
       const batchSetInformation = {
         batchSetName: this.batchsetNameField.value,
-        batches: [
+        label: this.batchsetNameField.value,
+        fields: keyBy(fixedFieldsOptionsUpdated, "key"),
+      };
+
+      let batch = [
           {
             batchName: this.batchNameField.value,
             batchDescription: this.batchDescription.value,
             fields: keyBy(staticFieldsOptionsUpdated, "key"),
-          },
-        ],
-        fields: keyBy(fixedFieldsOptionsUpdated, "key"),
-      };
-
-      console.log("==> BatchSet Information; ",batchSetInformation)
+          }
+        ]
+      this.sampleService.createBatchSet(batchSetInformation).subscribe(
+        (response) => {
+          if(!response?.error){
+            this.sampleService.createBatch(batch).subscribe(
+              (response) => {
+                if(!response?.error){
+                  console.log("==> Batch created; ", response)
+                } else {
+                  console.log("==> Failed to create batch; ", response)
+                }
+              }
+            );         
+          }
+        }
+      );
   }
 
   onPageChange(e: any) {
