@@ -30,9 +30,6 @@ export class StoreHomeComponent implements OnInit {
   settingCurrentLocationStatus$: Observable<boolean>;
   currentStorePage: any;
   privileges$: Observable<any>;
-  // added some code ( search function)
-  
-  searchTerm: string = "";
   constructor(private store: Store<AppState>) {
     this.store.dispatch(clearStockMetrics());
   }
