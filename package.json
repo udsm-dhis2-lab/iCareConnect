@@ -1,3 +1,5 @@
 {
-  "dependencies": {}
+  "dependencies": {
+    "mvn": "^3.5.0"
+  }
 }
