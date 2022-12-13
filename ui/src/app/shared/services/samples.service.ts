@@ -471,4 +471,27 @@ export class SamplesService {
         })
       );
   }
+
+  createBatchSet(batchSet: any): Observable<any> {
+    return this.httpClient.post(BASE_URL + "lab/batchset", batchSet).pipe(
+      map((response) => {
+          return response;
+        }
+      ),
+      catchError((err) => {
+          return err
+        }
+      )
+    );
+  }
+  createBatch(batch: any): Observable<any> {
+    return this.httpClient.post(BASE_URL + "lab/batch", batch).pipe(
+      map((response) => {
+        return response;
+      }),
+      catchError((err) => {
+        return err;
+      })
+    );
+  }
 }
