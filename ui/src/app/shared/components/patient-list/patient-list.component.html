@@ -103,8 +103,8 @@
                 class="text-muted w-100"
                 >person</mat-icon
               >
-              <p class="patient-name" style="text-transform: uppercase;">
-                {{ visit?.visit?.patient?.person?.display }}
+              <p class="patient-name">
+                {{ visit?.visit?.patient?.person?.display.toUpperCase() }}
               </p>
               <p class="patient-mrn">
                 {{ visit?.visit?.patient?.identifiers[0]?.identifier }}
