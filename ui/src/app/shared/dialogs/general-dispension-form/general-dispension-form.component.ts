@@ -1,4 +1,12 @@
-import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+  Injectable,
+} from "@angular/core";
+
 import { Store } from "@ngrx/store";
 import { uniqBy } from "lodash";
 import { Observable } from "rxjs";
@@ -21,6 +29,7 @@ import { OrdersService } from "../../resources/order/services/orders.service";
   templateUrl: "./general-dispension-form.component.html",
   styleUrls: ["./general-dispension-form.component.scss"],
 })
+@Injectable()
 export class GeneralDispensingFormComponent implements OnInit {
   @Input() orderType: any;
   @Input() encounterType: any;
@@ -43,6 +52,7 @@ export class GeneralDispensingFormComponent implements OnInit {
   @Input() strengthConceptUuid: any;
   @Input() useSpecificDrugPrescription: any;
   @Input() specificDrugConceptUuid: any;
+  @Input() dosingUnits: any;
 
   drugOrder: DrugOrderObject;
 
@@ -57,6 +67,7 @@ export class GeneralDispensingFormComponent implements OnInit {
   savingError: boolean = false;
 
   drugConceptField: Dropdown;
+  unitField: Dropdown;
   drugDurationField: Textbox;
   frequencyField: Dropdown;
   drugDoseField: Textbox;
@@ -131,22 +142,6 @@ export class GeneralDispensingFormComponent implements OnInit {
         shouldHaveLiveSearchForDropDownFields: true,
       });
     }
-
-    // this.drugDoseField = new Textbox({
-    //   id: "dose",
-    //   key: "dose",
-    //   label: "Dose",
-    //   required: true,
-    //   type: "number",
-    // });
-
-    // this.drugDurationField = new Textbox({
-    //   id: "duration",
-    //   key: "duration",
-    //   label: "Duration",
-    //   required: true,
-    //   type: "number",
-    // });
   }
 
   onFormUpdate(formValues: FormValue, fieldItem?: string): void {
@@ -159,6 +154,7 @@ export class GeneralDispensingFormComponent implements OnInit {
         ?.drug?.options?.filter(
           (option) => option?.name === formValues.getValues()?.drug?.value
         )[0];
+      // console.log(this.selectedDrug)
     }
     if (fieldItem == "drug" && !this.specificDrugConceptUuid) {
       this.drugService
@@ -189,6 +185,105 @@ export class GeneralDispensingFormComponent implements OnInit {
             this.strengthFormField = null;
           }
         });
+    }
+
+    if (formValues.form.value.drug.display) {
+      const final_value = formValues.form.value.drug.display;
+      const filterValueStr = final_value.toString();
+      if (filterValueStr.includes("vial") || filterValueStr.includes("Vial")) {
+        formValues.form.value.drug.name = "vial";
+      } else if (
+        filterValueStr.includes("Tablet") ||
+        filterValueStr.includes("tablet")
+      ) {
+        formValues.form.value.drug.name = "tablet";
+      } else if (
+        filterValueStr.includes("Capsule") ||
+        filterValueStr.includes("capsule")
+      ) {
+        formValues.form.value.drug.name = "capsule";
+      } else if (
+        filterValueStr.includes("Ampoule") ||
+        filterValueStr.includes("ampule")
+      ) {
+        formValues.form.value.drug.name = "ampule";
+      } else if (
+        filterValueStr.includes("Pc") ||
+        filterValueStr.includes("pc")
+      ) {
+        formValues.form.value.drug.name = "pc";
+      } else if (
+        filterValueStr.includes("Bottle") ||
+        filterValueStr.includes("bottle")
+      ) {
+        formValues.form.value.drug.name = "bottle";
+      } else if (
+        filterValueStr.includes("Gm") ||
+        filterValueStr.includes("gm")
+      ) {
+        formValues.form.value.drug.name = "gm";
+      } else if (
+        filterValueStr.includes("Mg") ||
+        filterValueStr.includes("mg")
+      ) {
+        formValues.form.value.drug.name = "mg";
+      } else if (
+        filterValueStr.includes("Mcg") ||
+        filterValueStr.includes("mcg")
+      ) {
+        formValues.form.value.drug.name = "mcg";
+      } else if (filterValueStr.includes("mL")) {
+        formValues.form.value.drug.name = "ml";
+      } else if (
+        filterValueStr.includes("Mcg") ||
+        filterValueStr.includes("mcg")
+      ) {
+        formValues.form.value.drug.name = "mcg";
+      } else if (
+        filterValueStr.includes("Ltr") ||
+        filterValueStr.includes("ltr")
+      ) {
+        formValues.form.value.drug.name = "ltr";
+      } else if (
+        filterValueStr.includes("Tube") ||
+        filterValueStr.includes("tube")
+      ) {
+        formValues.form.value.drug.name = "tube";
+      } else if (
+        filterValueStr.includes("Suppose") ||
+        filterValueStr.includes("suppose")
+      ) {
+        formValues.form.value.drug.name = "supposer";
+      } else if (
+        filterValueStr.includes("Sachet") ||
+        filterValueStr.includes("sachet")
+      ) {
+        formValues.form.value.drug.name = "sachet";
+      } else if (
+        filterValueStr.includes("PKT") ||
+        filterValueStr.includes("Pkt")
+      ) {
+        formValues.form.value.drug.name = "pkt";
+      } else if (
+        filterValueStr.includes("Respules") ||
+        filterValueStr.includes("respules")
+      ) {
+        formValues.form.value.drug.name = "prespules";
+      } else if (
+        filterValueStr.includes("Strip") ||
+        filterValueStr.includes("strip")
+      ) {
+        formValues.form.value.drug.name = "strip";
+      } else if (filterValueStr.includes("IU")) {
+        formValues.form.value.drug.name = "IU";
+      } else if (
+        filterValueStr.includes("PKT") ||
+        filterValueStr.includes("Pkt")
+      ) {
+        formValues.form.value.drug.name = "pkt";
+      } else {
+        console.log("Other");
+      }
     }
   }
 

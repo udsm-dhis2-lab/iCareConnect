@@ -47,6 +47,7 @@
     "file-saver": "^2.0.5",
     "font-awesome": "^4.7.0",
     "highcharts": "^9.1.2",
+    "install": "^0.13.0",
     "material-design-icons": "^3.0.1",
     "moment": "^2.29.1",
     "ngrx-store-freeze": "^0.2.4",
@@ -61,7 +62,7 @@
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^15.0.1",
-    "@angular/cli": "^15.0.1",
+    "@angular/cli": "^15.0.3",
     "@angular/compiler-cli": "^15.0.1",
     "@types/jasmine": "~3.6.0",
     "@types/jasminewd2": "~2.0.3",

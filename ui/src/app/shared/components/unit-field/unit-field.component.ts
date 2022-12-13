@@ -1,5 +1,7 @@
 import { Component, EventEmitter, OnInit, Output, Input } from "@angular/core";
 import { Dropdown } from "../../modules/form/models/dropdown.model";
+import { Textbox } from "../../modules/form/models/text-box.model";
+import { GeneralDispensingFormComponent } from "../../dialogs/general-dispension-form/general-dispension-form.component";
 
 @Component({
   selector: "app-unit-field",
@@ -15,7 +17,9 @@ export class UnitFieldComponent implements OnInit {
   @Output() formUpdate = new EventEmitter();
   unitField: Dropdown;
 
-  constructor() {}
+  constructor(
+    private GeneralDispensingFormComponent: GeneralDispensingFormComponent
+  ) {}
 
   ngOnInit(): void {
     if (this.dosingUnits) {
@@ -24,7 +28,7 @@ export class UnitFieldComponent implements OnInit {
         key: "dosingUnit",
         label: `Select Dose Unit`,
         conceptClass: this.dosingUnits?.conceptClass?.display,
-        value: null,
+        value: "tablet",
         options: this.dosingUnits?.answers?.map((answer) => {
           return {
             key: answer?.uuid,
@@ -89,5 +93,13 @@ export class UnitFieldComponent implements OnInit {
 
   onFormUpdate(e: any) {
     this.formUpdate.emit(e);
+    if (this.dosingUnits) {
+      this.unitField = new Textbox({
+        id: "dosingUnit",
+        key: "dosingUnit",
+        label: `Dose Unit`,
+        value: this.GeneralDispensingFormComponent.formValues.drug.value.name,
+      });
+    }
   }
 }
