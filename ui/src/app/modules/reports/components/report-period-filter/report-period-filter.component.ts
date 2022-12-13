@@ -21,7 +21,7 @@ export class ReportPeriodFilterComponent implements OnInit, OnChanges {
   formattedPeriods: any[];
   currentYear: any;
   selectedDay: any;
-
+  
   startDate: any = new Date();
   endDate: any = new Date();
 

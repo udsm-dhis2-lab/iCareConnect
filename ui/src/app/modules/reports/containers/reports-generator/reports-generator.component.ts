@@ -425,7 +425,7 @@ export class ReportsGeneratorComponent implements OnInit {
 
     return existsDataSetWithDXConcept;
   }
-
+  
   downloadToExcel(event: Event, dataToDownload, currentReport): void {
     event.stopPropagation();
     this.exportDataService.exportAsExcelFile(
