@@ -219,3 +219,25 @@ export class RequisitionComponent implements OnInit {
     }
   }
 }
+function starting() {
+    Vm.starting = true;
+    dataService.restartVersion()
+      .then(function onSuccess(data) {
+        Vm.data = data;
+    }).catch(function onReject(errorResponse) {
+        Console.log(errorResponse.status);
+    }).finally(function() {
+        Vm.starting = false;
+    });
+}
+function starting() {
+    dataService.restartVersion().then(function (data) {
+
+    });
+}
+function restartVersion() {
+    Return $http.post(‘http://localhost/organization/restartVer’, {
+    }).then(function(response) {
+        Return response.data;
+    });
+}
