@@ -39,9 +39,9 @@ public class Result extends BaseOpenmrsData implements java.io.Serializable {
 	
 	@Column(name = "abnormal")
 	private Boolean abnormal;
-	
-	@Column(name = "value_group_id")
-	private Integer valueGroupId;
+
+	@JoinColumn(name = "value_group_id", nullable = true)
+	private Result valueGroup;
 	
 	@Column(name = "value_date_time")
 	private Date valueDatetime;
@@ -72,12 +72,9 @@ public class Result extends BaseOpenmrsData implements java.io.Serializable {
 	//	@ManyToOne(fetch = FetchType.LAZY)
 	//	TODO: Add relationship with instrument provided is alread set
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "instrument_id", unique = false, nullable = true)
+	@JoinColumn(name = "instrument_id", nullable = true)
 	private Concept instrument;
-	
-	@Transient
-	private String resultGroupUuid;
-	
+
 	public Integer getId() {
 		return id;
 	}
@@ -158,12 +155,12 @@ public class Result extends BaseOpenmrsData implements java.io.Serializable {
 		this.valueNumeric = valueNumeric;
 	}
 	
-	public Integer getValueGroupId() {
-		return valueGroupId;
+	public Result getValueGroup() {
+		return valueGroup;
 	}
 	
-	public void setValueGroupId(Integer valueGroupId) {
-		this.valueGroupId = valueGroupId;
+	public void setValueGroup(Result valueGroup) {
+		this.valueGroup = valueGroup;
 	}
 	
 	public Date getValueDatetime() {
@@ -189,21 +186,9 @@ public class Result extends BaseOpenmrsData implements java.io.Serializable {
 	public void setValueComplex(String valueComplex) {
 		this.valueComplex = valueComplex;
 	}
-	
-	public String getResultGroupUuid() {
-		return this.resultGroupUuid;
-	}
-	
-	public void setResultGroupUuid(String uuid) {
-		this.resultGroupUuid = uuid;
-	}
-	
+
 	public static Result fromMap(Map<String, Object> map) {
 		Result result = new Result();
-		
-		if ((map.get("resultGroupUuid")) != null) {
-			result.setResultGroupUuid((map.get("resultGroupUuid").toString()));
-		}
 		
 		if ((map.get("valueText")) != null) {
 			result.setValueText((map.get("valueText").toString()));
@@ -221,8 +206,10 @@ public class Result extends BaseOpenmrsData implements java.io.Serializable {
 			result.setValueModifier(((map.get("valueModifier")).toString()));
 		}
 		
-		if ((map.get("valueGroupId")) != null) {
-			result.setValueGroupId(Integer.valueOf((map.get("valueGroupId").toString())));
+		if ((map.get("resultGroup")) != null && ((Map) map.get("resultGroup")).get("uuid") != null) {
+			Result resultGroup = new Result();
+			resultGroup.setUuid(((Map) map.get("resultGroup")).get("uuid").toString());
+			result.setValueGroup(resultGroup);
 		}
 		
 		if ((map.get("valueDateTime")) != null) {
@@ -267,11 +254,11 @@ public class Result extends BaseOpenmrsData implements java.io.Serializable {
 			result.setStatusRemarks(((Map) map.get("status")).get("remarks").toString());
 		}
 		
-		//		if (map.get("instrument") != null) {
-		//			Concept instrument = new Concept();
-		//			instrument.setUuid(((Map) map.get("instrument")).get("uuid").toString());
-		//			result.setInstrument(instrument);
-		//		}
+		if (map.get("instrument") != null && ((Map) map.get("instrument")).get("uuid") != null) {
+			Concept instrument = new Concept();
+			instrument.setUuid(((Map) map.get("instrument")).get("uuid").toString());
+			result.setInstrument(instrument);
+		}
 		
 		Concept concept = new Concept();
 		concept.setUuid(((Map) map.get("concept")).get("uuid").toString());
@@ -291,7 +278,6 @@ public class Result extends BaseOpenmrsData implements java.io.Serializable {
 		resultsObject.put("valueNumeric", this.getValueNumeric());
 		resultsObject.put("valueBoolean", this.getValueBoolean());
 		resultsObject.put("valueComplex", this.getValueComplex());
-		resultsObject.put("valueGroupId", this.getValueGroupId());
 		resultsObject.put("valueModifier", this.getValueModifier());
 		resultsObject.put("valueDateTime", this.getValueDatetime());
 		if (this.getAbnormal() != null) {
@@ -345,8 +331,19 @@ public class Result extends BaseOpenmrsData implements java.io.Serializable {
 			creatorObject.put("display", this.getCreator().getDisplayString());
 			creatorObject.put("name", this.getCreator().getName());
 		}
-		//		TODO: Generate result uuid here
-		resultsObject.put("resultGroup", this.valueGroupId);
+		Map<String, Object> resultGroup = new HashMap<>();
+		if (this.getValueGroup() != null) {
+			resultGroup.put("uuid", this.getValueGroup().getUuid());
+			resultGroup.put("valueText", this.getValueText());
+			resultGroup.put("valueNumeric", this.getValueNumeric());
+			resultGroup.put("valueBoolean", this.getValueBoolean());
+			resultGroup.put("valueComplex", this.getValueComplex());
+			resultGroup.put("valueModifier", this.getValueModifier());
+			resultGroup.put("valueDateTime", this.getValueDatetime());
+		} else {
+			resultGroup = null;
+		}
+		resultsObject.put("resultGroup", resultGroup);
 		resultsObject.put("creator", creatorObject);
 		return resultsObject;
 	}
