@@ -1,11 +1,11 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from "@angular/core";
 import { flatten, omit, keyBy } from "lodash";
-import { DropdownOption } from 'src/app/shared/modules/form/models/dropdown-option.model';
-import { Dropdown } from 'src/app/shared/modules/form/models/dropdown.model';
-import { FormValue } from 'src/app/shared/modules/form/models/form-value.model';
-import { TextArea } from 'src/app/shared/modules/form/models/text-area.model';
-import { Textbox } from 'src/app/shared/modules/form/models/text-box.model';
-import { SamplesService } from 'src/app/shared/services/samples.service';
+import { DropdownOption } from "src/app/shared/modules/form/models/dropdown-option.model";
+import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
+import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
+import { TextArea } from "src/app/shared/modules/form/models/text-area.model";
+import { Textbox } from "src/app/shared/modules/form/models/text-box.model";
+import { SamplesService } from "src/app/shared/services/samples.service";
 
 @Component({
   selector: "app-batch-registration",
@@ -24,9 +24,11 @@ export class BatchRegistrationComponent implements OnInit {
   @Input() labSections: any;
   @Input() testsFromExternalSystemsConfigs: any;
   @Input() allRegistrationFields: any;
+  @Input() existingBatchSets: any[];
   formData: any;
   useExistingBatchset: boolean = false;
   validForm: boolean = false;
+  validBatchSetName: boolean = true;
   addFixedField: Dropdown;
   addStaticField: Dropdown;
   batchSetField: Textbox;
@@ -44,10 +46,9 @@ export class BatchRegistrationComponent implements OnInit {
   staticFieldsOptionsObject: { [key: string]: any };
   fixedFieldsOptionsObject: { [key: string]: any };
   allFields: any[] = [];
+  existingBatchSetFields: any;
 
-  constructor(
-    private sampleService: SamplesService
-  ) {}
+  constructor(private sampleService: SamplesService) {}
 
   ngOnInit(): void {
     this.warning = {
@@ -97,7 +98,7 @@ export class BatchRegistrationComponent implements OnInit {
       }),
       "key"
     );
-    // console.log("==> Fixed fields Object: ", this.fixedFieldsOptionsObject);
+    console.log("==> Fixed fields Object: ", this.existingBatchSets);
 
     this.instantiateBatchRegistrationFields();
   }
@@ -118,6 +119,17 @@ export class BatchRegistrationComponent implements OnInit {
 
     this.existingBatchsetField =
       this.allRegistrationFields?.batchRegistrationFields?.existingBatchsetField;
+    if (this.existingBatchSets.length) {
+      let existingBatchSetOptions = this.existingBatchSets.map((batchSet) => {
+        return {
+          key: batchSet?.uuid,
+          label: batchSet?.name,
+          value: batchSet?.name,
+          name: batchSet?.name,
+        };
+      });
+      this.existingBatchsetField.options = existingBatchSetOptions;
+    }
 
     this.batchsetNameField =
       this.allRegistrationFields?.batchRegistrationFields?.batchSetNameField;
@@ -196,6 +208,7 @@ export class BatchRegistrationComponent implements OnInit {
               [fieldKey]: {
                 ...this.fixedFieldsOptionsObject[fieldKey],
                 value: this.formData[fieldKey].value,
+                disabled: true,
               },
             }
           : this.fixedFieldsOptionsObject;
@@ -209,14 +222,11 @@ export class BatchRegistrationComponent implements OnInit {
               [fieldKey]: {
                 ...this.staticFieldsOptionsObject[fieldKey],
                 value: this.formData[fieldKey].value,
-                disabled: true
-
+                disabled: true,
               },
             }
           : this.staticFieldsOptionsObject;
     }
-
-    console.log("==> Test Static Field: ", this.staticFieldsOptionsObject);
 
     //Handle all other fields in batch registration
     this.batchNameField.value = this.formData[this.batchNameField.key]?.value;
@@ -226,61 +236,128 @@ export class BatchRegistrationComponent implements OnInit {
       this.formData[this.existingBatchsetField.key]?.value;
     this.batchsetNameField.value =
       this.formData[this.batchsetNameField.key]?.value;
+    
+    if(this.batchsetNameField.value){
+      this.validBatchSetName = this.existingBatchSets.filter((batchSet) => batchSet.name === this.batchsetNameField.value).length === 0;
+    }
+
+    //Clear batchSet Name field or existingBatchSet values depending on what field is being used.
+    if(this.useExistingBatchset && key === "Existing Batchset"){
+      this.batchsetNameField.value = null;
+      this.existingBatchSetFields = this.existingBatchSets.filter(
+        (batchSet) => batchSet.name === this.existingBatchsetField.value
+      )[0]?.fields;
+      if (this.existingBatchSetFields?.length > 0){
+        this.selectedFixedFields  = JSON.parse(this.existingBatchSetFields);
+      }
+    }
+    if (
+      !this.useExistingBatchset &&
+      this.existingBatchsetField.value &&
+      key === "New Batchset Name"
+    ) {
+      this.existingBatchsetField.value = null;
+      this.selectedFixedFields = [];
+    }
 
     if (
       (this.batchsetNameField.value || this.existingBatchsetField.value) &&
       this.batchNameField.value &&
       (this.selectedFixedFields?.length > 0 ||
-        this.selectedStaticFields?.length > 0)
+        this.selectedStaticFields?.length > 0) &&
+        this.validBatchSetName
     ) {
       this.validForm = true;
     } else {
       this.validForm = false;
     }
+
+    this.addFixedField.disabled = this.useExistingBatchset;
   }
 
   onSave(e: any) {
-    const fixedFieldsOptionsUpdated = Object.keys(this.fixedFieldsOptionsObject).map((key) => {
+    const fixedFieldsWithValues = Object.keys(this.fixedFieldsOptionsObject)
+      .map((key) => {
         return this.fixedFieldsOptionsObject[key];
       })
       .filter((field) => {
         return field && field.value;
       });
-    const staticFieldsOptionsUpdated = Object.keys(this.staticFieldsOptionsObject).map((key) => {
+    const staticFieldsWithValues = Object.keys(
+      this.staticFieldsOptionsObject
+    ).map((key) => {
         return this.staticFieldsOptionsObject[key];
       })
       .filter((field) => {
         return field && field.value;
       });
-      // this.existingBatchsetField.value;
-      const batchSetInformation = {
-        batchSetName: this.batchsetNameField.value,
+    // this.existingBatchsetFiel[d.value;
+    const batchSetsInformation = [
+      {
+        name: this.batchsetNameField.value,
         label: this.batchsetNameField.value,
-        fields: keyBy(fixedFieldsOptionsUpdated, "key"),
-      };
+        fields: JSON.stringify(fixedFieldsWithValues),
+        description: "",
+      },
+    ];
 
-      let batch = [
-          {
-            batchName: this.batchNameField.value,
-            batchDescription: this.batchDescription.value,
-            fields: keyBy(staticFieldsOptionsUpdated, "key"),
+    let batches = [
+      {
+        label: this.batchNameField.value,
+        name: this.batchNameField.value,
+        description: this.batchDescription.value,
+        fields: JSON.stringify(staticFieldsWithValues),
+      },
+    ];
+    console.log("==> batch set save: ", batchSetsInformation)
+    if (this.useExistingBatchset){
+      let batchSet = this.existingBatchSets.filter(
+        (batchSet) => batchSet.name === this.existingBatchsetField.value
+      )[0];
+      batches = batches.map((batch) => {
+        return {
+          ...batch,
+          batchSet: {
+            uuid: batchSet?.uuid,
+            name: batchSet?.name,
+          },
+        };
+      });
+      if (batchSet) {
+        this.sampleService.createBatch(batches).subscribe((response) => {
+          if (!response?.error) {
+            console.log("==> Batch created; ", response);
+          } else {
+            console.log("==> Failed to create batch; ", response);
           }
-        ]
-      this.sampleService.createBatchSet(batchSetInformation).subscribe(
-        (response) => {
-          if(!response?.error){
-            this.sampleService.createBatch(batch).subscribe(
-              (response) => {
-                if(!response?.error){
-                  console.log("==> Batch created; ", response)
+        });
+      }
+    } else {
+      this.sampleService
+        .createBatchSets(batchSetsInformation)
+        .subscribe((response) => {
+          if (!response?.error) {
+            batches = batches.map((batch) => {
+              return {
+                ...batch,
+                batchSet: {
+                  uuid: response[0]?.uuid,
+                  name: response[0]?.name,
+                },
+              };
+            });
+            if (this.batchsetNameField.value) {
+              this.sampleService.createBatch(batches).subscribe((response) => {
+                if (!response?.error) {
+                  console.log("==> Batch created; ", response);
                 } else {
-                  console.log("==> Failed to create batch; ", response)
+                  console.log("==> Failed to create batch; ", response);
                 }
-              }
-            );         
+              });
+            }
           }
-        }
-      );
+        });
+    }
   }
 
   onPageChange(e: any) {

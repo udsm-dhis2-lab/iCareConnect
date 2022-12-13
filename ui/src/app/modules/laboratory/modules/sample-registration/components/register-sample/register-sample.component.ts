@@ -69,6 +69,7 @@ export class RegisterSampleComponent implements OnInit {
   manyObservables$: Observable<any>;
   identifierTypes$: Observable<any>;
   batchRegistrationFields: any;
+  batchSets$: Observable<any>;
 
   get maximumDate() {
     let maxDate = new Date();
@@ -121,10 +122,19 @@ export class RegisterSampleComponent implements OnInit {
       id: this.LISConfigurations?.agencyConceptUuid,
     });
 
-    this.referringDoctorAttributes$ = this.systemSettingsService
-      .getSystemSettingsMatchingAKey("lis.attributes.referringDoctor");
+    this.batchSets$ = this.samplesService.getBatchSets().pipe(map((response) => {
+      if(!response?.error){
+        return response
+      }
+    }));
 
-    this.identifierTypes$ = this.registrationService.getPatientIdentifierTypes();
+    this.referringDoctorAttributes$ =
+      this.systemSettingsService.getSystemSettingsMatchingAKey(
+        "lis.attributes.referringDoctor"
+      );
+
+    this.identifierTypes$ =
+      this.registrationService.getPatientIdentifierTypes();
 
     this.testsFromExternalSystemsConfigs$ =
       this.systemSettingsService.getSystemSettingsMatchingAKey(
@@ -142,7 +152,7 @@ export class RegisterSampleComponent implements OnInit {
         "lis.settings.labNumber.charactersCount"
       );
 
-  this.initializeRegistrationFields();
+    this.initializeRegistrationFields();
   }
 
   getSelection(event: MatRadioChange): void {
@@ -169,8 +179,7 @@ export class RegisterSampleComponent implements OnInit {
     this.selectedTabGroup = group;
   }
 
-  initializeRegistrationFields(
-  ) {
+  initializeRegistrationFields() {
     this.specimenDetailsFields = {
       specimen: new Dropdown({
         id: "specimen",
@@ -406,8 +415,8 @@ export class RegisterSampleComponent implements OnInit {
         id: "batchSetName",
         key: "batchSetName",
         label: "Type Batchset Name",
-      })
-    }
+      }),
+    };
 
     this.allRegistrationFields = {
       batchRegistrationFields: this.batchRegistrationFields,

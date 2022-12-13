@@ -196,15 +196,12 @@ export class SamplesService {
       ];
     }
 
-    if (searchText && searchText.length > 0){
-      queryParams = [
-        ...queryParams,
-        `q=${searchText}`
-      ]
+    if (searchText && searchText.length > 0) {
+      queryParams = [...queryParams, `q=${searchText}`];
     }
-      if (dates && dates?.startDate) {
-        queryParams = [...queryParams, `startDate=${dates?.startDate}`];
-      }
+    if (dates && dates?.startDate) {
+      queryParams = [...queryParams, `startDate=${dates?.startDate}`];
+    }
 
     if (dates && dates?.endDate) {
       queryParams = [...queryParams, `endDate=${dates?.endDate}`];
@@ -472,20 +469,29 @@ export class SamplesService {
       );
   }
 
-  createBatchSet(batchSet: any): Observable<any> {
-    return this.httpClient.post(BASE_URL + "lab/batchset", batchSet).pipe(
+  createBatchSets(batchSet: any): Observable<any> {
+    return this.httpClient.post(BASE_URL + "lab/batchsets", batchSet).pipe(
       map((response) => {
-          return response;
-        }
-      ),
+        return response;
+      }),
       catchError((err) => {
-          return err
-        }
-      )
+        return err;
+      })
+    );
+  }
+
+  getBatchSets(): Observable<any> {
+    return this.httpClient.get(BASE_URL + "lab/batchsets").pipe(
+      map((response) => {
+        return response;
+      }),
+      catchError((err) => {
+        return err;
+      })
     );
   }
   createBatch(batch: any): Observable<any> {
-    return this.httpClient.post(BASE_URL + "lab/batch", batch).pipe(
+    return this.httpClient.post(BASE_URL + "lab/batches", batch).pipe(
       map((response) => {
         return response;
       }),

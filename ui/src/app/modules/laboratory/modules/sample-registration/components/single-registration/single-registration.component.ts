@@ -55,6 +55,7 @@ export class SingleRegistrationComponent implements OnInit {
   @Input() currentUser: any;
   @Input() isBatchRegistration: any;
   @Input() allRegistrationFields: any;
+  @Input() existingBatchSets: any[];
 
   departmentField: any = {};
   specimenDetailsFields: any;
@@ -124,6 +125,7 @@ export class SingleRegistrationComponent implements OnInit {
   savingLabRequest: boolean = false;
   labLocations$: Observable<any>;
   currentLabLocation: any;
+  existingFields: any;
 
   constructor(
     private samplesService: SamplesService,
@@ -162,6 +164,8 @@ export class SingleRegistrationComponent implements OnInit {
       .map((key) => {
         return this.allRegistrationFields?.specimenDetailFields[key];
       });
+
+    this.existingFields = this.existingBatchSets.length > 0 ? keyBy(this.existingBatchSets, "key") : {} 
 
     // this.specimenDetailsFields = [
     //   new Dropdown({
@@ -220,22 +224,39 @@ export class SingleRegistrationComponent implements OnInit {
     // ];
 
     this.receivedOnField =
-      this.allRegistrationFields.specimenDetailFields.receivedOn;
+      this.isBatchRegistration && this.existingBatchSets.length > 0
+        ? this.existingFields?.receivedOn
+        : this.allRegistrationFields?.specimenDetailFields?.receivedOn;
     this.receivedByField =
-      this.allRegistrationFields.specimenDetailFields.receivedBy;
+      this.isBatchRegistration && this.existingBatchSets.length > 0
+        ? this.existingFields?.receivedBy
+        : this.allRegistrationFields?.specimenDetailFields?.receivedBy;
     this.transportCondition =
-      this.allRegistrationFields.specimenDetailFields.transportCondition;
+      this.isBatchRegistration && this.existingBatchSets.length > 0
+        ? this.existingFields?.transportCondition
+        : this.allRegistrationFields?.specimenDetailFields?.transportCondition;
     this.transportationTemperature =
-      this.allRegistrationFields.specimenDetailFields.transportationTemperature;
+      this.isBatchRegistration && this.existingBatchSets.length > 0
+        ? this.existingFields?.transportationTemperature
+        : this.allRegistrationFields?.specimenDetailFields
+            ?.transportationTemperature;
 
     this.sampleColectionDateField =
-      this.allRegistrationFields.specimenDetailFields.collectedOn;
+      this.isBatchRegistration && this.existingBatchSets.length > 0
+        ? this.existingFields?.collectedOn
+        : this.allRegistrationFields?.specimenDetailFields?.collectedOn;
     this.sampleCollectedByField =
-      this.allRegistrationFields.specimenDetailFields.collectedBy;
+      this.isBatchRegistration && this.existingBatchSets.length > 0
+        ? this.existingFields?.collectedBy
+        : this.allRegistrationFields?.specimenDetailFields?.collectedBy;
     this.broughtOnField =
-      this.allRegistrationFields.specimenDetailFields.broughtOn;
+      this.isBatchRegistration && this.existingBatchSets.length > 0
+        ? this.existingFields?.broughtOn
+        : this.allRegistrationFields?.specimenDetailFields?.broughtOn;
     this.broughtByField =
-      this.allRegistrationFields.specimenDetailFields.broughtBy;
+      this.isBatchRegistration && this.existingBatchSets.length > 0
+        ? this.existingFields?.broughtBy
+        : this.allRegistrationFields?.specimenDetailFields?.broughtBy;
 
     const currentLocation = JSON.parse(localStorage.getItem("currentLocation"));
     const labsAvailable =
@@ -257,7 +278,6 @@ export class SingleRegistrationComponent implements OnInit {
     //   }),
     //   shouldHaveLiveSearchForDropDownFields: false,
     // });getSelectedRCollectedOnTime
-
   }
 
   get maximumDate() {
