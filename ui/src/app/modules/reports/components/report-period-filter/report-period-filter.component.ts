@@ -7,6 +7,7 @@ import {
   Output,
 } from "@angular/core";
 import { getFormattedPeriodsByPeriodType } from "src/app/shared/helpers/format-dates-types.helper";
+import { getCurrentPeriod } from "src/app/store/selectors";
 
 @Component({
   selector: "app-report-period-filter",

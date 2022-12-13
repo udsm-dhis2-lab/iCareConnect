@@ -138,7 +138,7 @@ export function getReportPeriodObjectFromPeriodId(id: string) {
 export function getFormattedPeriodsByPeriodType(yearlyPe, periodType) {
   let periods = [];
   const now = new Date();
-  const currentMonth = now.getMonth() + 1;
+  const currentMonth = now.getMonth();
   const currentYear = now.getFullYear();
   periodType === "Monthly"
     ? _.forEach(monthsOfTheYear, (month) => {
@@ -182,6 +182,6 @@ export function getFormattedPeriodsByPeriodType(yearlyPe, periodType) {
           ];
         }
       })
-    : periods == [];
+    : periods = [];
   return periods;
 }
