@@ -1,11 +1,11 @@
 import { Component, Input, OnInit } from "@angular/core";
-import { MatDialog } from "@angular/material/dialog";
+import { MatLegacyDialog as MatDialog } from "@angular/material/legacy-dialog";
 import { Store } from "@ngrx/store";
 import { Observable } from "rxjs";
 import { take } from "rxjs/operators";
 import { SampleResultsPrintingComponent } from "src/app/modules/laboratory/components/sample-results-printing/sample-results-printing.component";
 import { SamplesService } from "src/app/modules/laboratory/resources/services/samples.service";
-import { SharedConfirmationComponent } from "src/app/shared/components/shared-confirmation /shared-confirmation.component";
+import { SharedConfirmationComponent } from "src/app/shared/components/shared-confirmation/shared-confirmation.component";
 import {
   setSampleStatus,
   loadLabSamplesByCollectionDates,

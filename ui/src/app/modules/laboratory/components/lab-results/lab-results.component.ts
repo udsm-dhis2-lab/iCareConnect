@@ -2,7 +2,7 @@ import { Component, OnInit, Input } from '@angular/core';
 import { SampleObject } from '../../resources/models';
 import { Store } from '@ngrx/store';
 import { AppState } from 'src/app/store/reducers';
-import { FormControl } from '@angular/forms';
+import { UntypedFormControl } from '@angular/forms';
 import {
   getLabSamplesGroupedBymrNoAndFilteredByStatus,
   getLabSampleById,
@@ -10,7 +10,7 @@ import {
 } from '../../store/selectors/samples.selectors';
 import { Observable, of } from 'rxjs';
 import { UserGetFull } from 'src/app/shared/resources/openmrs';
-import { MatDialog } from '@angular/material/dialog';
+import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { ResultsAndSignOffsModalComponent } from '../results-and-sign-offs-modal/results-and-sign-offs-modal.component';
 import { loadConcept } from 'src/app/store/actions';
 
@@ -23,7 +23,7 @@ export class LabResultsComponent implements OnInit {
   expandedRow: number;
   samplesGroupedBymrNo$: Observable<SampleObject[]>;
   currentSample$: Observable<SampleObject>;
-  selectedTab = new FormControl(0);
+  selectedTab = new UntypedFormControl(0);
   testResultsObject = {};
   @Input() currentUser: UserGetFull;
   labTests$: Observable<any>;

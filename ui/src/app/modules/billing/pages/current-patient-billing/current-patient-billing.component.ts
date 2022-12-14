@@ -30,10 +30,10 @@ import { any } from "cypress/types/bluebird";
 import { ICARE_CONFIG } from "src/app/shared/resources/config";
 import { getEncounterTypeByName } from "src/app/store/selectors/encounter-type.selectors";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
-import { MatTableDataSource } from "@angular/material/table";
+import { MatLegacyTableDataSource as MatTableDataSource } from "@angular/material/legacy-table";
 import { getIsPatientSentForExemption } from "src/app/store/selectors/visit.selectors";
 import { go, loadCurrentPatient } from "src/app/store/actions";
-import { MatDialog } from "@angular/material/dialog";
+import { MatLegacyDialog as MatDialog } from "@angular/material/legacy-dialog";
 import { ExemptionConfirmationComponent } from "../../components/exemption-confirmation/exemption-confirmation.component";
 
 @Component({

@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Inject, OnInit, Output } from "@angular/core";
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
+import { MatLegacyDialog as MatDialog, MatLegacyDialogRef as MatDialogRef, MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA } from "@angular/material/legacy-dialog";
 import { select, Store } from "@ngrx/store";
 import { Observable, of, zip } from "rxjs";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";

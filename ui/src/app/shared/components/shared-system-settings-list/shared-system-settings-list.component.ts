@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from "@angular/core";
-import { MatDialog } from "@angular/material/dialog";
+import { MatLegacyDialog as MatDialog } from "@angular/material/legacy-dialog";
 import { Observable } from "rxjs";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { ManageSystemSettingComponent } from "../../dialogs/manage-system-setting/manage-system-setting.component";

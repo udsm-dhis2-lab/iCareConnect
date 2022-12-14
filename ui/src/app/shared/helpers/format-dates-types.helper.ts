@@ -182,6 +182,6 @@ export function getFormattedPeriodsByPeriodType(yearlyPe, periodType) {
           ];
         }
       })
-    : periods == [];
+    : (periods = []);
   return periods;
 }

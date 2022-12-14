@@ -1,7 +1,7 @@
 import { SelectionModel } from "@angular/cdk/collections";
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
-import { MatDialog } from "@angular/material/dialog";
-import { MatTableDataSource } from "@angular/material/table";
+import { MatLegacyDialog as MatDialog } from "@angular/material/legacy-dialog";
+import { MatLegacyTableDataSource as MatTableDataSource } from "@angular/material/legacy-table";
 import { Observable } from "rxjs";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { BillableItemsService } from "src/app/shared/resources/billable-items/services/billable-items.service";

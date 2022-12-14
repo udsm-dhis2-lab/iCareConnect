@@ -5,7 +5,7 @@ import { Store } from '@ngrx/store';
 import { AppState } from 'src/app/store/reducers';
 import { getLabSamplesGroupedBymrNoAndFilteredByStatus } from '../../store/selectors/samples.selectors';
 import { AllocateTechnicianModalComponent } from '../allocate-technician-modal/allocate-technician-modal.component';
-import { MatDialog } from '@angular/material/dialog';
+import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import {
   allocateTechnicianToLabTest,
   loadAllLabSamples,

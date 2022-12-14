@@ -6,7 +6,7 @@ import { OrdersService } from "../../resources/order/services/orders.service";
 import { Observable } from "rxjs";
 import { VisitsService } from "../../resources/visits/services";
 import { getProcedures } from "src/app/core/helpers/get-setmembers-from-departments.helper";
-import { MatDialog } from "@angular/material/dialog";
+import { MatLegacyDialog as MatDialog } from "@angular/material/legacy-dialog";
 import { AttendProcedureOrderComponent } from "../attend-procedure-order/attend-procedure-order.component";
 import { Store } from "@ngrx/store";
 import { AppState } from "src/app/store/reducers";

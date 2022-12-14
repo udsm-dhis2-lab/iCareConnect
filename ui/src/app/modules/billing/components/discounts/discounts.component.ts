@@ -1,10 +1,10 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
-import { MatTableDataSource } from "@angular/material/table";
+import { MatLegacyTableDataSource as MatTableDataSource } from "@angular/material/legacy-table";
 import { Bill } from "../../models/bill.model";
 import { flatten } from "lodash";
 import { PaymentReceiptComponent } from "../payment-reciept/payment-reciept.component";
 import { BillConfirmationComponent } from "../bill-confirmation/bill-confirmation.component";
-import { MatDialog } from "@angular/material/dialog";
+import { MatLegacyDialog as MatDialog } from "@angular/material/legacy-dialog";
 import { SelectionModel } from "@angular/cdk/collections";
 import { BillItem } from "../../models/bill-item.model";
 import { ThisReceiver } from "@angular/compiler";

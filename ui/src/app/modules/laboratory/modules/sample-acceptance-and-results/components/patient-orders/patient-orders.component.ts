@@ -1,9 +1,9 @@
 import { Component, OnInit, Input, Output, EventEmitter } from "@angular/core";
 import * as _ from "lodash";
-import { FormControl } from "@angular/forms";
+import { UntypedFormControl } from "@angular/forms";
 import { Store } from "@ngrx/store";
 import { Observable } from "rxjs";
-import { MatDialog } from "@angular/material/dialog";
+import { MatLegacyDialog as MatDialog } from "@angular/material/legacy-dialog";
 import { BarCodeModalComponent } from "../bar-code-modal/bar-code-modal.component";
 import { AppState } from "src/app/store/reducers";
 import {
@@ -47,7 +47,7 @@ export class PatientOrdersComponent implements OnInit {
   savedData: any = {};
   samplesCollected: any[];
 
-  selected = new FormControl(0);
+  selected = new UntypedFormControl(0);
 
   sampleValues = {};
 

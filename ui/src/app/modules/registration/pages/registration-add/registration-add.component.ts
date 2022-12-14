@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from "@angular/core";
-import { MatSnackBar } from "@angular/material/snack-bar";
+import { MatLegacySnackBar as MatSnackBar } from "@angular/material/legacy-snack-bar";
 import { Router } from "@angular/router";
 import { Store } from "@ngrx/store";
 import {
@@ -20,7 +20,7 @@ import { LocationService } from "src/app/core/services";
 import { tail, filter, keyBy, groupBy, uniqBy, uniq } from "lodash";
 import { StartVisitModelComponent } from "../../components/start-visit-model/start-visit-model.component";
 import { VisitStatusConfirmationModelComponent } from "../../components/visit-status-confirmation-model/visit-status-confirmation-model.component";
-import { MatDialog } from "@angular/material/dialog";
+import { MatLegacyDialog as MatDialog } from "@angular/material/legacy-dialog";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import {
   Notification,

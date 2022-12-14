@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from "@angular/core";
-import { MatDialog } from "@angular/material/dialog";
+import { MatLegacyDialog as MatDialog } from "@angular/material/legacy-dialog";
 import { Observable, of } from "rxjs";
 import { map } from "rxjs/operators";
 import { LocationService } from "src/app/core/services";

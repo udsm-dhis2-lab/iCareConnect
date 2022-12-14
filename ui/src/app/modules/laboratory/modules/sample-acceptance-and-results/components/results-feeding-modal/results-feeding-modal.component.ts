@@ -1,9 +1,9 @@
 import { Component, Inject, OnInit } from "@angular/core";
 import {
-  MatDialog,
-  MatDialogRef,
-  MAT_DIALOG_DATA,
-} from "@angular/material/dialog";
+  MatLegacyDialog as MatDialog,
+  MatLegacyDialogRef as MatDialogRef,
+  MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA,
+} from "@angular/material/legacy-dialog";
 import { Store } from "@ngrx/store";
 import { forkJoin, Observable, of, zip } from "rxjs";
 import * as _ from "lodash";
@@ -259,6 +259,10 @@ export class ResultsFeedingModalComponent implements OnInit {
       type: "text",
       controlType: "textarea",
     });
+  }
+
+  onGetFormData(val: any, parameter: any): void {
+    this.values[parameter?.uuid] = val;
   }
 
   loadSampleByUuid(): void {
@@ -748,6 +752,51 @@ export class ResultsFeedingModalComponent implements OnInit {
         this.savingMessage[parameter?.uuid + "-" + signOff] = null;
       }
     });
+
+    this.getLoadingAndTestOrdersData();
+  }
+
+  onSaveSignOffForParameters(e, item, signOff, currentSample, allocation) {
+    e.stopPropagation();
+
+    const approvalStatuses = item?.order?.concept?.setMembers
+      ?.map((parameter: any) => {
+        this.savingMessage[parameter?.uuid + "-first"] =
+          signOff == "second" ? false : true;
+        this.savingMessage[parameter?.uuid + "-" + signOff] = true;
+        const approvalStatus = {
+          status: "APPROVED",
+          remarks: signOff == "first" ? "APPROVED" : "SECOND_APPROVAL",
+          user: {
+            uuid: this.userUuid,
+          },
+          testAllocation: {
+            uuid: item?.allocationsPairedBySetMember[parameter?.uuid]
+              ?.allocationUuid,
+          },
+        };
+        if (
+          item?.allocationsPairedBySetMember[parameter?.uuid]?.results?.length >
+          0
+        ) {
+          return approvalStatus;
+        }
+      })
+      ?.filter((approvalStatus) => approvalStatus);
+
+    this.store.dispatch(
+      saveLabTestResultsStatus({
+        resultsStatus: approvalStatuses,
+        sampleDetails: currentSample,
+        concept: item?.order?.concept,
+        allocation,
+        isResultAnArray: true,
+      })
+    );
+
+    this.savingLabResultsStatusState$ = this.store.select(
+      getSavingLabTestResultsStatusState
+    );
 
     this.getLoadingAndTestOrdersData();
   }

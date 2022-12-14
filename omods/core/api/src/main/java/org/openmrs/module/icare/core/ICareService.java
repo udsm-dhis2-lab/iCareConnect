@@ -141,5 +141,4 @@ public interface ICareService extends OpenmrsService {
 	String verifyExternalSystemCredentials(String username, String password, String systemKey) throws IOException,
 	        URISyntaxException;
 	
-	String voidOrder(String uuid, String voidReason) throws IOException;
 }

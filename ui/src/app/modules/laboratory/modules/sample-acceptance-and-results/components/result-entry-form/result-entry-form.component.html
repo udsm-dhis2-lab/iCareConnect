@@ -1,0 +1,5 @@
+<app-form
+  *ngIf="formField"
+  [fields]="[formField]"
+  (formUpdate)="onFormUpdate($event)"
+></app-form>

@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from "@angular/core";
-import { MatRadioChange } from "@angular/material/radio";
+import { MatLegacyRadioChange as MatRadioChange } from "@angular/material/legacy-radio";
 import { Store } from "@ngrx/store";
 import { Observable } from "rxjs";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
@@ -39,6 +39,8 @@ export class RegisterSampleComponent implements OnInit {
   labNumberCharactersCount$: Observable<string>;
   testsFromExternalSystemsConfigs$: Observable<any[]>;
   labLocations$: Observable<any>;
+
+  selectedTabGroup: string = "NEW";
   constructor(
     private samplesService: SamplesService,
     private systemSettingsService: SystemSettingsService,
@@ -114,5 +116,10 @@ export class RegisterSampleComponent implements OnInit {
       this.samplesService.getCollectedSamplesByPaginationDetails(
         paginationParameters
       );
+  }
+
+  setTabGroup(event: Event, group: string): void {
+    event.stopPropagation();
+    this.selectedTabGroup = group;
   }
 }

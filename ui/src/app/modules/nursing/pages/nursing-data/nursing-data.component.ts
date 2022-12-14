@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from "@angular/core";
-import { FormControl } from "@angular/forms";
-import { MatDialog } from "@angular/material/dialog";
+import { UntypedFormControl } from "@angular/forms";
+import { MatLegacyDialog as MatDialog } from "@angular/material/legacy-dialog";
 import { select, Store } from "@ngrx/store";
 import { map } from "lodash";
 import { Observable } from "rxjs";
@@ -69,7 +69,7 @@ export class NursingDataComponent implements OnInit {
 
   privileges$: Observable<any>;
   applicableForms: any[];
-  selectedTab = new FormControl(0);
+  selectedTab = new UntypedFormControl(0);
   doesPatientHasPendingPaymentForTheCurrentVisitType$: Observable<boolean>;
   activeVisitDeathStatus$: Observable<boolean>;
   billLoadingState$: Observable<boolean>;

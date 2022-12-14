@@ -1,9 +1,9 @@
 import { Component, OnInit, Input } from '@angular/core';
 import * as _ from 'lodash';
-import { FormControl } from '@angular/forms';
+import { UntypedFormControl } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
-import { MatDialog } from '@angular/material/dialog';
+import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { SampleTrackingModalComponent } from '../sample-tracking-modal/sample-tracking-modal.component';
 import { AppState } from 'src/app/store/reducers';
 import { groupLabOrdersBySpecimenSources } from 'src/app/shared/helpers/sample-types.helper';
@@ -50,7 +50,7 @@ export class SampleTrackingComponent implements OnInit {
   savedData: any = {};
   searchingText: string = '';
 
-  selected = new FormControl(0);
+  selected = new UntypedFormControl(0);
   // New
   samplesToBeTracked$: Observable<any[]>;
   rejectedSamples$: Observable<any[]>;

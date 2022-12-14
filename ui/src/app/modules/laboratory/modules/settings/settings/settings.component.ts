@@ -1,5 +1,5 @@
 import { Component, OnInit } from "@angular/core";
-import { FormControl } from "@angular/forms";
+import { UntypedFormControl } from "@angular/forms";
 import { Router } from "@angular/router";
 import { Store } from "@ngrx/store";
 import { Observable } from "rxjs";
@@ -13,7 +13,7 @@ import { LISConfigurationsModel } from "../../../resources/models/lis-configurat
   styleUrls: ["./settings.component.scss"],
 })
 export class SettingsComponent implements OnInit {
-  selectedTab = new FormControl(0);
+  selectedTab = new UntypedFormControl(0);
 
   LISConfigurations$: Observable<LISConfigurationsModel>;
   constructor(private router: Router, private store: Store<AppState>) {}

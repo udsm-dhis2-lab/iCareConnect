@@ -29,7 +29,7 @@ import {
   getUserAssignedLocations,
 } from "src/app/store/selectors/current-user.selectors";
 import { UserGet } from "src/app/shared/resources/openmrs";
-import { MatDialog, MatDialogRef } from "@angular/material/dialog";
+import { MatLegacyDialog as MatDialog, MatLegacyDialogRef as MatDialogRef } from "@angular/material/legacy-dialog";
 import { LocationSelectModalComponent } from "src/app/shared/components/location-select-modal/location-select-modal.component";
 import { showSearchPatientOnMenu } from "src/app/store/selectors/ui.selectors";
 import { ChangePasswordComponent } from "../change-password/change-password.component";

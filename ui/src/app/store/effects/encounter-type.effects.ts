@@ -1,14 +1,13 @@
-import { ThrowStmt } from "@angular/compiler";
 import { Injectable } from "@angular/core";
-import { Actions, createEffect, ofType, OnInitEffects } from "@ngrx/effects";
-import { Action, Store } from "@ngrx/store";
+import { Actions, createEffect, ofType } from "@ngrx/effects";
+import { Store } from "@ngrx/store";
 import { from, of } from "rxjs";
 import {
   catchError,
   map,
   switchMap,
   tap,
-  withLatestFrom,
+  withLatestFrom
 } from "rxjs/operators";
 import { AuthService } from "src/app/core/services/auth.service";
 import { EncounterType } from "src/app/shared/models/encounter-type.model";
@@ -17,7 +16,7 @@ import {
   initiateEncounterType,
   loadEncounterTypes,
   loadEncounterTypesFailed,
-  upsertEncounterTypes,
+  upsertEncounterTypes
 } from "../actions/encounter-type.actions";
 import { AppState } from "../reducers";
 import { getAllEncounterTypes } from "../selectors/encounter-type.selectors";

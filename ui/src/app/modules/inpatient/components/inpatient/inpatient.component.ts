@@ -1,6 +1,6 @@
 import { Component, Input, OnInit, Provider } from "@angular/core";
-import { FormControl } from "@angular/forms";
-import { MatDialog } from "@angular/material/dialog";
+import { UntypedFormControl } from "@angular/forms";
+import { MatLegacyDialog as MatDialog } from "@angular/material/legacy-dialog";
 import { select, Store } from "@ngrx/store";
 import { Observable } from "rxjs";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
@@ -56,7 +56,7 @@ export class InpatientComponent implements OnInit {
   forms$: Observable<any[]>;
   observations$: Observable<any>;
 
-  selectedTab = new FormControl(0);
+  selectedTab = new UntypedFormControl(0);
   lastBedOrder: any;
   observationsGroupedByConcept$: Observable<any>;
 
