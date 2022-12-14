@@ -416,13 +416,19 @@ public class LaboratoryController {
 		return savedResultsResponse;
 
 	}
+
+
+	@RequestMapping(value = "resultsinstrument", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> saveResultsInstrument(@RequestBody Map<String, Object> resultsInstrument) throws Exception {
+		Map<String, Object> savedResultsInstrumentResponse = laboratoryService.saveResultsInstrument(resultsInstrument);
+		return savedResultsInstrumentResponse;
+	}
 	
 	@RequestMapping(value = "results", method = RequestMethod.GET)
 	@ResponseBody
 	public List<Result> getResults() {
-		
 		return laboratoryService.getResults();
-		
 	}
 	
 	@RequestMapping(value = "allocationstatus", method = RequestMethod.POST)
