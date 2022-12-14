@@ -23,6 +23,27 @@
     <mat-tab-group>
       <mat-tab label="Result Entry & Review">
         <div class="p-2">
+          <div class="d-flex justify-content-end mb-2">
+            <mat-radio-group class="registration-category">
+              <mat-radio-button
+                (change)="getSelection($event)"
+                [value]="'FULLY_SPECIFIED'"
+                [checked]="preferredName === 'FULLY_SPECIFIED'"
+                color="primary"
+              >
+                Fully specified name
+              </mat-radio-button>
+              <mat-radio-button
+                (change)="getSelection($event)"
+                class="ml-2"
+                [value]="'SHORT'"
+                [checked]="preferredName === 'SHORT'"
+                color="primary"
+              >
+                Short name
+              </mat-radio-button>
+            </mat-radio-group>
+          </div>
           <div style="max-height: 75vh; overflow: auto">
             <div class="loading-overlay" *ngIf="saving">
               <div class="text-center">
@@ -88,6 +109,7 @@
                         >
                           <div class="w-100">
                             <app-test-parameter-entry
+                              *ngIf="preferredName"
                               [parameterUuid]="
                                 allocationData?.allocation?.parameter?.uuid
                               "
@@ -100,7 +122,7 @@
                                 !data?.LISConfigurations?.isLIS
                               "
                               [isLIS]="data?.LISConfigurations?.isLIS"
-                              [conceptNameType]=""
+                              [conceptNameType]="preferredName"
                               (data)="
                                 onGetFieldData(
                                   $event,
