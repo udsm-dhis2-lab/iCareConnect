@@ -46,7 +46,9 @@
                     <td
                       rowspan="3"
                       *ngIf="
-                        params?.sampleAllocations[0]?.allocations[0]?.isSet
+                        params?.sampleAllocations?.length > 1 ||
+                        (params?.sampleAllocations?.length == 1 &&
+                          params?.sampleAllocations[0]?.allocations[0]?.isSet)
                       "
                       [ngStyle]="{
                         'width:': params?.sampleAllocations[0]?.allocations[0]
@@ -84,9 +86,6 @@
                           class="entry-col"
                           *ngFor="let allocationData of order?.allocations"
                         >
-                          <div class="w-100 ml-2">
-                            {{ allocationData?.allocation?.parameter?.display }}
-                          </div>
                           <div class="w-100">
                             <app-test-parameter-entry
                               [parameterUuid]="
@@ -100,6 +99,8 @@
                                 data?.actionType === 'review' &&
                                 !data?.LISConfigurations?.isLIS
                               "
+                              [isLIS]="data?.LISConfigurations?.isLIS"
+                              [conceptNameType]=""
                               (data)="
                                 onGetFieldData(
                                   $event,

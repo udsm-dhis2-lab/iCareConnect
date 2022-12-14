@@ -8,6 +8,8 @@
     *ngIf="params?.testParameter"
     [parameter]="params?.testParameter"
     [disabled]="disabled"
+    [isLIS]="isLIS"
+    [conceptNameType]="conceptNameType"
     [value]="latestResult?.value"
     [multipleResultsAttributeType]="multipleResultsAttributeType"
     (formData)="onGetFormData($event, params?.testParameter)"
