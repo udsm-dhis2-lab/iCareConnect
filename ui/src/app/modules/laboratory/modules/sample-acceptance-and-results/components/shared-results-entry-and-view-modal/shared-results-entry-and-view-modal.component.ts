@@ -11,6 +11,10 @@ import { omit } from "lodash";
 import { HttpClient } from "@angular/common/http";
 import { OrdersService } from "src/app/shared/resources/order/services/orders.service";
 import { zip } from "cypress/types/lodash";
+import { VisitsService } from "src/app/shared/resources/visits/services";
+import { Store } from "@ngrx/store";
+import { AppState } from "src/app/store/reducers";
+import { getProviderDetails } from "src/app/store/selectors/current-user.selectors";
 
 @Component({
   selector: "app-shared-results-entry-and-view-modal",
@@ -32,16 +36,21 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
   remarksData: any = {};
   showSideNavigation: boolean = false;
   selectedAllocation: any;
+  visitDetails$: Observable<any>;
+  providerDetails$: Observable<any>;
   constructor(
     private dialogRef: MatDialogRef<SharedResultsEntryAndViewModalComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     private sampleAllocationService: SampleAllocationService,
     private systemSettingsService: SystemSettingsService,
     private httpClient: HttpClient,
-    private ordersService: OrdersService
+    private ordersService: OrdersService,
+    private visitService: VisitsService,
+    private store: Store<AppState>
   ) {}
 
   ngOnInit(): void {
+    this.providerDetails$ = this.store.select(getProviderDetails);
     this.userUuid = localStorage.getItem("userUuid");
     this.multipleResultsAttributeType$ = this.systemSettingsService
       .getSystemSettingsByKey(
@@ -58,6 +67,36 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
         })
       );
     this.getAllocations();
+    this.visitDetails$ = this.visitService
+      .getVisitDetailsByVisitUuid(this.data?.sample?.visit?.uuid, {
+        v: "custom:(encounters:(uuid,display,obs,orders,encounterDatetime,encounterType,location))",
+      })
+      .pipe(
+        map((response) => {
+          if (response) {
+            return {
+              ...response,
+              encounters: response?.encounters?.map((encounter) => {
+                return {
+                  ...encounter,
+                  orders: encounter?.orders?.map((order) => {
+                    return {
+                      ...order,
+                      concept: {
+                        ...order?.concept,
+                        display:
+                          order?.concept?.display?.indexOf(":") > -1
+                            ? order?.concept?.display?.split(":")[1]
+                            : order?.concept?.display,
+                      },
+                    };
+                  }),
+                };
+              }),
+            };
+          }
+        })
+      );
   }
 
   toggleSideNavigation(event: Event, allocation?: any): void {
