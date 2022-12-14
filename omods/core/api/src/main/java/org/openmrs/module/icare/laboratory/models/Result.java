@@ -39,7 +39,7 @@ public class Result extends BaseOpenmrsData implements java.io.Serializable {
 	
 	@Column(name = "abnormal")
 	private Boolean abnormal;
-
+	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "value_group_id", nullable = true)
 	private Result valueGroup;

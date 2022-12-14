@@ -416,8 +416,7 @@ public class LaboratoryController {
 		return savedResultsResponse;
 
 	}
-
-
+	
 	@RequestMapping(value = "resultsinstrument", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> saveResultsInstrument(@RequestBody Map<String, Object> resultsInstrument) throws Exception {

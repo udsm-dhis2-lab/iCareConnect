@@ -462,7 +462,7 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		    ArrayList.class);
 		System.out.println(resultsObject);
 	}
-
+	
 	@Test
 	public void testSaveResultsInstrument() throws Exception {
 		//Given
@@ -470,14 +470,15 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		Map<String, Object> resultsInstrument = (new ObjectMapper()).readValue(dto, Map.class);
 		// When
 		MockHttpServletRequest newPostRequest = newPostRequest("lab/resultsinstrument", resultsInstrument);
-
+		
 		MockHttpServletResponse handle = handle(newPostRequest);
-
+		
 		// Then
-		Map<String, Object> instrumentResponse = (new ObjectMapper()).readValue(handle.getContentAsString(),
-				Map.class);
+		Map<String, Object> instrumentResponse = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
 		System.out.println(instrumentResponse);
-		assertThat("Instrument should match", ((Map)((Map)((ArrayList)instrumentResponse.get("results")).get(0)).get("instrument")).get("uuid"), is(((Map) resultsInstrument.get("instrument")).get("uuid")));
+		assertThat("Instrument should match",
+		    ((Map) ((Map) ((ArrayList) instrumentResponse.get("results")).get(0)).get("instrument")).get("uuid"),
+		    is(((Map) resultsInstrument.get("instrument")).get("uuid")));
 	}
 	
 	@Test
