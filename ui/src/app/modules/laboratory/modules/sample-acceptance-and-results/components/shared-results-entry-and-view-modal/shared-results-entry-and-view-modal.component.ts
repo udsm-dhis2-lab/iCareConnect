@@ -15,6 +15,7 @@ import { VisitsService } from "src/app/shared/resources/visits/services";
 import { Store } from "@ngrx/store";
 import { AppState } from "src/app/store/reducers";
 import { getProviderDetails } from "src/app/store/selectors/current-user.selectors";
+import { MatRadioChange } from "@angular/material/radio";
 
 @Component({
   selector: "app-shared-results-entry-and-view-modal",
@@ -38,6 +39,7 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
   selectedAllocation: any;
   visitDetails$: Observable<any>;
   providerDetails$: Observable<any>;
+  preferredName: string;
   constructor(
     private dialogRef: MatDialogRef<SharedResultsEntryAndViewModalComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
@@ -50,6 +52,7 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.preferredName = this.data?.LISConfigurations?.isLIS ? "SHORT" : "";
     this.providerDetails$ = this.store.select(getProviderDetails);
     this.userUuid = localStorage.getItem("userUuid");
     this.multipleResultsAttributeType$ = this.systemSettingsService
@@ -103,6 +106,13 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
     event.stopPropagation();
     this.selectedAllocation = allocation ? allocation : this.selectedAllocation;
     this.showSideNavigation = !this.showSideNavigation;
+  }
+
+  getSelection(event: MatRadioChange): void {
+    this.preferredName = null;
+    setTimeout(() => {
+      this.preferredName = event?.value;
+    }, 100);
   }
 
   getAllocations(): void {
