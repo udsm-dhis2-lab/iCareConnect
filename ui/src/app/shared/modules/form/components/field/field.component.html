@@ -203,6 +203,11 @@
     >
       <mat-icon>arrow_drop_down</mat-icon>
     </span>
+    <!-- 
+      Add search loading when waiting for the members subscriber to resolve
+     -->
+    <mat-spinner diameter="20" *ngIf="!(members$ | async)"></mat-spinner>
+
     <mat-autocomplete #auto="matAutocomplete">
       <ng-container *ngFor="let option of members$ | async">
         <mat-option

@@ -148,6 +148,7 @@ export class FieldComponent {
   searchItem(event: any, field?: any): void {
     // event.stopPropagation();
     const searchingText = event.target.value;
+    console.log("search", searchingText)
     const parameters = {
       q: searchingText,
       limit: 50,
@@ -164,16 +165,20 @@ export class FieldComponent {
           ? "custom:(uuid,display,datatype,conceptClass,mappings)"
           : "custom:(uuid,display)",
     };
+    console.log("Searching...")
     this.members$ = this.formService.searchItem(
       parameters,
       this.field?.searchControlType,
       this.field?.filteringItems,
       this.field
     );
+    console.log(this.members$)
+    console.log("completed")
   }
 
   searchItemFromOptions(event, field): void {
     const searchingText = event.target.value;
+    console.log(searchingText)
     this.members$ = of(
       field?.options?.filter(
         (option) =>

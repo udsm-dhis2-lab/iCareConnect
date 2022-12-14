@@ -51,10 +51,14 @@ export class GeneralDispensingFormComponent implements OnInit {
   savingOrder: boolean;
   savingOrderSuccess: boolean;
   savedOrder: DrugOrder;
+  searching: boolean;
   dispensingLocations$: Observable<any>;
   countOfDispensingFormFieldsWithValues: number = 0;
   isFormValid: boolean;
   savingError: boolean = false;
+
+  loading: boolean = false;
+  test: boolean;
 
   drugConceptField: Dropdown;
   drugDurationField: Textbox;
@@ -108,6 +112,7 @@ export class GeneralDispensingFormComponent implements OnInit {
       this.specificDrugConceptUuid
     ) {
       const drugs = await this.drugOrderService.getAllDrugs("full");
+      // console.log(drugs);
       this.drugConceptField = new Dropdown({
         options: drugs,
         key: "drug",
@@ -117,6 +122,8 @@ export class GeneralDispensingFormComponent implements OnInit {
         label: "Drug",
         searchControlType: "drugStock",
         shouldHaveLiveSearchForDropDownFields: true,
+        loading: true
+
       });
     } else {
       this.drugConceptField = new Dropdown({
@@ -129,6 +136,8 @@ export class GeneralDispensingFormComponent implements OnInit {
         value: null,
         searchTerm: "ICARE_GENERIC_DRUG",
         shouldHaveLiveSearchForDropDownFields: true,
+        loading: true
+
       });
     }
 
@@ -149,18 +158,51 @@ export class GeneralDispensingFormComponent implements OnInit {
     // });
   }
 
+  async onSearchChange(value: String) {
+    console.log(value);
+
+    this.loading = true;
+    const drugs = await this.drugOrderService.getAllDrugs("full");
+    console.log(drugs);
+    setTimeout(() => {
+      this.loading = false;
+    }, 7000);
+    this.drugConceptField = new Dropdown({
+      options: drugs,
+      key: "drug",
+      value: "drug",
+      required: true,
+      locationUuid: "7f65d926-57d6-4402-ae10-a5b3bcbf7986",
+      label: "Drug",
+      searchControlType: "drugStock",
+      shouldHaveLiveSearchForDropDownFields: true,
+    });
+  }
+
   onFormUpdate(formValues: FormValue, fieldItem?: string): void {
+    console.log(formValues.getValues()?.drug);
+    console.log(fieldItem)
+    // console.log(this.specificDrugConceptUuid)
+    // this.loading = true;
     this.isFormValid = formValues.isValid;
     this.formValues = { ...this.formValues, ...formValues.getValues() };
 
     if (formValues.getValues()?.drug?.value?.length > 0) {
+      // alert("this now")
+      this.loading = true;
       this.selectedDrug = formValues
         .getValues()
         ?.drug?.options?.filter(
           (option) => option?.name === formValues.getValues()?.drug?.value
         )[0];
+      this.loading = false;
     }
+
     if (fieldItem == "drug" && !this.specificDrugConceptUuid) {
+      this.searching = true;
+      // this.loading = true;
+
+      alert("hahsa");
       this.drugService
         .getDrugsUsingConceptUuid(this.formValues?.drug?.value)
         .subscribe((response) => {
@@ -185,6 +227,8 @@ export class GeneralDispensingFormComponent implements OnInit {
                 "key"
               ),
             });
+
+            this.searching = false;
           } else {
             this.strengthFormField = null;
           }
