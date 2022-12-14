@@ -853,6 +853,17 @@
                 referencedTableName="concept"/>
     </changeSet>
 
+    <changeSet id="add_foreign_key_for_lb_test_result" author="dennis-kibahila" dbms="mysql">
+
+        <sql>
+            ALTER TABLE lb_test_result
+            ADD CONSTRAINT lb_test_result_value_group_id_lb_test_result_test_result_id_fk
+            FOREIGN KEY (value_group_id) REFERENCES lb_test_result(test_result_id);
+        </sql>
+
+    </changeSet>
+
+
     <changeSet id="create_st_requisition" author="jesse-justin" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>

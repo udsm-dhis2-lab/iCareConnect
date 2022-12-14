@@ -40,6 +40,7 @@ public class Result extends BaseOpenmrsData implements java.io.Serializable {
 	@Column(name = "abnormal")
 	private Boolean abnormal;
 
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "value_group_id", nullable = true)
 	private Result valueGroup;
 	
@@ -74,7 +75,7 @@ public class Result extends BaseOpenmrsData implements java.io.Serializable {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "instrument_id", nullable = true)
 	private Concept instrument;
-
+	
 	public Integer getId() {
 		return id;
 	}
@@ -186,7 +187,7 @@ public class Result extends BaseOpenmrsData implements java.io.Serializable {
 	public void setValueComplex(String valueComplex) {
 		this.valueComplex = valueComplex;
 	}
-
+	
 	public static Result fromMap(Map<String, Object> map) {
 		Result result = new Result();
 		

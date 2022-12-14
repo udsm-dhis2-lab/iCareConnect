@@ -82,7 +82,7 @@ public class LaboratoryController {
 			newSample.setLocation(location);
 			System.out.println(location.getName());
 		}
-		if(sample.get("batch") != null){
+		if (sample.get("batch") != null) {
 			Batch batch = laboratoryService.getBatchByUuid(((Map) sample.get("batch")).get("uuid").toString());
 			newSample.setBatch(batch);
 		}
@@ -831,7 +831,7 @@ public class LaboratoryController {
 		BatchSetStatus savedbatchSetStatus = laboratoryService.addBatchSetStatus(batchSetStatus);
 		
 		return savedbatchSetStatus.toMap();
-
+		
 	}
-
+	
 }
