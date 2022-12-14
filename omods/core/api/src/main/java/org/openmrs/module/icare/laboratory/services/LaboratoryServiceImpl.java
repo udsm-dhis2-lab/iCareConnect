@@ -400,8 +400,9 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 				result.setValueDrug(drug);
 			}
 
-			if (result.getValueGroup() != null && this.getResultsByUuid(result.getValueGroup().getUuid()) != null) {
+			if (result.getValueGroup() != null && result.getValueGroup().getUuid() != null) {
 				Result valueGroup = this.resultDAO.findByUuid(result.getValueGroup().getUuid());
+				System.out.println(valueGroup.getValueText());
 				result.setValueGroup(valueGroup);
 			}
 
@@ -434,6 +435,28 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 			resultResponses.add(response.toMap());
 		}
 		return  resultResponses;
+	}
+
+	public Map<String, Object> saveResultsInstrument(Map<String, Object> resultsInstrumentObject)throws Exception  {
+		Concept instrument = new Concept();
+		List responses = new ArrayList();
+		if (resultsInstrumentObject.get("instrument") == null || ((Map) resultsInstrumentObject.get("instrument")).get("uuid") == null) {
+			throw new Exception("Instrument is not set");
+		} else {
+//			instrument.setUuid(((Map) resultsInstrumentObject.get("instrument")).get("uuid").toString());
+		}
+
+		for (Map<String, Object> resultObject: (ArrayList<Map<String, Object>>) resultsInstrumentObject.get("results")) {
+			Result result = new Result();
+			result = resultDAO.findByUuid(resultObject.get("uuid").toString());
+			String instrumentUuid = ((Map) resultsInstrumentObject.get("instrument")).get("uuid").toString();
+			instrument = Context.getConceptService().getConceptByUuid(instrumentUuid);
+			Result response = this.resultDAO.updateResultsBySettingInstrument(result, instrument);
+			responses.add(response.toMap());
+		}
+		Map<String, Object> returnResponse = new HashMap<>();
+		returnResponse.put("results", responses);
+		return returnResponse;
 	}
 	
 	@Override
