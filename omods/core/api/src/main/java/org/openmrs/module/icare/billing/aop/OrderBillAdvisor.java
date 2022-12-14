@@ -186,7 +186,14 @@ public class OrderBillAdvisor extends StaticMethodMatcherPointcutAdvisor impleme
 					String stockEnabled= administrationService.getGlobalProperty(ICareConfig.STOCK_ENABLE);
 					if(!(stockEnabled != null && stockEnabled.equals("false"))){
 						List<Stock> stockList = storeService.getStockByItemAndLocations(item.getUuid(), locationUuids);
-						if (stockList.size() == 0) {
+
+						//Getting the total quantity of an item in all the dispensing units
+						Double totalQuantity=0.00;
+						for(Stock stock : stockList){
+							totalQuantity = stock.getQuantity() + totalQuantity;
+						}
+
+						if (order.getQuantity() > totalQuantity) {
 							throw new StockOutException(item.getDisplayString() + " is stocked out.");
 						}
 					}
