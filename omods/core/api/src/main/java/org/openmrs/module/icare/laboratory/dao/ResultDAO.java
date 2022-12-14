@@ -11,12 +11,12 @@ import java.util.Calendar;
 import java.util.List;
 
 public class ResultDAO extends BaseDAO<Result> {
-
-    public Result getResultById(Integer id) {
-        DbSession session = this.getSession();
-        String queryStr = "SELECT re FROM Result re \n" + "WHERE id= :id";
-        Query query = session.createQuery(queryStr);
-        query.setParameter("id", id);
-        return  (Result)query.list().get(0);
-    }
+	
+	public Result getResultById(Integer id) {
+		DbSession session = this.getSession();
+		String queryStr = "SELECT re FROM Result re \n" + "WHERE id= :id";
+		Query query = session.createQuery(queryStr);
+		query.setParameter("id", id);
+		return (Result) query.list().get(0);
+	}
 }
