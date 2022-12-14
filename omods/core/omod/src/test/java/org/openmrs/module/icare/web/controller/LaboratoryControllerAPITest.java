@@ -631,7 +631,7 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		List<Map<String, Object>> createdbatchSets = (new ObjectMapper()).readValue(handle.getContentAsString(), List.class);
 		
 		assertThat("created 1 batchSet", createdbatchSets.size(), is(2));
-
+		
 		//2. Getting batchSets
 		//When
 		MockHttpServletRequest newGetRequest = newGetRequest("lab/batchsets", new Parameter("startDate", "2022-12-09"),
