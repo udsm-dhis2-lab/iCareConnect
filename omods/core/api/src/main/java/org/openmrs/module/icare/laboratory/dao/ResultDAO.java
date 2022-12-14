@@ -14,6 +14,7 @@ import java.util.List;
 
 public class ResultDAO extends BaseDAO<Result> {
 
+
     public Result getResultById(Integer id) {
         DbSession session = this.getSession();
         String queryStr = "SELECT re FROM Result re \n" + "WHERE id= :id";
@@ -41,4 +42,5 @@ public class ResultDAO extends BaseDAO<Result> {
             return null;
         }
     }
+
 }

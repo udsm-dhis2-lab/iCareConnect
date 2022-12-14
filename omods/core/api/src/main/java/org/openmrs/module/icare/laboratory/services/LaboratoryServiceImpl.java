@@ -413,6 +413,7 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 
 			Date date = new Date();
 			result.setDateCreated(date);
+			System.out.println(result.getValueGroup());
 
 			Result response = this.resultDAO.save(result);
 
