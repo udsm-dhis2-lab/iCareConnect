@@ -53,6 +53,8 @@ public interface LaboratoryService extends OpenmrsService {
 	Result recordTestAllocationResults(Result result) throws Exception;
 	
 	List<Map<String, Object>> saveMultipleResults(List<Result> results) throws Exception;
+
+	Map<String, Object> saveResultsInstrument(Map<String, Object> resultsInstrumentObject) throws Exception;
 	
 	Sample getSampleByUuid(String sampleUuid);
 	
