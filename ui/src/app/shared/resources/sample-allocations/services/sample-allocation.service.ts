@@ -47,7 +47,20 @@ export class SampleAllocationService {
               )?.filter((result) => result?.authorizationIsReady) || []
             )?.length > 0;
           return {
-            ...groupedAllocations[key][0]?.order,
+            ...{
+              ...groupedAllocations[key][0]?.order,
+              concept: {
+                ...groupedAllocations[key][0]?.order?.concept,
+                display:
+                  groupedAllocations[key][0]?.order?.concept?.display?.indexOf(
+                    ":"
+                  ) > -1
+                    ? groupedAllocations[
+                        key
+                      ][0]?.order?.concept?.display?.split(":")[1]
+                    : groupedAllocations[key][0]?.order?.concept?.display,
+              },
+            },
             authorizationStatuses: flatten(
               groupedAllocations[key]?.map(
                 (allocation) =>
