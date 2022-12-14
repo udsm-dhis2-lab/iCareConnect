@@ -16,11 +16,16 @@ export class ResultEntryFormComponent implements OnInit {
   @Input() value: any;
   @Input() disabled: boolean;
   @Input() multipleResultsAttributeType: string;
+  @Input() conceptNameType: string;
+  @Input() isLIS: boolean;
   formField: Field<string>;
   @Output() formData: EventEmitter<any> = new EventEmitter<any>();
+  label: string;
   constructor() {}
 
   ngOnInit(): void {
+    this.conceptNameType =
+      !this.conceptNameType && this.isLIS ? "SHORT" : this.conceptNameType;
     this.hasMultipleAnswers =
       (
         this.parameter?.attributes?.filter(
@@ -28,12 +33,17 @@ export class ResultEntryFormComponent implements OnInit {
             attribute?.attributeType?.uuid == this.multipleResultsAttributeType
         ) || []
       )?.length > 0;
+    this.label = !this.conceptNameType
+      ? this.parameter?.display
+      : (this.parameter?.names?.filter(
+          (name) => name?.conceptNameType === this.conceptNameType
+        ) || [])[0]?.display;
     this.formField =
       this.parameter?.datatype?.display === "Numeric"
         ? new Textbox({
             id: this.parameter?.uuid,
             key: this.parameter?.uuid,
-            label: this.parameter?.display,
+            label: this.label,
             type: "number",
             value: this.value,
             disabled: this.disabled,
@@ -45,16 +55,21 @@ export class ResultEntryFormComponent implements OnInit {
         ? new Dropdown({
             id: this.parameter?.uuid,
             key: this.parameter?.uuid,
-            label: this.parameter?.display,
+            label: this.label,
             value: this.value,
             disabled: this.disabled,
             multiple: this.hasMultipleAnswers,
             options: this.parameter?.answers?.map((answer) => {
+              const answerLabel = !this.conceptNameType
+                ? answer?.display
+                : (answer?.names?.filter(
+                    (name) => name?.conceptNameType === this.conceptNameType
+                  ) || [])[0]?.display;
               return {
                 value: answer?.uuid,
                 key: answer?.uuid,
-                name: answer?.display,
-                label: answer?.display,
+                name: answerLabel,
+                label: answerLabel,
               };
             }),
             min: this.parameter?.min,
@@ -65,7 +80,7 @@ export class ResultEntryFormComponent implements OnInit {
         ? new ComplexDefaultFileField({
             id: this.parameter?.uuid,
             key: this.parameter?.uuid,
-            label: this.parameter?.display,
+            label: this.label,
             value: this.value,
             disabled: this.disabled,
             required: true,
@@ -73,7 +88,7 @@ export class ResultEntryFormComponent implements OnInit {
         : new Textbox({
             id: this.parameter?.uuid,
             key: this.parameter?.uuid,
-            label: this.parameter?.display,
+            label: this.label,
             type: "text",
             value: this.value,
             disabled: this.disabled,
