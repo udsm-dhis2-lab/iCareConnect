@@ -6,7 +6,7 @@ import javax.persistence.*;
 import java.util.Date;
 
 @Entity
-@Table(name="worksheet_sample_status")
+@Table(name="lb_worksheet_sample_status")
 public class WorksheetSampleStatus extends BaseOpenmrsData implements java.io.Serializable {
 
     @Id
@@ -27,9 +27,6 @@ public class WorksheetSampleStatus extends BaseOpenmrsData implements java.io.Se
     @Column(name = "remarks", length = 65535)
     private String remarks;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "timestamp", length = 19)
-    private Date timestamp;
 
 
     @Override
@@ -74,11 +71,5 @@ public class WorksheetSampleStatus extends BaseOpenmrsData implements java.io.Se
         this.worksheetSample = worksheetSample;
     }
 
-    public Date getTimestamp() {
-        return timestamp;
-    }
 
-    public void setTimestamp(Date timestamp) {
-        this.timestamp = timestamp;
-    }
 }
