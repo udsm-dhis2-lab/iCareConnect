@@ -5,19 +5,24 @@ import { MatLegacyTableDataSource as MatTableDataSource } from "@angular/materia
 import { ActivatedRoute, Router } from "@angular/router";
 import { Store } from "@ngrx/store";
 import { Observable } from "rxjs";
+import { map } from 'rxjs/operators';
 import { go } from "src/app/store/actions";
 import { AppState } from "src/app/store/reducers";
 import { getCurrentUserDetails } from "src/app/store/selectors/current-user.selectors";
 import { CaptureSignatureComponent } from "../../../../../shared/components/capture-signature/capture-signature.component";
 import { UserCreateModel } from "../../../models/user.model";
 import { UserService } from "../../../services/users.service";
+import { OnDestroy, VERSION} from "@angular/core"
+import { fromEvent, merge, of, Subscription} from "rxjs"
 
 @Component({
   selector: "app-user-management",
   templateUrl: "./user-management.component.html",
   styleUrls: ["./user-management.component.scss"],
 })
-export class UserManagementComponent implements OnInit, AfterViewInit {
+export class UserManagementComponent implements OnInit, AfterViewInit, OnDestroy {
+  networkStatus: boolean = false;
+  networkStatus$: Subscription = Subscription.EMPTY;
   itemSearchTerm: string;
   addingUserItem: boolean;
   currentUser$: Observable<any>;
@@ -46,7 +51,27 @@ export class UserManagementComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     // TODO: current user to be used for privilages control
     this.currentUser$ = this.store.select(getCurrentUserDetails);
+    this.checkNetworkStatus();
   }
+
+  ngOnDestroy(): void {
+    this.networkStatus$.unsubscribe();
+}
+
+// To check internet connection stability
+checkNetworkStatus() {
+    this.networkStatus = navigator.onLine;
+    this.networkStatus$ = merge(
+      of(null),
+      fromEvent(window, 'online'),
+  fromEvent(window, 'offline')
+)
+  .pipe(map(() => navigator.onLine))
+  .subscribe(status => {
+        console.log('status', status);
+    this.networkStatus = status;
+  });
+}
 
   ngAfterViewInit() {
     if (this.dataSource) {

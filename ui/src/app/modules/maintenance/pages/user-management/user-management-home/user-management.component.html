@@ -1,6 +1,12 @@
 <mat-card>
   <div class="w-100 d-flex justify-content-between mb-2">
     <div class="h4 font-weight-normal">User Management</div>
+    <div>
+        <h2>
+      Internet Connection Status:
+      {{ networkStatus ? "IS CONNECTED" : "NOT CONNECTED" }}
+        </h2>
+    </div>
     <button
       mat-flat-button
       color="primary"
@@ -13,8 +19,8 @@
         color="primary"
         *ngIf="addingUserItem"
         [diameter]="20"
-        style="display: inline-block !important; margin-right: 4px"
-      ></mat-spinner>
+        style="display: inline-block !important; margin-right: 4px">
+     </mat-spinner>
       <span>Add User</span>
     </button>
   </div>
