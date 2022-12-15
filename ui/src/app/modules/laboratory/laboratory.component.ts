@@ -1,5 +1,5 @@
-import { Component, OnInit } from "@angular/core";
-import { Observable } from "rxjs";
+import { Component, OnDestroy, OnInit } from "@angular/core";
+import { Observable, Subscription } from "rxjs";
 import { Store } from "@ngrx/store";
 import { ActivatedRoute, NavigationEnd, Router } from "@angular/router";
 import { map } from "rxjs/operators";
@@ -32,7 +32,7 @@ import { Title } from "@angular/platform-browser";
   templateUrl: "./laboratory.component.html",
   styleUrls: ["./laboratory.component.scss"],
 })
-export class LaboratoryComponent implements OnInit {
+export class LaboratoryComponent implements OnInit, OnDestroy {
   title = "Laboratory";
   billingInformation$: Observable<any>;
   results$: Observable<any>;
@@ -68,6 +68,7 @@ export class LaboratoryComponent implements OnInit {
    */
 
   LISConfigurations$: Observable<LISConfigurationsModel>;
+  subscription: Subscription = null;
   constructor(
     private store: Store<AppState>,
     private router: Router,
@@ -79,7 +80,7 @@ export class LaboratoryComponent implements OnInit {
     // this.store.dispatch(loadLISConfigurations());
 
     this.LISConfigurations$ = this.store.select(getLISConfigurations);
-    router.events.subscribe((currentRoute) => {
+    this.subscription = router.events.subscribe((currentRoute) => {
       // console.log('this :: ', currentRoute instanceof NavigationEnd);
       if (currentRoute instanceof NavigationEnd) {
         // console.log(currentRoute);
@@ -92,17 +93,15 @@ export class LaboratoryComponent implements OnInit {
               path: ["/laboratory/sample-acceptance-and-results"],
             })
           );
-        } 
-        // else if (currentRoute?.url?.includes("/dashboard")) {
-        //   this.enableDate(this.datesRangeDifference, this.showDate);
-        //   this.currentSubModule = "dashboard";
-        //   this.store.dispatch(
-        //     go({
-        //       path: ["/laboratory/dashboard-lab"],
-        //     })
-        //   );
-        // } 
-        else if (currentRoute?.url?.includes("/sample-tracking")) {
+        } else if (currentRoute?.url?.includes("/dashboard")) {
+          this.enableDate(this.datesRangeDifference, this.showDate);
+          this.currentSubModule = "dashboard";
+          this.store.dispatch(
+            go({
+              path: ["/laboratory/dashboard-lab"],
+            })
+          );
+        } else if (currentRoute?.url?.includes("/sample-tracking")) {
           this.enableDate(this.datesRangeDifference, this.showDate);
           this.currentSubModule = "tracking";
           this.store.dispatch(
@@ -160,7 +159,7 @@ export class LaboratoryComponent implements OnInit {
       }
     });
   }
-
+ 
   ngOnInit() {
     this.LISConfigurations$.subscribe((response) => {
       if (response && response?.isLIS) {
@@ -335,5 +334,9 @@ export class LaboratoryComponent implements OnInit {
       }
       //this.refreshPage()
     }
+  }
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
+    
   }
 }
