@@ -6,17 +6,17 @@ import javax.persistence.*;
 import java.util.Date;
 
 @Entity
-@Table(name = "lb_worksheet_status")
-public class WorksheetStatus extends BaseOpenmrsData implements java.io.Serializable {
+@Table(name="worksheet_sample_status")
+public class WorksheetSampleStatus extends BaseOpenmrsData implements java.io.Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "worksheet_status_id",unique = true,nullable = false)
+    @Column(name = "worksheet_sample_status_id",unique = true,nullable = false)
     private Integer id;
 
     @ManyToOne
-    @JoinColumn(name = "worksheet_id", nullable = false)
-    private Worksheet worksheet;
+    @JoinColumn(name = "worksheet_sample_id",nullable = false)
+    private WorksheetSample worksheetSample;
 
     @Column(name = "category", length = 32)
     private String Category;
@@ -31,6 +31,7 @@ public class WorksheetStatus extends BaseOpenmrsData implements java.io.Serializ
     @Column(name = "timestamp", length = 19)
     private Date timestamp;
 
+
     @Override
     public Integer getId() {
         return id;
@@ -41,20 +42,20 @@ public class WorksheetStatus extends BaseOpenmrsData implements java.io.Serializ
         this.id=id;
     }
 
-    public Worksheet getWorksheet() {
-        return worksheet;
-    }
-
-    public void setWorksheet(Worksheet worksheet) {
-        this.worksheet = worksheet;
-    }
-
     public String getCategory() {
         return Category;
     }
 
     public void setCategory(String category) {
         Category = category;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public String getRemarks() {
@@ -65,12 +66,12 @@ public class WorksheetStatus extends BaseOpenmrsData implements java.io.Serializ
         this.remarks = remarks;
     }
 
-    public String getStatus() {
-        return status;
+    public WorksheetSample getWorksheetSample() {
+        return worksheetSample;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public void setWorksheetSample(WorksheetSample worksheetSample) {
+        this.worksheetSample = worksheetSample;
     }
 
     public Date getTimestamp() {
