@@ -1,0 +1,159 @@
+{
+  "uuid": "a000cb34-9ec1-4344-a1c8-f692232f6edd",
+  "display": "Registration",
+  "name": "Registration",
+  "description": null,
+  "formFields": [
+    {
+      "uuid": "field-uuid",
+      "name": "Patient Type",
+      "description": "For capturing weight of a person",
+      "personAttribute": "d52cb407-290d-4e45-a4db-be115ac29b03",
+      "typeId": "d52cb407-290d-4e45-a4db-be115ac29b03",
+      "selectMultiple": false,
+      "fieldNumber": 4,
+      "fieldPart": "1",
+      "pageNumber": 1,
+      "minOccurs": null,
+      "maxOccurs": null,
+      "required": false,
+      "sortWeight": 650,
+      "retired": false,
+      "rules": [
+        {
+          "trigger": "ON_CHANGE",
+          "conditions": [
+            {
+              "condition": "FIELD_VALUE=='Student'",
+              "actions": [
+                {
+                  "action": "SHOW",
+                  "field": "student-id-uuid"
+                },
+                {
+                  "action": "HIDE",
+                  "field": "staff-id-uuid"
+                }
+              ]
+            },
+            {
+              "condition": "FIELD_VALUE=='Staff'",
+              "actions": [
+                {
+                  "action": "SHOW",
+                  "field": "staff-id-uuid"
+                },
+                {
+                  "action": "HIDE",
+                  "field": "student-id-uuid"
+                }
+              ]
+            },
+            {
+              "condition": "FIELD_VALUE=='Other'",
+              "actions": [
+                {
+                  "action": "HIDE",
+                  "field": "student-id-uuid"
+                },
+                {
+                  "action": "HIDE",
+                  "field": "staff-id-uuid"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "uuid": "field-uuid",
+      "name": "MRN",
+      "description": "For capturing weight of a person",
+      "identifier": "d52cb407-290d-4e45-a4db-be115ac29b03",
+      "selectMultiple": false,
+      "fieldNumber": 4,
+      "fieldPart": "1",
+      "pageNumber": 1,
+      "minOccurs": null,
+      "maxOccurs": null,
+      "required": true,
+      "sortWeight": 650,
+      "retired": false
+    },
+    {
+      "uuid": "student-id-uuid",
+      "name": "Student ID",
+      "description": "Identifier for MRN",
+      "identifier": "d52cb407-290d-4e45-a4db-be115ac29b03",
+      "selectMultiple": false,
+      "fieldNumber": 4,
+      "fieldPart": "1",
+      "pageNumber": 1,
+      "minOccurs": null,
+      "maxOccurs": null,
+      "required": false,
+      "sortWeight": 650,
+      "retired": false
+    },
+    {
+      "uuid": "field-uuid",
+      "name": "First Name",
+      "description": "Stores the first name",
+      "attribute": "firstName",
+      "selectMultiple": false,
+      "fieldNumber": 4,
+      "fieldPart": "1",
+      "pageNumber": 1,
+      "minOccurs": null,
+      "maxOccurs": null,
+      "required": false,
+      "sortWeight": 650,
+      "retired": true
+    },
+    {
+      "uuid": "d52cb407-290d-4e45-a4db-be115ac29b03",
+      "name": "Middle Name",
+      "description": "For capturing weight of a person",
+      "attribute": "middleName",
+      "selectMultiple": false,
+      "fieldNumber": 4,
+      "fieldPart": "1",
+      "pageNumber": 1,
+      "minOccurs": null,
+      "maxOccurs": null,
+      "required": false,
+      "sortWeight": 650
+    },
+    {
+      "uuid": "d52cb407-290d-4e45-a4db-be115ac29b03",
+      "name": "Last Name",
+      "description": "For capturing weight of a person",
+      "attribute": "lastName",
+      "selectMultiple": false,
+      "fieldNumber": 4,
+      "fieldPart": "1",
+      "pageNumber": 1,
+      "minOccurs": null,
+      "maxOccurs": null,
+      "required": true,
+      "sortWeight": 650
+    },
+    {
+      "uuid": "d52cb407-290d-4e45-a4db-be115ac29b03",
+      "name": "Gender",
+      "description": "For capturing weight of a person",
+      "attribute": "gender",
+      "concept": "gender-concept-uuid",
+      "selectMultiple": false,
+      "fieldNumber": 4,
+      "fieldPart": "1",
+      "pageNumber": 1,
+      "minOccurs": null,
+      "maxOccurs": null,
+      "required": true,
+      "sortWeight": 650
+    }
+  ],
+  "resources": []
+}

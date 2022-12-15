@@ -728,4 +728,19 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		assertThat("The encounter is voided", voidedEncounter.getVoided() == true);
 		
 	}
+
+	@Test
+	public void testRegistrationForm() throws Exception {
+
+		//Get visits by attribute value references
+		MockHttpServletRequest newGetRequest = newGetRequest("icare/registration-form");
+		MockHttpServletResponse handle = handle(newGetRequest);
+		String summaryData = handle.getContentAsString();
+		System.out.println(summaryData);
+		Map summaryMap = (new ObjectMapper()).readValue(summaryData, Map.class);
+		List<Map> summaryDetails = (List<Map>) summaryMap.get("results");
+		//assertThat("Should return a visit", visitDetails.size() == 1);
+
+
+	}
 }
