@@ -23,7 +23,6 @@
           color="primary"
           [disabled]="
             saving ||
-            !params?.isCurrentLocationMainStore ||
             (params?.userPrivileges &&
               !params?.userPrivileges['STORE_ADD_NEW_BATCH'])
           "
