@@ -298,16 +298,16 @@ export class ParametersComponent implements OnInit {
           };
         }),
       ];
-      searchIndexedTerms = searchIndexedTerms.filter(
-        (searchIndexedTerm) =>
-          (
-            this.conceptBeingEdited?.names?.filter(
-              (savedName) =>
-                savedName?.name != searchIndexedTerm?.name &&
-                savedName?.conceptNameType == "INDEX_TERM"
-            ) || []
-          ).length === 0
-      );
+      // searchIndexedTerms = searchIndexedTerms.filter(
+      //   (searchIndexedTerm) =>
+      //     (
+      //       this.conceptBeingEdited?.names?.filter(
+      //         (savedName) =>
+      //           savedName?.name != searchIndexedTerm?.name &&
+      //           savedName?.conceptNameType == "INDEX_TERM"
+      //       ) || []
+      //     ).length === 0
+      // );
     }
 
     this.concept = {
@@ -384,14 +384,36 @@ export class ParametersComponent implements OnInit {
                       if (updateResponse) {
                         this.parameterUuid = null;
                         this.conceptBeingEdited = null;
-                        this.savingMessage =
-                          "Successfully created " + conceptName;
-                        this.alertType = "success";
-                        setTimeout(() => {
-                          this.savingMessage = null;
-                        }, 4000);
-                        this.saving = false;
-                        this.resetFields();
+                        if (updateResponse) {
+                          this.conceptService
+                            .createConceptNames(
+                              response?.uuid,
+                              uniqBy(searchIndexedTerms, "name")
+                            )
+                            .subscribe((conceptNameResponse) => {
+                              if (conceptNameResponse) {
+                                this.savingMessage =
+                                  "Successfully updated " + conceptName;
+                                this.alertType = "success";
+                                setTimeout(() => {
+                                  this.savingMessage = null;
+                                }, 4000);
+                                this.saving = false;
+                                this.resetFields();
+                                this.parameterUuid = null;
+                                this.conceptBeingEdited = null;
+                                this.saving = false;
+                                this.alertType = "success";
+                                this.savingMessage =
+                                  "Successfully created " + conceptName;
+
+                                setTimeout(() => {
+                                  this.savingMessage = null;
+                                }, 4000);
+                                this.resetFields();
+                              }
+                            });
+                        }
                       }
                     });
                 } else {
