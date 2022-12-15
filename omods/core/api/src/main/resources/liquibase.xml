@@ -3407,12 +3407,12 @@
             </column>
             <column name="changed_by" type="INTEGER"/>
             <column name="date_changed" type="DATE"/>
-            <column name="voided" type="BOOLEAN">
+            <column name="retired" type="BOOLEAN">
                 <constraints nullable="false"></constraints>
             </column>
-            <column name="date_voided" type="DATE"/>
-            <column name="voided_by" type="INTEGER"/>
-            <column name="void_reason" type="TEXT"/>
+            <column name="date_retired" type="DATE"/>
+            <column name="retired_by" type="INTEGER"/>
+            <column name="retire_reason" type="TEXT"/>
         </createTable>
 
         <addForeignKeyConstraint
