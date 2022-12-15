@@ -27,9 +27,6 @@ public class WorksheetStatus extends BaseOpenmrsData implements java.io.Serializ
     @Column(name = "remarks", length = 65535)
     private String remarks;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "timestamp", length = 19)
-    private Date timestamp;
 
     @Override
     public Integer getId() {
@@ -73,11 +70,4 @@ public class WorksheetStatus extends BaseOpenmrsData implements java.io.Serializ
         this.status = status;
     }
 
-    public Date getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(Date timestamp) {
-        this.timestamp = timestamp;
-    }
 }
