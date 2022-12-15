@@ -3444,5 +3444,59 @@
                 referencedTableName="concept"/>
     </changeSet>
 
+    <changeSet id="create_lb_worksheet_definition" author="dennis-kibahila" dbms="mysql">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="lb_worksheet_definition"/>
+            </not>
+        </preConditions>
+        <comment>Creating openmrs lb_worksheet table</comment>
+        <createTable tableName="lb_worksheet_definition">
+            <column name="work_sheet_definition_id" type="INTEGER" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="work_sheet_definition_id_pk"/>
+            </column>
+            <column name="uuid" type="char(38)">
+                <constraints nullable="false" unique="true"></constraints>
+            </column>
+            <column name="code" type="TEXT"/>
+            <column name="worksheet_id" type="INTEGER"/>
+            <column name="creator" type="INTEGER"/>
+            <column name="date_created" type="DATE">
+                <constraints nullable="false"></constraints>
+            </column>
+            <column name="changed_by" type="INTEGER"/>
+            <column name="date_changed" type="DATE"/>
+            <column name="voided" type="BOOLEAN">
+                <constraints nullable="false"></constraints>
+            </column>
+            <column name="date_voided" type="DATE"/>
+            <column name="voided_by" type="INTEGER"/>
+            <column name="void_reason" type="TEXT"/>
+        </createTable>
+
+        <addForeignKeyConstraint
+                baseColumnNames="changed_by"
+                baseTableName="lb_worksheet_definition"
+                constraintName="lb_worksheet_definition_changed_by_users_user_id_fk"
+                referencedColumnNames="user_id"
+                referencedTableName="users"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="creator"
+                baseTableName="lb_worksheet_definition"
+                constraintName="lb_worksheet_definition_creator_users_user_id_fk"
+                referencedColumnNames="user_id"
+                referencedTableName="users"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="worksheet_id"
+                baseTableName="lb_worksheet_definition"
+                constraintName="lb_worksheet_definition_worksheet_id_concept_concept_id_fk"
+                referencedColumnNames="concept_id"
+                referencedTableName="concept"/>
+
+    </changeSet>
+
+
 
 </databaseChangeLog>
