@@ -3657,38 +3657,81 @@
 
         <addForeignKeyConstraint
                 baseColumnNames="changed_by"
-                baseTableName="lb_worksheet_sample"
-                constraintName="lb_worksheet_sample_changed_by_users_user_id_fk"
+                baseTableName="lb_worksheet_sample_status"
+                constraintName="lb_worksheet_sample_status_changed_by_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
 
         <addForeignKeyConstraint
                 baseColumnNames="creator"
-                baseTableName="lb_worksheet_sample"
-                constraintName="lb_worksheet_sample_creator_users_user_id_fk"
+                baseTableName="lb_worksheet_sample_status"
+                constraintName="lb_worksheet_sample_status_creator_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
 
         <addForeignKeyConstraint
-                baseColumnNames="worksheet_definition_id"
-                baseTableName="lb_worksheet_sample"
-                constraintName="lb_worksheet_sample_worksheet_definition_id_lb_worksheet_definition_worksheet_definition_id_fk"
-                referencedColumnNames="worksheet_definition_id"
-                referencedTableName="lb_worksheet_definition"/>
+                baseColumnNames="worksheet_sample_id"
+                baseTableName="lb_worksheet_sample_status"
+                constraintName="lb_worksheet_sample_status_worksheet_sample_id_lb_worksheet_sample_worksheet_sample_id_fk"
+                referencedColumnNames="worksheet_sample_id"
+                referencedTableName="lb_worksheet_sample"/>
+
+
+    </changeSet>
+
+    <changeSet id="create_lb_worksheet_status" author="dennis-kibahila" dbms="mysql">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="lb_worksheet_status"/>
+            </not>
+        </preConditions>
+        <comment>Creating openmrs lb_worksheet_sample_status table</comment>
+        <createTable tableName="lb_worksheet_status">
+            <column name="worksheet_status_id" type="INTEGER" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="worksheet_sample_status_id_pk"/>
+            </column>
+            <column name="uuid" type="char(38)">
+                <constraints nullable="false" unique="true"></constraints>
+            </column>
+            <column name="worksheet_id" type="INTEGER"/>
+            <column name="category" type="TEXT"/>
+            <column name="status" type="TEXT"/>
+            <column name="remarks" type="TEXT"/>
+            <column name="creator" type="INTEGER"/>
+            <column name="date_created" type="DATE">
+                <constraints nullable="false"></constraints>
+            </column>
+            <column name="changed_by" type="INTEGER"/>
+            <column name="date_changed" type="DATE"/>
+            <column name="voided" type="BOOLEAN">
+                <constraints nullable="false"></constraints>
+            </column>
+            <column name="date_voided" type="DATE"/>
+            <column name="voided_by" type="INTEGER"/>
+            <column name="void_reason" type="TEXT"/>
+        </createTable>
 
         <addForeignKeyConstraint
-                baseColumnNames="sample_id"
-                baseTableName="lb_worksheet_sample"
-                constraintName="lb_worksheet_sample_sample_id_lb_sample_sample_id_fk"
-                referencedColumnNames="worksheet_control_id"
-                referencedTableName="lb_worksheet_control"/>
+                baseColumnNames="changed_by"
+                baseTableName="lb_worksheet_status"
+                constraintName="lb_worksheet_status_changed_by_users_user_id_fk"
+                referencedColumnNames="user_id"
+                referencedTableName="users"/>
 
         <addForeignKeyConstraint
-                baseColumnNames="control_id"
-                baseTableName="lb_worksheet_control"
-                constraintName="lb_worksheet_control_control_id_lb_sample_sample_id_fk"
-                referencedColumnNames="sample_id"
-                referencedTableName="lb_sample"/>
+                baseColumnNames="creator"
+                baseTableName="lb_worksheet_status"
+                constraintName="lb_worksheet_status_creator_users_user_id_fk"
+                referencedColumnNames="user_id"
+                referencedTableName="users"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="worksheet_id"
+                baseTableName="lb_worksheet_status"
+                constraintName="lb_worksheet_status_worksheet_id_lb_worksheet_worksheet_id_fk"
+                referencedColumnNames="worksheet_id"
+                referencedTableName="lb_worksheet"/>
+
 
     </changeSet>
 
