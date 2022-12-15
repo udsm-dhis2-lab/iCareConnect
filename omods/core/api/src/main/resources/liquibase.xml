@@ -3381,5 +3381,68 @@
                 referencedTableName="lb_batch"/>
     </changeSet>
 
+    <changeSet id="create_lb_worksheet" author="dennis-kibahila" dbms="mysql">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="lb_worksheet"/>
+            </not>
+        </preConditions>
+        <comment>Creating openmrs lb_worksheet table</comment>
+        <createTable tableName="lb_worksheet">
+            <column name="worksheet_id" type="INTEGER" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="worksheet_id_pk"/>
+            </column>
+            <column name="uuid" type="char(38)">
+                <constraints nullable="false" unique="true"></constraints>
+            </column>
+            <column name="code" type="TEXT"/>
+            <column name="description" type="TEXT"/>
+            <column name="rows" type="INTEGER"/>
+            <column name="columns" type="INTEGER"/>
+            <column name="test_order_id" type="INTEGER"/>
+            <column name="instrument_id" type="INTEGER"/>
+            <column name="creator" type="INTEGER"/>
+            <column name="date_created" type="DATE">
+                <constraints nullable="false"></constraints>
+            </column>
+            <column name="changed_by" type="INTEGER"/>
+            <column name="date_changed" type="DATE"/>
+            <column name="voided" type="BOOLEAN">
+                <constraints nullable="false"></constraints>
+            </column>
+            <column name="date_voided" type="DATE"/>
+            <column name="voided_by" type="INTEGER"/>
+            <column name="void_reason" type="TEXT"/>
+        </createTable>
+
+        <addForeignKeyConstraint
+                baseColumnNames="changed_by"
+                baseTableName="lb_worksheet"
+                constraintName="lb_worksheet_changed_by_users_user_id_fk"
+                referencedColumnNames="user_id"
+                referencedTableName="users"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="creator"
+                baseTableName="lb_worksheet"
+                constraintName="lb_worksheet_creator_users_user_id_fk"
+                referencedColumnNames="user_id"
+                referencedTableName="users"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="test_order_id"
+                baseTableName="lb_worksheet"
+                constraintName="lb_worksheet_test_order_id_concept_concept_id_fk"
+                referencedColumnNames="concept_id"
+                referencedTableName="concept"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="instrument_id"
+                baseTableName="lb_worksheet"
+                constraintName="lb_worksheet_instrument_id_concept_concept_id_fk"
+                referencedColumnNames="concept_id"
+                referencedTableName="concept"/>
+    </changeSet>
+
 
 </databaseChangeLog>

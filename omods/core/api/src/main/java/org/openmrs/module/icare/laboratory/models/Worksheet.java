@@ -89,5 +89,11 @@ public class Worksheet extends BaseChangeableOpenmrsMetadata implements java.io.
         this.testOrder = testOrder;
     }
 
+    public Concept getInstrument() {
+        return instrument;
+    }
 
+    public void setInstrument(Concept instrument) {
+        this.instrument = instrument;
+    }
 }
