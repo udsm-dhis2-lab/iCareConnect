@@ -10,7 +10,7 @@ public class WorksheetDefinition extends BaseOpenmrsData implements java.io.Seri
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "work_sheet_definition_id",unique = true,nullable = false)
+    @Column(name = "worksheet_definition_id",unique = true,nullable = false)
     private Integer id;
 
     @Column(name = "code", length = 30)

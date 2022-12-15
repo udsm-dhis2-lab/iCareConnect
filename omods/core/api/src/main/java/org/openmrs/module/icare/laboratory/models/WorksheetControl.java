@@ -7,7 +7,7 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "lb_worksheet_control")
-public class WorksheetSampleControl extends BaseOpenmrsMetadata implements java.io.Serializable {
+public class WorksheetControl extends BaseOpenmrsMetadata implements java.io.Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -3450,10 +3450,10 @@
                 <tableExists tableName="lb_worksheet_definition"/>
             </not>
         </preConditions>
-        <comment>Creating openmrs lb_worksheet table</comment>
+        <comment>Creating openmrs lb_worksheet_definition table</comment>
         <createTable tableName="lb_worksheet_definition">
-            <column name="work_sheet_definition_id" type="INTEGER" autoIncrement="true">
-                <constraints primaryKey="true" primaryKeyName="work_sheet_definition_id_pk"/>
+            <column name="worksheet_definition_id" type="INTEGER" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="worksheet_definition_id_pk"/>
             </column>
             <column name="uuid" type="char(38)">
                 <constraints nullable="false" unique="true"></constraints>
@@ -3496,6 +3496,134 @@
                 referencedTableName="concept"/>
 
     </changeSet>
+
+    <changeSet id="create_lb_worksheet_control" author="dennis-kibahila" dbms="mysql">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="lb_worksheet_control"/>
+            </not>
+        </preConditions>
+        <comment>Creating openmrs lb_worksheet table</comment>
+        <createTable tableName="lb_worksheet_control">
+            <column name="worksheet_control_id" type="INTEGER" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="worksheet_control_id_pk"/>
+            </column>
+            <column name="uuid" type="char(38)">
+                <constraints nullable="false" unique="true"></constraints>
+            </column>
+            <column name="code" type="TEXT"/>
+            <column name="name" type="TEXT"/>
+            <column name="test_order_id" type="INTEGER"/>
+            <column name="creator" type="INTEGER"/>
+            <column name="date_created" type="DATE">
+                <constraints nullable="false"></constraints>
+            </column>
+            <column name="changed_by" type="INTEGER"/>
+            <column name="date_changed" type="DATE"/>
+            <column name="retired" type="BOOLEAN">
+                <constraints nullable="false"></constraints>
+            </column>
+            <column name="date_retired" type="DATE"/>
+            <column name="retired_by" type="INTEGER"/>
+            <column name="retire_reason" type="TEXT"/>
+        </createTable>
+
+        <addForeignKeyConstraint
+                baseColumnNames="changed_by"
+                baseTableName="lb_worksheet_control"
+                constraintName="lb_worksheet_control_changed_by_users_user_id_fk"
+                referencedColumnNames="user_id"
+                referencedTableName="users"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="creator"
+                baseTableName="lb_worksheet_control"
+                constraintName="lb_worksheet_control_creator_users_user_id_fk"
+                referencedColumnNames="user_id"
+                referencedTableName="users"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="test_order_id"
+                baseTableName="lb_worksheet_control"
+                constraintName="lb_worksheet_control_test_order_id_concept_concept_id_fk"
+                referencedColumnNames="concept_id"
+                referencedTableName="concept"/>
+
+    </changeSet>
+
+    <changeSet id="create_lb_worksheet_sample" author="dennis-kibahila" dbms="mysql">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="lb_worksheet_sample"/>
+            </not>
+        </preConditions>
+        <comment>Creating openmrs lb_worksheet_definition table</comment>
+        <createTable tableName="lb_worksheet_sample">
+            <column name="worksheet_sample_id" type="INTEGER" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="worksheet_sample_id_pk"/>
+            </column>
+            <column name="uuid" type="char(38)">
+                <constraints nullable="false" unique="true"></constraints>
+            </column>
+            <column name="code" type="TEXT"/>
+            <column name="worksheet_definition_id" type="INTEGER"/>
+            <column name="row" type="INTEGER"/>
+            <column name="column" type="INTEGER"/>
+            <column name="sample_id" type="INTEGER"/>
+            <column name="control_id" type="INTEGER"/>
+            <column name="type" type="TEXT"/>
+            <column name="creator" type="INTEGER"/>
+            <column name="date_created" type="DATE">
+                <constraints nullable="false"></constraints>
+            </column>
+            <column name="changed_by" type="INTEGER"/>
+            <column name="date_changed" type="DATE"/>
+            <column name="voided" type="BOOLEAN">
+                <constraints nullable="false"></constraints>
+            </column>
+            <column name="date_voided" type="DATE"/>
+            <column name="voided_by" type="INTEGER"/>
+            <column name="void_reason" type="TEXT"/>
+        </createTable>
+
+        <addForeignKeyConstraint
+                baseColumnNames="changed_by"
+                baseTableName="lb_worksheet_sample"
+                constraintName="lb_worksheet_sample_changed_by_users_user_id_fk"
+                referencedColumnNames="user_id"
+                referencedTableName="users"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="creator"
+                baseTableName="lb_worksheet_sample"
+                constraintName="lb_worksheet_sample_creator_users_user_id_fk"
+                referencedColumnNames="user_id"
+                referencedTableName="users"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="worksheet_definition_id"
+                baseTableName="lb_worksheet_sample"
+                constraintName="lb_worksheet_sample_worksheet_definition_id_lb_worksheet_definition_worksheet_definition_id_fk"
+                referencedColumnNames="worksheet_definition_id"
+                referencedTableName="lb_worksheet_definition"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="sample_id"
+                baseTableName="lb_worksheet_sample"
+                constraintName="lb_worksheet_sample_sample_id_lb_sample_sample_id_fk"
+                referencedColumnNames="worksheet_control_id"
+                referencedTableName="lb_worksheet_control"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="control_id"
+                baseTableName="lb_worksheet_control"
+                constraintName="lb_worksheet_control_control_id_lb_sample_sample_id_fk"
+                referencedColumnNames="sample_id"
+                referencedTableName="lb_sample"/>
+
+    </changeSet>
+
+
 
 
 
