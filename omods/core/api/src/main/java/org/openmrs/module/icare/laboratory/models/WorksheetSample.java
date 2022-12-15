@@ -7,6 +7,8 @@ import javax.persistence.*;
 
 import static javax.persistence.GenerationType.IDENTITY;
 
+@Entity
+@Table(name = "lb_worksheet_sample")
 public class WorksheetSample extends BaseOpenmrsData implements java.io.Serializable {
 
     @Id
@@ -31,7 +33,7 @@ public class WorksheetSample extends BaseOpenmrsData implements java.io.Serializ
     private Sample sample;
 
     @Column(name = "control_id", nullable = true)
-    private WorksheetSampleControl worksheetSampleControl;
+    private WorksheetControl worksheetControl;
 
     @Column(name = "type")
     private String type;
@@ -79,12 +81,12 @@ public class WorksheetSample extends BaseOpenmrsData implements java.io.Serializ
         this.sample = sample;
     }
 
-    public WorksheetSampleControl getWorksheetSampleControl() {
-        return worksheetSampleControl;
+    public WorksheetControl getWorksheetControl() {
+        return worksheetControl;
     }
 
-    public void setWorksheetSampleControl(WorksheetSampleControl worksheetSampleControl) {
-        this.worksheetSampleControl = worksheetSampleControl;
+    public void setWorksheetControl(WorksheetControl worksheetControl) {
+        this.worksheetControl = worksheetControl;
     }
 
     public String getType() {
