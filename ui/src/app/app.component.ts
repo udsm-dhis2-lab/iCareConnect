@@ -1,21 +1,27 @@
-import { Component, OnInit } from "@angular/core";
-import { MatLegacyDialog as MatDialog } from "@angular/material/legacy-dialog";
-import { ActivatedRoute } from "@angular/router";
-import { select, Store } from "@ngrx/store";
-import { Observable, timer } from "rxjs";
-import { LoginDialogComponent } from "./core/dialogs/login-dialog/login-dialog.component";
-import { AuthService } from "./core/services/auth.service";
-import { loadDHIS2ReportsConfigs } from "./store/actions";
-import { AppState } from "./store/reducers";
-import { getIfNonLoginRoute } from "./store/selectors";
+import { Component, OnInit } from '@angular/core';
+import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
+import { ActivatedRoute } from '@angular/router';
+import { select, Store } from '@ngrx/store';
+import { Observable, timer } from 'rxjs';
+import { LoginDialogComponent } from './core/dialogs/login-dialog/login-dialog.component';
+import { AuthService } from './core/services/auth.service';
+import { loadDHIS2ReportsConfigs } from './store/actions';
+import { AppState } from './store/reducers';
+import { getIfNonLoginRoute } from './store/selectors';
+
+
+
+
 
 @Component({
-  selector: "app-root",
-  templateUrl: "./app.component.html",
-  styleUrls: ["./app.component.scss"],
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.scss'],
 })
 export class AppComponent implements OnInit {
-  title = "iCare";
+
+  title = 'iCare';
+
 
   isNonLoginRoute$: Observable<boolean>;
   isDialogOpen: boolean;
@@ -29,20 +35,30 @@ export class AppComponent implements OnInit {
   ngOnInit(): void {
     this.monitorSession();
     this.isNonLoginRoute$ = this.store.pipe(select(getIfNonLoginRoute));
+
   }
 
+
+
+
+
+  // tslint:disable-next-line:typedef
+
+
+
+  // tslint:disable-next-line:typedef
   monitorSession() {
     timer(2000, 10000).subscribe(() => {
       this.auth.session().subscribe((session) => {
         if (
           !session?.authenticated &&
           !this.isDialogOpen &&
-          !window.location.href.includes("login")
+          !window.location.href.includes('login')
         ) {
           this.isDialogOpen = true;
           const dialog = this.dialog.open(LoginDialogComponent, {
-            width: "25%",
-            panelClass: "custom-dialog-container",
+            width: '25%',
+            panelClass: 'custom-dialog-container',
             disableClose: true,
           });
 
@@ -53,4 +69,7 @@ export class AppComponent implements OnInit {
       });
     });
   }
+
+
+
 }

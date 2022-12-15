@@ -1,34 +1,42 @@
-import { AfterViewInit, Component, OnInit, ViewChild } from "@angular/core";
-import { MatLegacyDialog as MatDialog } from "@angular/material/legacy-dialog";
-import { MatLegacyPaginator as MatPaginator } from "@angular/material/legacy-paginator";
-import { MatLegacyTableDataSource as MatTableDataSource } from "@angular/material/legacy-table";
-import { ActivatedRoute, Router } from "@angular/router";
-import { Store } from "@ngrx/store";
-import { Observable } from "rxjs";
-import { go } from "src/app/store/actions";
-import { AppState } from "src/app/store/reducers";
-import { getCurrentUserDetails } from "src/app/store/selectors/current-user.selectors";
-import { CaptureSignatureComponent } from "../../../../../shared/components/capture-signature/capture-signature.component";
-import { UserCreateModel } from "../../../models/user.model";
-import { UserService } from "../../../services/users.service";
+import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
+import { MatLegacyPaginator as MatPaginator } from '@angular/material/legacy-paginator';
+import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Store } from '@ngrx/store';
+import { Observable } from 'rxjs';
+import { go } from 'src/app/store/actions';
+import { AppState } from 'src/app/store/reducers';
+import { getCurrentUserDetails } from 'src/app/store/selectors/current-user.selectors';
+import { CaptureSignatureComponent } from '../../../../../shared/components/capture-signature/capture-signature.component';
+import { UserCreateModel } from '../../../models/user.model';
+import { UserService } from '../../../services/users.service';
+
+import { OnDestroy, VERSION } from '@angular/core';
+import { fromEvent, merge, of, Subscription } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 @Component({
-  selector: "app-user-management",
-  templateUrl: "./user-management.component.html",
-  styleUrls: ["./user-management.component.scss"],
+  selector: 'app-user-management',
+  templateUrl: './user-management.component.html',
+  styleUrls: ['./user-management.component.scss'],
 })
-export class UserManagementComponent implements OnInit, AfterViewInit {
+export class UserManagementComponent implements OnInit, AfterViewInit, OnDestroy  {
+
+  networkStatus = false;
+  networkStatus$: Subscription = Subscription.EMPTY;
+
   itemSearchTerm: string;
   addingUserItem: boolean;
   currentUser$: Observable<any>;
-  loading: boolean = true;
+  loading = true;
   displayedColumns: string[] = [
-    "index",
-    "display",
-    "fullName",
-    "username",
-    "systemId",
-    "actions",
+    'index',
+    'display',
+    'fullName',
+    'username',
+    'systemId',
+    'actions',
   ];
   dataSource: MatTableDataSource<UserCreateModel>;
   users$: Observable<any>;
@@ -46,8 +54,29 @@ export class UserManagementComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     // TODO: current user to be used for privilages control
     this.currentUser$ = this.store.select(getCurrentUserDetails);
+    this.checkNetworkStatus();
   }
 
+  ngOnDestroy(): void {
+    this.networkStatus$.unsubscribe();
+  }
+
+  // tslint:disable-next-line:typedef
+  checkNetworkStatus() {
+    this.networkStatus = navigator.onLine;
+    this.networkStatus$ = merge(
+        of(null),
+        fromEvent(window, 'online'),
+        fromEvent(window, 'offline')
+    )
+        .pipe(map(() => navigator.onLine))
+        .subscribe(status => {
+          console.log('status', status);
+          this.networkStatus = status;
+        });
+  }
+
+  // tslint:disable-next-line:typedef
   ngAfterViewInit() {
     if (this.dataSource) {
       this.dataSource.paginator = this.paginator;
@@ -56,7 +85,7 @@ export class UserManagementComponent implements OnInit, AfterViewInit {
 
   getRecord(row: UserCreateModel): void {
     this.data = row;
-    localStorage.setItem("selectedUser", JSON.stringify(row));
+    localStorage.setItem('selectedUser', JSON.stringify(row));
     // this.router.navigate(["manage-user"], {
     //   state: this.data,
     //   relativeTo: this.route,
@@ -64,16 +93,19 @@ export class UserManagementComponent implements OnInit, AfterViewInit {
     // });
     this.store.dispatch(
       go({
-        path: ["/maintenance/users-management/manage-user"],
+        path: ['/maintenance/users-management/manage-user'],
         query: { queryParams: { id: row.uuid } },
       })
     );
   }
 
+  // tslint:disable-next-line:typedef
   onEditChild(e) {}
 
+  // tslint:disable-next-line:typedef
   onDelete(e) {}
 
+  // tslint:disable-next-line:typedef
   onOpenDetails(e) {}
 
   applyFilter(event: Event): void {
@@ -85,7 +117,7 @@ export class UserManagementComponent implements OnInit, AfterViewInit {
   onRouteToManageUser(event: Event): void {
     event.stopPropagation();
     this.store.dispatch(
-      go({ path: ["/maintenance/users-management/manage-user"] })
+      go({ path: ['/maintenance/users-management/manage-user'] })
     );
   }
 }
