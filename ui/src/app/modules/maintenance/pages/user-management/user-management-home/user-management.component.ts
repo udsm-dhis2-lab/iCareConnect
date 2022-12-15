@@ -12,14 +12,22 @@ import { CaptureSignatureComponent } from "../../../../../shared/components/capt
 import { UserCreateModel } from "../../../models/user.model";
 import { UserService } from "../../../services/users.service";
 
+import {  OnDestroy, VERSION } from '@angular/core';
+import { fromEvent, merge, of, Subscription } from 'rxjs';
+import { map } from 'rxjs/operators';
+
 @Component({
   selector: "app-user-management",
   templateUrl: "./user-management.component.html",
   styleUrls: ["./user-management.component.scss"],
 })
-export class UserManagementComponent implements OnInit, AfterViewInit {
+export class UserManagementComponent implements OnInit, AfterViewInit, OnDestroy {
   itemSearchTerm: string;
   addingUserItem: boolean;
+
+  networkStatus: boolean = false;
+  networkStatus$: Subscription = Subscription.EMPTY;
+
   currentUser$: Observable<any>;
   loading: boolean = true;
   displayedColumns: string[] = [
@@ -46,7 +54,27 @@ export class UserManagementComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     // TODO: current user to be used for privilages control
     this.currentUser$ = this.store.select(getCurrentUserDetails);
+
+    this.checkNetworkStatus();
   }
+
+  ngOnDestroy(): void {
+    this.networkStatus$.unsubscribe();
+}
+
+checkNetworkStatus() {
+  this.networkStatus = navigator.onLine;
+  this.networkStatus$ = merge(
+    of(null),
+    fromEvent(window, 'online'),
+fromEvent(window, 'offline')
+)
+.pipe(map(() => navigator.onLine))
+.subscribe(status => {
+      console.log('status', status);
+  this.networkStatus = status;
+});
+}
 
   ngAfterViewInit() {
     if (this.dataSource) {
