@@ -1,8 +1,8 @@
 <div
   *ngIf="{ authenticationLoading: authenticationLoading$ | async } as params"
 >
-  <form class="login-form" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-    <mat-form-field appearance="fill" class="w-100">
+  <form class="login-form" [formGroup]="loginForm" 
+    mat-form-field appearance="fill" class="w-100">
       <mat-label>Username</mat-label>
       <input
         id="username"
@@ -41,6 +41,9 @@
         color="primary"
         [disabled]="params.authenticationLoading"
         data-test="icare-login-button"
+        (click)="onSubmit()"
+        submitted = false;onSubmit() {
+  this.submitted = true;}
       >
         <mat-spinner
           color="primary"
