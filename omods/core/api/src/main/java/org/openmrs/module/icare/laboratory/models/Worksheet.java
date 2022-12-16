@@ -28,11 +28,13 @@ public class Worksheet extends BaseChangeableOpenmrsMetadata implements java.io.
 	@Column(name = "columns", columnDefinition = "TINYINT")
 	@Type(type = "org.hibernate.type.IntegerType")
 	private Integer columns;
-	
-	@Column(name = "test_order_id")
+
+	@ManyToOne
+	@JoinColumn(name = "test_order_id")
 	private Concept testOrder;
-	
-	@Column(name = "instrument_id")
+
+	@ManyToOne
+	@JoinColumn(name = "instrument_id")
 	private Concept instrument;
 	
 	@Override
@@ -89,6 +91,7 @@ public class Worksheet extends BaseChangeableOpenmrsMetadata implements java.io.
 	public static Worksheet fromMap(Map<String,Object> worksheetMap){
 
 		Worksheet worksheet = new Worksheet();
+		System.out.println(worksheetMap.get("code").toString());
 		worksheet.setCode(worksheetMap.get("code").toString());
 		worksheet.setDescription(worksheetMap.get("description").toString());
 		worksheet.setRows((Integer) worksheetMap.get("rows"));

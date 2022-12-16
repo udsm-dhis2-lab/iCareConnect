@@ -3557,7 +3557,7 @@
                 <tableExists tableName="lb_worksheet_sample"/>
             </not>
         </preConditions>
-        <comment>Creating openmrs lb_worksheet_definition table</comment>
+        <comment>Creating openmrs lb_worksheet_sample table</comment>
         <createTable tableName="lb_worksheet_sample">
             <column name="worksheet_sample_id" type="INTEGER" autoIncrement="true">
                 <constraints primaryKey="true" primaryKeyName="worksheet_sample_id_pk"/>
