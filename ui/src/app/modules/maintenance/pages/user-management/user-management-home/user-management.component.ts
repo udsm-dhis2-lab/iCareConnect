@@ -5,7 +5,6 @@ import { MatLegacyTableDataSource as MatTableDataSource } from "@angular/materia
 import { ActivatedRoute, Router } from "@angular/router";
 import { Store } from "@ngrx/store";
 import { Observable } from "rxjs";
-import { map } from 'rxjs/operators';
 import { go } from "src/app/store/actions";
 import { AppState } from "src/app/store/reducers";
 import { getCurrentUserDetails } from "src/app/store/selectors/current-user.selectors";
@@ -14,6 +13,7 @@ import { UserCreateModel } from "../../../models/user.model";
 import { UserService } from "../../../services/users.service";
 import { OnDestroy, VERSION} from "@angular/core"
 import { fromEvent, merge, of, Subscription} from "rxjs"
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: "app-user-management",
