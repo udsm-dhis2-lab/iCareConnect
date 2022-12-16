@@ -128,7 +128,7 @@ export class CurrentPatientBillingComponent implements OnInit {
                 bill.billDetails.items.forEach((givenItem) => {
                   if (discountItem.item.uuid === givenItem.item.uuid) {
                     givenItems = [...givenItems, givenItem];
-                    item = givenItem
+                    item = givenItem;
                   }
                 });
 
@@ -177,17 +177,20 @@ export class CurrentPatientBillingComponent implements OnInit {
       .getSystemSettingsByKey("icare.billing.exemption.encounterType")
       .pipe(
         tap((response) => {
-          if(response?.error){
+          if (response?.error) {
             this.errors = [...this.errors, response.error];
           }
-          if(response === 'none'){
-            this.errors = [...this.errors, 
-              {error: { 
-                message: "Missing Icare Exemption Configurations. Please set 'icare.billing.exemption.encounterType' or Contact IT"
-                }
-              }
-            ]
-          };
+          if (response === "none") {
+            this.errors = [
+              ...this.errors,
+              {
+                error: {
+                  message:
+                    "Missing Icare Exemption Configurations. Please set 'icare.billing.exemption.encounterType' or Contact IT",
+                },
+              },
+            ];
+          }
         })
       );
 
@@ -291,7 +294,6 @@ export class CurrentPatientBillingComponent implements OnInit {
 
     let exemptionEncounterStart = {
       visit: patientBillingDetails.visit?.uuid,
-      encounterDatetime: currentDate.toISOString(),
       patient: params.currentPatient?.id,
       encounterType: params?.exemptionEncounterType,
       location: params.currentLocation?.uuid,
