@@ -4,24 +4,23 @@ import org.hibernate.Query;
 import org.openmrs.api.db.hibernate.DbSession;
 import org.openmrs.module.icare.core.dao.BaseDAO;
 import org.openmrs.module.icare.laboratory.models.Batch;
-import org.openmrs.module.icare.laboratory.models.Device;
+import org.openmrs.module.icare.laboratory.models.Worksheet;
 
 import java.util.Date;
 import java.util.List;
-import org.springframework.stereotype.Repository;
 
-public class BatchDAO extends BaseDAO<Batch> {
+public class WorksheetDAO extends BaseDAO<Worksheet> {
 	
-	public List<Batch> getBatches(Date startDate, Date endDate, String q, Integer startIndex, Integer limit) {
+	public List<Worksheet> getWorksheets(Date startDate, Date endDate, String q, Integer startIndex, Integer limit) {
 		
 		DbSession session = this.getSession();
-		String queryStr = "SELECT bt FROM Batch bt";
+		String queryStr = "SELECT ws FROM Worksheet ws";
 		
 		if (startDate != null && endDate != null) {
 			if (!queryStr.contains("WHERE")) {
 				queryStr += " WHERE ";
 			}
-			queryStr += " (cast(bt.dateCreated as date) BETWEEN :startDate AND :endDate)";
+			queryStr += " (cast(ws.dateCreated as date) BETWEEN :startDate AND :endDate)";
 		}
 		
 		if (q != null) {
@@ -31,7 +30,7 @@ public class BatchDAO extends BaseDAO<Batch> {
 				queryStr += " AND ";
 			}
 			
-			queryStr += "lower(bt.batchName) like lower(:q) OR (bt.label) LIKE lower(:q)";
+			queryStr += "lower(ws.code) like lower(:q) OR lower(ws.name) like lower(:q)";
 		}
 		
 		//Construct a query object
@@ -55,5 +54,4 @@ public class BatchDAO extends BaseDAO<Batch> {
 		return query.list();
 		
 	}
-	
 }
