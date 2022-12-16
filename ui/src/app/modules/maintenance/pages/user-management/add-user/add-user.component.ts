@@ -45,6 +45,8 @@ export class AddUserComponent implements OnInit {
   loading: boolean = true;
   userForm: FormGroup;
   hide: boolean = true;
+  container: number = 1;
+  containerSize: number = 100;
   roles: RoleCreate[];
   selectedRoles: any[] = [];
   displayedColumns: string[] = ["display"];
@@ -190,14 +192,8 @@ export class AddUserComponent implements OnInit {
     } else {
       this.userForm = this.generateForm(this.user);
 
-      this.service.getRoles().subscribe((roles) => {
-        this.roles = roles.results;
-        this.rolesDataSource = new MatTableDataSource(this.roles);
-        this.selectedRolesDatasource = new MatTableDataSource(
-          this.selectedRoles
-        );
-        this.loading = false;
-      });
+      // changed this to accomodate having more data
+      this.getRolesList();
       this.locationService
         .getLocationsByTagNames(
           ["Treatment+Room", "Admission+Location", "Module+Location"],
@@ -492,7 +488,27 @@ export class AddUserComponent implements OnInit {
       ? { background: "#2a8fd1", color: "white !important" }
       : { background: "", color: "black" };
   }
-
+    // Get more roles from database
+    getRolesList(): void {
+      this.service.getRoles({
+        limit: this.containerSize,
+        startIndex: (this.container - 1) * this.containerSize,
+      }).subscribe((roles) => {
+        this.roles = roles.results;
+        console.log(typeof this.roles.length, typeof this.containerSize);
+        this.rolesDataSource = new MatTableDataSource(this.roles);
+        this.selectedRolesDatasource = new MatTableDataSource(
+          this.selectedRoles
+        );
+        this.loading = false;
+      });
+    }
+  
+    getRoles(event: Event, actionType: string): void {
+      event.stopPropagation();
+      this.container = actionType === "next" ? this.container + 1 : this.container - 1;
+      this.getRolesList();
+    }
   assignAll() {
     this.moveToAvailable = [];
     this.moveToSelected = [];

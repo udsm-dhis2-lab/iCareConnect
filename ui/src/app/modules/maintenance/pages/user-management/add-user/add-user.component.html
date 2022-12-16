@@ -528,6 +528,25 @@
             <div class="d-flex justify-content-between" *ngIf="!loading">
               <button
                 mat-flat-button
+                [disabled]="roles.length < containerSize"
+                color="primary"
+                style="max-width: 50px;"
+                (click)="getRoles($event, 'next')"
+              >
+                NEXT
+              </button>
+              <button
+                mat-flat-button
+                [disabled]="container <= 1"
+                color="primary"
+                style="max-width: 50px; margin-right: .2rem;"
+                (click)="getRoles($event, 'prev')"
+              >
+                PREV
+              </button>
+              
+              <button
+                mat-flat-button
                 color="primary"
                 style="max-width: 160px"
                 (click)="assignAll()"
