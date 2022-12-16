@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Inject, OnInit, Output } from "@angular/core";
+import { Component, EventEmitter, Inject, Input, OnInit, Output } from "@angular/core";
 import { MatLegacyDialog as MatDialog, MatLegacyDialogRef as MatDialogRef, MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA } from "@angular/material/legacy-dialog";
 import { select, Store } from "@ngrx/store";
 import { Observable, of, zip } from "rxjs";
@@ -330,8 +330,12 @@ export class DispensingFormComponent implements OnInit {
     this.dialogRef.close();
   }
 
-  onChangeDrugQuantity(quantity) {
+  onChangeDrugQuantity(quantity, drugId) { // We added the drugId parameter to the function to receive specifi Id of the drug
+    while(this.errors.length > 0){
+      this.errors.pop();
+    }
     this.drugOrder = { ...(this.drugOrder || ({} as any)), quantity };
+    this.onUpdateQuantity(drugId); // We added this to call a new created function onUpdateQuantity to check if the drug exist in stock
   }
 
   onOrderingDrug(drugOrder: any) {
@@ -343,6 +347,10 @@ export class DispensingFormComponent implements OnInit {
       }),
     });
   }
+
+
+
+
 
   onFormUpdate(formData: {
     formName: string;
@@ -375,6 +383,10 @@ export class DispensingFormComponent implements OnInit {
     };
   }
 
+
+
+
+
   onOrderSaved(saved, visit): void {
     this.getVisitByUuid(visit?.uuid);
   }
@@ -390,6 +402,149 @@ export class DispensingFormComponent implements OnInit {
         })
       );
   }
+
+// We created this new function to check the existence of a specific drug in stock
+  onUpdateQuantity(specificDrugConceptUuid?: any){
+          this.savingOrder = false; //true
+          this.savingOrderSuccess = false;
+          this.savingError = null;
+          this.savedOrder = null;
+
+          const order = this.drugOrderData?.order || {};
+          this.drugsService
+            .getDrug(order?.obs[specificDrugConceptUuid]?.value)
+            .subscribe((response) => {
+              if (response) {
+                const formattedOrder = {
+                  ...order,
+                  orderType: "iCARESTS-PRES-1111-1111-525400e4297f",
+                  drug: {
+                    uuid: response?.uuid,
+                  },
+                  concept: {
+                    uuid: response?.concept?.uuid,
+                  },
+                  action: order?.action || "NEW",
+                  urgency: "ROUTINE",
+                  location: localStorage.getItem("currentLocation")
+                    ? JSON.parse(localStorage.getItem("currentLocation"))[
+                        "uuid"
+                      ]
+                    : null,
+                  providerUuid: this.drugOrderData?.provider?.uuid,
+                  encounterUuid: this.data?.fromDispensing
+                    ? this.data?.drugOrder?.encounter?.uuid
+                    : JSON.parse(localStorage.getItem("patientConsultation"))[
+                        "encounterUuid"
+                      ],
+                  patientUuid: this.data?.patient
+                    ? this.data?.patient?.uuid
+                    : order?.patientUuid
+                    ? order?.patientUuid
+                    : this.data?.patientUuid,
+                };
+                // console.log("this.data?.drugOrder", this.data?.drugOrder);
+                this.drugOrderService
+                  .saveDrugOrder(
+                    DrugOrder.getOrderForSaving(formattedOrder),
+                    "PRESCRIBE",
+                    this.data.visit,
+                    order?.location?.uuid ||
+                      JSON.parse(localStorage.getItem("currentLocation"))[
+                        "uuid"
+                      ],
+                    this.drugOrderData?.provider?.uuid
+                  )
+                  .subscribe(
+                    (res) => {
+                      this.getVisitByUuid(this.data?.visit?.uuid);
+                      if (res?.message || res?.stackTrace) {
+                        this.savingOrder = false;
+                        this.errors = [
+                          ...this.errors,
+                          {
+                            error: {
+                              message:
+                                res?.message ||
+                                "Error occurred while connecting to the server",
+                              detail: res?.stackTrace
+                                ? JSON.stringify(res?.stackTrace)
+                                : "",
+                            },
+                          },
+                        ];
+                      }
+                      if (this.data?.useGenericPrescription && !res?.message) {
+                        const genericOrderPayload = {
+                          uuid: order?.uuid,
+                          fulfillerStatus: "RECEIVED",
+                          encounter: order?.encounter?.uuid,
+                        };
+                        this.orderService
+                          .updateOrdersViaEncounter([genericOrderPayload])
+                          .subscribe({
+                            next: (order) => {
+                              this.savingOrder = false;
+                              if (this.data.fromDispensing) {
+                                this.savingOrderSuccess = true;
+                                this.savedOrder = new DrugOrder(res);
+                                setTimeout(() => {
+                                  this.dialogRef.close({
+                                    action: "ORDER_SAVED",
+                                    drugOrder: this.savedOrder,
+                                  });
+                                }, 200);
+                              }
+                              return order;
+                            },
+                            error: (error) => {
+                              this.savingOrder = false;
+                              return error;
+                            },
+                          });
+                      }
+                    },
+                    (errorResponse) => {
+                      this.savingOrder = false;
+                      this.savingError =
+                        DrugOrderError[errorResponse?.error?.message] ||
+                        (errorResponse?.error?.message || "")
+                          .replace("[", "")
+                          .replace("]", "");
+                      if (errorResponse?.message) {
+                        this.errors = [
+                          ...this.errors,
+                          {
+                            error: {
+                              message:
+                                errorResponse?.message ||
+                                "Error occurred while connecting to the server",
+                              detail: errorResponse?.error || "",
+                            },
+                          },
+                        ];
+                      } else {
+                        this.errors = [
+                          ...this.errors,
+                          errorResponse.error || {
+                            error: {
+                              message:
+                                "Error occured while executing the command",
+                            },
+                          },
+                        ];
+                      }
+                      this.savingOrderSuccess = false;
+                    }
+                  );
+
+                this.onUpdateConsultationOrder();
+              }
+            });
+  }
+// End of new added function
+
+
 
   onUpdateOrder(e: Event, specificDrugConceptUuid?: string) {
     this.dialog

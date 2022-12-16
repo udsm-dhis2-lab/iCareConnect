@@ -41,9 +41,14 @@
     </button>
   </mat-toolbar>
 
+
+
   <div *ngIf="errors?.length > 0">
     <app-shared-error [errors]="errors"></app-shared-error>
   </div>
+
+
+
   <div
     class="alert alert-danger d-flex justify-content-between align-items-center"
     *ngIf="savingError"
@@ -233,7 +238,7 @@
                         params?.specificDrugConceptUuid
                       "
                       [drugsToBeDispensed]="drugsToBeDispensed$ | async"
-                      (drugQuantity)="onChangeDrugQuantity($event)"
+                      (drugQuantity)="onChangeDrugQuantity($event, params?.specificDrugConceptUuid)"
                       (drugOrdered)="onOrderingDrug($event)"
                       (cancelForm)="onCancel()"
                       (formUpdate)="onFormUpdate($event)"
@@ -241,6 +246,8 @@
                     ></app-drug-order>
 
                     <div>
+
+                      <!-- In the below button, we added the parameter params?.specificDrugConceptUuid on the onUpdateOrder function-->
                       <button
                         class="float-right"
                         (click)="
