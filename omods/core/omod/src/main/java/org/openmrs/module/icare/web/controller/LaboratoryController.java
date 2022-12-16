@@ -730,7 +730,6 @@ public class LaboratoryController {
 				BatchSet batchSet = laboratoryService.getBatchSetByUuid(((Map) batchObject.get("batchSet")).get("uuid")
 				        .toString());
 				batch.setBatchSet(batchSet);
-				
 			}
 			
 			Batch newBatch = laboratoryService.addBatch(batch);
@@ -799,9 +798,7 @@ public class LaboratoryController {
 	@RequestMapping(value = "batchsets", method = RequestMethod.GET)
 	@ResponseBody
 	public List<Map<String, Object>> getbatchsets(@RequestParam(value = "startDate", required = false) String startDate,
-	        @RequestParam(value = "endDate", required = false) String endDate,
-	        @RequestParam(value = "q", required = false) String q, @RequestParam(defaultValue = "0") Integer startIndex,
-	        @RequestParam(defaultValue = "100") Integer limit) throws ParseException {
+	        @RequestParam(value = "endDate", required = false) String endDate, @RequestParam(value = "q", required = false) String q, @RequestParam(defaultValue = "0") Integer startIndex, @RequestParam(defaultValue = "100") Integer limit) throws ParseException {
 		
 		Date start = null;
 		Date end = null;
@@ -831,6 +828,59 @@ public class LaboratoryController {
 		
 		return savedbatchSetStatus.toMap();
 		
+	}
+
+	@RequestMapping(value = "worksheets",method = RequestMethod.GET)
+	@ResponseBody
+	public List<Map<String,Object>> getWorkSheets(@RequestParam(value = "startDate", required = false) String startDate, @RequestParam(value = "endDate", required = false) String endDate, @RequestParam(value = "q", required = false) String q, @RequestParam(defaultValue = "0") Integer startIndex, @RequestParam(defaultValue = "100") Integer limit) throws ParseException{
+
+		Date start = null;
+		Date end = null;
+		if (startDate != null && endDate != null) {
+
+			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+			start = formatter.parse(startDate);
+			end = formatter.parse(endDate);
+		}
+
+		List<Worksheet> worksheets = laboratoryService.getWorksheets(start, end, q, startIndex, limit);
+
+		List<Map<String, Object>> responseWorkSheetsObject = new ArrayList<Map<String, Object>>();
+		for (Worksheet worksheet : worksheets) {
+			Map<String, Object> worksheetObject = worksheet.toMap();
+			responseWorkSheetsObject.add(worksheetObject);
+		}
+
+		return responseWorkSheetsObject;
+	}
+
+	@RequestMapping(value = "worksheets",method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public List<Map<String,Object>> addWorksheet(@RequestBody List<Map<String,Object>> worksheetsObject){
+
+		Worksheet worksheet = new Worksheet();
+		List<Map<String,Object>> newWorksheets = new ArrayList<>();
+
+		for(Map<String,Object> worksheetObject : worksheetsObject){
+
+			worksheet = Worksheet.fromMap(worksheetObject);
+
+			Concept testOrderConcept = conceptService.getConceptByUuid(((Map) worksheetObject.get("testorder")).get("uuid").toString());
+			worksheet.setTestOrder(testOrderConcept);
+
+			if(worksheetObject.get("instrument") != null){
+
+				Concept instrumentconcept = conceptService.getConceptByUuid(((Map) worksheetObject.get("instrument")).get("uuid").toString());
+				worksheet.setInstrument(instrumentconcept);
+			}
+
+			Worksheet newworksheet = laboratoryService.addWorksheet(worksheet);
+			newWorksheets.add(newworksheet.toMap());
+
+
+		}
+		return newWorksheets;
+
 	}
 	
 }
