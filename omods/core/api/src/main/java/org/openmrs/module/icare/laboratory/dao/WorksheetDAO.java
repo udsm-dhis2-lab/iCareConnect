@@ -30,7 +30,7 @@ public class WorksheetDAO extends BaseDAO<Worksheet> {
                 queryStr += " AND ";
             }
 
-            queryStr += "lower(ws.code) like lower(:q)";
+            queryStr += "lower(ws.code) like lower(:q) OR lower(ws.name) like lower(:q)";
         }
 
         //Construct a query object

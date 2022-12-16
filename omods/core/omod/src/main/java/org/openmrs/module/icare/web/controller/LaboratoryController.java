@@ -863,6 +863,7 @@ public class LaboratoryController {
 
 		for(Map<String,Object> worksheetObject : worksheetsObject){
 
+			System.out.println(worksheetObject);
 			worksheet = Worksheet.fromMap(worksheetObject);
 
 			Concept testOrderConcept = conceptService.getConceptByUuid(((Map) worksheetObject.get("testorder")).get("uuid").toString());
