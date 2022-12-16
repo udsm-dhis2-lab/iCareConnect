@@ -3503,7 +3503,7 @@
                 <tableExists tableName="lb_worksheet_control"/>
             </not>
         </preConditions>
-        <comment>Creating openmrs lb_worksheet table</comment>
+        <comment>Creating openmrs lb_worksheet_control table</comment>
         <createTable tableName="lb_worksheet_control">
             <column name="worksheet_control_id" type="INTEGER" autoIncrement="true">
                 <constraints primaryKey="true" primaryKeyName="worksheet_control_id_pk"/>
@@ -3569,8 +3569,12 @@
             <column name="worksheet_definition_id" type="INTEGER"/>
             <column name="row" type="INTEGER"/>
             <column name="column" type="INTEGER"/>
-            <column name="sample_id" type="INTEGER"/>
-            <column name="control_id" type="INTEGER"/>
+            <column name="sample_id" type="INTEGER">
+                <constraints nullable="true"></constraints>
+            </column>
+            <column name="control_id" type="INTEGER">
+                <constraints nullable="true"></constraints>
+            </column>
             <column name="type" type="TEXT"/>
             <column name="creator" type="INTEGER"/>
             <column name="date_created" type="DATE">
@@ -3603,7 +3607,7 @@
         <addForeignKeyConstraint
                 baseColumnNames="worksheet_definition_id"
                 baseTableName="lb_worksheet_sample"
-                constraintName="lb_worksheet_sample_worksheet_definition_id_lb_worksheet_definition_worksheet_definition_id_fk"
+                constraintName="lb_sheet_sample_sheet_dfn_id_sheet_dfn_sheet_dfn_id_fk"
                 referencedColumnNames="worksheet_definition_id"
                 referencedTableName="lb_worksheet_definition"/>
 
@@ -3616,7 +3620,7 @@
 
         <addForeignKeyConstraint
                 baseColumnNames="control_id"
-                baseTableName="lb_worksheet_control"
+                baseTableName="lb_worksheet_sample"
                 constraintName="lb_worksheet_control_control_id_lb_sample_sample_id_fk"
                 referencedColumnNames="sample_id"
                 referencedTableName="lb_sample"/>
@@ -3672,7 +3676,7 @@
         <addForeignKeyConstraint
                 baseColumnNames="worksheet_sample_id"
                 baseTableName="lb_worksheet_sample_status"
-                constraintName="lb_worksheet_sample_status_worksheet_sample_id_lb_worksheet_sample_worksheet_sample_id_fk"
+                constraintName="sheet_smpl_sts_sheet_smpl_id_sheet_smpl_sheet_smpl_id_fk"
                 referencedColumnNames="worksheet_sample_id"
                 referencedTableName="lb_worksheet_sample"/>
 
@@ -3728,14 +3732,11 @@
         <addForeignKeyConstraint
                 baseColumnNames="worksheet_id"
                 baseTableName="lb_worksheet_status"
-                constraintName="lb_worksheet_status_worksheet_id_lb_worksheet_worksheet_id_fk"
+                constraintName="lb_sheet_status_sheet_id_lb_sheet_sheet_id_fk"
                 referencedColumnNames="worksheet_id"
                 referencedTableName="lb_worksheet"/>
 
-
     </changeSet>
-
-
 
 
 
