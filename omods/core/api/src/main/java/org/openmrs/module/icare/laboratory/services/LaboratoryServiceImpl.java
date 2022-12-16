@@ -48,7 +48,7 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	BatchSetStatusDAO batchSetStatusDAO;
 	
 	BatchStatusDAO batchStatusDAO;
-
+	
 	WorksheetDAO worksheetDAO;
 	
 	public void setSampleDAO(SampleDAO sampleDAO) {
@@ -106,8 +106,10 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	public void setBatchStatusDAO(BatchStatusDAO batchStatusDAO) {
 		this.batchStatusDAO = batchStatusDAO;
 	}
-
-	public void setWorksheetDAO(WorksheetDAO worksheetDAO){this.worksheetDAO = worksheetDAO;}
+	
+	public void setWorksheetDAO(WorksheetDAO worksheetDAO) {
+		this.worksheetDAO = worksheetDAO;
+	}
 	
 	@Override
 	public Sample createSample(Sample sample) {
@@ -786,8 +788,7 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 		batchStatus.setUser(user);
 		return batchStatusDAO.save(batchStatus);
 	}
-
-
+	
 	@Override
 	public List<BatchSet> getBatchSets(Date startDate, Date endDate, String q, Integer startIndex, Integer limit) {
 		return batchSetDAO.getBatchSets(startDate, endDate, q, startIndex, limit);
@@ -818,15 +819,15 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 		
 		return savedBatchSetStatus;
 	}
-
+	
 	@Override
 	public List<Worksheet> getWorksheets(Date startDate, Date endDate, String q, Integer startIndex, Integer limit) {
 		return worksheetDAO.getWorksheets(startDate, endDate, q, startIndex, limit);
 	}
-
+	
 	@Override
 	public Worksheet addWorksheet(Worksheet worksheet) {
 		return worksheetDAO.save(worksheet);
 	}
-
+	
 }

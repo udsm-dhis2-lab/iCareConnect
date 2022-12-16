@@ -798,7 +798,9 @@ public class LaboratoryController {
 	@RequestMapping(value = "batchsets", method = RequestMethod.GET)
 	@ResponseBody
 	public List<Map<String, Object>> getbatchsets(@RequestParam(value = "startDate", required = false) String startDate,
-	        @RequestParam(value = "endDate", required = false) String endDate, @RequestParam(value = "q", required = false) String q, @RequestParam(defaultValue = "0") Integer startIndex, @RequestParam(defaultValue = "100") Integer limit) throws ParseException {
+	        @RequestParam(value = "endDate", required = false) String endDate,
+	        @RequestParam(value = "q", required = false) String q, @RequestParam(defaultValue = "0") Integer startIndex,
+	        @RequestParam(defaultValue = "100") Integer limit) throws ParseException {
 		
 		Date start = null;
 		Date end = null;
@@ -829,31 +831,34 @@ public class LaboratoryController {
 		return savedbatchSetStatus.toMap();
 		
 	}
-
-	@RequestMapping(value = "worksheets",method = RequestMethod.GET)
+	
+	@RequestMapping(value = "worksheets", method = RequestMethod.GET)
 	@ResponseBody
-	public List<Map<String,Object>> getWorkSheets(@RequestParam(value = "startDate", required = false) String startDate, @RequestParam(value = "endDate", required = false) String endDate, @RequestParam(value = "q", required = false) String q, @RequestParam(defaultValue = "0") Integer startIndex, @RequestParam(defaultValue = "100") Integer limit) throws ParseException{
-
+	public List<Map<String, Object>> getWorkSheets(@RequestParam(value = "startDate", required = false) String startDate,
+	        @RequestParam(value = "endDate", required = false) String endDate,
+	        @RequestParam(value = "q", required = false) String q, @RequestParam(defaultValue = "0") Integer startIndex,
+	        @RequestParam(defaultValue = "100") Integer limit) throws ParseException {
+		
 		Date start = null;
 		Date end = null;
 		if (startDate != null && endDate != null) {
-
+			
 			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 			start = formatter.parse(startDate);
 			end = formatter.parse(endDate);
 		}
-
+		
 		List<Worksheet> worksheets = laboratoryService.getWorksheets(start, end, q, startIndex, limit);
-
+		
 		List<Map<String, Object>> responseWorkSheetsObject = new ArrayList<Map<String, Object>>();
 		for (Worksheet worksheet : worksheets) {
 			Map<String, Object> worksheetObject = worksheet.toMap();
 			responseWorkSheetsObject.add(worksheetObject);
 		}
-
+		
 		return responseWorkSheetsObject;
 	}
-
+	
 	@RequestMapping(value = "worksheets",method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public List<Map<String,Object>> addWorksheet(@RequestBody List<Map<String,Object>> worksheetsObject){
@@ -883,5 +888,4 @@ public class LaboratoryController {
 		return newWorksheets;
 
 	}
-	
 }

@@ -48,7 +48,7 @@ public class BatchDAO extends BaseDAO<Batch> {
 		if (q != null) {
 			query.setParameter("q", "%" + q.replace(" ", "%") + "%");
 		}
-
+		
 		query.setFirstResult(startIndex);
 		query.setMaxResults(limit);
 		

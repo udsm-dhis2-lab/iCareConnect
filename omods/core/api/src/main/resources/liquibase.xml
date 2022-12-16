@@ -3738,6 +3738,13 @@
 
     </changeSet>
 
+    <changeSet id="update_lb_worksheet_add_column_name" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE lb_worksheet
+            ADD COLUMN name VARCHAR(50) AFTER uuid;
+        </sql>
+    </changeSet>
+
 
 
 </databaseChangeLog>
