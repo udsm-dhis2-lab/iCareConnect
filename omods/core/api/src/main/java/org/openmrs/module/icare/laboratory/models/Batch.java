@@ -125,13 +125,12 @@ public class Batch extends BaseOpenmrsData implements java.io.Serializable, JSON
 			batchObject.put("dateCreated", this.getDateCreated());
 		}
 		
-		Map<String, Object> creatorObject = new HashMap<String, Object>();
-		
 		if (this.getCreator() != null) {
+			Map<String, Object> creatorObject = new HashMap<String, Object>();
 			creatorObject.put("uuid", this.getCreator().getUuid());
 			creatorObject.put("display", this.getCreator().getDisplayString());
+			batchObject.put("creator", creatorObject);
 		}
-		batchObject.put("creator", creatorObject);
 		
 		Map<String, Object> batchSetObject = new HashMap<String, Object>();
 		if (this.getBatchSet() != null) {

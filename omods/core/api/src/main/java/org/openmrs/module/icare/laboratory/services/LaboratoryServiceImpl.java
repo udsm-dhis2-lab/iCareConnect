@@ -49,6 +49,10 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	
 	BatchStatusDAO batchStatusDAO;
 	
+	WorksheetDAO worksheetDAO;
+
+	WorksheetControlDAO worksheetControlDAO;
+	
 	public void setSampleDAO(SampleDAO sampleDAO) {
 		this.sampleDAO = sampleDAO;
 	}
@@ -103,6 +107,14 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	
 	public void setBatchStatusDAO(BatchStatusDAO batchStatusDAO) {
 		this.batchStatusDAO = batchStatusDAO;
+	}
+	
+	public void setWorksheetDAO(WorksheetDAO worksheetDAO) {
+		this.worksheetDAO = worksheetDAO;
+	}
+
+	public void setWorksheetControlDAO(WorksheetControlDAO worksheetControlDAO) {
+		this.worksheetControlDAO = worksheetControlDAO;
 	}
 	
 	@Override
@@ -812,6 +824,26 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 		BatchSetStatus savedBatchSetStatus = batchSetStatusDAO.save(batchSetStatus);
 		
 		return savedBatchSetStatus;
+	}
+	
+	@Override
+	public List<Worksheet> getWorksheets(Date startDate, Date endDate, String q, Integer startIndex, Integer limit) {
+		return worksheetDAO.getWorksheets(startDate, endDate, q, startIndex, limit);
+	}
+	
+	@Override
+	public Worksheet addWorksheet(Worksheet worksheet) {
+		return worksheetDAO.save(worksheet);
+	}
+
+	@Override
+	public List<WorksheetControl> getWorksheetControls(Date startDate, Date endDate, String q, Integer startIndex, Integer limit) {
+		return worksheetControlDAO.getWorksheetControls(startDate, endDate, q, startIndex, limit);
+	}
+
+	@Override
+	public WorksheetControl addWorksheetControl(WorksheetControl worksheetControl) {
+		return worksheetControlDAO.save(worksheetControl);
 	}
 	
 }

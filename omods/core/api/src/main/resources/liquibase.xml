@@ -3557,7 +3557,7 @@
                 <tableExists tableName="lb_worksheet_sample"/>
             </not>
         </preConditions>
-        <comment>Creating openmrs lb_worksheet_definition table</comment>
+        <comment>Creating openmrs lb_worksheet_sample table</comment>
         <createTable tableName="lb_worksheet_sample">
             <column name="worksheet_sample_id" type="INTEGER" autoIncrement="true">
                 <constraints primaryKey="true" primaryKeyName="worksheet_sample_id_pk"/>
@@ -3736,6 +3736,13 @@
                 referencedColumnNames="worksheet_id"
                 referencedTableName="lb_worksheet"/>
 
+    </changeSet>
+
+    <changeSet id="update_lb_worksheet_add_column_name" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE lb_worksheet
+            ADD COLUMN name VARCHAR(50) AFTER code;
+        </sql>
     </changeSet>
 
 
