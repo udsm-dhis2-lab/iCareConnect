@@ -23,6 +23,7 @@ export class OpenmrsHttpClientService {
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
       'Access-Control-Allow-Origin': '*',
+      'No-Auth-Challenge': 'true',
       Authorization: 'Basic ' + credentialsToken,
     });
 
