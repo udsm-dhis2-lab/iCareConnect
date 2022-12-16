@@ -124,4 +124,9 @@ public interface LaboratoryService extends OpenmrsService {
 	List<Worksheet> getWorksheets(Date start, Date end, String q, Integer startIndex, Integer limit);
 	
 	Worksheet addWorksheet(Worksheet worksheet);
+
+    List<WorksheetControl> getWorksheetControls(Date start, Date end, String q, Integer startIndex, Integer limit);
+
+    WorksheetControl addWorksheetControl(WorksheetControl worksheetControl);
+
 }

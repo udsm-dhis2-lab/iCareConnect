@@ -90,7 +90,6 @@ public class Worksheet extends BaseChangeableOpenmrsMetadata implements java.io.
 	public static Worksheet fromMap(Map<String, Object> worksheetMap) {
 		
 		Worksheet worksheet = new Worksheet();
-		System.out.println(worksheetMap.get("code").toString());
 		worksheet.setCode(worksheetMap.get("code").toString());
 		worksheet.setDescription(worksheetMap.get("description").toString());
 		worksheet.setRows((Integer) worksheetMap.get("rows"));

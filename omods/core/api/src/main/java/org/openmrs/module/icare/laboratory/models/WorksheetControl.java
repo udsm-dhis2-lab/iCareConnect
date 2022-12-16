@@ -4,6 +4,8 @@ import org.openmrs.BaseOpenmrsMetadata;
 import org.openmrs.Concept;
 
 import javax.persistence.*;
+import java.util.HashMap;
+import java.util.Map;
 
 @Entity
 @Table(name = "lb_worksheet_control")
@@ -16,9 +18,10 @@ public class WorksheetControl extends BaseOpenmrsMetadata implements java.io.Ser
 	
 	@Column(name = "code")
 	private String code;
-	
-	@Column(name = "test_order_id")
-	private Concept testorder;
+
+	@ManyToOne
+	@JoinColumn(name = "test_order_id")
+	private Concept testOrder;
 	
 	@Override
 	public Integer getId() {
@@ -38,12 +41,43 @@ public class WorksheetControl extends BaseOpenmrsMetadata implements java.io.Ser
 		this.code = code;
 	}
 	
-	public Concept getTestorder() {
-		return testorder;
+	public Concept getTestOrder() {
+		return testOrder;
 	}
 	
-	public void setTestorder(Concept testorder) {
-		this.testorder = testorder;
+	public void setTestOrder(Concept testOrder) {
+		this.testOrder = testOrder;
 	}
-	
+
+	public static WorksheetControl fromMap(Map<String, Object> worksheetMap) {
+
+		WorksheetControl worksheetControl = new WorksheetControl();
+		worksheetControl.setCode(worksheetMap.get("code").toString());
+		worksheetControl.setDescription(worksheetMap.get("description").toString());
+		worksheetControl.setName(worksheetMap.get("name").toString());
+
+		return worksheetControl;
+	}
+
+	public Map<String,Object> toMap(){
+
+		HashMap<String,Object> worksheetObject = new HashMap<>();
+
+		worksheetObject.put("code",this.getCode());
+		worksheetObject.put("description",this.getDescription());
+		worksheetObject.put("name",this.getName());
+
+		Map<String,Object> testOrderObject = new HashMap<>();
+		testOrderObject.put("uuid",this.getTestOrder().getUuid());
+		testOrderObject.put("display",this.getTestOrder().getDisplayString());
+		worksheetObject.put("testOrder",testOrderObject);
+
+		if(this.getCreator() != null){
+			Map<String,Object> creatorObject = new HashMap<>();
+			creatorObject.put("uuid",this.getCreator().getUuid());
+			creatorObject.put("display",this.getCreator().getDisplayString());
+		}
+
+		return worksheetObject;
+	}
 }
