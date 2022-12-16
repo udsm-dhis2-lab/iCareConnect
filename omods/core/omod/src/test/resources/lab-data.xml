@@ -164,5 +164,8 @@
     <!-- Worksheet -->
     <lb_worksheet worksheet_id="1" name="worksheet3" code="W1" uuid="iCARE890-YTRE-IUYT-9beb-d30dcfc0c66e" rows="10" columns="12" description="Test worksheet" instrument_id="810" test_order_id="800" date_created="2022-12-10 15:51:57.0" retired="false" creator="1"/>
 
+    <!-- WorksheetControl -->
+    <lb_worksheet_control worksheet_control_id="1" name="worksheetControl3" code="W1" uuid="iCARE890-YTYE-IUYT-9beb-d30dcfc0c66e"  description="Test worksheet control"  test_order_id="800" date_created="2022-12-10 15:51:57.0" retired="false" creator="1"/>
+
 
 </dataset>
