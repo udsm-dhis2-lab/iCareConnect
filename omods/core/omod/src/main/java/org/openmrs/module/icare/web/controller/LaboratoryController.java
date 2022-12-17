@@ -970,10 +970,6 @@ public class LaboratoryController {
 		for(Map<String,Object> worksheetDefinitionObject : worksheetDefinitionsObject){
 
 			worksheetDefinition = WorksheetDefinition.fromMap(worksheetDefinitionObject);
-
-			Worksheet worksheet = laboratoryService.getWorksheetByUuid(((Map)worksheetDefinitionObject.get("worksheet")).get("uuid").toString());
-			worksheetDefinition.setWorksheet(worksheet);
-
 			WorksheetDefinition newWorksheetDefinition = laboratoryService.addWorksheetDefinition(worksheetDefinition);
 			newWorksheetDefinitions.add(newWorksheetDefinition.toMap());
 
