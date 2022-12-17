@@ -52,6 +52,8 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	WorksheetDAO worksheetDAO;
 
 	WorksheetControlDAO worksheetControlDAO;
+
+	WorksheetDefinitionDAO worksheetDefinitionDAO;
 	
 	public void setSampleDAO(SampleDAO sampleDAO) {
 		this.sampleDAO = sampleDAO;
@@ -115,6 +117,10 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 
 	public void setWorksheetControlDAO(WorksheetControlDAO worksheetControlDAO) {
 		this.worksheetControlDAO = worksheetControlDAO;
+	}
+
+	public void setWorksheetDefinitionDAO(WorksheetDefinitionDAO worksheetDefinitionDAO){
+		this.worksheetDefinitionDAO = worksheetDefinitionDAO;
 	}
 	
 	@Override
@@ -830,6 +836,11 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	public List<Worksheet> getWorksheets(Date startDate, Date endDate, String q, Integer startIndex, Integer limit) {
 		return worksheetDAO.getWorksheets(startDate, endDate, q, startIndex, limit);
 	}
+
+	@Override
+	public Worksheet getWorksheetByUuid(String worksheetUuid){
+		return worksheetDAO.findByUuid(worksheetUuid);
+	}
 	
 	@Override
 	public Worksheet addWorksheet(Worksheet worksheet) {
@@ -844,6 +855,16 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	@Override
 	public WorksheetControl addWorksheetControl(WorksheetControl worksheetControl) {
 		return worksheetControlDAO.save(worksheetControl);
+	}
+
+	@Override
+	public List<WorksheetDefinition> getWorksheetDefinitions(Date startDate, Date endDate, String q, Integer startIndex, Integer limit){
+		return worksheetDefinitionDAO.getWorksheetDefinitions(startDate, endDate, q, startIndex, limit);
+	}
+
+	@Override
+	public WorksheetDefinition addWorksheetDefinition(WorksheetDefinition worksheetDefinition){
+		return worksheetDefinitionDAO.save(worksheetDefinition);
 	}
 	
 }

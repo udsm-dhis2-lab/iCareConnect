@@ -122,6 +122,8 @@ public interface LaboratoryService extends OpenmrsService {
 	BatchStatus addBatchStatus(BatchStatus batchStatus) throws Exception;
 	
 	List<Worksheet> getWorksheets(Date start, Date end, String q, Integer startIndex, Integer limit);
+
+	Worksheet getWorksheetByUuid(String worksheetUuid);
 	
 	Worksheet addWorksheet(Worksheet worksheet);
 
@@ -129,4 +131,7 @@ public interface LaboratoryService extends OpenmrsService {
 
     WorksheetControl addWorksheetControl(WorksheetControl worksheetControl);
 
+	List<WorksheetDefinition> getWorksheetDefinitions(Date start, Date end, String q, Integer startIndex, Integer limit);
+
+	WorksheetDefinition addWorksheetDefinition(WorksheetDefinition worksheetDefinition) throws Exception;
 }

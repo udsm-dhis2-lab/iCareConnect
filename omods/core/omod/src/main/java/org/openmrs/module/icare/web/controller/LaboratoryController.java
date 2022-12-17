@@ -936,4 +936,49 @@ public class LaboratoryController {
 
 	}
 
+	@RequestMapping(value = "worksheetdefinitions",method = RequestMethod.GET)
+	@ResponseBody
+	public List<Map<String,Object>> getWorksheetDefinitions(@RequestParam(value = "startDate", required = false) String startDate, @RequestParam(value = "endDate", required = false) String endDate, @RequestParam(value = "q", required = false) String q, @RequestParam(defaultValue = "0") Integer startIndex, @RequestParam(defaultValue = "100") Integer limit) throws ParseException{
+
+		Date start = null;
+		Date end = null;
+		if (startDate != null && endDate != null) {
+
+			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+			start = formatter.parse(startDate);
+			end = formatter.parse(endDate);
+		}
+
+		List<WorksheetDefinition> worksheetDefinitions = laboratoryService.getWorksheetDefinitions(start, end, q, startIndex, limit);
+
+		List<Map<String,Object>> worksheetDefinitionsObject = new ArrayList<>();
+		for(WorksheetDefinition worksheetDefinition : worksheetDefinitions){
+
+			Map<String,Object> worksheetDefinitionObject = worksheetDefinition.toMap();
+			worksheetDefinitionsObject.add(worksheetDefinitionObject);
+		}
+		return  worksheetDefinitionsObject;
+	}
+
+	@RequestMapping(value="worksheetdefinitions",method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public List<Map<String,Object>> addWorksheetDefinitions(@RequestBody List<Map<String,Object>> worksheetDefinitionsObject) throws Exception{
+
+		WorksheetDefinition worksheetDefinition = new WorksheetDefinition();
+		List<Map<String,Object>> newWorksheetDefinitions = new ArrayList<>();
+
+		for(Map<String,Object> worksheetDefinitionObject : worksheetDefinitionsObject){
+
+			worksheetDefinition = WorksheetDefinition.fromMap(worksheetDefinitionObject);
+
+			Worksheet worksheet = laboratoryService.getWorksheetByUuid(((Map)worksheetDefinitionObject.get("worksheet")).get("uuid").toString());
+			worksheetDefinition.setWorksheet(worksheet);
+
+			WorksheetDefinition newWorksheetDefinition = laboratoryService.addWorksheetDefinition(worksheetDefinition);
+			newWorksheetDefinitions.add(newWorksheetDefinition.toMap());
+
+		}
+		return newWorksheetDefinitions;
+	}
+
 }

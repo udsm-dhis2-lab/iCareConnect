@@ -181,6 +181,12 @@
                     </bean>
                 </property>
 
+                <property name="worksheetDefinitionDAO">
+                    <bean class="org.openmrs.module.icare.laboratory.dao.WorksheetDefinitionDAO">
+                        <property name="sessionFactory" ref="dbSessionFactory" />
+                    </bean>
+                </property>
+
 
             </bean>
         </property>
