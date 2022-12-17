@@ -3,6 +3,8 @@ package org.openmrs.module.icare.laboratory.models;
 import org.openmrs.BaseOpenmrsData;
 
 import javax.persistence.*;
+import java.util.HashMap;
+import java.util.Map;
 
 @Entity
 @Table(name = "lb_worksheet_definition")
@@ -16,7 +18,7 @@ public class WorksheetDefinition extends BaseOpenmrsData implements java.io.Seri
 	@Column(name = "code", length = 30)
 	private String code;
 	
-	@OneToOne
+	@OneToMany
 	@JoinColumn(name = "worksheet_id")
 	private Worksheet worksheet;
 	
@@ -44,5 +46,33 @@ public class WorksheetDefinition extends BaseOpenmrsData implements java.io.Seri
 	
 	public void setWorksheet(Worksheet worksheet) {
 		this.worksheet = worksheet;
+	}
+
+	public static WorksheetDefinition fromMap(Map<String,Object> worksheetDefinitionMap){
+
+		WorksheetDefinition worksheetDefinition = new WorksheetDefinition();
+		worksheetDefinition.setCode(worksheetDefinitionMap.get("code").toString());
+
+		return worksheetDefinition;
+	}
+
+	public Map<String,Object> toMap(){
+
+		Map<String,Object> worksheetDefinitionObject = new HashMap<>();
+		worksheetDefinitionObject.put("code",this.getCode());
+
+		Map<String,Object> worksheetObject = new HashMap<>();
+		worksheetObject.put("uuid",this.worksheet.getUuid());
+		worksheetObject.put("display",this.worksheet.getName());
+		worksheetDefinitionObject.put("worksheet",worksheetObject);
+
+		if (this.creator != null){
+			Map<String,Object> userObject = new HashMap<>();
+			userObject.put("uuid",this.getCreator().getUuid());
+			userObject.put("display",this.getCreator().getDisplayString());
+			worksheetDefinitionObject.put("creator",userObject);
+		}
+
+		return worksheetDefinitionObject;
 	}
 }
