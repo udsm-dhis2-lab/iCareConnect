@@ -167,5 +167,6 @@
     <!-- WorksheetControl -->
     <lb_worksheet_control worksheet_control_id="1" name="worksheetControl3" code="W1" uuid="iCARE890-YTYE-IUYT-9beb-d30dcfc0c66e"  description="Test worksheet control"  test_order_id="800" date_created="2022-12-10 15:51:57.0" retired="false" creator="1"/>
 
+    <lb_worksheet_definition worksheet_definition_id ="1" uuid = "iCARE890-TEST-GGGH-9beb-d30dcfc0c635" code="WD"  worksheet_id="1" date_created="2022-12-10 15:51:57.0" voided="0" creator="1" />
 
 </dataset>

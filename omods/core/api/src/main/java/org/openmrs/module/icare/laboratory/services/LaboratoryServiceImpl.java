@@ -863,7 +863,13 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	}
 
 	@Override
-	public WorksheetDefinition addWorksheetDefinition(WorksheetDefinition worksheetDefinition){
+	public WorksheetDefinition addWorksheetDefinition(WorksheetDefinition worksheetDefinition) throws Exception{
+
+		Worksheet worksheet = this.getWorksheetByUuid(worksheetDefinition.getWorksheet().getUuid());
+		if (worksheet == null) {
+			throw new Exception("The worksheet definition with id " + worksheetDefinition.getWorksheet().getUuid() + " does not exist");
+		}
+		worksheetDefinition.setWorksheet(worksheet);
 		return worksheetDefinitionDAO.save(worksheetDefinition);
 	}
 	
