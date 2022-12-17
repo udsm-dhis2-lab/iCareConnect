@@ -87,7 +87,13 @@ export class TableComponent implements OnInit {
     if (this.visit && this.visit.uuid) {
       this.patientDrugOrdersStatuses$ =
         this.drugOrderService.getDrugOrderStatus(this.visit.uuid);
+      
+        this.patientDrugOrdersStatuses$.subscribe(x => console.log(x))
+
     }
+
+    console.log(this.drugOrders);
+    
 
     this.data$?.pipe(filter((data) => data !== null)).subscribe((data) => {
       this.dataSource = data;
