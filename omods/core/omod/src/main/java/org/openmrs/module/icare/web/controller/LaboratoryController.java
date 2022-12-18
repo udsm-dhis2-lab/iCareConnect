@@ -977,4 +977,48 @@ public class LaboratoryController {
 		return newWorksheetDefinitions;
 	}
 
+	@RequestMapping(value = "worksheetsamples", method = RequestMethod.GET)
+	@ResponseBody
+	public List<Map<String,Object>> getWorksheetSamples(@RequestParam(value = "startDate", required = false) String startDate, @RequestParam(value = "endDate", required = false) String endDate, @RequestParam(value = "q", required = false) String q, @RequestParam(defaultValue = "0") Integer startIndex, @RequestParam(defaultValue = "100") Integer limit) throws ParseException{
+
+		Date start = null;
+		Date end = null;
+		if (startDate != null && endDate != null) {
+
+			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+			start = formatter.parse(startDate);
+			end = formatter.parse(endDate);
+		}
+
+		List<WorksheetSample> worksheetSamples = laboratoryService.getWorksheetSamples(start, end, q, startIndex, limit);
+
+		List<Map<String,Object>> worksheetSamplesObject = new ArrayList<>();
+
+		for(WorksheetSample worksheetSample : worksheetSamples){
+			Map<String,Object> worksheetSampleObject = worksheetSample.toMap();
+			worksheetSamplesObject.add(worksheetSampleObject);
+
+		}
+		return worksheetSamplesObject;
+	}
+
+	@RequestMapping(value="worksheetsamples",method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public List<Map<String,Object>> addWorksheetSamples(@RequestBody List<Map<String,Object>> worksheetSamplesObject) throws Exception{
+
+		WorksheetSample worksheetSample = new WorksheetSample();
+		List<Map<String,Object>> newWorksheetSamples = new ArrayList<>();
+
+		for(Map<String,Object> worksheetSampleObject : worksheetSamplesObject){
+
+			worksheetSample = WorksheetSample.fromMap(worksheetSampleObject);
+			WorksheetSample newWorksheetSample = laboratoryService.addWorksheetSample(worksheetSample);
+			newWorksheetSamples.add(newWorksheetSample.toMap());
+
+		}
+		return newWorksheetSamples;
+	}
+
+
+
 }

@@ -54,6 +54,8 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	WorksheetControlDAO worksheetControlDAO;
 
 	WorksheetDefinitionDAO worksheetDefinitionDAO;
+
+	WorksheetSampleDAO worksheetSampleDAO;
 	
 	public void setSampleDAO(SampleDAO sampleDAO) {
 		this.sampleDAO = sampleDAO;
@@ -121,6 +123,10 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 
 	public void setWorksheetDefinitionDAO(WorksheetDefinitionDAO worksheetDefinitionDAO){
 		this.worksheetDefinitionDAO = worksheetDefinitionDAO;
+	}
+
+	public void setWorksheetSampleDAO(WorksheetSampleDAO worksheetSampleDAO){
+		this.worksheetSampleDAO = worksheetSampleDAO;
 	}
 	
 	@Override
@@ -853,6 +859,11 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	}
 
 	@Override
+	public WorksheetControl getWorksheetControlByUuid(String worksheetControlUuid){
+		return worksheetControlDAO.findByUuid(worksheetControlUuid);
+	}
+
+	@Override
 	public WorksheetControl addWorksheetControl(WorksheetControl worksheetControl) {
 		return worksheetControlDAO.save(worksheetControl);
 	}
@@ -860,6 +871,11 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	@Override
 	public List<WorksheetDefinition> getWorksheetDefinitions(Date startDate, Date endDate, String q, Integer startIndex, Integer limit){
 		return worksheetDefinitionDAO.getWorksheetDefinitions(startDate, endDate, q, startIndex, limit);
+	}
+
+	@Override
+	public WorksheetDefinition getWorksheetDefinitionByUuid(String worksheetDefinitionUuid){
+		return worksheetDefinitionDAO.findByUuid(worksheetDefinitionUuid);
 	}
 
 	@Override
@@ -871,6 +887,36 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 		}
 		worksheetDefinition.setWorksheet(worksheet);
 		return worksheetDefinitionDAO.save(worksheetDefinition);
+	}
+
+	@Override
+	public List<WorksheetSample> getWorksheetSamples(Date startDate, Date endDate, String q, Integer startIndex, Integer limit){
+       return worksheetSampleDAO.getWorksheetSamples(startDate, endDate, q, startIndex, limit);
+	}
+
+	@Override
+	public WorksheetSample addWorksheetSample(WorksheetSample worksheetSample) throws Exception{
+
+		Sample sample = this.getSampleByUuid(worksheetSample.getSample().getUuid());
+		if (sample == null) {
+			throw new Exception("The sample with id " + worksheetSample.getSample().getUuid() + " does not exist");
+		}
+
+		WorksheetDefinition worksheetDefinition = this.getWorksheetDefinitionByUuid(worksheetSample.getWorksheetDefinition().getUuid());
+		if (worksheetDefinition == null) {
+			throw new Exception("The worksheet definition with id " + worksheetSample.getWorksheetDefinition().getUuid() + " does not exist");
+		}
+
+		if(worksheetSample.getWorksheetControl().getUuid() != null){
+			WorksheetControl worksheetControl = this.getWorksheetControlByUuid(worksheetSample.getWorksheetControl().getUuid());
+			if (worksheetControl == null) {
+				throw new Exception("The worksheet control with id " + worksheetSample.getWorksheetControl().getUuid() + " does not exist");
+			}
+			worksheetSample.setWorksheetControl(worksheetControl);
+		}
+		worksheetSample.setSample(sample);
+		worksheetSample.setWorksheetDefinition(worksheetDefinition);
+		return worksheetSampleDAO.save(worksheetSample);
 	}
 	
 }
