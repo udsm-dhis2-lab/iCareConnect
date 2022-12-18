@@ -768,7 +768,33 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		assertThat("Has 1 worksheet control", batches.size(), is(1));
 
 	}
-	
+
+	@Test
+	public void CreatingAndGettingWorksheetSamples() throws Exception {
+
+		//1. Creating worksheet definitions
+		//Given
+//		String dto = this.readFile("dto/worksheet-definition-create-dto.json");
+//		List<Map<String, Object>> worksheetObject = (new ObjectMapper()).readValue(dto, List.class);
+//
+//		//When
+//		MockHttpServletRequest newPostRequest = newPostRequest("lab/worksheetdefinitions", worksheetObject);
+//		MockHttpServletResponse handle = handle(newPostRequest);
+//		List<Map<String, Object>> createdbatchSets = (new ObjectMapper()).readValue(handle.getContentAsString(), List.class);
+//
+//		assertThat("created 2 worksheets definitions", createdbatchSets.size(), is(2));
+
+		//2. Getting worksheet definitions
+		//When
+		MockHttpServletRequest newGetRequest = newGetRequest("lab/worksheetsamples");
+		MockHttpServletResponse handle2 = handle(newGetRequest);
+
+		List<Map<String, Object>> batches = (new ObjectMapper()).readValue(handle2.getContentAsString(), List.class);
+
+		assertThat("Has 1 worksheet control", batches.size(), is(1));
+
+	}
+
 	@Override
 	public String getURI() {
 		return null;

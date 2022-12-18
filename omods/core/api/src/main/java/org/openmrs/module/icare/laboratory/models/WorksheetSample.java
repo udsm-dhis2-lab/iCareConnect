@@ -5,6 +5,9 @@ import org.openmrs.BaseOpenmrsData;
 
 import javax.persistence.*;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static javax.persistence.GenerationType.IDENTITY;
 
 @Entity
@@ -31,8 +34,9 @@ public class WorksheetSample extends BaseOpenmrsData implements java.io.Serializ
 	@ManyToOne
 	@JoinColumn(name = "sample_id", nullable = true)
 	private Sample sample;
-	
-	@Column(name = "control_id", nullable = true)
+
+	@ManyToOne
+	@JoinColumn(name = "control_id", nullable = true)
 	private WorksheetControl worksheetControl;
 	
 	@Column(name = "type")
@@ -94,5 +98,60 @@ public class WorksheetSample extends BaseOpenmrsData implements java.io.Serializ
 	
 	public void setType(String type) {
 		this.type = type;
+	}
+
+	public static WorksheetSample fromMap(Map<String,Object> worksheetSampleMap){
+
+		WorksheetSample worksheetSample = new WorksheetSample();
+
+		worksheetSample.setRow((Integer)worksheetSampleMap.get("row"));
+		worksheetSample.setColumn((Integer)worksheetSampleMap.get("column"));
+		worksheetSample.setType(worksheetSampleMap.get("type").toString());
+
+		Sample sample = new Sample();
+		sample.setUuid(((Map) worksheetSampleMap.get("sample")).get("uuid").toString());
+		worksheetSample.setSample(sample);
+
+		WorksheetDefinition worksheetDefinition = new WorksheetDefinition();
+		worksheetDefinition.setUuid(((Map) worksheetSampleMap.get("worksheetDefinition")).get("uuid").toString());
+		worksheetSample.setWorksheetDefinition(worksheetDefinition);
+
+		if(worksheetSampleMap.get("worksheetControl") != null) {
+			WorksheetControl worksheetControl = new WorksheetControl();
+			worksheetControl.setUuid(((Map) worksheetSampleMap.get("worksheetControl")).get("uuid").toString());
+		}
+
+		return worksheetSample;
+	}
+
+	public Map<String,Object> toMap(){
+
+		Map<String,Object> worksheetSampleObject = new HashMap<>();
+
+		worksheetSampleObject.put("row",this.getRow());
+		worksheetSampleObject.put("column",this.getColumn());
+		worksheetSampleObject.put("type",this.getType());
+
+		Map<String,Object> worksheetDefinitionObject = new HashMap<>();
+		worksheetDefinitionObject.put("uuid",this.getWorksheetDefinition().getUuid());
+		worksheetDefinitionObject.put("display",this.getWorksheetDefinition().getCode());
+
+		Map<String,Object> sampleObject = new HashMap<>();
+		sampleObject.put("uuid",this.getSample().getUuid());
+		sampleObject.put("display",this.getSample().getLabel());
+
+		if( this.getWorksheetControl() != null){
+			Map<String,Object> worksheetControlObject = new HashMap<>();
+			worksheetControlObject.put("uuid",this.getWorksheetControl().getUuid());
+			worksheetControlObject.put("display",this.getWorksheetControl().getCode());
+		}
+
+		if (this.creator != null){
+			Map<String,Object> userObject = new HashMap<>();
+			userObject.put("uuid",this.getCreator().getUuid());
+			userObject.put("display",this.getCreator().getDisplayString());
+			worksheetDefinitionObject.put("creator",userObject);
+		}
+		return worksheetSampleObject;
 	}
 }

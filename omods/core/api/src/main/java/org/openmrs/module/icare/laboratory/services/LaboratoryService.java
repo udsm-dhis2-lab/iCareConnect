@@ -129,9 +129,17 @@ public interface LaboratoryService extends OpenmrsService {
 
     List<WorksheetControl> getWorksheetControls(Date start, Date end, String q, Integer startIndex, Integer limit);
 
+	WorksheetControl getWorksheetControlByUuid(String worksheetControlUuid);
+
     WorksheetControl addWorksheetControl(WorksheetControl worksheetControl);
 
 	List<WorksheetDefinition> getWorksheetDefinitions(Date start, Date end, String q, Integer startIndex, Integer limit);
 
+	WorksheetDefinition getWorksheetDefinitionByUuid(String worksheetDefinitionUuid);
+
 	WorksheetDefinition addWorksheetDefinition(WorksheetDefinition worksheetDefinition) throws Exception;
+
+	List<WorksheetSample> getWorksheetSamples(Date start, Date end, String q, Integer startIndex, Integer limit);
+
+	WorksheetSample addWorksheetSample(WorksheetSample worksheetSample) throws Exception;
 }
