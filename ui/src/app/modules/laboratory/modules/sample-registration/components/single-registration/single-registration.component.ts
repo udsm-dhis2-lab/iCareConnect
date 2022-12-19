@@ -34,7 +34,7 @@ import { SampleRegistrationFinalizationComponent } from "../sample-registration-
 import { ConceptsService } from "src/app/shared/resources/concepts/services/concepts.service";
 import { map } from "rxjs/operators";
 import { OtherClientLevelSystemsService } from "src/app/modules/laboratory/resources/services/other-client-level-systems.service";
-import { SharedConfirmationComponent } from "src/app/shared/components/shared-confirmation /shared-confirmation.component";
+import { SharedConfirmationComponent } from "src/app/shared/components/shared-confirmation/shared-confirmation.component";
 import { Store } from "@ngrx/store";
 import { AppState } from "src/app/store/reducers";
 import { getLocationsByIds } from "src/app/store/selectors";

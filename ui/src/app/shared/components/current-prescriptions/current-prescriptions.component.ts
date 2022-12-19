@@ -28,26 +28,36 @@ export class CurrentPrescriptionComponent implements OnInit {
   errors: any[] = [];
   specificDrugConceptUuid$: Observable<any>;
   prescriptionArrangementFields$: Observable<any>;
+  <<<<<<< feature/upgrade-angular
   patientDrugOrdersStatuses$: Observable<any>;
   drugOrders$: Observable<any>;
 
   constructor(
     private systemSettingsService: SystemSettingsService,
     private drugOrderService: DrugOrdersService,
+
+
+  constructor(
+    private systemSettingsService: SystemSettingsService,
+
+    feature/upgrade-angular
     private encounterService: EncountersService,
     private ordersService: OrdersService,
     private dialog: MatDialog
   ) { }
 
   ngOnInit(): void {
-    this.getDrugsPrescribed();
+this.getDrugsPrescribed();
+
+feature/upgrade-angular
 
     this.drugOrders$ = this.ordersService
         .getOrdersByVisitAndOrderType({
           visit: this.visit?.uuid,
           orderType: "iCARESTS-PRES-1111-1111-525400e4297f",
-        })
-        
+        })      
+
+ feature/upgrade-angular
 
     this.specificDrugConceptUuid$ = this.systemSettingsService
       .getSystemSettingsByKey(
@@ -95,7 +105,7 @@ export class CurrentPrescriptionComponent implements OnInit {
         })
       );
   }
-
+   feature/upgrade-angular
 
   ngAfterViewInit() {
     
@@ -120,6 +130,8 @@ export class CurrentPrescriptionComponent implements OnInit {
     return false
   }
 
+
+ feature/upgrade-angular
   getDrugsPrescribed() {
     this.drugsPrescribed = flatten(
       this.visit?.encounters
@@ -156,7 +168,7 @@ export class CurrentPrescriptionComponent implements OnInit {
         ?.filter((order) => order)
     );
   }
-
+feature/upgrade-angular
 
 stopDrugOrderEnabled = true;
 
@@ -208,4 +220,36 @@ stopDrugOrder(e: Event, drugOrder: any, drugName: string, dispensedDrug: string)
 
 }
 /** */
+
+  stopDrugOrder(e: Event, drugOrder: any, drugName: string) {
+    const confirmDialog = this.dialog.open(SharedConfirmationComponent, {
+      width: "25%",
+      data: {
+        modalTitle: `Stop Medicaton`,
+        modalMessage: `You are about to stop ${drugName} for this patient, Click confirm to finish!`,
+        showRemarksInput: true,
+      },
+      disableClose: false,
+      panelClass: "custom-dialog-container",
+    });
+
+    confirmDialog.afterClosed().subscribe((confirmationObject) => {
+      if (confirmationObject?.confirmed) {
+        this.encounterService
+          .voidEncounterWithReason({
+            ...drugOrder?.encounter,
+            voidReason: confirmationObject?.remarks || "",
+          })
+          .subscribe((response) => {
+            if (!response?.error) {
+              this.loadVisit.emit(this.visit);
+            }
+            if (response?.error) {
+              this.errors = [...this.errors, response?.error];
+            }
+          });
+      }
+    });
+  }
+ feature/upgrade-angular
 }
