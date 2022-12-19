@@ -108,10 +108,11 @@ public class WorksheetSample extends BaseOpenmrsData implements java.io.Serializ
 		worksheetSample.setColumn((Integer)worksheetSampleMap.get("column"));
 		worksheetSample.setType(worksheetSampleMap.get("type").toString());
 
-		Sample sample = new Sample();
-		sample.setUuid(((Map) worksheetSampleMap.get("sample")).get("uuid").toString());
-		worksheetSample.setSample(sample);
-
+		if(worksheetSampleMap.get("sample") != null) {
+			Sample sample = new Sample();
+			sample.setUuid(((Map) worksheetSampleMap.get("sample")).get("uuid").toString());
+			worksheetSample.setSample(sample);
+		}
 		WorksheetDefinition worksheetDefinition = new WorksheetDefinition();
 		worksheetDefinition.setUuid(((Map) worksheetSampleMap.get("worksheetDefinition")).get("uuid").toString());
 		worksheetSample.setWorksheetDefinition(worksheetDefinition);
@@ -119,6 +120,7 @@ public class WorksheetSample extends BaseOpenmrsData implements java.io.Serializ
 		if(worksheetSampleMap.get("worksheetControl") != null) {
 			WorksheetControl worksheetControl = new WorksheetControl();
 			worksheetControl.setUuid(((Map) worksheetSampleMap.get("worksheetControl")).get("uuid").toString());
+			worksheetSample.setWorksheetControl(worksheetControl);
 		}
 
 		return worksheetSample;
@@ -136,11 +138,12 @@ public class WorksheetSample extends BaseOpenmrsData implements java.io.Serializ
 		worksheetDefinitionObject.put("uuid",this.getWorksheetDefinition().getUuid());
 		worksheetDefinitionObject.put("display",this.getWorksheetDefinition().getCode());
 		worksheetSampleObject.put("worksheetDefinition",worksheetDefinitionObject);
-
-		Map<String,Object> sampleObject = new HashMap<>();
-		sampleObject.put("uuid",this.getSample().getUuid());
-		sampleObject.put("display",this.getSample().getLabel());
-		worksheetSampleObject.put("sample",sampleObject);
+		if( this.getSample() != null) {
+			Map<String, Object> sampleObject = new HashMap<>();
+			sampleObject.put("uuid", this.getSample().getUuid());
+			sampleObject.put("display", this.getSample().getLabel());
+			worksheetSampleObject.put("sample", sampleObject);
+		}
 
 		if( this.getWorksheetControl() != null){
 			Map<String,Object> worksheetControlObject = new HashMap<>();
