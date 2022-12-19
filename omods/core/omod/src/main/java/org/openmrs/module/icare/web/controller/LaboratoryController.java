@@ -992,8 +992,6 @@ public class LaboratoryController {
 
 		List<WorksheetSample> worksheetSamples = laboratoryService.getWorksheetSamples(start, end, q, startIndex, limit);
 
-		System.out.println("-->"+worksheetSamples);
-
 		List<Map<String,Object>> worksheetSamplesObject = new ArrayList<>();
 
 		for(WorksheetSample worksheetSample : worksheetSamples){
@@ -1001,7 +999,6 @@ public class LaboratoryController {
 			worksheetSamplesObject.add(worksheetSampleObject);
 
 		}
-		System.out.println("-->"+worksheetSamplesObject);
 		return worksheetSamplesObject;
 	}
 

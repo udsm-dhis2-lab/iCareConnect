@@ -897,9 +897,12 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	@Override
 	public WorksheetSample addWorksheetSample(WorksheetSample worksheetSample) throws Exception{
 
-		Sample sample = this.getSampleByUuid(worksheetSample.getSample().getUuid());
-		if (sample == null) {
-			throw new Exception("The sample with id " + worksheetSample.getSample().getUuid() + " does not exist");
+		if(worksheetSample.getSample() != null) {
+			Sample sample = this.getSampleByUuid(worksheetSample.getSample().getUuid());
+			if (sample == null) {
+				throw new Exception("The sample with id " + worksheetSample.getSample().getUuid() + " does not exist");
+			}
+			worksheetSample.setSample(sample);
 		}
 
 		WorksheetDefinition worksheetDefinition = this.getWorksheetDefinitionByUuid(worksheetSample.getWorksheetDefinition().getUuid());
@@ -907,16 +910,14 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 			throw new Exception("The worksheet definition with id " + worksheetSample.getWorksheetDefinition().getUuid() + " does not exist");
 		}
 
-		if(worksheetSample.getWorksheetControl().getUuid() != null){
+		if(worksheetSample.getWorksheetControl() != null){
 			WorksheetControl worksheetControl = this.getWorksheetControlByUuid(worksheetSample.getWorksheetControl().getUuid());
 			if (worksheetControl == null) {
 				throw new Exception("The worksheet control with id " + worksheetSample.getWorksheetControl().getUuid() + " does not exist");
 			}
 			worksheetSample.setWorksheetControl(worksheetControl);
 		}
-		worksheetSample.setSample(sample);
 		worksheetSample.setWorksheetDefinition(worksheetDefinition);
-		System.out.println(worksheetSample);
 		return worksheetSampleDAO.save(worksheetSample);
 	}
 	
