@@ -916,6 +916,7 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 		}
 		worksheetSample.setSample(sample);
 		worksheetSample.setWorksheetDefinition(worksheetDefinition);
+		System.out.println(worksheetSample);
 		return worksheetSampleDAO.save(worksheetSample);
 	}
 	

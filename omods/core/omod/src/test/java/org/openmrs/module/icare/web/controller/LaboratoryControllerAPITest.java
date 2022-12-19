@@ -786,12 +786,15 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 
 		//2. Getting worksheet definitions
 		//When
-		MockHttpServletRequest newGetRequest = newGetRequest("lab/worksheetsamples");
+		MockHttpServletRequest newGetRequest = newGetRequest("lab/worksheetsamples", new Parameter("startDate", "2022-12-10"),
+				new Parameter("endDate", "2022-12-11"), new Parameter("q", "Sample Label y"));
 		MockHttpServletResponse handle2 = handle(newGetRequest);
 
-		List<Map<String, Object>> batches = (new ObjectMapper()).readValue(handle2.getContentAsString(), List.class);
+		List<Map<String, Object>> worksheetsamples = (new ObjectMapper()).readValue(handle2.getContentAsString(), List.class);
 
-		assertThat("Has 1 worksheet control", batches.size(), is(1));
+		System.out.println(handle2.getContentAsString());
+
+		assertThat("Has 1 worksheet control", worksheetsamples.size(), is(1));
 
 	}
 
