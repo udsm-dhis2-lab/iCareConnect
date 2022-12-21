@@ -69,7 +69,7 @@ export class RegisterSampleComponent implements OnInit {
   manyObservables$: Observable<any>;
   identifierTypes$: Observable<any>;
   batchRegistrationFields: any;
-  batchSets$: Observable<any>;
+  batchsets$: Observable<any>;
 
   get maximumDate() {
     let maxDate = new Date();
@@ -122,7 +122,7 @@ export class RegisterSampleComponent implements OnInit {
       id: this.LISConfigurations?.agencyConceptUuid,
     });
 
-    this.batchSets$ = this.samplesService.getBatchSets().pipe(map((response) => {
+    this.batchsets$ = this.samplesService.getBatchsets().pipe(map((response) => {
       if(!response?.error){
         return response
       }
@@ -384,21 +384,34 @@ export class RegisterSampleComponent implements OnInit {
       addFixedField: new Dropdown({
         id: "addFixedField",
         key: "addFixedField",
-        label: "Select fixed field",
+        label: "Select fixed field(s)",
         shouldHaveLiveSearchForDropDownFields: false,
         multiple: true,
       }),
       addStaticField: new Dropdown({
         id: "addStaticField",
         key: "addStaticField",
-        label: "Select static field",
+        label: "Select static field(s)",
         shouldHaveLiveSearchForDropDownFields: false,
         multiple: true,
+      }),
+      addDynamicField: new Dropdown({
+        id: "addDynamicField",
+        key: "addDynamicField",
+        label: "Select dynamic field(s)",
+        shouldHaveLiveSearchForDropDownFields: false,
+        multiple: true,
+      }),
+      existingBatchField: new Dropdown({
+        id: "existingBatch",
+        key: "existingBatch",
+        label: "Select exising batch",
+        shouldHaveLiveSearchForDropDownFields: false,
       }),
       batchNameField: new Textbox({
         id: "batchName",
         key: "batchName",
-        label: "Batch Name",
+        label: "Type Batch Name",
       }),
       batchDescriptionField: new TextArea({
         id: "batchDescription",
@@ -407,14 +420,19 @@ export class RegisterSampleComponent implements OnInit {
       }),
       existingBatchsetField: new Dropdown({
         id: "existingBatchset",
-        key: "existingBatchSet",
+        key: "existingBatchset",
         label: "Select exising batch set",
         shouldHaveLiveSearchForDropDownFields: false,
       }),
-      batchSetNameField: new Textbox({
-        id: "batchSetName",
-        key: "batchSetName",
+      batchsetNameField: new Textbox({
+        id: "batchsetName",
+        key: "batchsetName",
         label: "Type Batchset Name",
+      }),
+      batchsetDescriptionField: new TextArea({
+        id: "batchsetDescription",
+        key: "batchsetDescription",
+        label: "Batchset Description",
       }),
     };
 
