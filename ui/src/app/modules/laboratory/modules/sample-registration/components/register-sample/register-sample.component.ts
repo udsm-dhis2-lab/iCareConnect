@@ -93,18 +93,12 @@ export class RegisterSampleComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    const paginationParameters = {
-      page: 1,
-      pageSize: 10,
-    };
 
     this.currentUser$ = this.store.select(getCurrentUserDetails);
 
     this.store.dispatch(
       loadLocationsByTagNames({ tagNames: ["Lab+Location"] })
     );
-
-    this.loadSamplesByPaginationDetails(paginationParameters);
 
     this.mrnGeneratorSourceUuid$ =
       this.systemSettingsService.getSystemSettingsByKey(
@@ -165,21 +159,6 @@ export class RegisterSampleComponent implements OnInit {
 
   getSelection(event: MatRadioChange): void {
     this.registrationCategory = event?.value;
-  }
-
-  getSamples(event: Event, action: string, pager: any): void {
-    event.stopPropagation();
-    this.loadSamplesByPaginationDetails({
-      page: action === "next" ? pager?.page + 1 : pager?.page - 1,
-      pageSize: 10,
-    });
-  }
-
-  loadSamplesByPaginationDetails(paginationParameters: any): void {
-    this.labSamples$ =
-      this.samplesService.getCollectedSamplesByPaginationDetails(
-        paginationParameters
-      );
   }
 
   setTabGroup(event: Event, group: string): void {

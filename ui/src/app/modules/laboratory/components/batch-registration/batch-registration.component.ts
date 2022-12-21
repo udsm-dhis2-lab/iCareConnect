@@ -425,22 +425,23 @@ export class BatchRegistrationComponent implements OnInit {
         fields: JSON.stringify({
           fixedFields: fixedFieldsWithValues,
           staticFields: staticFields,
-          dynamicFields: dynamicFields,
+          dynamicFields: dynamicFields
         }),
-        description: this.batchsetDescription.value,
-      },
+        description: this.batchsetDescription.value.length > 0 ? this.batchsetDescription.value : "",
+      }
     ];
 
     let batches = [
       {
         label: this.batchNameField.value,
         name: this.batchNameField.value,
-        description: this.batchDescription.value,
         fields: JSON.stringify({
+          fixedFields: fixedFieldsWithValues,
           staticFields: staticFields,
-          dynamicFields: dynamicFields,
+          dynamicFields: dynamicFields
         }),
-      },
+        description: this.batchDescription.value.length > 0 ? this.batchDescription.value : "",
+      }
     ];
     if (this.useExistingBatchset) {
       let batchset = this.existingBatchsets.filter(
