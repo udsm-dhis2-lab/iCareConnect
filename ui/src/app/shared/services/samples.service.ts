@@ -500,4 +500,14 @@ export class SamplesService {
       })
     );
   }
+  getBatches(): Observable<any> {
+    return this.httpClient.get(BASE_URL + "lab/batches").pipe(
+      map((response) => {
+        return response;
+      }),
+      catchError((err) => {
+        return err;
+      })
+    );
+  }
 }

@@ -31,6 +31,7 @@ export class BatchRegistrationComponent implements OnInit {
   useExistingBatch: boolean = false;
   validForm: boolean = false;
   validBatchsetName: boolean = true;
+  validBatchName: boolean = true;
   addFixedField: Dropdown;
   addStaticField: Dropdown;
   batchsetField: Textbox;
@@ -53,6 +54,7 @@ export class BatchRegistrationComponent implements OnInit {
   addDynamicField: any;
   selectedDynamicFields: any;
   existingBatchField: any;
+  batchsetDescription: any;
 
   constructor(private sampleService: SamplesService) {}
 
@@ -137,6 +139,9 @@ export class BatchRegistrationComponent implements OnInit {
     this.batchNameField =
       this.allRegistrationFields?.batchRegistrationFields?.batchNameField;
 
+    this.batchsetDescription =
+      this.allRegistrationFields?.batchRegistrationFields?.batchsetDescriptionField;
+    
     this.batchDescription =
       this.allRegistrationFields?.batchRegistrationFields?.batchDescriptionField;
 
@@ -168,9 +173,11 @@ export class BatchRegistrationComponent implements OnInit {
 
   onUseExisting(e: any, key: string) {
     if (key === "batchset") {
+      this.batchsetNameField.value = null;
       this.useExistingBatchset = !this.useExistingBatchset;
     }
     if (key === "batch") {
+      this.batchNameField.value = null;
       this.useExistingBatch = !this.useExistingBatch;
     }
   }
@@ -287,54 +294,69 @@ export class BatchRegistrationComponent implements OnInit {
     }
 
     //Handle all other fields in batch registration
-    this.batchNameField.value = this.formData[this.batchNameField.key]?.value;
+    this.batchsetNameField.value = this.formData[this.batchsetNameField.key]?.value;
     this.batchDescription.value =
       this.formData[this.batchDescription.key]?.value;
+    this.batchsetDescription.value =
+      this.formData[this.batchsetDescription.key]?.value;
     this.existingBatchsetField.value =
       this.formData[this.existingBatchsetField.key]?.value;
+    this.existingBatchField.value =
+      this.formData[this.existingBatchField.key]?.value;
     this.batchNameField.value =
       this.formData[this.batchNameField.key]?.value;
 
-    if (this.batchNameField.value) {
+    if (this.batchsetNameField.value) {
       this.validBatchsetName =
         this.existingBatchsets.filter(
-          (batchset) => batchset.name === this.batchNameField.value
+          (batchset) => batchset.name === this.batchsetNameField.value
+        ).length === 0;
+    }
+    if (this.batchNameField.value) {
+      this.validBatchName =
+        this.existingBatches.filter(
+          (batch) => batch.name === this.batchNameField.value
         ).length === 0;
     }
 
     //Clear batchset Name field or existingBatchset values depending on what field is being used.
     if (this.useExistingBatchset && key === "Existing Batchset") {
       this.batchNameField.value = null;
+      this.validBatchsetName = true;
       let existingBatchsetFields = this.existingBatchsets.filter(
         (batchset) => batchset.name === this.existingBatchsetField.value
       )[0]?.fields;
       if (existingBatchsetFields?.length > 0) {
-        this.selectedFixedFields = JSON.parse(existingBatchsetFields)[
-          "fixedFields"
-        ];
-        this.selectedStaticFields = JSON.parse(existingBatchsetFields)[
-          "staticFields"
-        ];
-        this.selectedDynamicFields = JSON.parse(existingBatchsetFields)[
-          "dynamicFields"
-        ];
+        this.selectedFixedFields =
+          JSON.parse(existingBatchsetFields)["fixedFields"]?.length > 0
+            ? JSON.parse(existingBatchsetFields)["fixedFields"]
+            : this.selectedFixedFields;
+        this.selectedStaticFields =
+          JSON.parse(existingBatchsetFields)["staticFields"]?.length > 0
+            ? JSON.parse(existingBatchsetFields)["staticFields"]
+            : this.selectedStaticFields;
+        this.selectedDynamicFields =
+          JSON.parse(existingBatchsetFields)["dynamicFields"]?.length > 0
+            ? JSON.parse(existingBatchsetFields)["dynamicFields"]
+            : this.selectedDynamicFields;
       }
     }
     if (this.useExistingBatch && key === "Existing Batch") {
       this.batchNameField.value = null;
+      this.validBatchName = true;
       let existingBatchFields = this.existingBatches.filter(
         (batch) => batch.name === this.existingBatchField.value
       )[0]?.fields;
       if (existingBatchFields?.length > 0) {
-        this.selectedFixedFields = JSON.parse(existingBatchFields)["fixedFields"].length > 0 
-          ? JSON.parse(existingBatchFields)["fixedFields"] 
-          : this.selectedFixedFields;
+        this.selectedFixedFields = JSON.parse(existingBatchFields)["fixedFields"]?.length > 0 
+        ? JSON.parse(existingBatchFields)["fixedFields"] 
+        : this.selectedFixedFields;
         this.selectedStaticFields =
-          JSON.parse(existingBatchFields)["staticFields"].length > 0
+          JSON.parse(existingBatchFields)["staticFields"]?.length > 0
             ? JSON.parse(existingBatchFields)["staticFields"]
             : this.selectedStaticFields;
         this.selectedDynamicFields =
-          JSON.parse(existingBatchFields)["dynamicFields"].length > 0
+          JSON.parse(existingBatchFields)["dynamicFields"]?.length > 0
             ? JSON.parse(existingBatchFields)["dynamicFields"]
             : this.selectedDynamicFields;
       }
@@ -362,10 +384,11 @@ export class BatchRegistrationComponent implements OnInit {
 
     if (
       (this.batchNameField.value || this.existingBatchsetField.value) &&
-      this.batchNameField.value &&
-      (this.selectedFixedFields?.length > 0 ||
-        this.selectedStaticFields?.length > 0) &&
-      this.validBatchsetName
+        (this.selectedFixedFields?.length > 0 ||
+          this.selectedStaticFields?.length > 0 || 
+          this.selectedDynamicFields?.length > 0
+        ) && 
+      this.validBatchsetName && this.validBatchName
     ) {
       this.validForm = true;
     } else {
@@ -395,7 +418,6 @@ export class BatchRegistrationComponent implements OnInit {
         return this.staticFieldsOptionsObject[key];
       }
     );
-    // this.existingBatchsetFiel[d.value;
     const batchsetsInformation = [
       {
         name: this.batchNameField.value,
@@ -405,7 +427,7 @@ export class BatchRegistrationComponent implements OnInit {
           staticFields: staticFields,
           dynamicFields: dynamicFields,
         }),
-        description: "",
+        description: this.batchsetDescription.value,
       },
     ];
 

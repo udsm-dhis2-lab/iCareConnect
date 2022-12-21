@@ -38,6 +38,12 @@
                         ></app-form>
                         <p class="text-danger" *ngIf="!validBatchsetName">This batchset already exists</p>
                     </div>
+                    <div class="col-12">
+                        <app-form
+                            [fields]="[batchsetDescription]"
+                            (formUpdate)="onFormUpdate($event)"
+                        ></app-form>
+                    </div>
                     <div class="col-12 d-flex ml-1" *ngIf="existingBatches.length">
                     <!-- <div class="col-12 d-flex ml-1"> -->
                         <h4 class="w-75">Use existing batch</h4>
@@ -53,7 +59,7 @@
                             [fields]="useExistingBatch ? [existingBatchField] : [batchNameField]"
                             (formUpdate)="onFormUpdate($event, useExistingBatch ? 'Existing Batch' : 'New Batch Name')"
                         ></app-form>
-                        <p class="text-danger" *ngIf="!validBatchsetName">This batch already exists</p>
+                        <p class="text-danger" *ngIf="!validBatchName">This batch already exists</p>
                     </div>
                     <div class="col-12">
                         <app-form
