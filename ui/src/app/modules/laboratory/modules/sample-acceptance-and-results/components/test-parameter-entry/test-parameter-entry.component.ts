@@ -16,6 +16,8 @@ export class TestParameterEntryComponent implements OnInit {
   @Input() multipleResultsAttributeType: string;
   @Input() allocation: SampleAllocationObject;
   @Input() disabled: boolean;
+  @Input() isLIS: boolean;
+  @Input() conceptNameType: string;
   testParameter$: Observable<ConceptGet>;
   @Output() data: EventEmitter<any> = new EventEmitter<any>();
   latestResult: any;
@@ -24,7 +26,7 @@ export class TestParameterEntryComponent implements OnInit {
   ngOnInit(): void {
     this.testParameter$ = this.conceptService.getConceptDetailsByUuid(
       this.parameterUuid,
-      "custom:(uuid,display,datatype,answers,attributes:(uuid,display,attributeType:(uuid,display)))"
+      "custom:(uuid,display,datatype,names,answers:(uuid,display,names),attributes:(uuid,display,attributeType:(uuid,display)))"
     );
     this.latestResult =
       this.allocation?.results?.length > 0

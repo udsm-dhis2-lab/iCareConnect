@@ -37,10 +37,9 @@ public class Batch extends BaseOpenmrsData implements java.io.Serializable, JSON
 	@ManyToOne
 	@JoinColumn(name = "batch_set_id", nullable = true)
 	private BatchSet batchSet;
-
-	@OneToMany(fetch = FetchType.LAZY,mappedBy = "batch")
+	
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "batch")
 	private List<Sample> samples = new ArrayList<Sample>();
-
 	
 	@Override
 	public Integer getId() {
@@ -92,15 +91,15 @@ public class Batch extends BaseOpenmrsData implements java.io.Serializable, JSON
 	public void setBatchSet(BatchSet batchSet) {
 		this.batchSet = batchSet;
 	}
-
+	
 	public List<Sample> getSamples() {
 		return samples;
 	}
-
+	
 	public void setSamples(List<Sample> samples) {
 		this.samples = samples;
 	}
-
+	
 	public static Batch fromMap(Map<String, Object> batchMap) {
 		
 		Batch batch = new Batch();
@@ -126,13 +125,12 @@ public class Batch extends BaseOpenmrsData implements java.io.Serializable, JSON
 			batchObject.put("dateCreated", this.getDateCreated());
 		}
 		
-		Map<String, Object> creatorObject = new HashMap<String, Object>();
-		
 		if (this.getCreator() != null) {
+			Map<String, Object> creatorObject = new HashMap<String, Object>();
 			creatorObject.put("uuid", this.getCreator().getUuid());
 			creatorObject.put("display", this.getCreator().getDisplayString());
+			batchObject.put("creator", creatorObject);
 		}
-		batchObject.put("creator", creatorObject);
 		
 		Map<String, Object> batchSetObject = new HashMap<String, Object>();
 		if (this.getBatchSet() != null) {
@@ -140,14 +138,14 @@ public class Batch extends BaseOpenmrsData implements java.io.Serializable, JSON
 			batchSetObject.put("name", this.getBatchSet().getBatchSetName());
 			batchObject.put("batchSet", batchSetObject);
 		}
-
-		List<Map<String,Object>> samplesObject = new ArrayList<Map<String,Object>>();
-		if(this.getSamples() != null){
-
-			for(Sample sample : this.getSamples()){
+		
+		List<Map<String, Object>> samplesObject = new ArrayList<Map<String, Object>>();
+		if (this.getSamples() != null) {
+			
+			for (Sample sample : this.getSamples()) {
 				samplesObject.add(sample.toMap());
 			}
-			batchObject.put("samples",samplesObject);
+			batchObject.put("samples", samplesObject);
 		}
 		
 		return batchObject;

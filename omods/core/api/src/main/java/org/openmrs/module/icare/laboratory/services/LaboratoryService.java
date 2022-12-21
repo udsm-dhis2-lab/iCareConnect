@@ -54,6 +54,8 @@ public interface LaboratoryService extends OpenmrsService {
 	
 	List<Map<String, Object>> saveMultipleResults(List<Result> results) throws Exception;
 	
+	Map<String, Object> saveResultsInstrument(Map<String, Object> resultsInstrumentObject) throws Exception;
+	
 	Sample getSampleByUuid(String sampleUuid);
 	
 	List<Result> getResults();
@@ -118,4 +120,26 @@ public interface LaboratoryService extends OpenmrsService {
 	BatchSetStatus addBatchSetStatus(BatchSetStatus batchSetStatus) throws Exception;
 	
 	BatchStatus addBatchStatus(BatchStatus batchStatus) throws Exception;
+	
+	List<Worksheet> getWorksheets(Date start, Date end, String q, Integer startIndex, Integer limit);
+
+	Worksheet getWorksheetByUuid(String worksheetUuid);
+	
+	Worksheet addWorksheet(Worksheet worksheet);
+
+    List<WorksheetControl> getWorksheetControls(Date start, Date end, String q, Integer startIndex, Integer limit);
+
+	WorksheetControl getWorksheetControlByUuid(String worksheetControlUuid);
+
+    WorksheetControl addWorksheetControl(WorksheetControl worksheetControl);
+
+	List<WorksheetDefinition> getWorksheetDefinitions(Date start, Date end, String q, Integer startIndex, Integer limit);
+
+	WorksheetDefinition getWorksheetDefinitionByUuid(String worksheetDefinitionUuid);
+
+	WorksheetDefinition addWorksheetDefinition(WorksheetDefinition worksheetDefinition) throws Exception;
+
+	List<WorksheetSample> getWorksheetSamples(Date start, Date end, String q, Integer startIndex, Integer limit);
+
+	WorksheetSample addWorksheetSample(WorksheetSample worksheetSample) throws Exception;
 }

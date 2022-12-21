@@ -82,7 +82,7 @@ public class LaboratoryController {
 			newSample.setLocation(location);
 			System.out.println(location.getName());
 		}
-		if(sample.get("batch") != null){
+		if (sample.get("batch") != null) {
 			Batch batch = laboratoryService.getBatchByUuid(((Map) sample.get("batch")).get("uuid").toString());
 			newSample.setBatch(batch);
 		}
@@ -417,12 +417,17 @@ public class LaboratoryController {
 
 	}
 	
+	@RequestMapping(value = "resultsinstrument", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> saveResultsInstrument(@RequestBody Map<String, Object> resultsInstrument) throws Exception {
+		Map<String, Object> savedResultsInstrumentResponse = laboratoryService.saveResultsInstrument(resultsInstrument);
+		return savedResultsInstrumentResponse;
+	}
+	
 	@RequestMapping(value = "results", method = RequestMethod.GET)
 	@ResponseBody
 	public List<Result> getResults() {
-		
 		return laboratoryService.getResults();
-		
 	}
 	
 	@RequestMapping(value = "allocationstatus", method = RequestMethod.POST)
@@ -725,7 +730,6 @@ public class LaboratoryController {
 				BatchSet batchSet = laboratoryService.getBatchSetByUuid(((Map) batchObject.get("batchSet")).get("uuid")
 				        .toString());
 				batch.setBatchSet(batchSet);
-				
 			}
 			
 			Batch newBatch = laboratoryService.addBatch(batch);
@@ -825,7 +829,196 @@ public class LaboratoryController {
 		BatchSetStatus savedbatchSetStatus = laboratoryService.addBatchSetStatus(batchSetStatus);
 		
 		return savedbatchSetStatus.toMap();
+		
+	}
+	
+	@RequestMapping(value = "worksheets", method = RequestMethod.GET)
+	@ResponseBody
+	public List<Map<String, Object>> getWorkSheets(@RequestParam(value = "startDate", required = false) String startDate,
+	        @RequestParam(value = "endDate", required = false) String endDate,
+	        @RequestParam(value = "q", required = false) String q, @RequestParam(defaultValue = "0") Integer startIndex,
+	        @RequestParam(defaultValue = "100") Integer limit) throws ParseException {
+		
+		Date start = null;
+		Date end = null;
+		if (startDate != null && endDate != null) {
+			
+			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+			start = formatter.parse(startDate);
+			end = formatter.parse(endDate);
+		}
+		
+		List<Worksheet> worksheets = laboratoryService.getWorksheets(start, end, q, startIndex, limit);
+		
+		List<Map<String, Object>> responseWorkSheetsObject = new ArrayList<Map<String, Object>>();
+		for (Worksheet worksheet : worksheets) {
+			Map<String, Object> worksheetObject = worksheet.toMap();
+			responseWorkSheetsObject.add(worksheetObject);
+		}
+		
+		return responseWorkSheetsObject;
+	}
+	
+	@RequestMapping(value = "worksheets",method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public List<Map<String,Object>> addWorksheet(@RequestBody List<Map<String,Object>> worksheetsObject){
+
+		Worksheet worksheet = new Worksheet();
+		List<Map<String,Object>> newWorksheets = new ArrayList<>();
+
+		for(Map<String,Object> worksheetObject : worksheetsObject){
+
+			System.out.println(worksheetObject);
+			worksheet = Worksheet.fromMap(worksheetObject);
+
+			Concept testOrderConcept = conceptService.getConceptByUuid(((Map) worksheetObject.get("testorder")).get("uuid").toString());
+			worksheet.setTestOrder(testOrderConcept);
+
+			if(worksheetObject.get("instrument") != null){
+
+				Concept instrumentconcept = conceptService.getConceptByUuid(((Map) worksheetObject.get("instrument")).get("uuid").toString());
+				worksheet.setInstrument(instrumentconcept);
+			}
+
+			Worksheet newworksheet = laboratoryService.addWorksheet(worksheet);
+			newWorksheets.add(newworksheet.toMap());
+
+
+		}
+		return newWorksheets;
 
 	}
+
+	@RequestMapping(value = "worksheetcontrols", method = RequestMethod.GET)
+	@ResponseBody
+	public List<Map<String, Object>> getWorkSheetControls(@RequestParam(value = "startDate", required = false) String startDate, @RequestParam(value = "endDate", required = false) String endDate, @RequestParam(value = "q", required = false) String q, @RequestParam(defaultValue = "0") Integer startIndex, @RequestParam(defaultValue = "100") Integer limit) throws ParseException {
+
+		Date start = null;
+		Date end = null;
+		if (startDate != null && endDate != null) {
+
+			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+			start = formatter.parse(startDate);
+			end = formatter.parse(endDate);
+		}
+
+		List<WorksheetControl> worksheetControls = laboratoryService.getWorksheetControls(start, end, q, startIndex, limit);
+
+		List<Map<String, Object>> responseWorkSheetControlsObject = new ArrayList<Map<String, Object>>();
+		for (WorksheetControl worksheetControl : worksheetControls) {
+			Map<String, Object> worksheetControlObject = worksheetControl.toMap();
+			responseWorkSheetControlsObject.add(worksheetControlObject);
+		}
+
+		return responseWorkSheetControlsObject;
+	}
+
+	@RequestMapping(value = "worksheetcontrols",method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public List<Map<String,Object>> addWorksheetControl(@RequestBody List<Map<String,Object>> worksheetControlsObject){
+
+		WorksheetControl worksheetControl = new WorksheetControl();
+		List<Map<String,Object>> newWorksheetControls = new ArrayList<>();
+
+		for(Map<String,Object> worksheetControlObject : worksheetControlsObject){
+
+			worksheetControl = WorksheetControl.fromMap(worksheetControlObject);
+
+			Concept testOrderConcept = conceptService.getConceptByUuid(((Map) worksheetControlObject.get("testorder")).get("uuid").toString());
+			worksheetControl.setTestOrder(testOrderConcept);
+
+
+			WorksheetControl newworksheetControl = laboratoryService.addWorksheetControl(worksheetControl);
+			newWorksheetControls.add(newworksheetControl.toMap());
+
+		}
+		return newWorksheetControls;
+
+	}
+
+	@RequestMapping(value = "worksheetdefinitions",method = RequestMethod.GET)
+	@ResponseBody
+	public List<Map<String,Object>> getWorksheetDefinitions(@RequestParam(value = "startDate", required = false) String startDate, @RequestParam(value = "endDate", required = false) String endDate, @RequestParam(value = "q", required = false) String q, @RequestParam(defaultValue = "0") Integer startIndex, @RequestParam(defaultValue = "100") Integer limit) throws ParseException{
+
+		Date start = null;
+		Date end = null;
+		if (startDate != null && endDate != null) {
+
+			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+			start = formatter.parse(startDate);
+			end = formatter.parse(endDate);
+		}
+
+		List<WorksheetDefinition> worksheetDefinitions = laboratoryService.getWorksheetDefinitions(start, end, q, startIndex, limit);
+
+		List<Map<String,Object>> worksheetDefinitionsObject = new ArrayList<>();
+		for(WorksheetDefinition worksheetDefinition : worksheetDefinitions){
+
+			Map<String,Object> worksheetDefinitionObject = worksheetDefinition.toMap();
+			worksheetDefinitionsObject.add(worksheetDefinitionObject);
+		}
+		return  worksheetDefinitionsObject;
+	}
+
+	@RequestMapping(value="worksheetdefinitions",method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public List<Map<String,Object>> addWorksheetDefinitions(@RequestBody List<Map<String,Object>> worksheetDefinitionsObject) throws Exception{
+
+		WorksheetDefinition worksheetDefinition = new WorksheetDefinition();
+		List<Map<String,Object>> newWorksheetDefinitions = new ArrayList<>();
+
+		for(Map<String,Object> worksheetDefinitionObject : worksheetDefinitionsObject){
+
+			worksheetDefinition = WorksheetDefinition.fromMap(worksheetDefinitionObject);
+			WorksheetDefinition newWorksheetDefinition = laboratoryService.addWorksheetDefinition(worksheetDefinition);
+			newWorksheetDefinitions.add(newWorksheetDefinition.toMap());
+
+		}
+		return newWorksheetDefinitions;
+	}
+
+	@RequestMapping(value = "worksheetsamples", method = RequestMethod.GET)
+	@ResponseBody
+	public List<Map<String,Object>> getWorksheetSamples(@RequestParam(value = "startDate", required = false) String startDate, @RequestParam(value = "endDate", required = false) String endDate, @RequestParam(value = "q", required = false) String q, @RequestParam(defaultValue = "0") Integer startIndex, @RequestParam(defaultValue = "100") Integer limit) throws ParseException{
+
+		Date start = null;
+		Date end = null;
+		if (startDate != null && endDate != null) {
+
+			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+			start = formatter.parse(startDate);
+			end = formatter.parse(endDate);
+		}
+
+		List<WorksheetSample> worksheetSamples = laboratoryService.getWorksheetSamples(start, end, q, startIndex, limit);
+
+		List<Map<String,Object>> worksheetSamplesObject = new ArrayList<>();
+
+		for(WorksheetSample worksheetSample : worksheetSamples){
+			Map<String,Object> worksheetSampleObject = worksheetSample.toMap();
+			worksheetSamplesObject.add(worksheetSampleObject);
+
+		}
+		return worksheetSamplesObject;
+	}
+
+	@RequestMapping(value="worksheetsamples",method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public List<Map<String,Object>> addWorksheetSamples(@RequestBody List<Map<String,Object>> worksheetSamplesObject) throws Exception{
+
+		WorksheetSample worksheetSample = new WorksheetSample();
+		List<Map<String,Object>> newWorksheetSamples = new ArrayList<>();
+
+		for(Map<String,Object> worksheetSampleObject : worksheetSamplesObject){
+
+			worksheetSample = WorksheetSample.fromMap(worksheetSampleObject);
+			WorksheetSample newWorksheetSample = laboratoryService.addWorksheetSample(worksheetSample);
+			newWorksheetSamples.add(newWorksheetSample.toMap());
+
+		}
+		return newWorksheetSamples;
+	}
+
+
 
 }

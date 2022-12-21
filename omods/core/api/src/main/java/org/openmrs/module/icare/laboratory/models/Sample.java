@@ -62,7 +62,7 @@ public class Sample extends BaseOpenmrsData implements java.io.Serializable, JSO
 	
 	//	@OneToMany(fetch = FetchType.LAZY, mappedBy = "sampleOrder.id.sample")
 	//	private List<TestAllocation> testAllocations = new ArrayList<TestAllocation>(0);
-
+	
 	@ManyToOne
 	@JoinColumn(name = "batch_id")
 	private Batch batch;
@@ -289,11 +289,11 @@ public class Sample extends BaseOpenmrsData implements java.io.Serializable, JSO
 	public void setSampleStatuses(List<SampleStatus> sampleStatuses) {
 		this.sampleStatuses = sampleStatuses;
 	}
-
+	
 	public void setBatch(Batch batch) {
 		this.batch = batch;
 	}
-
+	
 	public Batch getBatch() {
 		return batch;
 	}
