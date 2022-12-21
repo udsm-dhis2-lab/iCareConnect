@@ -24,6 +24,7 @@ import { PersonService } from "src/app/core/services/person.service";
 import { Observable } from "rxjs";
 import { map, tap } from "rxjs/operators";
 import { PatientService } from "src/app/shared/services/patient.service";
+import { flatten } from "lodash";
 
 @Component({
   selector: "app-person-details",
@@ -299,16 +300,37 @@ export class PersonDetailsComponent implements OnInit {
     this.personFields = Object.keys(
       this.allRegistrationFields?.personFields
     ).map((key) => {
+      if (personDetails) {
+        personDetails = {
+          ...personDetails,
+          firstName: personDetails?.preferredName?.givenName,
+          middleName: personDetails?.preferredName?.middleName,
+          lastName: personDetails?.preferredName?.familyName,
+          mobileNumber: personDetails?.attributes?.filter((attribute) => {
+            if(attribute?.attributeType === 'aeb3a16c-f5b6-4848-aa51-d7e3146886d6'){
+              return attribute
+            }
+          })[0]?.value
+        };
+      }
       return {
         ...this.allRegistrationFields?.personFields[key],
         value: personDetails ? personDetails[key] : null
       };
     });
-    this.personDOBField = [this.allRegistrationFields?.patientAgeFields?.dob];
+    this.personDOBField = [
+      {
+        ...this.allRegistrationFields?.patientAgeFields?.dob,
+        value: personDetails && personDetails?.birthdate ? new Date(personDetails?.birthdate) : null,
+      },
+    ];
     this.personFieldsGroupThree = Object.keys(
       this.allRegistrationFields?.personFieldsGroupThree
     ).map((key) => {
-      return this.allRegistrationFields?.personFieldsGroupThree[key];
+      return {
+        ...this.allRegistrationFields?.personFieldsGroupThree[key],
+        value: personDetails ? personDetails[key] : null,
+      };
     });
     if (personDetails) {
       this.setIdentifierFields(this.identifierTypes, personDetails);
