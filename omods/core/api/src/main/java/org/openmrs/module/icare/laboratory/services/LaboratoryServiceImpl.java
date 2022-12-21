@@ -49,6 +49,14 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	
 	BatchStatusDAO batchStatusDAO;
 	
+	WorksheetDAO worksheetDAO;
+
+	WorksheetControlDAO worksheetControlDAO;
+
+	WorksheetDefinitionDAO worksheetDefinitionDAO;
+
+	WorksheetSampleDAO worksheetSampleDAO;
+	
 	public void setSampleDAO(SampleDAO sampleDAO) {
 		this.sampleDAO = sampleDAO;
 	}
@@ -103,6 +111,22 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	
 	public void setBatchStatusDAO(BatchStatusDAO batchStatusDAO) {
 		this.batchStatusDAO = batchStatusDAO;
+	}
+	
+	public void setWorksheetDAO(WorksheetDAO worksheetDAO) {
+		this.worksheetDAO = worksheetDAO;
+	}
+
+	public void setWorksheetControlDAO(WorksheetControlDAO worksheetControlDAO) {
+		this.worksheetControlDAO = worksheetControlDAO;
+	}
+
+	public void setWorksheetDefinitionDAO(WorksheetDefinitionDAO worksheetDefinitionDAO){
+		this.worksheetDefinitionDAO = worksheetDefinitionDAO;
+	}
+
+	public void setWorksheetSampleDAO(WorksheetSampleDAO worksheetSampleDAO){
+		this.worksheetSampleDAO = worksheetSampleDAO;
 	}
 	
 	@Override
@@ -400,8 +424,9 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 				result.setValueDrug(drug);
 			}
 
-			if (result.getValueGroup() != null && this.getResultsByUuid(result.getValueGroup().getUuid()) != null) {
+			if (result.getValueGroup() != null && result.getValueGroup().getUuid() != null) {
 				Result valueGroup = this.resultDAO.findByUuid(result.getValueGroup().getUuid());
+				System.out.println(valueGroup.getValueText());
 				result.setValueGroup(valueGroup);
 			}
 
@@ -412,6 +437,7 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 
 			Date date = new Date();
 			result.setDateCreated(date);
+			System.out.println(result.getValueGroup());
 
 			Result response = this.resultDAO.save(result);
 
@@ -433,6 +459,28 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 			resultResponses.add(response.toMap());
 		}
 		return  resultResponses;
+	}
+	
+	public Map<String, Object> saveResultsInstrument(Map<String, Object> resultsInstrumentObject)throws Exception  {
+		Concept instrument = new Concept();
+		List responses = new ArrayList();
+		if (resultsInstrumentObject.get("instrument") == null || ((Map) resultsInstrumentObject.get("instrument")).get("uuid") == null) {
+			throw new Exception("Instrument is not set");
+		} else {
+//			instrument.setUuid(((Map) resultsInstrumentObject.get("instrument")).get("uuid").toString());
+		}
+
+		for (Map<String, Object> resultObject: (ArrayList<Map<String, Object>>) resultsInstrumentObject.get("results")) {
+			Result result = new Result();
+			result = resultDAO.findByUuid(resultObject.get("uuid").toString());
+			String instrumentUuid = ((Map) resultsInstrumentObject.get("instrument")).get("uuid").toString();
+			instrument = Context.getConceptService().getConceptByUuid(instrumentUuid);
+			Result response = this.resultDAO.updateResultsBySettingInstrument(result, instrument);
+			responses.add(response.toMap());
+		}
+		Map<String, Object> returnResponse = new HashMap<>();
+		returnResponse.put("results", responses);
+		return returnResponse;
 	}
 	
 	@Override
@@ -788,6 +836,89 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 		BatchSetStatus savedBatchSetStatus = batchSetStatusDAO.save(batchSetStatus);
 		
 		return savedBatchSetStatus;
+	}
+	
+	@Override
+	public List<Worksheet> getWorksheets(Date startDate, Date endDate, String q, Integer startIndex, Integer limit) {
+		return worksheetDAO.getWorksheets(startDate, endDate, q, startIndex, limit);
+	}
+
+	@Override
+	public Worksheet getWorksheetByUuid(String worksheetUuid){
+		return worksheetDAO.findByUuid(worksheetUuid);
+	}
+	
+	@Override
+	public Worksheet addWorksheet(Worksheet worksheet) {
+		return worksheetDAO.save(worksheet);
+	}
+
+	@Override
+	public List<WorksheetControl> getWorksheetControls(Date startDate, Date endDate, String q, Integer startIndex, Integer limit) {
+		return worksheetControlDAO.getWorksheetControls(startDate, endDate, q, startIndex, limit);
+	}
+
+	@Override
+	public WorksheetControl getWorksheetControlByUuid(String worksheetControlUuid){
+		return worksheetControlDAO.findByUuid(worksheetControlUuid);
+	}
+
+	@Override
+	public WorksheetControl addWorksheetControl(WorksheetControl worksheetControl) {
+		return worksheetControlDAO.save(worksheetControl);
+	}
+
+	@Override
+	public List<WorksheetDefinition> getWorksheetDefinitions(Date startDate, Date endDate, String q, Integer startIndex, Integer limit){
+		return worksheetDefinitionDAO.getWorksheetDefinitions(startDate, endDate, q, startIndex, limit);
+	}
+
+	@Override
+	public WorksheetDefinition getWorksheetDefinitionByUuid(String worksheetDefinitionUuid){
+		return worksheetDefinitionDAO.findByUuid(worksheetDefinitionUuid);
+	}
+
+	@Override
+	public WorksheetDefinition addWorksheetDefinition(WorksheetDefinition worksheetDefinition) throws Exception{
+
+		Worksheet worksheet = this.getWorksheetByUuid(worksheetDefinition.getWorksheet().getUuid());
+		if (worksheet == null) {
+			throw new Exception("The worksheet definition with id " + worksheetDefinition.getWorksheet().getUuid() + " does not exist");
+		}
+		worksheetDefinition.setWorksheet(worksheet);
+		return worksheetDefinitionDAO.save(worksheetDefinition);
+	}
+
+	@Override
+	public List<WorksheetSample> getWorksheetSamples(Date startDate, Date endDate, String q, Integer startIndex, Integer limit){
+       return worksheetSampleDAO.getWorksheetSamples(startDate, endDate, q, startIndex, limit);
+	}
+
+	@Override
+	public WorksheetSample addWorksheetSample(WorksheetSample worksheetSample) throws Exception{
+
+		if(worksheetSample.getSample() != null) {
+			Sample sample = this.getSampleByUuid(worksheetSample.getSample().getUuid());
+			if (sample == null) {
+				throw new Exception("The sample with id " + worksheetSample.getSample().getUuid() + " does not exist");
+			}
+			worksheetSample.setSample(sample);
+		}
+
+		WorksheetDefinition worksheetDefinition = this.getWorksheetDefinitionByUuid(worksheetSample.getWorksheetDefinition().getUuid());
+		if (worksheetDefinition == null) {
+			throw new Exception("The worksheet definition with id " + worksheetSample.getWorksheetDefinition().getUuid() + " does not exist");
+		}
+
+		if(worksheetSample.getWorksheetControl() != null){
+			WorksheetControl worksheetControl = this.getWorksheetControlByUuid(worksheetSample.getWorksheetControl().getUuid());
+			if (worksheetControl == null) {
+				throw new Exception("The worksheet control with id " + worksheetSample.getWorksheetControl().getUuid() + " does not exist");
+			}
+			worksheetSample.setWorksheetControl(worksheetControl);
+		}
+		worksheetSample.setWorksheetDefinition(worksheetDefinition);
+		return worksheetSampleDAO.save(worksheetSample);
 	}
 	
 }

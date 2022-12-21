@@ -144,10 +144,6 @@
 
     <lb_sample_order sample_id="204" order_id="300"/>
 
-
-
-
-
     <!--<lb_test_allocation test_allocation_id="322" uuid="111xxx60-7777-11e3-1111-0sndiu87hsju" device_id="123" sample_id="202" order_id="301" label="Allocation Label Y"/> -->
 
     <lb_test_allocation test_allocation_id="322" uuid="111xxx60-7777-11e3-1111-0sndiu87hsju" sample_id="202" order_id="301" label="Allocation Label Y" date_created="2020-12-27 00:00:00" voided="false" creator="1"/>
@@ -165,5 +161,18 @@
     <!-- Location -->
     <location location_id ="602" uuid = "iCARE890-TEST-MOTR-9beb-d30dcfc0c66e" name = "My location" description = "Testing" date_created="2017-02-14 15:51:57.0" retired="false" />
 
+    <!-- Worksheet -->
+    <lb_worksheet worksheet_id="1" name="worksheet3" code="W1" uuid="iCARE890-YTRE-IUYT-9beb-d30dcfc0c66e" rows="10" columns="12" description="Test worksheet" instrument_id="810" test_order_id="800" date_created="2022-12-10 15:51:57.0" retired="false" creator="1"/>
+
+    <!-- WorksheetControl -->
+    <lb_worksheet_control worksheet_control_id="1" name="worksheetControl3" code="W1" uuid="iCARE890-YTYE-IUYT-9beb-d30dcfc0c66e"  description="Test worksheet control"  test_order_id="800" date_created="2022-12-10 15:51:57.0" retired="false" creator="1"/>
+
+    <!-- WorksheetDefinition -->
+    <lb_worksheet_definition worksheet_definition_id ="1" uuid = "iCARE890-TEST-GGGH-9beb-d30dcfc0c635" code="WD"  worksheet_id="1" date_created="2022-12-10 15:51:57.0" voided="0" creator="1" />
+
+    <!-- WorksheetSample -->
+    <lb_worksheet_sample worksheet_sample_id ="1" uuid = "iCARE890-TEST-OSDH-9beb-d30dcfc0c635" row="10" column="20" type="SAMPLE"  worksheet_definition_id="1" sample_id="201"  date_created="2022-12-10 15:51:57.0" voided="0" creator="1" />
+
+    <lb_worksheet_sample worksheet_sample_id ="2" uuid = "iCARE890-TEST-OSDH-9beb-d30dcfc0c631" row="1" column="1" type="CONTROL"  worksheet_definition_id="1"  control_id="1" date_created="2022-12-10 15:51:57.0" voided="0" creator="1" />
 
 </dataset>
