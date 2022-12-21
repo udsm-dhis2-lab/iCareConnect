@@ -34,7 +34,7 @@ public class WorksheetSample extends BaseOpenmrsData implements java.io.Serializ
 	@ManyToOne
 	@JoinColumn(name = "sample_id", nullable = true)
 	private Sample sample;
-
+	
 	@ManyToOne
 	@JoinColumn(name = "control_id", nullable = true)
 	private WorksheetControl worksheetControl;
@@ -99,16 +99,16 @@ public class WorksheetSample extends BaseOpenmrsData implements java.io.Serializ
 	public void setType(String type) {
 		this.type = type;
 	}
-
-	public static WorksheetSample fromMap(Map<String,Object> worksheetSampleMap){
-
+	
+	public static WorksheetSample fromMap(Map<String, Object> worksheetSampleMap) {
+		
 		WorksheetSample worksheetSample = new WorksheetSample();
-
-		worksheetSample.setRow((Integer)worksheetSampleMap.get("row"));
-		worksheetSample.setColumn((Integer)worksheetSampleMap.get("column"));
+		
+		worksheetSample.setRow((Integer) worksheetSampleMap.get("row"));
+		worksheetSample.setColumn((Integer) worksheetSampleMap.get("column"));
 		worksheetSample.setType(worksheetSampleMap.get("type").toString());
-
-		if(worksheetSampleMap.get("sample") != null) {
+		
+		if (worksheetSampleMap.get("sample") != null) {
 			Sample sample = new Sample();
 			sample.setUuid(((Map) worksheetSampleMap.get("sample")).get("uuid").toString());
 			worksheetSample.setSample(sample);
@@ -116,16 +116,16 @@ public class WorksheetSample extends BaseOpenmrsData implements java.io.Serializ
 		WorksheetDefinition worksheetDefinition = new WorksheetDefinition();
 		worksheetDefinition.setUuid(((Map) worksheetSampleMap.get("worksheetDefinition")).get("uuid").toString());
 		worksheetSample.setWorksheetDefinition(worksheetDefinition);
-
-		if(worksheetSampleMap.get("worksheetControl") != null) {
+		
+		if (worksheetSampleMap.get("worksheetControl") != null) {
 			WorksheetControl worksheetControl = new WorksheetControl();
 			worksheetControl.setUuid(((Map) worksheetSampleMap.get("worksheetControl")).get("uuid").toString());
 			worksheetSample.setWorksheetControl(worksheetControl);
 		}
-
+		
 		return worksheetSample;
 	}
-
+	
 	public Map<String,Object> toMap(){
 
 		Map<String,Object> worksheetSampleObject = new HashMap<>();

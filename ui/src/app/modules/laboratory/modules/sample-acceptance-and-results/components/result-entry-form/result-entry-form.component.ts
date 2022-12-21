@@ -20,7 +20,9 @@ export class ResultEntryFormComponent implements OnInit {
   @Input() isLIS: boolean;
   formField: Field<string>;
   @Output() formData: EventEmitter<any> = new EventEmitter<any>();
+  fieldsData: any = {};
   label: string;
+  options: any[];
   constructor() {}
 
   ngOnInit(): void {
@@ -38,6 +40,20 @@ export class ResultEntryFormComponent implements OnInit {
       : (this.parameter?.names?.filter(
           (name) => name?.conceptNameType === this.conceptNameType
         ) || [])[0]?.display;
+    this.options =
+      this.parameter?.answers?.map((answer) => {
+        const answerLabel = !this.conceptNameType
+          ? answer?.display
+          : (answer?.names?.filter(
+              (name) => name?.conceptNameType === this.conceptNameType
+            ) || [])[0]?.display;
+        return {
+          value: answer?.uuid,
+          key: answer?.uuid,
+          name: answerLabel,
+          label: answerLabel,
+        };
+      }) || [];
     this.formField =
       this.parameter?.datatype?.display === "Numeric"
         ? new Textbox({
@@ -59,19 +75,7 @@ export class ResultEntryFormComponent implements OnInit {
             value: this.value,
             disabled: this.disabled,
             multiple: this.hasMultipleAnswers,
-            options: this.parameter?.answers?.map((answer) => {
-              const answerLabel = !this.conceptNameType
-                ? answer?.display
-                : (answer?.names?.filter(
-                    (name) => name?.conceptNameType === this.conceptNameType
-                  ) || [])[0]?.display;
-              return {
-                value: answer?.uuid,
-                key: answer?.uuid,
-                name: answerLabel,
-                label: answerLabel,
-              };
-            }),
+            options: this.options,
             min: this.parameter?.min,
             max: this.parameter?.max,
             required: true,
@@ -98,5 +102,9 @@ export class ResultEntryFormComponent implements OnInit {
 
   onFormUpdate(formValue: FormValue): void {
     this.formData.emit(formValue?.getValues()[this.parameter?.uuid]?.value);
+  }
+
+  getSelectedItems(value: any): void {
+    this.formData.emit(value);
   }
 }

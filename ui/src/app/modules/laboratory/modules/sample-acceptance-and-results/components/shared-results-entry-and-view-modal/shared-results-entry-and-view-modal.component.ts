@@ -1,21 +1,21 @@
 import { Component, Inject, OnInit } from "@angular/core";
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
-import { Observable } from "rxjs";
+import { Observable, zip } from "rxjs";
 import { map } from "rxjs/operators";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { ConceptGet } from "src/app/shared/resources/openmrs";
 import { SampleAllocationObject } from "src/app/shared/resources/sample-allocations/models/allocation.model";
 import { SampleAllocationService } from "src/app/shared/resources/sample-allocations/services/sample-allocation.service";
 
-import { omit } from "lodash";
+import { omit, groupBy, flatten } from "lodash";
 import { HttpClient } from "@angular/common/http";
 import { OrdersService } from "src/app/shared/resources/order/services/orders.service";
-import { zip } from "cypress/types/lodash";
 import { VisitsService } from "src/app/shared/resources/visits/services";
 import { Store } from "@ngrx/store";
 import { AppState } from "src/app/store/reducers";
 import { getProviderDetails } from "src/app/store/selectors/current-user.selectors";
 import { MatRadioChange } from "@angular/material/radio";
+import { FormControl } from "@angular/forms";
 
 @Component({
   selector: "app-shared-results-entry-and-view-modal",
@@ -40,6 +40,7 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
   visitDetails$: Observable<any>;
   providerDetails$: Observable<any>;
   preferredName: string;
+
   constructor(
     private dialogRef: MatDialogRef<SharedResultsEntryAndViewModalComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
@@ -129,74 +130,201 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
 
   onSave(event: Event, order: any): void {
     event.stopPropagation();
-    const data = Object.keys(this.dataValues)
-      .map((key) => {
-        const dataValue = this.dataValues[key];
-        if (
-          dataValue?.parameter?.isFile ||
-          dataValue?.parameter?.datatype?.display === "Complex"
-        ) {
-          let existingFile = this.files.find(
-            (file) => file.parameterUuid === dataValue?.parameter?.uuid
-          );
-          this.files = [
-            ...this.files.filter(
-              (file) => file?.parameterUuid !== dataValue?.parameter?.uuid
-            ),
-            existingFile
-              ? {
-                  ...existingFile,
-                  valueFile: dataValue?.value,
-                }
-              : {
-                  parameterUuid: dataValue?.parameter?.uuid,
-                  valueFile: dataValue?.value,
-                  currentSample: this.data?.sample,
-                  allocation: dataValue?.allocation,
-                },
-          ];
-        }
-        return {
-          concept: {
-            uuid: key,
-          },
-          testAllocation: {
-            uuid: dataValue?.allocation?.uuid,
-          },
-          valueNumeric: dataValue?.parameter?.isNumeric
-            ? dataValue?.value
-            : null,
-          valueText: dataValue?.parameter?.isText ? dataValue?.value : null,
-
-          valueCoded: dataValue?.parameter?.isCoded
+    let data = [];
+    let dataWithResultsGroup = [];
+    Object.keys(this.dataValues).forEach((key) => {
+      const dataValue = this.dataValues[key];
+      if (
+        dataValue?.parameter?.isFile ||
+        dataValue?.parameter?.datatype?.display === "Complex"
+      ) {
+        let existingFile = this.files.find(
+          (file) => file.parameterUuid === dataValue?.parameter?.uuid
+        );
+        this.files = [
+          ...this.files.filter(
+            (file) => file?.parameterUuid !== dataValue?.parameter?.uuid
+          ),
+          existingFile
             ? {
-                uuid: dataValue?.value,
+                ...existingFile,
+                valueFile: dataValue?.value,
               }
-            : null,
-          abnormal: false,
-          status: {
-            category: "RESULT_REMARKS",
-            status: "REMARKS",
-            remarks: this.remarksData[order?.concept?.uuid],
-          },
-        };
-      })
-      ?.filter(
-        (data) => data?.valueCoded || data?.valueNumeric || data?.valueText
-      );
-    this.saving = true;
+            : {
+                parameterUuid: dataValue?.parameter?.uuid,
+                valueFile: dataValue?.value,
+                currentSample: this.data?.sample,
+                allocation: dataValue?.allocation,
+              },
+        ];
+      }
+      if (dataValue?.multipleResults) {
+        /**
+         * 1. Create allocation
+         * 2. Formulate parent payload
+         * 3. Save the parent results
+         * 4. Update the data value accordingly
+         */
 
-    this.saveFilesAsObservations(this.files, order);
-    this.sampleAllocationService
-      .saveResultsViaAllocations(data)
-      .subscribe((response) => {
-        if (response) {
-          this.saving = false;
-          setTimeout(() => {
-            this.getAllocations();
-          }, 100);
-        }
+        dataWithResultsGroup = [
+          ...dataWithResultsGroup,
+          {
+            concept: {
+              uuid: key,
+            },
+            testAllocation: {
+              uuid: dataValue?.allocation?.uuid,
+            },
+            abnormal: false,
+            value: dataValue?.value,
+            order: dataValue?.order,
+            parameter: dataValue?.parameter,
+            parent: dataValue?.parent,
+            parentUuid: dataValue?.parent?.uuid,
+            sample: dataValue?.sample,
+            status: {
+              category: "RESULT_REMARKS",
+              status: "REMARKS",
+              remarks: this.remarksData[order?.concept?.uuid],
+            },
+          },
+        ];
+      } else {
+        data = [
+          ...data,
+          {
+            concept: {
+              uuid: key,
+            },
+            testAllocation: {
+              uuid: dataValue?.allocation?.uuid,
+            },
+            valueNumeric: dataValue?.parameter?.isNumeric
+              ? dataValue?.value
+              : null,
+            valueText: dataValue?.parameter?.isText ? dataValue?.value : null,
+
+            valueCoded: dataValue?.parameter?.isCoded
+              ? {
+                  uuid: dataValue?.value,
+                }
+              : null,
+            abnormal: false,
+            status: {
+              category: "RESULT_REMARKS",
+              status: "REMARKS",
+              remarks: this.remarksData[order?.concept?.uuid],
+            },
+          },
+        ];
+      }
+    });
+    this.saving = true;
+    if (dataWithResultsGroup?.length > 0) {
+      const groupedByParent = groupBy(dataWithResultsGroup, "parentUuid");
+      Object.keys(groupedByParent).map((key) => {
+        const dataValue = dataWithResultsGroup[0];
+        const parentAllocation = {
+          concept: {
+            uuid: dataValue?.parent?.uuid,
+          },
+          order: {
+            uuid: dataValue?.order?.uuid,
+          },
+          container: {
+            uuid: "eb21ff23-a627-4a62-8bd0-efdc1db2ebb5", // Remove this hardcoded uuid
+          },
+          sample: {
+            uuid: dataValue?.sample?.uuid,
+          },
+          label: dataValue?.order?.orderNumber,
+        };
+        this.sampleAllocationService
+          .createTestAllocation(parentAllocation)
+          .subscribe((response) => {
+            if (response && !response?.error) {
+              const results = [
+                {
+                  concept: {
+                    uuid: dataValue?.parent?.uuid,
+                  },
+                  testAllocation: {
+                    uuid: response?.uuid,
+                  },
+                  valueNumeric: null,
+                  valueText: null,
+
+                  valueCoded: null,
+                  abnormal: false,
+                },
+              ];
+              this.sampleAllocationService
+                .saveResultsViaAllocations(results)
+                .subscribe((resultsResponse) => {
+                  if (resultsResponse) {
+                    const results = flatten(
+                      groupedByParent[key]?.map((testAllocation) => {
+                        return testAllocation?.value?.map((val) => {
+                          return omit(
+                            {
+                              ...testAllocation,
+                              valueNumeric: testAllocation?.parameter?.isNumeric
+                                ? val?.value
+                                : null,
+                              valueText: testAllocation?.parameter?.isText
+                                ? val?.value
+                                : null,
+
+                              valueCoded: testAllocation?.parameter?.isCoded
+                                ? {
+                                    uuid: val?.value,
+                                  }
+                                : null,
+                              resultGroup: {
+                                uuid: resultsResponse[0]?.uuid,
+                              },
+                            },
+                            [
+                              "parent",
+                              "parentUuid",
+                              "value",
+                              "order",
+                              "sample",
+                              "parameter",
+                            ]
+                          );
+                        });
+                      })
+                    );
+                    this.sampleAllocationService
+                      .saveResultsViaAllocations(results)
+                      .subscribe((response) => {
+                        if (response) {
+                          this.saving = false;
+                          setTimeout(() => {
+                            this.getAllocations();
+                          }, 100);
+                        }
+                      });
+                  }
+                });
+            }
+          });
       });
+    }
+    this.saveFilesAsObservations(this.files, order);
+    if (data?.length > 0) {
+      this.sampleAllocationService
+        .saveResultsViaAllocations(data)
+        .subscribe((response) => {
+          if (response) {
+            this.saving = false;
+            setTimeout(() => {
+              this.getAllocations();
+            }, 100);
+          }
+        });
+    }
   }
 
   onAuthorize(
@@ -277,6 +405,9 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
       this.dataValues[parameter?.uuid] = {
         ...dataObject,
         allocation: allocation,
+        parent: allocation?.order?.concept,
+        sample: allocation?.sample,
+        order: allocation?.order,
       };
     } else if (
       dataObject?.value &&

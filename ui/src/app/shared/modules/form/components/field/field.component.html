@@ -133,6 +133,7 @@
         [required]="field?.required"
         (selectionChange)="onFieldUpdate()"
         multiple
+        [value]="field?.value"
       >
         <mat-option *ngFor="let option of members$ | async" [value]="option">{{
           option?.label
@@ -290,8 +291,10 @@
 
 <div
   [formGroup]="form"
-  *ngIf="(isBoolean || field?.controlType === 'checkbox' ||
-      isCheckBoxButton) && !isReport"
+  *ngIf="
+    (isBoolean || field?.controlType === 'checkbox' || isCheckBoxButton) &&
+    !isReport
+  "
 >
   <section>
     <mat-checkbox

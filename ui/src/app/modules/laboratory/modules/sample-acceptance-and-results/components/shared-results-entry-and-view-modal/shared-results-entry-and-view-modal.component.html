@@ -121,6 +121,9 @@
                                 data?.actionType === 'review' &&
                                 !data?.LISConfigurations?.isLIS
                               "
+                              [finalResult]="
+                                allocationData?.allocation?.finalResult
+                              "
                               [isLIS]="data?.LISConfigurations?.isLIS"
                               [conceptNameType]="preferredName"
                               (data)="
