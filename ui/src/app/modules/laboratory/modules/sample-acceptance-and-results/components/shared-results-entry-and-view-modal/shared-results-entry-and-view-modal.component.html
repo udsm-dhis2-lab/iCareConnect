@@ -3,7 +3,9 @@
     sampleAllocations: sampleAllocations$ | async,
     multipleResultsAttributeType: multipleResultsAttributeType$ | async,
     visitDetails: visitDetails$ | async,
-    providerDetails: providerDetails$ | async
+    providerDetails: providerDetails$ | async,
+    parametersRelationshipConceptSourceUuid:
+      parametersRelationshipConceptSourceUuid$ | async
   } as params"
 >
   <mat-toolbar color="primary"
@@ -126,6 +128,9 @@
                               "
                               [isLIS]="data?.LISConfigurations?.isLIS"
                               [conceptNameType]="preferredName"
+                              [parametersRelationshipConceptSourceUuid]="
+                                params?.parametersRelationshipConceptSourceUuid
+                              "
                               (data)="
                                 onGetFieldData(
                                   $event,
