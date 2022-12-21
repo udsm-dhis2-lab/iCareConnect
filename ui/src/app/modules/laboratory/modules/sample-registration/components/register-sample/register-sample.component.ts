@@ -70,6 +70,7 @@ export class RegisterSampleComponent implements OnInit {
   identifierTypes$: Observable<any>;
   batchRegistrationFields: any;
   batchsets$: Observable<any>;
+  batches$: Observable<any>;
 
   get maximumDate() {
     let maxDate = new Date();
@@ -127,6 +128,13 @@ export class RegisterSampleComponent implements OnInit {
         return response
       }
     }));
+    this.batches$ = this.samplesService.getBatches().pipe(
+      map((response) => {
+        if (!response?.error) {
+          return response;
+        }
+      })
+    );
 
     this.referringDoctorAttributes$ =
       this.systemSettingsService.getSystemSettingsMatchingAKey(
