@@ -11,7 +11,7 @@
     testsFromExternalSystemsConfigs: testsFromExternalSystemsConfigs$ | async,
     currentUser: currentUser$ | async,
     identifierTypes: identifierTypes$ | async,
-    batchSets: batchSets$ | async
+    batchsets: batchsets$ | async
   } as params"
 >
   <div class="row">
@@ -93,7 +93,7 @@
               params?.referringDoctorAttributes &&
               params?.referFromFacilityVisitAttribute && 
               params?.identifierTypes && 
-              params?.batchSets
+              params?.batchsets
           ">
           <app-batch-registration
             [mrnGeneratorSourceUuid]="params?.mrnGeneratorSourceUuid"
@@ -111,7 +111,7 @@
               params?.testsFromExternalSystemsConfigs
             "
             [allRegistrationFields]="allRegistrationFields | createLabFields: params?.referringDoctorAttributes : params?.agencyConceptConfigs : params?.referFromFacilityVisitAttribute : params?.identifierTypes"
-            [existingBatchSets]="params?.batchSets"
+            [existingBatchsets]="params?.batchsets"
           ></app-batch-registration>
         </div>
       </div>

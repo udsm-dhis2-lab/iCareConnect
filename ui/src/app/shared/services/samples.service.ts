@@ -469,8 +469,8 @@ export class SamplesService {
       );
   }
 
-  createBatchSets(batchSet: any): Observable<any> {
-    return this.httpClient.post(BASE_URL + "lab/batchsets", batchSet).pipe(
+  createBatchsets(batchset: any): Observable<any> {
+    return this.httpClient.post(BASE_URL + "lab/batchsets", batchset).pipe(
       map((response) => {
         return response;
       }),
@@ -480,7 +480,7 @@ export class SamplesService {
     );
   }
 
-  getBatchSets(): Observable<any> {
+  getBatchsets(): Observable<any> {
     return this.httpClient.get(BASE_URL + "lab/batchsets").pipe(
       map((response) => {
         return response;
