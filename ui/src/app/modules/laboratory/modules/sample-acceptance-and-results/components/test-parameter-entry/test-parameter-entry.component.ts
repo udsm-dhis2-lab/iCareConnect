@@ -19,6 +19,7 @@ export class TestParameterEntryComponent implements OnInit {
   @Input() isLIS: boolean;
   @Input() conceptNameType: string;
   @Input() finalResult: any;
+  @Input() parametersRelationshipConceptSourceUuid: string;
   testParameter$: Observable<ConceptGet>;
   @Output() data: EventEmitter<any> = new EventEmitter<any>();
   latestResult: any;
@@ -27,7 +28,7 @@ export class TestParameterEntryComponent implements OnInit {
   ngOnInit(): void {
     this.testParameter$ = this.conceptService.getConceptDetailsByUuid(
       this.parameterUuid,
-      "custom:(uuid,display,datatype,names,answers:(uuid,display,names),attributes:(uuid,display,attributeType:(uuid,display)))"
+      "custom:(uuid,display,datatype,names,answers:(uuid,display,names),mappings:(conceptMapType,conceptReferenceTerm),attributes:(uuid,display,attributeType:(uuid,display)))"
     );
 
     if (this.finalResult && !this.finalResult?.groups) {

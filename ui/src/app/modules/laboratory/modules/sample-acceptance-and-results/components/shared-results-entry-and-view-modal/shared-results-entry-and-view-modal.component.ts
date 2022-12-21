@@ -40,6 +40,7 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
   visitDetails$: Observable<any>;
   providerDetails$: Observable<any>;
   preferredName: string;
+  parametersRelationshipConceptSourceUuid$: Observable<string>;
 
   constructor(
     private dialogRef: MatDialogRef<SharedResultsEntryAndViewModalComponent>,
@@ -59,6 +60,20 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
     this.multipleResultsAttributeType$ = this.systemSettingsService
       .getSystemSettingsByKey(
         `iCare.laboratory.settings.testParameters.attributes.multipleResultsAttributeTypeUuid`
+      )
+      .pipe(
+        map((response) => {
+          if (response && !response?.error) {
+            return response;
+          } else {
+            this.errors = [...this.errors, response];
+            return response;
+          }
+        })
+      );
+    this.parametersRelationshipConceptSourceUuid$ = this.systemSettingsService
+      .getSystemSettingsByKey(
+        `iCare.lis.testParameterRelationship.conceptSourceUuid`
       )
       .pipe(
         map((response) => {
