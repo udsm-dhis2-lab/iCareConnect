@@ -1,4 +1,4 @@
-import { orderBy } from "lodash";
+import { orderBy, groupBy } from "lodash";
 import { ConceptGet } from "../../openmrs";
 
 export interface AlloCationStatusObject {
@@ -97,6 +97,7 @@ export class SampleAllocation {
     return this.allocation?.results.map((result: ResultObject) => {
       return {
         ...result,
+        resultGroupUuid: result?.resultGroup?.uuid,
         statuses: this.allocation?.statuses?.filter(
           (status) => status?.result && status?.result?.uuid === result?.uuid
         ),
@@ -130,13 +131,46 @@ export class SampleAllocation {
   }
 
   get finalResult(): any {
-    const finalResult =
+    const formattedResults =
       this.allocation?.results?.length > 0
-        ? orderBy(this.allocation?.results, ["dateCreated"], ["desc"])[0]
+        ? orderBy(
+            this.allocation?.results?.map((result) => {
+              return {
+                ...result,
+                resultGroupUuid: !result?.resultGroup?.uuid
+                  ? "NONE"
+                  : result?.resultGroup?.uuid,
+                resultGroupDateCreated: result?.resultGroup?.uuid
+                  ? result?.resultGroup?.dateCreated
+                  : null,
+              };
+            }),
+            ["dateCreated"],
+            ["desc"]
+          )
+        : [];
+    const finalResult =
+      formattedResults[0] && formattedResults[0]?.resultGroupUuid == "NONE"
+        ? formattedResults[0]
+        : formattedResults[0] && formattedResults[0]?.resultGroupUuid !== "NONE"
+        ? groupBy(formattedResults, "resultGroupUuid")
         : null;
+    const hasResultsGroup =
+      formattedResults[0] && formattedResults[0]?.resultGroupUuid !== "NONE";
     return finalResult
       ? {
-          ...finalResult,
+          ...{
+            ...(!hasResultsGroup
+              ? finalResult
+              : {
+                  groups: Object.keys(finalResult)?.map((key) => {
+                    return {
+                      key,
+                      results: finalResult[key],
+                    };
+                  }),
+                }),
+          },
           statuses:
             this.allocation?.statuses?.filter(
               (status) => status?.result?.uuid === finalResult?.uuid

@@ -97,4 +97,11 @@ export class SampleAllocationService {
         catchError((error) => of(error))
       );
   }
+
+  createTestAllocation(data: any): Observable<any> {
+    return this.httpClient.post(`lab/allocation`, data).pipe(
+      map((response) => response),
+      catchError((error) => of(error))
+    );
+  }
 }

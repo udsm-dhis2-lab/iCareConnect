@@ -9,7 +9,7 @@ import {
 import { Observable, from, of, zip } from "rxjs";
 import { OpenmrsHttpClientService } from "src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service";
 import { catchError, map } from "rxjs/operators";
-import { flatten } from "lodash";
+import { flatten, omit } from "lodash";
 
 @Injectable({
   providedIn: "root",
@@ -205,7 +205,8 @@ export class ConceptsService {
   }
 
   updateConcept(uuid: string, data: any): Observable<ConceptCreateFull> {
-    return from(this.api.concept.updateConcept(uuid, data)).pipe(
+    const dataToUpdate = omit(data, "answers");
+    return from(this.api.concept.updateConcept(uuid, dataToUpdate)).pipe(
       map((response) => response),
       catchError((error) => {
         return of(error);
