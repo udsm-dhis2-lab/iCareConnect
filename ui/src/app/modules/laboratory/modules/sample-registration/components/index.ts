@@ -6,6 +6,7 @@ import { MultipleTestsSelectionComponent } from "./multiple-tests-selection/mult
 import { PersonDetailsComponent } from "./person-details/person-details.component";
 import { RegisterSampleComponent } from "./register-sample/register-sample.component";
 import { RegisteredPatientDetailsComponent } from "./registered-patient-details/registered-patient-details.component";
+import { SampleInBatchRegistrationComponent } from "./sample-in-batch/sample-in-batch-registration.component";
 import { SampleLabelComponent } from "./sample-label/sample-label.component";
 import { SampleRegistrationFinalizationComponent } from "./sample-registration-finalization/sample-registration-finalization.component";
 import { SamplesListComponent } from "./samples-list/samples-list.component";
@@ -24,6 +25,7 @@ export const sampleRegistrationComponents: any[] = [
   SampleRegistrationFinalizationComponent,
   ClientsFromExternalSystemsComponent,
   SamplesListComponent,
+  SampleInBatchRegistrationComponent,
 ];
 
 export const regModals: any[] = [SampleRegistrationFinalizationComponent];
