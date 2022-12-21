@@ -73,7 +73,6 @@ export class TestParameterEntryComponent implements OnInit {
   }
 
   onGetFormData(data: any, parameter: any): void {
-    console.log("data:::::: ", data);
     this.data.emit({
       value: data,
       previousValue: this.latestResult?.value,
