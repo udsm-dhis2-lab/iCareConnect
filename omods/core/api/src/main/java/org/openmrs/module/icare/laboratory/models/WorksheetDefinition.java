@@ -47,19 +47,19 @@ public class WorksheetDefinition extends BaseOpenmrsData implements java.io.Seri
 	public void setWorksheet(Worksheet worksheet) {
 		this.worksheet = worksheet;
 	}
-
-	public static WorksheetDefinition fromMap(Map<String,Object> worksheetDefinitionMap){
-
+	
+	public static WorksheetDefinition fromMap(Map<String, Object> worksheetDefinitionMap) {
+		
 		WorksheetDefinition worksheetDefinition = new WorksheetDefinition();
 		worksheetDefinition.setCode(worksheetDefinitionMap.get("code").toString());
-
+		
 		Worksheet worksheet = new Worksheet();
 		worksheet.setUuid(((Map) worksheetDefinitionMap.get("worksheet")).get("uuid").toString());
 		worksheetDefinition.setWorksheet(worksheet);
-
+		
 		return worksheetDefinition;
 	}
-
+	
 	public Map<String,Object> toMap(){
 
 		Map<String,Object> worksheetDefinitionObject = new HashMap<>();
