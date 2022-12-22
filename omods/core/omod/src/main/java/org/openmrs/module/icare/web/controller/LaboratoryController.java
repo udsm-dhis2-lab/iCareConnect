@@ -888,31 +888,35 @@ public class LaboratoryController {
 		return newWorksheets;
 
 	}
-
+	
 	@RequestMapping(value = "worksheetcontrols", method = RequestMethod.GET)
 	@ResponseBody
-	public List<Map<String, Object>> getWorkSheetControls(@RequestParam(value = "startDate", required = false) String startDate, @RequestParam(value = "endDate", required = false) String endDate, @RequestParam(value = "q", required = false) String q, @RequestParam(defaultValue = "0") Integer startIndex, @RequestParam(defaultValue = "100") Integer limit) throws ParseException {
-
+	public List<Map<String, Object>> getWorkSheetControls(
+	        @RequestParam(value = "startDate", required = false) String startDate,
+	        @RequestParam(value = "endDate", required = false) String endDate,
+	        @RequestParam(value = "q", required = false) String q, @RequestParam(defaultValue = "0") Integer startIndex,
+	        @RequestParam(defaultValue = "100") Integer limit) throws ParseException {
+		
 		Date start = null;
 		Date end = null;
 		if (startDate != null && endDate != null) {
-
+			
 			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 			start = formatter.parse(startDate);
 			end = formatter.parse(endDate);
 		}
-
+		
 		List<WorksheetControl> worksheetControls = laboratoryService.getWorksheetControls(start, end, q, startIndex, limit);
-
+		
 		List<Map<String, Object>> responseWorkSheetControlsObject = new ArrayList<Map<String, Object>>();
 		for (WorksheetControl worksheetControl : worksheetControls) {
 			Map<String, Object> worksheetControlObject = worksheetControl.toMap();
 			responseWorkSheetControlsObject.add(worksheetControlObject);
 		}
-
+		
 		return responseWorkSheetControlsObject;
 	}
-
+	
 	@RequestMapping(value = "worksheetcontrols",method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public List<Map<String,Object>> addWorksheetControl(@RequestBody List<Map<String,Object>> worksheetControlsObject){
@@ -935,7 +939,7 @@ public class LaboratoryController {
 		return newWorksheetControls;
 
 	}
-
+	
 	@RequestMapping(value = "worksheetdefinitions",method = RequestMethod.GET)
 	@ResponseBody
 	public List<Map<String,Object>> getWorksheetDefinitions(@RequestParam(value = "startDate", required = false) String startDate, @RequestParam(value = "endDate", required = false) String endDate, @RequestParam(value = "q", required = false) String q, @RequestParam(defaultValue = "0") Integer startIndex, @RequestParam(defaultValue = "100") Integer limit) throws ParseException{
@@ -959,7 +963,7 @@ public class LaboratoryController {
 		}
 		return  worksheetDefinitionsObject;
 	}
-
+	
 	@RequestMapping(value="worksheetdefinitions",method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public List<Map<String,Object>> addWorksheetDefinitions(@RequestBody List<Map<String,Object>> worksheetDefinitionsObject) throws Exception{
@@ -976,7 +980,7 @@ public class LaboratoryController {
 		}
 		return newWorksheetDefinitions;
 	}
-
+	
 	@RequestMapping(value = "worksheetsamples", method = RequestMethod.GET)
 	@ResponseBody
 	public List<Map<String,Object>> getWorksheetSamples(@RequestParam(value = "startDate", required = false) String startDate, @RequestParam(value = "endDate", required = false) String endDate, @RequestParam(value = "q", required = false) String q, @RequestParam(defaultValue = "0") Integer startIndex, @RequestParam(defaultValue = "100") Integer limit) throws ParseException{
@@ -1001,7 +1005,7 @@ public class LaboratoryController {
 		}
 		return worksheetSamplesObject;
 	}
-
+	
 	@RequestMapping(value="worksheetsamples",method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public List<Map<String,Object>> addWorksheetSamples(@RequestBody List<Map<String,Object>> worksheetSamplesObject) throws Exception{
@@ -1018,7 +1022,4 @@ public class LaboratoryController {
 		}
 		return newWorksheetSamples;
 	}
-
-
-
 }

@@ -1,0 +1,33 @@
+<div class="w-100" style="height: 20vh; overflow: auto">
+  <table class="table">
+    <tbody>
+      <tr>
+        <td *ngFor="let result of finalResultsForParentTestParameter">
+          <div class="w-100 mb-2">
+            {{ result?.valueCoded?.display }}
+          </div>
+          <div class="w-100">
+            <table class="table">
+              <tr *ngFor="let allocation of parametersWithDefinedRelationship">
+                <td>
+                  <app-test-parameter-entry
+                    [parameterUuid]="allocation?.allocation?.parameter?.uuid"
+                    [allocation]="allocation?.allocation"
+                    [isLIS]="isLIS"
+                    [relatedResult]="result"
+                    [disabled]="disabled"
+                    [finalResult]="allocation?.formattedAllocation?.finalResult"
+                    [conceptNameType]="conceptNameType"
+                    (data)="
+                      getFedResult($event, result, allocation?.allocation)
+                    "
+                  ></app-test-parameter-entry>
+                </td>
+              </tr>
+            </table>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
