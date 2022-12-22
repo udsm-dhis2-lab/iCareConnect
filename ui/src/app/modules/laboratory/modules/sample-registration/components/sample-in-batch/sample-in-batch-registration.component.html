@@ -1,6 +1,6 @@
 <div *ngIf="dynamicFields.length">
   <div class="row">
-    <div class="col-11">
+    <div class="col-11 fluid-form">
       <app-form
         [fields]="dynamicFields"
         [isFormHorizontal]="true"
@@ -8,11 +8,15 @@
       >  
       </app-form>
     </div>
+    <div class="col-1">
+      <button mat-fab color="primary">
+        <mat-icon>add</mat-icon>
+      </button>
+    </div>
   </div>
 </div>
 
 <div
-  class="single-registration"
   *ngIf="{
     labSampleLabel: labSampleLabel$ | async,
     testsUnderSpecimen: testsUnderSpecimen$ | async,
