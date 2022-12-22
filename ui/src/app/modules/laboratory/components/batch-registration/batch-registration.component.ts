@@ -55,6 +55,7 @@ export class BatchRegistrationComponent implements OnInit {
   selectedDynamicFields: any;
   existingBatchField: any;
   batchsetDescription: any;
+  errors: any;
 
   constructor(private sampleService: SamplesService) {}
 
@@ -326,19 +327,24 @@ export class BatchRegistrationComponent implements OnInit {
       let existingBatchsetFields = this.existingBatchsets.filter(
         (batchset) => batchset.name === this.existingBatchsetField.value
       )[0]?.fields;
+      console.log("==> Existing batchset fields: ", existingBatchsetFields);
       if (existingBatchsetFields?.length > 0) {
         this.selectedFixedFields =
           JSON.parse(existingBatchsetFields)["fixedFields"]?.length > 0
             ? JSON.parse(existingBatchsetFields)["fixedFields"]
-            : this.selectedFixedFields;
+            : this.selectedFixedFields.length
+            ? this.selectedFixedFields
+            : [];
         this.selectedStaticFields =
           JSON.parse(existingBatchsetFields)["staticFields"]?.length > 0
             ? JSON.parse(existingBatchsetFields)["staticFields"]
-            : this.selectedStaticFields;
+            : this.selectedStaticFields.length
+            ? this.selectedStaticFields
+            : [];
         this.selectedDynamicFields =
           JSON.parse(existingBatchsetFields)["dynamicFields"]?.length > 0
             ? JSON.parse(existingBatchsetFields)["dynamicFields"]
-            : this.selectedDynamicFields;
+            : this.selectedDynamicFields.length ? this.selectedDynamicFields : [];
       }
     }
     if (this.useExistingBatch && key === "Existing Batch") {
@@ -348,17 +354,24 @@ export class BatchRegistrationComponent implements OnInit {
         (batch) => batch.name === this.existingBatchField.value
       )[0]?.fields;
       if (existingBatchFields?.length > 0) {
-        this.selectedFixedFields = JSON.parse(existingBatchFields)["fixedFields"]?.length > 0 
-        ? JSON.parse(existingBatchFields)["fixedFields"] 
-        : this.selectedFixedFields;
+        this.selectedFixedFields =
+          JSON.parse(existingBatchFields)["fixedFields"]?.length > 0
+            ? JSON.parse(existingBatchFields)["fixedFields"]
+            : this.selectedFixedFields.length
+            ? this.selectedFixedFields
+            : [];
         this.selectedStaticFields =
           JSON.parse(existingBatchFields)["staticFields"]?.length > 0
             ? JSON.parse(existingBatchFields)["staticFields"]
-            : this.selectedStaticFields;
+            : this.selectedStaticFields.length
+            ? this.selectedStaticFields
+            : [];
         this.selectedDynamicFields =
           JSON.parse(existingBatchFields)["dynamicFields"]?.length > 0
             ? JSON.parse(existingBatchFields)["dynamicFields"]
-            : this.selectedDynamicFields;
+            : this.selectedDynamicFields.length
+            ? this.selectedDynamicFields
+            : [];
       }
     }
     if (
@@ -383,12 +396,11 @@ export class BatchRegistrationComponent implements OnInit {
     }
 
     if (
-      (this.batchNameField.value || this.existingBatchsetField.value) &&
-        (this.selectedFixedFields?.length > 0 ||
-          this.selectedStaticFields?.length > 0 || 
-          this.selectedDynamicFields?.length > 0
-        ) && 
-      this.validBatchsetName && this.validBatchName
+      (this.batchNameField.value || this.existingBatchField.value) && 
+      (this.selectedFixedFields?.length > 0 ||
+       this.selectedStaticFields?.length > 0 ||
+       this.selectedDynamicFields?.length > 0
+      ) && this.validBatchsetName && this.validBatchName
     ) {
       this.validForm = true;
     } else {
@@ -407,17 +419,28 @@ export class BatchRegistrationComponent implements OnInit {
       })
       .filter((field) => {
         return field && field.value;
-      });
+      }).filter((field) => field);
     const staticFields = Object.keys(this.staticFieldsOptionsObject).map(
       (key) => {
-        return this.staticFieldsOptionsObject[key];
+        //filter out selected fields that possibly have value
+        const isSelectedField = this.selectedStaticFields.filter(
+          (field) => field.key === key
+        ).length;
+        if(isSelectedField){
+          return this.staticFieldsOptionsObject[key];
+        }
       }
-    );
+    ).filter((field) => field);
     const dynamicFields = Object.keys(this.dynamicFieldsOptionsObject).map(
       (key) => {
-        return this.staticFieldsOptionsObject[key];
+        const isSelectedField = this.selectedDynamicFields.filter(
+          (field) => field.key === key
+        ).length;
+        if (isSelectedField) {
+          return this.dynamicFieldsOptionsObject[key];
+        }
       }
-    );
+    ).filter((field) => field);
     const batchsetsInformation = [
       {
         name: this.batchNameField.value,
@@ -465,7 +488,7 @@ export class BatchRegistrationComponent implements OnInit {
           }
         });
       }
-    } else {
+    } else if (this.batchsetNameField.value.length) {
       this.sampleService
         .createBatchsets(batchsetsInformation)
         .subscribe((response) => {
@@ -479,7 +502,7 @@ export class BatchRegistrationComponent implements OnInit {
                 },
               };
             });
-            if (this.batchNameField.value) {
+            if (this.batchNameField.value.length) {
               this.sampleService.createBatch(batches).subscribe((response) => {
                 if (!response?.error) {
                   console.log("==> Batch created; ", response);
@@ -487,9 +510,60 @@ export class BatchRegistrationComponent implements OnInit {
                   console.log("==> Failed to create batch; ", response);
                 }
               });
+            } else {
+              this.errors = [
+                ...this.errors,
+                {
+                  error: {
+                    message: "Please supply a batch name!",
+                  },
+                },
+              ];
             }
           }
+          if(response?.error || response?.stackTrace){
+            this.errors =
+              response?.error && !response?.stackTrace
+                ? [...this.errors, response?.error]
+                : response?.stackTrace
+                ? [
+                    ...this.errors,
+                    {
+                      error: {
+                        message: response?.message,
+                      },
+                    },
+                  ]
+                : [
+                    ...this.errors,
+                    {
+                      error: {
+                        message: "Unknown error occurred!",
+                      },
+                    },
+                  ];
+          }
+
         });
+    } else {
+      if (this.batchNameField.value) {
+        this.sampleService.createBatch(batches).subscribe((response) => {
+          if (!response?.error) {
+            console.log("==> Batch created; ", response);
+          } else {
+            console.log("==> Failed to create batch; ", response);
+          }
+        });
+      } else {
+        this.errors = [
+          ...this.errors,
+          {
+            error: {
+              message: "Please supply a batch name!"
+            }
+          }
+        ]
+      }
     }
   }
 

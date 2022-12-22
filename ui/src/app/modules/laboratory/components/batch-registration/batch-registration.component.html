@@ -82,7 +82,7 @@
                                     (formUpdate)="onFormUpdate($event, 'SelectedFixedField', selectedFixedField.key)"
                                 ></app-form>
                             </div>
-                            <div class="col-1" *ngIf="!useExistingBatchset">
+                            <div class="col-1" *ngIf="!useExistingBatchset && !useExistingBatch">
                                 <button class="remove-field" mat-button matTooltip="Remove '{{ selectedFixedField?.label }}' from Fixed fields "><mat-icon>delete_outline</mat-icon></button>
                             </div>
                         </ng-container>
@@ -116,18 +116,18 @@
                 <div class="row">
                     <ng-container *ngIf="selectedStaticFields?.length > 0">
                         <ng-container *ngFor="let selectedStaticField of selectedStaticFields">
-                            <div class="{{ useExistingBatchset ? 'col-12' : 'col-10' }}">
+                            <div class="{{ useExistingBatchset || useExistingBatch ? 'col-12' : 'col-10' }}">
                                 <app-form
                                     [fields]="[selectedStaticField]"
                                     (formUpdate)="onFormUpdate($event, 'SelectedStaticField', selectedStaticField.key)"
                                 ></app-form>
                             </div>
-                            <div class="col-1" *ngIf="!useExistingBatchset">
+                            <div class="col-1" *ngIf="!useExistingBatchset && !useExistingBatch">
                                 <button class="remove-field" mat-button matTooltip="Remove '{{ selectedStaticField?.label }}' from Static fields"><mat-icon>delete_outline</mat-icon></button>
                             </div>
                         </ng-container>
                     </ng-container>
-                    <div class="{{ useExistingBatchset ? 'col-12' : 'col-10' }}">
+                    <div class="{{ useExistingBatchset || useExistingBatch ? 'col-12' : 'col-10' }}">
                         <mat-progress-bar
                             *ngIf="!addStaticField?.options?.length"
                             mode="indeterminate">
@@ -155,18 +155,18 @@
                 <div class="row">
                     <ng-container *ngIf="selectedDynamicFields?.length > 0">
                         <ng-container *ngFor="let selectedDynamicField of selectedDynamicFields">
-                            <div class="{{ useExistingBatchset ? 'col-12' : 'col-10' }}">
+                            <div class="{{ useExistingBatchset || useExistingBatch ? 'col-12' : 'col-10' }}">
                                 <app-form
                                     [fields]="[selectedDynamicField]"
                                     (formUpdate)="onFormUpdate($event, 'SelectedDynamicField', selectedDynamicField.key)"
                                 ></app-form>
                             </div>
-                            <div class="col-1" *ngIf="useExistingBatchset">
+                            <div class="col-1" *ngIf="!useExistingBatchset && !useExistingBatch">
                                 <button class="remove-field" mat-button matTooltip="Remove '{{ selectedDynamicField?.label }}' from Dynamic fields"><mat-icon>delete_outline</mat-icon></button>
                             </div>
                         </ng-container>
                     </ng-container>
-                    <div class="{{ useExistingBatchset ? 'col-12' : 'col-10' }}">
+                    <div class="{{ useExistingBatchset || useExistingBatch ? 'col-12' : 'col-10' }}">
                         <mat-progress-bar
                             *ngIf="!addDynamicField?.options?.length"
                             mode="indeterminate">
@@ -242,14 +242,10 @@
             </table>
         </div>
         <button mat-flat-button *ngIf="selectedFixedFields.length" style="border:1px solid #cecece" (click)="onAddAnotherSample($event)"> {{ addAnotherSample ? 'Hide sample form' : 'Add another sample' }} </button>
-        <div class="dynamic-fields mt-4" *ngIf="addAnotherSample && (selectedFixedFields.length || selectedStaticFields.length || selectedDynamicFields.length)">
+        <div class="dynamic-fields mt-4" *ngIf="!addAnotherSample">
             <div class="dynamic-form row">
-                <div class="col-10">
-                    <ng-container *ngIf="selectedDynamicFields?.length > 0">
-                        <app-form
-                            [fields]="[selectedDynamicFields]"
-                        ></app-form>
-                    </ng-container>
+                <div class="col-12">
+                    <app-sample-in-batch-registration></app-sample-in-batch-registration>
                 </div>
                 <div class="col-11"></div>
             </div>
