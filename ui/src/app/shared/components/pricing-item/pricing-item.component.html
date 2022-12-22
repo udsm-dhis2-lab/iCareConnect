@@ -42,7 +42,8 @@
     <button
       mat-flat-button
       id="save-price-btn-{{ pricingItem?.htmlDisplay }}"
-      class="bg-success text-white ml-2 mt-n3"
+      class="ml-2 mt-3"
+      color="primary"
       [disabled]="!formValue?.isValid"
       (click)="onSaveItemPrice($event)"
       style="height: 36px"
