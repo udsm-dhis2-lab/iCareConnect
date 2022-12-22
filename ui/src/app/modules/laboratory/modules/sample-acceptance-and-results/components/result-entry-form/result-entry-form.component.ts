@@ -13,11 +13,12 @@ import { Textbox } from "src/app/shared/modules/form/models/text-box.model";
 export class ResultEntryFormComponent implements OnInit {
   @Input() parameter: any;
   @Input() hasMultipleAnswers: boolean;
-  @Input() value: any;
+  value: any;
   @Input() disabled: boolean;
   @Input() multipleResultsAttributeType: string;
   @Input() conceptNameType: string;
   @Input() isLIS: boolean;
+  @Input() latestResult: any;
   formField: Field<string>;
   @Output() formData: EventEmitter<any> = new EventEmitter<any>();
   fieldsData: any = {};
@@ -35,6 +36,12 @@ export class ResultEntryFormComponent implements OnInit {
             attribute?.attributeType?.uuid == this.multipleResultsAttributeType
         ) || []
       )?.length > 0;
+    this.value =
+      !this.hasMultipleAnswers && !this.latestResult?.isArray
+        ? this.latestResult?.value
+        : !this.hasMultipleAnswers && this.latestResult?.isArray
+        ? this.latestResult?.value[0]
+        : this.latestResult?.value;
     this.label = !this.conceptNameType
       ? this.parameter?.display
       : (this.parameter?.names?.filter(

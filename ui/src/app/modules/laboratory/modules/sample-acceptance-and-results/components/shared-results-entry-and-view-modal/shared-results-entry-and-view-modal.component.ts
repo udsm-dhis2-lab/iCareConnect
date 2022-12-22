@@ -7,7 +7,7 @@ import { ConceptGet } from "src/app/shared/resources/openmrs";
 import { SampleAllocationObject } from "src/app/shared/resources/sample-allocations/models/allocation.model";
 import { SampleAllocationService } from "src/app/shared/resources/sample-allocations/services/sample-allocation.service";
 
-import { omit, groupBy, flatten } from "lodash";
+import { omit, groupBy, flatten, orderBy } from "lodash";
 import { HttpClient } from "@angular/common/http";
 import { OrdersService } from "src/app/shared/resources/order/services/orders.service";
 import { VisitsService } from "src/app/shared/resources/visits/services";
@@ -15,7 +15,6 @@ import { Store } from "@ngrx/store";
 import { AppState } from "src/app/store/reducers";
 import { getProviderDetails } from "src/app/store/selectors/current-user.selectors";
 import { MatRadioChange } from "@angular/material/radio";
-import { FormControl } from "@angular/forms";
 
 @Component({
   selector: "app-shared-results-entry-and-view-modal",
@@ -41,7 +40,7 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
   providerDetails$: Observable<any>;
   preferredName: string;
   parametersRelationshipConceptSourceUuid$: Observable<string>;
-
+  relatedResults: any[] = [];
   constructor(
     private dialogRef: MatDialogRef<SharedResultsEntryAndViewModalComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
@@ -60,20 +59,6 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
     this.multipleResultsAttributeType$ = this.systemSettingsService
       .getSystemSettingsByKey(
         `iCare.laboratory.settings.testParameters.attributes.multipleResultsAttributeTypeUuid`
-      )
-      .pipe(
-        map((response) => {
-          if (response && !response?.error) {
-            return response;
-          } else {
-            this.errors = [...this.errors, response];
-            return response;
-          }
-        })
-      );
-    this.parametersRelationshipConceptSourceUuid$ = this.systemSettingsService
-      .getSystemSettingsByKey(
-        `iCare.lis.testParameterRelationship.conceptSourceUuid`
       )
       .pipe(
         map((response) => {
@@ -346,41 +331,86 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
     event: Event,
     order: any,
     confirmed?: boolean,
-    approvalStatusType?: string
+    approvalStatusType?: string,
+    related?: boolean
   ): void {
     event.stopPropagation();
     if (confirmed) {
       const allocationsData = order?.allocations;
-      this.allocationStatuses = allocationsData
-        ?.map((allocationData) => {
-          if (
-            allocationData?.allocation?.finalResult &&
-            allocationData?.allocation?.parameter?.datatype?.display !=
-              "Complex"
-          ) {
-            // TODO: Find a better way to handle second complex (file) data types
-            const approvalStatus = {
-              status:
-                order?.authorizationStatuses?.length === 0 &&
-                !this.data?.LISConfigurations?.isLIS
-                  ? "APPROVED"
-                  : "AUTHORIZED",
-              remarks: "APPROVED",
-              category: "RESULT_AUTHORIZATION",
-              user: {
-                uuid: this.userUuid,
-              },
-              testAllocation: {
-                uuid: allocationData?.allocation?.uuid,
-              },
-              testResult: {
-                uuid: allocationData?.allocation?.finalResult?.uuid,
-              },
-            };
-            return approvalStatus;
-          }
-        })
-        ?.filter((allStatus) => allStatus);
+      this.allocationStatuses = flatten(
+        allocationsData
+          ?.map((allocationData) => {
+            if (
+              allocationData?.allocation?.finalResult &&
+              allocationData?.allocation?.parameter?.datatype?.display !=
+                "Complex"
+            ) {
+              // TODO: Find a better way to handle second complex (file) data types
+              const results = !allocationData?.allocation?.finalResult?.groups
+                ? [allocationData?.allocation?.finalResult]
+                : !related
+                ? allocationData?.allocation?.finalResult?.groups[
+                    allocationData?.allocation?.finalResult?.groups?.length - 1
+                  ]?.results
+                : allocationData?.allocation?.finalResult?.groups?.map(
+                    (group) => {
+                      return orderBy(
+                        group?.results,
+                        ["dateCreated"],
+                        ["desc"]
+                      )[0];
+                    }
+                  );
+              let approvalStatuses = [];
+              if (allocationData?.allocation?.finalResult?.groups) {
+                approvalStatuses = results?.map((result) => {
+                  return {
+                    status:
+                      order?.authorizationStatuses?.length === 0 &&
+                      !this.data?.LISConfigurations?.isLIS
+                        ? "APPROVED"
+                        : "AUTHORIZED",
+                    remarks: "APPROVED",
+                    category: "RESULT_AUTHORIZATION",
+                    user: {
+                      uuid: this.userUuid,
+                    },
+                    testAllocation: {
+                      uuid: allocationData?.allocation?.uuid,
+                    },
+                    testResult: {
+                      uuid: result?.uuid,
+                    },
+                  };
+                });
+              } else {
+                approvalStatuses = [
+                  {
+                    status:
+                      order?.authorizationStatuses?.length === 0 &&
+                      !this.data?.LISConfigurations?.isLIS
+                        ? "APPROVED"
+                        : "AUTHORIZED",
+                    remarks: "APPROVED",
+                    category: "RESULT_AUTHORIZATION",
+                    user: {
+                      uuid: this.userUuid,
+                    },
+                    testAllocation: {
+                      uuid: allocationData?.allocation?.uuid,
+                    },
+                    testResult: {
+                      uuid: orderBy(results, ["dateCreated"], ["desc"])[0]
+                        ?.uuid,
+                    },
+                  },
+                ];
+              }
+              return approvalStatuses;
+            }
+          })
+          ?.filter((allStatus) => allStatus)
+      );
       this.saving = true;
       this.shouldConfirm = false;
       this.sampleAllocationService
@@ -507,5 +537,66 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
 
   onGetRemarks(remarks: string, order: any): void {
     this.remarksData[order?.concept?.uuid] = remarks;
+  }
+
+  getFedResults(results: any): void {
+    this.relatedResults = [];
+    // console.log("results", results);
+    Object.keys(results)?.forEach((key) => {
+      if (
+        results[key]?.value &&
+        results[key]?.value != results[key]?.previousValue[0]
+      ) {
+        this.relatedResults = [
+          ...this.relatedResults,
+          {
+            concept: {
+              uuid: results[key]?.parameter?.uuid,
+            },
+            testAllocation: {
+              uuid: results[key]?.allocation?.uuid,
+            },
+            valueNumeric: results[key]?.parameter?.isNumeric
+              ? results[key]?.value
+              : null,
+            valueText: results[key]?.parameter?.isText
+              ? results[key]?.value
+              : null,
+
+            valueCoded: results[key]?.parameter?.isCoded
+              ? {
+                  uuid: results[key]?.value,
+                }
+              : null,
+            resultGroup: {
+              uuid: results[key]?.relatedResult?.uuid,
+            },
+            abnormal: false,
+            status: this.remarksData[results[key]?.parameter?.uuid]
+              ? {
+                  category: "RESULT_REMARKS",
+                  status: "REMARKS",
+                  remarks: this.remarksData[results[key]?.parameter?.uuid],
+                }
+              : null,
+          },
+        ];
+      }
+    });
+  }
+
+  onSaveRelatedResults(event: Event, order: any): void {
+    event.stopPropagation();
+    // console.log("relatedResults", this.relatedResults);
+    this.sampleAllocationService
+      .saveResultsViaAllocations(this.relatedResults)
+      .subscribe((response) => {
+        if (response) {
+          this.saving = false;
+          setTimeout(() => {
+            this.getAllocations();
+          }, 100);
+        }
+      });
   }
 }

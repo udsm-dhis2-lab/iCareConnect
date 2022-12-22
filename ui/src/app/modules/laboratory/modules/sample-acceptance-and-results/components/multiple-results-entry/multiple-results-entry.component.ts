@@ -84,7 +84,7 @@ export class MultipleResultsEntryComponent implements OnInit {
   }
 
   ngAfterViewInit() {
-    this.setInitialValue();
+    // this.setInitialValue();
   }
 
   getSelectedValues(event: MatSelectChange): void {
@@ -103,7 +103,7 @@ export class MultipleResultsEntryComponent implements OnInit {
     this.filteredList
       .pipe(take(1), takeUntil(this._onDestroy))
       .subscribe(() => {
-        this.singleSelect.compareWith = (a: any, b: any) => a.id === b.id;
+        this.singleSelect.compareWith = (a: any, b: any) => a?.key === b?.key;
       });
   }
 

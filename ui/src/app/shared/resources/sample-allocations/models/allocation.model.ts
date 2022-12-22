@@ -39,7 +39,7 @@ export interface SampleAllocationObject {
   id?: string;
   container: ConceptGet;
   isSet: boolean;
-  parameter: ConceptGet;
+  parameter: any;
   statuses: AlloCationStatusObject[];
   label?: string;
   uuid: string;
@@ -53,6 +53,7 @@ export interface SampleAllocationObject {
   orderUuid?: string;
   finalResult?: ResultObject;
   resultApprovalConfiguration?: any;
+  testRelationshipConceptSourceUuid?: string;
 }
 
 export class SampleAllocation {
@@ -73,8 +74,17 @@ export class SampleAllocation {
     return this.allocation?.container;
   }
 
-  get parameter(): ConceptGet {
-    return this.allocation?.parameter;
+  get parameter(): any {
+    return {
+      ...this.allocation?.parameter,
+      relatedTo: this.allocation?.parameter?.mappings
+        ? (this.allocation?.parameter?.mappings?.filter(
+            (mapping: any) =>
+              mapping?.conceptReference?.conceptSource?.uuid ===
+              this.allocation?.testRelationshipConceptSourceUuid
+          ) || [])[0]?.conceptReference
+        : null,
+    };
   }
 
   get sample(): any {
@@ -167,6 +177,33 @@ export class SampleAllocation {
                     return {
                       key,
                       results: finalResult[key],
+                      authorizationStatuses:
+                        this.allocation?.statuses?.filter(
+                          (status) =>
+                            status?.category === "RESULT_AUTHORIZATION" &&
+                            status?.result?.uuid ===
+                              orderBy(
+                                finalResult[key],
+                                ["dateCreated"],
+                                ["desc"]
+                              )[0]?.uuid
+                        ) || [],
+                      authorizationIsReady:
+                        Number(this.allocation?.resultApprovalConfiguration) <=
+                        (
+                          this.allocation?.statuses?.filter(
+                            (status) =>
+                              status?.category === "RESULT_AUTHORIZATION" &&
+                              (status?.status == "APPROVED" ||
+                                status?.status == "AUTHORIZED") &&
+                              status?.result?.uuid ===
+                                orderBy(
+                                  finalResult[key],
+                                  ["dateCreated"],
+                                  ["desc"]
+                                )[0]?.uuid
+                          ) || []
+                        )?.length,
                     };
                   }),
                 }),
