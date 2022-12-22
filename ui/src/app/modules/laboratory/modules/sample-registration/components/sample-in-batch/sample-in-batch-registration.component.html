@@ -1,3 +1,16 @@
+<div *ngIf="dynamicFields.length">
+  <div class="row">
+    <div class="col-11">
+      <app-form
+        [fields]="dynamicFields"
+        [isFormHorizontal]="true"
+        (formUpdate)="onFormUpdate($event)"
+      >  
+      </app-form>
+    </div>
+  </div>
+</div>
+
 <div
   class="single-registration"
   *ngIf="{
@@ -6,7 +19,6 @@
     labLocations: labLocations$ | async
   } as params"
 >
-
   <div class="row">
     <div class="col-12" *ngIf="savingDataResponse?.error">
       <div *ngIf="savingDataResponse?.error?.error">

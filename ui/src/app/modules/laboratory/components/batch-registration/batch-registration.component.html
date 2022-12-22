@@ -241,14 +241,28 @@
                 </tbody>
             </table>
         </div>
-        <button mat-flat-button *ngIf="selectedFixedFields.length" style="border:1px solid #cecece" (click)="onAddAnotherSample($event)"> {{ addAnotherSample ? 'Hide sample form' : 'Add another sample' }} </button>
-        <div class="dynamic-fields mt-4" *ngIf="!addAnotherSample">
+        <button mat-flat-button 
+            *ngIf="
+                selectedDynamicFields.length && 
+                fieldsObjectValues?.fixedFieldsWithValues?.length === selectedFixedFields.length &&
+                fieldsObjectValues?.staticFieldsWithValues?.length === selectedStaticFields.length
+                " 
+                style="border:1px solid #cecece" 
+                (click)="onAddAnotherSample($event)"
+        > 
+            {{ addAnotherSample ? 'Hide sample form' : 'Add another sample' }} 
+        </button>
+        <div class="dynamic-fields mt-4" *ngIf="addAnotherSample">
             <div class="dynamic-form row">
                 <div class="col-12">
-                    <app-sample-in-batch-registration></app-sample-in-batch-registration>
+                    <app-sample-in-batch-registration
+                     [dynamicFields]="selectedDynamicFields"
+                     [staticFieldsWithValues]="fieldsObjectValues?.staticFieldsWithValues"
+                     [fixedFieldsWithValues]="fieldsObjectValues?.fixedFieldsWithValues"
+                    ></app-sample-in-batch-registration>
                 </div>
                 <div class="col-11"></div>
-            </div>
+            </div> 
         </div>
     </fieldset>
 </div>
