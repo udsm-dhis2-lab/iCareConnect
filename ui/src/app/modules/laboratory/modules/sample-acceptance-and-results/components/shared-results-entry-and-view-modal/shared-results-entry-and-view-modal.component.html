@@ -109,6 +109,8 @@
                                 allocationData?.allocation
                               )
                             "
+                            matTooltip="Double Click to view history"
+                            [matTooltipPosition]="'above'"
                             class="entry-col"
                             *ngFor="let allocationData of order?.allocations"
                           >
@@ -236,20 +238,30 @@
                         {{ order?.concept?.display }}
                       </td>
                       <td>
-                        <app-related-test-parameters-entry
-                          *ngIf="preferredName"
-                          [allSampleAllocations]="params?.sampleAllocations"
-                          [parametersWithDefinedRelationship]="
-                            order?.parametersWithDefinedRelationship
+                        <div
+                          (dblclick)="
+                            toggleSideNavigationGrouped(
+                              $event,
+                              order?.parametersWithDefinedRelationship
+                            )
                           "
-                          [disabled]="
-                            data?.actionType === 'review' &&
-                            !data?.LISConfigurations?.isLIS
-                          "
-                          [isLIS]="data?.LISConfigurations?.isLIS"
-                          [conceptNameType]="preferredName"
-                          (data)="getFedResults($event)"
-                        ></app-related-test-parameters-entry>
+                          class="entry-col"
+                        >
+                          <app-related-test-parameters-entry
+                            *ngIf="preferredName"
+                            [allSampleAllocations]="params?.sampleAllocations"
+                            [parametersWithDefinedRelationship]="
+                              order?.parametersWithDefinedRelationship
+                            "
+                            [disabled]="
+                              data?.actionType === 'review' &&
+                              !data?.LISConfigurations?.isLIS
+                            "
+                            [isLIS]="data?.LISConfigurations?.isLIS"
+                            [conceptNameType]="preferredName"
+                            (data)="getFedResults($event)"
+                          ></app-related-test-parameters-entry>
+                        </div>
                       </td>
                       <td>
                         <div class="mt-4">
@@ -363,8 +375,11 @@
       <div class="h6">
         {{ selectedAllocation?.allocation?.concept?.display }}
       </div>
-      <div style="height: 40vh; overflow: auto">
-        <table class="table table-bordered">
+      <div style="max-height: 50vh; overflow: auto">
+        <table
+          class="table table-bordered"
+          *ngIf="!selectedParametersWithDefinedRelationship"
+        >
           <thead>
             <tr>
               <th>Result</th>
@@ -415,6 +430,13 @@
             </tr>
           </tbody>
         </table>
+        <div *ngIf="selectedParametersWithDefinedRelationship">
+          <app-related-results-history
+            [parametersWithDefinedRelationship]="
+              selectedParametersWithDefinedRelationship
+            "
+          ></app-related-results-history>
+        </div>
       </div>
       <div></div>
     </div>

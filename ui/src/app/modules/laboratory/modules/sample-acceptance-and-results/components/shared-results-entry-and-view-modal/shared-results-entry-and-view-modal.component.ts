@@ -41,6 +41,7 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
   preferredName: string;
   parametersRelationshipConceptSourceUuid$: Observable<string>;
   relatedResults: any[] = [];
+  selectedParametersWithDefinedRelationship: any[];
   constructor(
     private dialogRef: MatDialogRef<SharedResultsEntryAndViewModalComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
@@ -104,8 +105,19 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
   }
 
   toggleSideNavigation(event: Event, allocation?: any): void {
+    this.selectedParametersWithDefinedRelationship = null;
     event.stopPropagation();
     this.selectedAllocation = allocation ? allocation : this.selectedAllocation;
+    this.showSideNavigation = !this.showSideNavigation;
+  }
+
+  toggleSideNavigationGrouped(
+    event: Event,
+    parametersWithDefinedRelationship: any[]
+  ): void {
+    event.stopPropagation();
+    this.selectedParametersWithDefinedRelationship =
+      parametersWithDefinedRelationship;
     this.showSideNavigation = !this.showSideNavigation;
   }
 
