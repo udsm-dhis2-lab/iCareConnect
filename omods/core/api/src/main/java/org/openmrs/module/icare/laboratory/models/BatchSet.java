@@ -5,7 +5,9 @@ import org.openmrs.module.icare.core.JSONConverter;
 
 import javax.persistence.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static javax.persistence.GenerationType.IDENTITY;
@@ -30,6 +32,9 @@ public class BatchSet extends BaseOpenmrsData implements java.io.Serializable, J
 	
 	@Column(name = "fields", length = 100000)
 	private String fields;
+
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "batchSet")
+	private List<Batch> batches = new ArrayList<Batch>(0);
 	
 	@Override
 	public Integer getId() {
@@ -73,7 +78,15 @@ public class BatchSet extends BaseOpenmrsData implements java.io.Serializable, J
 	public String getFields() {
 		return fields;
 	}
-	
+
+	public List<Batch> getBatches() {
+		return batches;
+	}
+
+	public void setBatches(List<Batch> batches) {
+		this.batches = batches;
+	}
+
 	public static BatchSet fromMap(Map<String, Object> batchSetMap) {
 		
 		BatchSet batchSet = new BatchSet();
@@ -99,14 +112,20 @@ public class BatchSet extends BaseOpenmrsData implements java.io.Serializable, J
 		if (this.getDateCreated() != null) {
 			batchSetObject.put("dateCreated", this.getDateCreated());
 		}
-		
-		Map<String, Object> creatorObject = new HashMap<String, Object>();
+
+		List<Map<String,Object>> batchesMap = new ArrayList<>();
+		for(Batch batch : this.getBatches()){
+			batchesMap.add(batch.toMap());
+		}
+		batchSetObject.put("batches",batchesMap);
 		
 		if (this.getCreator() != null) {
+			Map<String, Object> creatorObject = new HashMap<String, Object>();
 			creatorObject.put("uuid", this.getCreator().getUuid());
 			creatorObject.put("display", this.getCreator().getDisplayString());
+			batchSetObject.put("creator", creatorObject);
 		}
-		batchSetObject.put("creator", creatorObject);
+
 		
 		return batchSetObject;
 		
