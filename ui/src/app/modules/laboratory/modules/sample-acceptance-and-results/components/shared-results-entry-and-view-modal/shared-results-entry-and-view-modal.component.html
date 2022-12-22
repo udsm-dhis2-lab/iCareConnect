@@ -3,9 +3,7 @@
     sampleAllocations: sampleAllocations$ | async,
     multipleResultsAttributeType: multipleResultsAttributeType$ | async,
     visitDetails: visitDetails$ | async,
-    providerDetails: providerDetails$ | async,
-    parametersRelationshipConceptSourceUuid:
-      parametersRelationshipConceptSourceUuid$ | async
+    providerDetails: providerDetails$ | async
   } as params"
 >
   <mat-toolbar color="primary"
@@ -65,165 +63,262 @@
             >
               <tbody>
                 <ng-container *ngFor="let order of params?.sampleAllocations">
-                  <tr>
-                    <td
-                      rowspan="3"
-                      *ngIf="
-                        params?.sampleAllocations?.length > 1 ||
-                        (params?.sampleAllocations?.length == 1 &&
-                          params?.sampleAllocations[0]?.allocations[0]?.isSet)
-                      "
-                      [ngStyle]="{
-                        'width:': params?.sampleAllocations[0]?.allocations[0]
-                          ?.isSet
-                          ? '100px'
-                          : '30%'
-                      }"
-                    >
-                      {{ order?.concept?.display }}
-                    </td>
-                    <td>
-                      <div class="row">
-                        <div
-                          [ngClass]="{
-                            'parameter-test-default':
-                              (allocationData?.allocation?.parameter?.datatype
-                                .name == 'Numeric' ||
+                  <ng-container
+                    *ngIf="
+                      order?.parametersWithDefinedRelationship?.length === 0
+                    "
+                  >
+                    <tr>
+                      <td
+                        rowspan="3"
+                        *ngIf="
+                          params?.sampleAllocations?.length > 1 ||
+                          (params?.sampleAllocations?.length == 1 &&
+                            params?.sampleAllocations[0]?.allocations[0]?.isSet)
+                        "
+                        [ngStyle]="{
+                          'width:': params?.sampleAllocations[0]?.allocations[0]
+                            ?.isSet
+                            ? '100px'
+                            : '30%'
+                        }"
+                      >
+                        {{ order?.concept?.display }}
+                      </td>
+                      <td>
+                        <div class="row">
+                          <div
+                            [ngClass]="{
+                              'parameter-test-default':
+                                (allocationData?.allocation?.parameter?.datatype
+                                  .name == 'Numeric' ||
+                                  allocationData?.allocation?.parameter
+                                    ?.datatype.name == 'Coded') &&
+                                allocationData?.allocation?.isSet,
+                              'parameter-test-text':
                                 allocationData?.allocation?.parameter?.datatype
-                                  .name == 'Coded') &&
-                              allocationData?.allocation?.isSet,
-                            'parameter-test-text':
-                              allocationData?.allocation?.parameter?.datatype
-                                .name != 'Numeric' &&
-                              allocationData?.allocation?.parameter?.datatype
-                                .name != 'Coded' &&
-                              allocationData?.allocation?.isSet,
-                            'col-12': !allocationData?.allocation?.isSet
-                          }"
-                          (dblclick)="
-                            toggleSideNavigation(
-                              $event,
-                              allocationData?.allocation
-                            )
-                          "
-                          class="entry-col"
-                          *ngFor="let allocationData of order?.allocations"
-                        >
-                          <div class="w-100">
-                            <app-test-parameter-entry
-                              *ngIf="preferredName"
-                              [parameterUuid]="
-                                allocationData?.allocation?.parameter?.uuid
-                              "
-                              [multipleResultsAttributeType]="
-                                params?.multipleResultsAttributeType
-                              "
-                              [allocation]="allocationData?.allocation"
-                              [disabled]="
-                                data?.actionType === 'review' &&
-                                !data?.LISConfigurations?.isLIS
-                              "
-                              [finalResult]="
-                                allocationData?.allocation?.finalResult
-                              "
-                              [isLIS]="data?.LISConfigurations?.isLIS"
-                              [conceptNameType]="preferredName"
-                              [parametersRelationshipConceptSourceUuid]="
-                                params?.parametersRelationshipConceptSourceUuid
-                              "
-                              (data)="
-                                onGetFieldData(
-                                  $event,
-                                  allocationData?.allocation?.parameter,
-                                  allocationData?.allocation
-                                )
-                              "
-                            ></app-test-parameter-entry>
+                                  .name != 'Numeric' &&
+                                allocationData?.allocation?.parameter?.datatype
+                                  .name != 'Coded' &&
+                                allocationData?.allocation?.isSet,
+                              'col-12': !allocationData?.allocation?.isSet
+                            }"
+                            (dblclick)="
+                              toggleSideNavigation(
+                                $event,
+                                allocationData?.allocation
+                              )
+                            "
+                            class="entry-col"
+                            *ngFor="let allocationData of order?.allocations"
+                          >
+                            <div class="w-100">
+                              <app-test-parameter-entry
+                                *ngIf="preferredName"
+                                [parameterUuid]="
+                                  allocationData?.allocation?.parameter?.uuid
+                                "
+                                [multipleResultsAttributeType]="
+                                  params?.multipleResultsAttributeType
+                                "
+                                [allocation]="allocationData?.allocation"
+                                [disabled]="
+                                  data?.actionType === 'review' &&
+                                  !data?.LISConfigurations?.isLIS
+                                "
+                                [finalResult]="
+                                  allocationData?.allocation?.finalResult
+                                "
+                                [isLIS]="data?.LISConfigurations?.isLIS"
+                                [conceptNameType]="preferredName"
+                                (data)="
+                                  onGetFieldData(
+                                    $event,
+                                    allocationData?.allocation?.parameter,
+                                    allocationData?.allocation
+                                  )
+                                "
+                              ></app-test-parameter-entry>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </td>
-                    <td rowspan="3" style="width: 100px">
-                      <div class="mt-4">
-                        <button
-                          *ngIf="data?.actionType !== 'review'"
-                          [disabled]="!isFormValid"
-                          mat-flat-button
-                          color="primary"
-                          (click)="onSave($event, order)"
-                        >
-                          Save
-                        </button>
-                      </div>
-                      <div class="mt-4 d-flex justify-content-end">
-                        <button
-                          *ngIf="shouldConfirm"
-                          class="mr-2"
-                          mat-stroked-button
-                          (click)="onCancelAuthorize($event)"
-                        >
-                          Cancel
-                        </button>
-                        <button
-                          *ngIf="
-                            ((!data?.LISConfigurations?.isLIS &&
-                              !order?.authorizationIsReady) ||
-                              (data?.LISConfigurations?.isLIS &&
-                                !order?.authorizationIsReady)) &&
-                            order?.finalResults?.length > 0
-                          "
-                          mat-flat-button
-                          color="primary"
-                          (click)="onAuthorize($event, order, shouldConfirm)"
-                        >
-                          {{ !shouldConfirm ? "Authorize" : "Confirm" }}
-                        </button>
-                      </div>
-                      <div class="mt-2">
-                        <p
-                          *ngIf="
-                            order?.authorizationStatuses?.length > 0 &&
-                            !order?.authorizationIsReady
-                          "
-                        >
-                          Approved, but waiting another approval
-                        </p>
-                        <p color="primary" *ngIf="order?.authorizationIsReady">
-                          <b
-                            >Authorized
-                            <span *ngIf="!data?.LISConfigurations?.isLIS"
-                              >(Second Approval)</span
-                            ></b
+                      </td>
+                      <td rowspan="3" style="width: 100px">
+                        <div class="mt-4">
+                          <button
+                            *ngIf="data?.actionType !== 'review'"
+                            [disabled]="!isFormValid"
+                            mat-flat-button
+                            color="primary"
+                            (click)="onSave($event, order)"
                           >
-                        </p>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td colspan="100%">
-                      <app-shared-remarks-entry
-                        [order]="order"
-                        [disabled]="
-                          data?.actionType === 'review' &&
-                          !data?.LISConfigurations?.isLIS
-                        "
-                        (remarks)="onGetRemarks($event, order)"
-                      ></app-shared-remarks-entry>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td
-                      colspan="100%"
-                      class="text-muted test-order-description"
-                    >
-                      <em>
-                        Ordered By:
-                        <b>
-                          {{ order?.orderer?.name }}
-                        </b>
-                      </em>
-                    </td>
-                  </tr>
+                            Save
+                          </button>
+                        </div>
+                        <div class="mt-4 d-flex justify-content-end">
+                          <button
+                            *ngIf="shouldConfirm"
+                            class="mr-2"
+                            mat-stroked-button
+                            (click)="onCancelAuthorize($event)"
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            *ngIf="
+                              ((!data?.LISConfigurations?.isLIS &&
+                                !order?.authorizationIsReady) ||
+                                (data?.LISConfigurations?.isLIS &&
+                                  !order?.authorizationIsReady)) &&
+                              order?.finalResults?.length > 0
+                            "
+                            mat-flat-button
+                            color="primary"
+                            (click)="onAuthorize($event, order, shouldConfirm)"
+                          >
+                            {{ !shouldConfirm ? "Authorize" : "Confirm" }}
+                          </button>
+                        </div>
+                        <div class="mt-2">
+                          <p
+                            *ngIf="
+                              order?.authorizationStatuses?.length > 0 &&
+                              !order?.authorizationIsReady
+                            "
+                          >
+                            Approved, but waiting another approval
+                          </p>
+                          <p
+                            color="primary"
+                            *ngIf="order?.authorizationIsReady"
+                          >
+                            <b
+                              >Authorized
+                              <span *ngIf="!data?.LISConfigurations?.isLIS"
+                                >(Second Approval)</span
+                              ></b
+                            >
+                          </p>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td colspan="100%">
+                        <app-shared-remarks-entry
+                          [order]="order"
+                          [disabled]="
+                            data?.actionType === 'review' &&
+                            !data?.LISConfigurations?.isLIS
+                          "
+                          (remarks)="onGetRemarks($event, order)"
+                        ></app-shared-remarks-entry>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td
+                        colspan="100%"
+                        class="text-muted test-order-description"
+                      >
+                        <em>
+                          Ordered By:
+                          <b>
+                            {{ order?.orderer?.name }}
+                          </b>
+                        </em>
+                      </td>
+                    </tr>
+                  </ng-container>
+                  <ng-container
+                    *ngIf="order?.parametersWithDefinedRelationship?.length > 0"
+                  >
+                    <tr>
+                      <td>
+                        {{ order?.concept?.display }}
+                      </td>
+                      <td>
+                        <app-related-test-parameters-entry
+                          *ngIf="preferredName"
+                          [allSampleAllocations]="params?.sampleAllocations"
+                          [parametersWithDefinedRelationship]="
+                            order?.parametersWithDefinedRelationship
+                          "
+                          [disabled]="
+                            data?.actionType === 'review' &&
+                            !data?.LISConfigurations?.isLIS
+                          "
+                          [isLIS]="data?.LISConfigurations?.isLIS"
+                          [conceptNameType]="preferredName"
+                          (data)="getFedResults($event)"
+                        ></app-related-test-parameters-entry>
+                      </td>
+                      <td>
+                        <div class="mt-4">
+                          <button
+                            *ngIf="data?.actionType !== 'review'"
+                            [disabled]="relatedResults?.length == 0"
+                            mat-flat-button
+                            color="primary"
+                            (click)="onSaveRelatedResults($event, order)"
+                          >
+                            Save
+                          </button>
+                        </div>
+                        <div class="mt-4 d-flex justify-content-end">
+                          <button
+                            *ngIf="shouldConfirm"
+                            class="mr-2"
+                            mat-stroked-button
+                            (click)="onCancelAuthorize($event)"
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            *ngIf="
+                              ((!data?.LISConfigurations?.isLIS &&
+                                !order?.authorizationIsReady) ||
+                                (data?.LISConfigurations?.isLIS &&
+                                  !order?.authorizationIsReady)) &&
+                              order?.finalResults?.length > 0
+                            "
+                            mat-flat-button
+                            color="primary"
+                            (click)="
+                              onAuthorize(
+                                $event,
+                                order,
+                                shouldConfirm,
+                                null,
+                                true
+                              )
+                            "
+                          >
+                            {{ !shouldConfirm ? "Authorize" : "Confirm" }}
+                          </button>
+                        </div>
+                        <div class="mt-2">
+                          <p
+                            *ngIf="
+                              order?.authorizationStatuses?.length > 0 &&
+                              !order?.authorizationIsReady
+                            "
+                          >
+                            Approved, but waiting another approval
+                          </p>
+                          <p
+                            color="primary"
+                            *ngIf="order?.authorizationIsReady"
+                          >
+                            <b
+                              >Authorized
+                              <span *ngIf="!data?.LISConfigurations?.isLIS"
+                                >(Second Approval)</span
+                              ></b
+                            >
+                          </p>
+                        </div>
+                      </td>
+                    </tr>
+                  </ng-container>
                 </ng-container>
               </tbody>
             </table>

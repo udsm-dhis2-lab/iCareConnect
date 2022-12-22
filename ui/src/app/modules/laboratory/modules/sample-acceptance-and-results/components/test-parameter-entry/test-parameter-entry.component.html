@@ -10,7 +10,7 @@
     [disabled]="disabled"
     [isLIS]="isLIS"
     [conceptNameType]="conceptNameType"
-    [value]="latestResult?.value"
+    [latestResult]="latestResult"
     [multipleResultsAttributeType]="multipleResultsAttributeType"
     (formData)="onGetFormData($event, params?.testParameter)"
   ></app-result-entry-form>

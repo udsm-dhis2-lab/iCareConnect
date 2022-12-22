@@ -20,6 +20,7 @@ export class TestParameterEntryComponent implements OnInit {
   @Input() conceptNameType: string;
   @Input() finalResult: any;
   @Input() parametersRelationshipConceptSourceUuid: string;
+  @Input() relatedResult: any;
   testParameter$: Observable<ConceptGet>;
   @Output() data: EventEmitter<any> = new EventEmitter<any>();
   latestResult: any;
@@ -28,7 +29,7 @@ export class TestParameterEntryComponent implements OnInit {
   ngOnInit(): void {
     this.testParameter$ = this.conceptService.getConceptDetailsByUuid(
       this.parameterUuid,
-      "custom:(uuid,display,datatype,names,answers:(uuid,display,names),mappings:(conceptMapType,conceptReferenceTerm),attributes:(uuid,display,attributeType:(uuid,display)))"
+      "custom:(uuid,display,datatype,names,answers:(uuid,display,names),attributes:(uuid,display,attributeType:(uuid,display)))"
     );
 
     if (this.finalResult && !this.finalResult?.groups) {
@@ -50,11 +51,30 @@ export class TestParameterEntryComponent implements OnInit {
       };
     } else {
       this.latestResult = {
-        ...this.finalResult?.groups[this.finalResult?.groups?.length - 1]
-          ?.results[0],
-        value: this.finalResult?.groups[
-          this.finalResult?.groups?.length - 1
-        ]?.results?.map((result) => {
+        ...(!this.relatedResult
+          ? this.finalResult?.groups[this.finalResult?.groups?.length - 1]
+              ?.results[0]
+          : orderBy(
+              (this.finalResult?.groups?.filter(
+                (group) => group?.key === this.relatedResult?.uuid
+              ) || [])[0]?.results,
+              ["dateCreated"],
+              ["desc"]
+            )[0]),
+        isArray: true,
+        value: (!this.relatedResult
+          ? this.finalResult?.groups[this.finalResult?.groups?.length - 1]
+              ?.results
+          : [
+              orderBy(
+                (this.finalResult?.groups?.filter(
+                  (group) => group?.key === this.relatedResult?.uuid
+                ) || [])[0]?.results,
+                ["dateCreated"],
+                ["desc"]
+              )[0],
+            ]
+        )?.map((result) => {
           return result?.valueNumeric
             ? result?.valueNumeric
             : result?.valueBoolean

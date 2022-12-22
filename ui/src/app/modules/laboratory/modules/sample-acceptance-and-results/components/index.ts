@@ -30,6 +30,7 @@ import { SharedResultsEntryAndViewModalComponent } from "./shared-results-entry-
 import { TestParameterEntryComponent } from "./test-parameter-entry/test-parameter-entry.component";
 import { SharedRemarksEntryComponent } from "./shared-remarks-entry/shared-remarks-entry.component";
 import { MultipleResultsEntryComponent } from "./multiple-results-entry/multiple-results-entry.component";
+import { RelatedTestParametersEntryComponent } from "./related-test-parameters-entry/related-test-parameters-entry.component";
 
 export const components: any[] = [
   PatientsByVisitsListComponent,
@@ -64,6 +65,7 @@ export const components: any[] = [
   TestParameterEntryComponent,
   SharedRemarksEntryComponent,
   MultipleResultsEntryComponent,
+  RelatedTestParametersEntryComponent,
 ];
 
 export const sampleAcceptanceAndResultsModals: any[] = [
