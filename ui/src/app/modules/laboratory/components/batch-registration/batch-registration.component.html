@@ -207,58 +207,24 @@
         </div>
     </fieldset>
 
-    <fieldset>
-        <div class="sample-list-table w-100">
-              <mat-paginator
-                [length]="30"
-                [pageSize]=""
-                [pageSizeOptions]="[5, 10, 15, 20, 25, 50, 100]"
-                (page)="onPageChange($event)"
-            >
-
-            </mat-paginator>
-            <table class="table table-striped table-hovered">
-                <thead>
-                    <tr>
-                        <th>Test Batch</th>
-                        <th>Lab Number</th>
-                        <th>Registered By</th>
-                        <th>Registered On</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Batch</td>
-                        <td>NPHL/22/000001</td>
-                        <td>LIS Admin</td>
-                        <td>7 December 2022 11:39 AM</td>
-                        <td class="d-flex">
-                            <button mat-flat-button class="ml-3" style="border:1px solid #cecece"><mat-icon>edit</mat-icon></button>
-                            <button mat-flat-button class="ml-3" style="border:1px solid #cecece" color="warn"><mat-icon>delete_outline</mat-icon></button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        <button mat-flat-button 
-            *ngIf="
-                selectedDynamicFields.length && 
-                fieldsObjectValues?.fixedFieldsWithValues?.length === selectedFixedFields.length &&
-                fieldsObjectValues?.staticFieldsWithValues?.length === selectedStaticFields.length
-                " 
+    <fieldset 
+        *ngIf="
+            selectedDynamicFields.length && 
+            fieldsObjectValues?.fixedFieldsWithValues?.length === selectedFixedFields.length &&
+            fieldsObjectValues?.staticFieldsWithValues?.length === selectedStaticFields.length && 
+            (batchNameField.value || existingBatchField.value)
+        ">
+        <button mat-flat-button
                 style="border:1px solid #cecece" 
                 (click)="onAddAnotherSample($event)"
-        > 
+        >  
             {{ addAnotherSample ? 'Hide sample form' : 'Add another sample' }} 
         </button>
         <div class="dynamic-fields mt-4" *ngIf="addAnotherSample">
             <div class="dynamic-form row">
                 <div class="col-12">
                     <app-sample-in-batch-registration
-                     [dynamicFields]="selectedDynamicFields"
-                     [staticFieldsWithValues]="fieldsObjectValues?.staticFieldsWithValues"
-                     [fixedFieldsWithValues]="fieldsObjectValues?.fixedFieldsWithValues"
+                    [fieldsObject] = "fieldsObjectValues"
                     ></app-sample-in-batch-registration>
                 </div>
                 <div class="col-11"></div>

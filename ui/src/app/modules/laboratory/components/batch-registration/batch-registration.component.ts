@@ -406,7 +406,7 @@ export class BatchRegistrationComponent implements OnInit {
         this.selectedDynamicFields?.length > 0) &&
       this.validBatchsetName &&
       this.validBatchName &&
-      (!this.useExistingBatch || !this.useExistingBatchset)
+      !this.useExistingBatch
     ) {
       this.validForm = true;
     } else {
@@ -424,23 +424,21 @@ export class BatchRegistrationComponent implements OnInit {
   get fieldsObjectValues(){
     const fixedFieldsWithValues = Object.keys(this.fixedFieldsOptionsObject).length > 0 ? Object.keys(this.fixedFieldsOptionsObject)?.map((key) => {
         return this.fixedFieldsOptionsObject[key];
-      })
-      .filter((field) => {
+      }).filter((field) => {
         return field && field.value;
       }) : [];
     const staticFields = Object.keys(this.staticFieldsOptionsObject).length > 0 ? Object.keys(this.staticFieldsOptionsObject)?.map((key) => {
-        //filter out selected fields that possibly have value
         const isSelectedField = this.selectedStaticFields.filter(
           (field) => field.key === key
         ).length;
         if (isSelectedField) {
           return this.staticFieldsOptionsObject[key];
         }
-      })
-      .filter((field) => field && field.value) : [];
+      }).filter((field) => field && field.value) : [];
     return {
       fixedFieldsWithValues: fixedFieldsWithValues,
-      staticFieldsWithValues: staticFields
+      staticFieldsWithValues: staticFields,
+      dynamicFields: this.selectedDynamicFields
     }
   }
 
@@ -598,7 +596,4 @@ export class BatchRegistrationComponent implements OnInit {
     }
   }
 
-  onPageChange(e: any) {
-    console.log("==> On page change.");
-  }
 }
