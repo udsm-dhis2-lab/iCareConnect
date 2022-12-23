@@ -43,6 +43,7 @@ export interface SampleAllocationObject {
   statuses: AlloCationStatusObject[];
   label?: string;
   uuid: string;
+  allocationUuid?: string;
   results: ResultObject[];
   sample?: { uuid: string; display: string };
   order?: {
@@ -72,6 +73,10 @@ export class SampleAllocation {
 
   get container(): ConceptGet {
     return this.allocation?.container;
+  }
+
+  get allocationUuid(): string {
+    return this.allocation?.uuid;
   }
 
   get parameter(): any {
@@ -259,6 +264,7 @@ export class SampleAllocation {
     return {
       id: this.id,
       uuid: this.uuid,
+      allocationUuid: this.allocationUuid,
       isSet: this.isSet,
       container: this.container,
       parameter: this.parameter,
