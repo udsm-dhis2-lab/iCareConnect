@@ -21,7 +21,6 @@ import { ParametersComponent } from "./parameters/parameters.component";
 import { SampleTypesListComponent } from "./sample-types-list/sample-types-list.component";
 import { SharedPriceListComponent } from "./shared-price-list/shared-price-list.component";
 import { StandardConceptCreationComponent } from "./standard-concept-creation/standard-concept-creation.component";
-import { StandardConceptsListComponent } from "./standard-concepts-list/standard-concepts-list.component";
 import { TestMethodsComponent } from "./test-methods/test-methods.component";
 import { TestsControlComponent } from "./tests-control/tests-control.component";
 import { UserManagementDashboardComponent } from "./user-management-dashboard/user-management-dashboard.component";
@@ -43,7 +42,6 @@ export const components: any[] = [
   LabConfigurationsComponent,
   OtherParametersConfigsComponent,
   StandardConceptCreationComponent,
-  StandardConceptsListComponent,
   ConceptSetMembersComponent,
   ConceptSetMembersSelectionComponent,
   LabsSectionManagementComponent,

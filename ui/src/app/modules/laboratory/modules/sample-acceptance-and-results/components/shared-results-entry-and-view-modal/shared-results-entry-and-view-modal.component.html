@@ -58,7 +58,7 @@
               [errors]="errors"
             ></app-shared-error>
             <table
-              class="table table-bordered"
+              class="table table-bordered table-responsive"
               *ngIf="!errors || errors?.length == 0"
             >
               <tbody>
@@ -243,6 +243,7 @@
                               order?.parametersWithDefinedRelationship
                             )
                           "
+                          style="width: 99%; overflow: auto"
                           class="entry-col"
                         >
                           <app-related-test-parameters-entry

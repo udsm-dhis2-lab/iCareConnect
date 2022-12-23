@@ -71,6 +71,8 @@ export class SharedConceptCreateComponent implements OnInit {
 
   testMethodUuid: string;
   conceptBeingEdited: ConceptGetFull;
+
+  errors: any[] = [];
   constructor(
     private conceptService: ConceptsService,
     private billableItemService: BillableItemsService
@@ -279,6 +281,7 @@ export class SharedConceptCreateComponent implements OnInit {
 
   onSave(event: Event, selectedTestMethodDetails?: any): void {
     event.stopPropagation();
+    this.errors = [];
     const conceptName = this.formData["name"]?.value;
     let searchIndexedTerms = [
       {
@@ -413,7 +416,7 @@ export class SharedConceptCreateComponent implements OnInit {
             ? this.conceptService.createConcept(concept)
             : this.conceptService.updateConcept(this.conceptUuid, concept)
           ).subscribe((response: any) => {
-            if (response) {
+            if (response && !response?.error) {
               // If it is test order create as a billable item
               if (
                 !this.conceptUuid &&
@@ -426,7 +429,7 @@ export class SharedConceptCreateComponent implements OnInit {
                 this.billableItemService
                   .createBillableItem(billableItem)
                   .subscribe((billableItemResponse) => {
-                    if (billableItemResponse) {
+                    if (billableItemResponse && !billableItemResponse?.error) {
                       // Create prices
                       const prices = [
                         {
@@ -467,8 +470,11 @@ export class SharedConceptCreateComponent implements OnInit {
                               response?.uuid,
                               searchIndexedTerms
                             )
-                            .subscribe((conceptNameResponse) => {
-                              if (conceptNameResponse) {
+                            .subscribe((conceptNameResponse: any) => {
+                              if (
+                                conceptNameResponse &&
+                                !conceptNameResponse?.error
+                              ) {
                                 this.saving = false;
                                 this.conceptUuid = null;
                                 this.savingMessage =
@@ -480,10 +486,19 @@ export class SharedConceptCreateComponent implements OnInit {
                                 this.conceptCreated.emit(true);
                                 this.selectedSetMembers = [];
                                 this.createBasicConceptFields();
+                              } else {
+                                this.saving = false;
+                                this.errors = [
+                                  ...this.errors,
+                                  conceptNameResponse,
+                                ];
                               }
                             });
                         }
                       });
+                    } else {
+                      this.saving = false;
+                      this.errors = [...this.errors, billableItemResponse];
                     }
                   });
               } else {
@@ -492,8 +507,8 @@ export class SharedConceptCreateComponent implements OnInit {
                     response?.uuid,
                     uniqBy(searchIndexedTerms, "name")
                   )
-                  .subscribe((conceptNameResponse) => {
-                    if (conceptNameResponse) {
+                  .subscribe((conceptNameResponse: any) => {
+                    if (conceptNameResponse && !conceptNameResponse?.error) {
                       this.saving = false;
                       this.alertType = "success";
                       this.savingMessage =
@@ -506,9 +521,15 @@ export class SharedConceptCreateComponent implements OnInit {
                       this.conceptCreated.emit(true);
                       this.selectedSetMembers = [];
                       this.createBasicConceptFields();
+                    } else {
+                      this.saving = false;
+                      this.errors = [...this.errors, conceptNameResponse];
                     }
                   });
               }
+            } else {
+              this.saving = false;
+              this.errors = [...this.errors, response];
             }
           });
         }
