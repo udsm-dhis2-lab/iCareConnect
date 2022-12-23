@@ -329,7 +329,6 @@ export class BatchRegistrationComponent implements OnInit {
       let existingBatchsetFields = this.existingBatchsets.filter(
         (batchset) => batchset.name === this.existingBatchsetField.value
       )[0]?.fields;
-      console.log("==> Existing batchset fields: ", existingBatchsetFields);
       if (existingBatchsetFields?.length > 0) {
         this.selectedFixedFields =
           JSON.parse(existingBatchsetFields)["fixedFields"]?.length > 0
@@ -415,10 +414,8 @@ export class BatchRegistrationComponent implements OnInit {
 
     this.addFixedField.disabled =
       this.useExistingBatchset || this.useExistingBatch;
-    this.addStaticField.disabled =
-      this.useExistingBatchset || this.useExistingBatch;
-    this.addDynamicField.disabled =
-      this.useExistingBatchset || this.useExistingBatch;
+    this.addStaticField.disabled = this.useExistingBatch;
+    this.addDynamicField.disabled = this.useExistingBatch;
   }
 
   get fieldsObjectValues(){

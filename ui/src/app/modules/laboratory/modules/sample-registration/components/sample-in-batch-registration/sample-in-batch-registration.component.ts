@@ -128,8 +128,9 @@ export class SampleInBatchRegistrationComponent implements OnInit {
   staticFields: any[] = [];
   dynamicFields: any[] = [];
   formDataObject: any = {};
-  fieldsWithValues: any[] = [];
+  fieldsWithValues: any;
   fieldWithValuesChanged: boolean = false;
+  samplesCreated: any[] = [];
 
   constructor(
     private samplesService: SamplesService,
@@ -151,10 +152,10 @@ export class SampleInBatchRegistrationComponent implements OnInit {
 
   ngOnInit(): void {
     this.assignFields();
-    // const userLocationsIds = JSON.parse(
-    //   this.currentUser?.userProperties?.locations
-    // );
-    // this.labLocations$ = this.store.select(getLocationsByIds(userLocationsIds));
+    const userLocationsIds = JSON.parse(
+      this.currentUser?.userProperties?.locations
+    );
+    this.labLocations$ = this.store.select(getLocationsByIds(userLocationsIds));
     // this.labSampleLabel$ = this.samplesService.getSampleLabel();
     // this.referringDoctorFields = Object.keys(
     //   this.allRegistrationFields?.referringDoctorFields
@@ -162,6 +163,58 @@ export class SampleInBatchRegistrationComponent implements OnInit {
     //   return this.allRegistrationFields?.referringDoctorFields[key];
     // });
     // const currentLocation = JSON.parse(localStorage.getItem("currentLocation"));
+    this.referringDoctorFields;
+    let fields = [
+      ...this.staticFields.map((field) => {
+        return {
+          [field.key]: field.value
+        }
+      }),
+      ...this.fixedFields.map((field) => {
+        return {
+          [field.key]: field.value
+        }
+      })
+    ];
+    fields.forEach((field) => {
+      this.fieldsWithValues = {
+        ...this.fieldsWithValues,
+        ...field
+      }
+    })
+
+    Object.keys(this.allRegistrationFields?.patientAgeFields).forEach((key) => {
+        if(this.fieldsWithValues[key]){
+          this.personDetailsData = {
+            ...this.personDetailsData,
+            [key]: this.fieldsWithValues[key]
+          };
+        }
+      })
+    Object.keys(this.allRegistrationFields?.testFields).forEach((key) => {
+      if (this.fieldsWithValues[key]?.length > 0) {
+        this.testOrders = [
+          ...this.testOrders,
+          ...this.fieldsWithValues[key]?.map((value, index) => {
+            return {
+              id: "test" + index,
+              key: "test" + index,
+              value: value?.uuid,
+            };
+          }),
+        ];
+      }
+    });
+    Object.keys(this.allRegistrationFields?.primaryIdentifierFields).forEach(
+      (key) => {
+        if (this.fieldsWithValues[key]) {
+          this.personDetailsData = {
+            ...this.personDetailsData,
+            [key]: this.fieldsWithValues[key]
+          };
+        }
+      }
+    );
   }
 
   get maximumDate() {
@@ -330,11 +383,39 @@ export class SampleInBatchRegistrationComponent implements OnInit {
   onFormUpdate(formValues: FormValue, itemKey?: string): void {
     //Validate Date fields
     this.formData = { ...this.formData, ...formValues.getValues() };
-    if (formValues.getValues()?.collectedOn?.value.toString()?.length > 0) {
+    if (
+      formValues.getValues()?.collectedOn?.value.toString()?.length > 0 ||
+      this.fixedFields.filter((field) => {
+        if (field?.id === "collectedOn") {
+          return field.value;
+        }
+      }).length ||
+      this.staticFields.filter((field) => {
+        if (field?.id === "collectedOn") {
+          return field.value;
+        }
+      }).length
+    ) {
       let collected_on_date;
-      collected_on_date = this.getDateStringFromDate(
-        new Date(formValues.getValues()?.collectedOn?.value)
-      );
+      collected_on_date = formValues.getValues()?.collectedOn?.value
+        ? this.getDateStringFromDate(
+            new Date(formValues.getValues()?.collectedOn?.value)
+          )
+        : this.fixedFields.filter((field) => {
+            if (field?.id === "collectedOn") {
+              return field.value;
+            }
+          }).length > 0
+        ? this.fixedFields.filter((field) => {
+            if (field?.id === "collectedOn") {
+              return field.value;
+            }
+          })[0]
+        : this.staticFields.filter((field) => {
+            if (field?.id === "collectedOn") {
+              return field.value;
+            }
+          })[0];
       this.collectedOnDateLatestValue = collected_on_date;
       this.collectedOnTimeValid = this.isValidTime(
         this.collectedOnTime,
@@ -343,11 +424,39 @@ export class SampleInBatchRegistrationComponent implements OnInit {
           : this.maximumDate
       );
     }
-    if (formValues.getValues()?.receivedOn?.value?.toString()?.length > 0) {
+    if (
+      formValues.getValues()?.receivedOn?.value?.toString()?.length > 0 ||
+      this.fixedFields.filter((field) => {
+        if (field?.id === "receivedOn") {
+          return field.value;
+        }
+      }).length ||
+      this.staticFields.filter((field) => {
+        if (field?.id === "receivedOn") {
+          return field.value;
+        }
+      }).length
+    ) {
       let received_on_date;
-      received_on_date = this.getDateStringFromDate(
-        new Date(formValues.getValues()?.receivedOn?.value)
-      );
+      received_on_date = formValues.getValues()?.receivedOn?.value
+        ? this.getDateStringFromDate(
+            new Date(formValues.getValues()?.receivedOn?.value)
+          )
+        : this.fixedFields.filter((field) => {
+            if (field?.id === "receivedOn") {
+              return field.value;
+            }
+          }).length > 0
+        ? this.fixedFields.filter((field) => {
+            if (field?.id === "receivedOn") {
+              return field.value;
+            }
+          })[0]
+        : this.staticFields.filter((field) => {
+            if (field?.id === "receivedOn") {
+              return field.value;
+            }
+          })[0];
       this.receivedOnDateLatestValue = received_on_date;
       this.receivedOnTimeValid = this.isValidTime(
         this.receivedOnTime,
@@ -356,11 +465,39 @@ export class SampleInBatchRegistrationComponent implements OnInit {
           : this.maximumDate
       );
     }
-    if (formValues.getValues()?.broughtOn?.value.toString()?.length > 0) {
+    if (
+      formValues.getValues()?.broughtOn?.value.toString()?.length > 0 ||
+      this.fixedFields.filter((field) => {
+        if (field?.id === "broughtOn") {
+          return field.value;
+        }
+      }).length ||
+      this.staticFields.filter((field) => {
+        if (field?.id === "broughtOn") {
+          return field.value;
+        }
+      }).length
+    ) {
       let brought_on_date;
-      brought_on_date = this.getDateStringFromDate(
-        new Date(formValues.getValues()?.broughtOn?.value)
-      );
+      brought_on_date = formValues.getValues()?.broughtOn?.value
+        ? this.getDateStringFromDate(
+            new Date(formValues.getValues()?.broughtOn?.value)
+          )
+        : this.fixedFields.filter((field) => {
+            if (field?.id === "broughtOn") {
+              return field.value;
+            }
+          }).length > 0
+        ? this.fixedFields.filter((field) => {
+            if (field?.id === "broughtOn") {
+              return field.value;
+            }
+          })[0]
+        : this.staticFields.filter((field) => {
+            if (field?.id === "broughtOn") {
+              return field.value;
+            }
+          })[0];
       this.broughtOnDateLatestValue = brought_on_date;
       this.broughtOnTimeValid = this.isValidTime(
         this.broughtOnTime,
@@ -371,38 +508,74 @@ export class SampleInBatchRegistrationComponent implements OnInit {
     }
 
     this.minForReceivedOn = false;
-    this.receivedOnField.min = this.broughtOnDateLatestValue
-      ? this.broughtOnDateLatestValue
-      : this.collectedOnDateLatestValue;
-    this.broughtOnField.min = this.collectedOnDateLatestValue
-      ? this.collectedOnDateLatestValue
-      : "";
+    if (this.receivedOnField?.min){
+      this.receivedOnField.min = this.broughtOnDateLatestValue
+        ? this.broughtOnDateLatestValue
+        : this.collectedOnDateLatestValue;
+    }
+    if (this.broughtOnField?.min){
+      this.broughtOnField.min = this.collectedOnDateLatestValue
+        ? this.collectedOnDateLatestValue
+        : "";
+    }
     this.minForReceivedOn = true;
 
     this.maxForCollectedOn = false;
-    this.sampleColectionDateField.max = this.broughtOnDateLatestValue
-      ? this.broughtOnDateLatestValue
-      : this.receivedOnDateLatestValue
-      ? this.receivedOnDateLatestValue
-      : this.maximumDate;
-    this.broughtOnField.max = this.receivedOnDateLatestValue
-      ? this.receivedOnDateLatestValue
-      : this.maximumDate;
+    if (this.sampleColectionDateField?.max){
+      this.sampleColectionDateField.max = this.broughtOnDateLatestValue
+        ? this.broughtOnDateLatestValue
+        : this.receivedOnDateLatestValue
+        ? this.receivedOnDateLatestValue
+        : this.maximumDate;
+    }
+    if (this.broughtOnField?.max){
+      this.broughtOnField.max = this.receivedOnDateLatestValue
+        ? this.receivedOnDateLatestValue
+        : this.maximumDate;
+    }
     this.maxForCollectedOn = true;
 
     // this.getDateStringFromMoment_i();
     if (
-      itemKey &&
-      itemKey === "specimenDetails" &&
-      this.selectedSpecimenUuid !== this.formData["specimen"]?.value
+      this.formData["specimen"]?.value
     ) {
       this.selectedSpecimenUuid = this.formData["specimen"]?.value;
-      this.testsUnderSpecimen$ =
-        this.labTestsService.getSetMembersByConceptUuid(
-          this.selectedSpecimenUuid
-        );
+    } else {
+      this.selectedSpecimenUuid = this.fieldsWithValues['specimen'];
     }
-  }
+    Object.keys(this.formData).forEach((key) => {
+      if(this.allRegistrationFields?.testFields[key] && this.formData[key] && this.formData[key]?.value){
+          this.testOrders = [
+            ...this.testOrders,
+            ...this.formData[key]?.value?.map((value, index) => {
+                return {
+                  id: "test" + index,
+                  key: "test" + index,
+                  value: value,
+                };
+              })
+          ]
+        }
+      if (
+        (this.allRegistrationFields?.personFields[key] ||
+          this.allRegistrationFields?.patientAgeFields[key] ||
+          this.allRegistrationFields?.personFieldsGroupThree[key]) &&
+        this.formData[key]?.value
+      ) {
+        this.personDetailsData = {
+          ...this.personDetailsData,
+          [key]: this.formData[key]?.value,
+        };
+      }
+
+      if(this.allRegistrationFields?.primaryIdentifierFields[key]){
+        this.personDetailsData = {
+          ...this.personDetailsData,
+          [key]: this.allRegistrationFields?.primaryIdentifierFields[key].value
+        }
+      }
+    });
+}
 
   onAddSampleData() {
     this.formDataObject = {
@@ -424,8 +597,7 @@ export class SampleInBatchRegistrationComponent implements OnInit {
             return null;
           }
         });
-      })
-      .filter((field) => field);
+      }).filter((field) => field);
     this.dynamicFields = [];
     this.fieldWithValuesChanged = false;
     setTimeout(() => {
@@ -544,6 +716,7 @@ export class SampleInBatchRegistrationComponent implements OnInit {
 
   onSave(event: Event, labLocations?: any[]): void {
     event.stopPropagation();
+    console.log("==> On Save lab locations ", labLocations);
     if (labLocations?.length === 1) {
       this.currentLabLocation = labLocations[0];
     } else {
@@ -562,22 +735,26 @@ export class SampleInBatchRegistrationComponent implements OnInit {
 
     confirmationDialogue.afterClosed().subscribe((closingObject) => {
       if (closingObject?.confirmed) {
-        // Identify if tests ordered are well configured
-
+        // Identify if tests orderes are well configured
         // Identify referring doctor fields entered values
         let attributeMissingOnDoctorsAttributes;
         this.sampleLabelsUsedDetails = [];
         const doctorsAttributesWithValues =
           this.referringDoctorAttributes.filter(
-            (attribute) => this.formData["attribute-" + attribute?.value]?.value
+            (attribute) =>
+              this.formData["attribute-" + attribute?.value]?.value ||
+              this.fieldsWithValues["attribute-" + attribute?.value]
           ) || [];
         if (
-          doctorsAttributesWithValues?.length !=
+          doctorsAttributesWithValues?.length !==
           this.referringDoctorAttributes?.length
         ) {
           attributeMissingOnDoctorsAttributes = true;
           this.referringDoctorAttributes.forEach((attribute) => {
-            if (!this.formData["attribute-" + attribute?.value]?.value) {
+            if (
+              !this.formData["attribute-" + attribute?.value]?.value &&
+              !this.fieldsWithValues["attribute-" + attribute?.value]
+            ) {
               this.formData["attribute-" + attribute?.value] = {
                 id: "attribute-" + attribute?.value,
                 value: "NONE",
@@ -624,10 +801,10 @@ export class SampleInBatchRegistrationComponent implements OnInit {
                       .subscribe((identifierResponse) => {
                         if (identifierResponse) {
                           /**
-                  1. Create user
-                  2. Create visit (Orders should be added in)
-                  3. Create sample
-                  */
+                            1. Create user
+                            2. Create visit (Orders should be added in)
+                            3. Create sample
+                          */
 
                           this.patientPayload = {
                             person: {
@@ -635,7 +812,7 @@ export class SampleInBatchRegistrationComponent implements OnInit {
                                 {
                                   givenName: this.personDetailsData?.firstName,
                                   familyName: this.personDetailsData?.lastName,
-                                  familyName2:
+                                  middleName:
                                     this.personDetailsData?.middleName,
                                 },
                               ],
@@ -677,13 +854,16 @@ export class SampleInBatchRegistrationComponent implements OnInit {
                                         this.preferredPersonIdentifier
                                       ) {
                                         return {
-                                          identifier: this.personDetailsData[
-                                            "mrn"
-                                          ]
+                                          identifier: this.personDetailsData
+                                            ?.mrn
                                             ? this.personDetailsData["mrn"]
                                             : this.personDetailsData[
                                                 personIdentifierType.id
-                                              ],
+                                              ]?.toString()?.length > 0
+                                            ? this.personDetailsData[
+                                                personIdentifierType.id
+                                              ]
+                                            : identifierResponse[0],
                                           identifierType:
                                             personIdentifierType.id,
                                           location:
@@ -987,6 +1167,11 @@ export class SampleInBatchRegistrationComponent implements OnInit {
                                                                             ...sample,
                                                                           },
                                                                         ];
+
+                                                                        this.samplesCreated = [
+                                                                          ...this.samplesCreated,
+                                                                          sampleResponse
+                                                                        ]
                                                                       // TODO: Find a better way to control three labels to be printed
 
                                                                       this.sampleLabelsUsedDetails =
