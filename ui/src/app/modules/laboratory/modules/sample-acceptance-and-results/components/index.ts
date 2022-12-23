@@ -29,6 +29,9 @@ import { ResultEntryFormComponent } from "./result-entry-form/result-entry-form.
 import { SharedResultsEntryAndViewModalComponent } from "./shared-results-entry-and-view-modal/shared-results-entry-and-view-modal.component";
 import { TestParameterEntryComponent } from "./test-parameter-entry/test-parameter-entry.component";
 import { SharedRemarksEntryComponent } from "./shared-remarks-entry/shared-remarks-entry.component";
+import { MultipleResultsEntryComponent } from "./multiple-results-entry/multiple-results-entry.component";
+import { RelatedTestParametersEntryComponent } from "./related-test-parameters-entry/related-test-parameters-entry.component";
+import { RelatedResultsHistoryComponent } from "./related-results-history/related-results-history.component";
 
 export const components: any[] = [
   PatientsByVisitsListComponent,
@@ -62,6 +65,9 @@ export const components: any[] = [
   SharedResultsEntryAndViewModalComponent,
   TestParameterEntryComponent,
   SharedRemarksEntryComponent,
+  MultipleResultsEntryComponent,
+  RelatedTestParametersEntryComponent,
+  RelatedResultsHistoryComponent,
 ];
 
 export const sampleAcceptanceAndResultsModals: any[] = [

@@ -1,16 +1,15 @@
 import { Component, Inject, OnInit } from "@angular/core";
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
-import { Observable } from "rxjs";
+import { Observable, zip } from "rxjs";
 import { map } from "rxjs/operators";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { ConceptGet } from "src/app/shared/resources/openmrs";
 import { SampleAllocationObject } from "src/app/shared/resources/sample-allocations/models/allocation.model";
 import { SampleAllocationService } from "src/app/shared/resources/sample-allocations/services/sample-allocation.service";
 
-import { omit } from "lodash";
+import { omit, groupBy, flatten, orderBy } from "lodash";
 import { HttpClient } from "@angular/common/http";
 import { OrdersService } from "src/app/shared/resources/order/services/orders.service";
-import { zip } from "cypress/types/lodash";
 import { VisitsService } from "src/app/shared/resources/visits/services";
 import { Store } from "@ngrx/store";
 import { AppState } from "src/app/store/reducers";
@@ -40,6 +39,10 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
   visitDetails$: Observable<any>;
   providerDetails$: Observable<any>;
   preferredName: string;
+  parametersRelationshipConceptSourceUuid$: Observable<string>;
+  relatedResults: any[] = [];
+  selectedParametersWithDefinedRelationship: any[];
+  selectedInstruments: any = {};
   constructor(
     private dialogRef: MatDialogRef<SharedResultsEntryAndViewModalComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
@@ -52,7 +55,9 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.preferredName = this.data?.LISConfigurations?.isLIS ? "SHORT" : "";
+    this.preferredName = this.data?.LISConfigurations?.isLIS
+      ? "SHORT"
+      : "FULLY_SPECIFIED";
     this.providerDetails$ = this.store.select(getProviderDetails);
     this.userUuid = localStorage.getItem("userUuid");
     this.multipleResultsAttributeType$ = this.systemSettingsService
@@ -103,8 +108,19 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
   }
 
   toggleSideNavigation(event: Event, allocation?: any): void {
+    this.selectedParametersWithDefinedRelationship = null;
     event.stopPropagation();
     this.selectedAllocation = allocation ? allocation : this.selectedAllocation;
+    this.showSideNavigation = !this.showSideNavigation;
+  }
+
+  toggleSideNavigationGrouped(
+    event: Event,
+    parametersWithDefinedRelationship: any[]
+  ): void {
+    event.stopPropagation();
+    this.selectedParametersWithDefinedRelationship =
+      parametersWithDefinedRelationship;
     this.showSideNavigation = !this.showSideNavigation;
   }
 
@@ -129,115 +145,299 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
 
   onSave(event: Event, order: any): void {
     event.stopPropagation();
-    const data = Object.keys(this.dataValues)
-      .map((key) => {
-        const dataValue = this.dataValues[key];
-        if (
-          dataValue?.parameter?.isFile ||
-          dataValue?.parameter?.datatype?.display === "Complex"
-        ) {
-          let existingFile = this.files.find(
-            (file) => file.parameterUuid === dataValue?.parameter?.uuid
-          );
-          this.files = [
-            ...this.files.filter(
-              (file) => file?.parameterUuid !== dataValue?.parameter?.uuid
-            ),
-            existingFile
-              ? {
-                  ...existingFile,
-                  valueFile: dataValue?.value,
-                }
-              : {
-                  parameterUuid: dataValue?.parameter?.uuid,
-                  valueFile: dataValue?.value,
-                  currentSample: this.data?.sample,
-                  allocation: dataValue?.allocation,
-                },
-          ];
-        }
-        return {
-          concept: {
-            uuid: key,
-          },
-          testAllocation: {
-            uuid: dataValue?.allocation?.uuid,
-          },
-          valueNumeric: dataValue?.parameter?.isNumeric
-            ? dataValue?.value
-            : null,
-          valueText: dataValue?.parameter?.isText ? dataValue?.value : null,
-
-          valueCoded: dataValue?.parameter?.isCoded
+    let data = [];
+    let dataWithResultsGroup = [];
+    Object.keys(this.dataValues).forEach((key) => {
+      const dataValue = this.dataValues[key];
+      if (
+        dataValue?.parameter?.isFile ||
+        dataValue?.parameter?.datatype?.display === "Complex"
+      ) {
+        let existingFile = this.files.find(
+          (file) => file.parameterUuid === dataValue?.parameter?.uuid
+        );
+        this.files = [
+          ...this.files.filter(
+            (file) => file?.parameterUuid !== dataValue?.parameter?.uuid
+          ),
+          existingFile
             ? {
-                uuid: dataValue?.value,
+                ...existingFile,
+                valueFile: dataValue?.value,
               }
-            : null,
-          abnormal: false,
-          status: {
-            category: "RESULT_REMARKS",
-            status: "REMARKS",
-            remarks: this.remarksData[order?.concept?.uuid],
-          },
-        };
-      })
-      ?.filter(
-        (data) => data?.valueCoded || data?.valueNumeric || data?.valueText
-      );
-    this.saving = true;
+            : {
+                parameterUuid: dataValue?.parameter?.uuid,
+                valueFile: dataValue?.value,
+                currentSample: this.data?.sample,
+                allocation: dataValue?.allocation,
+              },
+        ];
+      }
+      if (dataValue?.multipleResults) {
+        /**
+         * 1. Create allocation
+         * 2. Formulate parent payload
+         * 3. Save the parent results
+         * 4. Update the data value accordingly
+         */
 
-    this.saveFilesAsObservations(this.files, order);
-    this.sampleAllocationService
-      .saveResultsViaAllocations(data)
-      .subscribe((response) => {
-        if (response) {
-          this.saving = false;
-          setTimeout(() => {
-            this.getAllocations();
-          }, 100);
-        }
+        dataWithResultsGroup = [
+          ...dataWithResultsGroup,
+          {
+            concept: {
+              uuid: key,
+            },
+            testAllocation: {
+              uuid: dataValue?.allocation?.uuid,
+            },
+            abnormal: false,
+            value: dataValue?.value,
+            order: dataValue?.order,
+            parameter: dataValue?.parameter,
+            parent: dataValue?.parent,
+            parentUuid: dataValue?.parent?.uuid,
+            sample: dataValue?.sample,
+            instrument:
+              order && this.selectedInstruments[order?.concept?.uuid]
+                ? {
+                    uuid: this.selectedInstruments[order?.concept?.uuid],
+                  }
+                : null,
+            status: {
+              category: "RESULT_REMARKS",
+              status: "REMARKS",
+              remarks: this.remarksData[order?.concept?.uuid],
+            },
+          },
+        ];
+      } else {
+        data = [
+          ...data,
+          {
+            concept: {
+              uuid: key,
+            },
+            testAllocation: {
+              uuid: dataValue?.allocation?.uuid,
+            },
+            valueNumeric: dataValue?.parameter?.isNumeric
+              ? dataValue?.value
+              : null,
+            valueText: dataValue?.parameter?.isText ? dataValue?.value : null,
+
+            valueCoded: dataValue?.parameter?.isCoded
+              ? {
+                  uuid: dataValue?.value,
+                }
+              : null,
+            abnormal: false,
+            instrument:
+              order && this.selectedInstruments[order?.concept?.uuid]
+                ? {
+                    uuid: this.selectedInstruments[order?.concept?.uuid],
+                  }
+                : null,
+            status: {
+              category: "RESULT_REMARKS",
+              status: "REMARKS",
+              remarks: this.remarksData[order?.concept?.uuid],
+            },
+          },
+        ];
+      }
+    });
+    this.saving = true;
+    if (dataWithResultsGroup?.length > 0) {
+      const groupedByParent = groupBy(dataWithResultsGroup, "parentUuid");
+      Object.keys(groupedByParent).map((key) => {
+        const dataValue = dataWithResultsGroup[0];
+        const parentAllocation = {
+          concept: {
+            uuid: dataValue?.parent?.uuid,
+          },
+          order: {
+            uuid: dataValue?.order?.uuid,
+          },
+          container: {
+            uuid: "eb21ff23-a627-4a62-8bd0-efdc1db2ebb5", // Remove this hardcoded uuid
+          },
+          sample: {
+            uuid: dataValue?.sample?.uuid,
+          },
+          label: dataValue?.order?.orderNumber,
+        };
+        this.sampleAllocationService
+          .createTestAllocation(parentAllocation)
+          .subscribe((response) => {
+            if (response && !response?.error) {
+              const results = [
+                {
+                  concept: {
+                    uuid: dataValue?.parent?.uuid,
+                  },
+                  testAllocation: {
+                    uuid: response?.uuid,
+                  },
+                  valueNumeric: null,
+                  valueText: null,
+
+                  valueCoded: null,
+                  abnormal: false,
+                },
+              ];
+              this.sampleAllocationService
+                .saveResultsViaAllocations(results)
+                .subscribe((resultsResponse) => {
+                  if (resultsResponse) {
+                    const results = flatten(
+                      groupedByParent[key]?.map((testAllocation) => {
+                        return testAllocation?.value?.map((val) => {
+                          return omit(
+                            {
+                              ...testAllocation,
+                              valueNumeric: testAllocation?.parameter?.isNumeric
+                                ? val?.value
+                                : null,
+                              valueText: testAllocation?.parameter?.isText
+                                ? val?.value
+                                : null,
+
+                              valueCoded: testAllocation?.parameter?.isCoded
+                                ? {
+                                    uuid: val?.value,
+                                  }
+                                : null,
+                              resultGroup: {
+                                uuid: resultsResponse[0]?.uuid,
+                              },
+                            },
+                            [
+                              "parent",
+                              "parentUuid",
+                              "value",
+                              "order",
+                              "sample",
+                              "parameter",
+                            ]
+                          );
+                        });
+                      })
+                    );
+                    this.sampleAllocationService
+                      .saveResultsViaAllocations(results)
+                      .subscribe((response) => {
+                        if (response) {
+                          this.saving = false;
+                          setTimeout(() => {
+                            this.getAllocations();
+                          }, 100);
+                        }
+                      });
+                  }
+                });
+            }
+          });
       });
+    }
+    this.saveFilesAsObservations(this.files, order);
+    if (data?.length > 0) {
+      this.sampleAllocationService
+        .saveResultsViaAllocations(data)
+        .subscribe((response) => {
+          if (response) {
+            this.saving = false;
+            setTimeout(() => {
+              this.getAllocations();
+            }, 100);
+          }
+        });
+    }
   }
 
   onAuthorize(
     event: Event,
     order: any,
     confirmed?: boolean,
-    approvalStatusType?: string
+    approvalStatusType?: string,
+    related?: boolean
   ): void {
     event.stopPropagation();
     if (confirmed) {
       const allocationsData = order?.allocations;
-      this.allocationStatuses = allocationsData
-        ?.map((allocationData) => {
-          if (
-            allocationData?.allocation?.finalResult &&
-            allocationData?.allocation?.parameter?.datatype?.display !=
-              "Complex"
-          ) {
-            // TODO: Find a better way to handle second complex (file) data types
-            const approvalStatus = {
-              status:
-                order?.authorizationStatuses?.length === 0 &&
-                !this.data?.LISConfigurations?.isLIS
-                  ? "APPROVED"
-                  : "AUTHORIZED",
-              remarks: "APPROVED",
-              category: "RESULT_AUTHORIZATION",
-              user: {
-                uuid: this.userUuid,
-              },
-              testAllocation: {
-                uuid: allocationData?.allocation?.uuid,
-              },
-              testResult: {
-                uuid: allocationData?.allocation?.finalResult?.uuid,
-              },
-            };
-            return approvalStatus;
-          }
-        })
-        ?.filter((allStatus) => allStatus);
+      this.allocationStatuses = flatten(
+        allocationsData
+          ?.map((allocationData) => {
+            if (
+              allocationData?.allocation?.finalResult &&
+              allocationData?.allocation?.parameter?.datatype?.display !=
+                "Complex"
+            ) {
+              // TODO: Find a better way to handle second complex (file) data types
+              const results = !allocationData?.allocation?.finalResult?.groups
+                ? [allocationData?.allocation?.finalResult]
+                : !related
+                ? allocationData?.allocation?.finalResult?.groups[
+                    allocationData?.allocation?.finalResult?.groups?.length - 1
+                  ]?.results
+                : allocationData?.allocation?.finalResult?.groups?.map(
+                    (group) => {
+                      return orderBy(
+                        group?.results,
+                        ["dateCreated"],
+                        ["desc"]
+                      )[0];
+                    }
+                  );
+              let approvalStatuses = [];
+              if (allocationData?.allocation?.finalResult?.groups) {
+                approvalStatuses = results?.map((result) => {
+                  return {
+                    status:
+                      order?.authorizationStatuses?.length === 0 &&
+                      !this.data?.LISConfigurations?.isLIS
+                        ? "APPROVED"
+                        : "AUTHORIZED",
+                    remarks: "APPROVED",
+                    category: "RESULT_AUTHORIZATION",
+                    user: {
+                      uuid: this.userUuid,
+                    },
+                    testAllocation: {
+                      uuid: allocationData?.allocation?.uuid,
+                    },
+                    testResult: {
+                      uuid: result?.uuid,
+                    },
+                  };
+                });
+              } else {
+                approvalStatuses = [
+                  {
+                    status:
+                      order?.authorizationStatuses?.length === 0 &&
+                      !this.data?.LISConfigurations?.isLIS
+                        ? "APPROVED"
+                        : "AUTHORIZED",
+                    remarks: "APPROVED",
+                    category: "RESULT_AUTHORIZATION",
+                    user: {
+                      uuid: this.userUuid,
+                    },
+                    testAllocation: {
+                      uuid: allocationData?.allocation?.uuid,
+                    },
+                    testResult: {
+                      uuid: orderBy(results, ["dateCreated"], ["desc"])[0]
+                        ?.uuid,
+                    },
+                  },
+                ];
+              }
+              return approvalStatuses;
+            }
+          })
+          ?.filter((allStatus) => allStatus)
+      );
       this.saving = true;
       this.shouldConfirm = false;
       this.sampleAllocationService
@@ -277,6 +477,9 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
       this.dataValues[parameter?.uuid] = {
         ...dataObject,
         allocation: allocation,
+        parent: allocation?.order?.concept,
+        sample: allocation?.sample,
+        order: allocation?.order,
       };
     } else if (
       dataObject?.value &&
@@ -362,4 +565,76 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
   onGetRemarks(remarks: string, order: any): void {
     this.remarksData[order?.concept?.uuid] = remarks;
   }
+
+  getFedResults(results: any, order: any): void {
+    this.relatedResults = [];
+    // console.log("results", results);
+    Object.keys(results)?.forEach((key) => {
+      if (
+        results[key]?.value &&
+        results[key]?.value != results[key]?.previousValue[0]
+      ) {
+        this.relatedResults = [
+          ...this.relatedResults,
+          {
+            concept: {
+              uuid: results[key]?.parameter?.uuid,
+            },
+            testAllocation: {
+              uuid: results[key]?.allocation?.uuid,
+            },
+            valueNumeric: results[key]?.parameter?.isNumeric
+              ? results[key]?.value
+              : null,
+            valueText: results[key]?.parameter?.isText
+              ? results[key]?.value
+              : null,
+
+            valueCoded: results[key]?.parameter?.isCoded
+              ? {
+                  uuid: results[key]?.value,
+                }
+              : null,
+            resultGroup: {
+              uuid: results[key]?.relatedResult?.uuid,
+            },
+            instrument:
+              order && this.selectedInstruments[order?.concept?.uuid]
+                ? {
+                    uuid: this.selectedInstruments[order?.concept?.uuid],
+                  }
+                : null,
+            abnormal: false,
+            status: this.remarksData[results[key]?.parameter?.uuid]
+              ? {
+                  category: "RESULT_REMARKS",
+                  status: "REMARKS",
+                  remarks: this.remarksData[results[key]?.parameter?.uuid],
+                }
+              : null,
+          },
+        ];
+      }
+    });
+  }
+
+  onSaveRelatedResults(event: Event, order: any): void {
+    event.stopPropagation();
+    // console.log("relatedResults", this.relatedResults);
+    this.sampleAllocationService
+      .saveResultsViaAllocations(this.relatedResults)
+      .subscribe((response) => {
+        if (response) {
+          this.saving = false;
+          setTimeout(() => {
+            this.getAllocations();
+          }, 100);
+        }
+      });
+  }
+
+  onGetSelectedInstrument(instrument: any, order: any): void {
+    this.selectedInstruments[order?.concept?.uuid] = instrument;
+  }
 }
+[];
