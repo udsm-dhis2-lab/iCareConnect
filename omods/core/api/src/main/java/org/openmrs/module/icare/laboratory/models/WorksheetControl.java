@@ -18,7 +18,7 @@ public class WorksheetControl extends BaseOpenmrsMetadata implements java.io.Ser
 	
 	@Column(name = "code")
 	private String code;
-
+	
 	@ManyToOne
 	@JoinColumn(name = "test_order_id")
 	private Concept testOrder;
@@ -48,17 +48,17 @@ public class WorksheetControl extends BaseOpenmrsMetadata implements java.io.Ser
 	public void setTestOrder(Concept testOrder) {
 		this.testOrder = testOrder;
 	}
-
+	
 	public static WorksheetControl fromMap(Map<String, Object> worksheetMap) {
-
+		
 		WorksheetControl worksheetControl = new WorksheetControl();
 		worksheetControl.setCode(worksheetMap.get("code").toString());
 		worksheetControl.setDescription(worksheetMap.get("description").toString());
 		worksheetControl.setName(worksheetMap.get("name").toString());
-
+		
 		return worksheetControl;
 	}
-
+	
 	public Map<String,Object> toMap(){
 
 		HashMap<String,Object> worksheetObject = new HashMap<>();

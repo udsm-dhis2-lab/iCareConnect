@@ -15,6 +15,7 @@ import { UpdateRolesWithSelectedAttributePipe } from "./update-roles-with-select
 import { SanitizeDangerousUrlPipe } from "./sanitize-dangerous-url.pipe";
 import { SearchTestDetailsPipe } from "./search-test-details.pipe";
 import { CreateLabFieldsPipe } from "./create-lab-fields.pipe";
+import { FilterResultsByResultGroupPipe } from "./filter-results-by-result-group.pipe";
 
 export const sharedPipes: any[] = [
   FilterByPipe,
@@ -34,4 +35,5 @@ export const sharedPipes: any[] = [
   SanitizeDangerousUrlPipe,
   SearchTestDetailsPipe,
   CreateLabFieldsPipe,
+  FilterResultsByResultGroupPipe,
 ];

@@ -50,11 +50,11 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	BatchStatusDAO batchStatusDAO;
 	
 	WorksheetDAO worksheetDAO;
-
+	
 	WorksheetControlDAO worksheetControlDAO;
-
+	
 	WorksheetDefinitionDAO worksheetDefinitionDAO;
-
+	
 	WorksheetSampleDAO worksheetSampleDAO;
 	
 	public void setSampleDAO(SampleDAO sampleDAO) {
@@ -116,16 +116,16 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	public void setWorksheetDAO(WorksheetDAO worksheetDAO) {
 		this.worksheetDAO = worksheetDAO;
 	}
-
+	
 	public void setWorksheetControlDAO(WorksheetControlDAO worksheetControlDAO) {
 		this.worksheetControlDAO = worksheetControlDAO;
 	}
-
-	public void setWorksheetDefinitionDAO(WorksheetDefinitionDAO worksheetDefinitionDAO){
+	
+	public void setWorksheetDefinitionDAO(WorksheetDefinitionDAO worksheetDefinitionDAO) {
 		this.worksheetDefinitionDAO = worksheetDefinitionDAO;
 	}
-
-	public void setWorksheetSampleDAO(WorksheetSampleDAO worksheetSampleDAO){
+	
+	public void setWorksheetSampleDAO(WorksheetSampleDAO worksheetSampleDAO) {
 		this.worksheetSampleDAO = worksheetSampleDAO;
 	}
 	
@@ -208,12 +208,34 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 		if (testConcept == null) {
 			throw new Exception("Test Concept with ID '" + testAllocation.getTestConcept().getUuid() + "' does not exist.");
 		}
+		String sampleUuid = testAllocation.getSample().getUuid();
+		Sample sampleData = testAllocationDAO.getAllocationsBySample(sampleUuid).get(0);
+		TestAllocation matchedAllocation = new TestAllocation();
+		Boolean allocationAlreadySet = false;
+		if (sampleData != null) {
+			if (sample.getSampleOrders().size() > 0) {
+				for (SampleOrder sampleOrder : sample.getSampleOrders()) {
+					if (sampleOrder.getTestAllocations().size() > 0) {
+						for (TestAllocation allocation : sampleOrder.getTestAllocations()) {
+							if (allocation.getTestConcept().getUuid().toString() == testConcept.getUuid().toString()) {
+								allocationAlreadySet = true;
+								matchedAllocation = allocation;
+							}
+						}
+					}
+				}
+			}
+		}
+		if (!allocationAlreadySet) {
+			testAllocation.setTestConcept(testConcept);
+			testAllocation.setContainer(containerConcept);
+			testAllocation.getSampleOrder().setSample(sample);
+			testAllocation.getSampleOrder().setOrder(order);
+			return this.testAllocationDAO.save(testAllocation);
+		} else {
+			return testAllocationDAO.findByUuid(matchedAllocation.getUuid().toString());
+		}
 		
-		testAllocation.setTestConcept(testConcept);
-		testAllocation.setContainer(containerConcept);
-		testAllocation.getSampleOrder().setSample(sample);
-		testAllocation.getSampleOrder().setOrder(order);
-		return this.testAllocationDAO.save(testAllocation);
 	}
 	
 	@Override
@@ -306,7 +328,6 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 		}
 		savedSampleOrder.setTechnician(user);
 		return this.sampleOrderDAO.save(savedSampleOrder);
-		
 	}
 	
 	@Override
@@ -842,9 +863,9 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	public List<Worksheet> getWorksheets(Date startDate, Date endDate, String q, Integer startIndex, Integer limit) {
 		return worksheetDAO.getWorksheets(startDate, endDate, q, startIndex, limit);
 	}
-
+	
 	@Override
-	public Worksheet getWorksheetByUuid(String worksheetUuid){
+	public Worksheet getWorksheetByUuid(String worksheetUuid) {
 		return worksheetDAO.findByUuid(worksheetUuid);
 	}
 	
@@ -852,68 +873,76 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	public Worksheet addWorksheet(Worksheet worksheet) {
 		return worksheetDAO.save(worksheet);
 	}
-
+	
 	@Override
-	public List<WorksheetControl> getWorksheetControls(Date startDate, Date endDate, String q, Integer startIndex, Integer limit) {
+	public List<WorksheetControl> getWorksheetControls(Date startDate, Date endDate, String q, Integer startIndex,
+	        Integer limit) {
 		return worksheetControlDAO.getWorksheetControls(startDate, endDate, q, startIndex, limit);
 	}
-
+	
 	@Override
-	public WorksheetControl getWorksheetControlByUuid(String worksheetControlUuid){
+	public WorksheetControl getWorksheetControlByUuid(String worksheetControlUuid) {
 		return worksheetControlDAO.findByUuid(worksheetControlUuid);
 	}
-
+	
 	@Override
 	public WorksheetControl addWorksheetControl(WorksheetControl worksheetControl) {
 		return worksheetControlDAO.save(worksheetControl);
 	}
-
+	
 	@Override
-	public List<WorksheetDefinition> getWorksheetDefinitions(Date startDate, Date endDate, String q, Integer startIndex, Integer limit){
+	public List<WorksheetDefinition> getWorksheetDefinitions(Date startDate, Date endDate, String q, Integer startIndex,
+	        Integer limit) {
 		return worksheetDefinitionDAO.getWorksheetDefinitions(startDate, endDate, q, startIndex, limit);
 	}
-
+	
 	@Override
-	public WorksheetDefinition getWorksheetDefinitionByUuid(String worksheetDefinitionUuid){
+	public WorksheetDefinition getWorksheetDefinitionByUuid(String worksheetDefinitionUuid) {
 		return worksheetDefinitionDAO.findByUuid(worksheetDefinitionUuid);
 	}
-
+	
 	@Override
-	public WorksheetDefinition addWorksheetDefinition(WorksheetDefinition worksheetDefinition) throws Exception{
-
+	public WorksheetDefinition addWorksheetDefinition(WorksheetDefinition worksheetDefinition) throws Exception {
+		
 		Worksheet worksheet = this.getWorksheetByUuid(worksheetDefinition.getWorksheet().getUuid());
 		if (worksheet == null) {
-			throw new Exception("The worksheet definition with id " + worksheetDefinition.getWorksheet().getUuid() + " does not exist");
+			throw new Exception("The worksheet definition with id " + worksheetDefinition.getWorksheet().getUuid()
+			        + " does not exist");
 		}
 		worksheetDefinition.setWorksheet(worksheet);
 		return worksheetDefinitionDAO.save(worksheetDefinition);
 	}
-
+	
 	@Override
-	public List<WorksheetSample> getWorksheetSamples(Date startDate, Date endDate, String q, Integer startIndex, Integer limit){
-       return worksheetSampleDAO.getWorksheetSamples(startDate, endDate, q, startIndex, limit);
+	public List<WorksheetSample> getWorksheetSamples(Date startDate, Date endDate, String q, Integer startIndex,
+	        Integer limit) {
+		return worksheetSampleDAO.getWorksheetSamples(startDate, endDate, q, startIndex, limit);
 	}
-
+	
 	@Override
-	public WorksheetSample addWorksheetSample(WorksheetSample worksheetSample) throws Exception{
-
-		if(worksheetSample.getSample() != null) {
+	public WorksheetSample addWorksheetSample(WorksheetSample worksheetSample) throws Exception {
+		
+		if (worksheetSample.getSample() != null) {
 			Sample sample = this.getSampleByUuid(worksheetSample.getSample().getUuid());
 			if (sample == null) {
 				throw new Exception("The sample with id " + worksheetSample.getSample().getUuid() + " does not exist");
 			}
 			worksheetSample.setSample(sample);
 		}
-
-		WorksheetDefinition worksheetDefinition = this.getWorksheetDefinitionByUuid(worksheetSample.getWorksheetDefinition().getUuid());
+		
+		WorksheetDefinition worksheetDefinition = this.getWorksheetDefinitionByUuid(worksheetSample.getWorksheetDefinition()
+		        .getUuid());
 		if (worksheetDefinition == null) {
-			throw new Exception("The worksheet definition with id " + worksheetSample.getWorksheetDefinition().getUuid() + " does not exist");
+			throw new Exception("The worksheet definition with id " + worksheetSample.getWorksheetDefinition().getUuid()
+			        + " does not exist");
 		}
-
-		if(worksheetSample.getWorksheetControl() != null){
-			WorksheetControl worksheetControl = this.getWorksheetControlByUuid(worksheetSample.getWorksheetControl().getUuid());
+		
+		if (worksheetSample.getWorksheetControl() != null) {
+			WorksheetControl worksheetControl = this.getWorksheetControlByUuid(worksheetSample.getWorksheetControl()
+			        .getUuid());
 			if (worksheetControl == null) {
-				throw new Exception("The worksheet control with id " + worksheetSample.getWorksheetControl().getUuid() + " does not exist");
+				throw new Exception("The worksheet control with id " + worksheetSample.getWorksheetControl().getUuid()
+				        + " does not exist");
 			}
 			worksheetSample.setWorksheetControl(worksheetControl);
 		}

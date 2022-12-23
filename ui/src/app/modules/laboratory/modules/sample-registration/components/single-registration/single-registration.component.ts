@@ -1527,10 +1527,6 @@ export class SingleRegistrationComponent implements OnInit {
                                                                           0
                                                                         ) {
                                                                           zip(
-                                                                            this.samplesService.saveTestContainerAllocation(
-                                                                              ordersWithConceptsDetails,
-                                                                              configs
-                                                                            ),
                                                                             this.samplesService.setMultipleSampleStatuses(
                                                                               statuses
                                                                             )
