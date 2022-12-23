@@ -275,6 +275,7 @@ public class Result extends BaseOpenmrsData implements java.io.Serializable {
 	public Map<String, Object> toMap() {
 		Map<String, Object> resultsObject = new HashMap<String, Object>();
 		resultsObject.put("uuid", this.getUuid());
+		resultsObject.put("dateCreated", this.getDateCreated());
 		resultsObject.put("valueText", this.getValueText());
 		resultsObject.put("valueNumeric", this.getValueNumeric());
 		resultsObject.put("valueBoolean", this.getValueBoolean());
@@ -292,8 +293,6 @@ public class Result extends BaseOpenmrsData implements java.io.Serializable {
 		resultsObject.put("additionalReqTimeLimit", this.getAddReqTimeLimit());
 		
 		if (this.getDateCreated() != null) {
-			//			sampleObject.put("created", sdf.format(this.getDateCreated()));
-			
 			resultsObject.put("dateCreated", this.getDateCreated());
 		} else {
 			resultsObject.put("dateCreated", null);
@@ -336,6 +335,7 @@ public class Result extends BaseOpenmrsData implements java.io.Serializable {
 		if (this.getValueGroup() != null) {
 			resultGroup.put("uuid", this.getValueGroup().getUuid());
 			resultGroup.put("valueText", this.getValueText());
+			resultGroup.put("dateCreated", this.getDateCreated());
 			resultGroup.put("valueNumeric", this.getValueNumeric());
 			resultGroup.put("valueBoolean", this.getValueBoolean());
 			resultGroup.put("valueComplex", this.getValueComplex());
