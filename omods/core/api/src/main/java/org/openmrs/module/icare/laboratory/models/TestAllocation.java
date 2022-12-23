@@ -216,14 +216,17 @@ public class TestAllocation extends BaseOpenmrsData implements java.io.Serializa
 		Map<String, Object> orderConcept = new HashMap<>();
 		orderConcept.put("uuid", this.sampleOrder.getOrder().getConcept().getUuid());
 		orderConcept.put("display", this.sampleOrder.getOrder().getConcept().getDisplayString());
+		orderConcept.put("setMembers", this.sampleOrder.getOrder().getConcept().getSetMembers());
 		order.put("concept", orderConcept);
+		order.put("dateCreated", this.sampleOrder.getOrder().getDateCreated());
+		order.put("dateActivated", this.sampleOrder.getOrder().getDateActivated());
 		testAllocationMap.put("order", order);
 		
 		Map<String, Object> sample = new HashMap<String, Object>();
 		sample.put("uuid", this.sampleOrder.getSample().getUuid());
 		sample.put("label", this.sampleOrder.getSample().getLabel());
 		testAllocationMap.put("sample", sample);
-		testAllocationMap.put("isSet", this.getSampleOrder().getOrder().getConcept().getSetMembers().size() > 1);
+		testAllocationMap.put("hasSetMembers", this.getSampleOrder().getOrder().getConcept().getSetMembers().size() > 1);
 		return testAllocationMap;
 	}
 	
