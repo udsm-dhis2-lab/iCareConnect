@@ -113,6 +113,7 @@ import { SharedAddTestorderToSampleComponent } from "./shared-add-testorder-to-s
 import { SharedDepartmentsSelectionComponent } from "./shared-departments-selection/shared-departments-selection.component";
 import { SharedInstrumentsManagementComponent } from "./shared-instruments-management/shared-instruments-management.component";
 import { StandardConceptsListComponent } from "./standard-concepts-list/standard-concepts-list.component";
+import { SharedInstrumentSelectionComponent } from "./shared-instrument-selection/shared-instrument-selection.component";
 
 export const components: any[] = [
   PatientAddressComponent,
@@ -231,6 +232,7 @@ export const components: any[] = [
   SharedDepartmentsSelectionComponent,
   SharedInstrumentsManagementComponent,
   StandardConceptsListComponent,
+  SharedInstrumentSelectionComponent,
 ];
 
 export const sharedEntryComponents: any[] = [

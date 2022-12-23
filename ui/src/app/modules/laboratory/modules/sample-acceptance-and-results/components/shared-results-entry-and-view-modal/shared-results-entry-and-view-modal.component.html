@@ -58,7 +58,7 @@
               [errors]="errors"
             ></app-shared-error>
             <table
-              class="table table-bordered table-responsive"
+              class="table table-bordered"
               *ngIf="!errors || errors?.length == 0"
             >
               <tbody>
@@ -70,7 +70,7 @@
                   >
                     <tr>
                       <td
-                        rowspan="3"
+                        rowspan="4"
                         *ngIf="order?.concept?.setMembers?.length > 0"
                       >
                         {{ order?.concept?.display }}
@@ -143,7 +143,7 @@
                           </div>
                         </div>
                       </td>
-                      <td rowspan="3" style="width: 100px">
+                      <td rowspan="4" style="width: 100px">
                         <div class="mt-4">
                           <button
                             *ngIf="data?.actionType !== 'review'"
@@ -215,6 +215,21 @@
                       </td>
                     </tr>
                     <tr>
+                      <td colspan="100%">
+                        <div
+                          class="w-75"
+                          *ngIf="data?.LISConfigurations?.isLIS"
+                        >
+                          <app-shared-instrument-selection
+                            [conceptReferenceTerm]="'LIS_INSTRUMENT'"
+                            (selectedInstrument)="
+                              onGetSelectedInstrument($event, order)
+                            "
+                          ></app-shared-instrument-selection>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
                       <td
                         colspan="100%"
                         class="text-muted test-order-description"
@@ -232,7 +247,7 @@
                     *ngIf="order?.parametersWithDefinedRelationship?.length > 0"
                   >
                     <tr>
-                      <td>
+                      <td rowspan="3">
                         {{ order?.concept?.display }}
                       </td>
                       <td>
@@ -258,11 +273,11 @@
                             "
                             [isLIS]="data?.LISConfigurations?.isLIS"
                             [conceptNameType]="preferredName"
-                            (data)="getFedResults($event)"
+                            (data)="getFedResults($event, order)"
                           ></app-related-test-parameters-entry>
                         </div>
                       </td>
-                      <td>
+                      <td rowspan="3">
                         <div class="mt-4">
                           <button
                             *ngIf="data?.actionType !== 'review'"
@@ -327,6 +342,34 @@
                             >
                           </p>
                         </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td colspan="100%">
+                        <div
+                          class="w-75"
+                          *ngIf="data?.LISConfigurations?.isLIS"
+                        >
+                          <app-shared-instrument-selection
+                            [conceptReferenceTerm]="'LIS_INSTRUMENT'"
+                            (selectedInstrument)="
+                              onGetSelectedInstrument($event, order)
+                            "
+                          ></app-shared-instrument-selection>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td
+                        colspan="100%"
+                        class="text-muted test-order-description"
+                      >
+                        <em>
+                          Ordered By:
+                          <b>
+                            {{ order?.orderer?.name }}
+                          </b>
+                        </em>
                       </td>
                     </tr>
                   </ng-container>
