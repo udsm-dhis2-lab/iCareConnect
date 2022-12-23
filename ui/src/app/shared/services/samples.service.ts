@@ -196,15 +196,12 @@ export class SamplesService {
       ];
     }
 
-    if (searchText && searchText.length > 0){
-      queryParams = [
-        ...queryParams,
-        `q=${searchText}`
-      ]
+    if (searchText && searchText.length > 0) {
+      queryParams = [...queryParams, `q=${searchText}`];
     }
-      if (dates && dates?.startDate) {
-        queryParams = [...queryParams, `startDate=${dates?.startDate}`];
-      }
+    if (dates && dates?.startDate) {
+      queryParams = [...queryParams, `startDate=${dates?.startDate}`];
+    }
 
     if (dates && dates?.endDate) {
       queryParams = [...queryParams, `endDate=${dates?.endDate}`];

@@ -71,17 +71,7 @@
                     <tr>
                       <td
                         rowspan="3"
-                        *ngIf="
-                          params?.sampleAllocations?.length > 1 ||
-                          (params?.sampleAllocations?.length == 1 &&
-                            params?.sampleAllocations[0]?.allocations[0]?.isSet)
-                        "
-                        [ngStyle]="{
-                          'width:': params?.sampleAllocations[0]?.allocations[0]
-                            ?.isSet
-                            ? '100px'
-                            : '30%'
-                        }"
+                        *ngIf="order?.concept?.setMembers?.length > 0"
                       >
                         {{ order?.concept?.display }}
                       </td>
@@ -94,14 +84,14 @@
                                   .name == 'Numeric' ||
                                   allocationData?.allocation?.parameter
                                     ?.datatype.name == 'Coded') &&
-                                allocationData?.allocation?.isSet,
+                                allocationData?.allocation?.isSetMember,
                               'parameter-test-text':
                                 allocationData?.allocation?.parameter?.datatype
                                   .name != 'Numeric' &&
                                 allocationData?.allocation?.parameter?.datatype
                                   .name != 'Coded' &&
-                                allocationData?.allocation?.isSet,
-                              'col-12': !allocationData?.allocation?.isSet
+                                allocationData?.allocation?.isSetMember,
+                              'col-12': !allocationData?.allocation?.isSetMember
                             }"
                             (dblclick)="
                               toggleSideNavigation(
@@ -114,7 +104,15 @@
                             class="entry-col"
                             *ngFor="let allocationData of order?.allocations"
                           >
-                            <div class="w-100">
+                            <div
+                              class="w-100"
+                              *ngIf="
+                                order?.concept?.setMembers?.length == 0 ||
+                                (order?.concept?.setMembers?.length > 0 &&
+                                  order?.concept?.uuid !==
+                                    allocationData?.allocation?.parameter?.uuid)
+                              "
+                            >
                               <app-test-parameter-entry
                                 *ngIf="preferredName"
                                 [parameterUuid]="

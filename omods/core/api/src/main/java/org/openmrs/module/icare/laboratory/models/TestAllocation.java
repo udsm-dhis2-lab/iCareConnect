@@ -216,7 +216,14 @@ public class TestAllocation extends BaseOpenmrsData implements java.io.Serializa
 		Map<String, Object> orderConcept = new HashMap<>();
 		orderConcept.put("uuid", this.sampleOrder.getOrder().getConcept().getUuid());
 		orderConcept.put("display", this.sampleOrder.getOrder().getConcept().getDisplayString());
-		orderConcept.put("setMembers", this.sampleOrder.getOrder().getConcept().getSetMembers());
+		List<Map<String, Object>> setMembers = new ArrayList<>();
+		for (Concept setMember: this.sampleOrder.getOrder().getConcept().getSetMembers()) {
+			Map<String, Object> member = new HashMap<>();
+			member.put("uuid", setMember.getUuid());
+			member.put("display", setMember.getDisplayString());
+			setMembers.add(member);
+		}
+		orderConcept.put("setMembers", setMembers);
 		order.put("concept", orderConcept);
 		order.put("dateCreated", this.sampleOrder.getOrder().getDateCreated());
 		order.put("dateActivated", this.sampleOrder.getOrder().getDateActivated());
@@ -226,7 +233,7 @@ public class TestAllocation extends BaseOpenmrsData implements java.io.Serializa
 		sample.put("uuid", this.sampleOrder.getSample().getUuid());
 		sample.put("label", this.sampleOrder.getSample().getLabel());
 		testAllocationMap.put("sample", sample);
-		testAllocationMap.put("hasSetMembers", this.getSampleOrder().getOrder().getConcept().getSetMembers().size() > 1);
+		testAllocationMap.put("isSetMember", this.getSampleOrder().getOrder().getConcept().getSetMembers().size() > 0 && this.getTestConcept().getUuid().toString() != this.getSampleOrder().getOrder().getConcept().getUuid().toString());
 		return testAllocationMap;
 	}
 	

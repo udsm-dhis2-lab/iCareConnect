@@ -31,7 +31,6 @@ export class TestParameterEntryComponent implements OnInit {
       this.parameterUuid,
       "custom:(uuid,display,datatype,names,answers:(uuid,display,names),attributes:(uuid,display,attributeType:(uuid,display)))"
     );
-
     if (this.finalResult && !this.finalResult?.groups) {
       this.latestResult = {
         ...this.finalResult,
