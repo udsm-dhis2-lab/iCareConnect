@@ -54,7 +54,9 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.preferredName = this.data?.LISConfigurations?.isLIS ? "SHORT" : "";
+    this.preferredName = this.data?.LISConfigurations?.isLIS
+      ? "SHORT"
+      : "FULLY_SPECIFIED";
     this.providerDetails$ = this.store.select(getProviderDetails);
     this.userUuid = localStorage.getItem("userUuid");
     this.multipleResultsAttributeType$ = this.systemSettingsService
