@@ -61,7 +61,7 @@ export class PersonDetailsComponent implements OnInit {
   fieldItems: QueryList<FieldComponent>;
 
   pinnedCategory: string;
-  @Output() selecedSystem: EventEmitter<any> = new EventEmitter<any>();
+  @Output() selectedSystem: EventEmitter<any> = new EventEmitter<any>();
 
   @Output() fromExternalSystem: EventEmitter<boolean> =
     new EventEmitter<boolean>();
@@ -370,7 +370,7 @@ export class PersonDetailsComponent implements OnInit {
 
   onGetSelectedSystem(system: any): void {
     this.fromExternalSystem.emit(true);
-    this.selecedSystem.emit(system);
+    this.selectedSystem.emit(system);
   }
 
   getSelectedClientRequest(clientRequest: any): void {

@@ -71,6 +71,7 @@ export class RegisterSampleComponent implements OnInit {
   batchRegistrationFields: any;
   batchsets$: Observable<any>;
   batches$: Observable<any>;
+  testFields: any;
 
   get maximumDate() {
     let maxDate = new Date();
@@ -423,6 +424,21 @@ export class RegisterSampleComponent implements OnInit {
       }),
     };
 
+    this.testFields = {
+      testorders: new Dropdown({
+        id: "testorders",
+        key: "testorders",
+        label: "Select Test Orders",
+        required: true,
+        options: [],
+        searchControlType: "concept",
+        searchTerm: "TEST_ORDERS",
+        conceptClass: "Test",
+        multiple: true,
+        shouldHaveLiveSearchForDropDownFields: true,
+      })
+    };
+
     this.allRegistrationFields = {
       batchRegistrationFields: this.batchRegistrationFields,
       specimenDetailFields: this.specimenDetailsFields,
@@ -430,6 +446,7 @@ export class RegisterSampleComponent implements OnInit {
       patientAgeFields: this.patientAgeFields,
       personFieldsGroupThree: this.personFieldsGroupThree,
       clinicalFormFields: this.clinicalFormFields,
+      testFields: this.testFields
     };
   }
 }
