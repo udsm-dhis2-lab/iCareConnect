@@ -70,18 +70,8 @@
                   >
                     <tr>
                       <td
-                        rowspan="3"
-                        *ngIf="
-                          params?.sampleAllocations?.length > 1 ||
-                          (params?.sampleAllocations?.length == 1 &&
-                            params?.sampleAllocations[0]?.allocations[0]?.isSet)
-                        "
-                        [ngStyle]="{
-                          'width:': params?.sampleAllocations[0]?.allocations[0]
-                            ?.isSet
-                            ? '100px'
-                            : '30%'
-                        }"
+                        rowspan="4"
+                        *ngIf="order?.concept?.setMembers?.length > 0"
                       >
                         {{ order?.concept?.display }}
                       </td>
@@ -94,14 +84,14 @@
                                   .name == 'Numeric' ||
                                   allocationData?.allocation?.parameter
                                     ?.datatype.name == 'Coded') &&
-                                allocationData?.allocation?.isSet,
+                                allocationData?.allocation?.isSetMember,
                               'parameter-test-text':
                                 allocationData?.allocation?.parameter?.datatype
                                   .name != 'Numeric' &&
                                 allocationData?.allocation?.parameter?.datatype
                                   .name != 'Coded' &&
-                                allocationData?.allocation?.isSet,
-                              'col-12': !allocationData?.allocation?.isSet
+                                allocationData?.allocation?.isSetMember,
+                              'col-12': !allocationData?.allocation?.isSetMember
                             }"
                             (dblclick)="
                               toggleSideNavigation(
@@ -109,10 +99,20 @@
                                 allocationData?.allocation
                               )
                             "
+                            matTooltip="Double Click to view history"
+                            [matTooltipPosition]="'above'"
                             class="entry-col"
                             *ngFor="let allocationData of order?.allocations"
                           >
-                            <div class="w-100">
+                            <div
+                              class="w-100"
+                              *ngIf="
+                                order?.concept?.setMembers?.length == 0 ||
+                                (order?.concept?.setMembers?.length > 0 &&
+                                  order?.concept?.uuid !==
+                                    allocationData?.allocation?.parameter?.uuid)
+                              "
+                            >
                               <app-test-parameter-entry
                                 *ngIf="preferredName"
                                 [parameterUuid]="
@@ -143,7 +143,7 @@
                           </div>
                         </div>
                       </td>
-                      <td rowspan="3" style="width: 100px">
+                      <td rowspan="4" style="width: 100px">
                         <div class="mt-4">
                           <button
                             *ngIf="data?.actionType !== 'review'"
@@ -215,6 +215,21 @@
                       </td>
                     </tr>
                     <tr>
+                      <td colspan="100%">
+                        <div
+                          class="w-75"
+                          *ngIf="data?.LISConfigurations?.isLIS"
+                        >
+                          <app-shared-instrument-selection
+                            [conceptReferenceTerm]="'LIS_INSTRUMENT'"
+                            (selectedInstrument)="
+                              onGetSelectedInstrument($event, order)
+                            "
+                          ></app-shared-instrument-selection>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
                       <td
                         colspan="100%"
                         class="text-muted test-order-description"
@@ -232,26 +247,37 @@
                     *ngIf="order?.parametersWithDefinedRelationship?.length > 0"
                   >
                     <tr>
-                      <td>
+                      <td rowspan="3">
                         {{ order?.concept?.display }}
                       </td>
                       <td>
-                        <app-related-test-parameters-entry
-                          *ngIf="preferredName"
-                          [allSampleAllocations]="params?.sampleAllocations"
-                          [parametersWithDefinedRelationship]="
-                            order?.parametersWithDefinedRelationship
+                        <div
+                          (dblclick)="
+                            toggleSideNavigationGrouped(
+                              $event,
+                              order?.parametersWithDefinedRelationship
+                            )
                           "
-                          [disabled]="
-                            data?.actionType === 'review' &&
-                            !data?.LISConfigurations?.isLIS
-                          "
-                          [isLIS]="data?.LISConfigurations?.isLIS"
-                          [conceptNameType]="preferredName"
-                          (data)="getFedResults($event)"
-                        ></app-related-test-parameters-entry>
+                          style="width: 99%; overflow: auto"
+                          class="entry-col"
+                        >
+                          <app-related-test-parameters-entry
+                            *ngIf="preferredName"
+                            [allSampleAllocations]="params?.sampleAllocations"
+                            [parametersWithDefinedRelationship]="
+                              order?.parametersWithDefinedRelationship
+                            "
+                            [disabled]="
+                              data?.actionType === 'review' &&
+                              !data?.LISConfigurations?.isLIS
+                            "
+                            [isLIS]="data?.LISConfigurations?.isLIS"
+                            [conceptNameType]="preferredName"
+                            (data)="getFedResults($event, order)"
+                          ></app-related-test-parameters-entry>
+                        </div>
                       </td>
-                      <td>
+                      <td rowspan="3">
                         <div class="mt-4">
                           <button
                             *ngIf="data?.actionType !== 'review'"
@@ -318,6 +344,34 @@
                         </div>
                       </td>
                     </tr>
+                    <tr>
+                      <td colspan="100%">
+                        <div
+                          class="w-75"
+                          *ngIf="data?.LISConfigurations?.isLIS"
+                        >
+                          <app-shared-instrument-selection
+                            [conceptReferenceTerm]="'LIS_INSTRUMENT'"
+                            (selectedInstrument)="
+                              onGetSelectedInstrument($event, order)
+                            "
+                          ></app-shared-instrument-selection>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td
+                        colspan="100%"
+                        class="text-muted test-order-description"
+                      >
+                        <em>
+                          Ordered By:
+                          <b>
+                            {{ order?.orderer?.name }}
+                          </b>
+                        </em>
+                      </td>
+                    </tr>
                   </ng-container>
                 </ng-container>
               </tbody>
@@ -363,8 +417,11 @@
       <div class="h6">
         {{ selectedAllocation?.allocation?.concept?.display }}
       </div>
-      <div style="height: 40vh; overflow: auto">
-        <table class="table table-bordered">
+      <div style="max-height: 50vh; overflow: auto">
+        <table
+          class="table table-bordered"
+          *ngIf="!selectedParametersWithDefinedRelationship"
+        >
           <thead>
             <tr>
               <th>Result</th>
@@ -415,6 +472,13 @@
             </tr>
           </tbody>
         </table>
+        <div *ngIf="selectedParametersWithDefinedRelationship">
+          <app-related-results-history
+            [parametersWithDefinedRelationship]="
+              selectedParametersWithDefinedRelationship
+            "
+          ></app-related-results-history>
+        </div>
       </div>
       <div></div>
     </div>
