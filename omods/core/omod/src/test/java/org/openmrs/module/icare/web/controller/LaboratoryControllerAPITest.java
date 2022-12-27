@@ -644,7 +644,8 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		//Given
 		String dto = this.readFile("dto/batch-set-create-dto.json");
 		List<Map<String, Object>> batchObject = (new ObjectMapper()).readValue(dto, List.class);
-		
+
+
 		//When
 		MockHttpServletRequest newPostRequest = newPostRequest("lab/batchsets", batchObject);
 		MockHttpServletResponse handle = handle(newPostRequest);
