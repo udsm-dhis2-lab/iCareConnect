@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { flatten, omit, keyBy } from "lodash";
 import { DropdownOption } from "src/app/shared/modules/form/models/dropdown-option.model";
 import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
@@ -26,6 +26,7 @@ export class BatchRegistrationComponent implements OnInit {
   @Input() allRegistrationFields: any;
   @Input() existingBatchsets: any[] = [];
   @Input() existingBatches: any[] = [];
+  @Output() reloadRegisterSample: EventEmitter<any> = new EventEmitter;
   formData: any;
   useExistingBatchset: boolean = false;
   useExistingBatch: boolean = false;
@@ -56,6 +57,7 @@ export class BatchRegistrationComponent implements OnInit {
   existingBatchField: any;
   batchsetDescription: any;
   errors: any[] = [];
+  selectedBatch: any;
 
   constructor(private sampleService: SamplesService) {}
 
@@ -178,10 +180,23 @@ export class BatchRegistrationComponent implements OnInit {
     if (key === "batchset") {
       this.batchsetNameField.value = null;
       this.useExistingBatchset = !this.useExistingBatchset;
+      if (!this.useExistingBatchset) {
+        this.existingBatchField.options = this.existingBatches?.map((batch) => {
+          return {
+            key: batch?.uuid,
+            label: batch?.name,
+            value: batch?.name,
+            name: batch?.name,
+          };
+        });
+      }
     }
     if (key === "batch") {
       this.batchNameField.value = null;
       this.useExistingBatch = !this.useExistingBatch;
+      if(!this.useExistingBatch) {
+        this.selectedBatch = undefined;
+      }
     }
   }
 
@@ -326,9 +341,20 @@ export class BatchRegistrationComponent implements OnInit {
     if (this.useExistingBatchset && key === "Existing Batchset") {
       this.batchNameField.value = null;
       this.validBatchsetName = true;
-      let existingBatchsetFields = this.existingBatchsets.filter(
+      let existingBatchset = this.existingBatchsets.filter(
         (batchset) => batchset.name === this.existingBatchsetField.value
-      )[0]?.fields;
+      )[0];
+      this.existingBatchField.options = existingBatchset?.batches?.map(
+        (batch) => {
+          return {
+            key: batch?.uuid,
+            label: batch?.name,
+            value: batch?.name,
+            name: batch?.name,
+          };
+        }
+      );
+      let existingBatchsetFields = existingBatchset?.fields;
       if (existingBatchsetFields?.length > 0) {
         this.selectedFixedFields =
           JSON.parse(existingBatchsetFields)["fixedFields"]?.length > 0
@@ -353,9 +379,10 @@ export class BatchRegistrationComponent implements OnInit {
     if (this.useExistingBatch && key === "Existing Batch") {
       this.batchNameField.value = null;
       this.validBatchName = true;
-      let existingBatchFields = this.existingBatches.filter(
+      this.selectedBatch = this.existingBatches.filter(
         (batch) => batch.name === this.existingBatchField.value
-      )[0]?.fields;
+      )[0];
+      let existingBatchFields = this.selectedBatch?.fields;
       if (existingBatchFields?.length > 0) {
         this.selectedFixedFields =
           JSON.parse(existingBatchFields)["fixedFields"]?.length > 0
@@ -418,29 +445,38 @@ export class BatchRegistrationComponent implements OnInit {
     this.addDynamicField.disabled = this.useExistingBatch;
   }
 
-  get fieldsObjectValues(){
-    const fixedFieldsWithValues = Object.keys(this.fixedFieldsOptionsObject).length > 0 ? Object.keys(this.fixedFieldsOptionsObject)?.map((key) => {
-        return this.fixedFieldsOptionsObject[key];
-      }).filter((field) => {
-        return field && field.value;
-      }) : [];
-    const staticFields = Object.keys(this.staticFieldsOptionsObject).length > 0 ? Object.keys(this.staticFieldsOptionsObject)?.map((key) => {
-        const isSelectedField = this.selectedStaticFields.filter(
-          (field) => field.key === key
-        ).length;
-        if (isSelectedField) {
-          return this.staticFieldsOptionsObject[key];
-        }
-      }).filter((field) => field && field.value) : [];
+  get fieldsObjectValues() {
+    const fixedFieldsWithValues =
+      Object.keys(this.fixedFieldsOptionsObject).length > 0
+        ? Object.keys(this.fixedFieldsOptionsObject)
+            ?.map((key) => {
+              return this.fixedFieldsOptionsObject[key];
+            })
+            .filter((field) => {
+              return field && field.value;
+            })
+        : [];
+    const staticFields =
+      Object.keys(this.staticFieldsOptionsObject).length > 0
+        ? Object.keys(this.staticFieldsOptionsObject)
+            ?.map((key) => {
+              const isSelectedField = this.selectedStaticFields.filter(
+                (field) => field.key === key
+              ).length;
+              if (isSelectedField) {
+                return this.staticFieldsOptionsObject[key];
+              }
+            })
+            .filter((field) => field && field.value)
+        : [];
     return {
       fixedFieldsWithValues: fixedFieldsWithValues,
       staticFieldsWithValues: staticFields,
-      dynamicFields: this.selectedDynamicFields
-    }
+      dynamicFields: this.selectedDynamicFields,
+    };
   }
 
   onSave(e: any) {
-    
     const staticFields = Object.keys(this.staticFieldsOptionsObject)
       .map((key) => {
         //filter out selected fields that possibly have value
@@ -500,7 +536,7 @@ export class BatchRegistrationComponent implements OnInit {
       batches = batches.map((batch) => {
         return {
           ...batch,
-          batchset: {
+          batchSet: {
             uuid: batchset?.uuid,
             name: batchset?.name,
           },
@@ -509,6 +545,7 @@ export class BatchRegistrationComponent implements OnInit {
       if (batchset) {
         this.sampleService.createBatch(batches).subscribe((response) => {
           if (!response?.error) {
+            this.reloadRegisterSample.emit({ fromKey: "BATCH" });
             console.log("==> Batch created; ", response);
           } else {
             console.log("==> Failed to create batch; ", response);
@@ -523,7 +560,7 @@ export class BatchRegistrationComponent implements OnInit {
             batches = batches.map((batch) => {
               return {
                 ...batch,
-                batchset: {
+                batchSet: {
                   uuid: response[0]?.uuid,
                   name: response[0]?.name,
                 },
@@ -532,9 +569,15 @@ export class BatchRegistrationComponent implements OnInit {
             if (this.batchNameField.value.length) {
               this.sampleService.createBatch(batches).subscribe((response) => {
                 if (!response?.error) {
+                  this.reloadRegisterSample.emit({
+                    fromKey: "BATCH",
+                  });
                   console.log("==> Batch created; ", response);
                 } else {
-                  console.log("==> Failed to create batch; ", response);
+                  this.errors = [
+                    ...this.errors,
+                    response?.error
+                  ];
                 }
               });
             } else {
@@ -575,9 +618,12 @@ export class BatchRegistrationComponent implements OnInit {
       if (this.batchNameField.value) {
         this.sampleService.createBatch(batches).subscribe((response) => {
           if (!response?.error) {
+            this.reloadRegisterSample.emit({
+              fromKey: "BATCH",
+            });
             console.log("==> Batch created; ", response);
           } else {
-            console.log("==> Failed to create batch; ", response);
+            this.errors = [...this.errors, response?.error];
           }
         });
       } else {
@@ -592,5 +638,4 @@ export class BatchRegistrationComponent implements OnInit {
       }
     }
   }
-
 }

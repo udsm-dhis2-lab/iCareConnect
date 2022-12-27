@@ -1,5 +1,5 @@
-<!-- 
-<div class="sample-list-table w-100" *ngIf="fieldsWithValues.length">
+
+<div class="sample-list-table w-100" *ngIf="samplesCreated.length">
       <mat-paginator
         [length]="30"
         [pageSize]=""
@@ -34,7 +34,7 @@
             </tr>
         </tbody>
     </table>
-</div> -->
+</div>
 <div
   *ngIf="{
     labLocations: labLocations$ | async
