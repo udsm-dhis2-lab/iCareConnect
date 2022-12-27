@@ -54,6 +54,7 @@ export class SampleInBatchRegistrationComponent implements OnInit {
   @Input() currentUser: any;
   @Input() allRegistrationFields: any;
   @Input() fieldsObject: any;
+  @Input() batch: any;
 
   departmentField: any = {};
   specimenDetailsFields: any;
@@ -128,7 +129,7 @@ export class SampleInBatchRegistrationComponent implements OnInit {
   staticFields: any[] = [];
   dynamicFields: any[] = [];
   formDataObject: any = {};
-  fieldsWithValues: any;
+  fieldsWithValues: any = {};
   fieldWithValuesChanged: boolean = false;
   samplesCreated: any[] = [];
 
@@ -215,6 +216,8 @@ export class SampleInBatchRegistrationComponent implements OnInit {
         }
       }
     );
+
+    console.log("==> Fields with values: ", this.fieldsWithValues);
   }
 
   get maximumDate() {
@@ -606,113 +609,101 @@ export class SampleInBatchRegistrationComponent implements OnInit {
     }, 200);
   }
 
-  //   onFormUpdateForTest(testValues: any): void {
-  //     Object.keys(this.formData).forEach((key) => {
-  //       if (!testValues[key] && key?.indexOf("test") > -1) {
-  //         this.formData = omit(this.formData, key);
-  //       }
-  //     });
-  //     this.formData = { ...this.formData, ...testValues };
-  //     Object.keys(this.formData).forEach((key) => {
-  //       if (key.indexOf("test") === 0) {
-  //         this.testOrders = uniqBy(
-  //           [
-  //             ...this.testOrders,
-  //             {
-  //               ...this.formData[key],
-  //             },
-  //           ],
-  //           "id"
-  //         );
-  //       }
-  //     });
-  //     this.groupedTestOrdersByDepartments = formulateSamplesByDepartments(
-  //       this.labSections,
-  //       this.testOrders
-  //     );
+    onFormUpdateForTest(testValues: any): void {
+      Object.keys(this.formData).forEach((key) => {
+        if (!testValues[key] && key?.indexOf("test") > -1) {
+          this.formData = omit(this.formData, key);
+        }
+      });
+      this.formData = { ...this.formData, ...testValues };
+      Object.keys(this.formData).forEach((key) => {
+        if (key.indexOf("test") === 0) {
+          this.testOrders = uniqBy(
+            [
+              ...this.testOrders,
+              {
+                ...this.formData[key],
+              },
+            ],
+            "id"
+          );
+        }
+      });
+      this.groupedTestOrdersByDepartments = formulateSamplesByDepartments(
+        this.labSections,
+        this.testOrders
+      );
 
-  //     if (this.testOrders?.length === 0) {
-  //       this.errorMessage = "No test has been selected";
-  //     } else {
-  //       this.errorMessage = "";
-  //     }
+      if (this.testOrders?.length === 0) {
+        this.errorMessage = "No test has been selected";
+      } else {
+        this.errorMessage = "";
+      }
 
-  //     if (this.groupedTestOrdersByDepartments?.length === 0) {
-  //       this.errorMessage = "Test missing lab section";
-  //     } else {
-  //       this.errorMessage = "";
-  //     }
-  //   }
+      if (this.groupedTestOrdersByDepartments?.length === 0) {
+        this.errorMessage = "Test missing lab section";
+      } else {
+        this.errorMessage = "";
+      }
+    }
 
-  //   onFormUpdateForAgency(formValues: FormValue): void {
-  //     this.formData = { ...this.formData, ...formValues.getValues() };
-  //   }
+    onFormUpdateForAgency(formValues: FormValue): void {
+      this.formData = { ...this.formData, ...formValues.getValues() };
+    }
 
-  //   onFormUpdateForLab(formValues: FormValue): void {
-  //     this.formData = { ...this.formData, ...formValues.getValues() };
-  //   }
+    onFormUpdateForLab(formValues: FormValue): void {
+      this.formData = { ...this.formData, ...formValues.getValues() };
+    }
 
-  //   onGetSampleLabel(sampleLabel: string): void {
-  //     this.currentSampleLabel = sampleLabel;
-  //   }
+    onGetSampleLabel(sampleLabel: string): void {
+      this.currentSampleLabel = sampleLabel;
+    }
 
-  //   onGetSelectedOptionDetails(details): void {
-  //     this.formData = { ...this.formData, ...details };
-  //   }
+    onGetSelectedOptionDetails(details): void {
+      this.formData = { ...this.formData, ...details };
+    }
 
-  //   onGetPersonDetails(personDetails: any): void {
-  //     this.personDetailsData =
-  //       this.registrationCategory === "CLINICAL"
-  //         ? personDetails
-  //         : this.registrationCategory === "EQA"
-  //         ? EQA_PERSON_DATA
-  //         : NON_CLINICAL_PERSON_DATA;
-  //     if (this.fromExternalSystem && this.selectedSystem) {
-  //       // console.log(
-  //       //   "this.testsFromExternalSystemsConfigs",
-  //       //   this.testsFromExternalSystemsConfigs
-  //       // );
-  //       // console.log(this.selectedSystem);
-  //       // console.log(
-  //       //   this.testsFromExternalSystemsConfigs.filter(
-  //       //     (testConfigs) =>
-  //       //       testConfigs?.referenceKeyPart ===
-  //       //       this.selectedSystem?.testsSearchingKey
-  //       //   ) || []
-  //       // );
-  //       const uuid = (this.testsFromExternalSystemsConfigs.filter(
-  //         (testConfigs) =>
-  //           testConfigs?.referenceKeyPart ===
-  //           this.selectedSystem?.testsSearchingKey
-  //       ) || [])[0]?.value;
-  //       this.testsUnderSpecimen$ = this.conceptService
-  //         .getConceptDetailsByUuid(uuid, "custom:(uuid,display)")
-  //         .pipe(map((response) => [response]));
-  //     }
-  //   }
+    onGetPersonDetails(personDetails: any): void {
+      this.personDetailsData =
+        this.registrationCategory === "CLINICAL"
+          ? personDetails
+          : this.registrationCategory === "EQA"
+          ? EQA_PERSON_DATA
+          : NON_CLINICAL_PERSON_DATA;
+      if (this.fromExternalSystem && this.selectedSystem) {
+        const uuid = (this.testsFromExternalSystemsConfigs.filter(
+          (testConfigs) =>
+            testConfigs?.referenceKeyPart ===
+            this.selectedSystem?.testsSearchingKey
+        ) || [])[0]?.value;
+        this.testsUnderSpecimen$ = this.conceptService
+          .getConceptDetailsByUuid(uuid, "custom:(uuid,display)")
+          .pipe(map((response) => [response]));
+      }
+    }
 
-  //   formatToSpecifiedChars(labNumber): string {
-  //     let generatedStr = "";
-  //     for (
-  //       let count = 0;
-  //       count <
-  //       Number(this.labNumberCharactersCount) -
-  //         (labNumber.toString()?.length + 6);
-  //       count++
-  //     ) {
-  //       generatedStr = generatedStr + "0";
-  //     }
-  //     return (
-  //       new Date().getFullYear().toString() +
-  //       new Date().getMonth().toString() +
-  //       generatedStr +
-  //       labNumber.toString()
-  //     );
-  //   }
+    formatToSpecifiedChars(labNumber): string {
+      let generatedStr = "";
+      for (
+        let count = 0;
+        count <
+        Number(this.labNumberCharactersCount) -
+          (labNumber.toString()?.length + 6);
+        count++
+      ) {
+        generatedStr = generatedStr + "0";
+      }
+      return (
+        new Date().getFullYear().toString() +
+        new Date().getMonth().toString() +
+        generatedStr +
+        labNumber.toString()
+      );
+    }
 
-  //   onGetClinicalDataValues(clinicalData): void {
-  //     this.formData = { ...this.formData, ...clinicalData };
-  //   }
+    onGetClinicalDataValues(clinicalData): void {
+      this.formData = { ...this.formData, ...clinicalData };
+    }
 
   onSave(event: Event, labLocations?: any[]): void {
     event.stopPropagation();
@@ -1147,6 +1138,9 @@ export class SampleInBatchRegistrationComponent implements OnInit {
                                                                         };
                                                                       }
                                                                     ),
+                                                                  batch: {
+                                                                    uuid: this.batch?.uuid
+                                                                  }
                                                                 };
                                                                 // Create sample
                                                                 this.samplesService
@@ -1710,6 +1704,10 @@ export class SampleInBatchRegistrationComponent implements OnInit {
                                                                                   .afterClosed()
                                                                                   .subscribe(
                                                                                     () => {
+                                                                                      this.dynamicFields = []
+                                                                                      setTimeout(() => {
+                                                                                        this.assignFields();
+                                                                                      }, 100)
                                                                                       this.openBarCodeDialog(
                                                                                         data
                                                                                       );
@@ -1843,28 +1841,6 @@ export class SampleInBatchRegistrationComponent implements OnInit {
         }
       }
     });
-  }
-
-  toggleFieldSet(fieldName: string) {
-    switch (fieldName) {
-      case "sampleInformation":
-        this.sampleInformation = !this.sampleInformation;
-        break;
-      case "clinicalData":
-        this.clinicalData = !this.clinicalData;
-        break;
-      case "referingDoctor":
-        this.referingDoctor = !this.referingDoctor;
-        break;
-      case "broughtBy":
-        this.broughtBy = !this.broughtBy;
-        break;
-      case "tests":
-        this.tests = !this.tests;
-        break;
-      default:
-        break;
-    }
   }
 
   isValidTime(

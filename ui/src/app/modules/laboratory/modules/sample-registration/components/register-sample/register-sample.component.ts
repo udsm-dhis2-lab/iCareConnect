@@ -94,7 +94,6 @@ export class RegisterSampleComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-
     this.currentUser$ = this.store.select(getCurrentUserDetails);
 
     this.store.dispatch(
@@ -118,11 +117,13 @@ export class RegisterSampleComponent implements OnInit {
       id: this.LISConfigurations?.agencyConceptUuid,
     });
 
-    this.batchsets$ = this.samplesService.getBatchsets().pipe(map((response) => {
-      if(!response?.error){
-        return response
-      }
-    }));
+    this.batchsets$ = this.samplesService.getBatchsets().pipe(
+      map((response) => {
+        if (!response?.error) {
+          return response;
+        }
+      })
+    );
     this.batches$ = this.samplesService.getBatches().pipe(
       map((response) => {
         if (!response?.error) {
@@ -165,6 +166,11 @@ export class RegisterSampleComponent implements OnInit {
   setTabGroup(event: Event, group: string): void {
     event.stopPropagation();
     this.selectedTabGroup = group;
+  }
+
+  onReloadRegisterSample(eventData: any){
+      this.ngOnInit()
+      this.selectedTabGroup = eventData?.fromKey;
   }
 
   initializeRegistrationFields() {
@@ -436,7 +442,7 @@ export class RegisterSampleComponent implements OnInit {
         conceptClass: "Test",
         multiple: true,
         shouldHaveLiveSearchForDropDownFields: true,
-      })
+      }),
     };
 
     this.allRegistrationFields = {
@@ -446,7 +452,7 @@ export class RegisterSampleComponent implements OnInit {
       patientAgeFields: this.patientAgeFields,
       personFieldsGroupThree: this.personFieldsGroupThree,
       clinicalFormFields: this.clinicalFormFields,
-      testFields: this.testFields
+      testFields: this.testFields,
     };
   }
 }

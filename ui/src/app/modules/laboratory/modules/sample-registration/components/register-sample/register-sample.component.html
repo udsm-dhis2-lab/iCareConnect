@@ -113,6 +113,7 @@
             [allRegistrationFields]="allRegistrationFields | createLabFields: params?.referringDoctorAttributes : params?.agencyConceptConfigs : params?.referFromFacilityVisitAttribute : params?.identifierTypes"
             [existingBatchsets]="params?.batchsets"
             [existingBatches]="params?.batches"
+            (reloadRegisterSample)="onReloadRegisterSample($event)"
           ></app-batch-registration>
         </div>
       </div>
