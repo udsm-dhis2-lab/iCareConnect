@@ -108,6 +108,7 @@ public class Worksheet extends BaseChangeableOpenmrsMetadata implements java.io.
 		worksheetObject.put("rows",this.getRows());
 		worksheetObject.put("columns",this.getColumns());
 		worksheetObject.put("name",this.getName());
+		worksheetObject.put("uuid",this.getUuid());
 
 		Map<String,Object> testOrderObject = new HashMap<>();
 		testOrderObject.put("uuid",this.getTestOrder().getUuid());

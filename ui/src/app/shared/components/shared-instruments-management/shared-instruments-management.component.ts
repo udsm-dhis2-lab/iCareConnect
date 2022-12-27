@@ -13,6 +13,7 @@ export class SharedInstrumentsManagementComponent implements OnInit {
   conceptClass: string = "LIS instrument";
   conceptSources$: Observable<any[]>;
   conceptToEdit$: Observable<any>;
+  showList: boolean = false;
 
   constructor(
     private conceptService: ConceptsService,
@@ -21,9 +22,19 @@ export class SharedInstrumentsManagementComponent implements OnInit {
 
   ngOnInit(): void {
     this.conceptSources$ = this.conceptSourceService.getConceptSources();
+    this.showList = true;
   }
 
   onEditInstrument(event: any): void {
     console.log(event);
+  }
+
+  onGetConceptCreatedStatus(created: boolean): void {
+    if (created) {
+      this.showList = false;
+      setTimeout(() => {
+        this.showList = true;
+      }, 100);
+    }
   }
 }

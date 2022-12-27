@@ -1,0 +1,51 @@
+<div
+  class="row"
+  *ngIf="{ worksheetDefinitions: worksheetDefinitions$ | async } as params"
+>
+  <div class="col-md-8">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>SN</th>
+          <th>Code</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <ng-container
+          *ngIf="
+            params?.worksheetDefinitions &&
+            params?.worksheetDefinitions?.length > 0
+          "
+        >
+          <tr
+            *ngFor="
+              let worksheetDefinition of params?.worksheetDefinitions;
+              let count = index
+            "
+          >
+            <td>
+              {{ count + 1 }}
+            </td>
+            <td>
+              {{ worksheetDefinition?.code }}
+            </td>
+            <td></td>
+          </tr>
+        </ng-container>
+        <ng-container
+          *ngIf="
+            params?.worksheetDefinitions &&
+            params?.worksheetDefinitions?.length === 0
+          "
+        ></ng-container>
+      </tbody>
+    </table>
+  </div>
+  <div class="col-md-4">
+    <app-form
+      [fields]="worksheetDefinitionFields"
+      (formUpdate)="onGetFormData($event)"
+    ></app-form>
+  </div>
+</div>
