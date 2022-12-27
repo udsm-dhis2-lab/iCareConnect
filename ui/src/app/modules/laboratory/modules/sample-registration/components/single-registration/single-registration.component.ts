@@ -35,6 +35,7 @@ import { SharedConfirmationComponent } from "src/app/shared/components/shared-co
 import { Store } from "@ngrx/store";
 import { AppState } from "src/app/store/reducers";
 import { getLocationsByIds } from "src/app/store/selectors";
+import { formatDateToYYMMDD } from "src/app/shared/helpers/format-date.helper";
 
 @Component({
   selector: "app-single-registration",
@@ -1905,20 +1906,24 @@ export class SingleRegistrationComponent implements OnInit {
       dataValues: [
         {
           dataElement: "Q98LhagGLFj",
-          value: new Date(
-            this.getTimestampFromDateAndTime(
-              this.receivedOnDateLatestValue,
-              this.receivedOnTime
+          value: this.formatDateAndTime(
+            new Date(
+              this.getTimestampFromDateAndTime(
+                this.receivedOnDateLatestValue,
+                this.receivedOnTime
+              )
             )
-          ).toISOString(),
+          ),
         },
         { dataElement: "D0RBm3alWd9", value: "RT - PCR" },
         {
           dataElement: "RfWBPHo9MnC",
-          value: new Date(
-            this.getTimestampFromDateAndTime(
-              this.broughtOnDateLatestValue,
-              this.broughtOnTime
+          value: this.formatDateAndTime(
+            new Date(
+              this.getTimestampFromDateAndTime(
+                this.receivedOnDateLatestValue,
+                this.receivedOnTime
+              )
             )
           ),
         },
@@ -1927,11 +1932,24 @@ export class SingleRegistrationComponent implements OnInit {
       ],
       eventDate: new Date(
         this.getTimestampFromDateAndTime(
-          this.broughtOnDateLatestValue,
-          this.broughtOnTime
+          this.receivedOnDateLatestValue,
+          this.receivedOnTime
         )
-      ).toISOString(),
+      ),
     };
     return this.labRequestPayload;
+  }
+
+  formatDateAndTime(date: Date): string {
+    return (
+      formatDateToYYMMDD(date) +
+      "T" +
+      date.getHours() +
+      ":" +
+      date.getMinutes() +
+      ":" +
+      date.getSeconds() +
+      ".000Z"
+    );
   }
 }
