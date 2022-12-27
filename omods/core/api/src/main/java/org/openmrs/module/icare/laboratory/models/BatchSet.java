@@ -32,7 +32,7 @@ public class BatchSet extends BaseOpenmrsData implements java.io.Serializable, J
 	
 	@Column(name = "fields", length = 100000)
 	private String fields;
-
+	
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "batchSet")
 	private List<Batch> batches = new ArrayList<Batch>(0);
 	
@@ -78,15 +78,15 @@ public class BatchSet extends BaseOpenmrsData implements java.io.Serializable, J
 	public String getFields() {
 		return fields;
 	}
-
+	
 	public List<Batch> getBatches() {
 		return batches;
 	}
-
+	
 	public void setBatches(List<Batch> batches) {
 		this.batches = batches;
 	}
-
+	
 	public static BatchSet fromMap(Map<String, Object> batchSetMap) {
 		
 		BatchSet batchSet = new BatchSet();
