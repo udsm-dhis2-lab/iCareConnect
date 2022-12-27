@@ -727,16 +727,16 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		MockHttpServletRequest newPostRequest = newPostRequest("lab/worksheetcontrols", worksheetObject);
 		MockHttpServletResponse handle = handle(newPostRequest);
 		List<Map<String, Object>> createdbatchSets = (new ObjectMapper()).readValue(handle.getContentAsString(), List.class);
-
+		
 		assertThat("created 2 worksheets", createdbatchSets.size(), is(2));
-
+		
 		//2. Getting batchSets
 		//When
 		MockHttpServletRequest newGetRequest = newGetRequest("lab/worksheetcontrols");
 		MockHttpServletResponse handle2 = handle(newGetRequest);
 		
 		List<Map<String, Object>> batches = (new ObjectMapper()).readValue(handle2.getContentAsString(), List.class);
-
+		
 		System.out.println(batches);
 		
 		assertThat("Has 1 worksheet control", batches.size(), is(1));
