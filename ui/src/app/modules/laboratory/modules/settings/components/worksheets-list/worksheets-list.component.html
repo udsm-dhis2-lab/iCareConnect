@@ -22,10 +22,18 @@
             <td>
               {{ count + 1 }}
             </td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
+            <td>
+              {{ worksheet?.name }}
+            </td>
+            <td>
+              {{ worksheet?.code }}
+            </td>
+            <td>
+              {{ worksheet?.rows }}
+            </td>
+            <td>
+              {{ worksheet?.columns }}
+            </td>
           </tr>
         </ng-container>
         <ng-container
