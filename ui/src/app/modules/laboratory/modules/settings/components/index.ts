@@ -8,6 +8,7 @@ import { ConceptSetMembersSelectionComponent } from "./concept-set-members-selec
 import { ConceptSetMembersComponent } from "./concept-set-members/concept-set-members.component";
 import { ConceptSourcesComponent } from "./concept-sources/concept-sources.component";
 import { ConfigsComponent } from "./configs/configs.component";
+import { CreateWorksheetComponent } from "./create-worksheet/create-worksheet.component";
 import { LabConfigurationsComponent } from "./lab-configurations/lab-configurations.component";
 import { LabEditUserModalComponent } from "./lab-edit-user-modal/lab-edit-user-modal.component";
 import { LabOrdersManagementDashboardComponent } from "./lab-orders-management-dashboard/lab-orders-management-dashboard.component";
@@ -25,6 +26,9 @@ import { TestMethodsComponent } from "./test-methods/test-methods.component";
 import { TestsControlComponent } from "./tests-control/tests-control.component";
 import { UserManagementDashboardComponent } from "./user-management-dashboard/user-management-dashboard.component";
 import { UsersListComponent } from "./users-list/users-list.component";
+import { WorksheetConfigurationComponent } from "./worksheet-configuration/worksheet-configuration.component";
+import { WorksheetControlsComponent } from "./worksheet-controls/worksheet-controls.component";
+import { WorksheetsListComponent } from "./worksheets-list/worksheets-list.component";
 
 export const components: any[] = [
   LabOrdersManagementComponent,
@@ -54,6 +58,10 @@ export const components: any[] = [
   SharedPriceListComponent,
   LabEditUserModalComponent,
   ManageConceptAttributesComponent,
+  CreateWorksheetComponent,
+  WorksheetsListComponent,
+  WorksheetConfigurationComponent,
+  WorksheetControlsComponent,
 ];
 
 export const entrySettingComponents: any[] = [

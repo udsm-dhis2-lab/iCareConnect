@@ -33,6 +33,7 @@ import { SharedConfirmationComponent } from "src/app/shared/components/shared-co
 import { Store } from "@ngrx/store";
 import { AppState } from "src/app/store/reducers";
 import { getLocationsByIds } from "src/app/store/selectors";
+import { formatDateToYYMMDD } from "src/app/shared/helpers/format-date.helper";
 
 @Component({
   selector: "app-single-registration",
@@ -1817,6 +1818,7 @@ export class SingleRegistrationComponent implements OnInit {
   }
 
   createLabRequestPayload(data): any {
+    // TODO:Softcode program stage ID
     this.labRequestPayload = {
       program: data?.program,
       programStage: "emVt37lHjub",
@@ -1824,14 +1826,52 @@ export class SingleRegistrationComponent implements OnInit {
       trackedEntityInstance: data?.trackedEntityInstance,
       enrollment: data?.enrollment,
       dataValues: [
-        { dataElement: "Q98LhagGLFj", value: new Date().toISOString() },
+        {
+          dataElement: "Q98LhagGLFj",
+          value: this.formatDateAndTime(
+            new Date(
+              this.getTimestampFromDateAndTime(
+                this.receivedOnDateLatestValue,
+                this.receivedOnTime
+              )
+            )
+          ),
+        },
         { dataElement: "D0RBm3alWd9", value: "RT - PCR" },
-        { dataElement: "RfWBPHo9MnC", value: new Date() },
+        {
+          dataElement: "RfWBPHo9MnC",
+          value: this.formatDateAndTime(
+            new Date(
+              this.getTimestampFromDateAndTime(
+                this.receivedOnDateLatestValue,
+                this.receivedOnTime
+              )
+            )
+          ),
+        },
         { dataElement: "HTBFvtjeztu", value: true },
         { dataElement: "xzuzLYN1f0J", value: true },
       ],
-      eventDate: new Date().toISOString(),
+      eventDate: new Date(
+        this.getTimestampFromDateAndTime(
+          this.receivedOnDateLatestValue,
+          this.receivedOnTime
+        )
+      ),
     };
     return this.labRequestPayload;
+  }
+
+  formatDateAndTime(date: Date): string {
+    return (
+      formatDateToYYMMDD(date) +
+      "T" +
+      date.getHours() +
+      ":" +
+      date.getMinutes() +
+      ":" +
+      date.getSeconds() +
+      ".000Z"
+    );
   }
 }
