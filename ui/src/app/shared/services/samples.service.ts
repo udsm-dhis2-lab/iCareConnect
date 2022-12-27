@@ -500,8 +500,17 @@ export class SamplesService {
       })
     );
   }
-  getBatches(): Observable<any> {
-    return this.httpClient.get(BASE_URL + "lab/batches").pipe(
+  getBatches(startDate?: string, endDate?: string, q?: string): Observable<any> {
+    let startDateParam = startDate?.length ? `?startDate=${startDate}` : ""; 
+    let endDateParam = endDate?.length && startDateParam.length ? `&endDate=${endDate}` : endDate?.length ? `&endDate=${endDate}` :""; 
+    let qParam =
+      q?.length && (startDateParam.length || endDateParam.length)
+        ? `&q=${q}`
+        : q?.length
+        ? `?q=${q}`
+        : ""; 
+    const queryParams = startDateParam + endDateParam + qParam; 
+    return this.httpClient.get(BASE_URL + "lab/batches" + queryParams).pipe(
       map((response) => {
         return response;
       }),

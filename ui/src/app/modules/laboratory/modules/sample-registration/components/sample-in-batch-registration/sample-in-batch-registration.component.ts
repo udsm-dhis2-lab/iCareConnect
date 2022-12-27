@@ -27,7 +27,7 @@ import { uniqBy, keyBy, omit } from "lodash";
 import { OrdersService } from "src/app/shared/resources/order/services/orders.service";
 import { SampleRegistrationFinalizationComponent } from "../sample-registration-finalization/sample-registration-finalization.component";
 import { ConceptsService } from "src/app/shared/resources/concepts/services/concepts.service";
-import { map } from "rxjs/operators";
+import { map, tap } from "rxjs/operators";
 import { OtherClientLevelSystemsService } from "src/app/modules/laboratory/resources/services/other-client-level-systems.service";
 import { SharedConfirmationComponent } from "src/app/shared/components/shared-confirmation /shared-confirmation.component";
 import { Store } from "@ngrx/store";
@@ -132,6 +132,7 @@ export class SampleInBatchRegistrationComponent implements OnInit {
   fieldsWithValues: any = {};
   fieldWithValuesChanged: boolean = false;
   samplesCreated: any[] = [];
+  getBatch: any;
 
   constructor(
     private samplesService: SamplesService,
@@ -234,6 +235,11 @@ export class SampleInBatchRegistrationComponent implements OnInit {
   }
 
   assignFields() {
+    this.samplesService.getBatches(null, null, this.batch?.name).pipe(tap((response) => {
+      if(!response?.error){
+        this.getBatch = response;
+      }
+    })).subscribe()
     this.fixedFields = this.fieldsObject?.fixedFieldsWithValues;
     this.staticFields = this.fieldsObject?.staticFieldsWithValues;
     this.dynamicFields = this.fieldsObject?.dynamicFields;
@@ -1705,6 +1711,7 @@ export class SampleInBatchRegistrationComponent implements OnInit {
                                                                                   .subscribe(
                                                                                     () => {
                                                                                       this.dynamicFields = []
+                                                                                      this.getBatch = undefined;
                                                                                       setTimeout(() => {
                                                                                         this.assignFields();
                                                                                       }, 100)
