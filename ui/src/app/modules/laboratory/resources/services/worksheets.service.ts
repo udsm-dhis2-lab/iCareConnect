@@ -23,4 +23,18 @@ export class WorkSeetsService {
       catchError((error) => of(error))
     );
   }
+
+  createWorksheetControls(data: any): Observable<any> {
+    return this.httpClient.post(`lab/worksheetcontrols`, data).pipe(
+      map((response) => response),
+      catchError((error) => of(error))
+    );
+  }
+
+  getWorksheetControls(): Observable<any[]> {
+    return this.httpClient.get(`lab/worksheetcontrols`).pipe(
+      map((response) => response),
+      catchError((error) => of(error))
+    );
+  }
 }
