@@ -69,6 +69,7 @@ export class WorksheetControlsComponent implements OnInit {
     this.worksheetControlPayload = {
       name: values?.name?.value,
       code: values?.code?.value,
+      description: values?.description?.value,
       testorder: {
         uuid: values?.testorder?.value,
       },

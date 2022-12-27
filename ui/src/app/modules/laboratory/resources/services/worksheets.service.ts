@@ -37,4 +37,11 @@ export class WorkSeetsService {
       catchError((error) => of(error))
     );
   }
+
+  getWorksheetDefinitions(): Observable<any[]> {
+    return this.httpClient.get(`lab/worksheetdefinitions`).pipe(
+      map((response) => response),
+      catchError((error) => of(error))
+    );
+  }
 }
