@@ -27,20 +27,20 @@ import { uniqBy, keyBy, omit } from "lodash";
 import { OrdersService } from "src/app/shared/resources/order/services/orders.service";
 import { SampleRegistrationFinalizationComponent } from "../sample-registration-finalization/sample-registration-finalization.component";
 import { ConceptsService } from "src/app/shared/resources/concepts/services/concepts.service";
-import { map } from "rxjs/operators";
+import { map, tap } from "rxjs/operators";
 import { OtherClientLevelSystemsService } from "src/app/modules/laboratory/resources/services/other-client-level-systems.service";
 import { SharedConfirmationComponent } from "src/app/shared/components/shared-confirmation /shared-confirmation.component";
 import { Store } from "@ngrx/store";
 import { AppState } from "src/app/store/reducers";
 import { getLocationsByIds } from "src/app/store/selectors";
-import { formatDateToYYMMDD } from "src/app/shared/helpers/format-date.helper";
+import { isMoment } from "moment";
 
 @Component({
-  selector: "app-single-registration",
-  templateUrl: "./single-registration.component.html",
-  styleUrls: ["./single-registration.component.scss"],
+  selector: "app-sample-in-batch-registration",
+  templateUrl: "./sample-in-batch-registration.component.html",
+  styleUrls: ["./sample-in-batch-registration.component.scss"],
 })
-export class SingleRegistrationComponent implements OnInit {
+export class SampleInBatchRegistrationComponent implements OnInit {
   labSampleLabel$: Observable<string>;
   @Input() mrnGeneratorSourceUuid: string;
   @Input() preferredPersonIdentifier: string;
@@ -53,6 +53,8 @@ export class SingleRegistrationComponent implements OnInit {
   @Input() testsFromExternalSystemsConfigs: any[];
   @Input() currentUser: any;
   @Input() allRegistrationFields: any;
+  @Input() fieldsObject: any;
+  @Input() batch: any;
 
   departmentField: any = {};
   specimenDetailsFields: any;
@@ -123,6 +125,14 @@ export class SingleRegistrationComponent implements OnInit {
   labLocations$: Observable<any>;
   currentLabLocation: any;
   existingFields: any;
+  fixedFields: any[] = [];
+  staticFields: any[] = [];
+  dynamicFields: any[] = [];
+  formDataObject: any = {};
+  fieldsWithValues: any = {};
+  fieldWithValuesChanged: boolean = false;
+  samplesCreated: any[] = [];
+  getBatch: any;
 
   constructor(
     private samplesService: SamplesService,
@@ -143,111 +153,72 @@ export class SingleRegistrationComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.assignFields();
     const userLocationsIds = JSON.parse(
       this.currentUser?.userProperties?.locations
     );
     this.labLocations$ = this.store.select(getLocationsByIds(userLocationsIds));
-    this.labSampleLabel$ = this.samplesService.getSampleLabel();
-    this.referringDoctorFields = Object.keys(
-      this.allRegistrationFields?.referringDoctorFields
-    ).map((key) => {
-      return this.allRegistrationFields?.referringDoctorFields[key];
+    // this.labSampleLabel$ = this.samplesService.getSampleLabel();
+    // this.referringDoctorFields = Object.keys(
+    //   this.allRegistrationFields?.referringDoctorFields
+    // ).map((key) => {
+    //   return this.allRegistrationFields?.referringDoctorFields[key];
+    // });
+    // const currentLocation = JSON.parse(localStorage.getItem("currentLocation"));
+    this.referringDoctorFields;
+    let fields = [
+      ...this.staticFields.map((field) => {
+        return {
+          [field.key]: field.value
+        }
+      }),
+      ...this.fixedFields.map((field) => {
+        return {
+          [field.key]: field.value
+        }
+      })
+    ];
+    fields.forEach((field) => {
+      this.fieldsWithValues = {
+        ...this.fieldsWithValues,
+        ...field
+      }
+    })
+
+    Object.keys(this.allRegistrationFields?.patientAgeFields).forEach((key) => {
+        if(this.fieldsWithValues[key]){
+          this.personDetailsData = {
+            ...this.personDetailsData,
+            [key]: this.fieldsWithValues[key]
+          };
+        }
+      })
+    Object.keys(this.allRegistrationFields?.testFields).forEach((key) => {
+      if (this.fieldsWithValues[key]?.length > 0) {
+        this.testOrders = [
+          ...this.testOrders,
+          ...this.fieldsWithValues[key]?.map((value, index) => {
+            return {
+              id: "test" + index,
+              key: "test" + index,
+              value: value?.uuid,
+            };
+          }),
+        ];
+      }
     });
+    Object.keys(this.allRegistrationFields?.primaryIdentifierFields).forEach(
+      (key) => {
+        if (this.fieldsWithValues[key]) {
+          this.personDetailsData = {
+            ...this.personDetailsData,
+            [key]: this.fieldsWithValues[key]
+          };
+        }
+      }
+    );
 
-    this.specimenDetailsFields = Object.keys(
-      this.allRegistrationFields?.specimenDetailFields
-    ).slice(0, 3)
-      .map((key) => {
-        const field = this.allRegistrationFields?.specimenDetailFields[key];
-        return field
-      });
-
-    // this.specimenDetailsFields = [
-    //   new Dropdown({
-    //     id: "specimen",
-    //     key: "specimen",
-    //     label: "Specimen",
-    //     searchTerm: "SPECIMEN_SOURCE",
-    //     options: [],
-    //     conceptClass: "Specimen",
-    //     searchControlType: "concept",
-    //     shouldHaveLiveSearchForDropDownFields: true,
-    //   }),
-    //   new Dropdown({
-    //     id: "condition",
-    //     key: "condition",
-    //     label: "Condition",
-    //     options: [],
-    //     conceptClass: "condition",
-    //     searchControlType: "concept",
-    //     searchTerm: "SAMPLE_CONDITIONS",
-    //     shouldHaveLiveSearchForDropDownFields: true,
-    //   }),
-    //   new Dropdown({
-    //     id: "agency",
-    //     key: "agency",
-    //     label: "Urgency/Priority",
-    //     options: [],
-    //     conceptClass: "priority",
-    //     searchControlType: "concept",
-    //     searchTerm: "SAMPLE_PRIORITIES",
-    //     shouldHaveLiveSearchForDropDownFields: true,
-    //   }),
-    //   // new Dropdown({
-    //   //   id: "receivinglab",
-    //   //   key: "receivinglab",
-    //   //   label: "Receiving Lab",
-    //   //   options: [],
-    //   //   searchControlType: "concept",
-    //   //   conceptClass: "Lab Department",
-    //   //   shouldHaveLiveSearchForDropDownFields: true,
-    //   // }),
-    //   // new DateField({
-    //   //   id: "receivedOn",
-    //   //   key: "receivedOn",
-    //   //   label: "Received On",
-    //   // }),
-    //   // new Dropdown({
-    //   //   id: "department",
-    //   //   key: "department",
-    //   //   label: "Department",
-    //   //   options: [],
-    //   //   searchControlType: "concept",
-    //   //   conceptClass: "Lab Department",
-    //   //   shouldHaveLiveSearchForDropDownFields: true,
-    //   // }),
-    // ];
-
-    this.receivedOnField = this.allRegistrationFields?.specimenDetailFields?.receivedOn;
-    this.receivedByField = this.allRegistrationFields?.specimenDetailFields?.receivedBy;
-    this.transportCondition = this.allRegistrationFields?.specimenDetailFields?.transportCondition;
-    this.transportationTemperature = this.allRegistrationFields?.specimenDetailFields?.transportationTemperature;
-
-    this.sampleColectionDateField = this.allRegistrationFields?.specimenDetailFields?.collectedOn;
-    this.sampleCollectedByField = this.allRegistrationFields?.specimenDetailFields?.collectedBy;
-    this.broughtOnField = this.allRegistrationFields?.specimenDetailFields?.broughtOn;
-    this.broughtByField = this.allRegistrationFields?.specimenDetailFields?.broughtBy;
-
-    const currentLocation = JSON.parse(localStorage.getItem("currentLocation"));
-    const labsAvailable =
-      currentLocation && currentLocation?.childLocations
-        ? currentLocation?.childLocations
-        : [];
-
-    // this.labFormField = new Dropdown({
-    //   id: "lab",
-    //   key: "lab",
-    //   label: "Receiving Lab",
-    //   options: labsAvailable.map((location) => {
-    //     return {
-    //       key: location?.uuid,
-    //       value: location?.uuid,
-    //       label: location?.display,
-    //       name: location?.display,
-    //     };
-    //   }),
-    //   shouldHaveLiveSearchForDropDownFields: false,
-    // });getSelectedRCollectedOnTime
+    console.log("==> Fields with values: ", this.fieldsWithValues);
   }
 
   get maximumDate() {
@@ -261,6 +232,17 @@ export class SingleRegistrationComponent implements OnInit {
         ? maxDate.getDate()
         : `0${maxDate.getDate()}`;
     return `${maxDate.getFullYear()}-${maxMonth}-${maxDay}`;
+  }
+
+  assignFields() {
+    this.samplesService.getBatches(null, null, this.batch?.name).pipe(tap((response) => {
+      if(!response?.error){
+        this.getBatch = response;
+      }
+    })).subscribe()
+    this.fixedFields = this.fieldsObject?.fixedFieldsWithValues;
+    this.staticFields = this.fieldsObject?.staticFieldsWithValues;
+    this.dynamicFields = this.fieldsObject?.dynamicFields;
   }
 
   getDateStringFromDate(date) {
@@ -280,141 +262,169 @@ export class SingleRegistrationComponent implements OnInit {
     this.patientFieldSetClosed = !this.patientFieldSetClosed;
   }
 
-  getSelection(event: MatRadioChange): void {
-    this.registrationCategory = event?.value;
-  }
+  //   getSelection(event: MatRadioChange): void {
+  //     this.registrationCategory = event?.value;
+  //   }
 
   getTimestampFromDateAndTime(date: string, time: string): number {
     return new Date(`${date} ${time}`).getTime();
   }
 
-  getSelectedReceivedOnTime(event: Event): void {
-    this.receivedOnTime = (event.target as any)?.value;
-    this.receivedOnTimeValid = this.isValidTime(
-      this.receivedOnTime,
-      this.receivedOnDateLatestValue
-        ? this.receivedOnDateLatestValue
-        : this.maximumDate
-    );
-    if (this.collectedOnTime || this.broughtOnTime) {
-      let valid1 = this.isValidTime(
-        this.broughtOnTime ? this.broughtOnTime : this.collectedOnTime,
-        this.broughtOnDateLatestValue
-          ? this.broughtOnDateLatestValue
-          : this?.collectedOnDateLatestValue
-          ? this?.collectedOnDateLatestValue
-          : this.maximumDate,
-        this.receivedOnTime,
-        this.receivedOnDateLatestValue
-          ? this.receivedOnDateLatestValue
-          : this.maximumDate
-      );
+  //   getSelectedReceivedOnTime(event: Event): void {
+  //     this.receivedOnTime = (event.target as any)?.value;
+  //     this.receivedOnTimeValid = this.isValidTime(
+  //       this.receivedOnTime,
+  //       this.receivedOnDateLatestValue
+  //         ? this.receivedOnDateLatestValue
+  //         : this.maximumDate
+  //     );
+  //     if (this.collectedOnTime || this.broughtOnTime) {
+  //       let valid1 = this.isValidTime(
+  //         this.broughtOnTime ? this.broughtOnTime : this.collectedOnTime,
+  //         this.broughtOnDateLatestValue
+  //           ? this.broughtOnDateLatestValue
+  //           : this?.collectedOnDateLatestValue
+  //           ? this?.collectedOnDateLatestValue
+  //           : this.maximumDate,
+  //         this.receivedOnTime,
+  //         this.receivedOnDateLatestValue
+  //           ? this.receivedOnDateLatestValue
+  //           : this.maximumDate
+  //       );
 
-      let valid2 = (this.receivedOnTimeValid = this.isValidTime(
-        this.receivedOnTime,
-        this.receivedOnDateLatestValue
-          ? this.receivedOnDateLatestValue
-          : this.maximumDate
-      ));
-      this.receivedOnTimeValid = valid1 && valid2 ? true : false;
-    }
-    this.formData = {
-      ...this.formData,
-      receivedAt: {
-        value: (event.target as any)?.value,
-        id: "receivedAt",
-        key: "receivedAt",
-      },
-    };
-  }
+  //       let valid2 = (this.receivedOnTimeValid = this.isValidTime(
+  //         this.receivedOnTime,
+  //         this.receivedOnDateLatestValue
+  //           ? this.receivedOnDateLatestValue
+  //           : this.maximumDate
+  //       ));
+  //       this.receivedOnTimeValid = valid1 && valid2 ? true : false;
+  //     }
+  //     this.formData = {
+  //       ...this.formData,
+  //       receivedAt: {
+  //         value: (event.target as any)?.value,
+  //         id: "receivedAt",
+  //         key: "receivedAt",
+  //       },
+  //     };
+  //   }
 
-  getSelectedRCollectedOnTime(event: Event): void {
-    this.collectedOnTime = (event.target as any)?.value;
-    this.collectedOnTimeValid = this.isValidTime(
-      this.collectedOnTime,
-      this.collectedOnDateLatestValue
-        ? this.collectedOnDateLatestValue
-        : this.maximumDate
-    );
-    if (this.broughtOnTime || this.receivedOnTime) {
-      this.collectedOnTimeValid = this.isValidTime(
-        this.collectedOnTime,
-        this.collectedOnDateLatestValue
-          ? this.collectedOnDateLatestValue
-          : this.maximumDate,
-        this.broughtOnTime ? this.broughtOnTime : this.receivedOnTime,
-        this.broughtOnDateLatestValue
-          ? this.broughtOnDateLatestValue
-          : this?.receivedOnDateLatestValue
-      );
-    }
-    this.formData = {
-      ...this.formData,
-      collectedAt: {
-        value: (event.target as any)?.value,
-        id: "collectedAt",
-        key: "collectedAt",
-      },
-    };
-  }
+  //   getSelectedRCollectedOnTime(event: Event): void {
+  //     this.collectedOnTime = (event.target as any)?.value;
+  //     this.collectedOnTimeValid = this.isValidTime(
+  //       this.collectedOnTime,
+  //       this.collectedOnDateLatestValue
+  //         ? this.collectedOnDateLatestValue
+  //         : this.maximumDate
+  //     );
+  //     if (this.broughtOnTime || this.receivedOnTime) {
+  //       this.collectedOnTimeValid = this.isValidTime(
+  //         this.collectedOnTime,
+  //         this.collectedOnDateLatestValue
+  //           ? this.collectedOnDateLatestValue
+  //           : this.maximumDate,
+  //         this.broughtOnTime ? this.broughtOnTime : this.receivedOnTime,
+  //         this.broughtOnDateLatestValue
+  //           ? this.broughtOnDateLatestValue
+  //           : this?.receivedOnDateLatestValue
+  //       );
+  //     }
+  //     this.formData = {
+  //       ...this.formData,
+  //       collectedAt: {
+  //         value: (event.target as any)?.value,
+  //         id: "collectedAt",
+  //         key: "collectedAt",
+  //       },
+  //     };
+  //   }
 
-  getSelectedBroughtOnTime(event: Event): void {
-    this.broughtOnTime = (event.target as any)?.value;
-    let valid1: boolean = true;
-    let valid2: boolean = true;
-    let valid3: boolean = true;
-    let valid4: boolean = true;
-    valid1 = this.isValidTime(
-      this.broughtOnTime,
-      this.broughtOnDateLatestValue
-        ? this.broughtOnDateLatestValue
-        : this.maximumDate
-    );
+  //   getSelectedBroughtOnTime(event: Event): void {
+  //     this.broughtOnTime = (event.target as any)?.value;
+  //     let valid1: boolean = true;
+  //     let valid2: boolean = true;
+  //     let valid3: boolean = true;
+  //     let valid4: boolean = true;
+  //     valid1 = this.isValidTime(
+  //       this.broughtOnTime,
+  //       this.broughtOnDateLatestValue
+  //         ? this.broughtOnDateLatestValue
+  //         : this.maximumDate
+  //     );
 
-    if (this.receivedOnTime) {
-      valid2 = this.isValidTime(
-        this.broughtOnTime,
-        this.broughtOnDateLatestValue
-          ? this.broughtOnDateLatestValue
-          : this.maximumDate,
-        this.receivedOnTime,
-        this.receivedOnDateLatestValue
-          ? this.receivedOnDateLatestValue
-          : this.maximumDate
-      );
-      valid3 = valid1 && valid2 ? true : false;
-    }
-    if (this.collectedOnTime) {
-      valid4 = this.isValidTime(
-        this.collectedOnTime,
-        this.collectedOnDateLatestValue
-          ? this.collectedOnDateLatestValue
-          : this.maximumDate,
-        this.broughtOnTime,
-        this.broughtOnDateLatestValue
-          ? this.broughtOnDateLatestValue
-          : this.maximumDate
-      );
-    }
-    this.broughtOnTimeValid = valid1 && valid2 && valid3 && valid4;
-    this.formData = {
-      ...this.formData,
-      broughtAt: {
-        value: (event.target as any)?.value,
-        id: "broughtAt",
-        key: "broughtAt",
-      },
-    };
-  }
+  //     if (this.receivedOnTime) {
+  //       valid2 = this.isValidTime(
+  //         this.broughtOnTime,
+  //         this.broughtOnDateLatestValue
+  //           ? this.broughtOnDateLatestValue
+  //           : this.maximumDate,
+  //         this.receivedOnTime,
+  //         this.receivedOnDateLatestValue
+  //           ? this.receivedOnDateLatestValue
+  //           : this.maximumDate
+  //       );
+  //       valid3 = valid1 && valid2 ? true : false;
+  //     }
+  //     if (this.collectedOnTime) {
+  //       valid4 = this.isValidTime(
+  //         this.collectedOnTime,
+  //         this.collectedOnDateLatestValue
+  //           ? this.collectedOnDateLatestValue
+  //           : this.maximumDate,
+  //         this.broughtOnTime,
+  //         this.broughtOnDateLatestValue
+  //           ? this.broughtOnDateLatestValue
+  //           : this.maximumDate
+  //       );
+  //     }
+  //     this.broughtOnTimeValid = valid1 && valid2 && valid3 && valid4;
+  //     this.formData = {
+  //       ...this.formData,
+  //       broughtAt: {
+  //         value: (event.target as any)?.value,
+  //         id: "broughtAt",
+  //         key: "broughtAt",
+  //       },
+  //     };
+  //   }
 
   onFormUpdate(formValues: FormValue, itemKey?: string): void {
     //Validate Date fields
     this.formData = { ...this.formData, ...formValues.getValues() };
-    if (formValues.getValues()?.collectedOn?.value.toString()?.length > 0) {
+    if (
+      formValues.getValues()?.collectedOn?.value.toString()?.length > 0 ||
+      this.fixedFields.filter((field) => {
+        if (field?.id === "collectedOn") {
+          return field.value;
+        }
+      }).length ||
+      this.staticFields.filter((field) => {
+        if (field?.id === "collectedOn") {
+          return field.value;
+        }
+      }).length
+    ) {
       let collected_on_date;
-      collected_on_date = this.getDateStringFromDate(
-        new Date(formValues.getValues()?.collectedOn?.value)
-      );
+      collected_on_date = formValues.getValues()?.collectedOn?.value
+        ? this.getDateStringFromDate(
+            new Date(formValues.getValues()?.collectedOn?.value)
+          )
+        : this.fixedFields.filter((field) => {
+            if (field?.id === "collectedOn") {
+              return field.value;
+            }
+          }).length > 0
+        ? this.fixedFields.filter((field) => {
+            if (field?.id === "collectedOn") {
+              return field.value;
+            }
+          })[0]
+        : this.staticFields.filter((field) => {
+            if (field?.id === "collectedOn") {
+              return field.value;
+            }
+          })[0];
       this.collectedOnDateLatestValue = collected_on_date;
       this.collectedOnTimeValid = this.isValidTime(
         this.collectedOnTime,
@@ -423,11 +433,39 @@ export class SingleRegistrationComponent implements OnInit {
           : this.maximumDate
       );
     }
-    if (formValues.getValues()?.receivedOn?.value?.toString()?.length > 0) {
+    if (
+      formValues.getValues()?.receivedOn?.value?.toString()?.length > 0 ||
+      this.fixedFields.filter((field) => {
+        if (field?.id === "receivedOn") {
+          return field.value;
+        }
+      }).length ||
+      this.staticFields.filter((field) => {
+        if (field?.id === "receivedOn") {
+          return field.value;
+        }
+      }).length
+    ) {
       let received_on_date;
-      received_on_date = this.getDateStringFromDate(
-        new Date(formValues.getValues()?.receivedOn?.value)
-      );
+      received_on_date = formValues.getValues()?.receivedOn?.value
+        ? this.getDateStringFromDate(
+            new Date(formValues.getValues()?.receivedOn?.value)
+          )
+        : this.fixedFields.filter((field) => {
+            if (field?.id === "receivedOn") {
+              return field.value;
+            }
+          }).length > 0
+        ? this.fixedFields.filter((field) => {
+            if (field?.id === "receivedOn") {
+              return field.value;
+            }
+          })[0]
+        : this.staticFields.filter((field) => {
+            if (field?.id === "receivedOn") {
+              return field.value;
+            }
+          })[0];
       this.receivedOnDateLatestValue = received_on_date;
       this.receivedOnTimeValid = this.isValidTime(
         this.receivedOnTime,
@@ -436,11 +474,39 @@ export class SingleRegistrationComponent implements OnInit {
           : this.maximumDate
       );
     }
-    if (formValues.getValues()?.broughtOn?.value.toString()?.length > 0) {
+    if (
+      formValues.getValues()?.broughtOn?.value.toString()?.length > 0 ||
+      this.fixedFields.filter((field) => {
+        if (field?.id === "broughtOn") {
+          return field.value;
+        }
+      }).length ||
+      this.staticFields.filter((field) => {
+        if (field?.id === "broughtOn") {
+          return field.value;
+        }
+      }).length
+    ) {
       let brought_on_date;
-      brought_on_date = this.getDateStringFromDate(
-        new Date(formValues.getValues()?.broughtOn?.value)
-      );
+      brought_on_date = formValues.getValues()?.broughtOn?.value
+        ? this.getDateStringFromDate(
+            new Date(formValues.getValues()?.broughtOn?.value)
+          )
+        : this.fixedFields.filter((field) => {
+            if (field?.id === "broughtOn") {
+              return field.value;
+            }
+          }).length > 0
+        ? this.fixedFields.filter((field) => {
+            if (field?.id === "broughtOn") {
+              return field.value;
+            }
+          })[0]
+        : this.staticFields.filter((field) => {
+            if (field?.id === "broughtOn") {
+              return field.value;
+            }
+          })[0];
       this.broughtOnDateLatestValue = brought_on_date;
       this.broughtOnTimeValid = this.isValidTime(
         this.broughtOnTime,
@@ -451,149 +517,203 @@ export class SingleRegistrationComponent implements OnInit {
     }
 
     this.minForReceivedOn = false;
-    this.receivedOnField.min = this.broughtOnDateLatestValue
-      ? this.broughtOnDateLatestValue
-      : this.collectedOnDateLatestValue;
-    this.broughtOnField.min = this.collectedOnDateLatestValue
-      ? this.collectedOnDateLatestValue
-      : "";
+    if (this.receivedOnField?.min){
+      this.receivedOnField.min = this.broughtOnDateLatestValue
+        ? this.broughtOnDateLatestValue
+        : this.collectedOnDateLatestValue;
+    }
+    if (this.broughtOnField?.min){
+      this.broughtOnField.min = this.collectedOnDateLatestValue
+        ? this.collectedOnDateLatestValue
+        : "";
+    }
     this.minForReceivedOn = true;
 
     this.maxForCollectedOn = false;
-    this.sampleColectionDateField.max = this.broughtOnDateLatestValue
-      ? this.broughtOnDateLatestValue
-      : this.receivedOnDateLatestValue
-      ? this.receivedOnDateLatestValue
-      : this.maximumDate;
-    this.broughtOnField.max = this.receivedOnDateLatestValue
-      ? this.receivedOnDateLatestValue
-      : this.maximumDate;
+    if (this.sampleColectionDateField?.max){
+      this.sampleColectionDateField.max = this.broughtOnDateLatestValue
+        ? this.broughtOnDateLatestValue
+        : this.receivedOnDateLatestValue
+        ? this.receivedOnDateLatestValue
+        : this.maximumDate;
+    }
+    if (this.broughtOnField?.max){
+      this.broughtOnField.max = this.receivedOnDateLatestValue
+        ? this.receivedOnDateLatestValue
+        : this.maximumDate;
+    }
     this.maxForCollectedOn = true;
 
     // this.getDateStringFromMoment_i();
     if (
-      itemKey &&
-      itemKey === "specimenDetails" &&
-      this.selectedSpecimenUuid !== this.formData["specimen"]?.value
+      this.formData["specimen"]?.value
     ) {
       this.selectedSpecimenUuid = this.formData["specimen"]?.value;
-      this.testsUnderSpecimen$ =
-        this.labTestsService.getSetMembersByConceptUuid(
-          this.selectedSpecimenUuid
-        );
+    } else {
+      this.selectedSpecimenUuid = this.fieldsWithValues['specimen'];
     }
-  }
-
-  onFormUpdateForTest(testValues: any): void {
     Object.keys(this.formData).forEach((key) => {
-      if (!testValues[key] && key?.indexOf("test") > -1) {
-        this.formData = omit(this.formData, key);
-      }
-    });
-    this.formData = { ...this.formData, ...testValues };
-    Object.keys(this.formData).forEach((key) => {
-      if (key.indexOf("test") === 0) {
-        this.testOrders = uniqBy(
-          [
+      if(this.allRegistrationFields?.testFields[key] && this.formData[key] && this.formData[key]?.value){
+          this.testOrders = [
             ...this.testOrders,
-            {
-              ...this.formData[key],
-            },
-          ],
-          "id"
-        );
+            ...this.formData[key]?.value?.map((value, index) => {
+                return {
+                  id: "test" + index,
+                  key: "test" + index,
+                  value: value,
+                };
+              })
+          ]
+        }
+      if (
+        (this.allRegistrationFields?.personFields[key] ||
+          this.allRegistrationFields?.patientAgeFields[key] ||
+          this.allRegistrationFields?.personFieldsGroupThree[key]) &&
+        this.formData[key]?.value
+      ) {
+        this.personDetailsData = {
+          ...this.personDetailsData,
+          [key]: this.formData[key]?.value,
+        };
+      }
+
+      if(this.allRegistrationFields?.primaryIdentifierFields[key]){
+        this.personDetailsData = {
+          ...this.personDetailsData,
+          [key]: this.allRegistrationFields?.primaryIdentifierFields[key].value
+        }
       }
     });
-    this.groupedTestOrdersByDepartments = formulateSamplesByDepartments(
-      this.labSections,
-      this.testOrders
-    );
+}
 
-    if (this.testOrders?.length === 0) {
-      this.errorMessage = "No test has been selected";
-    } else {
-      this.errorMessage = "";
+  onAddSampleData() {
+    this.formDataObject = {
+      ...this.formDataObject,
+      [Object.keys(this.formDataObject).length + 1]: this.formData,
+    };
+    this.fieldsWithValues = Object.keys(this.formDataObject)
+      .map((key) => {
+        return Object.keys(this.formDataObject[key]).map((insideKey) => {
+          if (
+            this.formDataObject[key][insideKey]?.value?.toString().length > 0
+          ) {
+            return {
+              [insideKey]: isMoment(this.formDataObject[key][insideKey]?.value)
+                ? this.formDataObject[key][insideKey]?.value?.toDate()
+                : this.formDataObject[key][insideKey]?.value,
+            };
+          } else {
+            return null;
+          }
+        });
+      }).filter((field) => field);
+    this.dynamicFields = [];
+    this.fieldWithValuesChanged = false;
+    setTimeout(() => {
+      this.assignFields();
+      this.fieldWithValuesChanged = true;
+    }, 200);
+  }
+
+    onFormUpdateForTest(testValues: any): void {
+      Object.keys(this.formData).forEach((key) => {
+        if (!testValues[key] && key?.indexOf("test") > -1) {
+          this.formData = omit(this.formData, key);
+        }
+      });
+      this.formData = { ...this.formData, ...testValues };
+      Object.keys(this.formData).forEach((key) => {
+        if (key.indexOf("test") === 0) {
+          this.testOrders = uniqBy(
+            [
+              ...this.testOrders,
+              {
+                ...this.formData[key],
+              },
+            ],
+            "id"
+          );
+        }
+      });
+      this.groupedTestOrdersByDepartments = formulateSamplesByDepartments(
+        this.labSections,
+        this.testOrders
+      );
+
+      if (this.testOrders?.length === 0) {
+        this.errorMessage = "No test has been selected";
+      } else {
+        this.errorMessage = "";
+      }
+
+      if (this.groupedTestOrdersByDepartments?.length === 0) {
+        this.errorMessage = "Test missing lab section";
+      } else {
+        this.errorMessage = "";
+      }
     }
 
-    if (this.groupedTestOrdersByDepartments?.length === 0) {
-      this.errorMessage = "Test missing lab section";
-    } else {
-      this.errorMessage = "";
+    onFormUpdateForAgency(formValues: FormValue): void {
+      this.formData = { ...this.formData, ...formValues.getValues() };
     }
-  }
 
-  onFormUpdateForAgency(formValues: FormValue): void {
-    this.formData = { ...this.formData, ...formValues.getValues() };
-  }
-
-  onFormUpdateForLab(formValues: FormValue): void {
-    this.formData = { ...this.formData, ...formValues.getValues() };
-  }
-
-  onGetSampleLabel(sampleLabel: string): void {
-    this.currentSampleLabel = sampleLabel;
-  }
-
-  onGetSelectedOptionDetails(details): void {
-    this.formData = { ...this.formData, ...details };
-  }
-
-  onGetPersonDetails(personDetails: any): void {
-    this.personDetailsData =
-      this.registrationCategory === "CLINICAL"
-        ? personDetails
-        : this.registrationCategory === "EQA"
-        ? EQA_PERSON_DATA
-        : NON_CLINICAL_PERSON_DATA;
-    if (this.fromExternalSystem && this.selectedSystem) {
-      // console.log(
-      //   "this.testsFromExternalSystemsConfigs",
-      //   this.testsFromExternalSystemsConfigs
-      // );
-      // console.log(this.selectedSystem);
-      // console.log(
-      //   this.testsFromExternalSystemsConfigs.filter(
-      //     (testConfigs) =>
-      //       testConfigs?.referenceKeyPart ===
-      //       this.selectedSystem?.testsSearchingKey
-      //   ) || []
-      // );
-      const uuid = (this.testsFromExternalSystemsConfigs.filter(
-        (testConfigs) =>
-          testConfigs?.referenceKeyPart ===
-          this.selectedSystem?.testsSearchingKey
-      ) || [])[0]?.value;
-      this.testsUnderSpecimen$ = this.conceptService
-        .getConceptDetailsByUuid(uuid, "custom:(uuid,display)")
-        .pipe(map((response) => [response]));
+    onFormUpdateForLab(formValues: FormValue): void {
+      this.formData = { ...this.formData, ...formValues.getValues() };
     }
-  }
 
-  formatToSpecifiedChars(labNumber): string {
-    let generatedStr = "";
-    for (
-      let count = 0;
-      count <
-      Number(this.labNumberCharactersCount) -
-        (labNumber.toString()?.length + 6);
-      count++
-    ) {
-      generatedStr = generatedStr + "0";
+    onGetSampleLabel(sampleLabel: string): void {
+      this.currentSampleLabel = sampleLabel;
     }
-    return (
-      new Date().getFullYear().toString() +
-      new Date().getMonth().toString() +
-      generatedStr +
-      labNumber.toString()
-    );
-  }
 
-  onGetClinicalDataValues(clinicalData): void {
-    this.formData = { ...this.formData, ...clinicalData };
-  }
+    onGetSelectedOptionDetails(details): void {
+      this.formData = { ...this.formData, ...details };
+    }
 
-  onSave(event: Event, forRejection?: boolean, labLocations?: any[]): void {
+    onGetPersonDetails(personDetails: any): void {
+      this.personDetailsData =
+        this.registrationCategory === "CLINICAL"
+          ? personDetails
+          : this.registrationCategory === "EQA"
+          ? EQA_PERSON_DATA
+          : NON_CLINICAL_PERSON_DATA;
+      if (this.fromExternalSystem && this.selectedSystem) {
+        const uuid = (this.testsFromExternalSystemsConfigs.filter(
+          (testConfigs) =>
+            testConfigs?.referenceKeyPart ===
+            this.selectedSystem?.testsSearchingKey
+        ) || [])[0]?.value;
+        this.testsUnderSpecimen$ = this.conceptService
+          .getConceptDetailsByUuid(uuid, "custom:(uuid,display)")
+          .pipe(map((response) => [response]));
+      }
+    }
+
+    formatToSpecifiedChars(labNumber): string {
+      let generatedStr = "";
+      for (
+        let count = 0;
+        count <
+        Number(this.labNumberCharactersCount) -
+          (labNumber.toString()?.length + 6);
+        count++
+      ) {
+        generatedStr = generatedStr + "0";
+      }
+      return (
+        new Date().getFullYear().toString() +
+        new Date().getMonth().toString() +
+        generatedStr +
+        labNumber.toString()
+      );
+    }
+
+    onGetClinicalDataValues(clinicalData): void {
+      this.formData = { ...this.formData, ...clinicalData };
+    }
+
+  onSave(event: Event, labLocations?: any[]): void {
     event.stopPropagation();
+    console.log("==> On Save lab locations ", labLocations);
     if (labLocations?.length === 1) {
       this.currentLabLocation = labLocations[0];
     } else {
@@ -603,10 +723,8 @@ export class SingleRegistrationComponent implements OnInit {
     let confirmationDialogue = this.dialog.open(SharedConfirmationComponent, {
       width: "25%",
       data: {
-        modalTitle: forRejection ? `Save to reject sample` : `Save sample`,
-        modalMessage: forRejection
-          ? `You are about to register to reject the current sample. Proceed?`
-          : `Proceed with saving sample?`,
+        modalTitle: `Save samples`,
+        modalMessage: `Proceed with saving samples?`,
         showRemarksInput: false,
         confirmationButtonText: "Proceed",
       },
@@ -614,22 +732,26 @@ export class SingleRegistrationComponent implements OnInit {
 
     confirmationDialogue.afterClosed().subscribe((closingObject) => {
       if (closingObject?.confirmed) {
-        // Identify if tests ordered are well configured
-
+        // Identify if tests orderes are well configured
         // Identify referring doctor fields entered values
         let attributeMissingOnDoctorsAttributes;
         this.sampleLabelsUsedDetails = [];
         const doctorsAttributesWithValues =
           this.referringDoctorAttributes.filter(
-            (attribute) => this.formData["attribute-" + attribute?.value]?.value
+            (attribute) =>
+              this.formData["attribute-" + attribute?.value]?.value ||
+              this.fieldsWithValues["attribute-" + attribute?.value]
           ) || [];
         if (
-          doctorsAttributesWithValues?.length !=
+          doctorsAttributesWithValues?.length !==
           this.referringDoctorAttributes?.length
         ) {
           attributeMissingOnDoctorsAttributes = true;
           this.referringDoctorAttributes.forEach((attribute) => {
-            if (!this.formData["attribute-" + attribute?.value]?.value) {
+            if (
+              !this.formData["attribute-" + attribute?.value]?.value &&
+              !this.fieldsWithValues["attribute-" + attribute?.value]
+            ) {
               this.formData["attribute-" + attribute?.value] = {
                 id: "attribute-" + attribute?.value,
                 value: "NONE",
@@ -676,10 +798,10 @@ export class SingleRegistrationComponent implements OnInit {
                       .subscribe((identifierResponse) => {
                         if (identifierResponse) {
                           /**
-                1. Create user
-                2. Create visit (Orders should be added in)
-                3. Create sample
-                */
+                            1. Create user
+                            2. Create visit (Orders should be added in)
+                            3. Create sample
+                          */
 
                           this.patientPayload = {
                             person: {
@@ -687,7 +809,7 @@ export class SingleRegistrationComponent implements OnInit {
                                 {
                                   givenName: this.personDetailsData?.firstName,
                                   familyName: this.personDetailsData?.lastName,
-                                  familyName2:
+                                  middleName:
                                     this.personDetailsData?.middleName,
                                 },
                               ],
@@ -729,13 +851,16 @@ export class SingleRegistrationComponent implements OnInit {
                                         this.preferredPersonIdentifier
                                       ) {
                                         return {
-                                          identifier: this.personDetailsData[
-                                            "mrn"
-                                          ]
+                                          identifier: this.personDetailsData
+                                            ?.mrn
                                             ? this.personDetailsData["mrn"]
                                             : this.personDetailsData[
                                                 personIdentifierType.id
-                                              ],
+                                              ]?.toString()?.length > 0
+                                            ? this.personDetailsData[
+                                                personIdentifierType.id
+                                              ]
+                                            : identifierResponse[0],
                                           identifierType:
                                             personIdentifierType.id,
                                           location:
@@ -1019,6 +1144,9 @@ export class SingleRegistrationComponent implements OnInit {
                                                                         };
                                                                       }
                                                                     ),
+                                                                  batch: {
+                                                                    uuid: this.batch?.uuid
+                                                                  }
                                                                 };
                                                                 // Create sample
                                                                 this.samplesService
@@ -1039,6 +1167,11 @@ export class SingleRegistrationComponent implements OnInit {
                                                                             ...sample,
                                                                           },
                                                                         ];
+
+                                                                        this.samplesCreated = [
+                                                                          ...this.samplesCreated,
+                                                                          sampleResponse
+                                                                        ]
                                                                       // TODO: Find a better way to control three labels to be printed
 
                                                                       this.sampleLabelsUsedDetails =
@@ -1528,6 +1661,10 @@ export class SingleRegistrationComponent implements OnInit {
                                                                           0
                                                                         ) {
                                                                           zip(
+                                                                            this.samplesService.saveTestContainerAllocation(
+                                                                              ordersWithConceptsDetails,
+                                                                              configs
+                                                                            ),
                                                                             this.samplesService.setMultipleSampleStatuses(
                                                                               statuses
                                                                             )
@@ -1556,19 +1693,13 @@ export class SingleRegistrationComponent implements OnInit {
                                                                                     SampleRegistrationFinalizationComponent,
                                                                                     {
                                                                                       height:
-                                                                                        forRejection
-                                                                                          ? "200px"
-                                                                                          : "100px",
+                                                                                        "100px",
                                                                                       width:
                                                                                         "30%",
                                                                                       data: {
                                                                                         ...data,
-                                                                                        forRejection:
-                                                                                          forRejection,
                                                                                         popupHeader:
-                                                                                          forRejection
-                                                                                            ? "Sample Rejection"
-                                                                                            : "Sample Saved",
+                                                                                          "Sample Saved",
                                                                                       },
                                                                                       disableClose:
                                                                                         true,
@@ -1579,6 +1710,11 @@ export class SingleRegistrationComponent implements OnInit {
                                                                                   .afterClosed()
                                                                                   .subscribe(
                                                                                     () => {
+                                                                                      this.dynamicFields = []
+                                                                                      this.getBatch = undefined;
+                                                                                      setTimeout(() => {
+                                                                                        this.assignFields();
+                                                                                      }, 100)
                                                                                       this.openBarCodeDialog(
                                                                                         data
                                                                                       );
@@ -1714,28 +1850,6 @@ export class SingleRegistrationComponent implements OnInit {
     });
   }
 
-  toggleFieldSet(fieldName: string) {
-    switch (fieldName) {
-      case "sampleInformation":
-        this.sampleInformation = !this.sampleInformation;
-        break;
-      case "clinicalData":
-        this.clinicalData = !this.clinicalData;
-        break;
-      case "referingDoctor":
-        this.referingDoctor = !this.referingDoctor;
-        break;
-      case "broughtBy":
-        this.broughtBy = !this.broughtBy;
-        break;
-      case "tests":
-        this.tests = !this.tests;
-        break;
-      default:
-        break;
-    }
-  }
-
   isValidTime(
     time: string,
     date: string,
@@ -1808,17 +1922,16 @@ export class SingleRegistrationComponent implements OnInit {
       .subscribe();
   }
 
-  onGetIsDataFromExternalSystem(fromExternalSystem: boolean): void {
-    this.fromExternalSystem = fromExternalSystem;
-    this.testsUnderSpecimen$ = of(null);
-  }
+  //   onGetIsDataFromExternalSystem(fromExternalSystem: boolean): void {
+  //     this.fromExternalSystem = fromExternalSystem;
+  //     this.testsUnderSpecimen$ = of(null);
+  //   }
 
-  onGetSelectedSystem(system): void {
-    this.selectedSystem = system;
-  }
+  //   onGetSelectedSystem(system): void {
+  //     this.selectedSystem = system;
+  //   }
 
   createLabRequestPayload(data): any {
-    // TODO:Softcode program stage ID
     this.labRequestPayload = {
       program: data?.program,
       programStage: "emVt37lHjub",
@@ -1826,52 +1939,18 @@ export class SingleRegistrationComponent implements OnInit {
       trackedEntityInstance: data?.trackedEntityInstance,
       enrollment: data?.enrollment,
       dataValues: [
-        {
-          dataElement: "Q98LhagGLFj",
-          value: this.formatDateAndTime(
-            new Date(
-              this.getTimestampFromDateAndTime(
-                this.receivedOnDateLatestValue,
-                this.receivedOnTime
-              )
-            )
-          ),
-        },
+        { dataElement: "Q98LhagGLFj", value: new Date().toISOString() },
         { dataElement: "D0RBm3alWd9", value: "RT - PCR" },
-        {
-          dataElement: "RfWBPHo9MnC",
-          value: this.formatDateAndTime(
-            new Date(
-              this.getTimestampFromDateAndTime(
-                this.receivedOnDateLatestValue,
-                this.receivedOnTime
-              )
-            )
-          ),
-        },
+        { dataElement: "RfWBPHo9MnC", value: new Date() },
         { dataElement: "HTBFvtjeztu", value: true },
         { dataElement: "xzuzLYN1f0J", value: true },
       ],
-      eventDate: new Date(
-        this.getTimestampFromDateAndTime(
-          this.receivedOnDateLatestValue,
-          this.receivedOnTime
-        )
-      ),
+      eventDate: new Date().toISOString(),
     };
     return this.labRequestPayload;
   }
 
-  formatDateAndTime(date: Date): string {
-    return (
-      formatDateToYYMMDD(date) +
-      "T" +
-      date.getHours() +
-      ":" +
-      date.getMinutes() +
-      ":" +
-      date.getSeconds() +
-      ".000Z"
-    );
+  onPageChange(e: any) {
+    console.log("==> On page change.");
   }
 }
