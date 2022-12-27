@@ -26,6 +26,8 @@ import { TestMethodsComponent } from "./test-methods/test-methods.component";
 import { TestsControlComponent } from "./tests-control/tests-control.component";
 import { UserManagementDashboardComponent } from "./user-management-dashboard/user-management-dashboard.component";
 import { UsersListComponent } from "./users-list/users-list.component";
+import { WorksheetConfigurationComponent } from "./worksheet-configuration/worksheet-configuration.component";
+import { WorksheetControlsComponent } from "./worksheet-controls/worksheet-controls.component";
 import { WorksheetsListComponent } from "./worksheets-list/worksheets-list.component";
 
 export const components: any[] = [
@@ -58,6 +60,8 @@ export const components: any[] = [
   ManageConceptAttributesComponent,
   CreateWorksheetComponent,
   WorksheetsListComponent,
+  WorksheetConfigurationComponent,
+  WorksheetControlsComponent,
 ];
 
 export const entrySettingComponents: any[] = [
