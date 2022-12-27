@@ -149,6 +149,12 @@ public class LaboratoryController {
 			statusesObject.put("changedAt", sampleStatus.getTimestamp());
 			sampleStatusesList.add(statusesObject);
 		}
+		if(createdSample.getBatch() != null){
+			HashMap<String,Object> batchObject = new HashMap<>();
+			batchObject.put("uuid",createdSample.getBatch().getUuid());
+			batchObject.put("display",createdSample.getBatch().getBatchName());
+			response.put("batch",batchObject);
+		}
 		
 		response.put("status", sampleStatusesList);
 		response.put("uuid", createdSample.getUuid());
