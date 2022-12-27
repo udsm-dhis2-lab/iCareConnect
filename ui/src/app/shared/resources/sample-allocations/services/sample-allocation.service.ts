@@ -3,9 +3,10 @@ import { Observable, of, zip } from "rxjs";
 import { OpenmrsHttpClientService } from "src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service";
 import { SampleAllocation } from "../models/allocation.model";
 
-import { groupBy, flatten, keyBy } from "lodash";
+import { groupBy, flatten, keyBy, uniqBy } from "lodash";
 import { catchError, map, retry } from "rxjs/operators";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
+import { all } from "cypress/types/bluebird";
 
 @Injectable({
   providedIn: "root",
@@ -52,23 +53,25 @@ export class SampleAllocationService {
           const authorizationIsReady =
             (
               flatten(
-                groupedAllocations[key]?.map((allocation) => {
-                  if (!allocation?.finalResult?.groups) {
-                    return allocation?.finalResult;
-                  } else {
-                    const results = allocation?.finalResult?.groups?.map(
-                      (group) => {
-                        return group?.results.map((res) => {
-                          return {
-                            ...res,
-                            authorizationIsReady: group?.authorizationIsReady,
-                          };
-                        });
-                      }
-                    );
-                    return flatten(results);
+                uniqBy(groupedAllocations[key], "allocationUuid")?.map(
+                  (allocation) => {
+                    if (!allocation?.finalResult?.groups) {
+                      return allocation?.finalResult;
+                    } else {
+                      const results = allocation?.finalResult?.groups?.map(
+                        (group) => {
+                          return group?.results.map((res) => {
+                            return {
+                              ...res,
+                              authorizationIsReady: group?.authorizationIsReady,
+                            };
+                          });
+                        }
+                      );
+                      return flatten(results);
+                    }
                   }
-                })
+                )
               )?.filter((result) => result?.authorizationIsReady) || []
             )?.length > 0;
           const allocationsKeyedByParametersUuid = keyBy(

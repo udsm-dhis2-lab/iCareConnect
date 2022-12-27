@@ -88,5 +88,8 @@
         {{ !conceptUuid ? "Save" : "Update" }}
       </button>
     </div>
+    <div *ngIf="errors?.length > 0">
+      <shared-error [errors]="errors"></shared-error>
+    </div>
   </div>
 </div>

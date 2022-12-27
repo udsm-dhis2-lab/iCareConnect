@@ -41,6 +41,8 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
   preferredName: string;
   parametersRelationshipConceptSourceUuid$: Observable<string>;
   relatedResults: any[] = [];
+  selectedParametersWithDefinedRelationship: any[];
+  selectedInstruments: any = {};
   constructor(
     private dialogRef: MatDialogRef<SharedResultsEntryAndViewModalComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
@@ -53,7 +55,9 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.preferredName = this.data?.LISConfigurations?.isLIS ? "SHORT" : "";
+    this.preferredName = this.data?.LISConfigurations?.isLIS
+      ? "SHORT"
+      : "FULLY_SPECIFIED";
     this.providerDetails$ = this.store.select(getProviderDetails);
     this.userUuid = localStorage.getItem("userUuid");
     this.multipleResultsAttributeType$ = this.systemSettingsService
@@ -104,8 +108,19 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
   }
 
   toggleSideNavigation(event: Event, allocation?: any): void {
+    this.selectedParametersWithDefinedRelationship = null;
     event.stopPropagation();
     this.selectedAllocation = allocation ? allocation : this.selectedAllocation;
+    this.showSideNavigation = !this.showSideNavigation;
+  }
+
+  toggleSideNavigationGrouped(
+    event: Event,
+    parametersWithDefinedRelationship: any[]
+  ): void {
+    event.stopPropagation();
+    this.selectedParametersWithDefinedRelationship =
+      parametersWithDefinedRelationship;
     this.showSideNavigation = !this.showSideNavigation;
   }
 
@@ -182,6 +197,12 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
             parent: dataValue?.parent,
             parentUuid: dataValue?.parent?.uuid,
             sample: dataValue?.sample,
+            instrument:
+              order && this.selectedInstruments[order?.concept?.uuid]
+                ? {
+                    uuid: this.selectedInstruments[order?.concept?.uuid],
+                  }
+                : null,
             status: {
               category: "RESULT_REMARKS",
               status: "REMARKS",
@@ -210,6 +231,12 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
                 }
               : null,
             abnormal: false,
+            instrument:
+              order && this.selectedInstruments[order?.concept?.uuid]
+                ? {
+                    uuid: this.selectedInstruments[order?.concept?.uuid],
+                  }
+                : null,
             status: {
               category: "RESULT_REMARKS",
               status: "REMARKS",
@@ -539,7 +566,7 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
     this.remarksData[order?.concept?.uuid] = remarks;
   }
 
-  getFedResults(results: any): void {
+  getFedResults(results: any, order: any): void {
     this.relatedResults = [];
     // console.log("results", results);
     Object.keys(results)?.forEach((key) => {
@@ -571,6 +598,12 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
             resultGroup: {
               uuid: results[key]?.relatedResult?.uuid,
             },
+            instrument:
+              order && this.selectedInstruments[order?.concept?.uuid]
+                ? {
+                    uuid: this.selectedInstruments[order?.concept?.uuid],
+                  }
+                : null,
             abnormal: false,
             status: this.remarksData[results[key]?.parameter?.uuid]
               ? {
@@ -599,4 +632,9 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
         }
       });
   }
+
+  onGetSelectedInstrument(instrument: any, order: any): void {
+    this.selectedInstruments[order?.concept?.uuid] = instrument;
+  }
 }
+[];

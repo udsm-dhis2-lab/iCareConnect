@@ -1605,10 +1605,6 @@ export class SingleRegistrationComponent implements OnInit {
                                                                           0
                                                                         ) {
                                                                           zip(
-                                                                            this.samplesService.saveTestContainerAllocation(
-                                                                              ordersWithConceptsDetails,
-                                                                              configs
-                                                                            ),
                                                                             this.samplesService.setMultipleSampleStatuses(
                                                                               statuses
                                                                             )
@@ -1899,6 +1895,7 @@ export class SingleRegistrationComponent implements OnInit {
   }
 
   createLabRequestPayload(data): any {
+    // TODO:Softcode program stage ID
     this.labRequestPayload = {
       program: data?.program,
       programStage: "emVt37lHjub",
@@ -1906,13 +1903,34 @@ export class SingleRegistrationComponent implements OnInit {
       trackedEntityInstance: data?.trackedEntityInstance,
       enrollment: data?.enrollment,
       dataValues: [
-        { dataElement: "Q98LhagGLFj", value: new Date().toISOString() },
+        {
+          dataElement: "Q98LhagGLFj",
+          value: new Date(
+            this.getTimestampFromDateAndTime(
+              this.receivedOnDateLatestValue,
+              this.receivedOnTime
+            )
+          ).toISOString(),
+        },
         { dataElement: "D0RBm3alWd9", value: "RT - PCR" },
-        { dataElement: "RfWBPHo9MnC", value: new Date() },
+        {
+          dataElement: "RfWBPHo9MnC",
+          value: new Date(
+            this.getTimestampFromDateAndTime(
+              this.broughtOnDateLatestValue,
+              this.broughtOnTime
+            )
+          ),
+        },
         { dataElement: "HTBFvtjeztu", value: true },
         { dataElement: "xzuzLYN1f0J", value: true },
       ],
-      eventDate: new Date().toISOString(),
+      eventDate: new Date(
+        this.getTimestampFromDateAndTime(
+          this.broughtOnDateLatestValue,
+          this.broughtOnTime
+        )
+      ).toISOString(),
     };
     return this.labRequestPayload;
   }
