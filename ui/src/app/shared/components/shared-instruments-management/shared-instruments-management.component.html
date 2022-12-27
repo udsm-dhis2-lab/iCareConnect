@@ -15,10 +15,12 @@
         [conceptSources]="params?.conceptSources"
         [saveOnTheComponent]="true"
         [multipleSelectionCompHeight]="'10vh'"
+        (conceptCreated)="onGetConceptCreatedStatus($event)"
       ></app-shared-concept-create>
     </div>
     <div class="col-md-4">
       <app-standard-concepts-list
+        *ngIf="showList"
         [standardSearchTerm]="standardSearchTerm"
         [selectedConceptUuid]="conceptUuid"
         [conceptClass]="conceptClass"
