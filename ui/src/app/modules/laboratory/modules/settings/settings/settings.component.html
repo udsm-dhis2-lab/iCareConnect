@@ -50,6 +50,17 @@
         </div>
       </ng-template>
     </mat-tab>
+
+    <mat-tab
+      label="Worksheets Management"
+      *ngIf="params?.LISConfigurations?.isLIS"
+    >
+      <ng-template matTabContent>
+        <div class="p-3">
+          <app-worksheet-management></app-worksheet-management>
+        </div>
+      </ng-template>
+    </mat-tab>
     <mat-tab
       label="Users, Profiles & Access Control"
       *ngIf="params?.LISConfigurations?.isLIS"
