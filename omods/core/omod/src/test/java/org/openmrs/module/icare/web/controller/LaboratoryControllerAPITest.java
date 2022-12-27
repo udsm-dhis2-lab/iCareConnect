@@ -89,6 +89,8 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		//When
 		MockHttpServletRequest newPostRequest = newPostRequest("lab/sample", sample);
 		handle = handle(newPostRequest);
+		Map<String, Object> createsample = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
+		System.out.println(createsample);
 		
 		//Then
 		//TODO put test for the results that should be returned to the client
