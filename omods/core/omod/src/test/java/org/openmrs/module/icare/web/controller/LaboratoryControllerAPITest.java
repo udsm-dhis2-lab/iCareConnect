@@ -89,6 +89,8 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		//When
 		MockHttpServletRequest newPostRequest = newPostRequest("lab/sample", sample);
 		handle = handle(newPostRequest);
+		Map<String, Object> createsample = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
+		System.out.println(createsample);
 		
 		//Then
 		//TODO put test for the results that should be returned to the client
@@ -642,7 +644,8 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		//Given
 		String dto = this.readFile("dto/batch-set-create-dto.json");
 		List<Map<String, Object>> batchObject = (new ObjectMapper()).readValue(dto, List.class);
-		
+
+
 		//When
 		MockHttpServletRequest newPostRequest = newPostRequest("lab/batchsets", batchObject);
 		MockHttpServletResponse handle = handle(newPostRequest);
@@ -732,11 +735,12 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		
 		//2. Getting batchSets
 		//When
-		MockHttpServletRequest newGetRequest = newGetRequest("lab/worksheetcontrols", new Parameter("startDate",
-		        "2022-12-10"), new Parameter("endDate", "2022-12-11"), new Parameter("q", "worksheetControl3"));
+		MockHttpServletRequest newGetRequest = newGetRequest("lab/worksheetcontrols");
 		MockHttpServletResponse handle2 = handle(newGetRequest);
 		
 		List<Map<String, Object>> batches = (new ObjectMapper()).readValue(handle2.getContentAsString(), List.class);
+		
+		System.out.println(batches);
 		
 		assertThat("Has 1 worksheet control", batches.size(), is(1));
 		
