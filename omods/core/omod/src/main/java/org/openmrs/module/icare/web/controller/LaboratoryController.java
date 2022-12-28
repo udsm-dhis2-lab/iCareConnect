@@ -1025,7 +1025,18 @@ public class LaboratoryController {
 	public Map<String, Object> addWorksheetStatus(@RequestBody Map<String,Object> worksheetStatusObject) throws Exception {
 
 		WorksheetStatus worksheetStatus = WorksheetStatus.fromMap(worksheetStatusObject);
-		WorksheetStatus savedWorksheetStatus = laboratoryService.addWorksheetStatus(worksheetStatus);
+		WorksheetStatus newWorksheetStatus = laboratoryService.addWorksheetStatus(worksheetStatus);
+		return  newWorksheetStatus.toMap();
 
+	}
+
+	@RequestMapping(value = "worksheetsamplestatus", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public Map<String, Object> addWorksheetSampleStatus(@RequestBody Map<String,Object> worksheetSampleObject) throws Exception{
+
+		WorksheetSampleStatus worksheetSampleStatus = WorksheetSampleStatus.fromMap(worksheetSampleObject);
+		WorksheetSampleStatus newWorksheetSampleStatus = laboratoryService.addWorksheetSampleStatus(worksheetSampleStatus);
+
+		return newWorksheetSampleStatus.toMap();
 	}
 }
