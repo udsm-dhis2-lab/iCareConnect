@@ -12,6 +12,7 @@ import { ResultsAndSignOffsModalComponent } from "./results-and-sign-offs-modal/
 import { CaptureLabResultsComponent } from "./capture-lab-results/capture-lab-results.component";
 import { CaptureLabResultsApprovalComponent } from "./capture-lab-results-approval/capture-lab-results-approval.component";
 import { SampleResultsPrintingComponent } from "./sample-results-printing/sample-results-printing.component";
+import { BatchRegistrationComponent } from "./batch-registration/batch-registration.component";
 
 export const labComponents: any[] = [
   LabSamplesStatusesComponent,

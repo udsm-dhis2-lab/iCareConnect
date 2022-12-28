@@ -32,6 +32,7 @@ export class RegisterSampleComponent implements OnInit {
   @Input() provider: any;
   @Input() LISConfigurations: LISConfigurationsModel;
   @Input() labSections: ConceptGetFull[];
+  @Input() fromMaintenance: boolean;
   registrationCategory: string = "single";
   currentUser$: Observable<any>;
 
@@ -168,9 +169,9 @@ export class RegisterSampleComponent implements OnInit {
     this.selectedTabGroup = group;
   }
 
-  onReloadRegisterSample(eventData: any){
-      this.ngOnInit()
-      this.selectedTabGroup = eventData?.fromKey;
+  onReloadRegisterSample(eventData: any) {
+    this.ngOnInit();
+    this.selectedTabGroup = eventData?.fromKey;
   }
 
   initializeRegistrationFields() {
