@@ -656,9 +656,9 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		    new Parameter("endDate", "2022-12-09"), new Parameter("q", "My batch set"));
 		MockHttpServletResponse handle2 = handle(newGetRequest);
 		
-		List<Map<String, Object>> batches = (new ObjectMapper()).readValue(handle2.getContentAsString(), List.class);
+		List<Map<String, Object>> batchSets = (new ObjectMapper()).readValue(handle2.getContentAsString(), List.class);
 		
-		assertThat("Has 1 batchSet", batches.size(), is(1));
+		assertThat("Has 1 batchSet", batchSets.size(), is(1));
 		
 	}
 	
@@ -691,7 +691,7 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 	@Test
 	public void CreatingAndGettingWorksheets() throws Exception {
 		
-		//1. Creating batchSets
+		//1. Creating worksheets
 		//Given
 		String dto = this.readFile("dto/worksheet-create-dto.json");
 		List<Map<String, Object>> worksheetObject = (new ObjectMapper()).readValue(dto, List.class);
@@ -699,46 +699,46 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		//When
 		MockHttpServletRequest newPostRequest = newPostRequest("lab/worksheets", worksheetObject);
 		MockHttpServletResponse handle = handle(newPostRequest);
-		List<Map<String, Object>> createdbatchSets = (new ObjectMapper()).readValue(handle.getContentAsString(), List.class);
+		List<Map<String, Object>> createdWorksheets = (new ObjectMapper()).readValue(handle.getContentAsString(), List.class);
 		
-		assertThat("created 2 worksheets", createdbatchSets.size(), is(2));
+		assertThat("created 2 worksheets", createdWorksheets.size(), is(2));
 		
-		//2. Getting batchSets
+		//2. Getting worksheets
 		//When
 		MockHttpServletRequest newGetRequest = newGetRequest("lab/worksheets", new Parameter("startDate", "2022-12-10"),
 		    new Parameter("endDate", "2022-12-11"), new Parameter("q", "worksheet3"));
 		MockHttpServletResponse handle2 = handle(newGetRequest);
 		
-		List<Map<String, Object>> batches = (new ObjectMapper()).readValue(handle2.getContentAsString(), List.class);
+		List<Map<String, Object>> worksheets = (new ObjectMapper()).readValue(handle2.getContentAsString(), List.class);
 		
-		assertThat("Has 1 worksheet", batches.size(), is(1));
+		assertThat("Has 1 worksheet", worksheets.size(), is(1));
 		
 	}
 	
 	@Test
 	public void CreatingAndGettingWorksheetControls() throws Exception {
 		
-		//1. Creating batchSets
+		//1. Creating worksheetControls
 		//Given
 		String dto = this.readFile("dto/worksheet-control-create-dto.json");
-		List<Map<String, Object>> worksheetObject = (new ObjectMapper()).readValue(dto, List.class);
+		List<Map<String, Object>> worksheetControlObject = (new ObjectMapper()).readValue(dto, List.class);
 		
 		//When
-		MockHttpServletRequest newPostRequest = newPostRequest("lab/worksheetcontrols", worksheetObject);
+		MockHttpServletRequest newPostRequest = newPostRequest("lab/worksheetcontrols", worksheetControlObject);
 		MockHttpServletResponse handle = handle(newPostRequest);
-		List<Map<String, Object>> createdbatchSets = (new ObjectMapper()).readValue(handle.getContentAsString(), List.class);
+		List<Map<String, Object>> createdWorksheetControls = (new ObjectMapper()).readValue(handle.getContentAsString(), List.class);
 		
-		assertThat("created 2 worksheets", createdbatchSets.size(), is(2));
+		assertThat("created 2 worksheet controls", createdWorksheetControls.size(), is(2));
 		
-		//2. Getting batchSets
+		//2. Getting worksheetControls
 		//When
 		MockHttpServletRequest newGetRequest = newGetRequest("lab/worksheetcontrols", new Parameter("startDate",
 		        "2022-12-10"), new Parameter("endDate", "2022-12-11"), new Parameter("q", "worksheetControl3"));
 		MockHttpServletResponse handle2 = handle(newGetRequest);
 		
-		List<Map<String, Object>> batches = (new ObjectMapper()).readValue(handle2.getContentAsString(), List.class);
+		List<Map<String, Object>> worksheetControls = (new ObjectMapper()).readValue(handle2.getContentAsString(), List.class);
 		
-		assertThat("Has 1 worksheet control", batches.size(), is(1));
+		assertThat("Has 1 worksheet control", worksheetControls.size(), is(1));
 		
 	}
 	
@@ -748,14 +748,14 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		//1. Creating worksheet definitions
 		//Given
 		String dto = this.readFile("dto/worksheet-definition-create-dto.json");
-		List<Map<String, Object>> worksheetObject = (new ObjectMapper()).readValue(dto, List.class);
+		List<Map<String, Object>> worksheetDefinitionObject = (new ObjectMapper()).readValue(dto, List.class);
 		
 		//When
-		MockHttpServletRequest newPostRequest = newPostRequest("lab/worksheetdefinitions", worksheetObject);
+		MockHttpServletRequest newPostRequest = newPostRequest("lab/worksheetdefinitions", worksheetDefinitionObject);
 		MockHttpServletResponse handle = handle(newPostRequest);
-		List<Map<String, Object>> createdbatchSets = (new ObjectMapper()).readValue(handle.getContentAsString(), List.class);
+		List<Map<String, Object>> createdWorksheetDefinitions = (new ObjectMapper()).readValue(handle.getContentAsString(), List.class);
 		
-		assertThat("created 2 worksheets definitions", createdbatchSets.size(), is(2));
+		assertThat("created 2 worksheets definitions", createdWorksheetDefinitions.size(), is(2));
 		
 		//2. Getting worksheet definitions
 		//When
@@ -763,9 +763,9 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		        "2022-12-10"), new Parameter("endDate", "2022-12-11"), new Parameter("q", "WD"));
 		MockHttpServletResponse handle2 = handle(newGetRequest);
 		
-		List<Map<String, Object>> batches = (new ObjectMapper()).readValue(handle2.getContentAsString(), List.class);
+		List<Map<String, Object>> worksheetdefinitions = (new ObjectMapper()).readValue(handle2.getContentAsString(), List.class);
 		
-		assertThat("Has 1 worksheet control", batches.size(), is(1));
+		assertThat("Has 1 worksheet definition", worksheetdefinitions.size(), is(1));
 		
 	}
 	
@@ -775,14 +775,14 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		//1. Creating worksheet definitions
 		//Given
 		String dto = this.readFile("dto/worksheet-sample-create-dto.json");
-		List<Map<String, Object>> worksheetObject = (new ObjectMapper()).readValue(dto, List.class);
+		List<Map<String, Object>> worksheetSampleObject = (new ObjectMapper()).readValue(dto, List.class);
 		
 		//When
-		MockHttpServletRequest newPostRequest = newPostRequest("lab/worksheetsamples", worksheetObject);
+		MockHttpServletRequest newPostRequest = newPostRequest("lab/worksheetsamples", worksheetSampleObject);
 		MockHttpServletResponse handle = handle(newPostRequest);
-		List<Map<String, Object>> createdbatchSets = (new ObjectMapper()).readValue(handle.getContentAsString(), List.class);
+		List<Map<String, Object>> createdWorksheetSamples = (new ObjectMapper()).readValue(handle.getContentAsString(), List.class);
 		
-		assertThat("created 2 worksheets definitions", createdbatchSets.size(), is(2));
+		assertThat("created 2 worksheets samples", createdWorksheetSamples.size(), is(2));
 		
 		//2. Getting worksheet definitions
 		//When
@@ -791,10 +791,9 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		            "Sample Label y"));
 		MockHttpServletResponse handle2 = handle(newGetRequest);
 		
-		List<Map<String, Object>> worksheetsamples = (new ObjectMapper())
-		        .readValue(handle2.getContentAsString(), List.class);
+		List<Map<String, Object>> worksheetsamples = (new ObjectMapper()).readValue(handle2.getContentAsString(), List.class);
 		
-		assertThat("Has 1 worksheet control", worksheetsamples.size(), is(1));
+		assertThat("Has 1 worksheet sample", worksheetsamples.size(), is(1));
 		
 	}
 
@@ -804,24 +803,24 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		//1.Creating BatchSetStatus
 		//Given
 		String dto = this.readFile("dto/worksheet-status-create-dto.json");
-		Map<String, Object> batchSetStatusObject = (new ObjectMapper()).readValue(dto, Map.class);
+		Map<String, Object> worksheetStatusObject = (new ObjectMapper()).readValue(dto, Map.class);
 
-		MockHttpServletRequest newPostRequest = newPostRequest("lab/worksheetstatus", batchSetStatusObject);
+		MockHttpServletRequest newPostRequest = newPostRequest("lab/worksheetstatus", worksheetStatusObject);
 		MockHttpServletResponse handle = handle(newPostRequest);
-		Map<String, Object> createdBatchSetStatus = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
+		Map<String, Object> createdWorksheetStatus = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
 
-		assertThat("created batchSet status", createdBatchSetStatus.get("status") != null);
+		assertThat("created worksheet status", createdWorksheetStatus.get("status") != null);
 
 		//2. Creating BatchStatus
 		//Given
 		String dto1 = this.readFile("dto/worksheet-sample-status-create-dto.json");
-		Map<String, Object> batchStatusObject = (new ObjectMapper()).readValue(dto1, Map.class);
+		Map<String, Object> worksheetSampleStatusObject = (new ObjectMapper()).readValue(dto1, Map.class);
 
-		MockHttpServletRequest newPostRequest1 = newPostRequest("lab/worksheetsamplestatus", batchStatusObject);
+		MockHttpServletRequest newPostRequest1 = newPostRequest("lab/worksheetsamplestatus", worksheetSampleStatusObject);
 		MockHttpServletResponse handle1 = handle(newPostRequest1);
-		Map<String, Object> createdBatchStatus = (new ObjectMapper()).readValue(handle1.getContentAsString(), Map.class);
+		Map<String, Object> createdWorksheetSampleStatus = (new ObjectMapper()).readValue(handle1.getContentAsString(), Map.class);
 
-		assertThat("created batch status", createdBatchStatus.get("status") != null);
+		assertThat("created worksheet sample status", createdWorksheetSampleStatus.get("status") != null);
 	}
 	
 	@Override
