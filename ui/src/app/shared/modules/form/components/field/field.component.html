@@ -80,6 +80,7 @@
         [formControlName]="field?.key"
         matInput
         [value]="field?.value"
+        [disabled]="field?.disabled"
         autocomplete="off"
         (keyup)="searchItemFromOptions($event, field)"
         [matAutocomplete]="auto"
@@ -132,6 +133,7 @@
         [formControlName]="field?.key"
         [required]="field?.required"
         (selectionChange)="onFieldUpdate()"
+        [disabled]="field?.disabled"
         multiple
         [value]="field?.value"
       >
@@ -188,6 +190,8 @@
       [id]="field?.key"
       [formControlName]="field?.key"
       [placeholder]="field?.placeholder"
+      [value]="field?.value"
+      [disabled]="field?.disabled"
       (keyup)="onFieldUpdate()"
     ></textarea>
     <!-- end of text area field -->
@@ -221,6 +225,7 @@
           ? (members$ | async)[0]?.display
           : ''
       "
+      [disabled]="field?.disabled"
       autocomplete="off"
       (keyup)="searchItem($event, field)"
       [matAutocomplete]="auto"
@@ -273,6 +278,7 @@
     <mat-select
       [formControlName]="field?.key"
       [required]="field?.required"
+      [disabled]="field?.disabled"
       (selectionChange)="onFieldUpdate()"
       multiple
     >
@@ -327,6 +333,8 @@
       autocomplete="off"
       [id]="field?.key"
       [required]="field?.required"
+      [value]="field?.value"
+      [disabled]="field?.disabled"
       [ngxMatDatetimePicker]="fieldId"
       [placeholder]="field?.placeholder"
       [max]="field?.max"

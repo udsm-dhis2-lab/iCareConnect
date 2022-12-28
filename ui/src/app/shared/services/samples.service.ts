@@ -468,4 +468,55 @@ export class SamplesService {
         })
       );
   }
+
+  createBatchsets(batchset: any): Observable<any> {
+    return this.httpClient.post(BASE_URL + "lab/batchsets", batchset).pipe(
+      map((response) => {
+        return response;
+      }),
+      catchError((err) => {
+        return err;
+      })
+    );
+  }
+
+  getBatchsets(): Observable<any> {
+    return this.httpClient.get(BASE_URL + "lab/batchsets").pipe(
+      map((response) => {
+        return response;
+      }),
+      catchError((err) => {
+        return err;
+      })
+    );
+  }
+  createBatch(batch: any): Observable<any> {
+    return this.httpClient.post(BASE_URL + "lab/batches", batch).pipe(
+      map((response) => {
+        return response;
+      }),
+      catchError((err) => {
+        return err;
+      })
+    );
+  }
+  getBatches(startDate?: string, endDate?: string, q?: string): Observable<any> {
+    let startDateParam = startDate?.length ? `?startDate=${startDate}` : ""; 
+    let endDateParam = endDate?.length && startDateParam.length ? `&endDate=${endDate}` : endDate?.length ? `&endDate=${endDate}` :""; 
+    let qParam =
+      q?.length && (startDateParam.length || endDateParam.length)
+        ? `&q=${q}`
+        : q?.length
+        ? `?q=${q}`
+        : ""; 
+    const queryParams = startDateParam + endDateParam + qParam; 
+    return this.httpClient.get(BASE_URL + "lab/batches" + queryParams).pipe(
+      map((response) => {
+        return response;
+      }),
+      catchError((err) => {
+        return err;
+      })
+    );
+  }
 }

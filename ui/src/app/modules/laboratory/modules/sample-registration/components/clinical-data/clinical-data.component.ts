@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnInit, Output } from "@angular/core";
+import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
 import { TextArea } from "src/app/shared/modules/form/models/text-area.model";
@@ -11,32 +11,16 @@ import { Textbox } from "src/app/shared/modules/form/models/text-box.model";
 })
 export class ClinicalDataComponent implements OnInit {
   clinicalFormFields: any[] = [];
+  @Input() clinicalFields: any;
   @Output() clinicalDataValues: EventEmitter<any> = new EventEmitter<any>();
   constructor() {}
 
   ngOnInit(): void {
-    this.clinicalFormFields = [
-      new Dropdown({
-        id: "icd10",
-        key: "icd10",
-        label: "ICD 10",
-        options: [],
-        conceptClass: "Diagnosis",
-        shouldHaveLiveSearchForDropDownFields: true,
-      }),
-      new TextArea({
-        id: "notes",
-        key: "notes",
-        label: "Clinical Information / History",
-        type: "text",
-      }),
-      new Textbox({
-        id: "diagnosis",
-        key: "diagnosis",
-        label: "Diagnosis - Clinical",
-        type: "text",
-      }),
-    ];
+    this.clinicalFormFields = Object.keys(this.clinicalFields)
+      .map((key) => {
+        return this.clinicalFields[key];
+      });
+
   }
 
   onFormUpdate(formValues: FormValue): void {
