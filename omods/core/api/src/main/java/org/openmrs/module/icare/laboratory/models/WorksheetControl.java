@@ -53,7 +53,9 @@ public class WorksheetControl extends BaseOpenmrsMetadata implements java.io.Ser
 		
 		WorksheetControl worksheetControl = new WorksheetControl();
 		worksheetControl.setCode(worksheetMap.get("code").toString());
-		worksheetControl.setDescription(worksheetMap.get("description").toString());
+		if(worksheetMap.get("description") != null){
+			worksheetControl.setDescription(worksheetMap.get("description").toString());
+		}
 		worksheetControl.setName(worksheetMap.get("name").toString());
 		
 		return worksheetControl;
@@ -64,7 +66,9 @@ public class WorksheetControl extends BaseOpenmrsMetadata implements java.io.Ser
 		HashMap<String,Object> worksheetObject = new HashMap<>();
 
 		worksheetObject.put("code",this.getCode());
-		worksheetObject.put("description",this.getDescription());
+		if(this.getDescription() != null){
+			worksheetObject.put("description",this.getDescription());
+		}
 		worksheetObject.put("name",this.getName());
 
 		Map<String,Object> testOrderObject = new HashMap<>();

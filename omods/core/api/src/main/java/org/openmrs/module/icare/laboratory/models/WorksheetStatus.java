@@ -73,22 +73,22 @@ public class WorksheetStatus extends BaseOpenmrsData implements java.io.Serializ
 	}
 
 
-	public static WorksheetStatus fromMap(Map<String,Object> worksheetMap){
+	public static WorksheetStatus fromMap(Map<String,Object> worksheetStatusMap){
 
 		WorksheetStatus worksheetStatus = new WorksheetStatus();
-		if(worksheetMap.get("category") != null){
-			worksheetStatus.setCategory(worksheetMap.get("category").toString());
+		if(worksheetStatusMap.get("category") != null){
+			worksheetStatus.setCategory(worksheetStatusMap.get("category").toString());
 		}
-		if(worksheetMap.get("status") != null){
-			worksheetStatus.setStatus(worksheetMap.get("status").toString());
+		if(worksheetStatusMap.get("status") != null){
+			worksheetStatus.setStatus(worksheetStatusMap.get("status").toString());
 		}
-		if(worksheetMap.get("remarks") != null){
-			worksheetStatus.setRemarks(worksheetMap.get("remarks").toString());
+		if(worksheetStatusMap.get("remarks") != null){
+			worksheetStatus.setRemarks(worksheetStatusMap.get("remarks").toString());
 		}
 
-		if(worksheetMap.get("worksheet") != null){
+		if(worksheetStatusMap.get("worksheet") != null){
 			Worksheet worksheet = new Worksheet();
-			worksheet.setUuid(((Map) worksheetMap.get("worksheet")).get("uuid").toString());
+			worksheet.setUuid(((Map) worksheetStatusMap.get("worksheet")).get("uuid").toString());
 			worksheetStatus.setWorksheet(worksheet);
 		}
 
@@ -117,7 +117,6 @@ public class WorksheetStatus extends BaseOpenmrsData implements java.io.Serializ
 		}
 
 		return worksheetStatusObject;
-
 	}
 	
 }
