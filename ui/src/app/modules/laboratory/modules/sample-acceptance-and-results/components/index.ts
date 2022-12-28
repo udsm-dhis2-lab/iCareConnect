@@ -32,6 +32,8 @@ import { SharedRemarksEntryComponent } from "./shared-remarks-entry/shared-remar
 import { MultipleResultsEntryComponent } from "./multiple-results-entry/multiple-results-entry.component";
 import { RelatedTestParametersEntryComponent } from "./related-test-parameters-entry/related-test-parameters-entry.component";
 import { RelatedResultsHistoryComponent } from "./related-results-history/related-results-history.component";
+import { WorksheetsComponent } from "./worksheets/worksheets.component";
+import { WorksheetDefinitionComponent } from "./worksheet-definition/worksheet-definition.component";
 
 export const components: any[] = [
   PatientsByVisitsListComponent,
@@ -68,6 +70,8 @@ export const components: any[] = [
   MultipleResultsEntryComponent,
   RelatedTestParametersEntryComponent,
   RelatedResultsHistoryComponent,
+  WorksheetsComponent,
+  WorksheetDefinitionComponent,
 ];
 
 export const sampleAcceptanceAndResultsModals: any[] = [

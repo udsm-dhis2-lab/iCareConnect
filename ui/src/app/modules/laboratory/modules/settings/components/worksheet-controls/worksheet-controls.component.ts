@@ -1,5 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import { Observable } from "rxjs";
+import { map } from "rxjs/operators";
 import { WorkSeetsService } from "src/app/modules/laboratory/resources/services/worksheets.service";
 import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
@@ -69,6 +70,7 @@ export class WorksheetControlsComponent implements OnInit {
     this.worksheetControlPayload = {
       name: values?.name?.value,
       code: values?.code?.value,
+      description: values?.description?.value,
       testorder: {
         uuid: values?.testorder?.value,
       },
