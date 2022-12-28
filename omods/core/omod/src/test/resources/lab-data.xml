@@ -171,8 +171,8 @@
     <lb_worksheet_definition worksheet_definition_id ="1" uuid = "iCARE890-TEST-GGGH-9beb-d30dcfc0c635" code="WD"  worksheet_id="1" date_created="2022-12-10 15:51:57.0" voided="0" creator="1" />
 
     <!-- WorksheetSample -->
-    <lb_worksheet_sample worksheet_sample_id ="1" uuid = "iCARE890-TEST-OSDH-9beb-d30dcfc0c635" row="10" column="20" type="SAMPLE"  worksheet_definition_id="1" sample_id="201"  date_created="2022-12-10 15:51:57.0" voided="0" creator="1" />
+    <lb_worksheet_sample worksheet_sample_id ="1" code="ABC" uuid = "iCARE890-TEST-OSDH-9beb-d30dcfc0c635" row="10" column="20" type="SAMPLE"  worksheet_definition_id="1" sample_id="201"  date_created="2022-12-10 15:51:57.0" voided="0" creator="1" />
 
-    <lb_worksheet_sample worksheet_sample_id ="2" uuid = "iCARE890-TEST-OSDH-9beb-d30dcfc0c631" row="1" column="1" type="CONTROL"  worksheet_definition_id="1"  control_id="1" date_created="2022-12-10 15:51:57.0" voided="0" creator="1" />
+    <lb_worksheet_sample worksheet_sample_id ="2" code="BCD" uuid = "iCARE890-TEST-OSDH-9beb-d30dcfc0c631" row="1" column="1" type="CONTROL"  worksheet_definition_id="1"  control_id="1" date_created="2022-12-10 15:51:57.0" voided="0" creator="1" />
 
 </dataset>

@@ -797,6 +797,32 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		assertThat("Has 1 worksheet control", worksheetsamples.size(), is(1));
 		
 	}
+
+	@Test
+	public void creatingWorksheetStatusAndWorksheetSampleStatus() throws Exception {
+
+		//1.Creating BatchSetStatus
+		//Given
+		String dto = this.readFile("dto/worksheet-status-create-dto.json");
+		Map<String, Object> batchSetStatusObject = (new ObjectMapper()).readValue(dto, Map.class);
+
+		MockHttpServletRequest newPostRequest = newPostRequest("lab/worksheetstatus", batchSetStatusObject);
+		MockHttpServletResponse handle = handle(newPostRequest);
+		Map<String, Object> createdBatchSetStatus = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
+
+		assertThat("created batchSet status", createdBatchSetStatus.get("status") != null);
+
+		//2. Creating BatchStatus
+		//Given
+		String dto1 = this.readFile("dto/worksheet-sample-status-create-dto.json");
+		Map<String, Object> batchStatusObject = (new ObjectMapper()).readValue(dto1, Map.class);
+
+		MockHttpServletRequest newPostRequest1 = newPostRequest("lab/worksheetsamplestatus", batchStatusObject);
+		MockHttpServletResponse handle1 = handle(newPostRequest1);
+		Map<String, Object> createdBatchStatus = (new ObjectMapper()).readValue(handle1.getContentAsString(), Map.class);
+
+		assertThat("created batch status", createdBatchStatus.get("status") != null);
+	}
 	
 	@Override
 	public String getURI() {

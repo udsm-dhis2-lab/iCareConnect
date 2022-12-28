@@ -193,6 +193,18 @@
                     </bean>
                 </property>
 
+                <property name="worksheetStatusDAO">
+                    <bean class="org.openmrs.module.icare.laboratory.dao.WorksheetStatusDAO">
+                        <property name="sessionFactory" ref="dbSessionFactory" />
+                    </bean>
+                </property>
+
+                <property name="worksheetSampleStatusDAO">
+                    <bean class="org.openmrs.module.icare.laboratory.dao.WorksheetSampleStatusDAO">
+                        <property name="sessionFactory" ref="dbSessionFactory" />
+                    </bean>
+                </property>
+
 
             </bean>
         </property>
