@@ -733,8 +733,7 @@ public class LaboratoryController {
 			
 			if ((batchObject.get("batchSet")) != null) {
 				
-				BatchSet batchSet = laboratoryService.getBatchSetByUuid(((Map) batchObject.get("batchSet")).get("uuid")
-				        .toString());
+				BatchSet batchSet = laboratoryService.getBatchSetByUuid(((Map) batchObject.get("batchSet")).get("uuid").toString());
 				batch.setBatchSet(batchSet);
 			}
 			
@@ -795,7 +794,6 @@ public class LaboratoryController {
 	public Map<String, Object> addBatchStatus(@RequestBody Map<String, Object> batchStatusObject) throws Exception {
 		
 		BatchStatus batchStatus = BatchStatus.fromMap(batchStatusObject);
-		
 		BatchStatus savedBatchStatus = laboratoryService.addBatchStatus(batchStatus);
 		
 		return savedBatchStatus.toMap();
@@ -874,7 +872,6 @@ public class LaboratoryController {
 
 		for(Map<String,Object> worksheetObject : worksheetsObject){
 
-			System.out.println(worksheetObject);
 			worksheet = Worksheet.fromMap(worksheetObject);
 
 			Concept testOrderConcept = conceptService.getConceptByUuid(((Map) worksheetObject.get("testorder")).get("uuid").toString());
@@ -1027,5 +1024,25 @@ public class LaboratoryController {
 
 		}
 		return newWorksheetSamples;
+	}
+
+	@RequestMapping(value = "worksheetstatus", method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public Map<String, Object> addWorksheetStatus(@RequestBody Map<String,Object> worksheetStatusObject) throws Exception {
+
+		WorksheetStatus worksheetStatus = WorksheetStatus.fromMap(worksheetStatusObject);
+		WorksheetStatus newWorksheetStatus = laboratoryService.addWorksheetStatus(worksheetStatus);
+		return  newWorksheetStatus.toMap();
+
+	}
+
+	@RequestMapping(value = "worksheetsamplestatus", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public Map<String, Object> addWorksheetSampleStatus(@RequestBody Map<String,Object> worksheetSampleObject) throws Exception{
+
+		WorksheetSampleStatus worksheetSampleStatus = WorksheetSampleStatus.fromMap(worksheetSampleObject);
+		WorksheetSampleStatus newWorksheetSampleStatus = laboratoryService.addWorksheetSampleStatus(worksheetSampleStatus);
+
+		return newWorksheetSampleStatus.toMap();
 	}
 }

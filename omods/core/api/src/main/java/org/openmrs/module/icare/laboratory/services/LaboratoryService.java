@@ -140,6 +140,12 @@ public interface LaboratoryService extends OpenmrsService {
 	WorksheetDefinition addWorksheetDefinition(WorksheetDefinition worksheetDefinition) throws Exception;
 	
 	List<WorksheetSample> getWorksheetSamples(Date start, Date end, String q, Integer startIndex, Integer limit);
+
+	WorksheetSample getWorksheetSampleByUuid(String worksheetSampleUuid);
 	
 	WorksheetSample addWorksheetSample(WorksheetSample worksheetSample) throws Exception;
+
+    WorksheetStatus addWorksheetStatus(WorksheetStatus worksheetStatus) throws Exception;
+
+    WorksheetSampleStatus addWorksheetSampleStatus(WorksheetSampleStatus worksheetSampleStatus) throws Exception;
 }

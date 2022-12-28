@@ -18,6 +18,9 @@ public class WorksheetSample extends BaseOpenmrsData implements java.io.Serializ
 	@GeneratedValue(strategy = IDENTITY)
 	@Column(name = "worksheet_sample_id", unique = true, nullable = false)
 	private Integer id;
+
+	@Column(name = "code")
+	private String code;
 	
 	@ManyToOne
 	@JoinColumn(name = "worksheet_definition_id")
@@ -99,7 +102,15 @@ public class WorksheetSample extends BaseOpenmrsData implements java.io.Serializ
 	public void setType(String type) {
 		this.type = type;
 	}
-	
+
+	public String getCode() {
+		return code;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
+	}
+
 	public static WorksheetSample fromMap(Map<String, Object> worksheetSampleMap) {
 		
 		WorksheetSample worksheetSample = new WorksheetSample();

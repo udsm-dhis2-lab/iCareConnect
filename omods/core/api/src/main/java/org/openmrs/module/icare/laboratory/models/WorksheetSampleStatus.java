@@ -4,6 +4,8 @@ import org.openmrs.BaseOpenmrsData;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @Entity
 @Table(name = "lb_worksheet_sample_status")
@@ -67,6 +69,52 @@ public class WorksheetSampleStatus extends BaseOpenmrsData implements java.io.Se
 	
 	public void setWorksheetSample(WorksheetSample worksheetSample) {
 		this.worksheetSample = worksheetSample;
+	}
+
+
+	public static WorksheetSampleStatus fromMap(Map<String,Object> worksheetSampleStatusMap){
+
+		WorksheetSampleStatus worksheetSampleStatus = new WorksheetSampleStatus();
+		if(worksheetSampleStatusMap.get("category") != null){
+			worksheetSampleStatus.setCategory(worksheetSampleStatusMap.get("category").toString());
+		}
+		if(worksheetSampleStatusMap.get("status") != null){
+			worksheetSampleStatus.setStatus(worksheetSampleStatusMap.get("status").toString());
+		}
+		if(worksheetSampleStatusMap.get("remarks") != null){
+			worksheetSampleStatus.setRemarks(worksheetSampleStatusMap.get("remarks").toString());
+		}
+		if(worksheetSampleStatusMap.get("worksheetSample") != null){
+			WorksheetSample worksheetSample = new WorksheetSample();
+			worksheetSample.setUuid(((Map) worksheetSampleStatusMap.get("worksheetSample")).get("uuid").toString());
+			worksheetSampleStatus.setWorksheetSample(worksheetSample);
+		}
+
+		return worksheetSampleStatus;
+	}
+
+	public Map<String,Object> toMap(){
+
+		HashMap<String,Object> worksheetSampleStatusObject = new HashMap<>();
+		worksheetSampleStatusObject.put("category",this.getCategory());
+		worksheetSampleStatusObject.put("status", this.getStatus());
+		worksheetSampleStatusObject.put("uuid",this.getUuid());
+
+		if(this.getCreator() != null){
+			Map<String,Object> creatorObject = new HashMap<>();
+			creatorObject.put("uuid",this.getCreator().getUuid());
+			creatorObject.put("display",this.getCreator().getDisplayString());
+		}
+		if(this.getWorksheetSample() != null){
+			Map<String,Object> worksheetObject  = new HashMap<>();
+			worksheetObject.put("uuid",this.getWorksheetSample().getUuid());
+			worksheetObject.put("display",this.getWorksheetSample().getCode());
+		}
+		if(this.getDateCreated() != null){
+			worksheetSampleStatusObject.put("dateCreated",this.getDateCreated());
+		}
+
+		return worksheetSampleStatusObject;
 	}
 	
 }
