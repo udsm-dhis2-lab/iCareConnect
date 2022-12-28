@@ -26,7 +26,8 @@ export class BatchRegistrationComponent implements OnInit {
   @Input() allRegistrationFields: any;
   @Input() existingBatchsets: any[] = [];
   @Input() existingBatches: any[] = [];
-  @Output() reloadRegisterSample: EventEmitter<any> = new EventEmitter;
+  @Input() fromMaintenance: boolean;
+  @Output() reloadRegisterSample: EventEmitter<any> = new EventEmitter();
   formData: any;
   useExistingBatchset: boolean = false;
   useExistingBatch: boolean = false;
@@ -194,7 +195,7 @@ export class BatchRegistrationComponent implements OnInit {
     if (key === "batch") {
       this.batchNameField.value = null;
       this.useExistingBatch = !this.useExistingBatch;
-      if(!this.useExistingBatch) {
+      if (!this.useExistingBatch) {
         this.selectedBatch = undefined;
       }
     }
@@ -432,7 +433,9 @@ export class BatchRegistrationComponent implements OnInit {
         this.selectedDynamicFields?.length > 0) &&
       this.validBatchsetName &&
       this.validBatchName &&
-      !this.useExistingBatch
+      !this.useExistingBatch &&
+      this.fieldsObjectValues?.fixedFieldsWithValues?.length ===
+        this.selectedFixedFields.length
     ) {
       this.validForm = true;
     } else {
@@ -574,10 +577,7 @@ export class BatchRegistrationComponent implements OnInit {
                   });
                   console.log("==> Batch created; ", response);
                 } else {
-                  this.errors = [
-                    ...this.errors,
-                    response?.error
-                  ];
+                  this.errors = [...this.errors, response?.error];
                 }
               });
             } else {
