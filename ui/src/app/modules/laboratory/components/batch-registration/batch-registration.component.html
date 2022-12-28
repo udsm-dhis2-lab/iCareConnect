@@ -87,7 +87,7 @@
                             </div>
                         </ng-container>
                     </ng-container>
-                    <div class="{{ useExistingBatchset ? 'col-12' : 'col-10' }}">
+                    <div class="{{ useExistingBatchset || useExistingBatch ? 'col-12' : 'col-10' }}">
                         <mat-progress-bar
                             *ngIf="!addFixedField?.options?.length"
                             mode="indeterminate">
