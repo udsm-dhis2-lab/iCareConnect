@@ -34,6 +34,8 @@ import { Store } from "@ngrx/store";
 import { AppState } from "src/app/store/reducers";
 import { getLocationsByIds } from "src/app/store/selectors";
 import { isMoment } from "moment";
+import { PersonService } from "src/app/core/services/person.service";
+import { Field } from "src/app/shared/modules/form/models/field.model";
 
 @Component({
   selector: "app-sample-in-batch-registration",
@@ -151,7 +153,8 @@ export class SampleInBatchRegistrationComponent implements OnInit {
     private orderService: OrdersService,
     private conceptService: ConceptsService,
     private otherSystemsService: OtherClientLevelSystemsService,
-    private store: Store<AppState>
+    private store: Store<AppState>,
+    private personService: PersonService,
   ) {
     this.currentLocation = JSON.parse(localStorage.getItem("currentLocation"));
   }
@@ -271,9 +274,9 @@ export class SampleInBatchRegistrationComponent implements OnInit {
     this.patientFieldSetClosed = !this.patientFieldSetClosed;
   }
 
-  //   getSelection(event: MatRadioChange): void {
-  //     this.registrationCategory = event?.value;
-  //   }
+  // getSelection(event: MatRadioChange): void {
+  //   this.registrationCategory = event?.value;
+  // }
 
   getTimestampFromDateAndTime(date: string, time: string): number {
     return new Date(`${date} ${time}`).getTime();
@@ -1958,8 +1961,6 @@ export class SampleInBatchRegistrationComponent implements OnInit {
 
   getSelection(event: MatRadioChange): void {
     this.personDetailsCategory = event?.value;
-    this.personDetailsCategory === "other" ? true : false;
-
     this.personDetailsData = {
       ...this.personDetailsData,
       isNewPatient: this.personDetailsCategory === "new",
@@ -1971,46 +1972,6 @@ export class SampleInBatchRegistrationComponent implements OnInit {
     if (this.personDetailsCategory === "new") {
       this.setPersonDetails();
     }
-  }
-
-  setIdentifierFields(
-    identifierTypes: any[],
-    personDetails?: any,
-    patientIdentifier?: string
-  ): void {
-    this.dynamicFields.map(
-      (field) => {
-        return {
-          ...field,
-          value: patientIdentifier
-            ? patientIdentifier
-            : personDetails && personDetails?.identifiers?.length > 0
-            ? (personDetails?.identifiers?.filter(
-                (identifier) =>
-                  identifier?.identifierType?.uuid ===
-                  field?.id
-              ) || [])[0]?.identifier
-            : null,
-        };
-      }
-    );
-
-    Object.keys(this.allRegistrationFields?.otherIdentifiersFields).map(
-      (key) => {
-        return {
-          ...this.allRegistrationFields?.otherIdentifiersFields[key],
-          value: patientIdentifier
-            ? patientIdentifier
-            : personDetails && personDetails?.identifiers?.length > 0
-            ? (personDetails?.identifiers?.filter(
-                (identifier) =>
-                  identifier?.identifierType?.uuid ===
-                  this.allRegistrationFields?.otherIdentifiersFields[key]?.id
-              ) || [])[0]?.identifier
-            : null,
-        };
-      }
-    );
   }
   onGetPersonDetails(personDetails: any): void {
     this.personDetailsData =
@@ -2030,6 +1991,7 @@ export class SampleInBatchRegistrationComponent implements OnInit {
   }
 
   setPersonDetails(personDetails?: any): void {
+    console.log("==> This selected patient from Pima Covid: ",personDetails)
     this.patientUuid = personDetails?.uuid;
     this.dynamicFields = this.dynamicFields.map((field) => {
       if(field.id === 'dob'){
@@ -2070,7 +2032,6 @@ export class SampleInBatchRegistrationComponent implements OnInit {
       return field;
     });
     if (personDetails) {
-      this.setIdentifierFields(this.identifierTypes, personDetails);
       this.personDetailsData = {
         ...this.personDetailsData,
         isNewPatient: this.personDetailsCategory === "new",
@@ -2080,5 +2041,57 @@ export class SampleInBatchRegistrationComponent implements OnInit {
           : null,
       };
     }
+
+    this.dynamicFields = []
+    setTimeout(() => {
+      this.dynamicFields = this.fieldsObject?.dynamicFields?.map((field) => {
+        return {
+          ...field,
+        value: personDetails && personDetails?.identifiers?.length > 0
+          ? (personDetails?.identifiers?.filter(
+              (identifier) =>
+                identifier?.identifierType?.uuid ===
+                field?.id
+            ) || [])[0]?.identifier
+          : this.personDetailsData[field.key] ? this.personDetailsData[field.key] 
+          : null
+        }
+      });
+    }, 100)
+  }
+
+  getSelectedClientRequest(clientRequest: any): void {
+    this.selectedClientData = clientRequest;
+    // First Check if client exists
+    this.personService
+      .getPatientsByIdentifier(clientRequest?.passportNumber)
+      .subscribe((response) => {
+        if (response) {
+          if (response?.length > 0) {
+            console.log("==> Person Detail Category: ", this.personDetailsCategory)
+            this.personDetailsCategory === "existing";
+            this.setPersonDetails(response[0]);
+          } else {
+            this.personDetailsData = {
+              ...this.personDetailsData,
+              preferredName: {
+                givenName: clientRequest?.firstName,
+                familyName2: clientRequest?.middleName,
+                familyName: clientRequest?.lastName,
+              },
+              gender:
+                clientRequest?.gender &&
+                clientRequest?.gender?.toLowerCase() == "me"
+                  ? "M"
+                  : "F",
+              email: clientRequest?.email,
+              phoneNumber: clientRequest?.phoneNumber,
+              birthdate: clientRequest?.dob,
+            };
+
+            this.setPersonDetails(this.personDetailsData);
+          }
+        }
+      });
   }
 }

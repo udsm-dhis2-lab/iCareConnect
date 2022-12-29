@@ -76,7 +76,7 @@
                     <!-- If available fixed fields -->
                     <ng-container *ngIf="selectedFixedFields?.length > 0">
                         <ng-container *ngFor="let selectedFixedField of selectedFixedFields">
-                            <div class="{{ useExistingBatchset ? 'col-12' : 'col-10' }}">
+                            <div class="{{ useExistingBatchset || useExistingBatch ? 'col-12' : 'col-10' }}">
                                 <app-form
                                     [fields]="[selectedFixedField]"
                                     (formUpdate)="onFormUpdate($event, 'SelectedFixedField', selectedFixedField.key)"
