@@ -16,10 +16,13 @@ export class WorksheetDefinitionComponent implements OnInit {
   worksheetDefinitionFields: any[];
   selectedWorkSheetConfiguration: any;
   worksheetDefinitions$: Observable<any[]>;
+  worksheetDefnPayload: any;
+  saving: boolean = false;
+  isWorksheetDefnValid: boolean = false;
   constructor(private worksheetsService: WorkSeetsService) {}
 
   ngOnInit(): void {
-    console.log(this.worksheets);
+    this.getWorksheetDefinitions();
     this.createWorksheetDefinitionFields();
   }
 
@@ -54,7 +57,27 @@ export class WorksheetDefinitionComponent implements OnInit {
   }
 
   onGetFormData(formValue: FormValue): void {
-    this.selectedWorkSheetConfiguration =
-      formValue.getValues()?.worksheet?.value;
+    const values = formValue.getValues();
+    this.isWorksheetDefnValid = formValue.isValid;
+    this.selectedWorkSheetConfiguration = values?.worksheet?.value;
+    this.worksheetDefnPayload = {
+      code: values?.code?.value,
+      worksheet: {
+        uuid: this.selectedWorkSheetConfiguration,
+      },
+    };
+  }
+
+  onSaveWorkSheetDefinition(event: Event): void {
+    this.saving = true;
+    this.worksheetsService
+      .createWorksheetDefinitions([this.worksheetDefnPayload])
+      .subscribe((response: any) => {
+        if (response && !response?.error) {
+          this.getWorksheetDefinitions();
+          this.createWorksheetDefinitionFields();
+          this.saving = false;
+        }
+      });
   }
 }
