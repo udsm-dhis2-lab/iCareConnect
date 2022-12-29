@@ -133,6 +133,10 @@ export class SampleInBatchRegistrationComponent implements OnInit {
   fieldWithValuesChanged: boolean = false;
   samplesCreated: any[] = [];
   getBatch: any;
+  patientUuid: any;
+  personDetailsCategory: string;
+  selectedClientData: any;
+  identifierTypes: any[];
 
   constructor(
     private samplesService: SamplesService,
@@ -169,30 +173,30 @@ export class SampleInBatchRegistrationComponent implements OnInit {
     let fields = [
       ...this.staticFields.map((field) => {
         return {
-          [field.key]: field.value
-        }
+          [field.key]: field.value,
+        };
       }),
       ...this.fixedFields.map((field) => {
         return {
-          [field.key]: field.value
-        }
-      })
+          [field.key]: field.value,
+        };
+      }),
     ];
     fields.forEach((field) => {
       this.fieldsWithValues = {
         ...this.fieldsWithValues,
-        ...field
-      }
-    })
+        ...field,
+      };
+    });
 
     Object.keys(this.allRegistrationFields?.patientAgeFields).forEach((key) => {
-        if(this.fieldsWithValues[key]){
-          this.personDetailsData = {
-            ...this.personDetailsData,
-            [key]: this.fieldsWithValues[key]
-          };
-        }
-      })
+      if (this.fieldsWithValues[key]) {
+        this.personDetailsData = {
+          ...this.personDetailsData,
+          [key]: this.fieldsWithValues[key],
+        };
+      }
+    });
     Object.keys(this.allRegistrationFields?.testFields).forEach((key) => {
       if (this.fieldsWithValues[key]?.length > 0) {
         this.testOrders = [
@@ -212,7 +216,7 @@ export class SampleInBatchRegistrationComponent implements OnInit {
         if (this.fieldsWithValues[key]) {
           this.personDetailsData = {
             ...this.personDetailsData,
-            [key]: this.fieldsWithValues[key]
+            [key]: this.fieldsWithValues[key],
           };
         }
       }
@@ -235,11 +239,16 @@ export class SampleInBatchRegistrationComponent implements OnInit {
   }
 
   assignFields() {
-    this.samplesService.getBatches(null, null, this.batch?.name).pipe(tap((response) => {
-      if(!response?.error){
-        this.getBatch = response;
-      }
-    })).subscribe()
+    this.samplesService
+      .getBatches(null, null, this.batch?.name)
+      .pipe(
+        tap((response) => {
+          if (!response?.error) {
+            this.getBatch = response;
+          }
+        })
+      )
+      .subscribe();
     this.fixedFields = this.fieldsObject?.fixedFieldsWithValues;
     this.staticFields = this.fieldsObject?.staticFieldsWithValues;
     this.dynamicFields = this.fieldsObject?.dynamicFields;
@@ -517,12 +526,12 @@ export class SampleInBatchRegistrationComponent implements OnInit {
     }
 
     this.minForReceivedOn = false;
-    if (this.receivedOnField?.min){
+    if (this.receivedOnField?.min) {
       this.receivedOnField.min = this.broughtOnDateLatestValue
         ? this.broughtOnDateLatestValue
         : this.collectedOnDateLatestValue;
     }
-    if (this.broughtOnField?.min){
+    if (this.broughtOnField?.min) {
       this.broughtOnField.min = this.collectedOnDateLatestValue
         ? this.collectedOnDateLatestValue
         : "";
@@ -530,14 +539,14 @@ export class SampleInBatchRegistrationComponent implements OnInit {
     this.minForReceivedOn = true;
 
     this.maxForCollectedOn = false;
-    if (this.sampleColectionDateField?.max){
+    if (this.sampleColectionDateField?.max) {
       this.sampleColectionDateField.max = this.broughtOnDateLatestValue
         ? this.broughtOnDateLatestValue
         : this.receivedOnDateLatestValue
         ? this.receivedOnDateLatestValue
         : this.maximumDate;
     }
-    if (this.broughtOnField?.max){
+    if (this.broughtOnField?.max) {
       this.broughtOnField.max = this.receivedOnDateLatestValue
         ? this.receivedOnDateLatestValue
         : this.maximumDate;
@@ -545,26 +554,28 @@ export class SampleInBatchRegistrationComponent implements OnInit {
     this.maxForCollectedOn = true;
 
     // this.getDateStringFromMoment_i();
-    if (
-      this.formData["specimen"]?.value
-    ) {
+    if (this.formData["specimen"]?.value) {
       this.selectedSpecimenUuid = this.formData["specimen"]?.value;
     } else {
-      this.selectedSpecimenUuid = this.fieldsWithValues['specimen'];
+      this.selectedSpecimenUuid = this.fieldsWithValues["specimen"];
     }
     Object.keys(this.formData).forEach((key) => {
-      if(this.allRegistrationFields?.testFields[key] && this.formData[key] && this.formData[key]?.value){
-          this.testOrders = [
-            ...this.testOrders,
-            ...this.formData[key]?.value?.map((value, index) => {
-                return {
-                  id: "test" + index,
-                  key: "test" + index,
-                  value: value,
-                };
-              })
-          ]
-        }
+      if (
+        this.allRegistrationFields?.testFields[key] &&
+        this.formData[key] &&
+        this.formData[key]?.value
+      ) {
+        this.testOrders = [
+          ...this.testOrders,
+          ...this.formData[key]?.value?.map((value, index) => {
+            return {
+              id: "test" + index,
+              key: "test" + index,
+              value: value,
+            };
+          }),
+        ];
+      }
       if (
         (this.allRegistrationFields?.personFields[key] ||
           this.allRegistrationFields?.patientAgeFields[key] ||
@@ -577,14 +588,14 @@ export class SampleInBatchRegistrationComponent implements OnInit {
         };
       }
 
-      if(this.allRegistrationFields?.primaryIdentifierFields[key]){
+      if (this.allRegistrationFields?.primaryIdentifierFields[key]) {
         this.personDetailsData = {
           ...this.personDetailsData,
-          [key]: this.allRegistrationFields?.primaryIdentifierFields[key].value
-        }
+          [key]: this.allRegistrationFields?.primaryIdentifierFields[key].value,
+        };
       }
     });
-}
+  }
 
   onAddSampleData() {
     this.formDataObject = {
@@ -606,7 +617,8 @@ export class SampleInBatchRegistrationComponent implements OnInit {
             return null;
           }
         });
-      }).filter((field) => field);
+      })
+      .filter((field) => field);
     this.dynamicFields = [];
     this.fieldWithValuesChanged = false;
     setTimeout(() => {
@@ -615,101 +627,82 @@ export class SampleInBatchRegistrationComponent implements OnInit {
     }, 200);
   }
 
-    onFormUpdateForTest(testValues: any): void {
-      Object.keys(this.formData).forEach((key) => {
-        if (!testValues[key] && key?.indexOf("test") > -1) {
-          this.formData = omit(this.formData, key);
-        }
-      });
-      this.formData = { ...this.formData, ...testValues };
-      Object.keys(this.formData).forEach((key) => {
-        if (key.indexOf("test") === 0) {
-          this.testOrders = uniqBy(
-            [
-              ...this.testOrders,
-              {
-                ...this.formData[key],
-              },
-            ],
-            "id"
-          );
-        }
-      });
-      this.groupedTestOrdersByDepartments = formulateSamplesByDepartments(
-        this.labSections,
-        this.testOrders
-      );
-
-      if (this.testOrders?.length === 0) {
-        this.errorMessage = "No test has been selected";
-      } else {
-        this.errorMessage = "";
+  onFormUpdateForTest(testValues: any): void {
+    Object.keys(this.formData).forEach((key) => {
+      if (!testValues[key] && key?.indexOf("test") > -1) {
+        this.formData = omit(this.formData, key);
       }
-
-      if (this.groupedTestOrdersByDepartments?.length === 0) {
-        this.errorMessage = "Test missing lab section";
-      } else {
-        this.errorMessage = "";
+    });
+    this.formData = { ...this.formData, ...testValues };
+    Object.keys(this.formData).forEach((key) => {
+      if (key.indexOf("test") === 0) {
+        this.testOrders = uniqBy(
+          [
+            ...this.testOrders,
+            {
+              ...this.formData[key],
+            },
+          ],
+          "id"
+        );
       }
+    });
+    this.groupedTestOrdersByDepartments = formulateSamplesByDepartments(
+      this.labSections,
+      this.testOrders
+    );
+
+    if (this.testOrders?.length === 0) {
+      this.errorMessage = "No test has been selected";
+    } else {
+      this.errorMessage = "";
     }
 
-    onFormUpdateForAgency(formValues: FormValue): void {
-      this.formData = { ...this.formData, ...formValues.getValues() };
+    if (this.groupedTestOrdersByDepartments?.length === 0) {
+      this.errorMessage = "Test missing lab section";
+    } else {
+      this.errorMessage = "";
     }
+  }
 
-    onFormUpdateForLab(formValues: FormValue): void {
-      this.formData = { ...this.formData, ...formValues.getValues() };
-    }
+  onFormUpdateForAgency(formValues: FormValue): void {
+    this.formData = { ...this.formData, ...formValues.getValues() };
+  }
 
-    onGetSampleLabel(sampleLabel: string): void {
-      this.currentSampleLabel = sampleLabel;
-    }
+  onFormUpdateForLab(formValues: FormValue): void {
+    this.formData = { ...this.formData, ...formValues.getValues() };
+  }
 
-    onGetSelectedOptionDetails(details): void {
-      this.formData = { ...this.formData, ...details };
-    }
+  onGetSampleLabel(sampleLabel: string): void {
+    this.currentSampleLabel = sampleLabel;
+  }
 
-    onGetPersonDetails(personDetails: any): void {
-      this.personDetailsData =
-        this.registrationCategory === "CLINICAL"
-          ? personDetails
-          : this.registrationCategory === "EQA"
-          ? EQA_PERSON_DATA
-          : NON_CLINICAL_PERSON_DATA;
-      if (this.fromExternalSystem && this.selectedSystem) {
-        const uuid = (this.testsFromExternalSystemsConfigs.filter(
-          (testConfigs) =>
-            testConfigs?.referenceKeyPart ===
-            this.selectedSystem?.testsSearchingKey
-        ) || [])[0]?.value;
-        this.testsUnderSpecimen$ = this.conceptService
-          .getConceptDetailsByUuid(uuid, "custom:(uuid,display)")
-          .pipe(map((response) => [response]));
-      }
-    }
+  onGetSelectedOptionDetails(details): void {
+    this.formData = { ...this.formData, ...details };
+  }
 
-    formatToSpecifiedChars(labNumber): string {
-      let generatedStr = "";
-      for (
-        let count = 0;
-        count <
-        Number(this.labNumberCharactersCount) -
-          (labNumber.toString()?.length + 6);
-        count++
-      ) {
-        generatedStr = generatedStr + "0";
-      }
-      return (
-        new Date().getFullYear().toString() +
-        new Date().getMonth().toString() +
-        generatedStr +
-        labNumber.toString()
-      );
+  formatToSpecifiedChars(labNumber): string {
+    let generatedStr = "";
+    for (
+      let count = 0;
+      count <
+      Number(this.labNumberCharactersCount) -
+        (labNumber.toString()?.length + 6);
+      count++
+    ) {
+      generatedStr = generatedStr + "0";
     }
+    return (
+      new Date().getFullYear().toString() +
+      new Date().getMonth().toString() +
+      generatedStr +
+      labNumber.toString()
+    );
+  }
 
-    onGetClinicalDataValues(clinicalData): void {
-      this.formData = { ...this.formData, ...clinicalData };
-    }
+  onGetClinicalDataValues(clinicalData): void {
+    this.formData = { ...this.formData, ...clinicalData };
+  }
 
   onSave(event: Event, labLocations?: any[]): void {
     event.stopPropagation();
@@ -814,7 +807,7 @@ export class SampleInBatchRegistrationComponent implements OnInit {
                                 },
                               ],
                               gender:
-                                this.personDetailsData?.gender.length > 0
+                                this.personDetailsData?.gender?.length > 0
                                   ? this.personDetailsData?.gender
                                   : "U",
                               age: this.personDetailsData?.age,
@@ -1145,8 +1138,10 @@ export class SampleInBatchRegistrationComponent implements OnInit {
                                                                       }
                                                                     ),
                                                                   batch: {
-                                                                    uuid: this.batch?.uuid
-                                                                  }
+                                                                    uuid: this
+                                                                      .batch
+                                                                      ?.uuid,
+                                                                  },
                                                                 };
                                                                 // Create sample
                                                                 this.samplesService
@@ -1168,10 +1163,12 @@ export class SampleInBatchRegistrationComponent implements OnInit {
                                                                           },
                                                                         ];
 
-                                                                        this.samplesCreated = [
-                                                                          ...this.samplesCreated,
-                                                                          sampleResponse
-                                                                        ]
+                                                                      this.samplesCreated =
+                                                                        [
+                                                                          ...this
+                                                                            .samplesCreated,
+                                                                          sampleResponse,
+                                                                        ];
                                                                       // TODO: Find a better way to control three labels to be printed
 
                                                                       this.sampleLabelsUsedDetails =
@@ -1710,11 +1707,16 @@ export class SampleInBatchRegistrationComponent implements OnInit {
                                                                                   .afterClosed()
                                                                                   .subscribe(
                                                                                     () => {
-                                                                                      this.dynamicFields = []
-                                                                                      this.getBatch = undefined;
-                                                                                      setTimeout(() => {
-                                                                                        this.assignFields();
-                                                                                      }, 100)
+                                                                                      this.dynamicFields =
+                                                                                        [];
+                                                                                      this.getBatch =
+                                                                                        undefined;
+                                                                                      setTimeout(
+                                                                                        () => {
+                                                                                          this.assignFields();
+                                                                                        },
+                                                                                        100
+                                                                                      );
                                                                                       this.openBarCodeDialog(
                                                                                         data
                                                                                       );
@@ -1952,5 +1954,131 @@ export class SampleInBatchRegistrationComponent implements OnInit {
 
   onPageChange(e: any) {
     console.log("==> On page change.");
+  }
+
+  getSelection(event: MatRadioChange): void {
+    this.personDetailsCategory = event?.value;
+    this.personDetailsCategory === "other" ? true : false;
+
+    this.personDetailsData = {
+      ...this.personDetailsData,
+      isNewPatient: this.personDetailsCategory === "new",
+      patientUuid: this.patientUuid,
+      pimaCOVIDLinkDetails: !this.selectedClientData?.hasResults
+        ? this.selectedClientData
+        : null,
+    };
+    if (this.personDetailsCategory === "new") {
+      this.setPersonDetails();
+    }
+  }
+
+  setIdentifierFields(
+    identifierTypes: any[],
+    personDetails?: any,
+    patientIdentifier?: string
+  ): void {
+    this.dynamicFields.map(
+      (field) => {
+        return {
+          ...field,
+          value: patientIdentifier
+            ? patientIdentifier
+            : personDetails && personDetails?.identifiers?.length > 0
+            ? (personDetails?.identifiers?.filter(
+                (identifier) =>
+                  identifier?.identifierType?.uuid ===
+                  field?.id
+              ) || [])[0]?.identifier
+            : null,
+        };
+      }
+    );
+
+    Object.keys(this.allRegistrationFields?.otherIdentifiersFields).map(
+      (key) => {
+        return {
+          ...this.allRegistrationFields?.otherIdentifiersFields[key],
+          value: patientIdentifier
+            ? patientIdentifier
+            : personDetails && personDetails?.identifiers?.length > 0
+            ? (personDetails?.identifiers?.filter(
+                (identifier) =>
+                  identifier?.identifierType?.uuid ===
+                  this.allRegistrationFields?.otherIdentifiersFields[key]?.id
+              ) || [])[0]?.identifier
+            : null,
+        };
+      }
+    );
+  }
+  onGetPersonDetails(personDetails: any): void {
+    this.personDetailsData =
+      this.registrationCategory === "CLINICAL"
+        ? personDetails
+        : this.registrationCategory === "EQA"
+        ? EQA_PERSON_DATA
+        : NON_CLINICAL_PERSON_DATA;
+    if (this.fromExternalSystem && this.selectedSystem) {
+      const uuid = (this.testsFromExternalSystemsConfigs.filter(
+        (testConfigs) =>
+          testConfigs?.referenceKeyPart ===
+          this.selectedSystem?.testsSearchingKey
+      ) || [])[0]?.value;
+    }
+    this.setPersonDetails(personDetails);
+  }
+
+  setPersonDetails(personDetails?: any): void {
+    this.patientUuid = personDetails?.uuid;
+    this.dynamicFields = this.dynamicFields.map((field) => {
+      if(field.id === 'dob'){
+        field = {
+          ...field,
+        value:
+          personDetails && personDetails?.birthdate
+            ? new Date(personDetails?.birthdate)
+            : null
+        }
+      }
+
+      if (this.allRegistrationFields?.personFields[field.key]) {
+        if (personDetails) {
+          this.personDetailsData = {
+            ...this.personDetailsData,
+            firstName: personDetails?.preferredName?.givenName,
+            middleName: personDetails?.preferredName?.middleName,
+            lastName: personDetails?.preferredName?.familyName,
+            mobileNumber: personDetails?.attributes?.filter((attribute) => {
+              if (
+                attribute?.attributeType ===
+                "aeb3a16c-f5b6-4848-aa51-d7e3146886d6"
+              ) {
+                return attribute;
+              }
+            })[0]?.value,
+          };
+        }
+      }
+      
+      if (personDetails[field.key]) {
+        field = {
+          ...field,
+          value: personDetails ? personDetails[field.key] : null,
+        }
+      } 
+      return field;
+    });
+    if (personDetails) {
+      this.setIdentifierFields(this.identifierTypes, personDetails);
+      this.personDetailsData = {
+        ...this.personDetailsData,
+        isNewPatient: this.personDetailsCategory === "new",
+        patientUuid: this.patientUuid,
+        pimaCOVIDLinkDetails: !this.selectedClientData?.hasResults
+          ? this.selectedClientData
+          : null,
+      };
+    }
   }
 }
