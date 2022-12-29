@@ -1991,72 +1991,65 @@ export class SampleInBatchRegistrationComponent implements OnInit {
   }
 
   setPersonDetails(personDetails?: any): void {
-    console.log("==> This selected patient from Pima Covid: ",personDetails)
     this.patientUuid = personDetails?.uuid;
-    this.dynamicFields = this.dynamicFields.map((field) => {
-      if(field.id === 'dob'){
-        field = {
-          ...field,
-        value:
-          personDetails && personDetails?.birthdate
-            ? new Date(personDetails?.birthdate)
-            : null
-        }
-      }
-
-      if (this.allRegistrationFields?.personFields[field.key]) {
-        if (personDetails) {
-          this.personDetailsData = {
-            ...this.personDetailsData,
-            firstName: personDetails?.preferredName?.givenName,
-            middleName: personDetails?.preferredName?.middleName,
-            lastName: personDetails?.preferredName?.familyName,
-            mobileNumber: personDetails?.attributes?.filter((attribute) => {
-              if (
-                attribute?.attributeType ===
-                "aeb3a16c-f5b6-4848-aa51-d7e3146886d6"
-              ) {
-                return attribute;
-              }
-            })[0]?.value,
-          };
-        }
-      }
-      
-      if (personDetails[field.key]) {
-        field = {
-          ...field,
-          value: personDetails ? personDetails[field.key] : null,
-        }
-      } 
-      return field;
-    });
-    if (personDetails) {
-      this.personDetailsData = {
-        ...this.personDetailsData,
-        isNewPatient: this.personDetailsCategory === "new",
-        patientUuid: this.patientUuid,
-        pimaCOVIDLinkDetails: !this.selectedClientData?.hasResults
-          ? this.selectedClientData
-          : null,
-      };
-    }
-
     this.dynamicFields = []
     setTimeout(() => {
+      if (personDetails) {
+        this.personDetailsData = {
+          ...this.personDetailsData,
+          isNewPatient: this.personDetailsCategory === "new",
+          patientUuid: this.patientUuid,
+          pimaCOVIDLinkDetails: !this.selectedClientData?.hasResults
+            ? this.selectedClientData
+            : null,
+        };
+      }
       this.dynamicFields = this.fieldsObject?.dynamicFields?.map((field) => {
-        return {
-          ...field,
-        value: personDetails && personDetails?.identifiers?.length > 0
-          ? (personDetails?.identifiers?.filter(
-              (identifier) =>
-                identifier?.identifierType?.uuid ===
-                field?.id
-            ) || [])[0]?.identifier
-          : this.personDetailsData[field.key] ? this.personDetailsData[field.key] 
-          : null
-        }
-      });
+          if (field.id === "dob") {
+            field = {
+              ...field,
+              value:
+                personDetails && personDetails?.birthdate
+                  ? new Date(personDetails?.birthdate)
+                  : null,
+            };
+          }
+
+          if (this.allRegistrationFields?.personFields[field.key]) {
+            if (personDetails) {
+              this.personDetailsData = {
+                ...this.personDetailsData,
+                firstName: personDetails?.preferredName?.givenName,
+                middleName: personDetails?.preferredName?.middleName,
+                lastName: personDetails?.preferredName?.familyName,
+                mobileNumber: personDetails?.attributes?.filter((attribute) => {
+                  if (
+                    attribute?.attributeType ===
+                    "aeb3a16c-f5b6-4848-aa51-d7e3146886d6"
+                  ) {
+                    return attribute;
+                  }
+                })[0]?.value,
+              };
+            }
+          }
+
+          if (personDetails[field.key]) {
+            field = {
+              ...field,
+              value:
+                personDetails && personDetails?.identifiers?.length > 0
+                  ? (personDetails?.identifiers?.filter(
+                      (identifier) =>
+                        identifier?.identifierType?.uuid === field?.id
+                    ) || [])[0]?.identifier
+                  : this.personDetailsData[field.key]
+                  ? this.personDetailsData[field.key]
+                  : null,
+            };
+          }
+          return field;
+        });
     }, 100)
   }
 
