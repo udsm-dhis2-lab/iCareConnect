@@ -16,14 +16,19 @@ export class WorksheetDefinitionComponent implements OnInit {
   worksheetDefinitionFields: any[];
   selectedWorkSheetConfiguration: any;
   worksheetDefinitions$: Observable<any[]>;
+  testControls$: Observable<any[]>;
   worksheetDefnPayload: any;
   saving: boolean = false;
   isWorksheetDefnValid: boolean = false;
+  currentWorksheetDefinition: any;
+  selectedRowsColumns: any = {};
+  definedControls: any = {};
   constructor(private worksheetsService: WorkSeetsService) {}
 
   ngOnInit(): void {
     this.getWorksheetDefinitions();
     this.createWorksheetDefinitionFields();
+    this.getTestControls();
   }
 
   createWorksheetDefinitionFields(): void {
@@ -56,6 +61,10 @@ export class WorksheetDefinitionComponent implements OnInit {
       this.worksheetsService.getWorksheetDefinitions();
   }
 
+  getTestControls(): void {
+    this.testControls$ = this.worksheetsService.getWorksheetControls();
+  }
+
   onGetFormData(formValue: FormValue): void {
     const values = formValue.getValues();
     this.isWorksheetDefnValid = formValue.isValid;
@@ -79,5 +88,48 @@ export class WorksheetDefinitionComponent implements OnInit {
           this.saving = false;
         }
       });
+  }
+
+  setCurrentWorksheetDefn(event: Event, worksheetDefn: any): void {
+    // event.stopPropagation();
+    const matchedWorksheet = (this.worksheets?.filter(
+      (worksheet) => worksheet?.uuid === worksheetDefn?.worksheet?.uuid
+    ) || [])[0];
+    this.currentWorksheetDefinition = {
+      ...worksheetDefn,
+      worksheet: {
+        ...worksheetDefn?.worksheet,
+        ...{
+          ...matchedWorksheet,
+          columns: this.generateArrayOfItemsFromCount(
+            matchedWorksheet?.columns
+          ),
+          rows: this.generateArrayOfItemsFromCount(matchedWorksheet?.rows),
+        },
+      },
+    };
+
+    this.currentWorksheetDefinition?.worksheet?.rows?.forEach((row) => {
+      this.currentWorksheetDefinition?.worksheet?.columns?.forEach((column) => {
+        this.selectedRowsColumns[row + "-" + column + "-sample"] =
+          row + "-" + column + "-sample";
+      });
+    });
+  }
+
+  generateArrayOfItemsFromCount(count: number): any[] {
+    let items = [];
+    for (let cnt = 1; cnt <= count; cnt++) {
+      items.push(cnt);
+    }
+    return items;
+  }
+
+  toggleControl(event, rowColumn: string): void {
+    this.selectedRowsColumns[rowColumn] = rowColumn;
+  }
+
+  getSelectedTestControl(selectedControlUuid: string, id: string): void {
+    this.definedControls[id] = selectedControlUuid;
   }
 }

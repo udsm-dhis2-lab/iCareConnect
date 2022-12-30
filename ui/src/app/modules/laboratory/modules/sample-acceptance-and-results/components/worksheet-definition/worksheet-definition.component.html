@@ -1,6 +1,9 @@
 <div
   class="row"
-  *ngIf="{ worksheetDefinitions: worksheetDefinitions$ | async } as params"
+  *ngIf="{
+    worksheetDefinitions: worksheetDefinitions$ | async,
+    testControls: testControls$ | async
+  } as params"
 >
   <div class="loading-overlay" *ngIf="saving">
     <div class="text-center">
@@ -26,27 +29,140 @@
             params?.worksheetDefinitions?.length > 0
           "
         >
-          <tr
+          <ng-container
             *ngFor="
               let worksheetDefinition of params?.worksheetDefinitions;
               let count = index
             "
           >
-            <td>
-              {{ count + 1 }}
-            </td>
-            <td>
-              {{ worksheetDefinition?.code }}
-            </td>
-            <td></td>
-          </tr>
+            <tr>
+              <td>
+                {{ count + 1 }}
+              </td>
+              <td>
+                {{ worksheetDefinition?.code }}
+              </td>
+              <td>
+                <button
+                  mat-icon-button
+                  [matMenuTriggerFor]="menu"
+                  aria-label=""
+                >
+                  <mat-icon>more_vert</mat-icon>
+                </button>
+                <mat-menu #menu="matMenu">
+                  <button
+                    (click)="
+                      setCurrentWorksheetDefn($event, worksheetDefinition)
+                    "
+                    mat-menu-item
+                  >
+                    <mat-icon>view</mat-icon>
+                    <span>View details</span>
+                  </button>
+                </mat-menu>
+              </td>
+            </tr>
+            <tr
+              *ngIf="
+                worksheetDefinition?.code === currentWorksheetDefinition?.code
+              "
+            >
+              <td colspan="100%">
+                <div class="w-100" style="max-height: 400px; overflow: auto">
+                  <table class="table table-bordered">
+                    <tr
+                      *ngFor="
+                        let row of currentWorksheetDefinition?.worksheet?.rows;
+                        let rowCount = index
+                      "
+                    >
+                      <td
+                        *ngFor="
+                          let column of currentWorksheetDefinition?.worksheet
+                            ?.columns;
+                          let columnCount = index
+                        "
+                      >
+                        <section class="example-section">
+                          <mat-radio-group>
+                            <mat-radio-button
+                              color="primary"
+                              (change)="
+                                toggleControl(
+                                  $event,
+                                  row + '-' + column + '-control'
+                                )
+                              "
+                              [checked]="
+                                selectedRowsColumns &&
+                                selectedRowsColumns[
+                                  row + '-' + column + '-control'
+                                ]
+                              "
+                              [value]="row + '-' + column + '-control'"
+                            >
+                              Control
+                            </mat-radio-button>
+                            <mat-radio-button
+                              (change)="
+                                toggleControl(
+                                  $event,
+                                  row + '-' + column + '-sample'
+                                )
+                              "
+                              [checked]="
+                                selectedRowsColumns &&
+                                selectedRowsColumns[
+                                  row + '-' + column + '-sample'
+                                ]
+                              "
+                              color="primary"
+                              [value]="row + '-' + column + '-sample'"
+                            >
+                              Sample
+                            </mat-radio-button>
+                          </mat-radio-group>
+                        </section>
+                        <div
+                          *ngIf="
+                            selectedRowsColumns[row + '-' + column + '-control']
+                          "
+                        >
+                          <app-test-control-selection-form
+                            *ngIf="params?.testControls"
+                            [id]="row + '-' + column + '-control'"
+                            [testControls]="params?.testControls"
+                            (selectedControl)="
+                              getSelectedTestControl(
+                                $event,
+                                row + '-' + column + '-control'
+                              )
+                            "
+                          ></app-test-control-selection-form>
+                        </div>
+                      </td>
+                    </tr>
+                  </table>
+                </div>
+              </td>
+            </tr>
+          </ng-container>
         </ng-container>
         <ng-container
           *ngIf="
             params?.worksheetDefinitions &&
             params?.worksheetDefinitions?.length === 0
           "
-        ></ng-container>
+        >
+          <tr>
+            <td colspan="100%">
+              <div class="alert alert-warning" role="alert">
+                No Worksheet definition available
+              </div>
+            </td>
+          </tr>
+        </ng-container>
       </tbody>
     </table>
   </div>

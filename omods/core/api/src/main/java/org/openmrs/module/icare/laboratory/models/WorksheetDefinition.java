@@ -68,6 +68,9 @@ public class WorksheetDefinition extends BaseOpenmrsData implements java.io.Seri
 		Map<String,Object> worksheetObject = new HashMap<>();
 		worksheetObject.put("uuid",this.worksheet.getUuid());
 		worksheetObject.put("display",this.worksheet.getName());
+		worksheetObject.put("code",this.worksheet.getCode());
+		worksheetObject.put("rows",this.worksheet.getRows());
+		worksheetObject.put("columns",this.worksheet.getColumns());
 		worksheetDefinitionObject.put("worksheet",worksheetObject);
 
 		if (this.creator != null){

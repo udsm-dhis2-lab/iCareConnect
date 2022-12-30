@@ -71,30 +71,29 @@ public class WorksheetStatus extends BaseOpenmrsData implements java.io.Serializ
 	public void setStatus(String status) {
 		this.status = status;
 	}
-
-
-	public static WorksheetStatus fromMap(Map<String,Object> worksheetStatusMap){
-
+	
+	public static WorksheetStatus fromMap(Map<String, Object> worksheetStatusMap) {
+		
 		WorksheetStatus worksheetStatus = new WorksheetStatus();
-		if(worksheetStatusMap.get("category") != null){
+		if (worksheetStatusMap.get("category") != null) {
 			worksheetStatus.setCategory(worksheetStatusMap.get("category").toString());
 		}
-		if(worksheetStatusMap.get("status") != null){
+		if (worksheetStatusMap.get("status") != null) {
 			worksheetStatus.setStatus(worksheetStatusMap.get("status").toString());
 		}
-		if(worksheetStatusMap.get("remarks") != null){
+		if (worksheetStatusMap.get("remarks") != null) {
 			worksheetStatus.setRemarks(worksheetStatusMap.get("remarks").toString());
 		}
-
-		if(worksheetStatusMap.get("worksheet") != null){
+		
+		if (worksheetStatusMap.get("worksheet") != null) {
 			Worksheet worksheet = new Worksheet();
 			worksheet.setUuid(((Map) worksheetStatusMap.get("worksheet")).get("uuid").toString());
 			worksheetStatus.setWorksheet(worksheet);
 		}
-
+		
 		return worksheetStatus;
 	}
-
+	
 	public Map<String,Object> toMap(){
 
 		HashMap<String,Object> worksheetStatusObject = new HashMap<>();
@@ -118,5 +117,4 @@ public class WorksheetStatus extends BaseOpenmrsData implements java.io.Serializ
 
 		return worksheetStatusObject;
 	}
-	
 }
