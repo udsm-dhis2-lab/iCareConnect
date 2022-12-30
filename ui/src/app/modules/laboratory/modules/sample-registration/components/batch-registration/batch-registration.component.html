@@ -55,9 +55,8 @@
                         </mat-slide-toggle>
                     </div>
                     <div class="col-12">
-                        {{ existingBatchField }}
                         <app-form
-                            [fields]="useExistingBatch && existingBatchField?.options?.length ? [existingBatchField] : [batchNameField]"
+                            [fields]="(useExistingBatch && existingBatchField?.options?.length) || !fromMaintenance? [existingBatchField] : [batchNameField]"
                             (formUpdate)="onFormUpdate($event, useExistingBatch ? 'Existing Batch' : 'New Batch Name')"
                         ></app-form>
                         <p class="text-danger" *ngIf="!validBatchName">This batch already exists</p>
