@@ -66,7 +66,7 @@ export class BatchRegistrationComponent implements OnInit {
   ngOnInit(): void {
     this.warning = {
       error: {
-        message: "This feature is still under development hence not usable!",
+        message: "This feature is still under development hence official usage is not allowed (Use it for testing purposes)!",
       },
       type: "warning",
     };
@@ -362,23 +362,27 @@ export class BatchRegistrationComponent implements OnInit {
       let existingBatchset = this.existingBatchsets.filter(
         (batchset) => batchset.name === this.existingBatchsetField.value
       )[0];
-      this.existingBatchField.options = existingBatchset
-        ? existingBatchset?.batches?.map((batch) => {
-            return {
-              key: batch?.uuid,
-              label: batch?.name,
-              value: batch?.name,
-              name: batch?.name,
-            };
-          })
-        : this.existingBatches?.map((batch) => {
-            return {
-              key: batch?.uuid,
-              label: batch?.name,
-              value: batch?.name,
-              name: batch?.name,
-            };
-          });
+      this.useExistingBatch = false
+      setTimeout(() => {
+        this.existingBatchField.options = existingBatchset && existingBatchset?.batches?.length
+            ? existingBatchset?.batches?.map((batch) => {
+              return {
+                key: batch?.uuid,
+                  label: batch?.name,
+                  value: batch?.name,
+                  name: batch?.name,
+                };
+              })
+              : this.existingBatches?.map((batch) => {
+                return {
+                  key: batch?.uuid,
+                  label: batch?.name,
+                  value: batch?.name,
+                  name: batch?.name,
+                };
+              });
+        this.useExistingBatch = false
+      }, 100)
       this.batchsetDescription.value = existingBatchset?.description?.length ? existingBatchset?.description : "";
       let existingBatchsetFields = existingBatchset?.fields;
       if (existingBatchsetFields?.length > 0) {
