@@ -134,7 +134,8 @@ export class SampleInBatchRegistrationComponent implements OnInit {
   fieldsWithValues: any = {};
   fieldWithValuesChanged: boolean = false;
   samplesCreated: any[] = [];
-  getBatch: any;
+  getBatch: any[] = [];
+  gettingBatches: boolean = false;
   patientUuid: any;
   personDetailsCategory: string;
   selectedClientData: any;
@@ -224,8 +225,6 @@ export class SampleInBatchRegistrationComponent implements OnInit {
         }
       }
     );
-
-    console.log("==> Fields with values: ", this.fieldsWithValues);
   }
 
   get maximumDate() {
@@ -242,16 +241,16 @@ export class SampleInBatchRegistrationComponent implements OnInit {
   }
 
   assignFields() {
-    this.samplesService
-      .getBatches(null, null, this.batch?.name)
+    this.gettingBatches = true
+    this.samplesService.getBatches(null, null, this.batch?.name)
       .pipe(
         tap((response) => {
           if (!response?.error) {
             this.getBatch = response;
+            this.gettingBatches = false;
           }
         })
-      )
-      .subscribe();
+      ).subscribe();
     this.fixedFields = this.fieldsObject?.fixedFieldsWithValues;
     this.staticFields = this.fieldsObject?.staticFieldsWithValues;
     this.dynamicFields = this.fieldsObject?.dynamicFields;
@@ -709,7 +708,6 @@ export class SampleInBatchRegistrationComponent implements OnInit {
 
   onSave(event: Event, labLocations?: any[]): void {
     event.stopPropagation();
-    console.log("==> On Save lab locations ", labLocations);
     if (labLocations?.length === 1) {
       this.currentLabLocation = labLocations[0];
     } else {
@@ -1712,8 +1710,7 @@ export class SampleInBatchRegistrationComponent implements OnInit {
                                                                                     () => {
                                                                                       this.dynamicFields =
                                                                                         [];
-                                                                                      this.getBatch =
-                                                                                        undefined;
+                                                                                      this.getBatch = [];
                                                                                       setTimeout(
                                                                                         () => {
                                                                                           this.assignFields();
@@ -1997,6 +1994,18 @@ export class SampleInBatchRegistrationComponent implements OnInit {
       if (personDetails) {
         this.personDetailsData = {
           ...this.personDetailsData,
+          ...personDetails,
+          firstName: personDetails?.preferredName?.givenName,
+          middleName: personDetails?.preferredName?.middleName,
+          lastName: personDetails?.preferredName?.familyName,
+          mobileNumber: personDetails?.attributes?.filter((attribute) => {
+            if (
+              attribute?.attributeType ===
+              "aeb3a16c-f5b6-4848-aa51-d7e3146886d6"
+            ) {
+              return attribute;
+            }
+          })[0]?.value,
           isNewPatient: this.personDetailsCategory === "new",
           patientUuid: this.patientUuid,
           pimaCOVIDLinkDetails: !this.selectedClientData?.hasResults
@@ -2005,49 +2014,33 @@ export class SampleInBatchRegistrationComponent implements OnInit {
         };
       }
       this.dynamicFields = this.fieldsObject?.dynamicFields?.map((field) => {
+          
+          
+          const id = (this.personDetailsData?.identifiers?.filter(
+                (identifier) => identifier?.identifierType?.uuid === field?.id
+              ) || [])
+          console.log("==> Field ID: ", field?.id);
+          field = {
+            ...field,
+            value:
+              this.personDetailsData &&
+              this.personDetailsData?.identifiers?.length &&
+              id.length
+                ? id[0]?.identifier
+                : this.personDetailsData[field.id]
+                ? this.personDetailsData[field.id]
+                : null,
+          };
           if (field.id === "dob") {
             field = {
               ...field,
               value:
-                personDetails && personDetails?.birthdate
+                this.personDetailsData && this.personDetailsData?.birthdate
                   ? new Date(personDetails?.birthdate)
                   : null,
             };
           }
-
-          if (this.allRegistrationFields?.personFields[field.key]) {
-            if (personDetails) {
-              this.personDetailsData = {
-                ...this.personDetailsData,
-                firstName: personDetails?.preferredName?.givenName,
-                middleName: personDetails?.preferredName?.middleName,
-                lastName: personDetails?.preferredName?.familyName,
-                mobileNumber: personDetails?.attributes?.filter((attribute) => {
-                  if (
-                    attribute?.attributeType ===
-                    "aeb3a16c-f5b6-4848-aa51-d7e3146886d6"
-                  ) {
-                    return attribute;
-                  }
-                })[0]?.value,
-              };
-            }
-          }
-
-          if (personDetails[field.key]) {
-            field = {
-              ...field,
-              value:
-                personDetails && personDetails?.identifiers?.length > 0
-                  ? (personDetails?.identifiers?.filter(
-                      (identifier) =>
-                        identifier?.identifierType?.uuid === field?.id
-                    ) || [])[0]?.identifier
-                  : this.personDetailsData[field.key]
-                  ? this.personDetailsData[field.key]
-                  : null,
-            };
-          }
+          
           return field;
         });
     }, 100)
@@ -2061,7 +2054,6 @@ export class SampleInBatchRegistrationComponent implements OnInit {
       .subscribe((response) => {
         if (response) {
           if (response?.length > 0) {
-            console.log("==> Person Detail Category: ", this.personDetailsCategory)
             this.personDetailsCategory === "existing";
             this.setPersonDetails(response[0]);
           } else {
@@ -2081,8 +2073,7 @@ export class SampleInBatchRegistrationComponent implements OnInit {
               phoneNumber: clientRequest?.phoneNumber,
               birthdate: clientRequest?.dob,
             };
-
-            this.setPersonDetails(this.personDetailsData);
+            this.setPersonDetails(this.personDetailsData)
           }
         }
       });
