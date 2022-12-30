@@ -1030,7 +1030,7 @@
     </mat-tab>
     <mat-tab label="Worksheets" *ngIf="LISConfigurations?.isLIS">
       <div class="p-3">
-        <app-worksheets></app-worksheets>
+        <app-worksheets [datesParameters]="datesParameters"></app-worksheets>
       </div>
     </mat-tab>
     <mat-tab
