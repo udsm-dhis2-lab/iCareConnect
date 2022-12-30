@@ -16,7 +16,7 @@
 >
   <div class="row">
     <div class="col-12">
-      <div class="w-100 d-flex mb-4">
+      <div class="w-100 d-flex mb-4" *ngIf="!fromMaintenance">
         <mat-button-toggle-group>
           <mat-button-toggle
             (click)="setTabGroup($event, 'NEW')"
@@ -40,7 +40,7 @@
           </mat-button-toggle>
         </mat-button-toggle-group>
       </div>
-      <div class="w-100" *ngIf="selectedTabGroup === 'NEW'">
+      <div class="w-100" *ngIf="selectedTabGroup === 'NEW' && !fromMaintenance">
         <div class="single-sample-registration">
           <mat-progress-bar
             *ngIf="
@@ -87,7 +87,7 @@
           <app-batch-registration></app-batch-registration>
         </div> -->
       </div>
-      <div class="w-100" *ngIf="selectedTabGroup === 'BATCH'">
+      <div class="w-100" *ngIf="selectedTabGroup === 'BATCH' || fromMaintenance">
         <div class="w-100" *ngIf="
               params?.preferredPersonIdentifier &&
               params?.referringDoctorAttributes &&
@@ -113,11 +113,12 @@
             [allRegistrationFields]="allRegistrationFields | createLabFields: params?.referringDoctorAttributes : params?.agencyConceptConfigs : params?.referFromFacilityVisitAttribute : params?.identifierTypes"
             [existingBatchsets]="params?.batchsets"
             [existingBatches]="params?.batches"
+            [fromMaintenance]="fromMaintenance"
             (reloadRegisterSample)="onReloadRegisterSample($event)"
           ></app-batch-registration>
         </div>
       </div>
-      <div class="w-100" *ngIf="selectedTabGroup === 'LIST'">
+      <div class="w-100" *ngIf="selectedTabGroup === 'LIST' && !fromMaintenance">
         <app-samples-list></app-samples-list>
       </div>
     </div>

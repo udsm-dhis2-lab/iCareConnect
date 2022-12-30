@@ -1,7 +1,5 @@
 import { NgModule } from "@angular/core";
 import { Routes, RouterModule } from "@angular/router";
-import { LaboratorySampleCollectionComponent } from "./modules/sample-collection/pages/laboratory-sample-collection/laboratory-sample-collection.component";
-import { SampleCollectionHomeComponent } from "./modules/sample-collection/pages/sample-collection-home/sample-collection-home.component";
 import { LaboratoryComponent } from "./laboratory.component";
 import { NoLabAccessComponent } from "./pages/no-lab-access/no-lab-access.component";
 
