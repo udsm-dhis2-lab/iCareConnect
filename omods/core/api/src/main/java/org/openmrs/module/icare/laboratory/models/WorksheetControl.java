@@ -63,18 +63,19 @@ public class WorksheetControl extends BaseOpenmrsMetadata implements java.io.Ser
 	
 	public Map<String,Object> toMap(){
 
-		HashMap<String,Object> worksheetObject = new HashMap<>();
+		HashMap<String,Object> worksheetControlObject = new HashMap<>();
 
-		worksheetObject.put("code",this.getCode());
+		worksheetControlObject.put("code",this.getCode());
+		worksheetControlObject.put("uuid",this.getUuid());
 		if(this.getDescription() != null){
-			worksheetObject.put("description",this.getDescription());
+			worksheetControlObject.put("description",this.getDescription());
 		}
-		worksheetObject.put("name",this.getName());
+		worksheetControlObject.put("name",this.getName());
 
 		Map<String,Object> testOrderObject = new HashMap<>();
 		testOrderObject.put("uuid",this.getTestOrder().getUuid());
 		testOrderObject.put("display",this.getTestOrder().getDisplayString());
-		worksheetObject.put("testOrder",testOrderObject);
+		worksheetControlObject.put("testOrder",testOrderObject);
 
 		if(this.getCreator() != null){
 			Map<String,Object> creatorObject = new HashMap<>();
@@ -82,6 +83,6 @@ public class WorksheetControl extends BaseOpenmrsMetadata implements java.io.Ser
 			creatorObject.put("display",this.getCreator().getDisplayString());
 		}
 
-		return worksheetObject;
+		return worksheetControlObject;
 	}
 }
