@@ -20,6 +20,28 @@ export class CreateWorksheetComponent implements OnInit {
 
   createWorksheetFields(): void {
     this.worksheetFields = [
+      new Dropdown({
+        id: "instrument",
+        key: "instrument",
+        label: "Instrument",
+        required: false,
+        options: [],
+        conceptClass: "LIS instrument",
+        searchControlType: "concept",
+        searchTerm: "LIS_INSTRUMENT",
+        shouldHaveLiveSearchForDropDownFields: true,
+      }),
+      new Dropdown({
+        id: "testorder",
+        key: "testorder",
+        label: "Test Order",
+        required: false,
+        options: [],
+        conceptClass: "Test",
+        searchControlType: "concept",
+        searchTerm: "TEST_ORDERS",
+        shouldHaveLiveSearchForDropDownFields: true,
+      }),
       new Textbox({
         id: "name",
         key: "name",
@@ -53,28 +75,6 @@ export class CreateWorksheetComponent implements OnInit {
         type: "number",
         min: 1,
         required: true,
-      }),
-      new Dropdown({
-        id: "testorder",
-        key: "testorder",
-        label: "Test Order",
-        required: false,
-        options: [],
-        conceptClass: "Test",
-        searchControlType: "concept",
-        searchTerm: "TEST_ORDERS",
-        shouldHaveLiveSearchForDropDownFields: true,
-      }),
-      new Dropdown({
-        id: "instrument",
-        key: "instrument",
-        label: "Instrument",
-        required: false,
-        options: [],
-        conceptClass: "LIS instrument",
-        searchControlType: "concept",
-        searchTerm: "LIS_INSTRUMENT",
-        shouldHaveLiveSearchForDropDownFields: true,
       }),
     ];
   }
