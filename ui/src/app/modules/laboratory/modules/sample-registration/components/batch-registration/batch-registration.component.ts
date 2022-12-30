@@ -26,7 +26,8 @@ export class BatchRegistrationComponent implements OnInit {
   @Input() allRegistrationFields: any;
   @Input() existingBatchsets: any[] = [];
   @Input() existingBatches: any[] = [];
-  @Output() reloadRegisterSample: EventEmitter<any> = new EventEmitter;
+  @Input() fromMaintenance: boolean;
+  @Output() reloadRegisterSample: EventEmitter<any> = new EventEmitter();
   formData: any;
   useExistingBatchset: boolean = false;
   useExistingBatch: boolean = false;
@@ -174,6 +175,15 @@ export class BatchRegistrationComponent implements OnInit {
     });
     this.batchsetNameField =
       this.allRegistrationFields?.batchRegistrationFields?.batchsetNameField;
+
+    this.useExistingBatch = this.fromMaintenance ? false : true;
+    this.useExistingBatchset = this.fromMaintenance ? false : true;
+    this.batchDescription.disabled = this.useExistingBatch ? true : false;
+    this.batchsetDescription.disabled = this.useExistingBatchset
+      ? true
+      : false;
+
+    console.log("==> Existing batches: ", this.existingBatchField.options);
   }
 
   onUseExisting(e: any, key: string) {
@@ -190,13 +200,16 @@ export class BatchRegistrationComponent implements OnInit {
           };
         });
       }
+      this.batchsetDescription.disabled = this.useExistingBatchset;
+      
     }
     if (key === "batch") {
       this.batchNameField.value = null;
       this.useExistingBatch = !this.useExistingBatch;
-      if(!this.useExistingBatch) {
+      if (!this.useExistingBatch) {
         this.selectedBatch = undefined;
       }
+      this.batchDescription.disabled = this.useExistingBatch;
     }
   }
 
@@ -354,6 +367,7 @@ export class BatchRegistrationComponent implements OnInit {
           };
         }
       );
+      this.batchsetDescription.value = existingBatchset?.description?.length ? existingBatchset?.description : "";
       let existingBatchsetFields = existingBatchset?.fields;
       if (existingBatchsetFields?.length > 0) {
         this.selectedFixedFields =
@@ -382,6 +396,7 @@ export class BatchRegistrationComponent implements OnInit {
       this.selectedBatch = this.existingBatches.filter(
         (batch) => batch.name === this.existingBatchField.value
       )[0];
+      this.batchDescription.value = this.selectedBatch?.description?.length ? this.selectedBatch?.description : "";
       let existingBatchFields = this.selectedBatch?.fields;
       if (existingBatchFields?.length > 0) {
         this.selectedFixedFields =
@@ -432,12 +447,20 @@ export class BatchRegistrationComponent implements OnInit {
         this.selectedDynamicFields?.length > 0) &&
       this.validBatchsetName &&
       this.validBatchName &&
-      !this.useExistingBatch
+      !this.useExistingBatch &&
+      this.fieldsObjectValues?.fixedFieldsWithValues?.length ===
+        this.selectedFixedFields.length
     ) {
       this.validForm = true;
     } else {
       this.validForm = false;
     }
+    if(!this.fromMaintenance){
+      this.useExistingBatch = true;
+      this.useExistingBatchset = true;
+    }
+    this.batchDescription.disabled = this.useExistingBatch
+    this.batchsetDescription.disabled = this.useExistingBatchset
 
     this.addFixedField.disabled =
       this.useExistingBatchset || this.useExistingBatch;
@@ -461,7 +484,7 @@ export class BatchRegistrationComponent implements OnInit {
         ? Object.keys(this.staticFieldsOptionsObject)
             ?.map((key) => {
               const isSelectedField = this.selectedStaticFields.filter(
-                (field) => field.key === key
+                (field) => field?.key === key
               ).length;
               if (isSelectedField) {
                 return this.staticFieldsOptionsObject[key];
@@ -574,10 +597,7 @@ export class BatchRegistrationComponent implements OnInit {
                   });
                   console.log("==> Batch created; ", response);
                 } else {
-                  this.errors = [
-                    ...this.errors,
-                    response?.error
-                  ];
+                  this.errors = [...this.errors, response?.error];
                 }
               });
             } else {
