@@ -70,29 +70,28 @@ public class WorksheetSampleStatus extends BaseOpenmrsData implements java.io.Se
 	public void setWorksheetSample(WorksheetSample worksheetSample) {
 		this.worksheetSample = worksheetSample;
 	}
-
-
-	public static WorksheetSampleStatus fromMap(Map<String,Object> worksheetSampleStatusMap){
-
+	
+	public static WorksheetSampleStatus fromMap(Map<String, Object> worksheetSampleStatusMap) {
+		
 		WorksheetSampleStatus worksheetSampleStatus = new WorksheetSampleStatus();
-		if(worksheetSampleStatusMap.get("category") != null){
+		if (worksheetSampleStatusMap.get("category") != null) {
 			worksheetSampleStatus.setCategory(worksheetSampleStatusMap.get("category").toString());
 		}
-		if(worksheetSampleStatusMap.get("status") != null){
+		if (worksheetSampleStatusMap.get("status") != null) {
 			worksheetSampleStatus.setStatus(worksheetSampleStatusMap.get("status").toString());
 		}
-		if(worksheetSampleStatusMap.get("remarks") != null){
+		if (worksheetSampleStatusMap.get("remarks") != null) {
 			worksheetSampleStatus.setRemarks(worksheetSampleStatusMap.get("remarks").toString());
 		}
-		if(worksheetSampleStatusMap.get("worksheetSample") != null){
+		if (worksheetSampleStatusMap.get("worksheetSample") != null) {
 			WorksheetSample worksheetSample = new WorksheetSample();
 			worksheetSample.setUuid(((Map) worksheetSampleStatusMap.get("worksheetSample")).get("uuid").toString());
 			worksheetSampleStatus.setWorksheetSample(worksheetSample);
 		}
-
+		
 		return worksheetSampleStatus;
 	}
-
+	
 	public Map<String,Object> toMap(){
 
 		HashMap<String,Object> worksheetSampleStatusObject = new HashMap<>();
@@ -116,5 +115,4 @@ public class WorksheetSampleStatus extends BaseOpenmrsData implements java.io.Se
 
 		return worksheetSampleStatusObject;
 	}
-	
 }

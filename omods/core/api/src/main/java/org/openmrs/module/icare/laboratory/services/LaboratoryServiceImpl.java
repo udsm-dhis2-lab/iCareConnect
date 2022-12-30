@@ -56,9 +56,9 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	WorksheetDefinitionDAO worksheetDefinitionDAO;
 	
 	WorksheetSampleDAO worksheetSampleDAO;
-
+	
 	WorksheetStatusDAO worksheetStatusDAO;
-
+	
 	WorksheetSampleStatusDAO worksheetSampleStatusDAO;
 	
 	public void setSampleDAO(SampleDAO sampleDAO) {
@@ -132,13 +132,13 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	public void setWorksheetSampleDAO(WorksheetSampleDAO worksheetSampleDAO) {
 		this.worksheetSampleDAO = worksheetSampleDAO;
 	}
-
-	public void setWorksheetStatusDAO(WorksheetStatusDAO worksheetStatusDAO){
-		this.worksheetStatusDAO=worksheetStatusDAO;
+	
+	public void setWorksheetStatusDAO(WorksheetStatusDAO worksheetStatusDAO) {
+		this.worksheetStatusDAO = worksheetStatusDAO;
 	}
-
-	public void setWorksheetSampleStatusDAO(WorksheetSampleStatusDAO worksheetSampleStatusDAO){
-		this.worksheetSampleStatusDAO=worksheetSampleStatusDAO;
+	
+	public void setWorksheetSampleStatusDAO(WorksheetSampleStatusDAO worksheetSampleStatusDAO) {
+		this.worksheetSampleStatusDAO = worksheetSampleStatusDAO;
 	}
 	
 	@Override
@@ -930,12 +930,12 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	        Integer limit) {
 		return worksheetSampleDAO.getWorksheetSamples(startDate, endDate, q, startIndex, limit);
 	}
-
+	
 	@Override
 	public WorksheetSample getWorksheetSampleByUuid(String worksheetSampleUuid) {
 		return worksheetSampleDAO.findByUuid(worksheetSampleUuid);
 	}
-
+	
 	@Override
 	public WorksheetSample addWorksheetSample(WorksheetSample worksheetSample) throws Exception {
 		
@@ -966,24 +966,26 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 		worksheetSample.setWorksheetDefinition(worksheetDefinition);
 		return worksheetSampleDAO.save(worksheetSample);
 	}
-
-	public WorksheetStatus addWorksheetStatus( WorksheetStatus worksheetStatus) throws Exception{
-
+	
+	public WorksheetStatus addWorksheetStatus(WorksheetStatus worksheetStatus) throws Exception {
+		
 		Worksheet worksheet = this.getWorksheetByUuid(worksheetStatus.getWorksheet().getUuid());
 		if (worksheet == null) {
 			throw new Exception("The worksheet with id " + worksheetStatus.getWorksheet().getUuid() + " does not exist");
 		}
 		worksheetStatus.setWorksheet(worksheet);
 		return worksheetStatusDAO.save(worksheetStatus);
-
+		
 	}
-
+	
 	@Override
 	public WorksheetSampleStatus addWorksheetSampleStatus(WorksheetSampleStatus worksheetSampleStatus) throws Exception {
-
-		WorksheetSample worksheetSample = this.getWorksheetSampleByUuid(worksheetSampleStatus.getWorksheetSample().getUuid());
-		if(worksheetSample == null){
-			throw new Exception("The worksheet sample with uuid "+worksheetSampleStatus.getWorksheetSample().getUuid()+" does not exist");
+		
+		WorksheetSample worksheetSample = this
+		        .getWorksheetSampleByUuid(worksheetSampleStatus.getWorksheetSample().getUuid());
+		if (worksheetSample == null) {
+			throw new Exception("The worksheet sample with uuid " + worksheetSampleStatus.getWorksheetSample().getUuid()
+			        + " does not exist");
 		}
 		worksheetSampleStatus.setWorksheetSample(worksheetSample);
 		return worksheetSampleStatusDAO.save(worksheetSampleStatus);
