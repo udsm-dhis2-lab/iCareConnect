@@ -144,6 +144,7 @@ public class WorksheetSample extends BaseOpenmrsData implements java.io.Serializ
 		worksheetSampleObject.put("row",this.getRow());
 		worksheetSampleObject.put("column",this.getColumn());
 		worksheetSampleObject.put("type",this.getType());
+		worksheetSampleObject.put("uuid",this.getUuid());
 
 		Map<String,Object> worksheetDefinitionObject = new HashMap<>();
 		worksheetDefinitionObject.put("uuid",this.getWorksheetDefinition().getUuid());
