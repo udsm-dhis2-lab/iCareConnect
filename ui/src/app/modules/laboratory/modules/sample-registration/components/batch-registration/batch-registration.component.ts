@@ -59,6 +59,7 @@ export class BatchRegistrationComponent implements OnInit {
   batchsetDescription: any;
   errors: any[] = [];
   selectedBatch: any;
+  isFormInstantiated: boolean = false
 
   constructor(private sampleService: SamplesService) {}
 
@@ -125,9 +126,11 @@ export class BatchRegistrationComponent implements OnInit {
       }),
       "key"
     );
-
-    this.instantiateBatchRegistrationFields();
+    setTimeout(() => {
+      this.instantiateBatchRegistrationFields();
+    }, 200);
   }
+
   instantiateBatchRegistrationFields() {
     this.addFixedField =
       this.allRegistrationFields?.batchRegistrationFields?.addFixedField;
@@ -165,25 +168,27 @@ export class BatchRegistrationComponent implements OnInit {
     this.existingBatchField =
       this.allRegistrationFields?.batchRegistrationFields?.existingBatchField;
 
-    this.existingBatchField.options = this.existingBatches?.map((batch) => {
-      return {
-        key: batch?.uuid,
-        label: batch?.name,
-        value: batch?.name,
-        name: batch?.name,
-      };
-    });
+    this.existingBatchField = {
+      ...this.existingBatchField,
+      options: this.existingBatches?.map((batch) => {
+        return {
+          key: batch?.uuid,
+          label: batch?.name,
+          value: batch?.name,
+          name: batch?.name,
+        };
+      })
+    }
+    
     this.batchsetNameField =
       this.allRegistrationFields?.batchRegistrationFields?.batchsetNameField;
 
     this.useExistingBatch = this.fromMaintenance ? false : true;
     this.useExistingBatchset = this.fromMaintenance ? false : true;
-    this.batchDescription.disabled = this.useExistingBatch ? true : false;
-    this.batchsetDescription.disabled = this.useExistingBatchset
-      ? true
-      : false;
+    this.batchDescription.disabled = this.useExistingBatch;
+    this.batchsetDescription.disabled = this.useExistingBatchset;
 
-    console.log("==> Existing batches: ", this.existingBatchField.options);
+    this.isFormInstantiated = true;
   }
 
   onUseExisting(e: any, key: string) {
@@ -357,16 +362,23 @@ export class BatchRegistrationComponent implements OnInit {
       let existingBatchset = this.existingBatchsets.filter(
         (batchset) => batchset.name === this.existingBatchsetField.value
       )[0];
-      this.existingBatchField.options = existingBatchset?.batches?.map(
-        (batch) => {
-          return {
-            key: batch?.uuid,
-            label: batch?.name,
-            value: batch?.name,
-            name: batch?.name,
-          };
-        }
-      );
+      this.existingBatchField.options = existingBatchset
+        ? existingBatchset?.batches?.map((batch) => {
+            return {
+              key: batch?.uuid,
+              label: batch?.name,
+              value: batch?.name,
+              name: batch?.name,
+            };
+          })
+        : this.existingBatches?.map((batch) => {
+            return {
+              key: batch?.uuid,
+              label: batch?.name,
+              value: batch?.name,
+              name: batch?.name,
+            };
+          });
       this.batchsetDescription.value = existingBatchset?.description?.length ? existingBatchset?.description : "";
       let existingBatchsetFields = existingBatchset?.fields;
       if (existingBatchsetFields?.length > 0) {
