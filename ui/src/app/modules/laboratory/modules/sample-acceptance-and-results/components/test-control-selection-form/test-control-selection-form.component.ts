@@ -10,11 +10,14 @@ import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
 export class TestControlSelectionFormComponent implements OnInit {
   @Input() testControls: any[];
   @Input() id: string;
+  @Input() testOrder: any;
   formField: any;
   @Output() selectedControl: EventEmitter<any> = new EventEmitter<any>();
   constructor() {}
 
   ngOnInit(): void {
+    // console.log(this.testOrder);
+    // console.log(this.testControls);
     this.formField = new Dropdown({
       id: this.id,
       key: this.id,
@@ -32,6 +35,9 @@ export class TestControlSelectionFormComponent implements OnInit {
   }
 
   onFormUpdate(formValue: FormValue): void {
-    this.selectedControl.emit(formValue.getValues()[this.id]?.value);
+    const val = formValue.getValues()[this.id]?.value;
+    this.selectedControl.emit(
+      (this.testControls?.filter((control) => control?.code === val) || [])[0]
+    );
   }
 }

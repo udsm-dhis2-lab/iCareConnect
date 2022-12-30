@@ -4,6 +4,8 @@ import { WorkSeetsService } from "src/app/modules/laboratory/resources/services/
 import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
 import { Textbox } from "src/app/shared/modules/form/models/text-box.model";
+import { omit } from "lodash";
+import { DatasetDataService } from "src/app/core/services/dataset-data.service";
 
 @Component({
   selector: "app-worksheet-definition",
@@ -12,6 +14,7 @@ import { Textbox } from "src/app/shared/modules/form/models/text-box.model";
 })
 export class WorksheetDefinitionComponent implements OnInit {
   @Input() worksheets: any[];
+  @Input() datesParameters: any;
   worksheetFormField: any;
   worksheetDefinitionFields: any[];
   selectedWorkSheetConfiguration: any;
@@ -23,7 +26,15 @@ export class WorksheetDefinitionComponent implements OnInit {
   currentWorksheetDefinition: any;
   selectedRowsColumns: any = {};
   definedControls: any = {};
-  constructor(private worksheetsService: WorkSeetsService) {}
+  isWorksheetRenderingReady: boolean = false;
+  isComplete: boolean = false;
+  maxLabelCharCount: number = 7;
+  currentLabelCharCount: number = 7;
+  minLabelCharCount: number = 3;
+  constructor(
+    private worksheetsService: WorkSeetsService,
+    private datasetDataService: DatasetDataService
+  ) {}
 
   ngOnInit(): void {
     this.getWorksheetDefinitions();
@@ -108,9 +119,14 @@ export class WorksheetDefinitionComponent implements OnInit {
         },
       },
     };
+    this.isWorksheetRenderingReady = true;
 
-    this.currentWorksheetDefinition?.worksheet?.rows?.forEach((row) => {
-      this.currentWorksheetDefinition?.worksheet?.columns?.forEach((column) => {
+    this.generateDefaultWorksheetRowsColumns();
+  }
+
+  generateDefaultWorksheetRowsColumns(): void {
+    this.currentWorksheetDefinition?.worksheet?.columns?.forEach((column) => {
+      this.currentWorksheetDefinition?.worksheet?.rows?.forEach((row) => {
         this.selectedRowsColumns[row + "-" + column + "-sample"] =
           row + "-" + column + "-sample";
       });
@@ -127,9 +143,87 @@ export class WorksheetDefinitionComponent implements OnInit {
 
   toggleControl(event, rowColumn: string): void {
     this.selectedRowsColumns[rowColumn] = rowColumn;
+    if (
+      rowColumn?.indexOf("sample") > -1 &&
+      this.selectedRowsColumns[rowColumn?.split("-sample")[0] + "-control"]
+    ) {
+      this.selectedRowsColumns = omit(
+        this.selectedRowsColumns,
+        rowColumn?.split("-sample")[0] + "-control"
+      );
+    } else if (
+      rowColumn?.indexOf("control") > -1 &&
+      this.selectedRowsColumns[rowColumn?.split("-control")[0] + "-sample"]
+    ) {
+      this.selectedRowsColumns = omit(
+        this.selectedRowsColumns,
+        rowColumn?.split("-control")[0] + "-sample"
+      );
+    }
+  }
+
+  onUnPopulateSamples(event: Event): void {
+    event.stopPropagation();
+    this.isComplete = false;
+    this.selectedRowsColumns = {};
+    this.isWorksheetRenderingReady = false;
+    this.generateDefaultWorksheetRowsColumns();
+    this.definedControls = {};
+    setTimeout(() => {
+      this.isWorksheetRenderingReady = true;
+    }, 100);
   }
 
   getSelectedTestControl(selectedControlUuid: string, id: string): void {
     this.definedControls[id] = selectedControlUuid;
+  }
+
+  changeLabelCount(event: Event, type: string): void {
+    event.stopPropagation();
+    this.currentLabelCharCount =
+      type === "next"
+        ? this.currentLabelCharCount + 1
+        : this.currentLabelCharCount - 1;
+  }
+
+  onPopulateSamples(event: Event, selectedRowsColumns: any): void {
+    event.stopPropagation();
+    this.isWorksheetRenderingReady = false;
+    this.datasetDataService
+      .getDatasetData(
+        "3425b3f8-6efa-4093-963c-7bdca8ec5c11",
+        this.datesParameters
+      )
+      .subscribe((response) => {
+        const samples = response?.rows;
+        this.currentLabelCharCount = samples[0]?.label?.length;
+        let sampleAreas = [];
+        let controlAreas = [];
+        Object.keys(selectedRowsColumns).map((key, index) => {
+          if (key?.indexOf("sample") > -1) {
+            sampleAreas = [...sampleAreas, key];
+          } else {
+            controlAreas = [...controlAreas, key];
+          }
+        });
+        sampleAreas?.forEach((sampleRef, index) => {
+          if (index < samples?.length) {
+            this.selectedRowsColumns[sampleRef] = {
+              set: true,
+              value: samples[index],
+            };
+          }
+        });
+
+        controlAreas?.forEach((controlRef, index) => {
+          this.selectedRowsColumns[controlRef] = {
+            set: true,
+            value: this.definedControls[controlRef],
+          };
+        });
+
+        this.isWorksheetRenderingReady = true;
+        this.isComplete = true;
+      });
   }
 }
