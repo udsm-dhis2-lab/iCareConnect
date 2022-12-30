@@ -1,4 +1,4 @@
-import { BatchRegistrationComponent } from "../../../components/batch-registration/batch-registration.component";
+import { BatchRegistrationComponent } from "./batch-registration/batch-registration.component";
 import { ClientsFromExternalSystemsComponent } from "./clients-from-external-systems/clients-from-external-systems.component";
 import { ClinicalDataComponent } from "./clinical-data/clinical-data.component";
 import { LbOptionSelectorComponent } from "./lb-option-selector/lb-option-selector.component";
