@@ -66,7 +66,7 @@ export class BatchRegistrationComponent implements OnInit {
   ngOnInit(): void {
     this.warning = {
       error: {
-        message: "This feature is still under development hence not usable!",
+        message: "This feature is still under development hence official usage is not allowed (Use it for testing purposes)!",
       },
       type: "warning",
     };
