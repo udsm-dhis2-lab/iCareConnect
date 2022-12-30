@@ -5,24 +5,24 @@
     ></app-shared-error>
     <fieldset>
         <div class="row">
-            <div class="col-3">
+            <div class="{{ fromMaintenance ? 'col-3' : 'col-4' }}">
                 <h3>Batch Information</h3>
             </div>
-            <div class="col-3">
+            <div class="{{ fromMaintenance ? 'col-3' : 'col-4' }}">
                 <h3>Fixed Fields</h3>
             </div>
-            <div class="col-3">
+            <div class="{{ fromMaintenance ? 'col-3' : 'col-4' }}">
                 <h3>Static Fields</h3>
             </div>
-            <div class="col-3">
+            <div *ngIf="fromMaintenance" class="col-3">
                 <h3>Dynamic Fields</h3>
             </div>
         </div>
         <div class="row">
             <!--  Bach Information -->
-            <div class="col-3">
+            <div class="{{ fromMaintenance ? 'col-3' : 'col-4' }}">
                 <div class="row">
-                    <div class="col-12 d-flex ml-1" *ngIf="existingBatchsets?.length">
+                    <div class="col-12 d-flex ml-1" *ngIf="existingBatchsets?.length && fromMaintenance">
                         <h4 class="w-75">Use existing batch set</h4>
                         <mat-slide-toggle
                             [color]="'primary'"
@@ -44,7 +44,7 @@
                             (formUpdate)="onFormUpdate($event)"
                         ></app-form>
                     </div>
-                    <div class="col-12 d-flex ml-1" *ngIf="existingBatches?.length && existingBatchField?.options?.length">
+                    <div class="col-12 d-flex ml-1" *ngIf="existingBatches?.length && existingBatchField?.options?.length && fromMaintenance">
                     <!-- <div class="col-12 d-flex ml-1"> -->
                         <h4 class="w-75">Use existing batch</h4>
                         <mat-slide-toggle
@@ -55,6 +55,7 @@
                         </mat-slide-toggle>
                     </div>
                     <div class="col-12">
+                        {{ existingBatchField }}
                         <app-form
                             [fields]="useExistingBatch && existingBatchField?.options?.length ? [existingBatchField] : [batchNameField]"
                             (formUpdate)="onFormUpdate($event, useExistingBatch ? 'Existing Batch' : 'New Batch Name')"
@@ -71,23 +72,23 @@
             </div>
 
             <!-- Fixed fields -->
-            <div class="col-3">
+            <div class="{{ fromMaintenance ? 'col-3' : 'col-4' }}">
                 <div class="row">
                     <!-- If available fixed fields -->
                     <ng-container *ngIf="selectedFixedFields?.length > 0">
                         <ng-container *ngFor="let selectedFixedField of selectedFixedFields">
-                            <div class="{{ useExistingBatchset || useExistingBatch ? 'col-12' : 'col-10' }}">
+                            <div class="col-12">
                                 <app-form
                                     [fields]="[selectedFixedField]"
                                     (formUpdate)="onFormUpdate($event, 'SelectedFixedField', selectedFixedField.key)"
                                 ></app-form>
                             </div>
-                            <div class="col-1" *ngIf="!useExistingBatchset && !useExistingBatch">
+                            <!-- <div class="col-1" *ngIf="!useExistingBatchset && !useExistingBatch">
                                 <button class="remove-field" mat-button matTooltip="Remove '{{ selectedFixedField?.label }}' from Fixed fields "><mat-icon>delete_outline</mat-icon></button>
-                            </div>
+                            </div> -->
                         </ng-container>
                     </ng-container>
-                    <div class="{{ useExistingBatchset || useExistingBatch ? 'col-12' : 'col-10' }}">
+                    <div class="col-12">
                         <mat-progress-bar
                             *ngIf="!addFixedField?.options?.length"
                             mode="indeterminate">
@@ -112,22 +113,22 @@
             </div>
 
             <!-- Static fields -->
-            <div class="col-3">
+            <div class="{{ fromMaintenance ? 'col-3' : 'col-4' }}">
                 <div class="row">
                     <ng-container *ngIf="selectedStaticFields?.length > 0">
                         <ng-container *ngFor="let selectedStaticField of selectedStaticFields">
-                            <div class="{{ useExistingBatchset || useExistingBatch ? 'col-12' : 'col-10' }}">
+                            <div class="col-12">
                                 <app-form
                                     [fields]="[selectedStaticField]"
                                     (formUpdate)="onFormUpdate($event, 'SelectedStaticField', selectedStaticField.key)"
                                 ></app-form>
                             </div>
-                            <div class="col-1" *ngIf="!useExistingBatchset && !useExistingBatch">
+                            <!-- <div class="col-1" *ngIf="!useExistingBatchset && !useExistingBatch">
                                 <button class="remove-field" mat-button matTooltip="Remove '{{ selectedStaticField?.label }}' from Static fields"><mat-icon>delete_outline</mat-icon></button>
-                            </div>
+                            </div> -->
                         </ng-container>
                     </ng-container>
-                    <div class="{{ useExistingBatchset || useExistingBatch ? 'col-12' : 'col-10' }}">
+                    <div class="col-12">
                         <mat-progress-bar
                             *ngIf="!addStaticField?.options?.length"
                             mode="indeterminate">
@@ -151,7 +152,7 @@
                 </div>
             </div>
             <!-- Dynamic fields -->
-            <div class="col-3">
+            <div class="col-3" *ngIf="fromMaintenance">
                 <div class="row">
                     <ng-container *ngIf="selectedDynamicFields?.length > 0">
                         <ng-container *ngFor="let selectedDynamicField of selectedDynamicFields">
@@ -161,12 +162,12 @@
                                     (formUpdate)="onFormUpdate($event, 'SelectedDynamicField', selectedDynamicField.key)"
                                 ></app-form>
                             </div>
-                            <div class="col-1" *ngIf="!useExistingBatchset && !useExistingBatch">
+                            <!-- <div class="col-1" *ngIf="!useExistingBatchset && !useExistingBatch">
                                 <button class="remove-field" mat-button matTooltip="Remove '{{ selectedDynamicField?.label }}' from Dynamic fields"><mat-icon>delete_outline</mat-icon></button>
-                            </div>
+                            </div> -->
                         </ng-container>
                     </ng-container>
-                    <div class="{{ useExistingBatchset || useExistingBatch ? 'col-12' : 'col-10' }}">
+                    <div class="col-12">
                         <mat-progress-bar
                             *ngIf="!addDynamicField?.options?.length"
                             mode="indeterminate">
@@ -177,20 +178,10 @@
                             (formUpdate)="onFormUpdate($event, 'Dynamic')"
                         ></app-form>
                     </div>
-                    <!-- <div class="col-2">
-                        <button 
-                        [disabled]="!selectedStaticFields?.length" 
-                        class="save-field" 
-                        mat-flat-button 
-                        color="primary" 
-                        matTooltip="Save all static fields"
-                        (click)="onSave($event, 'Static')"
-                        > Save </button>
-                    </div> -->
                 </div>
             </div>
         </div>
-        <div class="row">
+        <div class="row" *ngIf="fromMaintenance">
             <div class="col-12">
                 <div class="d-flex justify-content-end">
                     <div class="w-25 d-flex justify-content-end">
@@ -212,7 +203,7 @@
             selectedDynamicFields.length && 
             fieldsObjectValues?.fixedFieldsWithValues?.length === selectedFixedFields.length &&
             fieldsObjectValues?.staticFieldsWithValues?.length === selectedStaticFields.length && 
-            (batchNameField.value || existingBatchField.value) && selectedBatch
+            (batchNameField.value || existingBatchField.value) && selectedBatch && !fromMaintenance
         ">
         <button mat-flat-button
                 style="border:1px solid #cecece" 

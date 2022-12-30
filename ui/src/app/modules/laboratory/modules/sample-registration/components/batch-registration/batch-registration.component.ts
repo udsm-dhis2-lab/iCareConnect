@@ -175,6 +175,15 @@ export class BatchRegistrationComponent implements OnInit {
     });
     this.batchsetNameField =
       this.allRegistrationFields?.batchRegistrationFields?.batchsetNameField;
+
+    this.useExistingBatch = this.fromMaintenance ? false : true;
+    this.useExistingBatchset = this.fromMaintenance ? false : true;
+    this.batchDescription.disabled = this.useExistingBatch ? true : false;
+    this.batchsetDescription.disabled = this.useExistingBatchset
+      ? true
+      : false;
+
+    console.log("==> Existing batches: ", this.existingBatchField.options);
   }
 
   onUseExisting(e: any, key: string) {
@@ -191,6 +200,8 @@ export class BatchRegistrationComponent implements OnInit {
           };
         });
       }
+      this.batchsetDescription.disabled = this.useExistingBatchset;
+      
     }
     if (key === "batch") {
       this.batchNameField.value = null;
@@ -198,6 +209,7 @@ export class BatchRegistrationComponent implements OnInit {
       if (!this.useExistingBatch) {
         this.selectedBatch = undefined;
       }
+      this.batchDescription.disabled = this.useExistingBatch;
     }
   }
 
@@ -355,6 +367,7 @@ export class BatchRegistrationComponent implements OnInit {
           };
         }
       );
+      this.batchsetDescription.value = existingBatchset?.description?.length ? existingBatchset?.description : "";
       let existingBatchsetFields = existingBatchset?.fields;
       if (existingBatchsetFields?.length > 0) {
         this.selectedFixedFields =
@@ -383,6 +396,7 @@ export class BatchRegistrationComponent implements OnInit {
       this.selectedBatch = this.existingBatches.filter(
         (batch) => batch.name === this.existingBatchField.value
       )[0];
+      this.batchDescription.value = this.selectedBatch?.description?.length ? this.selectedBatch?.description : "";
       let existingBatchFields = this.selectedBatch?.fields;
       if (existingBatchFields?.length > 0) {
         this.selectedFixedFields =
@@ -441,6 +455,12 @@ export class BatchRegistrationComponent implements OnInit {
     } else {
       this.validForm = false;
     }
+    if(!this.fromMaintenance){
+      this.useExistingBatch = true;
+      this.useExistingBatchset = true;
+    }
+    this.batchDescription.disabled = this.useExistingBatch
+    this.batchsetDescription.disabled = this.useExistingBatchset
 
     this.addFixedField.disabled =
       this.useExistingBatchset || this.useExistingBatch;
@@ -464,7 +484,7 @@ export class BatchRegistrationComponent implements OnInit {
         ? Object.keys(this.staticFieldsOptionsObject)
             ?.map((key) => {
               const isSelectedField = this.selectedStaticFields.filter(
-                (field) => field.key === key
+                (field) => field?.key === key
               ).length;
               if (isSelectedField) {
                 return this.staticFieldsOptionsObject[key];
