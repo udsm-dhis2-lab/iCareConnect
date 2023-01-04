@@ -32,6 +32,7 @@ export class PatientDiagnosesSummaryComponent implements OnInit {
   @Input() forConsultation: boolean;
   @Input() isInpatient: boolean;
   @Input() diagnosisFormDetails: any;
+  @Input() forHistory: boolean;
   diagnosisForm: any;
   diagnosisField: any;
   diagnosisRankField: any;
@@ -52,7 +53,9 @@ export class PatientDiagnosesSummaryComponent implements OnInit {
         (field) => field?.key === "rank"
       ) || [])[0];
     }
-    this.diagnoses$ = of(getAllDiagnosesFromVisitDetails(this.patientVisit));
+    this.diagnoses$ = !this.forHistory
+      ? this.store.select(getAllDiagnoses)
+      : of(getAllDiagnosesFromVisitDetails(this.patientVisit));
     this.loadingVisit$ = this.store.pipe(select(getVisitLoadingState));
   }
 
