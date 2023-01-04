@@ -241,7 +241,8 @@ export class Visit {
           order &&
           order.type === "testorder" &&
           !order?.dateStopped &&
-          !order?.previousOrder && !order?.voided
+          !order?.previousOrder &&
+          !order?.voided
       )
       .map((order) => new LabOrder(order));
   }
@@ -425,7 +426,8 @@ export class Visit {
       ? (
           diagnoses.filter(
             (diagnosis: any) =>
-              diagnosis?.diagnosisDetails?.certainty === "CONFIRMED" && !diagnosis?.diagnosisDetails?.voided
+              diagnosis?.diagnosisDetails?.certainty === "CONFIRMED" &&
+              !diagnosis?.diagnosisDetails?.voided
           ) || []
         )?.length > 0
       : false;
@@ -459,6 +461,8 @@ export class Visit {
       consultationStatusOrder: this.consultationStatusOrder,
       hasProvisonalDiagnosis: this.hasProvisonalDiagnosis,
       hasConfirmedDiagnosis: this.hasConfirmedDiagnosis,
+      observations: this.observations,
+      drugOrders: this.drugOrders,
     };
   }
 

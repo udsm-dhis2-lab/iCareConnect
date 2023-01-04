@@ -15,6 +15,7 @@ import {
 } from "src/app/store/selectors";
 import { getProviderDetails } from "src/app/store/selectors/current-user.selectors";
 import { OpenmrsHttpClientService } from "../../modules/openmrs-http-client/services/openmrs-http-client.service";
+import { VisitObject } from "../../resources/visits/models/visit-object.model";
 import { Visit } from "../../resources/visits/models/visit.model";
 import { VisitsService } from "../../resources/visits/services";
 
@@ -26,7 +27,7 @@ import { VisitsService } from "../../resources/visits/services";
 export class PatientLabResultsSummaryComponent implements OnInit {
   @Input() labConceptsTree: any;
   @Input() observations: any;
-  @Input() patientVisit: Visit;
+  @Input() patientVisit: VisitObject;
   @Input() investigationAndProceduresFormsDetails: any;
   @Input() iCareGeneralConfigurations: any;
   @Input() isInpatient: boolean;
@@ -55,6 +56,9 @@ export class PatientLabResultsSummaryComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadLabResultsComponent();
+    this.observations = !this.forHistory
+      ? this.observations
+      : this.patientVisit.observations;
   }
 
   loadLabResultsComponent(): void {
@@ -116,7 +120,9 @@ export class PatientLabResultsSummaryComponent implements OnInit {
       let obsValuesConcepts = [];
       let testsConcepts = [];
       // TODO: Remove subscribe within this ts
-      this.labOrders$ = this.store.select(getAllNewLabOrders);
+      this.labOrders$ = !this.forHistory
+        ? this.store.select(getAllNewLabOrders)
+        : of(this.patientVisit?.labOrders);
       this.creatingLabOrdersState$.subscribe((creatingLabOrderState) => {
         if (!creatingLabOrderState) {
           (!this.forHistory
@@ -127,7 +133,7 @@ export class PatientLabResultsSummaryComponent implements OnInit {
                 true
               )
             : of(this.patientVisit)
-          ).subscribe((visitResponse) => {
+          ).subscribe((visitResponse: VisitObject) => {
             if (visitResponse) {
               this.loadedLabOrders = true;
               this.labOrdersResultsInformation = visitResponse?.labOrders.map(
@@ -138,6 +144,7 @@ export class PatientLabResultsSummaryComponent implements OnInit {
                   );
                   // TODO: For multiple orders for the same test consider using encounter and dates
                   const observation: any =
+                    this.observations &&
                     this.observations[labOrder?.order?.concept?.uuid] &&
                     this.observations[labOrder?.order?.concept?.uuid]?.latest
                       ? this.observations[labOrder?.order?.concept?.uuid]

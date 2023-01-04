@@ -85,7 +85,7 @@ export class PatientRadiologySummaryComponent implements OnInit {
   }
 
   getRadiologyServices(departments): any {
-    const procedureDepartment = (departments.filter(
+    const procedureDepartment = ((departments || [])?.filter(
       (department) => department?.name?.toLowerCase().indexOf("radiology") === 0
     ) || [])[0];
     return !procedureDepartment

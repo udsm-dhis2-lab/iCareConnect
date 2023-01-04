@@ -162,7 +162,11 @@
     <mat-tab-group *ngIf="drugParams?.currentVisit?.hasConfirmedDiagnosis">
       <mat-tab
         label="Doctor's Prescriptions"
-        *ngIf="drugParams?.useGeneralPrescription === 'true' && !previous"
+        *ngIf="
+          drugParams?.useGeneralPrescription === 'true' &&
+          !previous &&
+          !forHistory
+        "
       >
         <div class="mat-tab-container">
           <ng-template matTabContent>
@@ -212,8 +216,10 @@
       </mat-tab>
       <mat-tab
         label="{{
-          drugParams?.useGeneralPrescription === 'true'
+          drugParams?.useGeneralPrescription === 'true' && !forHistory
             ? 'To Be Dispensed'
+            : forHistory
+            ? 'Ordered by not dispensed'
             : 'Doctor\'s Prescriptions'
         }}"
       >
@@ -248,7 +254,13 @@
                   "
                 >
                   <td>{{ count + 1 }}</td>
-                  <td>{{ drugOrder?.drug?.display }}</td>
+                  <td>
+                    {{
+                      drugOrder?.drug
+                        ? drugOrder?.drug?.display
+                        : drugOrder?.drugOrder?.display
+                    }}
+                  </td>
                   <td>
                     {{ drugOrder?.orderer?.display }}
                   </td>
@@ -323,7 +335,11 @@
                       {{ count + 1 }}
                     </td>
                     <td>
-                      {{ drugOrder?.drug?.display }}
+                      {{
+                        drugOrder?.drug
+                          ? drugOrder?.drug?.display
+                          : drugOrder?.drugOrder?.display
+                      }}
                     </td>
                     <td>
                       {{
