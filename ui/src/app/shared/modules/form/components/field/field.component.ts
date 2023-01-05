@@ -6,7 +6,6 @@ import {
   MAT_DATE_FORMATS,
   MAT_DATE_LOCALE,
 } from "@angular/material/core";
-import { keyBy } from "lodash";
 import { Observable, of } from "rxjs";
 import { DATE_FORMATS_DD_MM_YYYY } from "src/app/core/constants/date-formats.constants";
 import { Field } from "../../models/field.model";
@@ -139,7 +138,6 @@ export class FieldComponent {
 
   updateFieldOnDemand(objectToUpdate): void {
     this.form.patchValue(objectToUpdate);
-    const theKey = Object.keys(objectToUpdate);
     this.form.setValue({ dob: new Date() });
     this.fieldUpdate.emit(this.form);
   }
@@ -149,6 +147,13 @@ export class FieldComponent {
       (option) => option?.key === this.value
     ) || [])[0];
     return matchedOption ? matchedOption?.value : "";
+  }
+
+  get getOptionValueLabel(): any {
+    const matchedOption = (this.field.options.filter(
+      (option) => option?.key === this.value
+    ) || [])[0];
+    return matchedOption ? matchedOption?.label : "";
   }
 
   searchItem(event: any, field?: any): void {
