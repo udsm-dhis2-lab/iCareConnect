@@ -39,7 +39,9 @@ export class ResultEntryFormComponent implements OnInit {
     this.value =
       !this.hasMultipleAnswers && !this.latestResult?.isArray
         ? this.latestResult?.value
-        : !this.hasMultipleAnswers && this.latestResult?.isArray
+        : !this.hasMultipleAnswers &&
+          this.latestResult?.isArray &&
+          this.latestResult?.value
         ? this.latestResult?.value[0]
         : this.latestResult?.value;
     this.label = !this.conceptNameType
