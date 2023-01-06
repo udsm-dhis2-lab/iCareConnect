@@ -53,24 +53,11 @@ export class PatientMedicationSummaryComponent implements OnInit {
       this.systemSettingsService.getSystemSettingsByKey(
         "iCare.clinic.useGeneralPrescription"
       );
-    this.patientVisitData$ = !this.forHistory
-      ? this.visitService.getActiveVisit(
-          this.patientVisit?.patientUuid,
-          false,
-          false,
-          true
-        )
-      : of(this.patientVisit);
-
-    this.currentVisit$ = this.forHistory
-      ? this.visitService.getActiveVisit(
-          this.patientVisit?.patientUuid,
-          false,
-          false,
-          true
-        )
-      : of(this.patientVisit);
-
+    if (!this.forHistory) {
+      this.loadVisit();
+    } else {
+      this.currentVisit$ = of(this.patientVisit);
+    }
     if (this.patientVisit) {
       this.drugOrders$ = (
         !this.forHistory
@@ -128,6 +115,7 @@ export class PatientMedicationSummaryComponent implements OnInit {
   }
 
   loadVisit(visit?: any) {
+    this.currentVisit$ = of(null);
     let visitUuid = this.patientVisit?.uuid
       ? this.patientVisit?.uuid
       : visit
@@ -136,11 +124,13 @@ export class PatientMedicationSummaryComponent implements OnInit {
     this.currentVisit$ = this.visitService.getVisitDetailsByVisitUuid(
       visitUuid,
       {
-        v: "custom:(uuid,display,patient,encounters:(uuid,display,obs,orders),attributes)",
+        v:
+          "custom:(uuid,display,patient,startDatetime,attributes,stopDatetime," +
+          "patient:(uuid,display,identifiers,person,voided)," +
+          "encounters:(uuid,diagnoses,display,obs,orders,encounterProviders," +
+          "encounterDatetime,encounterType,voided,voidReason),attributes)",
       }
     );
-
-    this.updateMedicationComponent.emit();
   }
 
   onAddOrder(e: Event) {
@@ -166,10 +156,11 @@ export class PatientMedicationSummaryComponent implements OnInit {
     });
 
     dialog.afterClosed().subscribe((data) => {
+      this.loadVisit();
       if (data?.updateConsultationOrder) {
+        this.updateMedicationComponent.emit();
         this.updateConsultationOrder.emit();
       }
-      this.loadVisit();
     });
   }
 }
