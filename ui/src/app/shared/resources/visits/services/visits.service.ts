@@ -559,7 +559,7 @@ export class VisitsService {
   getVisitDetailsByVisitUuid(uuid: string, params?: any): Observable<any> {
     return from(this.api.visit.getVisit(uuid, params)).pipe(
       map((response) => {
-        return response;
+        return new Visit(response);
       }),
       catchError((error) => of(error))
     );
