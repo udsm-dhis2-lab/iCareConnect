@@ -114,6 +114,7 @@ import { SharedDepartmentsSelectionComponent } from "./shared-departments-select
 import { SharedInstrumentsManagementComponent } from "./shared-instruments-management/shared-instruments-management.component";
 import { StandardConceptsListComponent } from "./standard-concepts-list/standard-concepts-list.component";
 import { SharedInstrumentSelectionComponent } from "./shared-instrument-selection/shared-instrument-selection.component";
+import { PatientHistoryComponent } from "./patient-history/patient-history.component";
 
 export const components: any[] = [
   PatientAddressComponent,
@@ -233,6 +234,7 @@ export const components: any[] = [
   SharedInstrumentsManagementComponent,
   StandardConceptsListComponent,
   SharedInstrumentSelectionComponent,
+  PatientHistoryComponent,
 ];
 
 export const sharedEntryComponents: any[] = [
