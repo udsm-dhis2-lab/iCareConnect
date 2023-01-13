@@ -74,6 +74,9 @@
             <!-- Fixed fields -->
             <div class="{{ fromMaintenance ? 'col-3' : 'col-4' }}">
                 <div class="row">
+                    <!-- <div class="col-12">
+                        <app-date-time-field [dateTimeField]="allRegistrationFields?.specimenDetailFields?.receivedOn"></app-date-time-field>
+                    </div> -->
                     <!-- If available fixed fields -->
                     <ng-container *ngIf="selectedFixedFields?.length > 0">
                         <ng-container *ngFor="let selectedFixedField of selectedFixedFields">
