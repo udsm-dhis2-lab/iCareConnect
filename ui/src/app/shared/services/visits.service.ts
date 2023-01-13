@@ -36,12 +36,10 @@ export class VisitsService {
         )
       )
     );
-    // return this.httpClient.get(
-    //   BASE_URL +
-    //     'visit/' +
-    //     uuid +
-    //     '?v=custom:(uuid,startDatetime,display,patient,encounters:(uuid,encounterType,display,patient,visit,encounterProviders,encounterDatetime,voided,obs:(comment,value,encounter,person,uuid,display,concept:(uuid,display,setMembers:(uuid,display),answers:(uuid,display))),orders:(uuid,display,orderer,dateActivated,orderNumber,concept:(uuid,display,setMembers:(uuid,display),answers:(uuid,display)),display)),voided,attributes,visitType)'
-    // );
+  }
+  getPatientVisits(patientUuid: string, includeInactive?: boolean ): Observable<any> {
+    const params = `patient="${patientUuid}&includeInactive=${includeInactive}`;
+    return from(this.httpClient.get(BASE_URL + "visit/" + +`?${params}`));
   }
 
   getActiveVisitsByStartDate(startDate, endDate): Observable<any> {

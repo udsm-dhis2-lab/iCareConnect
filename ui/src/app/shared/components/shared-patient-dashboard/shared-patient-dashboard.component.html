@@ -371,6 +371,18 @@
                   'col-lg-8 col-md-8 col-sm-12 col-sx-12 obs-table': isInpatient
                 }"
               >
+                <div class="w-100">
+                  <mat-accordion>
+                    <mat-expansion-panel
+                      class="mb-2 border p-0"
+                    >
+                      <mat-expansion-panel-header>
+                        <mat-panel-title>Patient History </mat-panel-title>
+                      </mat-expansion-panel-header>
+                      <app-patient-history [patient]="dashboardParams?.currentPatient?.patient"></app-patient-history>
+                    </mat-expansion-panel>
+                  </mat-accordion>
+                </div>
                 <div>
                   <mat-progress-bar
                     *ngIf="!readyForClinicalNotes"
