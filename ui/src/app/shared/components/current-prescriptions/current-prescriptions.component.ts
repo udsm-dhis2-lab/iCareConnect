@@ -25,17 +25,15 @@ export class CurrentPrescriptionComponent implements OnInit {
   errors: any[] = [];
   specificDrugConceptUuid$: Observable<any>;
   prescriptionArrangementFields$: Observable<any>;
-  
+
   constructor(
-    private systemSettingsService: SystemSettingsService, 
+    private systemSettingsService: SystemSettingsService,
     private encounterService: EncountersService,
     private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
-
-    this.getDrugsPrescribed()
-
+    this.getDrugsPrescribed();
     this.specificDrugConceptUuid$ = this.systemSettingsService
       .getSystemSettingsByKey(
         "iCare.clinic.genericPrescription.specificDrugConceptUuid"
@@ -72,18 +70,18 @@ export class CurrentPrescriptionComponent implements OnInit {
               },
             ];
           }
-          if(response?.error){
+          if (response?.error) {
             this.errors = [...this.errors, response?.error];
           }
           return {
             ...response,
-            keys: Object.keys(response).length
+            keys: Object.keys(response).length,
           };
         })
       );
   }
 
-  getDrugsPrescribed(){
+  getDrugsPrescribed() {
     this.drugsPrescribed = flatten(
       this.visit?.encounters
         ?.map((encounter) => {
@@ -93,11 +91,13 @@ export class CurrentPrescriptionComponent implements OnInit {
                 order.orderType?.uuid === this.genericPrescriptionOrderType
             ) || []
           )?.map((genericDrugOrder) => {
-            let formulatedDescription = encounter?.obs?.map((ob) => {
-              if(ob?.comment === null){
-                return ob
-              }
-            }).filter((ob) => ob)
+            let formulatedDescription = encounter?.obs
+              ?.map((ob) => {
+                if (ob?.comment === null) {
+                  return ob;
+                }
+              })
+              .filter((ob) => ob);
             return {
               ...genericDrugOrder,
               formulatedDescription: formulatedDescription,
@@ -146,6 +146,6 @@ export class CurrentPrescriptionComponent implements OnInit {
             }
           });
       }
-    })
+    });
   }
 }

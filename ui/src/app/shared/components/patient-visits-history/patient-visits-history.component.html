@@ -37,6 +37,7 @@
               <app-patient-diagnoses-summary
                 [patientVisit]="currentPatientVisit"
                 [isConfirmedDiagnosis]="false"
+                [forHistory]="true"
               >
               </app-patient-diagnoses-summary>
             </div>
@@ -45,6 +46,7 @@
               <app-patient-lab-results-summary
                 [labConceptsTree]="null"
                 [observations]="null"
+                [forHistory]="true"
                 [patientVisit]="currentPatientVisit"
               ></app-patient-lab-results-summary>
             </div>
@@ -53,6 +55,7 @@
               <app-patient-diagnoses-summary
                 [patientVisit]="currentPatientVisit"
                 [isConfirmedDiagnosis]="true"
+                [forHistory]="true"
               >
               </app-patient-diagnoses-summary>
             </div>
@@ -60,6 +63,7 @@
             <div class="w-100 mb-3 mt-1">
               <app-patient-medication-summary
                 [patientVisit]="currentPatientVisit"
+                [forHistory]="true"
               ></app-patient-medication-summary>
             </div>
           </div>
@@ -69,6 +73,7 @@
               <app-patient-clinical-notes-summary
                 [patientVisit]="currentPatientVisit"
                 [forms]="forms"
+                [forHistory]="true"
               >
               </app-patient-clinical-notes-summary>
             </div>

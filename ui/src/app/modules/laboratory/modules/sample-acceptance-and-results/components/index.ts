@@ -34,6 +34,7 @@ import { RelatedTestParametersEntryComponent } from "./related-test-parameters-e
 import { RelatedResultsHistoryComponent } from "./related-results-history/related-results-history.component";
 import { WorksheetsComponent } from "./worksheets/worksheets.component";
 import { WorksheetDefinitionComponent } from "./worksheet-definition/worksheet-definition.component";
+import { TestControlSelectionFormComponent } from "./test-control-selection-form/test-control-selection-form.component";
 
 export const components: any[] = [
   PatientsByVisitsListComponent,
@@ -72,6 +73,7 @@ export const components: any[] = [
   RelatedResultsHistoryComponent,
   WorksheetsComponent,
   WorksheetDefinitionComponent,
+  TestControlSelectionFormComponent,
 ];
 
 export const sampleAcceptanceAndResultsModals: any[] = [

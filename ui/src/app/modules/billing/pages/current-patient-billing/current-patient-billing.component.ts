@@ -1,5 +1,5 @@
 import { Payment } from "src/app/modules/billing/models/payment.model";
-import { keys } from "lodash";
+import { keys, sumBy, sum } from "lodash";
 import { Component, OnInit } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
 
@@ -510,8 +510,8 @@ export class CurrentPatientBillingComponent implements OnInit {
                 : "0" + paymentDate.getDate()
             }-${
               paymentDate.getMonth().toString().length > 1
-                ? paymentDate.getMonth()
-                : "0" + paymentDate.getMonth()
+                ? paymentDate.getMonth() + 1
+                : "0" + paymentDate.getMonth() + 1
             }-${paymentDate.getFullYear()}`;
             contents = `
                 <tr>
@@ -523,6 +523,17 @@ export class CurrentPatientBillingComponent implements OnInit {
           });
         });
 
+        let total = sum(
+          e.Payments.map((payment) => {
+            return sumBy(payment.paymentDetails.items, "amount");
+          })
+        );
+        contents = `<tr>
+        
+        <td  style ="font-weight:bold;"> &nbsp;Total </td>
+        <td colspan="2" style ="font-weight:bold; text-align:center">${total}</td>
+        </tr>`;
+        frameDoc.document.write(contents);
         frameDoc.document.write(`
           </tbody>
         </table>`);
@@ -556,6 +567,12 @@ export class CurrentPatientBillingComponent implements OnInit {
             </tr>`;
             frameDoc.document.write(contents);
           });
+          contents = `<tr>
+          
+          <td  style ="font-weight:bold;"> &nbsp;Total </td>
+          <td colspan="2" style ="font-weight:bold; text-align:center">${bill.totalPaymentAmount}</td>
+          </tr>`;
+          frameDoc.document.write(contents);
         });
 
         frameDoc.document.write(`

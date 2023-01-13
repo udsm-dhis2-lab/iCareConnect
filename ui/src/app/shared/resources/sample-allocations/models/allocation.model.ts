@@ -55,6 +55,7 @@ export interface SampleAllocationObject {
   finalResult?: ResultObject;
   resultApprovalConfiguration?: any;
   testRelationshipConceptSourceUuid?: string;
+  isSetMember?: boolean;
 }
 
 export class SampleAllocation {
@@ -260,6 +261,10 @@ export class SampleAllocation {
     return this.allocation?.resultApprovalConfiguration;
   }
 
+  get isSetMember(): boolean {
+    return this.allocation?.isSetMember;
+  }
+
   toJson(): SampleAllocationObject {
     return {
       id: this.id,
@@ -274,6 +279,7 @@ export class SampleAllocation {
       statuses: this.statuses,
       results: this.results,
       finalResult: this.finalResult,
+      isSetMember: this.isSetMember,
     };
   }
 }

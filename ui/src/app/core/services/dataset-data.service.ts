@@ -22,7 +22,6 @@ export class DatasetDataService {
       )
       .pipe(
         map((report) => {
-          console.log("report", report);
           return report;
         })
       );
