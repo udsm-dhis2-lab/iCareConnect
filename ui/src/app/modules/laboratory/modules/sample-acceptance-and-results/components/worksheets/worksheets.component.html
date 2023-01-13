@@ -1,0 +1,12 @@
+<div *ngIf="{ worksheets: worksheets$ | async } as params">
+  <mat-progress-bar
+    mode="indeterminate"
+    *ngIf="!params?.worksheets"
+  ></mat-progress-bar>
+  <div *ngIf="params?.worksheets">
+    <app-worksheet-definition
+      [worksheets]="params?.worksheets"
+      [datesParameters]="datesParameters"
+    ></app-worksheet-definition>
+  </div>
+</div>

@@ -14,6 +14,9 @@ import { UpdatePrivilegesWithSelectedAttributePipe } from "./update-privileges-w
 import { UpdateRolesWithSelectedAttributePipe } from "./update-roles-with-selected-attribute.pipe";
 import { SanitizeDangerousUrlPipe } from "./sanitize-dangerous-url.pipe";
 import { SearchTestDetailsPipe } from "./search-test-details.pipe";
+import { CreateLabFieldsPipe } from "./create-lab-fields.pipe";
+import { FilterResultsByResultGroupPipe } from "./filter-results-by-result-group.pipe";
+import { FormatLabelCharCountDisplayPipe } from "./format-label-char-count-display.pipe";
 
 export const sharedPipes: any[] = [
   FilterByPipe,
@@ -32,4 +35,7 @@ export const sharedPipes: any[] = [
   UpdateRolesWithSelectedAttributePipe,
   SanitizeDangerousUrlPipe,
   SearchTestDetailsPipe,
+  CreateLabFieldsPipe,
+  FilterResultsByResultGroupPipe,
+  FormatLabelCharCountDisplayPipe,
 ];

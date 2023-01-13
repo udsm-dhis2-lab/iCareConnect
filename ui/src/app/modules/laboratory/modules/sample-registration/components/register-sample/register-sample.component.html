@@ -1,7 +1,6 @@
 <div
   class="sample-registration"
   *ngIf="{
-    labSamples: labSamples$ | async,
     mrnGeneratorSourceUuid: mrnGeneratorSourceUuid$ | async,
     preferredPersonIdentifier: preferredPersonIdentifier$ | async,
     agencyConceptConfigs: agencyConceptConfigs$ | async,
@@ -9,51 +8,119 @@
     referringDoctorAttributes: referringDoctorAttributes$ | async,
     labNumberCharactersCount: labNumberCharactersCount$ | async,
     testsFromExternalSystemsConfigs: testsFromExternalSystemsConfigs$ | async,
-    currentUser: currentUser$ | async
+    currentUser: currentUser$ | async,
+    identifierTypes: identifierTypes$ | async,
+    batchsets: batchsets$ | async,
+    batches: batches$ | async
   } as params"
 >
   <div class="row">
-    <div class="col-lg-12 col-md-12 col-sm-12 col-sx-12">
-      <div class="single-sample-registration">
-        <mat-progress-bar
-          *ngIf="
-            !params?.mrnGeneratorSourceUuid ||
-            !params?.preferredPersonIdentifier ||
-            !params?.referringDoctorAttributes ||
-            !params?.referFromFacilityVisitAttribute ||
-            !params?.labNumberCharactersCount ||
-            !params?.testsFromExternalSystemsConfigs
-          "
-          mode="indeterminate"
-        ></mat-progress-bar>
-        <app-single-registration
-          *ngIf="
-            params?.mrnGeneratorSourceUuid &&
-            params?.preferredPersonIdentifier &&
-            params?.referringDoctorAttributes &&
-            params?.referFromFacilityVisitAttribute &&
-            params?.labNumberCharactersCount &&
-            params?.testsFromExternalSystemsConfigs
-          "
-          [mrnGeneratorSourceUuid]="params?.mrnGeneratorSourceUuid"
-          [preferredPersonIdentifier]="params?.preferredPersonIdentifier"
-          [provider]="provider"
-          [agencyConceptConfigs]="params?.agencyConceptConfigs"
-          [referFromFacilityVisitAttribute]="
-            params?.referFromFacilityVisitAttribute
-          "
-          [currentUser]="params?.currentUser"
-          [labNumberCharactersCount]="params?.labNumberCharactersCount"
-          [referringDoctorAttributes]="params?.referringDoctorAttributes"
-          [labSections]="labSections"
-          [testsFromExternalSystemsConfigs]="
-            params?.testsFromExternalSystemsConfigs
-          "
-        ></app-single-registration>
+    <div class="col-12">
+      <div class="w-100 d-flex mb-4" *ngIf="!fromMaintenance">
+        <mat-button-toggle-group>
+          <mat-button-toggle
+            (click)="setTabGroup($event, 'NEW')"
+            [value]="'NEW'"
+            [ngClass]="{ 'selected-tab-group': selectedTabGroup === 'NEW' }"
+            >Sample Registration
+          </mat-button-toggle>
+          
+          <mat-button-toggle
+            (click)="setTabGroup($event, 'BATCH')"
+            [value]="'BATCH'"
+            [ngClass]="{ 'selected-tab-group': selectedTabGroup === 'BATCH' }"
+            >Batch Registration
+          </mat-button-toggle>
+
+          <mat-button-toggle
+            (click)="setTabGroup($event, 'LIST')"
+            [value]="'LIST'"
+            [ngClass]="{ 'selected-tab-group': selectedTabGroup === 'LIST' }"
+            >Registered Samples
+          </mat-button-toggle>
+        </mat-button-toggle-group>
       </div>
-      <!-- <div class="batch-sample-registration">
-        <app-batch-registration></app-batch-registration>
-      </div> -->
+      <div class="w-100" *ngIf="selectedTabGroup === 'NEW' && !fromMaintenance">
+        <div class="single-sample-registration">
+          <mat-progress-bar
+            *ngIf="
+              !params?.mrnGeneratorSourceUuid ||
+              !params?.preferredPersonIdentifier ||
+              !params?.referringDoctorAttributes ||
+              !params?.referFromFacilityVisitAttribute ||
+              !params?.labNumberCharactersCount ||
+              !params?.testsFromExternalSystemsConfigs
+            "
+            mode="indeterminate"
+          ></mat-progress-bar>
+          <div
+            *ngIf="
+              params?.mrnGeneratorSourceUuid &&
+              params?.preferredPersonIdentifier &&
+              params?.referringDoctorAttributes &&
+              params?.referFromFacilityVisitAttribute &&
+              params?.labNumberCharactersCount &&
+              params?.testsFromExternalSystemsConfigs && 
+              params?.identifierTypes
+            "
+          >
+            <app-single-registration
+              [mrnGeneratorSourceUuid]="params?.mrnGeneratorSourceUuid"
+              [preferredPersonIdentifier]="params?.preferredPersonIdentifier"
+              [provider]="provider"
+              [agencyConceptConfigs]="params?.agencyConceptConfigs"
+              [referFromFacilityVisitAttribute]="
+                params?.referFromFacilityVisitAttribute
+              "
+              [currentUser]="params?.currentUser"
+              [labNumberCharactersCount]="params?.labNumberCharactersCount"
+              [referringDoctorAttributes]="params?.referringDoctorAttributes"
+              [labSections]="labSections"
+              [testsFromExternalSystemsConfigs]="
+                params?.testsFromExternalSystemsConfigs
+              "
+              [allRegistrationFields]="allRegistrationFields | createLabFields: params?.referringDoctorAttributes : params?.agencyConceptConfigs : params?.referFromFacilityVisitAttribute : params?.identifierTypes"
+            ></app-single-registration>
+          </div>
+        </div>
+        <!-- <div class="batch-sample-registration">referFrom
+          <app-batch-registration></app-batch-registration>
+        </div> -->
+      </div>
+      <div class="w-100" *ngIf="selectedTabGroup === 'BATCH' || fromMaintenance">
+        <div class="w-100" *ngIf="
+              params?.preferredPersonIdentifier &&
+              params?.referringDoctorAttributes &&
+              params?.referFromFacilityVisitAttribute && 
+              params?.identifierTypes && 
+              params?.batchsets && params?.batches
+          ">
+          <app-batch-registration
+            [mrnGeneratorSourceUuid]="params?.mrnGeneratorSourceUuid"
+            [preferredPersonIdentifier]="params?.preferredPersonIdentifier"
+            [provider]="provider"
+            [agencyConceptConfigs]="params?.agencyConceptConfigs"
+            [referFromFacilityVisitAttribute]="
+              params?.referFromFacilityVisitAttribute
+            "
+            [currentUser]="params?.currentUser"
+            [labNumberCharactersCount]="params?.labNumberCharactersCount"
+            [referringDoctorAttributes]="params?.referringDoctorAttributes"
+            [labSections]="labSections"
+            [testsFromExternalSystemsConfigs]="
+              params?.testsFromExternalSystemsConfigs
+            "
+            [allRegistrationFields]="allRegistrationFields | createLabFields: params?.referringDoctorAttributes : params?.agencyConceptConfigs : params?.referFromFacilityVisitAttribute : params?.identifierTypes"
+            [existingBatchsets]="params?.batchsets"
+            [existingBatches]="params?.batches"
+            [fromMaintenance]="fromMaintenance"
+            (reloadRegisterSample)="onReloadRegisterSample($event)"
+          ></app-batch-registration>
+        </div>
+      </div>
+      <div class="w-100" *ngIf="selectedTabGroup === 'LIST' && !fromMaintenance">
+        <app-samples-list></app-samples-list>
+      </div>
     </div>
   </div>
 </div>

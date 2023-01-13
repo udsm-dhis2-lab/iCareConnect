@@ -102,10 +102,11 @@ export class AuthEffects {
           new Notification({ message: "Logging out", type: "LOADING" })
         );
         document.cookie = `JSESSIONID= ;expires=${new Date()}`;
+        let credetialsToken = localStorage.getItem("credetialsToken");
         localStorage.removeItem("credentialsToken");
         localStorage.removeItem("currentLocation");
         localStorage.removeItem("navigationDetails");
-        return this.authService.logout().pipe(
+        return this.authService.logout(credetialsToken).pipe(
           switchMap(() => [
             clearLocations(),
             go({ path: ["/login"] }),

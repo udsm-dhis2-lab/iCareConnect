@@ -32,7 +32,6 @@ public class SampleDAO extends BaseDAO<Sample> {
 	//	TODO: Add also support to get samples by day and month
 	public long getNumberOfRegisteredSamplesThisYear() {
 		DbSession session = this.getSession();
-		new Sample();
 		String queryStr = "SELECT COUNT(sp) FROM Sample sp \n" + "WHERE YEAR(sp.dateTime) = :year";
 		Calendar calendar = Calendar.getInstance();
 		Query query = session.createQuery(queryStr);
@@ -63,7 +62,6 @@ public class SampleDAO extends BaseDAO<Sample> {
 		query.setParameter("endDate", endDate);
 		
 		return query.list();
-		
 	}
 	
 	public List<Visit> getPendingSampleCollectionVisits(Integer limit, Integer startIndex) {
@@ -80,10 +78,11 @@ public class SampleDAO extends BaseDAO<Sample> {
 	}
 	
 	public ListResult<Sample> getSamples(Date startDate, Date endDate, Pager pager, String locationUuid,
-	        String sampleCategory, String testCategory) {
-		
+	        String sampleCategory, String testCategory, String q) {
+		new Sample();
 		DbSession session = this.getSession();
-		String queryStr = "SELECT sp \n" + "FROM Sample sp \n";
+		String queryStr = "SELECT sp \n" + "FROM Sample sp JOIN sp.visit v \n"
+		        + "JOIN v.patient p JOIN p.names pname JOIN p.identifiers pi \n";
 		
 		if (startDate != null && endDate != null) {
 			if (!queryStr.contains("WHERE")) {
@@ -96,6 +95,8 @@ public class SampleDAO extends BaseDAO<Sample> {
 		if (locationUuid != null) {
 			if (!queryStr.contains("WHERE")) {
 				queryStr += " WHERE ";
+			} else {
+				queryStr += " AND ";
 			}
 			queryStr += " sp.visit.location = (SELECT l FROM Location l WHERE l.uuid = :locationUuid)";
 		}
@@ -116,6 +117,17 @@ public class SampleDAO extends BaseDAO<Sample> {
 			}
 			queryStr += "sp IN(SELECT testalloc.sampleOrder.id.sample FROM TestAllocation testalloc WHERE testalloc IN (SELECT testallocstatus.testAllocation FROM TestAllocationStatus testallocstatus WHERE testallocstatus.category=:testCategory))";
 		}
+		
+		if (q != null) {
+			if (!queryStr.contains("WHERE")) {
+				queryStr += " WHERE ";
+			} else {
+				queryStr += " AND ";
+			}
+			
+			queryStr += "lower(sp.label) like lower(:q) OR (lower(concat(pname.givenName,pname.middleName,pname.familyName)) LIKE lower(:q) OR lower(pname.givenName) LIKE lower(:q) OR lower(pname.middleName) LIKE lower(:q) OR lower(pname.familyName) LIKE lower(:q) OR lower(concat(pname.givenName,'',pname.familyName)) LIKE lower(:q) OR lower(concat(pname.givenName,'',pname.middleName)) LIKE lower(:q) OR lower(concat(pname.middleName,'',pname.familyName)) LIKE lower(:q)  OR pi.identifier LIKE :q)";
+		}
+		
 		if (testCategory == "Completed") {
 			if (!queryStr.contains("WHERE")) {
 				queryStr += " WHERE ";
@@ -130,7 +142,7 @@ public class SampleDAO extends BaseDAO<Sample> {
 			
 		}
 		
-		queryStr += " ORDER BY sp.dateCreated ";
+		queryStr += " ORDER BY sp.dateCreated DESC";
 		Query query = session.createQuery(queryStr);
 		if (startDate != null && endDate != null) {
 			query.setParameter("startDate", startDate);
@@ -143,6 +155,11 @@ public class SampleDAO extends BaseDAO<Sample> {
 		if (sampleCategory != null) {
 			query.setParameter("sampleCategory", sampleCategory);
 		}
+		
+		if (q != null) {
+			query.setParameter("q", "%" + q.replace(" ", "%") + "%");
+		}
+		
 		if (testCategory != null && testCategory != "Completed") {
 			query.setParameter("testCategory", testCategory);
 		}
@@ -155,11 +172,8 @@ public class SampleDAO extends BaseDAO<Sample> {
 		}
 		
 		ListResult<Sample> listResults = new ListResult();
-		
 		listResults.setPager(pager);
 		listResults.setResults(query.list());
-		
-		//
 		return listResults;
 	}
 	
