@@ -15,6 +15,7 @@ import { Store } from "@ngrx/store";
 import { AppState } from "src/app/store/reducers";
 import { getProviderDetails } from "src/app/store/selectors/current-user.selectors";
 import { MatRadioChange } from "@angular/material/radio";
+import { SamplesService } from "src/app/modules/laboratory/resources/services/samples.service";
 
 @Component({
   selector: "app-shared-results-entry-and-view-modal",
@@ -51,7 +52,8 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
     private httpClient: HttpClient,
     private ordersService: OrdersService,
     private visitService: VisitsService,
-    private store: Store<AppState>
+    private store: Store<AppState>,
+    private sampleService: SamplesService
   ) {}
 
   ngOnInit(): void {
@@ -328,6 +330,28 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
                       .subscribe((response) => {
                         if (response) {
                           this.saving = false;
+                          if (
+                            (
+                              this.data?.sample?.statuses?.filter(
+                                (status) => status?.category === "HAS_RESULTS"
+                              ) || []
+                            )?.length === 0
+                          ) {
+                            const status = {
+                              sample: {
+                                uuid: this.data?.sample?.uuid,
+                              },
+                              user: {
+                                uuid: localStorage.getItem("userUuid"),
+                              },
+                              remarks: "",
+                              status: "HAS RESULTS",
+                              category: "HAS_RESULTS",
+                            };
+                            this.sampleService
+                              .saveSampleStatus(status)
+                              .subscribe((response) => {});
+                          }
                           setTimeout(() => {
                             this.getAllocations();
                           }, 100);
@@ -346,6 +370,28 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
         .subscribe((response) => {
           if (response) {
             this.saving = false;
+            if (
+              (
+                this.data?.sample?.statuses?.filter(
+                  (status) => status?.category === "HAS_RESULTS"
+                ) || []
+              )?.length === 0
+            ) {
+              const status = {
+                sample: {
+                  uuid: this.data?.sample?.uuid,
+                },
+                user: {
+                  uuid: localStorage.getItem("userUuid"),
+                },
+                remarks: "",
+                status: "HAS RESULTS",
+                category: "HAS_RESULTS",
+              };
+              this.sampleService
+                .saveSampleStatus(status)
+                .subscribe((response) => {});
+            }
             setTimeout(() => {
               this.getAllocations();
             }, 100);

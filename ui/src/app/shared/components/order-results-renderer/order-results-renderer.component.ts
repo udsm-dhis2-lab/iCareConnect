@@ -191,11 +191,13 @@ export class OrderResultsRendererComponent implements OnInit {
     });
     confirmDialog.afterClosed().subscribe((confirmationObject) => {
       if (confirmationObject?.confirmed) {
-        this.ordersService.voidOrderWithReason({
-          ...labOrder,
-          voidReason: confirmationObject?.remarks || "",
-        }).subscribe((response) => {
-          if (!response?.error) {
+        this.ordersService
+          .voidOrderWithReason({
+            ...labOrder,
+            voidReason: confirmationObject?.remarks || "",
+          })
+          .subscribe((response) => {
+            if (!response?.error) {
               this.reloadOrderComponent.emit();
             }
             if (response?.error) {
@@ -207,7 +209,7 @@ export class OrderResultsRendererComponent implements OnInit {
   }
 
   getLabTests(departments): any {
-    const labDepartment = (departments.filter(
+    const labDepartment = ((departments || [])?.filter(
       (department) => department?.name?.toLowerCase().indexOf("lab") === 0
     ) || [])[0];
     return !labDepartment

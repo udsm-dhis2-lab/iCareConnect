@@ -13,8 +13,8 @@
       </div>
     </div>
   </div>
-  <div class="col-md-9">
-    <table class="table">
+  <div class="col-md-9" style="z-index: 102">
+    <table class="table mt-2">
       <thead>
         <tr>
           <th>SN</th>
@@ -69,8 +69,29 @@
               "
             >
               <td colspan="100%">
-                <div class="w-100" style="max-height: 400px; overflow: auto">
-                  <table class="table table-bordered">
+                <div
+                  class="w-100 d-flex justify-content-end"
+                  *ngIf="isComplete"
+                >
+                  <button mat-button (click)="changeLabelCount($event, 'prev')">
+                    <mat-icon>arrow_backward</mat-icon>
+                  </button>
+                  <button
+                    (click)="changeLabelCount($event, 'next')"
+                    mat-button
+                    class="ml-2"
+                  >
+                    <mat-icon>arrow_forward</mat-icon>
+                  </button>
+                </div>
+                <div
+                  class="w-100 mt-2"
+                  style="max-height: 400px; overflow: auto"
+                >
+                  <table
+                    class="table table-bordered"
+                    *ngIf="isWorksheetRenderingReady"
+                  >
                     <tr
                       *ngFor="
                         let row of currentWorksheetDefinition?.worksheet?.rows;
@@ -78,13 +99,20 @@
                       "
                     >
                       <td
+                        [ngStyle]="{
+                          width:
+                            100 /
+                              currentWorksheetDefinition?.worksheet?.columns
+                                ?.length +
+                            '%'
+                        }"
                         *ngFor="
                           let column of currentWorksheetDefinition?.worksheet
                             ?.columns;
                           let columnCount = index
                         "
                       >
-                        <section class="example-section">
+                        <section class="example-section" *ngIf="!isComplete">
                           <mat-radio-group>
                             <mat-radio-button
                               color="primary"
@@ -124,15 +152,35 @@
                             </mat-radio-button>
                           </mat-radio-group>
                         </section>
+                        {{
+                          (selectedRowsColumns[row + "-" + column + "-control"]
+                            ?.value
+                            ? selectedRowsColumns[
+                                row + "-" + column + "-control"
+                              ]?.value?.code
+                            : selectedRowsColumns[
+                                row + "-" + column + "-sample"
+                              ]?.value
+                            ? selectedRowsColumns[
+                                row + "-" + column + "-sample"
+                              ]?.value?.label
+                            : ""
+                          ) | formatLabelCharCountDisplay: currentLabelCharCount
+                        }}
                         <div
                           *ngIf="
-                            selectedRowsColumns[row + '-' + column + '-control']
+                            selectedRowsColumns[
+                              row + '-' + column + '-control'
+                            ] && !isComplete
                           "
                         >
                           <app-test-control-selection-form
                             *ngIf="params?.testControls"
                             [id]="row + '-' + column + '-control'"
                             [testControls]="params?.testControls"
+                            [testOrder]="
+                              currentWorksheetDefinition?.worksheet?.testOrder
+                            "
                             (selectedControl)="
                               getSelectedTestControl(
                                 $event,
@@ -144,6 +192,23 @@
                       </td>
                     </tr>
                   </table>
+                </div>
+                <div class="d-flex justify-content-end mt-2">
+                  <button
+                    *ngIf="!isComplete"
+                    mat-flat-button
+                    color="primary"
+                    (click)="onPopulateSamples($event, selectedRowsColumns)"
+                  >
+                    Populate</button
+                  ><button
+                    *ngIf="isComplete"
+                    mat-flat-button
+                    color="primary"
+                    (click)="onUnPopulateSamples($event)"
+                  >
+                    Un-populate
+                  </button>
                 </div>
               </td>
             </tr>
@@ -166,7 +231,7 @@
       </tbody>
     </table>
   </div>
-  <div class="col-md-3">
+  <div class="col-md-3" style="z-index: 100">
     <app-form
       [fields]="worksheetDefinitionFields"
       (formUpdate)="onGetFormData($event)"

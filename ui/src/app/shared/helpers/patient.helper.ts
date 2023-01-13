@@ -1,4 +1,5 @@
 import * as _ from "lodash";
+import { VisitObject } from "../resources/visits/models/visit-object.model";
 
 import {
   getVisitsByEncounterTypeWhereThereAreOrders,
@@ -1585,4 +1586,8 @@ export function formatPatientNotes(notes, patientUuid, conceptUuid) {
 
     return [mergedNotes];
   } else return formattedNotes;
+}
+
+export function getAllDiagnosesFromVisitDetails(visit: VisitObject) {
+  return visit.diagnoses;
 }

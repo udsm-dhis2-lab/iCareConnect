@@ -3752,5 +3752,13 @@
         </sql>
     </changeSet>
 
+    <changeSet id="update_lb_worksheet_definition_add_column_header_fields" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE lb_worksheet_definition
+            ADD COLUMN header_fields TEXT(100000) AFTER code;
+        </sql>
+    </changeSet>
+
+
 
 </databaseChangeLog>
