@@ -3,15 +3,18 @@ package org.openmrs.module.icare.laboratory.services;
 import org.apache.commons.collections.IteratorUtils;
 import org.openmrs.*;
 //import org.openmrs.api.ObsService;
+import org.openmrs.api.AdministrationService;
 import org.openmrs.api.ObsService;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.impl.BaseOpenmrsService;
+import org.openmrs.module.icare.ICareConfig;
 import org.openmrs.module.icare.core.ListResult;
 import org.openmrs.module.icare.core.Pager;
 import org.openmrs.module.icare.core.Summary;
 import org.openmrs.module.icare.laboratory.dao.*;
 import org.openmrs.module.icare.laboratory.models.*;
 
+import javax.naming.ConfigurationException;
 import java.util.*;
 
 public class LaboratoryServiceImpl extends BaseOpenmrsService implements LaboratoryService {
@@ -37,6 +40,26 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	SampleLableDAO sampleLableDAO;
 	
 	TestOrderLocationDAO testOrderLocationDAO;
+	
+	BatchDAO batchDAO;
+	
+	BatchSetDAO batchSetDAO;
+	
+	BatchSetStatusDAO batchSetStatusDAO;
+	
+	BatchStatusDAO batchStatusDAO;
+	
+	WorksheetDAO worksheetDAO;
+	
+	WorksheetControlDAO worksheetControlDAO;
+	
+	WorksheetDefinitionDAO worksheetDefinitionDAO;
+	
+	WorksheetSampleDAO worksheetSampleDAO;
+	
+	WorksheetStatusDAO worksheetStatusDAO;
+	
+	WorksheetSampleStatusDAO worksheetSampleStatusDAO;
 	
 	public void setSampleDAO(SampleDAO sampleDAO) {
 		this.sampleDAO = sampleDAO;
@@ -78,6 +101,46 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 		this.sampleLableDAO = sampleLableDAO;
 	}
 	
+	public void setBatchSetDAO(BatchSetDAO batchSetDAO) {
+		this.batchSetDAO = batchSetDAO;
+	}
+	
+	public void setBatchDAO(BatchDAO batchDAO) {
+		this.batchDAO = batchDAO;
+	}
+	
+	public void setBatchSetStatusDAO(BatchSetStatusDAO batchSetStatusDAO) {
+		this.batchSetStatusDAO = batchSetStatusDAO;
+	}
+	
+	public void setBatchStatusDAO(BatchStatusDAO batchStatusDAO) {
+		this.batchStatusDAO = batchStatusDAO;
+	}
+	
+	public void setWorksheetDAO(WorksheetDAO worksheetDAO) {
+		this.worksheetDAO = worksheetDAO;
+	}
+	
+	public void setWorksheetControlDAO(WorksheetControlDAO worksheetControlDAO) {
+		this.worksheetControlDAO = worksheetControlDAO;
+	}
+	
+	public void setWorksheetDefinitionDAO(WorksheetDefinitionDAO worksheetDefinitionDAO) {
+		this.worksheetDefinitionDAO = worksheetDefinitionDAO;
+	}
+	
+	public void setWorksheetSampleDAO(WorksheetSampleDAO worksheetSampleDAO) {
+		this.worksheetSampleDAO = worksheetSampleDAO;
+	}
+	
+	public void setWorksheetStatusDAO(WorksheetStatusDAO worksheetStatusDAO) {
+		this.worksheetStatusDAO = worksheetStatusDAO;
+	}
+	
+	public void setWorksheetSampleStatusDAO(WorksheetSampleStatusDAO worksheetSampleStatusDAO) {
+		this.worksheetSampleStatusDAO = worksheetSampleStatusDAO;
+	}
+	
 	@Override
 	public Sample createSample(Sample sample) {
 		this.sampleDAO.save(sample);
@@ -96,8 +159,8 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	
 	@Override
 	public ListResult<Sample> getSamples(Date startDate, Date endDate, Pager pager, String location, String sampleCategory,
-	        String testCategory) {
-		return this.sampleDAO.getSamples(startDate, endDate, pager, location, sampleCategory, testCategory);
+	        String testCategory, String q) {
+		return this.sampleDAO.getSamples(startDate, endDate, pager, location, sampleCategory, testCategory, q);
 	}
 	
 	@Override
@@ -157,12 +220,34 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 		if (testConcept == null) {
 			throw new Exception("Test Concept with ID '" + testAllocation.getTestConcept().getUuid() + "' does not exist.");
 		}
+		String sampleUuid = testAllocation.getSample().getUuid();
+		Sample sampleData = testAllocationDAO.getAllocationsBySample(sampleUuid).get(0);
+		TestAllocation matchedAllocation = new TestAllocation();
+		Boolean allocationAlreadySet = false;
+		if (sampleData != null) {
+			if (sample.getSampleOrders().size() > 0) {
+				for (SampleOrder sampleOrder : sample.getSampleOrders()) {
+					if (sampleOrder.getTestAllocations().size() > 0) {
+						for (TestAllocation allocation : sampleOrder.getTestAllocations()) {
+							if (allocation.getTestConcept().getUuid().toString() == testConcept.getUuid().toString()) {
+								allocationAlreadySet = true;
+								matchedAllocation = allocation;
+							}
+						}
+					}
+				}
+			}
+		}
+		if (!allocationAlreadySet) {
+			testAllocation.setTestConcept(testConcept);
+			testAllocation.setContainer(containerConcept);
+			testAllocation.getSampleOrder().setSample(sample);
+			testAllocation.getSampleOrder().setOrder(order);
+			return this.testAllocationDAO.save(testAllocation);
+		} else {
+			return testAllocationDAO.findByUuid(matchedAllocation.getUuid().toString());
+		}
 		
-		testAllocation.setTestConcept(testConcept);
-		testAllocation.setContainer(containerConcept);
-		testAllocation.getSampleOrder().setSample(sample);
-		testAllocation.getSampleOrder().setOrder(order);
-		return this.testAllocationDAO.save(testAllocation);
 	}
 	
 	@Override
@@ -255,7 +340,6 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 		}
 		savedSampleOrder.setTechnician(user);
 		return this.sampleOrderDAO.save(savedSampleOrder);
-		
 	}
 	
 	@Override
@@ -264,15 +348,33 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	}
 	
 	@Override
-	public List<TestAllocation> getAllocationBySample(String sampleId) {
-		
-		return this.testAllocationDAO.getAllocationBySample(sampleId);
-		
+	public List<Sample> getSampleOrdersBySampleUuid(String sampleUuid) {
+		return IteratorUtils.toList(this.sampleOrderDAO.getSampleOrdersBySampleUuid(sampleUuid).iterator());
+	}
+	
+	@Override
+	public List<Sample> getAllocationsBySample(String sampleUuid) {
+		Sample sample = this.sampleDAO.findByUuid(sampleUuid);
+		List<Map<String, Object>> allocations = new ArrayList<>();
+		if (sample.getSampleOrders().size() > 0) {
+			for (SampleOrder order: sample.getSampleOrders()) {
+				if (order.getTestAllocations().size() > 0) {
+					for (TestAllocation allocation: order.getTestAllocations()) {
+						allocations.add(allocation.toMap());
+					}
+				}
+			}
+		}
+		return this.testAllocationDAO.getAllocationsBySample(sampleUuid);
+	}
+	
+	@Override
+	public List<TestAllocation> getAllocationsByOrder(String orderUuid) {
+		return this.testAllocationDAO.getAllocationsByOrder(orderUuid);
 	}
 	
 	@Override
 	public List<TestAllocation> getAllAllocations() {
-		
 		return IteratorUtils.toList(this.testAllocationDAO.findAll().iterator());
 	}
 	
@@ -313,10 +415,105 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 			result.setValueDrug(drug);
 		}
 		
+		Date date = new Date();
+		result.setDateCreated(date);
+		
 		this.resultDAO.save(result);
 		
 		return result;
 		
+	}
+	
+	public List<Map<String, Object>> saveMultipleResults(List<Result> results) throws Exception {
+		List<Map<String, Object>> resultResponses = new ArrayList<>();
+		for (Result result: results) {
+			if (result.getConcept().getUuid() == null) {
+				throw new Exception("Concept is null. Concept for the result must be provided");
+			}
+			if (result.getTestAllocation().getUuid() == null) {
+				throw new Exception("Test Allocation is null. Test allocation uuid must be provided");
+			}
+
+			Concept concept = Context.getConceptService().getConceptByUuid(result.getConcept().getUuid());
+			if (concept == null) {
+				throw new Exception("Concept with id '" + result.getConcept().getUuid() + "' does not exist");
+			}
+
+			result.setConcept(concept);
+
+			TestAllocation testAllocation = this.testAllocationDAO.findByUuid(result.getTestAllocation().getUuid());
+			if (testAllocation == null) {
+				throw new Exception("Test Allocation with id '" + result.getTestAllocation().getUuid() + "' does not exist");
+			}
+			result.setTestAllocation(testAllocation);
+
+			if (result.getValueCoded() != null) {
+				Concept valueCoded = Context.getConceptService().getConceptByUuid(result.getValueCoded().getUuid());
+				result.setValueCoded(valueCoded);
+			}
+
+			if (result.getValueDrug() != null) {
+				Drug drug = Context.getConceptService().getDrugByUuid(result.getValueDrug().getUuid());
+				result.setValueDrug(drug);
+			}
+
+			if (result.getValueGroup() != null && result.getValueGroup().getUuid() != null) {
+				Result valueGroup = this.resultDAO.findByUuid(result.getValueGroup().getUuid());
+				System.out.println(valueGroup.getValueText());
+				result.setValueGroup(valueGroup);
+			}
+
+			if (result.getInstrument() != null) {
+				Concept instrument = Context.getConceptService().getConceptByUuid(result.getInstrument().getUuid());
+				result.setInstrument(instrument);
+			}
+
+			Date date = new Date();
+			result.setDateCreated(date);
+			System.out.println(result.getValueGroup());
+
+			Result response = this.resultDAO.save(result);
+
+			/*
+			Save status via results
+			* */
+			TestAllocationStatus resultStatus = new TestAllocationStatus();
+			resultStatus.setStatus(result.getStatus());
+			resultStatus.setCategory(result.getStatusCategory());
+			resultStatus.setRemarks(result.getStatusRemarks());
+			resultStatus.setTestResult(response);
+			resultStatus.setUser(response.getCreator());
+			resultStatus.setTestAllocation(response.getTestAllocation());
+			this.testAllocationStatusDAO.save(resultStatus);
+			/*
+			End of save status via results
+			* */
+//			TODO: Add support to accommodate new status on the allocation response
+			resultResponses.add(response.toMap());
+		}
+		return  resultResponses;
+	}
+	
+	public Map<String, Object> saveResultsInstrument(Map<String, Object> resultsInstrumentObject)throws Exception  {
+		Concept instrument = new Concept();
+		List responses = new ArrayList();
+		if (resultsInstrumentObject.get("instrument") == null || ((Map) resultsInstrumentObject.get("instrument")).get("uuid") == null) {
+			throw new Exception("Instrument is not set");
+		} else {
+//			instrument.setUuid(((Map) resultsInstrumentObject.get("instrument")).get("uuid").toString());
+		}
+
+		for (Map<String, Object> resultObject: (ArrayList<Map<String, Object>>) resultsInstrumentObject.get("results")) {
+			Result result = new Result();
+			result = resultDAO.findByUuid(resultObject.get("uuid").toString());
+			String instrumentUuid = ((Map) resultsInstrumentObject.get("instrument")).get("uuid").toString();
+			instrument = Context.getConceptService().getConceptByUuid(instrumentUuid);
+			Result response = this.resultDAO.updateResultsBySettingInstrument(result, instrument);
+			responses.add(response.toMap());
+		}
+		Map<String, Object> returnResponse = new HashMap<>();
+		returnResponse.put("results", responses);
+		return returnResponse;
 	}
 	
 	@Override
@@ -327,6 +524,14 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	@Override
 	public List<Result> getResults() {
 		return IteratorUtils.toList(this.resultDAO.findAll().iterator());
+	}
+	
+	private Result getResultsByUuid(String uuid) {
+		return this.resultDAO.findByUuid(uuid);
+	}
+	
+	private Integer getResultsId(String uuid) {
+		return this.resultDAO.findByUuid(uuid).getId();
 	}
 	
 	@Override
@@ -341,13 +546,27 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 		if (user == null) {
 			throw new Exception("The user is not authenticated.");
 		}
+		
+		Result testResult = this.resultDAO.findByUuid(testAllocationStatus.getTestResult().getUuid());
+		//		System.out.println(testAllocationStatus.getTestResult().getUuid());
 		testAllocationStatus.setTestAllocation(testAllocation);
 		testAllocationStatus.setUser(user);
+		if (testResult != null) {
+			testAllocationStatus.setTestResult(testResult);
+		}
 		TestAllocationStatus createdStatus = this.testAllocationStatusDAO.save(testAllocationStatus);
 		
 		//		if (countTestAllocationApprovedStatuses(testAllocation.getUuid()) == 2) {
 		
-		if (testAllocationStatus.getRemarks().equals("SECOND_APPROVAL")) {
+		AdministrationService administrationService = Context.getAdministrationService();
+		String labResultApprovalConfig = administrationService
+		        .getGlobalProperty(ICareConfig.LAB_RESULT_APPROVAL_CONFIGURATION);
+		if (labResultApprovalConfig == null) {
+			throw new ConfigurationException("Lab result approval configuration is not set. Please set '"
+			        + ICareConfig.LAB_RESULT_APPROVAL_CONFIGURATION + "'");
+		}
+		
+		if ((testAllocationStatus.getStatus().equals("AUTHORIZED") && labResultApprovalConfig.equals("2"))) {
 			List<Result> resList = testAllocation.getTestAllocationResults();
 			
 			Collections.sort(resList, new Comparator<Result>() {
@@ -358,7 +577,8 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 				}
 			});
 			
-			Result allocationResults = resList.get(resList.size() - 1);
+			Result allocationResults = testResult;
+			//					resList.get(resList.size() - 1);
 			//			for (Result allocationResults : testAllocation.getTestAllocationResults()) {
 			
 			if (allocationResults != null) {
@@ -377,7 +597,8 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 				
 				List<TestAllocationStatus> resultsRemarks = new ArrayList<TestAllocationStatus>();
 				for (TestAllocationStatus status : testAllocationStatuses) {
-					if (status.getStatus().equals("COMMENT") || status.getStatus().equals("ANSWER DESCRIPTION")) {
+					if (status.getStatus() != null
+					        && (status.getStatus().equals("COMMENT") || status.getStatus().equals("ANSWER DESCRIPTION"))) {
 						resultsRemarks.add(status);
 					}
 				}
@@ -392,7 +613,7 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 				observation.setDateCreated(new Date());
 				observation.setVoided(false);
 				for (TestAllocationStatus resultsRemark : resultsRemarks) {
-					if (resultsRemark.getStatus().equals("ANSWER DESCRIPTION")) {
+					if (resultsRemark.getStatus() != null && resultsRemark.getStatus().equals("ANSWER DESCRIPTION")) {
 						observation.setComment(resultsRemark.getRemarks());
 					}
 				}
@@ -432,6 +653,15 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 		}
 		
 		return createdStatus;
+	}
+	
+	public List<Map<String, Object>> updateTestAllocationStatuses(List<TestAllocationStatus> testAllocationStatuses) throws Exception {
+		List<Map<String, Object>> responses = new ArrayList<>();
+		for(TestAllocationStatus testAllocationStatus: testAllocationStatuses) {
+			TestAllocationStatus response = this.updateTestAllocationStatus(testAllocationStatus);
+			responses.add(response.toMap());
+		}
+		return responses;
 	}
 	
 	@Override
@@ -573,4 +803,191 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 		return sampleDAO.getWorkloadSummary(startDate, endDate);
 	}
 	
+	@Override
+	public List<Batch> getBatches(Date startDate, Date endDate, String q, Integer startIndex, Integer limit) {
+		return batchDAO.getBatches(startDate, endDate, q, startIndex, limit);
+	}
+	
+	@Override
+	public Batch getBatchByUuid(String batchUuid) {
+		return batchDAO.findByUuid(batchUuid);
+	}
+	
+	@Override
+	public Batch addBatch(Batch batch) {
+		return batchDAO.save(batch);
+	}
+	
+	public BatchSet addBatchSet(BatchSet batchSet) {
+		return batchSetDAO.save(batchSet);
+	}
+	
+	@Override
+	public BatchStatus addBatchStatus(BatchStatus batchStatus) throws Exception {
+		
+		Batch batch = this.getBatchByUuid(batchStatus.getBatch().getUuid());
+		
+		if (batch == null) {
+			throw new Exception("The batch with id " + batchStatus.getBatch().getUuid() + " does not exist");
+		}
+		User user = Context.getUserService().getUserByUuid(batchStatus.getUser().getUuid());
+		if (user == null) {
+			throw new Exception("The user with id " + batchStatus.getUser().getUuid() + " does not exist");
+		}
+		
+		batchStatus.setBatch(batch);
+		batchStatus.setUser(user);
+		return batchStatusDAO.save(batchStatus);
+	}
+	
+	@Override
+	public List<BatchSet> getBatchSets(Date startDate, Date endDate, String q, Integer startIndex, Integer limit) {
+		return batchSetDAO.getBatchSets(startDate, endDate, q, startIndex, limit);
+	}
+	
+	@Override
+	public BatchSet getBatchSetByUuid(String batchSetUuid) {
+		return batchSetDAO.findByUuid(batchSetUuid);
+	}
+	
+	@Override
+	public BatchSetStatus addBatchSetStatus(BatchSetStatus batchSetStatus) throws Exception {
+		
+		BatchSet batchSet = this.getBatchSetByUuid(batchSetStatus.getBatchSet().getUuid());
+		if (batchSet == null) {
+			throw new Exception("The batchSet with id " + batchSetStatus.getBatchSet().getUuid() + " does not exist");
+		}
+		
+		User user = Context.getUserService().getUserByUuid(batchSetStatus.getUser().getUuid());
+		if (user == null) {
+			throw new Exception(" The user with id " + batchSetStatus.getUser().getUuid() + " does not exist");
+		}
+		
+		batchSetStatus.setBatchSet(batchSet);
+		batchSetStatus.setUser(user);
+		
+		BatchSetStatus savedBatchSetStatus = batchSetStatusDAO.save(batchSetStatus);
+		
+		return savedBatchSetStatus;
+	}
+	
+	@Override
+	public List<Worksheet> getWorksheets(Date startDate, Date endDate, String q, Integer startIndex, Integer limit) {
+		return worksheetDAO.getWorksheets(startDate, endDate, q, startIndex, limit);
+	}
+	
+	@Override
+	public Worksheet getWorksheetByUuid(String worksheetUuid) {
+		return worksheetDAO.findByUuid(worksheetUuid);
+	}
+	
+	@Override
+	public Worksheet addWorksheet(Worksheet worksheet) {
+		return worksheetDAO.save(worksheet);
+	}
+	
+	@Override
+	public List<WorksheetControl> getWorksheetControls(Date startDate, Date endDate, String q, Integer startIndex,
+	        Integer limit) {
+		return worksheetControlDAO.getWorksheetControls(startDate, endDate, q, startIndex, limit);
+	}
+	
+	@Override
+	public WorksheetControl getWorksheetControlByUuid(String worksheetControlUuid) {
+		return worksheetControlDAO.findByUuid(worksheetControlUuid);
+	}
+	
+	@Override
+	public WorksheetControl addWorksheetControl(WorksheetControl worksheetControl) {
+		return worksheetControlDAO.save(worksheetControl);
+	}
+	
+	@Override
+	public List<WorksheetDefinition> getWorksheetDefinitions(Date startDate, Date endDate, String q, Integer startIndex,
+	        Integer limit) {
+		return worksheetDefinitionDAO.getWorksheetDefinitions(startDate, endDate, q, startIndex, limit);
+	}
+	
+	@Override
+	public WorksheetDefinition getWorksheetDefinitionByUuid(String worksheetDefinitionUuid) {
+		return worksheetDefinitionDAO.findByUuid(worksheetDefinitionUuid);
+	}
+	
+	@Override
+	public WorksheetDefinition addWorksheetDefinition(WorksheetDefinition worksheetDefinition) throws Exception {
+		
+		Worksheet worksheet = this.getWorksheetByUuid(worksheetDefinition.getWorksheet().getUuid());
+		if (worksheet == null) {
+			throw new Exception("The worksheet definition with id " + worksheetDefinition.getWorksheet().getUuid()
+			        + " does not exist");
+		}
+		worksheetDefinition.setWorksheet(worksheet);
+		return worksheetDefinitionDAO.save(worksheetDefinition);
+	}
+	
+	@Override
+	public List<WorksheetSample> getWorksheetSamples(Date startDate, Date endDate, String q, Integer startIndex,
+	        Integer limit) {
+		return worksheetSampleDAO.getWorksheetSamples(startDate, endDate, q, startIndex, limit);
+	}
+	
+	@Override
+	public WorksheetSample getWorksheetSampleByUuid(String worksheetSampleUuid) {
+		return worksheetSampleDAO.findByUuid(worksheetSampleUuid);
+	}
+	
+	@Override
+	public WorksheetSample addWorksheetSample(WorksheetSample worksheetSample) throws Exception {
+		
+		if (worksheetSample.getSample() != null) {
+			Sample sample = this.getSampleByUuid(worksheetSample.getSample().getUuid());
+			if (sample == null) {
+				throw new Exception("The sample with id " + worksheetSample.getSample().getUuid() + " does not exist");
+			}
+			worksheetSample.setSample(sample);
+		}
+		
+		WorksheetDefinition worksheetDefinition = this.getWorksheetDefinitionByUuid(worksheetSample.getWorksheetDefinition()
+		        .getUuid());
+		if (worksheetDefinition == null) {
+			throw new Exception("The worksheet definition with id " + worksheetSample.getWorksheetDefinition().getUuid()
+			        + " does not exist");
+		}
+		
+		if (worksheetSample.getWorksheetControl() != null) {
+			WorksheetControl worksheetControl = this.getWorksheetControlByUuid(worksheetSample.getWorksheetControl()
+			        .getUuid());
+			if (worksheetControl == null) {
+				throw new Exception("The worksheet control with id " + worksheetSample.getWorksheetControl().getUuid()
+				        + " does not exist");
+			}
+			worksheetSample.setWorksheetControl(worksheetControl);
+		}
+		worksheetSample.setWorksheetDefinition(worksheetDefinition);
+		return worksheetSampleDAO.save(worksheetSample);
+	}
+	
+	public WorksheetStatus addWorksheetStatus(WorksheetStatus worksheetStatus) throws Exception {
+		
+		Worksheet worksheet = this.getWorksheetByUuid(worksheetStatus.getWorksheet().getUuid());
+		if (worksheet == null) {
+			throw new Exception("The worksheet with id " + worksheetStatus.getWorksheet().getUuid() + " does not exist");
+		}
+		worksheetStatus.setWorksheet(worksheet);
+		return worksheetStatusDAO.save(worksheetStatus);
+		
+	}
+	
+	@Override
+	public WorksheetSampleStatus addWorksheetSampleStatus(WorksheetSampleStatus worksheetSampleStatus) throws Exception {
+		
+		WorksheetSample worksheetSample = this
+		        .getWorksheetSampleByUuid(worksheetSampleStatus.getWorksheetSample().getUuid());
+		if (worksheetSample == null) {
+			throw new Exception("The worksheet sample with uuid " + worksheetSampleStatus.getWorksheetSample().getUuid()
+			        + " does not exist");
+		}
+		worksheetSampleStatus.setWorksheetSample(worksheetSample);
+		return worksheetSampleStatusDAO.save(worksheetSampleStatus);
+	}
 }

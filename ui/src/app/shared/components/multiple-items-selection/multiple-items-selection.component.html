@@ -16,7 +16,9 @@
     </div>
     <div
       class="concept-list w-100"
-      *ngIf="items$ | async | filterItemsBySelections: selectedItems as items"
+      *ngIf="
+        items$ | async | filterItemsBySelections: currentSelectedItems as items
+      "
     >
       <ul
         class="w-100 ul-listed-items"
@@ -63,7 +65,7 @@
       <li
         class="item-in-list"
         (click)="removeSelectedItem($event, item, items, itemType)"
-        *ngFor="let item of selectedItems"
+        *ngFor="let item of currentSelectedItems"
       >
         {{ item?.display }}
       </li>

@@ -114,7 +114,12 @@ export class FieldComponent {
   }
 
   get isCommonField(): boolean {
-    return !this.isCheckBoxButton && !this.isDate && !this.isBoolean;
+    return (
+      this.field?.controlType !== "checkbox" &&
+      !this.isDate &&
+      !this.isBoolean &&
+      !this.isCheckBoxButton
+    );
   }
 
   get fieldId(): string {
@@ -133,7 +138,6 @@ export class FieldComponent {
 
   updateFieldOnDemand(objectToUpdate): void {
     this.form.patchValue(objectToUpdate);
-    const theKey = Object.keys(objectToUpdate);
     this.form.setValue({ dob: new Date() });
     this.fieldUpdate.emit(this.form);
   }
@@ -143,6 +147,13 @@ export class FieldComponent {
       (option) => option?.key === this.value
     ) || [])[0];
     return matchedOption ? matchedOption?.value : "";
+  }
+
+  get getOptionValueLabel(): any {
+    const matchedOption = (this.field.options.filter(
+      (option) => option?.key === this.value
+    ) || [])[0];
+    return matchedOption ? matchedOption?.label : "";
   }
 
   searchItem(event: any, field?: any): void {

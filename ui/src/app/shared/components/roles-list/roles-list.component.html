@@ -77,14 +77,14 @@
       <button
         mat-stroked-button
         [disabled]="page <= 1"
-        (click)="getroles($event, 'next')"
+        (click)="getRoles($event, 'prev')"
       >
         Prev
       </button>
       <button
         [disabled]="params?.roles?.length < pageSize"
         mat-stroked-button
-        (click)="getroles($event, 'next')"
+        (click)="getRoles($event, 'next')"
         class="ml-2"
       >
         Next

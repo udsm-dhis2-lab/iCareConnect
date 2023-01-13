@@ -6,10 +6,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openmrs.Order;
 import org.openmrs.Visit;
+import org.openmrs.api.AdministrationService;
 import org.openmrs.api.OrderService;
 import org.openmrs.api.UserService;
 import org.openmrs.api.VisitService;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.icare.ICareConfig;
 import org.openmrs.module.icare.laboratory.models.*;
 import org.openmrs.module.icare.laboratory.services.LaboratoryService;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -42,6 +44,9 @@ public class LaboratoryServiceTest extends LaboratoryTestBase {
 	
 	@Test
 	public void testCreatingSampleAndAllocatingTest() throws Exception {
+		
+		AdministrationService adminService = Context.getService(AdministrationService.class);
+		adminService.setGlobalProperty(ICareConfig.LAB_RESULT_APPROVAL_CONFIGURATION, "2");
 		
 		//add sample
 		//Given

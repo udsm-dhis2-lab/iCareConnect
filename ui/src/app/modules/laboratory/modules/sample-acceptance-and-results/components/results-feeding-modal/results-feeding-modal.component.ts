@@ -38,6 +38,8 @@ import { OpenmrsHttpClientService } from "src/app/shared/modules/openmrs-http-cl
 import { Textbox } from "src/app/shared/modules/form/models/text-box.model";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
 import { TextArea } from "src/app/shared/modules/form/models/text-area.model";
+import { SystemSettingsService } from "src/app/core/services/system-settings.service";
+import { MatTabChangeEvent } from "@angular/material/tabs";
 
 @Component({
   selector: "app-results-feeding-modal",
@@ -93,6 +95,11 @@ export class ResultsFeedingModalComponent implements OnInit {
   labSampleLoadingState$: Observable<boolean>;
   visitDetails$: Observable<any>;
   currentUser$: Observable<any>;
+  selectedIndex: number = 0;
+
+  multipleResultsAttributeType$: Observable<any>;
+  errors: any[] = [];
+  files: any[] = [];
   constructor(
     private dialog: MatDialog,
     private dialogRef: MatDialogRef<ResultsFeedingModalComponent>,
@@ -101,7 +108,8 @@ export class ResultsFeedingModalComponent implements OnInit {
     private dataService: DataService,
     private sampleService: SamplesService,
     private httpClient: HttpClient,
-    private visitService: VisitsService
+    private visitService: VisitsService,
+    private systemSettingsService: SystemSettingsService
   ) {
     this.dialogData = data;
     this.sample = data?.sample;
@@ -118,6 +126,20 @@ export class ResultsFeedingModalComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.multipleResultsAttributeType$ = this.systemSettingsService
+      .getSystemSettingsByKey(
+        `iCare.laboratory.settings.testParameters.attributes.multipleResultsAttributeTypeUuid`
+      )
+      .pipe(
+        map((response) => {
+          if (response && !response?.error) {
+            return response;
+          } else {
+            this.errors = [...this.errors, response];
+            return response;
+          }
+        })
+      );
     this.labSampleLoadingState$ = this.store.select(getLabSampleLoadingState);
     this.testOrders$ = this.store.select(
       getFormattedLabSampleOrdersBySampleIdentifier,
@@ -261,6 +283,43 @@ export class ResultsFeedingModalComponent implements OnInit {
     });
   }
 
+  onGetFormData(
+    val: any,
+    parameter: any,
+    item?: any,
+    currentSample?: any,
+    allocation?: any
+  ): void {
+    //Work around of the below logic to overwrite a file
+    // let newFiles = [];
+    // const availableFile = newFiles.find(file => file.parameterUuid === parameter.uuid);
+    // const index = newFiles.indexOf(availableFile);
+    // newFiles = index < 0 ? [...newFiles, {}] : [...newFiles.slice(0, index), availableFile, newFiles.slice(index + 1)];
+    let existingFile = this.files.find(
+          (file) => file.parameterUuid === parameter?.uuid
+        )
+    if (
+      parameter?.datatype?.display === "Complex"
+    ) {
+      this.files = [
+        ...this.files.filter((file) => file.parameterUuid !== parameter?.uuid),
+        existingFile
+          ? {
+              ...existingFile,
+              valueFile: val,
+            }
+          : {
+              parameterUuid: parameter?.uuid,
+              valueFile: val,
+              item: item,
+              currentSample: currentSample,
+              allocation: allocation,
+            },
+      ];
+    }
+    this.values[parameter?.uuid] = val;
+  }
+
   loadSampleByUuid(): void {
     this.store.dispatch(loadSampleByUuid({ uuid: this.sample?.uuid }));
   }
@@ -280,15 +339,6 @@ export class ResultsFeedingModalComponent implements OnInit {
   }
 
   setEnteredParameterValue(item, val) {
-    // if (this.LISConfigurations?.isLIS) {
-    //   if (this.temporaryValues[item?.uuid]) {
-    //     this.values[item?.uuid] = val;
-    //   } else {
-    //     this.temporaryValues[item?.uuid] = val;
-    //   }
-    // } else {
-    //   this.values[item?.uuid] = val;
-    // }
     this.values[item?.uuid] = val;
   }
 
@@ -478,34 +528,46 @@ export class ResultsFeedingModalComponent implements OnInit {
     this.savingMessage[parameter?.uuid] = true;
     this.saving = true;
     if (!type || type !== "file") {
-      const resultObject = {
-        concept: {
-          uuid: parameter?.uuid,
-        },
-        testAllocation: {
-          uuid: allocation?.allocationUuid,
-        },
-        valueNumeric: parameter?.numeric ? this.values[parameter?.uuid] : null,
-        valueText:
-          !parameter?.numeric && parameter?.answers?.length == 0
-            ? this.values[parameter?.uuid]
-            : null,
-
-        valueCoded:
-          parameter.answers && parameter.answers.length > 0
-            ? {
-                uuid: this.values[parameter?.uuid],
+      const results = this.values[parameter?.uuid]
+        ? (
+            (!this.values[parameter?.uuid][0]?.value
+              ? [{ value: this.values[parameter?.uuid] }]
+              : this.values[parameter?.uuid]
+            )?.map((valueOption) => {
+              if (valueOption?.value) {
+                return {
+                  concept: {
+                    uuid: parameter?.uuid,
+                  },
+                  testAllocation: {
+                    uuid: allocation?.allocationUuid,
+                  },
+                  valueNumeric: parameter?.numeric ? valueOption?.value : null,
+                  valueText:
+                    !parameter?.numeric && parameter?.answers?.length == 0
+                      ? valueOption?.value
+                      : null,
+                  valueCoded:
+                    parameter.answers && parameter.answers.length > 0
+                      ? {
+                          uuid: valueOption?.value,
+                        }
+                      : null,
+                  abnormal: this.values[parameter?.uuid + "-abnormal"]
+                    ? this.values[parameter?.uuid + "-abnormal"]
+                    : false,
+                  additionalReqTimeLimit: this.getTimeConfigs(
+                    item?.order?.concept?.uuid
+                  )?.additionalReqTimeLimit,
+                  standardTAT: this.getTimeConfigs(item?.order?.concept?.uuid)
+                    ?.standardTAT,
+                  urgentTAT: this.getTimeConfigs(item?.order?.concept?.uuid)
+                    ?.urgentTAT,
+                };
               }
-            : null,
-        abnormal: this.values[parameter?.uuid + "-abnormal"]
-          ? this.values[parameter?.uuid + "-abnormal"]
-          : false,
-        additionalReqTimeLimit: this.getTimeConfigs(item?.order?.concept?.uuid)
-          ?.additionalReqTimeLimit,
-        standardTAT: this.getTimeConfigs(item?.order?.concept?.uuid)
-          ?.standardTAT,
-        urgentTAT: this.getTimeConfigs(item?.order?.concept?.uuid)?.urgentTAT,
-      };
+            }) || []
+          )?.filter((data) => data)
+        : [];
 
       const resultsComments = {
         status: this.amendmentRemarks
@@ -526,22 +588,17 @@ export class ResultsFeedingModalComponent implements OnInit {
           uuid: allocation.allocationUuid,
         },
       };
-
-      let formattedDataObject = {};
-      _.map(this.getAllKeysWithData(resultObject), (key) => {
-        formattedDataObject[key] = resultObject[key];
-      });
       this.store.dispatch(
         saveLabTestResults({
-          results: formattedDataObject,
+          results: results,
           comments: resultsComments,
           sampleDetails: currentSample,
-          concept: item?.order?.concept,
-          allocation,
+          concept: null,
+          allocation: null,
+          isResultAnArray: true,
         })
       );
       this.getLoadingAndTestOrdersData(parameter);
-      console.log("GETEEE");
     } else {
       // Attachment
       this.savingLabResultsState$ = of(false);
@@ -557,7 +614,14 @@ export class ResultsFeedingModalComponent implements OnInit {
         status: "PRELIMINARY",
         comment: this.values[parameter?.uuid + "-comment"],
       };
-      data.append("file", this.file);
+      data.append(
+        "file",
+        this.file ||
+          this.files.filter(
+            (fileObject) =>
+              fileObject.parameterUuid === parameter?.uuid
+          )[0]?.valueFile
+      );
       data.append("json", JSON.stringify(jsonData));
 
       // void first the existing observation
@@ -752,6 +816,51 @@ export class ResultsFeedingModalComponent implements OnInit {
     this.getLoadingAndTestOrdersData();
   }
 
+  onSaveSignOffForParameters(e, item, signOff, currentSample, allocation) {
+    e.stopPropagation();
+
+    const approvalStatuses = item?.order?.concept?.setMembers
+      ?.map((parameter: any) => {
+        this.savingMessage[parameter?.uuid + "-first"] =
+          signOff == "second" ? false : true;
+        this.savingMessage[parameter?.uuid + "-" + signOff] = true;
+        const approvalStatus = {
+          status: "APPROVED",
+          remarks: signOff == "first" ? "APPROVED" : "SECOND_APPROVAL",
+          user: {
+            uuid: this.userUuid,
+          },
+          testAllocation: {
+            uuid: item?.allocationsPairedBySetMember[parameter?.uuid]
+              ?.allocationUuid,
+          },
+        };
+        if (
+          item?.allocationsPairedBySetMember[parameter?.uuid]?.results?.length >
+          0
+        ) {
+          return approvalStatus;
+        }
+      })
+      ?.filter((approvalStatus) => approvalStatus);
+
+    this.store.dispatch(
+      saveLabTestResultsStatus({
+        resultsStatus: approvalStatuses,
+        sampleDetails: currentSample,
+        concept: item?.order?.concept,
+        allocation,
+        isResultAnArray: true,
+      })
+    );
+
+    this.savingLabResultsStatusState$ = this.store.select(
+      getSavingLabTestResultsStatusState
+    );
+
+    this.getLoadingAndTestOrdersData();
+  }
+
   rejectResults(e, item, currentSample, allocation) {
     e.stopPropagation();
     this.dialog
@@ -918,6 +1027,10 @@ export class ResultsFeedingModalComponent implements OnInit {
       (Object.keys(values)?.filter((key) => values[key]) || [])?.length > 0;
     if (this.hasFedResults) {
       this.saveAllMessage = null;
+
+      //Save files first
+      this.saveFilesAsObservations(this.files);
+
       const testAllocations = _.flatten(
         currentSample?.orders?.map((order) =>
           order?.testAllocations?.map((alloc) => {
@@ -930,47 +1043,101 @@ export class ResultsFeedingModalComponent implements OnInit {
           })
         ) || []
       );
-      const resultsToSave = testAllocations
-        ?.map((testAllocation) => {
-          if (this.values[testAllocation?.parameterUuid])
-            return {
-              concept: {
-                uuid: testAllocation?.parameterUuid,
-              },
-              testAllocation: {
-                uuid: testAllocation?.allocationUuid,
-              },
-              valueNumeric: testAllocation?.parameter?.numeric
-                ? this.values[testAllocation?.parameterUuid]
-                : null,
-              valueText:
-                !testAllocation?.parameter?.numeric &&
-                testAllocation?.parameter?.answers?.length == 0
+      const resultsToSave = _.flatten(
+        testAllocations
+          ?.map((testAllocation) => {
+            if (
+              this.values[testAllocation?.parameterUuid] &&
+              !this.values[testAllocation?.parameterUuid][0]?.value
+            ) {
+              return {
+                concept: {
+                  uuid: testAllocation?.parameterUuid,
+                },
+                testAllocation: {
+                  uuid: testAllocation?.allocationUuid,
+                },
+                valueNumeric: testAllocation?.parameter?.numeric
                   ? this.values[testAllocation?.parameterUuid]
                   : null,
+                valueText:
+                  !testAllocation?.parameter?.numeric &&
+                  testAllocation?.parameter?.answers?.length == 0
+                    ? this.values[testAllocation?.parameterUuid]
+                    : null,
 
-              valueCoded:
-                testAllocation?.parameter?.answers &&
-                testAllocation?.parameter?.answers.length > 0
-                  ? {
-                      uuid: this.values[testAllocation?.parameterUuid],
-                    }
-                  : null,
-              abnormal: this.values[testAllocation?.parameterUuid + "-abnormal"]
-                ? this.values[testAllocation?.parameterUuid + "-abnormal"]
-                : false,
-              additionalReqTimeLimit: this.getTimeConfigs(
-                testAllocation?.order?.concept?.uuid
-              )?.additionalReqTimeLimit,
-              standardTAT: this.getTimeConfigs(
-                testAllocation?.order?.concept?.uuid
-              )?.standardTAT,
-              urgentTAT: this.getTimeConfigs(
-                testAllocation?.order?.concept?.uuid
-              )?.urgentTAT,
-            };
-        })
-        ?.filter((allocWithResults) => allocWithResults);
+                valueCoded:
+                  testAllocation?.parameter?.answers &&
+                  testAllocation?.parameter?.answers.length > 0
+                    ? {
+                        uuid: this.values[testAllocation?.parameterUuid],
+                      }
+                    : null,
+                abnormal: this.values[
+                  testAllocation?.parameterUuid + "-abnormal"
+                ]
+                  ? this.values[testAllocation?.parameterUuid + "-abnormal"]
+                  : false,
+                additionalReqTimeLimit: this.getTimeConfigs(
+                  testAllocation?.order?.concept?.uuid
+                )?.additionalReqTimeLimit,
+                standardTAT: this.getTimeConfigs(
+                  testAllocation?.order?.concept?.uuid
+                )?.standardTAT,
+                urgentTAT: this.getTimeConfigs(
+                  testAllocation?.order?.concept?.uuid
+                )?.urgentTAT,
+              };
+            } else if (
+              this.values[testAllocation?.parameterUuid] &&
+              this.values[testAllocation?.parameterUuid][0]?.value
+            ) {
+              return this.values[testAllocation?.parameterUuid]?.map(
+                (valueOption) => {
+                  return {
+                    concept: {
+                      uuid: testAllocation?.parameterUuid,
+                    },
+                    testAllocation: {
+                      uuid: testAllocation?.allocationUuid,
+                    },
+                    valueNumeric: testAllocation?.parameter?.numeric
+                      ? this.values[testAllocation?.parameterUuid]
+                      : null,
+                    valueText:
+                      !testAllocation?.parameter?.numeric &&
+                      testAllocation?.parameter?.answers?.length == 0
+                        ? this.values[testAllocation?.parameterUuid]
+                        : null,
+
+                    valueCoded:
+                      testAllocation?.parameter?.answers &&
+                      testAllocation?.parameter?.answers.length > 0
+                        ? {
+                            uuid: valueOption?.value,
+                          }
+                        : null,
+                    abnormal: this.values[
+                      testAllocation?.parameterUuid + "-abnormal"
+                    ]
+                      ? this.values[testAllocation?.parameterUuid + "-abnormal"]
+                      : false,
+                    additionalReqTimeLimit: this.getTimeConfigs(
+                      testAllocation?.order?.concept?.uuid
+                    )?.additionalReqTimeLimit,
+                    standardTAT: this.getTimeConfigs(
+                      testAllocation?.order?.concept?.uuid
+                    )?.standardTAT,
+                    urgentTAT: this.getTimeConfigs(
+                      testAllocation?.order?.concept?.uuid
+                    )?.urgentTAT,
+                  };
+                }
+              );
+            }
+          })
+          ?.filter((allocWithResults) => allocWithResults)
+      );
 
       this.store.dispatch(
         saveLabTestResults({
@@ -986,5 +1153,78 @@ export class ResultsFeedingModalComponent implements OnInit {
     } else {
       this.saveAllMessage = "Please feed results first";
     }
+  }
+
+
+  saveFilesAsObservations(fileObjects: any[]) {
+    fileObjects.forEach((file) => {
+      this.savingLabResultsState$ = of(false);
+      let data = new FormData();
+      const jsonData = {
+        concept: file?.parameterUuid,
+        person: this.sample?.patient?.uuid,
+        encounter:
+          this.ordersKeyedByConcepts[file?.item?.order?.concept?.uuid]
+            ?.encounter?.uuid,
+        obsDatetime: new Date(),
+        voided: false,
+        status: "PRELIMINARY",
+        comment: this.values[file?.parameterUuid + "-comment"],
+      };
+      data.append("file", file?.valueFile);
+      data.append("json", JSON.stringify(jsonData));
+
+      // void first the existing observation
+      if (
+        this.obsKeyedByConcepts[file?.parameterUuid] &&
+        this.obsKeyedByConcepts[file?.parameterUuid]?.value
+      ) {
+        const existingObs = {
+          concept: file?.parameterUuid,
+          person: this.sample?.patient?.uuid,
+          obsDatetime:
+            this.obsKeyedByConcepts[file?.parameterUuid]?.encounter
+              ?.obsDatetime,
+          encounter:
+            this.obsKeyedByConcepts[file?.parameterUuid]?.encounter?.uuid,
+          status: "PRELIMINARY",
+          comment:
+            this.obsKeyedByConcepts[file?.parameterUuid]?.encounter?.comment,
+        };
+        this.httpClient
+          .post(
+            `../../../openmrs/ws/rest/v1/obs/${
+              this.obsKeyedByConcepts[file?.parameterUuid]?.uuid
+            }`,
+            {
+              ...existingObs,
+              voided: true,
+            }
+          )
+          .subscribe((response) => {
+            if (response) {
+              this.savingLabResultsState$ = of(false);
+            }
+          });
+      }
+      this.httpClient
+        .post(`../../../openmrs/ws/rest/v1/obs`, data)
+        .subscribe((response: any) => {
+          if (response) {
+            this.obsKeyedByConcepts[file?.parameterUuid] = {
+              ...response,
+              uri: response?.value?.links
+                ? response?.value?.links?.uri?.replace("http", "https")
+                : null,
+            };
+
+            this.savingLabResultsState$ = of(false);
+          }
+        });
+    });
+  }
+
+  tabSelection(matTabEvent: MatTabChangeEvent): void {
+    this.selectedIndex = matTabEvent.index;
   }
 }

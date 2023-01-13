@@ -135,4 +135,15 @@ export class ReferenceTermsService {
       catchError((error) => of(error))
     );
   }
+
+  deleteConceptReferenceTerm(uuid: string): Observable<any> {
+    return from(
+      this.api.conceptreferenceterm.deleteConceptReferenceTerm(uuid)
+    ).pipe(
+      map((response) => {
+        return response;
+      }),
+      catchError((error) => of(error))
+    );
+  }
 }

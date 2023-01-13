@@ -110,6 +110,10 @@ import { SharedDashboardChartItemComponent } from "./shared-dashboard-chart-item
 import { SharedDashboardSingleValueItemComponent } from "./shared-dashboard-single-value-item/shared-dashboard-single-value-item.component";
 import { SharedDashboardSingleValueContainerComponent } from "./shared-dashboard-single-value-container/shared-dashboard-single-value-container.component";
 import { SharedAddTestorderToSampleComponent } from "./shared-add-testorder-to-sample/shared-add-testorder-to-sample.component";
+import { SharedDepartmentsSelectionComponent } from "./shared-departments-selection/shared-departments-selection.component";
+import { SharedInstrumentsManagementComponent } from "./shared-instruments-management/shared-instruments-management.component";
+import { StandardConceptsListComponent } from "./standard-concepts-list/standard-concepts-list.component";
+import { SharedInstrumentSelectionComponent } from "./shared-instrument-selection/shared-instrument-selection.component";
 
 export const components: any[] = [
   PatientAddressComponent,
@@ -225,6 +229,10 @@ export const components: any[] = [
   SharedDashboardSingleValueItemComponent,
   SharedDashboardSingleValueContainerComponent,
   SharedAddTestorderToSampleComponent,
+  SharedDepartmentsSelectionComponent,
+  SharedInstrumentsManagementComponent,
+  StandardConceptsListComponent,
+  SharedInstrumentSelectionComponent,
 ];
 
 export const sharedEntryComponents: any[] = [

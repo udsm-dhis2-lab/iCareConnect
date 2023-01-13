@@ -6,6 +6,7 @@ import { sortBy, reverse, head } from "lodash";
 import { getFormEntitiesByNames, getFormsEntities } from "./form.selectors";
 import { ICARE_CONFIG } from "src/app/shared/resources/config";
 import { flatten, orderBy, groupBy } from "lodash";
+import { groupObservationByConcept } from "src/app/shared/helpers/observations.helpers";
 
 const getObservationState = createSelector(
   getRootState,
@@ -158,29 +159,7 @@ export const getGroupedObservationByDateAndTimeOfIPDRounds = (
 export const getGroupedObservationByConcept = createSelector(
   getAllObservations,
   (observations: ObservationObject[]) => {
-    const groupedObservations = {};
-
-    (observations || []).forEach((observation) => {
-      if (observation?.concept?.uuid) {
-        const conceptObservation =
-          groupedObservations[observation.concept.uuid];
-
-        const conceptObservations = reverse(
-          sortBy(
-            [...(conceptObservation?.history || []), observation],
-            "observationDatetime"
-          )
-        );
-
-        groupedObservations[observation.concept.uuid] = {
-          uuid: observation.concept.uuid,
-          latest: head(conceptObservations),
-          history: conceptObservations,
-        };
-      }
-    });
-
-    return groupedObservations;
+    return groupObservationByConcept(observations);
   }
 );
 
