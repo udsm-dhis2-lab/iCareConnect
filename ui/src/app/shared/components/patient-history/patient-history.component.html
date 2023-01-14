@@ -1,16 +1,14 @@
-<div class="history" *ngIf="{ visits: visits$ | async } as params">
-  {{ params?.visits | json }}
-  <mat-vertical-stepper [linear]="false" #stepper [animationDuration]="2000">
+<div class="history" *ngIf="{ 
+    visits: visits$ | async, 
+    customForms: customForms$ | async 
+  } as params">
+  <mat-vertical-stepper [linear]="false" #stepper>
     <mat-step *ngFor="let visit of params?.visits">
       <ng-template matStepLabel>
         {{ visit?.visit?.visitType?.display}} - {{ visit?.visit?.startDatetime | date:"medium" }}
       </ng-template>
       <div>
-        <mat-vertical-stepper [linear]="false" #stepper [animationDuration]="2000">
-          <mat-step>
-            <ng-template matStepLabel>{{ visit?.visit?.visitType?.display}} - {{ visit?.visit?.startDatetime | date:"medium" }}</ng-template>
-          </mat-step>
-        </mat-vertical-stepper>
+        <app-visit-data [visit]="visit" [forms]="params?.customForms"></app-visit-data>
       </div>
     </mat-step>
   </mat-vertical-stepper>
