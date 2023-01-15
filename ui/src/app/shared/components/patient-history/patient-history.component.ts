@@ -6,6 +6,7 @@ import { Store } from "@ngrx/store";
 import { AppState } from "src/app/store/reducers";
 import { getCustomOpenMRSFormsByIds } from "src/app/store/selectors/form.selectors";
 import { FormService } from "../../modules/form/services/form.service";
+import { Visit } from "../../resources/visits/models/visit.model";
 
 @Component({
   selector: "app-patient-history",

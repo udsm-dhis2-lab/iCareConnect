@@ -37,10 +37,6 @@ export class VisitsService {
       )
     );
   }
-  getPatientVisits(patientUuid: string, includeInactive?: boolean ): Observable<any> {
-    const params = `patient="${patientUuid}&includeInactive=${includeInactive}`;
-    return from(this.httpClient.get(BASE_URL + "visit/" + +`?${params}`));
-  }
 
   getActiveVisitsByStartDate(startDate, endDate): Observable<any> {
     // console.log(new Date(startDate))

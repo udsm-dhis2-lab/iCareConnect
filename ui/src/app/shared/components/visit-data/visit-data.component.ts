@@ -1,5 +1,6 @@
 import { Component, EventEmitter, OnInit, Output, Input } from "@angular/core";
 import { Dropdown } from "../../modules/form/models/dropdown.model";
+import { Visit } from "../../resources/visits/models/visit.model";
 
 @Component({
   selector: "app-visit-data",
@@ -14,57 +15,48 @@ export class VisitDataComponent implements OnInit {
   constructor() {}
 
   ngOnInit(): void {
+    let visit = new Visit(this.visit?.visit);
     this.forms?.map((form) => {
-      let observations = []
+      let observations = [];
       form?.formFields?.forEach((field) => {
-          if (field?.formFields?.length) {
-            field?.formFields?.forEach((formField) => {
-                this.visit?.obs?.forEach((obs) => {
-                  if (obs?.concept?.uuid === formField?.key) {
-                    observations = [
-                      ...observations,
-                      obs
-                    ];
-                  }
-                })
-            });
-          } else {
+        if (field?.formFields?.length) {
+          field?.formFields?.forEach((formField) => {
             this.visit?.obs?.forEach((obs) => {
-                if (obs?.concept?.uuid === field?.formField?.key) {
-                  observations = [
-                    ...observations,
-                    obs
-                  ];
-                }
-              })
-          } 
-        });
+              if (obs?.concept?.uuid === formField?.key) {
+                observations = [...observations, obs];
+              }
+            });
+          });
+        } else {
+          this.visit?.obs?.forEach((obs) => {
+            if (obs?.concept?.uuid === field?.formField?.key) {
+              observations = [...observations, obs];
+            }
+          });
+        }
+      });
 
       let obsbasedOnForms = {
         form: form?.name,
         obs: observations?.reduce(
-            (obs, ob) => ({
-              ...obs,
-              [`${ob?.concept?.display}/${ob?.obsDatetime}`]:
-                `${ob?.concept?.display}/${ob?.obsDatetime}` in obs
-                  ? obs[`${ob?.concept?.display}/${ob?.obsDatetime}`].concat(ob)
-                  : [ob],
-            }),
-            []
-          ),
+          (obs, ob) => ({
+            ...obs,
+            [`${ob?.concept?.display}/${ob?.obsDatetime}`]:
+              `${ob?.concept?.display}/${ob?.obsDatetime}` in obs
+                ? obs[`${ob?.concept?.display}/${ob?.obsDatetime}`].concat(ob)
+                : [ob],
+          }),
+          []
+        ),
       };
-
-      // let orders = this.visit?.orders.map((order) => {
-      //   if(order?.orderType?.uuid === "settingsOrderUuid"){
-      //     return {
-      //       ...order,
-      //       obs: this.visit?.obs?.filter((obs) => obs?.order === order?.uuid)
-      //     }
-      //   }
-      // })
-
-      console.log("==> Observations: ", obsbasedOnForms);
-    }) 
-    this.visit;
+    });
+    // let orders = this.visit?.orders.map((order) => {
+    //   if(order?.orderType?.uuid === "settingsOrderUuid"){
+    //     return {
+    //       ...order,
+    //       obs: this.visit?.obs?.filter((obs) => obs?.order === order?.uuid)
+    //     }
+    //   }
+    // })
   }
 }
