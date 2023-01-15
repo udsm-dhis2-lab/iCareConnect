@@ -14,35 +14,56 @@ export class VisitDataComponent implements OnInit {
   constructor() {}
 
   ngOnInit(): void {
-    console.log("==> Visit: ", this.visit);
     this.forms?.map((form) => {
-      let obsObject = {
+      let observations = []
+      form?.formFields?.forEach((field) => {
+          if (field?.formFields?.length) {
+            field?.formFields?.forEach((formField) => {
+                this.visit?.obs?.forEach((obs) => {
+                  if (obs?.concept?.uuid === formField?.key) {
+                    observations = [
+                      ...observations,
+                      obs
+                    ];
+                  }
+                })
+            });
+          } else {
+            this.visit?.obs?.forEach((obs) => {
+                if (obs?.concept?.uuid === field?.formField?.key) {
+                  observations = [
+                    ...observations,
+                    obs
+                  ];
+                }
+              })
+          } 
+        });
+
+      let obsbasedOnForms = {
         form: form?.name,
-        obs: form?.formFields?.map((field) => {
-          return this.visit?.obs
-          ?.filter((obs) =>{
-              // console.log("==> Obs: ", obs?.concept?.uuid);
-              // console.log("==> field: ", field?.uuid)
-              if(obs?.concept?.uuid === field?.uuid){
-                return obs
-              }
-            })
-            // ?.reduce(
-            //   (obs, ob) => ({
-            //     ...obs,
-            //     [`${ob?.concept?.display}/${ob?.obsDatetime}`]:
-            //       `${ob?.concept?.display}/${ob?.obsDatetime}` in obs
-            //         ? obs[`${ob?.concept?.display}/${ob?.obsDatetime}`].concat(
-            //             ob
-            //           )
-            //         : [ob],
-            //   }),
-            //   []
-            // );
-        })
+        obs: observations?.reduce(
+            (obs, ob) => ({
+              ...obs,
+              [`${ob?.concept?.display}/${ob?.obsDatetime}`]:
+                `${ob?.concept?.display}/${ob?.obsDatetime}` in obs
+                  ? obs[`${ob?.concept?.display}/${ob?.obsDatetime}`].concat(ob)
+                  : [ob],
+            }),
+            []
+          ),
       };
 
-      // console.log("==> Observations: ", obsObject);
+      // let orders = this.visit?.orders.map((order) => {
+      //   if(order?.orderType?.uuid === "settingsOrderUuid"){
+      //     return {
+      //       ...order,
+      //       obs: this.visit?.obs?.filter((obs) => obs?.order === order?.uuid)
+      //     }
+      //   }
+      // })
+
+      console.log("==> Observations: ", obsbasedOnForms);
     }) 
     this.visit;
   }

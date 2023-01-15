@@ -35,22 +35,25 @@ export class PatientHistoryComponent implements OnInit {
         map((response) => {
           if (!response?.error) {
             return response.map((visit) => {
+              let obs = [] 
+              visit?.visit?.encounters.forEach((encounter) => {
+                (encounter?.obs || []).forEach((observation) => {
+                  obs = [
+                    ...obs,
+                    {
+                      ...observation,
+                      encounterType: {
+                        uuid: encounter?.encounterType?.uuid,
+                        display: encounter?.encounterType?.display,
+                      },
+                      provider: encounter?.encounterProviders[0]?.provider,
+                    }
+                  ]
+                });
+              });
               return {
                 visit: visit?.visit,
-                obs: [
-                  ...visit?.visit?.encounters.map((encounter) => {
-                    return (encounter?.obs || []).map((observation) => {
-                      return {
-                        ...observation,
-                        encounterType: {
-                          uuid: encounter?.encounterType?.uuid,
-                          display: encounter?.encounterType?.display,
-                        },
-                        provider: encounter?.encounterProviders[0]?.provider,
-                      };
-                    });
-                  }),
-                ].filter((obs) => obs.length),
+                obs: obs,
                 orders: [
                   ...visit?.visit?.encounters.map((encounter) => {
                     return (encounter?.orders || []).map((order) => {
