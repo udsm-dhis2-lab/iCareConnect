@@ -14,7 +14,7 @@
 
                             <p *ngFor="let observation of formsObservations?.obs[field?.key]">
                                 {{
-                                    observation?.valueNumeric ? observation?.valueNumeric : observation?.value?.value ? observation?.value?.value : observation?.value
+                                    observation?.value?.uuid ? observation?.value?.display : observation?.valueNumeric ? observation?.valueNumeric : observation?.value
                                 }}
                             </p>
                         </li>

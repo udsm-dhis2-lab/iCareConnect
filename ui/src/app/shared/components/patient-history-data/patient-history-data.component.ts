@@ -1,6 +1,6 @@
 import { Component, EventEmitter, OnInit, Output, Input } from "@angular/core";
 import { flatten, keyBy } from "lodash";
-import { getGenericDrugPrescriptionsFromVisit } from "../../helpers/visits.helper";
+import { getEncountersByProviderInAVisit, getGenericDrugPrescriptionsFromVisit } from "../../helpers/visits.helper";
 import { Visit } from "../../resources/visits/models/visit.model";
 
 @Component({
@@ -21,6 +21,7 @@ export class PatientHistoryDataComponent implements OnInit {
   obsBasedOnForms: any[] = [];
   medications: any[];
   drugsPrescribed: any;
+  encountersByProvider: any;
 
   constructor() {}
 
@@ -126,13 +127,9 @@ export class PatientHistoryDataComponent implements OnInit {
       this.visit?.visit,
       this.generalPrescriptionOrderType
     );
-
-    // console.log("Drugs proescribed: ", this.visit?.visit?.encounters?.map((encounter) => {
-    //     return (
-    //       encounter?.orders.filter(
-    //         (order) => order.orderType?.uuid === this.genericPrescriptionOrderType
-    //       ) || []
-    //     )}));
+    
+    // For IPD Rounds
+    // this.encountersByProvider = getEncountersByProviderInAVisit(this.visit?.visit)
   }
 
   getStringDate(date: Date) {
