@@ -10,7 +10,11 @@ import { Api } from "src/app/shared/resources/openmrs";
 export class DatasetDataService {
   constructor(private httpClient: OpenmrsHttpClientService, private api: Api) {}
 
-  getDatasetData(uuid: string, selectionDates: any): Observable<any> {
+  getDatasetData(
+    uuid: string,
+    selectionDates: any,
+    otherParameters?: any[]
+  ): Observable<any> {
     return this.httpClient
       .get(
         `reportingrest/dataSet/` +
@@ -18,7 +22,10 @@ export class DatasetDataService {
           `?startDate=` +
           selectionDates?.startDate +
           `&endDate=` +
-          selectionDates?.endDate
+          selectionDates?.endDate +
+          `&${otherParameters
+            ?.map((param) => param?.key + "=" + param?.value)
+            .join("&")}`
       )
       .pipe(
         map((report) => {
