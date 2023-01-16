@@ -34,6 +34,8 @@ export class WorksheetDefinitionComponent implements OnInit {
   minLabelCharCount: number = 3;
 
   message: string;
+  worksheetSelectionField: any;
+  currentWorksheet: any;
   constructor(
     private worksheetsService: WorkSeetsService,
     private datasetDataService: DatasetDataService
@@ -43,24 +45,28 @@ export class WorksheetDefinitionComponent implements OnInit {
     this.getWorksheetDefinitions();
     this.createWorksheetDefinitionFields();
     this.getTestControls();
+    this.createWorksheetSelectionField();
+  }
+
+  createWorksheetSelectionField(): void {
+    this.worksheetSelectionField = new Dropdown({
+      id: "worksheet",
+      key: "worksheet",
+      label: "Worksheet",
+      required: true,
+      options: this.worksheets?.map((worksheet) => {
+        return {
+          key: worksheet?.uuid,
+          label: worksheet?.name,
+          name: worksheet?.name,
+          value: worksheet?.uuid,
+        };
+      }),
+    });
   }
 
   createWorksheetDefinitionFields(): void {
     this.worksheetDefinitionFields = [
-      new Dropdown({
-        id: "worksheet",
-        key: "worksheet",
-        label: "Worksheet setting",
-        required: true,
-        options: this.worksheets?.map((worksheet) => {
-          return {
-            key: worksheet?.uuid,
-            label: worksheet?.name,
-            name: worksheet?.name,
-            value: worksheet?.uuid,
-          };
-        }),
-      }),
       new Textbox({
         id: "code",
         key: "code",
@@ -68,6 +74,70 @@ export class WorksheetDefinitionComponent implements OnInit {
         required: true,
       }),
     ];
+  }
+
+  onGetSelectedWorksheet(formValue: FormValue): void {
+    const worksheetUuid = formValue.getValues()?.worksheet?.value;
+    this.currentWorksheet = (this.worksheets?.filter(
+      (worksheet) => worksheet?.uuid === worksheetUuid
+    ) || [])[0];
+
+    if (this.currentWorksheet) {
+      this.currentWorksheetDefinition = {
+        worksheet: {
+          ...this.currentWorksheet,
+          columns: this.generateArrayOfItemsFromCount(
+            this.currentWorksheet?.columns
+          ),
+          rows: this.generateArrayOfItemsFromCount(this.currentWorksheet?.rows),
+        },
+      };
+
+      this.isWorksheetRenderingReady = true;
+
+      this.generateDefaultWorksheetRowsColumns();
+    }
+  }
+
+  onSave(event: Event): void {
+    event.stopPropagation();
+
+    // Create worksheetdefn and worksheet sample
+    // console.log("selectedRowsColumns", this.selectedRowsColumns);
+    this.saving = true;
+    this.worksheetsService
+      .createWorksheetDefinitions([this.worksheetDefnPayload])
+      .subscribe((responseWorkSheetDefn: any) => {
+        if (responseWorkSheetDefn && !responseWorkSheetDefn?.error) {
+          const worksheetSamples = Object.keys(this.selectedRowsColumns)
+            ?.map((key) => {
+              if (this.selectedRowsColumns[key]?.set) {
+                return {
+                  row: Number(key?.split("-")[0]),
+                  column: Number(key?.split("-")[1]),
+                  sample: {
+                    uuid: this.selectedRowsColumns[key]?.value?.uuid,
+                  },
+                  worksheetDefinition: {
+                    uuid: responseWorkSheetDefn?.uuid,
+                  },
+                  type: "SAMPLE",
+                };
+              }
+            })
+            ?.filter((worksheetSample) => worksheetSample);
+
+          this.worksheetsService
+            .createWorksheetSamples(worksheetSamples)
+            .subscribe((response) => {
+              if (response && !response?.error) {
+                this.saving = false;
+              } else {
+                this.saving = false;
+              }
+            });
+        }
+      });
   }
 
   getWorksheetDefinitions(): void {
@@ -86,7 +156,7 @@ export class WorksheetDefinitionComponent implements OnInit {
     this.worksheetDefnPayload = {
       code: values?.code?.value,
       worksheet: {
-        uuid: this.selectedWorkSheetConfiguration,
+        uuid: this.currentWorksheet?.uuid,
       },
     };
   }
