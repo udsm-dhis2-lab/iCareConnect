@@ -8,7 +8,8 @@
   <mat-vertical-stepper [linear]="false" #stepper>
     <mat-step *ngFor="let visit of params?.visits">
       <ng-template matStepLabel>
-        {{ visit?.visit?.visitType?.display}} on {{ visit?.visit?.startDatetime | date:"medium" }}
+        <!-- {{ visit?.visit?.visitType?.display}} -->
+          {{ visit?.visit?.startDatetime | date:"medium" }} 
       </ng-template>
       <div>
         <app-patient-history-data 

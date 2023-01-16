@@ -3,7 +3,7 @@
         <mat-step *ngFor="let formsObservations of obsBasedOnForms">
             <ng-template matStepLabel>{{ formsObservations?.form }}</ng-template>
             <div class="step-body ml-1">
-                <div class="mat-card p-2">
+                <div class="card pt-4 ">
                     <ul>
                         <li *ngFor="let field of formsObservations?.fields">
                             <p>
@@ -24,7 +24,7 @@
         </mat-step>
         <mat-step *ngIf="drugsPrescribed.length > 0">
             <ng-template matStepLabel>Medications</ng-template>
-            <div class="mat-card p-2">
+            <div class="card pt-4 ">
                 <ul>
                     <li *ngFor="let drug of drugsPrescribed; let index = index">    
                      <p>
@@ -58,7 +58,7 @@
         </mat-step>
         <mat-step *ngIf="labOrders.length > 0">
             <ng-template matStepLabel>Lab Orders</ng-template>
-            <div class="mat-card p-2">
+            <div class="card pt-4 ">
                 <ul>
                     <li *ngFor="let order of labOrders">
                         <strong>
@@ -70,7 +70,7 @@
         </mat-step>
         <mat-step *ngIf="radiologyOrders.length > 0">
             <ng-template matStepLabel>Radiology Orders</ng-template>
-            <div class="mat-card p-2">
+            <div class="card pt-4 ">
                 <ul>
                     <li *ngFor="let order of radiologyOrders">
                         <strong>
@@ -82,7 +82,7 @@
         </mat-step>
         <mat-step *ngIf="procedureOrders.length > 0">
             <ng-template matStepLabel>Procedure Orders</ng-template>
-            <div class="mat-card p-2">
+            <div class="card pt-4 ">
                 <ul>
                     <li *ngFor="let order of procedureOrders">
                         <strong>

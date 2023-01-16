@@ -90,11 +90,11 @@
               >
                 {{ form?.name }}
               </button>
-              <button mat-button (click)="onToggleVisibityIcons($event)">
+              <!-- <button mat-button (click)="onToggleVisibityIcons($event)">
                 <mat-icon *ngIf="showRoundDetails">visibility_off</mat-icon>
                 <mat-icon *ngIf="!showRoundDetails">visibility</mat-icon>
                 Visit Information
-              </button>
+              </button> -->
             </ng-container>
           </div>
 
@@ -201,13 +201,21 @@
               *ngIf="!isInpatient"
               mat-stroked-button
               (click)="
+                onToggleVisibityIcons($event)
+              "
+              class="mr-2 float-right"
+            >
+            <!-- <button
+              *ngIf="!isInpatient"
+              mat-stroked-button
+              (click)="
                 viewPatientHistory(
                   $event,
                   dashboardParams?.currentPatient?.patient?.uuid
                 )
               "
               class="mr-2 float-right"
-            >
+            > -->
               History
             </button>
             <button
@@ -371,18 +379,6 @@
                   'col-lg-8 col-md-8 col-sm-12 col-sx-12 obs-table': isInpatient
                 }"
               >
-                <div class="w-100">
-                  <mat-accordion>
-                    <mat-expansion-panel
-                      class="mb-2 border p-0"
-                    >
-                      <mat-expansion-panel-header>
-                        <mat-panel-title>Patient History </mat-panel-title>
-                      </mat-expansion-panel-header>
-                      <app-patient-history [patient]="dashboardParams?.currentPatient?.patient" [location]="dashboardParams?.currentLocation"></app-patient-history>
-                    </mat-expansion-panel>
-                  </mat-accordion>
-                </div>
                 <div>
                   <mat-progress-bar
                     *ngIf="!readyForClinicalNotes"
@@ -392,11 +388,27 @@
                   <div class="w-100">
                     <div class="w-100">
                       <div class="w-100 mt-2">
-                        <app-shared-visit-history-summary
+                        <!-- <app-shared-visit-history-summary
                           *ngIf="showRoundDetails"
                           [location]="dashboardParams?.currentLocation"
                           [activeVisit]="activeVisit"
-                        ></app-shared-visit-history-summary>
+                        ></app-shared-visit-history-summary> -->
+                        <div class="w-100" *ngIf="showRoundDetails">
+                          <mat-accordion>
+                            <mat-expansion-panel
+                              class="mb-2 border p-0"
+                              [expanded]="true"
+                            >
+                              <mat-expansion-panel-header>
+                                <mat-panel-title>Patient History </mat-panel-title>
+                              </mat-expansion-panel-header>
+                              <app-patient-history 
+                                [patient]="dashboardParams?.currentPatient?.patient" 
+                                [location]="dashboardParams?.currentLocation"
+                              ></app-patient-history>
+                            </mat-expansion-panel>
+                          </mat-accordion>
+                        </div>
                       </div>
                     </div>
                   </div>
