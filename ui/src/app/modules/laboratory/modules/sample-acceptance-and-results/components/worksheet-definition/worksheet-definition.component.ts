@@ -32,6 +32,8 @@ export class WorksheetDefinitionComponent implements OnInit {
   maxLabelCharCount: number = 7;
   currentLabelCharCount: number = 7;
   minLabelCharCount: number = 3;
+
+  message: string;
   constructor(
     private worksheetsService: WorkSeetsService,
     private datasetDataService: DatasetDataService
@@ -193,38 +195,54 @@ export class WorksheetDefinitionComponent implements OnInit {
     this.datasetDataService
       .getDatasetData(
         this.dataSetReportUuidForAcceptedSamplesWithNoResults,
-        this.datesParameters
+        this.datesParameters,
+        [
+          {
+            key: "uuid",
+            value: this.currentWorksheetDefinition?.worksheet?.testOrder?.uuid,
+          },
+        ]
       )
       .subscribe((response) => {
         const samples = response?.rows;
-        this.currentLabelCharCount = samples[0]?.label?.length;
-        let sampleAreas = [];
-        let controlAreas = [];
-        Object.keys(selectedRowsColumns).map((key, index) => {
-          if (key?.indexOf("sample") > -1) {
-            sampleAreas = [...sampleAreas, key];
-          } else {
-            controlAreas = [...controlAreas, key];
-          }
-        });
-        sampleAreas?.forEach((sampleRef, index) => {
-          if (index < samples?.length) {
-            this.selectedRowsColumns[sampleRef] = {
+        if (samples?.length > 0) {
+          this.currentLabelCharCount = samples[0]?.label?.length;
+          let sampleAreas = [];
+          let controlAreas = [];
+          Object.keys(selectedRowsColumns).map((key, index) => {
+            if (key?.indexOf("sample") > -1) {
+              sampleAreas = [...sampleAreas, key];
+            } else {
+              controlAreas = [...controlAreas, key];
+            }
+          });
+          sampleAreas?.forEach((sampleRef, index) => {
+            if (index < samples?.length) {
+              this.selectedRowsColumns[sampleRef] = {
+                set: true,
+                value: samples[index],
+              };
+            }
+          });
+
+          controlAreas?.forEach((controlRef, index) => {
+            this.selectedRowsColumns[controlRef] = {
               set: true,
-              value: samples[index],
+              value: this.definedControls[controlRef],
             };
-          }
-        });
+          });
 
-        controlAreas?.forEach((controlRef, index) => {
-          this.selectedRowsColumns[controlRef] = {
-            set: true,
-            value: this.definedControls[controlRef],
-          };
-        });
-
-        this.isWorksheetRenderingReady = true;
-        this.isComplete = true;
+          this.isWorksheetRenderingReady = true;
+          this.isComplete = true;
+        } else {
+          this.isWorksheetRenderingReady = true;
+          this.message = `NO samples for the test order ${this.currentWorksheetDefinition?.worksheet?.testOrder?.display} from ${this.datesParameters?.startDate} to ${this.datesParameters?.endDate}`;
+        }
       });
+  }
+
+  onCloseMessage(event: Event): void {
+    event.stopPropagation();
+    this.message = null;
   }
 }
