@@ -145,3 +145,39 @@ export function getFormattedEncountersByEncounterTypeFromVisit(
     ["asc"]
   );
 }
+
+export function getGenericDrugPrescriptionsFromVisit(visit, genericPrescriptionOrderType) {
+  return _.flatten(
+    visit?.encounters
+      ?.map((encounter) => {
+        return (
+          encounter?.orders.filter(
+            (order) => order.orderType?.uuid === genericPrescriptionOrderType
+          ) || []
+        )?.map((genericDrugOrder) => {
+          let formulatedDescription = encounter?.obs
+            ?.map((ob) => {
+              if (ob?.comment === null) {
+                return ob;
+              }
+            })
+            .filter((ob) => ob);
+          return {
+            ...genericDrugOrder,
+            formulatedDescription: formulatedDescription,
+            obs: _.keyBy(
+              encounter?.obs?.map((observation) => {
+                return {
+                  ...observation,
+                  conceptKey: observation?.concept?.uuid,
+                  valueIsObject: observation?.value?.uuid ? true : false,
+                };
+              }),
+              "conceptKey"
+            ),
+          };
+        });
+      })
+      ?.filter((order) => order)
+  );
+}
