@@ -14,6 +14,7 @@ import { DatasetDataService } from "src/app/core/services/dataset-data.service";
 })
 export class WorksheetDefinitionComponent implements OnInit {
   @Input() worksheets: any[];
+  @Input() dataSetReportUuidForAcceptedSamplesWithNoResults: string;
   @Input() datesParameters: any;
   worksheetFormField: any;
   worksheetDefinitionFields: any[];
@@ -191,7 +192,7 @@ export class WorksheetDefinitionComponent implements OnInit {
     this.isWorksheetRenderingReady = false;
     this.datasetDataService
       .getDatasetData(
-        "3425b3f8-6efa-4093-963c-7bdca8ec5c11",
+        this.dataSetReportUuidForAcceptedSamplesWithNoResults,
         this.datesParameters
       )
       .subscribe((response) => {
