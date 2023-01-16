@@ -1,0 +1,96 @@
+<div class="visit">
+    <mat-vertical-stepper [linear]="false" #stepper>
+        <mat-step *ngFor="let formsObservations of obsBasedOnForms">
+            <ng-template matStepLabel>{{ formsObservations?.form }}</ng-template>
+            <div class="step-body ml-1">
+                <div class="card pt-4 ">
+                    <ul>
+                        <li *ngFor="let field of formsObservations?.fields">
+                            <p>
+                                <strong>
+                                    {{ field?.label }}
+                                </strong>
+                            </p>
+
+                            <p *ngFor="let observation of formsObservations?.obs[field?.key]">
+                                {{
+                                    observation?.value?.uuid ? observation?.value?.display : observation?.valueNumeric ? observation?.valueNumeric : observation?.value
+                                }}
+                            </p>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </mat-step>
+        <mat-step *ngIf="drugsPrescribed.length > 0">
+            <ng-template matStepLabel>Medications</ng-template>
+            <div class="card pt-4 ">
+                <ul>
+                    <li *ngFor="let drug of drugsPrescribed; let index = index">    
+                     <p>
+                        <strong>
+                            {{ drug.obs[specificDrugConceptUuid] ? drug.obs[specificDrugConceptUuid]?.comment : drug?.display }} 
+                        </strong>
+                     </p>
+                     <p>
+                         <span *ngIf="prescriptionArrangementFields">
+                         {{ drug.obs[prescriptionArrangementFields['1']?.uuid]?.value?.display ? drug.obs[prescriptionArrangementFields['1']?.uuid]?.value?.display : drug.obs[prescriptionArrangementFields['1']?.uuid]?.value }}
+                         ({{ drug.obs[prescriptionArrangementFields['2']?.uuid]?.value?.display ? drug.obs[prescriptionArrangementFields['2']?.uuid]?.value?.display : drug.obs[prescriptionArrangementFields['2']?.uuid]?.value }})
+                         {{ drug.obs[prescriptionArrangementFields['3']?.uuid]?.value?.display ? drug.obs[prescriptionArrangementFields['3']?.uuid]?.value?.display : drug.obs[prescriptionArrangementFields['3']?.uuid]?.value }}
+                         {{ drug.obs[prescriptionArrangementFields['4']?.uuid]?.value?.display ? drug.obs[prescriptionArrangementFields['4']?.uuid]?.value?.display : drug.obs[prescriptionArrangementFields['4']?.uuid]?.value }}
+                         {{ drug.obs[prescriptionArrangementFields['5']?.uuid]?.value?.display ? drug.obs[prescriptionArrangementFields['5']?.uuid]?.value?.display : drug.obs[prescriptionArrangementFields['5']?.uuid]?.value }}
+                         {{ drug.obs[prescriptionArrangementFields['6']?.uuid]?.value?.display ? drug.obs[prescriptionArrangementFields['6']?.uuid]?.value?.display : drug.obs[prescriptionArrangementFields['6']?.uuid]?.value }}
+                         </span>
+
+                         <ng-container *ngIf="!prescriptionArrangementFields">
+                            <span *ngFor="let instruction of drug?.formulatedDescription; let instructonIndex=index">
+                                {{ instructonIndex + 1 }}. {{ instruction?.concept?.display }} - {{ instruction?.value?.display ? instruction?.value?.display : instruction?.value }} <br>
+                            </span>
+                         </ng-container>
+
+                        <span class="faint-small-text"> On 
+                            {{ drug.dateActivated | date: "medium" }}
+                        </span>
+                     </p>
+                    </li>
+                </ul>
+            </div>
+        </mat-step>
+        <mat-step *ngIf="labOrders.length > 0">
+            <ng-template matStepLabel>Lab Orders</ng-template>
+            <div class="card pt-4 ">
+                <ul>
+                    <li *ngFor="let order of labOrders">
+                        <strong>
+                            {{ order?.order?.concept?.display }}
+                        </strong>
+                    </li>
+                </ul>
+            </div>
+        </mat-step>
+        <mat-step *ngIf="radiologyOrders.length > 0">
+            <ng-template matStepLabel>Radiology Orders</ng-template>
+            <div class="card pt-4 ">
+                <ul>
+                    <li *ngFor="let order of radiologyOrders">
+                        <strong>
+                            {{ order?.order?.concept?.display }}
+                        </strong>
+                    </li>
+                </ul>
+            </div>
+        </mat-step>
+        <mat-step *ngIf="procedureOrders.length > 0">
+            <ng-template matStepLabel>Procedure Orders</ng-template>
+            <div class="card pt-4 ">
+                <ul>
+                    <li *ngFor="let order of procedureOrders">
+                        <strong>
+                            {{ order?.order?.concept?.display }}
+                        </strong>
+                    </li>
+                </ul>
+            </div>
+        </mat-step>
+    </mat-vertical-stepper>
+</div>
