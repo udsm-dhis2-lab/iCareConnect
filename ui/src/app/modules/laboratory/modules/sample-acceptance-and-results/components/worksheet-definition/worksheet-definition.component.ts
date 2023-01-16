@@ -119,7 +119,7 @@ export class WorksheetDefinitionComponent implements OnInit {
                     uuid: this.selectedRowsColumns[key]?.value?.uuid,
                   },
                   worksheetDefinition: {
-                    uuid: responseWorkSheetDefn?.uuid,
+                    uuid: responseWorkSheetDefn[0]?.uuid,
                   },
                   type: "SAMPLE",
                 };
