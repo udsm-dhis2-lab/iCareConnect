@@ -145,3 +145,73 @@ export function getFormattedEncountersByEncounterTypeFromVisit(
     ["asc"]
   );
 }
+
+export function getGenericDrugPrescriptionsFromVisit(visit, genericPrescriptionOrderType) {
+  return _.flatten(
+    visit?.encounters
+      ?.map((encounter) => {
+        return (
+          encounter?.orders.filter(
+            (order) => order.orderType?.uuid === genericPrescriptionOrderType
+          ) || []
+        )?.map((genericDrugOrder) => {
+          let formulatedDescription = encounter?.obs
+            ?.map((ob) => {
+              if (ob?.comment === null) {
+                return ob;
+              }
+            })
+            .filter((ob) => ob);
+          return {
+            ...genericDrugOrder,
+            formulatedDescription: formulatedDescription,
+            obs: _.keyBy(
+              encounter?.obs?.map((observation) => {
+                return {
+                  ...observation,
+                  conceptKey: observation?.concept?.uuid,
+                  valueIsObject: observation?.value?.uuid ? true : false,
+                };
+              }),
+              "conceptKey"
+            ),
+          };
+        });
+      })
+      ?.filter((order) => order)
+  );
+}
+export function getEncountersByProviderInAVisit(visit) {
+  let encountersByProvider = {};
+  encountersByProvider = {
+    ...encountersByProvider,
+    encounters: visit?.encounters?.reduce(
+      (encounters, encounter) => ({
+        ...encounters,
+        [`${encounter.encounterProviders[0].uuid}-${getStringDate(
+          new Date(encounter.encounterDatetime)
+        )}`]:
+          `${encounter.encounterProviders[0].uuid}-${getStringDate(
+            new Date(encounter.encounterDatetime)
+          )}` in encounters
+            ? encounters[
+                `${encounter.encounterProviders[0].uuid}-${getStringDate(
+                  new Date(encounter.encounterDatetime)
+                )}`
+              ].concat(encounter)
+            : [encounter],
+      }),
+      []
+    ),
+  };
+
+  return encountersByProvider;
+}
+
+function getStringDate(date: Date) {
+    return `${date.getDate()}/${
+      (date.getMonth() + 1).toString().length > 1
+        ? date.getMonth() + 1
+        : "0" + date.getMonth() + 1
+    }/${date.getFullYear()}`;
+  }
