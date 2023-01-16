@@ -181,3 +181,37 @@ export function getGenericDrugPrescriptionsFromVisit(visit, genericPrescriptionO
       ?.filter((order) => order)
   );
 }
+export function getEncountersByProviderInAVisit(visit) {
+  let encountersByProvider = {};
+  encountersByProvider = {
+    ...encountersByProvider,
+    encounters: visit?.encounters?.reduce(
+      (encounters, encounter) => ({
+        ...encounters,
+        [`${encounter.encounterProviders[0].uuid}-${getStringDate(
+          new Date(encounter.encounterDatetime)
+        )}`]:
+          `${encounter.encounterProviders[0].uuid}-${getStringDate(
+            new Date(encounter.encounterDatetime)
+          )}` in encounters
+            ? encounters[
+                `${encounter.encounterProviders[0].uuid}-${getStringDate(
+                  new Date(encounter.encounterDatetime)
+                )}`
+              ].concat(encounter)
+            : [encounter],
+      }),
+      []
+    ),
+  };
+
+  return encountersByProvider;
+}
+
+function getStringDate(date: Date) {
+    return `${date.getDate()}/${
+      (date.getMonth() + 1).toString().length > 1
+        ? date.getMonth() + 1
+        : "0" + date.getMonth() + 1
+    }/${date.getFullYear()}`;
+  }
