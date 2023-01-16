@@ -128,7 +128,7 @@ export class PatientHistoryDataComponent implements OnInit {
       this.generalPrescriptionOrderType
     );
     
-    // For IPD Rounds
+    // RESERVE: For IPD Rounds
     // this.encountersByProvider = getEncountersByProviderInAVisit(this.visit?.visit)
   }
 
