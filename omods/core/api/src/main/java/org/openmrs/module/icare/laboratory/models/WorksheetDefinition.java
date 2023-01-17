@@ -50,16 +50,15 @@ public class WorksheetDefinition extends BaseOpenmrsData implements java.io.Seri
 	public void setWorksheet(Worksheet worksheet) {
 		this.worksheet = worksheet;
 	}
-
-
+	
 	public String getAdditionalFields() {
 		return additionalFields;
 	}
-
+	
 	public void setAdditionalFields(String additionalFields) {
 		this.additionalFields = additionalFields;
 	}
-
+	
 	public static WorksheetDefinition fromMap(Map<String, Object> worksheetDefinitionMap) {
 		
 		WorksheetDefinition worksheetDefinition = new WorksheetDefinition();
