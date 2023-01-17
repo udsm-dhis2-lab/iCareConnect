@@ -19,7 +19,7 @@ public class WorksheetDefinition extends BaseOpenmrsData implements java.io.Seri
 	private String code;
 	
 	@Column(name = "header_fields", nullable = true)
-	private String headerFields;
+	private String additionalFields;
 	
 	@ManyToOne
 	@JoinColumn(name = "worksheet_id")
@@ -50,21 +50,22 @@ public class WorksheetDefinition extends BaseOpenmrsData implements java.io.Seri
 	public void setWorksheet(Worksheet worksheet) {
 		this.worksheet = worksheet;
 	}
-	
-	public String getHeaderFields() {
-		return headerFields;
+
+
+	public String getAdditionalFields() {
+		return additionalFields;
 	}
-	
-	public void setHeaderFields(String headerFields) {
-		this.headerFields = headerFields;
+
+	public void setAdditionalFields(String additionalFields) {
+		this.additionalFields = additionalFields;
 	}
-	
+
 	public static WorksheetDefinition fromMap(Map<String, Object> worksheetDefinitionMap) {
 		
 		WorksheetDefinition worksheetDefinition = new WorksheetDefinition();
 		worksheetDefinition.setCode(worksheetDefinitionMap.get("code").toString());
-		if (worksheetDefinitionMap.get("header_fields") != null) {
-			worksheetDefinition.setHeaderFields(worksheetDefinitionMap.get("header_fields").toString());
+		if (worksheetDefinitionMap.get("additionalFields") != null) {
+			worksheetDefinition.setAdditionalFields(worksheetDefinitionMap.get("additionalFields").toString());
 		}
 		
 		Worksheet worksheet = new Worksheet();
@@ -79,8 +80,8 @@ public class WorksheetDefinition extends BaseOpenmrsData implements java.io.Seri
 		Map<String,Object> worksheetDefinitionObject = new HashMap<>();
 		worksheetDefinitionObject.put("code",this.getCode());
 		worksheetDefinitionObject.put("uuid",this.getUuid());
-		if(this.getHeaderFields() != null){
-			worksheetDefinitionObject.put("header_fields",this.getHeaderFields());
+		if(this.getAdditionalFields() != null){
+			worksheetDefinitionObject.put("additionalFields",this.getAdditionalFields());
 		}
 
 		Map<String,Object> worksheetObject = new HashMap<>();
