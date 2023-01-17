@@ -14,6 +14,7 @@ import { DatasetDataService } from "src/app/core/services/dataset-data.service";
 })
 export class WorksheetDefinitionComponent implements OnInit {
   @Input() worksheets: any[];
+  @Input() dataSetReportUuidForAcceptedSamplesWithNoResults: string;
   @Input() datesParameters: any;
   worksheetFormField: any;
   worksheetDefinitionFields: any[];
@@ -31,6 +32,10 @@ export class WorksheetDefinitionComponent implements OnInit {
   maxLabelCharCount: number = 7;
   currentLabelCharCount: number = 7;
   minLabelCharCount: number = 3;
+
+  message: string;
+  worksheetSelectionField: any;
+  currentWorksheet: any;
   constructor(
     private worksheetsService: WorkSeetsService,
     private datasetDataService: DatasetDataService
@@ -40,24 +45,28 @@ export class WorksheetDefinitionComponent implements OnInit {
     this.getWorksheetDefinitions();
     this.createWorksheetDefinitionFields();
     this.getTestControls();
+    this.createWorksheetSelectionField();
+  }
+
+  createWorksheetSelectionField(): void {
+    this.worksheetSelectionField = new Dropdown({
+      id: "worksheet",
+      key: "worksheet",
+      label: "Worksheet",
+      required: true,
+      options: this.worksheets?.map((worksheet) => {
+        return {
+          key: worksheet?.uuid,
+          label: worksheet?.name,
+          name: worksheet?.name,
+          value: worksheet?.uuid,
+        };
+      }),
+    });
   }
 
   createWorksheetDefinitionFields(): void {
     this.worksheetDefinitionFields = [
-      new Dropdown({
-        id: "worksheet",
-        key: "worksheet",
-        label: "Worksheet setting",
-        required: true,
-        options: this.worksheets?.map((worksheet) => {
-          return {
-            key: worksheet?.uuid,
-            label: worksheet?.name,
-            name: worksheet?.name,
-            value: worksheet?.uuid,
-          };
-        }),
-      }),
       new Textbox({
         id: "code",
         key: "code",
@@ -65,6 +74,70 @@ export class WorksheetDefinitionComponent implements OnInit {
         required: true,
       }),
     ];
+  }
+
+  onGetSelectedWorksheet(formValue: FormValue): void {
+    const worksheetUuid = formValue.getValues()?.worksheet?.value;
+    this.currentWorksheet = (this.worksheets?.filter(
+      (worksheet) => worksheet?.uuid === worksheetUuid
+    ) || [])[0];
+
+    if (this.currentWorksheet) {
+      this.currentWorksheetDefinition = {
+        worksheet: {
+          ...this.currentWorksheet,
+          columns: this.generateArrayOfItemsFromCount(
+            this.currentWorksheet?.columns
+          ),
+          rows: this.generateArrayOfItemsFromCount(this.currentWorksheet?.rows),
+        },
+      };
+
+      this.isWorksheetRenderingReady = true;
+
+      this.generateDefaultWorksheetRowsColumns();
+    }
+  }
+
+  onSave(event: Event): void {
+    event.stopPropagation();
+
+    // Create worksheetdefn and worksheet sample
+    // console.log("selectedRowsColumns", this.selectedRowsColumns);
+    this.saving = true;
+    this.worksheetsService
+      .createWorksheetDefinitions([this.worksheetDefnPayload])
+      .subscribe((responseWorkSheetDefn: any) => {
+        if (responseWorkSheetDefn && !responseWorkSheetDefn?.error) {
+          const worksheetSamples = Object.keys(this.selectedRowsColumns)
+            ?.map((key) => {
+              if (this.selectedRowsColumns[key]?.set) {
+                return {
+                  row: Number(key?.split("-")[0]),
+                  column: Number(key?.split("-")[1]),
+                  sample: {
+                    uuid: this.selectedRowsColumns[key]?.value?.uuid,
+                  },
+                  worksheetDefinition: {
+                    uuid: responseWorkSheetDefn[0]?.uuid,
+                  },
+                  type: "SAMPLE",
+                };
+              }
+            })
+            ?.filter((worksheetSample) => worksheetSample);
+
+          this.worksheetsService
+            .createWorksheetSamples(worksheetSamples)
+            .subscribe((response) => {
+              if (response && !response?.error) {
+                this.saving = false;
+              } else {
+                this.saving = false;
+              }
+            });
+        }
+      });
   }
 
   getWorksheetDefinitions(): void {
@@ -83,7 +156,7 @@ export class WorksheetDefinitionComponent implements OnInit {
     this.worksheetDefnPayload = {
       code: values?.code?.value,
       worksheet: {
-        uuid: this.selectedWorkSheetConfiguration,
+        uuid: this.currentWorksheet?.uuid,
       },
     };
   }
@@ -191,39 +264,55 @@ export class WorksheetDefinitionComponent implements OnInit {
     this.isWorksheetRenderingReady = false;
     this.datasetDataService
       .getDatasetData(
-        "3425b3f8-6efa-4093-963c-7bdca8ec5c11",
-        this.datesParameters
+        this.dataSetReportUuidForAcceptedSamplesWithNoResults,
+        this.datesParameters,
+        [
+          {
+            key: "uuid",
+            value: this.currentWorksheetDefinition?.worksheet?.testOrder?.uuid,
+          },
+        ]
       )
       .subscribe((response) => {
         const samples = response?.rows;
-        this.currentLabelCharCount = samples[0]?.label?.length;
-        let sampleAreas = [];
-        let controlAreas = [];
-        Object.keys(selectedRowsColumns).map((key, index) => {
-          if (key?.indexOf("sample") > -1) {
-            sampleAreas = [...sampleAreas, key];
-          } else {
-            controlAreas = [...controlAreas, key];
-          }
-        });
-        sampleAreas?.forEach((sampleRef, index) => {
-          if (index < samples?.length) {
-            this.selectedRowsColumns[sampleRef] = {
+        if (samples?.length > 0) {
+          this.currentLabelCharCount = samples[0]?.label?.length;
+          let sampleAreas = [];
+          let controlAreas = [];
+          Object.keys(selectedRowsColumns).map((key, index) => {
+            if (key?.indexOf("sample") > -1) {
+              sampleAreas = [...sampleAreas, key];
+            } else {
+              controlAreas = [...controlAreas, key];
+            }
+          });
+          sampleAreas?.forEach((sampleRef, index) => {
+            if (index < samples?.length) {
+              this.selectedRowsColumns[sampleRef] = {
+                set: true,
+                value: samples[index],
+              };
+            }
+          });
+
+          controlAreas?.forEach((controlRef, index) => {
+            this.selectedRowsColumns[controlRef] = {
               set: true,
-              value: samples[index],
+              value: this.definedControls[controlRef],
             };
-          }
-        });
+          });
 
-        controlAreas?.forEach((controlRef, index) => {
-          this.selectedRowsColumns[controlRef] = {
-            set: true,
-            value: this.definedControls[controlRef],
-          };
-        });
-
-        this.isWorksheetRenderingReady = true;
-        this.isComplete = true;
+          this.isWorksheetRenderingReady = true;
+          this.isComplete = true;
+        } else {
+          this.isWorksheetRenderingReady = true;
+          this.message = `NO samples for the test order ${this.currentWorksheetDefinition?.worksheet?.testOrder?.display} from ${this.datesParameters?.startDate} to ${this.datesParameters?.endDate}`;
+        }
       });
+  }
+
+  onCloseMessage(event: Event): void {
+    event.stopPropagation();
+    this.message = null;
   }
 }
