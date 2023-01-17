@@ -191,7 +191,7 @@ export class WorksheetDefinitionComponent implements OnInit {
     this.selectedWorkSheetConfiguration = values?.worksheet?.value;
     this.worksheetDefnPayload = {
       code: values?.code?.value,
-      header_fields: JSON.stringify(
+      additionalFields: JSON.stringify(
         Object.keys(values).map((key) => {
           return values[key];
         })
@@ -220,8 +220,8 @@ export class WorksheetDefinitionComponent implements OnInit {
     this.currentWorksheetDefinition = null;
     this.isWorksheetRenderingReady = false;
     this.createWorksheetSelectionField(worksheetDefn?.worksheet);
-    const wsDefnFields = worksheetDefn?.header_fields
-      ? JSON.parse(worksheetDefn?.header_fields)
+    const wsDefnFields = worksheetDefn?.additionalFields
+      ? JSON.parse(worksheetDefn?.additionalFields)
       : null;
     this.createWorksheetDefinitionFields(
       wsDefnFields ? keyBy(wsDefnFields, "id") : null
