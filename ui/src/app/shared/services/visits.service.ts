@@ -36,12 +36,6 @@ export class VisitsService {
         )
       )
     );
-    // return this.httpClient.get(
-    //   BASE_URL +
-    //     'visit/' +
-    //     uuid +
-    //     '?v=custom:(uuid,startDatetime,display,patient,encounters:(uuid,encounterType,display,patient,visit,encounterProviders,encounterDatetime,voided,obs:(comment,value,encounter,person,uuid,display,concept:(uuid,display,setMembers:(uuid,display),answers:(uuid,display))),orders:(uuid,display,orderer,dateActivated,orderNumber,concept:(uuid,display,setMembers:(uuid,display),answers:(uuid,display)),display)),voided,attributes,visitType)'
-    // );
   }
 
   getActiveVisitsByStartDate(startDate, endDate): Observable<any> {
