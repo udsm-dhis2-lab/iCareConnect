@@ -63,7 +63,7 @@ export class PatientMedicationSummaryComponent implements OnInit {
         !this.forHistory
           ? this.ordersService.getOrdersByVisitAndOrderType({
               visit: this.patientVisit?.uuid,
-              orderType: "iCARESTS-PRES-1111-1111-525400e4297f",
+              orderType: "iCARESTS-PRES-1111-1111-525400e4297f", // TODO: This has to be softcoded
             })
           : of(this.patientVisit?.drugOrders)
       ).pipe(

@@ -3759,6 +3759,29 @@
         </sql>
     </changeSet>
 
+    <changeSet id="update_lb_worksheet_sample_rename_row_to_rows" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE lb_worksheet_sample
+            CHANGE row rows INT;
+        </sql>
+    </changeSet>
+
+    <changeSet id="update_lb_worksheet_sample_rename_column_to_columns" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE lb_worksheet_sample
+            CHANGE `column` `columns` INT;
+        </sql>
+    </changeSet>
+
+    <changeSet id="update_lb_worksheet_sample_change_sample_id_foreign_key" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE lb_worksheet_sample DROP FOREIGN KEY lb_worksheet_sample_sample_id_lb_sample_sample_id_fk,
+            ADD FOREIGN KEY lb_worksheet_sample_sample_id_lb_sample_sample_id_fk(sample_id) REFERENCES lb_sample(sample_id);
+        </sql>
+    </changeSet>
+
+
+
 
 
 </databaseChangeLog>
