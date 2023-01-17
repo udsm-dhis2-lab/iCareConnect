@@ -7,6 +7,7 @@ import { Textbox } from "src/app/shared/modules/form/models/text-box.model";
 import { omit, keyBy } from "lodash";
 import { DatasetDataService } from "src/app/core/services/dataset-data.service";
 import { TextArea } from "src/app/shared/modules/form/models/text-area.model";
+import { DateField } from "src/app/shared/modules/form/models/date-field.model";
 
 @Component({
   selector: "app-worksheet-definition",
@@ -37,6 +38,7 @@ export class WorksheetDefinitionComponent implements OnInit {
   message: string;
   worksheetSelectionField: any;
   currentWorksheet: any;
+  isFormValid: boolean = false;
   constructor(
     private worksheetsService: WorkSeetsService,
     private datasetDataService: DatasetDataService
@@ -89,6 +91,13 @@ export class WorksheetDefinitionComponent implements OnInit {
         label: "Abbreviation",
         value: data?.abbreviation?.value,
         required: false,
+      }),
+      new DateField({
+        id: "expirationDateTime",
+        key: "expirationDateTime",
+        label: "Expiration Date",
+        value: data?.expirationDateTime?.value,
+        required: true,
       }),
       new Textbox({
         id: "assayName",
@@ -187,10 +196,12 @@ export class WorksheetDefinitionComponent implements OnInit {
 
   onGetFormData(formValue: FormValue): void {
     const values = formValue.getValues();
+    this.isFormValid = formValue.isValid;
     this.isWorksheetDefnValid = formValue.isValid;
     this.selectedWorkSheetConfiguration = values?.worksheet?.value;
     this.worksheetDefnPayload = {
       code: values?.code?.value,
+      expirationDateTime: new Date(values?.expirationDateTime?.value),
       additionalFields: JSON.stringify(
         Object.keys(values).map((key) => {
           return values[key];
