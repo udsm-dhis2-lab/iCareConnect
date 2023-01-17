@@ -5,7 +5,7 @@
       "uuid": "iCARE890-YTRE-IUYT-9beb-d30dcfc0c66e",
       "name": "worksheet3"
     },
-    "header_fields": "{ SerialNumber:{ name:SerialNumber},KinNumber:{ name:KinNumber}}"
+    "additionalFields": "{ SerialNumber:{ name:SerialNumber},KinNumber:{ name:KinNumber}}"
   },
   {
     "code": "WD2",

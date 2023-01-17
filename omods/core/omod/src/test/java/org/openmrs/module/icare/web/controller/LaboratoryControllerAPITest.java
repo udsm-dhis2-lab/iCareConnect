@@ -760,7 +760,7 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		MockHttpServletResponse handle = handle(newPostRequest);
 		List<Map<String, Object>> createdWorksheetDefinitions = (new ObjectMapper()).readValue(handle.getContentAsString(),
 		    List.class);
-		
+		System.out.println(createdWorksheetDefinitions);
 		assertThat("created 2 worksheets definitions", createdWorksheetDefinitions.size(), is(2));
 		
 		//2. Getting worksheet definitions
