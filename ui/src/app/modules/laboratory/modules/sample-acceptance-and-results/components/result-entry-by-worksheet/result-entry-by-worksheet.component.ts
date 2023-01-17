@@ -36,6 +36,7 @@ export class ResultEntryByWorksheetComponent implements OnInit {
 
   onFormUpdate(formValue: FormValue): void {
     const values = formValue?.getValues();
+    console.log(values);
     this.selectedWorksheetDefinition.emit(
       (this.worksheetDefinitions?.filter(
         (worksheetDefn) =>
