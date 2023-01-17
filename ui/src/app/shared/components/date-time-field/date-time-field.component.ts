@@ -1,5 +1,6 @@
 import { Component, EventEmitter, OnInit, Output, Input } from "@angular/core";
-import { Dropdown } from "../../modules/form/models/dropdown.model";
+import * as moment from "moment";
+import { FormValue } from "../../modules/form/models/form-value.model";
 
 @Component({
   selector: "app-date-time-field",
@@ -10,15 +11,80 @@ export class DateTimeFieldComponent implements OnInit {
   @Input() dateTimeField: any;
   @Output() formUpdate = new EventEmitter();
 
-  timeValid: boolean;
+  timeValid: boolean = true;
+  selectedTime: string;
+  selectedDate: any;
+  formValues: any;
 
   constructor() {}
 
-  ngOnInit(): void {}
-
-  onFormUpdate(e: any) {
-    this.formUpdate.emit(e);
+  ngOnInit(): void {
+    const hours =
+      new Date(this.dateTimeField?.value).getHours().toString().length > 1
+        ? new Date(this.dateTimeField?.value).getHours()
+        : `0${new Date(this.dateTimeField?.value).getHours()}`;
+    const minutes =
+      new Date(this.dateTimeField?.value).getMinutes().toString().length > 1
+        ? new Date(this.dateTimeField?.value).getMinutes()
+        : `0${new Date(this.dateTimeField?.value).getMinutes()}`;
+    this.selectedTime = `${hours}:${minutes}`
   }
 
-  getSelectedTime(e: any) {}
+  onFormUpdate(formValues: FormValue) {
+    this.formValues = formValues;
+    const selectedDateValue =
+      this.formValues.getValues()[this.dateTimeField?.id]?.value;
+    this.selectedDate = selectedDateValue
+      ? formValues.getValues()[this.dateTimeField?.id]
+      : this.selectedDate;
+    if(this.selectedTime && this.selectedDate?.value){
+      const today = new Date();
+      this.selectedDate.value = this.transformDate(
+        moment(this.selectedDate?.value).toDate(),
+        this.selectedTime
+      );
+      this.formValues.getValues()[this.dateTimeField?.id] = this.selectedDate;
+      if (today >= this.selectedDate.value) {
+        console.log(
+          "==> Selected Dates: ",
+          this.formValues.getValues()[this.dateTimeField?.id]
+        );
+        this.timeValid = true;
+        this.formUpdate.emit(this.formValues);
+      } else {
+        this.timeValid = false;
+      }
+    }
+  }
+
+  getSelectedTime(e: any) {
+    this.selectedTime = e?.target?.value;
+    if (this.selectedTime && this.selectedDate?.value) {
+      const today = new Date();
+      this.selectedDate.value = this.transformDate(
+        moment(this.selectedDate?.value).toDate(),
+        this.selectedTime
+      );
+      this.formValues.getValues()[this.dateTimeField?.id] = this.selectedDate;
+      if (today >= this.selectedDate.value) {
+        console.log(
+          "==> Selected Dates: ",
+          this.formValues.getValues()[this.dateTimeField?.id]
+        );
+        this.timeValid = true;
+        this.formUpdate.emit(this.formValues);
+      } else {
+        this.timeValid = false;
+      }
+    }
+  }
+
+  transformDate(date: Date, time: string){
+    const year = date?.getFullYear();
+    const month = date?.getMonth();
+    const day = date?.getDate();
+    const hours = Number(time.split(':')[0]);
+    const minutes = Number(time.split(':')[1]);
+    return new Date(year, month, day, hours, minutes);
+  }
 }

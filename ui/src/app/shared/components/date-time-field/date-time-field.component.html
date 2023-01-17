@@ -1,16 +1,17 @@
-<div class="d-flex">
-    <div class="w-75">
+<div class="d-flex field">
+    <div class="date">
         <app-form
         [fields]="[dateTimeField]"
         (formUpdate)="onFormUpdate($event)"
         ></app-form>
     </div>
-    <div class="w-25">
+    <div class="time">
         <input
-        (change)="getSelectedTime($event)"
-        [ngClass]="{ 'invalid-time-input': !timeValid }"
-        class="time-input-field"
-        type="time"
+            (change)="getSelectedTime($event)"
+            [ngClass]="{ 'invalid-time-input': !timeValid }"
+            class="time-input-field"
+            type="time"
+            value="{{ selectedTime }}"
         />
         <p class="invalid-text" *ngIf="!timeValid">
         invalid time

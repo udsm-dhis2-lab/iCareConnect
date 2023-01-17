@@ -407,6 +407,10 @@ export class SingleRegistrationComponent implements OnInit {
     };
   }
 
+  onGetDateTime(e: any){
+    console.log("==> Date time: ", e )
+  }
+
   onFormUpdate(formValues: FormValue, itemKey?: string): void {
     //Validate Date fields
     this.formData = { ...this.formData, ...formValues.getValues() };

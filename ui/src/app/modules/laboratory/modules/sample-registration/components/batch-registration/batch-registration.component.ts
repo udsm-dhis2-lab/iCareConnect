@@ -224,6 +224,7 @@ export class BatchRegistrationComponent implements OnInit {
   }
 
   onFormUpdate(formValues: FormValue, key?: string, fieldKey?: string): void {
+    console.log("==> On Form Update: ", formValues.getValues());
     //Validate Date fields
     this.formData = { ...this.formData, ...formValues.getValues() };
     if (key === "Fixed") {
@@ -539,8 +540,8 @@ export class BatchRegistrationComponent implements OnInit {
       .filter((field) => field);
     const batchsetsInformation = [
       {
-        name: this.batchNameField.value,
-        label: this.batchNameField.value,
+        name: this.batchsetNameField.value,
+        label: this.batchsetNameField.value,
         fields: JSON.stringify({
           fixedFields: this.fieldsObjectValues?.fixedFieldsWithValues,
           staticFields: staticFields,

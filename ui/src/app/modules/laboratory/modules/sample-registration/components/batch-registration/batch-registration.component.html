@@ -82,9 +82,15 @@
                         <ng-container *ngFor="let selectedFixedField of selectedFixedFields">
                             <div class="col-12">
                                 <app-form
+                                    *ngIf="!selectedFixedField?.allowCustomDateTime"
                                     [fields]="[selectedFixedField]"
                                     (formUpdate)="onFormUpdate($event, 'SelectedFixedField', selectedFixedField.key)"
                                 ></app-form>
+                                <app-date-time-field 
+                                    *ngIf="selectedFixedField?.allowCustomDateTime"
+                                    [dateTimeField]="selectedFixedField"
+                                    (formUpdate)="onFormUpdate($event, 'SelectedFixedField', selectedFixedField.key)"
+                                ></app-date-time-field>
                             </div>
                             <!-- <div class="col-1" *ngIf="!useExistingBatchset && !useExistingBatch">
                                 <button class="remove-field" mat-button matTooltip="Remove '{{ selectedFixedField?.label }}' from Fixed fields "><mat-icon>delete_outline</mat-icon></button>
@@ -122,9 +128,15 @@
                         <ng-container *ngFor="let selectedStaticField of selectedStaticFields">
                             <div class="col-12">
                                 <app-form
+                                    *ngIf="!selectedStaticField?.allowCustomDateTime"
                                     [fields]="[selectedStaticField]"
                                     (formUpdate)="onFormUpdate($event, 'SelectedStaticField', selectedStaticField.key)"
                                 ></app-form>
+                                <app-date-time-field 
+                                    *ngIf="selectedStaticField?.allowCustomDateTime"
+                                    [dateTimeField]="selectedStaticField"
+                                    (formUpdate)="onFormUpdate($event, 'SelectedStaticField', selectedStaticField.key)"
+                                ></app-date-time-field>
                             </div>
                             <!-- <div class="col-1" *ngIf="!useExistingBatchset && !useExistingBatch">
                                 <button class="remove-field" mat-button matTooltip="Remove '{{ selectedStaticField?.label }}' from Static fields"><mat-icon>delete_outline</mat-icon></button>
@@ -161,9 +173,15 @@
                         <ng-container *ngFor="let selectedDynamicField of selectedDynamicFields">
                             <div class="{{ useExistingBatchset || useExistingBatch ? 'col-12' : 'col-10' }}">
                                 <app-form
+                                    *ngIf="!selectedDynamicField?.allowCustomDateTime"
                                     [fields]="[selectedDynamicField]"
                                     (formUpdate)="onFormUpdate($event, 'SelectedDynamicField', selectedDynamicField.key)"
                                 ></app-form>
+                                <app-date-time-field 
+                                    *ngIf="selectedDynamicField?.allowCustomDateTime"
+                                    [dateTimeField]="selectedDynamicField"
+                                    (formUpdate)="onFormUpdate($event, 'SelectedDynamicField', selectedDynamicField.key)"
+                                ></app-date-time-field>
                             </div>
                             <!-- <div class="col-1" *ngIf="!useExistingBatchset && !useExistingBatch">
                                 <button class="remove-field" mat-button matTooltip="Remove '{{ selectedDynamicField?.label }}' from Dynamic fields"><mat-icon>delete_outline</mat-icon></button>
