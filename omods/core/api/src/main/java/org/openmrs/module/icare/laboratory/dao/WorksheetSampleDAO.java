@@ -55,7 +55,7 @@ public class WorksheetSampleDAO extends BaseDAO<WorksheetSample> {
 		return query.list();
 		
 	}
-
+	
 	public List<WorksheetSample> getWorksheetSamplesByWorksheetDefinition(String uuid) {
 		DbSession session = this.getSession();
 		String queryStr = "SELECT wss FROM WorksheetSample wss INNER JOIN wss.worksheetDefinition wd WHERE wd.uuid =:uuid";
@@ -64,6 +64,6 @@ public class WorksheetSampleDAO extends BaseDAO<WorksheetSample> {
 		if (uuid != null) {
 			query.setParameter("uuid", uuid);
 		}
-		return  query.list();
+		return query.list();
 	}
 }
