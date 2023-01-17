@@ -1131,7 +1131,33 @@
         </mat-form-field>
       </div>
       <div class="p-1">
-        <table class="table table-bordered">
+        <mat-radio-group
+          class="entry-category"
+          *ngIf="LISConfigurations?.isLIS"
+        >
+          <mat-radio-button
+            (change)="getEntryType($event)"
+            class="entry-category-btn"
+            [value]="'CLINICAL'"
+            [checked]="entryCategory === 'INDIVIDUAL'"
+            color="primary"
+          >
+            Individual
+          </mat-radio-button>
+          <mat-radio-button
+            (change)="getEntryType($event)"
+            class="entry-category-btn ml-2"
+            [value]="'WORKSHEET'"
+            [checked]="entryCategory === 'WORKSHEET'"
+            color="primary"
+          >
+            By Worksheet
+          </mat-radio-button>
+        </mat-radio-group>
+        <table
+          class="table table-bordered"
+          *ngIf="entryCategory === 'INDIVIDUAL'"
+        >
           <thead class="table-header">
             <tr>
               <th rowspan="2">SN</th>
@@ -1357,6 +1383,9 @@
             </ng-container>
           </tbody>
         </table>
+        <div class="p-3" *ngIf="entryCategory === 'WORKSHEET'">
+          <app-result-entry-by-worksheet-home></app-result-entry-by-worksheet-home>
+        </div>
       </div>
     </mat-tab>
     <mat-tab label="Completed Samples" *ngIf="!LISConfigurations?.isLIS">
