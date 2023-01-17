@@ -774,11 +774,10 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		
 		assertThat("Has 1 worksheet definition", worksheetdefinitions.size(), is(1));
 	}
-
-
+	
 	@Test
 	public void TestGettingWorksheetDefinitionByUuid() throws Exception {
-
+		
 		//1. Creating worksheet definitions
 		//Given
 		String dto = this.readFile("dto/worksheet-definition-create-dto.json");
@@ -787,20 +786,18 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		MockHttpServletRequest newPostRequest = newPostRequest("lab/worksheetdefinitions", worksheetDefinitionObject);
 		MockHttpServletResponse handle = handle(newPostRequest);
 		List<Map<String, Object>> createdWorksheetDefinitions = (new ObjectMapper()).readValue(handle.getContentAsString(),
-				List.class);
-
+		    List.class);
+		
 		assertThat("created 2 worksheets definitions", createdWorksheetDefinitions.size(), is(2));
-
+		
 		String uuid = ((Map<String, Object>) createdWorksheetDefinitions.get(0)).get("uuid").toString();
-
+		
 		//2. Getting worksheet definitions
 		//When
-		MockHttpServletRequest newGetRequest = newGetRequest("lab/worksheetdefinition", new Parameter("uuid",
-				uuid));
+		MockHttpServletRequest newGetRequest = newGetRequest("lab/worksheetdefinition", new Parameter("uuid", uuid));
 		MockHttpServletResponse handle2 = handle(newGetRequest);
-
-		Map<String, Object> worksheetDefinition = (new ObjectMapper()).readValue(handle2.getContentAsString(),
-				Map.class);
+		
+		Map<String, Object> worksheetDefinition = (new ObjectMapper()).readValue(handle2.getContentAsString(), Map.class);
 		assertThat("Worksheet definition matches", worksheetDefinition.get("uuid").toString(), is(uuid));
 	}
 	
