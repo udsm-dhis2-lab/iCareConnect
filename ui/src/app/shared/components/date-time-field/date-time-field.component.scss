@@ -1,12 +1,16 @@
-.invalid-time-input {
-  border-color: red;
-  color: red;
+.field {
+  width: 100%;
 }
-
 .invalid-text {
   color: red;
 }
 
-.d-flex {
-    width: 100%;
+.field .time {
+  margin-right: -10px;
+  width: 80%;
+}
+.invalid-time-input {
+  width: 8%;
+  border-color: red;
+  color: red;
 }
