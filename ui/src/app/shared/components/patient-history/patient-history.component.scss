@@ -1,0 +1,16 @@
+.top-history-banner {
+  padding: 5px 15px;
+}
+
+.history {
+  max-height: 100vh;
+  overflow: auto;
+}
+
+::ng-deep .mat-step-icon-content { 
+  display: none !important;
+}
+::ng-deep .mat-step-header { 
+  background-color: transparent !important;
+}
+

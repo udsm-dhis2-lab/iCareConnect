@@ -8,6 +8,7 @@ import { map, tap } from "rxjs/operators";
 import { Observable } from "rxjs";
 import { SharedConfirmationComponent } from "../shared-confirmation /shared-confirmation.component";
 import { MatDialog } from "@angular/material/dialog";
+import { getGenericDrugPrescriptionsFromVisit } from "../../helpers/visits.helper";
 
 @Component({
   selector: "app-current-prescriptions",
@@ -82,40 +83,7 @@ export class CurrentPrescriptionComponent implements OnInit {
   }
 
   getDrugsPrescribed() {
-    this.drugsPrescribed = flatten(
-      this.visit?.encounters
-        ?.map((encounter) => {
-          return (
-            encounter?.orders.filter(
-              (order) =>
-                order.orderType?.uuid === this.genericPrescriptionOrderType
-            ) || []
-          )?.map((genericDrugOrder) => {
-            let formulatedDescription = encounter?.obs
-              ?.map((ob) => {
-                if (ob?.comment === null) {
-                  return ob;
-                }
-              })
-              .filter((ob) => ob);
-            return {
-              ...genericDrugOrder,
-              formulatedDescription: formulatedDescription,
-              obs: keyBy(
-                encounter?.obs?.map((observation) => {
-                  return {
-                    ...observation,
-                    conceptKey: observation?.concept?.uuid,
-                    valueIsObject: observation?.value?.uuid ? true : false,
-                  };
-                }),
-                "conceptKey"
-              ),
-            };
-          });
-        })
-        ?.filter((order) => order)
-    );
+    this.drugsPrescribed = getGenericDrugPrescriptionsFromVisit(this.visit, this.genericPrescriptionOrderType);
   }
 
   stopDrugOrder(e: Event, drugOrder: any, drugName: string) {
