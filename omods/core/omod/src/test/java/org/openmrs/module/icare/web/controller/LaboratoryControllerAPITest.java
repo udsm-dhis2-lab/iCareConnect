@@ -789,7 +789,6 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		    List.class);
 		
 		assertThat("created 2 worksheets definitions", createdWorksheetDefinitions.size(), is(2));
-		
 		String uuid = ((Map<String, Object>) createdWorksheetDefinitions.get(0)).get("uuid").toString();
 		
 		//2. Getting worksheet definitions

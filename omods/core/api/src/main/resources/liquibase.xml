@@ -3497,6 +3497,19 @@
 
     </changeSet>
 
+    <changeSet id="add_columns_to_lb_worksheet_definition" author="josephat-mwakyusa" dbms="mysql">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists columnName="expiration_date_time" tableName="lb_worksheet_definition"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="lb_worksheet_definition" >
+            <column name="expiration_date_time" type="DATETIME">
+                <constraints nullable="true"></constraints>
+            </column>
+        </addColumn>
+    </changeSet>
+
     <changeSet id="create_lb_worksheet_control" author="dennis-kibahila" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>

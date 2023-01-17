@@ -3,6 +3,10 @@ package org.openmrs.module.icare.laboratory.models;
 import org.openmrs.BaseOpenmrsData;
 
 import javax.persistence.*;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,6 +21,8 @@ public class WorksheetDefinition extends BaseOpenmrsData implements java.io.Seri
 	
 	@Column(name = "code", length = 30)
 	private String code;
+	@Column(name = "expiration_date_time", nullable = true)
+	private Date expirationDateTime;
 	
 	@Column(name = "header_fields", nullable = true)
 	private String additionalFields;
@@ -42,7 +48,15 @@ public class WorksheetDefinition extends BaseOpenmrsData implements java.io.Seri
 	public void setCode(String code) {
 		this.code = code;
 	}
-	
+
+	public Date getExpirationDateTime() {
+		return expirationDateTime;
+	}
+
+	public void setExpirationDateTime(Date expirationDateTime) {
+		this.expirationDateTime = expirationDateTime;
+	}
+
 	public Worksheet getWorksheet() {
 		return worksheet;
 	}
@@ -59,10 +73,15 @@ public class WorksheetDefinition extends BaseOpenmrsData implements java.io.Seri
 		this.additionalFields = additionalFields;
 	}
 	
-	public static WorksheetDefinition fromMap(Map<String, Object> worksheetDefinitionMap) {
+	public static WorksheetDefinition fromMap(Map<String, Object> worksheetDefinitionMap) throws ParseException {
 		
 		WorksheetDefinition worksheetDefinition = new WorksheetDefinition();
 		worksheetDefinition.setCode(worksheetDefinitionMap.get("code").toString());
+		if (worksheetDefinitionMap.get("expirationDateTime") != null) {
+			DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			Date expirationDateTime = dateFormat.parse(worksheetDefinitionMap.get("expirationDateTime").toString());
+			worksheetDefinition.setExpirationDateTime(expirationDateTime);
+		}
 		if (worksheetDefinitionMap.get("additionalFields") != null) {
 			worksheetDefinition.setAdditionalFields(worksheetDefinitionMap.get("additionalFields").toString());
 		}
@@ -79,6 +98,7 @@ public class WorksheetDefinition extends BaseOpenmrsData implements java.io.Seri
 		Map<String,Object> worksheetDefinitionObject = new HashMap<>();
 		worksheetDefinitionObject.put("code",this.getCode());
 		worksheetDefinitionObject.put("uuid",this.getUuid());
+		worksheetDefinitionObject.put("expirationDateTime", this.getExpirationDateTime());
 		if(this.getAdditionalFields() != null){
 			worksheetDefinitionObject.put("additionalFields",this.getAdditionalFields());
 		}
