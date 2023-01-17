@@ -26,11 +26,11 @@ public class WorksheetSample extends BaseOpenmrsData implements java.io.Serializ
 	@JoinColumn(name = "worksheet_definition_id")
 	private WorksheetDefinition worksheetDefinition;
 	
-	@Column(name = "row", columnDefinition = "TINYINT")
+	@Column(name = "rows", columnDefinition = "TINYINT")
 	@Type(type = "org.hibernate.type.IntegerType")
 	private Integer row;
 	
-	@Column(name = "column", columnDefinition = "TINYINT")
+	@Column(name = "columns", columnDefinition = "TINYINT")
 	@Type(type = "org.hibernate.type.IntegerType")
 	private Integer column;
 	

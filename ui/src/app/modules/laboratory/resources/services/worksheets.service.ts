@@ -68,4 +68,18 @@ export class WorkSeetsService {
       catchError((error) => of(error))
     );
   }
+
+  createWorksheetSamples(data: any): Observable<any> {
+    return this.httpClient.post(`lab/worksheetsamples`, data).pipe(
+      map((response) => response),
+      catchError((error) => of(error))
+    );
+  }
+
+  getWorksheetSamples(): Observable<any[]> {
+    return this.httpClient.get(`lab/worksheetsamples`).pipe(
+      map((response) => response),
+      catchError((error) => of(error))
+    );
+  }
 }
