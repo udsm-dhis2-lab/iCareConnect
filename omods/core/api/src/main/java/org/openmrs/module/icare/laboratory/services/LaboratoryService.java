@@ -135,7 +135,7 @@ public interface LaboratoryService extends OpenmrsService {
 	
 	List<WorksheetDefinition> getWorksheetDefinitions(Date start, Date end, String q, Integer startIndex, Integer limit);
 	
-	WorksheetDefinition getWorksheetDefinitionByUuid(String worksheetDefinitionUuid);
+	Map<String, Object> getWorksheetDefinitionByUuid(String worksheetDefinitionUuid);
 	
 	WorksheetDefinition addWorksheetDefinition(WorksheetDefinition worksheetDefinition) throws Exception;
 	
