@@ -4,8 +4,9 @@ import { WorkSeetsService } from "src/app/modules/laboratory/resources/services/
 import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
 import { Textbox } from "src/app/shared/modules/form/models/text-box.model";
-import { omit } from "lodash";
+import { omit, keyBy } from "lodash";
 import { DatasetDataService } from "src/app/core/services/dataset-data.service";
+import { TextArea } from "src/app/shared/modules/form/models/text-area.model";
 
 @Component({
   selector: "app-worksheet-definition",
@@ -48,12 +49,13 @@ export class WorksheetDefinitionComponent implements OnInit {
     this.createWorksheetSelectionField();
   }
 
-  createWorksheetSelectionField(): void {
+  createWorksheetSelectionField(worksheet?: any): void {
     this.worksheetSelectionField = new Dropdown({
       id: "worksheet",
       key: "worksheet",
       label: "Worksheet",
       required: true,
+      value: worksheet?.uuid,
       options: this.worksheets?.map((worksheet) => {
         return {
           key: worksheet?.uuid,
@@ -65,13 +67,42 @@ export class WorksheetDefinitionComponent implements OnInit {
     });
   }
 
-  createWorksheetDefinitionFields(): void {
+  createWorksheetDefinitionFields(data?: any): void {
     this.worksheetDefinitionFields = [
       new Textbox({
         id: "code",
         key: "code",
         label: "Reference code",
+        value: data?.code?.value,
         required: true,
+      }),
+      new TextArea({
+        id: "description",
+        key: "description",
+        label: "Description",
+        value: data?.description?.value,
+        required: false,
+      }),
+      new Textbox({
+        id: "abbreviation",
+        key: "abbreviation",
+        label: "Abbreviation",
+        value: data?.abbreviation?.value,
+        required: false,
+      }),
+      new Textbox({
+        id: "assayName",
+        key: "assayName",
+        label: "Assay Name",
+        value: data?.assayName?.value,
+        required: false,
+      }),
+      new Textbox({
+        id: "lotNumber",
+        key: "lotNumber",
+        label: "LOT Number",
+        value: data?.lotNumber?.value,
+        required: false,
       }),
     ];
   }
@@ -132,8 +163,13 @@ export class WorksheetDefinitionComponent implements OnInit {
             .subscribe((response) => {
               if (response && !response?.error) {
                 this.saving = false;
+                this.currentWorksheetDefinition = null;
+                this.getWorksheetDefinitions();
+                this.createWorksheetSelectionField();
               } else {
                 this.saving = false;
+                this.getWorksheetDefinitions();
+                this.createWorksheetSelectionField();
               }
             });
         }
@@ -155,6 +191,11 @@ export class WorksheetDefinitionComponent implements OnInit {
     this.selectedWorkSheetConfiguration = values?.worksheet?.value;
     this.worksheetDefnPayload = {
       code: values?.code?.value,
+      header_fields: JSON.stringify(
+        Object.keys(values).map((key) => {
+          return values[key];
+        })
+      ),
       worksheet: {
         uuid: this.currentWorksheet?.uuid,
       },
@@ -176,9 +217,19 @@ export class WorksheetDefinitionComponent implements OnInit {
 
   setCurrentWorksheetDefn(event: Event, worksheetDefn: any): void {
     // event.stopPropagation();
+    this.currentWorksheetDefinition = null;
+    this.isWorksheetRenderingReady = false;
+    this.createWorksheetSelectionField(worksheetDefn?.worksheet);
+    const wsDefnFields = worksheetDefn?.header_fields
+      ? JSON.parse(worksheetDefn?.header_fields)
+      : null;
+    this.createWorksheetDefinitionFields(
+      wsDefnFields ? keyBy(wsDefnFields, "id") : null
+    );
     const matchedWorksheet = (this.worksheets?.filter(
       (worksheet) => worksheet?.uuid === worksheetDefn?.worksheet?.uuid
     ) || [])[0];
+    // console.log(worksheetDefn);
     this.currentWorksheetDefinition = {
       ...worksheetDefn,
       worksheet: {
