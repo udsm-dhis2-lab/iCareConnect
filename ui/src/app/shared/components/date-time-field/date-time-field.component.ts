@@ -14,20 +14,23 @@ export class DateTimeFieldComponent implements OnInit {
   timeValid: boolean = true;
   selectedTime: string;
   selectedDate: any;
-  formValues: any;
+  formValues: FormValue;
+  disabled: string;
 
   constructor() {}
 
   ngOnInit(): void {
-    const hours =
-      new Date(this.dateTimeField?.value).getHours().toString().length > 1
-        ? new Date(this.dateTimeField?.value).getHours()
-        : `0${new Date(this.dateTimeField?.value).getHours()}`;
-    const minutes =
-      new Date(this.dateTimeField?.value).getMinutes().toString().length > 1
-        ? new Date(this.dateTimeField?.value).getMinutes()
-        : `0${new Date(this.dateTimeField?.value).getMinutes()}`;
-    this.selectedTime = `${hours}:${minutes}`
+    if (this.dateTimeField?.value){
+      const hours =
+        new Date(this.dateTimeField?.value).getHours().toString().length > 1
+          ? new Date(this.dateTimeField?.value).getHours()
+          : `0${new Date(this.dateTimeField?.value).getHours()}`;
+      const minutes =
+        new Date(this.dateTimeField?.value).getMinutes().toString().length > 1
+          ? new Date(this.dateTimeField?.value).getMinutes()
+          : `0${new Date(this.dateTimeField?.value).getMinutes()}`;
+      this.selectedTime = `${hours}:${minutes}`
+    }
   }
 
   onFormUpdate(formValues: FormValue) {
@@ -39,16 +42,12 @@ export class DateTimeFieldComponent implements OnInit {
       : this.selectedDate;
     if(this.selectedTime && this.selectedDate?.value){
       const today = new Date();
-      this.selectedDate.value = this.transformDate(
+      this.formValues.setValue(this.dateTimeField?.id, this.transformDate(
         moment(this.selectedDate?.value).toDate(),
-        this.selectedTime
-      );
-      this.formValues.getValues()[this.dateTimeField?.id] = this.selectedDate;
-      if (today >= this.selectedDate.value) {
-        console.log(
-          "==> Selected Dates: ",
-          this.formValues.getValues()[this.dateTimeField?.id]
-        );
+        this.selectedTime,
+        true
+      ));
+      if (today >= new Date(this.selectedDate.value)) {
         this.timeValid = true;
         this.formUpdate.emit(this.formValues);
       } else {
@@ -65,12 +64,15 @@ export class DateTimeFieldComponent implements OnInit {
         moment(this.selectedDate?.value).toDate(),
         this.selectedTime
       );
-      this.formValues.getValues()[this.dateTimeField?.id] = this.selectedDate;
+      this.formValues.setValue(
+        this.dateTimeField?.id,
+        this.transformDate(
+          moment(this.selectedDate?.value).toDate(),
+          this.selectedTime,
+          true
+        )
+      );
       if (today >= this.selectedDate.value) {
-        console.log(
-          "==> Selected Dates: ",
-          this.formValues.getValues()[this.dateTimeField?.id]
-        );
         this.timeValid = true;
         this.formUpdate.emit(this.formValues);
       } else {
@@ -79,12 +81,20 @@ export class DateTimeFieldComponent implements OnInit {
     }
   }
 
-  transformDate(date: Date, time: string){
+  transformDate(date: Date, time: string, returnString?: boolean){
     const year = date?.getFullYear();
-    const month = date?.getMonth();
+    const month = returnString
+      ? date?.getMonth().toString().length > 1
+        ? date?.getMonth()
+        : `0${date?.getMonth()+1}`
+      : date?.getMonth();
     const day = date?.getDate();
     const hours = Number(time.split(':')[0]);
     const minutes = Number(time.split(':')[1]);
-    return new Date(year, month, day, hours, minutes);
+    if(returnString){
+      return `${year}-${month}-${day} ${time}`
+    } else {
+      return new Date(year, Number(month), day, hours, minutes);
+    }
   }
 }

@@ -1,8 +1,8 @@
-<div class="d-flex field">
+<div class="d-flex field w-100">
     <div class="date">
         <app-form
-        [fields]="[dateTimeField]"
-        (formUpdate)="onFormUpdate($event)"
+            [fields]="[dateTimeField]"
+            (formUpdate)="onFormUpdate($event)"
         ></app-form>
     </div>
     <div class="time">
@@ -10,6 +10,7 @@
             (change)="getSelectedTime($event)"
             [ngClass]="{ 'invalid-time-input': !timeValid }"
             class="time-input-field"
+            [disabled]="dateTimeField.disabled"
             type="time"
             value="{{ selectedTime }}"
         />

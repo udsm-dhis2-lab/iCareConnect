@@ -1,16 +1,20 @@
-.field {
-  width: 100%;
-}
 .invalid-text {
   color: red;
 }
 
-.field .time {
-  margin-right: -10px;
+.field {
+  width: 100%;
+}
+
+.field .date {
   width: 80%;
 }
+
+.field .time {
+  width: 20%;
+}
+
 .invalid-time-input {
-  width: 8%;
   border-color: red;
   color: red;
 }
