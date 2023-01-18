@@ -14,10 +14,15 @@ export class RenderStandardReportComponent implements OnInit {
   constructor(private datasetReportService: DatasetReportsService) {}
 
   ngOnInit(): void {
-    this.evaluatedDataSetsReport$ =
-      this.datasetReportService.getEvaluatedDatasetReport(
-        this.report?.queries?.map((query) => query?.uuid),
-        this.parameters
-      );
+    if (
+      !this.report?.renderAs ||
+      (this.report?.renderAs && this.report?.renderAs != "iframe")
+    ) {
+      this.evaluatedDataSetsReport$ =
+        this.datasetReportService.getEvaluatedDatasetReport(
+          this.report?.queries?.map((query) => query?.uuid),
+          this.parameters
+        );
+    }
   }
 }
