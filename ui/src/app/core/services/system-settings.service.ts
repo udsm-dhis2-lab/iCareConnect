@@ -5,6 +5,7 @@ import { OpenmrsHttpClientService } from "src/app/shared/modules/openmrs-http-cl
 import { SystemSettingsWithKeyDetails } from "../models/system-settings.model";
 import { capitalize } from "lodash";
 import { Api } from "src/app/shared/resources/openmrs";
+import { sanitizeSystemSettingsValue } from "../helpers";
 
 @Injectable({
   providedIn: "root",
