@@ -96,6 +96,7 @@ public interface LaboratoryService extends OpenmrsService {
 	SampleLable updateSampleLable(SampleLable sampleLable, Integer previousLable);
 	
 	String generateSampleLabel();
+	
 	List<String> generateLaboratoryIdLabels(String globalPropertyUuid, String metadataType, Integer count);
 	
 	List<Visit> getSamplePendingVisits(Integer limit, Integer startIndex);
