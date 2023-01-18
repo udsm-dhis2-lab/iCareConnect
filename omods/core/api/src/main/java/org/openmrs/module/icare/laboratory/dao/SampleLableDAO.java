@@ -56,7 +56,7 @@ public class SampleLableDAO extends BaseDAO<SampleLable> {
 		}
 		return idFormat;
 	}
-
+	
 	public List<String> generateLaboratoryIdLabels(String globalPropertyUuid, String metadataType, Integer count) {
 		AdministrationService adminService = Context.getService(AdministrationService.class);
 		String idFormat = adminService.getGlobalPropertyByUuid(globalPropertyUuid).getValue().toString();
@@ -80,6 +80,8 @@ public class SampleLableDAO extends BaseDAO<SampleLable> {
 				queryStr = "SELECT COUNT(sp) FROM Sample sp \n" + "WHERE YEAR(sp.dateTime) = :year";
 			} else if (metadataType == "worksheetdefinition") {
 				queryStr = "SELECT COUNT(wd) FROM WorksheetDefinition wd \n" + "WHERE YEAR(wd.dateCreated) = :year";
+			} else if (metadataType == "worksheet"){
+				queryStr = "SELECT COUNT(ws) FROM Worksheet wd \n" + "WHERE YEAR(ws.dateCreated) = :year";
 			} else if (metadataType == "batchset"){
 				queryStr = "SELECT COUNT(bs) FROM BatchSet bs \n" + "WHERE YEAR(bs.dateCreated) = :year";
 			} else if (metadataType == "batch"){

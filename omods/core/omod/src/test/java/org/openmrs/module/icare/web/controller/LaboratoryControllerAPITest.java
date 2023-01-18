@@ -56,12 +56,12 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		String label = handle.getContentAsString();
 		System.out.println(label);
 	}
-
+	
 	@Test
 	public void testGenerateLaboratoryIdLabels() throws Exception {
-		MockHttpServletRequest newGetRequest = newGetRequest("lab/labidgen",new Parameter("globalProperty",
-				"iCARE110-TEST-OSDH-9beb-d30dcfc0c631"),new Parameter("metadataType",
-				"sample"), new Parameter("count", "3"));
+		MockHttpServletRequest newGetRequest = newGetRequest("lab/labidgen", new Parameter("globalProperty",
+		        "iCARE110-TEST-OSDH-9beb-d30dcfc0c631"), new Parameter("metadataType", "sample"),
+		    new Parameter("count", "3"));
 		MockHttpServletResponse getReqHandle = handle(newGetRequest);
 		List<String> labels = (new ObjectMapper()).readValue(getReqHandle.getContentAsString(), List.class);
 		System.out.println(labels);
