@@ -7,6 +7,7 @@ import {
 } from "@angular/forms";
 import { MatLegacySnackBar as MatSnackBar } from "@angular/material/legacy-snack-bar";
 import { MatLegacyTable as MatTable, MatLegacyTableDataSource as MatTableDataSource } from "@angular/material/legacy-table";
+import { Observable } from "rxjs";
 import { Router } from "@angular/router";
 import * as moment from "moment";
 import { LocationService } from "src/app/core/services";
@@ -15,6 +16,8 @@ import {
   LocationGet,
   LocationGetFull,
   RoleCreate,
+  RoleCreateFull,
+  RoleGetFull,
   UserGet,
   UserGetFull,
 } from "src/app/shared/resources/openmrs";
@@ -45,7 +48,10 @@ export class AddUserComponent implements OnInit {
   loading: boolean = true;
   userForm: UntypedFormGroup;
   hide: boolean = true;
+  container: number = 1;
+  containerSize: number = 100;
   roles: RoleCreate[];
+  roles$: Observable<RoleGetFull[]>
   selectedRoles: any[] = [];
   displayedColumns: string[] = ["display"];
   selectedUserId: any;
@@ -143,14 +149,7 @@ export class AddUserComponent implements OnInit {
             this.userForm = this.generateForm(this.user);
             this.passwordIsRequired = false;
 
-            this.service.getRoles().subscribe((roles) => {
-              this.roles = roles.results;
-              this.rolesDataSource = new MatTableDataSource(this.roles);
-              this.selectedRolesDatasource = new MatTableDataSource(
-                this.selectedRoles
-              );
-              this.loading = false;
-            });
+            this.getRolesList();
             this.locationService
               .getLocationsByTagNames(["Treatment+Room", "Module+Location"], {
                 limit: 100,
@@ -190,14 +189,8 @@ export class AddUserComponent implements OnInit {
     } else {
       this.userForm = this.generateForm(this.user);
 
-      this.service.getRoles().subscribe((roles) => {
-        this.roles = roles.results;
-        this.rolesDataSource = new MatTableDataSource(this.roles);
-        this.selectedRolesDatasource = new MatTableDataSource(
-          this.selectedRoles
-        );
-        this.loading = false;
-      });
+      // changed this to accomodate having more data
+      this.getRolesList();
       this.locationService
         .getLocationsByTagNames(
           ["Treatment+Room", "Admission+Location", "Module+Location"],
@@ -491,6 +484,28 @@ export class AddUserComponent implements OnInit {
     return clicked
       ? { background: "#2a8fd1", color: "white !important" }
       : { background: "", color: "black" };
+  }
+
+  // Get more roles from database
+  getRolesList(): void {
+    this.service.getRoles({
+      limit: this.containerSize,
+      startIndex: (this.container - 1) * this.containerSize,
+    }).subscribe((roles) => {
+      this.roles = roles.results;
+      console.log(typeof this.roles.length, typeof this.containerSize);
+      this.rolesDataSource = new MatTableDataSource(this.roles);
+      this.selectedRolesDatasource = new MatTableDataSource(
+        this.selectedRoles
+      );
+      this.loading = false;
+    });
+  }
+
+  getRoles(event: Event, actionType: string): void {
+    event.stopPropagation();
+    this.container = actionType === "next" ? this.container + 1 : this.container - 1;
+    this.getRolesList();
   }
 
   assignAll() {

@@ -132,7 +132,10 @@
                   selectedReportParameters?.name?.length > 0 &&
                   !reportConfigs?.dhisConfigs)
                   ? selectedReportParameters?.length !== count
-                  : false)
+                  : false) &&
+                  (currentReport &&
+                  currentReport?.parameters &&
+                  reportSelectionParams)
               "
               class="ml-2"
               mat-flat-button
@@ -148,7 +151,8 @@
             >
               Get Report
             </button>
-
+            {{ currentReport?.parameters.type | json }}
+            <!-- {{ selectedReportParameters | json }} -->
             <span *ngIf="reportConfigs && reportConfigs?.dhisConfigs">
               <!-- {{ reportConfigs?.countOfReportsSent | json }} -->
               <button
