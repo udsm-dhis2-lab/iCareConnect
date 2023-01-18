@@ -405,7 +405,6 @@ export class SampleInBatchRegistrationComponent implements OnInit {
   onFormUpdate(formValues: FormValue, itemKey?: string): void {
     //Validate Date fields
     this.formData = { ...this.formData, ...formValues.getValues() };
-    console.log("==> Form Data: ", this.formData);
     if (
       formValues.getValues()?.collectedOn?.value.toString()?.length > 0 ||
       this.fixedFields.filter((field) => {
