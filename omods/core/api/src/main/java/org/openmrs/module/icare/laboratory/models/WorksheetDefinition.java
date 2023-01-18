@@ -21,6 +21,7 @@ public class WorksheetDefinition extends BaseOpenmrsData implements java.io.Seri
 	
 	@Column(name = "code", length = 30)
 	private String code;
+	
 	@Column(name = "expiration_date_time", nullable = true)
 	private Date expirationDateTime;
 	
@@ -48,15 +49,15 @@ public class WorksheetDefinition extends BaseOpenmrsData implements java.io.Seri
 	public void setCode(String code) {
 		this.code = code;
 	}
-
+	
 	public Date getExpirationDateTime() {
 		return expirationDateTime;
 	}
-
+	
 	public void setExpirationDateTime(Date expirationDateTime) {
 		this.expirationDateTime = expirationDateTime;
 	}
-
+	
 	public Worksheet getWorksheet() {
 		return worksheet;
 	}
