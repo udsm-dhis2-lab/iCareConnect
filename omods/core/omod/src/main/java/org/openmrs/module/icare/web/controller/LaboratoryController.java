@@ -628,7 +628,17 @@ public class LaboratoryController {
 		label.put("label", sampleLabel);
 		return label;
 	}
-	
+
+	@RequestMapping(value = "labidgen", method = RequestMethod.GET)
+	@ResponseBody
+	public List<String> generateLaboratoryIdLabels(@RequestParam(value = "globalProperty", required = true) String globalProperty,
+												   @RequestParam(value = "metadataType", required = true) String metadataType,
+												   @RequestParam(value = "count", required = false) Integer count) {
+		List<String> labLabels = laboratoryService.generateLaboratoryIdLabels(globalProperty,metadataType, count);
+		return labLabels;
+	}
+
+
 	@RequestMapping(value = "samplelable", method = RequestMethod.GET)
 	@ResponseBody
 	public Map<String, Object> geenerateSampleLable() {
