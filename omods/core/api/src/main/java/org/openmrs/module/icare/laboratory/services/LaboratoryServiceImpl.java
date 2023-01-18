@@ -748,6 +748,11 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	public String generateSampleLabel() {
 		return this.sampleLableDAO.generateSampleLabel();
 	}
+
+	@Override
+	public List<String> generateLaboratoryIdLabels(String globalPropertyUuid, String metadataType, Integer count) {
+		return this.sampleLableDAO.generateLaboratoryIdLabels(globalPropertyUuid, metadataType, count);
+	}
 	
 	@Override
 	public SampleLable addSampleLable(SampleLable sampleLable) {

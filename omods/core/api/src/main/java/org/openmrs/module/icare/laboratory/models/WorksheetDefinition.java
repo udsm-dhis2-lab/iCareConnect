@@ -99,6 +99,7 @@ public class WorksheetDefinition extends BaseOpenmrsData implements java.io.Seri
 		Map<String,Object> worksheetDefinitionObject = new HashMap<>();
 		worksheetDefinitionObject.put("code",this.getCode());
 		worksheetDefinitionObject.put("uuid",this.getUuid());
+		worksheetDefinitionObject.put("dateCreated",this.getDateCreated());
 		worksheetDefinitionObject.put("expirationDateTime", this.getExpirationDateTime());
 		if(this.getAdditionalFields() != null){
 			worksheetDefinitionObject.put("additionalFields",this.getAdditionalFields());
