@@ -10,8 +10,6 @@ import {
 } from "src/app/store/selectors";
 import { ReportGroup } from "../../models/report-group.model";
 import { Report } from "../../models/report.model";
-import { ReportParamsService } from "../../services/report-params.service";
-import { ReportService } from "../../services/report.service";
 import * as _ from "lodash";
 import {
   clearSendingDataStatus,
@@ -28,6 +26,8 @@ import { take } from "rxjs/operators";
 import { MatDialog } from "@angular/material/dialog";
 import { ExportDataService } from "src/app/core/services/export-data.service";
 import { Dhis2ReportsSentSummaryComponent } from "../../components/dhis2-reports-sent-summary/dhis2-reports-sent-summary.component";
+import { ReportParamsService } from "src/app/core/services/report-params.service";
+import { ReportService } from "src/app/core/services/report.service";
 
 @Component({
   selector: "app-reports-generator",
@@ -88,9 +88,9 @@ export class ReportsGeneratorComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    console.log(this.reportCategories);
-    console.log(this.reportGroups);
-    console.log(this.reportsCategoriesConfigurations);
+    // console.log(this.reportCategories);
+    // console.log(this.reportGroups);
+    // console.log(this.reportsCategoriesConfigurations);
     this.reportCategories = this.reportsCategoriesConfigurations
       .map((category) => {
         const reportCategoryAccesses =

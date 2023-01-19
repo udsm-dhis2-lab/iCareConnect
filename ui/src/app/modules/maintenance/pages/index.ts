@@ -8,6 +8,7 @@ import { SystemSettingsComponent } from "./system-settings/system-settings.compo
 import { PrivilegesAndRolesComponent } from "./privileges-and-roles/privileges-and-roles.component";
 import { DrugManagementComponent } from "./drug-management/drug-management.component";
 import { ReportsManagementComponent } from "./reports-management/reports-management.component";
+import { ReportsSettingsComponent } from "./reports-settings/reports-settings.component";
 
 export const maintenancePages: any[] = [
   MaintenanceHomeComponent,
@@ -20,6 +21,7 @@ export const maintenancePages: any[] = [
   PrivilegesAndRolesComponent,
   DrugManagementComponent,
   ReportsManagementComponent,
+  ReportsSettingsComponent,
 ];
 
 export {

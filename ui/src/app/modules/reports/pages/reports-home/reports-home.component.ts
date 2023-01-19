@@ -1,6 +1,8 @@
 import { Component, OnInit } from "@angular/core";
 import { Store } from "@ngrx/store";
 import { Observable } from "rxjs";
+import { ReportParamsService } from "src/app/core/services/report-params.service";
+import { ReportService } from "src/app/core/services/report.service";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { loadRolesDetails } from "src/app/store/actions";
 import { AppState } from "src/app/store/reducers";
@@ -9,8 +11,6 @@ import {
   getRolesLoadedState,
   getRolesLoadingState,
 } from "src/app/store/selectors/current-user.selectors";
-import { ReportParamsService } from "../../services/report-params.service";
-import { ReportService } from "../../services/report.service";
 
 @Component({
   selector: "app-reports-home",
