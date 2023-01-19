@@ -6,17 +6,35 @@
                 <div class="card pt-4 ">
                     <ul>
                         <li *ngFor="let field of formsObservations?.fields">
-                            <p>
-                                <strong>
-                                    {{ field?.label }}
-                                </strong>
-                            </p>
-
-                            <p *ngFor="let observation of formsObservations?.obs[field?.key]">
-                                {{
-                                    observation?.value?.uuid ? observation?.value?.display : observation?.valueNumeric ? observation?.valueNumeric : observation?.value
-                                }}
-                            </p>
+                            
+                            <ng-container *ngIf="field?.formFields?.length">
+                                <ng-container *ngFor="let formField of field?.formFields">
+                                    <div *ngIf="formsObservations?.obs[formField?.key]">
+                                        <p>
+                                            <strong>
+                                                {{ formField?.label }}
+                                            </strong>
+                                        </p>
+                                        <p *ngFor="let observation of formsObservations?.obs[formField?.key]">
+                                            {{
+                                                observation?.value?.uuid ? observation?.value?.display : observation?.valueNumeric ? observation?.valueNumeric : observation?.value
+                                            }}
+                                        </p>
+                                    </div>
+                                </ng-container>
+                            </ng-container>
+                            <ng-container *ngIf="!field?.formFields && formsObservations?.obs[field?.formField?.key]">
+                                <p>
+                                    <strong>
+                                        {{ field?.formField?.label }}
+                                    </strong>
+                                </p>
+                                <p *ngFor="let observation of formsObservations?.obs[field?.formField?.key]">
+                                    {{
+                                        observation?.value?.uuid ? observation?.value?.display : observation?.valueNumeric ? observation?.valueNumeric : observation?.value
+                                    }}
+                                </p>
+                            </ng-container>
                         </li>
                     </ul>
                 </div>

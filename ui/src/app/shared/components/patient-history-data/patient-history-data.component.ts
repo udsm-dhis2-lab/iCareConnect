@@ -22,6 +22,7 @@ export class PatientHistoryDataComponent implements OnInit {
   medications: any[];
   drugsPrescribed: any;
   encountersByProvider: any;
+  diagnoses: any;
 
   constructor() {}
 
@@ -61,33 +62,35 @@ export class PatientHistoryDataComponent implements OnInit {
               }),
               []
             ),
-            fields: flatten(
-              form?.formFields
-                ?.map((formField) => {
-                  return formField?.formFields
-                    ? formField?.formFields
-                    : formField?.formField;
-                })
-                .filter((field) => field)
-            )
-              .filter((field) => {
-                if (
-                  field?.key in
-                  observations?.reduce(
-                    (obs, ob) => ({
-                      ...obs,
-                      [`${ob?.concept?.uuid}`]:
-                        `${ob?.concept?.uuid}` in obs
-                          ? obs[`${ob?.concept?.uuid}`].concat(ob)
-                          : [ob],
-                    }),
-                    []
-                  )
-                ) {
-                  return field;
-                }
-              })
-              .filter((field) => field),
+            fields: form?.formFields,
+            obsDatetime: observations[0]?.obsDatetime
+            // fields: flatten(
+            //   form?.formFields
+            //     ?.map((formField) => {
+            //       return formField?.formFields
+            //         ? formField?.formFields
+            //         : formField?.formField;
+            //     })
+            //     .filter((field) => field)
+            // )
+            //   .filter((field) => {
+            //     if (
+            //       field?.key in
+            //       observations?.reduce(
+            //         (obs, ob) => ({
+            //           ...obs,
+            //           [`${ob?.concept?.uuid}`]:
+            //             `${ob?.concept?.uuid}` in obs
+            //               ? obs[`${ob?.concept?.uuid}`].concat(ob)
+            //               : [ob],
+            //         }),
+            //         []
+            //       )
+            //     ) {
+            //       return field;
+            //     }
+            //   })
+            //   .filter((field) => field),
           },
         ];
       }
@@ -127,9 +130,23 @@ export class PatientHistoryDataComponent implements OnInit {
       this.visit?.visit,
       this.generalPrescriptionOrderType
     );
+
+    this.diagnoses = visit.diagnoses
     
     // RESERVE: For IPD Rounds
-    // this.encountersByProvider = getEncountersByProviderInAVisit(this.visit?.visit)
+    this.encountersByProvider = getEncountersByProviderInAVisit(
+      {
+        ...this.visit?.visit,
+        observations: this.obsBasedOnForms,
+        labOrders: this.labOrders,
+        radiologyOrders: this.radiologyOrders,
+        procedureOrders: this.procedureOrders,
+        drugs: this.drugsPrescribed,
+      },
+      this.specificDrugConceptUuid,
+      this.prescriptionArrangementFields
+    );
+    console.log("==> Encounters by Provider: ", this.encountersByProvider);
   }
 
   getStringDate(date: Date) {

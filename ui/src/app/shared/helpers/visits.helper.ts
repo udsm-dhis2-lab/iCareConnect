@@ -181,23 +181,29 @@ export function getGenericDrugPrescriptionsFromVisit(visit, genericPrescriptionO
       ?.filter((order) => order)
   );
 }
-export function getEncountersByProviderInAVisit(visit) {
+export function getEncountersByProviderInAVisit(
+  visit: any,
+  specificDrugConceptUuid?: string,
+  prescriptionArrangementFields?: any
+) {
   let encountersByProvider = {};
+
+  // Restructure object to collect all related encounters in a single day
   encountersByProvider = {
     ...encountersByProvider,
     encounters: visit?.encounters?.reduce(
       (encounters, encounter) => ({
         ...encounters,
-        [`${encounter.encounterProviders[0].uuid}-${getStringDate(
-          new Date(encounter.encounterDatetime)
-        )}`]:
-          `${encounter.encounterProviders[0].uuid}-${getStringDate(
-            new Date(encounter.encounterDatetime)
-          )}` in encounters
+        [`${encounter.encounterProviders[0].uuid}|${
+          getStringDate(new Date(encounter.encounterDatetime)).date
+        }`]:
+          `${encounter.encounterProviders[0].uuid}|${
+            getStringDate(new Date(encounter.encounterDatetime)).date
+          }` in encounters
             ? encounters[
-                `${encounter.encounterProviders[0].uuid}-${getStringDate(
-                  new Date(encounter.encounterDatetime)
-                )}`
+                `${encounter.encounterProviders[0].uuid}|${
+                  getStringDate(new Date(encounter.encounterDatetime)).date
+                }`
               ].concat(encounter)
             : [encounter],
       }),
@@ -205,13 +211,160 @@ export function getEncountersByProviderInAVisit(visit) {
     ),
   };
 
-  return encountersByProvider;
+  // Find Observations and orders in a particular visit
+  let visitData = {
+    observations: visit?.observations.map((observation) => {
+      return {
+        form: observation.form,
+        observations: _.flatten(
+          observation?.fields
+            ?.map((field) => {
+              if (field?.formFields) {
+                return field.formFields
+                  .map((formField) => {
+                    if (formField?.key in observation?.obs) {
+                      return {
+                        ...observation?.obs[formField?.key][0],
+                        date: getStringDate(
+                          new Date(
+                            observation?.obs[formField?.key][0]?.obsDatetime
+                          )
+                        ).date,
+                        time: getStringDate(
+                          new Date(
+                            observation?.obs[formField?.key][0]?.obsDatetime
+                          )
+                        ).time,
+                      };
+                    }
+                  })
+                  .filter((observation) => observation);
+              } else {
+                if (
+                  field?.formField?.key in observation?.obs
+                ) {
+                  return _.flatten(observation?.obs[field?.formField?.key]?.map((ob) => {
+                    return {
+                      ...ob,
+                      date: getStringDate(
+                        new Date(
+                          ob?.obsDatetime
+                        )
+                      ).date,
+                      time: getStringDate(
+                        new Date(
+                          ob?.obsDatetime
+                        )
+                      ).time,
+                    };
+                  }));
+                }
+              }
+            })
+            .filter((observation) => observation)
+        ),
+        obsDatetime: observation?.obsDatetime,
+        date: getStringDate(new Date(observation?.obsDatetime)).date,
+        time: getStringDate(new Date(observation?.obsDatetime)).time
+      };
+    }),
+    drugs: visit?.drugs?.map((drugOrder) => {
+      return {
+        name: drugOrder.obs[specificDrugConceptUuid]
+          ? drugOrder.obs[specificDrugConceptUuid]?.comment
+          : drugOrder?.display,
+        description: `${
+          drugOrder.obs[prescriptionArrangementFields["1"]?.uuid]?.value
+            ?.display
+            ? drugOrder.obs[prescriptionArrangementFields["1"]?.uuid]?.value
+                ?.display
+            : drugOrder.obs[prescriptionArrangementFields["1"]?.uuid]?.value
+        } (${
+          drugOrder.obs[prescriptionArrangementFields["2"]?.uuid]?.value
+            ?.display
+            ? drugOrder.obs[prescriptionArrangementFields["2"]?.uuid]?.value
+                ?.display
+            : drugOrder.obs[prescriptionArrangementFields["2"]?.uuid]?.value
+        }) ${
+          drugOrder.obs[prescriptionArrangementFields["3"]?.uuid]?.value
+            ?.display
+            ? drugOrder.obs[prescriptionArrangementFields["3"]?.uuid]?.value
+                ?.display
+            : drugOrder.obs[prescriptionArrangementFields["3"]?.uuid]?.value
+        } ${
+          drugOrder.obs[prescriptionArrangementFields["4"]?.uuid]?.value
+            ?.display
+            ? drugOrder.obs[prescriptionArrangementFields["4"]?.uuid]?.value
+                ?.display
+            : drugOrder.obs[prescriptionArrangementFields["4"]?.uuid]?.value
+        } ${
+          drugOrder.obs[prescriptionArrangementFields["5"]?.uuid]?.value
+            ?.display
+            ? drugOrder.obs[prescriptionArrangementFields["5"]?.uuid]?.value
+                ?.display
+            : drugOrder.obs[prescriptionArrangementFields["5"]?.uuid]?.value
+        } ${
+          drugOrder.obs[prescriptionArrangementFields["6"]?.uuid]?.value
+            ?.display
+            ? drugOrder.obs[prescriptionArrangementFields["6"]?.uuid]?.value
+                ?.display
+            : drugOrder.obs[prescriptionArrangementFields["6"]?.uuid]?.value
+        }`,
+        date: getStringDate(new Date(drugOrder.dateActivated)).date,
+        time: getStringDate(new Date(drugOrder.dateActivated)).time,
+      };
+    }),
+    labOrders: visit?.labOrders?.map((order) => {
+      return {
+        ...order,
+        date: getStringDate(new Date(order?.order?.dateActivated)).date,
+        time: getStringDate(new Date(order?.order?.dateActivated)).time,
+      };
+    }),
+    radiologyOrders: visit?.radiologyOrders?.map((order) => {
+      return {
+        ...order,
+        date: getStringDate(new Date(order?.order?.dateActivated)).date,
+        time: getStringDate(new Date(order?.order?.dateActivated)).time,
+      };
+    }),
+    procedureOrders: visit?.procedureOrders?.map((order) => {
+      return {
+        ...order?.order,
+        date: getStringDate(new Date(order?.order?.dateActivated)).date,
+        time: getStringDate(new Date(order?.order?.dateActivated)).time,
+      };
+    }),
+  };
+
+  let visitArray = _.flatten(Object.keys(visitData).map((key) => {
+    return visitData[key];
+  }))
+
+  return visitData;
 }
 
-function getStringDate(date: Date) {
-    return `${date.getDate()}/${
-      (date.getMonth() + 1).toString().length > 1
-        ? date.getMonth() + 1
-        : "0" + date.getMonth() + 1
-    }/${date.getFullYear()}`;
+function getStringDate(date: Date, separator?: string){
+    separator = separator || '-'
+    return {
+      date: `${date.getDate()}${separator}${
+        (date.getMonth() + 1).toString().length > 1
+          ? date.getMonth() + 1
+          : `0${date.getMonth() + 1}`
+      }${separator}${date.getFullYear()}`,
+      time: `${
+        (date.getHours() || 0) < 10
+          ? "0" + date.getHours()
+          : "" + date.getHours()
+      }:${
+        (date.getMinutes() || 0) < 10
+          ? "0" + date.getMinutes()
+          : "" + date.getMinutes()
+      }:${
+        (date.getMilliseconds() || 0) < 10
+          ? "0" + date.getMilliseconds()
+          : "" + date.getMilliseconds()
+      }`,
+    };
   }
+
