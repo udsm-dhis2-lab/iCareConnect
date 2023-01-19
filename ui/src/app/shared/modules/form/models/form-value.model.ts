@@ -33,6 +33,8 @@ export class FormValue {
           value: field?.value ? field?.value : formValues[key],
           options: field.options,
           isFile: this.fileValues ? true : false,
+          label: field?.label,
+          name: field?.name,
         };
       }
     });

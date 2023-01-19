@@ -1,6 +1,7 @@
 package org.openmrs.module.icare.laboratory.services;
 
 import org.apache.commons.collections.IteratorUtils;
+import org.azeckoski.reflectutils.transcoders.ObjectEncoder;
 import org.openmrs.*;
 //import org.openmrs.api.ObsService;
 import org.openmrs.api.AdministrationService;
@@ -749,6 +750,11 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	}
 	
 	@Override
+	public List<String> generateLaboratoryIdLabels(String globalPropertyUuid, String metadataType, Integer count) {
+		return this.sampleLableDAO.generateLaboratoryIdLabels(globalPropertyUuid, metadataType, count);
+	}
+	
+	@Override
 	public SampleLable addSampleLable(SampleLable sampleLable) {
 		return this.sampleLableDAO.save(sampleLable);
 	}
@@ -799,7 +805,6 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	}
 	
 	public WorkloadSummary getWorkLoadSummary(Date startDate, Date endDate) {
-		
 		return sampleDAO.getWorkloadSummary(startDate, endDate);
 	}
 	
@@ -909,8 +914,23 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	}
 	
 	@Override
-	public WorksheetDefinition getWorksheetDefinitionByUuid(String worksheetDefinitionUuid) {
-		return worksheetDefinitionDAO.findByUuid(worksheetDefinitionUuid);
+	public Map<String, Object> getWorksheetDefinitionByUuid(String worksheetDefinitionUuid) {
+		WorksheetDefinition worksheetDefinition = worksheetDefinitionDAO.findByUuid(worksheetDefinitionUuid);
+		List<WorksheetSample> worksheetSamples = worksheetSampleDAO.getWorksheetSamplesByWorksheetDefinition(worksheetDefinition.getUuid().toString());
+
+		Map<String, Object> worksheetDefinitionModified = new HashMap<>();
+		worksheetDefinitionModified.put("uuid", worksheetDefinition.getUuid());
+		worksheetDefinitionModified.put("code", worksheetDefinition.getCode());
+		worksheetDefinitionModified.put("display", worksheetDefinition.getCode());
+		worksheetDefinitionModified.put("additionFields", worksheetDefinition.getAdditionalFields());
+
+		List<Map<String, Object>> worksheetSamplesList = new ArrayList<>();
+		for (WorksheetSample wSample: worksheetSamples) {
+			worksheetSamplesList.add(wSample.toMap());
+		}
+		worksheetDefinitionModified.put("worksheetSamples", worksheetSamplesList);
+		worksheetDefinitionModified.put("worksheet", worksheetDefinition.getWorksheet().toMap());
+		return worksheetDefinitionModified;
 	}
 	
 	@Override
@@ -947,8 +967,8 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 			worksheetSample.setSample(sample);
 		}
 		
-		WorksheetDefinition worksheetDefinition = this.getWorksheetDefinitionByUuid(worksheetSample.getWorksheetDefinition()
-		        .getUuid());
+		WorksheetDefinition worksheetDefinition = (WorksheetDefinition) this.getWorksheetDefinitionByUuid(worksheetSample
+		        .getWorksheetDefinition().getUuid());
 		if (worksheetDefinition == null) {
 			throw new Exception("The worksheet definition with id " + worksheetSample.getWorksheetDefinition().getUuid()
 			        + " does not exist");

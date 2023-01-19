@@ -8,7 +8,10 @@ import { Component, Input, OnInit } from "@angular/core";
 export class StandardReportComponent implements OnInit {
   @Input() parameters: any;
   @Input() report: any;
+  @Input() actionType: string;
   constructor() {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.actionType = this.actionType ? this.actionType : "report";
+  }
 }
