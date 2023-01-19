@@ -2,10 +2,12 @@ import { AddUserComponent } from "../pages/user-management/add-user/add-user.com
 import { AddNewGenericDrugModalComponent } from "./add-new-generic-drug-modal/add-new-generic-drug-modal.component";
 import { DrugListModalComponent } from "./drug-list-modal/drug-list-modal.component";
 import { ManageDrugModalComponent } from "./manage-drug-modal/manage-drug-modal.component";
+import { ManageReportModalComponent } from "./manage-report-modal/manage-report-modal.component";
 
 export const maintenanceModals: any[] = [
   AddNewGenericDrugModalComponent,
   DrugListModalComponent,
   ManageDrugModalComponent,
+  ManageReportModalComponent,
 ];
 export { AddUserComponent };

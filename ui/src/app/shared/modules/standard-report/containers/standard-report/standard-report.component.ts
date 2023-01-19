@@ -9,6 +9,8 @@ export class StandardReportComponent implements OnInit {
   @Input() parameters: any;
   @Input() report: any;
   @Input() actionType: string;
+  @Input() additionalKey: string;
+  @Input() reportToEdit: any;
   constructor() {}
 
   ngOnInit(): void {

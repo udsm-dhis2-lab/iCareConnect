@@ -2,7 +2,8 @@
   *ngIf="{
     reports: reports$ | async,
     reportsAccessConfigurations: reportsAccessConfigurations$ | async,
-    userRoles: userRoles$ | async
+    userRoles: userRoles$ | async,
+    standardReports: standardReports$ | async
   } as params"
 >
   <mat-progress-bar
@@ -10,7 +11,8 @@
     *ngIf="
       !params?.reports ||
       !params?.reportsAccessConfigurations ||
-      !params?.userRoles
+      !params?.userRoles ||
+      !params?.standardReports
     "
   ></mat-progress-bar>
   <div
@@ -18,13 +20,16 @@
     *ngIf="
       params?.reports &&
       params?.reportsAccessConfigurations &&
-      params?.userRoles
+      params?.userRoles &&
+      params?.standardReports
     "
   >
     <app-reports-groups-list
       [accessConfigs]="params?.reportsAccessConfigurations"
       [userRoles]="params?.userRoles"
       [reports]="params?.reports"
+      [standardReports]="params?.standardReports"
+      (reloadList)="onReloadList($event)"
     ></app-reports-groups-list>
   </div>
 </div>

@@ -4,9 +4,9 @@
       <tr>
         <th style="width: 25px">SN</th>
         <th>Report Group</th>
-        <th>Who can access?</th>
+        <th>Who can access? (Privilege)</th>
         <th>Report</th>
-        <th>Who can access?</th>
+        <th>Who can access? (Privilege)</th>
         <th>Category</th>
         <th></th>
       </tr>
@@ -33,16 +33,34 @@
               *ngIf="repCount === 0"
               [attr.rowspan]="reportGroup?.reports?.length"
             >
-              {{ reportGroup?.group?.privilege?.name }}
+              {{
+                reportGroup?.group?.privilege?.name
+                  ? reportGroup?.group?.privilege?.name
+                  : "-"
+              }}
             </td>
             <td>
               {{ report?.name }}
             </td>
+            <td>
+              {{ report?.privilege?.name ? report?.privilege?.name : "-" }}
+            </td>
             <td>{{ report?.category?.name }}</td>
             <td>
-              {{ report?.privilege?.name }}
+              <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="">
+                <mat-icon>more_vert</mat-icon>
+              </button>
+              <mat-menu #menu="matMenu">
+                <button (click)="onEdit(report)" mat-menu-item>
+                  <mat-icon>edit</mat-icon>
+                  <span>Edit</span>
+                </button>
+                <button (click)="onDelete(report)" mat-menu-item disabled>
+                  <mat-icon>delete</mat-icon>
+                  <span>Delete</span>
+                </button>
+              </mat-menu>
             </td>
-            <td></td>
           </tr>
         </ng-container>
       </ng-container>
