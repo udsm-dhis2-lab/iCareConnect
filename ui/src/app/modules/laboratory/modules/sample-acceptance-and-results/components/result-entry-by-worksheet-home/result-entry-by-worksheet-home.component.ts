@@ -9,6 +9,8 @@ import { WorkSeetsService } from "src/app/modules/laboratory/resources/services/
 })
 export class ResultEntryByWorksheetHomeComponent implements OnInit {
   worksheetDefinitions$: Observable<any[]>;
+  currentWorksheetDefinition$: Observable<any>;
+  currentWorksheetDefinitionUuid: string;
   constructor(private worksheetsService: WorkSeetsService) {}
 
   ngOnInit(): void {
@@ -17,6 +19,14 @@ export class ResultEntryByWorksheetHomeComponent implements OnInit {
   }
 
   onGetSelectedWorksheetDefinition(selectedWorksheetDefinition: any): void {
-    console.log(selectedWorksheetDefinition);
+    this.currentWorksheetDefinitionUuid = selectedWorksheetDefinition?.uuid;
+    if (selectedWorksheetDefinition) {
+      this.getWorksheetDefinitionByUuid(selectedWorksheetDefinition?.uuid);
+    }
+  }
+
+  getWorksheetDefinitionByUuid(uuid: string): void {
+    this.currentWorksheetDefinition$ =
+      this.worksheetsService.getWorksheetDefinitionsByUuid(uuid);
   }
 }

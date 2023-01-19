@@ -1,13 +1,25 @@
 <div
-  *ngIf="{
-    evaluatedDataSetsReport: evaluatedDataSetsReport$ | async
-  } as params"
+  *ngIf="
+    !report?.renderAs || (report?.renderAs && report?.renderAs != 'iframe')
+  "
 >
   <div
-    class="d-flex justify-content-center"
-    *ngIf="!params?.evaluatedDataSetsReport"
+    *ngIf="{
+      evaluatedDataSetsReport: evaluatedDataSetsReport$ | async
+    } as params"
   >
-    <mat-spinner color="primary"></mat-spinner>
+    <div
+      class="d-flex justify-content-center"
+      *ngIf="!params?.evaluatedDataSetsReport"
+    >
+      <mat-spinner color="primary"></mat-spinner>
+    </div>
+    <div [innerHTML]="report?.htmlCode"></div>
   </div>
-  <div [innerHTML]="report?.htmlCode"></div>
+</div>
+<div *ngIf="report?.renderAs && report?.renderAs === 'iframe'">
+  <app-iframe-based-standard-report
+    [reportHtml]="report?.htmlCode"
+    [parameters]="parameters"
+  ></app-iframe-based-standard-report>
 </div>

@@ -629,6 +629,16 @@ public class LaboratoryController {
 		return label;
 	}
 	
+	@RequestMapping(value = "labidgen", method = RequestMethod.GET)
+	@ResponseBody
+	public List<String> generateLaboratoryIdLabels(
+	        @RequestParam(value = "globalProperty", required = true) String globalProperty,
+	        @RequestParam(value = "metadataType", required = true) String metadataType,
+	        @RequestParam(value = "count", required = false) Integer count) {
+		List<String> labLabels = laboratoryService.generateLaboratoryIdLabels(globalProperty, metadataType, count);
+		return labLabels;
+	}
+	
 	@RequestMapping(value = "samplelable", method = RequestMethod.GET)
 	@ResponseBody
 	public Map<String, Object> geenerateSampleLable() {
@@ -942,6 +952,15 @@ public class LaboratoryController {
 		}
 		return newWorksheetControls;
 
+	}
+	
+	@RequestMapping(value = "worksheetdefinition", method = RequestMethod.GET)
+	@ResponseBody
+	public Map<String, Object> getWorksheetDefinitionByUuid(@RequestParam(value = "uuid", required = true) String uuid)
+	        throws ParseException {
+		
+		Map<String, Object> worksheetDefinition = laboratoryService.getWorksheetDefinitionByUuid(uuid);
+		return worksheetDefinition;
 	}
 	
 	@RequestMapping(value = "worksheetdefinitions",method = RequestMethod.GET)
