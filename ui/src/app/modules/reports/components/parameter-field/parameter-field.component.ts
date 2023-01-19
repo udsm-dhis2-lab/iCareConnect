@@ -1,5 +1,4 @@
 import { Component, OnInit, Input, Output, EventEmitter } from "@angular/core";
-import { getSanitizedParamValue } from "../../helpers/get-sanitized-param-value.helper";
 import { ReportParam } from "../../models/report-params.model";
 
 @Component({

@@ -1,0 +1,30 @@
+<div
+  *ngIf="{
+    reports: reports$ | async,
+    reportsAccessConfigurations: reportsAccessConfigurations$ | async,
+    userRoles: userRoles$ | async
+  } as params"
+>
+  <mat-progress-bar
+    mode="indeterminate"
+    *ngIf="
+      !params?.reports ||
+      !params?.reportsAccessConfigurations ||
+      !params?.userRoles
+    "
+  ></mat-progress-bar>
+  <div
+    class="w-100"
+    *ngIf="
+      params?.reports &&
+      params?.reportsAccessConfigurations &&
+      params?.userRoles
+    "
+  >
+    <app-reports-groups-list
+      [accessConfigs]="params?.reportsAccessConfigurations"
+      [userRoles]="params?.userRoles"
+      [reports]="params?.reports"
+    ></app-reports-groups-list>
+  </div>
+</div>

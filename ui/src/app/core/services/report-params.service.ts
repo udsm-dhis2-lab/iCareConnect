@@ -8,7 +8,7 @@ import {
 } from "src/app/shared/services/notification.service";
 import { getSanitizedReportGroup } from "../helpers/get-sanitized-report-group.helper";
 
-@Injectable()
+@Injectable({ providedIn: "root" })
 export class ReportParamsService {
   constructor(
     private httpClient: OpenmrsHttpClientService,
