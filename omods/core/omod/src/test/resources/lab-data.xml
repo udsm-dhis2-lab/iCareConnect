@@ -171,8 +171,10 @@
     <lb_worksheet_definition worksheet_definition_id ="1" uuid = "iCARE890-TEST-GGGH-9beb-d30dcfc0c635" code="WD"  worksheet_id="1" date_created="2022-12-10 15:51:57.0" voided="0" creator="1" />
 
     <!-- WorksheetSample -->
-    <lb_worksheet_sample worksheet_sample_id ="1" code="ABC" uuid = "iCARE890-TEST-OSDH-9beb-d30dcfc0c635" row="10" column="20" type="SAMPLE"  worksheet_definition_id="1" sample_id="201"  date_created="2022-12-10 15:51:57.0" voided="0" creator="1" />
+    <lb_worksheet_sample worksheet_sample_id ="1" code="ABC" uuid = "iCARE890-TEST-OSDH-9beb-d30dcfc0c635" rows="10" columns="20" type="SAMPLE"  worksheet_definition_id="1" sample_id="201"  date_created="2022-12-10 15:51:57.0" voided="0" creator="1" />
 
-    <lb_worksheet_sample worksheet_sample_id ="2" code="BCD" uuid = "iCARE890-TEST-OSDH-9beb-d30dcfc0c631" row="1" column="1" type="CONTROL"  worksheet_definition_id="1"  control_id="1" date_created="2022-12-10 15:51:57.0" voided="0" creator="1" />
+    <lb_worksheet_sample worksheet_sample_id ="2" code="BCD" uuid = "iCARE890-TEST-OSDH-9beb-d30dcfc0c631" rows="1" columns="1" type="CONTROL"  worksheet_definition_id="1"  control_id="1" date_created="2022-12-10 15:51:57.0" voided="0" creator="1" />
+
+    <global_property property="icare.laboratory.settings.sample.id.format" property_value="NPHL/D{YY}/COUNT:5" uuid="iCARE110-TEST-OSDH-9beb-d30dcfc0c631" description="For sample label format" datatype_config="" preferred_handler="" datatype="TEXT" date_changed="2022-12-10 15:51:57.0" changed_by="1" />
 
 </dataset>

@@ -1,5 +1,6 @@
 import { Component, Input, OnInit } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
+import { MatRadioChange } from "@angular/material/radio";
 import { Store } from "@ngrx/store";
 import { Observable } from "rxjs";
 import { map, take } from "rxjs/operators";
@@ -79,6 +80,8 @@ export class SampleAcceptanceComponent implements OnInit {
   @Input() page: number;
   @Input() pageCount: number;
   samplesLoadedState$: Observable<boolean>;
+
+  entryCategory: string = "INDIVIDUAL";
   constructor(
     private store: Store<AppState>,
     private dialog: MatDialog,
@@ -380,6 +383,10 @@ export class SampleAcceptanceComponent implements OnInit {
         codedSampleRejectionReasons: this.codedSampleRejectionReasons,
       })
     );
+  }
+
+  getEntryType(event: MatRadioChange): void {
+    this.entryCategory = event?.value;
   }
 
   onOpenNewTab(e): void {

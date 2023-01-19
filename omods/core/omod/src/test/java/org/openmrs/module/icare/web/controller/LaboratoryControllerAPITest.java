@@ -58,6 +58,17 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 	}
 	
 	@Test
+	public void testGenerateLaboratoryIdLabels() throws Exception {
+		MockHttpServletRequest newGetRequest = newGetRequest("lab/labidgen", new Parameter("globalProperty",
+		        "iCARE110-TEST-OSDH-9beb-d30dcfc0c631"), new Parameter("metadataType", "sample"),
+		    new Parameter("count", "3"));
+		MockHttpServletResponse getReqHandle = handle(newGetRequest);
+		List<String> labels = (new ObjectMapper()).readValue(getReqHandle.getContentAsString(), List.class);
+		System.out.println(labels);
+		assertThat("IDS generated equals to 3", labels.size(), is(3));
+	}
+	
+	@Test
 	public void testConversion() {
 		SimpleObject sample = new SimpleObject();
 		sample.add("visit", (new SimpleObject().add("uuid", "d9c1d8ac-2b8e-427f-804d-b858c52e6f11")));
@@ -760,7 +771,7 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		MockHttpServletResponse handle = handle(newPostRequest);
 		List<Map<String, Object>> createdWorksheetDefinitions = (new ObjectMapper()).readValue(handle.getContentAsString(),
 		    List.class);
-		
+		System.out.println(createdWorksheetDefinitions);
 		assertThat("created 2 worksheets definitions", createdWorksheetDefinitions.size(), is(2));
 		
 		//2. Getting worksheet definitions
@@ -773,7 +784,31 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		    List.class);
 		
 		assertThat("Has 1 worksheet definition", worksheetdefinitions.size(), is(1));
+	}
+	
+	@Test
+	public void TestGettingWorksheetDefinitionByUuid() throws Exception {
 		
+		//1. Creating worksheet definitions
+		//Given
+		String dto = this.readFile("dto/worksheet-definition-create-dto.json");
+		List<Map<String, Object>> worksheetDefinitionObject = (new ObjectMapper()).readValue(dto, List.class);
+		//When
+		MockHttpServletRequest newPostRequest = newPostRequest("lab/worksheetdefinitions", worksheetDefinitionObject);
+		MockHttpServletResponse handle = handle(newPostRequest);
+		List<Map<String, Object>> createdWorksheetDefinitions = (new ObjectMapper()).readValue(handle.getContentAsString(),
+		    List.class);
+		
+		assertThat("created 2 worksheets definitions", createdWorksheetDefinitions.size(), is(2));
+		String uuid = ((Map<String, Object>) createdWorksheetDefinitions.get(0)).get("uuid").toString();
+		
+		//2. Getting worksheet definitions
+		//When
+		MockHttpServletRequest newGetRequest = newGetRequest("lab/worksheetdefinition", new Parameter("uuid", uuid));
+		MockHttpServletResponse handle2 = handle(newGetRequest);
+		
+		Map<String, Object> worksheetDefinition = (new ObjectMapper()).readValue(handle2.getContentAsString(), Map.class);
+		assertThat("Worksheet definition matches", worksheetDefinition.get("uuid").toString(), is(uuid));
 	}
 	
 	@Test

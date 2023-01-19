@@ -82,4 +82,11 @@ export class WorkSeetsService {
       catchError((error) => of(error))
     );
   }
+
+  getWorksheetDefinitionsByUuid(uuid: string): Observable<any> {
+    return this.httpClient.get(`lab/worksheetdefinition?uuid=${uuid}`).pipe(
+      map((response) => response),
+      catchError((error) => of(error))
+    );
+  }
 }

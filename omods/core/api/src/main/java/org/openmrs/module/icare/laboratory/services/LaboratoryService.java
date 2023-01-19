@@ -97,6 +97,8 @@ public interface LaboratoryService extends OpenmrsService {
 	
 	String generateSampleLabel();
 	
+	List<String> generateLaboratoryIdLabels(String globalPropertyUuid, String metadataType, Integer count);
+	
 	List<Visit> getSamplePendingVisits(Integer limit, Integer startIndex);
 	
 	TestOrderLocation addTestOrderWithLocation(TestOrderLocation testOrderLocation);
@@ -135,7 +137,7 @@ public interface LaboratoryService extends OpenmrsService {
 	
 	List<WorksheetDefinition> getWorksheetDefinitions(Date start, Date end, String q, Integer startIndex, Integer limit);
 	
-	WorksheetDefinition getWorksheetDefinitionByUuid(String worksheetDefinitionUuid);
+	Map<String, Object> getWorksheetDefinitionByUuid(String worksheetDefinitionUuid);
 	
 	WorksheetDefinition addWorksheetDefinition(WorksheetDefinition worksheetDefinition) throws Exception;
 	
