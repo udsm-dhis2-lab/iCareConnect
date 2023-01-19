@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { flatten, omit, keyBy } from "lodash";
+import { DateField } from "src/app/shared/modules/form/models/date-field.model";
 import { DropdownOption } from "src/app/shared/modules/form/models/dropdown-option.model";
 import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
@@ -359,6 +360,13 @@ export class BatchRegistrationComponent implements OnInit {
     if (this.useExistingBatchset && key === "Existing Batchset") {
       this.batchNameField.value = null;
       this.validBatchsetName = true;
+      let today = new Date();
+      let year = today.getFullYear();
+      let month =
+        today.getMonth().toString().length > 1
+          ? today.getMonth()
+          : `0${today.getMonth()}`;
+      let day = today.getDate();
       let existingBatchset = this.existingBatchsets.filter(
         (batchset) => batchset.name === this.existingBatchsetField.value
       )[0];
@@ -404,11 +412,51 @@ export class BatchRegistrationComponent implements OnInit {
             : this.selectedDynamicFields.length
             ? this.selectedDynamicFields
             : [];
+        
+        this.selectedFixedFields.map((field) => {
+          if (field.allowCustomDateTime) {
+            field = {
+              ...field,
+              max: `${year}-${month}-${day}`,
+              disabled: true
+            };
+            return field;
+          }
+          return field;
+        });
+
+        this.selectedStaticFields.map((field) => {
+          if (field.allowCustomDateTime) {
+            field = {
+              ...field,
+              max: `${year}-${month}-${day}`,
+            };
+            return field;
+          }
+          return field;
+        });
+        this.selectedDynamicFields.map((field) => {
+          if (field.allowCustomDateTime) {
+            field = {
+              ...field,
+              max: `${year}-${month}-${day}`,
+            };
+            return field;
+          }
+          return field;
+        });
       }
     }
     if (this.useExistingBatch && key === "Existing Batch") {
       this.batchNameField.value = null;
       this.validBatchName = true;
+      let today = new Date();
+      let year = today.getFullYear();
+      let month =
+        today.getMonth().toString().length > 1
+          ? today.getMonth()
+          : `0${today.getMonth()}`;
+      let day = today.getDate();
       this.selectedBatch = this.existingBatches.filter(
         (batch) => batch.name === this.existingBatchField.value
       )[0];
@@ -433,6 +481,39 @@ export class BatchRegistrationComponent implements OnInit {
             : this.selectedDynamicFields.length
             ? this.selectedDynamicFields
             : [];
+
+        this.selectedFixedFields.map((field) => {
+          if (field.allowCustomDateTime) {
+            field = {
+              ...field,
+              max: `${year}-${month}-${day}`,
+              disabled: true
+            };
+            return field;
+          }
+          return field;
+        });
+
+        this.selectedStaticFields.map((field) => {
+          if(field.allowCustomDateTime){
+            field = {
+              ...field,
+              max: `${year}-${month}-${day}`
+            };
+            return field; 
+          }
+          return field
+        })
+        this.selectedDynamicFields.map((field) => {
+          if(field.allowCustomDateTime){
+            field = {
+              ...field,
+              max : `${year}-${month}-${day}`,
+            }
+            return field; 
+          }
+          return field
+        })
       }
     }
     if (
@@ -539,8 +620,8 @@ export class BatchRegistrationComponent implements OnInit {
       .filter((field) => field);
     const batchsetsInformation = [
       {
-        name: this.batchNameField.value,
-        label: this.batchNameField.value,
+        name: this.batchsetNameField.value,
+        label: this.batchsetNameField.value,
         fields: JSON.stringify({
           fixedFields: this.fieldsObjectValues?.fixedFieldsWithValues,
           staticFields: staticFields,

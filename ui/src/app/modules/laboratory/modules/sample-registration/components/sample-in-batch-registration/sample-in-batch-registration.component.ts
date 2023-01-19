@@ -177,12 +177,14 @@ export class SampleInBatchRegistrationComponent implements OnInit {
     let fields = [
       ...this.staticFields.map((field) => {
         return {
-          [field.key]: field.value,
+          [field.key]: isMoment(field.value)
+            ? field.value.toString()
+            : field.value,
         };
       }),
       ...this.fixedFields.map((field) => {
         return {
-          [field.key]: field.value,
+          [field.key]: isMoment(field.value) ? field.value.toString() : field.value,
         };
       }),
     ];
@@ -277,8 +279,8 @@ export class SampleInBatchRegistrationComponent implements OnInit {
   //   this.registrationCategory = event?.value;
   // }
 
-  getTimestampFromDateAndTime(date: string, time: string): number {
-    return new Date(`${date} ${time}`).getTime();
+  getTimestampFromDateAndTime(date: string, time?: string): number {
+    return time ? new Date(`${date} ${time}`).getTime() : new Date(date).getTime() ;
   }
 
   //   getSelectedReceivedOnTime(event: Event): void {
@@ -1222,7 +1224,11 @@ export class SampleInBatchRegistrationComponent implements OnInit {
                                                                             .formData[
                                                                             "agency"
                                                                           ]
-                                                                            ?.value
+                                                                            ?.value ||
+                                                                          this
+                                                                            .fieldsWithValues[
+                                                                            "agency"
+                                                                          ]
                                                                             ? true
                                                                             : false;
                                                                         let statuses =
@@ -1232,7 +1238,11 @@ export class SampleInBatchRegistrationComponent implements OnInit {
                                                                             .formData[
                                                                             "agency"
                                                                           ]
-                                                                            ?.value
+                                                                            ?.value ||
+                                                                          this
+                                                                            .fieldsWithValues[
+                                                                            "agency"
+                                                                          ]
                                                                         ) {
                                                                           const agencyStatus =
                                                                             {
@@ -1250,7 +1260,11 @@ export class SampleInBatchRegistrationComponent implements OnInit {
                                                                                   .formData[
                                                                                   "agency"
                                                                                 ]
-                                                                                  ?.value,
+                                                                                  ?.value ||
+                                                                                this
+                                                                                  .fieldsWithValues[
+                                                                                  "agency"
+                                                                                ],
                                                                               category:
                                                                                 "PRIORITY",
                                                                               status:
@@ -1264,11 +1278,10 @@ export class SampleInBatchRegistrationComponent implements OnInit {
                                                                         }
 
                                                                         if (
-                                                                          this
-                                                                            .formData[
+                                                                          this.formData[
                                                                             "receivedOn"
-                                                                          ]
-                                                                            ?.value
+                                                                          ]?.value ||
+                                                                          this.fieldsWithValues?.receivedOn
                                                                         ) {
                                                                           const receivedOnStatus =
                                                                             {
@@ -1282,7 +1295,7 @@ export class SampleInBatchRegistrationComponent implements OnInit {
                                                                                 ),
                                                                               },
                                                                               remarks:
-                                                                                this.getTimestampFromDateAndTime(
+                                                                                this.fieldsWithValues?.receivedOn ? this.getTimestampFromDateAndTime(this.fieldsWithValues?.receivedOn) : this.getTimestampFromDateAndTime(
                                                                                   this
                                                                                     .receivedOnDateLatestValue,
                                                                                   this
@@ -1305,7 +1318,10 @@ export class SampleInBatchRegistrationComponent implements OnInit {
                                                                             .formData[
                                                                             "broughtOn"
                                                                           ]
-                                                                            ?.value
+                                                                            ?.value ||
+                                                                          this
+                                                                            .fieldsWithValues
+                                                                            ?.broughtOn
                                                                         ) {
                                                                           const broughtOnStatus =
                                                                             {
@@ -1319,12 +1335,20 @@ export class SampleInBatchRegistrationComponent implements OnInit {
                                                                                 ),
                                                                               },
                                                                               remarks:
-                                                                                this.getTimestampFromDateAndTime(
-                                                                                  this
-                                                                                    .broughtOnDateLatestValue,
-                                                                                  this
-                                                                                    .broughtOnTime
-                                                                                ),
+                                                                                this
+                                                                                  .fieldsWithValues
+                                                                                  ?.broughtOn
+                                                                                  ? this.getTimestampFromDateAndTime(
+                                                                                      this
+                                                                                        .fieldsWithValues
+                                                                                        ?.broughtOn
+                                                                                    )
+                                                                                  : this.getTimestampFromDateAndTime(
+                                                                                      this
+                                                                                        .broughtOnDateLatestValue,
+                                                                                      this
+                                                                                        .broughtOnTime
+                                                                                    ),
                                                                               status:
                                                                                 "BROUGHT_ON",
                                                                               category:
@@ -1342,7 +1366,10 @@ export class SampleInBatchRegistrationComponent implements OnInit {
                                                                             .formData[
                                                                             "collectedOn"
                                                                           ]
-                                                                            ?.value
+                                                                            ?.value ||
+                                                                          this
+                                                                            .fieldsWithValues
+                                                                            ?.collectedOn
                                                                         ) {
                                                                           const collectedOnStatus =
                                                                             {
@@ -1356,7 +1383,7 @@ export class SampleInBatchRegistrationComponent implements OnInit {
                                                                                 ),
                                                                               },
                                                                               remarks:
-                                                                                this.getTimestampFromDateAndTime(
+                                                                                this.fieldsWithValues?.collectedOn ? this.getTimestampFromDateAndTime(this.fieldsWithValues?.broughtOn) :this.getTimestampFromDateAndTime(
                                                                                   this
                                                                                     .collectedOnDateLatestValue,
                                                                                   this
@@ -1379,9 +1406,13 @@ export class SampleInBatchRegistrationComponent implements OnInit {
                                                                             .formData[
                                                                             "condition"
                                                                           ]
-                                                                            ?.value
+                                                                            ?.value ||
+                                                                          this
+                                                                            .fieldsWithValues[
+                                                                            "condition"
+                                                                          ]
                                                                         ) {
-                                                                          const receivedOnStatus =
+                                                                          const conditionStatus =
                                                                             {
                                                                               sample:
                                                                                 {
@@ -1397,7 +1428,11 @@ export class SampleInBatchRegistrationComponent implements OnInit {
                                                                                   .formData[
                                                                                   "condition"
                                                                                 ]
-                                                                                  ?.value,
+                                                                                  ?.value ||
+                                                                                this
+                                                                                  .fieldsWithValues[
+                                                                                  "condition"
+                                                                                ],
                                                                               category:
                                                                                 "CONDITION",
                                                                               status:
@@ -1410,50 +1445,73 @@ export class SampleInBatchRegistrationComponent implements OnInit {
                                                                           statuses =
                                                                             [
                                                                               ...statuses,
-                                                                              receivedOnStatus,
+                                                                              conditionStatus,
                                                                             ];
                                                                         }
 
-                                                                        const receivedByStatus =
-                                                                          {
-                                                                            sample:
-                                                                              {
-                                                                                uuid: sampleResponse?.uuid,
+                                                                        if (
+                                                                          this
+                                                                            .formData[
+                                                                            "receivedBy"
+                                                                          ]
+                                                                            ?.value || this
+                                                                            .fieldsWithValues[
+                                                                            "receivedBy"
+                                                                          ]
+                                                                        ) {
+                                                                          const receivedByStatus =
+                                                                            {
+                                                                              sample:
+                                                                                {
+                                                                                  uuid: sampleResponse?.uuid,
+                                                                                },
+                                                                              user: {
+                                                                                uuid: this
+                                                                                  .formData[
+                                                                                  "receivedBy"
+                                                                                ]
+                                                                                  ?.value
+                                                                                  ? this
+                                                                                      .formData[
+                                                                                      "receivedBy"
+                                                                                    ]
+                                                                                      ?.value
+                                                                                  : this
+                                                                                      .fieldsWithValues[
+                                                                                      "receivedBy"
+                                                                                    ]
+                                                                                  ? this
+                                                                                      .fieldsWithValues[
+                                                                                      "receivedBy"
+                                                                                    ]
+                                                                                  : localStorage.getItem(
+                                                                                      "userUuid"
+                                                                                    ),
                                                                               },
-                                                                            user: {
-                                                                              uuid: this
-                                                                                .formData[
-                                                                                "receivedBy"
-                                                                              ]
-                                                                                ?.value
-                                                                                ? this
-                                                                                    .formData[
-                                                                                    "receivedBy"
-                                                                                  ]
-                                                                                    ?.value
-                                                                                : localStorage.getItem(
-                                                                                    "userUuid"
-                                                                                  ),
-                                                                            },
-                                                                            category:
-                                                                              "RECEIVED_BY",
-                                                                            remarks:
-                                                                              "RECEIVED_BY",
-                                                                            status:
-                                                                              "RECEIVED_BY",
-                                                                          };
-                                                                        statuses =
-                                                                          [
-                                                                            ...statuses,
-                                                                            receivedByStatus,
-                                                                          ];
+                                                                              category:
+                                                                                "RECEIVED_BY",
+                                                                              remarks:
+                                                                                "RECEIVED_BY",
+                                                                              status:
+                                                                                "RECEIVED_BY",
+                                                                            };
+                                                                          statuses =
+                                                                            [
+                                                                              ...statuses,
+                                                                              receivedByStatus,
+                                                                            ];
+                                                                        }
 
                                                                         if (
                                                                           this
                                                                             .formData[
                                                                             "collectedBy"
                                                                           ]
-                                                                            ?.value
+                                                                            ?.value ||
+                                                                          this
+                                                                            .fieldsWithValues[
+                                                                            "collectedBy"
+                                                                          ]
                                                                         ) {
                                                                           const collectedByStatus =
                                                                             {
@@ -1471,7 +1529,18 @@ export class SampleInBatchRegistrationComponent implements OnInit {
                                                                                   .formData[
                                                                                   "collectedBy"
                                                                                 ]
-                                                                                  ?.value ||
+                                                                                  ?.value ? 
+                                                                                this
+                                                                                  .formData[
+                                                                                  "collectedBy"
+                                                                                ]
+                                                                                  ?.value : this
+                                                                            .fieldsWithValues[
+                                                                            "receivedBy"
+                                                                          ] ? this
+                                                                            .fieldsWithValues[
+                                                                            "receivedBy"
+                                                                          ] :
                                                                                 "NO COLLECTOR SPECIFIED",
                                                                               status:
                                                                                 "COLLECTED_BY",
@@ -1490,7 +1559,11 @@ export class SampleInBatchRegistrationComponent implements OnInit {
                                                                             .formData[
                                                                             "broughtBy"
                                                                           ]
-                                                                            ?.value
+                                                                            ?.value ||
+                                                                          this
+                                                                            .fieldsWithValues[
+                                                                            "broughtBy"
+                                                                          ]
                                                                         ) {
                                                                           const broughtdByStatus =
                                                                             {
@@ -1508,7 +1581,18 @@ export class SampleInBatchRegistrationComponent implements OnInit {
                                                                                   .formData[
                                                                                   "broughtBy"
                                                                                 ]
-                                                                                  ?.value ||
+                                                                                  ?.value ?
+                                                                                this
+                                                                                  .formData[
+                                                                                  "broughtBy"
+                                                                                ]
+                                                                                  ?.value : this
+                                                                            .fieldsWithValues[
+                                                                            "broughtBy"
+                                                                          ] ? this
+                                                                            .fieldsWithValues[
+                                                                            "broughtBy"
+                                                                          ] :
                                                                                 "NO PERSON SPECIFIED",
                                                                               status:
                                                                                 "DELIVERED_BY",
@@ -1528,7 +1612,11 @@ export class SampleInBatchRegistrationComponent implements OnInit {
                                                                           ]
                                                                             ?.value
                                                                             .length >
-                                                                          0
+                                                                            0 ||
+                                                                          this
+                                                                            .fieldsWithValues[
+                                                                            "transportCondition"
+                                                                          ]
                                                                         ) {
                                                                           const transportCondition =
                                                                             {
@@ -1546,7 +1634,18 @@ export class SampleInBatchRegistrationComponent implements OnInit {
                                                                                   .formData[
                                                                                   "transportCondition"
                                                                                 ]
-                                                                                  ?.value ||
+                                                                                  ?.value?
+                                                                                this
+                                                                                  .formData[
+                                                                                  "transportCondition"
+                                                                                ]
+                                                                                  ?.value : this
+                                                                            .fieldsWithValues[
+                                                                            "transportCondition"
+                                                                          ] ? this
+                                                                            .fieldsWithValues[
+                                                                            "transportCondition"
+                                                                          ] :
                                                                                 "NO TRANSPORT CONDITION SPECIFIED",
                                                                               category:
                                                                                 "TRANSPORT_CONDITION",
@@ -1566,7 +1665,11 @@ export class SampleInBatchRegistrationComponent implements OnInit {
                                                                           ]
                                                                             ?.value
                                                                             ?.length >
-                                                                          0
+                                                                            0 ||
+                                                                          this
+                                                                            .fieldsWithValues[
+                                                                            "transportationTemperature"
+                                                                          ]
                                                                         ) {
                                                                           const transportationTemperature =
                                                                             {
@@ -1584,8 +1687,21 @@ export class SampleInBatchRegistrationComponent implements OnInit {
                                                                                   .formData[
                                                                                   "transportationTemperature"
                                                                                 ]
-                                                                                  ?.value ||
-                                                                                "NO TRANSPORTATION TEMPERATURE SPECIFIED",
+                                                                                  ?.value
+                                                                                  ? this
+                                                                                      .formData[
+                                                                                      "transportationTemperature"
+                                                                                    ]
+                                                                                      ?.value
+                                                                                  : this
+                                                                                      .fieldsWithValues[
+                                                                                      "transportationTemperature"
+                                                                                    ]
+                                                                                  ? this
+                                                                                      .fieldsWithValues[
+                                                                                      "transportationTemperature"
+                                                                                    ]
+                                                                                  : "NO TRANSPORTATION TEMPERATURE SPECIFIED",
                                                                               category:
                                                                                 "TRANSPORT_TEMPERATURE",
                                                                               status:
