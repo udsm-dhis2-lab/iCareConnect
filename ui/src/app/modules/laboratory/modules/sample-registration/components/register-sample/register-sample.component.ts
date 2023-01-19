@@ -8,6 +8,7 @@ import { LabSampleModel } from "src/app/modules/laboratory/resources/models";
 import { LISConfigurationsModel } from "src/app/modules/laboratory/resources/models/lis-configurations.model";
 import { RegistrationService } from "src/app/modules/registration/services/registration.services";
 import { DateField } from "src/app/shared/modules/form/models/date-field.model";
+import { DateTimeField } from "src/app/shared/modules/form/models/date-time-field.model";
 import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
 import { PhoneNumber } from "src/app/shared/modules/form/models/phone-number.model";
 import { TextArea } from "src/app/shared/modules/form/models/text-area.model";
@@ -215,6 +216,7 @@ export class RegisterSampleComponent implements OnInit {
         key: "receivedOn",
         label: "Received On",
         max: this.maximumDate,
+        allowCustomDateTime: true,
       }),
       transportCondition: new Dropdown({
         id: "transportCondition",
@@ -245,6 +247,7 @@ export class RegisterSampleComponent implements OnInit {
         key: "collectedOn",
         label: "Collected On",
         max: this.maximumDate,
+        allowCustomDateTime: true
       }),
       collectedBy: new Textbox({
         id: "collectedBy",
@@ -256,6 +259,7 @@ export class RegisterSampleComponent implements OnInit {
         key: "broughtOn",
         label: "Delivered On",
         max: this.maximumDate,
+        allowCustomDateTime: true,
       }),
       broughtBy: new Textbox({
         id: "broughtBy",

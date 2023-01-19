@@ -42,11 +42,21 @@
               <tr>
                 <ng-container *ngFor="let dynamicField of dynamicFields">
                   <td>
-                    <app-form
-                      [fields]="[dynamicField]"
-                      (formUpdate)="onFormUpdate($event)"
-                    >  
-                    </app-form>
+                    <div>
+                      <app-form
+                        *ngIf="!dynamicField?.allowCustomDateTime"
+                        [fields]="[dynamicField]"
+                        (formUpdate)="onFormUpdate($event)"
+                      >  
+                      </app-form>
+                    </div>
+                    <div>
+                      <app-date-time-field 
+                          *ngIf="dynamicField?.allowCustomDateTime"
+                          [dateTimeField]="dynamicField"
+                          (formUpdate)="onFormUpdate($event)"
+                      ></app-date-time-field>
+                    </div>
                   </td>
                 </ng-container>
               </tr>
