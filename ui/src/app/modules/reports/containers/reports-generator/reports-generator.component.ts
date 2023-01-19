@@ -41,6 +41,7 @@ export class ReportsGeneratorComponent implements OnInit {
   @Input() reportsExtraParams: any;
   @Input() reportGroups: ReportGroup[];
   @Input() reportsParametersConfigurations: any;
+  @Input() standardReports: any[];
   reportConfigs$: Observable<any>;
   reportLoaded$: Observable<boolean>;
   loadingReportGroup: boolean;
@@ -78,6 +79,7 @@ export class ReportsGeneratorComponent implements OnInit {
     label: string;
     options?: any[];
   }[];
+  countOfSelectedParams: number;
   keyedReportsExtraParameters: any = {};
   constructor(
     private reportParamsService: ReportParamsService,
@@ -88,17 +90,49 @@ export class ReportsGeneratorComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // console.log(this.reportCategories);
-    // console.log(this.reportGroups);
-    // console.log(this.reportsCategoriesConfigurations);
-    this.reportCategories = this.reportsCategoriesConfigurations
-      .map((category) => {
+    this.standardReports = this.standardReports
+      ? this.standardReports?.map((report) => {
+          return {
+            ...report,
+            dataSetUuid: JSON.parse(report?.value)?.id,
+            value: JSON.parse(report?.value),
+          };
+        })
+      : [];
+
+    const allReports = _.flatten(
+      this.reportGroups?.map((reportCategory) => {
+        return reportCategory?.reports?.map((report) => {
+          return {
+            ...report,
+            category: reportCategory,
+            group:
+              reportCategory?.name?.toLowerCase() !== "reports"
+                ? report?.name?.split(" ")[0]
+                : "Reports",
+          };
+        });
+      })
+    );
+    const reportsKeyedByGroup = _.keyBy(allReports, "group");
+    const formattedReportGroups = Object.keys(reportsKeyedByGroup).map(
+      (key) => {
+        return {
+          id: key,
+          name: key,
+          label: key,
+          reports: reportsKeyedByGroup[key],
+        };
+      }
+    );
+    this.reportCategories = formattedReportGroups
+      .map((formattedReportGroup) => {
         const reportCategoryAccesses =
           this.reportsAccessConfigurations.filter(
-            (acessConfig) => acessConfig?.id === category?.id
+            (acessConfig) => acessConfig?.id === formattedReportGroup?.id
           ) || [];
         const formattedReportCategory = {
-          ...category,
+          ...formattedReportGroup,
           currentUserCanAccess:
             (
               reportCategoryAccesses.filter(
@@ -107,7 +141,7 @@ export class ReportsGeneratorComponent implements OnInit {
               ) || []
             )?.length > 0
               ? true
-              : this.userPrivileges["REPORT_ALL"]
+              : this.userPrivileges["REPORT_ALL"] || this.userPrivileges["ALL"]
               ? true
               : false,
         };
@@ -140,8 +174,6 @@ export class ReportsGeneratorComponent implements OnInit {
         })
       );
     });
-
-    // console.log("reports", this.reports);
 
     this.store.dispatch(loadDHIS2ReportsConfigs());
     this.currentVisualization = "TABLE";
@@ -202,14 +234,15 @@ export class ReportsGeneratorComponent implements OnInit {
               this.userPrivileges[reportAccessConfig?.privilege]
           ) || []
         )?.length > 0 ||
-        this.userPrivileges["REPORT_ALL"]
+        this.userPrivileges["REPORT_ALL"] ||
+        this.userPrivileges["ALL"]
       ) {
         return report;
       }
     });
   }
 
-  onSelectReport(e, report) {
+  onSelectReport(e: Event, report: any, standardReports: any[]) {
     e.stopPropagation();
     this.store.dispatch(loadReportLogsByReportId({ reportId: report?.id }));
     // this.store.dispatch(clearReportSelections());
@@ -221,7 +254,12 @@ export class ReportsGeneratorComponent implements OnInit {
     this.countOfReportsSent$ = this.store.select(
       getCountOfCurrentReportSubmittedToDHIS2
     );
-    this.currentReport = report;
+    this.currentReport = {
+      ...report,
+      standardReport: (standardReports?.filter(
+        (standardReport) => standardReport?.value?.id === report?.id
+      ) || [])[0],
+    };
 
     const matchedReportWithParametersConfigs =
       (this.reportsParametersConfigurations.filter(
@@ -239,8 +277,6 @@ export class ReportsGeneratorComponent implements OnInit {
       };
     });
 
-    console.log(this.selectedReportParameters);
-
     this.reportData = null;
     this.reportError = null;
     this.hasError = false;
@@ -257,7 +293,7 @@ export class ReportsGeneratorComponent implements OnInit {
       ...this.reportSelectionParams,
       ...paramValue,
     };
-    this.count = Object.keys(this.reportSelectionParams).filter(
+    this.countOfSelectedParams = Object.keys(this.reportSelectionParams).filter(
       (keyItem) => this.reportSelectionParams[keyItem] !== undefined
     ).length;
   }

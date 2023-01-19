@@ -25,6 +25,7 @@ export class ReportsHomeComponent implements OnInit {
   reportsExtraParams$: Observable<any>;
   reportGroups$: Observable<any>;
   loadedAllRoles$: Observable<boolean>;
+  standardReports$: Observable<any[]>;
   constructor(
     private store: Store<AppState>,
     private systemSettingsService: SystemSettingsService,
@@ -53,5 +54,9 @@ export class ReportsHomeComponent implements OnInit {
     this.reportsExtraParams$ = this.reportParamsService.getReportExtraParams();
     this.reportGroups$ = this.reportParamsService.getReportGroups();
     this.loadedAllRoles$ = this.store.select(getRolesLoadedState);
+    this.standardReports$ =
+      this.systemSettingsService.getSystemSettingsMatchingAKey(
+        `iCare.reports.standardReports`
+      );
   }
 }
