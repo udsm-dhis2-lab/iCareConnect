@@ -1,5 +1,7 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import { MatDialog } from "@angular/material/dialog";
 import { flatten, keyBy, groupBy } from "lodash";
+import { ManageReportModalComponent } from "../../modals/manage-report-modal/manage-report-modal.component";
 
 @Component({
   selector: "app-reports-groups-list",
@@ -10,11 +12,22 @@ export class ReportsGroupsListComponent implements OnInit {
   @Input() accessConfigs: any[];
   @Input() userRoles: any[];
   @Input() reports: any[];
+  @Input() standardReports: any[];
   formattedReportGroups: any[];
   privileges: any = {};
-  constructor() {}
+  @Output() reloadList: EventEmitter<any> = new EventEmitter<any>();
+  constructor(private dialog: MatDialog) {}
 
   ngOnInit(): void {
+    this.standardReports = this.standardReports
+      ? this.standardReports?.map((report) => {
+          return {
+            ...report,
+            dataSetUuid: JSON.parse(report?.value)?.id,
+            value: JSON.parse(report?.value),
+          };
+        })
+      : [];
     this.privileges = keyBy(
       flatten(
         this.userRoles?.map((userRole) => {
@@ -53,8 +66,39 @@ export class ReportsGroupsListComponent implements OnInit {
               accessConfigsKeyedByReportOrReportGroup[key]?.privilege
             ],
         },
-        reports: groupedReports[key],
+        reports: groupedReports[key]?.map((report) => {
+          return {
+            ...report,
+            standardDefinition:
+              this.standardReports?.length > 0
+                ? keyBy(this.standardReports, "dataSetUuid")[report?.id]
+                : null,
+            group: {
+              name: key,
+              privilege:
+                this.privileges[
+                  accessConfigsKeyedByReportOrReportGroup[key]?.privilege
+                ],
+            },
+          };
+        }),
       };
     });
+  }
+
+  onDelete(report: any): void {
+    // console.log(report);
+  }
+
+  onEdit(report: any): void {
+    this.dialog
+      .open(ManageReportModalComponent, {
+        data: report,
+        width: "60%",
+      })
+      .afterClosed()
+      .subscribe(() => {
+        this.reloadList.emit(true);
+      });
   }
 }

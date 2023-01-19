@@ -17,6 +17,7 @@ export class ReportsGroupsComponent implements OnInit {
   reports$: Observable<any[]>;
   reportsAccessConfigurations$: Observable<any>;
   userRoles$: Observable<any>;
+  standardReports$: Observable<any[]>;
   constructor(
     private reportParamsService: ReportParamsService,
     private systemSettingsService: SystemSettingsService,
@@ -24,40 +25,49 @@ export class ReportsGroupsComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.loadData();
+  }
+
+  loadData(): void {
     this.userRoles$ = this.store.select(getAllUSerRoles);
     this.reportsAccessConfigurations$ =
       this.systemSettingsService.getSystemSettingsByKey(
         "icare.Reports.Access.Configurations"
       );
-    this.reportsAccessConfigurations$.subscribe((response) => {
-      if (response) {
-        this.reports$ = this.reportParamsService.getReportGroups().pipe(
-          map((reportGroups) => {
-            return flatten(
-              reportGroups?.map((reportGroup) =>
-                reportGroup?.reports?.map((report) => {
-                  console.log(report);
-                  return {
-                    ...report,
-                    name:
-                      reportGroup?.name?.toLowerCase() !== "reports"
-                        ? report?.name?.replace(
-                            report?.name?.split(" ")[0] + " ",
-                            ""
-                          )
-                        : report?.name,
-                    group:
-                      reportGroup?.name?.toLowerCase() !== "reports"
-                        ? report?.name?.split(" ")[0]
-                        : "Reports",
-                    category: reportGroup,
-                  };
-                })
-              )
-            );
-          })
+    this.standardReports$ =
+      this.systemSettingsService.getSystemSettingsMatchingAKey(
+        `iCare.reports.standardReports`
+      );
+    this.reports$ = this.reportParamsService.getReportGroups().pipe(
+      map((reportGroups) => {
+        return flatten(
+          reportGroups?.map((reportGroup) =>
+            reportGroup?.reports?.map((report) => {
+              return {
+                ...report,
+                name:
+                  reportGroup?.name?.toLowerCase() !== "reports"
+                    ? report?.name?.replace(
+                        report?.name?.split(" ")[0] + " ",
+                        ""
+                      )
+                    : report?.name,
+                group:
+                  reportGroup?.name?.toLowerCase() !== "reports"
+                    ? report?.name?.split(" ")[0]
+                    : "Reports",
+                category: reportGroup,
+              };
+            })
+          )
         );
-      }
-    });
+      })
+    );
+  }
+
+  onReloadList(shouldLoad: boolean) {
+    if (shouldLoad) {
+      this.loadData();
+    }
   }
 }

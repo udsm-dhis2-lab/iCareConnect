@@ -42,6 +42,7 @@ export class ManageStandardReportComponent implements OnInit {
     ],
   };
   @Input() report: any;
+  @Input() additionalKey: string;
   reportFields: any[];
   saving: boolean = false;
   errors: any[] = [];
@@ -80,7 +81,9 @@ export class ManageStandardReportComponent implements OnInit {
     event.stopPropagation();
     this.saving = true;
     const value = {
-      id: this.formData?.name?.value?.replace(/\s/g, ""),
+      id: this.report?.value
+        ? this.report?.value?.id
+        : this.formData?.name?.value?.replace(/\s/g, ""),
       name: this.formData?.name?.value,
       description: this.formData?.description?.value,
       category: "standard",
@@ -91,8 +94,9 @@ export class ManageStandardReportComponent implements OnInit {
       value: JSON.stringify(value),
       property: this.report?.property
         ? this.report?.property
-        : "iCare.reports.standardReports.lis." +
-          this.formData?.name?.value?.replace(/\s/g, ""),
+        : `iCare.reports.standardReports.${
+            this.additionalKey ? this.additionalKey + "." : ""
+          }` + this.formData?.name?.value?.replace(/\s/g, ""),
       description: this.formData?.description?.value,
       uuid: this.report && this.report?.uuid ? this.report?.uuid : null,
     };

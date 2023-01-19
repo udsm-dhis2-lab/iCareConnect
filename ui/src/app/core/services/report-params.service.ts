@@ -19,11 +19,12 @@ export class ReportParamsService {
     this.notificationService.show(
       new Notification({ message: "Loading report groups", type: "LOADING" })
     );
+    // TODO: Improve to ensure more than 100 reports are returned
 
     return zip(
       this.httpClient
         .get(
-          "reportingrest/dataSetDefinition?v=custom:(uuid,name,description,parameters)"
+          "reportingrest/dataSetDefinition?v=custom:(uuid,name,description,parameters)&limit=100"
         )
         .pipe(
           map((dataSetResponse) => {
