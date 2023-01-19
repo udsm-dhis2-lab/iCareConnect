@@ -545,7 +545,7 @@ export class CurrentPatientBillingComponent implements OnInit {
       if (e.Bill.length > 0) {
         frameDoc.document.write(`
         <div>
-          <h5>Unpaid Items</h5>
+          <h5>Unpaid Items (Un-attended items)</h5>
         </div>
         <table id="table">
           <thead>
