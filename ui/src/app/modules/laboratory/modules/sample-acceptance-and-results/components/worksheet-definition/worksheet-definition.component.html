@@ -154,7 +154,7 @@
         </button>
         <button
           class="ml-2"
-          [disabled]="!isComplete"
+          [disabled]="!isComplete || !isFormValid"
           mat-flat-button
           color="primary"
           (click)="onSave($event)"
