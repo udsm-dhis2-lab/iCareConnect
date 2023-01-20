@@ -1,6 +1,9 @@
 import { Component, EventEmitter, OnInit, Output, Input } from "@angular/core";
 import { flatten, keyBy } from "lodash";
-import { getEncountersByProviderInAVisit, getGenericDrugPrescriptionsFromVisit } from "../../helpers/visits.helper";
+import {
+  arrangeVisitDataChronologically,
+  getGenericDrugPrescriptionsFromVisit,
+} from "../../helpers/visits.helper";
 import { Visit } from "../../resources/visits/models/visit.model";
 
 @Component({
@@ -21,7 +24,8 @@ export class PatientHistoryDataComponent implements OnInit {
   obsBasedOnForms: any[] = [];
   medications: any[];
   drugsPrescribed: any;
-  encountersByProvider: any;
+  visitHistory: any;
+  diagnoses: any;
 
   constructor() {}
 
@@ -61,33 +65,35 @@ export class PatientHistoryDataComponent implements OnInit {
               }),
               []
             ),
-            fields: flatten(
-              form?.formFields
-                ?.map((formField) => {
-                  return formField?.formFields
-                    ? formField?.formFields
-                    : formField?.formField;
-                })
-                .filter((field) => field)
-            )
-              .filter((field) => {
-                if (
-                  field?.key in
-                  observations?.reduce(
-                    (obs, ob) => ({
-                      ...obs,
-                      [`${ob?.concept?.uuid}`]:
-                        `${ob?.concept?.uuid}` in obs
-                          ? obs[`${ob?.concept?.uuid}`].concat(ob)
-                          : [ob],
-                    }),
-                    []
-                  )
-                ) {
-                  return field;
-                }
-              })
-              .filter((field) => field),
+            fields: form?.formFields,
+            obsDatetime: observations[0]?.obsDatetime,
+            // fields: flatten(
+            //   form?.formFields
+            //     ?.map((formField) => {
+            //       return formField?.formFields
+            //         ? formField?.formFields
+            //         : formField?.formField;
+            //     })
+            //     .filter((field) => field)
+            // )
+            //   .filter((field) => {
+            //     if (
+            //       field?.key in
+            //       observations?.reduce(
+            //         (obs, ob) => ({
+            //           ...obs,
+            //           [`${ob?.concept?.uuid}`]:
+            //             `${ob?.concept?.uuid}` in obs
+            //               ? obs[`${ob?.concept?.uuid}`].concat(ob)
+            //               : [ob],
+            //         }),
+            //         []
+            //       )
+            //     ) {
+            //       return field;
+            //     }
+            //   })
+            //   .filter((field) => field),
           },
         ];
       }
@@ -127,9 +133,25 @@ export class PatientHistoryDataComponent implements OnInit {
       this.visit?.visit,
       this.generalPrescriptionOrderType
     );
-    
-    // RESERVE: For IPD Rounds
-    // this.encountersByProvider = getEncountersByProviderInAVisit(this.visit?.visit)
+
+    this.diagnoses = visit.diagnoses;
+
+    // RESERVE: For TimeLine History
+    this.visitHistory = arrangeVisitDataChronologically(
+      {
+        ...this.visit?.visit,
+        observations: this.obsBasedOnForms,
+        labOrders: this.labOrders,
+        radiologyOrders: this.radiologyOrders,
+        procedureOrders: this.procedureOrders,
+        drugs: this.drugsPrescribed,
+        diagnoses: this.diagnoses,
+      },
+      'desc',
+      this.specificDrugConceptUuid,
+      this.prescriptionArrangementFields
+    );
+    console.log("==> Encounters by Provider: ", this.visitHistory);
   }
 
   getStringDate(date: Date) {
