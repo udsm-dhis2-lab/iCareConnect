@@ -151,7 +151,7 @@ export class PatientHistoryDataComponent implements OnInit {
       this.specificDrugConceptUuid,
       this.prescriptionArrangementFields
     );
-    // console.log("==> Encounters by Provider: ", this.visitHistory);
+    console.log("==> Encounters by Provider: ", this.visitHistory);
   }
 
   getStringDate(date: Date) {
