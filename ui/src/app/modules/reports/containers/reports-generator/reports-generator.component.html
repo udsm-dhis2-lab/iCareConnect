@@ -11,7 +11,7 @@
       class="side-menu-panel"
       [ngStyle]="{ display: showFullReportRenderingArea ? 'none' : 'block' }"
       [ngClass]="{
-        'col-lg-2 col-md-2 col-sm-12 col-sx-12': !showFullReportRenderingArea
+        'col-lg-3 col-md-4 col-sm-12 col-sx-12': !showFullReportRenderingArea
       }"
     >
       <mat-accordion class="p-0">
@@ -68,21 +68,37 @@
         <ng-container
           *ngIf="selectedReportParameters && !reportConfigs?.dhisConfigs"
         >
-          <mat-expansion-panel
-            *ngFor="let parameter of selectedReportParameters"
-            class="border mt-1"
-          >
-            <mat-expansion-panel-header>
-              <mat-panel-title>
-                {{ parameter?.name }}
-              </mat-panel-title>
-            </mat-expansion-panel-header>
-            <app-parameter-field
-              [field]="parameter"
-              [parameter]="parameter"
-              (parameterUpdate)="onSetParameterValue($event)"
-            ></app-parameter-field>
-          </mat-expansion-panel>
+          <ng-container *ngIf="!useDefaultDatesParametersConfigs">
+            <mat-expansion-panel class="border mt-1">
+              <mat-expansion-panel-header>
+                <mat-panel-title> Period </mat-panel-title>
+              </mat-expansion-panel-header>
+              <app-parameter-field
+                [field]="selectedReportParameters[0]"
+                [type]="'custom'"
+                [parameter]="selectedReportParameters[0]"
+                (parameterUpdate)="onSetParameterValue($event)"
+              ></app-parameter-field>
+            </mat-expansion-panel>
+          </ng-container>
+          <ng-container *ngIf="useDefaultDatesParametersConfigs">
+            <mat-expansion-panel
+              *ngFor="let parameter of selectedReportParameters"
+              class="border mt-1"
+            >
+              <mat-expansion-panel-header>
+                <mat-panel-title>
+                  {{ parameter?.name }}
+                </mat-panel-title>
+              </mat-expansion-panel-header>
+              <app-parameter-field
+                [field]="parameter"
+                [type]="'default'"
+                [parameter]="parameter"
+                (parameterUpdate)="onSetParameterValue($event)"
+              ></app-parameter-field>
+            </mat-expansion-panel>
+          </ng-container>
         </ng-container>
         <mat-expansion-panel
           class="border mt-1"
@@ -104,8 +120,7 @@
     <ng-container>
       <div
         [ngClass]="{
-          'col-lg-10 col-md-10 col-sm-12 col-sx-12':
-            !showFullReportRenderingArea,
+          'col-lg-9 col-md-9 col-sm-12 col-sx-12': !showFullReportRenderingArea,
           'col-md-12 col-sm-12 col-sx-12': showFullReportRenderingArea
         }"
         class="d-print-none"
@@ -126,14 +141,7 @@
             </button>
             <button
               [disabled]="
-                !currentReport ||
-                !currentReport?.name ||
-                (reportSelectionParams ||
-                (selectedReportParameters &&
-                  selectedReportParameters?.name?.length > 0 &&
-                  !reportConfigs?.dhisConfigs)
-                  ? selectedReportParameters?.length !== countOfSelectedParams
-                  : false)
+                !currentReport || !currentReport?.name || !reportSelectionParams
               "
               class="ml-2"
               mat-flat-button
@@ -313,17 +321,12 @@
             </div>
             <app-chart *ngIf="currentVisualization === 'CHART'"></app-chart>
           </div>
-          <!-- 
-          period - {{ period | json }} <br />
-          config - {{ reportConfigs?.dhisConfigs | json }} <br />
-          dhisR? - {{ dhisReport }} <br />
-          loaded dhis report - {{ reportConfigs?.reportLoaded }} -->
           <div
             class="mt-3"
             *ngIf="
               selectedReportParameters &&
-              selectedReportParameters?.length === countOfSelectedParams &&
-              currentReport?.standardReport
+              currentReport?.standardReport &&
+              standardReportIsReady
             "
           >
             <ngx-standard-report

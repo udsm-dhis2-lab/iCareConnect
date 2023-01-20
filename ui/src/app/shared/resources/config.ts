@@ -262,10 +262,12 @@ export const ICARE_CONFIG = {
         {
           id: "monthly",
           name: "Monthly",
+          type: "MONTHLY",
         },
         {
           id: "quarterly",
           name: "Quarterly",
+          type: "QUARTERLY",
         },
       ],
     },

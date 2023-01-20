@@ -1,4 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter } from "@angular/core";
+import { ICARE_CONFIG } from "src/app/shared/resources/config";
 import { ReportParam } from "../../models/report-params.model";
 
 @Component({
@@ -7,7 +8,7 @@ import { ReportParam } from "../../models/report-params.model";
   styleUrls: ["./parameter-field.component.scss"],
 })
 export class ParameterFieldComponent implements OnInit {
-  @Input() field: ReportParam;
+  @Input() field: any;
   @Input() parameter: {
     order?: string;
     id: string;
@@ -15,17 +16,24 @@ export class ParameterFieldComponent implements OnInit {
     name: string;
     label: string;
     options?: any[];
+    periodType?: any;
   };
+  @Input() type: string;
 
   fieldId: string;
   fieldValue: any;
   selectedDateTime: any;
 
   @Output() parameterUpdate = new EventEmitter();
+  periodTypes: any[] = ICARE_CONFIG.periodTypes;
   constructor() {}
 
   ngOnInit() {
-    this.fieldId = this.field?.id;
+    this.fieldId = !this.field?.periodType
+      ? this.field?.id
+      : this.field?.periodType?.id;
+
+    console.log(this.parameter?.periodType);
   }
 
   onParamChange(e, paramId, selectedDateTime?) {
@@ -54,5 +62,9 @@ export class ParameterFieldComponent implements OnInit {
       [paramId]:
         value || e?.target?.value || e?.value || e?.checked || this.fieldValue,
     });
+  }
+
+  onGetSelectedPeriods(periods: any[]): void {
+    this.parameterUpdate.emit(periods);
   }
 }

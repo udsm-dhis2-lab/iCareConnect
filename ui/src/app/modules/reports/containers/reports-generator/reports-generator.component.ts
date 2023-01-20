@@ -50,13 +50,13 @@ export class ReportsGeneratorComponent implements OnInit {
   dhisReport: boolean;
   reportCategories: any[];
   currentReportGroup: ReportGroup;
-  currentReport: Report;
+  currentReport: any;
   reportCategory;
   reports: any[] = [];
   reportFromSelectedGroup: any[] = [];
   selectedReportGroup: any;
   period: any;
-  reportSelectionParams = {};
+  reportSelectionParams: any = null;
   countOfReportsSent$: Observable<any>;
   renderDhisReport: boolean;
   showReportArea: boolean;
@@ -81,6 +81,8 @@ export class ReportsGeneratorComponent implements OnInit {
   }[];
   countOfSelectedParams: number;
   keyedReportsExtraParameters: any = {};
+  useDefaultDatesParametersConfigs: boolean = true;
+  standardReportIsReady: boolean = false;
   constructor(
     private reportParamsService: ReportParamsService,
     private reportService: ReportService,
@@ -265,6 +267,10 @@ export class ReportsGeneratorComponent implements OnInit {
       (this.reportsParametersConfigurations.filter(
         (reportConfigs) => reportConfigs?.id === this.currentReport?.id
       ) || [])[0];
+    this.useDefaultDatesParametersConfigs =
+      matchedReportWithParametersConfigs?.hasNonDefaultDatesConfigs
+        ? false
+        : true;
     this.selectedReportParameters = (
       matchedReportWithParametersConfigs
         ? matchedReportWithParametersConfigs?.parameters
@@ -276,7 +282,7 @@ export class ReportsGeneratorComponent implements OnInit {
         type: param?.type === "DATETIME" ? "DATE" : param?.type,
       };
     });
-
+    this.reportSelectionParams = null;
     this.reportData = null;
     this.reportError = null;
     this.hasError = false;
@@ -289,6 +295,9 @@ export class ReportsGeneratorComponent implements OnInit {
   }
 
   onSetParameterValue(paramValue: any) {
+    this.reportSelectionParams = !this.reportSelectionParams
+      ? {}
+      : this.reportSelectionParams;
     this.reportSelectionParams = {
       ...this.reportSelectionParams,
       ...paramValue,
@@ -350,16 +359,16 @@ export class ReportsGeneratorComponent implements OnInit {
       });
   }
 
-  onRunReport(e, dhisConfigs?: any, period?: any, reportConfigs?: any) {
+  onRunReport(e: Event, dhisConfigs?: any, period?: any, reportConfigs?: any) {
     e.stopPropagation();
 
     this.renderDhisReport = false;
+    this.standardReportIsReady = false;
+    console.log(period);
+    console.log(dhisConfigs);
+    console.log(this.currentReport);
 
     if (dhisConfigs) {
-      // setTimeout(() => {
-      //   this.renderDhisReport = true;
-      // }, 100);
-
       this.showReportArea = false;
 
       const params =
@@ -391,15 +400,12 @@ export class ReportsGeneratorComponent implements OnInit {
       setTimeout(() => {
         this.showReportArea = true;
       }, 200);
-    } else {
+    } else if (!this.currentReport?.standardReport) {
       this.loadingReport = true;
       this.reportData = null;
       this.reportError = null;
       this.hasError = false;
       this.dhisReport = false;
-
-      // console.log('R.G :: ', this.currentReport);
-
       this.reportService
         .getReport({
           reportGroup: this.currentReport?.reportGroup,
@@ -426,6 +432,9 @@ export class ReportsGeneratorComponent implements OnInit {
             this.loadingReport = false;
           }
         );
+    } else {
+      console.log(this.standardReportIsReady);
+      this.standardReportIsReady = true;
     }
   }
 

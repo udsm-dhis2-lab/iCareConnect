@@ -1,0 +1,36 @@
+<div class="w-100" [ngStyle]="{ 'max-height': maxHeight }">
+  <div class="w-100 d-flex justify-content-end">
+    <button mat-stroked-button (click)="setYearlyPeriod($event, 'prev')">
+      Prev
+    </button>
+    <button
+      mat-stroked-button
+      [disabled]="currentYearlyPe >= currentYear"
+      (click)="setYearlyPeriod($event, 'next')"
+      class="ml-2"
+    >
+      Next
+    </button>
+  </div>
+  <div class="w-100 d-flex justify-content-between" *ngIf="periodsList">
+    <div class="w-50 list">
+      <lib-period-items-list
+        [periodsList]="periodsList"
+        (selectedPeriod)="onGetSelectedPeriods($event)"
+      ></lib-period-items-list>
+    </div>
+    <div class="w-50 list-selected">
+      <table>
+        <tr
+          (click)="unSelectItem($event, selectedPe)"
+          *ngFor="let selectedPe of selectedPeriods"
+        >
+          {{
+            selectedPe?.name
+          }}
+        </tr>
+      </table>
+    </div>
+  </div>
+  <div class="d-flex justify-content-end mt-2"></div>
+</div>
