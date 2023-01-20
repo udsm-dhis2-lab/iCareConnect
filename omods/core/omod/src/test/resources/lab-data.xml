@@ -113,6 +113,9 @@
     <!-- Batch  -->
     <lb_batch batch_id ="601" uuid = "iCARE890-TEST-MOTR-9beb-d30dcfc0c635" name = "My batch" label="batch-label" description = "Testing batch" batch_set_id="602" date_created="2022-12-10 15:51:57.0" voided="0" creator="1" />
 
+    <!-- Batch Sample -->
+    <lb_batch_sample batch_sample_id ="1" uuid = "iCARE890-TEST-GGGH-9beb-d30dcfc0cd35" code="BS01"  batch_id="601" date_created="2022-12-10 15:51:57.0" voided="0" creator="1" />
+
 
     <!-- Care Settings -->
     <care_setting care_setting_id="1" name="Outpatient" description="Out-patient care setting" care_setting_type="OUTPATIENT"

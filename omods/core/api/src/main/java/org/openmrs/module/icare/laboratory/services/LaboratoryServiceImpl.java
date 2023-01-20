@@ -840,6 +840,11 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 		return batchSampleDAO.save(batchSample);
 	}
 
+	@Override
+	public List<BatchSample> getBatchSamples(Date startDate, Date endDate, String q, Integer startIndex, Integer limit) {
+		return batchSampleDAO.getBatchSamples(startDate, endDate, q, startIndex, limit);
+	}
+
 	public BatchSet addBatchSet(BatchSet batchSet) {
 		return batchSetDAO.save(batchSet);
 	}
@@ -1027,4 +1032,6 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 		worksheetSampleStatus.setWorksheetSample(worksheetSample);
 		return worksheetSampleStatusDAO.save(worksheetSampleStatus);
 	}
+
+
 }

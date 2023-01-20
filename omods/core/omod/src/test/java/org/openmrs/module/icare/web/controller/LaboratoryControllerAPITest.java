@@ -661,9 +661,17 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		MockHttpServletResponse handle = handle(newPostRequest);
 		List<Map<String,Object>> createdBatchSamples = (new ObjectMapper()).readValue(handle.getContentAsString(),List.class);
 
-		System.out.println(createdBatchSamples);
-
 		assertThat("created 2 batch samples",createdBatchSamples.size(),is(2));
+
+		//2. Getting batchSamples
+			//when
+		MockHttpServletRequest newGetRequest = newGetRequest("lab/batchsamples", new Parameter("startDate", "2022-12-10"),
+				new Parameter("endDate", "2022-12-10"), new Parameter("q", "BS01"));
+
+		MockHttpServletResponse handle2 = handle(newGetRequest);
+		List<Map<String,Object>> batchsamples = (new ObjectMapper()).readValue(handle2.getContentAsString(), List.class);
+
+		assertThat("Has 1 batch sample", batchsamples.size(), is(1));
 	}
 	
 	@Test
