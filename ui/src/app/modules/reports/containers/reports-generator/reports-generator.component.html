@@ -203,7 +203,16 @@
               "
               class="ml-2"
               mat-stroked-button
-              (click)="downloadToExcel($event, reportData, currentReport)"
+              (click)="
+                exportData(
+                  $event,
+                  !currentReport?.standardReport
+                    ? 'report-to-download'
+                    : 'iframe_id',
+                  currentReport?.name,
+                  currentReport?.standardReport ? true : false
+                )
+              "
             >
               Download
             </button>
@@ -224,125 +233,129 @@
             </button>
           </div>
           <div class="menu-and-report-sepatator w-100"></div>
-          <div class="w-100 mt-3">
-            <div
-              class="
-                w-100
-                report-dimensions-summary
-                h5
-                font-weight-normal
-                d-flex
-                justify-content-left
-              "
-            >
-              <div class="w-100">
-                {{
-                  currentReport && currentReport?.name
-                    ? currentReport?.name
-                    : "Please select report"
-                }}
-              </div>
+          <div class="w-100" id="report-to-download">
+            <div class="w-100 mt-3">
               <div
-                class="ml-3 d-flex justify-content-right"
-                style="font-size: 1rem"
-                *ngIf="
-                  currentReport &&
-                  currentReport?.parameters &&
-                  reportSelectionParams
+                class="
+                  w-100
+                  report-dimensions-summary
+                  h5
+                  font-weight-normal
+                  d-flex
+                  justify-content-left
                 "
               >
+                <div class="w-100">
+                  {{
+                    currentReport && currentReport?.name
+                      ? currentReport?.name
+                      : "Please select report"
+                  }}
+                </div>
                 <div
-                  class="ml-2"
-                  *ngFor="let parameter of currentReport?.parameters"
+                  class="ml-3 d-flex justify-content-right"
+                  style="font-size: 1rem"
+                  *ngIf="
+                    currentReport &&
+                    currentReport?.parameters &&
+                    reportSelectionParams
+                  "
                 >
-                  <div *ngIf="reportSelectionParams[parameter?.id]">
-                    <b class="text-muted">
-                      {{ sanitizeParameter(parameter?.name) }} </b
-                    >:
-                    <span
-                      style="font-size: smaller"
-                      *ngIf="parameter?.type === 'DATE'"
-                    >
-                      {{
-                        reportSelectionParams[parameter?.id]
-                          | formatIsoStrDateForDisplay
-                      }}
-                    </span>
-                    <span
-                      style="font-size: smaller"
-                      *ngIf="parameter?.type !== 'DATE'"
-                    >
-                      {{ reportSelectionParams[parameter?.id] }}
-                    </span>
+                  <div
+                    class="ml-2"
+                    *ngFor="let parameter of currentReport?.parameters"
+                  >
+                    <div *ngIf="reportSelectionParams[parameter?.id]">
+                      <b class="text-muted">
+                        {{ sanitizeParameter(parameter?.name) }} </b
+                      >:
+                      <span
+                        style="font-size: smaller"
+                        *ngIf="parameter?.type === 'DATE'"
+                      >
+                        {{
+                          reportSelectionParams[parameter?.id]
+                            | formatIsoStrDateForDisplay
+                        }}
+                      </span>
+                      <span
+                        style="font-size: smaller"
+                        *ngIf="parameter?.type !== 'DATE'"
+                      >
+                        {{ reportSelectionParams[parameter?.id] }}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          <div
-            class="w-100 text-center"
-            style="font-size: 1rem"
-            *ngIf="!currentReport"
-          >
-            <img src="assets/images/report-table.png" height="200" />
-          </div>
-
-          <div class="mt-3" *ngIf="loadingReport">
-            <mat-progress-bar mode="indeterminate"></mat-progress-bar>
-          </div>
-
-          <div class="mt-3 alert alert-danger" role="alert" *ngIf="hasError">
-            Something went wrong when loading report, try again with different
-            parameters
-          </div>
-
-          <div
-            class="mt-3"
-            *ngIf="
-              showReportArea && !loadingReport && !currentReport?.standardReport
-            "
-          >
-            <div *ngFor="let dataSet of reportData?.dataSets">
-              <div
-                style="height: 70vh; overflow: auto"
-                *ngIf="!isQuickPivotSet"
-              >
-                <app-report-table
-                  [data]="dataSet"
-                  *ngIf="currentVisualization === 'TABLE' && !isQuickPivotSet"
-                ></app-report-table>
-              </div>
-              <div *ngIf="isQuickPivotSet">
-                <app-quick-pivot
-                  [dataToPivot]="reportData?.dataSets[0]?.rows"
-                ></app-quick-pivot>
-              </div>
-            </div>
-            <app-chart *ngIf="currentVisualization === 'CHART'"></app-chart>
-          </div>
-          <div
-            class="mt-3"
-            *ngIf="
-              selectedReportParameters &&
-              currentReport?.standardReport &&
-              standardReportIsReady
-            "
-          >
-            <ngx-standard-report
-              [parameters]="reportSelectionParams"
-              [report]="currentReport?.standardReport?.value"
-            ></ngx-standard-report>
-          </div>
-          <div
-            class="mt-3"
-            *ngIf="period && reportConfigs?.dhisConfigs && showReportArea"
-          >
-            <app-report
-              [period]="period"
-              [reportConfigs]="reportConfigs?.dhisConfigs"
+            <div
+              class="w-100 text-center"
+              style="font-size: 1rem"
+              *ngIf="!currentReport"
             >
-            </app-report>
+              <img src="assets/images/report-table.png" height="200" />
+            </div>
+
+            <div class="mt-3" *ngIf="loadingReport">
+              <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+            </div>
+
+            <div class="mt-3 alert alert-danger" role="alert" *ngIf="hasError">
+              Something went wrong when loading report, try again with different
+              parameters
+            </div>
+
+            <div
+              class="mt-3"
+              *ngIf="
+                showReportArea &&
+                !loadingReport &&
+                !currentReport?.standardReport
+              "
+            >
+              <div *ngFor="let dataSet of reportData?.dataSets">
+                <div
+                  style="height: 70vh; overflow: auto"
+                  *ngIf="!isQuickPivotSet"
+                >
+                  <app-report-table
+                    [data]="dataSet"
+                    *ngIf="currentVisualization === 'TABLE' && !isQuickPivotSet"
+                  ></app-report-table>
+                </div>
+                <div *ngIf="isQuickPivotSet">
+                  <app-quick-pivot
+                    [dataToPivot]="reportData?.dataSets[0]?.rows"
+                  ></app-quick-pivot>
+                </div>
+              </div>
+              <app-chart *ngIf="currentVisualization === 'CHART'"></app-chart>
+            </div>
+            <div
+              class="mt-3"
+              *ngIf="
+                selectedReportParameters &&
+                currentReport?.standardReport &&
+                standardReportIsReady
+              "
+            >
+              <ngx-standard-report
+                [parameters]="reportSelectionParams"
+                [report]="currentReport?.standardReport?.value"
+              ></ngx-standard-report>
+            </div>
+            <div
+              class="mt-3"
+              *ngIf="period && reportConfigs?.dhisConfigs && showReportArea"
+            >
+              <app-report
+                [period]="period"
+                [reportConfigs]="reportConfigs?.dhisConfigs"
+              >
+              </app-report>
+            </div>
           </div>
         </mat-card>
       </div>
