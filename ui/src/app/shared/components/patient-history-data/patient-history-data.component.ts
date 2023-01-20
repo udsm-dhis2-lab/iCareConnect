@@ -1,6 +1,9 @@
 import { Component, EventEmitter, OnInit, Output, Input } from "@angular/core";
 import { flatten, keyBy } from "lodash";
-import { getEncountersByProviderInAVisit, getGenericDrugPrescriptionsFromVisit } from "../../helpers/visits.helper";
+import {
+  arrangeVisitDataChronologically,
+  getGenericDrugPrescriptionsFromVisit,
+} from "../../helpers/visits.helper";
 import { Visit } from "../../resources/visits/models/visit.model";
 
 @Component({
@@ -21,7 +24,7 @@ export class PatientHistoryDataComponent implements OnInit {
   obsBasedOnForms: any[] = [];
   medications: any[];
   drugsPrescribed: any;
-  encountersByProvider: any;
+  visitHistory: any;
   diagnoses: any;
 
   constructor() {}
@@ -63,7 +66,7 @@ export class PatientHistoryDataComponent implements OnInit {
               []
             ),
             fields: form?.formFields,
-            obsDatetime: observations[0]?.obsDatetime
+            obsDatetime: observations[0]?.obsDatetime,
             // fields: flatten(
             //   form?.formFields
             //     ?.map((formField) => {
@@ -131,10 +134,10 @@ export class PatientHistoryDataComponent implements OnInit {
       this.generalPrescriptionOrderType
     );
 
-    this.diagnoses = visit.diagnoses
-    
-    // RESERVE: For IPD Rounds
-    this.encountersByProvider = getEncountersByProviderInAVisit(
+    this.diagnoses = visit.diagnoses;
+
+    // RESERVE: For TimeLine History
+    this.visitHistory = arrangeVisitDataChronologically(
       {
         ...this.visit?.visit,
         observations: this.obsBasedOnForms,
@@ -142,11 +145,13 @@ export class PatientHistoryDataComponent implements OnInit {
         radiologyOrders: this.radiologyOrders,
         procedureOrders: this.procedureOrders,
         drugs: this.drugsPrescribed,
+        diagnoses: this.diagnoses,
       },
+      'desc',
       this.specificDrugConceptUuid,
       this.prescriptionArrangementFields
     );
-    console.log("==> Encounters by Provider: ", this.encountersByProvider);
+    console.log("==> Encounters by Provider: ", this.visitHistory);
   }
 
   getStringDate(date: Date) {
