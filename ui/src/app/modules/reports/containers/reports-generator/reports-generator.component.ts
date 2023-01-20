@@ -294,14 +294,16 @@ export class ReportsGeneratorComponent implements OnInit {
     this.onSetParameterValue({ location: location.uuid });
   }
 
-  onSetParameterValue(paramValue: any) {
+  onSetParameterValue(paramValue: any, itemsType?: string) {
     this.reportSelectionParams = !this.reportSelectionParams
       ? {}
       : this.reportSelectionParams;
-    this.reportSelectionParams = {
-      ...this.reportSelectionParams,
-      ...paramValue,
-    };
+    this.reportSelectionParams = !itemsType
+      ? {
+          ...this.reportSelectionParams,
+          ...paramValue,
+        }
+      : paramValue;
     this.countOfSelectedParams = Object.keys(this.reportSelectionParams).filter(
       (keyItem) => this.reportSelectionParams[keyItem] !== undefined
     ).length;
