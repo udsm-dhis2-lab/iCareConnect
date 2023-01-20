@@ -5,10 +5,9 @@
     prescriptionArrangementFields: prescriptionArrangementFields$ | async,
     specificDrugConceptUuid: specificDrugConceptUuid$ | async
   } as params">
-  <mat-vertical-stepper [linear]="false" #stepper>
+  <!-- <mat-vertical-stepper [linear]="false" #stepper>
     <mat-step *ngFor="let visit of params?.visits">
       <ng-template matStepLabel>
-        <!-- {{ visit?.visit?.visitType?.display}} -->
           {{ visit?.visit?.startDatetime | date:"medium" }} 
       </ng-template>
       <div>
@@ -19,7 +18,19 @@
           [prescriptionArrangementFields]="params?.prescriptionArrangementFields"
           [specificDrugConceptUuid]="params?.specificDrugConceptUuid"
           ></app-patient-history-data>
-      </div>
-    </mat-step>
-  </mat-vertical-stepper>
+        </div>
+      </mat-step>
+    </mat-vertical-stepper> -->
+    <div class="history overflow-auto">
+      <ng-container *ngFor="let visit of params?.visits">
+        <app-patient-history-data 
+          
+          [visit]="visit" 
+          [forms]="params?.customForms" 
+          [generalPrescriptionOrderType]="params?.generalPrescriptionOrderType"
+          [prescriptionArrangementFields]="params?.prescriptionArrangementFields"
+          [specificDrugConceptUuid]="params?.specificDrugConceptUuid"
+          ></app-patient-history-data>
+      </ng-container>
+    </div>
 </div>
