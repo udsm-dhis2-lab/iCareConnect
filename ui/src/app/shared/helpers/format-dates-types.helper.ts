@@ -140,12 +140,12 @@ export function getFormattedPeriodsByPeriodType(yearlyPe, periodType) {
   const now = new Date();
   const currentMonth = now.getMonth() + 1;
   const currentYear = now.getFullYear();
-  periodType === "Monthly"
+  periodType?.toLowerCase() === "monthly"
     ? _.forEach(monthsOfTheYear, (month) => {
         if (
           Number(yearlyPe) < currentYear ||
           (Number(yearlyPe) === currentYear &&
-            Number(month.value) < currentMonth)
+            Number(month.value) <= currentMonth)
         ) {
           periods = [
             ...periods,
@@ -153,6 +153,7 @@ export function getFormattedPeriodsByPeriodType(yearlyPe, periodType) {
               id: yearlyPe + month.value,
               name: month.name + " " + yearlyPe,
               startDate: yearlyPe + "-" + month.value + "-01",
+              value: Number(yearlyPe + month.value),
               endDate:
                 yearlyPe +
                 "-" +
@@ -163,7 +164,7 @@ export function getFormattedPeriodsByPeriodType(yearlyPe, periodType) {
           ];
         }
       })
-    : periodType === "Quarterly"
+    : periodType?.toLowerCase() === "quarterly"
     ? _.map(quartersOfTheYear, (quarter) => {
         if (
           Number(yearlyPe) < currentYear ||
@@ -182,6 +183,8 @@ export function getFormattedPeriodsByPeriodType(yearlyPe, periodType) {
           ];
         }
       })
-    : periods == [];
+    : () => {
+        periods = [];
+      };
   return periods;
 }

@@ -1,4 +1,4 @@
-<div>
+<div *ngIf="type !== 'custom'">
   <mat-form-field
     appearance="fill"
     class="w-100"
@@ -88,4 +88,12 @@
       (keyup)="onParamChange($event, field?.id)"
     />
   </mat-form-field> -->
+</div>
+<div *ngIf="type === 'custom'">
+  <ngx-period-filter
+    [periodType]="parameter?.periodType"
+    [periodTypes]="periodTypes"
+    [maxHeight]="'300px'"
+    (selectedItems)="onGetSelectedPeriods($event)"
+  ></ngx-period-filter>
 </div>
