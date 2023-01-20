@@ -3,7 +3,8 @@
     reports: reports$ | async,
     reportsAccessConfigurations: reportsAccessConfigurations$ | async,
     userRoles: userRoles$ | async,
-    standardReports: standardReports$ | async
+    standardReports: standardReports$ | async,
+    reportsParametersConfigurations: reportsParametersConfigurations$ | async
   } as params"
 >
   <mat-progress-bar
@@ -12,7 +13,8 @@
       !params?.reports ||
       !params?.reportsAccessConfigurations ||
       !params?.userRoles ||
-      !params?.standardReports
+      !params?.standardReports ||
+      !params?.reportsParametersConfigurations
     "
   ></mat-progress-bar>
   <div
@@ -21,7 +23,8 @@
       params?.reports &&
       params?.reportsAccessConfigurations &&
       params?.userRoles &&
-      params?.standardReports
+      params?.standardReports &&
+      params?.reportsParametersConfigurations
     "
   >
     <app-reports-groups-list
@@ -30,6 +33,9 @@
       [reports]="params?.reports"
       [standardReports]="params?.standardReports"
       (reloadList)="onReloadList($event)"
+      [reportsParametersConfigurations]="
+        params?.reportsParametersConfigurations
+      "
     ></app-reports-groups-list>
   </div>
 </div>
