@@ -781,6 +781,23 @@ public class LaboratoryController {
 		return responseBatchesObject;
 		
 	}
+
+	@RequestMapping(value = "batchsample",method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public List<Map<String,Object>> addBatchSetSample(@RequestBody List<Map<String,Object>> batchSamplesObject){
+
+		BatchSample batchSample = new BatchSample();
+		List<Map<String,Object>> newBatchSamples = new ArrayList<>();
+
+		for(Map<String,Object> batchSampleObject : batchSamplesObject){
+
+			batchSample = BatchSample.fromMap(batchSampleObject);
+			BatchSample newBatchSample = laboratoryService.addBatchSamples(batchSample);
+			newBatchSamples.add(newBatchSample.toMap());
+		}
+
+		return newBatchSamples;
+	}
 	
 	@RequestMapping(value = "batchsets", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
