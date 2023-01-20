@@ -364,78 +364,72 @@ export class ReportsGeneratorComponent implements OnInit {
 
     this.renderDhisReport = false;
     this.standardReportIsReady = false;
-    console.log(period);
-    console.log(dhisConfigs);
-    console.log(this.currentReport);
 
-    if (dhisConfigs) {
-      this.showReportArea = false;
+    setTimeout(() => {
+      if (dhisConfigs) {
+        this.showReportArea = false;
 
-      const params =
-        this.period?.startDate && this.period?.endDate
-          ? {
-              startDate: period?.startDate,
-              endDate: period?.endDate,
-              reportId: reportConfigs?.id,
-              reportGroup: reportConfigs?.reportGroup,
-              reportName: reportConfigs?.name,
-              periodId: period?.id ? period?.id : period.periodId,
-              configs: reportConfigs,
-              params: [
-                `startDate=${period?.startDate}`,
-                `endDate=${period?.endDate}`,
-              ],
+        const params =
+          this.period?.startDate && this.period?.endDate
+            ? {
+                startDate: period?.startDate,
+                endDate: period?.endDate,
+                reportId: reportConfigs?.id,
+                reportGroup: reportConfigs?.reportGroup,
+                reportName: reportConfigs?.name,
+                periodId: period?.id ? period?.id : period.periodId,
+                configs: reportConfigs,
+                params: [
+                  `startDate=${period?.startDate}`,
+                  `endDate=${period?.endDate}`,
+                ],
+              }
+            : {
+                reportName: "dhis2.sqlGet." + reportConfigs?.id,
+                date: period?.date,
+                periodId: period?.id ? period?.id : period.periodId,
+                configs: reportConfigs,
+              };
+
+        // console.log('params before the dispatch : ', params);
+
+        this.store.dispatch(loadReport({ params }));
+
+        setTimeout(() => {
+          this.showReportArea = true;
+        }, 200);
+      } else if (!this.currentReport?.standardReport) {
+        this.loadingReport = true;
+        this.reportData = null;
+        this.reportError = null;
+        this.hasError = false;
+        this.dhisReport = false;
+        this.reportService
+          .getReport({
+            reportGroup: this.currentReport?.reportGroup,
+            reportId: this.currentReport?.id,
+            params: ((this.selectedReportParameters as any) || []).map(
+              (param) => `${param.id}=${this.reportSelectionParams[param.id]}`
+            ),
+          })
+          .subscribe(
+            (res) => {
+              this.loadingReport = false;
+              this.showReportArea = true;
+              this.reportData = res;
+
+              this.dhisReport = this.isDhisReport(this.reportData);
+            },
+            (error) => {
+              this.reportError = error;
+              this.hasError = true;
+              this.loadingReport = false;
             }
-          : {
-              reportName: "dhis2.sqlGet." + reportConfigs?.id,
-              date: period?.date,
-              periodId: period?.id ? period?.id : period.periodId,
-              configs: reportConfigs,
-            };
-
-      // console.log('params before the dispatch : ', params);
-
-      this.store.dispatch(loadReport({ params }));
-
-      setTimeout(() => {
-        this.showReportArea = true;
-      }, 200);
-    } else if (!this.currentReport?.standardReport) {
-      this.loadingReport = true;
-      this.reportData = null;
-      this.reportError = null;
-      this.hasError = false;
-      this.dhisReport = false;
-      this.reportService
-        .getReport({
-          reportGroup: this.currentReport?.reportGroup,
-          reportId: this.currentReport?.id,
-          params: ((this.selectedReportParameters as any) || []).map(
-            (param) => `${param.id}=${this.reportSelectionParams[param.id]}`
-          ),
-        })
-        .subscribe(
-          (res) => {
-            this.loadingReport = false;
-            this.showReportArea = true;
-            this.reportData = res;
-
-            //console.log("the data :: ",this.reportData)
-
-            this.dhisReport = this.isDhisReport(this.reportData);
-
-            //console.log(this.dhisReport)
-          },
-          (error) => {
-            this.reportError = error;
-            this.hasError = true;
-            this.loadingReport = false;
-          }
-        );
-    } else {
-      console.log(this.standardReportIsReady);
-      this.standardReportIsReady = true;
-    }
+          );
+      } else {
+        this.standardReportIsReady = true;
+      }
+    }, 50);
   }
 
   sendDhisReport() {
