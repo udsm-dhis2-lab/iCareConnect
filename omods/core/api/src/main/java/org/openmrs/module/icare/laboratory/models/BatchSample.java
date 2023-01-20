@@ -3,9 +3,7 @@ package org.openmrs.module.icare.laboratory.models;
 import org.openmrs.BaseOpenmrsData;
 
 import javax.persistence.*;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Entity
 @Table(name = "lb_batch_sample")
@@ -22,6 +20,9 @@ public class BatchSample extends BaseOpenmrsData implements java.io.Serializable
     @ManyToOne
     @JoinColumn(name = "batch_id")
     private Batch batch;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "batchSample")
+    private List<Sample> samples = new ArrayList<Sample>();
 
     @Override
     public Integer getId() {
@@ -49,6 +50,15 @@ public class BatchSample extends BaseOpenmrsData implements java.io.Serializable
         this.batch = batch;
     }
 
+
+    public List<Sample> getSamples() {
+        return samples;
+    }
+
+    public void setSamples(List<Sample> samples) {
+        this.samples = samples;
+    }
+
     public Map<String,Object> toMap(){
 
         Map<String,Object> newBatchSampleObject = new HashMap<>();
@@ -67,6 +77,15 @@ public class BatchSample extends BaseOpenmrsData implements java.io.Serializable
             userObject.put("uuid",this.getCreator().getUuid());
             userObject.put("display",this.getCreator().getDisplayString());
             newBatchSampleObject.put("creator",userObject);
+        }
+
+        List<Map<String, Object>> samplesObject = new ArrayList<Map<String, Object>>();
+        if (this.getSamples() != null) {
+
+            for (Sample sample : this.getSamples()) {
+                samplesObject.add(sample.toMap());
+            }
+            newBatchSampleObject.put("samples", samplesObject);
         }
 
         return newBatchSampleObject;

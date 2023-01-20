@@ -841,6 +841,11 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	}
 
 	@Override
+	public BatchSample getBatchSampleByUuid(String batchSampleUuid) {
+		return batchSampleDAO.findByUuid(batchSampleUuid);
+	}
+
+	@Override
 	public List<BatchSample> getBatchSamples(Date startDate, Date endDate, String q, Integer startIndex, Integer limit) {
 		return batchSampleDAO.getBatchSamples(startDate, endDate, q, startIndex, limit);
 	}
@@ -928,6 +933,7 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	public WorksheetControl addWorksheetControl(WorksheetControl worksheetControl) {
 		return worksheetControlDAO.save(worksheetControl);
 	}
+
 	
 	@Override
 	public List<WorksheetDefinition> getWorksheetDefinitions(Date startDate, Date endDate, String q, Integer startIndex,
@@ -954,7 +960,13 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 		worksheetDefinitionModified.put("worksheet", worksheetDefinition.getWorksheet().toMap());
 		return worksheetDefinitionModified;
 	}
-	
+
+	@Override
+	public WorksheetDefinition getDefaultWorksheetDefinitionByUuid(String worksheetDefinitionUuid) {
+		WorksheetDefinition worksheetDefinition = worksheetDefinitionDAO.findByUuid(worksheetDefinitionUuid);
+		return worksheetDefinition;
+	}
+
 	@Override
 	public WorksheetDefinition addWorksheetDefinition(WorksheetDefinition worksheetDefinition) throws Exception {
 		
@@ -989,7 +1001,7 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 			worksheetSample.setSample(sample);
 		}
 		
-		WorksheetDefinition worksheetDefinition = (WorksheetDefinition) this.getWorksheetDefinitionByUuid(worksheetSample
+		WorksheetDefinition worksheetDefinition = this.getDefaultWorksheetDefinitionByUuid(worksheetSample
 		        .getWorksheetDefinition().getUuid());
 		if (worksheetDefinition == null) {
 			throw new Exception("The worksheet definition with id " + worksheetSample.getWorksheetDefinition().getUuid()
