@@ -782,9 +782,9 @@ public class LaboratoryController {
 		
 	}
 
-	@RequestMapping(value = "batchsample",method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "batchsamples",method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
-	public List<Map<String,Object>> addBatchSetSample(@RequestBody List<Map<String,Object>> batchSamplesObject){
+	public List<Map<String,Object>> addBatchSamples(@RequestBody List<Map<String,Object>> batchSamplesObject) throws Exception{
 
 		BatchSample batchSample = new BatchSample();
 		List<Map<String,Object>> newBatchSamples = new ArrayList<>();

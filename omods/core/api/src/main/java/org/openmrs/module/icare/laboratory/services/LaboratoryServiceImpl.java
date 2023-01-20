@@ -830,7 +830,13 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	}
 
 	@Override
-	public BatchSample addBatchSamples(BatchSample batchSample) {
+	public BatchSample addBatchSamples(BatchSample batchSample) throws Exception {
+		Batch batch = batchDAO.findByUuid(batchSample.getBatch().getUuid());
+		if (batch == null){
+			throw new Exception("The batch with uuid "+ batchSample.getBatch().getUuid() +" does not exist");
+		}
+
+		batchSample.setBatch(batch);
 		return batchSampleDAO.save(batchSample);
 	}
 

@@ -113,7 +113,7 @@ public interface LaboratoryService extends OpenmrsService {
 	
 	Batch addBatch(Batch batch);
 
-	BatchSample addBatchSamples(BatchSample batchSample);
+	BatchSample addBatchSamples(BatchSample batchSample) throws Exception;
 	
 	BatchSet addBatchSet(BatchSet batchSet);
 	
