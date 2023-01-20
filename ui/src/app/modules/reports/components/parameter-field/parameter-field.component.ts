@@ -32,8 +32,6 @@ export class ParameterFieldComponent implements OnInit {
     this.fieldId = !this.field?.periodType
       ? this.field?.id
       : this.field?.periodType?.id;
-
-    console.log(this.parameter?.periodType);
   }
 
   onParamChange(e, paramId, selectedDateTime?) {
