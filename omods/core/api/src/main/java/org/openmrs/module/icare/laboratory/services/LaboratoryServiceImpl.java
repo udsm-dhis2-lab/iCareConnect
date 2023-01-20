@@ -61,6 +61,8 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	WorksheetStatusDAO worksheetStatusDAO;
 	
 	WorksheetSampleStatusDAO worksheetSampleStatusDAO;
+
+	BatchSampleDAO batchSampleDAO;
 	
 	public void setSampleDAO(SampleDAO sampleDAO) {
 		this.sampleDAO = sampleDAO;
@@ -109,7 +111,11 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	public void setBatchDAO(BatchDAO batchDAO) {
 		this.batchDAO = batchDAO;
 	}
-	
+
+	public void setBatchSampleDAO(BatchSampleDAO batchSampleDAO) {
+		this.batchSampleDAO = batchSampleDAO;
+	}
+
 	public void setBatchSetStatusDAO(BatchSetStatusDAO batchSetStatusDAO) {
 		this.batchSetStatusDAO = batchSetStatusDAO;
 	}
@@ -822,7 +828,12 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	public Batch addBatch(Batch batch) {
 		return batchDAO.save(batch);
 	}
-	
+
+	@Override
+	public BatchSample addBatchSamples(BatchSample batchSample) {
+		return batchSampleDAO.save(batchSample);
+	}
+
 	public BatchSet addBatchSet(BatchSet batchSet) {
 		return batchSetDAO.save(batchSet);
 	}

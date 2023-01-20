@@ -112,6 +112,8 @@ public interface LaboratoryService extends OpenmrsService {
 	Batch getBatchByUuid(String batchUuid);
 	
 	Batch addBatch(Batch batch);
+
+	BatchSample addBatchSamples(BatchSample batchSample);
 	
 	BatchSet addBatchSet(BatchSet batchSet);
 	
@@ -150,4 +152,6 @@ public interface LaboratoryService extends OpenmrsService {
 	WorksheetStatus addWorksheetStatus(WorksheetStatus worksheetStatus) throws Exception;
 	
 	WorksheetSampleStatus addWorksheetSampleStatus(WorksheetSampleStatus worksheetSampleStatus) throws Exception;
+
+
 }
