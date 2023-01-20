@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -647,9 +648,26 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		assertThat("Has 1 batch", batches.size(), is(1));
 		
 	}
+
+	@Test
+	public void testCreatingAndGettingBatchSamples() throws Exception {
+		//1. Creating batchSamples
+			//Given
+		String dto = this.readFile("dto/batch-sample-create-dto.json");
+		List<Map<String,Object>> batchSampleObject = (new ObjectMapper()).readValue(dto,List.class);
+
+			//When
+		MockHttpServletRequest newPostRequest = newPostRequest("lab/batchsamples",batchSampleObject);
+		MockHttpServletResponse handle = handle(newPostRequest);
+		List<Map<String,Object>> createdBatchSamples = (new ObjectMapper()).readValue(handle.getContentAsString(),List.class);
+
+		System.out.println(createdBatchSamples);
+
+		assertThat("created 2 batch samples",createdBatchSamples.size(),is(2));
+	}
 	
 	@Test
-	public void CreatingAndGettingBatchSets() throws Exception {
+	public void testCreatingAndGettingBatchSets() throws Exception {
 		
 		//1. Creating batchSets
 		//Given
@@ -676,7 +694,7 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 	}
 	
 	@Test
-	public void creatingBatchStatusAndBatchSetStatus() throws Exception {
+	public void testCreatingBatchStatusAndBatchSetStatus() throws Exception {
 		
 		//1.Creating BatchSetStatus
 		//Given
@@ -702,7 +720,7 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 	}
 	
 	@Test
-	public void CreatingAndGettingWorksheets() throws Exception {
+	public void testCreatingAndGettingWorksheets() throws Exception {
 		
 		//1. Creating worksheets
 		//Given
@@ -730,7 +748,7 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 	}
 	
 	@Test
-	public void CreatingAndGettingWorksheetControls() throws Exception {
+	public void testCreatingAndGettingWorksheetControls() throws Exception {
 		
 		//1. Creating worksheetControls
 		//Given
@@ -759,7 +777,7 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 	}
 	
 	@Test
-	public void CreatingAndGettingWorksheetDefinitions() throws Exception {
+	public void testCreatingAndGettingWorksheetDefinitions() throws Exception {
 		
 		//1. Creating worksheet definitions
 		//Given
@@ -812,7 +830,7 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 	}
 	
 	@Test
-	public void CreatingAndGettingWorksheetSamples() throws Exception {
+	public void testCreatingAndGettingWorksheetSamples() throws Exception {
 		
 		//1. Creating worksheet definitions
 		//Given
@@ -842,7 +860,7 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 	}
 	
 	@Test
-	public void creatingWorksheetStatusAndWorksheetSampleStatus() throws Exception {
+	public void testCreatingWorksheetStatusAndWorksheetSampleStatus() throws Exception {
 		
 		//1.Creating BatchSetStatus
 		//Given
