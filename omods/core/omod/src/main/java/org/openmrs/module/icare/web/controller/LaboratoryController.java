@@ -82,9 +82,9 @@ public class LaboratoryController {
 			newSample.setLocation(location);
 			System.out.println(location.getName());
 		}
-		if (sample.get("batch") != null) {
-			Batch batch = laboratoryService.getBatchByUuid(((Map) sample.get("batch")).get("uuid").toString());
-			newSample.setBatch(batch);
+		if (sample.get("batchSample") != null) {
+			BatchSample batchSample = laboratoryService.getBatchSampleByUuid(((Map) sample.get("batchSample")).get("uuid").toString());
+			newSample.setBatchSample(batchSample);
 		}
 		
 		newSample.setVisit(existingVisit);
@@ -149,10 +149,10 @@ public class LaboratoryController {
 			statusesObject.put("changedAt", sampleStatus.getTimestamp());
 			sampleStatusesList.add(statusesObject);
 		}
-		if(createdSample.getBatch() != null){
+		if(createdSample.getBatchSample() != null){
 			HashMap<String,Object> batchObject = new HashMap<>();
-			batchObject.put("uuid",createdSample.getBatch().getUuid());
-			batchObject.put("display",createdSample.getBatch().getBatchName());
+			batchObject.put("uuid",createdSample.getBatchSample().getUuid());
+			batchObject.put("display",createdSample.getBatchSample().getCode());
 			response.put("batch",batchObject);
 		}
 		

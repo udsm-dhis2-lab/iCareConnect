@@ -670,7 +670,7 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 
 		MockHttpServletResponse handle2 = handle(newGetRequest);
 		List<Map<String,Object>> batchsamples = (new ObjectMapper()).readValue(handle2.getContentAsString(), List.class);
-
+		System.out.println(batchsamples);
 		assertThat("Has 1 batch sample", batchsamples.size(), is(1));
 	}
 	

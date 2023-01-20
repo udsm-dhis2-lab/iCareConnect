@@ -3772,6 +3772,7 @@
         </sql>
     </changeSet>
 
+    <!-- column name was a mysqlkeyword -->
     <changeSet id="update_lb_worksheet_sample_rename_row_to_rows" author="dennis-kibahila" dbms="mysql">
         <sql>
             ALTER TABLE lb_worksheet_sample
@@ -3779,6 +3780,7 @@
         </sql>
     </changeSet>
 
+    <!-- column name was a mysql keyword -->
     <changeSet id="update_lb_worksheet_sample_rename_column_to_columns" author="dennis-kibahila" dbms="mysql">
         <sql>
             ALTER TABLE lb_worksheet_sample
@@ -3853,6 +3855,33 @@
                 referencedColumnNames="batch_id"
                 referencedTableName="batch"/>
 
+    </changeSet>
+
+    <changeSet id="update_lb_sample_drop_column_batch_id" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE lb_sample DROP COLUMN batch_id;
+        </sql>
+    </changeSet>
+
+    <changeSet id="add_batch_sample_column_to_lb_sample" author="dennis-kibahila" dbms="mysql">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists columnName="batch_sample_id" tableName="lb_sample"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="lb_sample" >
+            <column name="batch_sample_id" type="INT">
+                <constraints nullable="true"></constraints>
+            </column>
+
+        </addColumn>
+
+        <addForeignKeyConstraint
+                baseColumnNames="batch_sample_id"
+                baseTableName="lb_sample"
+                constraintName="lb_sample_batch_sample_id_lb_batch_sample_fk"
+                referencedColumnNames="batch_sample_id"
+                referencedTableName="lb_batch_sample"/>
     </changeSet>
 
 
