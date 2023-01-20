@@ -103,7 +103,7 @@ export class PatientHistoryDataComponent implements OnInit {
       return {
         ...order,
         results: this.visit?.obs?.filter((ob) => {
-          if (order?.uuid == ob?.uuid) {
+          if (order?.uuid == ob?.order?.uuid) {
             return ob;
           }
         }),
@@ -113,7 +113,7 @@ export class PatientHistoryDataComponent implements OnInit {
       return {
         ...order,
         results: this.visit?.obs?.filter((ob) => {
-          if (order?.uuid == ob?.uuid) {
+          if (order?.uuid == ob?.order?.uuid) {
             return ob;
           }
         }),
@@ -123,7 +123,7 @@ export class PatientHistoryDataComponent implements OnInit {
       return {
         ...order,
         results: this.visit?.obs?.filter((ob) => {
-          if (order?.uuid == ob?.uuid) {
+          if (order?.uuid == ob?.order?.uuid) {
             return ob;
           }
         }),
@@ -151,7 +151,7 @@ export class PatientHistoryDataComponent implements OnInit {
       this.specificDrugConceptUuid,
       this.prescriptionArrangementFields
     );
-    console.log("==> Encounters by Provider: ", this.visitHistory);
+    // console.log("==> Encounters by Provider: ", this.visitHistory);
   }
 
   getStringDate(date: Date) {
