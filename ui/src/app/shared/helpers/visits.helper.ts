@@ -352,7 +352,7 @@ export function arrangeVisitDataChronologically(
         ...order?.order,
         date: getStringDate(new Date(order?.order?.dateActivated)).date,
         time: getStringDate(new Date(order?.order?.dateActivated)).time,
-        provider: order?.orderer?.display?.split("-")[1],
+        provider: order?.order?.orderer?.display?.split("-")[1],
         category: "PROCEDURE_ORDER",
       };
     }),
