@@ -3,11 +3,13 @@ import { AddNewGenericDrugModalComponent } from "./add-new-generic-drug-modal/ad
 import { DrugListModalComponent } from "./drug-list-modal/drug-list-modal.component";
 import { ManageDrugModalComponent } from "./manage-drug-modal/manage-drug-modal.component";
 import { ManageReportModalComponent } from "./manage-report-modal/manage-report-modal.component";
+import { ReportAccessAndConfisSettingsModalComponent } from "./report-access-and-confis-settings-modal/report-access-and-confis-settings-modal.component";
 
 export const maintenanceModals: any[] = [
   AddNewGenericDrugModalComponent,
   DrugListModalComponent,
   ManageDrugModalComponent,
   ManageReportModalComponent,
+  ReportAccessAndConfisSettingsModalComponent,
 ];
 export { AddUserComponent };

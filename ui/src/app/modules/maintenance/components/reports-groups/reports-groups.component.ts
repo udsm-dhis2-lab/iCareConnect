@@ -17,6 +17,7 @@ export class ReportsGroupsComponent implements OnInit {
   reports$: Observable<any[]>;
   reportsAccessConfigurations$: Observable<any>;
   userRoles$: Observable<any>;
+  reportsParametersConfigurations$: Observable<any>;
   standardReports$: Observable<any[]>;
   constructor(
     private reportParamsService: ReportParamsService,
@@ -29,6 +30,10 @@ export class ReportsGroupsComponent implements OnInit {
   }
 
   loadData(): void {
+    this.reportsParametersConfigurations$ =
+      this.systemSettingsService.getSystemSettingsDetailsByKey(
+        "icare.Reports.Parameters.Configurations"
+      );
     this.userRoles$ = this.store.select(getAllUSerRoles);
     this.reportsAccessConfigurations$ =
       this.systemSettingsService.getSystemSettingsByKey(
