@@ -74,7 +74,6 @@ public class FolioItem {
 				}
 			}*/
 		}
-		
 		folioItem.setItemQuantity(invoiceItem.getQuantity().intValue());
 		folioItem.setUnitPrice(invoiceItem.getPrice().intValue());
 		folioItem.setAmountClaimed((int) (invoiceItem.getQuantity() * invoiceItem.getPrice()));
@@ -193,7 +192,7 @@ public class FolioItem {
 	public String itemCode;
 	
 	@JsonProperty("ItemName")
-	private String itemName;
+	public String itemName;
 	
 	@JsonProperty("OtherDetails")
 	public Object otherDetails;

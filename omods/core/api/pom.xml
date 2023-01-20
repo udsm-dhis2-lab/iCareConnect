@@ -92,7 +92,13 @@
 			<artifactId>flying-saucer-pdf-openpdf</artifactId>
 			<version>9.1.20</version>
 		</dependency>
-	</dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>RELEASE</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 	<parent>
 		<groupId>com.icare.module</groupId>
 		<artifactId>icare</artifactId>
