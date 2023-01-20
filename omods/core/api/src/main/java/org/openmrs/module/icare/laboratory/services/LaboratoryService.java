@@ -154,4 +154,5 @@ public interface LaboratoryService extends OpenmrsService {
 	WorksheetSampleStatus addWorksheetSampleStatus(WorksheetSampleStatus worksheetSampleStatus) throws Exception;
 
 
+    List<BatchSample> getBatchSamples(Date start, Date end, String q, Integer startIndex, Integer limit);
 }
