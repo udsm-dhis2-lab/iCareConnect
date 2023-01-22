@@ -1,4 +1,4 @@
-<div class="visit">
+<!-- <div class="visit">
     <mat-vertical-stepper [linear]="false" #stepper>
         <mat-step *ngFor="let formsObservations of obsBasedOnForms">
             <ng-template matStepLabel>{{ formsObservations?.form }}</ng-template>
@@ -6,17 +6,35 @@
                 <div class="card pt-4 ">
                     <ul>
                         <li *ngFor="let field of formsObservations?.fields">
-                            <p>
-                                <strong>
-                                    {{ field?.label }}
-                                </strong>
-                            </p>
-
-                            <p *ngFor="let observation of formsObservations?.obs[field?.key]">
-                                {{
-                                    observation?.value?.uuid ? observation?.value?.display : observation?.valueNumeric ? observation?.valueNumeric : observation?.value
-                                }}
-                            </p>
+                            
+                            <ng-container *ngIf="field?.formFields?.length">
+                                <ng-container *ngFor="let formField of field?.formFields">
+                                    <div *ngIf="formsObservations?.obs[formField?.key]">
+                                        <p>
+                                            <strong>
+                                                {{ formField?.label }}
+                                            </strong>
+                                        </p>
+                                        <p *ngFor="let observation of formsObservations?.obs[formField?.key]">
+                                            {{
+                                                observation?.value?.uuid ? observation?.value?.display : observation?.valueNumeric ? observation?.valueNumeric : observation?.value
+                                            }}
+                                        </p>
+                                    </div>
+                                </ng-container>
+                            </ng-container>
+                            <ng-container *ngIf="!field?.formFields && formsObservations?.obs[field?.formField?.key]">
+                                <p>
+                                    <strong>
+                                        {{ field?.formField?.label }}
+                                    </strong>
+                                </p>
+                                <p *ngFor="let observation of formsObservations?.obs[field?.formField?.key]">
+                                    {{
+                                        observation?.value?.uuid ? observation?.value?.display : observation?.valueNumeric ? observation?.valueNumeric : observation?.value
+                                    }}
+                                </p>
+                            </ng-container>
                         </li>
                     </ul>
                 </div>
@@ -93,4 +111,113 @@
             </div>
         </mat-step>
     </mat-vertical-stepper>
+</div> -->
+
+<div id="timeline-content">
+  <ul class="timeline">
+     <li class="event" *ngIf="visitHistory?.visitStopDateTime?.date" [attr.data-date]="[visitHistory?.visitStopDateTime?.date]">
+        <p> 
+            <strong>
+                Visit was stopped
+            </strong> 
+            <i *ngIf="visitHistory?.visitStopDateTime?.time" class="text-small"> at {{ visitHistory?.visitStopDateTime?.time }} </i>
+        </p>
+    </li>
+    <ng-container *ngFor="let visitData of visitHistory?.visitOrderedData">
+        <li class="mini-event" *ngIf="visitData?.category === 'DRUG_ORDER'">
+            <p class="data-name"> 
+                <strong>
+                    {{visitData?.name}}
+                </strong>
+                <span>
+                    <i *ngIf="visitData?.date" class="text-small">prescribed on {{ visitData?.date }} {{ visitData?.time }} by {{ visitData?.provider }} </i>
+                </span>
+            </p>
+            <p class="data-description"> {{ visitData?.description }} </p>
+        </li>
+        <li class="mini-event" *ngIf="visitData?.category === 'LAB_ORDER'">
+            <p class="data-name"> 
+                <strong>
+                    {{visitData?.order?.display}}
+                </strong>
+                <span>
+                    <i *ngIf="visitData?.date" class="text-small"> ordered on {{ visitData?.date }} {{ visitData?.time }} by {{ visitData?.provider }} </i>
+                </span>
+            </p>
+        </li>
+        <li class="mini-event" *ngIf="visitData?.category === 'RADIOLOGY_ORDER'">
+            <p class="data-name"> 
+                <strong>
+                    {{visitData?.order?.display}}
+                </strong>
+                <span>
+                    <i *ngIf="visitData?.date" class="text-small"> ordered on {{ visitData?.date }} {{ visitData?.time }} by {{ visitData?.provider }} </i>
+                </span>
+            </p>
+        </li>
+        <li class="mini-event" *ngIf="visitData?.category === 'PROCEDURE_ORDER'">
+            <p class="data-name"> 
+                <strong>
+                    {{visitData?.display}}
+                </strong>
+                <span>
+                    <i *ngIf="visitData?.date" class="text-small"> ordered on {{ visitData?.date }} {{ visitData?.time }} by {{ visitData?.provider }} </i>
+                </span>
+            </p>
+        </li>
+        <li class="mini-event" *ngIf="visitData?.category === 'OBSERVATIONS'">
+            <p class="data-name"> 
+                <strong>
+                    {{visitData?.form }}
+                </strong>
+                <span>
+                    <i *ngIf="visitData?.date" class="text-small"> written on {{ visitData?.date }} {{ visitData?.time }} by {{ visitData?.provider }} </i>
+                </span>
+            </p> 
+            <table class="table table-responsive table-striped">
+                <tbody>
+                    <tr>
+                        <td *ngFor="let ob of visitData?.obs">
+                            {{ ob?.concept?.display }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td *ngFor="let ob of visitData?.obs">
+                            {{ ob?.value?.display ? ob?.value?.display : ob?.value  }}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </li>
+    </ng-container>
+    <li class="mini-event" *ngIf="visitHistory?.diagnoses?.PROVISIONAL?.length">
+        <p class="data-name"> 
+            <strong>
+                Provisional Diagnoses
+            </strong>
+        </p>
+        <p class="data-description" *ngFor="let diagnosis of visitHistory?.diagnoses?.PROVISIONAL">
+            {{diagnosis?.display}}
+        </p>
+    </li>
+    <li class="mini-event" *ngIf="visitHistory?.diagnoses?.CONFIRMED?.length">
+        <p class="data-name"> 
+            <strong>
+                Confirmed Diagnoses
+            </strong>
+        </p>
+        <p class="data-description" *ngFor="let diagnosis of visitHistory?.diagnoses?.CONFIRMED">
+            {{diagnosis?.display}}
+        </p>
+    </li>
+    <li class="event" [attr.data-date]="[visitHistory?.visitStartDateTime?.date]">
+        <p> 
+            <strong>
+                Started new visit
+            </strong> 
+            <i *ngIf="visitHistory?.visitStartDateTime?.time" class="text-small"> at {{ visitHistory?.visitStartDateTime?.time }} </i>
+        </p>
+    </li>
+    <hr>
+  </ul>
 </div>

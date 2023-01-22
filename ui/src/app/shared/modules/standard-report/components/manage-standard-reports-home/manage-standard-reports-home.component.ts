@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, Input, OnInit } from "@angular/core";
 
 @Component({
   selector: "lib-manage-standard-reports-home",
@@ -7,13 +7,17 @@ import { Component, OnInit } from "@angular/core";
 })
 export class ManageStandardReportsHomeComponent implements OnInit {
   report: any = "<p></p>";
+  @Input() reportToEdit: any;
   constructor() {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    if (this.reportToEdit) {
+      this.report = this.reportToEdit;
+    }
+  }
 
   onGetSelectedStandardReport(report: any): void {
     this.report = null;
-    console.log("tetwewe", report);
     setTimeout(() => {
       this.report = { ...report, value: JSON.parse(report?.value) };
     }, 100);
