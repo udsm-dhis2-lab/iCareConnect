@@ -62,6 +62,8 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	
 	WorksheetSampleStatusDAO worksheetSampleStatusDAO;
 	
+	BatchSampleDAO batchSampleDAO;
+	
 	public void setSampleDAO(SampleDAO sampleDAO) {
 		this.sampleDAO = sampleDAO;
 	}
@@ -108,6 +110,10 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	
 	public void setBatchDAO(BatchDAO batchDAO) {
 		this.batchDAO = batchDAO;
+	}
+	
+	public void setBatchSampleDAO(BatchSampleDAO batchSampleDAO) {
+		this.batchSampleDAO = batchSampleDAO;
 	}
 	
 	public void setBatchSetStatusDAO(BatchSetStatusDAO batchSetStatusDAO) {
@@ -823,6 +829,27 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 		return batchDAO.save(batch);
 	}
 	
+	@Override
+	public BatchSample addBatchSamples(BatchSample batchSample) throws Exception {
+		Batch batch = batchDAO.findByUuid(batchSample.getBatch().getUuid());
+		if (batch == null) {
+			throw new Exception("The batch with uuid " + batchSample.getBatch().getUuid() + " does not exist");
+		}
+		
+		batchSample.setBatch(batch);
+		return batchSampleDAO.save(batchSample);
+	}
+	
+	@Override
+	public BatchSample getBatchSampleByUuid(String batchSampleUuid) {
+		return batchSampleDAO.findByUuid(batchSampleUuid);
+	}
+	
+	@Override
+	public List<BatchSample> getBatchSamples(Date startDate, Date endDate, String q, Integer startIndex, Integer limit) {
+		return batchSampleDAO.getBatchSamples(startDate, endDate, q, startIndex, limit);
+	}
+	
 	public BatchSet addBatchSet(BatchSet batchSet) {
 		return batchSetDAO.save(batchSet);
 	}
@@ -934,6 +961,12 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	}
 	
 	@Override
+	public WorksheetDefinition getDefaultWorksheetDefinitionByUuid(String worksheetDefinitionUuid) {
+		WorksheetDefinition worksheetDefinition = worksheetDefinitionDAO.findByUuid(worksheetDefinitionUuid);
+		return worksheetDefinition;
+	}
+	
+	@Override
 	public WorksheetDefinition addWorksheetDefinition(WorksheetDefinition worksheetDefinition) throws Exception {
 		
 		Worksheet worksheet = this.getWorksheetByUuid(worksheetDefinition.getWorksheet().getUuid());
@@ -967,7 +1000,7 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 			worksheetSample.setSample(sample);
 		}
 		
-		WorksheetDefinition worksheetDefinition = (WorksheetDefinition) this.getWorksheetDefinitionByUuid(worksheetSample
+		WorksheetDefinition worksheetDefinition = this.getDefaultWorksheetDefinitionByUuid(worksheetSample
 		        .getWorksheetDefinition().getUuid());
 		if (worksheetDefinition == null) {
 			throw new Exception("The worksheet definition with id " + worksheetSample.getWorksheetDefinition().getUuid()
@@ -1010,4 +1043,5 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 		worksheetSampleStatus.setWorksheetSample(worksheetSample);
 		return worksheetSampleStatusDAO.save(worksheetSampleStatus);
 	}
+	
 }
