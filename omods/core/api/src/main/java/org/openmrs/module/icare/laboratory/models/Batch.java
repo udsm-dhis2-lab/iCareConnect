@@ -37,7 +37,6 @@ public class Batch extends BaseOpenmrsData implements java.io.Serializable, JSON
 	@ManyToOne
 	@JoinColumn(name = "batch_set_id", nullable = true)
 	private BatchSet batchSet;
-
 	
 	@Override
 	public Integer getId() {
@@ -89,7 +88,6 @@ public class Batch extends BaseOpenmrsData implements java.io.Serializable, JSON
 	public void setBatchSet(BatchSet batchSet) {
 		this.batchSet = batchSet;
 	}
-
 	
 	public static Batch fromMap(Map<String, Object> batchMap) {
 		
@@ -129,7 +127,6 @@ public class Batch extends BaseOpenmrsData implements java.io.Serializable, JSON
 			batchSetObject.put("name", this.getBatchSet().getBatchSetName());
 			batchObject.put("batchSet", batchSetObject);
 		}
-
 		
 		return batchObject;
 	}

@@ -3804,6 +3804,18 @@
         </sql>
     </changeSet>
 
+    <changeSet id="update_lb_sample_drop_foreign_key_batch_id" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE lb_sample DROP FOREIGN KEY lb_sample_batch_id_lb_batch_batch_id_fk
+        </sql>
+    </changeSet>
+
+    <changeSet id="update_lb_sample_drop_column_batch_id" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE lb_sample DROP COLUMN batch_id;
+        </sql>
+    </changeSet>
+
     <changeSet id="create_lb_batch_sample" author="dennis-kibahila" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -3851,16 +3863,10 @@
         <addForeignKeyConstraint
                 baseColumnNames="batch_id"
                 baseTableName="lb_batch_sample"
-                constraintName="lb_batch_sample_batch_id_batch_batch_id_fk"
+                constraintName="lb_batch_sample_batch_id_lb_batch_fk"
                 referencedColumnNames="batch_id"
-                referencedTableName="batch"/>
+                referencedTableName="lb_batch"/>
 
-    </changeSet>
-
-    <changeSet id="update_lb_sample_drop_column_batch_id" author="dennis-kibahila" dbms="mysql">
-        <sql>
-            ALTER TABLE lb_sample DROP COLUMN batch_id;
-        </sql>
     </changeSet>
 
     <changeSet id="add_batch_sample_column_to_lb_sample" author="dennis-kibahila" dbms="mysql">

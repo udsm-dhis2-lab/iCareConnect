@@ -8,58 +8,57 @@ import java.util.*;
 @Entity
 @Table(name = "lb_batch_sample")
 public class BatchSample extends BaseOpenmrsData implements java.io.Serializable {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "batch_sample_id", unique = true, nullable = false)
-    private Integer id;
-
-    @Column(name = "code", length = 30)
-    private String code;
-
-    @ManyToOne
-    @JoinColumn(name = "batch_id")
-    private Batch batch;
-
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "batchSample")
-    private List<Sample> samples = new ArrayList<Sample>();
-
-    @Override
-    public Integer getId() {
-        return id;
-    }
-
-    @Override
-    public void setId(Integer integer) {
-        this.id = id;
-    }
-
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
-    }
-
-    public Batch getBatch() {
-        return batch;
-    }
-
-    public void setBatch(Batch batch) {
-        this.batch = batch;
-    }
-
-
-    public List<Sample> getSamples() {
-        return samples;
-    }
-
-    public void setSamples(List<Sample> samples) {
-        this.samples = samples;
-    }
-
-    public Map<String,Object> toMap(){
+	
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "batch_sample_id", unique = true, nullable = false)
+	private Integer id;
+	
+	@Column(name = "code", length = 30)
+	private String code;
+	
+	@ManyToOne
+	@JoinColumn(name = "batch_id")
+	private Batch batch;
+	
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "batchSample")
+	private List<Sample> samples = new ArrayList<Sample>();
+	
+	@Override
+	public Integer getId() {
+		return id;
+	}
+	
+	@Override
+	public void setId(Integer integer) {
+		this.id = id;
+	}
+	
+	public String getCode() {
+		return code;
+	}
+	
+	public void setCode(String code) {
+		this.code = code;
+	}
+	
+	public Batch getBatch() {
+		return batch;
+	}
+	
+	public void setBatch(Batch batch) {
+		this.batch = batch;
+	}
+	
+	public List<Sample> getSamples() {
+		return samples;
+	}
+	
+	public void setSamples(List<Sample> samples) {
+		this.samples = samples;
+	}
+	
+	public Map<String,Object> toMap(){
 
         Map<String,Object> newBatchSampleObject = new HashMap<>();
         newBatchSampleObject.put("code",this.getCode());
@@ -90,18 +89,18 @@ public class BatchSample extends BaseOpenmrsData implements java.io.Serializable
 
         return newBatchSampleObject;
     }
-
-    public static BatchSample fromMap(Map<String,Object> batchSampleMap){
-
-        BatchSample batchSample = new BatchSample();
-
-        batchSample.setCode(batchSampleMap.get("code").toString());
-
-        Batch batch = new Batch();
-        batch.setUuid(((Map) batchSampleMap.get("batch")).get("uuid").toString());
-
-        batchSample.setBatch(batch);
-
-        return batchSample;
-    }
+	
+	public static BatchSample fromMap(Map<String, Object> batchSampleMap) {
+		
+		BatchSample batchSample = new BatchSample();
+		
+		batchSample.setCode(batchSampleMap.get("code").toString());
+		
+		Batch batch = new Batch();
+		batch.setUuid(((Map) batchSampleMap.get("batch")).get("uuid").toString());
+		
+		batchSample.setBatch(batch);
+		
+		return batchSample;
+	}
 }

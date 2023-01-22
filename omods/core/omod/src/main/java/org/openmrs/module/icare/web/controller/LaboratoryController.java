@@ -781,7 +781,7 @@ public class LaboratoryController {
 		return responseBatchesObject;
 		
 	}
-
+	
 	@RequestMapping(value = "batchsamples",method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public List<Map<String,Object>> addBatchSamples(@RequestBody List<Map<String,Object>> batchSamplesObject) throws Exception{
@@ -798,7 +798,7 @@ public class LaboratoryController {
 
 		return newBatchSamples;
 	}
-
+	
 	@RequestMapping(value = "batchsamples",method = RequestMethod.GET)
 	@ResponseBody
 	public List<Map<String,Object>> getBatchSamples(@RequestParam(value = "startDate", required = false) String startDate, @RequestParam(value = "endDate", required = false) String endDate, @RequestParam(value = "q", required = false) String q, @RequestParam(defaultValue = "0") Integer startIndex, @RequestParam(defaultValue = "100") Integer limit) throws ParseException{
