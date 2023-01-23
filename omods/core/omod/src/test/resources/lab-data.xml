@@ -178,6 +178,6 @@
 
     <lb_worksheet_sample worksheet_sample_id ="2" code="BCD" uuid = "iCARE890-TEST-OSDH-9beb-d30dcfc0c631" rows="1" columns="1" type="CONTROL"  worksheet_definition_id="1"  control_id="1" date_created="2022-12-10 15:51:57.0" voided="0" creator="1" />
 
-    <global_property property="icare.laboratory.settings.sample.id.format" property_value="NPHL/D{YY}/COUNT:5" uuid="iCARE110-TEST-OSDH-9beb-d30dcfc0c631" description="For sample label format" datatype_config="" preferred_handler="" datatype="TEXT" date_changed="2022-12-10 15:51:57.0" changed_by="1" />
+    <global_property property="icare.laboratory.settings.sample.id.format" property_value="NPHL/WS/D{YYYY}/COUNT:5" uuid="iCARE110-TEST-OSDH-9beb-d30dcfc0c631" description="For sample label format" datatype_config="" preferred_handler="" datatype="TEXT" date_changed="2022-12-10 15:51:57.0" changed_by="1" />
 
 </dataset>

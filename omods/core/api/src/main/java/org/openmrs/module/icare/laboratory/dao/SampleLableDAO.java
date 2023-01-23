@@ -68,24 +68,24 @@ public class SampleLableDAO extends BaseDAO<SampleLable> {
 				substringCount = 2;
 				idFormat = idFormat.replace("D{YY}", formatter.format(new Date()).substring(substringCount));
 			} else if (idFormat.contains("D{YYY}")) {
-				substringCount = 3;
+				substringCount = 1;
 				idFormat = idFormat.replace("D{YYY}", formatter.format(new Date()).substring(substringCount));
 			} else if (idFormat.contains("D{YYYY}")) {
-				substringCount = 4;
+				substringCount = 0;
 				idFormat = idFormat.replace("D{YYYY}", formatter.format(new Date()).substring(substringCount));
 			}
 			DbSession session = this.getSession();
 			String queryStr = null;
-			if (metadataType == "sample") {
-				queryStr = "SELECT COUNT(sp) FROM Sample sp \n" + "WHERE YEAR(sp.dateTime) = :year";
-			} else if (metadataType == "worksheetdefinition") {
-				queryStr = "SELECT COUNT(wd) FROM WorksheetDefinition wd \n" + "WHERE YEAR(wd.dateCreated) = :year";
-			} else if (metadataType == "worksheet"){
-				queryStr = "SELECT COUNT(ws) FROM Worksheet wd \n" + "WHERE YEAR(ws.dateCreated) = :year";
-			} else if (metadataType == "batchset"){
-				queryStr = "SELECT COUNT(bs) FROM BatchSet bs \n" + "WHERE YEAR(bs.dateCreated) = :year";
-			} else if (metadataType == "batch"){
-				queryStr = "SELECT COUNT(b) FROM Batch wd \n" + "WHERE YEAR(b.dateCreated) = :year";
+			if (metadataType.equals("sample")) {
+				queryStr = "SELECT COUNT(sp) FROM Sample sp WHERE YEAR(sp.dateTime) = :year";
+			} else if (metadataType.equals("worksheetdefinition")) {
+				queryStr = "SELECT COUNT(wd) FROM WorksheetDefinition wd WHERE YEAR(wd.dateCreated) = :year";
+			} else if (metadataType.equals("worksheet")){
+				queryStr = "SELECT COUNT(ws) FROM Worksheet ws WHERE YEAR(ws.dateCreated) = :year";
+			} else if (metadataType.equals("batchset")){
+				queryStr = "SELECT COUNT(bs) FROM BatchSet bs WHERE YEAR(bs.dateCreated) = :year";
+			} else if (metadataType.equals("batch")){
+				queryStr = "SELECT COUNT(b) FROM Batch b WHERE YEAR(b.dateCreated) = :year";
 			}
 			if (queryStr != null) {
 				Calendar calendar = Calendar.getInstance();
