@@ -22,6 +22,7 @@ strong {
 
 .text-small {
   font-size: small;
+  color:#555555;
 }
 
 #timeline-content {
@@ -45,8 +46,8 @@ strong {
   padding: 30px 50px;   
   list-style: none;
   text-align: left;  
-  max-width: 60%;
-  left: 0%;
+  max-width: 80%;
+  left: 40px;
   
   .event {
     border-bottom: 1px dashed fade(white, 10%);
