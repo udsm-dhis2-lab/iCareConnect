@@ -3,6 +3,7 @@ import { Api } from "src/app/shared/resources/openmrs";
 import { Observable, from, of } from "rxjs";
 import { OpenmrsHttpClientService } from "src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service";
 import { catchError, map } from "rxjs/operators";
+import { SampleAllocation } from "src/app/shared/resources/sample-allocations/models/allocation.model";
 
 @Injectable({
   providedIn: "root",
@@ -85,7 +86,24 @@ export class WorkSeetsService {
 
   getWorksheetDefinitionsByUuid(uuid: string): Observable<any> {
     return this.httpClient.get(`lab/worksheetdefinition?uuid=${uuid}`).pipe(
-      map((response) => response),
+      map((response) => {
+        return {
+          ...response,
+          worksheetSamples: response?.worksheetSamples?.map(
+            (worksheetSample) => {
+              return {
+                ...worksheetSample,
+                sample: {
+                  ...worksheetSample?.sample,
+                  allocations: worksheetSample?.sample?.allocations?.map(
+                    (allocation) => new SampleAllocation(allocation)
+                  ),
+                },
+              };
+            }
+          ),
+        };
+      }),
       catchError((error) => of(error))
     );
   }
