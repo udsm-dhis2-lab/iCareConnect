@@ -128,8 +128,8 @@ export class SystemSettingsService {
           key,
           value:
             response?.results && response?.results[0]
-              ? response?.results[0]?.value.indexOf("{") > -1 ||
-                response?.results[0]?.value.indexOf("[") > -1
+              ? response?.results[0]?.value.indexOf("{") === 0 ||
+                response?.results[0]?.value.indexOf("[") === 0
                 ? JSON.parse(response?.results[0]?.value)
                 : response?.results[0]?.value
               : "",
