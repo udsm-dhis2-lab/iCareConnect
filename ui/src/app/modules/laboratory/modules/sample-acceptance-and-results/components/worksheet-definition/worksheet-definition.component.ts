@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from "@angular/core";
-import { Observable } from "rxjs";
+import { Observable, of } from "rxjs";
 import { WorkSeetsService } from "src/app/modules/laboratory/resources/services/worksheets.service";
 import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
@@ -148,59 +148,59 @@ export class WorksheetDefinitionComponent implements OnInit {
     // Create worksheetdefn and worksheet sample
     // console.log("selectedRowsColumns", this.selectedRowsColumns);
     this.saving = true;
-    this.generateMetadataLabelsService
-      .getLabMetadatalabels({
-        globalProperty: this.worksheetDefinitionLabelFormatReferenceUuid,
-        metadataType: "worksheetdefinition",
-      })
-      .subscribe((response) => {
-        if (response) {
-          this.worksheetDefnPayload = {
-            ...this.worksheetDefnPayload,
-            code: response[0],
-          };
-          console.log(this.worksheetDefnPayload);
+    (!this.currentWorksheetDefinition
+      ? this.generateMetadataLabelsService.getLabMetadatalabels({
+          globalProperty: this.worksheetDefinitionLabelFormatReferenceUuid,
+          metadataType: "worksheetdefinition",
+        })
+      : of([this.currentWorksheetDefinition?.code])
+    ).subscribe((response) => {
+      if (response) {
+        this.worksheetDefnPayload = {
+          ...this.worksheetDefnPayload,
+          code: response[0],
+        };
 
-          this.worksheetsService
-            .createWorksheetDefinitions([this.worksheetDefnPayload])
-            .subscribe((responseWorkSheetDefn: any) => {
-              if (responseWorkSheetDefn && !responseWorkSheetDefn?.error) {
-                const worksheetSamples = Object.keys(this.selectedRowsColumns)
-                  ?.map((key) => {
-                    if (this.selectedRowsColumns[key]?.set) {
-                      return {
-                        row: Number(key?.split("-")[0]),
-                        column: Number(key?.split("-")[1]),
-                        sample: {
-                          uuid: this.selectedRowsColumns[key]?.value?.uuid,
-                        },
-                        worksheetDefinition: {
-                          uuid: responseWorkSheetDefn[0]?.uuid,
-                        },
-                        type: "SAMPLE",
-                      };
-                    }
-                  })
-                  ?.filter((worksheetSample) => worksheetSample);
+        this.worksheetsService
+          .createWorksheetDefinitions([this.worksheetDefnPayload])
+          .subscribe((responseWorkSheetDefn: any) => {
+            if (responseWorkSheetDefn && !responseWorkSheetDefn?.error) {
+              const worksheetSamples = Object.keys(this.selectedRowsColumns)
+                ?.map((key) => {
+                  if (this.selectedRowsColumns[key]?.set) {
+                    return {
+                      row: Number(key?.split("-")[0]),
+                      column: Number(key?.split("-")[1]),
+                      sample: {
+                        uuid: this.selectedRowsColumns[key]?.value?.uuid,
+                      },
+                      worksheetDefinition: {
+                        uuid: responseWorkSheetDefn[0]?.uuid,
+                      },
+                      type: "SAMPLE",
+                    };
+                  }
+                })
+                ?.filter((worksheetSample) => worksheetSample);
 
-                this.worksheetsService
-                  .createWorksheetSamples(worksheetSamples)
-                  .subscribe((response) => {
-                    if (response && !response?.error) {
-                      this.saving = false;
-                      this.currentWorksheetDefinition = null;
-                      this.getWorksheetDefinitions();
-                      this.createWorksheetSelectionField();
-                    } else {
-                      this.saving = false;
-                      this.getWorksheetDefinitions();
-                      this.createWorksheetSelectionField();
-                    }
-                  });
-              }
-            });
-        }
-      });
+              this.worksheetsService
+                .createWorksheetSamples(worksheetSamples)
+                .subscribe((response) => {
+                  if (response && !response?.error) {
+                    this.saving = false;
+                    this.currentWorksheetDefinition = null;
+                    this.getWorksheetDefinitions();
+                    this.createWorksheetSelectionField();
+                  } else {
+                    this.saving = false;
+                    this.getWorksheetDefinitions();
+                    this.createWorksheetSelectionField();
+                  }
+                });
+            }
+          });
+      }
+    });
   }
 
   getWorksheetDefinitions(): void {
