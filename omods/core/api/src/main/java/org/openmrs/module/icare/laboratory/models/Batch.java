@@ -38,9 +38,6 @@ public class Batch extends BaseOpenmrsData implements java.io.Serializable, JSON
 	@JoinColumn(name = "batch_set_id", nullable = true)
 	private BatchSet batchSet;
 	
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "batch")
-	private List<Sample> samples = new ArrayList<Sample>();
-	
 	@Override
 	public Integer getId() {
 		return id;
@@ -92,14 +89,6 @@ public class Batch extends BaseOpenmrsData implements java.io.Serializable, JSON
 		this.batchSet = batchSet;
 	}
 	
-	public List<Sample> getSamples() {
-		return samples;
-	}
-	
-	public void setSamples(List<Sample> samples) {
-		this.samples = samples;
-	}
-	
 	public static Batch fromMap(Map<String, Object> batchMap) {
 		
 		Batch batch = new Batch();
@@ -137,15 +126,6 @@ public class Batch extends BaseOpenmrsData implements java.io.Serializable, JSON
 			batchSetObject.put("uuid", this.getBatchSet().getUuid());
 			batchSetObject.put("name", this.getBatchSet().getBatchSetName());
 			batchObject.put("batchSet", batchSetObject);
-		}
-		
-		List<Map<String, Object>> samplesObject = new ArrayList<Map<String, Object>>();
-		if (this.getSamples() != null) {
-			
-			for (Sample sample : this.getSamples()) {
-				samplesObject.add(sample.toMap());
-			}
-			batchObject.put("samples", samplesObject);
 		}
 		
 		return batchObject;
