@@ -230,7 +230,7 @@
                                     </strong>
                                     <span class="text-small"> 
                                         <i>
-                                            fed on {{ visitData?.results[0]?.obsDatetime | date:"dd-MM-yyyy HH:mm:ss" }} by {{ visitData?.results[0]?.provider?.display?.split('-')[1] }}
+                                            fed on {{ visitData?.results[0]?.obsDatetime | date:"dd-MM-yyyy HH:mm:ss" }} by {{ visitData?.results[0]?.provider?.display?.split('-')[1] }} {{ visitData?.results[0]?.provider?.display }}
                                         </i> 
                                     </span>
                                 </span>
@@ -331,19 +331,19 @@
                             </a>
                         </span>
                         <span *ngIf="!visitData?.results[0]?.value?.links?.uri">
-                            {{ visitData?.results[0]?.value?.display ? visitData?.results[0]?.value?.display : visitData?.results[0]?.value }}
+                            Attended successfully
                         </span>
 
                         <span class="text-small"> 
                             <i>
-                                fed on {{ visitData?.results[0]?.obsDatetime | date:"dd-MM-yyyy HH:mm:ss"}} by {{ visitData?.results[0]?.provider?.display }} 
+                                 on {{ visitData?.results[0]?.obsDatetime | date:"dd-MM-yyyy HH:mm:ss"}} by {{ visitData?.results[0]?.provider?.display }} 
                             </i>
                         </span>
                     </p>
                 </ng-container>
                 <ng-container *ngIf="!visitData?.results?.length">
                     <p>
-                        No results found
+                        Not attended
                     </p>
                 </ng-container>
             </div>
