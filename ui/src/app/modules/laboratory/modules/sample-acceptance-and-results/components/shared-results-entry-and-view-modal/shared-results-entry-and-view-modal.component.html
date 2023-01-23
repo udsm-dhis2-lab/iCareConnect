@@ -79,19 +79,22 @@
                         <div class="row">
                           <div
                             [ngClass]="{
+                              'col-12':
+                                !allocationData?.allocation?.isSetMember ||
+                                order?.allocations?.length == 1,
                               'parameter-test-default':
                                 (allocationData?.allocation?.parameter?.datatype
-                                  .name == 'Numeric' ||
+                                  ?.name == 'Numeric' ||
                                   allocationData?.allocation?.parameter
                                     ?.datatype.name == 'Coded') &&
-                                allocationData?.allocation?.isSetMember,
+                                allocationData?.allocation?.isSetMember &&
+                                order?.allocations?.length > 1,
                               'parameter-test-text':
                                 allocationData?.allocation?.parameter?.datatype
                                   .name != 'Numeric' &&
                                 allocationData?.allocation?.parameter?.datatype
                                   .name != 'Coded' &&
-                                allocationData?.allocation?.isSetMember,
-                              'col-12': !allocationData?.allocation?.isSetMember
+                                allocationData?.allocation?.isSetMember
                             }"
                             (dblclick)="
                               toggleSideNavigation(

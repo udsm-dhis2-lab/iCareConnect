@@ -113,6 +113,10 @@ public interface LaboratoryService extends OpenmrsService {
 	
 	Batch addBatch(Batch batch);
 	
+	BatchSample addBatchSamples(BatchSample batchSample) throws Exception;
+	
+	BatchSample getBatchSampleByUuid(String batchSampleUuid);
+	
 	BatchSet addBatchSet(BatchSet batchSet);
 	
 	List<BatchSet> getBatchSets(Date start, Date end, String q, Integer startIndex, Integer limit);
@@ -139,6 +143,8 @@ public interface LaboratoryService extends OpenmrsService {
 	
 	Map<String, Object> getWorksheetDefinitionByUuid(String worksheetDefinitionUuid);
 	
+	WorksheetDefinition getDefaultWorksheetDefinitionByUuid(String worksheetDefinitionUuid);
+	
 	WorksheetDefinition addWorksheetDefinition(WorksheetDefinition worksheetDefinition) throws Exception;
 	
 	List<WorksheetSample> getWorksheetSamples(Date start, Date end, String q, Integer startIndex, Integer limit);
@@ -150,4 +156,6 @@ public interface LaboratoryService extends OpenmrsService {
 	WorksheetStatus addWorksheetStatus(WorksheetStatus worksheetStatus) throws Exception;
 	
 	WorksheetSampleStatus addWorksheetSampleStatus(WorksheetSampleStatus worksheetSampleStatus) throws Exception;
+	
+	List<BatchSample> getBatchSamples(Date start, Date end, String q, Integer startIndex, Integer limit);
 }

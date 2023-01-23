@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -649,7 +650,33 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 	}
 	
 	@Test
-	public void CreatingAndGettingBatchSets() throws Exception {
+	public void testCreatingAndGettingBatchSamples() throws Exception {
+		//1. Creating batchSamples
+		//Given
+		String dto = this.readFile("dto/batch-sample-create-dto.json");
+		List<Map<String, Object>> batchSampleObject = (new ObjectMapper()).readValue(dto, List.class);
+		
+		//When
+		MockHttpServletRequest newPostRequest = newPostRequest("lab/batchsamples", batchSampleObject);
+		MockHttpServletResponse handle = handle(newPostRequest);
+		List<Map<String, Object>> createdBatchSamples = (new ObjectMapper()).readValue(handle.getContentAsString(),
+		    List.class);
+		
+		assertThat("created 2 batch samples", createdBatchSamples.size(), is(2));
+		
+		//2. Getting batchSamples
+		//when
+		MockHttpServletRequest newGetRequest = newGetRequest("lab/batchsamples", new Parameter("startDate", "2022-12-10"),
+		    new Parameter("endDate", "2022-12-10"), new Parameter("q", "BS01"));
+		
+		MockHttpServletResponse handle2 = handle(newGetRequest);
+		List<Map<String, Object>> batchsamples = (new ObjectMapper()).readValue(handle2.getContentAsString(), List.class);
+		System.out.println(batchsamples);
+		assertThat("Has 1 batch sample", batchsamples.size(), is(1));
+	}
+	
+	@Test
+	public void testCreatingAndGettingBatchSets() throws Exception {
 		
 		//1. Creating batchSets
 		//Given
@@ -676,7 +703,7 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 	}
 	
 	@Test
-	public void creatingBatchStatusAndBatchSetStatus() throws Exception {
+	public void testCreatingBatchStatusAndBatchSetStatus() throws Exception {
 		
 		//1.Creating BatchSetStatus
 		//Given
@@ -702,7 +729,7 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 	}
 	
 	@Test
-	public void CreatingAndGettingWorksheets() throws Exception {
+	public void testCreatingAndGettingWorksheets() throws Exception {
 		
 		//1. Creating worksheets
 		//Given
@@ -730,7 +757,7 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 	}
 	
 	@Test
-	public void CreatingAndGettingWorksheetControls() throws Exception {
+	public void testCreatingAndGettingWorksheetControls() throws Exception {
 		
 		//1. Creating worksheetControls
 		//Given
@@ -759,7 +786,7 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 	}
 	
 	@Test
-	public void CreatingAndGettingWorksheetDefinitions() throws Exception {
+	public void testCreatingAndGettingWorksheetDefinitions() throws Exception {
 		
 		//1. Creating worksheet definitions
 		//Given
@@ -812,7 +839,7 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 	}
 	
 	@Test
-	public void CreatingAndGettingWorksheetSamples() throws Exception {
+	public void testCreatingAndGettingWorksheetSamples() throws Exception {
 		
 		//1. Creating worksheet definitions
 		//Given
@@ -842,7 +869,7 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 	}
 	
 	@Test
-	public void creatingWorksheetStatusAndWorksheetSampleStatus() throws Exception {
+	public void testCreatingWorksheetStatusAndWorksheetSampleStatus() throws Exception {
 		
 		//1.Creating BatchSetStatus
 		//Given

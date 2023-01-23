@@ -3772,6 +3772,7 @@
         </sql>
     </changeSet>
 
+    <!-- column name was a mysqlkeyword -->
     <changeSet id="update_lb_worksheet_sample_rename_row_to_rows" author="dennis-kibahila" dbms="mysql">
         <sql>
             ALTER TABLE lb_worksheet_sample
@@ -3779,6 +3780,7 @@
         </sql>
     </changeSet>
 
+    <!-- column name was a mysql keyword -->
     <changeSet id="update_lb_worksheet_sample_rename_column_to_columns" author="dennis-kibahila" dbms="mysql">
         <sql>
             ALTER TABLE lb_worksheet_sample
@@ -3786,6 +3788,7 @@
         </sql>
     </changeSet>
 
+    <!-- foreign key was wrongly referenced in lb_worksheet_sample -->
     <changeSet id="update_lb_worksheet_sample_change_sample_id_foreign_key" author="dennis-kibahila" dbms="mysql">
         <sql>
             ALTER TABLE lb_worksheet_sample DROP FOREIGN KEY lb_worksheet_sample_sample_id_lb_sample_sample_id_fk,
@@ -3793,7 +3796,99 @@
         </sql>
     </changeSet>
 
+    <!-- foreign key was wrongly referenced in lb_worksheet_definition -->
+    <changeSet id="update_lb_worksheet_definition_change_worksheet_id_foreign_key" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE lb_worksheet_definition DROP FOREIGN KEY lb_worksheet_definition_worksheet_id_concept_concept_id_fk,
+            ADD FOREIGN KEY lb_worksheet_definition_worksheet_id_worksheet_worksheet_id_fk(worksheet_id) REFERENCES lb_worksheet(worksheet_id);
+        </sql>
+    </changeSet>
 
+    <changeSet id="update_lb_sample_drop_foreign_key_batch_id" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE lb_sample DROP FOREIGN KEY lb_sample_batch_id_lb_batch_batch_id_fk
+        </sql>
+    </changeSet>
+
+    <changeSet id="update_lb_sample_drop_column_batch_id" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE lb_sample DROP COLUMN batch_id;
+        </sql>
+    </changeSet>
+
+    <changeSet id="create_lb_batch_sample" author="dennis-kibahila" dbms="mysql">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="lb_batch_sample"/>
+            </not>
+        </preConditions>
+        <comment>Creating openmrs lb_batch_sample table</comment>
+        <createTable tableName="lb_batch_sample">
+            <column name="batch_sample_id" type="INTEGER" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="batch_sample_id_pk"/>
+            </column>
+            <column name="uuid" type="char(38)">
+                <constraints nullable="false" unique="true"></constraints>
+            </column>
+            <column name="code" type="TEXT"/>
+            <column name="batch_id" type="INTEGER"/>
+            <column name="creator" type="INTEGER"/>
+            <column name="date_created" type="DATE">
+                <constraints nullable="false"></constraints>
+            </column>
+            <column name="changed_by" type="INTEGER"/>
+            <column name="date_changed" type="DATE"/>
+            <column name="voided" type="BOOLEAN">
+                <constraints nullable="false"></constraints>
+            </column>
+            <column name="date_voided" type="DATE"/>
+            <column name="voided_by" type="INTEGER"/>
+            <column name="void_reason" type="TEXT"/>
+        </createTable>
+
+        <addForeignKeyConstraint
+                baseColumnNames="changed_by"
+                baseTableName="lb_batch_sample"
+                constraintName="lb_batch_sample_changed_by_users_user_id_fk"
+                referencedColumnNames="user_id"
+                referencedTableName="users"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="creator"
+                baseTableName="lb_batch_sample"
+                constraintName="lb_batch_sample_creator_users_user_id_fk"
+                referencedColumnNames="user_id"
+                referencedTableName="users"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="batch_id"
+                baseTableName="lb_batch_sample"
+                constraintName="lb_batch_sample_batch_id_lb_batch_fk"
+                referencedColumnNames="batch_id"
+                referencedTableName="lb_batch"/>
+
+    </changeSet>
+
+    <changeSet id="add_batch_sample_column_to_lb_sample" author="dennis-kibahila" dbms="mysql">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists columnName="batch_sample_id" tableName="lb_sample"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="lb_sample" >
+            <column name="batch_sample_id" type="INT">
+                <constraints nullable="true"></constraints>
+            </column>
+
+        </addColumn>
+
+        <addForeignKeyConstraint
+                baseColumnNames="batch_sample_id"
+                baseTableName="lb_sample"
+                constraintName="lb_sample_batch_sample_id_lb_batch_sample_fk"
+                referencedColumnNames="batch_sample_id"
+                referencedTableName="lb_batch_sample"/>
+    </changeSet>
 
 
 
