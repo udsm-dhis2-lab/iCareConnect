@@ -1,5 +1,7 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, Input, OnInit } from "@angular/core";
 import { Observable } from "rxjs";
+import { map } from "rxjs/operators";
+import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { WorkSeetsService } from "src/app/modules/laboratory/resources/services/worksheets.service";
 
 @Component({
@@ -8,25 +10,35 @@ import { WorkSeetsService } from "src/app/modules/laboratory/resources/services/
   styleUrls: ["./result-entry-by-worksheet-home.component.scss"],
 })
 export class ResultEntryByWorksheetHomeComponent implements OnInit {
+  @Input() isLIS: boolean;
   worksheetDefinitions$: Observable<any[]>;
-  currentWorksheetDefinition$: Observable<any>;
+  multipleResultsAttributeType$: Observable<any>;
   currentWorksheetDefinitionUuid: string;
-  constructor(private worksheetsService: WorkSeetsService) {}
+  conceptNameType: string;
+  errors: any[] = [];
+  constructor(
+    private worksheetsService: WorkSeetsService,
+    private systemSettingsService: SystemSettingsService
+  ) {}
 
   ngOnInit(): void {
+    this.conceptNameType = this.isLIS ? "SHORT" : "FULLY_SPECIFIED";
     this.worksheetDefinitions$ =
       this.worksheetsService.getWorksheetDefinitions();
-  }
 
-  onGetSelectedWorksheetDefinition(selectedWorksheetDefinition: any): void {
-    this.currentWorksheetDefinitionUuid = selectedWorksheetDefinition?.uuid;
-    if (selectedWorksheetDefinition) {
-      this.getWorksheetDefinitionByUuid(selectedWorksheetDefinition?.uuid);
-    }
-  }
-
-  getWorksheetDefinitionByUuid(uuid: string): void {
-    this.currentWorksheetDefinition$ =
-      this.worksheetsService.getWorksheetDefinitionsByUuid(uuid);
+    this.multipleResultsAttributeType$ = this.systemSettingsService
+      .getSystemSettingsByKey(
+        `iCare.laboratory.settings.testParameters.attributes.multipleResultsAttributeTypeUuid`
+      )
+      .pipe(
+        map((response) => {
+          if (response && !response?.error) {
+            return response;
+          } else {
+            this.errors = [...this.errors, response];
+            return response;
+          }
+        })
+      );
   }
 }
