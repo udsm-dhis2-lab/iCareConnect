@@ -86,6 +86,7 @@
           <app-visit
             *ngIf="params?.servicesConfigs && params?.visitTypes"
             [patientsByLocation]="[]"
+            [patientDetails]="patient"
             [treatmentLocations]="params?.treatmentLocations"
             [servicesConfigs]="params?.servicesConfigs"
             [visitTypes]="params?.visitTypes"
