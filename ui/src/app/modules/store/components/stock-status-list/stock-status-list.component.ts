@@ -27,6 +27,7 @@ export class StockStatusListComponent implements OnInit {
   currentItemStock$: Observable<StockObject>;
   saving: boolean = false;
   itemID?: string;
+  showReceivingForm?: boolean;
   errors: any[] = [];
   constructor(
     private stockService: StockService,
@@ -42,7 +43,7 @@ export class StockStatusListComponent implements OnInit {
     this.searchTerm = event.target?.value;
     setTimeout(() => {
       this.getStock();
-    }, 200)
+    }, 200);
   }
 
   onAddNewStockRecevied(
@@ -101,11 +102,8 @@ export class StockStatusListComponent implements OnInit {
           this.currentLocation?.uuid
         );
       }
-      if(response?.error){
-        this.errors = [
-          ...this.errors,
-          response?.error
-        ]
+      if (response?.error) {
+        this.errors = [...this.errors, response?.error];
       }
     });
   }
@@ -117,5 +115,15 @@ export class StockStatusListComponent implements OnInit {
   }
   onClearItemID() {
     this.itemID = undefined;
+  }
+
+  onHideReceivingForm(e: any){
+    e.stopPropagation();
+    this.showReceivingForm = false;
+  }
+  
+  onShowReceivingForm(e: any){
+    e.stopPropagation();
+    this.showReceivingForm = true;
   }
 }

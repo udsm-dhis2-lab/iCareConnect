@@ -1,0 +1,67 @@
+<div>
+  <div class="row">
+    <div class="col-11">
+      <app-form [fields]="commonFields" [isFormHorizontal]="true" (formUpdate)="onFormUpdate($event)"></app-form>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-12">
+      <mat-accordion>
+        <mat-expansion-panel
+          class="border mat-elevation-z0 mt-2"
+          [expanded]="false"
+        >
+          <mat-expansion-panel-header class="d-flex justify-content-between">
+            <mat-panel-title>
+              <span>Added Items</span>
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+          <table class="table table-hover table-striped">
+            <thead>
+              <tr>
+                <th>Item 1</th>
+                <th>Item 2</th>
+                <th>Item 3</th>
+                <th>Item 4</th>
+                <th>Item 5</th>
+                <th>Item 6</th>
+                <th>Item 7</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1</td>
+                <td>2</td>
+                <td>3</td>
+                <td>4</td>
+                <td>5</td>
+                <td>6</td>
+                <td>7</td>
+              </tr>
+            </tbody>
+          </table>
+        </mat-expansion-panel>
+      </mat-accordion>
+    </div>
+  </div>
+  <div class="row">
+    <table class="table table-responsive col-11">
+      <tbody>
+        <tr>
+          <td *ngFor="let itemField of itemFields">
+            <app-form [fields]="[itemField]" (formUpdate)="onFormUpdate($event)"></app-form>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="col-1">
+      <button
+        class="button-round mt-3"
+        color="primary"
+        mat-stroked-button
+      >
+        Save
+      </button>
+    </div>
+  </div>
+</div>
