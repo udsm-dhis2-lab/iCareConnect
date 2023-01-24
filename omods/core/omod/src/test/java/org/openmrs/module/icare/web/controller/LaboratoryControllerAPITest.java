@@ -110,7 +110,7 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		MockHttpServletResponse handleGet = handle(newGetRequest);
 		List<Map<String, Object>> createdsample = (new ObjectMapper()).readValue(handleGet.getContentAsString(), List.class);
 		
-		assertThat("Samples are added to total 3:", createdsample.size(), is(4));
+		assertThat("Samples are added to total 5:", createdsample.size(), is(5));
 		boolean found = false;
 		for (Map<String, Object> sampleMap : createdsample) {
 			if (sampleMap.get("label").equals("Create Sample Test")) {
@@ -313,6 +313,7 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		
 		//System.out.println(Context.getVisitService().getVisitByUuid("d9c1d8ac-2b8e-427f-804d-b858c52e6f11").getLocation().getUuid());
 		Map<String, Object> sampleResults = (new ObjectMapper()).readValue(handleGet.getContentAsString(), Map.class);
+		System.out.println(sampleResults);
 		
 		Map<String, Object> pagerObject = (Map<String, Object>) sampleResults.get("pager");
 		assertThat("Page Count is 2", (Integer) pagerObject.get("pageCount") == 2, is(true));
