@@ -45,6 +45,7 @@
             <app-patient-list
               [encounterType]="'e22e39fd-7db2-45e7-80f1-60fa0d5a4378'"
               (selectPatient)="onSelectPatient($event)"
+
               [shouldShowParentLocation]="true"
               [isTabularList]="true"
             ></app-patient-list>
@@ -99,14 +100,33 @@
           <div class="w-100 text-centered">
             <!-- TODO: Softcode the order uuid -->
             <!-- {{ locationsIds$ | async | json }} -->
-            <app-patient-list
-                    [encounterType]="'e22e39fd-7db2-45e7-80f1-60fa0d5a4378'"
-                    (selectPatient)="onSelectPatient($event)"
-                    [shouldShowParentLocation]="true"
-                    [isTabularList]="true"
-            ></app-patient-list>
+            <app-table [columns]="billingColumns" [loading]="loadingVisits" [loadingDataError]="loadingVisitsError"
+                       [tableConfig]="tableConfig" [data$]="visits$" (selectRow)="onSelectVisit($event)"></app-table>
           </div>
         </div>
+      </mat-tab>
+
+      <mat-tab label="Enter date">
+        <mat-label>Enter a date range</mat-label>
+        <mat-date-range-input [rangePicker]="visitDatePicker">
+          <input
+                  matStartDate
+                  placeholder="Start date"
+                  [(ngModel)]="startDate"
+                  (dateInput)="onDateChange()"
+          />
+          <input
+                  matEndDate
+                  placeholder="End date"
+                  [(ngModel)]="endDate"
+                  (dateInput)="onDateChange()"
+          />
+        </mat-date-range-input>
+        <mat-datepicker-toggle
+                matSuffix
+                [for]="visitDatePicker"
+        ></mat-datepicker-toggle>
+        <mat-date-range-picker #visitDatePicker></mat-date-range-picker>
       </mat-tab>
       <!-- SAMUEL YONA -->
 

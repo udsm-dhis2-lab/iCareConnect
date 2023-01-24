@@ -2,8 +2,8 @@ import { Component, Input, OnInit } from "@angular/core";
 import { MatLegacyDialog as MatDialog } from "@angular/material/legacy-dialog";
 import { ActivatedRoute } from "@angular/router";
 import { select, Store } from "@ngrx/store";
-import { Observable } from "rxjs";
-import { take, takeLast } from "rxjs/operators";
+import {Observable, of} from "rxjs";
+import {catchError, take, takeLast, tap} from "rxjs/operators";
 import { Location } from "src/app/core/models";
 import { LocationService } from "src/app/core/services";
 import { OccupiedLocationStatusModalComponent } from "src/app/shared/components/occupied-location-status-modal/occupied-location-status-modal.component";
@@ -28,6 +28,11 @@ import {
   getAllAdmittedPatientVisits,
   getVisitLoadingState,
 } from "src/app/store/selectors/visit.selectors";
+import {MatLegacyTableDataSource as MatTableDataSource} from "@angular/material/legacy-table";
+import {VisitExt} from "../../../../shared/resources/visits/models/visit.model";
+import { SystemSettingsService } from "src/app/core/services/system-settings.service";
+// import { getExemptionVisits } from "src/app/modules/billing/pages/exemption-home/exemption-home.component";
+
 
 @Component({
   selector: "app-inpatient-home",
@@ -49,6 +54,7 @@ export class InpatientHomeComponent implements OnInit {
     private store: Store<AppState>,
     private dialog: MatDialog,
     private route: ActivatedRoute,
+    private systemSettingService: SystemSettingsService,
     private locationService: LocationService
   ) {
     this.store.dispatch(loadRolesDetails());
@@ -130,4 +136,33 @@ export class InpatientHomeComponent implements OnInit {
       panelClass: "custom-dialog-container",
     });
   }
+  // getExemptionVisits() {
+  //   //Get order type
+  //   this.orderType$ = this.systemSettingService
+  //       .getSystemSettingsMatchingAKey("icare.billing.exemption.orderType")
+  //       .pipe(
+  //           tap((orderType) => {
+  //             return orderType[0];
+  //           }),
+  //           catchError((error) => {
+  //             console.log("Error occured while trying to get orderType: ", error);
+  //             return of(new MatTableDataSource([]));
+  //           })
+  //       );
+  //
+  //   this.orderType$.subscribe({
+  //     next: (orderType) => {
+  //       this.orderType = orderType[0];
+  //
+  //       this.getVisits(this.orderType).subscribe({
+  //         next: (visits) => {
+  //           this.visits$ = of(
+  //               new MatTableDataSource(visits.map((visit) => new VisitExt(visit)))
+  //           );
+  //           this.visitsLength = visits.length;
+  //         },
+  //       });
+  //     },
+  //   });
+  // }
 }
