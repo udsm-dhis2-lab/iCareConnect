@@ -5,7 +5,10 @@ package org.openmrs.module.icare.store.dao;
 import org.hibernate.Query;
 import org.openmrs.Location;
 import org.openmrs.api.db.hibernate.DbSession;
+import org.openmrs.module.icare.core.ListResult;
+import org.openmrs.module.icare.core.Pager;
 import org.openmrs.module.icare.core.dao.BaseDAO;
+import org.openmrs.module.icare.laboratory.models.Sample;
 import org.openmrs.module.icare.store.models.Issue;
 import org.openmrs.module.icare.store.models.Requisition;
 import org.springframework.stereotype.Repository;
@@ -21,26 +24,47 @@ import java.util.List;
 
 public class RequisitionDAO extends BaseDAO<Requisition> {
 	
-	public List<Requisition> getRequisitionsByRequestingLocation(String requestingLocationUuid) {
+	public ListResult<Requisition> getRequisitionsByRequestingLocation(String requestingLocationUuid, Pager pager) {
 		DbSession session = this.getSession();
 		String queryStr = "SELECT rq \n" + "FROM Requisition rq \n"
 		        + "WHERE rq.requestingLocation = (SELECT l FROM Location l WHERE l.uuid = :requestingLocationUuid)";
 		
 		Query query = session.createQuery(queryStr);
 		query.setParameter("requestingLocationUuid", requestingLocationUuid);
-		
-		return query.list();
+
+		if (pager.isAllowed()) {
+			pager.setTotal(query.list().size());
+			//pager.setPageCount(pager.getT);
+			query.setFirstResult((pager.getPage() - 1) * pager.getPageSize());
+			query.setMaxResults(pager.getPageSize());
+		}
+
+		ListResult<Requisition> listResults = new ListResult();
+		listResults.setPager(pager);
+		listResults.setResults(query.list());
+		return listResults;
 	}
 	
-	public List<Requisition> getRequisitionsByRequestedLocation(String requestedLocationUuid) {
+	public ListResult<Requisition> getRequisitionsByRequestedLocation(String requestedLocationUuid, Pager pager) {
 		DbSession session = this.getSession();
 		String queryStr = "SELECT rq \n" + "FROM Requisition rq \n"
 		        + "WHERE rq.requestedLocation = (SELECT l FROM Location l WHERE l.uuid = :requestedLocationUuid)";
 		
 		Query query = session.createQuery(queryStr);
 		query.setParameter("requestedLocationUuid", requestedLocationUuid);
-		
-		return query.list();
+
+		if (pager.isAllowed()) {
+			pager.setTotal(query.list().size());
+			//pager.setPageCount(pager.getT);
+			query.setFirstResult((pager.getPage() - 1) * pager.getPageSize());
+			query.setMaxResults(pager.getPageSize());
+		}
+
+		ListResult<Requisition> listResults = new ListResult();
+		listResults.setPager(pager);
+		listResults.setResults(query.list());
+		return listResults;
+
 	}
 	
 }

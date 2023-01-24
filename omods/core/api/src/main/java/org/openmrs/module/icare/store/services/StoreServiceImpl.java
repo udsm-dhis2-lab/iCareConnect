@@ -14,6 +14,8 @@ import org.openmrs.module.icare.ICareConfig;
 import org.openmrs.module.icare.billing.models.Prescription;
 import org.openmrs.module.icare.core.ICareService;
 import org.openmrs.module.icare.core.Item;
+import org.openmrs.module.icare.core.ListResult;
+import org.openmrs.module.icare.core.Pager;
 import org.openmrs.module.icare.core.dao.ICareDao;
 import org.openmrs.module.icare.store.dao.*;
 import org.openmrs.module.icare.store.models.*;
@@ -179,11 +181,11 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 	}
 	
 	@Override
-	public List<Requisition> getRequestsByRequestingLocation(String requestingLocationUuid) {
+	public ListResult<Requisition> getRequestsByRequestingLocation(String requestingLocationUuid, Pager pager) {
 		
-		List<Requisition> requisitions = this.requisitionDAO.getRequisitionsByRequestingLocation(requestingLocationUuid);
+		ListResult<Requisition> requisitions = this.requisitionDAO.getRequisitionsByRequestingLocation(requestingLocationUuid,pager);
 		
-		for (Requisition requisition : requisitions) {
+		for (Requisition requisition : requisitions.getResults()) {
 			List<RequisitionStatus> requisitionStatuses = this.requisitionStatusDAO.getStatusesByRequisition(requisition
 			        .getUuid());
 			
@@ -195,11 +197,11 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 	}
 	
 	@Override
-	public List<Requisition> getRequestsForRequestedLocation(String requestedLocationUuid) {
+	public ListResult<Requisition> getRequestsForRequestedLocation(String requestedLocationUuid, Pager pager) {
 		
-		List<Requisition> requisitions = this.requisitionDAO.getRequisitionsByRequestedLocation(requestedLocationUuid);
+		ListResult<Requisition> requisitions = this.requisitionDAO.getRequisitionsByRequestedLocation(requestedLocationUuid,pager);
 		
-		for (Requisition requisition : requisitions) {
+		for (Requisition requisition : requisitions.getResults()) {
 			List<RequisitionStatus> requisitionStatuses = this.requisitionStatusDAO.getStatusesByRequisition(requisition
 			        .getUuid());
 			

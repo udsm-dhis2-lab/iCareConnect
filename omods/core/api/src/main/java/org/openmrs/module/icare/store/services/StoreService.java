@@ -4,6 +4,8 @@ import org.openmrs.DrugOrder;
 import org.openmrs.Location;
 import org.openmrs.api.OpenmrsService;
 import org.openmrs.module.icare.core.Item;
+import org.openmrs.module.icare.core.ListResult;
+import org.openmrs.module.icare.core.Pager;
 import org.openmrs.module.icare.store.models.*;
 import org.openmrs.module.icare.store.util.StockOutException;
 
@@ -37,9 +39,9 @@ public interface StoreService extends OpenmrsService {
 	
 	public List<RequisitionStatus> getRequisitionStatuses();
 	
-	public List<Requisition> getRequestsByRequestingLocation(String requestingLocationUuid);
+	public ListResult<Requisition> getRequestsByRequestingLocation(String requestingLocationUuid, Pager pager);
 	
-	public List<Requisition> getRequestsForRequestedLocation(String requestedLocationUuid);
+	public ListResult<Requisition> getRequestsForRequestedLocation(String requestedLocationUuid, Pager pager);
 	
 	public Requisition getRequestByUuid(String requisitionUuid);
 	

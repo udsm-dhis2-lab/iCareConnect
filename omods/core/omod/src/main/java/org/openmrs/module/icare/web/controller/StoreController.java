@@ -6,6 +6,8 @@ import org.openmrs.DrugOrder;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.icare.core.ICareService;
 import org.openmrs.module.icare.core.Item;
+import org.openmrs.module.icare.core.ListResult;
+import org.openmrs.module.icare.core.Pager;
 import org.openmrs.module.icare.laboratory.models.Sample;
 import org.openmrs.module.icare.store.models.*;
 import org.openmrs.module.icare.store.services.StoreService;
@@ -170,33 +172,41 @@ public class StoreController {
 	
 	@RequestMapping(value = "requests", method = RequestMethod.GET)
 	@ResponseBody
-	public List<Map<String, Object>> getRequisitionsByLocation(
+	public Map<String, Object> getRequisitionsByLocation(
 	        @RequestParam(required = false) String requestingLocationUuid,
-	        @RequestParam(required = false) String requestedLocationUuid) {
-		
+	        @RequestParam(required = false) String requestedLocationUuid,
+			@RequestParam(defaultValue = "true",value = "paging", required = false) boolean paging,
+			@RequestParam(defaultValue = "50",value = "pageSize", required = false) Integer pageSize,
+			@RequestParam(defaultValue = "1",value = "page",required = false) Integer page) {
+
+		Pager pager = new Pager();
+		pager.setAllowed(paging);
+		pager.setPageSize(pageSize);
+		pager.setPage(page);
+
 		if (requestedLocationUuid != null && requestingLocationUuid == null) {
-			List<Requisition> requisitions = this.storeService.getRequestsForRequestedLocation(requestedLocationUuid);
+			ListResult<Requisition> requisitions = this.storeService.getRequestsForRequestedLocation(requestedLocationUuid,pager);
 			
-			List<Map<String, Object>> requisitionsList = new ArrayList<Map<String, Object>>();
+//			List<Map<String, Object>> requisitionsList = new ArrayList<Map<String, Object>>();
+//
+//			for (Requisition requisition : requisitions.getResults()) {
+//				requisitionsList.add(requisition.toMap());
+//			}
 			
-			for (Requisition requisition : requisitions) {
-				requisitionsList.add(requisition.toMap());
-			}
-			
-			return requisitionsList;
+			return requisitions.toMap();
 			
 		}
 		
 		if (requestingLocationUuid != null && requestedLocationUuid == null) {
-			List<Requisition> requisitions = this.storeService.getRequestsByRequestingLocation(requestingLocationUuid);
+			ListResult<Requisition> requisitions = this.storeService.getRequestsByRequestingLocation(requestingLocationUuid,pager);
 			
-			List<Map<String, Object>> requisitionsList = new ArrayList<Map<String, Object>>();
+//			List<Map<String, Object>> requisitionsList = new ArrayList<Map<String, Object>>();
+//
+//			for (Requisition requisition : requisitions.getResults()) {
+//				requisitionsList.add(requisition.toMap());
+//			}
 			
-			for (Requisition requisition : requisitions) {
-				requisitionsList.add(requisition.toMap());
-			}
-			
-			return requisitionsList;
+			return requisitions.toMap();
 		}
 		
 		return null;
