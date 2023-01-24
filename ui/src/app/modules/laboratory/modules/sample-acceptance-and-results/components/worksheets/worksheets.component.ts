@@ -14,6 +14,7 @@ export class WorksheetsComponent implements OnInit {
   worksheets$: Observable<any[]>;
   dataSetReportUuidForAcceptedSamplesWithNoResults$: Observable<string>;
   errors: any[] = [];
+  worksheetDefinitionLabelFormatReference$: Observable<string>;
   constructor(
     private worksheetsService: WorkSeetsService,
     private systemSettingsService: SystemSettingsService
@@ -22,6 +23,32 @@ export class WorksheetsComponent implements OnInit {
   ngOnInit(): void {
     this.errors = [];
     this.worksheets$ = this.worksheetsService.getWorkSheets();
+    this.worksheetDefinitionLabelFormatReference$ = this.systemSettingsService
+      .getSystemSettingsDetailsByKey(
+        `iCare.laboratory.settings.worksheetdefinition.label.format`
+      )
+      .pipe(
+        tap((response) => {
+          console.log("response", response);
+          if (response && !response?.error && response?.uuid) {
+            return response;
+          } else if (!response?.uuid && !response?.error) {
+            this.errors = [
+              ...this.errors,
+              {
+                error: {
+                  error:
+                    "iCare.laboratory.settings.worksheetdefinition.label.format is not set",
+                  message:
+                    "iCare.laboratory.settings.worksheetdefinition.label.format is not set",
+                },
+              },
+            ];
+          } else {
+            this.errors = [...this.errors, response];
+          }
+        })
+      );
     this.dataSetReportUuidForAcceptedSamplesWithNoResults$ =
       this.systemSettingsService
         .getSystemSettingsByKey(

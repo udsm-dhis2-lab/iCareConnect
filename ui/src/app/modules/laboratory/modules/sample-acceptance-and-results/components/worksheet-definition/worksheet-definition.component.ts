@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from "@angular/core";
-import { Observable } from "rxjs";
+import { Observable, of } from "rxjs";
 import { WorkSeetsService } from "src/app/modules/laboratory/resources/services/worksheets.service";
 import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
@@ -8,6 +8,7 @@ import { omit, keyBy } from "lodash";
 import { DatasetDataService } from "src/app/core/services/dataset-data.service";
 import { TextArea } from "src/app/shared/modules/form/models/text-area.model";
 import { DateField } from "src/app/shared/modules/form/models/date-field.model";
+import { GenerateMetadataLabelsService } from "src/app/core/services";
 
 @Component({
   selector: "app-worksheet-definition",
@@ -18,6 +19,7 @@ export class WorksheetDefinitionComponent implements OnInit {
   @Input() worksheets: any[];
   @Input() dataSetReportUuidForAcceptedSamplesWithNoResults: string;
   @Input() datesParameters: any;
+  @Input() worksheetDefinitionLabelFormatReferenceUuid: string;
   worksheetFormField: any;
   worksheetDefinitionFields: any[];
   selectedWorkSheetConfiguration: any;
@@ -41,7 +43,8 @@ export class WorksheetDefinitionComponent implements OnInit {
   isFormValid: boolean = false;
   constructor(
     private worksheetsService: WorkSeetsService,
-    private datasetDataService: DatasetDataService
+    private datasetDataService: DatasetDataService,
+    private generateMetadataLabelsService: GenerateMetadataLabelsService
   ) {}
 
   ngOnInit(): void {
@@ -75,8 +78,8 @@ export class WorksheetDefinitionComponent implements OnInit {
         id: "code",
         key: "code",
         label: "Reference code",
+        disabled: true,
         value: data?.code?.value,
-        required: true,
       }),
       new TextArea({
         id: "description",
@@ -145,44 +148,59 @@ export class WorksheetDefinitionComponent implements OnInit {
     // Create worksheetdefn and worksheet sample
     // console.log("selectedRowsColumns", this.selectedRowsColumns);
     this.saving = true;
-    this.worksheetsService
-      .createWorksheetDefinitions([this.worksheetDefnPayload])
-      .subscribe((responseWorkSheetDefn: any) => {
-        if (responseWorkSheetDefn && !responseWorkSheetDefn?.error) {
-          const worksheetSamples = Object.keys(this.selectedRowsColumns)
-            ?.map((key) => {
-              if (this.selectedRowsColumns[key]?.set) {
-                return {
-                  row: Number(key?.split("-")[0]),
-                  column: Number(key?.split("-")[1]),
-                  sample: {
-                    uuid: this.selectedRowsColumns[key]?.value?.uuid,
-                  },
-                  worksheetDefinition: {
-                    uuid: responseWorkSheetDefn[0]?.uuid,
-                  },
-                  type: "SAMPLE",
-                };
-              }
-            })
-            ?.filter((worksheetSample) => worksheetSample);
+    (!this.currentWorksheetDefinition
+      ? this.generateMetadataLabelsService.getLabMetadatalabels({
+          globalProperty: this.worksheetDefinitionLabelFormatReferenceUuid,
+          metadataType: "worksheetdefinition",
+        })
+      : of([this.currentWorksheetDefinition?.code])
+    ).subscribe((response) => {
+      if (response) {
+        this.worksheetDefnPayload = {
+          ...this.worksheetDefnPayload,
+          code: response[0],
+        };
 
-          this.worksheetsService
-            .createWorksheetSamples(worksheetSamples)
-            .subscribe((response) => {
-              if (response && !response?.error) {
-                this.saving = false;
-                this.currentWorksheetDefinition = null;
-                this.getWorksheetDefinitions();
-                this.createWorksheetSelectionField();
-              } else {
-                this.saving = false;
-                this.getWorksheetDefinitions();
-                this.createWorksheetSelectionField();
-              }
-            });
-        }
-      });
+        this.worksheetsService
+          .createWorksheetDefinitions([this.worksheetDefnPayload])
+          .subscribe((responseWorkSheetDefn: any) => {
+            if (responseWorkSheetDefn && !responseWorkSheetDefn?.error) {
+              const worksheetSamples = Object.keys(this.selectedRowsColumns)
+                ?.map((key) => {
+                  if (this.selectedRowsColumns[key]?.set) {
+                    return {
+                      row: Number(key?.split("-")[0]),
+                      column: Number(key?.split("-")[1]),
+                      sample: {
+                        uuid: this.selectedRowsColumns[key]?.value?.uuid,
+                      },
+                      worksheetDefinition: {
+                        uuid: responseWorkSheetDefn[0]?.uuid,
+                      },
+                      type: "SAMPLE",
+                    };
+                  }
+                })
+                ?.filter((worksheetSample) => worksheetSample);
+
+              this.worksheetsService
+                .createWorksheetSamples(worksheetSamples)
+                .subscribe((response) => {
+                  if (response && !response?.error) {
+                    this.saving = false;
+                    this.currentWorksheetDefinition = null;
+                    this.getWorksheetDefinitions();
+                    this.createWorksheetSelectionField();
+                  } else {
+                    this.saving = false;
+                    this.getWorksheetDefinitions();
+                    this.createWorksheetSelectionField();
+                  }
+                });
+            }
+          });
+      }
+    });
   }
 
   getWorksheetDefinitions(): void {
@@ -200,7 +218,7 @@ export class WorksheetDefinitionComponent implements OnInit {
     this.isWorksheetDefnValid = formValue.isValid;
     this.selectedWorkSheetConfiguration = values?.worksheet?.value;
     this.worksheetDefnPayload = {
-      code: values?.code?.value,
+      code: null,
       expirationDateTime: new Date(values?.expirationDateTime?.value),
       additionalFields: JSON.stringify(
         Object.keys(values).map((key) => {
@@ -215,13 +233,27 @@ export class WorksheetDefinitionComponent implements OnInit {
 
   onSaveWorkSheetDefinition(event: Event): void {
     this.saving = true;
-    this.worksheetsService
-      .createWorksheetDefinitions([this.worksheetDefnPayload])
-      .subscribe((response: any) => {
-        if (response && !response?.error) {
-          this.getWorksheetDefinitions();
-          this.createWorksheetDefinitionFields();
-          this.saving = false;
+    this.generateMetadataLabelsService
+      .getLabMetadatalabels({
+        globalProperty: this.worksheetDefinitionLabelFormatReferenceUuid,
+        metadataType: "worksheetdefinition",
+      })
+      .subscribe((response) => {
+        if (response) {
+          this.worksheetDefnPayload = {
+            ...this.worksheetDefnPayload,
+            code: response[0],
+          };
+          console.log("worksheetDefnPayload", this.worksheetDefnPayload);
+          // this.worksheetsService
+          //   .createWorksheetDefinitions([this.worksheetDefnPayload])
+          //   .subscribe((response: any) => {
+          //     if (response && !response?.error) {
+          //       this.getWorksheetDefinitions();
+          //       this.createWorksheetDefinitionFields();
+          //       this.saving = false;
+          //     }
+          //   });
         }
       });
   }

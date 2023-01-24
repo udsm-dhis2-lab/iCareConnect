@@ -1384,7 +1384,9 @@
           </tbody>
         </table>
         <div class="p-3" *ngIf="entryCategory === 'WORKSHEET'">
-          <app-result-entry-by-worksheet-home></app-result-entry-by-worksheet-home>
+          <app-result-entry-by-worksheet-home
+            [isLIS]="LISConfigurations?.isLIS"
+          ></app-result-entry-by-worksheet-home>
         </div>
       </div>
     </mat-tab>
