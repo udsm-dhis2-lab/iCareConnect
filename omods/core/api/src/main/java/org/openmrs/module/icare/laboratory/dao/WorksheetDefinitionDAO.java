@@ -12,7 +12,7 @@ import java.util.List;
 public class WorksheetDefinitionDAO extends BaseDAO<WorksheetDefinition> {
 	
 	public List<WorksheetDefinition> getWorksheetDefinitions(Date startDate, Date endDate, String q, Integer startIndex,
-	        Integer limit) {
+	        Integer limit, Date expirationDate) {
 		
 		DbSession session = this.getSession();
 		String queryStr = "SELECT wd FROM WorksheetDefinition wd";
@@ -33,6 +33,15 @@ public class WorksheetDefinitionDAO extends BaseDAO<WorksheetDefinition> {
 			
 			queryStr += "lower(wd.code) like lower(:q)";
 		}
+
+		if (expirationDate != null) {
+			if (!queryStr.contains("WHERE")) {
+				queryStr += " WHERE ";
+			} else {
+				queryStr += " AND ";
+			}
+			queryStr += " cast(wd.expirationDateTime as date) >= :expirationDate";
+		}
 		
 		//Construct a query object
 		Query query = session.createQuery(queryStr);
@@ -48,7 +57,11 @@ public class WorksheetDefinitionDAO extends BaseDAO<WorksheetDefinition> {
 		if (q != null) {
 			query.setParameter("q", "%" + q.replace(" ", "%") + "%");
 		}
-		
+
+		if (expirationDate != null) {
+			query.setParameter("expirationDate", expirationDate);
+		}
+
 		query.setFirstResult(startIndex);
 		query.setMaxResults(limit);
 		

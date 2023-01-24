@@ -73,7 +73,7 @@ export class WorksheetDefinitionComponent implements OnInit {
   }
 
   createWorksheetDefinitionFields(data?: any): void {
-    console.log(data);
+    // console.log(data);
     this.worksheetDefinitionFields = [
       new Textbox({
         id: "code",
