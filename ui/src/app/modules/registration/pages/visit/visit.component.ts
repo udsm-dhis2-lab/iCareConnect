@@ -346,7 +346,6 @@ export class VisitComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    console.log("The patient is :", this.patientDetails);
     this.visitDetails["InsuranceID"] =
       (this.patientDetails?.person?.attributes?.filter(
         (attribute) => attribute?.attributeType?.display === "ID"
