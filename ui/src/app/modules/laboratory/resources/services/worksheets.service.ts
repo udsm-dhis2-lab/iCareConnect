@@ -8,7 +8,7 @@ import { SampleAllocation } from "src/app/shared/resources/sample-allocations/mo
 @Injectable({
   providedIn: "root",
 })
-export class WorkSeetsService {
+export class WorkSheetsService {
   constructor(private httpClient: OpenmrsHttpClientService) {}
 
   createWorkSheet(data: any): Observable<any> {
@@ -63,11 +63,21 @@ export class WorkSeetsService {
     );
   }
 
-  getWorksheetDefinitions(): Observable<any[]> {
-    return this.httpClient.get(`lab/worksheetdefinitions`).pipe(
-      map((response) => response),
-      catchError((error) => of(error))
-    );
+  getWorksheetDefinitions(parameters?: any): Observable<any[]> {
+    let qParameters = [];
+    if (parameters?.startDate) {
+      qParameters = [...qParameters, "expirationDate=" + parameters?.startDate];
+    }
+    if (parameters?.q) {
+      qParameters = [...qParameters, "q=" + parameters?.q];
+    }
+
+    return this.httpClient
+      .get(`lab/worksheetdefinitions?${qParameters.join("&")}`)
+      .pipe(
+        map((response) => response),
+        catchError((error) => of(error))
+      );
   }
 
   createWorksheetSamples(data: any): Observable<any> {

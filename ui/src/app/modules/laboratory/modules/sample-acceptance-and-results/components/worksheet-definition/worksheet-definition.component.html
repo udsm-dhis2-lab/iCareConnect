@@ -128,15 +128,7 @@
           </tr>
         </table>
       </div>
-
-      <div class="w-100 mt-2" *ngIf="currentWorksheet">
-        <app-form
-          [fields]="worksheetDefinitionFields"
-          [isFormHorizontal]="true"
-          (formUpdate)="onGetFormData($event)"
-        ></app-form>
-      </div>
-      <div class="d-flex justify-content-end mt-2">
+      <div class="d-flex justify-content-end mt-3">
         <button
           *ngIf="!isComplete"
           mat-flat-button
@@ -152,6 +144,16 @@
         >
           Un-populate
         </button>
+      </div>
+
+      <div class="w-100 mt-2" *ngIf="currentWorksheet">
+        <app-form
+          [fields]="worksheetDefinitionFields"
+          [isFormHorizontal]="true"
+          (formUpdate)="onGetFormData($event)"
+        ></app-form>
+      </div>
+      <div class="d-flex justify-content-end mt-3">
         <button
           class="ml-2"
           [disabled]="!isComplete || !isFormValid"
@@ -165,7 +167,27 @@
     </div>
   </div>
   <div class="col-md-3" style="z-index: 100">
-    <div class="h5">Worksheets defined</div>
+    <div class="h6">Available defined Worksheets</div>
+    <hr />
+    <mat-form-field class="w-100">
+      <mat-label>Search</mat-label>
+      <mat-icon matPrefix>search</mat-icon
+      ><input
+        type="text"
+        placeholder="Search"
+        matInput
+        (keyup)="getWSDefns($event)"
+        [(ngModel)]="searchingText"
+      />
+    </mat-form-field>
+    <section class="example-section">
+      <mat-checkbox
+        color="primary"
+        (change)="setExpirationDate($event)"
+        [checked]="expirationDateChecked"
+        >Include Expiration Date</mat-checkbox
+      >
+    </section>
     <table class="table mt-2">
       <thead>
         <tr>
@@ -228,6 +250,13 @@
               <div class="alert alert-warning" role="alert">
                 No Worksheet definition available
               </div>
+            </td>
+          </tr>
+        </ng-container>
+        <ng-container *ngIf="!params?.worksheetDefinitions">
+          <tr>
+            <td colspan="100%">
+              <mat-progress-bar mode="indeterminate"></mat-progress-bar>
             </td>
           </tr>
         </ng-container>
