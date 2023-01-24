@@ -73,11 +73,12 @@ export class WorksheetDefinitionComponent implements OnInit {
   }
 
   createWorksheetDefinitionFields(data?: any): void {
+    console.log(data);
     this.worksheetDefinitionFields = [
       new Textbox({
         id: "code",
         key: "code",
-        label: "Reference code",
+        label: "Reference code (system generated)",
         disabled: true,
         value: data?.code?.value,
       }),
@@ -148,7 +149,8 @@ export class WorksheetDefinitionComponent implements OnInit {
     // Create worksheetdefn and worksheet sample
     // console.log("selectedRowsColumns", this.selectedRowsColumns);
     this.saving = true;
-    (!this.currentWorksheetDefinition
+    (!this.currentWorksheetDefinition ||
+    (this.currentWorksheetDefinition && !this.currentWorksheetDefinition?.code)
       ? this.generateMetadataLabelsService.getLabMetadatalabels({
           globalProperty: this.worksheetDefinitionLabelFormatReferenceUuid,
           metadataType: "worksheetdefinition",
@@ -213,13 +215,21 @@ export class WorksheetDefinitionComponent implements OnInit {
   }
 
   onGetFormData(formValue: FormValue): void {
-    const values = formValue.getValues();
+    let values = formValue.getValues();
+    values["currentLabelCharCount"] = {
+      id: "currentLabelCharCount",
+      value: this.currentLabelCharCount.toString(),
+      options: null,
+    };
     this.isFormValid = formValue.isValid;
     this.isWorksheetDefnValid = formValue.isValid;
     this.selectedWorkSheetConfiguration = values?.worksheet?.value;
     this.worksheetDefnPayload = {
       code: null,
-      expirationDateTime: new Date(values?.expirationDateTime?.value),
+      expirationDateTime: new Date(values?.expirationDateTime?.value)
+        ?.toISOString()
+        ?.replace("T", " ")
+        .replace(".000Z", ""),
       additionalFields: JSON.stringify(
         Object.keys(values).map((key) => {
           return values[key];
@@ -266,8 +276,17 @@ export class WorksheetDefinitionComponent implements OnInit {
     const wsDefnFields = worksheetDefn?.additionalFields
       ? JSON.parse(worksheetDefn?.additionalFields)
       : null;
+    console.log("wsDefnFields", wsDefnFields);
     this.createWorksheetDefinitionFields(
-      wsDefnFields ? keyBy(wsDefnFields, "id") : null
+      wsDefnFields
+        ? keyBy(
+            [
+              ...wsDefnFields,
+              { id: "code", key: "code", value: worksheetDefn?.code },
+            ],
+            "id"
+          )
+        : null
     );
     const matchedWorksheet = (this.worksheets?.filter(
       (worksheet) => worksheet?.uuid === worksheetDefn?.worksheet?.uuid
