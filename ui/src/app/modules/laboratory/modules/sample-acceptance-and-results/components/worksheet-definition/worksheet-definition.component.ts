@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from "@angular/core";
 import { Observable, of } from "rxjs";
-import { WorkSeetsService } from "src/app/modules/laboratory/resources/services/worksheets.service";
+import { WorkSheetsService } from "src/app/modules/laboratory/resources/services/worksheets.service";
 import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
 import { Textbox } from "src/app/shared/modules/form/models/text-box.model";
@@ -9,6 +9,7 @@ import { DatasetDataService } from "src/app/core/services/dataset-data.service";
 import { TextArea } from "src/app/shared/modules/form/models/text-area.model";
 import { DateField } from "src/app/shared/modules/form/models/date-field.model";
 import { GenerateMetadataLabelsService } from "src/app/core/services";
+import { MatCheckboxChange } from "@angular/material/checkbox";
 
 @Component({
   selector: "app-worksheet-definition",
@@ -41,14 +42,16 @@ export class WorksheetDefinitionComponent implements OnInit {
   worksheetSelectionField: any;
   currentWorksheet: any;
   isFormValid: boolean = false;
+  expirationDateChecked: boolean = true;
+  searchingText: string;
   constructor(
-    private worksheetsService: WorkSeetsService,
+    private worksheetsService: WorkSheetsService,
     private datasetDataService: DatasetDataService,
     private generateMetadataLabelsService: GenerateMetadataLabelsService
   ) {}
 
   ngOnInit(): void {
-    this.getWorksheetDefinitions();
+    this.getWorksheetDefinitions(this.datesParameters);
     this.createWorksheetDefinitionFields();
     this.getTestControls();
     this.createWorksheetSelectionField();
@@ -118,6 +121,24 @@ export class WorksheetDefinitionComponent implements OnInit {
         required: false,
       }),
     ];
+  }
+
+  getWSDefns(event: any): void {
+    const searchingText = event ? event?.target?.value : "";
+    this.getWorksheetDefinitions(
+      this.expirationDateChecked
+        ? { ...this.datesParameters, q: searchingText }
+        : { q: searchingText }
+    );
+  }
+
+  setExpirationDate(event: MatCheckboxChange): void {
+    this.expirationDateChecked = event?.checked;
+    this.getWorksheetDefinitions(
+      this.expirationDateChecked
+        ? { ...this.datesParameters, q: this.searchingText }
+        : { q: this.searchingText }
+    );
   }
 
   onGetSelectedWorksheet(formValue: FormValue): void {
@@ -191,11 +212,11 @@ export class WorksheetDefinitionComponent implements OnInit {
                   if (response && !response?.error) {
                     this.saving = false;
                     this.currentWorksheetDefinition = null;
-                    this.getWorksheetDefinitions();
+                    this.getWorksheetDefinitions(this.datesParameters);
                     this.createWorksheetSelectionField();
                   } else {
                     this.saving = false;
-                    this.getWorksheetDefinitions();
+                    this.getWorksheetDefinitions(this.datesParameters);
                     this.createWorksheetSelectionField();
                   }
                 });
@@ -205,9 +226,9 @@ export class WorksheetDefinitionComponent implements OnInit {
     });
   }
 
-  getWorksheetDefinitions(): void {
+  getWorksheetDefinitions(parameters?: any): void {
     this.worksheetDefinitions$ =
-      this.worksheetsService.getWorksheetDefinitions();
+      this.worksheetsService.getWorksheetDefinitions(parameters);
   }
 
   getTestControls(): void {
