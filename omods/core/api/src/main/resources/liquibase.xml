@@ -4111,7 +4111,7 @@
             <column name="changed_by" type="INTEGER"/>
             <column name="date_changed" type="DATE"/>
             <column name="voided" type="BOOLEAN">
-                <constraints nullable="false"></constraints>item_id
+                <constraints nullable="false"></constraints>
             </column>
             <column name="date_voided" type="DATE"/>
             <column name="voided_by" type="INTEGER"/>
@@ -4124,14 +4124,14 @@
         <addForeignKeyConstraint
                 baseColumnNames="changed_by"
                 baseTableName="st_purchase_order_item"
-                constraintName="st_purchase_order_changed_by_users_user_id_fk"
+                constraintName="st_purchase_order_item_changed_by_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
 
         <addForeignKeyConstraint
                 baseColumnNames="creator"
                 baseTableName="st_purchase_order_item"
-                constraintName="st_purchase_order_creator_users_user_id_fk"
+                constraintName="st_purchase_order_item_creator_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
 
@@ -4140,12 +4140,12 @@
                 baseTableName="st_purchase_order_item"
                 constraintName="st_purchase_order_item_purchase_order_id_purchase_order_fk"
                 referencedColumnNames="purchase_order_id"
-                referencedTableName="purchase_order"/>
+                referencedTableName="st_purchase_order"/>
 
         <addForeignKeyConstraint
                 baseColumnNames="item_id"
-                baseTableName="item"
-                constraintName="st_item_item_id_item_fk"
+                baseTableName="st_purchase_order_item"
+                constraintName="st_purchase_order_item_item_id_item_fk"
                 referencedColumnNames="item_id"
                 referencedTableName="item"/>
 
@@ -4172,7 +4172,7 @@
             <column name="changed_by" type="INTEGER"/>
             <column name="date_changed" type="DATE"/>
             <column name="voided" type="BOOLEAN">
-                <constraints nullable="false"></constraints>item_id
+                <constraints nullable="false"></constraints>
             </column>
             <column name="date_voided" type="DATE"/>
             <column name="voided_by" type="INTEGER"/>
@@ -4201,14 +4201,7 @@
                 baseTableName="st_purchase_order_status"
                 constraintName="st_purchase_order_status_purchase_order_id_purchase_order_fk"
                 referencedColumnNames="purchase_order_id"
-                referencedTableName="purchase_order"/>
-
-        <addForeignKeyConstraint
-                baseColumnNames="item_id"
-                baseTableName="st_purchase_order_status"
-                constraintName="st_purchase_order_status_item_id_item_fk"
-                referencedColumnNames="item_id"
-                referencedTableName="item"/>
+                referencedTableName="st_purchase_order"/>
 
     </changeSet>
 
@@ -4266,7 +4259,7 @@
                 baseTableName="st_stock_invoice"
                 constraintName="st_stock_invoice_supplier_id_supplier_fk"
                 referencedColumnNames="supplier_id"
-                referencedTableName="supplier"/>
+                referencedTableName="st_supplier"/>
 
         <addForeignKeyConstraint
                 baseColumnNames="purchase_order_id"
@@ -4436,6 +4429,13 @@
                 referencedTableName="users"/>
 
         <addForeignKeyConstraint
+                baseColumnNames="stock_invoice_id"
+                baseTableName="st_stock_invoice_item"
+                constraintName="st_stock_invoice_item_st_inv_id_stock_invoice_fk"
+                referencedColumnNames="stock_invoice_id"
+                referencedTableName="st_stock_invoice"/>
+
+        <addForeignKeyConstraint
                 baseColumnNames="uom"
                 baseTableName="st_stock_invoice_item"
                 constraintName="st_stock_invoice_item_uom_concept_fk"
@@ -4465,7 +4465,7 @@
             <column name="changed_by" type="INTEGER"/>
             <column name="date_changed" type="DATE"/>
             <column name="voided" type="BOOLEAN">
-                <constraints nullable="false"></constraints>item_id
+                <constraints nullable="false"></constraints>
             </column>
             <column name="date_voided" type="DATE"/>
             <column name="voided_by" type="INTEGER"/>
@@ -4494,7 +4494,7 @@
                 baseTableName="st_stock_invoice_status"
                 constraintName="st_stock_invoice_status_st_invoice_id_st_stock_invoice_fk"
                 referencedColumnNames="stock_invoice_id"
-                referencedTableName="stock_invoice"/>
+                referencedTableName="st_stock_invoice"/>
 
     </changeSet>
 
@@ -4505,7 +4505,7 @@
             </not>
         </preConditions>
         <comment>Creating openmrs st_stock_invoice_status table</comment>
-        <createTable tableName="st_stock_invoice_status">
+        <createTable tableName="st_stock_invoice_item_status">
             <column name="stock_invoice_item_status_id" type="INTEGER" autoIncrement="true">
                 <constraints primaryKey="true" primaryKeyName="stock_invoice_item_status_id_pk"/>
             </column>
@@ -4519,7 +4519,7 @@
             <column name="changed_by" type="INTEGER"/>
             <column name="date_changed" type="DATE"/>
             <column name="voided" type="BOOLEAN">
-                <constraints nullable="false"></constraints>item_id
+                <constraints nullable="false"></constraints>
             </column>
             <column name="date_voided" type="DATE"/>
             <column name="voided_by" type="INTEGER"/>
@@ -4544,11 +4544,11 @@
                 referencedTableName="users"/>
 
         <addForeignKeyConstraint
-                baseColumnNames="stock_invoice_id"
+                baseColumnNames="stock_invoice_item_id"
                 baseTableName="st_stock_invoice_item_status"
                 constraintName="st_stock_invoice_item_status_st_invoice_id_st_stock_invoice_fk"
                 referencedColumnNames="stock_invoice_item_id"
-                referencedTableName="stock_invoice_item"/>
+                referencedTableName="st_stock_invoice_item"/>
 
     </changeSet>
 
