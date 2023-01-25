@@ -5,10 +5,20 @@
     prescriptionArrangementFields: prescriptionArrangementFields$ | async,
     specificDrugConceptUuid: specificDrugConceptUuid$ | async
   } as params">
-  <!-- <mat-vertical-stepper [linear]="false" #stepper>
+  <!-- Allow this if you want to have a segmented timeline grouped by visits -->
+  <mat-vertical-stepper [linear]="false" #stepper>
     <mat-step *ngFor="let visit of params?.visits">
       <ng-template matStepLabel>
-          {{ visit?.visit?.startDatetime | date:"medium" }} 
+          <strong>
+            {{ visit?.visit?.visitType?.display }} :
+          </strong>
+           {{ visit?.visit?.startDatetime | date:"dd-MM-yyyy HH:mm:ss" }} 
+           <span *ngIf="visit?.visit?.stopDatetime">
+             to {{ visit?.visit?.stopDatetime | date:"dd-MM-yyyy HH:mm:ss" }}
+           </span>
+           <span *ngIf="!visit?.visit?.stopDatetime">
+             <i>(On going visit)</i>
+           </span>
       </ng-template>
       <div>
         <app-patient-history-data 
@@ -20,8 +30,10 @@
           ></app-patient-history-data>
         </div>
       </mat-step>
-    </mat-vertical-stepper> -->
-    <div class="history overflow-auto">
+    </mat-vertical-stepper> 
+
+    <!-- Allow this if you want to have a linked timeline -->
+    <!-- <div class="history overflow-auto">
       <ng-container *ngFor="let visit of params?.visits">
         <app-patient-history-data 
           
@@ -33,4 +45,5 @@
           ></app-patient-history-data>
       </ng-container>
     </div>
+    </div> -->
 </div>
