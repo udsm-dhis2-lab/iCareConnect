@@ -80,6 +80,7 @@
                 params?.testsFromExternalSystemsConfigs
               "
               [allRegistrationFields]="allRegistrationFields | createLabFields: params?.referringDoctorAttributes : params?.agencyConceptConfigs : params?.referFromFacilityVisitAttribute : params?.identifierTypes"
+              [LISConfigurations]="LISConfigurations"
             ></app-single-registration>
           </div>
         </div>
@@ -114,6 +115,7 @@
             [existingBatchsets]="params?.batchsets"
             [existingBatches]="params?.batches"
             [fromMaintenance]="fromMaintenance"
+            [LISConfigurations]="LISConfigurations"
             (reloadRegisterSample)="onReloadRegisterSample($event)"
           ></app-batch-registration>
         </div>
