@@ -13,7 +13,7 @@
         <input autocomplete="off" type="text" matInput placeholder="Search" />
       </mat-form-field>
       <mat-form-field class="w-25 float-right">
-        <mat-label>Choose Store</mat-label>
+        <mat-label>Choose Store1</mat-label>
         <mat-select (selectionChange)="getSelectedStore($event)" name="store">
           <mat-option [value]="'All'">All</mat-option>
           <mat-option *ngFor="let store of params?.stores" [value]="store">
