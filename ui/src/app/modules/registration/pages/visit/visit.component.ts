@@ -31,6 +31,8 @@ import {
 import { SelectRoomComponent } from "../../components/select-room/select-room.component";
 import { VisitClaimComponent } from "../../components/visit-claim/visit-claim.component";
 import { RegistrationService } from "../../services/registration.services";
+import { VisitsService } from "src/app/shared/resources/visits/services";
+import { map } from "rxjs/operators";
 
 @Component({
   selector: "app-visit",
@@ -100,6 +102,7 @@ export class VisitComponent implements OnInit {
   isReferralVisit: boolean = false;
   currentServiceConfigsSelected: any;
   authorizationNumberAvailable: boolean = true;
+  patientVisist$: Observable<any>;
 
   searchRoom(event: Event) {
     event.stopPropagation();
@@ -342,18 +345,44 @@ export class VisitComponent implements OnInit {
     public dialog: MatDialog,
     private _snackBar: MatSnackBar,
     private registrationService: RegistrationService,
-    private router: Router
+    private router: Router,
+    private visitService: VisitsService
   ) {}
 
   ngOnInit(): void {
-    this.visitDetails["InsuranceID"] =
-      (this.patientDetails?.person?.attributes?.filter(
-        (attribute) => attribute?.attributeType?.display === "ID"
-      ) || [])[0]?.value.length > 0
-        ? (this.patientDetails?.person?.attributes?.filter(
-            (attribute) => attribute?.attributeType?.display === "ID"
-          ) || [])[0]?.value
-        : null;
+    let visit$: Observable<any> = this.visitService.getLastPatientVisit(
+      this.patientDetails?.uuid
+    );
+
+    this.patientVisist$ = visit$.pipe(
+      map((patientvisit) => {
+        // this.visitDetails["InsuranceID"] =
+        //   patientvisit[0]?.visit?.attributesToDisplay?.filter((values) => {
+        //     return values.uuid === "d2d87341-1ec7-4bf6-9c49-c10736953706";
+        //   })[0]?.value.length > 0
+        //     ? patientvisit[0]?.visit?.attributesToDisplay?.filter((values) => {
+        //         return values.uuid === "d2d87341-1ec7-4bf6-9c49-c10736953706";
+        //       })[0]?.value
+        //     : null;
+        return (patientvisit[0]?.visit?.attributesToDisplay?.filter(
+          (values) => {
+            return values.uuid === "d2d87341-1ec7-4bf6-9c49-c10736953706";
+          }
+        ) || [])[0]?.value;
+      })
+    );
+    this.patientVisist$.subscribe((data: any) => {
+      this.visitDetails["InsuranceID"] =
+        (this.patientDetails?.person?.attributes?.filter(
+          (attribute) => attribute?.attributeType?.display === "ID"
+        ) || [])[0]?.value.length > 0
+          ? (this.patientDetails?.person?.attributes?.filter(
+              (attribute) => attribute?.attributeType?.display === "ID"
+            ) || [])[0]?.value
+          : data.length > 0
+          ? data
+          : null;
+    });
     this.currentPatient$ = this.store.pipe(select(getCurrentPatient));
     this.activeVisit$ = this.store.pipe(select(getActiveVisit));
     this.loadingVisit$ = this.store.pipe(select(getVisitLoadingState));
