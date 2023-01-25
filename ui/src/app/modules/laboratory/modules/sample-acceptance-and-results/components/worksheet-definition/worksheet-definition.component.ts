@@ -35,7 +35,7 @@ export class WorksheetDefinitionComponent implements OnInit {
   isWorksheetRenderingReady: boolean = false;
   isComplete: boolean = false;
   maxLabelCharCount: number = 7;
-  currentLabelCharCount: number = 7;
+  currentLabelCharCount: number = 15;
   minLabelCharCount: number = 3;
 
   message: string;
@@ -85,13 +85,6 @@ export class WorksheetDefinitionComponent implements OnInit {
         disabled: true,
         value: data?.code?.value,
       }),
-      new TextArea({
-        id: "description",
-        key: "description",
-        label: "Description",
-        value: data?.description?.value,
-        required: false,
-      }),
       new Textbox({
         id: "abbreviation",
         key: "abbreviation",
@@ -118,6 +111,13 @@ export class WorksheetDefinitionComponent implements OnInit {
         key: "lotNumber",
         label: "LOT Number",
         value: data?.lotNumber?.value,
+        required: false,
+      }),
+      new TextArea({
+        id: "description",
+        key: "description",
+        label: "Description",
+        value: data?.description?.value,
         required: false,
       }),
     ];
@@ -262,33 +262,6 @@ export class WorksheetDefinitionComponent implements OnInit {
     };
   }
 
-  onSaveWorkSheetDefinition(event: Event): void {
-    this.saving = true;
-    this.generateMetadataLabelsService
-      .getLabMetadatalabels({
-        globalProperty: this.worksheetDefinitionLabelFormatReferenceUuid,
-        metadataType: "worksheetdefinition",
-      })
-      .subscribe((response) => {
-        if (response) {
-          this.worksheetDefnPayload = {
-            ...this.worksheetDefnPayload,
-            code: response[0],
-          };
-          console.log("worksheetDefnPayload", this.worksheetDefnPayload);
-          // this.worksheetsService
-          //   .createWorksheetDefinitions([this.worksheetDefnPayload])
-          //   .subscribe((response: any) => {
-          //     if (response && !response?.error) {
-          //       this.getWorksheetDefinitions();
-          //       this.createWorksheetDefinitionFields();
-          //       this.saving = false;
-          //     }
-          //   });
-        }
-      });
-  }
-
   setCurrentWorksheetDefn(event: Event, worksheetDefn: any): void {
     // event.stopPropagation();
     this.currentWorksheetDefinition = null;
@@ -297,7 +270,6 @@ export class WorksheetDefinitionComponent implements OnInit {
     const wsDefnFields = worksheetDefn?.additionalFields
       ? JSON.parse(worksheetDefn?.additionalFields)
       : null;
-    console.log("wsDefnFields", wsDefnFields);
     this.createWorksheetDefinitionFields(
       wsDefnFields
         ? keyBy(
@@ -312,23 +284,54 @@ export class WorksheetDefinitionComponent implements OnInit {
     const matchedWorksheet = (this.worksheets?.filter(
       (worksheet) => worksheet?.uuid === worksheetDefn?.worksheet?.uuid
     ) || [])[0];
-    // console.log(worksheetDefn);
-    this.currentWorksheetDefinition = {
-      ...worksheetDefn,
-      worksheet: {
-        ...worksheetDefn?.worksheet,
-        ...{
-          ...matchedWorksheet,
-          columns: this.generateArrayOfItemsFromCount(
-            matchedWorksheet?.columns
-          ),
-          rows: this.generateArrayOfItemsFromCount(matchedWorksheet?.rows),
-        },
-      },
-    };
-    this.isWorksheetRenderingReady = true;
+    this.worksheetsService
+      .getWorksheetDefinitionsByUuid(worksheetDefn?.uuid)
+      .subscribe((response) => {
+        if (response && !response?.error) {
+          const worksheetDefnItems = {};
+          response?.worksheetSamples?.forEach((ws) => {
+            worksheetDefnItems[
+              ws?.row +
+                "-" +
+                ws?.column +
+                "-" +
+                (ws?.type === "SAMPLE" ? "sample" : "control")
+            ] = {
+              set: true,
+              value: { ...ws?.sample, label: ws?.sample?.display },
+            };
+          });
+          const additionalFields = JSON.parse(response?.additionFields);
+          const currentLabelCharCountField = (additionalFields?.filter(
+            (field) => field?.id === "currentLabelCharCount"
+          ) || [])[0];
+          this.currentLabelCharCount = currentLabelCharCountField
+            ? currentLabelCharCountField?.value
+            : this.currentLabelCharCount;
+          // console.log("worksheetDefnItems", worksheetDefnItems);
+          this.selectedRowsColumns = worksheetDefnItems;
+          this.isComplete = true;
+          this.currentWorksheetDefinition = {
+            ...worksheetDefn,
+            ...response,
+            worksheet: {
+              ...worksheetDefn?.worksheet,
+              ...{
+                ...matchedWorksheet,
+                columns: this.generateArrayOfItemsFromCount(
+                  matchedWorksheet?.columns
+                ),
+                rows: this.generateArrayOfItemsFromCount(
+                  matchedWorksheet?.rows
+                ),
+              },
+            },
+          };
+          this.isWorksheetRenderingReady = true;
 
-    this.generateDefaultWorksheetRowsColumns();
+          // this.generateDefaultWorksheetRowsColumns();
+        }
+      });
   }
 
   generateDefaultWorksheetRowsColumns(): void {
