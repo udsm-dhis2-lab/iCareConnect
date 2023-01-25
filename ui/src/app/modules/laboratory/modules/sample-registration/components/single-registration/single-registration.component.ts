@@ -53,6 +53,7 @@ export class SingleRegistrationComponent implements OnInit {
   @Input() testsFromExternalSystemsConfigs: any[];
   @Input() currentUser: any;
   @Input() allRegistrationFields: any;
+  @Input() LISConfigurations: any;
 
   departmentField: any = {};
   specimenDetailsFields: any;
@@ -143,6 +144,29 @@ export class SingleRegistrationComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.openBarCodeDialog({
+      sampleLabelsUsedDetails: [
+        {
+          visit: {
+            uuid: "612f8729-5137-41ef-ad3c-a61be01f38d3",
+          },
+          label: "NPHL/23/0000009",
+          concept: {
+            uuid: "e61969c1-eb08-4c26-b9ce-fd7b02a4064e",
+          },
+          location: {
+            uuid: "7fdfa2cb-bc95-405a-88c6-32b7673c0453",
+          },
+          orders: [
+            {
+              uuid: "5054b30f-16eb-4a61-a02e-7951975a3af8",
+            },
+          ],
+          uuid: "0400bfa3-0d7f-47d8-99a4-eda66143b8da",
+        },
+      ],
+      isLis: true
+    });
     const userLocationsIds = JSON.parse(
       this.currentUser?.userProperties?.locations
     );
@@ -156,10 +180,11 @@ export class SingleRegistrationComponent implements OnInit {
 
     this.specimenDetailsFields = Object.keys(
       this.allRegistrationFields?.specimenDetailFields
-    ).slice(0, 3)
+    )
+      .slice(0, 3)
       .map((key) => {
         const field = this.allRegistrationFields?.specimenDetailFields[key];
-        return field
+        return field;
       });
 
     // this.specimenDetailsFields = [
@@ -218,15 +243,23 @@ export class SingleRegistrationComponent implements OnInit {
     //   // }),
     // ];
 
-    this.receivedOnField = this.allRegistrationFields?.specimenDetailFields?.receivedOn;
-    this.receivedByField = this.allRegistrationFields?.specimenDetailFields?.receivedBy;
-    this.transportCondition = this.allRegistrationFields?.specimenDetailFields?.transportCondition;
-    this.transportationTemperature = this.allRegistrationFields?.specimenDetailFields?.transportationTemperature;
+    this.receivedOnField =
+      this.allRegistrationFields?.specimenDetailFields?.receivedOn;
+    this.receivedByField =
+      this.allRegistrationFields?.specimenDetailFields?.receivedBy;
+    this.transportCondition =
+      this.allRegistrationFields?.specimenDetailFields?.transportCondition;
+    this.transportationTemperature =
+      this.allRegistrationFields?.specimenDetailFields?.transportationTemperature;
 
-    this.sampleColectionDateField = this.allRegistrationFields?.specimenDetailFields?.collectedOn;
-    this.sampleCollectedByField = this.allRegistrationFields?.specimenDetailFields?.collectedBy;
-    this.broughtOnField = this.allRegistrationFields?.specimenDetailFields?.broughtOn;
-    this.broughtByField = this.allRegistrationFields?.specimenDetailFields?.broughtBy;
+    this.sampleColectionDateField =
+      this.allRegistrationFields?.specimenDetailFields?.collectedOn;
+    this.sampleCollectedByField =
+      this.allRegistrationFields?.specimenDetailFields?.collectedBy;
+    this.broughtOnField =
+      this.allRegistrationFields?.specimenDetailFields?.broughtOn;
+    this.broughtByField =
+      this.allRegistrationFields?.specimenDetailFields?.broughtBy;
 
     const currentLocation = JSON.parse(localStorage.getItem("currentLocation"));
     const labsAvailable =
@@ -407,8 +440,8 @@ export class SingleRegistrationComponent implements OnInit {
     };
   }
 
-  onGetDateTime(e: any){
-    console.log("==> Date time: ", e )
+  onGetDateTime(e: any) {
+    console.log("==> Date time: ", e);
   }
 
   onFormUpdate(formValues: FormValue, itemKey?: string): void {
@@ -1041,22 +1074,24 @@ export class SingleRegistrationComponent implements OnInit {
                                                                             .sampleLabelsUsedDetails,
                                                                           {
                                                                             ...sample,
+                                                                            uuid:
+                                                                              sampleResponse?.uuid,
                                                                           },
                                                                         ];
                                                                       // TODO: Find a better way to control three labels to be printed
 
-                                                                      this.sampleLabelsUsedDetails =
-                                                                        [
-                                                                          ...this
-                                                                            .sampleLabelsUsedDetails,
-                                                                          sample,
-                                                                        ];
-                                                                      this.sampleLabelsUsedDetails =
-                                                                        [
-                                                                          ...this
-                                                                            .sampleLabelsUsedDetails,
-                                                                          sample,
-                                                                        ];
+                                                                      // this.sampleLabelsUsedDetails =
+                                                                      //   [
+                                                                      //     ...this
+                                                                      //       .sampleLabelsUsedDetails,
+                                                                      //     sample,
+                                                                      //   ];
+                                                                      // this.sampleLabelsUsedDetails =
+                                                                      //   [
+                                                                      //     ...this
+                                                                      //       .sampleLabelsUsedDetails,
+                                                                      //     sample,
+                                                                      //   ];
 
                                                                       // Create sample allocations
 
@@ -1549,11 +1584,13 @@ export class SingleRegistrationComponent implements OnInit {
                                                                                     identifier:
                                                                                       this
                                                                                         .currentSampleLabel,
-                                                                                    sample:
-                                                                                      sampleResponse,
                                                                                     sampleLabelsUsedDetails:
                                                                                       this
                                                                                         .sampleLabelsUsedDetails,
+                                                                                    isLis:
+                                                                                      this
+                                                                                        .LISConfigurations
+                                                                                        ?.isLis,
                                                                                   };
                                                                                 this.dialog
                                                                                   .open(
