@@ -74,6 +74,36 @@
           <td>
             <div class="float-right">
               <button
+                mat-icon-button
+                #menuTrigger="matMenuTrigger"
+                [matMenuTriggerFor]="menu"
+              >
+                <mat-icon>more_vert</mat-icon>
+              </button>
+              <mat-menu #menu="matMenu">
+                <button
+                  mat-menu-item
+                  [disabled]="currentItemStock?.id === stock.id"
+                  color="primary"
+                  (click)="onToggleCurrentStock($event, stock)"
+                  (click)="menuTrigger.closeMenu()"
+                >
+                  <mat-icon>visibility</mat-icon>
+                  <span>View/Add Batches</span>
+                </button>
+                <button
+                  mat-menu-item
+                  [disabled]="currentItemStock?.id === stock.id"
+                  color="primary"
+                  (click)="onViewStockStatus($event, stock?.id)"
+                  (click)="menuTrigger.closeMenu()"
+                >
+                  <mat-icon>visibility</mat-icon>
+                  <span>View Other In-stores</span>
+                </button>
+              </mat-menu>
+
+              <!-- <button
                 class="action-buttons"
                 [disabled]="currentItemStock?.id === stock.id"
                 mat-flat-button
@@ -90,7 +120,7 @@
                 (click)="onViewStockStatus($event, stock?.id)"
               >
                 View Other In-stores
-              </button>
+              </button> -->
             </div>
           </td>
         </tr>
