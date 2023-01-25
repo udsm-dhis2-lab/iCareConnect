@@ -1007,18 +1007,27 @@ public class LaboratoryController {
 	
 	@RequestMapping(value = "worksheetdefinitions",method = RequestMethod.GET)
 	@ResponseBody
-	public List<Map<String,Object>> getWorksheetDefinitions(@RequestParam(value = "startDate", required = false) String startDate, @RequestParam(value = "endDate", required = false) String endDate, @RequestParam(value = "q", required = false) String q, @RequestParam(defaultValue = "0") Integer startIndex, @RequestParam(defaultValue = "100") Integer limit) throws ParseException{
+	public List<Map<String,Object>> getWorksheetDefinitions(@RequestParam(value = "startDate", required = false) String startDate,
+															@RequestParam(value = "endDate", required = false) String endDate,
+															@RequestParam(value = "q", required = false) String q,
+															@RequestParam(defaultValue = "0") Integer startIndex,
+															@RequestParam(defaultValue = "100") Integer limit,
+															@RequestParam(value = "expirationDate", required = false) String expirationDate) throws ParseException{
 
 		Date start = null;
 		Date end = null;
+		Date expirationDateFormatted = null;
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 		if (startDate != null && endDate != null) {
-
-			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 			start = formatter.parse(startDate);
 			end = formatter.parse(endDate);
 		}
 
-		List<WorksheetDefinition> worksheetDefinitions = laboratoryService.getWorksheetDefinitions(start, end, q, startIndex, limit);
+		if (expirationDate !=null) {
+			expirationDateFormatted = formatter.parse(expirationDate);
+		}
+
+		List<WorksheetDefinition> worksheetDefinitions = laboratoryService.getWorksheetDefinitions(start, end, q, startIndex, limit,expirationDateFormatted);
 
 		List<Map<String,Object>> worksheetDefinitionsObject = new ArrayList<>();
 		for(WorksheetDefinition worksheetDefinition : worksheetDefinitions){
