@@ -936,8 +936,8 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	
 	@Override
 	public List<WorksheetDefinition> getWorksheetDefinitions(Date startDate, Date endDate, String q, Integer startIndex,
-	        Integer limit) {
-		return worksheetDefinitionDAO.getWorksheetDefinitions(startDate, endDate, q, startIndex, limit);
+	        Integer limit, Date expirationDate) {
+		return worksheetDefinitionDAO.getWorksheetDefinitions(startDate, endDate, q, startIndex, limit, expirationDate);
 	}
 	
 	@Override

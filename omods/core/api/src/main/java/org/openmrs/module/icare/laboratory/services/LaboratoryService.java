@@ -139,7 +139,7 @@ public interface LaboratoryService extends OpenmrsService {
 	
 	WorksheetControl addWorksheetControl(WorksheetControl worksheetControl);
 	
-	List<WorksheetDefinition> getWorksheetDefinitions(Date start, Date end, String q, Integer startIndex, Integer limit);
+	List<WorksheetDefinition> getWorksheetDefinitions(Date start, Date end, String q, Integer startIndex, Integer limit, Date expirationDate);
 	
 	Map<String, Object> getWorksheetDefinitionByUuid(String worksheetDefinitionUuid);
 	
