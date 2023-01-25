@@ -56,3 +56,89 @@ export function getAgeInYearsMontthsDays(birthdate) {
     days: day,
   };
 }
+
+export function compateTwoDates(date1: Date, date2: Date) {
+  let year1 = date1.getFullYear();
+  let month1 = date1.getMonth();
+  let day1 = date1.getDate();
+  let hours1 = date1.getHours() === 24 ? 0 : date1.getHours();
+  let minutes1 = date1.getMinutes();
+
+  let year2 = date2.getFullYear();
+  let month2 = date2.getMonth();
+  let day2 = date2.getDate();
+  let hours2 = date2.getHours() === 24 ? 0 : date2.getHours();
+  let minutes2 = date2.getMinutes();
+
+  console.log(`Date 1: ${year1} ${month1} ${day1} ${hours1} ${minutes1}`);
+  console.log(`Date 2: ${year2} ${month2} ${day2} ${hours2} ${minutes2}`);
+
+  let date1IsGreater: boolean;
+  let date2IsGreater: boolean;
+  let datesEquals: boolean;
+
+  if (year1 > year2) {
+    date1IsGreater = true;
+  } else if (year1 === year2 && month1 > month2) {
+    date1IsGreater = true;
+  } else if (year1 === year2 && month1 === month2 && day1 > day2) {
+    date1IsGreater = true;
+  } else if (
+    year1 === year2 &&
+    month1 === month2 &&
+    day1 === day2 &&
+    hours1 > hours2
+  ) {
+    date1IsGreater = true;
+  } else if (
+    year1 === year2 &&
+    month1 === month2 &&
+    day1 === day2 &&
+    hours1 === hours2 &&
+    minutes1 > minutes2
+  ) {
+    date1IsGreater = true;
+  } else {
+    date1IsGreater = false;
+  }
+
+  if (year2 > year1) {
+    date2IsGreater = true;
+  } else if (year2 === year1 && month2 > month1) {
+    date2IsGreater = true;
+  } else if (year2 === year1 && month2 === month1 && day2 > day1) {
+    date2IsGreater = true;
+  } else if (
+    year2 === year1 &&
+    month2 === month1 &&
+    day2 === day1 &&
+    hours2 > hours1
+  ) {
+    date2IsGreater = true;
+  } else if (
+    year2 === year1 &&
+    month2 === month1 &&
+    day2 === day1 &&
+    hours2 === hours1 &&
+    minutes2 > minutes1
+  ) {
+    date2IsGreater = true;
+  } else {
+    date2IsGreater = false;
+  }
+
+  datesEquals =
+    year1 === year2 &&
+    month1 === month2 &&
+    day1 === day2 &&
+    hours1 === hours2 &&
+    minutes1 === minutes2
+      ? true
+      : false;
+
+  return {
+    date1isGreater: date1IsGreater,
+    date2isGreater: date2IsGreater,
+    datesEquals: datesEquals,
+  };
+}
