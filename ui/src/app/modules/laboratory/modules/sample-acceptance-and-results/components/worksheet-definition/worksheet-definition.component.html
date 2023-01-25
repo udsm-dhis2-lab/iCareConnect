@@ -46,6 +46,7 @@
         </button>
       </div>
       <div class="w-100 mt-2" style="max-height: 700px; overflow: auto">
+        <!-- {{ selectedRowsColumns | json }} -->
         <table class="table table-bordered" *ngIf="isWorksheetRenderingReady">
           <tr
             *ngFor="
@@ -262,19 +263,5 @@
         </ng-container>
       </tbody>
     </table>
-    <!-- <app-form
-      [fields]="worksheetDefinitionFields"
-      (formUpdate)="onGetFormData($event)"
-    ></app-form>
-    <div class="d-flex justify-content-end mt-2">
-      <button
-        mat-flat-button
-        color="primary"
-        [disabled]="!isWorksheetDefnValid"
-        (click)="onSaveWorkSheetDefinition($event)"
-      >
-        Save
-      </button>
-    </div> -->
   </div>
 </div>
