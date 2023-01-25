@@ -18,7 +18,7 @@
   ></mat-progress-bar>
   <div *ngIf="params?.bedsByLocationDetails && params?.locationsIds">
     <mat-tab-group mat-align-tabs="start" dynamicHeight="true">
-      <mat-tab label="Admitted Patients">
+      <mat-tab label="Patients">
         <mat-toolbar>
           <button
             mat-icon-button
@@ -106,28 +106,28 @@
         </div>
       </mat-tab>
 
-      <mat-tab label="Enter date">
-        <mat-label>Enter a date range</mat-label>
-        <mat-date-range-input [rangePicker]="visitDatePicker">
-          <input
-                  matStartDate
-                  placeholder="Start date"
-                  [(ngModel)]="startDate"
-                  (dateInput)="onDateChange()"
-          />
-          <input
-                  matEndDate
-                  placeholder="End date"
-                  [(ngModel)]="endDate"
-                  (dateInput)="onDateChange()"
-          />
-        </mat-date-range-input>
-        <mat-datepicker-toggle
-                matSuffix
-                [for]="visitDatePicker"
-        ></mat-datepicker-toggle>
-        <mat-date-range-picker #visitDatePicker></mat-date-range-picker>
-      </mat-tab>
+<!--      <mat-tab label="Enter date">-->
+<!--        <mat-label>Enter a date range</mat-label>-->
+<!--        <mat-date-range-input [rangePicker]="visitDatePicker">-->
+<!--          <input-->
+<!--                  matStartDate-->
+<!--                  placeholder="Start date"-->
+<!--                  [(ngModel)]="startDate"-->
+<!--                  (dateInput)="onDateChange()"-->
+<!--          />-->
+<!--          <input-->
+<!--                  matEndDate-->
+<!--                  placeholder="End date"-->
+<!--                  [(ngModel)]="endDate"-->
+<!--                  (dateInput)="onDateChange()"-->
+<!--          />-->
+<!--        </mat-date-range-input>-->
+<!--        <mat-datepicker-toggle-->
+<!--                matSuffix-->
+<!--                [for]="visitDatePicker"-->
+<!--        ></mat-datepicker-toggle>-->
+<!--        <mat-date-range-picker #visitDatePicker></mat-date-range-picker>-->
+<!--      </mat-tab>-->
       <!-- SAMUEL YONA -->
 
     </mat-tab-group>

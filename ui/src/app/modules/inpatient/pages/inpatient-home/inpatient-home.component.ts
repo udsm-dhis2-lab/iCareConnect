@@ -31,6 +31,7 @@ import {
 import {MatLegacyTableDataSource as MatTableDataSource} from "@angular/material/legacy-table";
 import {VisitExt} from "../../../../shared/resources/visits/models/visit.model";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
+import {TableColumn} from "../../../../shared/models/table-column.model";
 // import { getExemptionVisits } from "src/app/modules/billing/pages/exemption-home/exemption-home.component";
 
 
@@ -49,6 +50,7 @@ export class InpatientHomeComponent implements OnInit {
   orderType$: Observable<any>;
   settingCurrentLocationStatus$: Observable<boolean>;
   currentLocationUuid: string;
+  billingColumns: TableColumn[];
 
   constructor(
     private store: Store<AppState>,
@@ -69,6 +71,29 @@ export class InpatientHomeComponent implements OnInit {
     /**
      * TODO: Check how to softcode the 'Bed Location' tag
      */
+    this.billingColumns = [
+      {
+        id: "index",
+        label: "#",
+      },
+      {
+        id: "patientName",
+        label: "Name",
+      },
+      {
+        id: "patientGender",
+        label: "Gender",
+      },
+      {
+        id: "locationName",
+        label: "Location",
+      },
+      {
+        id: "patientAge",
+        label: "Age",
+      },
+    ];
+
 
     // this.store
     //   .select(getCurrentLocation)
