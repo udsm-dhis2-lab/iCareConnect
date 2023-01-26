@@ -306,7 +306,7 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 	public void testGettingSamples() throws Exception {
 		
 		MockHttpServletRequest newGetRequest = newGetRequest("lab/samples", new Parameter("page", "2"), new Parameter(
-		        "pageSize", "2"));
+		        "pageSize", "2"), new Parameter("hasStatus", "NO"));
 		
 		//System.out.println(Context.getVisitService().getVisitByUuid("d9c1d8ac-2b8e-427f-804d-b858c52e6f11").getLocation().getUuid());
 		MockHttpServletResponse handleGet = handle(newGetRequest);
