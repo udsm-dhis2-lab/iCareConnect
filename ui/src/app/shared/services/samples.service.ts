@@ -14,14 +14,26 @@ import { formatSample } from "../helpers/lab-samples.helper";
 export class SamplesService {
   constructor(private httpClient: HttpClient) {}
 
-  getLabSamplesByCollectionDates(dates): Observable<any> {
+  getLabSamplesByCollectionDates(
+    dates: any,
+    category?: string,
+    hasStatus?: string
+  ): Observable<any> {
+    let parameters = [];
+    if (dates) {
+      parameters = [...parameters, "startDate=" + dates?.startDate];
+      parameters = [...parameters, "endDate=" + dates?.endDate];
+    }
+    if (category) {
+      parameters = [...parameters, "category=" + category];
+    }
+    if (hasStatus) {
+      parameters = [...parameters, "hasStatus=" + hasStatus];
+    }
     return this.httpClient
       .get(
         BASE_URL +
-          "lab/samples?startDate=" +
-          dates?.startDate +
-          "&endDate=" +
-          dates?.endDate
+          `lab/samples?${parameters?.length > 0 ? parameters?.join("&") : ""}`
       )
       .pipe(
         map((response: any) => {

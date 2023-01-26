@@ -1,6 +1,5 @@
 <div
   *ngIf="{
-    samplesLoadedState: samplesLoadedState$ | async,
     privileges: privileges$ | async,
     labConfigs: labConfigs$ | async,
     codedSampleRejectionReasons: codedSampleRejectionReasons$ | async,
@@ -9,7 +8,6 @@
 >
   <mat-progress-bar
     *ngIf="
-      !params?.samplesLoadedState ||
       !params?.labConfigs ||
       !params?.codedSampleRejectionReasons ||
       !datesParameters
@@ -19,7 +17,6 @@
   <div
     class="row"
     *ngIf="
-      params?.samplesLoadedState &&
       params?.labConfigs &&
       params?.codedSampleRejectionReasons &&
       datesParameters

@@ -42,17 +42,18 @@ export class SampleAcceptanceDashboardComponent implements OnInit {
     this.store.dispatch(
       addLabDepartments({ labDepartments: this.labSamplesDepartments })
     );
-    this.store.dispatch(
-      loadLabSamplesByCollectionDates({
-        datesParameters: this.datesParameters,
-        patients: this.patients,
-        sampleTypes: this.sampleTypes,
-        departments: this.labSamplesDepartments,
-        containers: this.labSamplesContainers,
-        configs: this.configs,
-        codedSampleRejectionReasons: this.codedSampleRejectionReasons,
-      })
-    );
+    // this.store.dispatch(
+    //   loadLabSamplesByCollectionDates({
+    //     datesParameters: this.datesParameters,
+    //     patients: this.patients,
+    //     sampleTypes: this.sampleTypes,
+    //     departments: this.labSamplesDepartments,
+    //     containers: this.labSamplesContainers,
+    //     configs: this.configs,
+    //     hasStatus: "NO",
+    //     codedSampleRejectionReasons: this.codedSampleRejectionReasons,
+    //   })
+    // );
 
     this.codedSampleRejectionReasons$ = this.store.select(
       getCodedSampleRejectionReassons
