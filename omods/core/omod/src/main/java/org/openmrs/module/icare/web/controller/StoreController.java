@@ -7,6 +7,8 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.icare.billing.models.InvoiceItem;
 import org.openmrs.module.icare.core.ICareService;
 import org.openmrs.module.icare.core.Item;
+import org.openmrs.module.icare.core.ListResult;
+import org.openmrs.module.icare.core.Pager;
 import org.openmrs.module.icare.laboratory.models.Sample;
 import org.openmrs.module.icare.store.models.*;
 import org.openmrs.module.icare.store.services.StoreService;
@@ -560,5 +562,18 @@ public class StoreController {
 
 		return newStockInvoicesObject;
 
+	}
+
+	@RequestMapping(value = "stockinvoices", method = RequestMethod.GET)
+	@ResponseBody
+	public Map<String,Object> getStockInvoices(@RequestParam(defaultValue = "true",value = "paging" ,required = false) boolean paging, @RequestParam(defaultValue="50",value="pageSize",required = false) Integer pageSize, @RequestParam(defaultValue = "1",value = "page",required = false) Integer page){
+		Pager pager = new Pager();
+		pager.setAllowed(paging);
+		pager.setPageSize(pageSize);
+		pager.setPage(page);
+
+		ListResult<StockInvoice> stockInvoices = this.storeService.getStockInvoices(pager);
+
+		return stockInvoices.toMap();
 	}
 }
