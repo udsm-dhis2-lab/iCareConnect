@@ -222,6 +222,7 @@ public class LaboratoryController {
 	        @RequestParam(value = "location", required = false) String locationUuid,
 	        @RequestParam(value = "sampleCategory", required = false) String sampleCategory,
 	        @RequestParam(value = "testCategory", required = false) String testCategory,
+	        @RequestParam(value = "hasStatus", required = false) String hasStatus,
 	        @RequestParam(value = "q", required = false) String q) throws ParseException {
 		
 		Date start = null;
@@ -239,7 +240,7 @@ public class LaboratoryController {
 		pager.setPageSize(pageSize);
 		pager.setPage(page);
 		ListResult<Sample> sampleResults = laboratoryService.getSamples(start, end, pager, locationUuid, sampleCategory,
-		    testCategory, q);
+		    testCategory, q, hasStatus);
 		return sampleResults.toMap();
 		/*List<Sample> samples;
 		

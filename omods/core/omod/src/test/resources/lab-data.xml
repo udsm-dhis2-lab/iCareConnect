@@ -134,7 +134,6 @@
     <lb_sample uuid="ec2c9ec1-e742-4f89-979a-01560a607d0" sample_id="204" visit_id="500" label="LB/22/00078" concept_id="600" creator="1" date_created="2022-11-21 00:00:00" voided="false" date_time="2022-11-21 00:00:00"/>
 
 
-
     <st_device_type device_type_id="201" uuid="245ff55-2200-11e3-1111-0sndiu87hsju" name="lab devices" date_created="2020-12-27 00:00:00" voided="false" creator="1"/>
     <!--<lb_device device_id="123" uuid="d365e560-zz77-11e3-1111-0sndiu87hsju" item_id="666" device_type="201" name="mrt test device" serial_no="6563"/>-->
     <lb_device device_id="123"  uuid="d365e560-zz77-11e3-1111-0sndiu87hsju"  item_id="666" device_type_id="201" name="mrt test device"  serial_no="6563" date_created="2020-12-27 00:00:00" voided="false" creator="1"/>
