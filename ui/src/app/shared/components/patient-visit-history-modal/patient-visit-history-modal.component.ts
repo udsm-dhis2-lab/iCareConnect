@@ -19,7 +19,7 @@ export class PatientVisitHistoryModalComponent implements OnInit {
   patientVisits$: Observable<any>;
   patientUuid: string;
   shouldShowVitalsOnly: Boolean;
-  omitCurrent: boolean = true;
+  omitCurrent: boolean = false;
   forms$: Observable<any[]>;
   constructor(
     private visitService: VisitsService,
