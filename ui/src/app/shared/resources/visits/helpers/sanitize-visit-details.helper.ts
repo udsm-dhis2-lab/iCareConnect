@@ -21,19 +21,17 @@ export function getOrdersFromCurrentVisitEncounters(
         ) || [],
         (order) => {
           const paid =
-            bills?.length == 0
-              ? true
-              : !bills
+            !bills || bills?.length === 0
               ? true
               : !isEnsured && bills && bills?.length === 0
               ? true
               : isEnsured && bills && bills?.length === 0
               ? true
               : (
-                  bills.filter(
+                  bills?.filter(
                     (bill) =>
                       (
-                        bill?.items.filter(
+                        bill?.items?.filter(
                           (billItem) =>
                             billItem?.billItem?.item?.concept?.uuid ===
                             order?.concept?.uuid
