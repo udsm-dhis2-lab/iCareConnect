@@ -67,6 +67,7 @@ export class SampleAcceptanceComponent implements OnInit {
   samplesWithResults$: Observable<any[]>;
   patientsWithResults$: Observable<any>;
   showTabSampleTrackingForLis = false;
+  currentTabWithDataLoaded: number = 0;
   constructor(private store: Store<AppState>, private dialog: MatDialog) {}
 
   ngOnInit(): void {
@@ -369,7 +370,6 @@ export class SampleAcceptanceComponent implements OnInit {
   }
 
   onOpenNewTab(e) {
-    console.log("test", e);
     if (e.index === 0) {
       this.store.dispatch(
         loadLabSamplesByCollectionDates({
@@ -383,7 +383,8 @@ export class SampleAcceptanceComponent implements OnInit {
           codedSampleRejectionReasons: this.codedSampleRejectionReasons,
         })
       );
-    } else {
+      this.currentTabWithDataLoaded = e.index;
+    } else if (this.currentTabWithDataLoaded === 0) {
       this.store.dispatch(
         loadLabSamplesByCollectionDates({
           datesParameters: this.datesParameters,
@@ -397,6 +398,7 @@ export class SampleAcceptanceComponent implements OnInit {
           codedSampleRejectionReasons: this.codedSampleRejectionReasons,
         })
       );
+      this.currentTabWithDataLoaded = e.index;
     }
     this.searchingText = "";
     this.selectedDepartment = "";
