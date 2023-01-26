@@ -328,4 +328,19 @@ export class PriceListComponent implements OnInit, OnChanges {
     this.currentDepartmentId = this.selectedPriceListDepartment?.uuid;
     this.loadData();
   }
+  
+  ownloadPriceList(){
+
+    // this.priceList = [ ...this.priceList];
+    const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(this.testdata);
+    const wb: XLSX.WorkBook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+    /* generate an excel file and prompt the user to download it */
+    XLSX.writeFile(wb, 'data.xlsx');
+  }
+
+  uploadExcelFile(event) {
+    // here it is needed a Logic for handling the file upload goes here
+    let file = event.target.files[0];
+  }
 }
