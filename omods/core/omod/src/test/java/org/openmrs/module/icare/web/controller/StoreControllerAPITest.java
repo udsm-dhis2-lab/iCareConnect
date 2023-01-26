@@ -653,5 +653,12 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		List<Map<String,Object>> createdStockInvoices = (new ObjectMapper()).readValue(handle.getContentAsString(),List.class);
 
 		assertThat("created 1 stock invoice",createdStockInvoices.size(),is(1));
+
+		//Get stock invoices
+		MockHttpServletRequest newGetRequest = newGetRequest("store/stockinvoices",new Parameter("page","1"), new Parameter("pageSize","1"));
+		MockHttpServletResponse handleGet = handle(newGetRequest);
+		Map<String,Object> stockInvoices = (new ObjectMapper()).readValue(handleGet.getContentAsString(),Map.class);
+		System.out.println(stockInvoices);
+
 	}
 }

@@ -14,6 +14,8 @@ import org.openmrs.module.icare.ICareConfig;
 import org.openmrs.module.icare.billing.models.Prescription;
 import org.openmrs.module.icare.core.ICareService;
 import org.openmrs.module.icare.core.Item;
+import org.openmrs.module.icare.core.ListResult;
+import org.openmrs.module.icare.core.Pager;
 import org.openmrs.module.icare.core.dao.ICareDao;
 import org.openmrs.module.icare.store.dao.*;
 import org.openmrs.module.icare.store.models.*;
@@ -513,6 +515,11 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 
 	public Supplier getSupplierByUuid(String supplierUuid){
 		return supplierDAO.findByUuid(supplierUuid);
+	}
+
+	@Override
+	public ListResult<StockInvoice> getStockInvoices(Pager pager) {
+		return stockInvoiceDAO.getStockInvoices(pager);
 	}
 
 	@Override

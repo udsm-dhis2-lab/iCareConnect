@@ -4,6 +4,8 @@ import org.openmrs.DrugOrder;
 import org.openmrs.Location;
 import org.openmrs.api.OpenmrsService;
 import org.openmrs.module.icare.core.Item;
+import org.openmrs.module.icare.core.ListResult;
+import org.openmrs.module.icare.core.Pager;
 import org.openmrs.module.icare.store.models.*;
 import org.openmrs.module.icare.store.util.StockOutException;
 
@@ -104,4 +106,6 @@ public interface StoreService extends OpenmrsService {
 	StockInvoice saveStockInvoice(StockInvoice stockInvoice) throws Exception;
 
 	public Supplier getSupplierByUuid(String supplierUuid);
+
+	ListResult<StockInvoice> getStockInvoices(Pager pager);
 }
