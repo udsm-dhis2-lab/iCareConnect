@@ -26,7 +26,8 @@
           *ngFor="let order of orders; let count = index"
           [ngClass]="{
             'attended-radiology-order':
-              obsKeyedByConcepts[order?.concept?.uuid]?.uri
+              obsKeyedByConcepts[order?.concept?.uuid]?.uri,
+            'no-mouse-event': !order?.paid
           }"
         >
           <td>
