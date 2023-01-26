@@ -71,6 +71,18 @@ export class SampleAcceptanceComponent implements OnInit {
 
   ngOnInit(): void {
     this.userUuid = this.currentUser?.uuid;
+    this.store.dispatch(
+      loadLabSamplesByCollectionDates({
+        datesParameters: this.datesParameters,
+        patients: this.patients,
+        sampleTypes: this.sampleTypes,
+        departments: this.labSamplesDepartments,
+        containers: this.labSamplesContainers,
+        hasStatus: "NO",
+        configs: this.labConfigs,
+        codedSampleRejectionReasons: this.codedSampleRejectionReasons,
+      })
+    );
     this.labDepartments$ = this.store.select(getLabDepartments);
     this.samplesAccepted$ = this.store.select(getAcceptedFormattedLabSamples, {
       department: "",
@@ -357,7 +369,7 @@ export class SampleAcceptanceComponent implements OnInit {
   }
 
   onOpenNewTab(e) {
-    // console.log("test", e);
+    console.log("test", e);
     if (e.index === 0) {
       this.store.dispatch(
         loadLabSamplesByCollectionDates({
@@ -366,6 +378,21 @@ export class SampleAcceptanceComponent implements OnInit {
           sampleTypes: this.sampleTypes,
           departments: this.labSamplesDepartments,
           containers: this.labSamplesContainers,
+          hasStatus: "NO",
+          configs: this.labConfigs,
+          codedSampleRejectionReasons: this.codedSampleRejectionReasons,
+        })
+      );
+    } else {
+      this.store.dispatch(
+        loadLabSamplesByCollectionDates({
+          datesParameters: this.datesParameters,
+          patients: this.patients,
+          sampleTypes: this.sampleTypes,
+          departments: this.labSamplesDepartments,
+          containers: this.labSamplesContainers,
+          hasStatus: "YES",
+          category: "ACCEPTED",
           configs: this.labConfigs,
           codedSampleRejectionReasons: this.codedSampleRejectionReasons,
         })

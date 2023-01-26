@@ -63,7 +63,11 @@ export class LabSamplesEffects {
       withLatestFrom(this.store.select(getLISConfigurations)),
       switchMap(([action, lisConfigs]: [any, any]) => {
         return this.sampleService
-          .getLabSamplesByCollectionDates(action.datesParameters)
+          .getLabSamplesByCollectionDates(
+            action.datesParameters,
+            action?.category,
+            action?.hasStatus
+          )
           .pipe(
             map((response) => {
               const keyedDepartments = keyDepartmentsByTestOrder(
