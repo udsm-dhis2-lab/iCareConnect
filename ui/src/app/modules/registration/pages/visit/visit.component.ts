@@ -350,16 +350,21 @@ export class VisitComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.visitService
+      .getLastPatientVisit(this.patientDetails?.uuid)
+      .subscribe((data) => console.log("visit", data));
     this.patientVisist$ = this.visitService
       .getLastPatientVisit(this.patientDetails?.uuid)
       .pipe(
         map((patientvisit) => {
-          return (patientvisit[0]?.visit?.attributes?.filter((values) => {
-            return (
-              values.attributeType.uuid ===
-              "INSURANCEIDIIIIIIIIIIIIIIIIIIIIATYPE"
-            );
-          }) || [])[0]?.value;
+          return (patientvisit[0]?.visit?.attributesToDisplay?.filter(
+            (values) => {
+              return (
+                values.attributeType.uuid ===
+                "INSURANCEIDIIIIIIIIIIIIIIIIIIIIATYPE"
+              );
+            }
+          ) || [])[0]?.value;
         })
       );
     this.patientVisist$.subscribe((data: any) => {
