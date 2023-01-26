@@ -170,7 +170,7 @@
     <lb_worksheet_control worksheet_control_id="1" name="worksheetControl3" code="W1" uuid="iCARE890-YTYE-IUYT-9beb-d30dcfc0c66e"  description="Test worksheet control"  test_order_id="800" date_created="2022-12-10 15:51:57.0" retired="false" creator="1"/>
 
     <!-- WorksheetDefinition -->
-    <lb_worksheet_definition worksheet_definition_id ="1" uuid = "iCARE890-TEST-GGGH-9beb-d30dcfc0c635" code="WD"  worksheet_id="1" date_created="2022-12-10 15:51:57.0" voided="0" creator="1" />
+    <lb_worksheet_definition worksheet_definition_id ="1" uuid = "iCARE890-TEST-GGGH-9beb-d30dcfc0c635" expiration_date_time="2023-01-23 15:51:57.0" code="WD"  worksheet_id="1" date_created="2022-12-10 15:51:57.0" voided="0" creator="1" />
 
     <!-- WorksheetSample -->
     <lb_worksheet_sample worksheet_sample_id ="1" code="ABC" uuid = "iCARE890-TEST-OSDH-9beb-d30dcfc0c635" rows="10" columns="20" type="SAMPLE"  worksheet_definition_id="1" sample_id="201"  date_created="2022-12-10 15:51:57.0" voided="0" creator="1" />

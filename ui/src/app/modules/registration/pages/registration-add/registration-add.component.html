@@ -803,6 +803,7 @@
                 <mat-label>First Name</mat-label>
                 <input
                   matInput
+                  id="kfname"
                   placeholder="Enter Text"
                   [(ngModel)]="patient['kinFname']"
                   name="kinFname"
@@ -836,13 +837,13 @@
                 <mat-label>Last Name</mat-label>
                 <input
                   matInput
+                  id="klname"
                   placeholder="Enter Text"
                   [(ngModel)]="patient['kinLName']"
                   name="kinLName"
                   [disabled]="addingPatient && !patientAdded"
                 />
               </mat-form-field>
-              {{ patient.kinLName }}
               <!-- <mat-form-field appearance="fill" class="w-100 ml-2">
                 <mat-label>Relationship with patient</mat-label>
                 <input

@@ -29,7 +29,6 @@ export class WorksheetsComponent implements OnInit {
       )
       .pipe(
         tap((response) => {
-          console.log("response", response);
           if (response && !response?.error && response?.uuid) {
             return response;
           } else if (!response?.uuid && !response?.error) {

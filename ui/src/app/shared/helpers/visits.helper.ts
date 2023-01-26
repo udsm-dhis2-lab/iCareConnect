@@ -186,7 +186,7 @@ export function getGenericDrugPrescriptionsFromVisit(
 }
 export function arrangeVisitDataChronologically(
   visit: any,
-  orderDirection: string = 'desc',
+  orderDirection: string = "desc",
   specificDrugConceptUuid?: string,
   prescriptionArrangementFields?: any
 ) {
@@ -217,69 +217,77 @@ export function arrangeVisitDataChronologically(
 
   // Find Observations and orders in a particular visit
   let visitData = {
-    observations: _.flatten(visit?.observations?.map((observation) => {
-      const obs = _.groupBy(_.flatten(
-          observation?.fields
-            ?.map((field) => {
-              if (field?.formFields) {
-                return _.flatten(field.formFields
-                  .map((formField) => {
-                    if (formField?.key in observation?.obs) {
-                      
-                      return _.flatten(
-                        observation?.obs[formField?.key]?.map((ob) => {
-                          return {
-                            ...ob,
-                            date: getStringDate(new Date(ob?.obsDatetime)).date,
-                            time: getStringDate(new Date(ob?.obsDatetime)).time,
-                          };
-                        })
-                      );
-                      return {
-                        ...observation?.obs[formField?.key][0],
-                        date: getStringDate(
-                          new Date(
-                            observation?.obs[formField?.key][0]?.obsDatetime
-                          )
-                        ).date,
-                        time: getStringDate(
-                          new Date(
-                            observation?.obs[formField?.key][0]?.obsDatetime
-                          )
-                        ).time,
-                      };
-                    }
-                  })
-                  .filter((observation) => observation));
-              } else {
-                if (field?.formField?.key in observation?.obs) {
+    observations: _.flatten(
+      visit?.observations?.map((observation) => {
+        const obs = _.groupBy(
+          _.flatten(
+            observation?.fields
+              ?.map((field) => {
+                if (field?.formFields) {
                   return _.flatten(
-                    observation?.obs[field?.formField?.key]?.map((ob) => {
-                      return {
-                        ...ob,
-                        date: getStringDate(new Date(ob?.obsDatetime)).date,
-                        time: getStringDate(new Date(ob?.obsDatetime)).time,
-                      };
-                    })
+                    field.formFields
+                      .map((formField) => {
+                        if (formField?.key in observation?.obs) {
+                          return _.flatten(
+                            observation?.obs[formField?.key]?.map((ob) => {
+                              return {
+                                ...ob,
+                                date: getStringDate(new Date(ob?.obsDatetime))
+                                  .date,
+                                time: getStringDate(new Date(ob?.obsDatetime))
+                                  .time,
+                              };
+                            })
+                          );
+                          return {
+                            ...observation?.obs[formField?.key][0],
+                            date: getStringDate(
+                              new Date(
+                                observation?.obs[formField?.key][0]?.obsDatetime
+                              )
+                            ).date,
+                            time: getStringDate(
+                              new Date(
+                                observation?.obs[formField?.key][0]?.obsDatetime
+                              )
+                            ).time,
+                          };
+                        }
+                      })
+                      .filter((observation) => observation)
                   );
+                } else {
+                  if (field?.formField?.key in observation?.obs) {
+                    return _.flatten(
+                      observation?.obs[field?.formField?.key]?.map((ob) => {
+                        return {
+                          ...ob,
+                          date: getStringDate(new Date(ob?.obsDatetime)).date,
+                          time: getStringDate(new Date(ob?.obsDatetime)).time,
+                        };
+                      })
+                    );
+                  }
                 }
-              }
-            })
-            .filter((observation) => observation)), "obsDatetime"
-        )
-      const groupedObs = Object.keys(obs)?.map((key) => {
+              })
+              .filter((observation) => observation)
+          ),
+          "obsDatetime"
+        );
+        const groupedObs = Object.keys(obs)?.map((key) => {
           return {
             form: observation.form,
             obs: obs[key],
             obsDatetime: obs[key][0]?.obsDatetime,
             date: getStringDate(new Date(obs[key][0]?.obsDatetime)).date,
             time: getStringDate(new Date(obs[key][0]?.obsDatetime)).time,
-            provider: obs[key][0]?.provider?.display?.split('-')[1],
+            provider: obs[key][0]?.provider?.display?.split("-")[1],
             category: "OBSERVATIONS",
           };
-        })
-      return  _.flatten(groupedObs)
-    })),
+        });
+        return _.flatten(groupedObs);
+      })
+    ),
     drugs: visit?.drugs?.map((drugOrder) => {
       return {
         ...drugOrder,
