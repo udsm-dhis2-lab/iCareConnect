@@ -5,6 +5,7 @@ import {
   OnInit,
   SimpleChanges,
 } from "@angular/core";
+import * as XLSX from 'xlsx';
 import { MatLegacyDialog as MatDialog } from "@angular/material/legacy-dialog";
 import { MatLegacySelectChange as MatSelectChange } from "@angular/material/legacy-select";
 import { select, Store } from "@ngrx/store";
