@@ -1,3 +1,5 @@
+import { flatten,groupBy, omit } from "lodash";
+
 export function addBillStatusToOrderedItems(items, bills, encounters, visit) {
   return items?.length > 0
     ? items.map((item) => {
@@ -43,4 +45,35 @@ export function addBillStatusToOrderedItems(items, bills, encounters, visit) {
         };
       })
     : [];
+} 
+
+
+export function addBillStatusToOrders(orders, bills){
+  bills = bills?.map((bill) => {
+    return {
+      ...bill,
+      items: bill?.items?.map((item) => {
+        return item?.billItem;
+      }),
+    };
+  });
+
+  return orders?.map((order) => {
+    if(bills?.length === 0){
+      return {
+        ...order,
+        paid: true
+      }
+    }
+    
+    return bills?.map((bill) => {
+      return bill?.items?.map((item) => {
+        return {
+          ...order,
+          paid: item?.item?.uuid === order?.concept?.uuid ? true : false
+        }
+      })
+    })
+
+  })
 }
