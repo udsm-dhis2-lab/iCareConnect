@@ -1,5 +1,6 @@
 package org.openmrs.module.icare.store.models;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.openmrs.BaseOpenmrsData;
 import org.openmrs.Concept;
 import org.openmrs.module.icare.billing.models.InvoiceItem;
@@ -7,6 +8,8 @@ import org.openmrs.module.icare.core.Item;
 import org.openmrs.module.icare.core.JSONConverter;
 
 import javax.persistence.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -160,11 +163,32 @@ public class StockInvoiceItem extends BaseOpenmrsData implements java.io.Seriali
         return invoiceItemObject;
     }
 
-    public static InvoiceItem fromMap(Map<String,Object> invoiceItemMap){
+    public static StockInvoiceItem fromMap(Map<String,Object> stockInvoiceItemMap) throws ParseException {
 
-        InvoiceItem invoiceItem = new InvoiceItem();
+        StockInvoiceItem stockInvoiceItem = new StockInvoiceItem();
 
-        return invoiceItem;
+        Item item = new Item();
+        item.setUuid(((Map)stockInvoiceItemMap.get("item")).get("uuid").toString());
+        stockInvoiceItem.setItem(item);
+
+        Concept uom = new Concept();
+        uom.setUuid(((Map) stockInvoiceItemMap.get("uom")).get("uuid").toString());
+        stockInvoiceItem.setUom(uom);
+
+        stockInvoiceItem.setBatchNo(stockInvoiceItemMap.get("batchNo").toString());
+        stockInvoiceItem.setUnitPrice((Integer) stockInvoiceItemMap.get("unitPrice"));
+        stockInvoiceItem.setAmount((Integer) stockInvoiceItemMap.get("amount"));
+        stockInvoiceItem.setBatchQuantity((Integer) stockInvoiceItemMap.get("batchQuantity"));
+        stockInvoiceItem.setOrderQuantity((Integer) stockInvoiceItemMap.get("orderQuantity"));
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        if (stockInvoiceItemMap.get("expiryDate").toString().length() == 10) {
+            stockInvoiceItem.setExpiryDate(dateFormat.parse(stockInvoiceItemMap.get("expiryDate").toString()));
+        } else {
+            stockInvoiceItem.setExpiryDate(dateFormat.parse(stockInvoiceItemMap.get("expiryDate").toString().substring(0, stockInvoiceItemMap.get("expiryDate").toString().indexOf("T"))));
+        }
+
+        return stockInvoiceItem;
 
     }
 }
