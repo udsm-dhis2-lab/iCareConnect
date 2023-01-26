@@ -17,6 +17,30 @@
 >
   <div class="d-flex justify-content-between mb-2">
     <div class="h4 font-weight-normal">Price List</div>
+    
+      
+    <input
+    color="primary"
+    type="file" 
+    (change)="uploadExcelFile($event)" 
+    accept=".xlsx, .xls" 
+    [ngStyle]="{'background-color': '#2a8fd1', 'color': 'white', 'padding': '10px 20px', 'border-radius': '5px', 'font-size': '16px'}"
+    >
+      <button
+      mat-flat-button
+      color="primary"
+      style="height: 40px"
+      (click)="DownloadPriceList()"
+    >
+    <mat-spinner
+        color="primary"
+        *ngIf="DownloadPriceList"
+        [diameter]="20"
+        style="display: inline-block !important; margin-right: 4px"
+      ></mat-spinner>
+      <span>Download</span>
+    </button>
+    
     <button
       mat-flat-button
       color="primary"
