@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -637,5 +638,20 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		
 		System.out.println(stockList);
 		assertThat("stock listing has 4 entries:", stockList.size(), is(5));
+	}
+
+	@Test
+	public void creatingAndGettingStockInvoices() throws Exception {
+
+		String dto = this.readFile("dto/store/stock-invoice-create.json");
+		List<Map<String,Object>> stockInvoice = (new ObjectMapper()).readValue(dto,List.class);
+
+		//post stock invoice
+		MockHttpServletRequest newPostRequest = newPostRequest("store/stockinvoices",stockInvoice);
+		MockHttpServletResponse handle = handle(newPostRequest);
+
+		List<Map<String,Object>> createdStockInvoices = (new ObjectMapper()).readValue(handle.getContentAsString(),List.class);
+
+		assertThat("created 1 stock invoice",createdStockInvoices.size(),is(1));
 	}
 }
