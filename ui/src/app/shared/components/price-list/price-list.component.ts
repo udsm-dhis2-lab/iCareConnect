@@ -51,6 +51,15 @@ export class PriceListComponent implements OnInit, OnChanges {
   @Input() paymentTypes: PaymentTypeInterface[];
   @Input() departmentId: string;
   currentDepartmentId: string;
+
+  testdata: any[] = [
+   
+    { name: "John", age: 30, city: "Dar es salaam" },
+    { name: "Smith", age: 25, city: "Mwanza" },
+    { name: "Johnson", age: 35, city: "Arusha" }
+  
+  ];
+
   priceList: any[];
   priceList$: Observable<any[]>;
 
