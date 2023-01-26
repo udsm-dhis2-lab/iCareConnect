@@ -350,37 +350,28 @@ export class VisitComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    let visit$: Observable<any> = this.visitService.getLastPatientVisit(
-      this.patientDetails?.uuid
-    );
-
-    this.patientVisist$ = visit$.pipe(
-      map((patientvisit) => {
-        // this.visitDetails["InsuranceID"] =
-        //   patientvisit[0]?.visit?.attributesToDisplay?.filter((values) => {
-        //     return values.uuid === "d2d87341-1ec7-4bf6-9c49-c10736953706";
-        //   })[0]?.value.length > 0
-        //     ? patientvisit[0]?.visit?.attributesToDisplay?.filter((values) => {
-        //         return values.uuid === "d2d87341-1ec7-4bf6-9c49-c10736953706";
-        //       })[0]?.value
-        //     : null;
-        return (patientvisit[0]?.visit?.attributesToDisplay?.filter(
-          (values) => {
-            return values.uuid === "d2d87341-1ec7-4bf6-9c49-c10736953706";
-          }
-        ) || [])[0]?.value;
-      })
-    );
+    this.patientVisist$ = this.visitService
+      .getLastPatientVisit(this.patientDetails?.uuid)
+      .pipe(
+        map((patientvisit) => {
+          return (patientvisit[0]?.visit?.attributes?.filter((values) => {
+            return (
+              values.attributeType.uuid ===
+              "INSURANCEIDIIIIIIIIIIIIIIIIIIIIATYPE"
+            );
+          }) || [])[0]?.value;
+        })
+      );
     this.patientVisist$.subscribe((data: any) => {
       this.visitDetails["InsuranceID"] =
-        (this.patientDetails?.person?.attributes?.filter(
-          (attribute) => attribute?.attributeType?.display === "ID"
-        ) || [])[0]?.value.length > 0
+        data?.length > 0
+          ? data
+          : (this.patientDetails?.person?.attributes?.filter(
+              (attribute) => attribute?.attributeType?.display === "ID"
+            ) || [])[0]?.value.length > 0
           ? (this.patientDetails?.person?.attributes?.filter(
               (attribute) => attribute?.attributeType?.display === "ID"
             ) || [])[0]?.value
-          : data.length > 0
-          ? data
           : null;
     });
     this.currentPatient$ = this.store.pipe(select(getCurrentPatient));
