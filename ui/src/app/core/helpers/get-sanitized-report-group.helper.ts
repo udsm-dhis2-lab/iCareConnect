@@ -1,8 +1,6 @@
-import { ReportGroup } from '../models/report-group.model';
-import { ReportParam } from '../models/report-params.model';
-import { getSanitizedReportParamType } from './get-sanitized-report-param-type.helper';
+import { getSanitizedReportParamType } from "./get-sanitized-report-param-type.helper";
 
-export function getSanitizedReportGroup(reportGroupResponse: any): ReportGroup {
+export function getSanitizedReportGroup(reportGroupResponse: any): any {
   return {
     id: reportGroupResponse?.id,
     name: reportGroupResponse?.name,
@@ -16,13 +14,11 @@ export function getSanitizedReportGroup(reportGroupResponse: any): ReportGroup {
   };
 }
 
-export function getSanitizedParameters(
-  parameterResponse: any[]
-): {
-  parameters: ReportParam[];
-  dateParameters: ReportParam[];
-  locationParameters: ReportParam[];
-  otherParameters: ReportParam[];
+export function getSanitizedParameters(parameterResponse: any[]): {
+  parameters: any[];
+  dateParameters: any[];
+  locationParameters: any[];
+  otherParameters: any[];
 } {
   const reportParameters = (parameterResponse || []).map((param) => {
     return {
@@ -34,12 +30,12 @@ export function getSanitizedParameters(
   });
   return {
     parameters: reportParameters,
-    dateParameters: reportParameters.filter((param) => param.type === 'DATE'),
+    dateParameters: reportParameters.filter((param) => param.type === "DATE"),
     locationParameters: reportParameters.filter(
-      (param) => param.type === 'LOCATION'
+      (param) => param.type === "LOCATION"
     ),
     otherParameters: reportParameters.filter(
-      (param) => param.type !== 'DATE' && param.type !== 'LOCATION'
+      (param) => param.type !== "DATE" && param.type !== "LOCATION"
     ),
   };
 }

@@ -152,7 +152,7 @@ export class SharedPatientDashboardComponent implements OnInit {
   currentRound: any;
   latestRound$: Observable<any>;
   updateMedication: boolean = true;
-
+  tabsToShow: string[] = ["laboratory", "procedure", "radiology"];
   constructor(
     private store: Store<AppState>,
     private dialog: MatDialog,

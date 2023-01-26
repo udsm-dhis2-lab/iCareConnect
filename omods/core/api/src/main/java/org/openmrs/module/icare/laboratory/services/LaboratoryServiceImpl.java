@@ -10,7 +10,6 @@ import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.icare.ICareConfig;
 import org.openmrs.module.icare.core.ListResult;
 import org.openmrs.module.icare.core.Pager;
-import org.openmrs.module.icare.core.Summary;
 import org.openmrs.module.icare.laboratory.dao.*;
 import org.openmrs.module.icare.laboratory.models.*;
 
@@ -61,6 +60,8 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	
 	WorksheetSampleStatusDAO worksheetSampleStatusDAO;
 	
+	BatchSampleDAO batchSampleDAO;
+	
 	public void setSampleDAO(SampleDAO sampleDAO) {
 		this.sampleDAO = sampleDAO;
 	}
@@ -107,6 +108,10 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	
 	public void setBatchDAO(BatchDAO batchDAO) {
 		this.batchDAO = batchDAO;
+	}
+	
+	public void setBatchSampleDAO(BatchSampleDAO batchSampleDAO) {
+		this.batchSampleDAO = batchSampleDAO;
 	}
 	
 	public void setBatchSetStatusDAO(BatchSetStatusDAO batchSetStatusDAO) {
@@ -159,8 +164,8 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	
 	@Override
 	public ListResult<Sample> getSamples(Date startDate, Date endDate, Pager pager, String location, String sampleCategory,
-	        String testCategory, String q) {
-		return this.sampleDAO.getSamples(startDate, endDate, pager, location, sampleCategory, testCategory, q);
+	        String testCategory, String q, String hasStatus) {
+		return this.sampleDAO.getSamples(startDate, endDate, pager, location, sampleCategory, testCategory, q, hasStatus);
 	}
 	
 	@Override
@@ -749,6 +754,11 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	}
 	
 	@Override
+	public List<String> generateLaboratoryIdLabels(String globalPropertyUuid, String metadataType, Integer count) {
+		return this.sampleLableDAO.generateLaboratoryIdLabels(globalPropertyUuid, metadataType, count);
+	}
+	
+	@Override
 	public SampleLable addSampleLable(SampleLable sampleLable) {
 		return this.sampleLableDAO.save(sampleLable);
 	}
@@ -799,7 +809,6 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	}
 	
 	public WorkloadSummary getWorkLoadSummary(Date startDate, Date endDate) {
-		
 		return sampleDAO.getWorkloadSummary(startDate, endDate);
 	}
 	
@@ -816,6 +825,27 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	@Override
 	public Batch addBatch(Batch batch) {
 		return batchDAO.save(batch);
+	}
+	
+	@Override
+	public BatchSample addBatchSamples(BatchSample batchSample) throws Exception {
+		Batch batch = batchDAO.findByUuid(batchSample.getBatch().getUuid());
+		if (batch == null) {
+			throw new Exception("The batch with uuid " + batchSample.getBatch().getUuid() + " does not exist");
+		}
+		
+		batchSample.setBatch(batch);
+		return batchSampleDAO.save(batchSample);
+	}
+	
+	@Override
+	public BatchSample getBatchSampleByUuid(String batchSampleUuid) {
+		return batchSampleDAO.findByUuid(batchSampleUuid);
+	}
+	
+	@Override
+	public List<BatchSample> getBatchSamples(Date startDate, Date endDate, String q, Integer startIndex, Integer limit) {
+		return batchSampleDAO.getBatchSamples(startDate, endDate, q, startIndex, limit);
 	}
 	
 	public BatchSet addBatchSet(BatchSet batchSet) {
@@ -904,13 +934,34 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	
 	@Override
 	public List<WorksheetDefinition> getWorksheetDefinitions(Date startDate, Date endDate, String q, Integer startIndex,
-	        Integer limit) {
-		return worksheetDefinitionDAO.getWorksheetDefinitions(startDate, endDate, q, startIndex, limit);
+	        Integer limit, Date expirationDate) {
+		return worksheetDefinitionDAO.getWorksheetDefinitions(startDate, endDate, q, startIndex, limit, expirationDate);
 	}
 	
 	@Override
-	public WorksheetDefinition getWorksheetDefinitionByUuid(String worksheetDefinitionUuid) {
-		return worksheetDefinitionDAO.findByUuid(worksheetDefinitionUuid);
+	public Map<String, Object> getWorksheetDefinitionByUuid(String worksheetDefinitionUuid) {
+		WorksheetDefinition worksheetDefinition = worksheetDefinitionDAO.findByUuid(worksheetDefinitionUuid);
+		List<WorksheetSample> worksheetSamples = worksheetSampleDAO.getWorksheetSamplesByWorksheetDefinition(worksheetDefinition.getUuid().toString());
+
+		Map<String, Object> worksheetDefinitionModified = new HashMap<>();
+		worksheetDefinitionModified.put("uuid", worksheetDefinition.getUuid());
+		worksheetDefinitionModified.put("code", worksheetDefinition.getCode());
+		worksheetDefinitionModified.put("display", worksheetDefinition.getCode());
+		worksheetDefinitionModified.put("additionFields", worksheetDefinition.getAdditionalFields());
+
+		List<Map<String, Object>> worksheetSamplesList = new ArrayList<>();
+		for (WorksheetSample wSample: worksheetSamples) {
+			worksheetSamplesList.add(wSample.toMap());
+		}
+		worksheetDefinitionModified.put("worksheetSamples", worksheetSamplesList);
+		worksheetDefinitionModified.put("worksheet", worksheetDefinition.getWorksheet().toMap());
+		return worksheetDefinitionModified;
+	}
+	
+	@Override
+	public WorksheetDefinition getDefaultWorksheetDefinitionByUuid(String worksheetDefinitionUuid) {
+		WorksheetDefinition worksheetDefinition = worksheetDefinitionDAO.findByUuid(worksheetDefinitionUuid);
+		return worksheetDefinition;
 	}
 	
 	@Override
@@ -947,8 +998,8 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 			worksheetSample.setSample(sample);
 		}
 		
-		WorksheetDefinition worksheetDefinition = this.getWorksheetDefinitionByUuid(worksheetSample.getWorksheetDefinition()
-		        .getUuid());
+		WorksheetDefinition worksheetDefinition = this.getDefaultWorksheetDefinitionByUuid(worksheetSample
+		        .getWorksheetDefinition().getUuid());
 		if (worksheetDefinition == null) {
 			throw new Exception("The worksheet definition with id " + worksheetSample.getWorksheetDefinition().getUuid()
 			        + " does not exist");
@@ -990,4 +1041,5 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 		worksheetSampleStatus.setWorksheetSample(worksheetSample);
 		return worksheetSampleStatusDAO.save(worksheetSampleStatus);
 	}
+	
 }

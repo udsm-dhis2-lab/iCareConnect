@@ -30,7 +30,7 @@ export class ReportsDashboardComponent implements OnInit {
           return reports?.map((report) => {
             return {
               ...report,
-              ...JSON.parse(report?.value),
+              ...this.formatJsonExpectedValue(report),
             };
           });
         })
@@ -49,5 +49,11 @@ export class ReportsDashboardComponent implements OnInit {
     //   );
 
     this.configs$ = this.store.select(getLabConfigurations);
+  }
+
+  formatJsonExpectedValue(report: any): any {
+    try {
+      return JSON.parse(report?.value);
+    } catch {}
   }
 }

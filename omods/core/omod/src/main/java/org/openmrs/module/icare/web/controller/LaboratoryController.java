@@ -82,9 +82,9 @@ public class LaboratoryController {
 			newSample.setLocation(location);
 			System.out.println(location.getName());
 		}
-		if (sample.get("batch") != null) {
-			Batch batch = laboratoryService.getBatchByUuid(((Map) sample.get("batch")).get("uuid").toString());
-			newSample.setBatch(batch);
+		if (sample.get("batchSample") != null) {
+			BatchSample batchSample = laboratoryService.getBatchSampleByUuid(((Map) sample.get("batchSample")).get("uuid").toString());
+			newSample.setBatchSample(batchSample);
 		}
 		
 		newSample.setVisit(existingVisit);
@@ -149,10 +149,10 @@ public class LaboratoryController {
 			statusesObject.put("changedAt", sampleStatus.getTimestamp());
 			sampleStatusesList.add(statusesObject);
 		}
-		if(createdSample.getBatch() != null){
+		if(createdSample.getBatchSample() != null){
 			HashMap<String,Object> batchObject = new HashMap<>();
-			batchObject.put("uuid",createdSample.getBatch().getUuid());
-			batchObject.put("display",createdSample.getBatch().getBatchName());
+			batchObject.put("uuid",createdSample.getBatchSample().getUuid());
+			batchObject.put("display",createdSample.getBatchSample().getCode());
 			response.put("batch",batchObject);
 		}
 		
@@ -222,6 +222,7 @@ public class LaboratoryController {
 	        @RequestParam(value = "location", required = false) String locationUuid,
 	        @RequestParam(value = "sampleCategory", required = false) String sampleCategory,
 	        @RequestParam(value = "testCategory", required = false) String testCategory,
+	        @RequestParam(value = "hasStatus", required = false) String hasStatus,
 	        @RequestParam(value = "q", required = false) String q) throws ParseException {
 		
 		Date start = null;
@@ -239,7 +240,7 @@ public class LaboratoryController {
 		pager.setPageSize(pageSize);
 		pager.setPage(page);
 		ListResult<Sample> sampleResults = laboratoryService.getSamples(start, end, pager, locationUuid, sampleCategory,
-		    testCategory, q);
+		    testCategory, q, hasStatus);
 		return sampleResults.toMap();
 		/*List<Sample> samples;
 		
@@ -629,6 +630,16 @@ public class LaboratoryController {
 		return label;
 	}
 	
+	@RequestMapping(value = "labidgen", method = RequestMethod.GET)
+	@ResponseBody
+	public List<String> generateLaboratoryIdLabels(
+	        @RequestParam(value = "globalProperty", required = true) String globalProperty,
+	        @RequestParam(value = "metadataType", required = true) String metadataType,
+	        @RequestParam(value = "count", required = false) Integer count) {
+		List<String> labLabels = laboratoryService.generateLaboratoryIdLabels(globalProperty, metadataType, count);
+		return labLabels;
+	}
+	
 	@RequestMapping(value = "samplelable", method = RequestMethod.GET)
 	@ResponseBody
 	public Map<String, Object> geenerateSampleLable() {
@@ -770,6 +781,48 @@ public class LaboratoryController {
 		
 		return responseBatchesObject;
 		
+	}
+	
+	@RequestMapping(value = "batchsamples",method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public List<Map<String,Object>> addBatchSamples(@RequestBody List<Map<String,Object>> batchSamplesObject) throws Exception{
+
+		BatchSample batchSample = new BatchSample();
+		List<Map<String,Object>> newBatchSamples = new ArrayList<>();
+
+		for(Map<String,Object> batchSampleObject : batchSamplesObject){
+
+			batchSample = BatchSample.fromMap(batchSampleObject);
+			BatchSample newBatchSample = laboratoryService.addBatchSamples(batchSample);
+			newBatchSamples.add(newBatchSample.toMap());
+		}
+
+		return newBatchSamples;
+	}
+	
+	@RequestMapping(value = "batchsamples",method = RequestMethod.GET)
+	@ResponseBody
+	public List<Map<String,Object>> getBatchSamples(@RequestParam(value = "startDate", required = false) String startDate, @RequestParam(value = "endDate", required = false) String endDate, @RequestParam(value = "q", required = false) String q, @RequestParam(defaultValue = "0") Integer startIndex, @RequestParam(defaultValue = "100") Integer limit) throws ParseException{
+
+		Date start = null;
+		Date end = null;
+		if (startDate != null && endDate != null) {
+
+			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+			start = formatter.parse(startDate);
+			end = formatter.parse(endDate);
+		}
+
+		List<BatchSample> batchSamples = laboratoryService.getBatchSamples(start, end, q, startIndex, limit);
+
+		List<Map<String,Object>> responseBatchSampleObject = new ArrayList<>();
+		for(BatchSample batchSample : batchSamples){
+			Map<String,Object> batchSampleMap = batchSample.toMap();
+			responseBatchSampleObject.add(batchSampleMap);
+		}
+
+		return  responseBatchSampleObject;
+
 	}
 	
 	@RequestMapping(value = "batchsets", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -944,20 +997,38 @@ public class LaboratoryController {
 
 	}
 	
+	@RequestMapping(value = "worksheetdefinition", method = RequestMethod.GET)
+	@ResponseBody
+	public Map<String, Object> getWorksheetDefinitionByUuid(@RequestParam(value = "uuid", required = true) String uuid)
+	        throws ParseException {
+		
+		Map<String, Object> worksheetDefinition = laboratoryService.getWorksheetDefinitionByUuid(uuid);
+		return worksheetDefinition;
+	}
+	
 	@RequestMapping(value = "worksheetdefinitions",method = RequestMethod.GET)
 	@ResponseBody
-	public List<Map<String,Object>> getWorksheetDefinitions(@RequestParam(value = "startDate", required = false) String startDate, @RequestParam(value = "endDate", required = false) String endDate, @RequestParam(value = "q", required = false) String q, @RequestParam(defaultValue = "0") Integer startIndex, @RequestParam(defaultValue = "100") Integer limit) throws ParseException{
+	public List<Map<String,Object>> getWorksheetDefinitions(@RequestParam(value = "startDate", required = false) String startDate,
+															@RequestParam(value = "endDate", required = false) String endDate,
+															@RequestParam(value = "q", required = false) String q,
+															@RequestParam(defaultValue = "0") Integer startIndex,
+															@RequestParam(defaultValue = "100") Integer limit,
+															@RequestParam(value = "expirationDate", required = false) String expirationDate) throws ParseException{
 
 		Date start = null;
 		Date end = null;
+		Date expirationDateFormatted = null;
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 		if (startDate != null && endDate != null) {
-
-			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 			start = formatter.parse(startDate);
 			end = formatter.parse(endDate);
 		}
 
-		List<WorksheetDefinition> worksheetDefinitions = laboratoryService.getWorksheetDefinitions(start, end, q, startIndex, limit);
+		if (expirationDate !=null) {
+			expirationDateFormatted = formatter.parse(expirationDate);
+		}
+
+		List<WorksheetDefinition> worksheetDefinitions = laboratoryService.getWorksheetDefinitions(start, end, q, startIndex, limit,expirationDateFormatted);
 
 		List<Map<String,Object>> worksheetDefinitionsObject = new ArrayList<>();
 		for(WorksheetDefinition worksheetDefinition : worksheetDefinitions){
