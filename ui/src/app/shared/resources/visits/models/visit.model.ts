@@ -241,7 +241,8 @@ export class Visit {
           order &&
           order.type === "testorder" &&
           !order?.dateStopped &&
-          !order?.previousOrder
+          !order?.previousOrder &&
+          !order?.voided
       )
       .map((order) => new LabOrder(order));
   }
@@ -302,10 +303,22 @@ export class Visit {
     return flatten(
       flatten(
         this.encounters?.map((encounter) =>
-          (encounter?.obs || []).map((observation) => ({
-            ...observation,
-            encounterType: encounter.encounterType,
-          }))
+          (encounter?.obs || []).map((observation) => {
+            const encounterProvider = encounter?.encounterProviders[0];
+            const formattedObs = {
+              ...observation,
+              encounterProvider: {
+                ...encounterProvider?.provider,
+                name:
+                  encounterProvider?.provider &&
+                  encounterProvider?.provider?.display?.indexOf(":") > -1
+                    ? encounterProvider?.provider?.display?.split(":")[0]
+                    : encounterProvider?.provider?.display?.split("- ")[1],
+              },
+              encounterType: encounter.encounterType,
+            };
+            return formattedObs;
+          })
         )
       )
     ).map((observation) => new Observation(observation));
@@ -399,7 +412,22 @@ export class Visit {
     return diagnoses.length > 0
       ? (
           diagnoses.filter(
-            (diagnosis) => diagnosis["diagnosisDetails"]["certainty"]
+            (diagnosis) =>
+              diagnosis["diagnosisDetails"]["certainty"] &&
+              !diagnosis["diagnosisDetails"].voided
+          ) || []
+        )?.length > 0
+      : false;
+  }
+
+  get hasConfirmedDiagnosis(): boolean {
+    const diagnoses = this.diagnoses;
+    return diagnoses.length > 0
+      ? (
+          diagnoses.filter(
+            (diagnosis: any) =>
+              diagnosis?.diagnosisDetails?.certainty === "CONFIRMED" &&
+              !diagnosis?.diagnosisDetails?.voided
           ) || []
         )?.length > 0
       : false;
@@ -432,6 +460,9 @@ export class Visit {
       consultationStarted: this.consultationStarted,
       consultationStatusOrder: this.consultationStatusOrder,
       hasProvisonalDiagnosis: this.hasProvisonalDiagnosis,
+      hasConfirmedDiagnosis: this.hasConfirmedDiagnosis,
+      observations: this.observations,
+      drugOrders: this.drugOrders,
     };
   }
 

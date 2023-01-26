@@ -18,12 +18,13 @@
       <button mat-stroked-button (click)="onCancel($event)">Cancel</button>
       <button
         id="btn-exemption-confirmed"
-        class="ml-4 bg-success text-white"
+        class="ml-4"
+        color="primary"
         mat-flat-button
         color="primary"
         (click)="onConfirm($event)"
       >
-        Confirm
+        {{ data?.confirmationButtonText ? data?.confirmationButtonText : "Confirm" }}
       </button>
     </div>
   </div>

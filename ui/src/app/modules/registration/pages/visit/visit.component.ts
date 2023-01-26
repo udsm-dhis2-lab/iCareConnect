@@ -78,6 +78,7 @@ export class VisitComponent implements OnInit {
   @Input() visitTypes: any;
   @Input() servicesConfigs: any;
   @Input() allowOnlineVerification: boolean;
+  @Input() patientDetails: any;
   visitDetails: any = {};
   referralHospital: any;
 
@@ -345,6 +346,14 @@ export class VisitComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.visitDetails["InsuranceID"] =
+      (this.patientDetails?.person?.attributes?.filter(
+        (attribute) => attribute?.attributeType?.display === "ID"
+      ) || [])[0]?.value.length > 0
+        ? (this.patientDetails?.person?.attributes?.filter(
+            (attribute) => attribute?.attributeType?.display === "ID"
+          ) || [])[0]?.value
+        : null;
     this.currentPatient$ = this.store.pipe(select(getCurrentPatient));
     this.activeVisit$ = this.store.pipe(select(getActiveVisit));
     this.loadingVisit$ = this.store.pipe(select(getVisitLoadingState));

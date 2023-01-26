@@ -1,50 +1,86 @@
-<div>
-  <!-- {{ parameterResultsDetails | json }} -->
-  <span> {{ parameter?.display }}</span>
-  <span>
-    <!-- <b>
-      <span *ngIf="parameter?.answers?.length > 0">
-      </span>
-      <span *ngIf="parameter?.answers?.length == 0"> Answers </span>
-    </b> -->
-    <table
-      class="table"
-      *ngFor="let resultAllocation of parameterResultsDetails"
-    >
-      <tr *ngFor="let result of resultAllocation?.results">
-        <td>
-          {{
-            !result?.valueCoded?.display
-              ? result?.value
-              : result?.valueCoded?.display
-          }}
-        </td>
-        <!-- <td>
-          {{ result?.resultsFedBy?.name }}
-        </td> -->
-      </tr>
+<ng-container *ngIf="parameterResultsDetails">
+  <div>
+    <table class="table">
+      <tbody>
+        <tr>
+          <td class="w-50" *ngIf="!hideParameterLabel">
+            <b>{{ parameter?.display }}</b>
+          </td>
+          <td class="w-50">
+            <ng-container *ngIf="parameterResultsDetails">
+              <table *ngFor="let resultAllocation of parameterResultsDetails">
+                <ng-container *ngIf="resultAllocation?.results?.length > 0">
+                  <ng-container
+                    *ngFor="let result of resultAllocation?.results"
+                  >
+                    <tr *ngIf="result?.toShow">
+                      <td>
+                        {{
+                          !result?.valueCoded?.display
+                            ? result?.value
+                            : result?.valueCoded?.display
+                        }}
+
+                        <span
+                          class="ml-3 text-muted float-right"
+                          style="font-size: 0.7rem"
+                        >
+                          <em
+                            >(By
+                            {{
+                              result?.value ? result?.resultsFedBy?.name : "-"
+                            }}
+                            On {{ result?.dateCreated | date: "medium" }})</em
+                          >
+                        </span>
+                      </td>
+                      <!-- <td>
+                        {{
+                          resultAllocation?.authorized
+                            ? "Authorized"
+                            : "Un-Authorized"
+                        }}
+                        <span
+                          *ngIf="resultAllocation?.authorized"
+                          class="ml-3 text-muted float-right"
+                          style="font-size: 0.7rem"
+                        >
+                          <em>
+                            By {{ resultAllocation?.authorizedBy?.name }} On
+                            {{
+                              resultAllocation?.authorizedBy?.timestamp
+                                | date: "medium"
+                            }}</em
+                          >
+                        </span>
+                      </td> -->
+                    </tr>
+                  </ng-container>
+                </ng-container>
+                <ng-container *ngIf="resultAllocation?.results?.length === 0">
+                  <tr>
+                    <td colspan="100%">
+                      <div class="alert alert-warning" role="alert">
+                        No results/Processing
+                      </div>
+                    </td>
+                  </tr>
+                </ng-container>
+              </table>
+            </ng-container>
+            <div
+              *ngIf="!parameterResultsDetails"
+              class="alert alert-warning"
+              role="alert"
+            >
+              No data/Processing
+            </div>
+            <span>
+              {{ units }}
+            </span>
+          </td>
+        </tr>
+      </tbody>
     </table>
-  </span>
-  <!-- <span
-    *ngIf="
-      order?.testAllocations[count]?.secondSignOff &&
-      order?.order?.concept?.setMembers[count]?.lowNormal &&
-      order?.order?.concept?.setMembers[count]?.lowNormal >
-        order?.testAllocations[count]?.results[
-          order?.testAllocations[count]?.results?.length - 1
-        ]?.valueNumeric
-    "
-    ><img src="assets/images/arrowdownred.png" height="8px"
-  /></span>
-  <span
-    *ngIf="
-      order?.testAllocations[count]?.secondSignOff &&
-      order?.order?.concept?.setMembers[count]?.hiNormal &&
-      order?.testAllocations[count]?.results[
-        order?.testAllocations[count]?.results?.length - 1
-      ]?.valueNumeric > order?.order?.concept?.setMembers[count]?.hiNormal
-    "
-    ><img src="assets/images/arrowupred.png" height="8px"
-  /></span> -->
-  <br />
-</div>
+  </div>
+</ng-container>

@@ -29,4 +29,7 @@ export interface VisitObject {
   consultationStarted?: boolean;
   consultationStatusOrder?: any;
   hasProvisonalDiagnosis?: boolean;
+  hasConfirmedDiagnosis?: boolean;
+  observations?: any;
+  drugOrders?: any;
 }

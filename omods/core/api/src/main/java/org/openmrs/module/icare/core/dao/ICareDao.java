@@ -131,7 +131,7 @@ public class ICareDao extends BaseDAO<Item> {
 	
 	public List<Item> getItems() {
 		DbSession session = getSession();
-		String queryStr = "SELECT ip FROM Item ip";
+		String queryStr = "SELECT ip FROM Item ip WHERE ip.voided=false";
 		Query query = session.createQuery(queryStr);
 		log.info("QUERY:" + query.getQueryString());
 		return query.list();
@@ -280,9 +280,9 @@ public class ICareDao extends BaseDAO<Item> {
 		return prescription;
 	}
 	
-	public List<Visit> getVisitsByOrderType(String search, String orderTypeUuid, String locationUuid,
-	        OrderStatus.OrderStatusCode orderStatusCode, Order.FulfillerStatus fulfillerStatus, Integer limit,
-	        Integer startIndex, VisitWrapper.OrderBy orderBy, VisitWrapper.OrderByDirection orderByDirection,
+	public List<Visit> getVisitsByOrderType(String search, String orderTypeUuid, String encounterTypeUuid,
+	        String locationUuid, OrderStatus.OrderStatusCode orderStatusCode, Order.FulfillerStatus fulfillerStatus,
+	        Integer limit, Integer startIndex, VisitWrapper.OrderBy orderBy, VisitWrapper.OrderByDirection orderByDirection,
 	        String attributeValueReference, VisitWrapper.PaymentStatus paymentStatus) {
 		
 		Query query = null;
@@ -292,8 +292,7 @@ public class ICareDao extends BaseDAO<Item> {
 		        + "LEFT JOIN p.identifiers pi ";
 		//				+ " INNER JOIN p.attributes pattr";
 		
-		if (orderTypeUuid != null) {
-			
+		if (orderTypeUuid != null && encounterTypeUuid == null) {
 			queryStr = queryStr + " INNER JOIN v.encounters e" + " INNER JOIN e.orders o" + " INNER JOIN o.orderType ot"
 			        + " WHERE ot.uuid=:orderTypeUuid " + " AND v.stopDatetime IS NULL ";
 			
@@ -312,6 +311,9 @@ public class ICareDao extends BaseDAO<Item> {
 				}
 			}
 			
+		} else if (encounterTypeUuid != null && orderTypeUuid == null) {
+			queryStr += " INNER JOIN v.encounters e INNER JOIN e.encounterType et ";
+			queryStr += " WHERE et.uuid = :encounterTypeUuid AND v.stopDatetime IS NULL ";
 		} else {
 			queryStr = queryStr + " INNER JOIN v.encounters e WHERE v.stopDatetime IS NULL ";
 			
@@ -379,6 +381,10 @@ public class ICareDao extends BaseDAO<Item> {
 			} else {
 				query.setParameter("orderStatusCode", orderStatusCode);
 			}
+		}
+		
+		if (encounterTypeUuid != null) {
+			query.setParameter("encounterTypeUuid", encounterTypeUuid);
 		}
 		
 		if (locationUuid != null) {
@@ -626,4 +632,26 @@ public class ICareDao extends BaseDAO<Item> {
 		return query.list();
 	}
 	
+	//	public String voidOrder(String uuid, String voidReason) {
+	//		DbSession session = getSession();
+	//		new Order();
+	//		String queryStr = "UPDATE Order SET voided = 1,voidReason=:voidReason WHERE uuid =:uuid";
+	//		Query sqlQuery = session.createQuery(queryStr);
+	//
+	//		if (uuid == null) {
+	//			return "";
+	//		} else {
+	//			sqlQuery.setParameter("uuid", uuid);
+	//		}
+	//
+	//		if (voidReason != null) {
+	//			sqlQuery.setParameter("voidReason", voidReason);
+	//		} else {
+	//			sqlQuery.setParameter("voidReason", "");
+	//		}
+	//		sqlQuery.executeUpdate();
+	//
+	//		return uuid;
+	//	}
+	//
 }

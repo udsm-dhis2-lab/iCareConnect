@@ -53,24 +53,60 @@ export class EncountersService {
   createEncounter(encounter): Observable<any> {
     return from(this.API.encounter.createEncounter(encounter)).pipe(
       map((encounter) => {
-        return encounter
+        return encounter;
       }),
       catchError((err) => {
         return of(err);
-      }));
+      })
+    );
   }
 
-voidEncounter(encounter): Observable<any> {
-    return from(this.OpenmrsHttpClientService.delete(`encounter/${encounter.uuid}`)).pipe(
-      map((encounter) => {return encounter}),
-      catchError((err) => {return of(err);})
-    )
+  voidEncounter(encounter): Observable<any> {
+    const voidReason =
+      encounter?.voidReason.length > 0
+        ? `?voidReason=${encounter?.voidReason}`
+        : "";
+    return from(
+      this.OpenmrsHttpClientService.delete(
+        `encounter/${encounter?.uuid}${voidReason}`
+      )
+    ).pipe(
+      map((encounter) => {
+        return encounter;
+      }),
+      catchError((err) => {
+        return of(err);
+      })
+    );
   }
 
+  voidEncounterWithReason(encounter): Observable<any> {
+    const voidReason =
+      encounter?.voidReason.length > 0
+        ? encounter?.voidReason
+        : "No reason";
+    return from(
+      this.OpenmrsHttpClientService.post(`icare/voidencounter`, {
+        uuid: encounter?.uuid,
+        voidReason: voidReason,
+      })
+    ).pipe(
+      map((encounter) => {
+        return encounter;
+      }),
+      catchError((err) => {
+        return of(err);
+      })
+    );
+  }
 
-updateEncounter(encounter): Observable<any> {
-    return from(this.API.encounter.updateEncounter(encounter.uuid, encounter)).pipe(
-      map((encounter) => {return encounter})
-    )
+  updateEncounter(encounter): Observable<any> {
+    return from(
+      this.API.encounter.updateEncounter(encounter.uuid, encounter)
+    ).pipe(
+      map((encounter) => {
+        return encounter;
+      })
+    );
   }
 }

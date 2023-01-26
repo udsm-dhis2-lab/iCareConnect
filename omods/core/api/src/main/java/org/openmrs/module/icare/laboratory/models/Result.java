@@ -3,9 +3,7 @@ package org.openmrs.module.icare.laboratory.models;
 import org.openmrs.*;
 
 import javax.persistence.*;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import static javax.persistence.GenerationType.IDENTITY;
 
@@ -42,8 +40,9 @@ public class Result extends BaseOpenmrsData implements java.io.Serializable {
 	@Column(name = "abnormal")
 	private Boolean abnormal;
 	
-	@Column(name = "value_group_id")
-	private Integer valueGroupId;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "value_group_id", nullable = true)
+	private Result valueGroup;
 	
 	@Column(name = "value_date_time")
 	private Date valueDatetime;
@@ -70,6 +69,12 @@ public class Result extends BaseOpenmrsData implements java.io.Serializable {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "concept_id", unique = true, nullable = false)
 	private Concept concept;
+	
+	//	@ManyToOne(fetch = FetchType.LAZY)
+	//	TODO: Add relationship with instrument provided is alread set
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "instrument_id", nullable = true)
+	private Concept instrument;
 	
 	public Integer getId() {
 		return id;
@@ -151,12 +156,12 @@ public class Result extends BaseOpenmrsData implements java.io.Serializable {
 		this.valueNumeric = valueNumeric;
 	}
 	
-	public Integer getValueGroupId() {
-		return valueGroupId;
+	public Result getValueGroup() {
+		return valueGroup;
 	}
 	
-	public void setValueGroupId(Integer valueGroupId) {
-		this.valueGroupId = valueGroupId;
+	public void setValueGroup(Result valueGroup) {
+		this.valueGroup = valueGroup;
 	}
 	
 	public Date getValueDatetime() {
@@ -202,8 +207,10 @@ public class Result extends BaseOpenmrsData implements java.io.Serializable {
 			result.setValueModifier(((map.get("valueModifier")).toString()));
 		}
 		
-		if ((map.get("valueGroupId")) != null) {
-			result.setValueGroupId(Integer.valueOf((map.get("valueGroupId").toString())));
+		if ((map.get("resultGroup")) != null && ((Map) map.get("resultGroup")).get("uuid") != null) {
+			Result resultGroup = new Result();
+			resultGroup.setUuid(((Map) map.get("resultGroup")).get("uuid").toString());
+			result.setValueGroup(resultGroup);
 		}
 		
 		if ((map.get("valueDateTime")) != null) {
@@ -231,21 +238,27 @@ public class Result extends BaseOpenmrsData implements java.io.Serializable {
 		}
 		
 		if (map.get("standardTAT") != null) {
-			
 			result.setStandardTAT((Integer) map.get("standardTAT"));
-			
 		}
 		
 		if (map.get("urgentTAT") != null) {
-			
 			result.setUrgentTAT((Integer) map.get("urgentTAT"));
-			
 		}
 		
 		if (map.get("additionalReqTimeLimit") != null) {
-			
 			result.setAddReqTimeLimit((Integer) map.get("additionalReqTimeLimit"));
-			
+		}
+		
+		if (map.get("status") != null && ((Map) map.get("status")).get("status") != null) {
+			result.setStatusCategory(((Map) map.get("status")).get("category").toString());
+			result.setStatus(((Map) map.get("status")).get("status").toString());
+			result.setStatusRemarks(((Map) map.get("status")).get("remarks").toString());
+		}
+		
+		if (map.get("instrument") != null && ((Map) map.get("instrument")).get("uuid") != null) {
+			Concept instrument = new Concept();
+			instrument.setUuid(((Map) map.get("instrument")).get("uuid").toString());
+			result.setInstrument(instrument);
 		}
 		
 		Concept concept = new Concept();
@@ -261,12 +274,12 @@ public class Result extends BaseOpenmrsData implements java.io.Serializable {
 	
 	public Map<String, Object> toMap() {
 		Map<String, Object> resultsObject = new HashMap<String, Object>();
-		
+		resultsObject.put("uuid", this.getUuid());
+		resultsObject.put("dateCreated", this.getDateCreated());
 		resultsObject.put("valueText", this.getValueText());
 		resultsObject.put("valueNumeric", this.getValueNumeric());
 		resultsObject.put("valueBoolean", this.getValueBoolean());
 		resultsObject.put("valueComplex", this.getValueComplex());
-		resultsObject.put("valueGroupId", this.getValueGroupId());
 		resultsObject.put("valueModifier", this.getValueModifier());
 		resultsObject.put("valueDateTime", this.getValueDatetime());
 		if (this.getAbnormal() != null) {
@@ -280,23 +293,30 @@ public class Result extends BaseOpenmrsData implements java.io.Serializable {
 		resultsObject.put("additionalReqTimeLimit", this.getAddReqTimeLimit());
 		
 		if (this.getDateCreated() != null) {
-			//			sampleObject.put("created", sdf.format(this.getDateCreated()));
-			
 			resultsObject.put("dateCreated", this.getDateCreated());
 		} else {
 			resultsObject.put("dateCreated", null);
 		}
 		
 		if (this.getValueCoded() != null) {
-			
 			Map<String, Object> resultsCodedObject = new HashMap<String, Object>();
-			
 			resultsCodedObject.put("uuid", this.getValueCoded().getUuid());
 			resultsCodedObject.put("display", this.getValueCoded().getDisplayString());
 			resultsCodedObject.put("name", this.getValueCoded().getName().getName());
-			
 			resultsObject.put("valueCoded", resultsCodedObject);
 		}
+		
+		Map<String, Object> instrument = new HashMap<String, Object>();
+		if (this.getInstrument() != null) {
+			instrument.put("uuid", this.getInstrument().getUuid());
+			instrument.put("display", this.getInstrument().getDisplayString());
+			instrument.put("name", this.getInstrument().getName().getName());
+		} else {
+			instrument = null;
+		}
+		
+		resultsObject.put("instrument", instrument);
+		
 		HashMap<String, Object> resultsConceptObject = new HashMap<String, Object>();
 		resultsConceptObject.put("uuid", this.getConcept().getUuid());
 		resultsObject.put("concept", resultsConceptObject);
@@ -311,8 +331,21 @@ public class Result extends BaseOpenmrsData implements java.io.Serializable {
 			creatorObject.put("display", this.getCreator().getDisplayString());
 			creatorObject.put("name", this.getCreator().getName());
 		}
+		Map<String, Object> resultGroup = new HashMap<>();
+		if (this.getValueGroup() != null) {
+			resultGroup.put("uuid", this.getValueGroup().getUuid());
+			resultGroup.put("valueText", this.getValueText());
+			resultGroup.put("dateCreated", this.getDateCreated());
+			resultGroup.put("valueNumeric", this.getValueNumeric());
+			resultGroup.put("valueBoolean", this.getValueBoolean());
+			resultGroup.put("valueComplex", this.getValueComplex());
+			resultGroup.put("valueModifier", this.getValueModifier());
+			resultGroup.put("valueDateTime", this.getValueDatetime());
+		} else {
+			resultGroup = null;
+		}
+		resultsObject.put("resultGroup", resultGroup);
 		resultsObject.put("creator", creatorObject);
-		
 		return resultsObject;
 	}
 	
@@ -339,4 +372,53 @@ public class Result extends BaseOpenmrsData implements java.io.Serializable {
 	public void setAddReqTimeLimit(Integer addReqTimeLimit) {
 		this.addReqTimeLimit = addReqTimeLimit;
 	}
+	
+	public Concept getInstrument() {
+		return instrument;
+	}
+	
+	public void setInstrument(Concept instrument) {
+		this.instrument = instrument;
+	}
+	
+	/*
+	For statuses passed via results object
+	* */
+	@Transient
+	private String status;
+	
+	@Transient
+	private String category;
+	
+	@Transient
+	private String remarks;
+	
+	public String getStatus() {
+		return this.status;
+	}
+	
+	public void setStatus(String status) {
+		this.status = status;
+	}
+	
+	public String getStatusCategory() {
+		return this.category;
+	}
+	
+	public void setStatusCategory(String category) {
+		this.category = category;
+	}
+	
+	public String getStatusRemarks() {
+		return this.remarks;
+	}
+	
+	public void setStatusRemarks(String remarks) {
+		this.remarks = remarks;
+	}
+	
+	/*
+	End of result's statuses
+	 */
+	
 }

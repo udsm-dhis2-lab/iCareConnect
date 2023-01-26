@@ -65,11 +65,15 @@ export class FormService {
           })
         );
       } else {
-        return from(
-          this.api.concept.getAllConcepts(omit(parameters, "value"))
-        ).pipe(
+        let params = omit(parameters, "value");
+        const hasSearchTerm = field?.searchTerm ? true : false;
+        params = {
+          ...params,
+          q: hasSearchTerm ? field?.searchTerm : params?.q,
+        };
+        return from(this.api.concept.getAllConcepts(params)).pipe(
           map((response) => {
-            return orderBy(
+            const concepts = orderBy(
               (
                 response.results.filter(
                   (result: any) =>
@@ -95,6 +99,24 @@ export class FormService {
               ["display"],
               ["asc"]
             );
+            if (!hasSearchTerm) {
+              return concepts;
+            } else if (
+              hasSearchTerm &&
+              parameters?.q?.toLowerCase() != field?.searchTerm?.toLowerCase()
+            ) {
+              return concepts?.filter((listItem) => {
+                if (
+                  listItem?.name
+                    ?.toLowerCase()
+                    ?.indexOf(parameters?.q?.toLowerCase()) > -1
+                ) {
+                  return listItem;
+                }
+              });
+            } else {
+              return concepts;
+            }
           })
         );
       }
@@ -357,8 +379,6 @@ export class FormService {
                 facility?.display?.toLowerCase()?.indexOf("clinic") > -1
             ) || []
           )?.map((location: any) => {
-            console.log(location?.parentLocation?.parentLocation);
-            console.log(location?.parentLocation?.parentLocation?.display);
             return {
               ...location,
               display:
@@ -397,7 +417,14 @@ export class FormService {
      */
     const fields =
       "?v=custom:(uuid,display,name,encounterType,formFields:(uuid,display,fieldNumber,required,retired,fieldPart,maxOccurs,pageNumber,minOccurs,field:(uuid,display,concept:(uuid,display,conceptClass,datatype,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,numeric,descriptions,allowDecimal,displayPrecision,setMembers:(uuid,display,conceptClass,datatype,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,numeric,descriptions,allowDecimal,displayPrecision,answers,setMembers:(uuid,display,conceptClass,datatype,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,numeric,descriptions,allowDecimal,displayPrecision,answers)),answers:(uuid,display,conceptClass,datatype,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,numeric,descriptions,allowDecimal,displayPrecision,answers)))))";
-    return this.httpClient.get("form/" + uuid + fields);
+    return this.httpClient.get("form/" + uuid + fields).pipe(
+      map((response) => {
+        return response;
+      }),
+      catchError((error) => {
+        return of(error);
+      })
+    );
   }
 
   getCustomeOpenMRSForms(uuids): Observable<any> {

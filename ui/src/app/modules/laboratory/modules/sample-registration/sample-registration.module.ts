@@ -6,8 +6,9 @@ import { sampleRegistrationPages } from "./pages";
 import { regModals, sampleRegistrationComponents } from "./components";
 
 @NgModule({
-  declarations: [...sampleRegistrationPages, ...sampleRegistrationComponents],
   imports: [CommonModule, SampleRegistrationRoutingModule, SharedModule],
+  declarations: [...sampleRegistrationPages, ...sampleRegistrationComponents],
+  exports: [...sampleRegistrationPages, ...sampleRegistrationComponents],
   entryComponents: [...regModals],
 })
 export class SampleRegistrationModule {}

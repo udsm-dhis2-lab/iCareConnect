@@ -3,7 +3,6 @@ import { Actions, createEffect, ofType } from "@ngrx/effects";
 import { Store } from "@ngrx/store";
 import { of } from "rxjs";
 import { catchError, map, switchMap } from "rxjs/operators";
-import { ReportParamsService } from "src/app/modules/reports/services/report-params.service";
 import { formatReportResponse } from "src/app/shared/helpers/format-report.helper";
 import { ReportsService } from "src/app/shared/services/reports.service";
 import {

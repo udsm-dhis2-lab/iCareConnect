@@ -5,7 +5,11 @@
     currentSample: currentSample$ | async,
     testOrders: testOrders$ | async,
     savingLabResultsState: savingLabResultsState$ | async,
-    savingLabResultsStatusState: savingLabResultsStatusState$ | async
+    savingLabResultsStatusState: savingLabResultsStatusState$ | async,
+    labSampleLoadingState: labSampleLoadingState$ | async,
+    visitDetails: visitDetails$ | async,
+    currentUser: currentUser$ | async,
+    multipleResultsAttributeType: multipleResultsAttributeType$ | async
   } as params"
 >
   <mat-toolbar class="modal-header"
@@ -15,9 +19,17 @@
       - {{ params?.currentSample?.containerDetails?.display }}
     </span></mat-toolbar
   >
+  <div class="loading-overlay" *ngIf="params?.savingLabResultsState">
+    <div class="text-center">
+      <div>Saving data</div>
+      <div class="mt-3 d-flex justify-content-center w-100">
+        <mat-spinner diameter="50" strokeWidth="2"></mat-spinner>
+      </div>
+    </div>
+  </div>
 
-  <div style="padding: 10px">
-    <span *ngIf="!LISConfigurations?.isLIS"
+  <div style="padding: 10px" *ngIf="!LISConfigurations?.isLIS">
+    <span
       >Patient:
       {{ params?.currentSample?.patient?.givenName }}
       {{ params?.currentSample?.patient?.midllename }}
@@ -26,12 +38,43 @@
     <b>{{ params?.currentSample?.patient?.age }} Yrs</b>
   </div>
 
+  <!-- {{ params?.currentSample | json }} -->
   <mat-progress-bar
     mode="indeterminate"
-    *ngIf="loadingTestTimeSettings"
+    *ngIf="
+      loadingTestTimeSettings ||
+      params?.labSampleLoadingState ||
+      !params?.currentSample
+    "
   ></mat-progress-bar>
-  <div style="padding: 10px" *ngIf="!loadingTestTimeSettings">
-    <mat-tab-group>
+  <div
+    style="padding: 10px"
+    *ngIf="
+      !loadingTestTimeSettings &&
+      !params?.labSampleLoadingState &&
+      params?.currentSample
+    "
+  >
+    <div class="w-50" *ngIf="LISConfigurations?.isLIS">
+      <mat-form-field class="w-50">
+        <mat-label>Search</mat-label>
+        <mat-icon matPrefix>search</mat-icon
+        ><input
+          matInput
+          (keyup)="onSearch($event)"
+          [(ngModel)]="searchingText"
+        />
+      </mat-form-field>
+    </div>
+    <app-shared-error
+      *ngIf="errors?.length > 0"
+      [errors]="errors"
+    ></app-shared-error>
+    <mat-tab-group 
+      #tabGroup
+      *ngIf="errors?.length == 0"
+      (selectedTabChange)="tabSelection($event)"
+      >
       <mat-tab label="Results" *ngIf="dialogData?.actionType === 'Entry'">
         <div
           style="margin-top: 15px; overflow: auto"
@@ -40,7 +83,7 @@
           <table class="table table-bordered">
             <thead class="table-header">
               <tr>
-                <th style="width: 15%">Test Parameter</th>
+                <th style="width: 15%">Test Order</th>
                 <th style="width: 5%">Container</th>
                 <th style="width: 5%" *ngIf="!LISConfigurations?.isLIS">
                   Label
@@ -53,7 +96,12 @@
               </tr>
             </thead>
             <tbody>
-              <ng-container *ngFor="let item of params?.testOrders">
+              <ng-container
+                *ngFor="
+                  let item of params?.testOrders
+                    | searchTestDetails: searchingText
+                "
+              >
                 <ng-container
                   *ngIf="item?.order?.concept?.setMembers?.length == 0"
                 >
@@ -182,7 +230,8 @@
                                 "
                                 [disabled]="
                                   item?.testAllocations?.length > 0 &&
-                                  item?.testAllocations[0]?.firstSignOff && !LISConfigurations?.isLIS
+                                  item?.testAllocations[0]?.firstSignOff &&
+                                  !LISConfigurations?.isLIS
                                 "
                                 required
                                 id="{{ item?.order?.concept?.display }}"
@@ -201,7 +250,8 @@
                               <mat-select
                                 [disabled]="
                                   item?.testAllocations?.length > 0 &&
-                                  item?.testAllocations[0]?.firstSignOff && !LISConfigurations?.isLIS
+                                  item?.testAllocations[0]?.firstSignOff &&
+                                  !LISConfigurations?.isLIS
                                 "
                                 required
                                 [value]="
@@ -233,7 +283,49 @@
                                 item?.order?.concept.numeric &&
                                 item?.order?.concept.lowNormal &&
                                 item?.order?.concept.hiNormal &&
-                                !LISConfigurations?.isLIS
+                                !LISConfigurations?.isLIS &&
+                                !item?.order?.concept
+                                  ?.shouldUseGeneratedNumericOptions
+                              "
+                            >
+                              <mat-label
+                                >Enter value for
+                                {{ item?.order?.concept?.display }}</mat-label
+                              >
+
+                              <input
+                                matInput
+                                [type]="'number'"
+                                class="text-center"
+                                [value]="
+                                  item?.testAllocations?.length > 0 &&
+                                  item?.testAllocations[0]?.results?.length > 0
+                                    ? item?.testAllocations[0]?.results[
+                                        item?.testAllocations[0]?.results
+                                          ?.length - 1
+                                      ]?.value
+                                    : null
+                                "
+                                [disabled]="
+                                  item?.testAllocations[0]?.firstSignOff &&
+                                  !LISConfigurations?.isLIS
+                                "
+                                [min]="item?.order?.concept.lowNormal"
+                                [max]="item?.order?.concept.hiNormal"
+                                [(ngModel)]="values[item?.order?.concept?.uuid]"
+                              />
+                            </mat-form-field>
+
+                            <mat-form-field
+                              class="w-50"
+                              *ngIf="
+                                !notInRangeIsSet[item?.order?.concept?.uuid] &&
+                                item?.order?.concept.numeric &&
+                                item?.order?.concept.lowNormal &&
+                                item?.order?.concept.hiNormal &&
+                                !LISConfigurations?.isLIS &&
+                                item?.order?.concept
+                                  ?.shouldUseGeneratedNumericOptions
                               "
                             >
                               <mat-label
@@ -242,7 +334,8 @@
                               >
                               <mat-select
                                 [disabled]="
-                                  item?.testAllocations[0]?.firstSignOff && !LISConfigurations?.isLIS
+                                  item?.testAllocations[0]?.firstSignOff &&
+                                  !LISConfigurations?.isLIS
                                 "
                                 required
                                 [value]="
@@ -293,7 +386,8 @@
                                     : null
                                 "
                                 [disabled]="
-                                  item?.testAllocations[0]?.firstSignOff && !LISConfigurations?.isLIS
+                                  item?.testAllocations[0]?.firstSignOff &&
+                                  !LISConfigurations?.isLIS
                                 "
                                 [(ngModel)]="values[item?.order?.concept?.uuid]"
                               />
@@ -314,7 +408,8 @@
                                 "
                                 style="text-align: center"
                                 [disabled]="
-                                  item?.testAllocations[0]?.firstSignOff && !LISConfigurations?.isLIS
+                                  item?.testAllocations[0]?.firstSignOff &&
+                                  !LISConfigurations?.isLIS
                                 "
                                 matInput
                                 required
@@ -379,10 +474,11 @@
                                       ]?.valueNumeric
                                     : null
                                 "
-                                style="text-align: center"
+                                class="text-center"
                                 [disabled]="
                                   item?.testAllocations?.length > 0 &&
-                                  item?.testAllocations[0]?.firstSignOff && !LISConfigurations?.isLIS
+                                  item?.testAllocations[0]?.firstSignOff &&
+                                  !LISConfigurations?.isLIS
                                 "
                                 matInput
                                 required
@@ -395,10 +491,13 @@
                                 item?.order?.concept.numeric &&
                                 item?.order?.concept.lowNormal &&
                                 item?.order?.concept.hiNormal &&
-                                !LISConfigurations?.isLIS
+                                !LISConfigurations?.isLIS &&
+                                item?.order?.concept
+                                  ?.shouldUseGeneratedNumericOptions
                               "
                               [disabled]="
-                                item?.testAllocations[0]?.firstSignOff && !LISConfigurations?.isLIS
+                                item?.testAllocations[0]?.firstSignOff &&
+                                !LISConfigurations?.isLIS
                               "
                               style="font-size: 0.6rem; margin-left: 5px"
                               mat-button
@@ -442,7 +541,7 @@
 
                             <div
                               class="w-100"
-                              *ngIf="parameter?.datatype?.display !== 'Complex'"
+                              *ngIf="parameter?.datatype?.display === 'Numeric'"
                             >
                               <mat-checkbox
                                 [checked]="
@@ -476,7 +575,8 @@
                               <textarea
                                 [disabled]="
                                   (item?.testAllocations?.length > 0 &&
-                                    item?.testAllocations[0]?.firstSignOff && !LISConfigurations?.isLIS) ||
+                                    item?.testAllocations[0]?.firstSignOff &&
+                                    !LISConfigurations?.isLIS) ||
                                   item?.secondSignOff
                                 "
                                 (keyup)="
@@ -552,7 +652,8 @@
                             <table class="table table-bordered">
                               <thead class="table-header">
                                 <th>Value</th>
-                                <th>Remarks</th>Audit Tra
+                                <th>Remarks</th>
+                                Audit Tra
                                 <th>Date Time</th>
                                 <th>Completed By</th>
                               </thead>
@@ -665,46 +766,51 @@
                       </mat-tab-group>
                     </td>
                     <td>
-                      <button
-                        [disabled]="
-                          !item?.testAllocations[0] ||
-                          (!values[item?.order?.concept?.uuid] &&
-                            !values[item?.order?.concept?.uuid + '-comment']) ||
-                          (item?.testAllocations[0]?.firstSignOff && !LISConfigurations?.isLIS)
-                        "
-                        (click)="
-                          onSave(
-                            $event,
-                            item,
-                            params?.testOrders,
-                            params?.currentSample,
-                            item?.testAllocations[0]
-                          )
-                        "
-                        mat-stroked-button
-                        class="ml-2"
-                      >
-                        <mat-spinner
-                          *ngIf="
-                            params?.savingLabResultsState &&
-                            savingMessage[item?.order?.concept?.uuid]
+                      <div class="d-flex justify-content-end">
+                        <button
+                          [disabled]="
+                            !item?.testAllocations[0] ||
+                            (!values[item?.order?.concept?.uuid] &&
+                              !values[
+                                item?.order?.concept?.uuid + '-comment'
+                              ]) ||
+                            (item?.testAllocations[0]?.firstSignOff &&
+                              !LISConfigurations?.isLIS)
                           "
-                          color="primary"
-                          [diameter]="20"
-                          style="
-                            display: inline-block !important;
-                            margin-right: 4px;
+                          (click)="
+                            onSave(
+                              $event,
+                              item,
+                              params?.testOrders,
+                              params?.currentSample,
+                              item?.testAllocations[0]
+                            )
                           "
+                          mat-stroked-button
+                          class="ml-2"
                         >
-                        </mat-spinner>
-                        {{
-                          item?.testAllocations?.length == 0 ||
-                          (item?.testAllocations[0]?.results &&
-                            item?.testAllocations[0]?.results?.length == 0)
-                            ? "Save"
-                            : "Update"
-                        }}
-                      </button>
+                          <mat-spinner
+                            *ngIf="
+                              params?.savingLabResultsState &&
+                              savingMessage[item?.order?.concept?.uuid]
+                            "
+                            color="primary"
+                            [diameter]="20"
+                            style="
+                              display: inline-block !important;
+                              margin-right: 4px;
+                            "
+                          >
+                          </mat-spinner>
+                          {{
+                            item?.testAllocations?.length == 0 ||
+                            (item?.testAllocations[0]?.results &&
+                              item?.testAllocations[0]?.results?.length == 0)
+                              ? "Save"
+                              : "Update"
+                          }}
+                        </button>
+                      </div>
                       <span
                         *ngIf="!item?.testAllocations[0]"
                         class="text-warning"
@@ -718,9 +824,6 @@
                 <ng-container
                   *ngIf="item?.order?.concept?.setMembers?.length > 0"
                 >
-                  <!-- {{ item?.concept?.setMembers | json }} -->
-
-                  <!-- {{ item | json}} -->
                   <tr
                     *ngFor="
                       let parameter of item?.order?.concept?.setMembers;
@@ -774,576 +877,48 @@
                     </td>
                     <td style="width: 20px">
                       {{ parameter?.display }}
-                      <!-- - {{ parameter | json }} -->
                     </td>
                     <td>
-                      <!-- {{item | json}} -->
                       <mat-tab-group>
                         <mat-tab label="Current">
-                          <div class="p-3">
-                            <!-- {{ parameter?.datatype?.display }} -->
-
-                            <!-- {{ parameter | json }} -->
-                            <div
-                              *ngIf="parameter?.datatype?.display === 'Complex'"
-                            >
-                              <input
-                                type="file"
-                                style="
-                                  border: none;
-                                  background-color: transparent;
-                                "
-                                class="form-control"
-                                name="file"
-                                accept=".pdf, .doc"
-                                id="file-selector-{{ parameter?.uuid }}"
-                                (change)="fileSelection($event, parameter)"
-                              />
-                              <div
-                                *ngIf="obsKeyedByConcepts[parameter?.uuid]"
-                                class="text-right"
-                              >
-                                <a
-                                  [href]="
-                                    obsKeyedByConcepts[parameter?.uuid]?.uri
-                                  "
-                                  target="_blank"
-                                  ><img
-                                    src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABmJLR0QA/wD/AP+gvaeTAAABbklEQVRIibXUTygEUQDH8e/MDi1WbZQoHDZ/tkSxrfynxIE9yMUmJ83FwcEBZ1H+XBwUN26y5cBJ7YEtLtuWf4dVm9aiOMmBcpodB1H7b3bM7vyOM+/9Pu/15g2YHCH5gep1LOqfHvcJB7HY/4AJh6qnWq1rRXgKP6MoA8J+JJppnKinLC1Q34Yir9VgkQLqZIMj7wCA6mxHkVc1kZwAPUjOQAIiSqfJ7wwfcqYIvmhCZ152oBX9QHM37F5D/7hJQKML4gq09JkEPN6BzQ5vLyYBl2fw8Q6vDyYBRTawloBHhkKrCUCXB0J+iFzB7CbUOsE9BE0dIKR87X+R9C3DAiPTcHsOZZXgGgT3MHx9gijC3hIEDg0CpXbwzkNFNZRXwcUx7CxASw/0joFUAPc3Gadr3+TOUZBXoNgGy1MQDmZdT/JN1t7BzMbPgR5t6ypPF21gaw4sEgRPDJVnB0J+w8W/Mf1nl7oDlXWz0bzmG0ZVX0NFOd9TAAAAAElFTkSuQmCC"
-                                  />
-                                  Download
-                                </a>
-                              </div>
-                            </div>
-                            <mat-form-field
-                              class="w-75"
-                              *ngIf="
-                                !notInRangeIsSet[parameter?.uuid] &&
-                                !parameter?.numeric &&
-                                parameter?.datatype?.display !== 'Numeric' &&
-                                parameter?.datatype?.display !== 'Complex' &&
-                                parameter?.answers &&
-                                parameter?.answers.length == 0 &&
-                                !LISConfigurations?.isLIS
-                              "
-                            >
-                              <mat-label
-                                >Value for {{ parameter?.display }}
-                              </mat-label>
-                              <textarea
-                                (keyup)="
-                                  setEnteredParameterValue(
-                                    parameter,
-                                    $event.target.value
-                                  )
-                                "
-                                class="text-left"
-                                matInput
-                                [value]="
-                                  item?.allocationsPairedBySetMember[
-                                    parameter?.uuid
-                                  ]?.results?.length > 0
-                                    ? item?.allocationsPairedBySetMember[
-                                        parameter?.uuid
-                                      ]?.results[
-                                        item?.allocationsPairedBySetMember[
-                                          parameter?.uuid
-                                        ]?.results?.length - 1
-                                      ]?.value
-                                    : null
-                                "
-                                [disabled]="
-                                  item?.allocationsPairedBySetMember[
-                                    parameter?.uuid
-                                  ]?.firstSignOff && !LISConfigurations?.isLIS
-                                "
-                                required
-                                id="{{ parameter?.display }}"
-                              ></textarea>
-                            </mat-form-field>
-                            <div class="w-75 d-flex justify-content-left">
-                              <mat-form-field
-                                class="w-50"
-                                *ngIf="
-                                  !notInRangeIsSet[
-                                    item?.order?.concept?.uuid
-                                  ] &&
-                                  parameter?.answers &&
-                                  parameter?.answers.length > 0
-                                "
-                              >
-                                <mat-label
-                                  >Select {{ parameter?.display }}</mat-label
-                                >
-                                <mat-select
-                                  [disabled]="
-                                    item?.allocationsPairedBySetMember[
-                                      parameter?.uuid
-                                    ]?.firstSignOff && !LISConfigurations?.isLIS
-                                  "
-                                  required
-                                  [value]="
-                                    item?.allocationsPairedBySetMember[
-                                      parameter?.uuid
-                                    ]?.results?.length > 0
-                                      ? item?.allocationsPairedBySetMember[
-                                          parameter?.uuid
-                                        ]?.results[
-                                          item?.allocationsPairedBySetMember[
-                                            parameter?.uuid
-                                          ]?.results?.length - 1
-                                        ]?.value
-                                      : null
-                                  "
-                                  (selectionChange)="
-                                    setParameterValue($event.value, parameter)
-                                  "
-                                >
-                                  <mat-option>None</mat-option>
-                                  <mat-option
-                                    *ngFor="let option of parameter?.answers"
-                                    [value]="option.uuid"
-                                  >
-                                    {{ option.display }}
-                                  </mat-option>
-                                </mat-select>
-                              </mat-form-field>
-                              <div
-                                class="w-25"
-                                *ngIf="
-                                  temporaryValues[parameter?.uuid] &&
-                                  !values[parameter?.uuid] &&
-                                  LISConfigurations?.isLIS &&
-                                  parameter?.answers &&
-                                  parameter?.answers.length > 0
-                                "
-                              >
-                                <button
-                                  class="ml-2"
-                                  mat-flat-button
-                                  (click)="onGoNext($event, parameter)"
-                                >
-                                  Again
-                                </button>
-                              </div>
-                            </div>
-
-                            <mat-form-field
-                              class="w-50"
-                              *ngIf="
-                                !notInRangeIsSet[parameter?.uuid] &&
-                                (parameter?.numeric ||
-                                  parameter?.datatype?.display === 'Numeric') &&
-                                parameter?.lowNormal &&
-                                parameter?.hiNormal &&
-                                !LISConfigurations?.isLIS
-                              "
-                            >
-                              <mat-label
-                                >Select value for
-                                {{ parameter?.display }}</mat-label
-                              >
-                              <mat-select
-                                [disabled]="
-                                  item?.allocationsPairedBySetMember[
-                                    parameter?.uuid
-                                  ]?.firstSignOff && !LISConfigurations?.isLIS
-                                "
-                                required
-                                [value]="
-                                  item?.allocationsPairedBySetMember[
-                                    parameter?.uuid
-                                  ]?.results?.length > 0
-                                    ? item?.allocationsPairedBySetMember[
-                                        parameter?.uuid
-                                      ]?.results[
-                                        item?.allocationsPairedBySetMember[
-                                          parameter?.uuid
-                                        ]?.results?.length - 1
-                                      ]?.value
-                                    : null
-                                "
-                                (selectionChange)="
-                                  setParameterValue($event.value, parameter)
-                                "
-                              >
-                                <mat-option>None</mat-option>
-                                <mat-option
-                                  *ngFor="
-                                    let option of parameter?.selectionOptions
-                                  "
-                                  [value]="option"
-                                  >{{ option }}
-                                </mat-option>
-                              </mat-select>
-                            </mat-form-field>
-
-                            <button
-                              *ngIf="
-                                !notInRangeIsSet[parameter?.uuid] &&
-                                (parameter?.numeric ||
-                                  parameter?.datatype?.display === 'Numeric') &&
-                                parameter?.lowNormal &&
-                                parameter?.hiNormal &&
-                                !LISConfigurations?.isLIS
-                              "
-                              style="font-size: 0.6rem; margin-left: 5px"
-                              mat-button
-                              matSuffix
-                              mat-icon-button
-                              aria-label="Feed"
-                              (click)="
-                                onToggleFreeEntryForParameter($event, parameter)
-                              "
-                            >
-                              Not in range?
-                            </button>
-                            <mat-form-field
-                              class="w-50"
-                              *ngIf="
-                                notInRangeIsSet[parameter?.uuid] &&
-                                !LISConfigurations?.isLIS
-                              "
-                            >
-                              <mat-label
-                                >Enter value for {{ parameter?.display }}
-                              </mat-label>
-                              <input
-                                *ngIf="
-                                  !parameter?.numeric &&
-                                  parameter?.datatype?.display !== 'Numeric'
-                                "
-                                matInput
-                                autocomplete="off"
-                                [type]="'text'"
-                                class="text-left"
-                                [value]="
-                                  item?.allocationsPairedBySetMember[
-                                    parameter?.uuid
-                                  ]?.results?.length > 0
-                                    ? item?.allocationsPairedBySetMember[
-                                        parameter?.uuid
-                                      ]?.results[
-                                        item?.allocationsPairedBySetMember[
-                                          parameter?.uuid
-                                        ]?.results?.length - 1
-                                      ]?.value
-                                    : null
-                                "
-                                [disabled]="
-                                  item?.allocationsPairedBySetMember[
-                                    parameter?.uuid
-                                  ]?.firstSignOff && !LISConfigurations?.isLIS
-                                "
-                                (keyup.enter)="
-                                  setEnteredParameterValue(
-                                    parameter,
-                                    $event.target.value
-                                  )
-                                "
-                              />
-
-                              <input
-                                *ngIf="
-                                  parameter?.numeric ||
-                                  parameter?.datatype?.display === 'Numeric'
-                                "
-                                type="number"
-                                (change)="
-                                  setEnteredParameterValue(
-                                    parameter,
-                                    $event.target.value
-                                  )
-                                "
-                                [value]="
-                                  item?.allocationsPairedBySetMember[
-                                    parameter?.uuid
-                                  ]?.results?.length > 0
-                                    ? item?.allocationsPairedBySetMember[
-                                        parameter?.uuid
-                                      ]?.results[
-                                        item?.allocationsPairedBySetMember[
-                                          parameter?.uuid
-                                        ]?.results?.length - 1
-                                      ]?.valueNumeric
-                                    : null
-                                "
-                                style="text-align: center"
-                                [disabled]="
-                                  item?.allocationsPairedBySetMember[
-                                    parameter?.uuid
-                                  ]?.firstSignOff && !LISConfigurations?.isLIS
-                                "
-                                matInput
-                                required
-                                id="{{ parameter?.display }}"
-                              />
-                              <button
-                                mat-button
-                                *ngIf="values[parameter?.uuid]"
-                                matSuffix
-                                mat-icon-button
-                                aria-label="Clear"
-                                (click)="values[parameter?.uuid] = ''"
-                              >
-                                <mat-icon>close</mat-icon>
-                              </button>
-                              <button
-                                *ngIf="
-                                  notInRangeIsSet[parameter?.uuid] &&
-                                  !LISConfigurations?.isLIS
-                                "
-                                style="font-size: 0.6rem; margin-left: 5px"
-                                mat-button
-                                matSuffix
-                                mat-icon-button
-                                aria-label="Feed"
-                                (click)="
-                                  onToggleFreeEntryForParameter(
-                                    $event,
-                                    parameter
-                                  )
-                                "
-                              >
-                                Go to range
-                              </button>
-                            </mat-form-field>
-
-                            <mat-form-field
-                              class="w-50"
-                              *ngIf="
-                                parameter?.datatype?.display === 'Numeric' &&
-                                (!parameter?.lowNormal || !parameter?.hiNormal)
-                              "
-                            >
-                              <mat-label
-                                >Enter value for {{ parameter?.display }}
-                              </mat-label>
-                              <input
-                                matInput
-                                autocomplete="off"
-                                [type]="'number'"
-                                class="text-left"
-                                [value]="
-                                  item?.allocationsPairedBySetMember[
-                                    parameter?.uuid
-                                  ]?.results?.length > 0
-                                    ? item?.allocationsPairedBySetMember[
-                                        parameter?.uuid
-                                      ]?.results[
-                                        item?.allocationsPairedBySetMember[
-                                          parameter?.uuid
-                                        ]?.results?.length - 1
-                                      ]?.value
-                                    : null
-                                "
-                                [disabled]="
-                                  item?.allocationsPairedBySetMember[
-                                    parameter?.uuid
-                                  ]?.firstSignOff && !LISConfigurations?.isLIS
-                                "
-                                (change)="
-                                  setEnteredParameterValue(
-                                    parameter,
-                                    $event.target.value
-                                  )
-                                "
-                              />
-                            </mat-form-field>
-
-                            <div class="50 d-flex justify-content-left">
-                              <mat-form-field
-                                class="w-25"
-                                *ngIf="
-                                  LISConfigurations?.isLIS &&
-                                  parameter?.datatype?.display === 'Numeric'
-                                "
-                              >
-                                <mat-label
-                                  >Enter value for {{ parameter?.display }}
-                                </mat-label>
-                                <!-- <input
-                                  *ngIf="
-                                    !parameter?.numeric &&
-                                    parameter?.datatype?.display !== 'Numeric'
-                                  "
-                                  matInput
-                                  autocomplete="off"
-                                  [type]="'text'"
-                                  class="text-left"
-                                  [value]="
-                                    item?.allocationsPairedBySetMember[
-                                      parameter?.uuid
-                                    ]?.results?.length > 0
-                                      ? item?.allocationsPairedBySetMember[
-                                          parameter?.uuid
-                                        ]?.results[
-                                          item?.allocationsPairedBySetMember[
-                                            parameter?.uuid
-                                          ]?.results?.length - 1
-                                        ]?.value
-                                      : null
-                                  "
-                                  [disabled]="
-                                    item?.allocationsPairedBySetMember[
-                                      parameter?.uuid
-                                    ]?.firstSignOff
-                                  "
-                                  (keyup)="
-                                    setEnteredParameterValue(
-                                      parameter,
-                                      $event.target.value
-                                    )
-                                  "
-                                  id="{{ parameter?.display }}"
-                                /> -->
-
-                                <input
-                                  *ngIf="
-                                    parameter?.numeric ||
-                                    parameter?.datatype?.display === 'Numeric'
-                                  "
-                                  type="number"
-                                  (change)="
-                                    setEnteredParameterValue(
-                                      parameter,
-                                      $event.target.value
-                                    )
-                                  "
-                                  [value]="
-                                    item?.allocationsPairedBySetMember[
-                                      parameter?.uuid
-                                    ]?.results?.length > 0
-                                      ? item?.allocationsPairedBySetMember[
-                                          parameter?.uuid
-                                        ]?.results[
-                                          item?.allocationsPairedBySetMember[
-                                            parameter?.uuid
-                                          ]?.results?.length - 1
-                                        ]?.valueNumeric
-                                      : null
-                                  "
-                                  style="text-align: center"
-                                  [disabled]="
-                                    item?.allocationsPairedBySetMember[
-                                      parameter?.uuid
-                                    ]?.firstSignOff && !LISConfigurations?.isLIS
-                                  "
-                                  matInput
-                                  required
-                                  id="{{ parameter?.display }}"
+                          <div
+                            class="p-3"
+                            *ngIf="params?.multipleResultsAttributeType"
+                          >
+                            <div *ngIf="obsKeyedByConcepts[parameter?.uuid]?.value && obsKeyedByConcepts[parameter?.uuid]?.value?.links">
+                              <a href="{{ obsKeyedByConcepts[parameter?.uuid]?.value?.links?.uri }}" target="_blank"
+                                ><img
+                                  src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABmJLR0QA/wD/AP+gvaeTAAABbklEQVRIibXUTygEUQDH8e/MDi1WbZQoHDZ/tkSxrfynxIE9yMUmJ83FwcEBZ1H+XBwUN26y5cBJ7YEtLtuWf4dVm9aiOMmBcpodB1H7b3bM7vyOM+/9Pu/15g2YHCH5gep1LOqfHvcJB7HY/4AJh6qnWq1rRXgKP6MoA8J+JJppnKinLC1Q34Yir9VgkQLqZIMj7wCA6mxHkVc1kZwAPUjOQAIiSqfJ7wwfcqYIvmhCZ152oBX9QHM37F5D/7hJQKML4gq09JkEPN6BzQ5vLyYBl2fw8Q6vDyYBRTawloBHhkKrCUCXB0J+iFzB7CbUOsE9BE0dIKR87X+R9C3DAiPTcHsOZZXgGgT3MHx9gijC3hIEDg0CpXbwzkNFNZRXwcUx7CxASw/0joFUAPc3Gadr3+TOUZBXoNgGy1MQDmZdT/JN1t7BzMbPgR5t6ypPF21gaw4sEgRPDJVnB0J+w8W/Mf1nl7oDlXWz0bzmG0ZVX0NFOd9TAAAAAElFTkSuQmCC"
                                 />
-                                <button
-                                  mat-button
-                                  *ngIf="values[parameter?.uuid]"
-                                  matSuffix
-                                  mat-icon-button
-                                  aria-label="Clear"
-                                  (click)="values[parameter?.uuid] = ''"
-                                >
-                                  <mat-icon>close</mat-icon>
-                                </button>
-                              </mat-form-field>
-                              <div
-                                class="w-25"
-                                *ngIf="
-                                  temporaryValues[parameter?.uuid] &&
-                                  !values[parameter?.uuid] &&
-                                  LISConfigurations?.isLIS
-                                "
-                              >
-                                <button
-                                  class="ml-2"
-                                  mat-flat-button
-                                  (click)="onGoNext($event, parameter)"
-                                >
-                                  Again
-                                </button>
-                              </div>
+                              </a>
                             </div>
-
-                            <!-- <mat-form-field
-                              class="w-50"
-                              *ngIf="
-                                (!notInRangeIsSet[parameter?.uuid] ||
-                                  LISConfigurations?.isLIS) &&
-                                (parameter?.numeric ||
-                                  parameter?.datatype?.display === 'Numeric') &&
-                                (!parameter.lowNormal || !parameter.hiNormal)
-                              "
-                            >
-                              <mat-label>
-                                here for 1 :: {{ parameter?.display }} Value for
-                                {{ parameter?.display }}</mat-label
-                              >
-
-                              <input
-                                type="number"
-                                (change)="
-                                  setEnteredParameterValue(
-                                    parameter,
-                                    $event.target.value
-                                  )
-                                "
-                                [value]="
+                            <app-result-entry-form
+                              [parameter]="parameter"
+                              [value]="
+                                item?.allocationsPairedBySetMember[
+                                  parameter?.uuid
+                                ]?.results[
                                   item?.allocationsPairedBySetMember[
                                     parameter?.uuid
-                                  ]?.results?.length > 0
-                                    ? item?.allocationsPairedBySetMember[
-                                        parameter?.uuid
-                                      ]?.results[
-                                        item?.allocationsPairedBySetMember[
-                                          parameter?.uuid
-                                        ]?.results?.length - 1
-                                      ]?.valueNumeric
-                                    : null
-                                "
-                                style="text-align: center"
-                                [disabled]="
-                                  item?.allocationsPairedBySetMember[
-                                    parameter?.uuid
-                                  ]?.firstSignOff
-                                "
-                                matInput
-                                required
-                                id="{{ parameter?.display }}"
-                              />
-                            </mat-form-field> -->
-
-                            <span
-                              *ngIf="parameter?.units"
-                              style="margin-right: 10px; margin-left: 20px"
-                            >
-                              Units: <b>{{ parameter?.units }}</b>
-                            </span>
-
-                            <span
-                              *ngIf="
-                                (parameter?.numeric ||
-                                  parameter?.datatype?.display === 'Numeric') &&
-                                parameter?.lowNormal &&
-                                parameter?.hiNormal
+                                  ]?.results?.length - 1
+                                ]?.value
                               "
-                            >
-                              <br />
-                              (<span style="font-weight: 400"
-                                >Min:
-                                <b style="margin-left: 10px">{{
-                                  parameter?.lowNormal
-                                }}</b></span
-                              >
-                              -
-                              <span style="margin-left: 20px; font-weight: 400"
-                                >Max:
-                                <b style="margin-left: 10px">{{
-                                  parameter?.hiNormal
-                                }}</b></span
-                              >)
-                            </span>
+                              [multipleResultsAttributeType]="
+                                params?.multipleResultsAttributeType
+                              "
+                              (formData)="onGetFormData(
+                                $event, 
+                                parameter,
+                                item,
+                                params?.currentSample,
+                                item?.allocationsPairedBySetMember[
+                                  parameter?.uuid
+                                ])"
+                            ></app-result-entry-form>
 
                             <div
                               class="w-100"
-                              *ngIf="parameter?.datatype?.display !== 'Complex'"
+                              *ngIf="parameter?.datatype?.display === 'Numeric'"
                             >
                               <mat-checkbox
                                 [checked]="
@@ -1383,6 +958,10 @@
                               ></textarea>
                             </mat-form-field>
                           </div>
+                          <mat-progress-bar
+                            mode="indeterminate"
+                            *ngIf="!params?.multipleResultsAttributeType"
+                          ></mat-progress-bar>
                         </mat-tab>
                         <mat-tab label="Audit Trail">
                           <div class="p-3">
@@ -1505,72 +1084,77 @@
                       </mat-tab-group>
                     </td>
                     <td>
-                      <button
-                        [disabled]="
-                          (parameter?.datatype?.display !== 'Complex' &&
-                            !item?.allocationsPairedBySetMember[
-                              parameter?.uuid
-                            ]) ||
-                          (parameter?.datatype?.display === 'Complex' &&
-                            !file) ||
-                          (!values[parameter?.uuid] &&
-                            !values[parameter?.uuid + '-comment']) ||
-                          (item?.allocationsPairedBySetMember[parameter?.uuid]
-                            ?.firstSignOff && !LISConfigurations?.isLIS)
-                        "
-                        (click)="
-                          onSaveParameterValue(
-                            $event,
-                            item,
-                            parameter,
-                            params?.currentSample,
-                            item?.allocationsPairedBySetMember[parameter?.uuid],
-                            parameter?.datatype?.display === 'Complex'
-                              ? 'file'
-                              : null
-                          )
-                        "
-                        mat-stroked-button
-                        class="ml-2"
-                      >
-                        <mat-spinner
-                          *ngIf="
-                            params?.savingLabResultsState &&
-                            savingMessage[parameter?.uuid]
+                      <div class="d-flex justify-content-end">
+                        <button
+                          [disabled]="
+                            (parameter?.datatype?.display !== 'Complex' &&
+                              !item?.allocationsPairedBySetMember[
+                                parameter?.uuid
+                              ]) ||
+                            (parameter?.datatype?.display === 'Complex' &&
+                              !file && !files?.length) ||
+                            (!values[parameter?.uuid] &&
+                              !values[parameter?.uuid + '-comment']) ||
+                            (item?.allocationsPairedBySetMember[parameter?.uuid]
+                              ?.firstSignOff &&
+                              !LISConfigurations?.isLIS)
                           "
-                          color="primary"
-                          [diameter]="20"
-                          style="
-                            display: inline-block !important;
-                            margin-right: 4px;
+                          (click)="
+                            onSaveParameterValue(
+                              $event,
+                              item,
+                              parameter,
+                              params?.currentSample,
+                              item?.allocationsPairedBySetMember[
+                                parameter?.uuid
+                              ],
+                              parameter?.datatype?.display === 'Complex'
+                                ? 'file'
+                                : null
+                            )
+                          "
+                          mat-stroked-button
+                          class="ml-2"
+                        >
+                          <mat-spinner
+                            *ngIf="
+                              params?.savingLabResultsState &&
+                              savingMessage[parameter?.uuid]
+                            "
+                            color="primary"
+                            [diameter]="20"
+                            style="
+                              display: inline-block !important;
+                              margin-right: 4px;
+                            "
+                          >
+                          </mat-spinner>
+                          {{
+                            item?.allocationsPairedBySetMember[
+                              parameter?.uuid
+                            ] &&
+                            item?.allocationsPairedBySetMember[parameter?.uuid]
+                              ?.results?.length > 0
+                              ? "Update"
+                              : "Save"
+                          }}
+                        </button>
+
+                        <span
+                          class="mt-2"
+                          *ngIf="
+                            LISConfigurations?.isLIS &&
+                            temporaryValues[parameter?.uuid] &&
+                            values[parameter?.uuid] &&
+                            temporaryValues[parameter?.uuid] !=
+                              values[parameter?.uuid]
                           "
                         >
-                        </mat-spinner>
-                        {{
-                          item?.allocationsPairedBySetMember[parameter?.uuid] &&
-                          item?.allocationsPairedBySetMember[parameter?.uuid]
-                            ?.results?.length > 0
-                            ? "Update"
-                            : "Save"
-                        }}
-                      </button>
-
-                      <!-- {{item?.allocationsPairedBySetMember | json}} -->
-                      <span
-                        class="mt-2"
-                        *ngIf="
-                          LISConfigurations?.isLIS &&
-                          temporaryValues[parameter?.uuid] &&
-                          values[parameter?.uuid] &&
-                          temporaryValues[parameter?.uuid] !=
-                            values[parameter?.uuid]
-                        "
-                      >
-                        <div class="alert alert-warning" role="alert">
-                          You have incorrect entered results
-                        </div>
-                      </span>
-
+                          <div class="alert alert-warning" role="alert">
+                            You have incorrect entered results
+                          </div>
+                        </span>
+                      </div>
                       <span
                         *ngIf="
                           !item?.allocationsPairedBySetMember[parameter?.uuid]
@@ -1666,7 +1250,9 @@
             <thead class="table-header">
               <tr>
                 <th style="width: 15%">Test Order</th>
-                <th style="width: 10%">Ordered By</th>
+                <th style="width: 10%">
+                  {{ !LISConfigurations?.isLIS ? "Ordered By" : "Parameter" }}
+                </th>
                 <th *ngIf="LISConfigurations?.isLIS" colspan="1">Results</th>
                 <th *ngIf="!LISConfigurations?.isLIS" colspan="2">Results</th>
                 <th style="width: 10%">
@@ -1907,7 +1493,6 @@
                       }}
                     </td>
                     <td colspan="2" *ngIf="!LISConfigurations?.isLIS">
-                      <!-- TODO: reject first approval -->
                       <button
                         [disabled]="
                           item?.testAllocations[0]?.firstSignOff ||
@@ -1916,15 +1501,13 @@
                         "
                         mat-stroked-button
                         (click)="
-                          rejectResults(
+                          amendResults(
                             $event,
-                            item,
-                            params?.currentSample,
-                            item?.testAllocations[0]
+                            item?.allocationsPairedBySetMember[parameter?.uuid]
                           )
                         "
                       >
-                        Reject
+                        Amend
                       </button>
                       <button
                         [ngClass]="{
@@ -1966,7 +1549,6 @@
                         >
                       </button>
                     </td>
-                    search
 
                     <td colspan="2" *ngIf="!LISConfigurations?.isLIS">
                       <!-- TODO: reject first approval -->
@@ -1985,7 +1567,7 @@
                           )
                         "
                       >
-                        Reject
+                        Amend
                       </button>
                       <button
                         [ngClass]="{
@@ -2045,7 +1627,7 @@
                             )
                           "
                         >
-                          Reject
+                          Amend
                         </button>
                         <button
                           [ngClass]="{
@@ -2095,16 +1677,13 @@
                       let count = index
                     "
                   >
-                    <tr
-                      *ngIf="
-                        item?.testAllocations?.length > 0 &&
-                        item?.allocationsPairedBySetMember[parameter?.uuid]
-                          ?.results &&
-                        item?.allocationsPairedBySetMember[parameter?.uuid]
-                          ?.results?.length > 0
-                      "
-                    >
-                      <td>
+                    <tr>
+                      <td
+                        *ngIf="count == 0"
+                        [attr.rowspan]="
+                          item?.order?.concept?.setMembers?.length
+                        "
+                      >
                         {{ item?.order?.concept?.display }}
                       </td>
                       <td *ngIf="!LISConfigurations?.isLIS">
@@ -2114,8 +1693,50 @@
                       <td>
                         <mat-tab-group>
                           <mat-tab label="Current.">
-                            <div class="p-3">
-                              <mat-form-field
+                            <div
+                              class="p-3"
+                              *ngIf="params?.multipleResultsAttributeType"
+                            > 
+                              <a *ngIf="obsKeyedByConcepts[parameter?.uuid]?.value?.links?.uri.split('openmrs').length > 2" href="{{ '/openmrs' + obsKeyedByConcepts[parameter?.uuid]?.value?.links?.uri.split('openmrs')[2] }}"> <img
+                                  src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABmJLR0QA/wD/AP+gvaeTAAABbklEQVRIibXUTygEUQDH8e/MDi1WbZQoHDZ/tkSxrfynxIE9yMUmJ83FwcEBZ1H+XBwUN26y5cBJ7YEtLtuWf4dVm9aiOMmBcpodB1H7b3bM7vyOM+/9Pu/15g2YHCH5gep1LOqfHvcJB7HY/4AJh6qnWq1rRXgKP6MoA8J+JJppnKinLC1Q34Yir9VgkQLqZIMj7wCA6mxHkVc1kZwAPUjOQAIiSqfJ7wwfcqYIvmhCZ152oBX9QHM37F5D/7hJQKML4gq09JkEPN6BzQ5vLyYBl2fw8Q6vDyYBRTawloBHhkKrCUCXB0J+iFzB7CbUOsE9BE0dIKR87X+R9C3DAiPTcHsOZZXgGgT3MHx9gijC3hIEDg0CpXbwzkNFNZRXwcUx7CxASw/0joFUAPc3Gadr3+TOUZBXoNgGy1MQDmZdT/JN1t7BzMbPgR5t6ypPF21gaw4sEgRPDJVnB0J+w8W/Mf1nl7oDlXWz0bzmG0ZVX0NFOd9TAAAAAElFTkSuQmCC"
+                                /> </a>
+                              <a *ngIf="obsKeyedByConcepts[parameter?.uuid]?.value?.links?.uri.split('openmrs').length == 2 " href="{{ '/openmrs' + obsKeyedByConcepts[parameter?.uuid]?.value?.links?.uri.split('openmrs')[1] }}"> <img
+                                  src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABmJLR0QA/wD/AP+gvaeTAAABbklEQVRIibXUTygEUQDH8e/MDi1WbZQoHDZ/tkSxrfynxIE9yMUmJ83FwcEBZ1H+XBwUN26y5cBJ7YEtLtuWf4dVm9aiOMmBcpodB1H7b3bM7vyOM+/9Pu/15g2YHCH5gep1LOqfHvcJB7HY/4AJh6qnWq1rRXgKP6MoA8J+JJppnKinLC1Q34Yir9VgkQLqZIMj7wCA6mxHkVc1kZwAPUjOQAIiSqfJ7wwfcqYIvmhCZ152oBX9QHM37F5D/7hJQKML4gq09JkEPN6BzQ5vLyYBl2fw8Q6vDyYBRTawloBHhkKrCUCXB0J+iFzB7CbUOsE9BE0dIKR87X+R9C3DAiPTcHsOZZXgGgT3MHx9gijC3hIEDg0CpXbwzkNFNZRXwcUx7CxASw/0joFUAPc3Gadr3+TOUZBXoNgGy1MQDmZdT/JN1t7BzMbPgR5t6ypPF21gaw4sEgRPDJVnB0J+w8W/Mf1nl7oDlXWz0bzmG0ZVX0NFOd9TAAAAAElFTkSuQmCC"
+                                />
+                              </a>
+                              <app-result-entry-form
+                                *ngIf="
+                                  (amendUuid &&
+                                    item?.allocationsPairedBySetMember[
+                                      parameter?.uuid
+                                    ]?.uuid === amendUuid) ||
+                                  item?.allocationsPairedBySetMember[
+                                    parameter?.uuid
+                                  ]?.uuid != amendUuid
+                                "
+                                [parameter]="parameter"
+                                [value]="
+                                  item?.allocationsPairedBySetMember[
+                                    parameter?.uuid
+                                  ]?.results[
+                                    item?.allocationsPairedBySetMember[
+                                      parameter?.uuid
+                                    ]?.results?.length - 1
+                                  ]?.value
+                                "
+                                [disabled]="
+                                  item?.allocationsPairedBySetMember[
+                                    parameter?.uuid
+                                  ]?.uuid === amendUuid
+                                    ? false
+                                    : true
+                                "
+                                [multipleResultsAttributeType]="
+                                  params?.multipleResultsAttributeType
+                                "
+                                (formData)="onGetFormData($event, parameter)"
+                              ></app-result-entry-form>
+                              <!-- <mat-form-field
                                 class="w-100"
                                 *ngIf="
                                   parameter?.answers &&
@@ -2123,7 +1744,11 @@
                                 "
                               >
                                 <mat-select
-                                  [disabled]="true"
+                                  [disabled]="
+                                    item?.allocationsPairedBySetMember[
+                                      parameter?.uuid
+                                    ]?.uuid !== amendUuid
+                                  "
                                   required
                                   [value]="
                                     item?.allocationsPairedBySetMember[
@@ -2135,7 +1760,7 @@
                                     ]?.value
                                   "
                                   (selectionChange)="
-                                    setValue($event.value, item)
+                                    setParameterValue($event.value, parameter)
                                   "
                                 >
                                   <mat-option
@@ -2146,14 +1771,31 @@
                                   </mat-option>
                                 </mat-select>
                               </mat-form-field>
-                              <div
+
+                              <mat-form-field
+                                class="w-25 numeric-field"
                                 *ngIf="
-                                  parameter?.answers &&
-                                  parameter?.answers.length === 0
+                                  parameter?.datatype?.display === 'Numeric'
                                 "
                               >
-                                <span>
-                                  {{
+                                <mat-label
+                                  >Enter value for
+                                  {{ item?.order?.concept?.display }}
+                                </mat-label>
+                                <input
+                                  [disabled]="
+                                    item?.allocationsPairedBySetMember[
+                                      parameter?.uuid
+                                    ]?.uuid !== amendUuid
+                                  "
+                                  type="number"
+                                  (change)="
+                                    setEnteredParameterValue(
+                                      parameter,
+                                      $event.target.value
+                                    )
+                                  "
+                                  [value]="
                                     item?.allocationsPairedBySetMember[
                                       parameter?.uuid
                                     ]?.results[
@@ -2161,8 +1803,92 @@
                                         parameter?.uuid
                                       ]?.results?.length - 1
                                     ]?.value
-                                  }}
-                                </span>
+                                  "
+                                  class="text-center"
+                                  [disabled]="
+                                    item?.allocationsPairedBySetMember[
+                                      parameter?.uuid
+                                    ]?.uuid !== amendUuid
+                                  "
+                                  matInput
+                                  required
+                                  id="{{ item?.order?.concept?.display }}"
+                                />
+                                <button
+                                  mat-button
+                                  *ngIf="values[item?.order?.concept?.uuid]"
+                                  matSuffix
+                                  mat-icon-button
+                                  aria-label="Clear"
+                                  (click)="values[parameter?.uuid] = ''"
+                                >
+                                  <mat-icon>close</mat-icon>
+                                </button>
+                              </mat-form-field>
+
+                              <mat-form-field
+                                class="w-75 text-field"
+                                *ngIf="
+                                  parameter?.datatype?.display === 'Text' &&
+                                  item?.allocationsPairedBySetMember[
+                                    parameter?.uuid
+                                  ]?.uuid == amendUuid
+                                "
+                              >
+                                <mat-label
+                                  >Enter value for
+                                  {{ parameter?.display }}
+                                </mat-label>
+                                <input
+                                  [disabled]="
+                                    item?.allocationsPairedBySetMember[
+                                      parameter?.uuid
+                                    ]?.uuid !== amendUuid
+                                  "
+                                  type="text"
+                                  (change)="
+                                    setEnteredParameterValue(
+                                      parameter,
+                                      $event.target.value
+                                    )
+                                  "
+                                  [value]="
+                                    item?.allocationsPairedBySetMember[
+                                      parameter?.uuid
+                                    ]?.results[
+                                      item?.allocationsPairedBySetMember[
+                                        parameter?.uuid
+                                      ]?.results?.length - 1
+                                    ]?.value
+                                  "
+                                  style="text-align: left"
+                                  [disabled]="
+                                    item?.allocationsPairedBySetMember[
+                                      parameter?.uuid
+                                    ]?.uuid !== amendUuid
+                                  "
+                                  matInput
+                                  required
+                                  id="{{ parameter?.display }}"
+                                />
+                                <button
+                                  mat-button
+                                  *ngIf="values[parameter?.uuid]"
+                                  matSuffix
+                                  mat-icon-button
+                                  aria-label="Clear"
+                                  (click)="values[parameter?.uuid] = ''"
+                                >
+                                  <mat-icon>close</mat-icon>
+                                </button>
+                              </mat-form-field>
+                               -->
+                              <div
+                                *ngIf="
+                                  parameter?.answers &&
+                                  parameter?.answers.length === 0
+                                "
+                              >
                                 <span
                                   *ngIf="parameter?.units"
                                   style="margin-right: 10px"
@@ -2193,7 +1919,75 @@
                                   >)
                                 </span>
                               </div>
+                              <div
+                                *ngIf="
+                                  item?.allocationsPairedBySetMember[
+                                    parameter?.uuid
+                                  ]?.uuid === amendUuid
+                                "
+                                class="w-100"
+                              >
+                                <app-form
+                                  [fields]="[amendmentRemarksField]"
+                                  (formUpdate)="onFormUpdate($event, parameter)"
+                                ></app-form>
+                              </div>
+                              <button
+                                *ngIf="
+                                  LISConfigurations?.isLIS &&
+                                  item?.allocationsPairedBySetMember[
+                                    parameter?.uuid
+                                  ]?.uuid == amendUuid
+                                "
+                                [disabled]="
+                                  item?.allocationsPairedBySetMember[
+                                    parameter?.uuid
+                                  ]?.uuid !== amendUuid
+                                "
+                                (click)="
+                                  onSaveParameterValue(
+                                    $event,
+                                    item,
+                                    parameter,
+                                    params?.currentSample,
+                                    item?.allocationsPairedBySetMember[
+                                      parameter?.uuid
+                                    ],
+                                    parameter?.datatype?.display === 'Complex'
+                                      ? 'file'
+                                      : null
+                                  )
+                                "
+                                mat-flat-button
+                                color="primary"
+                                class="ml-2 float-right"
+                              >
+                                <mat-spinner
+                                  *ngIf="
+                                    params?.savingLabResultsState &&
+                                    savingMessage[parameter?.uuid]
+                                  "
+                                  color="primary"
+                                  [diameter]="20"
+                                >
+                                </mat-spinner>
+                                <!-- {{
+                                  item?.allocationsPairedBySetMember[
+                                    parameter?.uuid
+                                  ] &&
+                                  item?.allocationsPairedBySetMember[
+                                    parameter?.uuid
+                                  ]?.results?.length > 0
+                                    ? "Update"
+                                    : "Save"
+                                }} -->
+                                Save
+                              </button>
                             </div>
+                            <mat-progress-bar
+                              mode="indeterminate"
+                              *ngIf="!params?.multipleResultsAttributeType"
+                            ></mat-progress-bar>
                           </mat-tab>
                           <mat-tab label="Audit Trail">
                             <div class="p-3">
@@ -2215,8 +2009,9 @@
                                     >
                                       <ng-container
                                         *ngFor="
-                                          let result of item?.testAllocations[
-                                            count
+                                          let result of item
+                                            ?.allocationsPairedBySetMember[
+                                            parameter?.uuid
                                           ]?.results;
                                           let i = index
                                         "
@@ -2231,7 +2026,39 @@
                                           "
                                         >
                                           <td>
-                                            {{ result?.value }}
+                                            <mat-form-field
+                                              class="w-100"
+                                              *ngIf="
+                                                parameter?.answers &&
+                                                parameter?.answers.length > 0
+                                              "
+                                            >
+                                              <mat-select
+                                                [disabled]="true"
+                                                required
+                                                [value]="result?.value"
+                                                (selectionChange)="
+                                                  setValue($event.value, item)
+                                                "
+                                              >
+                                                <mat-option
+                                                  *ngFor="
+                                                    let option of parameter?.answers
+                                                  "
+                                                  [value]="option.uuid"
+                                                >
+                                                  {{ option.display }}
+                                                </mat-option>
+                                              </mat-select>
+                                            </mat-form-field>
+                                            <div
+                                              *ngIf="
+                                                parameter?.answers &&
+                                                parameter?.answers.length == 0
+                                              "
+                                            >
+                                              {{ result?.value }}
+                                            </div>
                                           </td>
                                           <td>
                                             {{
@@ -2299,7 +2126,8 @@
                         <button
                           [disabled]="
                             (item?.allocationsPairedBySetMember[parameter?.uuid]
-                              ?.firstSignOff && !LISConfigurations?.isLIS) ||
+                              ?.firstSignOff &&
+                              !LISConfigurations?.isLIS) ||
                             item?.allocationsPairedBySetMember[parameter?.uuid]
                               ?.results[
                               item?.allocationsPairedBySetMember[
@@ -2314,17 +2142,15 @@
                           "
                           mat-stroked-button
                           (click)="
-                            rejectResults(
+                            amendResults(
                               $event,
-                              item,
-                              params?.currentSample,
                               item?.allocationsPairedBySetMember[
                                 parameter?.uuid
-                              ]
+                              ]?.uuid
                             )
                           "
                         >
-                          Reject
+                          Amend
                         </button>
                         <button
                           [ngClass]="{
@@ -2335,7 +2161,8 @@
                           }"
                           [disabled]="
                             (item?.allocationsPairedBySetMember[parameter?.uuid]
-                              ?.firstSignOff && !LISConfigurations?.isLIS) ||
+                              ?.firstSignOff &&
+                              !LISConfigurations?.isLIS) ||
                             item?.allocationsPairedBySetMember[parameter?.uuid]
                               ?.results?.length == 0 ||
                             item?.allocationsPairedBySetMember[parameter?.uuid]
@@ -2400,7 +2227,7 @@
                             )
                           "
                         >
-                          Reject
+                          Amend
                         </button>
                         <button
                           [ngClass]="{
@@ -2453,9 +2280,14 @@
                           >
                         </button>
                       </td>
-                      <td *ngIf="LISConfigurations?.isLIS">
+                      <td
+                        *ngIf="LISConfigurations?.isLIS && count == 0"
+                        [attr.rowspan]="
+                          item?.order?.concept?.setMembers?.length
+                        "
+                      >
                         <div class="w-100 d-flex justify-content-end">
-                          <button
+                          <!-- <button
                             [disabled]="
                               item?.allocationsPairedBySetMember[
                                 parameter?.uuid
@@ -2463,18 +2295,17 @@
                             "
                             mat-stroked-button
                             (click)="
-                              rejectResults(
+                              amendResults(
                                 $event,
-                                item,
-                                params?.currentSample,
                                 item?.allocationsPairedBySetMember[
                                   parameter?.uuid
-                                ]
+                                ]?.uuid
                               )
                             "
                           >
-                            Reject
-                          </button>
+                            Amend
+                          </button> -->
+                          <!-- {{item?.testAllocations[0] | json}} -->
                           <button
                             class="ml-2"
                             [ngClass]="{
@@ -2486,14 +2317,13 @@
                             [disabled]="
                               item?.allocationsPairedBySetMember[
                                 parameter?.uuid
-                              ]?.firstSignOff && !LISConfigurations?.isLIS
+                              ]?.firstSignOff
                             "
                             mat-stroked-button
                             (click)="
-                              onSaveSignOffForParameter(
+                              onSaveSignOffForParameters(
                                 $event,
                                 item,
-                                parameter,
                                 'first',
                                 params?.currentSample,
                                 item?.allocationsPairedBySetMember[
@@ -2553,9 +2383,46 @@
           </div>
         </div>
       </mat-tab>
+      <mat-tab
+        label="Update Sample Tests"
+        *ngIf="dialogData?.actionType === 'Entry' && LISConfigurations?.isLIS"
+      >
+        <div class="p-3">
+          <div
+            class="w-100"
+            *ngIf="!params?.providerDetails || !params?.visitDetails"
+          >
+            <mat-spinner
+              style="text-align: center"
+              color="primary"
+            ></mat-spinner>
+          </div>
+          <app-shared-add-testorder-to-sample
+            *ngIf="params?.providerDetails && params?.visitDetails"
+            [provider]="params?.providerDetails"
+            [visit]="params?.visitDetails"
+            [sample]="params?.currentSample"
+            [currentUser]="params?.currentUser"
+          ></app-shared-add-testorder-to-sample>
+        </div>
+      </mat-tab>
     </mat-tab-group>
-    <div class="w-100 d-flex justify-content-end mb-2 mt-2">
-      <button mat-stroked-button (click)="onClose($event)">Close</button>
+    <div class="w-100 mb-2 mt-2">
+      <div class="alert alert-warning" role="alert" *ngIf="saveAllMessage">
+        {{ saveAllMessage }}
+      </div>
+      <div class="d-flex justify-content-end">
+        <button mat-stroked-button (click)="onClose($event)">Close</button>
+        <button
+          class="ml-2"
+          mat-flat-button
+          color="primary"
+          *ngIf="dialogData?.actionType === 'Entry' && selectedIndex === 0"
+          (click)="onSaveAll($event, values, params?.currentSample)"
+        >
+          Save All
+        </button>
+      </div>
     </div>
   </div>
 </div>

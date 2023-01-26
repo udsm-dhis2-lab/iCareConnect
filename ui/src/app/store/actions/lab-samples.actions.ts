@@ -12,6 +12,8 @@ export const loadLabSamplesByCollectionDates = createAction(
     codedSampleRejectionReasons: any;
     hasStatus?: string;
     category?: string;
+    startIndex?: number;
+    limit?: number;
   }>()
 );
 
@@ -37,6 +39,15 @@ export const setLoadedSamples = createAction(
   props<{ labSamples: any[] }>()
 );
 
+export const loadSampleRejectionCodedReasons = createAction(
+  "[Lab samples] load sample rejection coded reaons"
+);
+
+export const addLoadedSampleRejectionCodedReasons = createAction(
+  "[Lab samples] Add loaded sample rejection coded reaons",
+  props<{ reasons: any[] }>()
+);
+
 export const updateLabSample = createAction(
   "[Lab Sample] update sample",
   props<{ sample: any }>()
@@ -60,6 +71,11 @@ export const creatingSampleFails = createAction(
 export const setSampleStatus = createAction(
   "[Sample] set sample status",
   props<{ status: any; details: any }>()
+);
+
+export const setSampleStatuses = createAction(
+  "[Sample] set sample statuses",
+  props<{ statuses: any; details?: any }>()
 );
 
 export const acceptSample = createAction(
@@ -93,7 +109,8 @@ export const saveLabTestResults = createAction(
     comments: any;
     sampleDetails: any;
     concept: any;
-    allocation: any;
+    allocation?: any;
+    isResultAnArray?: boolean;
   }>()
 );
 
@@ -104,6 +121,7 @@ export const saveLabTestResultsStatus = createAction(
     sampleDetails: any;
     concept: any;
     allocation: any;
+    isResultAnArray?: boolean;
   }>()
 );
 
@@ -119,4 +137,19 @@ export const clearLoadedLabSamples = createAction(
 export const addReloadedLabSamples = createAction(
   "[Samples] add new loaded samples",
   props<{ newSamples: any }>()
+);
+
+export const loadSampleByUuid = createAction(
+  "[Samples] Load sample by ID",
+  props<{ uuid: string }>()
+);
+
+export const clearLabSample = createAction(
+  "[Samples] Clear loaded sample by label",
+  props<{ label: string }>()
+);
+
+export const addLoadedSample = createAction(
+  "[Samples] Add loaded sample by ID",
+  props<{ sample: any }>()
 );

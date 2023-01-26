@@ -136,7 +136,8 @@
                         mat-stroked-button
                         [ngClass]="
                           params?.exemptionEncounterType === 'none' ||
-                          params?.exemptionOrderType === 'none' || params?.exemptionConcept === 'none' ||
+                          params?.exemptionOrderType === 'none' ||
+                          params?.exemptionConcept === 'none' ||
                           hasOpenExemptionRequest
                             ? 'button-faint'
                             : 'button'

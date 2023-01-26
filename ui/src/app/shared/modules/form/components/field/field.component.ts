@@ -68,6 +68,8 @@ export class FieldComponent {
         this.field?.filteringItems,
         this.field
       );
+    } else if (this.field?.options?.length > 0) {
+      this.members$ = of(this.field?.options);
     }
     this.fieldUpdate.emit(this.form);
   }
@@ -112,7 +114,12 @@ export class FieldComponent {
   }
 
   get isCommonField(): boolean {
-    return !this.isCheckBoxButton && !this.isDate && !this.isBoolean;
+    return (
+      this.field?.controlType !== "checkbox" &&
+      !this.isDate &&
+      !this.isBoolean &&
+      !this.isCheckBoxButton
+    );
   }
 
   get fieldId(): string {
@@ -131,7 +138,6 @@ export class FieldComponent {
 
   updateFieldOnDemand(objectToUpdate): void {
     this.form.patchValue(objectToUpdate);
-    const theKey = Object.keys(objectToUpdate);
     this.form.setValue({ dob: new Date() });
     this.fieldUpdate.emit(this.form);
   }
@@ -143,8 +149,15 @@ export class FieldComponent {
     return matchedOption ? matchedOption?.value : "";
   }
 
+  get getOptionValueLabel(): any {
+    const matchedOption = (this.field.options.filter(
+      (option) => option?.key === this.value
+    ) || [])[0];
+    return matchedOption ? matchedOption?.label : "";
+  }
+
   searchItem(event: any, field?: any): void {
-    event.stopPropagation();
+    // event.stopPropagation();
     const searchingText = event.target.value;
     const parameters = {
       q: searchingText,
@@ -170,13 +183,26 @@ export class FieldComponent {
     );
   }
 
+  searchItemFromOptions(event, field): void {
+    const searchingText = event.target.value;
+    this.members$ = of(
+      field?.options?.filter(
+        (option) =>
+          option?.label?.toLowerCase()?.indexOf(searchingText?.toLowerCase()) >
+          -1
+      ) || []
+    );
+  }
+
   getSelectedItemFromOption(event: Event, item, field): void {
     event.stopPropagation();
     const value = item?.isDrug
       ? item?.formattedKey
       : item?.uuid
       ? item?.uuid
-      : item?.id;
+      : item?.id
+      ? item?.id
+      : item?.value;
     let objectToUpdate = {};
     objectToUpdate[field?.key] =
       field?.searchControlType === "drugStock"
@@ -192,5 +218,13 @@ export class FieldComponent {
   getStockStatus(option) {
     const optionName = option?.display ? option?.display : option?.name;
     return optionName.includes("Available, Location") ? true : false;
+  }
+
+  displayLabelFunc(value?: any): string {
+    return value
+      ? this.field?.options?.find(
+          (option) => option?.value === (value?.value ? value?.value : value)
+        )?.label
+      : undefined;
   }
 }

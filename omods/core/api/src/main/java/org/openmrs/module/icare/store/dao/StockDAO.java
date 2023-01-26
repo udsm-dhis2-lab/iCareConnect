@@ -54,7 +54,7 @@ public class StockDAO extends BaseDAO<Stock> {
 		String queryStr = "SELECT st \n" + "FROM Stock st \n"
 		        + "WHERE st.item = (SELECT it FROM Item it WHERE it.uuid = :itemUuid) "
 		        + "AND st.location = (SELECT l FROM Location l WHERE l.uuid = :locationUuid)\n"
-		        + "AND st.item.stockable = true ORDER BY st.expiryDate DESC";
+		        + "AND st.item.stockable = true AND st.quantity > 0 ORDER BY st.expiryDate DESC";
 		
 		Query query = session.createQuery(queryStr);
 		query.setParameter("itemUuid", itemUuid);
@@ -200,7 +200,7 @@ public class StockDAO extends BaseDAO<Stock> {
 		} else {
 			queryStr += " AND ";
 		}
-		queryStr += " (d.retired = false OR c.retired = false)";
+		queryStr += " (d.retired = false OR c.retired = false) AND it.voided=false";
 		
 		Query query = session.createQuery(queryStr);
 		query.setFirstResult(startIndex);
@@ -223,7 +223,7 @@ public class StockDAO extends BaseDAO<Stock> {
 		
 		DbSession session = this.getSession();
 		String queryStr = "SELECT item FROM Item item \n"
-		        + "WHERE item.stockable = true AND (item NOT IN(SELECT stock.item FROM Stock stock) OR item IN(SELECT stock.item FROM Stock stock WHERE stock.quantity = 0))";
+		        + "WHERE item.stockable = true AND item.voided=false AND (item NOT IN(SELECT stock.item FROM Stock stock) OR item IN(SELECT stock.item FROM Stock stock WHERE stock.quantity = 0))";
 		
 		Query query = session.createQuery(queryStr);
 		
@@ -237,7 +237,7 @@ public class StockDAO extends BaseDAO<Stock> {
 		//String queryStr = "SELECT item FROM Item item \n"
 		//        + "WHERE item.stockable = true AND item.uuid NOT IN(SELECT stock.item.uuid FROM Stock stock WHERE stock.location.uuid =:locationUuid)";
 		//String queryStr = "SELECT item FROM Item item, Stock stock WHERE item.stockable = true AND stock.item=item AND stock.location.uuid =:locationUuid";
-		String queryStr = "SELECT item FROM Item item LEFT JOIN item.concept c LEFT JOIN item.drug d \n";
+		String queryStr = "SELECT item FROM Item item LEFT JOIN item.concept c WITH c.retired = false LEFT JOIN item.drug d WITH d.retired = false \n";
 		
 		if (q != null) {
 			queryStr += " LEFT JOIN c.names cn";
@@ -249,7 +249,7 @@ public class StockDAO extends BaseDAO<Stock> {
 		} else {
 			queryStr += " AND ";
 		}
-		queryStr += "  item.stockable = true AND (d.retired = false OR c.retired = false) AND (item NOT IN(SELECT stock.item FROM Stock stock WHERE stock.location.uuid =:locationUuid) OR item IN(SELECT stock.item FROM Stock stock WHERE stock.location.uuid =:locationUuid AND stock.quantity = 0))";
+		queryStr += "  item.stockable = true AND item.voided=false AND (item NOT IN(SELECT stock.item FROM Stock stock WHERE stock.location.uuid =:locationUuid) OR item IN(SELECT stock.item FROM Stock stock WHERE stock.location.uuid =:locationUuid AND stock.quantity = 0))";
 		
 		Query query = session.createQuery(queryStr);
 		//		query.setFirstResult(startIndex);
@@ -319,7 +319,7 @@ public class StockDAO extends BaseDAO<Stock> {
 		query for out of stock
 		------------------------
 		------------------------- */
-		metricsMap.put("stockedOut", this.getStockedOutByLocation(locationUuid, "", 0, 0, "").size());
+		metricsMap.put("stockedOut", this.getStockedOutByLocation(locationUuid, null, 0, 0, null).size());
 		
 		/* ------------------------
 		-----------------------

@@ -60,21 +60,15 @@
       </div>
     </div>
   </div>
-  <div style="margin-top: 40px">
+  <div class="d-flex just-content-end mt-4">
+    <button mat-flat-button (click)="onCancel($event)">Cancel</button>
     <button
+      color="primary"
       mat-flat-button
-      class="print-btn float-left"
+      class="ml-2"
       (click)="onPrint($event)"
     >
       Print
-    </button>
-
-    <button
-      mat-flat-button
-      class="print-btn float-right"
-      (click)="onCancel($event)"
-    >
-      Cancel
     </button>
   </div>
 </div>

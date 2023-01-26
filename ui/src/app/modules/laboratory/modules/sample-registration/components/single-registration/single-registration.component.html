@@ -2,7 +2,8 @@
   class="single-registration"
   *ngIf="{
     labSampleLabel: labSampleLabel$ | async,
-    testsUnderSpecimen: testsUnderSpecimen$ | async
+    testsUnderSpecimen: testsUnderSpecimen$ | async,
+    labLocations: labLocations$ | async
   } as params"
 >
   <div class="row" *ngIf="isRegistrationReady">
@@ -55,12 +56,13 @@
           </span>
         </legend>
         <app-person-details
-          *ngIf="!patientFieldSetClosed"
+          *ngIf="!patientFieldSetClosed && allRegistrationFields.personFields"
           [referFromFacilityVisitAttribute]="referFromFacilityVisitAttribute"
+          [allRegistrationFields]="allRegistrationFields"
           [maximumDate]="maximumDate"
           (personDetails)="onGetPersonDetails($event)"
           (fromExternalSystem)="onGetIsDataFromExternalSystem($event)"
-          (selecedSystem)="onGetSelectedSystem($event)"
+          (selectedSystem)="onGetSelectedSystem($event)"
         ></app-person-details>
       </fieldset>
     </div>
@@ -227,7 +229,7 @@
       </mat-stepper> -->
       <!-- ===================================================== Commented Mat Stepper ============================================================================= -->
       <ng-template matStepLabel>Sample Information</ng-template>
-      <div class="row" *ngIf="!fromExternalSystem">
+      <div class="row">
         <div class="col-lg-12 col-md-12 col-sx-12 col-sm-12">
           <div class="for-specimen-details">
             <fieldset>
@@ -259,26 +261,34 @@
                       (formUpdate)="onFormUpdate($event)"
                     ></app-form>
                   </div>
-                  <div class="col-4">
+                  <ng-container *ngIf="sampleColectionDateField">
+                    <div class="col-4">
+                      <app-form
+                        *ngIf="maxForCollectedOn"
+                        [fields]="[sampleColectionDateField]"
+                        (formUpdate)="onFormUpdate($event)"
+                      ></app-form>
+                    </div>
+                    <div class="col-1">
+                      <input
+                        (change)="getSelectedRCollectedOnTime($event)"
+                        [ngClass]="{
+                          'invalid-time-input': !collectedOnTimeValid
+                        }"
+                        class="time-input-field"
+                        placeholder="Collected At"
+                        type="time"
+                      />
+                      <p class="invalid-text" *ngIf="!collectedOnTimeValid">
+                        invalid time
+                      </p>
+                    </div>
+                  </ng-container>
+                  <div class="col-3">
                     <app-form
-                      *ngIf="maxForCollectedOn"
-                      [fields]="[sampleColectionDateField]"
+                      [fields]="[transportCondition]"
                       (formUpdate)="onFormUpdate($event)"
                     ></app-form>
-                  </div>
-                  <div class="col-4">
-                    <input
-                      (change)="getSelectedRCollectedOnTime($event)"
-                      [ngClass]="{
-                        'invalid-time-input': !collectedOnTimeValid
-                      }"
-                      class="time-input-field"
-                      placeholder="Collected At"
-                      type="time"
-                    />
-                    <p class="invalid-text" *ngIf="!collectedOnTimeValid">
-                      invalid time
-                    </p>
                   </div>
                 </div>
                 <div class="row">
@@ -288,25 +298,27 @@
                       (formUpdate)="onFormUpdate($event)"
                     ></app-form>
                   </div>
-                  <div class="col-4">
-                    <app-form
-                      *ngIf="maxForCollectedOn && minForReceivedOn"
-                      [fields]="[broughtOnField]"
-                      (formUpdate)="onFormUpdate($event)"
-                    ></app-form>
-                  </div>
-                  <div class="col-4">
-                    <input
-                      (change)="getSelectedBroughtOnTime($event)"
-                      [ngClass]="{ 'invalid-time-input': !broughtOnTimeValid }"
-                      class="time-input-field"
-                      placeholder="Brought At"
-                      type="time"
-                    />
-                    <p class="invalid-text" *ngIf="!broughtOnTimeValid">
-                      invalid time
-                    </p>
-                  </div>
+                  <ng-container *ngIf="broughtOnField">
+                    <div class="col-4">
+                      <app-form
+                        *ngIf="maxForCollectedOn && minForReceivedOn"
+                        [fields]="[broughtOnField]"
+                        (formUpdate)="onFormUpdate($event)"
+                      ></app-form>
+                    </div>
+                    <div class="col-4">
+                      <input
+                        (change)="getSelectedBroughtOnTime($event)"
+                        [ngClass]="{ 'invalid-time-input': !broughtOnTimeValid }"
+                        class="time-input-field"
+                        placeholder="Brought At"
+                        type="time"
+                      />
+                      <p class="invalid-text" *ngIf="!broughtOnTimeValid">
+                        invalid time
+                      </p>
+                    </div>
+                  </ng-container>
                 </div>
                 <div class="row">
                   <div class="col-4">
@@ -315,24 +327,32 @@
                       (formUpdate)="onFormUpdate($event)"
                     ></app-form>
                   </div>
-                  <div class="col-4">
+                  <ng-container *ngIf="receivedOnField">
+                    <div class="col-4">
+                      <app-form
+                        *ngIf="minForReceivedOn"
+                        [fields]="[receivedOnField]"
+                        (formUpdate)="onFormUpdate($event)"
+                      ></app-form>
+                    </div>
+                    <div class="col-1">
+                      <input
+                        (change)="getSelectedReceivedOnTime($event)"
+                        [ngClass]="{ 'invalid-time-input': !receivedOnTimeValid }"
+                        class="time-input-field"
+                        placeholder="Received At"
+                        type="time"
+                      />
+                      <p class="invalid-text" *ngIf="!receivedOnTimeValid">
+                        invalid time
+                      </p>
+                    </div>
+                  </ng-container>
+                  <div class="col-3">
                     <app-form
-                      *ngIf="minForReceivedOn"
-                      [fields]="[receivedOnField]"
+                      [fields]="[transportationTemperature]"
                       (formUpdate)="onFormUpdate($event)"
                     ></app-form>
-                  </div>
-                  <div class="col-4">
-                    <input
-                      (change)="getSelectedReceivedOnTime($event)"
-                      [ngClass]="{ 'invalid-time-input': !receivedOnTimeValid }"
-                      class="time-input-field"
-                      placeholder="Received At"
-                      type="time"
-                    />
-                    <p class="invalid-text" *ngIf="!receivedOnTimeValid">
-                      invalid time
-                    </p>
                   </div>
                 </div>
               </ng-container>
@@ -354,8 +374,9 @@
                 <mat-icon *ngIf="clinicalData">keyboard_arrow_up</mat-icon>
               </span>
             </legend>
-            <ng-container *ngIf="clinicalData">
+            <ng-container *ngIf="allRegistrationFields.clinicalFormFields">
               <app-clinical-data
+                [clinicalFields]="allRegistrationFields.clinicalFormFields"
                 (clinicalDataValues)="onGetClinicalDataValues($event)"
               ></app-clinical-data>
             </ng-container>
@@ -472,7 +493,7 @@
           !collectedOnTimeValid
         "
         color="primary"
-        (click)="onSave($event, true)"
+        (click)="onSave($event, true, params?.labLocations)"
       >
         Save to Reject
       </button>
@@ -486,7 +507,7 @@
           !collectedOnTimeValid
         "
         class="ml-2"
-        (click)="onSave($event)"
+        (click)="onSave($event, false,  params?.labLocations)"
       >
         Save & Continue
       </button>

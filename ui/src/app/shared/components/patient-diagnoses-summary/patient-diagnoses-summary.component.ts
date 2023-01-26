@@ -16,6 +16,8 @@ import { saveDiagnosis } from "src/app/store/actions/diagnosis.actions";
 import { MatDialog } from "@angular/material/dialog";
 import { AddDiagnosisModalComponent } from "../add-diagnosis-modal/add-diagnosis-modal.component";
 import { DeleteDiagnosisModalComponent } from "../delete-diagnosis-modal/delete-diagnosis-modal.component";
+import { getAllDiagnosesFromVisitDetails } from "../../helpers/patient.helper";
+import { VisitObject } from "../../resources/visits/models/visit-object.model";
 
 @Component({
   selector: "app-patient-diagnoses-summary",
@@ -25,11 +27,12 @@ import { DeleteDiagnosisModalComponent } from "../delete-diagnosis-modal/delete-
 export class PatientDiagnosesSummaryComponent implements OnInit {
   diagnoses$: Observable<DiagnosisObject[]>;
   loadingVisit$: Observable<boolean>;
-  @Input() patientVisit: Visit;
+  @Input() patientVisit: VisitObject;
   @Input() isConfirmedDiagnosis: boolean;
   @Input() forConsultation: boolean;
   @Input() isInpatient: boolean;
   @Input() diagnosisFormDetails: any;
+  @Input() forHistory: boolean;
   diagnosisForm: any;
   diagnosisField: any;
   diagnosisRankField: any;
@@ -37,6 +40,7 @@ export class PatientDiagnosesSummaryComponent implements OnInit {
   diagnosesData: any = {};
   savingDiagnosisState$: Observable<boolean>;
   @Output() updateConsultationOrder = new EventEmitter();
+  @Output() updateMedicationComponent = new EventEmitter();
   constructor(private store: Store<AppState>, private dialog: MatDialog) {}
 
   ngOnInit(): void {
@@ -49,7 +53,9 @@ export class PatientDiagnosesSummaryComponent implements OnInit {
         (field) => field?.key === "rank"
       ) || [])[0];
     }
-    this.diagnoses$ = this.store.select(getAllDiagnoses);
+    this.diagnoses$ = !this.forHistory
+      ? this.store.select(getAllDiagnoses)
+      : of(getAllDiagnosesFromVisitDetails(this.patientVisit));
     this.loadingVisit$ = this.store.pipe(select(getVisitLoadingState));
   }
 
@@ -64,10 +70,13 @@ export class PatientDiagnosesSummaryComponent implements OnInit {
     map(Object.keys(this.formValuesData), (key) => {
       if (this.formValuesData[key]) {
         if (key === "diagnosis") {
-          this.diagnosesData[key] = {
-            coded: this.formValuesData[key].value,
-            nonCoded: null,
-            specificName: null,
+          this.diagnosesData = {
+            ...this.diagnosesData,
+            [key]: {
+              coded: this.formValuesData[key].value,
+              nonCoded: null,
+              specificName: null,
+            },
           };
         } else {
           const options = this.formValuesData[key]?.options || [];
@@ -105,6 +114,7 @@ export class PatientDiagnosesSummaryComponent implements OnInit {
         currentDiagnosisUuid: null,
       })
     );
+    this.updateMedicationComponent.emit();
     this.updateConsultationOrder.emit();
   }
 
@@ -119,28 +129,38 @@ export class PatientDiagnosesSummaryComponent implements OnInit {
       ? diagnosisData?.diagnosisDetails?.uuid
       : diagnosisData?.uuid;
     // e.stopPropagation();
-    this.dialog.open(AddDiagnosisModalComponent, {
-      width: "75%",
-      data: {
-        patient: this.patientVisit?.patientUuid,
-        diagnosisForm: this.diagnosisForm,
-        visit: null,
-        edit: true,
-        currentDiagnosisUuid: currentDiagnosisUuid,
-      },
-    });
+    this.dialog
+      .open(AddDiagnosisModalComponent, {
+        width: "75%",
+        data: {
+          patient: this.patientVisit?.patientUuid,
+          diagnosisForm: this.diagnosisForm,
+          visit: null,
+          edit: true,
+          currentDiagnosisUuid: currentDiagnosisUuid,
+        },
+      })
+      .afterClosed()
+      .subscribe(() => {
+        this.updateMedicationComponent.emit();
+      });
   }
 
   onDelete(e: Event, diagnosisData) {
     // e.stopPropagation();
-    this.dialog.open(DeleteDiagnosisModalComponent, {
-      width: "25%",
-      data: {
-        patient: this.patientVisit?.patientUuid,
-        diagnosis: diagnosisData?.diagnosisDetails
-          ? diagnosisData?.diagnosisDetails
-          : diagnosisData,
-      },
-    });
+    this.dialog
+      .open(DeleteDiagnosisModalComponent, {
+        width: "25%",
+        data: {
+          patient: this.patientVisit?.patientUuid,
+          diagnosis: diagnosisData?.diagnosisDetails
+            ? diagnosisData?.diagnosisDetails
+            : diagnosisData,
+        },
+      })
+      .afterClosed()
+      .subscribe(() => {
+        this.updateMedicationComponent.emit();
+      });
   }
 }

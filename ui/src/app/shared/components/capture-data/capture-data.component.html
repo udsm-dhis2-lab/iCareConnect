@@ -22,14 +22,19 @@
         <div *ngIf="forms && forms?.length > 0" class="form-area">
           <div class="h5 mb-3">{{ currentCustomForm?.name }}</div>
           <app-capture-form-data
+            *ngIf="currentCustomForm"
             [form]="currentCustomForm"
             [visit]="visit"
             [observations]="observations"
             (formDataUpdate)="onFormUpdate($event)"
           ></app-capture-form-data>
           <div class="d-flex justify-content-end">
-            <button class="mr-2" mat-stroked-button [routerLink]="['/nursing']">
-              Cancel
+            <button
+              class="mr-2"
+              (click)="onClear($event, currentCustomForm)"
+              mat-stroked-button
+            >
+              Clear
             </button>
             <button
               [disabled]="!isFormValid"

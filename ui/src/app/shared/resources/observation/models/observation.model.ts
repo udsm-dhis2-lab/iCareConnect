@@ -47,8 +47,8 @@ export class Observation {
 
   get value(): string | number {
     return this.obs?.value?.hasOwnProperty("uuid")
-    ? this.obs?.value?.uuid
-    : this.obs?.value;
+      ? this.obs?.value?.uuid
+      : this.obs?.value;
   }
 
   get valueObject(): any {
@@ -62,6 +62,29 @@ export class Observation {
     return this.obs.status;
   }
 
+  get obsTime(): number {
+    return new Date(this.obs.obsDatetime).getHours();
+  }
+
+  get obsDate(): any {
+    const obsDateTime = new Date(this.obs.obsDatetime);
+    return new Date(
+      obsDateTime.getFullYear() +
+        "-" +
+        obsDateTime.getMonth() +
+        "-" +
+        obsDateTime.getDate()
+    );
+  }
+
+  get conceptUuid(): string {
+    return this.obs?.concept?.uuid;
+  }
+
+  get provider(): any {
+    return this.obs?.encounterProvider;
+  }
+
   toJson(): ObservationObject {
     return {
       id: this.uuid,
@@ -73,10 +96,14 @@ export class Observation {
       valueCodedName: this.valueCodedName,
       location: this.location,
       encounterUuid: this.encounterUuid,
+      obsDate: this.obsDate,
+      obsTime: this.obsTime,
       voided: this.voided,
       value: this.value,
       valueObject: this.valueObject,
       status: this.status,
+      conceptUuid: this.conceptUuid,
+      provider: this.provider,
     };
   }
 }

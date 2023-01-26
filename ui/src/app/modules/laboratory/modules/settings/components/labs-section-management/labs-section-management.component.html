@@ -15,9 +15,22 @@
         </div>
       </ng-template>
     </mat-tab>
-    <mat-tab label="Laboratories">
+    <mat-tab label="Laboratories Management">
       <ng-template matTabContent>
-        <div class="p-3"></div>
+        <div class="p-3">
+          <div>
+            <app-shared-location-settings-home
+              [key]="'icare.location.types'"
+            ></app-shared-location-settings-home>
+          </div>
+        </div>
+      </ng-template>
+    </mat-tab>
+    <mat-tab label="Lab Equipments/Instruments">
+      <ng-template matTabContent>
+        <div class="p-3">
+          <app-shared-instruments-management></app-shared-instruments-management>
+        </div>
       </ng-template>
     </mat-tab>
   </mat-tab-group>

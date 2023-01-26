@@ -58,6 +58,13 @@ export const getStoreLocations = createSelector(
   }
 );
 
+export const getLocationsByIds = (ids: string[]) =>
+  createSelector(getLocations, (locations) => {
+    return (
+      locations?.filter((location) => _.indexOf(ids, location?.id) > -1) || []
+    );
+  });
+
 export const getModuleLocations = createSelector(
   getLocations,
   (locations: Location[]) => {
@@ -86,7 +93,7 @@ export const getParentLocation = createSelector(
       (location) =>
         (
           location?.tags?.filter(
-            (tag) => tag?.display?.toLowerCase() === "login location"
+            (tag) => tag?.display?.toLowerCase() === "main location"
           ) || []
         ).length > 0
     ) || [])[0];

@@ -27,6 +27,7 @@ import { BarCodeModalComponent } from "../../modules/sample-acceptance-and-resul
 import { formatDateToYYMMDD } from "src/app/shared/helpers/format-date.helper";
 import { MatDialog } from "@angular/material/dialog";
 import { LabOrdersService } from "../../resources/services/lab-orders.service";
+import { OrdersService } from "src/app/shared/resources/order/services/orders.service";
 
 @Component({
   selector: "app-samples-to-collect",
@@ -64,7 +65,8 @@ export class SamplesToCollectComponent implements OnInit, OnChanges {
     private store: Store<AppState>,
     private sampleService: SamplesService,
     private dialog: MatDialog,
-    private labOrdersService: LabOrdersService
+    private labOrdersService: LabOrdersService,
+    private ordersService: OrdersService
   ) {}
 
   ngOnInit(): void {}
@@ -200,6 +202,22 @@ export class SamplesToCollectComponent implements OnInit, OnChanges {
 
   generateSampleId(e, sample, count, patient) {
     e.stopPropagation();
+    //52a447d3-a64a-11e3-9aeb-50e549534c5e Laboratory Order Type Uuid
+    const orders = sample?.orders?.map((order) => {
+      return {
+        uuid: order.uuid,
+        fulfillerStatus: "RECEIVED",
+        encounter: order?.encounterUuid,
+      };
+    })
+    this.ordersService.updateOrdersViaEncounter(orders).subscribe({
+      next: (order) => {
+        return order;
+      },
+      error: (error) => {
+        return error;
+      },
+    });
     this.sampleService.getSampleLabel().subscribe((label) => {
       if (label) {
         const labelSection =

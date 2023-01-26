@@ -107,7 +107,6 @@ export class GeneralDispensingFormComponent implements OnInit {
       this.useSpecificDrugPrescription !== "none" &&
       this.specificDrugConceptUuid
     ) {
-      // console.log("==> Drug: ", this.useSpecificDrugPrescription, "==> Balaa");
       const drugs = await this.drugOrderService.getAllDrugs("full");
       this.drugConceptField = new Dropdown({
         options: drugs,
@@ -275,43 +274,44 @@ export class GeneralDispensingFormComponent implements OnInit {
     this.ordersService
       .createOrdersViaCreatingEncounter(encounterObject)
       .subscribe((response) => {
-          if (response?.uuid) {
-            let data = {
-              encounterUuid: response?.uuid,
-              obs: [
-                ...(obs.filter((observation) => {
-                  if (observation.value && observation.value.length > 0) {
-                    return observation;
+        if (response?.uuid) {
+          let data = {
+            encounterUuid: response?.uuid,
+            obs: [
+              ...(obs.filter((observation) => {
+                if (observation.value && observation.value.length > 0) {
+                  return observation;
+                }
+              }) || []),
+              this.strengthConceptUuid && !this.specificDrugConceptUuid
+                ? {
+                    person: this.currentPatient?.id,
+                    concept: this.strengthConceptUuid,
+                    obsDatetime: new Date(),
+                    value: this.formValues[this.strengthConceptUuid]?.value,
+                    order: (response?.orders || [])[0]?.uuid
                   }
-                }) || []),
-                this.strengthConceptUuid && !this.specificDrugConceptUuid
-                  ? {
-                      person: this.currentPatient?.id,
-                      concept: this.strengthConceptUuid,
-                      obsDatetime: new Date(),
-                      value: this.formValues[this.strengthConceptUuid]?.value,
-                    }
-                  : null,
-              ]?.filter((observation) => observation),
-            };
-            this.observationService
-              .saveObservationsViaEncounter(data)
-              .subscribe((res) => {
-                if (res?.error) {
-                  this.errors = [...this.errors, response?.error];
-                }
-                
-                if (res) {
-                  this.orderSaved.emit(true);
-                }
-                this.savingOrder = false;
-              });
-            }
-          if (response?.error) {
-            this.errors = [...this.errors, response?.error];
-          }
-          this.savingOrder = false;
-        });
+                : null,
+            ]?.filter((observation) => observation),
+          };
+          this.observationService
+            .saveObservationsViaEncounter(data)
+            .subscribe((res) => {
+              if (res?.error) {
+                this.errors = [...this.errors, response?.error];
+              }
+
+              if (res) {
+                this.orderSaved.emit(true);
+              }
+              this.savingOrder = false;
+            });
+        }
+        if (response?.error) {
+          this.errors = [...this.errors, response?.error];
+        }
+        this.savingOrder = false;
+      });
 
     this.updateConsultationOrder.emit();
   }

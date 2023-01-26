@@ -97,12 +97,12 @@ export class NursingDataComponent implements OnInit {
     this.orderTypes$ = this.store.select(getAllOrderTypes);
     this.privileges$ = this.store.select(getCurrentUserPrivileges);
     this.conceptsWithDepartmentsDetails$ =
-      this.conceptsService.getConceptsDepartmentDetails(
+      this.conceptsService.getDepartmentDetails(
         this.nursingConfigurations?.departmentsReference?.id
       );
-    this.forms$ = this.store.select(getCustomOpenMRSFormsByIds, {
-      formUUids: this.locationFormsIds,
-    });
+    this.forms$ = this.store.select(
+      getCustomOpenMRSFormsByIds(this.locationFormsIds)
+    );
     this.provider$ = this.store.select(getProviderDetails);
     this.visit$ = this.store.select(getActiveVisit);
     this.currentLocation$ = this.store.pipe(select(getCurrentLocation));

@@ -22,12 +22,6 @@
       datesParameters
     "
   >
-    <div class="col-12">
-      <div class="sample-dashboard-summary">
-        <app-samples-summary-dashboard></app-samples-summary-dashboard>
-      </div>
-    </div>
-
     <div style="margin-top: 15px" class="col-12">
       <div>
         <app-sample-acceptance
@@ -36,6 +30,8 @@
           [datesParameters]="datesParameters"
           [LISConfigurations]="LISConfigurations"
           [patients]="patients"
+          [page]="page"
+          [pageCount]="pageCount"
           [sampleTypes]="sampleTypes"
           [labSamplesDepartments]="labSamplesDepartments"
           [labSamplesContainers]="labSamplesContainers"
