@@ -113,6 +113,7 @@ export class SampleAcceptanceComponent implements OnInit {
         codedSampleRejectionReasons: this.codedSampleRejectionReasons,
       })
     );
+    this.getSamples();
   }
 
   onToggleViewSampleDetails(event: Event, sample: any): void {
