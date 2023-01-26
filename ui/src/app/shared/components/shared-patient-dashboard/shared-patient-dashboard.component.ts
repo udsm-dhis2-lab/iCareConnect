@@ -152,6 +152,13 @@ export class SharedPatientDashboardComponent implements OnInit {
   currentRound: any;
   latestRound$: Observable<any>;
   updateMedication: boolean = true;
+  componentsInInvestigations: string[] = [
+
+    'Procedures',
+    'Radiology orders',
+    'Laboratory',
+    
+  ]
 
   constructor(
     private store: Store<AppState>,

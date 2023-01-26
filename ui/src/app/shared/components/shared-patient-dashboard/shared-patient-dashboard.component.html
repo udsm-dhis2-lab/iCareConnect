@@ -568,57 +568,8 @@
                     </div>
                   </mat-expansion-panel>
                 </mat-accordion>
-                <mat-accordion>
-                  <mat-expansion-panel
-                    *ngIf="
-                      userPrivileges['CLINIC_ADD_LABORATORY_INVESTIGATION'] ||
-                      userPrivileges['CLINIC_ADD_RADIOLOGY_INVESTIGATION'] ||
-                      userPrivileges['CLINIC_ADD_PROCEDURE_ORDER']
-                    "
-                    class="mb-2 border p-0"
-                    [expanded]="!isTheatre ? false : true"
-                  >
-                    <mat-expansion-panel-header>
-                      <mat-panel-title
-                        >Investigation / Procedures
-                      </mat-panel-title>
-                    </mat-expansion-panel-header>
-                    <app-patient-investigations-and-procedures
-                      *ngIf="
-                        activeVisit &&
-                        dashboardParams?.formEntities['All orderables']
-                      "
-                      [observations]="
-                        dashboardParams?.observationsGroupedByConcept
-                      "
-                      [investigationAndProceduresFormsDetails]="
-                        dashboardParams?.formEntities['All orderables']
-                      "
-                      [patientVisit]="activeVisit"
-                      [isTheatre]="isTheatre"
-                      [forConsultation]="true"
-                      [provider]="dashboardParams?.provider"
-                      [orderTypes]="dashboardParams?.orderTypes"
-                      [iCareGeneralConfigurations]="iCareGeneralConfigurations"
-                      [clinicConfigurations]="clinicConfigurations"
-                      [userPrivileges]="userPrivileges"
-                      [fromConsultation]="true"
-                      [isInpatient]="isInpatient"
-                      (updateConsultationOrder)="onUpdateConsultationOrder()"
-                    ></app-patient-investigations-and-procedures>
 
-                    <mat-progress-bar
-                      *ngIf="
-                        dashboardParams?.loadingVisit ||
-                        !activeVisit ||
-                        !dashboardParams?.formEntities['All orderables'] ||
-                        !dashboardParams?.provider ||
-                        !dashboardParams?.orderTypes
-                      "
-                      mode="indeterminate"
-                    ></mat-progress-bar>
-                  </mat-expansion-panel>
-                </mat-accordion>
+              
 
                 <mat-accordion
                   *ngIf="userPrivileges['CLINIC_ADD_CONFIRMED_DIAGNOSIS']"
@@ -676,6 +627,135 @@
                       (updateMedicationComponent)="onUpdateMedicationComponent()"
                     ></app-patient-medication-summary>
                   </mat-expansion-panel>
+
+
+
+                 <!-- INVESTIGATION/PROCEDURES -->
+
+                 <!-- split sections if component list exist -->
+                
+                <ng-container *ngIf="componentsInInvestigations?.length">
+                  <ng-container *ngFor="let componentToShow of componentsInInvestigations">
+                    <mat-accordion>
+                      <mat-expansion-panel
+                        *ngIf="
+                          userPrivileges['CLINIC_ADD_LABORATORY_INVESTIGATION'] ||
+                          userPrivileges['CLINIC_ADD_RADIOLOGY_INVESTIGATION'] ||
+                          userPrivileges['CLINIC_ADD_PROCEDURE_ORDER']
+                        "
+                        class="mb-2 border p-0"
+                        [expanded]="!isTheatre ? false : true"
+                      >
+                        <mat-expansion-panel-header>
+                          <mat-panel-title
+                            > {{ componentToShow }} 
+                          </mat-panel-title>
+                        </mat-expansion-panel-header>
+    
+                          <app-patient-investigations-and-procedures
+                            *ngIf="
+                              activeVisit &&
+                              dashboardParams?.formEntities['All orderables']
+                            "
+                            [observations]="
+                              dashboardParams?.observationsGroupedByConcept
+                            "
+                            [investigationAndProceduresFormsDetails]="
+                              dashboardParams?.formEntities['All orderables']
+                            "
+                            [patientVisit]="activeVisit"
+                            [isTheatre]="isTheatre"
+                            [forConsultation]="true"
+                            [provider]="dashboardParams?.provider"
+                            [orderTypes]="dashboardParams?.orderTypes"
+                            [iCareGeneralConfigurations]="iCareGeneralConfigurations"
+                            [clinicConfigurations]="clinicConfigurations"
+                            [userPrivileges]="userPrivileges"
+                            [fromConsultation]="true"
+                            [componentToShow]="componentToShow"
+                            [isInpatient]="isInpatient"
+                            (updateConsultationOrder)="onUpdateConsultationOrder()"
+                          ></app-patient-investigations-and-procedures>
+    
+                        <mat-progress-bar
+                          *ngIf="
+                            dashboardParams?.loadingVisit ||
+                            !activeVisit ||
+                            !dashboardParams?.formEntities['All orderables'] ||
+                            !dashboardParams?.provider ||
+                            !dashboardParams?.orderTypes
+                          "
+                          mode="indeterminate"
+                        ></mat-progress-bar>
+                      </mat-expansion-panel>
+                    </mat-accordion>
+                  </ng-container>
+                </ng-container>
+
+
+
+                <!-- display all sections if component list does not exist -->
+
+                <ng-container *ngIf="!componentsInInvestigations?.length">
+                  <mat-accordion>
+                    <mat-expansion-panel
+                      *ngIf="
+                        userPrivileges['CLINIC_ADD_LABORATORY_INVESTIGATION'] ||
+                        userPrivileges['CLINIC_ADD_RADIOLOGY_INVESTIGATION'] ||
+                        userPrivileges['CLINIC_ADD_PROCEDURE_ORDER']
+                      "
+                      class="mb-2 border p-0"
+                      [expanded]="!isTheatre ? false : true"
+                    >
+                      <mat-expansion-panel-header>
+                        <mat-panel-title
+                          >Investigation / Procedures
+                        </mat-panel-title>
+                      </mat-expansion-panel-header>
+  
+                        <app-patient-investigations-and-procedures
+                          *ngIf="
+                            activeVisit &&
+                            dashboardParams?.formEntities['All orderables']
+                          "
+                          [observations]="
+                            dashboardParams?.observationsGroupedByConcept
+                          "
+                          [investigationAndProceduresFormsDetails]="
+                            dashboardParams?.formEntities['All orderables']
+                          "
+                          [patientVisit]="activeVisit"
+                          [isTheatre]="isTheatre"
+                          [forConsultation]="true"
+                          [provider]="dashboardParams?.provider"
+                          [orderTypes]="dashboardParams?.orderTypes"
+                          [iCareGeneralConfigurations]="iCareGeneralConfigurations"
+                          [clinicConfigurations]="clinicConfigurations"
+                          [userPrivileges]="userPrivileges"
+                          [fromConsultation]="true"
+                          [isInpatient]="isInpatient"
+                          (updateConsultationOrder)="onUpdateConsultationOrder()"
+                        ></app-patient-investigations-and-procedures>
+  
+                      <mat-progress-bar
+                        *ngIf="
+                          dashboardParams?.loadingVisit ||
+                          !activeVisit ||
+                          !dashboardParams?.formEntities['All orderables'] ||
+                          !dashboardParams?.provider ||
+                          !dashboardParams?.orderTypes
+                        "
+                        mode="indeterminate"
+                      ></mat-progress-bar>
+                    </mat-expansion-panel>
+                  </mat-accordion>
+                </ng-container>
+
+
+              <!-- INVESTIGATION/PROCEDURES END-->
+
+              
+
                 </mat-accordion>
               </div>
             </div>

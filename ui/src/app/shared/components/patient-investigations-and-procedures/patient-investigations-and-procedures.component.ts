@@ -20,6 +20,7 @@ export class PatientInvestigationsAndProceduresComponent implements OnInit {
   @Input() fromConsultation: boolean;
   @Input() isInpatient: boolean;
   @Input() isTheatre: boolean;
+  @Input() componentToShow: string;
   selectedTab = new FormControl(0);
 
   shouldShowLabSection: boolean = false;
