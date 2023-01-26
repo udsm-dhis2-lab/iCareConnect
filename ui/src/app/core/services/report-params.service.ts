@@ -8,7 +8,7 @@ import {
 } from "src/app/shared/services/notification.service";
 import { getSanitizedReportGroup } from "../helpers/get-sanitized-report-group.helper";
 
-@Injectable()
+@Injectable({ providedIn: "root" })
 export class ReportParamsService {
   constructor(
     private httpClient: OpenmrsHttpClientService,
@@ -19,11 +19,12 @@ export class ReportParamsService {
     this.notificationService.show(
       new Notification({ message: "Loading report groups", type: "LOADING" })
     );
+    // TODO: Improve to ensure more than 100 reports are returned
 
     return zip(
       this.httpClient
         .get(
-          "reportingrest/dataSetDefinition?v=custom:(uuid,name,description,parameters)"
+          "reportingrest/dataSetDefinition?v=custom:(uuid,name,description,parameters)&limit=100"
         )
         .pipe(
           map((dataSetResponse) => {

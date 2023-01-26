@@ -1,7 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import { Observable } from "rxjs";
-import { map } from "rxjs/operators";
-import { WorkSeetsService } from "src/app/modules/laboratory/resources/services/worksheets.service";
+import { WorkSheetsService } from "src/app/modules/laboratory/resources/services/worksheets.service";
 import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
 import { TextArea } from "src/app/shared/modules/form/models/text-area.model";
@@ -19,7 +18,7 @@ export class WorksheetControlsComponent implements OnInit {
   worksheetControlPayload: any;
   saving: boolean = false;
   errors: any[] = [];
-  constructor(private worksheetsService: WorkSeetsService) {}
+  constructor(private worksheetsService: WorkSheetsService) {}
 
   ngOnInit(): void {
     this.createWorksheetControlsFields();

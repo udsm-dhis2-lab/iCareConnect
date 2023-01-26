@@ -5,7 +5,9 @@ import org.openmrs.BaseOpenmrsData;
 
 import javax.persistence.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static javax.persistence.GenerationType.IDENTITY;
@@ -26,11 +28,11 @@ public class WorksheetSample extends BaseOpenmrsData implements java.io.Serializ
 	@JoinColumn(name = "worksheet_definition_id")
 	private WorksheetDefinition worksheetDefinition;
 	
-	@Column(name = "row", columnDefinition = "TINYINT")
+	@Column(name = "rows", columnDefinition = "TINYINT")
 	@Type(type = "org.hibernate.type.IntegerType")
 	private Integer row;
 	
-	@Column(name = "column", columnDefinition = "TINYINT")
+	@Column(name = "columns", columnDefinition = "TINYINT")
 	@Type(type = "org.hibernate.type.IntegerType")
 	private Integer column;
 	
@@ -154,6 +156,17 @@ public class WorksheetSample extends BaseOpenmrsData implements java.io.Serializ
 			Map<String, Object> sampleObject = new HashMap<>();
 			sampleObject.put("uuid", this.getSample().getUuid());
 			sampleObject.put("display", this.getSample().getLabel());
+			List<Map<String, Object>> allocations = new ArrayList<>();
+			if (this.getSample().getSampleOrders().size() > 0) {
+				for (SampleOrder order: sample.getSampleOrders()) {
+					if (order.getTestAllocations().size() > 0) {
+						for (TestAllocation allocation: order.getTestAllocations()) {
+							allocations.add(allocation.toMap());
+						}
+					}
+				}
+			}
+			sampleObject.put("allocations", allocations);
 			worksheetSampleObject.put("sample", sampleObject);
 		}
 

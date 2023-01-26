@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -55,6 +56,17 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		MockHttpServletResponse handle = handle(newGetRequest);
 		String label = handle.getContentAsString();
 		System.out.println(label);
+	}
+	
+	@Test
+	public void testGenerateLaboratoryIdLabels() throws Exception {
+		MockHttpServletRequest newGetRequest = newGetRequest("lab/labidgen", new Parameter("globalProperty",
+		        "iCARE110-TEST-OSDH-9beb-d30dcfc0c631"), new Parameter("metadataType", "sample"),
+		    new Parameter("count", "3"));
+		MockHttpServletResponse getReqHandle = handle(newGetRequest);
+		List<String> labels = (new ObjectMapper()).readValue(getReqHandle.getContentAsString(), List.class);
+		System.out.println(labels);
+		assertThat("IDS generated equals to 3", labels.size(), is(3));
 	}
 	
 	@Test
@@ -294,7 +306,7 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 	public void testGettingSamples() throws Exception {
 		
 		MockHttpServletRequest newGetRequest = newGetRequest("lab/samples", new Parameter("page", "2"), new Parameter(
-		        "pageSize", "2"));
+		        "pageSize", "2"), new Parameter("hasStatus", "NO"));
 		
 		//System.out.println(Context.getVisitService().getVisitByUuid("d9c1d8ac-2b8e-427f-804d-b858c52e6f11").getLocation().getUuid());
 		MockHttpServletResponse handleGet = handle(newGetRequest);
@@ -638,7 +650,33 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 	}
 	
 	@Test
-	public void CreatingAndGettingBatchSets() throws Exception {
+	public void testCreatingAndGettingBatchSamples() throws Exception {
+		//1. Creating batchSamples
+		//Given
+		String dto = this.readFile("dto/batch-sample-create-dto.json");
+		List<Map<String, Object>> batchSampleObject = (new ObjectMapper()).readValue(dto, List.class);
+		
+		//When
+		MockHttpServletRequest newPostRequest = newPostRequest("lab/batchsamples", batchSampleObject);
+		MockHttpServletResponse handle = handle(newPostRequest);
+		List<Map<String, Object>> createdBatchSamples = (new ObjectMapper()).readValue(handle.getContentAsString(),
+		    List.class);
+		
+		assertThat("created 2 batch samples", createdBatchSamples.size(), is(2));
+		
+		//2. Getting batchSamples
+		//when
+		MockHttpServletRequest newGetRequest = newGetRequest("lab/batchsamples", new Parameter("startDate", "2022-12-10"),
+		    new Parameter("endDate", "2022-12-10"), new Parameter("q", "BS01"));
+		
+		MockHttpServletResponse handle2 = handle(newGetRequest);
+		List<Map<String, Object>> batchsamples = (new ObjectMapper()).readValue(handle2.getContentAsString(), List.class);
+		System.out.println(batchsamples);
+		assertThat("Has 1 batch sample", batchsamples.size(), is(1));
+	}
+	
+	@Test
+	public void testCreatingAndGettingBatchSets() throws Exception {
 		
 		//1. Creating batchSets
 		//Given
@@ -665,7 +703,7 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 	}
 	
 	@Test
-	public void creatingBatchStatusAndBatchSetStatus() throws Exception {
+	public void testCreatingBatchStatusAndBatchSetStatus() throws Exception {
 		
 		//1.Creating BatchSetStatus
 		//Given
@@ -691,7 +729,7 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 	}
 	
 	@Test
-	public void CreatingAndGettingWorksheets() throws Exception {
+	public void testCreatingAndGettingWorksheets() throws Exception {
 		
 		//1. Creating worksheets
 		//Given
@@ -719,7 +757,7 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 	}
 	
 	@Test
-	public void CreatingAndGettingWorksheetControls() throws Exception {
+	public void testCreatingAndGettingWorksheetControls() throws Exception {
 		
 		//1. Creating worksheetControls
 		//Given
@@ -748,7 +786,7 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 	}
 	
 	@Test
-	public void CreatingAndGettingWorksheetDefinitions() throws Exception {
+	public void testCreatingAndGettingWorksheetDefinitions() throws Exception {
 		
 		//1. Creating worksheet definitions
 		//Given
@@ -760,24 +798,48 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		MockHttpServletResponse handle = handle(newPostRequest);
 		List<Map<String, Object>> createdWorksheetDefinitions = (new ObjectMapper()).readValue(handle.getContentAsString(),
 		    List.class);
-		
 		assertThat("created 2 worksheets definitions", createdWorksheetDefinitions.size(), is(2));
 		
 		//2. Getting worksheet definitions
 		//When
 		MockHttpServletRequest newGetRequest = newGetRequest("lab/worksheetdefinitions", new Parameter("startDate",
-		        "2022-12-10"), new Parameter("endDate", "2022-12-11"), new Parameter("q", "WD"));
+		        "2022-12-10"), new Parameter("endDate", "2022-12-11"), new Parameter("q", "WD"), new Parameter("expirationDate", "2023-01-18 00:12:22"));
 		MockHttpServletResponse handle2 = handle(newGetRequest);
 		
 		List<Map<String, Object>> worksheetdefinitions = (new ObjectMapper()).readValue(handle2.getContentAsString(),
 		    List.class);
+		System.out.println(worksheetdefinitions);
 		
 		assertThat("Has 1 worksheet definition", worksheetdefinitions.size(), is(1));
-		
 	}
 	
 	@Test
-	public void CreatingAndGettingWorksheetSamples() throws Exception {
+	public void TestGettingWorksheetDefinitionByUuid() throws Exception {
+		
+		//1. Creating worksheet definitions
+		//Given
+		String dto = this.readFile("dto/worksheet-definition-create-dto.json");
+		List<Map<String, Object>> worksheetDefinitionObject = (new ObjectMapper()).readValue(dto, List.class);
+		//When
+		MockHttpServletRequest newPostRequest = newPostRequest("lab/worksheetdefinitions", worksheetDefinitionObject);
+		MockHttpServletResponse handle = handle(newPostRequest);
+		List<Map<String, Object>> createdWorksheetDefinitions = (new ObjectMapper()).readValue(handle.getContentAsString(),
+		    List.class);
+		
+		assertThat("created 2 worksheets definitions", createdWorksheetDefinitions.size(), is(2));
+		String uuid = ((Map<String, Object>) createdWorksheetDefinitions.get(0)).get("uuid").toString();
+		
+		//2. Getting worksheet definitions
+		//When
+		MockHttpServletRequest newGetRequest = newGetRequest("lab/worksheetdefinition", new Parameter("uuid", uuid));
+		MockHttpServletResponse handle2 = handle(newGetRequest);
+		
+		Map<String, Object> worksheetDefinition = (new ObjectMapper()).readValue(handle2.getContentAsString(), Map.class);
+		assertThat("Worksheet definition matches", worksheetDefinition.get("uuid").toString(), is(uuid));
+	}
+	
+	@Test
+	public void testCreatingAndGettingWorksheetSamples() throws Exception {
 		
 		//1. Creating worksheet definitions
 		//Given
@@ -807,7 +869,7 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 	}
 	
 	@Test
-	public void creatingWorksheetStatusAndWorksheetSampleStatus() throws Exception {
+	public void testCreatingWorksheetStatusAndWorksheetSampleStatus() throws Exception {
 		
 		//1.Creating BatchSetStatus
 		//Given

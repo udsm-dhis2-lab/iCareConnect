@@ -1,5 +1,5 @@
 import { Component, OnInit } from "@angular/core";
-import { WorkSeetsService } from "src/app/modules/laboratory/resources/services/worksheets.service";
+import { WorkSheetsService } from "src/app/modules/laboratory/resources/services/worksheets.service";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
 
 @Component({
@@ -12,7 +12,7 @@ export class WorksheetConfigurationComponent implements OnInit {
   worksheetPayload: any = {};
   errors: any[] = [];
   saving: boolean = false;
-  constructor(private worksheetsService: WorkSeetsService) {}
+  constructor(private worksheetsService: WorkSheetsService) {}
 
   ngOnInit(): void {}
 

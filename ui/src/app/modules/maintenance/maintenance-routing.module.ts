@@ -12,6 +12,7 @@ import {
 import { DrugManagementComponent } from "./pages/drug-management/drug-management.component";
 import { PrivilegesAndRolesComponent } from "./pages/privileges-and-roles/privileges-and-roles.component";
 import { ReportsManagementComponent } from "./pages/reports-management/reports-management.component";
+import { ReportsSettingsComponent } from "./pages/reports-settings/reports-settings.component";
 import { SystemSettingsComponent } from "./pages/system-settings/system-settings.component";
 
 // TODO: Improve routing, at least include child routing
@@ -60,6 +61,10 @@ const routes: Routes = [
       {
         path: "drug",
         component: DrugManagementComponent,
+      },
+      {
+        path: "reports-settings",
+        component: ReportsSettingsComponent,
       },
     ],
   },

@@ -768,9 +768,9 @@ export class RegistrationAddComponent implements OnInit {
           person: {
             names: [
               {
-                givenName: this.patient.fname,
-                middleName: this.patient.mname,
-                familyName: this.patient.lname,
+                givenName: this.patient.fname.toUpperCase(),
+                middleName: this.patient.mname.toUpperCase(),
+                familyName: this.patient.lname.toUpperCase(),
               },
             ],
             gender: this.patient.gender,

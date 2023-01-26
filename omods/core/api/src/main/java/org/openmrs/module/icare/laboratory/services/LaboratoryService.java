@@ -22,7 +22,7 @@ public interface LaboratoryService extends OpenmrsService {
 	List<Sample> getAllSamples();
 	
 	ListResult<Sample> getSamples(Date startDate, Date endDate, Pager pager, String location, String sampleCategory,
-	        String testCategory, String q);
+	        String testCategory, String q, String hasStatus);
 	
 	List<Sample> getSampleByDates(Date startDate, Date endDate);
 	
@@ -97,6 +97,8 @@ public interface LaboratoryService extends OpenmrsService {
 	
 	String generateSampleLabel();
 	
+	List<String> generateLaboratoryIdLabels(String globalPropertyUuid, String metadataType, Integer count);
+	
 	List<Visit> getSamplePendingVisits(Integer limit, Integer startIndex);
 	
 	TestOrderLocation addTestOrderWithLocation(TestOrderLocation testOrderLocation);
@@ -110,6 +112,10 @@ public interface LaboratoryService extends OpenmrsService {
 	Batch getBatchByUuid(String batchUuid);
 	
 	Batch addBatch(Batch batch);
+	
+	BatchSample addBatchSamples(BatchSample batchSample) throws Exception;
+	
+	BatchSample getBatchSampleByUuid(String batchSampleUuid);
 	
 	BatchSet addBatchSet(BatchSet batchSet);
 	
@@ -133,9 +139,11 @@ public interface LaboratoryService extends OpenmrsService {
 	
 	WorksheetControl addWorksheetControl(WorksheetControl worksheetControl);
 	
-	List<WorksheetDefinition> getWorksheetDefinitions(Date start, Date end, String q, Integer startIndex, Integer limit);
+	List<WorksheetDefinition> getWorksheetDefinitions(Date start, Date end, String q, Integer startIndex, Integer limit, Date expirationDate);
 	
-	WorksheetDefinition getWorksheetDefinitionByUuid(String worksheetDefinitionUuid);
+	Map<String, Object> getWorksheetDefinitionByUuid(String worksheetDefinitionUuid);
+	
+	WorksheetDefinition getDefaultWorksheetDefinitionByUuid(String worksheetDefinitionUuid);
 	
 	WorksheetDefinition addWorksheetDefinition(WorksheetDefinition worksheetDefinition) throws Exception;
 	
@@ -148,4 +156,6 @@ public interface LaboratoryService extends OpenmrsService {
 	WorksheetStatus addWorksheetStatus(WorksheetStatus worksheetStatus) throws Exception;
 	
 	WorksheetSampleStatus addWorksheetSampleStatus(WorksheetSampleStatus worksheetSampleStatus) throws Exception;
+	
+	List<BatchSample> getBatchSamples(Date start, Date end, String q, Integer startIndex, Integer limit);
 }
