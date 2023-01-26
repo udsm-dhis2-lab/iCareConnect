@@ -26,7 +26,7 @@ export class SamplesService {
     category?: string,
     hasStatus?: string
   ): Observable<any> {
-    let parameters = [];
+    let parameters = ["paging=false"];
     if (dates) {
       parameters = [...parameters, "startDate=" + dates?.startDate];
       parameters = [...parameters, "endDate=" + dates?.endDate];
@@ -37,10 +37,12 @@ export class SamplesService {
     if (hasStatus) {
       parameters = [...parameters, "hasStatus=" + hasStatus];
     }
-    return this.httpClient.get(
-      BASE_URL +
-        `lab/samples?${parameters?.length > 0 ? parameters?.join("&") : ""}`
-    );
+    return this.httpClient
+      .get(
+        BASE_URL +
+          `lab/samples?${parameters?.length > 0 ? parameters?.join("&") : ""}`
+      )
+      .pipe(map((response: any) => response?.results));
   }
 
   getSampleByUuid(uuid: string): Observable<any> {
