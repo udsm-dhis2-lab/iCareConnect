@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, ElementRef, Input, OnInit, ViewChild } from "@angular/core";
 import { Observable, of } from "rxjs";
 import { WorkSheetsService } from "src/app/modules/laboratory/resources/services/worksheets.service";
 import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
@@ -10,6 +10,11 @@ import { TextArea } from "src/app/shared/modules/form/models/text-area.model";
 import { DateField } from "src/app/shared/modules/form/models/date-field.model";
 import { GenerateMetadataLabelsService } from "src/app/core/services";
 import { MatCheckboxChange } from "@angular/material/checkbox";
+// import jsPDF from "jspdf";
+import pdfMake from "pdfmake/build/pdfmake";
+import pdfFonts from "pdfmake/build/vfs_fonts";
+pdfMake.vfs = pdfFonts.pdfMake.vfs;
+import htmlToPdfmake from "html-to-pdfmake";
 
 @Component({
   selector: "app-worksheet-definition",
@@ -44,6 +49,7 @@ export class WorksheetDefinitionComponent implements OnInit {
   isFormValid: boolean = false;
   expirationDateChecked: boolean = true;
   searchingText: string;
+  @ViewChild("wsdefntable") pdfTable: ElementRef;
   constructor(
     private worksheetsService: WorkSheetsService,
     private datasetDataService: DatasetDataService,
@@ -265,6 +271,7 @@ export class WorksheetDefinitionComponent implements OnInit {
   setCurrentWorksheetDefn(event: Event, worksheetDefn: any): void {
     // event.stopPropagation();
     this.currentWorksheetDefinition = null;
+    this.message = null;
     this.isWorksheetRenderingReady = false;
     this.createWorksheetSelectionField(worksheetDefn?.worksheet);
     const wsDefnFields = worksheetDefn?.additionalFields
@@ -451,5 +458,103 @@ export class WorksheetDefinitionComponent implements OnInit {
   onCloseMessage(event: Event): void {
     event.stopPropagation();
     this.message = null;
+  }
+
+  printPDF(event: Event) {
+    event.stopPropagation();
+
+    const pdfTable = this.pdfTable.nativeElement;
+
+    const html = htmlToPdfmake(pdfTable.innerHTML);
+
+    const documentDefinition = {
+      pageMargins: [30, 60, 30, 80],
+      header: "WORKSHEET: " + this.currentWorksheetDefinition?.code,
+      footer: (currentPage, pageCount) => {
+        return {
+          table: {
+            body: [
+              [
+                {
+                  text: "Page " + currentPage + " of " + pageCount,
+                  alignment: "right",
+                  style: "normalText",
+                  margin: [0, 20, 50, 0],
+                },
+              ],
+            ],
+          },
+          layout: "noBorders",
+        };
+      },
+      content: html,
+      defaultStyle: {
+        fontSize: 12,
+      },
+      pageSize: "A4",
+      styles: {
+        header: {
+          fontSize: 6,
+          margin: [15, 20, 15, 10],
+        },
+      },
+    };
+    const fonts = null;
+    const vfs = null;
+    const tableLayouts = { layout: "fixed" };
+    pdfMake.fonts = fonts;
+
+    pdfMake.createPdf(documentDefinition, tableLayouts, fonts, vfs).print();
+    // pdfMake.createPdf(documentDefinition).download("filename.pdf");
+    // setTimeout(function () {
+    //   window.print();
+    // }, 500);
+
+    // var file = new Blob([data], { type: 'application/pdf' });
+    // var fileURL = URL.createObjectURL(file);
+
+    // // if you want to open PDF in new tab
+    // window.open(fileURL);
+    // var a = document.createElement('a');
+    // a.href = fileURL;
+    // a.target = '_blank';
+    // a.download = 'bill.pdf';
+    // document.body.appendChild(a);
+    // a.click();
+  }
+
+  public download(event: Event, id, filename): void {
+    event.stopPropagation();
+    var preHtml =
+      "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Export HTML To Doc</title></head><body>";
+    var postHtml = "</body></html>";
+    var html = preHtml + document.getElementById(id).innerHTML + postHtml;
+
+    var blob = new Blob(["\ufeff", html], {
+      type: "application/msword",
+    });
+
+    // Specify link url
+    var url =
+      "data:application/vnd.ms-word;charset=utf-8," + encodeURIComponent(html);
+
+    // Specify file name
+    filename = filename ? filename + ".doc" : "document.doc";
+
+    // Create download link element
+    var downloadLink = document.createElement("a");
+
+    document.body.appendChild(downloadLink);
+
+    // Create a link to the file
+    downloadLink.href = url;
+
+    // Setting the file name
+    downloadLink.download = filename;
+
+    //triggering the function
+    downloadLink.click();
+
+    document.body.removeChild(downloadLink);
   }
 }
