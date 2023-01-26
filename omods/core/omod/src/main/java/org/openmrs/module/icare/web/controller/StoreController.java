@@ -4,6 +4,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.DrugOrder;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.icare.billing.models.InvoiceItem;
 import org.openmrs.module.icare.core.ICareService;
 import org.openmrs.module.icare.core.Item;
 import org.openmrs.module.icare.laboratory.models.Sample;
@@ -515,5 +516,49 @@ public class StoreController {
 			throw new Exception("location is not provided");
 		}
 		
+	}
+
+	@RequestMapping(value = "stockinvoices",method = RequestMethod.POST)
+	@ResponseBody
+	public List<Map<String,Object>> addStockInvoices(@RequestBody List<Map<String,Object>> stockInvoicesMap) throws Exception {
+
+		StockInvoice stockInvoice = new StockInvoice();
+		List<Map<String,Object>> newStockInvoicesObject = new ArrayList<>();
+
+		for(Map<String,Object> stockInvoiceMap : stockInvoicesMap){
+
+			stockInvoice = StockInvoice.fromMap(stockInvoiceMap);
+
+			List<StockInvoiceItem> stockInvoiceItems = new ArrayList<>();
+			for (Map<String, Object> invoiceItemMap : (List<Map<String, Object>>) stockInvoiceMap.get("invoiceItems")){
+				StockInvoiceItem stockInvoiceItem = new StockInvoiceItem();
+				stockInvoiceItem.setItem(iCareService.getItemByUuid(((Map)invoiceItemMap.get("item")).get("uuid").toString()));
+				stockInvoiceItem.setBatchNo((String) invoiceItemMap.get("batchNo"));
+				stockInvoiceItem.setOrderQuantity((Integer) invoiceItemMap.get("orderQuantity"));
+				stockInvoiceItem.setBatchQuantity((Integer) invoiceItemMap.get("batchQuantity"));
+				stockInvoiceItem.setAmount((Integer) invoiceItemMap.get("amount"));
+				stockInvoiceItem.setUnitPrice((Integer) invoiceItemMap.get("unitPrice"));
+				stockInvoiceItem.setUom(Context.getConceptService().getConceptByUuid(((Map)invoiceItemMap.get("uom")).get("uuid").toString()));
+
+				SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+				if (invoiceItemMap.get("expiryDate").toString().length() == 10) {
+					stockInvoiceItem.setExpiryDate(dateFormat.parse(invoiceItemMap.get("expiryDate").toString()));
+				} else {
+					stockInvoiceItem.setExpiryDate(dateFormat.parse(invoiceItemMap.get("expiryDate").toString()
+							.substring(0, invoiceItemMap.get("expiryDate").toString().indexOf("T"))));
+				}
+				stockInvoiceItem.setStockInvoice(stockInvoice);
+				stockInvoiceItems.add(stockInvoiceItem);
+			}
+
+			stockInvoice.setStockInvoiceItems(stockInvoiceItems);
+
+			StockInvoice savedStockInvoice = storeService.saveStockInvoice(stockInvoice);
+			newStockInvoicesObject.add(savedStockInvoice.toMap());
+
+		}
+
+		return newStockInvoicesObject;
+
 	}
 }

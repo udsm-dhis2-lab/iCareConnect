@@ -47,6 +47,10 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 	TransactionDAO transactionDAO;
 	
 	ReorderLevelDAO reorderLevelDAO;
+
+	StockInvoiceDAO stockInvoiceDAO;
+
+	SupplierDAO supplierDAO;
 	
 	public void setLedgerDAO(LedgerDAO ledgerDAO) {
 		this.ledgerDAO = ledgerDAO;
@@ -90,6 +94,12 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 	
 	public void setReorderLevelDAO(ReorderLevelDAO reorderLevelDAO) {
 		this.reorderLevelDAO = reorderLevelDAO;
+	}
+
+	public void setStockInvoiceDAO(StockInvoiceDAO stockInvoiceDAO){ this.stockInvoiceDAO =stockInvoiceDAO;}
+
+	public void setSupplierDAO(SupplierDAO supplierDAO){
+		this.supplierDAO=supplierDAO;
 	}
 	
 	@Override
@@ -229,9 +239,7 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 		for (IssueItem issueItem : issue.getIssueItems()) {
 			TransactionUtil.operateOnStock("-", issueItem);
 		}
-		System.out.println("Kabla");
 		Issue newIssue = this.issueDAO.save(issue);
-		System.out.println("Baada");
 		IssueStatus issueStatus = new IssueStatus();
 		issueStatus.setIssue(newIssue);
 		issueStatus.setRemarks("Items have been issued");
@@ -502,7 +510,22 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 			return this.stockDAO.saveOrderStatus(orderStatus);
 		}
 	}
-	
+
+	public Supplier getSupplierByUuid(String supplierUuid){
+		return supplierDAO.findByUuid(supplierUuid);
+	}
+
+	@Override
+	public StockInvoice saveStockInvoice(StockInvoice stockInvoice) throws Exception {
+
+		Supplier supplier = this.getSupplierByUuid(stockInvoice.getSupplier().getUuid());
+		if(supplier == null){
+			throw new Exception("The supplier with uuid "+ stockInvoice.getSupplier().getUuid() +" does not exist");
+		}
+		stockInvoice.setSupplier(supplier);
+		return this.stockInvoiceDAO.save(stockInvoice);
+	}
+
 	@Override
 	public List<OrderStatus> getOrderStatus(String visitUuid) {
 		return this.stockDAO.getOrderStatusByVisit(visitUuid);

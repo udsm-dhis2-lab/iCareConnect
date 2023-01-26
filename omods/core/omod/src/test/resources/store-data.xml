@@ -93,4 +93,7 @@
 
     <st_reorder_level location_id="200" item_id="123" quantity="150"/>
 
+    <!-- Supplier  -->
+    <st_supplier supplier_id="1" name="MSD" description="MSD description" creator="1" voided="0" uuid="8800zx3570-8z37-11ff-2234-01102007810" date_created="2023-01-25 00:00:00"/>
+
 </dataset>
