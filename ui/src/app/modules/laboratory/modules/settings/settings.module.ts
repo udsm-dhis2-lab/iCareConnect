@@ -19,8 +19,15 @@ import { ParametersDashboardComponent } from "./containers/parameters-dashboard/
 import { ProfilesAndAccessControlComponent } from "./containers/profiles-and-access-control/profiles-and-access-control.component";
 import { ExtendedParametersSettingsComponent } from "./containers/extended-parameters-settings/extended-parameters-settings.component";
 import { settingsContainers } from "./containers";
+import { SampleRegistrationModule } from "../sample-registration/sample-registration.module";
 
 @NgModule({
+  imports: [
+    CommonModule,
+    SettingsRoutingModule,
+    SharedModule,
+    SampleRegistrationModule,
+  ],
   declarations: [
     SettingsComponent,
     HomeComponent,
@@ -40,7 +47,6 @@ import { settingsContainers } from "./containers";
     ProfilesAndAccessControlComponent,
     ExtendedParametersSettingsComponent,
   ],
-  imports: [CommonModule, SettingsRoutingModule, SharedModule],
   entryComponents: [...entrySettingComponents],
 })
 export class SettingsModule {}

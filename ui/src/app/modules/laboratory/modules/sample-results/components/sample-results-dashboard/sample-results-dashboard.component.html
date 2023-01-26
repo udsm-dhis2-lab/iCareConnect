@@ -1,7 +1,10 @@
 <div
   *ngIf="{
     allSamples: allSamples$ | async,
-    samplesWithResults: samplesWithResults$ | async
+    samplesWithResults: samplesWithResults$ | async,
+    testResultsMapping: testResultsMapping$ | async,
+    externalSystemsReferenceConceptUuid:
+      externalSystemsReferenceConceptUuid$ | async
   } as sampleParams"
 >
   <mat-progress-bar
@@ -9,11 +12,20 @@
     mode="indeterminate"
   ></mat-progress-bar>
 
+  <div class="loading-overlay" *ngIf="saving">
+    <div class="text-center">
+      <div>Saving data</div>
+      <div class="mt-3 d-flex justify-content-center w-100">
+        <mat-spinner diameter="50" strokeWidth="2"></mat-spinner>
+      </div>
+    </div>
+  </div>
+
   <div *ngIf="sampleParams?.allSamples">
     <!-- <div class="sample-dashboard-summary">
       <app-samples-summary-dashboard></app-samples-summary-dashboard>
     </div> -->
-    <div class="filtering-div">
+    <div class="filtering-div d-flex justify-content-end">
       <mat-form-field class="w-50">
         <mat-label>Search</mat-label>
         <mat-icon matPrefix>search</mat-icon
@@ -23,22 +35,12 @@
           [(ngModel)]="searchingText"
         />
       </mat-form-field>
-      <mat-form-field appearance="fill" class="w-30 ml-2 float-right">
-        <mat-label
-          >Select
-          {{ !LISConfigurations?.isLIS ? "Department" : "Section" }}</mat-label
-        >
-        <mat-select [(value)]="selectedDepartment">
-          <mat-option (click)="setDepartment('')">All</mat-option>
-          <mat-option
-            *ngFor="let dept of labSamplesDepartments"
-            [value]="dept.display"
-            (click)="setDepartment(dept.display)"
-          >
-            {{ dept.display }}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
+      <div class="w-50">
+        <app-shared-departments-selection
+          [searchTerm]="'LAB_DEPARTMENT'"
+          (selectedDepartments)="getSelectedDepartments($event)"
+        ></app-shared-departments-selection>
+      </div>
     </div>
     <div class="p-1">
       <!-- {{ sampleParams?.samplesWithResults | json }} -->
@@ -50,7 +52,7 @@
             <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">
               Sample / Specimen
             </th>
-            <th rowspan="2">Sample ID</th>
+            <th rowspan="2">Laboratory ID</th>
             <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">MRN</th>
             <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">Patient Names</th>
             <th colspan="2" class="text-center">Test Orders Details</th>
@@ -83,19 +85,8 @@
             >
               <tr
                 [ngStyle]="{
-                  'background-color': sample?.completed
-                    ? '#6fd67bcf'
-                    : sample?.atLestOneOrderWithRejectedResults &&
-                      !sample?.completed
-                    ? '#d04747ab'
-                    : order?.testAllocations[0]?.firstSignOff &&
-                      !LISConfigurations?.isLIS
-                    ? '#f5f171f7'
-                    : order?.testAllocations[0]?.firstSignOff &&
-                      LISConfigurations?.isLIS
+                  'background-color': sample?.integrationStatus
                     ? '#0080009e'
-                    : sample?.atLeastOneHasResults && !sample?.completed
-                    ? '#ec864acf'
                     : ''
                 }"
                 [ngClass]="{ 'row-alternated': count % 2 !== 0 }"
@@ -158,8 +149,8 @@
                   [attr.rowspan]="sample?.orders?.length"
                 >
                   {{
-                    sample?.receivedOnStatus?.timestamp
-                      ? (sample?.receivedOnStatus?.timestamp | date: "medium")
+                    sample?.receivedOnStatus?.remarks
+                      ? (sample?.receivedOnStatus?.remarks | date: "medium")
                       : ""
                   }}
                 </td>
@@ -200,16 +191,17 @@
                   >
                     <span>
                       {{
-                        sample?.releasedStatuses?.length > 0
-                          ? sample?.releasedStatuses[
-                              sample?.releasedStatuses?.length - 1
-                            ]?.status
+                        sample?.integrationStatus
+                          ? "Already Sent to Pima COVID"
                           : "-"
                       }}
                     </span>
                   </a>
                 </td>
-                <td>
+                <td
+                  *ngIf="orderCount == 0"
+                  [attr.rowspan]="sample?.orders?.length"
+                >
                   <!-- *ngIf="
                       !sample.externalUseStatus.length ||
                       sample?.releasedStatuses[0]?.status !== 'RELEASED'
@@ -220,7 +212,7 @@
                       sample.externalUseStatus.length > 0 &&
                       sample?.externalUseStatus[0]?.status === 'RELEASED'
                     " -->
-                  <button
+                  <!-- <button
                     *ngIf="sample?.releasedStatuses?.length === 0"
                     mat-stroked-button
                     class="colored-button"
@@ -235,7 +227,110 @@
                     (click)="onUpdateStatus($event, sample, 'restrict')"
                   >
                     Restrict
-                  </button>
+                  </button> -->
+                  <div class="d-flex justify-content-center">
+                    <button
+                      mat-flat-button
+                      color="primary"
+                      (click)="onToggleViewSampleDetails($event, sample)"
+                    >
+                      <mat-icon *ngIf="!samplesToViewMoreDetails[sample?.id]"
+                        >expand_more</mat-icon
+                      >
+                      <mat-icon *ngIf="samplesToViewMoreDetails[sample?.id]"
+                        >expand_less</mat-icon
+                      >
+                      {{
+                        !samplesToViewMoreDetails[sample?.id] ? "View" : "Hide"
+                      }}
+                      Details
+                    </button>
+                    {{ params?.externalSystemsReferenceConceptUuid }}
+                  </div>
+                </td>
+              </tr>
+
+              <tr
+                *ngIf="
+                  samplesToViewMoreDetails[sample?.id] &&
+                  sampleParams?.externalSystemsReferenceConceptUuid
+                "
+                class="sample-details-row"
+              >
+                <td colspan="11">
+                  <app-shared-sample-details
+                    [sample]="sample"
+                    [departments]="labSamplesDepartments"
+                    [codedReasonsForRejection]="codedSampleRejectionReasons"
+                    [specimenSources]="sampleTypes"
+                    [hasResults]="true"
+                    [externalSystemsReferenceConceptUuid]="
+                      sampleParams?.externalSystemsReferenceConceptUuid
+                    "
+                    (visitDetails)="onGetVisitDetails($event)"
+                  ></app-shared-sample-details>
+                </td>
+                <td>
+                  <div
+                    *ngIf="message[sample?.id]"
+                    class="alert alert-warning"
+                    role="alert"
+                  >
+                    {{ message[sample?.id] }}
+                  </div>
+                  <div class="d-flex justify-content-center">
+                    <button
+                      mat-flat-button
+                      [disabled]="
+                        shouldConfirm ||
+                        !externalSystemPayload ||
+                        sample?.authorizationInfo?.length == 0 ||
+                        !sampleParams?.testResultsMapping ||
+                        sample?.integrationStatus
+                      "
+                      color="primary"
+                      (click)="
+                        onSend(
+                          $event,
+                          sample,
+                          shouldConfirm,
+                          sampleParams?.testResultsMapping
+                        )
+                      "
+                    >
+                      Send
+                    </button>
+                    <button
+                      class="ml-2"
+                      color="primary"
+                      mat-flat-button
+                      *ngIf="shouldConfirm"
+                      (click)="
+                        onSend(
+                          $event,
+                          sample,
+                          shouldConfirm,
+                          sampleParams?.testResultsMapping
+                        )
+                      "
+                    >
+                      Confirm
+                    </button>
+                  </div>
+                  <div class="mt-2">
+                    <button
+                      mat-stroked-button
+                      (click)="
+                        onVerifyIfIsFromExternalSystem(
+                          $event,
+                          sample,
+                          sampleParams?.externalSystemsReferenceConceptUuid
+                        )
+                      "
+                    >
+                      Verify for External System
+                    </button>
+                  </div>
                 </td>
               </tr>
               <tr *ngIf="sampleDetailsToggleControl[sample?.id]">

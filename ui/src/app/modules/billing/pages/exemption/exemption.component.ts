@@ -127,11 +127,11 @@ export class ExemptionComponent implements OnInit, AfterContentInit {
         })
       );
 
-    this.systemSettingsService.getSystemSettingsByKey(
-      "icare.billing.exemption.attachmentConcept"
-    ).subscribe((value) => {
-      this.attachmentConcept = value;
-    });
+    this.systemSettingsService
+      .getSystemSettingsByKey("icare.billing.exemption.attachmentConcept")
+      .subscribe((value) => {
+        this.attachmentConcept = value;
+      });
   }
 
   ngAfterContentInit() {
@@ -175,8 +175,11 @@ export class ExemptionComponent implements OnInit, AfterContentInit {
       this.store.dispatch(discountBill({ bill, discountDetails, patient }));
     }
 
-    if(params){
-      this.updateOrderAndExemptionEncounter(params?.currentVisit?.encounters, params?.exemptionEncounterType)
+    if (params) {
+      this.updateOrderAndExemptionEncounter(
+        params?.currentVisit?.encounters,
+        params?.exemptionEncounterType
+      );
     }
     this.store.dispatch(go({ path: ["/billing/exemption"] }));
   }
@@ -192,14 +195,19 @@ export class ExemptionComponent implements OnInit, AfterContentInit {
     });
 
     dialog.afterClosed().subscribe((data) => {
-      if(data){
-        let reason = data.reason
-        
-      //Update Encounter Order after Succesfully exempting this person
-      this.updateOrderAndExemptionEncounter(params?.currentVisit?.encounters, params?.exemptionEncounterType, reason, true)
-      
-      this.store.dispatch(go({ path: ['/billing/exemption']}))
-    }
+      if (data) {
+        let reason = data.reason;
+
+        //Update Encounter Order after Succesfully exempting this person
+        this.updateOrderAndExemptionEncounter(
+          params?.currentVisit?.encounters,
+          params?.exemptionEncounterType,
+          reason,
+          true
+        );
+
+        this.store.dispatch(go({ path: ["/billing/exemption"] }));
+      }
     });
   }
 
@@ -283,7 +291,7 @@ export class ExemptionComponent implements OnInit, AfterContentInit {
       fulfillerStatus: exemptionOrder?.fulfillerStatus,
       fulfillerComment: exemptionOrder?.fulfillerComment,
       encounter: exemptionOrder?.encounter,
-    }
+    };
     this.ordersService
       .updateOrdersViaEncounter([exemptionOrderPayload])
       .subscribe({
@@ -299,10 +307,10 @@ export class ExemptionComponent implements OnInit, AfterContentInit {
     if (voidEncounter === true) {
       this.encounterService.voidEncounter(exemptionEncounter).subscribe({
         next: (encounter) => {
-          console.log("==> Successfully updated encounter: ", encounter);
+          console.warn("==> Successfully updated encounter: ", encounter);
         },
         error: (error) => {
-          console.log("==> Failed to update encounter: ", error);
+          console.warn("==> Failed to update encounter: ", error);
         },
       });
     }
@@ -312,13 +320,11 @@ export class ExemptionComponent implements OnInit, AfterContentInit {
     this.showActionButtons = true;
   }
 
-  backToExemptionList(e: Event){
+  backToExemptionList(e: Event) {
     e.stopPropagation();
     this.store.dispatch(
       go({
-        path: [
-          `/billing/exemption`
-        ],
+        path: [`/billing/exemption`],
       })
     );
   }

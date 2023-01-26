@@ -50,7 +50,7 @@ export class LaboratoryComponent implements OnInit {
   showDate: boolean = false;
   startDate: any;
   endDate: any;
-  datesRangeDifference: number = 5;
+  datesRangeDifference: number = 2;
   currentSubModule: string;
 
   sampleTypes$: Observable<any>;

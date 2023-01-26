@@ -78,10 +78,11 @@ public class SampleOrder implements Serializable {
 		sample.setUuid(((Map) map.get("sample")).get("uuid").toString());
 		sampleOrder.setSample(sample);
 		
-		User user = new User();
-		user.setUuid(((Map) map.get("technician")).get("uuid").toString());
-		sampleOrder.setTechnician(user);
-		
+		if (map.get("technician") != null) {
+			User user = new User();
+			user.setUuid(((Map) map.get("technician")).get("uuid").toString());
+			sampleOrder.setTechnician(user);
+		}
 		return sampleOrder;
 	}
 	
@@ -107,10 +108,14 @@ public class SampleOrder implements Serializable {
 		Map<String, Object> orderObject = new HashMap<String, Object>();
 		orderObject.put("uuid", this.getOrder().getUuid());
 		orderObject.put("orderNumber", this.getOrder().getOrderNumber());
+		orderObject.put("voided", this.getOrder().getVoided());
+		orderObject.put("voidReason", this.getOrder().getVoidReason());
 		
 		Map<String, Object> ordererObject = new HashMap<String, Object>();
 		ordererObject.put("uuid", this.getOrder().getOrderer().getUuid());
 		ordererObject.put("name", this.getOrder().getOrderer().getName());
+		orderObject.put("voided", this.getOrder().getVoided());
+		orderObject.put("voidReason", this.getOrder().getVoidReason());
 		orderObject.put("orderer", ordererObject);
 		
 		Map<String, Object> conceptObject = new HashMap<String, Object>();

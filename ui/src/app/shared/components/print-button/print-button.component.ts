@@ -41,8 +41,8 @@ export class PrintButtonComponent implements OnInit {
     let year = today.getFullYear();
     let month =
       today.getMonth().toString().length > 1
-        ? today.getMonth()
-        : `0${today.getMonth()}`;
+        ? today.getMonth() + 1
+        : `0${today.getMonth() + 1}`;
     let day =
       today.getDate().toString().length > 1
         ? today.getDate()

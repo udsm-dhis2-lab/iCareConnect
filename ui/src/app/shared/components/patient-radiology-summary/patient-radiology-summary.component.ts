@@ -5,6 +5,8 @@ import { OrdersService } from "../../resources/order/services/orders.service";
 import { Visit } from "../../resources/visits/models/visit.model";
 import { VisitsService } from "../../resources/visits/services";
 import { flatten, orderBy, uniqBy } from "lodash";
+import { SharedConfirmationComponent } from "../shared-confirmation /shared-confirmation.component";
+import { MatDialog } from "@angular/material/dialog";
 
 @Component({
   selector: "app-patient-radiology-summary",
@@ -20,7 +22,7 @@ export class PatientRadiologySummaryComponent implements OnInit {
   @Input() orderTypes: any[];
   addingOrder: boolean = false;
   hasError: boolean = false;
-  error: string;
+  errors: any[] = [];
   formFields: any[];
   isFormValid: boolean = false;
   formValuesData: any = {};
@@ -32,7 +34,8 @@ export class PatientRadiologySummaryComponent implements OnInit {
   @Output() updateConsultationOrder = new EventEmitter();
   constructor(
     private ordersService: OrdersService,
-    private visitService: VisitsService
+    private visitService: VisitsService,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
@@ -40,6 +43,11 @@ export class PatientRadiologySummaryComponent implements OnInit {
       this.patientVisit.uuid,
       this.fields
     );
+
+    this.getFormFields();
+  }
+
+  getFormFields() {
     this.formFields = [
       {
         id: "radiology",
@@ -77,7 +85,7 @@ export class PatientRadiologySummaryComponent implements OnInit {
   }
 
   getRadiologyServices(departments): any {
-    const procedureDepartment = (departments.filter(
+    const procedureDepartment = ((departments || [])?.filter(
       (department) => department?.name?.toLowerCase().indexOf("radiology") === 0
     ) || [])[0];
     return !procedureDepartment
@@ -125,25 +133,61 @@ export class PatientRadiologySummaryComponent implements OnInit {
         },
       ];
     }
-    this.creatingOrdersResponse$ =
-      this.ordersService.createOrdersViaEncounter(orders);
-
-    this.creatingOrdersResponse$.subscribe((response) => {
-      if (response) {
-        this.addingOrder = false;
-        if (!response?.error) {
-          this.orders$ = this.visitService.getActiveVisitRadiologyOrders(
-            this.patientVisit.uuid,
-            this.fields
-          );
-          this.hasError = false;
-        } else {
-          console.log("==> response", response);
-          this.hasError = true;
-          this.error = response?.error?.message;
+    this.ordersService
+      .createOrdersViaEncounter(orders)
+      .subscribe((response) => {
+        if (response) {
+          this.addingOrder = false;
+          if (!response?.error) {
+            this.orders$ = this.visitService.getActiveVisitRadiologyOrders(
+              this.patientVisit.uuid,
+              this.fields
+            );
+            this.hasError = false;
+            this.getFormFields();
+          } else {
+            this.hasError = true;
+            this.errors = [
+              ...this.errors,
+              {
+                error: response?.error,
+              },
+            ];
+            this.getFormFields();
+          }
         }
+      });
+    this.updateConsultationOrder.emit();
+  }
+
+  onDeleteOrder(e: Event, order: any) {
+    e.stopPropagation();
+    const confirmDialog = this.dialog.open(SharedConfirmationComponent, {
+      width: "25%",
+      data: {
+        modalTitle: `Delete ${order?.concept?.display}`,
+        modalMessage: `You are about to delete ${order?.concept?.display} for this patient, Click confirm to delete!`,
+        showRemarksInput: true,
+      },
+      disableClose: false,
+      panelClass: "custom-dialog-container",
+    });
+    confirmDialog.afterClosed().subscribe((confirmationObject) => {
+      if (confirmationObject?.confirmed) {
+        this.ordersService
+          .voidOrderWithReason({
+            ...order,
+            voidReason: confirmationObject?.remarks || "",
+          })
+          .subscribe((response) => {
+            if (!response?.error) {
+              // this.reloadOrderComponent.emit();
+            }
+            if (response?.error) {
+              this.errors = [...this.errors, response?.error];
+            }
+          });
       }
     });
-    this.updateConsultationOrder.emit();
   }
 }

@@ -1,4 +1,5 @@
 import { Injectable } from "@angular/core";
+import { offset } from "highcharts";
 import { from, Observable, of } from "rxjs";
 import { catchError, map } from "rxjs/operators";
 import { OpenmrsHttpClientService } from "src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service";
@@ -18,7 +19,9 @@ export class PersonService {
   }
 
   getPatientsByIdentifier(identifier: string): Observable<any> {
-    return from(this.api.patient.getAllPatients({ q: identifier })).pipe(
+    return from(
+      this.api.patient.getAllPatients({ q: identifier, v: "full" })
+    ).pipe(
       map((response) => {
         return response?.results?.length > 0
           ? response?.results?.map((result: any) => {
@@ -31,6 +34,9 @@ export class PersonService {
               };
             }) || []
           : response?.results;
+      }),
+      catchError((error) => {
+        return of(error);
       })
     );
   }

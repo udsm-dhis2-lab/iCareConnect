@@ -21,7 +21,6 @@
           </ng-container>
         </ng-container>
       </tr>
-   
     </thead>
     <tbody>
       <tr *ngFor="let encounter of obsChartEncountersData">
@@ -30,32 +29,48 @@
         </td>
         <td *ngFor="let fieldHoldingData of fieldsHoldingData">
           <ng-container *ngIf="fieldHoldingData?.setMembers?.length > 0">
-            <ng-container *ngFor="let member of fieldHoldingData?.setMembers">  
+            <ng-container *ngFor="let member of fieldHoldingData?.setMembers">
               <span *ngIf="!(member.dataType === 'Boolean')">
-                  {{ encounter?.obsKeyedByConcept[fieldHoldingData?.concept?.uuid]?.value?.display ? encounter?.obsKeyedByConcept[member?.uuid]
-                    ?.value?.display : encounter?.obsKeyedByConcept[member?.uuid]
-                    ?.value ? encounter?.obsKeyedByConcept[member?.uuid]
-                    ?.value
-                    : "-" }} 
-              </span> &nbsp;
+                {{
+                  encounter?.obsKeyedByConcept[fieldHoldingData?.concept?.uuid]
+                    ?.value?.display
+                    ? encounter?.obsKeyedByConcept[member?.uuid]?.value?.display
+                    : encounter?.obsKeyedByConcept[member?.uuid]?.value
+                    ? encounter?.obsKeyedByConcept[member?.uuid]?.value
+                    : "-"
+                }}
+              </span>
+              &nbsp;
               <span *ngIf="member.dataType === 'Boolean'">
-                {{ encounter?.obsKeyedByConcept[member?.uuid]
-                    ?.value?.display ? " (Abnormal)" : "" }}
+                {{
+                  encounter?.obsKeyedByConcept[member?.uuid]?.value?.display
+                    ? " (Abnormal)"
+                    : ""
+                }}
               </span>
             </ng-container>
           </ng-container>
           <ng-container *ngIf="!fieldHoldingData?.setMembers?.length">
             <span>
-              {{ encounter?.obsKeyedByConcept[fieldHoldingData?.concept?.uuid]?.value?.display ? encounter?.obsKeyedByConcept[fieldHoldingData?.concept?.uuid]
-                      ?.value?.display : encounter?.obsKeyedByConcept[fieldHoldingData?.concept?.uuid]
-                      ?.value ? encounter?.obsKeyedByConcept[fieldHoldingData?.concept?.uuid]
-                      ?.value
-                      : "-" }} 
+              {{
+                encounter?.obsKeyedByConcept[fieldHoldingData?.concept?.uuid]
+                  ?.value?.display
+                  ? encounter?.obsKeyedByConcept[
+                      fieldHoldingData?.concept?.uuid
+                    ]?.value?.display
+                  : encounter?.obsKeyedByConcept[
+                      fieldHoldingData?.concept?.uuid
+                    ]?.value
+                  ? encounter?.obsKeyedByConcept[
+                      fieldHoldingData?.concept?.uuid
+                    ]?.value
+                  : "-"
+              }}
             </span>
           </ng-container>
         </td>
       </tr>
-      <tr>
+      <tr *ngIf="!shouldNotEnterData">
         <td></td>
         <td class="field" *ngFor="let formField of fieldsHoldingData">
           <app-form
@@ -72,10 +87,7 @@
             (formUpdate)="onFormUpdate($event)"
           ></app-form>
           <app-form
-            *ngIf="
-              formField?.formFields &&
-              formField?.formFields?.length > 0
-            "
+            *ngIf="formField?.formFields && formField?.formFields?.length > 0"
             [fields]="formField?.formFields"
             [isFormHorizontal]="true"
             [isReport]="false"

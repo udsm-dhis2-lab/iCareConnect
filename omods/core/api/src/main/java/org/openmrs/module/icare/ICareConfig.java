@@ -73,6 +73,8 @@ public class ICareConfig {
 	
 	public static final String PATIENT_ID_FORMAT = "icare.patient.id.format";
 	
+	public static final String SAMPLE_ID_FORMAT = "icare.laboratory.settings.sample.id.format";
+	
 	public static final String REGISTRATION_ENCOUNTER_ROLE = "icare.encounterRole.registration";
 	
 	public static final String STOCK_ENABLE = "icare.stock.enable";
@@ -88,5 +90,7 @@ public class ICareConfig {
 	public static final String END_CONSULTATION_CONCEPT = "iCare.visits.settings.controlVisitsEndingStatuses.ConceptUuid";
 	
 	public static final String BED_ORDER_CONCEPT = "icare.billing.accomodationChargesConcept";
+	
+	public static final String LAB_RESULT_APPROVAL_CONFIGURATION = "iCare.laboratory.resultApprovalConfiguration";
 	
 }

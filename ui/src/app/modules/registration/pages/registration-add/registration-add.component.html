@@ -217,8 +217,8 @@
             >
               <div class="w-100 d-flex">
                 <p class="alert alert-danger mt-1 w-75">
-                  There is patient with the same name. Would you like to
-                  Continue?
+                  Patient with the same name exits. Click the patient to Start
+                  Visit &nbsp;&nbsp; OR
                 </p>
                 <button
                   class="ml-3 mt-1 w-25"
@@ -227,7 +227,7 @@
                   color="primary"
                   (click)="onContinueRegistrion()"
                 >
-                  Continue
+                  Register New
                 </button>
               </div>
               <table
@@ -803,6 +803,7 @@
                 <mat-label>First Name</mat-label>
                 <input
                   matInput
+                  id="kfname"
                   placeholder="Enter Text"
                   [(ngModel)]="patient['kinFname']"
                   name="kinFname"
@@ -836,13 +837,13 @@
                 <mat-label>Last Name</mat-label>
                 <input
                   matInput
+                  id="klname"
                   placeholder="Enter Text"
                   [(ngModel)]="patient['kinLName']"
                   name="kinLName"
                   [disabled]="addingPatient && !patientAdded"
                 />
               </mat-form-field>
-              {{ patient.kinLName }}
               <!-- <mat-form-field appearance="fill" class="w-100 ml-2">
                 <mat-label>Relationship with patient</mat-label>
                 <input

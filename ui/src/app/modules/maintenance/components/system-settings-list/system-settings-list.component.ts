@@ -2,7 +2,7 @@ import { Component, Input, OnInit } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { Observable } from "rxjs";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
-import { ManageSystemSettingComponent } from "../../modals/manage-system-setting/manage-system-setting.component";
+import { ManageSystemSettingComponent } from "../../../../shared/dialogs/manage-system-setting/manage-system-setting.component";
 
 @Component({
   selector: "app-system-settings-list",

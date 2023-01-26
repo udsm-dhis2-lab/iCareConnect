@@ -4,8 +4,11 @@ import { AppState } from "src/app/store/reducers";
 import { flatten, keyBy } from "lodash";
 import { EncountersService } from "../../services/encounters.service";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
-import { tap } from "rxjs/operators";
+import { map, tap } from "rxjs/operators";
 import { Observable } from "rxjs";
+import { SharedConfirmationComponent } from "../shared-confirmation /shared-confirmation.component";
+import { MatDialog } from "@angular/material/dialog";
+import { getGenericDrugPrescriptionsFromVisit } from "../../helpers/visits.helper";
 
 @Component({
   selector: "app-current-prescriptions",
@@ -22,16 +25,16 @@ export class CurrentPrescriptionComponent implements OnInit {
   drugsPrescribed: any;
   errors: any[] = [];
   specificDrugConceptUuid$: Observable<any>;
-  
+  prescriptionArrangementFields$: Observable<any>;
+
   constructor(
-    private systemSettingsService: SystemSettingsService, 
+    private systemSettingsService: SystemSettingsService,
     private encounterService: EncountersService,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
-
-    this.getDrugsPrescribed()
-
+    this.getDrugsPrescribed();
     this.specificDrugConceptUuid$ = this.systemSettingsService
       .getSystemSettingsByKey(
         "iCare.clinic.genericPrescription.specificDrugConceptUuid"
@@ -52,53 +55,65 @@ export class CurrentPrescriptionComponent implements OnInit {
           }
         })
       );
-  }
-
-  getDrugsPrescribed(){
-    this.drugsPrescribed = flatten(
-      this.visit?.encounters
-        ?.map((encounter) => {
-          return (
-            encounter?.orders.filter(
-              (order) =>
-                order.orderType?.uuid === this.genericPrescriptionOrderType
-            ) || []
-          )?.map((genericDrugOrder) => {
-            let formulatedDescription = encounter?.obs?.map((ob) => {
-              if(ob?.comment === null){
-                return ob
-              }
-            }).filter((ob) => ob)
-            return {
-              ...genericDrugOrder,
-              formulatedDescription: formulatedDescription,
-              obs: keyBy(
-                encounter?.obs?.map((observation) => {
-                  return {
-                    ...observation,
-                    conceptKey: observation?.concept?.uuid,
-                    valueIsObject: observation?.value?.uuid ? true : false,
-                  };
-                }),
-                "conceptKey"
-              ),
-            };
-          });
+    this.prescriptionArrangementFields$ = this.systemSettingsService
+      .getSystemSettingsByKey("iCare.clinic.prescription.arrangement")
+      .pipe(
+        map((response) => {
+          if (response === "none") {
+            this.errors = [
+              ...this.errors,
+              {
+                error: {
+                  message:
+                    "Arrangement setting isn't defined, Set 'iCare.clinic.prescription.arrangement' or Contact IT (Close to continue)",
+                },
+                type: "warning",
+              },
+            ];
+          }
+          if (response?.error) {
+            this.errors = [...this.errors, response?.error];
+          }
+          return {
+            ...response,
+            keys: Object.keys(response).length,
+          };
         })
-        ?.filter((order) => order)
-    );
+      );
   }
 
-  stopDrugOrder(e: Event, drugOrder: any) {
-    this.encounterService
-      .voidEncounter(drugOrder?.encounter)
-      .subscribe((response) => {
-        if (!response?.error) {
-          this.loadVisit.emit(this.visit);
-        }
-        if (response?.error) {
-          this.errors = [...this.errors, response?.error];
-        }
-      });
+  getDrugsPrescribed() {
+    this.drugsPrescribed = getGenericDrugPrescriptionsFromVisit(this.visit, this.genericPrescriptionOrderType);
+  }
+
+  stopDrugOrder(e: Event, drugOrder: any, drugName: string) {
+    const confirmDialog = this.dialog.open(SharedConfirmationComponent, {
+      width: "25%",
+      data: {
+        modalTitle: `Stop Medicaton`,
+        modalMessage: `You are about to stop ${drugName} for this patient, Click confirm to finish!`,
+        showRemarksInput: true,
+      },
+      disableClose: false,
+      panelClass: "custom-dialog-container",
+    });
+
+    confirmDialog.afterClosed().subscribe((confirmationObject) => {
+      if (confirmationObject?.confirmed) {
+        this.encounterService
+          .voidEncounterWithReason({
+            ...drugOrder?.encounter,
+            voidReason: confirmationObject?.remarks || "",
+          })
+          .subscribe((response) => {
+            if (!response?.error) {
+              this.loadVisit.emit(this.visit);
+            }
+            if (response?.error) {
+              this.errors = [...this.errors, response?.error];
+            }
+          });
+      }
+    });
   }
 }

@@ -41,6 +41,7 @@ import {
 import {
   getCountOfVitalsFilled,
   getGroupedObservationByConcept,
+  getLatestIPDRound,
   getVitalSignObservations,
 } from "src/app/store/selectors/observation.selectors";
 import {
@@ -56,8 +57,6 @@ const CONSULTATION_FORM_CONFIGS: FormConfig[] = [
   { name: "All orderables", formLevel: 5 },
   { name: "Visit Diagnoses", formLevel: 2 },
 ];
-
-import { filter, map } from "lodash";
 import { clearBills } from "src/app/store/actions/bill.actions";
 import { PatientVisitHistoryModalComponent } from "../patient-visit-history-modal/patient-visit-history-modal.component";
 import { MatDialog } from "@angular/material/dialog";
@@ -74,10 +73,7 @@ import {
   ObsCreate,
   ProviderGetFull,
 } from "../../resources/openmrs";
-import {
-  loadPreviousObservations,
-  saveObservations,
-} from "src/app/store/actions/observation.actions";
+import { saveObservations } from "src/app/store/actions/observation.actions";
 import { loadEncounterTypes } from "src/app/store/actions/encounter-type.actions";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { OrdersService } from "../../resources/order/services/orders.service";
@@ -151,6 +147,11 @@ export class SharedPatientDashboardComponent implements OnInit {
   codedVisitCloseStatus: any;
   errors: any[] = [];
   patientInvoice$: Observable<any>;
+  @Input() IPDRoundConceptUuid: string;
+  showRoundDetails: boolean = true;
+  currentRound: any;
+  latestRound$: Observable<any>;
+  updateMedication: boolean = true;
 
   constructor(
     private store: Store<AppState>,
@@ -228,16 +229,16 @@ export class SharedPatientDashboardComponent implements OnInit {
 
     this.loadingPaymentStatus$ = this.store.select(getLoadingPaymentStatus);
 
-    // this.store.dispatch(
-    //   loadForms({ formConfigs: ICARE_CONFIG?.consultation?.forms })
-    // );
+    this.latestRound$ = this.store.select(
+      getLatestIPDRound(this.IPDRoundConceptUuid)
+    );
     this.consultationForms$ = this.store.pipe(
       select(getFormEntitiesByNames(CONSULTATION_FORM_CONFIGS))
     );
 
-    this.forms$ = this.store.select(getCustomOpenMRSFormsByIds, {
-      formUUids: this.currentLocation?.forms,
-    });
+    this.forms$ = this.store.select(
+      getCustomOpenMRSFormsByIds(this.currentLocation?.forms)
+    );
 
     this.currentLocation$ = this.store.select(getCurrentLocation);
     this.consultationOrderType$ =
@@ -317,6 +318,7 @@ export class SharedPatientDashboardComponent implements OnInit {
           return res;
         })
       );
+    this.showRoundDetails = this.activeVisit?.isAdmitted;
   }
 
   onToggleVitalsSummary(event: Event): void {
@@ -330,6 +332,7 @@ export class SharedPatientDashboardComponent implements OnInit {
       event.stopPropagation();
     }
     this.selectedForm = form;
+    this.showRoundDetails = false;
     setTimeout(() => {
       this.readyForClinicalNotes = true;
     }, 50);
@@ -343,6 +346,15 @@ export class SharedPatientDashboardComponent implements OnInit {
 
   onStartConsultation(visit: VisitObject): void {
     this.store.dispatch(startConsultation());
+  }
+
+  onToggleVisibityIcons(event: Event): void {
+    event.stopPropagation();
+    this.showRoundDetails = !this.showRoundDetails;
+  }
+
+  onGetLatestRound(round: any): void {
+    this.currentRound = round;
   }
 
   clearBills(event: Event) {
@@ -483,7 +495,7 @@ export class SharedPatientDashboardComponent implements OnInit {
       ];
       this.ordersService.updateOrdersViaEncounter(orders).subscribe((order) => {
         if (!order.error) {
-          console.log("==> Order results: ", order);
+          // console.log("==> Order results: ", order);
         }
       });
     }
@@ -492,6 +504,13 @@ export class SharedPatientDashboardComponent implements OnInit {
   onAssignBed(event: Event): void {
     event.stopPropagation();
     this.assignBed.emit(true);
+  }
+
+  onUpdateMedicationComponent() {
+    this.updateMedication = false;
+    setTimeout(() => {
+      this.updateMedication = true;
+    }, 500);
   }
 
   onDischargePatient(event: Event, invoice?: any): void {

@@ -20,6 +20,13 @@ export const getLabSamplesLoadedState = createSelector(
   (state: LabSamplesState) => state.loaded
 );
 
+export const getLabSampleLoadingState = createSelector(
+  getLabSamplesState,
+  (state) => {
+    return state.loading;
+  }
+);
+
 export const getAllCollectedLabSamples = createSelector(
   getAllLabSamples,
   (samples) => {

@@ -34,17 +34,24 @@
       [form]="currentCustomForm"
       [visit]="visit"
       [patient]="patient"
-      [observations]="clinicalObservations"
       (formDataUpdate)="onFormUpdate($event)"
     ></app-capture-form-data>
 
     <!-- buttons -->
     <div class="d-flex justify-content-end">
       <button
+        [disabled]="!atLeastOneFieldHasData"
+        mat-stroked-button
+        (click)="onClear($event, currentCustomForm)"
+      >
+        Clear
+      </button>
+      <button
         mat-flat-button
         (click)="onConfirm($event, visit)"
         color="primary"
-        [disabled]="params?.savingObservations"
+        [disabled]="params?.savingObservations || !atLeastOneFieldHasData"
+        class="ml-2"
       >
         <mat-spinner
           color="primary"

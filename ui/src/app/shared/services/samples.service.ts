@@ -5,14 +5,21 @@ import { HttpClient } from "@angular/common/http";
 import { from, Observable, of, zip } from "rxjs";
 import { BASE_URL } from "../constants/constants.constants";
 import { catchError, delay, map } from "rxjs/operators";
-import { SampleObject } from "src/app/modules/laboratory/resources/models";
+import {
+  LabSample,
+  SampleObject,
+} from "src/app/modules/laboratory/resources/models";
 import { formatSample } from "../helpers/lab-samples.helper";
+import { OpenmrsHttpClientService } from "../modules/openmrs-http-client/services/openmrs-http-client.service";
 
 @Injectable({
   providedIn: "root",
 })
 export class SamplesService {
-  constructor(private httpClient: HttpClient) {}
+  constructor(
+    private httpClient: HttpClient,
+    private opeMRSHttpClientService: OpenmrsHttpClientService
+  ) {}
 
   getLabSamplesByCollectionDates(
     dates: any,
@@ -30,23 +37,52 @@ export class SamplesService {
     if (hasStatus) {
       parameters = [...parameters, "hasStatus=" + hasStatus];
     }
-    return this.httpClient
-      .get(
-        BASE_URL +
-          `lab/samples?${parameters?.length > 0 ? parameters?.join("&") : ""}`
-      )
-      .pipe(
-        map((response: any) => {
-          return response?.results || [];
-        }),
-        catchError((error) => of(error))
-      );
+    return this.httpClient.get(
+      BASE_URL +
+        `lab/samples?${parameters?.length > 0 ? parameters?.join("&") : ""}`
+    );
+  }
+
+  getSampleByUuid(uuid: string): Observable<any> {
+    return this.opeMRSHttpClientService.get(`lab/sample/${uuid}`).pipe(
+      map((response) => response),
+      catchError((error) => of(error))
+    );
+  }
+
+  getFormattedSampleByUuid(
+    uuid: string,
+    departments: any[],
+    specimenSources: any[],
+    codedRejectedReasons: any[]
+  ): Observable<any> {
+    return this.opeMRSHttpClientService.get(`lab/sample/${uuid}`).pipe(
+      map(
+        (response) =>
+          new LabSample(
+            response,
+            departments,
+            specimenSources,
+            codedRejectedReasons
+          )
+      ),
+      catchError((error) => of(error))
+    );
   }
 
   getSampleLabel(): Observable<string> {
     return this.httpClient.get(`${BASE_URL}lab/samplelable`).pipe(
       map((response: { label: number }) => {
         return response?.label;
+      }),
+      catchError((error) => of(error))
+    );
+  }
+
+  getIncreamentalSampleLabel(): Observable<string> {
+    return this.opeMRSHttpClientService.get(`lab/sampleidgen`).pipe(
+      map((response) => {
+        return response?.label.toString();
       }),
       catchError((error) => of(error))
     );
@@ -60,6 +96,15 @@ export class SamplesService {
       catchError((error) => of(error))
     );
     // return of(sample);
+  }
+
+  createSampleOrder(sampleOrder): Observable<any> {
+    return this.httpClient.post(BASE_URL + "lab/sampleorder", sampleOrder).pipe(
+      map((response) => {
+        return response;
+      }),
+      catchError((error) => of(error))
+    );
   }
 
   getTestTimeSettings(conceptUuid: string) {
@@ -80,23 +125,43 @@ export class SamplesService {
     testCategory?: string,
     startDate?: any,
     endDate?: any,
-    formattingInfo?: any
+    formattingInfo?: any,
+    paging?: boolean,
+    page?: number,
+    pageSize?: number
   ) {
-    testCategory = testCategory ? `?testCategory=${testCategory}` : "";
-    sampleCategory = sampleCategory ? `?testCategory=${sampleCategory}` : "";
-    const dates =
-      startDate &&
-      endDate &&
-      (sampleCategory.length > 0 || testCategory.length > 0)
-        ? `&startDate=${startDate}&endDate=${endDate}`
-        : startDate &&
-          endDate &&
-          testCategory.length === 0 &&
-          sampleCategory.length === 0
-        ? `?startDate=${startDate}&endDate=${endDate}`
-        : "";
+    let queryParams = [];
+    if (sampleCategory) {
+      queryParams = [...queryParams, `sampleCategory=${sampleCategory}`];
+    }
+
+    if (testCategory) {
+      queryParams = [...queryParams, `testCategory=${testCategory}`];
+    }
+
+    if (startDate) {
+      queryParams = [...queryParams, `startDate=${startDate}`];
+    }
+
+    if (endDate) {
+      queryParams = [...queryParams, `endDate=${endDate}`];
+    }
+
+    if (paging) {
+      queryParams = [...queryParams, `paging=${paging}`];
+    } else {
+      queryParams = [...queryParams, `paging=false`];
+    }
+
+    if (page) {
+      queryParams = [...queryParams, `page=${page}`];
+    }
+
+    if (pageSize) {
+      queryParams = [...queryParams, `pageSize=${pageSize}`];
+    }
     return this.httpClient
-      .get(BASE_URL + `lab/sample${testCategory}${sampleCategory}${dates}`)
+      .get(BASE_URL + `lab/sample?${queryParams.join("&")}`)
       .pipe(
         map((response: any) => {
           return _.map(response, (sample) => {
@@ -111,21 +176,81 @@ export class SamplesService {
     return this.httpClient.post(BASE_URL + "lab/sample", data);
   }
 
+  getSamplesByPaginationDetails(
+    paginationParameters: { page: number; pageSize: number },
+    dates?: { startDate: string; endDate: string },
+    searchText?: string,
+    departments?: any[],
+    specimenSources?: any[],
+    codedSampleRejectionReasons?: any[]
+  ): Observable<{ pager: any; results: any[] }> {
+    let queryParams = [];
+    if (paginationParameters && paginationParameters?.page) {
+      queryParams = [...queryParams, `page=${paginationParameters?.page}`];
+    }
+
+    if (paginationParameters && paginationParameters?.pageSize) {
+      queryParams = [
+        ...queryParams,
+        `pageSize=${paginationParameters?.pageSize}`,
+      ];
+    }
+
+    if (searchText && searchText.length > 0) {
+      queryParams = [...queryParams, `q=${searchText}`];
+    }
+    if (dates && dates?.startDate) {
+      queryParams = [...queryParams, `startDate=${dates?.startDate}`];
+    }
+
+    if (dates && dates?.endDate) {
+      queryParams = [...queryParams, `endDate=${dates?.endDate}`];
+    }
+    return this.httpClient
+      .get(BASE_URL + `lab/samples?${queryParams?.join("&")}`)
+      .pipe(
+        map((response: any) => {
+          return {
+            ...response,
+            results: response?.results?.map((result) => {
+              return new LabSample(
+                result,
+                departments,
+                specimenSources,
+                codedSampleRejectionReasons
+              );
+            }),
+          };
+        }),
+        catchError((error) => of(error))
+      );
+  }
+
   getCollectedSamplesByPaginationDetails(
     paginationParameters: { page: number; pageSize: number },
     dates?: { startDate: string; endDate: string }
   ): Observable<{ pager: any; results: any[] }> {
+    let queryParams = [];
+    if (paginationParameters && paginationParameters?.page) {
+      queryParams = [...queryParams, `page=${paginationParameters?.page}`];
+    }
+
+    if (paginationParameters && paginationParameters?.pageSize) {
+      queryParams = [
+        ...queryParams,
+        `pageSize=${paginationParameters?.pageSize}`,
+      ];
+    }
+
+    if (dates && dates?.startDate) {
+      queryParams = [...queryParams, `startDate=${dates?.startDate}`];
+    }
+
+    if (dates && dates?.endDate) {
+      queryParams = [...queryParams, `endDate=${dates?.endDate}`];
+    }
     return this.httpClient
-      .get(
-        BASE_URL +
-          `lab/samples?page=${paginationParameters?.page}&pageSize=${
-            paginationParameters?.pageSize
-          }${
-            dates
-              ? "&startDate=" + dates?.startDate + "&endDate=" + dates?.endDate
-              : ""
-          }`
-      )
+      .get(BASE_URL + `lab/samples?${queryParams?.join("&")}`)
       .pipe(
         map((response: any) => response),
         catchError((error) => of(error))
@@ -147,9 +272,23 @@ export class SamplesService {
     }
   }
 
+  saveSampleStatuses(statusesData): Observable<any> {
+    if (statusesData) {
+      return zip(
+        ...statusesData.map((status) => {
+          return this.httpClient.post(BASE_URL + "lab/samplestatus", status);
+        })
+      ).pipe(
+        map((response) => response),
+        catchError((error) => of(error))
+      );
+    } else {
+      return from([null]);
+    }
+  }
+
   setSampleStatus(data): Observable<any> {
     if (data) {
-      console.log(data);
       return this.httpClient.post(BASE_URL + "lab/samplestatus", data).pipe(
         map((response) => response),
         catchError((error) => of(error))
@@ -160,8 +299,8 @@ export class SamplesService {
   }
 
   acceptSampleAndCreateAllocations(statusWithAllocations: {
-    status: any;
-    allocations: any[];
+    status?: any;
+    allocations?: any[];
   }): Observable<any> {
     return this.httpClient.post(
       BASE_URL + "lab/sampleaccept",
@@ -247,10 +386,30 @@ export class SamplesService {
     return this.httpClient.post(BASE_URL + "lab/results", result);
   }
 
+  saveLabResults(results): Observable<any> {
+    return zip(
+      ...results?.map((result) => {
+        return this.httpClient.post(BASE_URL + "lab/results", result);
+      }),
+      catchError((error) => of(error))
+    );
+  }
+
   saveLabResultStatus(resultStatus): Observable<any> {
     return this.httpClient.post(
       BASE_URL + "lab/allocationstatus",
       resultStatus
+    );
+  }
+
+  saveLabResultStatuses(resultStatuses): Observable<any> {
+    return zip(
+      ...resultStatuses?.map((resultStatus) => {
+        return this.httpClient.post(
+          BASE_URL + "lab/allocationstatus",
+          resultStatus
+        );
+      })
     );
   }
 
@@ -308,5 +467,65 @@ export class SamplesService {
           return of(e);
         })
       );
+  }
+
+  createBatchsets(batchset: any): Observable<any> {
+    return this.httpClient.post(BASE_URL + "lab/batchsets", batchset).pipe(
+      map((response) => {
+        return response;
+      }),
+      catchError((err) => {
+        return err;
+      })
+    );
+  }
+
+  getBatchsets(): Observable<any> {
+    return this.httpClient.get(BASE_URL + "lab/batchsets").pipe(
+      map((response) => {
+        return response;
+      }),
+      catchError((err) => {
+        return err;
+      })
+    );
+  }
+  createBatch(batch: any): Observable<any> {
+    return this.httpClient.post(BASE_URL + "lab/batches", batch).pipe(
+      map((response) => {
+        return response;
+      }),
+      catchError((err) => {
+        return err;
+      })
+    );
+  }
+  getBatches(
+    startDate?: string,
+    endDate?: string,
+    q?: string
+  ): Observable<any> {
+    let startDateParam = startDate?.length ? `?startDate=${startDate}` : "";
+    let endDateParam =
+      endDate?.length && startDateParam.length
+        ? `&endDate=${endDate}`
+        : endDate?.length
+        ? `&endDate=${endDate}`
+        : "";
+    let qParam =
+      q?.length && (startDateParam.length || endDateParam.length)
+        ? `&q=${q}`
+        : q?.length
+        ? `?q=${q}`
+        : "";
+    const queryParams = startDateParam + endDateParam + qParam;
+    return this.httpClient.get(BASE_URL + "lab/batches" + queryParams).pipe(
+      map((response) => {
+        return response;
+      }),
+      catchError((err) => {
+        return err;
+      })
+    );
   }
 }

@@ -76,8 +76,7 @@
                 "
                 [disabled]="
                   stockBatch?.expiryDate < today ||
-                  !params?.userPrivileges['STORE_ADD_STOCK_ON_BATCH'] ||
-                  !params?.isCurrentLocationMainStore
+                  !params?.userPrivileges['STORE_ADD_STOCK_ON_BATCH']
                 "
                 mat-flat-button
                 color="primary"

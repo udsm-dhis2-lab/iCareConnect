@@ -144,6 +144,74 @@
                         <property name="sessionFactory" ref="dbSessionFactory" />
                     </bean>
                 </property>
+
+                <property name="batchSetDAO">
+                    <bean class="org.openmrs.module.icare.laboratory.dao.BatchSetDAO">
+                        <property name="sessionFactory" ref="dbSessionFactory" />
+                    </bean>
+                </property>
+
+                <property name="batchDAO">
+                    <bean class="org.openmrs.module.icare.laboratory.dao.BatchDAO">
+                        <property name="sessionFactory" ref="dbSessionFactory" />
+                    </bean>
+                </property>
+
+                <property name="batchSampleDAO">
+                    <bean class="org.openmrs.module.icare.laboratory.dao.BatchSampleDAO">
+                        <property name="sessionFactory" ref="dbSessionFactory" />
+                    </bean>
+                </property>
+
+                <property name="batchSetStatusDAO">
+                    <bean class="org.openmrs.module.icare.laboratory.dao.BatchSetStatusDAO">
+                        <property name="sessionFactory" ref="dbSessionFactory" />
+                    </bean>
+                </property>
+
+                <property name="batchStatusDAO">
+                    <bean class="org.openmrs.module.icare.laboratory.dao.BatchStatusDAO">
+                        <property name="sessionFactory" ref="dbSessionFactory" />
+                    </bean>
+                </property>
+
+                <property name="worksheetDAO">
+                    <bean class="org.openmrs.module.icare.laboratory.dao.WorksheetDAO">
+                        <property name="sessionFactory" ref="dbSessionFactory" />
+                    </bean>
+                </property>
+
+                <property name="worksheetControlDAO">
+                    <bean class="org.openmrs.module.icare.laboratory.dao.WorksheetControlDAO">
+                        <property name="sessionFactory" ref="dbSessionFactory" />
+                    </bean>
+                </property>
+
+                <property name="worksheetDefinitionDAO">
+                    <bean class="org.openmrs.module.icare.laboratory.dao.WorksheetDefinitionDAO">
+                        <property name="sessionFactory" ref="dbSessionFactory" />
+                    </bean>
+                </property>
+
+                <property name="worksheetSampleDAO">
+                    <bean class="org.openmrs.module.icare.laboratory.dao.WorksheetSampleDAO">
+                        <property name="sessionFactory" ref="dbSessionFactory" />
+                    </bean>
+                </property>
+
+                <property name="worksheetStatusDAO">
+                    <bean class="org.openmrs.module.icare.laboratory.dao.WorksheetStatusDAO">
+                        <property name="sessionFactory" ref="dbSessionFactory" />
+                    </bean>
+                </property>
+
+                <property name="worksheetSampleStatusDAO">
+                    <bean class="org.openmrs.module.icare.laboratory.dao.WorksheetSampleStatusDAO">
+                        <property name="sessionFactory" ref="dbSessionFactory" />
+                    </bean>
+                </property>
+
+
             </bean>
         </property>
         <property name="preInterceptors">
@@ -224,6 +292,7 @@
                         <property name="sessionFactory" ref="dbSessionFactory" />
                     </bean>
                 </property>
+
             </bean>
         </property>
         <property name="preInterceptors">

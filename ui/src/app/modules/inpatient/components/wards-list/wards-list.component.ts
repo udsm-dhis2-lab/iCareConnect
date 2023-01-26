@@ -24,6 +24,7 @@ export class WardsListComponent implements OnInit {
   @Input() locationBedsDetails: any;
   @Input() bedOrdersWithBillStatus: any[];
   @Input() locationsIds: string[];
+  @Input() encounterType: string;
   wardsInfo$: Observable<Location[]>;
   admissionVisitsAdded$: Observable<boolean>;
   admittedPatientsVisits$: Observable<VisitObject[]>;
@@ -41,9 +42,10 @@ export class WardsListComponent implements OnInit {
       }
     );
 
-    this.admittedPatientsVisits$ = this.visitService.getAdmittedPatientsVisits(
-      this.locationsIds
-    );
+    this.admittedPatientsVisits$ =
+      this.visitService.getAdmittedPatientsVisitsByEncounterType(
+        this.encounterType
+      );
 
     this.admissionVisitsAdded$ = this.store.select(
       getPatientVisitsForAdmissionAddedState

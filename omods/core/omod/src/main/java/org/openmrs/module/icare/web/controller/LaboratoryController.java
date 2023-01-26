@@ -1,6 +1,7 @@
 package org.openmrs.module.icare.web.controller;
 
 import org.openmrs.Concept;
+import org.openmrs.Location;
 import org.openmrs.User;
 import org.openmrs.Visit;
 import org.openmrs.api.*;
@@ -12,13 +13,11 @@ import org.openmrs.module.icare.laboratory.models.*;
 import org.openmrs.module.icare.laboratory.services.LaboratoryService;
 import org.openmrs.module.webservices.rest.web.RestConstants;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -44,6 +43,9 @@ public class LaboratoryController {
 	
 	@Autowired
 	UserService userService;
+	
+	@Autowired
+	LocationService locationService;
 	
 	@RequestMapping(value = "visit", method = RequestMethod.GET)
 	@ResponseBody
@@ -75,8 +77,19 @@ public class LaboratoryController {
 		Visit existingVisit = visitService.getVisitByUuid(((Map) sample.get("visit")).get("uuid").toString());
 		Concept concept = conceptService.getConceptByUuid(((Map) sample.get("concept")).get("uuid").toString());
 		
+		if (sample.get("location") != null) {
+			Location location = locationService.getLocationByUuid(((Map) sample.get("location")).get("uuid").toString());
+			newSample.setLocation(location);
+			System.out.println(location.getName());
+		}
+		if (sample.get("batchSample") != null) {
+			BatchSample batchSample = laboratoryService.getBatchSampleByUuid(((Map) sample.get("batchSample")).get("uuid").toString());
+			newSample.setBatchSample(batchSample);
+		}
+		
 		newSample.setVisit(existingVisit);
 		newSample.setConcept(concept);
+		
 		newSample.setLabel((String) sample.get("label"));
 		
 		List<SampleOrder> sampleOrders = new ArrayList<SampleOrder>();
@@ -135,6 +148,12 @@ public class LaboratoryController {
 			statusesObject.put("status", sampleStatus.getStatus());
 			statusesObject.put("changedAt", sampleStatus.getTimestamp());
 			sampleStatusesList.add(statusesObject);
+		}
+		if(createdSample.getBatchSample() != null){
+			HashMap<String,Object> batchObject = new HashMap<>();
+			batchObject.put("uuid",createdSample.getBatchSample().getUuid());
+			batchObject.put("display",createdSample.getBatchSample().getCode());
+			response.put("batch",batchObject);
 		}
 		
 		response.put("status", sampleStatusesList);
@@ -202,7 +221,8 @@ public class LaboratoryController {
 	        @RequestParam(defaultValue = "1", value = "page", required = false) Integer page,
 	        @RequestParam(value = "location", required = false) String locationUuid,
 	        @RequestParam(value = "sampleCategory", required = false) String sampleCategory,
-	        @RequestParam(value = "testCategory", required = false) String testCategory) throws ParseException {
+	        @RequestParam(value = "testCategory", required = false) String testCategory,
+	        @RequestParam(value = "q", required = false) String q) throws ParseException {
 		
 		Date start = null;
 		Date end = null;
@@ -219,7 +239,7 @@ public class LaboratoryController {
 		pager.setPageSize(pageSize);
 		pager.setPage(page);
 		ListResult<Sample> sampleResults = laboratoryService.getSamples(start, end, pager, locationUuid, sampleCategory,
-		    testCategory);
+		    testCategory, q);
 		return sampleResults.toMap();
 		/*List<Sample> samples;
 		
@@ -293,6 +313,30 @@ public class LaboratoryController {
 		SampleStatus savedSampleStatus = laboratoryService.updateSampleStatus(sampleStatus);
 		
 		return savedSampleStatus.toMap();//sampleStatusResponse;
+	}
+	
+	@RequestMapping(value = "sampleorder", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public Map<String, Object> createsampleorder(@RequestBody Map<String, Object> sampleOrderObject) throws Exception {
+		//save a sample order with the technician
+		//		System.out.println(sampleOrderObject);
+		SampleOrder sampleOrder = SampleOrder.fromMap(sampleOrderObject);
+		SampleOrder newSampleOrder = laboratoryService.saveSampleOrder(sampleOrder);
+		//save the sampleorder
+		return newSampleOrder.toMap();
+	}
+	
+	@RequestMapping(value = "sample/{sampleUuid}/orders", method = RequestMethod.GET)
+	@ResponseBody
+	public List<Map<String, Object>> getSampleOrdersBySampleUuid(@PathVariable String sampleUuid) {
+		List<Map<String, Object>> orders = new ArrayList();
+		List<Sample> samples = laboratoryService.getSampleOrdersBySampleUuid(sampleUuid);
+		for (Sample sample : samples) {
+			for (SampleOrder order : sample.getSampleOrders()) {
+				orders.add(order.toMap());
+			}
+		}
+		return orders;
 		
 	}
 	
@@ -314,11 +358,45 @@ public class LaboratoryController {
 		return createdTestAllocation.toMap();
 	}
 	
-	@RequestMapping(value = "allocation", method = RequestMethod.GET)
+	@RequestMapping(value = "allocations", method = RequestMethod.GET)
 	@ResponseBody
 	public List<TestAllocation> getAllocation() {
 		return laboratoryService.getAllAllocations();
 		
+	}
+	
+	@RequestMapping(value = "allocation", method = RequestMethod.GET)
+	@ResponseBody
+	public Map<String, Object> getAllocation(@RequestParam(value = "uuid", required = true) String uuid) {
+		return laboratoryService.getAllocationByUuid(uuid).toMap();
+	}
+	
+	@RequestMapping(value = "allocationsbyorder", method = RequestMethod.GET)
+	@ResponseBody
+	public List<TestAllocation> getAllocationsByOrder(@RequestParam(value = "uuid", required = true) String uuid) {
+		return laboratoryService.getAllocationsByOrder(uuid);
+	}
+	
+	@RequestMapping(value = "allocationsbysample", method = RequestMethod.GET)
+	@ResponseBody
+	public List<Map<String, Object>> getAllocationsBySample(@RequestParam(value = "uuid", required = true) String uuid) {
+		List<Map<String, Object>> allocations = new ArrayList<>();
+		 List<Sample> samplesResponse = laboratoryService.getAllocationsBySample(uuid);
+		 if (samplesResponse.size() > 0) {
+			 for(Sample sample: samplesResponse) {
+				 if (sample.getSampleOrders().size() > 0) {
+					 for (SampleOrder order: sample.getSampleOrders()) {
+						 if (order.getTestAllocations().size() > 0) {
+							 for (TestAllocation allocation: order.getTestAllocations()) {
+								 allocations.add(allocation.toMap());
+							 }
+						 }
+					 }
+				 }
+			 }
+		 }
+
+		 return  allocations;
 	}
 	
 	@RequestMapping(value = "results", method = RequestMethod.POST)
@@ -331,12 +409,31 @@ public class LaboratoryController {
 		
 	}
 	
+	@RequestMapping(value = "multipleresults", method = RequestMethod.POST)
+	@ResponseBody
+	public List<Map<String, Object>> saveMultipleResults(@RequestBody List<Map<String, Object>> results) throws Exception {
+		List<Result> formattedResults = new ArrayList<>();
+		for(Map<String, Object> resultObject: results) {
+			Result result = Result.fromMap(resultObject);
+			result.setCreator(Context.getAuthenticatedUser());
+			formattedResults.add(result);
+		}
+		List<Map<String, Object>> savedResultsResponse = laboratoryService.saveMultipleResults(formattedResults);
+		return savedResultsResponse;
+
+	}
+	
+	@RequestMapping(value = "resultsinstrument", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> saveResultsInstrument(@RequestBody Map<String, Object> resultsInstrument) throws Exception {
+		Map<String, Object> savedResultsInstrumentResponse = laboratoryService.saveResultsInstrument(resultsInstrument);
+		return savedResultsInstrumentResponse;
+	}
+	
 	@RequestMapping(value = "results", method = RequestMethod.GET)
 	@ResponseBody
 	public List<Result> getResults() {
-		
 		return laboratoryService.getResults();
-		
 	}
 	
 	@RequestMapping(value = "allocationstatus", method = RequestMethod.POST)
@@ -346,6 +443,22 @@ public class LaboratoryController {
 		TestAllocationStatus testAllocationStatus = TestAllocationStatus.fromMap(testAllocationStatusObject);
 		TestAllocationStatus savedTestAllocationStatus = laboratoryService.updateTestAllocationStatus(testAllocationStatus);
 		return savedTestAllocationStatus.toMap();
+		
+	}
+	
+	@RequestMapping(value = "allocationstatuses", method = RequestMethod.POST)
+	@ResponseBody
+	public List<Map<String, Object>> saveTestAllocationStatuses(
+	        @RequestBody List<Map<String, Object>> testAllocationStatusesObject) throws Exception {
+		List<TestAllocationStatus> testAllocationStatuses = new ArrayList<TestAllocationStatus>();
+		for (Map<String, Object> testAllocationStatusObject : testAllocationStatusesObject) {
+			TestAllocationStatus testAllocationStatus = TestAllocationStatus.fromMap(testAllocationStatusObject);
+			testAllocationStatuses.add(testAllocationStatus);
+		}
+		
+		List<Map<String, Object>> savedTestAllocationStatuses = laboratoryService
+		        .updateTestAllocationStatuses(testAllocationStatuses);
+		return savedTestAllocationStatuses;
 		
 	}
 	
@@ -507,6 +620,25 @@ public class LaboratoryController {
 		}
 	}
 	
+	@RequestMapping(value = "sampleidgen", method = RequestMethod.GET)
+	@ResponseBody
+	public Map<String, Object> generateSampleLabel() {
+		String sampleLabel = (String) laboratoryService.generateSampleLabel();
+		Map<String, Object> label = new HashMap<>();
+		label.put("label", sampleLabel);
+		return label;
+	}
+	
+	@RequestMapping(value = "labidgen", method = RequestMethod.GET)
+	@ResponseBody
+	public List<String> generateLaboratoryIdLabels(
+	        @RequestParam(value = "globalProperty", required = true) String globalProperty,
+	        @RequestParam(value = "metadataType", required = true) String metadataType,
+	        @RequestParam(value = "count", required = false) Integer count) {
+		List<String> labLabels = laboratoryService.generateLaboratoryIdLabels(globalProperty, metadataType, count);
+		return labLabels;
+	}
+	
 	@RequestMapping(value = "samplelable", method = RequestMethod.GET)
 	@ResponseBody
 	public Map<String, Object> geenerateSampleLable() {
@@ -598,4 +730,391 @@ public class LaboratoryController {
 		return workloadSummary.toMap();
 	}
 	
+	@RequestMapping(value = "batches", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public List<Map<String, Object>> addBatch(@RequestBody List<Map<String, Object>> batchesObject) throws Exception {
+		
+		Batch batch = new Batch();
+		List<Map<String, Object>> newBatches = new ArrayList<Map<String, Object>>();
+		
+		for (Map<String, Object> batchObject : batchesObject) {
+			
+			batch = Batch.fromMap(batchObject);
+			
+			if ((batchObject.get("batchSet")) != null) {
+				
+				BatchSet batchSet = laboratoryService.getBatchSetByUuid(((Map) batchObject.get("batchSet")).get("uuid")
+				        .toString());
+				batch.setBatchSet(batchSet);
+			}
+			
+			Batch newBatch = laboratoryService.addBatch(batch);
+			newBatches.add(newBatch.toMap());
+		}
+		return newBatches;
+	}
+	
+	@RequestMapping(value = "batches", method = RequestMethod.GET)
+	@ResponseBody
+	public List<Map<String, Object>> getbatches(@RequestParam(value = "startDate", required = false) String startDate,
+	        @RequestParam(value = "endDate", required = false) String endDate,
+	        @RequestParam(value = "q", required = false) String q, @RequestParam(defaultValue = "0") Integer startIndex,
+	        @RequestParam(defaultValue = "100") Integer limit) throws ParseException {
+		
+		Date start = null;
+		Date end = null;
+		if (startDate != null && endDate != null) {
+			
+			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+			start = formatter.parse(startDate);
+			end = formatter.parse(endDate);
+		}
+		
+		List<Batch> batches = laboratoryService.getBatches(start, end, q, startIndex, limit);
+		
+		List<Map<String, Object>> responseBatchesObject = new ArrayList<Map<String, Object>>();
+		for (Batch batch : batches) {
+			Map<String, Object> batchObject = batch.toMap();
+			responseBatchesObject.add(batchObject);
+		}
+		
+		return responseBatchesObject;
+		
+	}
+	
+	@RequestMapping(value = "batchsamples",method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public List<Map<String,Object>> addBatchSamples(@RequestBody List<Map<String,Object>> batchSamplesObject) throws Exception{
+
+		BatchSample batchSample = new BatchSample();
+		List<Map<String,Object>> newBatchSamples = new ArrayList<>();
+
+		for(Map<String,Object> batchSampleObject : batchSamplesObject){
+
+			batchSample = BatchSample.fromMap(batchSampleObject);
+			BatchSample newBatchSample = laboratoryService.addBatchSamples(batchSample);
+			newBatchSamples.add(newBatchSample.toMap());
+		}
+
+		return newBatchSamples;
+	}
+	
+	@RequestMapping(value = "batchsamples",method = RequestMethod.GET)
+	@ResponseBody
+	public List<Map<String,Object>> getBatchSamples(@RequestParam(value = "startDate", required = false) String startDate, @RequestParam(value = "endDate", required = false) String endDate, @RequestParam(value = "q", required = false) String q, @RequestParam(defaultValue = "0") Integer startIndex, @RequestParam(defaultValue = "100") Integer limit) throws ParseException{
+
+		Date start = null;
+		Date end = null;
+		if (startDate != null && endDate != null) {
+
+			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+			start = formatter.parse(startDate);
+			end = formatter.parse(endDate);
+		}
+
+		List<BatchSample> batchSamples = laboratoryService.getBatchSamples(start, end, q, startIndex, limit);
+
+		List<Map<String,Object>> responseBatchSampleObject = new ArrayList<>();
+		for(BatchSample batchSample : batchSamples){
+			Map<String,Object> batchSampleMap = batchSample.toMap();
+			responseBatchSampleObject.add(batchSampleMap);
+		}
+
+		return  responseBatchSampleObject;
+
+	}
+	
+	@RequestMapping(value = "batchsets", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public List<Map<String, Object>> addBatchSet(@RequestBody List<Map<String, Object>> batchSetsObject) {
+		
+		BatchSet batchSet = new BatchSet();
+		List<Map<String, Object>> newBatchSets = new ArrayList<Map<String, Object>>();
+		
+		for (Map<String, Object> batchSetObject : batchSetsObject) {
+			
+			batchSet = BatchSet.fromMap(batchSetObject);
+			BatchSet newBatchSet = laboratoryService.addBatchSet(batchSet);
+			newBatchSets.add(newBatchSet.toMap());
+		}
+		
+		return newBatchSets;
+		
+	}
+	
+	@RequestMapping(value = "batchstatus", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public Map<String, Object> addBatchStatus(@RequestBody Map<String, Object> batchStatusObject) throws Exception {
+		
+		BatchStatus batchStatus = BatchStatus.fromMap(batchStatusObject);
+		BatchStatus savedBatchStatus = laboratoryService.addBatchStatus(batchStatus);
+		
+		return savedBatchStatus.toMap();
+	}
+	
+	@RequestMapping(value = "batchsets", method = RequestMethod.GET)
+	@ResponseBody
+	public List<Map<String, Object>> getbatchsets(@RequestParam(value = "startDate", required = false) String startDate,
+	        @RequestParam(value = "endDate", required = false) String endDate,
+	        @RequestParam(value = "q", required = false) String q, @RequestParam(defaultValue = "0") Integer startIndex,
+	        @RequestParam(defaultValue = "100") Integer limit) throws ParseException {
+		
+		Date start = null;
+		Date end = null;
+		if (startDate != null && endDate != null) {
+			
+			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+			start = formatter.parse(startDate);
+			end = formatter.parse(endDate);
+		}
+		
+		List<BatchSet> batchsets = laboratoryService.getBatchSets(start, end, q, startIndex, limit);
+		
+		List<Map<String, Object>> responseBatchSetsObject = new ArrayList<Map<String, Object>>();
+		for (BatchSet batchSet : batchsets) {
+			Map<String, Object> batchObject = batchSet.toMap();
+			responseBatchSetsObject.add(batchObject);
+		}
+		return responseBatchSetsObject;
+	}
+	
+	@RequestMapping(value = "batchsetstatus", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public Map<String, Object> addBatchSetStatus(@RequestBody Map<String, Object> batchSetStatusObject) throws Exception {
+		
+		BatchSetStatus batchSetStatus = BatchSetStatus.fromMap(batchSetStatusObject);
+		BatchSetStatus savedbatchSetStatus = laboratoryService.addBatchSetStatus(batchSetStatus);
+		
+		return savedbatchSetStatus.toMap();
+		
+	}
+	
+	@RequestMapping(value = "worksheets", method = RequestMethod.GET)
+	@ResponseBody
+	public List<Map<String, Object>> getWorkSheets(@RequestParam(value = "startDate", required = false) String startDate,
+	        @RequestParam(value = "endDate", required = false) String endDate,
+	        @RequestParam(value = "q", required = false) String q, @RequestParam(defaultValue = "0") Integer startIndex,
+	        @RequestParam(defaultValue = "100") Integer limit) throws ParseException {
+		
+		Date start = null;
+		Date end = null;
+		if (startDate != null && endDate != null) {
+			
+			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+			start = formatter.parse(startDate);
+			end = formatter.parse(endDate);
+		}
+		
+		List<Worksheet> worksheets = laboratoryService.getWorksheets(start, end, q, startIndex, limit);
+		
+		List<Map<String, Object>> responseWorkSheetsObject = new ArrayList<Map<String, Object>>();
+		for (Worksheet worksheet : worksheets) {
+			Map<String, Object> worksheetObject = worksheet.toMap();
+			responseWorkSheetsObject.add(worksheetObject);
+		}
+		
+		return responseWorkSheetsObject;
+	}
+	
+	@RequestMapping(value = "worksheets",method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public List<Map<String,Object>> addWorksheet(@RequestBody List<Map<String,Object>> worksheetsObject){
+
+		Worksheet worksheet = new Worksheet();
+		List<Map<String,Object>> newWorksheets = new ArrayList<>();
+
+		for(Map<String,Object> worksheetObject : worksheetsObject){
+
+			worksheet = Worksheet.fromMap(worksheetObject);
+
+			Concept testOrderConcept = conceptService.getConceptByUuid(((Map) worksheetObject.get("testorder")).get("uuid").toString());
+			worksheet.setTestOrder(testOrderConcept);
+
+			if(worksheetObject.get("instrument") != null){
+
+				Concept instrumentconcept = conceptService.getConceptByUuid(((Map) worksheetObject.get("instrument")).get("uuid").toString());
+				worksheet.setInstrument(instrumentconcept);
+			}
+
+			Worksheet newworksheet = laboratoryService.addWorksheet(worksheet);
+			newWorksheets.add(newworksheet.toMap());
+
+
+		}
+		return newWorksheets;
+
+	}
+	
+	@RequestMapping(value = "worksheetcontrols", method = RequestMethod.GET)
+	@ResponseBody
+	public List<Map<String, Object>> getWorkSheetControls(
+	        @RequestParam(value = "startDate", required = false) String startDate,
+	        @RequestParam(value = "endDate", required = false) String endDate,
+	        @RequestParam(value = "q", required = false) String q, @RequestParam(defaultValue = "0") Integer startIndex,
+	        @RequestParam(defaultValue = "100") Integer limit) throws ParseException {
+		
+		Date start = null;
+		Date end = null;
+		if (startDate != null && endDate != null) {
+			
+			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+			start = formatter.parse(startDate);
+			end = formatter.parse(endDate);
+		}
+		
+		List<WorksheetControl> worksheetControls = laboratoryService.getWorksheetControls(start, end, q, startIndex, limit);
+		
+		List<Map<String, Object>> responseWorkSheetControlsObject = new ArrayList<Map<String, Object>>();
+		for (WorksheetControl worksheetControl : worksheetControls) {
+			Map<String, Object> worksheetControlObject = worksheetControl.toMap();
+			responseWorkSheetControlsObject.add(worksheetControlObject);
+		}
+		
+		return responseWorkSheetControlsObject;
+	}
+	
+	@RequestMapping(value = "worksheetcontrols",method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public List<Map<String,Object>> addWorksheetControl(@RequestBody List<Map<String,Object>> worksheetControlsObject){
+
+		WorksheetControl worksheetControl = new WorksheetControl();
+		List<Map<String,Object>> newWorksheetControls = new ArrayList<>();
+
+		for(Map<String,Object> worksheetControlObject : worksheetControlsObject){
+
+			worksheetControl = WorksheetControl.fromMap(worksheetControlObject);
+
+			Concept testOrderConcept = conceptService.getConceptByUuid(((Map) worksheetControlObject.get("testorder")).get("uuid").toString());
+			worksheetControl.setTestOrder(testOrderConcept);
+
+
+			WorksheetControl newworksheetControl = laboratoryService.addWorksheetControl(worksheetControl);
+			newWorksheetControls.add(newworksheetControl.toMap());
+
+		}
+		return newWorksheetControls;
+
+	}
+	
+	@RequestMapping(value = "worksheetdefinition", method = RequestMethod.GET)
+	@ResponseBody
+	public Map<String, Object> getWorksheetDefinitionByUuid(@RequestParam(value = "uuid", required = true) String uuid)
+	        throws ParseException {
+		
+		Map<String, Object> worksheetDefinition = laboratoryService.getWorksheetDefinitionByUuid(uuid);
+		return worksheetDefinition;
+	}
+	
+	@RequestMapping(value = "worksheetdefinitions",method = RequestMethod.GET)
+	@ResponseBody
+	public List<Map<String,Object>> getWorksheetDefinitions(@RequestParam(value = "startDate", required = false) String startDate,
+															@RequestParam(value = "endDate", required = false) String endDate,
+															@RequestParam(value = "q", required = false) String q,
+															@RequestParam(defaultValue = "0") Integer startIndex,
+															@RequestParam(defaultValue = "100") Integer limit,
+															@RequestParam(value = "expirationDate", required = false) String expirationDate) throws ParseException{
+
+		Date start = null;
+		Date end = null;
+		Date expirationDateFormatted = null;
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+		if (startDate != null && endDate != null) {
+			start = formatter.parse(startDate);
+			end = formatter.parse(endDate);
+		}
+
+		if (expirationDate !=null) {
+			expirationDateFormatted = formatter.parse(expirationDate);
+		}
+
+		List<WorksheetDefinition> worksheetDefinitions = laboratoryService.getWorksheetDefinitions(start, end, q, startIndex, limit,expirationDateFormatted);
+
+		List<Map<String,Object>> worksheetDefinitionsObject = new ArrayList<>();
+		for(WorksheetDefinition worksheetDefinition : worksheetDefinitions){
+
+			Map<String,Object> worksheetDefinitionObject = worksheetDefinition.toMap();
+			worksheetDefinitionsObject.add(worksheetDefinitionObject);
+		}
+		return  worksheetDefinitionsObject;
+	}
+	
+	@RequestMapping(value="worksheetdefinitions",method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public List<Map<String,Object>> addWorksheetDefinitions(@RequestBody List<Map<String,Object>> worksheetDefinitionsObject) throws Exception{
+
+		WorksheetDefinition worksheetDefinition = new WorksheetDefinition();
+		List<Map<String,Object>> newWorksheetDefinitions = new ArrayList<>();
+
+		for(Map<String,Object> worksheetDefinitionObject : worksheetDefinitionsObject){
+
+			worksheetDefinition = WorksheetDefinition.fromMap(worksheetDefinitionObject);
+			WorksheetDefinition newWorksheetDefinition = laboratoryService.addWorksheetDefinition(worksheetDefinition);
+			newWorksheetDefinitions.add(newWorksheetDefinition.toMap());
+
+		}
+		return newWorksheetDefinitions;
+	}
+	
+	@RequestMapping(value = "worksheetsamples", method = RequestMethod.GET)
+	@ResponseBody
+	public List<Map<String,Object>> getWorksheetSamples(@RequestParam(value = "startDate", required = false) String startDate, @RequestParam(value = "endDate", required = false) String endDate, @RequestParam(value = "q", required = false) String q, @RequestParam(defaultValue = "0") Integer startIndex, @RequestParam(defaultValue = "100") Integer limit) throws ParseException{
+
+		Date start = null;
+		Date end = null;
+		if (startDate != null && endDate != null) {
+
+			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+			start = formatter.parse(startDate);
+			end = formatter.parse(endDate);
+		}
+
+		List<WorksheetSample> worksheetSamples = laboratoryService.getWorksheetSamples(start, end, q, startIndex, limit);
+
+		List<Map<String,Object>> worksheetSamplesObject = new ArrayList<>();
+
+		for(WorksheetSample worksheetSample : worksheetSamples){
+			Map<String,Object> worksheetSampleObject = worksheetSample.toMap();
+			worksheetSamplesObject.add(worksheetSampleObject);
+
+		}
+		return worksheetSamplesObject;
+	}
+	
+	@RequestMapping(value="worksheetsamples",method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public List<Map<String,Object>> addWorksheetSamples(@RequestBody List<Map<String,Object>> worksheetSamplesObject) throws Exception{
+
+		WorksheetSample worksheetSample = new WorksheetSample();
+		List<Map<String,Object>> newWorksheetSamples = new ArrayList<>();
+
+		for(Map<String,Object> worksheetSampleObject : worksheetSamplesObject){
+
+			worksheetSample = WorksheetSample.fromMap(worksheetSampleObject);
+			WorksheetSample newWorksheetSample = laboratoryService.addWorksheetSample(worksheetSample);
+			newWorksheetSamples.add(newWorksheetSample.toMap());
+
+		}
+		return newWorksheetSamples;
+	}
+	
+	@RequestMapping(value = "worksheetstatus", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public Map<String, Object> addWorksheetStatus(@RequestBody Map<String, Object> worksheetStatusObject) throws Exception {
+		
+		WorksheetStatus worksheetStatus = WorksheetStatus.fromMap(worksheetStatusObject);
+		WorksheetStatus newWorksheetStatus = laboratoryService.addWorksheetStatus(worksheetStatus);
+		return newWorksheetStatus.toMap();
+		
+	}
+	
+	@RequestMapping(value = "worksheetsamplestatus", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public Map<String, Object> addWorksheetSampleStatus(@RequestBody Map<String, Object> worksheetSampleObject)
+	        throws Exception {
+		
+		WorksheetSampleStatus worksheetSampleStatus = WorksheetSampleStatus.fromMap(worksheetSampleObject);
+		WorksheetSampleStatus newWorksheetSampleStatus = laboratoryService.addWorksheetSampleStatus(worksheetSampleStatus);
+		
+		return newWorksheetSampleStatus.toMap();
+	}
 }

@@ -6,9 +6,11 @@ import { ActivatedRoute, Router } from "@angular/router";
 import { Store } from "@ngrx/store";
 import { Observable } from "rxjs";
 import { SystemUsersService } from "src/app/core/services/system-users.service";
+import { UserService } from "src/app/modules/maintenance/services/users.service";
 import { AppState } from "src/app/store/reducers";
 import { getCurrentUserDetails } from "src/app/store/selectors/current-user.selectors";
 import { AddNewUserComponent } from "../add-new-user/add-new-user.component";
+import { LabEditUserModalComponent } from "../lab-edit-user-modal/lab-edit-user-modal.component";
 
 @Component({
   selector: "app-user-management-dashboard",
@@ -30,12 +32,16 @@ export class UserManagementDashboardComponent implements OnInit, AfterViewInit {
   ];
   dataSource: MatTableDataSource<any>;
   users$: Observable<any>;
+  page: number = 1;
+  pageCount: number = 25;
   @ViewChild(MatPaginator) paginator: MatPaginator;
+  filterValue: string = "";
   public data = {};
 
   constructor(
     private store: Store<AppState>,
     private service: SystemUsersService,
+    private userService: UserService,
     private route: ActivatedRoute,
     private router: Router,
     private dialog: MatDialog
@@ -44,7 +50,7 @@ export class UserManagementDashboardComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     // TODO: current user to be used for privilages control
     this.currentUser$ = this.store.select(getCurrentUserDetails);
-    this.users$ = this.service.getUsers({ q: "" });
+    this.getUsers();
   }
 
   ngAfterViewInit() {
@@ -54,12 +60,21 @@ export class UserManagementDashboardComponent implements OnInit, AfterViewInit {
   }
 
   getRecord(row: any): void {
-    this.data = row;
     localStorage.setItem("selectedUser", JSON.stringify(row));
-    this.router.navigate(["edit-user"], {
-      state: this.data,
-      relativeTo: this.route,
-      queryParams: { id: row.uuid },
+    // this.router.navigate(["edit-user"], {
+    //   state: this.data,
+    //   relativeTo: this.route,
+    //   queryParams: { id: row.uuid },
+    // });
+    this.service.getUserById(row?.uuid).subscribe((userResponse) => {
+      if (userResponse) {
+        this.data = userResponse;
+        this.dialog.open(LabEditUserModalComponent, {
+          width: "70%",
+          data: this.data,
+          maxHeight: "70vh",
+        });
+      }
     });
   }
 
@@ -79,7 +94,22 @@ export class UserManagementDashboardComponent implements OnInit, AfterViewInit {
 
   applyFilter(event: Event): void {
     event.stopPropagation();
-    const filterValue = (event.target as HTMLInputElement).value;
-    this.users$ = this.service.getUsers({ q: filterValue });
+    this.filterValue = (event.target as HTMLInputElement).value;
+    this.page = 1;
+    this.getUsers();
+  }
+
+  getUsers(): void {
+    this.users$ = this.service.getUsers({
+      q: this.filterValue,
+      limit: this.pageCount,
+      startIndex: (this.page - 1) * this.pageCount,
+    });
+  }
+
+  getUsersList(event: Event, action: string): void {
+    event.stopPropagation();
+    this.page = action === "next" ? this.page + 1 : this.page - 1;
+    this.getUsers();
   }
 }
