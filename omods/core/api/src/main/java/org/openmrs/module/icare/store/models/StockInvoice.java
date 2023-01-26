@@ -1,6 +1,7 @@
 package org.openmrs.module.icare.store.models;
 
 import org.openmrs.BaseOpenmrsData;
+import org.openmrs.module.icare.billing.models.InvoiceItem;
 import org.openmrs.module.icare.core.JSONConverter;
 
 import javax.persistence.*;
@@ -130,12 +131,19 @@ public class StockInvoice extends BaseOpenmrsData implements java.io.Serializabl
             stockInvoiceObject.put("purchaseOrder",purchaseOrderObject);
         }
 
+        List<Map<String,Object>> stockInvoiceItems = new ArrayList<>();
+        for(StockInvoiceItem stockInvoiceItem : this.getStockInvoiceItems()){
+            stockInvoiceItems.add(stockInvoiceItem.toMap());
+        }
+        stockInvoiceObject.put("stockInvoiceItems",stockInvoiceItems);
+
         if (this.getCreator() != null) {
             Map<String, Object> creatorObject = new HashMap<String, Object>();
             creatorObject.put("uuid", this.getCreator().getUuid());
             creatorObject.put("display", this.getCreator().getDisplayString());
             stockInvoiceObject.put("creator", creatorObject);
         }
+        System.out.println(stockInvoiceObject);
         return stockInvoiceObject;
     }
 

@@ -12,11 +12,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Entity
-@Table(name="stock_invoice_item")
+@Table(name="st_stock_invoice_item")
 public class StockInvoiceItem extends BaseOpenmrsData implements java.io.Serializable, JSONConverter {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "stock_invoice_item_id",unique= true, nullable = false)
     private Integer id;
 
     @ManyToOne
@@ -145,7 +146,7 @@ public class StockInvoiceItem extends BaseOpenmrsData implements java.io.Seriali
         HashMap<String,Object> stockInvoiceObject = new HashMap<>();
         stockInvoiceObject.put("uuid",this.stockInvoice.getUuid());
         stockInvoiceObject.put("display",this.stockInvoice.getInvoiceNumber());
-        invoiceItemObject.put("invoice",stockInvoiceObject);
+        invoiceItemObject.put("stockInvoice",stockInvoiceObject);
 
         HashMap<String,Object> itemObject = new HashMap<>();
         itemObject.put("uuid",this.getItem().getUuid());

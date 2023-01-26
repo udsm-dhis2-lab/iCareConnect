@@ -567,13 +567,13 @@ public class StoreController {
 	@RequestMapping(value = "stockinvoices", method = RequestMethod.GET)
 	@ResponseBody
 	public Map<String,Object> getStockInvoices(@RequestParam(defaultValue = "true",value = "paging" ,required = false) boolean paging, @RequestParam(defaultValue="50",value="pageSize",required = false) Integer pageSize, @RequestParam(defaultValue = "1",value = "page",required = false) Integer page){
+
 		Pager pager = new Pager();
 		pager.setAllowed(paging);
 		pager.setPageSize(pageSize);
 		pager.setPage(page);
 
 		ListResult<StockInvoice> stockInvoices = this.storeService.getStockInvoices(pager);
-
 		return stockInvoices.toMap();
 	}
 }
