@@ -339,7 +339,7 @@ export class PriceListComponent implements OnInit, OnChanges {
     this.loadData();
   }
   
-  ownloadPriceList(){
+  DownloadPriceList(){
 
     // this.priceList = [ ...this.priceList];
     const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(this.testdata);
