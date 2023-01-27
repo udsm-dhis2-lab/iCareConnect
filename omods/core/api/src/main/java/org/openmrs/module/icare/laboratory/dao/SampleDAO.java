@@ -82,7 +82,7 @@ public class SampleDAO extends BaseDAO<Sample> {
 		new Sample();
 		DbSession session = this.getSession();
 		String queryStr = "SELECT sp \n" + "FROM Sample sp JOIN sp.visit v \n"
-		        + "LEFT JOIN v.patient p LEFT JOIN p.names pname LEFT JOIN p.identifiers pi \n";
+			        + "LEFT JOIN v.patient p LEFT JOIN p.names pname LEFT JOIN p.identifiers pi \n";
 		
 		if (startDate != null && endDate != null) {
 			if (!queryStr.contains("WHERE")) {

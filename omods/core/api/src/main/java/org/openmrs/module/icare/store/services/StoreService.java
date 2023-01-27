@@ -1,6 +1,5 @@
 package org.openmrs.module.icare.store.services;
 
-import org.openmrs.DrugOrder;
 import org.openmrs.Location;
 import org.openmrs.api.OpenmrsService;
 import org.openmrs.module.icare.core.Item;
@@ -39,9 +38,9 @@ public interface StoreService extends OpenmrsService {
 	
 	public List<RequisitionStatus> getRequisitionStatuses();
 	
-	public ListResult<Requisition> getRequestsByRequestingLocation(String requestingLocationUuid, Pager pager);
+	public ListResult<Requisition> getRequestsByRequestingLocation(String requestingLocationUuid, Pager pager, RequisitionStatus.RequisitionStatusCode status);
 	
-	public ListResult<Requisition> getRequestsForRequestedLocation(String requestedLocationUuid, Pager pager);
+	public ListResult<Requisition> getRequestsForRequestedLocation(String requestedLocationUuid, Pager pager, RequisitionStatus.RequisitionStatusCode status);
 	
 	public Requisition getRequestByUuid(String requisitionUuid);
 	

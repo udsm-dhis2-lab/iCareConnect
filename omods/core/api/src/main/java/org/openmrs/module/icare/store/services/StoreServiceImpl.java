@@ -4,7 +4,6 @@ import org.apache.commons.collections.IteratorUtils;
 import org.openmrs.DrugOrder;
 import org.openmrs.Location;
 import org.openmrs.Order;
-import org.openmrs.Visit;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.api.OrderEntryException;
 import org.openmrs.api.OrderService;
@@ -181,9 +180,9 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 	}
 	
 	@Override
-	public ListResult<Requisition> getRequestsByRequestingLocation(String requestingLocationUuid, Pager pager) {
+	public ListResult<Requisition> getRequestsByRequestingLocation(String requestingLocationUuid, Pager pager, RequisitionStatus.RequisitionStatusCode status) {
 		
-		ListResult<Requisition> requisitions = this.requisitionDAO.getRequisitionsByRequestingLocation(requestingLocationUuid,pager);
+		ListResult<Requisition> requisitions = this.requisitionDAO.getRequisitionsByRequestingLocation(requestingLocationUuid,pager,status);
 		
 		for (Requisition requisition : requisitions.getResults()) {
 			List<RequisitionStatus> requisitionStatuses = this.requisitionStatusDAO.getStatusesByRequisition(requisition
@@ -197,9 +196,9 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 	}
 	
 	@Override
-	public ListResult<Requisition> getRequestsForRequestedLocation(String requestedLocationUuid, Pager pager) {
+	public ListResult<Requisition> getRequestsForRequestedLocation(String requestedLocationUuid, Pager pager, RequisitionStatus.RequisitionStatusCode status) {
 		
-		ListResult<Requisition> requisitions = this.requisitionDAO.getRequisitionsByRequestedLocation(requestedLocationUuid,pager);
+		ListResult<Requisition> requisitions = this.requisitionDAO.getRequisitionsByRequestedLocation(requestedLocationUuid,pager,status);
 		
 		for (Requisition requisition : requisitions.getResults()) {
 			List<RequisitionStatus> requisitionStatuses = this.requisitionStatusDAO.getStatusesByRequisition(requisition

@@ -217,6 +217,21 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		
 		assertThat("The requesting location id store B", ((Map) requestObject.get(0).get("requestingLocation")).get("display")
 		        .toString(), is("store B"));
+
+		// filter by status
+		MockHttpServletRequest newGetRequest2 = newGetRequest("store/requests",new Parameter("status","RECEIVED"),new Parameter("requestingLocationUuid",
+				"44939999-d333-fff2-9bff-61d11117c22e"));
+
+		MockHttpServletResponse handleGet2 = handle(newGetRequest2);
+		System.out.println("=> "+handleGet2.getContentAsString());
+		Map<String,Object> requests2= (new ObjectMapper()).readValue(handleGet2.getContentAsString(),Map.class);
+
+		List<Map<String, Object>> requestObject2 =((List<Map<String, Object>>) requests2.get("results"));
+
+		assertThat("The requesting location id store B", ((List) requestObject2.get(0).get("requisitionStatuses")).size()
+				, is(1));
+
+		System.out.println(requestObject2);
 		
 	}
 	
