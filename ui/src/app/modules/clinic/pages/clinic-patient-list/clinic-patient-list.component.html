@@ -67,7 +67,7 @@
           <!-- </div> -->
         </mat-tab>
 
-        <!-- <mat-tab label="Patient With Lab Orders Not Received at LAB">
+        <mat-tab label="Patient With Lab Orders Not Received at LAB">
           <div class="p-2" *ngIf="selectedTab.value === 3">
             <app-patient-list
               [currentLocation]="(currentLocation$ | async)?.id"
@@ -77,7 +77,7 @@
               (selectPatient)="onSelectPatient($event)"
             ></app-patient-list>
           </div>
-        </mat-tab> -->
+        </mat-tab>
         <mat-tab label="With Laboratory Tests">
           <!-- <div class="p-2" *ngIf="selectedTab.value === 2"> -->
 

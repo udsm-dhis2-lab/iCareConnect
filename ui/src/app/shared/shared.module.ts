@@ -15,6 +15,7 @@ import { FilterDiagnosesPipe } from "./pipes/filter-diagnoses.pipe";
 import { FilterItemsBySelectionsPipe } from "./pipes/filter-items-by-selections.pipe";
 import { HttpClientModule } from "@angular/common/http";
 import { SearchTestDetailsPipe } from './pipes/search-test-details.pipe';
+
 @NgModule({
   imports: [CommonModule, ...materialModules, ...modules],
   exports: [

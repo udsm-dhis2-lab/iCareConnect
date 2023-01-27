@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<module configVersion="1.4">
+	
+	<!-- Base Module Properties -->
+	<id>${project.parent.artifactId}</id>
+	<name>${project.parent.name}</name>
+	<version>${project.parent.version}</version>
+	<package>org.openmrs.module.icare</package>
+	<author>vincentminde</author>
+	<description>
+			${project.parent.description}
+	</description>
+
+	<activator>org.openmrs.module.icare.ICareActivator</activator>
+	
+	<!-- <updateURL>https://modules.openmrs.org/modules/download/@MODULE_ID@/update.rdf</updateURL> -->
+	<!-- /Base Module Properties -->
+
+	<require_version>2.0.3</require_version>
+
+	<advice>
+		<point>org.openmrs.api.VisitService</point>
+		<class>org.openmrs.module.icare.billing.aop.VisitBillAdvisor</class>
+	</advice>
+	<advice>
+		<point>org.openmrs.api.OrderService</point>
+		<class>org.openmrs.module.icare.billing.aop.OrderBillAdvisor</class>
+	</advice>
+	<globalProperty>
+		<property>icare.billing.serviceAttribute</property>
+		<defaultValue>SERVICE0IIIIIIIIIIIIIIIIIIIIIIIATYPE</defaultValue>
+		<description>
+			UUID for the visit attribute which registers the service.
+		</description>
+	</globalProperty>
+	<globalProperty>
+		<property>icare.billing.paymentSchemeAttribute</property>
+		<defaultValue>PSCHEME0IIIIIIIIIIIIIIIIIIIIIIIATYPE</defaultValue>
+		<description>
+			UUID for the visit attribute which registers the payment scheme to be used.
+		</description>
+	</globalProperty>
+	<globalProperty>
+		<property>icare.billing.paymentTypeAttribute</property>
+		<defaultValue>PTYPE000IIIIIIIIIIIIIIIIIIIIIIIATYPE</defaultValue>
+		<description>
+			UUID for the visit attribute which registers the payment type.
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>icare.registration.encounterType</property>
+		<defaultValue>REG00000IIIIIIIIIIIIIIIIIIIIIIIETYPE</defaultValue>
+		<description>
+			UUID for the registration encounter type.
+		</description>
+	</globalProperty>
+	<globalProperty>
+		<property>icare.registration.feeConcept</property>
+		<defaultValue>REG00000IIIIIIIIIIIIIIIIIIIIIIIIIIII</defaultValue>
+		<description>
+			UUID for the fee concept used to make payment.
+		</description>
+	</globalProperty>
+	<globalProperty>
+		<property>icare.billing.orderType</property>
+		<defaultValue>BIL00000IIIIIIIIIIIIIIIIIIIIIIIOTYPE</defaultValue>
+		<description>
+			UUID for the billing order type.
+		</description>
+	</globalProperty>
+	<globalProperty>
+		<property>icare.billing.insuranceAttribute</property>
+		<defaultValue>INSURANCEIIIIIIIIIIIIIIIIIIIIIIATYPE</defaultValue>
+		<description>
+			UUID for the Insurance type.
+		</description>
+	</globalProperty>
+	<globalProperty>
+		<property>icare.billing.insuranceIDAttribute</property>
+		<defaultValue>INSURANCEIDIIIIIIIIIIIIIIIIIIIIATYPE</defaultValue>
+		<description>
+			UUID for the Insurance ID.
+		</description>
+	</globalProperty>
+	<globalProperty>
+		<property>icare.billing.insuranceAuthorizationAttribute</property>
+		<defaultValue>INSURANCEAUTHNOIIIIIIIIIIIIIIIIATYPE</defaultValue>
+		<description>
+			UUID for the Insurance Authorization Attribute.
+		</description>
+	</globalProperty>
+	
+	<!-- Internationalization -->
+	<!-- All message codes should start with @MODULE_ID@.* -->
+	<messages>
+		<lang>en</lang>
+		<file>messages.properties</file>
+	</messages>
+	<messages>
+		<lang>fr</lang>
+		<file>messages_fr.properties</file>
+	</messages>
+	<messages>
+		<lang>es</lang>
+		<file>messages_es.properties</file>
+	</messages>
+	<!-- /Internationalization -->
+
+	<!-- Privileges -->
+	<privilege>
+		<name>CLINIC_RETIRE_LABORATORY_INVESTIGATION</name>
+		<description>Access for the clinic module to retire laboratory investigation</description>
+	</privilege>
+	<privilege>
+		<name>CLINIC_DELETE_LABORATORY_INVESTIGATION</name>
+		<description>Access for the clinic module to delete laboratory investigation</description>
+	</privilege>
+	<privilege>
+		<name>CLINIC_ADD_RADIOLOGY_INVESTIGATION</name>
+		<description>Access for the clinic module to add radiology investigation</description>
+	</privilege>
+	<privilege>
+		<name>CLINIC_RETIRE_RADIOLOGY_INVESTIGRATION</name>
+		<description>Access for the clinic module to retire radiology investigation</description>
+	</privilege>
+	<privilege>
+		<name>CLINIC_DELETE_RADIOLOGY_INVESTIGATION</name>
+		<description>Access for the clinic module to delete radiology investigation</description>
+	</privilege>
+	<privilege>
+		<name>CLINIC_ADD_PROCEDURE_ORDER</name>
+		<description>Access for the clinic module to add procedure order</description>
+	</privilege>
+	<privilege>
+		<name>CLINIC_RETIRE_PROCEDURE_ORDER</name>
+		<description>Access for the clinic module to retire procedure order</description>
+	</privilege>
+	<privilege>
+		<name>CLINIC_DELETE_PROCEDURE_ORDER</name>
+		<description>Access for the clinic module to delete procedure order</description>
+	</privilege>
+	<privilege>
+		<name>CLINIC_ADD_CONFIRMED_DIAGNOSIS</name>
+		<description>Access for the clinic module to add confirmed diagnosis</description>
+	</privilege>
+	<privilege>
+		<name>CLINIC_RETIRE_CONFIRMED_DIAGNOSIS</name>
+		<description>Access for the clinic module to retire confirmed diagnosis</description>
+	</privilege>
+	<privilege>
+		<name>CLINIC_DELETE_CONFIRMED_DIAGNOSIS</name>
+		<description>Access for the clinic module to delete confirmed diagnosis</description>
+	</privilege>
+	<privilege>
+		<name>CLINIC_ADD_PROVISIONAL_DIAGNOSIS</name>
+		<description>Access for the clinic module to add provisional diagnosis</description>
+	</privilege>
+	<privilege>
+		<name>CLINIC_RETIRE_PROVISIONAL_DIAGNOSIS</name>
+		<description>Access for the clinic module to retire provisional diagnosis</description>
+	</privilege>
+	<privilege>
+		<name>CLINIC_DELETE_PROVISIONAL_DIAGNOSIS</name>
+		<description>Access for the clinic module to delete provisional diagnosis</description>
+	</privilege>
+	<privilege>
+		<name>CLINIC_ADD_PRESCRIPTION</name>
+		<description>Access for the clinic module to add prescription</description>
+	</privilege>
+	<privilege>
+		<name>CLINIC_RETIRE_PRESCRIPTION</name>
+		<description>Access for the clinic module to retire prescription</description>
+	</privilege>
+	<privilege>
+		<name>CLINIC_DELETE_PRESCRIPTION</name>
+		<description>Access for the clinic module to delete prescription</description>
+	</privilege>
+	<privilege>
+		<name>ALL</name>
+		<description>Access for the all system functionalities</description>
+	</privilege>
+	<!-- /Priviledges -->
+
+	<mappingFiles>
+		Prescription.hbm.xml
+	</mappingFiles>
+</module>
+

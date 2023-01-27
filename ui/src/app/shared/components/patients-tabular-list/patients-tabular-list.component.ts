@@ -10,6 +10,7 @@ import { Visit } from "../../resources/visits/models/visit.model";
   templateUrl: "./patients-tabular-list.component.html",
   styleUrls: ["./patients-tabular-list.component.scss"],
 })
+
 export class PatientsTabularListComponent implements OnInit, OnChanges {
   @Input() visits: Visit[];
   @Input() shouldShowParentLocation: boolean;
@@ -29,6 +30,7 @@ export class PatientsTabularListComponent implements OnInit, OnChanges {
     "gender",
     "age",
     "location",
+    "results",
     "paymentType",
     "startDatetime",
   ];

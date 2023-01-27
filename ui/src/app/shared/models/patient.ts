@@ -37,4 +37,5 @@ export class patientObj {
   get uuid() {
     return this.patient.uuid;
   }
+
 }

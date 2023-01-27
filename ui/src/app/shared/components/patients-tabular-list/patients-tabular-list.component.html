@@ -43,6 +43,12 @@
         {{ element.location }}
       </td>
     </ng-container>
+    <ng-container matColumnDef="results">
+      <th mat-header-cell *matHeaderCellDef>Status with/without results</th>
+      <td mat-cell *matCellDef="let element">
+        {{element.encounters[0].orders.length > 0 ? 'results present' : 'no results'}}
+      </td>
+    </ng-container>
     <ng-container matColumnDef="paymentType">
       <th mat-header-cell *matHeaderCellDef>Payment Type</th>
       <td mat-cell *matCellDef="let element">
