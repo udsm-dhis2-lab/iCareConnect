@@ -12,6 +12,7 @@ import { RegistrationEditComponent } from './components/registration-edit/regist
 import { entryRegComponents, regComponents } from './components';
 import { LocationsChipsComponent } from './components/locations-chips/locations-chips.component';
 import { RegistrationSummaryCardsComponent } from './components/registration-summary-cards/registration-summary-cards/registration-summary-cards.component';
+import { UpdatePaymentCategoryComponent } from './components/update-payment-category/update-payment-category.component';
 
 @NgModule({
     declarations: [
@@ -25,6 +26,7 @@ import { RegistrationSummaryCardsComponent } from './components/registration-sum
         ...regComponents,
         LocationsChipsComponent,
         RegistrationSummaryCardsComponent,
+        UpdatePaymentCategoryComponent,
     ],
     imports: [CommonModule, RegistrationRoutingModule, SharedModule]
 })
