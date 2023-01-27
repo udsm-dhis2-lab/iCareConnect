@@ -10,6 +10,7 @@ export class Patient {
   // TODO: Need to find best way to type incoming patient
   constructor(private patient: any) {}
 
+
   get id(): string {
     return this.patient?.uuid;
   }
@@ -31,6 +32,10 @@ export class Patient {
 
   get name(): string {
     return this.patient?.person?.display;
+  }
+
+  get exempt(): boolean{
+    return this.patient?.exempt;
   }
 
   get fname(): string {

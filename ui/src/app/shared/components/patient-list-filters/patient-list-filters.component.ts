@@ -14,6 +14,8 @@ export class PatientListFiltersComponent implements OnInit {
   filterCategoriesOptions$: Observable<any>;
   filterParameters: any[] = [];
   filterList: any[] = [];
+  startDate: any = new Date();
+  endDate: any = new Date();
 
   @Output() onFilterChanged = new EventEmitter<any>();
 

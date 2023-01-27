@@ -288,7 +288,7 @@ export class CurrentPatientBillingComponent implements OnInit {
 
   requestExemption(patientBillingDetails, params) {
     let currentDate = new Date();
-
+    console.log(patientBillingDetails)
     let exemptionEncounterStart = {
       visit: patientBillingDetails.visit?.uuid,
       encounterDatetime: currentDate.toISOString(),

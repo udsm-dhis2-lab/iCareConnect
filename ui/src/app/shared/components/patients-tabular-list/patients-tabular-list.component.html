@@ -1,3 +1,23 @@
+<!-- mat inputs with function to filter patients by date range-->
+    <mat-form-field>
+      <input matInput [matDatepicker]="picker" placeholder="Start Date"
+      (dateChange)="assignStartDate($event)"
+      >
+      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
+    </mat-form-field>
+
+    <mat-form-field>
+      <input matInput [matDatepicker]="picker2" placeholder="End Date"
+      (dateChange)="assignEndDate($event)"
+      >
+      <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+      <mat-datepicker #picker2></mat-datepicker>
+    </mat-form-field>
+
+    <button mat-raised-button color="primary" (click)="filterByDateRange()">Filter</button>
+
+
 <div>
   <table
     class="mat-elevation-z2"

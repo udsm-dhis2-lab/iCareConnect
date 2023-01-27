@@ -4,6 +4,7 @@ import { MatLegacyPaginator as MatPaginator } from "@angular/material/legacy-pag
 import { MatLegacyTableDataSource as MatTableDataSource } from "@angular/material/legacy-table";
 import { sanitizePatientsVisitsForTabularPatientListing } from "../../helpers/sanitize-visits-list-for-patient-tabular-listing.helper";
 import { Visit } from "../../resources/visits/models/visit.model";
+import * as moment from "moment/moment";
 
 @Component({
   selector: "app-patients-tabular-list",
@@ -21,6 +22,10 @@ export class PatientsTabularListComponent implements OnInit, OnChanges {
   @Output() shouldLoadNewList: EventEmitter<boolean> =
     new EventEmitter<boolean>();
   currentPage: number = 0;
+  // declare start date picker
+  startDate:  any;
+// declare end date picker
+    endDate : any;
 
   displayedColumns: string[] = [
     "position",
@@ -80,5 +85,42 @@ export class PatientsTabularListComponent implements OnInit, OnChanges {
         ? this.page - 1
         : this.page;
     this.shouldLoadNewList.emit({ ...visit, type, page: this.page });
+  }
+
+  // assign start date and end date
+    assignStartDate(event) {
+        this.startDate = moment(event.target.value).format("MMMM Do YYYY");
+        console.log("start date", this.startDate);
+    }
+
+    assignEndDate(event) {
+        this.endDate = moment(event.target.value).format("MMMM Do YYYY");
+console.log("end date", this.endDate);
+    }
+//  function to filter in visits by date range then update visits and dataSource
+  filterByDateRange() {
+    console.log("filter by date range");
+    const filteredVisits = this.visits.filter(
+        // loop through visits, console log visitStartTime and filter by date range  then update visits and dataSource
+
+        (visit) => {
+            const visitStartTime = visit.visitStartTime;
+            console.log("visitStartTime", visitStartTime);
+            return (
+                visitStartTime >= this.startDate &&
+                visitStartTime <= this.endDate
+            );
+        }
+    );
+    this.dataSource = new MatTableDataSource(
+        sanitizePatientsVisitsForTabularPatientListing(
+            filteredVisits,
+            this.shouldShowParentLocation,
+            this.paymentTypeSelected,
+            this.itemsPerPage,
+            this.page
+        )
+    );
+    this.dataSource.paginator = this.paginator;
   }
 }

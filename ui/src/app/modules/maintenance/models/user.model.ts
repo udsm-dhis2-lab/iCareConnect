@@ -36,6 +36,7 @@ export interface PersonCreateModel {
   birthdateEstimated?: boolean;
   dead?: boolean;
   birthdate?: string;
+  exempted?: boolean;
   preferredAddress?: PersonAddress;
   addresses?: PersonAddress[];
 }

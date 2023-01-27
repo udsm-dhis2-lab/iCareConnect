@@ -7,6 +7,7 @@ import { Textbox } from "src/app/shared/modules/form/models/text-box.model";
 import { BillItem } from "../../models/bill-item.model";
 import { BillObject } from "../../models/bill-object.model";
 import { Bill } from "../../models/bill.model";
+import {Patient} from "../../../../shared/resources/patient/models/patient.model";
 import { BillingService } from "../../services/billing.service";
 import { ExemptionConfirmationComponent } from "../exemption-confirmation/exemption-confirmation.component";
 import * as _ from "lodash";
@@ -168,6 +169,7 @@ export class ExemptionItemComponent implements OnInit {
   }
 
   onConfirmExemption(e): void {
+    console.log(this.exemptionDetails.exemptionType.id);
     e.stopPropagation();
     const dialog = this.dialog.open(ExemptionConfirmationComponent, {
       width: "25%",

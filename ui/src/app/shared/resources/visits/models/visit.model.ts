@@ -50,7 +50,7 @@ export class Visit {
   }
 
   get visitStartTime(): string {
-    return moment(this.visit.startDatetime).format("MMMM Do YYYY, h:mm:ss a");
+    return moment(this.visit.startDatetime).format("MMMM Do YYYY");
   }
 
   get visitStopTime(): string {
@@ -545,6 +545,10 @@ export class VisitExt extends Visit {
 
   get patientName(): string {
     return this.visit?.patient?.name;
+  }
+
+  get patientExempted(): boolean{
+    return this.patient?.exempt;
   }
 
   get patientGender(): string {
