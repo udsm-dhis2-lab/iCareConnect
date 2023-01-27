@@ -114,6 +114,15 @@
           >
             Edit Visit
           </button> -->
+
+
+          <!-- Close visit added -->
+          <button mat-stroked-button 
+          (click)="closeVisit($event, params.activeVisitUuid)" 
+          class="mr-2">Close Visit</button>
+
+
+
           <button
             mat-stroked-button
             (click)="
@@ -707,6 +716,8 @@
             <button mat-stroked-button (click)="onCancel($event)">
               Cancel
             </button>
+
+
             <button
               mat-stroked-button
               class="ml-2"
