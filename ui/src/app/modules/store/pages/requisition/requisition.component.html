@@ -171,6 +171,7 @@
         </td>
       </tr>
     </table> -->
+
     <mat-progress-bar mode="indeterminate" *ngIf="!requisitions && !loadedRequisitions"></mat-progress-bar>
     <app-requisition-by-store
       *ngIf="loadedRequisitions && requisitions"
@@ -181,18 +182,18 @@
       (receiveRequisition)="onReceiveRequisition($event)"
       (selectionChange)="getSelection($event)"
     >
-    </app-requisition-by-store>
-
+    </app-requisition-by-store>    
     <div class="d-flex justify-content-end mt-2 mr-2">
       <button
         color="primary"
         mat-flat-button
-        (click)="issueAllSelected($event, selectedIssues)"
-        [disabled]="selectedRequestsCount == 0"
+        (click)="requisitionAllSelected($event, selectedRequisition)"
+        [disabled]="selectedRequisitionCount == 0"
       >
         Request selected items
       </button>
     </div>
-  
+
+    
   </mat-card>
 </div>

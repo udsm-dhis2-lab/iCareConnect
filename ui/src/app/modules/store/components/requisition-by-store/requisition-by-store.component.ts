@@ -81,7 +81,7 @@ export class RequisitionByStoreComponent implements OnInit {
   }
 
   getSelection(event: MatCheckboxChange, request: any): void {
-    this.selectionChange.emit({event: event, issue: request});
+    this.selectionChange.emit({event: event, request: request});
   }
 
   get selectedRequestsCount(): number {
