@@ -1,6 +1,6 @@
 import { DispensingFormComponent } from "./dispension-form/dispension-form.component";
 import { GeneralDispensingFormComponent } from "./general-dispension-form/general-dispension-form.component";
-import { GenericDialogComponent } from "./generic-dialog/generic-dialog.component";
+import { PatientHistoryDialogComponent } from "./patient-history-dialog/patient-history-dialog.component";
 import { ManageSystemSettingComponent } from "./manage-system-setting/manage-system-setting.component";
 import { ManageUserProfileModalComponent } from "./manage-user-profile-modal/manage-user-profile-modal.component";
 import { PatientListDialogComponent } from "./patient-list-dialog/patient-list-dialog.component";
@@ -17,7 +17,7 @@ export const sharedDialogs: any[] = [
   ManageSystemSettingComponent,
   ManageUserProfileModalComponent,
   SharedSamplesVerificationIntegratedComponent,
-  GenericDialogComponent,
+  PatientHistoryDialogComponent,
 ];
 export {
   PatientListDialogComponent,
