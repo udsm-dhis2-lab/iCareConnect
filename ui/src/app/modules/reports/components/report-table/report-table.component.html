@@ -24,7 +24,7 @@
       </tr>
     </thead>
 
-    <tr *ngFor="let row of data?.rows">
+    <tr *ngFor="let row of processedData?.rows">
       <!-- changing "data" to "processedData?" Assigned to Elizabeth-->
       <td *ngFor="let column of processedData?.metadata?.columns">
         <span
