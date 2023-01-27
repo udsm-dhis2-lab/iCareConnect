@@ -519,7 +519,7 @@ public class StoreController {
 		}
 		
 	}
-
+	
 	@RequestMapping(value = "stockinvoices",method = RequestMethod.POST)
 	@ResponseBody
 	public List<Map<String,Object>> addStockInvoices(@RequestBody List<Map<String,Object>> stockInvoicesMap) throws Exception {
@@ -538,8 +538,8 @@ public class StoreController {
 				stockInvoiceItem.setBatchNo((String) invoiceItemMap.get("batchNo"));
 				stockInvoiceItem.setOrderQuantity((Integer) invoiceItemMap.get("orderQuantity"));
 				stockInvoiceItem.setBatchQuantity((Integer) invoiceItemMap.get("batchQuantity"));
-				stockInvoiceItem.setAmount((Integer) invoiceItemMap.get("amount"));
-				stockInvoiceItem.setUnitPrice((Integer) invoiceItemMap.get("unitPrice"));
+				stockInvoiceItem.setAmount((Double) invoiceItemMap.get("amount"));
+				stockInvoiceItem.setUnitPrice((Double) invoiceItemMap.get("unitPrice"));
 				stockInvoiceItem.setUom(Context.getConceptService().getConceptByUuid(((Map)invoiceItemMap.get("uom")).get("uuid").toString()));
 
 				SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -563,20 +563,23 @@ public class StoreController {
 		return newStockInvoicesObject;
 
 	}
-
+	
 	@RequestMapping(value = "stockinvoices", method = RequestMethod.GET)
 	@ResponseBody
-	public Map<String,Object> getStockInvoices(@RequestParam(defaultValue = "true",value = "paging" ,required = false) boolean paging, @RequestParam(defaultValue="50",value="pageSize",required = false) Integer pageSize, @RequestParam(defaultValue = "1",value = "page",required = false) Integer page){
-
+	public Map<String, Object> getStockInvoices(
+	        @RequestParam(defaultValue = "true", value = "paging", required = false) boolean paging,
+	        @RequestParam(defaultValue = "50", value = "pageSize", required = false) Integer pageSize,
+	        @RequestParam(defaultValue = "1", value = "page", required = false) Integer page) {
+		
 		Pager pager = new Pager();
 		pager.setAllowed(paging);
 		pager.setPageSize(pageSize);
 		pager.setPage(page);
-
+		
 		ListResult<StockInvoice> stockInvoices = this.storeService.getStockInvoices(pager);
 		return stockInvoices.toMap();
 	}
-
+	
 	@RequestMapping(value = "suppliers",method = RequestMethod.POST)
 	@ResponseBody
 	public List<Map<String,Object>> addSuppliers(@RequestBody List<Map<String,Object>> suppliersMap){
@@ -593,7 +596,7 @@ public class StoreController {
 
 		return newSuppliersMapList;
 	}
-
+	
 	@RequestMapping(value="suppliers",method = RequestMethod.GET)
 	@ResponseBody
 	public List<Map<String,Object>> getSuppliers(@RequestParam(value = "startIndex",required = false,defaultValue = "0") Integer startIndex,@RequestParam(value="limit" ,required=false,defaultValue = "100") Integer limit){
