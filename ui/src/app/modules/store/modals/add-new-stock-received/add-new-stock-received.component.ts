@@ -55,6 +55,16 @@ export class AddNewStockReceivedComponent implements OnInit {
         value: "",
       }),
       new Textbox({
+        id: "time",
+        key: "time",
+        label: "Time",
+        type: "time",
+        controlType: "time",
+        required: true,
+        disabled: false,
+        value: "",
+      }),
+      new Textbox({
         id: "batchNo",
         key: "batchNo",
         label: "Batch NO",
