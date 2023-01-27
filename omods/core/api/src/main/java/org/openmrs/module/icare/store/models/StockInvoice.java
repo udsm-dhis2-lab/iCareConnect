@@ -143,7 +143,6 @@ public class StockInvoice extends BaseOpenmrsData implements java.io.Serializabl
             creatorObject.put("display", this.getCreator().getDisplayString());
             stockInvoiceObject.put("creator", creatorObject);
         }
-        System.out.println(stockInvoiceObject);
         return stockInvoiceObject;
     }
 

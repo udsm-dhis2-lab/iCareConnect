@@ -660,5 +660,10 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		Map<String,Object> stockInvoices = (new ObjectMapper()).readValue(handleGet.getContentAsString(),Map.class);
 		System.out.println(stockInvoices);
 
+		Map<String,Object> pagerObject = (Map<String,Object>) stockInvoices.get("pager");
+		assertThat("page is 1",(Integer) pagerObject.get("page")== 1,is(true));
+		assertThat("Total is 2", (Integer) pagerObject.get("total")==2,is(true));
+		assertThat("List count is 1", ((List) stockInvoices.get("results")).size() == 1, is(true));
+
 	}
 }

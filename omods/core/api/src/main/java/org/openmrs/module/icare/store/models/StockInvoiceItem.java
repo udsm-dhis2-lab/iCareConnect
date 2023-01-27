@@ -43,7 +43,9 @@ public class StockInvoiceItem extends BaseOpenmrsData implements java.io.Seriali
     @Column(name = "expiry_date")
     private Date expiryDate;
 
-    @Column(name = "uom")
+
+    @ManyToOne
+    @JoinColumn(name = "uom")
     private Concept uom;
 
     @Column(name = "unit_price")
