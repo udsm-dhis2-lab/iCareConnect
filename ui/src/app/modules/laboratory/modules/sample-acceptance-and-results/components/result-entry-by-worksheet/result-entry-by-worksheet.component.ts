@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { Observable } from "rxjs";
-import { WorkSeetsService } from "src/app/modules/laboratory/resources/services/worksheets.service";
+import { WorkSheetsService } from "src/app/modules/laboratory/resources/services/worksheets.service";
 import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
 import { groupBy, flatten, omit } from "lodash";
@@ -27,7 +27,7 @@ export class ResultEntryByWorksheetComponent implements OnInit {
   files: any[];
   isFormValid: boolean = false;
   constructor(
-    private worksheetsService: WorkSeetsService,
+    private worksheetsService: WorkSheetsService,
     private sampleService: SamplesService,
     private sampleAllocationService: SampleAllocationService
   ) {}

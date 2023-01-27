@@ -10,6 +10,8 @@ export const loadLabSamplesByCollectionDates = createAction(
     containers: any;
     configs: any;
     codedSampleRejectionReasons: any;
+    hasStatus?: string;
+    category?: string;
     startIndex?: number;
     limit?: number;
   }>()
