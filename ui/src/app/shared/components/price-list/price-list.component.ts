@@ -330,7 +330,8 @@ export class PriceListComponent implements OnInit, OnChanges {
     this.currentDepartmentId = this.selectedPriceListDepartment?.uuid;
     this.loadData();
   }
-  
+
+  //Function to download the excel file
   DownloadPriceList(){
     // this.priceList = [ ...this.priceList];
     const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(this.priceList);
