@@ -177,7 +177,8 @@ public class StoreController {
 	        @RequestParam(required = false) String requestedLocationUuid,
 			@RequestParam(defaultValue = "true",value = "paging", required = false) boolean paging,
 			@RequestParam(defaultValue = "50",value = "pageSize", required = false) Integer pageSize,
-			@RequestParam(defaultValue = "1",value = "page",required = false) Integer page) {
+			@RequestParam(defaultValue = "1",value = "page",required = false) Integer page,
+			@RequestParam(value = "status",required = false) RequisitionStatus.RequisitionStatusCode status) {
 
 		Pager pager = new Pager();
 		pager.setAllowed(paging);
@@ -185,7 +186,7 @@ public class StoreController {
 		pager.setPage(page);
 
 		if (requestedLocationUuid != null && requestingLocationUuid == null) {
-			ListResult<Requisition> requisitions = this.storeService.getRequestsForRequestedLocation(requestedLocationUuid,pager);
+			ListResult<Requisition> requisitions = this.storeService.getRequestsForRequestedLocation(requestedLocationUuid,pager,status);
 			
 //			List<Map<String, Object>> requisitionsList = new ArrayList<Map<String, Object>>();
 //
@@ -198,7 +199,7 @@ public class StoreController {
 		}
 		
 		if (requestingLocationUuid != null && requestedLocationUuid == null) {
-			ListResult<Requisition> requisitions = this.storeService.getRequestsByRequestingLocation(requestingLocationUuid,pager);
+			ListResult<Requisition> requisitions = this.storeService.getRequestsByRequestingLocation(requestingLocationUuid,pager,status);
 			
 //			List<Map<String, Object>> requisitionsList = new ArrayList<Map<String, Object>>();
 //
