@@ -52,14 +52,6 @@ export class PriceListComponent implements OnInit, OnChanges {
   @Input() departmentId: string;
   currentDepartmentId: string;
 
-  testdata: any[] = [
-   
-    { name: "John", age: 30, city: "Dar es salaam" },
-    { name: "Smith", age: 25, city: "Mwanza" },
-    { name: "Johnson", age: 35, city: "Arusha" }
-  
-  ];
-
   priceList: any[];
   priceList$: Observable<any[]>;
 
@@ -340,9 +332,8 @@ export class PriceListComponent implements OnInit, OnChanges {
   }
   
   DownloadPriceList(){
-
     // this.priceList = [ ...this.priceList];
-    const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(this.testdata);
+    const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(this.priceList);
     const wb: XLSX.WorkBook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
     /* generate an excel file and prompt the user to download it */
@@ -353,4 +344,5 @@ export class PriceListComponent implements OnInit, OnChanges {
     // here it is needed a Logic for handling the file upload goes here
     let file = event.target.files[0];
   }
+
 }
