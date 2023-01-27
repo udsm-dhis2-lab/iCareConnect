@@ -571,9 +571,9 @@ export class LabSamplesEffects {
       switchMap(([action, lisConfigs]: [any, any]) => {
         return this.sampleService
           .getLabSamplesByCollectionDates(
-            action?.datesParameters,
-            action?.startIndex,
-            action?.limit
+            action.datesParameters,
+            action?.category,
+            action?.hasStatus
           )
           .pipe(
             map((response) => {

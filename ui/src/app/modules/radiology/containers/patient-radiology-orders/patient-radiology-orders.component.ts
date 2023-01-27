@@ -8,6 +8,7 @@ import { loadPatientBills } from "src/app/store/actions/bill.actions";
 import { loadActiveVisit } from "src/app/store/actions/visit.actions";
 import { AppState } from "src/app/store/reducers";
 import { getAllRadiologyOrders } from "src/app/store/selectors";
+import { getAllBills } from "src/app/store/selectors/bill.selectors";
 import { getCurrentPatient } from "src/app/store/selectors/current-patient.selectors";
 import {
   getAllUSerRoles,
@@ -33,6 +34,7 @@ export class PatientRadiologyOrdersComponent implements OnInit {
 
   activeVisitUuid$: Observable<string>;
   currentPatient$: Observable<any>;
+  currentBills$: Observable<any>;
   constructor(
     private store: Store<AppState>,
     private route: ActivatedRoute,
@@ -49,6 +51,7 @@ export class PatientRadiologyOrdersComponent implements OnInit {
         isRegistrationPage: true,
       })
     );
+    this.currentBills$ = this.store.select(getAllBills);
     this.store.dispatch(loadActiveVisit({ patientId: this.patientId }));
     this.store.dispatch(loadCurrentPatient({ uuid: this.patientId }));
     this.store.dispatch(loadPatientBills({ patientUuid: this.patientId }));

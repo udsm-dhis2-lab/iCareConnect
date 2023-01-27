@@ -772,6 +772,7 @@ export class VisitsService {
     bills?: any,
     isEnsured?: boolean
   ): Observable<any> {
+    console.log("==> Sanity checking: ", bills)
     return from(
       this.api.visit.getVisit(uuid, {
         v: fields,
