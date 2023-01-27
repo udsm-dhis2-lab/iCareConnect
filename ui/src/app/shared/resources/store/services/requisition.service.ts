@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { Observable, of, throwError } from "rxjs";
-import { map } from "rxjs/operators";
+import { catchError, map } from "rxjs/operators";
 import { OpenmrsHttpClientService } from "src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service";
 import { RequisitionInput } from "../models/requisition-input.model";
 import {
@@ -9,6 +9,12 @@ import {
   RequisitionObject,
   RequisitionStatus,
 } from "../models/requisition.model";
+import {
+  IssueInput,
+  IssueStatusInput,
+  Issuing,
+  IssuingObject,
+} from "../models/issuing.model";
 import { orderBy } from "lodash";
 
 @Injectable({
@@ -37,6 +43,37 @@ export class RequisitionService {
       );
   }
 
+  issueRequest(issueInput: IssueInput): Observable<any> {
+    if (!issueInput) {
+      return throwError({ message: "You have provided incorrect parameters" });
+    }
+    const issueObject = Issuing.createIssue(issueInput);
+    return this.httpClient.post("store/issue", issueObject).pipe(
+      map((response) => response),
+      catchError((error) => of(error))
+    );
+  }
+
+  getAllIssuings(
+    locationUuid?: string,
+    requestingLocationUuid?: string
+  ): Observable<IssuingObject[]> {
+    return this.httpClient
+      .get(
+        `store/requests?${
+          requestingLocationUuid
+            ? "requestingLocationUuid=" + requestingLocationUuid
+            : "requestedLocationUuid=" + locationUuid
+        }`
+      )
+      .pipe(
+        map((issueResponse: any) => {
+          return (orderBy(issueResponse, ["created"], ["desc"]) || []).map(
+            (issueItem) => new Issuing(issueItem).toJson()
+          );
+        })
+      );
+  }
   createRequest(
     requisitionInput: RequisitionInput
   ): Observable<RequisitionObject> {

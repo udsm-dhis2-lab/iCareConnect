@@ -1,7 +1,8 @@
 import { Component, OnInit } from "@angular/core";
 import { MatLegacyDialog as MatDialog } from "@angular/material/legacy-dialog";
 import { select, Store } from "@ngrx/store";
-import { Observable } from "rxjs";
+import { uniqBy, groupBy, orderBy, flatten, omit } from "lodash";
+import { Observable, of, zip } from "rxjs";
 import { map } from "rxjs/operators";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { RequisitionInput } from "src/app/shared/resources/store/models/requisition-input.model";
@@ -18,8 +19,10 @@ import { getAllStockableItems } from "src/app/store/selectors/pricing-item.selec
 import {
   getRequisitionLoadingState
 } from "src/app/store/selectors/requisition.selectors";
+import { ConfirmRequisitionsModalComponent } from "../../modals/confirm-requisitions-modal/confirm-requisitions-modal.component"; 
 import { RequestCancelComponent } from "../../modals/request-cancel/request-cancel.component";
 import { RequisitionFormComponent } from "../../modals/requisition-form/requisition-form.component";
+import { IssuingObject } from "src/app/shared/resources/store/models/issuing.model";
 
 @Component({
   selector: "app-requisition",
@@ -40,6 +43,9 @@ export class RequisitionComponent implements OnInit {
   searchTerm: any;
   requisitions: RequisitionObject[];
   storedRequisitions: RequisitionObject[];
+  selectedIssues: any = {};
+  issuingList$: Observable<IssuingObject[]>;
+  requestingLocation: any;
   constructor(
     private store: Store<AppState>,
     private dialog: MatDialog,
@@ -91,6 +97,13 @@ export class RequisitionComponent implements OnInit {
           return requisitions;
         })
       );
+  }
+
+  getAllIssuing(): void {
+    this.issuingList$ = this.requisitionService.getAllIssuings(
+      JSON.parse(localStorage.getItem("currentLocation"))?.uuid,
+      this.requestingLocation?.uuid
+    );
   }
 
   onSearchRequisition(event?: any){
@@ -208,5 +221,112 @@ export class RequisitionComponent implements OnInit {
       );
       this.getAllRequisition();
     }
+  }
+
+  getBatchsNotExpired(batches): any {
+    return orderBy(
+      batches?.filter(
+        (batch) => Number(batch?.quantity) > 0 && batch?.expiryDate > Date.now()
+      ),
+      ["expiryDate"],
+      ["asc"]
+    );
+  }
+
+  issueAllSelected(event: Event, selectedItemsToIssue: any): void {
+    event.stopPropagation();
+    let itemsToIssue = [];
+    Object.keys(selectedItemsToIssue).forEach((key) => {
+      itemsToIssue = [...itemsToIssue, selectedItemsToIssue[key]];
+    });
+    const groupedRequisitions = groupBy(itemsToIssue, "requisitionUuid");
+
+    this.dialog
+      .open(ConfirmRequisitionsModalComponent, {
+        width: "20%",
+        data: groupedRequisitions,
+      })
+      .afterClosed()
+      .subscribe((requisitionData) => {
+        const groupedRequisitions = requisitionData?.requisitions;
+        const nonExpiredBatches = this.getBatchsNotExpired(
+          flatten(
+            requisitionData?.stockStatus.map(
+              (stockStatus) => stockStatus?.batches
+            )
+          )
+        );
+
+        if (groupedRequisitions) {
+          zip(
+            ...Object.keys(groupedRequisitions).map((key) => {
+              const currentItemsToIssue = groupedRequisitions[key];
+              // Create items to issue by batches
+              const toIssueItemsByBatches = flatten(
+                currentItemsToIssue.map((item) => {
+                  // Determine all batches eligible to match the requested quantity
+                  const batchesForThisItem =
+                    nonExpiredBatches.filter(
+                      (batch) => batch?.item?.uuid === item?.itemUuid
+                    ) || [];
+                  let eligibleBatches = [];
+                  const quantityToIssue = Number(item?.quantityRequested);
+                  let eligibleToIssue = 0;
+                  let count = 0;
+                  while (
+                    batchesForThisItem?.length > 0 &&
+                    quantityToIssue > eligibleToIssue
+                  ) {
+                    const toIssue =
+                      quantityToIssue - eligibleToIssue >
+                      Number(batchesForThisItem[count]?.quantity)
+                        ? Number(batchesForThisItem[count]?.quantity)
+                        : quantityToIssue - eligibleToIssue;
+                    eligibleBatches = [
+                      ...eligibleBatches,
+                      {
+                        ...batchesForThisItem[count],
+                        ...item,
+                        toIssue: toIssue,
+                      },
+                    ];
+                    eligibleToIssue =
+                      eligibleToIssue +
+                      Number(batchesForThisItem[count]?.quantity);
+                    count++;
+                  }
+                  return eligibleBatches;
+                })
+              );
+              const issueInput = {
+                requisitionUuid: key,
+                issuedLocationUuid:
+                  groupedRequisitions[key][0]?.requestingLocation.uuid,
+                issuingLocationUuid:
+                  groupedRequisitions[key][0].requestedLocation.uuid,
+                issueItems: toIssueItemsByBatches.map((matchedItemToIssue) => {
+                  // console.log("matchedItemToIssue", matchedItemToIssue);
+                  return {
+                    itemUuid: matchedItemToIssue?.itemUuid,
+                    quantity: matchedItemToIssue?.toIssue,
+                    batch: matchedItemToIssue?.batch,
+                    expiryDate: new Date(matchedItemToIssue?.expiryDate),
+                  };
+                }),
+              };
+              return this.requisitionService.issueRequest(issueInput).pipe(
+                map((response) => {
+                  return response;
+                })
+              );
+            })
+          ).subscribe((response) => {
+            if (response) {
+              this.selectedIssues = {};
+              this.getAllIssuing();
+            }
+          });
+        }
+      });
   }
 }
