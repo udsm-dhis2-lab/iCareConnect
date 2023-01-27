@@ -26,6 +26,8 @@ import { LocationGet } from "src/app/shared/resources/openmrs";
 import { getCurrentLocation } from "src/app/store/selectors";
 import { map } from "rxjs/operators";
 import { getAllObservations } from "src/app/store/selectors/observation.selectors";
+import { DischargePatientModalComponent } from "src/app/shared/components/discharge-patient-modal/discharge-patient-modal.component";
+import { MatDialog } from "@angular/material/dialog";
 
 @Component({
   selector: "app-patient-dashboard",
@@ -50,6 +52,7 @@ export class PatientDashboardComponent implements OnInit {
   IPDRoundConceptUuid$: Observable<any>;
   constructor(
     private store: Store<AppState>,
+    private dialog: MatDialog,
     private route: ActivatedRoute,
     private systemSettingsService: SystemSettingsService
   ) {}
@@ -139,5 +142,19 @@ export class PatientDashboardComponent implements OnInit {
         `iCare.visits.settings.controlVisitsEndingStatuses.ConceptUuid`
       );
     this.observations$ = this.store.select(getAllObservations);
+  }
+
+  dischargePatient(event: any, visit, currentPatient, provider, lastBedOrder) {
+    console.log("--------------->", event);
+    this.dialog.open(DischargePatientModalComponent, {
+      width: "30%",
+      data: {
+        ...visit,
+        provider,
+        patient: currentPatient?.patient,
+        lastBedOrder,
+        invoice: event?.invoice,
+      },
+    });
   }
 }

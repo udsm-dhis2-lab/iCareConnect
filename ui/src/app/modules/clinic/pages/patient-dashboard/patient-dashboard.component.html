@@ -49,6 +49,25 @@
     "
     [observations]="params?.observations"
     [IPDRoundConceptUuid]="params?.IPDRoundConceptUuid"
+    [isInpatient]="true"
+    (assignBed)="
+              onAssignBed(
+                bedsByLocationDetails,
+                currentPatient,
+                provider,
+                activeVisit,
+                bedOrdersWithBillStatus
+              )
+            "
+            (dichargePatient)="
+              dischargePatient(
+                $event,
+                activeVisit,
+                currentPatient,
+                provider,
+                lastBedOrder
+              )
+            "
   ></app-shared-patient-dashboard>
   <div *ngIf="errors">
     <app-shared-error [errors]="errors"></app-shared-error>
