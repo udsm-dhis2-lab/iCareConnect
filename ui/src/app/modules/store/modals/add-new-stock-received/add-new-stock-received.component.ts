@@ -37,6 +37,15 @@ export class AddNewStockReceivedComponent implements OnInit {
     // Create formfields
     this.formFields = [
       new Textbox({
+        id: "supplierName",
+        key: "supplierName",
+        label: "Supplier Name",
+        type: "text",
+        required: true,
+        disabled: false,
+        value: "",
+      }),
+      new Textbox({
         id: "batchNo",
         key: "batchNo",
         label: "Batch NO",
