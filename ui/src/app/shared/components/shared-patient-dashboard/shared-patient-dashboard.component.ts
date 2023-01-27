@@ -90,6 +90,8 @@ import { tap, map as rxMap } from "rxjs/operators";
   styleUrls: ["./shared-patient-dashboard.component.scss"],
 })
 export class SharedPatientDashboardComponent implements OnInit {
+  vitalSign = {value: 70, isNormal:true};
+  @Input() normalRange = {min: 60, max: 90};
   @Input() formPrivilegesConfigs: any;
   @Input() currentUser: any;
   @Input() userPrivileges: any;
@@ -319,6 +321,15 @@ export class SharedPatientDashboardComponent implements OnInit {
         })
       );
     this.showRoundDetails = this.activeVisit?.isAdmitted;
+    this.vitalSign.isNormal = this.checkVitalSign(this.vitalSign.value, {min: 60,max: 90});
+  }
+  checkVitalSign(value: number, arg1: { min: number; max: number; }): boolean {
+    // throw new Error("Method not implemented.");
+    if (value >= this.normalRange.min && value<= this.normalRange.max){
+      return true;
+    } else {
+      return false;
+    }
   }
 
   onToggleVitalsSummary(event: Event): void {

@@ -15,6 +15,8 @@ import { FilterDiagnosesPipe } from "./pipes/filter-diagnoses.pipe";
 import { FilterItemsBySelectionsPipe } from "./pipes/filter-items-by-selections.pipe";
 import { HttpClientModule } from "@angular/common/http";
 import { SearchTestDetailsPipe } from './pipes/search-test-details.pipe';
+import { SharedVitalSignsComponent } from './components/shared-vital-signs/shared-vital-signs.component';
+import { VitalSignsComponent } from './components/vital-signs/vital-signs.component';
 @NgModule({
     imports: [CommonModule, ...materialModules, ...modules],
     exports: [
@@ -38,6 +40,8 @@ import { SearchTestDetailsPipe } from './pipes/search-test-details.pipe';
         FilterDiagnosesPipe,
         FilterItemsBySelectionsPipe,
         SearchTestDetailsPipe,
+        SharedVitalSignsComponent,
+        VitalSignsComponent,
     ],
     providers: [...sharedServices]
 })
