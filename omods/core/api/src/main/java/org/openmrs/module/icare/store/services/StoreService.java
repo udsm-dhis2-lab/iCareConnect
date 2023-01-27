@@ -108,4 +108,8 @@ public interface StoreService extends OpenmrsService {
 	public Supplier getSupplierByUuid(String supplierUuid);
 
 	ListResult<StockInvoice> getStockInvoices(Pager pager);
+
+    Supplier saveSupplier(Supplier supplier);
+
+	List<Supplier> getSuppliers(Integer startIndex, Integer limit);
 }

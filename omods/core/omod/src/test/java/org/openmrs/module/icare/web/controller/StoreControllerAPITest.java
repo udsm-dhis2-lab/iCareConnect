@@ -666,4 +666,26 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		assertThat("List count is 1", ((List) stockInvoices.get("results")).size() == 1, is(true));
 
 	}
+
+	@Test
+	public void creatingAndgettingSuppliers() throws Exception {
+		String dto = this.readFile("dto/store/supplier-create.json");
+		List<Map<String,Object>> suppliers = (new ObjectMapper()).readValue(dto,List.class);
+
+		//post stock invoice
+		MockHttpServletRequest newPostRequest = newPostRequest("store/suppliers",suppliers);
+		MockHttpServletResponse handle = handle(newPostRequest);
+
+		List<Map<String,Object>> createdSuppliers = (new ObjectMapper()).readValue(handle.getContentAsString(),List.class);
+
+		assertThat("created 1 supplier",createdSuppliers.size(),is(1));
+
+		//Getsuppliers
+		//Get stock invoices
+		MockHttpServletRequest newGetRequest = newGetRequest("store/suppliers",new Parameter("startIndex","1"), new Parameter("limit","10"));
+		MockHttpServletResponse handleGet = handle(newGetRequest);
+		List<Map<String,Object>> suppliersObjectMap = (new ObjectMapper()).readValue(handleGet.getContentAsString(),List.class);
+		assertThat("created 1 supplier",suppliersObjectMap.size(),is(1));
+
+	}
 }

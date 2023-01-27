@@ -4,6 +4,7 @@ import org.openmrs.BaseOpenmrsData;
 import org.openmrs.module.icare.core.JSONConverter;
 
 import javax.persistence.*;
+import java.util.HashMap;
 import java.util.Map;
 
 @Entity
@@ -49,7 +50,21 @@ public class Supplier extends BaseOpenmrsData implements java.io.Serializable, J
     }
 
     @Override
-    public Map<String, Object> toMap() {
-        return null;
+    public Map<String, Object> toMap()
+    {
+        Map<String,Object> supplierMap = new HashMap<>();
+        supplierMap.put("name",this.getName());
+        supplierMap.put("description",this.getDescription());
+        supplierMap.put("uuid",this.getUuid());
+        return supplierMap;
+    }
+
+    public static Supplier fromMap(Map<String,Object> supplierMap){
+
+        Supplier supplier = new Supplier();
+        supplier.setDescription(supplierMap.get("description").toString());
+        supplier.setName(supplierMap.get("name").toString());
+
+        return supplier;
     }
 }
