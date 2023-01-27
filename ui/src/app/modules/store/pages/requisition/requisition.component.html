@@ -179,6 +179,7 @@
       (cancelRequisition)="onCancelRequisition($event)"
       (rejectRequisition)="onRejectRequisition($event)"
       (receiveRequisition)="onReceiveRequisition($event)"
+      (selectionChange)="getSelection($event)"
     >
     </app-requisition-by-store>
 
@@ -187,7 +188,7 @@
         color="primary"
         mat-flat-button
         (click)="issueAllSelected($event, selectedIssues)"
-        [disabled]="selectedIssuesCount == 0"
+        [disabled]="selectedRequestsCount == 0"
       >
         Request selected items
       </button>

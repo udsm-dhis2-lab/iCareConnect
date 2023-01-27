@@ -44,6 +44,7 @@ export class RequisitionComponent implements OnInit {
   requisitions: RequisitionObject[];
   storedRequisitions: RequisitionObject[];
   selectedIssues: any = {};
+  selectedRequests: any = {};
   issuingList$: Observable<IssuingObject[]>;
   requestingLocation: any;
   constructor(
@@ -223,6 +224,23 @@ export class RequisitionComponent implements OnInit {
     }
   }
 
+  getSelection(event: any, request?: any): void {
+    request = event?.request ? event?.request : request 
+    event = event?.event ? event?.event : event 
+    if (event?.checked) {
+      this.selectedRequests[request?.id] = request;
+    } else {
+      let newSelectedRequests: any;
+      Object.keys(this.selectedRequests).forEach((id) => {
+        if (id === request?.id) {
+          newSelectedRequests = omit(this.selectedRequests, id);
+        }
+      });
+      this.selectedRequests = newSelectedRequests;
+    }
+
+  }
+
   getBatchsNotExpired(batches): any {
     return orderBy(
       batches?.filter(
@@ -328,5 +346,9 @@ export class RequisitionComponent implements OnInit {
           });
         }
       });
+  }
+
+  get selectedRequestsCount(): number {
+    return this.selectedRequests ? Object.keys(this.selectedRequests)?.length : 0;
   }
 }
