@@ -22,11 +22,13 @@
           <table class="table">
             <tr>
               <td>#</td>
+              <td>Invoice #</td>
               <td>Item</td>
               <td>Quantity Requested</td>
               <td>Requested On</td>
               <td>Quantity Issued</td>
               <td>Issued On</td>
+              <td>Requester Name</td>
               <td>Requsted From</td>
               <td>Status</td>
               <td><span class="float-right">Actions</span></td>
@@ -41,6 +43,7 @@
               *ngFor="let request of requisitionByStoreAndDate[key?.searchKey]; let requestIndex = index"
             >
               <td>{{ requestIndex + 1 }}</td>
+              <td>{{ request?.itemUuid }}</td>
               <td>{{ request?.name }}</td>
               <td>{{ request?.quantityRequested }}</td>
               <td>{{ request?.created | date }}</td>
@@ -48,6 +51,7 @@
               <td>
                 {{ request?.quantityIssued ? (request?.issuedDate | date) : "-" }}
               </td>
+              <td>{{ request?.requestingStore?.name }}</td>
               <td>{{ request?.targetStore?.name }}</td>
               <td>
                 <div
