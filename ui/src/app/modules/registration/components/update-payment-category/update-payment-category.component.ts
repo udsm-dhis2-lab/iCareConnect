@@ -87,7 +87,7 @@ export class UpdatePaymentCategoryComponent implements OnInit {
   @Input() treatmentLocations: any[];
   @Input() patientVisitsCount: number;
   @Output() editPatient = new EventEmitter<any>();
-  // @Output() startVisitEvent = new EventEmitter<any>();
+  //@Output() startVisitEvent = new EventEmitter<any>();
 
   searchTerm: string;
   currentRoom: any;
