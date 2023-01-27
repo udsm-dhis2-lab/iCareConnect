@@ -46,6 +46,15 @@ export class AddNewStockReceivedComponent implements OnInit {
         value: "",
       }),
       new Textbox({
+        id: "invoiceDate",
+        key: "invoiceDate",
+        label: "Invoice Date",
+        type: "text",
+        required: true,
+        disabled: false,
+        value: "",
+      }),
+      new Textbox({
         id: "batchNo",
         key: "batchNo",
         label: "Batch NO",
