@@ -9,6 +9,7 @@ import { Observable, of, pipe } from "rxjs";
 })
 export class BinCardComponent implements OnInit {
   allStock: any[] = [];
+  binData: any[] = [];
   JSON: JSON;
   displayedReport: number;
 
@@ -35,7 +36,7 @@ export class BinCardComponent implements OnInit {
   showReport(value: number, requestedItemLocationId: string): void{
     this.displayedReport = value;
     this.getBinCardReport(requestedItemLocationId).subscribe((data) => {
-      console.log(data);
+      this.binData = data;
     })
     //get bin report of item
   }

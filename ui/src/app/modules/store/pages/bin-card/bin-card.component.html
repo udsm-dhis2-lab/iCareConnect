@@ -29,6 +29,17 @@
                     <th>Balance</th>
                     <th>Remarks</th>
                   </thead>
+                  <tbody>
+                    <tr *ngFor="let item of binData; let keyIndex = index">
+                        <td>{{item?.requestingLocation?.display || ''}}</td>
+                        <td>{{item?.receivedDate || ''}}</td>
+                        <td>{{item?.requestedDate || ''}}</td>
+                        <td>{{item?.quantityRequested|| ''}}</td>
+                        <td>{{item?.quantityIssued || ''}}</td>
+                        <td>{{item?.quantityIssued || ''}}</td>
+                        <td>{{item.remarks}}</td>
+                    </tr>
+                  </tbody>
                 </table>
               </div>
             </div>
