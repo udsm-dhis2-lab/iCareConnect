@@ -639,53 +639,57 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		System.out.println(stockList);
 		assertThat("stock listing has 4 entries:", stockList.size(), is(5));
 	}
-
+	
 	@Test
 	public void creatingAndGettingStockInvoices() throws Exception {
-
+		
 		String dto = this.readFile("dto/store/stock-invoice-create.json");
-		List<Map<String,Object>> stockInvoice = (new ObjectMapper()).readValue(dto,List.class);
-
+		List<Map<String, Object>> stockInvoice = (new ObjectMapper()).readValue(dto, List.class);
+		
 		//post stock invoice
-		MockHttpServletRequest newPostRequest = newPostRequest("store/stockinvoices",stockInvoice);
+		MockHttpServletRequest newPostRequest = newPostRequest("store/stockinvoices", stockInvoice);
 		MockHttpServletResponse handle = handle(newPostRequest);
-
-		List<Map<String,Object>> createdStockInvoices = (new ObjectMapper()).readValue(handle.getContentAsString(),List.class);
-
-		assertThat("created 1 stock invoice",createdStockInvoices.size(),is(1));
-
+		
+		List<Map<String, Object>> createdStockInvoices = (new ObjectMapper()).readValue(handle.getContentAsString(),
+		    List.class);
+		
+		assertThat("created 1 stock invoice", createdStockInvoices.size(), is(1));
+		
 		//Get stock invoices
-		MockHttpServletRequest newGetRequest = newGetRequest("store/stockinvoices",new Parameter("page","1"), new Parameter("pageSize","1"));
+		MockHttpServletRequest newGetRequest = newGetRequest("store/stockinvoices", new Parameter("page", "1"),
+		    new Parameter("pageSize", "1"));
 		MockHttpServletResponse handleGet = handle(newGetRequest);
-		Map<String,Object> stockInvoices = (new ObjectMapper()).readValue(handleGet.getContentAsString(),Map.class);
+		Map<String, Object> stockInvoices = (new ObjectMapper()).readValue(handleGet.getContentAsString(), Map.class);
 		System.out.println(stockInvoices);
-
-		Map<String,Object> pagerObject = (Map<String,Object>) stockInvoices.get("pager");
-		assertThat("page is 1",(Integer) pagerObject.get("page")== 1,is(true));
-		assertThat("Total is 2", (Integer) pagerObject.get("total")==2,is(true));
+		
+		Map<String, Object> pagerObject = (Map<String, Object>) stockInvoices.get("pager");
+		assertThat("page is 1", (Integer) pagerObject.get("page") == 1, is(true));
+		assertThat("Total is 2", (Integer) pagerObject.get("total") == 2, is(true));
 		assertThat("List count is 1", ((List) stockInvoices.get("results")).size() == 1, is(true));
-
+		
 	}
-
+	
 	@Test
 	public void creatingAndgettingSuppliers() throws Exception {
 		String dto = this.readFile("dto/store/supplier-create.json");
-		List<Map<String,Object>> suppliers = (new ObjectMapper()).readValue(dto,List.class);
-
+		List<Map<String, Object>> suppliers = (new ObjectMapper()).readValue(dto, List.class);
+		
 		//post stock invoice
-		MockHttpServletRequest newPostRequest = newPostRequest("store/suppliers",suppliers);
+		MockHttpServletRequest newPostRequest = newPostRequest("store/suppliers", suppliers);
 		MockHttpServletResponse handle = handle(newPostRequest);
-
-		List<Map<String,Object>> createdSuppliers = (new ObjectMapper()).readValue(handle.getContentAsString(),List.class);
-
-		assertThat("created 1 supplier",createdSuppliers.size(),is(1));
-
+		
+		List<Map<String, Object>> createdSuppliers = (new ObjectMapper()).readValue(handle.getContentAsString(), List.class);
+		
+		assertThat("created 1 supplier", createdSuppliers.size(), is(1));
+		
 		//Getsuppliers
 		//Get stock invoices
-		MockHttpServletRequest newGetRequest = newGetRequest("store/suppliers",new Parameter("startIndex","1"), new Parameter("limit","10"));
+		MockHttpServletRequest newGetRequest = newGetRequest("store/suppliers", new Parameter("startIndex", "1"),
+		    new Parameter("limit", "10"));
 		MockHttpServletResponse handleGet = handle(newGetRequest);
-		List<Map<String,Object>> suppliersObjectMap = (new ObjectMapper()).readValue(handleGet.getContentAsString(),List.class);
-		assertThat("created 1 supplier",suppliersObjectMap.size(),is(1));
-
+		List<Map<String, Object>> suppliersObjectMap = (new ObjectMapper()).readValue(handleGet.getContentAsString(),
+		    List.class);
+		assertThat("created 1 supplier", suppliersObjectMap.size(), is(1));
+		
 	}
 }
