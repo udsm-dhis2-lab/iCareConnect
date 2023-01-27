@@ -191,4 +191,21 @@ export class DispensingComponent implements OnInit {
   onCloseForm() {
     this.expandedRow = undefined;
   }
+  
+}
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class NotificationService {
+  constructor(private http: HttpClient) {}
+
+  sendNotification(message: string, doctorId: string) {
+    // construct the notification object
+    const notification = { message, doctorId };
+    // send the notification to the server
+    this.http.post('/api/notification', notification).subscribe();
+  }
 }
