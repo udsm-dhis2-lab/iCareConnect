@@ -2,7 +2,7 @@ import { Component, Input, OnInit } from "@angular/core";
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
-import { WorkSeetsService } from "src/app/modules/laboratory/resources/services/worksheets.service";
+import { WorkSheetsService } from "src/app/modules/laboratory/resources/services/worksheets.service";
 
 @Component({
   selector: "app-result-entry-by-worksheet-home",
@@ -11,20 +11,22 @@ import { WorkSeetsService } from "src/app/modules/laboratory/resources/services/
 })
 export class ResultEntryByWorksheetHomeComponent implements OnInit {
   @Input() isLIS: boolean;
+  @Input() datesParameters: any;
   worksheetDefinitions$: Observable<any[]>;
   multipleResultsAttributeType$: Observable<any>;
   currentWorksheetDefinitionUuid: string;
   conceptNameType: string;
   errors: any[] = [];
   constructor(
-    private worksheetsService: WorkSeetsService,
+    private worksheetsService: WorkSheetsService,
     private systemSettingsService: SystemSettingsService
   ) {}
 
   ngOnInit(): void {
     this.conceptNameType = this.isLIS ? "SHORT" : "FULLY_SPECIFIED";
-    this.worksheetDefinitions$ =
-      this.worksheetsService.getWorksheetDefinitions();
+    this.worksheetDefinitions$ = this.worksheetsService.getWorksheetDefinitions(
+      this.datesParameters
+    );
 
     this.multipleResultsAttributeType$ = this.systemSettingsService
       .getSystemSettingsByKey(
