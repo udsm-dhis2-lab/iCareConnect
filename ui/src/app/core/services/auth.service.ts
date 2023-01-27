@@ -112,17 +112,17 @@ export class AuthService {
     );
   }
 
-  logout(credetialsToken): Observable<any> {
+  logout(): Observable<any> {
+    this.clearCookie();
     const headers = {
       httpHeaders: {
-        Authorization: "Basic " + credetialsToken,
+        Authorization: "Basic " + localStorage.getItem("credentialsToken"),
       },
     };
     return this.httpClient.delete("session", headers).pipe(
       tap(() => {
         sessionStorage.clear();
         localStorage.clear();
-        this.clearCookie();
       })
     );
   }

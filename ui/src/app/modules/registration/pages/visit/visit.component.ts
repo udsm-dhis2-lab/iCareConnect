@@ -31,8 +31,6 @@ import {
 import { SelectRoomComponent } from "../../components/select-room/select-room.component";
 import { VisitClaimComponent } from "../../components/visit-claim/visit-claim.component";
 import { RegistrationService } from "../../services/registration.services";
-import { VisitsService } from "src/app/shared/resources/visits/services";
-import { map } from "rxjs/operators";
 
 @Component({
   selector: "app-visit",
@@ -80,7 +78,6 @@ export class VisitComponent implements OnInit {
   @Input() visitTypes: any;
   @Input() servicesConfigs: any;
   @Input() allowOnlineVerification: boolean;
-  @Input() patientDetails: any;
   visitDetails: any = {};
   referralHospital: any;
 
@@ -102,7 +99,6 @@ export class VisitComponent implements OnInit {
   isReferralVisit: boolean = false;
   currentServiceConfigsSelected: any;
   authorizationNumberAvailable: boolean = true;
-  patientVisist$: Observable<any>;
 
   searchRoom(event: Event) {
     event.stopPropagation();
@@ -345,40 +341,10 @@ export class VisitComponent implements OnInit {
     public dialog: MatDialog,
     private _snackBar: MatSnackBar,
     private registrationService: RegistrationService,
-    private router: Router,
-    private visitService: VisitsService
+    private router: Router
   ) {}
 
   ngOnInit(): void {
-    this.visitService
-      .getLastPatientVisit(this.patientDetails?.uuid)
-      .subscribe((data) => console.log("visit", data));
-    this.patientVisist$ = this.visitService
-      .getLastPatientVisit(this.patientDetails?.uuid)
-      .pipe(
-        map((patientvisit) => {
-          return (patientvisit[0]?.visit?.attributesToDisplay?.filter(
-            (values) => {
-              return (
-                values.attributeType.uuid ===
-                "INSURANCEIDIIIIIIIIIIIIIIIIIIIIATYPE"
-              );
-            }
-          ) || [])[0]?.value;
-        })
-      );
-    this.patientVisist$.subscribe((data: any) => {
-      this.visitDetails["InsuranceID"] =
-        data?.length > 0
-          ? data
-          : (this.patientDetails?.person?.attributes?.filter(
-              (attribute) => attribute?.attributeType?.display === "ID"
-            ) || [])[0]?.value.length > 0
-          ? (this.patientDetails?.person?.attributes?.filter(
-              (attribute) => attribute?.attributeType?.display === "ID"
-            ) || [])[0]?.value
-          : null;
-    });
     this.currentPatient$ = this.store.pipe(select(getCurrentPatient));
     this.activeVisit$ = this.store.pipe(select(getActiveVisit));
     this.loadingVisit$ = this.store.pipe(select(getVisitLoadingState));

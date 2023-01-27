@@ -8,7 +8,6 @@ import { map, tap } from "rxjs/operators";
 import { Observable } from "rxjs";
 import { SharedConfirmationComponent } from "../shared-confirmation /shared-confirmation.component";
 import { MatDialog } from "@angular/material/dialog";
-import { getGenericDrugPrescriptionsFromVisit } from "../../helpers/visits.helper";
 
 @Component({
   selector: "app-current-prescriptions",
@@ -26,15 +25,17 @@ export class CurrentPrescriptionComponent implements OnInit {
   errors: any[] = [];
   specificDrugConceptUuid$: Observable<any>;
   prescriptionArrangementFields$: Observable<any>;
-
+  
   constructor(
-    private systemSettingsService: SystemSettingsService,
+    private systemSettingsService: SystemSettingsService, 
     private encounterService: EncountersService,
     private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
-    this.getDrugsPrescribed();
+
+    this.getDrugsPrescribed()
+
     this.specificDrugConceptUuid$ = this.systemSettingsService
       .getSystemSettingsByKey(
         "iCare.clinic.genericPrescription.specificDrugConceptUuid"
@@ -71,19 +72,50 @@ export class CurrentPrescriptionComponent implements OnInit {
               },
             ];
           }
-          if (response?.error) {
+          if(response?.error){
             this.errors = [...this.errors, response?.error];
           }
           return {
             ...response,
-            keys: Object.keys(response).length,
+            keys: Object.keys(response).length
           };
         })
       );
   }
 
-  getDrugsPrescribed() {
-    this.drugsPrescribed = getGenericDrugPrescriptionsFromVisit(this.visit, this.genericPrescriptionOrderType);
+  getDrugsPrescribed(){
+    this.drugsPrescribed = flatten(
+      this.visit?.encounters
+        ?.map((encounter) => {
+          return (
+            encounter?.orders.filter(
+              (order) =>
+                order.orderType?.uuid === this.genericPrescriptionOrderType
+            ) || []
+          )?.map((genericDrugOrder) => {
+            let formulatedDescription = encounter?.obs?.map((ob) => {
+              if(ob?.comment === null){
+                return ob
+              }
+            }).filter((ob) => ob)
+            return {
+              ...genericDrugOrder,
+              formulatedDescription: formulatedDescription,
+              obs: keyBy(
+                encounter?.obs?.map((observation) => {
+                  return {
+                    ...observation,
+                    conceptKey: observation?.concept?.uuid,
+                    valueIsObject: observation?.value?.uuid ? true : false,
+                  };
+                }),
+                "conceptKey"
+              ),
+            };
+          });
+        })
+        ?.filter((order) => order)
+    );
   }
 
   stopDrugOrder(e: Event, drugOrder: any, drugName: string) {
@@ -92,7 +124,7 @@ export class CurrentPrescriptionComponent implements OnInit {
       data: {
         modalTitle: `Stop Medicaton`,
         modalMessage: `You are about to stop ${drugName} for this patient, Click confirm to finish!`,
-        showRemarksInput: true,
+        showRemarksInput: false,
       },
       disableClose: false,
       panelClass: "custom-dialog-container",
@@ -101,9 +133,9 @@ export class CurrentPrescriptionComponent implements OnInit {
     confirmDialog.afterClosed().subscribe((confirmationObject) => {
       if (confirmationObject?.confirmed) {
         this.encounterService
-          .voidEncounterWithReason({
+          .voidEncounter({
             ...drugOrder?.encounter,
-            voidReason: confirmationObject?.remarks || "",
+            voidReason: confirmationObject?.remarks || ""
           })
           .subscribe((response) => {
             if (!response?.error) {
@@ -114,6 +146,6 @@ export class CurrentPrescriptionComponent implements OnInit {
             }
           });
       }
-    });
+    })
   }
 }

@@ -101,7 +101,7 @@ export class SampleTypesService {
                 BASE_URL +
                   "concept/" +
                   parsedConfigs["sampleTypes"].id +
-                  "?v=custom:(uuid,display,setMembers:(uuid,display,answers:(uuid,display),setMembers:(uuid,display,answers:(uuid,display),setMembers:(uuid,display,conceptClass,datatype,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,numeric,descriptions,allowDecimal,displayPrecision,attributes:(uuid,display,value,attributeType:(uuid,display)),answers:(uuid,display)))))"
+                  "?v=custom:(uuid,display,setMembers:(uuid,display,answers:(uuid,display),setMembers:(uuid,display,answers:(uuid,display),setMembers:(uuid,display,conceptClass,datatype,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,numeric,descriptions,allowDecimal,displayPrecision,answers:(uuid,display)))))"
               )
               .pipe(map((sampleTypes) => sampleTypes["setMembers"]))
           : this.conceptsService.getConceptsBySearchTerm("SPECIMEN_SOURCE");
@@ -131,7 +131,7 @@ export class SampleTypesService {
                 BASE_URL +
                   "concept/" +
                   parsedConfigs["labDepartments"] +
-                  "?v=custom:(uuid,display,setMembers:(uuid,display,answers:(uuid,display),setMembers:(uuid,display,answers:(uuid,display),setMembers:(uuid,display,conceptClass,datatype,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,numeric,descriptions,allowDecimal,displayPrecision,attributes:(uuid,display,value,attributeType:(uuid,display)),answers:(uuid,display)))))"
+                  "?v=custom:(uuid,display,setMembers:(uuid,display,answers:(uuid,display),setMembers:(uuid,display,answers:(uuid,display),setMembers:(uuid,display,conceptClass,datatype,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,numeric,descriptions,allowDecimal,displayPrecision,answers:(uuid,display)))))"
               )
               .pipe(
                 map((departments: any) => {

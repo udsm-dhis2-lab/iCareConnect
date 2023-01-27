@@ -1,10 +1,6 @@
 <div
   class="settings"
-  *ngIf="{
-    LISConfigurations: LISConfigurations$ | async,
-    labSections: labSections$ | async,
-    provider: provider$ | async
-  } as params"
+  *ngIf="{ LISConfigurations: LISConfigurations$ | async } as params"
 >
   <mat-progress-bar
     class="mt-2"
@@ -54,36 +50,6 @@
         </div>
       </ng-template>
     </mat-tab>
-
-    <mat-tab
-      label="Batch Registration Management"
-      *ngIf="
-        params?.LISConfigurations?.isLIS &&
-        params?.labSections &&
-        params?.provider
-      "
-    >
-      <ng-template matTabContent>
-        <div class="p-3">
-          <app-register-sample
-            [provider]="params?.provider"
-            [labSections]="params?.labSections"
-            [LISConfigurations]="params?.LISConfigurations"
-            [fromMaintenance]="true"
-          ></app-register-sample>
-        </div>
-      </ng-template>
-    </mat-tab>
-    <mat-tab
-      label="Worksheets Management"
-      *ngIf="params?.LISConfigurations?.isLIS"
-    >
-      <ng-template matTabContent>
-        <div class="p-3">
-          <app-worksheet-management></app-worksheet-management>
-        </div>
-      </ng-template>
-    </mat-tab>
     <mat-tab
       label="Users, Profiles & Access Control"
       *ngIf="params?.LISConfigurations?.isLIS"
@@ -113,16 +79,6 @@
       <ng-template matTabContent>
         <div class="p-3">
           <app-lab-system-settings></app-lab-system-settings>
-        </div>
-      </ng-template>
-    </mat-tab>
-    <mat-tab label="Reports" *ngIf="params?.LISConfigurations?.isLIS">
-      <ng-template matTabContent>
-        <div class="p-3">
-          <ngx-standard-report
-            [actionType]="'manage'"
-            [additionalKey]="'lis'"
-          ></ngx-standard-report>
         </div>
       </ng-template>
     </mat-tab>

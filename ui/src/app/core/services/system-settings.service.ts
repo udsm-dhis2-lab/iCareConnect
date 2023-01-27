@@ -5,7 +5,6 @@ import { OpenmrsHttpClientService } from "src/app/shared/modules/openmrs-http-cl
 import { SystemSettingsWithKeyDetails } from "../models/system-settings.model";
 import { capitalize } from "lodash";
 import { Api } from "src/app/shared/resources/openmrs";
-import { sanitizeSystemSettingsValue } from "../helpers";
 
 @Injectable({
   providedIn: "root",
@@ -128,8 +127,8 @@ export class SystemSettingsService {
           key,
           value:
             response?.results && response?.results[0]
-              ? response?.results[0]?.value.indexOf("{") === 0 ||
-                response?.results[0]?.value.indexOf("[") === 0
+              ? response?.results[0]?.value.indexOf("{") > -1 ||
+                response?.results[0]?.value.indexOf("[") > -1
                 ? JSON.parse(response?.results[0]?.value)
                 : response?.results[0]?.value
               : "",

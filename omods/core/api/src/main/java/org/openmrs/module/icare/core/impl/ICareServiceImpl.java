@@ -748,7 +748,7 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		}
 	}
 	
-	//	public String voidOrder(String uuid, String voidReason) {
-	//		return dao.voidOrder(uuid, voidReason);
-	//	}
+	public String voidOrder(String uuid, String voidReason) {
+		return dao.voidOrder(uuid, voidReason);
+	}
 }

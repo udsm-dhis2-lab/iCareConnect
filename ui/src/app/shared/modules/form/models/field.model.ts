@@ -27,7 +27,6 @@ export class Field<T> {
   isDiagnosis?: boolean;
   locationUuid?: string;
   multiple?: boolean;
-  allowCustomDateTime?: boolean;
 
   constructor(
     options: {
@@ -56,7 +55,6 @@ export class Field<T> {
       source?: string;
       locationUuid?: string;
       multiple?: boolean;
-      allowCustomDateTime?: boolean;
     } = {}
   ) {
     this.value = options.value;
@@ -84,6 +82,5 @@ export class Field<T> {
     this.isDiagnosis = options?.isDiagnosis;
     this.locationUuid = options?.locationUuid;
     this.multiple = options?.multiple;
-    this.allowCustomDateTime = options?.allowCustomDateTime;
   }
 }

@@ -384,7 +384,6 @@ export class SamplesToAcceptComponent implements OnInit {
         uuid: this.userUuid,
       },
       remarks: "accepted",
-      category: "ACCEPTED",
       status: "ACCEPTED",
     };
 

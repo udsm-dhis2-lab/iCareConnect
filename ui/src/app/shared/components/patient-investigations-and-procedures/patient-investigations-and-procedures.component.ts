@@ -19,7 +19,6 @@ export class PatientInvestigationsAndProceduresComponent implements OnInit {
   @Input() userPrivileges: any;
   @Input() fromConsultation: boolean;
   @Input() isInpatient: boolean;
-  @Input() tabToShow: boolean;
   @Input() isTheatre: boolean;
   selectedTab = new FormControl(0);
 

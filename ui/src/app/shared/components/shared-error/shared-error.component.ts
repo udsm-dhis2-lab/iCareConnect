@@ -15,7 +15,6 @@ import { StandardError } from "../../models/error-type.models";
 })
 export class SharedErrorComponent implements OnInit {
   @Input() errors: error[];
-  @Input() dismissible: boolean = true;
 
   toggleIndex?: string;
   /**
@@ -37,7 +36,8 @@ export class SharedErrorComponent implements OnInit {
 
   constructor() {}
 
-  ngOnInit() {}
+  ngOnInit() {
+  }
 
   typeof(error) {
     return typeof error;
@@ -57,26 +57,25 @@ export class SharedErrorComponent implements OnInit {
     }
   }
 
-  onCloseError(event: Event, errorIndex: any, globalErrorIndex?: any) {
+  onCloseError(event: Event, errorIndex: any, globalErrorIndex?: any){
     event.stopPropagation();
     // With error index and global error index set
     if (
       (errorIndex || errorIndex === 0) &&
       (globalErrorIndex || globalErrorIndex === 0)
-    ) {
+    ){
       let index = 0;
       let filteredErrors = this.errors.filter((error) => {
         let globalIndex = 0;
         let globalErrorsFiltered;
         if (errorIndex === index) {
-          globalErrorsFiltered = error.error.globalErrors.filter(
-            (globalError) => {
-              if (globalIndex !== globalErrorIndex) {
+          globalErrorsFiltered = error.error.globalErrors.filter((globalError) => {
+              if (globalIndex !== globalErrorIndex){
                 globalIndex = globalIndex + 1;
                 return globalError;
               }
               globalIndex = globalIndex + 1;
-              return;
+              return
             }
           );
         }
@@ -89,18 +88,14 @@ export class SharedErrorComponent implements OnInit {
       this.errors = filteredErrors.filter((error) => error);
     }
     // For error index with no global error index
-    if (
-      (errorIndex || errorIndex === 0) &&
-      !globalErrorIndex &&
-      globalErrorIndex !== 0
-    ) {
+    if((errorIndex || errorIndex === 0) && !globalErrorIndex && globalErrorIndex !== 0) {
       let index = 0;
       let filteredErrors = this.errors.filter((error) => {
         if (errorIndex !== index) {
-          return error;
+          return error
         }
         index = index + 1;
-        return;
+        return
       });
       this.errors = filteredErrors.filter((error) => error);
     }

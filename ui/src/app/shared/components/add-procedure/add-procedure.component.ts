@@ -16,7 +16,7 @@ export class AddProcedureComponent implements OnInit {
 
   ngOnInit(): void {
     // console.log("nursingConfigurations", this.nursingConfigurations);
-    this.proceduresDetails$ = this.conceptService.getDepartmentDetails(
+    this.proceduresDetails$ = this.conceptService.getConceptsDepartmentDetails(
       this.nursingConfigurations?.departmentsReference?.id
     );
   }

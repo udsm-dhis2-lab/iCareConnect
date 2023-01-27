@@ -11,9 +11,7 @@ import {
   ConceptsourceGet,
 } from "src/app/shared/resources/openmrs";
 
-import { omit, uniqBy, uniq } from "lodash";
-import { Observable } from "rxjs";
-import { ConceptMappingsService } from "src/app/core/services/concept-mappings.service";
+import { omit, uniqBy } from "lodash";
 
 @Component({
   selector: "app-parameters",
@@ -33,7 +31,6 @@ export class ParametersComponent implements OnInit {
 
   saving: boolean = false;
   codedOptions: any[];
-  selectedParameter: any;
   parameterUuid: string;
 
   selectedAnswers: any[] = [];
@@ -51,17 +48,9 @@ export class ParametersComponent implements OnInit {
   selectedCodingSource: string;
 
   isFormValid: boolean = false;
-  conceptsAttributesTypes$: Observable<any>;
-  attributesValues: any[];
-  showAttributes: boolean = true;
-
-  errors: any[] = [];
-
-  selectedConceptDetails$: Observable<any>;
   constructor(
     private conceptService: ConceptsService,
-    private conceptReferenceService: ReferenceTermsService,
-    private conceptMappingService: ConceptMappingsService
+    private conceptReferenceService: ReferenceTermsService
   ) {}
 
   ngOnInit(): void {
@@ -69,7 +58,6 @@ export class ParametersComponent implements OnInit {
     this.createUnitField();
     this.createCodesMappingSourceField();
     this.createCodeField([]);
-    this.conceptsAttributesTypes$ = this.conceptService.getConceptsAttributes();
   }
 
   onFormUpdate(formValue: FormValue): void {
@@ -84,19 +72,6 @@ export class ParametersComponent implements OnInit {
 
   onGetSelectedAnswers(selectedAnswers: any[]): void {
     this.selectedAnswers = selectedAnswers;
-  }
-
-  onDeleteMapping(event: Event, item: any): void {
-    event.stopPropagation();
-    this.conceptMappingService
-      .deleteConceptMapping(item?.conceptUuid, item?.mappingUuid)
-      .subscribe((response: any) => {
-        if (response && !response?.error) {
-          this.onGetSelectedParameter(this.selectedParameter);
-        } else {
-          this.errors = [...this.errors, response];
-        }
-      });
   }
 
   createLowAndHighNormalFields(data?: any): void {
@@ -173,7 +148,7 @@ export class ParametersComponent implements OnInit {
         id: "name",
         key: "name",
         label: "Name",
-        value: data && data?.display ? data?.display : null,
+        value: data && data?.name ? data?.name?.name : null,
         required: true,
       }),
       new Textbox({
@@ -234,10 +209,6 @@ export class ParametersComponent implements OnInit {
     this.selectedCodeItems = items;
   }
 
-  onGetAttributeValues(attributesValues: any): void {
-    this.attributesValues = attributesValues;
-  }
-
   onSave(event: Event, uuid?: string): void {
     event.stopPropagation();
     const conceptName = this.formData["name"]?.value;
@@ -274,11 +245,9 @@ export class ParametersComponent implements OnInit {
     let answers = [];
 
     if (this.selectedAnswers?.length > 0) {
-      answers = uniq(
-        this.selectedAnswers.map((answer) => {
-          return answer?.uuid;
-        })
-      );
+      answers = this.selectedAnswers.map((answer) => {
+        return answer?.uuid;
+      });
     }
 
     const conceptMapType = "35543629-7d8c-11e1-909d-c80aa9edcf4e";
@@ -300,32 +269,18 @@ export class ParametersComponent implements OnInit {
           };
         }),
       ];
-      // searchIndexedTerms = searchIndexedTerms.filter(
-      //   (searchIndexedTerm) =>
-      //     (
-      //       this.conceptBeingEdited?.names?.filter(
-      //         (savedName) =>
-      //           savedName?.name != searchIndexedTerm?.name &&
-      //           savedName?.conceptNameType == "INDEX_TERM"
-      //       ) || []
-      //     ).length === 0
-      // );
+      searchIndexedTerms = searchIndexedTerms.filter(
+        (searchIndexedTerm) =>
+          (
+            this.conceptBeingEdited?.names?.filter(
+              (savedName) =>
+                savedName?.name != searchIndexedTerm?.name &&
+                savedName?.conceptNameType == "INDEX_TERM"
+            ) || []
+          ).length === 0
+      );
     }
-    const attributesData = !this.parameterUuid
-      ? this.attributesValues
-      : this.attributesValues
-          ?.map((attributesValue) => {
-            const matchedAttribute =
-              (this.conceptBeingEdited?.attributes?.filter(
-                (attribute) =>
-                  attribute?.attributeType?.uuid ===
-                  attributesValue?.attributeType
-              ) || [])[0];
-            if (!matchedAttribute) {
-              return attributesValue;
-            }
-          })
-          ?.filter((attributesValue) => attributesValue) || [];
+
     this.concept = {
       names: names,
       descriptions: [
@@ -338,7 +293,7 @@ export class ParametersComponent implements OnInit {
       // Softcode concept class
       set: false,
       setMembers: [],
-      answers: answers,
+      answers: uuid ? [] : answers,
       lowNormal: this.formData["lowNormal"]?.value
         ? this.formData["lowNormal"]?.value
         : null,
@@ -356,7 +311,6 @@ export class ParametersComponent implements OnInit {
           ? this.formData["precision"]?.value
           : null,
       mappings: uniqBy(mappings, "conceptReferenceTerm"),
-      attributes: attributesData?.length > 0 ? attributesData : null,
     };
 
     const keys = Object.keys(this.concept);
@@ -400,36 +354,14 @@ export class ParametersComponent implements OnInit {
                       if (updateResponse) {
                         this.parameterUuid = null;
                         this.conceptBeingEdited = null;
-                        if (updateResponse) {
-                          this.conceptService
-                            .createConceptNames(
-                              response?.uuid,
-                              uniqBy(searchIndexedTerms, "name")
-                            )
-                            .subscribe((conceptNameResponse) => {
-                              if (conceptNameResponse) {
-                                this.savingMessage =
-                                  "Successfully updated " + conceptName;
-                                this.alertType = "success";
-                                setTimeout(() => {
-                                  this.savingMessage = null;
-                                }, 4000);
-                                this.saving = false;
-                                this.resetFields();
-                                this.parameterUuid = null;
-                                this.conceptBeingEdited = null;
-                                this.saving = false;
-                                this.alertType = "success";
-                                this.savingMessage =
-                                  "Successfully created " + conceptName;
-
-                                setTimeout(() => {
-                                  this.savingMessage = null;
-                                }, 4000);
-                                this.resetFields();
-                              }
-                            });
-                        }
+                        this.savingMessage =
+                          "Successfully created " + conceptName;
+                        this.alertType = "success";
+                        setTimeout(() => {
+                          this.savingMessage = null;
+                        }, 4000);
+                        this.saving = false;
+                        this.resetFields();
                       }
                     });
                 } else {
@@ -463,34 +395,28 @@ export class ParametersComponent implements OnInit {
 
   onGetSelectedParameter(selectedParameter: ConceptGetFull): void {
     this.parameterUuid = selectedParameter?.uuid;
-    this.selectedParameter = selectedParameter;
-    this.conceptsAttributesTypes$ = this.conceptService.getConceptsAttributes();
-    this.selectedConceptDetails$ = this.conceptService.getConceptDetailsByUuid(
-      this.parameterUuid,
-      "custom:(uuid,display,datatype,set,retired,descriptions,name,names,setMembers:(uuid,display),conceptClass:(uuid,display),answers:(uuid,display),attributes:(uuid,display,value,attributeType:(uuid,display)),mappings:(uuid,conceptReferenceTerm:(uuid,display,retired,conceptSource:(uuid,display))))"
-    );
-
-    this.selectedConceptDetails$.subscribe((response) => {
-      if (response) {
-        this.conceptBeingEdited = response;
-        this.selectedCodeItems =
-          response?.mappings.map((mapping) => {
-            return {
-              ...mapping?.conceptReferenceTerm,
-              mappingUuid: mapping?.uuid,
-              conceptUuid: this.parameterUuid,
-            };
-          }) || [];
-        this.selectedCodingSource =
-          response?.mappings[0]?.conceptReferenceTerm?.conceptSource;
-        this.createBasicParametersFields(response);
-        this.createUnitField();
-        this.createCodesMappingSourceField(response?.mappings);
-        this.createCodeField([]);
-        this.selectedAnswers = response?.answers;
-        this.createLowAndHighNormalFields(response);
-      }
-    });
+    this.conceptService
+      .getConceptDetailsByUuid(
+        this.parameterUuid,
+        "custom:(uuid,display,datatype,set,retired,descriptions,name,names,setMembers:(uuid,display),conceptClass:(uuid,display),answers:(uuid,display),mappings:(conceptReferenceTerm:(uuid,display,conceptSource:(uuid,display))))"
+      )
+      .subscribe((response) => {
+        if (response) {
+          this.conceptBeingEdited = response;
+          this.selectedCodeItems =
+            response?.mappings.map(
+              (mapping) => mapping?.conceptReferenceTerm
+            ) || [];
+          this.selectedCodingSource =
+            response?.mappings[0]?.conceptReferenceTerm?.conceptSource;
+          this.createBasicParametersFields(response);
+          this.createUnitField();
+          this.createCodesMappingSourceField(response?.mappings);
+          this.createCodeField([]);
+          this.selectedAnswers = response?.answers;
+          this.createLowAndHighNormalFields(response);
+        }
+      });
   }
 
   resetFields() {

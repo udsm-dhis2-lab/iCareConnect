@@ -9,7 +9,6 @@ import org.openmrs.module.icare.laboratory.models.*;
 import javax.transaction.Transactional;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 @Transactional
 public interface LaboratoryService extends OpenmrsService {
@@ -22,7 +21,7 @@ public interface LaboratoryService extends OpenmrsService {
 	List<Sample> getAllSamples();
 	
 	ListResult<Sample> getSamples(Date startDate, Date endDate, Pager pager, String location, String sampleCategory,
-	        String testCategory, String q, String hasStatus);
+	        String testCategory);
 	
 	List<Sample> getSampleByDates(Date startDate, Date endDate);
 	
@@ -39,11 +38,7 @@ public interface LaboratoryService extends OpenmrsService {
 	
 	SampleOrder saveSampleOrder(SampleOrder sampleOrder);
 	
-	List<Sample> getSampleOrdersBySampleUuid(String sampleUuid);
-	
-	List<Sample> getAllocationsBySample(String sampleUuid);
-	
-	List<TestAllocation> getAllocationsByOrder(String orderUuid);
+	List<TestAllocation> getAllocationBySample(String sampleUuid);
 	
 	List<TestAllocation> getAllAllocations();
 	
@@ -52,18 +47,11 @@ public interface LaboratoryService extends OpenmrsService {
 	@Transactional
 	Result recordTestAllocationResults(Result result) throws Exception;
 	
-	List<Map<String, Object>> saveMultipleResults(List<Result> results) throws Exception;
-	
-	Map<String, Object> saveResultsInstrument(Map<String, Object> resultsInstrumentObject) throws Exception;
-	
 	Sample getSampleByUuid(String sampleUuid);
 	
 	List<Result> getResults();
 	
 	TestAllocationStatus updateTestAllocationStatus(TestAllocationStatus testAllocationStatus) throws Exception;
-	
-	List<Map<String, Object>> updateTestAllocationStatuses(List<TestAllocationStatus> testAllocationStatuses)
-	        throws Exception;
 	
 	Device getDeviceByUuid(String deviceUuid);
 	
@@ -97,8 +85,6 @@ public interface LaboratoryService extends OpenmrsService {
 	
 	String generateSampleLabel();
 	
-	List<String> generateLaboratoryIdLabels(String globalPropertyUuid, String metadataType, Integer count);
-	
 	List<Visit> getSamplePendingVisits(Integer limit, Integer startIndex);
 	
 	TestOrderLocation addTestOrderWithLocation(TestOrderLocation testOrderLocation);
@@ -107,55 +93,4 @@ public interface LaboratoryService extends OpenmrsService {
 	
 	WorkloadSummary getWorkLoadSummary(Date startDate, Date endDate);
 	
-	List<Batch> getBatches(Date start, Date end, String q, Integer startIndex, Integer limit);
-	
-	Batch getBatchByUuid(String batchUuid);
-	
-	Batch addBatch(Batch batch);
-	
-	BatchSample addBatchSamples(BatchSample batchSample) throws Exception;
-	
-	BatchSample getBatchSampleByUuid(String batchSampleUuid);
-	
-	BatchSet addBatchSet(BatchSet batchSet);
-	
-	List<BatchSet> getBatchSets(Date start, Date end, String q, Integer startIndex, Integer limit);
-	
-	BatchSet getBatchSetByUuid(String batchSetUuid);
-	
-	BatchSetStatus addBatchSetStatus(BatchSetStatus batchSetStatus) throws Exception;
-	
-	BatchStatus addBatchStatus(BatchStatus batchStatus) throws Exception;
-	
-	List<Worksheet> getWorksheets(Date start, Date end, String q, Integer startIndex, Integer limit);
-	
-	Worksheet getWorksheetByUuid(String worksheetUuid);
-	
-	Worksheet addWorksheet(Worksheet worksheet);
-	
-	List<WorksheetControl> getWorksheetControls(Date start, Date end, String q, Integer startIndex, Integer limit);
-	
-	WorksheetControl getWorksheetControlByUuid(String worksheetControlUuid);
-	
-	WorksheetControl addWorksheetControl(WorksheetControl worksheetControl);
-	
-	List<WorksheetDefinition> getWorksheetDefinitions(Date start, Date end, String q, Integer startIndex, Integer limit, Date expirationDate);
-	
-	Map<String, Object> getWorksheetDefinitionByUuid(String worksheetDefinitionUuid);
-	
-	WorksheetDefinition getDefaultWorksheetDefinitionByUuid(String worksheetDefinitionUuid);
-	
-	WorksheetDefinition addWorksheetDefinition(WorksheetDefinition worksheetDefinition) throws Exception;
-	
-	List<WorksheetSample> getWorksheetSamples(Date start, Date end, String q, Integer startIndex, Integer limit);
-	
-	WorksheetSample getWorksheetSampleByUuid(String worksheetSampleUuid);
-	
-	WorksheetSample addWorksheetSample(WorksheetSample worksheetSample) throws Exception;
-	
-	WorksheetStatus addWorksheetStatus(WorksheetStatus worksheetStatus) throws Exception;
-	
-	WorksheetSampleStatus addWorksheetSampleStatus(WorksheetSampleStatus worksheetSampleStatus) throws Exception;
-	
-	List<BatchSample> getBatchSamples(Date start, Date end, String q, Integer startIndex, Integer limit);
 }

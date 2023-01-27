@@ -18,7 +18,6 @@ import { InvestigationProcedureService } from "../../resources/investigation-pro
 import { OrdersService } from "../../resources/order/services/orders.service";
 import { Visit } from "../../resources/visits/models/visit.model";
 import { DeleteConfirmationComponent } from "../delete-confirmation/delete-confirmation.component";
-import { SharedConfirmationComponent } from "../shared-confirmation /shared-confirmation.component";
 
 @Component({
   selector: "app-order-results-renderer",
@@ -53,8 +52,6 @@ export class OrderResultsRendererComponent implements OnInit {
 
   isFormValid: boolean = false;
   @Output() updateConsultationOrder = new EventEmitter();
-  @Output() reloadOrderComponent = new EventEmitter();
-  errors: any[] = [];
   constructor(
     private store: Store<AppState>,
     private dialog: MatDialog,
@@ -176,40 +173,12 @@ export class OrderResultsRendererComponent implements OnInit {
     this.updateConsultationOrder.emit();
   }
 
-  onDeleteTest(e: Event, labOrder): void {
-    e.stopPropagation();
-    // this.store.dispatch(deleteLabOrder({ uuid: labOrder?.uuid }));
-    const confirmDialog = this.dialog.open(SharedConfirmationComponent, {
-      width: "25%",
-      data: {
-        modalTitle: `Delete ${labOrder?.concept?.display}`,
-        modalMessage: `You are about to delete ${labOrder?.concept?.display} for this patient, Click confirm to delete!`,
-        showRemarksInput: true,
-      },
-      disableClose: false,
-      panelClass: "custom-dialog-container",
-    });
-    confirmDialog.afterClosed().subscribe((confirmationObject) => {
-      if (confirmationObject?.confirmed) {
-        this.ordersService
-          .voidOrderWithReason({
-            ...labOrder,
-            voidReason: confirmationObject?.remarks || "",
-          })
-          .subscribe((response) => {
-            if (!response?.error) {
-              this.reloadOrderComponent.emit();
-            }
-            if (response?.error) {
-              this.errors = [...this.errors, response?.error];
-            }
-          });
-      }
-    });
+  onDelete(event: Event, labOrder): void {
+    this.store.dispatch(deleteLabOrder({ uuid: labOrder?.uuid }));
   }
 
   getLabTests(departments): any {
-    const labDepartment = ((departments || [])?.filter(
+    const labDepartment = (departments.filter(
       (department) => department?.name?.toLowerCase().indexOf("lab") === 0
     ) || [])[0];
     return !labDepartment

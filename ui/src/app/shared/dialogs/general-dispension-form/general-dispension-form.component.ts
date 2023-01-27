@@ -289,7 +289,6 @@ export class GeneralDispensingFormComponent implements OnInit {
                     concept: this.strengthConceptUuid,
                     obsDatetime: new Date(),
                     value: this.formValues[this.strengthConceptUuid]?.value,
-                    order: (response?.orders || [])[0]?.uuid
                   }
                 : null,
             ]?.filter((observation) => observation),

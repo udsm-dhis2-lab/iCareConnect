@@ -107,7 +107,6 @@ export class DrugOrderFormComponent implements OnInit {
       this.keysWithData =
         this.keysWithData.filter((key) => key !== "quantity") || [];
       if (data?.quantity?.value != "" && Number(data?.quantity?.value) === 0) {
-        this.drugQuantity.emit();
         this.quantityField = null;
         setTimeout(() => {
           this.quantityField = {

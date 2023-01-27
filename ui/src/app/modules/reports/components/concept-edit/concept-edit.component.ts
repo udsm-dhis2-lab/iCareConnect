@@ -1,14 +1,14 @@
-import { Component, Inject, OnInit } from "@angular/core";
-import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
-import { Observable, observable } from "rxjs";
-import { tap } from "rxjs/operators";
+import { Component, Inject, OnInit } from '@angular/core';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { Observable, observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
+import { ReportService } from '../../services/report.service';
 import * as _ from "lodash";
-import { ReportService } from "src/app/core/services/report.service";
 
 @Component({
-  selector: "app-concept-edit",
-  templateUrl: "./concept-edit.component.html",
-  styleUrls: ["./concept-edit.component.scss"],
+  selector: 'app-concept-edit',
+  templateUrl: './concept-edit.component.html',
+  styleUrls: ['./concept-edit.component.scss'],
 })
 export class ConceptEditComponent implements OnInit {
   conceptData: any;
@@ -30,7 +30,7 @@ export class ConceptEditComponent implements OnInit {
   settingMap: boolean;
 
   selectedDataElement: any;
-  selectedDataElementName: string = "";
+  selectedDataElementName: string = '';
   selectedCategoryOptionCombo: any;
 
   constructor(
@@ -90,6 +90,7 @@ export class ConceptEditComponent implements OnInit {
   }
 
   onSelectCategoryOptionCombo(categoryOptionCombo) {
+
     this.settingMap = true;
     this.selectedCategoryOptionCombo = categoryOptionCombo;
 
@@ -103,15 +104,15 @@ export class ConceptEditComponent implements OnInit {
     this.reportService
       .searchConceptReferenceTerm(conceptRefTerm)
       .subscribe((res) => {
-        // console.log(res);
+       // console.log(res);
         //check if reference term exists
         if (res?.results?.length > 0) {
-          // console.log('here', res?.results);
+         // console.log('here', res?.results);
           //used the existing ref term
 
           this.mapping = {
-            conceptReferenceTerm: res?.results[0]["uuid"],
-            conceptMapType: "35543629-7d8c-11e1-909d-c80aa9edcf4e",
+            conceptReferenceTerm: res?.results[0]['uuid'],
+            conceptMapType: '35543629-7d8c-11e1-909d-c80aa9edcf4e',
           };
 
           this.settingMap = false;
@@ -121,9 +122,9 @@ export class ConceptEditComponent implements OnInit {
           let refTermPayload = {
             name: `${this.selectedDataElement?.name}_${this.selectedCategoryOptionCombo?.name}`,
             code: conceptRefTerm,
-            description: "description for the concept reference term",
-            conceptSource: "2baf47eb-4a17-4eb2-b496-6c792e9ebf6f",
-            version: "1.0.0",
+            description: 'description for the concept reference term',
+            conceptSource: '2baf47eb-4a17-4eb2-b496-6c792e9ebf6f',
+            version: '1.0.0',
           };
 
           this.reportService
@@ -133,7 +134,7 @@ export class ConceptEditComponent implements OnInit {
 
               this.mapping = {
                 conceptReferenceTerm: refTermResponse?.uuid,
-                conceptMapType: "35543629-7d8c-11e1-909d-c80aa9edcf4e",
+                conceptMapType: '35543629-7d8c-11e1-909d-c80aa9edcf4e',
               };
 
               this.settingMap = false;
@@ -165,32 +166,32 @@ export class ConceptEditComponent implements OnInit {
       names: [
         {
           name: this.conceptData?.name,
-          locale: "en",
+          locale: 'en',
           localePreferred: true,
-          conceptNameType: "FULLY_SPECIFIED",
+          conceptNameType: 'FULLY_SPECIFIED',
         },
       ],
-      datatype: "8d4a4c94-c2cc-11de-8d13-0010c6dffd0f",
-      version: "1.2.2",
-      conceptClass: "8d492774-c2cc-11de-8d13-0010c6dffd0f",
+      datatype: '8d4a4c94-c2cc-11de-8d13-0010c6dffd0f',
+      version: '1.2.2',
+      conceptClass: '8d492774-c2cc-11de-8d13-0010c6dffd0f',
       mappings: [{ ...this.mapping }],
       descriptions: [
         {
           description: `Mapping concept ${this.conceptData?.name} for data element`,
-          locale: "en",
+          locale: 'en',
         },
       ],
       set: true,
-      setMembers: _.map(this.conceptSetMembers, (conceptSetMember) => {
+      setMembers: _.map(this.conceptSetMembers, conceptSetMember =>{
         return {
-          uuid: conceptSetMember?.uuid,
-        };
-      }),
+          uuid: conceptSetMember?.uuid
+        }
+      })
     };
 
-    this.reportService.createMappingConcept(conceptPayload).subscribe((res) => {
+    this.reportService.createMappingConcept(conceptPayload).subscribe(res =>{
       //console.log("VVVV ", res)
-    });
+    })
   }
 
   updateConcept() {}

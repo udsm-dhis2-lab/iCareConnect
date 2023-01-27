@@ -1,6 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { Observable, of } from "rxjs";
-import { ConceptMappingsService } from "src/app/core/services/concept-mappings.service";
 import { ReferenceTermsService } from "src/app/core/services/reference-terms.service";
 import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
@@ -21,12 +20,7 @@ export class CodesSelectionComponent implements OnInit {
 
   selectedCodingSource: string;
   @Output() selectedCodesItems: EventEmitter<any[]> = new EventEmitter<any[]>();
-
-  errors: any[] = [];
-  constructor(
-    private conceptReferenceService: ReferenceTermsService,
-    private conceptMappingService: ConceptMappingsService
-  ) {}
+  constructor(private conceptReferenceService: ReferenceTermsService) {}
 
   ngOnInit(): void {
     this.createCodesMappingSourceField(this.mappings);
@@ -64,7 +58,7 @@ export class CodesSelectionComponent implements OnInit {
     this.selectedCodingSource = values["source"]?.value;
     if (values["source"]?.value)
       this.conceptReferenceService
-        .getReferenceTermsBySource(this.selectedCodingSource)
+        .getReferenceTermsBySource(values["source"]?.value)
         .subscribe((response) => {
           this.codedOptions$ = of(
             response.map((referenceTerm) => {
@@ -79,33 +73,5 @@ export class CodesSelectionComponent implements OnInit {
             })
           );
         });
-  }
-
-  onDeleteMapping(event: Event, item: any): void {
-    event.stopPropagation();
-    this.conceptMappingService
-      .deleteConceptMapping(item?.conceptUuid, item?.uuid)
-      .subscribe((response) => {
-        if (response && !response?.error) {
-          this.conceptReferenceService
-            .getReferenceTermsBySource(this.selectedCodingSource)
-            .subscribe((response) => {
-              this.codedOptions$ = of(
-                response.map((referenceTerm) => {
-                  return {
-                    ...referenceTerm,
-                    value: referenceTerm?.uuid,
-                    label: referenceTerm?.display,
-                    key: referenceTerm?.uuid,
-                    name: referenceTerm?.display,
-                    uuid: referenceTerm?.uuid,
-                  };
-                })
-              );
-            });
-        } else {
-          this.errors = [...this.errors, response];
-        }
-      });
   }
 }

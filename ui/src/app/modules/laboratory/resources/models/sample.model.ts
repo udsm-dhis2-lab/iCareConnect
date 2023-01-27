@@ -6,10 +6,8 @@ import {
 import * as moment from "moment";
 import { map, flatten, keyBy, filter, uniqBy, orderBy, groupBy } from "lodash";
 import {
-  createSearchingText,
   formatResults,
   formatUserChangedStatus,
-  getAuthorizationDetails,
   getAuthorizationDetailsByOrder,
   getResultsCommentsStatuses,
   mergeTestAllocations,
@@ -293,13 +291,7 @@ export class LabSample {
   }
 
   get creator(): any {
-    return {
-      ...this.sample?.creator,
-      name:
-        this.sample?.creator?.display?.indexOf("(") > -1
-          ? this.sample?.creator?.display?.split(" (")[0]
-          : this.sample?.creator?.display,
-    };
+    return this.sample?.creator;
   }
 
   get keyedDepartments(): any {
@@ -411,76 +403,6 @@ export class LabSample {
       : null;
   }
 
-  get collectedBy(): any {
-    return {
-      display: this.sample?.creator?.display?.split(" (")[0],
-      name: this.sample?.creator?.display?.split(" (")[0],
-      uid: this.sample?.creator?.uuid,
-    };
-  }
-
-  get searchingText(): string {
-    return createSearchingText(this.sample);
-  }
-
-  get authorizationInfo(): any {
-    return getAuthorizationDetails(this.sample);
-  }
-
-  get priorityStatus(): any {
-    return (this.sample?.statuses?.filter(
-      (status) => status?.remarks === "PRIORITY"
-    ) || [])[0];
-  }
-
-  get receivedOnStatus(): any {
-    return (this.sample?.statuses?.filter(
-      (status) =>
-        status?.category === "RECEIVED_ON" || status?.status === "RECEIVED_ON"
-    ) || [])[0];
-  }
-
-  get disposedStatus(): any {
-    return (this.sample?.statuses?.filter(
-      (status) =>
-        status?.category === "DISPOSED" || status?.status === "DISPOSED"
-    ) || [])[0];
-  }
-
-  get deliveredByStatus(): any {
-    return (this.sample?.statuses?.filter(
-      (status) =>
-        status?.category === "DELIVERED_BY" || status?.status === "DELIVERED_BY"
-    ) || [])[0];
-  }
-
-  get receivedByStatus(): any {
-    return (this.sample?.statuses?.filter(
-      (status) =>
-        status?.category === "RECEIVED_BY" || status?.status === "RECEIVED_BY"
-    ) || [])[0];
-  }
-
-  get priorityHigh(): any {
-    return (
-      this.sample?.statuses?.filter(
-        (status) => status?.status === "HIGH" || status?.status === "Urgent"
-      ) || []
-    )?.length > 0
-      ? true
-      : false;
-  }
-
-  get priorityOrderNumber(): any {
-    return (
-      this.sample?.statuses?.filter(
-        (status) => status?.status === "HIGH" || status?.status === "Urgent"
-      ) || []
-    )?.length > 0
-      ? 0
-      : 1;
-  }
-
   toJSon(): any {
     return {
       uuid: this.uuid,
@@ -502,18 +424,6 @@ export class LabSample {
       releasedStatuses: this.releasedStatuses,
       restrictedStatuses: this.restrictedStatuses,
       reasonsForRejection: this.reasonsForRejection,
-      rejected: this.rejected,
-      rejectedBy: this.rejectedBy,
-      departmentName: this.department?.name,
-      collectedBy: this.collectedBy,
-      authorizationInfo: this.authorizationInfo,
-      priorityStatus: this.priorityStatus,
-      disposedStatus: this.disposedStatus,
-      receivedOnStatus: this.receivedOnStatus,
-      deliveredByStatus: this.deliveredByStatus,
-      receivedByStatus: this.receivedByStatus,
-      priorityHigh: this.priorityHigh,
-      priorityOrderNumber: this.priorityOrderNumber,
     };
   }
 }

@@ -1,12 +1,13 @@
-import { ComponentFixture, TestBed } from "@angular/core/testing";
-import { provideMockStore } from "@ngrx/store/testing";
-import { of } from "rxjs";
-import { ReportParamsService } from "src/app/core/services/report-params.service";
-import { ReportService } from "src/app/core/services/report.service";
-import { storeDataMock } from "src/test-mocks/store-data.mock";
-import { ReportsGeneratorComponent } from "./reports-generator.component";
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideMockStore } from '@ngrx/store/testing';
+import { of } from 'rxjs';
+import { storeDataMock } from 'src/test-mocks/store-data.mock';
+import { ReportParamsService } from '../../services/report-params.service';
+import { ReportService } from '../../services/report.service';
 
-describe("ReportsGeneratorComponent", () => {
+import { ReportsGeneratorComponent } from './reports-generator.component';
+
+describe('ReportsGeneratorComponent', () => {
   let component: ReportsGeneratorComponent;
   let fixture: ComponentFixture<ReportsGeneratorComponent>;
 
@@ -33,7 +34,7 @@ describe("ReportsGeneratorComponent", () => {
     fixture.detectChanges();
   });
 
-  it("should create", () => {
+  it('should create', () => {
     expect(component).toBeTruthy();
   });
 });

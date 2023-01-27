@@ -378,8 +378,7 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 		String stockEnabled = administrationService.getGlobalProperty(ICareConfig.STOCK_ENABLE);
 		
 		if (!(stockEnabled != null && stockEnabled.equals("false"))) {
-			
-			if (stockList.get(0).getQuantity() < savedOrder.getQuantity()) {
+			if (stockList.size() == 0) {
 				throw new StockOutException(item.getDisplayString() + " is stocked out.");
 			}
 			Double totalQuantity = savedOrder.getQuantity();

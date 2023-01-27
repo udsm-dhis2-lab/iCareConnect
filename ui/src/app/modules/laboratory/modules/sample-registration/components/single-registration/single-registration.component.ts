@@ -1,6 +1,7 @@
 import { Component, Input, OnInit } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { MatRadioChange } from "@angular/material/radio";
+import * as moment from "moment";
 import { Observable, of, zip } from "rxjs";
 import {
   EQA_PERSON_DATA,
@@ -11,11 +12,15 @@ import { Location } from "src/app/core/models";
 import { SystemSettingsWithKeyDetails } from "src/app/core/models/system-settings.model";
 import { LocationService } from "src/app/core/services";
 import { IdentifiersService } from "src/app/core/services/identifiers.service";
+import { LabSampleModel } from "src/app/modules/laboratory/resources/models";
 import { LabOrdersService } from "src/app/modules/laboratory/resources/services/lab-orders.service";
 import { LabTestsService } from "src/app/modules/laboratory/resources/services/lab-tests.service";
 import { RegistrationService } from "src/app/modules/registration/services/registration.services";
+import { formatDateToYYMMDD } from "src/app/shared/helpers/format-date.helper";
+import { DateField } from "src/app/shared/modules/form/models/date-field.model";
 import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
+import { Textbox } from "src/app/shared/modules/form/models/text-box.model";
 import { ICARE_CONFIG } from "src/app/shared/resources/config";
 import { DiagnosisService } from "src/app/shared/resources/diagnosis/services";
 import { ConceptGetFull } from "src/app/shared/resources/openmrs";
@@ -33,7 +38,6 @@ import { SharedConfirmationComponent } from "src/app/shared/components/shared-co
 import { Store } from "@ngrx/store";
 import { AppState } from "src/app/store/reducers";
 import { getLocationsByIds } from "src/app/store/selectors";
-import { formatDateToYYMMDD } from "src/app/shared/helpers/format-date.helper";
 
 @Component({
   selector: "app-single-registration",
@@ -52,7 +56,6 @@ export class SingleRegistrationComponent implements OnInit {
   @Input() labNumberCharactersCount: string;
   @Input() testsFromExternalSystemsConfigs: any[];
   @Input() currentUser: any;
-  @Input() allRegistrationFields: any;
 
   departmentField: any = {};
   specimenDetailsFields: any;
@@ -122,7 +125,6 @@ export class SingleRegistrationComponent implements OnInit {
   savingLabRequest: boolean = false;
   labLocations$: Observable<any>;
   currentLabLocation: any;
-  existingFields: any;
 
   constructor(
     private samplesService: SamplesService,
@@ -143,90 +145,135 @@ export class SingleRegistrationComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    console.log(this.currentUser);
     const userLocationsIds = JSON.parse(
       this.currentUser?.userProperties?.locations
     );
     this.labLocations$ = this.store.select(getLocationsByIds(userLocationsIds));
     this.labSampleLabel$ = this.samplesService.getSampleLabel();
-    this.referringDoctorFields = Object.keys(
-      this.allRegistrationFields?.referringDoctorFields
-    ).map((key) => {
-      return this.allRegistrationFields?.referringDoctorFields[key];
+    this.referringDoctorFields = this.referringDoctorAttributes.map(
+      (attribute) => {
+        return new Textbox({
+          id: "attribute-" + attribute?.value,
+          key: "attribute-" + attribute?.value,
+          label: attribute?.name,
+          type: "text",
+        });
+      }
+    );
+
+    this.specimenDetailsFields = [
+      new Dropdown({
+        id: "specimen",
+        key: "specimen",
+        label: "Specimen",
+        searchTerm: "SPECIMEN_SOURCE",
+        options: [],
+        conceptClass: "Specimen",
+        searchControlType: "concept",
+        shouldHaveLiveSearchForDropDownFields: true,
+      }),
+      new Dropdown({
+        id: "condition",
+        key: "condition",
+        label: "Condition",
+        options: [],
+        conceptClass: "condition",
+        searchControlType: "concept",
+        searchTerm: "SAMPLE_CONDITIONS",
+        shouldHaveLiveSearchForDropDownFields: true,
+      }),
+      new Dropdown({
+        id: "agency",
+        key: "agency",
+        label: "Urgency/Priority",
+        options: [],
+        conceptClass: "priority",
+        searchControlType: "concept",
+        searchTerm: "SAMPLE_PRIORITIES",
+        shouldHaveLiveSearchForDropDownFields: true,
+      }),
+      // new Dropdown({
+      //   id: "receivinglab",
+      //   key: "receivinglab",
+      //   label: "Receiving Lab",
+      //   options: [],
+      //   searchControlType: "concept",
+      //   conceptClass: "Lab Department",
+      //   shouldHaveLiveSearchForDropDownFields: true,
+      // }),
+      // new DateField({
+      //   id: "receivedOn",
+      //   key: "receivedOn",
+      //   label: "Received On",
+      // }),
+      // new Dropdown({
+      //   id: "department",
+      //   key: "department",
+      //   label: "Department",
+      //   options: [],
+      //   searchControlType: "concept",
+      //   conceptClass: "Lab Department",
+      //   shouldHaveLiveSearchForDropDownFields: true,
+      // }),
+    ];
+
+    this.receivedOnField = new DateField({
+      id: "receivedOn",
+      key: "receivedOn",
+      label: "Received On",
+      max: this.maximumDate,
     });
 
-    this.specimenDetailsFields = Object.keys(
-      this.allRegistrationFields?.specimenDetailFields
-    ).slice(0, 3)
-      .map((key) => {
-        const field = this.allRegistrationFields?.specimenDetailFields[key];
-        return field
-      });
+    this.receivedByField = new Dropdown({
+      id: "receivedBy",
+      key: "receivedBy",
+      label: "Received By",
+      options: [],
+      shouldHaveLiveSearchForDropDownFields: true,
+      searchControlType: "user",
+    });
 
-    // this.specimenDetailsFields = [
-    //   new Dropdown({
-    //     id: "specimen",
-    //     key: "specimen",
-    //     label: "Specimen",
-    //     searchTerm: "SPECIMEN_SOURCE",
-    //     options: [],
-    //     conceptClass: "Specimen",
-    //     searchControlType: "concept",
-    //     shouldHaveLiveSearchForDropDownFields: true,
-    //   }),
-    //   new Dropdown({
-    //     id: "condition",
-    //     key: "condition",
-    //     label: "Condition",
-    //     options: [],
-    //     conceptClass: "condition",
-    //     searchControlType: "concept",
-    //     searchTerm: "SAMPLE_CONDITIONS",
-    //     shouldHaveLiveSearchForDropDownFields: true,
-    //   }),
-    //   new Dropdown({
-    //     id: "agency",
-    //     key: "agency",
-    //     label: "Urgency/Priority",
-    //     options: [],
-    //     conceptClass: "priority",
-    //     searchControlType: "concept",
-    //     searchTerm: "SAMPLE_PRIORITIES",
-    //     shouldHaveLiveSearchForDropDownFields: true,
-    //   }),
-    //   // new Dropdown({
-    //   //   id: "receivinglab",
-    //   //   key: "receivinglab",
-    //   //   label: "Receiving Lab",
-    //   //   options: [],
-    //   //   searchControlType: "concept",
-    //   //   conceptClass: "Lab Department",
-    //   //   shouldHaveLiveSearchForDropDownFields: true,
-    //   // }),
-    //   // new DateField({
-    //   //   id: "receivedOn",
-    //   //   key: "receivedOn",
-    //   //   label: "Received On",
-    //   // }),
-    //   // new Dropdown({
-    //   //   id: "department",
-    //   //   key: "department",
-    //   //   label: "Department",
-    //   //   options: [],
-    //   //   searchControlType: "concept",
-    //   //   conceptClass: "Lab Department",
-    //   //   shouldHaveLiveSearchForDropDownFields: true,
-    //   // }),
-    // ];
+    this.agencyFormField = new Dropdown({
+      id: "agency",
+      key: "agency",
+      label: "urgency/Priority",
+      options: this.agencyConceptConfigs?.setMembers.map((member) => {
+        return {
+          key: member?.uuid,
+          value: member?.display,
+          label: member?.display,
+          name: member?.display,
+        };
+      }),
+      shouldHaveLiveSearchForDropDownFields: false,
+    });
 
-    this.receivedOnField = this.allRegistrationFields?.specimenDetailFields?.receivedOn;
-    this.receivedByField = this.allRegistrationFields?.specimenDetailFields?.receivedBy;
-    this.transportCondition = this.allRegistrationFields?.specimenDetailFields?.transportCondition;
-    this.transportationTemperature = this.allRegistrationFields?.specimenDetailFields?.transportationTemperature;
+    this.transportCondition = new Dropdown({
+      id: "transportCondition",
+      key: "transportCondition",
+      label: "Transport Condition",
+      searchTerm: "SAMPLE_TRANSPORT_CONDITION",
+      required: false,
+      options: [],
+      multiple: false,
+      conceptClass: "Misc",
+      searchControlType: "concept",
+      shouldHaveLiveSearchForDropDownFields: true,
+    });
 
-    this.sampleColectionDateField = this.allRegistrationFields?.specimenDetailFields?.collectedOn;
-    this.sampleCollectedByField = this.allRegistrationFields?.specimenDetailFields?.collectedBy;
-    this.broughtOnField = this.allRegistrationFields?.specimenDetailFields?.broughtOn;
-    this.broughtByField = this.allRegistrationFields?.specimenDetailFields?.broughtBy;
+    this.transportationTemperature = new Dropdown({
+      id: "transportationTemperature",
+      key: "transportationTemperature",
+      label: "Transportation Temperature",
+      searchTerm: "SAMPLE_TRANSPORT_TEMPERATURE",
+      required: false,
+      options: [],
+      multiple: false,
+      conceptClass: "Misc",
+      searchControlType: "concept",
+      shouldHaveLiveSearchForDropDownFields: true,
+    });
 
     const currentLocation = JSON.parse(localStorage.getItem("currentLocation"));
     const labsAvailable =
@@ -248,6 +295,9 @@ export class SingleRegistrationComponent implements OnInit {
     //   }),
     //   shouldHaveLiveSearchForDropDownFields: false,
     // });getSelectedRCollectedOnTime
+
+    this.createSampleCollectionDetailsFields();
+    this.createSampleBroughtByDetailsFields();
   }
 
   get maximumDate() {
@@ -273,6 +323,36 @@ export class SingleRegistrationComponent implements OnInit {
         ? date.getDate()
         : `0${date.getDate()}`;
     return `${date.getFullYear()}-${month}-${day}`;
+  }
+
+  createSampleCollectionDetailsFields(data?: any): void {
+    this.sampleColectionDateField = new DateField({
+      id: "collectedOn",
+      key: "collectedOn",
+      label: "Collected On",
+      max: this.maximumDate,
+    });
+
+    this.sampleCollectedByField = new Textbox({
+      id: "collectedBy",
+      key: "collectedBy",
+      label: "Collected By",
+    });
+  }
+
+  createSampleBroughtByDetailsFields(data?: any): void {
+    this.broughtOnField = new DateField({
+      id: "broughtOn",
+      key: "broughtOn",
+      label: "Delivered On",
+      max: this.maximumDate,
+    });
+
+    this.broughtByField = new Textbox({
+      id: "broughtBy",
+      key: "broughtBy",
+      label: "Delivered By",
+    });
   }
 
   togglePatientDetailsFieldSet(event: Event): void {
@@ -405,10 +485,6 @@ export class SingleRegistrationComponent implements OnInit {
         key: "broughtAt",
       },
     };
-  }
-
-  onGetDateTime(e: any){
-    console.log("==> Date time: ", e )
   }
 
   onFormUpdate(formValues: FormValue, itemKey?: string): void {
@@ -1532,6 +1608,10 @@ export class SingleRegistrationComponent implements OnInit {
                                                                           0
                                                                         ) {
                                                                           zip(
+                                                                            this.samplesService.saveTestContainerAllocation(
+                                                                              ordersWithConceptsDetails,
+                                                                              configs
+                                                                            ),
                                                                             this.samplesService.setMultipleSampleStatuses(
                                                                               statuses
                                                                             )
@@ -1822,7 +1902,6 @@ export class SingleRegistrationComponent implements OnInit {
   }
 
   createLabRequestPayload(data): any {
-    // TODO:Softcode program stage ID
     this.labRequestPayload = {
       program: data?.program,
       programStage: "emVt37lHjub",
@@ -1830,52 +1909,14 @@ export class SingleRegistrationComponent implements OnInit {
       trackedEntityInstance: data?.trackedEntityInstance,
       enrollment: data?.enrollment,
       dataValues: [
-        {
-          dataElement: "Q98LhagGLFj",
-          value: this.formatDateAndTime(
-            new Date(
-              this.getTimestampFromDateAndTime(
-                this.receivedOnDateLatestValue,
-                this.receivedOnTime
-              )
-            )
-          ),
-        },
+        { dataElement: "Q98LhagGLFj", value: new Date().toISOString() },
         { dataElement: "D0RBm3alWd9", value: "RT - PCR" },
-        {
-          dataElement: "RfWBPHo9MnC",
-          value: this.formatDateAndTime(
-            new Date(
-              this.getTimestampFromDateAndTime(
-                this.receivedOnDateLatestValue,
-                this.receivedOnTime
-              )
-            )
-          ),
-        },
+        { dataElement: "RfWBPHo9MnC", value: new Date() },
         { dataElement: "HTBFvtjeztu", value: true },
         { dataElement: "xzuzLYN1f0J", value: true },
       ],
-      eventDate: new Date(
-        this.getTimestampFromDateAndTime(
-          this.receivedOnDateLatestValue,
-          this.receivedOnTime
-        )
-      ),
+      eventDate: new Date().toISOString(),
     };
     return this.labRequestPayload;
-  }
-
-  formatDateAndTime(date: Date): string {
-    return (
-      formatDateToYYMMDD(date) +
-      "T" +
-      date.getHours() +
-      ":" +
-      date.getMinutes() +
-      ":" +
-      date.getSeconds() +
-      ".000Z"
-    );
   }
 }

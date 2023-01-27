@@ -15,7 +15,6 @@ import {
 } from "src/app/store/selectors";
 import { getProviderDetails } from "src/app/store/selectors/current-user.selectors";
 import { OpenmrsHttpClientService } from "../../modules/openmrs-http-client/services/openmrs-http-client.service";
-import { VisitObject } from "../../resources/visits/models/visit-object.model";
 import { Visit } from "../../resources/visits/models/visit.model";
 import { VisitsService } from "../../resources/visits/services";
 
@@ -27,12 +26,11 @@ import { VisitsService } from "../../resources/visits/services";
 export class PatientLabResultsSummaryComponent implements OnInit {
   @Input() labConceptsTree: any;
   @Input() observations: any;
-  @Input() patientVisit: VisitObject;
+  @Input() patientVisit: Visit;
   @Input() investigationAndProceduresFormsDetails: any;
   @Input() iCareGeneralConfigurations: any;
   @Input() isInpatient: boolean;
   @Input() forConsultation: boolean;
-  @Input() forHistory: boolean;
 
   labOrdersResultsInformation: any[] = [];
   codedResultsData$: Observable<any>;
@@ -55,19 +53,11 @@ export class PatientLabResultsSummaryComponent implements OnInit {
   labResultsObject: any = [];
 
   ngOnInit(): void {
-    this.loadLabResultsComponent();
-    this.observations = !this.forHistory
-      ? this.observations
-      : this.patientVisit.observations;
-  }
-
-  loadLabResultsComponent(): void {
-    this.creatingLabOrdersState$ = undefined;
     this.store.dispatch(loadOrderTypes());
     this.orderTypes$ = this.store.select(getAllOrderTypes);
     this.provider$ = this.store.select(getProviderDetails);
     this.creatingLabOrdersState$ = this.store.select(getCreatingLabOrderState);
-    if (!this.patientVisit && !this.forHistory) {
+    if (!this.patientVisit) {
       const labDeptConceptArray = filter(
         this.labConceptsTree?.setMembers,
         (setMember) => {
@@ -120,70 +110,61 @@ export class PatientLabResultsSummaryComponent implements OnInit {
       let obsValuesConcepts = [];
       let testsConcepts = [];
       // TODO: Remove subscribe within this ts
-      this.labOrders$ = !this.forHistory
-        ? this.store.select(getAllNewLabOrders)
-        : of(this.patientVisit?.labOrders);
+      this.labOrders$ = this.store.select(getAllNewLabOrders);
       this.creatingLabOrdersState$.subscribe((creatingLabOrderState) => {
         if (!creatingLabOrderState) {
-          (!this.forHistory
-            ? this.visitService.getActiveVisit(
-                this.patientVisit?.patientUuid,
-                false,
-                false,
-                true
-              )
-            : of(this.patientVisit)
-          ).subscribe((visitResponse: VisitObject) => {
-            if (visitResponse) {
-              this.loadedLabOrders = true;
-              this.labOrdersResultsInformation = visitResponse?.labOrders.map(
-                (labOrder: any) => {
-                  testsConcepts = uniqBy(
-                    [...testsConcepts, labOrder?.order?.concept],
-                    "uuid"
-                  );
-                  // TODO: For multiple orders for the same test consider using encounter and dates
-                  const observation: any =
-                    this.observations &&
-                    this.observations[labOrder?.order?.concept?.uuid] &&
-                    this.observations[labOrder?.order?.concept?.uuid]?.latest
-                      ? this.observations[labOrder?.order?.concept?.uuid]
-                          ?.latest
-                      : null;
-                  if (observation) {
-                    obsValuesConcepts = [
-                      ...obsValuesConcepts,
-                      {
-                        value: observation?.value,
-                        concept: observation?.concept?.uuid,
-                      },
-                    ];
-                  }
-
-                  this.testSetMembersDetails$ =
-                    this.getSetMembersForTheConcepts(testsConcepts);
-                  this.codedResultsData$ =
-                    obsValuesConcepts?.length > 0
-                      ? this.getValuesForCocedConcepts(obsValuesConcepts)
-                      : of([]);
-
-                  this.codedResultsData$.subscribe((data) => {
-                    if (data) {
-                      this.keyedResults = keyBy(data, "test");
+          this.visitService
+            .getActiveVisit(this.patientVisit?.patientUuid, false, false, true)
+            .subscribe((visitResponse) => {
+              if (visitResponse) {
+                this.loadedLabOrders = true;
+                this.labOrdersResultsInformation = visitResponse?.labOrders.map(
+                  (labOrder: any) => {
+                    testsConcepts = uniqBy(
+                      [...testsConcepts, labOrder?.order?.concept],
+                      "uuid"
+                    );
+                    // TODO: For multiple orders for the same test consider using encounter and dates
+                    const observation: any =
+                      this.observations[labOrder?.order?.concept?.uuid] &&
+                      this.observations[labOrder?.order?.concept?.uuid]?.latest
+                        ? this.observations[labOrder?.order?.concept?.uuid]
+                            ?.latest
+                        : null;
+                    if (observation) {
+                      obsValuesConcepts = [
+                        ...obsValuesConcepts,
+                        {
+                          value: observation?.value,
+                          concept: observation?.concept?.uuid,
+                        },
+                      ];
                     }
-                  });
-                  return {
-                    ...labOrder?.order,
-                    voided: labOrder?.voided,
-                    result: observation,
-                  };
-                }
-              );
-            } else {
-              this.loadedLabOrders = false;
-              this.labOrdersResultsInformation = null;
-            }
-          });
+
+                    this.testSetMembersDetails$ =
+                      this.getSetMembersForTheConcepts(testsConcepts);
+                    this.codedResultsData$ =
+                      obsValuesConcepts?.length > 0
+                        ? this.getValuesForCocedConcepts(obsValuesConcepts)
+                        : of([]);
+
+                    this.codedResultsData$.subscribe((data) => {
+                      if (data) {
+                        this.keyedResults = keyBy(data, "test");
+                      }
+                    });
+                    return {
+                      ...labOrder?.order,
+                      voided: labOrder?.voided,
+                      result: observation,
+                    };
+                  }
+                );
+              } else {
+                this.loadedLabOrders = false;
+                this.labOrdersResultsInformation = null;
+              }
+            });
         }
       });
     }

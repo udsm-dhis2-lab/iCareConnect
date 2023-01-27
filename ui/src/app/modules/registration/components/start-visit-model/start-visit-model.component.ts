@@ -58,8 +58,7 @@ export class StartVisitModelComponent implements OnInit {
     this.patient?.person?.attributes?.map((attribute) => {
       if (
         (attribute?.display?.split(" = ") || [])?.length > 0 &&
-        (attribute?.display?.split(" = ")[0].toLowerCase() === "phone" ||
-          attribute?.display?.split(" = ")[0].toLowerCase() === "mobilenumber")
+        attribute?.display?.split(" = ")[0].toLowerCase() === "phone"
       ) {
         this.patientPhone = attribute?.display?.split(" = ")[1];
       }

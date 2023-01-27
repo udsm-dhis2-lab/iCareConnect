@@ -232,7 +232,7 @@ export class AddUserComponent implements OnInit {
   }
 
   generateForm(user: any): any {
-    this.selectedRoles = user?.roles || [];
+    this.selectedRoles = user?.roles;
     return this.fb.group({
       username: new FormControl(user?.username, Validators.required),
       password: [

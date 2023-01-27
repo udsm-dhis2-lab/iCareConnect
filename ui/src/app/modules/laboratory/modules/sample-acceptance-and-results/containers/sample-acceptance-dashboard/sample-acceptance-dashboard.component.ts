@@ -45,6 +45,19 @@ export class SampleAcceptanceDashboardComponent implements OnInit {
     this.store.dispatch(
       addLabDepartments({ labDepartments: this.labSamplesDepartments })
     );
+    this.store.dispatch(
+      loadLabSamplesByCollectionDates({
+        datesParameters: this.datesParameters,
+        patients: this.patients,
+        sampleTypes: this.sampleTypes,
+        departments: this.labSamplesDepartments,
+        containers: this.labSamplesContainers,
+        configs: this.configs,
+        codedSampleRejectionReasons: this.codedSampleRejectionReasons,
+        startIndex: (this.page - 1) * this.pageCount,
+        limit: this.pageCount,
+      })
+    );
 
     this.codedSampleRejectionReasons$ = this.store.select(
       getCodedSampleRejectionReassons
@@ -56,6 +69,24 @@ export class SampleAcceptanceDashboardComponent implements OnInit {
 
     this.samplesLoadedState$ = this.store.select(
       getFormattedLabSamplesLoadedState
+    );
+  }
+
+  getSamples(event: Event, action: string): void {
+    event.stopPropagation();
+    this.page = action === "next" ? this.page + 1 : this.page - 1;
+    this.store.dispatch(
+      loadLabSamplesByCollectionDates({
+        datesParameters: this.datesParameters,
+        patients: this.patients,
+        sampleTypes: this.sampleTypes,
+        departments: this.labSamplesDepartments,
+        containers: this.labSamplesContainers,
+        configs: this.configs,
+        codedSampleRejectionReasons: this.codedSampleRejectionReasons,
+        startIndex: (this.page - 1) * this.pageCount,
+        limit: this.pageCount,
+      })
     );
   }
 }

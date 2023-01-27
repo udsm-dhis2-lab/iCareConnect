@@ -1,12 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { uniqBy, orderBy } from "lodash";
 import { Observable, of } from "rxjs";
-import {
-  debounceTime,
-  distinctUntilChanged,
-  map,
-  switchMap,
-} from "rxjs/operators";
+import { debounceTime, distinctUntilChanged, switchMap } from "rxjs/operators";
 import { LocationService } from "src/app/core/services";
 import { ReferenceTermsService } from "src/app/core/services/reference-terms.service";
 import { ConceptsService } from "../../resources/concepts/services/concepts.service";
@@ -37,8 +32,7 @@ export class MultipleItemsSelectionComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.currentSelectedItems =
-      this.selectedItems?.filter((item) => !item?.retired) || [];
+    this.currentSelectedItems = this.selectedItems;
     if (
       this.itemType &&
       this.itemType === "concept" &&
@@ -69,19 +63,14 @@ export class MultipleItemsSelectionComponent implements OnInit {
               searchTerm: this.standardSearchTerm,
             });
     } else if (this.itemType === "conceptReferenceTerm") {
-      this.items$ = this.conceptReferenceService
-        .getConceptReferenceTermsByParameters({
+      this.items$ =
+        this.conceptReferenceService.getConceptReferenceTermsByParameters({
           q: "",
           source: this.source,
           limit: this.pageSize,
           startIndex: (this.page - 1) * this.pageSize,
           searchTerm: this.standardSearchTerm,
-        })
-        .pipe(
-          map((response) => {
-            return response?.filter((item) => !item?.retired) || [];
-          })
-        );
+        });
     } else {
       this.items$ = of(
         this.items.filter(

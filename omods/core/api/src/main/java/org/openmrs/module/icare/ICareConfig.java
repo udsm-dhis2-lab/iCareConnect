@@ -91,6 +91,4 @@ public class ICareConfig {
 	
 	public static final String BED_ORDER_CONCEPT = "icare.billing.accomodationChargesConcept";
 	
-	public static final String LAB_RESULT_APPROVAL_CONFIGURATION = "iCare.laboratory.resultApprovalConfiguration";
-	
 }

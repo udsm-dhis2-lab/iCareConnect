@@ -25,7 +25,7 @@
     <!-- <div class="sample-dashboard-summary">
       <app-samples-summary-dashboard></app-samples-summary-dashboard>
     </div> -->
-    <div class="filtering-div d-flex justify-content-end">
+    <div class="filtering-div">
       <mat-form-field class="w-50">
         <mat-label>Search</mat-label>
         <mat-icon matPrefix>search</mat-icon
@@ -35,12 +35,22 @@
           [(ngModel)]="searchingText"
         />
       </mat-form-field>
-      <div class="w-50">
-        <app-shared-departments-selection
-          [searchTerm]="'LAB_DEPARTMENT'"
-          (selectedDepartments)="getSelectedDepartments($event)"
-        ></app-shared-departments-selection>
-      </div>
+      <mat-form-field appearance="fill" class="w-30 ml-2 float-right">
+        <mat-label
+          >Select
+          {{ !LISConfigurations?.isLIS ? "Department" : "Section" }}</mat-label
+        >
+        <mat-select [(value)]="selectedDepartment">
+          <mat-option (click)="setDepartment('')">All</mat-option>
+          <mat-option
+            *ngFor="let dept of labSamplesDepartments"
+            [value]="dept.display"
+            (click)="setDepartment(dept.display)"
+          >
+            {{ dept.display }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
     </div>
     <div class="p-1">
       <!-- {{ sampleParams?.samplesWithResults | json }} -->

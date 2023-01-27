@@ -79,41 +79,25 @@
       <!-- Name Column -->
       <ng-container matColumnDef="name">
         <th mat-header-cell *matHeaderCellDef>Name</th>
-        <td mat-cell *matCellDef="let element">
-          {{ element?.patient.person.display }}
-        </td>
+        <td mat-cell *matCellDef="let element">{{ element.name }}</td>
       </ng-container>
 
       <!-- Gender Column -->
       <ng-container matColumnDef="gender">
         <th mat-header-cell *matHeaderCellDef>Gender</th>
-        <td mat-cell *matCellDef="let element">
-          {{ element?.patient.person.gender }}
-        </td>
+        <td mat-cell *matCellDef="let element">{{ element.gender }}</td>
       </ng-container>
 
       <!-- Age Column -->
       <ng-container matColumnDef="age">
         <th mat-header-cell *matHeaderCellDef>Age</th>
-        <td mat-cell *matCellDef="let element">
-          {{ element?.patient.person.age }}
-        </td>
+        <td mat-cell *matCellDef="let element">{{ element.age }}</td>
       </ng-container>
       <!-- Phone Column -->
       <ng-container matColumnDef="phone">
         <th mat-header-cell *matHeaderCellDef>Phone</th>
         <td mat-cell *matCellDef="let element">
-          {{
-            element?.phone
-              ? (element?.phone + "").length === 9
-                ? "0" + element.phone
-                : element.phone
-              : element?.phoneNumber
-              ? (element?.phoneNumber + "").length === 9
-                ? "0" + element.phoneNumber
-                : element.phoneNumber
-              : ""
-          }}
+          {{ element?.phone }}
         </td>
       </ng-container>
 

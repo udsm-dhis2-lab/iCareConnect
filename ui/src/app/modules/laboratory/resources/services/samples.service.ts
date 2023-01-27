@@ -415,17 +415,15 @@ export class SamplesService {
             : startDate && endDate && category.length === 0
             ? `?startDate=${startDate}&endDate=${endDate}`
             : "";
-        return this.httpClientService
-          .get(`lab/samples${category}${dates}`)
-          .pipe(
-            map((response) => {
-              return {
-                category: statusCategory,
-                samplesCount: response?.length,
-                samples: response,
-              };
-            })
-          );
+        return this.httpClientService.get(`lab/sample${category}${dates}`).pipe(
+          map((response) => {
+            return {
+              category: statusCategory,
+              samplesCount: response?.length,
+              samples: response,
+            };
+          })
+        );
       })
     ).pipe(
       map((response) => {

@@ -11,9 +11,6 @@ import { AttendProcedureOrderComponent } from "../attend-procedure-order/attend-
 import { Store } from "@ngrx/store";
 import { AppState } from "src/app/store/reducers";
 import { getGroupedObservationByConcept } from "src/app/store/selectors/observation.selectors";
-import { DeleteConfirmationComponent } from "../delete-confirmation/delete-confirmation.component";
-import { SharedConfirmationComponent } from "../shared-confirmation /shared-confirmation.component";
-import { map } from "rxjs/operators";
 
 @Component({
   selector: "app-patient-procedures-summary",
@@ -41,8 +38,6 @@ export class PatientProceduresSummaryComponent implements OnInit {
   formDetails: FormValue;
   observationsKeyedByConcepts$: Observable<any>;
   @Output() updateConsultationOrder = new EventEmitter();
-  reloadOrderComponent: any;
-  errors: any[];
   constructor(
     private ordersService: OrdersService,
     private visitService: VisitsService,
@@ -51,7 +46,6 @@ export class PatientProceduresSummaryComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    
     this.procedures$ = this.visitService.getActiveVisitProcedures(
       this.patientVisit.uuid,
       this.fields
@@ -155,37 +149,6 @@ export class PatientProceduresSummaryComponent implements OnInit {
       data: {
         proceduredOrder,
       },
-    });
-  }
-
-  onDeleteProcedure(e: Event, procedure: any){
-    e.stopPropagation();
-    const confirmDialog = this.dialog.open(SharedConfirmationComponent, {
-      width: "25%",
-      data: {
-        modalTitle: `Delete ${procedure?.concept?.display}`,
-        modalMessage: `You are about to delete ${procedure?.concept?.display} for this patient, Click confirm to delete!`,
-        showRemarksInput: true,
-      },
-      disableClose: false,
-      panelClass: "custom-dialog-container",
-    });
-    confirmDialog.afterClosed().subscribe((confirmationObject) => {
-      if (confirmationObject?.confirmed) {
-        this.ordersService
-          .voidOrderWithReason({
-            ...procedure,
-            voidReason: confirmationObject?.remarks || "",
-          })
-          .subscribe((response) => {
-            if (!response?.error) {
-              this.reloadOrderComponent.emit();
-            }
-            if (response?.error) {
-              this.errors = [...this.errors, response?.error];
-            }
-          });
-      }
     });
   }
 }

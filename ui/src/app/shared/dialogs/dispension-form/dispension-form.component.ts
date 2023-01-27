@@ -30,7 +30,6 @@ import { LocationService } from "src/app/core/services";
 import { map, tap } from "rxjs/operators";
 import { ConceptGet } from "../../resources/openmrs";
 import { SharedConfirmationDialogComponent } from "../../components/shared-confirmation-dialog/shared-confirmation-dialog.component";
-import { ItemPriceService } from "../../services/item-price.service";
 
 @Component({
   selector: "app-dispension-form",
@@ -78,9 +77,6 @@ export class DispensingFormComponent implements OnInit {
   strengthConceptUuid$: Observable<string>;
   useSpecificDrugPrescription$: Observable<any>;
   specificDrugConceptUuid$: Observable<any>;
-  prescribedMedication: any;
-  drugPrice: number;
-  showPrice: boolean;
 
   constructor(
     private drugOrderService: DrugOrdersService,
@@ -94,7 +90,6 @@ export class DispensingFormComponent implements OnInit {
     private visitService: VisitsService,
     private locationService: LocationService,
     private conceptService: ConceptsService,
-    private itemPricesService: ItemPriceService,
     @Inject(MAT_DIALOG_DATA)
     public data: {
       drugOrder: any;
@@ -192,8 +187,6 @@ export class DispensingFormComponent implements OnInit {
                 type: "warning",
               },
             ];
-          } else {
-            this.prescribedMedication = this.drugOrder?.obs[response]?.value
           }
         })
       );
@@ -338,23 +331,7 @@ export class DispensingFormComponent implements OnInit {
   }
 
   onChangeDrugQuantity(quantity) {
-    this.showPrice = false
     this.drugOrder = { ...(this.drugOrder || ({} as any)), quantity };
-    const pricePayload = {
-      visitUuid: this.data.visit.uuid,
-      drugUuid: this.prescribedMedication
-    }
-    if (this.drugOrder.quantity?.toString().length > 0 && this.drugOrder.quantity !== 0) {
-      this.itemPricesService
-        .getItemPrice(pricePayload)
-        .pipe(
-          tap((response: any) => {
-            this.showPrice = true;
-            this.drugPrice = this.drugOrder.quantity * response?.price;
-          })
-        )
-        .subscribe();
-    }
   }
 
   onOrderingDrug(drugOrder: any) {

@@ -50,7 +50,7 @@ export class PricingItemComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.fieldId = `${this.paymentScheme?.concept?.uuid}_${this.pricingItem?.uuid}`;
+    this.fieldId = `${this.paymentScheme?.uuid}_${this.pricingItem?.uuid}`;
 
     this.pricingItemField = new Textbox({
       id: this.fieldId,

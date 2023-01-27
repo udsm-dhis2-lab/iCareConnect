@@ -3,7 +3,6 @@ import { Component, Input, OnInit } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { zip } from "rxjs";
 import { map } from "rxjs/operators";
-import { addBillStatusToOrders } from "src/app/shared/helpers/add-bill-status-to-ordered-items.helper";
 import { OrdersService } from "src/app/shared/resources/order/services/orders.service";
 import { VisitsService } from "src/app/shared/resources/visits/services";
 import { AppState } from "src/app/store/reducers";
@@ -19,7 +18,6 @@ export class PatientRadiologyOrdersListComponent implements OnInit {
   @Input() allUserRoles: any;
   @Input() userPrivileges: any;
   @Input() orders: any[];
-  @Input() currentBills: any[];
   @Input() patientId: string;
   @Input() activeVisitUuid: string;
 
@@ -62,7 +60,6 @@ export class PatientRadiologyOrdersListComponent implements OnInit {
       });
 
     this.activeVisit$ = this.store.pipe(select(getActiveVisit));
-    this.orders = addBillStatusToOrders(this.orders, this.currentBills);
   }
 
   fileSelection(event, order): void {

@@ -9,7 +9,7 @@ import {
 import { Observable, from, of, zip } from "rxjs";
 import { OpenmrsHttpClientService } from "src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service";
 import { catchError, map } from "rxjs/operators";
-import { flatten, omit } from "lodash";
+import { flatten } from "lodash";
 
 @Injectable({
   providedIn: "root",
@@ -76,19 +76,6 @@ export class ConceptsService {
             response?.display?.indexOf(":") > -1
               ? response?.display?.split(":")[1]
               : response?.display,
-          names: response?.names?.map((name) => {
-            return {
-              ...name,
-              display:
-                name?.display?.indexOf(":") > -1
-                  ? name?.display?.split(":")[1]
-                  : name?.display,
-              name:
-                name?.display?.indexOf(":") > -1
-                  ? name?.display?.split(":")[1]
-                  : name?.display,
-            };
-          }),
           answers:
             response?.answers && response?.answers?.length > 0
               ? response?.answers.map((answer) => {
@@ -134,7 +121,7 @@ export class ConceptsService {
     );
   }
 
-  getDepartmentDetails(referenceConcept: string): Observable<any> {
+  getConceptsDepartmentDetails(referenceConcept: string): Observable<any> {
     return this.httpClient
       .get(
         "concept/" +
@@ -205,8 +192,7 @@ export class ConceptsService {
   }
 
   updateConcept(uuid: string, data: any): Observable<ConceptCreateFull> {
-    const dataToUpdate = omit(data, "answers");
-    return from(this.api.concept.updateConcept(uuid, dataToUpdate)).pipe(
+    return from(this.api.concept.updateConcept(uuid, data)).pipe(
       map((response) => response),
       catchError((error) => {
         return of(error);
@@ -256,15 +242,6 @@ export class ConceptsService {
               result?.display?.indexOf(":") > -1
                 ? result?.display?.split(":")[1]
                 : result?.display,
-            names: result?.names?.filter((name) => {
-              return {
-                ...name,
-                display:
-                  name?.display?.indexOf(":") > -1
-                    ? name?.display?.split(":")[1]
-                    : name?.display,
-              };
-            }),
           };
         });
       }),
@@ -349,16 +326,11 @@ export class ConceptsService {
     );
   }
 
-  getConceptsBySearchTerm(
-    searchTerm: string,
-    fields?: string
-  ): Observable<ConceptGetFull[]> {
+  getConceptsBySearchTerm(searchTerm: string): Observable<ConceptGetFull[]> {
     return from(
       this.api.concept.getAllConcepts({
         q: searchTerm,
-        v: !fields
-          ? "custom:(uuid,display,names,descriptions,setMembers:(uuid,display,datatype,attributes:(uuid,display,value,attributeType:(uuid,display)),answers:(uuid,display),setMembers:(uuid,display,attributes:(uuid,display,value,attributeType:(uuid,display)),datatype,answers:(uuid,display))))"
-          : fields,
+        v: "custom:(uuid,display,names,descriptions,setMembers:(uuid,display,datatype,answers:(uuid,display),setMembers:(uuid,display,datatype,answers:(uuid,display))))",
       })
     ).pipe(
       map((response) => {
@@ -459,13 +431,5 @@ export class ConceptsService {
     );
   }
 
-  getConceptsAttributes(): Observable<any> {
-    return from(
-      this.api.conceptattributetype.getAllConceptAttributeTypes({ v: "full" })
-    ).pipe(
-      map((response) => {
-        return response?.results;
-      })
-    );
-  }
+  get;
 }

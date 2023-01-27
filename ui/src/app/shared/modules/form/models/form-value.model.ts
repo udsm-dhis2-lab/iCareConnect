@@ -30,27 +30,13 @@ export class FormValue {
       if (field) {
         newValues[key] = {
           id: field.id,
-          value:
-            formValues[key] && field?.value
-              ? formValues[key]
-              : formValues[key]
-              ? formValues[key]
-              : field?.value || "",
+          value: formValues[key],
           options: field.options,
           isFile: this.fileValues ? true : false,
-          label: field?.label,
-          name: field?.name,
         };
       }
     });
 
     return newValues;
-  }
-
-  getFields(){
-    return this.fields;
-  }
-  setValue(key, value){
-    this.fields.filter((field) => field.key === key)[0].value = value;
   }
 }

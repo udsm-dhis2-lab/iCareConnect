@@ -58,12 +58,6 @@ public class ICareController {
 	@Autowired
 	BillingService billingService;
 	
-	@Autowired
-	OrderService orderService;
-	
-	@Autowired
-	EncounterService encounterService;
-	
 	/** Logger for this class and subclasses */
 	protected final Log log = LogFactory.getLog(getClass());
 	
@@ -393,15 +387,12 @@ public class ICareController {
 			Map<String, Object> conceptReferenceTermMap = new HashMap<String, Object>();
 			conceptReferenceTermMap.put("uuid", conceptReferenceTerm.getUuid().toString());
 			conceptReferenceTermMap.put("display", conceptReferenceTerm.getName().toString());
-			conceptReferenceTermMap.put("retired", conceptReferenceTerm.getRetired().booleanValue());
 			conceptReferenceTermMap.put("code", conceptReferenceTerm.getCode());
-			conceptReferenceTermMap.put("name", conceptReferenceTerm.getName());
 
 //			Source details
 			Map<String, Object> sourceDetails = new HashMap<String, Object>();
 			sourceDetails.put("uuid", conceptReferenceTerm.getConceptSource().getUuid().toString() );
 			sourceDetails.put("name", conceptReferenceTerm.getConceptSource().getName().toString() );
-			sourceDetails.put("retired", conceptReferenceTerm.getConceptSource().getRetired().booleanValue() );
 			conceptReferenceTermMap.put("source", sourceDetails);
 			conceptReferenceTermsList.add(conceptReferenceTermMap);
 		}
@@ -418,7 +409,6 @@ public class ICareController {
 			Map<String, Object> conceptSet = new HashMap<String, Object>();
 			conceptSet.put("uuid", conceptSets.getConceptSet().getUuid());
 			conceptSet.put("display", conceptSets.getConceptSet().getDisplayString());
-			conceptSet.put("retired", conceptSets.getConceptSet().getRetired().booleanValue());
 			conceptSetsList.add(conceptSet);
 		}
 		Map<String, Object> results = new HashMap<>();
@@ -660,37 +650,16 @@ public class ICareController {
 	
 	@RequestMapping(value = "voidorder", method = RequestMethod.POST)
 	@ResponseBody
-	public Map<String, Object> voidOrder(@RequestBody Map<String, Object> voidObj) {
+	public Map<String, Object> voidOrder(@RequestBody Map<String, Object> voidObj) throws IOException {
 		Map<String, Object> returnResponse = new HashMap<>();
-//		String response;
-//		try {
-//			response = iCareService.voidOrder((String) voidObj.get("uuid"), (String) voidObj.get("voidReason"));
-//		}
-//		catch (IOException e) {
-//			throw new RuntimeException(e);
-//		}
-
-		Order order = orderService.getOrderByUuid((String) voidObj.get("uuid"));
-		if (order == null){
-			throw new APIException("The order uuid does not exist");
+		String response;
+		try {
+			response = iCareService.voidOrder((String) voidObj.get("uuid"), (String) voidObj.get("voidReason"));
 		}
-		Order voidedorder =orderService.voidOrder(order,(String) voidObj.get("voidReason"));
-
-		returnResponse.put("uuid", voidedorder.getUuid());
-		return returnResponse;
-	}
-	
-	@RequestMapping(value = "voidencounter", method = RequestMethod.POST)
-	@ResponseBody
-	public Map<String, Object> voidEncounter(@RequestBody Map<String, Object> voidObj) {
-		Map<String, Object> returnResponse = new HashMap<>();
-		Encounter encounter = encounterService.getEncounterByUuid((String) voidObj.get("uuid"));
-		if (encounter == null){
-			throw new APIException("This encounter uuid does not exist");
+		catch (IOException e) {
+			throw new RuntimeException(e);
 		}
-		Encounter voidedEncounter =encounterService.voidEncounter(encounter,(String) voidObj.get("voidReason"));
-
-		returnResponse.put("encounter", voidedEncounter.getUuid());
+		returnResponse.put("uuid", response);
 		return returnResponse;
 	}
 }

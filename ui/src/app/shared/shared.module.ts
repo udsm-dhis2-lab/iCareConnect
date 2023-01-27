@@ -14,8 +14,7 @@ import { FormatIsoStrDateForDisplayPipe } from "./pipes/format-iso-str-date-for-
 import { FilterDiagnosesPipe } from "./pipes/filter-diagnoses.pipe";
 import { FilterItemsBySelectionsPipe } from "./pipes/filter-items-by-selections.pipe";
 import { HttpClientModule } from "@angular/common/http";
-import { SearchTestDetailsPipe } from "./pipes/search-test-details.pipe";
-import { FormatLabelCharCountDisplayPipe } from './pipes/format-label-char-count-display.pipe';
+import { SearchTestDetailsPipe } from './pipes/search-test-details.pipe';
 @NgModule({
   imports: [CommonModule, ...materialModules, ...modules],
   exports: [
@@ -40,7 +39,6 @@ import { FormatLabelCharCountDisplayPipe } from './pipes/format-label-char-count
     FilterDiagnosesPipe,
     FilterItemsBySelectionsPipe,
     SearchTestDetailsPipe,
-    FormatLabelCharCountDisplayPipe,
   ],
   providers: [...sharedServices],
 })

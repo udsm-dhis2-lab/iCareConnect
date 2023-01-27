@@ -328,19 +328,6 @@ public class VisitWrapper {
 			encounterMap.put("dateVoided",encounter.getDateVoided());
 			encounterMap.put("createdOn",encounter.getDateCreated());
 			encounterMap.put("changedOn",encounter.getDateChanged());
-
-			List<Map<String,Object>> encountersOrdersMap = new ArrayList<>();
-			for (Order order: encounter.getOrders()){
-				Map<String,Object> encounterOrdersMap = new HashMap<>();
-				encounterOrdersMap.put("uuid",order.getUuid());
-				encounterOrdersMap.put("id",order.getId());
-				encounterOrdersMap.put("voided",order.getVoided());
-				encounterOrdersMap.put("voidedReason",order.getVoidReason());
-				encountersOrdersMap.add(encounterOrdersMap);
-			}
-			encounterMap.put("orders",encountersOrdersMap);
-
-
 			//encounterMap.put("diagnoses",encounter.getDiagnoses());
 
 			encountersMap.add(encounterMap);

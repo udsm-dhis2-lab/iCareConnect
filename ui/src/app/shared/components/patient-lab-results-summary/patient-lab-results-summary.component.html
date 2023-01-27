@@ -60,7 +60,7 @@
           "
           mode="indeterminate"
         ></mat-progress-bar>
-        <!-- {{ labOrdersResultsInformation | json }} -->
+        <!-- {{ params?.orderTypes | json }} -->
         <app-order-results-renderer
           *ngIf="
             ((labOrdersResultsInformation?.length > 0 &&
@@ -84,7 +84,6 @@
           [provider]="params?.provider"
           [iCareGeneralConfigurations]="iCareGeneralConfigurations"
           (updateConsultationOrder)="onUpdateConsultationOrder()"
-          (reloadOrderComponent)="loadLabResultsComponent()"
         ></app-order-results-renderer>
       </div>
     </div>

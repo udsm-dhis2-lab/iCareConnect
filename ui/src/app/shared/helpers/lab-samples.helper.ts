@@ -107,21 +107,6 @@ export function formatSample(sample, formattingInfo) {
         "RECOLLECT"
         ? true
         : false,
-    disposed:
-      sample?.statuses?.length > 0 &&
-      _.orderBy(sample?.statuses, ["timestamp"], ["desc"])[0]?.status ==
-        "DISPOSED"
-        ? true
-        : false,
-    disposedAt: (_.filter(sample?.statuses, {
-      status: "DISPOSED",
-    }) || [])[0]?.timestamp,
-    disposedBy:
-      sample?.statuses?.length > 0 &&
-      _.orderBy(sample?.statuses, ["timestamp"], ["desc"])[0]?.status ==
-        "DISPOSED"
-        ? _.orderBy(sample?.statuses, ["timestamp"], ["desc"])[0]?.user
-        : null,
     rejected:
       sample?.statuses?.length > 0 &&
       _.orderBy(sample?.statuses, ["timestamp"], ["desc"])[0]?.status ==

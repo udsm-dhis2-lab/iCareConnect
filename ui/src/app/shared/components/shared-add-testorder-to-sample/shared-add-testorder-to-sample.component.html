@@ -13,9 +13,6 @@
       </div>
     </div>
   </div>
-  <div *ngIf="errors?.length > 0">
-    <app-shared-error [errors]="errors"></app-shared-error>
-  </div>
   <div class="row">
     <div class="col-md-6">
       <app-form
@@ -52,24 +49,6 @@
               <!-- <td>
                 {{ order?.dateCreated | date: "medium" }}
               </td> -->
-              <td>
-                <button
-                  mat-icon-button
-                  [matMenuTriggerFor]="menu"
-                  aria-label="Options"
-                >
-                  <mat-icon>more_vert</mat-icon>
-                </button>
-                <mat-menu #menu="matMenu">
-                  <button
-                    mat-menu-item
-                    (click)="onRemoveSampleOrder($event, order)"
-                  >
-                    <mat-icon>delete</mat-icon>
-                    <span>Delete</span>
-                  </button>
-                </mat-menu>
-              </td>
             </tr>
           </tbody>
         </table>

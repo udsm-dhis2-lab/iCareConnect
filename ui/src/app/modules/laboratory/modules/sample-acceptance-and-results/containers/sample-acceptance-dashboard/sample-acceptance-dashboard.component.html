@@ -1,5 +1,6 @@
 <div
   *ngIf="{
+    samplesLoadedState: samplesLoadedState$ | async,
     privileges: privileges$ | async,
     labConfigs: labConfigs$ | async,
     codedSampleRejectionReasons: codedSampleRejectionReasons$ | async,

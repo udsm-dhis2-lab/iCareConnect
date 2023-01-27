@@ -2,14 +2,15 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { UnitFieldComponent } from './unit-field.component';
 
-describe("UnitFieldComponent", () => {
+describe('DosageUnitFieldComponent', () => {
   let component: UnitFieldComponent;
   let fixture: ComponentFixture<UnitFieldComponent>;
-  UnitFieldComponent;
+UnitFieldComponent
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [UnitFieldComponent],
-    }).compileComponents();
+      declarations: [ UnitFieldComponent ]
+    })
+    .compileComponents();
   });
 
   beforeEach(() => {
@@ -18,7 +19,7 @@ describe("UnitFieldComponent", () => {
     fixture.detectChanges();
   });
 
-  it("should create", () => {
+  it('should create', () => {
     expect(component).toBeTruthy();
   });
 });

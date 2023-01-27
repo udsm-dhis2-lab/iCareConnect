@@ -1,5 +1,7 @@
 import { NgModule } from "@angular/core";
 import { Routes, RouterModule } from "@angular/router";
+import { LaboratorySampleCollectionComponent } from "./modules/sample-collection/pages/laboratory-sample-collection/laboratory-sample-collection.component";
+import { SampleCollectionHomeComponent } from "./modules/sample-collection/pages/sample-collection-home/sample-collection-home.component";
 import { LaboratoryComponent } from "./laboratory.component";
 import { NoLabAccessComponent } from "./pages/no-lab-access/no-lab-access.component";
 
@@ -73,13 +75,6 @@ const routes: Routes = [
         loadChildren: () =>
           import("./modules/sample-results/sample-results.module").then(
             (m) => m.SampleResultsModule
-          ),
-      },
-      {
-        path: "sample-storage",
-        loadChildren: () =>
-          import("./modules/sample-storage/sample-storage.module").then(
-            (m) => m.SampleStorageModule
           ),
       },
     ],

@@ -63,10 +63,6 @@ public class Sample extends BaseOpenmrsData implements java.io.Serializable, JSO
 	//	@OneToMany(fetch = FetchType.LAZY, mappedBy = "sampleOrder.id.sample")
 	//	private List<TestAllocation> testAllocations = new ArrayList<TestAllocation>(0);
 	
-	@ManyToOne
-	@JoinColumn(name = "batch_sample_id")
-	private BatchSample batchSample;
-	
 	public Sample() {
 	}
 	
@@ -156,10 +152,7 @@ public class Sample extends BaseOpenmrsData implements java.io.Serializable, JSO
 		List<Map<String, Object>> orders = new ArrayList<Map<String, Object>>();
 		
 		for (SampleOrder sampleOrder : this.getSampleOrders()) {
-			
-			if (!sampleOrder.getOrder().getVoided()) {
-				orders.add(sampleOrder.toMap());
-			}
+			orders.add(sampleOrder.toMap());
 		}
 		
 		sampleObject.put("orders", orders);
@@ -215,13 +208,6 @@ public class Sample extends BaseOpenmrsData implements java.io.Serializable, JSO
 		patientObject.put("uuid", this.getVisit().getPatient().getUuid());
 		
 		sampleObject.put("patient", patientObject);
-
-		if(this.getBatchSample() != null){
-			Map<String,Object> batchObject = new HashMap<>();
-			batchObject.put("uuid",this.getBatchSample().getUuid());
-			batchObject.put("display",this.getBatchSample().getCode());
-			sampleObject.put("batch",batchObject);
-		}
 		
 		return sampleObject;
 	}
@@ -290,11 +276,4 @@ public class Sample extends BaseOpenmrsData implements java.io.Serializable, JSO
 		this.sampleStatuses = sampleStatuses;
 	}
 	
-	public void setBatchSample(BatchSample batchSample) {
-		this.batchSample = batchSample;
-	}
-	
-	public BatchSample getBatchSample() {
-		return batchSample;
-	}
 }

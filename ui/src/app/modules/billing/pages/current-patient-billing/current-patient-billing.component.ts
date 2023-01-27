@@ -1,5 +1,5 @@
 import { Payment } from "src/app/modules/billing/models/payment.model";
-import { keys, sumBy, sum } from "lodash";
+import { keys } from "lodash";
 import { Component, OnInit } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
 
@@ -128,7 +128,7 @@ export class CurrentPatientBillingComponent implements OnInit {
                 bill.billDetails.items.forEach((givenItem) => {
                   if (discountItem.item.uuid === givenItem.item.uuid) {
                     givenItems = [...givenItems, givenItem];
-                    item = givenItem;
+                    item = givenItem
                   }
                 });
 
@@ -177,20 +177,17 @@ export class CurrentPatientBillingComponent implements OnInit {
       .getSystemSettingsByKey("icare.billing.exemption.encounterType")
       .pipe(
         tap((response) => {
-          if (response?.error) {
+          if(response?.error){
             this.errors = [...this.errors, response.error];
           }
-          if (response === "none") {
-            this.errors = [
-              ...this.errors,
-              {
-                error: {
-                  message:
-                    "Missing Icare Exemption Configurations. Please set 'icare.billing.exemption.encounterType' or Contact IT",
-                },
-              },
-            ];
-          }
+          if(response === 'none'){
+            this.errors = [...this.errors, 
+              {error: { 
+                message: "Missing Icare Exemption Configurations. Please set 'icare.billing.exemption.encounterType' or Contact IT"
+                }
+              }
+            ]
+          };
         })
       );
 
@@ -294,6 +291,7 @@ export class CurrentPatientBillingComponent implements OnInit {
 
     let exemptionEncounterStart = {
       visit: patientBillingDetails.visit?.uuid,
+      encounterDatetime: currentDate.toISOString(),
       patient: params.currentPatient?.id,
       encounterType: params?.exemptionEncounterType,
       location: params.currentLocation?.uuid,
@@ -510,8 +508,8 @@ export class CurrentPatientBillingComponent implements OnInit {
                 : "0" + paymentDate.getDate()
             }-${
               paymentDate.getMonth().toString().length > 1
-                ? paymentDate.getMonth() + 1
-                : "0" + paymentDate.getMonth() + 1
+                ? paymentDate.getMonth()
+                : "0" + paymentDate.getMonth()
             }-${paymentDate.getFullYear()}`;
             contents = `
                 <tr>
@@ -523,17 +521,6 @@ export class CurrentPatientBillingComponent implements OnInit {
           });
         });
 
-        let total = sum(
-          e.Payments.map((payment) => {
-            return sumBy(payment.paymentDetails.items, "amount");
-          })
-        );
-        contents = `<tr>
-        
-        <td  style ="font-weight:bold;"> &nbsp;Total </td>
-        <td colspan="2" style ="font-weight:bold; text-align:center">${total}</td>
-        </tr>`;
-        frameDoc.document.write(contents);
         frameDoc.document.write(`
           </tbody>
         </table>`);
@@ -545,7 +532,7 @@ export class CurrentPatientBillingComponent implements OnInit {
       if (e.Bill.length > 0) {
         frameDoc.document.write(`
         <div>
-          <h5>Unpaid Items (Un-attended items)</h5>
+          <h5>Unpaid Items</h5>
         </div>
         <table id="table">
           <thead>
@@ -567,12 +554,6 @@ export class CurrentPatientBillingComponent implements OnInit {
             </tr>`;
             frameDoc.document.write(contents);
           });
-          contents = `<tr>
-          
-          <td  style ="font-weight:bold;"> &nbsp;Total </td>
-          <td colspan="2" style ="font-weight:bold; text-align:center">${bill.totalPaymentAmount}</td>
-          </tr>`;
-          frameDoc.document.write(contents);
         });
 
         frameDoc.document.write(`
