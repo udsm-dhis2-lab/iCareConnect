@@ -72,7 +72,7 @@
                     request?.status === 'REJECTED' ||
                     !currentStore
                   "
-                  (click)="onIssue($event, request, currentStore)"
+                  (click)="onRequest($event, request, currentStore)"
                 >
                   <mat-spinner
                     color="primary"
@@ -80,7 +80,7 @@
                     [diameter]="20"
                     style="display: inline-block !important; margin-right: 4px"
                   ></mat-spinner>
-                  request
+                  Request 
                 </button>
                 <button
                   mat-flat-button
@@ -107,7 +107,7 @@
               </td>
               <td>
                 <section>
-                  <mat-checkbox
+                  <mat-checkbox [aria-label]
                     color="primary"
                     [enabled]="request?.status === 'REQUESTED' || 
                     request?.status === 'CANCELLED' ||
