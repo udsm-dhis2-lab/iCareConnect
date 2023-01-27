@@ -62,48 +62,64 @@
                 </div>
               </td>
               <td>
-                <button
-                  mat-flat-button
-                  color="primary"
-                  [disabled]="
-                    request?.crudOperationStatus?.status === 'ISSUING' ||
-                    request?.status === 'REQUESTED' ||
-                    request?.status === 'CANCELLED' ||
-                    request?.status === 'REJECTED' ||
-                    !currentStore
-                  "
-                  (click)="onRequest($event, request, currentStore)"
-                >
-                  <mat-spinner
-                    color="primary"
-                    *ngIf="request?.crudOperationStatus?.status === 'REQUESTING'"
-                    [diameter]="20"
-                    style="display: inline-block !important; margin-right: 4px"
-                  ></mat-spinner>
-                  Request 
-                </button>
-                <button
-                  mat-flat-button
-                  class="ml-2"
-                  color="warn"
-                  [disabled]="
-                    request?.crudOperationStatus?.status === 'REJECTING' ||
-                    request?.status === 'REQUESTED' ||
-                    request?.status === 'REJECTED' ||
-                    request?.status === 'CANCELLED'
-                  "
-                  (click)="onReject($event, request)"
-                >
-                  <mat-spinner
-                    color="primary"
-                    *ngIf="
-                      request?.crudOperationStatus?.status === 'REJECTING' 
-                    "
-                    [diameter]="20"
-                    style="display: inline-block !important; margin-right: 4px"
-                  ></mat-spinner>
-                  Reject
-                </button>
+                <div *ngIf="request.status !== 'RECEIVED'">
+                  <div *ngIf="request.status !== 'ISSUED'">
+                    <button
+                      class="float-right"
+                      mat-flat-button
+                      color="warn"
+                      *ngIf="request.status !== 'REJECTED'"
+                      [disabled]="
+                        request?.crudOperationStatus?.status === 'CANCELLING'
+                      "
+                      (click)="onCancelRequisition($event, request?.id)"
+                    >
+                      <mat-spinner
+                        color="primary"
+                        *ngIf="request?.crudOperationStatus?.status === 'CANCELLING'"
+                        [diameter]="20"
+                        style="display: inline-block !important; margin-right: 4px"
+                      ></mat-spinner>
+                      Cancel Request
+                    </button>
+                  </div>
+
+                  <div class="float-right" *ngIf="request.status === 'ISSUED'">
+                    <button
+                      mat-flat-button
+                      color="primary"
+                      [disabled]="
+                        request?.crudOperationStatus?.status === 'CANCELLING'
+                      "
+                      (click)="onReceiveRequisition($event, request)"
+                    >
+                      <mat-spinner
+                        color="primary"
+                        *ngIf="request?.crudOperationStatus?.status === 'CANCELLING'"
+                        [diameter]="20"
+                        style="display: inline-block !important; margin-right: 4px"
+                      ></mat-spinner>
+                      Receive
+                    </button>
+                    <button
+                      mat-flat-button
+                      class="ml-2"
+                      color="warn"
+                      [disabled]="
+                        request?.crudOperationStatus?.status === 'REJECTING'
+                      "
+                      (click)="onRejectRequisition($event, request)"
+                    >
+                      <mat-spinner
+                        color="primary"
+                        *ngIf="request?.crudOperationStatus?.status === 'REJECTING'"
+                        [diameter]="20"
+                        style="display: inline-block !important; margin-right: 4px"
+                      ></mat-spinner>
+                      Reject
+                    </button>
+                  </div>
+                </div>
               </td>
               <td>
                 <section>
