@@ -1,8 +1,10 @@
 import { Component, OnInit } from "@angular/core";
 import { FormControl } from "@angular/forms";
+import { MatDialog } from "@angular/material/dialog";
 import { select, Store } from "@ngrx/store";
 import { Observable } from "rxjs";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
+import { PatientHistoryComponent } from "src/app/shared/components/patient-history/patient-history.component";
 import { Patient } from "src/app/shared/resources/patient/models/patient.model";
 import { go } from "src/app/store/actions";
 import { AppState } from "src/app/store/reducers";
@@ -28,7 +30,8 @@ export class ClinicPatientListComponent implements OnInit {
   showAllPatientsTab$: Observable<any>;
   constructor(
     private store: Store<AppState>,
-    private systemSettingsService: SystemSettingsService
+    private systemSettingsService: SystemSettingsService,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit() {
@@ -77,5 +80,16 @@ export class ClinicPatientListComponent implements OnInit {
   onBack(e: Event) {
     e.stopPropagation();
     this.store.dispatch(go({ path: ["/"] }));
+  }
+
+  onOpenHistory(patient: any) {
+    this.dialog.open(PatientHistoryComponent, {
+      width: "25%",
+      data: {
+        patient: patient,
+      },
+      disableClose: false,
+      panelClass: "custom-dialog-container",
+    });
   }
 }

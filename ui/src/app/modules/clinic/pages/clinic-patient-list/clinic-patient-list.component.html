@@ -149,6 +149,13 @@
             ></app-patient-list>
           </ng-template>
         </mat-tab>
+        <mat-tab label="Search Any patient">
+          <ng-template matTabContent>
+            <app-patient-search
+              (selectPatient)="onOpenHistory($event)"
+            ></app-patient-search>
+          </ng-template>
+        </mat-tab>
       </mat-tab-group>
     </div>
   </div>
