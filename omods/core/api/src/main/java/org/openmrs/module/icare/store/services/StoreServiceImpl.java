@@ -4,7 +4,6 @@ import org.apache.commons.collections.IteratorUtils;
 import org.openmrs.DrugOrder;
 import org.openmrs.Location;
 import org.openmrs.Order;
-import org.openmrs.Visit;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.api.OrderEntryException;
 import org.openmrs.api.OrderService;
@@ -193,11 +192,11 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 	}
 	
 	@Override
-	public List<Requisition> getRequestsByRequestingLocation(String requestingLocationUuid) {
+	public ListResult<Requisition> getRequestsByRequestingLocation(String requestingLocationUuid, Pager pager, RequisitionStatus.RequisitionStatusCode status) {
 		
-		List<Requisition> requisitions = this.requisitionDAO.getRequisitionsByRequestingLocation(requestingLocationUuid);
+		ListResult<Requisition> requisitions = this.requisitionDAO.getRequisitionsByRequestingLocation(requestingLocationUuid,pager,status);
 		
-		for (Requisition requisition : requisitions) {
+		for (Requisition requisition : requisitions.getResults()) {
 			List<RequisitionStatus> requisitionStatuses = this.requisitionStatusDAO.getStatusesByRequisition(requisition
 			        .getUuid());
 			
@@ -209,11 +208,11 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 	}
 	
 	@Override
-	public List<Requisition> getRequestsForRequestedLocation(String requestedLocationUuid) {
+	public ListResult<Requisition> getRequestsForRequestedLocation(String requestedLocationUuid, Pager pager, RequisitionStatus.RequisitionStatusCode status) {
 		
-		List<Requisition> requisitions = this.requisitionDAO.getRequisitionsByRequestedLocation(requestedLocationUuid);
+		ListResult<Requisition> requisitions = this.requisitionDAO.getRequisitionsByRequestedLocation(requestedLocationUuid,pager,status);
 		
-		for (Requisition requisition : requisitions) {
+		for (Requisition requisition : requisitions.getResults()) {
 			List<RequisitionStatus> requisitionStatuses = this.requisitionStatusDAO.getStatusesByRequisition(requisition
 			        .getUuid());
 			
