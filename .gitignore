@@ -46,6 +46,7 @@ ui/.classpath
 ui/.c9/
 *.launch
 ui/.settings/
+ui/.angular
 *.sublime-workspace
 
 # IDE - VSCode

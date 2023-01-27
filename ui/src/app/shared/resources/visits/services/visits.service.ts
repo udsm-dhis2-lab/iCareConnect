@@ -559,7 +559,7 @@ export class VisitsService {
   getVisitDetailsByVisitUuid(uuid: string, params?: any): Observable<any> {
     return from(this.api.visit.getVisit(uuid, params)).pipe(
       map((response) => {
-        return response;
+        return new Visit(response);
       }),
       catchError((error) => of(error))
     );
@@ -721,7 +721,7 @@ export class VisitsService {
         this.api.visit.getAllVisits({
           includeInactive: includeInactive,
           patient,
-          v: `custom:(uuid,visitType,location:(uuid,display,tags,parentLocation:(uuid,display)),startDatetime,attributes,stopDatetime,patient:(uuid,display,identifiers,person,voided),encounters:(uuid,form,location,obs,orders,diagnoses,encounterProviders,encounterDatetime,encounterType))`,
+          v: `custom:(uuid,visitType,location:(uuid,display,tags,parentLocation:(uuid,display)),startDatetime,attributes,stopDatetime,patient:(uuid,display,identifiers,person,voided),encounters:(uuid,form,location,obs,orders,diagnoses,encounterProviders,encounterDatetime,encounterType,voided,voidReason))`,
         } as any)
       ),
       shouldNotLoadNonVisitItems
@@ -772,6 +772,7 @@ export class VisitsService {
     bills?: any,
     isEnsured?: boolean
   ): Observable<any> {
+    console.log("==> Sanity checking: ", bills)
     return from(
       this.api.visit.getVisit(uuid, {
         v: fields,

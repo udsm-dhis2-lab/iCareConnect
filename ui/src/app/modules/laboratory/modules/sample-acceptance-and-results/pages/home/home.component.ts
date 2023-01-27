@@ -45,6 +45,11 @@ export class HomeComponent implements OnInit {
     this.labSamplesContainers$ = this.store.select(getLabTestsContainers);
     this.configs$ = this.store.select(getLabConfigurations);
 
+    this.LISConfigurations$ = this.store.select(getLISConfigurations);
+    this.labSamplesDepartments$ = this.store.select(getLabDepartments);
+
+    this.sampleTypes$ = this.store.select(getAllSampleTypes);
+
     this.codedSampleRejectionReasons$ = this.store.select(
       getCodedSampleRejectionReassons
     );
@@ -56,16 +61,9 @@ export class HomeComponent implements OnInit {
         this.labSamplesDepartments$ = !LISConfigs?.isLIS
           ? this.store.select(getLabDepartments)
           : this.conceptService.getConceptsBySearchTerm("LAB_DEPARTMENT");
-
         this.sampleTypes$ = !LISConfigs?.isLIS
           ? this.store.select(getAllSampleTypes)
           : this.conceptService.getConceptsBySearchTerm("SPECIMEN_SOURCE");
-
-        this.codedSampleRejectionReasons$ = !LISConfigs?.isLIS
-          ? this.store.select(getCodedSampleRejectionReassons)
-          : this.conceptService.getConceptsBySearchTerm(
-              "SAMPLE_REJECTION_REASONS"
-            );
       }
     });
   }

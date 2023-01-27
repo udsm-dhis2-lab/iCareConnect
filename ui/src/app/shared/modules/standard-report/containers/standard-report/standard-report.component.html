@@ -1,0 +1,10 @@
+<lib-render-standard-report
+  *ngIf="actionType === 'report'"
+  [report]="report"
+  [parameters]="parameters"
+></lib-render-standard-report>
+<lib-manage-standard-reports-home
+  *ngIf="actionType === 'manage'"
+  [additionalKey]="additionalKey"
+  [reportToEdit]="reportToEdit"
+></lib-manage-standard-reports-home>

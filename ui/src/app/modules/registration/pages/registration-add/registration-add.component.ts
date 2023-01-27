@@ -587,7 +587,12 @@ export class RegistrationAddComponent implements OnInit {
             this.primaryPhoneNumberFormField.value =
               this.patientInformation?.patient?.person?.attributes.filter(
                 (attribute) => {
-                  return attribute.attributeType.display === "phone";
+                  return (
+                    attribute.attributeType.uuid ===
+                      "96878413-bbae-4ee0-812f-241a4fc94500" ||
+                    attribute.attributeType.uuid ===
+                      "aeb3a16c-f5b6-4848-aa51-d7e3146886d6"
+                  );
                 }
               )[0]?.value;
             this.patient = {
@@ -624,12 +629,6 @@ export class RegistrationAddComponent implements OnInit {
               gender: this.patientInformation?.patientFull?.person?.gender
                 ? this.patientInformation?.patientFull?.person?.gender
                 : this.patientInformation?.patient?.person?.gender,
-              phone:
-                this.patientInformation?.patient?.person?.attributes.filter(
-                  (attribute) => {
-                    return attribute.attributeType.display === "phone";
-                  }
-                )[0]?.value,
               cityVillage: this.patientInformation?.cityVillage,
               village: this.patientInformation?.street,
               district:
@@ -659,11 +658,6 @@ export class RegistrationAddComponent implements OnInit {
                     return attribute.attributeType.display === "kinLName";
                   }
                 )[0]?.value,
-              // kinRelationship:
-              //  this.patientInformation?.patient?.person?.attributes.filter(
-              //     (attribute) => { return
-              //       attribute.attributeType.display === "RelationshipType"
-              //   )[0]?.value,
               kinPhone:
                 this.patientInformation?.patient?.person?.attributes.filter(
                   (attribute) => {
@@ -774,9 +768,9 @@ export class RegistrationAddComponent implements OnInit {
           person: {
             names: [
               {
-                givenName: this.patient.fname,
-                middleName: this.patient.mname,
-                familyName: this.patient.lname,
+                givenName: this.patient.fname.toUpperCase(),
+                middleName: this.patient.mname.toUpperCase(),
+                familyName: this.patient.lname.toUpperCase(),
               },
             ],
             gender: this.patient.gender,
@@ -818,7 +812,8 @@ export class RegistrationAddComponent implements OnInit {
                   .filter((patientIdentifier) => patientIdentifier?.identifier),
                 {
                   identifier: this.openEMPId?.identifier,
-                  identifierType: "26742868-a38c-4e6a-ac1d-ae283c414c2e",
+                  // identifierType: "26742868-a38c-4e6a-ac1d-ae283c414c2e",
+                  identifierType: "a5d38e09-efcb-4d91-a526-50ce1ba5011a",
                   location: currentLocation?.uuid,
                   preferred: false,
                 },
@@ -841,7 +836,7 @@ export class RegistrationAddComponent implements OnInit {
             .updatePatient(patientPayload, this.patientInformation?.id)
             .subscribe(
               (updatePatientResponse) => {
-                if (!updatePatientResponse?.error){
+                if (!updatePatientResponse?.error) {
                   this.notificationService.show(
                     new Notification({
                       message: "Patient details updated succesfully",
@@ -849,10 +844,10 @@ export class RegistrationAddComponent implements OnInit {
                     })
                   );
 
-                this.store.dispatch(go({ path: ["/registration/home"] }));
+                  this.store.dispatch(go({ path: ["/registration/home"] }));
                 }
 
-                if(updatePatientResponse?.error){
+                if (updatePatientResponse?.error) {
                   this.errorAddingPatient = true;
                   this.patientAdded = false;
                   this.addingPatient = false;

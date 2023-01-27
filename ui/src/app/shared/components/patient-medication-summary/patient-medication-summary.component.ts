@@ -1,13 +1,14 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { Store } from "@ngrx/store";
-import { Observable, zip } from "rxjs";
+import { Observable, of, zip } from "rxjs";
 import { map, tap } from "rxjs/operators";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { AppState } from "src/app/store/reducers";
 import { DispensingFormComponent } from "../../dialogs";
 import { DrugOrdersService } from "../../resources/order/services";
 import { OrdersService } from "../../resources/order/services/orders.service";
+import { VisitObject } from "../../resources/visits/models/visit-object.model";
 import { Visit } from "../../resources/visits/models/visit.model";
 import { VisitsService } from "../../resources/visits/services";
 
@@ -17,11 +18,12 @@ import { VisitsService } from "../../resources/visits/services";
   styleUrls: ["./patient-medication-summary.component.scss"],
 })
 export class PatientMedicationSummaryComponent implements OnInit {
-  @Input() patientVisit: Visit;
+  @Input() patientVisit: VisitObject;
   @Input() forConsultation: boolean;
   @Input() fromDispensing: boolean;
   @Input() isInpatient: boolean;
   @Input() previous: boolean;
+  @Input() forHistory: boolean;
   drugOrders$: Observable<any>;
   patientVisitData$: Observable<any>;
   generalPrescriptionOrderType$: Observable<any>;
@@ -51,33 +53,24 @@ export class PatientMedicationSummaryComponent implements OnInit {
       this.systemSettingsService.getSystemSettingsByKey(
         "iCare.clinic.useGeneralPrescription"
       );
-    this.patientVisitData$ = this.visitService.getActiveVisit(
-      this.patientVisit?.patientUuid,
-      false,
-      false,
-      true
-    );
-
-    // console.log(this.patientVisit);
-
-    this.currentVisit$ = this.visitService.getActiveVisit(
-      this.patientVisit?.patientUuid,
-      false,
-      false,
-      true
-    );
-
+    if (!this.forHistory) {
+      this.loadVisit();
+    } else {
+      this.currentVisit$ = of(this.patientVisit);
+    }
     if (this.patientVisit) {
-      this.drugOrders$ = this.ordersService
-        .getOrdersByVisitAndOrderType({
-          visit: this.patientVisit?.uuid,
-          orderType: "iCARESTS-PRES-1111-1111-525400e4297f",
+      this.drugOrders$ = (
+        !this.forHistory
+          ? this.ordersService.getOrdersByVisitAndOrderType({
+              visit: this.patientVisit?.uuid,
+              orderType: "iCARESTS-PRES-1111-1111-525400e4297f", // TODO: This has to be softcoded
+            })
+          : of(this.patientVisit?.drugOrders)
+      ).pipe(
+        map((response) => {
+          return response;
         })
-        .pipe(
-          map((response) => {
-            return response;
-          })
-        );
+      );
       this.patientDrugOrdersStatuses$ = this.drugOrderService
         .getDrugOrderStatus(this.patientVisit?.uuid)
         .pipe(
@@ -122,6 +115,7 @@ export class PatientMedicationSummaryComponent implements OnInit {
   }
 
   loadVisit(visit?: any) {
+    this.currentVisit$ = of(null);
     let visitUuid = this.patientVisit?.uuid
       ? this.patientVisit?.uuid
       : visit
@@ -130,11 +124,13 @@ export class PatientMedicationSummaryComponent implements OnInit {
     this.currentVisit$ = this.visitService.getVisitDetailsByVisitUuid(
       visitUuid,
       {
-        v: "custom:(uuid,display,patient,encounters:(uuid,display,obs,orders),attributes)",
+        v:
+          "custom:(uuid,display,patient,startDatetime,attributes,stopDatetime," +
+          "patient:(uuid,display,identifiers,person,voided)," +
+          "encounters:(uuid,diagnoses,display,obs,orders,encounterProviders," +
+          "encounterDatetime,encounterType,voided,voidReason),attributes)",
       }
     );
-
-    this.updateMedicationComponent.emit();
   }
 
   onAddOrder(e: Event) {
@@ -144,7 +140,7 @@ export class PatientMedicationSummaryComponent implements OnInit {
       disableClose: true,
       data: {
         drugOrder: null,
-        patient: this.patientVisit.patient,
+        patient: this.patientVisit?.patientUuid,
         patientUuid: this.patientVisit?.patientUuid,
         visit: this.patientVisit,
         location: localStorage.getItem("currentLocation")
@@ -160,10 +156,11 @@ export class PatientMedicationSummaryComponent implements OnInit {
     });
 
     dialog.afterClosed().subscribe((data) => {
+      this.loadVisit();
       if (data?.updateConsultationOrder) {
+        this.updateMedicationComponent.emit();
         this.updateConsultationOrder.emit();
       }
-      this.loadVisit();
     });
   }
 }

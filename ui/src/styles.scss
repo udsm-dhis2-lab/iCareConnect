@@ -113,9 +113,11 @@ body {
 .mat-mini-fab {
   font-weight: 400;
 }
+button,
 ​ button:focus,
-button:active {
-  outline: none;
+button:active,
+button:hover {
+  outline: none !important;
 }
 ​ .radio-group {
   display: flex;

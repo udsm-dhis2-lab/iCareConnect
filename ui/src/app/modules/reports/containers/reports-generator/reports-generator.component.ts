@@ -10,8 +10,6 @@ import {
 } from "src/app/store/selectors";
 import { ReportGroup } from "../../models/report-group.model";
 import { Report } from "../../models/report.model";
-import { ReportParamsService } from "../../services/report-params.service";
-import { ReportService } from "../../services/report.service";
 import * as _ from "lodash";
 import {
   clearSendingDataStatus,
@@ -28,6 +26,8 @@ import { take } from "rxjs/operators";
 import { MatDialog } from "@angular/material/dialog";
 import { ExportDataService } from "src/app/core/services/export-data.service";
 import { Dhis2ReportsSentSummaryComponent } from "../../components/dhis2-reports-sent-summary/dhis2-reports-sent-summary.component";
+import { ReportParamsService } from "src/app/core/services/report-params.service";
+import { ReportService } from "src/app/core/services/report.service";
 
 @Component({
   selector: "app-reports-generator",
@@ -41,6 +41,7 @@ export class ReportsGeneratorComponent implements OnInit {
   @Input() reportsExtraParams: any;
   @Input() reportGroups: ReportGroup[];
   @Input() reportsParametersConfigurations: any;
+  @Input() standardReports: any[];
   reportConfigs$: Observable<any>;
   reportLoaded$: Observable<boolean>;
   loadingReportGroup: boolean;
@@ -49,13 +50,13 @@ export class ReportsGeneratorComponent implements OnInit {
   dhisReport: boolean;
   reportCategories: any[];
   currentReportGroup: ReportGroup;
-  currentReport: Report;
+  currentReport: any;
   reportCategory;
   reports: any[] = [];
   reportFromSelectedGroup: any[] = [];
   selectedReportGroup: any;
   period: any;
-  reportSelectionParams = {};
+  reportSelectionParams: any = null;
   countOfReportsSent$: Observable<any>;
   renderDhisReport: boolean;
   showReportArea: boolean;
@@ -78,7 +79,10 @@ export class ReportsGeneratorComponent implements OnInit {
     label: string;
     options?: any[];
   }[];
+  countOfSelectedParams: number;
   keyedReportsExtraParameters: any = {};
+  useDefaultDatesParametersConfigs: boolean = true;
+  standardReportIsReady: boolean = false;
   constructor(
     private reportParamsService: ReportParamsService,
     private reportService: ReportService,
@@ -88,14 +92,49 @@ export class ReportsGeneratorComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.reportCategories = this.reportsCategoriesConfigurations
-      .map((category) => {
+    this.standardReports = this.standardReports
+      ? this.standardReports?.map((report) => {
+          return {
+            ...report,
+            dataSetUuid: JSON.parse(report?.value)?.id,
+            value: JSON.parse(report?.value),
+          };
+        })
+      : [];
+
+    const allReports = _.flatten(
+      this.reportGroups?.map((reportCategory) => {
+        return reportCategory?.reports?.map((report) => {
+          return {
+            ...report,
+            category: reportCategory,
+            group:
+              reportCategory?.name?.toLowerCase() !== "reports"
+                ? report?.name?.split(" ")[0]
+                : "Reports",
+          };
+        });
+      })
+    );
+    const reportsKeyedByGroup = _.keyBy(allReports, "group");
+    const formattedReportGroups = Object.keys(reportsKeyedByGroup).map(
+      (key) => {
+        return {
+          id: key,
+          name: key,
+          label: key,
+          reports: reportsKeyedByGroup[key],
+        };
+      }
+    );
+    this.reportCategories = formattedReportGroups
+      .map((formattedReportGroup) => {
         const reportCategoryAccesses =
           this.reportsAccessConfigurations.filter(
-            (acessConfig) => acessConfig?.id === category?.id
+            (acessConfig) => acessConfig?.id === formattedReportGroup?.id
           ) || [];
         const formattedReportCategory = {
-          ...category,
+          ...formattedReportGroup,
           currentUserCanAccess:
             (
               reportCategoryAccesses.filter(
@@ -104,7 +143,7 @@ export class ReportsGeneratorComponent implements OnInit {
               ) || []
             )?.length > 0
               ? true
-              : this.userPrivileges["REPORT_ALL"]
+              : this.userPrivileges["REPORT_ALL"] || this.userPrivileges["ALL"]
               ? true
               : false,
         };
@@ -137,8 +176,6 @@ export class ReportsGeneratorComponent implements OnInit {
         })
       );
     });
-
-    // console.log("reports", this.reports);
 
     this.store.dispatch(loadDHIS2ReportsConfigs());
     this.currentVisualization = "TABLE";
@@ -199,14 +236,15 @@ export class ReportsGeneratorComponent implements OnInit {
               this.userPrivileges[reportAccessConfig?.privilege]
           ) || []
         )?.length > 0 ||
-        this.userPrivileges["REPORT_ALL"]
+        this.userPrivileges["REPORT_ALL"] ||
+        this.userPrivileges["ALL"]
       ) {
         return report;
       }
     });
   }
 
-  onSelectReport(e, report) {
+  onSelectReport(e: Event, report: any, standardReports: any[]) {
     e.stopPropagation();
     this.store.dispatch(loadReportLogsByReportId({ reportId: report?.id }));
     // this.store.dispatch(clearReportSelections());
@@ -218,12 +256,21 @@ export class ReportsGeneratorComponent implements OnInit {
     this.countOfReportsSent$ = this.store.select(
       getCountOfCurrentReportSubmittedToDHIS2
     );
-    this.currentReport = report;
+    this.currentReport = {
+      ...report,
+      standardReport: (standardReports?.filter(
+        (standardReport) => standardReport?.value?.id === report?.id
+      ) || [])[0],
+    };
 
     const matchedReportWithParametersConfigs =
       (this.reportsParametersConfigurations.filter(
         (reportConfigs) => reportConfigs?.id === this.currentReport?.id
       ) || [])[0];
+    this.useDefaultDatesParametersConfigs =
+      matchedReportWithParametersConfigs?.hasNonDefaultDatesConfigs
+        ? false
+        : true;
     this.selectedReportParameters = (
       matchedReportWithParametersConfigs
         ? matchedReportWithParametersConfigs?.parameters
@@ -232,10 +279,10 @@ export class ReportsGeneratorComponent implements OnInit {
       return {
         ...param,
         name: this.sanitizeParameter(param?.lable ? param.lable : param?.name),
-        type: param?.type === 'DATETIME' ? 'DATE' : param?.type
+        type: param?.type === "DATETIME" ? "DATE" : param?.type,
       };
     });
-
+    this.reportSelectionParams = null;
     this.reportData = null;
     this.reportError = null;
     this.hasError = false;
@@ -247,12 +294,17 @@ export class ReportsGeneratorComponent implements OnInit {
     this.onSetParameterValue({ location: location.uuid });
   }
 
-  onSetParameterValue(paramValue: any) {
-    this.reportSelectionParams = {
-      ...this.reportSelectionParams,
-      ...paramValue,
-    };
-    this.count = Object.keys(this.reportSelectionParams).filter(
+  onSetParameterValue(paramValue: any, itemsType?: string) {
+    this.reportSelectionParams = !this.reportSelectionParams
+      ? {}
+      : this.reportSelectionParams;
+    this.reportSelectionParams = !itemsType
+      ? {
+          ...this.reportSelectionParams,
+          ...paramValue,
+        }
+      : paramValue;
+    this.countOfSelectedParams = Object.keys(this.reportSelectionParams).filter(
       (keyItem) => this.reportSelectionParams[keyItem] !== undefined
     ).length;
   }
@@ -309,83 +361,78 @@ export class ReportsGeneratorComponent implements OnInit {
       });
   }
 
-  onRunReport(e, dhisConfigs?: any, period?: any, reportConfigs?: any) {
+  onRunReport(e: Event, dhisConfigs?: any, period?: any, reportConfigs?: any) {
     e.stopPropagation();
 
     this.renderDhisReport = false;
+    this.standardReportIsReady = false;
 
-    if (dhisConfigs) {
-      // setTimeout(() => {
-      //   this.renderDhisReport = true;
-      // }, 100);
+    setTimeout(() => {
+      if (dhisConfigs) {
+        this.showReportArea = false;
 
-      this.showReportArea = false;
+        const params =
+          this.period?.startDate && this.period?.endDate
+            ? {
+                startDate: period?.startDate,
+                endDate: period?.endDate,
+                reportId: reportConfigs?.id,
+                reportGroup: reportConfigs?.reportGroup,
+                reportName: reportConfigs?.name,
+                periodId: period?.id ? period?.id : period.periodId,
+                configs: reportConfigs,
+                params: [
+                  `startDate=${period?.startDate}`,
+                  `endDate=${period?.endDate}`,
+                ],
+              }
+            : {
+                reportName: "dhis2.sqlGet." + reportConfigs?.id,
+                date: period?.date,
+                periodId: period?.id ? period?.id : period.periodId,
+                configs: reportConfigs,
+              };
 
-      const params =
-        this.period?.startDate && this.period?.endDate
-          ? {
-              startDate: period?.startDate,
-              endDate: period?.endDate,
-              reportId: reportConfigs?.id,
-              reportGroup: reportConfigs?.reportGroup,
-              reportName: reportConfigs?.name,
-              periodId: period?.id ? period?.id : period.periodId,
-              configs: reportConfigs,
-              params: [
-                `startDate=${period?.startDate}`,
-                `endDate=${period?.endDate}`,
-              ],
+        // console.log('params before the dispatch : ', params);
+
+        this.store.dispatch(loadReport({ params }));
+
+        setTimeout(() => {
+          this.showReportArea = true;
+        }, 200);
+      } else if (!this.currentReport?.standardReport) {
+        this.loadingReport = true;
+        this.reportData = null;
+        this.reportError = null;
+        this.hasError = false;
+        this.dhisReport = false;
+        this.reportService
+          .getReport({
+            reportGroup: this.currentReport?.reportGroup,
+            reportId: this.currentReport?.id,
+            params: ((this.selectedReportParameters as any) || []).map(
+              (param) => `${param.id}=${this.reportSelectionParams[param.id]}`
+            ),
+          })
+          .subscribe(
+            (res) => {
+              this.loadingReport = false;
+              this.showReportArea = true;
+              this.reportData = res;
+
+              this.dhisReport = this.isDhisReport(this.reportData);
+            },
+            (error) => {
+              this.reportError = error;
+              this.hasError = true;
+              this.loadingReport = false;
             }
-          : {
-              reportName: "dhis2.sqlGet." + reportConfigs?.id,
-              date: period?.date,
-              periodId: period?.id ? period?.id : period.periodId,
-              configs: reportConfigs,
-            };
-
-      // console.log('params before the dispatch : ', params);
-
-      this.store.dispatch(loadReport({ params }));
-
-      setTimeout(() => {
+          );
+      } else {
         this.showReportArea = true;
-      }, 200);
-    } else {
-      this.loadingReport = true;
-      this.reportData = null;
-      this.reportError = null;
-      this.hasError = false;
-      this.dhisReport = false;
-
-      // console.log('R.G :: ', this.currentReport);
-
-      this.reportService
-        .getReport({
-          reportGroup: this.currentReport?.reportGroup,
-          reportId: this.currentReport?.id,
-          params: ((this.selectedReportParameters as any) || []).map(
-            (param) => `${param.id}=${this.reportSelectionParams[param.id]}`
-          ),
-        })
-        .subscribe(
-          (res) => {
-            this.loadingReport = false;
-            this.showReportArea = true;
-            this.reportData = res;
-
-            //console.log("the data :: ",this.reportData)
-
-            this.dhisReport = this.isDhisReport(this.reportData);
-
-            //console.log(this.dhisReport)
-          },
-          (error) => {
-            this.reportError = error;
-            this.hasError = true;
-            this.loadingReport = false;
-          }
-        );
-    }
+        this.standardReportIsReady = true;
+      }
+    }, 50);
   }
 
   sendDhisReport() {
@@ -432,6 +479,53 @@ export class ReportsGeneratorComponent implements OnInit {
       dataToDownload?.dataSets[0]?.rows,
       currentReport?.name
     );
+  }
+
+  exportData(
+    event: Event,
+    id: string,
+    reportName: string,
+    isIframe?: boolean
+  ): void {
+    const fileName =
+      "Report for " + reportName + new Date().toLocaleDateString();
+    event.stopPropagation();
+    let htmlTable;
+    if (isIframe) {
+      const iframe: any = document.getElementById(id);
+      const iWindow = iframe.contentWindow;
+      const iDocument = iWindow.document;
+
+      // accessing the element
+      htmlTable = iDocument.getElementsByTagName("body")[0].outerHTML;
+    } else {
+      htmlTable = document.getElementById(id).outerHTML;
+    }
+    if (htmlTable) {
+      const uri = "data:application/vnd.ms-excel;base64,",
+        template =
+          '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:' +
+          'office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook>' +
+          "<x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/>" +
+          "</x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]-->" +
+          '</head><body><table border="1">{table}</table><br /><table border="1">{table}</table></body></html>',
+        base64 = (s) => window.btoa(unescape(encodeURIComponent(s))),
+        format = (s, c) => s.replace(/{(\w+)}/g, (m, p) => c[p]);
+
+      const ctx = { worksheet: "Data", filename: fileName };
+      let str =
+        '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office' +
+        ':excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook>' +
+        "<x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/>" +
+        "</x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body>";
+      ctx["div"] = htmlTable;
+
+      str += "{div}</body></html>";
+      const link = document.createElement("a");
+      link.download = fileName + ".xls";
+      link.href = uri + base64(format(str, ctx));
+      link.click();
+    }
   }
 
   setQuickPivot(event: Event): void {
