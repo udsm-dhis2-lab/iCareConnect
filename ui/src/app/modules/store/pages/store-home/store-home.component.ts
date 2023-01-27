@@ -70,6 +70,11 @@ export class StoreHomeComponent implements OnInit {
         url: "settings",
         privilege: "STORE_SETTINGS",
       },
+      {
+        id: "bin",
+        name: "Bin Card Reports",
+        url: "/bin_card_reports",
+      },
     ];
     this.currentStorePage = this.storePages[0];
 

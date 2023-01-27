@@ -8,6 +8,8 @@ import { StockComponent } from "./pages/stock/stock.component";
 import { StoreHomeComponent } from "./pages/store-home/store-home.component";
 import { StoreSettingsComponent } from "./pages/store-settings/store-settings.component";
 import { StoreTransactionComponent } from "./pages/store-transaction/store-transaction.component";
+import { BinCardComponent } from "./pages/bin-card/bin-card.component";
+
 
 const routes: Routes = [
   {
@@ -46,6 +48,10 @@ const routes: Routes = [
       {
         path: "stockout-items/:location",
         component: StockOutItemsComponent,
+      },
+      {
+        path: "bin_card_reports",
+        component: BinCardComponent,
       },
     ],
   },

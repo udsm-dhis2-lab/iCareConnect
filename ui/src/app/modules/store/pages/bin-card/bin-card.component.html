@@ -1,0 +1,46 @@
+<div class="stock-container table-responsive">
+  <!-- stock content -->
+  <div class="row">
+    <div class="col-12">
+      <mat-card class="border">
+        <table class="table">
+          <thead>
+            <th>#</th>
+            <th>Item</th>
+            <th>Action</th>
+          </thead>
+          <tbody>
+            <div *ngFor="let stock of allStock; let keyIndex = index">
+              <tr>
+                <td>{{ keyIndex + 1 }}</td>
+                <td>{{ stock.item.display }}</td>
+                <td>
+                  <button (click)="showReport(keyIndex)" class="btn btn-light">Show report</button>
+                </td>
+              </tr>
+              <div *ngIf="displayedReport === keyIndex" class="table-responsive dropdown">
+                <table class="table">
+                  <thead>
+                    <th>Target</th>
+                    <th>Date Received</th>
+                    <th>Issued Date</th>
+                    <th>Issued Quantity</th>
+                    <th>Quanity Received</th>
+                    <th>Balance</th>
+                    <th>Remarks</th>
+                  </thead>
+                </table>
+              </div>
+            </div>
+
+            <!-- <tr *ngFor="let item of params?.currentStock; let keyIndex = index">
+              <td>hello {{ item.name }}</td>
+              <td>hi {{ item.quantity }}</td>
+            </tr> -->
+          </tbody>
+        </table>
+      </mat-card>
+    </div>
+  </div>
+  <!-- end of stock content -->
+</div>
