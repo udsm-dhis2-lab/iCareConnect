@@ -3,34 +3,20 @@
     No data for the current selections
   </p>
 </div>
-<!-- <div class="table-responsive">
-  <table class="table table-bordered">
-    <thead>
-      <tr>
-        <th *ngFor="let column of processedData?.metadata?.columns">
-          {{ column?.label }}
-        </th>
-      </tr>
-    </thead>
 
-    <tr *ngFor="let row of data?.rows">
-      <td *ngFor="let column of processedData?.metadata?.columns">
-        <span
-          style="cursor: pointer"
-          *ngIf="row[column?.name]?.concept"
-          (click)="openConcept($event, row[column?.name]['concept'])"
-          >{{ row[column?.name]?.value }}</span
-        >
-        <span *ngIf="!row[column?.name]?.value">{{ row[column?.name] }}</span>
-      </td>
-    </tr>
-  </table>
-</div> -->
 
-<!-- My implementation -->
 <div>
+
+  <!-- Search bar starts here assigned to Glory-->
+  <mat-form-field class="w-25">
+    <mat-label></mat-label>
+    <input autocomplete="off" type="text" matInput placeholder="" (keyup)="searchReportData($event)"/>  
+  </mat-form-field>
+  <!-- Search bar ends here -->
+
+
   <table class="table table-bordered">
-    <thead>
+    <thead> 
       <tr>
         <th *ngFor="let column of processedData?.metadata?.columns">
           {{ column?.label }}
@@ -39,6 +25,7 @@
     </thead>
 
     <tr *ngFor="let row of data?.rows">
+      <!-- changing "data" to "processedData?" Assigned to Elizabeth-->
       <td *ngFor="let column of processedData?.metadata?.columns">
         <span
           style="cursor: pointer"
@@ -47,7 +34,12 @@
           >{{ row[column?.name]?.value }}</span
         >
         <span *ngIf="!row[column?.name]?.value">{{ row[column?.name] }}</span>
-      </td>
+  
     </tr>
   </table>
+
+  <div class="col-12" *ngIf="data?.rows?.length == 0">
+    <p class="alert alert-warning" role="alert">
+      No data for the current selections
+    </p>
 </div>
