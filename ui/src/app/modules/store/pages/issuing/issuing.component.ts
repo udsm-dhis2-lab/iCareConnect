@@ -31,6 +31,7 @@ import { RequestCancelComponent } from "../../modals/request-cancel/request-canc
 })
 export class IssuingComponent implements OnInit {
   issuingList$: Observable<IssuingObject[]>;
+  searchTerm: string;
   loadingIssuingList$: Observable<boolean>;
   currentStore$: Observable<LocationGet>;
   stores$: Observable<any>;
@@ -149,6 +150,43 @@ export class IssuingComponent implements OnInit {
 
 //end of creating a search function
 
+  //FIXME: This is a fix for the search functionality
+  // search issues by search term
+  searchIssuing(event: any): void {
+    this.searchTerm = event.target?.value;
+    setTimeout(() => {
+      // call the search function
+      this.getIssuing();
+    }, 200)
+  }
+
+    getIssuing(): void {
+    if (this.searchTerm) {
+      // return issuingList with search term
+      this.issuingList$ = this.issuingList$.pipe(
+        map((issuingList) => {
+          return issuingList.filter((issuing) => {
+            return (
+              issuing?.name?.toLowerCase().includes(this.searchTerm?.toLowerCase()) ||
+              issuing?.status?.toLowerCase().includes(this.searchTerm?.toLowerCase()) 
+            );
+          });
+        })
+      );
+
+    } else {
+      this.issuingList$ = this.issuingService.getAllIssuings(
+        JSON.parse(localStorage.getItem("currentLocation"))?.uuid,
+        this.requestingLocation?.uuid
+      );
+    }
+  }
+
+
+
+
+
+
   onReject(e, issue?: IssuingObject): void {
     // e.stopPropagation();
     issue = issue ? issue : e;
@@ -207,8 +245,8 @@ export class IssuingComponent implements OnInit {
         const groupedRequisitions = requisitionData?.requisitions;
         const nonExpiredBatches = this.getBatchsNotExpired(
           flatten(
-            requisitionData?.stockStatus.map(
-              (stockStatus) => stockStatus?.batches
+            requisitionData?.IssuingStatus.map(
+              (IssuingStatus) => IssuingStatus?.batches
             )
           )
         );
