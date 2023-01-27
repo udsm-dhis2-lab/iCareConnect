@@ -163,18 +163,18 @@
             *ngIf="!params?.currentPatientVisit"
           >
             Update can only be done for client with active visit
-          </div>
+          </div> 
           <app-update-payment-category
-          *ngIf="params?.servicesConfigs && params?.visitTypes"
-          [patientsByLocation]="[]"
-          [treatmentLocations]="params?.treatmentLocations"
-          [servicesConfigs]="params?.servicesConfigs"
-          [visitTypes]="params?.visitTypes"
-          [allowOnlineVerification]="params?.allowOnlineVerification"
-          (visitUpdate)="onVisitUpdate($event)"
-          (cancelVisitChanges)="onCancelVisitChanges($event)"
-          (startVisitEvent)="onStartVisit()"
-          (editPatient)="onEditPatient($event)"
+            *ngIf="params?.servicesConfigs && params?.visitTypes"
+            [patientsByLocation]="[]"
+            [treatmentLocations]="params?.treatmentLocations"
+            [servicesConfigs]="params?.servicesConfigs"
+            [visitTypes]="params?.visitTypes"
+            [allowOnlineVerification]="params?.allowOnlineVerification"
+            (visitUpdate)="onVisitUpdate($event)"
+            (cancelVisitChanges)="onCancelVisitChanges($event)"
+            (startVisitEvent)="onStartVisit()"
+            (editPatient)="onEditPatient($event)"
           ></app-update-payment-category>
         </div>
       </mat-tab>
