@@ -21,7 +21,7 @@
                   params?.privileges[storePage?.privilege]) ||
                 !storePage?.privilege
               "
-              [ngClass]="{
+              [ngClass]="{ 
                 'not-allowed-menu-item':
                   params?.currentStore?.isMainStore &&
                   (storePage?.id === 'requisition' ||
@@ -51,7 +51,7 @@
         </div>
       </div>
 
-      <div class="row" *ngIf="stockMetrics$ | async as metrics">
+      <div class="row" *ngIf="(stockMetrics$ | async) as metrics">
         <div class="col mb-2">
           <mat-card class="border p-2">
             <mat-card-subtitle class="mb-1" style="font-size: 12px">
@@ -77,9 +77,7 @@
             <mat-card-subtitle class="mb-1" style="font-size: 12px">
               Stocked Out
             </mat-card-subtitle>
-            <mat-card-title style="font-size: 17px">{{
-              metrics?.stockedOut
-            }}</mat-card-title>
+            <mat-card-title style="font-size: 17px">{{metrics?.stockedOut}}</mat-card-title>
           </mat-card>
         </div>
         <div class="col mb-2">

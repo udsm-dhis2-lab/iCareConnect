@@ -69,7 +69,7 @@
               matTooltip="Back to List"
             >
               <mat-icon>arrow_back</mat-icon>
-              Back to Client List
+              Back to Client List 
             </button>
             <ng-container>
               <button
@@ -545,12 +545,14 @@
                     !isTheatre
                   "
                 >
+                <button mat-button class="btnFill" (click)="disableFill()">
                   <mat-expansion-panel
                     class="mb-2 border p-0"
-                    [expanded]="true"
+                    [expanded]="false"
                   >
-                    <mat-expansion-panel-header>
-                      <mat-panel-title>Provisional Diagnoses </mat-panel-title>
+                    <mat-expansion-panel-header >
+                      <mat-panel-title>Provisional Diagnoses  </mat-panel-title>
+                     
                     </mat-expansion-panel-header>
                     <div
                       *ngIf="dashboardParams?.formEntities['Visit Diagnoses']"
@@ -564,11 +566,16 @@
                         [patientVisit]="activeVisit"
                         [isInpatient]="isInpatient"
                         (updateConsultationOrder)="onUpdateConsultationOrder()"
+                        
                       ></app-patient-diagnoses-summary>
                     </div>
                   </mat-expansion-panel>
+                </button>
+
+
                 </mat-accordion>
                 <mat-accordion>
+                  
                   <mat-expansion-panel
                     *ngIf="
                       userPrivileges['CLINIC_ADD_LABORATORY_INVESTIGATION'] ||
@@ -664,7 +671,7 @@
                     [expanded]="false"
                   >
                     <mat-expansion-panel-header>
-                      <mat-panel-title>Medication </mat-panel-title>
+                      <mat-panel-title>Medication second</mat-panel-title>
                     </mat-expansion-panel-header>
                     <app-patient-medication-summary
                       *ngIf="activeVisit && updateMedication"

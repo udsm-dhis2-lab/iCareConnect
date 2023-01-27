@@ -321,6 +321,7 @@ export class SharedPatientDashboardComponent implements OnInit {
     this.showRoundDetails = this.activeVisit?.isAdmitted;
   }
 
+
   onToggleVitalsSummary(event: Event): void {
     event.stopPropagation();
     this.showVitalsSummary = !this.showVitalsSummary;
@@ -541,4 +542,11 @@ export class SharedPatientDashboardComponent implements OnInit {
       },
     });
   }
+  disableFill(){
+    
+    alert("Please You Must fill Visit Notes")
+    
+
+  }
+
 }

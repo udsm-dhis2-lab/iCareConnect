@@ -18,7 +18,7 @@
           *ngFor="let clinicalForm of forms | searchItem: searchingText"
           (click)="onSetClinicalForm($event, clinicalForm)"
         >
-          {{ clinicalForm?.name }}
+        {{ clinicalForm?.name }}
         </mat-option>
       </mat-select>
     </mat-form-field>
