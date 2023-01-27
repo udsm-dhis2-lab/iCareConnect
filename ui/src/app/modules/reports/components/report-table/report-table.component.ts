@@ -82,7 +82,7 @@ export class ReportTableComponent implements OnInit {
     });
 
   }
-}
+
 
 // search report  data in data?.rows row[column?.name]?.concept or row[column?.name]?.value or  with search text assigned to Alex
 searchReportData(event: any): void {
@@ -95,4 +95,20 @@ searchReportData(event: any): void {
     this.processedData = this.processReportData(this.data);
   }
 }
+
+
+searchData(data,searchText){
+  let filteredData = {
+    ...data,
+    rows: _.filter(data?.rows, (row) => {
+      return (
+      row != undefined
+      );
+    }),
+  };
+
+  return filteredData;
+}
+}
+
 //
