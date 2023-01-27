@@ -82,4 +82,41 @@ export class ReportTableComponent implements OnInit {
     });
 
   }
+
+
+// search report  data in data?.rows row[column?.name]?.concept or row[column?.name]?.value or  with search text assigned to Alex
+searchReportData(event: any): void {
+  const searchText = event.target.value;
+  if (searchText) {
+    this.processedData = this.processReportData(
+      this.searchData(this.data, searchText)
+    );
+  } else {
+    this.processedData = this.processReportData(this.data);
+  }
 }
+
+
+searchData(data,searchText){
+  let filteredData = {
+    ...data,
+    rows: _.filter(data?.rows, (row) => {
+      return (
+        _.find(row, (value) => {
+          return (
+            value &&
+            value
+              .toString()
+              .toLowerCase()
+              .includes(searchText.toLowerCase())
+          );
+        }) != undefined
+      );
+    }),
+  };
+
+  return filteredData;
+}
+}
+
+//

@@ -13,10 +13,15 @@
       <!-- identified bug issue #63 (no function linked to the input html element) -->
 
       <mat-form-field class="w-25">
+<<<<<<< HEAD
         
          <!-- linked the search function(searchIssuing($event)) with the input element (event listener) -->
 
-        <input autocomplete="off" type="text" matInput placeholder="" (keyup) = "searchIssuing($event)" />
+        <input autocomplete="off" type="text" matInput placeholder="Search" (keyup) = "searchIssuing($event)" />
+=======
+        <mat-label>Search</mat-label>
+        <input autocomplete="off" type="text" matInput placeholder="" (keyup)="searchIssuing($event)"/>
+>>>>>>> f14a6636d0e5206bb6933f5600575a4848fa1a63
       </mat-form-field>
 
       <mat-form-field class="w-25 float-right">
