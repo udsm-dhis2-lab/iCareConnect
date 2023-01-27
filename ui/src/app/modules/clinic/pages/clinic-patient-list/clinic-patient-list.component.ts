@@ -4,9 +4,7 @@ import { MatDialog } from "@angular/material/dialog";
 import { select, Store } from "@ngrx/store";
 import { Observable } from "rxjs";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
-import { PatientHistoryComponent } from "src/app/shared/components/patient-history/patient-history.component";
-import { GenericDialogComponent } from "src/app/shared/dialogs/generic-dialog/generic-dialog.component";
-import { Patient } from "src/app/shared/resources/patient/models/patient.model";
+import { PatientHistoryDialogComponent } from "src/app/shared/dialogs/patient-history-dialog/patient-history-dialog.component";
 import { go } from "src/app/store/actions";
 import { AppState } from "src/app/store/reducers";
 import {
@@ -87,7 +85,7 @@ export class ClinicPatientListComponent implements OnInit {
   }
 
   onOpenHistory(patient: any) {
-    this.dialog.open(GenericDialogComponent, {
+    this.dialog.open(PatientHistoryDialogComponent, {
       width: "50%",
       data: {
         patient: patient,
