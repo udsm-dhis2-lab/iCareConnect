@@ -113,7 +113,11 @@ export class AuthService {
   }
 
   logout(): Observable<any> {
-    this.clearCookie();
+    this.clearCookie(); // Clear cookies
+    localStorage.clear(); // Clear local storage
+    sessionStorage.clear(); // Clear session storage
+    this._session.next({}); // Clear user information
+    
     const headers = {
       httpHeaders: {
         Authorization: "Basic " + localStorage.getItem("credentialsToken"),
