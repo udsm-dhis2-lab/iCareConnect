@@ -78,11 +78,22 @@ public class SampleDAO extends BaseDAO<Sample> {
 	}
 	
 	public ListResult<Sample> getSamples(Date startDate, Date endDate, Pager pager, String locationUuid,
-	        String sampleCategory, String testCategory, String q) {
-		new Sample();
+	        String sampleCategory, String testCategory, String q, String hasStatus) {
+		System.out.println(hasStatus + " =>status");
 		DbSession session = this.getSession();
-		String queryStr = "SELECT sp \n" + "FROM Sample sp JOIN sp.visit v \n"
-		        + "JOIN v.patient p JOIN p.names pname JOIN p.identifiers pi \n";
+		String queryStr = "SELECT sp \n" + "FROM Sample sp JOIN sp.visit v";
+		
+		if (q != null) {
+			queryStr += " LEFT JOIN v.patient p LEFT JOIN p.names pname LEFT JOIN p.identifiers pi ";
+			
+			if (!queryStr.contains("WHERE")) {
+				queryStr += " WHERE ";
+			} else {
+				queryStr += " AND ";
+			}
+			
+			queryStr += "lower(sp.label) like lower(:q) OR (lower(concat(pname.givenName,pname.middleName,pname.familyName)) LIKE lower(:q) OR lower(pname.givenName) LIKE lower(:q) OR lower(pname.middleName) LIKE lower(:q) OR lower(pname.familyName) LIKE lower(:q) OR lower(concat(pname.givenName,'',pname.familyName)) LIKE lower(:q) OR lower(concat(pname.givenName,'',pname.middleName)) LIKE lower(:q) OR lower(concat(pname.middleName,'',pname.familyName)) LIKE lower(:q)  OR pi.identifier LIKE :q)";
+		}
 		
 		if (startDate != null && endDate != null) {
 			if (!queryStr.contains("WHERE")) {
@@ -118,16 +129,6 @@ public class SampleDAO extends BaseDAO<Sample> {
 			queryStr += "sp IN(SELECT testalloc.sampleOrder.id.sample FROM TestAllocation testalloc WHERE testalloc IN (SELECT testallocstatus.testAllocation FROM TestAllocationStatus testallocstatus WHERE testallocstatus.category=:testCategory))";
 		}
 		
-		if (q != null) {
-			if (!queryStr.contains("WHERE")) {
-				queryStr += " WHERE ";
-			} else {
-				queryStr += " AND ";
-			}
-			
-			queryStr += "lower(sp.label) like lower(:q) OR (lower(concat(pname.givenName,pname.middleName,pname.familyName)) LIKE lower(:q) OR lower(pname.givenName) LIKE lower(:q) OR lower(pname.middleName) LIKE lower(:q) OR lower(pname.familyName) LIKE lower(:q) OR lower(concat(pname.givenName,'',pname.familyName)) LIKE lower(:q) OR lower(concat(pname.givenName,'',pname.middleName)) LIKE lower(:q) OR lower(concat(pname.middleName,'',pname.familyName)) LIKE lower(:q)  OR pi.identifier LIKE :q)";
-		}
-		
 		if (testCategory == "Completed") {
 			if (!queryStr.contains("WHERE")) {
 				queryStr += " WHERE ";
@@ -142,7 +143,30 @@ public class SampleDAO extends BaseDAO<Sample> {
 			
 		}
 		
+		if (hasStatus != null) {
+			if (hasStatus.toLowerCase().equals("no")) {
+				
+				if (!queryStr.contains("WHERE")) {
+					queryStr += " WHERE ";
+				} else {
+					queryStr += " AND ";
+				}
+				queryStr += "sp NOT IN( SELECT samplestatus.sample FROM SampleStatus samplestatus)";
+				
+			}
+			if (hasStatus.toLowerCase().equals("yes")) {
+				
+				if (!queryStr.contains("WHERE")) {
+					queryStr += " WHERE ";
+				} else {
+					queryStr += " AND ";
+				}
+				queryStr += "sp IN( SELECT samplestatus.sample FROM SampleStatus samplestatus)";
+				
+			}
+		}
 		queryStr += " ORDER BY sp.dateCreated DESC";
+		//System.out.println(queryStr);
 		Query query = session.createQuery(queryStr);
 		if (startDate != null && endDate != null) {
 			query.setParameter("startDate", startDate);

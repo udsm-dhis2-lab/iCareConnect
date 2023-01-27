@@ -21,6 +21,30 @@ export class SamplesService {
     private opeMRSHttpClientService: OpenmrsHttpClientService
   ) {}
 
+  getLabSamplesByCollectionDates(
+    dates: any,
+    category?: string,
+    hasStatus?: string
+  ): Observable<any> {
+    let parameters = ["paging=false"];
+    if (dates) {
+      parameters = [...parameters, "startDate=" + dates?.startDate];
+      parameters = [...parameters, "endDate=" + dates?.endDate];
+    }
+    if (category) {
+      parameters = [...parameters, "category=" + category];
+    }
+    if (hasStatus) {
+      parameters = [...parameters, "hasStatus=" + hasStatus];
+    }
+    return this.httpClient
+      .get(
+        BASE_URL +
+          `lab/samples?${parameters?.length > 0 ? parameters?.join("&") : ""}`
+      )
+      .pipe(map((response: any) => response?.results));
+  }
+
   getSampleByUuid(uuid: string): Observable<any> {
     return this.opeMRSHttpClientService.get(`lab/sample/${uuid}`).pipe(
       map((response) => response),
@@ -46,28 +70,6 @@ export class SamplesService {
       ),
       catchError((error) => of(error))
     );
-  }
-
-  getLabSamplesByCollectionDates(
-    dates,
-    startIndex?: number,
-    limit?: number
-  ): Observable<any> {
-    return this.httpClient
-      .get(
-        BASE_URL +
-          "lab/samples?startDate=" +
-          dates?.startDate +
-          "&endDate=" +
-          dates?.endDate +
-          "&paging=false"
-      )
-      .pipe(
-        map((response: any) => {
-          return response?.results || [];
-        }),
-        catchError((error) => of(error))
-      );
   }
 
   getSampleLabel(): Observable<string> {
@@ -500,16 +502,25 @@ export class SamplesService {
       })
     );
   }
-  getBatches(startDate?: string, endDate?: string, q?: string): Observable<any> {
-    let startDateParam = startDate?.length ? `?startDate=${startDate}` : ""; 
-    let endDateParam = endDate?.length && startDateParam.length ? `&endDate=${endDate}` : endDate?.length ? `&endDate=${endDate}` :""; 
+  getBatches(
+    startDate?: string,
+    endDate?: string,
+    q?: string
+  ): Observable<any> {
+    let startDateParam = startDate?.length ? `?startDate=${startDate}` : "";
+    let endDateParam =
+      endDate?.length && startDateParam.length
+        ? `&endDate=${endDate}`
+        : endDate?.length
+        ? `&endDate=${endDate}`
+        : "";
     let qParam =
       q?.length && (startDateParam.length || endDateParam.length)
         ? `&q=${q}`
         : q?.length
         ? `?q=${q}`
-        : ""; 
-    const queryParams = startDateParam + endDateParam + qParam; 
+        : "";
+    const queryParams = startDateParam + endDateParam + qParam;
     return this.httpClient.get(BASE_URL + "lab/batches" + queryParams).pipe(
       map((response) => {
         return response;

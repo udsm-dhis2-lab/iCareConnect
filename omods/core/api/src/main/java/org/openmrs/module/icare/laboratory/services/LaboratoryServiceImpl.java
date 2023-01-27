@@ -1,7 +1,6 @@
 package org.openmrs.module.icare.laboratory.services;
 
 import org.apache.commons.collections.IteratorUtils;
-import org.azeckoski.reflectutils.transcoders.ObjectEncoder;
 import org.openmrs.*;
 //import org.openmrs.api.ObsService;
 import org.openmrs.api.AdministrationService;
@@ -11,7 +10,6 @@ import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.icare.ICareConfig;
 import org.openmrs.module.icare.core.ListResult;
 import org.openmrs.module.icare.core.Pager;
-import org.openmrs.module.icare.core.Summary;
 import org.openmrs.module.icare.laboratory.dao.*;
 import org.openmrs.module.icare.laboratory.models.*;
 
@@ -166,8 +164,8 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	
 	@Override
 	public ListResult<Sample> getSamples(Date startDate, Date endDate, Pager pager, String location, String sampleCategory,
-	        String testCategory, String q) {
-		return this.sampleDAO.getSamples(startDate, endDate, pager, location, sampleCategory, testCategory, q);
+	        String testCategory, String q, String hasStatus) {
+		return this.sampleDAO.getSamples(startDate, endDate, pager, location, sampleCategory, testCategory, q, hasStatus);
 	}
 	
 	@Override
