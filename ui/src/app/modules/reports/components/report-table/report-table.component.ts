@@ -102,7 +102,15 @@ searchData(data,searchText){
     ...data,
     rows: _.filter(data?.rows, (row) => {
       return (
-      row != undefined
+        _.find(row, (value) => {
+          return (
+            value &&
+            value
+              .toString()
+              .toLowerCase()
+              .includes(searchText.toLowerCase())
+          );
+        }) != undefined
       );
     }),
   };
