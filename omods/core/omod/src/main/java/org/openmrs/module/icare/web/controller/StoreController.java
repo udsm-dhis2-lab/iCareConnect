@@ -576,4 +576,34 @@ public class StoreController {
 		ListResult<StockInvoice> stockInvoices = this.storeService.getStockInvoices(pager);
 		return stockInvoices.toMap();
 	}
+
+	@RequestMapping(value = "suppliers",method = RequestMethod.POST)
+	@ResponseBody
+	public List<Map<String,Object>> addSuppliers(@RequestBody List<Map<String,Object>> suppliersMap){
+
+		Supplier supplier = new Supplier();
+		List<Map<String,Object>> newSuppliersMapList = new ArrayList<>();
+
+		for(Map<String,Object> supplierMap : suppliersMap){
+			supplier = Supplier.fromMap(supplierMap);
+
+			Supplier savedSupplier = storeService.saveSupplier(supplier);
+			newSuppliersMapList.add(savedSupplier.toMap());
+		}
+
+		return newSuppliersMapList;
+	}
+
+	@RequestMapping(value="suppliers",method = RequestMethod.GET)
+	@ResponseBody
+	public List<Map<String,Object>> getSuppliers(@RequestParam(value = "startIndex",required = false,defaultValue = "0") Integer startIndex,@RequestParam(value="limit" ,required=false,defaultValue = "100") Integer limit){
+
+		List<Supplier> suppliers = storeService.getSuppliers(startIndex,limit);
+		List<Map<String,Object>> suppliersMap = new ArrayList<>();
+		for (Supplier supplier : suppliers){
+			suppliersMap.add(supplier.toMap());
+		}
+		return suppliersMap;
+
+	}
 }

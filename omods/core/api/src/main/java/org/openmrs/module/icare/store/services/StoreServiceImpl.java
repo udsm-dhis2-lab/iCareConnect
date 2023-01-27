@@ -523,6 +523,16 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 	}
 
 	@Override
+	public Supplier saveSupplier(Supplier supplier) {
+		return supplierDAO.save(supplier);
+	}
+
+	@Override
+	public List<Supplier> getSuppliers(Integer startIndex, Integer limit) {
+		return supplierDAO.getSuppliers(startIndex,limit);
+	}
+
+	@Override
 	public StockInvoice saveStockInvoice(StockInvoice stockInvoice) throws Exception {
 
 		Supplier supplier = this.getSupplierByUuid(stockInvoice.getSupplier().getUuid());
