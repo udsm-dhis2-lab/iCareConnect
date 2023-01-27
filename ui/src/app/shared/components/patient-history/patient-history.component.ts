@@ -4,7 +4,7 @@ import { map, tap } from "rxjs/operators";
 import { VisitsService } from "../../resources/visits/services/visits.service";
 import { Store } from "@ngrx/store";
 import { AppState } from "src/app/store/reducers";
-import { getAllForms } from "src/app/store/selectors/form.selectors";
+import { getAllForms, getCustomOpenMRSFormsByIds } from "src/app/store/selectors/form.selectors";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { MAT_DIALOG_DATA } from "@angular/material/dialog";
 
@@ -33,7 +33,13 @@ export class PatientHistoryComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadingData = true
-    this.customForms$ = this.store.select(getAllForms);
+    if(this.location){
+      this.customForms$ = this.store.select(
+        getCustomOpenMRSFormsByIds(this.location?.forms || [])
+      );
+    } else {
+      this.customForms$ = this.store.select(getAllForms);
+    }
     this.generalPrescriptionOrderType$ =
       this.systemSettingsService.getSystemSettingsByKey(
         "iCare.clinic.genericPrescription.orderType"
