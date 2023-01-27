@@ -250,7 +250,44 @@
             </button>
           </div>
         </div>
-
+         <div class="row" *ngIf="!editMode">
+          <div class="col-md-12" style="text-align: right">
+            
+            <button
+              id="btn-start-visit"
+              class="ml-2"
+              mat-flat-button
+              color="primary"
+              (click)="startVisit($event)"
+              [disabled]="
+                (
+                  (!editMode &&
+                    visitDetails?.visitType?.uuid &&
+                    visitDetails?.Payment &&
+                    visitDetails?.service?.display &&
+                    (visitDetails?.Cash ||
+                      (visitDetails?.Insurance && visitDetails?.InsuranceID)) &&
+                    visitDetails?.RoomName) ||
+                  (editMode && visitDetails?.RoomName)
+                ) ||
+                params.loadingVisit ||
+                (authorizationNumberAvailable &&
+                  !visitDetails['InsuranceAuthNo'] &&
+                  visitDetails?.Insurance &&
+                  visitDetails?.InsuranceID &&
+                  !visitDetails?.Cash)
+              "
+            >
+              <mat-spinner
+                color="primary"
+                *ngIf="params.loadingVisit"
+                [diameter]="20"
+                style="display: inline-block !important; margin-right: 4px"
+              ></mat-spinner>
+              {{ params?.loadingVisit ? "Saving..." : "Save" }}
+            </button>
+          </div>
+        </div>
         
       </div>
     
