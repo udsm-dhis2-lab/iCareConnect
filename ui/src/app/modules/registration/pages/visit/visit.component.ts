@@ -803,6 +803,125 @@ export class VisitComponent implements OnInit {
     }
   }
 
+
+
+  
+  // Close visit function
+
+  closeVisit(event:any, patientId) {
+    event.stopPropagation();
+
+    var currentTime = new Date();
+    var datetime = currentTime.toISOString();
+
+    if (true) {
+      let visitAttributes = [];
+      visitAttributes.push({
+        uuid: this.visitDetails?.Cash?.attributeUuid || null,
+        attributeType: "PSCHEME0IIIIIIIIIIIIIIIIIIIIIIIATYPE",
+        value:
+          this.visitDetails?.Cash && this.visitDetails?.Cash?.uuid
+            ? this.visitDetails?.Cash?.uuid
+            : this.visitDetails?.insuranceScheme?.uuid
+            ? this.visitDetails?.insuranceScheme?.uuid
+            : null,
+      });
+
+      if (this.visitDetails?.Insurance?.uuid) {
+        visitAttributes.push({
+          attributeType: "INSURANCEIIIIIIIIIIIIIIIIIIIIIIATYPE",
+          value: this.visitDetails?.Insurance?.uuid || null,
+        });
+
+        visitAttributes.push({
+          attributeType: "INSURANCEIDIIIIIIIIIIIIIIIIIIIIATYPE",
+          value: this.visitDetails?.InsuranceID || null,
+        });
+
+        visitAttributes.push({
+          attributeType: "INSURANCEAUTHNOIIIIIIIIIIIIIIIIATYPE",
+          value: this.visitDetails?.InsuranceAuthNo || null,
+        });
+      }
+
+      if (this.visitDetails?.emergency?.attributeUuid) {
+        visitAttributes.push({
+          uuid: this.visitDetails?.emergency?.attributeUuid,
+          value: this.visitDetails?.emergency?.value,
+          attributeType: "f0cfcd18-5fd1-4c1b-9447-dc0e56be66d4",
+        });
+      }
+
+      if (this.referralHospital != null) {
+        visitAttributes.push({
+          uuid: this.referralHospital?.attributeUuid,
+          attributeType: "47da17a9-a910-4382-8149-736de57dab18",
+          value: this.referralHospital.uuid,
+        });
+      }
+
+      let visitPayload = {
+        uuid: patientId,
+        visitType: this.visitDetails?.visitType?.uuid,
+        location: this.visitDetails?.Room?.uuid,
+        stopDatetime: datetime,
+        attributes: [
+          ...visitAttributes,
+          {
+            uuid: this.visitDetails?.Payment?.attributeUuid,
+            attributeType: "PTYPE000IIIIIIIIIIIIIIIIIIIIIIIATYPE",
+            value: this.visitDetails?.Payment?.uuid,
+          },
+          {
+            uuid: this.visitDetails?.service?.attributeUuid,
+            attributeType: "SERVICE0IIIIIIIIIIIIIIIIIIIIIIIATYPE",
+            value: this.visitDetails?.service?.uuid,
+          },
+          {
+            attributeType: "ebc0a258-44a1-409f-908c-652338c411e8",
+            value: this.visitDetails?.insuranceVisitType,
+          },
+          {
+            attributeType: "1ada2d4f-e6b7-4a5d-a2d0-d6d58e96ac7a",
+            value: this.visitDetails?.referralNo,
+          },
+          {
+            attributeType: "66f3825d-1915-4278-8e5d-b045de8a5db9",
+            value: this.visitDetails?.visitService,
+          },
+          {
+            attributeType: "6eb602fc-ae4a-473c-9cfb-f11a60eeb9ac",
+            value: this.visitDetails?.visitRoom,
+          },
+          {
+            attributeType: "370e6cf0-539f-46f1-87a2-43446d8b17b0",
+            value: this.visitDetails?.voteNumber,
+          },
+        ],
+      };
+      visitPayload = {
+        ...visitPayload,
+        attributes:
+          visitPayload?.attributes.filter((attribute) => attribute?.value) ||
+          [],
+      };
+
+      this.store.dispatch(
+        // updateVisit({ details: visitPayload, visitUuid: visitPayload?.uuid })
+        updateVisit({ visitUuid: visitPayload?.uuid, details: visitPayload })
+      );
+      this.visitUpdate.emit(visitPayload);
+    } else {
+      console.log("Error");
+      
+      this.openSnackBar("Error: location is not set", null);
+    }
+  }
+
+
+  // 
+
+
   getClaimForm(event, visitDetails): void {
     event.stopPropagation();
     this.visitUpdate.emit(null);
@@ -834,6 +953,7 @@ export class VisitComponent implements OnInit {
   }
 
   onSetEditPatient(event, path, patientUuid) {
+    this.editMode = true;
     event.stopPropagation();
     this.editPatient.emit(path + patientUuid);
   }
