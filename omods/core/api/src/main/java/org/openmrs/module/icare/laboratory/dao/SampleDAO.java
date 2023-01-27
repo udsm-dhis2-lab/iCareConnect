@@ -79,8 +79,9 @@ public class SampleDAO extends BaseDAO<Sample> {
 	
 	public ListResult<Sample> getSamples(Date startDate, Date endDate, Pager pager, String locationUuid,
 	        String sampleCategory, String testCategory, String q, String hasStatus) {
-		System.out.println(hasStatus + " =>status");
+
 		DbSession session = this.getSession();
+
 		String queryStr = "SELECT sp \n" + "FROM Sample sp JOIN sp.visit v";
 		
 		if (q != null) {
