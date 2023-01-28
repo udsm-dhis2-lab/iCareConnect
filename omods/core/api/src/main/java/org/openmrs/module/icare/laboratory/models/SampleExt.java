@@ -1,14 +1,20 @@
 package org.openmrs.module.icare.laboratory.models;
 
+import org.hibernate.annotations.DiscriminatorFormula;
 import org.openmrs.PatientIdentifier;
 import org.openmrs.PersonAttribute;
 
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+@Entity
+@Table(name = "lb_sample")
+@DiscriminatorValue("00")
 public class SampleExt extends Sample{
 
     @Override
