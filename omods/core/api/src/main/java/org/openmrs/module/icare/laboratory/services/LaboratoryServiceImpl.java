@@ -847,7 +847,12 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	public List<BatchSample> getBatchSamples(Date startDate, Date endDate, String q, Integer startIndex, Integer limit) {
 		return batchSampleDAO.getBatchSamples(startDate, endDate, q, startIndex, limit);
 	}
-	
+
+	@Override
+	public ListResult<SampleExt> getSamplesWithoutAllocations(Date startDate, Date endDate, Pager pager, String location, String sampleCategory, String testCategory, String q, String hasStatus) {
+		return sampleDAO.getSamplesWithoutAllocations(startDate, endDate, pager, location, sampleCategory, testCategory, q, hasStatus);
+	}
+
 	public BatchSet addBatchSet(BatchSet batchSet) {
 		return batchSetDAO.save(batchSet);
 	}

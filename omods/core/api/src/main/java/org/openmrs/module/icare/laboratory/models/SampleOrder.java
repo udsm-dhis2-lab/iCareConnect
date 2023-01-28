@@ -2,6 +2,7 @@ package org.openmrs.module.icare.laboratory.models;
 
 // Generated Oct 7, 2020 12:48:40 PM by Hibernate Tools 5.2.10.Final
 
+import org.apache.xpath.operations.Bool;
 import org.openmrs.Order;
 import org.openmrs.User;
 
@@ -86,7 +87,7 @@ public class SampleOrder implements Serializable {
 		return sampleOrder;
 	}
 	
-	public Map<String, Object> toMap() {
+	public Map<String, Object> toMap(Boolean excludeAllocations) {
 		Map<String, Object> sampleOrderObject = new HashMap<String, Object>();
 		
 		Map<String, Object> technicianObject = new HashMap<String, Object>();
@@ -124,13 +125,13 @@ public class SampleOrder implements Serializable {
 		orderObject.put("concept", conceptObject);
 		
 		sampleOrderObject.put("order", orderObject);
-		
-		List<Map<String, Object>> testAllocationObject = new ArrayList<Map<String, Object>>();
-		for (TestAllocation testAllocation : this.getTestAllocations()) {
-			testAllocationObject.add(testAllocation.toMap());
+		if(!excludeAllocations) {
+			List<Map<String, Object>> testAllocationObject = new ArrayList<Map<String, Object>>();
+			for (TestAllocation testAllocation : this.getTestAllocations()) {
+				testAllocationObject.add(testAllocation.toMap());
+			}
+			sampleOrderObject.put("testAllocations", testAllocationObject);
 		}
-		sampleOrderObject.put("testAllocations", testAllocationObject);
-		
 		return sampleOrderObject;
 	}
 	

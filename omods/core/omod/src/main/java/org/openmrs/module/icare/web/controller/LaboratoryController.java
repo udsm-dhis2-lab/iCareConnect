@@ -223,7 +223,7 @@ public class LaboratoryController {
 	        @RequestParam(value = "sampleCategory", required = false) String sampleCategory,
 	        @RequestParam(value = "testCategory", required = false) String testCategory,
 	        @RequestParam(value = "hasStatus", required = false) String hasStatus,
-	        @RequestParam(value = "q", required = false) String q) throws ParseException {
+	        @RequestParam(value = "q", required = false) String q, @RequestParam(value = "excludeAllocations",required = false) boolean excludeAllocations) throws ParseException {
 		
 		Date start = null;
 		Date end = null;
@@ -239,9 +239,21 @@ public class LaboratoryController {
 		pager.setAllowed(paging);
 		pager.setPageSize(pageSize);
 		pager.setPage(page);
-		ListResult<Sample> sampleResults = laboratoryService.getSamples(start, end, pager, locationUuid, sampleCategory,
-		    testCategory, q, hasStatus);
-		return sampleResults.toMap();
+		if(!excludeAllocations) {
+			System.out.println("1");
+			ListResult<Sample> sampleResults = laboratoryService.getSamples(start, end, pager, locationUuid, sampleCategory,
+					testCategory, q, hasStatus);
+			return sampleResults.toMap();
+		}
+		if(excludeAllocations){
+			System.out.println("2");
+			ListResult<SampleExt> sampleResults = laboratoryService.getSamplesWithoutAllocations(start, end, pager, locationUuid, sampleCategory,
+					testCategory, q, hasStatus);
+			return sampleResults.toMap();
+		}
+
+		return null;
+
 		/*List<Sample> samples;
 		
 		if (startDate != null && endDate != null) {
@@ -265,8 +277,9 @@ public class LaboratoryController {
 			//add the sample after creating its object
 			responseSamplesObject.add(sampleObject);
 		}
-		
+
 		return responseSamplesObject;*/
+
 	}
 	
 	@RequestMapping(value = "sampleaccept", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -288,7 +301,7 @@ public class LaboratoryController {
 			allocationsToSave.add(testAllocation);
 			
 		}
-		
+
 		List<TestAllocation> savedAllocations = laboratoryService.createAllocationsForSample(allocationsToSave);
 		Map<String, Object> response = new HashMap<String, Object>();
 		List<Map<String, Object>> savedAllocationsListMap = new ArrayList<Map<String, Object>>();
@@ -324,7 +337,7 @@ public class LaboratoryController {
 		SampleOrder sampleOrder = SampleOrder.fromMap(sampleOrderObject);
 		SampleOrder newSampleOrder = laboratoryService.saveSampleOrder(sampleOrder);
 		//save the sampleorder
-		return newSampleOrder.toMap();
+		return newSampleOrder.toMap(false);
 	}
 	
 	@RequestMapping(value = "sample/{sampleUuid}/orders", method = RequestMethod.GET)
@@ -334,7 +347,7 @@ public class LaboratoryController {
 		List<Sample> samples = laboratoryService.getSampleOrdersBySampleUuid(sampleUuid);
 		for (Sample sample : samples) {
 			for (SampleOrder order : sample.getSampleOrders()) {
-				orders.add(order.toMap());
+				orders.add(order.toMap(false));
 			}
 		}
 		return orders;
@@ -348,7 +361,7 @@ public class LaboratoryController {
 		SampleOrder sampleOrder = SampleOrder.fromMap(sampleOrderObject);
 		SampleOrder newSampleOrder = laboratoryService.updateSampleOrder(sampleOrder);
 		//save the sampleorder
-		return newSampleOrder.toMap();
+		return newSampleOrder.toMap(false);
 	}
 	
 	@RequestMapping(value = "allocation", method = RequestMethod.POST)
