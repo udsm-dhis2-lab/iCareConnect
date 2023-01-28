@@ -223,7 +223,7 @@ public class LaboratoryController {
 	        @RequestParam(value = "sampleCategory", required = false) String sampleCategory,
 	        @RequestParam(value = "testCategory", required = false) String testCategory,
 	        @RequestParam(value = "hasStatus", required = false) String hasStatus,
-	        @RequestParam(value = "q", required = false) String q, @RequestParam(value = "excludeAllocations",required = false,defaultValue = "false") boolean excludeAllocations) throws ParseException {
+	        @RequestParam(value = "q", required = false) String q, @RequestParam(value = "excludeAllocations",required = false) boolean excludeAllocations) throws ParseException {
 		
 		Date start = null;
 		Date end = null;
@@ -240,11 +240,13 @@ public class LaboratoryController {
 		pager.setPageSize(pageSize);
 		pager.setPage(page);
 		if(!excludeAllocations) {
+			System.out.println("1");
 			ListResult<Sample> sampleResults = laboratoryService.getSamples(start, end, pager, locationUuid, sampleCategory,
 					testCategory, q, hasStatus);
 			return sampleResults.toMap();
 		}
 		if(excludeAllocations){
+			System.out.println("2");
 			ListResult<SampleExt> sampleResults = laboratoryService.getSamplesWithoutAllocations(start, end, pager, locationUuid, sampleCategory,
 					testCategory, q, hasStatus);
 			return sampleResults.toMap();
@@ -299,7 +301,7 @@ public class LaboratoryController {
 			allocationsToSave.add(testAllocation);
 			
 		}
-		
+
 		List<TestAllocation> savedAllocations = laboratoryService.createAllocationsForSample(allocationsToSave);
 		Map<String, Object> response = new HashMap<String, Object>();
 		List<Map<String, Object>> savedAllocationsListMap = new ArrayList<Map<String, Object>>();

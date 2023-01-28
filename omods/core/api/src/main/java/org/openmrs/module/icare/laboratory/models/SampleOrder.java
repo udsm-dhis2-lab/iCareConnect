@@ -125,7 +125,7 @@ public class SampleOrder implements Serializable {
 		orderObject.put("concept", conceptObject);
 		
 		sampleOrderObject.put("order", orderObject);
-		if(excludeAllocations) {
+		if(!excludeAllocations) {
 			List<Map<String, Object>> testAllocationObject = new ArrayList<Map<String, Object>>();
 			for (TestAllocation testAllocation : this.getTestAllocations()) {
 				testAllocationObject.add(testAllocation.toMap());
