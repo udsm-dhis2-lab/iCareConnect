@@ -351,8 +351,8 @@ public class SampleDAO extends BaseDAO<Sample> {
 			if (!queryStr.contains("WHERE")) {
 				queryStr += " WHERE ";
 			}
-			queryStr += " (cast(sp.dateTime as date) BETWEEN :startDate AND :endDate) \n"
-			        + "OR (cast(sp.dateCreated as date) BETWEEN :startDate AND :endDate)";
+			queryStr += " ((cast(sp.dateTime as date) BETWEEN :startDate AND :endDate) \n"
+			        + "OR (cast(sp.dateCreated as date) BETWEEN :startDate AND :endDate))";
 		}
 		
 		if (locationUuid != null) {
