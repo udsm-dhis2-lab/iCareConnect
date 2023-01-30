@@ -3,19 +3,14 @@ package org.openmrs.module.icare.laboratory.dao;
 // Generated Oct 7, 2020 12:49:21 PM by Hibernate Tools 5.2.10.Final
 
 import org.hibernate.Query;
-import org.openmrs.Drug;
-import org.openmrs.Patient;
-import org.openmrs.Person;
+import org.openmrs.User;
 import org.openmrs.Visit;
 import org.openmrs.api.db.hibernate.DbSession;
-import org.openmrs.module.icare.billing.models.Discount;
 import org.openmrs.module.icare.core.ListResult;
 import org.openmrs.module.icare.core.Pager;
 import org.openmrs.module.icare.core.dao.BaseDAO;
 import org.openmrs.module.icare.laboratory.models.*;
-import org.springframework.stereotype.Repository;
 
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -78,7 +73,7 @@ public class SampleDAO extends BaseDAO<Sample> {
 	}
 	
 	public ListResult<Sample> getSamples(Date startDate, Date endDate, Pager pager, String locationUuid,
-	        String sampleCategory, String testCategory, String q, String hasStatus) {
+	        String sampleCategory, String testCategory, String q, String hasStatus, String acceptedByUuid) {
 		
 		DbSession session = this.getSession();
 		
@@ -140,10 +135,7 @@ public class SampleDAO extends BaseDAO<Sample> {
 			}
 			queryStr += "sp IN(SELECT testalloc.sampleOrder.id.sample FROM TestAllocation testalloc WHERE testalloc IN (SELECT testresults.testAllocation FROM Result testresults))) ";
 			
-			//			queryStr+="LEFT JOIN TestAllocation testalloc ON testalloc.sampleOrder.id.sample = sp JOIN Result testresults ON testresults.testAllocation = testalloc GROUP BY sp HAVING COUNT(testalloc)=COUNT(testresults) ";
-			
-			//			queryStr +=" LEFT JOIN sp.testAllocations al LEFT JOIN al.testAllocationResults ar GROUP BY sp HAVING COUNT(al.id) = COUNT(ar.testAllocation)";
-			
+
 		}
 		
 		if (hasStatus != null) {
@@ -164,12 +156,19 @@ public class SampleDAO extends BaseDAO<Sample> {
 				} else {
 					queryStr += " AND ";
 				}
-				queryStr += "sp IN( SELECT samplestatus.sample FROM SampleStatus samplestatus)";
-				
+				if (acceptedByUuid == null) {
+					queryStr += "sp IN( SELECT samplestatus.sample FROM SampleStatus samplestatus)";
+					
+				}
+				if (acceptedByUuid != null) {
+					queryStr += "sp IN ( SELECT samplestatus.sample FROM SampleStatus samplestatus WHERE samplestatus.user IN( SELECT usr FROM User usr WHERE uuid = :acceptedByUuid))";
+					
+				}
 			}
 		}
+
+		
 		queryStr += " ORDER BY sp.dateCreated DESC";
-		//System.out.println(queryStr);
 		Query query = session.createQuery(queryStr);
 		if (startDate != null && endDate != null) {
 			query.setParameter("startDate", startDate);
@@ -189,6 +188,9 @@ public class SampleDAO extends BaseDAO<Sample> {
 		
 		if (testCategory != null && testCategory != "Completed") {
 			query.setParameter("testCategory", testCategory);
+		}
+		if (acceptedByUuid != null && hasStatus.toLowerCase().equals("yes")) {
+			query.setParameter("acceptedByUuid", acceptedByUuid);
 		}
 		
 		if (pager.isAllowed()) {
@@ -329,7 +331,8 @@ public class SampleDAO extends BaseDAO<Sample> {
 	}
 	
 	public ListResult<SampleExt> getSamplesWithoutAllocations(Date startDate, Date endDate, Pager pager,
-	        String locationUuid, String sampleCategory, String testCategory, String q, String hasStatus) {
+	        String locationUuid, String sampleCategory, String testCategory, String q, String hasStatus,
+	        String acceptedByUuid) {
 		
 		DbSession session = this.getSession();
 		
@@ -413,7 +416,15 @@ public class SampleDAO extends BaseDAO<Sample> {
 				} else {
 					queryStr += " AND ";
 				}
-				queryStr += "sp IN( SELECT samplestatus.sample FROM SampleStatus samplestatus)";
+
+				if (acceptedByUuid == null) {
+					queryStr += "sp IN( SELECT samplestatus.sample FROM SampleStatus samplestatus)";
+
+				}
+				if (acceptedByUuid != null) {
+					queryStr += "sp IN ( SELECT samplestatus.sample FROM SampleStatus samplestatus WHERE samplestatus.user IN( SELECT usr FROM User usr WHERE uuid = :acceptedByUuid))";
+
+				}
 				
 			}
 		}
@@ -438,6 +449,10 @@ public class SampleDAO extends BaseDAO<Sample> {
 		
 		if (testCategory != null && testCategory != "Completed") {
 			query.setParameter("testCategory", testCategory);
+		}
+
+		if (acceptedByUuid != null && hasStatus.toLowerCase().equals("yes")) {
+			query.setParameter("acceptedByUuid", acceptedByUuid);
 		}
 		
 		if (pager.isAllowed()) {
