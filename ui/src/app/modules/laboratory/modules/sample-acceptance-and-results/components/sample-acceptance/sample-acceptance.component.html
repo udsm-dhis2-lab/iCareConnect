@@ -876,7 +876,26 @@
         </div>
       </ng-template>
     </mat-tab> -->
+
     <mat-tab label="Worklist">
+      <ng-template matTabContent>
+        <div class="p-2">
+          <app-worklist
+            [codedSampleRejectionReasons]="params?.codedSampleRejectionReasons"
+            [labConfigs]="labConfigs"
+            [datesParameters]="datesParameters"
+            [LISConfigurations]="LISConfigurations"
+            [patients]="patients"
+            [sampleTypes]="sampleTypes"
+            [labSamplesDepartments]="labSamplesDepartments"
+            [labSamplesContainers]="labSamplesContainers"
+            [userUuid]="userUuid"
+          ></app-worklist>
+        </div>
+      </ng-template>
+    </mat-tab>
+
+    <!-- <mat-tab label="Worklist">
       <ng-template matTabContent>
         <div class="filter-and-legend">
           <mat-form-field class="w-50">
@@ -945,8 +964,6 @@
                 <th>
                   {{ !LISConfigurations?.isLIS ? "Collected By" : "ID" }}
                 </th>
-                <!-- <th>Date Ordered</th>
-              <th>Source</th> -->
               </tr>
             </thead>
             <tbody>
@@ -1009,8 +1026,6 @@
                           : order?.order?.orderNumber
                       }}
                     </td>
-                    <!-- <td>{{ order?.order?.orderDate | date: "medium" }}</td>
-                  <td>{{ order?.order?.location?.name }}</td> -->
                     <td
                       *ngIf="orderCount == 0 && LISConfigurations?.isLIS"
                       [attr.rowspan]="sample?.orders?.length"
@@ -1104,7 +1119,7 @@
           </table>
         </div>
       </ng-template>
-    </mat-tab>
+    </mat-tab> -->
     <mat-tab label="Worksheets" *ngIf="LISConfigurations?.isLIS">
       <ng-template matTabContent>
         <div class="p-3">
@@ -1449,7 +1464,25 @@
         </div>
       </ng-template>
     </mat-tab>
-    <mat-tab label="Completed Samples" *ngIf="!LISConfigurations?.isLIS">
+
+    <mat-tab label="Completed Samples">
+      <ng-template matTabContent>
+        <div class="p-2">
+          <app-completed-samples
+            [codedSampleRejectionReasons]="params?.codedSampleRejectionReasons"
+            [labConfigs]="labConfigs"
+            [datesParameters]="datesParameters"
+            [LISConfigurations]="LISConfigurations"
+            [patients]="patients"
+            [sampleTypes]="sampleTypes"
+            [labSamplesDepartments]="labSamplesDepartments"
+            [labSamplesContainers]="labSamplesContainers"
+            [userUuid]="userUuid"
+          ></app-completed-samples>
+        </div>
+      </ng-template>
+    </mat-tab>
+    <!-- <mat-tab label="Completed Samples" *ngIf="!LISConfigurations?.isLIS">
       <ng-template matTabContent>
         <div class="filter-and-legend">
           <mat-form-field class="w-50">
@@ -1510,11 +1543,7 @@
               </tr>
               <tr>
                 <th>Test Order</th>
-                <!-- <th>Container</th> -->
                 <th>Ordered By</th>
-                <!-- <th>Source</th>
-              <th>Date Ordered</th> -->
-                <!-- <th>Payment</th> -->
               </tr>
             </thead>
             <tbody>
@@ -1571,12 +1600,7 @@
                     <td>
                       {{ order?.order?.concept?.display.replace("TO:", "") }}
                     </td>
-                    <!-- <td></td> -->
                     <td>{{ order?.order?.orderer?.name }}</td>
-
-                    <!-- <td>{{ order?.order?.location?.name }}</td>
-                  <td>{{ order?.order?.orderDate | date: "medium" }}</td> -->
-                    <!-- <td>{{order?.p_sub_category}} - {{order?.p_sub_category}}</td> -->
                     <td
                       *ngIf="orderCount == 0"
                       [attr.rowspan]="sample?.orders?.length"
@@ -1627,7 +1651,7 @@
           </table>
         </div>
       </ng-template>
-    </mat-tab>
+    </mat-tab> -->
     <mat-tab *ngIf="showTabSampleTrackingForLis" label="Sample Tracking">
       <ng-template matTabContent>
         <div class="filter-and-legend">

@@ -31,7 +31,8 @@ export class SamplesService {
       departments: any[];
       specimenSources: any[];
       codedRejectionReasons: any[];
-    }
+    },
+    acceptedBy?: string
   ): Observable<any> {
     let parameters = [];
     if (pagerInfo) {

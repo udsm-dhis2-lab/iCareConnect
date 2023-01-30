@@ -39,6 +39,8 @@ import { ResultEntryByWorksheetComponent } from "./result-entry-by-worksheet/res
 import { ResultEntryByWorksheetHomeComponent } from "./result-entry-by-worksheet-home/result-entry-by-worksheet-home.component";
 import { AcceptedSamplesComponent } from "./accepted-samples/accepted-samples.component";
 import { RejectedSamplesComponent } from "./rejected-samples/rejected-samples.component";
+import { WorklistComponent } from "./worklist/worklist.component";
+import { CompletedSamplesComponent } from "./completed-samples/completed-samples.component";
 
 export const components: any[] = [
   PatientsByVisitsListComponent,
@@ -82,6 +84,8 @@ export const components: any[] = [
   SamplesToAcceptComponent,
   AcceptedSamplesComponent,
   RejectedSamplesComponent,
+  WorklistComponent,
+  CompletedSamplesComponent,
 ];
 
 export const sampleAcceptanceAndResultsModals: any[] = [
