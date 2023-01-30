@@ -43,7 +43,7 @@
         </div>
       </ng-template>
     </mat-tab>
-    <mat-tab label="Sample Acceptance Old">
+    <!-- <mat-tab label="Sample Acceptance Old">
       <ng-template matTabContent>
         <div class="filter-and-legend">
           <mat-form-field class="w-50">
@@ -113,12 +113,9 @@
               </tr>
               <tr>
                 <th>Test Order</th>
-                <!-- <th>Container</th> -->
                 <th>
                   {{ !LISConfigurations?.isLIS ? "Collected By" : "ID" }}
                 </th>
-                <!-- <th>Date Ordered</th>
-              <th>Source</th> -->
               </tr>
             </thead>
             <tbody>
@@ -178,7 +175,6 @@
                     <td>
                       {{ order?.order?.concept?.display.replace("TO:", "") }}
                     </td>
-                    <!-- <td></td> -->
                     <td>
                       {{
                         !LISConfigurations?.isLIS
@@ -186,9 +182,6 @@
                           : order?.order?.orderNumber
                       }}
                     </td>
-                    <!-- <td>{{ order?.order?.orderDate | date: "medium" }}</td>
-                  <td>{{ order?.order?.location?.name }}</td> -->
-                    <!-- <td>{{order?.p_sub_category}} - {{order?.p_sub_category}}</td> -->
                     <td
                       *ngIf="orderCount == 0 && LISConfigurations?.isLIS"
                       [attr.rowspan]="sample?.orders?.length"
@@ -394,8 +387,25 @@
           </table>
         </div>
       </ng-template>
-    </mat-tab>
+    </mat-tab> -->
     <mat-tab label="Accepted Samples">
+      <ng-template matTabContent>
+        <div class="p-2">
+          <app-accepted-samples
+            [codedSampleRejectionReasons]="params?.codedSampleRejectionReasons"
+            [labConfigs]="labConfigs"
+            [datesParameters]="datesParameters"
+            [LISConfigurations]="LISConfigurations"
+            [patients]="patients"
+            [sampleTypes]="sampleTypes"
+            [labSamplesDepartments]="labSamplesDepartments"
+            [labSamplesContainers]="labSamplesContainers"
+            [userUuid]="userUuid"
+          ></app-accepted-samples>
+        </div>
+      </ng-template>
+    </mat-tab>
+    <!-- <mat-tab label="Accepted Samples">
       <ng-template matTabContent>
         <div class="filter-and-legend">
           <mat-form-field class="w-50">
@@ -526,7 +536,6 @@
                     <td>
                       {{ order?.order?.concept?.display.replace("TO:", "") }}
                     </td>
-                    <!-- <td></td> -->
                     <td>
                       {{
                         !LISConfigurations?.isLIS
@@ -534,10 +543,6 @@
                           : order?.order?.orderNumber
                       }}
                     </td>
-
-                    <!-- <td>{{ order?.order?.location?.name }}</td>
-                  <td>{{ order?.order?.orderDate | date: "medium" }}</td> -->
-                    <!-- <td>{{order?.p_sub_category}} - {{order?.p_sub_category}}</td> -->
                     <td
                       *ngIf="orderCount == 0 && LISConfigurations?.isLIS"
                       [attr.rowspan]="sample?.orders?.length"
@@ -600,8 +605,26 @@
           </table>
         </div>
       </ng-template>
-    </mat-tab>
+    </mat-tab> -->
+
     <mat-tab label="Rejected Samples">
+      <ng-template matTabContent>
+        <div class="p-2">
+          <app-rejected-samples
+            [codedSampleRejectionReasons]="params?.codedSampleRejectionReasons"
+            [labConfigs]="labConfigs"
+            [datesParameters]="datesParameters"
+            [LISConfigurations]="LISConfigurations"
+            [patients]="patients"
+            [sampleTypes]="sampleTypes"
+            [labSamplesDepartments]="labSamplesDepartments"
+            [labSamplesContainers]="labSamplesContainers"
+            [userUuid]="userUuid"
+          ></app-rejected-samples>
+        </div>
+      </ng-template>
+    </mat-tab>
+    <!-- <mat-tab label="Rejected Samples">
       <ng-template matTabContent>
         <div class="filter-and-legend">
           <mat-form-field class="w-50">
@@ -670,13 +693,9 @@
               </tr>
               <tr>
                 <th>Test Order</th>
-                <!-- <th>Container</th> -->
                 <th>
                   {{ !LISConfigurations?.isLIS ? "Collected By" : "ID" }}
                 </th>
-                <!-- <th>Source</th>
-              <th>Date Ordered</th> -->
-                <!-- <th>Payment</th> -->
               </tr>
             </thead>
             <tbody>
@@ -733,7 +752,6 @@
                     <td>
                       {{ order?.order?.concept?.display.replace("TO:", "") }}
                     </td>
-                    <!-- <td></td> -->
                     <td>
                       {{
                         !LISConfigurations?.isLIS
@@ -741,10 +759,6 @@
                           : order?.order?.orderNumber
                       }}
                     </td>
-
-                    <!-- <td>{{ order?.order?.location?.name }}</td>
-                  <td>{{ order?.order?.orderDate | date: "medium" }}</td> -->
-                    <!-- <td>{{order?.p_sub_category}} - {{order?.p_sub_category}}</td> -->
                     <td
                       *ngIf="orderCount == 0 && LISConfigurations?.isLIS"
                       [attr.rowspan]="sample?.orders?.length"
@@ -861,7 +875,7 @@
           </table>
         </div>
       </ng-template>
-    </mat-tab>
+    </mat-tab> -->
     <mat-tab label="Worklist">
       <ng-template matTabContent>
         <div class="filter-and-legend">
