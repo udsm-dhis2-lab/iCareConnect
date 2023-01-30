@@ -39,15 +39,22 @@ export class SamplesService {
     } else {
       parameters = [...parameters, "paging=false"];
     }
+
     if (dates) {
       parameters = [...parameters, "startDate=" + dates?.startDate];
       parameters = [...parameters, "endDate=" + dates?.endDate];
     }
+
     if (category) {
-      parameters = [...parameters, "category=" + category];
+      parameters = [...parameters, "sampleCategory=" + category];
     }
+
     if (hasStatus) {
       parameters = [...parameters, "hasStatus=" + hasStatus];
+    }
+
+    if (acceptedBy) {
+      parameters = [...parameters, "acceptedBy=" + acceptedBy];
     }
 
     if (excludeAllocations) {

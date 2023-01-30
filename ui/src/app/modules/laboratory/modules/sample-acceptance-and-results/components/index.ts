@@ -41,6 +41,8 @@ import { AcceptedSamplesComponent } from "./accepted-samples/accepted-samples.co
 import { RejectedSamplesComponent } from "./rejected-samples/rejected-samples.component";
 import { WorklistComponent } from "./worklist/worklist.component";
 import { CompletedSamplesComponent } from "./completed-samples/completed-samples.component";
+import { SamplesForResultsEntryComponent } from "./samples-for-results-entry/samples-for-results-entry.component";
+import { SampleTrackingListComponent } from "./sample-tracking-list/sample-tracking-list.component";
 
 export const components: any[] = [
   PatientsByVisitsListComponent,
@@ -86,6 +88,8 @@ export const components: any[] = [
   RejectedSamplesComponent,
   WorklistComponent,
   CompletedSamplesComponent,
+  SamplesForResultsEntryComponent,
+  SampleTrackingListComponent,
 ];
 
 export const sampleAcceptanceAndResultsModals: any[] = [

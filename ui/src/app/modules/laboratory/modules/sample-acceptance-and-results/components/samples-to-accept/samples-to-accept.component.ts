@@ -3,12 +3,13 @@ import * as _ from "lodash";
 import { MatDialog } from "@angular/material/dialog";
 import { Store } from "@ngrx/store";
 import { AppState } from "src/app/store/reducers";
-import { Observable, of } from "rxjs";
+import { Observable, of, zip } from "rxjs";
 import { SamplesService } from "src/app/shared/services/samples.service";
 import { getProviderDetails } from "src/app/store/selectors/current-user.selectors";
 import { SharedConfirmationComponent } from "src/app/shared/components/shared-confirmation /shared-confirmation.component";
 import { RejectionReasonComponent } from "../rejection-reason/rejection-reason.component";
-import { take } from "rxjs/operators";
+import { map, take } from "rxjs/operators";
+import { ConceptsService } from "src/app/shared/resources/concepts/services/concepts.service";
 @Component({
   selector: "app-samples-to-accept",
   templateUrl: "./samples-to-accept.component.html",
@@ -42,7 +43,8 @@ export class SamplesToAcceptComponent implements OnInit {
   constructor(
     private dialog: MatDialog,
     private store: Store<AppState>,
-    private sampleService: SamplesService
+    private sampleService: SamplesService,
+    private conceptService: ConceptsService
   ) {}
 
   ngOnInit(): void {
@@ -117,27 +119,90 @@ export class SamplesToAcceptComponent implements OnInit {
         }
 
         this.savingMessage[sample?.id + "-accept"] = true;
-        const data = [
-          {
-            sample: {
-              uuid: sample?.uuid,
-            },
-            user: {
-              uuid: this.userUuid,
-            },
-            remarks: "accepted",
-            status: "ACCEPTED",
-            category: "ACCEPTED",
+        const data = {
+          sample: {
+            uuid: sample?.uuid,
           },
-        ];
-        this.sampleService.saveSampleStatuses(data).subscribe((response) => {
-          if (response && !response?.error) {
-            this.saving = false;
-            this.getSamples();
-          } else {
-            this.saving = false;
-          }
-        });
+          user: {
+            uuid: this.userUuid,
+          },
+          remarks: "accepted",
+          status: "ACCEPTED",
+          category: "ACCEPTED",
+        };
+        zip(
+          ...sample?.orders.map((sampleOrder) => {
+            return this.conceptService
+              .getConceptDetailsByUuid(
+                sampleOrder?.order?.concept?.uuid,
+                "custom:(uuid,display,setMembers:(uuid,display))"
+              )
+              .pipe(
+                map((response) => {
+                  return response?.setMembers?.length == 0
+                    ? [
+                        {
+                          order: {
+                            uuid: sampleOrder?.order?.uuid,
+                          },
+                          container: {
+                            uuid: this.labConfigs["otherContainer"]?.uuid,
+                          },
+                          sample: {
+                            uuid: sample?.uuid,
+                          },
+                          concept: {
+                            uuid: sampleOrder?.order?.concept?.uuid,
+                          },
+                          label: sampleOrder?.order?.orderNumber,
+                        },
+                      ]
+                    : response?.setMembers?.map((setMember) => {
+                        return {
+                          order: {
+                            uuid: sampleOrder?.order?.uuid,
+                          },
+                          container: {
+                            uuid: this.labConfigs["otherContainer"]?.uuid,
+                          },
+                          sample: {
+                            uuid: sample?.uuid,
+                          },
+                          concept: {
+                            uuid: setMember?.uuid,
+                          },
+                          label: sampleOrder?.order?.orderNumber,
+                        };
+                      });
+                })
+              );
+          })
+        )
+          .pipe(
+            map((allocationsData) => {
+              let sampleAcceptStatusWithAllocations = {
+                status: data,
+                allocations: _.flatten(allocationsData),
+              };
+              return sampleAcceptStatusWithAllocations;
+            })
+          )
+          .subscribe((sampleAcceptStatusWithAllocations) => {
+            this.sampleService
+              .acceptSampleAndCreateAllocations(
+                sampleAcceptStatusWithAllocations
+              )
+              .subscribe((response) => {
+                if (response && !response?.error) {
+                  this.saving = false;
+                  this.getSamples();
+                } else {
+                  // TODO: Handle errors
+                  this.saving = false;
+                  this.getSamples();
+                }
+              });
+          });
       }
     });
   }

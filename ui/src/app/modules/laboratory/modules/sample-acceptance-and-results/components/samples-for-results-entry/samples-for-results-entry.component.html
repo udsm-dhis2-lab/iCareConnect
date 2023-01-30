@@ -1,13 +1,13 @@
 <div
   class="w-100"
   *ngIf="{
-    acceptedSamples: acceptedSamples$ | async,
+    sampplesForResultsEntry: sampplesForResultsEntry$ | async,
     providerDetails: providerDetails$ | async
   } as params"
 >
   <mat-progress-bar
     mode="indeterminate"
-    *ngIf="!params?.acceptedSamples"
+    *ngIf="!params?.sampplesForResultsEntry"
   ></mat-progress-bar>
   <div class="loading-overlay" *ngIf="saving">
     <div class="text-center">
@@ -17,7 +17,7 @@
       </div>
     </div>
   </div>
-  <div *ngIf="params?.acceptedSamples">
+  <div *ngIf="params?.sampplesForResultsEntry">
     <table class="table table-bordered">
       <thead class="table-header">
         <tr>
@@ -47,11 +47,27 @@
         </tr>
       </thead>
       <tbody>
-        <ng-container *ngIf="params?.acceptedSamples?.length > 0">
+        <ng-container *ngIf="params?.sampplesForResultsEntry?.length > 0">
           <ng-container
-            *ngFor="let sample of params?.acceptedSamples; let count = index"
+            *ngFor="
+              let sample of params?.sampplesForResultsEntry;
+              let count = index
+            "
           >
             <tr
+              [ngStyle]="{
+                'background-color': sample?.authorized
+                  ? '#6fd67bcf'
+                  : sample?.atLestOneOrderWithRejectedResults
+                  ? '#d04747ab'
+                  : sample?.approved && !LISConfigurations?.isLIS
+                  ? '#f5f171f7'
+                  : sample?.approved && LISConfigurations?.isLIS
+                  ? '#0080009e'
+                  : sample?.hasResults
+                  ? '#ec864acf'
+                  : ''
+              }"
               *ngFor="let order of sample?.orders; let orderCount = index"
               [ngClass]="{ 'row-alternated': count % 2 !== 0 }"
             >
@@ -154,7 +170,27 @@
                 *ngIf="orderCount == 0"
                 [attr.rowspan]="sample?.orders?.length"
               >
-                <div class="d-flex justify-content-center"></div>
+                <div class="d-flex justify-content-end">
+                  <button
+                    class="colored-button"
+                    mat-flat-button
+                    color="primary"
+                    (click)="
+                      onResultsEntryAndReview(
+                        $event,
+                        sample,
+                        params?.providerDetails,
+                        'entry'
+                      )
+                    "
+                  >
+                    {{
+                      sample?.ordersWithResults?.length === 0
+                        ? "Results entry"
+                        : "Edit Results"
+                    }}
+                  </button>
+                </div>
               </td>
             </tr>
             <tr
@@ -172,11 +208,11 @@
             </tr>
           </ng-container>
         </ng-container>
-        <ng-container *ngIf="params?.acceptedSamples?.length === 0">
+        <ng-container *ngIf="params?.sampplesForResultsEntry?.length === 0">
           <tr>
             <td colspan="100%">
               <div class="alert alert-warning" role="alert">
-                No accepted samples
+                No rejected samples
               </div>
             </td>
           </tr>
