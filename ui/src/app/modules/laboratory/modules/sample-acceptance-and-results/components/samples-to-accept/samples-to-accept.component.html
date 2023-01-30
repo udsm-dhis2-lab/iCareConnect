@@ -30,7 +30,7 @@
           <th colspan="2" class="text-center">Test details</th>
           <th rowspan="2" *ngIf="LISConfigurations?.isLIS">Received By</th>
           <th rowspan="2" *ngIf="LISConfigurations?.isLIS">Received On</th>
-          <th rowspan="2" *ngIf="LISConfigurations?.isLIS">
+          <th rowspan="2">
             {{ !LISConfigurations?.isLIS ? "Collected By" : "Registered By" }}
           </th>
           <th rowspan="2">
@@ -42,7 +42,7 @@
         <tr>
           <th>Test Order</th>
           <th>
-            {{ !LISConfigurations?.isLIS ? "Collected By" : "ID" }}
+            {{ !LISConfigurations?.isLIS ? "Ordered By" : "ID" }}
           </th>
         </tr>
       </thead>
@@ -124,10 +124,14 @@
                 }}
               </td>
               <td
-                *ngIf="orderCount == 0 && LISConfigurations?.isLIS"
+                *ngIf="orderCount == 0"
                 [attr.rowspan]="sample?.orders?.length"
               >
-                {{ sample?.collectedBy?.display }}
+                {{
+                  LISConfigurations?.isLIS
+                    ? sample?.collectedBy?.display
+                    : sample?.creator?.name
+                }}
               </td>
               <td
                 *ngIf="orderCount == 0"

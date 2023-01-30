@@ -52,6 +52,19 @@
             *ngFor="let sample of params?.completedSamples; let count = index"
           >
             <tr
+              [ngStyle]="{
+                'background-color': sample?.authorized
+                  ? '#6fd67bcf'
+                  : sample?.atLestOneOrderWithRejectedResults
+                  ? '#d04747ab'
+                  : sample?.approved && !LISConfigurations?.isLIS
+                  ? '#f5f171f7'
+                  : sample?.approved && LISConfigurations?.isLIS
+                  ? '#0080009e'
+                  : sample?.hasResults
+                  ? '#ec864acf'
+                  : ''
+              }"
               *ngFor="let order of sample?.orders; let orderCount = index"
               [ngClass]="{ 'row-alternated': count % 2 !== 0 }"
             >
@@ -176,7 +189,7 @@
           <tr>
             <td colspan="100%">
               <div class="alert alert-warning" role="alert">
-                No sample to ready for acceptance or rejection
+                No completed samples
               </div>
             </td>
           </tr>

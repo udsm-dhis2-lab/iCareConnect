@@ -6,11 +6,11 @@ import { AppState } from "src/app/store/reducers";
 import { getProviderDetails } from "src/app/store/selectors/current-user.selectors";
 
 @Component({
-  selector: "app-completed-samples",
-  templateUrl: "./completed-samples.component.html",
-  styleUrls: ["./completed-samples.component.scss"],
+  selector: "app-sample-tracking-list",
+  templateUrl: "./sample-tracking-list.component.html",
+  styleUrls: ["./sample-tracking-list.component.scss"],
 })
-export class CompletedSamplesComponent implements OnInit {
+export class SampleTrackingListComponent implements OnInit {
   @Input() codedSampleRejectionReasons: any;
   @Input() labConfigs: any;
   @Input() datesParameters: any;
@@ -22,7 +22,7 @@ export class CompletedSamplesComponent implements OnInit {
   @Input() LISConfigurations: any;
   @Input() userUuid: string;
 
-  completedSamples$: Observable<any[]>;
+  acceptedSamples$: Observable<any[]>;
   selectedDepartment: string;
   searchingText: string;
   excludeAllocations: boolean = true;
@@ -35,6 +35,7 @@ export class CompletedSamplesComponent implements OnInit {
 
   samplesToViewMoreDetails: any = {};
   saving: boolean = false;
+  departmentName: string;
   constructor(
     private store: Store<AppState>,
     private sampleService: SamplesService
@@ -46,9 +47,9 @@ export class CompletedSamplesComponent implements OnInit {
   }
 
   getSamples(): void {
-    this.completedSamples$ = this.sampleService.getLabSamplesByCollectionDates(
+    this.acceptedSamples$ = this.sampleService.getLabSamplesByCollectionDates(
       this.datesParameters,
-      "RESULT_AUTHORIZATION",
+      "ACCEPTED",
       "YES",
       this.excludeAllocations,
       null,
@@ -63,5 +64,10 @@ export class CompletedSamplesComponent implements OnInit {
   onToggleViewSampleDetails(event: Event, sample: any): void {
     event.stopPropagation();
     console.log(sample);
+  }
+
+  setDepartment(event: Event, departmentName): void {
+    event.stopPropagation();
+    this.departmentName = departmentName;
   }
 }

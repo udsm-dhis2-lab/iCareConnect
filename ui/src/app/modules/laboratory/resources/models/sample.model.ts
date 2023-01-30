@@ -418,7 +418,11 @@ export class LabSample {
   }
 
   get searchingText(): string {
-    return createSearchingText(this.sample);
+    return createSearchingText(
+      this.sample,
+      this.department,
+      this.specimenSource
+    );
   }
 
   get authorizationInfo(): any {
@@ -479,6 +483,36 @@ export class LabSample {
       : 1;
   }
 
+  get hasResults(): boolean {
+    return (
+      this.sample?.statuses?.filter(
+        (status) => status?.category === "HAS_RESULTS"
+      ) || []
+    )?.length > 0
+      ? true
+      : false;
+  }
+
+  get approved(): boolean {
+    return (
+      this.sample?.statuses?.filter(
+        (status) => status?.status === "APPROVED"
+      ) || []
+    )?.length > 0
+      ? true
+      : false;
+  }
+
+  get authorized(): boolean {
+    return (
+      this.sample?.statuses?.filter(
+        (status) => status?.status === "AUTHORIZED"
+      ) || []
+    )?.length > 0
+      ? true
+      : false;
+  }
+
   toJSon(): any {
     return {
       uuid: this.uuid,
@@ -493,6 +527,9 @@ export class LabSample {
       dateCreated: this.dateCreated,
       creator: this.creator,
       registeredBy: this.creator,
+      hasResults: this.hasResults,
+      approved: this.approved,
+      authorized: this.authorized,
       mrn: this.mrn,
       department: this.department,
       specimen: this.specimenSource,
@@ -514,6 +551,7 @@ export class LabSample {
       receivedByStatus: this.receivedByStatus,
       priorityHigh: this.priorityHigh,
       priorityOrderNumber: this.priorityOrderNumber,
+      searchingText: this.searchingText,
     };
   }
 }
