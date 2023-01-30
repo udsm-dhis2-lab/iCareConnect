@@ -621,7 +621,7 @@ public class StoreController {
 
 	@RequestMapping(value = "stockinvoicestatus",method = RequestMethod.POST)
 	@ResponseBody
-	public List<Map<String,Object>> addStockInvoiceStatuses(@RequestBody List<Map<String,Object>> stockInvoicesStatusMap) throws ParseException {
+	public List<Map<String,Object>> addStockInvoiceStatuses(@RequestBody List<Map<String,Object>> stockInvoicesStatusMap) throws Exception {
 
 		List<Map<String,Object>> newStockInvoiceStatusMapList = new ArrayList<>();
 		for(Map<String,Object> stockInvoiceStatusMap : stockInvoicesStatusMap){
