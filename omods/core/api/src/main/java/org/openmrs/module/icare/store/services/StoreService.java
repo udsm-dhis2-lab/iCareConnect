@@ -113,4 +113,6 @@ public interface StoreService extends OpenmrsService {
 	List<Supplier> getSuppliers(Integer startIndex, Integer limit);
 
     StockInvoiceStatus saveStockInvoiceStatus(StockInvoiceStatus stockInvoiceStatus) throws Exception;
+
+	List<StockInvoiceStatus> getStockInvoicesStatus(Integer startIndex, Integer limit, String q);
 }
