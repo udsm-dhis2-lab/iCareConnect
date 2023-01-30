@@ -7,6 +7,7 @@ import { LocationGet } from "src/app/shared/resources/openmrs";
 import { LedgerInput } from "src/app/shared/resources/store/models/ledger-input.model";
 import { StockObject } from "src/app/shared/resources/store/models/stock.model";
 import { StockService } from "src/app/shared/resources/store/services/stock.service";
+import { SupplierService } from "src/app/shared/resources/store/services/supplier.service";
 import { AddNewStockReceivedComponent } from "../../modals/add-new-stock-received/add-new-stock-received.component";
 
 @Component({
@@ -29,13 +30,25 @@ export class StockStatusListComponent implements OnInit {
   itemID?: string;
   showReceivingForm?: boolean;
   errors: any[] = [];
+  suppliers$: Observable<any>;
   constructor(
     private stockService: StockService,
     private dialog: MatDialog,
-    private locationService: LocationService
+    private locationService: LocationService,
+    private supplierService: SupplierService
   ) {}
 
   ngOnInit(): void {
+    this.suppliers$ = this.supplierService.getSuppliers().pipe(
+      map((response) => {
+        if (!response?.error) {
+          return response;
+        }
+        if (response?.error) {
+          this.errors = [...this.errors, response.error];
+        }
+      })
+    );
     this.getStock();
   }
 
@@ -117,12 +130,12 @@ export class StockStatusListComponent implements OnInit {
     this.itemID = undefined;
   }
 
-  onHideReceivingForm(e: any){
+  onHideReceivingForm(e: any) {
     e.stopPropagation();
     this.showReceivingForm = false;
   }
-  
-  onShowReceivingForm(e: any){
+
+  onShowReceivingForm(e: any) {
     e.stopPropagation();
     this.showReceivingForm = true;
   }

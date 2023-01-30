@@ -7,6 +7,8 @@ import { StockInOtherUnitsComponent } from "./stock-in-other-units/stock-in-othe
 import { StockOutItemsComponent } from "./stock-out-items/stock-out-items.component";
 import { StockReceivingFormComponent } from "./stock-receiving-form/stock-receiving-form.component";
 import { StockStatusListComponent } from "./stock-status-list/stock-status-list.component";
+import { SupplierFormComponent } from "./supplier-form/supplier-form.component";
+import { SuppliersListComponent } from "./suppliers-list/suppliers-list.component";
 import { TotalizeStockUnitsQuantityComponent } from "./totalize-stock-units-quantity/totalize-stock-units-quantity.component";
 
 export const stockComponents: any[] = [
@@ -20,4 +22,6 @@ export const stockComponents: any[] = [
   IssuingStockByStoreComponent,
   RequisitionReceiptByStoreComponent,
   StockReceivingFormComponent,
+  SupplierFormComponent,
+  SuppliersListComponent,
 ];
