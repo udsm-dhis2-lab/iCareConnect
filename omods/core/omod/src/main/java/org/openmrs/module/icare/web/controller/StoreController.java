@@ -619,7 +619,7 @@ public class StoreController {
 
 	}
 
-	@RequestMapping(value = "stockinvoicestatus",method = RequestMethod.POST)
+	@RequestMapping(value = "stockinvoicesstatus",method = RequestMethod.POST)
 	@ResponseBody
 	public List<Map<String,Object>> addStockInvoiceStatuses(@RequestBody List<Map<String,Object>> stockInvoicesStatusMap) throws Exception {
 
@@ -632,5 +632,12 @@ public class StoreController {
 		}
 
 		return newStockInvoiceStatusMapList;
+	}
+
+	@RequestMapping(value ="stockinvoicesstatus", method = RequestMethod.GET)
+	@ResponseBody
+	public List<Map<String,Object>> getStockInvoicesStatus(@RequestParam(value = "startIndex",defaultValue = "0", required = false) Integer startIndex,@RequestParam(value="limit",required = false,defaultValue = "100") Integer limit, @RequestParam(required = false) String q){
+
+		List<StockInvoiceStatus> stockInvoiceStatus = storeService.getStockInvoicesStatus(startIndex,limit,q);
 	}
 }
