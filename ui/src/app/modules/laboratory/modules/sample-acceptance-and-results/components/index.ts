@@ -37,6 +37,8 @@ import { WorksheetDefinitionComponent } from "./worksheet-definition/worksheet-d
 import { TestControlSelectionFormComponent } from "./test-control-selection-form/test-control-selection-form.component";
 import { ResultEntryByWorksheetComponent } from "./result-entry-by-worksheet/result-entry-by-worksheet.component";
 import { ResultEntryByWorksheetHomeComponent } from "./result-entry-by-worksheet-home/result-entry-by-worksheet-home.component";
+import { AcceptedSamplesComponent } from "./accepted-samples/accepted-samples.component";
+import { RejectedSamplesComponent } from "./rejected-samples/rejected-samples.component";
 
 export const components: any[] = [
   PatientsByVisitsListComponent,
@@ -78,6 +80,8 @@ export const components: any[] = [
   ResultEntryByWorksheetComponent,
   ResultEntryByWorksheetHomeComponent,
   SamplesToAcceptComponent,
+  AcceptedSamplesComponent,
+  RejectedSamplesComponent,
 ];
 
 export const sampleAcceptanceAndResultsModals: any[] = [

@@ -261,7 +261,6 @@ export class SampleAcceptanceComponent implements OnInit {
 
   setDepartment(department) {
     this.selectedDepartment = department;
-
     this.getSamples();
   }
 
@@ -406,36 +405,36 @@ export class SampleAcceptanceComponent implements OnInit {
   onOpenNewTab(e): void {
     this.searchingText = "";
     this.selectedDepartment = "";
-    if (e.index === 0) {
-      this.store.dispatch(
-        loadLabSamplesByCollectionDates({
-          datesParameters: this.datesParameters,
-          patients: this.patients,
-          sampleTypes: this.sampleTypes,
-          departments: this.labSamplesDepartments,
-          containers: this.labSamplesContainers,
-          hasStatus: "NO",
-          configs: this.labConfigs,
-          codedSampleRejectionReasons: this.codedSampleRejectionReasons,
-        })
-      );
-      this.currentTabWithDataLoaded = e.index;
-    } else if (this.currentTabWithDataLoaded === 0) {
-      this.store.dispatch(
-        loadLabSamplesByCollectionDates({
-          datesParameters: this.datesParameters,
-          patients: this.patients,
-          sampleTypes: this.sampleTypes,
-          departments: this.labSamplesDepartments,
-          containers: this.labSamplesContainers,
-          hasStatus: "YES",
-          category: "ACCEPTED",
-          configs: this.labConfigs,
-          codedSampleRejectionReasons: this.codedSampleRejectionReasons,
-        })
-      );
-      this.currentTabWithDataLoaded = e.index;
-    }
+    // if (e.index === 0) {
+    //   this.store.dispatch(
+    //     loadLabSamplesByCollectionDates({
+    //       datesParameters: this.datesParameters,
+    //       patients: this.patients,
+    //       sampleTypes: this.sampleTypes,
+    //       departments: this.labSamplesDepartments,
+    //       containers: this.labSamplesContainers,
+    //       hasStatus: "NO",
+    //       configs: this.labConfigs,
+    //       codedSampleRejectionReasons: this.codedSampleRejectionReasons,
+    //     })
+    //   );
+    //   this.currentTabWithDataLoaded = e.index;
+    // } else if (this.currentTabWithDataLoaded === 0) {
+    //   this.store.dispatch(
+    //     loadLabSamplesByCollectionDates({
+    //       datesParameters: this.datesParameters,
+    //       patients: this.patients,
+    //       sampleTypes: this.sampleTypes,
+    //       departments: this.labSamplesDepartments,
+    //       containers: this.labSamplesContainers,
+    //       hasStatus: "YES",
+    //       category: "ACCEPTED",
+    //       configs: this.labConfigs,
+    //       codedSampleRejectionReasons: this.codedSampleRejectionReasons,
+    //     })
+    //   );
+    //   this.currentTabWithDataLoaded = e.index;
+    // }
   }
 
   onResultsReview(event: Event, sample, providerDetails): void {
