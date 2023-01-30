@@ -573,7 +573,8 @@ export class LabSamplesEffects {
           .getLabSamplesByCollectionDates(
             action.datesParameters,
             action?.category,
-            action?.hasStatus
+            action?.hasStatus,
+            action.excludeAllocations
           )
           .pipe(
             map((response) => {

@@ -101,19 +101,19 @@ export class SampleAcceptanceComponent implements OnInit {
       getSettingLabSampleStatusState
     );
 
-    this.store.dispatch(
-      loadLabSamplesByCollectionDates({
-        datesParameters: this.datesParameters,
-        patients: this.patients,
-        sampleTypes: this.sampleTypes,
-        departments: this.labSamplesDepartments,
-        containers: this.labSamplesContainers,
-        hasStatus: "NO",
-        configs: this.labConfigs,
-        codedSampleRejectionReasons: this.codedSampleRejectionReasons,
-      })
-    );
-    this.getSamples();
+    // this.store.dispatch(
+    //   loadLabSamplesByCollectionDates({
+    //     datesParameters: this.datesParameters,
+    //     patients: this.patients,
+    //     sampleTypes: this.sampleTypes,
+    //     departments: this.labSamplesDepartments,
+    //     containers: this.labSamplesContainers,
+    //     hasStatus: "NO",
+    //     configs: this.labConfigs,
+    //     codedSampleRejectionReasons: this.codedSampleRejectionReasons,
+    //   })
+    // );
+    // this.getSamples();
   }
 
   onToggleViewSampleDetails(event: Event, sample: any): void {
