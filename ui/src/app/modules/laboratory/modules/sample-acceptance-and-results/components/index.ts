@@ -43,7 +43,6 @@ export const components: any[] = [
   PatientOrdersComponent,
   SampleArrivalDashboardComponent,
   SamplesCollectedComponent,
-  SamplesToAcceptComponent,
   TestAllocationDashboardComponent,
   SummarySampleCollectedComponent,
   SummarySamplePendingComponent,
@@ -78,6 +77,7 @@ export const components: any[] = [
   TestControlSelectionFormComponent,
   ResultEntryByWorksheetComponent,
   ResultEntryByWorksheetHomeComponent,
+  SamplesToAcceptComponent,
 ];
 
 export const sampleAcceptanceAndResultsModals: any[] = [

@@ -28,6 +28,23 @@
   <mat-tab-group (selectedTabChange)="onOpenNewTab($event)">
     <mat-tab label="Sample Acceptance">
       <ng-template matTabContent>
+        <div class="p-2">
+          <app-samples-to-accept
+            [codedSampleRejectionReasons]="params?.codedSampleRejectionReasons"
+            [labConfigs]="labConfigs"
+            [datesParameters]="datesParameters"
+            [LISConfigurations]="LISConfigurations"
+            [patients]="patients"
+            [sampleTypes]="sampleTypes"
+            [labSamplesDepartments]="labSamplesDepartments"
+            [labSamplesContainers]="labSamplesContainers"
+            [userUuid]="userUuid"
+          ></app-samples-to-accept>
+        </div>
+      </ng-template>
+    </mat-tab>
+    <mat-tab label="Sample Acceptance Old">
+      <ng-template matTabContent>
         <div class="filter-and-legend">
           <mat-form-field class="w-50">
             <mat-label>Search</mat-label>
@@ -163,7 +180,6 @@
                     </td>
                     <!-- <td></td> -->
                     <td>
-                      WorkList
                       {{
                         !LISConfigurations?.isLIS
                           ? order?.order?.orderer?.name

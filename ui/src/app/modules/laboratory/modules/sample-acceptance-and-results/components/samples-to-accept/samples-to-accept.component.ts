@@ -1,413 +1,145 @@
 import { Component, OnInit, Input } from "@angular/core";
 import * as _ from "lodash";
-import { FormControl } from "@angular/forms";
-import { RejectionReasonComponent } from "../rejection-reason/rejection-reason.component";
 import { MatDialog } from "@angular/material/dialog";
 import { Store } from "@ngrx/store";
-import { Observable } from "rxjs";
-import { ResultsFeedingModalComponent } from "../results-feeding-modal/results-feeding-modal.component";
-import { SampleTrackingModalComponent } from "../sample-tracking-modal/sample-tracking-modal.component";
-import { PrintResultsModalComponent } from "../print-results-modal/print-results-modal.component";
-import { take } from "rxjs/operators";
 import { AppState } from "src/app/store/reducers";
-import {
-  getCurrentUserInfo,
-  getProviderDetails,
-} from "src/app/store/selectors/current-user.selectors";
-import { groupLabOrdersBySpecimenSources } from "src/app/shared/helpers/sample-types.helper";
-import {
-  loadActiveVisitsForSampleManagement,
-  reloadPatientsLabOrders,
-  setLoadedSamples,
-  setSampleStatus,
-} from "src/app/store/actions";
-import {
-  formatSamplesToFeedResults,
-  getPatientsCollectedSamples,
-} from "src/app/shared/helpers/patient.helper";
-import { EncountersService } from "src/app/shared/services/encounters.service";
-import {
-  getAllFullCompletedLabSamples,
-  getAllLabSamplesWaitingAcceptance,
-  getLabSamplesForShowingTrackingDetails,
-  getLabSamplesWaitingToFeedResults,
-  getSamplesLoadedState,
-  getSettingLabSampleStatusState,
-  getWorkListFromLabSamples,
-} from "src/app/store/selectors";
-
+import { Observable, of } from "rxjs";
+import { SamplesService } from "src/app/shared/services/samples.service";
+import { getProviderDetails } from "src/app/store/selectors/current-user.selectors";
+import { SharedConfirmationComponent } from "src/app/shared/components/shared-confirmation /shared-confirmation.component";
+import { RejectionReasonComponent } from "../rejection-reason/rejection-reason.component";
+import { take } from "rxjs/operators";
 @Component({
   selector: "app-samples-to-accept",
   templateUrl: "./samples-to-accept.component.html",
   styleUrls: ["./samples-to-accept.component.scss"],
 })
 export class SamplesToAcceptComponent implements OnInit {
-  @Input() visits: any;
-  @Input() sampleTypes: any;
-  @Input() labOrdersBillingInfo: any;
+  @Input() codedSampleRejectionReasons: any;
   @Input() labConfigs: any;
-  @Input() samplesByMRN: any;
-  @Input() visitsParameters: any;
-  @Input() providerDetails: any;
-
-  @Input() labOrdersGroupedByPatients: any;
-  @Input() collectedLabOrders: any;
-  @Input() visitReferences: any;
-
-  @Input() testsContainers: any;
-  @Input() sampleContainers: any;
-
-  @Input() privileges: any;
-  @Input() codedSampleRejectionReasons: any[];
-  @Input() labDepartments: any[];
+  @Input() datesParameters: any;
+  @Input() patients: any[];
+  @Input() sampleTypes: any;
+  @Input() labSamplesDepartments: any;
+  @Input() labSamplesContainers: any;
   @Input() currentUser: any;
-  completedResultsGroupedByMRN$: Observable<any>;
-  authenticatedUser$: Observable<any>;
-  showClinicalNotesSummary: boolean = false;
-  samples: any[];
-  searchingText: string = "";
-  savingChanges: boolean = false;
-  savingMessage: any = {};
+  @Input() LISConfigurations: any;
+  @Input() userUuid: string;
 
-  selected = new FormControl(0);
-  itemsToFeedResults: any = {};
-  samplesWithCompletedTestResults: any[];
-  samplesToTrack: any[];
-  openStatus: any = {};
-
-  currentSample: any;
-  values: any = {};
-  savedData = {};
-  ready: boolean = false;
-  samplesReadyForAction: any = {};
-
-  samplesToAcceptOrReject: any[];
-
-  samplesGroupedBymRNo: any[] = [];
-
-  samplesWithResultsGrouped: any;
-
-  // New
-  samplesLoadedState$: Observable<boolean>;
-  samplesWaitingAcceptanceGroupedByMrNo$: Observable<any[]>;
-  samplesWaitingToFeedResults$: Observable<any[]>;
-
-  patientMRNS: string[];
-
-  itemsToFeedResults$: Observable<any>;
-  samplesToBeTracked$: Observable<any>;
-  technicianWorklist$: Observable<any[]>;
-  samplesFullCompleted$: Observable<any[]>;
-  providerDetails$: Observable<any>;
-  labSamplesWaitingToFeedResults$: Observable<any>;
-  labSamplesForTrackingDetails$: Observable<any>;
-  settingLabSampleStatus$: Observable<boolean>;
-
-  userUuid: string;
+  samplesToAccept$: Observable<any[]>;
   selectedDepartment: string;
+  searchingText: string;
+  excludeAllocations: boolean = true;
+
+  page: number = 1;
+  pageCount: number = 100;
+
+  savingMessage: any = {};
+  providerDetails$: Observable<any>;
+
+  samplesToViewMoreDetails: any = {};
+  saving: boolean = false;
   constructor(
-    private encounterService: EncountersService,
     private dialog: MatDialog,
-    private store: Store<AppState>
+    private store: Store<AppState>,
+    private sampleService: SamplesService
   ) {}
 
   ngOnInit(): void {
-    this.userUuid = this.currentUser?.uuid;
-    if (
-      this.privileges &&
-      !this.privileges["Sample Collection"] &&
-      !this.privileges["Sample Tracking"] &&
-      !this.privileges["Laboratory Reports"] &&
-      !this.privileges["Sample Acceptance and Results"] &&
-      !this.privileges["Tests Settings"]
-    ) {
-      window.location.replace("../../../bahmni/home/index.html#/dashboard");
-    }
-
     this.providerDetails$ = this.store.select(getProviderDetails);
+    this.getSamples();
+  }
 
-    const formattedLabSamples = groupLabOrdersBySpecimenSources(
-      this.labOrdersGroupedByPatients,
-      this.sampleTypes,
-      this.collectedLabOrders,
-      this.testsContainers,
-      this.sampleContainers,
-      this.visitReferences,
-      this.codedSampleRejectionReasons,
-      this.labConfigs,
-      this.labDepartments
-    );
-
-    this.store.dispatch(setLoadedSamples({ labSamples: formattedLabSamples }));
-
-    this.labSamplesWaitingToFeedResults$ = this.store.select(
-      getLabSamplesWaitingToFeedResults,
-      { searchingText: this.searchingText }
-    );
-    this.labSamplesForTrackingDetails$ = this.store.select(
-      getLabSamplesForShowingTrackingDetails,
-      { searchingText: this.searchingText }
-    );
-    if (this.visits && this.sampleTypes)
-      this.store.dispatch(
-        loadActiveVisitsForSampleManagement({
-          visits: this.visits,
-          sampleTypes: this.sampleTypes,
-          billingInfo: null,
-        })
-      );
-    this.samplesLoadedState$ = this.store.select(getSamplesLoadedState);
-    this.samplesWaitingAcceptanceGroupedByMrNo$ = this.store.select(
-      getAllLabSamplesWaitingAcceptance,
-      { searchingText: this.searchingText }
-    );
-
-    this.samplesFullCompleted$ = this.store.select(
-      getAllFullCompletedLabSamples,
-      { searchingText: this.searchingText }
-    );
-
-    // console.log('providerDetails', this.providerDetails);
-    this.technicianWorklist$ = this.store.select(getWorkListFromLabSamples, {
-      userUuid: this.providerDetails?.uuid,
-    });
-
-    this.settingLabSampleStatus$ = this.store.select(
-      getSettingLabSampleStatusState
-    );
-    this.samples = getPatientsCollectedSamples(
-      this.visits,
-      this.sampleTypes,
-      this.labOrdersBillingInfo
-    );
-
-    this.samplesToAcceptOrReject = _.filter(this.samples, {
-      accepted: false,
-      rejected: false,
-    });
-
-    this.samplesGroupedBymRNo = _.map(
-      Object.keys(_.groupBy(this.samplesToAcceptOrReject, "mrNo")),
-      (key) => {
-        return {
-          mrNo: key,
-          samples: _.groupBy(this.samplesToAcceptOrReject, "mrNo")[key],
-        };
-      }
-    );
-
-    this.samplesWithCompletedTestResults = _.filter(
-      formatSamplesToFeedResults(this.samples),
+  getSamples(): void {
+    this.samplesToAccept$ = this.sampleService.getLabSamplesByCollectionDates(
+      this.datesParameters,
+      null,
+      "NO",
+      this.excludeAllocations,
+      null,
       {
-        accepted: true,
-        rejected: false,
-        allHaveResults: true,
-        secondSignOff: true,
+        departments: this.labSamplesDepartments,
+        specimenSources: this.sampleTypes,
+        codedRejectionReasons: this.codedSampleRejectionReasons,
       }
     );
-
-    this.samplesToTrack = _.filter(formatSamplesToFeedResults(this.samples), {
-      collected: true,
-      rejected: false,
-      allHaveResults: false,
-      secondSignOff: false,
-    });
-
-    this.samplesGroupedBymRNo = _.groupBy(this.samplesByMRN, "mrNo");
-
-    this.patientMRNS = Object.keys(this.samplesGroupedBymRNo);
-
-    this.authenticatedUser$ = this.store.select(getCurrentUserInfo);
-
-    // Reload data after 5 mins
-    setInterval(() => {
-      this.store.dispatch(
-        reloadPatientsLabOrders({
-          visitStartDate: this.visitsParameters.startDate,
-          endDate: this.visitsParameters.endDate,
-          configs: this.labConfigs,
-        })
-      );
-    }, 300000);
   }
 
-  setDepartment(department) {
-    this.selectedDepartment = department;
-
-    this.onSearch(null);
+  onToggleViewSampleDetails(event: Event, sample: any): void {
+    event.stopPropagation();
+    console.log(sample);
   }
 
-  onSearch(e) {
-    if (e) {
-      e.stopPropagation();
-    }
-    this.labSamplesWaitingToFeedResults$ = this.store.select(
-      getLabSamplesWaitingToFeedResults,
-      { searchingText: this.searchingText, department: this.selectedDepartment }
-    );
-
-    this.samplesWaitingAcceptanceGroupedByMrNo$ = this.store.select(
-      getAllLabSamplesWaitingAcceptance,
-      { searchingText: this.searchingText, department: this.selectedDepartment }
-    );
-
-    this.labSamplesForTrackingDetails$ = this.store.select(
-      getLabSamplesForShowingTrackingDetails,
-      { searchingText: this.searchingText, department: this.selectedDepartment }
-    );
-
-    this.samplesFullCompleted$ = this.store.select(
-      getAllFullCompletedLabSamples,
-      { searchingText: this.searchingText, department: this.selectedDepartment }
-    );
-  }
-
-  onOpenNewTab(e) {
-    this.searchingText = "";
-    this.selectedDepartment = null;
-    this.labSamplesWaitingToFeedResults$ = this.store.select(
-      getLabSamplesWaitingToFeedResults,
-      { searchingText: this.searchingText, department: this.selectedDepartment }
-    );
-
-    this.samplesWaitingAcceptanceGroupedByMrNo$ = this.store.select(
-      getAllLabSamplesWaitingAcceptance,
-      { searchingText: this.searchingText, department: this.selectedDepartment }
-    );
-
-    this.labSamplesForTrackingDetails$ = this.store.select(
-      getLabSamplesForShowingTrackingDetails,
-      { searchingText: this.searchingText, department: this.selectedDepartment }
-    );
-
-    this.samplesFullCompleted$ = this.store.select(
-      getAllFullCompletedLabSamples,
-      { searchingText: this.searchingText, department: this.selectedDepartment }
-    );
-  }
-
-  onOpenModalForFeedingResults(e, sample) {
-    e.stopPropagation();
-    this.dialog.open(ResultsFeedingModalComponent, {
-      data: {
-        sample: sample,
-        currentUser: this.currentUser,
-        labConfigs: this.labConfigs,
-        maxHeight:
-          sample?.orders?.length == 1 &&
-          sample?.orders[0]?.concept?.setMembers?.length == 0
-            ? "60vh"
-            : "80vh",
-      },
-      maxHeight:
-        sample?.orders?.length == 1 &&
-        sample?.orders[0]?.concept?.setMembers?.length == 0
-          ? "70vh"
-          : "90vh",
-      width: "100%",
-      disableClose: false,
-      panelClass: "custom-dialog-container",
-    });
-
-    this.store.dispatch(
-      reloadPatientsLabOrders({
-        visitStartDate: this.visitsParameters.startDate,
-        endDate: this.visitsParameters.endDate,
-        configs: this.labConfigs,
-      })
-    );
-  }
-
-  openPrintDialog(e, key) {
-    e.stopPropagation();
-
-    this.dialog.open(PrintResultsModalComponent, {
-      data: { samples: this.samplesGroupedBymRNo[key] },
-      width: "60%",
-      height: "610px",
-      disableClose: false,
-    });
-
-    this.store.dispatch(
-      reloadPatientsLabOrders({
-        visitStartDate: this.visitsParameters.startDate,
-        endDate: this.visitsParameters.endDate,
-        configs: this.labConfigs,
-      })
-    );
-  }
-
-  changeTab(val) {
-    this.selected.setValue(val);
-  }
-
-  setViewItems(e, sample) {
-    e.stopPropagation();
-    this.dialog.open(SampleTrackingModalComponent, {
-      width: "60%",
-      height: "400px",
-      disableClose: false,
-      data: sample,
-      panelClass: "custom-dialog-container",
-    });
-    this.store.dispatch(
-      reloadPatientsLabOrders({
-        visitStartDate: this.visitsParameters.startDate,
-        endDate: this.visitsParameters.endDate,
-        configs: this.labConfigs,
-      })
-    );
-  }
-
-  unSetSampleToView(sample, addedKey) {
-    this.samplesReadyForAction[
-      sample.sampleUniquIdentification + "-" + addedKey
-    ] = false;
-  }
-
-  setEnteredValue(item, val) {
-    this.values[
-      this.currentSample.sampleUniquIdentification + "-" + item.display
-    ] = val;
-  }
-
-  accept(e, sample, providerDetails) {
-    e.stopPropagation();
-
-    this.savingMessage[sample?.id + "-accept"] = true;
-
-    const data = {
-      sample: {
-        uuid: sample?.sampleUuid,
-      },
-      user: {
-        uuid: this.userUuid,
-      },
-      remarks: "accepted",
-      category: "ACCEPTED",
-      status: "ACCEPTED",
-    };
-
-    this.store.dispatch(
-      setSampleStatus({
-        status: data,
-        details: {
-          ...sample,
-          acceptedBy: {
-            uuid: providerDetails?.uuid,
-            name: providerDetails?.display,
-          },
+  accept(event: Event, sample: any, providerDetails: any): void {
+    event.stopPropagation();
+    this.saving = true;
+    let confirmDialog;
+    if (this.LISConfigurations?.isLIS) {
+      confirmDialog = this.dialog.open(SharedConfirmationComponent, {
+        width: "25%",
+        data: {
+          modalTitle: `Accept Sample`,
+          modalMessage: `Please, provide results compromization remarks if any upon accepting this sample. Click confirm to accept the sample!`,
+          showRemarksInput: true,
         },
-      })
-    );
+        disableClose: false,
+        panelClass: "custom-dialog-container",
+      });
+    }
 
-    this.store.dispatch(
-      reloadPatientsLabOrders({
-        visitStartDate: this.visitsParameters.startDate,
-        endDate: this.visitsParameters.endDate,
-        configs: this.labConfigs,
-      })
-    );
+    (this.LISConfigurations?.isLIS
+      ? confirmDialog.afterClosed()
+      : of({ confirmed: true })
+    ).subscribe((confirmationObject) => {
+      if (confirmationObject?.confirmed) {
+        if (
+          confirmationObject?.remarks &&
+          confirmationObject?.remarks.length > 0
+        ) {
+          const confirmationRemarks = {
+            sample: {
+              uuid: sample?.uuid,
+            },
+            user: {
+              uuid: this.userUuid,
+            },
+            remarks: confirmationObject?.remarks,
+            status: "ACCEPTANCE_REMARKS",
+            category: "ACCEPTANCE_REMARKS",
+          };
+          this.sampleService
+            .saveSampleStatuses(confirmationRemarks)
+            .subscribe((response) => {
+              console.log(
+                response?.error ? "Error Occured" : `Success: ${response}`
+              );
+            });
+        }
+
+        this.savingMessage[sample?.id + "-accept"] = true;
+        const data = [
+          {
+            sample: {
+              uuid: sample?.uuid,
+            },
+            user: {
+              uuid: this.userUuid,
+            },
+            remarks: "accepted",
+            status: "ACCEPTED",
+            category: "ACCEPTED",
+          },
+        ];
+        this.sampleService.saveSampleStatuses(data).subscribe((response) => {
+          if (response && !response?.error) {
+            this.saving = false;
+            this.getSamples();
+          } else {
+            this.saving = false;
+          }
+        });
+      }
+    });
   }
 
   reject(e, sample, providerDetails) {
@@ -415,7 +147,6 @@ export class SamplesToAcceptComponent implements OnInit {
     this.dialog
       .open(RejectionReasonComponent, {
         width: "40%",
-        height: "250px",
         disableClose: false,
         data: {
           sample: sample,
@@ -425,53 +156,32 @@ export class SamplesToAcceptComponent implements OnInit {
       })
       .afterClosed()
       .pipe(take(1))
-      .subscribe((reason) => {
-        if (reason) {
+      .subscribe((response) => {
+        if (response && response?.reasons) {
+          this.saving = true;
           this.savingMessage[sample?.id + "-reject"] = true;
 
-          const data = {
-            sample: {
-              uuid: sample?.sampleUuid,
-            },
-            user: {
-              uuid: this.userUuid,
-            },
-            remarks: reason?.reasonUuid,
-            status: "REJECTED",
-          };
-          this.store.dispatch(
-            setSampleStatus({
-              status: data,
-              details: {
-                ...sample,
-                rejectionReason: reason?.reasonText,
-                acceptedBy: {
-                  uuid: providerDetails?.uuid,
-                  name: providerDetails?.display,
-                },
+          const data = response?.reasons?.map((reason) => {
+            return {
+              sample: {
+                uuid: sample?.uuid,
               },
-            })
-          );
+              user: {
+                uuid: this.userUuid,
+              },
+              remarks: response?.rejectionRemarks
+                ? response?.rejectionRemarks
+                : "None",
+              category: "REJECTED_LABORATORY",
+              status: reason?.uuid,
+            };
+          });
+          this.sampleService.saveSampleStatuses(data).subscribe((response) => {
+            if (response && !response?.error) {
+              this.getSamples();
+            }
+          });
         }
-
-        this.store.dispatch(
-          reloadPatientsLabOrders({
-            visitStartDate: this.visitsParameters.startDate,
-            endDate: this.visitsParameters.endDate,
-            configs: this.labConfigs,
-          })
-        );
       });
-  }
-
-  setValue(val, item) {
-    this.values[
-      this.currentSample.sampleUniquIdentification + "-" + item.display
-    ] = val;
-  }
-
-  showClinicalNotes(e) {
-    e.stopPropagation();
-    this.showClinicalNotesSummary = !this.showClinicalNotesSummary;
   }
 }
