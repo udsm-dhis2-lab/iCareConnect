@@ -12,12 +12,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 @Entity
 @Table(name = "lb_sample")
 @DiscriminatorValue("00")
-public class SampleExt extends Sample{
-
-    @Override
+public class SampleExt extends Sample {
+	
+	@Override
     public Map<String, Object> toMap() {
         HashMap<String, Object> sampleObject = (new HashMap<String, Object>());
         sampleObject.put("label", this.getLabel());

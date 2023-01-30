@@ -33,7 +33,7 @@ public class WorksheetDefinitionDAO extends BaseDAO<WorksheetDefinition> {
 			
 			queryStr += "lower(wd.code) like lower(:q)";
 		}
-
+		
 		if (expirationDate != null) {
 			if (!queryStr.contains("WHERE")) {
 				queryStr += " WHERE ";
@@ -57,11 +57,11 @@ public class WorksheetDefinitionDAO extends BaseDAO<WorksheetDefinition> {
 		if (q != null) {
 			query.setParameter("q", "%" + q.replace(" ", "%") + "%");
 		}
-
+		
 		if (expirationDate != null) {
 			query.setParameter("expirationDate", expirationDate);
 		}
-
+		
 		query.setFirstResult(startIndex);
 		query.setMaxResults(limit);
 		

@@ -38,9 +38,11 @@ public interface StoreService extends OpenmrsService {
 	
 	public List<RequisitionStatus> getRequisitionStatuses();
 	
-	public ListResult<Requisition> getRequestsByRequestingLocation(String requestingLocationUuid, Pager pager, RequisitionStatus.RequisitionStatusCode status);
+	public ListResult<Requisition> getRequestsByRequestingLocation(String requestingLocationUuid, Pager pager,
+	        RequisitionStatus.RequisitionStatusCode status);
 	
-	public ListResult<Requisition> getRequestsForRequestedLocation(String requestedLocationUuid, Pager pager, RequisitionStatus.RequisitionStatusCode status);
+	public ListResult<Requisition> getRequestsForRequestedLocation(String requestedLocationUuid, Pager pager,
+	        RequisitionStatus.RequisitionStatusCode status);
 	
 	public Requisition getRequestByUuid(String requisitionUuid);
 	
@@ -111,8 +113,8 @@ public interface StoreService extends OpenmrsService {
 	Supplier saveSupplier(Supplier supplier);
 	
 	List<Supplier> getSuppliers(Integer startIndex, Integer limit);
-
-    StockInvoiceStatus saveStockInvoiceStatus(StockInvoiceStatus stockInvoiceStatus) throws Exception;
-
+	
+	StockInvoiceStatus saveStockInvoiceStatus(StockInvoiceStatus stockInvoiceStatus) throws Exception;
+	
 	List<StockInvoiceStatus> getStockInvoicesStatus(Integer startIndex, Integer limit, String q);
 }

@@ -173,40 +173,41 @@ public class StoreController {
 	
 	@RequestMapping(value = "requests", method = RequestMethod.GET)
 	@ResponseBody
-	public Map<String, Object> getRequisitionsByLocation(
-	        @RequestParam(required = false) String requestingLocationUuid,
+	public Map<String, Object> getRequisitionsByLocation(@RequestParam(required = false) String requestingLocationUuid,
 	        @RequestParam(required = false) String requestedLocationUuid,
-			@RequestParam(defaultValue = "true",value = "paging", required = false) boolean paging,
-			@RequestParam(defaultValue = "50",value = "pageSize", required = false) Integer pageSize,
-			@RequestParam(defaultValue = "1",value = "page",required = false) Integer page,
-			@RequestParam(value = "status",required = false) RequisitionStatus.RequisitionStatusCode status) {
-
+	        @RequestParam(defaultValue = "true", value = "paging", required = false) boolean paging,
+	        @RequestParam(defaultValue = "50", value = "pageSize", required = false) Integer pageSize,
+	        @RequestParam(defaultValue = "1", value = "page", required = false) Integer page,
+	        @RequestParam(value = "status", required = false) RequisitionStatus.RequisitionStatusCode status) {
+		
 		Pager pager = new Pager();
 		pager.setAllowed(paging);
 		pager.setPageSize(pageSize);
 		pager.setPage(page);
-
+		
 		if (requestedLocationUuid != null && requestingLocationUuid == null) {
-			ListResult<Requisition> requisitions = this.storeService.getRequestsForRequestedLocation(requestedLocationUuid,pager,status);
+			ListResult<Requisition> requisitions = this.storeService.getRequestsForRequestedLocation(requestedLocationUuid,
+			    pager, status);
 			
-//			List<Map<String, Object>> requisitionsList = new ArrayList<Map<String, Object>>();
-//
-//			for (Requisition requisition : requisitions.getResults()) {
-//				requisitionsList.add(requisition.toMap());
-//			}
+			//			List<Map<String, Object>> requisitionsList = new ArrayList<Map<String, Object>>();
+			//
+			//			for (Requisition requisition : requisitions.getResults()) {
+			//				requisitionsList.add(requisition.toMap());
+			//			}
 			
 			return requisitions.toMap();
 			
 		}
 		
 		if (requestingLocationUuid != null && requestedLocationUuid == null) {
-			ListResult<Requisition> requisitions = this.storeService.getRequestsByRequestingLocation(requestingLocationUuid,pager,status);
+			ListResult<Requisition> requisitions = this.storeService.getRequestsByRequestingLocation(requestingLocationUuid,
+			    pager, status);
 			
-//			List<Map<String, Object>> requisitionsList = new ArrayList<Map<String, Object>>();
-//
-//			for (Requisition requisition : requisitions.getResults()) {
-//				requisitionsList.add(requisition.toMap());
-//			}
+			//			List<Map<String, Object>> requisitionsList = new ArrayList<Map<String, Object>>();
+			//
+			//			for (Requisition requisition : requisitions.getResults()) {
+			//				requisitionsList.add(requisition.toMap());
+			//			}
 			
 			return requisitions.toMap();
 		}
@@ -618,7 +619,7 @@ public class StoreController {
 		return suppliersMap;
 
 	}
-
+	
 	@RequestMapping(value = "stockinvoicesstatus",method = RequestMethod.POST)
 	@ResponseBody
 	public List<Map<String,Object>> addStockInvoiceStatuses(@RequestBody List<Map<String,Object>> stockInvoicesStatusMap) throws Exception {
@@ -633,7 +634,7 @@ public class StoreController {
 
 		return newStockInvoiceStatusMapList;
 	}
-
+	
 	@RequestMapping(value ="stockinvoicesstatus", method = RequestMethod.GET)
 	@ResponseBody
 	public List<Map<String,Object>> getStockInvoicesStatus(@RequestParam(value = "startIndex",defaultValue = "0", required = false) Integer startIndex,@RequestParam(value="limit",required = false,defaultValue = "100") Integer limit, @RequestParam(required = false) String q){

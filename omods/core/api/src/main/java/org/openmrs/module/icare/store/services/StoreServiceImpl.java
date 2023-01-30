@@ -52,7 +52,7 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 	StockInvoiceDAO stockInvoiceDAO;
 	
 	SupplierDAO supplierDAO;
-
+	
 	StockInvoiceStatusDAO stockInvoiceStatusDAO;
 	
 	public void setLedgerDAO(LedgerDAO ledgerDAO) {
@@ -106,11 +106,11 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 	public void setSupplierDAO(SupplierDAO supplierDAO) {
 		this.supplierDAO = supplierDAO;
 	}
-
+	
 	public void setStockInvoiceStatusDAO(StockInvoiceStatusDAO stockInvoiceStatusDAO) {
 		this.stockInvoiceStatusDAO = stockInvoiceStatusDAO;
 	}
-
+	
 	@Override
 	public ReorderLevel addReorderLevel(ReorderLevel reorderLevel) {
 		
@@ -198,9 +198,11 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 	}
 	
 	@Override
-	public ListResult<Requisition> getRequestsByRequestingLocation(String requestingLocationUuid, Pager pager, RequisitionStatus.RequisitionStatusCode status) {
+	public ListResult<Requisition> getRequestsByRequestingLocation(String requestingLocationUuid, Pager pager,
+	        RequisitionStatus.RequisitionStatusCode status) {
 		
-		ListResult<Requisition> requisitions = this.requisitionDAO.getRequisitionsByRequestingLocation(requestingLocationUuid,pager,status);
+		ListResult<Requisition> requisitions = this.requisitionDAO.getRequisitionsByRequestingLocation(
+		    requestingLocationUuid, pager, status);
 		
 		for (Requisition requisition : requisitions.getResults()) {
 			List<RequisitionStatus> requisitionStatuses = this.requisitionStatusDAO.getStatusesByRequisition(requisition
@@ -214,9 +216,11 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 	}
 	
 	@Override
-	public ListResult<Requisition> getRequestsForRequestedLocation(String requestedLocationUuid, Pager pager, RequisitionStatus.RequisitionStatusCode status) {
+	public ListResult<Requisition> getRequestsForRequestedLocation(String requestedLocationUuid, Pager pager,
+	        RequisitionStatus.RequisitionStatusCode status) {
 		
-		ListResult<Requisition> requisitions = this.requisitionDAO.getRequisitionsByRequestedLocation(requestedLocationUuid,pager,status);
+		ListResult<Requisition> requisitions = this.requisitionDAO.getRequisitionsByRequestedLocation(requestedLocationUuid,
+		    pager, status);
 		
 		for (Requisition requisition : requisitions.getResults()) {
 			List<RequisitionStatus> requisitionStatuses = this.requisitionStatusDAO.getStatusesByRequisition(requisition
@@ -538,25 +542,27 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 	public List<Supplier> getSuppliers(Integer startIndex, Integer limit) {
 		return supplierDAO.getSuppliers(startIndex, limit);
 	}
-
-	public StockInvoice getStockInvoicebyUuid(String stockInvoiceUuid){
-		return  stockInvoiceDAO.findByUuid(stockInvoiceUuid);
+	
+	public StockInvoice getStockInvoicebyUuid(String stockInvoiceUuid) {
+		return stockInvoiceDAO.findByUuid(stockInvoiceUuid);
 	}
+	
 	@Override
 	public StockInvoiceStatus saveStockInvoiceStatus(StockInvoiceStatus stockInvoiceStatus) throws Exception {
 		StockInvoice stockInvoice = this.getStockInvoicebyUuid(stockInvoiceStatus.getStockInvoice().getUuid());
-		if(stockInvoice == null){
-			throw new Exception(" The stock invoice with uuid "+ stockInvoiceStatus.getStockInvoice().getUuid()+" does not exist");
+		if (stockInvoice == null) {
+			throw new Exception(" The stock invoice with uuid " + stockInvoiceStatus.getStockInvoice().getUuid()
+			        + " does not exist");
 		}
 		stockInvoiceStatus.setStockInvoice(stockInvoice);
 		return stockInvoiceStatusDAO.save(stockInvoiceStatus);
 	}
-
+	
 	@Override
 	public List<StockInvoiceStatus> getStockInvoicesStatus(Integer startIndex, Integer limit, String q) {
-		return stockInvoiceStatusDAO.getStockInvoicesStatus(startIndex,limit,q);
+		return stockInvoiceStatusDAO.getStockInvoicesStatus(startIndex, limit, q);
 	}
-
+	
 	@Override
 	public StockInvoice saveStockInvoice(StockInvoice stockInvoice) throws Exception {
 		
