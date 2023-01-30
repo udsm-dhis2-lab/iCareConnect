@@ -618,4 +618,19 @@ public class StoreController {
 		return suppliersMap;
 
 	}
+
+	@RequestMapping(value = "stockinvoicestatus",method = RequestMethod.POST)
+	@ResponseBody
+	public List<Map<String,Object>> addStockInvoiceStatuses(@RequestBody List<Map<String,Object>> stockInvoicesStatusMap) throws ParseException {
+
+		List<Map<String,Object>> newStockInvoiceStatusMapList = new ArrayList<>();
+		for(Map<String,Object> stockInvoiceStatusMap : stockInvoicesStatusMap){
+			StockInvoiceStatus stockInvoiceStatus = StockInvoiceStatus.fromMap(stockInvoiceStatusMap);
+
+			StockInvoiceStatus savedStockInvoiceStatus = storeService.saveStockInvoiceStatus(stockInvoiceStatus);
+			newStockInvoiceStatusMapList.add(savedStockInvoiceStatus.toMap());
+		}
+
+		return newStockInvoiceStatusMapList;
+	}
 }
