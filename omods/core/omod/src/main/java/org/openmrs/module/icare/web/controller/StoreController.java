@@ -638,6 +638,12 @@ public class StoreController {
 	@ResponseBody
 	public List<Map<String,Object>> getStockInvoicesStatus(@RequestParam(value = "startIndex",defaultValue = "0", required = false) Integer startIndex,@RequestParam(value="limit",required = false,defaultValue = "100") Integer limit, @RequestParam(required = false) String q){
 
-		List<StockInvoiceStatus> stockInvoiceStatus = storeService.getStockInvoicesStatus(startIndex,limit,q);
+		List<StockInvoiceStatus> stockInvoiceStatusList = storeService.getStockInvoicesStatus(startIndex,limit,q);
+		List<Map<String,Object>> stockInvoiceStatusMapList = new ArrayList<>();
+		for(StockInvoiceStatus stockInvoiceStatus : stockInvoiceStatusList){
+			stockInvoiceStatusMapList.add(stockInvoiceStatus.toMap());
+		}
+
+		return stockInvoiceStatusMapList;
 	}
 }
