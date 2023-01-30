@@ -714,4 +714,25 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		assertThat("created 1 supplier", suppliersObjectMap.size(), is(1));
 		
 	}
+
+	@Test
+	public void creatingAndGettingStockInvoicesStatus() throws Exception {
+		String dto = this.readFile("dto/store/stock-invoice-status-create.json");
+		List<Map<String,Object>>  stockInvoiceStatusMapList = (new ObjectMapper()).readValue(dto,List.class);
+
+		//post stock invoices status
+		MockHttpServletRequest newPostRequest = newPostRequest("store/stockinvoicesstatus",stockInvoiceStatusMapList);
+		MockHttpServletResponse handle = handle(newPostRequest);
+
+		List<Map<String,Object>> createdStockInvoicesStatus = (new ObjectMapper()).readValue(handle.getContentAsString(),List.class);
+		assertThat("Created 1 stock invoice status",createdStockInvoicesStatus.size() == 1);
+
+		// get stock invoices status
+		MockHttpServletRequest newGetRequest = newGetRequest("store/stockinvoicesstatus", new Parameter("startIndex","1"),new Parameter("limit","100"),new Parameter("q","DRAFT"));
+		MockHttpServletResponse handle2 = handle((newGetRequest));
+		List<Map<String,Object>> stockInvoicesStatusListMap = (new ObjectMapper()).readValue(handle2.getContentAsString(),List.class);
+		assertThat("There is one drafted stock invoice",stockInvoicesStatusListMap.size(),is(1));
+
+
+	}
 }

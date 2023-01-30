@@ -548,6 +548,7 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 		if(stockInvoice == null){
 			throw new Exception(" The stock invoice with uuid "+ stockInvoiceStatus.getStockInvoice().getUuid()+" does not exist");
 		}
+		stockInvoiceStatus.setStockInvoice(stockInvoice);
 		return stockInvoiceStatusDAO.save(stockInvoiceStatus);
 	}
 

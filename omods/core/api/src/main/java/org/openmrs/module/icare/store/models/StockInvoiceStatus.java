@@ -70,10 +70,10 @@ public class StockInvoiceStatus extends BaseOpenmrsData implements java.io.Seria
         stockInvoiceStatusMap.put("remarks",this.getRemarks());
         stockInvoiceStatusMap.put("uuid",this.getUuid());
 
-        Map<String,Object> stockInvoice = new HashMap<>();
-        stockInvoiceStatusMap.put("uuid",this.getStockInvoice().getUuid());
-        stockInvoiceStatusMap.put("display",this.getStockInvoice().getInvoiceNumber());
-        stockInvoiceStatusMap.put("stockInvoice",stockInvoice);
+        Map<String,Object> stockInvoiceMap = new HashMap<>();
+        stockInvoiceMap.put("uuid",this.getStockInvoice().getUuid());
+        stockInvoiceMap.put("display",this.getStockInvoice().getInvoiceNumber());
+        stockInvoiceStatusMap.put("stockInvoice",stockInvoiceMap);
 
 
         return stockInvoiceStatusMap;

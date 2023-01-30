@@ -12,7 +12,7 @@ public class StockInvoiceStatusDAO extends BaseDAO<StockInvoiceStatus> {
 
         DbSession dbSession = this.getSession();
 
-        String querStr = "SELECT stinvstatus FROM StockInvoiceStatus";
+        String querStr = "SELECT stinvstatus FROM StockInvoiceStatus stinvstatus";
 
         if(search != null){
             querStr += " WHERE lower(stinvstatus.status) LIKE lower(:search)";
