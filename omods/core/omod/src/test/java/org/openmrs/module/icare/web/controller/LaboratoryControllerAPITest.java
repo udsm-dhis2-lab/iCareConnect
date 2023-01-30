@@ -804,7 +804,8 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		//2. Getting worksheet definitions
 		//When
 		MockHttpServletRequest newGetRequest = newGetRequest("lab/worksheetdefinitions", new Parameter("startDate",
-		        "2022-12-10"), new Parameter("endDate", "2022-12-11"), new Parameter("q", "WD"), new Parameter("expirationDate", "2023-01-18 00:12:22"));
+		        "2022-12-10"), new Parameter("endDate", "2022-12-11"), new Parameter("q", "WD"), new Parameter(
+		        "expirationDate", "2023-01-18 00:12:22"));
 		MockHttpServletResponse handle2 = handle(newGetRequest);
 		
 		List<Map<String, Object>> worksheetdefinitions = (new ObjectMapper()).readValue(handle2.getContentAsString(),
