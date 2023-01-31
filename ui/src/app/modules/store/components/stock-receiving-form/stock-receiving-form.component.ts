@@ -32,4 +32,8 @@ export class StockReceivingFormComponent implements OnInit {
       }
     } ));
   }
+
+  loadInvoices(){
+    // this.invoice
+  }
 }
