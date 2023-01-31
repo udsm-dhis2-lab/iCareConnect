@@ -1,0 +1,21 @@
+<div class="w-100" *ngIf="{
+    stockInvoices: stockInvoices$ | async
+} as params">
+  <div *ngIf="params?.stockInvoices?.results?.length">
+    <mat-accordion>
+      <mat-expansion-panel
+        class="border mat-elevation-z0 mt-2"
+        *ngFor="let invoice of params?.stockInvoices?.results; let invoiceIndex = index"
+        [expanded]="invoiceIndex === 0"
+      >
+        <mat-expansion-panel-header class="d-flex justify-content-between">
+          <mat-panel-title>
+            <span>INVOICE: {{ invoice?.invoiceNumber }}</span>
+            <span class="ml-4">{{ invoice?.supplier?.name }}</span>
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <app-stock-invoice-items [invoice]="invoice"></app-stock-invoice-items>
+      </mat-expansion-panel>
+    </mat-accordion>
+  </div>
+</div>

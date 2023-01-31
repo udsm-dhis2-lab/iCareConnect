@@ -4,6 +4,9 @@ import { ReOrderLevelItemsListComponent } from "./re-order-level-items-list/re-o
 import { RequisitionReceiptByStoreComponent } from "./requisition-receipt-by-store/requisition-receipt-by-store.component";
 import { StockBatchListComponent } from "./stock-batch-list/stock-batch-list.component";
 import { StockInOtherUnitsComponent } from "./stock-in-other-units/stock-in-other-units.component";
+import { StockInvoiceItemsComponent } from "./stock-invoice-items/stock-invoice-items.component";
+import { StockInvoiceComponent } from "./stock-invoice/stock-invoice.component";
+import { StockInvoicesListComponent } from "./stock-invoices-list/stock-invoices-list.component";
 import { StockOutItemsComponent } from "./stock-out-items/stock-out-items.component";
 import { StockReceivingFormFieldsComponent } from "./stock-receiving-form-fields/stock-receiving-form-fields.component";
 import { StockReceivingFormComponent } from "./stock-receiving-form/stock-receiving-form.component";
@@ -26,4 +29,7 @@ export const stockComponents: any[] = [
   SupplierFormComponent,
   SuppliersListComponent,
   StockReceivingFormFieldsComponent,
+  StockInvoiceComponent,
+  StockInvoicesListComponent,
+  StockInvoiceItemsComponent,
 ];
