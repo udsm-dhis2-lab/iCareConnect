@@ -1,0 +1,30 @@
+<div class="w-100" *ngIf="{
+    suppliers: suppliers$ | async,
+    unitsOfMeasurementSettings: unitsOfMeasurementSettings$ | async
+} as params">
+  <mat-tab-group>
+    <mat-tab *ngIf="params?.unitsOfMeasurementSettings && params?.suppliers" >
+      <ng-template mat-tab-label>
+        <span>Receive New Items</span>
+      </ng-template>
+      <app-stock-receiving-form 
+          [suppliers]="params?.suppliers"
+          [unitsOfMeasurementSettings]="params?.unitsOfMeasurementSettings"
+        ></app-stock-receiving-form>
+    </mat-tab>
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <span>Draft Invoices</span>
+      </ng-template>
+      <app-stock-invoices-list></app-stock-invoices-list>
+    </mat-tab>
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <span>Receive Invoices</span>
+      </ng-template>
+      <div>
+        <h1>New Items</h1>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</div>

@@ -38,29 +38,9 @@ export class StockStatusListComponent implements OnInit {
   constructor(
     private stockService: StockService,
     private dialog: MatDialog,
-    private locationService: LocationService,
-    private supplierService: SupplierService,
-    private systemSettingsService: SystemSettingsService,
-    private conceptService: ConceptsService,
   ) {}
 
   ngOnInit(): void {
-    this.suppliers$ = this.supplierService.getSuppliers().pipe(
-      map((response) => {
-        if (!response?.error) {
-          return response;
-        }
-        if (response?.error) {
-          this.errors = [...this.errors, response.error];
-        }
-      })
-    );
-
-    this.unitsOfMeasurementSettings$ =
-      this.systemSettingsService.getSystemSettingsByKey(
-        "iCare.store.mapping.items.unitOfMeasure.mappingSource"
-      );
-
     this.getStock();
   }
 

@@ -1,0 +1,53 @@
+<div class="w-100" *ngIf="{
+    stockInvoiceItems: stockInvoiceItems$ | async
+} as params">
+   <div class="row">
+    <div class="col-12">
+      
+      <table class="table table-hover table-striped">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Item</th>
+                <th>Unit of Measure</th>
+                <th>Order Quantity</th>
+                <th>Mfg Batch No</th>
+                <th>Batch Quantity</th>
+                <th>Expiry Date</th>
+                <th>Unit Price</th>
+                <th>Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1</td>
+                <td>2</td>
+                <td>3</td>
+                <td>4</td>
+                <td>5</td>
+                <td>6</td>
+                <td>7</td>
+                <td>8</td>
+                <td>9</td>
+                <td>
+                  <button
+                    mat-icon-button
+                    [matMenuTriggerFor]="menu"
+                  >
+                    <mat-icon>more_vert</mat-icon>
+                  </button>
+                  <mat-menu #menu="matMenu">
+                    <button
+                      mat-menu-item
+                    >
+                      <mat-icon>edit</mat-icon>
+                      <span>Delete</span>
+                    </button>
+                  </mat-menu>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+    </div>
+  </div>
+</div>
