@@ -2,7 +2,8 @@
   *ngIf="{
     stocksList: stocksList$ | async,
     currentItemStock: currentItemStock$ | async,
-    suppliers: suppliers$ | async
+    suppliers: suppliers$ | async,
+    unitsOfMeasurementSettings: unitsOfMeasurementSettings$ | async
   } as params"
 >
   <ng-container *ngIf="!showReceivingForm">
@@ -162,6 +163,7 @@
           <app-stock-receiving-form 
             class="col-12"
             [suppliers]="params?.suppliers"
+            [unitsOfMeasurementSettings]="params?.unitsOfMeasurementSettings"
           ></app-stock-receiving-form>
         </div>
     </div>

@@ -1,14 +1,11 @@
-<div>
-  <div class="row">
-    <div class="col-11">
-      <app-form [fields]="commonFields" [isFormHorizontal]="true" (formUpdate)="onFormUpdate($event)"></app-form>
-    </div>
-  </div>
+<div *ngIf="{
+  unitsOfMeasurements: unitsOfMeasurements$ | async
+} as params">
   <div class="row">
     <div class="col-12">
       <mat-accordion>
         <mat-expansion-panel
-          class="border mat-elevation-z0 mt-2"
+          class="border mat-elevation-z0"
           [expanded]="false"
         >
           <mat-expansion-panel-header class="d-flex justify-content-between">
@@ -44,24 +41,12 @@
       </mat-accordion>
     </div>
   </div>
-  <div class="row">
-    <table class="table table-responsive col-11">
-      <tbody>
-        <tr>
-          <td *ngFor="let itemField of itemFields">
-            <app-form [fields]="[itemField]" (formUpdate)="onFormUpdate($event)"></app-form>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-    <div class="col-1">
-      <button
-        class="button-round mt-3"
-        color="primary"
-        mat-stroked-button
-      >
-        Save
-      </button>
-    </div>
+  <div class="row mt-3" *ngIf="params?.unitsOfMeasurements && suppliers && unitsOfMeasurementSettings">
+    <app-stock-receiving-form-fields 
+      class="w-100"
+      [suppliers]="suppliers"
+      [unitsOfMeasurements]="params?.unitsOfMeasurements"
+      [unitsOfMeasurementSettings]="unitsOfMeasurementSettings"
+    ></app-stock-receiving-form-fields>
   </div>
 </div>
