@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { flatten } from "lodash";
 import * as moment from "moment";
 import { from, Observable, of, zip } from "rxjs";
-import { debounceTime, distinctUntilChanged, map, switchMap } from "rxjs/operators";
+import { debounceTime, distinctUntilChanged, map, switchMap, tap } from "rxjs/operators";
 import { formatDateToYYMMDD } from "src/app/shared/helpers/format-date.helper";
 import { DateField } from "src/app/shared/modules/form/models/date-field.model";
 import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
@@ -21,6 +21,7 @@ export class StockReceivingFormFieldsComponent implements OnInit {
   @Input() suppliers: any[];
   @Input() unitsOfMeasurements: any[];
   @Input() unitsOfMeasurementSettings: any;
+  @Output() loadInvoices: EventEmitter<any> = new EventEmitter();
 
   supplierNameField: any;
   invoiceNumberField: any;
@@ -50,7 +51,7 @@ export class StockReceivingFormFieldsComponent implements OnInit {
   unitField: Dropdown;
   batchQuantity: string;
   unitPrice: string;
-  amount: number;
+  amount: string;
   itemField: Textbox;
   unitOfMeasure: any;
 
@@ -187,10 +188,11 @@ export class StockReceivingFormFieldsComponent implements OnInit {
             mapping?.conceptReferenceTerm?.uuid ===
             this.unitsOfMeasurementSettings?.conceptReferenceTerm
         )[0]?.conceptReferenceTerm?.code || 1;
-      this.amount =
+      this.amount = (
         parseFloat(this.unitPrice) *
         parseInt(this.batchQuantity) *
-        unit;
+        unit
+      ).toFixed(2);
     }
   }
 
@@ -268,10 +270,10 @@ export class StockReceivingFormFieldsComponent implements OnInit {
               uuid: this.selectedItem?.uuid,
             },
             batchNo: this.formValues?.mfgBatchNumber?.value,
-            orderQuantity: this.formValues?.orderQuantity?.value,
-            batchQuantity: this.batchQuantity,
-            amount: this.amount,
-            unitPrice: this.unitPrice,
+            orderQuantity: Number(this.formValues?.orderQuantity?.value),
+            batchQuantity: Number(this.batchQuantity),
+            amount: parseFloat(this.amount),
+            unitPrice: parseFloat(this.unitPrice),
             uom: {
               uuid: this.unitOfMeasure?.uuid,
             },
@@ -283,7 +285,9 @@ export class StockReceivingFormFieldsComponent implements OnInit {
       },
     ];
 
-    this.stockInvoicesService.createStockInvoices(invoicesObject).subscribe();
+    this.stockInvoicesService.createStockInvoices(invoicesObject).pipe(tap(() => {
+      this.loadInvoices.emit()
+    })).subscribe();
 
     console.log("==> Selected Item and invoice object: ", invoicesObject);
     this.reloadItemFields(true);
@@ -298,8 +302,11 @@ export class StockReceivingFormFieldsComponent implements OnInit {
             mapping?.conceptReferenceTerm?.uuid ===
             this.unitsOfMeasurementSettings?.conceptReferenceTerm
         )[0]?.conceptReferenceTerm?.code || 1;
-      this.amount =
-        parseFloat(this.unitPrice) * parseInt(this.batchQuantity) * unit;
+      this.amount = (
+        parseFloat(this.unitPrice) *
+        parseInt(this.batchQuantity) *
+        unit
+      ).toFixed(2);
     }
   }
 
@@ -314,7 +321,7 @@ export class StockReceivingFormFieldsComponent implements OnInit {
             this.unitsOfMeasurementSettings?.conceptReferenceTerm
         )[0]?.conceptReferenceTerm?.code || 1;
       this.amount =
-        parseFloat(this.unitPrice) * parseInt(this.batchQuantity) * unit;
+        (parseFloat(this.unitPrice) * parseInt(this.batchQuantity) * unit).toFixed(2);
     }
   }
 }
