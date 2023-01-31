@@ -1,18 +1,14 @@
-import { Component, Input, OnInit } from "@angular/core";
-import { MatDialog } from "@angular/material/dialog";
-import { from, interval, Observable, of } from "rxjs";
-import { debounceTime, map, tap } from "rxjs/operators";
-import { LocationService } from "src/app/core/services";
+import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import { flatten } from "lodash";
+import { from, Observable, of, zip } from "rxjs";
+import { debounceTime, distinctUntilChanged, map, switchMap } from "rxjs/operators";
 import { formatDateToYYMMDD } from "src/app/shared/helpers/format-date.helper";
+import { DateField } from "src/app/shared/modules/form/models/date-field.model";
 import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
 import { Textbox } from "src/app/shared/modules/form/models/text-box.model";
-import { LocationGet } from "src/app/shared/resources/openmrs";
-import { LedgerInput } from "src/app/shared/resources/store/models/ledger-input.model";
-import { StockObject } from "src/app/shared/resources/store/models/stock.model";
-import { StockService } from "src/app/shared/resources/store/services/stock.service";
-import { SupplierService } from "src/app/shared/resources/store/services/supplier.service";
-import { AddNewStockReceivedComponent } from "../../modals/add-new-stock-received/add-new-stock-received.component";
+import { ConceptsService } from "src/app/shared/resources/concepts/services/concepts.service";
+import { Api } from "src/app/shared/resources/openmrs";
 
 @Component({
   selector: "app-stock-receiving-form",
@@ -21,110 +17,19 @@ import { AddNewStockReceivedComponent } from "../../modals/add-new-stock-receive
 })
 export class StockReceivingFormComponent implements OnInit {
   @Input() suppliers: any[];
-  supplierNameField: any;
-  invoiceNumberField: any;
-  receivingDateField: any;
-  errors: any[] = [];
-  commonFields: Textbox[];
-  itemFields: any[];
-  formValues: { [id: string]: { id: string; value: string; options: any[] } };
-  constructor(
-    private stockService: StockService,
-    private dialog: MatDialog,
-    private supplierService: SupplierService
-  ) {}
+  @Input() unitsOfMeasurementSettings: any;
+
+  unitsOfMeasurements$: Observable<any>;
+  constructor(private conceptService: ConceptsService) {}
 
   ngOnInit(): void {
-    this.setFields();
+    this.unitsOfMeasurements$ = this.conceptService?.getConceptByMappingSource(
+      this.unitsOfMeasurementSettings?.mappingSource,
+      "custom:(uuid,display,mappings:(uuid,display,conceptReferenceTerm:(uuid,display,code)))"
+    ).pipe(map((response) => {
+      if(!response?.error){
+        return response?.results
+      }
+    } ));
   }
-
-  setFields(suppliers?: any[]): void {
-    const supplierFieldOptions = this.suppliers?.map((supplier) => {
-       return {
-         key: supplier,
-         label: supplier.name,
-         value: supplier,
-         name: supplier?.name,
-       };
-    });
-    this.commonFields = [
-      new Dropdown({
-        id: "supplier",
-        key: "supplier",
-        label: "Supplier",
-        options: supplierFieldOptions,
-      }),
-      new Textbox({
-        id: "invoiceNumber",
-        key: "invoiceNumber",
-        label: "Invoice Number",
-      }),
-      new Textbox({
-        id: "receivingDate",
-        key: "receivingDate",
-        label: "Receiving Date",
-        max: formatDateToYYMMDD(new Date()),
-      }),
-    ];
-
-    this.itemFields = [
-      new Textbox({
-        id: "item",
-        key: "item",
-        label: "Item",
-      }),
-      new Textbox({
-        id: "unit",
-        key: "unit",
-        label: "Unit of Measure",
-      }),
-      new Textbox({
-        id: "orderQuantity",
-        key: "orderQuantity",
-        label: "Order Quantity",
-      }),
-      new Textbox({
-        id: "mfgBatchNumber",
-        key: "mfgBatchNumber",
-        label: "Mfg Batch Number",
-      }),
-      new Textbox({
-        id: "expiryDate",
-        key: "expiryDate",
-        label: "Expiry Date",
-      }),
-      new Textbox({
-        id: "batchQuantity",
-        key: "batchQuantity",
-        label: "Batch Quantity",
-      }),
-      new Textbox({
-        id: "unitPrice",
-        key: "unitPrice",
-        label: "Unit Price",
-      }),
-      new Textbox({
-        id: "amount",
-        key: "amount",
-        label: "Amount",
-      }),
-    ];
-  }
-
-  onFormUpdate(formValues: FormValue) {
-    this.formValues = formValues.getValues();
-    if (this.formValues?.supplierName?.value) {
-      from(this.formValues?.supplierName?.value).pipe(
-        tap(() => {
-          this.supplierService.getSuppliers().subscribe();
-        }),
-        debounceTime(100)
-      );
-    }
-    console.log("==> on FormUpdate: ", this.formValues?.supplierName?.value);
-  }
-
-  // getSuppliers(supplierName: Observable<any>){
-  //   supplierName?
-  // }
 }

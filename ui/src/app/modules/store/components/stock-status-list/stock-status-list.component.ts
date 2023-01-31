@@ -3,6 +3,8 @@ import { MatDialog } from "@angular/material/dialog";
 import { Observable, of } from "rxjs";
 import { map } from "rxjs/operators";
 import { LocationService } from "src/app/core/services";
+import { SystemSettingsService } from "src/app/core/services/system-settings.service";
+import { ConceptsService } from "src/app/shared/resources/concepts/services/concepts.service";
 import { LocationGet } from "src/app/shared/resources/openmrs";
 import { LedgerInput } from "src/app/shared/resources/store/models/ledger-input.model";
 import { StockObject } from "src/app/shared/resources/store/models/stock.model";
@@ -31,11 +33,15 @@ export class StockStatusListComponent implements OnInit {
   showReceivingForm?: boolean;
   errors: any[] = [];
   suppliers$: Observable<any>;
+  unitsOfMeasurementSettings$: Observable<any>;
+  unitsOfMeasurement$: Observable<any>;
   constructor(
     private stockService: StockService,
     private dialog: MatDialog,
     private locationService: LocationService,
-    private supplierService: SupplierService
+    private supplierService: SupplierService,
+    private systemSettingsService: SystemSettingsService,
+    private conceptService: ConceptsService,
   ) {}
 
   ngOnInit(): void {
@@ -49,6 +55,12 @@ export class StockStatusListComponent implements OnInit {
         }
       })
     );
+
+    this.unitsOfMeasurementSettings$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        "iCare.store.mapping.items.unitOfMeasure.mappingSource"
+      );
+
     this.getStock();
   }
 
@@ -139,4 +151,5 @@ export class StockStatusListComponent implements OnInit {
     e.stopPropagation();
     this.showReceivingForm = true;
   }
+
 }
