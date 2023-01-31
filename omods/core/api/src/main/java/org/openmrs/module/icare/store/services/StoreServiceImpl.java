@@ -55,6 +55,8 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 	
 	StockInvoiceStatusDAO stockInvoiceStatusDAO;
 	
+	StockInvoiceItemDAO stockInvoiceItemDAO;
+	
 	public void setLedgerDAO(LedgerDAO ledgerDAO) {
 		this.ledgerDAO = ledgerDAO;
 	}
@@ -109,6 +111,10 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 	
 	public void setStockInvoiceStatusDAO(StockInvoiceStatusDAO stockInvoiceStatusDAO) {
 		this.stockInvoiceStatusDAO = stockInvoiceStatusDAO;
+	}
+	
+	public void setStockInvoiceItemDAO(StockInvoiceItemDAO stockInvoiceItemDAO) {
+		this.stockInvoiceItemDAO = stockInvoiceItemDAO;
 	}
 	
 	@Override
@@ -571,7 +577,13 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 			throw new Exception("The supplier with uuid " + stockInvoice.getSupplier().getUuid() + " does not exist");
 		}
 		stockInvoice.setSupplier(supplier);
-		return this.stockInvoiceDAO.save(stockInvoice);
+		StockInvoice savedStockInvoice = this.stockInvoiceDAO.save(stockInvoice);
+		
+		for (StockInvoiceItem stockInvoiceItem : savedStockInvoice.getStockInvoiceItems()) {
+			this.stockInvoiceItemDAO.save(stockInvoiceItem);
+		}
+		
+		return savedStockInvoice;
 	}
 	
 	@Override

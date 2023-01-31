@@ -548,8 +548,10 @@ public class StoreController {
 				stockInvoiceItem.setBatchNo((String) invoiceItemMap.get("batchNo"));
 				stockInvoiceItem.setOrderQuantity((Integer) invoiceItemMap.get("orderQuantity"));
 				stockInvoiceItem.setBatchQuantity((Integer) invoiceItemMap.get("batchQuantity"));
-				stockInvoiceItem.setAmount((Double) invoiceItemMap.get("amount"));
-				stockInvoiceItem.setUnitPrice((Double) invoiceItemMap.get("unitPrice"));
+				Double amount = Double.valueOf(invoiceItemMap.get("amount").toString());
+				stockInvoiceItem.setAmount(amount);
+				Double unitPrice = Double.valueOf(invoiceItemMap.get("unitPrice").toString());
+				stockInvoiceItem.setUnitPrice(unitPrice);
 				stockInvoiceItem.setUom(Context.getConceptService().getConceptByUuid(((Map)invoiceItemMap.get("uom")).get("uuid").toString()));
 
 				SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
