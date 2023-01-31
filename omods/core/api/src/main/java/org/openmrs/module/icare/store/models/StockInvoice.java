@@ -116,6 +116,7 @@ public class StockInvoice extends BaseOpenmrsData implements java.io.Serializabl
         HashMap<String,Object> stockInvoiceObject = new HashMap<String,Object>();
         stockInvoiceObject.put("invoiceNumber",this.getInvoiceNumber());
         stockInvoiceObject.put("receivingDate", this.getReceivingDate());
+        stockInvoiceObject.put("uuid",this.getUuid());
 
         if(this.getSupplier() != null){
             Map<String,Object> supplierObject = new HashMap<>();
@@ -135,7 +136,7 @@ public class StockInvoice extends BaseOpenmrsData implements java.io.Serializabl
         for(StockInvoiceItem stockInvoiceItem : this.getStockInvoiceItems()){
             stockInvoiceItems.add(stockInvoiceItem.toMap());
         }
-        stockInvoiceObject.put("stockInvoiceItems",stockInvoiceItems);
+        stockInvoiceObject.put("InvoiceItems",stockInvoiceItems);
 
         if (this.getCreator() != null) {
             Map<String, Object> creatorObject = new HashMap<String, Object>();

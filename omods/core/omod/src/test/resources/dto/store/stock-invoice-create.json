@@ -13,8 +13,8 @@
         "batchNo": "batch-1",
         "orderQuantity": 10,
         "batchQuantity": 10,
-        "amount": 20.00,
-        "unitPrice": 10.00,
+        "amount": 20,
+        "unitPrice": 10,
         "uom": {
           "uuid":"344ab1zz-x011-487z-868y-acc38ebc6252"
         },

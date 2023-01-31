@@ -135,7 +135,6 @@ public class SampleDAO extends BaseDAO<Sample> {
 			}
 			queryStr += "sp IN(SELECT testalloc.sampleOrder.id.sample FROM TestAllocation testalloc WHERE testalloc IN (SELECT testresults.testAllocation FROM Result testresults))) ";
 			
-
 		}
 		
 		if (hasStatus != null) {
@@ -166,7 +165,6 @@ public class SampleDAO extends BaseDAO<Sample> {
 				}
 			}
 		}
-
 		
 		queryStr += " ORDER BY sp.dateCreated DESC";
 		Query query = session.createQuery(queryStr);
@@ -416,14 +414,14 @@ public class SampleDAO extends BaseDAO<Sample> {
 				} else {
 					queryStr += " AND ";
 				}
-
+				
 				if (acceptedByUuid == null) {
 					queryStr += "sp IN( SELECT samplestatus.sample FROM SampleStatus samplestatus)";
-
+					
 				}
 				if (acceptedByUuid != null) {
 					queryStr += "sp IN ( SELECT samplestatus.sample FROM SampleStatus samplestatus WHERE samplestatus.user IN( SELECT usr FROM User usr WHERE uuid = :acceptedByUuid))";
-
+					
 				}
 				
 			}
@@ -450,7 +448,7 @@ public class SampleDAO extends BaseDAO<Sample> {
 		if (testCategory != null && testCategory != "Completed") {
 			query.setParameter("testCategory", testCategory);
 		}
-
+		
 		if (acceptedByUuid != null && hasStatus.toLowerCase().equals("yes")) {
 			query.setParameter("acceptedByUuid", acceptedByUuid);
 		}

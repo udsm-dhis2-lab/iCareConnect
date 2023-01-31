@@ -673,6 +673,7 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		
 		List<Map<String, Object>> createdStockInvoices = (new ObjectMapper()).readValue(handle.getContentAsString(),
 		    List.class);
+		System.out.println(createdStockInvoices);
 		
 		assertThat("created 1 stock invoice", createdStockInvoices.size(), is(1));
 		
