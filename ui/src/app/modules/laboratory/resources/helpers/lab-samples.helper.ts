@@ -328,3 +328,28 @@ export function getTestAllocationsWithResults(allocations) {
     "conceptUuid"
   )?.filter((allocation) => allocation?.hasResult);
 }
+
+export function getLabOrdersNotSampled(labOrders, sampledOrders, paidItems) {
+  let ordersNotSampled = [];
+  _.each(labOrders, (labOrder) => {
+    if (
+      (
+        _.filter(sampledOrders, (sampledOrder) => {
+          if (sampledOrder?.order?.uuid === labOrder?.uuid) {
+            return sampledOrder?.order;
+          }
+        }) || []
+      )?.length > 0
+    ) {
+    } else {
+      ordersNotSampled = [
+        ...ordersNotSampled,
+        {
+          ...labOrder,
+          paid: paidItems[labOrder?.concept?.display] ? true : false,
+        },
+      ];
+    }
+  });
+  return _.uniqBy(ordersNotSampled, "uuid");
+}

@@ -13,6 +13,9 @@ export class SharedSamplesListComponent implements OnInit {
   searchingText: string;
   samplesToViewMoreDetails: any = {};
   selectedDepartment: string;
+
+  page: number = 1;
+  pageCount: number = 100;
   @Output() resultEntrySample: EventEmitter<any> = new EventEmitter<any>();
   @Output() selectedSampleDetails: EventEmitter<any> = new EventEmitter<any>();
   constructor() {}
