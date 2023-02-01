@@ -121,10 +121,10 @@
         </tr>
       </table>
     </div> -->
-    <div *ngIf="!params?.issuingList || !params?.currentStore">
+    <div *ngIf="!params?.issuingList && !params?.currentStore">
       <mat-progress-bar mode="indeterminate"></mat-progress-bar>
     </div>
-    <div *ngIf="params?.issuingList && params?.currentStore">
+    <div *ngIf="params?.issuingList?.length && params?.currentStore">
       <app-issuing-stock-by-store
         [issuingStock]="params?.issuingList"
         [currentStore]="params?.currentStore"

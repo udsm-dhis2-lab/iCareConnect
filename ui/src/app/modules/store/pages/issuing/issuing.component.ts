@@ -51,17 +51,12 @@ export class IssuingComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.issuingList$ = this.issuingService.getIssuings(
-      this.currentLocation?.id
-    )?.pipe(map((response) => {
-      return response?.issuings
-    }));
     // this.issuingList$ = this.store.pipe(select(getAllIssuings));
     // this.loadingIssuingList$ = this.store.pipe(select(getIssuingLoadingState));
     // this.issuingList$ = this.store.pipe(select(getAllIssuings));
-    // this.getAllIssuing();
+    this.getAllIssuing();
     // this.loadingIssuingList$ = this.store.pipe(select(getIssuingLoadingState));
-    // this.currentStore$ = this.store.select(getCurrentLocation);
+    this.currentStore$ = this.store.select(getCurrentLocation);
     this.stores$ = this.store.pipe(select(getStoreLocations));
   }
 
@@ -127,6 +122,11 @@ export class IssuingComponent implements OnInit {
     //   JSON.parse(localStorage.getItem("currentLocation"))?.uuid,
     //   this.requestingLocation?.uuid
     // );
+    this.issuingList$ = this.issuingService.getIssuings(
+      this.currentLocation?.id
+    )?.pipe(map((response) => {
+      return response?.issuings
+    }));
   }
 
   onReject(e, issue?: IssuingObject): void {
