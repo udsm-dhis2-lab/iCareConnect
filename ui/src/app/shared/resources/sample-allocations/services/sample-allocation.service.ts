@@ -72,8 +72,34 @@ export class SampleAllocationService {
                     }
                   }
                 )
-              )?.filter((result) => result?.authorizationIsReady) || []
-            )?.length > 0;
+              )?.filter((result) => {
+                console.log("result", result);
+                return result?.authorizationIsReady;
+              }) || []
+            )?.length ===
+            (
+              flatten(
+                uniqBy(groupedAllocations[key], "allocationUuid")?.map(
+                  (allocation) => {
+                    if (!allocation?.finalResult?.groups) {
+                      return allocation?.finalResult;
+                    } else {
+                      const results = allocation?.finalResult?.groups?.map(
+                        (group) => {
+                          return group?.results.map((res) => {
+                            return {
+                              ...res,
+                              authorizationIsReady: group?.authorizationIsReady,
+                            };
+                          });
+                        }
+                      );
+                      return flatten(results);
+                    }
+                  }
+                )
+              )?.filter((result) => result) || []
+            )?.length;
           const allocationsKeyedByParametersUuid = keyBy(
             allSampleAllocations?.map((allocation) => {
               return {

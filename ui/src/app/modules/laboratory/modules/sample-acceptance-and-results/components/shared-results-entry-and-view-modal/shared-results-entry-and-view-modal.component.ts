@@ -582,6 +582,7 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
     parameter: ConceptGet,
     allocation: SampleAllocationObject
   ): void {
+    // console.log(dataObject);
     if (
       (dataObject?.value && !dataObject?.previousValue) ||
       (dataObject?.value &&
