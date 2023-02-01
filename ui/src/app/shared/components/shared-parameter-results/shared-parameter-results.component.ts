@@ -12,6 +12,7 @@ export class SharedParameterResultsComponent implements OnInit {
   @Input() count: number;
   @Input() units: string;
   @Input() hideParameterLabel: boolean;
+  @Input() allocation: any;
 
   parameterResultsDetails: any;
   constructor() {}
@@ -41,9 +42,6 @@ export class SharedParameterResultsComponent implements OnInit {
         "parameterUuid"
       ),
     };
-    // console.log(this.order);
-    // console.log(this.parameter);
-    // console.log(this.count);
     this.parameterResultsDetails = this.order?.allocationsGroupedByParameter[
       this.parameter?.uuid
     ]?.map((result) => {
@@ -75,6 +73,14 @@ export class SharedParameterResultsComponent implements OnInit {
           (resultValue, index) => {
             return {
               ...resultValue,
+              creator: {
+                ...resultValue?.creator,
+                name: resultValue?.creator?.display?.split("(")[0],
+              },
+              resultsFedBy: {
+                ...resultValue?.creator,
+                name: resultValue?.creator?.display?.split("(")[0],
+              },
               toShow: index === 0,
             };
           }
