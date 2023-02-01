@@ -27,4 +27,48 @@ public class StockInvoiceDAO extends BaseDAO<StockInvoice> {
 		return listResults;
 		
 	}
+	
+	public StockInvoice updateStockInvoice(StockInvoice stockInvoice) {
+		DbSession session = this.getSession();
+		
+		String queryStr = " UPDATE StockInvoice st";
+		
+		if (stockInvoice.getInvoiceNumber() != null) {
+			queryStr += " SET st.invoiceNumber = :invoiceNumber,";
+		}
+		
+		if (stockInvoice.getSupplier() != null) {
+			queryStr += " st.supplier = :supplier";
+		}
+		
+		if (stockInvoice.getPurchaseOrder() != null) {
+			queryStr += " SET st.purchaseOrder = :purchaseOrder";
+		}
+		
+		queryStr += " WHERE uuid = :uuid";
+		System.out.println(queryStr);
+		Query query = session.createQuery(queryStr);
+		
+		if (stockInvoice.getInvoiceNumber() != null) {
+			query.setParameter("invoiceNumber", stockInvoice.getInvoiceNumber());
+		}
+		
+		if (stockInvoice.getSupplier() != null) {
+			query.setParameter("supplier", stockInvoice.getSupplier());
+		}
+		
+		if (stockInvoice.getPurchaseOrder() != null) {
+			query.setParameter("purchaseOrder", stockInvoice.getPurchaseOrder());
+		}
+		
+		query.setParameter("uuid", stockInvoice.getUuid());
+		
+		Integer success = query.executeUpdate();
+		
+		if (success == 1) {
+			return stockInvoice;
+		} else {
+			return null;
+		}
+	}
 }

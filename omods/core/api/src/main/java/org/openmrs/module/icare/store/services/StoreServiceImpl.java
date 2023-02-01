@@ -1,6 +1,7 @@
 package org.openmrs.module.icare.store.services;
 
 import org.apache.commons.collections.IteratorUtils;
+import org.openmrs.Concept;
 import org.openmrs.DrugOrder;
 import org.openmrs.Location;
 import org.openmrs.Order;
@@ -570,6 +571,59 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 	}
 	
 	@Override
+	public StockInvoiceItem saveStockInvoiceItem(StockInvoiceItem stockInvoiceItemObject) throws Exception {
+		
+		StockInvoice stockInvoice = this.getStockInvoicebyUuid(stockInvoiceItemObject.getStockInvoice().getUuid());
+		
+		if (stockInvoice == null) {
+			throw new Exception("The stock invoice with uuid " + stockInvoiceItemObject.getStockInvoice().getUuid()
+			        + " does not exist");
+		}
+		
+		Item item = dao.findByUuid(stockInvoiceItemObject.getItem().getUuid().toString());
+		if (item == null) {
+			throw new Exception("The item with uuid " + stockInvoiceItemObject.getItem().getUuid() + " does not exist");
+		}
+		
+		Concept uom = Context.getConceptService().getConceptByUuid(stockInvoiceItemObject.getUom().getUuid());
+		if (uom == null) {
+			throw new Exception(" The unit of measurement with uuid " + stockInvoiceItemObject.getUom().getUuid()
+			        + " does not exist");
+		}
+		
+		stockInvoiceItemObject.setStockInvoice(stockInvoice);
+		stockInvoiceItemObject.setItem(item);
+		stockInvoiceItemObject.setUom(uom);
+		return this.stockInvoiceItemDAO.save(stockInvoiceItemObject);
+	}
+	
+	@Override
+	public StockInvoice updateStockInvoice(StockInvoice stockInvoice) throws Exception {
+		
+		if (stockInvoice.getSupplier() != null) {
+			Supplier supplier = this.getSupplierByUuid(stockInvoice.getSupplier().getUuid());
+			if (supplier == null) {
+				throw new Exception("The supplier with uuid " + stockInvoice.getSupplier().getUuid() + " does not exist");
+			}
+			stockInvoice.setSupplier(supplier);
+		}
+		StockInvoice existingStockInvoice = new StockInvoice();
+		if (stockInvoice.getInvoiceNumber() != null || stockInvoice.getSupplier() != null) {
+			existingStockInvoice = this.stockInvoiceDAO.updateStockInvoice(stockInvoice);
+		}
+		if (stockInvoice.getStockInvoiceItems() != null) {
+			existingStockInvoice = this.stockInvoiceDAO.findByUuid(stockInvoice.getUuid());
+			for (StockInvoiceItem stockInvoiceItem : stockInvoice.getStockInvoiceItems()) {
+				stockInvoiceItem.setStockInvoice(existingStockInvoice);
+				this.stockInvoiceItemDAO.save(stockInvoiceItem);
+			}
+			List<StockInvoiceItem> savedStockInvoiceItems = stockInvoice.getStockInvoiceItems();
+			existingStockInvoice.setStockInvoiceItems(savedStockInvoiceItems);
+		}
+		return existingStockInvoice;
+	}
+	
+	@Override
 	public StockInvoice saveStockInvoice(StockInvoice stockInvoice) throws Exception {
 		
 		Supplier supplier = this.getSupplierByUuid(stockInvoice.getSupplier().getUuid());
@@ -582,7 +636,6 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 		for (StockInvoiceItem stockInvoiceItem : savedStockInvoice.getStockInvoiceItems()) {
 			this.stockInvoiceItemDAO.save(stockInvoiceItem);
 		}
-		
 		return savedStockInvoice;
 	}
 	

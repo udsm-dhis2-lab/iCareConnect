@@ -88,19 +88,28 @@ public class StockInvoice extends BaseOpenmrsData implements java.io.Serializabl
     public static StockInvoice fromMap(Map<String,Object> stockInvoiceMap) throws ParseException {
 
         StockInvoice stockInvoice = new StockInvoice();
-        stockInvoice.setInvoiceNumber(stockInvoiceMap.get("invoiceNumber").toString());
-
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        if (stockInvoiceMap.get("receivingDate").toString().length() == 10) {
-            stockInvoice.setReceivingDate(dateFormat.parse(stockInvoiceMap.get("receivingDate").toString()));
-        } else {
-            stockInvoice.setReceivingDate(dateFormat.parse(stockInvoiceMap.get("receivingDate").toString().substring(0, stockInvoiceMap.get("receivingDate").toString().indexOf("T"))));
+        if(stockInvoiceMap.get("invoiceNumber") != null) {
+            stockInvoice.setInvoiceNumber(stockInvoiceMap.get("invoiceNumber").toString());
         }
 
-        Supplier supplier = new Supplier();
-        supplier.setUuid(((Map) stockInvoiceMap.get("supplier")).get("uuid").toString());
-        stockInvoice.setSupplier(supplier);
+        if(stockInvoiceMap.get("receivingDate") != null) {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            if (stockInvoiceMap.get("receivingDate").toString().length() == 10) {
+                stockInvoice.setReceivingDate(dateFormat.parse(stockInvoiceMap.get("receivingDate").toString()));
+            } else {
+                stockInvoice.setReceivingDate(dateFormat.parse(stockInvoiceMap.get("receivingDate").toString().substring(0, stockInvoiceMap.get("receivingDate").toString().indexOf("T"))));
+            }
+        }
 
+        if(stockInvoiceMap.get("uuid") != null){
+            stockInvoice.setUuid(stockInvoiceMap.get("uuid").toString());
+        }
+
+        if(stockInvoiceMap.get("supplier") != null) {
+            Supplier supplier = new Supplier();
+            supplier.setUuid(((Map) stockInvoiceMap.get("supplier")).get("uuid").toString());
+            stockInvoice.setSupplier(supplier);
+        }
         if(stockInvoiceMap.get("purchaseOrder") != null){
             PurchaseOrder purchaseOrder = new PurchaseOrder();
             purchaseOrder.setUuid(((Map)stockInvoiceMap.get("purchaseOrder")).get("uuid").toString());
