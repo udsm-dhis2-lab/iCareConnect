@@ -208,15 +208,15 @@ export class SamplesService {
             ...allSamplesAfterFiltering,
             ...samplesNotMatchingToCollectedOnes,
           ]);
-
+          let collectedSamples = [];
           samples && samples?.length > 0
             ? _.each(samples, (sample) => {
                 this.api.concept
                   .getConcept(sample?.concept?.uuid)
                   .then((response) => {
                     if (response) {
-                      allSamples = [
-                        ...allSamples,
+                      collectedSamples = [
+                        ...collectedSamples,
                         {
                           id: sample?.label,
                           uuid: sample?.uuid,
@@ -272,11 +272,17 @@ export class SamplesService {
                               : null,
                         },
                       ];
-                      observer.next(
-                        allSamples?.filter(
-                          (sample) => sample?.orders?.length > 0
-                        ) || []
-                      );
+                      observer.next([
+                        ...(allSamples?.filter(
+                          (sample) =>
+                            (
+                              sample?.orders?.filter(
+                                (order) => !collectedOrders[order?.uuid]
+                              ) || []
+                            )?.length > 0
+                        ) || []),
+                        ...collectedSamples,
+                      ]);
                     }
                   });
               })
