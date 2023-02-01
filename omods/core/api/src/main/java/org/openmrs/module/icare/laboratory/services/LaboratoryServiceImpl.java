@@ -598,10 +598,14 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 				observation.setObsDatetime(new Date());
 				observation.setDateCreated(new Date());
 				observation.setVoided(false);
-				observation.setComment(resultsRemarks.get(0).getRemarks());
-				if (resultStatuses.get(0) != null && resultStatuses.get(0).getStatus() != null) {
-					if (resultStatuses.get(0).getStatus().equals("AMENDED")) {
-						observation.setStatus(Obs.Status.AMENDED);
+				if (resultsRemarks.size() > 0) {
+					observation.setComment(resultsRemarks.get(0).getRemarks());
+				}
+				if (resultStatuses.size() > 0) {
+					if (resultStatuses.get(0) != null && resultStatuses.get(0).getStatus() != null) {
+						if (resultStatuses.get(0).getStatus().equals("AMENDED")) {
+							observation.setStatus(Obs.Status.AMENDED);
+						}
 					}
 				} else {
 					observation.setStatus(Obs.Status.FINAL);
