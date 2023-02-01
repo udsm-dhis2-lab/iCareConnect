@@ -189,6 +189,12 @@ public class StockInvoiceItem extends BaseOpenmrsData implements java.io.Seriali
 			        .substring(0, stockInvoiceItemMap.get("expiryDate").toString().indexOf("T"))));
 		}
 		
+		//		if(stockInvoiceItemMap.get("stockInvoiceUuid") != null){
+		//			StockInvoice stockInvoice = new StockInvoice();
+		//			stockInvoice.setUuid(stockInvoiceItemMap.get("stockInvoiceUuid").toString());
+		//			stockInvoiceItem.setStockInvoice(stockInvoice);
+		//		}
+		
 		return stockInvoiceItem;
 		
 	}

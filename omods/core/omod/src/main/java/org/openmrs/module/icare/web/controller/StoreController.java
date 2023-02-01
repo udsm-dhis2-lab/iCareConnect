@@ -576,6 +576,44 @@ public class StoreController {
 
 	}
 	
+	@RequestMapping(value = "stockinvoice/{stockInvoiceUuid}",method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String,Object> updateStockInvoice(@PathVariable String stockInvoiceUuid, @RequestBody Map<String,Object> stockInvoiceMap) throws Exception {
+
+		StockInvoice stockInvoice = StockInvoice.fromMap(stockInvoiceMap);
+		stockInvoice.setUuid(stockInvoiceUuid);
+		if(stockInvoiceMap.get("invoiceItems") != null) {
+			List<StockInvoiceItem> stockInvoiceItems = new ArrayList<>();
+			for (Map<String, Object> invoiceItemMap : (List<Map<String, Object>>) stockInvoiceMap.get("invoiceItems")) {
+				StockInvoiceItem stockInvoiceItem = new StockInvoiceItem();
+				stockInvoiceItem.setItem(iCareService.getItemByUuid(((Map) invoiceItemMap.get("item")).get("uuid").toString()));
+				stockInvoiceItem.setBatchNo((String) invoiceItemMap.get("batchNo"));
+				stockInvoiceItem.setOrderQuantity((Integer) invoiceItemMap.get("orderQuantity"));
+				stockInvoiceItem.setBatchQuantity((Integer) invoiceItemMap.get("batchQuantity"));
+				Double amount = Double.valueOf(invoiceItemMap.get("amount").toString());
+				stockInvoiceItem.setAmount(amount);
+				Double unitPrice = Double.valueOf(invoiceItemMap.get("unitPrice").toString());
+				stockInvoiceItem.setUnitPrice(unitPrice);
+				stockInvoiceItem.setUom(Context.getConceptService().getConceptByUuid(((Map) invoiceItemMap.get("uom")).get("uuid").toString()));
+
+				SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+				if (invoiceItemMap.get("expiryDate").toString().length() == 10) {
+					stockInvoiceItem.setExpiryDate(dateFormat.parse(invoiceItemMap.get("expiryDate").toString()));
+				} else {
+					stockInvoiceItem.setExpiryDate(dateFormat.parse(invoiceItemMap.get("expiryDate").toString()
+							.substring(0, invoiceItemMap.get("expiryDate").toString().indexOf("T"))));
+				}
+				stockInvoiceItem.setStockInvoice(stockInvoice);
+				stockInvoiceItems.add(stockInvoiceItem);
+			}
+
+			stockInvoice.setStockInvoiceItems(stockInvoiceItems);
+		}
+		StockInvoice updatedStockInvoice = storeService.updateStockInvoice(stockInvoice);
+
+		return updatedStockInvoice.toMap();
+	}
+	
 	@RequestMapping(value = "stockinvoices", method = RequestMethod.GET)
 	@ResponseBody
 	public Map<String, Object> getStockInvoices(
@@ -648,5 +686,27 @@ public class StoreController {
 		}
 
 		return stockInvoiceStatusMapList;
+	}
+	
+	@RequestMapping(value="stockinvoiceitems", method =RequestMethod.POST)
+	@ResponseBody
+	public List<Map<String,Object>> addStockInvoiceItems(@RequestBody Map<String,Object> stockInvoiceItemsMap) throws Exception {
+
+			List<Map<String,Object>> stockInvoiceItemsList = (List<Map<String, Object>>) stockInvoiceItemsMap.get("stockInvoiceItems");
+			StockInvoice stockInvoice = new StockInvoice();
+			stockInvoice.setUuid(stockInvoiceItemsMap.get("stockInvoiceUuid").toString());
+			List<Map<String,Object>>  stockInvoiceItemsMapList = new ArrayList<>();
+
+			for(Map<String,Object> stockInvoiceItem : stockInvoiceItemsList){
+				StockInvoiceItem stockInvoiceItemObject = StockInvoiceItem.fromMap(stockInvoiceItem);
+				stockInvoiceItemObject.setStockInvoice(stockInvoice);
+
+				StockInvoiceItem savedStockInvoiceItem = storeService.saveStockInvoiceItem(stockInvoiceItemObject);
+				stockInvoiceItemsMapList.add(savedStockInvoiceItem.toMap());
+			}
+
+			return stockInvoiceItemsMapList;
+
+
 	}
 }

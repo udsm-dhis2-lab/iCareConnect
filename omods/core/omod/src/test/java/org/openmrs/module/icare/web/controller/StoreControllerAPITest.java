@@ -7,10 +7,7 @@ import org.openmrs.api.AdministrationService;
 import org.openmrs.api.LocationService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.icare.ICareConfig;
-import org.openmrs.module.icare.billing.models.Invoice;
-import org.openmrs.module.icare.core.ListResult;
 import org.openmrs.module.icare.store.models.IssueStatus;
-import org.openmrs.module.icare.store.models.Requisition;
 import org.openmrs.module.icare.store.models.RequisitionStatus;
 import org.openmrs.module.icare.store.services.StoreService;
 import org.openmrs.module.icare.web.controller.core.BaseResourceControllerTest;
@@ -18,16 +15,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
-import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.Mockito.when;
 
 public class StoreControllerAPITest extends BaseResourceControllerTest {
 	
@@ -689,6 +683,20 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		assertThat("Total is 2", (Integer) pagerObject.get("total") == 2, is(true));
 		assertThat("List count is 1", ((List) stockInvoices.get("results")).size() == 1, is(true));
 		
+		//Creating stock invoice items with the existing stock invoices
+		String dto2 = this.readFile("dto/store/stock-invoice-items-create.json");
+		List<Map<String, Object>> stockInvoice2 = (new ObjectMapper()).readValue(dto2, List.class);
+		
+		//post stock invoice
+		MockHttpServletRequest newPostRequest2 = newPostRequest("store/stockinvoices", stockInvoice);
+		MockHttpServletResponse handle2 = handle(newPostRequest);
+		
+		List<Map<String, Object>> createdStockInvoices2 = (new ObjectMapper()).readValue(handle2.getContentAsString(),
+		    List.class);
+		System.out.println("1: =>" + createdStockInvoices2);
+		
+		assertThat("created 1 stock invoice", createdStockInvoices.size(), is(1));
+		
 	}
 	
 	@Test
@@ -735,6 +743,36 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		List<Map<String, Object>> stockInvoicesStatusListMap = (new ObjectMapper()).readValue(handle2.getContentAsString(),
 		    List.class);
 		assertThat("There is one drafted stock invoice", stockInvoicesStatusListMap.size(), is(1));
+		
+	}
+	
+	@Test
+	public void creatingAndGettingStockInvoiceItems() throws Exception {
+		
+		String dto = this.readFile("dto/store/stock-invoice-items-create.json");
+		Map<String, Object> stockInvoiceItemMap = (new ObjectMapper()).readValue(dto, Map.class);
+		
+		MockHttpServletRequest newPostRequest = newPostRequest("store/stockinvoiceitems", stockInvoiceItemMap);
+		MockHttpServletResponse handle = handle(newPostRequest);
+		
+		List<Map<String, Object>> createdstockInvoiceItems = (new ObjectMapper()).readValue(handle.getContentAsString(),
+		    List.class);
+		
+		//assertThat("created 1 invoice item");
+		
+	}
+	
+	@Test
+	public void updatingStockInvoices() throws Exception {
+		String dto = this.readFile("dto/store/stock-invoice-update.json");
+		Map<String, Object> stockInvoiceMap = (new ObjectMapper()).readValue(dto, Map.class);
+		
+		MockHttpServletRequest newPostRequest = newPostRequest("store/stockinvoice/8800zx3570-8z37-11ff-2234-01102007811",
+		    stockInvoiceMap);
+		MockHttpServletResponse handle = handle(newPostRequest);
+		
+		Map<String, Object> updatedInvoice = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
+		assertThat("stock invoice has been updated",updatedInvoice.get("invoiceNumber").equals("StInvoice3"));
 		
 	}
 }
