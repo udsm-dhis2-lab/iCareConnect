@@ -54,11 +54,7 @@ export class RequisitionComponent implements OnInit {
 
   ngOnInit() {
     // RequisitionObject
-    this.requisitions$ = this.requisitionService.getRequisitions(
-      this.currentLocation?.id
-    ).pipe(map((response) => {
-      return response?.requisitions
-    }));
+    
     // this.requisitions$ = this.store.pipe(select(getActiveRequisitions));
     // this.loadingRequisitions$ = this.store.pipe(
     //   select(getRequisitionLoadingState)
@@ -80,7 +76,7 @@ export class RequisitionComponent implements OnInit {
       this.systemSettingsService.getSystemSettingsByKey(
         `iCare.store.settings.pharmacy.locationTagUuid`
       );
-    // this.getAllRequisition();
+    this.getAllRequisition();
     // this.loadingRequisitions$ = this.store.pipe(
     //   select(getRequisitionLoadingState)
     // );
