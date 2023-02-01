@@ -634,6 +634,14 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 		for (StockInvoiceItem stockInvoiceItem : savedStockInvoice.getStockInvoiceItems()) {
 			this.stockInvoiceItemDAO.save(stockInvoiceItem);
 		}
+
+		for (StockInvoiceStatus stockInvoiceStatus : stockInvoice.getStockInvoiceStatuses()){
+			//TODO Limit status to check the ones available in enums
+
+			stockInvoiceStatus.setRemarks(stockInvoiceStatus.getStatus());
+			stockInvoiceStatus.setStockInvoice(savedStockInvoice);
+			this.stockInvoiceStatusDAO.save(stockInvoiceStatus);
+		}
 		return savedStockInvoice;
 	}
 	

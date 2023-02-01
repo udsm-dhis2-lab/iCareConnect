@@ -35,6 +35,10 @@ public class StockInvoice extends BaseOpenmrsData implements java.io.Serializabl
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "stockInvoice")
     private List<StockInvoiceItem> stockInvoiceItems = new ArrayList<>(0);
 
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "stockInvoice")
+    private List<StockInvoiceStatus> stockInvoiceStatuses = new ArrayList<>(0);
+
+
     @Override
     public Integer getId() {
         return id;
@@ -85,6 +89,14 @@ public class StockInvoice extends BaseOpenmrsData implements java.io.Serializabl
         this.stockInvoiceItems = stockInvoiceItems;
     }
 
+    public List<StockInvoiceStatus> getStockInvoiceStatuses() {
+        return stockInvoiceStatuses;
+    }
+
+    public void setStockInvoiceStatuses(List<StockInvoiceStatus> stockInvoiceStatuses) {
+        this.stockInvoiceStatuses = stockInvoiceStatuses;
+    }
+
     public static StockInvoice fromMap(Map<String,Object> stockInvoiceMap) throws ParseException {
 
         StockInvoice stockInvoice = new StockInvoice();
@@ -114,6 +126,16 @@ public class StockInvoice extends BaseOpenmrsData implements java.io.Serializabl
             PurchaseOrder purchaseOrder = new PurchaseOrder();
             purchaseOrder.setUuid(((Map)stockInvoiceMap.get("purchaseOrder")).get("uuid").toString());
             stockInvoice.setPurchaseOrder(purchaseOrder);
+        }
+
+        if(stockInvoiceMap.get("stockInvoiceStatus") != null){
+            List<StockInvoiceStatus> stockInvoiceStatusesList = new ArrayList<>();
+           for(Map<String,Object> stockInvoiceMapObject :(List<Map<String, Object>>) stockInvoiceMap.get("stockInvoiceStatus")) {
+               StockInvoiceStatus stockInvoiceStatus = new StockInvoiceStatus();
+               stockInvoiceStatus.setStatus(stockInvoiceMapObject.get("status").toString());
+               stockInvoiceStatusesList.add(stockInvoiceStatus);
+           }
+           stockInvoice.setStockInvoiceStatuses(stockInvoiceStatusesList);
         }
 
          return stockInvoice;
@@ -153,6 +175,19 @@ public class StockInvoice extends BaseOpenmrsData implements java.io.Serializabl
             creatorObject.put("display", this.getCreator().getDisplayString());
             stockInvoiceObject.put("creator", creatorObject);
         }
+
+        if(this.getStockInvoiceStatuses() != null){
+            List<Map<String,Object>> stockInvoiceStatusesMapList = new ArrayList<>();
+            Map<String,Object> stockInvoiceStatusesMap = new HashMap<>();
+            for (StockInvoiceStatus stockInvoiceStatus : this.getStockInvoiceStatuses()){
+                stockInvoiceStatusesMap.put("status",stockInvoiceStatus.getStatus());
+            }
+            stockInvoiceStatusesMapList.add(stockInvoiceStatusesMap);
+            stockInvoiceObject.put("stockInvoiceStatus",stockInvoiceStatusesMapList);
+
+        }
+
+
         return stockInvoiceObject;
     }
 
