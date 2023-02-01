@@ -1,15 +1,15 @@
 /* tslint:disable:no-unused-variable */
 
 import { TestBed } from "@angular/core/testing";
-import { SupplierService } from "./supplier.service";
+import { StockInvoicesService } from "./stockInvoice.service";
 
 
-describe("SupplierService", () => {
-  let service: SupplierService;
+describe("StockInvoicesService", () => {
+  let service: StockInvoicesService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(SupplierService);
+    service = TestBed.inject(StockInvoicesService);
   });
 
   it("should be created", () => {

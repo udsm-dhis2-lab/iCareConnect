@@ -1,21 +1,24 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, Input, OnInit } from "@angular/core";
+import { MatDialog } from "@angular/material/dialog";
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
-import { LocationService } from "src/app/core/services";
-import { SystemSettingsService } from "src/app/core/services/system-settings.service";
-import { ConceptsService } from "src/app/shared/resources/concepts/services/concepts.service";
-import { StockInvoicesService } from "src/app/shared/resources/store/services/invoice.service";
-import { SupplierService } from "src/app/shared/resources/store/services/supplier.service";
+import { StockInvoicesService } from "src/app/shared/resources/store/services/stockInvoice.service";
+import { StockInvoiceFormDialogComponent } from "../stock-invoice-form-dialog/stock-invoice-form-dialog.component";
 @Component({
   selector: "app-stock-invoices-list",
   templateUrl: "./stock-invoices-list.component.html",
   styleUrls: ["./stock-invoices-list.component.scss"],
 })
 export class StockInvoicesListComponent implements OnInit {
+  @Input() suppliers: any[];
+  @Input() unitsOfMeasurementSettings: any;
+
   errors: any[];
   stockInvoices$: Observable<any>;
+  viewStockInvoiceItems: any;
   constructor(
-    private stockInvoicesService: StockInvoicesService
+    private stockInvoicesService: StockInvoicesService,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
@@ -29,5 +32,24 @@ export class StockInvoicesListComponent implements OnInit {
         }
       })
     );
+  }
+
+  onEditStockInvoice(stockInvoice) {
+    this.dialog.open(StockInvoiceFormDialogComponent, {
+      width: "80%",
+      data: {
+        stockInvoice: stockInvoice,
+        suppliers: this.suppliers,
+        unitsOfMeasurementSettings: this.unitsOfMeasurementSettings
+      },
+    });
+  }
+  
+  onViewStockInvoiceItems(stockInvoiceUuid) {
+    if (stockInvoiceUuid === this.viewStockInvoiceItems){
+      this.viewStockInvoiceItems = undefined
+    } else {
+      this.viewStockInvoiceItems = stockInvoiceUuid;
+    }
   }
 }
