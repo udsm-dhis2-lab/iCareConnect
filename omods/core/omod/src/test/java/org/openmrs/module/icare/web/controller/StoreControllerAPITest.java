@@ -753,17 +753,14 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 	
 	@Test
 	public void creatingAndGettingStockInvoiceItems() throws Exception {
-		
-		String dto = this.readFile("dto/store/stock-invoice-items-create.json");
-		Map<String, Object> stockInvoiceItemMap = (new ObjectMapper()).readValue(dto, Map.class);
-		
-		MockHttpServletRequest newPostRequest = newPostRequest("store/stockinvoiceitems", stockInvoiceItemMap);
-		MockHttpServletResponse handle = handle(newPostRequest);
-		
-		List<Map<String, Object>> createdstockInvoiceItems = (new ObjectMapper()).readValue(handle.getContentAsString(),
-		    List.class);
-		
-		//assertThat("created 1 invoice item");
+
+		//getting specific stock invoice
+		MockHttpServletRequest newGetRequest3 = newGetRequest("store/stockinvoiceitem/8800zx3570-8z37-11ff-2234-01102007812");
+		MockHttpServletResponse handle3 = handle(newGetRequest3);
+		Map<String,Object> stockInvoiceItemGet = (new ObjectMapper()).readValue(handle3.getContentAsString(),Map.class);
+		assertThat("There is 1 stock invoice item present",stockInvoiceItemGet.get("uuid").equals("8800zx3570-8z37-11ff-2234-01102007812"));
+
+
 		
 	}
 	

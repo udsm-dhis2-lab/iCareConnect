@@ -139,6 +139,9 @@ public class StockInvoiceItem extends BaseOpenmrsData implements java.io.Seriali
     public Map<String, Object> toMap() {
 
         HashMap<String,Object> invoiceItemObject = new HashMap<>();
+		if(this.getUuid() != null){
+			invoiceItemObject.put("uuid",this.getUuid());
+		}
 		if(this.getBatchNo() != null) {
 			invoiceItemObject.put("batchNo", this.getBatchNo());
 		}
