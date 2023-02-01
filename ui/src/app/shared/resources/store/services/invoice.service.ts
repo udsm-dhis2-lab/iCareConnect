@@ -28,4 +28,8 @@ export class StockInvoicesService {
       catchError((error: any) => error)
     );
   }
+
+  // getInvoiceItems(uuid: string): Observable<any> {
+  //   return this.httpClient.get(`store/stockinvoices/${}`
+  // }
 }
