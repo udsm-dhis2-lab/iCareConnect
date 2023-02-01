@@ -698,25 +698,14 @@ public class StoreController {
 		return stockInvoiceStatusMapList;
 	}
 	
-	@RequestMapping(value="stockinvoiceitems", method =RequestMethod.POST)
+	@RequestMapping(value="stockinvoiceitem/{stockInvoiceItemUuid}", method =RequestMethod.POST)
 	@ResponseBody
-	public List<Map<String,Object>> addStockInvoiceItems(@RequestBody Map<String,Object> stockInvoiceItemsMap) throws Exception {
+	public Map<String,Object> updateStockInvoiceItems(@PathVariable String stockInvoiceItemUuid,@RequestBody Map<String,Object> stockInvoiceItemsMap) throws Exception {
 
-			List<Map<String,Object>> stockInvoiceItemsList = (List<Map<String, Object>>) stockInvoiceItemsMap.get("stockInvoiceItems");
-			StockInvoice stockInvoice = new StockInvoice();
-			stockInvoice.setUuid(stockInvoiceItemsMap.get("stockInvoiceUuid").toString());
-			List<Map<String,Object>>  stockInvoiceItemsMapList = new ArrayList<>();
-
-			for(Map<String,Object> stockInvoiceItem : stockInvoiceItemsList){
-				StockInvoiceItem stockInvoiceItemObject = StockInvoiceItem.fromMap(stockInvoiceItem);
-				stockInvoiceItemObject.setStockInvoice(stockInvoice);
-
-				StockInvoiceItem savedStockInvoiceItem = storeService.saveStockInvoiceItem(stockInvoiceItemObject);
-				stockInvoiceItemsMapList.add(savedStockInvoiceItem.toMap());
-			}
-
-			return stockInvoiceItemsMapList;
-
+		StockInvoiceItem stockInvoiceItem = StockInvoiceItem.fromMap(stockInvoiceItemsMap);
+		stockInvoiceItem.setUuid(stockInvoiceItemUuid);
+		StockInvoiceItem updatedStockInvoiceItem = storeService.updateStockInvoiceItem(stockInvoiceItem);
+		return updatedStockInvoiceItem.toMap();
 
 	}
 }
