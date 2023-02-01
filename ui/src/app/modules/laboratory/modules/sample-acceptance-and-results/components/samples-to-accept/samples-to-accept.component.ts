@@ -72,8 +72,15 @@ export class SamplesToAcceptComponent implements OnInit {
     console.log(sample);
   }
 
-  accept(event: Event, sample: any, providerDetails: any): void {
-    event.stopPropagation();
+  onGetSelectedSampleDetails(sample: any, providerDetails: any): void {
+    if (sample?.actionType === "accept") {
+      this.accept(sample?.sample, providerDetails);
+    } else {
+      this.reject(sample?.sample, providerDetails);
+    }
+  }
+
+  accept(sample: any, providerDetails: any): void {
     this.saving = true;
     let confirmDialog;
     if (this.LISConfigurations?.isLIS) {
@@ -207,8 +214,7 @@ export class SamplesToAcceptComponent implements OnInit {
     });
   }
 
-  reject(e, sample, providerDetails) {
-    e.stopPropagation();
+  reject(sample, providerDetails) {
     this.dialog
       .open(RejectionReasonComponent, {
         width: "40%",
