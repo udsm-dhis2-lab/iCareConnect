@@ -10,7 +10,7 @@
       <app-stock-invoices-list 
         [suppliers]="params?.suppliers"
         [unitsOfMeasurementSettings]="params?.unitsOfMeasurementSettings" 
-        [status]="DRAFT" 
+        [status]="'DRAFT'" 
       ></app-stock-invoices-list>
     </mat-tab>
     <mat-tab>
@@ -20,7 +20,7 @@
       <app-stock-invoices-list 
         [suppliers]="params?.suppliers"
         [unitsOfMeasurementSettings]="params?.unitsOfMeasurementSettings"
-        [status]="RECEIVED"
+        [status]="'RECEIVED'"
       ></app-stock-invoices-list>
     </mat-tab>
     <mat-tab>
