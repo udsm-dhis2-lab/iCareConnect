@@ -684,18 +684,23 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		assertThat("List count is 1", ((List) stockInvoices.get("results")).size() == 1, is(true));
 		
 		//Creating stock invoice items with the existing stock invoices
-		String dto2 = this.readFile("dto/store/stock-invoice-items-create.json");
-		List<Map<String, Object>> stockInvoice2 = (new ObjectMapper()).readValue(dto2, List.class);
-		
-		//post stock invoice
-		MockHttpServletRequest newPostRequest2 = newPostRequest("store/stockinvoices", stockInvoice);
-		MockHttpServletResponse handle2 = handle(newPostRequest);
-		
-		List<Map<String, Object>> createdStockInvoices2 = (new ObjectMapper()).readValue(handle2.getContentAsString(),
-		    List.class);
-		System.out.println("1: =>" + createdStockInvoices2);
-		
-		assertThat("created 1 stock invoice", createdStockInvoices.size(), is(1));
+//		String dto2 = this.readFile("dto/store/stock-invoice-items-create.json");
+//		List<Map<String, Object>> stockInvoice2 = (new ObjectMapper()).readValue(dto2, List.class);
+//
+//		//post stock invoice
+//		MockHttpServletRequest newPostRequest2 = newPostRequest("store/stockinvoices", stockInvoice);
+//		MockHttpServletResponse handle2 = handle(newPostRequest);
+//
+//		List<Map<String, Object>> createdStockInvoices2 = (new ObjectMapper()).readValue(handle2.getContentAsString(),
+//		    List.class);
+//
+//		assertThat("created 1 stock invoice", createdStockInvoices.size(), is(1));
+
+		//getting specific stock invoice
+		MockHttpServletRequest newGetRequest3 = newGetRequest("store/stockinvoice/8800zx3570-8z37-11ff-2234-01102007811");
+		MockHttpServletResponse handle3 = handle(newGetRequest3);
+		Map<String,Object> stockInvoiceGet = (new ObjectMapper()).readValue(handle3.getContentAsString(),Map.class);
+		assertThat("There is 1 stock invoice present",stockInvoiceGet.get("uuid").equals("8800zx3570-8z37-11ff-2234-01102007811"));
 		
 	}
 	

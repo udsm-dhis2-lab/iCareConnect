@@ -121,4 +121,6 @@ public interface StoreService extends OpenmrsService {
 	StockInvoiceItem saveStockInvoiceItem(StockInvoiceItem stockInvoiceItemObject) throws Exception;
 	
 	StockInvoice updateStockInvoice(StockInvoice stockInvoice) throws Exception;
+
+    StockInvoice getStockInvoice(String stockInvoiceUuid);
 }

@@ -613,6 +613,7 @@ public class StoreController {
 
 		return updatedStockInvoice.toMap();
 	}
+
 	
 	@RequestMapping(value = "stockinvoices", method = RequestMethod.GET)
 	@ResponseBody
@@ -628,6 +629,15 @@ public class StoreController {
 		
 		ListResult<StockInvoice> stockInvoices = this.storeService.getStockInvoices(pager);
 		return stockInvoices.toMap();
+	}
+
+	@RequestMapping(value = "stockinvoice/{stockInvoiceUuid}", method = RequestMethod.GET)
+	@ResponseBody
+	public Map<String,Object> getStockInvoiceByUuid(@PathVariable String stockInvoiceUuid){
+
+		StockInvoice stockInvoice = storeService.getStockInvoice(stockInvoiceUuid);
+		return stockInvoice.toMap();
+
 	}
 	
 	@RequestMapping(value = "suppliers",method = RequestMethod.POST)
