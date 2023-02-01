@@ -622,7 +622,13 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 		}
 		return existingStockInvoice;
 	}
-	
+
+	@Override
+	public StockInvoice getStockInvoice(String stockInvoiceUuid) {
+		return stockInvoiceDAO.findByUuid(stockInvoiceUuid);
+	}
+
+
 	@Override
 	public StockInvoice saveStockInvoice(StockInvoice stockInvoice) throws Exception {
 		
