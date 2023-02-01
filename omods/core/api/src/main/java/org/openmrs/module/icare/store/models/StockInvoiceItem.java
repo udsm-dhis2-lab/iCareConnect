@@ -139,54 +139,87 @@ public class StockInvoiceItem extends BaseOpenmrsData implements java.io.Seriali
     public Map<String, Object> toMap() {
 
         HashMap<String,Object> invoiceItemObject = new HashMap<>();
-        invoiceItemObject.put("batchNo",this.getBatchNo());
-        invoiceItemObject.put("orderQuantity",this.getOrderQuantity());
-        invoiceItemObject.put("batchQuantity",this.getBatchQuantity());
-        invoiceItemObject.put("unitPrice",this.getUnitPrice());
-        invoiceItemObject.put("amount",this.getAmount());
-        invoiceItemObject.put("expiryDate",this.getExpiryDate());
+		if(this.getBatchNo() != null) {
+			invoiceItemObject.put("batchNo", this.getBatchNo());
+		}
+		if(this.getOrderQuantity() != null) {
+			invoiceItemObject.put("orderQuantity", this.getOrderQuantity());
+		}
 
-        HashMap<String,Object> stockInvoiceObject = new HashMap<>();
-        stockInvoiceObject.put("uuid",this.stockInvoice.getUuid());
-        stockInvoiceObject.put("display",this.stockInvoice.getInvoiceNumber());
-        invoiceItemObject.put("stockInvoice",stockInvoiceObject);
+		if(this.getBatchQuantity() != null) {
+			invoiceItemObject.put("batchQuantity", this.getBatchQuantity());
+		}
+		if(this.getUnitPrice() != null) {
+			invoiceItemObject.put("unitPrice", this.getUnitPrice());
+		}
+		if(this.getAmount() != null) {
+			invoiceItemObject.put("amount", this.getAmount());
+		}
+		if(this.getExpiryDate() != null) {
+			invoiceItemObject.put("expiryDate", this.getExpiryDate());
+		}
+		if(this.getStockInvoice() != null) {
+			HashMap<String, Object> stockInvoiceObject = new HashMap<>();
+			stockInvoiceObject.put("uuid", this.stockInvoice.getUuid());
+			stockInvoiceObject.put("display", this.stockInvoice.getInvoiceNumber());
+			invoiceItemObject.put("stockInvoice", stockInvoiceObject);
+		}
+		if(this.getItem() != null) {
+			HashMap<String, Object> itemObject = new HashMap<>();
+			itemObject.put("uuid", this.getItem().getUuid());
+			itemObject.put("display", this.getItem().getDisplayString());
+			invoiceItemObject.put("item", itemObject);
+		}
 
-        HashMap<String,Object> itemObject = new HashMap<>();
-        itemObject.put("uuid",this.getItem().getUuid());
-        itemObject.put("display",this.getItem().getDisplayString());
-        invoiceItemObject.put("item",itemObject);
-
-        HashMap<String,Object> uomObject = new HashMap<>();
-        uomObject.put("uuid",this.getUom().getUuid());
-        uomObject.put("display",this.getUom().getDisplayString());
-        invoiceItemObject.put("uom",uomObject);
+		if(this.getUom() != null) {
+			HashMap<String, Object> uomObject = new HashMap<>();
+			uomObject.put("uuid", this.getUom().getUuid());
+			uomObject.put("display", this.getUom().getDisplayString());
+			invoiceItemObject.put("uom", uomObject);
+		}
         return invoiceItemObject;
     }
 	
 	public static StockInvoiceItem fromMap(Map<String, Object> stockInvoiceItemMap) throws ParseException {
 		
 		StockInvoiceItem stockInvoiceItem = new StockInvoiceItem();
-		
-		Item item = new Item();
-		item.setUuid(((Map) stockInvoiceItemMap.get("item")).get("uuid").toString());
-		stockInvoiceItem.setItem(item);
-		
-		Concept uom = new Concept();
-		uom.setUuid(((Map) stockInvoiceItemMap.get("uom")).get("uuid").toString());
-		stockInvoiceItem.setUom(uom);
-		
-		stockInvoiceItem.setBatchNo(stockInvoiceItemMap.get("batchNo").toString());
-		stockInvoiceItem.setUnitPrice((Double) stockInvoiceItemMap.get("unitPrice"));
-		stockInvoiceItem.setAmount((Double) stockInvoiceItemMap.get("amount"));
-		stockInvoiceItem.setBatchQuantity((Integer) stockInvoiceItemMap.get("batchQuantity"));
-		stockInvoiceItem.setOrderQuantity((Integer) stockInvoiceItemMap.get("orderQuantity"));
-		
-		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-		if (stockInvoiceItemMap.get("expiryDate").toString().length() == 10) {
-			stockInvoiceItem.setExpiryDate(dateFormat.parse(stockInvoiceItemMap.get("expiryDate").toString()));
-		} else {
-			stockInvoiceItem.setExpiryDate(dateFormat.parse(stockInvoiceItemMap.get("expiryDate").toString()
-			        .substring(0, stockInvoiceItemMap.get("expiryDate").toString().indexOf("T"))));
+
+		if(stockInvoiceItemMap.get("item") != null) {
+			Item item = new Item();
+			item.setUuid(((Map) stockInvoiceItemMap.get("item")).get("uuid").toString());
+			stockInvoiceItem.setItem(item);
+		}
+
+		if(stockInvoiceItemMap.get("uom") != null) {
+			Concept uom = new Concept();
+			uom.setUuid(((Map) stockInvoiceItemMap.get("uom")).get("uuid").toString());
+			stockInvoiceItem.setUom(uom);
+		}
+
+		if(stockInvoiceItemMap.get("batchNo") != null) {
+			stockInvoiceItem.setBatchNo(stockInvoiceItemMap.get("batchNo").toString());
+		}
+		if(stockInvoiceItemMap.get("unitPrice") != null) {
+			stockInvoiceItem.setUnitPrice((Double) stockInvoiceItemMap.get("unitPrice"));
+		}
+		if(stockInvoiceItemMap.get("amount") != null) {
+			stockInvoiceItem.setAmount((Double) stockInvoiceItemMap.get("amount"));
+		}
+
+		if(stockInvoiceItemMap.get("batchQuantity") != null) {
+			stockInvoiceItem.setBatchQuantity((Integer) stockInvoiceItemMap.get("batchQuantity"));
+		}
+		if(stockInvoiceItemMap.get("orderQuantity") != null) {
+			stockInvoiceItem.setOrderQuantity((Integer) stockInvoiceItemMap.get("orderQuantity"));
+		}
+		if(stockInvoiceItemMap.get("expiryDate") != null) {
+			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+			if (stockInvoiceItemMap.get("expiryDate").toString().length() == 10) {
+				stockInvoiceItem.setExpiryDate(dateFormat.parse(stockInvoiceItemMap.get("expiryDate").toString()));
+			} else {
+				stockInvoiceItem.setExpiryDate(dateFormat.parse(stockInvoiceItemMap.get("expiryDate").toString()
+						.substring(0, stockInvoiceItemMap.get("expiryDate").toString().indexOf("T"))));
+			}
 		}
 		
 		//		if(stockInvoiceItemMap.get("stockInvoiceUuid") != null){

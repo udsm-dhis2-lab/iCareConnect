@@ -768,7 +768,7 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 	}
 	
 	@Test
-	public void updatingStockInvoices() throws Exception {
+	public void updatingStockInvoice() throws Exception {
 		String dto = this.readFile("dto/store/stock-invoice-update.json");
 		Map<String, Object> stockInvoiceMap = (new ObjectMapper()).readValue(dto, Map.class);
 		
@@ -779,5 +779,15 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		Map<String, Object> updatedInvoice = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
 		assertThat("stock invoice has been updated",updatedInvoice.get("invoiceNumber").equals("StInvoice3"));
 		
+	}
+
+	@Test
+	public void updateStockInvoiceItem() throws Exception{
+		String dto = this.readFile("dto/store/stock-invoice-item-update.json");
+		Map<String,Object> stockInvoiceItemMap = (new ObjectMapper()).readValue(dto,Map.class);
+		MockHttpServletRequest newPostRequest = newPostRequest("store/stockinvoiceitem/8800zx3570-8z37-11ff-2234-01102007812",stockInvoiceItemMap);
+		MockHttpServletResponse handle = handle(newPostRequest);
+		Map<String, Object> updateInvoiceItem =(new ObjectMapper()).readValue(handle.getContentAsString(),Map.class);
+		assertThat(" The stock invoice item has been updated",updateInvoiceItem.get("batchNo").equals("batch-2"));
 	}
 }

@@ -569,33 +569,7 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 	public List<StockInvoiceStatus> getStockInvoicesStatus(Integer startIndex, Integer limit, String q) {
 		return stockInvoiceStatusDAO.getStockInvoicesStatus(startIndex, limit, q);
 	}
-	
-	@Override
-	public StockInvoiceItem saveStockInvoiceItem(StockInvoiceItem stockInvoiceItemObject) throws Exception {
-		
-		StockInvoice stockInvoice = this.getStockInvoicebyUuid(stockInvoiceItemObject.getStockInvoice().getUuid());
-		
-		if (stockInvoice == null) {
-			throw new Exception("The stock invoice with uuid " + stockInvoiceItemObject.getStockInvoice().getUuid()
-			        + " does not exist");
-		}
-		
-		Item item = dao.findByUuid(stockInvoiceItemObject.getItem().getUuid().toString());
-		if (item == null) {
-			throw new Exception("The item with uuid " + stockInvoiceItemObject.getItem().getUuid() + " does not exist");
-		}
-		
-		Concept uom = Context.getConceptService().getConceptByUuid(stockInvoiceItemObject.getUom().getUuid());
-		if (uom == null) {
-			throw new Exception(" The unit of measurement with uuid " + stockInvoiceItemObject.getUom().getUuid()
-			        + " does not exist");
-		}
-		
-		stockInvoiceItemObject.setStockInvoice(stockInvoice);
-		stockInvoiceItemObject.setItem(item);
-		stockInvoiceItemObject.setUom(uom);
-		return this.stockInvoiceItemDAO.save(stockInvoiceItemObject);
-	}
+
 	
 	@Override
 	public StockInvoice updateStockInvoice(StockInvoice stockInvoice) throws Exception {
@@ -626,6 +600,19 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 	@Override
 	public StockInvoice getStockInvoice(String stockInvoiceUuid) {
 		return stockInvoiceDAO.findByUuid(stockInvoiceUuid);
+	}
+
+	@Override
+	public StockInvoiceItem updateStockInvoiceItem(StockInvoiceItem stockInvoiceItem) throws Exception {
+		if (stockInvoiceItem.getItem() != null) {
+			ICareService iCareService = Context.getService(ICareService.class);
+			Item item = iCareService.getItemByUuid(stockInvoiceItem.getItem().getUuid());
+			if (item == null) {
+				throw new Exception("The item with uuid " + stockInvoiceItem.getItem().getUuid() + " does not exist");
+			}
+			stockInvoiceItem.setItem(item);
+		}
+		return stockInvoiceItemDAO.updateStockInvoiceItem(stockInvoiceItem);
 	}
 
 
