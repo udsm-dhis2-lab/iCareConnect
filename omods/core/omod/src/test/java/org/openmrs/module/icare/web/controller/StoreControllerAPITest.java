@@ -684,23 +684,24 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		assertThat("List count is 1", ((List) stockInvoices.get("results")).size() == 1, is(true));
 		
 		//Creating stock invoice items with the existing stock invoices
-//		String dto2 = this.readFile("dto/store/stock-invoice-items-create.json");
-//		List<Map<String, Object>> stockInvoice2 = (new ObjectMapper()).readValue(dto2, List.class);
-//
-//		//post stock invoice
-//		MockHttpServletRequest newPostRequest2 = newPostRequest("store/stockinvoices", stockInvoice);
-//		MockHttpServletResponse handle2 = handle(newPostRequest);
-//
-//		List<Map<String, Object>> createdStockInvoices2 = (new ObjectMapper()).readValue(handle2.getContentAsString(),
-//		    List.class);
-//
-//		assertThat("created 1 stock invoice", createdStockInvoices.size(), is(1));
-
+		//		String dto2 = this.readFile("dto/store/stock-invoice-items-create.json");
+		//		List<Map<String, Object>> stockInvoice2 = (new ObjectMapper()).readValue(dto2, List.class);
+		//
+		//		//post stock invoice
+		//		MockHttpServletRequest newPostRequest2 = newPostRequest("store/stockinvoices", stockInvoice);
+		//		MockHttpServletResponse handle2 = handle(newPostRequest);
+		//
+		//		List<Map<String, Object>> createdStockInvoices2 = (new ObjectMapper()).readValue(handle2.getContentAsString(),
+		//		    List.class);
+		//
+		//		assertThat("created 1 stock invoice", createdStockInvoices.size(), is(1));
+		
 		//getting specific stock invoice
 		MockHttpServletRequest newGetRequest3 = newGetRequest("store/stockinvoice/8800zx3570-8z37-11ff-2234-01102007811");
 		MockHttpServletResponse handle3 = handle(newGetRequest3);
-		Map<String,Object> stockInvoiceGet = (new ObjectMapper()).readValue(handle3.getContentAsString(),Map.class);
-		assertThat("There is 1 stock invoice present",stockInvoiceGet.get("uuid").equals("8800zx3570-8z37-11ff-2234-01102007811"));
+		Map<String, Object> stockInvoiceGet = (new ObjectMapper()).readValue(handle3.getContentAsString(), Map.class);
+		assertThat("There is 1 stock invoice present",
+		    stockInvoiceGet.get("uuid").equals("8800zx3570-8z37-11ff-2234-01102007811"));
 		
 	}
 	
@@ -753,14 +754,13 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 	
 	@Test
 	public void creatingAndGettingStockInvoiceItems() throws Exception {
-
+		
 		//getting specific stock invoice
 		MockHttpServletRequest newGetRequest3 = newGetRequest("store/stockinvoiceitem/8800zx3570-8z37-11ff-2234-01102007812");
 		MockHttpServletResponse handle3 = handle(newGetRequest3);
-		Map<String,Object> stockInvoiceItemGet = (new ObjectMapper()).readValue(handle3.getContentAsString(),Map.class);
-		assertThat("There is 1 stock invoice item present",stockInvoiceItemGet.get("uuid").equals("8800zx3570-8z37-11ff-2234-01102007812"));
-
-
+		Map<String, Object> stockInvoiceItemGet = (new ObjectMapper()).readValue(handle3.getContentAsString(), Map.class);
+		assertThat("There is 1 stock invoice item present",
+		    stockInvoiceItemGet.get("uuid").equals("8800zx3570-8z37-11ff-2234-01102007812"));
 		
 	}
 	
@@ -774,17 +774,19 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		MockHttpServletResponse handle = handle(newPostRequest);
 		
 		Map<String, Object> updatedInvoice = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
-		assertThat("stock invoice has been updated",updatedInvoice.get("invoiceNumber").equals("StInvoice3"));
+		System.out.println(updatedInvoice);
+		assertThat("stock invoice has been updated", updatedInvoice.get("invoiceNumber").equals("StInvoice3"));
 		
 	}
-
+	
 	@Test
-	public void updateStockInvoiceItem() throws Exception{
+	public void updateStockInvoiceItem() throws Exception {
 		String dto = this.readFile("dto/store/stock-invoice-item-update.json");
-		Map<String,Object> stockInvoiceItemMap = (new ObjectMapper()).readValue(dto,Map.class);
-		MockHttpServletRequest newPostRequest = newPostRequest("store/stockinvoiceitem/8800zx3570-8z37-11ff-2234-01102007812",stockInvoiceItemMap);
+		Map<String, Object> stockInvoiceItemMap = (new ObjectMapper()).readValue(dto, Map.class);
+		MockHttpServletRequest newPostRequest = newPostRequest(
+		    "store/stockinvoiceitem/8800zx3570-8z37-11ff-2234-01102007812", stockInvoiceItemMap);
 		MockHttpServletResponse handle = handle(newPostRequest);
-		Map<String, Object> updateInvoiceItem =(new ObjectMapper()).readValue(handle.getContentAsString(),Map.class);
-		assertThat(" The stock invoice item has been updated",updateInvoiceItem.get("batchNo").equals("batch-2"));
+		Map<String, Object> updateInvoiceItem = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
+		assertThat(" The stock invoice item has been updated", updateInvoiceItem.get("batchNo").equals("batch-2"));
 	}
 }
