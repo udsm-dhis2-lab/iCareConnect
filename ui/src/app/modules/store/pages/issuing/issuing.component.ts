@@ -1,14 +1,14 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, Input, OnInit } from "@angular/core";
 import { MatCheckboxChange } from "@angular/material/checkbox";
 import { MatDialog } from "@angular/material/dialog";
 import { MatSelectChange } from "@angular/material/select";
 import { select, Store } from "@ngrx/store";
+import { IssuingObject } from "src/app/shared/resources/store/models/issuing.model";
+import { IssuingService } from "src/app/shared/resources/store/services/issuing.service";
 import { uniqBy, groupBy, orderBy, flatten, omit } from "lodash";
 import { Observable, of, zip } from "rxjs";
 import { map } from "rxjs/operators";
 import { LocationGet } from "src/app/shared/resources/openmrs";
-import { IssuingObject } from "src/app/shared/resources/store/models/issuing.model";
-import { IssuingService } from "src/app/shared/resources/store/services/issuing.service";
 import { loadLocationsByTagName } from "src/app/store/actions";
 import {
   issueRequest,
@@ -31,6 +31,8 @@ import { RequestCancelComponent } from "../../modals/request-cancel/request-canc
   styleUrls: ["./issuing.component.scss"],
 })
 export class IssuingComponent implements OnInit {
+  @Input() currentLocation: any;
+
   issuingList$: Observable<IssuingObject[]>;
   loadingIssuingList$: Observable<boolean>;
   currentStore$: Observable<LocationGet>;
@@ -49,10 +51,17 @@ export class IssuingComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.issuingList$ = this.issuingService.getIssuings(
+      this.currentLocation?.id
+    )?.pipe(map((response) => {
+      return response?.issuings
+    }));
     // this.issuingList$ = this.store.pipe(select(getAllIssuings));
-    this.getAllIssuing();
-    this.loadingIssuingList$ = this.store.pipe(select(getIssuingLoadingState));
-    this.currentStore$ = this.store.select(getCurrentLocation);
+    // this.loadingIssuingList$ = this.store.pipe(select(getIssuingLoadingState));
+    // this.issuingList$ = this.store.pipe(select(getAllIssuings));
+    // this.getAllIssuing();
+    // this.loadingIssuingList$ = this.store.pipe(select(getIssuingLoadingState));
+    // this.currentStore$ = this.store.select(getCurrentLocation);
     this.stores$ = this.store.pipe(select(getStoreLocations));
   }
 
@@ -114,10 +123,10 @@ export class IssuingComponent implements OnInit {
   }
 
   getAllIssuing(): void {
-    this.issuingList$ = this.issuingService.getAllIssuings(
-      JSON.parse(localStorage.getItem("currentLocation"))?.uuid,
-      this.requestingLocation?.uuid
-    );
+    // this.issuingList$ = this.issuingService.getAllIssuings(
+    //   JSON.parse(localStorage.getItem("currentLocation"))?.uuid,
+    //   this.requestingLocation?.uuid
+    // );
   }
 
   onReject(e, issue?: IssuingObject): void {

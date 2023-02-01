@@ -1,9 +1,8 @@
-import { ThrowStmt } from "@angular/compiler";
-import { Component, OnInit } from "@angular/core";
+import { Component, Input, OnInit } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { select, Store } from "@ngrx/store";
-import { Observable, of } from "rxjs";
 import { map } from "rxjs/operators";
+import { Observable, of } from "rxjs";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { RequisitionInput } from "src/app/shared/resources/store/models/requisition-input.model";
 import { RequisitionObject } from "src/app/shared/resources/store/models/requisition.model";
@@ -18,15 +17,9 @@ import {
 import { AppState } from "src/app/store/reducers";
 import {
   getCurrentLocation,
-  getLocations,
   getStoreLocations,
 } from "src/app/store/selectors";
 import { getAllStockableItems } from "src/app/store/selectors/pricing-item.selectors";
-import {
-  getActiveRequisitions,
-  getAllRequisitions,
-  getRequisitionLoadingState,
-} from "src/app/store/selectors/requisition.selectors";
 import { RequestCancelComponent } from "../../modals/request-cancel/request-cancel.component";
 import { RequisitionFormComponent } from "../../modals/requisition-form/requisition-form.component";
 
@@ -36,6 +29,7 @@ import { RequisitionFormComponent } from "../../modals/requisition-form/requisit
   styleUrls: ["./requisition.component.scss"],
 })
 export class RequisitionComponent implements OnInit {
+  @Input() currentLocation: any
   requisitions$: Observable<RequisitionObject[]>;
   loadingRequisitions$: Observable<boolean>;
   stores$: Observable<any>;
@@ -59,6 +53,16 @@ export class RequisitionComponent implements OnInit {
   }
 
   ngOnInit() {
+    // RequisitionObject
+    this.requisitions$ = this.requisitionService.getRequisitions(
+      this.currentLocation?.id
+    ).pipe(map((response) => {
+      return response?.requisitions
+    }));
+    // this.requisitions$ = this.store.pipe(select(getActiveRequisitions));
+    // this.loadingRequisitions$ = this.store.pipe(
+    //   select(getRequisitionLoadingState)
+    // );
     this.referenceTagsThatCanRequestFromMainStoreConfigs$ =
       this.systemSettingsService.getSystemSettingsMatchingAKey(
         `iCare.store.mappings.canRequestFromMainStore.LocationTagsUuid`
@@ -76,22 +80,24 @@ export class RequisitionComponent implements OnInit {
       this.systemSettingsService.getSystemSettingsByKey(
         `iCare.store.settings.pharmacy.locationTagUuid`
       );
-    this.getAllRequisition();
-    this.loadingRequisitions$ = this.store.pipe(
-      select(getRequisitionLoadingState)
-    );
+    // this.getAllRequisition();
+    // this.loadingRequisitions$ = this.store.pipe(
+    //   select(getRequisitionLoadingState)
+    // );
+    // this.currentStore$ = this.store.pipe(select(getCurrentLocation));
     this.stores$ = this.store.pipe(select(getStoreLocations));
-    this.currentStore$ = this.store.pipe(select(getCurrentLocation));
     this.stockableItems$ = this.store.pipe(select(getAllStockableItems));
   }
 
   getAllRequisition(event?: any): void {
     this.loadedRequisitions = false;
     this.searchTerm = event ? event?.target?.value : "";
+    // this.requisitions$ = this.requisitionService
+    //   .getAllRequisitions(
+    //     JSON.parse(localStorage.getItem("currentLocation"))?.uuid
+    //   )
     this.requisitions$ = this.requisitionService
-      .getAllRequisitions(
-        JSON.parse(localStorage.getItem("currentLocation"))?.uuid
-      )
+      .getRequisitions(this.currentLocation?.id)
       .pipe(
         map((requisitions) => {
           this.requisitions = requisitions;
