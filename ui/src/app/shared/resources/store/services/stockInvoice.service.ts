@@ -1,9 +1,8 @@
 import { Injectable } from "@angular/core";
-import { flatten } from "lodash";
+import { omit } from "lodash";
 import { Observable, zip } from "rxjs";
 import { catchError, map } from "rxjs/operators";
 import { OpenmrsHttpClientService } from "src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service";
-import { SupplierObject } from "../models/suppler.model";
 
 @Injectable({
   providedIn: "root",
@@ -14,7 +13,7 @@ export class StockInvoicesService {
   createStockInvoices(invoices: any[]): Observable<any> {
     return this.httpClient.post(`store/stockinvoices`, invoices).pipe(
       map((invoicesResponse: any) => {
-        return invoicesResponse;
+        return invoicesResponse[0];
       }),
       catchError((error: any) => error)
     );
@@ -22,14 +21,30 @@ export class StockInvoicesService {
 
   getStockInvoices(): Observable<any> {
     return this.httpClient.get(`store/stockinvoices`).pipe(
-      map((invoiceResponse: any) => {
-        return invoiceResponse;
+      map((stockInvoiceResponse: any) => {
+        return stockInvoiceResponse;
       }),
       catchError((error: any) => error)
     );
   }
 
-  // getInvoiceItems(uuid: string): Observable<any> {
-  //   return this.httpClient.get(`store/stockinvoices/${}`
-  // }
+  updateStockInvoice(invoiceUuid: string, invoiceObject: any): Observable<any>{
+    return this.httpClient
+      .post(`store/stockinvoice/${invoiceUuid}`, invoiceObject)
+      .pipe(
+        map((stockInvoicesResponse: any) => {
+          return stockInvoicesResponse;
+        }),
+        catchError((error: any) => error)
+      );
+  }
+
+  getStockInvoice(uuid: string): Observable<any> {
+    return this.httpClient.get(`store/stockinvoice/${uuid}`).pipe(
+      map((stockInvoiceResponse: any) => {
+        return stockInvoiceResponse
+      }),
+      catchError((error: any) => error)
+    );
+  }
 }

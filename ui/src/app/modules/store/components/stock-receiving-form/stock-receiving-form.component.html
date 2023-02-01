@@ -1,12 +1,13 @@
 <div class="container-fluid" *ngIf="{
     unitsOfMeasurements: unitsOfMeasurements$ | async
   } as params">
-  <div class="row">
+  <div class="row" *ngIf="!stockInvoice && !loadingInvoice">
     <div class="col-12">
       <h2 class="text-center">NEW RECEIVED STOCK INVOICE</h2>
     </div>
   </div>
-  <div class="row">
+  <mat-progress-bar mode="indeterminate" *ngIf="!stockInvoice && loadingInvoice"></mat-progress-bar>
+  <div class="row" *ngIf="stockInvoice && !loadingInvoice">
     <div class="col-12">
       <mat-accordion>
         <mat-expansion-panel
@@ -18,7 +19,9 @@
               <span>Added Items</span>
             </mat-panel-title>
           </mat-expansion-panel-header>
-          <app-stock-invoice-items></app-stock-invoice-items>
+          <div class="inv-items-table">
+            <app-stock-invoice-items [stockInvoice]="stockInvoice"></app-stock-invoice-items>
+          </div>
         </mat-expansion-panel>
       </mat-accordion>
     </div>
@@ -29,7 +32,8 @@
       [suppliers]="suppliers"
       [unitsOfMeasurements]="params?.unitsOfMeasurements"
       [unitsOfMeasurementSettings]="unitsOfMeasurementSettings"
-      (loadInvoices)="loadInvoices()"
+      [existingStockInvoice]="stockInvoice"
+      (loadInvoices)="loadInvoices($event)"
     ></app-stock-receiving-form-fields>
   </div>
 </div>

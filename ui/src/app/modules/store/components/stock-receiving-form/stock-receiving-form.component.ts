@@ -9,6 +9,7 @@ import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
 import { Textbox } from "src/app/shared/modules/form/models/text-box.model";
 import { ConceptsService } from "src/app/shared/resources/concepts/services/concepts.service";
 import { Api } from "src/app/shared/resources/openmrs";
+import { StockInvoicesService } from "src/app/shared/resources/store/services/stockInvoice.service";
 
 @Component({
   selector: "app-stock-receiving-form",
@@ -18,22 +19,37 @@ import { Api } from "src/app/shared/resources/openmrs";
 export class StockReceivingFormComponent implements OnInit {
   @Input() suppliers: any[];
   @Input() unitsOfMeasurementSettings: any;
+  @Input() existingStockInvoice: any;
 
   unitsOfMeasurements$: Observable<any>;
-  constructor(private conceptService: ConceptsService) {}
+  stockInvoice: any;
+  loadingInvoice: boolean = false;
+  constructor(
+    private conceptService: ConceptsService,
+  ) {}
 
   ngOnInit(): void {
-    this.unitsOfMeasurements$ = this.conceptService?.getConceptByMappingSource(
-      this.unitsOfMeasurementSettings?.mappingSource,
-      "custom:(uuid,display,mappings:(uuid,display,conceptReferenceTerm:(uuid,display,code)))"
-    ).pipe(map((response) => {
-      if(!response?.error){
-        return response?.results
-      }
-    } ));
+    this.stockInvoice = this.existingStockInvoice;
+    this.unitsOfMeasurements$ = this.conceptService
+      ?.getConceptByMappingSource(
+        this.unitsOfMeasurementSettings?.mappingSource,
+        "custom:(uuid,display,mappings:(uuid,display,conceptReferenceTerm:(uuid,display,code)))"
+      )
+      .pipe(
+        map((response) => {
+          if (!response?.error) {
+            return response?.results;
+          }
+        })
+      );
   }
 
-  loadInvoices(){
-    // this.invoice
+  loadInvoices(invoice) {
+    this.loadingInvoice = true
+    this.stockInvoice = undefined;
+    setTimeout(() => {
+      this.stockInvoice = this.existingStockInvoice || invoice;
+      this.loadingInvoice = false
+    }, 100)
   }
 }

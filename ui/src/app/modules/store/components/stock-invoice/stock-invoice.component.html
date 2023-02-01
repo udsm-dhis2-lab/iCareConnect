@@ -2,12 +2,15 @@
     suppliers: suppliers$ | async,
     unitsOfMeasurementSettings: unitsOfMeasurementSettings$ | async
 } as params">
-  <mat-tab-group>
+  <mat-tab-group *ngIf="params?.unitsOfMeasurementSettings && params?.suppliers">
     <mat-tab>
       <ng-template mat-tab-label>
         <span>Draft Invoices</span>
       </ng-template>
-      <app-stock-invoices-list></app-stock-invoices-list>
+      <app-stock-invoices-list 
+        [suppliers]="params?.suppliers"
+        [unitsOfMeasurementSettings]="params?.unitsOfMeasurementSettings"  
+      ></app-stock-invoices-list>
     </mat-tab>
     <mat-tab>
       <ng-template mat-tab-label>
@@ -17,7 +20,7 @@
         <h1>New Items</h1>
       </div>
     </mat-tab>
-    <mat-tab *ngIf="params?.unitsOfMeasurementSettings && params?.suppliers" >
+    <mat-tab>
       <ng-template mat-tab-label>
         <span>Receive New Items</span>
       </ng-template>

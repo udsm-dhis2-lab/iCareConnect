@@ -207,7 +207,7 @@ export class Requisition {
   }
 
   get status(): RequisitionStatus {
-    const isReceived = this.requisition?.issues.some(
+    const isReceived = this.requisition?.issues?.some(
       (issue) => issue.receipts?.length > 0
     );
 
