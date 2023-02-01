@@ -72,10 +72,7 @@ export class SampleAllocationService {
                     }
                   }
                 )
-              )?.filter((result) => {
-                console.log("result", result);
-                return result?.authorizationIsReady;
-              }) || []
+              )?.filter((result) => result?.authorizationIsReady) || []
             )?.length ===
             (
               flatten(
