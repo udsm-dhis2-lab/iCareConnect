@@ -62,24 +62,12 @@ export class StockReceivingFormFieldsComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.setFields();
-  }
-
-  async setFields(): Promise<void> {
     const supplierFieldOptions = this.suppliers?.map((supplier) => {
       return {
         key: supplier,
         label: supplier.name,
         value: supplier?.uuid,
         name: supplier?.name,
-      };
-    });
-    const unitOfMeasureOptions = this.unitsOfMeasurements?.map((unit) => {
-      return {
-        key: unit?.uuid,
-        label: unit?.display,
-        value: unit,
-        name: unit?.display,
       };
     });
     this.commonFields = [
@@ -101,7 +89,19 @@ export class StockReceivingFormFieldsComponent implements OnInit {
         max: formatDateToYYMMDD(new Date()),
       }),
     ];
+    this.setFields();
+  }
 
+  setFields() {
+    const unitOfMeasureOptions = this.unitsOfMeasurements?.map((unit) => {
+      return {
+        key: unit?.uuid,
+        label: unit?.display,
+        value: unit,
+        name: unit?.display,
+      };
+    });
+    
     this.itemField = new Textbox({
       id: "item",
       key: "item",
@@ -144,6 +144,15 @@ export class StockReceivingFormFieldsComponent implements OnInit {
         label: "Amount",
         disabled: true,
       }));
+
+      this.itemFields = [
+        this.unitField, 
+        this.orderQuantityField,
+        this.mfgBatchNumberField,
+        this.expiryDateField,
+        this.batchQuantityField,
+        this.unitPriceField
+      ];
   }
 
   onFormUpdate(formValues: FormValue) {
@@ -254,7 +263,6 @@ export class StockReceivingFormFieldsComponent implements OnInit {
 
   saveInvoices(e: any) {
     e?.stopPropagation();
-    console.log("==> Form Values: ", this.formValues);
     const invoicesObject = [
       {
         invoiceNumber: this.formValues?.invoiceNumber?.value,
@@ -286,10 +294,13 @@ export class StockReceivingFormFieldsComponent implements OnInit {
     ];
 
     this.stockInvoicesService.createStockInvoices(invoicesObject).pipe(tap(() => {
+      this.itemFields = []
+      setTimeout(() => {
+        this.setFields();
+      }, 100)
       this.loadInvoices.emit()
     })).subscribe();
 
-    console.log("==> Selected Item and invoice object: ", invoicesObject);
     this.reloadItemFields(true);
   }
 
