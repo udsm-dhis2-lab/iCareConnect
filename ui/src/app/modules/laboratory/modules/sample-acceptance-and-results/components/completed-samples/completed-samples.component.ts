@@ -10,6 +10,7 @@ import { getProviderDetails } from "src/app/store/selectors/current-user.selecto
 import { filter, orderBy, groupBy } from "lodash";
 import { getCompletedOrders } from "src/app/modules/laboratory/resources/helpers";
 import { PrintResultsModalComponent } from "../print-results-modal/print-results-modal.component";
+import { LabSample } from "src/app/modules/laboratory/resources/models";
 
 @Component({
   selector: "app-completed-samples",
@@ -103,10 +104,13 @@ export class CompletedSamplesComponent implements OnInit {
                     departmentName: depName,
                     samples: samplesKeyedByDepartments[depName].map(
                       (sampleObject) => {
-                        return {
-                          ...sampleObject,
-                          ...sampleObject?.sample,
-                        };
+                        const sample = new LabSample(
+                          sampleObject?.sample,
+                          this.labSamplesDepartments,
+                          this.sampleTypes,
+                          this.codedSampleRejectionReasons
+                        );
+                        return sample;
                       }
                     ),
                   };
