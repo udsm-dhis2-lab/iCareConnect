@@ -708,4 +708,11 @@ public class StoreController {
 		return updatedStockInvoiceItem.toMap();
 
 	}
+
+	@RequestMapping(value = "stockinvoiceitem/{stockInvoiceItemUuid}",method = RequestMethod.GET)
+	@ResponseBody
+	public Map<String,Object> getStockInvoiceItemByUuid(@PathVariable String stockInvoiceItemUuid){
+		StockInvoiceItem stockInvoiceItem = storeService.getStockInvoiceItem(stockInvoiceItemUuid);
+		return  stockInvoiceItem.toMap();
+	}
 }
