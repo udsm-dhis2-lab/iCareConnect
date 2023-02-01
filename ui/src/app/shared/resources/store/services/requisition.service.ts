@@ -1,8 +1,9 @@
-import { Injectable } from "@angular/core";
-import { Observable, of, throwError } from "rxjs";
-import { map } from "rxjs/operators";
-import { OpenmrsHttpClientService } from "src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service";
-import { RequisitionInput } from "../models/requisition-input.model";
+import { Injectable } from '@angular/core';
+import { omit } from 'lodash';
+import { Observable, of, throwError } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { OpenmrsHttpClientService } from 'src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service';
+import { RequisitionInput } from '../models/requisition-input.model';
 import {
   Requisition,
   RequisitionIssueInput,
@@ -16,6 +17,29 @@ import { orderBy } from "lodash";
 })
 export class RequisitionService {
   constructor(private httpClient: OpenmrsHttpClientService) {}
+
+  getRequisitions(locationUuid?: string): Observable<any> {
+    return this.httpClient
+      .get(`store/requests?requestingLocationUuid=${locationUuid}`)
+      .pipe(
+        map((requestResponse) => {
+          return {
+            ...omit(requestResponse, "results"),
+            requisitions: (requestResponse?.results || [])
+              ?.map((requestItem) => {
+                const requisitionInstance = new Requisition(requestItem);
+
+                if (requisitionInstance.status === "CANCELLED") {
+                  return null;
+                }
+
+                return requisitionInstance.toJson();
+              })
+              .filter((requisition) => requisition),
+          };
+        })
+      );
+  }
 
   getAllRequisitions(locationUuid?: string): Observable<RequisitionObject[]> {
     return this.httpClient

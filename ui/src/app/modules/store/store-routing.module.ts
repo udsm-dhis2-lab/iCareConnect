@@ -1,7 +1,9 @@
 import { NgModule } from "@angular/core";
 import { Routes, RouterModule } from "@angular/router";
 import { StockOutItemsComponent } from "./components/stock-out-items/stock-out-items.component";
+import { IssuingPageComponent } from "./pages/issuing-page/issuing-page.component";
 import { IssuingComponent } from "./pages/issuing/issuing.component";
+import { RequisitionPageComponent } from "./pages/requisition-page/requisition-page.component";
 import { RequisitionReceiptComponent } from "./pages/requisition-receipt/requisition-receipt.component";
 import { RequisitionComponent } from "./pages/requisition/requisition.component";
 import { StockComponent } from "./pages/stock/stock.component";
@@ -25,7 +27,7 @@ const routes: Routes = [
       },
       {
         path: "requisition",
-        component: RequisitionComponent,
+        component: RequisitionPageComponent,
       },
       {
         path: "receipt",
@@ -33,7 +35,7 @@ const routes: Routes = [
       },
       {
         path: "issuing",
-        component: IssuingComponent,
+        component: IssuingPageComponent,
       },
       {
         path: "transaction",
