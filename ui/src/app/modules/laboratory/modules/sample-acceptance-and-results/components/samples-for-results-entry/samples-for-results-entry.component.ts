@@ -64,18 +64,7 @@ export class SamplesForResultsEntryComponent implements OnInit {
       );
   }
 
-  onToggleViewSampleDetails(event: Event, sample: any): void {
-    event.stopPropagation();
-    console.log(sample);
-  }
-
-  onResultsEntryAndReview(
-    e,
-    sample,
-    providerDetails,
-    actionType: string
-  ): void {
-    e.stopPropagation();
+  onResultsEntryAndReview(sample, providerDetails, actionType: string): void {
     this.dialog
       .open(SharedResultsEntryAndViewModalComponent, {
         data: {

@@ -7,7 +7,7 @@
 >
   <mat-progress-bar
     mode="indeterminate"
-    *ngIf="!params?.completedSamples"
+    *ngIf="!params?.completedSamples || !params?.providerDetails"
   ></mat-progress-bar>
   <div class="loading-overlay" *ngIf="saving">
     <div class="text-center">
@@ -17,184 +17,15 @@
       </div>
     </div>
   </div>
-  <div *ngIf="params?.completedSamples">
-    <table class="table table-bordered">
-      <thead class="table-header">
-        <tr>
-          <th rowspan="2">SN</th>
-          <th rowspan="2">Department/Section</th>
-          <th rowspan="2">Sample / Specimen</th>
-          <th rowspan="2">Laboratory ID</th>
-          <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">MRN</th>
-          <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">Patient Names</th>
-          <th colspan="2" class="text-center">Test details</th>
-          <th rowspan="2" *ngIf="LISConfigurations?.isLIS">Received By</th>
-          <th rowspan="2" *ngIf="LISConfigurations?.isLIS">Received On</th>
-          <th rowspan="2" *ngIf="LISConfigurations?.isLIS">
-            {{ !LISConfigurations?.isLIS ? "Collected By" : "Registered By" }}
-          </th>
-          <th rowspan="2">
-            {{ !LISConfigurations?.isLIS ? "Collected On" : "Registered On" }}
-          </th>
-          <th rowspan="2">Priority</th>
-          <th rowspan="2">Action</th>
-        </tr>
-        <tr>
-          <th>Test Order</th>
-          <th>
-            {{ !LISConfigurations?.isLIS ? "Collected By" : "ID" }}
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        <ng-container *ngIf="params?.completedSamples?.length > 0">
-          <ng-container
-            *ngFor="let sample of params?.completedSamples; let count = index"
-          >
-            <tr
-              [ngStyle]="{
-                'background-color': sample?.authorized
-                  ? '#6fd67bcf'
-                  : sample?.atLestOneOrderWithRejectedResults
-                  ? '#d04747ab'
-                  : sample?.approved && !LISConfigurations?.isLIS
-                  ? '#f5f171f7'
-                  : sample?.approved && LISConfigurations?.isLIS
-                  ? '#0080009e'
-                  : sample?.hasResults
-                  ? '#ec864acf'
-                  : ''
-              }"
-              *ngFor="let order of sample?.orders; let orderCount = index"
-              [ngClass]="{ 'row-alternated': count % 2 !== 0 }"
-            >
-              <td
-                *ngIf="orderCount == 0"
-                [attr.rowspan]="sample?.orders?.length"
-              >
-                {{ count + 1 + (page - 1) * pageCount }}
-              </td>
-              <td
-                *ngIf="orderCount == 0"
-                [attr.rowspan]="sample?.orders?.length"
-              >
-                {{
-                  sample?.department?.name
-                    ? sample?.department?.name
-                    : "Not set"
-                }}
-              </td>
-              <td
-                *ngIf="orderCount == 0"
-                [attr.rowspan]="sample?.orders?.length"
-              >
-                {{ sample?.specimenSource?.specimenName }}
-              </td>
-              <td
-                *ngIf="orderCount == 0"
-                [attr.rowspan]="sample?.orders?.length"
-              >
-                {{ sample?.label }}
-              </td>
-              <td
-                *ngIf="orderCount == 0 && !LISConfigurations?.isLIS"
-                [attr.rowspan]="sample?.orders?.length"
-              >
-                {{ sample?.mrn }}
-              </td>
-              <td
-                *ngIf="orderCount == 0 && !LISConfigurations?.isLIS"
-                [attr.rowspan]="sample?.orders?.length"
-              >
-                {{ sample?.patient?.givenName }}
-                {{ sample?.patient?.middleName }}
-                {{ sample?.patient?.familyName }}
-              </td>
-              <td>
-                {{ order?.order?.concept?.display }}
-              </td>
-              <td>
-                {{
-                  !LISConfigurations?.isLIS
-                    ? order?.order?.orderer?.name
-                    : order?.order?.orderNumber
-                }}
-              </td>
-              <td
-                *ngIf="orderCount == 0 && LISConfigurations?.isLIS"
-                [attr.rowspan]="sample?.orders?.length"
-              >
-                {{ sample?.receivedByStatus?.user?.name }}
-              </td>
-              <td
-                *ngIf="orderCount == 0 && LISConfigurations?.isLIS"
-                [attr.rowspan]="sample?.orders?.length"
-              >
-                {{
-                  sample?.receivedOnStatus?.timestamp
-                    ? (sample?.receivedOnStatus?.remarks | date: "medium")
-                    : ""
-                }}
-              </td>
-              <td
-                *ngIf="orderCount == 0 && LISConfigurations?.isLIS"
-                [attr.rowspan]="sample?.orders?.length"
-              >
-                {{ sample?.collectedBy?.display }}
-              </td>
-              <td
-                *ngIf="orderCount == 0"
-                [attr.rowspan]="sample?.orders?.length"
-              >
-                {{ sample?.dateCreated | date: "medium" }}
-              </td>
-              <td
-                *ngIf="orderCount == 0"
-                [attr.rowspan]="sample?.orders?.length"
-              >
-                {{
-                  !LISConfigurations?.isLIS
-                    ? sample?.priorityHigh
-                      ? "Urgent"
-                      : "Routine"
-                    : sample?.priorityStatus?.status
-                    ? sample?.priorityStatus?.status
-                    : "Routine"
-                }}
-              </td>
-
-              <td
-                *ngIf="orderCount == 0"
-                [attr.rowspan]="sample?.orders?.length"
-              >
-                <div class="d-flex justify-content-center"></div>
-              </td>
-            </tr>
-            <tr
-              *ngIf="samplesToViewMoreDetails[sample?.id]"
-              class="sample-details-row"
-            >
-              <td colspan="11">
-                <app-shared-sample-details
-                  [sample]="sample"
-                ></app-shared-sample-details>
-              </td>
-              <td>
-                <div class="d-flex justify-content-center"></div>
-              </td>
-            </tr>
-          </ng-container>
-        </ng-container>
-        <ng-container *ngIf="params?.completedSamples?.length === 0">
-          <tr>
-            <td colspan="100%">
-              <div class="alert alert-warning" role="alert">
-                No completed samples
-              </div>
-            </td>
-          </tr>
-        </ng-container>
-      </tbody>
-    </table>
+  <div *ngIf="params?.completedSamples && params?.providerDetails">
+    <app-shared-samples-list
+      [tabType]="'completed-samples'"
+      [samples]="params?.completedSamples"
+      [LISConfigurations]="LISConfigurations"
+      [labSamplesDepartments]="labSamplesDepartments"
+      (selectedSampleDetails)="
+        onGetSelectedSampleDetails($event, params?.providerDetails)
+      "
+    ></app-shared-samples-list>
   </div>
 </div>

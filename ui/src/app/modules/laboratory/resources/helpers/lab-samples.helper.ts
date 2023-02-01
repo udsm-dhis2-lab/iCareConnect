@@ -299,3 +299,32 @@ function formatOrders(orders, sample) {
     };
   });
 }
+
+export function getCompletedOrders(orders, isLIS?: boolean) {
+  return (
+    _.filter(orders, (order) => {
+      const testAllocationsWithResults = getTestAllocationsWithResults(
+        order?.testAllocations
+      );
+      if (
+        testAllocationsWithResults?.length > 0 &&
+        order?.authorizationInfo?.length > 0
+      ) {
+        return order;
+      }
+    }) || []
+  );
+}
+
+export function getTestAllocationsWithResults(allocations) {
+  return _.uniqBy(
+    allocations?.map((allocation) => {
+      return {
+        ...allocation,
+        conceptUuid: allocation?.concept?.uuid,
+        hasResult: allocation?.results?.length > 0,
+      };
+    }) || [],
+    "conceptUuid"
+  )?.filter((allocation) => allocation?.hasResult);
+}

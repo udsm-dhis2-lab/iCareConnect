@@ -23,7 +23,6 @@ export class SampleTrackingListComponent implements OnInit {
   @Input() userUuid: string;
 
   acceptedSamples$: Observable<any[]>;
-  selectedDepartment: string;
   searchingText: string;
   excludeAllocations: boolean = true;
 
@@ -35,7 +34,6 @@ export class SampleTrackingListComponent implements OnInit {
 
   samplesToViewMoreDetails: any = {};
   saving: boolean = false;
-  departmentName: string;
   constructor(
     private store: Store<AppState>,
     private sampleService: SamplesService
@@ -59,15 +57,5 @@ export class SampleTrackingListComponent implements OnInit {
         codedRejectionReasons: this.codedSampleRejectionReasons,
       }
     );
-  }
-
-  onToggleViewSampleDetails(event: Event, sample: any): void {
-    event.stopPropagation();
-    console.log(sample);
-  }
-
-  setDepartment(event: Event, departmentName): void {
-    event.stopPropagation();
-    this.departmentName = departmentName;
   }
 }

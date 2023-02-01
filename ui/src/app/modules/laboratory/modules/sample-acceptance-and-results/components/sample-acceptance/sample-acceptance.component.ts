@@ -535,7 +535,6 @@ export class SampleAcceptanceComponent implements OnInit {
   }
 
   onPrintSampleResults(event: Event, sample: any): void {
-    console.log(sample);
     event.stopPropagation();
     this.dialog.open(SampleResultsPrintingComponent, {
       width: "70%",
