@@ -613,7 +613,6 @@ public class StoreController {
 
 		return updatedStockInvoice.toMap();
 	}
-
 	
 	@RequestMapping(value = "stockinvoices", method = RequestMethod.GET)
 	@ResponseBody
@@ -630,14 +629,14 @@ public class StoreController {
 		ListResult<StockInvoice> stockInvoices = this.storeService.getStockInvoices(pager);
 		return stockInvoices.toMap();
 	}
-
+	
 	@RequestMapping(value = "stockinvoice/{stockInvoiceUuid}", method = RequestMethod.GET)
 	@ResponseBody
-	public Map<String,Object> getStockInvoiceByUuid(@PathVariable String stockInvoiceUuid){
-
+	public Map<String, Object> getStockInvoiceByUuid(@PathVariable String stockInvoiceUuid) {
+		
 		StockInvoice stockInvoice = storeService.getStockInvoice(stockInvoiceUuid);
 		return stockInvoice.toMap();
-
+		
 	}
 	
 	@RequestMapping(value = "suppliers",method = RequestMethod.POST)
@@ -698,21 +697,22 @@ public class StoreController {
 		return stockInvoiceStatusMapList;
 	}
 	
-	@RequestMapping(value="stockinvoiceitem/{stockInvoiceItemUuid}", method =RequestMethod.POST)
+	@RequestMapping(value = "stockinvoiceitem/{stockInvoiceItemUuid}", method = RequestMethod.POST)
 	@ResponseBody
-	public Map<String,Object> updateStockInvoiceItems(@PathVariable String stockInvoiceItemUuid,@RequestBody Map<String,Object> stockInvoiceItemsMap) throws Exception {
-
+	public Map<String, Object> updateStockInvoiceItems(@PathVariable String stockInvoiceItemUuid,
+	        @RequestBody Map<String, Object> stockInvoiceItemsMap) throws Exception {
+		
 		StockInvoiceItem stockInvoiceItem = StockInvoiceItem.fromMap(stockInvoiceItemsMap);
 		stockInvoiceItem.setUuid(stockInvoiceItemUuid);
 		StockInvoiceItem updatedStockInvoiceItem = storeService.updateStockInvoiceItem(stockInvoiceItem);
 		return updatedStockInvoiceItem.toMap();
-
+		
 	}
-
-	@RequestMapping(value = "stockinvoiceitem/{stockInvoiceItemUuid}",method = RequestMethod.GET)
+	
+	@RequestMapping(value = "stockinvoiceitem/{stockInvoiceItemUuid}", method = RequestMethod.GET)
 	@ResponseBody
-	public Map<String,Object> getStockInvoiceItemByUuid(@PathVariable String stockInvoiceItemUuid){
+	public Map<String, Object> getStockInvoiceItemByUuid(@PathVariable String stockInvoiceItemUuid) {
 		StockInvoiceItem stockInvoiceItem = storeService.getStockInvoiceItem(stockInvoiceItemUuid);
-		return  stockInvoiceItem.toMap();
+		return stockInvoiceItem.toMap();
 	}
 }

@@ -57,6 +57,8 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 	StockInvoiceStatusDAO stockInvoiceStatusDAO;
 	
 	StockInvoiceItemDAO stockInvoiceItemDAO;
+
+	StockInvoiceItemStatusDAO stockInvoiceItemStatusDAO;
 	
 	public void setLedgerDAO(LedgerDAO ledgerDAO) {
 		this.ledgerDAO = ledgerDAO;
@@ -117,7 +119,11 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 	public void setStockInvoiceItemDAO(StockInvoiceItemDAO stockInvoiceItemDAO) {
 		this.stockInvoiceItemDAO = stockInvoiceItemDAO;
 	}
-	
+
+	public void setStockInvoiceItemStatusDAO(StockInvoiceItemStatusDAO stockInvoiceItemStatusDAO) {
+		this.stockInvoiceItemStatusDAO = stockInvoiceItemStatusDAO;
+	}
+
 	@Override
 	public ReorderLevel addReorderLevel(ReorderLevel reorderLevel) {
 		
@@ -569,7 +575,6 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 	public List<StockInvoiceStatus> getStockInvoicesStatus(Integer startIndex, Integer limit, String q) {
 		return stockInvoiceStatusDAO.getStockInvoicesStatus(startIndex, limit, q);
 	}
-
 	
 	@Override
 	public StockInvoice updateStockInvoice(StockInvoice stockInvoice) throws Exception {
@@ -589,19 +594,26 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 			existingStockInvoice = this.stockInvoiceDAO.findByUuid(stockInvoice.getUuid());
 			for (StockInvoiceItem stockInvoiceItem : stockInvoice.getStockInvoiceItems()) {
 				stockInvoiceItem.setStockInvoice(existingStockInvoice);
-				this.stockInvoiceItemDAO.save(stockInvoiceItem);
+				StockInvoiceItem savedStockInvoiceItem = this.stockInvoiceItemDAO.save(stockInvoiceItem);
+
+				for(StockInvoiceItemStatus stockInvoiceItemStatus : stockInvoiceItem.getStockInvoiceItemStatuses()){
+					stockInvoiceItemStatus.setStockInvoiceItem(savedStockInvoiceItem);
+					this.stockInvoiceItemStatusDAO.save(stockInvoiceItemStatus);
+				}
+
 			}
 			List<StockInvoiceItem> savedStockInvoiceItems = stockInvoice.getStockInvoiceItems();
 			existingStockInvoice.setStockInvoiceItems(savedStockInvoiceItems);
 		}
+
 		return existingStockInvoice;
 	}
-
+	
 	@Override
 	public StockInvoice getStockInvoice(String stockInvoiceUuid) {
 		return stockInvoiceDAO.findByUuid(stockInvoiceUuid);
 	}
-
+	
 	@Override
 	public StockInvoiceItem updateStockInvoiceItem(StockInvoiceItem stockInvoiceItem) throws Exception {
 		if (stockInvoiceItem.getItem() != null) {
@@ -614,13 +626,12 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 		}
 		return stockInvoiceItemDAO.updateStockInvoiceItem(stockInvoiceItem);
 	}
-
+	
 	@Override
 	public StockInvoiceItem getStockInvoiceItem(String stockInvoiceItemUuid) {
 		return stockInvoiceItemDAO.findByUuid(stockInvoiceItemUuid);
 	}
-
-
+	
 	@Override
 	public StockInvoice saveStockInvoice(StockInvoice stockInvoice) throws Exception {
 		
@@ -634,10 +645,10 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 		for (StockInvoiceItem stockInvoiceItem : savedStockInvoice.getStockInvoiceItems()) {
 			this.stockInvoiceItemDAO.save(stockInvoiceItem);
 		}
-
-		for (StockInvoiceStatus stockInvoiceStatus : stockInvoice.getStockInvoiceStatuses()){
+		
+		for (StockInvoiceStatus stockInvoiceStatus : stockInvoice.getStockInvoiceStatuses()) {
 			//TODO Limit status to check the ones available in enums
-
+			
 			stockInvoiceStatus.setRemarks(stockInvoiceStatus.getStatus());
 			stockInvoiceStatus.setStockInvoice(savedStockInvoice);
 			this.stockInvoiceStatusDAO.save(stockInvoiceStatus);
