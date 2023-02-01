@@ -9,16 +9,19 @@
       </ng-template>
       <app-stock-invoices-list 
         [suppliers]="params?.suppliers"
-        [unitsOfMeasurementSettings]="params?.unitsOfMeasurementSettings"  
+        [unitsOfMeasurementSettings]="params?.unitsOfMeasurementSettings" 
+        [status]="DRAFT" 
       ></app-stock-invoices-list>
     </mat-tab>
     <mat-tab>
       <ng-template mat-tab-label>
-        <span>Receive Invoices</span>
+        <span>Received Invoices</span>
       </ng-template>
-      <div>
-        <h1>New Items</h1>
-      </div>
+      <app-stock-invoices-list 
+        [suppliers]="params?.suppliers"
+        [unitsOfMeasurementSettings]="params?.unitsOfMeasurementSettings"
+        [status]="RECEIVED"
+      ></app-stock-invoices-list>
     </mat-tab>
     <mat-tab>
       <ng-template mat-tab-label>

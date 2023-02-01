@@ -12,6 +12,7 @@ import { StockInvoiceFormDialogComponent } from "../stock-invoice-form-dialog/st
 export class StockInvoicesListComponent implements OnInit {
   @Input() suppliers: any[];
   @Input() unitsOfMeasurementSettings: any;
+  @Input() status: any;
 
   errors: any[];
   stockInvoices$: Observable<any>;
@@ -40,14 +41,14 @@ export class StockInvoicesListComponent implements OnInit {
       data: {
         stockInvoice: stockInvoice,
         suppliers: this.suppliers,
-        unitsOfMeasurementSettings: this.unitsOfMeasurementSettings
+        unitsOfMeasurementSettings: this.unitsOfMeasurementSettings,
       },
     });
   }
-  
+
   onViewStockInvoiceItems(stockInvoiceUuid) {
-    if (stockInvoiceUuid === this.viewStockInvoiceItems){
-      this.viewStockInvoiceItems = undefined
+    if (stockInvoiceUuid === this.viewStockInvoiceItems) {
+      this.viewStockInvoiceItems = undefined;
     } else {
       this.viewStockInvoiceItems = stockInvoiceUuid;
     }
