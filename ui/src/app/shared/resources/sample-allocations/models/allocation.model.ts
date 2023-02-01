@@ -207,8 +207,7 @@ export class SampleAllocation {
                   this.allocation?.statuses?.filter(
                     (status) =>
                       status?.category === "RESULT_AUTHORIZATION" &&
-                      (status?.status == "APPROVED" ||
-                        status?.status == "AUTHORIZED") &&
+                      status?.status == "AUTHORIZED" &&
                       status?.result?.uuid ===
                         orderBy(finalResult[key], ["dateCreated"], ["desc"])[0]
                           ?.uuid
