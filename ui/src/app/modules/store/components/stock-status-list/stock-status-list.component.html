@@ -18,14 +18,14 @@
       </mat-form-field>
   
       <div class="w-75 float-right" *ngIf="isCurrentLocationMainStore">
-        <!-- <button
+        <button
           [disabled]="!userPrivileges['STORE_ADD_NEW_STOCKABLE_ITEM']"
           class="float-right"
           color="primary"
           mat-stroked-button
           (click)="onAddNewStockRecevied($event, ledgerTypes, currentLocation)"
-        > -->
-        <button
+        > Receive New Item </button>
+        <!-- <button
           [disabled]="!userPrivileges['STORE_ADD_NEW_STOCKABLE_ITEM']"
           class="float-right button-round"
           color="primary"
@@ -33,7 +33,7 @@
           (click)="onShowReceivingForm($event)"
         >
           Invoices
-        </button>
+        </button> -->
       </div>
     </div>
     <div class="overflow-x-auto">
