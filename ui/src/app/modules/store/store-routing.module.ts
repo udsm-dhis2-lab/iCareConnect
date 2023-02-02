@@ -29,10 +29,10 @@ const routes: Routes = [
         path: "requisition",
         component: RequisitionPageComponent,
       },
-      {
-        path: "receipt",
-        component: RequisitionReceiptComponent,
-      },
+      // {
+      //   path: "receipt",
+      //   component: RequisitionReceiptComponent,
+      // },
       {
         path: "issuing",
         component: IssuingPageComponent,
