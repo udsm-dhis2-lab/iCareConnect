@@ -29,7 +29,7 @@ import { RequisitionFormComponent } from "../../modals/requisition-form/requisit
   styleUrls: ["./requisition.component.scss"],
 })
 export class RequisitionComponent implements OnInit {
-  @Input() currentLocation: any
+  @Input() currentLocation: any;
   requisitions$: Observable<RequisitionObject[]>;
   loadingRequisitions$: Observable<boolean>;
   stores$: Observable<any>;
@@ -43,6 +43,8 @@ export class RequisitionComponent implements OnInit {
   searchTerm: any;
   requisitions: RequisitionObject[];
   storedRequisitions: RequisitionObject[];
+  page: any;
+  pageSize: number;
   constructor(
     private store: Store<AppState>,
     private dialog: MatDialog,
@@ -88,22 +90,26 @@ export class RequisitionComponent implements OnInit {
       );
   }
 
-  onSearchRequisition(event?: any){
-    this.requisitions = undefined
+  onSearchRequisition(event?: any) {
+    this.requisitions = undefined;
     this.loadedRequisitions = false;
     this.searchTerm = event ? event?.target?.value : "";
     setTimeout(() => {
-      if (this.searchTerm?.length > 0){
+      if (this.searchTerm?.length > 0) {
         this.requisitions = this.storedRequisitions.filter((requisition) => {
-          if(requisition?.name?.toLowerCase().includes(this.searchTerm.toLowerCase())){
-            return requisition
+          if (
+            requisition?.name
+              ?.toLowerCase()
+              .includes(this.searchTerm.toLowerCase())
+          ) {
+            return requisition;
           }
         });
       } else {
-        this.requisitions = this.storedRequisitions
+        this.requisitions = this.storedRequisitions;
       }
       this.loadedRequisitions = true;
-    }, 200)
+    }, 200);
   }
 
   onNewRequest(e: Event, params: any): void {
@@ -203,5 +209,11 @@ export class RequisitionComponent implements OnInit {
       );
       this.getAllRequisition();
     }
+  }
+
+  onPageChange(event) {
+    this.page = event.pageIndex + 1;
+    this.pageSize = Number(event?.pageSize);
+    this.getAllRequisition();
   }
 }
