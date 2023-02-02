@@ -19,74 +19,76 @@ import org.openmrs.module.icare.store.models.RequisitionStatus;
 
 public class RequisitionDAO extends BaseDAO<Requisition> {
 	
-	public ListResult<Requisition> getRequisitionsByRequestingLocation(String requestingLocationUuid, Pager pager, RequisitionStatus.RequisitionStatusCode status) {
+	public ListResult<Requisition> getRequisitionsByRequestingLocation(String requestingLocationUuid, Pager pager,
+	        RequisitionStatus.RequisitionStatusCode status) {
 		DbSession session = this.getSession();
 		String queryStr = "SELECT rq \n" + "FROM Requisition rq \n"
 		        + "WHERE rq.requestingLocation = (SELECT l FROM Location l WHERE l.uuid = :requestingLocationUuid)";
-
+		
 		if (status != null) {
 			if (!queryStr.contains("WHERE")) {
 				queryStr += " WHERE ";
 			} else {
 				queryStr += " AND ";
 			}
-
+			
 			queryStr += " rq IN ( SELECT rs.requisition FROM RequisitionStatus rs WHERE rs.status = :status)";
 		}
 		
 		Query query = session.createQuery(queryStr);
 		query.setParameter("requestingLocationUuid", requestingLocationUuid);
-		if(status != null){
-			query.setParameter("status",status);
+		if (status != null) {
+			query.setParameter("status", status);
 		}
-
+		
 		if (pager.isAllowed()) {
 			pager.setTotal(query.list().size());
 			//pager.setPageCount(pager.getT);
 			query.setFirstResult((pager.getPage() - 1) * pager.getPageSize());
 			query.setMaxResults(pager.getPageSize());
 		}
-
+		
 		ListResult<Requisition> listResults = new ListResult();
 		listResults.setPager(pager);
 		listResults.setResults(query.list());
 		return listResults;
 	}
 	
-	public ListResult<Requisition> getRequisitionsByRequestedLocation(String requestedLocationUuid, Pager pager, RequisitionStatus.RequisitionStatusCode status) {
+	public ListResult<Requisition> getRequisitionsByRequestedLocation(String requestedLocationUuid, Pager pager,
+	        RequisitionStatus.RequisitionStatusCode status) {
 		DbSession session = this.getSession();
 		System.out.println(status);
 		String queryStr = "SELECT rq \n" + "FROM Requisition rq \n"
 		        + "WHERE rq.requestedLocation = (SELECT l FROM Location l WHERE l.uuid = :requestedLocationUuid)";
-
+		
 		if (status != null) {
 			if (!queryStr.contains("WHERE")) {
 				queryStr += " WHERE ";
 			} else {
 				queryStr += " AND ";
 			}
-
+			
 			queryStr += " rq IN ( SELECT rs.requisition FROM RequisitionStatus rs WHERE rs.status = :status)";
 		}
 		
 		Query query = session.createQuery(queryStr);
 		query.setParameter("requestedLocationUuid", requestedLocationUuid);
-		if(status != null){
-			query.setParameter("status",status);
+		if (status != null) {
+			query.setParameter("status", status);
 		}
-
+		
 		if (pager.isAllowed()) {
 			pager.setTotal(query.list().size());
 			//pager.setPageCount(pager.getT);
 			query.setFirstResult((pager.getPage() - 1) * pager.getPageSize());
 			query.setMaxResults(pager.getPageSize());
 		}
-
+		
 		ListResult<Requisition> listResults = new ListResult();
 		listResults.setPager(pager);
 		listResults.setResults(query.list());
 		return listResults;
-
+		
 	}
 	
 }

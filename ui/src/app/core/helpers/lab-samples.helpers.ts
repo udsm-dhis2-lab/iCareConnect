@@ -97,13 +97,19 @@ export function getAuthorizationDetails(sample) {
   return allocationStatuses;
 }
 
-export function createSearchingText(sample) {
+export function createSearchingText(
+  sample,
+  department?: any,
+  specimenSource?: any
+): string {
   return (
     sample?.label +
     "-" +
     sample?.patient?.givenName +
     sample?.patient?.middleName +
     sample?.patient?.familyName +
+    department?.name +
+    specimenSource?.specimenName +
     sample?.patient?.identifiers[0]?.id +
     map(sample?.orders, (order) => {
       return order?.order?.concept?.display;
