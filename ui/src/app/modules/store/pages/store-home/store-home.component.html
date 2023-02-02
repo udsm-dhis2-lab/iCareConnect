@@ -4,15 +4,15 @@
     currentStore: currentStore$ | async,
     privileges: privileges$ | async
   } as params"
+  class="container-fluid"
 >
   <div
     *ngIf="!params?.settingCurrentLocationStatus"
-    class="pt-2 store-container"
+    class="pt-2 store-container row"
   >
     <!-- store sidebar -->
-    <div class="store-sidebar">
-      <mat-card class="p-0 border">
-        <h3 class="pl-3 pt-3 pr-3">Store: {{ params?.currentStore?.name }}</h3>
+    <div class="store-sidebar col-2">
+        <h3 class="pl-3 pt-3">Store: {{ params?.currentStore?.name }}</h3>
         <mat-nav-list>
           <ng-container *ngFor="let storePage of storePages">
             <mat-list-item
@@ -26,8 +26,9 @@
                   params?.currentStore?.isMainStore &&
                   (storePage?.id === 'requisition' ||
                     storePage?.id === 'received'),
-                'store-active': storePage?.id === currentStorePage?.id
-              }"
+                'store-active': storePage?.id === currentStorePage?.id,
+                'page': true
+              } "
               (click)="onChangeRoute($event, storePage.url, storePage)"
               routerLinkActive="store-active"
             >
@@ -35,12 +36,11 @@
             </mat-list-item>
           </ng-container>
         </mat-nav-list>
-      </mat-card>
     </div>
     <!-- end of store sidebar -->
 
     <!-- store-content -->
-    <div class="store-content">
+    <div class="store-content col-10">
       <!-- stock summary -->
       <div class="row" *ngIf="!(stockMetrics$ | async)">
         <div class="col p-2">
@@ -53,18 +53,18 @@
 
       <div class="row" *ngIf="stockMetrics$ | async as metrics">
         <div class="col mb-2">
-          <mat-card class="border p-2">
-            <mat-card-subtitle class="mb-1" style="font-size: 12px">
+          <mat-card class="border p-3">
+            <mat-card-subtitle class="mb-3 h5 text-center">
               Nearly Stocked Out
             </mat-card-subtitle>
-            <mat-card-title style="font-size: 17px">{{
+            <mat-card-title class="h2 text-center">{{
               metrics?.nearlyStockedOut
             }}</mat-card-title>
           </mat-card>
         </div>
         <div class="col mb-2">
           <mat-card
-            class="border p-2"
+            class="border p-3"
             style="cursor: pointer"
             (click)="
               onChangeRoute(
@@ -74,30 +74,30 @@
               )
             "
           >
-            <mat-card-subtitle class="mb-1" style="font-size: 12px">
+            <mat-card-subtitle class="mb-3 h5 text-center">
               Stocked Out
             </mat-card-subtitle>
-            <mat-card-title style="font-size: 17px">{{
+            <mat-card-title class="h2 text-center">{{
               metrics?.stockedOut
             }}</mat-card-title>
           </mat-card>
         </div>
         <div class="col mb-2">
-          <mat-card class="border p-2">
-            <mat-card-subtitle class="mb-1" style="font-size: 12px">
+          <mat-card class="border p-3">
+            <mat-card-subtitle class="mb-3 h5 text-center">
               Expired
             </mat-card-subtitle>
-            <mat-card-title style="font-size: 17px">{{
+            <mat-card-title class="h2 text-center">{{
               metrics?.expired
             }}</mat-card-title>
           </mat-card>
         </div>
         <div class="col mb-2">
-          <mat-card class="border p-2">
-            <mat-card-subtitle class="mb-1" style="font-size: 12px">
+          <mat-card class="border p-3">
+            <mat-card-subtitle class="mb-3 h5 text-center">
               Nearly Expired
             </mat-card-subtitle>
-            <mat-card-title style="font-size: 17px">{{
+            <mat-card-title class="h2 text-center">{{
               metrics?.nearlyExpired
             }}</mat-card-title>
           </mat-card>

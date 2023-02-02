@@ -22,7 +22,7 @@ public interface LaboratoryService extends OpenmrsService {
 	List<Sample> getAllSamples();
 	
 	ListResult<Sample> getSamples(Date startDate, Date endDate, Pager pager, String location, String sampleCategory,
-	        String testCategory, String q);
+	        String testCategory, String q, String hasStatus, String acceptedByUuid);
 	
 	List<Sample> getSampleByDates(Date startDate, Date endDate);
 	
@@ -139,7 +139,8 @@ public interface LaboratoryService extends OpenmrsService {
 	
 	WorksheetControl addWorksheetControl(WorksheetControl worksheetControl);
 	
-	List<WorksheetDefinition> getWorksheetDefinitions(Date start, Date end, String q, Integer startIndex, Integer limit, Date expirationDate);
+	List<WorksheetDefinition> getWorksheetDefinitions(Date start, Date end, String q, Integer startIndex, Integer limit,
+	        Date expirationDate);
 	
 	Map<String, Object> getWorksheetDefinitionByUuid(String worksheetDefinitionUuid);
 	
@@ -158,4 +159,7 @@ public interface LaboratoryService extends OpenmrsService {
 	WorksheetSampleStatus addWorksheetSampleStatus(WorksheetSampleStatus worksheetSampleStatus) throws Exception;
 	
 	List<BatchSample> getBatchSamples(Date start, Date end, String q, Integer startIndex, Integer limit);
+	
+	ListResult<SampleExt> getSamplesWithoutAllocations(Date start, Date end, Pager pager, String locationUuid,
+	        String sampleCategory, String testCategory, String q, String hasStatus, String acceptedByUuid);
 }

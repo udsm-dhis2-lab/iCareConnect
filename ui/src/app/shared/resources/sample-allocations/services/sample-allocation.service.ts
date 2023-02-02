@@ -37,6 +37,7 @@ export class SampleAllocationService {
     ).pipe(
       map((responses) => {
         let allSampleAllocations: any = [];
+        let countOfAuthorizationRequired = Number(responses[0]);
         const groupedAllocations = groupBy(
           responses[2]?.map((allocation) => {
             const alloc: SampleAllocation = new SampleAllocation({
@@ -50,6 +51,28 @@ export class SampleAllocationService {
           "orderUuid"
         );
         return Object.keys(groupedAllocations).map((key) => {
+          const withResults =
+            flatten(
+              uniqBy(groupedAllocations[key], "allocationUuid")?.map(
+                (allocation) => {
+                  if (!allocation?.finalResult?.groups) {
+                    return allocation?.finalResult;
+                  } else {
+                    const results = allocation?.finalResult?.groups?.map(
+                      (group) => {
+                        return group?.results.map((res) => {
+                          return {
+                            ...res,
+                            authorizationIsReady: group?.authorizationIsReady,
+                          };
+                        });
+                      }
+                    );
+                    return flatten(results);
+                  }
+                }
+              )
+            )?.filter((result) => result) || [];
           const authorizationIsReady =
             (
               flatten(
@@ -72,8 +95,13 @@ export class SampleAllocationService {
                     }
                   }
                 )
-              )?.filter((result) => result?.authorizationIsReady) || []
-            )?.length > 0;
+              )?.filter(
+                (result) =>
+                  result?.authorizationIsReady &&
+                  result?.authorizationStatuses?.length >=
+                    countOfAuthorizationRequired
+              ) || []
+            )?.length === withResults?.length && withResults?.length > 0;
           const allocationsKeyedByParametersUuid = keyBy(
             allSampleAllocations?.map((allocation) => {
               return {

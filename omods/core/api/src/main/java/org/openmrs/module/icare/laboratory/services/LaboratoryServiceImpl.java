@@ -1,7 +1,6 @@
 package org.openmrs.module.icare.laboratory.services;
 
 import org.apache.commons.collections.IteratorUtils;
-import org.azeckoski.reflectutils.transcoders.ObjectEncoder;
 import org.openmrs.*;
 //import org.openmrs.api.ObsService;
 import org.openmrs.api.AdministrationService;
@@ -11,7 +10,6 @@ import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.icare.ICareConfig;
 import org.openmrs.module.icare.core.ListResult;
 import org.openmrs.module.icare.core.Pager;
-import org.openmrs.module.icare.core.Summary;
 import org.openmrs.module.icare.laboratory.dao.*;
 import org.openmrs.module.icare.laboratory.models.*;
 
@@ -166,8 +164,9 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	
 	@Override
 	public ListResult<Sample> getSamples(Date startDate, Date endDate, Pager pager, String location, String sampleCategory,
-	        String testCategory, String q) {
-		return this.sampleDAO.getSamples(startDate, endDate, pager, location, sampleCategory, testCategory, q);
+	        String testCategory, String q, String hasStatus, String acceptedByUuid) {
+		return this.sampleDAO.getSamples(startDate, endDate, pager, location, sampleCategory, testCategory, q, hasStatus,
+		    acceptedByUuid);
 	}
 	
 	@Override
@@ -361,17 +360,17 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	
 	@Override
 	public List<Sample> getAllocationsBySample(String sampleUuid) {
-		Sample sample = this.sampleDAO.findByUuid(sampleUuid);
-		List<Map<String, Object>> allocations = new ArrayList<>();
-		if (sample.getSampleOrders().size() > 0) {
-			for (SampleOrder order: sample.getSampleOrders()) {
-				if (order.getTestAllocations().size() > 0) {
-					for (TestAllocation allocation: order.getTestAllocations()) {
-						allocations.add(allocation.toMap());
-					}
-				}
-			}
-		}
+		//		Sample sample = this.sampleDAO.findByUuid(sampleUuid);
+		//		List<Map<String, Object>> allocations = new ArrayList<>();
+		//		if (sample.getSampleOrders().size() > 0) {
+		//			for (SampleOrder order: sample.getSampleOrders()) {
+		//				if (order.getTestAllocations().size() > 0) {
+		//					for (TestAllocation allocation: order.getTestAllocations()) {
+		//						allocations.add(allocation.toMap());
+		//					}
+		//				}
+		//			}
+		//		}
 		return this.testAllocationDAO.getAllocationsBySample(sampleUuid);
 	}
 	
@@ -422,10 +421,36 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 			result.setValueDrug(drug);
 		}
 		
+		if (result.getValueGroup() != null && result.getValueGroup().getUuid() != null) {
+			Result valueGroup = this.resultDAO.findByUuid(result.getValueGroup().getUuid());
+			result.setValueGroup(valueGroup);
+		}
+		
+		if (result.getInstrument() != null) {
+			Concept instrument = Context.getConceptService().getConceptByUuid(result.getInstrument().getUuid());
+			result.setInstrument(instrument);
+		}
+		
 		Date date = new Date();
 		result.setDateCreated(date);
 		
-		this.resultDAO.save(result);
+		Result response = this.resultDAO.save(result);
+		
+		/*
+		Save status via results
+		* */
+		TestAllocationStatus resultStatus = new TestAllocationStatus();
+		resultStatus.setStatus(result.getStatus());
+		resultStatus.setCategory(result.getStatusCategory());
+		resultStatus.setRemarks(result.getStatusRemarks());
+		resultStatus.setTestResult(response);
+		resultStatus.setUser(response.getCreator());
+		resultStatus.setTestAllocation(response.getTestAllocation());
+		this.testAllocationStatusDAO.save(resultStatus);
+		
+		if (result.getResultStatus() == "AMEND") {
+			
+		}
 		
 		return result;
 		
@@ -434,64 +459,8 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	public List<Map<String, Object>> saveMultipleResults(List<Result> results) throws Exception {
 		List<Map<String, Object>> resultResponses = new ArrayList<>();
 		for (Result result: results) {
-			if (result.getConcept().getUuid() == null) {
-				throw new Exception("Concept is null. Concept for the result must be provided");
-			}
-			if (result.getTestAllocation().getUuid() == null) {
-				throw new Exception("Test Allocation is null. Test allocation uuid must be provided");
-			}
 
-			Concept concept = Context.getConceptService().getConceptByUuid(result.getConcept().getUuid());
-			if (concept == null) {
-				throw new Exception("Concept with id '" + result.getConcept().getUuid() + "' does not exist");
-			}
-
-			result.setConcept(concept);
-
-			TestAllocation testAllocation = this.testAllocationDAO.findByUuid(result.getTestAllocation().getUuid());
-			if (testAllocation == null) {
-				throw new Exception("Test Allocation with id '" + result.getTestAllocation().getUuid() + "' does not exist");
-			}
-			result.setTestAllocation(testAllocation);
-
-			if (result.getValueCoded() != null) {
-				Concept valueCoded = Context.getConceptService().getConceptByUuid(result.getValueCoded().getUuid());
-				result.setValueCoded(valueCoded);
-			}
-
-			if (result.getValueDrug() != null) {
-				Drug drug = Context.getConceptService().getDrugByUuid(result.getValueDrug().getUuid());
-				result.setValueDrug(drug);
-			}
-
-			if (result.getValueGroup() != null && result.getValueGroup().getUuid() != null) {
-				Result valueGroup = this.resultDAO.findByUuid(result.getValueGroup().getUuid());
-				System.out.println(valueGroup.getValueText());
-				result.setValueGroup(valueGroup);
-			}
-
-			if (result.getInstrument() != null) {
-				Concept instrument = Context.getConceptService().getConceptByUuid(result.getInstrument().getUuid());
-				result.setInstrument(instrument);
-			}
-
-			Date date = new Date();
-			result.setDateCreated(date);
-			System.out.println(result.getValueGroup());
-
-			Result response = this.resultDAO.save(result);
-
-			/*
-			Save status via results
-			* */
-			TestAllocationStatus resultStatus = new TestAllocationStatus();
-			resultStatus.setStatus(result.getStatus());
-			resultStatus.setCategory(result.getStatusCategory());
-			resultStatus.setRemarks(result.getStatusRemarks());
-			resultStatus.setTestResult(response);
-			resultStatus.setUser(response.getCreator());
-			resultStatus.setTestAllocation(response.getTestAllocation());
-			this.testAllocationStatusDAO.save(resultStatus);
+			Result response = this.recordTestAllocationResults(result);
 			/*
 			End of save status via results
 			* */
@@ -594,6 +563,8 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 				
 				Encounter encounter = testAllocation.getSampleOrder().getOrder().getEncounter();
 				
+				//						testAllocation.getSampleOrder().getOrder().getEncounter();
+				
 				Order order = testAllocation.getSampleOrder().getOrder();
 				
 				Concept concept = Context.getConceptService().getConceptByUuid(allocationResults.getConcept().getUuid());
@@ -604,9 +575,17 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 				
 				List<TestAllocationStatus> resultsRemarks = new ArrayList<TestAllocationStatus>();
 				for (TestAllocationStatus status : testAllocationStatuses) {
-					if (status.getStatus() != null
-					        && (status.getStatus().equals("COMMENT") || status.getStatus().equals("ANSWER DESCRIPTION"))) {
+					if (status.getStatus() != null && status.getTestResult().getUuid().equals(testResult.getUuid())
+					        && (status.getCategory().equals("RESULT_REMARKS"))) {
 						resultsRemarks.add(status);
+					}
+				}
+				
+				List<TestAllocationStatus> resultStatuses = new ArrayList<TestAllocationStatus>();
+				for (TestAllocationStatus status : testAllocationStatuses) {
+					if (status.getStatus() != null && status.getTestResult().getUuid().equals(testResult.getUuid())
+					        && (status.getCategory().equals("RESULT_AMENDMENT"))) {
+						resultStatuses.add(status);
 					}
 				}
 				
@@ -619,10 +598,17 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 				observation.setObsDatetime(new Date());
 				observation.setDateCreated(new Date());
 				observation.setVoided(false);
-				for (TestAllocationStatus resultsRemark : resultsRemarks) {
-					if (resultsRemark.getStatus() != null && resultsRemark.getStatus().equals("ANSWER DESCRIPTION")) {
-						observation.setComment(resultsRemark.getRemarks());
+				if (resultsRemarks.size() > 0) {
+					observation.setComment(resultsRemarks.get(0).getRemarks());
+				}
+				if (resultStatuses.size() > 0) {
+					if (resultStatuses.get(0) != null && resultStatuses.get(0).getStatus() != null) {
+						if (resultStatuses.get(0).getStatus().equals("AMENDED")) {
+							observation.setStatus(Obs.Status.AMENDED);
+						}
 					}
+				} else {
+					observation.setStatus(Obs.Status.FINAL);
 				}
 				
 				//quick fix for lab - to capture coded results
@@ -848,6 +834,13 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	@Override
 	public List<BatchSample> getBatchSamples(Date startDate, Date endDate, String q, Integer startIndex, Integer limit) {
 		return batchSampleDAO.getBatchSamples(startDate, endDate, q, startIndex, limit);
+	}
+	
+	@Override
+	public ListResult<SampleExt> getSamplesWithoutAllocations(Date startDate, Date endDate, Pager pager, String location,
+	        String sampleCategory, String testCategory, String q, String hasStatus, String acceptedByUuid) {
+		return sampleDAO.getSamplesWithoutAllocations(startDate, endDate, pager, location, sampleCategory, testCategory, q,
+		    hasStatus, acceptedByUuid);
 	}
 	
 	public BatchSet addBatchSet(BatchSet batchSet) {

@@ -1,13 +1,12 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, Inject, Input, OnInit } from "@angular/core";
 import { Observable } from "rxjs";
 import { map, tap } from "rxjs/operators";
 import { VisitsService } from "../../resources/visits/services/visits.service";
 import { Store } from "@ngrx/store";
 import { AppState } from "src/app/store/reducers";
-import { getCustomOpenMRSFormsByIds } from "src/app/store/selectors/form.selectors";
-import { FormService } from "../../modules/form/services/form.service";
-import { Visit } from "../../resources/visits/models/visit.model";
+import { getAllForms, getCustomOpenMRSFormsByIds } from "src/app/store/selectors/form.selectors";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
+import { MAT_DIALOG_DATA } from "@angular/material/dialog";
 
 @Component({
   selector: "app-patient-history",
@@ -23,19 +22,24 @@ export class PatientHistoryComponent implements OnInit {
   generalPrescriptionOrderType$: any;
   prescriptionArrangementFields$: Observable<any>;
   specificDrugConceptUuid$: Observable<unknown>;
-  errors: any[] =[];
+  errors: any[] = [];
+  allForms$: Observable<any>;
+  loadingData: boolean = false;
   constructor(
     private visitsService: VisitsService,
     private store: Store<AppState>,
-    private visitService: VisitsService,
-    private formService: FormService,
     private systemSettingsService: SystemSettingsService
   ) {}
 
   ngOnInit(): void {
-    this.customForms$ = this.store.select(
-      getCustomOpenMRSFormsByIds(this.location?.forms || [])
-    );
+    this.loadingData = true
+    if(this.location){
+      this.customForms$ = this.store.select(
+        getCustomOpenMRSFormsByIds(this.location?.forms || [])
+      );
+    } else {
+      this.customForms$ = this.store.select(getAllForms);
+    }
     this.generalPrescriptionOrderType$ =
       this.systemSettingsService.getSystemSettingsByKey(
         "iCare.clinic.genericPrescription.orderType"
@@ -65,7 +69,6 @@ export class PatientHistoryComponent implements OnInit {
           };
         })
       );
-
     this.specificDrugConceptUuid$ = this.systemSettingsService
       .getSystemSettingsByKey(
         "iCare.clinic.genericPrescription.specificDrugConceptUuid"
@@ -86,13 +89,13 @@ export class PatientHistoryComponent implements OnInit {
           }
         })
       );
-      
     this.visits$ = this.visitsService
       .getAllPatientVisits(this.patient?.uuid, true)
       .pipe(
         map((response) => {
+          this.loadingData = false;
           if (!response?.error) {
-            return response.map((visit) => {
+            return response?.map((visit) => {
               let obs = [];
               visit?.visit?.encounters.forEach((encounter) => {
                 (encounter?.obs || []).forEach((observation) => {
