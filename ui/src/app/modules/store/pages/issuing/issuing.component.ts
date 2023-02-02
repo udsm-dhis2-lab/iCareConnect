@@ -44,7 +44,7 @@ export class IssuingComponent implements OnInit {
   pageSize: number = 50;
   pageSizeOptions: number[] = [5, 10, 25, 50, 100];
   pager: any;
-  statuses: string[] = ["CANCELLED", "REJECTED", "ISSUED"];
+  statuses: string[] = ['', "CANCELLED", "REJECTED", "ISSUED"];
   selectedStatus: string;
 
   constructor(
