@@ -75,6 +75,7 @@ export class RequisitionComponent implements OnInit {
         `iCare.store.settings.pharmacy.locationTagUuid`
       );
     this.getAllRequisition();
+    this.currentStore$ = of(this.currentLocation);
     this.stores$ = this.store.pipe(select(getStoreLocations));
     this.stockableItems$ = this.store.pipe(select(getAllStockableItems));
   }

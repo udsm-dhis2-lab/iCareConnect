@@ -1,6 +1,6 @@
 <div class="container-fluid">
   <hr>
-  <div class="row">
+  <div class="row" *ngIf="!stockInvoiceItem">
     <div class="col-11 ml-3">
       <app-form [fields]="commonFields" [isFormHorizontal]="true" (formUpdate)="onFormUpdate($event)"></app-form>
     </div>
@@ -46,10 +46,20 @@
     </table>
     <div class="col-1">
       <button
+      *ngIf="!stockInvoiceItem"
         class="button-round mt-3"
         color="primary"
         mat-stroked-button
         (click)="saveInvoices($event)"
+      >
+        <mat-icon>add</mat-icon>
+      </button>
+      <button
+      *ngIf="stockInvoiceItem"
+        class="button-round mt-3"
+        color="primary"
+        mat-stroked-button
+        (click)="updateInvoiceItem($event)"
       >
         <mat-icon>add</mat-icon>
       </button>

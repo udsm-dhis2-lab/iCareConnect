@@ -29,7 +29,7 @@
                 <td>{{ item?.batchQuantity }}</td>
                 <td>{{ item?.unitPrice }}</td>
                 <td>{{ item?.amount }}</td>
-                <td>
+                <td *ngIf="status !== 'RECEIVED'">
                   <button
                     mat-icon-button
                     [matMenuTriggerFor]="menu"
@@ -39,9 +39,22 @@
                   <mat-menu #menu="matMenu">
                     <button
                       mat-menu-item
+                      (click)="onUpdateStockInvoiceItem(item)"
                     >
                       <mat-icon>edit</mat-icon>
-                      <span>Delete</span>
+                      <span>Update</span>
+                    </button>
+                    <button
+                      mat-menu-item
+                    >
+                      <mat-icon>check</mat-icon>
+                      <span>Mark Received</span>
+                    </button>
+                    <button
+                      mat-menu-item
+                    >
+                      <mat-icon>delete</mat-icon>
+                      <span>Remove</span>
                     </button>
                   </mat-menu>
                 </td>

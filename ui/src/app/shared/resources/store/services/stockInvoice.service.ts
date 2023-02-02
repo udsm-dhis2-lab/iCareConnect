@@ -47,4 +47,15 @@ export class StockInvoicesService {
       catchError((error: any) => error)
     );
   }
+
+  updateStockInvoiceItem(uuid: string, stockInvoiceItem: any): Observable<any> {
+    return this.httpClient
+      .post(`store/stockinvoiceitem/${uuid}`, stockInvoiceItem)
+      .pipe(
+        map((stockInvoiceItemResponse: any) => {
+          return stockInvoiceItemResponse;
+        }),
+        catchError((error: any) => error)
+      );
+  }
 }

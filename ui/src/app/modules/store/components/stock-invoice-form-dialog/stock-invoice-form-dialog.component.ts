@@ -13,7 +13,8 @@ export class StockInvoiceFormDialogComponent implements OnInit {
   ) {}
 
   ngOnInit() {}
-  onClosePopup(e: any){
+
+  onClosePopup(e?: any){
     this.dialogRef.close();
   }
 }

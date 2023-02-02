@@ -24,6 +24,7 @@
                 class="anchor-button" 
                 color="primary"
                 (click)="onEditStockInvoice(stockInvoice)"  
+                matTooltip="Edit invoice"
               >
                 <mat-icon>edit</mat-icon>
               </a>
@@ -31,15 +32,34 @@
                 class="anchor-button ml-4" 
                 color="primary"
                 (click)="onViewStockInvoiceItems(stockInvoice?.uuid)"  
+                matTooltip="{{viewStockInvoiceItems !== stockInvoice?.uuid ? 'View invoice Items' : 'Hide Invoice Items' }}"
               >
                  <mat-icon *ngIf="viewStockInvoiceItems === stockInvoice?.uuid">visibility_off</mat-icon>
                   <mat-icon *ngIf="viewStockInvoiceItems !== stockInvoice?.uuid">visibility</mat-icon>
               </a>
+              <ng-container *ngIf="status === 'DRAFT'">
+                <a 
+                  class="anchor-button ml-4" 
+                  color="primary"
+                  (click)="onViewStockInvoiceItems(stockInvoice?.uuid)"  
+                  matTooltip="Mark this invoice receive"
+                >
+                    <mat-icon>check</mat-icon>
+                </a>
+                <a 
+                  class="anchor-button ml-4" 
+                  color="primary"
+                  (click)="onViewStockInvoiceItems(stockInvoice?.uuid)"  
+                  matTooltip="Delete this invoice"
+                >
+                    <mat-icon>delete</mat-icon>
+                </a>
+              </ng-container>
             </div>
           </div>
         </div>
         <div class="inv-items-table container-fluid" *ngIf="this.viewStockInvoiceItems === stockInvoice?.uuid">
-          <app-stock-invoice-items [stockInvoice]="stockInvoice"></app-stock-invoice-items>
+          <app-stock-invoice-items [stockInvoice]="stockInvoice" [status]="status"></app-stock-invoice-items>
         </div>
       </mat-expansion-panel>
     </mat-accordion>
