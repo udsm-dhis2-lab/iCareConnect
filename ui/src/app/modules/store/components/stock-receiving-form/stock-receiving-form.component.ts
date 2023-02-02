@@ -20,13 +20,13 @@ export class StockReceivingFormComponent implements OnInit {
   @Input() suppliers: any[];
   @Input() unitsOfMeasurementSettings: any;
   @Input() existingStockInvoice: any;
+  @Input() stockInvoiceItem: any;
+  @Output() closeDialog: EventEmitter<any> = new EventEmitter();
 
   unitsOfMeasurements$: Observable<any>;
   stockInvoice: any;
   loadingInvoice: boolean = false;
-  constructor(
-    private conceptService: ConceptsService,
-  ) {}
+  constructor(private conceptService: ConceptsService) {}
 
   ngOnInit(): void {
     this.stockInvoice = this.existingStockInvoice;
@@ -45,11 +45,15 @@ export class StockReceivingFormComponent implements OnInit {
   }
 
   loadInvoices(invoice) {
-    this.loadingInvoice = true
+    this.loadingInvoice = true;
     this.stockInvoice = undefined;
     setTimeout(() => {
       this.stockInvoice = this.existingStockInvoice || invoice;
-      this.loadingInvoice = false
-    }, 100)
+      this.loadingInvoice = false;
+    }, 100);
+  }
+
+  onCloseDialog() {
+    this.closeDialog.emit()
   }
 }
