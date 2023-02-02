@@ -544,24 +544,6 @@ public class StoreController {
 			List<StockInvoiceItem> stockInvoiceItems = new ArrayList<>();
 			for (Map<String, Object> invoiceItemMap : (List<Map<String, Object>>) stockInvoiceMap.get("invoiceItems")){
 				StockInvoiceItem stockInvoiceItem = StockInvoiceItem.fromMap(invoiceItemMap);
-//				StockInvoiceItem stockInvoiceItem = new StockInvoiceItem();
-//				stockInvoiceItem.setItem(iCareService.getItemByUuid(((Map)invoiceItemMap.get("item")).get("uuid").toString()));
-//				stockInvoiceItem.setBatchNo((String) invoiceItemMap.get("batchNo"));
-//				stockInvoiceItem.setOrderQuantity((Integer) invoiceItemMap.get("orderQuantity"));
-//				stockInvoiceItem.setBatchQuantity((Integer) invoiceItemMap.get("batchQuantity"));
-//				Double amount = Double.valueOf(invoiceItemMap.get("amount").toString());
-//				stockInvoiceItem.setAmount(amount);
-//				Double unitPrice = Double.valueOf(invoiceItemMap.get("unitPrice").toString());
-//				stockInvoiceItem.setUnitPrice(unitPrice);
-//				stockInvoiceItem.setUom(Context.getConceptService().getConceptByUuid(((Map)invoiceItemMap.get("uom")).get("uuid").toString()));
-//
-//				SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-//				if (invoiceItemMap.get("expiryDate").toString().length() == 10) {
-//					stockInvoiceItem.setExpiryDate(dateFormat.parse(invoiceItemMap.get("expiryDate").toString()));
-//				} else {
-//					stockInvoiceItem.setExpiryDate(dateFormat.parse(invoiceItemMap.get("expiryDate").toString()
-//							.substring(0, invoiceItemMap.get("expiryDate").toString().indexOf("T"))));
-//				}
 				stockInvoiceItem.setStockInvoice(stockInvoice);
 				stockInvoiceItems.add(stockInvoiceItem);
 			}
@@ -572,7 +554,6 @@ public class StoreController {
 			newStockInvoicesObject.add(savedStockInvoice.toMap());
 
 		}
-
 		return newStockInvoicesObject;
 
 	}
@@ -587,26 +568,7 @@ public class StoreController {
 			List<StockInvoiceItem> stockInvoiceItems = new ArrayList<>();
 			for (Map<String, Object> invoiceItemMap : (List<Map<String, Object>>) stockInvoiceMap.get("invoiceItems")) {
 				StockInvoiceItem stockInvoiceItem = StockInvoiceItem.fromMap(invoiceItemMap);
-//				StockInvoiceItem stockInvoiceItem = new StockInvoiceItem();
-//				stockInvoiceItem.setItem(iCareService.getItemByUuid(((Map) invoiceItemMap.get("item")).get("uuid").toString()));
-//				stockInvoiceItem.setBatchNo((String) invoiceItemMap.get("batchNo"));
-//				stockInvoiceItem.setOrderQuantity((Integer) invoiceItemMap.get("orderQuantity"));
-//				stockInvoiceItem.setBatchQuantity((Integer) invoiceItemMap.get("batchQuantity"));
-//				Double amount = Double.valueOf(invoiceItemMap.get("amount").toString());
-//				stockInvoiceItem.setAmount(amount);
-//				Double unitPrice = Double.valueOf(invoiceItemMap.get("unitPrice").toString());
-//				stockInvoiceItem.setUnitPrice(unitPrice);
-//				stockInvoiceItem.setUom(Context.getConceptService().getConceptByUuid(((Map) invoiceItemMap.get("uom")).get("uuid").toString()));
-//
-//				SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-//				if (invoiceItemMap.get("expiryDate").toString().length() == 10) {
-//					stockInvoiceItem.setExpiryDate(dateFormat.parse(invoiceItemMap.get("expiryDate").toString()));
-//				} else {
-//					stockInvoiceItem.setExpiryDate(dateFormat.parse(invoiceItemMap.get("expiryDate").toString()
-//							.substring(0, invoiceItemMap.get("expiryDate").toString().indexOf("T"))));
-//				}
 				stockInvoiceItem.setStockInvoice(stockInvoice);
-
 				stockInvoiceItems.add(stockInvoiceItem);
 			}
 
