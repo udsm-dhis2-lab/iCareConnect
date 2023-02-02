@@ -22,7 +22,9 @@ export class StockReceivingFormFieldsComponent implements OnInit {
   @Input() unitsOfMeasurements: any[];
   @Input() unitsOfMeasurementSettings: any;
   @Input() existingStockInvoice: any;
+  @Input() stockInvoiceItem: any;
   @Output() loadInvoice: EventEmitter<any> = new EventEmitter();
+  @Output() closeDialog: EventEmitter<any> = new EventEmitter();
 
   supplierNameField: any;
   invoiceNumberField: any;
@@ -64,7 +66,7 @@ export class StockReceivingFormFieldsComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.stockInvoice = this.existingStockInvoice
+    this.stockInvoice = this.existingStockInvoice;
     const supplierFieldOptions = this.suppliers?.map((supplier) => {
       return {
         key: supplier,
@@ -79,22 +81,28 @@ export class StockReceivingFormFieldsComponent implements OnInit {
         key: "supplier",
         label: "Supplier",
         options: supplierFieldOptions,
-        value: this.existingStockInvoice ? this.existingStockInvoice?.supplier?.uuid : '',
+        value: this.existingStockInvoice
+          ? this.existingStockInvoice?.supplier?.uuid
+          : "",
       }),
       new Textbox({
         id: "invoiceNumber",
         key: "invoiceNumber",
         label: "Invoice Number",
-        value: this.existingStockInvoice ? this.existingStockInvoice?.invoiceNumber : '',
+        value: this.existingStockInvoice
+          ? this.existingStockInvoice?.invoiceNumber
+          : "",
       }),
       new DateField({
         id: "receivingDate",
         key: "receivingDate",
         label: "Receiving Date",
         max: formatDateToYYMMDD(new Date()),
-        value: this.existingStockInvoice ? formatDateToYYMMDD(
-          new Date(this.existingStockInvoice?.receivingDate)
-        ) : '',
+        value: this.existingStockInvoice
+          ? formatDateToYYMMDD(
+              new Date(this.existingStockInvoice?.receivingDate)
+            )
+          : "",
       }),
     ];
     this.setFields();
@@ -114,37 +122,54 @@ export class StockReceivingFormFieldsComponent implements OnInit {
       id: "item",
       key: "item",
       label: "Item",
+      value: this.stockInvoiceItem ? this.stockInvoiceItem?.item?.display : "",
     });
     (this.unitField = new Dropdown({
       id: "unit",
       key: "unit",
       label: "Unit of Measure",
       options: unitOfMeasureOptions,
+      value: this.stockInvoiceItem
+        ? this.unitsOfMeasurements?.filter(
+            (unit) => unit?.uuid === this.stockInvoiceItem?.uom?.uuid
+          )[0]?.uuid
+        : "",
     })),
       (this.orderQuantityField = new Textbox({
         id: "orderQuantity",
         key: "orderQuantity",
         label: "Order Quantity",
+        value: this.stockInvoiceItem
+          ? this.stockInvoiceItem?.orderQuantity
+          : "",
       })),
       (this.mfgBatchNumberField = new Textbox({
         id: "mfgBatchNumber",
         key: "mfgBatchNumber",
         label: "Mfg Batch Number",
+        value: this.stockInvoiceItem ? this.stockInvoiceItem?.batchNo : "",
       })),
       (this.expiryDateField = new DateField({
         id: "expiryDate",
         key: "expiryDate",
         label: "Expiry Date",
+        value: this.stockInvoiceItem
+          ? formatDateToYYMMDD(new Date(this.stockInvoiceItem?.expiryDate))
+          : "",
       })),
       (this.batchQuantityField = new Textbox({
         id: "batchQuantity",
         key: "batchQuantity",
         label: "Batch Quantity",
+        value: this.stockInvoiceItem
+          ? this.stockInvoiceItem?.batchQuantity
+          : "",
       })),
       (this.unitPriceField = new Textbox({
         id: "unitPrice",
         key: "unitPrice",
         label: "Unit Price",
+        value: this.stockInvoiceItem ? this.stockInvoiceItem?.unitPrice : "",
       })),
       (this.amountField = new Textbox({
         id: "amount",
@@ -362,6 +387,35 @@ export class StockReceivingFormFieldsComponent implements OnInit {
     }
     this.amount = undefined;
     this.reloadItemFields(true);
+  }
+
+  updateInvoiceItem(e: any) {
+    e?.stopPropagation();
+    const invoicesItemObject = {
+      item: {
+        uuid: this.stockInvoiceItem?.uuid,
+      },
+      batchNo: this.formValues?.mfgBatchNumber?.value,
+      orderQuantity: Number(this.formValues?.orderQuantity?.value),
+      batchQuantity: Number(this.batchQuantity),
+      amount: parseFloat(this.amount),
+      unitPrice: parseFloat(this.unitPrice),
+      uom: {
+        uuid: this.unitOfMeasure?.uuid,
+      },
+      expiryDate: new Date(
+        moment(this.formValues?.expiryDate?.value).toDate()
+      )?.toISOString(),
+    };
+
+    this.stockInvoicesService
+      .updateStockInvoiceItem(this.stockInvoiceItem?.uuid, invoicesItemObject)
+      .pipe(
+        tap((response) => {
+          this.closeDialog.emit();
+        })
+      )
+      .subscribe();
   }
 
   onGetBatchQuantity(formValue: FormValue) {

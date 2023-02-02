@@ -1,7 +1,7 @@
 <div class="container-fluid" *ngIf="{
     unitsOfMeasurements: unitsOfMeasurements$ | async
   } as params">
-  <div class="row" *ngIf="!stockInvoice && !loadingInvoice">
+  <div class="row mt-2" *ngIf="!stockInvoice && !loadingInvoice && !stockInvoiceItem">
     <div class="col-12">
       <h2 class="text-center">NEW RECEIVED STOCK INVOICE</h2>
     </div>
@@ -26,14 +26,16 @@
       </mat-accordion>
     </div>
   </div>
-  <div class="row mt-3" *ngIf="params?.unitsOfMeasurements && suppliers && unitsOfMeasurementSettings">
+  <div class="row mt-3" *ngIf="(params?.unitsOfMeasurements && suppliers && unitsOfMeasurementSettings) || stockInvoiceItem">
     <app-stock-receiving-form-fields 
       class="w-100"
       [suppliers]="suppliers"
       [unitsOfMeasurements]="params?.unitsOfMeasurements"
       [unitsOfMeasurementSettings]="unitsOfMeasurementSettings"
       [existingStockInvoice]="stockInvoice"
+      [stockInvoiceItem]="stockInvoiceItem"
       (loadInvoices)="loadInvoices($event)"
+      (closeDialog)="onCloseDialog()"
     ></app-stock-receiving-form-fields>
   </div>
 </div>
