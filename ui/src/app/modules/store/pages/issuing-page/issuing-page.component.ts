@@ -18,9 +18,7 @@ export class IssuingPageComponent implements OnInit {
   currentStore$: Observable<any>;
   constructor(
     private store: Store<AppState>,
-  ){
-    this.store.dispatch(loadRequisitions());
-  }
+  ){}
 
   ngOnInit() {
     this.currentStore$ = this.store.pipe(select(getCurrentLocation));

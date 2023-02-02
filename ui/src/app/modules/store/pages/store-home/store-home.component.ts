@@ -39,8 +39,6 @@ export class StoreHomeComponent implements OnInit {
       getSettingCurrentLocationStatus
     );
     this.store.dispatch(loadLedgerTypes());
-    this.store.dispatch(loadIssuings());
-    this.store.dispatch(loadRequisitions());
     this.store.dispatch(loadStockMetrics());
     this.currentStore$ = this.store.pipe(select(getCurrentLocation));
     this.storePages = [

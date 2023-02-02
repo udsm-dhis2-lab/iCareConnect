@@ -47,7 +47,7 @@ export class IssuingComponent implements OnInit {
     private issuingService: IssuingService
   ) {
     store.dispatch(loadLocationsByTagName({ tagName: "Store" }));
-    store.dispatch(loadIssuings());
+    // store.dispatch(loadIssuings());
   }
 
   ngOnInit() {
@@ -56,7 +56,6 @@ export class IssuingComponent implements OnInit {
     // this.issuingList$ = this.store.pipe(select(getAllIssuings));
     this.getAllIssuing();
     // this.loadingIssuingList$ = this.store.pipe(select(getIssuingLoadingState));
-    this.currentStore$ = this.store.select(getCurrentLocation);
     this.stores$ = this.store.pipe(select(getStoreLocations));
   }
 
@@ -118,12 +117,9 @@ export class IssuingComponent implements OnInit {
   }
 
   getAllIssuing(): void {
-    // this.issuingList$ = this.issuingService.getAllIssuings(
-    //   JSON.parse(localStorage.getItem("currentLocation"))?.uuid,
-    //   this.requestingLocation?.uuid
-    // );
     this.issuingList$ = this.issuingService.getIssuings(
-      this.currentLocation?.id
+      this.currentLocation?.id,
+      this.requestingLocation?.uuid || undefined
     )?.pipe(map((response) => {
       return response?.issuings
     }));

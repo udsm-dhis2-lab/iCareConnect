@@ -2,8 +2,6 @@
   class="issuing-container"
   *ngIf="{
     issuingList: issuingList$ | async,
-    loadingIssuingList: loadingIssuingList$ | async,
-    currentStore: currentStore$ | async,
     stores: stores$ | async
   } as params"
 >
@@ -121,13 +119,13 @@
         </tr>
       </table>
     </div> -->
-    <div *ngIf="!params?.issuingList && !params?.currentStore">
+    <div *ngIf="!params?.issuingList?.length && !currentLocation">
       <mat-progress-bar mode="indeterminate"></mat-progress-bar>
     </div>
-    <div *ngIf="params?.issuingList?.length && params?.currentStore">
+    <div *ngIf="params?.issuingList?.length && currentLocation">
       <app-issuing-stock-by-store
         [issuingStock]="params?.issuingList"
-        [currentStore]="params?.currentStore"
+        [currentStore]="currentLocation"
         (rejectRequest)="onReject($event)"
         (issueRequest)="onIssue($event)"
         (selectionChange)="getSelection($event)"

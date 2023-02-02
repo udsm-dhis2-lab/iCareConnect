@@ -16,9 +16,18 @@ import {
 export class IssuingService {
   constructor(private httpClient: OpenmrsHttpClientService) {}
 
-  getIssuings(locationUuid?: string): Observable<any> {
+  getIssuings(
+    locationUuid?: string,
+    requestingLocationUuid?: string
+  ): Observable<any> {
     return this.httpClient
-      .get(`store/requests?requestedLocationUuid=${locationUuid}`)
+      .get(
+        `store/requests?${
+          requestingLocationUuid
+            ? "requestedLocationUuid=" + requestingLocationUuid
+            : "requestedLocationUuid=" + locationUuid
+        }`
+      )
       .pipe(
         map((issueResponse: any) => {
           return {
