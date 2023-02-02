@@ -52,11 +52,11 @@ export class StoreHomeComponent implements OnInit {
         name: "Requests",
         url: "requisition",
       },
-      {
-        id: "received",
-        name: "Received",
-        url: "receipt",
-      },
+      // {
+      //   id: "received",
+      //   name: "Received",
+      //   url: "receipt",
+      // },
       {
         id: "issuing",
         name: "Issuing",
