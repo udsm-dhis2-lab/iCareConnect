@@ -597,6 +597,16 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 			List<StockInvoiceItem> savedStockInvoiceItems = stockInvoice.getStockInvoiceItems();
 			existingStockInvoice.setStockInvoiceItems(savedStockInvoiceItems);
 		}
+
+		if(stockInvoice.getStockInvoiceStatuses() != null) {
+			for (StockInvoiceStatus stockInvoiceStatus : stockInvoice.getStockInvoiceStatuses()) {
+				//TODO Limit status to check the ones available in enums
+				existingStockInvoice = this.stockInvoiceDAO.findByUuid(stockInvoice.getUuid());
+				stockInvoiceStatus.setRemarks(stockInvoiceStatus.getStatus());
+				stockInvoiceStatus.setStockInvoice(existingStockInvoice);
+				this.saveStockInvoiceStatus(stockInvoiceStatus);
+			}
+		}
 		
 		return existingStockInvoice;
 	}
@@ -615,6 +625,12 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 				throw new Exception("The item with uuid " + stockInvoiceItem.getItem().getUuid() + " does not exist");
 			}
 			stockInvoiceItem.setItem(item);
+			if(stockInvoiceItem.getStockInvoiceItemStatuses() != null) {
+				for (StockInvoiceItemStatus stockInvoiceItemStatus : stockInvoiceItem.getStockInvoiceItemStatuses()) {
+					stockInvoiceItemStatus.setStockInvoiceItem(stockInvoiceItem);
+					this.saveStockInvoiceItemStatus(stockInvoiceItemStatus);
+				}
+			}
 		}
 		return stockInvoiceItemDAO.updateStockInvoiceItem(stockInvoiceItem);
 	}
