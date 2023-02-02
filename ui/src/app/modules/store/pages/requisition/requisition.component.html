@@ -172,15 +172,33 @@
       </tr>
     </table> -->
     <mat-progress-bar mode="indeterminate" *ngIf="!requisitions && !loadedRequisitions"></mat-progress-bar>
-    <app-requisition-by-store
-      *ngIf="loadedRequisitions && requisitions?.length"
-      [requisitions]="requisitions"
-      [currentStore]="params?.currentStore"
-      (cancelRequisition)="onCancelRequisition($event)"
-      (rejectRequisition)="onRejectRequisition($event)"
-      (receiveRequisition)="onReceiveRequisition($event)"
-    >
-    </app-requisition-by-store>
+    <div *ngIf="loadedRequisitions && requisitions?.length">
+      <mat-paginator 
+        [hidden]="!requisitions?.length"
+        [length]="requisitions?.length"
+        [pageSize]="50"
+        [pageSizeOptions]="[5, 10, 25, 50, 100]"
+        (page)="onPageChange($event)"
+      >
+      </mat-paginator>
+      <app-requisition-by-store
+        [requisitions]="requisitions"
+        [currentStore]="params?.currentStore"
+        (cancelRequisition)="onCancelRequisition($event)"
+        (rejectRequisition)="onRejectRequisition($event)"
+        (receiveRequisition)="onReceiveRequisition($event)"
+      >
+      </app-requisition-by-store>
+
+      <mat-paginator 
+        [hidden]="!requisitions?.length"
+        [length]="requisitions?.length"
+        [pageSize]="50"
+        [pageSizeOptions]="[5, 10, 25, 50, 100]"
+        (page)="onPageChange($event)"
+      >
+      </mat-paginator>
+    </div>
   
   </mat-card>
 </div>
