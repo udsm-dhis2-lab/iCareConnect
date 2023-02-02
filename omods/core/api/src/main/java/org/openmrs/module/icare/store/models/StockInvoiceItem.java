@@ -3,9 +3,12 @@ package org.openmrs.module.icare.store.models;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.openmrs.BaseOpenmrsData;
 import org.openmrs.Concept;
+import org.openmrs.Location;
+import org.openmrs.api.LocationService;
 import org.openmrs.module.icare.billing.models.InvoiceItem;
 import org.openmrs.module.icare.core.Item;
 import org.openmrs.module.icare.core.JSONConverter;
+import org.openmrs.module.icare.store.util.Stockable;
 
 import javax.persistence.*;
 import java.text.ParseException;
@@ -14,7 +17,7 @@ import java.util.*;
 
 @Entity
 @Table(name = "st_stock_invoice_item")
-public class StockInvoiceItem extends BaseOpenmrsData implements java.io.Serializable, JSONConverter {
+public class StockInvoiceItem extends BaseOpenmrsData implements java.io.Serializable, JSONConverter, Stockable {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -99,7 +102,18 @@ public class StockInvoiceItem extends BaseOpenmrsData implements java.io.Seriali
 	public Date getExpiryDate() {
 		return expiryDate;
 	}
-	
+
+	@Override
+	public Double getQuantity() {
+		Double batchQuantity = Double.valueOf(this.getBatchQuantity());
+		return batchQuantity;
+	}
+
+	@Override
+	public Location getLocation() {
+		return null;
+	}
+
 	public void setExpiryDate(Date expiryDate) {
 		this.expiryDate = expiryDate;
 	}
