@@ -768,9 +768,9 @@ export class RegistrationAddComponent implements OnInit {
           person: {
             names: [
               {
-                givenName: this.patient.fname.toUpperCase(),
-                middleName: this.patient.mname.toUpperCase(),
-                familyName: this.patient.lname.toUpperCase(),
+                givenName: this.patient?.fname?.toUpperCase(),
+                middleName: this.patient?.mname?.toUpperCase(),
+                familyName: this.patient?.lname?.toUpperCase(),
               },
             ],
             gender: this.patient.gender,
@@ -1154,21 +1154,21 @@ export class RegistrationAddComponent implements OnInit {
 
   get residenceRegion(): any[] {
     return uniq(
-      this.patientLocation.map((obj) => {
+      this.patientLocation?.map((obj) => {
         return obj.REGION;
       })
     );
   }
   get residenceDistrict(): any[] {
     return uniq(
-      this.patientLocation.map((obj) => {
+      this.patientLocation?.map((obj) => {
         return obj.DISTRICT;
       })
     );
   }
   // addResidenceArea(area: string) {
   //   if (area?.length > 0) {
-  //     let areaUpper = area.toUpperCase();
+  //     let areaUpper = area?.toUpperCase();
   //     const found = DarRegion.some((el) => el.STREET === areaUpper);
   //     if (!found) {
   //       let obj = {
