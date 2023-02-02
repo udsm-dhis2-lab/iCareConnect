@@ -24,25 +24,65 @@ export class SamplesService {
   getLabSamplesByCollectionDates(
     dates: any,
     category?: string,
-    hasStatus?: string
+    hasStatus?: string,
+    excludeAllocations?: boolean,
+    pagerInfo?: any,
+    otherParams?: {
+      departments: any[];
+      specimenSources: any[];
+      codedRejectionReasons: any[];
+    },
+    acceptedBy?: string
   ): Observable<any> {
-    let parameters = ["paging=false"];
+    let parameters = [];
+    if (pagerInfo) {
+    } else {
+      parameters = [...parameters, "paging=false"];
+    }
+
     if (dates) {
       parameters = [...parameters, "startDate=" + dates?.startDate];
       parameters = [...parameters, "endDate=" + dates?.endDate];
     }
+
     if (category) {
-      parameters = [...parameters, "category=" + category];
+      parameters = [...parameters, "sampleCategory=" + category];
     }
+
     if (hasStatus) {
       parameters = [...parameters, "hasStatus=" + hasStatus];
+    }
+
+    if (acceptedBy) {
+      parameters = [...parameters, "acceptedBy=" + acceptedBy];
+    }
+
+    if (excludeAllocations) {
+      parameters = [...parameters, "excludeAllocations=true"];
+    } else {
+      parameters = [...parameters, "excludeAllocations=true"];
     }
     return this.httpClient
       .get(
         BASE_URL +
           `lab/samples?${parameters?.length > 0 ? parameters?.join("&") : ""}`
       )
-      .pipe(map((response: any) => response?.results));
+      .pipe(
+        map((response: any) => {
+          if (!pagerInfo) {
+            return response?.results?.map(
+              (result) =>
+                new LabSample(
+                  result,
+                  otherParams?.departments,
+                  otherParams?.specimenSources,
+                  otherParams?.codedRejectionReasons
+                )
+            );
+          } else {
+          }
+        })
+      );
   }
 
   getSampleByUuid(uuid: string): Observable<any> {

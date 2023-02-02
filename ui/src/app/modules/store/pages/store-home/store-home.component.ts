@@ -39,8 +39,6 @@ export class StoreHomeComponent implements OnInit {
       getSettingCurrentLocationStatus
     );
     this.store.dispatch(loadLedgerTypes());
-    this.store.dispatch(loadIssuings());
-    this.store.dispatch(loadRequisitions());
     this.store.dispatch(loadStockMetrics());
     this.currentStore$ = this.store.pipe(select(getCurrentLocation));
     this.storePages = [
@@ -54,11 +52,11 @@ export class StoreHomeComponent implements OnInit {
         name: "Requests",
         url: "requisition",
       },
-      {
-        id: "received",
-        name: "Received",
-        url: "receipt",
-      },
+      // {
+      //   id: "received",
+      //   name: "Received",
+      //   url: "receipt",
+      // },
       {
         id: "issuing",
         name: "Issuing",

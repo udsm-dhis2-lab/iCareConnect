@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { orderBy } from "lodash";
+import { orderBy, omit } from "lodash";
 import { Observable, of, throwError } from "rxjs";
 import { catchError, map } from "rxjs/operators";
 import { OpenmrsHttpClientService } from "src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service";
@@ -15,6 +15,37 @@ import {
 })
 export class IssuingService {
   constructor(private httpClient: OpenmrsHttpClientService) {}
+
+  getIssuings(
+    locationUuid?: string,
+    requestingLocationUuid?: string,
+    page?: number,
+    pageSize?: number,
+    status?:string
+  ): Observable<any> {
+    const pageNumber = page ? `&page=${page}` : ``;
+    const pageSizeNumber = pageSize ? `&pageSize=${pageSize}` : ``;
+    const filterStatus = status ? `&status=${status}` : ``;
+    const pagingArgs = pageNumber + pageSizeNumber + filterStatus;
+    return this.httpClient
+      .get(
+        `store/requests?${
+          requestingLocationUuid
+            ? "requestedLocationUuid=" + requestingLocationUuid
+            : "requestedLocationUuid=" + locationUuid
+        }${pagingArgs}`
+      )
+      .pipe(
+        map((issueResponse: any) => {
+          return {
+            ...omit(issueResponse, "results"),
+            issuings: (issueResponse?.results || [])?.map((issueItem) =>
+              new Issuing(issueItem).toJson()
+            ),
+          };
+        })
+      );
+  }
 
   getAllIssuings(
     locationUuid?: string,
