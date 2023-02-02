@@ -20,7 +20,10 @@
         "expiryDate": "2025-01-08T00:00:00.000Z",
         "stockInvoiceItemStatus" : [{
           "status": "DRAFT"
-        }]
+        }],
+        "location": {
+          "uuid": "44939999-d333-fff2-9bff-61d11117c22e"
+        }
       }
     ]
   }

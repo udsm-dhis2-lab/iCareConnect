@@ -2,10 +2,7 @@ package org.openmrs.module.icare.store.services;
 
 import org.apache.commons.collections.IteratorUtils;
 import org.openmrs.*;
-import org.openmrs.api.AdministrationService;
-import org.openmrs.api.ConceptService;
-import org.openmrs.api.OrderEntryException;
-import org.openmrs.api.OrderService;
+import org.openmrs.api.*;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.icare.ICareConfig;
@@ -657,9 +654,15 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 			throw new Exception("The unit of measurement with uuid" + stockInvoiceItem.getUom().getUuid()
 			        + " does not exist");
 		}
+
+		Location location = Context.getLocationService().getLocationByUuid(stockInvoiceItem.getLocation().getUuid());
+		if(location == null){
+			throw new Exception(" The location with uuid"+ stockInvoiceItem.getLocation().getUuid()+" does not exist");
+		}
 		
 		stockInvoiceItem.setItem(item);
 		stockInvoiceItem.setUom(uom);
+		stockInvoiceItem.setLocation(location);
 		
 		StockInvoiceItem savedStockInvoiceItem = stockInvoiceItemDAO.save(stockInvoiceItem);
 		

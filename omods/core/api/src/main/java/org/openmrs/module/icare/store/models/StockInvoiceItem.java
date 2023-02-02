@@ -54,6 +54,10 @@ public class StockInvoiceItem extends BaseOpenmrsData implements java.io.Seriali
 	@Column(name = "amount")
 	private Double amount;
 
+	@ManyToOne
+	@JoinColumn(name = "location_id")
+	private Location location;
+
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "stockInvoiceItem")
 	private List<StockInvoiceItemStatus> stockInvoiceItemStatuses = new ArrayList<>(0);
 	
@@ -111,7 +115,11 @@ public class StockInvoiceItem extends BaseOpenmrsData implements java.io.Seriali
 
 	@Override
 	public Location getLocation() {
-		return null;
+		return location;
+	}
+
+	public void setLocation(Location location) {
+		this.location = location;
 	}
 
 	public void setExpiryDate(Date expiryDate) {
@@ -214,6 +222,13 @@ public class StockInvoiceItem extends BaseOpenmrsData implements java.io.Seriali
 			stockInvoiceItemObject.put("stockInvoiceItemStatus",stockInvoiceStatusesMapList);
 
 		}
+
+		if(this.getLocation() != null){
+			HashMap<String,Object> locationObjectMap = new HashMap<>();
+			locationObjectMap.put("uuid",this.getLocation().getUuid());
+			locationObjectMap.put("display",this.getLocation().getDisplayString());
+			stockInvoiceItemObject.put("location",locationObjectMap);
+		}
 		
         return stockInvoiceItemObject;
     }
@@ -276,6 +291,12 @@ public class StockInvoiceItem extends BaseOpenmrsData implements java.io.Seriali
 				stockInvoiceItemStatusesList.add(stockInvoiceItemStatus);
 			}
 			stockInvoiceItem.setStockInvoiceItemStatuses(stockInvoiceItemStatusesList);
+		}
+
+		if(stockInvoiceItemMap.get("location") != null){
+			Location location = new Location();
+			location.setUuid(((Map)stockInvoiceItemMap.get("location")).get("uuid").toString());
+			stockInvoiceItem.setLocation(location);
 		}
 		return stockInvoiceItem;
 		
