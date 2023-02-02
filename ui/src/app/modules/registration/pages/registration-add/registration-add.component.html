@@ -111,6 +111,7 @@
                 <mat-label>{{ selectedIdentifierType?.name }}</mat-label>
                 <input
                   matInput
+                  id="patientTypeID"
                   [pattern]="selectedIdentifierType?.format"
                   [placeholder]="selectedIdFormat"
                   [required]="selectedIdentifierType?.required"
@@ -329,7 +330,7 @@
                   [(ngModel)]="patient['age']['years']"
                   (keyup)="calculateDateOfBirth()"
                   name="age"
-                  id="age"
+                  id="ageYears"
                 />
               </mat-form-field>
               <mat-form-field appearance="fill" class="w-25 ml-1">
@@ -340,7 +341,7 @@
                   [(ngModel)]="patient['age']['months']"
                   (keyup)="calculateDateOfBirth()"
                   name="age"
-                  id="age"
+                  id="ageMonths"
                 />
               </mat-form-field>
               <mat-form-field appearance="fill" class="w-25 ml-1">
@@ -351,7 +352,7 @@
                   [(ngModel)]="patient['age']['days']"
                   (keyup)="calculateDateOfBirth()"
                   name="age"
-                  id="age"
+                  id="ageDays"
                 />
               </mat-form-field>
               <div class="ml-4 mr-4 h6">OR</div>
