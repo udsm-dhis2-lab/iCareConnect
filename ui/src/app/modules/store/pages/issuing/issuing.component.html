@@ -7,9 +7,21 @@
 >
   <mat-card>
     <div class="d-flex justify-content-between">
-      <mat-form-field class="w-25">
-        <input autocomplete="off" type="text" matInput placeholder="Search" />
-      </mat-form-field>
+      <div class="w-50">
+        <div class="d-flex">
+          <mat-form-field class="w-75">
+            <input autocomplete="off" type="text" matInput placeholder="Search" />
+          </mat-form-field>
+          <mat-form-field class="w-25 ml-2" appearance="fill">
+            <mat-label>Filter </mat-label>
+            <mat-select (selectionChange)="onSelectStatus($event)">
+              <mat-option *ngFor="let status of statuses" [value]="status">
+                {{ status }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </div>
       <mat-form-field class="w-25 float-right">
         <mat-label>Choose Store</mat-label>
         <mat-select (selectionChange)="getSelectedStore($event)" name="store">
@@ -122,6 +134,14 @@
     <div *ngIf="!params?.issuingList?.length && !currentLocation">
       <mat-progress-bar mode="indeterminate"></mat-progress-bar>
     </div>
+    <mat-paginator 
+      [hidden]="!params?.issuingList"
+      [length]="pager?.total"
+      [pageSize]="pageSize"
+      [pageSizeOptions]="pageSizeOptions"
+      (page)="onPageChange($event)"
+    >
+    </mat-paginator>
     <div *ngIf="params?.issuingList?.length && currentLocation">
       <app-issuing-stock-by-store
         [issuingStock]="params?.issuingList"
@@ -131,6 +151,15 @@
         (selectionChange)="getSelection($event)"
       >
       </app-issuing-stock-by-store>
+    </div>
+    <div *ngIf="!params?.issuingList?.length && currentLocation">
+      <table class="table table-striped">
+        <tbody>
+          <tr>
+            <h3 class="text-center">No issuings </h3>
+          </tr>
+        </tbody>
+      </table>
     </div>
 
     <div class="d-flex justify-content-end mt-2 mr-2">

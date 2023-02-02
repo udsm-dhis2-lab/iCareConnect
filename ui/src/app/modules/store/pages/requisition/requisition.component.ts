@@ -43,8 +43,12 @@ export class RequisitionComponent implements OnInit {
   searchTerm: any;
   requisitions: RequisitionObject[];
   storedRequisitions: RequisitionObject[];
-  page: any;
-  pageSize: number;
+  page: number = 1;
+  pageSize: number = 50;
+  pageSizeOptions: number[] = [5, 10, 25, 50, 100];
+  pager: any;
+  statuses: string[] = ["PENDING", "CANCELLED", "REJECTED", "RECEIVED"];
+  selectedStatus: string;
   constructor(
     private store: Store<AppState>,
     private dialog: MatDialog,
@@ -79,9 +83,15 @@ export class RequisitionComponent implements OnInit {
     this.loadedRequisitions = false;
     this.searchTerm = event ? event?.target?.value : "";
     this.requisitions$ = this.requisitionService
-      .getRequisitions(this.currentLocation?.id)
+      .getRequisitions(
+        this.currentLocation?.id,
+        this.page,
+        this.pageSize,
+        this.selectedStatus
+      )
       .pipe(
         map((requisitions) => {
+          this.pager = requisitions?.pager;
           this.requisitions = requisitions?.requisitions;
           this.storedRequisitions = requisitions?.requisitions;
           this.loadedRequisitions = true;
@@ -212,8 +222,14 @@ export class RequisitionComponent implements OnInit {
   }
 
   onPageChange(event) {
-    this.page = event.pageIndex + 1;
+    this.page =
+      event.pageIndex - this.page >= 0 ? this.page + 1 : this.page - 1;
     this.pageSize = Number(event?.pageSize);
+    this.getAllRequisition();
+  }
+
+  onSelectStatus(e) {
+    this.selectedStatus = e?.value;
     this.getAllRequisition();
   }
 }

@@ -40,6 +40,12 @@ export class IssuingComponent implements OnInit {
   requestingLocation: any;
   selectedIssues: any = {};
   errors: any[];
+  page: number = 1;
+  pageSize: number = 50;
+  pageSizeOptions: number[] = [5, 10, 25, 50, 100];
+  pager: any;
+  statuses: string[] = ["CANCELLED", "REJECTED", "ISSUED"];
+  selectedStatus: string;
 
   constructor(
     private store: Store<AppState>,
@@ -79,15 +85,13 @@ export class IssuingComponent implements OnInit {
             if (response) {
               this.getAllIssuing();
             }
-            if(response?.error && response?.message){
+            if (response?.error && response?.message) {
               this.errors = [
                 ...this.errors,
                 {
-                  error: {
-                    
-                  }
-                }
-              ]
+                  error: {},
+                },
+              ];
             }
           });
       }
@@ -95,8 +99,8 @@ export class IssuingComponent implements OnInit {
   }
 
   getSelection(event: any, issue?: any): void {
-    issue = event?.issue ? event?.issue : issue 
-    event = event?.event ? event?.event : event 
+    issue = event?.issue ? event?.issue : issue;
+    event = event?.event ? event?.event : event;
     if (event?.checked) {
       this.selectedIssues[issue?.id] = issue;
     } else {
@@ -108,7 +112,6 @@ export class IssuingComponent implements OnInit {
       });
       this.selectedIssues = newSelectedIssues;
     }
-
   }
 
   getSelectedStore(event: MatSelectChange): void {
@@ -117,12 +120,20 @@ export class IssuingComponent implements OnInit {
   }
 
   getAllIssuing(): void {
-    this.issuingList$ = this.issuingService.getIssuings(
-      this.currentLocation?.id,
-      this.requestingLocation?.uuid || undefined
-    )?.pipe(map((response) => {
-      return response?.issuings
-    }));
+    this.issuingList$ = this.issuingService
+      .getIssuings(
+        this.currentLocation?.id,
+        this.requestingLocation?.uuid || undefined,
+        this.page,
+        this.pageSize,
+        this.selectedStatus
+      )
+      ?.pipe(
+        map((response) => {
+          this.pager = response?.pager;
+          return response?.issuings;
+        })
+      );
   }
 
   onReject(e, issue?: IssuingObject): void {
@@ -260,6 +271,18 @@ export class IssuingComponent implements OnInit {
           });
         }
       });
+  }
+
+  onPageChange(event) {
+    this.page =
+      event.pageIndex - this.page >= 0 ? this.page + 1 : this.page - 1;
+    this.pageSize = Number(event?.pageSize);
+    this.getAllIssuing();
+  }
+
+  onSelectStatus(e) {
+    this.selectedStatus = e?.value;
+    this.getAllIssuing();
   }
 
   get selectedIssuesCount(): number {
