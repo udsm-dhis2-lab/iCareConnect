@@ -173,8 +173,8 @@
     </table> -->
     <mat-progress-bar mode="indeterminate" *ngIf="!requisitions && !loadedRequisitions"></mat-progress-bar>
     <app-requisition-by-store
-      *ngIf="loadedRequisitions && requisitions?.requisitions?.length"
-      [requisitions]="requisitions?.requisitions"
+      *ngIf="loadedRequisitions && requisitions?.length"
+      [requisitions]="requisitions"
       [currentStore]="params?.currentStore"
       (cancelRequisition)="onCancelRequisition($event)"
       (rejectRequisition)="onRejectRequisition($event)"

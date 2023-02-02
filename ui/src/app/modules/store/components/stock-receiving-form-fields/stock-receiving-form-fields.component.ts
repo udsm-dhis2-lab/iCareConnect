@@ -79,22 +79,22 @@ export class StockReceivingFormFieldsComponent implements OnInit {
         key: "supplier",
         label: "Supplier",
         options: supplierFieldOptions,
-        value: this.existingStockInvoice?.supplier?.uuid || '',
+        value: this.existingStockInvoice ? this.existingStockInvoice?.supplier?.uuid : '',
       }),
       new Textbox({
         id: "invoiceNumber",
         key: "invoiceNumber",
         label: "Invoice Number",
-        value: this.existingStockInvoice?.invoiceNumber,
+        value: this.existingStockInvoice ? this.existingStockInvoice?.invoiceNumber : '',
       }),
       new DateField({
         id: "receivingDate",
         key: "receivingDate",
         label: "Receiving Date",
         max: formatDateToYYMMDD(new Date()),
-        value: formatDateToYYMMDD(
+        value: this.existingStockInvoice ? formatDateToYYMMDD(
           new Date(this.existingStockInvoice?.receivingDate)
-        ),
+        ) : '',
       }),
     ];
     this.setFields();

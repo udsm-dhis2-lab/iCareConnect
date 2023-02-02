@@ -48,17 +48,9 @@ export class RequisitionComponent implements OnInit {
     private dialog: MatDialog,
     private systemSettingsService: SystemSettingsService,
     private requisitionService: RequisitionService
-  ) {
-    this.store.dispatch(loadRequisitions());
-  }
+  ) {}
 
   ngOnInit() {
-    // RequisitionObject
-    
-    // this.requisitions$ = this.store.pipe(select(getActiveRequisitions));
-    // this.loadingRequisitions$ = this.store.pipe(
-    //   select(getRequisitionLoadingState)
-    // );
     this.referenceTagsThatCanRequestFromMainStoreConfigs$ =
       this.systemSettingsService.getSystemSettingsMatchingAKey(
         `iCare.store.mappings.canRequestFromMainStore.LocationTagsUuid`
@@ -77,10 +69,6 @@ export class RequisitionComponent implements OnInit {
         `iCare.store.settings.pharmacy.locationTagUuid`
       );
     this.getAllRequisition();
-    // this.loadingRequisitions$ = this.store.pipe(
-    //   select(getRequisitionLoadingState)
-    // );
-    // this.currentStore$ = this.store.pipe(select(getCurrentLocation));
     this.stores$ = this.store.pipe(select(getStoreLocations));
     this.stockableItems$ = this.store.pipe(select(getAllStockableItems));
   }
@@ -88,16 +76,12 @@ export class RequisitionComponent implements OnInit {
   getAllRequisition(event?: any): void {
     this.loadedRequisitions = false;
     this.searchTerm = event ? event?.target?.value : "";
-    // this.requisitions$ = this.requisitionService
-    //   .getAllRequisitions(
-    //     JSON.parse(localStorage.getItem("currentLocation"))?.uuid
-    //   )
     this.requisitions$ = this.requisitionService
       .getRequisitions(this.currentLocation?.id)
       .pipe(
         map((requisitions) => {
-          this.requisitions = requisitions;
-          this.storedRequisitions = requisitions;
+          this.requisitions = requisitions?.requisitions;
+          this.storedRequisitions = requisitions?.requisitions;
           this.loadedRequisitions = true;
           return requisitions;
         })
