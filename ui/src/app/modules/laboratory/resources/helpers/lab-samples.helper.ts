@@ -299,3 +299,57 @@ function formatOrders(orders, sample) {
     };
   });
 }
+
+export function getCompletedOrders(orders, isLIS?: boolean) {
+  return (
+    _.filter(orders, (order) => {
+      const testAllocationsWithResults = getTestAllocationsWithResults(
+        order?.testAllocations
+      );
+      if (
+        testAllocationsWithResults?.length > 0 &&
+        order?.authorizationInfo?.length > 0
+      ) {
+        return order;
+      }
+    }) || []
+  );
+}
+
+export function getTestAllocationsWithResults(allocations) {
+  return _.uniqBy(
+    allocations?.map((allocation) => {
+      return {
+        ...allocation,
+        conceptUuid: allocation?.concept?.uuid,
+        hasResult: allocation?.results?.length > 0,
+      };
+    }) || [],
+    "conceptUuid"
+  )?.filter((allocation) => allocation?.hasResult);
+}
+
+export function getLabOrdersNotSampled(labOrders, sampledOrders, paidItems) {
+  let ordersNotSampled = [];
+  _.each(labOrders, (labOrder) => {
+    if (
+      (
+        _.filter(sampledOrders, (sampledOrder) => {
+          if (sampledOrder?.order?.uuid === labOrder?.uuid) {
+            return sampledOrder?.order;
+          }
+        }) || []
+      )?.length > 0
+    ) {
+    } else {
+      ordersNotSampled = [
+        ...ordersNotSampled,
+        {
+          ...labOrder,
+          paid: paidItems[labOrder?.concept?.display] ? true : false,
+        },
+      ];
+    }
+  });
+  return _.uniqBy(ordersNotSampled, "uuid");
+}
