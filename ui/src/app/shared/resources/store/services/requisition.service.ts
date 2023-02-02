@@ -18,9 +18,13 @@ import { orderBy } from "lodash";
 export class RequisitionService {
   constructor(private httpClient: OpenmrsHttpClientService) {}
 
-  getRequisitions(locationUuid?: string): Observable<any> {
+  getRequisitions(locationUuid?: string, page?: Number, pageSize?: number, status?: string): Observable<any> {
+    const pageNumber = page ? `&page=${page}` : ``;
+    const pageSizeNumber = pageSize ? `&pageSize=${pageSize}` : ``;
+    const filterStatus = status ? `&status=${status}` : ``;
+    const pagingArgs = pageNumber + pageSizeNumber + filterStatus;
     return this.httpClient
-      .get(`store/requests?requestingLocationUuid=${locationUuid}`)
+      .get(`store/requests?requestingLocationUuid=${locationUuid}${pagingArgs}`)
       .pipe(
         map((requestResponse) => {
           return {

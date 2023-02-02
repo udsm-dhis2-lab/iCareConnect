@@ -16,9 +16,21 @@
 >
   <mat-card class="border">
     <div class="d-flex justify-content-between">
-      <mat-form-field class="w-25">
-        <input autocomplete="off" type="text" matInput placeholder="Search" (keyup)="onSearchRequisition($event)" />
-      </mat-form-field>
+      <div class="w-50">
+        <div class="d-flex">
+          <mat-form-field class="w-75">
+            <input autocomplete="off" type="text" matInput placeholder="Search" (keyup)="onSearchRequisition($event)" />
+          </mat-form-field>
+          <mat-form-field class="w-25 ml-2" appearance="fill">
+            <mat-label>Filter </mat-label>
+            <mat-select (selectionChange)="onSelectStatus($event)">
+              <mat-option *ngFor="let status of statuses" [value]="status">
+                {{ status }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </div>
       <button
         [disabled]="
           !params?.pharmacyLocationTagUuid ||
@@ -171,16 +183,16 @@
         </td>
       </tr>
     </table> -->
-    <mat-progress-bar mode="indeterminate" *ngIf="!requisitions && !loadedRequisitions"></mat-progress-bar>
+    <mat-progress-bar mode="indeterminate" *ngIf="!requisitions?.length && !loadedRequisitions"></mat-progress-bar>
+    <mat-paginator 
+      [hidden]="!requisitions?.length"
+      [length]="pager?.total"
+      [pageSize]="pageSize"
+      [pageSizeOptions]="pageSizeOptions"
+      (page)="onPageChange($event)"
+    >
+    </mat-paginator>
     <div *ngIf="loadedRequisitions && requisitions?.length">
-      <mat-paginator 
-        [hidden]="!requisitions?.length"
-        [length]="requisitions?.length"
-        [pageSize]="50"
-        [pageSizeOptions]="[5, 10, 25, 50, 100]"
-        (page)="onPageChange($event)"
-      >
-      </mat-paginator>
       <app-requisition-by-store
         [requisitions]="requisitions"
         [currentStore]="params?.currentStore"
@@ -189,15 +201,15 @@
         (receiveRequisition)="onReceiveRequisition($event)"
       >
       </app-requisition-by-store>
-
-      <mat-paginator 
-        [hidden]="!requisitions?.length"
-        [length]="requisitions?.length"
-        [pageSize]="50"
-        [pageSizeOptions]="[5, 10, 25, 50, 100]"
-        (page)="onPageChange($event)"
-      >
-      </mat-paginator>
+    </div>
+    <div *ngIf="!requisitions?.length && loadedRequisitions">
+      <table class="table table-striped">
+        <tbody>
+          <tr>
+            <h3 class="text-center">No requisitions</h3>
+          </tr>
+        </tbody>
+      </table>
     </div>
   
   </mat-card>

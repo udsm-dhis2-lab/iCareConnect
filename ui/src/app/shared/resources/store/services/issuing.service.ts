@@ -18,15 +18,22 @@ export class IssuingService {
 
   getIssuings(
     locationUuid?: string,
-    requestingLocationUuid?: string
+    requestingLocationUuid?: string,
+    page?: number,
+    pageSize?: number,
+    status?:string
   ): Observable<any> {
+    const pageNumber = page ? `&page=${page}` : ``;
+    const pageSizeNumber = pageSize ? `&pageSize=${pageSize}` : ``;
+    const filterStatus = status ? `&status=${status}` : ``;
+    const pagingArgs = pageNumber + pageSizeNumber + filterStatus;
     return this.httpClient
       .get(
         `store/requests?${
           requestingLocationUuid
             ? "requestedLocationUuid=" + requestingLocationUuid
             : "requestedLocationUuid=" + locationUuid
-        }`
+        }${pagingArgs}`
       )
       .pipe(
         map((issueResponse: any) => {
