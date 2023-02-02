@@ -122,5 +122,21 @@ export class ItemPriceService {
         ),
         catchError((error) => of(error))
       );
+    }
+    
+  getItem(
+    q?: string,
+    ){
+    return this.httpClient
+      .get(`icare/item?q=${q}`)
+      .pipe(
+        map((response) =>
+          response?.results && response?.results?.length > 0
+            ? response?.results
+            : []
+        ),
+        catchError((error) => of(error))
+      );
+
   }
 }
