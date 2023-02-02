@@ -1,11 +1,9 @@
 package org.openmrs.module.icare.store.services;
 
 import org.apache.commons.collections.IteratorUtils;
-import org.openmrs.Concept;
-import org.openmrs.DrugOrder;
-import org.openmrs.Location;
-import org.openmrs.Order;
+import org.openmrs.*;
 import org.openmrs.api.AdministrationService;
+import org.openmrs.api.ConceptService;
 import org.openmrs.api.OrderEntryException;
 import org.openmrs.api.OrderService;
 import org.openmrs.api.context.Context;
@@ -57,7 +55,7 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 	StockInvoiceStatusDAO stockInvoiceStatusDAO;
 	
 	StockInvoiceItemDAO stockInvoiceItemDAO;
-
+	
 	StockInvoiceItemStatusDAO stockInvoiceItemStatusDAO;
 	
 	public void setLedgerDAO(LedgerDAO ledgerDAO) {
@@ -119,11 +117,11 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 	public void setStockInvoiceItemDAO(StockInvoiceItemDAO stockInvoiceItemDAO) {
 		this.stockInvoiceItemDAO = stockInvoiceItemDAO;
 	}
-
+	
 	public void setStockInvoiceItemStatusDAO(StockInvoiceItemStatusDAO stockInvoiceItemStatusDAO) {
 		this.stockInvoiceItemStatusDAO = stockInvoiceItemStatusDAO;
 	}
-
+	
 	@Override
 	public ReorderLevel addReorderLevel(ReorderLevel reorderLevel) {
 		
@@ -594,18 +592,12 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 			existingStockInvoice = this.stockInvoiceDAO.findByUuid(stockInvoice.getUuid());
 			for (StockInvoiceItem stockInvoiceItem : stockInvoice.getStockInvoiceItems()) {
 				stockInvoiceItem.setStockInvoice(existingStockInvoice);
-				StockInvoiceItem savedStockInvoiceItem = this.stockInvoiceItemDAO.save(stockInvoiceItem);
-
-				for(StockInvoiceItemStatus stockInvoiceItemStatus : stockInvoiceItem.getStockInvoiceItemStatuses()){
-					stockInvoiceItemStatus.setStockInvoiceItem(savedStockInvoiceItem);
-					this.stockInvoiceItemStatusDAO.save(stockInvoiceItemStatus);
-				}
-
+				this.saveStockInvoiceItem(stockInvoiceItem);
 			}
 			List<StockInvoiceItem> savedStockInvoiceItems = stockInvoice.getStockInvoiceItems();
 			existingStockInvoice.setStockInvoiceItems(savedStockInvoiceItems);
 		}
-
+		
 		return existingStockInvoice;
 	}
 	
@@ -633,6 +625,38 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 	}
 	
 	@Override
+	public StockInvoiceItem saveStockInvoiceItem(StockInvoiceItem stockInvoiceItem) throws Exception {
+		Item item = dao.findByUuid(stockInvoiceItem.getItem().getUuid());
+		if (item == null) {
+			throw new Exception("The item with uuid" + stockInvoiceItem.getItem().getUuid() + " does not exist");
+		}
+		
+		ConceptService conceptService = Context.getService(ConceptService.class);
+		Concept uom = conceptService.getConceptByUuid(stockInvoiceItem.getUom().getUuid());
+		if (uom == null) {
+			throw new Exception("The unit of measurement with uuid" + stockInvoiceItem.getUom().getUuid()
+			        + " does not exist");
+		}
+		
+		stockInvoiceItem.setItem(item);
+		stockInvoiceItem.setUom(uom);
+		
+		StockInvoiceItem savedStockInvoiceItem = stockInvoiceItemDAO.save(stockInvoiceItem);
+		
+		for (StockInvoiceItemStatus stockInvoiceItemStatus : stockInvoiceItem.getStockInvoiceItemStatuses()) {
+			stockInvoiceItemStatus.setStockInvoiceItem(savedStockInvoiceItem);
+			this.saveStockInvoiceItemStatus(stockInvoiceItemStatus);
+		}
+		
+		return savedStockInvoiceItem;
+	}
+	
+	@Override
+	public StockInvoiceItemStatus saveStockInvoiceItemStatus(StockInvoiceItemStatus stockInvoiceItemStatus) {
+		return this.stockInvoiceItemStatusDAO.save(stockInvoiceItemStatus);
+	}
+	
+	@Override
 	public StockInvoice saveStockInvoice(StockInvoice stockInvoice) throws Exception {
 		
 		Supplier supplier = this.getSupplierByUuid(stockInvoice.getSupplier().getUuid());
@@ -643,7 +667,7 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 		StockInvoice savedStockInvoice = this.stockInvoiceDAO.save(stockInvoice);
 		
 		for (StockInvoiceItem stockInvoiceItem : savedStockInvoice.getStockInvoiceItems()) {
-			this.stockInvoiceItemDAO.save(stockInvoiceItem);
+			this.saveStockInvoiceItem(stockInvoiceItem);
 		}
 		
 		for (StockInvoiceStatus stockInvoiceStatus : stockInvoice.getStockInvoiceStatuses()) {
@@ -651,7 +675,7 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 			
 			stockInvoiceStatus.setRemarks(stockInvoiceStatus.getStatus());
 			stockInvoiceStatus.setStockInvoice(savedStockInvoice);
-			this.stockInvoiceStatusDAO.save(stockInvoiceStatus);
+			this.saveStockInvoiceStatus(stockInvoiceStatus);
 		}
 		return savedStockInvoice;
 	}

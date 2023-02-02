@@ -197,7 +197,7 @@ public class StockInvoiceItem extends BaseOpenmrsData implements java.io.Seriali
 				stockInvoiceItemStatusesMap.put("status",stockInvoiceItemStatus.getStatus());
 			}
 			stockInvoiceStatusesMapList.add(stockInvoiceItemStatusesMap);
-			stockInvoiceItemObject.put("stockInvoiceStatus",stockInvoiceStatusesMapList);
+			stockInvoiceItemObject.put("stockInvoiceItemStatus",stockInvoiceStatusesMapList);
 
 		}
 		
@@ -224,10 +224,12 @@ public class StockInvoiceItem extends BaseOpenmrsData implements java.io.Seriali
 			stockInvoiceItem.setBatchNo(stockInvoiceItemMap.get("batchNo").toString());
 		}
 		if (stockInvoiceItemMap.get("unitPrice") != null) {
-			stockInvoiceItem.setUnitPrice((Double) stockInvoiceItemMap.get("unitPrice"));
+			Double unitPrice = Double.valueOf(stockInvoiceItemMap.get("unitPrice").toString());
+			stockInvoiceItem.setUnitPrice(unitPrice);
 		}
 		if (stockInvoiceItemMap.get("amount") != null) {
-			stockInvoiceItem.setAmount((Double) stockInvoiceItemMap.get("amount"));
+			Double amount = Double.valueOf(stockInvoiceItemMap.get("amount").toString());
+			stockInvoiceItem.setAmount(amount);
 		}
 		
 		if (stockInvoiceItemMap.get("batchQuantity") != null) {

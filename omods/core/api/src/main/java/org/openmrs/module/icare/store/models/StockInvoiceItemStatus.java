@@ -10,61 +10,61 @@ import java.util.Map;
 @Entity
 @Table(name = "st_stock_invoice_item_status")
 public class StockInvoiceItemStatus extends BaseOpenmrsData implements java.io.Serializable, JSONConverter {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "stock_invoice_item_status_id", unique = true, nullable = false)
-    public Integer id;
-
-    @ManyToOne
-    @JoinColumn(name = "stock_invoice_item_id")
-    public StockInvoiceItem stockInvoiceItem;
-
-    @Column(name = "status")
-    public String status;
-
-    @Column(name = "remarks")
-    public String remarks;
-
-    public enum Type {
-        DRAFT, RECEIVED
-    }
-
-    @Override
-    public Integer getId() {
-        return id;
-    }
-
-    @Override
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public StockInvoiceItem getStockInvoiceItem() {
-        return stockInvoiceItem;
-    }
-
-    public void setStockInvoiceItem(StockInvoiceItem stockInvoiceItem) {
-        this.stockInvoiceItem = stockInvoiceItem;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public void setRemarks(String remarks) {
-        this.remarks = remarks;
-    }
-
-    public String getRemarks() {
-        return remarks;
-    }
-
-    @Override
+	
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "stock_invoice_item_status_id", unique = true, nullable = false)
+	public Integer id;
+	
+	@ManyToOne
+	@JoinColumn(name = "stock_invoice_item_id")
+	public StockInvoiceItem stockInvoiceItem;
+	
+	@Column(name = "status")
+	public String status;
+	
+	@Column(name = "remarks")
+	public String remarks;
+	
+	public enum Type {
+		DRAFT, RECEIVED
+	}
+	
+	@Override
+	public Integer getId() {
+		return id;
+	}
+	
+	@Override
+	public void setId(Integer id) {
+		this.id = id;
+	}
+	
+	public StockInvoiceItem getStockInvoiceItem() {
+		return stockInvoiceItem;
+	}
+	
+	public void setStockInvoiceItem(StockInvoiceItem stockInvoiceItem) {
+		this.stockInvoiceItem = stockInvoiceItem;
+	}
+	
+	public String getStatus() {
+		return status;
+	}
+	
+	public void setStatus(String status) {
+		this.status = status;
+	}
+	
+	public void setRemarks(String remarks) {
+		this.remarks = remarks;
+	}
+	
+	public String getRemarks() {
+		return remarks;
+	}
+	
+	@Override
     public Map<String, Object> toMap() {
 
         Map<String,Object> stockInvoiceItemStatusMap = new HashMap<>();
@@ -79,18 +79,18 @@ public class StockInvoiceItemStatus extends BaseOpenmrsData implements java.io.S
 
         return stockInvoiceItemStatusMap;
     }
-
-    public static StockInvoiceItemStatus fromMap(Map<String, Object> stockInvoiceItemStatusMap) {
-
-        StockInvoiceItemStatus stockInvoiceItemStatus = new StockInvoiceItemStatus();
-        stockInvoiceItemStatus.setStatus(stockInvoiceItemStatusMap.get("status").toString());
-        stockInvoiceItemStatus.setRemarks(stockInvoiceItemStatusMap.get("remarks").toString());
-
-        StockInvoiceItem stockInvoiceItem = new StockInvoiceItem();
-        stockInvoiceItem.setUuid(((Map) stockInvoiceItemStatusMap.get("stockInvoiceItem")).get("uuid").toString());
-
-        stockInvoiceItemStatus.setStockInvoiceItem(stockInvoiceItem);
-
-        return stockInvoiceItemStatus;
-    }
+	
+	public static StockInvoiceItemStatus fromMap(Map<String, Object> stockInvoiceItemStatusMap) {
+		
+		StockInvoiceItemStatus stockInvoiceItemStatus = new StockInvoiceItemStatus();
+		stockInvoiceItemStatus.setStatus(stockInvoiceItemStatusMap.get("status").toString());
+		stockInvoiceItemStatus.setRemarks(stockInvoiceItemStatusMap.get("remarks").toString());
+		
+		StockInvoiceItem stockInvoiceItem = new StockInvoiceItem();
+		stockInvoiceItem.setUuid(((Map) stockInvoiceItemStatusMap.get("stockInvoiceItem")).get("uuid").toString());
+		
+		stockInvoiceItemStatus.setStockInvoiceItem(stockInvoiceItem);
+		
+		return stockInvoiceItemStatus;
+	}
 }
