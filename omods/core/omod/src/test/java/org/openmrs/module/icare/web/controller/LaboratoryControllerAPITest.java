@@ -110,7 +110,7 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		MockHttpServletResponse handleGet = handle(newGetRequest);
 		List<Map<String, Object>> createdsample = (new ObjectMapper()).readValue(handleGet.getContentAsString(), List.class);
 		
-		assertThat("Samples are added to total 3:", createdsample.size(), is(4));
+		assertThat("Samples are added to total 6:", createdsample.size(), is(6));
 		boolean found = false;
 		for (Map<String, Object> sampleMap : createdsample) {
 			if (sampleMap.get("label").equals("Create Sample Test")) {
@@ -210,7 +210,7 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 				System.out.println(((List<Map>) sample.get("statuses")).get(0));
 				
 				sampleFound = true;
-				assertThat("list of statuses is greater than 0", ((List<Map>) sample.get("statuses")).size(), is(1));
+				assertThat("list of statuses is greater than 0", ((List<Map>) sample.get("statuses")).size(), is(2));
 				Map<String, Object> status = ((List<Map>) sample.get("statuses")).get(0);
 				assertThat("list of statuses is greater than 0", (String) status.get("status"), is("RECEIVED"));
 			}
@@ -306,13 +306,14 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 	public void testGettingSamples() throws Exception {
 		
 		MockHttpServletRequest newGetRequest = newGetRequest("lab/samples", new Parameter("page", "2"), new Parameter(
-		        "pageSize", "2"));
+		        "pageSize", "2"), new Parameter("hasStatus", "NO"), new Parameter("excludeAllocations", "true"));
 		
 		//System.out.println(Context.getVisitService().getVisitByUuid("d9c1d8ac-2b8e-427f-804d-b858c52e6f11").getLocation().getUuid());
 		MockHttpServletResponse handleGet = handle(newGetRequest);
 		
 		//System.out.println(Context.getVisitService().getVisitByUuid("d9c1d8ac-2b8e-427f-804d-b858c52e6f11").getLocation().getUuid());
 		Map<String, Object> sampleResults = (new ObjectMapper()).readValue(handleGet.getContentAsString(), Map.class);
+		System.out.println(sampleResults);
 		
 		Map<String, Object> pagerObject = (Map<String, Object>) sampleResults.get("pager");
 		assertThat("Page Count is 2", (Integer) pagerObject.get("pageCount") == 2, is(true));
@@ -323,7 +324,7 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		assertThat(
 		    "There is atleast 1 sample for the visit from lab-data.xml with visit id = d9c1d8ac-2b8e-427f-804d-b858c52e6f11",
 		    handleGet.getContentAsString().contains("d9c1d8ac-2b8e-427f-804d-b858c52e6f11"));
-		
+		//
 		newGetRequest = newGetRequest("lab/samples", new Parameter("location", "58c57d25-8d39-41ab-8422-108a0c277d98"));
 		
 		//System.out.println(Context.getVisitService().getVisitByUuid("d9c1d8ac-2b8e-427f-804d-b858c52e6f11").getLocation().getUuid());
@@ -347,6 +348,14 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		handleGet = handle(newGetRequest);
 		Map<String, Object> response = (new ObjectMapper()).readValue(handleGet.getContentAsString(), Map.class);
 		assertThat("List by search q count is 1", ((List) response.get("results")).size() == 1, is(true));
+		
+		MockHttpServletRequest newGetRequest2 = newGetRequest("lab/samples", new Parameter("acceptedBy",
+		        "e4ef4d4d-5cf2-47ff-af6b-bb9abdabdd60"), new Parameter("hasStatus", "YES"), new Parameter(
+		        "excludeAllocations", "TRUE"));
+		MockHttpServletResponse handle2 = handle(newGetRequest2);
+		Map<String, Object> samples = (new ObjectMapper()).readValue(handle2.getContentAsString(), Map.class);
+		
+		assertThat("There is 1 sample", ((List<Map>) samples.get("results")).size(), is(1));
 	}
 	
 	@Test
@@ -803,7 +812,8 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		//2. Getting worksheet definitions
 		//When
 		MockHttpServletRequest newGetRequest = newGetRequest("lab/worksheetdefinitions", new Parameter("startDate",
-		        "2022-12-10"), new Parameter("endDate", "2022-12-11"), new Parameter("q", "WD"), new Parameter("expirationDate", "2023-01-18 00:12:22"));
+		        "2022-12-10"), new Parameter("endDate", "2022-12-11"), new Parameter("q", "WD"), new Parameter(
+		        "expirationDate", "2023-01-18 00:12:22"));
 		MockHttpServletResponse handle2 = handle(newGetRequest);
 		
 		List<Map<String, Object>> worksheetdefinitions = (new ObjectMapper()).readValue(handle2.getContentAsString(),

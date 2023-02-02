@@ -82,6 +82,7 @@ export class SampleAcceptanceComponent implements OnInit {
   samplesLoadedState$: Observable<boolean>;
 
   entryCategory: string = "INDIVIDUAL";
+  currentTabWithDataLoaded: number = 0;
   constructor(
     private store: Store<AppState>,
     private dialog: MatDialog,
@@ -100,7 +101,19 @@ export class SampleAcceptanceComponent implements OnInit {
       getSettingLabSampleStatusState
     );
 
-    this.getSamples();
+    // this.store.dispatch(
+    //   loadLabSamplesByCollectionDates({
+    //     datesParameters: this.datesParameters,
+    //     patients: this.patients,
+    //     sampleTypes: this.sampleTypes,
+    //     departments: this.labSamplesDepartments,
+    //     containers: this.labSamplesContainers,
+    //     hasStatus: "NO",
+    //     configs: this.labConfigs,
+    //     codedSampleRejectionReasons: this.codedSampleRejectionReasons,
+    //   })
+    // );
+    // this.getSamples();
   }
 
   onToggleViewSampleDetails(event: Event, sample: any): void {
@@ -248,7 +261,6 @@ export class SampleAcceptanceComponent implements OnInit {
 
   setDepartment(department) {
     this.selectedDepartment = department;
-
     this.getSamples();
   }
 
@@ -380,6 +392,7 @@ export class SampleAcceptanceComponent implements OnInit {
         departments: this.labSamplesDepartments,
         containers: this.labSamplesContainers,
         configs: this.labConfigs,
+        category: "ACCEPTED",
         codedSampleRejectionReasons: this.codedSampleRejectionReasons,
       })
     );
@@ -390,13 +403,38 @@ export class SampleAcceptanceComponent implements OnInit {
   }
 
   onOpenNewTab(e): void {
-    if (e.index === 0 || e.index === 6) {
-      this.getSamplesData();
-    }
     this.searchingText = "";
     this.selectedDepartment = "";
-
-    this.getSamples();
+    // if (e.index === 0) {
+    //   this.store.dispatch(
+    //     loadLabSamplesByCollectionDates({
+    //       datesParameters: this.datesParameters,
+    //       patients: this.patients,
+    //       sampleTypes: this.sampleTypes,
+    //       departments: this.labSamplesDepartments,
+    //       containers: this.labSamplesContainers,
+    //       hasStatus: "NO",
+    //       configs: this.labConfigs,
+    //       codedSampleRejectionReasons: this.codedSampleRejectionReasons,
+    //     })
+    //   );
+    //   this.currentTabWithDataLoaded = e.index;
+    // } else if (this.currentTabWithDataLoaded === 0) {
+    //   this.store.dispatch(
+    //     loadLabSamplesByCollectionDates({
+    //       datesParameters: this.datesParameters,
+    //       patients: this.patients,
+    //       sampleTypes: this.sampleTypes,
+    //       departments: this.labSamplesDepartments,
+    //       containers: this.labSamplesContainers,
+    //       hasStatus: "YES",
+    //       category: "ACCEPTED",
+    //       configs: this.labConfigs,
+    //       codedSampleRejectionReasons: this.codedSampleRejectionReasons,
+    //     })
+    //   );
+    //   this.currentTabWithDataLoaded = e.index;
+    // }
   }
 
   onResultsReview(event: Event, sample, providerDetails): void {
@@ -497,7 +535,6 @@ export class SampleAcceptanceComponent implements OnInit {
   }
 
   onPrintSampleResults(event: Event, sample: any): void {
-    console.log(sample);
     event.stopPropagation();
     this.dialog.open(SampleResultsPrintingComponent, {
       width: "70%",

@@ -153,9 +153,13 @@
                             [disabled]="!isFormValid"
                             mat-flat-button
                             color="primary"
-                            (click)="onSave($event, order)"
+                            (click)="
+                              onSave($event, order, order?.authorizationIsReady)
+                            "
                           >
-                            Save
+                            {{
+                              !order?.authorizationIsReady ? "Save" : "Amend"
+                            }}
                           </button>
                         </div>
                         <div class="mt-4 d-flex justify-content-end">

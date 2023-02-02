@@ -27,231 +27,826 @@
   </div>
   <mat-tab-group (selectedTabChange)="onOpenNewTab($event)">
     <mat-tab label="Sample Acceptance">
-      <div class="filter-and-legend">
-        <mat-form-field class="w-50">
-          <mat-label>Search</mat-label>
-          <mat-icon matPrefix>search</mat-icon
-          ><input
-            matInput
-            (keyup)="onSearch($event)"
-            [(ngModel)]="searchingText"
-          />
-        </mat-form-field>
+      <ng-template matTabContent>
+        <div class="p-2">
+          <app-samples-to-accept
+            [codedSampleRejectionReasons]="params?.codedSampleRejectionReasons"
+            [labConfigs]="labConfigs"
+            [datesParameters]="datesParameters"
+            [LISConfigurations]="LISConfigurations"
+            [patients]="patients"
+            [sampleTypes]="sampleTypes"
+            [labSamplesDepartments]="labSamplesDepartments"
+            [labSamplesContainers]="labSamplesContainers"
+            [userUuid]="userUuid"
+          ></app-samples-to-accept>
+        </div>
+      </ng-template>
+    </mat-tab>
+    <!-- <mat-tab label="Sample Acceptance Old">
+      <ng-template matTabContent>
+        <div class="filter-and-legend">
+          <mat-form-field class="w-50">
+            <mat-label>Search</mat-label>
+            <mat-icon matPrefix>search</mat-icon
+            ><input
+              matInput
+              (keyup)="onSearch($event)"
+              [(ngModel)]="searchingText"
+            />
+          </mat-form-field>
 
-        <mat-form-field appearance="fill" class="w-30 ml-2 float-right">
-          <mat-label
-            >Select
-            {{
-              !LISConfigurations?.isLIS ? "Department" : "Section"
-            }}</mat-label
-          >
-          <mat-select [(value)]="selectedDepartment">
-            <mat-option (click)="setDepartment('')">All</mat-option>
-            <mat-option
-              *ngFor="let dept of sampleParams?.labDepartments"
-              [value]="dept?.display"
-              (click)="setDepartment(dept?.display)"
+          <mat-form-field appearance="fill" class="w-30 ml-2 float-right">
+            <mat-label
+              >Select
+              {{
+                !LISConfigurations?.isLIS ? "Department" : "Section"
+              }}</mat-label
             >
-              {{ dept.display }}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
-      </div>
-      <mat-progress-bar
-        mode="indeterminate"
-        *ngIf="!sampleParams?.samplesLoadedState"
-      ></mat-progress-bar>
-      <div class="p-1" *ngIf="sampleParams?.samplesLoadedState">
-        <table class="table table-bordered">
-          <thead class="table-header">
-            <tr>
-              <th rowspan="2">SN</th>
-              <th rowspan="2">Department/Section</th>
-              <th rowspan="2">Sample / Specimen</th>
-              <th rowspan="2">Laboratory ID</th>
-              <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">MRN</th>
-              <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">
-                Patient Names
-              </th>
-              <th colspan="2" class="text-center">Test details</th>
-              <th rowspan="2" *ngIf="LISConfigurations?.isLIS">Received By</th>
-              <th rowspan="2" *ngIf="LISConfigurations?.isLIS">Received On</th>
-              <th rowspan="2">
-                {{
-                  !LISConfigurations?.isLIS ? "Collected By" : "Registered By"
-                }}
-              </th>
-              <th rowspan="2">
-                {{
-                  !LISConfigurations?.isLIS ? "Collected On" : "Registered On"
-                }}
-              </th>
-              <th rowspan="2">Priority</th>
-              <th rowspan="2">Action</th>
-            </tr>
-            <tr>
-              <th>Test Order</th>
-              <!-- <th>Container</th> -->
-              <th>
-                {{ !LISConfigurations?.isLIS ? "Collected By" : "ID" }}
-              </th>
-              <!-- <th>Date Ordered</th>
-              <th>Source</th> -->
-            </tr>
-          </thead>
-          <tbody>
-            <ng-container *ngIf="sampleParams?.samplesToAccept?.length > 0">
-              <ng-container
-                *ngFor="
-                  let sample of sampleParams?.samplesToAccept;
-                  let count = index
-                "
+            <mat-select [(value)]="selectedDepartment">
+              <mat-option (click)="setDepartment('')">All</mat-option>
+              <mat-option
+                *ngFor="let dept of sampleParams?.labDepartments"
+                [value]="dept?.display"
+                (click)="setDepartment(dept?.display)"
               >
-                <tr
-                  *ngFor="let order of sample?.orders; let orderCount = index"
-                  [ngClass]="{ 'row-alternated': count % 2 !== 0 }"
+                {{ dept.display }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <mat-progress-bar
+          mode="indeterminate"
+          *ngIf="!sampleParams?.samplesLoadedState"
+        ></mat-progress-bar>
+        <div class="p-1" *ngIf="sampleParams?.samplesLoadedState">
+          <table class="table table-bordered">
+            <thead class="table-header">
+              <tr>
+                <th rowspan="2">SN</th>
+                <th rowspan="2">Department/Section</th>
+                <th rowspan="2">Sample / Specimen</th>
+                <th rowspan="2">Laboratory ID</th>
+                <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">MRN</th>
+                <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">
+                  Patient Names
+                </th>
+                <th colspan="2" class="text-center">Test details</th>
+                <th rowspan="2" *ngIf="LISConfigurations?.isLIS">
+                  Received By
+                </th>
+                <th rowspan="2" *ngIf="LISConfigurations?.isLIS">
+                  Received On
+                </th>
+                <th rowspan="2">
+                  {{
+                    !LISConfigurations?.isLIS ? "Collected By" : "Registered By"
+                  }}
+                </th>
+                <th rowspan="2">
+                  {{
+                    !LISConfigurations?.isLIS ? "Collected On" : "Registered On"
+                  }}
+                </th>
+                <th rowspan="2">Priority</th>
+                <th rowspan="2">Action</th>
+              </tr>
+              <tr>
+                <th>Test Order</th>
+                <th>
+                  {{ !LISConfigurations?.isLIS ? "Collected By" : "ID" }}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <ng-container *ngIf="sampleParams?.samplesToAccept?.length > 0">
+                <ng-container
+                  *ngFor="
+                    let sample of sampleParams?.samplesToAccept;
+                    let count = index
+                  "
                 >
-                  <td
-                    *ngIf="orderCount == 0"
-                    [attr.rowspan]="sample?.orders?.length"
+                  <tr
+                    *ngFor="let order of sample?.orders; let orderCount = index"
+                    [ngClass]="{ 'row-alternated': count % 2 !== 0 }"
                   >
-                    {{ count + 1 + (page - 1) * pageCount }}
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{
-                      sample?.department?.departmentName
-                        ? sample?.department?.departmentName
-                        : "Not set"
-                    }}
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{ sample?.specimen?.specimenName }}
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{ sample?.label }}
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0 && !LISConfigurations?.isLIS"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{ sample?.mrn }}
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0 && !LISConfigurations?.isLIS"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{ sample?.patient?.givenName }}
-                    {{ sample?.patient?.middleName }}
-                    {{ sample?.patient?.familyName }}
-                  </td>
-                  <td>
-                    {{ order?.order?.concept?.display.replace("TO:", "") }}
-                  </td>
-                  <!-- <td></td> -->
-                  <td>
-                    WorkList
-                    {{
-                      !LISConfigurations?.isLIS
-                        ? order?.order?.orderer?.name
-                        : order?.order?.orderNumber
-                    }}
-                  </td>
-                  <!-- <td>{{ order?.order?.orderDate | date: "medium" }}</td>
-                  <td>{{ order?.order?.location?.name }}</td> -->
-                  <!-- <td>{{order?.p_sub_category}} - {{order?.p_sub_category}}</td> -->
-                  <td
-                    *ngIf="orderCount == 0 && LISConfigurations?.isLIS"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{ sample?.receivedByStatus?.user?.name }}
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0 && LISConfigurations?.isLIS"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{
-                      sample?.receivedOnStatus?.timestamp
-                        ? (sample?.receivedOnStatus?.remarks | date: "medium")
-                        : ""
-                    }}
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{ sample?.collectedBy?.display }}
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{ sample?.created | date: "medium" }}
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{
-                      !LISConfigurations?.isLIS
-                        ? sample?.priorityHigh
-                          ? "Urgent"
+                    <td
+                      *ngIf="orderCount == 0"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{ count + 1 + (page - 1) * pageCount }}
+                    </td>
+                    <td
+                      *ngIf="orderCount == 0"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{
+                        sample?.department?.departmentName
+                          ? sample?.department?.departmentName
+                          : "Not set"
+                      }}
+                    </td>
+                    <td
+                      *ngIf="orderCount == 0"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{ sample?.specimen?.specimenName }}
+                    </td>
+                    <td
+                      *ngIf="orderCount == 0"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{ sample?.label }}
+                    </td>
+                    <td
+                      *ngIf="orderCount == 0 && !LISConfigurations?.isLIS"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{ sample?.mrn }}
+                    </td>
+                    <td
+                      *ngIf="orderCount == 0 && !LISConfigurations?.isLIS"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{ sample?.patient?.givenName }}
+                      {{ sample?.patient?.middleName }}
+                      {{ sample?.patient?.familyName }}
+                    </td>
+                    <td>
+                      {{ order?.order?.concept?.display.replace("TO:", "") }}
+                    </td>
+                    <td>
+                      {{
+                        !LISConfigurations?.isLIS
+                          ? order?.order?.orderer?.name
+                          : order?.order?.orderNumber
+                      }}
+                    </td>
+                    <td
+                      *ngIf="orderCount == 0 && LISConfigurations?.isLIS"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{ sample?.receivedByStatus?.user?.name }}
+                    </td>
+                    <td
+                      *ngIf="orderCount == 0 && LISConfigurations?.isLIS"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{
+                        sample?.receivedOnStatus?.timestamp
+                          ? (sample?.receivedOnStatus?.remarks | date: "medium")
+                          : ""
+                      }}
+                    </td>
+                    <td
+                      *ngIf="orderCount == 0"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{ sample?.collectedBy?.display }}
+                    </td>
+                    <td
+                      *ngIf="orderCount == 0"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{ sample?.created | date: "medium" }}
+                    </td>
+                    <td
+                      *ngIf="orderCount == 0"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{
+                        !LISConfigurations?.isLIS
+                          ? sample?.priorityHigh
+                            ? "Urgent"
+                            : "Routine"
+                          : sample?.priorityStatus?.status
+                          ? sample?.priorityStatus?.status
                           : "Routine"
-                        : sample?.priorityStatus?.status
-                        ? sample?.priorityStatus?.status
-                        : "Routine"
-                    }}
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    <div class="d-flex justify-content-center">
-                      <button
-                        *ngIf="!LISConfigurations?.isLIS"
-                        [disabled]="
-                          sample.accepted ||
-                          sample.rejected ||
-                          sampleParams?.settingLabSampleStatus
-                        "
-                        mat-stroked-button
-                        class="accept-button"
-                        (click)="
-                          accept($event, sample, sampleParams?.providerDetails)
-                        "
-                      >
-                        <mat-spinner
-                          *ngIf="
-                            sampleParams?.settingLabSampleStatus &&
-                            savingMessage[sample?.id + '-accept']
+                      }}
+                    </td>
+                    <td
+                      *ngIf="orderCount == 0"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      <div class="d-flex justify-content-center">
+                        <button
+                          *ngIf="!LISConfigurations?.isLIS"
+                          [disabled]="
+                            sample.accepted ||
+                            sample.rejected ||
+                            sampleParams?.settingLabSampleStatus
                           "
-                          [diameter]="16"
+                          mat-stroked-button
+                          class="accept-button"
+                          (click)="
+                            accept(
+                              $event,
+                              sample,
+                              sampleParams?.providerDetails
+                            )
+                          "
                         >
-                        </mat-spinner>
-                        Accept
-                      </button>
+                          <mat-spinner
+                            *ngIf="
+                              sampleParams?.settingLabSampleStatus &&
+                              savingMessage[sample?.id + '-accept']
+                            "
+                            [diameter]="16"
+                          >
+                          </mat-spinner>
+                          Accept
+                        </button>
 
-                      <button
-                        *ngIf="!LISConfigurations?.isLIS"
-                        [disabled]="sample?.accepted || sample?.rejected"
-                        mat-stroked-button
-                        (click)="
-                          reject($event, sample, sampleParams?.providerDetails)
+                        <button
+                          *ngIf="!LISConfigurations?.isLIS"
+                          [disabled]="sample?.accepted || sample?.rejected"
+                          mat-stroked-button
+                          (click)="
+                            reject(
+                              $event,
+                              sample,
+                              sampleParams?.providerDetails
+                            )
+                          "
+                          class="ml-2 reject-button"
+                        >
+                          <mat-spinner
+                            *ngIf="
+                              sampleParams?.settingLabSampleStatus &&
+                              savingMessage[sample?.id + '-reject']
+                            "
+                            [diameter]="16"
+                            style="
+                              display: inline-block !important;
+                              margin-right: 4px;
+                            "
+                          >
+                          </mat-spinner>
+                          Reject
+                        </button>
+                        <button
+                          *ngIf="LISConfigurations?.isLIS"
+                          mat-flat-button
+                          color="primary"
+                          (click)="onToggleViewSampleDetails($event, sample)"
+                        >
+                          <mat-icon
+                            *ngIf="!samplesToViewMoreDetails[sample?.id]"
+                            >expand_more</mat-icon
+                          >
+                          <mat-icon *ngIf="samplesToViewMoreDetails[sample?.id]"
+                            >expand_less</mat-icon
+                          >
+                          {{
+                            !samplesToViewMoreDetails[sample?.id]
+                              ? "View"
+                              : "Hide"
+                          }}
+                          Details
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr
+                    *ngIf="samplesToViewMoreDetails[sample?.id]"
+                    class="sample-details-row"
+                  >
+                    <td colspan="11">
+                      <app-shared-sample-details
+                        [sample]="sample"
+                      ></app-shared-sample-details>
+                    </td>
+                    <td>
+                      <div class="d-flex justify-content-center">
+                        <button
+                          [disabled]="
+                            sample.accepted ||
+                            sample.rejected ||
+                            sampleParams?.settingLabSampleStatus
+                          "
+                          mat-stroked-button
+                          class="accept-button"
+                          (click)="
+                            accept(
+                              $event,
+                              sample,
+                              sampleParams?.providerDetails
+                            )
+                          "
+                        >
+                          <mat-spinner
+                            *ngIf="
+                              sampleParams?.settingLabSampleStatus &&
+                              savingMessage[sample?.id + '-accept']
+                            "
+                            [diameter]="16"
+                          >
+                          </mat-spinner>
+                          Accept
+                        </button>
+
+                        <button
+                          [disabled]="sample?.accepted || sample?.rejected"
+                          mat-stroked-button
+                          (click)="
+                            reject(
+                              $event,
+                              sample,
+                              sampleParams?.providerDetails
+                            )
+                          "
+                          class="ml-2 reject-button"
+                        >
+                          <mat-spinner
+                            *ngIf="
+                              sampleParams?.settingLabSampleStatus &&
+                              savingMessage[sample?.id + '-reject']
+                            "
+                            [diameter]="16"
+                            style="
+                              display: inline-block !important;
+                              margin-right: 4px;
+                            "
+                          >
+                          </mat-spinner>
+                          Reject
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                </ng-container>
+              </ng-container>
+              <ng-container *ngIf="sampleParams?.samplesToAccept?.length == 0">
+                <tr>
+                  <td colspan="14" class="text-danger text-center">
+                    No samples waiting acceptance
+                  </td>
+                </tr>
+              </ng-container>
+            </tbody>
+          </table>
+        </div>
+      </ng-template>
+    </mat-tab> -->
+    <mat-tab label="Accepted Samples">
+      <ng-template matTabContent>
+        <div class="p-2">
+          <app-accepted-samples
+            [codedSampleRejectionReasons]="params?.codedSampleRejectionReasons"
+            [labConfigs]="labConfigs"
+            [datesParameters]="datesParameters"
+            [LISConfigurations]="LISConfigurations"
+            [patients]="patients"
+            [sampleTypes]="sampleTypes"
+            [labSamplesDepartments]="labSamplesDepartments"
+            [labSamplesContainers]="labSamplesContainers"
+            [userUuid]="userUuid"
+          ></app-accepted-samples>
+        </div>
+      </ng-template>
+    </mat-tab>
+    <!-- <mat-tab label="Accepted Samples">
+      <ng-template matTabContent>
+        <div class="filter-and-legend">
+          <mat-form-field class="w-50">
+            <mat-label>Search</mat-label>
+            <mat-icon matPrefix>search</mat-icon
+            ><input
+              matInput
+              (keyup)="onSearch($event)"
+              [(ngModel)]="searchingText"
+            />
+          </mat-form-field>
+
+          <mat-form-field appearance="fill" class="w-30 ml-2 float-right">
+            <mat-label
+              >Select
+              {{
+                !LISConfigurations?.isLIS ? "Department" : "Section"
+              }}</mat-label
+            >
+            <mat-select [(value)]="selectedDepartment">
+              <mat-option (click)="setDepartment('')">All</mat-option>
+              <mat-option
+                *ngFor="let dept of sampleParams?.labDepartments"
+                [value]="dept?.display"
+                (click)="setDepartment(dept?.display)"
+              >
+                {{ dept?.display }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <mat-progress-bar
+          mode="indeterminate"
+          *ngIf="!sampleParams?.samplesLoadedState"
+        ></mat-progress-bar>
+        <div class="p-1" *ngIf="sampleParams?.samplesLoadedState">
+          <table class="table table-bordered">
+            <thead class="table-header">
+              <tr>
+                <th rowspan="2">SN</th>
+                <th rowspan="2">Department</th>
+                <th rowspan="2">Sample / Specimen</th>
+                <th rowspan="2">Laboratory ID</th>
+                <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">MRN</th>
+                <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">
+                  Patient Names
+                </th>
+                <th colspan="2" class="text-center">Test details</th>
+
+                <th rowspan="2" *ngIf="LISConfigurations?.isLIS">
+                  Received By
+                </th>
+                <th rowspan="2" *ngIf="LISConfigurations?.isLIS">
+                  Received On
+                </th>
+                <th rowspan="2">
+                  {{
+                    !LISConfigurations?.isLIS ? "Collected By" : "Registered By"
+                  }}
+                </th>
+                <th rowspan="2">
+                  {{
+                    !LISConfigurations?.isLIS ? "Collected On" : "Registered On"
+                  }}
+                </th>
+                <th rowspan="2">Priority</th>
+                <th rowspan="2">Accepted By</th>
+              </tr>
+              <tr>
+                <th>Test Order</th>
+                <th>
+                  {{ !LISConfigurations?.isLIS ? "Collected By" : "ID" }}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <ng-container *ngIf="sampleParams?.acceptedSamples?.length > 0">
+                <ng-container
+                  *ngFor="
+                    let sample of sampleParams?.acceptedSamples;
+                    let count = index
+                  "
+                >
+                  <tr
+                    *ngFor="let order of sample?.orders; let orderCount = index"
+                    [ngClass]="{ 'row-alternated': count % 2 !== 0 }"
+                  >
+                    <td
+                      *ngIf="orderCount == 0"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{ count + 1 }}
+                    </td>
+                    <td
+                      *ngIf="orderCount == 0"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{ sample?.department?.departmentName }}
+                    </td>
+                    <td
+                      *ngIf="orderCount == 0"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{ sample?.specimen?.specimenName }}
+                    </td>
+                    <td
+                      *ngIf="orderCount == 0"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{ sample?.label }}
+                    </td>
+
+                    <td
+                      *ngIf="orderCount == 0 && !LISConfigurations?.isLIS"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{ sample?.mrn }}
+                    </td>
+                    <td
+                      *ngIf="orderCount == 0 && !LISConfigurations?.isLIS"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{ sample?.patient?.givenName }}
+                      {{ sample?.patient?.middleName }}
+                      {{ sample?.patient?.familyName }}
+                    </td>
+                    <td>
+                      {{ order?.order?.concept?.display.replace("TO:", "") }}
+                    </td>
+                    <td>
+                      {{
+                        !LISConfigurations?.isLIS
+                          ? order?.order?.orderer?.name
+                          : order?.order?.orderNumber
+                      }}
+                    </td>
+                    <td
+                      *ngIf="orderCount == 0 && LISConfigurations?.isLIS"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{ sample?.receivedByStatus?.user?.name }}
+                    </td>
+                    <td
+                      *ngIf="orderCount == 0 && LISConfigurations?.isLIS"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{
+                        sample?.receivedOnStatus?.timestamp
+                          ? (sample?.receivedOnStatus?.remarks | date: "medium")
+                          : ""
+                      }}
+                    </td>
+                    <td
+                      *ngIf="orderCount == 0"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{ sample?.collectedBy?.display }}
+                    </td>
+                    <td
+                      *ngIf="orderCount == 0"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{ sample?.created | date: "medium" }}
+                    </td>
+                    <td
+                      *ngIf="orderCount == 0"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{
+                        !LISConfigurations?.isLIS
+                          ? sample?.priorityHigh
+                            ? "Urgent"
+                            : "Routine"
+                          : sample?.priorityStatus?.status
+                          ? sample?.priorityStatus?.status
+                          : "Routine"
+                      }}
+                    </td>
+                    <td
+                      *ngIf="orderCount == 0"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{ sample?.acceptedBy?.user?.display }}
+                    </td>
+                  </tr>
+                </ng-container>
+              </ng-container>
+              <ng-container *ngIf="sampleParams?.acceptedSamples?.length == 0">
+                <tr>
+                  <td colspan="100%" class="text-danger text-center">
+                    No accepted sample
+                  </td>
+                </tr>
+              </ng-container>
+            </tbody>
+          </table>
+        </div>
+      </ng-template>
+    </mat-tab> -->
+
+    <mat-tab label="Rejected Samples">
+      <ng-template matTabContent>
+        <div class="p-2">
+          <app-rejected-samples
+            [codedSampleRejectionReasons]="params?.codedSampleRejectionReasons"
+            [labConfigs]="labConfigs"
+            [datesParameters]="datesParameters"
+            [LISConfigurations]="LISConfigurations"
+            [patients]="patients"
+            [sampleTypes]="sampleTypes"
+            [labSamplesDepartments]="labSamplesDepartments"
+            [labSamplesContainers]="labSamplesContainers"
+            [userUuid]="userUuid"
+          ></app-rejected-samples>
+        </div>
+      </ng-template>
+    </mat-tab>
+    <!-- <mat-tab label="Rejected Samples">
+      <ng-template matTabContent>
+        <div class="filter-and-legend">
+          <mat-form-field class="w-50">
+            <mat-label>Search</mat-label>
+            <mat-icon matPrefix>search</mat-icon
+            ><input
+              matInput
+              (keyup)="onSearch($event)"
+              [(ngModel)]="searchingText"
+            />
+          </mat-form-field>
+
+          <mat-form-field appearance="fill" class="w-30 ml-2 float-right">
+            <mat-label
+              >Select
+              {{
+                !LISConfigurations?.isLIS ? "Department" : "Section"
+              }}</mat-label
+            >
+            <mat-select [(value)]="selectedDepartment">
+              <mat-option (click)="setDepartment('')">All</mat-option>
+              <mat-option
+                *ngFor="let dept of sampleParams?.labDepartments"
+                [value]="dept?.display"
+                (click)="setDepartment(dept?.display)"
+              >
+                {{ dept?.display }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div class="p-1">
+          <table class="table table-bordered">
+            <thead class="table-header">
+              <tr>
+                <th rowspan="2">SN</th>
+                <th rowspan="2">Department</th>
+                <th rowspan="2">Sample / Specimen</th>
+                <th rowspan="2">Laboratory ID</th>
+                <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">MRN</th>
+                <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">
+                  Patient Names
+                </th>
+                <th colspan="2" class="text-center">Test details</th>
+
+                <th rowspan="2" *ngIf="LISConfigurations?.isLIS">
+                  Received By
+                </th>
+                <th rowspan="2" *ngIf="LISConfigurations?.isLIS">
+                  Received On
+                </th>
+                <th rowspan="2">
+                  {{
+                    !LISConfigurations?.isLIS ? "Collected By" : "Registered By"
+                  }}
+                </th>
+                <th rowspan="2">
+                  {{
+                    !LISConfigurations?.isLIS ? "Collected On" : "Registered On"
+                  }}
+                </th>
+                <th rowspan="2">Priority</th>
+                <th rowspan="2">Rejected By</th>
+                <th rowspan="2">Reason For Rejection</th>
+                <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">Action</th>
+              </tr>
+              <tr>
+                <th>Test Order</th>
+                <th>
+                  {{ !LISConfigurations?.isLIS ? "Collected By" : "ID" }}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <ng-container *ngIf="sampleParams?.rejectedSamples?.length > 0">
+                <ng-container
+                  *ngFor="
+                    let sample of sampleParams?.rejectedSamples;
+                    let count = index
+                  "
+                >
+                  <tr
+                    *ngFor="let order of sample?.orders; let orderCount = index"
+                    [ngClass]="{ 'row-alternated': count % 2 !== 0 }"
+                  >
+                    <td
+                      *ngIf="orderCount == 0"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{ count + 1 }}
+                    </td>
+                    <td
+                      *ngIf="orderCount == 0"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{ sample?.department?.departmentName }}
+                    </td>
+                    <td
+                      *ngIf="orderCount == 0"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{ sample?.specimen?.specimenName }}
+                    </td>
+                    <td
+                      *ngIf="orderCount == 0"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{ sample?.label }}
+                    </td>
+
+                    <td
+                      *ngIf="orderCount == 0 && !LISConfigurations?.isLIS"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{ sample?.mrn }}
+                    </td>
+                    <td
+                      *ngIf="orderCount == 0 && !LISConfigurations?.isLIS"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{ sample?.patient?.givenName }}
+                      {{ sample?.patient?.middleName }}
+                      {{ sample?.patient?.familyName }}
+                    </td>
+                    <td>
+                      {{ order?.order?.concept?.display.replace("TO:", "") }}
+                    </td>
+                    <td>
+                      {{
+                        !LISConfigurations?.isLIS
+                          ? order?.order?.orderer?.name
+                          : order?.order?.orderNumber
+                      }}
+                    </td>
+                    <td
+                      *ngIf="orderCount == 0 && LISConfigurations?.isLIS"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{ sample?.receivedByStatus?.user?.name }}
+                    </td>
+                    <td
+                      *ngIf="orderCount == 0 && LISConfigurations?.isLIS"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{
+                        sample?.receivedOnStatus?.timestamp
+                          ? (sample?.receivedOnStatus?.remarks | date: "medium")
+                          : ""
+                      }}
+                    </td>
+                    <td
+                      *ngIf="orderCount == 0"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{ sample?.collectedBy?.display }}
+                    </td>
+                    <td
+                      *ngIf="orderCount == 0"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{ sample?.created | date: "medium" }}
+                    </td>
+                    <td
+                      *ngIf="orderCount == 0"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{
+                        !LISConfigurations?.isLIS
+                          ? sample?.priorityHigh
+                            ? "Urgent"
+                            : "Routine"
+                          : sample?.priorityStatus?.status
+                          ? sample?.priorityStatus?.status
+                          : "Routine"
+                      }}
+                    </td>
+                    <td>
+                      {{ sample?.rejectedBy?.name }}
+                      <span class="text-muted">
+                        <em>
+                          (On
+                          {{ sample?.rejectedBy?.timestamp | date: "medium" }})
+                        </em>
+                      </span>
+                    </td>
+                    <td>
+                      <span
+                        *ngFor="
+                          let rejectionReason of sample?.reasonsForRejection;
+                          let reasonCount = index
                         "
-                        class="ml-2 reject-button"
+                      >
+                        {{ rejectionReason?.display }}
+                        <span
+                          *ngIf="
+                            reasonCount <
+                            sample?.reasonsForRejection?.length - 1
+                          "
+                          >,</span
+                        >
+                      </span>
+                    </td>
+                    <td
+                      *ngIf="orderCount == 0 && !LISConfigurations?.isLIS"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      <button
+                        *ngIf="!sample?.markedForRecollection"
+                        class="colored-button"
+                        mat-button
+                        (click)="
+                          onMarkRecollection(
+                            $event,
+                            sample,
+                            sampleParams?.providerDetails
+                          )
+                        "
                       >
                         <mat-spinner
                           *ngIf="
                             sampleParams?.settingLabSampleStatus &&
-                            savingMessage[sample?.id + '-reject']
+                            savingMessage[sample?.id + '-re-collect']
                           "
                           [diameter]="16"
                           style="
@@ -260,10 +855,231 @@
                           "
                         >
                         </mat-spinner>
-                        Reject
+                        Mark for Re-collection
                       </button>
+                      <span *ngIf="sample?.markedForRecollection">
+                        Waiting for Re-collection
+                      </span>
+                    </td>
+                  </tr>
+                </ng-container>
+              </ng-container>
+              <ng-container *ngIf="sampleParams?.rejectedSamples?.length == 0">
+                <tr>
+                  <td colspan="15" class="text-danger text-center">
+                    No rejected sample
+                  </td>
+                </tr>
+              </ng-container>
+            </tbody>
+          </table>
+        </div>
+      </ng-template>
+    </mat-tab> -->
+
+    <mat-tab label="Worklist">
+      <ng-template matTabContent>
+        <div class="p-2">
+          <app-worklist
+            [codedSampleRejectionReasons]="params?.codedSampleRejectionReasons"
+            [labConfigs]="labConfigs"
+            [datesParameters]="datesParameters"
+            [LISConfigurations]="LISConfigurations"
+            [patients]="patients"
+            [sampleTypes]="sampleTypes"
+            [labSamplesDepartments]="labSamplesDepartments"
+            [labSamplesContainers]="labSamplesContainers"
+            [userUuid]="userUuid"
+          ></app-worklist>
+        </div>
+      </ng-template>
+    </mat-tab>
+
+    <!-- <mat-tab label="Worklist">
+      <ng-template matTabContent>
+        <div class="filter-and-legend">
+          <mat-form-field class="w-50">
+            <mat-label>Search</mat-label>
+            <mat-icon matPrefix>search</mat-icon
+            ><input
+              matInput
+              (keyup)="onSearch($event)"
+              [(ngModel)]="searchingText"
+            />
+          </mat-form-field>
+
+          <mat-form-field appearance="fill" class="w-30 ml-2 float-right">
+            <mat-label
+              >Select
+              {{
+                !LISConfigurations?.isLIS ? "Department" : "Section"
+              }}</mat-label
+            >
+            <mat-select [(value)]="selectedDepartment">
+              <mat-option (click)="setDepartment('')">All</mat-option>
+              <mat-option
+                *ngFor="let dept of sampleParams?.labDepartments"
+                [value]="dept?.display"
+                (click)="setDepartment(dept?.display)"
+              >
+                {{ dept?.display }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div class="p-1">
+          <table class="table table-bordered">
+            <thead class="table-header">
+              <tr>
+                <th rowspan="2">SN</th>
+                <th rowspan="2">Department</th>
+                <th rowspan="2">Sample / Specimen</th>
+                <th rowspan="2">Laboratory ID</th>
+                <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">MRN</th>
+                <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">
+                  Patient Names
+                </th>
+                <th colspan="2" class="text-center">Test details</th>
+                <th rowspan="2" *ngIf="LISConfigurations?.isLIS">
+                  Received By
+                </th>
+                <th rowspan="2" *ngIf="LISConfigurations?.isLIS">
+                  Received On
+                </th>
+                <th rowspan="2">
+                  {{
+                    !LISConfigurations?.isLIS ? "Collected By" : "Registered By"
+                  }}
+                </th>
+                <th rowspan="2">
+                  {{
+                    !LISConfigurations?.isLIS ? "Collected On" : "Registered On"
+                  }}
+                </th>
+                <th rowspan="2">Priority</th>
+                <th rowspan="2">Status</th>
+              </tr>
+              <tr>
+                <th>Test Order</th>
+                <th>
+                  {{ !LISConfigurations?.isLIS ? "Collected By" : "ID" }}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <ng-container *ngIf="sampleParams?.worklist?.length > 0">
+                <ng-container
+                  *ngFor="
+                    let sample of sampleParams?.worklist;
+                    let count = index
+                  "
+                >
+                  <tr
+                    *ngFor="let order of sample?.orders; let orderCount = index"
+                    [ngClass]="{ 'row-alternated': count % 2 !== 0 }"
+                  >
+                    <td
+                      *ngIf="orderCount == 0"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{ count + 1 }}
+                    </td>
+                    <td
+                      *ngIf="orderCount == 0"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{ sample?.department?.departmentName }}
+                    </td>
+                    <td
+                      *ngIf="orderCount == 0"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{ sample?.specimen?.specimenName }}
+                    </td>
+                    <td
+                      *ngIf="orderCount == 0"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{ sample?.label }}
+                    </td>
+                    <td
+                      *ngIf="orderCount == 0 && !LISConfigurations?.isLIS"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{ sample?.mrn }}
+                    </td>
+                    <td
+                      *ngIf="orderCount == 0 && !LISConfigurations?.isLIS"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{ sample?.patient?.givenName }}
+                      {{ sample?.patient?.middleName }}
+                      {{ sample?.patient?.familyName }}
+                    </td>
+                    <td>
+                      {{ order?.order?.concept?.display.replace("TO:", "") }}
+                    </td>
+                    <td>
+                      {{
+                        !LISConfigurations?.isLIS
+                          ? order?.order?.orderer?.name
+                          : order?.order?.orderNumber
+                      }}
+                    </td>
+                    <td
+                      *ngIf="orderCount == 0 && LISConfigurations?.isLIS"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{ sample?.receivedByStatus?.user?.name }}
+                    </td>
+                    <td
+                      *ngIf="orderCount == 0 && LISConfigurations?.isLIS"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{
+                        sample?.receivedOnStatus?.timestamp
+                          ? (sample?.receivedOnStatus?.remarks | date: "medium")
+                          : ""
+                      }}
+                    </td>
+                    <td
+                      *ngIf="orderCount == 0"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{ sample?.collectedBy?.display }}
+                    </td>
+                    <td
+                      *ngIf="orderCount == 0"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{ sample?.created | date: "medium" }}
+                    </td>
+                    <td
+                      *ngIf="orderCount == 0"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{
+                        !LISConfigurations?.isLIS
+                          ? sample?.priorityHigh
+                            ? "Urgent"
+                            : "Routine"
+                          : sample?.priorityStatus?.status
+                          ? sample?.priorityStatus?.status
+                          : "Routine"
+                      }}
+                    </td>
+                    <td
+                      *ngIf="orderCount == 0"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      <span *ngIf="sample?.accepted"> Accepted </span>
+                      <span *ngIf="sample?.rejected"> Rejected </span>
+                    </td>
+                    <td
+                      *ngIf="orderCount == 0"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
                       <button
-                        *ngIf="LISConfigurations?.isLIS"
                         mat-flat-button
                         color="primary"
                         (click)="onToggleViewSampleDetails($event, sample)"
@@ -281,934 +1097,734 @@
                         }}
                         Details
                       </button>
-                    </div>
-                  </td>
-                </tr>
-                <tr
-                  *ngIf="samplesToViewMoreDetails[sample?.id]"
-                  class="sample-details-row"
-                >
-                  <td colspan="11">
-                    <app-shared-sample-details
-                      [sample]="sample"
-                    ></app-shared-sample-details>
-                  </td>
-                  <td>
-                    <div class="d-flex justify-content-center">
-                      <button
-                        [disabled]="
-                          sample.accepted ||
-                          sample.rejected ||
-                          sampleParams?.settingLabSampleStatus
-                        "
-                        mat-stroked-button
-                        class="accept-button"
-                        (click)="
-                          accept($event, sample, sampleParams?.providerDetails)
-                        "
-                      >
-                        <mat-spinner
-                          *ngIf="
-                            sampleParams?.settingLabSampleStatus &&
-                            savingMessage[sample?.id + '-accept']
-                          "
-                          [diameter]="16"
-                        >
-                        </mat-spinner>
-                        Accept
-                      </button>
-
-                      <button
-                        [disabled]="sample?.accepted || sample?.rejected"
-                        mat-stroked-button
-                        (click)="
-                          reject($event, sample, sampleParams?.providerDetails)
-                        "
-                        class="ml-2 reject-button"
-                      >
-                        <mat-spinner
-                          *ngIf="
-                            sampleParams?.settingLabSampleStatus &&
-                            savingMessage[sample?.id + '-reject']
-                          "
-                          [diameter]="16"
-                          style="
-                            display: inline-block !important;
-                            margin-right: 4px;
-                          "
-                        >
-                        </mat-spinner>
-                        Reject
-                      </button>
-                    </div>
+                    </td>
+                  </tr>
+                  <tr *ngIf="samplesToViewMoreDetails[sample?.id]">
+                    <td colspan="11">
+                      <app-shared-sample-details
+                        [sample]="sample"
+                      ></app-shared-sample-details>
+                    </td>
+                  </tr>
+                </ng-container>
+              </ng-container>
+              <ng-container *ngIf="sampleParams?.worklist?.length == 0">
+                <tr>
+                  <td colspan="14" class="text-danger text-center">
+                    No samples you accepted
                   </td>
                 </tr>
               </ng-container>
-            </ng-container>
-            <ng-container *ngIf="sampleParams?.samplesToAccept?.length == 0">
-              <tr>
-                <td colspan="14" class="text-danger text-center">
-                  No samples waiting acceptance
-                </td>
-              </tr>
-            </ng-container>
-          </tbody>
-        </table>
-      </div>
-    </mat-tab>
-    <mat-tab label="Accepted Samples">
-      <div class="filter-and-legend">
-        <mat-form-field class="w-50">
-          <mat-label>Search</mat-label>
-          <mat-icon matPrefix>search</mat-icon
-          ><input
-            matInput
-            (keyup)="onSearch($event)"
-            [(ngModel)]="searchingText"
-          />
-        </mat-form-field>
-
-        <mat-form-field appearance="fill" class="w-30 ml-2 float-right">
-          <mat-label
-            >Select
-            {{
-              !LISConfigurations?.isLIS ? "Department" : "Section"
-            }}</mat-label
-          >
-          <mat-select [(value)]="selectedDepartment">
-            <mat-option (click)="setDepartment('')">All</mat-option>
-            <mat-option
-              *ngFor="let dept of sampleParams?.labDepartments"
-              [value]="dept?.display"
-              (click)="setDepartment(dept?.display)"
-            >
-              {{ dept?.display }}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
-      </div>
-
-      <mat-progress-bar
-        mode="indeterminate"
-        *ngIf="!sampleParams?.samplesLoadedState"
-      ></mat-progress-bar>
-      <div class="p-1" *ngIf="sampleParams?.samplesLoadedState">
-        <table class="table table-bordered">
-          <thead class="table-header">
-            <tr>
-              <th rowspan="2">SN</th>
-              <th rowspan="2">Department</th>
-              <th rowspan="2">Sample / Specimen</th>
-              <th rowspan="2">Laboratory ID</th>
-              <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">MRN</th>
-              <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">
-                Patient Names
-              </th>
-              <th colspan="2" class="text-center">Test details</th>
-
-              <th rowspan="2" *ngIf="LISConfigurations?.isLIS">Received By</th>
-              <th rowspan="2" *ngIf="LISConfigurations?.isLIS">Received On</th>
-              <th rowspan="2">
-                {{
-                  !LISConfigurations?.isLIS ? "Collected By" : "Registered By"
-                }}
-              </th>
-              <th rowspan="2">
-                {{
-                  !LISConfigurations?.isLIS ? "Collected On" : "Registered On"
-                }}
-              </th>
-              <th rowspan="2">Priority</th>
-              <th rowspan="2">Accepted By</th>
-            </tr>
-            <tr>
-              <th>Test Order</th>
-              <th>
-                {{ !LISConfigurations?.isLIS ? "Collected By" : "ID" }}
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <ng-container *ngIf="sampleParams?.acceptedSamples?.length > 0">
-              <ng-container
-                *ngFor="
-                  let sample of sampleParams?.acceptedSamples;
-                  let count = index
-                "
-              >
-                <tr
-                  *ngFor="let order of sample?.orders; let orderCount = index"
-                  [ngClass]="{ 'row-alternated': count % 2 !== 0 }"
-                >
-                  <td
-                    *ngIf="orderCount == 0"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{ count + 1 }}
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{ sample?.department?.departmentName }}
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{ sample?.specimen?.specimenName }}
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{ sample?.label }}
-                  </td>
-
-                  <td
-                    *ngIf="orderCount == 0 && !LISConfigurations?.isLIS"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{ sample?.mrn }}
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0 && !LISConfigurations?.isLIS"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{ sample?.patient?.givenName }}
-                    {{ sample?.patient?.middleName }}
-                    {{ sample?.patient?.familyName }}
-                  </td>
-                  <td>
-                    {{ order?.order?.concept?.display.replace("TO:", "") }}
-                  </td>
-                  <!-- <td></td> -->
-                  <td>
-                    {{
-                      !LISConfigurations?.isLIS
-                        ? order?.order?.orderer?.name
-                        : order?.order?.orderNumber
-                    }}
-                  </td>
-
-                  <!-- <td>{{ order?.order?.location?.name }}</td>
-                  <td>{{ order?.order?.orderDate | date: "medium" }}</td> -->
-                  <!-- <td>{{order?.p_sub_category}} - {{order?.p_sub_category}}</td> -->
-                  <td
-                    *ngIf="orderCount == 0 && LISConfigurations?.isLIS"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{ sample?.receivedByStatus?.user?.name }}
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0 && LISConfigurations?.isLIS"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{
-                      sample?.receivedOnStatus?.timestamp
-                        ? (sample?.receivedOnStatus?.remarks | date: "medium")
-                        : ""
-                    }}
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{ sample?.collectedBy?.display }}
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{ sample?.created | date: "medium" }}
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{
-                      !LISConfigurations?.isLIS
-                        ? sample?.priorityHigh
-                          ? "Urgent"
-                          : "Routine"
-                        : sample?.priorityStatus?.status
-                        ? sample?.priorityStatus?.status
-                        : "Routine"
-                    }}
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{ sample?.acceptedBy?.user?.display }}
-                  </td>
-                </tr>
-              </ng-container>
-            </ng-container>
-            <ng-container *ngIf="sampleParams?.acceptedSamples?.length == 0">
-              <tr>
-                <td colspan="100%" class="text-danger text-center">
-                  No accepted sample
-                </td>
-              </tr>
-            </ng-container>
-          </tbody>
-        </table>
-      </div>
-    </mat-tab>
-    <mat-tab label="Rejected Samples">
-      <div class="filter-and-legend">
-        <mat-form-field class="w-50">
-          <mat-label>Search</mat-label>
-          <mat-icon matPrefix>search</mat-icon
-          ><input
-            matInput
-            (keyup)="onSearch($event)"
-            [(ngModel)]="searchingText"
-          />
-        </mat-form-field>
-
-        <mat-form-field appearance="fill" class="w-30 ml-2 float-right">
-          <mat-label
-            >Select
-            {{
-              !LISConfigurations?.isLIS ? "Department" : "Section"
-            }}</mat-label
-          >
-          <mat-select [(value)]="selectedDepartment">
-            <mat-option (click)="setDepartment('')">All</mat-option>
-            <mat-option
-              *ngFor="let dept of sampleParams?.labDepartments"
-              [value]="dept?.display"
-              (click)="setDepartment(dept?.display)"
-            >
-              {{ dept?.display }}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
-      </div>
-      <div class="p-1">
-        <table class="table table-bordered">
-          <thead class="table-header">
-            <tr>
-              <th rowspan="2">SN</th>
-              <th rowspan="2">Department</th>
-              <th rowspan="2">Sample / Specimen</th>
-              <th rowspan="2">Laboratory ID</th>
-              <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">MRN</th>
-              <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">
-                Patient Names
-              </th>
-              <th colspan="2" class="text-center">Test details</th>
-
-              <th rowspan="2" *ngIf="LISConfigurations?.isLIS">Received By</th>
-              <th rowspan="2" *ngIf="LISConfigurations?.isLIS">Received On</th>
-              <th rowspan="2">
-                {{
-                  !LISConfigurations?.isLIS ? "Collected By" : "Registered By"
-                }}
-              </th>
-              <th rowspan="2">
-                {{
-                  !LISConfigurations?.isLIS ? "Collected On" : "Registered On"
-                }}
-              </th>
-              <th rowspan="2">Priority</th>
-              <th rowspan="2">Rejected By</th>
-              <th rowspan="2">Reason For Rejection</th>
-              <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">Action</th>
-            </tr>
-            <tr>
-              <th>Test Order</th>
-              <!-- <th>Container</th> -->
-              <th>
-                {{ !LISConfigurations?.isLIS ? "Collected By" : "ID" }}
-              </th>
-              <!-- <th>Source</th>
-              <th>Date Ordered</th> -->
-              <!-- <th>Payment</th> -->
-            </tr>
-          </thead>
-          <tbody>
-            <ng-container *ngIf="sampleParams?.rejectedSamples?.length > 0">
-              <ng-container
-                *ngFor="
-                  let sample of sampleParams?.rejectedSamples;
-                  let count = index
-                "
-              >
-                <tr
-                  *ngFor="let order of sample?.orders; let orderCount = index"
-                  [ngClass]="{ 'row-alternated': count % 2 !== 0 }"
-                >
-                  <td
-                    *ngIf="orderCount == 0"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{ count + 1 }}
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{ sample?.department?.departmentName }}
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{ sample?.specimen?.specimenName }}
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{ sample?.label }}
-                  </td>
-
-                  <td
-                    *ngIf="orderCount == 0 && !LISConfigurations?.isLIS"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{ sample?.mrn }}
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0 && !LISConfigurations?.isLIS"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{ sample?.patient?.givenName }}
-                    {{ sample?.patient?.middleName }}
-                    {{ sample?.patient?.familyName }}
-                  </td>
-                  <td>
-                    {{ order?.order?.concept?.display.replace("TO:", "") }}
-                  </td>
-                  <!-- <td></td> -->
-                  <td>
-                    {{
-                      !LISConfigurations?.isLIS
-                        ? order?.order?.orderer?.name
-                        : order?.order?.orderNumber
-                    }}
-                  </td>
-
-                  <!-- <td>{{ order?.order?.location?.name }}</td>
-                  <td>{{ order?.order?.orderDate | date: "medium" }}</td> -->
-                  <!-- <td>{{order?.p_sub_category}} - {{order?.p_sub_category}}</td> -->
-                  <td
-                    *ngIf="orderCount == 0 && LISConfigurations?.isLIS"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{ sample?.receivedByStatus?.user?.name }}
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0 && LISConfigurations?.isLIS"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{
-                      sample?.receivedOnStatus?.timestamp
-                        ? (sample?.receivedOnStatus?.remarks | date: "medium")
-                        : ""
-                    }}
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{ sample?.collectedBy?.display }}
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{ sample?.created | date: "medium" }}
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{
-                      !LISConfigurations?.isLIS
-                        ? sample?.priorityHigh
-                          ? "Urgent"
-                          : "Routine"
-                        : sample?.priorityStatus?.status
-                        ? sample?.priorityStatus?.status
-                        : "Routine"
-                    }}
-                  </td>
-                  <td>
-                    {{ sample?.rejectedBy?.name }}
-                    <span class="text-muted">
-                      <em>
-                        (On
-                        {{ sample?.rejectedBy?.timestamp | date: "medium" }})
-                      </em>
-                    </span>
-                  </td>
-                  <td>
-                    <span
-                      *ngFor="
-                        let rejectionReason of sample?.reasonsForRejection;
-                        let reasonCount = index
-                      "
-                    >
-                      {{ rejectionReason?.display }}
-                      <span
-                        *ngIf="
-                          reasonCount < sample?.reasonsForRejection?.length - 1
-                        "
-                        >,</span
-                      >
-                    </span>
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0 && !LISConfigurations?.isLIS"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    <button
-                      *ngIf="!sample?.markedForRecollection"
-                      class="colored-button"
-                      mat-button
-                      (click)="
-                        onMarkRecollection(
-                          $event,
-                          sample,
-                          sampleParams?.providerDetails
-                        )
-                      "
-                    >
-                      <mat-spinner
-                        *ngIf="
-                          sampleParams?.settingLabSampleStatus &&
-                          savingMessage[sample?.id + '-re-collect']
-                        "
-                        [diameter]="16"
-                        style="
-                          display: inline-block !important;
-                          margin-right: 4px;
-                        "
-                      >
-                      </mat-spinner>
-                      Mark for Re-collection
-                    </button>
-                    <span *ngIf="sample?.markedForRecollection">
-                      Waiting for Re-collection
-                    </span>
-                  </td>
-                </tr>
-              </ng-container>
-            </ng-container>
-            <ng-container *ngIf="sampleParams?.rejectedSamples?.length == 0">
-              <tr>
-                <td colspan="15" class="text-danger text-center">
-                  No rejected sample
-                </td>
-              </tr>
-            </ng-container>
-          </tbody>
-        </table>
-      </div>
-    </mat-tab>
-    <mat-tab label="Worklist">
-      <div class="filter-and-legend">
-        <mat-form-field class="w-50">
-          <mat-label>Search</mat-label>
-          <mat-icon matPrefix>search</mat-icon
-          ><input
-            matInput
-            (keyup)="onSearch($event)"
-            [(ngModel)]="searchingText"
-          />
-        </mat-form-field>
-
-        <mat-form-field appearance="fill" class="w-30 ml-2 float-right">
-          <mat-label
-            >Select
-            {{
-              !LISConfigurations?.isLIS ? "Department" : "Section"
-            }}</mat-label
-          >
-          <mat-select [(value)]="selectedDepartment">
-            <mat-option (click)="setDepartment('')">All</mat-option>
-            <mat-option
-              *ngFor="let dept of sampleParams?.labDepartments"
-              [value]="dept?.display"
-              (click)="setDepartment(dept?.display)"
-            >
-              {{ dept?.display }}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
-      </div>
-      <div class="p-1">
-        <table class="table table-bordered">
-          <thead class="table-header">
-            <tr>
-              <th rowspan="2">SN</th>
-              <th rowspan="2">Department</th>
-              <th rowspan="2">Sample / Specimen</th>
-              <th rowspan="2">Laboratory ID</th>
-              <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">MRN</th>
-              <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">
-                Patient Names
-              </th>
-              <th colspan="2" class="text-center">Test details</th>
-              <th rowspan="2" *ngIf="LISConfigurations?.isLIS">Received By</th>
-              <th rowspan="2" *ngIf="LISConfigurations?.isLIS">Received On</th>
-              <th rowspan="2">
-                {{
-                  !LISConfigurations?.isLIS ? "Collected By" : "Registered By"
-                }}
-              </th>
-              <th rowspan="2">
-                {{
-                  !LISConfigurations?.isLIS ? "Collected On" : "Registered On"
-                }}
-              </th>
-              <th rowspan="2">Priority</th>
-              <th rowspan="2">Status</th>
-            </tr>
-            <tr>
-              <th>Test Order</th>
-              <th>
-                {{ !LISConfigurations?.isLIS ? "Collected By" : "ID" }}
-              </th>
-              <!-- <th>Date Ordered</th>
-              <th>Source</th> -->
-            </tr>
-          </thead>
-          <tbody>
-            <ng-container *ngIf="sampleParams?.worklist?.length > 0">
-              <ng-container
-                *ngFor="let sample of sampleParams?.worklist; let count = index"
-              >
-                <tr
-                  *ngFor="let order of sample?.orders; let orderCount = index"
-                  [ngClass]="{ 'row-alternated': count % 2 !== 0 }"
-                >
-                  <td
-                    *ngIf="orderCount == 0"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{ count + 1 }}
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{ sample?.department?.departmentName }}
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{ sample?.specimen?.specimenName }}
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{ sample?.label }}
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0 && !LISConfigurations?.isLIS"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{ sample?.mrn }}
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0 && !LISConfigurations?.isLIS"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{ sample?.patient?.givenName }}
-                    {{ sample?.patient?.middleName }}
-                    {{ sample?.patient?.familyName }}
-                  </td>
-                  <td>
-                    {{ order?.order?.concept?.display.replace("TO:", "") }}
-                  </td>
-                  <td>
-                    {{
-                      !LISConfigurations?.isLIS
-                        ? order?.order?.orderer?.name
-                        : order?.order?.orderNumber
-                    }}
-                  </td>
-                  <!-- <td>{{ order?.order?.orderDate | date: "medium" }}</td>
-                  <td>{{ order?.order?.location?.name }}</td> -->
-                  <td
-                    *ngIf="orderCount == 0 && LISConfigurations?.isLIS"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{ sample?.receivedByStatus?.user?.name }}
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0 && LISConfigurations?.isLIS"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{
-                      sample?.receivedOnStatus?.timestamp
-                        ? (sample?.receivedOnStatus?.remarks | date: "medium")
-                        : ""
-                    }}
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{ sample?.collectedBy?.display }}
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{ sample?.created | date: "medium" }}
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{
-                      !LISConfigurations?.isLIS
-                        ? sample?.priorityHigh
-                          ? "Urgent"
-                          : "Routine"
-                        : sample?.priorityStatus?.status
-                        ? sample?.priorityStatus?.status
-                        : "Routine"
-                    }}
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    <span *ngIf="sample?.accepted"> Accepted </span>
-                    <span *ngIf="sample?.rejected"> Rejected </span>
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    <button
-                      mat-flat-button
-                      color="primary"
-                      (click)="onToggleViewSampleDetails($event, sample)"
-                    >
-                      <mat-icon *ngIf="!samplesToViewMoreDetails[sample?.id]"
-                        >expand_more</mat-icon
-                      >
-                      <mat-icon *ngIf="samplesToViewMoreDetails[sample?.id]"
-                        >expand_less</mat-icon
-                      >
-                      {{
-                        !samplesToViewMoreDetails[sample?.id] ? "View" : "Hide"
-                      }}
-                      Details
-                    </button>
-                  </td>
-                </tr>
-                <tr *ngIf="samplesToViewMoreDetails[sample?.id]">
-                  <td colspan="11">
-                    <app-shared-sample-details
-                      [sample]="sample"
-                    ></app-shared-sample-details>
-                  </td>
-                </tr>
-              </ng-container>
-            </ng-container>
-            <ng-container *ngIf="sampleParams?.worklist?.length == 0">
-              <tr>
-                <td colspan="14" class="text-danger text-center">
-                  No samples you accepted
-                </td>
-              </tr>
-            </ng-container>
-          </tbody>
-        </table>
-      </div>
-    </mat-tab>
+            </tbody>
+          </table>
+        </div>
+      </ng-template>
+    </mat-tab> -->
     <mat-tab label="Worksheets" *ngIf="LISConfigurations?.isLIS">
-      <div class="p-3">
-        <app-worksheets [datesParameters]="datesParameters"></app-worksheets>
-      </div>
+      <ng-template matTabContent>
+        <div class="p-3">
+          <app-worksheets [datesParameters]="datesParameters"></app-worksheets>
+        </div>
+      </ng-template>
     </mat-tab>
+    <!-- <mat-tab
+      label="Results Entry {{ !LISConfigurations?.isLIS ? '& Approval' : '' }}"
+    >
+      <ng-template matTabContent>
+        <div class="filter-and-legend">
+          <mat-form-field class="w-50">
+            <mat-label>Search</mat-label>
+            <mat-icon matPrefix>search</mat-icon
+            ><input
+              matInput
+              (keyup)="onSearch($event)"
+              [(ngModel)]="searchingText"
+            />
+          </mat-form-field>
+
+          <table
+            style="border: none; margin-left: 15px"
+            class="w-20 float-right"
+          >
+            <tr style="height: 30px">
+              <td style="width: 40px; border: solid 1px #eee"></td>
+              <td>
+                <div style="margin-left: 3px; margin-right: 20px">
+                  No results filled
+                </div>
+              </td>
+              <td
+                style="
+                  background-color: #ec864acf;
+                  width: 40px;
+                  margin-left: 20px;
+                "
+              ></td>
+              <td>
+                <div style="margin-left: 3px; margin-right: 20px">
+                  Has results
+                </div>
+              </td>
+              <td
+                style="width: 40px; margin-left: 20x"
+                [ngStyle]="{
+                  'background-color': !LISConfigurations?.isLIS
+                    ? '#f5f171f7'
+                    : '#0080009e'
+                }"
+              ></td>
+              <td>
+                <div style="margin-left: 3px; margin-right: 20px">
+                  {{
+                    !LISConfigurations?.isLIS
+                      ? "Waiting second approval"
+                      : "Authorized"
+                  }}
+                </div>
+              </td>
+
+              <td
+                *ngIf="LISConfigurations?.isLIS"
+                style="
+                  background-color: #d04747ab;
+                  width: 40px;
+                  margin-left: 20px;
+                "
+              ></td>
+              <td *ngIf="LISConfigurations?.isLIS">
+                <div style="margin-left: 3px">Has Amended results</div>
+              </td>
+
+              <td
+                *ngIf="!LISConfigurations?.isLIS"
+                style="
+                  background-color: #d04747ab;
+                  width: 40px;
+                  margin-left: 20px;
+                "
+              ></td>
+              <td *ngIf="!LISConfigurations?.isLIS">
+                <div style="margin-left: 3px">Has rejected results</div>
+              </td>
+            </tr>
+          </table>
+
+          <mat-form-field appearance="fill" class="w-30 ml-2 float-right">
+            <mat-label
+              >Select
+              {{
+                !LISConfigurations?.isLIS ? "Department" : "Section"
+              }}</mat-label
+            >
+            <mat-select [(value)]="selectedDepartment">
+              <mat-option (click)="setDepartment('')">All</mat-option>
+              <mat-option
+                *ngFor="let dept of sampleParams?.labDepartments"
+                [value]="dept?.display"
+                (click)="setDepartment(dept?.display)"
+              >
+                {{ dept?.display }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div class="p-1">
+          <table class="table table-bordered">
+            <thead class="table-header">
+              <tr>
+                <th rowspan="2">SN</th>
+                <th rowspan="2">Department</th>
+                <th rowspan="2">Sample / Specimen</th>
+                <th rowspan="2">Laboratory ID</th>
+                <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">MRN</th>
+                <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">
+                  Patient Names
+                </th>
+                <th colspan="2" class="text-center">Test details</th>
+                <th rowspan="2" *ngIf="LISConfigurations?.isLIS">
+                  Received By
+                </th>
+                <th rowspan="2" *ngIf="LISConfigurations?.isLIS">
+                  Received On
+                </th>
+                <th rowspan="2">
+                  {{
+                    !LISConfigurations?.isLIS ? "Collected By" : "Registered By"
+                  }}
+                </th>
+                <th rowspan="2">
+                  {{
+                    !LISConfigurations?.isLIS ? "Collected On" : "Registered On"
+                  }}
+                </th>
+                <th rowspan="2">Priority</th>
+                <th rowspan="2">Action</th>
+              </tr>
+              <tr>
+                <th>Test Order</th>
+                <th>
+                  {{ !LISConfigurations?.isLIS ? "Collected By" : "ID" }}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <ng-container
+                *ngIf="sampleParams?.samplesToFeedResults?.length > 0"
+              >
+                <ng-container
+                  *ngFor="
+                    let sample of sampleParams?.samplesToFeedResults;
+                    let count = index
+                  "
+                >
+                  <tr
+                    [ngStyle]="{
+                      'background-color':
+                        sample?.atLestOneOrderWithRejectedResults
+                          ? '#d04747ab'
+                          : order?.testAllocations[0]?.firstSignOff &&
+                            !LISConfigurations?.isLIS
+                          ? '#f5f171f7'
+                          : order?.testAllocations[0]?.firstSignOff &&
+                            LISConfigurations?.isLIS
+                          ? '#0080009e'
+                          : sample?.atLeastOneHasResults
+                          ? '#ec864acf'
+                          : ''
+                    }"
+                    *ngFor="let order of sample?.orders; let orderCount = index"
+                    [ngClass]="{ 'row-alternated': count % 2 !== 0 }"
+                  >
+                    <td
+                      *ngIf="orderCount == 0"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{ count + 1 }}
+                    </td>
+                    <td
+                      *ngIf="orderCount == 0"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{ sample?.department?.departmentName }}
+                    </td>
+                    <td
+                      *ngIf="orderCount == 0"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{ sample?.specimen?.specimenName }}
+                    </td>
+                    <td
+                      *ngIf="orderCount == 0"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{ sample?.label }}
+                    </td>
+                    <td
+                      *ngIf="orderCount == 0 && !LISConfigurations?.isLIS"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{ sample?.mrn }}
+                    </td>
+                    <td
+                      *ngIf="orderCount == 0 && !LISConfigurations?.isLIS"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{ sample?.patient?.givenName }}
+                      {{ sample?.patient?.middleName }}
+                      {{ sample?.patient?.familyName }}
+                    </td>
+
+                    <td>
+                      {{ order?.order?.concept?.display.replace("TO:", "") }}
+                    </td>
+                    <td>
+                      {{
+                        !LISConfigurations?.isLIS
+                          ? order?.order?.orderer?.name
+                          : order?.order?.orderNumber
+                      }}
+                    </td>
+                    <td
+                      *ngIf="orderCount == 0 && LISConfigurations?.isLIS"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{ sample?.receivedByStatus?.user?.name }}
+                    </td>
+                    <td
+                      *ngIf="orderCount == 0 && LISConfigurations?.isLIS"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{
+                        sample?.receivedOnStatus?.timestamp
+                          ? (sample?.receivedOnStatus?.remarks | date: "medium")
+                          : ""
+                      }}
+                    </td>
+                    <td
+                      *ngIf="orderCount == 0"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{ sample?.collectedBy?.display }}
+                    </td>
+                    <td
+                      *ngIf="orderCount == 0"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{ sample?.created | date: "medium" }}
+                    </td>
+                    <td
+                      *ngIf="orderCount == 0"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{
+                        !LISConfigurations?.isLIS
+                          ? sample?.priorityHigh
+                            ? "Urgent"
+                            : "Routine"
+                          : sample?.priorityStatus?.status
+                          ? sample?.priorityStatus?.status
+                          : "Routine"
+                      }}
+                    </td>
+
+                    <td
+                      *ngIf="orderCount == 0"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      <button
+                        mat-flat-button
+                        color="primary"
+                        (click)="onToggleViewSampleDetails($event, sample)"
+                      >
+                        <mat-icon *ngIf="!samplesToViewMoreDetails[sample?.id]"
+                          >expand_more</mat-icon
+                        >
+                        <mat-icon *ngIf="samplesToViewMoreDetails[sample?.id]"
+                          >expand_less</mat-icon
+                        >
+                        {{
+                          !samplesToViewMoreDetails[sample?.id]
+                            ? "View"
+                            : "Hide"
+                        }}
+                        Details
+                      </button>
+                    </td>
+                  </tr>
+                  <tr *ngIf="samplesToViewMoreDetails[sample?.id]">
+                    <td colspan="11">
+                      <app-shared-sample-details
+                        [sample]="sample"
+                      ></app-shared-sample-details>
+                    </td>
+                    <td>
+                      <button
+                        class="colored-button"
+                        mat-button
+                        (click)="
+                          onResultsEntryAndReview(
+                            $event,
+                            sample,
+                            sampleParams?.providerDetails,
+                            'entry'
+                          )
+                        "
+                      >
+                        {{
+                          sample?.ordersWithResults?.length === 0
+                            ? "Results entry"
+                            : "Edit Results"
+                        }}
+                      </button>
+                    </td>
+                  </tr>
+                </ng-container>
+              </ng-container>
+              <ng-container
+                *ngIf="sampleParams?.samplesToFeedResults?.length == 0"
+              >
+                <tr>
+                  <td colspan="14" class="text-danger text-center">
+                    No samples ready for results entry
+                  </td>
+                </tr>
+              </ng-container>
+            </tbody>
+          </table>
+        </div>
+      </ng-template>
+    </mat-tab> -->
+
     <mat-tab
       label="Results Entry {{ !LISConfigurations?.isLIS ? '& Approval' : '' }}"
     >
-      <div class="filter-and-legend">
-        <mat-form-field class="w-50">
-          <mat-label>Search</mat-label>
-          <mat-icon matPrefix>search</mat-icon
-          ><input
-            matInput
-            (keyup)="onSearch($event)"
-            [(ngModel)]="searchingText"
-          />
-        </mat-form-field>
+      <ng-template matTabContent>
+        <div class="p-2">
+          <app-samples-for-results-entry
+            [codedSampleRejectionReasons]="params?.codedSampleRejectionReasons"
+            [labConfigs]="labConfigs"
+            [datesParameters]="datesParameters"
+            [LISConfigurations]="LISConfigurations"
+            [patients]="patients"
+            [sampleTypes]="sampleTypes"
+            [labSamplesDepartments]="labSamplesDepartments"
+            [labSamplesContainers]="labSamplesContainers"
+            [userUuid]="userUuid"
+          ></app-samples-for-results-entry>
+        </div>
+      </ng-template>
+    </mat-tab>
 
-        <table style="border: none; margin-left: 15px" class="w-20 float-right">
-          <tr style="height: 30px">
-            <td style="width: 40px; border: solid 1px #eee"></td>
-            <td>
-              <div style="margin-left: 3px; margin-right: 20px">
-                No results filled
-              </div>
-            </td>
-            <td
-              style="
-                background-color: #ec864acf;
-                width: 40px;
-                margin-left: 20px;
-              "
-            ></td>
-            <td>
-              <div style="margin-left: 3px; margin-right: 20px">
-                Has results
-              </div>
-            </td>
-            <td
-              style="width: 40px; margin-left: 20x"
-              [ngStyle]="{
-                'background-color': !LISConfigurations?.isLIS
-                  ? '#f5f171f7'
-                  : '#0080009e'
-              }"
-            ></td>
-            <td>
-              <div style="margin-left: 3px; margin-right: 20px">
-                {{
-                  !LISConfigurations?.isLIS
-                    ? "Waiting second approval"
-                    : "Authorized"
-                }}
-              </div>
-            </td>
+    <mat-tab label="Completed Samples">
+      <ng-template matTabContent>
+        <div class="p-2">
+          <app-completed-samples
+            [codedSampleRejectionReasons]="params?.codedSampleRejectionReasons"
+            [labConfigs]="labConfigs"
+            [datesParameters]="datesParameters"
+            [LISConfigurations]="LISConfigurations"
+            [patients]="patients"
+            [sampleTypes]="sampleTypes"
+            [labSamplesDepartments]="labSamplesDepartments"
+            [labSamplesContainers]="labSamplesContainers"
+            [userUuid]="userUuid"
+          ></app-completed-samples>
+        </div>
+      </ng-template>
+    </mat-tab>
+    <!-- <mat-tab label="Completed Samples" *ngIf="!LISConfigurations?.isLIS">
+      <ng-template matTabContent>
+        <div class="filter-and-legend">
+          <mat-form-field class="w-50">
+            <mat-label>Search</mat-label>
+            <mat-icon matPrefix>search</mat-icon
+            ><input
+              matInput
+              (keyup)="onSearch($event)"
+              [(ngModel)]="searchingText"
+            />
+          </mat-form-field>
 
-            <td
-              *ngIf="LISConfigurations?.isLIS"
-              style="
-                background-color: #d04747ab;
-                width: 40px;
-                margin-left: 20px;
-              "
-            ></td>
-            <td *ngIf="LISConfigurations?.isLIS">
-              <div style="margin-left: 3px">Has Amended results</div>
-            </td>
-
-            <td
-              *ngIf="!LISConfigurations?.isLIS"
-              style="
-                background-color: #d04747ab;
-                width: 40px;
-                margin-left: 20px;
-              "
-            ></td>
-            <td *ngIf="!LISConfigurations?.isLIS">
-              <div style="margin-left: 3px">Has rejected results</div>
-            </td>
-          </tr>
-        </table>
-
-        <mat-form-field appearance="fill" class="w-30 ml-2 float-right">
-          <mat-label
-            >Select
-            {{
-              !LISConfigurations?.isLIS ? "Department" : "Section"
-            }}</mat-label
-          >
-          <mat-select [(value)]="selectedDepartment">
-            <mat-option (click)="setDepartment('')">All</mat-option>
-            <mat-option
-              *ngFor="let dept of sampleParams?.labDepartments"
-              [value]="dept?.display"
-              (click)="setDepartment(dept?.display)"
+          <mat-form-field appearance="fill" class="w-30 ml-2 float-right">
+            <mat-label
+              >Select
+              {{
+                !LISConfigurations?.isLIS ? "Department" : "Section"
+              }}</mat-label
             >
-              {{ dept?.display }}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
-      </div>
-      <div class="p-1">
-        <mat-radio-group
-          class="entry-category"
-          *ngIf="LISConfigurations?.isLIS"
-        >
-          <mat-radio-button
-            (change)="getEntryType($event)"
-            class="entry-category-btn"
-            [value]="'INDIVIDUAL'"
-            [checked]="entryCategory === 'INDIVIDUAL'"
-            color="primary"
-          >
-            Individual
-          </mat-radio-button>
-          <mat-radio-button
-            (change)="getEntryType($event)"
-            class="entry-category-btn ml-2"
-            [value]="'WORKSHEET'"
-            [checked]="entryCategory === 'WORKSHEET'"
-            color="primary"
-          >
-            By Worksheet
-          </mat-radio-button>
-        </mat-radio-group>
-        <table
-          class="table table-bordered"
-          *ngIf="entryCategory === 'INDIVIDUAL'"
-        >
-          <thead class="table-header">
-            <tr>
-              <th rowspan="2">SN</th>
-              <th rowspan="2">Department</th>
-              <th rowspan="2">Sample / Specimen</th>
-              <th rowspan="2">Laboratory ID</th>
-              <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">MRN</th>
-              <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">
-                Patient Names
-              </th>
-              <th colspan="2" class="text-center">Test details</th>
-              <th rowspan="2" *ngIf="LISConfigurations?.isLIS">Received By</th>
-              <th rowspan="2" *ngIf="LISConfigurations?.isLIS">Received On</th>
-              <th rowspan="2">
-                {{
-                  !LISConfigurations?.isLIS ? "Collected By" : "Registered By"
-                }}
-              </th>
-              <th rowspan="2">
-                {{
-                  !LISConfigurations?.isLIS ? "Collected On" : "Registered On"
-                }}
-              </th>
-              <th rowspan="2">Priority</th>
-              <th rowspan="2">Action</th>
-            </tr>
-            <tr>
-              <th>Test Order</th>
-              <!-- <th>Container</th> -->
-              <th>
-                {{ !LISConfigurations?.isLIS ? "Collected By" : "ID" }}
-              </th>
-              <!-- <th>Source</th>
-              <th>Date Ordered</th> -->
-              <!-- <th>Payment</th> -->
-            </tr>
-          </thead>
-          <tbody>
-            <ng-container
-              *ngIf="sampleParams?.samplesToFeedResults?.length > 0"
-            >
-              <ng-container
-                *ngFor="
-                  let sample of sampleParams?.samplesToFeedResults;
-                  let count = index
-                "
+            <mat-select [(value)]="selectedDepartment">
+              <mat-option (click)="setDepartment('')">All</mat-option>
+              <mat-option
+                *ngFor="let dept of sampleParams?.labDepartments"
+                [value]="dept?.display"
+                (click)="setDepartment(dept?.display)"
               >
-                <tr
-                  [ngStyle]="{
-                    'background-color':
-                      sample?.atLestOneOrderWithRejectedResults
+                {{ dept?.display }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div class="p-1">
+          <table class="table table-bordered">
+            <thead class="table-header">
+              <tr>
+                <th rowspan="2">SN</th>
+                <th rowspan="2">Department</th>
+                <th rowspan="2">Sample / Specimen</th>
+                <th rowspan="2">Laboratory ID</th>
+                <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">MRN</th>
+                <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">
+                  Patient Names
+                </th>
+                <th colspan="2" class="text-center">Test details</th>
+
+                <th rowspan="2">
+                  {{
+                    !LISConfigurations?.isLIS ? "Collected By" : "Received By"
+                  }}
+                </th>
+                <th rowspan="2">
+                  {{
+                    !LISConfigurations?.isLIS ? "Collected On" : "Received On"
+                  }}
+                </th>
+                <th rowspan="2">Priority</th>
+                <th rowspan="2">Action</th>
+              </tr>
+              <tr>
+                <th>Test Order</th>
+                <th>Ordered By</th>
+              </tr>
+            </thead>
+            <tbody>
+              <ng-container *ngIf="sampleParams?.completedSamples?.length > 0">
+                <ng-container
+                  *ngFor="
+                    let sample of sampleParams?.completedSamples;
+                    let count = index
+                  "
+                >
+                  <tr
+                    *ngFor="let order of sample?.orders; let orderCount = index"
+                    [ngClass]="{ 'row-alternated': count % 2 !== 0 }"
+                  >
+                    <td
+                      *ngIf="orderCount == 0"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{ count + 1 }}
+                    </td>
+                    <td
+                      *ngIf="orderCount == 0"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{ sample?.department?.departmentName }}
+                    </td>
+                    <td
+                      *ngIf="orderCount == 0"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{ sample?.specimen?.specimenName }}
+                    </td>
+                    <td
+                      *ngIf="orderCount == 0"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{ sample?.label }}
+                    </td>
+
+                    <td
+                      *ngIf="orderCount == 0 && !LISConfigurations?.isLIS"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{ sample?.mrn }}
+                    </td>
+                    <td
+                      *ngIf="orderCount == 0 && !LISConfigurations?.isLIS"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{ sample?.patient?.givenName }}
+                      {{ sample?.patient?.middleName }}
+                      {{ sample?.patient?.familyName }}
+                    </td>
+                    <td>
+                      {{ order?.order?.concept?.display.replace("TO:", "") }}
+                    </td>
+                    <td>{{ order?.order?.orderer?.name }}</td>
+                    <td
+                      *ngIf="orderCount == 0"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{ sample?.collectedBy?.display }}
+                    </td>
+                    <td
+                      *ngIf="orderCount == 0"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{ sample?.created | date: "medium" }}
+                    </td>
+                    <td
+                      *ngIf="orderCount == 0"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{ sample?.priorityHigh ? "Urgent" : "Routine" }}
+                    </td>
+                    <td
+                      *ngIf="orderCount == 0"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      <button
+                        class="colored-button"
+                        mat-button
+                        (click)="
+                          onResultsReview(
+                            $event,
+                            sample,
+                            sampleParams?.providerDetails
+                          )
+                        "
+                      >
+                        View results
+                      </button>
+                    </td>
+                  </tr>
+                </ng-container>
+              </ng-container>
+              <ng-container *ngIf="sampleParams?.completedSamples?.length == 0">
+                <tr>
+                  <td colspan="14" class="text-danger text-center">
+                    No completed sample
+                  </td>
+                </tr>
+              </ng-container>
+            </tbody>
+          </table>
+        </div>
+      </ng-template>
+    </mat-tab> -->
+    <mat-tab *ngIf="showTabSampleTrackingForLis" label="Sample Tracking">
+      <ng-template matTabContent>
+        <div class="filter-and-legend">
+          <mat-form-field class="w-50">
+            <mat-label>Search</mat-label>
+            <mat-icon matPrefix>search</mat-icon
+            ><input
+              matInput
+              (keyup)="onSearch($event)"
+              [(ngModel)]="searchingText"
+            />
+          </mat-form-field>
+
+          <table
+            style="border: none; margin-left: 15px"
+            class="w-20 float-right"
+          >
+            <tr style="height: 30px">
+              <td style="width: 40px; border: solid 1px #eee"></td>
+              <td>
+                <div style="margin-left: 3px; margin-right: 20px">
+                  No results filled
+                </div>
+              </td>
+              <td
+                style="
+                  background-color: #ec864acf;
+                  width: 40px;
+                  margin-left: 20px;
+                "
+              ></td>
+              <td>
+                <div style="margin-left: 3px; margin-right: 20px">
+                  Has results
+                </div>
+              </td>
+              <td
+                style="width: 40px; margin-left: 20x"
+                [ngStyle]="{
+                  'background-color': !LISConfigurations?.isLIS
+                    ? '#f5f171f7'
+                    : '#0080009e'
+                }"
+              ></td>
+              <td>
+                <div style="margin-left: 3px; margin-right: 20px">
+                  {{
+                    !LISConfigurations?.isLIS
+                      ? "Waiting second approval"
+                      : "Authorized"
+                  }}
+                </div>
+              </td>
+              <td
+                *ngIf="LISConfigurations?.isLIS"
+                style="
+                  background-color: #d04747ab;
+                  width: 40px;
+                  margin-left: 20px;
+                "
+              ></td>
+              <td *ngIf="LISConfigurations?.isLIS">
+                <div style="margin-left: 3px">Has Amended results</div>
+              </td>
+
+              <td
+                *ngIf="!LISConfigurations?.isLIS"
+                style="
+                  background-color: #d04747ab;
+                  width: 40px;
+                  margin-left: 20px;
+                "
+              ></td>
+              <td *ngIf="!LISConfigurations?.isLIS">
+                <div style="margin-left: 3px">Has rejected results</div>
+              </td>
+
+              <td
+                *ngIf="!LISConfigurations?.isLIS"
+                style="
+                  background-color: #6fd67bcf;
+                  width: 40px;
+                  margin-left: 20px;
+                "
+              ></td>
+              <td *ngIf="!LISConfigurations?.isLIS">
+                <div style="margin-left: 3px">Completed</div>
+              </td>
+            </tr>
+          </table>
+
+          <mat-form-field appearance="fill" class="w-30 ml-2 float-right">
+            <mat-label
+              >Select
+              {{
+                !LISConfigurations?.isLIS ? "Department" : "Section"
+              }}</mat-label
+            >
+            <mat-select [(value)]="selectedDepartment">
+              <mat-option (click)="setDepartment('')">All</mat-option>
+              <mat-option
+                *ngFor="let dept of sampleParams?.labDepartments"
+                [value]="dept?.display"
+                (click)="setDepartment(dept?.display)"
+              >
+                {{ dept?.display }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div class="p-1">
+          <table class="table table-bordered">
+            <thead class="table-header">
+              <tr>
+                <th rowspan="2">SN</th>
+                <th rowspan="2">Department</th>
+                <th rowspan="2">Sample / Specimen</th>
+                <th rowspan="2">Laboratory ID</th>
+                <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">MRN</th>
+                <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">
+                  Patient Names
+                </th>
+                <th colspan="2" class="text-center">Test details</th>
+                <th rowspan="2" *ngIf="LISConfigurations?.isLIS">
+                  Received By
+                </th>
+                <th rowspan="2" *ngIf="LISConfigurations?.isLIS">
+                  Received On
+                </th>
+                <th rowspan="2">
+                  {{
+                    !LISConfigurations?.isLIS ? "Collected By" : "Registered By"
+                  }}
+                </th>
+                <th rowspan="2">
+                  {{
+                    !LISConfigurations?.isLIS ? "Collected On" : "Registered On"
+                  }}
+                </th>
+                <th rowspan="2">Priority</th>
+                <th rowspan="2">Action</th>
+              </tr>
+              <tr>
+                <th>Test Order</th>
+                <th>Ordered By</th>
+                <!-- <th>Source</th>
+              <th>Date Ordered</th> -->
+              </tr>
+            </thead>
+            <tbody>
+              <ng-container *ngIf="sampleParams?.allSamples?.length > 0">
+                <ng-container
+                  *ngFor="
+                    let sample of sampleParams?.allSamples;
+                    let count = index
+                  "
+                >
+                  <tr
+                    [ngStyle]="{
+                      'background-color': sample?.completed
+                        ? '#6fd67bcf'
+                        : sample?.atLestOneOrderWithRejectedResults &&
+                          !sample?.completed
                         ? '#d04747ab'
                         : order?.testAllocations[0]?.firstSignOff &&
                           !LISConfigurations?.isLIS
@@ -1216,1306 +1832,552 @@
                         : order?.testAllocations[0]?.firstSignOff &&
                           LISConfigurations?.isLIS
                         ? '#0080009e'
-                        : sample?.atLeastOneHasResults
+                        : sample?.atLeastOneHasResults && !sample?.completed
                         ? '#ec864acf'
                         : ''
-                  }"
-                  *ngFor="let order of sample?.orders; let orderCount = index"
-                  [ngClass]="{ 'row-alternated': count % 2 !== 0 }"
-                >
-                  <td
-                    *ngIf="orderCount == 0"
-                    [attr.rowspan]="sample?.orders?.length"
+                    }"
+                    *ngFor="let order of sample?.orders; let orderCount = index"
+                    [ngClass]="{ 'row-alternated': count % 2 !== 0 }"
                   >
-                    {{ count + 1 }}
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{ sample?.department?.departmentName }}
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{ sample?.specimen?.specimenName }}
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{ sample?.label }}
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0 && !LISConfigurations?.isLIS"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{ sample?.mrn }}
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0 && !LISConfigurations?.isLIS"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{ sample?.patient?.givenName }}
-                    {{ sample?.patient?.middleName }}
-                    {{ sample?.patient?.familyName }}
-                  </td>
-
-                  <td>
-                    {{ order?.order?.concept?.display.replace("TO:", "") }}
-                  </td>
-                  <!-- <td></td> -->
-                  <td>
-                    {{
-                      !LISConfigurations?.isLIS
-                        ? order?.order?.orderer?.name
-                        : order?.order?.orderNumber
-                    }}
-                  </td>
-
-                  <!-- <td>{{ order?.order?.location?.name }}</td>
-                  <td>{{ order?.order?.orderDate | date: "medium" }}</td> -->
-                  <!-- <td> {{order?.orderDate | date: 'medium'}}</td> -->
-                  <!-- <td>{{order?.p_sub_category}} - {{order?.p_sub_category}}</td> -->
-                  <td
-                    *ngIf="orderCount == 0 && LISConfigurations?.isLIS"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{ sample?.receivedByStatus?.user?.name }}
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0 && LISConfigurations?.isLIS"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{
-                      sample?.receivedOnStatus?.timestamp
-                        ? (sample?.receivedOnStatus?.remarks | date: "medium")
-                        : ""
-                    }}
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{ sample?.collectedBy?.display }}
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{ sample?.created | date: "medium" }}
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{
-                      !LISConfigurations?.isLIS
-                        ? sample?.priorityHigh
-                          ? "Urgent"
-                          : "Routine"
-                        : sample?.priorityStatus?.status
-                        ? sample?.priorityStatus?.status
-                        : "Routine"
-                    }}
-                  </td>
-
-                  <td
-                    *ngIf="orderCount == 0"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    <button
-                      mat-flat-button
-                      color="primary"
-                      (click)="onToggleViewSampleDetails($event, sample)"
+                    <td
+                      *ngIf="orderCount == 0"
+                      [attr.rowspan]="sample?.orders?.length"
                     >
-                      <mat-icon *ngIf="!samplesToViewMoreDetails[sample?.id]"
-                        >expand_more</mat-icon
-                      >
-                      <mat-icon *ngIf="samplesToViewMoreDetails[sample?.id]"
-                        >expand_less</mat-icon
-                      >
-                      {{
-                        !samplesToViewMoreDetails[sample?.id] ? "View" : "Hide"
-                      }}
-                      Details
-                    </button>
-                  </td>
-                </tr>
-                <tr *ngIf="samplesToViewMoreDetails[sample?.id]">
-                  <td colspan="11">
-                    <app-shared-sample-details
-                      [sample]="sample"
-                    ></app-shared-sample-details>
-                  </td>
-                  <td>
-                    <button
-                      class="colored-button"
-                      mat-button
-                      (click)="
-                        onResultsEntryAndReview(
-                          $event,
-                          sample,
-                          sampleParams?.providerDetails,
-                          'entry'
-                        )
-                      "
+                      {{ count + 1 }}
+                    </td>
+                    <td
+                      *ngIf="orderCount == 0"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{ sample?.department?.departmentName }}
+                    </td>
+                    <td
+                      *ngIf="orderCount == 0"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{ sample?.specimen?.specimenName }}
+                    </td>
+                    <td
+                      *ngIf="orderCount == 0"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{ sample?.label }}
+                    </td>
+                    <td
+                      *ngIf="orderCount == 0 && !LISConfigurations?.isLIS"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{ sample?.mrn }}
+                    </td>
+                    <td
+                      *ngIf="orderCount == 0 && !LISConfigurations?.isLIS"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{ sample?.patient?.givenName }}
+                      {{ sample?.patient?.middleName }}
+                      {{ sample?.patient?.familyName }}
+                    </td>
+                    <td>
+                      {{ order?.order?.concept?.display.replace("TO:", "") }}
+                    </td>
+                    <td>{{ order?.order?.orderer?.name }}</td>
+                    <!-- <td>{{ order?.order?.location?.name }}</td>
+                  <td>{{ order?.order?.orderDate | date: "medium" }}</td> -->
+                    <td
+                      *ngIf="orderCount == 0 && LISConfigurations?.isLIS"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{ sample?.receivedByStatus?.user?.name }}
+                    </td>
+                    <td
+                      *ngIf="orderCount == 0 && LISConfigurations?.isLIS"
+                      [attr.rowspan]="sample?.orders?.length"
                     >
                       {{
-                        sample?.ordersWithResults?.length === 0
-                          ? "Results entry"
-                          : "Edit Results"
+                        sample?.receivedOnStatus?.timestamp
+                          ? (sample?.receivedOnStatus?.remarks | date: "medium")
+                          : ""
                       }}
-                    </button>
-                  </td>
-                </tr>
-              </ng-container>
-            </ng-container>
-            <ng-container
-              *ngIf="sampleParams?.samplesToFeedResults?.length == 0"
-            >
-              <tr>
-                <td colspan="14" class="text-danger text-center">
-                  No samples ready for results entry
-                </td>
-              </tr>
-            </ng-container>
-          </tbody>
-        </table>
-        <div class="p-3" *ngIf="entryCategory === 'WORKSHEET'">
-          <app-result-entry-by-worksheet-home
-            [isLIS]="LISConfigurations?.isLIS"
-          ></app-result-entry-by-worksheet-home>
-        </div>
-      </div>
-    </mat-tab>
-    <mat-tab label="Completed Samples" *ngIf="!LISConfigurations?.isLIS">
-      <div class="filter-and-legend">
-        <mat-form-field class="w-50">
-          <mat-label>Search</mat-label>
-          <mat-icon matPrefix>search</mat-icon
-          ><input
-            matInput
-            (keyup)="onSearch($event)"
-            [(ngModel)]="searchingText"
-          />
-        </mat-form-field>
-
-        <mat-form-field appearance="fill" class="w-30 ml-2 float-right">
-          <mat-label
-            >Select
-            {{
-              !LISConfigurations?.isLIS ? "Department" : "Section"
-            }}</mat-label
-          >
-          <mat-select [(value)]="selectedDepartment">
-            <mat-option (click)="setDepartment('')">All</mat-option>
-            <mat-option
-              *ngFor="let dept of sampleParams?.labDepartments"
-              [value]="dept?.display"
-              (click)="setDepartment(dept?.display)"
-            >
-              {{ dept?.display }}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
-      </div>
-      <div class="p-1">
-        <table class="table table-bordered">
-          <thead class="table-header">
-            <tr>
-              <th rowspan="2">SN</th>
-              <th rowspan="2">Department</th>
-              <th rowspan="2">Sample / Specimen</th>
-              <th rowspan="2">Laboratory ID</th>
-              <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">MRN</th>
-              <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">
-                Patient Names
-              </th>
-              <th colspan="2" class="text-center">Test details</th>
-
-              <th rowspan="2">
-                {{ !LISConfigurations?.isLIS ? "Collected By" : "Received By" }}
-              </th>
-              <th rowspan="2">
-                {{ !LISConfigurations?.isLIS ? "Collected On" : "Received On" }}
-              </th>
-              <th rowspan="2">Priority</th>
-              <th rowspan="2">Action</th>
-            </tr>
-            <tr>
-              <th>Test Order</th>
-              <!-- <th>Container</th> -->
-              <th>Ordered By</th>
-              <!-- <th>Source</th>
-              <th>Date Ordered</th> -->
-              <!-- <th>Payment</th> -->
-            </tr>
-          </thead>
-          <tbody>
-            <ng-container *ngIf="sampleParams?.completedSamples?.length > 0">
-              <ng-container
-                *ngFor="
-                  let sample of sampleParams?.completedSamples;
-                  let count = index
-                "
-              >
-                <tr
-                  *ngFor="let order of sample?.orders; let orderCount = index"
-                  [ngClass]="{ 'row-alternated': count % 2 !== 0 }"
-                >
-                  <td
-                    *ngIf="orderCount == 0"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{ count + 1 }}
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{ sample?.department?.departmentName }}
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{ sample?.specimen?.specimenName }}
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{ sample?.label }}
-                  </td>
-
-                  <td
-                    *ngIf="orderCount == 0 && !LISConfigurations?.isLIS"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{ sample?.mrn }}
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0 && !LISConfigurations?.isLIS"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{ sample?.patient?.givenName }}
-                    {{ sample?.patient?.middleName }}
-                    {{ sample?.patient?.familyName }}
-                  </td>
-                  <td>
-                    {{ order?.order?.concept?.display.replace("TO:", "") }}
-                  </td>
-                  <!-- <td></td> -->
-                  <td>{{ order?.order?.orderer?.name }}</td>
-
-                  <!-- <td>{{ order?.order?.location?.name }}</td>
-                  <td>{{ order?.order?.orderDate | date: "medium" }}</td> -->
-                  <!-- <td>{{order?.p_sub_category}} - {{order?.p_sub_category}}</td> -->
-                  <td
-                    *ngIf="orderCount == 0"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{ sample?.collectedBy?.display }}
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{ sample?.created | date: "medium" }}
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{ sample?.priorityHigh ? "Urgent" : "Routine" }}
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    <button
-                      class="colored-button"
-                      mat-button
-                      (click)="
-                        onResultsReview(
-                          $event,
-                          sample,
-                          sampleParams?.providerDetails
-                        )
-                      "
+                    </td>
+                    <td
+                      *ngIf="orderCount == 0"
+                      [attr.rowspan]="sample?.orders?.length"
                     >
-                      View results
-                    </button>
-                  </td>
-                </tr>
-              </ng-container>
-            </ng-container>
-            <ng-container *ngIf="sampleParams?.completedSamples?.length == 0">
-              <tr>
-                <td colspan="14" class="text-danger text-center">
-                  No completed sample
-                </td>
-              </tr>
-            </ng-container>
-          </tbody>
-        </table>
-      </div>
-    </mat-tab>
-    <mat-tab *ngIf="showTabSampleTrackingForLis" label="Sample Tracking">
-      <div class="filter-and-legend">
-        <mat-form-field class="w-50">
-          <mat-label>Search</mat-label>
-          <mat-icon matPrefix>search</mat-icon
-          ><input
-            matInput
-            (keyup)="onSearch($event)"
-            [(ngModel)]="searchingText"
-          />
-        </mat-form-field>
-
-        <table style="border: none; margin-left: 15px" class="w-20 float-right">
-          <tr style="height: 30px">
-            <td style="width: 40px; border: solid 1px #eee"></td>
-            <td>
-              <div style="margin-left: 3px; margin-right: 20px">
-                No results filled
-              </div>
-            </td>
-            <td
-              style="
-                background-color: #ec864acf;
-                width: 40px;
-                margin-left: 20px;
-              "
-            ></td>
-            <td>
-              <div style="margin-left: 3px; margin-right: 20px">
-                Has results
-              </div>
-            </td>
-            <td
-              style="width: 40px; margin-left: 20x"
-              [ngStyle]="{
-                'background-color': !LISConfigurations?.isLIS
-                  ? '#f5f171f7'
-                  : '#0080009e'
-              }"
-            ></td>
-            <td>
-              <div style="margin-left: 3px; margin-right: 20px">
-                {{
-                  !LISConfigurations?.isLIS
-                    ? "Waiting second approval"
-                    : "Authorized"
-                }}
-              </div>
-            </td>
-            <td
-              *ngIf="LISConfigurations?.isLIS"
-              style="
-                background-color: #d04747ab;
-                width: 40px;
-                margin-left: 20px;
-              "
-            ></td>
-            <td *ngIf="LISConfigurations?.isLIS">
-              <div style="margin-left: 3px">Has Amended results</div>
-            </td>
-
-            <td
-              *ngIf="!LISConfigurations?.isLIS"
-              style="
-                background-color: #d04747ab;
-                width: 40px;
-                margin-left: 20px;
-              "
-            ></td>
-            <td *ngIf="!LISConfigurations?.isLIS">
-              <div style="margin-left: 3px">Has rejected results</div>
-            </td>
-
-            <td
-              *ngIf="!LISConfigurations?.isLIS"
-              style="
-                background-color: #6fd67bcf;
-                width: 40px;
-                margin-left: 20px;
-              "
-            ></td>
-            <td *ngIf="!LISConfigurations?.isLIS">
-              <div style="margin-left: 3px">Completed</div>
-            </td>
-          </tr>
-        </table>
-
-        <mat-form-field appearance="fill" class="w-30 ml-2 float-right">
-          <mat-label
-            >Select
-            {{
-              !LISConfigurations?.isLIS ? "Department" : "Section"
-            }}</mat-label
-          >
-          <mat-select [(value)]="selectedDepartment">
-            <mat-option (click)="setDepartment('')">All</mat-option>
-            <mat-option
-              *ngFor="let dept of sampleParams?.labDepartments"
-              [value]="dept?.display"
-              (click)="setDepartment(dept?.display)"
-            >
-              {{ dept?.display }}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
-      </div>
-      <div class="p-1">
-        <table class="table table-bordered">
-          <thead class="table-header">
-            <tr>
-              <th rowspan="2">SN</th>
-              <th rowspan="2">Department</th>
-              <th rowspan="2">Sample / Specimen</th>
-              <th rowspan="2">Laboratory ID</th>
-              <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">MRN</th>
-              <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">
-                Patient Names
-              </th>
-              <th colspan="2" class="text-center">Test details</th>
-              <th rowspan="2" *ngIf="LISConfigurations?.isLIS">Received By</th>
-              <th rowspan="2" *ngIf="LISConfigurations?.isLIS">Received On</th>
-              <th rowspan="2">
-                {{
-                  !LISConfigurations?.isLIS ? "Collected By" : "Registered By"
-                }}
-              </th>
-              <th rowspan="2">
-                {{
-                  !LISConfigurations?.isLIS ? "Collected On" : "Registered On"
-                }}
-              </th>
-              <th rowspan="2">Priority</th>
-              <th rowspan="2">Action</th>
-            </tr>
-            <tr>
-              <th>Test Order</th>
-              <th>Ordered By</th>
-              <!-- <th>Source</th>
-              <th>Date Ordered</th> -->
-            </tr>
-          </thead>
-          <tbody>
-            <ng-container *ngIf="sampleParams?.allSamples?.length > 0">
-              <ng-container
-                *ngFor="
-                  let sample of sampleParams?.allSamples;
-                  let count = index
-                "
-              >
-                <tr
-                  [ngStyle]="{
-                    'background-color': sample?.completed
-                      ? '#6fd67bcf'
-                      : sample?.atLestOneOrderWithRejectedResults &&
-                        !sample?.completed
-                      ? '#d04747ab'
-                      : order?.testAllocations[0]?.firstSignOff &&
+                      {{ sample?.collectedBy?.display }}
+                    </td>
+                    <td
+                      *ngIf="orderCount == 0"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{ sample?.created | date: "medium" }}
+                    </td>
+                    <td
+                      *ngIf="orderCount == 0"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{
                         !LISConfigurations?.isLIS
-                      ? '#f5f171f7'
-                      : order?.testAllocations[0]?.firstSignOff &&
-                        LISConfigurations?.isLIS
-                      ? '#0080009e'
-                      : sample?.atLeastOneHasResults && !sample?.completed
-                      ? '#ec864acf'
-                      : ''
-                  }"
-                  *ngFor="let order of sample?.orders; let orderCount = index"
-                  [ngClass]="{ 'row-alternated': count % 2 !== 0 }"
-                >
-                  <td
-                    *ngIf="orderCount == 0"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{ count + 1 }}
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{ sample?.department?.departmentName }}
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{ sample?.specimen?.specimenName }}
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{ sample?.label }}
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0 && !LISConfigurations?.isLIS"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{ sample?.mrn }}
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0 && !LISConfigurations?.isLIS"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{ sample?.patient?.givenName }}
-                    {{ sample?.patient?.middleName }}
-                    {{ sample?.patient?.familyName }}
-                  </td>
-                  <td>
-                    {{ order?.order?.concept?.display.replace("TO:", "") }}
-                  </td>
-                  <td>{{ order?.order?.orderer?.name }}</td>
-                  <!-- <td>{{ order?.order?.location?.name }}</td>
-                  <td>{{ order?.order?.orderDate | date: "medium" }}</td> -->
-                  <td
-                    *ngIf="orderCount == 0 && LISConfigurations?.isLIS"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{ sample?.receivedByStatus?.user?.name }}
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0 && LISConfigurations?.isLIS"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{
-                      sample?.receivedOnStatus?.timestamp
-                        ? (sample?.receivedOnStatus?.remarks | date: "medium")
-                        : ""
-                    }}
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{ sample?.collectedBy?.display }}
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{ sample?.created | date: "medium" }}
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{
-                      !LISConfigurations?.isLIS
-                        ? sample?.priorityHigh
-                          ? "Urgent"
+                          ? sample?.priorityHigh
+                            ? "Urgent"
+                            : "Routine"
+                          : sample?.priorityStatus?.status
+                          ? sample?.priorityStatus?.status
                           : "Routine"
-                        : sample?.priorityStatus?.status
-                        ? sample?.priorityStatus?.status
-                        : "Routine"
-                    }}
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    <button
-                      class="colored-button"
-                      mat-button
-                      (click)="
-                        onResultsReview(
-                          $event,
-                          sample,
-                          sampleParams?.providerDetails
-                        )
-                      "
+                      }}
+                    </td>
+                    <td
+                      *ngIf="orderCount == 0"
+                      [attr.rowspan]="sample?.orders?.length"
                     >
-                      View
-                    </button>
+                      <button
+                        class="colored-button"
+                        mat-button
+                        (click)="
+                          onResultsReview(
+                            $event,
+                            sample,
+                            sampleParams?.providerDetails
+                          )
+                        "
+                      >
+                        View
+                      </button>
+                    </td>
+                  </tr>
+                </ng-container>
+              </ng-container>
+              <ng-container *ngIf="sampleParams?.allSamples?.length == 0">
+                <tr>
+                  <td colspan="14" class="text-danger text-center">
+                    No samples
                   </td>
                 </tr>
               </ng-container>
-            </ng-container>
-            <ng-container *ngIf="sampleParams?.allSamples?.length == 0">
-              <tr>
-                <td colspan="14" class="text-danger text-center">No samples</td>
-              </tr>
-            </ng-container>
-          </tbody>
-        </table>
-      </div>
+            </tbody>
+          </table>
+        </div>
+      </ng-template>
     </mat-tab>
     <mat-tab
       label="Results Review & Authorization"
       *ngIf="LISConfigurations?.isLIS"
     >
-      <div class="filter-and-legend">
-        <mat-form-field class="w-50">
-          <mat-label>Search</mat-label>
-          <mat-icon matPrefix>search</mat-icon
-          ><input
-            matInput
-            (keyup)="onSearch($event)"
-            [(ngModel)]="searchingText"
-          />
-        </mat-form-field>
+      <ng-template matTabContent>
+        <div class="filter-and-legend">
+          <mat-form-field class="w-50">
+            <mat-label>Search</mat-label>
+            <mat-icon matPrefix>search</mat-icon
+            ><input
+              matInput
+              (keyup)="onSearch($event)"
+              [(ngModel)]="searchingText"
+            />
+          </mat-form-field>
 
-        <mat-form-field appearance="fill" class="w-30 ml-2 float-right">
-          <mat-label
-            >Select
-            {{
-              !LISConfigurations?.isLIS ? "Department" : "Section"
-            }}</mat-label
-          >
-          <mat-select [(value)]="selectedDepartment">
-            <mat-option (click)="setDepartment('')">All</mat-option>
-            <mat-option
-              *ngFor="let dept of sampleParams?.labDepartments"
-              [value]="dept?.display"
-              (click)="setDepartment(dept?.display)"
+          <mat-form-field appearance="fill" class="w-30 ml-2 float-right">
+            <mat-label
+              >Select
+              {{
+                !LISConfigurations?.isLIS ? "Department" : "Section"
+              }}</mat-label
             >
-              {{ dept?.display }}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
-      </div>
-      <div class="p-1">
-        <table class="table table-bordered">
-          <thead class="table-header">
-            <tr>
-              <th rowspan="2">SN</th>
-              <th rowspan="2">Department</th>
-              <th rowspan="2">Sample / Specimen</th>
-              <th rowspan="2">Laboratory ID</th>
-              <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">MRN</th>
-              <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">
-                Patient Names
-              </th>
-              <th colspan="2" class="text-center">Test details</th>
-              <th rowspan="2" *ngIf="LISConfigurations?.isLIS">Received By</th>
-              <th rowspan="2" *ngIf="LISConfigurations?.isLIS">Received On</th>
-              <th rowspan="2">
-                {{
-                  !LISConfigurations?.isLIS ? "Collected By" : "Registered By"
-                }}
-              </th>
-              <th rowspan="2">
-                {{
-                  !LISConfigurations?.isLIS ? "Collected On" : "Registered On"
-                }}
-              </th>
-              <th rowspan="2">Priority</th>
-              <th rowspan="2">Action</th>
-            </tr>
-            <tr>
-              <th>Test Order</th>
-              <!-- <th>Container</th> -->
-              <th>
-                {{ !LISConfigurations?.isLIS ? "Collected By" : "ID" }}
-              </th>
-              <!-- <th>Source</th>
-              <th>Date Ordered</th> -->
-              <!-- <th>Payment</th> -->
-            </tr>
-          </thead>
-          <tbody>
-            <ng-container *ngIf="sampleParams?.samplesWithResults?.length > 0">
-              <ng-container
-                *ngFor="
-                  let sample of sampleParams?.samplesWithResults;
-                  let count = index
-                "
+            <mat-select [(value)]="selectedDepartment">
+              <mat-option (click)="setDepartment('')">All</mat-option>
+              <mat-option
+                *ngFor="let dept of sampleParams?.labDepartments"
+                [value]="dept?.display"
+                (click)="setDepartment(dept?.display)"
               >
-                <tr
-                  *ngFor="let order of sample?.orders; let orderCount = index"
-                  [ngClass]="{ 'row-alternated': count % 2 !== 0 }"
-                >
-                  <td
-                    *ngIf="orderCount == 0"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{ count + 1 }}
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{ sample?.department?.departmentName }}
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{ sample?.specimen?.specimenName }}
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{ sample?.label }}
-                  </td>
-
-                  <td
-                    *ngIf="orderCount == 0 && !LISConfigurations?.isLIS"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{ sample?.mrn }}
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0 && !LISConfigurations?.isLIS"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{ sample?.patient?.givenName }}
-                    {{ sample?.patient?.middleName }}
-                    {{ sample?.patient?.familyName }}
-                  </td>
-                  <td>
-                    {{ order?.order?.concept?.display.replace("TO:", "") }}
-                  </td>
-                  <!-- <td></td> -->
-                  <td>
-                    {{
-                      !LISConfigurations?.isLIS
-                        ? order?.order?.orderer?.name
-                        : order?.order?.orderNumber
-                    }}
-                  </td>
-
-                  <!-- <td>{{ order?.order?.location?.name }}</td>
-                  <td>{{ order?.order?.orderDate | date: "medium" }}</td> -->
-                  <!-- <td>{{order?.p_sub_category}} - {{order?.p_sub_category}}</td> -->
-
-                  <td
-                    *ngIf="orderCount == 0 && LISConfigurations?.isLIS"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{ sample?.receivedByStatus?.user?.name }}
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0 && LISConfigurations?.isLIS"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{
-                      sample?.receivedOnStatus?.timestamp
-                        ? (sample?.receivedOnStatus?.remarks | date: "medium")
-                        : ""
-                    }}
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{ sample?.collectedBy?.display }}
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{ sample?.created | date: "medium" }}
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{
-                      !LISConfigurations?.isLIS
-                        ? sample?.priorityHigh
-                          ? "Urgent"
-                          : "Routine"
-                        : sample?.priorityStatus?.status
-                        ? sample?.priorityStatus?.status
-                        : "Routine"
-                    }}
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    <button
-                      class="colored-button"
-                      mat-button
-                      (click)="
-                        onResultsEntryAndReview(
-                          $event,
-                          sample,
-                          sampleParams?.providerDetails,
-                          'Review'
-                        )
-                      "
-                    >
-                      View results
-                    </button>
-                  </td>
-                </tr>
-              </ng-container>
-            </ng-container>
-            <ng-container *ngIf="sampleParams?.samplesWithResults?.length == 0">
+                {{ dept?.display }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div class="p-1">
+          <table class="table table-bordered">
+            <thead class="table-header">
               <tr>
-                <td colspan="100%" class="text-danger text-center">
-                  No Sample With Results
-                </td>
+                <th rowspan="2">SN</th>
+                <th rowspan="2">Department</th>
+                <th rowspan="2">Sample / Specimen</th>
+                <th rowspan="2">Laboratory ID</th>
+                <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">MRN</th>
+                <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">
+                  Patient Names
+                </th>
+                <th colspan="2" class="text-center">Test details</th>
+                <th rowspan="2" *ngIf="LISConfigurations?.isLIS">
+                  Received By
+                </th>
+                <th rowspan="2" *ngIf="LISConfigurations?.isLIS">
+                  Received On
+                </th>
+                <th rowspan="2">
+                  {{
+                    !LISConfigurations?.isLIS ? "Collected By" : "Registered By"
+                  }}
+                </th>
+                <th rowspan="2">
+                  {{
+                    !LISConfigurations?.isLIS ? "Collected On" : "Registered On"
+                  }}
+                </th>
+                <th rowspan="2">Priority</th>
+                <th rowspan="2">Action</th>
               </tr>
-            </ng-container>
-          </tbody>
-        </table>
-      </div>
-    </mat-tab>
-    <mat-tab label="Authorized Results" *ngIf="!LISConfigurations?.isLIS">
-      <div class="filter-and-legend">
-        <mat-form-field class="w-50">
-          <mat-label>Search</mat-label>
-          <mat-icon matPrefix>search</mat-icon
-          ><input
-            matInput
-            (keyup)="onSearch($event)"
-            [(ngModel)]="searchingText"
-          />
-        </mat-form-field>
-      </div>
-      <div class="p-1">
-        <table class="table table-bordered">
-          <thead>
-            <tr>
-              <th style="width: 10px !important">SN</th>
-              <th>
-                {{ !LISConfigurations?.isLIS ? "Pantient ID" : "Reference ID" }}
-              </th>
-              <th>
-                {{
-                  !LISConfigurations?.isLIS
-                    ? "Patient names"
-                    : "Reference Names"
-                }}
-              </th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr
-              *ngFor="
-                let patient of sampleParams?.patientsWithCompletedSamples;
-                let count = index
-              "
-            >
-              <td>
-                {{ count + 1 }}
-              </td>
-              <td>
-                {{ patient?.mrn }}
-              </td>
-              <td>
-                {{ patient?.patient?.givenName }}
-                {{ patient?.patient?.middleName }}
-                {{ patient?.patient?.familyName }}
-              </td>
-              <td>
-                <button
-                  class="colored-button"
-                  mat-stroked-button
-                  (click)="
-                    onResultsToPrint(
-                      $event,
-                      patient,
-                      sampleParams?.providerDetails
-                    )
-                  "
-                >
-                  Print results
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </mat-tab>
-    <mat-tab label="Results" *ngIf="LISConfigurations?.isLIS">
-      <div class="filter-and-legend">
-        <mat-form-field class="w-50">
-          <mat-label>Search</mat-label>
-          <mat-icon matPrefix>search</mat-icon
-          ><input
-            matInput
-            (keyup)="onSearch($event)"
-            [(ngModel)]="searchingText"
-          />
-        </mat-form-field>
-      </div>
-
-      <mat-progress-bar
-        mode="indeterminate"
-        *ngIf="!sampleParams?.samplesLoadedState"
-      ></mat-progress-bar>
-      <div class="p-1" *ngIf="sampleParams?.samplesLoadedState">
-        <table class="table table-bordered">
-          <thead>
-            <tr>
-              <!-- <th style="width: 10px !important">SN</th> -->
-              <th>Patient Identification Number</th>
-              <th>Department</th>
-              <th>LAB ID/No.</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            <ng-container>
+              <tr>
+                <th>Test Order</th>
+                <!-- <th>Container</th> -->
+                <th>
+                  {{ !LISConfigurations?.isLIS ? "Collected By" : "ID" }}
+                </th>
+                <!-- <th>Source</th>
+              <th>Date Ordered</th> -->
+                <!-- <th>Payment</th> -->
+              </tr>
+            </thead>
+            <tbody>
               <ng-container
-                *ngFor="
-                  let patient of sampleParams?.patientsWithResults;
-                  let pCount = index
-                "
+                *ngIf="sampleParams?.samplesWithResults?.length > 0"
               >
                 <ng-container
                   *ngFor="
-                    let department of patient?.departments;
-                    let dCount = index
+                    let sample of sampleParams?.samplesWithResults;
+                    let count = index
                   "
                 >
                   <tr
-                    *ngFor="
-                      let sample of department?.samples;
-                      let sCount = index
+                    *ngFor="let order of sample?.orders; let orderCount = index"
+                    [ngClass]="{ 'row-alternated': count % 2 !== 0 }"
+                  >
+                    <td
+                      *ngIf="orderCount == 0"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{ count + 1 }}
+                    </td>
+                    <td
+                      *ngIf="orderCount == 0"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{ sample?.department?.departmentName }}
+                    </td>
+                    <td
+                      *ngIf="orderCount == 0"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{ sample?.specimen?.specimenName }}
+                    </td>
+                    <td
+                      *ngIf="orderCount == 0"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{ sample?.label }}
+                    </td>
+
+                    <td
+                      *ngIf="orderCount == 0 && !LISConfigurations?.isLIS"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{ sample?.mrn }}
+                    </td>
+                    <td
+                      *ngIf="orderCount == 0 && !LISConfigurations?.isLIS"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{ sample?.patient?.givenName }}
+                      {{ sample?.patient?.middleName }}
+                      {{ sample?.patient?.familyName }}
+                    </td>
+                    <td>
+                      {{ order?.order?.concept?.display.replace("TO:", "") }}
+                    </td>
+                    <!-- <td></td> -->
+                    <td>
+                      {{
+                        !LISConfigurations?.isLIS
+                          ? order?.order?.orderer?.name
+                          : order?.order?.orderNumber
+                      }}
+                    </td>
+
+                    <!-- <td>{{ order?.order?.location?.name }}</td>
+                  <td>{{ order?.order?.orderDate | date: "medium" }}</td> -->
+                    <!-- <td>{{order?.p_sub_category}} - {{order?.p_sub_category}}</td> -->
+
+                    <td
+                      *ngIf="orderCount == 0 && LISConfigurations?.isLIS"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{ sample?.receivedByStatus?.user?.name }}
+                    </td>
+                    <td
+                      *ngIf="orderCount == 0 && LISConfigurations?.isLIS"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{
+                        sample?.receivedOnStatus?.timestamp
+                          ? (sample?.receivedOnStatus?.remarks | date: "medium")
+                          : ""
+                      }}
+                    </td>
+                    <td
+                      *ngIf="orderCount == 0"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{ sample?.collectedBy?.display }}
+                    </td>
+                    <td
+                      *ngIf="orderCount == 0"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{ sample?.created | date: "medium" }}
+                    </td>
+                    <td
+                      *ngIf="orderCount == 0"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      {{
+                        !LISConfigurations?.isLIS
+                          ? sample?.priorityHigh
+                            ? "Urgent"
+                            : "Routine"
+                          : sample?.priorityStatus?.status
+                          ? sample?.priorityStatus?.status
+                          : "Routine"
+                      }}
+                    </td>
+                    <td
+                      *ngIf="orderCount == 0"
+                      [attr.rowspan]="sample?.orders?.length"
+                    >
+                      <button
+                        class="colored-button"
+                        mat-button
+                        (click)="
+                          onResultsEntryAndReview(
+                            $event,
+                            sample,
+                            sampleParams?.providerDetails,
+                            'Review'
+                          )
+                        "
+                      >
+                        View results
+                      </button>
+                    </td>
+                  </tr>
+                </ng-container>
+              </ng-container>
+              <ng-container
+                *ngIf="sampleParams?.samplesWithResults?.length == 0"
+              >
+                <tr>
+                  <td colspan="100%" class="text-danger text-center">
+                    No Sample With Results
+                  </td>
+                </tr>
+              </ng-container>
+            </tbody>
+          </table>
+        </div>
+      </ng-template>
+    </mat-tab>
+    <mat-tab
+      label="Authorized Results"
+      *ngIf="LISConfigurations?.isLIS == 'test'"
+    >
+      <ng-template matTabContent>
+        <div class="filter-and-legend">
+          <mat-form-field class="w-50">
+            <mat-label>Search</mat-label>
+            <mat-icon matPrefix>search</mat-icon
+            ><input
+              matInput
+              (keyup)="onSearch($event)"
+              [(ngModel)]="searchingText"
+            />
+          </mat-form-field>
+        </div>
+        <div class="p-1">
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th style="width: 10px !important">SN</th>
+                <th>
+                  {{
+                    !LISConfigurations?.isLIS ? "Pantient ID" : "Reference ID"
+                  }}
+                </th>
+                <th>
+                  {{
+                    !LISConfigurations?.isLIS
+                      ? "Patient names"
+                      : "Reference Names"
+                  }}
+                </th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                *ngFor="
+                  let patient of sampleParams?.patientsWithCompletedSamples;
+                  let count = index
+                "
+              >
+                <td>
+                  {{ count + 1 }}
+                </td>
+                <td>
+                  {{ patient?.mrn }}
+                </td>
+                <td>
+                  {{ patient?.patient?.givenName }}
+                  {{ patient?.patient?.middleName }}
+                  {{ patient?.patient?.familyName }}
+                </td>
+                <td>
+                  <button
+                    class="colored-button"
+                    mat-stroked-button
+                    (click)="
+                      onResultsToPrint(
+                        $event,
+                        patient,
+                        sampleParams?.providerDetails
+                      )
                     "
                   >
-                    <!--
+                    Print results
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </ng-template>
+    </mat-tab>
+    <mat-tab label="Results" *ngIf="LISConfigurations?.isLIS">
+      <ng-template matTabContent>
+        <div class="filter-and-legend">
+          <mat-form-field class="w-50">
+            <mat-label>Search</mat-label>
+            <mat-icon matPrefix>search</mat-icon
+            ><input
+              matInput
+              (keyup)="onSearch($event)"
+              [(ngModel)]="searchingText"
+            />
+          </mat-form-field>
+        </div>
+
+        <mat-progress-bar
+          mode="indeterminate"
+          *ngIf="!sampleParams?.samplesLoadedState"
+        ></mat-progress-bar>
+        <div class="p-1" *ngIf="sampleParams?.samplesLoadedState">
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <!-- <th style="width: 10px !important">SN</th> -->
+                <th>Patient Identification Number</th>
+                <th>Department</th>
+                <th>LAB ID/No.</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <ng-container>
+                <ng-container
+                  *ngFor="
+                    let patient of sampleParams?.patientsWithResults;
+                    let pCount = index
+                  "
+                >
+                  <ng-container
+                    *ngFor="
+                      let department of patient?.departments;
+                      let dCount = index
+                    "
+                  >
+                    <tr
+                      *ngFor="
+                        let sample of department?.samples;
+                        let sCount = index
+                      "
+                    >
+                      <!--
                     <td
                     > 
                       *ngIf="pCount == 0"
                       [attr.rowspan]="patient?.departments?.length"
                       {{ count + 1 }}
                     </td> -->
-                    <td>
-                      {{ patient?.mrn }}
-                    </td>
-                    <td>
-                      {{
-                        department?.departmentName &&
-                        department?.departmentName !== "undefined"
-                          ? department?.departmentName
-                          : "Not set"
-                      }}
-                    </td>
-                    <td>
-                      {{ sample?.id }}
-                    </td>
-                    <td>
-                      <button
-                        class="colored-button"
-                        mat-stroked-button
-                        (click)="
-                          onResultsToPrint(
-                            $event,
-                            patient,
-                            sampleParams?.providerDetails,
-                            sample?.authorizationInfo?.length > 0
-                          )
-                        "
-                      >
-                        Preview Report
-                      </button>
+                      <td>
+                        {{ patient?.mrn }}
+                      </td>
+                      <td>
+                        {{
+                          department?.departmentName &&
+                          department?.departmentName !== "undefined"
+                            ? department?.departmentName
+                            : "Not set"
+                        }}
+                      </td>
+                      <td>
+                        {{ sample?.id }}
+                      </td>
+                      <td>
+                        <button
+                          class="colored-button"
+                          mat-stroked-button
+                          (click)="
+                            onResultsToPrint(
+                              $event,
+                              patient,
+                              sampleParams?.providerDetails,
+                              sample?.authorizationInfo?.length > 0
+                            )
+                          "
+                        >
+                          Preview Report
+                        </button>
 
-                      <button
-                        class="colored-button ml-2"
-                        mat-stroked-button
-                        (click)="onReviewResults($event, patient, sample)"
-                      >
-                        Review
-                      </button>
-                    </td>
-                  </tr>
+                        <button
+                          class="colored-button ml-2"
+                          mat-stroked-button
+                          (click)="onReviewResults($event, patient, sample)"
+                        >
+                          Review
+                        </button>
+                      </td>
+                    </tr>
+                  </ng-container>
                 </ng-container>
               </ng-container>
-            </ng-container>
-          </tbody>
-        </table>
-      </div>
+            </tbody>
+          </table>
+        </div>
+      </ng-template>
     </mat-tab>
     <mat-tab label="Sample Tracking" *ngIf="!LISConfigurations?.isLIS">
-      <div class="filter-and-legend">
-        <mat-form-field class="w-50">
-          <mat-label>Search</mat-label>
-          <mat-icon matPrefix>search</mat-icon
-          ><input
-            matInput
-            (keyup)="onSearch($event)"
-            [(ngModel)]="searchingText"
-          />
-        </mat-form-field>
-
-        <table style="border: none; margin-left: 15px" class="w-20 float-right">
-          <tr style="height: 30px">
-            <td style="width: 40px; border: solid 1px #eee"></td>
-            <td>
-              <div style="margin-left: 3px; margin-right: 20px">
-                No results filled
-              </div>
-            </td>
-            <td
-              style="
-                background-color: #ec864acf;
-                width: 40px;
-                margin-left: 20px;
-              "
-            ></td>
-            <td>
-              <div style="margin-left: 3px; margin-right: 20px">
-                Has results
-              </div>
-            </td>
-            <td
-              style="width: 40px; margin-left: 20x"
-              [ngStyle]="{
-                'background-color': !LISConfigurations?.isLIS
-                  ? '#f5f171f7'
-                  : '#0080009e'
-              }"
-            ></td>
-            <td>
-              <div style="margin-left: 3px; margin-right: 20px">
-                {{
-                  !LISConfigurations?.isLIS
-                    ? "Waiting second approval"
-                    : "Authorized"
-                }}
-              </div>
-            </td>
-            <td
-              *ngIf="LISConfigurations?.isLIS"
-              style="
-                background-color: #d04747ab;
-                width: 40px;
-                margin-left: 20px;
-              "
-            ></td>
-            <td *ngIf="LISConfigurations?.isLIS">
-              <div style="margin-left: 3px">Has Amended results</div>
-            </td>
-
-            <td
-              *ngIf="!LISConfigurations?.isLIS"
-              style="
-                background-color: #d04747ab;
-                width: 40px;
-                margin-left: 20px;
-              "
-            ></td>
-            <td *ngIf="!LISConfigurations?.isLIS">
-              <div style="margin-left: 3px">Has rejected results</div>
-            </td>
-
-            <td
-              *ngIf="!LISConfigurations?.isLIS"
-              style="
-                background-color: #6fd67bcf;
-                width: 40px;
-                margin-left: 20px;
-              "
-            ></td>
-            <td *ngIf="!LISConfigurations?.isLIS">
-              <div style="margin-left: 3px">Completed</div>
-            </td>
-          </tr>
-        </table>
-
-        <mat-form-field appearance="fill" class="w-30 ml-2 float-right">
-          <mat-label
-            >Select
-            {{
-              !LISConfigurations?.isLIS ? "Department" : "Section"
-            }}</mat-label
+      <ng-template matTabContent>
+        <div class="p-2">
+          <app-sample-tracking-list
+            [codedSampleRejectionReasons]="params?.codedSampleRejectionReasons"
+            [labConfigs]="labConfigs"
+            [datesParameters]="datesParameters"
+            [LISConfigurations]="LISConfigurations"
+            [patients]="patients"
+            [sampleTypes]="sampleTypes"
+            [labSamplesDepartments]="labSamplesDepartments"
+            [labSamplesContainers]="labSamplesContainers"
+            [userUuid]="userUuid"
           >
-          <mat-select [(value)]="selectedDepartment">
-            <mat-option (click)="setDepartment('')">All</mat-option>
-            <mat-option
-              *ngFor="let dept of sampleParams?.labDepartments"
-              [value]="dept?.display"
-              (click)="setDepartment(dept?.display)"
-            >
-              {{ dept?.display }}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
-      </div>
-      <div class="p-1">
-        <table class="table table-bordered">
-          <thead class="table-header">
-            <tr>
-              <th rowspan="2">SN</th>
-              <th rowspan="2">Department</th>
-              <th rowspan="2">Sample / Specimen</th>
-              <th rowspan="2">Laboratory ID</th>
-              <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">MRN</th>
-              <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">
-                Patient Names
-              </th>
-              <th colspan="2" class="text-center">Test details</th>
-              <th rowspan="2" *ngIf="LISConfigurations?.isLIS">Received By</th>
-              <th rowspan="2" *ngIf="LISConfigurations?.isLIS">Received On</th>
-              <th rowspan="2">
-                {{
-                  !LISConfigurations?.isLIS ? "Collected By" : "Registered By"
-                }}
-              </th>
-              <th rowspan="2">
-                {{
-                  !LISConfigurations?.isLIS ? "Collected On" : "Registered On"
-                }}
-              </th>
-              <th rowspan="2">Priority</th>
-              <th rowspan="2">Action</th>
-            </tr>
-            <tr>
-              <th>Test Order</th>
-              <th>Ordered By</th>
-              <!-- <th>Source</th>
-              <th>Date Ordered</th> -->
-            </tr>
-          </thead>
-          <tbody>
-            <ng-container *ngIf="sampleParams?.allSamples?.length > 0">
-              <ng-container
-                *ngFor="
-                  let sample of sampleParams?.allSamples;
-                  let count = index
-                "
-              >
-                <tr
-                  [ngStyle]="{
-                    'background-color': sample?.completed
-                      ? '#6fd67bcf'
-                      : sample?.atLestOneOrderWithRejectedResults &&
-                        !sample?.completed
-                      ? '#d04747ab'
-                      : order?.testAllocations[0]?.firstSignOff &&
-                        !LISConfigurations?.isLIS
-                      ? '#f5f171f7'
-                      : order?.testAllocations[0]?.firstSignOff &&
-                        LISConfigurations?.isLIS
-                      ? '#0080009e'
-                      : sample?.atLeastOneHasResults && !sample?.completed
-                      ? '#ec864acf'
-                      : ''
-                  }"
-                  *ngFor="let order of sample?.orders; let orderCount = index"
-                  [ngClass]="{ 'row-alternated': count % 2 !== 0 }"
-                >
-                  <td
-                    *ngIf="orderCount == 0"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{ count + 1 }}
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{ sample?.department?.departmentName }}
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{ sample?.specimen?.specimenName }}
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{ sample?.label }}
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0 && !LISConfigurations?.isLIS"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{ sample?.mrn }}
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0 && !LISConfigurations?.isLIS"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{ sample?.patient?.givenName }}
-                    {{ sample?.patient?.middleName }}
-                    {{ sample?.patient?.familyName }}
-                  </td>
-                  <td>
-                    {{ order?.order?.concept?.display.replace("TO:", "") }}
-                  </td>
-                  <td>{{ order?.order?.orderer?.name }}</td>
-                  <!-- <td>{{ order?.order?.location?.name }}</td>
-                  <td>{{ order?.order?.orderDate | date: "medium" }}</td> -->
-                  <td
-                    *ngIf="orderCount == 0 && LISConfigurations?.isLIS"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{ sample?.receivedByStatus?.user?.name }}
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0 && LISConfigurations?.isLIS"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{
-                      sample?.receivedOnStatus?.timestamp
-                        ? (sample?.receivedOnStatus?.remarks | date: "medium")
-                        : ""
-                    }}
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{ sample?.collectedBy?.display }}
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{ sample?.created | date: "medium" }}
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    {{
-                      !LISConfigurations?.isLIS
-                        ? sample?.priorityHigh
-                          ? "Urgent"
-                          : "Routine"
-                        : sample?.priorityStatus?.status
-                        ? sample?.priorityStatus?.status
-                        : "Routine"
-                    }}
-                  </td>
-                  <td
-                    *ngIf="orderCount == 0"
-                    [attr.rowspan]="sample?.orders?.length"
-                  >
-                    <button
-                      class="colored-button"
-                      mat-button
-                      (click)="
-                        onResultsReview(
-                          $event,
-                          sample,
-                          sampleParams?.providerDetails
-                        )
-                      "
-                    >
-                      View results
-                    </button>
-                  </td>
-                </tr>
-              </ng-container>
-            </ng-container>
-            <ng-container *ngIf="sampleParams?.allSamples?.length == 0">
-              <tr>
-                <td colspan="14" class="text-danger text-center">No samples</td>
-              </tr>
-            </ng-container>
-          </tbody>
-        </table>
-      </div>
+          </app-sample-tracking-list>
+        </div>
+      </ng-template>
     </mat-tab>
   </mat-tab-group>
 </div>

@@ -10,6 +10,7 @@ import {
   groupTestsBySpecimenSource,
 } from "src/app/shared/resources/concepts/helpers";
 import { catchError, map } from "rxjs/operators";
+import { getLabOrdersNotSampled } from "../helpers";
 
 @Injectable({
   providedIn: "root",
@@ -84,6 +85,8 @@ export class SamplesService {
             patient
           );
 
+          let collectedOrders = {};
+
           /**
            * TODO: Review the all codes
            */
@@ -97,6 +100,9 @@ export class SamplesService {
               ]?.department?.id +
               "_" +
               sample?.concept?.uuid;
+            sample?.orders?.forEach((order) => {
+              collectedOrders[order?.order?.uuid] = order;
+            });
             if (
               (
                 _.filter(samplesMerged, {
@@ -132,7 +138,7 @@ export class SamplesService {
 
           let samplesNotMatchingToCollectedOnes = [];
 
-          _.each(
+          const allSamplesAfterFiltering = _.map(
             _.uniqBy(samplesMerged, "departmentSpecimentSource"),
             (sample) => {
               const departmentAndSourceId =
@@ -141,7 +147,7 @@ export class SamplesService {
                 ]?.department?.id +
                 "_" +
                 sample?.concept?.uuid;
-              const matchedSamples = _.filter(samplesToCollect, {
+              let matchedSamples = _.filter(samplesToCollect, {
                 departmentSpecimentSource: departmentAndSourceId,
               });
 
@@ -156,6 +162,12 @@ export class SamplesService {
                   }
                 }
               );
+              matchedSamples = matchedSamples?.map((sample) => {
+                return {
+                  ...sample,
+                  orders: sample?.orders,
+                };
+              });
               if (
                 matchedSamples.length > 0 &&
                 (matchedSamples || [])[0]?.orders?.length >
@@ -163,7 +175,8 @@ export class SamplesService {
               ) {
                 const unSampledOrders = getLabOrdersNotSampled(
                   (matchedSamples || [])[0]?.orders,
-                  sample?.orders
+                  sample?.orders,
+                  paidItems
                 );
                 allSamples = [
                   ...allSamples,
@@ -174,47 +187,36 @@ export class SamplesService {
                     orders: unSampledOrders,
                   },
                 ];
-              }
-
-              function getLabOrdersNotSampled(labOrders, sampledOrders) {
-                let ordersNotSampled = [];
-                _.each(labOrders, (labOrder) => {
-                  if (
-                    (
-                      _.filter(sampledOrders, (sampledOrder) => {
-                        if (sampledOrder?.order?.uuid == labOrder?.uuid) {
-                          return sampledOrder?.order;
-                        }
-                      }) || []
-                    )?.length > 0
-                  ) {
-                  } else {
-                    ordersNotSampled = [
-                      ...ordersNotSampled,
-                      {
-                        ...labOrder,
-                        paid: paidItems[labOrder?.concept?.display]
-                          ? true
-                          : false,
-                      },
-                    ];
-                  }
-                });
-                return _.uniqBy(ordersNotSampled, "uuid");
+                return [
+                  ...allSamples,
+                  ...matchedSamples.map((sample) => {
+                    return {
+                      ...sample,
+                      orders:
+                        sample?.order?.filter(
+                          (order) => collectedOrders[order?.uuid]
+                        ) || [],
+                    };
+                  }),
+                ];
+              } else {
+                return [];
               }
             }
           );
-
-          allSamples = [...allSamples, ...samplesNotMatchingToCollectedOnes];
-
+          allSamples = _.flatten([
+            ...allSamplesAfterFiltering,
+            ...samplesNotMatchingToCollectedOnes,
+          ]);
+          let collectedSamples = [];
           samples && samples?.length > 0
             ? _.each(samples, (sample) => {
                 this.api.concept
                   .getConcept(sample?.concept?.uuid)
                   .then((response) => {
                     if (response) {
-                      allSamples = [
-                        ...allSamples,
+                      collectedSamples = [
+                        ...collectedSamples,
                         {
                           id: sample?.label,
                           uuid: sample?.uuid,
@@ -270,7 +272,17 @@ export class SamplesService {
                               : null,
                         },
                       ];
-                      observer.next(allSamples);
+                      observer.next([
+                        ...(allSamples?.filter(
+                          (sample) =>
+                            (
+                              sample?.orders?.filter(
+                                (order) => !collectedOrders[order?.uuid]
+                              ) || []
+                            )?.length > 0
+                        ) || []),
+                        ...collectedSamples,
+                      ]);
                     }
                   });
               })
