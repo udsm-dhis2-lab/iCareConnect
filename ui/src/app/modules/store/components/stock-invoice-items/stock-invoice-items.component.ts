@@ -7,7 +7,7 @@ import { SystemSettingsService } from "src/app/core/services/system-settings.ser
 import { ConceptsService } from "src/app/shared/resources/concepts/services/concepts.service";
 import { StockInvoicesService } from "src/app/shared/resources/store/services/stockInvoice.service";
 import { SupplierService } from "src/app/shared/resources/store/services/supplier.service";
-import { StockInvoiceFormDialogComponent } from "../stock-invoice-form-dialog/stock-invoice-form-dialog.component";
+import { StockInvoiceFormDialogComponent } from "../../modals/stock-invoice-form-dialog/stock-invoice-form-dialog.component";
 @Component({
   selector: "app-stock-invoice-items",
   templateUrl: "./stock-invoice-items.component.html",
@@ -16,6 +16,7 @@ import { StockInvoiceFormDialogComponent } from "../stock-invoice-form-dialog/st
 export class StockInvoiceItemsComponent implements OnInit {
   @Input() stockInvoice: any;
   @Input() status: any;
+  @Input() currentLocation: any;
 
   errors: any[];
   specificStockInvoice$: Observable<any>;
@@ -38,7 +39,7 @@ export class StockInvoiceItemsComponent implements OnInit {
   }
 
   onUpdateStockInvoiceItem(stockInvoiceItem, key: string) {
-    if(!key){
+    if (!key) {
       this.dialog.open(StockInvoiceFormDialogComponent, {
         width: "80%",
         data: {
@@ -46,37 +47,32 @@ export class StockInvoiceItemsComponent implements OnInit {
         },
       });
     }
-    if(key === 'receive'){
-     const invoicesItemObject = {
+    if (key === "receive") {
+      const invoicesItemObject = {
         stockInvoiceItemStatus: [
           {
-            status: 'RECEIVED'
-          }
+            status: "RECEIVED",
+          },
         ],
-        
       };
 
       this.stockInvoicesService
         .updateStockInvoiceItem(stockInvoiceItem?.uuid, invoicesItemObject)
-        .pipe(
-          tap((response) => {
-          })
-        )
+        .pipe(tap((response) => {}))
         .subscribe();
     }
-    if(key === 'delete'){
-     const invoicesItemObject = {
+    if (key === "delete") {
+      const invoicesItemObject = {
+        location: {
+          uuid: this.currentLocation?.uuid,
+        },
         voided: true,
       };
 
       this.stockInvoicesService
         .updateStockInvoiceItem(stockInvoiceItem?.uuid, invoicesItemObject)
-        .pipe(
-          tap((response) => {
-          })
-        )
+        .pipe(tap((response) => {}))
         .subscribe();
     }
-    
   }
 }
