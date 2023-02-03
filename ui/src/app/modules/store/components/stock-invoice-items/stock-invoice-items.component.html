@@ -13,6 +13,7 @@
                 <th>Order Quantity</th>
                 <th>Mfg Batch No</th>
                 <th>Expiry Date</th>
+                <th>Status</th>
                 <th>Batch Quantity</th>
                 <th>Unit Price</th>
                 <th>Amount</th>
@@ -26,10 +27,11 @@
                 <td>{{ item?.orderQuantity }}</td>
                 <td>{{ item?.batchNo }}</td>
                 <td>{{ item?.expiryDate | date:"dd/MM/yyyy" }}</td>
+                <td [ngClass]="item?.stockInvoiceItemStatus[0]?.status !== 'RECEIVED' ? 'text-secondary' : 'text-success'">{{ item?.stockInvoiceItemStatus[0]?.status ? item?.stockInvoiceItemStatus[0]?.status : 'DRAFT' }}</td>
                 <td>{{ item?.batchQuantity }}</td>
                 <td>{{ item?.unitPrice }}</td>
                 <td>{{ item?.amount }}</td>
-                <td *ngIf="status !== 'RECEIVED'">
+                <td *ngIf="status !== 'RECEIVED' && item?.stockInvoiceItemStatus[0]?.status !== 'RECEIVED'">
                   <button
                     mat-icon-button
                     [matMenuTriggerFor]="menu"
@@ -53,6 +55,7 @@
                     </button>
                     <button
                       mat-menu-item
+                      (click)="onUpdateStockInvoiceItem(item, 'delete')"
                     >
                       <mat-icon>delete</mat-icon>
                       <span>Remove</span>
