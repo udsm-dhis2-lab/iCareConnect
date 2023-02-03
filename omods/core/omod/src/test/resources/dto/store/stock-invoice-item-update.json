@@ -15,5 +15,8 @@
   "orderQuantity": 10,
   "location": {
     "uuid": "44939999-d333-fff2-9bff-61d11117c22e"
-  }
+  },
+  "stockInvoiceItemStatus": [{
+    "status": "RECEIVED"
+  }]
 }
