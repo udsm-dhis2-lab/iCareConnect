@@ -1,6 +1,6 @@
 import { Component, Inject, OnInit } from "@angular/core";
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
-import { Observable, zip } from "rxjs";
+import { Observable, of, zip } from "rxjs";
 import { map } from "rxjs/operators";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { ConceptGet } from "src/app/shared/resources/openmrs";
@@ -145,7 +145,7 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
     this.dialogRef.close();
   }
 
-  onSave(event: Event, order: any): void {
+  onSave(event: Event, order: any, alreadyApproved?: boolean): void {
     event.stopPropagation();
     let data = [];
     let dataWithResultsGroup = [];
@@ -370,31 +370,55 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
         .subscribe((response) => {
           if (response) {
             this.saving = false;
-            if (
+            let allocationAmendmentStatuses = [];
+            if (alreadyApproved) {
+              allocationAmendmentStatuses = response?.map((result) => {
+                return {
+                  status: "AMENDED",
+                  remarks: "AMENDED",
+                  category: "RESULT_AMENDMENT",
+                  user: {
+                    uuid: this.userUuid,
+                  },
+                  testAllocation: {
+                    uuid: result?.testAllocation?.uuid,
+                  },
+                  testResult: {
+                    uuid: result?.uuid,
+                  },
+                };
+              });
+            }
+
+            const status = {
+              sample: {
+                uuid: this.data?.sample?.uuid,
+              },
+              user: {
+                uuid: localStorage.getItem("userUuid"),
+              },
+              remarks: "",
+              status: "HAS RESULTS",
+              category: "HAS_RESULTS",
+            };
+            zip(
+              allocationAmendmentStatuses?.length > 0
+                ? this.sampleAllocationService.saveAllocationStatuses(
+                    allocationAmendmentStatuses
+                  )
+                : of(null),
               (
                 this.data?.sample?.statuses?.filter(
                   (status) => status?.category === "HAS_RESULTS"
                 ) || []
               )?.length === 0
-            ) {
-              const status = {
-                sample: {
-                  uuid: this.data?.sample?.uuid,
-                },
-                user: {
-                  uuid: localStorage.getItem("userUuid"),
-                },
-                remarks: "",
-                status: "HAS RESULTS",
-                category: "HAS_RESULTS",
-              };
-              this.sampleService
-                .saveSampleStatus(status)
-                .subscribe((response) => {});
-            }
-            setTimeout(() => {
-              this.getAllocations();
-            }, 100);
+                ? this.sampleService.saveSampleStatus(status)
+                : of(null)
+            ).subscribe((response) => {
+              setTimeout(() => {
+                this.getAllocations();
+              }, 100);
+            });
           }
         });
     }
@@ -491,6 +515,50 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
         .subscribe((response) => {
           if (response && !response?.error) {
             this.saving = false;
+            if (
+              (
+                this.allocationStatuses?.filter(
+                  (status) => status?.status === "AUTHORIZED"
+                ) || []
+              )?.length > 0
+            ) {
+              // Save sample full authorized
+              const status = {
+                sample: {
+                  uuid: this.data?.sample?.uuid,
+                },
+                user: {
+                  uuid: localStorage.getItem("userUuid"),
+                },
+                remarks: "AUTHORIZED",
+                status: "AUTHORIZED",
+                category: "RESULT_AUTHORIZATION",
+              };
+              this.sampleService
+                .saveSampleStatus(status)
+                .subscribe((response) => {});
+            } else if (
+              (
+                response?.sample?.statuses?.filter(
+                  (status) => status?.status === "APPROVED"
+                ) || []
+              )?.length === 0
+            ) {
+              const status = {
+                sample: {
+                  uuid: this.data?.sample?.uuid,
+                },
+                user: {
+                  uuid: localStorage.getItem("userUuid"),
+                },
+                remarks: "APPROVED",
+                status: "APPROVED",
+                category: "RESULT_AUTHORIZATION",
+              };
+              this.sampleService
+                .saveSampleStatus(status)
+                .subscribe((response) => {});
+            }
             setTimeout(() => {
               this.getAllocations();
             }, 100);
@@ -514,6 +582,7 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
     parameter: ConceptGet,
     allocation: SampleAllocationObject
   ): void {
+    // console.log(dataObject);
     if (
       (dataObject?.value && !dataObject?.previousValue) ||
       (dataObject?.value &&
@@ -683,4 +752,3 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
     this.selectedInstruments[order?.concept?.uuid] = instrument;
   }
 }
-[];

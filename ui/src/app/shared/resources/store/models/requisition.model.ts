@@ -113,13 +113,13 @@ export class Requisition {
   }
 
   get name(): string {
-    return this.requisition?.requisitionItems[0]
+    return this.requisition?.requisitionItems?.length
       ? this.requisition?.requisitionItems[0].item?.display
       : undefined;
   }
 
   get itemUuid(): string {
-    return this.requisition?.requisitionItems[0]
+    return this.requisition?.requisitionItems?.length
       ? this.requisition?.requisitionItems[0].item?.uuid
       : undefined;
   }
@@ -141,8 +141,8 @@ export class Requisition {
       reverse(
         sortBy(
           flatten(
-            this.requisition?.issues.map((issue) =>
-              (issue?.issueItems || []).map((issueItem) => ({
+            this.requisition?.issues?.map((issue) =>
+              (issue?.issueItems || [])?.map((issueItem) => ({
                 ...issueItem,
                 created: issue?.created,
               }))
@@ -159,12 +159,12 @@ export class Requisition {
       reverse(
         sortBy(
           flatten(
-            this.requisition?.issues.map((issue) => {
+            this.requisition?.issues?.map((issue) => {
               if (issue?.issueStatuses.length === 0) {
                 return [{ created: issue?.created }];
               }
 
-              return (issue?.issueStatuses || []).map((issueStatus) => ({
+              return (issue?.issueStatuses || [])?.map((issueStatus) => ({
                 ...issueStatus,
                 created: issue?.created,
               }));
@@ -183,8 +183,8 @@ export class Requisition {
   }
 
   get quantityRequested(): number {
-    return this.requisition?.requisitionItems[0]
-      ? this.requisition?.requisitionItems[0].quantity || 0
+    return this.requisition?.requisitionItems?.length
+      ? this.requisition?.requisitionItems[0]?.quantity || 0
       : 0;
   }
 
@@ -207,8 +207,8 @@ export class Requisition {
   }
 
   get status(): RequisitionStatus {
-    const isReceived = this.requisition?.issues.some(
-      (issue) => issue.receipts?.length > 0
+    const isReceived = this.requisition?.issues?.some(
+      (issue) => issue?.receipts?.length > 0
     );
 
     if (isReceived) {
@@ -227,8 +227,8 @@ export class Requisition {
   }
 
   get remarks(): string {
-    return this.requisition?.requisitionStatuses[0]
-      ? this.requisition?.requisitionStatuses[0].remarks
+    return this.requisition?.requisitionStatuses?.length
+      ? this.requisition?.requisitionStatuses[0]?.remarks
       : undefined;
   }
 
@@ -257,14 +257,14 @@ export class Requisition {
       return null;
     }
     return {
-      requestedLocation: { uuid: requisitionInput.requestedLocationUuid },
-      requestingLocation: { uuid: requisitionInput.requestingLocationUuid },
-      requisitionItems: requisitionInput.items.map((item) => {
+      requestedLocation: { uuid: requisitionInput?.requestedLocationUuid },
+      requestingLocation: { uuid: requisitionInput?.requestingLocationUuid },
+      requisitionItems: requisitionInput?.items?.map((item) => {
         return {
           item: {
-            uuid: item.itemUuid,
+            uuid: item?.itemUuid,
           },
-          quantity: item.quantity,
+          quantity: item?.quantity,
         };
       }),
       requisitionStatuses: [],
@@ -278,14 +278,14 @@ export class Requisition {
       return null;
     }
     return {
-      issue: { uuid: requisitionIssueInput.issueUuid },
-      issueingLocation: { uuid: requisitionIssueInput.issueingLocationUuid },
-      receivingLocation: { uuid: requisitionIssueInput.receivingLocationUuid },
-      receiptItems: (requisitionIssueInput.receiptItems || []).map(
+      issue: { uuid: requisitionIssueInput?.issueUuid },
+      issueingLocation: { uuid: requisitionIssueInput?.issueingLocationUuid },
+      receivingLocation: { uuid: requisitionIssueInput?.receivingLocationUuid },
+      receiptItems: (requisitionIssueInput?.receiptItems || [])?.map(
         (receiptItem) => {
           return {
-            item: { uuid: receiptItem.itemUuid },
-            quantity: receiptItem.quantity,
+            item: { uuid: receiptItem?.itemUuid },
+            quantity: receiptItem?.quantity,
           };
         }
       ),
@@ -315,7 +315,7 @@ export class Requisition {
     }
 
     return {
-      issue: { uuid: requisition.issueUuid },
+      issue: { uuid: requisition?.issueUuid },
       receivingLocation: {
         uuid: requisition?.requestingStore?.uuid,
       },
