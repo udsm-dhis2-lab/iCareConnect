@@ -11,6 +11,7 @@ export const loadLabSamplesByCollectionDates = createAction(
     configs: any;
     codedSampleRejectionReasons: any;
     hasStatus?: string;
+    excludeAllocations?: boolean;
     category?: string;
     startIndex?: number;
     limit?: number;

@@ -3,19 +3,14 @@ package org.openmrs.module.icare.laboratory.dao;
 // Generated Oct 7, 2020 12:49:21 PM by Hibernate Tools 5.2.10.Final
 
 import org.hibernate.Query;
-import org.openmrs.Drug;
-import org.openmrs.Patient;
-import org.openmrs.Person;
+import org.openmrs.User;
 import org.openmrs.Visit;
 import org.openmrs.api.db.hibernate.DbSession;
-import org.openmrs.module.icare.billing.models.Discount;
 import org.openmrs.module.icare.core.ListResult;
 import org.openmrs.module.icare.core.Pager;
 import org.openmrs.module.icare.core.dao.BaseDAO;
 import org.openmrs.module.icare.laboratory.models.*;
-import org.springframework.stereotype.Repository;
 
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -78,13 +73,14 @@ public class SampleDAO extends BaseDAO<Sample> {
 	}
 	
 	public ListResult<Sample> getSamples(Date startDate, Date endDate, Pager pager, String locationUuid,
-	        String sampleCategory, String testCategory, String q, String hasStatus) {
-		System.out.println(hasStatus + " =>status");
+	        String sampleCategory, String testCategory, String q, String hasStatus, String acceptedByUuid) {
+		
 		DbSession session = this.getSession();
-		String queryStr = "SELECT sp \n" + "FROM Sample sp JOIN sp.visit v";
+		
+		String queryStr = "SELECT sp \n" + "FROM Sample sp ";
 		
 		if (q != null) {
-			queryStr += " LEFT JOIN v.patient p LEFT JOIN p.names pname LEFT JOIN p.identifiers pi ";
+			queryStr += " JOIN sp.visit v LEFT JOIN v.patient p LEFT JOIN p.names pname LEFT JOIN p.identifiers pi ";
 			
 			if (!queryStr.contains("WHERE")) {
 				queryStr += " WHERE ";
@@ -98,9 +94,11 @@ public class SampleDAO extends BaseDAO<Sample> {
 		if (startDate != null && endDate != null) {
 			if (!queryStr.contains("WHERE")) {
 				queryStr += " WHERE ";
+			} else {
+				queryStr += " AND ";
 			}
-			queryStr += " (cast(sp.dateTime as date) BETWEEN :startDate AND :endDate) \n"
-			        + "OR (cast(sp.dateCreated as date) BETWEEN :startDate AND :endDate)";
+			queryStr += " ((cast(sp.dateTime as date) BETWEEN :startDate AND :endDate) \n"
+			        + "OR (cast(sp.dateCreated as date) BETWEEN :startDate AND :endDate))";
 		}
 		
 		if (locationUuid != null) {
@@ -137,10 +135,6 @@ public class SampleDAO extends BaseDAO<Sample> {
 			}
 			queryStr += "sp IN(SELECT testalloc.sampleOrder.id.sample FROM TestAllocation testalloc WHERE testalloc IN (SELECT testresults.testAllocation FROM Result testresults))) ";
 			
-			//			queryStr+="LEFT JOIN TestAllocation testalloc ON testalloc.sampleOrder.id.sample = sp JOIN Result testresults ON testresults.testAllocation = testalloc GROUP BY sp HAVING COUNT(testalloc)=COUNT(testresults) ";
-			
-			//			queryStr +=" LEFT JOIN sp.testAllocations al LEFT JOIN al.testAllocationResults ar GROUP BY sp HAVING COUNT(al.id) = COUNT(ar.testAllocation)";
-			
 		}
 		
 		if (hasStatus != null) {
@@ -161,12 +155,18 @@ public class SampleDAO extends BaseDAO<Sample> {
 				} else {
 					queryStr += " AND ";
 				}
-				queryStr += "sp IN( SELECT samplestatus.sample FROM SampleStatus samplestatus)";
-				
+				if (acceptedByUuid == null) {
+					queryStr += "sp IN( SELECT samplestatus.sample FROM SampleStatus samplestatus)";
+					
+				}
+				if (acceptedByUuid != null) {
+					queryStr += "sp IN ( SELECT samplestatus.sample FROM SampleStatus samplestatus WHERE samplestatus.user IN( SELECT usr FROM User usr WHERE uuid = :acceptedByUuid))";
+					
+				}
 			}
 		}
+		
 		queryStr += " ORDER BY sp.dateCreated DESC";
-		//System.out.println(queryStr);
 		Query query = session.createQuery(queryStr);
 		if (startDate != null && endDate != null) {
 			query.setParameter("startDate", startDate);
@@ -186,6 +186,9 @@ public class SampleDAO extends BaseDAO<Sample> {
 		
 		if (testCategory != null && testCategory != "Completed") {
 			query.setParameter("testCategory", testCategory);
+		}
+		if (acceptedByUuid != null && hasStatus.toLowerCase().equals("yes")) {
+			query.setParameter("acceptedByUuid", acceptedByUuid);
 		}
 		
 		if (pager.isAllowed()) {
@@ -325,4 +328,142 @@ public class SampleDAO extends BaseDAO<Sample> {
 		
 	}
 	
+	public ListResult<SampleExt> getSamplesWithoutAllocations(Date startDate, Date endDate, Pager pager,
+	        String locationUuid, String sampleCategory, String testCategory, String q, String hasStatus,
+	        String acceptedByUuid) {
+		
+		DbSession session = this.getSession();
+		
+		String queryStr = "SELECT sp \n" + "FROM SampleExt sp ";
+		
+		if (q != null) {
+			queryStr += " JOIN sp.visit v LEFT JOIN v.patient p LEFT JOIN p.names pname LEFT JOIN p.identifiers pi ";
+			
+			if (!queryStr.contains("WHERE")) {
+				queryStr += " WHERE ";
+			} else {
+				queryStr += " AND ";
+			}
+			
+			queryStr += "lower(sp.label) like lower(:q) OR (lower(concat(pname.givenName,pname.middleName,pname.familyName)) LIKE lower(:q) OR lower(pname.givenName) LIKE lower(:q) OR lower(pname.middleName) LIKE lower(:q) OR lower(pname.familyName) LIKE lower(:q) OR lower(concat(pname.givenName,'',pname.familyName)) LIKE lower(:q) OR lower(concat(pname.givenName,'',pname.middleName)) LIKE lower(:q) OR lower(concat(pname.middleName,'',pname.familyName)) LIKE lower(:q)  OR pi.identifier LIKE :q)";
+		}
+		
+		if (startDate != null && endDate != null) {
+			if (!queryStr.contains("WHERE")) {
+				queryStr += " WHERE ";
+			}
+			queryStr += " ((cast(sp.dateTime as date) BETWEEN :startDate AND :endDate) \n"
+			        + "OR (cast(sp.dateCreated as date) BETWEEN :startDate AND :endDate))";
+		}
+		
+		if (locationUuid != null) {
+			if (!queryStr.contains("WHERE")) {
+				queryStr += " WHERE ";
+			} else {
+				queryStr += " AND ";
+			}
+			queryStr += " sp.visit.location = (SELECT l FROM Location l WHERE l.uuid = :locationUuid)";
+		}
+		if (sampleCategory != null) {
+			if (!queryStr.contains("WHERE")) {
+				queryStr += " WHERE ";
+			} else {
+				queryStr += " AND ";
+			}
+			queryStr += "sp IN( SELECT sst.sample FROM SampleStatus sst WHERE sst.category=:sampleCategory)";
+			
+		}
+		if (testCategory != null && testCategory != "Completed") {
+			if (!queryStr.contains("WHERE")) {
+				queryStr += " WHERE ";
+			} else {
+				queryStr += " AND ";
+			}
+			queryStr += "sp IN(SELECT testalloc.sampleOrder.id.sample FROM TestAllocation testalloc WHERE testalloc IN (SELECT testallocstatus.testAllocation FROM TestAllocationStatus testallocstatus WHERE testallocstatus.category=:testCategory))";
+		}
+		
+		if (testCategory == "Completed") {
+			if (!queryStr.contains("WHERE")) {
+				queryStr += " WHERE ";
+			} else {
+				queryStr += " AND ";
+			}
+			queryStr += "sp IN(SELECT testalloc.sampleOrder.id.sample FROM TestAllocation testalloc WHERE testalloc IN (SELECT testresults.testAllocation FROM Result testresults))) ";
+			
+			//			queryStr+="LEFT JOIN TestAllocation testalloc ON testalloc.sampleOrder.id.sample = sp JOIN Result testresults ON testresults.testAllocation = testalloc GROUP BY sp HAVING COUNT(testalloc)=COUNT(testresults) ";
+			
+			//			queryStr +=" LEFT JOIN sp.testAllocations al LEFT JOIN al.testAllocationResults ar GROUP BY sp HAVING COUNT(al.id) = COUNT(ar.testAllocation)";
+			
+		}
+		
+		if (hasStatus != null) {
+			if (hasStatus.toLowerCase().equals("no")) {
+				
+				if (!queryStr.contains("WHERE")) {
+					queryStr += " WHERE ";
+				} else {
+					queryStr += " AND ";
+				}
+				queryStr += "sp NOT IN( SELECT samplestatus.sample FROM SampleStatus samplestatus)";
+				
+			}
+			if (hasStatus.toLowerCase().equals("yes")) {
+				
+				if (!queryStr.contains("WHERE")) {
+					queryStr += " WHERE ";
+				} else {
+					queryStr += " AND ";
+				}
+				
+				if (acceptedByUuid == null) {
+					queryStr += "sp IN( SELECT samplestatus.sample FROM SampleStatus samplestatus)";
+					
+				}
+				if (acceptedByUuid != null) {
+					queryStr += "sp IN ( SELECT samplestatus.sample FROM SampleStatus samplestatus WHERE samplestatus.user IN( SELECT usr FROM User usr WHERE uuid = :acceptedByUuid))";
+					
+				}
+				
+			}
+		}
+		queryStr += " ORDER BY sp.dateCreated DESC";
+		//System.out.println(queryStr);
+		Query query = session.createQuery(queryStr);
+		if (startDate != null && endDate != null) {
+			query.setParameter("startDate", startDate);
+			query.setParameter("endDate", endDate);
+		}
+		if (locationUuid != null) {
+			query.setParameter("locationUuid", locationUuid);
+		}
+		
+		if (sampleCategory != null) {
+			query.setParameter("sampleCategory", sampleCategory);
+		}
+		
+		if (q != null) {
+			query.setParameter("q", "%" + q.replace(" ", "%") + "%");
+		}
+		
+		if (testCategory != null && testCategory != "Completed") {
+			query.setParameter("testCategory", testCategory);
+		}
+		
+		if (acceptedByUuid != null && hasStatus.toLowerCase().equals("yes")) {
+			query.setParameter("acceptedByUuid", acceptedByUuid);
+		}
+		
+		if (pager.isAllowed()) {
+			pager.setTotal(query.list().size());
+			//pager.setPageCount(pager.getT);
+			query.setFirstResult((pager.getPage() - 1) * pager.getPageSize());
+			query.setMaxResults(pager.getPageSize());
+		}
+		
+		ListResult<SampleExt> listResults = new ListResult();
+		listResults.setPager(pager);
+		listResults.setResults(query.list());
+		return listResults;
+		
+	}
 }

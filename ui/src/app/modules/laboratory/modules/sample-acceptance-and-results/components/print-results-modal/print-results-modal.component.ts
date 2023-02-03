@@ -33,7 +33,6 @@ export class PrintResultsModalComponent implements OnInit {
   providerDetails$: Observable<any>;
   visit$: Observable<any>;
   referringDoctorAttributes$: any;
-  authorized: any;
   refferedFromFacility$: Observable<any>;
   obs$: Observable<any>;
   phoneNumber$: Observable<any>;
@@ -57,7 +56,6 @@ export class PrintResultsModalComponent implements OnInit {
           this.errorLoadingPhone = false;
           this.loadingPatientPhone = false;
           this.phoneNumber = response;
-          this.authorized = data.authorized;
         })
       );
     this.labConfigs = data?.labConfigs;

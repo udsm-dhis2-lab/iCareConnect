@@ -94,7 +94,11 @@
                 "
               >
                 {{ samplesGroupedByDepartment?.departmentName }}
-                {{ authorized ? "Final Report" : "Provisional Report" }}
+                {{
+                  samplesGroupedByDepartment["samples"][0]
+                    ? "Final Report"
+                    : "Provisional Report"
+                }}
               </div>
               <div>
                 <!-- {{ samplesGroupedByDepartment["samples"][0]?.orders[0] | json }} -->
@@ -370,13 +374,13 @@
                       <b>Results Fed By</b>
                     </td>
                     <td>
-                      {{
+                      <!-- {{
                         samplesGroupedByDepartment?.samples[0]?.orders[0]
                           ?.testAllocations[0]?.results[
                           samplesGroupedByDepartment?.samples[0]?.orders[0]
                             ?.testAllocations[0]?.results?.length - 1
                         ]?.resultsFedBy?.name
-                      }}
+                      }} -->
                     </td>
                   </tr>
 
@@ -387,13 +391,13 @@
                       <b>Results Fed At</b>
                     </td>
                     <td>
-                      {{
+                      <!-- {{
                         samplesGroupedByDepartment?.samples[0]?.orders[0]
                           ?.testAllocations[0]?.resultsCommentsStatuses[
                           samplesGroupedByDepartment?.samples[0]?.orders[0]
                             ?.testAllocations[0]?.results?.length - 1
                         ]?.timestamp | date: "medium"
-                      }}
+                      }} -->
                     </td>
                   </tr>
                   <tr *ngIf="!LISConfigurations?.isLIS">
@@ -403,13 +407,13 @@
                       <b>Requested By</b>
                     </td>
                     <td>
-                      {{
+                      <!-- {{
                         samplesGroupedByDepartment?.samples[0]?.orders[0]
                           ?.testAllocations[0]?.resultsCommentsStatuses[
                           samplesGroupedByDepartment?.samples[0]?.orders[0]
                             ?.testAllocations[0]?.results?.length - 1
                         ]?.timestamp | date: "medium"
-                      }}
+                      }} -->
                     </td>
                   </tr>
                 </table>
@@ -561,37 +565,22 @@
                                       Processing ..
                                     </span>
                                   </div>
-
                                   <div
                                     class="w-100"
-                                    *ngIf="
-                                      order?.order?.concept?.setMembers
-                                        ?.length > 0
-                                    "
+                                    *ngIf="order?.testAllocations?.length > 0"
                                   >
                                     <div
                                       *ngFor="
-                                        let parameter of order?.order?.concept
-                                          ?.setMembers;
+                                        let allocation of order?.testAllocations;
                                         let count = index
                                       "
                                     >
-                                      <!-- {{ parameter | json }} -->
                                       <app-shared-parameter-results
-                                        *ngIf="
-                                          order
-                                            ?.allocationsGroupedByParameterUuid[
-                                            parameter?.uuid
-                                          ]
-                                        "
                                         [order]="order"
+                                        [allocation]="allocation"
                                         [count]="count"
-                                        [parameter]="parameter"
-                                        [units]="
-                                          order?.order?.concept?.setMembers[
-                                            count
-                                          ]?.units
-                                        "
+                                        [parameter]="allocation?.parameter"
+                                        [units]="allocation?.parameter?.units"
                                       ></app-shared-parameter-results>
                                     </div>
                                   </div>
@@ -781,19 +770,27 @@
                               </tr>
                               <tr class="mb-2">
                                 <td colspan="100%">
-                                  <div *ngIf="order?.authorizationInfo[0]">
+                                  <div
+                                    *ngIf="
+                                      sample?.authorizationInfo &&
+                                      sample?.authorizationInfo[0]
+                                    "
+                                  >
                                     <b>Authorised By: </b
-                                    >{{
-                                      order?.authorizationInfo[0]?.statuses[0]
-                                        ?.name
-                                    }}
+                                    >{{ sample?.authorizationInfo[0]?.name }}
                                     <b class="ml-4">On: </b
                                     >{{
-                                      order?.authorizationInfo[0]?.statuses[0]
-                                        ?.timestamp | date: "medium"
+                                      sample?.authorizationInfo[0]?.timestamp
+                                        | date: "medium"
                                     }}
                                   </div>
-                                  <div *ngIf="!order?.authorizationInfo[0]">
+                                  <div
+                                    *ngIf="
+                                      !sample?.authorizationInfo ||
+                                      (sample?.authorizationInfo &&
+                                        !sample?.authorizationInfo[0])
+                                    "
+                                  >
                                     Un-Authorized
                                   </div>
                                 </td>

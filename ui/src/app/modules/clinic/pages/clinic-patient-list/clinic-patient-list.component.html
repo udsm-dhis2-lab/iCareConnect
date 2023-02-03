@@ -6,7 +6,8 @@
     radiologyOrderType: radiologyOrderType$ | async,
     drugOrderType: drugOrderType$ | async,
     labTestOrderType: labTestOrderType$ | async,
-    showAllPatientsTab: showAllPatientsTab$ | async
+    showAllPatientsTab: showAllPatientsTab$ | async,
+    userPrivileges: userPrivileges$ | async
   } as params"
 >
   <mat-toolbar>
@@ -147,6 +148,13 @@
               [encounterType]="'e22e39fd-7db2-45e7-80f1-60fa0d5a4378'"
               (selectPatient)="onSelectPatient($event)"
             ></app-patient-list>
+          </ng-template>
+        </mat-tab>
+        <mat-tab label="Every Patients History" *ngIf="params?.userPrivileges['CLINIC_VIEW_PATIENT_HISTORY_WITHOUT_ACTIVE_VISIT']">
+          <ng-template matTabContent>
+            <app-patient-search
+              (selectPatient)="onOpenHistory($event)"
+            ></app-patient-search>
           </ng-template>
         </mat-tab>
       </mat-tab-group>

@@ -8,6 +8,7 @@ import org.openmrs.api.LocationService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.icare.ICareConfig;
 import org.openmrs.module.icare.billing.models.Invoice;
+import org.openmrs.module.icare.core.ListResult;
 import org.openmrs.module.icare.store.models.IssueStatus;
 import org.openmrs.module.icare.store.models.Requisition;
 import org.openmrs.module.icare.store.models.RequisitionStatus;
@@ -17,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -204,17 +206,33 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		        "44938888-e444-ggg3-8aee-61d22227c22e"));
 		MockHttpServletResponse handleGet = handle(newGetRequest);
 		
-		List<Map<String, Object>> requests = (new ObjectMapper()).readValue(handleGet.getContentAsString(), List.class);
+		Map<String, Object> requests = (new ObjectMapper()).readValue(handleGet.getContentAsString(), Map.class);
 		
-		assertThat("Listing of requests has one request:", requests.size(), is(1));
+		List<Map<String, Object>> requestObject = ((List<Map<String, Object>>) requests.get("results"));
+		assertThat("Listing of requests has one request:", requestObject.size(), is(1));
 		
-		assertThat("The requested location id store A", ((Map) requests.get(0).get("requestedLocation")).get("display")
+		assertThat("The requested location id store A", ((Map) requestObject.get(0).get("requestedLocation")).get("display")
 		        .toString(), is("store A"));
 		
-		assertThat("The request has one request item", ((List) requests.get(0).get("requisitionItems")).size(), is(1));
+		assertThat("The request has one request item", ((List) requestObject.get(0).get("requisitionItems")).size(), is(1));
 		
-		assertThat("The requesting location id store B", ((Map) requests.get(0).get("requestingLocation")).get("display")
-		        .toString(), is("store B"));
+		assertThat("The requesting location id store B",
+		    ((Map) requestObject.get(0).get("requestingLocation")).get("display").toString(), is("store B"));
+		
+		// filter by status
+		MockHttpServletRequest newGetRequest2 = newGetRequest("store/requests", new Parameter("status", "RECEIVED"),
+		    new Parameter("requestingLocationUuid", "44939999-d333-fff2-9bff-61d11117c22e"));
+		
+		MockHttpServletResponse handleGet2 = handle(newGetRequest2);
+		System.out.println("=> " + handleGet2.getContentAsString());
+		Map<String, Object> requests2 = (new ObjectMapper()).readValue(handleGet2.getContentAsString(), Map.class);
+		
+		List<Map<String, Object>> requestObject2 = ((List<Map<String, Object>>) requests2.get("results"));
+		
+		assertThat("The requesting location id store B", ((List) requestObject2.get(0).get("requisitionStatuses")).size(),
+		    is(1));
+		
+		System.out.println(requestObject2);
 		
 	}
 	
@@ -366,20 +384,24 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		StoreService storeService = Context.getService(StoreService.class);
 		List<RequisitionStatus> list = storeService.getRequisitionStatuses();
 		
-		List<Requisition> reqs = storeService.getRequestsByRequestingLocation("44938888-e444-ggg3-8aee-61d22227c22e");
+		//List<Requisition> reqs = storeService.getRequestsByRequestingLocation("44938888-e444-ggg3-8aee-61d22227c22e");
 		
 		//get the requests
 		
 		MockHttpServletRequest newGetRequest = newGetRequest("store/requests", new Parameter("requestingLocationUuid",
-		        "44938888-e444-ggg3-8aee-61d22227c22e"));
+		        "44938888-e444-ggg3-8aee-61d22227c22e"), new Parameter("page", "1"), new Parameter("pageSize", "1"));
 		MockHttpServletResponse handleGet = handle(newGetRequest);
+		Map<String, Object> requests = (new ObjectMapper()).readValue(handleGet.getContentAsString(), Map.class);
+		System.out.println(requests);
+		Map<String, Object> pagerObject = (Map<String, Object>) requests.get("pager");
+		assertThat("Page Count is 1", (Integer) pagerObject.get("pageCount") == 1, is(true));
+		assertThat("Total is 1", (Integer) pagerObject.get("total") == 1, is(true));
+		assertThat("Page Size is 1", (Integer) pagerObject.get("pageSize") == 1, is(true));
+		assertThat("Page is 1", (Integer) pagerObject.get("page") == 1, is(true));
+		assertThat("List count is 1", ((List) requests.get("results")).size() == 1, is(true));
 		
-		List<Map<String, Object>> requests = (new ObjectMapper()).readValue(handleGet.getContentAsString(), List.class);
-		
-		Map<String, Object> request = requests.get(0);
-		
-		assertThat("requisition statuses are more than one for the request",
-		    ((List) request.get("requisitionStatuses")).size(), is(1));
+		//		assertThat("requisition statuses are more than one for the request",
+		//		    ((List) requests.get("requisitionStatuses")).size(), is(1));
 		
 	}
 	
@@ -637,5 +659,81 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		
 		System.out.println(stockList);
 		assertThat("stock listing has 4 entries:", stockList.size(), is(5));
+	}
+	
+	@Test
+	public void creatingAndGettingStockInvoices() throws Exception {
+		
+		String dto = this.readFile("dto/store/stock-invoice-create.json");
+		List<Map<String, Object>> stockInvoice = (new ObjectMapper()).readValue(dto, List.class);
+		
+		//post stock invoice
+		MockHttpServletRequest newPostRequest = newPostRequest("store/stockinvoices", stockInvoice);
+		MockHttpServletResponse handle = handle(newPostRequest);
+		
+		List<Map<String, Object>> createdStockInvoices = (new ObjectMapper()).readValue(handle.getContentAsString(),
+		    List.class);
+		
+		assertThat("created 1 stock invoice", createdStockInvoices.size(), is(1));
+		
+		//Get stock invoices
+		MockHttpServletRequest newGetRequest = newGetRequest("store/stockinvoices", new Parameter("page", "1"),
+		    new Parameter("pageSize", "1"));
+		MockHttpServletResponse handleGet = handle(newGetRequest);
+		Map<String, Object> stockInvoices = (new ObjectMapper()).readValue(handleGet.getContentAsString(), Map.class);
+		System.out.println(stockInvoices);
+		
+		Map<String, Object> pagerObject = (Map<String, Object>) stockInvoices.get("pager");
+		assertThat("page is 1", (Integer) pagerObject.get("page") == 1, is(true));
+		assertThat("Total is 2", (Integer) pagerObject.get("total") == 2, is(true));
+		assertThat("List count is 1", ((List) stockInvoices.get("results")).size() == 1, is(true));
+		
+	}
+	
+	@Test
+	public void creatingAndgettingSuppliers() throws Exception {
+		String dto = this.readFile("dto/store/supplier-create.json");
+		List<Map<String, Object>> suppliers = (new ObjectMapper()).readValue(dto, List.class);
+		
+		//post stock invoice
+		MockHttpServletRequest newPostRequest = newPostRequest("store/suppliers", suppliers);
+		MockHttpServletResponse handle = handle(newPostRequest);
+		
+		List<Map<String, Object>> createdSuppliers = (new ObjectMapper()).readValue(handle.getContentAsString(), List.class);
+		
+		assertThat("created 1 supplier", createdSuppliers.size(), is(1));
+		
+		//Getsuppliers
+		//Get stock invoices
+		MockHttpServletRequest newGetRequest = newGetRequest("store/suppliers", new Parameter("startIndex", "1"),
+		    new Parameter("limit", "10"));
+		MockHttpServletResponse handleGet = handle(newGetRequest);
+		List<Map<String, Object>> suppliersObjectMap = (new ObjectMapper()).readValue(handleGet.getContentAsString(),
+		    List.class);
+		assertThat("created 1 supplier", suppliersObjectMap.size(), is(1));
+		
+	}
+	
+	@Test
+	public void creatingAndGettingStockInvoicesStatus() throws Exception {
+		String dto = this.readFile("dto/store/stock-invoice-status-create.json");
+		List<Map<String, Object>> stockInvoiceStatusMapList = (new ObjectMapper()).readValue(dto, List.class);
+		
+		//post stock invoices status
+		MockHttpServletRequest newPostRequest = newPostRequest("store/stockinvoicesstatus", stockInvoiceStatusMapList);
+		MockHttpServletResponse handle = handle(newPostRequest);
+		
+		List<Map<String, Object>> createdStockInvoicesStatus = (new ObjectMapper()).readValue(handle.getContentAsString(),
+		    List.class);
+		assertThat("Created 1 stock invoice status", createdStockInvoicesStatus.size() == 1);
+		
+		// get stock invoices status
+		MockHttpServletRequest newGetRequest = newGetRequest("store/stockinvoicesstatus", new Parameter("startIndex", "1"),
+		    new Parameter("limit", "100"), new Parameter("q", "DRAFT"));
+		MockHttpServletResponse handle2 = handle((newGetRequest));
+		List<Map<String, Object>> stockInvoicesStatusListMap = (new ObjectMapper()).readValue(handle2.getContentAsString(),
+		    List.class);
+		assertThat("There is one drafted stock invoice", stockInvoicesStatusListMap.size(), is(1));
+		
 	}
 }
