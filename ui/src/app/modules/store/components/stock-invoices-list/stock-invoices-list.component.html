@@ -59,7 +59,12 @@
           </div>
         </div>
         <div class="inv-items-table container-fluid" *ngIf="this.viewStockInvoiceItems === stockInvoice?.uuid">
-          <app-stock-invoice-items [stockInvoice]="stockInvoice" [status]="status" [currentLocation]="currentLocation"></app-stock-invoice-items>
+          <app-stock-invoice-items 
+            [stockInvoice]="stockInvoice" 
+            [status]="status" 
+            [currentLocation]="currentLocation"
+            [unitsOfMeasurementSettings]="unitsOfMeasurementSettings"
+            ></app-stock-invoice-items>
         </div>
       </mat-expansion-panel>
     </mat-accordion>
