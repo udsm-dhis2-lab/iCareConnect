@@ -4,6 +4,7 @@ import org.openmrs.api.db.hibernate.DbSession;
 import org.openmrs.module.icare.core.dao.BaseDAO;
 import org.openmrs.module.icare.store.models.StockInvoiceItem;
 import org.hibernate.Query;
+import org.openmrs.module.icare.store.models.StockInvoiceItemStatus;
 
 public class StockInvoiceItemDAO extends BaseDAO<StockInvoiceItem> {
 	
@@ -70,6 +71,7 @@ public class StockInvoiceItemDAO extends BaseDAO<StockInvoiceItem> {
 			}
 			queryStr += " sti.unitPrice = :unitPrice";
 		}
+
 		
 		if (stockInvoiceItem.getExpiryDate() != null) {
 			if (!queryStr.contains("SET")) {
