@@ -25,5 +25,10 @@
           "uuid": "44939999-d333-fff2-9bff-61d11117c22e"
         }
       }
-    ]
+    ],
+  "stockInvoiceStatus": [
+    {
+      "status": "RECEIVED"
+    }
+  ]
   }

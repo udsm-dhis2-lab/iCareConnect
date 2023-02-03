@@ -775,14 +775,13 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		MockHttpServletResponse handle = handle(newPostRequest);
 		
 		Map<String, Object> updatedInvoice = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
-		System.out.println(updatedInvoice);
 		assertThat("stock invoice has been updated", updatedInvoice.get("invoiceNumber").equals("StInvoice3"));
 
 		Map<String,Object> invoiceItemMap = (Map)(((List) stockInvoiceMap.get("invoiceItems")).get(0));
-		//System.out.println(invoiceItemMap.);
+		System.out.println(((Map)invoiceItemMap.get("location")).get("uuid"));
 
 		//updating stock invoice status
-		MockHttpServletRequest newGetRequest = newGetRequest("store/stock",new Parameter("locationUuid",((Map)((Map)stockInvoiceMap.get("invoiceItems")).get("location")).get("uuid").toString()));
+		MockHttpServletRequest newGetRequest = newGetRequest("store/stock",new Parameter("locationUuid",((Map)invoiceItemMap.get("location")).get("uuid").toString()));
 		MockHttpServletResponse handle2 = handle(newGetRequest);
 		List<Map<String,Object>> stockItemGet = (new ObjectMapper()).readValue(handle2.getContentAsString(),List.class);
 		System.out.println(stockItemGet);
