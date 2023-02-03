@@ -787,6 +787,21 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		    "store/stockinvoiceitem/8800zx3570-8z37-11ff-2234-01102007812", stockInvoiceItemMap);
 		MockHttpServletResponse handle = handle(newPostRequest);
 		Map<String, Object> updateInvoiceItem = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
-		assertThat(" The stock invoice item has been updated", updateInvoiceItem.get("batchNo").equals("batch-2"));
+		assertThat(" The stock invoice item has been updated", updateInvoiceItem.get("batchNo").equals("batch-9"));
+
+		//updating stock invoice item status and saving stock
+
+		MockHttpServletRequest newGetRequest = newGetRequest("store/stock",new Parameter("locationUuid",((Map)stockInvoiceItemMap.get("location")).get("uuid").toString()));
+		MockHttpServletResponse handle2 = handle(newGetRequest);
+		List<Map<String,Object>> stockItemGet = (new ObjectMapper()).readValue(handle2.getContentAsString(),List.class);
+		boolean newBatchexist = false;
+		for(Map<String,Object> stockItem : stockItemGet){
+			if(stockItem.get("batch").equals("batch-9")){
+				newBatchexist = true;
+			}
+		}
+		assertThat("The stock is created from the stock invoice item",newBatchexist,is(true));
+
+
 	}
 }

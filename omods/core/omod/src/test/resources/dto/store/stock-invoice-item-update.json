@@ -1,7 +1,7 @@
 {
   "unitPrice": 10.0,
   "expiryDate": "2025-01-08T00:00:00.000Z",
-  "batchNo": "batch-2",
+  "batchNo": "batch-9",
   "amount": 20.0,
   "item": {
   "display": "Registration Fee",
@@ -12,5 +12,11 @@
   "uuid": "344ab1zz-x011-487z-868y-acc38ebc6252"
 },
   "batchQuantity": 10,
-  "orderQuantity": 10
+  "orderQuantity": 10,
+  "location": {
+    "uuid": "44939999-d333-fff2-9bff-61d11117c22e"
+  },
+  "stockInvoiceItemStatus": [{
+    "status": "RECEIVED"
+  }]
 }
