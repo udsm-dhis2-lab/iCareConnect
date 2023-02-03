@@ -341,6 +341,36 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		assertThat("Should return a visit", visitDetails.size() == 0);
 		
 	}
+
+	//New code here
+    @Test
+	public void testGetPatientsByRadiologyType() throws Exception {
+		
+		// Get patients by X-Ray
+		MockHttpServletRequest newGetRequest = newGetRequest("icare/visit", new Parameter("orderTypeUuid",
+		        "2msir5eb-5345-11e8-9922-40b034c3cfee"), new Parameter("attributeValueReference", "x-ray"), new Parameter(
+		        "OrderBy", "ENCOUNTER"), new Parameter("orderByDirection", "ASC"), new Parameter("radiologyType", "X-RAY"),
+		    new Parameter("q", " Harry"));
+		
+		MockHttpServletResponse handle = handle(newGetRequest);
+		String visitData = handle.getContentAsString();
+		Map visitMap = (new ObjectMapper()).readValue(visitData, Map.class);
+		List<Map> visitDetails = (List<Map>) visitMap.get("results");
+		System.out.println(visitDetails.size());
+		assertThat("Should return a visit", visitDetails.size() == 1);
+		
+		// Get patients by Ultrasonic
+		// When testing for ultrasonic will return 0 since there are no ultrasonic payments
+		newGetRequest = newGetRequest("icare/visit", new Parameter("attributeValueReference", "ultrasonic"));
+		handle = handle(newGetRequest);
+		visitData = handle.getContentAsString();
+		visitMap = (new ObjectMapper()).readValue(visitData, Map.class);
+		visitDetails = (List<Map>) visitMap.get("results");
+		System.out.println(visitDetails.size());
+		assertThat("Should return 0 visits", visitDetails.size() == 0);
+		
+	}
+
 	
 	@Test
 	@Ignore(value = "Changed to Advice")

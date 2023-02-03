@@ -69,13 +69,27 @@ export class PatientListFiltersComponent implements OnInit {
             ...this.filterParameters,
             `&paymentStatus=${filter?.value?.display}`,
           ];
-        }
+        }else if (
+           filter?.value?.display === "Ultrasonic" ||
+           filter?.value?.display === "X-Ray") {
+          var searchPattern = new RegExp("^&patientType=");
+          this.filterParameters = this.filterOutStringFromStringList(
+            this.filterParameters,
+            searchPattern
+          );
+          this.filterParameters = [
+            ...this.filterParameters,
+            `&patientType=${filter?.value?.display}`,
+          ];
+        }//New code here
       }
 
       if (
         filter?.value &&
         filter?.value?.display !== "PENDING" &&
-        filter?.value?.display !== "PAID"
+        filter?.value?.display !== "PAID" &&
+        filter?.value?.display !== "Ultrasonic" && //New code here
+        filter?.value?.display !== "X-Ray"
       ) {
         var searchPattern = new RegExp("^&attributeValueReference=");
 

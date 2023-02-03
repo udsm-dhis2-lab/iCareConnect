@@ -348,4 +348,8 @@ public class VisitWrapper {
 	public enum PaymentStatus {
 		PAID, PENDING;
 	}
+
+	public enum RadiologyType {
+		XRAY, ULTRASONIC;
+	}
 }
