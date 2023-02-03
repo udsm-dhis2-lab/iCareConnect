@@ -9,11 +9,16 @@
     <table class="table table-responsive col-11">
       <mat-progress-bar mode="indeterminate" *ngIf="reloadFields"></mat-progress-bar>
       <tbody *ngIf="!reloadFields">
-        <tr>
-          <td *ngIf="itemField">
+        <tr class="dflex">
+          <td *ngIf="itemField" class="w-25">
             <app-form [fields]="[itemField]" (formUpdate)="onFormUpdate($event)"></app-form>
+            <span class="text-small text-secondary">
+              <i>
+                Selected Item: {{ this.stockInvoiceItem?.item?.display}}
+              </i>
+            </span>
           </td>
-          <ng-container *ngIf="itemFields">
+          <ng-container *ngIf="itemFields" class="w-75">
             <td *ngFor="let itemField of itemFields">
               <app-form [fields]="[itemField]" (formUpdate)="onFormUpdate($event)"></app-form>
             </td>
@@ -64,7 +69,7 @@
         <mat-icon>save</mat-icon>
       </button>
     </div>
-    <div class="container-fluid">
+    <!-- <div class="container-fluid">
       <div class="row" *ngIf="showItems">
           <div class="col-6">
             <div class="w-100">
@@ -100,6 +105,6 @@
             </div>
           </div>
       </div>
-    </div>
+    </div> -->
   </div>
 </div>
