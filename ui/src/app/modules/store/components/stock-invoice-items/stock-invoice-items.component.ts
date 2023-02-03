@@ -17,6 +17,7 @@ export class StockInvoiceItemsComponent implements OnInit {
   @Input() stockInvoice: any;
   @Input() status: any;
   @Input() currentLocation: any;
+  @Input() unitsOfMeasurementSettings: any;
 
   errors: any[];
   specificStockInvoice$: Observable<any>;
@@ -44,11 +45,15 @@ export class StockInvoiceItemsComponent implements OnInit {
         width: "80%",
         data: {
           stockInvoiceItem: stockInvoiceItem,
+          unitsOfMeasurementSettings: this.unitsOfMeasurementSettings,
+          currentLocation: this.currentLocation
         },
       });
     }
     if (key === "receive") {
       const invoicesItemObject = {
+        ...stockInvoiceItem,
+        expiryDate: new Date(stockInvoiceItem?.expiryDate).toISOString(),
         stockInvoiceItemStatus: [
           {
             status: "RECEIVED",
@@ -63,6 +68,7 @@ export class StockInvoiceItemsComponent implements OnInit {
     }
     if (key === "delete") {
       const invoicesItemObject = {
+        ...stockInvoiceItem,
         location: {
           uuid: this.currentLocation?.uuid,
         },

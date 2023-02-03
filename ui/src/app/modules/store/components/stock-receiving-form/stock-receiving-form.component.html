@@ -26,7 +26,7 @@
       </mat-accordion>
     </div>
   </div>
-  <div class="row mt-3" *ngIf="(params?.unitsOfMeasurements && suppliers && unitsOfMeasurementSettings) || stockInvoiceItem">
+  <div class="row mt-3" *ngIf="(params?.unitsOfMeasurements && suppliers && unitsOfMeasurementSettings) || (stockInvoiceItem && params?.unitsOfMeasurements)">
     <app-stock-receiving-form-fields 
       class="w-100"
       [suppliers]="suppliers"

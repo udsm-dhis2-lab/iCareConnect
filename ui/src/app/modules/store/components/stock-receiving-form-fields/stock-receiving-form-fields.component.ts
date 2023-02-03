@@ -119,13 +119,6 @@ export class StockReceivingFormFieldsComponent implements OnInit {
       };
     });
 
-    console.log(
-      "==> Unit of measure: ",
-      this.unitsOfMeasurements?.filter(
-        (unit) => unit?.uuid === this.stockInvoiceItem?.uom?.uuid
-      )[0]
-    );
-
     this.itemField = new Textbox({
       id: "item",
       key: "item",
@@ -231,17 +224,20 @@ export class StockReceivingFormFieldsComponent implements OnInit {
     this.batchQuantity = this.formValues?.batchQuantity?.value;
     this.unitPrice = this.formValues?.unitPrice?.value;
     if (this.batchQuantity?.length && this.unitPrice?.length) {
-      const unit =
-        this.unitOfMeasure?.mappings?.filter(
-          (mapping) =>
-            mapping?.conceptReferenceTerm?.uuid ===
-            this.unitsOfMeasurementSettings?.conceptReferenceTerm
-        )[0]?.conceptReferenceTerm?.code || 1;
-      this.amount = (
-        parseFloat(this.unitPrice) *
-        parseInt(this.batchQuantity) *
-        unit
-      ).toFixed(2);
+      this.amount = undefined;
+      setTimeout(() => {
+        const unit =
+          this.unitOfMeasure?.mappings?.filter(
+            (mapping) =>
+              mapping?.conceptReferenceTerm?.uuid ===
+              this.unitsOfMeasurementSettings?.conceptReferenceTerm
+          )[0]?.conceptReferenceTerm?.code || 1;
+        this.amount = (
+          parseFloat(this.unitPrice) *
+          parseInt(this.batchQuantity) *
+          unit
+        ).toFixed(2);
+      }, 100)
     }
   }
 
@@ -405,7 +401,7 @@ export class StockReceivingFormFieldsComponent implements OnInit {
     e?.stopPropagation();
     const invoicesItemObject = {
       item: {
-        uuid: this.stockInvoiceItem?.uuid,
+        uuid: this.selectedItem ? this.selectedItem?.uuid : this.stockInvoiceItem?.item?.uuid,
       },
       batchNo: this.formValues?.mfgBatchNumber?.value,
       orderQuantity: Number(this.formValues?.orderQuantity?.value),
@@ -413,8 +409,11 @@ export class StockReceivingFormFieldsComponent implements OnInit {
       amount: parseFloat(this.amount),
       unitPrice: parseFloat(this.unitPrice),
       location: {
-        uuid: this.currentLocation?.uuid
+        uuid: this.currentLocation?.uuid,
       },
+      stockInvoiceItemStatus: [{
+        status: 'DRAFT',
+      }],
       uom: {
         uuid: this.unitOfMeasure?.uuid,
       },
