@@ -23,6 +23,7 @@ export class StockReceivingFormFieldsComponent implements OnInit {
   @Input() unitsOfMeasurementSettings: any;
   @Input() existingStockInvoice: any;
   @Input() stockInvoiceItem: any;
+  @Input() currentLocation: any;
   @Output() loadInvoice: EventEmitter<any> = new EventEmitter();
   @Output() closeDialog: EventEmitter<any> = new EventEmitter();
 
@@ -118,6 +119,13 @@ export class StockReceivingFormFieldsComponent implements OnInit {
       };
     });
 
+    console.log(
+      "==> Unit of measure: ",
+      this.unitsOfMeasurements?.filter(
+        (unit) => unit?.uuid === this.stockInvoiceItem?.uom?.uuid
+      )[0]
+    );
+
     this.itemField = new Textbox({
       id: "item",
       key: "item",
@@ -132,7 +140,7 @@ export class StockReceivingFormFieldsComponent implements OnInit {
       value: this.stockInvoiceItem
         ? this.unitsOfMeasurements?.filter(
             (unit) => unit?.uuid === this.stockInvoiceItem?.uom?.uuid
-          )[0]?.uuid
+          )[0]
         : "",
     })),
       (this.orderQuantityField = new Textbox({
@@ -171,6 +179,7 @@ export class StockReceivingFormFieldsComponent implements OnInit {
         label: "Unit Price",
         value: this.stockInvoiceItem ? this.stockInvoiceItem?.unitPrice : "",
       })),
+      this.amount = this?.stockInvoiceItem ? this?.stockInvoiceItem?.amount : undefined;
       (this.amountField = new Textbox({
         id: "amount",
         key: "amount",
@@ -313,6 +322,9 @@ export class StockReceivingFormFieldsComponent implements OnInit {
             batchQuantity: Number(this.batchQuantity),
             amount: parseFloat(this.amount),
             unitPrice: parseFloat(this.unitPrice),
+            location: {
+              uuid: this.currentLocation?.uuid
+            },
             uom: {
               uuid: this.unitOfMeasure?.uuid,
             },
@@ -400,6 +412,9 @@ export class StockReceivingFormFieldsComponent implements OnInit {
       batchQuantity: Number(this.batchQuantity),
       amount: parseFloat(this.amount),
       unitPrice: parseFloat(this.unitPrice),
+      location: {
+        uuid: this.currentLocation?.uuid
+      },
       uom: {
         uuid: this.unitOfMeasure?.uuid,
       },

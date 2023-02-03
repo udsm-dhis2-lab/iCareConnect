@@ -3,7 +3,7 @@ import { MatDialog } from "@angular/material/dialog";
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
 import { StockInvoicesService } from "src/app/shared/resources/store/services/stockInvoice.service";
-import { StockInvoiceFormDialogComponent } from "../stock-invoice-form-dialog/stock-invoice-form-dialog.component";
+import { StockInvoiceFormDialogComponent } from "../../modals/stock-invoice-form-dialog/stock-invoice-form-dialog.component";
 @Component({
   selector: "app-stock-invoices-list",
   templateUrl: "./stock-invoices-list.component.html",
@@ -13,6 +13,7 @@ export class StockInvoicesListComponent implements OnInit {
   @Input() suppliers: any[];
   @Input() unitsOfMeasurementSettings: any;
   @Input() status: any;
+  @Input() currentLocation: any;
 
   errors: any[];
   stockInvoices$: Observable<any>;
