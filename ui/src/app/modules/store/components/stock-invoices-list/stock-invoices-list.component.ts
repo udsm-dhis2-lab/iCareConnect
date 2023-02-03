@@ -65,6 +65,7 @@ export class StockInvoicesListComponent implements OnInit {
         if (data?.confirmed) {
           const stockInvoiceObject = {
             ...stockInvoice,
+            receivingDate: new Date(stockInvoice?.receivingDate).toISOString(),
             stockInvoiceStatus: [
               {
                 status: 'RECEIVED'
