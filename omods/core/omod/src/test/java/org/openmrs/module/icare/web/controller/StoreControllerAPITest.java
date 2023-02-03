@@ -795,7 +795,7 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		String dto = this.readFile("dto/store/stock-invoice-item-update.json");
 		Map<String, Object> stockInvoiceItemMap = (new ObjectMapper()).readValue(dto, Map.class);
 		MockHttpServletRequest newPostRequest = newPostRequest(
-		    "store/stockinvoiceitem/8800zx357created0-8z37-11ff-2234-01102007812", stockInvoiceItemMap);
+		    "store/stockinvoiceitem/8800zx3570-8z37-11ff-2234-01102007812", stockInvoiceItemMap);
 		MockHttpServletResponse handle = handle(newPostRequest);
 		Map<String, Object> updateInvoiceItem = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
 		assertThat(" The stock invoice item has been updated", updateInvoiceItem.get("batchNo").equals("batch-9"));
