@@ -119,10 +119,20 @@ export class StockReceivingFormFieldsComponent implements OnInit {
       };
     });
 
-    this.itemField = new Textbox({
+    // this.itemField = new Textbox({
+    //   id: "item",
+    //   key: "item",
+    //   label: "Item",
+    //   value: this.stockInvoiceItem ? this.stockInvoiceItem?.item?.display : "",
+    // });
+    this.itemField = new Dropdown({
       id: "item",
       key: "item",
       label: "Item",
+      required: true,
+      options: [],
+      shouldHaveLiveSearchForDropDownFields: true,
+      searchControlType: "billableItem",
       value: this.stockInvoiceItem ? this.stockInvoiceItem?.item?.display : "",
     });
     (this.unitField = new Dropdown({
@@ -196,28 +206,29 @@ export class StockReceivingFormFieldsComponent implements OnInit {
       ...formValues.getValues(),
     };
 
-    if (this.formValues?.item?.value?.length >= 3) {
-      if (this.selectedItem?.display === this.formValues?.item?.value) {
-        this.showItems = false;
-      }
-      if (this.selectedItem?.display !== this.formValues?.item?.value) {
-        this.showItems = true;
-        this.searchingItems = true;
-        this.itemPriceService
-          .getItem(this.formValues?.item?.value)
-          .pipe(
-            map((response) => {
-              if (!response?.error) {
-                this.searchingItems = false;
-                this.items = response;
-                this.getItemsInPages();
-              }
-            })
-          )
-          .subscribe();
-      }
-    }
+    // if (this.formValues?.item?.value?.length >= 3) {
+    //   if (this.selectedItem?.display === this.formValues?.item?.value) {
+    //     this.showItems = false;
+    //   }
+    //   if (this.selectedItem?.display !== this.formValues?.item?.value) {
+    //     this.showItems = true;
+    //     this.searchingItems = true;
+    //     this.itemPriceService
+    //       .getItem(this.formValues?.item?.value)
+    //       .pipe(
+    //         map((response) => {
+    //           if (!response?.error) {
+    //             this.searchingItems = false;
+    //             this.items = response;
+    //             this.getItemsInPages();
+    //           }
+    //         })
+    //       )
+    //       .subscribe();
+    //   }
+    // }
 
+    this.selectedItem = this.formValues?.item?.value;
     this.unitOfMeasure = this.formValues?.unit?.value
       ? this.formValues?.unit?.value
       : undefined;
@@ -311,7 +322,7 @@ export class StockReceivingFormFieldsComponent implements OnInit {
         invoiceItems: [
           {
             item: {
-              uuid: this.selectedItem?.uuid,
+              uuid: this.selectedItem,
             },
             batchNo: this.formValues?.mfgBatchNumber?.value,
             orderQuantity: Number(this.formValues?.orderQuantity?.value),
@@ -319,7 +330,7 @@ export class StockReceivingFormFieldsComponent implements OnInit {
             amount: parseFloat(this.amount),
             unitPrice: parseFloat(this.unitPrice),
             location: {
-              uuid: this.currentLocation?.uuid
+              uuid: this.currentLocation?.uuid,
             },
             uom: {
               uuid: this.unitOfMeasure?.uuid,
@@ -359,7 +370,7 @@ export class StockReceivingFormFieldsComponent implements OnInit {
           invoiceItems: [
             {
               item: {
-                uuid: this.selectedItem?.uuid,
+                uuid: this.selectedItem,
               },
               batchNo: this.formValues?.mfgBatchNumber?.value,
               orderQuantity: Number(this.formValues?.orderQuantity?.value),
@@ -368,6 +379,9 @@ export class StockReceivingFormFieldsComponent implements OnInit {
               unitPrice: parseFloat(this.unitPrice),
               uom: {
                 uuid: this.unitOfMeasure?.uuid,
+              },
+              location: {
+                uuid: this.currentLocation?.uuid,
               },
               expiryDate: new Date(
                 moment(this.formValues?.expiryDate?.value).toDate()
@@ -401,7 +415,7 @@ export class StockReceivingFormFieldsComponent implements OnInit {
     e?.stopPropagation();
     const invoicesItemObject = {
       item: {
-        uuid: this.selectedItem ? this.selectedItem?.uuid : this.stockInvoiceItem?.item?.uuid,
+        uuid: this.selectedItem ? this.selectedItem : this.stockInvoiceItem?.item?.uuid,
       },
       batchNo: this.formValues?.mfgBatchNumber?.value,
       orderQuantity: Number(this.formValues?.orderQuantity?.value),
