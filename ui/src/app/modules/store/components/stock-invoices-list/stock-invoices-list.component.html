@@ -41,7 +41,7 @@
                 <a 
                   class="anchor-button ml-4" 
                   color="primary"
-                  (click)="onViewStockInvoiceItems(stockInvoice?.uuid)"  
+                  (click)="onReceiveStockInvoiceItems(stockInvoice)"  
                   matTooltip="Mark this invoice received"
                 >
                     <mat-icon>check</mat-icon>
@@ -58,12 +58,14 @@
             </div>
           </div>
         </div>
-        <div class="inv-items-table container-fluid" *ngIf="this.viewStockInvoiceItems === stockInvoice?.uuid">
+        <mat-progress-bar mode="indeterminate" *ngIf="this.viewStockInvoiceItems === stockInvoice?.uuid && loading"></mat-progress-bar>
+        <div class="inv-items-table container-fluid" *ngIf="this.viewStockInvoiceItems === stockInvoice?.uuid && !loading">
           <app-stock-invoice-items 
             [stockInvoice]="stockInvoice" 
             [status]="status" 
             [currentLocation]="currentLocation"
             [unitsOfMeasurementSettings]="unitsOfMeasurementSettings"
+            (reloadList)="onReloadStockIvoiceItemsList()"
             ></app-stock-invoice-items>
         </div>
       </mat-expansion-panel>
