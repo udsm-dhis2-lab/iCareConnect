@@ -49,7 +49,7 @@
       *ngIf="!stockInvoiceItem"
         class="button-round mt-3"
         color="primary"
-        mat-stroked-button
+        mat-flat-button
         (click)="saveInvoices($event)"
       >
         <mat-icon>add</mat-icon>
@@ -58,10 +58,10 @@
       *ngIf="stockInvoiceItem"
         class="button-round mt-3"
         color="primary"
-        mat-stroked-button
+        mat-flat-button
         (click)="updateInvoiceItem($event)"
       >
-        <mat-icon>add</mat-icon>
+        <mat-icon>save</mat-icon>
       </button>
     </div>
     <div class="container-fluid">

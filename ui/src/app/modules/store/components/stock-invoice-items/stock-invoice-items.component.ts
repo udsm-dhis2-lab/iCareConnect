@@ -37,12 +37,46 @@ export class StockInvoiceItemsComponent implements OnInit {
       );
   }
 
-  onUpdateStockInvoiceItem(stockInvoiceItem) {
-    this.dialog.open(StockInvoiceFormDialogComponent, {
-      width: "80%",
-      data: {
-        stockInvoiceItem: stockInvoiceItem,
-      },
-    });
+  onUpdateStockInvoiceItem(stockInvoiceItem, key: string) {
+    if(!key){
+      this.dialog.open(StockInvoiceFormDialogComponent, {
+        width: "80%",
+        data: {
+          stockInvoiceItem: stockInvoiceItem,
+        },
+      });
+    }
+    if(key === 'receive'){
+     const invoicesItemObject = {
+        stockInvoiceItemStatus: [
+          {
+            status: 'RECEIVED'
+          }
+        ],
+        
+      };
+
+      this.stockInvoicesService
+        .updateStockInvoiceItem(stockInvoiceItem?.uuid, invoicesItemObject)
+        .pipe(
+          tap((response) => {
+          })
+        )
+        .subscribe();
+    }
+    if(key === 'delete'){
+     const invoicesItemObject = {
+        voided: true,
+      };
+
+      this.stockInvoicesService
+        .updateStockInvoiceItem(stockInvoiceItem?.uuid, invoicesItemObject)
+        .pipe(
+          tap((response) => {
+          })
+        )
+        .subscribe();
+    }
+    
   }
 }
