@@ -17,6 +17,7 @@ import org.openmrs.module.icare.store.models.*;
 import org.openmrs.module.icare.store.util.StockOutException;
 import org.openmrs.module.icare.store.util.TransactionUtil;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -602,9 +603,29 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 				stockInvoiceStatus.setRemarks(stockInvoiceStatus.getStatus());
 				stockInvoiceStatus.setStockInvoice(existingStockInvoice);
 				this.saveStockInvoiceStatus(stockInvoiceStatus);
+
+				if (stockInvoiceStatus.status.equals(StockInvoiceItemStatus.Type.RECEIVED.toString())) {
+					for(StockInvoiceItem stockInvoiceItem : stockInvoice.getStockInvoiceItems()){
+
+						boolean isStatusReceieved = false;
+						for(StockInvoiceItemStatus stockInvoiceItemStatus : stockInvoiceItem.getStockInvoiceItemStatuses()){
+							if(stockInvoiceItemStatus.getStatus().equals(StockInvoiceItemStatus.Type.RECEIVED.toString())){
+								isStatusReceieved = true;
+							}
+						}
+						if(isStatusReceieved = false){
+							List<StockInvoiceItemStatus> stockInvoiceItemStatusList = new ArrayList<>();
+							StockInvoiceItemStatus stockInvoiceItemStatus = new StockInvoiceItemStatus();
+							stockInvoiceItemStatus.setStatus(StockInvoiceItemStatus.Type.RECEIVED.toString());
+							stockInvoiceItemStatusList.add(stockInvoiceItemStatus);
+							stockInvoiceItem.setStockInvoiceItemStatuses(stockInvoiceItemStatusList);
+							this.updateStockInvoiceItem(stockInvoiceItem);
+						}
+					}
+				}
+
 			}
 		}
-		
 		return existingStockInvoice;
 	}
 	
