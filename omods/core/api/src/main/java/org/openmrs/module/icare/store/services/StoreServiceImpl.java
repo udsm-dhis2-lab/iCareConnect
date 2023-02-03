@@ -622,22 +622,33 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 				throw new Exception("The item with uuid " + stockInvoiceItem.getItem().getUuid() + " does not exist");
 			}
 			stockInvoiceItem.setItem(item);
+		}
+
+		if(stockInvoiceItem.getLocation() != null) {
+			Location location = Context.getLocationService().getLocationByUuid(stockInvoiceItem.getLocation().getUuid());
+			if (location == null) {
+				throw new Exception("The location with uuid " + stockInvoiceItem.getLocation().getUuid() + " does not exist");
+			}
+			stockInvoiceItem.setLocation(location);
+		}
+			// Saving stock invoice status
 			if (stockInvoiceItem.getStockInvoiceItemStatuses() != null) {
 				for (StockInvoiceItemStatus stockInvoiceItemStatus : stockInvoiceItem.getStockInvoiceItemStatuses()) {
-					stockInvoiceItemStatus.setStockInvoiceItem(stockInvoiceItem);
+					StockInvoiceItem existingStockInvoiceItem = this.getStockInvoiceItemByUuid(stockInvoiceItem.getUuid());
+					stockInvoiceItemStatus.setStockInvoiceItem(existingStockInvoiceItem);
 					this.saveStockInvoiceItemStatus(stockInvoiceItemStatus);
-					
-					if (stockInvoiceItemStatus.status.equals(StockInvoiceItemStatus.Type.RECEIVED)) {
+
+					if (stockInvoiceItemStatus.status.equals(StockInvoiceItemStatus.Type.RECEIVED.toString())) {
 						TransactionUtil.operateOnStock("+", stockInvoiceItem);
 					}
 				}
 			}
-		}
+
 		return stockInvoiceItemDAO.updateStockInvoiceItem(stockInvoiceItem);
 	}
 	
 	@Override
-	public StockInvoiceItem getStockInvoiceItem(String stockInvoiceItemUuid) {
+	public StockInvoiceItem getStockInvoiceItemByUuid(String stockInvoiceItemUuid) {
 		return stockInvoiceItemDAO.findByUuid(stockInvoiceItemUuid);
 	}
 	

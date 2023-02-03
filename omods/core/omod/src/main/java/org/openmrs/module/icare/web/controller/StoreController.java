@@ -677,7 +677,7 @@ public class StoreController {
 	@RequestMapping(value = "stockinvoiceitem/{stockInvoiceItemUuid}", method = RequestMethod.GET)
 	@ResponseBody
 	public Map<String, Object> getStockInvoiceItemByUuid(@PathVariable String stockInvoiceItemUuid) {
-		StockInvoiceItem stockInvoiceItem = storeService.getStockInvoiceItem(stockInvoiceItemUuid);
+		StockInvoiceItem stockInvoiceItem = storeService.getStockInvoiceItemByUuid(stockInvoiceItemUuid);
 		return stockInvoiceItem.toMap();
 	}
 }
