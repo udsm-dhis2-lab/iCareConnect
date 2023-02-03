@@ -595,7 +595,7 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 			List<StockInvoiceItem> savedStockInvoiceItems = stockInvoice.getStockInvoiceItems();
 			existingStockInvoice.setStockInvoiceItems(savedStockInvoiceItems);
 		}
-		
+		System.out.println(stockInvoice.getStockInvoiceStatuses());
 		if (stockInvoice.getStockInvoiceStatuses() != null) {
 			for (StockInvoiceStatus stockInvoiceStatus : stockInvoice.getStockInvoiceStatuses()) {
 				//TODO Limit status to check the ones available in enums
@@ -606,14 +606,15 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 
 				if (stockInvoiceStatus.status.equals(StockInvoiceItemStatus.Type.RECEIVED.toString())) {
 					for(StockInvoiceItem stockInvoiceItem : stockInvoice.getStockInvoiceItems()){
-
+						System.out.println("aabb");
 						boolean isStatusReceieved = false;
 						for(StockInvoiceItemStatus stockInvoiceItemStatus : stockInvoiceItem.getStockInvoiceItemStatuses()){
 							if(stockInvoiceItemStatus.getStatus().equals(StockInvoiceItemStatus.Type.RECEIVED.toString())){
 								isStatusReceieved = true;
 							}
+
 						}
-						if(isStatusReceieved = false){
+						if(isStatusReceieved == false){
 							List<StockInvoiceItemStatus> stockInvoiceItemStatusList = new ArrayList<>();
 							StockInvoiceItemStatus stockInvoiceItemStatus = new StockInvoiceItemStatus();
 							stockInvoiceItemStatus.setStatus(StockInvoiceItemStatus.Type.RECEIVED.toString());
