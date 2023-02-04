@@ -11,7 +11,7 @@ public class StockInvoiceDAO extends BaseDAO<StockInvoice> {
 	
 	public ListResult<StockInvoice> getStockInvoices(Pager pager) {
 		DbSession session = this.getSession();
-		String queryStr = " SELECT stinv FROM StockInvoice stinv";
+		String queryStr = " SELECT stinv FROM StockInvoice stinv WHERE stinv.voided = false";
 		
 		Query query = session.createQuery(queryStr);
 		
