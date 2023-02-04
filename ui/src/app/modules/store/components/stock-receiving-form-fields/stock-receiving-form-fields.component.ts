@@ -23,6 +23,7 @@ export class StockReceivingFormFieldsComponent implements OnInit {
   @Input() unitsOfMeasurementSettings: any;
   @Input() existingStockInvoice: any;
   @Input() stockInvoiceItem: any;
+  @Input() currentLocation: any;
   @Output() loadInvoice: EventEmitter<any> = new EventEmitter();
   @Output() closeDialog: EventEmitter<any> = new EventEmitter();
 
@@ -118,10 +119,20 @@ export class StockReceivingFormFieldsComponent implements OnInit {
       };
     });
 
-    this.itemField = new Textbox({
+    // this.itemField = new Textbox({
+    //   id: "item",
+    //   key: "item",
+    //   label: "Item",
+    //   value: this.stockInvoiceItem ? this.stockInvoiceItem?.item?.display : "",
+    // });
+    this.itemField = new Dropdown({
       id: "item",
       key: "item",
       label: "Item",
+      required: true,
+      options: [],
+      shouldHaveLiveSearchForDropDownFields: true,
+      searchControlType: "billableItem",
       value: this.stockInvoiceItem ? this.stockInvoiceItem?.item?.display : "",
     });
     (this.unitField = new Dropdown({
@@ -132,7 +143,7 @@ export class StockReceivingFormFieldsComponent implements OnInit {
       value: this.stockInvoiceItem
         ? this.unitsOfMeasurements?.filter(
             (unit) => unit?.uuid === this.stockInvoiceItem?.uom?.uuid
-          )[0]?.uuid
+          )[0]
         : "",
     })),
       (this.orderQuantityField = new Textbox({
@@ -171,6 +182,7 @@ export class StockReceivingFormFieldsComponent implements OnInit {
         label: "Unit Price",
         value: this.stockInvoiceItem ? this.stockInvoiceItem?.unitPrice : "",
       })),
+      this.amount = this?.stockInvoiceItem ? this?.stockInvoiceItem?.amount : undefined;
       (this.amountField = new Textbox({
         id: "amount",
         key: "amount",
@@ -194,45 +206,49 @@ export class StockReceivingFormFieldsComponent implements OnInit {
       ...formValues.getValues(),
     };
 
-    if (this.formValues?.item?.value?.length >= 3) {
-      if (this.selectedItem?.display === this.formValues?.item?.value) {
-        this.showItems = false;
-      }
-      if (this.selectedItem?.display !== this.formValues?.item?.value) {
-        this.showItems = true;
-        this.searchingItems = true;
-        this.itemPriceService
-          .getItem(this.formValues?.item?.value)
-          .pipe(
-            map((response) => {
-              if (!response?.error) {
-                this.searchingItems = false;
-                this.items = response;
-                this.getItemsInPages();
-              }
-            })
-          )
-          .subscribe();
-      }
-    }
+    // if (this.formValues?.item?.value?.length >= 3) {
+    //   if (this.selectedItem?.display === this.formValues?.item?.value) {
+    //     this.showItems = false;
+    //   }
+    //   if (this.selectedItem?.display !== this.formValues?.item?.value) {
+    //     this.showItems = true;
+    //     this.searchingItems = true;
+    //     this.itemPriceService
+    //       .getItem(this.formValues?.item?.value)
+    //       .pipe(
+    //         map((response) => {
+    //           if (!response?.error) {
+    //             this.searchingItems = false;
+    //             this.items = response;
+    //             this.getItemsInPages();
+    //           }
+    //         })
+    //       )
+    //       .subscribe();
+    //   }
+    // }
 
+    this.selectedItem = this.formValues?.item?.value;
     this.unitOfMeasure = this.formValues?.unit?.value
       ? this.formValues?.unit?.value
       : undefined;
     this.batchQuantity = this.formValues?.batchQuantity?.value;
     this.unitPrice = this.formValues?.unitPrice?.value;
     if (this.batchQuantity?.length && this.unitPrice?.length) {
-      const unit =
-        this.unitOfMeasure?.mappings?.filter(
-          (mapping) =>
-            mapping?.conceptReferenceTerm?.uuid ===
-            this.unitsOfMeasurementSettings?.conceptReferenceTerm
-        )[0]?.conceptReferenceTerm?.code || 1;
-      this.amount = (
-        parseFloat(this.unitPrice) *
-        parseInt(this.batchQuantity) *
-        unit
-      ).toFixed(2);
+      this.amount = undefined;
+      setTimeout(() => {
+        const unit =
+          this.unitOfMeasure?.mappings?.filter(
+            (mapping) =>
+              mapping?.conceptReferenceTerm?.uuid ===
+              this.unitsOfMeasurementSettings?.conceptReferenceTerm
+          )[0]?.conceptReferenceTerm?.code || 1;
+        this.amount = (
+          parseFloat(this.unitPrice) *
+          parseInt(this.batchQuantity) *
+          unit
+        ).toFixed(2);
+      }, 100)
     }
   }
 
@@ -306,13 +322,16 @@ export class StockReceivingFormFieldsComponent implements OnInit {
         invoiceItems: [
           {
             item: {
-              uuid: this.selectedItem?.uuid,
+              uuid: this.selectedItem,
             },
             batchNo: this.formValues?.mfgBatchNumber?.value,
             orderQuantity: Number(this.formValues?.orderQuantity?.value),
             batchQuantity: Number(this.batchQuantity),
             amount: parseFloat(this.amount),
             unitPrice: parseFloat(this.unitPrice),
+            location: {
+              uuid: this.currentLocation?.uuid,
+            },
             uom: {
               uuid: this.unitOfMeasure?.uuid,
             },
@@ -351,7 +370,7 @@ export class StockReceivingFormFieldsComponent implements OnInit {
           invoiceItems: [
             {
               item: {
-                uuid: this.selectedItem?.uuid,
+                uuid: this.selectedItem,
               },
               batchNo: this.formValues?.mfgBatchNumber?.value,
               orderQuantity: Number(this.formValues?.orderQuantity?.value),
@@ -360,6 +379,9 @@ export class StockReceivingFormFieldsComponent implements OnInit {
               unitPrice: parseFloat(this.unitPrice),
               uom: {
                 uuid: this.unitOfMeasure?.uuid,
+              },
+              location: {
+                uuid: this.currentLocation?.uuid,
               },
               expiryDate: new Date(
                 moment(this.formValues?.expiryDate?.value).toDate()
@@ -393,13 +415,19 @@ export class StockReceivingFormFieldsComponent implements OnInit {
     e?.stopPropagation();
     const invoicesItemObject = {
       item: {
-        uuid: this.stockInvoiceItem?.uuid,
+        uuid: this.selectedItem ? this.selectedItem : this.stockInvoiceItem?.item?.uuid,
       },
       batchNo: this.formValues?.mfgBatchNumber?.value,
       orderQuantity: Number(this.formValues?.orderQuantity?.value),
       batchQuantity: Number(this.batchQuantity),
       amount: parseFloat(this.amount),
       unitPrice: parseFloat(this.unitPrice),
+      location: {
+        uuid: this.currentLocation?.uuid,
+      },
+      stockInvoiceItemStatus: [{
+        status: 'DRAFT',
+      }],
       uom: {
         uuid: this.unitOfMeasure?.uuid,
       },

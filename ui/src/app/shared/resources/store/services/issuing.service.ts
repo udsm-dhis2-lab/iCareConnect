@@ -21,12 +21,17 @@ export class IssuingService {
     requestingLocationUuid?: string,
     page?: number,
     pageSize?: number,
-    status?:string
+    status?: string,
+    orderByDirection?: string
   ): Observable<any> {
     const pageNumber = page ? `&page=${page}` : ``;
     const pageSizeNumber = pageSize ? `&pageSize=${pageSize}` : ``;
     const filterStatus = status ? `&status=${status}` : ``;
-    const pagingArgs = pageNumber + pageSizeNumber + filterStatus;
+    const orderByDirectionArg = orderByDirection
+      ? `&orderByDirection=${orderByDirection}`
+      : ``;
+    const pagingArgs =
+      pageNumber + pageSizeNumber + filterStatus + orderByDirectionArg;
     return this.httpClient
       .get(
         `store/requests?${
