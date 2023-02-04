@@ -12,7 +12,7 @@ public class SupplierDAO extends BaseDAO<Supplier> {
 	public List<Supplier> getSuppliers(Integer startIndex, Integer limit) {
 		
 		DbSession dbSession = this.getSession();
-		String queryStr = "SELECT sp FROM Supplier sp";
+		String queryStr = "SELECT sp FROM Supplier sp WHERE sp.voided = false";
 		
 		//Construct a query Object
 		Query query = dbSession.createQuery(queryStr);
