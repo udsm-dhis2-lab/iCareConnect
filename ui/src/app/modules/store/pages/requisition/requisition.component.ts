@@ -47,7 +47,7 @@ export class RequisitionComponent implements OnInit {
   pageSize: number = 50;
   pageSizeOptions: number[] = [5, 10, 25, 50, 100];
   pager: any;
-  statuses: string[] = ['', "CANCELLED", "REJECTED", "RECEIVED"];
+  statuses: string[] = ['', "PENDING", "CANCELLED", "REJECTED", "RECEIVED"];
   selectedStatus: string;
   showRequisitionForm: boolean;
   constructor(
