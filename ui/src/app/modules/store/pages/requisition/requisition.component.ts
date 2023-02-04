@@ -128,49 +128,49 @@ export class RequisitionComponent implements OnInit {
   onNewRequest(e: Event, params: any): void {
     e.stopPropagation();
 
-    this.showRequisitionForm = !this.showRequisitionForm
+    // this.showRequisitionForm = !this.showRequisitionForm
 
-    // if (params) {
-    //   const {
-    //     currentStore,
-    //     stockableItems,
-    //     stores,
-    //     mainStoreLocationTagUuid,
-    //     pharmacyLocationTagUuid,
-    //     referenceTagsThatCanRequestFromMainStoreConfigs,
-    //     referenceTagsThatCanRequestFromPharmacyConfigs,
-    //   } = params;
-    //   const dialog = this.dialog.open(RequisitionFormComponent, {
-    //     width: "50%",
-    //     panelClass: "custom-dialog-container",
-    //     data: {
-    //       currentStore,
-    //       items: stockableItems,
-    //       stores,
-    //       mainStoreLocationTagUuid,
-    //       pharmacyLocationTagUuid,
-    //       referenceTagsThatCanRequestFromMainStoreConfigs,
-    //       referenceTagsThatCanRequestFromPharmacyConfigs,
-    //     },
-    //   });
+    if (params) {
+      const {
+        currentStore,
+        stockableItems,
+        stores,
+        mainStoreLocationTagUuid,
+        pharmacyLocationTagUuid,
+        referenceTagsThatCanRequestFromMainStoreConfigs,
+        referenceTagsThatCanRequestFromPharmacyConfigs,
+      } = params;
+      const dialog = this.dialog.open(RequisitionFormComponent, {
+        width: "25%",
+        panelClass: "custom-dialog-container",
+        data: {
+          currentStore,
+          items: stockableItems,
+          stores,
+          mainStoreLocationTagUuid,
+          pharmacyLocationTagUuid,
+          referenceTagsThatCanRequestFromMainStoreConfigs,
+          referenceTagsThatCanRequestFromPharmacyConfigs,
+        },
+      });
 
-    //   dialog
-    //     .afterClosed()
-    //     .subscribe((data: { requisitionInput: RequisitionInput }) => {
-    //       if (data) {
-    //         const { requisitionInput } = data;
+      dialog
+        .afterClosed()
+        .subscribe((data: { requisitionInput: RequisitionInput }) => {
+          if (data) {
+            const { requisitionInput } = data;
 
-    //         // this.store.dispatch(createRequest({ requisitionInput }));
-    //         this.requisitionService
-    //           .createRequest(requisitionInput)
-    //           .subscribe((response) => {
-    //             if (response) {
-    //               this.getAllRequisition();
-    //             }
-    //           });
-    //       }
-    //     });
-    // }
+            // this.store.dispatch(createRequest({ requisitionInput }));
+            this.requisitionService
+              .createRequest(requisitionInput)
+              .subscribe((response) => {
+                if (response) {
+                  this.getAllRequisition();
+                }
+              });
+          }
+        });
+    }
   }
 
   onCancelRequisition(e: any, id?: string): void {
