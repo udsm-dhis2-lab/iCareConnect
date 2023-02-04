@@ -6,6 +6,7 @@ import { ManageLedgerComponent } from "./manage-ledger/manage-ledger.component";
 import { ManageReOrderLevelModalComponent } from "./manage-re-order-level-modal/manage-re-order-level-modal.component";
 import { RequestCancelComponent } from "./request-cancel/request-cancel.component";
 import { RequisitionFormComponent } from "./requisition-form/requisition-form.component";
+import { StockInvoiceFormDialogComponent } from "./stock-invoice-form-dialog/stock-invoice-form-dialog.component";
 
 export const storeModals: any[] = [
   LedgerFormComponent,
@@ -16,4 +17,5 @@ export const storeModals: any[] = [
   ConfirmRequisitionsModalComponent,
   ManageLedgerComponent,
   ManageReOrderLevelModalComponent,
+  StockInvoiceFormDialogComponent,
 ];

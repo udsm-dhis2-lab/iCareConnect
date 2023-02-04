@@ -244,7 +244,7 @@ export class LabSamplesEffects {
                   }) || [])[0]?.timestamp,
                   orders: _.map(sample?.orders, (order) => {
                     const allocationStatuses = _.flatten(
-                      order.testAllocations.map((allocation) => {
+                      order?.testAllocations?.map((allocation) => {
                         return allocation?.statuses;
                       })
                     );
@@ -746,7 +746,7 @@ export class LabSamplesEffects {
                   }) || [])[0]?.timestamp,
                   orders: _.map(sample?.orders, (order) => {
                     const allocationStatuses = _.flatten(
-                      order.testAllocations.map((allocation) => {
+                      order?.testAllocations?.map((allocation) => {
                         return allocation?.statuses;
                       })
                     );

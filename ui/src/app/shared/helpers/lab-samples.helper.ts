@@ -160,7 +160,7 @@ export function formatSample(sample, formattingInfo) {
     }) || [])[0]?.timestamp,
     orders: _.map(sample?.orders, (order) => {
       const allocationStatuses = _.flatten(
-        order.testAllocations.map((allocation) => {
+        order?.testAllocations?.map((allocation) => {
           return allocation?.statuses;
         })
       );

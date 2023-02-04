@@ -44,7 +44,7 @@ export class IssuingComponent implements OnInit {
   pageSize: number = 50;
   pageSizeOptions: number[] = [5, 10, 25, 50, 100];
   pager: any;
-  statuses: string[] = ['', "CANCELLED", "REJECTED", "ISSUED"];
+  statuses: string[] = ["", "PENDING", "CANCELLED", "REJECTED", "ISSUED"];
   selectedStatus: string;
 
   constructor(
@@ -64,7 +64,6 @@ export class IssuingComponent implements OnInit {
     // this.loadingIssuingList$ = this.store.pipe(select(getIssuingLoadingState));
     this.stores$ = this.store.pipe(select(getStoreLocations));
   }
-
   onIssue(e: any, issue?: IssuingObject, currentStore?: LocationGet): void {
     issue = issue ? issue : e?.issue;
     currentStore = currentStore ? currentStore : e?.currentStore;
@@ -126,7 +125,8 @@ export class IssuingComponent implements OnInit {
         this.requestingLocation?.uuid || undefined,
         this.page,
         this.pageSize,
-        this.selectedStatus
+        this.selectedStatus,
+        "DESC"
       )
       ?.pipe(
         map((response) => {
