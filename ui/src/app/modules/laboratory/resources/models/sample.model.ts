@@ -72,7 +72,7 @@ export class LabSample {
   get orders(): any[] {
     return map(this.sample?.orders, (order) => {
       const allocationStatuses = flatten(
-        order.testAllocations.map((allocation) => {
+        order?.testAllocations?.map((allocation) => {
           return allocation?.statuses;
         })
       );
