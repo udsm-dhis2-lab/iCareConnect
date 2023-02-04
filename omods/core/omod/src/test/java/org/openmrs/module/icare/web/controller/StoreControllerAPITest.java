@@ -209,6 +209,8 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		Map<String, Object> requests = (new ObjectMapper()).readValue(handleGet.getContentAsString(), Map.class);
 		
 		List<Map<String, Object>> requestObject = ((List<Map<String, Object>>) requests.get("results"));
+
+		System.out.println("=>="+requestObject);
 		assertThat("Listing of requests has one request:", requestObject.size(), is(1));
 		
 		assertThat("The requested location id store A", ((Map) requestObject.get(0).get("requestedLocation")).get("display")
@@ -735,5 +737,21 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		    List.class);
 		assertThat("There is one drafted stock invoice", stockInvoicesStatusListMap.size(), is(1));
 		
+	}
+
+	@Test
+	public void gettingRequesitionsbyOrder() throws Exception {
+
+		MockHttpServletRequest newGetRequest = newGetRequest("store/requests", new Parameter("requestingLocationUuid",
+				"44939999-d333-fff2-9bff-61d11117c22e"),new Parameter("orderByDirection","DESC"));
+		MockHttpServletResponse handleGet = handle(newGetRequest);
+			System.out.println(handleGet.getContentAsString());
+		Map<String, Object> requests = (new ObjectMapper()).readValue(handleGet.getContentAsString(), Map.class);
+
+		MockHttpServletRequest newGetRequest2 = newGetRequest("store/requests", new Parameter("requestingLocationUuid",
+				"44939999-d333-fff2-9bff-61d11117c22e"),new Parameter("orderByDirection","ASC"));
+		MockHttpServletResponse handleGet2 = handle(newGetRequest2);
+		System.out.println(handleGet2.getContentAsString());
+		Map<String, Object> requests2 = (new ObjectMapper()).readValue(handleGet2.getContentAsString(), Map.class);
 	}
 }
