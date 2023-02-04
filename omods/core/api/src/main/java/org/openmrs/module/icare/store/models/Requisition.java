@@ -41,6 +41,7 @@ public class Requisition extends BaseOpenmrsData implements java.io.Serializable
 	
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "requisition")
 	private List<Issue> issues = new ArrayList<Issue>(0);
+
 	
 	public static Requisition fromMap(Map<String, Object> requisitionMap) {
 		
@@ -105,6 +106,10 @@ public class Requisition extends BaseOpenmrsData implements java.io.Serializable
 	
 	public void setIssues(List<Issue> issues) {
 		this.issues = issues;
+	}
+
+	public enum OrderByDirection {
+		ASC, DESC;
 	}
 	
 	public Map<String, Object> toMap() {

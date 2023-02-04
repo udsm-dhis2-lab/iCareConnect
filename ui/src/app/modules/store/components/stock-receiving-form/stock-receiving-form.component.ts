@@ -21,6 +21,7 @@ export class StockReceivingFormComponent implements OnInit {
   @Input() unitsOfMeasurementSettings: any;
   @Input() existingStockInvoice: any;
   @Input() stockInvoiceItem: any;
+  @Input() currentLocation: any;
   @Output() closeDialog: EventEmitter<any> = new EventEmitter();
 
   unitsOfMeasurements$: Observable<any>;
@@ -54,6 +55,6 @@ export class StockReceivingFormComponent implements OnInit {
   }
 
   onCloseDialog() {
-    this.closeDialog.emit()
+    this.closeDialog.emit();
   }
 }

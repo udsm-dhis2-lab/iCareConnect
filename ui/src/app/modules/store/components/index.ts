@@ -1,10 +1,10 @@
 import { IssuingStockByStoreComponent } from "./issuing-stock-by-store/issuing-stock-by-store.component";
 import { LedgersListComponent } from "./ledgers-list/ledgers-list.component";
+import { NewRequisitionFormComponent } from "./new-requisition-form/new-requisition-form.component";
 import { ReOrderLevelItemsListComponent } from "./re-order-level-items-list/re-order-level-items-list.component";
 import { RequisitionReceiptByStoreComponent } from "./requisition-receipt-by-store/requisition-receipt-by-store.component";
 import { StockBatchListComponent } from "./stock-batch-list/stock-batch-list.component";
 import { StockInOtherUnitsComponent } from "./stock-in-other-units/stock-in-other-units.component";
-import { StockInvoiceFormDialogComponent } from "./stock-invoice-form-dialog/stock-invoice-form-dialog.component";
 import { StockInvoiceItemsComponent } from "./stock-invoice-items/stock-invoice-items.component";
 import { StockInvoiceComponent } from "./stock-invoice/stock-invoice.component";
 import { StockInvoicesListComponent } from "./stock-invoices-list/stock-invoices-list.component";
@@ -33,5 +33,5 @@ export const stockComponents: any[] = [
   StockInvoiceComponent,
   StockInvoicesListComponent,
   StockInvoiceItemsComponent,
-  StockInvoiceFormDialogComponent,
+  NewRequisitionFormComponent,
 ];
