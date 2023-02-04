@@ -58,8 +58,8 @@
             </div>
           </div>
         </div>
-        <mat-progress-bar mode="indeterminate" *ngIf="this.viewStockInvoiceItems === stockInvoice?.uuid && loading"></mat-progress-bar>
-        <div class="inv-items-table container-fluid" *ngIf="this.viewStockInvoiceItems === stockInvoice?.uuid && !loading">
+        <mat-progress-bar mode="indeterminate" *ngIf="viewStockInvoiceItems === stockInvoice?.uuid && loading"></mat-progress-bar>
+        <div class="inv-items-table container-fluid" *ngIf="viewStockInvoiceItems === stockInvoice?.uuid && !loading">
           <app-stock-invoice-items 
             [stockInvoice]="stockInvoice" 
             [status]="status" 
