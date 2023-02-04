@@ -199,10 +199,10 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 	
 	@Override
 	public ListResult<Requisition> getRequestsByRequestingLocation(String requestingLocationUuid, Pager pager,
-	        RequisitionStatus.RequisitionStatusCode status) {
+																   RequisitionStatus.RequisitionStatusCode status, Requisition.OrderByDirection orderByDirection) {
 		
 		ListResult<Requisition> requisitions = this.requisitionDAO.getRequisitionsByRequestingLocation(
-		    requestingLocationUuid, pager, status);
+		    requestingLocationUuid, pager, status,orderByDirection);
 		
 		for (Requisition requisition : requisitions.getResults()) {
 			List<RequisitionStatus> requisitionStatuses = this.requisitionStatusDAO.getStatusesByRequisition(requisition
@@ -217,10 +217,10 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 	
 	@Override
 	public ListResult<Requisition> getRequestsForRequestedLocation(String requestedLocationUuid, Pager pager,
-	        RequisitionStatus.RequisitionStatusCode status) {
+																   RequisitionStatus.RequisitionStatusCode status, Requisition.OrderByDirection orderByDirection) {
 		
 		ListResult<Requisition> requisitions = this.requisitionDAO.getRequisitionsByRequestedLocation(requestedLocationUuid,
-		    pager, status);
+		    pager, status,orderByDirection);
 		
 		for (Requisition requisition : requisitions.getResults()) {
 			List<RequisitionStatus> requisitionStatuses = this.requisitionStatusDAO.getStatusesByRequisition(requisition
