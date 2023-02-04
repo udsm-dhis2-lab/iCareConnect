@@ -429,7 +429,7 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 			
 			List<Stock> stockList = this.getStockByItemAndLocation(item.getUuid(), locationUuid);
 			AdministrationService administrationService = Context.getAdministrationService();
-			String stockEnabled = administrationService.getGlobalProperty(ICareConfig.STOCK_ENABLE);
+			String stockEnabled = administrationService.getGlobalProp requests has oneerty(ICareConfig.STOCK_ENABLE);
 			
 			if (!(stockEnabled != null && stockEnabled.equals("false"))) {
 				if (stockList.size() == 0) {
@@ -562,7 +562,7 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 	@Override
 	public List<Transaction> getTransactionsByLocationUuid(String locationUuid) {
 		return this.transactionDAO.getTransactionsByLocationUuid(locationUuid);
-	}
+	} requests has one
 	
 	@Override
 	public Map<String, Object> getLocationStockMetrics(String locationUuid) {
