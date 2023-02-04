@@ -47,8 +47,9 @@ export class RequisitionComponent implements OnInit {
   pageSize: number = 50;
   pageSizeOptions: number[] = [5, 10, 25, 50, 100];
   pager: any;
-  statuses: string[] = ['', "CANCELLED", "REJECTED", "RECEIVED"];
+  statuses: string[] = ['', "PENDING", "ISSUED", "CANCELLED", "REJECTED", "RECEIVED"];
   selectedStatus: string;
+  showRequisitionForm: boolean;
   constructor(
     private store: Store<AppState>,
     private dialog: MatDialog,
@@ -88,7 +89,8 @@ export class RequisitionComponent implements OnInit {
         this.currentLocation?.id,
         this.page,
         this.pageSize,
-        this.selectedStatus
+        this.selectedStatus,
+        'DESC'
       )
       .pipe(
         map((requisitions) => {
@@ -126,6 +128,8 @@ export class RequisitionComponent implements OnInit {
   onNewRequest(e: Event, params: any): void {
     e.stopPropagation();
 
+    // this.showRequisitionForm = !this.showRequisitionForm
+
     if (params) {
       const {
         currentStore,
@@ -137,7 +141,7 @@ export class RequisitionComponent implements OnInit {
         referenceTagsThatCanRequestFromPharmacyConfigs,
       } = params;
       const dialog = this.dialog.open(RequisitionFormComponent, {
-        width: "30%",
+        width: "25%",
         panelClass: "custom-dialog-container",
         data: {
           currentStore,

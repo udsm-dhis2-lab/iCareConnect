@@ -105,7 +105,7 @@ export class SampleTrackingDashboardComponent implements OnInit {
     event.stopPropagation();
     const sampleDetails = {
       label: sample?.label,
-      orders: sample?.orders.map((order) => {
+      orders: sample?.orders?.map((order) => {
         return {
           ...order?.order?.concept,
         };

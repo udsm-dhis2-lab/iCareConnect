@@ -10,7 +10,8 @@
       <ng-template matTabContent>
         <app-stock-invoices-list 
           [suppliers]="params?.suppliers"
-          [unitsOfMeasurementSettings]="params?.unitsOfMeasurementSettings" 
+          [unitsOfMeasurementSettings]="params?.unitsOfMeasurementSettings"
+          [currentLocation]="currentLocation"
           [status]="'DRAFT'" 
         ></app-stock-invoices-list>
       </ng-template>
@@ -35,6 +36,7 @@
         <app-stock-receiving-form 
             [suppliers]="params?.suppliers"
             [unitsOfMeasurementSettings]="params?.unitsOfMeasurementSettings"
+            [currentLocation]="currentLocation"
           ></app-stock-receiving-form>
       </ng-template>
     </mat-tab>
