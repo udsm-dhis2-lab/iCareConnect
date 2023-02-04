@@ -49,6 +49,7 @@ export class RequisitionComponent implements OnInit {
   pager: any;
   statuses: string[] = ['', "CANCELLED", "REJECTED", "RECEIVED"];
   selectedStatus: string;
+  showRequisitionForm: boolean;
   constructor(
     private store: Store<AppState>,
     private dialog: MatDialog,
@@ -126,47 +127,49 @@ export class RequisitionComponent implements OnInit {
   onNewRequest(e: Event, params: any): void {
     e.stopPropagation();
 
-    if (params) {
-      const {
-        currentStore,
-        stockableItems,
-        stores,
-        mainStoreLocationTagUuid,
-        pharmacyLocationTagUuid,
-        referenceTagsThatCanRequestFromMainStoreConfigs,
-        referenceTagsThatCanRequestFromPharmacyConfigs,
-      } = params;
-      const dialog = this.dialog.open(RequisitionFormComponent, {
-        width: "30%",
-        panelClass: "custom-dialog-container",
-        data: {
-          currentStore,
-          items: stockableItems,
-          stores,
-          mainStoreLocationTagUuid,
-          pharmacyLocationTagUuid,
-          referenceTagsThatCanRequestFromMainStoreConfigs,
-          referenceTagsThatCanRequestFromPharmacyConfigs,
-        },
-      });
+    this.showRequisitionForm = !this.showRequisitionForm
 
-      dialog
-        .afterClosed()
-        .subscribe((data: { requisitionInput: RequisitionInput }) => {
-          if (data) {
-            const { requisitionInput } = data;
+    // if (params) {
+    //   const {
+    //     currentStore,
+    //     stockableItems,
+    //     stores,
+    //     mainStoreLocationTagUuid,
+    //     pharmacyLocationTagUuid,
+    //     referenceTagsThatCanRequestFromMainStoreConfigs,
+    //     referenceTagsThatCanRequestFromPharmacyConfigs,
+    //   } = params;
+    //   const dialog = this.dialog.open(RequisitionFormComponent, {
+    //     width: "50%",
+    //     panelClass: "custom-dialog-container",
+    //     data: {
+    //       currentStore,
+    //       items: stockableItems,
+    //       stores,
+    //       mainStoreLocationTagUuid,
+    //       pharmacyLocationTagUuid,
+    //       referenceTagsThatCanRequestFromMainStoreConfigs,
+    //       referenceTagsThatCanRequestFromPharmacyConfigs,
+    //     },
+    //   });
 
-            // this.store.dispatch(createRequest({ requisitionInput }));
-            this.requisitionService
-              .createRequest(requisitionInput)
-              .subscribe((response) => {
-                if (response) {
-                  this.getAllRequisition();
-                }
-              });
-          }
-        });
-    }
+    //   dialog
+    //     .afterClosed()
+    //     .subscribe((data: { requisitionInput: RequisitionInput }) => {
+    //       if (data) {
+    //         const { requisitionInput } = data;
+
+    //         // this.store.dispatch(createRequest({ requisitionInput }));
+    //         this.requisitionService
+    //           .createRequest(requisitionInput)
+    //           .subscribe((response) => {
+    //             if (response) {
+    //               this.getAllRequisition();
+    //             }
+    //           });
+    //       }
+    //     });
+    // }
   }
 
   onCancelRequisition(e: any, id?: string): void {
