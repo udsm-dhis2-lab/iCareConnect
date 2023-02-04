@@ -89,7 +89,8 @@ export class RequisitionComponent implements OnInit {
         this.currentLocation?.id,
         this.page,
         this.pageSize,
-        this.selectedStatus
+        this.selectedStatus,
+        'DESC'
       )
       .pipe(
         map((requisitions) => {
