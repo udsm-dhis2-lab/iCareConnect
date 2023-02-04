@@ -81,8 +81,13 @@ public class RequisitionDAO extends BaseDAO<Requisition> {
 			} else {
 				queryStr += " AND ";
 			}
-			
-			queryStr += " rq IN ( SELECT rs.requisition FROM RequisitionStatus rs WHERE rs.status = :status)";
+
+			if(status != RequisitionStatus.RequisitionStatusCode.PENDING) {
+				queryStr += " rq IN ( SELECT rs.requisition FROM RequisitionStatus rs WHERE rs.status = :status)";
+			}
+			if(status == RequisitionStatus.RequisitionStatusCode.PENDING){
+				queryStr += "rq NOT IN (SELECT rs.requisition FROM RequisitionStatus rs)";
+			}
 		}
 
 		if(orderByDirection != null){
@@ -97,7 +102,7 @@ public class RequisitionDAO extends BaseDAO<Requisition> {
 		System.out.println(queryStr);
 		Query query = session.createQuery(queryStr);
 		query.setParameter("requestedLocationUuid", requestedLocationUuid);
-		if (status != null) {
+		if (status != null && status != RequisitionStatus.RequisitionStatusCode.PENDING) {
 			query.setParameter("status", status);
 		}
 		
