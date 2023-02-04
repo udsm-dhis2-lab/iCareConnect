@@ -73,13 +73,13 @@ export class NewRequisitionFormComponent implements OnInit {
                     (tag) => tag?.uuid === this.mainStoreLocationTagUuid
                   ) || []
                 )?.length > 0) ||
-                (canRequestFromPharmacy &&
+                (!canRequestFromPharmacy &&
                   (
                     store?.tags?.filter(
                       (tag) => tag?.uuid === this.pharmacyLocationTagUuid
                     ) || []
                   )?.length > 0) ||
-                (!canRequestFromMainStore &&
+                (canRequestFromMainStore &&
                   (
                     store?.tags?.filter(
                       (tag) => tag?.uuid === this.mainStoreLocationTagUuid
