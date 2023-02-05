@@ -21,16 +21,16 @@ export class PatientListFiltersComponent implements OnInit {
 
   ngOnInit(): void {
     this.filterCategoriesOptions$ = zip(
-      ...this.filterCategories?.map((category) =>
-        this.conceptService.getConceptDetailsByUuid(
-          category?.value,
-          "custom:(uuid,display,setMembers:(uuid,display))"
+        ...this.filterCategories?.map((category) =>
+            this.conceptService.getConceptDetailsByUuid(
+                category?.value,
+                "custom:(uuid,display,setMembers:(uuid,display))"
+            )
         )
-      )
     ).pipe(
-      map((response) => {
-        return keyBy(response, "uuid");
-      })
+        map((response) => {
+          return keyBy(response, "uuid");
+        })
     );
   }
 
@@ -55,33 +55,47 @@ export class PatientListFiltersComponent implements OnInit {
       // check if a value is selected and not the all option
       if (filter?.value && filter?.filterIndex === event?.value?.filterIndex) {
         if (
-          filter?.value?.display === "PENDING" ||
-          filter?.value?.display === "PAID"
+            filter?.value?.display === "PENDING" ||
+            filter?.value?.display === "PAID"
         ) {
           var searchPattern = new RegExp("^&paymentStatus=");
 
           this.filterParameters = this.filterOutStringFromStringList(
-            this.filterParameters,
-            searchPattern
+              this.filterParameters,
+              searchPattern
           );
 
           this.filterParameters = [
             ...this.filterParameters,
             `&paymentStatus=${filter?.value?.display}`,
           ];
+        }else if (
+            filter?.value?.display === "Ultrasonic" ||
+            filter?.value?.display === "X-Ray") {
+          var searchPattern = new RegExp("^&patientType=");
+          this.filterParameters = this.filterOutStringFromStringList(
+              this.filterParameters,
+              searchPattern
+          );
+          this.filterParameters = [
+            ...this.filterParameters,
+            `&patientType=${filter?.value?.display}`,
+          ];
         }
       }
 
       if (
-        filter?.value &&
-        filter?.value?.display !== "PENDING" &&
-        filter?.value?.display !== "PAID"
+          filter?.value &&
+          filter?.value?.display !== "PENDING" &&
+          filter?.value?.display !== "PAID" &&
+          filter?.value?.display !== "Ultrasonic" &&
+          filter?.value?.display !== "X-Ray"
       ) {
         var searchPattern = new RegExp("^&attributeValueReference=");
 
         this.filterParameters = this.filterOutStringFromStringList(
-          this.filterParameters,
-          searchPattern
+            this.filterParameters,
+            searchPattern
         );
 
         this.filterParameters = [
@@ -95,8 +109,8 @@ export class PatientListFiltersComponent implements OnInit {
         // use function filterOutStringFromStringList to remove filter parameter from the list of parameters
         var searchPattern = new RegExp("^&paymentStatus=");
         this.filterParameters = this.filterOutStringFromStringList(
-          this.filterParameters,
-          searchPattern
+            this.filterParameters,
+            searchPattern
         );
       }
 
@@ -104,8 +118,8 @@ export class PatientListFiltersComponent implements OnInit {
         // use function filterOutStringFromStringList to remove filter parameter from the list of parameters
         var searchPattern = new RegExp("^&attributeValueReference=");
         this.filterParameters = this.filterOutStringFromStringList(
-          this.filterParameters,
-          searchPattern
+            this.filterParameters,
+            searchPattern
         );
       }
     });
@@ -113,7 +127,7 @@ export class PatientListFiltersComponent implements OnInit {
     // Construct the filter statement string to be emmited
     let parametersString = "";
     this.filterParameters.map(
-      (parameter) => (parametersString = `${parametersString}${parameter}`)
+        (parameter) => (parametersString = `${parametersString}${parameter}`)
     );
 
     this.onFilterChanged.emit(parametersString);

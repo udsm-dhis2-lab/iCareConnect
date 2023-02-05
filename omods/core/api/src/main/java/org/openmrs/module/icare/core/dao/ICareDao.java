@@ -283,7 +283,7 @@ public class ICareDao extends BaseDAO<Item> {
 	public List<Visit> getVisitsByOrderType(String search, String orderTypeUuid, String encounterTypeUuid,
 	        String locationUuid, OrderStatus.OrderStatusCode orderStatusCode, Order.FulfillerStatus fulfillerStatus,
 	        Integer limit, Integer startIndex, VisitWrapper.OrderBy orderBy, VisitWrapper.OrderByDirection orderByDirection,
-	        String attributeValueReference, VisitWrapper.PaymentStatus paymentStatus) {
+	        String attributeValueReference, VisitWrapper.PaymentStatus paymentStatus, VisitWrapper.RadiologyType radiologyType ) {
 		
 		Query query = null;
 		DbSession session = this.getSession();
@@ -347,6 +347,29 @@ public class ICareDao extends BaseDAO<Item> {
 				        + "WHERE pi.id.payment.invoice = invoice)+(SELECT CASE WHEN SUM(di.amount) IS NULL THEN 0 ELSE SUM(di.amount) END FROM DiscountInvoiceItem di WHERE di.id.invoice = invoice))"
 				        + ") ORDER BY v.startDatetime  ASC)";
 				
+			}
+		}
+
+
+
+		//New code added here
+		if (radiologyType != null) {
+			if (radiologyType  == VisitWrapper.RadiologyType .XRAY) {
+				queryStr += " AND v IN (SELECT invoice.visit FROM Invoice invoice WHERE "
+						+ "(SELECT SUM(item.price*item.quantity) FROM InvoiceItem item WHERE item.id.invoice = invoice) <= ("
+						+ "(SELECT CASE WHEN SUM(pi.amount) IS NULL THEN 0 ELSE SUM(pi.amount) END FROM PaymentItem pi "
+						+ "WHERE pi.id.payment.invoice = invoice)+(SELECT CASE WHEN SUM(di.amount) IS NULL THEN 0 ELSE SUM(di.amount) END FROM DiscountInvoiceItem di WHERE di.id.invoice = invoice)) AND v NOT IN( SELECT invoice.visit FROM Invoice invoice WHERE (SELECT SUM(item.price*item.quantity) FROM InvoiceItem item WHERE item.id.invoice = invoice) > ((SELECT CASE WHEN SUM(pi.amount) IS NULL THEN 0 ELSE SUM(pi.amount) END FROM PaymentItem pi WHERE pi.id.payment.invoice = invoice)+(SELECT CASE WHEN SUM(di.amount) IS NULL THEN 0 ELSE SUM(di.amount) END FROM DiscountInvoiceItem di WHERE di.id.invoice = invoice ))"
+						+ ") ORDER BY v.startDatetime  ASC)";
+
+			}
+
+			if (radiologyType  == VisitWrapper.RadiologyType .ULTRASONIC) {
+				queryStr += " AND v IN (SELECT invoice.visit FROM Invoice invoice WHERE "
+						+ "(SELECT SUM(item.price*item.quantity) FROM InvoiceItem item WHERE item.id.invoice = invoice) > ("
+						+ "(SELECT CASE WHEN SUM(pi.amount) IS NULL THEN 0 ELSE SUM(pi.amount) END FROM PaymentItem pi "
+						+ "WHERE pi.id.payment.invoice = invoice)+(SELECT CASE WHEN SUM(di.amount) IS NULL THEN 0 ELSE SUM(di.amount) END FROM DiscountInvoiceItem di WHERE di.id.invoice = invoice))"
+						+ ") ORDER BY v.startDatetime  ASC)";
+
 			}
 		}
 		

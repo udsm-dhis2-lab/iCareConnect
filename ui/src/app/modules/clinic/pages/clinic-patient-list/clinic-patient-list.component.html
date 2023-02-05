@@ -99,7 +99,7 @@
           <ng-template matTabContent>
             <app-patient-list
               [shouldShowParentLocation]="true"
-              [orderType]="params?.radiologyOrderType"
+              [orderType] = "params?.radiologyOrderType"
               [isTabularList]="true"
               [itemsPerPage]="10"
               (selectPatient)="onSelectPatient($event)"

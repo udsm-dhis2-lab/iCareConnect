@@ -36,6 +36,7 @@ export class RadiologyHomeComponent implements OnInit {
       ? false
       : true;
     this.loadingVisit$ = this.store.pipe(select(getVisitLoadingState));
+
   }
 
   onSearchPatient(e: Event) {
