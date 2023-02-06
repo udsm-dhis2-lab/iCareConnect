@@ -1,7 +1,15 @@
 <div class="w-100" *ngIf="{
     stockInvoices: stockInvoices$ | async
 } as params">
-  <div *ngIf="params?.stockInvoices?.results?.length">
+  <mat-paginator 
+        [length]="pager?.total"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="pageSizeOptions"
+        (page)="onPageChange($event)"
+      >
+  </mat-paginator>
+  <mat-progress-bar mode="indeterminate" *ngIf="!params?.stockInvoices?.results?.length && loading"></mat-progress-bar>
+  <div *ngIf="params?.stockInvoices?.results?.length && !loading">
     <mat-accordion>
       <mat-expansion-panel
         class="border mat-elevation-z0 mt-2"
@@ -49,7 +57,7 @@
                 <a 
                   class="anchor-button ml-4" 
                   color="primary"
-                  (click)="onViewStockInvoiceItems(stockInvoice?.uuid)"  
+                  (click)="onDeleteStockInvoice(stockInvoice)"  
                   matTooltip="Delete this invoice"
                 >
                     <mat-icon>delete</mat-icon>
@@ -71,4 +79,9 @@
       </mat-expansion-panel>
     </mat-accordion>
   </div>
+  <table class="table table-striped" *ngIf="!params?.stockInvoices?.results?.length && !loading">
+    <tbody><tr>
+      <h3 class="text-center">No Stock Invoices</h3>
+    </tr></tbody>
+  </table>
 </div>

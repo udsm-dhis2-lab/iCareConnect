@@ -20,28 +20,35 @@ export class StockInvoicesListComponent implements OnInit {
   stockInvoices$: Observable<any>;
   loading: boolean = false;
   viewStockInvoiceItems: any;
+  pageSize: number = 10;
+  page: number = 1;
+  pager: number;
+  pageSizeOptions: number[] = [5, 10, 15, 25, 50];
   constructor(
     private stockInvoicesService: StockInvoicesService,
     private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
-    this.getInvoices()
+    this.getInvoices();
   }
 
-  getInvoices(){
+  getInvoices() {
     this.loading = true;
-    this.stockInvoices$ = this.stockInvoicesService.getStockInvoices().pipe(
-      map((response) => {
-        this.loading = false;
-        if (!response?.error) {
-          return response;
-        }
-        if (response?.error) {
-          this.errors = [...this.errors, response.error];
-        }
-      })
-    );
+    this.stockInvoices$ = this.stockInvoicesService
+      .getStockInvoices(this.page, this.pageSize, this.status)
+      .pipe(
+        map((response) => {
+          this.loading = false;
+          if (!response?.error) {
+            this.pager = response?.pager;
+            return response;
+          }
+          if (response?.error) {
+            this.errors = [...this.errors, response.error];
+          }
+        })
+      );
   }
 
   onEditStockInvoice(stockInvoice) {
@@ -52,13 +59,15 @@ export class StockInvoicesListComponent implements OnInit {
           stockInvoice: stockInvoice,
           suppliers: this.suppliers,
           unitsOfMeasurementSettings: this.unitsOfMeasurementSettings,
+          currentLocation: this.currentLocation,
         },
       })
       .afterClosed()
       .subscribe(() => {
         this.getInvoices();
-      });;
+      });
   }
+
   onReceiveStockInvoiceItems(stockInvoice) {
     this.dialog
       .open(SharedConfirmationComponent, {
@@ -77,9 +86,9 @@ export class StockInvoicesListComponent implements OnInit {
             receivingDate: new Date(stockInvoice?.receivingDate).toISOString(),
             stockInvoiceStatus: [
               {
-                status: 'RECEIVED'
-              }
-            ]
+                status: "RECEIVED",
+              },
+            ],
           };
 
           this.stockInvoicesService
@@ -88,7 +97,8 @@ export class StockInvoicesListComponent implements OnInit {
               tap((response) => {
                 this.getInvoices();
               })
-            ).subscribe();
+            )
+            .subscribe();
         }
       });
   }
@@ -101,11 +111,49 @@ export class StockInvoicesListComponent implements OnInit {
     }
   }
 
+  onDeleteStockInvoice(stockInvoice) {
+    this.dialog
+      .open(SharedConfirmationComponent, {
+        width: "25%",
+        data: {
+          modalTitle: "Are you sure to delete this stock invoice?",
+          modalMessage:
+            "This action is irreversible. Please, click confirm to delete stock invoice and click cancel to stop the action.",
+        },
+      })
+      .afterClosed()
+      .subscribe((data) => {
+        if (data?.confirmed) {
+          const stockInvoiceObject = {
+            ...stockInvoice,
+            receivingDate: new Date(stockInvoice?.receivingDate).toISOString(),
+            voided: true,
+          };
+
+          this.stockInvoicesService
+            .updateStockInvoice(stockInvoice?.uuid, stockInvoiceObject)
+            .pipe(
+              tap((response) => {
+                this.getInvoices();
+              })
+            )
+            .subscribe();
+        }
+      });
+  }
+
   onReloadStockInvoiceList(stockInvoice) {
     this.viewStockInvoiceItems = undefined;
     this.getInvoices();
     setTimeout(() => {
       this.viewStockInvoiceItems = stockInvoice?.uuid;
-    }, 100)
+    }, 100);
+  }
+
+  onPageChange(event) {
+    this.page =
+      event.pageIndex - this.page >= 0 ? this.page + 1 : this.page - 1;
+    this.pageSize = Number(event?.pageSize);
+    this.getInvoices();
   }
 }
