@@ -208,10 +208,10 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 	
 	@Override
 	public ListResult<Requisition> getRequestsByRequestingLocation(String requestingLocationUuid, Pager pager,
-																   RequisitionStatus.RequisitionStatusCode status, Requisition.OrderByDirection orderByDirection) {
+	        RequisitionStatus.RequisitionStatusCode status, Requisition.OrderByDirection orderByDirection) {
 		
 		ListResult<Requisition> requisitions = this.requisitionDAO.getRequisitionsByRequestingLocation(
-		    requestingLocationUuid, pager, status,orderByDirection);
+		    requestingLocationUuid, pager, status, orderByDirection);
 		
 		for (Requisition requisition : requisitions.getResults()) {
 			List<RequisitionStatus> requisitionStatuses = this.requisitionStatusDAO.getStatusesByRequisition(requisition
@@ -226,10 +226,10 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 	
 	@Override
 	public ListResult<Requisition> getRequestsForRequestedLocation(String requestedLocationUuid, Pager pager,
-																   RequisitionStatus.RequisitionStatusCode status, Requisition.OrderByDirection orderByDirection) {
+	        RequisitionStatus.RequisitionStatusCode status, Requisition.OrderByDirection orderByDirection) {
 		
 		ListResult<Requisition> requisitions = this.requisitionDAO.getRequisitionsByRequestedLocation(requestedLocationUuid,
-		    pager, status,orderByDirection);
+		    pager, status, orderByDirection);
 		
 		for (Requisition requisition : requisitions.getResults()) {
 			List<RequisitionStatus> requisitionStatuses = this.requisitionStatusDAO.getStatusesByRequisition(requisition
@@ -539,7 +539,7 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 	
 	@Override
 	public ListResult<StockInvoice> getStockInvoices(Pager pager, StockInvoiceStatus.Type status) {
-		return stockInvoiceDAO.getStockInvoices(pager,status);
+		return stockInvoiceDAO.getStockInvoices(pager, status);
 	}
 	
 	@Override
@@ -595,7 +595,6 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 			List<StockInvoiceItem> savedStockInvoiceItems = stockInvoice.getStockInvoiceItems();
 			existingStockInvoice.setStockInvoiceItems(savedStockInvoiceItems);
 		}
-		System.out.println(stockInvoice.getStockInvoiceStatuses().get(0).status);
 		if (stockInvoice.getStockInvoiceStatuses() != null) {
 			for (StockInvoiceStatus stockInvoiceStatus : stockInvoice.getStockInvoiceStatuses()) {
 				//TODO Limit status to check the ones available in enums
@@ -711,16 +710,16 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 	public StockInvoiceItemStatus saveStockInvoiceItemStatus(StockInvoiceItemStatus stockInvoiceItemStatus) {
 		return this.stockInvoiceItemStatusDAO.save(stockInvoiceItemStatus);
 	}
-
+	
 	@Override
 	public Supplier updateSupplier(Supplier supplier) throws Exception {
 		Supplier existingSupplier = this.supplierDAO.findByUuid(supplier.getUuid());
-		if(supplier == null){
-			throw new Exception(" The supplier with uuid "+ supplier.getUuid()+" does not exist");
+		if (supplier == null) {
+			throw new Exception(" The supplier with uuid " + supplier.getUuid() + " does not exist");
 		}
 		return this.supplierDAO.updateSupplier(supplier);
 	}
-
+	
 	@Override
 	public StockInvoice saveStockInvoice(StockInvoice stockInvoice) throws Exception {
 		

@@ -13,26 +13,25 @@ public class StockInvoiceDAO extends BaseDAO<StockInvoice> {
 	public ListResult<StockInvoice> getStockInvoices(Pager pager, StockInvoiceStatus.Type status) {
 		DbSession session = this.getSession();
 		String queryStr = " SELECT stinv FROM StockInvoice stinv WHERE stinv.voided = false";
-
-		if(status == StockInvoiceStatus.Type.DRAFT){
-			if(!queryStr.contains("WHERE")){
-				queryStr +=" WHERE";
-			}else{
-				queryStr +=" AND";
+		
+		if (status == StockInvoiceStatus.Type.DRAFT) {
+			if (!queryStr.contains("WHERE")) {
+				queryStr += " WHERE";
+			} else {
+				queryStr += " AND";
 			}
-			queryStr +=" stinv IN (SELECT stinvstatus.stockInvoice FROM StockInvoiceStatus stinvstatus WHERE stinvstatus.status LIKE 'DRAFT') AND stinv NOT IN( SELECT stinvstatus.stockInvoice FROM StockInvoiceStatus stinvstatus WHERE stinvstatus.status LIKE 'RECEIVED') ";
+			queryStr += " stinv IN (SELECT stinvstatus.stockInvoice FROM StockInvoiceStatus stinvstatus WHERE stinvstatus.status LIKE 'DRAFT') AND stinv NOT IN( SELECT stinvstatus.stockInvoice FROM StockInvoiceStatus stinvstatus WHERE stinvstatus.status LIKE 'RECEIVED') ";
 		}
-
-		if(status == StockInvoiceStatus.Type.RECEIVED){
-			if(!queryStr.contains("WHERE")){
-				queryStr +=" WHERE";
-			}else{
-				queryStr +=" AND";
+		
+		if (status == StockInvoiceStatus.Type.RECEIVED) {
+			if (!queryStr.contains("WHERE")) {
+				queryStr += " WHERE";
+			} else {
+				queryStr += " AND";
 			}
-			queryStr +=" stinv IN (SELECT stinvstatus.stockInvoice FROM StockInvoiceStatus stinvstatus WHERE stinvstatus.status LIKE 'RECEIVED') ";
+			queryStr += " stinv IN (SELECT stinvstatus.stockInvoice FROM StockInvoiceStatus stinvstatus WHERE stinvstatus.status LIKE 'RECEIVED') ";
 		}
-
-
+		
 		Query query = session.createQuery(queryStr);
 		System.out.println(query.getQueryString());
 		
@@ -55,7 +54,7 @@ public class StockInvoiceDAO extends BaseDAO<StockInvoice> {
 		String queryStr = " UPDATE StockInvoice st";
 		
 		if (stockInvoice.getInvoiceNumber() != null) {
-
+			
 			if (!queryStr.contains("SET")) {
 				queryStr += " SET ";
 			} else {
@@ -74,28 +73,28 @@ public class StockInvoiceDAO extends BaseDAO<StockInvoice> {
 		}
 		
 		if (stockInvoice.getPurchaseOrder() != null) {
-
+			
 			if (!queryStr.contains("SET")) {
 				queryStr += " SET ";
 			} else {
 				queryStr += " ,";
 			}
-
+			
 			queryStr += " st.purchaseOrder = :purchaseOrder";
 		}
-
-		if(stockInvoice.getVoided() != null){
+		
+		if (stockInvoice.getVoided() != null) {
 			if (!queryStr.contains("SET")) {
 				queryStr += " SET ";
 			} else {
 				queryStr += " ,";
 			}
-
+			
 			queryStr += " st.voided = :voided";
 		}
 		
 		queryStr += " WHERE uuid = :uuid";
-
+		
 		Query query = session.createQuery(queryStr);
 		
 		if (stockInvoice.getInvoiceNumber() != null) {
@@ -109,9 +108,9 @@ public class StockInvoiceDAO extends BaseDAO<StockInvoice> {
 		if (stockInvoice.getPurchaseOrder() != null) {
 			query.setParameter("purchaseOrder", stockInvoice.getPurchaseOrder());
 		}
-
-		if(stockInvoice.getVoided() != null){
-			query.setParameter("voided",stockInvoice.getVoided());
+		
+		if (stockInvoice.getVoided() != null) {
+			query.setParameter("voided", stockInvoice.getVoided());
 		}
 		
 		query.setParameter("uuid", stockInvoice.getUuid());

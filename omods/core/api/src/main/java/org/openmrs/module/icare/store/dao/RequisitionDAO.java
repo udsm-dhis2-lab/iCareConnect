@@ -20,7 +20,7 @@ import org.openmrs.module.icare.store.models.RequisitionStatus;
 public class RequisitionDAO extends BaseDAO<Requisition> {
 	
 	public ListResult<Requisition> getRequisitionsByRequestingLocation(String requestingLocationUuid, Pager pager,
-																	   RequisitionStatus.RequisitionStatusCode status, Requisition.OrderByDirection orderByDirection) {
+	        RequisitionStatus.RequisitionStatusCode status, Requisition.OrderByDirection orderByDirection) {
 		DbSession session = this.getSession();
 		String queryStr = "SELECT rq \n" + "FROM Requisition rq \n"
 		        + "WHERE rq.requestingLocation = (SELECT l FROM Location l WHERE l.uuid = :requestingLocationUuid)";
@@ -31,20 +31,20 @@ public class RequisitionDAO extends BaseDAO<Requisition> {
 			} else {
 				queryStr += " AND ";
 			}
-			if(status != RequisitionStatus.RequisitionStatusCode.PENDING) {
+			if (status != RequisitionStatus.RequisitionStatusCode.PENDING) {
 				queryStr += " rq IN ( SELECT rs.requisition FROM RequisitionStatus rs WHERE rs.status = :status)";
 			}
-			if(status == RequisitionStatus.RequisitionStatusCode.PENDING){
+			if (status == RequisitionStatus.RequisitionStatusCode.PENDING) {
 				queryStr += "rq NOT IN (SELECT rs.requisition FROM RequisitionStatus rs)";
 			}
 		}
-
-		if(orderByDirection != null){
-			if(orderByDirection == Requisition.OrderByDirection.DESC){
+		
+		if (orderByDirection != null) {
+			if (orderByDirection == Requisition.OrderByDirection.DESC) {
 				queryStr += " ORDER BY  rq.dateCreated DESC";
 			}
-
-			if(orderByDirection == Requisition.OrderByDirection.ASC){
+			
+			if (orderByDirection == Requisition.OrderByDirection.ASC) {
 				queryStr += " ORDER BY  rq.dateCreated ASC";
 			}
 		}
@@ -69,7 +69,7 @@ public class RequisitionDAO extends BaseDAO<Requisition> {
 	}
 	
 	public ListResult<Requisition> getRequisitionsByRequestedLocation(String requestedLocationUuid, Pager pager,
-																	  RequisitionStatus.RequisitionStatusCode status, Requisition.OrderByDirection orderByDirection) {
+	        RequisitionStatus.RequisitionStatusCode status, Requisition.OrderByDirection orderByDirection) {
 		DbSession session = this.getSession();
 		System.out.println(status);
 		String queryStr = "SELECT rq \n" + "FROM Requisition rq \n"
@@ -81,21 +81,21 @@ public class RequisitionDAO extends BaseDAO<Requisition> {
 			} else {
 				queryStr += " AND ";
 			}
-
-			if(status != RequisitionStatus.RequisitionStatusCode.PENDING) {
+			
+			if (status != RequisitionStatus.RequisitionStatusCode.PENDING) {
 				queryStr += " rq IN ( SELECT rs.requisition FROM RequisitionStatus rs WHERE rs.status = :status)";
 			}
-			if(status == RequisitionStatus.RequisitionStatusCode.PENDING){
+			if (status == RequisitionStatus.RequisitionStatusCode.PENDING) {
 				queryStr += "rq NOT IN (SELECT rs.requisition FROM RequisitionStatus rs)";
 			}
 		}
-
-		if(orderByDirection != null){
-			if(orderByDirection == Requisition.OrderByDirection.DESC){
+		
+		if (orderByDirection != null) {
+			if (orderByDirection == Requisition.OrderByDirection.DESC) {
 				queryStr += " ORDER BY  rq.dateCreated DESC";
 			}
-
-			if(orderByDirection == Requisition.OrderByDirection.ASC){
+			
+			if (orderByDirection == Requisition.OrderByDirection.ASC) {
 				queryStr += " ORDER BY  rq.dateCreated ASC";
 			}
 		}

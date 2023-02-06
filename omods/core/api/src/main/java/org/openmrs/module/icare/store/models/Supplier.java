@@ -62,14 +62,14 @@ public class Supplier extends BaseOpenmrsData implements java.io.Serializable, J
 	public static Supplier fromMap(Map<String, Object> supplierMap) {
 		
 		Supplier supplier = new Supplier();
-		if(supplierMap.get("description") != null){
+		if (supplierMap.get("description") != null) {
 			supplier.setDescription(supplierMap.get("description").toString());
 		}
-		if(supplierMap.get("name") != null) {
+		if (supplierMap.get("name") != null) {
 			supplier.setName(supplierMap.get("name").toString());
 		}
-
-		if(supplierMap.get("voided") != null){
+		
+		if (supplierMap.get("voided") != null) {
 			supplier.setVoided((boolean) supplierMap.get("voided"));
 		}
 		return supplier;
