@@ -18,14 +18,41 @@
     </div>
   </div>
   <div *ngIf="params?.samplesToAccept">
-    <app-shared-samples-list
-      [tabType]="'samples-to-accept'"
-      [samples]="params?.samplesToAccept"
-      [LISConfigurations]="LISConfigurations"
-      [labSamplesDepartments]="labSamplesDepartments"
-      (selectedSampleDetails)="
-        onGetSelectedSampleDetails($event, params?.providerDetails)
-      "
-    ></app-shared-samples-list>
+    <div class="w-100" style="max-height: 60vh; overflow: auto">
+      <app-shared-samples-list
+        [tabType]="'samples-to-accept'"
+        [samples]="params?.samplesToAccept"
+        [LISConfigurations]="LISConfigurations"
+        [labSamplesDepartments]="labSamplesDepartments"
+        (selectedSampleDetails)="
+          onGetSelectedSampleDetails($event, params?.providerDetails)
+        "
+        (samplesForAction)="onGetSelectedSamplesForAction($event)"
+      ></app-shared-samples-list>
+    </div>
+
+    <div class="d-flex justify-content-end mt-2">
+      <button
+        [disabled]="
+          !selectedSamplesForAction || selectedSamplesForAction?.length === 0
+        "
+        mat-stroked-button
+        class="btn btn-danger"
+        (click)="onRejectAll($event)"
+      >
+        Reject
+      </button>
+      <button
+        [disabled]="
+          !selectedSamplesForAction || selectedSamplesForAction?.length === 0
+        "
+        mat-flat-button
+        color="primary"
+        class="ml-2"
+        (click)="onAcceptAll($event)"
+      >
+        Accept
+      </button>
+    </div>
   </div>
 </div>
