@@ -2,9 +2,12 @@ package org.openmrs.module.icare.store.dao;
 
 import org.openmrs.api.db.hibernate.DbSession;
 import org.openmrs.module.icare.core.dao.BaseDAO;
+import org.openmrs.module.icare.store.models.StockInvoice;
 import org.openmrs.module.icare.store.models.StockInvoiceItem;
 import org.hibernate.Query;
 import org.openmrs.module.icare.store.models.StockInvoiceItemStatus;
+
+import java.util.List;
 
 public class StockInvoiceItemDAO extends BaseDAO<StockInvoiceItem> {
 	
@@ -138,5 +141,18 @@ public class StockInvoiceItemDAO extends BaseDAO<StockInvoiceItem> {
 		} else {
 			return null;
 		}
+	}
+	
+	public List<StockInvoiceItem> getStockInvoiceItemByInvoice(StockInvoice stockInvoice) {
+		
+		DbSession session = this.getSession();
+		
+		String queryStr = " SELECT stinvi FROM StockInvoiceItem stinvi WHERE stinvi.stockInvoice = :stockinvoice";
+		
+		Query query = session.createQuery(queryStr);
+		
+		query.setParameter("stockinvoice", stockInvoice);
+		
+		return query.list();
 	}
 }
