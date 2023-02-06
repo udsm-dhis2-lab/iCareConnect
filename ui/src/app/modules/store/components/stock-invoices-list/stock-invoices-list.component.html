@@ -32,10 +32,10 @@
                 class="anchor-button ml-4" 
                 color="primary"
                 (click)="onViewStockInvoiceItems(stockInvoice?.uuid)"  
-                matTooltip="{{viewStockInvoiceItems !== stockInvoice?.uuid ? 'View invoice Items' : 'Hide Invoice Items' }}"
+                matTooltip="{{viewStockInvoiceItems && viewStockInvoiceItems !== stockInvoice?.uuid ? 'View invoice Items' : 'Hide Invoice Items' }}"
               >
-                 <mat-icon *ngIf="viewStockInvoiceItems === stockInvoice?.uuid">visibility_off</mat-icon>
-                  <mat-icon *ngIf="viewStockInvoiceItems !== stockInvoice?.uuid">visibility</mat-icon>
+                 <mat-icon *ngIf="viewStockInvoiceItems && viewStockInvoiceItems === stockInvoice?.uuid">visibility_off</mat-icon>
+                  <mat-icon *ngIf="!viewStockInvoiceItems || viewStockInvoiceItems !== stockInvoice?.uuid">visibility</mat-icon>
               </a>
               <ng-container *ngIf="status === 'DRAFT'">
                 <a 
@@ -58,8 +58,8 @@
             </div>
           </div>
         </div>
-        <mat-progress-bar mode="indeterminate" *ngIf="viewStockInvoiceItems === stockInvoice?.uuid && loading"></mat-progress-bar>
-        <div class="inv-items-table container-fluid" *ngIf="viewStockInvoiceItems === stockInvoice?.uuid && !loading">
+        <mat-progress-bar mode="indeterminate" *ngIf="viewStockInvoiceItems && viewStockInvoiceItems === stockInvoice?.uuid && loading"></mat-progress-bar>
+        <div class="inv-items-table container-fluid" *ngIf="viewStockInvoiceItems && viewStockInvoiceItems === stockInvoice?.uuid && !loading">
           <app-stock-invoice-items 
             [stockInvoice]="stockInvoice" 
             [status]="status" 
