@@ -26,6 +26,10 @@ public class StockInvoiceStatus extends BaseOpenmrsData implements java.io.Seria
 	@Column(name = "remarks")
 	public String remarks;
 	
+	public enum Type {
+		DRAFT, RECEIVED
+	}
+	
 	@Override
 	public Integer getId() {
 		return id;
