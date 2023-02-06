@@ -712,7 +712,16 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 	public StockInvoiceItemStatus saveStockInvoiceItemStatus(StockInvoiceItemStatus stockInvoiceItemStatus) {
 		return this.stockInvoiceItemStatusDAO.save(stockInvoiceItemStatus);
 	}
-	
+
+	@Override
+	public Supplier updateSupplier(Supplier supplier) throws Exception {
+		Supplier existingSupplier = this.supplierDAO.findByUuid(supplier.getUuid());
+		if(supplier == null){
+			throw new Exception(" The supplier with uuid "+ supplier.getUuid()+" does not exist");
+		}
+		return this.supplierDAO.updateSupplier(supplier);
+	}
+
 	@Override
 	public StockInvoice saveStockInvoice(StockInvoice stockInvoice) throws Exception {
 		

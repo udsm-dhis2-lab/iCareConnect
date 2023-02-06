@@ -69,7 +69,7 @@ public class StockInvoiceDAO extends BaseDAO<StockInvoice> {
 		}
 		
 		queryStr += " WHERE uuid = :uuid";
-		System.out.println(queryStr);
+
 		Query query = session.createQuery(queryStr);
 		
 		if (stockInvoice.getInvoiceNumber() != null) {

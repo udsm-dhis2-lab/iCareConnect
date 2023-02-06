@@ -1,5 +1,6 @@
 package org.openmrs.module.icare.web.controller;
 
+import groovy.util.ObservableMap;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
@@ -714,7 +715,6 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		assertThat("created 1 supplier", createdSuppliers.size(), is(1));
 		
 		//Getsuppliers
-		//Get stock invoices
 		MockHttpServletRequest newGetRequest = newGetRequest("store/suppliers", new Parameter("startIndex", "1"),
 		    new Parameter("limit", "10"));
 		MockHttpServletResponse handleGet = handle(newGetRequest);
@@ -722,6 +722,15 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		    List.class);
 		System.out.println(suppliersObjectMap);
 		assertThat("get 1 supplier", suppliersObjectMap.size(), is(1));
+
+		//update suppliers
+		String dto2 = this.readFile("dto/store/supplier-update.json");
+		Map<String,Object> supplierUpdate = (new ObjectMapper()).readValue(dto2,Map.class);
+
+		MockHttpServletRequest newPostRequest2 = newPostRequest("store/supplier/8800zx3570-8z37-11ff-2234-01102007810",supplierUpdate);
+		MockHttpServletResponse handle3 = handle(newPostRequest2);
+		Map<String,Object> supplierUpdatedMap = (new ObjectMapper()).readValue(handle3.getContentAsString(),Map.class);
+		System.out.println("==>"+handle3.getContentAsString());
 
 		
 	}

@@ -621,6 +621,16 @@ public class StoreController {
 
 		return newSuppliersMapList;
 	}
+
+	@RequestMapping(value = "supplier/{supplierUuid}", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String,Object> updateSupplier(@PathVariable String supplierUuid,@RequestBody Map<String,Object> supplierMap) throws Exception {
+		Supplier supplier = Supplier.fromMap(supplierMap);
+		supplier.setUuid(supplierUuid);
+		Supplier updatedSupplier = storeService.updateSupplier(supplier);
+
+		return updatedSupplier.toMap();
+	}
 	
 	@RequestMapping(value="suppliers",method = RequestMethod.GET)
 	@ResponseBody
