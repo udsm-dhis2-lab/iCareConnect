@@ -39,10 +39,10 @@ public interface StoreService extends OpenmrsService {
 	public List<RequisitionStatus> getRequisitionStatuses();
 	
 	public ListResult<Requisition> getRequestsByRequestingLocation(String requestingLocationUuid, Pager pager,
-																   RequisitionStatus.RequisitionStatusCode status, Requisition.OrderByDirection orderByDirection);
+	        RequisitionStatus.RequisitionStatusCode status, Requisition.OrderByDirection orderByDirection);
 	
 	public ListResult<Requisition> getRequestsForRequestedLocation(String requestedLocationUuid, Pager pager,
-																   RequisitionStatus.RequisitionStatusCode status, Requisition.OrderByDirection orderByDirection);
+	        RequisitionStatus.RequisitionStatusCode status, Requisition.OrderByDirection orderByDirection);
 	
 	public Requisition getRequestByUuid(String requisitionUuid);
 	
@@ -129,6 +129,6 @@ public interface StoreService extends OpenmrsService {
 	StockInvoiceItem saveStockInvoiceItem(StockInvoiceItem stockInvoiceItem) throws Exception;
 	
 	StockInvoiceItemStatus saveStockInvoiceItemStatus(StockInvoiceItemStatus stockInvoiceItemStatus);
-
-    Supplier updateSupplier(Supplier supplier) throws Exception;
+	
+	Supplier updateSupplier(Supplier supplier) throws Exception;
 }

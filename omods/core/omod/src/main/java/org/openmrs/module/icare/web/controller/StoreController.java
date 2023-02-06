@@ -179,7 +179,7 @@ public class StoreController {
 	        @RequestParam(defaultValue = "50", value = "pageSize", required = false) Integer pageSize,
 	        @RequestParam(defaultValue = "1", value = "page", required = false) Integer page,
 	        @RequestParam(value = "status", required = false) RequisitionStatus.RequisitionStatusCode status,
-			@RequestParam(value ="orderByDirection", required = false) Requisition.OrderByDirection orderByDirection) {
+	        @RequestParam(value = "orderByDirection", required = false) Requisition.OrderByDirection orderByDirection) {
 		
 		Pager pager = new Pager();
 		pager.setAllowed(paging);
@@ -188,7 +188,7 @@ public class StoreController {
 		
 		if (requestedLocationUuid != null && requestingLocationUuid == null) {
 			ListResult<Requisition> requisitions = this.storeService.getRequestsForRequestedLocation(requestedLocationUuid,
-			    pager, status,orderByDirection);
+			    pager, status, orderByDirection);
 			
 			//			List<Map<String, Object>> requisitionsList = new ArrayList<Map<String, Object>>();
 			//
@@ -586,14 +586,14 @@ public class StoreController {
 	        @RequestParam(defaultValue = "true", value = "paging", required = false) boolean paging,
 	        @RequestParam(defaultValue = "50", value = "pageSize", required = false) Integer pageSize,
 	        @RequestParam(defaultValue = "1", value = "page", required = false) Integer page,
-			@RequestParam(required = false, value = "status") StockInvoiceStatus.Type status) {
+	        @RequestParam(required = false, value = "status") StockInvoiceStatus.Type status) {
 		
 		Pager pager = new Pager();
 		pager.setAllowed(paging);
 		pager.setPageSize(pageSize);
 		pager.setPage(page);
 		
-		ListResult<StockInvoice> stockInvoices = this.storeService.getStockInvoices(pager,status);
+		ListResult<StockInvoice> stockInvoices = this.storeService.getStockInvoices(pager, status);
 		return stockInvoices.toMap();
 	}
 	
@@ -622,14 +622,15 @@ public class StoreController {
 
 		return newSuppliersMapList;
 	}
-
+	
 	@RequestMapping(value = "supplier/{supplierUuid}", method = RequestMethod.POST)
 	@ResponseBody
-	public Map<String,Object> updateSupplier(@PathVariable String supplierUuid,@RequestBody Map<String,Object> supplierMap) throws Exception {
+	public Map<String, Object> updateSupplier(@PathVariable String supplierUuid, @RequestBody Map<String, Object> supplierMap)
+	        throws Exception {
 		Supplier supplier = Supplier.fromMap(supplierMap);
 		supplier.setUuid(supplierUuid);
 		Supplier updatedSupplier = storeService.updateSupplier(supplier);
-
+		
 		return updatedSupplier.toMap();
 	}
 	

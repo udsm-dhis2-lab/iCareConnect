@@ -22,61 +22,59 @@ public class SupplierDAO extends BaseDAO<Supplier> {
 		return query.list();
 		
 	}
-
+	
 	public Supplier updateSupplier(Supplier supplier) {
-
+		
 		DbSession dbSession = this.getSession();
 		String queryStr = "UPDATE Supplier sp";
-
-		if(supplier.getName() != null){
-			if(!queryStr.contains("SET")){
-				queryStr +=" SET ";
-			}else{
-				queryStr+=" , ";
+		
+		if (supplier.getName() != null) {
+			if (!queryStr.contains("SET")) {
+				queryStr += " SET ";
+			} else {
+				queryStr += " , ";
 			}
 			queryStr += " sp.name = :name";
 		}
-
-		if(supplier.getDescription() != null){
-			if(!queryStr.contains("SET")){
-				queryStr +=" SET ";
-			}else{
-				queryStr+=" ,";
+		
+		if (supplier.getDescription() != null) {
+			if (!queryStr.contains("SET")) {
+				queryStr += " SET ";
+			} else {
+				queryStr += " ,";
 			}
 			queryStr += " sp.description = :description";
 		}
-
-		if(supplier.getVoided() != null){
-			if(!queryStr.contains("SET")){
-				queryStr +=" SET ";
-			}else{
-				queryStr+=" ,";
+		
+		if (supplier.getVoided() != null) {
+			if (!queryStr.contains("SET")) {
+				queryStr += " SET ";
+			} else {
+				queryStr += " ,";
 			}
 			queryStr += " sp.voided = :voided";
 		}
-
+		
 		queryStr += " WHERE sp.uuid = :uuid";
-
+		
 		Query query = dbSession.createQuery(queryStr);
-
-		if(supplier.getName() != null){
-			query.setParameter("name",supplier.getName());
+		
+		if (supplier.getName() != null) {
+			query.setParameter("name", supplier.getName());
 		}
-
-		if(supplier.getDescription() != null){
-			query.setParameter("description",supplier.getDescription());
+		
+		if (supplier.getDescription() != null) {
+			query.setParameter("description", supplier.getDescription());
 		}
-
-		if(supplier.getVoided() != null){
-			query.setParameter("voided",supplier.getVoided());
+		
+		if (supplier.getVoided() != null) {
+			query.setParameter("voided", supplier.getVoided());
 		}
-
-
-		query.setParameter("uuid",supplier.getUuid());
-
-
+		
+		query.setParameter("uuid", supplier.getUuid());
+		
 		Integer success = query.executeUpdate();
-
+		
 		if (success == 1) {
 			return supplier;
 		} else {
