@@ -40,6 +40,8 @@ export class SamplesToAcceptComponent implements OnInit {
 
   samplesToViewMoreDetails: any = {};
   saving: boolean = false;
+
+  selectedSamplesForAction: any[];
   constructor(
     private dialog: MatDialog,
     private store: Store<AppState>,
@@ -80,7 +82,7 @@ export class SamplesToAcceptComponent implements OnInit {
     }
   }
 
-  accept(sample: any, providerDetails: any): void {
+  accept(sample: any, providerDetails?: any): void {
     this.saving = true;
     let confirmDialog;
     if (this.LISConfigurations?.isLIS) {
@@ -214,7 +216,7 @@ export class SamplesToAcceptComponent implements OnInit {
     });
   }
 
-  reject(sample, providerDetails) {
+  reject(sample: any, providerDetails?: any) {
     this.dialog
       .open(RejectionReasonComponent, {
         width: "40%",
@@ -254,5 +256,23 @@ export class SamplesToAcceptComponent implements OnInit {
           });
         }
       });
+  }
+
+  onGetSelectedSamplesForAction(samples: any[]): void {
+    this.selectedSamplesForAction = samples;
+  }
+
+  onAcceptAll(event: Event): void {
+    event.stopPropagation();
+    for (const sampleDetails of this.selectedSamplesForAction) {
+      this.accept(sampleDetails?.sample, null);
+    }
+  }
+
+  onRejectAll(event: Event): void {
+    event.stopPropagation();
+    for (const sampleDetails of this.selectedSamplesForAction) {
+      this.reject(sampleDetails?.sample, null);
+    }
   }
 }

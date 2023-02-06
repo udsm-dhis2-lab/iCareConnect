@@ -17,4 +17,5 @@ export interface ObservationObject {
   obsDate?: any;
   obsTime?: any;
   provider?: any;
+  order?: any;
 }
