@@ -80,6 +80,15 @@ public class StockInvoiceItemDAO extends BaseDAO<StockInvoiceItem> {
 			}
 			queryStr += " sti.expiryDate = :expiryDate";
 		}
+
+		if (stockInvoiceItem.getVoided() != null) {
+			if (!queryStr.contains("SET")) {
+				queryStr += " SET ";
+			} else {
+				queryStr += " ,";
+			}
+			queryStr += " sti.voided = :voided";
+		}
 		
 		queryStr += " WHERE uuid = :uuid";
 		
@@ -115,6 +124,9 @@ public class StockInvoiceItemDAO extends BaseDAO<StockInvoiceItem> {
 		
 		if (stockInvoiceItem.getLocation() != null) {
 			query.setParameter("location", stockInvoiceItem.getLocation());
+		}
+		if(stockInvoiceItem.getVoided() != null){
+			query.setParameter("voided",stockInvoiceItem.getVoided());
 		}
 		
 		query.setParameter("uuid", stockInvoiceItem.getUuid());

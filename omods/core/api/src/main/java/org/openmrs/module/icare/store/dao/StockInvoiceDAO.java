@@ -20,7 +20,6 @@ public class StockInvoiceDAO extends BaseDAO<StockInvoice> {
 			}else{
 				queryStr +=" AND";
 			}
-			System.out.println("DRAFT");
 			queryStr +=" stinv IN (SELECT stinvstatus.stockInvoice FROM StockInvoiceStatus stinvstatus WHERE stinvstatus.status LIKE 'DRAFT') AND stinv NOT IN( SELECT stinvstatus.stockInvoice FROM StockInvoiceStatus stinvstatus WHERE stinvstatus.status LIKE 'RECEIVED') ";
 		}
 
@@ -30,7 +29,6 @@ public class StockInvoiceDAO extends BaseDAO<StockInvoice> {
 			}else{
 				queryStr +=" AND";
 			}
-			System.out.println("RECEIVED");
 			queryStr +=" stinv IN (SELECT stinvstatus.stockInvoice FROM StockInvoiceStatus stinvstatus WHERE stinvstatus.status LIKE 'RECEIVED') ";
 		}
 
@@ -57,15 +55,43 @@ public class StockInvoiceDAO extends BaseDAO<StockInvoice> {
 		String queryStr = " UPDATE StockInvoice st";
 		
 		if (stockInvoice.getInvoiceNumber() != null) {
-			queryStr += " SET st.invoiceNumber = :invoiceNumber,";
+
+			if (!queryStr.contains("SET")) {
+				queryStr += " SET ";
+			} else {
+				queryStr += " ,";
+			}
+			queryStr += " st.invoiceNumber = :invoiceNumber";
 		}
 		
 		if (stockInvoice.getSupplier() != null) {
+			if (!queryStr.contains("SET")) {
+				queryStr += " SET ";
+			} else {
+				queryStr += " ,";
+			}
 			queryStr += " st.supplier = :supplier";
 		}
 		
 		if (stockInvoice.getPurchaseOrder() != null) {
-			queryStr += " SET st.purchaseOrder = :purchaseOrder";
+
+			if (!queryStr.contains("SET")) {
+				queryStr += " SET ";
+			} else {
+				queryStr += " ,";
+			}
+
+			queryStr += " st.purchaseOrder = :purchaseOrder";
+		}
+
+		if(stockInvoice.getVoided() != null){
+			if (!queryStr.contains("SET")) {
+				queryStr += " SET ";
+			} else {
+				queryStr += " ,";
+			}
+
+			queryStr += " st.voided = :voided";
 		}
 		
 		queryStr += " WHERE uuid = :uuid";
@@ -82,6 +108,10 @@ public class StockInvoiceDAO extends BaseDAO<StockInvoice> {
 		
 		if (stockInvoice.getPurchaseOrder() != null) {
 			query.setParameter("purchaseOrder", stockInvoice.getPurchaseOrder());
+		}
+
+		if(stockInvoice.getVoided() != null){
+			query.setParameter("voided",stockInvoice.getVoided());
 		}
 		
 		query.setParameter("uuid", stockInvoice.getUuid());

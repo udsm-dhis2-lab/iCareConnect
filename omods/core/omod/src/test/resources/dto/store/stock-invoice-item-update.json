@@ -18,5 +18,6 @@
   },
   "stockInvoiceItemStatus": [{
     "status": "RECEIVED"
-  }]
+  }],
+  "voided": false
 }

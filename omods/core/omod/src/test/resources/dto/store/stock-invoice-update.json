@@ -30,5 +30,6 @@
     {
       "status": "RECEIVED"
     }
-  ]
+  ],
+  "voided" : false
   }

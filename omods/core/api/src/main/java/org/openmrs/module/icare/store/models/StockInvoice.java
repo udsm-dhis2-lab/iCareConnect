@@ -138,6 +138,10 @@ public class StockInvoice extends BaseOpenmrsData implements java.io.Serializabl
            stockInvoice.setStockInvoiceStatuses(stockInvoiceStatusesList);
         }
 
+        if(stockInvoiceMap.get("voided") != null){
+            stockInvoice.setVoided((boolean) stockInvoiceMap.get("voided"));
+        }
+
          return stockInvoice;
     }
 
@@ -163,11 +167,12 @@ public class StockInvoice extends BaseOpenmrsData implements java.io.Serializabl
             stockInvoiceObject.put("purchaseOrder",purchaseOrderObject);
         }
 
-        List<Map<String,Object>> stockInvoiceItems = new ArrayList<>();
-        for(StockInvoiceItem stockInvoiceItem : this.getStockInvoiceItems()){
-            stockInvoiceItems.add(stockInvoiceItem.toMap());
-        }
-        stockInvoiceObject.put("InvoiceItems",stockInvoiceItems);
+        //Commented this to improve performance when getting data
+//        List<Map<String,Object>> stockInvoiceItems = new ArrayList<>();
+//        for(StockInvoiceItem stockInvoiceItem : this.getStockInvoiceItems()){
+//            stockInvoiceItems.add(stockInvoiceItem.toMap());
+//        }
+//        stockInvoiceObject.put("InvoiceItems",stockInvoiceItems);
 
         if (this.getCreator() != null) {
             Map<String, Object> creatorObject = new HashMap<String, Object>();
@@ -187,6 +192,9 @@ public class StockInvoice extends BaseOpenmrsData implements java.io.Serializabl
 
         }
 
+        if(this.getVoided() != null){
+            stockInvoiceObject.put("voided",this.getVoided());
+        }
 
         return stockInvoiceObject;
     }

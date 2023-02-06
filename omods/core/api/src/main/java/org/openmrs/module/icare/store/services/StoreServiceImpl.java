@@ -606,7 +606,6 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 				
 								if (stockInvoiceStatus.status.equals(StockInvoiceItemStatus.Type.RECEIVED.toString())) {
 									for(StockInvoiceItem stockInvoiceItem : stockInvoice.getStockInvoiceItems()){
-										System.out.println("aabb");
 										boolean isStatusReceieved = false;
 										for(StockInvoiceItemStatus stockInvoiceItemStatus : stockInvoiceItem.getStockInvoiceItemStatuses()){
 											if(stockInvoiceItemStatus.getStatus().equals(StockInvoiceItemStatus.Type.RECEIVED.toString())){
