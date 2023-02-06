@@ -538,8 +538,8 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 	}
 	
 	@Override
-	public ListResult<StockInvoice> getStockInvoices(Pager pager) {
-		return stockInvoiceDAO.getStockInvoices(pager);
+	public ListResult<StockInvoice> getStockInvoices(Pager pager, StockInvoiceStatus.Type status) {
+		return stockInvoiceDAO.getStockInvoices(pager,status);
 	}
 	
 	@Override
