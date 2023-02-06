@@ -236,6 +236,10 @@ public class StockInvoiceItem extends BaseOpenmrsData implements java.io.Seriali
 			creatorObject.put("display", this.getCreator().getDisplayString());
 			stockInvoiceItemObject.put("creator", creatorObject);
 		}
+
+		if(this.getVoided() != null){
+			stockInvoiceItemObject.put("voided",this.getVoided());
+		}
 		
         return stockInvoiceItemObject;
     }
@@ -304,6 +308,10 @@ public class StockInvoiceItem extends BaseOpenmrsData implements java.io.Seriali
 			Location location = new Location();
 			location.setUuid(((Map)stockInvoiceItemMap.get("location")).get("uuid").toString());
 			stockInvoiceItem.setLocation(location);
+		}
+
+		if(stockInvoiceItemMap.get("voided") != null){
+			stockInvoiceItem.setVoided((boolean) stockInvoiceItemMap.get("voided"));
 		}
 		return stockInvoiceItem;
 		
