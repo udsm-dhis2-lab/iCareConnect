@@ -6,7 +6,7 @@
       <mat-expansion-panel
         class="border mat-elevation-z0 mt-2"
         *ngFor="let stockInvoice of params?.stockInvoices?.results; let invoiceIndex = index"
-        [expanded]="invoiceIndex === 0"
+        [expanded]="viewStockInvoiceItems && viewStockInvoiceItems === stockInvoice?.uuid ? true : invoiceIndex === 0 ? true : false"
       >
         <mat-expansion-panel-header class="d-flex justify-content-between">
           <mat-panel-title>
@@ -65,7 +65,7 @@
             [status]="status" 
             [currentLocation]="currentLocation"
             [unitsOfMeasurementSettings]="unitsOfMeasurementSettings"
-            (reloadList)="onReloadStockIvoiceItemsList()"
+            (reloadList)="onReloadStockInvoiceList($event)"
             ></app-stock-invoice-items>
         </div>
       </mat-expansion-panel>
