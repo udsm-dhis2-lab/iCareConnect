@@ -35,6 +35,10 @@ public class StockInvoice extends BaseOpenmrsData implements java.io.Serializabl
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "stockInvoice")
     private List<StockInvoiceItem> stockInvoiceItems = new ArrayList<>(0);
 
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "stockInvoice")
+    private List<StockInvoiceStatus> stockInvoiceStatuses = new ArrayList<>(0);
+
+
     @Override
     public Integer getId() {
         return id;
@@ -85,37 +89,69 @@ public class StockInvoice extends BaseOpenmrsData implements java.io.Serializabl
         this.stockInvoiceItems = stockInvoiceItems;
     }
 
+    public List<StockInvoiceStatus> getStockInvoiceStatuses() {
+        return stockInvoiceStatuses;
+    }
+
+    public void setStockInvoiceStatuses(List<StockInvoiceStatus> stockInvoiceStatuses) {
+        this.stockInvoiceStatuses = stockInvoiceStatuses;
+    }
+
     public static StockInvoice fromMap(Map<String,Object> stockInvoiceMap) throws ParseException {
 
         StockInvoice stockInvoice = new StockInvoice();
-        stockInvoice.setInvoiceNumber(stockInvoiceMap.get("invoiceNumber").toString());
-
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        if (stockInvoiceMap.get("receivingDate").toString().length() == 10) {
-            stockInvoice.setReceivingDate(dateFormat.parse(stockInvoiceMap.get("receivingDate").toString()));
-        } else {
-            stockInvoice.setReceivingDate(dateFormat.parse(stockInvoiceMap.get("receivingDate").toString().substring(0, stockInvoiceMap.get("receivingDate").toString().indexOf("T"))));
+        if(stockInvoiceMap.get("invoiceNumber") != null) {
+            stockInvoice.setInvoiceNumber(stockInvoiceMap.get("invoiceNumber").toString());
         }
 
-        Supplier supplier = new Supplier();
-        supplier.setUuid(((Map) stockInvoiceMap.get("supplier")).get("uuid").toString());
-        stockInvoice.setSupplier(supplier);
+        if(stockInvoiceMap.get("receivingDate") != null) {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            if (stockInvoiceMap.get("receivingDate").toString().length() == 10) {
+                stockInvoice.setReceivingDate(dateFormat.parse(stockInvoiceMap.get("receivingDate").toString()));
+            } else {
+                stockInvoice.setReceivingDate(dateFormat.parse(stockInvoiceMap.get("receivingDate").toString().substring(0, stockInvoiceMap.get("receivingDate").toString().indexOf("T"))));
+            }
+        }
 
+        if(stockInvoiceMap.get("uuid") != null){
+            stockInvoice.setUuid(stockInvoiceMap.get("uuid").toString());
+        }
+
+        if(stockInvoiceMap.get("supplier") != null) {
+            Supplier supplier = new Supplier();
+            supplier.setUuid(((Map) stockInvoiceMap.get("supplier")).get("uuid").toString());
+            stockInvoice.setSupplier(supplier);
+        }
         if(stockInvoiceMap.get("purchaseOrder") != null){
             PurchaseOrder purchaseOrder = new PurchaseOrder();
             purchaseOrder.setUuid(((Map)stockInvoiceMap.get("purchaseOrder")).get("uuid").toString());
             stockInvoice.setPurchaseOrder(purchaseOrder);
         }
 
+        if(stockInvoiceMap.get("stockInvoiceStatus") != null){
+            List<StockInvoiceStatus> stockInvoiceStatusesList = new ArrayList<>();
+           for(Map<String,Object> stockInvoiceMapObject :(List<Map<String, Object>>) stockInvoiceMap.get("stockInvoiceStatus")) {
+               StockInvoiceStatus stockInvoiceStatus = new StockInvoiceStatus();
+               stockInvoiceStatus.setStatus(stockInvoiceMapObject.get("status").toString());
+               stockInvoiceStatusesList.add(stockInvoiceStatus);
+           }
+           stockInvoice.setStockInvoiceStatuses(stockInvoiceStatusesList);
+        }
+
+        if(stockInvoiceMap.get("voided") != null){
+            stockInvoice.setVoided((boolean) stockInvoiceMap.get("voided"));
+        }
+
          return stockInvoice;
     }
 
-    @Override
+
     public Map<String, Object> toMap() {
 
         HashMap<String,Object> stockInvoiceObject = new HashMap<String,Object>();
         stockInvoiceObject.put("invoiceNumber",this.getInvoiceNumber());
         stockInvoiceObject.put("receivingDate", this.getReceivingDate());
+        stockInvoiceObject.put("uuid",this.getUuid());
 
         if(this.getSupplier() != null){
             Map<String,Object> supplierObject = new HashMap<>();
@@ -130,12 +166,14 @@ public class StockInvoice extends BaseOpenmrsData implements java.io.Serializabl
             purchaseOrderObject.put("display",this.getPurchaseOrder().getCode());
             stockInvoiceObject.put("purchaseOrder",purchaseOrderObject);
         }
+        if(this.getStockInvoiceItems() != null) {
+                List<Map<String, Object>> stockInvoiceItems = new ArrayList<>();
+                for (StockInvoiceItem stockInvoiceItem : this.getStockInvoiceItems()) {
+                    stockInvoiceItems.add(stockInvoiceItem.toMap());
+                }
+                stockInvoiceObject.put("InvoiceItems", stockInvoiceItems);
 
-        List<Map<String,Object>> stockInvoiceItems = new ArrayList<>();
-        for(StockInvoiceItem stockInvoiceItem : this.getStockInvoiceItems()){
-            stockInvoiceItems.add(stockInvoiceItem.toMap());
         }
-        stockInvoiceObject.put("stockInvoiceItems",stockInvoiceItems);
 
         if (this.getCreator() != null) {
             Map<String, Object> creatorObject = new HashMap<String, Object>();
@@ -143,8 +181,23 @@ public class StockInvoice extends BaseOpenmrsData implements java.io.Serializabl
             creatorObject.put("display", this.getCreator().getDisplayString());
             stockInvoiceObject.put("creator", creatorObject);
         }
+
+        if(this.getStockInvoiceStatuses() != null){
+            List<Map<String,Object>> stockInvoiceStatusesMapList = new ArrayList<>();
+            Map<String,Object> stockInvoiceStatusesMap = new HashMap<>();
+            for (StockInvoiceStatus stockInvoiceStatus : this.getStockInvoiceStatuses()){
+                stockInvoiceStatusesMap.put("status",stockInvoiceStatus.getStatus());
+            }
+            stockInvoiceStatusesMapList.add(stockInvoiceStatusesMap);
+            stockInvoiceObject.put("stockInvoiceStatus",stockInvoiceStatusesMapList);
+
+        }
+
+        if(this.getVoided() != null){
+            stockInvoiceObject.put("voided",this.getVoided());
+        }
+
         return stockInvoiceObject;
     }
-
 
 }
