@@ -1,5 +1,5 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { keyBy } from 'lodash';
+import { Component, Input, OnInit } from "@angular/core";
+import { keyBy } from "lodash";
 
 @Component({
   selector: "app-lab-result-display",
@@ -19,6 +19,6 @@ export class LabResultDisplayComponent implements OnInit {
 
   ngOnInit(): void {
     this.keyedResults = keyBy(this.codedResultsData, "test");
-    this.baseUrl = document.location.origin
+    this.baseUrl = document.location.origin;
   }
 }
