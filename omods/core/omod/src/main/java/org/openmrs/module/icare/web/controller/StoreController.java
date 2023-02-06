@@ -584,14 +584,15 @@ public class StoreController {
 	public Map<String, Object> getStockInvoices(
 	        @RequestParam(defaultValue = "true", value = "paging", required = false) boolean paging,
 	        @RequestParam(defaultValue = "50", value = "pageSize", required = false) Integer pageSize,
-	        @RequestParam(defaultValue = "1", value = "page", required = false) Integer page) {
+	        @RequestParam(defaultValue = "1", value = "page", required = false) Integer page,
+			@RequestParam(required = false, value = "status") StockInvoiceStatus.Type status) {
 		
 		Pager pager = new Pager();
 		pager.setAllowed(paging);
 		pager.setPageSize(pageSize);
 		pager.setPage(page);
 		
-		ListResult<StockInvoice> stockInvoices = this.storeService.getStockInvoices(pager);
+		ListResult<StockInvoice> stockInvoices = this.storeService.getStockInvoices(pager,status);
 		return stockInvoices.toMap();
 	}
 	

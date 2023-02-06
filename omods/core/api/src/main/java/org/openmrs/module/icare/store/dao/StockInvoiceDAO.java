@@ -6,14 +6,37 @@ import org.openmrs.module.icare.core.ListResult;
 import org.openmrs.module.icare.core.Pager;
 import org.openmrs.module.icare.core.dao.BaseDAO;
 import org.openmrs.module.icare.store.models.StockInvoice;
+import org.openmrs.module.icare.store.models.StockInvoiceStatus;
 
 public class StockInvoiceDAO extends BaseDAO<StockInvoice> {
 	
-	public ListResult<StockInvoice> getStockInvoices(Pager pager) {
+	public ListResult<StockInvoice> getStockInvoices(Pager pager, StockInvoiceStatus.Type status) {
 		DbSession session = this.getSession();
 		String queryStr = " SELECT stinv FROM StockInvoice stinv WHERE stinv.voided = false";
-		
+
+		if(status == StockInvoiceStatus.Type.DRAFT){
+			if(!queryStr.contains("WHERE")){
+				queryStr +=" WHERE";
+			}else{
+				queryStr +=" AND";
+			}
+			System.out.println("DRAFT");
+			queryStr +=" stinv IN (SELECT stinvstatus.stockInvoice FROM StockInvoiceStatus stinvstatus WHERE stinvstatus.status LIKE 'DRAFT') AND stinv NOT IN( SELECT stinvstatus.stockInvoice FROM StockInvoiceStatus stinvstatus WHERE stinvstatus.status LIKE 'RECEIVED') ";
+		}
+
+		if(status == StockInvoiceStatus.Type.RECEIVED){
+			if(!queryStr.contains("WHERE")){
+				queryStr +=" WHERE";
+			}else{
+				queryStr +=" AND";
+			}
+			System.out.println("RECEIVED");
+			queryStr +=" stinv IN (SELECT stinvstatus.stockInvoice FROM StockInvoiceStatus stinvstatus WHERE stinvstatus.status LIKE 'RECEIVED') ";
+		}
+
+
 		Query query = session.createQuery(queryStr);
+		System.out.println(query.getQueryString());
 		
 		if (pager.isAllowed()) {
 			pager.setTotal(query.list().size());
