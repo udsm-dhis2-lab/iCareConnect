@@ -66,4 +66,8 @@ export class InvestigationProcedureService {
         ];
     return this.httpClientService.post(`encounter/${encounterId}`, data);
   }
+
+  createEncounterWithOrders(data): Observable<any> {
+    return this.httpClientService.post(`encounter`, data);
+  }
 }
