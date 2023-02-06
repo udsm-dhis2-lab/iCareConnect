@@ -1,12 +1,8 @@
 package org.openmrs.module.icare.store.services;
 
 import org.apache.commons.collections.IteratorUtils;
-import org.openmrs.DrugOrder;
-import org.openmrs.Location;
-import org.openmrs.Order;
-import org.openmrs.api.AdministrationService;
-import org.openmrs.api.OrderEntryException;
-import org.openmrs.api.OrderService;
+import org.openmrs.*;
+import org.openmrs.api.*;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.icare.ICareConfig;
@@ -21,6 +17,7 @@ import org.openmrs.module.icare.store.models.*;
 import org.openmrs.module.icare.store.util.StockOutException;
 import org.openmrs.module.icare.store.util.TransactionUtil;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -54,6 +51,10 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 	SupplierDAO supplierDAO;
 	
 	StockInvoiceStatusDAO stockInvoiceStatusDAO;
+	
+	StockInvoiceItemDAO stockInvoiceItemDAO;
+	
+	StockInvoiceItemStatusDAO stockInvoiceItemStatusDAO;
 	
 	public void setLedgerDAO(LedgerDAO ledgerDAO) {
 		this.ledgerDAO = ledgerDAO;
@@ -109,6 +110,14 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 	
 	public void setStockInvoiceStatusDAO(StockInvoiceStatusDAO stockInvoiceStatusDAO) {
 		this.stockInvoiceStatusDAO = stockInvoiceStatusDAO;
+	}
+	
+	public void setStockInvoiceItemDAO(StockInvoiceItemDAO stockInvoiceItemDAO) {
+		this.stockInvoiceItemDAO = stockInvoiceItemDAO;
+	}
+	
+	public void setStockInvoiceItemStatusDAO(StockInvoiceItemStatusDAO stockInvoiceItemStatusDAO) {
+		this.stockInvoiceItemStatusDAO = stockInvoiceItemStatusDAO;
 	}
 	
 	@Override
@@ -199,10 +208,10 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 	
 	@Override
 	public ListResult<Requisition> getRequestsByRequestingLocation(String requestingLocationUuid, Pager pager,
-																   RequisitionStatus.RequisitionStatusCode status, Requisition.OrderByDirection orderByDirection) {
+	        RequisitionStatus.RequisitionStatusCode status, Requisition.OrderByDirection orderByDirection) {
 		
 		ListResult<Requisition> requisitions = this.requisitionDAO.getRequisitionsByRequestingLocation(
-		    requestingLocationUuid, pager, status,orderByDirection);
+		    requestingLocationUuid, pager, status, orderByDirection);
 		
 		for (Requisition requisition : requisitions.getResults()) {
 			List<RequisitionStatus> requisitionStatuses = this.requisitionStatusDAO.getStatusesByRequisition(requisition
@@ -217,10 +226,10 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 	
 	@Override
 	public ListResult<Requisition> getRequestsForRequestedLocation(String requestedLocationUuid, Pager pager,
-																   RequisitionStatus.RequisitionStatusCode status, Requisition.OrderByDirection orderByDirection) {
+	        RequisitionStatus.RequisitionStatusCode status, Requisition.OrderByDirection orderByDirection) {
 		
 		ListResult<Requisition> requisitions = this.requisitionDAO.getRequisitionsByRequestedLocation(requestedLocationUuid,
-		    pager, status,orderByDirection);
+		    pager, status, orderByDirection);
 		
 		for (Requisition requisition : requisitions.getResults()) {
 			List<RequisitionStatus> requisitionStatuses = this.requisitionStatusDAO.getStatusesByRequisition(requisition
@@ -529,8 +538,8 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 	}
 	
 	@Override
-	public ListResult<StockInvoice> getStockInvoices(Pager pager) {
-		return stockInvoiceDAO.getStockInvoices(pager);
+	public ListResult<StockInvoice> getStockInvoices(Pager pager, StockInvoiceStatus.Type status) {
+		return stockInvoiceDAO.getStockInvoices(pager, status);
 	}
 	
 	@Override
@@ -564,6 +573,154 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 	}
 	
 	@Override
+	public StockInvoice updateStockInvoice(StockInvoice stockInvoice) throws Exception {
+		
+		if (stockInvoice.getSupplier() != null) {
+			Supplier supplier = this.getSupplierByUuid(stockInvoice.getSupplier().getUuid());
+			if (supplier == null) {
+				throw new Exception("The supplier with uuid " + stockInvoice.getSupplier().getUuid() + " does not exist");
+			}
+			stockInvoice.setSupplier(supplier);
+		}
+		StockInvoice existingStockInvoice = new StockInvoice();
+		if (stockInvoice.getInvoiceNumber() != null || stockInvoice.getSupplier() != null) {
+			existingStockInvoice = this.stockInvoiceDAO.updateStockInvoice(stockInvoice);
+		}
+		if (stockInvoice.getStockInvoiceItems() != null) {
+			existingStockInvoice = this.stockInvoiceDAO.findByUuid(stockInvoice.getUuid());
+			for (StockInvoiceItem stockInvoiceItem : stockInvoice.getStockInvoiceItems()) {
+				stockInvoiceItem.setStockInvoice(existingStockInvoice);
+				this.saveStockInvoiceItem(stockInvoiceItem);
+			}
+			List<StockInvoiceItem> savedStockInvoiceItems = stockInvoice.getStockInvoiceItems();
+			existingStockInvoice.setStockInvoiceItems(savedStockInvoiceItems);
+		}
+		if (stockInvoice.getStockInvoiceStatuses() != null) {
+			for (StockInvoiceStatus stockInvoiceStatus : stockInvoice.getStockInvoiceStatuses()) {
+				//TODO Limit status to check the ones available in enums
+				existingStockInvoice = this.stockInvoiceDAO.findByUuid(stockInvoice.getUuid());
+				stockInvoiceStatus.setRemarks(stockInvoiceStatus.getStatus());
+				stockInvoiceStatus.setStockInvoice(existingStockInvoice);
+				this.saveStockInvoiceStatus(stockInvoiceStatus);
+				
+								if (stockInvoiceStatus.status.equals(StockInvoiceItemStatus.Type.RECEIVED.toString())) {
+									for(StockInvoiceItem stockInvoiceItem : stockInvoice.getStockInvoiceItems()){
+										boolean isStatusReceieved = false;
+										for(StockInvoiceItemStatus stockInvoiceItemStatus : stockInvoiceItem.getStockInvoiceItemStatuses()){
+											if(stockInvoiceItemStatus.getStatus().equals(StockInvoiceItemStatus.Type.RECEIVED.toString())){
+												isStatusReceieved = true;
+											}
+
+										}
+										if(isStatusReceieved == false){
+											List<StockInvoiceItemStatus> stockInvoiceItemStatusList = new ArrayList<>();
+											StockInvoiceItemStatus stockInvoiceItemStatus = new StockInvoiceItemStatus();
+											stockInvoiceItemStatus.setStatus(StockInvoiceItemStatus.Type.RECEIVED.toString());
+											stockInvoiceItemStatus.setRemarks(StockInvoiceItemStatus.Type.RECEIVED.toString());
+											stockInvoiceItemStatusList.add(stockInvoiceItemStatus);
+											stockInvoiceItem.setStockInvoiceItemStatuses(stockInvoiceItemStatusList);
+											this.updateStockInvoiceItem(stockInvoiceItem);
+										}
+									}
+								}
+				
+			}
+		}
+		return existingStockInvoice;
+	}
+	
+	@Override
+	public StockInvoice getStockInvoice(String stockInvoiceUuid) {
+		return stockInvoiceDAO.findByUuid(stockInvoiceUuid);
+	}
+	
+	@Override
+	public StockInvoiceItem updateStockInvoiceItem(StockInvoiceItem stockInvoiceItem) throws Exception {
+		if (stockInvoiceItem.getItem() != null) {
+			ICareService iCareService = Context.getService(ICareService.class);
+			Item item = iCareService.getItemByUuid(stockInvoiceItem.getItem().getUuid());
+			if (item == null) {
+				throw new Exception("The item with uuid " + stockInvoiceItem.getItem().getUuid() + " does not exist");
+			}
+			stockInvoiceItem.setItem(item);
+		}
+		
+		if (stockInvoiceItem.getLocation() != null) {
+			Location location = Context.getLocationService().getLocationByUuid(stockInvoiceItem.getLocation().getUuid());
+			if (location == null) {
+				throw new Exception("The location with uuid " + stockInvoiceItem.getLocation().getUuid() + " does not exist");
+			}
+			stockInvoiceItem.setLocation(location);
+		}
+		// Saving stock invoice status
+		if (stockInvoiceItem.getStockInvoiceItemStatuses() != null) {
+			for (StockInvoiceItemStatus stockInvoiceItemStatus : stockInvoiceItem.getStockInvoiceItemStatuses()) {
+				StockInvoiceItem existingStockInvoiceItem = this.getStockInvoiceItemByUuid(stockInvoiceItem.getUuid());
+				stockInvoiceItemStatus.setStockInvoiceItem(existingStockInvoiceItem);
+				this.saveStockInvoiceItemStatus(stockInvoiceItemStatus);
+				
+				if (stockInvoiceItemStatus.status.equals(StockInvoiceItemStatus.Type.RECEIVED.toString())) {
+					TransactionUtil.operateOnStock("+", stockInvoiceItem);
+				}
+			}
+		}
+		
+		return stockInvoiceItemDAO.updateStockInvoiceItem(stockInvoiceItem);
+	}
+	
+	@Override
+	public StockInvoiceItem getStockInvoiceItemByUuid(String stockInvoiceItemUuid) {
+		return stockInvoiceItemDAO.findByUuid(stockInvoiceItemUuid);
+	}
+	
+	@Override
+	public StockInvoiceItem saveStockInvoiceItem(StockInvoiceItem stockInvoiceItem) throws Exception {
+		Item item = dao.findByUuid(stockInvoiceItem.getItem().getUuid());
+		if (item == null) {
+			throw new Exception("The item with uuid" + stockInvoiceItem.getItem().getUuid() + " does not exist");
+		}
+		
+		ConceptService conceptService = Context.getService(ConceptService.class);
+		Concept uom = conceptService.getConceptByUuid(stockInvoiceItem.getUom().getUuid());
+		if (uom == null) {
+			throw new Exception("The unit of measurement with uuid" + stockInvoiceItem.getUom().getUuid()
+			        + " does not exist");
+		}
+		
+		Location location = Context.getLocationService().getLocationByUuid(stockInvoiceItem.getLocation().getUuid());
+		if (location == null) {
+			throw new Exception(" The location with uuid" + stockInvoiceItem.getLocation().getUuid() + " does not exist");
+		}
+		
+		stockInvoiceItem.setItem(item);
+		stockInvoiceItem.setUom(uom);
+		stockInvoiceItem.setLocation(location);
+		
+		StockInvoiceItem savedStockInvoiceItem = stockInvoiceItemDAO.save(stockInvoiceItem);
+		
+		for (StockInvoiceItemStatus stockInvoiceItemStatus : stockInvoiceItem.getStockInvoiceItemStatuses()) {
+			stockInvoiceItemStatus.setStockInvoiceItem(savedStockInvoiceItem);
+			this.saveStockInvoiceItemStatus(stockInvoiceItemStatus);
+		}
+		
+		return savedStockInvoiceItem;
+	}
+	
+	@Override
+	public StockInvoiceItemStatus saveStockInvoiceItemStatus(StockInvoiceItemStatus stockInvoiceItemStatus) {
+		return this.stockInvoiceItemStatusDAO.save(stockInvoiceItemStatus);
+	}
+	
+	@Override
+	public Supplier updateSupplier(Supplier supplier) throws Exception {
+		Supplier existingSupplier = this.supplierDAO.findByUuid(supplier.getUuid());
+		if (supplier == null) {
+			throw new Exception(" The supplier with uuid " + supplier.getUuid() + " does not exist");
+		}
+		return this.supplierDAO.updateSupplier(supplier);
+	}
+	
+	@Override
 	public StockInvoice saveStockInvoice(StockInvoice stockInvoice) throws Exception {
 		
 		Supplier supplier = this.getSupplierByUuid(stockInvoice.getSupplier().getUuid());
@@ -571,7 +728,20 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 			throw new Exception("The supplier with uuid " + stockInvoice.getSupplier().getUuid() + " does not exist");
 		}
 		stockInvoice.setSupplier(supplier);
-		return this.stockInvoiceDAO.save(stockInvoice);
+		StockInvoice savedStockInvoice = this.stockInvoiceDAO.save(stockInvoice);
+		
+		for (StockInvoiceItem stockInvoiceItem : savedStockInvoice.getStockInvoiceItems()) {
+			this.saveStockInvoiceItem(stockInvoiceItem);
+		}
+		
+		for (StockInvoiceStatus stockInvoiceStatus : stockInvoice.getStockInvoiceStatuses()) {
+			//TODO Limit status to check the ones available in enums
+			
+			stockInvoiceStatus.setRemarks(stockInvoiceStatus.getStatus());
+			stockInvoiceStatus.setStockInvoice(savedStockInvoice);
+			this.saveStockInvoiceStatus(stockInvoiceStatus);
+		}
+		return savedStockInvoice;
 	}
 	
 	@Override
