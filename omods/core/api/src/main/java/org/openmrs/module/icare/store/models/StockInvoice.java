@@ -145,7 +145,7 @@ public class StockInvoice extends BaseOpenmrsData implements java.io.Serializabl
          return stockInvoice;
     }
 
-    @Override
+
     public Map<String, Object> toMap() {
 
         HashMap<String,Object> stockInvoiceObject = new HashMap<String,Object>();
@@ -166,13 +166,14 @@ public class StockInvoice extends BaseOpenmrsData implements java.io.Serializabl
             purchaseOrderObject.put("display",this.getPurchaseOrder().getCode());
             stockInvoiceObject.put("purchaseOrder",purchaseOrderObject);
         }
+        if(this.getStockInvoiceItems() != null) {
+                List<Map<String, Object>> stockInvoiceItems = new ArrayList<>();
+                for (StockInvoiceItem stockInvoiceItem : this.getStockInvoiceItems()) {
+                    stockInvoiceItems.add(stockInvoiceItem.toMap());
+                }
+                stockInvoiceObject.put("InvoiceItems", stockInvoiceItems);
 
-        //Commented this to improve performance when getting data
-//        List<Map<String,Object>> stockInvoiceItems = new ArrayList<>();
-//        for(StockInvoiceItem stockInvoiceItem : this.getStockInvoiceItems()){
-//            stockInvoiceItems.add(stockInvoiceItem.toMap());
-//        }
-//        stockInvoiceObject.put("InvoiceItems",stockInvoiceItems);
+        }
 
         if (this.getCreator() != null) {
             Map<String, Object> creatorObject = new HashMap<String, Object>();
@@ -198,6 +199,5 @@ public class StockInvoice extends BaseOpenmrsData implements java.io.Serializabl
 
         return stockInvoiceObject;
     }
-
 
 }
