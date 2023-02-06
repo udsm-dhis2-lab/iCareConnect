@@ -12,7 +12,7 @@
         <tr class="dflex">
           <td *ngIf="itemField" class="w-25">
             <app-form [fields]="[itemField]" (formUpdate)="onFormUpdate($event)"></app-form>
-            <span class="text-small text-secondary">
+            <span class="text-small text-secondary" *ngIf="this.stockInvoiceItem?.item">
               <i>
                 Selected Item: {{ this.stockInvoiceItem?.item?.display}}
               </i>
@@ -106,5 +106,25 @@
           </div>
       </div>
     </div> -->
+    <div class="col-12  mb-2" *ngIf="existingStockInvoice">
+      <div class="w-100">
+         <button
+         class="float-right justify-content-end"
+          color="primary"
+          mat-flat-button
+          (click)="onSaveUdatedInvoice($event)"
+        >
+          <mat-icon>save</mat-icon>
+          Save Invoice
+        </button>
+        <button
+          class="float-right mr-2"
+          mat-stroked-button
+          (click)="onClosePopup($event)"
+        >
+          Close
+        </button>
+      </div>
+    </div>
   </div>
 </div>

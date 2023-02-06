@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { omit } from 'lodash';
 import { Observable, of, throwError } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
 import { OpenmrsHttpClientService } from 'src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service';
 import { RequisitionInput } from '../models/requisition-input.model';
 import {
@@ -71,7 +71,7 @@ export class RequisitionService {
 
   createRequest(
     requisitionInput: RequisitionInput
-  ): Observable<RequisitionObject> {
+  ): Observable<RequisitionObject | any> {
     const request = Requisition.createRequisition(requisitionInput);
 
     if (!request) {
@@ -83,7 +83,8 @@ export class RequisitionService {
     return this.httpClient.post("store/request", request).pipe(
       map((response) => {
         return new Requisition(response).toJson();
-      })
+      }),
+      catchError((error) => error)
     );
   }
 
