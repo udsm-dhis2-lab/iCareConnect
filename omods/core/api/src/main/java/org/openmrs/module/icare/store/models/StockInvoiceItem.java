@@ -229,6 +229,13 @@ public class StockInvoiceItem extends BaseOpenmrsData implements java.io.Seriali
 			locationObjectMap.put("display",this.getLocation().getDisplayString());
 			stockInvoiceItemObject.put("location",locationObjectMap);
 		}
+
+		if (this.getCreator() != null) {
+			Map<String, Object> creatorObject = new HashMap<String, Object>();
+			creatorObject.put("uuid", this.getCreator().getUuid());
+			creatorObject.put("display", this.getCreator().getDisplayString());
+			stockInvoiceItemObject.put("creator", creatorObject);
+		}
 		
         return stockInvoiceItemObject;
     }

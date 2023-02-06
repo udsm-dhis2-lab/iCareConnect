@@ -595,7 +595,7 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 			List<StockInvoiceItem> savedStockInvoiceItems = stockInvoice.getStockInvoiceItems();
 			existingStockInvoice.setStockInvoiceItems(savedStockInvoiceItems);
 		}
-		System.out.println(stockInvoice.getStockInvoiceStatuses());
+		System.out.println(stockInvoice.getStockInvoiceStatuses().get(0).status);
 		if (stockInvoice.getStockInvoiceStatuses() != null) {
 			for (StockInvoiceStatus stockInvoiceStatus : stockInvoice.getStockInvoiceStatuses()) {
 				//TODO Limit status to check the ones available in enums
@@ -603,28 +603,29 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 				stockInvoiceStatus.setRemarks(stockInvoiceStatus.getStatus());
 				stockInvoiceStatus.setStockInvoice(existingStockInvoice);
 				this.saveStockInvoiceStatus(stockInvoiceStatus);
+				
+								if (stockInvoiceStatus.status.equals(StockInvoiceItemStatus.Type.RECEIVED.toString())) {
+									for(StockInvoiceItem stockInvoiceItem : stockInvoice.getStockInvoiceItems()){
+										System.out.println("aabb");
+										boolean isStatusReceieved = false;
+										for(StockInvoiceItemStatus stockInvoiceItemStatus : stockInvoiceItem.getStockInvoiceItemStatuses()){
+											if(stockInvoiceItemStatus.getStatus().equals(StockInvoiceItemStatus.Type.RECEIVED.toString())){
+												isStatusReceieved = true;
+											}
 
-				if (stockInvoiceStatus.status.equals(StockInvoiceItemStatus.Type.RECEIVED.toString())) {
-					for(StockInvoiceItem stockInvoiceItem : stockInvoice.getStockInvoiceItems()){
-						System.out.println("aabb");
-						boolean isStatusReceieved = false;
-						for(StockInvoiceItemStatus stockInvoiceItemStatus : stockInvoiceItem.getStockInvoiceItemStatuses()){
-							if(stockInvoiceItemStatus.getStatus().equals(StockInvoiceItemStatus.Type.RECEIVED.toString())){
-								isStatusReceieved = true;
-							}
-
-						}
-						if(isStatusReceieved == false){
-							List<StockInvoiceItemStatus> stockInvoiceItemStatusList = new ArrayList<>();
-							StockInvoiceItemStatus stockInvoiceItemStatus = new StockInvoiceItemStatus();
-							stockInvoiceItemStatus.setStatus(StockInvoiceItemStatus.Type.RECEIVED.toString());
-							stockInvoiceItemStatusList.add(stockInvoiceItemStatus);
-							stockInvoiceItem.setStockInvoiceItemStatuses(stockInvoiceItemStatusList);
-							this.updateStockInvoiceItem(stockInvoiceItem);
-						}
-					}
-				}
-
+										}
+										if(isStatusReceieved == false){
+											List<StockInvoiceItemStatus> stockInvoiceItemStatusList = new ArrayList<>();
+											StockInvoiceItemStatus stockInvoiceItemStatus = new StockInvoiceItemStatus();
+											stockInvoiceItemStatus.setStatus(StockInvoiceItemStatus.Type.RECEIVED.toString());
+											stockInvoiceItemStatus.setRemarks(StockInvoiceItemStatus.Type.RECEIVED.toString());
+											stockInvoiceItemStatusList.add(stockInvoiceItemStatus);
+											stockInvoiceItem.setStockInvoiceItemStatuses(stockInvoiceItemStatusList);
+											this.updateStockInvoiceItem(stockInvoiceItem);
+										}
+									}
+								}
+				
 			}
 		}
 		return existingStockInvoice;
@@ -645,27 +646,27 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 			}
 			stockInvoiceItem.setItem(item);
 		}
-
-		if(stockInvoiceItem.getLocation() != null) {
+		
+		if (stockInvoiceItem.getLocation() != null) {
 			Location location = Context.getLocationService().getLocationByUuid(stockInvoiceItem.getLocation().getUuid());
 			if (location == null) {
 				throw new Exception("The location with uuid " + stockInvoiceItem.getLocation().getUuid() + " does not exist");
 			}
 			stockInvoiceItem.setLocation(location);
 		}
-			// Saving stock invoice status
-			if (stockInvoiceItem.getStockInvoiceItemStatuses() != null) {
-				for (StockInvoiceItemStatus stockInvoiceItemStatus : stockInvoiceItem.getStockInvoiceItemStatuses()) {
-					StockInvoiceItem existingStockInvoiceItem = this.getStockInvoiceItemByUuid(stockInvoiceItem.getUuid());
-					stockInvoiceItemStatus.setStockInvoiceItem(existingStockInvoiceItem);
-					this.saveStockInvoiceItemStatus(stockInvoiceItemStatus);
-
-					if (stockInvoiceItemStatus.status.equals(StockInvoiceItemStatus.Type.RECEIVED.toString())) {
-						TransactionUtil.operateOnStock("+", stockInvoiceItem);
-					}
+		// Saving stock invoice status
+		if (stockInvoiceItem.getStockInvoiceItemStatuses() != null) {
+			for (StockInvoiceItemStatus stockInvoiceItemStatus : stockInvoiceItem.getStockInvoiceItemStatuses()) {
+				StockInvoiceItem existingStockInvoiceItem = this.getStockInvoiceItemByUuid(stockInvoiceItem.getUuid());
+				stockInvoiceItemStatus.setStockInvoiceItem(existingStockInvoiceItem);
+				this.saveStockInvoiceItemStatus(stockInvoiceItemStatus);
+				
+				if (stockInvoiceItemStatus.status.equals(StockInvoiceItemStatus.Type.RECEIVED.toString())) {
+					TransactionUtil.operateOnStock("+", stockInvoiceItem);
 				}
 			}
-
+		}
+		
 		return stockInvoiceItemDAO.updateStockInvoiceItem(stockInvoiceItem);
 	}
 	
@@ -687,10 +688,10 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 			throw new Exception("The unit of measurement with uuid" + stockInvoiceItem.getUom().getUuid()
 			        + " does not exist");
 		}
-
+		
 		Location location = Context.getLocationService().getLocationByUuid(stockInvoiceItem.getLocation().getUuid());
-		if(location == null){
-			throw new Exception(" The location with uuid"+ stockInvoiceItem.getLocation().getUuid()+" does not exist");
+		if (location == null) {
+			throw new Exception(" The location with uuid" + stockInvoiceItem.getLocation().getUuid() + " does not exist");
 		}
 		
 		stockInvoiceItem.setItem(item);

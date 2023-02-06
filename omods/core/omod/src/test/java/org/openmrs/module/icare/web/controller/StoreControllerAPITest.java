@@ -709,15 +709,15 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 	public void creatingAndgettingSuppliers() throws Exception {
 		String dto = this.readFile("dto/store/supplier-create.json");
 		List<Map<String, Object>> suppliers = (new ObjectMapper()).readValue(dto, List.class);
-
+		
 		//post stock invoice
 		MockHttpServletRequest newPostRequest = newPostRequest("store/suppliers", suppliers);
 		MockHttpServletResponse handle = handle(newPostRequest);
-
+		
 		List<Map<String, Object>> createdSuppliers = (new ObjectMapper()).readValue(handle.getContentAsString(), List.class);
-
+		
 		assertThat("created 1 supplier", createdSuppliers.size(), is(1));
-
+		
 		//Getsuppliers
 		//Get stock invoices
 		MockHttpServletRequest newGetRequest = newGetRequest("store/suppliers", new Parameter("startIndex", "1"),
@@ -776,16 +776,16 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		
 		Map<String, Object> updatedInvoice = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
 		assertThat("stock invoice has been updated", updatedInvoice.get("invoiceNumber").equals("StInvoice3"));
-
-		Map<String,Object> invoiceItemMap = (Map)(((List) stockInvoiceMap.get("invoiceItems")).get(0));
-		System.out.println(((Map)invoiceItemMap.get("location")).get("uuid"));
-
+		
+		Map<String, Object> invoiceItemMap = (Map) (((List) stockInvoiceMap.get("invoiceItems")).get(0));
+		System.out.println(((Map) invoiceItemMap.get("location")).get("uuid"));
+		
 		//updating stock invoice status
-		MockHttpServletRequest newGetRequest = newGetRequest("store/stock",new Parameter("locationUuid",((Map)invoiceItemMap.get("location")).get("uuid").toString()));
+		MockHttpServletRequest newGetRequest = newGetRequest("store/stock", new Parameter("locationUuid",
+		        ((Map) invoiceItemMap.get("location")).get("uuid").toString()));
 		MockHttpServletResponse handle2 = handle(newGetRequest);
-		List<Map<String,Object>> stockItemGet = (new ObjectMapper()).readValue(handle2.getContentAsString(),List.class);
-		System.out.println(stockItemGet);
-
+		List<Map<String, Object>> stockItemGet = (new ObjectMapper()).readValue(handle2.getContentAsString(), List.class);
+		System.out.println(handle2.getContentAsString());
 		
 	}
 	
@@ -798,20 +798,20 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		MockHttpServletResponse handle = handle(newPostRequest);
 		Map<String, Object> updateInvoiceItem = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
 		assertThat(" The stock invoice item has been updated", updateInvoiceItem.get("batchNo").equals("batch-9"));
-
+		
 		//updating stock invoice item status and saving stock
-
-		MockHttpServletRequest newGetRequest = newGetRequest("store/stock",new Parameter("locationUuid",((Map)stockInvoiceItemMap.get("location")).get("uuid").toString()));
+		
+		MockHttpServletRequest newGetRequest = newGetRequest("store/stock", new Parameter("locationUuid",
+		        ((Map) stockInvoiceItemMap.get("location")).get("uuid").toString()));
 		MockHttpServletResponse handle2 = handle(newGetRequest);
-		List<Map<String,Object>> stockItemGet = (new ObjectMapper()).readValue(handle2.getContentAsString(),List.class);
+		List<Map<String, Object>> stockItemGet = (new ObjectMapper()).readValue(handle2.getContentAsString(), List.class);
 		boolean newBatchexist = false;
-		for(Map<String,Object> stockItem : stockItemGet){
-			if(stockItem.get("batch").equals("batch-9")){
+		for (Map<String, Object> stockItem : stockItemGet) {
+			if (stockItem.get("batch").equals("batch-9")) {
 				newBatchexist = true;
 			}
 		}
-		assertThat("The stock is created from the stock invoice item",newBatchexist,is(true));
-
-
+		assertThat("The stock is created from the stock invoice item", newBatchexist, is(true));
+		
 	}
 }
