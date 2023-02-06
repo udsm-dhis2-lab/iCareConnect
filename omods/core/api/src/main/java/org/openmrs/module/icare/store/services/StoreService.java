@@ -129,4 +129,6 @@ public interface StoreService extends OpenmrsService {
 	StockInvoiceItem saveStockInvoiceItem(StockInvoiceItem stockInvoiceItem) throws Exception;
 	
 	StockInvoiceItemStatus saveStockInvoiceItemStatus(StockInvoiceItemStatus stockInvoiceItemStatus);
+
+    Supplier updateSupplier(Supplier supplier) throws Exception;
 }
