@@ -311,6 +311,18 @@
                     </bean>
                 </property>
 
+                <property name="stockInvoiceItemDAO">
+                    <bean class="org.openmrs.module.icare.store.dao.StockInvoiceItemDAO">
+                        <property name="sessionFactory" ref="dbSessionFactory" />
+                    </bean>
+                </property>
+
+                <property name="stockInvoiceItemStatusDAO">
+                    <bean class="org.openmrs.module.icare.store.dao.StockInvoiceItemStatusDAO">
+                        <property name="sessionFactory" ref="dbSessionFactory" />
+                    </bean>
+                </property>
+
             </bean>
         </property>
         <property name="preInterceptors">
