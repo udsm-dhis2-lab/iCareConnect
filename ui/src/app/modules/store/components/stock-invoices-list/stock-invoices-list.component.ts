@@ -26,6 +26,10 @@ export class StockInvoicesListComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.getInvoices()
+  }
+
+  getInvoices(){
     this.loading = true;
     this.stockInvoices$ = this.stockInvoicesService.getStockInvoices().pipe(
       map((response) => {
@@ -41,14 +45,19 @@ export class StockInvoicesListComponent implements OnInit {
   }
 
   onEditStockInvoice(stockInvoice) {
-    this.dialog.open(StockInvoiceFormDialogComponent, {
-      width: "80%",
-      data: {
-        stockInvoice: stockInvoice,
-        suppliers: this.suppliers,
-        unitsOfMeasurementSettings: this.unitsOfMeasurementSettings,
-      },
-    });
+    this.dialog
+      .open(StockInvoiceFormDialogComponent, {
+        width: "80%",
+        data: {
+          stockInvoice: stockInvoice,
+          suppliers: this.suppliers,
+          unitsOfMeasurementSettings: this.unitsOfMeasurementSettings,
+        },
+      })
+      .afterClosed()
+      .subscribe(() => {
+        this.getInvoices();
+      });;
   }
   onReceiveStockInvoiceItems(stockInvoice) {
     this.dialog
@@ -77,10 +86,9 @@ export class StockInvoicesListComponent implements OnInit {
             .updateStockInvoice(stockInvoice?.uuid, stockInvoiceObject)
             .pipe(
               tap((response) => {
-                // this.reloadList.emit();
+                this.getInvoices();
               })
-            )
-            .subscribe();
+            ).subscribe();
         }
       });
   }
@@ -93,7 +101,11 @@ export class StockInvoicesListComponent implements OnInit {
     }
   }
 
-  onReloadStockIvoiceItemsList() {
-    this.ngOnInit();
+  onReloadStockInvoiceList(stockInvoice) {
+    this.viewStockInvoiceItems = undefined;
+    this.getInvoices();
+    setTimeout(() => {
+      this.viewStockInvoiceItems = stockInvoice?.uuid;
+    }, 100)
   }
 }

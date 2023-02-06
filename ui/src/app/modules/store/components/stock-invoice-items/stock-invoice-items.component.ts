@@ -50,6 +50,8 @@ export class StockInvoiceItemsComponent implements OnInit {
           unitsOfMeasurementSettings: this.unitsOfMeasurementSettings,
           currentLocation: this.currentLocation
         },
+      }).afterClosed().subscribe(() => {
+        this.reloadList.emit(this.stockInvoice);
       });
     }
     if (key === "receive") {
@@ -78,7 +80,7 @@ export class StockInvoiceItemsComponent implements OnInit {
                 this.stockInvoicesService
                   .updateStockInvoiceItem(stockInvoiceItem?.uuid, invoicesItemObject)
                   .pipe(tap((response) => {
-                    this.reloadList.emit()  
+                    this.reloadList.emit(this.stockInvoice)  
                   }))
                   .subscribe();
           }
@@ -107,10 +109,11 @@ export class StockInvoiceItemsComponent implements OnInit {
             this.stockInvoicesService
               .updateStockInvoiceItem(stockInvoiceItem?.uuid, invoicesItemObject)
               .pipe(tap((response) => {
-                this.reloadList.emit()
+                this.reloadList.emit(this.stockInvoice);
               }))
               .subscribe();
             }
+            this.reloadList.emit(this.stockInvoice)
           }
         )
       }
