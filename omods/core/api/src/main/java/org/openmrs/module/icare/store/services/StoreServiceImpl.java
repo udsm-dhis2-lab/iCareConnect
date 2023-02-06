@@ -604,7 +604,9 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 				this.saveStockInvoiceStatus(stockInvoiceStatus);
 				
 								if (stockInvoiceStatus.status.equals(StockInvoiceItemStatus.Type.RECEIVED.toString())) {
-									for(StockInvoiceItem stockInvoiceItem : stockInvoice.getStockInvoiceItems()){
+									//Integer invoiceId = stockInvoice.getId();
+									List<StockInvoiceItem> stockInvoiceItemsList = this.stockInvoiceItemDAO.getStockInvoiceItemByInvoice(existingStockInvoice);
+									for(StockInvoiceItem stockInvoiceItem : stockInvoiceItemsList){
 										boolean isStatusReceieved = false;
 										for(StockInvoiceItemStatus stockInvoiceItemStatus : stockInvoiceItem.getStockInvoiceItemStatuses()){
 											if(stockInvoiceItemStatus.getStatus().equals(StockInvoiceItemStatus.Type.RECEIVED.toString())){
