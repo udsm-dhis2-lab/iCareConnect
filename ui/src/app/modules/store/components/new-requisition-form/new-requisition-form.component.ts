@@ -8,6 +8,7 @@ import { RequisitionInput } from "src/app/shared/resources/store/models/requisit
 import { keyBy } from "lodash";
 import { Observable } from "rxjs";
 import { StockService } from "src/app/shared/resources/store/services/stock.service";
+import { RequisitionService } from "src/app/shared/resources/store/services/requisition.service";
 
 @Component({
   selector: "app-new-requisition-form",
@@ -32,9 +33,12 @@ export class NewRequisitionFormComponent implements OnInit {
   targetStoreField: Dropdown[];
   storeUuid: string;
   itemUuid: string;
-  addedDataList: any;
+  addedDataList: RequisitionInput;
   addingRequisitions: boolean = false;
-  constructor(private stockService: StockService) {}
+  constructor(
+    private stockService: StockService,
+    private requisitionService: RequisitionService
+  ) {}
 
   ngOnInit() {
     const keyedMainStoreRequestEligibleTags = keyBy(
@@ -59,7 +63,7 @@ export class NewRequisitionFormComponent implements OnInit {
       )?.length > 0;
     this.targetStoreField = [
       new Dropdown({
-        id: "target_store",
+        id: "targetStore",
         key: "targetStore",
         label: "Target Store",
         required: true,
@@ -103,7 +107,7 @@ export class NewRequisitionFormComponent implements OnInit {
     ];
     this.requisitionFields = [
       new Dropdown({
-        id: "requisition_item",
+        id: "requisitionItem",
         key: "requisitionItem",
         label: "Item",
         required: true,
@@ -126,7 +130,7 @@ export class NewRequisitionFormComponent implements OnInit {
 
   onRequest(e: Event) {
     e.stopPropagation();
-    const requisitionInput: RequisitionInput = {
+    this.addedDataList = {
       requestingLocationUuid: this.currentStore?.id,
       requestedLocationUuid: this.formData?.targetStore?.value,
       items: [
@@ -136,10 +140,21 @@ export class NewRequisitionFormComponent implements OnInit {
         },
       ],
     };
+
+    this.requisitionService
+      .createRequest(this.addedDataList)
+      .subscribe((response) => {
+        if (response) {
+          console.log("==> Response: ", response);
+        }
+      });
   }
 
   onAdd(e) {
-    if(this.storeUuid === this.addedDataList?.requestedLocationUuid){
+    if (
+      this.formData?.quantity?.value ===
+      this.addedDataList?.requestedLocationUuid
+    ) {
       this.addedDataList = {
         ...this.addedDataList,
         requestingLocationUuid: this.currentStore?.id,
@@ -148,29 +163,47 @@ export class NewRequisitionFormComponent implements OnInit {
           ? [
               ...this.addedDataList?.items,
               {
-                itemUuid: this.itemUuid,
-                quantity: parseInt(String(this.specifiedQuantity), 10),
+                itemUuid: this.formData?.requisitionItem?.value,
+                quantity: parseInt(String(this.formData?.quantity?.value), 10),
               },
             ]
           : [
               {
-                itemUuid: this.itemUuid,
-                quantity: parseInt(String(this.specifiedQuantity), 10),
+                itemUuid: this.formData?.requisitionItem?.value,
+                quantity: parseInt(String(this.formData?.quantity?.value), 10),
               },
             ],
       };
     } else {
       this.addedDataList = {
         requestingLocationUuid: this.currentStore?.id,
-        requestedLocationUuid: this.storeUuid,
+        requestedLocationUuid: this.formData?.targetStore?.value,
         items: [
           {
-            itemUuid: this.itemUuid,
-            quantity: parseInt(String(this.specifiedQuantity), 10),
+            itemUuid: this.formData?.targetStore?.value,
+            quantity: parseInt(String(this.formData?.quantity?.value), 10),
           },
         ],
-      }
+      };
     }
+    this.addedDataList = {
+      requestingLocationUuid: this.currentStore?.id,
+      requestedLocationUuid: this.formData?.targetStore?.value,
+      items: [
+        {
+          itemUuid: this.formData?.requisitionItem?.value,
+          quantity: parseInt(this.formData?.quantity.value, 10),
+        },
+      ],
+    };
+    
+    this.requisitionService
+      .createRequest(this.addedDataList)
+      .subscribe((response) => {
+        if (!response?.error) {
+          this.addedDataList = response
+        }
+      });
   }
 
   onUpdateForm(formValue: FormValue): void {

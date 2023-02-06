@@ -182,13 +182,15 @@ export class StockReceivingFormFieldsComponent implements OnInit {
         label: "Unit Price",
         value: this.stockInvoiceItem ? this.stockInvoiceItem?.unitPrice : "",
       })),
-      this.amount = this?.stockInvoiceItem ? this?.stockInvoiceItem?.amount : undefined;
-      (this.amountField = new Textbox({
-        id: "amount",
-        key: "amount",
-        label: "Amount",
-        disabled: true,
-      }));
+      (this.amount = this?.stockInvoiceItem
+        ? this?.stockInvoiceItem?.amount
+        : undefined);
+    this.amountField = new Textbox({
+      id: "amount",
+      key: "amount",
+      label: "Amount",
+      disabled: true,
+    });
 
     this.itemFields = [
       this.unitField,
@@ -248,7 +250,7 @@ export class StockReceivingFormFieldsComponent implements OnInit {
           parseInt(this.batchQuantity) *
           unit
         ).toFixed(2);
-      }, 100)
+      }, 100);
     }
   }
 
@@ -319,6 +321,11 @@ export class StockReceivingFormFieldsComponent implements OnInit {
         receivingDate: new Date(
           moment(this.formValues?.receivingDate?.value).toDate()
         )?.toISOString(),
+        stockInvoiceStatus: [
+          {
+            status: "DRAFT",
+          },
+        ],
         invoiceItems: [
           {
             item: {
@@ -329,6 +336,11 @@ export class StockReceivingFormFieldsComponent implements OnInit {
             batchQuantity: Number(this.batchQuantity),
             amount: parseFloat(this.amount),
             unitPrice: parseFloat(this.unitPrice),
+            stockInvoiceItemStatus: [
+              {
+                status: "DRAFT",
+              },
+            ],
             location: {
               uuid: this.currentLocation?.uuid,
             },
@@ -367,6 +379,11 @@ export class StockReceivingFormFieldsComponent implements OnInit {
           receivingDate: new Date(
             moment(this.formValues?.receivingDate?.value).toDate()
           )?.toISOString(),
+          stockInvoiceStatus: [
+            {
+              status: "DRAFT",
+            },
+          ],
           invoiceItems: [
             {
               item: {
@@ -383,6 +400,11 @@ export class StockReceivingFormFieldsComponent implements OnInit {
               location: {
                 uuid: this.currentLocation?.uuid,
               },
+              stockInvoiceItemStatus: [
+                {
+                  status: "DRAFT",
+                },
+              ],
               expiryDate: new Date(
                 moment(this.formValues?.expiryDate?.value).toDate()
               )?.toISOString(),
@@ -411,11 +433,46 @@ export class StockReceivingFormFieldsComponent implements OnInit {
     this.reloadItemFields(true);
   }
 
+  onSaveUdatedInvoice() {
+    const invoice = {
+      invoiceNumber: this.formValues?.invoiceNumber?.value,
+      supplier: {
+        uuid: this.formValues?.supplier?.value,
+      },
+      receivingDate: new Date(
+        moment(this.formValues?.receivingDate?.value).toDate()
+      )?.toISOString(),
+      stockInvoiceStatus: [
+        {
+          status: "DRAFT",
+        },
+      ],
+    };
+
+    this.stockInvoicesService
+      .updateStockInvoice(this.stockInvoice?.uuid, invoice)
+      .pipe(
+        tap((response) => {
+          if (!response?.error) {
+            this.stockInvoice = response;
+          }
+          this.itemFields = [];
+          setTimeout(() => {
+            this.setFields();
+          }, 100);
+          this.closeDialog.emit();
+        })
+      )
+      .subscribe();
+  }
+
   updateInvoiceItem(e: any) {
     e?.stopPropagation();
     const invoicesItemObject = {
       item: {
-        uuid: this.selectedItem ? this.selectedItem : this.stockInvoiceItem?.item?.uuid,
+        uuid: this.selectedItem
+          ? this.selectedItem
+          : this.stockInvoiceItem?.item?.uuid,
       },
       batchNo: this.formValues?.mfgBatchNumber?.value,
       orderQuantity: Number(this.formValues?.orderQuantity?.value),
@@ -425,9 +482,11 @@ export class StockReceivingFormFieldsComponent implements OnInit {
       location: {
         uuid: this.currentLocation?.uuid,
       },
-      stockInvoiceItemStatus: [{
-        status: 'DRAFT',
-      }],
+      stockInvoiceItemStatus: [
+        {
+          status: "DRAFT",
+        },
+      ],
       uom: {
         uuid: this.unitOfMeasure?.uuid,
       },
@@ -479,5 +538,10 @@ export class StockReceivingFormFieldsComponent implements OnInit {
         unit
       ).toFixed(2);
     }
+  }
+
+  onClosePopup(e: any){
+    e?.stopPropagation();
+    this.closeDialog.emit();
   }
 }
