@@ -53,7 +53,7 @@ export class StockReceivingFormFieldsComponent implements OnInit {
   mfgBatchNumberField: Textbox;
   orderQuantityField: Textbox;
   unitField: Dropdown;
-  batchQuantity: string;
+  batchQuantity: number;
   unitPrice: string;
   amount: string;
   itemField: Textbox;
@@ -172,6 +172,7 @@ export class StockReceivingFormFieldsComponent implements OnInit {
         id: "batchQuantity",
         key: "batchQuantity",
         label: "Batch Quantity",
+        disabled: true,
         value: this.stockInvoiceItem
           ? this.stockInvoiceItem?.batchQuantity
           : "",
@@ -197,7 +198,6 @@ export class StockReceivingFormFieldsComponent implements OnInit {
       this.orderQuantityField,
       this.mfgBatchNumberField,
       this.expiryDateField,
-      this.batchQuantityField,
       this.unitPriceField,
     ];
   }
@@ -234,21 +234,30 @@ export class StockReceivingFormFieldsComponent implements OnInit {
     this.unitOfMeasure = this.formValues?.unit?.value
       ? this.formValues?.unit?.value
       : undefined;
-    this.batchQuantity = this.formValues?.batchQuantity?.value;
-    this.unitPrice = this.formValues?.unitPrice?.value;
-    if (this.batchQuantity?.length && this.unitPrice?.length) {
-      this.amount = undefined;
-      setTimeout(() => {
-        const unit =
+    if (this.formValues?.orderQuantity?.value && this.unitOfMeasure){
+      const unit =
           this.unitOfMeasure?.mappings?.filter(
             (mapping) =>
               mapping?.conceptReferenceTerm?.conceptSource?.uuid ===
               this.unitsOfMeasurementSettings?.uuid
           )[0]?.conceptReferenceTerm?.code || 1;
+          this.batchQuantity =
+            this.batchQuantity &&
+            this.formValues?.orderQuantity?.value * unit === this.batchQuantity
+              ? this.batchQuantity
+              : undefined;
+          setTimeout(() => {
+            this.batchQuantity = Number(this.formValues?.orderQuantity?.value) * unit;
+            this.batchQuantityField.value = this.batchQuantity.toString();
+          }, 100)
+    }
+    this.unitPrice = this.formValues?.unitPrice?.value;
+    if (this.batchQuantity && this.unitPrice?.length) {
+      this.amount = undefined;
+      setTimeout(() => {
         this.amount = (
           parseFloat(this.unitPrice) *
-          parseInt(this.batchQuantity) *
-          unit
+          this.batchQuantity
         ).toFixed(2);
       }, 100);
     }
@@ -391,7 +400,7 @@ export class StockReceivingFormFieldsComponent implements OnInit {
               },
               batchNo: this.formValues?.mfgBatchNumber?.value,
               orderQuantity: Number(this.formValues?.orderQuantity?.value),
-              batchQuantity: Number(this.batchQuantity),
+              batchQuantity: this.batchQuantity,
               amount: parseFloat(this.amount),
               unitPrice: parseFloat(this.unitPrice),
               uom: {
@@ -476,7 +485,7 @@ export class StockReceivingFormFieldsComponent implements OnInit {
       },
       batchNo: this.formValues?.mfgBatchNumber?.value,
       orderQuantity: Number(this.formValues?.orderQuantity?.value),
-      batchQuantity: Number(this.batchQuantity),
+      batchQuantity: this.batchQuantity,
       amount: parseFloat(this.amount),
       unitPrice: parseFloat(this.unitPrice),
       location: {
@@ -505,40 +514,40 @@ export class StockReceivingFormFieldsComponent implements OnInit {
       .subscribe();
   }
 
-  onGetBatchQuantity(formValue: FormValue) {
-    this.batchQuantity = formValue.getValues()?.batchQuantity?.value;
-    if (this.batchQuantity.length && this.unitPrice.length) {
-      const unit =
-        this.unitOfMeasure?.mappings?.filter(
-          (mapping) =>
-            mapping?.conceptReferenceTerm?.uuid ===
-            this.unitsOfMeasurementSettings?.conceptReferenceTerm
-        )[0]?.conceptReferenceTerm?.code || 1;
-      this.amount = (
-        parseFloat(this.unitPrice) *
-        parseInt(this.batchQuantity) *
-        unit
-      ).toFixed(2);
-    }
-  }
+  // onGetBatchQuantity(formValue: FormValue) {
+  //   this.batchQuantity = formValue.getValues()?.batchQuantity?.value;
+  //   if (this.batchQuantity.length && this.unitPrice.length) {
+  //     const unit =
+  //       this.unitOfMeasure?.mappings?.filter(
+  //         (mapping) =>
+  //           mapping?.conceptReferenceTerm?.uuid ===
+  //           this.unitsOfMeasurementSettings?.conceptReferenceTerm
+  //       )[0]?.conceptReferenceTerm?.code || 1;
+  //     this.amount = (
+  //       parseFloat(this.unitPrice) *
+  //       this.batchQuantity *
+  //       unit
+  //     ).toFixed(2);
+  //   }
+  // }
 
-  onGetUnitPrice(formValue: FormValue) {
-    this.unitPrice = formValue.getValues()?.unitPrice?.value;
+  // onGetUnitPrice(formValue: FormValue) {
+  //   this.unitPrice = formValue.getValues()?.unitPrice?.value;
 
-    if (this.batchQuantity?.length * this.unitPrice?.length) {
-      const unit =
-        this.unitOfMeasure?.mappings?.filter(
-          (mapping) =>
-            mapping?.conceptReferenceTerm?.uuid ===
-            this.unitsOfMeasurementSettings?.conceptReferenceTerm
-        )[0]?.conceptReferenceTerm?.code || 1;
-      this.amount = (
-        parseFloat(this.unitPrice) *
-        parseInt(this.batchQuantity) *
-        unit
-      ).toFixed(2);
-    }
-  }
+  //   if (this.batchQuantity?.length * this.unitPrice?.length) {
+  //     const unit =
+  //       this.unitOfMeasure?.mappings?.filter(
+  //         (mapping) =>
+  //           mapping?.conceptReferenceTerm?.uuid ===
+  //           this.unitsOfMeasurementSettings?.conceptReferenceTerm
+  //       )[0]?.conceptReferenceTerm?.code || 1;
+  //     this.amount = (
+  //       parseFloat(this.unitPrice) *
+  //       parseInt(this.batchQuantity) *
+  //       unit
+  //     ).toFixed(2);
+  //   }
+  // }
 
   onClosePopup(e: any){
     e?.stopPropagation();
