@@ -41,15 +41,17 @@
                   <mat-menu #menu="matMenu">
                     <button
                       mat-menu-item
+                      (click)="onUpdateSupplier($event, supplier)"
                     >
                       <mat-icon>edit</mat-icon>
                       <span>Update</span>
                     </button>
                     <button
                       mat-menu-item
+                      (click)="onDeleteSupplier($event, supplier)"
                     >
                       <mat-icon>delete</mat-icon>
-                      <span>Remove</span>
+                      <span>Delete</span>
                     </button>
                   </mat-menu>
             </td>
