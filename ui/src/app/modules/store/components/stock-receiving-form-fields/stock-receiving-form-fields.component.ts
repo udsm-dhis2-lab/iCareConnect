@@ -242,8 +242,8 @@ export class StockReceivingFormFieldsComponent implements OnInit {
         const unit =
           this.unitOfMeasure?.mappings?.filter(
             (mapping) =>
-              mapping?.conceptReferenceTerm?.uuid ===
-              this.unitsOfMeasurementSettings?.conceptReferenceTerm
+              mapping?.conceptReferenceTerm?.conceptSource?.uuid ===
+              this.unitsOfMeasurementSettings?.uuid
           )[0]?.conceptReferenceTerm?.code || 1;
         this.amount = (
           parseFloat(this.unitPrice) *
