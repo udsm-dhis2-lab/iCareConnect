@@ -4568,7 +4568,9 @@
         </preConditions>
         <comment>Creating openmrs st_requisition_item_status table</comment>
         <createTable tableName="st_requisition_item_status">
-            <column name="requisition_item_status_id" type="INTEGER" autoIncrement="true"/>
+            <column name="requisition_item_status_id" type="INTEGER" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="stock_requisition_item_status_id_pk"/>
+            </column>
             <column name="item_id" type="INTEGER"/>
             <column name="requisition_id" type="INTEGER"/>
             <column name="status" type="TEXT"/>
@@ -4589,7 +4591,7 @@
                 <constraints nullable="false" unique="true"></constraints>
             </column>
         </createTable>
-        <addPrimaryKey columnNames="item_id,requisition_id,requisition_item_status_id" tableName="st_requisition_item_status"/>
+
         <addForeignKeyConstraint
                 baseColumnNames="changed_by"
                 baseTableName="st_requisition_item_status"
@@ -4608,7 +4610,7 @@
                 baseColumnNames="item_id"
                 baseTableName="st_requisition_item_status"
                 constraintName="st_requisition_item_status_item_fk"
-                referencedColumnNames="tem_id"
+                referencedColumnNames="item_id"
                 referencedTableName="item"/>
 
         <addForeignKeyConstraint
@@ -4619,5 +4621,11 @@
                 referencedColumnNames="requisition_id"/>
     </changeSet>
 
+    <changeSet id="update_st_requisition_add_column_code" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE st_requisition
+            ADD COLUMN code VARCHAR(50) NULL AFTER requisition_id;
+        </sql>
+    </changeSet>
 
 </databaseChangeLog>
