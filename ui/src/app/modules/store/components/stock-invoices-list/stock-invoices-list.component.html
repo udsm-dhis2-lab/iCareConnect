@@ -20,51 +20,54 @@
           <mat-panel-title>
             <span>INVOICE: {{ stockInvoice?.invoiceNumber }}</span>
             <span class="ml-4">{{ stockInvoice?.supplier?.name }}</span>
+            <span class="ml-4 text-small"><i>
+              Received on: {{ stockInvoice?.receivingDate | date:"medium" }}
+            </i></span>
           </mat-panel-title>
         </mat-expansion-panel-header>
-        <div class="row mb-3">
-          <div class="col-4">Received on: {{ stockInvoice?.receivingDate | date:"medium" }}</div>
-          <div class="col-4"></div>
-          <div class="col-4">
-            <div class="float-right">
-              <a 
-                *ngIf="status === 'DRAFT'"
-                class="anchor-button" 
-                color="primary"
-                (click)="onEditStockInvoice(stockInvoice)"  
-                matTooltip="Edit invoice"
-              >
-                <mat-icon>edit</mat-icon>
-              </a>
-              <a 
-                class="anchor-button ml-4" 
-                color="primary"
-                (click)="onViewStockInvoiceItems(stockInvoice?.uuid)"  
-                matTooltip="{{viewStockInvoiceItems && viewStockInvoiceItems !== stockInvoice?.uuid ? 'View invoice Items' : 'Hide Invoice Items' }}"
-              >
-                 <mat-icon *ngIf="viewStockInvoiceItems && viewStockInvoiceItems === stockInvoice?.uuid">visibility_off</mat-icon>
-                  <mat-icon *ngIf="!viewStockInvoiceItems || viewStockInvoiceItems !== stockInvoice?.uuid">visibility</mat-icon>
-              </a>
-              <ng-container *ngIf="status === 'DRAFT'">
+        <div class="row mt-2">
+            <div class="col-4"></div>
+            <div class="col-4"></div>
+            <div class="col-4">
+              <div class="float-right">
                 <a 
-                  class="anchor-button ml-4" 
+                  *ngIf="status === 'DRAFT'"
+                  class="anchor-button" 
                   color="primary"
-                  (click)="onReceiveStockInvoiceItems(stockInvoice)"  
-                  matTooltip="Mark this invoice received"
+                  (click)="onEditStockInvoice(stockInvoice)"  
+                  matTooltip="Edit invoice"
                 >
-                    <mat-icon>check</mat-icon>
+                  <mat-icon>edit</mat-icon>
                 </a>
                 <a 
                   class="anchor-button ml-4" 
                   color="primary"
-                  (click)="onDeleteStockInvoice(stockInvoice)"  
-                  matTooltip="Delete this invoice"
+                  (click)="onViewStockInvoiceItems(stockInvoice?.uuid)"  
+                  matTooltip="{{viewStockInvoiceItems && viewStockInvoiceItems !== stockInvoice?.uuid ? 'View invoice Items' : 'Hide Invoice Items' }}"
                 >
-                    <mat-icon>delete</mat-icon>
+                   <mat-icon *ngIf="viewStockInvoiceItems && viewStockInvoiceItems === stockInvoice?.uuid">visibility_off</mat-icon>
+                    <mat-icon *ngIf="!viewStockInvoiceItems || viewStockInvoiceItems !== stockInvoice?.uuid">visibility</mat-icon>
                 </a>
-              </ng-container>
+                <ng-container *ngIf="status === 'DRAFT'">
+                  <a 
+                    class="anchor-button ml-4" 
+                    color="primary"
+                    (click)="onReceiveStockInvoiceItems(stockInvoice)"  
+                    matTooltip="Mark this invoice received"
+                  >
+                      <mat-icon>check</mat-icon>
+                  </a>
+                  <a 
+                    class="anchor-button ml-4" 
+                    color="primary"
+                    (click)="onDeleteStockInvoice(stockInvoice)"  
+                    matTooltip="Delete this invoice"
+                  >
+                      <mat-icon>delete</mat-icon>
+                  </a>
+                </ng-container>
+              </div>
             </div>
-          </div>
         </div>
         <mat-progress-bar mode="indeterminate" *ngIf="viewStockInvoiceItems && viewStockInvoiceItems === stockInvoice?.uuid && loading"></mat-progress-bar>
         <div class="inv-items-table container-fluid" *ngIf="viewStockInvoiceItems && viewStockInvoiceItems === stockInvoice?.uuid && !loading">
