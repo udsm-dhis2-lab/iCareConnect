@@ -24,8 +24,9 @@ export class StockReceivingFormFieldsComponent implements OnInit {
   @Input() existingStockInvoice: any;
   @Input() stockInvoiceItem: any;
   @Input() currentLocation: any;
-  @Output() loadInvoice: EventEmitter<any> = new EventEmitter();
+  @Output() loadInvoices: EventEmitter<any> = new EventEmitter();
   @Output() closeDialog: EventEmitter<any> = new EventEmitter();
+  @Output() reloadForm: EventEmitter<any> = new EventEmitter();
 
   supplierNameField: any;
   invoiceNumberField: any;
@@ -234,32 +235,35 @@ export class StockReceivingFormFieldsComponent implements OnInit {
     this.unitOfMeasure = this.formValues?.unit?.value
       ? this.formValues?.unit?.value
       : undefined;
-    if (this.formValues?.orderQuantity?.value && this.unitOfMeasure){
+    if (this.formValues?.orderQuantity?.value && this.unitOfMeasure) {
       const unit =
-          this.unitOfMeasure?.mappings?.filter(
-            (mapping) =>
-              mapping?.conceptReferenceTerm?.conceptSource?.uuid ===
-              this.unitsOfMeasurementSettings?.uuid
-          )[0]?.conceptReferenceTerm?.code || 1;
-          this.batchQuantity =
-            this.batchQuantity &&
-            this.formValues?.orderQuantity?.value * unit === this.batchQuantity
-              ? this.batchQuantity
-              : undefined;
-          setTimeout(() => {
-            this.batchQuantity = Number(this.formValues?.orderQuantity?.value) * unit;
-            this.batchQuantityField.value = this.batchQuantity.toString();
-          }, 100)
+        this.unitOfMeasure?.mappings?.filter(
+          (mapping) =>
+            mapping?.conceptReferenceTerm?.conceptSource?.uuid ===
+            this.unitsOfMeasurementSettings?.uuid
+        )[0]?.conceptReferenceTerm?.code || 1;
+      this.batchQuantity =
+        this.batchQuantity &&
+        this.formValues?.orderQuantity?.value * unit === this.batchQuantity
+          ? this.batchQuantity
+          : undefined;
+      setTimeout(() => {
+        this.batchQuantity =
+          Number(this.formValues?.orderQuantity?.value) * unit;
+        this.batchQuantityField.value = this.batchQuantity.toString();
+      }, 100);
     }
     this.unitPrice = this.formValues?.unitPrice?.value;
     if (this.batchQuantity && this.unitPrice?.length) {
       this.amount = undefined;
       setTimeout(() => {
-        this.amount = (
-          parseFloat(this.unitPrice) *
-          this.batchQuantity
-        ).toFixed(2);
+        this.amount = (parseFloat(this.unitPrice) * this.batchQuantity).toFixed(
+          2
+        );
       }, 100);
+    }
+    if (!this.batchQuantity || !this.unitPrice?.length) {
+      this.amount = undefined;
     }
   }
 
@@ -374,7 +378,7 @@ export class StockReceivingFormFieldsComponent implements OnInit {
             setTimeout(() => {
               this.setFields();
             }, 100);
-            this.loadInvoice.emit(response);
+            this.loadInvoices.emit(response);
           })
         )
         .subscribe();
@@ -433,7 +437,7 @@ export class StockReceivingFormFieldsComponent implements OnInit {
             setTimeout(() => {
               this.setFields();
             }, 100);
-            this.loadInvoice.emit(response);
+            this.loadInvoices.emit(response);
           })
         )
         .subscribe();
@@ -470,6 +474,7 @@ export class StockReceivingFormFieldsComponent implements OnInit {
             this.setFields();
           }, 100);
           this.closeDialog.emit();
+          this.reloadForm.emit();
         })
       )
       .subscribe();
@@ -549,7 +554,7 @@ export class StockReceivingFormFieldsComponent implements OnInit {
   //   }
   // }
 
-  onClosePopup(e: any){
+  onClosePopup(e: any) {
     e?.stopPropagation();
     this.closeDialog.emit();
   }
