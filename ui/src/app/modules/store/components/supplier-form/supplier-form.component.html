@@ -10,6 +10,7 @@
     <div class="d-flex justify-content-end">
       <button mat-stroked-button (click)="onCancel($event)">Cancel</button>
       <button
+        *ngIf="!data"
         color="primary"
         mat-flat-button
         color="primary"
@@ -17,6 +18,16 @@
         (click)="onSaveSupplier($event)"
       >
         Save
+      </button>
+      <button
+        *ngIf="data"
+        color="primary"
+        mat-flat-button
+        color="primary"
+        class="ml-3"
+        (click)="onUpdateSupplier($event)"
+      >
+        Update
       </button>
     </div>
   </div>
