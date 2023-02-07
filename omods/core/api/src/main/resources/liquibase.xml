@@ -4560,4 +4560,64 @@
         </sql>
     </changeSet>
 
+    <changeSet id="create_st_requisition_item_status" author="dennis-kibahila" dbms="mysql">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="st_requisition_item_status"/>
+            </not>
+        </preConditions>
+        <comment>Creating openmrs st_requisition_item_status table</comment>
+        <createTable tableName="st_requisition_item_status">
+            <column name="requisition_item_status_id" type="INTEGER" autoIncrement="true"/>
+            <column name="item_id" type="INTEGER"/>
+            <column name="requisition_id" type="INTEGER"/>
+            <column name="status" type="TEXT"/>
+            <column name="remarks" type="TEXT"/>
+            <column name="creator" type="INTEGER"/>
+            <column name="date_created" type="DATE">
+                <constraints nullable="false"></constraints>
+            </column>
+            <column name="changed_by" type="INTEGER"/>
+            <column name="date_changed" type="DATE"/>
+            <column name="voided" type="BOOLEAN">
+                <constraints nullable="false"></constraints>
+            </column>
+            <column name="date_voided" type="DATE"/>
+            <column name="voided_by" type="INTEGER"/>
+            <column name="void_reason" type="TEXT"/>
+            <column name="uuid" type="char(38)">
+                <constraints nullable="false" unique="true"></constraints>
+            </column>
+        </createTable>
+        <addPrimaryKey columnNames="item_id,requisition_id,requisition_item_status_id" tableName="st_requisition_item_status"/>
+        <addForeignKeyConstraint
+                baseColumnNames="changed_by"
+                baseTableName="st_requisition_item_status"
+                constraintName="st_requisition_item_status_changed_by_users_user_id_fk"
+                referencedColumnNames="user_id"
+                referencedTableName="users"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="creator"
+                baseTableName="st_requisition_item_status"
+                constraintName="st_requisition_item_status_creator_users_user_id_fk"
+                referencedColumnNames="user_id"
+                referencedTableName="users"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="item_id"
+                baseTableName="st_requisition_item_status"
+                constraintName="st_requisition_item_status_item_fk"
+                referencedColumnNames="tem_id"
+                referencedTableName="item"/>
+
+        <addForeignKeyConstraint
+                baseTableName="st_requisition_item_status"
+                baseColumnNames="requisition_id"
+                constraintName="st_requisition_item_status_st_requisition_requisition_id_fk"
+                referencedTableName="st_requisition"
+                referencedColumnNames="requisition_id"/>
+    </changeSet>
+
+
 </databaseChangeLog>
