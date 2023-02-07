@@ -34,7 +34,7 @@ export class StockReceivingFormComponent implements OnInit {
     this.unitsOfMeasurements$ = this.conceptService
       ?.getConceptByMappingSource(
         this.unitsOfMeasurementSettings?.mappingSource,
-        "custom:(uuid,display,mappings:(uuid,display,conceptReferenceTerm:(uuid,display,code)))"
+        "custom:(uuid,display,mappings:(uuid,display,conceptReferenceTerm:(uuid,display,code,conceptSource)))"
       )
       .pipe(
         map((response) => {
