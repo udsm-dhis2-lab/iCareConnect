@@ -22,7 +22,7 @@ public interface LaboratoryService extends OpenmrsService {
 	List<Sample> getAllSamples();
 	
 	ListResult<Sample> getSamples(Date startDate, Date endDate, Pager pager, String location, String sampleCategory,
-	        String testCategory, String q, String hasStatus, String acceptedByUuid);
+	        String testCategory, String q, String hasStatus, String acceptedByUuid, String test);
 	
 	List<Sample> getSampleByDates(Date startDate, Date endDate);
 	
@@ -161,5 +161,5 @@ public interface LaboratoryService extends OpenmrsService {
 	List<BatchSample> getBatchSamples(Date start, Date end, String q, Integer startIndex, Integer limit);
 	
 	ListResult<SampleExt> getSamplesWithoutAllocations(Date start, Date end, Pager pager, String locationUuid,
-	        String sampleCategory, String testCategory, String q, String hasStatus, String acceptedByUuid);
+	        String sampleCategory, String testCategory, String q, String hasStatus, String acceptedByUuid, String testConceptUuid);
 }

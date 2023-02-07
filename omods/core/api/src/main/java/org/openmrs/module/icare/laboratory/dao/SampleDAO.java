@@ -73,21 +73,34 @@ public class SampleDAO extends BaseDAO<Sample> {
 	}
 	
 	public ListResult<Sample> getSamples(Date startDate, Date endDate, Pager pager, String locationUuid,
-	        String sampleCategory, String testCategory, String q, String hasStatus, String acceptedByUuid) {
+	        String sampleCategory, String testCategory, String q, String hasStatus, String acceptedByUuid, String testConceptUuid) {
 		
 		DbSession session = this.getSession();
 		
 		String queryStr = "SELECT sp \n" + "FROM Sample sp ";
-		
+
+		if (testConceptUuid != null) {
+			queryStr+= " JOIN sp.sampleOrders sos LEFT JOIN sos.id.order o LEFT JOIN o.concept concept";
+			if (q!= null) {
+			} else {
+				queryStr += "WHERE concept.uuid =:testConceptUuid ";
+			}
+		}
+
 		if (q != null) {
 			queryStr += " JOIN sp.visit v LEFT JOIN v.patient p LEFT JOIN p.names pname LEFT JOIN p.identifiers pi ";
-			
+
+
+			if (testConceptUuid != null) {
+				queryStr+= " WHERE concept.uuid =:testConceptUuid ";
+			}
+
 			if (!queryStr.contains("WHERE")) {
 				queryStr += " WHERE ";
 			} else {
 				queryStr += " AND ";
 			}
-			
+
 			queryStr += "lower(sp.label) like lower(:q) OR (lower(concat(pname.givenName,pname.middleName,pname.familyName)) LIKE lower(:q) OR lower(pname.givenName) LIKE lower(:q) OR lower(pname.middleName) LIKE lower(:q) OR lower(pname.familyName) LIKE lower(:q) OR lower(concat(pname.givenName,'',pname.familyName)) LIKE lower(:q) OR lower(concat(pname.givenName,'',pname.middleName)) LIKE lower(:q) OR lower(concat(pname.middleName,'',pname.familyName)) LIKE lower(:q)  OR pi.identifier LIKE :q)";
 		}
 		
@@ -118,6 +131,7 @@ public class SampleDAO extends BaseDAO<Sample> {
 			queryStr += "sp IN( SELECT sst.sample FROM SampleStatus sst WHERE sst.category=:sampleCategory)";
 			
 		}
+
 		if (testCategory != null && testCategory != "Completed") {
 			if (!queryStr.contains("WHERE")) {
 				queryStr += " WHERE ";
@@ -189,6 +203,10 @@ public class SampleDAO extends BaseDAO<Sample> {
 		}
 		if (acceptedByUuid != null && hasStatus.toLowerCase().equals("yes")) {
 			query.setParameter("acceptedByUuid", acceptedByUuid);
+		}
+
+		if (testConceptUuid != null) {
+			query.setParameter("testConceptUuid", testConceptUuid);
 		}
 		
 		if (pager.isAllowed()) {
@@ -330,22 +348,35 @@ public class SampleDAO extends BaseDAO<Sample> {
 	
 	public ListResult<SampleExt> getSamplesWithoutAllocations(Date startDate, Date endDate, Pager pager,
 	        String locationUuid, String sampleCategory, String testCategory, String q, String hasStatus,
-	        String acceptedByUuid) {
+	        String acceptedByUuid, String testConceptUuid) {
 		
 		DbSession session = this.getSession();
 		
 		String queryStr = "SELECT sp \n" + "FROM SampleExt sp ";
-		
+
+		if (testConceptUuid != null) {
+			queryStr+= " LEFT JOIN sp.sampleOrders sos JOIN sos.id.order o JOIN o.concept orderConcept";
+			if (q!= null) {
+			} else {
+				queryStr += " WHERE orderConcept.uuid =:testConceptUuid ";
+			}
+		}
+
 		if (q != null) {
 			queryStr += " JOIN sp.visit v LEFT JOIN v.patient p LEFT JOIN p.names pname LEFT JOIN p.identifiers pi ";
-			
+
+
+			if (testConceptUuid != null) {
+				queryStr+= " WHERE orderConcept.uuid =:testConceptUuid ";
+			}
+
 			if (!queryStr.contains("WHERE")) {
 				queryStr += " WHERE ";
 			} else {
 				queryStr += " AND ";
 			}
 			
-			queryStr += "lower(sp.label) like lower(:q) OR (lower(concat(pname.givenName,pname.middleName,pname.familyName)) LIKE lower(:q) OR lower(pname.givenName) LIKE lower(:q) OR lower(pname.middleName) LIKE lower(:q) OR lower(pname.familyName) LIKE lower(:q) OR lower(concat(pname.givenName,'',pname.familyName)) LIKE lower(:q) OR lower(concat(pname.givenName,'',pname.middleName)) LIKE lower(:q) OR lower(concat(pname.middleName,'',pname.familyName)) LIKE lower(:q)  OR pi.identifier LIKE :q)";
+			queryStr += "(lower(sp.label) like lower(:q) OR (lower(concat(pname.givenName,pname.middleName,pname.familyName)) LIKE lower(:q) OR lower(pname.givenName) LIKE lower(:q) OR lower(pname.middleName) LIKE lower(:q) OR lower(pname.familyName) LIKE lower(:q) OR lower(concat(pname.givenName,'',pname.familyName)) LIKE lower(:q) OR lower(concat(pname.givenName,'',pname.middleName)) LIKE lower(:q) OR lower(concat(pname.middleName,'',pname.familyName)) LIKE lower(:q)  OR pi.identifier LIKE :q))";
 		}
 		
 		if (startDate != null && endDate != null) {
@@ -423,11 +454,10 @@ public class SampleDAO extends BaseDAO<Sample> {
 					queryStr += "sp IN ( SELECT samplestatus.sample FROM SampleStatus samplestatus WHERE samplestatus.user IN( SELECT usr FROM User usr WHERE uuid = :acceptedByUuid))";
 					
 				}
-				
 			}
 		}
 		queryStr += " ORDER BY sp.dateCreated DESC";
-		//System.out.println(queryStr);
+		System.out.println(queryStr);
 		Query query = session.createQuery(queryStr);
 		if (startDate != null && endDate != null) {
 			query.setParameter("startDate", startDate);
@@ -451,6 +481,9 @@ public class SampleDAO extends BaseDAO<Sample> {
 		
 		if (acceptedByUuid != null && hasStatus.toLowerCase().equals("yes")) {
 			query.setParameter("acceptedByUuid", acceptedByUuid);
+		}
+		if (testConceptUuid != null) {
+			query.setParameter("testConceptUuid", testConceptUuid);
 		}
 		
 		if (pager.isAllowed()) {
