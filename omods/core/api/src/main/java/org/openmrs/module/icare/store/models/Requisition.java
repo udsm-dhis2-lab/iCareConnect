@@ -32,6 +32,9 @@ public class Requisition extends BaseOpenmrsData implements java.io.Serializable
 	@ManyToOne
 	@JoinColumn(name = "requested_location_id")
 	private Location requestedLocation;
+
+	@Column(name = "code")
+	private String code;
 	
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "requisition")
 	private List<RequisitionStatus> requisitionStatuses = new ArrayList<RequisitionStatus>(0);
@@ -54,6 +57,8 @@ public class Requisition extends BaseOpenmrsData implements java.io.Serializable
 		Location requestingLocation = new Location();
 		requestingLocation.setUuid(((Map) requisitionMap.get("requestingLocation")).get("uuid").toString());
 		requisition.setRequestingLocation(requestingLocation);
+
+		requisition.setCode(requisitionMap.get("code").toString());
 		
 		return requisition;
 		
@@ -110,7 +115,15 @@ public class Requisition extends BaseOpenmrsData implements java.io.Serializable
 	public enum OrderByDirection {
 		ASC, DESC;
 	}
-	
+
+	public String getCode() {
+		return code;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
+	}
+
 	public Map<String, Object> toMap() {
 		
 		Map<String, Object> requisitionObject = new HashMap<String, Object>();
@@ -158,6 +171,10 @@ public class Requisition extends BaseOpenmrsData implements java.io.Serializable
 		Date date = this.getDateCreated();
 		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 		requisitionObject.put("created", dateFormat.format(date));
+
+		if(this.getCode() != null){
+			requisitionObject.put("code",this.getCode());
+		}
 		
 		return requisitionObject;
 	}
