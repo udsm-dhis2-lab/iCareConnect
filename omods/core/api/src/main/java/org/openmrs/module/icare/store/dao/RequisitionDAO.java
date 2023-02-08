@@ -23,7 +23,7 @@ public class RequisitionDAO extends BaseDAO<Requisition> {
 	        RequisitionStatus.RequisitionStatusCode status, Requisition.OrderByDirection orderByDirection) {
 		DbSession session = this.getSession();
 		String queryStr = "SELECT rq \n" + "FROM Requisition rq \n"
-		        + "WHERE rq.requestingLocation = (SELECT l FROM Location l WHERE l.uuid = :requestingLocationUuid)";
+		        + "WHERE rq.requestingLocation = (SELECT l FROM Location l WHERE l.uuid = :requestingLocationUuid) AND rq.voided = false";
 		
 		if (status != null) {
 			if (!queryStr.contains("WHERE")) {
@@ -73,7 +73,7 @@ public class RequisitionDAO extends BaseDAO<Requisition> {
 		DbSession session = this.getSession();
 		System.out.println(status);
 		String queryStr = "SELECT rq \n" + "FROM Requisition rq \n"
-		        + "WHERE rq.requestedLocation = (SELECT l FROM Location l WHERE l.uuid = :requestedLocationUuid)";
+		        + "WHERE rq.requestedLocation = (SELECT l FROM Location l WHERE l.uuid = :requestedLocationUuid) AND rq.voided = false";
 		
 		if (status != null) {
 			if (!queryStr.contains("WHERE")) {

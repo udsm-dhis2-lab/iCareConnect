@@ -779,6 +779,12 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 	}
 
 	@Override
+	public RequisitionItem updateRequisitionItem(RequisitionItem requisitionItem) {
+
+		return requisitionItemDAO.updateRequisitionItem(requisitionItem);
+	}
+
+	@Override
 	public StockInvoice saveStockInvoice(StockInvoice stockInvoice) throws Exception {
 		
 		Supplier supplier = this.getSupplierByUuid(stockInvoice.getSupplier().getUuid());

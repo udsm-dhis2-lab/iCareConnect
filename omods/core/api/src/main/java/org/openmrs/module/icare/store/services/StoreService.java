@@ -137,4 +137,6 @@ public interface StoreService extends OpenmrsService {
 	RequisitionItem saveRequisitionItem(RequisitionItem requisitionItem) throws Exception;
 
 	RequisitionItemStatus saveRequisitionItemStatus(RequisitionItemStatus requisitionItemStatus);
+
+    RequisitionItem updateRequisitionItem(RequisitionItem requisitionItem);
 }
