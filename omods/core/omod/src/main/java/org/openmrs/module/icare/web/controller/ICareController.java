@@ -75,6 +75,19 @@ public class ICareController {
         results.put("identifiers", ids);
         return results;
     }
+
+	@RequestMapping(value = "codegen",method = RequestMethod.GET)
+	@ResponseBody
+	public List<String> onGenerateCode(
+			@RequestParam(value = "globalProperty", required = true) String globalProperty,
+			@RequestParam(value = "metadataType", required = true) String metadataType,
+			@RequestParam(value="initialFormat",required = true) String format,
+			@RequestParam(value = "count",defaultValue = "1", required = false) Integer count
+	){
+		List<String> generatedCode = iCareService.generateCode(globalProperty,metadataType,format,count);
+
+		return generatedCode;
+	}
 	
 	/**
 	 * Initially called after the getUsers method to get the landing form name

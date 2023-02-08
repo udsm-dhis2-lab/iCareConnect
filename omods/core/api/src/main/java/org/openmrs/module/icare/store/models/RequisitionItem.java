@@ -5,7 +5,9 @@ package org.openmrs.module.icare.store.models;
 import org.openmrs.module.icare.core.Item;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -48,7 +50,10 @@ public class RequisitionItem implements java.io.Serializable {
 	
 	@Column(name = "quantity")
 	private Integer quantity;
-	
+
+	@Transient
+	private List<RequisitionItemStatus> requisitionItemStatuses = new ArrayList<RequisitionItemStatus>(0);
+
 	public Integer getQuantity() {
 		return this.quantity;
 	}
@@ -56,6 +61,8 @@ public class RequisitionItem implements java.io.Serializable {
 	public void setQuantity(Integer quantity) {
 		this.quantity = quantity;
 	}
+
+
 	
 	public RequisitionItemId getId() {
 		return id;
@@ -78,7 +85,23 @@ public class RequisitionItem implements java.io.Serializable {
 		}
 		this.id.setItem(item);
 	}
-	
+
+	public Item getItem(){
+		return this.id.getItem();
+	}
+
+	public Requisition getRequisition(){
+		return this.id.getRequisition();
+	}
+
+	public List<RequisitionItemStatus> getRequisitionItemStatuses() {
+		return requisitionItemStatuses;
+	}
+
+	public void setRequisitionItemStatuses(List<RequisitionItemStatus> requisitionItemStatuses) {
+		this.requisitionItemStatuses = requisitionItemStatuses;
+	}
+
 	public Map<String, Object> toMap() {
 		Map<String, Object> requisitionItemObject = new HashMap<String, Object>();
 		
@@ -97,8 +120,55 @@ public class RequisitionItem implements java.io.Serializable {
 		requisitionObject.put("uuid", this.getId().getRequisition().getUuid());
 		
 		requisitionItemObject.put("requisition", requisitionObject);
+
+		if(this.getRequisitionItemStatuses() != null){
+
+			List<Map<String,Object>> requisitionItemStatusesMapList = new ArrayList<>();
+			Map<String,Object> requisitionItemStatusMap = new HashMap<>();
+			for(RequisitionItemStatus requisitionItemStatus : this.getRequisitionItemStatuses()){
+				requisitionItemStatusMap.put("status",requisitionItemStatus.getStatus());
+			}
+			requisitionItemStatusesMapList.add(requisitionItemStatusMap);
+			requisitionItemObject.put("requisitionItemStatus",requisitionItemStatusesMapList);
+		}
 		
 		return requisitionItemObject;
+	}
+
+	public static RequisitionItem fromMap(Map<String,Object> requisitionItemMap){
+
+		RequisitionItem requisitionItem = new RequisitionItem();
+
+		if(requisitionItemMap.get("quantity") != null) {
+			requisitionItem.setQuantity((Integer) requisitionItemMap.get("quantity"));
+		}
+
+		if(requisitionItemMap.get("item") != null){
+			Item item = new Item();
+			item.setUuid(((Map)requisitionItemMap.get("item")).get("uuid").toString());
+			requisitionItem.setItem(item);
+		}
+
+		if(requisitionItemMap.get("requisition") != null){
+			Requisition requisition = new Requisition();
+			requisition.setUuid(((Map)requisitionItemMap.get("requisition")).get("uuid").toString());
+			requisitionItem.setRequisition(requisition);
+		}
+
+		if(requisitionItemMap.get("requisitionItemStatus") != null){
+
+			List<RequisitionItemStatus> requisitionItemStatusesList = new ArrayList<>();
+			for(Map<String,Object> requisitionItemMapObject :(List<Map<String, Object>>) requisitionItemMap.get("requisitionItemStatus")) {
+				RequisitionItemStatus requisitionItemStatus = new RequisitionItemStatus();
+				requisitionItemStatus.setStatus( requisitionItemMapObject.get("status").toString());
+				requisitionItemStatusesList.add(requisitionItemStatus);
+			}
+			requisitionItem.setRequisitionItemStatuses(requisitionItemStatusesList);
+
+		}
+
+
+		return requisitionItem;
 	}
 	
 }

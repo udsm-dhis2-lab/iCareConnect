@@ -251,6 +251,13 @@
                         <property name="sessionFactory" ref="dbSessionFactory" />
                     </bean>
                 </property>
+
+                <property name="requisitionItemDAO">
+                    <bean class="org.openmrs.module.icare.store.dao.RequisitionItemDAO">
+                        <property name="sessionFactory" ref="dbSessionFactory" />
+                    </bean>
+                </property>
+
                 <property name="issueDAO">
                     <bean class="org.openmrs.module.icare.store.dao.IssueDAO">
                         <property name="sessionFactory" ref="dbSessionFactory" />
@@ -273,6 +280,11 @@
                 </property>
                 <property name="requisitionStatusDAO">
                     <bean class="org.openmrs.module.icare.store.dao.RequisitionStatusDAO">
+                        <property name="sessionFactory" ref="dbSessionFactory" />
+                    </bean>
+                </property>
+                <property name="requisitionItemStatusDAO">
+                    <bean class="org.openmrs.module.icare.store.dao.RequisitionItemStatusDAO">
                         <property name="sessionFactory" ref="dbSessionFactory" />
                     </bean>
                 </property>

@@ -74,6 +74,8 @@ public class ICareConfig {
 	public static final String PATIENT_ID_FORMAT = "icare.patient.id.format";
 	
 	public static final String SAMPLE_ID_FORMAT = "icare.laboratory.settings.sample.id.format";
+
+	public static final String METADATA_CODE_ID_FORMAT = "icare.settings.code.generated.format";
 	
 	public static final String REGISTRATION_ENCOUNTER_ROLE = "icare.encounterRole.registration";
 	

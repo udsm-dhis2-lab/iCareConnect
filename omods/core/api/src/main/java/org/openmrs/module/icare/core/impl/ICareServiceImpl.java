@@ -10,14 +10,11 @@
 package org.openmrs.module.icare.core.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.hibernate.Session;
 import org.openmrs.*;
 import org.openmrs.api.*;
 import org.openmrs.api.context.Context;
-import org.openmrs.api.context.UserContext;
 import org.openmrs.api.db.PatientDAO;
 import org.openmrs.api.impl.BaseOpenmrsService;
-import org.openmrs.logic.op.In;
 import org.openmrs.module.icare.ICareConfig;
 import org.openmrs.module.icare.billing.ItemNotPayableException;
 import org.openmrs.module.icare.billing.models.ItemPrice;
@@ -26,14 +23,11 @@ import org.openmrs.module.icare.billing.services.insurance.Claim;
 import org.openmrs.module.icare.billing.services.insurance.ClaimResult;
 import org.openmrs.module.icare.billing.services.insurance.InsuranceService;
 import org.openmrs.module.icare.billing.services.insurance.VerificationException;
-import org.openmrs.module.icare.billing.services.insurance.nhif.AuthToken;
-import org.openmrs.module.icare.billing.services.insurance.nhif.NHIFConfig;
 import org.openmrs.module.icare.core.ICareService;
 import org.openmrs.module.icare.core.Item;
 import org.openmrs.module.icare.core.Message;
 import org.openmrs.module.icare.core.Summary;
 import org.openmrs.module.icare.core.dao.ICareDao;
-import org.openmrs.module.icare.core.models.PimaCovidLabRequest;
 import org.openmrs.module.icare.core.utils.PatientWrapper;
 import org.openmrs.module.icare.core.utils.VisitWrapper;
 import org.openmrs.module.icare.report.dhis2.DHIS2Config;
@@ -46,8 +40,6 @@ import java.net.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class ICareServiceImpl extends BaseOpenmrsService implements ICareService {
 	
@@ -398,6 +390,40 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		identifiers.add(idFormat);
 		return identifiers;
 	}
+
+	@Override
+	public List<String> generateCode(String globalPropertyUuid, String metadataType, String format, Integer count) {
+
+		AdministrationService administrationService = Context.getAdministrationService();
+		String idFormat = administrationService.getGlobalPropertyByUuid(globalPropertyUuid).getValue().toString();
+
+		List<String> idCodes = new ArrayList<>();
+		if (idFormat.contains("D{YYYY}") || idFormat.contains("D{YYY}") || idFormat.contains("D{YY}")) {
+			if(count == 1) {
+
+				SimpleDateFormat formatter = new SimpleDateFormat("YYYY", Locale.ENGLISH);
+				idFormat = idFormat.replace("D{YYYY}", formatter.format(new Date()));
+				idFormat = idFormat.replace("COUNT", "" + String.format("%05d", dao.countYearlyGeneratedMetadataCodes(metadataType) + 1));
+				idFormat = idFormat.replace("{FORMAT}", format);
+				idCodes.add(idFormat);
+			}
+			if(count > 1){
+				SimpleDateFormat formatter = new SimpleDateFormat("YYYY", Locale.ENGLISH);
+				idFormat = idFormat.replace("D{YYYY}", formatter.format(new Date()));
+				idFormat = idFormat.replace("{FORMAT}", format);
+				System.out.println(idFormat.indexOf("COUNT"));
+				for(int i = 0 ; i < count ; i++){
+					idFormat = idFormat.replace("COUNT", String.format("%05d", (dao.countYearlyGeneratedMetadataCodes(metadataType) + 1) + i));
+
+					//System.out.println(String.format("%05d",total));
+					//System.out.println(total);
+					idCodes.add(idFormat);
+				}
+			}
+
+		}
+		return idCodes;
+	}
 	
 	@Override
 	public Item getItemByConceptUuid(String uuid) {
@@ -747,7 +773,8 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 			return String.valueOf(content);
 		}
 	}
-	
+
+
 	//	public String voidOrder(String uuid, String voidReason) {
 	//		return dao.voidOrder(uuid, voidReason);
 	//	}

@@ -14,12 +14,10 @@ import org.openmrs.annotation.Authorized;
 import org.openmrs.api.APIException;
 import org.openmrs.api.OpenmrsService;
 import org.openmrs.module.icare.billing.ItemNotPayableException;
-import org.openmrs.module.icare.billing.VisitInvalidException;
 import org.openmrs.module.icare.billing.models.ItemPrice;
 import org.openmrs.module.icare.billing.models.Prescription;
 import org.openmrs.module.icare.billing.services.insurance.Claim;
 import org.openmrs.module.icare.billing.services.insurance.ClaimResult;
-import org.openmrs.module.icare.core.models.PimaCovidLabRequest;
 import org.openmrs.module.icare.core.utils.PatientWrapper;
 import org.openmrs.module.icare.core.utils.VisitWrapper;
 import org.openmrs.module.icare.store.models.OrderStatus;
@@ -140,5 +138,6 @@ public interface ICareService extends OpenmrsService {
 	
 	String verifyExternalSystemCredentials(String username, String password, String systemKey) throws IOException,
 	        URISyntaxException;
-	
+
+    List<String> generateCode(String globalProperty, String metadataType, String format, Integer count);
 }
