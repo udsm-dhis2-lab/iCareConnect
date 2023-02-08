@@ -3,7 +3,7 @@ import { flatten } from "lodash";
 import * as moment from "moment";
 import { from, Observable, of, zip } from "rxjs";
 import { debounceTime, distinctUntilChanged, map, switchMap, tap } from "rxjs/operators";
-import { formatDateToYYMMDD } from "src/app/shared/helpers/format-date.helper";
+import { dateToISOStringMidnight, formatDateToYYMMDD } from "src/app/shared/helpers/format-date.helper";
 import { DateField } from "src/app/shared/modules/form/models/date-field.model";
 import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
@@ -331,9 +331,9 @@ export class StockReceivingFormFieldsComponent implements OnInit {
         supplier: {
           uuid: this.formValues?.supplier?.value,
         },
-        receivingDate: new Date(
-          moment(this.formValues?.receivingDate?.value).toDate()
-        )?.toISOString(),
+        receivingDate: dateToISOStringMidnight(
+          new Date(moment(this.formValues?.receivingDate?.value).toDate())
+        ),
         stockInvoiceStatus: [
           {
             status: "DRAFT",
@@ -360,9 +360,9 @@ export class StockReceivingFormFieldsComponent implements OnInit {
             uom: {
               uuid: this.unitOfMeasure?.uuid,
             },
-            expiryDate: new Date(
-              moment(this.formValues?.expiryDate?.value).toDate()
-            )?.toISOString(),
+            expiryDate: dateToISOStringMidnight(
+              new Date(moment(this.formValues?.expiryDate?.value).toDate())
+            ),
           },
         ],
       };
@@ -452,9 +452,9 @@ export class StockReceivingFormFieldsComponent implements OnInit {
       supplier: {
         uuid: this.formValues?.supplier?.value,
       },
-      receivingDate: new Date(
-        moment(this.formValues?.receivingDate?.value).toDate()
-      )?.toISOString(),
+      receivingDate: dateToISOStringMidnight(
+        new Date(moment(this.formValues?.receivingDate?.value).toDate())
+      ),
       stockInvoiceStatus: [
         {
           status: "DRAFT",
@@ -504,9 +504,9 @@ export class StockReceivingFormFieldsComponent implements OnInit {
       uom: {
         uuid: this.unitOfMeasure?.uuid,
       },
-      expiryDate: new Date(
-        moment(this.formValues?.expiryDate?.value).toDate()
-      )?.toISOString(),
+      expiryDate: dateToISOStringMidnight(
+        new Date(moment(this.formValues?.expiryDate?.value).toDate())
+      ),
     };
 
     this.stockInvoicesService

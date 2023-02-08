@@ -37,7 +37,7 @@ export class StockInvoiceComponent implements OnInit {
 
     this.unitsOfMeasurementSettings$ =
       this.systemSettingsService.getSystemSettingsByKey(
-        "iCare.store.mapping.items.unitOfMeasure.mappingSource"
+        "iCare.store.mappings.items.unitOfMeasure.mappingSource"
       );
   }
 
