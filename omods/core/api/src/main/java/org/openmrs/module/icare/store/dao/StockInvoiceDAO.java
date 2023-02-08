@@ -82,6 +82,17 @@ public class StockInvoiceDAO extends BaseDAO<StockInvoice> {
 			
 			queryStr += " st.purchaseOrder = :purchaseOrder";
 		}
+		if(stockInvoice.getReceivingDate() != null){
+
+			if (!queryStr.contains("SET")) {
+				queryStr += " SET ";
+			} else {
+				queryStr += " ,";
+			}
+
+			queryStr += " st.receivingDate = :receivingDate";
+
+		}
 		
 		if (stockInvoice.getVoided() != null) {
 			if (!queryStr.contains("SET")) {
@@ -111,6 +122,10 @@ public class StockInvoiceDAO extends BaseDAO<StockInvoice> {
 		
 		if (stockInvoice.getVoided() != null) {
 			query.setParameter("voided", stockInvoice.getVoided());
+		}
+
+		if(stockInvoice.getReceivingDate() != null){
+			query.setParameter("receivingDate",stockInvoice.getReceivingDate());
 		}
 		
 		query.setParameter("uuid", stockInvoice.getUuid());
