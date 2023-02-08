@@ -1,6 +1,5 @@
 package org.openmrs.module.icare.web.controller;
 
-import groovy.util.ObservableMap;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
@@ -838,5 +837,15 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		}
 		assertThat("The stock is created from the stock invoice item", newBatchexist, is(true));
 		
+	}
+
+	@Test
+	public void addStockInvoiceItem() throws Exception{
+
+		String dto = this.readFile("dto/store/requisition-item-create.json");
+		Map<String,Object> requisitionMap = (new ObjectMapper()).readValue(dto,Map.class);
+		MockHttpServletRequest newPostRequest = newPostRequest("store/requestitem",requisitionMap);
+		MockHttpServletResponse handle = handle(newPostRequest);
+		System.out.println(handle.getContentAsString());
 	}
 }

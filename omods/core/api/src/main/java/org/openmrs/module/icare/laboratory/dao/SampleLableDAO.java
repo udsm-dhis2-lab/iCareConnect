@@ -98,6 +98,7 @@ public class SampleLableDAO extends BaseDAO<SampleLable> {
 				}
 				for (Integer labelCount =1; labelCount <= countOfIdLabels; labelCount++) {
 					idLabels.add(idFormat.replace( "COUNT:" + idFormat.split(":")[1], "" + String.format("%0" + idFormat.split(":")[1] +"d", data + labelCount)));
+
 				}
 			}
 		}

@@ -29,6 +29,8 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 	LedgerDAO ledgerDAO;
 	
 	RequisitionDAO requisitionDAO;
+
+	RequisitionItemDAO requisitionItemDAO;
 	
 	IssueDAO issueDAO;
 	
@@ -55,6 +57,8 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 	StockInvoiceItemDAO stockInvoiceItemDAO;
 	
 	StockInvoiceItemStatusDAO stockInvoiceItemStatusDAO;
+
+	RequisitionItemStatusDAO requisitionItemStatusDAO;
 	
 	public void setLedgerDAO(LedgerDAO ledgerDAO) {
 		this.ledgerDAO = ledgerDAO;
@@ -119,7 +123,15 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 	public void setStockInvoiceItemStatusDAO(StockInvoiceItemStatusDAO stockInvoiceItemStatusDAO) {
 		this.stockInvoiceItemStatusDAO = stockInvoiceItemStatusDAO;
 	}
-	
+
+	public void setRequisitionItemDAO(RequisitionItemDAO requisitionItemDAO) {
+		this.requisitionItemDAO = requisitionItemDAO;
+	}
+
+	public void setRequisitionItemStatusDAO(RequisitionItemStatusDAO requisitionItemStatusDAO) {
+		this.requisitionItemStatusDAO = requisitionItemStatusDAO;
+	}
+
 	@Override
 	public ReorderLevel addReorderLevel(ReorderLevel reorderLevel) {
 		
@@ -200,6 +212,8 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 		return this.requisitionStatusDAO.save(requisitionStatus);
 		
 	}
+
+
 	
 	@Override
 	public List<RequisitionStatus> getRequisitionStatuses() {
@@ -721,7 +735,49 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 		}
 		return this.supplierDAO.updateSupplier(supplier);
 	}
-	
+
+	@Override
+	public Requisition updateRequisition(Requisition requisition) throws Exception {
+		Requisition existingRequisition = this.requisitionDAO.findByUuid(requisition.getUuid());
+		if(existingRequisition == null){
+			throw new Exception(" The requisition with uuid "+requisition.getUuid()+" does not exist");
+		}
+		return this.requisitionDAO.updateRequisition(requisition);
+	}
+
+	@Override
+	public RequisitionItem saveRequisitionItem(RequisitionItem requisitionItem) throws Exception {
+
+		Item item = this.dao.findByUuid(requisitionItem.getItem().getUuid());
+		if(item == null){
+			throw new Exception(" The item with uuid"+ requisitionItem.getItem().getUuid()+" does not exist");
+		}
+		requisitionItem.setItem(item);
+
+		Requisition requisition = this.requisitionDAO.findByUuid(requisitionItem.getRequisition().getUuid());
+		if(requisition == null){
+			throw new Exception(" The requisition with uuid "+requisitionItem.getRequisition().getUuid()+" does not exist");
+		}
+		requisitionItem.setRequisition(requisition);
+
+		if(requisitionItem.getRequisitionItemStatuses().size() > 0){
+			System.out.println(requisitionItem.getRequisitionItemStatuses());
+			for(RequisitionItemStatus requisitionItemStatus : requisitionItem.getRequisitionItemStatuses()){
+				requisitionItemStatus.setRequisition(requisitionItem.getRequisition());
+				requisitionItemStatus.setItem(requisitionItem.getItem());
+				requisitionItemStatus.setRemarks(requisitionItemStatus.getStatus().toString());
+				this.requisitionItemStatusDAO.save(requisitionItemStatus);
+			}
+		}
+
+		return requisitionItemDAO.save(requisitionItem);
+	}
+
+	@Override
+	public RequisitionItemStatus saveRequisitionItemStatus(RequisitionItemStatus requisitionItemStatus) {
+		return requisitionItemStatusDAO.save(requisitionItemStatus);
+	}
+
 	@Override
 	public StockInvoice saveStockInvoice(StockInvoice stockInvoice) throws Exception {
 		

@@ -28,6 +28,7 @@ import org.openmrs.module.icare.core.Summary;
 import org.openmrs.module.icare.core.utils.PatientWrapper;
 import org.openmrs.module.icare.core.utils.VisitWrapper;
 import org.openmrs.module.icare.store.models.OrderStatus;
+import org.openmrs.module.icare.store.models.Requisition;
 
 import javax.persistence.EntityManager;
 import java.io.BufferedReader;
@@ -631,6 +632,19 @@ public class ICareDao extends BaseDAO<Item> {
 		Query query = session.createQuery(queryStr);
 		
 		return query.list();
+	}
+
+	public long countYearlyGeneratedMetadataCodes(String metadataType){
+		DbSession session = this.getSession();
+		if(metadataType.equals("requisition")) {
+			String queryStr = " SELECT COUNT(req) FROM Requisition req WHERE YEAR(req.dateCreated) = :year";
+			Query query = session.createQuery(queryStr);
+			Calendar calendar = Calendar.getInstance();
+			query.setParameter("year",calendar.get(Calendar.YEAR));
+			return (long) query.list().get(0);
+		}
+			return 0;
+
 	}
 	
 	//	public String voidOrder(String uuid, String voidReason) {

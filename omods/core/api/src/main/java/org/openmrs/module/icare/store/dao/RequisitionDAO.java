@@ -119,5 +119,33 @@ public class RequisitionDAO extends BaseDAO<Requisition> {
 		return listResults;
 		
 	}
-	
+
+    public Requisition updateRequisition(Requisition requisition) {
+		DbSession dbSession = this.getSession();
+		String queryStr = "UPDATE Requisition rq";
+
+		if (requisition.getVoided() != null) {
+			if (!queryStr.contains("SET")) {
+				queryStr += " SET ";
+			} else {
+				queryStr += " ,";
+			}
+			queryStr += " rq.voided = :voided";
+		}
+
+		queryStr += " WHERE rq.uuid = :uuid";
+
+		Query query = dbSession.createQuery(queryStr);
+
+		query.setParameter("uuid", requisition.getUuid());
+
+		Integer success = query.executeUpdate();
+
+		if (success == 1) {
+			return requisition;
+		} else {
+			return null;
+		}
+
+    }
 }

@@ -161,12 +161,37 @@ public class StoreController {
 		
 		return createdRequisition.toMap();
 	}
+
+	@RequestMapping(value = "requests/{requisitionUuid}",method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String,Object> updateRequisition(@PathVariable("requisitionUuid") String requisitionUuid,@RequestBody Map<String,Object> requsitionMap) throws Exception {
+
+		Requisition requisition = Requisition.fromMap(requsitionMap);
+		requisition.setUuid(requisitionUuid);
+		Requisition updateRequisition = storeService.updateRequisition(requisition);
+
+		return requisition.toMap();
+
+
+	}
+
+	@RequestMapping(value = "requestitem",method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String,Object> addRequisitionItems(@RequestBody Map<String,Object> requisitionItemMap) throws Exception {
+		RequisitionItem requisitionItem = RequisitionItem.fromMap(requisitionItemMap);
+
+		RequisitionItem savedRequisitionItem = storeService.saveRequisitionItem(requisitionItem);
+
+		return  savedRequisitionItem.toMap();
+	}
+
 	
 	@RequestMapping(value = "requeststatus", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> addRequisitionStatus(@RequestBody Map<String, Object> requisitionStatusMap) {
 		
 		RequisitionStatus requisitionStatus = new RequisitionStatus().fromMap(requisitionStatusMap);
+
 		
 		return storeService.saveRequestStatus(requisitionStatus).toMap();
 	}
