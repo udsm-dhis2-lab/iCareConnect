@@ -35,7 +35,7 @@ export class NewRequisitionFormComponent implements OnInit {
   targetStoreField: Dropdown[];
   storeUuid: string;
   itemUuid: string;
-  addedDataList: RequisitionInput;
+  requisitionObject: any;
   addingRequisitions: boolean = false;
   requisition: any;
   constructor(
@@ -134,7 +134,7 @@ export class NewRequisitionFormComponent implements OnInit {
 
   onRequest(e: Event) {
     e.stopPropagation();
-    this.addedDataList = {
+    this.requisitionObject = {
       requestingLocationUuid: this.currentStore?.id,
       requestedLocationUuid: this.formData?.targetStore?.value,
       items: [
@@ -146,7 +146,7 @@ export class NewRequisitionFormComponent implements OnInit {
     };
 
     this.requisitionService
-      .createRequest(this.addedDataList)
+      .createRequest(this.requisitionObject)
       .subscribe((response) => {
         if (response) {
           console.log("==> Response: ", response);
@@ -155,64 +155,105 @@ export class NewRequisitionFormComponent implements OnInit {
   }
 
   onAdd(e) {
-    if (
-      this.formData?.quantity?.value ===
-      this.addedDataList?.requestedLocationUuid
-    ) {
-      this.addedDataList = {
-        ...this.addedDataList,
-        requestingLocationUuid: this.currentStore?.id,
-        requestedLocationUuid: this.storeUuid,
-        items: this.addedDataList?.items?.length
-          ? [
-              ...this.addedDataList?.items,
-              {
-                itemUuid: this.formData?.requisitionItem?.value,
-                quantity: parseInt(String(this.formData?.quantity?.value), 10),
-              },
-            ]
-          : [
-              {
-                itemUuid: this.formData?.requisitionItem?.value,
-                quantity: parseInt(String(this.formData?.quantity?.value), 10),
-              },
-            ],
-      };
-    } else {
-      this.addedDataList = {
-        requestingLocationUuid: this.currentStore?.id,
-        requestedLocationUuid: this.formData?.targetStore?.value,
-        items: [
+    if (this.requisition) {
+      const item = {
+        item: {
+          uuid: this.formData?.requisitionItem?.value,
+        },
+        quantity: parseInt(this.formData?.quantity.value, 10),
+        requisition: {
+          uuid: this.requisition?.uuid,
+        },
+        requisitionItemStatus: [
           {
-            itemUuid: this.formData?.targetStore?.value,
-            quantity: parseInt(String(this.formData?.quantity?.value), 10),
+            status: "DRAFT",
           },
         ],
       };
+      this.requisitionService
+        .createRequisitionItem(item)
+        .subscribe((response) => {
+          if (!response?.error) {
+            const storedRequisition = this.requisition;
+            this.requisition = undefined;
+            setTimeout(() => {
+              this.requisition = storedRequisition;
+            }, 100);
+          }
+        });
+    } else {
+      // // if (
+      // //   this.formData?.quantity?.value ===
+      // //   this.requisitionObject?.requestedLocationUuid
+      // // ) {
+      // //   this.requisitionObject = {
+      // //     ...this.requisitionObject,
+      // //     requestingLocationUuid: this.currentStore?.id,
+      // //     requestedLocationUuid: this.storeUuid,
+      // //     items: this.requisitionObject?.items?.length
+      // //       ? [
+      // //           ...this.requisitionObject?.items,
+      // //           {
+      // //             itemUuid: this.formData?.requisitionItem?.value,
+      // //             quantity: parseInt(
+      // //               String(this.formData?.quantity?.value),
+      // //               10
+      // //             ),
+      // //           },
+      // //         ]
+      // //       : [
+      // //           {
+      // //             itemUuid: this.formData?.requisitionItem?.value,
+      // //             quantity: parseInt(
+      // //               String(this.formData?.quantity?.value),
+      // //               10
+      // //             ),
+      // //           },
+      // //         ],
+      // //   };
+      // } else {
+      // }
+      this.requisitionObject = {
+        requestingLocationUuid: this.currentStore?.id,
+        requestedLocationUuid: this.formData?.targetStore?.value,
+        requisitionStatuses: [
+          {
+            status: "DRAFT",
+          },
+        ],
+        requisitionItems: [
+          {
+            item: {
+              uuid: this.formData?.requisitionItem?.value,
+            },
+            quantity: parseInt(this.formData?.quantity.value, 10),
+            requisitionItemStatus: [
+              {
+                status: "DRAFT",
+              },
+            ],
+          },
+        ],
+      };
+
+      this.configService
+        .generateCode(this.codeFormatSetting?.uuid, "requisition", 1, 5)
+        .subscribe((response) => {
+          if (!response?.error) {
+            const requisitionObject = {
+              ...this.requisitionObject,
+              code: response[0] ? response[0] : "",
+            };
+            this.requisitionService
+              .createRequisition(requisitionObject)
+              .subscribe((response) => {
+                if (!response?.error) {
+                  this.requisition = response;
+                }
+              });
+          }
+        });
     }
-    this.addedDataList = {
-      requestingLocationUuid: this.currentStore?.id,
-      requestedLocationUuid: this.formData?.targetStore?.value,
-      items: [
-        {
-          itemUuid: this.formData?.requisitionItem?.value,
-          quantity: parseInt(this.formData?.quantity.value, 10),
-        },
-      ],
-    };
-
-    this.configService.generateCode(this.codeFormatSetting?.uuid, "requisition", 1, 5)
-    .subscribe((response) => {
-      console.log("==> Response Code: ", response)
-    })
-
-    // this.requisitionService
-    //   .createRequest(this.addedDataList)
-    //   .subscribe((response) => {
-    //     if (!response?.error) {
-    //       this.addedDataList = response;
-    //     }
-    //   });
   }
 
   onUpdateForm(formValue: FormValue): void {

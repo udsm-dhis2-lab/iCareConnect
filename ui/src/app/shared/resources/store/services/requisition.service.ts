@@ -69,6 +69,18 @@ export class RequisitionService {
       );
   }
 
+  createRequisition(
+    requisitionInput: any
+  ): Observable<any> {
+
+    return this.httpClient.post("store/request", requisitionInput).pipe(
+      map((response) => {
+        return new Requisition(response).toJson();
+      }),
+      catchError((error) => error)
+    );
+  }
+  
   createRequest(
     requisitionInput: RequisitionInput
   ): Observable<RequisitionObject | any> {
@@ -83,6 +95,31 @@ export class RequisitionService {
     return this.httpClient.post("store/request", request).pipe(
       map((response) => {
         return new Requisition(response).toJson();
+      }),
+      catchError((error) => error)
+    );
+  }
+
+  createRequisitionItem(
+    requisitionItem: any
+  ): Observable<any> {
+
+    return this.httpClient.post("store/requestitem", requisitionItem).pipe(
+      map((response) => {
+        return new Requisition(response).toJson();
+      }),
+      catchError((error) => error)
+    );
+  }
+  
+  updateRequisitionItem(
+    uuid: string,
+    requisitionItem: any
+  ): Observable<any> {
+
+    return this.httpClient.post(`store/requestitem/${uuid}`, requisitionItem).pipe(
+      map((response) => {
+        return response;
       }),
       catchError((error) => error)
     );
