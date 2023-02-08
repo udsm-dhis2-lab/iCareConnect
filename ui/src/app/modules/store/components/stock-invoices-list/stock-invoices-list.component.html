@@ -21,7 +21,7 @@
             <span>INVOICE: {{ stockInvoice?.invoiceNumber }}</span>
             <span class="ml-4">{{ stockInvoice?.supplier?.name }}</span>
             <span class="ml-4 text-small"><i>
-              Received on: {{ stockInvoice?.receivingDate | date:"medium" }}
+              Received on: {{ stockInvoice?.receivingDate | date:"dd/MM/yyyy" }}
             </i></span>
           </mat-panel-title>
         </mat-expansion-panel-header>
