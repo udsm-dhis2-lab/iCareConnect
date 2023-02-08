@@ -392,7 +392,7 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	}
 
 	@Override
-	public List<String> generateCode(String globalPropertyUuid, String metadataType, String format, Integer count) {
+	public List<String> generateCode(String globalPropertyUuid, String metadataType, Integer count, Integer digitCount) {
 
 		AdministrationService administrationService = Context.getAdministrationService();
 		String idFormat = administrationService.getGlobalPropertyByUuid(globalPropertyUuid).getValue().toString();
@@ -403,14 +403,13 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 
 				SimpleDateFormat formatter = new SimpleDateFormat("YYYY", Locale.ENGLISH);
 				idFormat = idFormat.replace("D{YYYY}", formatter.format(new Date()));
-				idFormat = idFormat.replace("COUNT", "" + String.format("%05d", dao.countYearlyGeneratedMetadataCodes(metadataType) + 1));
-				idFormat = idFormat.replace("{FORMAT}", format);
+				idFormat = idFormat.replace("COUNT", "" + String.format("%0"+digitCount+"d", dao.countYearlyGeneratedMetadataCodes(metadataType) + 1));
 				idCodes.add(idFormat);
 			}
 			if(count > 1){
+				// TODO ADD A SUPPORT FOR GENERATE MORE THAN ONE LABEL
 				SimpleDateFormat formatter = new SimpleDateFormat("YYYY", Locale.ENGLISH);
 				idFormat = idFormat.replace("D{YYYY}", formatter.format(new Date()));
-				idFormat = idFormat.replace("{FORMAT}", format);
 				System.out.println(idFormat.indexOf("COUNT"));
 				for(int i = 0 ; i < count ; i++){
 					idFormat = idFormat.replace("COUNT", String.format("%05d", (dao.countYearlyGeneratedMetadataCodes(metadataType) + 1) + i));

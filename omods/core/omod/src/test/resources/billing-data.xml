@@ -273,6 +273,6 @@
     <bl_discount discount_id="1" uuid="8b75eb-er45-12e8" discount_criteria_id="500" patient_id="1000" creator="1" date_created="2020-12-27 00:00:00" voided="0" />
     <bl_discount_invoice_item discount_id="1" invoice_id="11" item_id="123" amount="60" />
 
-    <global_property property="iCare.general.systemSettings.codeGeneratingFormat" property_value="{FORMAT}-COUNT/D{YYYY}" uuid="iCARE110-TEST-OSDH-9beb-d30dcfc0c632" description="For code format" datatype_config="" preferred_handler="" datatype="TEXT" date_changed="2022-12-10 15:51:57.0" changed_by="1" />
+    <global_property property="iCare.general.systemSettings.codeGeneratingFormat" property_value="RQ-NO-COUNT/D{YYYY}" uuid="iCARE110-TEST-OSDH-9beb-d30dcfc0c632" description="For code format" datatype_config="" preferred_handler="" datatype="TEXT" date_changed="2022-12-10 15:51:57.0" changed_by="1" />
 
 </dataset>
