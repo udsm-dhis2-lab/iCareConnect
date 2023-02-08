@@ -849,4 +849,13 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		Map<String,Object> createdRequisition = (new ObjectMapper()).readValue(handle.getContentAsString(),Map.class);
 		assertThat("There is one created requisition item",((Map)createdRequisition.get("item")).get("uuid").equals("8o00d43570-8y37-11f3-1234-08002007777"));
 	}
+
+	@Test
+	public void updateRequisition() throws Exception{
+		String dto = this.readFile("dto/store/requisition-update.json");
+		Map<String,Object> requisitionMap = (new ObjectMapper()).readValue(dto,Map.class);
+		MockHttpServletRequest newPostRequest = newPostRequest("store/request/8800zx3570-8z37-11ff-2234-01102007812",requisitionMap);
+		MockHttpServletResponse handle = handle(newPostRequest);
+		System.out.println(handle.getContentAsString());
+	}
 }

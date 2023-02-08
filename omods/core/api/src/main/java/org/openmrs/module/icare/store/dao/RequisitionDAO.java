@@ -139,6 +139,10 @@ public class RequisitionDAO extends BaseDAO<Requisition> {
 
 		query.setParameter("uuid", requisition.getUuid());
 
+		if(requisition.getVoided() != null){
+			query.setParameter("voided",requisition.getVoided());
+		}
+
 		Integer success = query.executeUpdate();
 
 		if (success == 1) {

@@ -19,6 +19,7 @@ import org.json.JSONObject;
 import org.openmrs.*;
 import org.openmrs.api.*;
 import org.openmrs.api.context.Context;
+import org.openmrs.logic.op.In;
 import org.openmrs.module.icare.billing.models.ItemPrice;
 import org.openmrs.module.icare.billing.models.Prescription;
 import org.openmrs.module.icare.billing.services.BillingService;
@@ -81,10 +82,10 @@ public class ICareController {
 	public List<String> onGenerateCode(
 			@RequestParam(value = "globalProperty", required = true) String globalProperty,
 			@RequestParam(value = "metadataType", required = true) String metadataType,
-			@RequestParam(value="initialFormat",required = true) String format,
-			@RequestParam(value = "count",defaultValue = "1", required = false) Integer count
-	){
-		List<String> generatedCode = iCareService.generateCode(globalProperty,metadataType,format,count);
+			@RequestParam(value = "count",defaultValue = "1", required = false) Integer count,
+			@RequestParam(value = "digitCount", defaultValue = "5",required = false) Integer digitCount
+			){
+		List<String> generatedCode = iCareService.generateCode(globalProperty,metadataType,count,digitCount);
 
 		return generatedCode;
 	}

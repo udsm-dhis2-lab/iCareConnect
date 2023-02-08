@@ -48,17 +48,26 @@ public class Requisition extends BaseOpenmrsData implements java.io.Serializable
 	public static Requisition fromMap(Map<String, Object> requisitionMap) {
 		
 		Requisition requisition = new Requisition();
-		
-		Location requestedLocation = new Location();
-		
-		requestedLocation.setUuid(((Map) requisitionMap.get("requestedLocation")).get("uuid").toString());
-		requisition.setRequestedLocation(requestedLocation);
-		
-		Location requestingLocation = new Location();
-		requestingLocation.setUuid(((Map) requisitionMap.get("requestingLocation")).get("uuid").toString());
-		requisition.setRequestingLocation(requestingLocation);
 
-		requisition.setCode(requisitionMap.get("code").toString());
+		if(requisitionMap.get("requestedLocation") != null) {
+			Location requestedLocation = new Location();
+			requestedLocation.setUuid(((Map) requisitionMap.get("requestedLocation")).get("uuid").toString());
+			requisition.setRequestedLocation(requestedLocation);
+		}
+
+		if(requisitionMap.get("requestingLocation") != null) {
+			Location requestingLocation = new Location();
+			requestingLocation.setUuid(((Map) requisitionMap.get("requestingLocation")).get("uuid").toString());
+			requisition.setRequestingLocation(requestingLocation);
+		}
+
+		if(requisitionMap.get("code") != null) {
+			requisition.setCode(requisitionMap.get("code").toString());
+		}
+
+		if(requisitionMap.get("voided") != null){
+			requisition.setVoided((Boolean) requisitionMap.get("voided"));
+		}
 		
 		return requisition;
 		
@@ -141,8 +150,9 @@ public class Requisition extends BaseOpenmrsData implements java.io.Serializable
 		if (this.getRequestingLocation() != null) {
 			requestingLocationObject.put("uuid", this.getRequestingLocation().getUuid());
 			requestingLocationObject.put("display", this.getRequestingLocation().getDisplayString());
+			requisitionObject.put("requestingLocation", requestingLocationObject);
 		}
-		requisitionObject.put("requestingLocation", requestingLocationObject);
+
 		
 		List<Map<String, Object>> requisitionStatuses = new ArrayList<Map<String, Object>>();
 		for (RequisitionStatus requisitionStatus : this.getRequisitionStatuses()) {
@@ -161,19 +171,25 @@ public class Requisition extends BaseOpenmrsData implements java.io.Serializable
 			requisitionItems.add(requisitionItem.toMap());
 		}
 		requisitionObject.put("requisitionItems", requisitionItems);
-		
-		Map<String, Object> creatorObject = new HashMap<String, Object>();
-		if (this.getCreator() != null) {
-			creatorObject.put("uuid", this.getCreator().getUuid());
-			creatorObject.put("display", this.getCreator().getDisplayString());
+
+		if(this.getCreator() != null) {
+			Map<String, Object> creatorObject = new HashMap<String, Object>();
+			if (this.getCreator() != null) {
+				creatorObject.put("uuid", this.getCreator().getUuid());
+				creatorObject.put("display", this.getCreator().getDisplayString());
+			}
+			requisitionObject.put("creator", creatorObject);
+			Date date = this.getDateCreated();
+			DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+			requisitionObject.put("created", dateFormat.format(date));
 		}
-		requisitionObject.put("creator", creatorObject);
-		Date date = this.getDateCreated();
-		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-		requisitionObject.put("created", dateFormat.format(date));
 
 		if(this.getCode() != null){
 			requisitionObject.put("code",this.getCode());
+		}
+
+		if(this.getVoided() != null){
+			requisitionObject.put("voided",this.getVoided());
 		}
 		
 		return requisitionObject;
