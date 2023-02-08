@@ -11,7 +11,8 @@
     referenceTagsThatCanRequestFromPharmacyConfigs:
       referenceTagsThatCanRequestFromPharmacyConfigs$ | async,
     mainStoreLocationTagUuid: mainStoreLocationTagUuid$ | async,
-    pharmacyLocationTagUuid: pharmacyLocationTagUuid$ | async
+    pharmacyLocationTagUuid: pharmacyLocationTagUuid$ | async,
+    requisitionCodeFormat: requisitionCodeFormat$ | async
   } as params"
 >
   <mat-card class="border">
@@ -214,7 +215,7 @@
         </table>
       </div>
     </div>
-    <div *ngIf="showRequisitionForm">
+    <div *ngIf="showRequisitionForm && params?.requisitionCodeFormat">
       <app-new-requisition-form
         [stores]="params?.stores"
         [currentStore]="params?.currentStore"
@@ -223,6 +224,7 @@
         [referenceTagsThatCanRequestFromPharmacyConfigs]="params?.referenceTagsThatCanRequestFromPharmacyConfigs"
         [mainStoreLocationTagUuid]="params?.mainStoreLocationTagUuid"
         [pharmacyLocationTagUuid]="params?.pharmacyLocationTagUuid"
+        [codeFormatSetting]="params?.requisitionCodeFormat[0]"
       ></app-new-requisition-form>
     </div>
   </mat-card>

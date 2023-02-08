@@ -50,6 +50,7 @@ export class RequisitionComponent implements OnInit {
   statuses: string[] = ['', "PENDING", "ISSUED", "CANCELLED", "REJECTED", "RECEIVED"];
   selectedStatus: string;
   showRequisitionForm: boolean;
+  requisitionCodeFormat$: Observable<import("/home/jonas/DHIS2Lab/icare/ui/src/app/core/models/system-settings.model").SystemSettingsWithKeyDetails[]>;
   constructor(
     private store: Store<AppState>,
     private dialog: MatDialog,
@@ -74,6 +75,11 @@ export class RequisitionComponent implements OnInit {
     this.pharmacyLocationTagUuid$ =
       this.systemSettingsService.getSystemSettingsByKey(
         `iCare.store.settings.pharmacy.locationTagUuid`
+      );
+    
+    this.requisitionCodeFormat$ =
+      this.systemSettingsService.getSystemSettingsMatchingAKey(
+        `iCare.store.requisition.code.format`
       );
     this.getAllRequisition();
     this.currentStore$ = of(this.currentLocation);

@@ -29,4 +29,14 @@ export class ConfigsService {
   getFacilityDetails(): Observable<any> {
     return this.httpClient.get('systemsetting?q=icare.facility.details&v=full');
   }
+  
+  generateCode(globalProperty: string, metadataType: string, count: number, digitCount: number): Observable<any> {
+    return this.httpClient.get(`icare/codegen?globalProperty=${globalProperty}&metadataType=${metadataType}&count=${count}&digitCount=${digitCount}`)
+    .pipe(
+      map((response) => {
+        return response
+      }
+    ),
+    catchError((error) => error));
+  }
 }
