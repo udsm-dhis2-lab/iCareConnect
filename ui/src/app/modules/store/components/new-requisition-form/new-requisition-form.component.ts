@@ -9,6 +9,7 @@ import { keyBy } from "lodash";
 import { Observable } from "rxjs";
 import { StockService } from "src/app/shared/resources/store/services/stock.service";
 import { RequisitionService } from "src/app/shared/resources/store/services/requisition.service";
+import { ConfigsService } from "src/app/shared/services/configs.service";
 
 @Component({
   selector: "app-new-requisition-form",
@@ -22,6 +23,7 @@ export class NewRequisitionFormComponent implements OnInit {
   @Input() mainStoreLocationTagUuid: any;
   @Input() pharmacyLocationTagUuid: any;
   @Input() stores: any;
+  @Input() codeFormatSetting: any;
 
   requisitionFields: Field<string>[];
   quantityField: Field<string>[];
@@ -35,9 +37,11 @@ export class NewRequisitionFormComponent implements OnInit {
   itemUuid: string;
   addedDataList: RequisitionInput;
   addingRequisitions: boolean = false;
+  requisition: any;
   constructor(
     private stockService: StockService,
-    private requisitionService: RequisitionService
+    private requisitionService: RequisitionService,
+    private configService: ConfigsService
   ) {}
 
   ngOnInit() {
@@ -196,14 +200,19 @@ export class NewRequisitionFormComponent implements OnInit {
         },
       ],
     };
-    
-    this.requisitionService
-      .createRequest(this.addedDataList)
-      .subscribe((response) => {
-        if (!response?.error) {
-          this.addedDataList = response
-        }
-      });
+
+    this.configService.generateCode(this.codeFormatSetting?.uuid, "requisition", 1, 5)
+    .subscribe((response) => {
+      console.log("==> Response Code: ", response)
+    })
+
+    // this.requisitionService
+    //   .createRequest(this.addedDataList)
+    //   .subscribe((response) => {
+    //     if (!response?.error) {
+    //       this.addedDataList = response;
+    //     }
+    //   });
   }
 
   onUpdateForm(formValue: FormValue): void {
