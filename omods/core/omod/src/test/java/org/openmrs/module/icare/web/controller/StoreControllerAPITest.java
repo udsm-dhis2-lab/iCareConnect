@@ -840,7 +840,7 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 	}
 
 	@Test
-	public void addStockInvoiceItem() throws Exception{
+	public void addRequisitionItem() throws Exception{
 
 		String dto = this.readFile("dto/store/requisition-item-create.json");
 		Map<String,Object> requisitionMap = (new ObjectMapper()).readValue(dto,Map.class);
