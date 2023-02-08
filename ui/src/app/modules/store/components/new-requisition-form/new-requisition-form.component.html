@@ -2,7 +2,7 @@
           stockStatusForSelectedStore: stockStatusForSelectedStore$ | async } as params">
   <mat-toolbar>Requisition Form</mat-toolbar>
   <div class="mt-4">
-      <ng-container *ngIf="addedDataList?.items?.length && !addingRequisitions">
+      <ng-container *ngIf="requisition?.items?.length && !addingRequisitions">
         <mat-accordion>
           <mat-expansion-panel
             class="border mat-elevation-z0 mt-2"
@@ -30,7 +30,7 @@
                  
 
                   <tr
-                    *ngFor="let item of addedDataList?.items; let itemIndex = index"
+                    *ngFor="let item of requisition?.items; let itemIndex = index"
                   >
                     <td>{{ itemIndex + 1 }}</td>
                     <td>Test Store {{ itemIndex + 1 }}</td>
@@ -45,8 +45,6 @@
             </div>
           </mat-expansion-panel>
         </mat-accordion>
-      </ng-container>
-      <ng-container *ngIf="!addedDataList?.length && addingRequisitions">
       </ng-container>
       <div class="requisition-form">
         <table class="table w-100">
@@ -95,25 +93,24 @@
           </tbody>
         </table>
       </div>
-     
-          <div
-              class="w-100 alert alert-warning"
-              role="alert"
-              *ngIf="
-                params?.stockStatusForSelectedStore?.eligibleQuantity && specifiedQuantity &&
-                specifiedQuantity >
-                  params?.stockStatusForSelectedStore?.eligibleQuantity
-              "
-            >
-              Request can not exceed availability. {{ params?.stockStatusForSelectedStore?.eligibleQuantity ? 'Available quantity is ' + params?.stockStatusForSelectedStore?.eligibleQuantity : '' }}
-              <button
-                type="button"
-                class="close"
-                data-dismiss="alert"
-                aria-label="Close"
-              >
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
+      <div
+        class="w-100 alert alert-warning"
+        role="alert"
+        *ngIf="
+          params?.stockStatusForSelectedStore?.eligibleQuantity && specifiedQuantity &&
+          specifiedQuantity >
+            params?.stockStatusForSelectedStore?.eligibleQuantity
+        "
+      >
+        Request can not exceed availability. {{ params?.stockStatusForSelectedStore?.eligibleQuantity ? 'Available quantity is ' + params?.stockStatusForSelectedStore?.eligibleQuantity : '' }}
+        <button
+          type="button"
+          class="close"
+          data-dismiss="alert"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
     </div>
 </div>

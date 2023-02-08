@@ -124,7 +124,7 @@ export class RequisitionFormComponent implements OnInit {
 
   onRequest(e: Event) {
     e.stopPropagation();
-    const requisitionInput: RequisitionInput = {
+    const requisitionInput: any = {
       requestingLocationUuid: this.data?.currentStore?.id,
       requestedLocationUuid: this.formData?.targetStore?.value,
       items: [
