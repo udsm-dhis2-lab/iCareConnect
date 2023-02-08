@@ -185,6 +185,17 @@ public class StoreController {
 		return  savedRequisitionItem.toMap();
 	}
 
+	@RequestMapping(value = "requestitem/{requestItemUuid}", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String,Object> updateRequisitionItem(@PathVariable(value = "requestItemUuid") String requestItemUuid, @RequestBody Map<String,Object> requestItemObjectMap){
+
+		RequisitionItem requisitionItem = RequisitionItem.fromMap(requestItemObjectMap);
+		requisitionItem.setUuid(requestItemUuid);
+		RequisitionItem updatedRequisitionItem = storeService.updateRequisitionItem(requisitionItem);
+
+		return updatedRequisitionItem.toMap();
+	}
+
 	
 	@RequestMapping(value = "requeststatus", method = RequestMethod.POST)
 	@ResponseBody

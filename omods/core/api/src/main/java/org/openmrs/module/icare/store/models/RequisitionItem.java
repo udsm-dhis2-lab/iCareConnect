@@ -2,6 +2,7 @@ package org.openmrs.module.icare.store.models;
 
 // Generated Oct 7, 2020 12:48:40 PM by Hibernate Tools 5.2.10.Final
 
+import org.openmrs.BaseOpenmrsData;
 import org.openmrs.module.icare.core.Item;
 
 import javax.persistence.*;
@@ -43,7 +44,7 @@ class RequisitionItemId implements java.io.Serializable {
 
 @Entity
 @Table(name = "st_requisition_item")
-public class RequisitionItem implements java.io.Serializable {
+public class RequisitionItem extends BaseOpenmrsData implements java.io.Serializable {
 	
 	@EmbeddedId
 	private RequisitionItemId id;
@@ -63,11 +64,12 @@ public class RequisitionItem implements java.io.Serializable {
 	}
 
 
-	
-	public RequisitionItemId getId() {
+
+	public RequisitionItemId getReqId() {
 		return id;
 	}
-	
+
+
 	public void setId(RequisitionItemId id) {
 		this.id = id;
 	}
@@ -108,16 +110,16 @@ public class RequisitionItem implements java.io.Serializable {
 		requisitionItemObject.put("quantity", this.getQuantity());
 		
 		Map<String, Object> itemObject = new HashMap<String, Object>();
-		itemObject.put("uuid", this.getId().getItem().getUuid());
-		if (this.getId().getItem().getConcept() != null) {
-			itemObject.put("display", this.getId().getItem().getConcept().getDisplayString());
-		} else if (this.getId().getItem().getDrug() != null) {
-			itemObject.put("display", this.getId().getItem().getDrug().getDisplayName());
+		itemObject.put("uuid", this.getReqId().getItem().getUuid());
+		if (this.getReqId().getItem().getConcept() != null) {
+			itemObject.put("display", this.getReqId().getItem().getConcept().getDisplayString());
+		} else if (this.getReqId().getItem().getDrug() != null) {
+			itemObject.put("display", this.getReqId().getItem().getDrug().getDisplayName());
 		}
 		requisitionItemObject.put("item", itemObject);
 		
 		Map<String, Object> requisitionObject = new HashMap<String, Object>();
-		requisitionObject.put("uuid", this.getId().getRequisition().getUuid());
+		requisitionObject.put("uuid", this.getReqId().getRequisition().getUuid());
 		
 		requisitionItemObject.put("requisition", requisitionObject);
 
@@ -170,5 +172,14 @@ public class RequisitionItem implements java.io.Serializable {
 
 		return requisitionItem;
 	}
-	
+
+	@Override
+	public Integer getId() {
+		return null;
+	}
+
+	@Override
+	public void setId(Integer integer) {
+
+	}
 }
