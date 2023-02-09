@@ -4,9 +4,8 @@ import { OpenmrsHttpClientService } from "src/app/shared/modules/openmrs-http-cl
 import { SampleAllocation } from "../models/allocation.model";
 
 import { groupBy, flatten, keyBy, uniqBy } from "lodash";
-import { catchError, map, retry } from "rxjs/operators";
+import { catchError, map } from "rxjs/operators";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
-import { all } from "cypress/types/bluebird";
 
 @Injectable({
   providedIn: "root",
@@ -40,11 +39,11 @@ export class SampleAllocationService {
         let countOfAuthorizationRequired = Number(responses[0]);
         const groupedAllocations = groupBy(
           responses[2]?.map((allocation) => {
-            const alloc: SampleAllocation = new SampleAllocation({
+            const alloc: any = new SampleAllocation({
               ...allocation,
               resultApprovalConfiguration: responses[0],
               testRelationshipConceptSourceUuid: responses[1],
-            });
+            }).toJson();
             allSampleAllocations = [...allSampleAllocations, alloc];
             return alloc;
           }),
@@ -134,8 +133,10 @@ export class SampleAllocationService {
                       allocationsKeyedByParametersUuid[
                         allocation?.parameter?.relatedTo?.code
                       ]?.allocation
-                    ),
-                    formattedAllocation: new SampleAllocation(allocation),
+                    ).toJson(),
+                    formattedAllocation: new SampleAllocation(
+                      allocation
+                    ).toJson(),
                   };
                 }) || [],
               concept: {
@@ -163,7 +164,7 @@ export class SampleAllocationService {
               )
             ),
             allocations: groupedAllocations[key]?.map((allocation) => {
-              return new SampleAllocation(allocation);
+              return new SampleAllocation(allocation).toJson();
             }),
           };
         });
