@@ -51,10 +51,10 @@ public class RequisitionItem extends BaseOpenmrsData implements java.io.Serializ
 	
 	@Column(name = "quantity")
 	private Integer quantity;
-
+	
 	@Transient
 	private List<RequisitionItemStatus> requisitionItemStatuses = new ArrayList<RequisitionItemStatus>(0);
-
+	
 	public Integer getQuantity() {
 		return this.quantity;
 	}
@@ -62,14 +62,11 @@ public class RequisitionItem extends BaseOpenmrsData implements java.io.Serializ
 	public void setQuantity(Integer quantity) {
 		this.quantity = quantity;
 	}
-
-
-
+	
 	public RequisitionItemId getReqId() {
 		return id;
 	}
-
-
+	
 	public void setId(RequisitionItemId id) {
 		this.id = id;
 	}
@@ -87,23 +84,23 @@ public class RequisitionItem extends BaseOpenmrsData implements java.io.Serializ
 		}
 		this.id.setItem(item);
 	}
-
-	public Item getItem(){
+	
+	public Item getItem() {
 		return this.id.getItem();
 	}
-
-	public Requisition getRequisition(){
+	
+	public Requisition getRequisition() {
 		return this.id.getRequisition();
 	}
-
+	
 	public List<RequisitionItemStatus> getRequisitionItemStatuses() {
 		return requisitionItemStatuses;
 	}
-
+	
 	public void setRequisitionItemStatuses(List<RequisitionItemStatus> requisitionItemStatuses) {
 		this.requisitionItemStatuses = requisitionItemStatuses;
 	}
-
+	
 	public Map<String, Object> toMap() {
 		Map<String, Object> requisitionItemObject = new HashMap<String, Object>();
 		if(this.getQuantity() != null) {
@@ -135,7 +132,7 @@ public class RequisitionItem extends BaseOpenmrsData implements java.io.Serializ
 				requisitionItemStatusMap.put("status",requisitionItemStatus.getStatus());
 			}
 			requisitionItemStatusesMapList.add(requisitionItemStatusMap);
-			requisitionItemObject.put("requisitionItemStatus",requisitionItemStatusesMapList);
+			requisitionItemObject.put("requisitionItemStatuses",requisitionItemStatusesMapList);
 		}
 		if(this.getVoided() != null){
 			requisitionItemObject.put("voided",this.getVoided());
@@ -143,7 +140,7 @@ public class RequisitionItem extends BaseOpenmrsData implements java.io.Serializ
 		
 		return requisitionItemObject;
 	}
-
+	
 	public static RequisitionItem fromMap(Map<String,Object> requisitionItemMap){
 
 		RequisitionItem requisitionItem = new RequisitionItem();
@@ -164,10 +161,10 @@ public class RequisitionItem extends BaseOpenmrsData implements java.io.Serializ
 			requisitionItem.setRequisition(requisition);
 		}
 
-		if(requisitionItemMap.get("requisitionItemStatus") != null){
+		if(requisitionItemMap.get("requisitionItemStatuses") != null){
 
 			List<RequisitionItemStatus> requisitionItemStatusesList = new ArrayList<>();
-			for(Map<String,Object> requisitionItemMapObject :(List<Map<String, Object>>) requisitionItemMap.get("requisitionItemStatus")) {
+			for(Map<String,Object> requisitionItemMapObject :(List<Map<String, Object>>) requisitionItemMap.get("requisitionItemStatuses")) {
 				RequisitionItemStatus requisitionItemStatus = new RequisitionItemStatus();
 				requisitionItemStatus.setStatus( requisitionItemMapObject.get("status").toString());
 				requisitionItemStatusesList.add(requisitionItemStatus);
@@ -183,14 +180,14 @@ public class RequisitionItem extends BaseOpenmrsData implements java.io.Serializ
 
 		return requisitionItem;
 	}
-
+	
 	@Override
 	public Integer getId() {
 		return null;
 	}
-
+	
 	@Override
 	public void setId(Integer integer) {
-
+		
 	}
 }

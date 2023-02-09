@@ -838,33 +838,38 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		assertThat("The stock is created from the stock invoice item", newBatchexist, is(true));
 		
 	}
-
+	
 	@Test
-	public void addRequisitionItem() throws Exception{
-
+	public void addRequisitionItem() throws Exception {
+		
 		String dto = this.readFile("dto/store/requisition-item-create.json");
-		Map<String,Object> requisitionMap = (new ObjectMapper()).readValue(dto,Map.class);
-		MockHttpServletRequest newPostRequest = newPostRequest("store/requestitem",requisitionMap);
+		Map<String, Object> requisitionMap = (new ObjectMapper()).readValue(dto, Map.class);
+		MockHttpServletRequest newPostRequest = newPostRequest("store/requestitem", requisitionMap);
 		MockHttpServletResponse handle = handle(newPostRequest);
-		Map<String,Object> createdRequisition = (new ObjectMapper()).readValue(handle.getContentAsString(),Map.class);
-		assertThat("There is one created requisition item",((Map)createdRequisition.get("item")).get("uuid").equals("8o00d43570-8y37-11f3-1234-08002007777"));
-
+		Map<String, Object> createdRequisition = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
+		assertThat("There is one created requisition item",
+		    ((Map) createdRequisition.get("item")).get("uuid").equals("8o00d43570-8y37-11f3-1234-08002007777"));
+		
 		//Update requisition Item
 		String dto2 = this.readFile("dto/store/requisition-item-update.json");
-		Map<String,Object> requisitionMap2 = (new ObjectMapper()).readValue(dto2,Map.class);
-		MockHttpServletRequest newPostRequest2 = newPostRequest("store/requestitem/8800zx3570-8z37-11ff-2234-01102007815",requisitionMap2);
+		Map<String, Object> requisitionMap2 = (new ObjectMapper()).readValue(dto2, Map.class);
+		MockHttpServletRequest newPostRequest2 = newPostRequest("store/requestitem/8800zx3570-8z37-11ff-2234-01102007815",
+		    requisitionMap2);
 		MockHttpServletResponse handle2 = handle(newPostRequest2);
-		Map<String,Object> updateRequisition = (new ObjectMapper()).readValue(handle2.getContentAsString(),Map.class);
+		Map<String, Object> updateRequisition = (new ObjectMapper()).readValue(handle2.getContentAsString(), Map.class);
 		System.out.println(updateRequisition);
-
+		
 	}
-
+	
 	@Test
-	public void updateRequisition() throws Exception{
+	public void updateRequisition() throws Exception {
 		String dto = this.readFile("dto/store/requisition-update.json");
-		Map<String,Object> requisitionMap = (new ObjectMapper()).readValue(dto,Map.class);
-		MockHttpServletRequest newPostRequest = newPostRequest("store/request/8800zx3570-8z37-11ff-2234-01102007812",requisitionMap);
+		Map<String, Object> requisitionMap = (new ObjectMapper()).readValue(dto, Map.class);
+		MockHttpServletRequest newPostRequest = newPostRequest("store/request/8800zx3570-8z37-11ff-2234-01102007812",
+		    requisitionMap);
 		MockHttpServletResponse handle = handle(newPostRequest);
-		System.out.println(handle.getContentAsString());
+		Map<String, Object> updateRequisition = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
+		assertThat("There is 1 stock invoice item present",
+		    updateRequisition.get("uuid").equals("8800zx3570-8z37-11ff-2234-01102007812"));
 	}
 }

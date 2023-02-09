@@ -67,7 +67,7 @@ public class RequisitionStatus extends BaseOpenmrsData implements java.io.Serial
 	}
 	
 	public static enum RequisitionStatusCode {
-		REQUESTED, CANCELLED, REJECTED, ISSUED, RECEIVED, PENDING;
+		REQUESTED, CANCELLED, REJECTED, ISSUED, RECEIVED, PENDING, DRAFT;
 		
 		private RequisitionStatusCode() {
 		}

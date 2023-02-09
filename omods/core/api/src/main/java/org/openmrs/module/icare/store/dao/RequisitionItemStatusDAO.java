@@ -5,5 +5,5 @@ import org.openmrs.module.icare.store.models.RequisitionItem;
 import org.openmrs.module.icare.store.models.RequisitionItemStatus;
 
 public class RequisitionItemStatusDAO extends BaseDAO<RequisitionItemStatus> {
-
+	
 }

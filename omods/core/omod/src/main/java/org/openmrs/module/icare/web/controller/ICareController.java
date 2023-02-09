@@ -76,17 +76,15 @@ public class ICareController {
         results.put("identifiers", ids);
         return results;
     }
-
-	@RequestMapping(value = "codegen",method = RequestMethod.GET)
+	
+	@RequestMapping(value = "codegen", method = RequestMethod.GET)
 	@ResponseBody
-	public List<String> onGenerateCode(
-			@RequestParam(value = "globalProperty", required = true) String globalProperty,
-			@RequestParam(value = "metadataType", required = true) String metadataType,
-			@RequestParam(value = "count",defaultValue = "1", required = false) Integer count,
-			@RequestParam(value = "digitCount", defaultValue = "5",required = false) Integer digitCount
-			){
-		List<String> generatedCode = iCareService.generateCode(globalProperty,metadataType,count,digitCount);
-
+	public List<String> onGenerateCode(@RequestParam(value = "globalProperty", required = true) String globalProperty,
+	        @RequestParam(value = "metadataType", required = true) String metadataType,
+	        @RequestParam(value = "count", defaultValue = "1", required = false) Integer count,
+	        @RequestParam(value = "digitCount", defaultValue = "5", required = false) Integer digitCount) {
+		List<String> generatedCode = iCareService.generateCode(globalProperty, metadataType, count, digitCount);
+		
 		return generatedCode;
 	}
 	

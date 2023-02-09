@@ -390,7 +390,7 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		identifiers.add(idFormat);
 		return identifiers;
 	}
-
+	
 	@Override
 	public List<String> generateCode(String globalPropertyUuid, String metadataType, Integer count, Integer digitCount) {
 
@@ -772,8 +772,7 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 			return String.valueOf(content);
 		}
 	}
-
-
+	
 	//	public String voidOrder(String uuid, String voidReason) {
 	//		return dao.voidOrder(uuid, voidReason);
 	//	}

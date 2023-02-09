@@ -131,12 +131,12 @@ public interface StoreService extends OpenmrsService {
 	StockInvoiceItemStatus saveStockInvoiceItemStatus(StockInvoiceItemStatus stockInvoiceItemStatus);
 	
 	Supplier updateSupplier(Supplier supplier) throws Exception;
-
-    Requisition updateRequisition(Requisition requisition) throws Exception;
-
+	
+	Requisition updateRequisition(Requisition requisition) throws Exception;
+	
 	RequisitionItem saveRequisitionItem(RequisitionItem requisitionItem) throws Exception;
-
+	
 	RequisitionItemStatus saveRequisitionItemStatus(RequisitionItemStatus requisitionItemStatus);
-
-    RequisitionItem updateRequisitionItem(RequisitionItem requisitionItem) throws Exception;
+	
+	RequisitionItem updateRequisitionItem(RequisitionItem requisitionItem) throws Exception;
 }
