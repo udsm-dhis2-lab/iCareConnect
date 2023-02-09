@@ -30,6 +30,7 @@ import { RequisitionFormComponent } from "../../modals/requisition-form/requisit
 })
 export class RequisitionComponent implements OnInit {
   @Input() currentLocation: any;
+
   requisitions$: Observable<RequisitionObject[]>;
   loadingRequisitions$: Observable<boolean>;
   stores$: Observable<any>;
@@ -47,10 +48,19 @@ export class RequisitionComponent implements OnInit {
   pageSize: number = 50;
   pageSizeOptions: number[] = [5, 10, 25, 50, 100];
   pager: any;
-  statuses: string[] = ['', "PENDING", "ISSUED", "CANCELLED", "REJECTED", "RECEIVED"];
+  statuses: string[] = [
+    "",
+    "DRAFT",
+    "PENDING",
+    "ISSUED",
+    "CANCELLED",
+    "REJECTED",
+    "RECEIVED",
+  ];
   selectedStatus: string;
   showRequisitionForm: boolean;
-  requisitionCodeFormat$: Observable<import("/home/jonas/DHIS2Lab/icare/ui/src/app/core/models/system-settings.model").SystemSettingsWithKeyDetails[]>;
+  requisitionCodeFormat$: Observable<any>;
+  viewRequisitionItems: string;
   constructor(
     private store: Store<AppState>,
     private dialog: MatDialog,
@@ -76,7 +86,7 @@ export class RequisitionComponent implements OnInit {
       this.systemSettingsService.getSystemSettingsByKey(
         `iCare.store.settings.pharmacy.locationTagUuid`
       );
-    
+
     this.requisitionCodeFormat$ =
       this.systemSettingsService.getSystemSettingsMatchingAKey(
         `iCare.store.requisition.code.format`
@@ -96,7 +106,7 @@ export class RequisitionComponent implements OnInit {
         this.page,
         this.pageSize,
         this.selectedStatus,
-        'DESC'
+        "DESC"
       )
       .pipe(
         map((requisitions) => {
@@ -134,7 +144,7 @@ export class RequisitionComponent implements OnInit {
   onNewRequest(e: Event, params: any): void {
     e.stopPropagation();
 
-    this.showRequisitionForm = !this.showRequisitionForm
+    this.showRequisitionForm = !this.showRequisitionForm;
 
     // if (params) {
     //   const {
@@ -179,56 +189,145 @@ export class RequisitionComponent implements OnInit {
     // }
   }
 
-  onCancelRequisition(e: any, id?: string): void {
-    id = id ? id : e?.id;
-    e = !e?.event ? e : e?.event;
-    e.stopPropagation();
-
-    const dialogToConfirmRejection = this.dialog.open(RequestCancelComponent, {
-      width: "25%",
-      panelClass: "custom-dialog-container",
-      data: "request",
-    });
-
-    dialogToConfirmRejection.afterClosed().subscribe((result) => {
-      //console.log('==> results :: ', result);
-      if (result) {
-        this.store.dispatch(
-          cancelRequisition({ id: id, reason: result?.reason })
-        );
-        this.getAllRequisition();
-      }
-    });
-  }
-
-  onReceiveRequisition(e: any, requisition?: RequisitionObject): void {
-    requisition = requisition ? requisition : e?.requisition;
-    e = !e?.event ? e : e?.event;
-    e.stopPropagation();
-
-    // this.store.dispatch(receiveRequisition({ requisition }));
+  onSendRequisition(e: any, requisition: any) {
+    e?.stopPropagation();
+    const requisitionObject = {
+      ...requisition,
+      requisitionStatuses: [
+        {
+          status: "PENDING",
+        },
+      ],
+    };
     this.requisitionService
-      .receiveRequisition(requisition)
+      .updateRequisition(requisition?.uuid, requisitionObject)
       .subscribe((response) => {
-        // Add support to catch error
-        if (response) {
-          this.getAllRequisition();
-        }
+        this.getAllRequisition();
       });
   }
 
-  onRejectRequisition(e: any, requisition?: RequisitionObject): void {
-    requisition = requisition ? requisition : e?.requisition;
-    e = !e?.event ? e : e?.event;
-    e.stopPropagation();
-    if (requisition) {
-      const { id, issueUuid } = requisition;
-      // TODO Add support to capture rejection reasons
-      const rejectionReason = "";
-      this.store.dispatch(
-        rejectRequisition({ id, issueUuid, rejectionReason })
-      );
-      this.getAllRequisition();
+  onDeleteRequisition(e: any, requisition: any) {
+    e?.stopPropagation();
+    const requisitionObject = {
+      ...requisition,
+      voided: true,
+    };
+    this.requisitionService
+      .updateRequisition(requisition?.uuid, requisitionObject)
+      .subscribe((response) => {
+        this.getAllRequisition();
+      });
+  }
+
+  onReceiveRequisition(e: any, requisition: any) {
+    e?.stopPropagation();
+    const requisitionObject = {
+      ...requisition,
+      requisitionStatuses: [
+        {
+          status: "RECEIVED",
+        },
+      ],
+    };
+    this.requisitionService
+      .updateRequisition(requisition?.uuid, requisitionObject)
+      .subscribe((response) => {
+        this.getAllRequisition();
+      });
+  }
+
+  onRejectRequisition(e: any, requisition: any) {
+    e?.stopPropagation();
+    const requisitionObject = {
+      ...requisition,
+      requisitionStatuses: [
+        {
+          status: "REJECTED",
+        },
+      ],
+    };
+    this.requisitionService
+      .updateRequisition(requisition?.uuid, requisitionObject)
+      .subscribe((response) => {
+        this.getAllRequisition();
+      });
+  }
+  
+  onCancelRequisition(e: any, requisition: any) {
+    e?.stopPropagation();
+    const requisitionObject = {
+      ...requisition,
+      requisitionStatuses: [
+        {
+          status: "CANCELLED",
+        },
+      ],
+    };
+    this.requisitionService
+      .updateRequisition(requisition?.uuid, requisitionObject)
+      .subscribe((response) => {
+        this.getAllRequisition();
+      });
+  }
+
+  // onCancelRequisition(e: any, id?: string): void {
+  //   id = id ? id : e?.id;
+  //   e = !e?.event ? e : e?.event;
+  //   e.stopPropagation();
+
+  //   const dialogToConfirmRejection = this.dialog.open(RequestCancelComponent, {
+  //     width: "25%",
+  //     panelClass: "custom-dialog-container",
+  //     data: "request",
+  //   });
+
+  //   dialogToConfirmRejection.afterClosed().subscribe((result) => {
+  //     //console.log('==> results :: ', result);
+  //     if (result) {
+  //       this.store.dispatch(
+  //         cancelRequisition({ id: id, reason: result?.reason })
+  //       );
+  //       this.getAllRequisition();
+  //     }
+  //   });
+  // }
+
+  // onReceiveRequisition(e: any, requisition?: any): void {
+  //   requisition = requisition ? requisition : e?.requisition;
+  //   e = !e?.event ? e : e?.event;
+  //   e.stopPropagation();
+
+  //   // this.store.dispatch(receiveRequisition({ requisition }));
+  //   this.requisitionService
+  //     .receiveRequisition(requisition)
+  //     .subscribe((response) => {
+  //       // Add support to catch error
+  //       if (response) {
+  //         this.getAllRequisition();
+  //       }
+  //     });
+  // }
+
+  // onRejectRequisition(e: any, requisition?: RequisitionObject): void {
+  //   requisition = requisition ? requisition : e?.requisition;
+  //   e = !e?.event ? e : e?.event;
+  //   e.stopPropagation();
+  //   if (requisition) {
+  //     const { id, issueUuid } = requisition;
+  //     // TODO Add support to capture rejection reasons
+  //     const rejectionReason = "";
+  //     this.store.dispatch(
+  //       rejectRequisition({ id, issueUuid, rejectionReason })
+  //     );
+  //     this.getAllRequisition();
+  //   }
+  // }
+
+  onViewRequisitionItems(requisitionUuid) {
+    if (requisitionUuid === this.viewRequisitionItems) {
+      this.viewRequisitionItems = undefined;
+    } else {
+      this.viewRequisitionItems = requisitionUuid;
     }
   }
 

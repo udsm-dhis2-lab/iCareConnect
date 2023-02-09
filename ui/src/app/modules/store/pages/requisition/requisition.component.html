@@ -196,14 +196,104 @@
       >
       </mat-paginator>
       <div *ngIf="loadedRequisitions && requisitions?.length">
-        <app-requisition-by-store
+          <mat-accordion>
+            <mat-expansion-panel
+              class="border mat-elevation-z0 mt-2"
+              *ngFor="let requisition of requisitions; let requisitionsIndex = index"
+              [expanded]="viewRequisitionItems && viewRequisitionItems === requisition?.uuid ? true : requisitionsIndex === 0 ? true : false"
+            >
+              <mat-expansion-panel-header class="d-flex justify-content-between">
+                <mat-panel-title>
+                  <span>Requisition: {{ requisition?.code }} </span>
+                  <span class="ml-4">Target Store: {{ requisition?.targetStore?.name }}</span>
+                  <span class="ml-4 text-small"><i>
+                    Requested on: {{ requisition?.created | date:"dd/MM/yyyy" }}
+                  </i></span>
+                  <span class="ml-4">
+                    Status: {{ requisition?.requisitionStatuses[requisitionStatuses?.length - 1]?.status ? requisition?.requisitionStatuses[requisitionStatuses?.length - 1]?.status : 'DRAFT' }}
+                  </span>
+                </mat-panel-title>
+              </mat-expansion-panel-header>
+              <div class="row mt-2">
+                  <div class="col-4"></div>
+                  <div class="col-4"></div>
+                  <div class="col-4">
+                    <div class="float-right">
+                      <a 
+                        class="anchor-button ml-4" 
+                        color="primary"
+                        (click)="onViewRequisitionItems(requisition?.uuid)"  
+                        matTooltip="{{viewRequisitionItems && viewRequisitionItems !== requisition?.uuid ? 'View Requisition Items' : 'Hide Requisition Items' }}"
+                      >
+                        <mat-icon *ngIf="viewRequisitionItems && viewRequisitionItems === requisition?.uuid">visibility_off</mat-icon>
+                          <mat-icon *ngIf="!viewRequisitionItems || viewRequisitionItems !== requisition?.uuid">visibility</mat-icon>
+                      </a>
+                      <!-- ATTENDED REQUISITION -->
+                      <ng-container *ngIf="requisition?.requisitionStatuses[requisitionStatuses?.length - 1]?.status === 'ATTENDED'">
+                        <a
+                          class="anchor-button ml-4" 
+                          color="primary" 
+                          matTooltip="Receive all items in this requisition"
+                          (click)="onReceiveRequisition($event, requisition)"
+                        >
+                            <mat-icon>done_all</mat-icon>
+                        </a>
+                        <a
+                          class="anchor-button ml-4" 
+                          color="primary" 
+                          matTooltip="Reject all items in this requisition"
+                          (click)="onRejectRequisition($event, requisition)"
+                        >
+                            <mat-icon>thumb_down</mat-icon>
+                        </a>
+                      </ng-container>
+                      <!-- DRAFT REQUISITION -->
+                      <ng-container *ngIf="requisition?.requisitionStatuses[requisitionStatuses?.length - 1]?.status === 'DRAFT' || !requisition?.requisitionStatuses[requisitionStatuses?.length - 1]">
+                        <a
+                          class="anchor-button ml-4" 
+                          color="primary" 
+                          matTooltip="Send this requisition"
+                          (click)="onSendRequisition($event, requisition)"
+                        >
+                            <mat-icon>send</mat-icon>
+                        </a>
+                        <a
+                          class="anchor-button ml-4" 
+                          color="primary"
+                          (click)="onDeleteRequisition($event, requisition)"  
+                          matTooltip="Delete this requisition"
+                        >
+                            <mat-icon>delete</mat-icon>
+                        </a>
+                      </ng-container>
+                      <!-- PENDING REQUISITION -->
+                      <a 
+                      *ngIf="requisition?.requisitionStatuses[requisitionStatuses?.length - 1]?.status === 'PENDING'"
+                        class="anchor-button ml-4" 
+                        color="primary"
+                        (click)="onCancelRequisition($event, requisition)"  
+                        matTooltip="Cancel this requisition"
+                      >
+                          <mat-icon>clear</mat-icon>
+                      </a>
+                    </div>
+                  </div>
+              </div>
+              <div class="inv-items-table container-fluid" *ngIf="viewRequisitionItems && viewRequisitionItems === requisition?.uuid">
+                <app-requisition-items 
+                  [requisition]="requisition"
+                  ></app-requisition-items>
+              </div>
+            </mat-expansion-panel>
+          </mat-accordion>
+        <!-- <app-requisition-by-store
           [requisitions]="requisitions"
           [currentStore]="params?.currentStore"
           (cancelRequisition)="onCancelRequisition($event)"
           (rejectRequisition)="onRejectRequisition($event)"
           (receiveRequisition)="onReceiveRequisition($event)"
         >
-        </app-requisition-by-store>
+        </app-requisition-by-store> -->
       </div>
       <div *ngIf="!requisitions?.length && loadedRequisitions">
         <table class="table table-striped">

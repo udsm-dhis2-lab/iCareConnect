@@ -1,6 +1,6 @@
  <div *ngIf="{
           stockStatusForSelectedStore: stockStatusForSelectedStore$ | async } as params">
-  <mat-toolbar>Requisition Form</mat-toolbar>
+  <mat-toolbar *ngIf="!existingRequisitionItem">Requisition Form</mat-toolbar>
   <div class="mt-4">
       <ng-container *ngIf="requisition">
         <mat-accordion>
@@ -18,7 +18,7 @@
               </mat-panel-title>
             </mat-expansion-panel-header>
             <div class="items-table">
-              <div style="overflow: auto">
+              <div class="container-fluid">
                 <app-requisition-items [requisition]="requisition"></app-requisition-items>
             </div>
             </div>
@@ -29,7 +29,7 @@
         <table class="table w-100">
           <tbody>
             <tr>
-              <td>
+              <td *ngIf="!existingRequisitionItem">
                 <app-form
                   [fields]="targetStoreField"
                   (formUpdate)="onUpdateForm($event)"
@@ -43,6 +43,11 @@
                   [isFormHorizontal]="true"
                   (formUpdate)="onUpdateForm($event)"
                 ></app-form>
+                <span class="mt-2 text-small" *ngIf="existingRequisitionItem">
+                  <i>
+                   Previous item selected: {{ existingRequisitionItem?.item?.display }}
+                  </i>
+                </span>
                 <div
                   class="w-100 ml-2 mr-2 mb-2"
                   *ngIf="params?.stockStatusForSelectedStore"
@@ -61,6 +66,7 @@
               </td>
               <td>
                 <button
+                *ngIf="!existingRequisitionItem"
                 class="mt-1"
                 (click)="onAdd($event)"
                 mat-flat-button
@@ -68,6 +74,16 @@
                 style="height: 45px"
               >
                 Add 
+              </button>
+                <button
+                *ngIf="existingRequisitionItem"
+                class="mt-1"
+                (click)="onUpdateItem($event)"
+                mat-flat-button
+                color="primary"
+                style="height: 45px"
+              >
+                Update
               </button>
               </td>
             </tr>
