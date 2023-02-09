@@ -48,6 +48,17 @@ export class RequisitionService {
         })
       );
   }
+  
+  getRequisitionByUuid(uuid: string) : Observable<any> {
+    return this.httpClient
+      .get(`store/request/${uuid}`)
+      .pipe(
+        map((requestResponse) => {
+          return requestResponse
+        }), 
+        catchError((error) => error)
+      );
+  }
 
   getAllRequisitions(locationUuid?: string): Observable<RequisitionObject[]> {
     return this.httpClient
@@ -75,7 +86,7 @@ export class RequisitionService {
 
     return this.httpClient.post("store/request", requisitionInput).pipe(
       map((response) => {
-        return new Requisition(response).toJson();
+        return response;
       }),
       catchError((error) => error)
     );
@@ -106,7 +117,7 @@ export class RequisitionService {
 
     return this.httpClient.post("store/requestitem", requisitionItem).pipe(
       map((response) => {
-        return new Requisition(response).toJson();
+        return response;
       }),
       catchError((error) => error)
     );

@@ -175,44 +175,19 @@ export class NewRequisitionFormComponent implements OnInit {
         .subscribe((response) => {
           if (!response?.error) {
             const storedRequisition = this.requisition;
+            const reserveRequisitionFields = this.requisitionFields;
+            const reserveQuantityFields = this.quantityField;
             this.requisition = undefined;
+            this.quantityField = [];
+            this.requisitionFields = [];
             setTimeout(() => {
               this.requisition = storedRequisition;
+              this.requisitionFields = reserveRequisitionFields;
+              this.quantityField = reserveQuantityFields;
             }, 100);
           }
         });
     } else {
-      // // if (
-      // //   this.formData?.quantity?.value ===
-      // //   this.requisitionObject?.requestedLocationUuid
-      // // ) {
-      // //   this.requisitionObject = {
-      // //     ...this.requisitionObject,
-      // //     requestingLocationUuid: this.currentStore?.id,
-      // //     requestedLocationUuid: this.storeUuid,
-      // //     items: this.requisitionObject?.items?.length
-      // //       ? [
-      // //           ...this.requisitionObject?.items,
-      // //           {
-      // //             itemUuid: this.formData?.requisitionItem?.value,
-      // //             quantity: parseInt(
-      // //               String(this.formData?.quantity?.value),
-      // //               10
-      // //             ),
-      // //           },
-      // //         ]
-      // //       : [
-      // //           {
-      // //             itemUuid: this.formData?.requisitionItem?.value,
-      // //             quantity: parseInt(
-      // //               String(this.formData?.quantity?.value),
-      // //               10
-      // //             ),
-      // //           },
-      // //         ],
-      // //   };
-      // } else {
-      // }
       this.requisitionObject = {
         requestingLocationUuid: this.currentStore?.id,
         requestedLocationUuid: this.formData?.targetStore?.value,
@@ -249,6 +224,14 @@ export class NewRequisitionFormComponent implements OnInit {
               .subscribe((response) => {
                 if (!response?.error) {
                   this.requisition = response;
+                  const reserveRequisitionFields = this.requisitionFields;
+                  const reserveQuantityFields = this.quantityField;
+                  this.quantityField = [];
+                  this.requisitionFields = [];
+                  setTimeout(() => {
+                    this.requisitionFields = reserveRequisitionFields;
+                    this.quantityField = reserveQuantityFields;
+                  }, 100);
                 }
               });
           }
