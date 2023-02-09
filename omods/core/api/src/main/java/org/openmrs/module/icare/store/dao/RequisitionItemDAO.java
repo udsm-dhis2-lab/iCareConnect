@@ -28,7 +28,7 @@ public class RequisitionItemDAO extends BaseDAO<RequisitionItem> {
             } else {
                 queryStr += " , ";
             }
-            queryStr += " ri.item = :item";
+            queryStr += " ri.id.item = :item";
         }
 
         if(requisitionItem.getQuantity() != null){

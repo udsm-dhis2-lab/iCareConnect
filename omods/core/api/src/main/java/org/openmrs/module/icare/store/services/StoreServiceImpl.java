@@ -779,7 +779,24 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 	}
 
 	@Override
-	public RequisitionItem updateRequisitionItem(RequisitionItem requisitionItem) {
+	public RequisitionItem updateRequisitionItem(RequisitionItem requisitionItem) throws Exception {
+
+		if(requisitionItem.getItem() != null){
+			Item item = dao.findByUuid(requisitionItem.getItem().getUuid());
+			if(item == null){
+				throw new Exception("The item with uuid "+requisitionItem.getItem().getUuid()+" does not exist");
+			}
+
+			requisitionItem.setItem(item);
+		}
+
+		if(requisitionItem.getRequisition() != null){
+			Requisition requisition = this.requisitionDAO.findByUuid(requisitionItem.getRequisition().getUuid());
+			if(requisition == null){
+				throw new Exception(" The requisition with uuid "+ requisitionItem.getRequisition().getUuid()+" does not exist");
+			}
+			requisitionItem.setRequisition(requisition);
+		}
 
 		return requisitionItemDAO.updateRequisitionItem(requisitionItem);
 	}

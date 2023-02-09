@@ -187,7 +187,7 @@ public class StoreController {
 
 	@RequestMapping(value = "requestitem/{requestItemUuid}", method = RequestMethod.POST)
 	@ResponseBody
-	public Map<String,Object> updateRequisitionItem(@PathVariable(value = "requestItemUuid") String requestItemUuid, @RequestBody Map<String,Object> requestItemObjectMap){
+	public Map<String,Object> updateRequisitionItem(@PathVariable(value = "requestItemUuid") String requestItemUuid, @RequestBody Map<String,Object> requestItemObjectMap) throws Exception {
 
 		RequisitionItem requisitionItem = RequisitionItem.fromMap(requestItemObjectMap);
 		requisitionItem.setUuid(requestItemUuid);

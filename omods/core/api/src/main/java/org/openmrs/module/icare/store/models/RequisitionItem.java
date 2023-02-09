@@ -106,22 +106,26 @@ public class RequisitionItem extends BaseOpenmrsData implements java.io.Serializ
 
 	public Map<String, Object> toMap() {
 		Map<String, Object> requisitionItemObject = new HashMap<String, Object>();
-		
-		requisitionItemObject.put("quantity", this.getQuantity());
-		
-		Map<String, Object> itemObject = new HashMap<String, Object>();
-		itemObject.put("uuid", this.getReqId().getItem().getUuid());
-		if (this.getReqId().getItem().getConcept() != null) {
-			itemObject.put("display", this.getReqId().getItem().getConcept().getDisplayString());
-		} else if (this.getReqId().getItem().getDrug() != null) {
-			itemObject.put("display", this.getReqId().getItem().getDrug().getDisplayName());
+		if(this.getQuantity() != null) {
+			requisitionItemObject.put("quantity", this.getQuantity());
 		}
-		requisitionItemObject.put("item", itemObject);
-		
-		Map<String, Object> requisitionObject = new HashMap<String, Object>();
-		requisitionObject.put("uuid", this.getReqId().getRequisition().getUuid());
-		
-		requisitionItemObject.put("requisition", requisitionObject);
+
+		if(this.getItem() != null) {
+			Map<String, Object> itemObject = new HashMap<String, Object>();
+			itemObject.put("uuid", this.getReqId().getItem().getUuid());
+			if (this.getReqId().getItem().getConcept() != null) {
+				itemObject.put("display", this.getReqId().getItem().getConcept().getDisplayString());
+			} else if (this.getReqId().getItem().getDrug() != null) {
+				itemObject.put("display", this.getReqId().getItem().getDrug().getDisplayName());
+			}
+			requisitionItemObject.put("item", itemObject);
+		}
+		if(this.getRequisition() != null) {
+			Map<String, Object> requisitionObject = new HashMap<String, Object>();
+			requisitionObject.put("uuid", this.getReqId().getRequisition().getUuid());
+
+			requisitionItemObject.put("requisition", requisitionObject);
+		}
 
 		if(this.getRequisitionItemStatuses() != null){
 
@@ -132,6 +136,9 @@ public class RequisitionItem extends BaseOpenmrsData implements java.io.Serializ
 			}
 			requisitionItemStatusesMapList.add(requisitionItemStatusMap);
 			requisitionItemObject.put("requisitionItemStatus",requisitionItemStatusesMapList);
+		}
+		if(this.getVoided() != null){
+			requisitionItemObject.put("voided",this.getVoided());
 		}
 		
 		return requisitionItemObject;
@@ -167,6 +174,10 @@ public class RequisitionItem extends BaseOpenmrsData implements java.io.Serializ
 			}
 			requisitionItem.setRequisitionItemStatuses(requisitionItemStatusesList);
 
+		}
+
+		if(requisitionItemMap.get("voided") != null){
+			requisitionItem.setVoided((Boolean) requisitionItemMap.get("voided"));
 		}
 
 
