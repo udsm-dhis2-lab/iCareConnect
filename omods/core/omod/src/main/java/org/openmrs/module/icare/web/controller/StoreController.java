@@ -161,48 +161,56 @@ public class StoreController {
 		
 		return createdRequisition.toMap();
 	}
-
-	@RequestMapping(value = "request/{requisitionUuid}",method = RequestMethod.POST)
+	
+	@RequestMapping(value = "request/{requisitionUuid}", method = RequestMethod.POST)
 	@ResponseBody
-	public Map<String,Object> updateRequisition(@PathVariable("requisitionUuid") String requisitionUuid,@RequestBody Map<String,Object> requisitionMap) throws Exception {
-
+	public Map<String, Object> updateRequisition(@PathVariable("requisitionUuid") String requisitionUuid,
+	        @RequestBody Map<String, Object> requisitionMap) throws Exception {
+		
 		Requisition requisition = Requisition.fromMap(requisitionMap);
 		requisition.setUuid(requisitionUuid);
 		Requisition updateRequisition = storeService.updateRequisition(requisition);
-
+		
 		return requisition.toMap();
-
-
+		
 	}
-
-	@RequestMapping(value = "requestitem",method = RequestMethod.POST)
+	
+	@RequestMapping(value = "requisition/{requisitionUuid}", method = RequestMethod.GET)
 	@ResponseBody
-	public Map<String,Object> addRequisitionItems(@RequestBody Map<String,Object> requisitionItemMap) throws Exception {
-		RequisitionItem requisitionItem = RequisitionItem.fromMap(requisitionItemMap);
-
-		RequisitionItem savedRequisitionItem = storeService.saveRequisitionItem(requisitionItem);
-
-		return  savedRequisitionItem.toMap();
+	public Map<String, Object> getRequisitionByUuid(@PathVariable("requisitionUuid") String requisitionUuid) {
+		
+		Requisition requisition = storeService.getRequestByUuid(requisitionUuid);
+		
+		return requisition.toMap();
 	}
-
+	
+	@RequestMapping(value = "requestitem", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> addRequisitionItem(@RequestBody Map<String, Object> requisitionItemMap) throws Exception {
+		RequisitionItem requisitionItem = RequisitionItem.fromMap(requisitionItemMap);
+		
+		RequisitionItem savedRequisitionItem = storeService.saveRequisitionItem(requisitionItem);
+		
+		return savedRequisitionItem.toMap();
+	}
+	
 	@RequestMapping(value = "requestitem/{requestItemUuid}", method = RequestMethod.POST)
 	@ResponseBody
-	public Map<String,Object> updateRequisitionItem(@PathVariable(value = "requestItemUuid") String requestItemUuid, @RequestBody Map<String,Object> requestItemObjectMap) throws Exception {
-
+	public Map<String, Object> updateRequisitionItem(@PathVariable(value = "requestItemUuid") String requestItemUuid,
+	        @RequestBody Map<String, Object> requestItemObjectMap) throws Exception {
+		
 		RequisitionItem requisitionItem = RequisitionItem.fromMap(requestItemObjectMap);
 		requisitionItem.setUuid(requestItemUuid);
 		RequisitionItem updatedRequisitionItem = storeService.updateRequisitionItem(requisitionItem);
-
+		
 		return updatedRequisitionItem.toMap();
 	}
-
 	
 	@RequestMapping(value = "requeststatus", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> addRequisitionStatus(@RequestBody Map<String, Object> requisitionStatusMap) {
 		
 		RequisitionStatus requisitionStatus = new RequisitionStatus().fromMap(requisitionStatusMap);
-
 		
 		return storeService.saveRequestStatus(requisitionStatus).toMap();
 	}

@@ -6,9 +6,9 @@
     "uuid": "8777d43571-yy77-11ff-2244-08002007647"
   },
   "quantity": 12,
-  "requisitionItemStatus": [
+  "requisitionItemStatuses": [
     {
-      "status": "RECEIVED"
+      "status": "REQUESTED"
     }
   ],
   "voided": false

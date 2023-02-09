@@ -138,6 +138,6 @@ public interface ICareService extends OpenmrsService {
 	
 	String verifyExternalSystemCredentials(String username, String password, String systemKey) throws IOException,
 	        URISyntaxException;
-
-    List<String> generateCode(String globalProperty, String metadataType, Integer count, Integer digitCount);
+	
+	List<String> generateCode(String globalProperty, String metadataType, Integer count, Integer digitCount);
 }
