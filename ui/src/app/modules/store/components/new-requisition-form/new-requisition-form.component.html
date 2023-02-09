@@ -2,7 +2,7 @@
           stockStatusForSelectedStore: stockStatusForSelectedStore$ | async } as params">
   <mat-toolbar>Requisition Form</mat-toolbar>
   <div class="mt-4">
-      <ng-container *ngIf="requisition?.items?.length && !addingRequisitions">
+      <ng-container *ngIf="requisition">
         <mat-accordion>
           <mat-expansion-panel
             class="border mat-elevation-z0 mt-2"
@@ -19,28 +19,7 @@
             </mat-expansion-panel-header>
             <div class="items-table">
               <div style="overflow: auto">
-                <table class="table">
-                  <tr>
-                    <td>#</td>
-                    <td>Store</td>
-                    <td>Item</td>
-                    <td>Quantity</td>
-                    <td><span class="float-right">Actions</span></td>
-                  </tr>
-                 
-
-                  <tr
-                    *ngFor="let item of requisition?.items; let itemIndex = index"
-                  >
-                    <td>{{ itemIndex + 1 }}</td>
-                    <td>Test Store {{ itemIndex + 1 }}</td>
-                    <td>Test Item {{ itemIndex + 1 }}</td>
-                    <td>{{item?.quantity}}</td>
-                    <td>
-                      ...
-                    </td>
-                  </tr>
-                </table>
+                <app-requisition-items [requisition]="requisition"></app-requisition-items>
             </div>
             </div>
           </mat-expansion-panel>
@@ -57,7 +36,9 @@
                 ></app-form>
               </td>
               <td>
+                <mat-progress-bar mode="indeterminate" *ngIf="!requisitionFields?.length"></mat-progress-bar>
                 <app-form
+                  *ngIf="requisitionFields?.length"
                   [fields]="requisitionFields"
                   [isFormHorizontal]="true"
                   (formUpdate)="onUpdateForm($event)"
