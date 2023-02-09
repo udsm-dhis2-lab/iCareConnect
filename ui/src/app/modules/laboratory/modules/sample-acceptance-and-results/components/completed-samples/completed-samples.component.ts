@@ -121,7 +121,6 @@ export class CompletedSamplesComponent implements OnInit {
         })
       )
       .subscribe((response) => {
-        console.log(response);
         this.dialog.open(PrintResultsModalComponent, {
           data: {
             patientDetailsAndSamples: response[0],

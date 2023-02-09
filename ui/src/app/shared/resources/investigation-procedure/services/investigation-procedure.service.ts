@@ -51,7 +51,6 @@ export class InvestigationProcedureService {
       })
       .pipe(
         map((response) => {
-          console.log(response);
           return response;
         }),
         catchError((error) => of(error))
