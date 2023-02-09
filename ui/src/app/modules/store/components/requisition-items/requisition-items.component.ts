@@ -39,13 +39,13 @@ export class RequisitionItemsComponent implements OnInit {
       );
   }
 
-  onUpdateStockInvoiceItem(RequsitionItem, key: string) {
+  onUpdateRequsitionItem(requisitionItem, key?: string) {
     if (!key) {
       this.dialog
         .open(RequisitionFormDialogComponent, {
           width: "80%",
           data: {
-            stockInvoiceItem: RequsitionItem,
+            requisitionItem: requisitionItem,
           },
         })
         .afterClosed()
@@ -68,13 +68,13 @@ export class RequisitionItemsComponent implements OnInit {
         .subscribe((data) => {
           if (data?.confirmed) {
             const requisitionItemObject = {
-              ...RequsitionItem,
+              ...requisitionItem,
               voided: true,
             };
 
             this.requisitionService
               .updateRequisitionItem(
-                RequsitionItem?.uuid,
+                requisitionItem?.uuid,
                 requisitionItemObject
               )
               .pipe(

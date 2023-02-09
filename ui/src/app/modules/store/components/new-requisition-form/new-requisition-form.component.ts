@@ -1,4 +1,4 @@
-import { Component, Inject, Input, OnInit } from "@angular/core";
+import { Component, EventEmitter, Inject, Input, OnInit, Output } from "@angular/core";
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
 import { Field } from "src/app/shared/modules/form/models/field.model";
@@ -10,6 +10,7 @@ import { Observable } from "rxjs";
 import { StockService } from "src/app/shared/resources/store/services/stock.service";
 import { RequisitionService } from "src/app/shared/resources/store/services/requisition.service";
 import { ConfigsService } from "src/app/shared/services/configs.service";
+import { inpatientComponents } from "src/app/modules/inpatient/components";
 
 @Component({
   selector: "app-new-requisition-form",
@@ -24,6 +25,9 @@ export class NewRequisitionFormComponent implements OnInit {
   @Input() pharmacyLocationTagUuid: any;
   @Input() stores: any;
   @Input() codeFormatSetting: any;
+  @Input() existingRequisitionItem: any;
+
+  @Output() closePopup: EventEmitter<any> = new EventEmitter();;
 
   requisitionFields: Field<string>[];
   quantityField: Field<string>[];
@@ -128,6 +132,9 @@ export class NewRequisitionFormComponent implements OnInit {
         min: 1,
         required: true,
         type: "number",
+        value: this.existingRequisitionItem
+          ? this.existingRequisitionItem?.quantity
+          : "",
       }),
     ];
   }
@@ -189,8 +196,12 @@ export class NewRequisitionFormComponent implements OnInit {
         });
     } else {
       this.requisitionObject = {
-        requestingLocationUuid: this.currentStore?.id,
-        requestedLocationUuid: this.formData?.targetStore?.value,
+        requestingLocation: {
+          uuid: this.currentStore?.id,
+        },
+        requestedLocation: {
+          uuid: this.formData?.targetStore?.value,
+        },
         requisitionStatuses: [
           {
             status: "DRAFT",
@@ -237,6 +248,27 @@ export class NewRequisitionFormComponent implements OnInit {
           }
         });
     }
+  }
+
+  onUpdateItem(e: any) {
+    e?.stopPropagation();
+    const item = {
+      item: {
+        uuid: this.formData?.requisitionItem?.value?.length
+          ? this.formData?.requisitionItem?.value
+          : this.existingRequisitionItem?.item?.uuid,
+      },
+      quantity: this.formData?.quantity.value?.length
+        ? parseInt(this.formData?.quantity.value, 10)
+        : this.existingRequisitionItem?.quantity,
+    };
+    this.requisitionService
+      .updateRequisitionItem(this.existingRequisitionItem?.uuid, item)
+      .subscribe((response) => {
+        if (!response?.error) {
+          this.closePopup.emit();
+        }
+      });
   }
 
   onUpdateForm(formValue: FormValue): void {

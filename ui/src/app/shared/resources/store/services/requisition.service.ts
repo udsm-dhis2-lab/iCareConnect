@@ -33,17 +33,7 @@ export class RequisitionService {
         map((requestResponse) => {
           return {
             ...omit(requestResponse, "results"),
-            requisitions: (requestResponse?.results || [])
-              ?.map((requestItem) => {
-                const requisitionInstance = new Requisition(requestItem);
-
-                if (requisitionInstance.status === "CANCELLED") {
-                  return null;
-                }
-
-                return requisitionInstance.toJson();
-              })
-              .filter((requisition) => requisition),
+            requisitions: requestResponse?.results,
           };
         })
       );
@@ -51,7 +41,7 @@ export class RequisitionService {
   
   getRequisitionByUuid(uuid: string) : Observable<any> {
     return this.httpClient
-      .get(`store/request/${uuid}`)
+      .get(`store/requisition/${uuid}`)
       .pipe(
         map((requestResponse) => {
           return requestResponse
@@ -85,6 +75,19 @@ export class RequisitionService {
   ): Observable<any> {
 
     return this.httpClient.post("store/request", requisitionInput).pipe(
+      map((response) => {
+        return response;
+      }),
+      catchError((error) => error)
+    );
+  }
+  
+  updateRequisition(
+    uuid: string,
+    requisitionInput: any
+  ): Observable<any> {
+
+    return this.httpClient.post(`store/request/${uuid}`, requisitionInput).pipe(
       map((response) => {
         return response;
       }),
