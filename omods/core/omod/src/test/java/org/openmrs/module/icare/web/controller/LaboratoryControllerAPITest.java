@@ -313,7 +313,7 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		
 		//System.out.println(Context.getVisitService().getVisitByUuid("d9c1d8ac-2b8e-427f-804d-b858c52e6f11").getLocation().getUuid());
 		Map<String, Object> sampleResults = (new ObjectMapper()).readValue(handleGet.getContentAsString(), Map.class);
-//		System.out.println(sampleResults);
+		//		System.out.println(sampleResults);
 		
 		Map<String, Object> pagerObject = (Map<String, Object>) sampleResults.get("pager");
 		assertThat("Page Count is 2", (Integer) pagerObject.get("pageCount") == 2, is(true));
@@ -356,14 +356,14 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		Map<String, Object> samples = (new ObjectMapper()).readValue(handle2.getContentAsString(), Map.class);
 		
 		assertThat("There is 1 sample", ((List<Map>) samples.get("results")).size(), is(1));
-
-		newGetRequest = newGetRequest("lab/samples", new Parameter("page", "1"), new Parameter(
-						"pageSize", "2"), new Parameter("hasStatus", "NO"), new Parameter("excludeAllocations", "true"),
-				new  Parameter("test", "a8102d6d-c528-477a-80bd-acc38ebc62532"),new  Parameter("q", "LIS/23/0221"));
-
+		
+		newGetRequest = newGetRequest("lab/samples", new Parameter("page", "1"), new Parameter("pageSize", "2"),
+		    new Parameter("hasStatus", "NO"), new Parameter("excludeAllocations", "true"), new Parameter("test",
+		            "a8102d6d-c528-477a-80bd-acc38ebc6252"), new Parameter("q", "LIS/23/0221"));
+		
 		//System.out.println(Context.getVisitService().getVisitByUuid("d9c1d8ac-2b8e-427f-804d-b858c52e6f11").getLocation().getUuid());
 		handleGet = handle(newGetRequest);
-
+		
 		//System.out.println(Context.getVisitService().getVisitByUuid("d9c1d8ac-2b8e-427f-804d-b858c52e6f11").getLocation().getUuid());
 		sampleResults = (new ObjectMapper()).readValue(handleGet.getContentAsString(), Map.class);
 		System.out.println(sampleResults);
