@@ -438,28 +438,25 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
         allocationsData
           ?.map((allocationData) => {
             if (
-              allocationData?.allocation?.finalResult &&
-              allocationData?.allocation?.parameter?.datatype?.display !=
-                "Complex"
+              allocationData?.finalResult &&
+              allocationData?.parameter?.datatype?.display != "Complex"
             ) {
               // TODO: Find a better way to handle second complex (file) data types
-              const results = !allocationData?.allocation?.finalResult?.groups
-                ? [allocationData?.allocation?.finalResult]
+              const results = !allocationData?.finalResult?.groups
+                ? [allocationData?.finalResult]
                 : !related
-                ? allocationData?.allocation?.finalResult?.groups[
-                    allocationData?.allocation?.finalResult?.groups?.length - 1
+                ? allocationData?.finalResult?.groups[
+                    allocationData?.finalResult?.groups?.length - 1
                   ]?.results
-                : allocationData?.allocation?.finalResult?.groups?.map(
-                    (group) => {
-                      return orderBy(
-                        group?.results,
-                        ["dateCreated"],
-                        ["desc"]
-                      )[0];
-                    }
-                  );
+                : allocationData?.finalResult?.groups?.map((group) => {
+                    return orderBy(
+                      group?.results,
+                      ["dateCreated"],
+                      ["desc"]
+                    )[0];
+                  });
               let approvalStatuses = [];
-              if (allocationData?.allocation?.finalResult?.groups) {
+              if (allocationData?.finalResult?.groups) {
                 approvalStatuses = results?.map((result) => {
                   return {
                     status:
@@ -473,7 +470,7 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
                       uuid: this.userUuid,
                     },
                     testAllocation: {
-                      uuid: allocationData?.allocation?.uuid,
+                      uuid: allocationData?.uuid,
                     },
                     testResult: {
                       uuid: result?.uuid,
@@ -494,7 +491,7 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
                       uuid: this.userUuid,
                     },
                     testAllocation: {
-                      uuid: allocationData?.allocation?.uuid,
+                      uuid: allocationData?.uuid,
                     },
                     testResult: {
                       uuid: orderBy(results, ["dateCreated"], ["desc"])[0]
