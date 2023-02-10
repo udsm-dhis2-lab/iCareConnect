@@ -35,15 +35,26 @@
   <section class="mt-2">
     <mat-checkbox
       class="text-muted"
+      color="primary"
       [checked]="thereIsAssociatedDataSetQueries"
       (change)="getIFThereisQueriesAssociated($event)"
       >Is there any linked dataset query?</mat-checkbox
     >
   </section>
-
-  <div class="d-flex justify-content-end mt-2">
+  <!-- {{ thereIsAssociatedDataSetQueries }} -->
+  <div *ngIf="thereIsAssociatedDataSetQueries">
+    <ngx-multiple-items-filter
+      [selectedItems]="selectedQueries"
+      (selected)="getSelected($event)"
+    ></ngx-multiple-items-filter>
+  </div>
+  <div class="d-flex justify-content-end mt-4">
     <button
-      [disabled]="!htmlContent"
+      [disabled]="
+        !htmlContent ||
+        !isFormValid ||
+        (thereIsAssociatedDataSetQueries && selectedQueries?.length === 0)
+      "
       mat-flat-button
       color="primary"
       (click)="onSave($event, htmlContent)"
