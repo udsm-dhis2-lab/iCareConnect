@@ -32,6 +32,15 @@
     (formUpdate)="onFormUpdate($event)"
   ></app-form>
   <angular-editor [(ngModel)]="htmlContent" [config]="config"></angular-editor>
+  <section class="mt-2">
+    <mat-checkbox
+      class="text-muted"
+      [checked]="thereIsAssociatedDataSetQueries"
+      (change)="getIFThereisQueriesAssociated($event)"
+      >Is there any linked dataset query?</mat-checkbox
+    >
+  </section>
+
   <div class="d-flex justify-content-end mt-2">
     <button
       [disabled]="!htmlContent"
