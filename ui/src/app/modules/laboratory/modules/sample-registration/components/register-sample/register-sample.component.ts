@@ -75,18 +75,18 @@ export class RegisterSampleComponent implements OnInit {
   batches$: Observable<any>;
   testFields: any;
 
-  get maximumDate() {
-    let maxDate = new Date();
-    let maxMonth =
-      (maxDate.getMonth() + 1).toString().length > 1
-        ? maxDate.getMonth() + 1
-        : `0${maxDate.getMonth() + 1}`;
-    let maxDay =
-      maxDate.getDate().toString().length > 1
-        ? maxDate.getDate()
-        : `0${maxDate.getDate()}`;
-    return `${maxDate.getFullYear()}-${maxMonth}-${maxDay}`;
-  }
+  // get maximumDate() {
+  //   let maxDate = new Date();
+  //   let maxMonth =
+  //     (maxDate.getMonth() + 1).toString().length > 1
+  //       ? maxDate.getMonth() + 1
+  //       : `0${maxDate.getMonth() + 1}`;
+  //   let maxDay =
+  //     maxDate.getDate().toString().length > 1
+  //       ? maxDate.getDate()
+  //       : `0${maxDate.getDate()}`;
+  //   return `${maxDate.getFullYear()}-${maxMonth}-${maxDay}`;
+  // }
 
   constructor(
     private samplesService: SamplesService,
@@ -215,7 +215,6 @@ export class RegisterSampleComponent implements OnInit {
         id: "receivedOn",
         key: "receivedOn",
         label: "Received On",
-        max: this.maximumDate,
         allowCustomDateTime: true,
       }),
       transportCondition: new Dropdown({
@@ -246,7 +245,6 @@ export class RegisterSampleComponent implements OnInit {
         id: "collectedOn",
         key: "collectedOn",
         label: "Collected On",
-        max: this.maximumDate,
         allowCustomDateTime: true
       }),
       collectedBy: new Textbox({
@@ -258,7 +256,6 @@ export class RegisterSampleComponent implements OnInit {
         id: "broughtOn",
         key: "broughtOn",
         label: "Delivered On",
-        max: this.maximumDate,
         allowCustomDateTime: true,
       }),
       broughtBy: new Textbox({
@@ -347,7 +344,6 @@ export class RegisterSampleComponent implements OnInit {
         label: "Date of birth",
         required: true,
         type: "date",
-        max: this.maximumDate,
       }),
     };
     this.personFieldsGroupThree = {
