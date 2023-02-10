@@ -23,6 +23,21 @@ export class RenderStandardReportComponent implements OnInit {
           this.report?.queries?.map((query) => query?.uuid),
           this.parameters
         );
+
+      this.evaluatedDataSetsReport$.subscribe((response: any) => {
+        if (response) {
+          response?.forEach((data) => {
+            data?.rows?.forEach((row) => {
+              const spanElems = document.getElementsByTagName("span") as any;
+              for (const spanItem of spanElems) {
+                if (spanItem?.outerText === Object.keys(row)[0]) {
+                  spanItem.outerText = row[Object.keys(row)[0]];
+                }
+              }
+            });
+          });
+        }
+      });
     }
   }
 }

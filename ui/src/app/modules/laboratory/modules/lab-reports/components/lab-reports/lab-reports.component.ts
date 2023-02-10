@@ -143,14 +143,6 @@ export class LabReportsComponent implements OnInit {
 
       this.endDate = null;
     }
-
-    // let selectionDates = {
-    //   startDate: new Date().toISOString(),
-    //   endDate: new Date().toISOString(),
-    // };
-
-    // this.selectionDates = selectionDates;
-    console.log("GERERE");
     this.dateChanged = false;
 
     setTimeout(() => {
