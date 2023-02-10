@@ -8,4 +8,4 @@ import { Api } from "../../resources/openmrs";
   exports: [],
   providers: [Api],
 })
-export class NgxOpenmrsHttpclientServiceModule {}
+export class NgxOpenmrsMultipleItemsFilterModule {}

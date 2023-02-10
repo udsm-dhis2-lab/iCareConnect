@@ -5,6 +5,7 @@ import { Textbox } from "../../../form/models/text-box.model";
 import { TextArea } from "../../../form/models/text-area.model";
 import { FormValue } from "../../../form/models/form-value.model";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
+import { MatCheckboxChange } from "@angular/material/checkbox";
 
 @Component({
   selector: "lib-manage-standard-report",
@@ -47,6 +48,7 @@ export class ManageStandardReportComponent implements OnInit {
   saving: boolean = false;
   errors: any[] = [];
   formData: any = {};
+  thereIsAssociatedDataSetQueries: boolean = false;
   constructor(
     private domSanitizer: DomSanitizer,
     private systemSettingsService: SystemSettingsService
@@ -119,5 +121,9 @@ export class ManageStandardReportComponent implements OnInit {
 
   onFormUpdate(formValue: FormValue): void {
     this.formData = formValue.getValues();
+  }
+
+  getIFThereisQueriesAssociated(event: MatCheckboxChange): void {
+    this.thereIsAssociatedDataSetQueries = event?.checked;
   }
 }
