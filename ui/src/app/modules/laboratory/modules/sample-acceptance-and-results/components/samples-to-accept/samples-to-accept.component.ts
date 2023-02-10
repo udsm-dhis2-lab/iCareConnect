@@ -58,7 +58,7 @@ export class SamplesToAcceptComponent implements OnInit {
     this.samplesToAccept$ = this.sampleService.getLabSamplesByCollectionDates(
       this.datesParameters,
       null,
-      "NO",
+      !this.LISConfigurations?.isLIS ? "NO" : "YES",
       this.excludeAllocations,
       null,
       {
