@@ -143,482 +143,120 @@ export class LabReportsComponent implements OnInit {
 
       this.endDate = null;
     }
-
-    // let selectionDates = {
-    //   startDate: new Date().toISOString(),
-    //   endDate: new Date().toISOString(),
-    // };
-
-    // this.selectionDates = selectionDates;
-    let categoryName = "";
     this.dateChanged = false;
 
-    let categories = [];
+    setTimeout(() => {
+      switch (this.period) {
+        case "ThisMonth": {
+          let currentDate = moment(formatDateToYYMMDD(new Date()));
+          this.selectionDates = {
+            startDate: currentDate
+              .startOf("month")
+              .format()
+              .split("T")
+              .join(" ")
+              .split("+")[0],
+            endDate: currentDate
+              .endOf("month")
+              .format()
+              .split("T")
+              .join(" ")
+              .split("+")[0],
+          };
+          this.dateChanged = true;
+          break;
+        }
 
-    switch (this.period) {
-      case "ThisMonth": {
-        let currentDate = moment(formatDateToYYMMDD(new Date()));
-        this.selectionDates = {
-          startDate: currentDate
-            .startOf("month")
-            .format()
-            .split("T")
-            .join(" ")
-            .split("+")[0],
-          endDate: currentDate
-            .endOf("month")
-            .format()
-            .split("T")
-            .join(" ")
-            .split("+")[0],
-        };
-        this.dateChanged = true;
-        break;
-      }
-
-      case "ThisWeek": {
-        const today = formatDateToYYMMDD(new Date());
-        let formattedDate = moment(
-          formatDateToYYMMDD(
-            new Date(
-              Number(today.split("-")[0]),
-              Number(today.split("-")[1]) - 1,
-              Number(today.split("-")[2]) + 1
+        case "ThisWeek": {
+          const today = formatDateToYYMMDD(new Date());
+          let formattedDate = moment(
+            formatDateToYYMMDD(
+              new Date(
+                Number(today.split("-")[0]),
+                Number(today.split("-")[1]) - 1,
+                Number(today.split("-")[2]) + 1
+              )
             )
-          )
-        );
-        this.selectionDates = {
-          startDate: formattedDate
-            .startOf("week")
-            .format()
-            .split("T")
-            .join(" ")
-            .split("+")[0],
-          endDate: formattedDate
-            .endOf("week")
-            .format()
-            .split("T")
-            .join(" ")
-            .split("+")[0],
-        };
-        this.dateChanged = true;
-        break;
+          );
+          this.selectionDates = {
+            startDate: formattedDate
+              .startOf("week")
+              .format()
+              .split("T")
+              .join(" ")
+              .split("+")[0],
+            endDate: formattedDate
+              .endOf("week")
+              .format()
+              .split("T")
+              .join(" ")
+              .split("+")[0],
+          };
+          this.dateChanged = true;
+          break;
+        }
+
+        case "custom-range": {
+          this.selectionDates = {
+            startDate: moment(formatDateToYYMMDD(this.startDate))
+              .startOf("day")
+              .format()
+              .split("T")
+              .join(" ")
+              .split("+")[0],
+            endDate: moment(formatDateToYYMMDD(this.endDate))
+              .endOf("day")
+              .format()
+              .split("T")
+              .join(" ")
+              .split("+")[0],
+          };
+          this.dateChanged = true;
+          break;
+        }
+
+        case "ThisYear": {
+          let currentDate = moment(formatDateToYYMMDD(new Date()));
+          this.selectionDates = {
+            startDate: currentDate
+              .startOf("year")
+              .format()
+              .split("T")
+              .join(" ")
+              .split("+")[0],
+            endDate: currentDate
+              .endOf("year")
+              .format()
+              .split("T")
+              .join(" ")
+              .split("+")[0],
+          };
+          this.dateChanged = true;
+          break;
+        }
+
+        case "ToDay": {
+          let currentDate = moment(formatDateToYYMMDD(new Date()));
+          this.selectionDates = {
+            startDate: currentDate
+              .startOf("day")
+              .format()
+              .split("T")
+              .join(" ")
+              .split("+")[0],
+            endDate: currentDate
+              .endOf("day")
+              .format()
+              .split("T")
+              .join(" ")
+              .split("+")[0],
+          };
+          this.dateChanged = true;
+          break;
+        }
       }
-
-      case "custom-range": {
-        this.selectionDates = {
-          startDate: moment(formatDateToYYMMDD(this.startDate))
-            .startOf("day")
-            .format()
-            .split("T")
-            .join(" ")
-            .split("+")[0],
-          endDate: moment(formatDateToYYMMDD(this.endDate))
-            .endOf("day")
-            .format()
-            .split("T")
-            .join(" ")
-            .split("+")[0],
-        };
-        this.dateChanged = true;
-        break;
-      }
-
-      case "ThisYear": {
-        let currentDate = moment(formatDateToYYMMDD(new Date()));
-        this.selectionDates = {
-          startDate: currentDate
-            .startOf("year")
-            .format()
-            .split("T")
-            .join(" ")
-            .split("+")[0],
-          endDate: currentDate
-            .endOf("year")
-            .format()
-            .split("T")
-            .join(" ")
-            .split("+")[0],
-        };
-        this.dateChanged = true;
-        break;
-      }
-
-      case "ToDay": {
-        let currentDate = moment(formatDateToYYMMDD(new Date()));
-        this.selectionDates = {
-          startDate: currentDate
-            .startOf("day")
-            .format()
-            .split("T")
-            .join(" ")
-            .split("+")[0],
-          endDate: currentDate
-            .endOf("day")
-            .format()
-            .split("T")
-            .join(" ")
-            .split("+")[0],
-        };
-        this.dateChanged = true;
-        break;
-      }
-    }
-    this.loadingReport = true;
-    // TODO: Find a better way to handle this
-    // console.log('selectionDates', selectionDates);
-    if (this.currentReport.id === "patient_level_tat") {
-      this.reportService
-        .runDataSet(this.currentReport?.key, this.selectionDates)
-        .subscribe((data: any) => {
-          this.reportData = _.map(data, (row: any) => {
-            if (data?.error) {
-              this.errors = [...this.errors, data?.error];
-            }
-            return {
-              ...row,
-              tat: (Number(row?.tat) / 60).toFixed(2),
-              tat_hrs: (Number(row?.tat) / 3600).toFixed(2),
-              standard_tat: row?.standard_tat
-                ? (Number(row?.standard_tat) / 60).toFixed(2)
-                : null,
-              standard_tat_hrs: row?.standard_tat
-                ? (Number(row?.standard_tat) / 3600).toFixed(2)
-                : null,
-              urgent_tat: row?.urgent_tat
-                ? (Number(row?.urgent_tat) / 60).toFixed(2)
-                : null,
-              urgent_tat_hrs: row?.urgent_tat
-                ? (Number(row?.urgent_tat) / 3600).toFixed(2)
-                : null,
-            };
-          });
-          this.loadingReport = false;
-        });
-    } else if (this.currentReport.id == "samples") {
-      this.reportData = {};
-      // laboratory.sqlGet.laboratory_samples_by_specimen_sources
-      this.reportService
-        .runDataSet(this.currentReport?.key, this.selectionDates)
-        .subscribe((data: any) => {
-          if (data?.error) {
-            this.errors = [...this.errors, data?.error];
-          }
-          let reportGroups = {
-            collected: 0,
-            accepted: 0,
-            rejected: 0,
-            recollected: 0,
-          };
-
-          this.specimenSources = [];
-
-          let reportDataBySpecimenSources = {
-            collected: {},
-            accepted: {},
-            rejected: {},
-            recollected: {},
-          };
-
-          _.map(data, (reportRow: any) => {
-            if (
-              reportRow?.status != "REJECTED" &&
-              reportRow?.status != "RECOLLECT" &&
-              reportRow?.status != "ACCEPTED" &&
-              reportRow?.status != "HIGH"
-            ) {
-              reportGroups.collected += Number(reportRow?.count);
-              this.specimenSources = [...this.specimenSources, reportRow?.name];
-            }
-          });
-
-          this.specimenSources = _.uniq(this.specimenSources);
-
-          reportGroups.accepted = (
-            _.filter(data, { status: "ACCEPTED" }) || []
-          )?.length;
-          reportGroups.rejected = (
-            _.filter(data, { status: "REJECTED" }) || []
-          )?.length;
-          reportGroups.recollected = (
-            _.filter(data, { status: "RECOLLECT" }) || []
-          )?.length;
-
-          let samplesCollected = [];
-          _.map(data, (reportRow: any) => {
-            if (
-              reportRow?.status != "REJECTED" &&
-              reportRow?.status != "RECOLLECT" &&
-              reportRow?.status != "ACCEPTED" &&
-              reportRow?.status != "HIGH"
-            ) {
-              samplesCollected = [...samplesCollected, reportRow];
-            }
-          });
-
-          reportDataBySpecimenSources.collected = _.groupBy(
-            samplesCollected,
-            "name"
-          );
-
-          reportDataBySpecimenSources.accepted = _.groupBy(
-            _.filter(data, { status: "ACCEPTED" }) || [],
-            "name"
-          );
-
-          reportDataBySpecimenSources.rejected = _.groupBy(
-            _.filter(data, { status: "REJECTED" }) || [],
-            "name"
-          );
-
-          reportDataBySpecimenSources.recollected = _.groupBy(
-            _.filter(data, { status: "RECOLLECT" }) || [],
-            "name"
-          );
-
-          this.reportData["status"] = reportGroups;
-          this.reportData["bySpecimenSouces"] = reportDataBySpecimenSources;
-          this.loadingReport = false;
-        });
-    } else if (
-      this.currentReport.id == "tests" ||
-      this.currentReport?.parent == "tests"
-    ) {
-      // laboratory.sqlGet.laboratory_tests_by_specimen
-
-      this.departments = [];
-      this.reportData = {};
-      this.specimenSources = [];
-
-      this.reportService
-        .runDataSet("545911ec-1dc3-4ac2-97bb-fb436158902a", this.selectionDates)
-        .subscribe((data: any) => {
-          if (data?.error) {
-            this.errors = [...this.errors, data?.error];
-          }
-          data = _.filter(data, (row: any) => {
-            return row?.dep_nm == "" ? false : true;
-          });
-
-          let departments = _.map(data, (row: any) => {
-            return row?.dep_nm;
-          });
-
-          this.departments = _.uniq(departments);
-
-          this.groupedByDeptDataObject = {};
-
-          this.Totals["all"] = 0;
-          this.Totals["completed"] = 0;
-          this.Totals["progress"] = 0;
-
-          _.each(this.departments, (department) => {
-            let departmentData = _.filter(data, (row: any) => {
-              return row?.dep_nm == department;
-            });
-
-            // console.log('dept data :: ', departmentData);
-            // console.log(
-            //   _.filter(departmentData, (data: any) => {
-            //     console.log(
-            //       'the data ::: ' + typeof data?.order_with_result_id
-            //     );
-            //   })
-            // );
-
-            this.groupedByDeptDataObject[department] = {
-              all: departmentData.length,
-              completed: _.filter(departmentData, (data: any) => {
-                return typeof data?.order_with_result_id == "number";
-              }).length,
-              progress: _.filter(departmentData, (data: any) => {
-                return typeof data?.order_with_result_id == "string";
-              }).length,
-            };
-
-            this.Totals["all"] += departmentData.length;
-            this.Totals["completed"] += _.filter(
-              departmentData,
-              (data: any) => {
-                return typeof data?.order_with_result_id == "number";
-              }
-            ).length;
-            this.Totals["progress"] += _.filter(departmentData, (data: any) => {
-              return typeof data?.order_with_result_id == "string";
-            }).length;
-          });
-
-          // console.log('grouped data :: ', this.groupedByDeptDataObject);
-
-          let testsData = {
-            performed: 0,
-            ordered: 0,
-            processing: 0,
-          };
-
-          let performed = [];
-          let testsInProcessing = [];
-
-          testsData.performed = (
-            _.filter(data, (testData) => {
-              if (testData["order_with_result_id"]) {
-                performed = [
-                  ...performed,
-                  {
-                    ...testData,
-                    testSpecimen: testData?.specimen + "-" + testData?.test,
-                  },
-                ];
-                return testData;
-              } else {
-                testsInProcessing = [
-                  ...testsInProcessing,
-                  {
-                    ...testData,
-                    testSpecimen: testData?.specimen + "-" + testData?.test,
-                  },
-                ];
-              }
-            }) || []
-          )?.length;
-
-          testsData.ordered = (
-            _.filter(data, (testData) => {
-              this.specimenSources = [
-                ...this.specimenSources,
-                testData.specimen,
-              ];
-              if (testData["order_id"]) {
-                return testData;
-              }
-            }) || []
-          )?.length;
-
-          testsData.processing = testsData.ordered - testsData.performed;
-
-          let groupedTestsBySpecimen = {
-            ordered: {},
-            performed: {},
-          };
-
-          let groupedByTestsAndSpecimen = {
-            ordered: {},
-            performed: {},
-          };
-
-          this.specimenSources = _.uniq(this.specimenSources);
-          const groupedBySpecimen = _.groupBy(data, "specimen");
-          _.map(Object.keys(groupedBySpecimen), (key) => {
-            let keyedData = {};
-            keyedData[key] = groupedBySpecimen[key];
-            groupedTestsBySpecimen.ordered[key] = groupedBySpecimen[key];
-            groupedTestsBySpecimen.performed[key] =
-              _.filter(groupedBySpecimen[key], (testData) => {
-                if (testData["order_with_result_id"]) {
-                  return testData;
-                }
-              }) || [];
-          });
-
-          _.map(Object.keys(groupedBySpecimen), (key) => {
-            let keyedData = {};
-            keyedData[key] = _.uniqBy(groupedBySpecimen[key], "test");
-            groupedByTestsAndSpecimen.ordered[key] = _.uniqBy(
-              groupedBySpecimen[key],
-              "test"
-            );
-            groupedByTestsAndSpecimen.performed[key] =
-              _.filter(groupedBySpecimen[key], (testData) => {
-                if (testData["order_with_result_id"]) {
-                  return testData;
-                }
-              }) || [];
-          });
-
-          // console.log('groupedTests', groupedTestsBySpecimen);
-          this.reportData["status"] = testsData;
-          this.reportData["bySpecimenSouces"] = groupedTestsBySpecimen;
-          this.reportData["groupedByTestsAndSpecimen"] =
-            groupedByTestsAndSpecimen;
-
-          // console.log(groupedTests);
-
-          this.reportData["performedKeyValuePair"] = _.groupBy(
-            performed,
-            "testSpecimen"
-          );
-          this.reportData["processingKeyValuePair"] = _.groupBy(
-            testsInProcessing,
-            "testSpecimen"
-          );
-          this.loadingReport = false;
-
-          // console.log('the data ::', this.reportData);
-        });
-    } else if (this.currentReport?.id == "SamplesRejected") {
-      this.reportData = null;
-      // laboratory.sqlGet.laboratory_samples_by_specimen_sources
-      this.reportService
-        .runDataSet(this.currentReport?.key, this.selectionDates)
-        .subscribe((data: any) => {
-          this.reportData = data;
-
-          this.loadingReport = false;
-        });
-    } else if (this.currentReport?.id == "Malaria") {
-      this.reportData = null;
-      // laboratory.sqlGet.laboratory_samples_by_specimen_sources
-      this.reportService
-        .runDataSet(this.currentReport?.key, this.selectionDates)
-        .subscribe((data: any) => {
-          this.reportData = formatDataReportResponse(data);
-          this.loadingReport = false;
-        });
-    } else if (
-      this.currentReport?.id == "tests-analysis" ||
-      this.currentReport?.parent == "tests-analysis"
-    ) {
-      //
-      this.reportData = null;
-      this.reportService
-        .runDataSet(this.currentReport?.key, this.selectionDates)
-        .subscribe((response) => {
-          let processedData = _.uniq(
-            _.map(response, (data: any) => {
-              return JSON.stringify({
-                test: data?.test,
-                dep_nm: data?.dep_nm,
-                count: _.filter(response, (resp: any) => {
-                  return resp?.order_with_result_id != "" &&
-                    resp?.dep_nm == data?.dep_nm &&
-                    resp?.test == data?.test
-                    ? true
-                    : false;
-                }).length,
-              });
-            })
-          );
-
-          this.reportData = _.map(processedData, (singleTestData) => {
-            return JSON.parse(singleTestData);
-          });
-
-          // this.departments = Object.keys(this.reportData);
-
-          this.loadingReport = false;
-        });
-    } else if (this.currentReport?.id == "PatientsAttended") {
-      this.reportData = null;
-      this.reportService
-        .runDataSet(this.currentReport?.key, this.selectionDates)
-        .subscribe((response) => {
-          // console.log('laboratory.sqlGet.patientsAttended response', response);
-          this.reportData = _.map(response, (patientData: any) => {
-            return { ...patientData, age: patientData?.age?.toFixed(0) };
-          });
-          this.loadingReport = false;
-        });
-    }
+      this.loadingReport = true;
+    }, 100);
   }
 
   onResultsToPrint(
