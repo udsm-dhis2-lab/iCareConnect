@@ -75,18 +75,18 @@ export class RegisterSampleComponent implements OnInit {
   batches$: Observable<any>;
   testFields: any;
 
-  // get maximumDate() {
-  //   let maxDate = new Date();
-  //   let maxMonth =
-  //     (maxDate.getMonth() + 1).toString().length > 1
-  //       ? maxDate.getMonth() + 1
-  //       : `0${maxDate.getMonth() + 1}`;
-  //   let maxDay =
-  //     maxDate.getDate().toString().length > 1
-  //       ? maxDate.getDate()
-  //       : `0${maxDate.getDate()}`;
-  //   return `${maxDate.getFullYear()}-${maxMonth}-${maxDay}`;
-  // }
+  get maximumDate() {
+    let maxDate = new Date();
+    let maxMonth =
+      (maxDate.getMonth() + 1).toString().length > 1
+        ? maxDate.getMonth() + 1
+        : `0${maxDate.getMonth() + 1}`;
+    let maxDay =
+      maxDate.getDate().toString().length > 1
+        ? maxDate.getDate()
+        : `0${maxDate.getDate()}`;
+    return `${maxDate.getFullYear()}-${maxMonth}-${maxDay}`;
+  }
 
   constructor(
     private samplesService: SamplesService,
@@ -344,6 +344,7 @@ export class RegisterSampleComponent implements OnInit {
         label: "Date of birth",
         required: true,
         type: "date",
+        max: this.maximumDate,
       }),
     };
     this.personFieldsGroupThree = {
