@@ -49,6 +49,8 @@ export class ManageStandardReportComponent implements OnInit {
   errors: any[] = [];
   formData: any = {};
   thereIsAssociatedDataSetQueries: boolean = false;
+  selectedQueries: any = [];
+  isFormValid: boolean = false;
   constructor(
     private domSanitizer: DomSanitizer,
     private systemSettingsService: SystemSettingsService
@@ -90,7 +92,16 @@ export class ManageStandardReportComponent implements OnInit {
       description: this.formData?.description?.value,
       category: "standard",
       htmlCode: htmlContent,
-      renderAs: "iframe",
+      renderAs: this.thereIsAssociatedDataSetQueries
+        ? "datasets-based"
+        : "iframe",
+      queries:
+        this.selectedQueries.map((query: any) => {
+          return {
+            ...query,
+            name: query?.display,
+          };
+        }) || [],
     };
     const data = {
       value: JSON.stringify(value),
@@ -121,9 +132,14 @@ export class ManageStandardReportComponent implements OnInit {
 
   onFormUpdate(formValue: FormValue): void {
     this.formData = formValue.getValues();
+    this.isFormValid = formValue.isValid;
   }
 
   getIFThereisQueriesAssociated(event: MatCheckboxChange): void {
     this.thereIsAssociatedDataSetQueries = event?.checked;
+  }
+
+  getSelected(selectedQueries: any[]): void {
+    this.selectedQueries = selectedQueries;
   }
 }
