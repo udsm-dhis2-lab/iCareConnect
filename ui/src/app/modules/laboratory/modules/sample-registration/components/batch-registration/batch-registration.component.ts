@@ -454,7 +454,7 @@ export class BatchRegistrationComponent implements OnInit {
           if (field.allowCustomDateTime) {
             field = {
               ...field,
-              max: `${year}-${month}-${day}`,
+              // max: `${year}-${month}-${day}`,
               disabled: true,
             };
             return field;
@@ -466,7 +466,7 @@ export class BatchRegistrationComponent implements OnInit {
           if (field.allowCustomDateTime) {
             field = {
               ...field,
-              max: `${year}-${month}-${day}`,
+              // max: `${year}-${month}-${day}`,
             };
             return field;
           }
@@ -476,7 +476,7 @@ export class BatchRegistrationComponent implements OnInit {
           if (field.allowCustomDateTime) {
             field = {
               ...field,
-              max: `${year}-${month}-${day}`,
+              // max: `${year}-${month}-${day}`,
             };
             return field;
           }
