@@ -10,8 +10,8 @@ export class DatasetDefinitionsService {
   constructor(private api: Api) {}
 
   getDataSets(): Observable<any[]> {
-    return from(this.api.reportingrest.getAllDataSetDefinitions()).pipe(
-      map((response) => response?.results)
-    );
+    return from(
+      this.api.reportingrest.getAllDataSetDefinitions({ limit: 100 })
+    ).pipe(map((response) => response?.results));
   }
 }
