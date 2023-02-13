@@ -32,7 +32,7 @@ export const createObservation = createAction(
 
 export const saveObservations = createAction(
   "[Observation] save observations",
-  props<{ observations: ObsCreate[] | ObsUpdate[]; patientId: string }>()
+  props<{ observations: ObsCreate[] | ObsUpdate[]; patientId: string; formUUid?: string }>()
 );
 
 export const saveObservationsFail = createAction(
@@ -47,7 +47,7 @@ export const addObservationsToEncounter = createAction(
 
 export const saveObservationsUsingEncounter = createAction(
   "[Observation] save observations using encounter",
-  props<{ data: any; patientId: string }>()
+  props<{ data: any; patientId: string; formUUid?: string }>()
 );
 
 export const saveObservationsForFiles = createAction(

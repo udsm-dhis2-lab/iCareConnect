@@ -338,9 +338,11 @@ export class SharedPatientDashboardComponent implements OnInit {
     }, 50);
   }
 
-  onSaveObservations(observations: ObsCreate[], patient): void {
+  onSaveObservations(saveData: any, patient): void {
+    const observations: ObsCreate[] = saveData?.obs
+    const form = saveData?.form
     this.store.dispatch(
-      saveObservations({ observations, patientId: patient?.patient?.uuid })
+      saveObservations({ observations, patientId: patient?.patient?.uuid, formUUid: form?.uuid })
     );
   }
 
