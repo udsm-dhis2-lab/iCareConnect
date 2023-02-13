@@ -581,6 +581,7 @@
                                         [count]="count"
                                         [parameter]="allocation?.parameter"
                                         [units]="allocation?.parameter?.units"
+                                        (remarksData)="onGetRemarks($event)"
                                       ></app-shared-parameter-results>
                                     </div>
                                   </div>
@@ -715,54 +716,15 @@
                                   </p>
                                 </td>
                                 <td>
-                                  <p
-                                    *ngIf="
-                                      order?.order?.concept?.setMembers
-                                        ?.length == 0
-                                    "
-                                  >
+                                  <span>
                                     {{
-                                      order?.testAllocations[0]
-                                        ?.resultsCommentsStatuses[0]
-                                        ?.remarks !== "NO DESCRPTION"
-                                        ? order?.testAllocations[0]
-                                            ?.resultsCommentsStatuses[0]
+                                      keyedRemarks &&
+                                      keyedRemarks[order?.order?.uuid]
+                                        ? keyedRemarks[order?.order?.uuid]
                                             ?.remarks
-                                        : null
+                                        : ""
                                     }}
-                                  </p>
-                                  <p
-                                    *ngIf="
-                                      order?.order?.concept?.setMembers
-                                        ?.length > 0
-                                    "
-                                  >
-                                    <span
-                                      *ngFor="
-                                        let allocation of order?.order
-                                          ?.testAllocations;
-                                        let count = index
-                                      "
-                                    >
-                                      {{
-                                        order?.order?.concept?.setMembers[count]
-                                          ?.display
-                                      }}
-                                      :
-                                      {{
-                                        order?.order?.testAllocations[count]
-                                          ?.resultsCommentsStatuses[0]
-                                          ?.remarks !==
-                                        "NO DESCRPTION FOR PARAMETER"
-                                          ? order?.order?.allocations[count]
-                                              ?.resultsCommentsStatuses[0]
-                                              ?.remarks
-                                          : null
-                                      }}
-
-                                      <br />
-                                    </span>
-                                  </p>
+                                  </span>
                                 </td>
                                 <td *ngIf="!LISConfigurations?.isLIS">
                                   {{ order?.order?.orderDate | date: "medium" }}

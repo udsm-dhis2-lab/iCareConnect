@@ -3,7 +3,7 @@ import { flatten } from "lodash";
 import * as moment from "moment";
 import { from, Observable, of, zip } from "rxjs";
 import { debounceTime, distinctUntilChanged, map, switchMap, tap } from "rxjs/operators";
-import { formatDateToYYMMDD } from "src/app/shared/helpers/format-date.helper";
+import { dateToISOStringMidnight, formatDateToYYMMDD } from "src/app/shared/helpers/format-date.helper";
 import { DateField } from "src/app/shared/modules/form/models/date-field.model";
 import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
@@ -24,8 +24,9 @@ export class StockReceivingFormFieldsComponent implements OnInit {
   @Input() existingStockInvoice: any;
   @Input() stockInvoiceItem: any;
   @Input() currentLocation: any;
-  @Output() loadInvoice: EventEmitter<any> = new EventEmitter();
+  @Output() loadInvoices: EventEmitter<any> = new EventEmitter();
   @Output() closeDialog: EventEmitter<any> = new EventEmitter();
+  @Output() reloadForm: EventEmitter<any> = new EventEmitter();
 
   supplierNameField: any;
   invoiceNumberField: any;
@@ -53,7 +54,7 @@ export class StockReceivingFormFieldsComponent implements OnInit {
   mfgBatchNumberField: Textbox;
   orderQuantityField: Textbox;
   unitField: Dropdown;
-  batchQuantity: string;
+  batchQuantity: number;
   unitPrice: string;
   amount: string;
   itemField: Textbox;
@@ -172,6 +173,7 @@ export class StockReceivingFormFieldsComponent implements OnInit {
         id: "batchQuantity",
         key: "batchQuantity",
         label: "Batch Quantity",
+        disabled: true,
         value: this.stockInvoiceItem
           ? this.stockInvoiceItem?.batchQuantity
           : "",
@@ -197,7 +199,6 @@ export class StockReceivingFormFieldsComponent implements OnInit {
       this.orderQuantityField,
       this.mfgBatchNumberField,
       this.expiryDateField,
-      this.batchQuantityField,
       this.unitPriceField,
     ];
   }
@@ -234,23 +235,35 @@ export class StockReceivingFormFieldsComponent implements OnInit {
     this.unitOfMeasure = this.formValues?.unit?.value
       ? this.formValues?.unit?.value
       : undefined;
-    this.batchQuantity = this.formValues?.batchQuantity?.value;
+    if (this.formValues?.orderQuantity?.value && this.unitOfMeasure) {
+      const unit =
+        this.unitOfMeasure?.mappings?.filter(
+          (mapping) =>
+            mapping?.conceptReferenceTerm?.conceptSource?.uuid ===
+            this.unitsOfMeasurementSettings?.uuid
+        )[0]?.conceptReferenceTerm?.code || 1;
+      this.batchQuantity =
+        this.batchQuantity &&
+        this.formValues?.orderQuantity?.value * unit === this.batchQuantity
+          ? this.batchQuantity
+          : undefined;
+      setTimeout(() => {
+        this.batchQuantity =
+          Number(this.formValues?.orderQuantity?.value) * unit;
+        this.batchQuantityField.value = this.batchQuantity.toString();
+      }, 100);
+    }
     this.unitPrice = this.formValues?.unitPrice?.value;
-    if (this.batchQuantity?.length && this.unitPrice?.length) {
+    if (this.batchQuantity && this.unitPrice?.length) {
       this.amount = undefined;
       setTimeout(() => {
-        const unit =
-          this.unitOfMeasure?.mappings?.filter(
-            (mapping) =>
-              mapping?.conceptReferenceTerm?.uuid ===
-              this.unitsOfMeasurementSettings?.conceptReferenceTerm
-          )[0]?.conceptReferenceTerm?.code || 1;
-        this.amount = (
-          parseFloat(this.unitPrice) *
-          parseInt(this.batchQuantity) *
-          unit
-        ).toFixed(2);
+        this.amount = (parseFloat(this.unitPrice) * this.batchQuantity).toFixed(
+          2
+        );
       }, 100);
+    }
+    if (!this.batchQuantity || !this.unitPrice?.length) {
+      this.amount = undefined;
     }
   }
 
@@ -318,9 +331,9 @@ export class StockReceivingFormFieldsComponent implements OnInit {
         supplier: {
           uuid: this.formValues?.supplier?.value,
         },
-        receivingDate: new Date(
-          moment(this.formValues?.receivingDate?.value).toDate()
-        )?.toISOString(),
+        receivingDate: dateToISOStringMidnight(
+          new Date(moment(this.formValues?.receivingDate?.value).toDate())
+        ),
         stockInvoiceStatus: [
           {
             status: "DRAFT",
@@ -347,9 +360,9 @@ export class StockReceivingFormFieldsComponent implements OnInit {
             uom: {
               uuid: this.unitOfMeasure?.uuid,
             },
-            expiryDate: new Date(
-              moment(this.formValues?.expiryDate?.value).toDate()
-            )?.toISOString(),
+            expiryDate: dateToISOStringMidnight(
+              new Date(moment(this.formValues?.expiryDate?.value).toDate())
+            ),
           },
         ],
       };
@@ -365,7 +378,7 @@ export class StockReceivingFormFieldsComponent implements OnInit {
             setTimeout(() => {
               this.setFields();
             }, 100);
-            this.loadInvoice.emit(response);
+            this.loadInvoices.emit(response);
           })
         )
         .subscribe();
@@ -391,7 +404,7 @@ export class StockReceivingFormFieldsComponent implements OnInit {
               },
               batchNo: this.formValues?.mfgBatchNumber?.value,
               orderQuantity: Number(this.formValues?.orderQuantity?.value),
-              batchQuantity: Number(this.batchQuantity),
+              batchQuantity: this.batchQuantity,
               amount: parseFloat(this.amount),
               unitPrice: parseFloat(this.unitPrice),
               uom: {
@@ -424,7 +437,7 @@ export class StockReceivingFormFieldsComponent implements OnInit {
             setTimeout(() => {
               this.setFields();
             }, 100);
-            this.loadInvoice.emit(response);
+            this.loadInvoices.emit(response);
           })
         )
         .subscribe();
@@ -439,9 +452,9 @@ export class StockReceivingFormFieldsComponent implements OnInit {
       supplier: {
         uuid: this.formValues?.supplier?.value,
       },
-      receivingDate: new Date(
-        moment(this.formValues?.receivingDate?.value).toDate()
-      )?.toISOString(),
+      receivingDate: dateToISOStringMidnight(
+        new Date(moment(this.formValues?.receivingDate?.value).toDate())
+      ),
       stockInvoiceStatus: [
         {
           status: "DRAFT",
@@ -461,6 +474,7 @@ export class StockReceivingFormFieldsComponent implements OnInit {
             this.setFields();
           }, 100);
           this.closeDialog.emit();
+          this.reloadForm.emit();
         })
       )
       .subscribe();
@@ -476,7 +490,7 @@ export class StockReceivingFormFieldsComponent implements OnInit {
       },
       batchNo: this.formValues?.mfgBatchNumber?.value,
       orderQuantity: Number(this.formValues?.orderQuantity?.value),
-      batchQuantity: Number(this.batchQuantity),
+      batchQuantity: this.batchQuantity,
       amount: parseFloat(this.amount),
       unitPrice: parseFloat(this.unitPrice),
       location: {
@@ -490,9 +504,9 @@ export class StockReceivingFormFieldsComponent implements OnInit {
       uom: {
         uuid: this.unitOfMeasure?.uuid,
       },
-      expiryDate: new Date(
-        moment(this.formValues?.expiryDate?.value).toDate()
-      )?.toISOString(),
+      expiryDate: dateToISOStringMidnight(
+        new Date(moment(this.formValues?.expiryDate?.value).toDate())
+      ),
     };
 
     this.stockInvoicesService
@@ -505,42 +519,42 @@ export class StockReceivingFormFieldsComponent implements OnInit {
       .subscribe();
   }
 
-  onGetBatchQuantity(formValue: FormValue) {
-    this.batchQuantity = formValue.getValues()?.batchQuantity?.value;
-    if (this.batchQuantity.length && this.unitPrice.length) {
-      const unit =
-        this.unitOfMeasure?.mappings?.filter(
-          (mapping) =>
-            mapping?.conceptReferenceTerm?.uuid ===
-            this.unitsOfMeasurementSettings?.conceptReferenceTerm
-        )[0]?.conceptReferenceTerm?.code || 1;
-      this.amount = (
-        parseFloat(this.unitPrice) *
-        parseInt(this.batchQuantity) *
-        unit
-      ).toFixed(2);
-    }
-  }
+  // onGetBatchQuantity(formValue: FormValue) {
+  //   this.batchQuantity = formValue.getValues()?.batchQuantity?.value;
+  //   if (this.batchQuantity.length && this.unitPrice.length) {
+  //     const unit =
+  //       this.unitOfMeasure?.mappings?.filter(
+  //         (mapping) =>
+  //           mapping?.conceptReferenceTerm?.uuid ===
+  //           this.unitsOfMeasurementSettings?.conceptReferenceTerm
+  //       )[0]?.conceptReferenceTerm?.code || 1;
+  //     this.amount = (
+  //       parseFloat(this.unitPrice) *
+  //       this.batchQuantity *
+  //       unit
+  //     ).toFixed(2);
+  //   }
+  // }
 
-  onGetUnitPrice(formValue: FormValue) {
-    this.unitPrice = formValue.getValues()?.unitPrice?.value;
+  // onGetUnitPrice(formValue: FormValue) {
+  //   this.unitPrice = formValue.getValues()?.unitPrice?.value;
 
-    if (this.batchQuantity?.length * this.unitPrice?.length) {
-      const unit =
-        this.unitOfMeasure?.mappings?.filter(
-          (mapping) =>
-            mapping?.conceptReferenceTerm?.uuid ===
-            this.unitsOfMeasurementSettings?.conceptReferenceTerm
-        )[0]?.conceptReferenceTerm?.code || 1;
-      this.amount = (
-        parseFloat(this.unitPrice) *
-        parseInt(this.batchQuantity) *
-        unit
-      ).toFixed(2);
-    }
-  }
+  //   if (this.batchQuantity?.length * this.unitPrice?.length) {
+  //     const unit =
+  //       this.unitOfMeasure?.mappings?.filter(
+  //         (mapping) =>
+  //           mapping?.conceptReferenceTerm?.uuid ===
+  //           this.unitsOfMeasurementSettings?.conceptReferenceTerm
+  //       )[0]?.conceptReferenceTerm?.code || 1;
+  //     this.amount = (
+  //       parseFloat(this.unitPrice) *
+  //       parseInt(this.batchQuantity) *
+  //       unit
+  //     ).toFixed(2);
+  //   }
+  // }
 
-  onClosePopup(e: any){
+  onClosePopup(e: any) {
     e?.stopPropagation();
     this.closeDialog.emit();
   }

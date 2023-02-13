@@ -76,31 +76,29 @@
                         {{ order?.concept?.display }}
                       </td>
                       <td>
+                        {{ allocationData | json }}
                         <div class="row">
                           <div
                             [ngClass]="{
                               'col-12':
-                                !allocationData?.allocation?.isSetMember ||
+                                !allocationData?.isSetMember ||
                                 order?.allocations?.length == 1,
                               'parameter-test-default':
-                                (allocationData?.allocation?.parameter?.datatype
-                                  ?.name == 'Numeric' ||
-                                  allocationData?.allocation?.parameter
-                                    ?.datatype.name == 'Coded') &&
-                                allocationData?.allocation?.isSetMember &&
+                                (allocationData?.parameter?.datatype?.name ==
+                                  'Numeric' ||
+                                  allocationData?.parameter?.datatype.name ==
+                                    'Coded') &&
+                                allocationData?.isSetMember &&
                                 order?.allocations?.length > 1,
                               'parameter-test-text':
-                                allocationData?.allocation?.parameter?.datatype
-                                  .name != 'Numeric' &&
-                                allocationData?.allocation?.parameter?.datatype
-                                  .name != 'Coded' &&
-                                allocationData?.allocation?.isSetMember
+                                allocationData?.parameter?.datatype.name !=
+                                  'Numeric' &&
+                                allocationData?.parameter?.datatype.name !=
+                                  'Coded' &&
+                                allocationData?.isSetMember
                             }"
                             (dblclick)="
-                              toggleSideNavigation(
-                                $event,
-                                allocationData?.allocation
-                              )
+                              toggleSideNavigation($event, allocationData)
                             "
                             matTooltip="Double Click to view history"
                             [matTooltipPosition]="'above'"
@@ -113,32 +111,30 @@
                                 order?.concept?.setMembers?.length == 0 ||
                                 (order?.concept?.setMembers?.length > 0 &&
                                   order?.concept?.uuid !==
-                                    allocationData?.allocation?.parameter?.uuid)
+                                    allocationData?.parameter?.uuid)
                               "
                             >
                               <app-test-parameter-entry
                                 *ngIf="preferredName"
                                 [parameterUuid]="
-                                  allocationData?.allocation?.parameter?.uuid
+                                  allocationData?.parameter?.uuid
                                 "
                                 [multipleResultsAttributeType]="
                                   params?.multipleResultsAttributeType
                                 "
-                                [allocation]="allocationData?.allocation"
+                                [allocation]="allocationData"
                                 [disabled]="
                                   data?.actionType === 'review' &&
                                   !data?.LISConfigurations?.isLIS
                                 "
-                                [finalResult]="
-                                  allocationData?.allocation?.finalResult
-                                "
+                                [finalResult]="allocationData?.finalResult"
                                 [isLIS]="data?.LISConfigurations?.isLIS"
                                 [conceptNameType]="preferredName"
                                 (data)="
                                   onGetFieldData(
                                     $event,
-                                    allocationData?.allocation?.parameter,
-                                    allocationData?.allocation
+                                    allocationData?.parameter,
+                                    allocationData
                                   )
                                 "
                               ></app-test-parameter-entry>

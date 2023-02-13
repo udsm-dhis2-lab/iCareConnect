@@ -19,7 +19,8 @@ export class StockInvoiceItemsComponent implements OnInit {
   @Input() status: any;
   @Input() currentLocation: any;
   @Input() unitsOfMeasurementSettings: any;
-  @Output() reloadList: EventEmitter<any> = new EventEmitter
+  @Input() updateStockInvoice: any;
+  @Output() reloadList: EventEmitter<any> = new EventEmitter();
 
   errors: any[];
   specificStockInvoice$: Observable<any>;
@@ -43,60 +44,73 @@ export class StockInvoiceItemsComponent implements OnInit {
 
   onUpdateStockInvoiceItem(stockInvoiceItem, key: string) {
     if (!key) {
-      this.dialog.open(StockInvoiceFormDialogComponent, {
-        width: "80%",
-        data: {
-          stockInvoiceItem: stockInvoiceItem,
-          unitsOfMeasurementSettings: this.unitsOfMeasurementSettings,
-          currentLocation: this.currentLocation
-        },
-      }).afterClosed().subscribe(() => {
-        this.reloadList.emit(this.stockInvoice);
-      });
+      this.dialog
+        .open(StockInvoiceFormDialogComponent, {
+          width: "80%",
+          data: {
+            stockInvoiceItem: stockInvoiceItem,
+            unitsOfMeasurementSettings: this.unitsOfMeasurementSettings,
+            currentLocation: this.currentLocation,
+          },
+        })
+        .afterClosed()
+        .subscribe(() => {
+          this.reloadList.emit(this.stockInvoice);
+        });
     }
     if (key === "receive") {
-      this.dialog.open(SharedConfirmationComponent,
-        {
+      this.dialog
+        .open(SharedConfirmationComponent, {
           width: "25%",
           data: {
             modalTitle: "Are you sure to receive this Item",
-            modalMessage: "After receiving an item you won't be able to update it, hence this action is irreversible. Please, click confirm to receive and click cancel to stop this action."
-          }
-        }).afterClosed().subscribe((data) => {
+            modalMessage:
+              "After receiving an item you won't be able to update it, hence this action is irreversible. Please, click confirm to receive and click cancel to stop this action.",
+          },
+        })
+        .afterClosed()
+        .subscribe((data) => {
           if (data?.confirmed) {
-              const invoicesItemObject = {
-                  ...stockInvoiceItem,
-                  location: {
-                    uuid: this.currentLocation?.uuid
-                  },
-                  expiryDate: new Date(stockInvoiceItem?.expiryDate).toISOString(),
-                  stockInvoiceItemStatus: [
-                    {
-                      status: "RECEIVED",
-                    },
-                  ],
-                };
+            const invoicesItemObject = {
+              ...stockInvoiceItem,
+              location: {
+                uuid: this.currentLocation?.uuid,
+              },
+              expiryDate: new Date(stockInvoiceItem?.expiryDate).toISOString(),
+              stockInvoiceItemStatus: [
+                {
+                  status: "RECEIVED",
+                },
+              ],
+            };
 
-                this.stockInvoicesService
-                  .updateStockInvoiceItem(stockInvoiceItem?.uuid, invoicesItemObject)
-                  .pipe(tap((response) => {
-                    this.reloadList.emit(this.stockInvoice)  
-                  }))
-                  .subscribe();
+            this.stockInvoicesService
+              .updateStockInvoiceItem(
+                stockInvoiceItem?.uuid,
+                invoicesItemObject
+              )
+              .pipe(
+                tap((response) => {
+                  this.reloadList.emit(this.stockInvoice);
+                })
+              )
+              .subscribe();
           }
-          }
-        )
+        });
     }
-    
+
     if (key === "delete") {
-      this.dialog.open(SharedConfirmationComponent,
-        {
+      this.dialog
+        .open(SharedConfirmationComponent, {
           width: "25%",
           data: {
             modalTitle: "Are you sure to delete this Item",
-            modalMessage: "This action is irreversible. Please, click confirm to delete and click cancel to cancel deletion."
-          }
-        }).afterClosed().subscribe((data) => {
+            modalMessage:
+              "This action is irreversible. Please, click confirm to delete and click cancel to cancel deletion.",
+          },
+        })
+        .afterClosed()
+        .subscribe((data) => {
           if (data?.confirmed) {
             const invoicesItemObject = {
               ...stockInvoiceItem,
@@ -105,17 +119,21 @@ export class StockInvoiceItemsComponent implements OnInit {
               },
               voided: true,
             };
-      
+
             this.stockInvoicesService
-              .updateStockInvoiceItem(stockInvoiceItem?.uuid, invoicesItemObject)
-              .pipe(tap((response) => {
-                this.reloadList.emit(this.stockInvoice);
-              }))
+              .updateStockInvoiceItem(
+                stockInvoiceItem?.uuid,
+                invoicesItemObject
+              )
+              .pipe(
+                tap((response) => {
+                  this.reloadList.emit(this.stockInvoice);
+                })
+              )
               .subscribe();
-            }
-            this.reloadList.emit(this.stockInvoice)
           }
-        )
-      }
+          this.reloadList.emit(this.stockInvoice);
+        });
     }
+  }
 }

@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { groupBy, orderBy } from "lodash";
 
 @Component({
@@ -15,6 +15,8 @@ export class SharedParameterResultsComponent implements OnInit {
   @Input() allocation: any;
 
   parameterResultsDetails: any;
+  resultRemarks: any = {};
+  @Output() remarksData: EventEmitter<any> = new EventEmitter<any>();
   constructor() {}
 
   ngOnInit(): void {
@@ -86,6 +88,16 @@ export class SharedParameterResultsComponent implements OnInit {
           }
         ),
       };
+    });
+    this.parameterResultsDetails?.forEach((parameterResultsDetail) => {
+      if (parameterResultsDetail?.results?.length > 0) {
+        const result = parameterResultsDetail?.results[0];
+        this.resultRemarks[this.order?.order?.uuid] =
+          (parameterResultsDetail?.statuses?.filter(
+            (status) => status?.result?.uuid === result?.uuid
+          ) || [])[0];
+        this.remarksData.emit(this.resultRemarks);
+      }
     });
   }
 }

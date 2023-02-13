@@ -128,6 +128,7 @@ export class OrderResultsRendererComponent implements OnInit {
                 (orderType) => orderType?.conceptClassName === "Test"
               ) || [])[0]?.uuid,
               action: "NEW",
+              visit: this.visit?.uuid,
               patient: this.visit?.patientUuid,
               careSetting: !this.visit?.isAdmitted ? "OUTPATIENT" : "INPATIENT",
               orderer: this.provider?.uuid,

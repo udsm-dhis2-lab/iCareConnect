@@ -1,5 +1,9 @@
-import { Component, Input, OnInit } from "@angular/core";
-import { MatDialog, MatDialogRef } from "@angular/material/dialog";
+import { Component, Inject, Input, OnInit } from "@angular/core";
+import {
+  MatDialog,
+  MatDialogRef,
+  MAT_DIALOG_DATA,
+} from "@angular/material/dialog";
 import { from, interval, Observable, of } from "rxjs";
 import { debounceTime, map, tap } from "rxjs/operators";
 import { LocationService } from "src/app/core/services";
@@ -27,7 +31,8 @@ export class SupplierFormComponent implements OnInit {
   formValues: any;
   constructor(
     private dialog: MatDialogRef<SupplierFormComponent>,
-    private supplierService: SupplierService
+    private supplierService: SupplierService,
+    @Inject(MAT_DIALOG_DATA) public data
   ) {}
 
   ngOnInit(): void {
@@ -40,11 +45,13 @@ export class SupplierFormComponent implements OnInit {
         id: "supplierName",
         key: "supplierName",
         label: "Supplier's Name",
+        value: this.data?.supplier ? this.data?.supplier?.name : "",
       }),
       new TextArea({
         id: "supplierDescription",
         key: "supplierDescription",
         label: "Supplier's Description",
+        value: this.data?.supplier ? this.data?.supplier?.description : "",
       }),
     ];
   }
@@ -64,14 +71,33 @@ export class SupplierFormComponent implements OnInit {
       .pipe(
         map((response) => {
           if (!response?.error) {
-            this.dialog.close()
+            this.dialog.close();
             return response;
           }
         })
-      ).subscribe();
+      )
+      .subscribe();
+  }
+  onUpdateSupplier(e: any) {
+    e?.stopPropagation();
+    const supplierObject = {
+      name: this.formValues?.supplierName?.value,
+      description: this.formValues?.supplierDescription?.value,
+    };
+    this.supplierService
+      .updateSupplier(this.data?.supplier?.uuid, supplierObject)
+      .pipe(
+        map((response) => {
+          if (!response?.error) {
+            this.dialog.close();
+            return response;
+          }
+        })
+      )
+      .subscribe();
   }
 
-  onCancel($event){
-    this.dialog.close()
+  onCancel($event) {
+    this.dialog.close();
   }
 }
