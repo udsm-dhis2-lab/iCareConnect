@@ -11,11 +11,21 @@ import { SupplierObject } from "../models/suppler.model";
 export class SupplierService {
   constructor(private httpClient: OpenmrsHttpClientService) {}
 
-  createSuppliers(
-    suppliers: any[]
-  ): Observable<SupplierObject[]|any> {
+  createSuppliers(suppliers: any[]): Observable<any> {
+    return this.httpClient.post(`store/suppliers`, suppliers).pipe(
+      map((supplierResponse: any) => {
+        return supplierResponse;
+      }),
+      catchError((error: any) => error)
+    );
+  }
+
+  updateSupplier(
+    supplierUuid: string,
+    supplierObject: any
+  ): Observable<any> {
     return this.httpClient
-      .post(`store/suppliers`, suppliers)
+      .post(`store/supplier/${supplierUuid}`, supplierObject)
       .pipe(
         map((supplierResponse: any) => {
           return supplierResponse;
@@ -24,16 +34,12 @@ export class SupplierService {
       );
   }
 
-  getSuppliers(): Observable<SupplierObject[]|any> {
-    return this.httpClient
-      .get(
-        `store/suppliers`)
-      .pipe(
-        map((supplierResponse: any) => {
-          return supplierResponse
-        }),
-        catchError((error: any) => error)
-      );
+  getSuppliers(): Observable<any> {
+    return this.httpClient.get(`store/suppliers`).pipe(
+      map((supplierResponse: any) => {
+        return supplierResponse;
+      }),
+      catchError((error: any) => error)
+    );
   }
-
 }

@@ -24,7 +24,7 @@ export class ReportsDashboardComponent implements OnInit {
 
   ngOnInit(): void {
     this.configuredReports$ = this.systemSettingsService
-      .getSystemSettingsMatchingAKey(`iCare.reports.standardReports.lis`)
+      .getSystemSettingsMatchingAKey(`iCare.reports.standardReports`)
       .pipe(
         map((reports) => {
           return reports?.map((report) => {

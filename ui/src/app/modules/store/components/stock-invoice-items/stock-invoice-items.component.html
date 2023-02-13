@@ -31,37 +31,39 @@
                 <td>{{ item?.batchQuantity }}</td>
                 <td>{{ item?.unitPrice }}</td>
                 <td>{{ item?.amount }}</td>
-                <td *ngIf="status !== 'RECEIVED' && item?.stockInvoiceItemStatus[0]?.status !== 'RECEIVED'">
-                  <button
-                    mat-icon-button
-                    [matMenuTriggerFor]="menu"
-                  >
-                    <mat-icon>more_vert</mat-icon>
-                  </button>
-                  <mat-menu #menu="matMenu">
+                <ng-container *ngIf=" !updateStockInvoice">
+                  <td *ngIf="(status !== 'RECEIVED' && item?.stockInvoiceItemStatus[0]?.status !== 'RECEIVED')">
                     <button
-                      mat-menu-item
-                      (click)="onUpdateStockInvoiceItem(item)"
+                      mat-icon-button
+                      [matMenuTriggerFor]="menu"
                     >
-                      <mat-icon>edit</mat-icon>
-                      <span>Update</span>
+                      <mat-icon>more_vert</mat-icon>
                     </button>
-                    <button
-                      mat-menu-item
-                      (click)="onUpdateStockInvoiceItem(item, 'receive')"
-                    >
-                      <mat-icon>check</mat-icon>
-                      <span>Mark Received</span>
-                    </button>
-                    <button
-                      mat-menu-item
-                      (click)="onUpdateStockInvoiceItem(item, 'delete')"
-                    >
-                      <mat-icon>delete</mat-icon>
-                      <span>Remove</span>
-                    </button>
-                  </mat-menu>
-                </td>
+                    <mat-menu #menu="matMenu">
+                      <button
+                        mat-menu-item
+                        (click)="onUpdateStockInvoiceItem(item)"
+                      >
+                        <mat-icon>edit</mat-icon>
+                        <span>Update</span>
+                      </button>
+                      <button
+                        mat-menu-item
+                        (click)="onUpdateStockInvoiceItem(item, 'receive')"
+                      >
+                        <mat-icon>check</mat-icon>
+                        <span>Mark Received</span>
+                      </button>
+                      <button
+                        mat-menu-item
+                        (click)="onUpdateStockInvoiceItem(item, 'delete')"
+                      >
+                        <mat-icon>delete</mat-icon>
+                        <span>Remove</span>
+                      </button>
+                    </mat-menu>
+                  </td>
+                </ng-container>
               </tr>
             </tbody>
       </table>

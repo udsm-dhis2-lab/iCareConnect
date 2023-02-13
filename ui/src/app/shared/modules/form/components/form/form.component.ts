@@ -6,6 +6,7 @@ import {
   Output,
   OnChanges,
   ViewChild,
+  SimpleChanges,
 } from "@angular/core";
 import { FormGroup } from "@angular/forms";
 import { Field } from "../../models/field.model";
@@ -20,7 +21,7 @@ import { FieldComponent } from "../field/field.component";
   templateUrl: "./form.component.html",
   styleUrls: ["./form.component.scss"],
 })
-export class FormComponent implements OnInit, OnChanges {
+export class FormComponent implements OnInit {
   @Input() fields: Field<string>[];
   @Input() dataType: any;
   @Input() isFormHorizontal: boolean;
@@ -44,16 +45,21 @@ export class FormComponent implements OnInit, OnChanges {
 
   constructor(private fieldControlService: FieldControlService) {}
 
-  ngOnChanges(): void {
-    this.shouldDisable = this.isReport ? true : this.shouldDisable;
+  // ngOnChanges(changes: SimpleChanges): void {
+  // this.shouldDisable = this.isReport ? true : this.shouldDisable;
+  // this.form = this.fieldControlService.toFormGroup(
+  //   this.fields,
+  //   this.fieldsData
+  // );
+  // this.values = this.form.getRawValue();
+  // }
+
+  ngOnInit(): void {
     this.form = this.fieldControlService.toFormGroup(
       this.fields,
       this.fieldsData
     );
-    this.values = this.form.getRawValue();
   }
-
-  ngOnInit(): void {}
 
   onSubmit(): void {
     this.formUpdate.emit(this.form.getRawValue());

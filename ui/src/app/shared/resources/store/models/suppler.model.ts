@@ -4,7 +4,7 @@ import { StockBatch } from './stock-batch.model';
 import { head } from 'lodash';
 
 export interface SupplierObject {
-  id: string;
+  id?: string;
   name: string;
   description?: string;
 }

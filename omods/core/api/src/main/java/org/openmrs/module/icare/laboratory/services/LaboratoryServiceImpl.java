@@ -164,9 +164,9 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	
 	@Override
 	public ListResult<Sample> getSamples(Date startDate, Date endDate, Pager pager, String location, String sampleCategory,
-	        String testCategory, String q, String hasStatus, String acceptedByUuid) {
+	        String testCategory, String q, String hasStatus, String acceptedByUuid, String testConceptUuid) {
 		return this.sampleDAO.getSamples(startDate, endDate, pager, location, sampleCategory, testCategory, q, hasStatus,
-		    acceptedByUuid);
+		    acceptedByUuid, testConceptUuid);
 	}
 	
 	@Override
@@ -838,9 +838,10 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	
 	@Override
 	public ListResult<SampleExt> getSamplesWithoutAllocations(Date startDate, Date endDate, Pager pager, String location,
-	        String sampleCategory, String testCategory, String q, String hasStatus, String acceptedByUuid) {
+	        String sampleCategory, String testCategory, String q, String hasStatus, String acceptedByUuid,
+	        String testConceptUuid) {
 		return sampleDAO.getSamplesWithoutAllocations(startDate, endDate, pager, location, sampleCategory, testCategory, q,
-		    hasStatus, acceptedByUuid);
+		    hasStatus, acceptedByUuid, testConceptUuid);
 	}
 	
 	public BatchSet addBatchSet(BatchSet batchSet) {

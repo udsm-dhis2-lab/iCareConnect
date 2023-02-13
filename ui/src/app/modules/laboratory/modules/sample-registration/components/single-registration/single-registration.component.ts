@@ -228,6 +228,11 @@ export class SingleRegistrationComponent implements OnInit {
     this.broughtOnField = this.allRegistrationFields?.specimenDetailFields?.broughtOn;
     this.broughtByField = this.allRegistrationFields?.specimenDetailFields?.broughtBy;
 
+
+    this.receivedOnField.max = this.maximumDate;
+    this.broughtOnField.max = this.maximumDate;
+    this.sampleColectionDateField.max = this.maximumDate;
+
     const currentLocation = JSON.parse(localStorage.getItem("currentLocation"));
     const labsAvailable =
       currentLocation && currentLocation?.childLocations

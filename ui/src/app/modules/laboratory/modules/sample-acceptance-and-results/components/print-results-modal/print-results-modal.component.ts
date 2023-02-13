@@ -36,6 +36,7 @@ export class PrintResultsModalComponent implements OnInit {
   refferedFromFacility$: Observable<any>;
   obs$: Observable<any>;
   phoneNumber$: Observable<any>;
+  keyedRemarks: any;
   constructor(
     private patientService: PatientService,
     private visitService: VisitsService,
@@ -278,5 +279,9 @@ export class PrintResultsModalComponent implements OnInit {
     return allocation?.length > 0
       ? allocation[0]?.results[allocation[0]?.results?.length - 1]["value"]
       : "";
+  }
+
+  onGetRemarks(remarks: any): void {
+    this.keyedRemarks = remarks;
   }
 }

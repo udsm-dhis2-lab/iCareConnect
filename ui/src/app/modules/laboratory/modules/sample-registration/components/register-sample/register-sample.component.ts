@@ -215,7 +215,6 @@ export class RegisterSampleComponent implements OnInit {
         id: "receivedOn",
         key: "receivedOn",
         label: "Received On",
-        max: this.maximumDate,
         allowCustomDateTime: true,
       }),
       transportCondition: new Dropdown({
@@ -246,7 +245,6 @@ export class RegisterSampleComponent implements OnInit {
         id: "collectedOn",
         key: "collectedOn",
         label: "Collected On",
-        max: this.maximumDate,
         allowCustomDateTime: true
       }),
       collectedBy: new Textbox({
@@ -258,7 +256,6 @@ export class RegisterSampleComponent implements OnInit {
         id: "broughtOn",
         key: "broughtOn",
         label: "Delivered On",
-        max: this.maximumDate,
         allowCustomDateTime: true,
       }),
       broughtBy: new Textbox({
