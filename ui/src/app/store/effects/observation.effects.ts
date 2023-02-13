@@ -120,7 +120,7 @@ export class ObservationEffects {
               })
             );
 
-            console.log("observationResults", observationResults);
+            // console.log("observationResults", observationResults);
             return [
               data?.fileObs && data?.fileObs?.length > 0
                 ? saveObservationsForFiles({
