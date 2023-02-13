@@ -197,9 +197,18 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 	@Override
 	public Requisition saveRequest(Requisition requisition) {
 		
-		this.requisitionDAO.save(requisition);
+		Requisition savedRequisition = this.requisitionDAO.save(requisition);
 		
-		return requisition;
+		if (requisition.getRequisitionStatuses() != null) {
+			for (RequisitionStatus requisitionStatus : requisition.getRequisitionStatuses()) {
+				requisitionStatus.setStatus(requisition.getRequisitionStatuses().get(0).getStatus());
+				requisitionStatus.setRemarks(requisition.getRequisitionStatuses().get(0).getStatus().toString());
+				requisitionStatus.setRequisition(savedRequisition);
+				this.requisitionStatusDAO.save(requisitionStatus);
+			}
+		}
+		
+		return savedRequisition;
 	}
 	
 	@Override
@@ -747,7 +756,8 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 				this.saveRequestStatus(requisitionStatus);
 				
 				if (requisitionStatus.getStatus().equals(RequisitionStatus.RequisitionStatusCode.PENDING)) {
-					for (RequisitionItem requisitionItem : existingRequisition.getRequisitionItems()) {
+					List<RequisitionItem> requisitionItems = requisitionItemDAO.getStockRequisitionItemsByRequisition(existingRequisition);
+					for (RequisitionItem requisitionItem : requisitionItems) {
 						RequisitionItemStatus requisitionItemStatus = new RequisitionItemStatus();
 						requisitionItemStatus.setStatus(RequisitionItemStatus.RequisitionItemStatusCode.PENDING.toString());
 						requisitionItemStatus.setRemarks(RequisitionItemStatus.RequisitionItemStatusCode.PENDING.toString());
