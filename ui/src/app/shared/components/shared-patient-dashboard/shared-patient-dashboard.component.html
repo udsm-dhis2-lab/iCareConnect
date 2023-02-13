@@ -198,7 +198,6 @@
               Discharge
             </button>
             <button
-              *ngIf="!isInpatient"
               mat-stroked-button
               (click)="onToggleVisibityIcons($event)"
               class="mr-2 float-right"
@@ -477,9 +476,6 @@
                           dashboardParams?.observationChartForm
                         ? dashboardParams?.forms[0]
                         : {}
-                    "
-                    (saveObservations)="
-                      onSaveObservations($event, params?.currentPatient)
                     "
                   >
                   </app-patient-observations-chart>

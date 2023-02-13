@@ -357,7 +357,7 @@ export function arrangeVisitDataChronologically(
     }),
     procedureOrders: visit?.procedureOrders?.map((order) => {
       return {
-        ...order?.order,
+        ...order,
         date: getStringDate(new Date(order?.order?.dateActivated)).date,
         time: getStringDate(new Date(order?.order?.dateActivated)).time,
         provider: order?.order?.orderer?.display?.split("-")[1],

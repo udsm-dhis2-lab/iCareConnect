@@ -98,16 +98,19 @@ export class ClinicalNotesComponent implements OnInit {
     e.stopPropagation();
     this.updateConsultationOrder.emit();
     this.saveObservations.emit(
-      getObservationsFromForm(
-        this.formData[this.currentCustomForm?.id],
-        this.patient?.personUuid,
-        this.location?.id,
-        this.visit?.encounterUuid
-          ? this.visit?.encounterUuid
-          : JSON.parse(localStorage.getItem("patientConsultation"))[
-              "encounterUuid"
-            ]
-      )
+      {
+        form: this.selectedForm,
+        obs: getObservationsFromForm(
+          this.formData[this.currentCustomForm?.id],
+          this.patient?.personUuid,
+          this.location?.id,
+          this.visit?.encounterUuid
+            ? this.visit?.encounterUuid
+            : JSON.parse(localStorage.getItem("patientConsultation"))[
+                "encounterUuid"
+              ]
+        )
+      }
     );
   }
 

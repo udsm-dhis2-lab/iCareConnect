@@ -1,5 +1,5 @@
 import { Component, EventEmitter, OnInit, Output, Input } from "@angular/core";
-import { flatten, keyBy } from "lodash";
+import * as _ from "lodash";
 import {
   arrangeVisitDataChronologically,
   getGenericDrugPrescriptionsFromVisit,
@@ -102,21 +102,25 @@ export class PatientHistoryDataComponent implements OnInit {
     this.labOrders = visit.labOrders.map((order) => {
       return {
         ...order,
-        results: this.visit?.obs?.filter((ob) => {
-          if (order?.uuid == ob?.order?.uuid) {
-            return ob;
-          }
-        }),
+        results: this.visit?.obs
+          ?.filter((ob) => {
+            if (order?.uuid == ob?.order?.uuid) {
+              return ob;
+            }
+          })
+          ?.filter((ob) => ob),
       };
     });
     this.radiologyOrders = visit.radiologyOrders.map((order) => {
       return {
         ...order,
-        results: this.visit?.obs?.filter((ob) => {
-          if (order?.uuid == ob?.order?.uuid) {
-            return ob;
-          }
-        }),
+        results: this.visit?.obs
+          ?.filter((ob) => {
+            if (order?.uuid == ob?.order?.uuid) {
+              return ob;
+            }
+          })
+          ?.filter((ob) => ob),
       };
     });
     this.procedureOrders = visit.procedureOrders.map((order) => {
@@ -126,7 +130,7 @@ export class PatientHistoryDataComponent implements OnInit {
           if (order?.uuid == ob?.order?.uuid) {
             return ob;
           }
-        }),
+        })?.filter((ob) => ob),
       };
     });
     this.drugsPrescribed = getGenericDrugPrescriptionsFromVisit(

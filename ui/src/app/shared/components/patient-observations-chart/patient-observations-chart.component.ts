@@ -70,6 +70,9 @@ export class PatientObservationsChartComponent implements OnInit {
       ],
       visit: data.visit?.uuid,
       obs: data?.obs,
+      form: {
+        uuid: data?.form?.uuid 
+      }
     };
 
     this.observationService
