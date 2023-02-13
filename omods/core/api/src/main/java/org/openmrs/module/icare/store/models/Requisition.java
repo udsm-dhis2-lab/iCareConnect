@@ -160,13 +160,13 @@ public class Requisition extends BaseOpenmrsData implements java.io.Serializable
 			requestingLocationObject.put("display", this.getRequestingLocation().getDisplayString());
 			requisitionObject.put("requestingLocation", requestingLocationObject);
 		}
-		
-		List<Map<String, Object>> requisitionStatuses = new ArrayList<Map<String, Object>>();
-		for (RequisitionStatus requisitionStatus : this.getRequisitionStatuses()) {
-			requisitionStatuses.add(requisitionStatus.toMap());
+		if (this.getRequisitionStatuses() != null) {
+			List<Map<String, Object>> requisitionStatuses = new ArrayList<Map<String, Object>>();
+			for (RequisitionStatus requisitionStatus : this.getRequisitionStatuses()) {
+				requisitionStatuses.add(requisitionStatus.toMap());
+			}
+			requisitionObject.put("requisitionStatuses", requisitionStatuses);
 		}
-		requisitionObject.put("requisitionStatuses", requisitionStatuses);
-		
 		List<Map<String, Object>> requisitionIssues = new ArrayList<Map<String, Object>>();
 		for (Issue issue : this.getIssues()) {
 			requisitionIssues.add(issue.toMap());

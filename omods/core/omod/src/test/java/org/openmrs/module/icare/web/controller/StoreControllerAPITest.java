@@ -224,6 +224,7 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		Map<String, Object> requests2 = (new ObjectMapper()).readValue(handleGet2.getContentAsString(), Map.class);
 		
 		List<Map<String, Object>> requestObject2 = ((List<Map<String, Object>>) requests2.get("results"));
+		System.out.println("==>|-> "+requestObject2);
 		
 		assertThat("The requesting location id store B", ((List) requestObject2.get(0).get("requisitionStatuses")).size(),
 		    is(1));
@@ -865,11 +866,12 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 	public void updateRequisition() throws Exception {
 		String dto = this.readFile("dto/store/requisition-update.json");
 		Map<String, Object> requisitionMap = (new ObjectMapper()).readValue(dto, Map.class);
-		MockHttpServletRequest newPostRequest = newPostRequest("store/request/8800zx3570-8z37-11ff-2234-01102007812",
+		MockHttpServletRequest newPostRequest = newPostRequest("store/request/8800zx3570-8z37-11ff-2234-01102007813",
 		    requisitionMap);
 		MockHttpServletResponse handle = handle(newPostRequest);
 		Map<String, Object> updateRequisition = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
-		assertThat("There is 1 stock invoice item present",
-		    updateRequisition.get("uuid").equals("8800zx3570-8z37-11ff-2234-01102007812"));
+		assertThat("There is 1 requisition updated",updateRequisition.get("uuid").equals("8800zx3570-8z37-11ff-2234-01102007813"));
+
+
 	}
 }

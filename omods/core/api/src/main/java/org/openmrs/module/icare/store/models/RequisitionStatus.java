@@ -76,13 +76,21 @@ public class RequisitionStatus extends BaseOpenmrsData implements java.io.Serial
 	public Map<String, Object> toMap() {
 		
 		Map<String, Object> requisitionStatusObject = new HashMap<String, Object>();
+		if(this.getUuid() != null){
+			requisitionStatusObject.put("uuid", this.getUuid());
+		}
 		
-		Date date = this.getDateCreated();
-		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-		requisitionStatusObject.put("created", dateFormat.format(date));
+//		Date date = this.getDateCreated();
+//		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+		requisitionStatusObject.put("created", this.getDateCreated());
 		requisitionStatusObject.put("remarks", this.getRemarks());
 		requisitionStatusObject.put("status", this.getStatus());
-		requisitionStatusObject.put("requisition", this.getRequisition().getUuid());
+
+		if(this.getRequisition() != null) {
+			Map<String, Object> requsitionMap = new HashMap<>();
+			requsitionMap.put("uuid", this.getRequisition().getUuid());
+			requisitionStatusObject.put("requisition", requsitionMap);
+		}
 		
 		Map<String, Object> creatorObject = new HashMap<String, Object>();
 		if (this.getCreator() != null) {

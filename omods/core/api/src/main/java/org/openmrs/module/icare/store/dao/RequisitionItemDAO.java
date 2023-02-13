@@ -5,8 +5,13 @@ package org.openmrs.module.icare.store.dao;
 import org.hibernate.Query;
 import org.openmrs.api.db.hibernate.DbSession;
 import org.openmrs.module.icare.core.dao.BaseDAO;
+import org.openmrs.module.icare.store.models.Requisition;
 import org.openmrs.module.icare.store.models.RequisitionItem;
+import org.openmrs.module.icare.store.models.StockInvoice;
+import org.openmrs.module.icare.store.models.StockInvoiceItem;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 /**
  * Home object for domain model class StRequisitionItem.
@@ -75,5 +80,18 @@ public class RequisitionItemDAO extends BaseDAO<RequisitionItem> {
 			return null;
 		}
 		
+	}
+
+	public List<RequisitionItem> getStockRequisitionItemsByRequisition(Requisition requisition) {
+
+		DbSession session = this.getSession();
+
+		String queryStr = " SELECT reqItem FROM RequisitionItem reqItem WHERE reqItem.id.requisition = :requisition";
+
+		Query query = session.createQuery(queryStr);
+
+		query.setParameter("requisition", requisition);
+
+		return query.list();
 	}
 }

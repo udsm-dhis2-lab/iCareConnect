@@ -103,6 +103,9 @@ public class RequisitionItem extends BaseOpenmrsData implements java.io.Serializ
 	
 	public Map<String, Object> toMap() {
 		Map<String, Object> requisitionItemObject = new HashMap<String, Object>();
+		if(this.getUuid() != null){
+			requisitionItemObject.put("uuid",this.getUuid());
+		}
 		if(this.getQuantity() != null) {
 			requisitionItemObject.put("quantity", this.getQuantity());
 		}
