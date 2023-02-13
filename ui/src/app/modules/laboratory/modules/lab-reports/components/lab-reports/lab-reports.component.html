@@ -71,24 +71,47 @@
         <app-shared-error [errors]="errors"></app-shared-error>
       </div>
       <div class="w-100 d-flex justify-content-end mt-1 mb-2">
-        <button
+        <!-- <button
           (click)="onDownloadCSV($event)"
           mat-stroked-button
           color="primary"
         >
           CSV
-        </button>
+        </button> -->
         <button
-          (click)="onPrint($event)"
-          class="ml-2"
-          mat-stroked-button
+          (click)="
+            onDownloadXLS(
+              $event,
+              currentReport?.renderAs && currentReport?.renderAs === 'iframe'
+                ? 'iframe_id'
+                : 'report-to-download',
+              currentReport?.name,
+              currentReport?.renderAs
+            )
+          "
+          [disabled]="!selectionDates || !dateChanged"
+          mat-flat-button
           color="primary"
         >
+          <mat-icon>
+            <img height="24px" src="assets/material/excel_white.png" />
+          </mat-icon>
+          Excel
+        </button>
+
+        <button
+          [disabled]="!selectionDates || !dateChanged"
+          (click)="onPrint($event)"
+          class="ml-2"
+          mat-flat-button
+          color="primary"
+        >
+          <mat-icon>print</mat-icon>
           Print
         </button>
       </div>
       <mat-card class="border">
-        <div *ngIf="!currentReport?.hardCoded">
+        <div *ngIf="!currentReport?.hardCoded" id="report-to-download">
           <div class="row">
             <div class="col-2" style="display: inline-block; width: 16.67%">
               <img [src]="params?.facilityDetails?.logo" height="90" />
@@ -116,7 +139,10 @@
               </h4>
             </div>
           </div>
-          <div class="header text-center h3 p-3">
+          <div
+            class="header text-center h3 p-3"
+            *ngIf="currentReport && currentReport?.category !== 'standard'"
+          >
             {{ currentReport?.name }}
           </div>
           <div *ngIf="selectionDates && dateChanged">

@@ -32,6 +32,7 @@ import { generateSelectionOptions } from "src/app/shared/helpers/patient.helper"
 import { ExportService } from "src/app/shared/services/export.service";
 import { LabReportsService } from "src/app/modules/laboratory/resources/services/reports.service";
 import { map } from "rxjs/operators";
+import { ExportDataService } from "src/app/core/services/export-data.service";
 // import { Agent } from 'http';
 
 @Component({
@@ -78,7 +79,8 @@ export class LabReportsComponent implements OnInit {
     private sampleService: SamplesService,
     private reportService: LabReportsService,
     private store: Store<AppState>,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private exportDataService: ExportDataService
   ) {}
 
   ngOnInit() {
@@ -728,10 +730,10 @@ export class LabReportsComponent implements OnInit {
     this.exportService.exportCSV(this.currentReport?.description, table);
   }
 
-  onDownloadXLS(e) {
+  onDownloadXLS(e: Event, id: string, fileName: string, type?: string) {
     e.stopPropagation();
     const table = document.getElementById("export-table");
-    this.exportService.exportXLS(this.currentReport?.description, table);
+    this.exportDataService.downloadTableToExcel(id, fileName, type);
   }
 
   getTATByStartDateAndEndDate(dates, allData) {
