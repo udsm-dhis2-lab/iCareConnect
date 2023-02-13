@@ -437,7 +437,7 @@
                       selectedForm ? selectedForm : dashboardParams?.forms[0]
                     "
                     (saveObservations)="
-                      onSaveObservations($event, params?.currentPatient)
+                      onSaveObservations($event, dashboardParams?.currentPatient, dashboardParams?.currentLocation, dashboardParams?.provider, activeVisit)
                     "
                   >
                   </app-clinical-notes>
@@ -515,7 +515,7 @@
                         : {}
                     "
                     (saveObservations)="
-                      onSaveObservations($event, params?.currentPatient)
+                      onSaveObservations($event, dashboardParams?.currentPatient, dashboardParams?.currentLocation, dashboardParams?.provider, activeVisit)
                     "
                   >
                   </app-ipd-forms>

@@ -47,7 +47,7 @@ export const addObservationsToEncounter = createAction(
 
 export const saveObservationsUsingEncounter = createAction(
   "[Observation] save observations using encounter",
-  props<{ data: any; patientId: string; formUUid?: string }>()
+  props<{ data: any; patientId: string; }>()
 );
 
 export const saveObservationsForFiles = createAction(

@@ -73,7 +73,7 @@ import {
   ObsCreate,
   ProviderGetFull,
 } from "../../resources/openmrs";
-import { saveObservations } from "src/app/store/actions/observation.actions";
+import { saveObservations, saveObservationsUsingEncounter } from "src/app/store/actions/observation.actions";
 import { loadEncounterTypes } from "src/app/store/actions/encounter-type.actions";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { OrdersService } from "../../resources/order/services/orders.service";
@@ -83,6 +83,7 @@ import { ConceptsService } from "../../resources/concepts/services/concepts.serv
 import { VisitConsultationStatusModalComponent } from "../../dialogs/visit-consultation-status-modal/visit-consultation-status-modal.component";
 import { BillingService } from "src/app/modules/billing/services/billing.service";
 import { tap, map as rxMap } from "rxjs/operators";
+import { ObservationService } from "../../resources/observation/services";
 
 @Component({
   selector: "app-shared-patient-dashboard",
@@ -161,7 +162,8 @@ export class SharedPatientDashboardComponent implements OnInit {
     private configService: ConfigsService,
     private userService: UserService,
     private conceptService: ConceptsService,
-    private billingService: BillingService
+    private billingService: BillingService,
+    private observationService: ObservationService
   ) {
     this.store.dispatch(loadEncounterTypes());
   }
@@ -338,12 +340,49 @@ export class SharedPatientDashboardComponent implements OnInit {
     }, 50);
   }
 
-  onSaveObservations(saveData: any, patient): void {
-    const observations: ObsCreate[] = saveData?.obs
-    const form = saveData?.form
+  // onSaveObservations(saveData: any, patient): void {
+  //   const observations: ObsCreate[] = saveData?.obs
+  //   const form = saveData?.form
+  //   this.store.dispatch(
+  //     saveObservations({ observations, patientId: patient?.patient?.uuid, formUUid: form?.uuid })
+  //   );
+  // }
+  onSaveObservations(saveData: any, patient?: any, location?: any, provider?: any, visit?: any): void {
+    const observations: ObsCreate[] = saveData?.obs;
+    const form = saveData?.form;
+    const encounterObject = {
+      patient: patient?.id,
+      encounterType: form?.encounterType?.uuid,
+      location: location?.uuid,
+      encounterProviders: [
+        {
+          provider: provider?.uuid,
+          encounterRole: ICARE_CONFIG?.encounterRole?.uuid,
+        },
+      ],
+      visit: visit?.uuid,
+      obs: saveData?.obs,
+      form: {
+        uuid: form?.uuid,
+      },
+    };
+
     this.store.dispatch(
-      saveObservations({ observations, patientId: patient?.patient?.uuid, formUUid: form?.uuid })
+      saveObservationsUsingEncounter({
+        data: encounterObject, 
+        patientId: patient?.id })
     );
+    // this.observationService
+    //   .saveEncounterWithObsDetails(encounterObject)
+    //   .pipe(
+    //     tap((response) => {
+    //       if (!response?.error) {
+    //         console.log("==> Response: ", response);
+    //         this.ngOnInit();
+    //       }
+    //     })
+    //   )
+    //   .subscribe();
   }
 
   onStartConsultation(visit: VisitObject): void {
