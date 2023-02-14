@@ -70,7 +70,21 @@ export class LabSample {
   }
 
   get orders(): any[] {
-    return this.sample?.orders;
+    return this.sample?.orders.map((orderObj) => {
+      return {
+        ...orderObj,
+        order: {
+          ...orderObj?.order,
+          concept: {
+            ...orderObj?.order?.concept,
+            display: orderObj?.order?.concept?.display?.replace(
+              "TEST_ORDERS:",
+              ""
+            ),
+          },
+        },
+      };
+    });
     return map(this.sample?.orders, (order) => {
       const allocationStatuses = flatten(
         order?.testAllocations?.map((allocation) => {

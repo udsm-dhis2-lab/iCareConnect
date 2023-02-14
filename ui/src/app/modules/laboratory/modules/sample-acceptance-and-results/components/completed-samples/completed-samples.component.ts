@@ -105,11 +105,11 @@ export class CompletedSamplesComponent implements OnInit {
                     samples: samplesKeyedByDepartments[depName].map(
                       (sampleObject) => {
                         const sample = new LabSample(
-                          sampleObject?.sample,
+                          sampleObject,
                           this.labSamplesDepartments,
                           this.sampleTypes,
                           this.codedSampleRejectionReasons
-                        );
+                        ).toJSon();
                         return sample;
                       }
                     ),

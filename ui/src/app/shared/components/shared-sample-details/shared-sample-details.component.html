@@ -68,7 +68,18 @@
                 let count = index
               "
             >
-              <tr
+              <tr>
+                <td>
+                  {{ count + 1 }}
+                </td>
+                <td>
+                  {{ order?.order?.concept?.display }}
+                </td>
+                <!-- <td>
+                  {{ allocation?.concept?.display }}
+                </td> -->
+              </tr>
+              <!-- <tr
                 *ngFor="
                   let allocation of order?.testAllocations;
                   let countAllocation = index
@@ -98,7 +109,7 @@
                     [units]=""
                   ></app-shared-parameter-results>
                 </td>
-              </tr>
+              </tr> -->
             </ng-container>
           </tbody>
         </table>
