@@ -70,14 +70,13 @@ export class SamplesService {
       .pipe(
         map((response: any) => {
           if (!pagerInfo) {
-            return response?.results?.map(
-              (result) =>
-                new LabSample(
-                  result,
-                  otherParams?.departments,
-                  otherParams?.specimenSources,
-                  otherParams?.codedRejectionReasons
-                )
+            return response?.results?.map((result) =>
+              new LabSample(
+                result,
+                otherParams?.departments,
+                otherParams?.specimenSources,
+                otherParams?.codedRejectionReasons
+              ).toJSon()
             );
           } else {
           }
@@ -99,14 +98,13 @@ export class SamplesService {
     codedRejectedReasons: any[]
   ): Observable<any> {
     return this.opeMRSHttpClientService.get(`lab/sample/${uuid}`).pipe(
-      map(
-        (response) =>
-          new LabSample(
-            response,
-            departments,
-            specimenSources,
-            codedRejectedReasons
-          )
+      map((response) =>
+        new LabSample(
+          response,
+          departments,
+          specimenSources,
+          codedRejectedReasons
+        ).toJSon()
       ),
       catchError((error) => of(error))
     );
@@ -260,7 +258,7 @@ export class SamplesService {
                 departments,
                 specimenSources,
                 codedSampleRejectionReasons
-              );
+              ).toJSon();
             }),
           };
         }),
@@ -571,14 +569,16 @@ export class SamplesService {
     );
   }
 
-  createBatchSample(batchSampleObject): Observable<any>{
-     return this.httpClient.post(BASE_URL + "lab/batchsamples",  batchSampleObject).pipe(
-       map((response) => {
-         return response;
-       }),
-       catchError((err) => {
-         return err;
-       })
-     );
+  createBatchSample(batchSampleObject): Observable<any> {
+    return this.httpClient
+      .post(BASE_URL + "lab/batchsamples", batchSampleObject)
+      .pipe(
+        map((response) => {
+          return response;
+        }),
+        catchError((err) => {
+          return err;
+        })
+      );
   }
 }
