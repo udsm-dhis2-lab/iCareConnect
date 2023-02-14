@@ -87,6 +87,9 @@
             </td>
             <td>
               <button
+              *ngIf="params?.observationsKeyedByConcepts[
+                    procedure?.concept?.uuid + '-' + procedure?.uuid
+                  ]"
                 mat-icon-button
                 [matMenuTriggerFor]="menu"
                 aria-label="Options"
