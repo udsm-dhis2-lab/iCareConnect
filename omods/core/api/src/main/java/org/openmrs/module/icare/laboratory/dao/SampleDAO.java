@@ -125,13 +125,26 @@ public class SampleDAO extends BaseDAO<Sample> {
 			queryStr += " sp.visit.location = (SELECT l FROM Location l WHERE l.uuid = :locationUuid)";
 		}
 		if (sampleCategory != null) {
-			if (!queryStr.contains("WHERE")) {
-				queryStr += " WHERE ";
-			} else {
-				queryStr += " AND ";
+
+			if(sampleCategory == "NOT ACCEPTED"){
+				if (!queryStr.contains("WHERE")) {
+					queryStr += " WHERE ";
+				} else {
+					queryStr += " AND ";
+				}
+				queryStr +=" sp NOT IN (SELECT DISTINCT sst.sample FROM SampleStatus sst WHERE sst.category='ACCEPTED')  ";
+
+			}else {
+
+				if (!queryStr.contains("WHERE")) {
+					queryStr += " WHERE ";
+				} else {
+					queryStr += " AND ";
+				}
+				queryStr += "sp IN( SELECT sst.sample FROM SampleStatus sst WHERE sst.category=:sampleCategory)";
+
 			}
-			queryStr += "sp IN( SELECT sst.sample FROM SampleStatus sst WHERE sst.category=:sampleCategory)";
-			
+
 		}
 		
 		if (testCategory != null && testCategory != "Completed") {
@@ -179,6 +192,7 @@ public class SampleDAO extends BaseDAO<Sample> {
 					queryStr += "sp IN ( SELECT samplestatus.sample FROM SampleStatus samplestatus WHERE samplestatus.user IN( SELECT usr FROM User usr WHERE uuid = :acceptedByUuid))";
 					
 				}
+
 			}
 		}
 		
@@ -195,7 +209,7 @@ public class SampleDAO extends BaseDAO<Sample> {
 			query.setParameter("locationUuid", locationUuid);
 		}
 		
-		if (sampleCategory != null) {
+		if (sampleCategory != null && sampleCategory != "NOT ACCEPTED") {
 			query.setParameter("sampleCategory", sampleCategory);
 		}
 		
@@ -402,12 +416,25 @@ public class SampleDAO extends BaseDAO<Sample> {
 			queryStr += " sp.visit.location = (SELECT l FROM Location l WHERE l.uuid = :locationUuid)";
 		}
 		if (sampleCategory != null) {
-			if (!queryStr.contains("WHERE")) {
-				queryStr += " WHERE ";
-			} else {
-				queryStr += " AND ";
+
+			if(sampleCategory == "NOT ACCEPTED"){
+				if (!queryStr.contains("WHERE")) {
+					queryStr += " WHERE ";
+				} else {
+					queryStr += " AND ";
+				}
+				queryStr +=" sp NOT IN (SELECT DISTINCT sst.sample FROM SampleStatus sst WHERE sst.category='ACCEPTED')  ";
+
+			}else {
+
+				if (!queryStr.contains("WHERE")) {
+					queryStr += " WHERE ";
+				} else {
+					queryStr += " AND ";
+				}
+				queryStr += "sp IN( SELECT sst.sample FROM SampleStatus sst WHERE sst.category=:sampleCategory)";
+
 			}
-			queryStr += "sp IN( SELECT sst.sample FROM SampleStatus sst WHERE sst.category=:sampleCategory)";
 			
 		}
 		if (testCategory != null && testCategory != "Completed") {
@@ -476,7 +503,7 @@ public class SampleDAO extends BaseDAO<Sample> {
 			query.setParameter("locationUuid", locationUuid);
 		}
 		
-		if (sampleCategory != null) {
+		if (sampleCategory != null && sampleCategory != "NOT ACCEPTED") {
 			query.setParameter("sampleCategory", sampleCategory);
 		}
 		

@@ -84,7 +84,7 @@
     <thead class="table-header">
       <tr>
         <th rowspan="2">SN</th>
-        <th rowspan="2">Department/Section</th>
+        <th rowspan="2">Department / Section</th>
         <th rowspan="2">Sample / Specimen</th>
         <th rowspan="2">Laboratory ID</th>
         <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">MRN</th>
@@ -210,6 +210,20 @@
             </td>
 
             <td *ngIf="orderCount == 0" [attr.rowspan]="sample?.orders?.length">
+              <button
+                *ngIf="LISConfigurations?.isLIS"
+                mat-flat-button
+                class="mr-2 mb-2"
+                color="primary"
+                (click)="onToggleViewSampleDetails($event, sample)"
+              >
+                <mat-icon *ngIf="!samplesToViewMoreDetails[sample?.uuid]"
+                  >remove_red_eye</mat-icon
+                >
+                {{
+                  !samplesToViewMoreDetails[sample?.uuid] ? "Details" : "Hide"
+                }}
+              </button>
               <div class="d-flex justify-content-center">
                 <div
                   class="d-flex justify-content-end"
@@ -268,7 +282,11 @@
                   >
                     Reject
                   </button>
-                  <section class="ml-4" title="Tick to accept or reject">
+                  <section
+                    class="ml-4"
+                    *ngIf="!LISConfigurations?.isLIS"
+                    title="Tick to accept or reject"
+                  >
                     <mat-checkbox
                       color="primary"
                       (change)="onSelectItem($event, sample)"
@@ -279,7 +297,7 @@
             </td>
           </tr>
           <tr
-            *ngIf="samplesToViewMoreDetails[sample?.id]"
+            *ngIf="samplesToViewMoreDetails[sample?.uuid]"
             class="sample-details-row"
           >
             <td colspan="11">
@@ -287,10 +305,40 @@
                 [sample]="sample"
               ></app-shared-sample-details>
             </td>
-            <td
-              *ngIf="orderCount == 0"
-              [attr.rowspan]="sample?.orders?.length"
-            ></td>
+            <td>
+              <div
+                class="d-flex justify-content-end"
+                *ngIf="tabType === 'samples-to-accept'"
+              >
+                <button
+                  *ngIf="LISConfigurations?.isLIS"
+                  mat-flat-button
+                  color="primary"
+                  (click)="onAccept($event, sample, 'accept')"
+                >
+                  Accept
+                </button>
+
+                <button
+                  *ngIf="LISConfigurations?.isLIS"
+                  mat-stroked-button
+                  (click)="onReject($event, sample, 'reject')"
+                  class="ml-2 reject-button"
+                >
+                  Reject
+                </button>
+                <section
+                  class="ml-4"
+                  *ngIf="LISConfigurations?.isLIS"
+                  title="Tick to accept or reject"
+                >
+                  <mat-checkbox
+                    color="primary"
+                    (change)="onSelectItem($event, sample)"
+                  ></mat-checkbox>
+                </section>
+              </div>
+            </td>
           </tr>
         </ng-container>
       </ng-container>

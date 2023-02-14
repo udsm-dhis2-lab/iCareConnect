@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { MatCheckboxChange } from "@angular/material/checkbox";
+import { omit } from "lodash";
 
 @Component({
   selector: "app-shared-samples-list",
@@ -27,7 +28,14 @@ export class SharedSamplesListComponent implements OnInit {
 
   onToggleViewSampleDetails(event: Event, sample: any): void {
     event.stopPropagation();
-    console.log(sample);
+    if (!this.samplesToViewMoreDetails[sample?.uuid]) {
+      this.samplesToViewMoreDetails[sample?.uuid] = sample;
+    } else {
+      this.samplesToViewMoreDetails = omit(
+        this.samplesToViewMoreDetails,
+        sample?.uuid
+      );
+    }
   }
 
   setDepartment(event: Event, departmentName): void {
