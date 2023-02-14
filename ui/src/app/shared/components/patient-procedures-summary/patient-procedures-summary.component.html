@@ -87,7 +87,7 @@
             </td>
             <td>
               <button
-              *ngIf="params?.observationsKeyedByConcepts[
+              *ngIf="!params?.observationsKeyedByConcepts[
                     procedure?.concept?.uuid + '-' + procedure?.uuid
                   ]"
                 mat-icon-button
