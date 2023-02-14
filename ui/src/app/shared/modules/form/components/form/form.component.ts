@@ -45,14 +45,14 @@ export class FormComponent implements OnInit {
 
   constructor(private fieldControlService: FieldControlService) {}
 
-  // ngOnChanges(changes: SimpleChanges): void {
-  // this.shouldDisable = this.isReport ? true : this.shouldDisable;
-  // this.form = this.fieldControlService.toFormGroup(
-  //   this.fields,
-  //   this.fieldsData
-  // );
-  // this.values = this.form.getRawValue();
-  // }
+  ngOnChanges(changes: SimpleChanges): void {
+  this.shouldDisable = this.isReport ? true : this.shouldDisable;
+  this.form = this.fieldControlService.toFormGroup(
+    this.fields,
+    this.fieldsData
+  );
+  this.values = this.form.getRawValue();
+  }
 
   ngOnInit(): void {
     this.form = this.fieldControlService.toFormGroup(
