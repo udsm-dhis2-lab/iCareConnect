@@ -357,6 +357,16 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		
 		assertThat("There is 1 sample", ((List<Map>) samples.get("results")).size(), is(1));
 		
+		MockHttpServletRequest newGetRequest3 = newGetRequest("lab/samples", new Parameter("excludeAllocations", "true"),
+		    new Parameter("sampleCategory", "NOT ACCEPTED"), new Parameter("hasStatus", "yes"));
+		
+		//System.out.println(Context.getVisitService().getVisitByUuid("d9c1d8ac-2b8e-427f-804d-b858c52e6f11").getLocation().getUuid());
+		MockHttpServletResponse handleGet3 = handle(newGetRequest3);
+		
+		//System.out.println(Context.getVisitService().getVisitByUuid("d9c1d8ac-2b8e-427f-804d-b858c52e6f11").getLocation().getUuid());
+		Map<String, Object> sampleResults3 = (new ObjectMapper()).readValue(handleGet3.getContentAsString(), Map.class);
+		System.out.println(sampleResults3);
+		
 		newGetRequest = newGetRequest("lab/samples", new Parameter("page", "1"), new Parameter("pageSize", "2"),
 		    new Parameter("hasStatus", "NO"), new Parameter("excludeAllocations", "true"), new Parameter("test",
 		            "a8102d6d-c528-477a-80bd-acc38ebc6252"), new Parameter("q", "LIS/23/0221"));
@@ -366,7 +376,8 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		
 		//System.out.println(Context.getVisitService().getVisitByUuid("d9c1d8ac-2b8e-427f-804d-b858c52e6f11").getLocation().getUuid());
 		sampleResults = (new ObjectMapper()).readValue(handleGet.getContentAsString(), Map.class);
-		System.out.println(sampleResults);
+		System.out.println("aaa: " + sampleResults);
+		
 	}
 	
 	@Test
