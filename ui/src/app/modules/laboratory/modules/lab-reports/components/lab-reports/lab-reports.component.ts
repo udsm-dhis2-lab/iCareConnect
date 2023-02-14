@@ -1,4 +1,3 @@
-import { HttpClient } from "@angular/common/http";
 import { Component, Input, OnInit } from "@angular/core";
 import { MatButtonToggleChange } from "@angular/material/button-toggle";
 import { MatDialog } from "@angular/material/dialog";
@@ -19,21 +18,15 @@ import {
   getParentLocation,
 } from "src/app/store/selectors";
 import { formatDateToYYMMDD } from "src/app/shared/helpers/format-date.helper";
-import { BASE_URL } from "src/app/shared/constants/constants.constants";
-import {
-  formatDataReportResponse,
-  formatReportResponse,
-} from "src/app/shared/helpers/format-report.helper";
 import {
   keyDepartmentsByTestOrder,
   keySampleTypesByTestOrder,
 } from "src/app/shared/helpers/sample-types.helper";
 import { generateSelectionOptions } from "src/app/shared/helpers/patient.helper";
 import { ExportService } from "src/app/shared/services/export.service";
-import { LabReportsService } from "src/app/modules/laboratory/resources/services/reports.service";
 import { map } from "rxjs/operators";
 import { ExportDataService } from "src/app/core/services/export-data.service";
-// import { Agent } from 'http';
+import { MatSelectChange } from "@angular/material/select";
 
 @Component({
   selector: "app-lab-reports",
@@ -57,7 +50,6 @@ export class LabReportsComponent implements OnInit {
   departments: string[];
   groupedByDeptDataObject: any = {};
   reports = [];
-  reportData: any = null;
   currentReport: any;
   specimenSources: any[];
   period: any;
@@ -74,10 +66,8 @@ export class LabReportsComponent implements OnInit {
   facilityDetails$: any;
   errors: any[] = [];
   constructor(
-    private httpClient: HttpClient,
     private exportService: ExportService,
     private sampleService: SamplesService,
-    private reportService: LabReportsService,
     private store: Store<AppState>,
     private dialog: MatDialog,
     private exportDataService: ExportDataService
@@ -114,11 +104,12 @@ export class LabReportsComponent implements OnInit {
     );
   }
 
-  onSetCurrentReport(e, report) {
-    e.stopPropagation();
-    this.reportData = null;
-    this.currentReport = report;
-    this.period = null;
+  onGetCurrentReport(selectionEvent: MatSelectChange) {
+    this.currentReport = null;
+    this.selectionDates = null;
+    setTimeout(() => {
+      this.currentReport = selectionEvent?.value;
+    }, 100);
   }
 
   dateRangeSelect() {
