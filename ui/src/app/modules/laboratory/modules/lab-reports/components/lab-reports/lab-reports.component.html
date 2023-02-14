@@ -15,7 +15,10 @@
         <div class="w-25">
           <mat-form-field class="w-100">
             <mat-label>Choose report</mat-label>
-            <mat-select [(ngModel)]="currentReport">
+            <mat-select
+              [(ngModel)]="currentReport"
+              (selectionChange)="onGetCurrentReport($event)"
+            >
               <mat-option [value]="report" *ngFor="let report of reports">
                 {{ report?.name }}
               </mat-option>
@@ -95,7 +98,10 @@
               currentReport?.renderAs
             )
           "
-          [disabled]="!selectionDates || !dateChanged"
+          [disabled]="
+            (!selectionDates || !dateChanged) &&
+            currentReport?.useDefaultPeFilter
+          "
           mat-flat-button
           color="primary"
         >
@@ -106,7 +112,10 @@
         </button>
 
         <button
-          [disabled]="!selectionDates || !dateChanged"
+          [disabled]="
+            (!selectionDates || !dateChanged) &&
+            currentReport?.useDefaultPeFilter
+          "
           (click)="onPrint($event)"
           class="ml-2"
           mat-flat-button
