@@ -126,7 +126,7 @@ public class SampleDAO extends BaseDAO<Sample> {
 		}
 		if (sampleCategory != null) {
 
-			if(sampleCategory == "NOT ACCEPTED"){
+			if(sampleCategory.toLowerCase().equals("not accepted")){
 				if (!queryStr.contains("WHERE")) {
 					queryStr += " WHERE ";
 				} else {
@@ -147,7 +147,7 @@ public class SampleDAO extends BaseDAO<Sample> {
 
 		}
 		
-		if (testCategory != null && testCategory != "Completed") {
+		if (testCategory != null && testCategory.toLowerCase().equals("completed")) {
 			if (!queryStr.contains("WHERE")) {
 				queryStr += " WHERE ";
 			} else {
@@ -156,7 +156,7 @@ public class SampleDAO extends BaseDAO<Sample> {
 			queryStr += "sp IN(SELECT testalloc.sampleOrder.id.sample FROM TestAllocation testalloc WHERE testalloc IN (SELECT testallocstatus.testAllocation FROM TestAllocationStatus testallocstatus WHERE testallocstatus.category=:testCategory))";
 		}
 		
-		if (testCategory == "Completed") {
+		if (testCategory.toLowerCase().equals("completed")) {
 			if (!queryStr.contains("WHERE")) {
 				queryStr += " WHERE ";
 			} else {
