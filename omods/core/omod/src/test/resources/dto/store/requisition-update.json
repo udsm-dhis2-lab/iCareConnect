@@ -1,7 +1,7 @@
 {
-  "voided": true,
+  "voided": false,
   "requisitionStatuses": [{
-    "status":"DRAFT"
+    "status":"PENDING"
   }
   ]
 }

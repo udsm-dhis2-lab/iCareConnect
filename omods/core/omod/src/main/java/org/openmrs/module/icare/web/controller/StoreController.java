@@ -175,7 +175,7 @@ public class StoreController {
 		
 	}
 	
-	@RequestMapping(value = "requisition/{requisitionUuid}", method = RequestMethod.GET)
+	@RequestMapping(value = "request/{requisitionUuid}", method = RequestMethod.GET)
 	@ResponseBody
 	public Map<String, Object> getRequisitionByUuid(@PathVariable("requisitionUuid") String requisitionUuid) {
 		

@@ -81,17 +81,17 @@ public class RequisitionItemDAO extends BaseDAO<RequisitionItem> {
 		}
 		
 	}
-
+	
 	public List<RequisitionItem> getStockRequisitionItemsByRequisition(Requisition requisition) {
-
+		
 		DbSession session = this.getSession();
-
+		
 		String queryStr = " SELECT reqItem FROM RequisitionItem reqItem WHERE reqItem.id.requisition = :requisition";
-
+		
 		Query query = session.createQuery(queryStr);
-
+		
 		query.setParameter("requisition", requisition);
-
+		
 		return query.list();
 	}
 }
