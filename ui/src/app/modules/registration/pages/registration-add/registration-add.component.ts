@@ -748,7 +748,7 @@ export class RegistrationAddComponent implements OnInit {
           if (!this.editMode) {
             this.patient[personAttributeType.name] = null;
           }
-          this.patient[personAttributeType.name] = null;
+          // this.patient[personAttributeType.name] = null;
         });
       });
   }
