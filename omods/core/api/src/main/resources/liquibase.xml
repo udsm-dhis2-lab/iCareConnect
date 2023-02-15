@@ -4585,7 +4585,7 @@
 
         <addForeignKeyConstraint
                 baseColumnNames="creator"
-                baseTableName="st_requisition_item_status"
+                baseTableName="st_requisition_item"
                 constraintName="st_requisition_item_creator_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
@@ -4663,6 +4663,184 @@
         </sql>
     </changeSet>
 
+    <changeSet id="update_st_transaction_date_columns" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE st_transaction
+            MODIFY date_created DATETIME,
+            MODIFY date_changed DATETIME,
+            MODIFY date_voided DATETIME;
+        </sql>
+    </changeSet>
+
+    <changeSet id="update_lb_worksheet_date_columns" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE lb_worksheet
+            MODIFY date_created DATETIME,
+            MODIFY date_changed DATETIME,
+            MODIFY date_retired DATETIME;
+        </sql>
+    </changeSet>
+
+    <changeSet id="update_lb_worksheet_control_date_columns" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE lb_worksheet_control
+            MODIFY date_created DATETIME,
+            MODIFY date_changed DATETIME,
+            MODIFY date_retired DATETIME;
+        </sql>
+    </changeSet>
+
+    <changeSet id="update_lb_worksheet_sample_date_columns" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE lb_worksheet_sample
+            MODIFY date_created DATETIME,
+            MODIFY date_changed DATETIME,
+            MODIFY date_voided DATETIME;
+        </sql>
+    </changeSet>
 
 
+    <changeSet id="update_lb_worksheet_sample_status_date_columns" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE lb_worksheet_sample_status
+            MODIFY date_created DATETIME,
+            MODIFY date_changed DATETIME,
+            MODIFY date_voided DATETIME;
+        </sql>
+    </changeSet>
+
+    <changeSet id="update_lb_worksheet_status_date_columns" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE lb_worksheet_status
+            MODIFY date_created DATETIME,
+            MODIFY date_changed DATETIME,
+            MODIFY date_voided DATETIME;
+        </sql>
+    </changeSet>
+
+    <changeSet id="update_lb_batch_sample_date_columns" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE lb_batch_sample
+            MODIFY date_created DATETIME,
+            MODIFY date_changed DATETIME,
+            MODIFY date_voided DATETIME;
+        </sql>
+    </changeSet>
+
+    <changeSet id="update_st_requisition_date_columns" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE st_requisition
+            MODIFY date_created DATETIME,
+            MODIFY date_changed DATETIME,
+            MODIFY date_voided DATETIME;
+        </sql>
+    </changeSet>
+
+    <changeSet id="update_st_requisition_status_date_columns" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE st_requisition_status
+            MODIFY date_created DATETIME,
+            MODIFY date_changed DATETIME,
+            MODIFY date_voided DATETIME;
+        </sql>
+    </changeSet>
+
+    <changeSet id="update_st_stock_invoice_date_columns" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE st_stock_invoice
+            MODIFY date_created DATETIME,
+            MODIFY date_changed DATETIME,
+            MODIFY date_voided DATETIME;
+        </sql>
+    </changeSet>
+
+    <changeSet id="update_st_stock_invoice_attribute_date_columns" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE st_stock_invoice_attribute
+            MODIFY date_created DATETIME,
+            MODIFY date_changed DATETIME,
+            MODIFY date_voided DATETIME;
+        </sql>
+    </changeSet>
+
+    <changeSet id="update_st_stock_invoice_attribute_type_date_columns" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE st_stock_invoice_attribute_type
+            MODIFY date_created DATETIME,
+            MODIFY date_changed DATETIME,
+            MODIFY date_retired DATETIME;
+        </sql>
+    </changeSet>
+
+    <changeSet id="update_st_stock_invoice_item_date_columns" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE st_stock_invoice_item
+            MODIFY date_created DATETIME,
+            MODIFY date_changed DATETIME,
+            MODIFY date_voided DATETIME;
+        </sql>
+    </changeSet>
+
+    <changeSet id="update_st_stock_invoice_item_status_date_columns" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE st_stock_invoice_item_status
+            MODIFY date_created DATETIME,
+            MODIFY date_changed DATETIME,
+            MODIFY date_voided DATETIME;
+        </sql>
+    </changeSet>
+
+    <changeSet id="update_st_stock_invoice_status_date_columns" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE st_stock_invoice_status
+            MODIFY date_created DATETIME,
+            MODIFY date_changed DATETIME,
+            MODIFY date_voided DATETIME;
+        </sql>
+    </changeSet>
+
+    <changeSet id="update_st_supplier_date_columns" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE st_supplier
+            MODIFY date_created DATETIME,
+            MODIFY date_changed DATETIME,
+            MODIFY date_voided DATETIME;
+        </sql>
+    </changeSet>
+
+    <changeSet id="update_st_supplier_attribute_date_columns" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE st_supplier_attribute
+            MODIFY date_created DATETIME,
+            MODIFY date_changed DATETIME,
+            MODIFY date_voided DATETIME;
+        </sql>
+    </changeSet>
+
+    <changeSet id="update_st_supplier_attribute_type_date_columns" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE st_supplier_attribute_type
+            MODIFY date_created DATETIME,
+            MODIFY date_changed DATETIME,
+            MODIFY date_retired DATETIME;
+        </sql>
+    </changeSet>
+
+    <changeSet id="update_lb_batch_date_columns" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE lb_batch
+            MODIFY date_created DATETIME,
+            MODIFY date_changed DATETIME,
+            MODIFY date_voided DATETIME;
+        </sql>
+    </changeSet>
+
+    <changeSet id="update_lb_batch_set_date_columns" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE lb_batch_set
+            MODIFY date_created DATETIME,
+            MODIFY date_changed DATETIME,
+            MODIFY date_voided DATETIME;
+        </sql>
+    </changeSet>
 </databaseChangeLog>

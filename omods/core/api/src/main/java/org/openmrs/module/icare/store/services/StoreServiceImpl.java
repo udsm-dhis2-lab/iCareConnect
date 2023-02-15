@@ -756,7 +756,8 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 				this.saveRequestStatus(requisitionStatus);
 				
 				if (requisitionStatus.getStatus().equals(RequisitionStatus.RequisitionStatusCode.PENDING)) {
-					List<RequisitionItem> requisitionItems = requisitionItemDAO.getStockRequisitionItemsByRequisition(existingRequisition);
+					List<RequisitionItem> requisitionItems = requisitionItemDAO
+					        .getStockRequisitionItemsByRequisition(existingRequisition);
 					for (RequisitionItem requisitionItem : requisitionItems) {
 						RequisitionItemStatus requisitionItemStatus = new RequisitionItemStatus();
 						requisitionItemStatus.setStatus(RequisitionItemStatus.RequisitionItemStatusCode.PENDING.toString());
