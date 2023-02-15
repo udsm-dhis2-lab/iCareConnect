@@ -52,7 +52,7 @@ public class RequisitionItem extends BaseOpenmrsData implements java.io.Serializ
 	
 	@Column(name = "quantity")
 	private Integer quantity;
-
+	
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "requisitionItem")
 	private List<RequisitionItemStatus> requisitionItemStatuses = new ArrayList<RequisitionItemStatus>(0);
 	

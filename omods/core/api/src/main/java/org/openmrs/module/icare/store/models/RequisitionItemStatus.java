@@ -22,14 +22,14 @@ public class RequisitionItemStatus extends BaseOpenmrsData implements java.io.Se
 	        @JoinColumn(name = "item_id", referencedColumnName = "item_id", nullable = false) })
 	private RequisitionItem requisitionItem;
 	
-//	@ManyToOne
-//	@JoinColumn(name = "requisition_id", nullable = false)
-//	private Requisition requisition;
-//
-//	@ManyToOne
-//	@JoinColumn(name = "item_id", nullable = false)
-//	private Item item;
-//
+	//	@ManyToOne
+	//	@JoinColumn(name = "requisition_id", nullable = false)
+	//	private Requisition requisition;
+	//
+	//	@ManyToOne
+	//	@JoinColumn(name = "item_id", nullable = false)
+	//	private Item item;
+	//
 	@Column(name = "remarks", length = 65535)
 	private String remarks;
 	
@@ -66,30 +66,30 @@ public class RequisitionItemStatus extends BaseOpenmrsData implements java.io.Se
 	public String getStatus() {
 		return status;
 	}
-
+	
 	public RequisitionItem getRequisitionItem() {
 		return requisitionItem;
 	}
-
+	
 	public void setRequisitionItem(RequisitionItem requisitionItem) {
 		this.requisitionItem = requisitionItem;
 	}
-
+	
 	//	public Item getItem() {
-//		return item;
-//	}
-//
-//	public void setItem(Item item) {
-//		this.item = item;
-//	}
-//
-//	public Requisition getRequisition() {
-//		return requisition;
-//	}
-//
-//	public void setRequisition(Requisition requisition) {
-//		this.requisition = requisition;
-//	}
+	//		return item;
+	//	}
+	//
+	//	public void setItem(Item item) {
+	//		this.item = item;
+	//	}
+	//
+	//	public Requisition getRequisition() {
+	//		return requisition;
+	//	}
+	//
+	//	public void setRequisition(Requisition requisition) {
+	//		this.requisition = requisition;
+	//	}
 	
 	public Map<String,Object> toMap(){
 
