@@ -293,6 +293,11 @@
                         <property name="sessionFactory" ref="dbSessionFactory" />
                     </bean>
                 </property>
+                <property name="issueItemStatusDAO">
+                    <bean class="org.openmrs.module.icare.store.dao.IssueItemStatusDAO">
+                        <property name="sessionFactory" ref="dbSessionFactory" />
+                    </bean>
+                </property>
                 <property name="transactionDAO">
                     <bean class="org.openmrs.module.icare.store.dao.TransactionDAO">
                         <property name="sessionFactory" ref="dbSessionFactory" />

@@ -4843,4 +4843,96 @@
             MODIFY date_voided DATETIME;
         </sql>
     </changeSet>
+
+    <changeSet id="update_st_issue_date_columns" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE st_issue
+            MODIFY date_created DATETIME,
+            MODIFY date_changed DATETIME,
+            MODIFY date_voided DATETIME;
+        </sql>
+    </changeSet>
+
+    <changeSet id="update_st_issue_date_columns" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE st_issue
+            MODIFY date_created DATETIME,
+            MODIFY date_changed DATETIME,
+            MODIFY date_voided DATETIME;
+        </sql>
+    </changeSet>
+
+    <changeSet id="update_st_issue_status_date_columns" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE st_issue_status
+            MODIFY date_created DATETIME,
+            MODIFY date_changed DATETIME,
+            MODIFY date_voided DATETIME;
+        </sql>
+    </changeSet>
+
+    <changeSet id="create_st_issue_item_status" author="dennis-kibahila" dbms="mysql">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="st_issue_item_status"/>
+            </not>
+        </preConditions>
+        <comment>Creating openmrs st_issue_item_status table</comment>
+        <createTable tableName="st_issue_item_status">
+            <column name="issue_item_status_id" type="INTEGER" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="stock_issue_item_status_id_pk"/>
+            </column>
+            <column name="item_id" type="INTEGER"/>
+            <column name="issue_id" type="INTEGER"/>
+            <column name="batch_no" type="INTEGER"/>
+            <column name="status" type="TEXT"/>
+            <column name="remarks" type="TEXT"/>
+            <column name="creator" type="INTEGER"/>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"></constraints>
+            </column>
+            <column name="changed_by" type="INTEGER"/>
+            <column name="date_changed" type="DATETIME"/>
+            <column name="voided" type="BOOLEAN">
+                <constraints nullable="false"></constraints>
+            </column>
+            <column name="date_voided" type="DATETIME"/>
+            <column name="voided_by" type="INTEGER"/>
+            <column name="void_reason" type="TEXT"/>
+            <column name="uuid" type="char(38)">
+                <constraints nullable="false" unique="true"></constraints>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint
+                baseColumnNames="changed_by"
+                baseTableName="st_issue_item_status"
+                constraintName="st_issue_item_status_changed_by_users_user_id_fk"
+                referencedColumnNames="user_id"
+                referencedTableName="users"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="creator"
+                baseTableName="st_issue_item_status"
+                constraintName="st_issue_item_status_creator_users_user_id_fk"
+                referencedColumnNames="user_id"
+                referencedTableName="users"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="item_id"
+                baseTableName="st_issue_item_status"
+                constraintName="st_issue_item_status_item_fk"
+                referencedColumnNames="item_id"
+                referencedTableName="item"/>
+
+        <addForeignKeyConstraint
+                baseTableName="st_issue_item_status"
+                baseColumnNames="issue_id"
+                constraintName="st_issue_item_status_st_issue_issue_id_fk"
+                referencedTableName="st_issue"
+                referencedColumnNames="issue_id"/>
+    </changeSet>
+
+
+
 </databaseChangeLog>

@@ -65,6 +65,9 @@ public class IssueItem implements java.io.Serializable, Stockable {
 	@Temporal(TemporalType.DATE)
 	@Column(name = "expiry_date", length = 10)
 	private Date expiryDate;
+
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "issueItem")
+	private List<IssueItemStatus> issueItemStatuses = new ArrayList<IssueItemStatus>(0);
 	
 	//@OneToMany(fetch = FetchType.LAZY, mappedBy = "id")
 	//private List<ReceiptItem> receiptItems = new ArrayList<ReceiptItem>(0);
@@ -128,7 +131,15 @@ public class IssueItem implements java.io.Serializable, Stockable {
 		}
 		this.id.setItem(item);
 	}
-	
+
+	public List<IssueItemStatus> getIssueItemStatuses() {
+		return issueItemStatuses;
+	}
+
+	public void setIssueItemStatuses(List<IssueItemStatus> issueItemStatuses) {
+		this.issueItemStatuses = issueItemStatuses;
+	}
+
 	public Map<String, Object> toMap() {
 		Map<String, Object> issueItemObject = new HashMap<String, Object>();
 		
@@ -149,6 +160,17 @@ public class IssueItem implements java.io.Serializable, Stockable {
 		issueObject.put("uuid", this.getId().getIssue().getUuid());
 		
 		issueItemObject.put("issue", issueObject);
+
+		if(this.getIssueItemStatuses() != null){
+
+			List<Map<String,Object>> issueItemStatusesMapList = new ArrayList<>();
+			Map<String,Object> issueItemStatusMap = new HashMap<>();
+			for(IssueItemStatus issueItemStatus : this.getIssueItemStatuses()){
+				issueItemStatusMap.put("status",issueItemStatus.getStatus());
+			}
+			issueItemStatusesMapList.add(issueItemStatusMap);
+			issueItemObject.put("issueItemStatuses",issueItemStatusesMapList);
+		}
 		
 		return issueItemObject;
 	}
