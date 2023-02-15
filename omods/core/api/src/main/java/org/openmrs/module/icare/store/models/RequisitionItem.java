@@ -4,6 +4,7 @@ package org.openmrs.module.icare.store.models;
 
 import org.openmrs.BaseOpenmrsData;
 import org.openmrs.module.icare.core.Item;
+import org.openmrs.module.icare.laboratory.models.TestAllocation;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -51,8 +52,8 @@ public class RequisitionItem extends BaseOpenmrsData implements java.io.Serializ
 	
 	@Column(name = "quantity")
 	private Integer quantity;
-	
-	@Transient
+
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "requisitionItem")
 	private List<RequisitionItemStatus> requisitionItemStatuses = new ArrayList<RequisitionItemStatus>(0);
 	
 	public Integer getQuantity() {

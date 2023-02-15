@@ -114,7 +114,7 @@
 
     <st_requisition_item requisition_id="1" item_id="124" creator="1" voided="0" date_created="2023-11-30 00:00:00" uuid="8800zx3570-8z37-11ff-2234-01102007815" />
 
-    <st_requisition_item_status requisition_id="1" item_id="124" creator="1" voided="0" date_created="2023-11-30 00:00:00" uuid="8800zx3570-8z37-11ff-2234-01102007815" />
+    <st_requisition_item_status requisition_item_status_id ="1" requisition_id="1" item_id="124" status="DRAFT" remarks="DRAFT" creator="1" voided="0" date_created="2023-11-30 00:00:00" uuid="8800zx3570-8z37-11ff-2234-01102007817" />
 
     <st_requisition_status requisition_status_id="1" remarks="ACCEPTED STOCK" status="4" creator="1" date_created="2022-11-30 00:00:00" uuid="8800zx3570-8z37-11ff-2234-01102007825" voided="0" requisition_id="1"/>
 
