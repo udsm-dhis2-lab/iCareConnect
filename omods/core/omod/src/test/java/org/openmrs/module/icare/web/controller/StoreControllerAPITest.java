@@ -876,7 +876,10 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		//updating statuses of requisition items
 		MockHttpServletRequest newGetRequest = newGetRequest("store/request/8800zx3570-8z37-11ff-2234-01102007813");
 		MockHttpServletResponse handleGet = handle(newGetRequest);
-		System.out.println(handleGet.getContentAsString());
+		Map<String,Object> handleGetObject = new ObjectMapper().readValue(handleGet.getContentAsString(),Map.class);
+		//System.out.println(((List)handleGetObject.get("requisitionItems")).get("requisitionItemStatuses"));
+		assertThat("There is a pending requisition item status",(((Map)((List)((Map)((List) handleGetObject.get("requisitionItems")).get(0)).get("requisitionItemStatuses")).get(0)).get("status")).equals("PENDING"));
+
 		
 	}
 }

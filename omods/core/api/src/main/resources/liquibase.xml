@@ -4560,6 +4560,38 @@
         </sql>
     </changeSet>
 
+
+    <changeSet id="add_columns_to_st_requisition_item" author="dennis-kibahila" dbms="mysql">
+        <addColumn tableName="st_requisition_item" >
+            <column name="creator" type="INTEGER"/>
+            <column name="date_created"  type="DATETIME"/>
+            <column name="changed_by" type="INTEGER"/>
+            <column name="date_changed" type="DATETIME"/>
+            <column name="voided" defaultValueBoolean="false" type="BOOLEAN"/>
+            <column name="date_voided" type="DATETIME"/>
+            <column name="voided_by" type="INTEGER"/>
+            <column name="void_reason" type="TEXT"/>
+            <column name="uuid"  type="char(38)" >
+                <constraints nullable="true"  unique="true"></constraints>
+            </column>
+
+        </addColumn>
+        <addForeignKeyConstraint
+                baseColumnNames="changed_by"
+                baseTableName="st_requisition_item"
+                constraintName="st_requisition_item_changed_by_users_user_id_fk"
+                referencedColumnNames="user_id"
+                referencedTableName="users"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="creator"
+                baseTableName="st_requisition_item_status"
+                constraintName="st_requisition_item_creator_users_user_id_fk"
+                referencedColumnNames="user_id"
+                referencedTableName="users"/>
+
+    </changeSet>
+
     <changeSet id="create_st_requisition_item_status" author="dennis-kibahila" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -4621,6 +4653,9 @@
                 referencedColumnNames="requisition_id"/>
     </changeSet>
 
+
+
+
     <changeSet id="update_st_requisition_add_column_code" author="dennis-kibahila" dbms="mysql">
         <sql>
             ALTER TABLE st_requisition
@@ -4628,35 +4663,6 @@
         </sql>
     </changeSet>
 
-    <changeSet id="add_columns_to_st_requisition_item" author="dennis-kibahila" dbms="mysql">
-        <addColumn tableName="st_requisition_item" >
-            <column name="creator" type="INTEGER"/>
-            <column name="date_created"  type="DATETIME"/>
-            <column name="changed_by" type="INTEGER"/>
-            <column name="date_changed" type="DATETIME"/>
-            <column name="voided" defaultValueBoolean="false" type="BOOLEAN"/>
-            <column name="date_voided" type="DATETIME"/>
-            <column name="voided_by" type="INTEGER"/>
-            <column name="void_reason" type="TEXT"/>
-            <column name="uuid"  type="char(38)" >
-                <constraints nullable="true"  unique="true"></constraints>
-            </column>
 
-        </addColumn>
-        <addForeignKeyConstraint
-                baseColumnNames="changed_by"
-                baseTableName="st_requisition_item"
-                constraintName="st_requisition_item_changed_by_users_user_id_fk"
-                referencedColumnNames="user_id"
-                referencedTableName="users"/>
-
-        <addForeignKeyConstraint
-                baseColumnNames="creator"
-                baseTableName="st_requisition_item_status"
-                constraintName="st_requisition_item_creator_users_user_id_fk"
-                referencedColumnNames="user_id"
-                referencedTableName="users"/>
-
-    </changeSet>
 
 </databaseChangeLog>

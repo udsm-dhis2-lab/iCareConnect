@@ -756,14 +756,12 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 				this.saveRequestStatus(requisitionStatus);
 				
 				if (requisitionStatus.getStatus().equals(RequisitionStatus.RequisitionStatusCode.PENDING)) {
-					List<RequisitionItem> requisitionItems = requisitionItemDAO
-					        .getStockRequisitionItemsByRequisition(existingRequisition);
+					List<RequisitionItem> requisitionItems = requisitionItemDAO.getStockRequisitionItemsByRequisition(existingRequisition);
 					for (RequisitionItem requisitionItem : requisitionItems) {
 						RequisitionItemStatus requisitionItemStatus = new RequisitionItemStatus();
 						requisitionItemStatus.setStatus(RequisitionItemStatus.RequisitionItemStatusCode.PENDING.toString());
 						requisitionItemStatus.setRemarks(RequisitionItemStatus.RequisitionItemStatusCode.PENDING.toString());
-						requisitionItemStatus.setItem(requisitionItem.getItem());
-						requisitionItemStatus.setRequisition(existingRequisition);
+						requisitionItemStatus.setRequisitionItem(requisitionItem);
 						this.saveRequisitionItemStatus(requisitionItemStatus);
 					}
 				}
@@ -791,8 +789,8 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 		
 		if (requisitionItem.getRequisitionItemStatuses().size() > 0) {
 			for (RequisitionItemStatus requisitionItemStatus : requisitionItem.getRequisitionItemStatuses()) {
-				requisitionItemStatus.setRequisition(requisitionItem.getRequisition());
-				requisitionItemStatus.setItem(requisitionItem.getItem());
+				//requisitionItemStatus.setRequisition(requisitionItem.getRequisition());
+				//requisitionItemStatus.setItem(requisitionItem.getItem());
 				requisitionItemStatus.setRemarks(requisitionItemStatus.getStatus().toString());
 				this.requisitionItemStatusDAO.save(requisitionItemStatus);
 			}
@@ -830,8 +828,8 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 		if (requisitionItem.getRequisitionItemStatuses().size() > 0) {
 			
 			for (RequisitionItemStatus requisitionItemStatus : requisitionItem.getRequisitionItemStatuses()) {
-				requisitionItemStatus.setRequisition(requisitionItem.getRequisition());
-				requisitionItemStatus.setItem(requisitionItem.getItem());
+				//requisitionItemStatus.setRequisition(requisitionItem.getRequisition());
+				//requisitionItemStatus.setItem(requisitionItem.getItem());
 				requisitionItemStatus.setRemarks(requisitionItemStatus.getStatus().toString());
 				this.requisitionItemStatusDAO.save(requisitionItemStatus);
 			}
