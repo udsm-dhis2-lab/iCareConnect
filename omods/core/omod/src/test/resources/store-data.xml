@@ -79,13 +79,13 @@
     <!-- Ledger Type -->
     <st_ledger_type ledger_type_id="321" uuid="8800zx3570-8z37-11ff-2234-01102007887" operation="+" name="stock in" date_created="2020-12-27 00:00:00" voided="false" creator="1"/>
 
-    <st_stock stock_id="10" item_id="123" batch="batch-xyz" expiry_date="2020-12-08 00:00:00" location_id="200" quantity="100"/>
+    <st_stock stock_id="10" item_id="123" batch="batch-xyz" expiry_date="2040-12-08 00:00:00" location_id="200" quantity="100"/>
 
     <st_stock stock_id="11" item_id="123" batch="batch-xyz1" expiry_date="2020-12-30 00:00:00" location_id="200" quantity="100"/>
 
     <st_stock stock_id="12" item_id="124" batch="batch-xyz3" expiry_date="2020-12-30 00:00:00" location_id="200" quantity="100"/>
 
-    <st_stock stock_id="13" item_id="123" batch="batch-xyz4" expiry_date="2022-11-30 00:00:00" location_id="200" quantity="10"/>
+    <st_stock stock_id="13" item_id="123" batch="batch-xyz4" expiry_date="2040-11-30 00:00:00" location_id="200" quantity="10"/>
 
     <st_stock stock_id="15" item_id="123" batch="batch-xyz6" expiry_date="2022-11-30 00:00:00" location_id="200" quantity="11"/>
 
